@@ -1,10 +1,6 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef stdafxH
-#define stdafxH
-
 #pragma once
+
+#include "Common/Common.hpp"
 
 #pragma warn - pck
 
@@ -26,11 +22,11 @@
 #include <fastmath.h>
 #include <io.h>
 #include <fcntl.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <process.h>
 #include <utime.h>
 
-// iseful macros
+// useful macros
 // MSC names for functions
 #ifdef _eof
 #undef _eof
@@ -57,7 +53,7 @@ __inline float modff(float a, float* b)
     return float(y);
 }
 __inline float expf(float val) { return ::exp(val); }
-#include "xrCore/Platform.h"
+#include "Common/Platform.hpp"
 #ifdef _ECOREB
 #define ECORE_API XR_IMPORT
 #define ENGINE_API XR_EXPORT
@@ -88,7 +84,7 @@ DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 
 #include "xrCDB/xrCDB.h"
 #include "xrSound/Sound.h"
-#include "PSystem.h"
+#include "xrParticles/psystem.h"
 
 // DirectX headers
 #include <d3d9.h>
@@ -166,9 +162,6 @@ DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
 #define _omotions_ "$omotions$"
 #define _smotion_ "$smotion$"
 #define _detail_objects_ "$detail_objects$"
-#endif
 
 #define TEX_POINT_ATT "internal\\internal_light_attpoint"
 #define TEX_SPOT_ATT "internal\\internal_light_attclip"
-
-#pragma hdrstop

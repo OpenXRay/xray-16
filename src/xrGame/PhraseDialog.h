@@ -29,7 +29,7 @@ struct SPhraseDialogData : CSharedResource
     int m_iPriority;
 };
 
-DEFINE_VECTOR(CPhrase*, PHRASE_VECTOR, PHRASE_VECTOR_IT);
+using PHRASE_VECTOR = xr_vector<CPhrase*>;
 
 class CPhraseDialog;
 class CPhraseDialogManager;
@@ -38,7 +38,6 @@ class CPhraseDialog : public CSharedClass<SPhraseDialogData, shared_str, false>,
                       public CXML_IdToIndex<CPhraseDialog>,
                       public intrusive_base
 {
-private:
     typedef CSharedClass<SPhraseDialogData, shared_str, false> inherited_shared;
     typedef CXML_IdToIndex<CPhraseDialog> id_to_index;
 
@@ -133,7 +132,7 @@ protected:
     virtual void load_shared(LPCSTR);
 
     //рекурсивное добавление фраз в граф
-    void AddPhrase(CUIXml* pXml, XML_NODE* phrase_node, const shared_str& phrase_id, const shared_str& prev_phrase_id);
+    void AddPhrase(CUIXml* pXml, XML_NODE phrase_node, const shared_str& phrase_id, const shared_str& prev_phrase_id);
 
 public:
     CPhrase* AddPhrase(LPCSTR text, const shared_str& phrase_id, const shared_str& prev_phrase_id, int goodwil_level);

@@ -14,6 +14,7 @@ Ernie Wright  17 Sep 00
 #include <math.h>
 #include "lwo2.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4996)
 
 /* IDs specific to LWOB */
@@ -79,7 +80,7 @@ static int add_clip(char* s, lwClip** clist, int* nclips)
         clip->source.still.name = s;
     }
 
-    *nclips++;
+    (*nclips)++;
     clip->index = *nclips;
 
     lwListAdd(clist, clip);
@@ -692,4 +693,4 @@ Fail:
     return NULL;
 }
 
-#pragma warning(default : 4996)
+#pragma warning(pop)

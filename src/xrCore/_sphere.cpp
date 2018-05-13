@@ -1,5 +1,7 @@
 #include "stdafx.h"
-#pragma hdrstop
+#pragma hdrstop // Huh? Surely this _source_ file isn't part of PCH creation?!
+#include "_sphere.h"
+#include "xrCommon/xr_list.h"
 
 class Miniball;
 class Basis;

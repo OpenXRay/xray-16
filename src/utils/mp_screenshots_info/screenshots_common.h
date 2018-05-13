@@ -1,6 +1,8 @@
 #ifndef SCREENSHOTS_COMMON_INCLUDED
 #define SCREENSHOTS_COMMON_INCLUDED
 
+#include "xrCore/Crypto/xr_dsa.h"
+
 namespace screenshots
 {
 extern u8 const p_number[crypto::xr_dsa::public_key_length];

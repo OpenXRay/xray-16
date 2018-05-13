@@ -5,21 +5,23 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment suns manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED
-#define EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
 class CLensFlareDescriptor;
 
+namespace XRay
+{
+namespace Editor
+{
+class property_holder_base;
+}
+}
+
 namespace editor
 {
-class property_holder;
-
 namespace environment
 {
 class manager;
@@ -35,7 +37,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(editor::property_holder* holder);
+    void fill(XRay::Editor::property_holder_base* holder);
     shared_str unique_id(shared_str const& id) const;
     CLensFlareDescriptor* get_flare(shared_str const& id) const;
 
@@ -44,7 +46,7 @@ private:
 
 public:
     typedef xr_vector<sun*> container_type;
-    typedef xr_vector<LPSTR> suns_ids_type;
+    typedef xr_vector<pstr> suns_ids_type;
 
 public:
     suns_ids_type const& suns_ids() const;
@@ -66,6 +68,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED

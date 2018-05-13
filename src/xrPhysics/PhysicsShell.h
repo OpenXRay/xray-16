@@ -1,14 +1,18 @@
+#pragma once
 #ifndef PhysicsShellH
 #define PhysicsShellH
-#pragma once
 
 #include "PHDefs.h"
 #include "PhysicsCommon.h"
 #include "icollidevalidator.h"
 #include "xrServerEntities/alife_space.h"
+#include "xrCore/_flags.h"
+#include "xrCore/xr_vector_defs.h"
 
 #include "xrEngine/iphysicsshell.h"
 #include "iphysics_scripted.h"
+
+// fwd. decl.
 class CPhysicsJoint;
 class CPhysicsElement;
 class CPhysicsShell;
@@ -23,10 +27,15 @@ struct SBoneShape;
 struct NearestToPointCallback;
 class CPHShellSplitterHolder;
 class IKinematics;
+class shared_str;
 typedef u32 CLClassBits;
 typedef u32 CLBits;
-
 struct dMass;
+struct SAllDDOParams;
+template <class T> class _cylinder; typedef _cylinder<float> Fcylinder;
+template <class T> struct _sphere; typedef _sphere<float> Fsphere;
+template <class T> struct _obb; typedef _obb<float> Fobb;
+template <class T> struct _quaternion;  typedef _quaternion<float> Fquaternion;
 
 enum motion_history_state
 {
@@ -45,8 +54,8 @@ struct physicsBone
         element = NULL;
     }
 };
-DEFINE_MAP(u16, physicsBone, BONE_P_MAP, BONE_P_PAIR_IT);
-typedef const BONE_P_MAP::iterator BONE_P_PAIR_CIT;
+using BONE_P_MAP = xr_map<u16, physicsBone>;
+using BONE_P_PAIR_CIT = const BONE_P_MAP::iterator;
 // ABSTRACT:
 class CPhysicsBase;
 extern XRPHYSICS_API void get_box(const CPhysicsBase* shell, const Fmatrix& form, Fvector& sz, Fvector& c);

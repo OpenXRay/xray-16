@@ -1,7 +1,9 @@
 #include "stdafx.h"
-#pragma hdrstop
+#pragma hdrstop // Huh?
 
 #include "xrstring.h"
+#include "Threading/Lock.hpp"
+#include "xrCore/_std_extensions.h"
 
 #include "FS_impl.h"
 
@@ -11,6 +13,7 @@ XRCORE_API str_container* g_pStringContainer = NULL;
 
 struct str_container_impl
 {
+    Lock cs;
     static const u32 buffer_size = 1024 * 256;
     str_value* buffer[buffer_size];
     int num_docs;
@@ -78,7 +81,7 @@ struct str_container_impl
                 u32 crc = crc32(value->value, value->dwLength);
                 string32 crc_str;
                 R_ASSERT3(crc == value->dwCRC, "CorePanic: read-only memory corruption (shared_strings)",
-                    itoa(value->dwCRC, crc_str, 16));
+                    xr_itoa(value->dwCRC, crc_str, 16));
                 R_ASSERT3(value->dwLength == xr_strlen(value->value),
                     "CorePanic: read-only memory corruption (shared_strings, internal structures)", value->value);
                 value = value->next;
@@ -135,17 +138,19 @@ struct str_container_impl
     }
 };
 
-str_container::str_container() { impl = new str_container_impl(); }
-str_value* str_container::dock(str_c value)
+str_container::str_container() :
+    impl(new str_container_impl())
+#ifdef CONFIG_PROFILE_LOCKS
+    , cs(MUTEX_PROFILE_ID(str_container))
+#endif
+{}
+
+str_value* str_container::dock(pcstr value)
 {
     if (0 == value)
         return 0;
 
-    cs.Enter();
-
-#ifdef DEBUG_MEMORY_MANAGER
-    Memory.stat_strdock++;
-#endif // DEBUG_MEMORY_MANAGER
+    impl->cs.Enter();
 
     str_value* result = 0;
 
@@ -175,12 +180,7 @@ str_value* str_container::dock(str_c value)
 #endif // DEBUG
         )
     {
-        result = (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero
-#ifdef DEBUG_MEMORY_NAME
-            ,
-            "storage: sstring"
-#endif // DEBUG_MEMORY_NAME
-            );
+        result = (str_value*)xr_malloc(sizeof(str_value) + s_len_with_zero);
 
 #ifdef DEBUG
         static int num_leaked_string = 0;
@@ -198,48 +198,48 @@ str_value* str_container::dock(str_c value)
 
         impl->insert(result);
     }
-    cs.Leave();
+    impl->cs.Leave();
 
     return result;
 }
 
 void str_container::clean()
 {
-    cs.Enter();
+    impl->cs.Enter();
     impl->clean();
-    cs.Leave();
+    impl->cs.Leave();
 }
 
 void str_container::verify()
 {
-    cs.Enter();
+    impl->cs.Enter();
     impl->verify();
-    cs.Leave();
+    impl->cs.Leave();
 }
 
 void str_container::dump()
 {
-    cs.Enter();
+    impl->cs.Enter();
     FILE* F = fopen("d:\\$str_dump$.txt", "w");
     impl->dump(F);
     fclose(F);
-    cs.Leave();
+    impl->cs.Leave();
 }
 
 void str_container::dump(IWriter* W)
 {
-    cs.Enter();
+    impl->cs.Enter();
     impl->dump(W);
-    cs.Leave();
+    impl->cs.Leave();
 }
 
 u32 str_container::stat_economy()
 {
-    cs.Enter();
+    impl->cs.Enter();
     int counter = 0;
     counter -= sizeof(*this);
     counter += impl->stat_economy();
-    cs.Leave();
+    impl->cs.Leave();
     return u32(counter);
 }
 
@@ -250,7 +250,7 @@ str_container::~str_container()
     xr_delete(impl);
 }
 
-#else
+#else // 0/1
 
 struct str_container_impl
 {
@@ -260,13 +260,19 @@ struct str_container_impl
     cdb container;
 };
 
-str_container::str_container() { impl = new str_container_impl(); }
+str_container::str_container() :
+    impl(new str_container_impl())
+#ifdef CONFIG_PROFILE_LOCKS
+    , cs(MUTEX_PROFILE_ID(str_container))
+#endif
+{}
+
 str_value* str_container::dock(str_c value)
 {
     if (0 == value)
         return 0;
 
-    cs.Enter();
+    impl->cs.Enter();
 
 // ++impl->num_docs;
 // if ( impl->num_docs == 10000000 )
@@ -278,10 +284,6 @@ str_value* str_container::dock(str_c value)
 // //#ifdef FIND_CHUNK_BENCHMARK_ENABLE
 // find_chunk_auto_timer timer;
 // //#endif // FIND_CHUNK_BENCHMARK_ENABLE
-
-#ifdef DEBUG_MEMORY_MANAGER
-    Memory.stat_strdock++;
-#endif // DEBUG_MEMORY_MANAGER
 
     str_value* result = 0;
 
@@ -322,9 +324,8 @@ str_value* str_container::dock(str_c value)
     if (0 == result || is_leaked_string)
     {
         // Insert string
-        // DUMP_PHASE;
 
-        result = (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero
+        result = (str_value*)xr_malloc(sizeof(str_value) + s_len_with_zero
 #ifdef DEBUG_MEMORY_NAME
             ,
             "storage: sstring"
@@ -339,8 +340,6 @@ str_value* str_container::dock(str_c value)
             Msg("leaked_string: %d 0x%08x", num11, result);
         }
 
-        // DUMP_PHASE;
-
         result->dwReference = 0;
         result->dwLength = sv->dwLength;
         result->dwCRC = sv->dwCRC;
@@ -351,14 +350,14 @@ str_value* str_container::dock(str_c value)
         impl->container.insert(result);
     }
 
-    cs.Leave();
+    impl->cs.Leave();
 
     return result;
 }
 
 void str_container::clean()
 {
-    cs.Enter();
+    impl->cs.Enter();
     str_container_impl::cdb::iterator it = impl->container.begin();
     str_container_impl::cdb::iterator end = impl->container.end();
     for (; it != end;)
@@ -379,12 +378,12 @@ void str_container::clean()
     }
     if (impl->container.empty())
         impl->container.clear();
-    cs.Leave();
+    impl->cs.Leave();
 }
 
 void str_container::verify()
 {
-    cs.Enter();
+    impl->cs.Enter();
     str_container_impl::cdb::iterator it = impl->container.begin();
     str_container_impl::cdb::iterator end = impl->container.end();
     for (; it != end; ++it)
@@ -392,17 +391,17 @@ void str_container::verify()
         str_value* sv = *it;
         u32 crc = crc32(sv->value, sv->dwLength);
         string32 crc_str;
-        R_ASSERT3(
-            crc == sv->dwCRC, "CorePanic: read-only memory corruption (shared_strings)", itoa(sv->dwCRC, crc_str, 16));
+        R_ASSERT3(crc == sv->dwCRC,
+            "CorePanic: read-only memory corruption (shared_strings)", xr_itoa(sv->dwCRC, crc_str, 16));
         R_ASSERT3(sv->dwLength == xr_strlen(sv->value),
             "CorePanic: read-only memory corruption (shared_strings, internal structures)", sv->value);
     }
-    cs.Leave();
+    impl->cs.Leave();
 }
 
 void str_container::dump()
 {
-    cs.Enter();
+    impl->cs.Enter();
     str_container_impl::cdb::iterator it = impl->container.begin();
     str_container_impl::cdb::iterator end = impl->container.end();
     FILE* F = fopen("d:\\$str_dump$.txt", "w");
@@ -410,12 +409,12 @@ void str_container::dump()
         fprintf(
             F, "ref[%4d]-len[%3d]-crc[%8X] : %s\n", (*it)->dwReference, (*it)->dwLength, (*it)->dwCRC, (*it)->value);
     fclose(F);
-    cs.Leave();
+    impl->cs.Leave();
 }
 
 u32 str_container::stat_economy()
 {
-    cs.Enter();
+    impl->cs.Enter();
     str_container_impl::cdb::iterator it = impl->container.begin();
     str_container_impl::cdb::iterator end = impl->container.end();
     int counter = 0;
@@ -428,7 +427,7 @@ u32 str_container::stat_economy()
         counter -= node_size;
         counter += int((int((*it)->dwReference) - 1) * int((*it)->dwLength + 1));
     }
-    cs.Leave();
+    impl->cs.Leave();
 
     return u32(counter);
 }
@@ -440,4 +439,5 @@ str_container::~str_container()
     xr_delete(impl);
     // R_ASSERT(impl->container.empty());
 }
-#endif
+
+#endif // 0/1

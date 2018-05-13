@@ -15,12 +15,6 @@ class ENGINE_API CLAItem;
 #include "Include/xrRender/ThunderboltDescRender.h"
 #include "Include/xrRender/ThunderboltRender.h"
 
-#ifdef INGAME_EDITOR
-#define INGAME_EDITOR_VIRTUAL virtual
-#else // #ifdef INGAME_EDITOR
-#define INGAME_EDITOR_VIRTUAL
-#endif // #ifdef INGAME_EDITOR
-
 class CEnvironment;
 
 struct SThunderboltDesc
@@ -52,21 +46,18 @@ struct SThunderboltDesc
 
 public:
     SThunderboltDesc();
-    INGAME_EDITOR_VIRTUAL ~SThunderboltDesc();
+    virtual ~SThunderboltDesc();
     void load(CInifile& pIni, shared_str const& sect);
-    INGAME_EDITOR_VIRTUAL void create_top_gradient(CInifile& pIni, shared_str const& sect);
-    INGAME_EDITOR_VIRTUAL void create_center_gradient(CInifile& pIni, shared_str const& sect);
+    virtual void create_top_gradient(CInifile& pIni, shared_str const& sect);
+    virtual void create_center_gradient(CInifile& pIni, shared_str const& sect);
 };
-
-#undef INGAME_EDITOR_VIRTUAL
 
 struct SThunderboltCollection
 {
-    DEFINE_VECTOR(SThunderboltDesc*, DescVec, DescIt);
+    using DescVec = xr_vector<SThunderboltDesc*>;
     DescVec palette;
     shared_str section;
 
-public:
     SThunderboltCollection();
     ~SThunderboltCollection();
     void load(CInifile* pIni, CInifile* thunderbolts, LPCSTR sect);
@@ -84,7 +75,7 @@ class ENGINE_API CEffect_Thunderbolt
     friend class dxThunderboltRender;
 
 protected:
-    DEFINE_VECTOR(SThunderboltCollection*, CollectionVec, CollectionVecIt);
+    using CollectionVec = xr_vector<SThunderboltCollection*>;
     CollectionVec collection;
     SThunderboltDesc* current;
 
@@ -122,8 +113,8 @@ private:
     // float p_sky_color;
     // float p_sun_color;
     // float p_fog_color;
-private:
-    BOOL RayPick(const Fvector& s, const Fvector& d, float& range);
+
+    static bool RayPick(const Fvector& s, const Fvector& d, float& range);
     void Bolt(shared_str id, float period, float life_time);
 
 public:

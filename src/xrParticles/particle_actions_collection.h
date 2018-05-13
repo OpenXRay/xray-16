@@ -1,9 +1,8 @@
-//---------------------------------------------------------------------------
-#ifndef particle_actions_collectionH
-#define particle_actions_collectionH
+#pragma once
 
 #include "particle_actions.h"
 #include "particle_core.h"
+
 namespace PAPI
 {
 #define _METHODS                                                            \
@@ -36,7 +35,7 @@ struct PARTICLES_API PABounce : public ParticleAction
 
 struct PARTICLES_API PACopyVertexB : public ParticleAction
 {
-    BOOL copy_pos; // True to copy pos to posB.
+    bool copy_pos; // True to copy pos to posB.
 
     _METHODS;
 };
@@ -105,7 +104,7 @@ struct PARTICLES_API PAJet : public ParticleAction
 struct PARTICLES_API PAKillOld : public ParticleAction
 {
     float age_limit; // Exact age at which to kill particles.
-    BOOL kill_less_than; // True to kill particles less than limit.
+    bool kill_less_than; // True to kill particles less than limit.
 
     _METHODS;
 };
@@ -190,7 +189,7 @@ struct PARTICLES_API PAScatter : public ParticleAction
 
 struct PARTICLES_API PASink : public ParticleAction
 {
-    BOOL kill_inside; // True to dispose of particles *inside* domain
+    bool kill_inside; // True to dispose of particles *inside* domain
     pDomain positionL; // Disposal region (in local space)
     pDomain position; // Disposal region
 
@@ -199,7 +198,7 @@ struct PARTICLES_API PASink : public ParticleAction
 
 struct PARTICLES_API PASinkVelocity : public ParticleAction
 {
-    BOOL kill_inside; // True to dispose of particles with vel *inside* domain
+    bool kill_inside; // True to dispose of particles with vel *inside* domain
     pDomain velocityL; // Disposal region (in local space)
     pDomain velocity; // Disposal region
 
@@ -223,6 +222,7 @@ struct PARTICLES_API PASource : public ParticleAction
         flVertexB_tracks = (1ul << 31ul), // True to get positionB from position.
         fl_FORCEDWORD = u32(-1)
     };
+
     pDomain positionL; // Choose a position in this domain. (local_space)
     pDomain velocityL; // Choose a velocity in this domain. (local_space)
     pDomain position; // Choose a position in this domain.
@@ -301,7 +301,4 @@ struct PARTICLES_API PATurbulence : public ParticleAction
 
     _METHODS;
 };
-};
-
-//---------------------------------------------------------------------------
-#endif
+} // namespace PAPI

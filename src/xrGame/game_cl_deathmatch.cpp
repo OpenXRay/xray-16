@@ -89,7 +89,7 @@ void game_cl_Deathmatch::SetGameUI(CUIGameCustom* uigame)
 
 CUIGameCustom* game_cl_Deathmatch::createGameUI()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return NULL;
 
     CLASS_ID clsid = CLSID_GAME_UI_DEATHMATCH;
@@ -302,7 +302,7 @@ BOOL game_cl_Deathmatch::CanCallInventoryMenu()
 
 void game_cl_Deathmatch::SetCurrentBuyMenu()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if (!pCurBuyMenu)
@@ -384,7 +384,7 @@ void game_cl_Deathmatch::OnSpectatorSelect()
     inherited::OnSpectatorSelect();
 };
 
-char* game_cl_Deathmatch::getTeamSection(int Team) { return "deathmatch_team0"; };
+pcstr game_cl_Deathmatch::getTeamSection(int Team) { return "deathmatch_team0"; };
 void game_cl_Deathmatch::Check_Invincible_Players(){};
 
 void game_cl_Deathmatch::ConvertTime2String(string64* str, u32 Time)
@@ -433,7 +433,7 @@ void game_cl_Deathmatch::OnConnected()
     inherited::OnConnected();
     if (m_game_ui)
     {
-        VERIFY(!g_dedicated_server);
+        VERIFY(!GEnv.isDedicatedServer);
         m_game_ui = smart_cast<CUIGameDM*>(CurrentGameUI());
         m_game_ui->SetClGame(this);
     }
@@ -445,7 +445,7 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
 
     inherited::shedule_Update(dt);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     // fake
@@ -535,7 +535,7 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                                 PlaySndMessage(ID_COUNTDOWN_1 + dwCurTimeRemains - 1);
                         }
                         dwLastTimeRemains = dwCurTimeRemains;
-                        _itoa(dwCurTimeRemains, S, 10);
+                        xr_itoa(dwCurTimeRemains, S, 10);
                         strconcat(sizeof(tmpStr), tmpStr, *st.translate("mp_ready"), "...", S);
                     }
                 };
@@ -1133,7 +1133,7 @@ void game_cl_Deathmatch::OnTeamChanged()
     ChangeItemsCosts(pCurBuyMenu);
 };
 
-void game_cl_Deathmatch::LoadPlayerDefItems(char* TeamName, IBuyWnd* pBuyMenu)
+void game_cl_Deathmatch::LoadPlayerDefItems(pcstr TeamName, IBuyWnd* pBuyMenu)
 {
     if (!local_player)
         return;

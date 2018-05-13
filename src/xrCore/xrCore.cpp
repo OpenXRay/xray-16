@@ -6,43 +6,34 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #include "xrCore.h"
-#include "Threading/ttapi.h"
+#include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
+#include "xrCore/_std_extensions.h"
 
 #pragma comment(lib, "winmm.lib")
 
-#ifdef DEBUG
-#include <malloc.h>
-#endif // DEBUG
-
 XRCORE_API xrCore Core;
-
-namespace CPU
-{
-extern void Detect();
-};
 
 static u32 init_counter = 0;
 
-//. extern xr_vector<shared_str>* LogFile;
-
-void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, LPCSTR fs_fname, bool plugin)
+void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
     {
+        CalculateBuildId();
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
         Params = xr_strdup(GetCommandLine());
-        if (!strstr(Params, "-editor"))
-            CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (!strstr(Params, "-weather"))
+            CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
         string_path fn, dr, di;
 
         // application path
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
-        _splitpath(fn, dr, di, 0, 0);
+        _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 
 #ifdef _EDITOR
@@ -64,33 +55,29 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
 
-        // Mathematics & PSI detection
-        CPU::Detect();
+        Memory._initialize();
 
-        Memory._initialize(strstr(Params, "-mem_debug") ? TRUE : FALSE);
-
-        DUMP_PHASE;
-
-        InitLog();
+        Msg("%s %s build %d, %s\n", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
+        Msg("command line %s\n", Params);
         _initialize_cpu();
-        R_ASSERT(CPU::ID.feature & _CPU_FEATURE_SSE);
-        ttapi_Init(CPU::ID);
+        R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
+        ttapi.initialize();
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
         rtc_initialize();
 
-        xr_FS = new CLocatorAPI();
+        xr_FS = std::make_unique<CLocatorAPI>();
 
-        xr_EFS = new EFS_Utils();
+        xr_EFS = std::make_unique<EFS_Utils>();
         //. R_ASSERT (co_res==S_OK);
     }
     if (init_fs)
     {
-        u32 flags = 0;
-        if (0 != strstr(Params, "-build"))
+        u32 flags = 0u;
+        if (strstr(Params, "-build") != nullptr)
             flags |= CLocatorAPI::flBuildCopy;
-        if (0 != strstr(Params, "-ebuild"))
+        if (strstr(Params, "-ebuild") != nullptr)
             flags |= CLocatorAPI::flBuildCopy | CLocatorAPI::flEBuildCopy;
 #ifdef DEBUG
         if (strstr(Params, "-cache"))
@@ -105,13 +92,11 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
-        if (0 != strstr(Params, "-file_activity"))
+        if (strstr(Params, "-file_activity") != nullptr)
             flags |= CLocatorAPI::flDumpFileActivity;
 #endif
 #endif
-        FS._initialize(flags, 0, fs_fname);
-        CalculateBuildId();
-        Msg("'%s' build %d, %s\n", "xrCore", buildId, buildDate);
+        FS._initialize(flags, nullptr, fs_fname);
         EFS._initialize();
 #ifdef DEBUG
 #ifndef _EDITOR
@@ -132,11 +117,11 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
-        ttapi_Done();
+        ttapi.destroy();
         FS._destroy();
         EFS._destroy();
-        xr_delete(xr_FS);
-        xr_delete(xr_EFS);
+        xr_FS.reset();
+        xr_EFS.reset();
 
 #ifndef _EDITOR
         if (trained_model)
@@ -149,6 +134,29 @@ void xrCore::_destroy()
         xr_free(Params);
         Memory._destroy();
     }
+}
+
+constexpr pcstr xrCore::GetBuildConfiguration()
+{
+#ifdef NDEBUG
+#ifdef XR_X64
+    return "Rx64";
+#else
+    return "Rx86";
+#endif
+#elif defined(MIXED)
+#ifdef XR_X64
+    return "Mx64";
+#else
+    return "Mx86";
+#endif
+#else
+#ifdef XR_X64
+    return "Dx64";
+#else
+    return "Dx86";
+#endif
+#endif
 }
 
 void xrCore::CalculateBuildId()
@@ -168,7 +176,7 @@ void xrCore::CalculateBuildId()
     sscanf(buffer, "%s %d %d", month, &days, &years);
     for (int i = 0; i < 12; i++)
     {
-        if (_stricmp(monthId[i], month))
+        if (xr_stricmp(monthId[i], month))
             continue;
         months = i;
         break;
@@ -180,7 +188,6 @@ void xrCore::CalculateBuildId()
         buildId -= daysInMonth[i];
 }
 
-//. why ???
 #ifdef _EDITOR
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #else
@@ -189,27 +196,23 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
 {
     switch (ul_reason_for_call)
     {
-    case DLL_PROCESS_ATTACH:
-    {
-        _clear87();
-        _control87(_PC_53, MCW_PC);
-        _control87(_RC_CHOP, MCW_RC);
-        _control87(_RC_NEAR, MCW_RC);
-        _control87(_MCW_EM, MCW_EM);
-    }
-    //. LogFile.reserve (256);
-    break;
-    case DLL_THREAD_ATTACH:
-        if (!strstr(GetCommandLine(), "-editor"))
-            CoInitializeEx(NULL, COINIT_MULTITHREADED);
-        timeBeginPeriod(1);
-        break;
-    case DLL_THREAD_DETACH: break;
-    case DLL_PROCESS_DETACH:
-#ifdef USE_MEMORY_MONITOR
-        memory_monitor::flush_each_time(true);
-#endif // USE_MEMORY_MONITOR
-        break;
+    /*
+    По сути это не рекомендуемый Microsoft, но повсеместно используемый способ повышения точности
+    соблюдения и измерения временных интревалов функциями Sleep, QueryPerformanceCounter,
+    timeGetTime и GetTickCount.
+    Функция действует на всю операционную систему в целом (!) и нет необходимости вызывать её при
+    старте нового потока. Вызов timeEndPeriod специалисты Microsoft считают обязательным.
+    Есть подозрения, что Windows сама устанавливает максимальную точность при старте таких
+    приложений как, например, игры. Тогда есть шанс, что вызов timeBeginPeriod здесь бессмысленен.
+    Недостатком данного способа является то, что он приводит к общему замедлению работы как
+    текущего приложения, так и всей операционной системы.
+    Ещё можно посмотреть ссылки:
+        https://msdn.microsoft.com/en-us/library/vs/alm/dd757624(v=vs.85).aspx
+        https://users.livejournal.com/-winnie/151099.html
+        https://github.com/tebjan/TimerTool
+    */
+    case DLL_PROCESS_ATTACH: timeBeginPeriod(1); break;
+    case DLL_PROCESS_DETACH: timeEndPeriod  (1); break;
     }
     return TRUE;
 }

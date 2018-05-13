@@ -5,71 +5,47 @@
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <AssemblyName>xrPostprocessEditor</AssemblyName>
+    <RootNamespace>xrPostprocessEditor</RootNamespace>
     <ProjectGuid>{CB449DB5-9C97-447A-AA25-35EA7712F62C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
+    <OutputPath>$(xrBinDir)</OutputPath>
+    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)</IntermediateOutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>xrPostprocessEditor</RootNamespace>
-    <AssemblyName>xrPostprocessEditor</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup>
-    <NoWin32Manifest>true</NoWin32Manifest>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>$(xrBinDir)</OutputPath>
-    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)</IntermediateOutputPath>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>$(xrBinDir)</OutputPath>
-    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)</IntermediateOutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)' == 'Mixed'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(xrPlatform)' == 'Win32'">
     <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mixed|Win32'">
-    <OutputPath>bin\Win32\Mixed\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mixed|x86'">
-    <OutputPath>bin\x86\Mixed\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mixed|x64'">
-    <OutputPath>bin\x64\Mixed\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  <PropertyGroup Condition="'$(xrPlatform)' == 'Win64'">
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Flobbster.Windows.Forms.PropertyGrid, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Flobbster.Windows.Forms.PropertyGrid">
+      <HintPath>$(xrSdkDir)binaries\Flobbster.Windows.Forms.PropertyGrid.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="xrSdkControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dialogs\MainDialog.cs">
@@ -117,7 +93,10 @@
     <ProjectReference Include="..\xrManagedApi\xrManagedApi.vcxproj">
       <Project>{55b0e2ca-e27a-47fc-bc92-21abdc1044f5}</Project>
       <Name>xrManagedApi</Name>
-      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\xrSdkControls\xrSdkControls.csproj">
+      <Project>{e9dc16a3-d0fa-4924-af6e-f6fdf3ea0661}</Project>
+      <Name>xrSdkControls</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

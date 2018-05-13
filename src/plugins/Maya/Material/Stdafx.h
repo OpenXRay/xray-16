@@ -1,15 +1,8 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef __INCDEF_STDAFX_H_
-#define __INCDEF_STDAFX_H_
-
 #pragma once
 
-#define _WIN32_WINNT 0x0500
+#include "Common/Common.hpp"
+
 #include "xrCore/xrCore.h"
-#pragma comment(lib, "xrCore.lib")
-#include <assert.h>
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -100,7 +93,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 #pragma warning(pop)
 
 #define AnsiString std::string
-DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
+using AStringVec = xr_vector<std::string>;
 
 #define THROW R_ASSERT(0)
 
@@ -114,5 +107,3 @@ DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 
 #define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
-
-#endif /*_INCDEF_STDAFX_H_*/

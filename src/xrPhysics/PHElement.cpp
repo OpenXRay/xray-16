@@ -11,7 +11,7 @@
 
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
-#include "Externals/ode/ode/src/util.h"
+#include "ode/ode/src/util.h"
 
 #ifdef DEBUG
 #include "debug_output.h"
@@ -19,11 +19,11 @@
 #endif // DEBUG
 
 ///////////////////////////////////////////////////////////////
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
-#include "Externals/ode/ode/src/collision_kernel.h"
-#pragma warning(default : 4267)
-#pragma warning(default : 4995)
+#include "ode/ode/src/collision_kernel.h"
+#pragma warning(pop)
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"
@@ -151,6 +151,7 @@ void CPHElement::set_local_mass_center(const Fvector& mc)
 }
 dMass CPHElement::recursive_mass_summ(u16 start_geom, FRACTURE_I cur_fracture)
 {
+    // XXX: Review
     dMass end_mass;
     dMassSetZero(&end_mass);
     GEOM_I i_geom = m_geoms.begin() + start_geom, e = m_geoms.begin() + cur_fracture->m_start_geom_num;
@@ -1196,12 +1197,12 @@ void CPHElement::add_Mass(
         l.sub(pos, mass_center);
         dMassSetCylinder(&m, 1.f, 2, shape.cylinder.m_radius, shape.cylinder.m_height);
         dMassAdjust(&m, mass);
-        dMatrix3 DMatx;
+        dMatrix3 DMatx2;
         Fmatrix33 m33;
         m33.j.set(shape.cylinder.m_direction);
         Fvector::generate_orthonormal_basis(m33.j, m33.k, m33.i);
-        PHDynamicData::FMX33toDMX(m33, DMatx);
-        dMassRotate(&m, DMatx);
+        PHDynamicData::FMX33toDMX(m33, DMatx2);
+        dMassRotate(&m, DMatx2);
         dMassTranslate(&m, l.x, l.y, l.z);
         break;
     }

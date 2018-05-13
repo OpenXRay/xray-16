@@ -10,11 +10,10 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 #include "string_table.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "debug_renderer.h"
 #include "xrGameSpyServer.h"
-
-ENGINE_API bool g_dedicated_server;
 
 #define MAPROT_LIST_NAME "maprot_list.ltx"
 string_path MAPROT_LIST = "";
@@ -25,7 +24,7 @@ u32 g_sv_base_dwRPointFreezeTime = 0;
 int g_sv_base_iVotingEnabled = 0x00ff;
 //-----------------------------------------------------------------
 
-xr_token round_end_result_str[] = {{"Finish", eRoundEnd_Finish}, {"Game restarted", eRoundEnd_GameRestarted},
+extern const xr_token round_end_result_str[] = {{"Finish", eRoundEnd_Finish}, {"Game restarted", eRoundEnd_GameRestarted},
     {"Game restarted fast", eRoundEnd_GameRestartedFast}, {"Time limit", eRoundEnd_TimeLimit},
     {"Frag limit", eRoundEnd_FragLimit}, {"Artefact limit", eRoundEnd_ArtrefactLimit}, {"Unknown", eRoundEnd_Force},
     {0, 0}};
@@ -290,7 +289,7 @@ void game_sv_GameState::net_Export_State(NET_Packet& P, ClientID to)
     P.w_u8(u8(g_bCollectStatisticData));
 
     // Players
-    //	u32	p_count			= get_players_count() - ((g_dedicated_server)? 1 : 0);
+    //	u32	p_count			= get_players_count() - ((GEnv.isDedicatedServer)? 1 : 0);
 
     xrClientData* tmp_client = static_cast<xrClientData*>(m_server->GetClientByID(to));
     game_PlayerState* tmp_ps = tmp_client->ps;
@@ -414,10 +413,10 @@ void game_sv_GameState::Create(shared_str& options)
         FS.r_close(F);
     }
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         // loading scripts
-        auto& scriptEngine = ai().script_engine();
+        auto& scriptEngine = *GEnv.ScriptEngine;
         scriptEngine.remove_script_process(ScriptProcessor::Game);
         string_path S;
         FS.update_path(S, "$game_config$", "script.ltx");
@@ -616,11 +615,11 @@ void game_sv_GameState::Update()
         m_item_respawner.update(Level().timeServer());
     }
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         if (Level().game)
         {
-            CScriptProcess* script_process = ai().script_engine().script_process(ScriptProcessor::Game);
+            CScriptProcess* script_process = GEnv.ScriptEngine->script_process(ScriptProcessor::Game);
             if (script_process)
                 script_process->update();
         }
@@ -646,8 +645,8 @@ game_sv_GameState::game_sv_GameState()
 
 game_sv_GameState::~game_sv_GameState()
 {
-    if (!g_dedicated_server)
-        ai().script_engine().remove_script_process(ScriptProcessor::Game);
+    if (!GEnv.isDedicatedServer)
+        GEnv.ScriptEngine->remove_script_process(ScriptProcessor::Game);
     xr_delete(m_event_queue);
 
     SaveMapList();
@@ -759,7 +758,7 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
         if (Level().IsDemoPlay())
             break;
 
-        if (g_dedicated_server && (CL == m_server->GetServerClient()))
+        if (GEnv.isDedicatedServer && (CL == m_server->GetServerClient()))
             break;
 
         CheckNewPlayer(CL);
@@ -768,7 +767,7 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
     default:
     {
         string16 tmp;
-        R_ASSERT3(0, "Game Event not implemented!!!", itoa(type, tmp, 10));
+        R_ASSERT3(0, "Game Event not implemented!!!", xr_itoa(type, tmp, 10));
     };
     };
 }

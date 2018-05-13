@@ -5,19 +5,21 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment weathers manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
+namespace XRay
+{
+namespace Editor
+{
+class property_holder_base;
+}
+}
+
 namespace editor
 {
-class property_holder;
-
 namespace environment
 {
 class manager;
@@ -33,7 +35,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(::editor::property_holder* property_holder);
+    void fill(XRay::Editor::property_holder_base* property_holder);
     shared_str unique_id(shared_str const& id) const;
     bool save_current_blend(char* buffer, u32 const& buffer_size);
     bool paste_current_time_frame(char const* buffer, u32 const& buffer_size);
@@ -45,22 +47,22 @@ public:
     bool add_time_frame(char const* buffer, u32 const& buffer_size);
 
 public:
-    typedef xr_vector<LPCSTR> weather_ids_type;
-    typedef xr_vector<LPCSTR> times_ids_type;
+    typedef xr_vector<pcstr> weather_ids_type;
+    typedef xr_vector<pcstr> times_ids_type;
     typedef xr_vector<weather*> weather_container_type;
 
 public:
     weather_ids_type const& weather_ids() const;
 
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
     typedef property_collection<weather_container_type, manager> collection_type;
 
 private:
-    LPCSTR const* xr_stdcall weathers_getter() const;
+    pcstr const* xr_stdcall weathers_getter() const;
     u32 xr_stdcall weathers_size_getter() const;
-    LPCSTR const* xr_stdcall frames_getter(LPCSTR weather_id) const;
-    u32 xr_stdcall frames_size_getter(LPCSTR weather_id) const;
+    pcstr const* xr_stdcall frames_getter(pcstr weather_id) const;
+    u32 xr_stdcall frames_size_getter(pcstr weather_id) const;
 
 private:
     weather_container_type m_weathers;
@@ -76,6 +78,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED

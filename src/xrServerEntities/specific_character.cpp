@@ -30,7 +30,7 @@ SSpecificCharacterData::SSpecificCharacterData()
 SSpecificCharacterData::~SSpecificCharacterData() {}
 #endif
 
-CSpecificCharacter::CSpecificCharacter() { m_OwnId = NULL; }
+CSpecificCharacter::CSpecificCharacter() { m_OwnId = nullptr; }
 CSpecificCharacter::~CSpecificCharacter() {}
 void CSpecificCharacter::InitXmlIdToIndex()
 {
@@ -44,7 +44,7 @@ void CSpecificCharacter::Load(shared_str id)
 {
     R_ASSERT(id.size());
     m_OwnId = id;
-    inherited_shared::load_shared(m_OwnId, NULL);
+    inherited_shared::load_shared(m_OwnId, nullptr);
 }
 
 void CSpecificCharacter::load_shared(LPCSTR)
@@ -59,7 +59,7 @@ void CSpecificCharacter::load_shared(LPCSTR)
 
     pXML->SetLocalRoot(pXML->GetRoot());
 
-    XML_NODE* item_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+    XML_NODE item_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
     R_ASSERT3(item_node, "specific_character id=", *item_data.id);
 
     pXML->SetLocalRoot(item_node);

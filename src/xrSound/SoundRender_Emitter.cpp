@@ -1,10 +1,9 @@
 #include "stdafx.h"
-#pragma hdrstop
 
-#include "soundrender_emitter.h"
-#include "soundrender_core.h"
-#include "soundrender_source.h"
-#include "soundrender_targetA.h"
+#include "SoundRender_Emitter.h"
+#include "SoundRender_Core.h"
+#include "SoundRender_Source.h"
+#include "SoundRender_TargetA.h"
 
 extern u32 psSoundModel;
 extern float psSoundVEffects;
@@ -16,18 +15,18 @@ void CSoundRender_Emitter::set_position(const Fvector& pos)
     else
         p_source.position.set(0, 0, 0);
 
-    bMoved = TRUE;
+    bMoved = true;
 }
 
-CSoundRender_Emitter::CSoundRender_Emitter(void)
+CSoundRender_Emitter::CSoundRender_Emitter()
 {
 #ifdef DEBUG
     static u32 incrementalID = 0;
     dbg_ID = ++incrementalID;
 #endif
-    target = NULL;
-    //.	source						= NULL;
-    owner_data = NULL;
+    target = nullptr;
+    //source = nullptr;
+    owner_data = nullptr;
     smooth_volume = 1.f;
     occluder_volume = 1.f;
     fade_volume = 1.f;
@@ -36,10 +35,10 @@ CSoundRender_Emitter::CSoundRender_Emitter(void)
     occluder[2].set(0, 0, 0);
     m_current_state = stStopped;
     set_cursor(0);
-    bMoved = TRUE;
-    b2D = FALSE;
-    bStopping = FALSE;
-    bRewind = FALSE;
+    bMoved = true;
+    b2D = false;
+    bStopping = false;
+    bRewind = false;
     iPaused = 0;
     fTimeStarted = 0.0f;
     fTimeToStop = 0.0f;
@@ -50,7 +49,7 @@ CSoundRender_Emitter::CSoundRender_Emitter(void)
     m_cur_handle_cursor = 0;
 }
 
-CSoundRender_Emitter::~CSoundRender_Emitter(void)
+CSoundRender_Emitter::~CSoundRender_Emitter()
 {
     // try to release dependencies, events, for example
     Event_ReleaseOwner();
@@ -59,7 +58,7 @@ CSoundRender_Emitter::~CSoundRender_Emitter(void)
 //////////////////////////////////////////////////////////////////////
 void CSoundRender_Emitter::Event_ReleaseOwner()
 {
-    if (!(owner_data))
+    if (!owner_data)
         return;
 
     for (u32 it = 0; it < SoundRender->s_events.size(); it++)
@@ -87,28 +86,27 @@ void CSoundRender_Emitter::Event_Propagade()
     VERIFY(_valid(p_source.volume));
     // Calculate range
     float clip = p_source.max_ai_distance * p_source.volume;
-    float range = _min(p_source.max_ai_distance, clip);
+    float range = std::min(p_source.max_ai_distance, clip);
     if (range < 0.1f)
         return;
 
     // Inform objects
-    SoundRender->s_events.push_back(mk_pair(owner_data, range));
+    SoundRender->s_events.push_back(std::make_pair(owner_data, range));
 }
 
 void CSoundRender_Emitter::switch_to_2D()
 {
-    b2D = TRUE;
+    b2D = true;
     set_priority(100.f);
 }
 
-void CSoundRender_Emitter::switch_to_3D() { b2D = FALSE; }
+void CSoundRender_Emitter::switch_to_3D() { b2D = false; }
 u32 CSoundRender_Emitter::play_time()
 {
     if (m_current_state == stPlaying || m_current_state == stPlayingLooped || m_current_state == stSimulating ||
         m_current_state == stSimulatingLooped)
         return iFloor((SoundRender->fTimer_Value - fTimeStarted) * 1000.0f);
-    else
-        return 0;
+    return 0;
 }
 
 #include "SoundRender_Source.h"
@@ -137,11 +135,8 @@ u32 CSoundRender_Emitter::get_cursor(bool b_absolute) const
 {
     if (b_absolute)
         return m_stream_cursor;
-    else
-    {
-        VERIFY(m_stream_cursor - m_cur_handle_cursor >= 0);
-        return m_stream_cursor - m_cur_handle_cursor;
-    }
+    VERIFY(m_stream_cursor - m_cur_handle_cursor >= 0);
+    return m_stream_cursor - m_cur_handle_cursor;
 }
 
 void CSoundRender_Emitter::move_cursor(int offset) { set_cursor(get_cursor(true) + offset); }

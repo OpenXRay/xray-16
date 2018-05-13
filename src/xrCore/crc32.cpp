@@ -1,51 +1,56 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-static BOOL crc32_ready = FALSE;
 static u32 crc32_table[256]; // Lookup table array
 
-inline u32 Reflect(u32 ref, char ch) // Reflects CRC bits in the lookup table
+class Crc32Initializer final
 {
-    // Used only by Init_CRC32_Table().
+public:
+    static void init() noexcept { static Crc32Initializer initializer; }
 
-    u32 value(0);
+private:
+    Crc32Initializer() noexcept { crc32_init(); }
 
-    // Swap bit 0 for bit 7
-    // bit 1 for bit 6, etc.
-    for (int i = 1; i < (ch + 1); i++)
+    static u32 reflect(u32 ref, char ch) noexcept // Reflects CRC bits in the lookup table
     {
-        if (ref & 1)
-            value |= 1 << (ch - i);
-        ref >>= 1;
+        // Used only by Init_CRC32_Table().
+
+        u32 value(0);
+
+        // Swap bit 0 for bit 7
+        // bit 1 for bit 6, etc.
+        for (int i = 1; i < (ch + 1); i++)
+        {
+            if (ref & 1)
+                value |= 1 << (ch - i);
+            ref >>= 1;
+        }
+        return value;
     }
-    return value;
-}
 
-void crc32_init()
-{
-    // Call this function only once to initialize the CRC table.
-
-    // This is the official polynomial used by CRC-32
-    // in PKZip, WinZip and Ethernet.
-    u32 ulPolynomial = 0x04c11db7;
-
-    // 256 values representing ASCII character codes.
-    for (int i = 0; i <= 0xFF; i++)
+    static void crc32_init() noexcept
     {
-        crc32_table[i] = Reflect(i, 8) << 24;
-        for (int j = 0; j < 8; j++)
-            crc32_table[i] = (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
-        crc32_table[i] = Reflect(crc32_table[i], 32);
+        // Call this function only once to initialize the CRC table.
+
+        // This is the official polynomial used by CRC-32
+        // in PKZip, WinZip and Ethernet.
+        u32 ulPolynomial = 0x04c11db7;
+
+        // 256 values representing ASCII character codes.
+        for (int i = 0; i <= 0xFF; i++)
+        {
+            crc32_table[i] = reflect(i, 8) << 24;
+            for (int j = 0; j < 8; j++)
+                crc32_table[i] =
+                    (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
+            crc32_table[i] = reflect(crc32_table[i], 32);
+        }
     }
-}
+};
 
 u32 crc32(const void* P, u32 len)
 {
-    if (!crc32_ready)
-    {
-        crc32_init();
-        crc32_ready = TRUE;
-    }
+    Crc32Initializer::init();
 
     // Pass a text string to this function and it will return the CRC.
 
@@ -71,11 +76,7 @@ u32 crc32(const void* P, u32 len)
 
 u32 crc32(const void* P, u32 len, u32 starting_crc)
 {
-    if (!crc32_ready)
-    {
-        crc32_init();
-        crc32_ready = TRUE;
-    }
+    Crc32Initializer::init();
 
     u32 ulCRC = 0xffffffff ^ starting_crc;
     u8* buffer = (u8*)P;
@@ -88,11 +89,7 @@ u32 crc32(const void* P, u32 len, u32 starting_crc)
 
 u32 path_crc32(const char* path, u32 len)
 {
-    if (!crc32_ready)
-    {
-        crc32_init();
-        crc32_ready = TRUE;
-    }
+    Crc32Initializer::init();
 
     u32 ulCRC = 0xffffffff;
     u8* buffer = (u8*)path;

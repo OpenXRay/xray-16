@@ -293,7 +293,7 @@ void game_cl_ArtefactHunt::SetGameUI(CUIGameCustom* uigame)
 
 CUIGameCustom* game_cl_ArtefactHunt::createGameUI()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return NULL;
 
     CLASS_ID clsid = CLSID_GAME_UI_ARTEFACTHUNT;
@@ -354,7 +354,7 @@ void game_cl_ArtefactHunt::shedule_Update(u32 dt)
 
     inherited::shedule_Update(dt);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if (!m_game_ui)
@@ -458,7 +458,7 @@ void game_cl_ArtefactHunt::shedule_Update(u32 dt)
                     dTime = iCeil(float(dReinforcementTime - CurTime) / 1000);
 
                 string128 _buff;
-                m_game_ui->m_pReinforcementInidcator->SetText(itoa(dTime, _buff, 10));
+                m_game_ui->m_pReinforcementInidcator->SetText(xr_itoa(dTime, _buff, 10));
             }
             else
                 m_game_ui->m_pReinforcementInidcator->SetText("0");
@@ -579,20 +579,16 @@ bool game_cl_ArtefactHunt::CanBeReady()
     return true;
 };
 
-char* game_cl_ArtefactHunt::getTeamSection(int Team)
+pcstr game_cl_ArtefactHunt::getTeamSection(int Team)
 {
     switch (Team)
     {
-    case 1: { return "artefacthunt_team1";
-    }
-    break;
-    case 2: { return "artefacthunt_team2";
-    }
-    break;
+    case 1: return "artefacthunt_team1";
+    case 2: return "artefacthunt_team2";
     default: NODEFAULT;
-    };
+    }
 #ifdef DEBUG
-    return NULL;
+    return nullptr;
 #endif
 };
 

@@ -62,7 +62,7 @@ IRender_Sector* CRender::detectSector(const Fvector& P)
     else if (id2 >= 0)
         ID = id2; // only id2 found
     else
-        return 0;
+        return nullptr;
 
     if (ID == id1)
     {

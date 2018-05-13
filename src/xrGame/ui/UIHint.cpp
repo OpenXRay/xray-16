@@ -24,8 +24,8 @@ void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     CUIXmlInit::InitWindow(xml, path, 0, this);
 
-    XML_NODE* stored_root = xml.GetLocalRoot();
-    XML_NODE* new_root = xml.NavigateToNode(path, 0);
+    XML_NODE stored_root = xml.GetLocalRoot();
+    XML_NODE new_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(new_root);
 
     m_background = UIHelper::CreateFrameWindow(xml, "background", this);

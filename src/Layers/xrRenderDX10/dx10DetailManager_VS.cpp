@@ -167,8 +167,9 @@ void CDetailManager::hw_Render_dump(
                 for (; _vI != _vE; _vI++)
                 {
                     SlotItemVec* items = *_vI;
-                    SlotItemVecIt _iI = items->begin();
-                    SlotItemVecIt _iE = items->end();
+
+                    auto _iI = items->begin();
+                    auto _iE = items->end();
                     for (; _iI != _iE; _iI++)
                     {
                         SlotItem& Instance = **_iI;
@@ -216,7 +217,7 @@ void CDetailManager::hw_Render_dump(
                         }
                     }
                 }
-                // flush if nessecary
+                // flush if necessary
                 if (dwBatch)
                 {
                     RImplementation.BasicStats.DetailCount += dwBatch;
@@ -229,7 +230,7 @@ void CDetailManager::hw_Render_dump(
                 }
             }
             // Clean up
-            vis.clear_not_free();
+            vis.clear();
         }
         vOffset += hw_BatchSize * Object.number_vertices;
         iOffset += hw_BatchSize * Object.number_indices;

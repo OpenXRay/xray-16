@@ -8,6 +8,7 @@
 #include "PHSynchronize.h"
 #include "xrPhysics/MathUtils.h"
 #include "Include/xrRender/Kinematics.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
@@ -245,7 +246,7 @@ void CPHSkeleton::RestoreNetState(CSE_PHSkeleton* po)
     PHNETSTATE_VECTOR& saved_bones = po->saved_bones.bones;
     VERIFY(saved_bones.size() == obj->PHGetSyncItemsNumber());
 
-    PHNETSTATE_I i = saved_bones.begin(), e = saved_bones.end();
+    auto i = saved_bones.begin(), e = saved_bones.end();
     if (obj->PPhysicsShell() && obj->PPhysicsShell()->isActive())
     {
         obj->PPhysicsShell()->Disable();
@@ -264,7 +265,7 @@ void CPHSkeleton::RestoreNetState(CSE_PHSkeleton* po)
 
 void CPHSkeleton::ClearUnsplited()
 {
-    SHELL_PAIR_I i = m_unsplited_shels.begin(), e = m_unsplited_shels.end();
+    auto i = m_unsplited_shels.begin(), e = m_unsplited_shels.end();
     for (; i != e; ++i)
     {
         i->first->Deactivate();
@@ -331,7 +332,7 @@ void CPHSkeleton::UnsplitSingle(CPHSkeleton* SO)
     mask0.assign(pKinematics->LL_GetBonesVisible()); // first part mask
     VERIFY2(mask0.flags, "mask0 -Zero");
     mask0.invert();
-    mask1.and (mask0.flags); // second part mask
+    mask1._and (mask0.flags); // second part mask
 
     newKinematics->LL_SetBoneRoot(split_bone);
     VERIFY2(mask1.flags, "mask1 -Zero");

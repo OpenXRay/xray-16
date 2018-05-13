@@ -282,7 +282,7 @@ Player_Statistic::Player_Statistic(LPCSTR Name)
     ZeroMemory(m_dwSpecialKills, sizeof(m_dwSpecialKills));
 };
 
-Player_Statistic::~Player_Statistic() { aWeaponStats.clear_and_free(); };
+Player_Statistic::~Player_Statistic() { aWeaponStats.clear(); };
 u32 Player_Statistic::create_victims_table(victims_table& victims_table)
 {
     u32 result_size = victims_table::header_count_size;
@@ -363,7 +363,7 @@ void Player_Statistic::net_load(NET_Packet* P)
     {
         shared_str WName;
         P->r_stringZ(WName);
-        WEAPON_STATS_it tmp_wst_it = FindPlayersWeapon(WName.c_str());
+        auto tmp_wst_it = FindPlayersWeapon(WName.c_str());
         R_ASSERT(tmp_wst_it != aWeaponStats.end());
         tmp_wst_it->net_load(P, vict_table, bone_table);
     }
@@ -427,14 +427,14 @@ void WeaponUsageStatistic::ChangePlayerName(LPCSTR from, LPCSTR to)
     statistic_sync_quard syncg(m_mutex);
     if (!CollectData())
         return;
-    PLAYERS_STATS_it pPlayerI = FindPlayer(from);
+    auto pPlayerI = FindPlayer(from);
     pPlayerI->PName = to;
 }
 
 WEAPON_STATS_it Player_Statistic::FindPlayersWeapon(LPCSTR WeaponName)
 {
     R_ASSERT(WeaponName);
-    WEAPON_STATS_it pWeaponI = std::find(aWeaponStats.begin(), aWeaponStats.end(), WeaponName);
+    auto pWeaponI = std::find(aWeaponStats.begin(), aWeaponStats.end(), WeaponName);
     if (pWeaponI == aWeaponStats.end() || !((*pWeaponI) == WeaponName))
     {
         aWeaponStats.push_back(Weapon_Statistic(WeaponName));
@@ -469,8 +469,8 @@ void WeaponUsageStatistic::RemoveBullet(ABULLETS_it& Bullet_it)
     if (!Bullet_it->Removed || Bullet_it->HitRefCount != Bullet_it->HitResponds)
         return;
     //-------------------------------------------------------------
-    PLAYERS_STATS_it PlayerIt = FindPlayer(*(Bullet_it->FirerName));
-    WEAPON_STATS_it WeaponIt = PlayerIt->FindPlayersWeapon(*(Bullet_it->WeaponName));
+    auto PlayerIt = FindPlayer(*(Bullet_it->FirerName));
+    auto WeaponIt = PlayerIt->FindPlayersWeapon(*(Bullet_it->WeaponName));
     HITS_VEC_it HitIt;
     if (WeaponIt->FindHit(Bullet_it->Bullet.m_dwID, HitIt))
     {
@@ -488,8 +488,8 @@ void WeaponUsageStatistic::OnWeaponBought(game_PlayerState* ps, LPCSTR WeaponNam
         return;
     if (!ps)
         return;
-    PLAYERS_STATS_it PlayerIt = FindPlayer(ps->getName());
-    WEAPON_STATS_it WeaponIt = PlayerIt->FindPlayersWeapon(WeaponName);
+    auto PlayerIt = FindPlayer(ps->getName());
+    auto WeaponIt = PlayerIt->FindPlayersWeapon(WeaponName);
     WeaponIt->NumBought++;
     //-----------------------------------------------
     int BasketPos = 0;
@@ -524,10 +524,10 @@ void WeaponUsageStatistic::OnBullet_Fire(SBullet* pBullet, const CCartridge& car
     if (!pActor)
         return;
     //-----------------------------------------------------------------------------------
-    PLAYERS_STATS_it PlayerIt = FindPlayer(*object_parent->cName());
+    auto PlayerIt = FindPlayer(*object_parent->cName());
     pBullet->m_dwID = PlayerIt->m_dwTotalShots++;
     PlayerIt->m_dwTotalShots_d++;
-    WEAPON_STATS_it WeaponIt = PlayerIt->FindPlayersWeapon(*object_weapon->cNameSect());
+    auto WeaponIt = PlayerIt->FindPlayersWeapon(*object_weapon->cNameSect());
     WeaponIt->m_dwRoundsFired = (++WeaponIt->m_dwBulletsFired) / cartridge.param_s.buckShot;
     WeaponIt->m_dwBulletsFired_d++;
     //-----------------------------------------------------------------------------------
@@ -546,8 +546,8 @@ void WeaponUsageStatistic::OnBullet_Hit(SBullet* pBullet, u16 TargetID, s16 elem
     if (!FindBullet(pBullet->m_dwID, BulletIt))
         return;
     //-----------------------------------------------------
-    PLAYERS_STATS_it PlayerIt = FindPlayer(*(BulletIt->FirerName));
-    WEAPON_STATS_it WeaponIt = PlayerIt->FindPlayersWeapon(*(BulletIt->WeaponName));
+    auto PlayerIt = FindPlayer(*(BulletIt->FirerName));
+    auto WeaponIt = PlayerIt->FindPlayersWeapon(*(BulletIt->WeaponName));
     if (!BulletIt->HitRefCount++)
     {
         WeaponIt->m_dwHitsScored++;
@@ -598,7 +598,7 @@ void WeaponUsageStatistic::OnBullet_Check_Request(SHit* pHDS)
     u32 BulletID = pHDS->BulletID;
     u32 SenderID = pHDS->SenderID;
 
-    BChA_it pSenderI = std::find(m_Requests.begin(), m_Requests.end(), SenderID);
+    auto pSenderI = std::find(m_Requests.begin(), m_Requests.end(), SenderID);
     if (pSenderI == m_Requests.end() || (*pSenderI) != SenderID)
     {
         m_Requests.push_back(Bullet_Check_Array(SenderID));
@@ -617,7 +617,7 @@ void WeaponUsageStatistic::OnBullet_Check_Result(bool Result)
         return;
     if (m_dwLastRequestSenderID)
     {
-        BChA_it pSenderI = std::find(m_Requests.begin(), m_Requests.end(), m_dwLastRequestSenderID);
+        auto pSenderI = std::find(m_Requests.begin(), m_Requests.end(), m_dwLastRequestSenderID);
         if (pSenderI != m_Requests.end() && (*pSenderI) == m_dwLastRequestSenderID)
         {
             (*pSenderI).Requests.back().Result = Result;
@@ -737,8 +737,8 @@ void WeaponUsageStatistic::On_Check_Respond(NET_Packet* P)
         BulletIt->HitResponds++;
 
         //---------------------------------------------------------------
-        PLAYERS_STATS_it PlayerIt = FindPlayer(*(BulletIt->FirerName));
-        WEAPON_STATS_it WeaponIt = PlayerIt->FindPlayersWeapon(*(BulletIt->WeaponName));
+        auto PlayerIt = FindPlayer(*(BulletIt->FirerName));
+        auto WeaponIt = PlayerIt->FindPlayersWeapon(*(BulletIt->WeaponName));
         (*WeaponIt).m_dwKillsScored++;
         (*WeaponIt).m_dwKillsScored_d++;
 
@@ -836,7 +836,7 @@ void WeaponUsageStatistic::OnExplosionKill(game_PlayerState* ps, const SHit& hit
     Player_Statistic& PlayerStatKiller = *(FindPlayer(killerPS->getName()));
 
     IGameObject* weapon_object = Level().Objects.net_Find(hit.weaponID);
-    WEAPON_STATS_it WeaponIt = PlayerStatKiller.FindPlayersWeapon(weapon_object->cNameSect().c_str());
+    auto WeaponIt = PlayerStatKiller.FindPlayersWeapon(weapon_object->cNameSect().c_str());
     ++WeaponIt->m_dwHitsScored;
     ++WeaponIt->m_dwKillsScored;
     ++WeaponIt->m_explosion_kills;
@@ -867,7 +867,7 @@ void WeaponUsageStatistic::OnBleedKill(game_PlayerState* killer_ps, game_PlayerS
     if (!weapon_object)
         return;
 
-    WEAPON_STATS_it WeaponIt = PlayerStatKiller.FindPlayersWeapon(weapon_object->cNameSect().c_str());
+    auto WeaponIt = PlayerStatKiller.FindPlayersWeapon(weapon_object->cNameSect().c_str());
 
     ++WeaponIt->m_dwHitsScored;
     ++WeaponIt->m_dwKillsScored;

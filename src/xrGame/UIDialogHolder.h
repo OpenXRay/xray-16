@@ -1,4 +1,7 @@
 #pragma once
+#include "xrCore/_flags.h"
+#include "xrEngine/pure.h"
+#include "xrCommon/xr_vector.h"
 
 class CUIDialogWnd;
 class CUIWindow;

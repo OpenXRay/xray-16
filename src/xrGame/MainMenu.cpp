@@ -19,6 +19,7 @@
 #include "CdkeyDecode/cdkeydecode.h"
 #include "string_table.h"
 #include "xrCore/os_clipboard.h"
+#include "xrGame/game_type.h"
 
 #include "DemoInfo.h"
 #include "DemoInfo_Loader.h"
@@ -35,6 +36,9 @@
 #include "profile_store.h"
 #include "stats_submitter.h"
 #include "atlas_submit_queue.h"
+
+// fwd. decl.
+extern ENGINE_API BOOL bShowPauseString;
 
 //#define DEMO_BUILD
 
@@ -90,7 +94,7 @@ CMainMenu::CMainMenu()
     GetCDKeyFromRegistry();
     m_demo_info_loader = NULL;
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         g_btnHint = new CUIButtonHint();
         g_statHint = new CUIButtonHint();
@@ -147,8 +151,8 @@ void CMainMenu::ReadTextureInfo()
 {
     FS_FileSet fset;
     FS.file_list(fset, "$game_config$", FS_ListFiles, "ui\\textures_descr\\*.xml");
-    FS_FileSetIt fit = fset.begin();
-    FS_FileSetIt fit_e = fset.end();
+    auto fit = fset.begin();
+    auto fit_e = fset.end();
 
     for (; fit != fit_e; ++fit)
     {
@@ -159,9 +163,6 @@ void CMainMenu::ReadTextureInfo()
         CUITextureMaster::ParseShTexInfo(fn3);
     }
 }
-
-extern ENGINE_API BOOL bShowPauseString;
-extern bool IsGameTypeSingle();
 
 void CMainMenu::Activate(bool bActivate)
 {
@@ -175,7 +176,7 @@ void CMainMenu::Activate(bool bActivate)
 
     bool b_is_single = IsGameTypeSingle();
 
-    if (g_dedicated_server && bActivate)
+    if (GEnv.isDedicatedServer && bActivate)
         return;
 
     if (bActivate)
@@ -346,7 +347,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     }
     if (DIK_F12 == dik)
     {
-        GlobalEnv.Render->Screenshot();
+        GEnv.Render->Screenshot();
         return;
     }
 
@@ -385,9 +386,9 @@ void CMainMenu::OnRender()
         return;
 
     if (g_pGameLevel)
-        GlobalEnv.Render->Calculate();
+        GEnv.Render->Calculate();
 
-    GlobalEnv.Render->Render();
+    GEnv.Render->Render();
     if (!OnRenderPPUI_query())
     {
         DoRenderDialogs();
@@ -456,7 +457,7 @@ void CMainMenu::OnFrame()
     if (m_Flags.test(flGameSaveScreenshot) && Device.dwFrame > m_screenshotFrame)
     {
         m_Flags.set(flGameSaveScreenshot, FALSE);
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_GAMESAVE, m_screenshot_name);
+        GEnv.Render->Screenshot(IRender::SM_FOR_GAMESAVE, m_screenshot_name);
 
         if (g_pGameLevel && m_Flags.test(flActive))
         {
@@ -499,7 +500,7 @@ void CMainMenu::Screenshot(IRender::ScreenshotMode mode, LPCSTR name)
 {
     if (mode != IRender::SM_FOR_GAMESAVE)
     {
-        GlobalEnv.Render->Screenshot(mode, name);
+        GEnv.Render->Screenshot(mode, name);
     }
     else
     {

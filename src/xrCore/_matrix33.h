@@ -1,5 +1,8 @@
+#pragma once
 #ifndef _matrix33H_
 #define _matrix33H_
+#include "_vector3d.h"
+#include "_matrix.h"
 
 template <class T>
 struct _matrix33
@@ -377,6 +380,7 @@ public:
         R.x = s1 * (m[0][0] * V1.x + m[1][0] * V1.y + m[2][0] * V1.z);
         R.y = s1 * (m[0][1] * V1.x + m[1][1] * V1.y + m[2][1] * V1.z);
         R.z = s1 * (m[0][2] * V1.x + m[1][2] * V1.y + m[2][2] * V1.z);
+        return *this;
     }
     IC SelfRef MxV(Tvector& R, const Tvector& V1) const
     {
@@ -410,7 +414,7 @@ typedef _matrix33<float> Fmatrix33;
 typedef _matrix33<double> Dmatrix33;
 
 template <class T>
-BOOL _valid(const _matrix33<T>& m)
+bool _valid(const _matrix33<T>& m)
 {
     return _valid(m.i) && _valid(m.j) && _valid(m.k);
 }

@@ -3,6 +3,7 @@
 #include "uicursor.h"
 #include "inventory_item.h"
 #include "UIDragDropListEx.h"
+#include "eatable_item.h"
 #include "xr_level_controller.h"
 #include "xrEngine/xr_input.h"
 #include "Level.h"
@@ -196,19 +197,41 @@ CUIDragItem* CUICellItem::CreateDragItem()
 void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 {
     m_pParentList = p;
-    UpdateConditionProgressBar();
+    //UpdateConditionProgressBar();
 }
 
 void CUICellItem::UpdateConditionProgressBar()
 {
     if (m_pParentList && m_pParentList->GetConditionProgBarVisibility())
     {
-        PIItem itm = (PIItem)m_pData;
-        CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
-        CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(itm);
-        CHelmet* pHelmet = smart_cast<CHelmet*>(itm);
-        if (pWeapon || pOutfit || pHelmet)
+        PIItem itm = static_cast<PIItem>(m_pData);
+
+        if (itm && itm->IsUsingCondition())
         {
+            float cond = itm->GetCondition();
+
+            CEatableItem* eitm = smart_cast<CEatableItem*>(itm);
+            if (eitm)
+            {
+                const u8 max_uses = eitm->GetMaxUses();
+                if (max_uses > 1)
+                {
+                    const u8 remaining_uses = eitm->GetRemainingUses();
+
+                    if (max_uses < 8)
+                        m_pConditionState->ShowBackground(false);
+
+                    if (remaining_uses < 1)
+                        cond = 0.f;
+                    else if (max_uses > 8)
+                        cond = (float)remaining_uses / (float)max_uses;
+                    else
+                        cond = (float)remaining_uses * 0.125f - 0.0625f;
+
+                    m_pConditionState->m_bUseGradient = false;
+                }
+            }
+
             Ivector2 itm_grid_size = GetGridSize();
             if (m_pParentList->GetVerticalPlacement())
                 std::swap(itm_grid_size.x, itm_grid_size.y);
@@ -219,7 +242,7 @@ void CUICellItem::UpdateConditionProgressBar()
             float y = itm_grid_size.y * (cell_size.y + cell_space.y) - m_pConditionState->GetHeight() - 2.f;
 
             m_pConditionState->SetWndPos(Fvector2().set(x, y));
-            m_pConditionState->SetProgressPos(iCeil(itm->GetCondition() * 13.0f) / 13.0f);
+            m_pConditionState->SetProgressPos(iCeil(cond * 13.0f) / 13.0f);
             m_pConditionState->Show(true);
             return;
         }

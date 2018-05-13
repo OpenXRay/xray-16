@@ -99,11 +99,11 @@ void CMonsterEnemyManager::update()
     flags.zero();
 
     if ((prev_enemy == enemy) && (time_last_seen != Device.dwTimeGlobal))
-        flags.or (FLAG_ENEMY_LOST_SIGHT);
+        flags._or (FLAG_ENEMY_LOST_SIGHT);
     if (prev_enemy && !prev_enemy->g_Alive())
-        flags.or (FLAG_ENEMY_DIE);
+        flags._or (FLAG_ENEMY_DIE);
     if (!enemy_see_me)
-        flags.or (FLAG_ENEMY_DOESNT_SEE_ME);
+        flags._or (FLAG_ENEMY_DOESNT_SEE_ME);
 
     float dist_now, dist_prev;
     if (prev_enemy == enemy)
@@ -112,28 +112,28 @@ void CMonsterEnemyManager::update()
         dist_prev = prev_enemy_position.distance_to(monster->Position());
 
         if (_abs(dist_now - dist_prev) < 0.2f)
-            flags.or (FLAG_ENEMY_STANDING);
+            flags._or (FLAG_ENEMY_STANDING);
         else
         {
             if (dist_now < dist_prev)
-                flags.or (FLAG_ENEMY_GO_CLOSER);
+                flags._or (FLAG_ENEMY_GO_CLOSER);
             else
-                flags.or (FLAG_ENEMY_GO_FARTHER);
+                flags._or (FLAG_ENEMY_GO_FARTHER);
 
             if (_abs(dist_now - dist_prev) < 1.2f)
             {
                 if (dist_now < dist_prev)
-                    flags.or (FLAG_ENEMY_GO_CLOSER_FAST);
+                    flags._or (FLAG_ENEMY_GO_CLOSER_FAST);
                 else
-                    flags.or (FLAG_ENEMY_GO_FARTHER_FAST);
+                    flags._or (FLAG_ENEMY_GO_FARTHER_FAST);
             }
         }
 
         if (flags.is(FLAG_ENEMY_STANDING) && flags.is(FLAG_ENEMY_DOESNT_SEE_ME))
-            flags.or (FLAG_ENEMY_DOESNT_KNOW_ABOUT_ME);
+            flags._or (FLAG_ENEMY_DOESNT_KNOW_ABOUT_ME);
     }
     else
-        flags.or (FLAG_ENEMY_STATS_NOT_READY);
+        flags._or (FLAG_ENEMY_STATS_NOT_READY);
 
     // сохранить текущего врага
     prev_enemy = enemy;

@@ -1,8 +1,7 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "particle_core.h"
+#include "xrCore/_fbox.h"
 
 using namespace PAPI;
 
@@ -22,13 +21,14 @@ float PAPI::NRand(float sigma)
     do
     {
         y = -logf(drand48());
-    } while (drand48() > expf(-_sqr(y - 1.0f) * 0.5f));
+    }
+    while (drand48() > expf(-_sqr(y - 1.0f) * 0.5f));
 
     if (rand() & 0x1)
         return y * sigma * ONE_OVER_SIGMA_EXP;
-    else
-        return -y * sigma * ONE_OVER_SIGMA_EXP;
+    return -y * sigma * ONE_OVER_SIGMA_EXP;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // Stuff for the pDomain.
 pDomain::pDomain(
@@ -37,7 +37,8 @@ pDomain::pDomain(
     type = dtype;
     switch (type)
     {
-    case PDPoint: p1 = pVector(a0, a1, a2); break;
+    case PDPoint: p1 = pVector(a0, a1, a2);
+        break;
     case PDLine:
     {
         p1 = pVector(a0, a1, a2);
@@ -45,7 +46,7 @@ pDomain::pDomain(
         // p2 is vector3 from p1 to other endpoint.
         p2 = tmp - p1;
     }
-    break;
+        break;
     case PDBox:
         // p1 is the min corner. p2 is the max corner.
         if (a0 < a3)
@@ -100,7 +101,7 @@ pDomain::pDomain(
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
     }
-    break;
+        break;
     case PDRectangle:
     {
         p1 = pVector(a0, a1, a2);
@@ -119,7 +120,7 @@ pDomain::pDomain(
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
     }
-    break;
+        break;
     case PDPlane:
     {
         p1 = pVector(a0, a1, a2);
@@ -129,7 +130,7 @@ pDomain::pDomain(
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
     }
-    break;
+        break;
     case PDSphere:
         p1 = pVector(a0, a1, a2);
         if (a3 > a4)
@@ -188,7 +189,7 @@ pDomain::pDomain(
         u.normalize_safe();
         v = n ^ u;
     }
-    break;
+        break;
     case PDBlob:
     {
         p1 = pVector(a0, a1, a2);
@@ -197,7 +198,7 @@ pDomain::pDomain(
         radius2Sqr = -0.5f * _sqr(tmp);
         radius2 = ONEOVERSQRT2PI * tmp;
     }
-    break;
+        break;
     case PDDisc:
     {
         p1 = pVector(a0, a1, a2); // Center point
@@ -227,18 +228,18 @@ pDomain::pDomain(
         v = p2 ^ u;
         radius1Sqr = -(p1 * p2); // D of the plane eqn.
     }
-    break;
+        break;
     }
 }
 
 // Determines if pos is inside the domain
-BOOL pDomain::Within(const pVector& pos) const
+bool pDomain::Within(const pVector& pos) const
 {
     switch (type)
     {
     case PDBox:
         return !(
-            (pos.x < p1.x) || (pos.x > p2.x) || (pos.y < p1.y) || (pos.y > p2.y) || (pos.z < p1.z) || (pos.z > p2.z));
+            pos.x < p1.x || pos.x > p2.x || pos.y < p1.y || pos.y > p2.y || pos.z < p1.z || pos.z > p2.z);
     case PDPlane:
         // Distance from plane = n * p + d
         // Inside is the positive half-space.
@@ -269,23 +270,22 @@ BOOL pDomain::Within(const pVector& pos) const
         // radius2Sqr stores 1 / (p2.p2)
         float dist = (p2 * x) * radius2Sqr;
         if (dist < 0.0f || dist > 1.0f)
-            return FALSE;
+            return false;
 
         // Check radial distance; scale radius along axis for cones
         pVector xrad = x - p2 * dist; // Radial component of x
         float rSqr = xrad.length2();
 
         if (type == PDCone)
-            return (rSqr <= _sqr(dist * radius1) && rSqr >= _sqr(dist * radius2));
-        else
-            return (rSqr <= radius1Sqr && rSqr >= _sqr(radius2));
+            return rSqr <= _sqr(dist * radius1) && rSqr >= _sqr(dist * radius2);
+        return rSqr <= radius1Sqr && rSqr >= _sqr(radius2);
     }
     case PDBlob:
     {
         pVector x(pos - p1);
         // return exp(-0.5 * xSq * Sqr(oneOverSigma)) * ONEOVERSQRT2PI * oneOverSigma;
         float Gx = expf(x.length2() * radius2Sqr) * radius2;
-        return (drand48() < Gx);
+        return drand48() < Gx;
     }
     case PDPoint:
     case PDLine:
@@ -293,17 +293,19 @@ BOOL pDomain::Within(const pVector& pos) const
     case PDTriangle:
     case PDDisc:
     default:
-        return FALSE; // XXX Is there something better?
+        return false; // XXX Is there something better?
     }
 }
 
-// Generate a random point uniformly distrbuted within the domain
+// Generate a random point uniformly distributed within the domain
 void pDomain::Generate(pVector& pos) const
 {
     switch (type)
     {
-    case PDPoint: pos = p1; break;
-    case PDLine: pos = p1 + p2 * drand48(); break;
+    case PDPoint: pos = p1;
+        break;
+    case PDLine: pos = p1 + p2 * drand48();
+        break;
     case PDBox:
         // Scale and translate [0,1] random to fit box
         pos.x = p1.x + (p2.x - p1.x) * drand48();
@@ -319,8 +321,9 @@ void pDomain::Generate(pVector& pos) const
         else
             pos = p1 + u * (1.0f - r1) + v * (1.0f - r2);
     }
-    break;
-    case PDRectangle: pos = p1 + u * drand48() + v * drand48(); break;
+        break;
+    case PDRectangle: pos = p1 + u * drand48() + v * drand48();
+        break;
     case PDPlane: // How do I sensibly make a point on an infinite plane?
         pos = p1;
         break;
@@ -357,7 +360,7 @@ void pDomain::Generate(pVector& pos) const
 
         pos = p1 + p2 * dist + u * x + v * y;
     }
-    break;
+        break;
     case PDBlob:
         pos.x = p1.x + NRand(radius1);
         pos.y = p1.y + NRand(radius1);
@@ -375,7 +378,7 @@ void pDomain::Generate(pVector& pos) const
 
         pos = p1 + u * x + v * y;
     }
-    break;
+        break;
     default: pos = pVector(0, 0, 0);
     }
 }
@@ -386,18 +389,19 @@ void pDomain::transform(const pDomain& domain, const Fmatrix& m)
     {
     case PDBox:
     {
-        Fbox* bb_dest = (Fbox*)&p1;
-        Fbox* bb_from = (Fbox*)&domain.p1;
+        auto bb_dest = (Fbox*)&p1;
+        auto bb_from = (Fbox*)&domain.p1;
         bb_dest->xform(*bb_from, m);
     }
-    break;
+        break;
     case PDPlane:
         m.transform_tiny(p1, domain.p1);
         m.transform_dir(p2, domain.p2);
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
         break;
-    case PDSphere: m.transform_tiny(p1, domain.p1); break;
+    case PDSphere: m.transform_tiny(p1, domain.p1);
+        break;
     case PDCylinder:
     case PDCone:
         m.transform_tiny(p1, domain.p1);
@@ -405,8 +409,10 @@ void pDomain::transform(const pDomain& domain, const Fmatrix& m)
         m.transform_dir(u, domain.u);
         m.transform_dir(v, domain.v);
         break;
-    case PDBlob: m.transform_tiny(p1, domain.p1); break;
-    case PDPoint: m.transform_tiny(p1, domain.p1); break;
+    case PDBlob: m.transform_tiny(p1, domain.p1);
+        break;
+    case PDPoint: m.transform_tiny(p1, domain.p1);
+        break;
     case PDLine:
         m.transform_tiny(p1, domain.p1);
         m.transform_dir(p2, domain.p2);

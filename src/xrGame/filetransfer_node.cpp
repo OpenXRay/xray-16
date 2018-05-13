@@ -2,6 +2,7 @@
 #include "filetransfer_node.h"
 #include "Level.h"
 #include "xrServer.h"
+#include "xrCore/buffer_vector.h"
 
 using namespace file_transfer;
 

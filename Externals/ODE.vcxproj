@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>ODE</ProjectName>
+    <ProjectGuid>{1BF75FEB-87DD-486C-880B-227987D191C2}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals)ode/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4100;4505;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>ode/config/msvcdefs.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <PreprocessorDefinitions>dNODEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Mixed'">
+    <ClCompile>
+      <PreprocessorDefinitions>dNODEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ode\include\ode\collision.h" />
+    <ClInclude Include="ode\include\ode\collision_space.h" />
+    <ClInclude Include="ode\include\ode\collision_trimesh.h" />
+    <ClInclude Include="ode\include\ode\common.h" />
+    <ClInclude Include="ode\include\ode\compatibility.h" />
+    <ClInclude Include="ode\include\ode\config.h" />
+    <ClInclude Include="ode\include\ode\contact.h" />
+    <ClInclude Include="ode\include\ode\error.h" />
+    <ClInclude Include="ode\include\ode\export-dif.h" />
+    <ClInclude Include="ode\include\ode\geom.h" />
+    <ClInclude Include="ode\include\ode\mass.h" />
+    <ClInclude Include="ode\include\ode\matrix.h" />
+    <ClInclude Include="ode\include\ode\memory.h" />
+    <ClInclude Include="ode\include\ode\misc.h" />
+    <ClInclude Include="ode\include\ode\objects.h" />
+    <ClInclude Include="ode\include\ode\ode.h" />
+    <ClInclude Include="ode\include\ode\odecpp.h" />
+    <ClInclude Include="ode\include\ode\odecpp_collision.h" />
+    <ClInclude Include="ode\include\ode\odemath.h" />
+    <ClInclude Include="ode\include\ode\rotation.h" />
+    <ClInclude Include="ode\include\ode\space.h" />
+    <ClInclude Include="ode\include\ode\timer.h" />
+    <ClInclude Include="ode\ode\src\array.h" />
+    <ClInclude Include="ode\ode\src\Bounder33.h" />
+    <ClInclude Include="ode\ode\src\collision_kernel.h" />
+    <ClInclude Include="ode\ode\src\collision_space_internal.h" />
+    <ClInclude Include="ode\ode\src\collision_std.h" />
+    <ClInclude Include="ode\ode\src\collision_transform.h" />
+    <ClInclude Include="ode\ode\src\collision_trimesh_internal.h" />
+    <ClInclude Include="ode\ode\src\collision_util.h" />
+    <ClInclude Include="ode\ode\src\geom_internal.h" />
+    <ClInclude Include="ode\ode\src\joint.h" />
+    <ClInclude Include="ode\ode\src\lcp.h" />
+    <ClInclude Include="ode\ode\src\Lcp33.h" />
+    <ClInclude Include="ode\ode\src\mat.h" />
+    <ClInclude Include="ode\ode\src\objects.h" />
+    <ClInclude Include="ode\ode\src\obstack.h" />
+    <ClInclude Include="ode\ode\src\quickstep.h" />
+    <ClInclude Include="ode\ode\src\stack.h" />
+    <ClInclude Include="ode\ode\src\step.h" />
+    <ClInclude Include="ode\ode\src\StepJointInternal.h" />
+    <ClInclude Include="ode\ode\src\testing.h" />
+    <ClInclude Include="ode\ode\src\util.h" />
+    <ClInclude Include="ode\contrib\msvc7\ode_default\de_padf_integration.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ode\ode\src\array.cpp" />
+    <ClCompile Include="ode\ode\src\Bounder33.cpp" />
+    <ClCompile Include="ode\ode\src\collision_kernel.cpp" />
+    <ClCompile Include="ode\ode\src\collision_quadtreespace.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="ode\ode\src\collision_space.cpp" />
+    <ClCompile Include="ode\ode\src\collision_std.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="ode\ode\src\collision_transform.cpp" />
+    <ClCompile Include="ode\ode\src\collision_util.cpp" />
+    <ClCompile Include="ode\ode\src\error.cpp" />
+    <ClCompile Include="ode\ode\src\export-dif.cpp" />
+    <ClCompile Include="ode\ode\src\fastdot.c" />
+    <ClCompile Include="ode\ode\src\fastldlt.c" />
+    <ClCompile Include="ode\ode\src\fastlsolve.c" />
+    <ClCompile Include="ode\ode\src\fastltsolve.c" />
+    <ClCompile Include="ode\ode\src\joint.cpp" />
+    <ClCompile Include="ode\ode\src\lcp.cpp" />
+    <ClCompile Include="ode\ode\src\mass.cpp" />
+    <ClCompile Include="ode\ode\src\mat.cpp" />
+    <ClCompile Include="ode\ode\src\matrix.cpp" />
+    <ClCompile Include="ode\ode\src\memory.cpp" />
+    <ClCompile Include="ode\ode\src\misc.cpp" />
+    <ClCompile Include="ode\ode\src\obstack.cpp" />
+    <ClCompile Include="ode\ode\src\ode.cpp" />
+    <ClCompile Include="ode\ode\src\odemath.cpp" />
+    <ClCompile Include="ode\ode\src\quickstep.cpp" />
+    <ClCompile Include="ode\ode\src\rotation.cpp" />
+    <ClCompile Include="ode\ode\src\step.cpp" />
+    <ClCompile Include="ode\ode\src\stepfast.cpp" />
+    <ClCompile Include="ode\ode\src\StepJointInternal.cpp" />
+    <ClCompile Include="ode\ode\src\testing.cpp" />
+    <ClCompile Include="ode\ode\src\timer.cpp" />
+    <ClCompile Include="ode\ode\src\util.cpp" />
+    <ClCompile Include="ode\contrib\msvc7\ode_default\de_padf_integration.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ode\config\msvcdefs.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="0" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

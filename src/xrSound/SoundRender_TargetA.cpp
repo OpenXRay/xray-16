@@ -1,9 +1,8 @@
 #include "stdafx.h"
-#pragma hdrstop
 
-#include "soundrender_TargetA.h"
-#include "soundrender_emitter.h"
-#include "soundrender_source.h"
+#include "SoundRender_TargetA.h"
+#include "SoundRender_Emitter.h"
+#include "SoundRender_Source.h"
 
 xr_vector<u8> g_target_temp_data;
 
@@ -12,10 +11,12 @@ CSoundRender_TargetA::CSoundRender_TargetA() : CSoundRender_Target()
     cache_gain = 0.f;
     cache_pitch = 1.f;
     pSource = 0;
+    buf_block = 0;
 }
 
 CSoundRender_TargetA::~CSoundRender_TargetA() {}
-BOOL CSoundRender_TargetA::_initialize()
+
+bool CSoundRender_TargetA::_initialize()
 {
     inherited::_initialize();
     // initialize buffer
@@ -29,13 +30,10 @@ BOOL CSoundRender_TargetA::_initialize()
         A_CHK(alSourcef(pSource, AL_MAX_GAIN, 1.f));
         A_CHK(alSourcef(pSource, AL_GAIN, cache_gain));
         A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
-        return TRUE;
+        return true;
     }
-    else
-    {
-        Msg("! sound: OpenAL: Can't create source. Error: %s.", (LPCSTR)alGetString(error));
-        return FALSE;
-    }
+    Msg("! sound: OpenAL: Can't create source. Error: %s.", static_cast<pcstr>(alGetString(error)));
+    return false;
 }
 
 void CSoundRender_TargetA::_destroy()
@@ -122,7 +120,7 @@ void CSoundRender_TargetA::update()
         A_CHK(alGetSourcei(pSource, AL_SOURCE_STATE, &state));
         if (state != AL_PLAYING)
         {
-            //			Log		("Queuing underrun detected.");
+            //Log("Queuing underrun detected.");
             A_CHK(alSourcePlay(pSource));
         }
     }
@@ -176,12 +174,12 @@ void CSoundRender_TargetA::fill_block(ALuint BufferID)
     R_ASSERT(m_pEmitter);
 
     m_pEmitter->fill_block(&g_target_temp_data.front(), buf_block);
-    ALuint format = (m_pEmitter->source()->m_wformat.nChannels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+    ALuint format = m_pEmitter->source()->m_wformat.nChannels == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
     A_CHK(alBufferData(
         BufferID, format, &g_target_temp_data.front(), buf_block, m_pEmitter->source()->m_wformat.nSamplesPerSec));
 }
 void CSoundRender_TargetA::source_changed()
 {
-    dettach();
+    detach();
     attach();
 }

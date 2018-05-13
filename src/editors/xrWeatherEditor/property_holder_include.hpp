@@ -11,9 +11,9 @@
 
 #pragma unmanaged
 #include "Common/Noncopyable.hpp"
-#include "xrcore/fastdelegate.h"
+#include "xrCore/fastdelegate.h"
 #include <utility>
-#include "include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #pragma managed
 
 generic<typename type0, typename type1> private ref struct Pair

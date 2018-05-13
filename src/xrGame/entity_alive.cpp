@@ -413,7 +413,7 @@ void CEntityAlive::PlaceBloodWallmark(const Fvector& dir, const Fvector& start_p
             {
                 //добавить отметку на материале
                 // GlobalEnv.Render->add_StaticWallmark(wallmarkShader, end_point, wallmark_size, pTri, pVerts);
-                GlobalEnv.Render->add_StaticWallmark(pwallmarks_vector, end_point, wallmark_size, pTri, pVerts);
+                GEnv.Render->add_StaticWallmark(pwallmarks_vector, end_point, wallmark_size, pTri, pVerts);
             }
         }
     }
@@ -456,7 +456,7 @@ void CEntityAlive::UpdateFireParticles()
 
     //	WOUND_VECTOR_IT last_it;
 
-    for (WOUND_VECTOR_IT it = m_ParticleWounds.begin(); it != m_ParticleWounds.end();)
+    for (auto it = m_ParticleWounds.begin(); it != m_ParticleWounds.end();)
     {
         CWound* pWound = *it;
         float burn_size = pWound->TypeSize(ALife::eHitTypeBurn);
@@ -522,7 +522,7 @@ void CEntityAlive::UpdateBloodDrops()
 
     //	WOUND_VECTOR_IT last_it;
 
-    for (WOUND_VECTOR_IT it = m_BloodWounds.begin(); it != m_BloodWounds.end();)
+    for (auto it = m_BloodWounds.begin(); it != m_BloodWounds.end();)
     {
         CWound* pWound = *it;
         float blood_size = pWound->BloodSize();
@@ -756,7 +756,7 @@ void CEntityAlive::fill_hit_bone_surface_areas() const
     VERIFY(kinematics);
     VERIFY(kinematics->LL_BoneCount());
 
-    m_hit_bone_surface_areas.clear_not_free();
+    m_hit_bone_surface_areas.clear();
 
     for (u16 i = 0, n = kinematics->LL_BoneCount(); i < n; ++i)
     {

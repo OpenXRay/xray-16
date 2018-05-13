@@ -80,8 +80,8 @@ void CUIGameLog::Update()
     CUIScrollView::Update();
     toDelList.clear();
 
-    WINDOW_LIST_it it = m_pad->GetChildWndList().begin();
-    WINDOW_LIST_it it_e = m_pad->GetChildWndList().end();
+    auto it = m_pad->GetChildWndList().begin();
+    auto it_e = m_pad->GetChildWndList().end();
 
     for (; it != it_e; ++it)
     {

@@ -5,7 +5,7 @@
 #ifndef LibraryH
 #define LibraryH
 
-#include "pure.h"
+#include "xrEngine/pure.h"
 #include "editors/xrEProps/FolderLib.h"
 //----------------------------------------------------
 class CEditableObject;
@@ -15,7 +15,7 @@ DEFINE_MAP_PRED(AnsiString, CEditableObject*, EditObjMap, EditObjPairIt, astr_pr
 class ECORE_API ELibrary //:	public pureDeviceCreate, public pureDeviceDestroy
 {
     bool m_bReady;
-    friendclass TfrmChoseObject;
+    friend class TfrmChoseObject;
     EditObjMap m_EditObjects;
 
     CEditableObject* LoadEditObject(LPCSTR full_name);
@@ -25,8 +25,8 @@ public:
     ELibrary();
     virtual ~ELibrary();
 
-    void__stdcall RemoveObject(LPCSTR fname, EItemType type, bool& res);
-    void__stdcall RenameObject(LPCSTR fn0, LPCSTR fn1, EItemType type);
+    void __stdcall RemoveObject(LPCSTR fname, EItemType type, bool& res);
+    void __stdcall RenameObject(LPCSTR fn0, LPCSTR fn1, EItemType type);
 
     void OnCreate();
     void OnDestroy();

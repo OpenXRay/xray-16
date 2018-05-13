@@ -117,7 +117,7 @@ void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCS
 
     int nodes_num = xml_doc.GetNodesNum(path, 0, "btn");
 
-    XML_NODE* tab_node = xml_doc.NavigateToNode(path, 0);
+    XML_NODE tab_node = xml_doc.NavigateToNode(path, 0);
     xml_doc.SetLocalRoot(tab_node);
 
     CUITextWnd* st;

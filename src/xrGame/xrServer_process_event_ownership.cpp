@@ -3,6 +3,8 @@
 #include "xrserver_objects.h"
 #include "xrserver_objects_alife_monsters.h"
 #include "xrServer_svclient_validation.h"
+#include "xrNetServer/NET_Messages.h"
+#include "xrServerEntities/xrMessages.h"
 
 void ReplaceOwnershipHeader(NET_Packet& P)
 {

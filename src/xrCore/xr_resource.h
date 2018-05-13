@@ -1,6 +1,7 @@
+#pragma once
 #ifndef xr_resourceH
 #define xr_resourceH
-#pragma once
+#include "xrstring.h"
 
 // resource itself, the base class for all derived resources
 class XRCORE_API xr_resource
@@ -110,7 +111,7 @@ public:
     // assignment
     self& operator=(const self& rhs)
     {
-        _set(rhs);
+        this->_set(rhs);
         return (self&)*this;
     }
 
@@ -124,9 +125,7 @@ public:
     // fast swapping
     void swap(self& rhs)
     {
-        T* tmp = C::p_;
-        C::p_ = rhs.p_;
-        rhs.p_ = tmp;
+        std::swap(this->p_, rhs.p_);
     }
 };
 

@@ -33,7 +33,7 @@ void Property::construct(shared_str const& property_id, Manager& manager_r)
     LPCSTR functor_str = pSettings->r_string(id(), "functor");
     m_desc.parameter = "";
     m_desc.parameter2 = id_str();
-    R_ASSERT2(ai().script_engine().functor(functor_str, m_desc.functr),
+    R_ASSERT2(GEnv.ScriptEngine->functor(functor_str, m_desc.functr),
         make_string("Failed to get upgrade property functor in section[%s], functor[%s]", id_str(), functor_str));
     m_desc(); // test
 

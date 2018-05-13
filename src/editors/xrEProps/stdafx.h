@@ -1,10 +1,7 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef stdafxH
-#define stdafxH
-
 #pragma once
+
+#define NO_ENGINE_API
+#include "Common/Common.hpp"
 
 #include <xrCore/xrCore.h>
 
@@ -20,8 +17,6 @@ class MODEL;
 
 #include "FolderLib.h"
 
-#include "xrCore/Platform.h"
-
 #define ENGINE_API
 #define DLL_API XR_IMPORT
 #define ECORE_API XR_EXPORT
@@ -32,5 +27,3 @@ class MODEL;
 #pragma comment(lib, "xrSoundB.lib")
 #pragma comment(lib, "xrCoreB.lib")
 #pragma comment(lib, "EToolsB.lib")
-
-#endif // stdafxH

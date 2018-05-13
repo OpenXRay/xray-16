@@ -44,52 +44,52 @@ bool xrCompressor::testSKIP(LPCSTR path)
     if (strstr(path, "textures\\det\\"))
         return true;
 
-    if (stricmp(p_ext, ".thm") && strstr(path, "textures\\terrain\\terrain_") && !is_tail(p_name, "_mask", 5))
+    if (xr_stricmp(p_ext, ".thm") && strstr(path, "textures\\terrain\\terrain_") && !is_tail(p_name, "_mask", 5))
         return true;
 
     if (strstr(path, "textures\\") && is_tail(p_name, "_nmap", 5) && !strstr(p_name, "water_flowing_nmap"))
         return true;
 
-    if (0 == stricmp(p_name, "build"))
+    if (0 == xr_stricmp(p_name, "build"))
     {
-        if (0 == stricmp(p_ext, ".aimap"))
+        if (0 == xr_stricmp(p_ext, ".aimap"))
             return true;
-        if (0 == stricmp(p_ext, ".cform"))
+        if (0 == xr_stricmp(p_ext, ".cform"))
             return true;
-        if (0 == stricmp(p_ext, ".details"))
+        if (0 == xr_stricmp(p_ext, ".details"))
             return true;
-        if (0 == stricmp(p_ext, ".prj"))
+        if (0 == xr_stricmp(p_ext, ".prj"))
             return true;
-        if (0 == stricmp(p_ext, ".lights"))
+        if (0 == xr_stricmp(p_ext, ".lights"))
             return false;
     }
-    if (0 == stricmp(p_name, "do_light") && 0 == stricmp(p_ext, ".ltx"))
+    if (0 == xr_stricmp(p_name, "do_light") && 0 == xr_stricmp(p_ext, ".ltx"))
         return true;
 
-    if (0 == stricmp(p_ext, ".txt"))
+    if (0 == xr_stricmp(p_ext, ".txt"))
         return true;
-    if (0 == stricmp(p_ext, ".tga"))
+    if (0 == xr_stricmp(p_ext, ".tga"))
         return true;
-    if (0 == stricmp(p_ext, ".db"))
+    if (0 == xr_stricmp(p_ext, ".db"))
         return true;
-    if (0 == stricmp(p_ext, ".smf"))
+    if (0 == xr_stricmp(p_ext, ".smf"))
         return true;
 
     if ('~' == p_ext[1])
         return true;
     if ('_' == p_ext[1])
         return true;
-    if (0 == stricmp(p_ext, ".vcproj"))
+    if (0 == xr_stricmp(p_ext, ".vcproj"))
         return true;
-    if (0 == stricmp(p_ext, ".sln"))
+    if (0 == xr_stricmp(p_ext, ".sln"))
         return true;
-    if (0 == stricmp(p_ext, ".old"))
+    if (0 == xr_stricmp(p_ext, ".old"))
         return true;
-    if (0 == stricmp(p_ext, ".rc"))
+    if (0 == xr_stricmp(p_ext, ".rc"))
         return true;
 
-    for (xr_vector<shared_str>::iterator it = exclude_exts.begin(); it != exclude_exts.end(); ++it)
-        if (PatternMatch(p_ext, it->c_str()))
+    for (const auto &it : exclude_exts)
+        if (PatternMatch(p_ext, it.c_str()))
             return true;
 
     return false;
@@ -103,13 +103,13 @@ bool xrCompressor::testVFS(LPCSTR path)
     string256 p_ext;
     _splitpath(path, 0, 0, 0, p_ext);
 
-    if (!stricmp(p_ext, ".xml"))
+    if (!xr_stricmp(p_ext, ".xml"))
         return (false);
 
-    if (!stricmp(p_ext, ".ltx"))
+    if (!xr_stricmp(p_ext, ".ltx"))
         return (FALSE);
 
-    if (!stricmp(p_ext, ".script"))
+    if (!xr_stricmp(p_ext, ".script"))
         return (FALSE);
 
     return (TRUE);
@@ -259,12 +259,12 @@ void xrCompressor::CompressOne(LPCSTR path)
                 if (bFast)
                 {
                     R_ASSERT(LZO_E_OK ==
-                        lzo1x_1_compress((u8*)src->pointer(), c_size_real, c_data, &c_size_compressed, c_heap));
+                        lzo1x_1_compress((u8*)src->pointer(), c_size_real, c_data, (lzo_uintp)&c_size_compressed, c_heap));
                 }
                 else
                 {
                     R_ASSERT(LZO_E_OK ==
-                        lzo1x_999_compress((u8*)src->pointer(), c_size_real, c_data, &c_size_compressed, c_heap));
+                        lzo1x_999_compress((u8*)src->pointer(), c_size_real, c_data, (lzo_uintp)&c_size_compressed, c_heap));
                 }
 
                 t_compress.End();
@@ -285,7 +285,7 @@ void xrCompressor::CompressOne(LPCSTR path)
                     {
                         u8* c_out = xr_alloc<u8>(c_size_real);
                         u32 c_orig = c_size_real;
-                        R_ASSERT(LZO_E_OK == lzo1x_optimize(c_data, c_size_compressed, c_out, &c_orig, NULL));
+                        R_ASSERT(LZO_E_OK == lzo1x_optimize(c_data, c_size_compressed, c_out, (lzo_uintp)&c_orig, NULL));
                         R_ASSERT(c_orig == c_size_real);
                         xr_free(c_out);
                     } // bFast
@@ -319,7 +319,7 @@ void xrCompressor::CompressOne(LPCSTR path)
         R.c_ptr = c_ptr;
         R.c_size_real = c_size_real;
         R.c_size_compressed = c_size_compressed;
-        aliases.insert(mk_pair(R.c_size_real, R));
+        aliases.insert(std::make_pair(R.c_size_real, R));
     }
 
     FS.r_close(src);
@@ -332,14 +332,13 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
     string_path fname;
     string128 s_num;
 #ifdef MOD_COMPRESS
-    strconcat(sizeof(fname), fname, tgt_folder, ".xdb", itoa(num, s_num, 10));
+    strconcat(sizeof(fname), fname, tgt_folder, ".xdb", xr_itoa(num, s_num, 10));
 #else
-    strconcat(sizeof(fname), fname, tgt_folder, ".pack_#", itoa(num, s_num, 10));
+    strconcat(sizeof(fname), fname, tgt_folder, ".pack_#", xr_itoa(num, s_num, 10));
 #endif
-    unlink(fname);
+    xr_unlink(fname);
     fs_pack_writer = FS.w_open(fname);
     fs_desc.clear();
-    aliases.clear();
 
     bytesSRC = 0;
     bytesDST = 0;
@@ -353,15 +352,12 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
     {
         CMemoryWriter W;
         CInifile::Sect& S = config_ltx->r_section("header");
-        CInifile::SectCIt it = S.Data.begin();
-        CInifile::SectCIt it_e = S.Data.end();
         string4096 buff;
         xr_sprintf(buff, "[%s]", S.Name.c_str());
         W.w_string(buff);
-        for (; it != it_e; ++it)
+        for (const auto &it : S.Data)
         {
-            const CInifile::Item& I = *it;
-            xr_sprintf(buff, "%s = %s", I.first.c_str(), I.second.c_str());
+            xr_sprintf(buff, "%s = %s", it.first.c_str(), it.second.c_str());
             W.w_string(buff);
         }
         W.seek(0);
@@ -419,6 +415,10 @@ void xrCompressor::ClosePack()
         100.f * float(bytesDST) / float(bytesSRC), ((dwTimeEnd - dwTimeStart) / 1000) / 60,
         ((dwTimeEnd - dwTimeStart) / 1000) % 60,
         float((float(bytesDST) / float(1024 * 1024)) / (t_compress.GetElapsed_sec())));
+
+    for (auto &it : aliases)
+        xr_free(it.second.path);
+    aliases.clear();
 }
 
 void xrCompressor::PerformWork()
@@ -430,16 +430,15 @@ void xrCompressor::PerformWork()
         int pack_num = 0;
         OpenPack(target_name.c_str(), pack_num++);
 
-        for (u32 it = 0; it < folders_list->size(); it++)
-            write_file_header((*folders_list)[it], 0, 0, 0, 0);
+        for (const auto &it : *folders_list)
+            write_file_header(it, 0, 0, 0, 0);
 
         if (!bStoreFiles)
             c_heap = xr_alloc<u8>(LZO1X_999_MEM_COMPRESS);
 
         for (u32 it = 0; it < files_list->size(); it++)
         {
-            xr_sprintf(
-                caption, "Compress files: %d/%d - %d%%", it, files_list->size(), (it * 100) / files_list->size());
+            xr_sprintf(caption, "Compress files: %d/%d - %d%%", it, files_list->size(), (it * 100) / files_list->size());
             SetWindowText(GetConsoleWindow(), caption);
             printf("\n%-80s   ", (*files_list)[it]);
 
@@ -478,17 +477,15 @@ void xrCompressor::ProcessTargetFolder()
 
 void xrCompressor::GatherFiles(LPCSTR path)
 {
-    xr_vector<char*>* i_list = FS.file_list_open("$target_folder$", path, FS_ListFiles | FS_RootOnly);
+    auto i_list = FS.file_list_open("$target_folder$", path, FS_ListFiles | FS_RootOnly);
     if (!i_list)
     {
         Msg("ERROR: Unable to open file list:%s", path);
         return;
     }
-    xr_vector<char*>::iterator it = i_list->begin();
-    xr_vector<char*>::iterator itE = i_list->end();
-    for (; it != itE; ++it)
+    for (const auto &it : *i_list)
     {
-        xr_string tmp_path = xr_string(path) + xr_string(*it);
+        xr_string tmp_path = xr_string(path) + xr_string(it);
         if (!testSKIP(tmp_path.c_str()))
         {
             files_list->push_back(xr_strdup(tmp_path.c_str()));
@@ -507,17 +504,17 @@ bool xrCompressor::IsFolderAccepted(CInifile& ltx, LPCSTR path, BOOL& recurse)
     if (ltx.section_exist("exclude_folders"))
     {
         CInifile::Sect& ef_sect = ltx.r_section("exclude_folders");
-        for (CInifile::SectCIt ef_it = ef_sect.Data.begin(); ef_it != ef_sect.Data.end(); ef_it++)
+        for (const auto &it : ef_sect.Data)
         {
-            recurse = CInifile::IsBOOL(ef_it->second.c_str());
+            recurse = CInifile::isBool(it.second.c_str());
             if (recurse)
             {
-                if (path == strstr(path, ef_it->first.c_str()))
+                if (path == strstr(path, it.first.c_str()))
                     return false;
             }
             else
             {
-                if (0 == xr_strcmp(path, ef_it->first.c_str()))
+                if (0 == xr_strcmp(path, it.first.c_str()))
                     return false;
             }
         }
@@ -538,14 +535,13 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
     if (ltx.section_exist("include_folders"))
     {
         CInifile::Sect& if_sect = ltx.r_section("include_folders");
-
-        for (CInifile::SectCIt if_it = if_sect.Data.begin(); if_it != if_sect.Data.end(); ++if_it)
+        for (const auto &it : if_sect.Data)
         {
-            BOOL ifRecurse = CInifile::IsBOOL(if_it->second.c_str());
+            BOOL ifRecurse = CInifile::isBool(it.second.c_str());
             u32 folder_mask = FS_ListFolders | (ifRecurse ? 0 : FS_RootOnly);
 
             string_path path;
-            LPCSTR _path = 0 == xr_strcmp(if_it->first.c_str(), ".\\") ? "" : if_it->first.c_str();
+            LPCSTR _path = 0 == xr_strcmp(it.first.c_str(), ".\\") ? "" : it.first.c_str();
             xr_strcpy(path, _path);
             u32 path_len = xr_strlen(path);
             if ((0 != path_len) && (path[path_len - 1] != '\\'))
@@ -560,18 +556,16 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
                 if (val)
                     GatherFiles(path);
 
-                xr_vector<char*>* i_fl_list = FS.file_list_open("$target_folder$", path, folder_mask);
+                auto i_fl_list = FS.file_list_open("$target_folder$", path, folder_mask);
                 if (!i_fl_list)
                 {
                     Msg("ERROR: Unable to open folder list:", path);
                     continue;
                 }
 
-                xr_vector<char*>::iterator it = i_fl_list->begin();
-                xr_vector<char*>::iterator itE = i_fl_list->end();
-                for (; it != itE; ++it)
+                for (const auto &it : *i_fl_list)
                 {
-                    xr_string tmp_path = xr_string(path) + xr_string(*it);
+                    xr_string tmp_path = xr_string(path) + xr_string(it);
                     bool val = IsFolderAccepted(ltx, tmp_path.c_str(), efRecurse);
                     if (val)
                     {
@@ -598,26 +592,20 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
     if (ltx.section_exist("include_files"))
     {
         CInifile::Sect& if_sect = ltx.r_section("include_files");
-        for (CInifile::SectCIt if_it = if_sect.Data.begin(); if_it != if_sect.Data.end(); ++if_it)
-        {
-            files_list->push_back(xr_strdup(if_it->first.c_str()));
-        }
+        for (const auto &it : if_sect.Data)
+            files_list->push_back(xr_strdup(it.first.c_str()));
     }
 
     PerformWork();
 
     // free
-    xr_vector<char*>::iterator it = files_list->begin();
-    xr_vector<char*>::iterator itE = files_list->end();
-    for (; it != itE; ++it)
-        xr_free(*it);
+    for (auto &it : *files_list)
+        xr_free(it);
     xr_delete(files_list);
 
-    it = folders_list->begin();
-    itE = folders_list->end();
-    for (; it != itE; ++it)
-        xr_free(*it);
+    for (auto &it : *folders_list)
+        xr_free(it);
     xr_delete(folders_list);
 
-    exclude_exts.clear_and_free();
+    exclude_exts.clear();
 }

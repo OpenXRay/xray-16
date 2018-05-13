@@ -8,9 +8,9 @@
 
 #include "stdafx.h"
 #include "script_properties_list_helper.h"
-#include "script_token_list.h"
-#include "xrServer_Object_Base.h"
-#include "script_value_container_impl.h"
+#include "xrServerEntities/script_token_list.h"
+#include "xrServerEntities/xrServer_Object_Base.h"
+#include "xrServerEntities/script_value_container_impl.h"
 #include "script_value_wrapper.h"
 #include "script_space.h"
 
@@ -25,10 +25,11 @@ template <typename T>
 struct CWrapHelper
 {
     typedef T result_type;
+
     template <bool a>
     static T* wrap_value(luabind::object object, LPCSTR name)
     {
-        CScriptValueWrapper<T>* value = xr_new<CScriptValueWrapper<T>>(object, name);
+        CScriptValueWrapper<T>* value = new CScriptValueWrapper<T>(object, name);
         owner(object)->add(value);
         return (value->value());
     }
@@ -44,10 +45,11 @@ template <>
 struct CWrapHelper<bool>
 {
     typedef BOOL result_type;
+
     template <bool a>
     static BOOL* wrap_value(luabind::object object, LPCSTR name)
     {
-        CScriptValueWrapper<bool>* value = xr_new<CScriptValueWrapper<bool>>(object, name);
+        CScriptValueWrapper<bool>* value = new CScriptValueWrapper<bool>(object, name);
         owner(object)->add(value);
         return (value->value());
     }
@@ -55,7 +57,7 @@ struct CWrapHelper<bool>
     template <bool a>
     static BOOL* wrap_value(luabind::object object, luabind::object table, LPCSTR name)
     {
-        CScriptValueWrapper<bool>* value = xr_new<CScriptValueWrapper<bool>>(table, name);
+        CScriptValueWrapper<bool>* value = new CScriptValueWrapper<bool>(table, name);
         owner(object)->add(value);
         return (value->value());
     }
@@ -64,14 +66,14 @@ struct CWrapHelper<bool>
 template <typename T>
 typename CWrapHelper<T>::result_type* wrap_value(luabind::object object, LPCSTR name)
 {
-    return (CWrapHelper<T>::wrap_value < is_class<T>::result &&
+    return (CWrapHelper<T>::wrap_value < std::is_class_v<T> &&
         !object_type_traits::is_same<shared_str, T>::value > (object, name));
 }
 
 template <typename T>
 typename CWrapHelper<T>::result_type* wrap_value(luabind::object object, luabind::object table, LPCSTR name)
 {
-    return (CWrapHelper<T>::wrap_value < is_class<T>::result &&
+    return (CWrapHelper<T>::wrap_value < std::is_class_v<T> &&
         !object_type_traits::is_same<shared_str, T>::value > (object, table, name));
 }
 
@@ -174,7 +176,7 @@ ChooseValue* CScriptPropertiesListHelper::CreateChoose(
 ChooseValue* CScriptPropertiesListHelper::CreateChoose(
     PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, u32 mode)
 {
-    return (PHelper().CreateChoose(*items, key, wrap_value<shared_str>(object, name), mode, 0));
+    return (PHelper().CreateChoose(*items, key, wrap_value<shared_str>(object, name), mode, nullptr));
 }
 
 // S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR

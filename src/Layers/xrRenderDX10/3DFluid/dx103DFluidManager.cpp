@@ -591,7 +591,7 @@ void dx103DFluidManager::ApplyVorticityConfinement(float timestep)
     // );
 }
 
-void dx103DFluidManager::ApplyExternalForces(const dx103DFluidData& FluidData, float timestep)
+void dx103DFluidManager::ApplyExternalForces(const dx103DFluidData& FluidData, float /*timestep*/)
 {
     PIX_EVENT(ApplyExternalForces);
 
@@ -602,7 +602,7 @@ void dx103DFluidManager::ApplyExternalForces(const dx103DFluidData& FluidData, f
     m_pEmittersHandler->RenderVelocity(FluidData);
 }
 
-void dx103DFluidManager::ComputeVelocityDivergence(float timestep)
+void dx103DFluidManager::ComputeVelocityDivergence(float /*timestep*/)
 {
     PIX_EVENT(ComputeVelocityDivergence);
 
@@ -621,7 +621,7 @@ void dx103DFluidManager::ComputeVelocityDivergence(float timestep)
     // pRenderTargetShaderViews[RENDER_TARGET_TEMPVECTOR] );
 }
 
-void dx103DFluidManager::ComputePressure(float timestep)
+void dx103DFluidManager::ComputePressure(float /*timestep*/)
 {
     PIX_EVENT(ComputePressure);
 
@@ -693,7 +693,7 @@ void dx103DFluidManager::ComputePressure(float timestep)
     // TechniqueJacobi->GetPassByIndex(0)->Apply(0);
 }
 
-void dx103DFluidManager::ProjectVelocity(float timestep)
+void dx103DFluidManager::ProjectVelocity(float /*timestep*/)
 {
     PIX_EVENT(ProjectVelocity);
 

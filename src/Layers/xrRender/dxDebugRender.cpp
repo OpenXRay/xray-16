@@ -6,7 +6,6 @@
 #include "dxUIShader.h"
 
 dxDebugRender DebugRenderImpl;
-dxDebugRender DebugRenderImpl_1;
 dxDebugRender::dxDebugRender()
 {
     m_line_indices.reserve(line_vertex_limit);
@@ -92,9 +91,10 @@ void dxDebugRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_worl
 void dxDebugRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
 void dxDebugRender::SetAmbient(u32 colour)
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //	TODO: DX10: Check if need this for DX10
     VERIFY(!"Not implemented for DX10");
+    UNUSED(colour);
 #else //	USE_DX10
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
 #endif //	USE_DX10
@@ -132,8 +132,6 @@ private:
     xr_vector<u16> _line_indices;
     xr_vector<FVF::L> _line_vertices;
 
-    //	Vertices		_line_vertices;
-    //	Indices			_line_indices;
 public:
     RDebugRender()
     {

@@ -37,8 +37,8 @@ public:
     void destroy()
     {
         width = height = 0;
-        surface.clear_and_free();
-        marker.clear_and_free();
+        surface.clear();
+        marker.clear();
     }
     u32 Area() { return (width + 2 * BORDER) * (height + 2 * BORDER); }
     void Pixel(u32 ID, u8& r, u8& g, u8& b, u8& s, u8& h);

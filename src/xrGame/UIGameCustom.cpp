@@ -18,6 +18,9 @@
 
 #include "xrEngine/x_ray.h"
 
+#include "ui\UICellItem.h" //Alundaio
+//#include "script_game_object.h" //Alundaio
+
 EGameIDs ParseStringToGameType(const char* str);
 
 struct predicate_find_stat
@@ -172,6 +175,35 @@ void CUIGameCustom::HideActorMenu()
     if (ActorMenu->IsShown())
         ActorMenu->HideDialog();
 }
+
+//Alundaio:
+void CUIGameCustom::UpdateActorMenu()
+{
+    if (ActorMenu->IsShown())
+    {
+        ActorMenu->UpdateActor();
+        ActorMenu->RefreshCurrentItemCell();
+    }
+}
+
+CScriptGameObject* CUIGameCustom::CurrentItemAtCell()
+{
+    CUICellItem* itm = ActorMenu->CurrentItem();
+    if (!itm->m_pData)
+        return nullptr;
+
+    PIItem IItm = static_cast<PIItem>(itm->m_pData);
+    if (!IItm)
+        return nullptr;
+
+    CGameObject* GO = smart_cast<CGameObject*>(IItm);
+
+    if (GO)
+        return GO->lua_game_object();
+
+    return nullptr;
+}
+//-Alundaio
 
 void CUIGameCustom::HideMessagesWindow()
 {

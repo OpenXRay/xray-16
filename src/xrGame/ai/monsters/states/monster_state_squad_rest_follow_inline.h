@@ -17,8 +17,8 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterSquadRestFollowAbstract::CStateMonsterSquadRestFollow(_Object* obj) : inherited(obj)
 {
-    add_state(eStateSquad_RestFollow_Idle, new CStateMonsterCustomAction<_Object>(obj));
-    add_state(eStateSquad_RestFollow_WalkToPoint, new CStateMonsterMoveToPointEx<_Object>(obj));
+    this->add_state(eStateSquad_RestFollow_Idle, new CStateMonsterCustomAction<_Object>(obj));
+    this->add_state(eStateSquad_RestFollow_WalkToPoint, new CStateMonsterMoveToPointEx<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION
@@ -28,21 +28,21 @@ void CStateMonsterSquadRestFollowAbstract::initialize()
 {
     inherited::initialize();
 
-    SSquadCommand& command = monster_squad().get_squad(object)->GetCommand(object);
+    SSquadCommand& command = monster_squad().get_squad(this->object)->GetCommand(this->object);
     last_point = command.position;
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterSquadRestFollowAbstract::reselect_state()
 {
-    SSquadCommand& command = monster_squad().get_squad(object)->GetCommand(object);
-    if (command.position.distance_to(object->Position()) < Random.randF(STOP_DISTANCE, STAY_DISTANCE))
+    SSquadCommand& command = monster_squad().get_squad(this->object)->GetCommand(this->object);
+    if (command.position.distance_to(this->object->Position()) < Random.randF(STOP_DISTANCE, STAY_DISTANCE))
     {
-        select_state(eStateSquad_RestFollow_Idle);
+        this->select_state(eStateSquad_RestFollow_Idle);
     }
     else
     {
-        select_state(eStateSquad_RestFollow_WalkToPoint);
+        this->select_state(eStateSquad_RestFollow_WalkToPoint);
     }
 }
 
@@ -51,14 +51,14 @@ void CStateMonsterSquadRestFollowAbstract::check_force_state() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterSquadRestFollowAbstract::setup_substates()
 {
-    state_ptr state = get_state_current();
+    state_ptr state = this->get_state_current();
 
-    if (current_substate == eStateSquad_RestFollow_Idle)
+    if (this->current_substate == eStateSquad_RestFollow_Idle)
     {
         SStateDataAction data;
         data.action = ACT_REST;
         data.sound_type = MonsterSound::eMonsterSoundIdle;
-        data.sound_delay = object->db().m_dwIdleSndDelay;
+        data.sound_delay = this->object->db().m_dwIdleSndDelay;
         data.time_out = Random.randI(MIN_TIME_OUT, MAX_TIME_OUT);
 
         state->fill_data_with(&data, sizeof(SStateDataAction));
@@ -66,14 +66,14 @@ void CStateMonsterSquadRestFollowAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateSquad_RestFollow_WalkToPoint)
+    if (this->current_substate == eStateSquad_RestFollow_WalkToPoint)
     {
         SStateDataMoveToPointEx data;
 
-        Fvector dest_pos = monster_squad().get_squad(object)->GetCommand(object).position;
-        if (!object->control().path_builder().restrictions().accessible(dest_pos))
+        Fvector dest_pos = monster_squad().get_squad(this->object)->GetCommand(this->object).position;
+        if (!this->object->control().path_builder().restrictions().accessible(dest_pos))
         {
-            data.vertex = object->control().path_builder().restrictions().accessible_nearest(dest_pos, data.point);
+            data.vertex = this->object->control().path_builder().restrictions().accessible_nearest(dest_pos, data.point);
         }
         else
         {
@@ -87,7 +87,7 @@ void CStateMonsterSquadRestFollowAbstract::setup_substates()
         data.accel_type = eAT_Calm;
         data.completion_dist = STOP_DISTANCE;
         data.action.sound_type = MonsterSound::eMonsterSoundIdle;
-        data.action.sound_delay = object->db().m_dwIdleSndDelay;
+        data.action.sound_delay = this->object->db().m_dwIdleSndDelay;
         data.time_to_rebuild = u32(-1);
 
         state->fill_data_with(&data, sizeof(SStateDataMoveToPointEx));

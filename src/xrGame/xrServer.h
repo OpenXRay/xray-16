@@ -14,6 +14,7 @@
 #include "secure_messaging.h"
 #include "xrServer_updates_compressor.h"
 #include "xrClientsPool.h"
+#include "xrCommon/xr_unordered_map.h"
 
 #ifdef DEBUG
 //. #define SLOW_VERIFY_ENTITIES
@@ -21,10 +22,10 @@
 
 class CSE_Abstract;
 
-const u32 NET_Latency = 50; // time in (ms)
+constexpr u32 NET_Latency = 50; // time in (ms)
 
-// t-defs
-typedef xr_hash_map<u16, CSE_Abstract*> xrS_entities;
+// XXX: check if u16 used for entity's id. If true, then this must be changed, if we want to increase the number of ID's.
+using xrS_entities = xr_unordered_map<u16, CSE_Abstract*>;
 
 class xrClientData : public IClient
 {
@@ -176,8 +177,8 @@ public:
     void Perform_reject(CSE_Abstract* what, CSE_Abstract* from, int delta);
     virtual void Perform_destroy(CSE_Abstract* tpSE_Abstract, u32 mode) override;
 
-    virtual CSE_Abstract* Process_spawn(NET_Packet& P, ClientID sender,
-        BOOL bSpawnWithClientsMainEntityAsParent = FALSE, CSE_Abstract* tpExistedEntity = 0) override;
+    CSE_Abstract* Process_spawn(NET_Packet& P, ClientID sender,
+                                bool bSpawnWithClientsMainEntityAsParent = false, CSE_Abstract* tpExistedEntity = nullptr) override;
     void Process_update(NET_Packet& P, ClientID sender);
     void Process_save(NET_Packet& P, ClientID sender);
     void Process_event(NET_Packet& P, ClientID sender);
@@ -189,7 +190,7 @@ public:
         const u16 id_entity, bool send_message = true);
 
     xrClientData* SelectBestClientToMigrateTo(CSE_Abstract* E, BOOL bForceAnother = FALSE);
-    void SendConnectResult(IClient* CL, u8 res, u8 res1, char* ResultStr);
+    void SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr);
     void __stdcall SendConfigFinished(ClientID const& clientId);
     void SendProfileCreationError(IClient* CL, char const* reason);
     void AttachNewClient(IClient* CL);
@@ -232,9 +233,9 @@ public:
     virtual void OnCL_Connected(IClient* CL);
     virtual void OnCL_Disconnected(IClient* CL);
     virtual bool OnCL_QueryHost();
-    virtual void SendTo_LL(ClientID ID, void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
-    void SecureSendTo(xrClientData* xrCL, NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
-    virtual void SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
+    virtual void SendTo_LL(ClientID ID, void* data, u32 size, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
+    void SecureSendTo(xrClientData* xrCL, NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
+    virtual void SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
     void GetPooledState(xrClientData* xrCL);
     void ClearDisconnectedPool() { m_disconnected_clients.Clear(); };
     virtual IClient* client_Create(); // create client info
@@ -243,7 +244,7 @@ public:
     virtual void client_Destroy(IClient* C); // destroy client info
 
     // utilities
-    virtual CSE_Abstract* entity_Create(LPCSTR name) override;
+    virtual CSE_Abstract* entity_Create(pcstr name) override;
     virtual void entity_Destroy(CSE_Abstract*& P) override;
     u32 GetEntitiesNum() { return entities.size(); };
     CSE_Abstract* GetEntity(u32 Num);

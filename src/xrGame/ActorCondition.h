@@ -139,7 +139,10 @@ protected:
     float m_fAccelK;
     float m_fSprintK;
 
+public:
     float m_MaxWalkWeight;
+
+protected:
     float m_zone_max_power[ALife::infl_max_count];
     float m_zone_danger[ALife::infl_max_count];
     float m_f_time_affected;

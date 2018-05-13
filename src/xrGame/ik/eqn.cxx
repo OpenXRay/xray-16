@@ -74,7 +74,7 @@ static int solve_trig1_aux(float c, float a2b2, float atan2ba, float theta[2])
 
         if (theta[0] > theta[1])
         {
-            swap(theta[0], theta[1]);
+            std::swap(theta[0], theta[1]);
             //	temp = theta[0];
             //    theta[0] = theta[1];
             //   theta[1] = temp;

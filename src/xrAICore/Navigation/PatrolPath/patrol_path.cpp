@@ -6,9 +6,8 @@
 //	Description : Patrol path
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "patrol_path.h"
-#include "xrCore/xrCore.h"
 #include "Common/LevelGameDef.h"
 
 LPCSTR TEST_PATROL_PATH_NAME = "val_dogs_nest4_centre";

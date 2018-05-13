@@ -13,8 +13,8 @@
 #include "gameobject.h"
 #include "script_game_object.h"
 
-CPhraseDialogManager::CPhraseDialogManager(void) {}
-CPhraseDialogManager::~CPhraseDialogManager(void) {}
+CPhraseDialogManager::CPhraseDialogManager() {}
+CPhraseDialogManager::~CPhraseDialogManager() {}
 const DIALOG_SHARED_PTR& CPhraseDialogManager::GetDialogByID(const shared_str& dialog_id) const
 {
     R_ASSERT2(HaveAvailableDialog(dialog_id), dialog_id.c_str());
@@ -54,7 +54,7 @@ void CPhraseDialogManager::InitDialog(CPhraseDialogManager* dialog_partner, DIAL
 
 void CPhraseDialogManager::AddDialog(DIALOG_SHARED_PTR& phrase_dialog)
 {
-    DIALOG_VECTOR_IT it = std::find(m_ActiveDialogs.begin(), m_ActiveDialogs.end(), phrase_dialog);
+    auto it = std::find(m_ActiveDialogs.begin(), m_ActiveDialogs.end(), phrase_dialog);
     THROW(m_ActiveDialogs.end() == it);
     m_ActiveDialogs.push_back(phrase_dialog);
 }
@@ -62,7 +62,7 @@ void CPhraseDialogManager::AddDialog(DIALOG_SHARED_PTR& phrase_dialog)
 void CPhraseDialogManager::ReceivePhrase(DIALOG_SHARED_PTR& phrase_dialog) {}
 void CPhraseDialogManager::SayPhrase(DIALOG_SHARED_PTR& phrase_dialog, const shared_str& phrase_id)
 {
-    DIALOG_VECTOR_IT it = std::find(m_ActiveDialogs.begin(), m_ActiveDialogs.end(), phrase_dialog);
+    auto it = std::find(m_ActiveDialogs.begin(), m_ActiveDialogs.end(), phrase_dialog);
     THROW(m_ActiveDialogs.end() != it);
 
     THROW(phrase_dialog->IsWeSpeaking(this));
@@ -76,8 +76,7 @@ static bool dialog_priority(DIALOG_SHARED_PTR dialog1, DIALOG_SHARED_PTR dialog2
 {
     if (dialog1->Priority() > dialog2->Priority())
         return true;
-    else
-        return false;
+    return false;
 }
 
 void CPhraseDialogManager::UpdateAvailableDialogs(CPhraseDialogManager* partner)

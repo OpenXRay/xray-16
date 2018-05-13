@@ -63,9 +63,9 @@ protected:
 private:
     void free_mem();
 
-    typedef xr_map<u32, CSState*> SubStates;
+    using SubStates = xr_map<u32, CSState*>;
     SubStates substates;
-    typedef typename xr_map<u32, CSState*>::iterator STATE_MAP_IT;
+    using STATE_MAP_IT = typename xr_map<u32, CSState*>::iterator;
 };
 
 template <typename _Object>
@@ -79,7 +79,7 @@ public:
     virtual void initialize()
     {
         inherited::initialize();
-        object->path().prepare_builder();
+        this->object->path().prepare_builder();
     }
 };
 

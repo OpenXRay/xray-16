@@ -9,5 +9,5 @@ public:
     CUIXml();
     virtual ~CUIXml();
 
-    virtual shared_str correct_file_name(LPCSTR path, LPCSTR fn);
+    virtual shared_str correct_file_name(pcstr path, pcstr fn);
 };

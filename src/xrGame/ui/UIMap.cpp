@@ -6,6 +6,7 @@
 #include "UIMap.h"
 #include "UIMapWnd.h"
 #include "xrEngine/xr_input.h" //remove me !!!
+#include "xrCore/_fbox2.h"
 
 const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
 const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
@@ -21,7 +22,7 @@ CUICustomMap::CUICustomMap()
 
 void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
 {
-    CInifile* levelIni = NULL;
+    CInifile* levelIni = nullptr;
     if (name == g_pGameLevel->name())
         levelIni = g_pGameLevel->pLevel;
     else
@@ -285,7 +286,7 @@ void CUIGlobalMap::Init_internal(const shared_str& name, CInifile& pLtx, const s
 
 void CUIGlobalMap::Update()
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         CUICustomMap* m = smart_cast<CUICustomMap*>(*it);
         if (!m)
@@ -385,7 +386,7 @@ void CUILevelMap::Draw()
     if (MapWnd())
     {
         float gmz = MapWnd()->GlobalMap()->GetCurrentZoom().x;
-        for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+        for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
         {
             CMapSpot* sp = smart_cast<CMapSpot*>((*it));
             if (sp)
@@ -446,16 +447,12 @@ void CUILevelMap::UpdateSpots()
         return;
 
     Locations& ls = Level().MapManager().Locations();
-    Locations_it it = ls.begin();
-    Locations_it it_e = ls.end();
+    auto it = ls.begin();
+    auto it_e = ls.end();
 
     for (u32 idx = 0; it != it_e; ++it, ++idx)
-    {
         if ((*it).actual && MapName() == (*it).location->GetLevelName())
-        {
             (*it).location->UpdateLevelMap(this);
-        }
-    }
 }
 
 Frect CUILevelMap::CalcWndRectOnGlobal()
@@ -556,7 +553,7 @@ void CUIMiniMap::UpdateSpots()
 {
     DetachAll();
     Locations& ls = Level().MapManager().Locations();
-    for (Locations_it it = ls.begin(); it != ls.end(); ++it)
+    for (auto it = ls.begin(); it != ls.end(); ++it)
         (*it).location->UpdateMiniMap(this);
 }
 
@@ -564,8 +561,8 @@ void CUIMiniMap::Draw()
 {
     u32 segments_count = 20;
 
-    GlobalEnv.UIRender->SetShader(*m_UIStaticItem.GetShader());
-    GlobalEnv.UIRender->StartPrimitive(segments_count * 3, IUIRender::ptTriList, UI().m_currentPointType);
+    GEnv.UIRender->SetShader(*m_UIStaticItem.GetShader());
+    GEnv.UIRender->StartPrimitive(segments_count * 3, IUIRender::ptTriList, UI().m_currentPointType);
 
     u32 color = m_UIStaticItem.GetTextureColor();
     float angle = GetHeading();
@@ -610,12 +607,12 @@ void CUIMiniMap::Draw()
 
     for (u32 idx = 0; idx < segments_count - 2; ++idx)
     {
-        GlobalEnv.UIRender->PushPoint(S[0 + 0].pt.x, S[0 + 0].pt.y, 0, color, S[0 + 0].uv.x, S[0 + 0].uv.y);
-        GlobalEnv.UIRender->PushPoint(S[idx + 2].pt.x, S[idx + 2].pt.y, 0, color, S[idx + 2].uv.x, S[idx + 2].uv.y);
-        GlobalEnv.UIRender->PushPoint(S[idx + 1].pt.x, S[idx + 1].pt.y, 0, color, S[idx + 1].uv.x, S[idx + 1].uv.y);
+        GEnv.UIRender->PushPoint(S[0 + 0].pt.x, S[0 + 0].pt.y, 0, color, S[0 + 0].uv.x, S[0 + 0].uv.y);
+        GEnv.UIRender->PushPoint(S[idx + 2].pt.x, S[idx + 2].pt.y, 0, color, S[idx + 2].uv.x, S[idx + 2].uv.y);
+        GEnv.UIRender->PushPoint(S[idx + 1].pt.x, S[idx + 1].pt.y, 0, color, S[idx + 1].uv.x, S[idx + 1].uv.y);
     }
 
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 
     //------------
     CUIWindow::Draw(); // draw childs

@@ -5,7 +5,10 @@
 #include "gametype_chooser.h"
 #include "UIDialogHolder.h"
 #include "xrEngine/CustomHUD.h"
-// refs
+#include "script_game_object.h"
+#include "xrCommon/xr_string.h"
+
+// fwd. decl.
 class CUI;
 class CTeamBaseZone;
 class game_cl_GameState;
@@ -100,6 +103,8 @@ public:
     IC CUIPdaWnd& GetPdaMenu() const { return *PdaMenu; }
     bool ShowActorMenu();
     void HideActorMenu();
+    void UpdateActorMenu(); //Alundaio
+    CScriptGameObject* CurrentItemAtCell(); //Alundaio
     bool ShowPdaMenu();
     void HidePdaMenu();
     void ShowMessagesWindow();

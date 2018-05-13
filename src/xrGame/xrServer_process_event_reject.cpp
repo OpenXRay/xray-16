@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "xrserver.h"
 #include "xrserver_objects.h"
+#include "xrNetServer/NET_Messages.h"
 
 bool xrServer::Process_event_reject(
     NET_Packet& P, const ClientID sender, const u32 time, const u16 id_parent, const u16 id_entity, bool send_message)
@@ -42,7 +43,7 @@ bool xrServer::Process_event_reject(
     xr_vector<u16>::iterator c = std::find(C.begin(), C.end(), id_entity);
     if (c == C.end())
     {
-        Msg("! ERROR: SV: can't find children [%d] of parent [%d]", id_entity, e_parent);
+        Msg("! WARNING: SV: can't find children [%d] of parent [%d]", id_entity, e_parent);
         return false;
     }
 

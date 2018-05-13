@@ -1,42 +1,22 @@
-// xrRender_R2.cpp : Defines the entry point for the DLL application.
-//
 #include "stdafx.h"
 #include "Layers/xrRender/dxRenderFactory.h"
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
+#include "Include/xrAPI/xrAPI.h"
 
-#pragma comment(lib, "xrEngine.lib")
-#pragma comment(lib, "xrScriptEngine.lib")
-
-extern "C" void XR_EXPORT SetupEnv()
+void SetupEnvR4()
 {
-    GlobalEnv.Render = &RImplementation;
-    GlobalEnv.RenderFactory = &RenderFactoryImpl;
-    GlobalEnv.DU = &DUImpl;
-    GlobalEnv.UIRender = &UIRenderImpl;
+    GEnv.Render = &RImplementation;
+    GEnv.RenderFactory = &RenderFactoryImpl;
+    GEnv.DU = &DUImpl;
+    GEnv.UIRender = &UIRenderImpl;
 #ifdef DEBUG
-    GlobalEnv.DRender = &DebugRenderImpl;
+    GEnv.DRender = &DebugRenderImpl;
 #endif
     xrRender_initconsole();
 }
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH: SetupEnv(); break;
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH: break;
-    }
-    return TRUE;
-}
-
-extern "C" {
-bool _declspec(dllexport) SupportsDX11Rendering();
-};
-
-bool _declspec(dllexport) SupportsDX11Rendering()
+bool SupportsDX11Rendering()
 {
     return xrRender_test_hw() ? true : false;
     /*
@@ -53,3 +33,19 @@ bool _declspec(dllexport) SupportsDX11Rendering()
         return true;
     */
 }
+
+// This must not be optimized by compiler
+static const volatile class GEnvHelper
+{
+public:
+    GEnvHelper()
+    {
+        GEnv.CheckR4 = SupportsDX11Rendering;
+        GEnv.SetupR4 = SetupEnvR4;
+    }
+    ~GEnvHelper()
+    {
+        GEnv.CheckR4 = nullptr;
+        GEnv.SetupR4 = nullptr;
+    }
+} helper;

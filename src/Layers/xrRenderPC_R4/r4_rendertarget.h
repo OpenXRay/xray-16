@@ -49,6 +49,7 @@ public:
     IBlender* b_accum_reflected_msaa[8];
     IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
+    IBlender* b_fxaa;
 
     // compute shader for hdao
     IBlender* b_hdao_cs;
@@ -80,6 +81,10 @@ public:
     ref_rt rt_Accumulator_temp; // only for HW which doesn't feature fp16 blend
     ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Generic_1; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+
+    //  Second viewport
+    ref_rt rt_secondVP; // 32bit		(r,g,b,a) --//#SM+#-- +SecondVP+
+
     //	Igor: for volumetric lights
     ref_rt rt_Generic_2; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Bloom_1; // 32bit, dim/4	(r,g,b,?)
@@ -126,6 +131,10 @@ private:
     ref_shader s_ssao_msaa[8];
     ref_shader s_hdao_cs;
     ref_shader s_hdao_cs_msaa;
+
+    //FXAA
+    ref_shader s_fxaa;
+    ref_geom g_fxaa;
 
     // Accum
     ref_shader s_accum_mask;
@@ -250,9 +259,9 @@ public:
         ID3DDepthStencilView* zb);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
-    BOOL u_need_PP();
+    bool u_need_PP();
     bool u_need_CM();
-    BOOL u_DBT_enable(float zMin, float zMax);
+    bool u_DBT_enable(float zMin, float zMax);
     void u_DBT_disable();
 
     void phase_scene_prepare();
@@ -261,6 +270,7 @@ public:
     void phase_occq();
     void phase_ssao();
     void phase_hdao();
+    void phase_fxaa();
     void phase_downsamp();
     void phase_wallmarks();
     void phase_smap_direct(light* L, u32 sub_phase);
@@ -283,7 +293,7 @@ public:
     bool need_to_render_sunshafts();
     bool use_minmax_sm_this_frame();
 
-    BOOL enable_scissor(light* L); // true if intersects near plane
+    bool enable_scissor(light* L); // true if intersects near plane
     void enable_dbt_bounds(light* L);
 
     void disable_aniso();
@@ -340,7 +350,7 @@ public:
         dbg_lines.back().P1 = P1;
         dbg_lines.back().color = c;
     }
-    IC void dbg_addplane(Fplane& P0, u32 c) { dbg_planes.push_back(P0); }
+    IC void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.push_back(P0); }
 #else
     IC void dbg_addline(Fvector& P0, Fvector& P1, u32 c) {}
     IC void dbg_addplane(Fplane& P0, u32 c) {}

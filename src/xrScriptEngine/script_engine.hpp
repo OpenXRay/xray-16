@@ -12,6 +12,8 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrScriptEngine/Functor.hpp"
+#include "xrCore/Threading/Lock.hpp"
+#include "xrCommon/xr_unordered_map.h"
 
 struct lua_State;
 
@@ -73,7 +75,7 @@ public:
 
 private:
     static Lock stateMapLock;
-    static xr_hash_map<lua_State*, CScriptEngine*>* stateMap;
+    static xr_unordered_map<lua_State*, CScriptEngine*> stateMap;
     lua_State* m_virtual_machine;
     CScriptThread* m_current_thread;
     bool m_reload_modules;
@@ -84,13 +86,14 @@ private:
     bool bindingsDumped = false;
     char* scriptBuffer = nullptr;
     size_t scriptBufferSize = 0;
+    bool m_is_editor;
 
 protected:
     CScriptProcessStorage m_script_processes;
     int m_stack_level;
-#ifdef DEBUG
+
     CMemoryWriter m_output; // for call stack
-#endif
+
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
     CScriptDebugger* m_scriptDebugger;
@@ -101,9 +104,7 @@ protected:
 #endif
 
 public:
-#ifdef DEBUG
     bool m_stack_is_ready;
-#endif
 
 private:
     static CScriptEngine* GetInstance(lua_State* state);
@@ -136,19 +137,23 @@ public:
     luabind::object name_space(LPCSTR namespace_name);
     int error_log(LPCSTR caFormat, ...);
     int script_log(LuaMessageType message, LPCSTR caFormat, ...);
-    static bool print_output(lua_State* L, LPCSTR caScriptName, int iErrorCode = 0, const char* caErrorText = NULL);
+    static bool print_output(lua_State* L, pcstr caScriptName, int iErrorCode = 0, pcstr caErrorText = nullptr);
 
 private:
     static void print_error(lua_State* L, int iErrorCode);
+    static void onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err = nullptr);
 
 public:
     static void on_error(lua_State* state);
-#ifdef DEBUG
+
     void flush_log();
-    void print_stack();
-#endif
+    void print_stack(lua_State* L = nullptr);
+
+    void LogTable(lua_State* l, pcstr S, int level);
+    void LogVariable(lua_State* l, pcstr name, int level);
+
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
-    CScriptEngine();
+    CScriptEngine(bool is_editor = false);
     virtual ~CScriptEngine();
     void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
@@ -189,12 +194,12 @@ public:
 #endif
 #endif
     void collect_all_garbage();
-    static u32 GetMemoryUsage();
 
     CScriptProcess* CreateScriptProcess(shared_str name, shared_str scripts);
     CScriptThread* CreateScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
     // This function is called from CScriptThread destructor
     void DestroyScriptThread(const CScriptThread* thread);
+    bool is_editor();
 };
 
 template <typename TResult>

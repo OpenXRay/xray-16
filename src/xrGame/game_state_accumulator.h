@@ -16,7 +16,14 @@ class CWeapon;
 namespace award_system
 {
 #ifdef DEBUG
-extern char* player_values_strtable[];
+constexpr pcstr player_values_strtable[] = {
+    "command_switch_count", "kill_in_raw_count", "death_count", "spots", "my_team_win_score", "my_team_win_score_now",
+    "enemy_top_player_div", "blitzkrieg_time", "enemy_team_score", "enemy_team_score_now", "artdeliver_counter",
+    "multi_champion", "mad", "achilles_heel_ready", "faster_than_bullets_time", "harvest_count", "skewer_count",
+    "double_shot_double_kill_time", "ammo_elapsed", "climber", "opener_ready", "invincible_fury", "move_state",
+    "move_velocity", "move_angular_velocity", "sprinter_victim_velocity", "marksman_count", "ambassador", "remembrance",
+    "avenger", "cherub_ready", "stalker_flair", "black_list", "thunder_count", "killer_victim_angle_cos",
+};
 #endif //#ifdef DEBUG
 
 class game_state_accumulator : public game_events_handler

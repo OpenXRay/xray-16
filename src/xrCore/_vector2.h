@@ -1,5 +1,15 @@
+#pragma once
 #ifndef __V2D__
 #define __V2D__
+#include "xrCommon/inlining_macros.h"
+
+#ifdef min
+# undef min
+#endif
+#ifdef max
+# undef max
+#endif
+
 
 template <class T>
 struct _vector2
@@ -45,26 +55,26 @@ public:
     }
     IC SelfRef min(const Self& p)
     {
-        x = _min(x, p.x);
-        y = _min(y, p.y);
+        x = std::min(x, p.x);
+        y = std::min(y, p.y);
         return *this;
     }
     IC SelfRef min(T _x, T _y)
     {
-        x = _min(x, _x);
-        y = _min(y, _y);
+        x = std::min(x, _x);
+        y = std::min(y, _y);
         return *this;
     }
     IC SelfRef max(const Self& p)
     {
-        x = _max(x, p.x);
-        y = _max(y, p.y);
+        x = std::max(x, p.x);
+        y = std::max(y, p.y);
         return *this;
     }
     IC SelfRef max(T _x, T _y)
     {
-        x = _max(x, _x);
-        y = _max(y, _y);
+        x = std::max(x, _x);
+        y = std::max(y, _y);
         return *this;
     }
     IC SelfRef sub(const T p)
@@ -252,9 +262,7 @@ typedef _vector2<double> Dvector2;
 typedef _vector2<int> Ivector2;
 
 template <class T>
-BOOL _valid(const _vector2<T>& v)
-{
-    return _valid((T)v.x) && _valid((T)v.y);
-}
+bool _valid(const _vector2<T>& v)
+{ return _valid((T)v.x) && _valid((T)v.y); }
 
 #endif

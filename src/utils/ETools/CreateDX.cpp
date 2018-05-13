@@ -5,14 +5,16 @@
 #include "xrCore/Debug/dxerr.h"
 
 // misc
+// Xottab_DUTY: it seems this is not used..
+/*
 __declspec(dllimport) bool WINAPI
-    FSColorPickerDoModal(unsigned int* currentColor, unsigned int* originalColor, const int initialExpansionState);
+FSColorPickerDoModal(unsigned int* currentColor, unsigned int* originalColor, const int initialExpansionState);
 extern "C" __declspec(dllexport) bool __stdcall FSColorPickerExecute(
     unsigned int* currentColor, unsigned int* originalColor, const int initialExpansionState)
 {
     return FSColorPickerDoModal(currentColor, originalColor, initialExpansionState);
 }
-
+*/
 extern "C" {
 ETOOLS_API UINT WINAPI D3DX_GetDriverLevel(LPDIRECT3DDEVICE9 pDevice) { return D3DXGetDriverLevel(pDevice); }
 ETOOLS_API HRESULT WINAPI D3DX_GetImageInfoFromFileInMemory(

@@ -126,7 +126,7 @@ public:
 //	virtual bool				GetInfo		(shared_str info_id, INFO_DATA&) const;
 
 #ifdef DEBUG
-    void CInventoryOwner::DumpInfo() const;
+    void DumpInfo() const;
 #endif
 
     CInfoPortionWrapper* m_known_info_registry;
@@ -170,6 +170,11 @@ public:
     virtual void ChangeRank(CHARACTER_RANK_VALUE);
     virtual void SetReputation(CHARACTER_REPUTATION_VALUE);
     virtual void ChangeReputation(CHARACTER_REPUTATION_VALUE);
+
+    virtual void SetIcon(const shared_str& iconName)
+    {
+        CharacterInfo().m_SpecificCharacter.data()->m_icon_name = iconName;
+    }
 
     //для работы с relation system
     u16 object_id() const;

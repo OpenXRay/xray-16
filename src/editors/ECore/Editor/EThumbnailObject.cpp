@@ -115,16 +115,16 @@ void EObjectThumbnail::Save(int age, LPCSTR path)
 
 void EObjectThumbnail::FillProp(PropItemVec& items)
 {
-    PHelper().CreateCaption(items, "Face Count", AnsiString(face_count).c_str());
-    PHelper().CreateCaption(items, "Vertex Count", AnsiString(vertex_count).c_str());
+    PHelper().CreateCaption(items, "Face Count", xr_string(face_count).c_str());
+    PHelper().CreateCaption(items, "Vertex Count", xr_string(vertex_count).c_str());
 }
 
 //------------------------------------------------------------------------------
 
 void EObjectThumbnail::FillInfo(PropItemVec& items)
 {
-    PHelper().CreateCaption(items, "Face Count", AnsiString(face_count).c_str());
-    PHelper().CreateCaption(items, "Vertex Count", AnsiString(vertex_count).c_str());
+    PHelper().CreateCaption(items, "Face Count", xr_string(face_count).c_str());
+    PHelper().CreateCaption(items, "Vertex Count", xr_string(vertex_count).c_str());
 }
 
 //------------------------------------------------------------------------------

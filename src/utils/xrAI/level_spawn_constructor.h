@@ -8,22 +8,13 @@
 
 #pragma once
 
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 #include "utils/xrLCUtil/xrThread.hpp"
 #include "spawn_constructor_space.h"
+#include "space_restrictor_wrapper.h"
+#include "game_spawn_constructor.h"
 
-class CLevelGraph;
-class CGameLevelCrossTable;
 class CGameSpawnConstructor;
-class CSE_ALifeCreatureActor;
-class CGraphEngine;
-class CSE_Abstract;
-class CSE_ALifeObject;
-class CSE_ALifeGraphPoint;
-// class CSE_SpawnGroup;
-class CSE_ALifeAnomalousZone;
-class CSpaceRestrictorWrapper;
-class CPatrolPathStorage;
-class CSE_ALifeDynamicObject;
 
 class CLevelSpawnConstructor : public CThread
 {

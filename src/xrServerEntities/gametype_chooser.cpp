@@ -3,6 +3,8 @@
 
 #include "gametype_chooser.h"
 #include "xrServer_Objects_Abstract.h"
+#include "xrCore/xr_token.h"
+
 // old
 enum ERPGameType
 { // [0..255]
@@ -14,9 +16,9 @@ enum ERPGameType
     rpgtGameCount,
 };
 
-xr_token rpoint_game_type[] = {{"Any game", rpgtGameAny}, {"Deathmatch", rpgtGameDeathmatch},
+const xr_token rpoint_game_type[] = {{"Any game", rpgtGameAny}, {"Deathmatch", rpgtGameDeathmatch},
     {"TeamDeathmatch", rpgtGameTeamDeathmatch}, {"ArtefactHunt", rpgtGameArtefactHunt},
-    {"CaptureTheArtefact", rpgtGameCaptureTheArtefact}, {0, 0}};
+    {"CaptureTheArtefact", rpgtGameCaptureTheArtefact}, {nullptr, 0}};
 
 #ifdef _EDITOR
 bool GameTypeChooser::LoadStream(IReader& F)

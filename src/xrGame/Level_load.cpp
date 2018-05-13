@@ -15,7 +15,7 @@
 bool CLevel::Load_GameSpecific_Before()
 {
     // AI space
-    //	g_pGamePersistent->LoadTitle		("st_loading_ai_objects");
+    g_pGamePersistent->SetLoadStageTitle("st_loading_ai_objects");
     g_pGamePersistent->LoadTitle();
     string_path fn_game;
 
@@ -23,7 +23,7 @@ bool CLevel::Load_GameSpecific_Before()
         !net_Hosts.empty())
         ai().load(net_SessionName());
 
-    if (!g_dedicated_server && !ai().get_alife() && ai().get_game_graph() && FS.exist(fn_game, "$level$", "level.game"))
+    if (!GEnv.isDedicatedServer && !ai().get_alife() && ai().get_game_graph() && FS.exist(fn_game, "$level$", "level.game"))
     {
         IReader* stream = FS.r_open(fn_game);
         ai().patrol_path_storage_raw(*stream);
@@ -80,7 +80,7 @@ bool CLevel::Load_GameSpecific_After()
         FS.r_close(F);
     }
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         // loading static sounds
         VERIFY(m_level_sound_manager);
@@ -90,14 +90,14 @@ bool CLevel::Load_GameSpecific_After()
         if (FS.exist(fn_game, "$level$", "level.snd_env"))
         {
             IReader* F = FS.r_open(fn_game);
-            ::Sound->set_geometry_env(F);
+            GEnv.Sound->set_geometry_env(F);
             FS.r_close(F);
         }
         // loading SOM
         if (FS.exist(fn_game, "$level$", "level.som"))
         {
             IReader* F = FS.r_open(fn_game);
-            ::Sound->set_geometry_som(F);
+            GEnv.Sound->set_geometry_som(F);
             FS.r_close(F);
         }
 
@@ -106,10 +106,10 @@ bool CLevel::Load_GameSpecific_After()
         {
             CInifile::Sect& S = pSettings->r_section("sounds_random");
             Sounds_Random.reserve(S.Data.size());
-            for (CInifile::SectCIt I = S.Data.begin(); S.Data.end() != I; ++I)
+            for (auto I = S.Data.cbegin(); S.Data.cend() != I; ++I)
             {
                 Sounds_Random.push_back(ref_sound());
-                Sound->create(Sounds_Random.back(), *I->first, st_Effect, sg_SourceType);
+                GEnv.Sound->create(Sounds_Random.back(), *I->first, st_Effect, sg_SourceType);
             }
             Sounds_Random_dwNextTime = Device.TimerAsync() + 50000;
             Sounds_Random_Enabled = FALSE;
@@ -138,10 +138,10 @@ bool CLevel::Load_GameSpecific_After()
         }
     }
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         // loading scripts
-        auto& scriptEngine = ai().script_engine();
+        auto& scriptEngine = *GEnv.ScriptEngine;
         scriptEngine.remove_script_process(ScriptProcessor::Level);
         shared_str scripts;
         if (pLevel->section_exist("level_scripts") && pLevel->line_exist("level_scripts", "script"))

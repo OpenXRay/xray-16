@@ -33,7 +33,7 @@ public:
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnAnimationEnd(u32 state);
 
     virtual void UpdateXForm();

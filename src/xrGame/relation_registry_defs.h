@@ -19,8 +19,8 @@ private:
     CHARACTER_GOODWILL m_iGoodwill;
 };
 
-DEFINE_MAP(u16, SRelation, PERSONAL_RELATION_MAP, PERSONAL_RELATION_MAP_IT);
-DEFINE_MAP(CHARACTER_COMMUNITY_INDEX, SRelation, COMMUNITY_RELATION_MAP, COMMUNITY_RELATION_MAP_IT);
+using PERSONAL_RELATION_MAP = xr_map<u16, SRelation>;
+using COMMUNITY_RELATION_MAP = xr_map<CHARACTER_COMMUNITY_INDEX, SRelation>;
 
 //структура, существует для каждого персонажа в игре
 struct RELATION_DATA : public ISerializable

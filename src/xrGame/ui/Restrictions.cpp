@@ -31,7 +31,13 @@ u32 get_rank(const shared_str& section)
         }
     }
 
-    R_ASSERT3(res != -1, "cannot find rank for", section.c_str());
+    if (res == -1)
+    {
+        Msg("Setting rank to 0. Cannot find rank for: [%s]", section.c_str());
+        // Xottab_DUTY: I'm not sure if it's save to leave it -1
+        res = 0;
+    }
+    //R_ASSERT3(res != -1, "cannot find rank for", section.c_str());
     return res;
 }
 
@@ -101,7 +107,7 @@ void CRestrictions::AddRestriction4rank(u32 rank, const shared_str& lst)
         restr_item* ritem = find_restr_item_internal(rank, r.name);
         VERIFY2((ritem || rank == _RANK_COUNT), singleItem);
         if (!ritem)
-            rest.push_back(mk_pair(r.name, r.n));
+            rest.push_back(std::make_pair(r.name, r.n));
         else
             ritem->second = r.n;
     }

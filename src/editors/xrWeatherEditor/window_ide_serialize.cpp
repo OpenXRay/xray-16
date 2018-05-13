@@ -16,12 +16,12 @@ using Microsoft::Win32::RegistryKey;
 using Microsoft::Win32::RegistryValueKind;
 
 #define COMPANY_NAME "GSC Game World"
-#define PRODUCT_NAME "S.T.A.L.K.E.R.: CLear Sky"
+#define PRODUCT_NAME "S.T.A.L.K.E.R.: Call of Pripyat"
 
 template <typename T>
-inline static T registry_value(RegistryKey ^ key, String ^ value_id, const T& default_value)
+inline static T registry_value(RegistryKey ^ key, System::String ^ value_id, const T& default_value)
 {
-    array<String ^> ^ names = key->GetValueNames();
+    array<System::String ^> ^ names = key->GetValueNames();
     if (names->IndexOf(names, value_id) >= 0)
         return ((T)key->GetValue(value_id));
 
@@ -57,7 +57,7 @@ void window_ide::save_on_exit()
     RegistryKey ^ windows = product->CreateSubKey("windows");
     using System::IO::MemoryStream;
     MemoryStream ^ stream = gcnew MemoryStream();
-    Editor->SaveAsXml(stream, System::Text::Encoding::Unicode, true);
+    EditorDock->SaveAsXml(stream, System::Text::Encoding::Unicode, true);
     stream->Seek(0, System::IO::SeekOrigin::Begin);
     windows->SetValue("editor", stream->ToArray());
     delete stream;
@@ -94,7 +94,7 @@ void window_ide::save_on_exit()
     product->Close();
 }
 
-WeifenLuo::WinFormsUI::IDockContent ^ window_ide::reload_content(System::String ^ persist_string)
+WeifenLuo::WinFormsUI::Docking::IDockContent ^ window_ide::reload_content(System::String ^ persist_string)
 {
     if (persist_string == "editor.window_view")
         return (m_view);
@@ -116,7 +116,7 @@ void window_ide::load_on_create()
     Width = 800;
     Height = 600;
 
-    m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
+    m_window_rectangle = gcnew System::Drawing::Rectangle(Location, Size);
 
     RegistryKey ^ product = base_registry_key();
     VERIFY(product);
@@ -139,7 +139,7 @@ void window_ide::load_on_create()
                 position->Close();
             }
 
-            m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
+            m_window_rectangle = gcnew System::Drawing::Rectangle(Location, Size);
 
             switch ((int)registry_value(ide, "window_state", 2))
             {
@@ -175,8 +175,7 @@ void window_ide::load_on_create()
             MemoryStream ^ stream = gcnew MemoryStream();
             stream->Write(safe_cast<array<unsigned char, 1> ^>(object), 0, object->Length);
             stream->Seek(0, System::IO::SeekOrigin::Begin);
-            Editor->LoadFromXml(
-                stream, gcnew WeifenLuo::WinFormsUI::DeserializeDockContent(this, &window_ide::reload_content));
+            EditorDock->LoadFromXml(stream, gcnew WeifenLuo::WinFormsUI::Docking::DeserializeDockContent(this, &window_ide::reload_content));
             delete (stream);
             return;
         }
@@ -188,10 +187,10 @@ void window_ide::load_on_create()
     product->Close();
     delete (product);
 
-    m_view->Show(Editor, WeifenLuo::WinFormsUI::DockState::Document);
-    m_levels->Show(Editor, WeifenLuo::WinFormsUI::DockState::DockRight);
-    m_weather->Show(Editor, WeifenLuo::WinFormsUI::DockState::DockRight);
-    m_weather_editor->Show(Editor, WeifenLuo::WinFormsUI::DockState::DockRight);
+    m_view->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::Document);
+    m_levels->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::DockRight);
+    m_weather->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::DockRight);
+    m_weather_editor->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::DockRight);
 
     this->WindowState = FormWindowState::Maximized;
 }

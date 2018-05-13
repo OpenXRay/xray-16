@@ -30,8 +30,8 @@ struct ARTICLE_DATA : public ISerializable
     EArticleType article_type;
 };
 
-DEFINE_VECTOR(shared_str, ARTICLE_ID_VECTOR, ARTICLE_ID_IT);
-DEFINE_VECTOR(ARTICLE_DATA, ARTICLE_VECTOR, ARTICLE_IT);
+using ARTICLE_ID_VECTOR = xr_vector<shared_str>;
+using ARTICLE_VECTOR = xr_vector<ARTICLE_DATA>;
 
 class FindArticleByIDPred
 {
@@ -41,8 +41,7 @@ public:
     {
         if (item.article_id == object_id)
             return true;
-        else
-            return false;
+        return false;
     }
 
 private:

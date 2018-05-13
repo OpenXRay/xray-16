@@ -13,8 +13,8 @@ void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
 {
     CUIXmlInit::InitWindow(uiXml, start_from, 0, this);
 
-    XML_NODE* stored_root = uiXml.GetLocalRoot();
-    XML_NODE* node = uiXml.NavigateToNode(start_from, 0);
+    XML_NODE stored_root = uiXml.GetLocalRoot();
+    XML_NODE node = uiXml.NavigateToNode(start_from, 0);
     uiXml.SetLocalRoot(node);
 
     m_UIImage = UIHelper::CreateStatic(uiXml, "image", this);

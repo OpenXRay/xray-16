@@ -44,19 +44,16 @@ float CalculateHeight(Fbox& BB)
     // All nodes
     BB.invalidate();
 
-    for (u32 i = 0; i < g_nodes.size(); i++)
-    {
-        vertex& N = g_nodes[i];
-        BB.modify(N.Pos);
-    }
-    return BB.max.y - BB.min.y + EPS_L;
+    for (auto &i : g_nodes)
+        BB.modify(i.Pos);
+
+    return BB.vMax.y - BB.vMin.y + EPS_L;
 }
 
 xr_vector<NodeCompressed> compressed_nodes;
 
 class CNodeRenumberer
 {
-    IC bool operator=(const CNodeRenumberer&) {}
     struct SSortNodesPredicate
     {
         IC bool operator()(const NodeCompressed& vertex0, const NodeCompressed& vertex1) const
@@ -64,7 +61,7 @@ class CNodeRenumberer
             return (vertex0.p.xz() < vertex1.p.xz());
         }
 
-        IC bool operator()(u32 vertex_id0, u32 vertex_id1) const
+        IC bool operator()(const u32 vertex_id0, const u32 vertex_id1) const
         {
             return (compressed_nodes[vertex_id0].p.xz() < compressed_nodes[vertex_id1].p.xz());
         }
@@ -78,7 +75,7 @@ public:
     CNodeRenumberer(xr_vector<NodeCompressed>& nodes, xr_vector<u32>& sorted, xr_vector<u32>& renumbering)
         : m_nodes(nodes), m_sorted(sorted), m_renumbering(renumbering)
     {
-        u32 N = (u32)m_nodes.size();
+        u32 N = m_nodes.size();
         m_sorted.resize(N);
         m_renumbering.resize(N);
 
@@ -90,14 +87,14 @@ public:
         for (u32 i = 0; i < N; ++i)
             m_renumbering[m_sorted[i]] = i;
 
-        for (u32 i = 0; i < N; ++i)
+        for (auto &i : m_nodes)
         {
-            for (u32 j = 0; j < 4; ++j)
+            for (u8 j = 0; j < 4; ++j)
             {
-                u32 vertex_id = m_nodes[i].link(u8(j));
+                u32 vertex_id = i.link(j);
                 if (vertex_id >= N)
                     continue;
-                m_nodes[i].link(u8(j), m_renumbering[vertex_id]);
+                i.link(j, m_renumbering[vertex_id]);
             }
         }
 
@@ -105,20 +102,19 @@ public:
     }
 };
 
-void xrSaveNodes(LPCSTR N, LPCSTR out_name)
+void xrSaveNodes(LPCSTR name, LPCSTR out_name)
 {
-    Msg("NS: %d, CNS: %d, ratio: %f%%", sizeof(vertex), sizeof(CLevelGraph::CVertex),
+    Logger.Status("Saving nodes...");
+
+    Logger.clMsg("NS: %d, CNS: %d, ratio: %f%%", sizeof(vertex), sizeof(CLevelGraph::CVertex),
         100 * float(sizeof(CLevelGraph::CVertex)) / float(sizeof(vertex)));
 
-    Msg("Renumbering nodes...");
-
     string_path fName;
-    strconcat(sizeof(fName), fName, N, out_name);
-
+    strconcat(sizeof(fName), fName, name, out_name);
     IWriter* fs = FS.w_open(fName);
 
     // Header
-    Logger.Status("Saving header...");
+    Logger.clMsg("Saving header...");
     hdrNODES H;
     H.version = XRAI_CURRENT_VERSION;
     H.count = g_nodes.size();
@@ -127,27 +123,27 @@ void xrSaveNodes(LPCSTR N, LPCSTR out_name)
     H.guid = generate_guid();
     fs->w(&H, sizeof(H));
     // All nodes
-    Logger.Status("Saving nodes...");
-    for (u32 i = 0; i < g_nodes.size(); ++i)
+    Logger.clMsg("Compressing nodes...");
+    compressed_nodes.reserve(g_nodes.size());
+    for (auto &i : g_nodes)
     {
-        vertex& N = g_nodes[i];
         NodeCompressed NC;
-        Compress(NC, N, H);
+        Compress(NC, i, H);
         compressed_nodes.push_back(NC);
     }
 
     xr_vector<u32> sorted;
     xr_vector<u32> renumbering;
+    Logger.clMsg("Renumbering nodes...");
     CNodeRenumberer A(compressed_nodes, sorted, renumbering);
 
-    for (u32 i = 0; i < g_nodes.size(); ++i)
-    {
-        fs->w(&compressed_nodes[i], sizeof(NodeCompressed));
-        Logger.Progress(float(i) / float(g_nodes.size()));
-    }
+    Logger.clMsg("Saving nodes...");
+    for (auto &i : compressed_nodes)
+        fs->w(&i, sizeof(NodeCompressed));
+
     // Stats
     u32 SizeTotal = fs->tell();
-    Msg("%dK saved", SizeTotal / 1024);
+    Logger.clMsg("%dK saved", SizeTotal / 1024);
 
     FS.w_close(fs);
 }

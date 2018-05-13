@@ -15,6 +15,36 @@
   <PropertyGroup Label="UserMacros" Condition="'$(xrPlatform)'==''">
     <xrPlatform>$(Platform)</xrPlatform>
   </PropertyGroup>
+
+  <!-- CxA – Configuration x Architecture -->
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)'=='Debug'">
+    <xrBuildCxA>Mx64</xrBuildCxA>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)'=='Debug'">
+    <xrBuildCxA>Mx86</xrBuildCxA>
+  </PropertyGroup>
+
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Debug|Win64'">
+    <xrBuildCxA>Dx64</xrBuildCxA>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Debug|Win32'">
+    <xrBuildCxA>Dx86</xrBuildCxA>
+  </PropertyGroup>
+
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Release|Win64'">
+    <xrBuildCxA>Rx64</xrBuildCxA>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Release|Win32'">
+    <xrBuildCxA>Rx86</xrBuildCxA>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- I don't want to touch every vcxproj file and $(SolutionDir) is not working here. This is a workaround. -->
+    <Natvis Include="TypeHelper.natvis" Condition="exists('TypeHelper.natvis')"/>
+    <Natvis Include="..\TypeHelper.natvis" Condition="exists('..\TypeHelper.natvis')"/>
+    <Natvis Include="..\..\TypeHelper.natvis" Condition="exists('..\..\TypeHelper.natvis')"/>
+  </ItemGroup>
+
   <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
     <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
@@ -23,23 +53,35 @@
     <xrLibDir>$(SolutionDir)..\lib\$(xrPlatform)\$(Configuration)\</xrLibDir>
     <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
+    <xrExternals>$(SolutionDir)..\Externals\</xrExternals>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(ConfigurationType)'=='Application'">
-    <OutDir>$(xrBinDir)</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(ConfigurationType)'=='DynamicLibrary'">
-    <OutDir>$(xrBinDir)</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(ConfigurationType)'=='StaticLibrary'">
-    <OutDir>$(xrLibDir)</OutDir>
-  </PropertyGroup>
-  <PropertyGroup>
+
+  <PropertyGroup Label="OutputDirectories">
+    <OutDir Condition="'$(ConfigurationType)'=='Application'"   >$(xrBinDir)</OutDir>
+    <OutDir Condition="'$(ConfigurationType)'=='DynamicLibrary'">$(xrBinDir)</OutDir>
+    <OutDir Condition="'$(ConfigurationType)'=='StaticLibrary'" >$(xrLibDir)</OutDir>
+    <OutDir Condition="'$(ConfigurationType)'=='Makefile'"      >$(xrLibDir)</OutDir>
+
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.StartsWith('Debug'  ))"> <UseDebugLibraries>true</UseDebugLibraries> </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.StartsWith('Mixed'  ))"> <UseDebugLibraries>false</UseDebugLibraries> </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.StartsWith('Release'))"> <UseDebugLibraries>false</UseDebugLibraries> </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.StartsWith('Debug'  ))"> <LinkIncremental>true</LinkIncremental> </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.StartsWith('Mixed'  ))"> <LinkIncremental>false</LinkIncremental> </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.StartsWith('Release'))"> <LinkIncremental>false</LinkIncremental> </PropertyGroup>
+
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;$(SolutionDir)Externals\GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>.;$(SolutionDir);$(xrExternals);$(ProjectDir);$(xrSdkDir)include;$(xrSdkDir)DXSDK/Include;$(xrExternals)luajit\src;$(xrExternals)luabind;$(xrExternals)GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <!-- MultiProcessorCompilation don't compatible with LinkIncremental and UseDebugLibraries -->
+      <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Debug'  ))">false</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Mixed'  ))">true</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Release'))">true</MultiProcessorCompilation>
+      <!-- Optimization is automatically enabled when UseDebugLibraries == false. That's why we'll turn it off manually -->
+      <Optimization Condition="$(Configuration.StartsWith('Mixed'))">Disabled</Optimization>
       <!--
         4251 : class 'x' needs to have dll-interface to be used by clients of class 'y'
         4275 : non dll-interface class 'x' used as base for dll-interface class 'y' 
@@ -52,14 +94,19 @@
         _SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE : temporary workaround for deprecated API
       -->
       <PreprocessorDefinitions>LUABIND_DYNAMIC_LINK;MSVC;dSINGLE;WIN32;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level1</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrSdkDir)libraries/$(PlatformShortName);$(xrLibDir);$(xrSdkDir)DXSDK/Lib/$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <LargeAddressAware>true</LargeAddressAware>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrSdkDir)libraries/$(PlatformShortName);$(xrLibDir);$(xrSdkDir)DXSDK/Lib/$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>$(xrLibDir)$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>

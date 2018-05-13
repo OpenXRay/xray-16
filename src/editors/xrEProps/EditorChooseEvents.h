@@ -1,7 +1,7 @@
 #ifndef EditorChooseEventsH
 #define EditorChooseEventsH
 
-#include "ChooseTypes.h"
+#include "xrCore/ChooseTypes.h"
 #include "Layers/xrRender/SkeletonAnimated.h"
 #include "Layers/xrRender/ResourceManager.h"
 
@@ -15,12 +15,11 @@ namespace ChoseEvents
 void __stdcall FillEntity(ChooseItemVec& items, void* param)
 {
     //.    AppendItem	   					(RPOINT_CHOOSE_NAME);
-    CInifile::Root const& data = pSettings->sections();
-    for (CInifile::RootCIt it = data.begin(); it != data.end(); it++)
+    for (auto& it : pSettings->sections())
     {
-        LPCSTR val;
-        if ((*it)->line_exist("$spawn", &val))
-            items.push_back(SChooseItem(*(*it)->Name, ""));
+        pcstr val;
+        if (it->line_exist("$spawn", &val))
+            items.push_back(SChooseItem(it->Name.c_str(), ""));
     }
 }
 //---------------------------------------------------------------------------
@@ -42,10 +41,8 @@ void __stdcall FillSoundSource(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (SndLib->GetGameSounds(lst))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 //---------------------------------------------------------------------------
@@ -54,10 +51,8 @@ void __stdcall FillSoundEnv(ChooseItemVec& items, void* param)
     AStringVec lst;
     if (SndLib->GetSoundEnvs(lst))
     {
-        AStringIt it = lst.begin();
-        AStringIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->c_str(), ""));
+        for (auto& it : lst)
+            items.push_back(SChooseItem(it.c_str(), ""));
     }
 }
 //---------------------------------------------------------------------------
@@ -66,10 +61,8 @@ void __stdcall FillObject(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (Lib.GetObjects(lst))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 void __stdcall SelectObject(SChooseItem* item, PropItemVec& info_items)
@@ -92,10 +85,8 @@ void __stdcall FillGroup(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (FS.file_list(lst, _groups_, FS_ListFiles | FS_ClampExt, "*.group"))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 void __stdcall SelectGroup(SChooseItem* item, PropItemVec& info_items)
@@ -118,10 +109,8 @@ void __stdcall FillVisual(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (FS.file_list(lst, _game_meshes_, FS_ListFiles | FS_ClampExt, "*.ogf"))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 void __stdcall SelectVisual(SChooseItem* item, PropItemVec& info_items)
@@ -155,10 +144,8 @@ void __stdcall FillGameObjectMots(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (FS.file_list(lst, _game_meshes_, FS_ListFiles | FS_ClampExt, "*.omf"))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 void __stdcall SelectGameObjectMots(SChooseItem* item, PropItemVec& info_items) {}
@@ -168,20 +155,16 @@ void __stdcall FillGameAnim(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (FS.file_list(lst, "$game_anims$", FS_ListFiles, "*.anm,*.anms"))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 //---------------------------------------------------------------------------
 void __stdcall FillLAnim(ChooseItemVec& items, void* param)
 {
-    LAItemVec& lst = LALib.Objects();
-    LAItemIt it = lst.begin();
-    LAItemIt _E = lst.end();
-    for (; it != _E; it++)
-        items.push_back(SChooseItem(*(*it)->cName, ""));
+    for (auto& it : LALib.Objects())
+        items.push_back(SChooseItem((*it)->cName.c_str(), ""));
 }
 void __stdcall DrawLAnim(LPCSTR name, HDC hdc, const Irect& r)
 {
@@ -197,33 +180,28 @@ void __stdcall DrawLAnim(LPCSTR name, HDC hdc, const Irect& r)
 //---------------------------------------------------------------------------
 void __stdcall FillEShader(ChooseItemVec& items, void* param)
 {
-    CResourceManager::map_Blender& blenders = EDevice.Resources->_GetBlenders();
-    CResourceManager::map_BlenderIt _S = blenders.begin();
-    CResourceManager::map_BlenderIt _E = blenders.end();
-    for (; _S != _E; _S++)
-        items.push_back(SChooseItem(_S->first, ""));
+    for (auto& it : EDevice.Resources->_GetBlenders())
+        items.push_back(SChooseItem(it.first, ""));
 }
 //---------------------------------------------------------------------------
 void __stdcall FillCShader(ChooseItemVec& items, void* param)
 {
-    Shader_xrLCVec& shaders = EDevice.ShaderXRLC.Library();
-    Shader_xrLCIt _F = shaders.begin();
-    Shader_xrLCIt _E = shaders.end();
-    for (; _F != _E; _F++)
-        items.push_back(SChooseItem(_F->Name, ""));
+    for (auto& it : EDevice.ShaderXRLC.Library())
+        items.push_back(SChooseItem(it.Name, ""));
 }
 //---------------------------------------------------------------------------
 void __stdcall FillPE(ChooseItemVec& items, void* param)
 {
-    for (PS::PEDIt E = ::Render->PSLibrary.FirstPED(); E != ::Render->PSLibrary.LastPED(); E++)
+    for (PS::PEDIt E = GEnv.Render->PSLibrary.FirstPED(); E != GEnv.Render->PSLibrary.LastPED(); ++E)
         items.push_back(SChooseItem(*(*E)->m_Name, "EFFECT"));
 }
 //---------------------------------------------------------------------------
 void __stdcall FillParticles(ChooseItemVec& items, void* param)
 {
-    for (PS::PEDIt E = ::Render->PSLibrary.FirstPED(); E != ::Render->PSLibrary.LastPED(); E++)
+    for (PS::PEDIt E = GEnv.Render->PSLibrary.FirstPED(); E != GEnv.Render->PSLibrary.LastPED(); ++E)
         items.push_back(SChooseItem(*(*E)->m_Name, "EFFECT"));
-    for (PS::PGDIt G = ::Render->PSLibrary.FirstPGD(); G != ::Render->PSLibrary.LastPGD(); G++)
+
+    for (PS::PGDIt G = GEnv.Render->PSLibrary.FirstPGD(); G != GEnv.Render->PSLibrary.LastPGD(); ++G)
         items.push_back(SChooseItem(*(*G)->m_Name, "GROUP"));
 }
 
@@ -232,14 +210,12 @@ void __stdcall SelectPE(SChooseItem* item, PropItemVec& info_items)
     string64 str;
     u32 i = 0;
     PHelper().CreateCaption(info_items, "", "used in groups");
-    for (PS::PGDIt G = ::Render->PSLibrary.FirstPGD(); G != ::Render->PSLibrary.LastPGD(); ++G)
+    for (PS::PGDIt G = GEnv.Render->PSLibrary.FirstPGD(); G != GEnv.Render->PSLibrary.LastPGD(); ++G)
     {
         PS::CPGDef* def = (*G);
-        PS::CPGDef::EffectIt pe_it = def->m_Effects.begin();
-        PS::CPGDef::EffectIt pe_it_e = def->m_Effects.end();
-        for (; pe_it != pe_it_e; ++pe_it)
+        for (auto& pe_it : def->m_Effects)
         {
-            if ((*pe_it)->m_EffectName == item->name)
+            if (pe_it->m_EffectName == item->name)
             {
                 xr_sprintf(str, sizeof(str), "%d", ++i);
                 PHelper().CreateCaption(info_items, str, def->m_Name);
@@ -253,17 +229,15 @@ void __stdcall SelectPG(SChooseItem* item, PropItemVec& info_items)
     string64 str;
     u32 i = 0;
     PHelper().CreateCaption(info_items, "", "using effects");
-    for (PS::PGDIt G = ::Render->PSLibrary.FirstPGD(); G != ::Render->PSLibrary.LastPGD(); G++)
+    for (PS::PGDIt G = GEnv.Render->PSLibrary.FirstPGD(); G != GEnv.Render->PSLibrary.LastPGD(); ++G)
     {
         PS::CPGDef* def = (*G);
         if (def->m_Name == item->name)
         {
-            PS::CPGDef::EffectIt pe_it = def->m_Effects.begin();
-            PS::CPGDef::EffectIt pe_it_e = def->m_Effects.end();
-            for (; pe_it != pe_it_e; ++pe_it)
+            for (auto& pe_it : def->m_Effects)
             {
                 xr_sprintf(str, sizeof(str), "%d", ++i);
-                PHelper().CreateCaption(info_items, str, (*pe_it)->m_EffectName);
+                PHelper().CreateCaption(info_items, str, pe_it->m_EffectName);
             }
             break;
         }
@@ -276,10 +250,9 @@ void __stdcall FillTexture(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (ImageLib.GetTextures(lst))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 
@@ -300,10 +273,9 @@ void __stdcall FillTextureRaw(ChooseItemVec& items, void* param)
     FS_FileSet lst;
     if (ImageLib.GetTexturesRaw(lst))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
-        for (; it != _E; it++)
-            items.push_back(SChooseItem(it->name.c_str(), ""));
+        for (auto& it : lst)
+
+            items.push_back(SChooseItem(it.name.c_str(), ""));
     }
 }
 
@@ -350,54 +322,48 @@ void __stdcall FillGameMaterial(ChooseItemVec& items, void* param)
 
 void __stdcall FillSkeletonAnims(ChooseItemVec& items, void* param)
 {
-    IRenderVisual* V = ::Render->model_Create((LPCSTR)param);
+    IRenderVisual* V = GEnv.Render->model_Create((LPCSTR)param);
     if (PKinematicsAnimated(V))
     {
         u32 cnt = PKinematicsAnimated(V)->LL_MotionsSlotCount();
         for (u32 k = 0; k < cnt; k++)
         {
-            accel_map* ll_motions = PKinematicsAnimated(V)->LL_Motions(k);
-            accel_map::iterator _I, _E;
-            _I = ll_motions->begin();
-            _E = ll_motions->end();
-            for (; _I != _E; ++_I)
+            for (auto& it : PKinematicsAnimated(V)->LL_Motions(k))
             {
-                bool bFound = false;
-                for (ChooseItemVecIt it = items.begin(); it != items.end(); it++)
-                    if (it->name == _I->first)
+                bool found = false;
+                for (auto& it2 : items)
+                {
+                    if (it2.name == it.first)
                     {
-                        bFound = true;
+                        found = true;
                         break;
                     }
-                if (!bFound)
-                    items.push_back(SChooseItem(*_I->first, ""));
+                }
+                if (!found)
+                    items.push_back(SChooseItem(it.first.c_str(), ""));
             }
         }
     }
-    ::Render->model_Delete(V);
+    GEnv.Render->model_Delete(V);
 }
 
 void __stdcall FillSkeletonBones(ChooseItemVec& items, void* param)
 {
-    IRenderVisual* V = ::Render->model_Create((LPCSTR)param);
+    IRenderVisual* V = GEnv.Render->model_Create((LPCSTR)param);
     if (PKinematics(V))
     {
-        CKinematicsAnimated::accel* ll_bones = PKinematics(V)->LL_Bones();
-        CKinematicsAnimated::accel::iterator _I, _E;
-        _I = ll_bones->begin();
-        _E = ll_bones->end();
-        for (; _I != _E; ++_I)
-            items.push_back(SChooseItem(*_I->first, ""));
+        for (auto& it : *PKinematics(V)->LL_Bones())
+            items.push_back(SChooseItem(it.first.c_str(), ""));
     }
-    ::Render->model_Delete(V);
+    GEnv.Render->model_Delete(V);
 }
 
 void __stdcall FillSkeletonBonesObject(ChooseItemVec& items, void* param)
 {
     CEditableObject* eo = (CEditableObject*)param;
 
-    BoneIt _I = eo->FirstBone();
-    BoneIt _E = eo->LastBone();
+    auto _I = eo->FirstBone();
+    auto _E = eo->LastBone();
     for (; _I != _E; ++_I)
     {
         items.push_back(SChooseItem((*_I)->Name().c_str(), ""));

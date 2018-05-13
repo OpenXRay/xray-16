@@ -124,9 +124,10 @@ generated on my behalf
 
 ******************************************************************************/
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <string>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 class NVMeshMender
 {
@@ -209,11 +210,11 @@ public:
         DontWeightNormalsByFaceSize
     };
 
-    bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVector& output,
+    bool Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVector& output,
         const float bSmoothCreaseAngleRadians = 3.141592654f / 3.0f, const float* pTextureMatrix = 0,
         const Option _FixTangents = FixTangents, const Option _FixCylindricalTexGen = FixCylindricalTexGen,
         const Option _WeightNormalsByFaceSize = WeightNormalsByFaceSize);
-    bool NVMeshMender::MungeD3DX(const NVMeshMender::VAVector& input, NVMeshMender::VAVector& output,
+    bool MungeD3DX(const NVMeshMender::VAVector& input, NVMeshMender::VAVector& output,
         const float bSmoothCreaseAngleRadians = 3.141592654f / 3.0f, const float* pTextureMatrix = 0,
         const Option _FixTangents = FixTangents, const Option _FixCylindricalTexGen = FixCylindricalTexGen,
         const Option _WeightNormalsByFaceSize = WeightNormalsByFaceSize);

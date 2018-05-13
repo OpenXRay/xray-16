@@ -2,6 +2,7 @@
 #define _EXEC_POOL_H_
 #include "hxgrid/Interface/IAgent.h"
 #include "hxgrid/Interface/hxgridinterface.h"
+#include "xrCore/Threading/Lock.hpp"
 
 namespace lc_net
 {

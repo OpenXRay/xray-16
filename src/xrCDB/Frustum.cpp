@@ -173,10 +173,10 @@ EFC_Visible CFrustum::testSAABB(Fvector& c, float r, const float* mM, u32& test_
                 test_mask &= ~bit; // fully - no need to test this plane
             else
             {
-                EFC_Visible r = AABB_OverlapPlane(planes[i], mM);
-                if (fcvFully == r)
+                EFC_Visible r2 = AABB_OverlapPlane(planes[i], mM);
+                if (fcvFully == r2)
                     test_mask &= ~bit; // fully - no need to test this plane
-                else if (fcvNone == r)
+                else if (fcvNone == r2)
                 {
                     test_mask = 0;
                     return fcvNone;
@@ -376,7 +376,7 @@ sPoly* CFrustum::ClipPoly(sPoly& S, sPoly& D) const
         // clip everything to this plane
         cls[src->size()] = cls[0];
         src->push_back((*src)[0]);
-        Fvector D;
+        Fvector D2;
         float denum, t;
         for (u32 j = 0; j < src->size() - 1; j++)
         {
@@ -389,12 +389,12 @@ sPoly* CFrustum::ClipPoly(sPoly& S, sPoly& D) const
                 if (positive(cls[j + 1]))
                 {
                     // segment intersects plane
-                    D.sub((*src)[j + 1], (*src)[j]);
-                    denum = P.n.dotproduct(D);
+                    D2.sub((*src)[j + 1], (*src)[j]);
+                    denum = P.n.dotproduct(D2);
                     if (denum != 0)
                     {
                         t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
-                        dest->last().mad((*src)[j], D, t);
+                        dest->last().mad((*src)[j], D2, t);
                         dest->inc();
                     }
                 }
@@ -406,12 +406,12 @@ sPoly* CFrustum::ClipPoly(sPoly& S, sPoly& D) const
                 {
                     // J+1  - inside
                     // segment intersects plane
-                    D.sub((*src)[j + 1], (*src)[j]);
-                    denum = P.n.dotproduct(D);
+                    D2.sub((*src)[j + 1], (*src)[j]);
+                    denum = P.n.dotproduct(D2);
                     if (denum != 0)
                     {
                         t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
-                        dest->last().mad((*src)[j], D, t);
+                        dest->last().mad((*src)[j], D2, t);
                         dest->inc();
                     }
                 }

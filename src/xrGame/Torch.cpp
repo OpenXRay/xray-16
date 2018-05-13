@@ -28,19 +28,17 @@ static const float OPTIMIZATION_DISTANCE = 100.f;
 
 static bool stalker_use_dynamic_lights = false;
 
-ENGINE_API int g_current_renderer;
-
 CTorch::CTorch(void)
 {
-    light_render = GlobalEnv.Render->light_create();
+    light_render = GEnv.Render->light_create();
     light_render->set_type(IRender_Light::SPOT);
     light_render->set_shadow(true);
-    light_omni = GlobalEnv.Render->light_create();
+    light_omni = GEnv.Render->light_create();
     light_omni->set_type(IRender_Light::POINT);
     light_omni->set_shadow(false);
 
     m_switched_on = false;
-    glow_render = GlobalEnv.Render->glow_create();
+    glow_render = GEnv.Render->glow_create();
     lanim = 0;
     fBrightness = 1.f;
 
@@ -50,7 +48,7 @@ CTorch::CTorch(void)
 
     // Disabling shift by x and z axes for 1st render,
     // because we don't have dynamic lighting in it.
-    if (g_current_renderer == 1)
+    if (GEnv.CurrentRenderer == 1)
     {
         TORCH_OFFSET.x = 0;
         TORCH_OFFSET.z = 0;
@@ -115,7 +113,7 @@ void CTorch::SwitchNightVision(bool vision_on, bool use_sounds)
     for (u32 i = 0; i < cnt; ++i)
     {
         _GetItem(disabled_names, i, tmp);
-        if (0 == stricmp(tmp, curr_map))
+        if (0 == xr_stricmp(tmp, curr_map))
         {
             b_allow = false;
             break;

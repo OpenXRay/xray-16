@@ -109,7 +109,7 @@ void CStats::Show()
     else
         fMem_calls = 0.9f * fMem_calls + 0.1f * memCalls;
     Memory.stat_calls = 0;
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     auto& font = *statsFont;
     auto engineTotal = Device.GetStats().EngineTotal.result;
@@ -137,27 +137,21 @@ void CStats::Show()
         if (g_pGameLevel)
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
+        Engine.Scheduler.DumpStatistics(font, alertPtr);
         g_pGamePersistent->DumpStatistics(font, alertPtr);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
         if (physics_world())
             physics_world()->DumpStatistics(font, alertPtr);
         font.OutSet(200, 0);
-        GlobalEnv.Render->DumpStatistics(font, alertPtr);
+        GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
-        Sound->DumpStatistics(font, alertPtr);
+        GEnv.Sound->DumpStatistics(font, alertPtr);
         font.OutSkip();
         pInput->DumpStatistics(font, alertPtr);
         font.OutSkip();
-#ifdef DEBUG_MEMORY_MANAGER
-        font.OutNext("str: cmp[%3d], dock[%3d], qpc[%3d]", Memory.stat_strcmp, Memory.stat_strdock, CPU::qpc_counter);
-        Memory.stat_strcmp = 0;
-        Memory.stat_strdock = 0;
-        CPU::qpc_counter = 0;
-#else
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
-#endif
     }
     if (psDeviceFlags.test(rsCameraPos))
     {
@@ -182,9 +176,10 @@ void CStats::Show()
 void CStats::OnDeviceCreate()
 {
     g_bDisableRedText = !!strstr(Core.Params, "-xclsx");
-#ifndef DEDICATED_SERVER
-    statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
-#endif
+
+    if (!GEnv.isDedicatedServer)
+        statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
+
 #ifdef DEBUG
     if (!g_bDisableRedText)
     {
@@ -216,20 +211,20 @@ void CStats::OnRender()
     if (g_stats_flags.is(st_sound))
     {
         CSound_stats_ext snd_stat_ext;
-        ::Sound->statistic(0, &snd_stat_ext);
-        CSound_stats_ext::item_vec_it _I = snd_stat_ext.items.begin();
-        CSound_stats_ext::item_vec_it _E = snd_stat_ext.items.end();
+        GEnv.Sound->statistic(0, &snd_stat_ext);
+        auto _I = snd_stat_ext.items.begin();
+        auto _E = snd_stat_ext.items.end();
         for (; _I != _E; _I++)
         {
             const CSound_stats_ext::SItem& item = *_I;
             if (item._3D)
             {
-                GlobalEnv.DU->DrawCross(item.params.position, 0.5f, 0xFF0000FF, true);
+                GEnv.DU->DrawCross(item.params.position, 0.5f, 0xFF0000FF, true);
                 if (g_stats_flags.is(st_sound_min_dist))
-                    GlobalEnv.DU->DrawSphere(
+                    GEnv.DU->DrawSphere(
                         Fidentity, item.params.position, item.params.min_distance, 0x400000FF, 0xFF0000FF, true, true);
                 if (g_stats_flags.is(st_sound_max_dist))
-                    GlobalEnv.DU->DrawSphere(
+                    GEnv.DU->DrawSphere(
                         Fidentity, item.params.position, item.params.max_distance, 0x4000FF00, 0xFF008000, true, true);
 
                 xr_string out_txt = (out_txt.size() && g_stats_flags.is(st_sound_info_name)) ? item.name.c_str() : "";
@@ -237,7 +232,7 @@ void CStats::OnRender()
                 if (item.game_object)
                 {
                     if (g_stats_flags.is(st_sound_ai_dist))
-                        GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance,
+                        GEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance,
                             0x80FF0000, 0xFF800000, true, true);
                     if (g_stats_flags.is(st_sound_info_object))
                     {
@@ -247,7 +242,7 @@ void CStats::OnRender()
                     }
                 }
                 if (g_stats_flags.is_any(st_sound_info_name | st_sound_info_object) && item.name.size())
-                    GlobalEnv.DU->OutText(item.params.position, out_txt.c_str(), 0xFFFFFFFF, 0xFF000000);
+                    GEnv.DU->OutText(item.params.position, out_txt.c_str(), 0xFFFFFFFF, 0xFF000000);
             }
         }
     }

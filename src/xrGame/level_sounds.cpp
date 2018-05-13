@@ -65,13 +65,13 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
         else
         {
             if (Device.dwTimeGlobal >= m_StopTime)
-                m_Source.stop_deffered();
+                m_Source.stop_deferred();
         }
     }
     else
     {
         if (0 != m_Source._feedback())
-            m_Source.stop_deffered();
+            m_Source.stop_deferred();
     }
 }
 //-----------------------------------------------------------------------------
@@ -132,7 +132,8 @@ BOOL SMusicTrack::IsPlaying()
 }
 
 void SMusicTrack::SetVolume(float volume) { m_SourceStereo.set_volume(volume * m_Volume); }
-void SMusicTrack::Stop() { m_SourceStereo.stop_deffered(); }
+void SMusicTrack::Stop() { m_SourceStereo.stop_deferred(); }
+
 //-----------------------------------------------------------------------------
 // level sound manager
 //-----------------------------------------------------------------------------
@@ -170,7 +171,7 @@ void CLevelSoundManager::Load()
                 Msg("- Loading music tracks from '%s'...", music_sect);
 #endif // #ifdef DEBUG
                 CInifile::Sect& S = gameLtx.r_section(music_sect);
-                CInifile::SectCIt it = S.Data.begin(), end = S.Data.end();
+                auto it = S.Data.cbegin(), end = S.Data.cend();
                 m_MusicTracks.reserve(S.Data.size());
                 for (; it != end; it++)
                 {

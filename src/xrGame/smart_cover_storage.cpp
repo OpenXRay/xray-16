@@ -47,7 +47,7 @@ storage::~storage()
     Descriptions::const_iterator I = m_descriptions.begin();
     Descriptions::const_iterator E = m_descriptions.end();
     for (; I != E; ++I)
-        VERIFY(!(*I)->m_ref_count);
+        VERIFY((*I)->released());
 #endif // DEBUG
     delete_data(m_descriptions);
 }
@@ -56,9 +56,9 @@ void storage::collect_garbage()
 {
     struct garbage
     {
-        static IC bool predicate(::description* const& object)
+        static bool predicate(::description* const& object)
         {
-            if (object->m_ref_count)
+            if (!object->released())
                 return (false);
 
             if (Device.dwTimeGlobal < object->m_last_time_dec + time_to_delete)

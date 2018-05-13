@@ -7,8 +7,7 @@
 // refs
 class ENGINE_API CObjectAnimator
 {
-private:
-    DEFINE_VECTOR(COMotion*, MotionVec, MotionIt);
+    using MotionVec = xr_vector<COMotion*>;
 
 protected:
     bool bLoop;
@@ -31,14 +30,14 @@ public:
 
     void Clear();
     void Load(LPCSTR name);
-    IC LPCSTR Name() { return *m_Name; }
+    IC LPCSTR Name() const { return *m_Name; }
     float& Speed() { return m_Speed; }
     COMotion* Play(bool bLoop, LPCSTR name = 0);
     void Pause(bool val) { return m_MParam.Pause(val); }
     void Stop();
-    IC BOOL IsPlaying() { return m_MParam.bPlay; }
-    IC const Fmatrix& XFORM() { return m_XFORM; }
-    float GetLength();
+    IC BOOL IsPlaying() const { return m_MParam.bPlay; }
+    IC const Fmatrix& XFORM() const { return m_XFORM; }
+    float GetLength() const;
     // Update
     void Update(float dt);
     void DrawPath();

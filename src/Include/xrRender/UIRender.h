@@ -1,8 +1,16 @@
 #ifndef UIRender_included
 #define UIRender_included
 #pragma once
+#include "xrCore/_types.h"
 
+// fwd. decl.
 class IUIShader;
+template <class T> struct _rect;
+using Irect = _rect<int>;
+template <class T> struct _vector2;
+using Fvector2 = _vector2<float>;
+template <class T> struct _matrix;
+using Fmatrix = _matrix<float>;
 
 class IUIRender
 {
@@ -50,7 +58,7 @@ public:
     //.	virtual void FlushLineStrip() = 0;
     //.	virtual void StartLineList(u32 iMaxVerts) = 0;
     //.	virtual void FlushLineList() = 0;
-    virtual void SetScissor(Irect* rect = NULL) = 0;
+    virtual void SetScissor(Irect* rect = nullptr) = 0;
     virtual void GetActiveTextureResolution(Fvector2& res) = 0;
 
     //.	virtual void PushPoint(float x, float y, u32 c, float u, float v) = 0;

@@ -22,6 +22,7 @@ for traversing a file system.  This version uses the MSVC runtime.
 #include <time.h>
 #include "lwo2.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4996)
 
 int nobjects = 0, nlayers = 0, nsurfs = 0, nenvs = 0, nclips = 0, npoints = 0, npolygons = 0;
@@ -151,4 +152,4 @@ void main(int argc, char* argv[])
     printf("%g seconds\n\n", t2);
 }
 
-#pragma warning(default : 4996)
+#pragma warning(pop)

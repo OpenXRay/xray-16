@@ -41,7 +41,8 @@ public:
     WaveForm scrollU, scrollV;
 
     CMatrix() { memset(this, 0, sizeof(CMatrix)); }
-    IC void tc_trans(Fmatrix& T, float u, float v)
+
+    void tc_trans(Fmatrix& T, float u, float v)
     {
         T.identity();
         T.m[2][0] = u;
@@ -49,7 +50,7 @@ public:
     }
     void Calculate();
 
-    IC BOOL Similar(CMatrix& M) // comare by modes and params
+    BOOL Similar(CMatrix& M) // comare by modes and params
     {
         if (dwMode != M.dwMode)
             return FALSE;

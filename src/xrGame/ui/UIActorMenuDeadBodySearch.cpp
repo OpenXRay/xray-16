@@ -99,7 +99,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
         known_info_registry.registry().init(m_pPartnerInvOwner->object_id());
         KNOWN_INFO_VECTOR& known_infos = known_info_registry.registry().objects();
 
-        KNOWN_INFO_VECTOR_IT it = known_infos.begin();
+        auto it = known_infos.begin();
         for (int i = 0; it != known_infos.end(); ++it, ++i)
         {
             NET_Packet P;
@@ -114,7 +114,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     UpdateDeadBodyBag();
 }
 
-void CUIActorMenu::DeInitDeadBodySearchMode()
+void CUIActorMenu::DeInitDeadBodySearchMode() const
 {
     m_pDeadBodyBagList->Show(false);
     m_PartnerCharacterInfo->Show(false);
@@ -150,7 +150,7 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
         return false;
 
     CUIDragDropListEx* old_owner = itm->OwnerList();
-    CUIDragDropListEx* new_owner = NULL;
+    CUIDragDropListEx* new_owner = nullptr;
 
     if (b_use_cursor_pos)
     {

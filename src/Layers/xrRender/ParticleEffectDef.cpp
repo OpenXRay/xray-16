@@ -21,7 +21,7 @@ CPEDef::CPEDef()
 {
     m_Frame.InitDefault();
     m_MaxParticles = 0;
-    m_CachedShader = 0;
+    m_CachedShader = nullptr;
     m_fTimeLimit = 0.f;
     // collision
     m_fCollideOneMinusFriction = 1.f;
@@ -135,7 +135,7 @@ void CPEDef::ExecuteCollision(
 #else
                 collide::rq_result RQ;
                 collide::rq_target RT = m_Flags.is(dfCollisionDyn) ? collide::rqtBoth : collide::rqtStatic;
-                if (g_pGameLevel->ObjectSpace.RayPick(m.posB, dir, dist, RT, RQ, NULL))
+                if (g_pGameLevel->ObjectSpace.RayPick(m.posB, dir, dist, RT, RQ, nullptr))
                 {
                     pt.mad(m.posB, dir, RQ.range);
                     if (RQ.O)

@@ -17,9 +17,9 @@ extern ENGINE_API BOOL g_bRendering;
 RenderableBase::~RenderableBase()
 {
     VERIFY(!g_bRendering);
-    GlobalEnv.Render->model_Delete(renderable.visual);
+    GEnv.Render->model_Delete(renderable.visual);
     if (renderable.pROS)
-        GlobalEnv.Render->ros_destroy(renderable.pROS);
+        GEnv.Render->ros_destroy(renderable.pROS);
     renderable.visual = NULL;
     renderable.pROS = NULL;
 }
@@ -27,6 +27,6 @@ RenderableBase::~RenderableBase()
 IRender_ObjectSpecific* RenderableBase::renderable_ROS()
 {
     if (0 == renderable.pROS && renderable.pROS_Allowed)
-        renderable.pROS = GlobalEnv.Render->ros_create(this);
+        renderable.pROS = GEnv.Render->ros_create(this);
     return renderable.pROS;
 }

@@ -11,6 +11,7 @@
 #pragma hdrstop
 
 #include "MxGeom3D.h"
+#include "xrCore/_std_extensions.h"
 
 void mx3d_box_corners(const Vec3& min, const Vec3& max, Vec3* v)
 {
@@ -112,7 +113,7 @@ void MxBounds::complete()
     Vec3 R1 = max - center;
     Vec3 R2 = min - center;
 
-    radius = _max(norm(R1), norm(R2));
+    radius = std::max(norm(R1), norm(R2));
 }
 
 void MxBounds::merge(const MxBounds& b)
@@ -131,6 +132,6 @@ void MxBounds::merge(const MxBounds& b)
         center /= 2;
 
         dist /= 2;
-        radius = _max(dist + radius, dist + b.radius);
+        radius = std::max(dist + radius, dist + b.radius);
     }
 }

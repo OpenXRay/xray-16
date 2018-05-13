@@ -31,8 +31,8 @@ void __stdcall CHOM::MT_RENDER()
 CHOM::CHOM() : xrc("HOM")
 {
     bEnabled = FALSE;
-    m_pModel = 0;
-    m_pTris = 0;
+    m_pModel = nullptr;
+    m_pTris = nullptr;
 #ifdef DEBUG
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 #endif
@@ -169,8 +169,8 @@ void CHOM::Render_DB(CFrustum& base)
         return;
 
     // Prepare
-    CDB::RESULT* it = xrc.r_begin();
-    CDB::RESULT* end = xrc.r_end();
+    auto it = xrc.r_get()->begin();
+    auto end = xrc.r_get()->end();
 
     Fvector COP = Device.vCameraPosition;
     end = std::remove_if(it, end, pred_fb(m_pTris));
@@ -185,10 +185,10 @@ void CHOM::Render_DB(CFrustum& base)
     stats.VisibleTriangleCount = 0;
 
     // Perfrom selection, sorting, culling
-    for (; it != end; it++)
+    for (auto &it : *xrc.r_get())
     {
         // Control skipping
-        occTri& T = m_pTris[it->id];
+        occTri& T = m_pTris[it.id];
         u32 next = _frame + ::Random.randI(3, 10);
 
         // Test for good occluder - should be improved :)
@@ -199,7 +199,7 @@ void CHOM::Render_DB(CFrustum& base)
         }
 
         // Access to triangle vertices
-        CDB::TRI& t = m_pModel->get_tris()[it->id];
+        CDB::TRI& t = m_pModel->get_tris()[it.id];
         Fvector* v = m_pModel->get_verts();
         src.clear();
         dst.clear();
@@ -207,7 +207,7 @@ void CHOM::Render_DB(CFrustum& base)
         src.push_back(v[t.verts[1]]);
         src.push_back(v[t.verts[2]]);
         sPoly* P = clip.ClipPoly(src, dst);
-        if (0 == P)
+        if (nullptr == P)
         {
             T.skip = next;
             continue;
@@ -217,11 +217,11 @@ void CHOM::Render_DB(CFrustum& base)
         stats.VisibleTriangleCount++;
         u32 pixels = 0;
         int limit = int(P->size()) - 1;
-        for (int v = 1; v < limit; v++)
+        for (int v2 = 1; v2 < limit; v2++)
         {
             m_xform.transform(T.raster[0], (*P)[0]);
-            m_xform.transform(T.raster[1], (*P)[v + 0]);
-            m_xform.transform(T.raster[2], (*P)[v + 1]);
+            m_xform.transform(T.raster[1], (*P)[v2 + 0]);
+            m_xform.transform(T.raster[2], (*P)[v2 + 1]);
             pixels += Raster.rasterize(&T);
         }
         if (0 == pixels)
@@ -283,21 +283,21 @@ IC BOOL _visible(Fbox& B, Fmatrix& m_xform_01)
     // Find min/max points of xformed-box
     Fvector2 min, max;
     float z;
-    if (xform_b0(min, max, z, m_xform_01, B.min.x, B.min.y, B.min.z))
+    if (xform_b0(min, max, z, m_xform_01, B.vMin.x, B.vMin.y, B.vMin.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.min.x, B.min.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMin.x, B.vMin.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.min.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMin.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.min.y, B.min.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMin.y, B.vMin.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.min.x, B.max.y, B.min.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMin.x, B.vMax.y, B.vMin.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.min.x, B.max.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMin.x, B.vMax.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.max.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMax.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.max.y, B.min.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMax.y, B.vMin.z))
         return TRUE;
     return Raster.test(min.x, min.y, max.x, max.y, z);
 }

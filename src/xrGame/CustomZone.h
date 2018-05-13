@@ -34,13 +34,11 @@ struct SZoneObjectInfo
 
 class CCustomZone : public CSpaceRestrictor, public Feel::Touch
 {
-private:
     typedef CSpaceRestrictor inherited;
 
 public:
     CZoneEffector* m_actor_effector;
 
-public:
     CCustomZone();
     virtual ~CCustomZone();
 
@@ -260,7 +258,7 @@ protected:
     void UpdateBlowoutLight();
 
     //список партиклов для объетов внутри зоны
-    DEFINE_VECTOR(SZoneObjectInfo, OBJECT_INFO_VEC, OBJECT_INFO_VEC_IT);
+    using OBJECT_INFO_VEC = xr_vector<SZoneObjectInfo>;
     OBJECT_INFO_VEC m_ObjectInfoMap;
 
     void CreateHit(u16 id_to, u16 id_from, const Fvector& hit_dir, float hit_power, s16 bone_id,

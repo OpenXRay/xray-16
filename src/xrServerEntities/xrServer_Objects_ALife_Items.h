@@ -1,5 +1,6 @@
+#pragma once
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: xrServer_Objects_ALife.h
+//	Module 		: xrServer_Objects_ALife_Items.h
 //	Created 	: 19.09.2002
 //  Modified 	: 04.06.2003
 //	Author		: Oles Shyshkovtsov, Alexander Maksimchuk, Victor Reutskiy and Dmitriy Iassenev
@@ -59,7 +60,7 @@ public:
     virtual CSE_Abstract* base() = 0;
     virtual const CSE_Abstract* base() const = 0;
     virtual CSE_Abstract* init();
-    virtual CSE_Abstract* cast_abstract() { return 0; };
+    virtual CSE_Abstract* cast_abstract() { return nullptr; };
     virtual CSE_ALifeInventoryItem* cast_inventory_item() { return this; };
     virtual u32 update_rate() const;
     virtual BOOL Net_Relevant();
@@ -151,8 +152,8 @@ public:
     CSE_ALifeItemAmmo(LPCSTR caSection);
     virtual ~CSE_ALifeItemAmmo();
     virtual CSE_ALifeItemAmmo* cast_item_ammo() { return this; };
-    virtual bool can_switch_online() const;
-    virtual bool can_switch_offline() const;
+    virtual bool can_switch_online() const noexcept;
+    virtual bool can_switch_offline() const noexcept;
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -403,8 +404,8 @@ public:
     u32 m_ef_weapon_type;
     CSE_ALifeItemBolt(LPCSTR caSection);
     virtual ~CSE_ALifeItemBolt();
-    virtual bool can_save() const;
-    virtual bool used_ai_locations() const;
+    virtual bool can_save() const noexcept;
+    virtual bool used_ai_locations() const noexcept;
     virtual u32 ef_weapon_type() const;
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);

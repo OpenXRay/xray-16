@@ -8,11 +8,6 @@
 
 #pragma once
 
-// STATIC_CHECK macro
-#ifndef STATIC_CHECK
-#define STATIC_CHECK(expr, msg) typedef char ERROR_##msg[1][(expr)]
-#endif // #ifndef STATIC_CHECK
-
 // DECLSPEC_NOVTABLE macro
 #ifndef DECLSPEC_NOVTABLE
 #if (_MSC_VER >= 1100) && defined(__cplusplus)

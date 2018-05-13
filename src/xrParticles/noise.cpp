@@ -1,12 +1,11 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "noise.h"
 
 #ifndef _EDITOR
 #include <xmmintrin.h>
 
-__forceinline int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
+ICF int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
 #endif
 
 //==============================================================================
@@ -59,7 +58,8 @@ void noise3Init()
                 v[j] = float((rnd % (B + B)) - B) / B;
             }
             s = DOT(v, v);
-        } while (s > 1.0);
+        }
+        while (s > 1.0);
         s = _sqrt(s);
         for (j = 0; j < 3; j++)
             g[i][j] = v[j] / s;

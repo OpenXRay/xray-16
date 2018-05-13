@@ -2,6 +2,7 @@
 #include "xrMessages.h"
 #include "xrGameSpyServer.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Level.h"
 #include "xrGameSpy/xrGameSpy.h"
 #include "xrGameSpy/GameSpy_Available.h"
 #include "xrGameSpy/GameSpy_GCD_Server.h"
@@ -125,14 +126,14 @@ void xrGameSpyServer::Update()
 int xrGameSpyServer::GetPlayersCount()
 {
     int NumPlayers = net_players.ClientsCount();
-    if (!g_dedicated_server || NumPlayers < 1)
+    if (!GEnv.isDedicatedServer || NumPlayers < 1)
         return NumPlayers;
     return NumPlayers - 1;
 };
 
 bool xrGameSpyServer::NeedToCheckClient_GameSpy_CDKey(IClient* CL)
 {
-    if (!m_bCDKey_Initialized || (CL == GetServerClient() && g_dedicated_server))
+    if (!m_bCDKey_Initialized || (CL == GetServerClient() && GEnv.isDedicatedServer))
     {
         return false;
     };
@@ -258,9 +259,9 @@ void xrGameSpyServer::GetServerInfo(CServerInfo* si)
     si->AddItem("Server name", HostName.c_str(), RGB(128, 128, 255));
     si->AddItem("Map", MapName.c_str(), RGB(255, 0, 128));
 
-    xr_strcpy(tmp, itoa(GetPlayersCount(), tmp2, 10));
+    xr_strcpy(tmp, xr_itoa(GetPlayersCount(), tmp2, 10));
     xr_strcat(tmp, " / ");
-    xr_strcat(tmp, itoa(m_iMaxPlayers, tmp2, 10));
+    xr_strcat(tmp, xr_itoa(m_iMaxPlayers, tmp2, 10));
     si->AddItem("Players", tmp, RGB(255, 128, 255));
 
     string256 res;
@@ -281,6 +282,6 @@ void xrGameSpyServer::GetServerInfo(CServerInfo* si)
     }
     si->AddItem("Access to server", res, RGB(200, 155, 155));
 
-    si->AddItem("GameSpy port", itoa(iGameSpyBasePort, tmp, 10), RGB(200, 5, 155));
+    si->AddItem("GameSpy port", xr_itoa(iGameSpyBasePort, tmp, 10), RGB(200, 5, 155));
     inherited::GetServerInfo(si);
 }

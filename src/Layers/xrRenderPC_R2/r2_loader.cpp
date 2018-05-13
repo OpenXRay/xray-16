@@ -24,7 +24,7 @@ void CRender::level_Load(IReader* fs)
     IReader* chunk;
 
     // Shaders
-    //	g_pGamePersistent->LoadTitle		("st_loading_shaders");
+    g_pGamePersistent->SetLoadStageTitle("st_loading_shaders");
     g_pGamePersistent->LoadTitle();
     {
         chunk = fs->open_chunk(fsL_SHADERS);
@@ -51,10 +51,10 @@ void CRender::level_Load(IReader* fs)
     Wallmarks = new CWallmarksEngine();
     Details = new CDetailManager();
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         // VB,IB,SWI
-        //		g_pGamePersistent->LoadTitle("st_loading_geometry");
+        g_pGamePersistent->SetLoadStageTitle("st_loading_geometry");
         g_pGamePersistent->LoadTitle();
         {
             CStreamReader* geom = FS.rs_open("$level$", "level.geom");
@@ -73,20 +73,20 @@ void CRender::level_Load(IReader* fs)
         }
 
         // Visuals
-        //		g_pGamePersistent->LoadTitle("st_loading_spatial_db");
+        g_pGamePersistent->SetLoadStageTitle("st_loading_spatial_db");
         g_pGamePersistent->LoadTitle();
         chunk = fs->open_chunk(fsL_VISUALS);
         LoadVisuals(chunk);
         chunk->close();
 
         // Details
-        //		g_pGamePersistent->LoadTitle("st_loading_details");
+        g_pGamePersistent->SetLoadStageTitle("st_loading_details");
         g_pGamePersistent->LoadTitle();
         Details->Load();
     }
 
     // Sectors
-    //	g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
+    g_pGamePersistent->SetLoadStageTitle("st_loading_sectors_portals");
     g_pGamePersistent->LoadTitle();
     LoadSectors(fs);
 
@@ -94,14 +94,14 @@ void CRender::level_Load(IReader* fs)
     HOM.Load();
 
     // Lights
-    // pApp->LoadTitle			("Loading lights...");
+    g_pGamePersistent->SetLoadStageTitle("st_loading_lights");
+    g_pGamePersistent->LoadTitle();
     LoadLights(fs);
 
     // End
     pApp->LoadEnd();
 
     // sanity-clear
-    lstLODs.clear();
     lstLODgroups.clear();
     mapLOD.clear();
 
@@ -192,11 +192,11 @@ void CRender::level_Unload()
     xr_delete(Wallmarks);
 
     //*** Shaders
-    Shaders.clear_and_free();
+    Shaders.clear();
     b_loaded = FALSE;
     /*
         Models->ClearPool( true );
-        Visuals.clear_and_free();
+        Visuals.clear();
         dxRenderDeviceRender::Instance().Resources->Dump(false);
         static int unload_counter = 0;
         Msg("The Level Unloaded.======================== %d", ++unload_counter);
@@ -391,7 +391,7 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
         for (; it != it_e; ++it)
             xr_free((*it).sw);
 
-        SWIs.clear_not_free();
+        SWIs.clear();
 
         SWIs.resize(item_count);
         for (u32 c = 0; c < item_count; c++)

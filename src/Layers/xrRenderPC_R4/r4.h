@@ -15,7 +15,7 @@
 
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
-#include "light_render_direct.h"
+#include "Layers/xrRender/light_render_direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
 
@@ -111,6 +111,7 @@ public:
         u32 forceskinw : 1;
         float forcegloss_v;
     } o;
+
     struct RenderR4Statistics
     {
         u32 l_total;
@@ -176,7 +177,7 @@ public:
     light_Package LP_normal;
     light_Package LP_pending;
 
-    xr_vector<Fbox3, render_alloc<Fbox3>> main_coarse_structure;
+    xr_vector<Fbox3> main_coarse_structure;
 
     shared_str c_sbase;
     shared_str c_lmaterial;
@@ -356,10 +357,15 @@ public:
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer);
     virtual void OnFrame();
 
+    void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
+    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
+
     // Render mode
     virtual void rmNear();
     virtual void rmFar();
     virtual void rmNormal();
+
+    u32 active_phase() override { return phase; }
 
     // Constructor/destructor/loader
     CRender();

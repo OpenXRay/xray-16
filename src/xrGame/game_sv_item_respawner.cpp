@@ -3,6 +3,7 @@
 #include "game_sv_base.h"
 #include "Level.h"
 #include "xrServer_Objects_Alife_Items.h"
+#include "xrNetServer/NET_Messages.h"
 #include <functional>
 
 item_respawn_manager::spawn_item::spawn_item()
@@ -279,7 +280,7 @@ void item_respawn_manager::add_new_rpoint(shared_str profile_sect, RPoint const&
 void item_respawn_manager::check_to_delete(u16 item_id)
 {
     respawn_iter temp_iter =
-        std::find_if(m_respawns.begin(), m_respawns.end(), std::bind2nd(search_by_id_predicate(), item_id));
+        std::find_if(m_respawns.begin(), m_respawns.end(), std::bind(search_by_id_predicate(), std::placeholders::_1, item_id));
 
     if (temp_iter != m_respawns.end())
     {

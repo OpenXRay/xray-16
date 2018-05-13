@@ -4,7 +4,7 @@
 
 // extern Fvector du_cone_vertices			[DU_CONE_NUMVERTEX];
 
-BOOL tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fvector& v2)
+bool tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fvector& v2)
 {
     Fvector e0, e1;
     return CDB::TestSphereTri(SC, R, v0, e0.sub(v1, v0), e1.sub(v2, v0));
@@ -37,11 +37,11 @@ void CRenderTarget::enable_dbt_bounds(light* L)
         Device.mFullTransform.transform(pt);
         bbp.modify(pt);
     }
-    u_DBT_enable(bbp.min.z, bbp.max.z);
+    u_DBT_enable(bbp.vMin.z, bbp.vMax.z);
 }
 
 // nv-DBT
-BOOL CRenderTarget::u_DBT_enable(float zMin, float zMax)
+bool CRenderTarget::u_DBT_enable(float /*zMin*/, float /*zMax*/)
 {
     if (!RImplementation.o.nvdbt)
         return FALSE;
@@ -66,7 +66,7 @@ void CRenderTarget::u_DBT_disable()
     //	HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X,0);
 }
 
-BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
+bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 {
     // Msg	("%d: %x type(%d), pos(%f,%f,%f)",Device.dwFrame,u32(L),u32(L->flags.type),VPUSH(L->position));
 
@@ -92,7 +92,7 @@ BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
     {
         Fsphere S;
         S.set(L->spatial.sphere.P, L->spatial.sphere.R);
-        dbg_spheres.push_back(mk_pair(S, L->color));
+        dbg_spheres.push_back(std::make_pair(S, L->color));
     }
 #endif
 

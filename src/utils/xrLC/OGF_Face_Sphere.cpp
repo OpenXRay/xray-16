@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "build.h"
 #include "ogf_face.h"
+#include "xrCore/_sphere.h"
 #pragma warning(disable : 4995)
 #include <MgcCont3DMinSphere.h>
-
-#pragma comment(lib, "MagicFM.lib")
 
 BOOL f_valid(float f) { return _finite(f) && !_isnan(f); }
 BOOL SphereValid(xr_vector<Fvector>& geom, Fsphere& test)

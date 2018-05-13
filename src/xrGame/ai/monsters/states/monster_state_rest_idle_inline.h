@@ -15,9 +15,9 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterRestIdleAbstract::CStateMonsterRestIdle(_Object* obj) : inherited(obj)
 {
-    add_state(eStateRest_WalkToCover, new CStateMonsterMoveToPointEx<_Object>(obj));
-    add_state(eStateRest_LookOpenPlace, new CStateMonsterLookToPoint<_Object>(obj));
-    add_state(eStateRest_Idle, new CStateMonsterCustomAction<_Object>(obj));
+    this->add_state(eStateRest_WalkToCover, new CStateMonsterMoveToPointEx<_Object>(obj));
+    this->add_state(eStateRest_LookOpenPlace, new CStateMonsterLookToPoint<_Object>(obj));
+    this->add_state(eStateRest_Idle, new CStateMonsterCustomAction<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION
@@ -28,17 +28,17 @@ void CStateMonsterRestIdleAbstract::initialize()
     m_target_node = u32(-1);
 
     // try to get cover
-    const CCoverPoint* point = object->CoverMan->find_cover(object->Position(), 5.f, 10.f);
+    const CCoverPoint* point = this->object->CoverMan->find_cover(this->object->Position(), 5.f, 10.f);
     if (!point)
     {
-        point = object->CoverMan->find_cover(object->Position(), 10.f, 30.f);
+        point = this->object->CoverMan->find_cover(this->object->Position(), 10.f, 30.f);
         if (!point)
             return;
     }
 
     m_target_node = point->level_vertex_id();
 
-    CMonsterSquad* squad = monster_squad().get_squad(object);
+    CMonsterSquad* squad = monster_squad().get_squad(this->object);
     squad->lock_cover(m_target_node);
 }
 
@@ -46,7 +46,7 @@ TEMPLATE_SPECIALIZATION
 void CStateMonsterRestIdleAbstract::finalize()
 {
     inherited::finalize();
-    CMonsterSquad* squad = monster_squad().get_squad(object);
+    CMonsterSquad* squad = monster_squad().get_squad(this->object);
     squad->unlock_cover(m_target_node);
 }
 
@@ -55,34 +55,34 @@ void CStateMonsterRestIdleAbstract::critical_finalize()
 {
     inherited::critical_finalize();
 
-    CMonsterSquad* squad = monster_squad().get_squad(object);
+    CMonsterSquad* squad = monster_squad().get_squad(this->object);
     squad->unlock_cover(m_target_node);
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestIdleAbstract::reselect_state()
 {
-    if ((prev_substate == u32(-1)) && (m_target_node != u32(-1)))
+    if ((this->prev_substate == u32(-1)) && (m_target_node != u32(-1)))
     {
-        select_state(eStateRest_WalkToCover);
+        this->select_state(eStateRest_WalkToCover);
         return;
     }
 
-    if ((prev_substate == eStateRest_WalkToCover) || (prev_substate == u32(-1)))
+    if ((this->prev_substate == eStateRest_WalkToCover) || (this->prev_substate == u32(-1)))
     {
-        select_state(eStateRest_LookOpenPlace);
+        this->select_state(eStateRest_LookOpenPlace);
         return;
     }
 
-    select_state(eStateRest_Idle);
+    this->select_state(eStateRest_Idle);
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestIdleAbstract::setup_substates()
 {
-    state_ptr state = get_state_current();
+    state_ptr state = this->get_state_current();
 
-    if (current_substate == eStateRest_WalkToCover)
+    if (this->current_substate == eStateRest_WalkToCover)
     {
         SStateDataMoveToPointEx data;
 
@@ -96,38 +96,38 @@ void CStateMonsterRestIdleAbstract::setup_substates()
         data.braking = true;
         data.accel_type = eAT_Calm;
         data.action.sound_type = MonsterSound::eMonsterSoundIdle;
-        data.action.sound_delay = object->db().m_dwIdleSndDelay;
+        data.action.sound_delay = this->object->db().m_dwIdleSndDelay;
 
         state->fill_data_with(&data, sizeof(SStateDataMoveToPointEx));
         return;
     }
 
-    if (current_substate == eStateRest_LookOpenPlace)
+    if (this->current_substate == eStateRest_LookOpenPlace)
     {
         SStateDataLookToPoint data;
 
         Fvector dir;
-        object->CoverMan->less_cover_direction(dir);
+        this->object->CoverMan->less_cover_direction(dir);
 
-        data.point.mad(object->Position(), dir, 10.f);
+        data.point.mad(this->object->Position(), dir, 10.f);
         data.action.action = ACT_STAND_IDLE;
         data.action.time_out = 2000;
         data.action.sound_type = MonsterSound::eMonsterSoundIdle;
-        data.action.sound_delay = object->db().m_dwIdleSndDelay;
+        data.action.sound_delay = this->object->db().m_dwIdleSndDelay;
         data.face_delay = 0;
 
         state->fill_data_with(&data, sizeof(SStateDataLookToPoint));
         return;
     }
 
-    if (current_substate == eStateRest_Idle)
+    if (this->current_substate == eStateRest_Idle)
     {
         SStateDataAction data;
 
         data.action = ACT_REST;
         data.time_out = 0; // do not use time out
         data.sound_type = MonsterSound::eMonsterSoundIdle;
-        data.sound_delay = object->db().m_dwIdleSndDelay;
+        data.sound_delay = this->object->db().m_dwIdleSndDelay;
 
         state->fill_data_with(&data, sizeof(SStateDataAction));
 

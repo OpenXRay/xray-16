@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __FBOX2
 #define __FBOX2
 
@@ -32,10 +33,10 @@ public:
         max.set(_max);
         return *this;
     };
-    IC SelfRef set(T x1, T y1, T x2, T y2)
+    IC SelfRef set(T x1_, T y1_, T x2_, T y2_)
     {
-        min.set(x1, y1);
-        max.set(x2, y2);
+        min.set(x1_, y1_);
+        max.set(x2_, y2_);
         return *this;
     };
     IC SelfRef set(SelfCRef b)
@@ -45,7 +46,7 @@ public:
         return *this;
     };
 
-    IC SelfRef null()
+    IC SelfRef set_zero()
     {
         min.set(0.f, 0.f);
         max.set(0.f, 0.f);
@@ -59,8 +60,8 @@ public:
     };
     IC SelfRef invalidate()
     {
-        min.set(type_max(T), type_max(T));
-        max.set(type_min(T), type_min(T));
+        min.set(type_max<T>, type_max<T>);
+        max.set(type_min<T>, type_min<T>);
         return *this;
     }
 
@@ -356,7 +357,7 @@ typedef _box2<float> Fbox2;
 typedef _box2<double> Dbox2;
 
 template <class T>
-BOOL _valid(const _box2<T>& c)
+bool _valid(const _box2<T>& c)
 {
     return _valid(c.min) && _valid(c.max);
 }

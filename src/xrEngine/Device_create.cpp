@@ -15,7 +15,7 @@ void CRenderDevice::_SetupStates()
     vCameraDirection.set(0, 0, 1);
     vCameraTop.set(0, 1, 0);
     vCameraRight.set(1, 0, 0);
-    GlobalEnv.Render->SetupStates();
+    GEnv.Render->SetupStates();
 }
 
 void CRenderDevice::Create()
@@ -26,7 +26,7 @@ void CRenderDevice::Create()
     bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
     bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
     bool gpuRef = !!strstr(Core.Params, "-gpu_ref");
-    GlobalEnv.Render->SetupGPU(gpuSW, gpuNonPure, gpuRef);
+    GEnv.Render->SetupGPU(gpuSW, gpuNonPure, gpuRef);
     Log("Starting RENDER device...");
 #ifdef _EDITOR
     psCurrentVidMode[0] = dwWidth;
@@ -34,18 +34,16 @@ void CRenderDevice::Create()
 #endif
     fFOV = 90.f;
     fASPECT = 1.f;
-#ifdef INGAME_EDITOR
-    bool noEd = !editor();
-#else
-    bool noEd = true;
-#endif
-    GlobalEnv.Render->Create(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
+    const bool noEd = !editor();
+    GEnv.Render->Create(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
+    GetWindowRect(m_hWnd, &m_rcWindowBounds);
+    GetClientRect(m_hWnd, &m_rcWindowClient);
     Memory.mem_compact();
     b_is_Ready = TRUE;
     _SetupStates();
     string_path fname;
     FS.update_path(fname, "$game_data$", "shaders.xr");
-    GlobalEnv.Render->OnDeviceCreate(fname);
+    GEnv.Render->OnDeviceCreate(fname);
     Statistic->OnDeviceCreate();
     dwFrame = 0;
     PreCache(0, false, false);

@@ -117,10 +117,10 @@ CCustomMonster::~CCustomMonster()
 
 #ifdef DEBUG
     Msg("dumping client spawn manager stuff for object with id %d", ID());
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         Level().client_spawn_manager().dump(ID());
 #endif // DEBUG
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         Level().client_spawn_manager().clear(ID());
 }
 
@@ -624,7 +624,7 @@ void CCustomMonster::update_range_fov(float& new_range, float& new_fov, float st
     // 300=standart, 50=super-fog
 
     new_fov = start_fov;
-    new_range = start_range * (_min(m_far_plane_factor * current_far_plane, standard_far_plane) / standard_far_plane) *
+    new_range = start_range * (std::min(m_far_plane_factor * current_far_plane, standard_far_plane) / standard_far_plane) *
         (1.f / (1.f + m_fog_density_factor * current_fog_density));
 }
 
@@ -1063,7 +1063,7 @@ void draw_visiblity_rays(CCustomMonster* self, const IGameObject* object, collid
 
 void CCustomMonster::OnRender()
 {
-    GlobalEnv.DRender->OnFrameEnd();
+    GEnv.DRender->OnFrameEnd();
     // RCache.OnFrameEnd				();
 
     {

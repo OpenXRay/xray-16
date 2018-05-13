@@ -20,6 +20,7 @@ class ENGINE_API CApplication : public pureFrame, public IEventReceiver
     };
 
 public:
+    string256 ls_title;
     string2048 ls_header;
     string2048 ls_tip_number;
     string2048 ls_tip;
@@ -55,7 +56,7 @@ public:
     int Level_ID(LPCSTR name, LPCSTR ver, bool bSet);
     void Level_Set(u32 ID);
     void LoadAllArchives();
-    CInifile* GetArchiveHeader(LPCSTR name, LPCSTR ver);
+    static CInifile* GetArchiveHeader(LPCSTR name, LPCSTR ver);
 
     // Loading
     void LoadBegin();
@@ -64,6 +65,8 @@ public:
     void LoadStage();
     void LoadSwitch();
     void LoadDraw();
+
+    void SetLoadStageTitle(pcstr ls_title);
 
     virtual void OnEvent(EVENT E, u64 P1, u64 P2);
 

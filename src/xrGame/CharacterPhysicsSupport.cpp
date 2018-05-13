@@ -248,7 +248,7 @@ void CCharacterPhysicsSupport::SpawnInitPhysics(CSE_Abstract* e)
     {
 #ifdef DEBUG
         if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) &&
-            stricmp(PH_DBG_ObjectTrackName(), *m_EntityAlife.cName()) == 0)
+            xr_stricmp(PH_DBG_ObjectTrackName(), *m_EntityAlife.cName()) == 0)
         {
             Msg("CCharacterPhysicsSupport::SpawnInitPhysics obj %s before collision correction %f,%f,%f",
                 PH_DBG_ObjectTrackName(), m_EntityAlife.Position().x, m_EntityAlife.Position().y,
@@ -267,7 +267,7 @@ void CCharacterPhysicsSupport::SpawnInitPhysics(CSE_Abstract* e)
 
 #ifdef DEBUG
         if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) &&
-            stricmp(PH_DBG_ObjectTrackName(), *m_EntityAlife.cName()) == 0)
+            xr_stricmp(PH_DBG_ObjectTrackName(), *m_EntityAlife.cName()) == 0)
         {
             Msg("CCharacterPhysicsSupport::SpawnInitPhysics obj %s after collision correction %f,%f,%f",
                 PH_DBG_ObjectTrackName(), m_EntityAlife.Position().x, m_EntityAlife.Position().y,
@@ -1119,7 +1119,9 @@ void CCharacterPhysicsSupport::CreateShell(IGameObject* who, Fvector& dp, Fvecto
     if (IsGameTypeSingle())
     {
         m_pPhysicsShell->SetPrefereExactIntegration(); // use exact integration for ragdolls in single
+#ifndef DEAD_BODY_COLLISION
         m_pPhysicsShell->SetRemoveCharacterCollLADisable();
+#endif
     }
     else
         m_pPhysicsShell->SetIgnoreDynamic();

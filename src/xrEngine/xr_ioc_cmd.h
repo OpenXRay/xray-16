@@ -26,7 +26,8 @@
         Console->AddCommand(&x##cls);      \
     }
 
-#include "xrSASH.h"
+#include "xrCore/xrCore_benchmark_macros.h"
+#include "xrCore/xr_token.h"
 
 class ENGINE_API IConsole_Command
 {
@@ -55,7 +56,7 @@ public:
     IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(TRUE), bEmptyArgsHandled(FALSE)
     {
         m_LRU.reserve(LRU_MAX_COUNT + 1);
-        m_LRU.clear_not_free();
+        m_LRU.clear();
     }
     virtual ~IConsole_Command()
     {
@@ -66,16 +67,7 @@ public:
     BENCH_SEC_SCRAMBLEVTBL3
 
     LPCSTR Name() { return cName; }
-    void InvalidSyntax()
-    {
-        TInfo I;
-        Info(I);
-        Msg("~ Invalid syntax in call to '%s'", cName);
-        Msg("~ Valid arguments: %s", I);
-
-        g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
-        g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
-    }
+    void InvalidSyntax();
     virtual void Execute(LPCSTR args) = 0;
     virtual void Status(TStatus& S) { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_strcpy(I, "(no arguments)"); }
@@ -89,7 +81,7 @@ public:
 
     BENCH_SEC_SCRAMBLEVTBL2
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { add_LRU_to_tips(tips); }
+    virtual void fill_tips(vecTips& tips, u32 /*mode*/) { add_LRU_to_tips(tips); }
     // vecLRU& LRU () { return m_LRU; }
     virtual void add_to_LRU(shared_str const& arg);
     void add_LRU_to_tips(vecTips& tips);
@@ -120,7 +112,7 @@ public:
     }
     virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
-    virtual void fill_tips(vecTips& tips, u32 mode)
+    virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
         TStatus str;
         xr_sprintf(str, sizeof(str), "%s (current) [on/off]", value->test(mask) ? "on" : "off");
@@ -137,7 +129,7 @@ protected:
 public:
     CCC_ToggleMask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = TRUE; };
     const BOOL GetValue() const { return value->test(mask); }
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(LPCSTR /*args*/)
     {
         value->set(mask, !GetValue());
         TStatus S;
@@ -146,7 +138,7 @@ public:
     }
     virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
-    virtual void fill_tips(vecTips& tips, u32 mode)
+    virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
         TStatus str;
         xr_sprintf(str, sizeof(str), "%s (current) [on/off]", value->test(mask) ? "on" : "off");
@@ -158,17 +150,17 @@ class ENGINE_API CCC_Token : public IConsole_Command
 {
 protected:
     u32* value;
-    xr_token* tokens;
+    const xr_token* tokens;
 
 public:
-    CCC_Token(LPCSTR N, u32* V, xr_token* T) : IConsole_Command(N), value(V), tokens(T){};
+    CCC_Token(LPCSTR N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){};
 
     virtual void Execute(LPCSTR args)
     {
-        xr_token* tok = tokens;
+        const xr_token* tok = tokens;
         while (tok->name)
         {
-            if (stricmp(tok->name, args) == 0)
+            if (xr_stricmp(tok->name, args) == 0)
             {
                 *value = tok->id;
                 break;
@@ -180,7 +172,7 @@ public:
     }
     virtual void Status(TStatus& S)
     {
-        xr_token* tok = tokens;
+        const xr_token* tok = tokens;
         while (tok->name)
         {
             if (tok->id == (int)(*value))
@@ -196,7 +188,7 @@ public:
     virtual void Info(TInfo& I)
     {
         I[0] = 0;
-        xr_token* tok = tokens;
+        const xr_token* tok = tokens;
         while (tok->name)
         {
             if (I[0])
@@ -205,12 +197,12 @@ public:
             tok++;
         }
     }
-    virtual xr_token* GetToken() { return tokens; }
-    virtual void fill_tips(vecTips& tips, u32 mode)
+    virtual const xr_token* GetToken() noexcept { return tokens; }
+    virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
         TStatus str;
         bool res = false;
-        xr_token* tok = GetToken();
+        const xr_token* tok = GetToken();
         while (tok->name && !res)
         {
             if (tok->id == (int)(*value))
@@ -347,7 +339,7 @@ public:
         else
             *value = v;
     }
-    virtual void Status(TStatus& S) { itoa(*value, S, 10); }
+    virtual void Status(TStatus& S) { xr_itoa(*value, S, 10); }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "integer value in range [%d,%d]", min, max); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -385,7 +377,7 @@ public:
 class ENGINE_API CCC_LoadCFG : public IConsole_Command
 {
 public:
-    virtual bool allow(LPCSTR cmd) { return true; };
+    virtual bool allow(LPCSTR /*cmd*/) { return true; };
     CCC_LoadCFG(LPCSTR N);
     virtual void Execute(LPCSTR args);
 };

@@ -1,21 +1,10 @@
-#ifndef XRCDB_H
-#define XRCDB_H
+#pragma once
 
-#include "Common/Platform.hpp"
-
-//#pragma once
-// The following ifdef block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the XRCDB_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// XRCDB_API functions as being imported from a DLL, wheras this DLL sees symbols
-// defined with this macro as being exported.
-
-#ifdef XRCDB_EXPORTS
-#define XRCDB_API XR_EXPORT
-#else
-#define XRCDB_API XR_IMPORT
-#endif
+#include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
+#include "Common/Noncopyable.hpp"
+#include "xrCore/math_constants.h"
+#include "xrCore/_vector3d.h"
+#include "xrCommon/xr_vector.h"
 
 // forward declarations
 class CFrustum;
@@ -24,6 +13,10 @@ namespace Opcode
 class OPCODE_Model;
 class AABBNoLeafNode;
 };
+template <class T> class _box3;
+using Fbox = _box3<float>;
+class Lock;
+
 
 #pragma pack(push, 8)
 namespace CDB
@@ -53,7 +46,7 @@ public:
 typedef void __stdcall build_callback(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
 
 // Model definition
-class XRCDB_API MODEL
+class XRCDB_API MODEL : Noncopyable
 {
     friend class COLLIDER;
     enum
@@ -65,9 +58,9 @@ class XRCDB_API MODEL
     };
 
 private:
-    Lock cs;
+    Lock* pcs;
     Opcode::OPCODE_Model* tree;
-    u32 status; // 0=ready, 1=init, 2=building
+    volatile u32 status; // 0=ready, 1=init, 2=building
 
     // tris
     TRI* tris;
@@ -88,18 +81,16 @@ public:
     IC void syncronize() const
     {
         if (S_READY != status)
-        {
-            Log("! WARNING: syncronized CDB::query");
-            Lock* C = (Lock*)&cs;
-            C->Enter();
-            C->Leave();
-        }
+            syncronize_impl();
     }
 
     static void build_thread(void*);
     void build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
     void build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
     u32 memory();
+
+private:
+    void syncronize_impl() const;
 };
 
 // Collider result
@@ -156,12 +147,13 @@ public:
     void frustum_query(const MODEL* m_def, const CFrustum& F);
 
     ICF RESULT* r_begin() { return &*rd.begin(); };
-    ICF RESULT* r_end() { return &*rd.end(); };
+    //ICF RESULT* r_end() { return &*rd.end(); };
+    ICF xr_vector<RESULT>* r_get() { return &rd; };
     RESULT& r_add();
     void r_free();
     ICF int r_count() { return rd.size(); };
-    ICF void r_clear() { rd.clear_not_free(); };
-    ICF void r_clear_compact() { rd.clear_and_free(); };
+    ICF void r_clear() { rd.clear(); };
+    ICF void r_clear_compact() { rd.clear(); };
 };
 
 //
@@ -192,21 +184,13 @@ public:
     }
 };
 
-struct non_copyable
-{
-    non_copyable() {}
-private:
-    non_copyable(const non_copyable&) {}
-    non_copyable& operator=(const non_copyable&) {}
-};
-
 #pragma warning(push)
 #pragma warning(disable : 4275)
 const u32 clpMX = 24, clpMY = 16, clpMZ = 24;
-class XRCDB_API CollectorPacked : public non_copyable
+class XRCDB_API CollectorPacked : public Noncopyable
 {
-    typedef xr_vector<u32> DWORDList;
-    typedef DWORDList::iterator DWORDIt;
+    using DWORDList = xr_vector<u32>;
+    using DWORDIt = DWORDList::iterator;
 
 private:
     xr_vector<Fvector> verts;
@@ -239,7 +223,5 @@ public:
     void clear();
 };
 #pragma warning(pop)
-};
-
+}
 #pragma pack(pop)
-#endif

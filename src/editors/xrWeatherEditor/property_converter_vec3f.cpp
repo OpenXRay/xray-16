@@ -56,7 +56,7 @@ Object ^ property_converter_vec3f::ConvertTo(
     if (destination_type == String::typeid)
     {
         property_container ^ container = safe_cast<property_container ^>(value);
-        editor::vec3f vec3f = safe_cast<property_vec3f_base %>(container->container_holder()).get_value_raw();
+        XRay::Editor::vec3f vec3f = safe_cast<property_vec3f_base %>(container->container_holder()).get_value_raw();
         return ("" + property_converter_float().ConvertTo(context, culture, vec3f.x, String::typeid) + " " +
             property_converter_float().ConvertTo(context, culture, vec3f.y, String::typeid) + " " +
             property_converter_float().ConvertTo(context, culture, vec3f.z, String::typeid) + "");
@@ -65,7 +65,7 @@ Object ^ property_converter_vec3f::ConvertTo(
     if (destination_type == Vec3f::typeid)
     {
         property_container ^ container = safe_cast<property_container ^>(value);
-        editor::vec3f vec3f = safe_cast<property_vec3f_base %>(container->container_holder()).get_value_raw();
+        XRay::Editor::vec3f vec3f = safe_cast<property_vec3f_base %>(container->container_holder()).get_value_raw();
         return (Vec3f(vec3f.x, vec3f.y, vec3f.z));
     }
 

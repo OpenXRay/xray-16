@@ -63,11 +63,11 @@ public:
     CSE_SmartCover(LPCSTR caSection);
     virtual ~CSE_SmartCover();
     virtual IServerEntityShape* __stdcall shape();
-    virtual bool used_ai_locations() const;
-    virtual bool can_save() const;
-    virtual bool can_switch_online() const;
-    virtual bool can_switch_offline() const;
-    virtual bool interactive() const;
+    virtual bool used_ai_locations() const noexcept;
+    virtual bool can_save() const noexcept;
+    virtual bool can_switch_online() const noexcept;
+    virtual bool can_switch_offline() const noexcept;
+    virtual bool interactive() const noexcept;
     LPCSTR description() const;
 #ifndef AI_COMPILER
     void set_available_loopholes(luabind::object table);

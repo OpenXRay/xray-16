@@ -9,6 +9,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "PHCollideValidator.h"
 #include "ph_valid_ode.h"
+
 CPHShellSplitterHolder::CPHShellSplitterHolder(CPHShell* shell)
 {
     m_pShell = shell;
@@ -31,14 +32,14 @@ shell_root CPHShellSplitterHolder::SplitJoint(u16 aspl)
     CPHShell* new_shell_desc = smart_cast<CPHShell*>(new_shell);
     new_shell_desc->mXFORM.set(m_pShell->mXFORM);
     new_shell_desc->m_object_in_root.set(m_pShell->m_object_in_root);
-    SPLITTER_I splitter = m_splitters.begin() + aspl;
+    auto splitter = m_splitters.begin() + aspl;
     u16 start_element = splitter->m_element;
     u16 start_joint = splitter->m_joint;
 
     u16 end_element = m_pShell->joints[start_joint]->JointDestroyInfo()->m_end_element;
     u16 end_joint = m_pShell->joints[start_joint]->JointDestroyInfo()->m_end_joint;
 
-    shell_root ret = mk_pair(new_shell, (m_pShell->joints[start_joint])->BoneID());
+    shell_root ret = std::make_pair(new_shell, (m_pShell->joints[start_joint])->BoneID());
 
     CShellSplitInfo split_inf;
     split_inf.m_bone_id = m_pShell->joints[start_joint]->BoneID();
@@ -71,7 +72,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
 
     ELEMENT_STORAGE& source_elements = m_pShell->elements;
     ELEMENT_STORAGE& dest_elements = dest->elements;
-    ELEMENT_I i_elem = source_elements.begin(), e_elem = source_elements.begin() + spl_inf.m_start_el_num;
+    auto i_elem = source_elements.begin(), e_elem = source_elements.begin() + spl_inf.m_start_el_num;
     u16 shift_e = spl_inf.m_end_el_num - spl_inf.m_start_el_num;
     u16 shift_j = spl_inf.m_end_jt_num - spl_inf.m_start_jt_num;
 
@@ -106,12 +107,12 @@ void CPHShellSplitterHolder::PassEndSplitters(
 
     // same for joints
     JOINT_STORAGE& source_joints = m_pShell->joints;
-    JOINT_I i_joint = source_joints.begin(), e_joint;
+    auto i_joint = source_joints.begin();
     if (u16(-1) != spl_inf.m_start_jt_num)
     {
         R_ASSERT2(source_joints.size() >= spl_inf.m_start_jt_num && source_joints.size() >= spl_inf.m_end_jt_num,
             "wrong spl_inf");
-        e_joint = source_joints.begin() + spl_inf.m_start_jt_num;
+        auto e_joint = source_joints.begin() + spl_inf.m_start_jt_num;
         for (; i_joint != e_joint; i_joint++)
         {
             CPHJointDestroyInfo* jointDestroyInfo = (*i_joint)->JointDestroyInfo();
@@ -153,7 +154,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
     }
 
     //////correct data in fractures for elements allready added to dest with fractures from source///////
-    ELEMENT_I i_dest_elem = dest_elements.begin(), e_dest_elem = dest_elements.end();
+    auto i_dest_elem = dest_elements.begin(), e_dest_elem = dest_elements.end();
     for (; i_dest_elem != e_dest_elem; ++i_dest_elem)
     {
         CPHFracturesHolder* fracturesHolder = (*i_dest_elem)->FracturesHolder();
@@ -177,7 +178,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
 
     if (spl_inf.m_end_jt_num != u16(-1))
     {
-        e_joint = source_joints.begin() + spl_inf.m_end_jt_num;
+        auto e_joint = source_joints.begin() + spl_inf.m_end_jt_num;
         for (; i_joint != e_joint; ++i_joint)
         {
             CPHJointDestroyInfo* jointDestroyInfo = (*i_joint)->JointDestroyInfo();
@@ -212,7 +213,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
         }
     }
 
-    e_joint = source_joints.end();
+    auto e_joint = source_joints.end();
     for (; i_joint != e_joint; ++i_joint)
     {
         CPHJointDestroyInfo* jointDestroyInfo = (*i_joint)->JointDestroyInfo();
@@ -227,7 +228,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
     }
     // at rest!! pass splitters it is very similar passing fractures
     // correct data for splitters before passed and find start splitter to pass
-    SPLITTER_I spl_e = m_splitters.end(), spl_i = m_splitters.begin();
+    auto spl_e = m_splitters.end(), spl_i = m_splitters.begin();
     for (; spl_i != spl_e; ++spl_i)
     {
         u16& elem = spl_i->m_element;
@@ -235,19 +236,19 @@ void CPHShellSplitterHolder::PassEndSplitters(
         if (spl_i->m_type == CPHShellSplitter::splElement)
         {
             if (elem != u16(-1) && elem >= spl_inf.m_start_el_num)
-                break; // we at begining
+                break; // we at beginning
         }
         else
         {
             if (joint != u16(-1) && joint >= spl_inf.m_start_jt_num)
-                break; // we at begining
+                break; // we at beginning
         }
         if (elem != u16(-1) && elem > spl_inf.m_end_el_num)
             elem = elem - shift_e;
         if (joint != u16(-1) && joint > spl_inf.m_end_jt_num)
             joint = joint - shift_j;
     }
-    SPLITTER_I i_from = spl_i;
+    auto i_from = spl_i;
     // correct data for passing splitters and find last splitter to pass
     for (; spl_i != spl_e; ++spl_i)
     {
@@ -256,12 +257,12 @@ void CPHShellSplitterHolder::PassEndSplitters(
         if (spl_i->m_type == CPHShellSplitter::splElement)
         {
             if (elem != u16(-1) && elem >= spl_inf.m_end_el_num)
-                break; // we after begining
+                break; // we after beginning
         }
         else
         {
             if (joint != u16(-1) && joint >= spl_inf.m_end_jt_num)
-                break; // we after begining
+                break; // we after beginning
         }
         if (elem != u16(-1))
             elem = elem - passed_shift_e;
@@ -269,7 +270,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
             joint = joint - passed_shift_j;
     }
 
-    SPLITTER_I i_to = spl_i;
+    auto i_to = spl_i;
 
     // corect data for all rest splitters
     for (; spl_i != spl_e; ++spl_i)
@@ -287,8 +288,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
 }
 
 static ELEMENT_PAIR_VECTOR new_elements;
-DEFINE_VECTOR(Fmatrix, TRANSFORM_VECTOR, TRANSFORM_I)
-static TRANSFORM_VECTOR bones_bind_forms;
+static xr_vector<Fmatrix> bones_bind_forms;
 shell_root CPHShellSplitterHolder::ElementSingleSplit(
     const element_fracture& split_elem, const CPHElement* source_element)
 {
@@ -300,11 +300,11 @@ shell_root CPHShellSplitterHolder::ElementSingleSplit(
     const u16 start_joint = split_elem.second.m_start_jt_num;
     R_ASSERT(_valid(new_shell_last->mXFORM));
     const u16 end_joint = split_elem.second.m_end_jt_num;
-    // it is not right for multiple joints attached to the unsplited part becource all these need to be reattached
+    // it is not right for multiple joints attached to the unsplitted part because all these need to be reattached
     if (start_joint != end_joint)
     {
         JOINT_STORAGE& joints = m_pShell->joints;
-        JOINT_I i = joints.begin() + start_joint, e = joints.begin() + end_joint;
+        auto i = joints.begin() + start_joint, e = joints.begin() + end_joint;
         for (; i != e; ++i)
         {
             CPHJoint* joint = (*i);
@@ -372,33 +372,31 @@ shell_root CPHShellSplitterHolder::ElementSingleSplit(
     VERIFY(dBodyStateValide(split_elem.first->get_body()));
     new_shell_last->set_ObjectContactCallback(NULL);
     new_shell_last->set_PhysicsRefObject(NULL);
-    return mk_pair(new_shell_last, split_elem.second.m_bone_id);
+    return std::make_pair(new_shell_last, split_elem.second.m_bone_id);
 }
 
 IC void correct_diapasones(ELEMENT_PAIR_VECTOR& element_pairs)
 {
-    ELEMENT_PAIR_I i, b = element_pairs.begin(), e = element_pairs.end();
+    auto b = element_pairs.begin(), e = element_pairs.end();
 
-    for (i = b; i != e; ++i)
+    for (auto i = b; i != e; ++i)
     {
-        ELEMENT_PAIR_I j = i + 1;
+        auto j = i + 1;
         for (; j != e; ++j)
-        {
             j->second.sub_diapasone(CShellSplitInfo(i->second));
-        }
     }
 }
 
 void CPHShellSplitterHolder::SplitElement(u16 aspl, PHSHELL_PAIR_VECTOR& out_shels)
 {
     new_elements.clear();
-    SPLITTER_I spl_i = (m_splitters.begin() + aspl);
+    auto spl_i = (m_splitters.begin() + aspl);
     CPHElement* E = m_pShell->elements[spl_i->m_element];
     E->SplitProcess(new_elements);
 
     correct_diapasones(new_elements);
 
-    ELEMENT_PAIR_I i = new_elements.begin(), e = new_elements.end();
+    auto i = new_elements.begin(), e = new_elements.end();
 
     for (; i != e; ++i)
     {
@@ -406,8 +404,8 @@ void CPHShellSplitterHolder::SplitElement(u16 aspl, PHSHELL_PAIR_VECTOR& out_she
         CPhysicsElement* ee = out_shels.back().first->get_ElementByStoreOrder(0);
         VERIFY(ee);
         VERIFY(smart_cast<CPHElement*>(ee));
-        CPHElement* e = static_cast<CPHElement*>(ee);
-        VERIFY(dBodyStateValide(e->get_body()));
+        CPHElement* e2 = static_cast<CPHElement*>(ee);
+        VERIFY(dBodyStateValide(e2->get_body()));
     }
 
     if (!E->FracturesHolder())
@@ -444,7 +442,7 @@ void CPHShellSplitterHolder::InitNewShell(CPHShell* shell)
 
 void CPHShellSplitterHolder::PhTune(dReal step)
 {
-    SPLITTER_I i = m_splitters.begin(), e = m_splitters.end();
+    auto i = m_splitters.begin(), e = m_splitters.end();
     for (; i != e; ++i)
     {
         switch (i->m_type)
@@ -463,7 +461,7 @@ void CPHShellSplitterHolder::PhTune(dReal step)
 }
 void CPHShellSplitterHolder::PhDataUpdate(dReal step)
 {
-    SPLITTER_I i = m_splitters.begin(), e = m_splitters.end();
+    auto i = m_splitters.begin(), e = m_splitters.end();
     for (; i != e; ++i)
     {
         switch (i->m_type)
@@ -518,7 +516,7 @@ CPHShellSplitter::CPHShellSplitter(CPHShellSplitter::EType type, u16 element, u1
 void CPHShellSplitterHolder::AddToGeomMap(const id_geom& id_rootgeom) { m_geom_root_map.insert(id_rootgeom); }
 u16 CPHShellSplitterHolder::FindRootGeom(u16 bone_id)
 {
-    GEOM_MAP_I iter = m_geom_root_map.find(bone_id);
+    auto iter = m_geom_root_map.find(bone_id);
     if (iter == m_geom_root_map.end())
         return u16(-1);
 

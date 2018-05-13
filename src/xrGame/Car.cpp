@@ -446,7 +446,7 @@ void CCar::VisualUpdate(float fov)
     Fvector C, V;
     Center(C);
     V.set(lin_vel);
-
+    
     m_car_sound->Update();
     if (Owner())
     {
@@ -719,7 +719,7 @@ void CCar::ParseDefinitions()
     bone_map.clear();
 
     IKinematics* pKinematics = smart_cast<IKinematics*>(Visual());
-    bone_map.insert(mk_pair(pKinematics->LL_GetBoneRoot(), physicsBone()));
+    bone_map.insert(std::make_pair(pKinematics->LL_GetBoneRoot(), physicsBone()));
     CInifile* ini = pKinematics->LL_UserData();
     R_ASSERT2(ini, "Car has no description !!! See ActorEditor Object - UserData");
     CExplosive::Load(ini, "explosion");
@@ -834,7 +834,8 @@ void CCar::CreateSkeleton(CSE_Abstract* po)
         pK->CalculateBones(TRUE);
     }
     phys_shell_verify_object_model(*this);
-#pragma todo(" replace below by P_build_Shell or call inherited")
+    /* Alundaio: p_build_shell
+    #pragma todo(" replace below by P_build_Shell or call inherited")
     m_pPhysicsShell = P_create_Shell();
     m_pPhysicsShell->build_FromKinematics(pK, &bone_map);
     m_pPhysicsShell->set_PhysicsRefObject(this);
@@ -842,6 +843,9 @@ void CCar::CreateSkeleton(CSE_Abstract* po)
     m_pPhysicsShell->Activate(true);
     m_pPhysicsShell->SetAirResistance(0.f, 0.f);
     m_pPhysicsShell->SetPrefereExactIntegration();
+    */
+    m_pPhysicsShell = P_build_Shell(this, false, &bone_map);
+    //-Alundaio
 
     ApplySpawnIniToPhysicShell(&po->spawn_ini(), m_pPhysicsShell, false);
     ApplySpawnIniToPhysicShell(pK->LL_UserData(), m_pPhysicsShell, false);
@@ -941,7 +945,7 @@ void CCar::Init()
     if (ini->section_exist("damage_items"))
     {
         CInifile::Sect& data = ini->r_section("damage_items");
-        for (CInifile::SectCIt I = data.Data.begin(); I != data.Data.end(); I++)
+        for (auto I = data.Data.cbegin(); I != data.Data.cend(); I++)
         {
             const CInifile::Item& item = *I;
             u16 index = pKinematics->LL_BoneID(*item.first);
@@ -1827,12 +1831,12 @@ IC void CCar::fill_wheel_vector(LPCSTR S, xr_vector<T>& type_wheels)
         type_wheels.push_back(T());
         T& twheel = type_wheels.back();
 
-        BONE_P_PAIR_IT J = bone_map.find(bone_id);
+        auto J = bone_map.find(bone_id);
         if (J == bone_map.end())
         {
-            bone_map.insert(mk_pair(bone_id, physicsBone()));
+            bone_map.insert(std::make_pair(bone_id, physicsBone()));
 
-            SWheel& wheel = (m_wheels_map.insert(mk_pair(bone_id, SWheel(this)))).first->second;
+            SWheel& wheel = (m_wheels_map.insert(std::make_pair(bone_id, SWheel(this)))).first->second;
             wheel.bone_id = bone_id;
             twheel.pwheel = &wheel;
             wheel.Load(S1);
@@ -1861,11 +1865,9 @@ IC void CCar::fill_exhaust_vector(LPCSTR S, xr_vector<SExhaust>& exhausts)
         SExhaust& exhaust = exhausts.back();
         exhaust.bone_id = bone_id;
 
-        BONE_P_PAIR_IT J = bone_map.find(bone_id);
+        auto J = bone_map.find(bone_id);
         if (J == bone_map.end())
-        {
-            bone_map.insert(mk_pair(bone_id, physicsBone()));
-        }
+            bone_map.insert(std::make_pair(bone_id, physicsBone()));
     }
 }
 
@@ -1881,12 +1883,10 @@ IC void CCar::fill_doors_map(LPCSTR S, xr_map<u16, SDoor>& doors)
         u16 bone_id = pKinematics->LL_BoneID(S1);
         SDoor door(this);
         door.bone_id = bone_id;
-        doors.insert(mk_pair(bone_id, door));
-        BONE_P_PAIR_IT J = bone_map.find(bone_id);
+        doors.insert(std::make_pair(bone_id, door));
+        auto J = bone_map.find(bone_id);
         if (J == bone_map.end())
-        {
-            bone_map.insert(mk_pair(bone_id, physicsBone()));
-        }
+            bone_map.insert(std::make_pair(bone_id, physicsBone()));
     }
 }
 
@@ -1908,8 +1908,8 @@ u16 CCar::Initiator()
         return ID();
 }
 
-float CCar::RefWheelMaxSpeed() { return m_max_rpm / m_current_gear_ratio; }
-float CCar::EngineCurTorque() { return m_current_engine_power / m_current_rpm; }
+float CCar::RefWheelMaxSpeed() const { return m_max_rpm / m_current_gear_ratio; }
+float CCar::EngineCurTorque() const { return m_current_engine_power / m_current_rpm; }
 float CCar::RefWheelCurTorque()
 {
     if (b_transmission_switching)
@@ -1979,4 +1979,74 @@ Fvector CCar::ExitVelocity()
     return v;
 }
 
-//#endif // #if 0
+/***** added by Ray Twitty (aka Shadows) START *****/
+// получить и задать текущее количество топлива
+float CCar::GetfFuel()
+{
+    return m_fuel;
+}
+
+void CCar::SetfFuel(float fuel)
+{
+    m_fuel = fuel;
+}
+
+// получить и задать размер топливного бака 
+float CCar::GetfFuelTank()
+{
+    return m_fuel_tank;
+}
+
+void CCar::SetfFuelTank(float fuel_tank)
+{
+    m_fuel_tank = fuel_tank;
+}
+
+// получить и задать величину потребление топлива
+float CCar::GetfFuelConsumption()
+{
+    return m_fuel_consumption;
+}
+
+void CCar::SetfFuelConsumption(float fuel_consumption)
+{
+    m_fuel_consumption = fuel_consumption;
+}
+
+// прибавить или убавить количество топлива
+void CCar::ChangefFuel(float fuel)
+{
+    if(m_fuel + fuel < 0)
+    {
+        m_fuel = 0;
+        return;
+    }
+
+    if(fuel < m_fuel_tank - m_fuel)
+        m_fuel += fuel;
+    else
+        m_fuel = m_fuel_tank;
+}
+
+// прибавить или убавить жизней :)
+void CCar::ChangefHealth(float health)
+{
+    float current_health = GetfHealth();
+    if(current_health + health < 0)
+    {
+        SetfHealth(0);
+        return;
+    }
+
+    if(health < 1 - current_health)
+        SetfHealth(current_health + health);
+	else
+        SetfHealth(1);
+}
+
+// активен ли сейчас двигатель
+bool CCar::isActiveEngine()
+{
+    return b_engine_on;
+}
+/***** added by Ray Twitty (aka Shadows) END *****/

@@ -3,11 +3,13 @@
 //****************************************************************************
 // Support for extension DLLs
 //****************************************************************************
-
-#if !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)
-#define AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_
 #pragma once
+#include <memory>
+
 #include "xrEngine/Engine.h"
+#include "xrCore/ModuleLookup.hpp"
+#include "xrCore/clsid.h"
+#include "xrCore/xrCore_benchmark_macros.h"
 
 class IFactoryObject
 {
@@ -33,35 +35,37 @@ public:
 
 // Class creation/destroying interface
 extern "C" {
-typedef DLL_API IFactoryObject* __cdecl Factory_Create(CLASS_ID CLS_ID);
-typedef DLL_API void __cdecl Factory_Destroy(IFactoryObject* O);
+using Factory_Create = DLL_API IFactoryObject* __cdecl(CLASS_ID CLS_ID);
+using Factory_Destroy = DLL_API void __cdecl(IFactoryObject* O);
 };
 
 // Tuning interface
 extern "C" {
-typedef void __cdecl VTPause(void);
-typedef void __cdecl VTResume(void);
+using VTPause = void __cdecl(void);
+using VTResume = void __cdecl(void);
 };
 
 class ENGINE_API CEngineAPI
 {
-private:
-    HMODULE hGame;
-    HMODULE hRender;
-    HMODULE hTuner;
+    XRay::Module hGame;
+    XRay::Module hTuner;
+    XRay::Module hRenderR1;
+    XRay::Module hRenderR2;
+    XRay::Module hRenderR3;
+    XRay::Module hRenderR4;
+    XRay::Module hRenderRGL;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
     Factory_Create* pCreate;
     Factory_Destroy* pDestroy;
-    BOOL tune_enabled;
+    bool tune_enabled;
     VTPause* tune_pause;
     VTResume* tune_resume;
     void Initialize();
 
-#ifndef DEDICATED_SERVER
-    void InitializeNotDedicated();
-#endif // DEDICATED_SERVER
+    void InitializeRenderers();
+    void SetupCurrentRenderer();
 
     void Destroy();
 
@@ -79,5 +83,3 @@ ENGINE_API bool is_enough_address_space_available();
         Engine.External.pDestroy(a);\
         a = NULL;\
     }
-
-#endif // !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)

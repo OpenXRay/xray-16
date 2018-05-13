@@ -35,7 +35,6 @@
 #include "xrCore/ppmd_compressor.h"
 #include "xrCore/Compression/rt_compressor.h"
 #include "game_cl_mp_snd_messages.h"
-#include "xrCore/Crypto/crypto.h"
 
 #include "reward_event_generator.h"
 #include "game_cl_base_weapon_usage_statistic.h"
@@ -97,7 +96,6 @@ game_cl_mp::game_cl_mp()
     m_reward_generator = NULL;
     m_ready_to_open_buy_menu = true;
     m_reward_manager = NULL;
-    crypto::xr_crypto_init();
 };
 
 game_cl_mp::~game_cl_mp()
@@ -340,12 +338,12 @@ void game_cl_mp::GetActiveVoting()
     u_EventSend(P);
 }
 
-u32 Color_Teams_u32[3] = {color_rgba(255, 240, 190, 255), color_rgba(64, 255, 64, 255), color_rgba(64, 64, 255, 255)};
-LPSTR Color_Teams[3] = {"%c[255,255,240,190]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
-char Color_Main[] = "%c[255,192,192,192]";
+u32 Color_Teams_u32[3] = { color_rgba(255, 240, 190, 255), color_rgba(64, 255, 64, 255), color_rgba(64, 64, 255, 255) };
+constexpr pcstr Color_Teams[3] = {"%c[255,255,240,190]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
+constexpr char Color_Main[] = "%c[255,192,192,192]";
 u32 Color_Neutral_u32 = color_rgba(255, 0, 255, 255);
-char Color_Red[] = "%c[255,255,1,1]";
-char Color_Green[] = "%c[255,1,255,1]";
+constexpr char Color_Red[] = "%c[255,255,1,1]";
+constexpr char Color_Green[] = "%c[255,1,255,1]";
 
 void game_cl_mp::TranslateGameMessage(u32 msg, NET_Packet& P)
 {
@@ -427,7 +425,7 @@ void game_cl_mp::TranslateGameMessage(u32 msg, NET_Packet& P)
         string1024 mess;
         P.r_stringZ(mess);
         Msg(mess);
-        if (MainMenu() && !g_dedicated_server)
+        if (MainMenu() && !GEnv.isDedicatedServer)
         {
             MainMenu()->OnSessionTerminate(mess);
         }
@@ -551,7 +549,7 @@ void game_cl_mp::OnChatMessage(NET_Packet* P)
     }
 
     //#endif
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if (team < 0 || 2 < team)
@@ -572,7 +570,7 @@ void game_cl_mp::shedule_Update(u32 dt)
     inherited::shedule_Update(dt);
     //-----------------------------------------
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if (m_reward_generator)
@@ -941,7 +939,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         break;
         case SKT_HEADSHOT: // Head Shot
         {
-            BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "headshot");
+            auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "headshot");
             if (it != m_pBonusList.end() && (*it == "headshot"))
             {
                 Bonus_Struct* pBS = &(*it);
@@ -960,7 +958,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         break;
         case SKT_EYESHOT:
         {
-            BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "eyeshot");
+            auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "eyeshot");
             if (it != m_pBonusList.end() && (*it == "eyeshot"))
             {
                 Bonus_Struct* pBS = &(*it);
@@ -979,7 +977,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         break;
         case SKT_BACKSTAB: // BackStab
         {
-            BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "backstab");
+            auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "backstab");
             if (it != m_pBonusList.end() && (*it == "backstab"))
             {
                 Bonus_Struct* pBS = &(*it);
@@ -1209,7 +1207,7 @@ void game_cl_mp::OnEventMoneyChanged(NET_Packet& P)
     OnMoneyChanged();
     {
         string256 MoneyStr;
-        itoa(local_player->money_for_round, MoneyStr, 10);
+        xr_itoa(local_player->money_for_round, MoneyStr, 10);
         m_game_ui_custom->ChangeTotalMoneyIndicator(MoneyStr);
     }
     s32 Money_Added = P.r_s32();
@@ -1275,7 +1273,7 @@ void game_cl_mp::OnEventMoneyChanged(NET_Packet& P)
         }
         break;
         };
-        BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), BName.c_str());
+        auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), BName.c_str());
         if (it != m_pBonusList.end() && (*it == BName.c_str()))
         {
             Bonus_Struct* pBS = &(*it);
@@ -1443,12 +1441,12 @@ void game_cl_mp::OnRadminMessage(u16 type, NET_Packet* P)
     {
         string4096 buff;
         P->r_stringZ(buff);
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
         {
             if (!m_pAdminMenuWindow)
                 m_pAdminMenuWindow = new CUIMpAdminMenu();
 
-            if (0 == stricmp(buff, "Access permitted."))
+            if (0 == xr_stricmp(buff, "Access permitted."))
                 m_pAdminMenuWindow->ShowDialog(true);
             else
                 m_pAdminMenuWindow->ShowMessageBox(CUIMessageBox::MESSAGEBOX_OK, buff);
@@ -1724,7 +1722,7 @@ void __stdcall game_cl_mp::fr_callback_binder::receiving_serverinfo_callback(
     case file_transfer::receiving_complete:
     {
         Msg("* serverinfo: download complete successfully !");
-        R_ASSERT2(m_owner->m_game_ui_custom || g_dedicated_server, "game ui not initialized");
+        R_ASSERT2(m_owner->m_game_ui_custom || GEnv.isDedicatedServer, "game ui not initialized");
         if (m_owner->m_game_ui_custom)
             m_owner->extract_server_info(m_writer.pointer(), m_writer.size());
         m_active = false;

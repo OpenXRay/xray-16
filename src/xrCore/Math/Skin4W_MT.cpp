@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Skin4W_MT.hpp"
-#include "Threading/ttapi.h"
+#include "Threading/ThreadPool.hpp"
 #ifdef _EDITOR
 #include "SkeletonX.h"
 #include "SkeletonCustom.h"
@@ -28,6 +28,7 @@ void Skin4W_Stream(void* params)
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("Skin4W_Stream()");
 #endif
+
     auto& sp = *(SkinParams*)params;
     auto dst = (vertRender*)sp.Dest;
     auto src = (vertBoned4W*)sp.Src;
@@ -40,7 +41,7 @@ void Skin4W_MT(vertRender* dst, vertBoned4W* src, u32 vCount, CBoneInstance* bon
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("Skin4W_MT()");
 #endif
-    u32 workerCount = ttapi_GetWorkerCount();
+    u32 workerCount = ttapi.threads.size();
     if (vCount < workerCount * 64)
     {
         Skin4W_MTs(dst, src, vCount, bones);
@@ -57,10 +58,10 @@ void Skin4W_MT(vertRender* dst, vertBoned4W* src, u32 vCount, CBoneInstance* bon
         params[i].Src = src + i * nStep;
         params[i].Count = i == (workerCount - 1) ? nLast : nStep;
         params[i].Data = bones;
-        ttapi_AddWorker(Skin4W_Stream, &params[i]);
+        ttapi.threads[i]->addJob([=] { Skin4W_Stream(&params[i]); });
     }
-    ttapi_Run();
+    ttapi.wait();
 }
 
-} // namespace Util3D
+} // namespace Math
 } // namespace XRay

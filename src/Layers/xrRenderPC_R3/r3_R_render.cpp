@@ -357,7 +357,7 @@ void CRender::Render()
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
         // perform tests
-        u32 count = 0;
+        auto count = 0;
         light_Package& LP = Lights.package;
 
         // stats
@@ -369,7 +369,7 @@ void CRender::Render()
         count = _max(count, LP.v_point.size());
         count = _max(count, LP.v_spot.size());
         count = _max(count, LP.v_shadowed.size());
-        for (u32 it = 0; it < count; it++)
+        for (auto it = 0; it < count; it++)
         {
             if (it < LP.v_point.size())
             {
@@ -565,4 +565,20 @@ void CRender::render_forward()
     }
 
     RImplementation.o.distortion = FALSE; // disable distorion
+}
+
+// Перед началом рендера мира --#SM+#-- +SecondVP+
+void CRender::BeforeWorldRender() {}
+
+// После рендера мира и пост-эффектов --#SM+#-- +SecondVP+
+void CRender::AfterWorldRender()
+{
+    if (Device.m_SecondViewport.IsSVPFrame())
+    {
+        // Делает копию бэкбуфера (текущего экрана) в рендер-таргет второго вьюпорта
+        ID3D10Texture2D* pBuffer = NULL;
+        HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID*)&pBuffer);
+        HW.pDevice->CopyResource(Target->rt_secondVP->pSurface, pBuffer);
+        pBuffer->Release(); // Корректно очищаем ссылку на бэкбуфер (иначе игра зависнет в опциях)
+    }
 }

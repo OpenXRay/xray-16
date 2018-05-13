@@ -11,7 +11,7 @@ public:
     virtual ~GlobalFeelTouch();
 
     virtual void feel_touch_update(Fvector& P, float R);
-    // virtual void			feel_touch_deny				(IGameObject* O, DWORD	T); - implemented in inherited class
+    // virtual void			feel_touch_deny				(IGameObject* O, /*DWORD*/ unsigned long T); - implemented in inherited class
 
     bool is_object_denied(IGameObject const* O);
 }; // class GlobalFeelTouch

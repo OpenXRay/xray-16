@@ -1,8 +1,6 @@
-#ifndef SoundRenderH
-#define SoundRenderH
 #pragma once
 
-#include "sound.h"
+#include "Sound.h"
 
 class CSoundRender_Core;
 class CSoundRender_Source;
@@ -19,5 +17,3 @@ const float s_f_def_source_footer = 0.0f; // sec of silence after buffer data, j
 const u32 sdef_env_version = 4; // current version of env-def
 const u32 sdef_level_version = 1; // current version of level-def
 const float s_f_def_event_pulse = 0.5f; // sec
-
-#endif

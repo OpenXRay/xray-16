@@ -33,10 +33,6 @@ public:
 
     void SetMaxAnisotropy(UINT uiMaxAniso);
 
-    //	Marks all device sample as unused
-    void ResetDeviceState();
-
-    //	Private declarations
 private:
     typedef ID3DSamplerState IDeviceState;
     typedef D3D_SAMPLER_DESC StateDecs;
@@ -51,22 +47,12 @@ private:
     void CreateState(StateDecs desc, IDeviceState** ppIState);
     SHandle FindState(const StateDecs& desc, u32 StateCRC);
 
-    void PrepareSamplerStates(HArray& samplers, ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT],
-        SHandle pCurrentState[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], u32& uiMin, u32& uiMax) const;
+    void PrepareSamplerStates(HArray& samplers, ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT]) const;
 
     //	Private data
 private:
     //	This must be cleared on device destroy
     xr_vector<StateRecord> m_StateArray;
-
-    SHandle m_aPSSamplers[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT];
-    SHandle m_aVSSamplers[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT];
-    SHandle m_aGSSamplers[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT];
-#ifdef USE_DX11
-    SHandle m_aHSSamplers[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT];
-    SHandle m_aDSSamplers[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT];
-    SHandle m_aCSSamplers[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT];
-#endif
 
     u32 m_uiMaxAnisotropy;
 };

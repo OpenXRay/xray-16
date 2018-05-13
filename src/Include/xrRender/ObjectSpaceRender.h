@@ -1,8 +1,12 @@
+#pragma once
 #ifndef ObjectSpaceRender_included
 #define ObjectSpaceRender_included
-#pragma once
 
 #ifdef DEBUG
+
+template <class T>
+struct _sphere;
+typedef _sphere<float> Fsphere;
 
 class IObjectSpaceRender
 {

@@ -116,22 +116,17 @@ BOOL IsExportableMesh(INode* pNode, Object*& pObj)
 
 CExporter::~CExporter()
 {
-    for (BoneDefIt b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
-    {
-        xr_delete(*b_it);
-    }
-    for (VertexDefIt v_it = m_Vertices.begin(); v_it != m_Vertices.end(); v_it++)
-    {
-        xr_delete(*v_it);
-    }
-    for (ExpVertIt ev_it = m_ExpVertices.begin(); ev_it != m_ExpVertices.end(); ev_it++)
-    {
-        xr_delete(*ev_it);
-    }
-    for (ExpFaceIt ef_it = m_ExpFaces.begin(); ef_it != m_ExpFaces.end(); ef_it++)
-    {
-        xr_delete(*ef_it);
-    }
+    for (auto& b_it : m_Bones)
+        xr_delete(b_it);
+
+    for (auto& v_it : m_Vertices)
+        xr_delete(v_it);
+
+    for (auto& ev_it : m_ExpVertices)
+        xr_delete(ev_it);
+
+    for (auto& ef_it : m_ExpFaces)
+        xr_delete(ef_it);
 }
 //-----------------------------------------------------------------------------
 int CExporter::AddBone(INode* pNode, Matrix3& matMesh, IPhysiqueExport* pExport)

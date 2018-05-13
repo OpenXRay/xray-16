@@ -65,11 +65,12 @@ struct SSquadCommand
 class CMonsterSquad
 {
 public:
-    DEFINE_MAP(const CEntity*, SSquadCommand, MEMBER_COMMAND_MAP, MEMBER_COMMAND_MAP_IT);
+    using MEMBER_COMMAND_MAP = xr_map<const CEntity*, SSquadCommand>;
+    using MEMBER_COMMAND_MAP_IT = MEMBER_COMMAND_MAP::iterator;
 
 private:
     CEntity* leader;
-    DEFINE_MAP(CEntity*, SMemberGoal, MEMBER_GOAL_MAP, MEMBER_GOAL_MAP_IT);
+    using MEMBER_GOAL_MAP = xr_map<CEntity*, SMemberGoal>;
 
     // карта целей членов группы (обновляется со стороны объекта)
     MEMBER_GOAL_MAP m_goals;
@@ -77,10 +78,10 @@ private:
     // карта комманд членов группы (обновляется со стороны squad manager)
     MEMBER_COMMAND_MAP m_commands;
 
-    DEFINE_VECTOR(u32, NODES_VECTOR, NODES_VECTOR_IT);
+    using NODES_VECTOR = xr_vector<u32>;
     NODES_VECTOR m_locked_covers;
 
-    DEFINE_VECTOR(const CEntityAlive*, CORPSES_VECTOR, CORPSES_VECTOR_IT);
+    using CORPSES_VECTOR = xr_vector<const CEntityAlive*>;
     CORPSES_VECTOR m_locked_corpses;
 
 public:
@@ -120,20 +121,20 @@ public:
     u8 get_count(const CEntity* object, float radius);
     void set_squad_index(const CEntity* m_enemy);
     void set_rat_squad_index(const CEntity* m_enemy);
-    u8 get_index(CEntity* m_object);
+    u8 get_index(CEntity* m_object) const;
 
     ///////////////////////////////////////////////////////////////////////////////////////
     //  Общие данные
     //////////////////////////////////////////////////////////////////////////////////////
 
-    DEFINE_VECTOR(CEntity*, ENTITY_VEC, ENTITY_VEC_IT);
+    using ENTITY_VEC = xr_vector<CEntity*>;
     ENTITY_VEC m_temp_entities;
 
     ///////////////////////////////////////////////////////////////////////////////////////
     //  Атака группой монстров
     //////////////////////////////////////////////////////////////////////////////////////
 
-    DEFINE_MAP(const CEntity*, ENTITY_VEC, ENEMY_MAP, ENEMY_MAP_IT);
+    using ENEMY_MAP = xr_map<const CEntity*, ENTITY_VEC>;
 
     ENEMY_MAP m_enemy_map;
 
@@ -151,7 +152,7 @@ public:
 
     void Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* enemy);
 
-    void get_index_in_squad(ENTITY_VEC& members, const CEntity* m_enemy);
+    void get_index_in_squad(ENTITY_VEC& members, const CEntity* m_enemy) const;
     void get_index_in_rat_squad(ENTITY_VEC& members, const CEntity* m_enemy);
 
     ////////////////////////////////////////////////////////////////////////////////////////

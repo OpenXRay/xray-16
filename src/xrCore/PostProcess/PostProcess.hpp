@@ -6,7 +6,7 @@
 #define POSTPROCESS_PARAMS_COUNT 11
 //.#define POSTPROCESS_FILE_VERSION 0x0001
 #define POSTPROCESS_FILE_VERSION 0x0002
-#define POSTPROCESS_FILE_EXTENSION ".ppe"
+constexpr pcstr POSTPROCESS_FILE_EXTENSION = ".ppe";
 
 typedef enum _pp_params {
     pp_unknown = -1,
@@ -50,7 +50,7 @@ protected:
     float* m_pfParam;
 
 public:
-    CPostProcessValue(float* pfparam) { m_pfParam = pfparam; }
+    CPostProcessValue(float* pfparam) : m_pfParam(pfparam) {}
     virtual void update(float dt) { *m_pfParam = m_Value.Evaluate(dt); }
     virtual void load(IReader& pReader);
     virtual void save(IWriter& pWriter);
@@ -76,13 +76,13 @@ class XRCORE_API CPostProcessColor : public CPostProcessParam
 {
 protected:
     float m_fBase;
+    SPPInfo::SColor* m_pColor;
     CEnvelope m_Red;
     CEnvelope m_Green;
     CEnvelope m_Blue;
-    SPPInfo::SColor* m_pColor;
 
 public:
-    CPostProcessColor(SPPInfo::SColor* pcolor) { m_pColor = pcolor; }
+    CPostProcessColor(SPPInfo::SColor* pcolor) : m_fBase(0.0),  m_pColor(pcolor) {}
     virtual void update(float dt)
     {
         m_pColor->r = m_Red.Evaluate(dt);

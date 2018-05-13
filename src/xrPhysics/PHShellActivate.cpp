@@ -7,14 +7,15 @@
 #include "PHJointDestroyInfo.h"
 #include "PHCollideValidator.h"
 
-#include "iphysicsshellholder.h"
+#include "IPhysicsShellHolder.h"
 #include "PhysicsShellAnimator.h"
 #include "Include/xrRender/Kinematics.h"
 
 ///////////////////////////////////////////////////////////////
+//#pragma warning(push)
 ///#pragma warning(disable:4995)
 
-//#pragma warning(default:4995)
+//#pragma warning(pop)
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"
@@ -34,21 +35,19 @@ void CPHShell::Activate(const Fmatrix& m0, float dt01, const Fmatrix& m2, bool d
     if (isActive())
         return;
     activate(disable);
-    //	ELEMENT_I i;
     mXFORM.set(m0);
-    // for(i=elements.begin();elements.end() != i;++i){
 
-    //	(*i)->Activate(m0,dt01, m2, disable);
-    //}
+    //for (auto i = elements.begin(); elements.end() != i; ++i)
+    //    (*i)->Activate(m0, dt01, m2, disable);
 
     {
-        ELEMENT_I i = elements.begin(), e = elements.end();
+        auto i = elements.begin(), e = elements.end();
         for (; i != e; ++i)
             (*i)->Activate(mXFORM, disable);
     }
 
     {
-        JOINT_I i = joints.begin(), e = joints.end();
+        auto i = joints.begin(), e = joints.end();
         for (; i != e; ++i)
             (*i)->Activate();
     }
@@ -87,23 +86,19 @@ void CPHShell::Activate(const Fmatrix& transform, const Fvector& lin_vel, const 
         return;
     activate(disable);
 
-    ELEMENT_I i;
     mXFORM.set(transform);
-    for (i = elements.begin(); elements.end() != i; ++i)
-    {
+    for (auto i = elements.begin(); elements.end() != i; ++i)
         (*i)->Activate(transform, lin_vel, ang_vel);
-    }
 
     {
-        JOINT_I i = joints.begin(), e = joints.end();
-        for (; i != e; ++i)
-            (*i)->Activate();
+        auto i2 = joints.begin(), e = joints.end();
+        for (; i2 != e; ++i2)
+            (*i2)->Activate();
     }
 
     if (PKinematics())
-    {
         SetCallbacks();
-    }
+
     spatial_register();
     // bActive=true;
     // bActivating=true;
@@ -127,22 +122,21 @@ void CPHShell::Activate(bool disable, bool not_set_bone_callbacks /*= false*/)
         IKinematics* K = m_pKinematics;
         if (not_set_bone_callbacks)
             m_pKinematics = 0;
-        ELEMENT_I i = elements.begin(), e = elements.end();
+        auto i = elements.begin(), e = elements.end();
         for (; i != e; ++i)
             (*i)->Activate(mXFORM, disable);
         m_pKinematics = K;
     }
 
     {
-        JOINT_I i = joints.begin(), e = joints.end();
+        auto i = joints.begin(), e = joints.end();
         for (; i != e; ++i)
             (*i)->Activate();
     }
 
     if (PKinematics() && !not_set_bone_callbacks)
-    {
         SetCallbacks();
-    }
+
     spatial_register();
     m_flags.set(flActivating, TRUE);
     m_flags.set(flActive, TRUE);
@@ -158,15 +152,13 @@ void CPHShell::Build(bool disable /*false*/)
     m_flags.set(flActive, TRUE);
 
     {
-        ELEMENT_I i = elements.begin(), e = elements.end();
+        auto i = elements.begin(), e = elements.end();
         for (; i != e; ++i)
-        {
             (*i)->build(disable);
-        }
     }
 
     {
-        JOINT_I i = joints.begin(), e = joints.end();
+        auto i = joints.begin(), e = joints.end();
         for (; i != e; ++i)
             (*i)->Create();
     }
@@ -181,13 +173,13 @@ void CPHShell::RunSimulation(bool place_current_forms /*true*/)
     dSpaceSetCleanup(m_space, 0);
 
     {
-        ELEMENT_I i = elements.begin(), e = elements.end();
+        auto i = elements.begin(), e = elements.end();
         if (place_current_forms)
             for (; i != e; ++i)
                 (*i)->RunSimulation(mXFORM);
     }
     {
-        JOINT_I i = joints.begin(), e = joints.end();
+        auto i = joints.begin(), e = joints.end();
         for (; i != e; ++i)
             (*i)->RunSimulation();
     }
@@ -202,7 +194,7 @@ void CPHShell::AfterSetActive()
     PureActivate();
     // bActive=true;
     m_flags.set(flActive, TRUE);
-    ELEMENT_I i = elements.begin(), e = elements.end();
+    auto i = elements.begin(), e = elements.end();
     for (; i != e; ++i)
         (*i)->PresetActive();
 }
@@ -239,7 +231,7 @@ void CPHShell::Deactivate()
     {
         VERIFY(PhysicsRefObject());
         PhysicsRefObject()->ObjectProcessingDeactivate();
-        xr_delete<CPhysicsShellAnimator>(m_pPhysicsShellAnimatorC);
+        xr_delete/*<CPhysicsShellAnimator>*/(m_pPhysicsShellAnimatorC);
     }
 
     if (!isActive())
@@ -270,12 +262,10 @@ void CPHShell::Deactivate()
     DisableObject();
     CPHObject::remove_from_recently_deactivated();
 
-    ELEMENT_I i;
-    for (i = elements.begin(); elements.end() != i; ++i)
+    for (auto i = elements.begin(); elements.end() != i; ++i)
         (*i)->Deactivate();
 
-    JOINT_I j;
-    for (j = joints.begin(); joints.end() != j; ++j)
+    for (auto j = joints.begin(); joints.end() != j; ++j)
         (*j)->Deactivate();
 
     if (m_space)
@@ -293,9 +283,8 @@ void CPHShell::Deactivate()
 
 void CPHShell::ActivatingBonePoses(IKinematics& K)
 {
-    ELEMENT_I i, e;
-    i = elements.begin();
-    e = elements.end();
+    auto i = elements.begin();
+    auto e = elements.end();
     for (; i != e; ++i)
         (*i)->ActivatingPos(K.LL_GetTransform((*i)->m_SelfID));
 }

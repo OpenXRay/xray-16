@@ -124,6 +124,9 @@
     <ClInclude Include="..\xrLC_Light\itterate_adjacents.h">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrLC_Light\ETextureParams.h">
+      <Filter>External</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StdAfx.cpp">
@@ -260,6 +263,9 @@
     </ClCompile>
     <ClCompile Include="net.cpp">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrLC_Light\ETextureParams.cpp">
+      <Filter>External</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

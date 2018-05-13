@@ -1,89 +1,142 @@
 ////////////////////////////////////////////////////////////////////////////
-// Module : intrusive_ptr.h
-// Created : 30.07.2004
-// Modified : 30.07.2004
-// Author : Dmitriy Iassenev
-// Description : Intrusive pointer template
+//	Module 		: intrusive_ptr.h
+//	Created 	: 30.07.2004
+//  Modified 	: 8.11.2016 by Im-Dex
+//	Author		: Dmitriy Iassenev
+//	Description : Intrusive pointer template
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include "Common/object_type_traits.h"
-
-#pragma pack(push, 4)
-
 struct intrusive_base
 {
-    u32 m_ref_count;
+    intrusive_base() XR_NOEXCEPT : m_ref_count(0) {}
 
-    IC intrusive_base() : m_ref_count(0) {}
     template <typename T>
-    IC void _release(T* object)
+    void release(T* object) XR_NOEXCEPT
     {
         try
         {
             xr_delete(object);
         }
-        catch (...)
-        {
-        }
+        catch (...) { }
     }
+
+    void acquire() XR_NOEXCEPT { ++m_ref_count; }
+
+    bool release() XR_NOEXCEPT { return --m_ref_count == 0; }
+
+    bool released() const XR_NOEXCEPT { return m_ref_count == 0; }
+
+private:
+    size_t m_ref_count;
 };
 
-template <typename object_type, typename base_type = intrusive_base>
+template <typename ObjectType, typename BaseType = intrusive_base>
 class intrusive_ptr
 {
-private:
-    typedef intrusive_ptr<object_type, base_type> self_type;
-    typedef const object_type* (intrusive_ptr::*unspecified_bool_type)() const;
+    using object_type = ObjectType;
+    using base_type = BaseType;
+    using self_type = intrusive_ptr<object_type, base_type>;
 
-private:
-    enum
-    {
-        result = object_type_traits::is_base_and_derived<base_type, object_type>::value ||
-            object_type_traits::is_same<base_type, object_type>::value
-    };
+    static_assert(std::is_base_of_v<BaseType, ObjectType>,
+        "ObjectType must be derived from the BaseType");
 
-private:
     object_type* m_object;
 
 protected:
-    IC void dec();
+    void dec() XR_NOEXCEPT
+    {
+        if (!m_object)
+            return;
+
+        if (m_object->release())
+            m_object->release(m_object);
+    }
 
 public:
-    IC intrusive_ptr();
-    IC intrusive_ptr(object_type* rhs);
-    IC intrusive_ptr(self_type const& rhs);
-    IC ~intrusive_ptr();
-    IC self_type& operator=(object_type* rhs);
-    IC self_type& operator=(self_type const& rhs);
-    IC object_type& operator*() const;
-    IC object_type* operator->() const;
-    IC bool operator!() const;
-    IC operator unspecified_bool_type() const { return (!m_object ? 0 : &intrusive_ptr::get); }
-    IC u32 size();
-    IC void swap(self_type& rhs);
-    IC bool equal(const self_type& rhs) const;
-    IC void set(object_type* rhs);
-    IC void set(self_type const& rhs);
-    IC const object_type* get() const;
+    intrusive_ptr() XR_NOEXCEPT : m_object(nullptr) {}
+
+    intrusive_ptr(object_type* rhs) XR_NOEXCEPT : m_object(rhs)
+    {
+        if (m_object != nullptr)
+            m_object->acquire();
+    }
+
+    intrusive_ptr(const self_type& rhs) XR_NOEXCEPT : m_object(rhs.m_object)
+    {
+        if (m_object != nullptr)
+            m_object->acquire();
+    }
+
+    intrusive_ptr(self_type&& rhs) XR_NOEXCEPT : m_object(rhs.m_object) { rhs.m_object = nullptr; }
+
+    ~intrusive_ptr() XR_NOEXCEPT { dec(); }
+
+    self_type& operator=(object_type* rhs) XR_NOEXCEPT
+    {
+        dec();
+        m_object = rhs;
+        if (m_object != nullptr)
+            m_object->acquire();
+
+        return *this;
+    }
+
+    self_type& operator=(const self_type& rhs) XR_NOEXCEPT
+    {
+        dec();
+        m_object = rhs.m_object;
+        if (m_object != nullptr)
+            m_object->acquire();
+
+        return *this;
+    }
+
+    self_type& operator=(self_type&& rhs) XR_NOEXCEPT
+    {
+        dec();
+        m_object = rhs.m_object;
+        if (m_object != nullptr)
+            rhs.m_object = nullptr;
+        return *this;
+    }
+
+    object_type& operator*() const XR_NOEXCEPT
+    {
+        VERIFY(m_object);
+        return *m_object;
+    }
+
+    object_type* operator->() const XR_NOEXCEPT
+    {
+        VERIFY(m_object);
+        return m_object;
+    }
+
+    explicit operator bool() const XR_NOEXCEPT { return m_object != nullptr; }
+
+    bool operator==(const self_type& rhs) const XR_NOEXCEPT { return m_object == rhs.m_object; }
+
+    bool operator!=(const self_type& rhs) const XR_NOEXCEPT { return m_object != rhs.m_object; }
+
+    bool operator<(const self_type& rhs) const XR_NOEXCEPT { return m_object < rhs.m_object; }
+
+    bool operator>(const self_type& rhs) const XR_NOEXCEPT { return m_object > rhs.m_object; }
+
+    void swap(self_type& rhs) XR_NOEXCEPT
+    {
+        object_type* tmp = m_object;
+        m_object = rhs.m_object;
+        rhs.m_object = tmp;
+    }
+
+    const object_type* get() const XR_NOEXCEPT { return m_object; }
 };
 
 template <typename object_type, typename base_type>
-IC bool operator==(intrusive_ptr<object_type, base_type> const& a, intrusive_ptr<object_type, base_type> const& b);
-
-template <typename object_type, typename base_type>
-IC bool operator!=(intrusive_ptr<object_type, base_type> const& a, intrusive_ptr<object_type, base_type> const& b);
-
-template <typename object_type, typename base_type>
-IC bool operator<(intrusive_ptr<object_type, base_type> const& a, intrusive_ptr<object_type, base_type> const& b);
-
-template <typename object_type, typename base_type>
-IC bool operator>(intrusive_ptr<object_type, base_type> const& a, intrusive_ptr<object_type, base_type> const& b);
-
-template <typename object_type, typename base_type>
-IC void swap(intrusive_ptr<object_type, base_type>& lhs, intrusive_ptr<object_type, base_type>& rhs);
-
-#include "intrusive_ptr_inline.h"
-
-#pragma pack(pop)
+void swap(intrusive_ptr<object_type, base_type>& lhs,
+          intrusive_ptr<object_type, base_type>& rhs) XR_NOEXCEPT
+{
+    lhs.swap(rhs);
+}

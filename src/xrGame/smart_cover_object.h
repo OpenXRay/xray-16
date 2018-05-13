@@ -6,6 +6,7 @@
 //	Description : smart cover object class
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef SMART_COVER_OBJECT_H_INCLUDED
 #define SMART_COVER_OBJECT_H_INCLUDED
 
@@ -16,7 +17,7 @@ namespace smart_cover
 {
 class cover;
 
-class object : public CGameObject, private Noncopyable
+class object : public CGameObject
 {
 private:
     typedef CGameObject inherited;

@@ -1,75 +1,34 @@
-// xrAI.cpp : Defines the entry point for the application.
-//
-
 #include "stdafx.h"
-#include "xrCore/xr_ini.h"
-#include "process.h"
 #include "xrAI.h"
 
-#include "xr_graph_merge.h"
 #include "game_spawn_constructor.h"
-#include "xrCrossTable.h"
 
-#include "game_graph_builder.h"
 #include <mmsystem.h>
-#include "spawn_patcher.h"
 
 #pragma comment(linker, "/STACK:0x800000,0x400000")
 
-#pragma comment(lib, "comctl32.lib")
-#pragma comment(lib, "d3dx9.lib")
-#pragma comment(lib, "IMAGEHLP.LIB")
 #pragma comment(lib, "winmm.LIB")
-#pragma comment(lib, "xrcdb.LIB")
-#pragma comment(lib, "MagicFM.LIB")
-#pragma comment(lib, "xrCore.LIB")
-#pragma comment(lib, "xrLCUtil.lib")
-#pragma comment(lib, "xrAICore.lib")
 
-#include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
-#include "xrCore/cdecl_cast.hpp"
+#include "xrCore/ModuleLookup.hpp"
 
-LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow();
+#include "factory_api.h"
 
-CThread::LogFunc ProxyMsg = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.clMsgV(format, args);
-    va_end(args);
-});
-
-CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.StatusV(format, args);
-    va_end(args);
-});
-
-CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast([](float progress) { Logger.Progress(progress); });
+Factory_Create* create_entity = 0;
+Factory_Destroy* destroy_entity = 0;
 
 extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
-extern void test_smooth_path(LPCSTR name);
-extern void test_hierarchy(LPCSTR name);
-extern void xrConvertMaps();
-extern void test_goap();
-extern void smart_cover(LPCSTR name);
 extern void verify_level_graph(LPCSTR name, bool verbose);
-extern void compare_graphs(LPCSTR level_name);
-extern void test_levels();
 
 static const char* h_str =
-    "The following keys are supported / required:\n"
-    "-? or -h   == this help\n"
-    "-f<NAME>   == compile level in gamedata/levels/<NAME>/\n"
-    "-o         == modify build options\n"
-    "-s         == build game spawn data\n"
-    "\n"
-    "NOTE: The last key is required for any functionality\n";
+    "-? or -h == this help\n"
+    "-f <NAME> == compile level.ai\n"
+    "-s <NAME,...> == build game spawn data\n"
+    "-verify <NAME> == verify compiled level.ai\n";
 
 void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 string_path INI_FILE;
 
-extern LPCSTR GAME_CONFIG;
+LPCSTR GAME_CONFIG = "game.ltx";
 
 extern void clear_temp_folder();
 
@@ -82,8 +41,6 @@ void execute(LPSTR cmd)
         sscanf(strstr(cmd, "-f") + 2, "%s", name);
     else if (strstr(cmd, "-s"))
         sscanf(strstr(cmd, "-s") + 2, "%s", name);
-    else if (strstr(cmd, "-t"))
-        sscanf(strstr(cmd, "-t") + 2, "%s", name);
     else if (strstr(cmd, "-verify"))
         sscanf(strstr(cmd, "-verify") + xr_strlen("-verify"), "%s", name);
 
@@ -144,7 +101,30 @@ void execute(LPSTR cmd)
             }
             char* no_separator_check = strstr(cmd, "-no_separator_check");
             clear_temp_folder();
+
+            const auto hFactory = XRay::LoadModule("xrSE_Factory");
+
+            R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
+
+#ifdef XR_X64
+            pcstr create_entity_name = "create_entity";
+            pcstr destroy_entity_name = "destroy_entity";
+#else
+            pcstr create_entity_name = "_create_entity@4";
+            pcstr destroy_entity_name = "_destroy_entity@4";
+#endif
+            create_entity = (Factory_Create*)hFactory->getProcAddress(create_entity_name);
+            destroy_entity = (Factory_Destroy*)hFactory->getProcAddress(destroy_entity_name);
+
+            R_ASSERT(create_entity);
+            R_ASSERT(destroy_entity);
+
             CGameSpawnConstructor(name, output, start, !!no_separator_check);
+
+            hFactory->close();
+
+            create_entity = nullptr;
+            destroy_entity = nullptr;
         }
         else if (strstr(cmd, "-verify"))
         {
@@ -157,29 +137,24 @@ void execute(LPSTR cmd)
 void Startup(LPSTR lpCmdLine)
 {
     string4096 cmd;
-    BOOL bModifyOptions = FALSE;
 
     xr_strcpy(cmd, lpCmdLine);
-    strlwr(cmd);
+    xr_strlwr(cmd);
     if (strstr(cmd, "-?") || strstr(cmd, "-h"))
     {
         Help();
         return;
     }
-    if ((strstr(cmd, "-f") == 0) && (strstr(cmd, "-g") == 0) && (strstr(cmd, "-m") == 0) && (strstr(cmd, "-s") == 0) &&
-        (strstr(cmd, "-t") == 0) && (strstr(cmd, "-c") == 0) && (strstr(cmd, "-verify") == 0) &&
-        (strstr(cmd, "-patch") == 0))
+    if ((strstr(cmd, "-f") == 0) && (strstr(cmd, "-s") == 0) && (strstr(cmd, "-verify") == 0))
     {
         Help();
         return;
     }
-    if (strstr(cmd, "-o"))
-        bModifyOptions = TRUE;
     Logger.Initialize("xrAI");
     u32 dwStartupTime = timeGetTime();
     execute(cmd);
     // Show statistic
-    char stats[256];
+    string256 stats;
     u32 dwEndTime = timeGetTime();
     xr_sprintf(stats, "Time elapsed: %s", make_time((dwEndTime - dwStartupTime) / 1000).c_str());
     Logger.Success(stats);
@@ -187,35 +162,14 @@ void Startup(LPSTR lpCmdLine)
     Logger.Destroy();
 }
 
-#include "factory_api.h"
-
-#include "xrGame/quadtree.h"
-
-Factory_Create* create_entity = 0;
-Factory_Destroy* destroy_entity = 0;
-
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     xrDebug::Initialize(false);
-    Core._initialize("xrai", 0);
-    HMODULE hFactory;
-    LPCSTR g_name = "xrSE_Factory";
-    Log("Loading DLL:", g_name);
-    hFactory = LoadLibrary(g_name);
-    if (0 == hFactory)
-        R_CHK(GetLastError());
-    R_ASSERT2(hFactory, "Factory DLL raised exception during loading or there is no factory DLL at all");
-
-    create_entity = (Factory_Create*)GetProcAddress(hFactory, "_create_entity@4");
-    R_ASSERT(create_entity);
-    destroy_entity = (Factory_Destroy*)GetProcAddress(hFactory, "_destroy_entity@4");
-    R_ASSERT(destroy_entity);
+    Core.Initialize("xrAI");
 
     Startup(lpCmdLine);
 
-    FreeLibrary(hFactory);
-
     Core._destroy();
 
-    return (0);
+    return 0;
 }

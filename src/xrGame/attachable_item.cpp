@@ -13,6 +13,7 @@
 #include "inventory.h"
 #include "xrEngine/xr_input.h"
 #include "ui_base.h"
+#include "xrEngine/GameFont.h"
 
 #ifdef DEBUG
 CAttachableItem* CAttachableItem::m_dbgItem = NULL;
@@ -60,8 +61,8 @@ void CAttachableItem::OnH_A_Chield()
 
 void CAttachableItem::renderable_Render()
 {
-    GlobalEnv.Render->set_Transform(&object().XFORM());
-    GlobalEnv.Render->add_Visual(object().Visual());
+    GEnv.Render->set_Transform(&object().XFORM());
+    GEnv.Render->add_Visual(object().Visual());
 }
 
 void CAttachableItem::OnH_A_Independent() { enable(false); }

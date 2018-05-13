@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level.h"
 #include <GameSpy/md5.h>
+#include "xrNetServer/NET_Messages.h"
 
 extern void GetCDKey_FromRegistry(char* CDKeyStr);
 char const* ComputeClientDigest(string128& dest)
@@ -14,7 +15,7 @@ char const* ComputeClientDigest(string128& dest)
         dest[0] = 0;
         return dest;
     }
-    strupr(cd_key);
+    xr_strupr(cd_key);
     MD5Digest(reinterpret_cast<unsigned char*>(cd_key), cd_keylen, md5hash);
     md5hash[33] = 0;
     xr_strcpy(dest, sizeof(dest), md5hash);

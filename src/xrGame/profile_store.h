@@ -9,6 +9,7 @@
 #include "gsc_dsigned_ltx.h"
 #include "best_scores_store.h"
 #include "awards_store.h"
+#include "profile_data_types_script.h"
 
 class CGameSpy_Full;
 class CGameSpy_SAKE;

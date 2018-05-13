@@ -10,9 +10,10 @@
 #include "script_space.h"
 #include "script_properties_list_helper.h"
 #include "ai_space.h"
+#include "xrCore/ModuleLookup.hpp"
 #include "xrScriptEngine/script_engine.hpp"
-#include "script_token_list.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrServerEntities/script_token_list.h"
 
 using namespace luabind;
 
@@ -20,29 +21,30 @@ struct CChooseType
 {
 };
 
-typedef IPropHelper&(__stdcall* TPHelper)();
+using TPHelper = IPropHelper&(__stdcall* )();
 
-TPHelper _PHelper = 0;
-HMODULE prop_helper_module = 0;
-LPCSTR prop_helper_library = "xrEPropsB", prop_helper_func = "PHelper";
-CScriptPropertiesListHelper* g_property_list_helper = 0;
+TPHelper _PHelper = nullptr;
+XRay::Module prop_helper_module;
+constexpr pcstr prop_helper_library = "xrEPropsB", prop_helper_func = "PHelper";
+CScriptPropertiesListHelper* g_property_list_helper = nullptr;
 
 void load_prop_helper()
 {
-    prop_helper_module = LoadLibrary(prop_helper_library);
-    if (!prop_helper_module)
+    prop_helper_module = XRay::LoadModule(prop_helper_library);
+    if (!prop_helper_module->exist())
     {
         Msg("! Cannot find library %s", prop_helper_library);
         return;
     }
-    _PHelper = (TPHelper)GetProcAddress(prop_helper_module, prop_helper_func);
+
+    _PHelper = (TPHelper)prop_helper_module->getProcAddress(prop_helper_func);
     if (!_PHelper)
     {
         Msg("! Cannot find entry point of the function %s in the library %s", prop_helper_func, prop_helper_func);
         return;
     }
 
-    g_property_list_helper = xr_new<CScriptPropertiesListHelper>();
+    g_property_list_helper = new CScriptPropertiesListHelper();
 }
 
 IPropHelper& PHelper()
@@ -97,11 +99,11 @@ SCRIPT_EXPORT(
                 .def("vector_on_after_edit", &CScriptPropertiesListHelper::FvectorRDOnAfterEdit)
                 .def("vector_on_before_edit", &CScriptPropertiesListHelper::FvectorRDOnBeforeEdit)
                 //			.def("vector_on_draw",			&CScriptPropertiesListHelper::FvectorRDOnDraw)
-                .def("float_on_after_edit", &CScriptPropertiesListHelper::floatRDOnAfterEdit)
-                .def("float_on_before_edit", &CScriptPropertiesListHelper::floatRDOnBeforeEdit)
+                .def("float_on_after_edit", &CScriptPropertiesListHelper::floatRDOnAfterEdit, luabind::policy::out_value<3>())
+                .def("float_on_before_edit", &CScriptPropertiesListHelper::floatRDOnBeforeEdit, luabind::policy::out_value<3>())
                 //			.def("float_on_draw",			&CScriptPropertiesListHelper::floatRDOnDraw)
-                .def("name_after_edit", &CScriptPropertiesListHelper::NameAfterEdit)
-                .def("name_before_edit", &CScriptPropertiesListHelper::NameBeforeEdit)
+                .def("name_after_edit", &CScriptPropertiesListHelper::NameAfterEdit, luabind::policy::pure_out_value<3>())
+                .def("name_before_edit", &CScriptPropertiesListHelper::NameBeforeEdit, luabind::policy::pure_out_value<3>())
                 //			.def("name_on_draw",			&CScriptPropertiesListHelper::NameDraw)
 
                 .def("create_caption", &CScriptPropertiesListHelper::CreateCaption)

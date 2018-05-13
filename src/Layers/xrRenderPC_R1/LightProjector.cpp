@@ -8,10 +8,6 @@
 #include "xrEngine/xr_object.h"
 #include "Layers/xrRender/LightTrack.h"
 
-#ifndef _EDITOR
-#include "xrCore/Threading/ttapi.h"
-#endif
-
 // tir2.xrdemo      -> 45.2
 // tir2.xrdemo      -> 61.8
 
@@ -31,8 +27,8 @@ float clipD(float R) { return P_distance * (R / P_ideal_size); }
 
 CLightProjector::CLightProjector()
 {
-    current = 0;
-    RT = 0;
+    current = nullptr;
+    RT = nullptr;
 
     //
     RT.create("$user$projector", P_rt_size, P_rt_size, P_rtf);
@@ -54,14 +50,14 @@ CLightProjector::~CLightProjector()
 
 void CLightProjector::set_object(IRenderable* O)
 {
-    if ((0 == O) || (receivers.size() >= P_o_count))
-        current = 0;
+    if ((nullptr == O) || (receivers.size() >= P_o_count))
+        current = nullptr;
     else
     {
         if (!O->renderable_ShadowReceive() || RImplementation.val_bInvisible ||
             ((CROS_impl*)O->renderable_ROS())->shadow_recv_frame == Device.dwFrame)
         {
-            current = 0;
+            current = nullptr;
             return;
         }
 
@@ -74,22 +70,22 @@ void CLightProjector::set_object(IRenderable* O)
         if (D < clipD(R))
             current = O;
         else
-            current = 0;
+            current = nullptr;
 
         if (current)
         {
             ISpatial* spatial = dynamic_cast<ISpatial*>(O);
-            if (0 == spatial)
-                current = 0;
+            if (nullptr == spatial)
+                current = nullptr;
             else
             {
                 spatial->spatial_updatesector();
-                if (0 == spatial->GetSpatialData().sector)
+                if (nullptr == spatial->GetSpatialData().sector)
                 {
                     IGameObject* obj = dynamic_cast<IGameObject*>(O);
                     if (obj)
                         Msg("! Invalid object '%s' position. Outside of sector structure.", obj->cName().c_str());
-                    current = 0;
+                    current = nullptr;
                 }
             }
         }
@@ -183,7 +179,7 @@ void CLightProjector::calculate()
     // Begin
     RCache.set_RT(RT->pRT);
     RCache.set_ZB(RImplementation.Target->pTempZB);
-    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), 0, 1, 0));
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), 0, 1, 0));
     RCache.set_xform_world(Fidentity);
 
     // reallocate/reassociate structures + perform all the work
@@ -292,7 +288,7 @@ void CLightProjector::calculate()
         // Clear color to ambience
         Fvector& cap = LT->get_approximate();
         CHK_DX(HW.pDevice->Clear(
-            0, 0, D3DCLEAR_TARGET, color_rgba_f(cap.x, cap.y, cap.z, (cap.x + cap.y + cap.z) / 4.f), 1, 0));
+            0, nullptr, D3DCLEAR_TARGET, color_rgba_f(cap.x, cap.y, cap.z, (cap.x + cap.y + cap.z) / 4.f), 1, 0));
 
         // calculate uv-gen matrix and clamper
         Fmatrix mCombine;

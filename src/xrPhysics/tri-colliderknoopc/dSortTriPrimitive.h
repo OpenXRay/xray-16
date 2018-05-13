@@ -95,18 +95,15 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
         // VERIFY( g_pGameLevel );
         XRC.box_query(inl_ph_world().ObjectSpace().GetStaticModel(), cast_fv(p), aabb);
 
-        CDB::RESULT* R_begin = XRC.r_begin();
-        CDB::RESULT* R_end = XRC.r_end();
 #ifdef DEBUG
-
         debug_output().dbg_total_saved_tries() -= data->cashed_tries.size();
         debug_output().dbg_new_queries_per_step()++;
 #endif
-        data->cashed_tries.clear_not_free();
-        for (CDB::RESULT* Res = R_begin; Res != R_end; ++Res)
-        {
-            data->cashed_tries.push_back(Res->id);
-        }
+        data->cashed_tries.clear();
+
+        for (auto &Res : *XRC.r_get())
+            data->cashed_tries.push_back(Res.id);
+
 #ifdef DEBUG
         debug_output().dbg_total_saved_tries() += data->cashed_tries.size();
 #endif
@@ -319,7 +316,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
     }
 
     // if(intersect) ret=0;
-    xr_vector<Triangle>::iterator i;
+    //xr_vector<Triangle>::iterator i;
 
     if (intersect)
     {
@@ -327,17 +324,19 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
         {
             bool include = true;
             if (no_last_pos)
-                for (i = pos_tries.begin(); pos_tries.end() != i; ++i)
+            {
+                for (auto& it : pos_tries)
                 {
                     VERIFY(neg_tri.T);
-                    if (TriContainPoint((dReal*)&V_array[i->T->verts[0]], (dReal*)&V_array[i->T->verts[1]],
-                            (dReal*)&V_array[i->T->verts[2]], i->norm, i->side0, i->side1, p))
-                        if (negative_tri_set_ignored_by_positive_tri(neg_tri, *i, V_array))
+                    if (TriContainPoint((dReal*)&V_array[it.T->verts[0]], (dReal*)&V_array[it.T->verts[1]],
+                        (dReal*)&V_array[it.T->verts[2]], it.norm, it.side0, it.side1, p))
+                        if (negative_tri_set_ignored_by_positive_tri(neg_tri, it, V_array))
                         {
                             include = false;
                             break;
                         }
-                };
+                }
+            }
 
             if (include)
             {
@@ -379,17 +378,17 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
     {
         bool include = true;
         if (no_last_pos)
-            for (i = pos_tries.begin(); pos_tries.end() != i; ++i)
+        {
+            for (auto& it : pos_tries)
             {
                 VERIFY(b_neg_tri.T && b_neg_tri.dist != -dInfinity);
-                if (negative_tri_set_ignored_by_positive_tri(b_neg_tri, *i, V_array)
-
-                        )
+                if (negative_tri_set_ignored_by_positive_tri(b_neg_tri, it, V_array))
                 {
                     include = false;
                     break;
                 }
-            };
+            }
+        }
 
         if (include)
         {

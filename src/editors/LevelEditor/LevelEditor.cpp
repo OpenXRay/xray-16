@@ -52,7 +52,7 @@ WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
     frmSplash->Repaint();
     frmSplash->SetStatus("Core initializing...");
 
-    Core._initialize("level", ELogCallback);
+    Core.Initialize("level", ELogCallback);
     CEditableMesh::m_bDraftMeshMode = TRUE;
     Application->Initialize();
 

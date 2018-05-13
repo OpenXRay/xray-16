@@ -5,18 +5,20 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Environment.h"
 
+namespace XRay
+{
+namespace Editor
+{
+class property_holder_base;
+}
+}
+
 namespace editor
 {
-class property_holder;
-
 namespace environment
 {
 namespace detail
@@ -61,9 +63,9 @@ class manager;
 class manager : public ::CEnvironment
 {
 public:
-    typedef xr_vector<LPCSTR> shader_ids_type;
-    typedef xr_vector<LPCSTR> particle_ids_type;
-    typedef xr_vector<LPCSTR> light_animator_ids_type;
+    typedef xr_vector<pcstr> shader_ids_type;
+    typedef xr_vector<pcstr> particle_ids_type;
+    typedef xr_vector<pcstr> light_animator_ids_type;
 
 public:
     manager();
@@ -74,7 +76,7 @@ public:
     virtual void create_mixer();
     virtual CEnvAmbient* AppendEnvAmb(const shared_str& sect);
     virtual SThunderboltDesc* thunderbolt_description(CInifile& config, shared_str const& section);
-    virtual SThunderboltCollection* thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, LPCSTR section);
+    virtual SThunderboltCollection* thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, pcstr section);
     virtual SThunderboltCollection* thunderbolt_collection(
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
     virtual CLensFlareDescriptor* add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id);
@@ -84,14 +86,14 @@ public:
     light_animator_ids_type const& light_animator_ids() const;
 
 public:
-    typedef editor::property_holder property_holder_type;
-    typedef editor::environment::suns::manager suns_manager_type;
-    typedef editor::environment::levels::manager levels_manager_type;
-    typedef editor::environment::effects::manager effects_manager_type;
-    typedef editor::environment::sound_channels::manager sound_channels_manager_type;
-    typedef editor::environment::ambients::manager ambients_manager_type;
-    typedef editor::environment::thunderbolts::manager thunderbolts_manager_type;
-    typedef editor::environment::weathers::manager weathers_manager_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
+    using suns_manager_type = editor::environment::suns::manager;
+    using levels_manager_type = editor::environment::levels::manager;
+    using effects_manager_type = editor::environment::effects::manager;
+    using sound_channels_manager_type = editor::environment::sound_channels::manager;
+    using ambients_manager_type = editor::environment::ambients::manager;
+    using thunderbolts_manager_type = editor::environment::thunderbolts::manager;
+    using weathers_manager_type = editor::environment::weathers::manager;
 
 public:
     inline suns_manager_type const& suns() const
@@ -154,7 +156,3 @@ private:
 }; // class manager
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED

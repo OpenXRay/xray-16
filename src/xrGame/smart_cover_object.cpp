@@ -90,7 +90,7 @@ void dbg_draw_frustum(float FOV, float _FAR, float A, Fvector& P, Fvector& D, Fv
 
 void object::OnRender()
 {
-    GlobalEnv.DRender->OnFrameEnd();
+    GEnv.DRender->OnFrameEnd();
     Fvector l_half;
     l_half.set(.5f, .5f, .5f);
     Fmatrix l_ball, l_box;

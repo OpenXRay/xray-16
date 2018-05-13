@@ -115,16 +115,16 @@ void CEditableObject::Save(IWriter& F)
     F.open_chunk(EOBJ_CHUNK_SURFACES3);
     F.w_u32(m_Surfaces.size());
 
-    for (SurfaceIt sf_it = m_Surfaces.begin(); sf_it != m_Surfaces.end(); ++sf_it)
+    for (auto& it : m_Surfaces)
     {
-        F.w_stringZ((*sf_it)->_Name());
-        F.w_stringZ((*sf_it)->_ShaderName());
-        F.w_stringZ((*sf_it)->_ShaderXRLCName());
-        F.w_stringZ((*sf_it)->_GameMtlName());
-        F.w_stringZ((*sf_it)->_Texture());
-        F.w_stringZ((*sf_it)->_VMap());
-        F.w_u32((*sf_it)->m_Flags.get());
-        F.w_u32((*sf_it)->_FVF());
+        F.w_stringZ(it->_Name());
+        F.w_stringZ(it->_ShaderName());
+        F.w_stringZ(it->_ShaderXRLCName());
+        F.w_stringZ(it->_GameMtlName());
+        F.w_stringZ(it->_Texture());
+        F.w_stringZ(it->_VMap());
+        F.w_u32(it->m_Flags.get());
+        F.w_u32(it->_FVF());
         F.w_u32(1);
     }
     F.close_chunk();
@@ -133,7 +133,7 @@ void CEditableObject::Save(IWriter& F)
     if (!m_Bones.empty())
     {
         F.open_chunk(EOBJ_CHUNK_BONES2);
-        for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
+        for (auto b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
         {
             F.open_chunk(b_it - m_Bones.begin());
             (*b_it)->Save(F);
@@ -175,8 +175,8 @@ void CEditableObject::Save(IWriter& F)
             F.w_stringZ(bp_it->alias);
             F.w_u32(bp_it->bones.size());
 
-            for (RStringVecIt s_it = bp_it->bones.begin(); s_it != bp_it->bones.end(); ++s_it)
-                F.w_stringZ(s_it->c_str());
+            for (auto& s_it : bp_it->bones)
+                F.w_stringZ(s_it.c_str());
         }
         F.close_chunk();
     }
@@ -233,7 +233,7 @@ bool CEditableObject::Load(IReader& F)
         {
             u32 cnt = F.r_u32();
             m_Surfaces.resize(cnt);
-            for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
+            for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); ++s_it)
             {
                 *s_it = new CSurface();
                 F.r_stringZ(buf);
@@ -260,7 +260,7 @@ bool CEditableObject::Load(IReader& F)
         {
             u32 cnt = F.r_u32();
             m_Surfaces.resize(cnt);
-            for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
+            for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); ++s_it)
             {
                 *s_it = new CSurface();
                 F.r_stringZ(buf);
@@ -286,7 +286,7 @@ bool CEditableObject::Load(IReader& F)
             R_ASSERT(F.find_chunk(EOBJ_CHUNK_SURFACES));
             u32 cnt = F.r_u32();
             m_Surfaces.resize(cnt);
-            for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
+            for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); ++s_it)
             {
                 *s_it = new CSurface();
                 F.r_stringZ(buf);
@@ -308,7 +308,7 @@ bool CEditableObject::Load(IReader& F)
 
             // surfaces xrlc part
             if (F.find_chunk(EOBJ_CHUNK_SURFACES_XRLC))
-                for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
+                for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); ++s_it)
                 {
                     F.r_stringZ(buf);
                     (*s_it)->SetShaderXRLC(buf.c_str());
@@ -359,7 +359,7 @@ bool CEditableObject::Load(IReader& F)
             else if (F.find_chunk(EOBJ_CHUNK_BONES))
             {
                 m_Bones.resize(F.r_u32());
-                for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
+                for (auto b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
                 {
                     *b_it = new CBone();
                     (*b_it)->Load_0(F);
@@ -371,7 +371,7 @@ bool CEditableObject::Load(IReader& F)
             if (F.find_chunk(EOBJ_CHUNK_SMOTIONS))
             {
                 m_SMotions.resize(F.r_u32());
-                for (SMotionIt s_it = m_SMotions.begin(); s_it != m_SMotions.end(); s_it++)
+                for (SMotionIt s_it = m_SMotions.begin(); s_it != m_SMotions.end(); ++s_it)
                 {
                     *s_it = new CSMotion();
                     if (!(*s_it)->Load(F))
@@ -418,17 +418,17 @@ bool CEditableObject::Load(IReader& F)
             {
                 m_BoneParts.resize(F.r_u32());
                 bool bBPok = true;
-                for (BPIt bp_it = m_BoneParts.begin(); bp_it != m_BoneParts.end(); bp_it++)
+                for (auto& bp_it : m_BoneParts)
                 {
                     F.r_stringZ(buf);
-                    bp_it->alias = buf;
-                    bp_it->bones.resize(F.r_u32());
-                    for (RStringVecIt s_it = bp_it->bones.begin(); s_it != bp_it->bones.end(); s_it++)
+                    bp_it.alias = buf;
+                    bp_it.bones.resize(F.r_u32());
+                    for (auto& s_it : bp_it.bones)
                     {
                         int idx = F.r_u32();
                         if ((idx >= 0) && (idx < (int)m_Bones.size()))
                         {
-                            *s_it = m_Bones[idx]->Name();
+                            s_it = m_Bones[idx]->Name();
                         }
                         else
                         {
@@ -448,13 +448,13 @@ bool CEditableObject::Load(IReader& F)
             else if (F.find_chunk(EOBJ_CHUNK_BONEPARTS2))
             {
                 m_BoneParts.resize(F.r_u32());
-                for (BPIt bp_it = m_BoneParts.begin(); bp_it != m_BoneParts.end(); bp_it++)
+                for (auto& bp_it : m_BoneParts)
                 {
                     F.r_stringZ(buf);
-                    bp_it->alias = buf;
-                    bp_it->bones.resize(F.r_u32());
-                    for (RStringVecIt s_it = bp_it->bones.begin(); s_it != bp_it->bones.end(); s_it++)
-                        F.r_stringZ(*s_it);
+                    bp_it.alias = buf;
+                    bp_it.bones.resize(F.r_u32());
+                    for (auto& s_it : bp_it.bones)
+                        F.r_stringZ(s_it);
                 }
                 if (!m_BoneParts.empty() && !VerifyBoneParts())
                     Log("!Invalid bone parts. Found duplicate bones in object '%s'.", GetName());

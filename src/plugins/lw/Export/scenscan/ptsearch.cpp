@@ -26,6 +26,7 @@ of points.
 #define COORD(p, c) odb->pt[odb->vsort[p]].pos[ipos][c]
 #define SORTVAL(p) COORD(p, key)
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 
 /*
@@ -231,4 +232,4 @@ int pointSearch(ObjectDB* odb, float pos[3])
     return -1;
 }
 
-#pragma warning(default : 4995)
+#pragma warning(pop)

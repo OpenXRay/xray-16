@@ -63,7 +63,7 @@ EScene::EScene()
     m_Locked = 0;
 
     for (int i = 0; i < OBJCLASS_COUNT; i++)
-        m_SceneTools.insert(mk_pair((ObjClassID)i, (ESceneToolBase*)NULL));
+        m_SceneTools.insert(std::make_pair((ObjClassID)i, (ESceneToolBase*)NULL));
 
     // first init scene graph for objects
     mapRenderObjects.init(MAX_VISUALS);

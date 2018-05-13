@@ -20,7 +20,7 @@ void CPlanner::setup(_object_type* object, CPropertyStorage* storage)
 {
     inherited_planner::setup(object);
     inherited_action::setup(object, storage);
-    set_target_state(effects());
+    this->set_target_state(this->effects());
 }
 
 TEMPLATE_SPECIALIZATION
@@ -47,7 +47,7 @@ TEMPLATE_SPECIALIZATION
 void CPlanner::execute()
 {
     inherited_action::execute();
-    update();
+    this->update();
 }
 
 TEMPLATE_SPECIALIZATION

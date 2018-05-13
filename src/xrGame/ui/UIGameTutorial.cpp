@@ -12,13 +12,14 @@
 #include "UIGameCustom.h"
 #include "UIActorMenu.h"
 #include "UIPdaWnd.h"
+#include "xrScriptEngine/Functor.hpp"
 
 extern ENGINE_API BOOL bShowPauseString;
 
 void CallFunction(shared_str const& func)
 {
     luabind::functor<void> functor_to_call;
-    bool functor_exists = ai().script_engine().functor(func.c_str(), functor_to_call);
+    bool functor_exists = GEnv.ScriptEngine->functor(func.c_str(), functor_to_call);
     THROW3(functor_exists, "Cannot find script function described in tutorial item ", func.c_str());
     if (functor_to_call.is_valid())
         functor_to_call();
@@ -33,7 +34,7 @@ void CallFunctions(xr_vector<shared_str>& v)
 
 void CUISequenceItem::Load(CUIXml* xml, int idx)
 {
-    XML_NODE* _stored_root = xml->GetLocalRoot();
+    XML_NODE _stored_root = xml->GetLocalRoot();
     xml->SetLocalRoot(xml->NavigateToNode("item", idx));
     int disabled_cnt = xml->GetNodesNum(xml->GetLocalRoot(), "disabled_key");
 
@@ -81,7 +82,7 @@ void CUISequenceItem::Start()
     CallFunctions(m_start_lua_functions);
     if (m_onframe_lua_function.size())
     {
-        bool functor_exists = ai().script_engine().functor(m_onframe_lua_function.c_str(), m_onframe_functor);
+        bool functor_exists = GEnv.ScriptEngine->functor(m_onframe_lua_function.c_str(), m_onframe_functor);
         THROW3(
             functor_exists, "Cannot find script function described in tutorial item ", m_onframe_lua_function.c_str());
     }
@@ -125,12 +126,12 @@ void CUISequencer::Start(LPCSTR tutor_name)
         xml_init.InitWindow(uiXml, "global_wnd", 0, m_UIWindow);
     }
 
-    XML_NODE* bk = uiXml.GetLocalRoot();
+    XML_NODE bk = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(uiXml.NavigateToNode("global_wnd", 0));
     {
         LPCSTR str = uiXml.Read("pause_state", 0, "ignore");
-        m_flags.set(etsNeedPauseOn, 0 == _stricmp(str, "on"));
-        m_flags.set(etsNeedPauseOff, 0 == _stricmp(str, "off"));
+        m_flags.set(etsNeedPauseOn, 0 == xr_stricmp(str, "on"));
+        m_flags.set(etsNeedPauseOff, 0 == xr_stricmp(str, "off"));
     }
 
     LPCSTR snd_name = uiXml.Read("sound", 0, "");
@@ -147,7 +148,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
     for (int i = 0; i < items_count; ++i)
     {
         LPCSTR _tp = uiXml.ReadAttrib("item", i, "type", "");
-        bool bVideo = 0 == _stricmp(_tp, "video");
+        bool bVideo = 0 == xr_stricmp(_tp, "video");
         CUISequenceItem* pItem = 0;
         if (bVideo)
             pItem = new CUISequenceVideoItem(this);
@@ -196,7 +197,7 @@ CUISequenceItem* CUISequencer::GetNextItem()
         if (f.size() == 0)
             break;
 
-        bool functor_exists = ai().script_engine().functor(f.c_str(), functor_to_call);
+        bool functor_exists = GEnv.ScriptEngine->functor(f.c_str(), functor_to_call);
         THROW3(functor_exists, "Cannot find script function described in tutorial item ", f.c_str());
 
         bool call_result = true;

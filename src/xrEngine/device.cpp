@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "xrCDB/Frustum.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 // mmsystem.h
 #define MMNOSOUND
@@ -9,7 +10,7 @@
 #define MMNOMIXER
 #define MMNOJOY
 #include <mmsystem.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 #include "x_ray.h"
 #include "Render.h"
@@ -18,14 +19,14 @@
 #define INCLUDE_FROM_ENGINE
 #include "xrCore/FS_impl.h"
 
-#ifdef INGAME_EDITOR
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
-#endif // #ifdef INGAME_EDITOR
 
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xr_input.h"
+#include "splash.h"
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -37,8 +38,10 @@ ref_light precache_light = 0;
 
 BOOL CRenderDevice::Begin()
 {
-#ifndef DEDICATED_SERVER
-    switch (GlobalEnv.Render->GetDeviceState())
+    if (GEnv.isDedicatedServer)
+        return TRUE;
+
+    switch (GEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
@@ -52,39 +55,37 @@ BOOL CRenderDevice::Begin()
         break;
     default: R_ASSERT(0);
     }
-    GlobalEnv.Render->Begin();
+    GEnv.Render->Begin();
     FPU::m24r();
     g_bRendering = TRUE;
-#endif
+
     return TRUE;
 }
 
-void CRenderDevice::Clear() { GlobalEnv.Render->Clear(); }
+void CRenderDevice::Clear() { GEnv.Render->Clear(); }
 extern void CheckPrivilegySlowdown();
 
 void CRenderDevice::End(void)
 {
-#ifndef DEDICATED_SERVER
-#ifdef INGAME_EDITOR
+    if (GEnv.isDedicatedServer)
+        return;
+
     bool load_finished = false;
-#endif // #ifdef INGAME_EDITOR
     if (dwPrecacheFrame)
     {
-        ::Sound->set_master_volume(0.f);
+        GEnv.Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
         if (!dwPrecacheFrame)
         {
-#ifdef INGAME_EDITOR
             load_finished = true;
-#endif
-            GlobalEnv.Render->updateGamma();
+            GEnv.Render->updateGamma();
             if (precache_light)
             {
                 precache_light->set_active(false);
                 precache_light.destroy();
             }
-            ::Sound->set_master_volume(1.f);
-            GlobalEnv.Render->ResourcesDestroyNecessaryTextures();
+            GEnv.Sound->set_master_volume(1.f);
+            GEnv.Render->ResourcesDestroyNecessaryTextures();
             Memory.mem_compact();
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
@@ -106,12 +107,44 @@ void CRenderDevice::End(void)
     // Present goes here, so call OA Frame end.
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(Device.fTimeGlobal);
-    GlobalEnv.Render->End();
-#ifdef INGAME_EDITOR
+    GEnv.Render->End();
+
     if (load_finished && m_editor)
         m_editor->on_load_finished();
-#endif
-#endif // !DEDICATED_SERVER
+}
+
+// XXX: make it work correct in all situations
+void CRenderDevice::RenderThreadProc(void* context)
+{
+    auto& device = *static_cast<CRenderDevice*>(context);
+    while (true)
+    {
+        device.renderProcessFrame.Wait();
+        if (device.mt_bMustExit)
+        {
+            device.renderThreadExit.Set();
+            return;
+        }
+
+        if (!GEnv.isDedicatedServer)
+        {
+            // all rendering is done here
+            CStatTimer renderTotalReal;
+            renderTotalReal.FrameStart();
+            renderTotalReal.Begin();
+            if (device.b_is_Active && device.Begin())
+            {
+                device.seqRender.Process(rp_Render);
+                device.CalcFrameStats();
+                device.Statistic->Show();
+                device.End(); // Present goes here
+            }
+            renderTotalReal.End();
+            renderTotalReal.FrameEnd();
+            device.stats.RenderTotal.accum = renderTotalReal.accum;
+        }
+        device.renderFrameDone.Set();
+    }
 }
 
 void CRenderDevice::SecondaryThreadProc(void* context)
@@ -128,7 +161,7 @@ void CRenderDevice::SecondaryThreadProc(void* context)
         }
         for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
             device.seqParallel[pit]();
-        device.seqParallel.clear_not_free();
+        device.seqParallel.clear();
         device.seqFrameMT.Process(rp_Frame);
         device.syncFrameDone.Set();
     }
@@ -137,16 +170,15 @@ void CRenderDevice::SecondaryThreadProc(void* context)
 #include "IGame_Level.h"
 void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
 {
-#ifdef DEDICATED_SERVER
-    amount = 0;
-#else
-    if (GlobalEnv.Render->GetForceGPU_REF())
+    if (GEnv.isDedicatedServer)
         amount = 0;
-#endif
+    else if (GEnv.Render->GetForceGPU_REF())
+        amount = 0;
+
     dwPrecacheFrame = dwPrecacheTotal = amount;
     if (amount && !precache_light && g_pGameLevel && g_loading_events.empty())
     {
-        precache_light = GlobalEnv.Render->light_create();
+        precache_light = GEnv.Render->light_create();
         precache_light->set_shadow(false);
         precache_light->set_position(vCameraPosition);
         precache_light->set_color(255, 255, 255);
@@ -174,7 +206,7 @@ void CRenderDevice::CalcFrameStats()
         stats.fFPS = fInv * stats.fFPS + fOne * fps;
         if (stats.RenderTotal.result > EPS_S)
         {
-            u32 renderedPolys = GlobalEnv.Render->GetCacheStatPolys();
+            u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
             stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
             stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
         }
@@ -193,13 +225,12 @@ void CRenderDevice::on_idle()
         Sleep(100);
         return;
     }
-#ifdef DEDICATED_SERVER
-    u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
-#endif
+
     if (psDeviceFlags.test(rsStatistic))
         g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
         g_bEnableStatGather = FALSE;
+
     if (g_loading_events.size())
     {
         if (g_loading_events.front()())
@@ -207,9 +238,14 @@ void CRenderDevice::on_idle()
         pApp->LoadDraw();
         return;
     }
+
+    const auto frameStartTime = TimerGlobal.GetElapsed_ms();
+
     if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
+
     FrameMove();
+
     // Precache
     if (dwPrecacheFrame)
     {
@@ -223,61 +259,76 @@ void CRenderDevice::on_idle()
     }
     // Matrices
     mFullTransform.mul(mProject, mView);
-    GlobalEnv.Render->SetCacheXform(mView, mProject);
+    GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert(mFullTransform);
-    vCameraPosition_saved = vCameraPosition;
-    mFullTransform_saved = mFullTransform;
-    mView_saved = mView;
-    mProject_saved = mProject;
-    syncProcessFrame.Set(); // allow secondary thread to do its job
-    Sleep(0);
 
-#ifndef DEDICATED_SERVER
-    // all rendering is done here
-    CStatTimer renderTotalReal;
-    renderTotalReal.FrameStart();
-    renderTotalReal.Begin();
-    if (b_is_Active && Begin())
+    vCameraPositionSaved = vCameraPosition;
+    vCameraDirectionSaved = vCameraDirection;
+    vCameraTopSaved = vCameraTop;
+    vCameraRightSaved = vCameraRight;
+
+    mFullTransformSaved = mFullTransform;
+    mViewSaved = mView;
+    mProjectSaved = mProject;
+
+    //renderProcessFrame.Set(); // allow render thread to do its job
+    syncProcessFrame.Set(); // allow secondary thread to do its job
+
+    const auto frameEndTime = TimerGlobal.GetElapsed_ms();
+    const auto frameTime = frameEndTime - frameStartTime;
+
+    if (!GEnv.isDedicatedServer)
     {
-        seqRender.Process(rp_Render);
-        CalcFrameStats();
-        Statistic->Show();
-        End(); // Present goes here
+        // all rendering is done here
+        CStatTimer renderTotalReal;
+        renderTotalReal.FrameStart();
+        renderTotalReal.Begin();
+        if (b_is_Active && Begin())
+        {
+            seqRender.Process(rp_Render);
+            CalcFrameStats();
+            Statistic->Show();
+            End(); // Present goes here
+        }
+        renderTotalReal.End();
+        renderTotalReal.FrameEnd();
+        stats.RenderTotal.accum = renderTotalReal.accum;
     }
-    renderTotalReal.End();
-    renderTotalReal.FrameEnd();
-    stats.RenderTotal.accum = renderTotalReal.accum;
-#endif // #ifndef DEDICATED_SERVER
+
+    // Eco render (by alpet)
+    u32 updateDelta = 0;
+
+    if (GEnv.isDedicatedServer)
+        updateDelta = 1000 / g_svDedicateServerUpdateReate;
+
+    else if (Device.Paused() || IGame_Persistent::IsMainMenuActive())
+        updateDelta = 10;
+
+    if (frameTime < updateDelta)
+        Sleep(updateDelta - frameTime);
+
     syncFrameDone.Wait(); // wait until secondary thread finish its job
-#ifdef DEDICATED_SERVER
-    u32 FrameEndTime = TimerGlobal.GetElapsed_ms();
-    u32 FrameTime = (FrameEndTime - FrameStartTime);
-    u32 DSUpdateDelta = 1000 / g_svDedicateServerUpdateReate;
-    if (FrameTime < DSUpdateDelta)
-        Sleep(DSUpdateDelta - FrameTime);
-#endif
+    //renderFrameDone.Wait(); // wait until render thread finish its job
+
     if (!b_is_Active)
         Sleep(1);
 }
 
-#ifdef INGAME_EDITOR
-void CRenderDevice::message_loop_editor()
+void CRenderDevice::message_loop_weather_editor()
 {
     m_editor->run();
     m_editor_finalize(m_editor);
     xr_delete(m_engine);
 }
-#endif // #ifdef INGAME_EDITOR
 
 void CRenderDevice::message_loop()
 {
-#ifdef INGAME_EDITOR
     if (editor())
     {
-        message_loop_editor();
+        message_loop_weather_editor();
         return;
     }
-#endif
+
     MSG msg;
     PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
     while (msg.message != WM_QUIT)
@@ -311,15 +362,22 @@ void CRenderDevice::Run()
     // Start all threads
     mt_bMustExit = FALSE;
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
+    //thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
-    GlobalEnv.Render->ClearTarget();
+    GEnv.Render->ClearTarget();
+    splash::hide();
+    ShowWindow(m_hWnd, SW_SHOWNORMAL);
+    pInput->ClipCursor(true);
     message_loop();
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
+    //renderProcessFrame.Set();
+    //renderThreadExit.Wait();
     syncProcessFrame.Set();
     syncThreadExit.Wait();
+
     while (mt_bMustExit)
         Sleep(0);
 }
@@ -384,78 +442,77 @@ ENGINE_API BOOL bShowPauseString = TRUE;
 void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 {
     static int snd_emitters_ = -1;
-    if (g_bBenchmark)
+    if (g_bBenchmark || GEnv.isDedicatedServer)
         return;
-#ifndef DEDICATED_SERVER
+
     if (bOn)
     {
         if (!Paused())
             bShowPauseString =
-#ifdef INGAME_EDITOR
                 editor() ? FALSE :
-#endif // #ifdef INGAME_EDITOR
 #ifdef DEBUG
                            !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
 #endif // DEBUG
                                                                         TRUE;
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
         {
-            g_pauseMngr()->Pause(TRUE);
+            g_pauseMngr().Pause(TRUE);
 #ifdef DEBUG
             if (!xr_strcmp(reason, "li_pause_key_no_clip"))
                 TimerGlobal.Pause(FALSE);
 #endif
         }
-        if (bSound && ::Sound)
-            snd_emitters_ = ::Sound->pause_emitters(true);
+        if (bSound && GEnv.Sound)
+            snd_emitters_ = GEnv.Sound->pause_emitters(true);
     }
     else
     {
-        if (bTimer && g_pauseMngr()->Paused())
+        if (bTimer && g_pauseMngr().Paused())
         {
             fTimeDelta = EPS_S + EPS_S;
-            g_pauseMngr()->Pause(FALSE);
+            g_pauseMngr().Pause(FALSE);
         }
         if (bSound)
         {
             if (snd_emitters_ > 0) // avoid crash
-                snd_emitters_ = ::Sound->pause_emitters(false);
+                snd_emitters_ = GEnv.Sound->pause_emitters(false);
             else
             {
 #ifdef DEBUG
-                Log("Sound->pause_emitters underflow");
+                Log("GEnv.Sound->pause_emitters underflow");
 #endif
             }
         }
     }
-#endif
 }
 
-BOOL CRenderDevice::Paused() { return g_pauseMngr()->Paused(); }
-void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
+BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
+void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
     u16 fActive = LOWORD(wParam);
-    BOOL fMinimized = (BOOL)HIWORD(wParam);
-    BOOL bActive = ((fActive != WA_INACTIVE) && (!fMinimized)) ? TRUE : FALSE;
-    if (bActive != Device.b_is_Active)
+    const BOOL fMinimized = (BOOL)HIWORD(wParam);
+
+    const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
+    if (!editor() && !GEnv.isDedicatedServer && isWndActive)
+        pInput->ClipCursor(true);
+    else
+        pInput->ClipCursor(false);
+
+    extern int ps_always_active;
+    const BOOL isGameActive = ps_always_active || isWndActive;
+
+    if (isGameActive != Device.b_is_Active)
     {
-        Device.b_is_Active = bActive;
+        Device.b_is_Active = isGameActive;
         if (Device.b_is_Active)
         {
             Device.seqAppActivate.Process(rp_AppActivate);
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
-#ifndef DEDICATED_SERVER
-#ifdef INGAME_EDITOR
-            if (!editor())
-#endif // #ifdef INGAME_EDITOR
-                ShowCursor(FALSE);
-#endif // #ifndef DEDICATED_SERVER
         }
         else
         {
             app_inactive_time_start = TimerMM.GetElapsed_ms();
             Device.seqAppDeactivate.Process(rp_AppDeactivate);
-            ShowCursor(TRUE);
         }
     }
 }
@@ -477,13 +534,20 @@ void CRenderDevice::RemoveSeqFrame(pureFrame* f)
 CRenderDevice* get_device() { return &Device; }
 u32 script_time_global() { return Device.dwTimeGlobal; }
 u32 script_time_global_async() { return Device.TimerAsync_MMT(); }
-SCRIPT_EXPORT(Device, (), {
+
+SCRIPT_EXPORT(Device, (),
+{
     using namespace luabind;
-    module(luaState)[def("time_global", &script_time_global), def("time_global_async", &script_time_global_async),
-        def("device", &get_device), def("is_enough_address_space_available", &is_enough_address_space_available)];
+    module(luaState)
+    [
+        def("time_global", &script_time_global),
+        def("time_global_async", &script_time_global_async),
+        def("device", &get_device),
+        def("is_enough_address_space_available", &is_enough_address_space_available)
+    ];
 });
 
-CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false) {}
+CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}
 void CLoadScreenRenderer::start(bool b_user_input)
 {
     Device.seqRender.Add(this, 0);
@@ -502,3 +566,8 @@ void CLoadScreenRenderer::stop()
 }
 
 void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(); }
+
+bool CRenderDevice::CSecondVPParams::IsSVPFrame() //--#SM+#-- +SecondVP+
+{
+    return IsSVPActive() && Device.dwFrame % frameDelay == 0;
+}

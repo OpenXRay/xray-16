@@ -1,50 +1,49 @@
 #include "stdafx.h"
-#include "resource.h"
-#ifdef INGAME_EDITOR
+#include "xr_3da/resource.h"
+
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
-#endif
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
-
 #include "xrCore/ModuleLookup.hpp"
 
 extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-#ifdef INGAME_EDITOR
-void CRenderDevice::initialize_editor()
+void CRenderDevice::initialize_weather_editor()
 {
-    m_editor_module = XRay::LoadLibrary("xrWeatherEditor");
-    if (!m_editor_module)
-    {
-        Msg("! cannot load library \"xrWeatherEditor\"");
+    m_editor_module = XRay::LoadModule("xrWeatherEditor");
+    if (!m_editor_module->exist())
         return;
-    }
-    m_editor_initialize = (initialize_function_ptr)XRay::GetProcAddress(m_editor_module, "initialize");
+
+    m_editor_initialize = (initialize_function_ptr)m_editor_module->getProcAddress("initialize");
     VERIFY(m_editor_initialize);
-    m_editor_finalize = (finalize_function_ptr)XRay::GetProcAddress(m_editor_module, "finalize");
+
+    m_editor_finalize = (finalize_function_ptr)m_editor_module->getProcAddress("finalize");
     VERIFY(m_editor_finalize);
+
     m_engine = new engine_impl();
     m_editor_initialize(m_editor, m_engine);
     VERIFY(m_editor);
+
     m_hWnd = m_editor->view_handle();
     VERIFY(m_hWnd != INVALID_HANDLE_VALUE);
+
+    GEnv.isEditor = true;
 }
-#endif // #ifdef INGAME_EDITOR
 
 void CRenderDevice::Initialize()
 {
     Log("Initializing Engine...");
     TimerGlobal.Start();
     TimerMM.Start();
-#ifdef INGAME_EDITOR
-    if (strstr(Core.Params, "-editor"))
-        initialize_editor();
-#endif
+
+    if (strstr(Core.Params, "-weather"))
+        initialize_weather_editor();
+
     // Unless a substitute hWnd has been specified, create a window to render into
     if (!m_hWnd)
     {
-        const char* wndclass = "_XRAY_1.5";
+        const char* wndclass = "_XRAY_1.6";
         // Register the windows class
         HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
         WNDCLASS wndClass = {0, WndProc, 0, 0, hInstance, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)),

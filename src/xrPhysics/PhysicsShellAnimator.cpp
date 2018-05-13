@@ -24,9 +24,8 @@ CPhysicsShellAnimator::CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CIni
     }
 
     if (all_bones)
-        for (xr_vector<CPHElement*>::iterator i = m_pPhysicsShell->Elements().begin();
-             i != m_pPhysicsShell->Elements().end(); i++)
-            CreateJoint(*i);
+        for (auto& it : m_pPhysicsShell->Elements())
+            CreateJoint(it);
 
     if (ini->line_exist(section, "leave_joints") && xr_strcmp(ini->r_string(section, "leave_joints"), "all") == 0)
         return;
@@ -39,10 +38,10 @@ CPhysicsShellAnimator::CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CIni
 
 CPhysicsShellAnimator::~CPhysicsShellAnimator()
 {
-    for (xr_vector<CPhysicsShellAnimatorBoneData>::iterator i = m_bones_data.begin(); i != m_bones_data.end(); i++)
+    for (auto& it : m_bones_data)
     {
-        ((CPHShell*)(m_pPhysicsShell))->Island().DActiveIsland()->RemoveJoint(i->m_anim_fixed_dJointID);
-        dJointDestroy(i->m_anim_fixed_dJointID);
+        ((CPHShell*)(m_pPhysicsShell))->Island().DActiveIsland()->RemoveJoint(it.m_anim_fixed_dJointID);
+        dJointDestroy(it.m_anim_fixed_dJointID);
     }
 }
 void CPhysicsShellAnimator::CreateJoints(LPCSTR controled)
@@ -80,17 +79,17 @@ void CPhysicsShellAnimator::OnFrame()
 {
     m_pPhysicsShell->Enable();
 
-    for (xr_vector<CPhysicsShellAnimatorBoneData>::iterator i = m_bones_data.begin(); i != m_bones_data.end(); i++)
+    for (auto it : m_bones_data)
     {
         Fmatrix target_obj_posFmatrixS;
-        CBoneInstance& B = m_pPhysicsShell->PKinematics()->LL_GetBoneInstance(i->m_element->m_SelfID);
+        CBoneInstance& B = m_pPhysicsShell->PKinematics()->LL_GetBoneInstance(it.m_element->m_SelfID);
 // B.Callback_overwrite = FALSE;
 // B.Callback = 0;
 #pragma todo("reset callback?")
-        B.set_callback(B.callback_type(), 0, B.callback_param(), FALSE);
+        B.set_callback(B.callback_type(), nullptr, B.callback_param(), false);
 
         m_pPhysicsShell->PKinematics()->CalculateBones_Invalidate();
-        m_pPhysicsShell->PKinematics()->CalculateBones(TRUE);
+        m_pPhysicsShell->PKinematics()->CalculateBones(true);
 
         target_obj_posFmatrixS.mul_43(m_StartXFORM, B.mTransform);
         dQuaternion target_obj_quat_dQuaternionS;
@@ -98,8 +97,8 @@ void CPhysicsShellAnimator::OnFrame()
         PHDynamicData::FMXtoDMX(target_obj_posFmatrixS, ph_mat);
         dQfromR(target_obj_quat_dQuaternionS, ph_mat);
         Fvector mc;
-        i->m_element->CPHGeometryOwner::get_mc_vs_transform(mc, target_obj_posFmatrixS);
-        dJointSetFixedQuaternionPos(i->m_anim_fixed_dJointID, target_obj_quat_dQuaternionS, &mc.x);
+        it.m_element->CPHGeometryOwner::get_mc_vs_transform(mc, target_obj_posFmatrixS);
+        dJointSetFixedQuaternionPos(it.m_anim_fixed_dJointID, target_obj_quat_dQuaternionS, &mc.x);
     }
     //(*(m_pPhysicsShell->Elements().begin()))->PhysicsRefObject()->XFORM().set(m_pPhysicsShell->mXFORM);
 }

@@ -13,6 +13,7 @@
 #include "UICursor.h"
 #include "string_table.h"
 #include "game_cl_base.h"
+#include "xrEngine/GameFont.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -60,7 +61,7 @@ void CFontManager::InitializeFonts()
 
 LPCSTR CFontManager::GetFontTexName(LPCSTR section)
 {
-    static char* tex_names[] = {"texture800", "texture", "texture1600"};
+    constexpr pcstr tex_names[] = { "texture800", "texture", "texture1600" };
     int def_idx = 1; // default 1024x768
     int idx = def_idx;
 #if 0
@@ -152,8 +153,6 @@ void CHUDManager::OnFrame()
 }
 //--------------------------------------------------------------------
 
-ENGINE_API extern float psHUD_FOV;
-
 void CHUDManager::Render_First()
 {
     if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))
@@ -170,10 +169,10 @@ void CHUDManager::Render_First()
         return;
 
     // only shadow
-    GlobalEnv.Render->set_Invisible(TRUE);
-    GlobalEnv.Render->set_Object(O->H_Root());
+    GEnv.Render->set_Invisible(TRUE);
+    GEnv.Render->set_Object(O->H_Root());
     O->renderable_Render();
-    GlobalEnv.Render->set_Invisible(FALSE);
+    GEnv.Render->set_Invisible(FALSE);
 }
 
 bool need_render_hud()
@@ -204,10 +203,27 @@ void CHUDManager::Render_Last()
 
     IGameObject* O = g_pGameLevel->CurrentViewEntity();
     // hud itself
-    GlobalEnv.Render->set_HUD(TRUE);
-    GlobalEnv.Render->set_Object(O->H_Root());
+    GEnv.Render->set_HUD(TRUE);
+    GEnv.Render->set_Object(O->H_Root());
     O->OnHUDDraw(this);
-    GlobalEnv.Render->set_HUD(FALSE);
+    GEnv.Render->set_HUD(FALSE);
+}
+
+void CHUDManager::Render_Actor_Shadow() // added by KD
+{
+    if (pUIGame == nullptr) return;
+
+    auto object = g_pGameLevel->CurrentViewEntity();
+    if (object == nullptr) return;
+
+    auto actor = smart_cast<CActor*>(object);
+    if (!actor) return;
+
+    // KD: we need to render actor shadow only in first eye cam mode because
+    // in other modes actor model already in scene graph and renders well
+    if (actor->active_cam() != eacFirstEye) return;
+    GEnv.Render->set_Object(object->H_Root());
+    object->renderable_Render();
 }
 
 #include "player_hud.h"

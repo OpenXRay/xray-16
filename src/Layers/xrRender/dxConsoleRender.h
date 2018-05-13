@@ -13,7 +13,7 @@ public:
     virtual void OnRender(bool bGame);
 
 private:
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     ref_shader m_Shader;
     ref_geom m_Geom;
 #endif

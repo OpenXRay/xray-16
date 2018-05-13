@@ -1,7 +1,7 @@
 #pragma once
 
-#include "uiwindow.h"
-#include "uibutton.h"
+#include "UIWindow.h"
+#include "UIButton.h"
 
 class CUIProgressBar : public CUIWindow
 {
@@ -32,10 +32,12 @@ protected:
 
 public:
     bool m_bUseColor;
+    bool m_bUseGradient; //Alundaio: if false then use only solid color with m_maxColor
     Fcolor m_minColor;
     Fcolor m_middleColor;
     Fcolor m_maxColor;
     float m_inertion; //
+
 public:
     CUIStatic m_UIProgressItem;
     CUIStatic m_UIBackgroundItem;

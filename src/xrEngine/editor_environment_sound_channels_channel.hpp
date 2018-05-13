@@ -5,21 +5,15 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment sound channels channel class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED
-#define EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "property_collection_forward.hpp"
 #include "Environment.h"
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace sound_channels
@@ -27,30 +21,29 @@ namespace sound_channels
 class source;
 class manager;
 
-class channel : public CEnvAmbient::SSndChannel, public editor::property_holder_holder, private Noncopyable
+class channel : public CEnvAmbient::SSndChannel, public XRay::Editor::property_holder_holder, private Noncopyable
 {
-private:
-    typedef CEnvAmbient::SSndChannel inherited;
+    using inherited = CEnvAmbient::SSndChannel;
 
 public:
     channel(manager const& manager, shared_str const& id);
     virtual ~channel();
     void load(CInifile& config);
     void save(CInifile& config);
-    void fill(editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_load_section.c_str(); }
+    void fill(XRay::Editor::property_holder_collection* collection);
+    inline pcstr id() const { return m_load_section.c_str(); }
     virtual sounds_type& sounds();
 
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 public:
-    typedef xr_vector<source*> sound_container_type;
+    using sound_container_type = xr_vector<source*>;
 
 private:
-    typedef editor::property_holder property_holder_type;
-    typedef property_collection<sound_container_type, channel> collection_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
+    using collection_type = property_collection<sound_container_type, channel>;
 
 public:
     virtual property_holder_type* object();
@@ -64,7 +57,3 @@ private:
 } // namespace sound_channels
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED

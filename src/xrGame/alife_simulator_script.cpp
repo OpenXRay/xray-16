@@ -20,6 +20,7 @@
 #include "xrServer.h"
 #include "Level.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrNetServer/NET_Messages.h"
 
 using namespace luabind;
 
@@ -43,7 +44,6 @@ bool valid_object_id(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
     return (object_id != 0xffff);
 }
 
-#ifdef DEBUG
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
 {
     VERIFY(self);
@@ -58,7 +58,6 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
 
     return (0);
 }
-#endif // #ifdef DEBUG
 
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID id, bool no_assert)
 {
@@ -306,15 +305,12 @@ bool dont_has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPC
     return (!has_info(self, id, info_id));
 }
 
-// void disable_info_portion						(const CALifeSimulator *self, const ALife::_OBJECT_ID &id)
-//{
-//	THROW								(self);
-//}
-
-// void give_info_portion							(const CALifeSimulator *self, const ALife::_OBJECT_ID &id)
-//{
-//	THROW								(self);
-//}
+//Alundaio: teleport object
+void teleport_object(CALifeSimulator* alife, ALife::_OBJECT_ID id, GameGraph::_GRAPH_ID game_vertex_id, u32 level_vertex_id, const Fvector& position)
+{
+    alife->teleport_object(id, game_vertex_id, level_vertex_id, position);
+}
+//-Alundaio
 
 SCRIPT_EXPORT(CALifeSimulator, (), {
     module(luaState)[class_<CALifeSimulator>("alife_simulator")
@@ -325,6 +321,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                              (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
                          .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
                                             alife_object))
+	                     .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
                          .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(
                                                   alife_story_object))
                          .def("set_switch_online",
@@ -351,7 +348,10 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          .def("has_info", &has_info)
                          .def("dont_has_info", &dont_has_info)
                          .def("switch_distance", &CALifeSimulator::switch_distance)
-                         .def("switch_distance", &CALifeSimulator::set_switch_distance)
+                         .def("set_switch_distance", &CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
+                         //Alundaio: extend alife simulator exports
+                         .def("teleport_object", &teleport_object)
+                         //Alundaio: END
 
                          ,
         def("alife", &alife)];

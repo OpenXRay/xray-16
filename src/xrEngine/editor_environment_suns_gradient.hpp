@@ -5,19 +5,21 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment suns gradient class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_SUNS_GRADIENT_HPP_INCLUDED
-#define EDITOR_WEATHER_SUNS_GRADIENT_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 
+namespace XRay
+{
+namespace Editor
+{
+class property_holder_base;
+class property_holder_collection;
+}
+}
+
 namespace editor
 {
-class property_holder;
-class property_holder_collection;
-
 namespace environment
 {
 namespace suns
@@ -30,7 +32,7 @@ public:
     gradient();
     void load(CInifile& config, shared_str const& section);
     void save(CInifile& config, shared_str const& section);
-    void fill(manager const& manager, editor::property_holder* holder, editor::property_holder_collection* collection);
+    void fill(manager const& manager, XRay::Editor::property_holder_base* holder, XRay::Editor::property_holder_collection* collection);
 
 private:
     bool xr_stdcall use_getter();
@@ -48,6 +50,3 @@ private:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_SUNS_GRADIENT_HPP_INCLUDED

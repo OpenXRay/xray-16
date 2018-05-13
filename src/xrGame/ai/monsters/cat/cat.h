@@ -20,5 +20,5 @@ public:
 
     virtual void HitEntityInJump(const CEntity* pEntity);
 
-    virtual char* get_monster_class_name() { return "cat"; }
+    pcstr get_monster_class_name() override { return "cat"; }
 };

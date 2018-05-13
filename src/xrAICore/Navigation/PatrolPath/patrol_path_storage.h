@@ -7,16 +7,15 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "Common/object_interfaces.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
+#include "xrScriptEngine/DebugMacros.hpp"
+#include "xrCore/xrstring.h"
 
 class CPatrolPath;
 class CLevelGraph;
 class CGameLevelCrossTable;
 class CGameGraph;
-
-#include "xrAICore/xrAICore.hpp"
-#include "Common/object_interfaces.h"
-#include "xrCore/Containers/AssociativeVector.hpp"
-#include "xrScriptEngine/DebugMacros.hpp"
 
 class XRAICORE_API CPatrolPathStorage : public ISerializable
 {

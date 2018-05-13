@@ -47,7 +47,7 @@ void CCF_Skeleton::SElement::center(Fvector& center) const
 bool pred_find_elem(const CCF_Skeleton::SElement& E, u16 elem) { return E.elem_id < elem; }
 bool CCF_Skeleton::_ElementCenter(u16 elem_id, Fvector& e_center)
 {
-    ElementVecIt it = std::lower_bound(elements.begin(), elements.end(), elem_id, pred_find_elem);
+    auto it = std::lower_bound(elements.begin(), elements.end(), elem_id, pred_find_elem);
     if (it->elem_id == elem_id)
     {
         it->center(e_center);
@@ -116,7 +116,7 @@ void CCF_Skeleton::BuildState()
     if (vis_mask != K->LL_GetBonesVisible())
     {
         vis_mask = K->LL_GetBonesVisible();
-        elements.clear_not_free();
+        elements.clear();
         bv_box.set(pVisual->getVisData().box);
         bv_box.getsphere(bv_sphere.P, bv_sphere.R);
         for (u16 i = 0; i < K->LL_BoneCount(); i++)
@@ -132,7 +132,7 @@ void CCF_Skeleton::BuildState()
         }
     }
 
-    for (ElementVecIt I = elements.begin(); I != elements.end(); I++)
+    for (auto I = elements.begin(); I != elements.end(); I++)
     {
         if (!I->valid())
             continue;
@@ -201,8 +201,8 @@ void CCF_Skeleton::BuildTopLevel()
     IRenderVisual* K = owner->Visual();
     vis_data& vis = K->getVisData();
     Fbox& B = vis.box;
-    bv_box.min.average(B.min);
-    bv_box.max.average(B.max);
+    bv_box.vMin.average(B.vMin);
+    bv_box.vMax.average(B.vMax);
     bv_box.grow(0.05f);
     bv_sphere.P.average(vis.sphere.P);
     bv_sphere.R += vis.sphere.R;
@@ -223,8 +223,8 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
     float tgt_dist = Q.range;
     float aft[2];
     int quant;
-    Fsphere::ERP_Result res = w_bv_sphere.intersect(Q.start, Q.dir, tgt_dist, quant, aft);
-    if ((Fsphere::rpNone == res) || ((Fsphere::rpOriginOutside == res) && (aft[0] > tgt_dist)))
+    Fsphere::ERP_Result res1 = w_bv_sphere.intersect(Q.start, Q.dir, tgt_dist, quant, aft);
+    if ((Fsphere::rpNone == res1) || ((Fsphere::rpOriginOutside == res1) && (aft[0] > tgt_dist)))
         return FALSE;
 
     if (dwFrame != Device.dwFrame)
@@ -241,7 +241,7 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
     }
 
     BOOL bHIT = FALSE;
-    for (ElementVecIt I = elements.begin(); I != elements.end(); I++)
+    for (auto I = elements.begin(); I != elements.end(); I++)
     {
         if (!I->valid())
             continue;
@@ -292,7 +292,7 @@ CCF_EventBox::CCF_EventBox(IGameObject* O) : ICollisionForm(O, cftShape)
     }
     bv_box.set(-.5f, -.5f, -.5f, +.5f, +.5f, +.5f);
     Fvector R;
-    R.set(bv_box.min);
+    R.set(bv_box.vMin);
     T.transform_dir(R);
     bv_sphere.R = R.magnitude();
 

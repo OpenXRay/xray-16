@@ -13,7 +13,7 @@ CHitImmunity::CHitImmunity()
 }
 
 CHitImmunity::~CHitImmunity() {}
-void CHitImmunity::LoadImmunities(LPCSTR imm_sect, CInifile const* ini)
+void CHitImmunity::LoadImmunities(const char* imm_sect, const CInifile* ini)
 {
     R_ASSERT2(ini->section_exist(imm_sect), imm_sect);
 
@@ -31,7 +31,7 @@ void CHitImmunity::LoadImmunities(LPCSTR imm_sect, CInifile const* ini)
     m_HitImmunityKoefs[ALife::eHitTypeLightBurn] = m_HitImmunityKoefs[ALife::eHitTypeBurn];
 }
 
-void CHitImmunity::AddImmunities(LPCSTR imm_sect, CInifile const* ini)
+void CHitImmunity::AddImmunities(const char* imm_sect, const CInifile* ini)
 {
     R_ASSERT2(ini->section_exist(imm_sect), imm_sect);
 

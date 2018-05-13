@@ -26,11 +26,7 @@ float stop_vibration_time = flt_max;
 static bool g_exclusive = true;
 static void on_error_dialog(bool before)
 {
-#ifdef INGAME_EDITOR
-    if (Device.editor())
-        return;
-#endif // #ifdef INGAME_EDITOR
-    if (!pInput || !g_exclusive)
+    if (!pInput || !g_exclusive || Device.editor())
         return;
 
     if (before)
@@ -134,9 +130,7 @@ HRESULT CInput::CreateInputDevice(
 
 // Set the cooperativity level to let DirectInput know how this device
 // should interact with the system and with other DirectInput applications.
-#ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif // #ifdef INGAME_EDITOR
     {
         HRESULT _hr = (*device)->SetCooperativeLevel(RDEVICE.m_hWnd, dwFlags);
         if (FAILED(_hr) && (_hr == E_NOTIMPL))
@@ -351,19 +345,15 @@ BOOL CInput::iGetAsyncKeyState(int dik)
 BOOL CInput::iGetAsyncBtnState(int btn) { return !!mouseState[btn]; }
 void CInput::ClipCursor(bool clip)
 {
-    HWND hwnd = Device.m_hWnd;
-    if (hwnd)
+    if (clip)
     {
-        if (clip)
-        {
-            RECT clientRect;
-            ::GetClientRect(hwnd, &clientRect);
-            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.left);
-            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.right);
-            ::ClipCursor(&clientRect);
-        }
-        else
-            ::ClipCursor(nullptr);
+        ::ClipCursor(&Device.m_rcWindowClient);
+        while (ShowCursor(FALSE) >= 0) {}
+    }
+    else
+    {
+        ::ClipCursor(nullptr);
+        while (ShowCursor(TRUE) <= 0) {}
     }
 }
 
@@ -517,20 +507,42 @@ void CInput::MouseUpdate()
         }
     }
 
-    if (mouseState[0] && mouse_prev[0])
-    {
-        cbStack.back()->IR_OnMouseHold(0);
-    }
+    // Giperion: double check mouse buttons state
+    DIMOUSESTATE2 MouseState;
+    hr = pMouse->GetDeviceState(sizeof(MouseState), &MouseState);
 
-    if (mouseState[1] && mouse_prev[1])
+    auto RecheckMouseButtonFunc = [&](int i)
     {
-        cbStack.back()->IR_OnMouseHold(1);
-    }
+        if (MouseState.rgbButtons[i] & 0x80 && mouseState[i] == FALSE)
+        {
+            mouseState[i] = TRUE;
+            cbStack.back()->IR_OnMousePress(i);
+        }
+        else if (!(MouseState.rgbButtons[i] & 0x80) && mouseState[i] == TRUE)
+        {
+            mouseState[i] = FALSE;
+            cbStack.back()->IR_OnMouseRelease(i);
+        }
+    };
 
-    if (mouseState[2] && mouse_prev[2])
+    if (hr == S_OK)
     {
-        cbStack.back()->IR_OnMouseHold(2);
+        RecheckMouseButtonFunc(0);
+        RecheckMouseButtonFunc(1);
+        RecheckMouseButtonFunc(2);
     }
+    //-Giperion
+
+    auto isButtonOnHold = [&](int i)
+    {
+        if (mouseState[i] && mouse_prev[i])
+            cbStack.back()->IR_OnMouseHold(i);
+    };
+
+    isButtonOnHold(0);
+    isButtonOnHold(1);
+    isButtonOnHold(2);
+
     if (dwElements)
     {
         if (offs[0] || offs[1])
@@ -648,17 +660,13 @@ void CInput::unacquire()
 void CInput::acquire(const bool& exclusive)
 {
     pKeyboard->SetCooperativeLevel(
-#ifdef INGAME_EDITOR
         Device.editor() ? Device.editor()->main_handle() :
-#endif // #ifdef INGAME_EDITOR
                           RDEVICE.m_hWnd,
         (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND);
     pKeyboard->Acquire();
 
     pMouse->SetCooperativeLevel(
-#ifdef INGAME_EDITOR
         Device.editor() ? Device.editor()->main_handle() :
-#endif // #ifdef INGAME_EDITOR
                           RDEVICE.m_hWnd,
         (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY);
     pMouse->Acquire();

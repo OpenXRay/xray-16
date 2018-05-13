@@ -10,7 +10,7 @@
 #include "ai/monsters/control_path_builder_base.h"
 
 // DEBUG purpose only
-char* dbg_anim_name_table[] = {"eAnimStandIdle", "eAnimStandTurnLeft", "eAnimStandTurnRight",
+constexpr pcstr dbg_anim_name_table[] = {"eAnimStandIdle", "eAnimStandTurnLeft", "eAnimStandTurnRight",
 
     "eAnimSitIdle", "eAnimLieIdle",
 

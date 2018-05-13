@@ -15,15 +15,15 @@
 #include "CustomHUD.h"
 #endif
 
-#ifdef _EDITOR
-bool g_dedicated_server = false;
-#endif
-
-#ifdef INGAME_EDITOR
 #include "editor_environment_manager.hpp"
-#endif // INGAME_EDITOR
 
-ENGINE_API IGame_Persistent* g_pGamePersistent = NULL;
+ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
+
+//ECO_RENDER add
+bool IGame_Persistent::IsMainMenuActive()
+{
+    return g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
+}
 
 IGame_Persistent::IGame_Persistent()
 {
@@ -33,18 +33,14 @@ IGame_Persistent::IGame_Persistent()
     RDEVICE.seqAppActivate.Add(this);
     RDEVICE.seqAppDeactivate.Add(this);
 
-    m_pMainMenu = NULL;
+    m_pMainMenu = nullptr;
 
-#ifndef INGAME_EDITOR
-#ifndef _EDITOR
-    pEnvironment = new CEnvironment();
-#endif
-#else // #ifdef INGAME_EDITOR
     if (RDEVICE.editor())
         pEnvironment = new editor::environment::manager();
     else
         pEnvironment = new CEnvironment();
-#endif // #ifdef INGAME_EDITOR
+
+    m_pGShaderConstants = new ShadersExternalData(); //--#SM+#--
 }
 
 IGame_Persistent::~IGame_Persistent()
@@ -57,6 +53,8 @@ IGame_Persistent::~IGame_Persistent()
 #ifndef _EDITOR
     xr_delete(pEnvironment);
 #endif
+
+    xr_delete(m_pGShaderConstants); //--#SM+#--
 }
 
 void IGame_Persistent::OnAppActivate() {}
@@ -129,7 +127,7 @@ void IGame_Persistent::Disconnect()
 void IGame_Persistent::OnGameStart()
 {
 #ifndef _EDITOR
-    // LoadTitle("st_prefetching_objects");
+    SetLoadStageTitle("st_prefetching_objects");
     LoadTitle();
     if (!strstr(Core.Params, "-noprefetch"))
         Prefetch();
@@ -146,8 +144,9 @@ void IGame_Persistent::Prefetch()
     Log("Loading objects...");
     ObjectPool.prefetch();
     Log("Loading models...");
-    GlobalEnv.Render->models_Prefetch();
-    GlobalEnv.Render->ResourcesDeferredUpload();
+    GEnv.Render->models_Prefetch();
+    Log("Loading textures...");
+    GEnv.Render->ResourcesDeferredUpload();
 
     p_time = 1000.f * Device.GetTimerGlobal()->GetElapsed_sec() - p_time;
     u32 p_mem = Memory.mem_usage() - mem_0;
@@ -161,7 +160,7 @@ void IGame_Persistent::OnGameEnd()
 {
 #ifndef _EDITOR
     ObjectPool.clear();
-    GlobalEnv.Render->models_Clear(TRUE);
+    GEnv.Render->models_Clear(TRUE);
 #endif
 }
 
@@ -241,7 +240,7 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
 void IGame_Persistent::OnAssetsChanged()
 {
 #ifndef _EDITOR
-    GlobalEnv.Render->OnAssetsChanged();
+    GEnv.Render->OnAssetsChanged();
 #endif
 }
 

@@ -1,9 +1,8 @@
-#ifndef SoundRender_EmitterH
-#define SoundRender_EmitterH
 #pragma once
 
-#include "soundrender.h"
-#include "soundrender_environment.h"
+#include "SoundRender.h"
+#include "SoundRender_Environment.h"
+#include "xrCore/_std_extensions.h"
 
 class CSoundRender_Emitter : public CSound_emitter
 {
@@ -35,7 +34,7 @@ public:
 #endif
 
     CSoundRender_Target* target;
-    IC CSoundRender_Source* source() { return (CSoundRender_Source*)owner_data->handle; };
+    CSoundRender_Source* source() { return (CSoundRender_Source*)owner_data->handle; };
     ref_sound_data_ptr owner_data;
 
     u32 get_bytes_total() const;
@@ -55,10 +54,10 @@ public:
     CSoundRender_Environment e_target;
 
     int iPaused;
-    BOOL bMoved;
-    BOOL b2D;
-    BOOL bStopping;
-    BOOL bRewind;
+    bool bMoved;
+    bool b2D;
+    bool bStopping;
+    bool bRewind;
     float fTimeStarted; // time of "Start"
     float fTimeToStop; // time to "Stop"
     float fTimeToPropagade;
@@ -73,46 +72,49 @@ public:
 public:
     void Event_Propagade();
     void Event_ReleaseOwner();
-    BOOL isPlaying(void) { return m_current_state != stStopped; }
-    virtual BOOL is_2D() { return b2D; }
-    virtual void switch_to_2D();
-    virtual void switch_to_3D();
-    virtual void set_position(const Fvector& pos);
-    virtual void set_frequency(float scale)
+    bool isPlaying() { return m_current_state != stStopped; }
+    bool is_2D() override { return b2D; }
+    void switch_to_2D() override;
+    void switch_to_3D() override;
+    void set_position(const Fvector& pos) override;
+
+    void set_frequency(float scale) override
     {
         VERIFY(_valid(scale));
         p_source.freq = scale;
     }
-    virtual void set_range(float min, float max)
+
+    void set_range(float min, float max) override
     {
         VERIFY(_valid(min) && _valid(max));
         p_source.min_distance = min;
         p_source.max_distance = max;
     }
-    virtual void set_volume(float vol)
+
+    void set_volume(float vol) override
     {
         if (!_valid(vol))
             vol = 0.0f;
         p_source.volume = vol;
     }
-    virtual void set_priority(float p) { priority_scale = p; }
-    virtual const CSound_params* get_params() { return &p_source; }
+
+    void set_priority(float p) override { priority_scale = p; }
+    const CSound_params* get_params() override { return &p_source; }
     void fill_block(void* ptr, u32 size);
     void fill_data(u8* ptr, u32 offset, u32 size);
 
     float priority();
-    void start(ref_sound* _owner, BOOL _loop, float delay);
+    void start(ref_sound* _owner, bool _loop, float delay);
     void cancel(); // manager forces out of rendering
     void update(float dt);
-    BOOL update_culling(float dt);
+    bool update_culling(float dt);
     void update_environment(float dt);
     void rewind();
-    virtual void stop(BOOL bDeffered);
-    void pause(BOOL bVal, int id);
+    void stop(bool isDeffered) override;
+    void pause(bool bVal, int id);
 
-    virtual u32 play_time();
+    u32 play_time() override;
 
     CSoundRender_Emitter();
     ~CSoundRender_Emitter();
 };
-#endif

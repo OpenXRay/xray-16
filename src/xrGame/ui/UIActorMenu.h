@@ -88,6 +88,7 @@ protected:
     CUICellItem* m_InfoCellItem;
     u32 m_InfoCellItem_timer;
     CUICellItem* m_pCurrentCellItem;
+
     CUICellItem* m_upgrade_selected;
     CUIPropertiesBox* m_UIPropertiesBox;
 
@@ -203,6 +204,7 @@ private:
     void PropertiesBoxForPlaying(PIItem item, bool& b_show);
     void PropertiesBoxForDrop(CUICellItem* cell_item, PIItem item, bool& b_show);
     void PropertiesBoxForRepair(PIItem item, bool& b_show);
+    void PropertiesBoxForDonate(PIItem item, bool& b_show); //Alundaio
 
 private:
     void clear_highlight_lists();
@@ -224,7 +226,11 @@ protected:
     void BindDragDropListEvents(CUIDragDropListEx* lst);
 
     EDDListType GetListType(CUIDragDropListEx* l);
-    CUIDragDropListEx* GetListByType(EDDListType t);
+
+public:
+    CUIDragDropListEx* GetListByType(EDDListType t); //Alundaio: Made public
+
+protected:
     CUIDragDropListEx* GetSlotList(u16 slot_idx);
     bool CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_slot);
 
@@ -250,13 +256,17 @@ protected:
     void InitUpgradeMode();
     void DeInitUpgradeMode();
     void InitDeadBodySearchMode();
-    void DeInitDeadBodySearchMode();
+    void DeInitDeadBodySearchMode() const;
 
     void CurModeToScript();
     void RepairEffect_CurItem();
 
+public:
+    //Alundaio: Made public
     void SetCurrentItem(CUICellItem* itm);
     CUICellItem* CurrentItem();
+
+protected:
     PIItem CurrentIItem();
 
     void InfoCurItem(CUICellItem* cell_item); // on update item
@@ -350,4 +360,7 @@ public:
     void UpdateConditionProgressBars();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
+
+    void RefreshCurrentItemCell();
+    void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu
 }; // class CUIActorMenu

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include <dinput.h>
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "entity_alive.h"
 #include "game_sv_single.h"
 #include "alife_simulator.h"
 #include "alife_simulator_header.h"
 #include "xrAICore/Navigation/level_graph.h"
-#include "xrEngine/fdemorecord.h"
+#include "xrEngine/FDemoRecord.h"
 #include "Level.h"
 #include "xr_level_controller.h"
 #include "game_cl_base.h"
@@ -14,13 +14,16 @@
 #include "Inventory.h"
 #include "xrServer.h"
 #include "autosave_manager.h"
+#include "script_callback_ex.h"
 
-#include "actor.h"
-#include "huditem.h"
+#include "Actor.h"
+#include "HudItem.h"
 #include "UIGameCustom.h"
 #include "UI/UIDialogWnd.h"
 #include "xrEngine/xr_input.h"
+#include "xrEngine/xr_object.h"
 #include "saved_game_wrapper.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "Include/xrRender/DebugRender.h"
 
@@ -46,6 +49,12 @@ void CLevel::IR_OnMouseWheel(int direction)
     if (g_bDisableAllInput)
         return;
 
+#ifdef INPUT_CALLBACKS
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eMouseWheel)(direction);
+    /* avo: end */
+#endif
     if (CurrentGameUI()->IR_UIOnMouseWheel(direction))
         return;
     if (Device.Paused()
@@ -72,6 +81,14 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 {
     if (g_bDisableAllInput)
         return;
+
+#ifdef INPUT_CALLBACKS
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eMouseMove)(dx, dy);
+    /* avo: end */
+#endif
+
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
         return;
     if (Device.Paused() && !IsDemoPlay()
@@ -103,21 +120,24 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (Device.dwPrecacheFrame)
         return;
 
-#ifdef INGAME_EDITOR
     if (Device.editor() && (pInput->iGetAsyncKeyState(DIK_LALT) || pInput->iGetAsyncKeyState(DIK_RALT)))
         return;
-#endif // #ifdef INGAME_EDITOR
 
-    bool b_ui_exist = (!!CurrentGameUI());
+    bool b_ui_exist = !!CurrentGameUI();
 
     EGameActions _curr = get_binded_action(key);
 
+#ifdef INPUT_CALLBACKS
+    /* avo: script callback */
+    if (!g_bDisableAllInput && g_actor)
+        g_actor->callback(GameObject::eKeyPress)(key);
+    /* avo: end */
+#endif
+
     if (_curr == kPAUSE)
     {
-#ifdef INGAME_EDITOR
         if (Device.editor())
             return;
-#endif // INGAME_EDITOR
 
         if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay()))
         {
@@ -137,7 +157,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     switch (_curr)
     {
     case kSCREENSHOT:
-        GlobalEnv.Render->Screenshot();
+        GEnv.Render->Screenshot();
         return;
         break;
 
@@ -315,7 +335,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     }
     case DIK_BACK:
         if (GameID() == eGameIDSingle)
-            GlobalEnv.DRender->NextSceneMode();
+            GEnv.DRender->NextSceneMode();
         // HW.Caps.SceneMode			= (HW.Caps.SceneMode+1)%3;
         return;
 
@@ -385,7 +405,7 @@ void CLevel::IR_OnKeyboardPress(int key)
                     CHudItem* pHudItem = smart_cast<CHudItem*>(pActor->inventory().ActiveItem());
                     if (pHudItem)
                     {
-                        pHudItem->OnStateSwitch(pHudItem->GetState());
+                        pHudItem->OnStateSwitch(pHudItem->GetState(), pHudItem->GetState());
                     }
                 }
             }
@@ -439,7 +459,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 //			m_bSynchronization	= false;
 //		}
 //		luabind::functor<void>	functor;
-//		ai().script_engine().functor("alife_test.set_switch_online",functor);
+//		GEnv.ScriptEngine->functor("alife_test.set_switch_online",functor);
 //		functor(0,false);
 //	}
 //		return;
@@ -483,6 +503,14 @@ void CLevel::IR_OnKeyboardRelease(int key)
 {
     if (!bReady || g_bDisableAllInput)
         return;
+
+#ifdef INPUT_CALLBACKS
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eKeyRelease)(key);
+    /* avo: end */
+#endif
+
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
         return;
     if (game && game->OnKeyboardRelease(get_binded_action(key)))
@@ -506,6 +534,13 @@ void CLevel::IR_OnKeyboardHold(int key)
 {
     if (g_bDisableAllInput)
         return;
+
+#ifdef INPUT_CALLBACKS
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eKeyHold)(key);
+    /* avo: end */
+#endif
 
 #ifdef DEBUG
     // Lain: added

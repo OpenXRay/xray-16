@@ -83,7 +83,7 @@ void moving_bones_snd_player::update(float time_delta, CGameObject& object)
     sound.set_position(new_position.c);
 
     if (smothed_velocity < play_threthhold)
-        sound.stop_deffered();
+        sound.stop_deferred();
 
     previous_position.set(new_position);
 }

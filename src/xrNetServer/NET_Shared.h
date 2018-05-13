@@ -1,22 +1,16 @@
 #pragma once
 
-#include "Common/Platform.hpp"
+#include "xrCore/_types.h"
+#include "xrCore/_flags.h"
+#include "xrCore/client_id.h"
+#include "xrCore/FTimer.h"
 
-#ifdef XR_NETSERVER_EXPORTS
-#define XRNETSERVER_API XR_EXPORT
-#else
-#define XRNETSERVER_API XR_IMPORT
+// XXX: review and delete
+//#include "xrCore/net_utils.h"
+//#include <dplay/dplay8.h>
+//#include "NET_Messages.h"
 
-#ifndef _EDITOR
-#pragma comment(lib, "xrNetServer")
-#endif
-#endif
-
-#include "xrCore/net_utils.h"
-#include <dplay/dplay8.h>
-#include "net_messages.h"
-
-#include "net_compressor.h"
+#include "NET_Compressor.h"
 
 XRNETSERVER_API extern ClientID BroadcastCID;
 
@@ -29,53 +23,47 @@ XRNETSERVER_API extern int psNET_ServerUpdate;
 XRNETSERVER_API extern int get_psNET_ServerUpdate();
 XRNETSERVER_API extern int psNET_ServerPending;
 
-XRNETSERVER_API extern BOOL psNET_direct_connect;
+XRNETSERVER_API extern bool psNET_direct_connect;
 
 enum
 {
-    NETFLAG_MINIMIZEUPDATES = (1 << 0),
-    NETFLAG_DBG_DUMPSIZE = (1 << 1),
-    NETFLAG_LOG_SV_PACKETS = (1 << 2),
-    NETFLAG_LOG_CL_PACKETS = (1 << 3),
+    NETFLAG_MINIMIZEUPDATES = 1 << 0,
+    NETFLAG_DBG_DUMPSIZE = 1 << 1,
+    NETFLAG_LOG_SV_PACKETS = 1 << 2,
+    NETFLAG_LOG_CL_PACKETS = 1 << 3,
 };
 
 IC u32 TimeGlobal(CTimer* timer) { return timer->GetElapsed_ms(); }
 IC u32 TimerAsync(CTimer* timer) { return TimeGlobal(timer); }
+
+// DPlay
+extern "C"
+{
+    typedef struct _DPN_CONNECTION_INFO DPN_CONNECTION_INFO;
+}
+
 class XRNETSERVER_API IClientStatistic
 {
-    DPN_CONNECTION_INFO ci_last;
-    u32 mps_recive, mps_receive_base;
-    u32 mps_send, mps_send_base;
-    u32 dwBaseTime;
-    CTimer* device_timer;
+    struct ClientStatisticImpl* m_pimpl;
 
 public:
-    IClientStatistic(CTimer* timer)
-    {
-        ZeroMemory(this, sizeof(*this));
-        device_timer = timer;
-        dwBaseTime = TimeGlobal(device_timer);
-    }
+    IClientStatistic();
+    IClientStatistic(CTimer* timer);
+    IClientStatistic(const IClientStatistic& rhs); // Required due to probable bug in CLevel::ProcessCompressedUpdate
+    ~IClientStatistic();
 
     void Update(DPN_CONNECTION_INFO& CI);
 
-    IC u32 getPing() { return ci_last.dwRoundTripLatencyMS; }
-    IC u32 getBPS() { return ci_last.dwThroughputBPS; }
-    IC u32 getPeakBPS() { return ci_last.dwPeakThroughputBPS; }
-    IC u32 getDroppedCount() { return ci_last.dwPacketsDropped; }
-    IC u32 getRetriedCount() { return ci_last.dwPacketsRetried; }
-    IC u32 getMPS_Receive() { return mps_recive; }
-    IC u32 getMPS_Send() { return mps_send; }
-    IC u32 getReceivedPerSec() { return dwBytesReceivedPerSec; }
-    IC u32 getSendedPerSec() { return dwBytesSendedPerSec; }
-    IC void Clear()
-    {
-        CTimer* timer = device_timer;
-        ZeroMemory(this, sizeof(*this));
-        device_timer = timer;
-        dwBaseTime = TimeGlobal(device_timer);
-    }
-
+    u32 getPing() const;
+    u32 getBPS() const;
+    u32 getPeakBPS() const;
+    u32 getDroppedCount() const;
+    u32 getRetriedCount() const;
+    u32 getMPS_Receive() const;
+    u32 getMPS_Send() const;
+    u32 getReceivedPerSec() const;
+    u32 getSendedPerSec() const;
+    IC void Clear();
     //-----------------------------------------------------------------------
     u32 dwTimesBlocked;
 

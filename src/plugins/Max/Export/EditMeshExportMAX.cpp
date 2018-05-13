@@ -91,7 +91,7 @@ bool CEditableMesh::Convert(INode* node)
     }
 
     // set smooth group MAX type
-    m_Flags.set(flSGMask, TRUE);
+    m_Flags.set(flSGMask, true);
 
     // faces
     m_FaceCount = obj->mesh.getNumFaces();
@@ -220,16 +220,16 @@ bool CEditableMesh::Convert(CExporter* E)
         m_Vertices = xr_alloc<Fvector>(m_VertCount);
         Fvector* p_it = m_Vertices;
 
-        for (ExpVertIt ev_it = E->m_ExpVertices.begin(); ev_it != E->m_ExpVertices.end(); ev_it++, p_it++)
+        for (auto& ev_it : E->m_ExpVertices)
         {
-            p_it->set((*ev_it)->P);
-            VM_UV->appendUV((*ev_it)->uv.x, (*ev_it)->uv.y);
+            p_it->set(ev_it->P);
+            VM_UV->appendUV(ev_it->uv.x, ev_it->uv.y);
         }
     }
     // faces
     {
         // set smooth group MAX type
-        m_Flags.set(flSGMask, TRUE);
+        m_Flags.set(flSGMask, true);
         // reserve space for faces and references
         m_FaceCount = E->m_ExpFaces.size();
         m_Faces = xr_alloc<st_Face>(m_FaceCount);
@@ -237,14 +237,14 @@ bool CEditableMesh::Convert(CExporter* E)
         m_VMRefs.resize(m_VertCount);
 
         int f_id = 0;
-        for (ExpFaceIt ef_it = E->m_ExpFaces.begin(); ef_it != E->m_ExpFaces.end(); ef_it++, f_id++)
+        for (auto& ef_it : E->m_ExpFaces)
         {
             // FACES
-            m_SmoothGroups[f_id] = (*ef_it)->sm_group;
+            m_SmoothGroups[f_id] = ef_it->sm_group;
             st_Face& F = m_Faces[f_id];
             for (int k = 0; k < 3; ++k)
             {
-                int v_idx = (*ef_it)->v[k];
+                int v_idx = ef_it->v[k];
                 st_FaceVert& vt = F.pv[k];
                 st_VERT* V = E->m_ExpVertices[v_idx];
                 vt.pindex = v_idx;
@@ -253,7 +253,7 @@ bool CEditableMesh::Convert(CExporter* E)
                 vm_lst.pts = xr_alloc<st_VMapPt>(vm_lst.count);
                 vm_lst.pts[0].vmap_index = VM_UV_idx;
                 vm_lst.pts[0].index = vt.pindex;
-                for (VDIt vd_it = V->data.begin(); vd_it != V->data.end(); vd_it++)
+                for (auto vd_it = V->data.begin(); vd_it != V->data.end(); vd_it++)
                 {
                     DWORD idx = vd_it - V->data.begin() + 1;
                     st_VMap* vm = m_VMaps[vd_it->bone];
@@ -263,10 +263,10 @@ bool CEditableMesh::Convert(CExporter* E)
                 }
                 vt.vmref = vt.pindex;
             }
-            CSurface* surf = m_Parent->CreateSurface(E->m_MtlMain, (*ef_it)->m_id);
+            CSurface* surf = m_Parent->CreateSurface(E->m_MtlMain, ef_it->m_id);
             if (!surf)
             {
-                bResult = FALSE;
+                bResult = false;
                 break;
             }
             m_SurfFaces[surf].push_back(f_id);

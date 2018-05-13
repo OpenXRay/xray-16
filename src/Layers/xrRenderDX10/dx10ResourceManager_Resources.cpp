@@ -1,13 +1,14 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
 #ifndef _EDITOR
 #pragma comment(lib, "d3dx9.lib")
 #include "xrEngine/Render.h"
 #endif
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 #include <D3DX10Core.h>
 
@@ -33,8 +34,8 @@ void fix_texture_name(LPSTR fn);
 template <class T>
 BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
 {
-    xr_vector<T*>::iterator it = vec.begin();
-    xr_vector<T*>::iterator end = vec.end();
+    auto it = vec.begin();
+    auto end = vec.end();
     for (; it != end; it++)
         if (*it == ptr)
         {
@@ -120,15 +121,15 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    if (0 == GlobalEnv.Render->m_skinning)
+    if (0 == GEnv.Render->m_skinning)
         xr_strcat(name, "_0");
-    if (1 == GlobalEnv.Render->m_skinning)
+    if (1 == GEnv.Render->m_skinning)
         xr_strcat(name, "_1");
-    if (2 == GlobalEnv.Render->m_skinning)
+    if (2 == GEnv.Render->m_skinning)
         xr_strcat(name, "_2");
-    if (3 == GlobalEnv.Render->m_skinning)
+    if (3 == GEnv.Render->m_skinning)
         xr_strcat(name, "_3");
-    if (4 == GlobalEnv.Render->m_skinning)
+    if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
     LPSTR N = LPSTR(name);
     map_VS::iterator I = m_vs.find(N);
@@ -138,10 +139,10 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     {
         SVS* _vs = new SVS();
         _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_vs.insert(mk_pair(_vs->set_name(name), _vs));
+        m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         //_vs->vs				= NULL;
         //_vs->signature		= NULL;
-        if (0 == stricmp(_name, "null"))
+        if (0 == xr_stricmp(_name, "null"))
         {
             return _vs;
         }
@@ -155,7 +156,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         }
 
         string_path cname;
-        strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), /*_name*/ shName, ".vs");
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*_name*/ shName, ".vs");
         FS.update_path(cname, "$game_shaders$", cname);
         //		LPCSTR						target		= NULL;
 
@@ -167,7 +168,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
             string1024 tmp;
             xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.vs", cname);
             Msg(tmp);
-            strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), "stub_default", ".vs");
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".vs");
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
@@ -196,13 +197,12 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
             c_entry = "main_vs_2_0";
         }
 
-        HRESULT const _hr = GlobalEnv.Render->shader_compile(
+        HRESULT const _hr = GEnv.Render->shader_compile(
             name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
 
         VERIFY(SUCCEEDED(_hr));
 
-        CHECK_OR_EXIT(!FAILED(_hr),
-            make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings."));
+        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
         return _vs;
     }
@@ -239,21 +239,21 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    if (0 == GlobalEnv.Render->m_MSAASample)
+    if (0 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_0");
-    if (1 == GlobalEnv.Render->m_MSAASample)
+    if (1 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_1");
-    if (2 == GlobalEnv.Render->m_MSAASample)
+    if (2 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_2");
-    if (3 == GlobalEnv.Render->m_MSAASample)
+    if (3 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_3");
-    if (4 == GlobalEnv.Render->m_MSAASample)
+    if (4 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_4");
-    if (5 == GlobalEnv.Render->m_MSAASample)
+    if (5 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_5");
-    if (6 == GlobalEnv.Render->m_MSAASample)
+    if (6 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_6");
-    if (7 == GlobalEnv.Render->m_MSAASample)
+    if (7 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_7");
     LPSTR N = LPSTR(name);
     map_PS::iterator I = m_ps.find(N);
@@ -263,8 +263,8 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     {
         SPS* _ps = new SPS();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_ps.insert(mk_pair(_ps->set_name(name), _ps));
-        if (0 == stricmp(_name, "null"))
+        m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
+        if (0 == xr_stricmp(_name, "null"))
         {
             _ps->ps = NULL;
             return _ps;
@@ -278,7 +278,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 
         // Open file
         string_path cname;
-        strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), /*_name*/ shName, ".ps");
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*_name*/ shName, ".ps");
         FS.update_path(cname, "$game_shaders$", cname);
 
         // duplicate and zero-terminate
@@ -291,7 +291,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
             // Memory.mem_compact();
             xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.ps", cname);
             Msg(tmp);
-            strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), "stub_default", ".ps");
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".ps");
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
@@ -331,13 +331,12 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
             c_entry = "main_ps_2_0";
         }
 
-        HRESULT const _hr = GlobalEnv.Render->shader_compile(
+        HRESULT const _hr = GEnv.Render->shader_compile(
             name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);
 
         VERIFY(SUCCEEDED(_hr));
 
-        CHECK_OR_EXIT(!FAILED(_hr),
-            make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings."));
+        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
         return _ps;
     }
@@ -368,8 +367,8 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     {
         SGS* _gs = new SGS();
         _gs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_gs.insert(mk_pair(_gs->set_name(name), _gs));
-        if (0 == stricmp(name, "null"))
+        m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
+        if (0 == xr_stricmp(name, "null"))
         {
             _gs->gs = NULL;
             return _gs;
@@ -377,39 +376,37 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
 
         // Open file
         string_path cname;
-        strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), name, ".gs");
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), name, ".gs");
         FS.update_path(cname, "$game_shaders$", cname);
 
         // duplicate and zero-terminate
-        IReader* R = FS.r_open(cname);
+        IReader* file = FS.r_open(cname);
         //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-        if (!R)
+        if (!file)
         {
             string1024 tmp;
             //	TODO: HACK: Test failure
             // Memory.mem_compact();
             xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.gs", cname);
             Msg(tmp);
-            strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), "stub_default", ".gs");
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".gs");
             FS.update_path(cname, "$game_shaders$", cname);
-            R = FS.r_open(cname);
+            file = FS.r_open(cname);
         }
-        IReader* file = FS.r_open(cname);
         R_ASSERT2(file, cname);
 
         // Select target
         LPCSTR c_target = "gs_4_0";
         LPCSTR c_entry = "main";
 
-        HRESULT const _hr = GlobalEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
+        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
             c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs);
 
         VERIFY(SUCCEEDED(_hr));
 
         FS.r_close(file);
 
-        CHECK_OR_EXIT(!FAILED(_hr),
-            make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings."));
+        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
         return _gs;
     }
@@ -511,7 +508,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 Sam
     {
         CRT* RT = new CRT();
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_rtargets.insert(mk_pair(RT->set_name(Name), RT));
+        m_rtargets.insert(std::make_pair(RT->set_name(Name), RT));
 #ifdef USE_DX11
         if (Device.b_is_Ready)
             RT->create(Name, w, h, f, SampleCount, useUAV);
@@ -549,7 +546,7 @@ CRTC*	CResourceManager::_CreateRTC		(LPCSTR Name, u32 size,	D3DFORMAT f)
     {
         CRTC *RT				=	new CRTC();
         RT->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
-        m_rtargets_c.insert		(mk_pair(RT->set_name(Name),RT));
+        m_rtargets_c.insert		(std::make_pair(RT->set_name(Name),RT));
         if (Device.b_is_Ready)	RT->create	(Name,size,f);
         return					RT;
     }
@@ -637,19 +634,17 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     fix_texture_name(Name);
     // ***** first pass - search already loaded texture
     LPSTR N = LPSTR(Name);
-    map_TextureIt I = m_textures.find(N);
+    auto I = m_textures.find(N);
     if (I != m_textures.end())
         return I->second;
-    else
-    {
-        CTexture* T = new CTexture();
-        T->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_textures.insert(mk_pair(T->set_name(Name), T));
-        T->Preload();
-        if (Device.b_is_Ready && !bDeferredLoad)
-            T->Load();
-        return T;
-    }
+
+    CTexture* T = new CTexture();
+    T->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    m_textures.insert(std::make_pair(T->set_name(Name), T));
+    T->Preload();
+    if (Device.b_is_Ready && !bDeferredLoad)
+        T->Load();
+    return T;
 }
 void CResourceManager::_DeleteTexture(const CTexture* T)
 {
@@ -686,7 +681,7 @@ void CResourceManager::DBG_VerifyTextures()
 CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
-    if (0 == stricmp(Name, "$null"))
+    if (0 == xr_stricmp(Name, "$null"))
         return NULL;
 
     LPSTR N = LPSTR(Name);
@@ -698,7 +693,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
         CMatrix* M = new CMatrix();
         M->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         M->dwReference = 1;
-        m_matrices.insert(mk_pair(M->set_name(Name), M));
+        m_matrices.insert(std::make_pair(M->set_name(Name), M));
         return M;
     }
 }
@@ -724,7 +719,7 @@ void CResourceManager::ED_UpdateMatrix(LPCSTR Name, CMatrix* data)
 CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
-    if (0 == stricmp(Name, "$null"))
+    if (0 == xr_stricmp(Name, "$null"))
         return NULL;
 
     LPSTR N = LPSTR(Name);
@@ -736,7 +731,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
         CConstant* C = new CConstant();
         C->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         C->dwReference = 1;
-        m_constants.insert(mk_pair(C->set_name(Name), C));
+        m_constants.insert(std::make_pair(C->set_name(Name), C));
         return C;
     }
 }

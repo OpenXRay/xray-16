@@ -11,6 +11,7 @@
 #include "xrAICore/Navigation/vertex_path.h"
 #include "xrAICore/Navigation/data_storage_constructor.h"
 #include "xrAICore/Navigation/dijkstra.h"
+#include "xrScriptEngine/DebugMacros.hpp" // XXX: move debug macros to xrCore
 
 template <typename TDistance, typename TVertexData>
 struct AStarVertexData
@@ -37,6 +38,9 @@ class CAStar : public CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVert
 protected:
     using Inherited = CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVertexAllocator, EuclidianHeuristics,
         TPathBuilder, TIteration, AStarVertexData<TDistance, TVertexData>>;
+    using Vertex = typename Inherited::Vertex;
+    using Distance = typename Vertex::Distance;
+    using Index = typename Vertex::Index;
 
 protected:
     template <typename TPathManager>

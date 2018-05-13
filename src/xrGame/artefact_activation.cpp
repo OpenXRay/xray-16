@@ -22,12 +22,13 @@
 #include "xrPhysics/iphworld.h"
 #include "restriction_space.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 
 SArtefactActivation::SArtefactActivation(CArtefact* af, u32 owner_id)
 {
     m_af = af;
     Load();
-    m_light = GlobalEnv.Render->light_create();
+    m_light = GEnv.Render->light_create();
     m_light->set_shadow(true);
     m_owner_id = owner_id;
     m_in_process = false;
@@ -173,7 +174,7 @@ void SArtefactActivation::SpawnAnomaly()
     Fvector pos;
     m_af->Center(pos);
     CSE_Abstract* object = Level().spawn_item(
-        zone_sect, pos, (g_dedicated_server) ? u32(-1) : m_af->ai_location().level_vertex_id(), 0xffff, true);
+        zone_sect, pos, (GEnv.isDedicatedServer) ? u32(-1) : m_af->ai_location().level_vertex_id(), 0xffff, true);
     CSE_ALifeAnomalousZone* AlifeZone = smart_cast<CSE_ALifeAnomalousZone*>(object);
     VERIFY(AlifeZone);
     CShapeData::shape_def _shape;

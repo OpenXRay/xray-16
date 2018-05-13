@@ -4,21 +4,22 @@
 #include <time.h>
 #include "resource.h"
 #include "log.h"
+#include "xrCore/Threading/Lock.hpp"
 #ifdef _EDITOR
 #include "malloc.h"
 #endif
 
-extern BOOL LogExecCB = TRUE;
-static string_path logFName = "engine.log";
-static string_path log_file_name = "engine.log";
-static BOOL no_log = TRUE;
+BOOL LogExecCB = TRUE;
+string_path logFName = "engine.log";
+string_path log_file_name = "engine.log";
+BOOL no_log = TRUE;
 #ifdef CONFIG_PROFILE_LOCKS
-static Lock logCS(MUTEX_PROFILE_ID(log));
+Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
-static Lock logCS;
+Lock logCS;
 #endif // CONFIG_PROFILE_LOCKS
-xr_vector<shared_str>* LogFile = NULL;
-static LogCallback LogCB = 0;
+xr_vector<xr_string> LogFile;
+LogCallback LogCB = 0;
 
 void FlushLog()
 {
@@ -28,9 +29,9 @@ void FlushLog()
         IWriter* f = FS.w_open(logFName);
         if (f)
         {
-            for (u32 it = 0; it < LogFile->size(); it++)
+            for (const auto &i : LogFile)
             {
-                LPCSTR s = *((*LogFile)[it]);
+                LPCSTR s = i.c_str();
                 f->w_string(s ? s : "");
             }
             FS.w_close(f);
@@ -41,9 +42,6 @@ void FlushLog()
 
 void AddOne(const char* split)
 {
-    if (!LogFile)
-        return;
-
     logCS.Enter();
 
 #ifdef DEBUG
@@ -51,12 +49,7 @@ void AddOne(const char* split)
     OutputDebugString("\n");
 #endif
 
-    // DUMP_PHASE;
-    {
-        shared_str temp = shared_str(split);
-        // DUMP_PHASE;
-        LogFile->push_back(temp);
-    }
+    LogFile.push_back(split);
 
     // exec CallBack
     if (LogExecCB && LogCB)
@@ -132,6 +125,15 @@ void Log(const char* msg, u32 dop)
     Log(buf);
 }
 
+void Log(const char* msg, u64 dop)
+{
+    u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    PSTR buf = (PSTR)_alloca(buffer_size);
+
+    xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
+    Log(buf);
+}
+
 void Log(const char* msg, int dop)
 {
     u32 buffer_size = (xr_strlen(msg) + 1 + 11 + 1) * sizeof(char);
@@ -181,15 +183,11 @@ LogCallback SetLogCB(const LogCallback& cb)
 }
 
 LPCSTR log_name() { return (log_file_name); }
-void InitLog()
-{
-    R_ASSERT(LogFile == NULL);
-    LogFile = new xr_vector<shared_str>();
-    LogFile->reserve(1000);
-}
 
 void CreateLog(BOOL nl)
 {
+    LogFile.reserve(1000);
+
     no_log = nl;
     strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, ".log");
     if (FS.path_exist("$logs$"))
@@ -209,6 +207,5 @@ void CreateLog(BOOL nl)
 void CloseLog(void)
 {
     FlushLog();
-    LogFile->clear();
-    xr_delete(LogFile);
+    LogFile.clear();
 }

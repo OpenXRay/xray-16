@@ -1,6 +1,8 @@
 #pragma once
 
 #include "xrUIXmlParser.h"
+#include "xrCore/_rect.h"
+#include "xrCommon/xr_map.h"
 
 class ITextureOwner;
 class CUIWindow;
@@ -32,6 +34,7 @@ class CUITrackBar;
 class UIHintWindow;
 class CUILines;
 class CUITextWnd;
+class CGameFont;
 
 class CUIXmlInit
 {
@@ -72,7 +75,6 @@ public:
     static Frect GetFRect(CUIXml& xml_doc, LPCSTR path, int index);
     static u32 GetColor(CUIXml& xml_doc, LPCSTR path, int index, u32 def_clr);
 
-public:
     static bool InitAlignment(CUIXml& xml_doc, const char* path, int index, float& x, float& y, CUIWindow* pWnd);
 
     static void InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pParentWnd);
@@ -83,7 +85,7 @@ public:
     static void ApplyAlign(float& x, float& y, u32 align);
 
     // Initialize and store predefined colors
-    DEF_MAP(ColorDefs, shared_str, u32);
+    using ColorDefs = xr_map<shared_str, u32>;
 
     static const ColorDefs* GetColorDefs()
     {

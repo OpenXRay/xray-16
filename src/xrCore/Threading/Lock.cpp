@@ -1,5 +1,16 @@
 #include "stdafx.h"
 #include "Lock.hpp"
+#include <mutex>
+
+struct LockImpl
+{
+    std::recursive_mutex mutex;
+};
+
+Lock::~Lock()
+{
+    delete impl;
+}
 
 #ifdef CONFIG_PROFILE_LOCKS
 static add_profile_portion_callback add_profile_portion = 0;
@@ -28,6 +39,8 @@ struct profiler
     }
 };
 
+Lock::Lock(const char* id) : impl(new LockImpl), lockCounter(0), id(id) {}
+
 void Lock::Enter()
 {
 #if 0 // def DEBUG
@@ -39,7 +52,29 @@ void Lock::Enter()
     mutex.lock();
     isLocked = true;
 }
+#else
+Lock::Lock() : impl(new LockImpl), lockCounter(0) {}
+
+void Lock::Enter()
+{
+    impl->mutex.lock();
+    lockCounter++;
+}
 #endif // CONFIG_PROFILE_LOCKS
+
+bool Lock::TryEnter()
+{
+    bool locked = impl->mutex.try_lock();
+    if (locked)
+        lockCounter++;
+    return locked;
+}
+
+void Lock::Leave()
+{
+    impl->mutex.unlock();
+    lockCounter--;
+}
 
 #ifdef DEBUG
 extern void OutputDebugStackTrace(const char* header);

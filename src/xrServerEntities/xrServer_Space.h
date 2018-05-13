@@ -6,26 +6,18 @@
 //	Description : Server objects space
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef xrServer_SpaceH
 #define xrServer_SpaceH
+#include "xrCore/_types.h"
+#include "xrCore/_vector3d.h"
+#include "xrCommon/xr_vector.h"
 
 #ifndef XRGAME_EXPORTS
 #define SERVER_ENTITY_EDITOR_METHODS virtual void FillProps(LPCSTR pref, PropItemVec& values);
 #else // #ifdef XRGAME_EXPORTS
 #define SERVER_ENTITY_EDITOR_METHODS
 #endif // #ifndef XRGAME_EXPORTS
-// XXX: move to core/math
-struct SRotation
-{
-    float yaw, pitch, roll;
-    SRotation() { yaw = pitch = roll = 0; }
-    SRotation(float y, float p, float r)
-    {
-        yaw = y;
-        pitch = p;
-        roll = r;
-    }
-};
 
 enum EPOType
 {
@@ -35,11 +27,11 @@ enum EPOType
     epotSkeleton
 };
 
-DEFINE_VECTOR(u32, DWORD_VECTOR, DWORD_IT);
-DEFINE_VECTOR(bool, BOOL_VECTOR, BOOL_IT);
-DEFINE_VECTOR(float, FLOAT_VECTOR, FLOAT_IT);
-DEFINE_VECTOR(LPSTR, LPSTR_VECTOR, LPSTR_IT);
-DEFINE_VECTOR(Fvector, FVECTOR_VECTOR, FVECTOR_IT);
+using DWORD_VECTOR = xr_vector<u32>;
+using BOOL_VECTOR = xr_vector<bool>;
+using FLOAT_VECTOR = xr_vector<float>;
+using LPSTR_VECTOR = xr_vector<LPSTR>;
+using FVECTOR_VECTOR = xr_vector<Fvector>;
 
 #ifdef XRGAME_EXPORTS
 #define DECLARE_ENTITY_DESTROY

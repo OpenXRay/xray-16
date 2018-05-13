@@ -37,6 +37,7 @@
 #include "game_object_space.h"
 #include "doors_door.h"
 #include "doors.h"
+#include "xrNetServer/NET_Messages.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -51,8 +52,6 @@ extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 #include "debug_renderer.h"
 #include "PHDebug.h"
 #endif
-
-ENGINE_API bool g_dedicated_server;
 
 static const float base_spu_epsP = 0.05f;
 static const float base_spu_epsR = 0.05f;
@@ -81,7 +80,7 @@ CGameObject::CGameObject() : SpatialBase(g_SpatialSpace), scriptBinder(this)
     m_bCrPr_Activated = false;
     m_dwCrPr_ActivationStep = 0;
     m_spawn_time = 0;
-    m_ai_location = !g_dedicated_server ? new CAI_ObjectLocation() : 0;
+    m_ai_location = !GEnv.isDedicatedServer ? new CAI_ObjectLocation() : 0;
     m_server_flags.one();
 
     m_callbacks = new CALLBACK_MAP();
@@ -130,7 +129,7 @@ void CGameObject::cNameVisual_set(shared_str N)
     {
         IRenderVisual* old_v = renderable.visual;
         NameVisual = N;
-        renderable.visual = GlobalEnv.Render->model_Create(*N);
+        renderable.visual = GEnv.Render->model_Create(*N);
         IKinematics* old_k = old_v ? old_v->dcast_PKinematics() : NULL;
         IKinematics* new_k = renderable.visual->dcast_PKinematics();
         /*
@@ -144,11 +143,11 @@ void CGameObject::cNameVisual_set(shared_str N)
             new_k->SetUpdateCallback(old_k->GetUpdateCallback());
             new_k->SetUpdateCallbackParam(old_k->GetUpdateCallbackParam());
         }
-        GlobalEnv.Render->model_Delete(old_v);
+        GEnv.Render->model_Delete(old_v);
     }
     else
     {
-        GlobalEnv.Render->model_Delete(renderable.visual);
+        GEnv.Render->model_Delete(renderable.visual);
         NameVisual = 0;
     }
     OnChangeVisual();
@@ -247,6 +246,8 @@ void CGameObject::Load(LPCSTR section)
     }
 }
 
+void CGameObject::PostLoad(LPCSTR section) {}
+
 void CGameObject::init()
 {
     m_lua_game_object = 0;
@@ -258,11 +259,11 @@ void CGameObject::init()
 void CGameObject::reinit()
 {
     m_visual_callback.clear();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         ai_location().reinit();
 
     // clear callbacks
-    for (CALLBACK_MAP_IT it = m_callbacks->begin(); it != m_callbacks->end(); ++it)
+    for (auto it = m_callbacks->begin(); it != m_callbacks->end(); ++it)
         it->second.clear();
 }
 
@@ -455,7 +456,13 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     }
     else
     {
-        R_ASSERT(Level().Objects.net_Find(E->ID) == NULL);
+        //Alundaio:
+        //R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
+        if (Level().Objects.net_Find(E->ID) != nullptr)
+        {
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name);
+            return false;
+        }
     }
 
     setID(E->ID);
@@ -466,7 +473,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     XFORM().setXYZ(E->o_Angle);
     Position().set(E->o_Position);
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s Position set from CSE_Abstract %f,%f,%f", PH_DBG_ObjectTrackName(),
             Position().x, Position().y, Position().z);
@@ -513,14 +520,14 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     }
 
     reload(*cNameSect());
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.reload(*cNameSect());
 
     reinit();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.reinit();
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s After Script Binder reinit %f,%f,%f", PH_DBG_ObjectTrackName(), Position().x,
             Position().y, Position().z);
@@ -599,7 +606,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     m_bObjectRemoved = false;
     spawn_supplies();
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f", PH_DBG_ObjectTrackName(),
             Position().x, Position().y, Position().z);
@@ -610,7 +617,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 #endif
 
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f", PH_DBG_ObjectTrackName(),
             Position().x, Position().y, Position().z);
@@ -675,7 +682,7 @@ void CGameObject::net_Load(IReader& ireader)
 #endif
 // ----------------------------------------------------------
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
     {
         Msg("CGameObject::net_Load obj %s (loaded) %f,%f,%f", PH_DBG_ObjectTrackName(), Position().x, Position().y,
             Position().z);
@@ -703,54 +710,59 @@ void CGameObject::spawn_supplies()
     for (u32 k = 0, j; spawn_ini()->r_line("spawn", k, &N, &V); k++)
     {
         VERIFY(xr_strlen(N));
-        j = 1;
-        p = 1.f;
-
-        float f_cond = 1.0f;
-        if (V && xr_strlen(V))
+        if (pSettings->section_exist(N)) //Alundaio: Validate section exists
         {
-            int n = _GetItemCount(V);
-            string16 temp;
-            if (n > 0)
-                j = atoi(_GetItem(V, 0, temp)); // count
+            j = 1;
+            p = 1.f;
 
-            if (NULL != strstr(V, "prob="))
-                p = (float)atof(strstr(V, "prob=") + 5);
-            if (fis_zero(p))
-                p = 1.f;
-            if (!j)
-                j = 1;
-            if (NULL != strstr(V, "cond="))
-                f_cond = (float)atof(strstr(V, "cond=") + 5);
-            bScope = (NULL != strstr(V, "scope"));
-            bSilencer = (NULL != strstr(V, "silencer"));
-            bLauncher = (NULL != strstr(V, "launcher"));
-        }
-        for (u32 i = 0; i < j; ++i)
-            if (::Random.randF(1.f) < p)
+            float f_cond = 1.0f;
+            if (V && xr_strlen(V))
             {
-                CSE_Abstract* A = Level().spawn_item(N, Position(), ai_location().level_vertex_id(), ID(), true);
+                int n = _GetItemCount(V);
+                string16 temp;
+                if (n > 0)
+                    j = atoi(_GetItem(V, 0, temp)); // count
 
-                CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
-                if (pSE_InventoryItem)
-                    pSE_InventoryItem->m_fCondition = f_cond;
-
-                CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(A);
-                if (W)
-                {
-                    if (W->m_scope_status == ALife::eAddonAttachable)
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
-                    if (W->m_silencer_status == ALife::eAddonAttachable)
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
-                    if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
-                }
-
-                NET_Packet P;
-                A->Spawn_Write(P, TRUE);
-                Level().Send(P, net_flags(TRUE));
-                F_entity_Destroy(A);
+                if (NULL != strstr(V, "prob="))
+                    p = (float)atof(strstr(V, "prob=") + 5);
+                if (fis_zero(p))
+                    p = 1.f;
+                if (!j)
+                    j = 1;
+                if (NULL != strstr(V, "cond="))
+                    f_cond = (float)atof(strstr(V, "cond=") + 5);
+                bScope = (NULL != strstr(V, "scope"));
+                bSilencer = (NULL != strstr(V, "silencer"));
+                bLauncher = (NULL != strstr(V, "launcher"));
             }
+            for (u32 i = 0; i < j; ++i)
+            {
+                if (::Random.randF(1.f) < p)
+                {
+                    CSE_Abstract* A = Level().spawn_item(N, Position(), ai_location().level_vertex_id(), ID(), true);
+
+                    CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
+                    if (pSE_InventoryItem)
+                        pSE_InventoryItem->m_fCondition = f_cond;
+
+                    CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(A);
+                    if (W)
+                    {
+                        if (W->m_scope_status == ALife::eAddonAttachable)
+                            W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
+                        if (W->m_silencer_status == ALife::eAddonAttachable)
+                            W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
+                        if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
+                            W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
+                    }
+
+                    NET_Packet P;
+                    A->Spawn_Write(P, TRUE);
+                    Level().Send(P, net_flags(TRUE));
+                    F_entity_Destroy(A);
+                }
+            }
+        }
     }
 }
 
@@ -1058,8 +1070,8 @@ void CGameObject::renderable_Render()
     //
     MakeMeCrow();
     // ~
-    GlobalEnv.Render->set_Transform(&XFORM());
-    GlobalEnv.Render->add_Visual(Visual());
+    GEnv.Render->set_Transform(&XFORM());
+    GEnv.Render->add_Visual(Visual());
     Visual()->getVisData().hom_frame = Device.dwFrame;
 }
 
@@ -1186,7 +1198,7 @@ void CGameObject::shedule_Update(u32 dt)
     else if (Device.vCameraPosition.distance_to_sqr(Position()) < CROW_RADIUS*CROW_RADIUS) MakeMeCrow ();
     */
     // ~
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.shedule_Update(dt);
 }
 
@@ -1246,7 +1258,7 @@ u32 CGameObject::ef_detector_type() const
 
 void CGameObject::net_Relcase(IGameObject* O)
 {
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.net_Relcase(O);
 }
 
@@ -1376,6 +1388,8 @@ void CGameObject::UpdateCL()
     on_matrix_change(m_previous_matrix);
     m_previous_matrix = XFORM();
 }
+
+void CGameObject::PostUpdateCL(bool bUpdateCL_disabled) {}
 
 void CGameObject::on_matrix_change(const Fmatrix& previous) { obstacle().on_move(); }
 #ifdef DEBUG

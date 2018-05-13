@@ -17,14 +17,15 @@ template <typename _object_type>
 class CActionPlannerAction : public CActionPlanner<_object_type>, public CActionBase<_object_type>
 {
 protected:
-    typedef CActionPlanner<_object_type> inherited_planner;
-    typedef CActionBase<_object_type> inherited_action;
-    typedef typename inherited_action::_edge_value_type _edge_value_type;
-    typedef typename inherited_action::_condition_type _condition_type;
-    typedef typename inherited_action::_value_type _value_type;
+    using inherited_planner = CActionPlanner<_object_type>;
+    using inherited_action = CActionBase<_object_type>;
+    using _edge_value_type = typename inherited_action::_edge_value_type;
+    using _condition_type = typename inherited_action::_condition_type;
+    using _value_type = typename inherited_action::_value_type;
 
 public:
-    typedef typename inherited_action::COperatorCondition COperatorCondition;
+    using COperatorCondition = typename inherited_action::COperatorCondition;
+    using _world_operator = typename inherited_planner::_world_operator;
 
 #ifdef LOG_ACTION
 public:

@@ -167,22 +167,22 @@ void SHeliMovementState::getPathAltitude(Fvector& point, float base_altitude)
     Fvector down_dir;
     down_dir.set(0.0f, -1.0f, 0.0f);
 
-    point.y = boundingVolume.max.y + EPS_L;
+    point.y = boundingVolume.vMax.y + EPS_L;
     VERIFY(_valid(point));
 
     Level().ObjectSpace.RayPick(point, down_dir, boundSize.y + 1.0f, collide::rqtStatic, cR, NULL);
 
     point.y = point.y - cR.range;
 
-    if (point.y + base_altitude < boundingVolume.max.y)
+    if (point.y + base_altitude < boundingVolume.vMax.y)
         point.y += base_altitude;
     else
-        point.y = boundingVolume.max.y - EPS_L;
+        point.y = boundingVolume.vMax.y - EPS_L;
 
     VERIFY(_valid(point));
 
-    float minY = boundingVolume.min.y; //+(m_boundingVolume.max.y-m_boundingVolume.min.y)*m_heli->m_data.m_alt_korridor;
-    float maxY = boundingVolume.max.y + base_altitude;
+    float minY = boundingVolume.vMin.y; //+(m_boundingVolume.vMax.y-m_boundingVolume.vMin.y)*m_heli->m_data.m_alt_korridor;
+    float maxY = boundingVolume.vMax.y + base_altitude;
     clamp(point.y, minY, maxY);
     VERIFY(_valid(point));
 }
@@ -300,7 +300,7 @@ void SHeliMovementState::load(IReader& input_packet)
 float SHeliMovementState::GetSafeAltitude()
 {
     Fbox boundingVolume = Level().ObjectSpace.GetBoundingVolume();
-    return boundingVolume.max.y + safe_altitude_add;
+    return boundingVolume.vMax.y + safe_altitude_add;
 }
 
 void SHeliMovementState::CreateRoundPoints(

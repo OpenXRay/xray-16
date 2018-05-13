@@ -1,10 +1,14 @@
-#ifndef XRENGINE_ISPATIAL_H_INCLUDED
-#define XRENGINE_ISPATIAL_H_INCLUDED
+#pragma once
 
-//#pragma once
-#include "Common/Platform.hpp"
+#include "Common/Noncopyable.hpp"
 #include "xrCore/xrPool.h"
-#include "xr_collide_defs.h"
+//#include "xr_collide_defs.h"
+#include "xrCore/xrCore_benchmark_macros.h"
+#include "xrCore/_types.h"
+#include "xrCore/_vector3d.h"
+#include "xrCore/_sphere.h"
+#include "xrCore/FTimer.h"
+#include "xrCDB.h"
 
 #pragma pack(push, 4)
 
@@ -13,7 +17,7 @@ Requirements:
 0. Generic
     * O(1) insertion
         - radius completely determines	"level"
-        - position completely detemines "node"
+        - position completely determines "node"
     * O(1) removal
     *
 1. Rendering
@@ -75,6 +79,7 @@ class Sound;
 }
 class IRenderable;
 class IRender_Light;
+class Lock;
 
 class SpatialData
 {
@@ -105,7 +110,7 @@ public:
     virtual IRender_Light* dcast_Light() = 0;
 };
 
-inline ISpatial::~ISpatial() {}
+ICF ISpatial::~ISpatial() {}
 class XRCDB_API SpatialBase : public virtual ISpatial
 {
 public:
@@ -129,10 +134,10 @@ public:
         spatial_updatesector_internal();
     }
 
-    virtual IGameObject* dcast_GameObject() override { return 0; }
-    virtual Feel::Sound* dcast_FeelSound() override { return 0; }
-    virtual IRenderable* dcast_Renderable() override { return 0; }
-    virtual IRender_Light* dcast_Light() override { return 0; }
+    virtual IGameObject* dcast_GameObject() override { return nullptr; }
+    virtual Feel::Sound* dcast_FeelSound() override { return nullptr; }
+    virtual IRenderable* dcast_Renderable() override { return nullptr; }
+    virtual IRender_Light* dcast_Light() override { return nullptr; }
     SpatialBase(ISpatial_DB* space);
     virtual ~SpatialBase();
 };
@@ -142,33 +147,30 @@ public:
 class ISpatial_NODE
 {
 public:
-    typedef _W64 unsigned ptrt;
-
-public:
     ISpatial_NODE* parent; // parent node for "empty-members" optimization
     ISpatial_NODE* children[8]; // children nodes
     xr_vector<ISpatial*> items; // own items
-public:
+
     void _init(ISpatial_NODE* _parent);
     void _remove(ISpatial* _S);
     void _insert(ISpatial* _S);
-    BOOL _empty()
+    bool _empty()
     {
         return items.empty() &&
-            (0 == (ptrt(children[0]) | ptrt(children[1]) | ptrt(children[2]) | ptrt(children[3]) | ptrt(children[4]) |
-                      ptrt(children[5]) | ptrt(children[6]) | ptrt(children[7])));
+            0 == (intptr_t(children[0]) | intptr_t(children[1]) | intptr_t(children[2]) | intptr_t(children[3]) | intptr_t(children[4]) |
+                intptr_t(children[5]) | intptr_t(children[6]) | intptr_t(children[7]));
     }
 };
 ////////////
 
 // template <class T, int granularity>
-// class	poolSS;
+// class poolSS;
 #ifndef DLL_API
 #define DLL_API XR_IMPORT
-#endif // #ifndef	DLL_API
+#endif // #ifndef DLL_API
 
 //////////////////////////////////////////////////////////////////////////
-class XRCDB_API ISpatial_DB
+class XRCDB_API ISpatial_DB : private Noncopyable
 {
 public:
     struct SpatialDBStatistics
@@ -207,7 +209,7 @@ public:
     };
 
 private:
-    Lock cs;
+    Lock* pcs;
 
     poolSS<ISpatial_NODE, 128> allocator;
 
@@ -256,7 +258,6 @@ public:
     void update(u32 nodes = 8);
     BOOL verify();
 
-public:
     enum
     {
         O_ONLYFIRST = (1 << 0),
@@ -277,5 +278,3 @@ XRCDB_API extern ISpatial_DB* g_SpatialSpace;
 XRCDB_API extern ISpatial_DB* g_SpatialSpacePhysic;
 
 #pragma pack(pop)
-
-#endif // #ifndef XRENGINE_ISPATIAL_H_INCLUDED

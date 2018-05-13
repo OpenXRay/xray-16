@@ -33,6 +33,7 @@ class CZoneList;
 class message_filter;
 class demoplay_control;
 class demo_info;
+class CStreamReader;
 
 #ifdef DEBUG
 class CDebugRenderer;
@@ -177,7 +178,7 @@ public:
 private:
     void OnSecureMessage(NET_Packet& P);
     void OnSecureKeySync(NET_Packet& P);
-    void SecureSend(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
+    void SecureSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
     secure_messaging::key_t m_secret_key;
     bool m_bNeed_CrPr = false;
     u32 m_dwNumSteps = 0;
@@ -215,7 +216,7 @@ public:
     void OnBuildVersionChallenge();
     void OnConnectResult(NET_Packet* P);
     // Static particles
-    DEFINE_VECTOR(CParticlesObject*, POVec, POIt);
+    using POVec = xr_vector<CParticlesObject*>;
     POVec m_StaticParticles;
     game_cl_GameState* game = nullptr;
     bool m_bGameConfigStarted = false;
@@ -229,7 +230,7 @@ public:
 
 private:
     // preload sounds registry
-    DEFINE_MAP(shared_str, ref_sound, SoundRegistryMap, SoundRegistryMapIt);
+    using SoundRegistryMap = xr_map<shared_str, ref_sound>;
     SoundRegistryMap sound_registry;
 
 public:
@@ -307,7 +308,7 @@ public:
     void ClientSendProfileData();
     void ClientSave();
     u32 Objects_net_Save(NET_Packet* _Packet, u32 start, u32 count);
-    virtual void Send(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
+    virtual void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
     void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos); // only ask server
     void g_sv_Spawn(CSE_Abstract* E); // server reply/command spawning
     // Save/Load/State
@@ -380,7 +381,7 @@ public:
     virtual u32 GetRealPing() { return m_dwRealPing; }
 public:
     void remove_objects();
-    virtual void OnSessionTerminate(LPCSTR reason);
+    virtual void OnSessionTerminate(pcstr reason);
     file_transfer::client_site* m_file_transfer = nullptr;
     compression::ppmd_trained_stream* m_trained_stream = nullptr;
     compression::lzo_dictionary_buffer m_lzo_dictionary;
@@ -453,7 +454,4 @@ IC CPHCommander& CLevel::ph_commander_physics_worldstep()
     return *m_ph_commander_physics_worldstep;
 }
 
-IC bool OnServer() { return Level().IsServer(); }
-IC bool OnClient() { return Level().IsClient(); }
-IC bool IsGameTypeSingle() { return (g_pGamePersistent->GameType() == eGameIDSingle); }
 extern bool g_bDebugEvents;

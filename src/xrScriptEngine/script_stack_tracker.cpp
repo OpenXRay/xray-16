@@ -9,7 +9,6 @@
 #include "pch.hpp"
 #include "script_stack_tracker.hpp"
 #include "script_engine.hpp"
-#include "Include/xrAPI/xrAPI.h"
 
 CScriptStackTracker::CScriptStackTracker(CScriptEngine* scriptEngine)
 {

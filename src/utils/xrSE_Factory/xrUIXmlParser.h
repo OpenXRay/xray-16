@@ -1,7 +1,7 @@
 #pragma once
-#include "xrXMLParser/xrXMLParser.h"
+#include "xrCore/XML/XMLDocument.hpp"
 
-class CUIXml : public CXml
+class CUIXml : public XMLDocument
 {
     int m_dbg_id;
 
@@ -9,5 +9,5 @@ public:
     CUIXml();
     virtual ~CUIXml();
 
-    virtual shared_str correct_file_name(LPCSTR path, LPCSTR fn);
+    virtual shared_str correct_file_name(pcstr path, pcstr fn);
 };

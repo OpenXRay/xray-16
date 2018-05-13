@@ -89,7 +89,7 @@ CEntityCondition::CEntityCondition(CEntityAlive* object) : CEntityConditionSimpl
 CEntityCondition::~CEntityCondition(void) { ClearWounds(); }
 void CEntityCondition::ClearWounds()
 {
-    for (WOUND_VECTOR_IT it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
+    for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
         xr_delete(*it);
     m_WoundVector.clear();
 
@@ -167,7 +167,7 @@ void CEntityCondition::ChangeEntityMorale(const float value) { m_fDeltaEntityMor
 void CEntityCondition::ChangeBleeding(const float percent)
 {
     //затянуть раны
-    for (WOUND_VECTOR_IT it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
+    for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
     {
         (*it)->Incarnation(percent, m_fMinWoundSize);
         if (0 == (*it)->TotalSize())
@@ -339,7 +339,7 @@ CWound* CEntityCondition::AddWound(float hit_power, ALife::EHitType hit_type, u1
     VERIFY(element < 64 || BI_NONE == element);
 
     //запомнить кость по которой ударили и силу удара
-    WOUND_VECTOR_IT it = m_WoundVector.begin();
+    auto it = m_WoundVector.begin();
     for (; it != m_WoundVector.end(); it++)
     {
         if ((*it)->GetBoneNum() == element)
@@ -480,7 +480,7 @@ float CEntityCondition::BleedingSpeed()
 {
     float bleeding_speed = 0;
 
-    for (WOUND_VECTOR_IT it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
+    for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
         bleeding_speed += (*it)->TotalSize();
 
     return (m_WoundVector.empty() ? 0.f : bleeding_speed / m_WoundVector.size());
@@ -537,7 +537,7 @@ void CEntityCondition::save(NET_Packet& output_packet)
         save_data(m_fPsyHealth, output_packet);
 
         output_packet.w_u8((u8)m_WoundVector.size());
-        for (WOUND_VECTOR_IT it = m_WoundVector.begin(); m_WoundVector.end() != it; it++)
+        for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; it++)
             (*it)->save(output_packet);
     }
 }

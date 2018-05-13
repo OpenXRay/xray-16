@@ -71,7 +71,7 @@ public:
     virtual void on_activate();
     virtual void on_deactivate();
     virtual void Hit(SHit* pHDS);
-    virtual char* get_monster_class_name() { return "poltergeist"; }
+    pcstr get_monster_class_name() override { return "poltergeist"; }
     bool detected_enemy();
     float get_fly_around_distance() const { return m_fly_around_distance; }
     float get_fly_around_change_direction_time() const { return m_fly_around_change_direction_time; }
@@ -234,7 +234,7 @@ public:
     };
 
 private:
-    DEFINE_VECTOR(SFlameElement*, FLAME_ELEMS_VEC, FLAME_ELEMS_IT);
+    using FLAME_ELEMS_VEC = xr_vector<SFlameElement*>;
     FLAME_ELEMS_VEC m_flames;
 
 public:

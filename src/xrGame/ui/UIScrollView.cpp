@@ -154,7 +154,7 @@ void CUIScrollView::RecalcSize()
     }
     else
     {
-        for (WINDOW_LIST_it it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
+        for (auto it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
         {
             (*it)->SetWndPos(item_pos);
             item_pos.y += (*it)->GetWndSize().y;
@@ -203,8 +203,8 @@ void CUIScrollView::Draw()
     visible_rect.bottom -= m_downIndent;
     UI().PushScissor(visible_rect);
 
-    WINDOW_LIST_it it = m_pad->GetChildWndList().begin();
-    //	WINDOW_LIST_it it_e					= m_pad->GetChildWndList().end();
+    auto it = m_pad->GetChildWndList().begin();
+    //	auto it_e					= m_pad->GetChildWndList().end();
 
     if (!Empty() && m_visible_rgn.x != -1)
     {
@@ -349,7 +349,7 @@ CUIWindow* CUIScrollView::GetItem(u32 idx)
     if (m_pad->GetChildWndList().size() <= idx)
         return NULL;
 
-    WINDOW_LIST_it it = m_pad->GetChildWndList().begin();
+    auto it = m_pad->GetChildWndList().begin();
     std::advance(it, idx);
     return (*it);
 }
@@ -369,7 +369,7 @@ void CUIScrollView::SetSelected(CUIWindow* w)
     if (!m_flags.test(eItemsSelectabe))
         return;
 
-    for (WINDOW_LIST_it it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
+    for (auto it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
     {
         smart_cast<CUISelectable*>(*it)->SetSelected(*it == w);
     }
@@ -380,7 +380,7 @@ CUIWindow* CUIScrollView::GetSelected()
     if (!m_flags.test(eItemsSelectabe))
         return NULL;
 
-    for (WINDOW_LIST_it it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
+    for (auto it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
     {
         if (smart_cast<CUISelectable*>(*it)->GetSelected())
             return *it;
@@ -392,7 +392,7 @@ CUIWindow* CUIScrollView::GetSelected()
 void CUIScrollView::UpdateChildrenLenght()
 {
     float len = GetDesiredChildWidth();
-    for (WINDOW_LIST_it it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
+    for (auto it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
     {
         (*it)->SetWidth(len);
     }

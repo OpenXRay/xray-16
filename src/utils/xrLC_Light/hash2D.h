@@ -1,5 +1,11 @@
 #pragma once
 #include "serialize.h"
+#include "xrCore/_types.h"
+#include "xrCore/_fbox2.h"
+#include "xrCore/_vector2.h"
+#include "xrCore/_bitwise.h"
+#include "xrCommon/xr_vector.h"
+
 template <class T, u32 s_X, u32 s_Y>
 class hash2D
 {
@@ -35,7 +41,7 @@ public:
         for (u32 y = 0; y < s_Y; y++)
             for (u32 x = 0; x < s_X; x++)
             {
-                table[y][x].clear_not_free();
+                table[y][x].clear();
                 table[y][x].reserve(apx);
             }
     };

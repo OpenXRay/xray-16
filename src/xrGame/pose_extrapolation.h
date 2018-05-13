@@ -1,6 +1,8 @@
 #pragma once
-
 #include "xrPhysics/CycleConstStorage.h"
+#include "xrCore/_vector3d.h"
+#include "xrCore/_quaternion.h"
+
 namespace extrapolation
 {
 class pose
@@ -56,4 +58,4 @@ private:
     u32 last_update;
     container m_points;
 };
-}
+} // namespace extrapolation

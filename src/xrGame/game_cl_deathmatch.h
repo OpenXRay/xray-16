@@ -3,6 +3,7 @@
 
 #include "ui\UIBuyWndShared.h"
 #include "ui\UIBuyWndBase.h"
+#include "xrCore/buffer_vector.h"
 
 class CUISkinSelectorWnd;
 class CUIDialogWnd;
@@ -39,6 +40,7 @@ public:
     virtual void LoadSndMessages();
 
     virtual bool Is_Rewarding_Allowed() const { return m_cl_dwWarmUp_Time == 0; };
+
 protected:
     struct PresetItem
     {
@@ -47,13 +49,15 @@ protected:
         s16 BigID;
         PresetItem(u8 Slot, u8 Item) { set(Slot, Item); };
         PresetItem(s16 Big) { set(Big); };
-        bool operator==(const s16& ID) { return (BigID) == (ID); }
+        bool operator==(const s16& ID) { return BigID == ID; }
+
         void set(s16 Big)
         {
             SlotID = u8((Big >> 0x08) & 0x00ff);
             ItemID = u8(Big & 0x00ff);
             BigID = Big;
         }
+
         void set(u8 Slot, u8 Item)
         {
             SlotID = Slot;
@@ -62,7 +66,7 @@ protected:
         };
     };
 
-    DEF_VECTOR(PRESET_ITEMS, PresetItem);
+    using PRESET_ITEMS = xr_vector<PresetItem>;
 
     PRESET_ITEMS PresetItemsTeam0;
     PRESET_ITEMS AdditionalPresetItems;
@@ -100,7 +104,7 @@ protected:
 
     virtual const shared_str GetTeamMenu(s16 team);
     virtual void LoadTeamDefaultPresetItems(const shared_str& caSection, IBuyWnd* pBuyMenu, PRESET_ITEMS* pPresetItems);
-    virtual void LoadPlayerDefItems(char* TeamName, IBuyWnd* pBuyMenu);
+    virtual void LoadPlayerDefItems(pcstr TeamName, IBuyWnd* pBuyMenu);
     virtual void LoadDefItemsForRank(IBuyWnd* pBuyMenu);
     virtual void ChangeItemsCosts(IBuyWnd* pBuyMenu);
     ///	virtual		s16					GetBuyMenuItemIndex			(u8 SlotID, u8 ItemID);
@@ -117,7 +121,7 @@ protected:
 public:
     virtual s16 ModifyTeam(s16 Team);
 
-    virtual char* getTeamSection(int Team);
+    virtual pcstr getTeamSection(int Team);
     virtual void SetCurrentBuyMenu();
     virtual void SetCurrentSkinMenu(); //	{pCurSkinMenu = pSkinMenuTeam0; };
 

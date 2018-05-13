@@ -78,15 +78,13 @@ void CUIVote::Update()
     if (m_prev_upd_time > Device.dwTimeContinual - 1000)
         return;
     m_prev_upd_time = Device.dwTimeContinual;
-    game_cl_GameState::PLAYERS_MAP_IT I = Game().players.begin();
-    game_cl_GameState::PLAYERS_MAP_IT E = Game().players.end();
+    auto I = Game().players.begin();
+    auto E = Game().players.end();
 
-    DEFINE_VECTOR(game_PlayerState*, ItemVec, ItemIt);
+    using ItemVec = xr_vector<game_PlayerState*>;
     ItemVec items;
     for (; I != E; ++I)
-    {
         items.push_back(I->second);
-    };
 
     std::sort(items.begin(), items.end(), DM_Compare_Players);
 

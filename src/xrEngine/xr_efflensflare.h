@@ -23,11 +23,13 @@ public:
         // ref_shader hShader;
         SFlare() { fOpacity = fRadius = fPosition = 0; }
     };
+
     struct SSource : public SFlare
     {
         BOOL ignore_color;
     };
-    DEFINE_VECTOR(SFlare, FlareVec, FlareIt);
+    using FlareVec = xr_vector<SFlare>;
+
     FlareVec m_Flares;
 
     enum

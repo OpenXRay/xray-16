@@ -9,8 +9,7 @@
 #pragma once
 
 #include "action_script_base.h"
-
-class CAI_Stalker;
+#include "xrGame/ai/stalker/ai_stalker.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionBase

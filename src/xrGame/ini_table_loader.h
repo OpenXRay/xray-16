@@ -47,7 +47,7 @@ private:
     template <typename T_CONVERT_ITEM>
     T_ITEM convert(LPCSTR)
     {
-        STATIC_CHECK(false, Specialization_for_convert_in_CIni_Table_not_found);
+        static_assert(!std::is_same_v<T_CONVERT_ITEM, T_CONVERT_ITEM>, "Specialization for convert in CIni_Table not found."); // Xottab_DUTY: Is this correct?
         NODEFAULT;
     }
 
@@ -106,11 +106,11 @@ typename CSIni_Table::ITEM_TABLE& CSIni_Table::table()
 
     R_ASSERT3(table_ini.Data.size() == table_size, "wrong size for table in section", table_sect);
 
-    for (CInifile::SectCIt i = table_ini.Data.begin(); table_ini.Data.end() != i; ++i)
+    for (auto i = table_ini.Data.cbegin(); table_ini.Data.cend() != i; ++i)
     {
-        T_INI_LOADER::index_type cur_index = T_INI_LOADER::IdToIndex((*i).first, type_max(T_INI_LOADER::index_type));
+        T_INI_LOADER::index_type cur_index = T_INI_LOADER::IdToIndex((*i).first, type_max<T_INI_LOADER::index_type>);
 
-        if (type_max(T_INI_LOADER::index_type) == cur_index)
+        if (type_max<T_INI_LOADER::index_type> == cur_index)
             xrDebug::Fatal(DEBUG_INFO, "wrong community %s in section [%s]", (*i).first, table_sect);
 
         (*m_pTable)[cur_index].resize(cur_table_width);

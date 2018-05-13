@@ -19,4 +19,4 @@ template <typename TResult, typename... Policies>
 class functor;
 template <class T, class ValueWrapper>
 T object_cast(ValueWrapper const& value_wrapper);
-};
+}

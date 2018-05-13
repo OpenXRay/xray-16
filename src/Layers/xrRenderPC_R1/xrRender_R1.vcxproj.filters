@@ -579,8 +579,8 @@
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\RenderAllocator.hpp">
-      <Filter>Core</Filter>
+    <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -967,9 +967,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\ParticleGroup.cpp">
       <Filter>Models\Visuals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\RenderAllocator.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

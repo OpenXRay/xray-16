@@ -1,7 +1,10 @@
 #pragma once
+#include "xrCore/fastdelegate.h"
+#include "xrCommon/xr_vector.h"
 
 struct SCallbackInfo;
 class CUIWindow;
+class shared_str;
 
 class CUIWndCallback
 {

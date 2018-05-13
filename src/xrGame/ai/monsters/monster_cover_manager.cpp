@@ -127,7 +127,7 @@ void CCoverEvaluator::evaluate_cover(const CCoverPoint* cover_point, float weigh
 
     float high_cover_value = ai().level_graph().high_cover_in_direction(y, cover_point->level_vertex_id());
     float low_cover_value = ai().level_graph().low_cover_in_direction(y, cover_point->level_vertex_id());
-    float cover_value = _min(high_cover_value, low_cover_value);
+    float cover_value = std::min(high_cover_value, low_cover_value);
     float value = cover_value;
     if (ai().level_graph().neighbour_in_direction(direction, cover_point->level_vertex_id()))
         value += 10.f;

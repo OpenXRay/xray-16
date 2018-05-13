@@ -38,7 +38,7 @@ void setup_lm_screenshot_matrices()
 
     bb.xform(Device.mView);
     // build project matrix
-    Device.mProject.build_projection_ortho(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.min.z, bb.max.z);
+    Device.mProject.build_projection_ortho(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMin.z, bb.vMax.z);
 }
 
 Fbox get_level_screenshot_bound()
@@ -47,11 +47,11 @@ Fbox get_level_screenshot_bound()
     if (g_pGameLevel->pLevel->section_exist("level_map"))
     {
         Fvector4 res2d = g_pGameLevel->pLevel->r_fvector4("level_map", "bound_rect");
-        res.min.x = res2d.x;
-        res.min.z = res2d.y;
+        res.vMin.x = res2d.x;
+        res.vMin.z = res2d.y;
 
-        res.max.x = res2d.z;
-        res.max.z = res2d.w;
+        res.vMax.x = res2d.z;
+        res.vMax.z = res2d.w;
     }
 
     return res;
@@ -69,7 +69,7 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
      psHUD_Flags.set(HUD_CROSSHAIR, FALSE);
      */
     m_b_redirect_input_to_level = false;
-    _unlink(name);
+    xr_unlink(name);
     file = FS.w_open(name);
     if (file)
     {
@@ -146,7 +146,7 @@ void CDemoRecord::MakeScreenshotFace()
         psHUD_Flags.assign(0);
         break;
     case 1:
-        GlobalEnv.Render->Screenshot();
+        GEnv.Render->Screenshot();
         psHUD_Flags.assign(s_hud_flag);
         m_bMakeScreenshot = FALSE;
         break;
@@ -156,32 +156,32 @@ void CDemoRecord::MakeScreenshotFace()
 
 void GetLM_BBox(Fbox& bb, INT Step)
 {
-    float half_x = bb.min.x + (bb.max.x - bb.min.x) / 2;
-    float half_z = bb.min.z + (bb.max.z - bb.min.z) / 2;
+    float half_x = bb.vMin.x + (bb.vMax.x - bb.vMin.x) / 2;
+    float half_z = bb.vMin.z + (bb.vMax.z - bb.vMin.z) / 2;
     switch (Step)
     {
     case 0:
     {
-        bb.max.x = half_x;
-        bb.min.z = half_z;
+        bb.vMax.x = half_x;
+        bb.vMin.z = half_z;
     }
     break;
     case 1:
     {
-        bb.min.x = half_x;
-        bb.min.z = half_z;
+        bb.vMin.x = half_x;
+        bb.vMin.z = half_z;
     }
     break;
     case 2:
     {
-        bb.max.x = half_x;
-        bb.max.z = half_z;
+        bb.vMax.x = half_x;
+        bb.vMax.z = half_z;
     }
     break;
     case 3:
     {
-        bb.min.x = half_x;
-        bb.max.z = half_z;
+        bb.vMin.x = half_x;
+        bb.vMax.z = half_z;
     }
     break;
     default: {
@@ -227,7 +227,7 @@ void CDemoRecord::MakeLevelMapProcess()
             }
         }
 
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_LEVELMAP, tmp);
+        GEnv.Render->Screenshot(IRender::SM_FOR_LEVELMAP, tmp);
 
         if (m_iLMScreenshotFragment == -1 || m_iLMScreenshotFragment == 4)
         {
@@ -267,10 +267,10 @@ void CDemoRecord::MakeCubeMapFace(Fvector& D, Fvector& N)
     case 5:
         N.set(cmNorm[m_Stage]);
         D.set(cmDir[m_Stage]);
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, itoa(m_Stage, buf, 10));
+        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, xr_itoa(m_Stage, buf, 10));
         break;
     case 6:
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, itoa(m_Stage, buf, 10));
+        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, xr_itoa(m_Stage, buf, 10));
         N.set(m_Camera.j);
         D.set(m_Camera.k);
         psHUD_Flags.assign(s_hud_flag);
@@ -423,7 +423,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     if (dik == DIK_ESCAPE)
         fLifeTime = -1;
 
-#ifndef MASTER_GOLD
+#ifdef DEBUG // ndef MASTER_GOLD // Xottab_DUTY: Teleport to demo cam in Debug configuration
     if (dik == DIK_RETURN)
     {
         if (g_pGameLevel->CurrentEntity())
@@ -432,7 +432,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
             fLifeTime = -1;
         }
     }
-#endif // #ifndef MASTER_GOLD
+#endif
 
     if (dik == DIK_PAUSE)
         Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");

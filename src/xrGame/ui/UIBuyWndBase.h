@@ -24,7 +24,7 @@ struct _preset_item
     shared_str addon_names[3];
     bool operator==(const shared_str& what) { return (sect_name == what); }
 };
-DEF_VECTOR(preset_items, _preset_item);
+using preset_items = xr_vector<_preset_item>;
 
 class IBuyWnd : public CUIDialogWnd
 {

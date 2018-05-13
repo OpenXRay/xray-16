@@ -42,11 +42,11 @@ bool CObjectSpace::BoxQuery(Fvector const& box_center, Fvector const& box_z_axis
 
     if (out_tris)
     {
-        for (CDB::RESULT* result = xrc.r_begin(); result != xrc.r_end(); ++result)
+        for (auto &result : *xrc.r_get())
         {
-            out_tris->push_back(result->verts[0]);
-            out_tris->push_back(result->verts[1]);
-            out_tris->push_back(result->verts[2]);
+            out_tris->push_back(result.verts[0]);
+            out_tris->push_back(result.verts[1]);
+            out_tris->push_back(result.verts[2]);
         }
     }
 

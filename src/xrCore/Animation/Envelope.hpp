@@ -36,17 +36,18 @@ the envelopes.
 #pragma pack(push, 1)
 struct st_Key
 {
+    u8 shape;
     enum
     {
         ktStepped = 1 << 0,
     };
     float value;
     float time;
-    u8 shape;
     float tension;
     float continuity;
     float bias;
     float param[4];
+
     st_Key() { ZeroMemory(this, sizeof(st_Key)); }
     IC bool equal(const st_Key& tgt)
     {
@@ -115,7 +116,8 @@ struct st_Key
 };
 #pragma pack(pop)
 
-DEFINE_VECTOR(st_Key*, KeyVec, KeyIt);
+using KeyVec = xr_vector<st_Key*>;
+using KeyIt = KeyVec::iterator;
 
 // refs
 class CExporter;
@@ -123,10 +125,9 @@ class CExporter;
 class XRCORE_API CEnvelope
 {
 public:
-    KeyVec keys;
     int behavior[2];
+    KeyVec keys;
 
-public:
     CEnvelope()
     {
         behavior[0] = 1;

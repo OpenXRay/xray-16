@@ -1,15 +1,14 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_Source* CSoundRender_Core::i_create_source(LPCSTR name)
+CSoundRender_Source* CSoundRender_Core::i_create_source(pcstr name)
 {
     // Search
     string256 id;
     xr_strcpy(id, name);
-    strlwr(id);
+    xr_strlwr(id);
     if (strext(id))
         *strext(id) = 0;
     for (u32 it = 0; it < s_sources.size(); it++)

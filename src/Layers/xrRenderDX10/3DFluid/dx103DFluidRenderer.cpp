@@ -787,7 +787,7 @@ void dx103DFluidRenderer::DrawBox()
 
 void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, FogLighting& LightData)
 {
-    m_lstRenderables.clear_not_free();
+    m_lstRenderables.clear();
 
     LightData.Reset();
 
@@ -802,8 +802,8 @@ void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, Fo
     const Fmatrix& Transform = FluidData.GetTransform();
 
     Fbox box;
-    box.min = Fvector3().set(-0.5f, -0.5f, -0.5f);
-    box.max = Fvector3().set(0.5f, 0.5f, 0.5f);
+    box.vMin = Fvector3().set(-0.5f, -0.5f, -0.5f);
+    box.vMax = Fvector3().set(0.5f, 0.5f, 0.5f);
     box.xform(Transform);
     Fvector3 center;
     Fvector3 size;

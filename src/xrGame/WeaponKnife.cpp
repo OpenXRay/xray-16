@@ -14,6 +14,9 @@
 #include "xrCore/Animation/SkeletonMotions.hpp"
 #include "player_hud.h"
 #include "ActorEffector.h"
+#ifdef DEBUG
+#include <iterator>
+#endif
 
 #define KNIFE_MATERIAL_NAME "objects\\knife"
 
@@ -68,14 +71,19 @@ void CWeaponKnife::Load(LPCSTR section)
     knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
 }
 
-void CWeaponKnife::OnStateSwitch(u32 S)
+void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
 {
-    inherited::OnStateSwitch(S);
+    inherited::OnStateSwitch(S, oldState);
     switch (S)
     {
     case eIdle: switch2_Idle(); break;
     case eShowing: switch2_Showing(); break;
-    case eHiding: switch2_Hiding(); break;
+    case eHiding:
+    {
+        if (oldState != eHiding)
+            switch2_Hiding();
+        break;
+    }
     case eHidden: switch2_Hidden(); break;
     case eFire:
     {

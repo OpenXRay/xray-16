@@ -1,6 +1,7 @@
 #pragma once
 #include "UIButton.h"
 #include "UI_IB_Static.h"
+#include "xrSound/Sound.h"
 
 class CUI3tButton : public CUIButton
 {

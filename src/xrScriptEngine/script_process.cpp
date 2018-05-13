@@ -11,7 +11,6 @@
 #include "script_process.hpp"
 #include "script_thread.hpp"
 #include "common/object_broker.h"
-#include "Include/xrAPI/xrAPI.h"
 
 string4096 g_ca_stdout; // XXX: allocate dynamically for each CScriptEngine instance
 

@@ -36,10 +36,21 @@ IC static void generate_orthonormal_basis1(const Fvector& dir, Fvector& updir, F
 void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 {
     // Lookout
-    if (mstate_wf & mcLookout)
-        mstate_real |= mstate_wf & mcLookout;
-    else
+    if ((mstate_wf & mcLLookout) && (mstate_wf & mcRLookout))
+    {
+        // It's impossible to perform right and left lookouts in the same time
         mstate_real &= ~mcLookout;
+    }
+    else if (mstate_wf & mcLookout)
+    {
+        // Activate one of lookouts
+        mstate_real |= mstate_wf & mcLookout;
+    }
+    else
+    {
+        // No lookouts needed
+        mstate_real &= ~mcLookout;
+    }
 
     if (mstate_real & (mcJump | mcFall | mcLanding | mcLanding2))
         mstate_real &= ~mcLookout;

@@ -10,6 +10,7 @@
 #include "blender_bloom_build.h"
 #include "blender_luminance.h"
 #include "blender_ssao.h"
+#include "blender_fxaa.h"
 #include "dx11MinMaxSMBlender.h"
 #include "dx11HDAOCSBlender.h"
 #include "Layers/xrRenderDX10/msaa/dx10MSAABlender.h"
@@ -293,7 +294,7 @@ CRenderTarget::CRenderTarget()
     param_noise_fps = 25.f;
     param_noise_scale = 1.f;
 
-    im_noise_time = 1 / 100;
+    im_noise_time = 1 / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 
@@ -321,6 +322,9 @@ CRenderTarget::CRenderTarget()
     b_luminance = new CBlender_luminance();
     b_combine = new CBlender_combine();
     b_ssao = new CBlender_SSAO_noMSAA();
+
+    //FXAA
+    b_fxaa = new CBlender_FXAA();
 
     // HDAO
     b_hdao_cs = new CBlender_CS_HDAO();
@@ -412,11 +416,13 @@ CRenderTarget::CRenderTarget()
         // generic(LDR) RTs
         rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, 1);
         rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
+        rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
+        rt_secondVP.create (r2_RT_secondVP, w, h, D3DFMT_A8R8G8B8, 1); //--#SM+#-- +SecondVP+
+
         if (RImplementation.o.dx10_msaa)
         {
             rt_Generic_0_r.create(r2_RT_generic0_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
             rt_Generic_1_r.create(r2_RT_generic1_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
-            rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
         }
         //	Igor: for volumetric lights
         // rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
@@ -630,6 +636,10 @@ CRenderTarget::CRenderTarget()
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
     }
 
+    //FXAA
+    s_fxaa.create(b_fxaa, "r3\\fxaa");
+    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
+
     // HBAO
     if (RImplementation.o.ssao_opt_data)
     {
@@ -652,32 +662,35 @@ CRenderTarget::CRenderTarget()
         s_ssao.create(b_ssao, "r2\\ssao");
     }
 
-    // if (RImplementation.o.ssao_blur_on)
-    //{
-    //	u32		w = Device.dwWidth, h = Device.dwHeight;
-    //	rt_ssao_temp.create			(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
-    //	s_ssao.create				(b_ssao, "r2\\ssao");
-
-    //	if( RImplementation.o.dx10_msaa )
-    //	{
-    //		int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
-
-    //		for( int i = 0; i < bound; ++i )
-    //		{
-    //			s_ssao_msaa[i].create( b_ssao_msaa[i], "null");
-    //		}
-    //	}
-    //}
-
     // HDAO
-    if (RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra)
+    const bool ssao_blur_on = RImplementation.o.ssao_blur_on;
+    const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra;
+    if (ssao_blur_on || ssao_hdao_ultra)
     {
-        u32 w = Device.dwWidth, h = Device.dwHeight;
-        rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, true);
-        s_hdao_cs.create(b_hdao_cs, "r2\\ssao");
-        if (RImplementation.o.dx10_msaa)
+        const auto w = Device.dwWidth, h = Device.dwHeight;
+
+        if (ssao_hdao_ultra)
         {
-            s_hdao_cs_msaa.create(b_hdao_msaa_cs, "r2\\ssao");
+            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, true);
+            s_hdao_cs.create(b_hdao_cs, "r2\\ssao");
+            if (RImplementation.o.dx10_msaa)
+                s_hdao_cs_msaa.create(b_hdao_msaa_cs, "r2\\ssao");
+        }
+
+        else if (ssao_blur_on)
+        {
+            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
+            s_ssao.create(b_ssao, "r2\\ssao");
+
+
+            /* Should be used in r4_rendertarget_phase_ssao.cpp but it's commented there.
+            if (RImplementation.o.dx10_msaa)
+            {
+                const int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
+
+                for (int i = 0; i < bound; ++i)
+                    s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
+            }*/
         }
     }
 
@@ -1061,6 +1074,7 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_accum_point);
     xr_delete(b_accum_direct);
     xr_delete(b_ssao);
+    xr_delete(b_fxaa); //FXAA
 
     if (RImplementation.o.dx10_msaa)
     {

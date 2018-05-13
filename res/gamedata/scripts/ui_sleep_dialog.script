@@ -35,7 +35,7 @@ function sleep_dialog:__init() super()
 	self:Register(self.btn_cancel, "btn_cancel")
 
 	self.sleep_mb = CUIMessageBoxEx()
-	self.sleep_mb:self:SetAutoDelete(true)
+	self.sleep_mb:SetAutoDelete(true)
 	self:Register(self.sleep_mb, "sleep_mb")
 --------------------------------------------------------------------------------
 	self:AddCallback("btn_sleep", ui_events.BUTTON_CLICKED, self.OnButtonSleep, self)
@@ -137,14 +137,16 @@ function sleep_dialog:OnMessageBoxOk()
 end
 
 function sleep_dialog:OnKeyboard(dik, keyboard_action)
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	CUIScriptWnd.OnKeyboard(self, dik, keyboard_action)
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_ESCAPE then
 			self:HideDialog()
 			db.actor:give_info_portion("tutorial_sleep")
 			disable_info("sleep_active")
+            return true
 		end
 	end
+	return false
 end
 --------------------------------------------------------------------------------
 function dream_callback()

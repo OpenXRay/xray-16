@@ -4,8 +4,9 @@
 #include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
+#include "xrSASH.h"
 
-#include "cameramanager.h"
+#include "CameraManager.h"
 #include "Environment.h"
 #include "xr_input.h"
 #include "CustomHUD.h"
@@ -13,9 +14,22 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
-xr_token* vid_quality_token = NULL;
+ENGINE_API xr_vector<xr_token> AvailableVideoModes;
+xr_vector<xr_token> vid_quality_token;
 
-xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
+const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
+
+void IConsole_Command::InvalidSyntax()
+{
+    TInfo I;
+    Info(I);
+    Msg("~ Invalid syntax in call to '%s'", cName);
+    Msg("~ Valid arguments: %s", I);
+
+    g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
+    g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
+}
+
 //-----------------------------------------------------------------------
 
 void IConsole_Command::add_to_LRU(shared_str const& arg)
@@ -61,44 +75,6 @@ public:
     }
 };
 //-----------------------------------------------------------------------
-#ifdef DEBUG_MEMORY_MANAGER
-class CCC_MemStat : public IConsole_Command
-{
-public:
-    CCC_MemStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
-    {
-        string_path fn;
-        if (args && args[0])
-            xr_sprintf(fn, sizeof(fn), "%s.dump", args);
-        else
-            strcpy_s_s(fn, sizeof(fn), "x:\\$memory$.dump");
-        Memory.mem_statistic(fn);
-        // g_pStringContainer->dump ();
-        // g_pSharedMemoryContainer->dump ();
-    }
-};
-#endif // DEBUG_MEMORY_MANAGER
-
-#ifdef DEBUG_MEMORY_MANAGER
-class CCC_DbgMemCheck : public IConsole_Command
-{
-public:
-    CCC_DbgMemCheck(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
-    {
-        if (Memory.debug_mode)
-        {
-            Memory.dbg_check();
-        }
-        else
-        {
-            Msg("~ Run with -mem_debug options.");
-        }
-    }
-};
-#endif // DEBUG_MEMORY_MANAGER
-
 class CCC_DbgStrCheck : public IConsole_Command
 {
 public:
@@ -112,7 +88,6 @@ public:
     CCC_DbgStrDump(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR args) { g_pStringContainer->dump(); }
 };
-
 //-----------------------------------------------------------------------
 class CCC_MotionsStat : public IConsole_Command
 {
@@ -305,7 +280,7 @@ class CCC_Start : public IConsole_Command
     {
         string4096 out;
         xr_strcpy(out, sizeof(out), str);
-        strlwr(str);
+        xr_strlwr(str);
 
         LPCSTR name_str = "name=";
         LPCSTR name1 = strstr(str, name_str);
@@ -348,7 +323,7 @@ public:
         parse(op_client, args, "client"); // 2. client
         parse(op_demo, args, "demo"); // 3. demo
 
-        strlwr(op_server);
+        xr_strlwr(op_server);
         protect_Name_strlwr(op_client);
 
         if (!op_client[0] && strstr(op_server, "single"))
@@ -415,7 +390,7 @@ public:
         }
     }
     virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
-    virtual xr_token* GetToken() { return GlobalEnv.vid_mode_token; }
+    const xr_token* GetToken() noexcept override { return AvailableVideoModes.data(); }
     virtual void Info(TInfo& I) { xr_strcpy(I, sizeof(I), "change screen resolution WxH"); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -423,7 +398,7 @@ public:
         Status(cur);
 
         bool res = false;
-        xr_token* tok = GetToken();
+        const xr_token* tok = GetToken();
         while (tok->name && !res)
         {
             if (!xr_strcmp(tok->name, cur))
@@ -453,8 +428,8 @@ public:
     CCC_SND_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR args)
     {
-        if (Sound)
-            Sound->_restart();
+        if (GEnv.Sound)
+            GEnv.Sound->_restart();
     }
 };
 
@@ -467,10 +442,10 @@ public:
     virtual void Execute(LPCSTR args)
     {
         CCC_Float::Execute(args);
-        GlobalEnv.Render->setGamma(ps_gamma);
-        GlobalEnv.Render->setBrightness(ps_brightness);
-        GlobalEnv.Render->setContrast(ps_contrast);
-        GlobalEnv.Render->updateGamma();
+        GEnv.Render->setGamma(ps_gamma);
+        GEnv.Render->setBrightness(ps_brightness);
+        GEnv.Render->setContrast(ps_contrast);
+        GEnv.Render->updateGamma();
     }
 };
 
@@ -537,16 +512,19 @@ public:
     virtual ~CCC_r2() {}
     virtual void Execute(LPCSTR args)
     {
-        // vid_quality_token must be already created!
-        tokens = vid_quality_token;
+        tokens = vid_quality_token.data();
 
         inherited::Execute(args);
         // 0 - r1
         // 1..3 - r2
         // 4 - r3
+        // 5 - r4
+        // 6 - rgl
+        psDeviceFlags.set(rsR1, renderer_value == 0);
         psDeviceFlags.set(rsR2, ((renderer_value > 0) && renderer_value < 4));
         psDeviceFlags.set(rsR3, (renderer_value == 4));
-        psDeviceFlags.set(rsR4, (renderer_value >= 5));
+        psDeviceFlags.set(rsR4, (renderer_value == 5));
+        psDeviceFlags.set(rsRGL, (renderer_value == 6));
 
         r2_sun_static = (renderer_value < 2);
 
@@ -556,19 +534,17 @@ public:
     virtual void Save(IWriter* F)
     {
         // fill_render_mode_list ();
-        tokens = vid_quality_token;
-        if (!strstr(Core.Params, "-r2"))
-        {
-            inherited::Save(F);
-        }
+        tokens = vid_quality_token.data();
+        inherited::Save(F);
     }
-    virtual xr_token* GetToken()
+
+    const xr_token* GetToken() noexcept override
     {
-        tokens = vid_quality_token;
+        tokens = vid_quality_token.data();
         return inherited::GetToken();
     }
 };
-#ifndef DEDICATED_SERVER
+
 class CCC_soundDevice : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -592,7 +568,7 @@ public:
         inherited::Status(S);
     }
 
-    virtual xr_token* GetToken()
+    const xr_token* GetToken() noexcept override
     {
         tokens = snd_devices_token;
         return inherited::GetToken();
@@ -606,8 +582,9 @@ public:
         inherited::Save(F);
     }
 };
-#endif
+
 //-----------------------------------------------------------------------
+
 class CCC_ExclusiveMode : public IConsole_Command
 {
 private:
@@ -664,6 +641,8 @@ extern Flags32 psEnvFlags;
 
 extern int g_ErrorLineCount;
 
+ENGINE_API int ps_always_active = 0;
+
 ENGINE_API int ps_r__Supersample = 1;
 void CCC_Register()
 {
@@ -679,11 +658,6 @@ void CCC_Register()
     CMD1(CCC_MotionsStat, "stat_motions");
     CMD1(CCC_TexturesStat, "stat_textures");
 #endif // DEBUG
-
-#ifdef DEBUG_MEMORY_MANAGER
-    CMD1(CCC_MemStat, "dbg_mem_dump");
-    CMD1(CCC_DbgMemCheck, "dbg_mem_check");
-#endif // DEBUG_MEMORY_MANAGER
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);
@@ -754,7 +728,7 @@ void CCC_Register()
     CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
     CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EAX);
     CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 4, 32);
-    CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 4, 32);
+    CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 4, 64);
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "snd_stats", &g_stats_flags, st_sound);
@@ -776,11 +750,13 @@ void CCC_Register()
     CMD2(CCC_Float, "cam_inert", &psCamInert);
     CMD2(CCC_Float, "cam_slide_inert", &psCamSlideInert);
 
+    CMD4(CCC_Integer, "always_active", &ps_always_active, 0, 1);
+
     CMD1(CCC_r2, "renderer");
 
-#ifndef DEDICATED_SERVER
-    CMD1(CCC_soundDevice, "snd_device");
-#endif
+    if (!GEnv.isDedicatedServer)
+        CMD1(CCC_soundDevice, "snd_device");
+
     // psSoundRolloff = pSettings->r_float ("sound","rolloff"); clamp(psSoundRolloff, EPS_S, 2.f);
     psSoundOcclusionScale = pSettings->r_float("sound", "occlusion_scale");
     clamp(psSoundOcclusionScale, 0.1f, .5f);

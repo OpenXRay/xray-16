@@ -19,7 +19,7 @@ void LevelCompilerLoggerWindow::Initialize(const char* name)
     InitCommonControls();
     Sleep(150);
     xr_strcpy(this->name, name);
-    thread_spawn(LogThreadProc, "log-update", 1024 * 1024, 0);
+    thread_spawn(LogThreadProc, "log-update", 1024 * 1024, this);
     while (!logWindow)
         Sleep(150);
     initialized = true;
@@ -56,7 +56,7 @@ void LevelCompilerLoggerWindow::LogThreadProc()
 {
     SetProcessPriorityBoost(GetCurrentProcess(), TRUE);
     logWindow =
-        CreateDialog(HINSTANCE(GetModuleHandle(0)), MAKEINTRESOURCE(IDD_LOG), 0, LevelCompilerLoggerWindowDlgProc);
+        CreateDialog(HINSTANCE(GetModuleHandle("xrLCUtil")), MAKEINTRESOURCE(IDD_LOG), 0, LevelCompilerLoggerWindowDlgProc);
     if (!logWindow)
         R_CHK(GetLastError());
     SetWindowText(logWindow, name);
@@ -79,7 +79,7 @@ void LevelCompilerLoggerWindow::LogThreadProc()
     string256 u_name;
     unsigned long u_size = sizeof(u_name) - 1;
     GetUserName(u_name, &u_size);
-    _strlwr(u_name);
+    xr_strlwr(u_name);
     if (!xr_strcmp(u_name, "oles") || !xr_strcmp(u_name, "alexmx"))
         bHighPriority = TRUE;
     // Main cycle
@@ -101,12 +101,12 @@ void LevelCompilerLoggerWindow::LogThreadProc()
         BOOL bWasChanges = FALSE;
         char tbuf[256];
         csLog.Enter();
-        if (LogSize != LogFile->size())
+        if (LogSize != LogFile.size())
         {
             bWasChanges = TRUE;
-            for (; LogSize < LogFile->size(); LogSize++)
+            for (; LogSize < LogFile.size(); LogSize++)
             {
-                const char* S = *(*LogFile)[LogSize];
+                const char* S = LogFile[LogSize].c_str();
                 if (!S)
                     S = "";
                 SendMessage(hwLog, LB_ADDSTRING, 0, (LPARAM)S);
@@ -252,3 +252,9 @@ void LevelCompilerLoggerWindow::Success(const char* msg)
 
 void LevelCompilerLoggerWindow::Failure(const char* msg) { MessageBox(logWindow, msg, "Error!", MB_OK | MB_ICONERROR); }
 HWND LevelCompilerLoggerWindow::GetWindow() const { return logWindow; }
+
+LevelCompilerLoggerWindow & LevelCompilerLoggerWindow::instance()
+{
+    static LevelCompilerLoggerWindow instance;
+    return instance;
+}

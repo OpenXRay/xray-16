@@ -58,8 +58,7 @@ PS::PEDIt CPSLibrary::FindPEDIt(LPCSTR Name)
     PS::PEDIt I = std::lower_bound(m_PEDs.begin(), m_PEDs.end(), Name, ped_find_pred);
     if (I == m_PEDs.end() || (0 != xr_strcmp((*I)->m_Name, Name)))
         return m_PEDs.end();
-    else
-        return I;
+    return I;
 #endif
 }
 
@@ -82,8 +81,7 @@ PS::PGDIt CPSLibrary::FindPGDIt(LPCSTR Name)
     PS::PGDIt I = std::lower_bound(m_PGDs.begin(), m_PGDs.end(), Name, pgd_find_pred);
     if (I == m_PGDs.end() || (0 != xr_strcmp((*I)->m_Name, Name)))
         return m_PGDs.end();
-    else
-        return I;
+    return I;
 #endif
 }
 
@@ -116,11 +114,11 @@ void CPSLibrary::Remove(const char* nm)
     }
     else
     {
-        PS::PGDIt it = FindPGDIt(nm);
-        if (it != m_PGDs.end())
+        PS::PGDIt it2 = FindPGDIt(nm);
+        if (it2 != m_PGDs.end())
         {
-            xr_delete(*it);
-            m_PGDs.erase(it);
+            xr_delete(*it2);
+            m_PGDs.erase(it2);
         }
     }
 }
@@ -134,7 +132,7 @@ bool CPSLibrary::Load2()
     FS.file_list(files, _path, FS_ListFiles, "*.pe,*.pg");
 
 #ifdef _EDITOR
-    SPBItem* pb = NULL;
+    SPBItem* pb = nullptr;
     if (UI->m_bReady)
         pb = UI->ProgressStart(files.size(), "Loading particles...");
 #endif
@@ -155,7 +153,7 @@ bool CPSLibrary::Load2()
 #endif
 
         xr_sprintf(_path, sizeof(_path), "%s%s", p_path, p_name);
-        if (0 == stricmp(p_ext, ".pe"))
+        if (0 == xr_stricmp(p_ext, ".pe"))
         {
             PS::CPEDef* def = new PS::CPEDef();
             def->m_Name = _path;
@@ -164,7 +162,7 @@ bool CPSLibrary::Load2()
             else
                 xr_delete(def);
         }
-        else if (0 == stricmp(p_ext, ".pg"))
+        else if (0 == xr_stricmp(p_ext, ".pg"))
         {
             PS::CPGDef* def = new PS::CPGDef();
             def->m_Name = _path;
@@ -275,8 +273,8 @@ void CPSLibrary::Reload()
 
 using PS::CPGDef;
 
-CPGDef const* const* CPSLibrary::particles_group_begin() const { return (m_PGDs.size() ? &*m_PGDs.begin() : 0); }
-CPGDef const* const* CPSLibrary::particles_group_end() const { return (m_PGDs.size() ? &*m_PGDs.end() : 0); }
+CPGDef const* const* CPSLibrary::particles_group_begin() const { return (m_PGDs.size() ? &m_PGDs.front() : 0); }
+CPGDef const* const* CPSLibrary::particles_group_end() const { return (m_PGDs.size() ? &m_PGDs.back() : 0); }
 void CPSLibrary::particles_group_next(PS::CPGDef const* const*& iterator) const
 {
     VERIFY(iterator);

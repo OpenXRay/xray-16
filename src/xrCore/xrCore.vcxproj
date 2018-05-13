@@ -5,160 +5,180 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Mixed|Win32">
       <Configuration>Mixed</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}</ProjectGuid>
     <RootNamespace>xrCore</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>false</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <BrowseInformation />
-      <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
     <Link>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;$(SolutionDir)Externals\lzo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <MapExports>false</MapExports>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying the required libraries ...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+      <Message>Copying the required libraries ...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <BrowseInformation />
-      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;$(SolutionDir)Externals\lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying the required libraries ...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+      <Message>Copying the required libraries ...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <ClCompile>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>false</OmitFramePointers>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <BrowseInformation />
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;$(SolutionDir)Externals\lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Windows</SubSystem>
-      <LargeAddressAware>true</LargeAddressAware>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying the required libraries ...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+      <Message>Copying the required libraries ...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation\Bone.cpp" />
@@ -172,15 +192,12 @@
     <ClCompile Include="Compression\rt_compressor9.cpp" />
     <ClCompile Include="cpuid.cpp" />
     <ClCompile Include="crc32.cpp" />
-    <ClCompile Include="Crypto\crypto.cpp" />
     <ClCompile Include="Crypto\xr_dsa.cpp" />
     <ClCompile Include="Crypto\xr_dsa_signer.cpp" />
     <ClCompile Include="Crypto\xr_dsa_verifyer.cpp" />
     <ClCompile Include="Crypto\xr_sha.cpp" />
     <ClCompile Include="Debug\dxerr.cpp" />
     <ClCompile Include="Debug\MiniDump.cpp" />
-    <ClCompile Include="Debug\StackTrace.cpp" />
-    <ClCompile Include="doug_lea_allocator.cpp" />
     <ClCompile Include="dump_string.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="FileSystem_borland.cpp" />
@@ -193,79 +210,65 @@
     <ClCompile Include="LocatorAPI_defs.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
+    <ClCompile Include="Math\PLC_CPP.cpp" />
     <ClCompile Include="Math\PLC_SSE.cpp" />
+    <ClCompile Include="Math\SkinXW_CPP.cpp" />
     <ClCompile Include="Math\Skin4W_MT.cpp" />
     <ClCompile Include="Math\SkinXW_SSE.cpp" />
     <ClCompile Include="Math\MathUtil.cpp" />
     <ClCompile Include="Media\Image.cpp" />
-    <ClCompile Include="memory_allocation_stats.cpp" />
-    <ClCompile Include="memory_monitor.cpp" />
-    <ClCompile Include="memory_usage.cpp" />
     <ClCompile Include="Model.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+      </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">TurnOffAllWarnings</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <ClCompile Include="NET_utils.cpp" />
     <ClCompile Include="os_clipboard.cpp" />
     <ClCompile Include="PostProcess\PostProcess.cpp" />
     <ClCompile Include="PostProcess\PPInfo.cpp" />
     <ClCompile Include="ppmd_compressor.cpp" />
-    <ClCompile Include="ptmalloc3\malloc.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4702</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">4702</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4702</DisableSpecificWarnings>
-    </ClCompile>
-    <ClCompile Include="ptmalloc3\sysdeps\win32\win32.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">Create</PrecompiledHeader>
       <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">false</ShowIncludes>
+      <ShowIncludes Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">false</ShowIncludes>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="stream_reader.cpp" />
     <ClCompile Include="string_concatenations.cpp" />
     <ClCompile Include="Text\MbHelpers.cpp" />
     <ClCompile Include="Threading\Event.cpp" />
-    <ClCompile Include="Threading\ttapi.cpp" />
+    <ClCompile Include="Threading\ScopeLock.cpp" />
+    <ClCompile Include="Threading\ThreadPool.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
-    <ClCompile Include="XML\tinystr.cpp" />
-    <ClCompile Include="XML\tinyxml.cpp" />
-    <ClCompile Include="XML\tinyxmlerror.cpp" />
-    <ClCompile Include="XML\tinyxmlparser.cpp" />
     <ClCompile Include="XML\XMLDocument.cpp" />
     <ClCompile Include="xrCore.cpp" />
     <ClCompile Include="ModuleLookup.cpp" />
     <ClCompile Include="xrDebug.cpp" />
     <ClCompile Include="xrMemory.cpp" />
-    <ClCompile Include="xrMemory_align.cpp" />
-    <ClCompile Include="xrMemory_debug.cpp" />
-    <ClCompile Include="xrMemory_POOL.cpp" />
-    <ClCompile Include="xrMemory_subst_borland.cpp" />
-    <ClCompile Include="xrMemory_subst_msvc.cpp" />
     <ClCompile Include="xrsharedmem.cpp" />
     <ClCompile Include="xrstring.cpp" />
-    <ClCompile Include="Xr_ini.cpp" />
+    <ClCompile Include="xr_ini.cpp" />
     <ClCompile Include="xr_shared.cpp" />
+    <ClCompile Include="xr_token.cpp" />
     <ClCompile Include="xr_trims.cpp" />
     <ClCompile Include="_compressed_normal.cpp" />
     <ClCompile Include="_math.cpp" />
@@ -303,7 +306,6 @@
     <ClInclude Include="Containers\AssociativeVector.hpp" />
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="cpuid.h" />
-    <ClInclude Include="Crypto\crypto.h" />
     <ClInclude Include="Crypto\xr_dsa.h" />
     <ClInclude Include="Crypto\xr_dsa_signer.h" />
     <ClInclude Include="Crypto\xr_dsa_verifyer.h" />
@@ -313,15 +315,10 @@
       <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="Debug\MiniDump.h" />
-    <ClInclude Include="Debug\StackTrace.h" />
-    <ClInclude Include="Debug\SymbolEngine.h" />
-    <ClInclude Include="doug_lea_allocator.h" />
     <ClInclude Include="dump_string.h" />
     <ClInclude Include="fastdelegate.h" />
     <CustomBuild Include="FileSystem.h" />
     <ClInclude Include="file_stream_reader.h" />
-    <ClInclude Include="FixedMap.h" />
-    <ClInclude Include="FixedSet.h" />
     <ClInclude Include="FixedVector.h" />
     <ClInclude Include="FMesh.hpp" />
     <ClInclude Include="FS.h" />
@@ -329,19 +326,19 @@
     <ClInclude Include="FS_internal.h" />
     <ClInclude Include="FTimer.h" />
     <ClInclude Include="intrusive_ptr.h" />
-    <ClInclude Include="intrusive_ptr_inline.h" />
     <ClInclude Include="LocatorAPI.h" />
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
+    <ClInclude Include="Math\PLC_CPP.hpp" />
     <ClInclude Include="Math\PLC_SSE.hpp" />
     <ClInclude Include="Math\Random32.hpp" />
     <ClInclude Include="Math\Skin4W_MT.hpp" />
+    <ClInclude Include="Math\SkinXW_CPP.hpp" />
     <ClInclude Include="Math\SkinXW_SSE.hpp" />
     <ClInclude Include="Math\MathUtil.hpp" />
+    <ClInclude Include="math_constants.h" />
     <ClInclude Include="Media\Image.hpp" />
-    <ClInclude Include="memory_allocator_options.h" />
-    <ClInclude Include="memory_monitor.h" />
     <ClInclude Include="net_utils.h" />
     <ClInclude Include="os_clipboard.h" />
     <ClInclude Include="PostProcess\PostProcess.hpp" />
@@ -349,7 +346,6 @@
     <ClInclude Include="PPMd.h" />
     <ClInclude Include="PPMdType.h" />
     <ClInclude Include="ppmd_compressor.h" />
-    <ClInclude Include="ptmalloc3\malloc-2.8.3.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="stream_reader.h" />
@@ -359,29 +355,27 @@
     <ClInclude Include="SubAlloc.hpp" />
     <ClInclude Include="Text\MbHelpers.h" />
     <ClInclude Include="Threading\Event.hpp" />
-    <ClInclude Include="Threading\ttapi.h" />
+    <ClInclude Include="Threading\ScopeLock.hpp" />
+    <ClInclude Include="Threading\ThreadPool.hpp" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
-    <ClInclude Include="XML\tinystr.h" />
-    <ClInclude Include="XML\tinyxml.h" />
     <ClInclude Include="XML\XMLDocument.hpp" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="ModuleLookup.hpp" />
+    <ClInclude Include="xrCore_benchmark_macros.h" />
     <ClInclude Include="xrDebug.h" />
     <ClInclude Include="xrDebug_macros.h" />
     <ClInclude Include="xrMemory.h" />
-    <ClInclude Include="xrMemory_align.h" />
-    <ClInclude Include="xrMEMORY_POOL.h" />
-    <ClInclude Include="xrMemory_pure.h" />
-    <ClInclude Include="xrMemory_subst_borland.h" />
-    <ClInclude Include="xrMemory_subst_msvc.h" />
     <ClInclude Include="xrPool.h" />
     <ClInclude Include="xrsharedmem.h" />
     <ClInclude Include="xrstring.h" />
     <ClInclude Include="xr_ini.h" />
     <ClInclude Include="xr_resource.h" />
     <ClInclude Include="xr_shared.h" />
+    <ClInclude Include="xr_shortcut.h" />
+    <ClInclude Include="xr_token.h" />
     <ClInclude Include="xr_trims.h" />
+    <ClInclude Include="xr_vector_defs.h" />
     <ClInclude Include="_bitwise.h" />
     <ClInclude Include="_color.h" />
     <ClInclude Include="_compressed_normal.h" />
@@ -419,8 +413,20 @@
     <None Include="Debug\DXTrace.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Externals\lzo.vcxproj">
+    <ProjectReference Include="$(xrExternals)BugTrap.vcxproj">
+      <Project>{e8cf1ada-264a-4127-86c2-fd7057d3792c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)cryptlib.vcxproj">
+      <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)lzo.vcxproj">
       <Project>{614aa57f-58d7-45a8-a5ff-93f04b05fac6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)pugixml_vs2017_static.vcxproj">
+      <Project>{07cf01c0-b887-499d-ad9c-799cb6a9fe64}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

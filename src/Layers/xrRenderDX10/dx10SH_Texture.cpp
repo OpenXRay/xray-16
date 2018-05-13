@@ -375,7 +375,7 @@ void CTexture::Load()
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
-    if (0 == stricmp(*cName, "$null"))
+    if (0 == xr_stricmp(*cName, "$null"))
         return;
     if (0 != strstr(*cName, "$user$"))
     {
@@ -498,7 +498,7 @@ void CTexture::Load()
 
         flags.seqCycles = FALSE;
         _fs->r_string(buffer, sizeof(buffer));
-        if (0 == stricmp(buffer, "cycled"))
+        if (0 == xr_stricmp(buffer, "cycled"))
         {
             flags.seqCycles = TRUE;
             _fs->r_string(buffer, sizeof(buffer));
@@ -547,10 +547,11 @@ void CTexture::Load()
             // pSurface->SetPriority	(PRIORITY_NORMAL);
             flags.MemoryUsage = mem;
         }
+
+        if (pSurface && bCreateView)
+            CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
     }
 
-    if (pSurface && bCreateView)
-        CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
     PostLoad();
 }
 
@@ -601,6 +602,8 @@ void CTexture::desc_update()
         {
             ID3DTexture2D* T = (ID3DTexture2D*)pSurface;
             T->GetDesc(&desc);
+            m_width = desc.Width;
+            m_height = desc.Height;
         }
     }
 }

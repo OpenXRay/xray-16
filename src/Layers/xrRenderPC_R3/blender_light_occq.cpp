@@ -35,7 +35,7 @@ void CBlender_light_occq::Compile(CBlender_Compile& C)
             // Clear all bits except the last one
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0x00, 0xFE, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
         }
-        //C.r_Stencil(TRUE,D3DCMP_ALWAYS,0x00,0xFF, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
+        // C.r_Stencil(TRUE,D3DCMP_ALWAYS,0x00,0xFF, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
         // keep/keep/keep
         C.r_End();
         break;

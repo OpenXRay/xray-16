@@ -19,14 +19,19 @@ using System::Type;
 using System::String;
 using System::Object;
 using System::ComponentModel::PropertyDescriptor;
-using editor::property_holder_collection;
 using Flobbster::Windows::Forms::PropertyBag;
 using System::ComponentModel::Design::CollectionEditor;
 
 typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 
 #pragma unmanaged
+namespace XRay
+{
+namespace Editor
+{
 extern ide_impl* g_ide;
+}
+}
 #pragma managed
 
 property_collection_editor::property_collection_editor(Type ^ type) : inherited(type) {}
@@ -44,7 +49,7 @@ String ^ property_collection_editor::GetDisplayText(Object ^ value)
 {
     property_container ^ container = safe_cast<property_container ^>(value);
 
-    property_holder_collection* collection = container->holder().collection();
+    XRay::Editor::property_holder_collection* collection = container->holder().collection();
     if (!collection)
         return (container->holder().display_name());
 
@@ -59,17 +64,16 @@ String ^ property_collection_editor::GetDisplayText(Object ^ value)
     return (to_string(buffer));
 }
 
-void property_collection_editor::on_move(Object ^ sender, EventArgs ^ e) { g_ide->window()->view().Invalidate(); }
+void property_collection_editor::on_move(Object ^ sender, EventArgs ^ e) { XRay::Editor::g_ide->window()->view().Invalidate(); }
 property_collection_editor::CollectionForm ^ property_collection_editor::CreateCollectionForm()
 {
-    //	VERIFY						(!m_collection_form);
+    //VERIFY(!m_collection_form);
     m_collection_form = inherited::CreateCollectionForm();
     m_collection_form->Move += gcnew System::EventHandler(this, &property_collection_editor::on_move);
     return (m_collection_form);
 }
 
-Object ^
-    property_collection_editor::EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value)
+Object^ property_collection_editor::EditValue(ITypeDescriptorContext ^ context, System::IServiceProvider ^ provider, Object ^ value)
 {
     if (!m_collection_form || !m_collection_form->Visible)
         return (inherited::EditValue(context, provider, value));

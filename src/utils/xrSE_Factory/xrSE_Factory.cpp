@@ -6,44 +6,31 @@
 //  Description : Precompiled header creatore
 ////////////////////////////////////////////////////////////////////////////
 
-#include "pch_script.h"
+#include "stdafx.h"
 #include "xrSE_Factory.h"
 #include "ai_space.h"
+#include "xrCore/ModuleLookup.hpp"
 #include "xrScriptEngine/script_engine.hpp"
-#include "object_factory.h"
-#include "xrEProps.h"
+#include "xrServerEntities/object_factory.h"
+#include "xrServerEntities/character_info.h"
+#include "xrServerEntities/specific_character.h"
 #include "xrSE_Factory_import_export.h"
 #include "script_properties_list_helper.h"
-
-#include "character_info.h"
-#include "specific_character.h"
-
-#include <lua/library_linkage.h>
-#include <luabind/library_linkage.h>
-
-#pragma comment(lib, "xrCore.lib")
 
 extern CSE_Abstract* F_entity_Create(LPCSTR section);
 
 extern CScriptPropertiesListHelper* g_property_list_helper;
-extern HMODULE prop_helper_module;
+extern XRay::Module prop_helper_module;
 
 extern "C" {
-FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section) { return (F_entity_Create(section)); }
+FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section) { return F_entity_Create(section); }
 FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
 {
-    CSE_Abstract* object = smart_cast<CSE_Abstract*>(abstract);
+    auto object = smart_cast<CSE_Abstract*>(abstract);
     F_entity_Destroy(object);
     abstract = 0;
 }
 };
-
-// typedef void DUMMY_STUFF (const void*,const u32&,void*);
-// XRCORE_API DUMMY_STUFF    *g_temporary_stuff;
-
-void setup_luabind_allocator();
-
-//#define TRIVIAL_ENCRYPTOR_DECODER
 
 BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
 {
@@ -51,15 +38,11 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
     {
     case DLL_PROCESS_ATTACH:
     {
-        //          g_temporary_stuff           = &trivial_encryptor::decode;
-
-        Debug._initialize(false);
-        Core._initialize("xrSE_Factory", NULL, TRUE, "fsfactory.ltx");
+        //xrDebug::Initialize(false);
+        //Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
         string_path SYSTEM_LTX;
         FS.update_path(SYSTEM_LTX, "$game_config$", "system.ltx");
-        pSettings = xr_new<CInifile>(SYSTEM_LTX);
-
-        setup_luabind_allocator();
+        pSettings = new CInifile(SYSTEM_LTX);
 
         CCharacterInfo::InitInternal();
         CSpecificCharacter::InitInternal();
@@ -74,14 +57,14 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
         CSpecificCharacter::DeleteIdToIndexData();
 
         xr_delete(g_object_factory);
-        CInifile** s = (CInifile**)(&pSettings);
+        auto s = (CInifile**)&pSettings;
         xr_delete(*s);
         xr_delete(g_property_list_helper);
         xr_delete(g_ai_space);
         xr_delete(g_object_factory);
         if (prop_helper_module)
-            FreeLibrary(prop_helper_module);
-        Core._destroy();
+            prop_helper_module->close();
+        //Core._destroy();
         break;
     }
     }
@@ -90,13 +73,13 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
 
 void _destroy_item_data_vector_cont(T_VECTOR* vec)
 {
-    T_VECTOR::iterator it = vec->begin();
-    T_VECTOR::iterator it_e = vec->end();
+    auto it = vec->begin();
+    auto it_e = vec->end();
 
     xr_vector<CUIXml*> _tmp;
     for (; it != it_e; ++it)
     {
-        xr_vector<CUIXml*>::iterator it_f = std::find(_tmp.begin(), _tmp.end(), (*it)._xml);
+        auto it_f = std::find(_tmp.begin(), _tmp.end(), (*it)._xml);
         if (it_f == _tmp.end())
             _tmp.push_back((*it)._xml);
     }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "RenderVisual.h"
+#include "Layers\xrRender\KinematicsAddBoneTransform.hpp" //--#SM+#--
 
 typedef void (*UpdateCallback)(IKinematics* P);
 
@@ -13,7 +14,15 @@ class IRenderVisual;
 class CBoneInstance;
 struct SEnumVerticesCallback;
 
-// 10 fps
+template <class T>
+class _box3;
+typedef _box3<float> Fbox;
+
+template <class T>
+struct _obb;
+typedef _obb<float> Fobb;
+
+// 100 ms = 10 fps
 #define UCalc_Interval (u32(100))
 
 class IKinematics
@@ -68,6 +77,9 @@ public:
     virtual void LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive) = 0;
     virtual u64 LL_GetBonesVisible() = 0;
     virtual void LL_SetBonesVisible(u64 mask) = 0;
+
+    virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset) = 0; //--#SM+#--
+    virtual void LL_ClearAdditionalTransform(u16 bone_id) = 0; //--#SM+#--
 
     // Main functionality
     virtual void CalculateBones(BOOL bForceExact = FALSE) = 0; // Recalculate skeleton

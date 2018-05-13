@@ -18,7 +18,7 @@ void CScriptGameObject::set_force_anti_aim(bool force)
     CBaseMonster* monster = smart_cast<CBaseMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "object is not CBaseMonster to call set_force_anti_aim");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "object is not CBaseMonster to call set_force_anti_aim");
         return;
     }
 
@@ -30,7 +30,7 @@ bool CScriptGameObject::get_force_anti_aim()
     CBaseMonster* monster = smart_cast<CBaseMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "object is not CBaseMonster to call get_force_anti_aim");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "object is not CBaseMonster to call get_force_anti_aim");
         return false;
     }
 
@@ -42,7 +42,7 @@ void CScriptGameObject::burer_set_force_gravi_attack(bool force)
     CBurer* monster = smart_cast<CBurer*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "object is not CBurer to call burer_set_force_gravi_attack");
         return;
     }
@@ -55,7 +55,7 @@ bool CScriptGameObject::burer_get_force_gravi_attack()
     CBurer* monster = smart_cast<CBurer*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "object is not CBurer to call burer_set_force_gravi_attack");
         return false;
     }
@@ -71,7 +71,7 @@ void CScriptGameObject::poltergeist_set_actor_ignore(bool ignore)
     CPoltergeist* monster = smart_cast<CPoltergeist*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "object is not Poltergeist to call poltergeist_set_actor_ignore");
         return;
     }
@@ -84,7 +84,7 @@ bool CScriptGameObject::poltergeist_get_actor_ignore()
     CPoltergeist* monster = smart_cast<CPoltergeist*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "object is not Poltergeist to call poltergeist_get_actor_ignore");
         return false;
     }
@@ -100,7 +100,7 @@ void CScriptGameObject::force_visibility_state(int state)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member force_visibility_state!");
         return;
     }
@@ -113,7 +113,7 @@ int CScriptGameObject::get_visibility_state()
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member get_visibility_state!");
         return CAI_Bloodsucker::full_visibility;
     }
@@ -126,7 +126,7 @@ void CScriptGameObject::set_override_animation(pcstr anim_name)
     CBaseMonster* monster = smart_cast<CBaseMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "object is not of CBaseMonster class!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "object is not of CBaseMonster class!");
         return;
     }
 
@@ -138,7 +138,7 @@ void CScriptGameObject::clear_override_animation()
     CBaseMonster* monster = smart_cast<CBaseMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "object is not of CBaseMonster class!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "object is not of CBaseMonster class!");
         return;
     }
 
@@ -150,7 +150,7 @@ void CScriptGameObject::force_stand_sleep_animation(u32 index)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member force_stand_sleep_animation!");
         return;
     }
@@ -163,7 +163,7 @@ void CScriptGameObject::release_stand_sleep_animation()
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member release_stand_sleep_animation!");
         return;
     }
@@ -176,7 +176,7 @@ void CScriptGameObject::set_invisible(bool val)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member set_invisible!");
         return;
     }
@@ -189,7 +189,7 @@ void CScriptGameObject::set_manual_invisibility(bool val)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member set_manual_invisible!");
         return;
     }
@@ -201,7 +201,7 @@ void CScriptGameObject::bloodsucker_drag_jump(CScriptGameObject* e, LPCSTR e_str
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot process drag, anim, jump for CAI_Bloodsucker!");
         return;
     }
@@ -217,7 +217,7 @@ void CScriptGameObject::set_enemy(CScriptGameObject* e)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member set_enemy!");
         return;
     }
@@ -231,7 +231,7 @@ void CScriptGameObject::set_vis_state(float val)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member set_vis_state!");
         return;
     }
@@ -250,7 +250,7 @@ void CScriptGameObject::off_collision(bool val)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member set_vis_state!");
         return;
     }
@@ -262,7 +262,7 @@ void CScriptGameObject::set_alien_control(bool val)
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Bloodsucker : cannot access class member alien_control_activate!");
         return;
     }
@@ -290,7 +290,7 @@ CScriptSoundInfo CScriptGameObject::GetSoundInfo()
     }
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member GetSoundInfo!");
     }
     return (ret_val);
@@ -312,7 +312,7 @@ CScriptMonsterHitInfo CScriptGameObject::GetMonsterHitInfo()
     }
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member GetMonsterHitInfo!");
     }
     return (ret_val);
@@ -351,7 +351,7 @@ bool CScriptGameObject::fake_death_fall_down()
     CZombie* monster = smart_cast<CZombie*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CZombie : cannot access class member fake_death_fall_down!");
         return false;
     }
@@ -363,7 +363,7 @@ void CScriptGameObject::fake_death_stand_up()
     CZombie* monster = smart_cast<CZombie*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CZombie : cannot access class member fake_death_fall_down!");
         return;
     }

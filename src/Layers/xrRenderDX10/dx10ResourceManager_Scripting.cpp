@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/ResourceManager.h"
@@ -24,7 +23,7 @@ class adopt_dx10options
 public:
     bool _dx10_msaa_alphatest_atoc()
     {
-        return (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        return RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
     }
 };
 
@@ -32,13 +31,15 @@ public:
 class adopt_dx10sampler
 {
     CBlender_Compile* m_pC;
-    u32 m_SI; //	Sampler index
+    u32 m_SI; // Sampler index
+
 public:
     adopt_dx10sampler(CBlender_Compile* C, u32 SamplerIndex) : m_pC(C), m_SI(SamplerIndex)
     {
         if (u32(-1) == m_SI)
             m_pC = 0;
     }
+
     adopt_dx10sampler(const adopt_dx10sampler& _C) : m_pC(_C.m_pC), m_SI(_C.m_SI)
     {
         if (u32(-1) == m_SI)
@@ -447,8 +448,8 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     LPCSTR t_0 = *L_textures[0] ? *L_textures[0] : "null";
     LPCSTR t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
     LPCSTR t_d = detail_texture ? detail_texture : "null";
-    object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
-    functor<void> element = shader[name];
+    const object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
+    const functor<void> element = (object)shader[name];
     bool bFirstPass = false;
     adopt_compiler ac = adopt_compiler(this, bFirstPass);
     element(ac, t_0, t_1, t_d);

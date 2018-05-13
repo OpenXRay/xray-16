@@ -5,15 +5,17 @@
 static LPCSTR RTname = "$user$rendertarget";
 static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
 static LPCSTR RTname_distort = "$user$distort";
+static LPCSTR RTname_SecondVP = "$user$viewport2"; //--#SM+#-- +SecondVP+
 
 CRenderTarget::CRenderTarget()
 {
     bAvailable = FALSE;
-    RT = 0;
-    RT_color_map = 0;
-    pTempZB = 0;
-    ZB = 0;
-    pFB = 0;
+    RT = nullptr;
+    RT_color_map = nullptr;
+    RT_SecondVP  = nullptr; //--#SM+# +SecondVP+
+    pTempZB = nullptr;
+    ZB = nullptr;
+    pFB = nullptr;
 
     param_blur = 0.f;
     param_gray = 0.f;
@@ -26,7 +28,7 @@ CRenderTarget::CRenderTarget()
     param_color_map_influence = 0.0f;
     param_color_map_interpolate = 0.0f;
 
-    im_noise_time = 1 / 100;
+    im_noise_time = 1 / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 
@@ -64,6 +66,8 @@ BOOL CRenderTarget::Create()
     }
     // RImplementation.o.color_mapping = RT_color_map->valid();
 
+    RT_SecondVP.create(RTname_SecondVP, rtWidth, rtHeight, HW.Caps.fTarget); //--#SM+#-- +SecondVP+
+
     if ((rtHeight != Device.dwHeight) || (rtWidth != Device.dwWidth))
     {
         R_CHK(HW.pDevice->CreateDepthStencilSurface(
@@ -84,7 +88,7 @@ BOOL CRenderTarget::Create()
     //u32 w = Device.dwWidth, h = Device.dwHeight;
     //HW.pDevice->CreateOffscreenPlainSurface(
     // Device.dwWidth, Device.dwHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pFB, NULL);
-    HW.pDevice->CreateOffscreenPlainSurface(rtWidth, rtHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, NULL);
+    HW.pDevice->CreateOffscreenPlainSurface(rtWidth, rtHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, nullptr);
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
@@ -111,6 +115,7 @@ CRenderTarget::~CRenderTarget()
     s_postprocess_D[0].destroy();
     s_postprocess[1].destroy();
     g_postprocess.destroy();
+    RT_SecondVP.destroy(); //--#SM+#-- +SecondVP+
     RT_distort.destroy();
     RT_color_map.destroy();
     RT.destroy();
@@ -272,7 +277,8 @@ struct TL_2c3uv
     u32 color0;
     u32 color1;
     Fvector2 uv[3];
-    IC void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
+
+    void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
     {
         p.set(x, y, EPS_S, 1.f);
         color0 = c0;

@@ -5,7 +5,7 @@
 
 dx103DFluidVolume::dx103DFluidVolume() {}
 dx103DFluidVolume::~dx103DFluidVolume() {}
-void dx103DFluidVolume::Load(LPCSTR N, IReader* data, u32 dwFlags)
+void dx103DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
 {
     //	Uncomment this if choose to read from OGF
     //	dxRender_Visual::Load		(N,data,dwFlags);
@@ -26,8 +26,8 @@ void dx103DFluidVolume::Load(LPCSTR N, IReader* data, u32 dwFlags)
     const Fmatrix& Transform = m_FluidData.GetTransform();
 
     //	Update visibility data
-    vis.box.min = Fvector3().set(-0.5f, -0.5f, -0.5f);
-    vis.box.max = Fvector3().set(0.5f, 0.5f, 0.5f);
+    vis.box.vMin = Fvector3().set(-0.5f, -0.5f, -0.5f);
+    vis.box.vMax = Fvector3().set(0.5f, 0.5f, 0.5f);
 
     vis.box.xform(Transform);
 
@@ -42,8 +42,8 @@ void dx103DFluidVolume::Load(LPCSTR N, IReader* data, u32 dwFlags)
         m_FluidData.SetTransform(Transform);
 
         //	Update visibility data
-        vis.box.min = Fvector3().set(-0.5f, -0.5f, -0.5f);
-        vis.box.max = Fvector3().set( 0.5f,  0.5f,  0.5f);
+        vis.box.vMin = Fvector3().set(-0.5f, -0.5f, -0.5f);
+        vis.box.vMax = Fvector3().set( 0.5f,  0.5f,  0.5f);
 
         vis.box.xform(Transform);
 
@@ -77,15 +77,15 @@ void dx103DFluidVolume::Load(LPCSTR N, IReader* data, u32 dwFlags)
     m_FluidData.SetTransform(Transform);
 
     vis.box.set(B);
-    //vis.box.min = Fvector3().set(-0.5f, -0.5f, -0.5f);
-    //vis.box.max = Fvector3().set( 0.5f,  0.5f,  0.5f);
+    //vis.box.vMin = Fvector3().set(-0.5f, -0.5f, -0.5f);
+    //vis.box.vMax = Fvector3().set( 0.5f,  0.5f,  0.5f);
 
     vis.box.getcenter(vis.sphere.P);
     vis.sphere.R = vis.box.getradius();
     */
 }
 
-void dx103DFluidVolume::Render(float LOD) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
+void dx103DFluidVolume::Render(float /*LOD*/) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
 {
     //	Render debug box
     //	Do it BEFORE update since update resets shaders and other pipeline settings
@@ -100,10 +100,10 @@ void dx103DFluidVolume::Render(float LOD) // LOD - Level Of Detail  [0.0f - min,
     u32 clr = 0xFFFFFFFF;
 
     Fbox box;
-    box.min = Fvector3().set(-0.5f, -0.5f, -0.5f);
-    box.max = Fvector3().set(0.5f, 0.5f, 0.5f);
-    // box.min = Fvector3().set( 0.0f,  0.0f,  0.0f);
-    // box.max = Fvector3().set( 1.0f,  1.0f,  1.0f);
+    box.vMin = Fvector3().set(-0.5f, -0.5f, -0.5f);
+    box.vMax = Fvector3().set(0.5f, 0.5f, 0.5f);
+    // box.vMin = Fvector3().set( 0.0f,  0.0f,  0.0f);
+    // box.vMax = Fvector3().set( 1.0f,  1.0f,  1.0f);
 
     //	Prepare box here
     {

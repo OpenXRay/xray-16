@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrAICore/xrAICore.hpp"
+
 #include "xrAICore/Navigation/game_graph_space.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 

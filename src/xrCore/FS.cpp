@@ -3,12 +3,13 @@
 
 #include "fs_internal.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <io.h>
 #include <direct.h>
 #include <fcntl.h>
 #include <sys\stat.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 #ifdef M_BORLAND
 #define O_SEQUENTIAL 0
@@ -121,12 +122,7 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& file_handle)
 
 void* FileDownload(LPCSTR file_name, const int& file_handle, u32& file_size)
 {
-    void* buffer = Memory.mem_alloc(file_size
-#ifdef DEBUG_MEMORY_NAME
-        ,
-        "FILE in memory"
-#endif // DEBUG_MEMORY_NAME
-        );
+    void* buffer = xr_malloc(file_size);
 
     int r_bytes = _read(file_handle, buffer, file_size);
     R_ASSERT3(
@@ -156,7 +152,7 @@ void FileCompress(const char* fn, const char* sign, void* data, u32 size)
     MARK M;
     mk_mark(M, sign);
 
-    int H = open(fn, O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
+    int H = _open(fn, O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
     R_ASSERT2(H > 0, fn);
     _write(H, &M, 8);
     _writeLZ(H, data, size);
@@ -168,7 +164,7 @@ void* FileDecompress(const char* fn, const char* sign, u32* size)
     MARK M, F;
     mk_mark(M, sign);
 
-    int H = open(fn, O_BINARY | O_RDONLY);
+    int H = _open(fn, O_BINARY | O_RDONLY);
     R_ASSERT2(H > 0, fn);
     _read(H, &F, 8);
     if (strncmp(M, F, 8) != 0)
@@ -180,7 +176,7 @@ void* FileDecompress(const char* fn, const char* sign, u32* size)
 
     void* ptr = 0;
     u32 SZ;
-    SZ = _readLZ(H, ptr, filelength(H) - 8);
+    SZ = _readLZ(H, ptr, _filelength(H) - 8);
     _close(H);
     if (size)
         *size = SZ;
@@ -203,19 +199,9 @@ void CMemoryWriter::w(const void* ptr, u32 count)
         while (mem_size <= (position + count))
             mem_size *= 2;
         if (0 == data)
-            data = (BYTE*)Memory.mem_alloc(mem_size
-#ifdef DEBUG_MEMORY_NAME
-                ,
-                "CMemoryWriter - storage"
-#endif // DEBUG_MEMORY_NAME
-                );
+            data = (BYTE*)xr_malloc(mem_size);
         else
-            data = (BYTE*)Memory.mem_realloc(data, mem_size
-#ifdef DEBUG_MEMORY_NAME
-                ,
-                "CMemoryWriter - storage"
-#endif // DEBUG_MEMORY_NAME
-                );
+            data = (BYTE*)xr_realloc(data, mem_size);
     }
     CopyMemory(data + position, ptr, count);
     position += count;

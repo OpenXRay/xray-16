@@ -69,7 +69,7 @@ last_updates_cache::last_update_t* last_updates_cache::search_entity(u16 const e
 last_updates_cache::last_update_t* last_updates_cache::search_most_expired(
     u32 const current_time, u32 const update_size)
 {
-    STATIC_CHECK(cache_entities_size > 1, cache_entities_size__must_be_greater_than_one);
+    static_assert(cache_entities_size > 1, "Cache entities size must be greater than one.");
     last_update_t* min_time = &m_cache[0];
     for (u32 i = 1; i < cache_entities_size; ++i)
     {

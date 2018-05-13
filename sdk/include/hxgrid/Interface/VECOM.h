@@ -1,6 +1,8 @@
 #ifndef VECOM_INCLUDED
 #define VECOM_INCLUDED
 
+#include <atomic>
+
 #include "hxplatform.h"
 #include "Singleton.h"
 
@@ -54,44 +56,28 @@ namespace VECOM
 class TRefCountHolder
 {
  public: 
-  volatile ULONG RefCount;  
+  std::atomic<ULONG> RefCount;  
  
   TRefCountHolder()
   {
-   RefCount=1;
+   RefCount.store(1, std::memory_order_release);
   } 
 };
 
 } //namespace
-
-#ifndef _XBOX
  
 //for instantiated classes - tracks refcount
 #define IUNKNOWN_METHODS_IMPLEMENTATION_INSTANCE()    \
   VECOM::TRefCountHolder RefCountHolder; \
   virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppv) {*ppv=NULL; return E_NOINTERFACE;};  \
-  virtual ULONG __stdcall AddRef() {volatile ULONG* p = &RefCountHolder.RefCount; __asm {mov eax,p}; __asm{LOCK INC DWORD PTR [EAX]}; return RefCountHolder.RefCount;};  \
-  virtual ULONG __stdcall Release() {volatile ULONG* p = &RefCountHolder.RefCount; __asm {mov eax,p}; __asm{LOCK DEC DWORD PTR [EAX]}; ULONG r = RefCountHolder.RefCount; if (r==0) delete this; return r;};  
-  
-#define IUNKNOWN_METHODS_IMPLEMENTATION_INSTANCE_EXCLUDEQUERYINTERFACE()    \
-    VECOM::TRefCountHolder RefCountHolder; \
-    virtual ULONG __stdcall AddRef() {volatile ULONG* p = &RefCountHolder.RefCount; __asm {mov eax,p}; __asm{LOCK INC DWORD PTR [EAX]}; return RefCountHolder.RefCount;};  \
-    virtual ULONG __stdcall Release() {volatile ULONG* p = &RefCountHolder.RefCount; __asm {mov eax,p}; __asm{LOCK DEC DWORD PTR [EAX]}; ULONG r = RefCountHolder.RefCount; if (r==0) delete this; return r;};  
-
-#else
-
-#define IUNKNOWN_METHODS_IMPLEMENTATION_INSTANCE()    \
-  VECOM::TRefCountHolder RefCountHolder; \
-  virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppv) {*ppv=NULL; return E_NOINTERFACE;};  \
-  virtual ULONG __stdcall AddRef() {RefCountHolder.RefCount++; return RefCountHolder.RefCount;};  \
-  virtual ULONG __stdcall Release() {RefCountHolder.RefCount--; ULONG r = RefCountHolder.RefCount; if (r==0) delete this; return r;};  
+  virtual ULONG __stdcall AddRef() { return RefCountHolder.RefCount.fetch_add(1, std::memory_order_acq_rel); };  \
+  virtual ULONG __stdcall Release() { ULONG r = RefCountHolder.RefCount.fetch_sub(1, std::memory_order_acq_rel); if (r==0) delete this; return r;};
 
 #define IUNKNOWN_METHODS_IMPLEMENTATION_INSTANCE_EXCLUDEQUERYINTERFACE()    \
     VECOM::TRefCountHolder RefCountHolder; \
-    virtual ULONG __stdcall AddRef() {RefCountHolder.RefCount++; return RefCountHolder.RefCount;};  \
-    virtual ULONG __stdcall Release() {RefCountHolder.RefCount--; ULONG r = RefCountHolder.RefCount; if (r==0) delete this; return r;};  
+    virtual ULONG __stdcall AddRef() { return RefCountHolder.RefCount.fetch_add(1, std::memory_order_acq_rel); };  \
+    virtual ULONG __stdcall Release() { ULONG r = RefCountHolder.RefCount.fetch_sub(1, std::memory_order_acq_rel); if (r==0) delete this; return r; };
 
-#endif  
 
 //factory method for creating interfaces
 typedef IUnknown* (__cdecl *PInterfaceFactoryMethod)(TINTERFACEID InterfaceId, DWORD version, const void* ExData);
@@ -135,4 +121,3 @@ public:
 }; 
 
 #endif VECOM_INCLUDED
-

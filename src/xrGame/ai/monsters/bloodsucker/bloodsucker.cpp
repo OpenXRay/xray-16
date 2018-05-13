@@ -430,7 +430,7 @@ void CAI_Bloodsucker::SatisfyVampire()
     float health = conditions().GetHealth();
     health += m_vampire_gain_health;
 
-    health = _min(health, conditions().GetMaxHealth());
+    health = std::min(health, conditions().GetMaxHealth());
     conditions().SetHealth(health);
 }
 

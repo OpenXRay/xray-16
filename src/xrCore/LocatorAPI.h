@@ -6,8 +6,13 @@
 #pragma warning(pop)
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
+//#include "xrCore/Threading/Lock.hpp"
+#include "xrCommon/xr_map.h"
+#include "xrCommon/predicates.h"
+#include "Common/Noncopyable.hpp"
 
-class XRCORE_API CStreamReader;
+class CStreamReader;
+class Lock;
 
 enum class FSType
 {
@@ -24,23 +29,23 @@ public:
     bool Exists;
     bool External; // File can be accessed only as external
 
-    inline FileStatus(bool exists, bool external)
+    FileStatus(bool exists, bool external)
     {
         Exists = exists;
         External = external;
     }
 
-    inline operator bool() { return Exists; }
+    operator bool() const { return Exists; }
 };
 
-class XRCORE_API CLocatorAPI
+class XRCORE_API CLocatorAPI : Noncopyable
 {
     friend class FS_Path;
 
 public:
     struct file
     {
-        LPCSTR name; // low-case name
+        pcstr name; // low-case name
         u32 vfs; // 0xffffffff - standart file
         u32 crc; // contents CRC
         u32 ptr; // pointer inside vfs
@@ -48,53 +53,58 @@ public:
         u32 size_compressed; // if (size_real==size_compressed) - uncompressed
         u32 modif; // for editor
     };
+
     struct archive
     {
+        u32 size;
+        u32 vfs_idx;
         shared_str path;
         void *hSrcFile, *hSrcMap;
-        u32 size;
         CInifile* header;
-        u32 vfs_idx;
-        archive() : hSrcFile(NULL), hSrcMap(NULL), header(NULL), size(0), vfs_idx(u32(-1)) {}
+        
+        archive() : size(0), vfs_idx(u32(-1)), hSrcFile(nullptr), hSrcMap(nullptr), header(nullptr) {}
         void open();
         void close();
     };
-    DEFINE_VECTOR(archive, archives_vec, archives_it);
+
+    using archives_vec = xr_vector<archive>;
     archives_vec m_archives;
-    void LoadArchive(archive& A, LPCSTR entrypoint = NULL);
+    void LoadArchive(archive& A, pcstr entrypoint = nullptr);
 
 private:
-    struct file_pred : public std::binary_function<file&, file&, bool>
+    struct file_pred
     {
-        IC bool operator()(const file& x, const file& y) const { return xr_strcmp(x.name, y.name) < 0; }
+        bool operator()(const file& x, const file& y) const { return xr_strcmp(x.name, y.name) < 0; }
     };
-    DEFINE_MAP_PRED(LPCSTR, FS_Path*, PathMap, PathPairIt, pred_str);
+
+    using PathMap = xr_map<pcstr, FS_Path*, pred_str>;
     PathMap pathes;
 
-    DEFINE_SET_PRED(file, files_set, files_it, file_pred);
+    using files_set = xr_set<file, file_pred>;
+    using files_it = files_set::iterator;
 
-    DEFINE_VECTOR(_finddata_t, FFVec, FFIt);
+    using FFVec = xr_vector<_finddata64i32_t>;
     FFVec rec_files;
 
     int m_iLockRescan;
     void check_pathes();
 
     files_set m_files;
-    BOOL bNoRecurse;
+    bool bNoRecurse;
 
-    Lock m_auth_lock;
+    Lock* m_auth_lock;
     u64 m_auth_code;
 
-    const file* RegisterExternal(const char* name);
-    const file* Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);
-    void ProcessArchive(LPCSTR path);
-    void ProcessOne(LPCSTR path, const _finddata_t& entry);
-    bool Recurse(LPCSTR path);
+    const file* RegisterExternal(pcstr name);
+    const file* Register(pcstr name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);
+    void ProcessArchive(pcstr path);
+    void ProcessOne(pcstr path, const _finddata_t& entry);
+    bool Recurse(pcstr path);
 
-    files_it file_find_it(LPCSTR n);
+    files_it file_find_it(pcstr n);
 
 public:
-    enum
+    enum : u32
     {
         flNeedRescan = (1 << 0),
         flBuildCopy = (1 << 1),
@@ -112,82 +122,81 @@ public:
     u32 dwOpenCounter;
 
 private:
-    void check_cached_files(LPSTR fname, const u32& fname_size, const file& desc, LPCSTR& source_name);
+    void check_cached_files(pstr fname, const u32& fname_size, const file& desc, pcstr& source_name);
 
     void file_from_cache_impl(IReader*& R, LPSTR fname, const file& desc);
     void file_from_cache_impl(CStreamReader*& R, LPSTR fname, const file& desc);
     template <typename T>
-    void file_from_cache(T*& R, LPSTR fname, const u32& fname_size, const file& desc, LPCSTR& source_name);
+    void file_from_cache(T*& R, pstr fname, const u32& fname_size, const file& desc, pcstr& source_name);
 
-    void file_from_archive(IReader*& R, LPCSTR fname, const file& desc);
-    void file_from_archive(CStreamReader*& R, LPCSTR fname, const file& desc);
+    void file_from_archive(IReader*& R, pcstr fname, const file& desc);
+    void file_from_archive(CStreamReader*& R, pcstr fname, const file& desc);
 
     void copy_file_to_build(IWriter* W, IReader* r);
     void copy_file_to_build(IWriter* W, CStreamReader* r);
     template <typename T>
-    void copy_file_to_build(T*& R, LPCSTR source_name);
+    void copy_file_to_build(T*& R, pcstr source_name);
 
-    bool check_for_file(LPCSTR path, LPCSTR _fname, string_path& fname, const file*& desc);
+    bool check_for_file(pcstr path, pcstr _fname, string_path& fname, const file*& desc);
 
     template <typename T>
-    IC T* r_open_impl(LPCSTR path, LPCSTR _fname);
+    T* r_open_impl(pcstr path, pcstr _fname);
 
-private:
-    void setup_fs_path(LPCSTR fs_name, string_path& fs_path);
-    void setup_fs_path(LPCSTR fs_name);
-    IReader* setup_fs_ltx(LPCSTR fs_name);
+    void setup_fs_path(pcstr fs_name, string_path& fs_path);
+    void setup_fs_path(pcstr fs_name);
+    IReader* setup_fs_ltx(pcstr fs_name);
 
 public:
     CLocatorAPI();
     ~CLocatorAPI();
-    void _initialize(u32 flags, LPCSTR target_folder = 0, LPCSTR fs_name = 0);
+    void _initialize(u32 flags, pcstr target_folder = nullptr, pcstr fs_name = nullptr);
     void _destroy();
 
-    CStreamReader* rs_open(LPCSTR initial, LPCSTR N);
-    IReader* r_open(LPCSTR initial, LPCSTR N);
-    IC IReader* r_open(LPCSTR N) { return r_open(0, N); }
+    CStreamReader* rs_open(pcstr initial, pcstr N);
+    IReader* r_open(pcstr initial, pcstr N);
+    IReader* r_open(pcstr N) { return r_open(nullptr, N); }
     void r_close(IReader*& S);
     void r_close(CStreamReader*& fs);
 
-    IWriter* w_open(LPCSTR initial, LPCSTR N);
-    IC IWriter* w_open(LPCSTR N) { return w_open(0, N); }
-    IWriter* w_open_ex(LPCSTR initial, LPCSTR N);
-    IC IWriter* w_open_ex(LPCSTR N) { return w_open_ex(0, N); }
+    IWriter* w_open(pcstr initial, pcstr N);
+    IWriter* w_open(pcstr N) { return w_open(nullptr, N); }
+    IWriter* w_open_ex(pcstr initial, pcstr N);
+    IWriter* w_open_ex(pcstr N) { return w_open_ex(nullptr, N); }
     void w_close(IWriter*& S);
     // For registered files only
-    const file* GetFileDesc(const char* path);
+    const file* GetFileDesc(pcstr path);
 
-    FileStatus exist(LPCSTR N, FSType fsType = FSType::Virtual);
-    FileStatus exist(LPCSTR path, LPCSTR name, FSType fsType = FSType::Virtual);
-    FileStatus exist(string_path& fn, LPCSTR path, LPCSTR name, FSType fsType = FSType::Virtual);
-    FileStatus exist(string_path& fn, LPCSTR path, LPCSTR name, LPCSTR ext, FSType fsType = FSType::Virtual);
+    FileStatus exist(pcstr N, FSType fsType = FSType::Virtual);
+    FileStatus exist(pcstr path, pcstr name, FSType fsType = FSType::Virtual);
+    FileStatus exist(string_path& fn, pcstr path, pcstr name, FSType fsType = FSType::Virtual);
+    FileStatus exist(string_path& fn, pcstr path, pcstr name, pcstr ext, FSType fsType = FSType::Virtual);
 
-    BOOL can_write_to_folder(LPCSTR path);
-    BOOL can_write_to_alias(LPCSTR path);
-    BOOL can_modify_file(LPCSTR fname);
-    BOOL can_modify_file(LPCSTR path, LPCSTR name);
+    bool can_write_to_folder(pcstr path);
+    bool can_write_to_alias(pcstr path);
+    bool can_modify_file(pcstr fname);
+    bool can_modify_file(pcstr path, pcstr name);
 
-    BOOL dir_delete(LPCSTR path, LPCSTR nm, BOOL remove_files);
-    BOOL dir_delete(LPCSTR full_path, BOOL remove_files) { return dir_delete(0, full_path, remove_files); }
-    void file_delete(LPCSTR path, LPCSTR nm);
-    void file_delete(LPCSTR full_path) { file_delete(0, full_path); }
-    void file_copy(LPCSTR src, LPCSTR dest);
-    void file_rename(LPCSTR src, LPCSTR dest, bool bOwerwrite = true);
-    int file_length(LPCSTR src);
+    bool dir_delete(pcstr path, pcstr nm, bool remove_files);
+    bool dir_delete(pcstr full_path, bool remove_files) { return dir_delete(nullptr, full_path, remove_files); }
+    void file_delete(pcstr path, pcstr nm);
+    void file_delete(pcstr full_path) { file_delete(nullptr, full_path); }
+    void file_copy(pcstr src, pcstr dest);
+    void file_rename(pcstr src, pcstr dest, bool overwrite = true);
+    int file_length(pcstr src);
 
-    u32 get_file_age(LPCSTR nm);
-    void set_file_age(LPCSTR nm, u32 age);
+    u32 get_file_age(pcstr nm);
+    void set_file_age(pcstr nm, u32 age);
 
-    xr_vector<LPSTR>* file_list_open(LPCSTR initial, LPCSTR folder, u32 flags = FS_ListFiles);
-    xr_vector<LPSTR>* file_list_open(LPCSTR path, u32 flags = FS_ListFiles);
-    void file_list_close(xr_vector<LPSTR>*& lst);
+    xr_vector<pstr>* file_list_open(pcstr initial, pcstr folder, u32 flags = FS_ListFiles);
+    xr_vector<pstr>* file_list_open(pcstr path, u32 flags = FS_ListFiles);
+    void file_list_close(xr_vector<pstr>*& lst);
 
-    bool path_exist(LPCSTR path);
-    FS_Path* get_path(LPCSTR path);
-    FS_Path* append_path(LPCSTR path_alias, LPCSTR root, LPCSTR add, BOOL recursive);
-    LPCSTR update_path(string_path& dest, LPCSTR initial, LPCSTR src);
+    bool path_exist(pcstr path);
+    FS_Path* get_path(pcstr path);
+    FS_Path* append_path(pcstr path_alias, pcstr root, pcstr add, bool recursive);
+    pcstr update_path(string_path& dest, pcstr initial, pcstr src);
 
-    int file_list(FS_FileSet& dest, LPCSTR path, u32 flags = FS_ListFiles, LPCSTR mask = 0);
+    int file_list(FS_FileSet& dest, pcstr path, u32 flags = FS_ListFiles, pcstr mask = nullptr);
 
     bool load_all_unloaded_archives();
     void unload_archive(archive& A);
@@ -196,12 +205,12 @@ public:
     u64 auth_get();
     void auth_runtime(void*);
 
-    void rescan_path(LPCSTR full_path, BOOL bRecurse);
+    void rescan_path(pcstr full_path, bool bRecurse);
     // editor functions
     void rescan_pathes();
     void lock_rescan();
     void unlock_rescan();
 };
 
-extern XRCORE_API CLocatorAPI* xr_FS;
+extern XRCORE_API std::unique_ptr<CLocatorAPI> xr_FS;
 #define FS (*xr_FS)

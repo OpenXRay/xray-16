@@ -146,8 +146,8 @@ void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
     CUIXml ui_xml;
     ui_xml.Load(CONFIG_PATH, UI_PATH, xml_name);
 
-    XML_NODE* stored_root = ui_xml.GetLocalRoot();
-    XML_NODE* node = ui_xml.NavigateToNode("upgrade_info", 0);
+    XML_NODE stored_root = ui_xml.GetLocalRoot();
+    XML_NODE node = ui_xml.NavigateToNode("upgrade_info", 0);
     ui_xml.SetLocalRoot(node);
 
     CUIXmlInit::InitWindow(ui_xml, "properties", 0, this);
@@ -165,8 +165,8 @@ void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
     shared_str property_id;
 
     CInifile::Sect& inv_section = pSettings->r_section(properties_section);
-    CInifile::SectIt_ ib = inv_section.Data.begin();
-    CInifile::SectIt_ ie = inv_section.Data.end();
+    auto ib = inv_section.Data.begin();
+    auto ie = inv_section.Data.end();
     for (; ib != ie; ++ib)
     {
         UIProperty* ui_property = new UIProperty(); // load one time !!
@@ -217,7 +217,7 @@ void UIInvUpgPropertiesWnd::set_upgrade_info(Upgrade_type& upgrade)
         return;
     }
 
-    m_temp_upgrade_vector.clear_not_free();
+    m_temp_upgrade_vector.clear();
     m_temp_upgrade_vector.push_back(upgrade.id());
     set_info(m_temp_upgrade_vector);
 }

@@ -16,6 +16,7 @@
 #pragma hdrstop
 
 #include "MxMat4.h"
+#include "xrCore/_std_extensions.h"
 
 #define ROT(a, i, j, k, l)\
     g = a[i][j];\

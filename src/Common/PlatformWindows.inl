@@ -4,7 +4,8 @@
 #define DIRECTINPUT_VERSION 0x0800 //
 
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
+// Request Windows 7 functionality
+#define _WIN32_WINNT _WIN32_WINNT_WIN7
 #endif
 
 #include <sys/utime.h>
@@ -26,10 +27,5 @@
 #define DOSWIN32
 #define _WIN32_DCOM
 
-#define STUBBED(txt) do {} while (0)
-
-#pragma warning(push)
-#pragma warning(disable : 4005) // macro redefinition
 #include <windows.h>
 #include <windowsx.h>
-#pragma warning(pop)

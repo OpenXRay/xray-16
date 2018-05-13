@@ -1,6 +1,9 @@
 #pragma once
 #include "xr_level_controller.h"
-#include <xrScriptEngine/Functor.hpp>
+#include "xrEngine/pure.h"
+#include "xrEngine/IInputReceiver.h"
+#include "xrScriptEngine/Functor.hpp"
+#include "xrCommon/xr_deque.h"
 
 class CUIWindow;
 class CUIStatic;
@@ -117,11 +120,10 @@ class CUISequenceSimpleItem : public CUISequenceItem
         float m_length;
         bool m_visible;
 
-    public:
         virtual void Start();
         virtual void Stop();
     };
-    DEFINE_VECTOR(SSubItem, SubItemVec, SubItemVecIt);
+    using SubItemVec = xr_vector<SSubItem>;
     SubItemVec m_subitems;
     struct SActionItem
     {

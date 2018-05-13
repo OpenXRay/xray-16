@@ -4,25 +4,28 @@
 
 // Common
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
-extern ECORE_API xr_token qsun_shafts_token[];
+extern ECORE_API const xr_token qsun_shafts_token[];
 
 extern ECORE_API u32 ps_r_ssao; //	=	0;
-extern ECORE_API xr_token qssao_token[];
+extern ECORE_API const xr_token qssao_token[];
 
 extern ECORE_API u32 ps_r_ssao_mode;
-extern ECORE_API xr_token qssao_mode_token[];
+extern ECORE_API const xr_token qssao_mode_token[];
 
 extern ECORE_API u32 ps_r_sun_quality; //	=	0;
-extern ECORE_API xr_token qsun_quality_token[];
+extern ECORE_API const xr_token qsun_quality_token[];
 
 extern ECORE_API u32 ps_r3_msaa; //	=	0;
-extern ECORE_API xr_token qmsaa_token[];
+extern ECORE_API const xr_token qmsaa_token[];
 
 extern ECORE_API u32 ps_r3_msaa_atest; //=	0;
-extern ECORE_API xr_token qmsaa__atest_token[];
+extern ECORE_API const xr_token qmsaa__atest_token[];
 
 extern ECORE_API u32 ps_r3_minmax_sm; //	=	0;
-extern ECORE_API xr_token qminmax_sm_token[];
+extern ECORE_API const xr_token qminmax_sm_token[];
+
+extern ECORE_API int ps_r2_fxaa;
+extern ECORE_API int ps_rs_loading_stages;
 
 extern ENGINE_API int ps_r__Supersample;
 extern ECORE_API int ps_r__LightSleepFrames;
@@ -193,6 +196,13 @@ enum
     R_FLAGEXT_HOM_DEPTH_DRAW = (1 << 7),
     R2FLAGEXT_SUN_ZCULLING = (1 << 8),
     R2FLAGEXT_SUN_OLD = (1 << 9),
+};
+
+extern ECORE_API Flags32 ps_actor_shadow_flags;
+
+enum
+{
+    RFLAG_ACTOR_SHADOW = (1 << 0),
 };
 
 extern void xrRender_initconsole();

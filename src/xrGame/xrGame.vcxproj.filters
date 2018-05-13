@@ -2287,6 +2287,15 @@
     <Filter Include="Core\Server\QR2 callbacks">
       <UniqueIdentifier>{0e29aa42-d79c-425a-994b-c18169f076de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{c2cce2fe-498b-4192-baf4-c5a1bf9717f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Client\Objects\zones\Ameba">
+      <UniqueIdentifier>{0ca5d322-0181-4fae-9706-95107e18fdc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\FractionWar">
+      <UniqueIdentifier>{49c6af0a-ea09-4212-bc7f-7cbcca7c5810}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -2371,9 +2380,6 @@
       <Filter>AI\AComponents\DecisionManagement\ActionManagement\WorldPropertyEvaluator</Filter>
     </ClInclude>
     <ClInclude Include="property_evaluator_const.h">
-      <Filter>AI\AComponents\DecisionManagement\ActionManagement\WorldPropertyEvaluator\const</Filter>
-    </ClInclude>
-    <ClInclude Include="property_evaluator_const_inline.h">
       <Filter>AI\AComponents\DecisionManagement\ActionManagement\WorldPropertyEvaluator\const</Filter>
     </ClInclude>
     <ClInclude Include="property_evaluator_member.h">
@@ -2913,9 +2919,6 @@
     <ClInclude Include="alife_simulator.h">
       <Filter>AI\ALife</Filter>
     </ClInclude>
-    <ClInclude Include="alife_simulator_inline.h">
-      <Filter>AI\ALife</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrServerEntities\alife_space.h">
       <Filter>AI\ALife</Filter>
     </ClInclude>
@@ -3055,9 +3058,6 @@
       <Filter>AI\ALife\simulator_base\time_manager</Filter>
     </ClInclude>
     <ClInclude Include="alife_update_manager.h">
-      <Filter>AI\ALife\update_manager</Filter>
-    </ClInclude>
-    <ClInclude Include="alife_update_manager_inline.h">
       <Filter>AI\ALife\update_manager</Filter>
     </ClInclude>
     <ClInclude Include="alife_storage_manager.h">
@@ -4653,12 +4653,6 @@
     <ClInclude Include="ai_space_inline.h">
       <Filter>AI\ASpace</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\pch_script.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="StdAfx.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="CameraFirstEye.h">
       <Filter>Core\Client\Cameras</Filter>
     </ClInclude>
@@ -4996,9 +4990,6 @@
       <Filter>Core\Client\Objects\inventory\AttachableItem</Filter>
     </ClInclude>
     <ClInclude Include="attachment_owner.h">
-      <Filter>Core\Client\Objects\inventory\AttachmentOwner</Filter>
-    </ClInclude>
-    <ClInclude Include="attachment_owner_inline.h">
       <Filter>Core\Client\Objects\inventory\AttachmentOwner</Filter>
     </ClInclude>
     <ClInclude Include="eatable_item.h">
@@ -5572,9 +5563,6 @@
       <Filter>Core\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\ItemListTypes.h">
-      <Filter>Core\Server\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\WaveForm.h">
       <Filter>Core\Server\Editor</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\xrEProps.h">
@@ -6648,8 +6636,43 @@
     <ClInclude Include="CdkeyDecode\cdkeydecode.h">
       <Filter>Core\Server\CdkeyDecode</Filter>
     </ClInclude>
-    <ClInclude Include="..\Externals\GameSpy\src\GameSpy\md5.h">
-      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
+    <ClInclude Include="..\xrServerEntities\pch_script.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="$(xrExternals)GameSpy\src\GameSpy\md5.h" />
+    <ClInclude Include="profile_data_types_script.h">
+      <Filter>Core\Server\Games\PlayerAccounts</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponRevolver.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponCustomPistolAuto.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClInclude>
+    <ClInclude Include="raypick.h">
+      <Filter>Core\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="AmebaZone.h">
+      <Filter>Core\Client\Objects\zones\Ameba</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIFactionWarWnd.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FractionState.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FactionState.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIWarState.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
+    <ClInclude Include="game_type.h" />
+    <ClInclude Include="..\xrEngine\WaveForm.h">
+      <Filter>Core\Server\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -8015,12 +8038,6 @@
     <ClCompile Include="ai_space.cpp">
       <Filter>AI\ASpace</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\pch_script.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="CameraFirstEye.cpp">
       <Filter>Core\Client\Cameras</Filter>
     </ClCompile>
@@ -9329,7 +9346,7 @@
     <ClCompile Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters_script2.cpp">
       <Filter>Core\Server\ServerEntities\objects_alife_monsters</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\xrserver_objects_alife_monsters_script3.cpp">
+    <ClCompile Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters_script3.cpp">
       <Filter>Core\Server\ServerEntities\objects_alife_monsters</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters_script4.cpp">
@@ -10157,8 +10174,40 @@
     <ClCompile Include="CdkeyDecode\cdkeydecode.c">
       <Filter>Core\Server\CdkeyDecode</Filter>
     </ClCompile>
-    <ClCompile Include="..\Externals\GameSpy\src\GameSpy\md5c.c">
-      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
+    <ClCompile Include="..\xrServerEntities\pch_script.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="$(xrExternals)GameSpy\src\GameSpy\md5c.c" />
+    <ClCompile Include="WeaponRevolver.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponCustomPistolAuto.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClCompile>
+    <ClCompile Include="raypick.cpp">
+      <Filter>Core\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="AmebaZone.cpp">
+      <Filter>Core\Client\Objects\zones\Ameba</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIFactionWarWnd.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\FactionState.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\FractionState.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIWarState.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClCompile>
+    <ClCompile Include="game_type.cpp" />
+    <ClCompile Include="ai\monsters\state.cpp">
+      <Filter>AI\AMonsters\common\components\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

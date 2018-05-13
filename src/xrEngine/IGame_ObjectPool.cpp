@@ -12,15 +12,14 @@ void IGame_ObjectPool::prefetch()
     R_ASSERT(m_PrefetchObjects.empty());
 
     int p_count = 0;
-    GlobalEnv.Render->model_Logging(FALSE);
+    GEnv.Render->model_Logging(FALSE);
 
     string256 section;
     // prefetch objects
     strconcat(sizeof(section), section, "prefetch_objects_", g_pGamePersistent->m_game_params.m_game_type);
     CInifile::Sect const& sect = pSettings->r_section(section);
-    for (CInifile::SectCIt I = sect.Data.begin(); I != sect.Data.end(); I++)
+    for (const auto& item : sect.Data)
     {
-        const CInifile::Item& item = *I;
         CLASS_ID CLS = pSettings->r_clsid(item.first.c_str(), "class");
         p_count++;
         IGameObject* pObject = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
@@ -30,16 +29,14 @@ void IGame_ObjectPool::prefetch()
     }
 
     // out statistic
-    GlobalEnv.Render->model_Logging(TRUE);
+    GEnv.Render->model_Logging(TRUE);
 }
 
 void IGame_ObjectPool::clear()
 {
     // Clear POOL
-    ObjectVecIt it = m_PrefetchObjects.begin();
-    ObjectVecIt itE = m_PrefetchObjects.end();
-    for (; it != itE; it++)
-        xr_delete(*it);
+    for (auto& it : m_PrefetchObjects)
+        xr_delete(it);
     m_PrefetchObjects.clear();
 }
 
@@ -49,6 +46,7 @@ IGameObject* IGame_ObjectPool::create(LPCSTR name)
     IGameObject* O = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
     O->cNameSect_set(name);
     O->Load(name);
+    O->PostLoad(name); //--#SM+#--
     return O;
 }
 
@@ -78,7 +76,7 @@ for (int c=0; c<count; c++){
 IGameObject* pObject= (IGameObject*) NEW_INSTANCE(CLS);
 pObject->Load (item.first.c_str());
 VERIFY2 (pObject->cNameSect().c_str(),item.first.c_str());
-map_POOL.insert (mk_pair(pObject->cNameSect(),pObject));
+map_POOL.insert (std::make_pair(pObject->cNameSect(),pObject));
 }
 }
 
@@ -106,7 +104,7 @@ map_POOL.clear();
 IGameObject* IGame_ObjectPool::create ( LPCSTR name )
 {
 string256 l_name;
-POOL_IT it = map_POOL.find (shared_str(strlwr(xr_strcpy(l_name,name))));
+POOL_IT it = map_POOL.find (shared_str(xr_strlwr(xr_strcpy(l_name,name))));
 if (it!=map_POOL.end())
 {
 // Instance found
@@ -125,6 +123,6 @@ return O;
 
 void IGame_ObjectPool::destroy ( IGameObject* O )
 {
-map_POOL.insert (mk_pair(O->cNameSect(),O));
+map_POOL.insert (std::make_pair(O->cNameSect(),O));
 }
 */

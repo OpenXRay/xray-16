@@ -20,6 +20,7 @@
 #include "clsid_game.h"
 #include "static_cast_checked.hpp"
 #include "player_hud.h"
+#include "xrNetServer/NET_Messages.h"
 
 using namespace InventoryUtilities;
 
@@ -43,7 +44,7 @@ CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
-    u32 sz = pSettings->r_s32("inventory", "slots_count");
+    u32 sz = LAST_SLOT + 1; //pSettings->r_s32("inventory", "slots_count"); //Alundaio: Get slot count directly to automate this process
     m_slots.resize(sz + 1); // first is [1]
 
     m_iActiveSlot = NO_ACTIVE_SLOT;
@@ -54,10 +55,10 @@ CInventory::CInventory()
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
     {
         xr_sprintf(temp, "slot_persistent_%d", i);
-        m_slots[i].m_bPersistent = !!pSettings->r_bool("inventory", temp);
+        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
 
         xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!pSettings->r_bool("inventory", temp);
+        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
     };
 
     m_bSlotsUseful = true;
@@ -316,11 +317,11 @@ bool CInventory::Slot(u16 slot_id, PIItem pIItem, bool bNotActivate, bool strict
 
     if (!strict_placement && !CanPutInSlot(pIItem, slot_id))
     {
-#ifdef _DEBUG
-        Msg("there is item %s[%d,%x] in slot %d[%d,%x]", ItemFromSlot(pIItem->GetSlot())->object().cName().c_str(),
-            ItemFromSlot(pIItem->GetSlot())->object().ID(), ItemFromSlot(pIItem->GetSlot()), pIItem->GetSlot(),
-            pIItem->object().ID(), pIItem);
-#endif
+//#ifdef _DEBUG
+        //Msg("there is item %s[%d,%x] in slot %d[%d,%x]", ItemFromSlot(pIItem->GetSlot())->object().cName().c_str(),
+        //    ItemFromSlot(pIItem->GetSlot())->object().ID(), ItemFromSlot(pIItem->GetSlot()), pIItem->GetSlot(),
+        //    pIItem->object().ID(), pIItem);
+//#endif
         //.		if(m_slots[pIItem->GetSlot()].m_pIItem == pIItem && !bNotActivate )
         //.			Activate(pIItem->GetSlot());
 
@@ -1070,14 +1071,26 @@ bool CInventory::Eat(PIItem pIItem)
         pItemToEat->object().cNameSect().c_str());
 #endif // MP_LOGGING
 
-    if (IsGameTypeSingle() && Actor()->m_inventory == this)
-        Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+    if (Actor()->m_inventory == this)
+    {
+        if (IsGameTypeSingle())
+            Actor()->callback(GameObject::eUseObject)(smart_cast<CGameObject*>(pIItem)->lua_game_object());
+
+        if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
+            CurrentGameUI()->GetActorMenu().RefreshCurrentItemCell();
+
+        CurrentGameUI()->GetActorMenu().SetCurrentItem(nullptr);
+    }
+        
 
     if (pItemToEat->Empty())
     {
-        pIItem->SetDropManual(TRUE);
-        return false;
+        if (!pItemToEat->CanDelete())
+            return false;
+
+        pIItem->SetDropManual(true);
     }
+
     return true;
 }
 
@@ -1191,7 +1204,7 @@ CInventoryItem* CInventory::tpfGetObjectByIndex(int iIndex)
     }
     else
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "invalid inventory index!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "invalid inventory index!");
         return (0);
     }
     R_ASSERT(false);
@@ -1300,6 +1313,11 @@ bool CInventory::isBeautifulForActiveSlot(CInventoryItem* pIItem)
             return (true);
     }
     return (false);
+}
+
+void CInventory::InvalidateState() throw()
+{
+    m_dwModifyFrame = Device.dwFrame;
 }
 
 //.#include "WeaponHUD.h"

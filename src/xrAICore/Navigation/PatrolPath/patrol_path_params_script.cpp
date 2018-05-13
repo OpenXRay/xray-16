@@ -6,17 +6,17 @@
 //	Description : Patrol path parameters class script export
 ////////////////////////////////////////////////////////////////////////////
 
-#include "ScriptPCH.hpp"
+#include "pch.hpp"
 #include "patrol_path_params.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/DebugMacros.hpp" // for THROW3 // XXX: move debug macros to xrCore
 
 using namespace luabind;
 
-Fvector CPatrolPathParams__point(const CPatrolPathParams* self, u32 index)
+Fvector CPatrolPathParams__point(const CPatrolPathParams* params, u32 index)
 {
-    THROW(self);
-    return (self->point(index));
+    THROW(params);
+    return params->point(index);
 }
 
 SCRIPT_EXPORT(CPatrolPathParams, (), {

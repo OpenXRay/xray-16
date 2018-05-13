@@ -1,6 +1,4 @@
 #pragma once
-
-#include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
 
 class XRGAMESPY_API CGameSpy_HTTP

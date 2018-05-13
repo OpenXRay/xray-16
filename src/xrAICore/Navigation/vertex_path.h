@@ -7,6 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrCore/_types.h"
+#include "xrCommon/xr_vector.h"
 
 template <bool EuclidianHeuristics = true>
 struct CVertexPath

@@ -1,6 +1,10 @@
 #pragma once
+#include "xrSound/Sound.h"
 
-class ENGINE_API IGameObject;
+// fwd. decl.
+class IGameObject;
+template <class T> struct _vector3;
+using Fvector = _vector3<float>;
 
 namespace Feel
 {

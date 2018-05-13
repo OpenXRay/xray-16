@@ -33,7 +33,7 @@ public:
         CScriptGameObject* object, u32 flags /*!< Looping */, float delay /*!< Delay */, Fvector pos, float vol);
     IC void AttachTail(LPCSTR caSoundName);
     IC void Stop();
-    IC void StopDeffered();
+    IC void StopDeferred();
     IC void SetPosition(const Fvector& position);
     IC void SetFrequency(float frequency);
     IC void SetVolume(float volume);

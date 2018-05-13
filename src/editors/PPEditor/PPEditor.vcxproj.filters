@@ -45,9 +45,6 @@
     <ClCompile Include="spline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="std.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Unit6.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,6 +57,7 @@
     <ClCompile Include="Unit9.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">

@@ -1,5 +1,8 @@
+#pragma once
 #ifndef ACTOR_MP_STATE_H
 #define ACTOR_MP_STATE_H
+#include "xrCore/_quaternion.h"
+#include "xrCore/_vector3d.h"
 
 //#define USE_DIFFERENCES
 

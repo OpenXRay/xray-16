@@ -8,7 +8,7 @@ struct itterate_adjacents_params_dynamic
 {
     typedef typeVertex type_vertex;
     typedef typename typeVertex::type_face type_face;
-    // typedef xr_vector<type_face*>								vecFace;
+    //typedef xr_vector<type_face*> vecFace;
 
 private:
     Fvector& normal;
@@ -17,7 +17,7 @@ private:
     const IntVec& a_lst;
     const type_face* m_Faces;
     u32 m_FaceCount;
-    U8Vec m_procesed;
+    xr_vector<u8> m_procesed;
 
 public:
     itterate_adjacents_params_dynamic(
@@ -46,14 +46,14 @@ private:
             type_vertex v1_a, v1_b;
             F1->EdgeVerts(e, v1_a, v1_b);
             if (v1_a.gt(v1_b))
-                swap(v1_a, v1_b);
+                std::swap(v1_a, v1_b);
 
             for (int r = 0; r < 3; ++r)
             {
                 type_vertex v2_a, v2_b;
                 F2->EdgeVerts(r, v2_a, v2_b);
                 if (v2_a.gt(v2_b))
-                    swap(v2_a, v2_b);
+                    std::swap(v2_a, v2_b);
 
                 if ((v1_a.eq(v2_a)) && (v1_b.eq(v2_b)))
                 {

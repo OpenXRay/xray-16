@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "particle_actions_collection.h"
 #include "particle_effect.h"
@@ -631,7 +630,7 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
             if (position.Within(pnext))
             {
                 // See if we were inside on previous timestep.
-                BOOL pinside = position.Within(m.pos);
+                const bool pinside = position.Within(m.pos);
 
                 // Normal to surface. This works for a sphere. Isn't
                 // computed quite right, should extrapolate particle
@@ -640,10 +639,10 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
                 n.normalize_safe();
 
                 // Compute tangential and normal components of velocity
-                float nmag = m.vel * n;
+                const float nmag = m.vel * n;
 
-                pVector vn(n * nmag); // Normal Vn = (V.N)N
-                pVector vt = m.vel - vn; // Tangent Vt = V - Vn
+                const pVector vn(n * nmag); // Normal Vn = (V.N)N
+                const pVector vt = m.vel - vn; // Tangent Vt = V - Vn
 
                 if (pinside)
                 {
@@ -678,25 +677,23 @@ void PABounce::Transform(const Fmatrix& m) { position.transform(positionL, m); }
 // Set the secondary position of each particle to be its position.
 void PACopyVertexB::Execute(ParticleEffect* effect, const float dt, float& tm_max)
 {
-    u32 i;
-
     if (copy_pos)
     {
-        for (i = 0; i < effect->p_count; i++)
+        for (u32 i = 0; i < effect->p_count; i++)
         {
             Particle& m = effect->particles[i];
             m.posB = m.pos;
         }
     }
     /*
-        if(copy_vel)
+    if (copy_vel)
+    {
+        for (u32 i = 0; i < effect->p_count; i++)
         {
-            for(i = 0; i < effect->p_count; i++)
-            {
-                Particle &m = effect->particles[i];
-                m.velB = m.vel;
-            }
+            Particle& m = effect->particles[i];
+            m.velB = m.vel;
         }
+    }
     */
 }
 void PACopyVertexB::Transform(const Fmatrix&) { ; }
@@ -707,7 +704,7 @@ void PADamping::Execute(ParticleEffect* effect, const float dt, float& tm_max)
 {
     // This is important if dt is != 1.
     pVector one(1, 1, 1);
-    pVector scale(one - ((one - damping) * dt));
+    pVector scale(one - (one - damping) * dt);
 
     for (u32 i = 0; i < effect->p_count; i++)
     {
@@ -944,10 +941,9 @@ void PAScatter::Execute(ParticleEffect* effect, const float dt, float& tm_max)
 
             if (rSqr < max_radiusSqr)
             {
-                pVector accel;
-                accel = dir / _sqrt(rSqr);
+                pVector accel = dir / _sqrt(rSqr);
 
-                //				acc.Generate(accel);
+                //acc.Generate(accel);
 
                 // Step velocity with acceleration
                 m.vel += accel * (magdt / (rSqr + epsilon));
@@ -967,8 +963,7 @@ void PAScatter::Execute(ParticleEffect* effect, const float dt, float& tm_max)
             // Soften by epsilon to avoid tight encounters to infinity
             float rSqr = dir.length2();
 
-            pVector accel;
-            accel = dir / _sqrt(rSqr);
+            pVector accel = dir / _sqrt(rSqr);
 
             // Step velocity with acceleration
             m.vel += accel * (magdt / (rSqr + epsilon));
@@ -1622,9 +1617,9 @@ extern void noise3Init();
 #ifndef _EDITOR
 
 #include <xmmintrin.h>
-#include "xrCore/Threading/ttapi.h"
+#include "xrCore/Threading/ThreadPool.hpp"
 
-__forceinline __m128 _mm_load_fvector(const Fvector& v)
+ICF __m128 _mm_load_fvector(const Fvector& v)
 {
     __m128 R1, R2;
 
@@ -1637,7 +1632,7 @@ __forceinline __m128 _mm_load_fvector(const Fvector& v)
     return R1;
 }
 
-__forceinline void _mm_store_fvector(Fvector& v, const __m128 R1)
+ICF void _mm_store_fvector(Fvector& v, const __m128 R1)
 {
     __m128 R2;
 
@@ -1749,7 +1744,7 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
     {
         noise_start = 0;
         noise3Init();
-    };
+    }
 
     age += dt;
 
@@ -1758,10 +1753,10 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
     if (!p_cnt)
         return;
 
-    u32 nWorkers = ttapi_GetWorkerCount();
+    auto nWorkers = ttapi.threads.size();
 
-    if (p_cnt < nWorkers * 20)
-        nWorkers = 1;
+    if (p_cnt < nWorkers)
+        nWorkers = p_cnt;
 
     TES_PARAMS* tesParams = (TES_PARAMS*)_alloca(sizeof(TES_PARAMS) * nWorkers);
 
@@ -1769,10 +1764,10 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
     // to minimize wait in final spin
     u32 nSlice = p_cnt / 128;
 
-    u32 nStep = ((p_cnt - nSlice) / nWorkers);
-    // u32 nStep = ( p_cnt / nWorkers );
+    u32 nStep = (p_cnt - nSlice) / nWorkers;
 
-    // Msg( "Trb: %u" , nStep );
+    //u32 nStep = (p_cnt / nWorkers);
+    //Msg("Trb: %u", nStep);
 
     for (u32 i = 0; i < nWorkers; ++i)
     {
@@ -1786,11 +1781,10 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
         tesParams[i].frequency = frequency;
         tesParams[i].octaves = octaves;
         tesParams[i].magnitude = magnitude;
-
-        ttapi_AddWorker(PATurbulenceExecuteStream, (LPVOID)&tesParams[i]);
+        ttapi.threads[i]->addJob([=] { PATurbulenceExecuteStream((void*)&tesParams[i]); });
     }
 
-    ttapi_Run();
+    ttapi.wait();
 }
 
 #else

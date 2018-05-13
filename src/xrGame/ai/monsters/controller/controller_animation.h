@@ -64,8 +64,8 @@ private:
     ELegsActionType m_current_legs_action;
     ETorsoActionType m_current_torso_action;
 
-    DEFINE_MAP(ELegsActionType, MotionID, LEGS_MOTION_MAP, LEGS_MOTION_MAP_IT);
-    DEFINE_MAP(ETorsoActionType, MotionID, TORSO_MOTION_MAP, TORSO_MOTION_MAP_IT);
+    using LEGS_MOTION_MAP = xr_map<ELegsActionType, MotionID>;
+    using TORSO_MOTION_MAP = xr_map<ETorsoActionType, MotionID>;
 
     LEGS_MOTION_MAP m_legs;
     TORSO_MOTION_MAP m_torso;
@@ -76,8 +76,8 @@ private:
         ELegsActionType legs_motion;
     };
 
-    DEFINE_VECTOR(SPathRotations, PATH_ROTATIONS_VEC, PATH_ROTATIONS_VEC_IT);
-    DEFINE_MAP(ELegsActionType, PATH_ROTATIONS_VEC, PATH_ROTATIONS_MAP, PATH_ROTATIONS_MAP_IT);
+    using PATH_ROTATIONS_VEC = xr_vector<SPathRotations>;
+    using PATH_ROTATIONS_MAP = xr_map<ELegsActionType, PATH_ROTATIONS_VEC>;
     PATH_ROTATIONS_MAP m_path_rotations;
 
     bool m_wait_torso_anim_end;

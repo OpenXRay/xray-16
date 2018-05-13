@@ -1,9 +1,6 @@
-#ifndef STDMIX_INCLUDED // -*- C++ -*-
-#define STDMIX_INCLUDED
-#if !defined(__GNUC__)
 #pragma once
-#endif
 
+#include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 
 /************************************************************************
@@ -19,11 +16,9 @@ $Id: stdmix.h,v 1.21.2.1 2002/01/31 18:38:37 garland Exp $
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 // STL makes Visual C++ complain about identifiers longer than 255
-// characters.  Unfortunately, this may limit the debugability of
+// characters.  Unfortunately, this may limit the debuggability of
 // code that uses STL.
 #pragma warning(disable : 4786)
 #endif
 
 inline bool streq(const char* a, const char* b) { return !xr_strcmp(a, b); }
-// STDMIX_INCLUDED
-#endif

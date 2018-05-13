@@ -1,9 +1,12 @@
+#pragma once
 #ifndef XR_DSA_INCLUDED
 #define XR_DSA_INCLUDED
 
 #include "xrCore/xrCore.h"
 
-struct dsa_st;
+#include <cryptopp/dsa.h>
+#include <cryptopp/sha.h>
+#include <cryptopp/osrng.h>
 
 namespace crypto
 {
@@ -35,7 +38,8 @@ public:
 #endif
 
 private:
-    dsa_st* m_dsa;
+    CryptoPP::DL_GroupParameters_DSA m_dsa;
+    CryptoPP::AutoSeededRandomPool m_rng;
 }; // class xr_dsa
 
 } // namespace crypto

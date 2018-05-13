@@ -23,7 +23,6 @@ void ImplicitThread::Execute()
     execute.Execute(0);
 }
 
-#define NUM_THREADS 8
 void RunImplicitMultithread(ImplicitDeflector& defl)
 {
     // Start threads

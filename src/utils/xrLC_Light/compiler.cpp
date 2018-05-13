@@ -6,8 +6,6 @@
 #include "lightthread.h"
 #include "xrLightDoNet.h"
 
-#define NUM_THREADS 3
-
 void xrLight()
 {
     u32 range = gl_data.slots_data.size_z();
@@ -15,6 +13,7 @@ void xrLight()
     // Start threads, wait, continue --- perform all the work
     CThreadManager Threads(ProxyStatus, ProxyProgress);
     CTimer start_time;
+    start_time.Start();
     u32 stride = range / NUM_THREADS;
     u32 last = range - stride * (NUM_THREADS - 1);
     for (u32 thID = 0; thID < NUM_THREADS; thID++)

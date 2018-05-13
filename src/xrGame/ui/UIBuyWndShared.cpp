@@ -9,7 +9,7 @@ void CItemMgr::Load(const shared_str& sect_cost)
     CInifile::Sect& sect = pSettings->r_section(sect_cost);
 
     u32 idx = 0;
-    for (CInifile::SectCIt it = sect.Data.begin(); it != sect.Data.end(); ++it, ++idx)
+    for (auto it = sect.Data.cbegin(); it != sect.Data.cend(); ++it, ++idx)
     {
         _i& val = m_items[it->first];
         val.slot_idx = 0xff;

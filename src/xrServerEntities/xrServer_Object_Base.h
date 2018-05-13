@@ -13,6 +13,7 @@
 #include "script_value_container.h"
 #include "alife_space.h"
 #include "xrCore/client_id.h"
+#include "xrCore/clsid.h"
 
 class NET_Packet;
 class xrClientData;
@@ -114,17 +115,17 @@ public:
 
     CSE_Abstract(LPCSTR caSection);
     virtual ~CSE_Abstract();
-    virtual void OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender){};
+    virtual void OnEvent(NET_Packet& /*tNetPacket*/, u16 /*type*/, u32 /*time*/, ClientID /*sender*/){};
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
     virtual void __stdcall FillProp(LPCSTR pref, PropItemVec& items);
-    virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
-        const Fmatrix& parent, int priority, bool strictB2F)
+    virtual void __stdcall on_render(CDUInterface* /*du*/, IServerEntityLEOwner* /*owner*/, bool /*bSelected*/,
+        const Fmatrix& /*parent*/, int /*priority*/, bool /*strictB2F*/)
     {
     }
-    virtual visual_data* __stdcall visual_collection() const { return 0; }
+    virtual visual_data* __stdcall visual_collection() const { return nullptr; }
     virtual u32 __stdcall visual_collection_size() const { return 0; }
-    virtual void __stdcall set_additional_info(void* info){};
+    virtual void __stdcall set_additional_info(void* /*info*/) {};
 #endif // #ifndef XRGAME_EXPORTS
     virtual BOOL Net_Relevant() { return FALSE; }; // !!!! WARNING!!!
     //
@@ -152,7 +153,7 @@ public:
     virtual CSE_Abstract* base();
     virtual const CSE_Abstract* base() const;
     virtual CSE_Abstract* init();
-    virtual bool match_configuration() const { return true; }
+    virtual bool match_configuration() const throw() { return true; }
     // end of the virtual inheritance dependant code
     IC int script_clsid() const
     {
@@ -162,23 +163,25 @@ public:
     CInifile& spawn_ini();
 
     // for smart cast
-    virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return 0; };
-    virtual CSE_ALifeSchedulable* cast_schedulable() { return 0; };
-    virtual CSE_ALifeInventoryItem* cast_inventory_item() { return 0; };
-    virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return 0; };
-    virtual CSE_ALifeObject* cast_alife_object() { return 0; }
-    virtual CSE_ALifeDynamicObject* cast_alife_dynamic_object() { return 0; }
-    virtual CSE_ALifeItemAmmo* cast_item_ammo() { return 0; }
-    virtual CSE_ALifeItemWeapon* cast_item_weapon() { return 0; }
-    virtual CSE_ALifeItemDetector* cast_item_detector() { return 0; }
-    virtual CSE_ALifeMonsterAbstract* cast_monster_abstract() { return 0; };
-    virtual CSE_ALifeHumanAbstract* cast_human_abstract() { return 0; };
-    virtual CSE_ALifeAnomalousZone* cast_anomalous_zone() { return 0; };
-    virtual CSE_ALifeTrader* cast_trader() { return 0; };
-    virtual CSE_ALifeCreatureAbstract* cast_creature_abstract() { return 0; };
-    virtual CSE_ALifeSmartZone* cast_smart_zone() { return 0; };
-    virtual CSE_ALifeOnlineOfflineGroup* cast_online_offline_group() { return 0; };
-    virtual CSE_ALifeItemPDA* cast_item_pda() { return 0; };
+    virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return nullptr; };
+    virtual CSE_ALifeSchedulable* cast_schedulable() { return nullptr; };
+    virtual CSE_ALifeInventoryItem* cast_inventory_item() { return nullptr; };
+    virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return nullptr; };
+    virtual CSE_ALifeObject* cast_alife_object() { return nullptr; }
+    virtual CSE_ALifeDynamicObject* cast_alife_dynamic_object() { return nullptr; }
+    virtual CSE_ALifeItemAmmo* cast_item_ammo() { return nullptr; }
+    virtual CSE_ALifeItemWeapon* cast_item_weapon() { return nullptr; }
+    virtual CSE_ALifeItemDetector* cast_item_detector() { return nullptr; }
+    virtual CSE_ALifeMonsterAbstract* cast_monster_abstract() { return nullptr; };
+    virtual CSE_ALifeHumanAbstract* cast_human_abstract() { return nullptr; };
+    virtual CSE_ALifeAnomalousZone* cast_anomalous_zone() { return nullptr; };
+    virtual CSE_ALifeTrader* cast_trader() { return nullptr; };
+    virtual CSE_ALifeCreatureAbstract* cast_creature_abstract() { return nullptr; };
+    virtual CSE_ALifeSmartZone* cast_smart_zone() { return nullptr; };
+    virtual CSE_ALifeOnlineOfflineGroup* cast_online_offline_group() { return nullptr; };
+    virtual CSE_ALifeItemPDA* cast_item_pda() { return nullptr; };
 };
+
+extern u16 script_server_object_version();
 
 #pragma warning(pop)

@@ -5,14 +5,10 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment weathers weather class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "property_collection_forward.hpp"
 
 namespace editor
@@ -26,17 +22,16 @@ namespace weathers
 class manager;
 class time;
 
-class weather : public editor::property_holder_holder, private Noncopyable
+class weather : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
-    typedef editor::property_holder property_holder_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
 
-public:
     weather(environment::manager* manager, shared_str const& id);
     virtual ~weather();
     void load();
     void save();
-    void fill(::editor::property_holder_collection* holder);
+    void fill(XRay::Editor::property_holder_collection* holder);
     inline shared_str const& id() const { return m_id; }
     shared_str unique_id(shared_str const& current, shared_str const& id) const;
     shared_str generate_unique_id() const;
@@ -55,8 +50,8 @@ private:
     shared_str generate_unique_id(shared_str const& start) const;
 
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 public:
     typedef xr_vector<time*> container_type;
@@ -79,6 +74,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED

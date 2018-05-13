@@ -101,6 +101,18 @@ static class cl_water_intensity : public R_constant_setup
     }
 } binder_water_intensity;
 
+#ifdef TREE_WIND_EFFECT
+static class cl_tree_amplitude_intensity : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
+        float fValue = env.m_fTreeAmplitudeIntensity;
+        RCache.set_c(C, fValue, fValue, fValue, 0);
+    }
+} binder_tree_amplitude_intensity;
+#endif
+
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
     virtual void setup(R_constant* C)
@@ -451,7 +463,6 @@ void CRender::destroy()
     //_RELEASE					(q_sync_point[0]);
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         _RELEASE(q_sync_point[i]);
-
     HWOCC.occq_destroy();
     xr_delete(Models);
     xr_delete(Target);
@@ -482,6 +493,14 @@ void CRender::reset_begin()
         Lights_LastFrame.clear();
     }
 
+    //AVO: let's reload details while changed details options on vid_restart
+    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    {
+        Details->Unload();
+        xr_delete(Details);
+    }
+    //-AVO
+
     xr_delete(Target);
     HWOCC.occq_destroy();
     //_RELEASE					(q_sync_point[1]);
@@ -508,6 +527,14 @@ void CRender::reset_end()
 
     Target = new CRenderTarget();
 
+    //AVO: let's reload details while changed details options on vid_restart
+    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    {
+        Details = new CDetailManager();
+        Details->Load();
+    }
+    //-AVO
+
     xrRender_apply_tf();
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 
@@ -515,15 +542,7 @@ void CRender::reset_end()
     // that some data is not ready in the first frame (for example device camera position)
     m_bFirstFrameAfterReset = true;
 }
-/*
-void CRender::OnFrame()
-{
-    Models->DeleteQueue			();
-    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))	{
-        Device.seqParallel.insert	(Device.seqParallel.begin(),
-            fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
-    }
-}*/
+
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
@@ -548,7 +567,7 @@ void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
-    V = 0;
+    V = nullptr;
 }
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
@@ -563,7 +582,7 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         CDetail* D = (CDetail*)F;
         D->Unload();
         xr_delete(D);
-        F = NULL;
+        F = nullptr;
     }
 }
 IRenderVisual* CRender::model_CreatePE(LPCSTR name)
@@ -751,25 +770,11 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-/////////
-#pragma comment(lib, "d3dx9.lib")
-/*
-extern "C"
-{
-LPCSTR WINAPI	D3DXGetPixelShaderProfile	(LPDIRECT3DDEVICE9  pDevice);
-LPCSTR WINAPI	D3DXGetVertexShaderProfile	(LPDIRECT3DDEVICE9	pDevice);
-};
-*/
-
 void CRender::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
     m_ShaderOptions.push_back(macro);
 }
-
-// XXX nitrocaster: workaround to eliminate conflict between different GUIDs from DXSDK/Windows SDK
-// 0a233719-3960-4578-9d7c-203b8b1d9cc1
-static const GUID guidShaderReflection = {0x0a233719, 0x3960, 0x4578, {0x9d, 0x7c, 0x20, 0x3b, 0x8b, 0x1d, 0x9c, 0xc1}};
 
 template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
@@ -779,7 +784,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
     ID3DShaderReflection* pReflection = 0;
 
-    HRESULT const _hr = D3DReflect(buffer, buffer_size, guidShaderReflection, (void**)&pReflection);
+    HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
     if (SUCCEEDED(_hr) && pReflection)
     {
         // Parse constant table data
@@ -795,8 +800,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _hr;
 }
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm)
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
@@ -817,7 +821,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         ID3DShaderReflection* pReflection = 0;
 
 #ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, guidShaderReflection, (void**)&pReflection);
+        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 #else
         _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
 #endif
@@ -855,7 +859,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
         ID3DShaderReflection* pReflection = 0;
 #ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, guidShaderReflection, (void**)&pReflection);
+        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 #else
         _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
 #endif
@@ -906,7 +910,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         ID3DShaderReflection* pReflection = 0;
 
 #ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, guidShaderReflection, (void**)&pReflection);
+        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 #else
         _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
 #endif
@@ -926,42 +930,6 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             Msg("! D3DReflectShader hr == 0x%08x", _result);
         }
     }
-    //	else if (pTarget[0] == 'c') {
-    //		SCS* scs_result = (SCS*)result;
-    //#ifdef USE_DX11
-    //		_result			= HW.pDevice->CreateComputeShader(buffer, buffer_size, 0, &scs_result->sh);
-    //#else // #ifdef USE_DX11
-    //		_result			= HW.pDevice->CreateComputeShader(buffer, buffer_size, &scs_result->sh);
-    //#endif // #ifdef USE_DX11
-    //		if ( !SUCCEEDED(_result) ) {
-    //			Log			("! CS: ", file_name);
-    //			Msg			("! CreateComputeShaderhr == 0x%08x", _result);
-    //			return		E_FAIL;
-    //		}
-    //
-    //		ID3DShaderReflection *pReflection = 0;
-    //
-    //#ifdef USE_DX11
-    //		_result			= D3DReflect( buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-    //#else
-    //		_result			= D3D10ReflectShader( buffer, buffer_size, &pReflection);
-    //#endif
-    //
-    //		//	Parse constant, texture, sampler binding
-    //		//	Store input signature blob
-    //		if (SUCCEEDED(_result) && pReflection)
-    //		{
-    //			//	Let constant table parse it's data
-    //			scs_result->constants.parse(pReflection,RC_dest_pixel);
-    //
-    //			_RELEASE(pReflection);
-    //		}
-    //		else
-    //		{
-    //			Log	("! PS: ", file_name);
-    //			Msg	("! D3DReflectShader hr == 0x%08x", _result);
-    //		}
-    //	}
     else if (pTarget[0] == 'c')
     {
         _result = create_shader(pTarget, buffer, buffer_size, file_name, (SCS*&)result, disasm);
@@ -996,7 +964,6 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _result;
 }
 
-//--------------------------------------------------------------------------------------------------------------
 class includer : public ID3DInclude
 {
 public:
@@ -1004,13 +971,13 @@ public:
         D3D10_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GlobalEnv.Render->getShaderPath(), pFileName);
+        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
-        if (0 == R)
+        if (nullptr == R)
         {
             // possibly in shared directory or somewhere else - open directly
             R = FS.r_open("$game_shaders$", pFileName);
-            if (0 == R)
+            if (nullptr == R)
                 return E_FAIL;
         }
 
@@ -1552,14 +1519,13 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         ++len;
     }
 
-    sh_name[len] = 0;
+    sh_name[len] = '\0';
 
     // finish
-    defines[def_it].Name = 0;
-    defines[def_it].Definition = 0;
+    defines[def_it].Name = nullptr;
+    defines[def_it].Definition = nullptr;
     def_it++;
 
-    //
     if (0 == xr_strcmp(pFunctionName, "main"))
     {
         if ('v' == pTarget[0])
@@ -1649,9 +1615,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         includer Includer;
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
-        _result = D3DCompile(pSrcData, SrcDataLen,
-            "", // NULL, //LPCSTR pFileName,	//	NVPerfHUD bug workaround.
-            defines, &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
+        _result = D3DCompile(pSrcData, SrcDataLen, "", defines, &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
 
         if (SUCCEEDED(_result))
         {
@@ -1661,12 +1625,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
             file->w(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
             FS.w_close(file);
 
-            _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize(),
+            _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
                 file_name, result, o.disasm);
         }
         else
         {
-            //			Msg						( "! shader compilation failed" );
             Log("! ", file_name);
             if (pErrorBuf)
                 Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());

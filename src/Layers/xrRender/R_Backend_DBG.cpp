@@ -17,9 +17,14 @@ void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV
 
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
+    UNUSED(T);
+    UNUSED(pVerts);
+    UNUSED(vcnt);
+    UNUSED(pIdx);
+    UNUSED(pcnt);
 #else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
@@ -28,9 +33,12 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
 }
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
+    UNUSED(T);
+    UNUSED(pVerts);
+    UNUSED(pcnt);
 #else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
@@ -116,7 +124,7 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
         -0.9239f, 0.0000f, -0.3827f, -0.9239f, 0.1464f, -0.3536f, -0.9239f, 0.2706f, -0.2706f, -0.9239f, 0.3536f,
         -0.1464f, -0.9239f, 0.3827f, 0.0000f, -0.9239f, 0.3536f, 0.1464f, -0.9239f, 0.2706f, 0.2706f, -0.9239f, 0.1464f,
         0.3536f, -0.9239f, 0.0000f, 0.0000f, -1.0000f};
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
     u16 gFaces[224 * 3] = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 7, 0, 7, 8, 0, 8, 9, 0, 9, 10, 0, 10, 11,
         0, 11, 12, 0, 12, 13, 0, 13, 14, 0, 14, 15, 0, 15, 16, 0, 16, 1, 1, 17, 18, 1, 18, 2, 2, 18, 19, 2, 19, 3, 3,
         19, 20, 3, 20, 4, 4, 20, 21, 4, 21, 5, 5, 21, 22, 5, 22, 6, 6, 22, 23, 6, 23, 7, 7, 23, 24, 7, 24, 8, 8, 24, 25,
@@ -154,7 +162,7 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
 
     set_xform_world(T);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
 // dbg_Draw(D3DPT_TRIANGLELIST,verts,vcnt,gFaces,224);

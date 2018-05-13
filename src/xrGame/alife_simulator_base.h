@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: alife_simulator_base.h
-//	Created 	: 25.12.2002
-//  Modified 	: 12.05.2004
-//	Author		: Dmitriy Iassenev
-//	Description : ALife Simulator base class
+//  Module      : alife_simulator_base.h
+//  Created     : 25.12.2002
+//  Modified    : 12.05.2004
+//  Author      : Dmitriy Iassenev
+//  Description : ALife Simulator base class
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -62,48 +62,47 @@ protected:
     ALife::SCHEDULE_P_VECTOR m_tpaCombatGroups[2];
 
 protected:
-    IC CALifeSimulatorHeader& header();
-    IC CALifeTimeManager& time();
-    IC CALifeSpawnRegistry& spawns();
-    IC CALifeObjectRegistry& objects();
-    IC CALifeStoryRegistry& story_objects();
-    IC CALifeSmartTerrainRegistry& smart_terrains();
-    IC CALifeGroupRegistry& groups();
-    IC void can_register_objects(const bool& value);
-    IC const bool& can_register_objects() const;
+    CALifeSimulatorHeader& header();
+    CALifeTimeManager& time();
+    CALifeSpawnRegistry& spawns();
+    CALifeObjectRegistry& objects();
+    CALifeStoryRegistry& story_objects();
+    CALifeSmartTerrainRegistry& smart_terrains();
+    CALifeGroupRegistry& groups();
+    void can_register_objects(bool value);
+    const bool& can_register_objects() const { return m_can_register_objects; }
 
 public:
-    IC CALifeGraphRegistry& graph();
-    IC CALifeScheduleRegistry& scheduled();
-    IC CALifeTimeManager& time_manager();
-    IC CALifeRegistryContainer& registry() const;
-    IC inventory::upgrade::Manager& inventory_upgrade_manager() const;
+    CALifeGraphRegistry& graph();
+    CALifeScheduleRegistry& scheduled();
+    CALifeTimeManager& time_manager();
+    CALifeRegistryContainer& registry() const;
+    inventory::upgrade::Manager& inventory_upgrade_manager() const;
 
 public:
     CALifeSimulatorBase(IPureServer* server, LPCSTR section);
     virtual ~CALifeSimulatorBase();
     virtual void destroy();
-    IC bool initialized() const;
-    IC const CALifeSimulatorHeader& header() const;
-    IC const CALifeTimeManager& time() const;
-    IC const CALifeSpawnRegistry& spawns() const;
-    IC const CALifeObjectRegistry& objects() const;
-    IC const CALifeGraphRegistry& graph() const;
-    IC const CALifeScheduleRegistry& scheduled() const;
-    IC const CALifeStoryRegistry& story_objects() const;
-    IC const CALifeSmartTerrainRegistry& smart_terrains() const;
-    IC const CALifeGroupRegistry& groups() const;
-    IC CRandom32& random();
-    IC IPureServer& server() const;
-    IC const CALifeTimeManager& time_manager() const;
-    IC shared_str* server_command_line() const;
+    bool initialized() const { return m_initialized; }
+    const CALifeSimulatorHeader& header() const;
+    const CALifeTimeManager& time() const;
+    const CALifeSpawnRegistry& spawns() const;
+    const CALifeObjectRegistry& objects() const;
+    const CALifeGraphRegistry& graph() const;
+    const CALifeScheduleRegistry& scheduled() const;
+    const CALifeStoryRegistry& story_objects() const;
+    const CALifeSmartTerrainRegistry& smart_terrains() const;
+    const CALifeGroupRegistry& groups() const;
+    CRandom32& random();
+    IPureServer& server() const;
+    const CALifeTimeManager& time_manager() const;
+    shared_str* server_command_line() const;
     template <typename T>
-    IC T& registry(T* t) const;
-
+    T& registry(T* t) const { return registry()(t); }
 protected:
     void unload();
     virtual void reload(LPCSTR section);
-    IC void setup_command_line(shared_str* command_line);
+    void setup_command_line(shared_str* command_line);
     void assign_death_position(CSE_ALifeCreatureAbstract* tpALifeCreatureAbstract, GameGraph::_GRAPH_ID tGraphID,
         CSE_ALifeSchedulable* tpALifeSchedulable = 0);
     virtual void setup_simulator(CSE_ALifeObject* object) = 0;
@@ -126,4 +125,6 @@ public:
     ALife::ITEM_P_VECTOR m_temp_item_vector;
 };
 
+#ifndef DEBUG // for debug builds, the functions are instantiated by alife_simulator_base.cpp
 #include "alife_simulator_base_inline.h"
+#endif

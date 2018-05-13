@@ -94,8 +94,8 @@ public:
     virtual void HitImpulse(float P, Fvector& vWorldDir, Fvector& vLocalDir) = 0;
 
     virtual void Die(IGameObject* who);
-    //			void			KillEntity			(IGameObject* who);
-    void KillEntity(u16 whoID);
+    //void KillEntity (IGameObject* who);
+    void KillEntity(u16 whoID, bool bypass_actor_check = false);
 
     // Events
     virtual void OnEvent(NET_Packet& P, u16 type);

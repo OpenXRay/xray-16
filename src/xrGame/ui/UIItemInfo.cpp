@@ -21,6 +21,7 @@
 #include "ActorHelmet.h"
 #include "eatable_item.h"
 #include "UICellItem.h"
+#include "xrGame/game_type.h"
 
 extern const LPCSTR g_inventory_upgrade_xml;
 
@@ -178,8 +179,6 @@ void CUIItemInfo::InitItemInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)
     inherited::SetWndSize(size);
     InitItemInfo(xml_name);
 }
-
-bool IsGameTypeSingle();
 
 void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem, u32 item_price, LPCSTR trade_tip)
 {

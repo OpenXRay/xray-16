@@ -29,7 +29,7 @@
 
 CUIRankingWnd::CUIRankingWnd()
 {
-    m_actor_ch_info = NULL;
+    m_actor_ch_info = nullptr;
     m_previous_time = Device.dwTimeGlobal;
     m_delay = 3000;
     m_last_monster_icon_back = "";
@@ -39,7 +39,7 @@ CUIRankingWnd::CUIRankingWnd()
 
 CUIRankingWnd::~CUIRankingWnd()
 {
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
         xr_delete(*b);
     m_achieves_vec.clear();
@@ -97,8 +97,8 @@ void CUIRankingWnd::Init()
 
     m_center_caption = UIHelper::CreateTextWnd(xml, "center_caption", this);
 
-    XML_NODE* stored_root = xml.GetLocalRoot();
-    XML_NODE* node = xml.NavigateToNode("stat_info", 0);
+    XML_NODE stored_root = xml.GetLocalRoot();
+    XML_NODE node = xml.NavigateToNode("stat_info", 0);
     xml.SetLocalRoot(node);
 
     m_stat_count = (u32)xml.GetNodesNum(node, "stat");
@@ -151,8 +151,8 @@ void CUIRankingWnd::Init()
     VERIFY2(pSettings->section_exist(section), make_string("Section [%s] does not exist!", section));
 
     CInifile::Sect& achievs_section = pSettings->r_section(section);
-    CInifile::SectIt_ ib = achievs_section.Data.begin();
-    CInifile::SectIt_ ie = achievs_section.Data.end();
+    auto ib = achievs_section.Data.begin();
+    auto ie = achievs_section.Data.end();
     for (u8 i = 0; ib != ie; ++ib, ++i)
         add_achievement(xml, (*ib).first);
 
@@ -177,7 +177,7 @@ void CUIRankingWnd::add_achievement(CUIXml& xml, shared_str const& achiev_id)
 
 void CUIRankingWnd::update_info()
 {
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
         (*b)->Update();
     get_statistic();
@@ -187,7 +187,7 @@ void CUIRankingWnd::update_info()
 
 void CUIRankingWnd::DrawHint()
 {
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
     {
         if ((*b)->IsShown())
@@ -205,7 +205,7 @@ void CUIRankingWnd::get_statistic()
     for (u8 i = 1; i < m_stat_count; ++i)
     {
         luabind::functor<LPCSTR> funct;
-        R_ASSERT(ai().script_engine().functor("pda.get_stat", funct));
+        R_ASSERT(GEnv.ScriptEngine->functor("pda.get_stat", funct));
         LPCSTR str = funct(i);
         m_stat_info[i]->SetTextColor(color_rgba(170, 170, 170, 255));
         m_stat_info[i]->SetTextST(str);
@@ -214,7 +214,7 @@ void CUIRankingWnd::get_statistic()
 void CUIRankingWnd::get_best_monster()
 {
     luabind::functor<LPCSTR> funct;
-    R_ASSERT(ai().script_engine().functor("pda.get_monster_back", funct));
+    R_ASSERT(GEnv.ScriptEngine->functor("pda.get_monster_back", funct));
     LPCSTR str = funct();
     if (!xr_strcmp(str, ""))
         return;
@@ -226,7 +226,7 @@ void CUIRankingWnd::get_best_monster()
         m_last_monster_icon_back = str;
     }
 
-    R_ASSERT(ai().script_engine().functor("pda.get_monster_icon", funct));
+    R_ASSERT(GEnv.ScriptEngine->functor("pda.get_monster_icon", funct));
     str = funct();
     if (!xr_strcmp(str, ""))
         return;
@@ -241,7 +241,7 @@ void CUIRankingWnd::get_best_monster()
 void CUIRankingWnd::get_favorite_weapon()
 {
     luabind::functor<LPCSTR> funct;
-    R_ASSERT(ai().script_engine().functor("pda.get_favorite_weapon", funct));
+    R_ASSERT(GEnv.ScriptEngine->functor("pda.get_favorite_weapon", funct));
     LPCSTR str = funct();
 
     if (!xr_strcmp(str, ""))
@@ -280,7 +280,7 @@ void CUIRankingWnd::ResetAll()
     m_monster_icon_back->TextureOff();
     m_monster_icon->TextureOff();
     m_favorite_weapon_icon->TextureOff();
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
         (*b)->Reset();
 

@@ -1,5 +1,11 @@
+#pragma once
 #ifndef _COMPR_NORMAL_
 #define _COMPR_NORMAL_
+#include "xrCore/_types.h"
+
+// fwd. decl.
+template <class T> struct _vector3; typedef _vector3<float> Fvector;
+
 
 // A Unit Vector to 16-bit word conversion algorithm
 // based on work of Rafael Baptista (rafael@oroboro.com)

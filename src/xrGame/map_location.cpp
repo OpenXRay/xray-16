@@ -92,7 +92,6 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         g_uiSpotXml->Load(CONFIG_PATH, UI_PATH, "map_spots.xml");
     }
 
-    XML_NODE* node = NULL;
     string512 path_base, path;
     xr_strcpy(path_base, type);
     R_ASSERT3(g_uiSpotXml->NavigateToNode(path_base, 0), "XML node not found in file map_spots.xml", path_base);
@@ -125,7 +124,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
     }
 
     strconcat(sizeof(path), path, path_base, ":level_map");
-    node = g_uiSpotXml->NavigateToNode(path, 0);
+    XML_NODE node = g_uiSpotXml->NavigateToNode(path, 0);
     if (node)
     {
         LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");

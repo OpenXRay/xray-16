@@ -9,6 +9,7 @@ Functions for creating an object database.
 #include "objectdb.h"
 #include "vecmat.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 
 /*
@@ -375,13 +376,17 @@ int printObjectDB(ObjectDB* odb, FILE* fp, int c)
     char* tag;
     int i, j, k, n;
 
-    fprintf(fp, "%08.8x %s\n\n", odb->id, odb->filename);
+    fprintf(fp, "%08.8x %s\n\n", (unsigned int)odb->id, odb->filename);
 
     fprintf(fp, "Points (%d)\n\n", odb->npoints);
     for (i = 0; i < odb->npoints; i++)
     {
-        fprintf(fp, "%08.8x  pos (%g, %g, %g)  npols %d:", odb->pt[i].id, odb->pt[i].pos[c][0], odb->pt[i].pos[c][1],
-            odb->pt[i].pos[c][2], odb->pt[i].npols);
+        fprintf(fp, "%08.8x  pos (%g, %g, %g)  npols %d:",
+            (unsigned int)odb->pt[i].id,
+            odb->pt[i].pos[c][0],
+            odb->pt[i].pos[c][1],
+            odb->pt[i].pos[c][2],
+            odb->pt[i].npols);
         for (j = 0; j < odb->pt[i].npols; j++)
             fprintf(fp, " %d", odb->pt[i].pol[j]);
         fprintf(fp, "\n");
@@ -419,8 +424,13 @@ int printObjectDB(ObjectDB* odb, FILE* fp, int c)
     fprintf(fp, "\n\nPolygons (%d)\n\n", odb->npolygons);
     for (i = 0; i < odb->npolygons; i++)
     {
-        fprintf(fp, "%08.8x  surf %d  norm (%g, %g, %g)  nverts %d:\n", odb->pol[i].id, odb->pol[i].sindex,
-            odb->pol[i].norm[c][0], odb->pol[i].norm[c][1], odb->pol[i].norm[c][2], odb->pol[i].nverts);
+        fprintf(fp, "%08.8x  surf %d  norm (%g, %g, %g)  nverts %d:\n",
+            (unsigned int)odb->pol[i].id,
+            odb->pol[i].sindex,
+            odb->pol[i].norm[c][0],
+            odb->pol[i].norm[c][1],
+            odb->pol[i].norm[c][2],
+            odb->pol[i].nverts);
         for (j = 0; j < odb->pol[i].nverts; j++)
         {
             fprintf(fp, "  vert %d  vnorm (%g, %g, %g)\n", odb->pol[i].v[j].index, odb->pol[i].v[j].norm[c][0],
@@ -431,7 +441,7 @@ int printObjectDB(ObjectDB* odb, FILE* fp, int c)
     fprintf(fp, "\n\nSurfaces (%d)\n", odb->nsurfaces);
     for (i = 0; i < odb->nsurfaces; i++)
     {
-        fprintf(fp, "\n%08.8X  \"%s\"\n", odb->surf[i].id, odb->surf[i].name);
+        fprintf(fp, "\n%08.8X  \"%s\"\n", (unsigned int)odb->surf[i].id, odb->surf[i].name);
         fprintf(fp, "  " SURF_COLR "  %g %g %g\n", odb->surf[i].colr[0], odb->surf[i].colr[1], odb->surf[i].colr[2]);
         fprintf(fp, "  " SURF_LUMI "  %g\n", odb->surf[i].lumi);
         fprintf(fp, "  " SURF_DIFF "  %g\n", odb->surf[i].diff);
@@ -459,8 +469,8 @@ int printObjectDB(ObjectDB* odb, FILE* fp, int c)
         fprintf(fp, "  " SURF_LSIZ "  %g\n", odb->surf[i].lsiz);
         fprintf(fp, "  " SURF_LCOL "  %g %g %g\n", odb->surf[i].lcol[0], odb->surf[i].lcol[1], odb->surf[i].lcol[2]);
         fprintf(fp, "  " SURF_SIDE "  0x%X\n", odb->surf[i].side);
-        fprintf(fp, "  " SURF_RIMG "  %08.8X\n", odb->surf[i].rimg);
-        fprintf(fp, "  " SURF_TIMG "  %08.8X\n", odb->surf[i].timg);
+        fprintf(fp, "  " SURF_RIMG "  %08.8X\n", (unsigned int)odb->surf[i].rimg);
+        fprintf(fp, "  " SURF_TIMG "  %08.8X\n", (unsigned int)odb->surf[i].timg);
     }
 
     fprintf(fp, "\n\nVertex Maps (%d)\n\n", odb->nvertmaps);
@@ -486,4 +496,4 @@ int printObjectDB(ObjectDB* odb, FILE* fp, int c)
     return 1;
 }
 
-#pragma warning(default : 4995)
+#pragma warning(pop)

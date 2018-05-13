@@ -1,14 +1,12 @@
-#ifndef SoundRender_TargetH
-#define SoundRender_TargetH
 #pragma once
 
-#include "soundrender.h"
+#include "SoundRender.h"
 
 class CSoundRender_Target
 {
 protected:
     CSoundRender_Emitter* m_pEmitter;
-    BOOL rendering;
+    bool rendering;
 
 public:
     float priority;
@@ -17,7 +15,7 @@ protected:
     OggVorbis_File ovf;
     IReader* wave;
     void attach();
-    void dettach();
+    void detach();
 
 public:
     OggVorbis_File* get_data()
@@ -27,13 +25,12 @@ public:
         return &ovf;
     }
 
-public:
     CSoundRender_Target();
     virtual ~CSoundRender_Target();
 
     CSoundRender_Emitter* get_emitter() { return m_pEmitter; }
-    BOOL get_Rendering() { return rendering; }
-    virtual BOOL _initialize() = 0;
+    bool get_Rendering() { return rendering; }
+    virtual bool _initialize() = 0;
     virtual void _destroy() = 0;
     virtual void _restart() = 0;
 
@@ -44,4 +41,3 @@ public:
     virtual void update() = 0;
     virtual void fill_parameters() = 0;
 };
-#endif

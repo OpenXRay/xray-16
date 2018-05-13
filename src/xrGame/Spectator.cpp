@@ -364,11 +364,11 @@ void CSpectator::FirstEye_ToPlayer(IGameObject* pObject)
         {
             pActor->inventory().Items_SetCurrentEntityHud(true);
 
-            /*			CHudItem* pHudItem = smart_cast<CHudItem*>(pActor->inventory().ActiveItem());
-                        if (pHudItem)
-                        {
-                            pHudItem->OnStateSwitch(pHudItem->GetState());
-                        }*/
+            /*CHudItem* pHudItem = smart_cast<CHudItem*>(pActor->inventory().ActiveItem());
+            if (pHudItem)
+            {
+                pHudItem->OnStateSwitch(pHudItem->GetState(), pHudItem->GetState());
+            }*/
         }
     };
     if (Device.Paused() && pOldActor)
@@ -541,7 +541,7 @@ BOOL CSpectator::net_Spawn(CSE_Abstract* DC)
 void CSpectator::net_Destroy()
 {
     inherited::net_Destroy();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         Level().MapManager().OnObjectDestroyNotify(ID());
 }
 

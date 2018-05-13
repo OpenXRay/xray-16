@@ -5,8 +5,6 @@
 #include "xrCDB/xrCDB.h"
 #include "common/face_smoth_flags.h"
 
-#pragma comment(lib, "xrQSlim.lib")
-
 #define MAX_DECIMATE_ERROR 0.0005f
 #define COMPACTNESS_RATIO 0.001f
 
@@ -52,14 +50,14 @@ IC u32 common_edge_idx(const MxFace& base_f, u32 base_edge_idx, const MxFace& te
     MxVertexID bv0 = base_f[base_edge_idx];
     MxVertexID bv1 = base_f[(base_edge_idx + 1) % 3];
     if (bv0 > bv1)
-        swap(bv0, bv1);
+        std::swap(bv0, bv1);
 
     for (u8 i = 0; i < 3; ++i)
     {
         MxVertexID tv0 = test_f[i];
         MxVertexID tv1 = test_f[(i + 1) % 3];
         if (tv0 > tv1)
-            swap(tv0, tv1);
+            std::swap(tv0, tv1);
         if (bv0 == tv0 && bv1 == tv1)
             return i;
     }
@@ -71,7 +69,7 @@ bool do_constrain(u32 base_edge_idx, u32 test_edg_idx, face_props& base_fprops, 
         !do_connect_faces_by_faces_edge_flags(base_fprops.flags, test_fprops.flags, base_edge_idx, test_edg_idx);
 }
 
-DEFINE_VECTOR(face_props, FPVec, FPVecIt);
+using FPVec = xr_vector<face_props>;
 
 void SimplifyCFORM(CDB::CollectorPacked& CL)
 {

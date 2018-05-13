@@ -1,0 +1,481 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{abfe17a9-bc26-482a-9fdb-e3a8dbb7ab36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Source Files">
+      <UniqueIdentifier>{58192bc1-ce4f-4731-955d-d0f73b272682}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Dialogs\Header Files">
+      <UniqueIdentifier>{434166ec-8cb3-44c8-880a-6d43c5800194}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Collections">
+      <UniqueIdentifier>{64d07bc4-5326-4453-9770-bf66a24f5f4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collections\Source Files">
+      <UniqueIdentifier>{2af5af35-9ef2-4b0d-bb85-dfd48a8b824b}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Collections\Header Files">
+      <UniqueIdentifier>{e9aa1277-165e-4dcd-b0b5-67c621f9c9fa}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Controls">
+      <UniqueIdentifier>{151704cd-5646-41e4-bdbd-e05ae05855f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls\Source Files">
+      <UniqueIdentifier>{e34a6198-a7f7-4f89-a19f-c54e74f84fe7}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Controls\Header Files">
+      <UniqueIdentifier>{1340d1c6-38af-4672-9962-ab0e4dece5dd}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{2408d194-feab-4642-a254-94b2ad2e0c8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Source Files">
+      <UniqueIdentifier>{45c62ad2-1328-42c7-8182-defc31c5808c}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="System\Header Files">
+      <UniqueIdentifier>{dd440d12-1e24-4ac2-b977-82d8495e5754}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{3fc7613e-0551-449e-8e0d-76c6a13de4d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Source Files">
+      <UniqueIdentifier>{01464f84-3c34-47f0-a1b8-7ef813b7082e}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Main\Header Files">
+      <UniqueIdentifier>{1b4812d8-efbf-4371-b29d-9818782829bb}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Accessories">
+      <UniqueIdentifier>{955249cd-1d5b-404d-9262-ecc078969658}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Accessories\Source Files">
+      <UniqueIdentifier>{2d2ec992-ca50-4ee4-94ea-6395457b8297}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Accessories\Header Files">
+      <UniqueIdentifier>{08d34c8c-4435-4346-b72d-7650bbaa282a}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Accessories\Resource Files">
+      <UniqueIdentifier>{7d08c357-7058-48da-bf7f-3972267571ef}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Encodings">
+      <UniqueIdentifier>{1a985d3c-df87-45b2-82de-7dc7a87ee3ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Encodings\Source Files">
+      <UniqueIdentifier>{76e579f3-747a-4a3e-8d19-a462d6ef5fb9}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Encodings\Header Files">
+      <UniqueIdentifier>{0f604217-7905-40b3-bb94-2b7f37dbcd29}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="XML">
+      <UniqueIdentifier>{6797dac5-c23c-437b-958d-20097f96f04b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML\Source Files">
+      <UniqueIdentifier>{cc355b88-50ca-45b8-8f97-2743d121738c}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="XML\Header Files">
+      <UniqueIdentifier>{0172fcfb-57f2-4e9f-8b25-d2b13833c9c2}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Streams">
+      <UniqueIdentifier>{025fe417-b07c-457e-ba8a-9c6c58ece1fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Streams\Source Files">
+      <UniqueIdentifier>{c2c1904e-3e10-4381-8214-c8c15fb3ac33}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Streams\Header Files">
+      <UniqueIdentifier>{a02d4066-bfbf-4e9b-8148-10a58852a3d8}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BugTrap\source\Client\AboutDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\DescribeErrorDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\MachineInfoDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\MachineStateDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\MainDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\PreviewDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\SendMailDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\SimpleDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\TransferProgressDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\WaitDlg.cpp">
+      <Filter>Dialogs\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\ColHelper.cpp">
+      <Filter>Collections\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\StrHolder.cpp">
+      <Filter>Collections\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\AnimProgressBar.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\HexView.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\HyperLink.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\ImageView.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\LayoutManager.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\Splitter.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\TextView.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\WaitCursor.cpp">
+      <Filter>Controls\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\CMapi.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\EnumProcess.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\InMemLogFile.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\LogFile.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\LogStream.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\ModuleImportTable.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\NetThunks.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\SymEngine.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\SymEngineNet.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\TextLogFile.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\ThemeXP.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\XmlLogFile.cpp">
+      <Filter>System\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\BugTrap.cpp">
+      <Filter>Main\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\BugTrapNet.cpp">
+      <Filter>Main\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\BugTrapUI.cpp">
+      <Filter>Main\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\BugTrapUtils.cpp">
+      <Filter>Main\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\ResManager.cpp">
+      <Filter>Main\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\AssemblyInfo.cpp">
+      <Filter>Accessories\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\Globals.cpp">
+      <Filter>Accessories\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\stdafx.cpp">
+      <Filter>Accessories\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\Encoding.cpp">
+      <Filter>Encodings\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\TextFormat.cpp">
+      <Filter>Encodings\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\XmlReader.cpp">
+      <Filter>XML\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\XmlWriter.cpp">
+      <Filter>XML\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\FileStream.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\InputStream.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\MemStream.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\OutputStream.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BugTrap\source\Client\StrStream.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BugTrap\source\Client\AboutDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\DescribeErrorDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\MachineInfoDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\MachineStateDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\MainDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\PreviewDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\SendMailDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\SimpleDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\TransferProgressDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\WaitDlg.h">
+      <Filter>Dialogs\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\Array.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\Buffer.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\ColHelper.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\Hash.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\InterfacePtr.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\List.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\SmartPtr.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\StrHolder.h">
+      <Filter>Collections\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\AnimProgressBar.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\HexView.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\HyperLink.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\ImageView.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\LayoutManager.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\Splitter.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\TextView.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\WaitCursor.h">
+      <Filter>Controls\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\CMapi.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\EnumProcess.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\InMemLogFile.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\LogFile.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\LogLink.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\LogStream.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\ModuleImportTable.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\NetThunks.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\SymEngine.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\SymEngineNet.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\TextLogFile.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\ThemeXP.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\XmlLogFile.h">
+      <Filter>System\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BTAtlWindow.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BTMfcWindow.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BTTrace.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BugTrap.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BugTrapNet.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BugTrapUI.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BugTrapUtils.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\ResManager.h">
+      <Filter>Main\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\Globals.h">
+      <Filter>Accessories\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\LeakWatcher.h">
+      <Filter>Accessories\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\resource.h">
+      <Filter>Accessories\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\stdafx.h">
+      <Filter>Accessories\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\VersionInfo.h">
+      <Filter>Accessories\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\Encoding.h">
+      <Filter>Encodings\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\TextFormat.h">
+      <Filter>Encodings\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\XmlReader.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\XmlWriter.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\BaseStream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\FileStream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\InputStream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\MemStream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\OutputStream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\Stream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\StrStream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BugTrap\source\Client\VersionInfoString.h">
+      <Filter>Accessories\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="BugTrap\source\Client\res\Bug.ico">
+      <Filter>Accessories\Resource Files</Filter>
+    </Image>
+    <Image Include="BugTrap\source\Client\res\CheckMark.bmp">
+      <Filter>Accessories\Resource Files</Filter>
+    </Image>
+    <Image Include="BugTrap\source\Client\res\ImageToolbar.bmp">
+      <Filter>Accessories\Resource Files</Filter>
+    </Image>
+    <Image Include="BugTrap\source\Client\res\SortArrows.bmp">
+      <Filter>Accessories\Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BugTrap\source\Client\BugTrap.def">
+      <Filter>Accessories\Resource Files</Filter>
+    </None>
+    <None Include="BugTrap\source\Client\res\KeyPair.snk">
+      <Filter>Accessories\Resource Files</Filter>
+    </None>
+    <None Include="BugTrap\source\Client\res\Upload.avi">
+      <Filter>Accessories\Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BugTrap\source\Client\BugTrap.rc">
+      <Filter>Accessories\Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

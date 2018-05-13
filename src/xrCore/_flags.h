@@ -1,55 +1,63 @@
+#pragma once
 #ifndef __FLAGS_H__
 #define __FLAGS_H__
+#include "_types.h"
 
 template <class T>
 struct _flags
 {
-public:
-    typedef T TYPE;
-    typedef _flags<T> Self;
-    typedef Self& SelfRef;
-    typedef const Self& SelfCRef;
+    using TYPE = T;
+    using Self =_flags<T>;
+    using SelfRef = Self&;
+    using SelfCRef = const Self&;
 
-public:
     T flags;
 
-    IC TYPE get() const { return flags; }
-    IC SelfRef zero()
+    TYPE get() const noexcept { return flags; }
+
+    SelfRef zero() noexcept
     {
         flags = T(0);
         return *this;
     }
-    IC SelfRef one()
+
+    SelfRef one() noexcept
     {
         flags = T(-1);
         return *this;
     }
-    IC SelfRef invert()
+
+    SelfRef invert() noexcept
     {
         flags = ~flags;
         return *this;
     }
-    IC SelfRef invert(const Self& f)
+
+    SelfRef invert(const Self& f) noexcept
     {
         flags = ~f.flags;
         return *this;
     }
-    IC SelfRef invert(const T mask)
+
+    SelfRef invert(const T mask) noexcept
     {
         flags ^= mask;
         return *this;
     }
-    IC SelfRef assign(const Self& f)
+
+    SelfRef assign(const Self& f) noexcept
     {
         flags = f.flags;
         return *this;
     }
-    IC SelfRef assign(const T mask)
+
+    SelfRef assign(const T mask) noexcept
     {
         flags = mask;
         return *this;
     }
-    IC SelfRef set(const T mask, BOOL value)
+
+    SelfRef set(const T mask, bool value) noexcept
     {
         if (value)
             flags |= mask;
@@ -57,40 +65,46 @@ public:
             flags &= ~mask;
         return *this;
     }
-    IC BOOL is(const T mask) const { return mask == (flags & mask); }
-    IC BOOL is_any(const T mask) const { return BOOL(!!(flags & mask)); }
-    IC BOOL test(const T mask) const { return BOOL(!!(flags & mask)); }
-    IC SelfRef or (const T mask)
+
+    bool is(const T mask) const noexcept { return mask == (flags & mask); }
+    bool is_any(const T mask) const noexcept { return !!(flags & mask); }
+    bool test(const T mask) const noexcept { return !!(flags & mask); }
+
+    SelfRef _or(const T mask) noexcept
     {
         flags |= mask;
         return *this;
     }
-    IC SelfRef or (const Self& f, const T mask)
+
+    SelfRef _or(const Self& f, const T mask) noexcept
     {
         flags = f.flags | mask;
         return *this;
     }
-    IC SelfRef and (const T mask)
+
+    SelfRef _and(const T mask) noexcept
     {
         flags &= mask;
         return *this;
     }
-    IC SelfRef and (const Self& f, const T mask)
+
+    SelfRef _and(const Self& f, const T mask) noexcept
     {
         flags = f.flags & mask;
         return *this;
     }
-    IC BOOL equal(const Self& f) const { return flags == f.flags; }
-    IC BOOL equal(const Self& f, const T mask) const { return (flags & mask) == (f.flags & mask); }
+
+    bool equal(const Self& f) const noexcept { return flags == f.flags; }
+    bool equal(const Self& f, const T mask) const noexcept { return (flags & mask) == (f.flags & mask); }
 };
 
-typedef _flags<u8> Flags8;
-typedef _flags<u8> flags8;
-typedef _flags<u16> Flags16;
-typedef _flags<u16> flags16;
-typedef _flags<u32> Flags32;
-typedef _flags<u32> flags32;
-typedef _flags<u64> Flags64;
-typedef _flags<u64> flags64;
+using Flags8 = _flags<u8>;
+using flags8 = _flags<u8>;
+using Flags16 = _flags<u16>;
+using flags16 = _flags<u16>;
+using Flags32 = _flags<u32>;
+using flags32 = _flags<u32>;
+using Flags64 = _flags<u64>;
+using flags64 = _flags<u64>;
 
 #endif //__FLAGS_H__

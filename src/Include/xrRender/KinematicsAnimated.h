@@ -5,6 +5,7 @@
 #include "xrCore/Animation/SkeletonMotions.hpp"
 #include "animation_blend.h"
 #include "Layers/xrrender/KinematicAnimatedDefs.h"
+#include "Layers/xrRender/KinematicsAddBoneTransform.hpp" //--#SM+#--
 
 class IKinematics;
 class CBlend;
@@ -61,6 +62,9 @@ public:
     virtual void LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 channel_mask, SKeyTable& keys) = 0;
     virtual void LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* parent, const SKeyTable& keys) = 0;
 
+    virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset) = 0; //--#SM+#--
+    virtual void LL_ClearAdditionalTransform(u16 bone_id) = 0; //--#SM+#--
+
     virtual IBlendDestroyCallback* GetBlendDestroyCallback() = 0;
     virtual void SetBlendDestroyCallback(IBlendDestroyCallback* cb) = 0;
     virtual void SetUpdateTracksCalback(IUpdateTracksCallback* callback) = 0;
@@ -91,11 +95,11 @@ public:
     virtual MotionID ID_Cycle(shared_str N) = 0;
     virtual MotionID ID_Cycle_Safe(shared_str N) = 0;
     virtual CBlend* PlayCycle(
-        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = 0, LPVOID CallbackParam = 0, u8 channel = 0) = 0;
+        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
     virtual CBlend* PlayCycle(
-        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = 0, LPVOID CallbackParam = 0, u8 channel = 0) = 0;
-    virtual CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = 0,
-        LPVOID CallbackParam = 0, u8 channel = 0) = 0;
+        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
+    virtual CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr,
+        LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
     // fx'es
     virtual MotionID ID_FX(LPCSTR N) = 0;
     virtual MotionID ID_FX_Safe(LPCSTR N) = 0;

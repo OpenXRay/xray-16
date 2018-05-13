@@ -111,9 +111,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="xrAICore.hpp">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="Navigation\game_graph.h">
       <Filter>AI\Navigation\GameGraph</Filter>
     </ClInclude>
@@ -333,9 +330,6 @@
     <ClInclude Include="Navigation\PatrolPath\patrol_path_params_inline.h">
       <Filter>AI\Navigation\PatrolPath\Params</Filter>
     </ClInclude>
-    <ClInclude Include="PCH.hpp">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="Components\problem_solver.h">
       <Filter>AI\Components\ProblemSolver</Filter>
     </ClInclude>
@@ -366,20 +360,17 @@
     <ClInclude Include="Components\condition_state_inline.h">
       <Filter>AI\Components\ProblemSolver\ConditionState</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptPCH.hpp">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="Components\problem_solver_inline.h">
       <Filter>AI\Components\ProblemSolver</Filter>
     </ClInclude>
     <ClInclude Include="AISpaceBase.hpp">
       <Filter>AI</Filter>
     </ClInclude>
+    <ClInclude Include="pch.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="xrAICore.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="Navigation\game_graph_script.cpp">
       <Filter>AI\Navigation\GameGraph</Filter>
     </ClCompile>
@@ -404,20 +395,17 @@
     <ClCompile Include="Navigation\PatrolPath\patrol_path_params_script.cpp">
       <Filter>AI\Navigation\PatrolPath\Params</Filter>
     </ClCompile>
-    <ClCompile Include="PCH.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="Components\script_world_state_script.cpp">
       <Filter>AI\Components\ProblemSolver\ConditionState\ScriptWorldState</Filter>
     </ClCompile>
     <ClCompile Include="Components\script_world_property_script.cpp">
       <Filter>AI\Components\ProblemSolver\OperatorCondition\ScriptWorldProperty</Filter>
     </ClCompile>
-    <ClCompile Include="ScriptPCH.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="AISpaceBase.cpp">
       <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Kernel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

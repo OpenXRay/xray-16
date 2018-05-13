@@ -35,7 +35,7 @@ using System::String;
 //				gcnew System::ComponentModel::ReadOnlyAttribute(true)
 //
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, string_getter_type const& getter, string_setter_type const& setter,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
     password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid)
@@ -47,7 +47,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, shared_str& value, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)
@@ -59,7 +59,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, string_getter_type const& getter, string_setter_type const& setter, LPCSTR default_extension,
     LPCSTR file_mask, LPCSTR default_folder, LPCSTR caption, enter_text_enum const& can_enter_text,
     extension_action_enum const& extension_action, readonly_enum const& read_only,
@@ -77,7 +77,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, shared_str& value, LPCSTR default_extension, LPCSTR file_mask, LPCSTR default_folder,
     LPCSTR caption, enter_text_enum const& can_enter_text, extension_action_enum const& extension_action,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
@@ -94,7 +94,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, string_getter_type const& getter, string_setter_type const& setter, LPCSTR const* values,
     u32 const& value_count, value_editor_enum const& value_editor, enter_text_enum const& can_enter_text,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
@@ -130,7 +130,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, shared_str& value, LPCSTR const* values, u32 const& value_count,
     value_editor_enum const& value_editor, enter_text_enum const& can_enter_text, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
@@ -167,7 +167,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, string_getter_type const& getter, string_setter_type const& setter,
     string_collection_getter_type const& values, string_collection_size_getter_type const& value_count,
     value_editor_enum const& value_editor, enter_text_enum const& can_enter_text, readonly_enum const& read_only,
@@ -204,7 +204,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     LPCSTR default_value, shared_str& value, string_collection_getter_type const& values,
     string_collection_size_getter_type const& value_count, value_editor_enum const& value_editor,
     enter_text_enum const& can_enter_text, readonly_enum const& read_only,

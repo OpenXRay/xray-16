@@ -423,7 +423,7 @@ int Limb::SetGoal(const Matrix G, int limits)
     return success;
 }
 
-static void init_error(char* msg)
+static void init_error(pcstr msg)
 {
     fprintf(stderr, "You forgot to call SetGoal or SetGoalPos in %s\n", msg);
     exit(0);
@@ -738,6 +738,7 @@ int Limb::try_singularities(int solves, float& swivel_angle, float x[])
 //
 // Assumes that either SetGoal or SetGoalPos has been called first
 //
+// XXX: Shouldn't the phInfinity declaration be in a header for xrPhysics?
 extern XRPHYSICS_API const float phInfinity;
 int Limb::Solve(float x[], float* new_swivel, float* new_pos)
 {

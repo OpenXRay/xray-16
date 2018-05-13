@@ -13,8 +13,6 @@ public:
     virtual void destroy_loading_shaders();
     virtual void setLevelLogo(LPCSTR pszLogoName);
     virtual void load_draw_internal(CApplication& owner);
-    //	?????
-    virtual void KillHW();
 
 private:
     ref_shader hLevelLogo;

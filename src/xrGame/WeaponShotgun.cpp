@@ -106,15 +106,15 @@ void CWeaponShotgun::TriStateReload()
     SwitchState(eReload);
 }
 
-void CWeaponShotgun::OnStateSwitch(u32 S)
+void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
 {
     if (!m_bTriStateReload || S != eReload)
     {
-        inherited::OnStateSwitch(S);
+        inherited::OnStateSwitch(S, oldState);
         return;
     }
 
-    CWeapon::OnStateSwitch(S);
+    CWeapon::OnStateSwitch(S, oldState);
 
     if (m_magazine.size() == (u32)iMagazineSize || !HaveCartridgeInInventory(1))
     {

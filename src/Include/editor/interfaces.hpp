@@ -9,14 +9,20 @@
 #ifndef EDITOR_INTERFACES_HPP_INCLUDED
 #define EDITOR_INTERFACES_HPP_INCLUDED
 
-namespace editor
+namespace XRay
 {
-class ide;
-class engine;
+namespace Editor
+{
+class ide_base;
+class engine_base;
 
-typedef void(__cdecl* initialize_function_ptr)(ide*&, engine*);
-typedef void(__cdecl* finalize_function_ptr)(ide*&);
+using initialize_function_ptr = void(*)(ide_base*&, engine_base*);
+using finalize_function_ptr = void(*)(ide_base*&);
 
-} // namespace editor
+// XXX: is __cdecl needed?
+//typedef void(__cdecl* initialize_function_ptr)(ide_base*&, engine_base*);
+//typedef void(__cdecl* finalize_function_ptr)(ide_base*&);
+}
+}
 
 #endif // ifndef EDITOR_INTERFACES_HPP_INCLUDED

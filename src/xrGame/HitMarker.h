@@ -1,11 +1,13 @@
+#pragma once
 #ifndef __XR_HITMARKER_H__
 #define __XR_HITMARKER_H__
-#pragma once
 
 #include "Include/xrRender/FactoryPtr.h"
-class IUIShader;
 #include "ui_defs.h"
+#include "Common/Noncopyable.hpp"
+#include "xrCommon/xr_deque.h"
 
+class IUIShader;
 class CUIStaticItem;
 class CLAItem;
 class CGrenade;
@@ -42,7 +44,7 @@ struct SGrenadeMark
     void Update(float angle);
 };
 
-class CHitMarker
+class CHitMarker : private Noncopyable
 {
 public:
     FactoryPtr<IUIShader> hShader2;

@@ -2,8 +2,6 @@
 #include "screenshots_writer.h"
 #include "screenshots_reader.h"
 
-#pragma comment(lib, "xrCore.lib")
-
 void print_format() { printf("Format: mp_screenshots_info.exe [screenshot_file_name]\n"); };
 void xrcore_log_cb(void* context, LPCSTR log_string) { printf("%s\n", log_string); };
 u8* ss_buffer = NULL;
@@ -69,8 +67,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
     printf("Initializing core...\n");
-    Core._initialize("mp_screenshots_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
-    crypto::xr_crypto_init();
+    Core.Initialize("mp_screenshots_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
 
 #ifdef DEBUG
     if (strstr(argv[1], "--gen_params"))

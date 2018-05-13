@@ -2,6 +2,8 @@
 #pragma hdrstop
 
 #include "Bone.hpp"
+#include "xrCore/xrDebug_macros.h"
+#include "xrCommon/math_funcs_inline.h"
 
 #define BONE_VERSION 0x0002
 //------------------------------------------------------------------------------
@@ -19,13 +21,75 @@
 static const Fobb dummy = Fobb().identity();
 
 const Fobb& CBone::get_obb() const { return dummy; }
+
+bool SBoneShape::Valid()
+{
+    switch (type)
+    {
+    case stBox:
+        return !fis_zero(box.m_halfsize.x) && !fis_zero(box.m_halfsize.y) && !fis_zero(box.m_halfsize.z);
+    case stSphere: return !fis_zero(sphere.R);
+    case stCylinder:
+        return !fis_zero(cylinder.m_height) && !fis_zero(cylinder.m_radius) &&
+            !fis_zero(cylinder.m_direction.square_magnitude());
+    default:
+        return true;
+    }
+}
+
+void SJointIKData::Export(IWriter& F)
+{
+    F.w_u32(type);
+    for (int k = 0; k < 3; k++)
+    {
+        // Kostya Slipchenko say:
+        // направление вращения в ОДЕ отличается от направления вращение в X-Ray
+        // поэтому меняем знак у лимитов
+        // F.w_float (std::min(-limits[k].limit.x,-limits[k].limit.y)); // min (swap special for ODE)
+        // F.w_float (std::max(-limits[k].limit.x,-limits[k].limit.y)); // max (swap special for ODE)
+
+        VERIFY(std::min(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.y);
+        VERIFY(std::max(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.x);
+
+        F.w_float(-limits[k].limit.y); // min (swap special for ODE)
+        F.w_float(-limits[k].limit.x); // max (swap special for ODE)
+
+        F.w_float(limits[k].spring_factor);
+        F.w_float(limits[k].damping_factor);
+    }
+    F.w_float(spring_factor);
+    F.w_float(damping_factor);
+
+    F.w_u32(ik_flags.get());
+    F.w_float(break_force);
+    F.w_float(break_torque);
+
+    F.w_float(friction);
+}
+
+bool SJointIKData::Import(IReader& F, u16 vers)
+{
+    type = (EJointType)F.r_u32();
+    F.r(limits, sizeof(SJointLimit) * 3);
+    spring_factor = F.r_float();
+    damping_factor = F.r_float();
+    ik_flags.flags = F.r_u32();
+    break_force = F.r_float();
+    break_torque = F.r_float();
+
+    if (vers > 0)
+        friction = F.r_float();
+
+    return true;
+}
+
 CBone::CBone()
 {
     construct();
     flags.zero();
     rest_length = 0;
     SelfID = -1;
-    parent = 0;
+    parent = nullptr;
 
     ResetData();
 }

@@ -13,6 +13,7 @@
 #pragma once
 
 #include "UIFrameWindow.h"
+#include "UIWindow.h"
 #include "UIFrameLineWnd.h"
 
 enum IBState

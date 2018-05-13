@@ -20,10 +20,10 @@ void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->
 //////////////////////////////////////////////////////////////////////
 CTexture::CTexture()
 {
-    pSurface = NULL;
-    pAVI = NULL;
-    pTheora = NULL;
-    desc_cache = 0;
+    pSurface = nullptr;
+    pAVI = nullptr;
+    pTheora = nullptr;
+    desc_cache = nullptr;
     seqMSPF = 0;
     flags.MemoryUsage = 0;
     flags.bLoaded = false;
@@ -152,25 +152,22 @@ void CTexture::Preload()
 void CTexture::Load()
 {
     flags.bLoaded = true;
-    desc_cache = 0;
+    desc_cache = nullptr;
     if (pSurface)
         return;
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
-    if (0 == stricmp(*cName, "$null"))
+    if (0 == xr_stricmp(*cName, "$null"))
         return;
-    if (0 != strstr(*cName, "$user$"))
+    if (nullptr != strstr(*cName, "$user$"))
     {
         flags.bUser = true;
         return;
     }
 
     Preload();
-//#ifndef		DEDICATED_SERVER
-#ifndef _EDITOR
-    if (!g_dedicated_server)
-#endif
+    if (!GEnv.isDedicatedServer)
     {
         // Check for OGM
         string_path fn;
@@ -188,16 +185,16 @@ void CTexture::Load()
             else
             {
                 flags.MemoryUsage = pTheora->Width(true) * pTheora->Height(true) * 4;
-                BOOL bstop_at_end = (0 != strstr(cName.c_str(), "intro\\")) || (0 != strstr(cName.c_str(), "outro\\"));
+                BOOL bstop_at_end = (nullptr != strstr(cName.c_str(), "intro\\")) || (nullptr != strstr(cName.c_str(), "outro\\"));
                 pTheora->Play(!bstop_at_end, RDEVICE.dwTimeContinual);
 
                 // Now create texture
-                ID3DTexture2D* pTexture = 0;
+                ID3DTexture2D* pTexture = nullptr;
                 u32 _w = pTheora->Width(false);
                 u32 _h = pTheora->Height(false);
 
                 HRESULT hrr =
-                    HW.pDevice->CreateTexture(_w, _h, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL);
+                    HW.pDevice->CreateTexture(_w, _h, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, nullptr);
 
                 pSurface = pTexture;
                 if (FAILED(hrr))
@@ -205,7 +202,7 @@ void CTexture::Load()
                     FATAL("Invalid video stream");
                     R_CHK(hrr);
                     xr_delete(pTheora);
-                    pSurface = 0;
+                    pSurface = nullptr;
                 }
             }
         }
@@ -224,16 +221,16 @@ void CTexture::Load()
                 flags.MemoryUsage = pAVI->m_dwWidth * pAVI->m_dwHeight * 4;
 
                 // Now create texture
-                ID3DTexture2D* pTexture = 0;
+                ID3DTexture2D* pTexture = nullptr;
                 HRESULT hrr = HW.pDevice->CreateTexture(
-                    pAVI->m_dwWidth, pAVI->m_dwHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL);
+                    pAVI->m_dwWidth, pAVI->m_dwHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, nullptr);
                 pSurface = pTexture;
                 if (FAILED(hrr))
                 {
                     FATAL("Invalid video stream");
                     R_CHK(hrr);
                     xr_delete(pAVI);
-                    pSurface = 0;
+                    pSurface = nullptr;
                 }
             }
         }
@@ -245,7 +242,7 @@ void CTexture::Load()
 
             flags.seqCycles = FALSE;
             _fs->r_string(buffer, sizeof(buffer));
-            if (0 == stricmp(buffer, "cycled"))
+            if (0 == xr_stricmp(buffer, "cycled"))
             {
                 flags.seqCycles = TRUE;
                 _fs->r_string(buffer, sizeof(buffer));
@@ -270,7 +267,7 @@ void CTexture::Load()
                     }
                 }
             }
-            pSurface = 0;
+            pSurface = nullptr;
             FS.r_close(_fs);
         }
         else
@@ -286,7 +283,6 @@ void CTexture::Load()
                 flags.MemoryUsage = mem;
             }
         }
-        //#endif
     }
     PostLoad();
 }
@@ -308,7 +304,7 @@ void CTexture::Unload()
             _RELEASE(seqDATA[I]);
         }
         seqDATA.clear();
-        pSurface = 0;
+        pSurface = nullptr;
     }
     flags.MemoryUsage = 0;
 
@@ -331,6 +327,8 @@ void CTexture::desc_update()
     {
         ID3DTexture2D* T = (ID3DTexture2D*)pSurface;
         R_CHK(T->GetLevelDesc(0, &desc));
+        m_width = desc.Width;
+        m_height = desc.Height;
     }
 }
 

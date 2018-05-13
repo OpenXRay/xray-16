@@ -1,9 +1,8 @@
 #pragma once
-#include "Common/Platform.hpp"
 #include "xrCore/FS.h"
 #include "utils/Shader_xrLC.h"
 struct STextureParams;
-#pragma comment(lib, "dxt.lib")
+
 extern "C" bool XR_IMPORT __stdcall DXTCompress(
     LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 

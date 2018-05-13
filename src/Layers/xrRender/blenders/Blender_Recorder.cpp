@@ -48,9 +48,9 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     //	optimization?
 
     // Analyze possibility to detail this shader
-    detail_texture = NULL;
-    detail_scaler = NULL;
-    LPCSTR base = NULL;
+    detail_texture = nullptr;
+    detail_scaler = nullptr;
+    LPCSTR base = nullptr;
     if (bDetail && BT->canBeDetailed())
     {
         //
@@ -64,7 +64,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
             base = *lst[id];
         }
         if (!RImplementation.Resources->m_textures_description.GetDetailTexture(base, detail_texture, detail_scaler))
-            bDetail = FALSE;
+            bDetail = false;
     }
     else
     {
@@ -86,17 +86,17 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
         //	Igor
         ////////////////////
 
-        bDetail = FALSE;
+        bDetail = false;
     }
 
     // Validate for R1 or R2
-    bDetail_Diffuse = FALSE;
-    bDetail_Bump = FALSE;
+    bDetail_Diffuse = false;
+    bDetail_Bump = false;
 
 #ifndef _EDITOR
 #if RENDER == R_R1
     if (RImplementation.o.no_detail_textures)
-        bDetail = FALSE;
+        bDetail = false;
 #endif
 #endif
 
@@ -178,7 +178,7 @@ void CBlender_Compile::PassEnd()
     proto.vs = RImplementation.Resources->_CreateVS(pass_vs);
     ctable.merge(&proto.ps->constants);
     ctable.merge(&proto.vs->constants);
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     proto.gs = RImplementation.Resources->_CreateGS(pass_gs);
     ctable.merge(&proto.gs->constants);
 #ifdef USE_DX11
@@ -205,13 +205,13 @@ void CBlender_Compile::PassEnd()
 void CBlender_Compile::PassSET_PS(LPCSTR name)
 {
     xr_strcpy(pass_ps, name);
-    strlwr(pass_ps);
+    xr_strlwr(pass_ps);
 }
 
 void CBlender_Compile::PassSET_VS(LPCSTR name)
 {
     xr_strcpy(pass_vs, name);
-    strlwr(pass_vs);
+    xr_strlwr(pass_vs);
 }
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
@@ -287,6 +287,9 @@ void CBlender_Compile::StageSET_XForm(u32 tf, u32 tc)
 #ifdef _EDITOR
     RS.SetTSS(Stage(), D3DTSS_TEXTURETRANSFORMFLAGS, tf);
     RS.SetTSS(Stage(), D3DTSS_TEXCOORDINDEX, tc);
+#else
+    UNUSED(tf);
+    UNUSED(tc);
 #endif
 }
 void CBlender_Compile::StageSET_Color(u32 a1, u32 op, u32 a2) { RS.SetColor(Stage(), a1, op, a2); }
@@ -319,7 +322,7 @@ void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 f
             xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
         N = *lst[id];
     }
-    passTextures.push_back(mk_pair(Stage(), ref_texture(RImplementation.Resources->_CreateTexture(N))));
+    passTextures.push_back(std::make_pair(Stage(), ref_texture(RImplementation.Resources->_CreateTexture(N))));
     //	i_Address				(Stage(),address);
     i_Filter(Stage(), fmin, fmip, fmag);
 }

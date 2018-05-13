@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CYCLE_CONST_STORAGE_H
 #define CYCLE_CONST_STORAGE_H
 

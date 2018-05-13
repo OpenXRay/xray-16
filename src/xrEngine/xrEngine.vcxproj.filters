@@ -4,9 +4,6 @@
     <Filter Include="General">
       <UniqueIdentifier>{789b2b01-e97a-4aef-b3c2-0281708942c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="General\Resources">
-      <UniqueIdentifier>{e11e63ee-7e2c-4cae-8562-81d199ac71df}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interfaces">
       <UniqueIdentifier>{fad49c5d-63ff-41cf-acdd-a213a33d84e0}</UniqueIdentifier>
     </Filter>
@@ -252,12 +249,6 @@
     <ClInclude Include="x_ray.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>General\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="psystem.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="IInputReceiver.h">
       <Filter>Interfaces\Input</Filter>
     </ClInclude>
@@ -397,9 +388,6 @@
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
     <ClInclude Include="xrTheora_Surface.h">
-      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
-    </ClInclude>
-    <ClInclude Include="xrTheora_Surface_mmx.h">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
     <ClInclude Include="Text_Console.h">
@@ -567,6 +555,16 @@
     <ClInclude Include="profiler_inline.h">
       <Filter>General\Profiler</Filter>
     </ClInclude>
+    <ClInclude Include="main.h" />
+    <ClInclude Include="splash.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="vis_object_data.h">
+      <Filter>Render\Visibility</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadersExternalData.h">
+      <Filter>Render\Visibility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -699,9 +697,6 @@
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
     <ClCompile Include="xrTheora_Surface.cpp">
-      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
-    </ClCompile>
-    <ClCompile Include="xrTheora_Surface_mmx.cpp">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
     <ClCompile Include="Text_Console.cpp">
@@ -887,19 +882,9 @@
     <ClCompile Include="profiler.cpp">
       <Filter>General\Profiler</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resource.rc">
-      <Filter>General\Resources</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="splash_xrcs_en.bmp">
-      <Filter>General\Resources</Filter>
-    </Image>
-    <Image Include="stalker_cs.ico">
-      <Filter>General\Resources</Filter>
-    </Image>
+    <ClCompile Include="splash.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />

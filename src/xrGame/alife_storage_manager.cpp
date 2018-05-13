@@ -22,6 +22,12 @@
 #include "string_table.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "autosave_manager.h"
+//Alundaio
+#ifdef ENGINE_LUA_ALIFE_STORAGE_MANAGER_CALLBACKS
+#include "pch_script.h"
+#include "xrScriptEngine/script_engine.hpp" 
+#endif
+//-Alundaio
 
 XRCORE_API string_path g_bug_report_file;
 
@@ -90,12 +96,30 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
     Msg("* Game %s is successfully saved to file '%s'", m_save_name, temp);
 #endif // DEBUG
 
+    //Alundaio: To get the savegame fname to make our own custom save states
+#ifdef ENGINE_LUA_ALIFE_STORAGE_MANAGER_CALLBACKS
+    luabind::functor<void> funct;
+    GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_save", funct);
+    if (funct)
+        funct(static_cast<pcstr>(m_save_name));
+#endif
+    //-Alundaio
+
     if (!update_name)
         xr_strcpy(m_save_name, save);
 }
 
 void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR file_name)
 {
+    //Alundaio: So we can get the fname to make our own custom save states
+#ifdef ENGINE_LUA_ALIFE_STORAGE_MANAGER_CALLBACKS
+    luabind::functor<void> funct;
+    GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_load", funct);
+    if (funct)
+        funct(file_name);
+#endif // _DEBUG
+    //-Alundaio
+
     IReader source(buffer, buffer_size);
     header().load(source);
     time_manager().load(source);
@@ -105,23 +129,21 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
 
     VERIFY(can_register_objects());
     can_register_objects(false);
-    CALifeObjectRegistry::OBJECT_REGISTRY::iterator B = objects().objects().begin();
-    CALifeObjectRegistry::OBJECT_REGISTRY::iterator E = objects().objects().end();
-    CALifeObjectRegistry::OBJECT_REGISTRY::iterator I;
-    for (I = B; I != E; ++I)
+
+    for (auto& object : objects().objects())
     {
-        ALife::_OBJECT_ID id = (*I).second->ID;
-        (*I).second->ID = server().PerformIDgen(id);
-        VERIFY(id == (*I).second->ID);
-        register_object((*I).second, false);
+        ALife::_OBJECT_ID id = object.second->ID;
+        object.second->ID = server().PerformIDgen(id);
+        VERIFY(id == object.second->ID);
+        register_object(object.second, false);
     }
 
     registry().load(source);
 
     can_register_objects(true);
 
-    for (I = B; I != E; ++I)
-        (*I).second->on_register();
+    for (auto& object : objects().objects())
+        object.second->on_register();
 
     if (!g_pGameLevel)
         return;
@@ -168,12 +190,12 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
     CHECK_OR_EXIT(CSavedGameWrapper::valid_saved_game(*stream),
         make_string("%s\nSaved game version mismatch or saved game is corrupted", file_name));
-    /*
-        string512					temp;
-        strconcat					(sizeof(temp),temp,CStringTable().translate("st_loading_saved_game").c_str(),"
-       \"",save_name,SAVE_EXTENSION,"\"");
-        g_pGamePersistent->LoadTitle(temp);
-    */
+
+    string512 temp;
+    strconcat(sizeof(temp), temp, CStringTable().translate("st_loading_saved_game").c_str(),
+        "\"", save_name,SAVE_EXTENSION, "\"");
+
+    g_pGamePersistent->SetLoadStageTitle(temp);
     g_pGamePersistent->LoadTitle();
 
     unload();

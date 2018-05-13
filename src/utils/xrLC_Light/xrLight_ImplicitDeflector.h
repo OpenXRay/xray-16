@@ -1,9 +1,14 @@
+#pragma once
 #ifndef _XRLIGHT_IPLICIDDEFLECTOR
 #define _XRLIGHT_IPLICIDDEFLECTOR
 
 #include "lm_layer.h"
 #include "xrFacedefs.h"
+
+// fwd. decl.
 struct b_BuildTexture;
+template <class T> class _box2; typedef _box2<float> Fbox2;
+
 class ImplicitDeflector
 {
 public:

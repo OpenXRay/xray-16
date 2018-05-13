@@ -30,7 +30,7 @@ int CSoundManager::GetGameSounds(FS_FileSet& files)
 int CSoundManager::GetSoundEnvs(AStringVec& items)
 {
     /*
-        SoundEnvironment_LIB* Lib = Sound->get_env_library();
+        SoundEnvironment_LIB* Lib = GEnv.Sound->get_env_library();
         if (Lib){
             for (SoundEnvironment_LIB::SE_IT it=Lib->Library().begin(); it!=Lib->Library().end(); it++)
                 items.push_back(*(*it)->name);
@@ -44,16 +44,15 @@ bool CSoundManager::OnCreate()
 {
     //.	psSoundFreq			= sf_44K;
     //	psSoundFlags.set	(ssHardware,FALSE);
-    CSound_manager_interface::_create(0);
-    CSound_manager_interface::_create(1);
+    ISoundManager::_create();
     return true;
 }
 
-void CSoundManager::OnDestroy() { CSound_manager_interface::_destroy(); }
+void CSoundManager::OnDestroy() { ISoundManager::_destroy(); }
 void CSoundManager::OnFrame()
 {
     ::psSoundVEffects = psDeviceFlags.is(rsMuteSounds) ? 0.f : 1.f;
-    Sound->update(EDevice.m_Camera.GetPosition(), EDevice.m_Camera.GetDirection(), EDevice.m_Camera.GetNormal());
+    GEnv.Sound->update(EDevice.m_Camera.GetPosition(), EDevice.m_Camera.GetDirection(), EDevice.m_Camera.GetNormal());
 }
 
 void CSoundManager::MuteSounds(BOOL bVal)
@@ -95,7 +94,7 @@ void CSoundManager::RenameSound(LPCSTR nm0, LPCSTR nm1, EItemType type)
         strcat(fn1, ".ogg");
         FS.file_rename(fn0, fn1, false);
 
-        Sound->refresh_sources();
+        GEnv.Sound->refresh_sources();
     }
 }
 
@@ -121,7 +120,7 @@ BOOL CSoundManager::RemoveSound(LPCSTR fname, EItemType type)
             FS.file_delete(_sounds_, thm_name.c_str());
             // game
             FS.file_delete(_game_sounds_, game_name.c_str());
-            Sound->refresh_sources();
+            GEnv.Sound->refresh_sources();
             return TRUE;
         }
     }
@@ -436,7 +435,7 @@ void CSoundManager::RefreshSounds(bool bSync)
             SynchronizeSounds(true, true, false, 0, 0);
             CleanupSounds();
         }
-        Sound->refresh_sources();
+        GEnv.Sound->refresh_sources();
         UI->SetStatus("");
     }
     else

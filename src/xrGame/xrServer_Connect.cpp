@@ -12,6 +12,7 @@
 #include "file_transfer.h"
 #include "screenshot_server.h"
 #include "xrNetServer/NET_AuthCheck.h"
+#include "xrNetServer/NET_Messages.h"
 
 LPCSTR xrServer::get_map_download_url(LPCSTR level_name, LPCSTR level_version)
 {
@@ -172,7 +173,7 @@ void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
         }
         else
         {
-            message_to_user = "";
+            STRCONCAT(message_to_user, "");
         }
         SendConnectResult(tmp_client, 0, ecr_have_been_banned, message_to_user);
         return;

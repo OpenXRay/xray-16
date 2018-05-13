@@ -1,14 +1,8 @@
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-
-#ifndef StdafxH
-#define StdafxH
-
 #pragma once
 
+#include "Common/Common.hpp"
+
 #include "xrCore/xrCore.h"
-#pragma comment(lib, "xrCore.lib")
 
 #define _BCL
 #define ENGINE_API
@@ -52,7 +46,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 #define AnsiString std::string
 
-DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
+using AStringVec = xr_vector<std::string>;
 
 #define THROW R_ASSERT(0)
 
@@ -70,5 +64,3 @@ DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 
 #define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
-
-#endif // StdafxH

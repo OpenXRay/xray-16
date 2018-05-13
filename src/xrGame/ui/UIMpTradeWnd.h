@@ -41,8 +41,7 @@ private:
     EItmState m_item_state;
 };
 
-DEF_VECTOR(ITEMS_vec, SBuyItemInfo*);
-typedef ITEMS_vec::const_iterator ITEMS_vec_cit;
+using ITEMS_vec = xr_vector<SBuyItemInfo*>;
 
 class CUIMpTradeWnd : public IBuyWnd, public CUIWndCallback
 {
@@ -90,7 +89,6 @@ public:
         bf_normal = bf_check_money | bf_check_rank_restr | bf_check_count_restr,
     };
 
-public:
     CUIMpTradeWnd();
     virtual ~CUIMpTradeWnd();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
@@ -99,7 +97,6 @@ public:
     virtual void Update();
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
 
-public:
     virtual void Init(const shared_str& sectionName, const shared_str& sectionPrice);
     virtual void BindDragDropListEvents(CUIDragDropListEx* lst, bool bDrag);
 

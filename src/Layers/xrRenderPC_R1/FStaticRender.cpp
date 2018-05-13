@@ -1,43 +1,33 @@
-// CRender.cpp: implementation of the CRender class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
+#include "FStaticRender.h"
+#include "Layers/xrRender/FBasicVisual.h"
+#include "xrEngine/xr_object.h"
+#include "xrEngine/CustomHUD.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
-#include "Layers/xrRender/FBasicVisual.h"
-#include "xrEngine/CustomHUD.h"
-#include "xrEngine/xr_object.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
-#include "xrCore/FMesh.hpp"
 #include "Layers/xrRender/SkeletonCustom.h"
-#include "Layers/xrRender/lighttrack.h"
+#include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
-#ifndef _EDITOR
-#include "xrCore/Threading/ttapi.h"
-#endif
-
-using namespace R_dsgraph;
 
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
+ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/)
 {
     switch (phase)
     {
     case PHASE_NORMAL:
-        return (RImplementation.L_Projector->shadowing() ? pVisual->shader->E[SE_R1_NORMAL_HQ] :
-                                                           pVisual->shader->E[SE_R1_NORMAL_LQ])
-            ._get();
+        return (RImplementation.L_Projector->shadowing() ?
+            pVisual->shader->E[SE_R1_NORMAL_HQ] : pVisual->shader->E[SE_R1_NORMAL_LQ])._get();
     case PHASE_POINT: return pVisual->shader->E[SE_R1_LPOINT]._get();
     case PHASE_SPOT: return pVisual->shader->E[SE_R1_LSPOT]._get();
     default: NODEFAULT;
     }
 #ifdef DEBUG
-    return 0;
+    return nullptr;
 #endif
 }
 //////////////////////////////////////////////////////////////////////////
@@ -54,16 +44,16 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
     default: NODEFAULT;
     }
 #ifdef DEBUG
-    return 0;
+    return nullptr;
 #endif
 }
 
 //////////////////////////////////////////////////////////////////////////
 void CRender::create()
 {
-    L_DB = 0;
-    L_Shadows = 0;
-    L_Projector = 0;
+    L_DB = nullptr;
+    L_Shadows = nullptr;
+    L_Projector = nullptr;
 
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
@@ -102,10 +92,8 @@ void CRender::create()
 
     m_bMakeAsyncSS = false;
 
-    //---------
-    Target = new CRenderTarget();
-    //---------
-    //
+    Target = new CRenderTarget(); // Main target
+
     Models = new CModelPool();
     L_Dynamic = new CLightR_Manager();
     PSLibrary.OnCreate();
@@ -128,14 +116,19 @@ void CRender::destroy()
     //*** Components
     xr_delete(Target);
     Device.seqFrame.Remove(this);
-
     r_dsgraph_destroy();
 }
 
 void CRender::reset_begin()
 {
+    //AVO: let's reload details while changed details options on vid_restart
+    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    {
+        Details->Unload();
+        xr_delete(Details);
+    }
     xr_delete(Target);
-    //.	HWOCC.occq_destroy			();
+    //HWOCC.occq_destroy();
 }
 
 void CRender::reset_end()
@@ -151,7 +144,28 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::OnFrame() { Models->DeleteQueue(); }
+void CRender::OnFrame()
+{
+    Models->DeleteQueue();
+}
+
+// Перед началом рендера мира --#SM+#-- +SecondVP+
+void CRender::BeforeWorldRender() {}
+
+// После рендера мира и пост-эффектов --#SM+#-- +SecondVP+
+void CRender::AfterWorldRender()
+{
+    if (Device.m_SecondViewport.IsSVPFrame())
+    {
+        // Делает копию бэкбуфера (текущего экрана) в рендер-таргет второго вьюпорта
+        IRender_Target* T = getTarget();
+        IDirect3DSurface9* pBackBuffer = nullptr;
+        HW.pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer); // Получаем ссылку на бэкбуфер
+        D3DXLoadSurfaceFromSurface(Target->RT_SecondVP->pRT, 0, 0, pBackBuffer, 0, 0, D3DX_DEFAULT, 0);
+        pBackBuffer->Release(); // Корректно очищаем ссылку на бэкбуфер (иначе игра зависнет в опциях)
+    }
+}
+
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
@@ -162,7 +176,7 @@ void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
-    V = 0;
+    V = nullptr;
 }
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
@@ -177,7 +191,7 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         CDetail* D = (CDetail*)F;
         D->Unload();
         xr_delete(D);
-        F = NULL;
+        F = nullptr;
     }
 }
 IRenderVisual* CRender::model_CreatePE(LPCSTR name)
@@ -186,7 +200,6 @@ IRenderVisual* CRender::model_CreatePE(LPCSTR name)
     R_ASSERT3(SE, "Particle effect doesn't exist", name);
     return Models->CreatePE(SE);
 }
-
 IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
@@ -237,25 +250,19 @@ IDirect3DIndexBuffer9* CRender::getIB(int id)
     VERIFY(id < int(IB.size()));
     return IB[id];
 }
-IRender_Target* CRender::getTarget() { return Target; }
 FSlideWindowItem* CRender::getSWI(int id)
 {
     VERIFY(id < int(SWIs.size()));
     return &SWIs[id];
 }
-
+IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return L_DB->Create(); }
 IRender_Glow* CRender::glow_create() { return new CGlow(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
 BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
-ENGINE_API extern BOOL g_bRendering;
-void CRender::add_Visual(IRenderVisual* V)
-{
-    VERIFY(g_bRendering);
-    add_leafs_Dynamic((dxRender_Visual*)V);
-}
+void CRender::add_Visual(IRenderVisual* V) { add_leafs_Dynamic((dxRender_Visual*)V); }
 void CRender::add_Geometry(IRenderVisual* V) { add_Static((dxRender_Visual*)V, View->getMask()); }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
@@ -279,12 +286,7 @@ void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, 
     add_StaticWallmark(pShader->hShader, P, s, T, V);
 }
 
-void CRender::clear_static_wallmarks()
-{
-    if (Wallmarks)
-        Wallmarks->clear();
-}
-
+void CRender::clear_static_wallmarks() { Wallmarks->clear(); }
 void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { Wallmarks->AddSkeletonWallmark(wm); }
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
@@ -299,16 +301,11 @@ void CRender::add_SkeletonWallmark(
     if (pShader)
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
-void CRender::add_Occluder(Fbox2& bb_screenspace)
-{
-    VERIFY(_valid(bb_screenspace));
-    HOM.occlude(bb_screenspace);
-}
+void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace); }
 
 #include "xrEngine/PS_instance.h"
 void CRender::set_Object(IRenderable* O)
 {
-    VERIFY(g_bRendering);
     val_pObject = O; // NULL is OK, trust me :)
     if (val_pObject)
     {
@@ -329,15 +326,15 @@ void CRender::set_Object(IRenderable* O)
     else
     {
         if (L_Shadows)
-            L_Shadows->set_object(0);
+            L_Shadows->set_object(nullptr);
 
         if (L_Projector)
-            L_Projector->set_object(0);
+            L_Projector->set_object(nullptr);
     }
 }
 void CRender::apply_object(IRenderable* O)
 {
-    if (0 == O)
+    if (nullptr == O)
         return;
     if (PHASE_NORMAL == phase && O->renderable_ROS())
     {
@@ -367,6 +364,25 @@ IC void gm_SetNearer(BOOL bNearer)
         else
             RImplementation.rmNormal();
     }
+}
+
+void CRender::rmNear()
+{
+    IRender_Target* T = getTarget();
+    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
+    CHK_DX(HW.pDevice->SetViewport(&VP));
+}
+void CRender::rmFar()
+{
+    IRender_Target* T = getTarget();
+    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
+    CHK_DX(HW.pDevice->SetViewport(&VP));
+}
+void CRender::rmNormal()
+{
+    IRender_Target* T = getTarget();
+    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
+    CHK_DX(HW.pDevice->SetViewport(&VP));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -409,7 +425,7 @@ void CRender::Calculate()
 
     // Frustum & HOM rendering
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-    View = 0;
+    View = nullptr;
     HOM.Enable();
     HOM.Render(ViewBase);
     gm_SetNearer(FALSE);
@@ -422,7 +438,7 @@ void CRender::Calculate()
         if (pSector && (pSector != pLastSector))
             g_pGamePersistent->OnSectorChanged(translateSector(pSector));
 
-        if (0 == pSector)
+        if (nullptr == pSector)
             pSector = pLastSector;
         pLastSector = pSector;
         vLastCameraPos.set(Device.vCameraPosition);
@@ -478,7 +494,7 @@ void CRender::Calculate()
             std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
 
             // Determine visibility for dynamic part of scene
-            set_Object(0);
+            set_Object(nullptr);
             g_hud->Render_First(); // R1 shadows
             g_hud->Render_Last();
             u32 uID_LTRACK = 0xffffffff;
@@ -502,7 +518,7 @@ void CRender::Calculate()
                 ISpatial* spatial = lstRenderables[o_it];
                 spatial->spatial_updatesector();
                 CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-                if (0 == sector)
+                if (nullptr == sector)
                     continue; // disassociated from S/P structure
 
                 // Filter only not light spatial
@@ -520,7 +536,7 @@ void CRender::Calculate()
                             continue;
                         // renderable
                         IRenderable* renderable = spatial->dcast_Renderable();
-                        if (0 == renderable)
+                        if (nullptr == renderable)
                         {
                             // It may be an glow
                             CGlow* glow = dynamic_cast<CGlow*>(spatial);
@@ -556,7 +572,7 @@ void CRender::Calculate()
                             }
                             set_Object(renderable);
                             renderable->renderable_Render();
-                            set_Object(0); //? is it needed at all
+                            set_Object(nullptr); //? is it needed at all
                         }
                         break; // exit loop on frustums
                     }
@@ -591,30 +607,11 @@ void CRender::Calculate()
     }
     else
     {
-        set_Object(0);
+        set_Object(nullptr);
     }
 
     // End calc
     BasicStats.Culling.End();
-}
-
-void CRender::rmNear()
-{
-    IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
-}
-void CRender::rmFar()
-{
-    IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
-}
-void CRender::rmNormal()
-{
-    IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
 }
 
 extern u32 g_r;
@@ -674,7 +671,7 @@ void CRender::Render()
     g_pGamePersistent->Environment().RenderFlares(); // lens-flares
     g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
 
-#if DEBUG
+#ifdef DEBUG
     for (int _priority = 0; _priority < 2; ++_priority)
     {
         for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
@@ -743,12 +740,77 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-#pragma comment(lib, "d3dx9.lib")
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+{
+    HRESULT _result = E_FAIL;
+    if (pTarget[0] == 'p')
+    {
+        SPS* sps_result = (SPS*)result;
+        _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->ps);
+        if (!SUCCEEDED(_result))
+        {
+            Log("! PS: ", file_name);
+            Msg("! CreatePixelShader hr == 0x%08x", _result);
+            return E_FAIL;
+        }
 
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
+        LPCVOID data = nullptr;
+        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+        if (SUCCEEDED(_result) && data)
+        {
+            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
+            sps_result->constants.parse(pConstants, 0x1);
+        }
+        else
+        {
+            Log("! PS: ", file_name);
+            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
+        }
+    }
+    else if (pTarget[0] == 'v')
+    {
+        SVS* svs_result = (SVS*)result;
+        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
+        if (!SUCCEEDED(_result))
+        {
+            Log("! VS: ", file_name);
+            Msg("! CreatePixelShader hr == 0x%08x", _result);
+            return E_FAIL;
+        }
 
-//--------------------------------------------------------------------------------------------------------------
+        LPCVOID data = nullptr;
+        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+        if (SUCCEEDED(_result) && data)
+        {
+            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
+            svs_result->constants.parse(pConstants, 0x2);
+        }
+        else
+        {
+            Log("! VS: ", file_name);
+            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
+        }
+    }
+    else
+    {
+        NODEFAULT;
+    }
+
+    if (disasm)
+    {
+        ID3DXBuffer* disasm = nullptr;
+        D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
+        string_path dname;
+        strconcat(sizeof(dname), dname, "disasm\\", file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
+        IWriter* W = FS.w_open("$logs$", dname);
+        W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
+        FS.w_close(W);
+        _RELEASE(disasm);
+    }
+
+    return _result;
+}
+
 class includer : public ID3DXInclude
 {
 public:
@@ -756,13 +818,13 @@ public:
         D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GlobalEnv.Render->getShaderPath(), pFileName);
+        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
-        if (0 == R)
+        if (nullptr == R)
         {
             // possibly in shared directory or somewhere else - open directly
             R = FS.r_open("$game_shaders$", pFileName);
-            if (0 == R)
+            if (nullptr == R)
                 return E_FAIL;
         }
 
@@ -784,73 +846,8 @@ public:
     }
 };
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm)
-{
-    HRESULT _result = E_FAIL;
-    if (pTarget[0] == 'p')
-    {
-        SPS* sps_result = (SPS*)result;
-        _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->ps);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! PS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        LPCVOID data = NULL;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            sps_result->constants.parse(pConstants, 0x1);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
-    }
-    else
-    {
-        SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! VS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        LPCVOID data = NULL;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            svs_result->constants.parse(pConstants, 0x2);
-        }
-        else
-        {
-            Log("! VS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
-    }
-
-    if (disasm)
-    {
-        ID3DXBuffer* disasm = 0;
-        D3DXDisassembleShader(LPDWORD(buffer), FALSE, 0, &disasm);
-        string_path dname;
-        strconcat(sizeof(dname), dname, "disasm\\", file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
-        IWriter* W = FS.w_open("$logs$", dname);
-        W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
-        FS.w_close(W);
-        _RELEASE(disasm);
-    }
-
-    return _result;
-}
+static inline bool match_shader_id(
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
@@ -860,7 +857,6 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
 
     char sh_name[MAX_PATH] = "";
     u32 len = 0;
-
     // options
     if (o.forceskinw)
     {
@@ -871,6 +867,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(o.forceskinw);
     ++len;
 
+    // skinning
     if (m_skinning < 0)
     {
         defines[def_it].Name = "SKIN_NONE";
@@ -930,9 +927,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(4 == m_skinning);
     ++len;
 
+    sh_name[len] = '\0';
+
     // finish
-    defines[def_it].Name = 0;
-    defines[def_it].Definition = 0;
+    defines[def_it].Name = nullptr;
+    defines[def_it].Definition = nullptr;
     def_it++;
     R_ASSERT(def_it < 128);
 
@@ -987,9 +986,9 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     if (FAILED(_result))
     {
         includer Includer;
-        LPD3DXBUFFER pShaderBuf = NULL;
-        LPD3DXBUFFER pErrorBuf = NULL;
-        LPD3DXCONSTANTTABLE pConstants = NULL;
+        LPD3DXBUFFER pShaderBuf = nullptr;
+        LPD3DXBUFFER pErrorBuf = nullptr;
+        LPD3DXCONSTANTTABLE pConstants = nullptr;
         LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)&Includer;
 
         _result = D3DXCompileShader((LPCSTR)pSrcData, SrcDataLen, defines, pInclude, pFunctionName, pTarget,

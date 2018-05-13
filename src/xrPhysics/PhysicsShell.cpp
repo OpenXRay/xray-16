@@ -105,7 +105,7 @@ CPhysicsShell* P_build_Shell(
             _GetItem(fixed_bones, i, fixed_bone);
             u16 fixed_bone_id = pKinematics->LL_BoneID(fixed_bone);
             R_ASSERT2(BI_NONE != fixed_bone_id, "wrong fixed bone");
-            p_bone_map->insert(mk_pair(fixed_bone_id, physicsBone()));
+            p_bone_map->insert(std::make_pair(fixed_bone_id, physicsBone()));
         }
 
         pPhysicsShell = P_build_Shell(obj, not_active_state, p_bone_map);
@@ -115,7 +115,7 @@ CPhysicsShell* P_build_Shell(
     else
         pPhysicsShell = P_build_Shell(obj, not_active_state);
 
-    BONE_P_PAIR_IT i = p_bone_map->begin(), e = p_bone_map->end();
+    auto i = p_bone_map->begin(), e = p_bone_map->end();
     if (i != e)
         pPhysicsShell->SetPrefereExactIntegration();
     for (; i != e; i++)
@@ -154,12 +154,12 @@ CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, U1
     bone_map.clear();
     CPhysicsShell* pPhysicsShell = 0;
     if (!fixed_bones.empty())
-        for (U16It it = fixed_bones.begin(); it != fixed_bones.end(); it++)
-            bone_map.insert(mk_pair(*it, physicsBone()));
+        for (auto it = fixed_bones.begin(); it != fixed_bones.end(); it++)
+            bone_map.insert(std::make_pair(*it, physicsBone()));
     pPhysicsShell = P_build_Shell(obj, not_active_state, &bone_map);
 
     // fix bones
-    BONE_P_PAIR_IT i = bone_map.begin(), e = bone_map.end();
+    auto i = bone_map.begin(), e = bone_map.end();
     if (i != e)
         pPhysicsShell->SetPrefereExactIntegration();
     for (; i != e; i++)

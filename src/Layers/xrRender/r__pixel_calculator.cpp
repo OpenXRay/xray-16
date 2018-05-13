@@ -51,7 +51,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
         mView.build_camera_dir(vFrom.invert(cmDir[face]).mul(100.f), cmDir[face], cmNorm[face]);
         aabb.xform(V->vis.box, mView);
         D3DXMatrixOrthoOffCenterLH(
-            (D3DXMATRIX*)&mProject, aabb.min.x, aabb.max.x, aabb.min.y, aabb.max.y, aabb.min.z, aabb.max.z);
+            (D3DXMATRIX*)&mProject, aabb.vMin.x, aabb.vMax.x, aabb.vMin.y, aabb.vMax.y, aabb.vMin.z, aabb.vMax.z);
         RCache.set_xform_world(Fidentity);
         RCache.set_xform_view(mView);
         RCache.set_xform_project(mProject);

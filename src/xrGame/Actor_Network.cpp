@@ -685,7 +685,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     inventory().SetPrevActiveSlot(NO_ACTIVE_SLOT);
 
     //-------------------------------------
-    m_States.empty();
+    m_States.clear(); // Xottab_DUTY: check if replace is correct
     //-------------------------------------
     if (!g_Alive())
     {
@@ -703,7 +703,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     callback.bind(this, &CActor::on_requested_spawn);
     m_holder_id = E->m_holderID;
     if (E->m_holderID != ALife::_OBJECT_ID(-1))
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
             Level().client_spawn_manager().add(E->m_holderID, ID(), callback);
     // F
     //-------------------------------------------------------------
@@ -737,12 +737,12 @@ void CActor::net_Destroy()
     inherited::net_Destroy();
 
     if (m_holder_id != ALife::_OBJECT_ID(-1))
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
             Level().client_spawn_manager().remove(m_holder_id, ID());
 
     delete_data(m_statistic_manager);
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         Level().MapManager().OnObjectDestroyNotify(ID());
 
 #pragma todo("Dima to MadMax : do not comment inventory owner net_Destroy!!!")
@@ -752,7 +752,7 @@ void CActor::net_Destroy()
     if (m_pPhysicsShell)
     {
         m_pPhysicsShell->Deactivate();
-        xr_delete<CPhysicsShell>(m_pPhysicsShell);
+        xr_delete/*<CPhysicsShell>*/(m_pPhysicsShell);
     };
     m_pPhysics_support->in_NetDestroy();
 
@@ -802,7 +802,7 @@ void CActor::net_Relcase(IGameObject* O)
     }
     inherited::net_Relcase(O);
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         memory().remove_links(O);
 
     m_pPhysics_support->in_NetRelcase(O);
@@ -865,7 +865,7 @@ void CActor::OnChangeVisual()
         CStepManager::reload(cNameSect().c_str());
         SetCallbacks();
         m_anims->Create(V);
-        //.		m_vehicle_anims->Create			(V);
+        m_vehicle_anims->Create(V);
         CDamageManager::reload(*cNameSect(), "damage", pSettings);
         //-------------------------------------------------------------------------------
         m_head = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head");
@@ -1464,10 +1464,10 @@ void dbg_draw_piramid(Fvector pos, Fvector dir, float size, float xdir, u32 colo
 
     if (!Double)
     {
-        GlobalEnv.DRender->dbg_DrawTRI(t, p0, p1, p4, color);
-        GlobalEnv.DRender->dbg_DrawTRI(t, p1, p2, p4, color);
-        GlobalEnv.DRender->dbg_DrawTRI(t, p2, p3, p4, color);
-        GlobalEnv.DRender->dbg_DrawTRI(t, p3, p0, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p0, p1, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p1, p2, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p2, p3, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p3, p0, p4, color);
         // RCache.dbg_DrawTRI(t, p0, p1, p4, color);
         // RCache.dbg_DrawTRI(t, p1, p2, p4, color);
         // RCache.dbg_DrawTRI(t, p2, p3, p4, color);
@@ -1495,7 +1495,7 @@ void dbg_draw_piramid(Fvector pos, Fvector dir, float size, float xdir, u32 colo
 void CActor::OnRender_Network()
 {
     // RCache.OnFrameEnd();
-    GlobalEnv.DRender->OnFrameEnd();
+    GEnv.DRender->OnFrameEnd();
 
     //-----------------------------------------------------------------------------------------------------
     float size = 0.2f;
@@ -1675,7 +1675,7 @@ void CActor::OnRender_Network()
         if (!pLastPos->empty())
         {
             Fvector Pos1, Pos2;
-            VIS_POSITION_it It = pLastPos->begin();
+            auto It = pLastPos->begin();
             Pos1 = *It;
             for (; It != pLastPos->end(); It++)
             {

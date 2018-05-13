@@ -7,6 +7,7 @@ Basic vector and matrix functions.
 ====================================================================== */
 #include "vecmat.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 
 float dot(LWFVector a, LWFVector b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
@@ -30,4 +31,4 @@ void normalize(LWFVector v)
     }
 }
 
-#pragma warning(default : 4995)
+#pragma warning(pop)

@@ -8,11 +8,10 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_weathers_manager.hpp"
 #include "editor_environment_detail.hpp"
 #include "ide.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "Common/object_broker.h"
 #include "editor_environment_weathers_weather.hpp"
 #include "editor_environment_weathers_time.hpp"
@@ -25,13 +24,13 @@ using editor::environment::detail::logical_string_predicate;
 
 template <>
 void property_collection<manager::weather_container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-editor::property_holder* property_collection<manager::weather_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<manager::weather_container_type, manager>::create()
 {
     weather* object = new weather(&m_holder.m_manager, generate_unique_id("weather_unique_id_").c_str());
     object->fill(this);
@@ -54,31 +53,29 @@ manager::~manager()
 
 void manager::load()
 {
-    typedef xr_vector<LPSTR> file_list_type;
-    file_list_type* file_list = FS.file_list_open("$game_weathers$", "");
+    xr_vector<pstr>* file_list = FS.file_list_open("$game_weathers$", "");
     VERIFY(file_list);
     xr_string id;
-    file_list_type::const_iterator i = file_list->begin();
-    file_list_type::const_iterator e = file_list->end();
-    for (; i != e; ++i)
+
+    for (const auto &i : *file_list)
     {
-        u32 length = xr_strlen(*i);
+        u32 length = xr_strlen(i);
         if (length <= 4)
             continue;
 
-        if ((*i)[length - 4] != '.')
+        if (i[length - 4] != '.')
             continue;
 
-        if ((*i)[length - 3] != 'l')
+        if (i[length - 3] != 'l')
             continue;
 
-        if ((*i)[length - 2] != 't')
+        if (i[length - 2] != 't')
             continue;
 
-        if ((*i)[length - 1] != 'x')
+        if (i[length - 1] != 'x')
             continue;
 
-        id = *i;
+        id = i;
         id[length - 4] = 0;
         weather* object = new weather(&m_manager, id.c_str());
         object->load();
@@ -91,77 +88,69 @@ void manager::load()
 
 void manager::save()
 {
-    weather_container_type::iterator i = m_weathers.begin();
-    weather_container_type::iterator e = m_weathers.end();
-    for (; i != e; ++i)
-        (*i)->save();
+    for (const auto &i : m_weathers)
+        i->save();
 }
 
-LPCSTR const* manager::weathers_getter() const { return (&*weather_ids().begin()); }
+pcstr const* manager::weathers_getter() const { return (&*weather_ids().begin()); }
 u32 manager::weathers_size_getter() const { return (weather_ids().size()); }
 struct predicate
 {
     shared_str value;
 
-    inline predicate(LPCSTR const& value_) : value(value_) {}
+    inline predicate(pcstr const& value_) : value(value_) {}
     inline bool operator()(weather const* weather) const { return (value._get() == weather->id()._get()); }
 }; // struct predicate
 
-LPCSTR const* manager::frames_getter(LPCSTR weather_id) const
+pcstr const* manager::frames_getter(pcstr weather_id) const
 {
     delete_data(m_times_ids);
 
-    weather_container_type::const_iterator found =
-        std::find_if(m_weathers.begin(), m_weathers.end(), predicate(weather_id));
+    auto found = std::find_if(m_weathers.begin(), m_weathers.end(), predicate(weather_id));
 
     if (found == m_weathers.end())
         return (0);
 
-    typedef weather::container_type container_type;
-    container_type const& times = (*found)->times();
+    weather::container_type const& times = (*found)->times();
 
     m_times_ids.resize(times.size());
-    times_ids_type::iterator j = m_times_ids.begin();
-    container_type::const_iterator i = times.begin();
-    container_type::const_iterator e = times.end();
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->id().c_str());
+
+    auto j = m_times_ids.begin();
+    for (const auto &i : times)
+        *j++ = xr_strdup(i->id().c_str());
 
     return (&*m_times_ids.begin());
 }
 
-u32 manager::frames_size_getter(LPCSTR weather_id) const
+u32 manager::frames_size_getter(pcstr weather_id) const
 {
-    weather_container_type::const_iterator found =
-        std::find_if(m_weathers.begin(), m_weathers.end(), predicate(weather_id));
+    auto found = std::find_if(m_weathers.begin(), m_weathers.end(), predicate(weather_id));
 
     if (found == m_weathers.end())
         return (0);
 
-#pragma todo( \
-    \
-"Dima to Dima: dangerous scheme: it depends on the call sequence (frames_getter should be called berfore frames_size_getter to get correct results)")
+#pragma todo("Dima to Dima: dangerous scheme: it depends on the call sequence (frames_getter should be called berfore frames_size_getter to get correct results)")
     return (m_times_ids.size());
 }
 
 void manager::fill(property_holder_type* holder)
 {
     VERIFY(holder);
-    holder->add_property("weathers", "weathers", "this option is resposible for weathers", m_collection);
+    holder->add_property("weathers", "weathers", "this option is responsible for weathers", m_collection);
 
-    typedef ::editor::ide::weathers_getter_type weathers_getter_type;
+    typedef XRay::Editor::ide_base::weathers_getter_type weathers_getter_type;
     weathers_getter_type weathers_getter;
     weathers_getter.bind(this, &manager::weathers_getter);
 
-    typedef ::editor::ide::weathers_size_getter_type weathers_size_getter_type;
+    typedef XRay::Editor::ide_base::weathers_size_getter_type weathers_size_getter_type;
     weathers_size_getter_type weathers_size_getter;
     weathers_size_getter.bind(this, &manager::weathers_size_getter);
 
-    typedef ::editor::ide::frames_getter_type frames_getter_type;
+    typedef XRay::Editor::ide_base::frames_getter_type frames_getter_type;
     frames_getter_type frames_getter;
     frames_getter.bind(this, &manager::frames_getter);
 
-    typedef ::editor::ide::frames_size_getter_type frames_size_getter_type;
+    typedef XRay::Editor::ide_base::frames_size_getter_type frames_size_getter_type;
     frames_size_getter_type frames_size_getter;
     frames_size_getter.bind(this, &manager::frames_size_getter);
 
@@ -179,11 +168,9 @@ manager::weather_ids_type const& manager::weather_ids() const
 
     m_weather_ids.resize(m_weathers.size());
 
-    weather_container_type::const_iterator i = m_weathers.begin();
-    weather_container_type::const_iterator e = m_weathers.end();
-    weather_ids_type::iterator j = m_weather_ids.begin();
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->id().c_str());
+    auto j = m_weather_ids.begin();
+    for (const auto &i : m_weathers)
+        *j++ = xr_strdup(i->id().c_str());
 
     std::sort(m_weather_ids.begin(), m_weather_ids.end(), logical_string_predicate());
 
@@ -200,7 +187,7 @@ shared_str manager::unique_id(shared_str const& id) const
 
 bool manager::save_current_blend(char* buffer, u32 const& buffer_size)
 {
-    CInifile temp(0, FALSE, FALSE, FALSE);
+    CInifile temp(nullptr, false, false, false);
 
     using editor::environment::weathers::time;
     time* frame = static_cast<time*>(m_manager.CurrentEnv);
@@ -222,14 +209,12 @@ bool manager::paste_current_time_frame(char const* buffer, u32 const& buffer_siz
     if (!m_manager.Current[0])
         return (false);
 
-    weather_container_type::iterator i = m_weathers.begin();
-    weather_container_type::iterator e = m_weathers.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_weathers)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+        if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
 
-        return ((*i)->paste_time_frame(m_manager.Current[0]->m_identifier, buffer, buffer_size));
+        return (i->paste_time_frame(m_manager.Current[0]->m_identifier, buffer, buffer_size));
     }
 
     return (false);
@@ -240,14 +225,12 @@ bool manager::paste_target_time_frame(char const* buffer, u32 const& buffer_size
     if (!m_manager.Current[1])
         return (false);
 
-    weather_container_type::iterator i = m_weathers.begin();
-    weather_container_type::iterator e = m_weathers.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_weathers)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+        if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
 
-        return ((*i)->paste_time_frame(m_manager.Current[1]->m_identifier, buffer, buffer_size));
+        return (i->paste_time_frame(m_manager.Current[1]->m_identifier, buffer, buffer_size));
     }
 
     return (false);
@@ -255,14 +238,12 @@ bool manager::paste_target_time_frame(char const* buffer, u32 const& buffer_size
 
 bool manager::add_time_frame(char const* buffer, u32 const& buffer_size)
 {
-    weather_container_type::iterator i = m_weathers.begin();
-    weather_container_type::iterator e = m_weathers.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_weathers)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+        if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
 
-        return ((*i)->add_time_frame(buffer, buffer_size));
+        return (i->add_time_frame(buffer, buffer_size));
     }
 
     return (false);
@@ -273,14 +254,12 @@ void manager::reload_current_time_frame()
     if (!m_manager.Current[0])
         return;
 
-    weather_container_type::iterator i = m_weathers.begin();
-    weather_container_type::iterator e = m_weathers.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_weathers)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+        if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
 
-        (*i)->reload_time_frame(m_manager.Current[0]->m_identifier);
+        i->reload_time_frame(m_manager.Current[0]->m_identifier);
         return;
     }
 }
@@ -290,28 +269,24 @@ void manager::reload_target_time_frame()
     if (!m_manager.Current[1])
         return;
 
-    weather_container_type::iterator i = m_weathers.begin();
-    weather_container_type::iterator e = m_weathers.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_weathers)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+        if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
 
-        (*i)->reload_time_frame(m_manager.Current[1]->m_identifier);
+        i->reload_time_frame(m_manager.Current[1]->m_identifier);
         return;
     }
 }
 
 void manager::reload_current_weather()
 {
-    weather_container_type::iterator i = m_weathers.begin();
-    weather_container_type::iterator e = m_weathers.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_weathers)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+        if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
 
-        (*i)->reload();
+        i->reload();
         return;
     }
 }
@@ -322,4 +297,3 @@ void manager::reload()
     load();
 }
 
-#endif // #ifdef INGAME_EDITOR

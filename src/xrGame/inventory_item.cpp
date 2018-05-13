@@ -21,6 +21,7 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "Common/object_broker.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "debug_renderer.h"
@@ -110,6 +111,9 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FCanTrade, m_can_trade);
     m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
 
+    // Added by Axel, to enable optional condition use on any item
+    m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", false));
+
     if (BaseSlot() != NO_ACTIVE_SLOT || Belt())
     {
         m_flags.set(FRuckDefault, pSettings->r_bool(section, "default_to_ruck"));
@@ -127,7 +131,7 @@ void CInventoryItem::ChangeCondition(float fDeltaCondition)
 
 void CInventoryItem::Hit(SHit* pHDS)
 {
-    if (!m_flags.test(FUsingCondition))
+    if (IsUsingCondition() == false)
         return;
 
     float hit_power = pHDS->damage();
@@ -257,7 +261,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
         CSE_ALifeDynamicObject* l_tpALifeDynamicObject = smart_cast<CSE_ALifeDynamicObject*>(D);
         R_ASSERT(l_tpALifeDynamicObject);
 
-        l_tpALifeDynamicObject->m_tNodeID = (g_dedicated_server) ? u32(-1) : object().ai_location().level_vertex_id();
+        l_tpALifeDynamicObject->m_tNodeID = (GEnv.isDedicatedServer) ? u32(-1) : object().ai_location().level_vertex_id();
 
         // Fill
         D->s_name = item_section_name;

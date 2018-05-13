@@ -5,34 +5,27 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment sound channels source class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_SOUND_CHANNELS_SOURCE_HPP_INCLUDED
-#define EDITOR_WEATHER_SOUND_CHANNELS_SOURCE_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace sound_channels
 {
-class source : public editor::property_holder_holder, private Noncopyable
+class source : public XRay::Editor::property_holder_holder, private Noncopyable
 {
+    using property_holder_type = XRay::Editor::property_holder_base;
+
 public:
     source(shared_str const& source);
     ~source();
-    void fill(editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_source.c_str(); }
-private:
-    typedef editor::property_holder property_holder_type;
+    void fill(XRay::Editor::property_holder_collection* collection);
+    pcstr id() const { return m_source.c_str(); }
 
-public:
     virtual property_holder_type* object();
 
 private:
@@ -43,6 +36,3 @@ private:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_SOURCE_HPP_INCLUDED

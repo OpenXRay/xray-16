@@ -2,6 +2,7 @@
 #include "UISpinText.h"
 #include "UILines.h"
 #include "string_table.h"
+#include "xrCore/xr_token.h"
 
 CUISpinText::CUISpinText() : m_curItem(-1) {}
 void CUISpinText::AddItem_(const char* item, int id)
@@ -35,7 +36,7 @@ void CUISpinText::SetCurrentOptValue()
 {
     CUIOptionsItem::SetCurrentOptValue();
 
-    xr_token* tok = GetOptToken();
+    const xr_token* tok = GetOptToken();
 
     while (tok->name)
     {

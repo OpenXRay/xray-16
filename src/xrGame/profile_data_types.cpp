@@ -3,17 +3,7 @@
 
 namespace gamespy_profile
 {
-char* profile_table_name = "PlayerStats_v1";
-
-char* profile_store_file_name = "mp_profile.ltx";
-char* award_count_line = "count";
-char* award_rdate_line = "rdate";
-char* best_score_value_line = "value";
-char* profile_data_section = "profile_data";
-char* profile_id_line = "id";
-char* profile_last_submit_time = "last_submit";
-
-static char const* awards_names[at_awards_count] = {
+static constexpr pcstr awards_names[at_awards_count] = {
     "mp_award_massacre", "mp_award_paranoia", "mp_award_overwhelming_superiority", "mp_award_blitzkrieg",
     "mp_award_dry_victory", "mp_award_multichampion", "mp_award_mad", "mp_award_achilles_heel",
     "mp_award_fater_than_bullets", "mp_award_harvest_time", "mp_award_skewer", "mp_award_double_shot_double_kill",
@@ -23,7 +13,7 @@ static char const* awards_names[at_awards_count] = {
     "mp_award_stalker_flair", "mp_award_lucky", "mp_award_black_list", "mp_award_silent_death",
 };
 
-static u16 award_atlas_keys_map[at_awards_count][ap_award_params_count] = {
+static constexpr u16 award_atlas_keys_map[at_awards_count][ap_award_params_count] = {
     {KEY_AwardMasscare, KEY_AwardMasscareLastRewardDate}, // mp_award_massacre
     {KEY_AwardParanoia, KEY_AwardParanoiaLastRewardDate}, // mp_award_paranoia
     {KEY_AwardOverwhelmingSuperiority,
@@ -57,7 +47,7 @@ static u16 award_atlas_keys_map[at_awards_count][ap_award_params_count] = {
     {KEY_AwardSilentDeath, KEY_AwardSilentDeathLastRewardDate}, // mp_award_silent_death
 };
 
-static u16 award_atlas_stats_map[at_awards_count][ap_award_params_count] = {
+static constexpr u16 award_atlas_stats_map[at_awards_count][ap_award_params_count] = {
     {STAT_AwardMasscare, STAT_AwardMasscareLastRewardDate}, // mp_award_massacre
     {STAT_AwardParanoia, STAT_AwardParanoiaLastRewardDate}, // mp_award_paranoia
     {STAT_AwardOwerwhelmingSuperiority,

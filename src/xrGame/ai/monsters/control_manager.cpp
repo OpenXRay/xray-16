@@ -14,7 +14,7 @@ enum EActiveComAction
     eAdd
 };
 
-char* make_xrstr(ControlCom::EControlType e)
+constexpr pcstr make_xrstr(ControlCom::EControlType e)
 {
     switch (e)
     {
@@ -63,7 +63,7 @@ CControl_Manager::~CControl_Manager()
 
 void CControl_Manager::init_external()
 {
-    // for (CONTROLLERS_MAP_IT it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
+    // for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
     //	it->second->init_external(this, m_object);
 }
 
@@ -71,12 +71,12 @@ void CControl_Manager::load(LPCSTR section)
 {
     init_external();
 
-    for (CONTROLLERS_MAP_IT it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
+    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
         it->second->load(section);
 }
 void CControl_Manager::reload(LPCSTR section)
 {
-    for (CONTROLLERS_MAP_IT it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
+    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
         it->second->reload(section);
 }
 
@@ -86,29 +86,26 @@ void CControl_Manager::reinit()
         return;
     // todo: make it simpler
     // reinit pure first, base second, custom third
-    CONTROLLERS_MAP_IT it;
 
-    for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (is_pure(it->second))
-            it->second->reinit();
+    for (auto& it : m_control_elems)
+        if (is_pure(it.second))
+            it.second->reinit();
 
-    for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (is_base(it->second))
-            it->second->reinit();
+    for (auto& it : m_control_elems)
+        if (is_base(it.second))
+            it.second->reinit();
 
-    for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (!is_pure(it->second) && !is_base(it->second))
-            it->second->reinit();
+    for (auto& it : m_control_elems)
+        if (!is_pure(it.second) && !is_base(it.second))
+            it.second->reinit();
 
-    // fill active elems
+    // fill active elements
     m_active_elems.clear();
     m_active_elems.reserve(ControlCom::eControllersCount);
-    for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
+    for (auto& it : m_control_elems)
     {
-        if (it->second->is_active() && !is_locked(it->second))
-        {
-            m_active_elems.push_back(it->second);
-        }
+        if (it.second->is_active() && !is_locked(it.second))
+            m_active_elems.push_back(it.second);
     }
 }
 
@@ -122,11 +119,11 @@ void CControl_Manager::update_frame()
     if (!m_object->g_Alive())
         return;
 
-    for (COM_VEC_IT it = m_active_elems.begin(); it != m_active_elems.end(); ++it)
+    for (auto& it : m_active_elems)
     {
         // update coms
-        if ((*it))
-            (*it)->update_frame();
+        if (it)
+            it->update_frame();
     }
 
     m_active_elems.erase(
@@ -138,11 +135,11 @@ void CControl_Manager::update_schedule()
     if (!m_object->g_Alive())
         return;
 
-    for (COM_VEC_IT it = m_active_elems.begin(); it != m_active_elems.end(); ++it)
+    for (auto& it : m_active_elems)
     {
         // update coms
-        if ((*it))
-            (*it)->update_schedule();
+        if (it)
+            it->update_schedule();
     }
 
     m_active_elems.erase(
@@ -151,9 +148,9 @@ void CControl_Manager::update_schedule()
 
 ControlCom::EControlType CControl_Manager::com_type(CControl_Com* com)
 {
-    for (CONTROLLERS_MAP_IT it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (it->second == com)
-            return it->first;
+    for (auto& it : m_control_elems)
+        if (it.second == com)
+            return it.first;
 
     return ControlCom::eControlInvalid;
 }
@@ -288,7 +285,7 @@ void CControl_Manager::release(CControl_Com* com, ControlCom::EControlType type)
     VERIFY(capturer == com);
 
     // select new capture if there is a base controller
-    CONTROLLERS_MAP_IT it = m_base_elems.find(type);
+    auto it = m_base_elems.find(type);
     if (it != m_base_elems.end())
     {
         com->cing()->on_stop_control(type);
@@ -415,14 +412,14 @@ void CControl_Manager::check_active_com(CControl_Com* com, bool b_add)
     {
         if (com->is_active() && !com->ced()->is_locked())
         {
-            COM_VEC_IT it = std::find(m_active_elems.begin(), m_active_elems.end(), com);
+            auto it = std::find(m_active_elems.begin(), m_active_elems.end(), com);
             if (it == m_active_elems.end())
                 m_active_elems.push_back(com);
         }
     }
     else
     {
-        COM_VEC_IT it = std::find(m_active_elems.begin(), m_active_elems.end(), com);
+        auto it = std::find(m_active_elems.begin(), m_active_elems.end(), com);
         if (it != m_active_elems.end())
             (*it) = 0; // do not remove just mark
     }
@@ -434,7 +431,7 @@ void CControl_Manager::check_active_com(CControl_Com* com, bool b_add)
 void CControl_Manager::add_debug_info(debug::text_tree& root_s)
 {
     u32 index = 0;
-    for (CONTROLLERS_MAP_IT it = m_control_elems.begin(); it != m_control_elems.end(); ++it, ++index)
+    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it, ++index)
     {
         if (!it->second->is_inited())
             continue;

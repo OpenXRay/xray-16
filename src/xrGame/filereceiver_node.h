@@ -1,7 +1,11 @@
+#pragma once
 #ifndef FILERECEIVER_NODE
 #define FILERECEIVER_NODE
 
 #include "filetransfer_common.h"
+
+// fwd. decl.
+template <typename T> class buffer_vector;
 
 namespace file_transfer
 {

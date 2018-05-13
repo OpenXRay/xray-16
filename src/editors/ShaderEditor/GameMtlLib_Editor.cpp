@@ -3,7 +3,7 @@
 #pragma hdrstop
 
 #include "xrEngine/GameMtlLib.h"
-#include "xr_trims.h"
+#include "xrCore/xr_trims.h"
 #include "xrServerEntities/PropertiesListTypes.h"
 #include "xrServerEntities/PropertiesListHelper.h"
 #include "editors/xrEProps/FolderLib.h"

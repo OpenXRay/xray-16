@@ -812,10 +812,10 @@ void CBulletManager::Render()
         }
 
         if (m_bullet_points.size() > 32768)
-            m_bullet_points.clear_not_free();
+            m_bullet_points.clear();
     }
     else
-        m_bullet_points.clear_not_free();
+        m_bullet_points.clear();
 
     // 0-рикошет
     // 1-застрявание пули в материале
@@ -826,7 +826,7 @@ void CBulletManager::Render()
         FvectorIt it;
         u32 C[3] = {0xffff0000, 0xff00ff00, 0xff0000ff};
         // RCache.set_xform_world(Fidentity);
-        GlobalEnv.DRender->CacheSetXformWorld(Fidentity);
+        GEnv.DRender->CacheSetXformWorld(Fidentity);
         for (int i = 0; i < 3; ++i)
             for (it = g_hit[i].begin(); it != g_hit[i].end(); ++it)
             {
@@ -841,9 +841,9 @@ void CBulletManager::Render()
     // u32	vOffset			=	0	;
     u32 bullet_num = m_BulletsRendered.size();
 
-    GlobalEnv.UIRender->StartPrimitive((u32)bullet_num * 12, IUIRender::ptTriList, IUIRender::pttLIT);
+    GEnv.UIRender->StartPrimitive((u32)bullet_num * 12, IUIRender::ptTriList, IUIRender::pttLIT);
 
-    for (BulletVecIt it = m_BulletsRendered.begin(); it != m_BulletsRendered.end(); it++)
+    for (auto it = m_BulletsRendered.begin(); it != m_BulletsRendered.end(); it++)
     {
         SBullet* bullet = &(*it);
         if (!bullet->flags.allow_tracer)
@@ -891,11 +891,11 @@ void CBulletManager::Render()
             bullet->bullet_pos, center, tracer_direction, length, width, bullet->m_u8ColorID, bullet->speed, bActor);
     }
 
-    GlobalEnv.UIRender->CacheSetCullMode(IUIRender::cmNONE);
-    GlobalEnv.UIRender->CacheSetXformWorld(Fidentity);
-    GlobalEnv.UIRender->SetShader(*tracers.sh_Tracer);
-    GlobalEnv.UIRender->FlushPrimitive();
-    GlobalEnv.UIRender->CacheSetCullMode(IUIRender::cmCCW);
+    GEnv.UIRender->CacheSetCullMode(IUIRender::cmNONE);
+    GEnv.UIRender->CacheSetXformWorld(Fidentity);
+    GEnv.UIRender->SetShader(*tracers.sh_Tracer);
+    GEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->CacheSetCullMode(IUIRender::cmCCW);
 }
 
 void CBulletManager::CommitRenderSet() // @ the end of frame
@@ -938,7 +938,7 @@ void CBulletManager::CommitEvents() // @ the start of frame
         break;
         }
     }
-    m_Events.clear_and_reserve();
+    m_Events.clear();
 }
 
 void CBulletManager::RegisterEvent(

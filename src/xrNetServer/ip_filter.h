@@ -1,3 +1,4 @@
+#pragma once
 #ifndef NET_SERVER_IP_FILTER
 #define NET_SERVER_IP_FILTER
 
@@ -12,9 +13,11 @@ struct subnet_item
             u8 a3;
             u8 a4;
         };
+
         u32 data;
     } subnet_ip; // IN NBO !!!
     u32 subnet_mask;
+
     subnet_item()
     {
         subnet_ip.data = 0;

@@ -4,6 +4,7 @@
 #include "xrface.h"
 #include "xrLC_GlobalData.h"
 #include "light_point.h"
+#include "xrCore/Threading/Lock.hpp"
 
 #include "xrCDB/xrCDB.h"
 //-----------------------------------------------------------------------
@@ -52,7 +53,7 @@ void g_trans_register_internal(Vertex* V)
     }
 
     // Register
-    mapVertIt ins = g_trans->insert(mk_pair(key, vecVertex()));
+    mapVertIt ins = g_trans->insert(std::make_pair(key, vecVertex()));
     ins->second.reserve(32);
     ins->second.push_back(V);
 }
@@ -155,7 +156,6 @@ namespace lc_net
 {
 void RunLightVertexNet();
 }
-#define NUM_THREADS 4
 void LightVertex(bool net)
 {
     g_trans = new mapVert();

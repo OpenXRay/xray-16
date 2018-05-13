@@ -1,5 +1,11 @@
+#pragma once
 #ifndef DISABLING_PARAMS_H
 #define DISABLING_PARAMS_H
+#include "xrPhysics.h"
+
+// fwd. decl.
+class CInifile;
+
 struct SOneDDOParams
 {
     void Mul(float v);

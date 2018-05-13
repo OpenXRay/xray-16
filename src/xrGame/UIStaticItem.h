@@ -1,5 +1,10 @@
 #pragma once
 #include "ui_defs.h"
+#include "xrCore/_flags.h"
+#include "xrCore/_vector2.h"
+#ifdef DEBUG
+#include "xrCore/xrstring.h"
+#endif
 
 class CUIStaticItem
 {
@@ -37,6 +42,10 @@ public:
     IC float GetPosY() { return vPos.y; }
     IC void SetTextureColor(u32 clr) { dwColor = clr; }
     IC u32 GetTextureColor() const { return dwColor; }
+    void SetColor(u32 clr) { dwColor = clr; }
+    void SetColor(Fcolor clr) { dwColor = clr.get(); }
+    u32 GetColor() const { return dwColor; }
+    u32& GetColorRef() { return dwColor; }
     ui_shader& GetShader() { return hShader; }
 public:
     CUIStaticItem();

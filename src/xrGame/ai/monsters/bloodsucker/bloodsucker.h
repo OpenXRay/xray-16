@@ -164,7 +164,7 @@ public:
     void manual_deactivate();
 
     float get_vampire_distance() const { return m_vampire_distance; }
-    virtual char* get_monster_class_name() { return "bloodsucker"; }
+    pcstr get_monster_class_name() override { return "bloodsucker"; }
     virtual void renderable_Render();
 
 #ifdef DEBUG

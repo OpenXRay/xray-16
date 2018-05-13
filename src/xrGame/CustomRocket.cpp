@@ -23,8 +23,6 @@
 #include "game_base_space.h"
 #endif
 
-extern ENGINE_API bool g_dedicated_server;
-
 #define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z) \
     if (x > y)                                      \
         if (x > z)                                  \
@@ -65,7 +63,7 @@ void CCustomRocket::reinit()
     inherited::reinit();
 
     m_pTrailLight.destroy();
-    m_pTrailLight = GlobalEnv.Render->light_create();
+    m_pTrailLight = GEnv.Render->light_create();
     m_pTrailLight->set_shadow(true);
 
     m_pEngineParticles = NULL;
@@ -153,11 +151,11 @@ void CCustomRocket::create_physic_shell()
     Fvector ax;
     float radius;
     CHOOSE_MAX(obb.m_halfsize.x, ax.set(obb.m_rotate.i); ax.mul(obb.m_halfsize.x);
-               radius = _min(obb.m_halfsize.y, obb.m_halfsize.z); obb.m_halfsize.y /= 2.f;
+               radius = std::min(obb.m_halfsize.y, obb.m_halfsize.z); obb.m_halfsize.y /= 2.f;
                obb.m_halfsize.z /= 2.f, obb.m_halfsize.y, ax.set(obb.m_rotate.j); ax.mul(obb.m_halfsize.y);
-               radius = _min(obb.m_halfsize.x, obb.m_halfsize.z); obb.m_halfsize.x /= 2.f;
+               radius = std::min(obb.m_halfsize.x, obb.m_halfsize.z); obb.m_halfsize.x /= 2.f;
                obb.m_halfsize.z /= 2.f, obb.m_halfsize.z, ax.set(obb.m_rotate.k); ax.mul(obb.m_halfsize.z);
-               radius = _min(obb.m_halfsize.y, obb.m_halfsize.x); obb.m_halfsize.y /= 2.f; obb.m_halfsize.x /= 2.f)
+               radius = std::min(obb.m_halfsize.y, obb.m_halfsize.x); obb.m_halfsize.y /= 2.f; obb.m_halfsize.x /= 2.f)
     // radius*=1.4142f;
     Fsphere sphere1, sphere2;
     sphere1.P.add(obb.m_translate, ax);

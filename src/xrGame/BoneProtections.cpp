@@ -43,7 +43,7 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
     m_default.BonePassBullet = FALSE;
 
     CInifile::Sect& protections = pSettings->r_section(bone_sect);
-    for (CInifile::SectCIt i = protections.Data.begin(); protections.Data.end() != i; ++i)
+    for (auto i = protections.Data.cbegin(); protections.Data.cend() != i; ++i)
     {
         string256 buffer;
 
@@ -51,7 +51,7 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
 
         BP.koeff = (float)atof(_GetItem(i->second.c_str(), 0, buffer));
         BP.armor = (float)atof(_GetItem(i->second.c_str(), 1, buffer));
-        BP.BonePassBullet = (BOOL)(atoi(_GetItem(i->second.c_str(), 2, buffer)) > 0.5f);
+        BP.BonePassBullet = (bool)(atof(_GetItem(i->second.c_str(), 2, buffer)) > 0.5f);
 
         if (!xr_strcmp(i->first.c_str(), "default"))
         {
@@ -64,7 +64,7 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
 
             s16 bone_id = kinematics->LL_BoneID(i->first);
             R_ASSERT2(BI_NONE != bone_id, i->first.c_str());
-            m_bones_koeff.insert(mk_pair(bone_id, BP));
+            m_bones_koeff.insert(std::make_pair(bone_id, BP));
         }
     }
 }
@@ -78,7 +78,7 @@ void SBoneProtections::add(const shared_str& bone_sect, IKinematics* kinematics)
     m_fHitFracNpc += READ_IF_EXISTS(pSettings, r_float, bone_sect.c_str(), "hit_fraction_npc", 0.0f);
 
     CInifile::Sect& protections = pSettings->r_section(bone_sect);
-    for (CInifile::SectCIt i = protections.Data.begin(); protections.Data.end() != i; ++i)
+    for (auto i = protections.Data.cbegin(); protections.Data.cend() != i; ++i)
     {
         if (!xr_strcmp(i->first.c_str(), "hit_fraction"))
             continue;

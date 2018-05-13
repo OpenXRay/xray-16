@@ -5,10 +5,12 @@
 //	Description : Smart cover auxillary namespace
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef SMART_COVER_DETAIL_H_INCLUDED
 #define SMART_COVER_DETAIL_H_INCLUDED
-
+#include <limits>
 #include "restriction_space.h"
+#include "xrCore/_vector3d.h"
 #include "xrScriptEngine/script_space_forward.hpp"
 
 namespace smart_cover

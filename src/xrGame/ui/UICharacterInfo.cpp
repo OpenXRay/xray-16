@@ -128,8 +128,8 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, LPCSTR xml
 void CUICharacterInfo::InitCharacterInfo(CUIXml* xml_doc, LPCSTR node_str)
 {
     Fvector2 pos, size;
-    XML_NODE* stored_root = xml_doc->GetLocalRoot();
-    XML_NODE* ch_node = xml_doc->NavigateToNode(node_str, 0);
+    XML_NODE stored_root = xml_doc->GetLocalRoot();
+    XML_NODE ch_node = xml_doc->NavigateToNode(node_str, 0);
     xml_doc->SetLocalRoot(ch_node);
     pos.x = xml_doc->ReadAttribFlt(ch_node, "x");
     pos.y = xml_doc->ReadAttribFlt(ch_node, "y");
@@ -391,8 +391,8 @@ bool CUICharacterInfo::ignore_community(shared_str const& check_community)
     VERIFY2(pSettings->section_exist(comm_section_str), make_string("Section [%s] does not exist !", comm_section_str));
 
     CInifile::Sect& faction_section = pSettings->r_section(comm_section_str);
-    CInifile::SectIt_ ib = faction_section.Data.begin();
-    CInifile::SectIt_ ie = faction_section.Data.end();
+    auto ib = faction_section.Data.begin();
+    auto ie = faction_section.Data.end();
     for (; ib != ie; ++ib)
     {
         if (check_community == (*ib).first)

@@ -19,8 +19,6 @@ UIPlayerItem::UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* ts
     VERIFY(m_teamPanels);
     myClientId = clientId;
     m_prevTeam = team;
-
-    m_player_node_root = NULL;
 }
 
 UIPlayerItem::~UIPlayerItem() {}
@@ -29,7 +27,7 @@ void UIPlayerItem::Init(CUIXml& uiXml, LPCSTR playerNode, int index)
     CUIXmlInit::InitWindow(uiXml, playerNode, index, this);
     m_player_node_root = uiXml.NavigateToNode(playerNode, index);
     VERIFY2(m_player_node_root, "player item in team xml node not initialized");
-    XML_NODE* prev_root = uiXml.GetLocalRoot();
+    XML_NODE prev_root = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(m_player_node_root);
     InitTextParams(uiXml);
     InitIconParams(uiXml);
@@ -49,7 +47,7 @@ void UIPlayerItem::InitTextParams(CUIXml& uiXml)
     int temp_number = uiXml.GetNodesNum(m_player_node_root, TEXTPARAM_NODE_NAME);
     for (int i = 0; i < temp_number; ++i)
     {
-        XML_NODE* text_param_node = uiXml.NavigateToNode(TEXTPARAM_NODE_NAME, i);
+        XML_NODE text_param_node = uiXml.NavigateToNode(TEXTPARAM_NODE_NAME, i);
         if (!text_param_node)
             break;
         LPCSTR param_name = uiXml.ReadAttrib(text_param_node, "name", "param_name_not_set_in_name_attribute");
@@ -69,7 +67,7 @@ void UIPlayerItem::InitIconParams(CUIXml& uiXml)
     int temp_number = uiXml.GetNodesNum(m_player_node_root, ICONPARAM_NODE_NAME);
     for (int i = 0; i < temp_number; ++i)
     {
-        XML_NODE* icon_param_node = uiXml.NavigateToNode(ICONPARAM_NODE_NAME, i);
+        XML_NODE icon_param_node = uiXml.NavigateToNode(ICONPARAM_NODE_NAME, i);
         if (!icon_param_node)
             break;
         LPCSTR param_name = uiXml.ReadAttrib(icon_param_node, "name", "param_name_not_set_in_name_attribute");

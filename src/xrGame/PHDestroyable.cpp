@@ -13,6 +13,7 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/game_graph.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/MathUtils.h"
 #ifdef DEBUG
@@ -43,7 +44,7 @@ av_transition_factor   =1       ; коэффициент передачи угл
 CPHDestroyable::CPHDestroyable()
 {
     m_flags.flags = 0;
-    m_flags.set(fl_released, TRUE);
+    m_flags.set(fl_released, true);
     m_depended_objects = 0;
 }
 /////////spawn object representing destroyed
@@ -145,7 +146,7 @@ void CPHDestroyable::Destroy(u16 source_id /*=u16(-1)*/, LPCSTR section /*="ph_s
     obj->processing_activate();
     if (source_id == obj->ID())
     {
-        m_flags.set(fl_released, FALSE);
+        m_flags.set(fl_released, false);
     }
     xr_vector<shared_str>::iterator i = m_destroyed_obj_visual_names.begin(), e = m_destroyed_obj_visual_names.end();
 
@@ -155,35 +156,34 @@ void CPHDestroyable::Destroy(u16 source_id /*=u16(-1)*/, LPCSTR section /*="ph_s
             GenSpawnReplace(source_id, section, *i);
     };
     ///////////////////////////////////////////////////////////////////////////
-    m_flags.set(fl_destroyed, TRUE);
-    return;
+    m_flags.set(fl_destroyed, true);
 }
 
 void CPHDestroyable::Load(CInifile* ini, LPCSTR section)
 {
-    m_flags.set(fl_destroyable, FALSE);
+    m_flags.set(fl_destroyable, false);
     if (ini->line_exist(section, "destroyed_vis_name"))
     {
-        m_flags.set(fl_destroyable, TRUE);
+        m_flags.set(fl_destroyable, true);
         m_destroyed_obj_visual_names.push_back(ini->r_string(section, "destroyed_vis_name"));
     }
     else
     {
         CInifile::Sect& data = ini->r_section(section);
         if (data.Data.size() > 0)
-            m_flags.set(fl_destroyable, TRUE);
-        for (CInifile::SectCIt I = data.Data.begin(); I != data.Data.end(); I++)
+            m_flags.set(fl_destroyable, true);
+        for (auto I = data.Data.cbegin(); I != data.Data.cend(); I++)
             if (I->first.size())
                 m_destroyed_obj_visual_names.push_back(I->first);
     }
 }
 void CPHDestroyable::Load(LPCSTR section)
 {
-    m_flags.set(fl_destroyable, FALSE);
+    m_flags.set(fl_destroyable, false);
 
     if (pSettings->line_exist(section, "destroyed_vis_name"))
     {
-        m_flags.set(fl_destroyable, TRUE);
+        m_flags.set(fl_destroyable, true);
         m_destroyed_obj_visual_names.push_back(pSettings->r_string(section, "destroyed_vis_name"));
     }
 }
@@ -191,8 +191,8 @@ void CPHDestroyable::Load(LPCSTR section)
 void CPHDestroyable::Init() { m_depended_objects = 0; }
 void CPHDestroyable::RespawnInit()
 {
-    m_flags.set(fl_destroyed, FALSE);
-    m_flags.set(fl_released, TRUE);
+    m_flags.set(fl_destroyed, false);
+    m_flags.set(fl_released, true);
     m_destroyed_obj_visual_names.clear();
     m_notificate_objects.clear();
     m_depended_objects = 0;
@@ -349,7 +349,7 @@ void CPHDestroyable::NotificateDestroy(CPHDestroyableNotificate* dn)
             NotificatePart(*i);
         PhysicallyRemoveSelf();
         m_notificate_objects.clear();
-        m_flags.set(fl_released, TRUE);
+        m_flags.set(fl_released, true);
     }
 }
 

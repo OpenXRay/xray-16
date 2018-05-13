@@ -10,8 +10,11 @@
 #include "game_object_space.h"
 #include "script_game_object.h"
 #include "xrEngine/LightAnimLibrary.h"
-
 #include "ui_base.h"
+#ifdef DEBUG
+#include "xrEngine/GameFont.h"
+#endif
+
 // 50fps fixed
 float STEP = 0.02f;
 
@@ -217,7 +220,7 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
     m_stepRemains = 0.0f;
 
     // lighting
-    m_light_render = GlobalEnv.Render->light_create();
+    m_light_render = GEnv.Render->light_create();
     m_light_render->set_shadow(false);
     m_light_render->set_type(IRender_Light::POINT);
     m_light_render->set_range(m_light_range);
@@ -286,7 +289,7 @@ void CHelicopter::MoveStep()
         dir.normalize_safe();
         pathDir = dir;
         dir.getHP(desired_H, desired_P);
-        float speed_ = _min(m_movement.GetSpeedInDestPoint(), GetMaxVelocity());
+        float speed_ = std::min(m_movement.GetSpeedInDestPoint(), GetMaxVelocity());
 
         static float ang = pSettings->r_float(cNameSect(), "magic_angle");
         if (m_movement.curLinearSpeed > GetMaxVelocity() || angle_difference(m_movement.currPathH, desired_H) > ang)

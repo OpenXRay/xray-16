@@ -1,6 +1,14 @@
 //---------------------------------------------------------------------------
+#pragma once
 #ifndef ParticleEffectActionsH
 #define ParticleEffectActionsH
+
+struct xr_token2
+{
+	pcstr name;
+	pcstr info;
+	int id;
+};
 
 struct PBool
 {
@@ -426,7 +434,7 @@ public:
     virtual void Render(const Fmatrix& parent);
 };
 
-extern xr_token2 actions_token[];
+extern const xr_token2 actions_token[];
 
 typedef EParticleAction* (*_CreateEAction)(PAPI::PActionEnum type);
 extern ECORE_API _CreateEAction pCreateEAction;

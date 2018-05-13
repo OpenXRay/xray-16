@@ -169,7 +169,7 @@ void game_cl_TeamDeathmatch::SetGameUI(CUIGameCustom* uigame)
 
 CUIGameCustom* game_cl_TeamDeathmatch::createGameUI()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return NULL;
 
     CLASS_ID clsid = CLSID_GAME_UI_TEAMDEATHMATCH;
@@ -301,7 +301,7 @@ void game_cl_TeamDeathmatch::SetCurrentBuyMenu()
         return;
     if (!local_player->team || local_player->skin == -1)
         return;
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if (!pCurBuyMenu)
@@ -377,17 +377,13 @@ bool game_cl_TeamDeathmatch::CanBeReady()
     return inherited::CanBeReady();
 };
 
-char* game_cl_TeamDeathmatch::getTeamSection(int Team)
+pcstr game_cl_TeamDeathmatch::getTeamSection(int Team)
 {
     switch (Team)
     {
-    case 1: { return "teamdeathmatch_team1";
-    }
-    break;
-    case 2: { return "teamdeathmatch_team2";
-    }
-    break;
-    default: return NULL;
+    case 1: return "teamdeathmatch_team1";
+    case 2: return "teamdeathmatch_team2";
+    default: return nullptr;
     };
 };
 

@@ -36,7 +36,7 @@ const int MAX_TRIS = 1024;
 IC bool operator==(const CWallmarksEngine::wm_slot* slot, const ref_shader& shader) { return slot->shader == shader; }
 CWallmarksEngine::wm_slot* CWallmarksEngine::FindSlot(ref_shader shader)
 {
-    WMSlotVecIt it = std::find(marks.begin(), marks.end(), shader);
+    auto it = std::find(marks.begin(), marks.end(), shader);
     return (it != marks.end()) ? *it : 0;
 }
 CWallmarksEngine::wm_slot* CWallmarksEngine::AppendSlot(ref_shader shader)
@@ -58,7 +58,7 @@ CWallmarksEngine::CWallmarksEngine()
 {
     static_pool.reserve(256);
     marks.reserve(256);
-    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), NULL);
+    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), 0);
 }
 
 CWallmarksEngine::~CWallmarksEngine()
@@ -70,11 +70,11 @@ CWallmarksEngine::~CWallmarksEngine()
 void CWallmarksEngine::clear()
 {
     {
-        for (WMSlotVecIt p_it = marks.begin(); p_it != marks.end(); p_it++)
+        for (auto &p_it : marks)
         {
-            for (StaticWMVecIt m_it = (*p_it)->static_items.begin(); m_it != (*p_it)->static_items.end(); m_it++)
-                static_wm_destroy(*m_it);
-            xr_delete(*p_it);
+            for (auto &m_it : p_it->static_items)
+                static_wm_destroy(m_it);
+            xr_delete(p_it);
         }
         marks.clear();
     }
@@ -88,7 +88,7 @@ void CWallmarksEngine::clear()
 // allocate
 CWallmarksEngine::static_wallmark* CWallmarksEngine::static_wm_allocate()
 {
-    static_wallmark* W = 0;
+    static_wallmark* W = nullptr;
     if (static_pool.empty())
         W = new static_wallmark();
     else
@@ -110,13 +110,13 @@ void CWallmarksEngine::static_wm_render(CWallmarksEngine::static_wallmark* W, FV
     int aC = iFloor(a * 255.f);
     clamp(aC, 0, 255);
     u32 C = color_rgba(128, 128, 128, aC);
-    FVF::LIT* S = &*W->verts.begin();
-    FVF::LIT* E = &*W->verts.end();
-    for (; S != E; S++, V++)
+
+    for (auto &i : W->verts)
     {
-        V->p.set(S->p);
+        V->p.set(i.p);
         V->color = C;
-        V->t.set(S->t);
+        V->t.set(i.t);
+        V++;
     }
 }
 //--------------------------------------------------------------------------------
@@ -255,10 +255,8 @@ void CWallmarksEngine::AddWallmark_internal(
         Fbox bb;
         bb.invalidate();
 
-        FVF::LIT* I = &*W->verts.begin();
-        FVF::LIT* E = &*W->verts.end();
-        for (; I != E; I++)
-            bb.modify(I->p);
+        for (auto &i : W->verts)
+            bb.modify(i.p);
         bb.getsphere(W->bounds.P, W->bounds.R);
     }
 
@@ -268,15 +266,13 @@ void CWallmarksEngine::AddWallmark_internal(
         wm_slot* slot = FindSlot(hShader);
         if (slot)
         {
-            StaticWMVecIt it = slot->static_items.begin();
-            StaticWMVecIt end = slot->static_items.end();
-            for (; it != end; it++)
+            for (auto &it : slot->static_items)
             {
-                static_wallmark* wm = *it;
+                static_wallmark* wm = it;
                 if (wm->bounds.P.similar(W->bounds.P, 0.02f))
                 { // replace
                     static_wm_destroy(wm);
-                    *it = W;
+                    it = W;
                     return;
                 }
             }
@@ -311,9 +307,11 @@ void CWallmarksEngine::AddStaticWallmark(
 void CWallmarksEngine::AddSkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
-    if (0 == g_r || ::RImplementation.phase != CRender::PHASE_NORMAL)
+    if (::RImplementation.phase != CRender::PHASE_NORMAL)
         return;
+
     // optimization cheat: don't allow wallmarks more than 50 m from viewer/actor
+    // XXX: Make console command for this
     if (xf->c.distance_to_sqr(Device.vCameraPosition) > _sqr(50.f))
         return;
 
@@ -325,7 +323,7 @@ void CWallmarksEngine::AddSkeletonWallmark(
 
 void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
 {
-    if (0 == g_r || ::RImplementation.phase != CRender::PHASE_NORMAL)
+    if (::RImplementation.phase != CRender::PHASE_NORMAL)
         return;
 
     if (!::RImplementation.val_bHUD)
@@ -333,7 +331,7 @@ void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
         lock.Enter();
         // search if similar wallmark exists
         wm_slot* slot = FindSlot(wm->Shader());
-        if (0 == slot)
+        if (nullptr == slot)
             slot = AppendSlot(wm->Shader());
         // no similar - register _new_
         slot->skeleton_items.push_back(wm);
@@ -394,16 +392,17 @@ void CWallmarksEngine::Render()
 
     lock.Enter(); // Physics may add wallmarks in parallel with rendering
 
-    for (WMSlotVecIt slot_it = marks.begin(); slot_it != marks.end(); slot_it++)
+    for (auto &slot_it : marks)
     {
         u32 w_offset;
         FVF::LIT *w_verts, *w_start;
         BeginStream(hGeom, w_offset, w_verts, w_start);
-        wm_slot* slot = *slot_it;
+        wm_slot* slot = slot_it;
+
         // static wallmarks
-        for (StaticWMVecIt w_it = slot->static_items.begin(); w_it != slot->static_items.end();)
+        for (auto &w_it : slot->static_items)
         {
-            static_wallmark* W = *w_it;
+            static_wallmark* W = w_it;
             if (RImplementation.ViewBase.testSphere_dirty(W->bounds.P, W->bounds.R))
             {
                 RImplementation.BasicStats.StaticWMCount++;
@@ -429,12 +428,9 @@ void CWallmarksEngine::Render()
             if (W->ttl <= EPS)
             {
                 static_wm_destroy(W);
-                *w_it = slot->static_items.back();
+                w_it = slot->static_items.back();
                 slot->static_items.pop_back();
-            }
-            else
-            {
-                w_it++;
+                break;
             }
         }
         // Flush stream
@@ -443,10 +439,9 @@ void CWallmarksEngine::Render()
         BeginStream(hGeom, w_offset, w_verts, w_start);
 
         // dynamic wallmarks
-        for (xr_vector<intrusive_ptr<CSkeletonWallmark>>::iterator w_it = slot->skeleton_items.begin();
-             w_it != slot->skeleton_items.end(); w_it++)
+        for (auto &w_it : slot->skeleton_items)
         {
-            intrusive_ptr<CSkeletonWallmark> W = *w_it;
+            intrusive_ptr<CSkeletonWallmark> W = w_it;
             if (!W)
             {
                 continue;

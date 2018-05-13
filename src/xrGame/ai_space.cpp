@@ -22,8 +22,6 @@
 #include "moving_objects.h"
 #include "doors_manager.h"
 
-ENGINE_API bool g_dedicated_server;
-
 CAI_Space* g_ai_space = 0;
 
 CAI_Space::CAI_Space()
@@ -37,7 +35,7 @@ CAI_Space::CAI_Space()
 
 void CAI_Space::init()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     AISpaceBase::Initialize();
     VERIFY(!m_ef_storage);
@@ -48,15 +46,15 @@ void CAI_Space::init()
 
     VERIFY(!m_moving_objects);
     m_moving_objects = new ::moving_objects();
-    VERIFY(!GlobalEnv.ScriptEngine);
-    GlobalEnv.ScriptEngine = new CScriptEngine();
+    VERIFY(!GEnv.ScriptEngine);
+    GEnv.ScriptEngine = new CScriptEngine();
     SetupScriptEngine();
 }
 
 CAI_Space::~CAI_Space()
 {
     unload();
-    xr_delete(GlobalEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
+    xr_delete(GEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
     xr_delete(m_doors_manager);
     xr_delete(m_moving_objects);
     xr_delete(m_cover_manager);
@@ -85,9 +83,9 @@ void CAI_Space::RegisterScriptClasses()
     {
         _GetItem(*registrators, i, I);
         luabind::functor<void> result;
-        if (!script_engine().functor(I, result))
+        if (!GEnv.ScriptEngine->functor(I, result))
         {
-            script_engine().script_log(LuaMessageType::Error, "Cannot load class registrator %s!", I);
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Cannot load class registrator %s!", I);
             continue;
         }
         result(const_cast<CObjectFactory*>(&object_factory()));
@@ -117,7 +115,7 @@ void CAI_Space::LoadCommonScripts()
         for (u32 i = 0; i < scriptCount; i++)
         {
             _GetItem(*scriptString, i, scriptName);
-            script_engine().load_file(scriptName, script_engine().GlobalNamespace);
+            GEnv.ScriptEngine->load_file(scriptName, CScriptEngine::GlobalNamespace);
         }
     }
     xr_delete(l_tpIniFile);
@@ -127,7 +125,7 @@ void CAI_Space::LoadCommonScripts()
 void CAI_Space::SetupScriptEngine()
 {
     XRay::ScriptExporter::Reset(); // mark all nodes as undone
-    GlobalEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
+    GEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
     RegisterScriptClasses();
     object_factory().register_script();
     LoadCommonScripts();
@@ -160,9 +158,9 @@ void CAI_Space::load(LPCSTR level_name)
 
 void CAI_Space::unload(bool reload)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
-    script_engine().unload();
+    GEnv.ScriptEngine->unload();
     xr_delete(m_doors_manager);
     AISpaceBase::Unload(reload);
 }

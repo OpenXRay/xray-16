@@ -41,7 +41,7 @@ IBlender* CRender::blender_create(CLASS_ID cls)
     case B_TREE: return new CBlender_Tree();
     case B_PARTICLE: return new CBlender_Particle();
     }
-    return 0;
+    return nullptr;
 }
 
 void CRender::blender_destroy(IBlender*& B) { xr_delete(B); }

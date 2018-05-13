@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "ISpatial.h"
 #include "Frustum.h"
+#include "xrCore/_fbox.h"
+#include "xrCore/Threading/Lock.hpp"
 
 extern Fvector c_spatial_offset[8];
 
@@ -28,11 +30,9 @@ public:
             return;
 
         // test items
-        xr_vector<ISpatial*>::iterator _it = N->items.begin();
-        xr_vector<ISpatial*>::iterator _end = N->items.end();
-        for (; _it != _end; _it++)
+        for (auto& it : N->items)
         {
-            ISpatial* S = *_it;
+            ISpatial* S = it;
             if (0 == (S->GetSpatialData().type & mask))
                 continue;
 
@@ -60,12 +60,12 @@ public:
 
 void ISpatial_DB::q_frustum(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const CFrustum& _frustum)
 {
-    cs.Enter();
+    pcs->Enter();
     Stats.Query.Begin();
     q_result = &R;
-    q_result->clear_not_free();
+    q_result->clear();
     walker W(this, _mask, &_frustum);
     W.walk(m_root, m_center, m_bounds, _frustum.getMask());
     Stats.Query.End();
-    cs.Leave();
+    pcs->Leave();
 }

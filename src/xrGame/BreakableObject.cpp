@@ -3,6 +3,7 @@
 #include "xrserver_objects_alife.h"
 #include "xrPhysics/IPHStaticGeomShell.h"
 #include "xrPhysics/PhysicsShell.h"
+#include "xrServerEntities/xrMessages.h"
 
 #include "xrEngine/xr_collide_form.h"
 #include "Include/xrRender/Kinematics.h"
@@ -179,7 +180,7 @@ void CBreakableObject::net_Destroy()
     xr_delete(CForm);
     Init();
     // Visual()->vis.box.set(m_saved_box);
-    GlobalEnv.Render->model_Delete(renderable.visual, TRUE);
+    GEnv.Render->model_Delete(renderable.visual, TRUE);
     cNameVisual_set("");
 }
 void CBreakableObject::Split()

@@ -26,11 +26,19 @@ void resptrcode_shader::create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, 
 }
 
 //////////////////////////////////////////////////////////////////////////
+#ifdef USE_OGL
+void resptrcode_geom::create(u32 FVF, GLuint vb, GLuint ib)
+#else
 void resptrcode_geom::create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+#endif // USE_OGL
 {
     _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
 }
+#ifdef USE_OGL
+void resptrcode_geom::create(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib)
+#else
 void resptrcode_geom::create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+#endif // USE_OGL
 {
     _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
 }
@@ -46,7 +54,7 @@ BOOL SPass::equal(const SPass& other)
         return FALSE;
     if (vs != other.vs)
         return FALSE;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     if (gs != other.gs)
         return FALSE;
 #ifdef USE_DX11
@@ -104,9 +112,9 @@ BOOL ShaderElement::equal(ShaderElement& S)
 
 BOOL ShaderElement::equal(ShaderElement* S)
 {
-    if (0 == S && 0 == this)
+    if (nullptr == S && nullptr == this)
         return TRUE;
-    if (0 == S || 0 == this)
+    if (nullptr == S || nullptr == this)
         return FALSE;
     return equal(*S);
 }
@@ -119,16 +127,6 @@ BOOL Shader::equal(Shader& S)
 }
 BOOL Shader::equal(Shader* S) { return equal(*S); }
 void STextureList::clear()
-{
-    iterator it = begin();
-    iterator it_e = end();
-    for (; it != it_e; ++it)
-        (*it).second.destroy();
-
-    erase(begin(), end());
-}
-
-void STextureList::clear_not_free()
 {
     iterator it = begin();
     iterator it_e = end();

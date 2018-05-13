@@ -20,41 +20,50 @@
 #include "CharacterPhysicsSupport.h"
 #include "inventory.h"
 
+#include "pch_script.h"
+#include "game_object_space.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
+
 void CActor::attach_Vehicle(CHolderCustom* vehicle)
 {
-    /*
-        if(!vehicle) return;
-        if(m_holder) return;
+    if(!vehicle || m_holder)
+        return;
 
-        PickupModeOff		();
-        m_holder=vehicle;
+    //PickupModeOff();
+    m_holder=vehicle;
 
-        IRenderVisual *pVis = Visual();
-        IKinematicsAnimated* V		= smart_cast<IKinematicsAnimated*>(pVis); R_ASSERT(V);
-        IKinematics* pK = smart_cast<IKinematics*>(pVis);
+    IRenderVisual* pVis = Visual();
+    IKinematicsAnimated* V = smart_cast<IKinematicsAnimated*>(pVis);
+    R_ASSERT(V);
+    IKinematics* pK = smart_cast<IKinematics*>(pVis);
 
-        if(!m_holder->attach_Actor(this)){
-            m_holder=NULL;
-            return;
-        }
-        // temp play animation
-        CCar*	car						= smart_cast<CCar*>(m_holder);
-        u16 anim_type					= car->DriverAnimationType();
-        SVehicleAnimCollection& anims	= m_vehicle_anims->m_vehicles_type_collections[anim_type];
-        V->PlayCycle					(anims.idles[0],FALSE);
+    if (!m_holder->attach_Actor(this))
+    {
+        m_holder = nullptr;
+        return;
+    }
 
-        ResetCallbacks					();
-        u16 head_bone					= pK->LL_BoneID("bip01_head");
-        pK->LL_GetBoneInstance			(u16(head_bone)).set_callback		(bctPhysics, VehicleHeadCallback,this);
+    // temp play animation
+    CCar* car = smart_cast<CCar*>(m_holder);
+    u16 anim_type = car->DriverAnimationType();
+    SVehicleAnimCollection& anims = m_vehicle_anims->m_vehicles_type_collections[anim_type];
+    V->PlayCycle(anims.idles[0], false);
 
-        character_physics_support		()->movement()->DestroyCharacter();
-        mstate_wishful					= 0;
-        m_holderID=car->ID				();
+    ResetCallbacks();
+    u16 head_bone = pK->LL_BoneID("bip01_head");
+    pK->LL_GetBoneInstance(u16(head_bone)).set_callback(bctPhysics, VehicleHeadCallback, this);
 
-        SetWeaponHideState				(INV_STATE_CAR, true);
+    character_physics_support()->movement()->DestroyCharacter();
+    mstate_wishful = 0;
+    m_holderID = car->ID();
 
-        CStepManager::on_animation_start(MotionID(), 0);
-    */
+    SetWeaponHideState(INV_STATE_CAR, true);
+
+    CStepManager::on_animation_start(MotionID(), nullptr);
+
+    // Real Wolf: Колбек на посадку в машину. 01.08.2014.
+    this->callback(GameObject::eAttachVehicle)(car->lua_game_object());
 }
 
 void CActor::detach_Vehicle()
@@ -80,6 +89,9 @@ void CActor::detach_Vehicle()
     //	sh->Activate();
     car->PPhysicsShell()->SplitterHolderActivate();
     m_holder->detach_Actor(); //
+
+    // Real Wolf: колбек на высадку из машины. 01.08.2014.
+    this->callback(GameObject::eDetachVehicle)(car->lua_game_object());
 
     character_physics_support()->movement()->SetPosition(m_holder->ExitPosition());
     character_physics_support()->movement()->SetVelocity(m_holder->ExitVelocity());
@@ -131,6 +143,9 @@ bool CActor::use_Vehicle(CHolderCustom* object)
 
                 attach_Vehicle(vehicle);
             }
+            // Real Wolf: колбек на использование машины (но не посадку) без учета расстояния. 01.08.2014.
+            else if (auto car = smart_cast<CCar*>(vehicle))
+                this->callback(GameObject::eUseVehicle)(car->lua_game_object());
             return true;
         }
         return false;

@@ -2,9 +2,10 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#pragma once
 #if !defined(_PORTAL_H_)
 #define _PORTAL_H_
-#pragma once
+#include "xrCore/_fbox2.h"
 
 class CPortal;
 class CSector;
@@ -81,7 +82,7 @@ public:
     void traverse(CFrustum& F, _scissor& R);
     void load(IReader& fs);
 
-    CSector() { m_root = NULL; }
+    CSector() { m_root = nullptr; }
     virtual ~CSector();
 };
 

@@ -58,12 +58,12 @@ void CRenderTarget::u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l
     l1.set(p1.x, p1.y);
 }
 
-BOOL CRenderTarget::u_need_PP()
+bool CRenderTarget::u_need_PP()
 {
-    bool _blur = (param_blur > 0.001f);
-    bool _gray = (param_gray > 0.001f);
-    bool _noise = (param_noise > 0.001f);
-    bool _dual = (param_duality_h > 0.001f) || (param_duality_v > 0.001f);
+    bool _blur = param_blur > 0.001f;
+    bool _gray = param_gray > 0.001f;
+    bool _noise = param_noise > 0.001f;
+    bool _dual = param_duality_h > 0.001f || param_duality_v > 0.001f;
 
     // bool	_menu_pp= g_pGamePersistent?g_pGamePersistent->OnRenderPPUI_query():false;
 
@@ -100,7 +100,8 @@ struct TL_2c3uv
     u32 color0;
     u32 color1;
     Fvector2 uv[3];
-    IC void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
+
+    void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
     {
         p.set(x, y, EPS_S, 1.f);
         color0 = c0;

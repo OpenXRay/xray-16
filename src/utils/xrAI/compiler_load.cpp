@@ -1,19 +1,19 @@
 #include "stdafx.h"
 #include "compiler.h"
-#include "Common/LevelGameDef.h"
-#include "xrAICore/Navigation/level_graph.h"
-#include "AIMapExport.h"
+
+// TODO: Do we really need this?
+//Lights g_lights;
 
 IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox& bb, const SAIParams& params)
 {
     Fvector Pdest;
     int x, z, row_length;
-    row_length = iFloor((bb.max.z - bb.min.z) / params.fPatchSize + EPS_L + 1.5f);
+    row_length = iFloor((bb.vMax.z - bb.vMin.z) / params.fPatchSize + EPS_L + 1.5f);
     x = Psrc.xz() / row_length;
     z = Psrc.xz() % row_length;
-    Pdest.x = float(x) * params.fPatchSize + bb.min.x;
-    Pdest.y = (float(Psrc.y()) / 65535) * (bb.max.y - bb.min.y) + bb.min.y;
-    Pdest.z = float(z) * params.fPatchSize + bb.min.z;
+    Pdest.x = float(x) * params.fPatchSize + bb.vMin.x;
+    Pdest.y = (float(Psrc.y()) / 65535) * (bb.vMax.y - bb.vMin.y) + bb.vMin.y;
+    Pdest.z = float(z) * params.fPatchSize + bb.vMin.z;
     return (Pdest);
 }
 
@@ -26,7 +26,7 @@ IC CNodePositionConverter::CNodePositionConverter(const SNodePositionOld& Psrc, 
 {
     Fvector Pdest;
     Pdest.x = float(Psrc.x) * m_header.size;
-    Pdest.y = (float(Psrc.y) / 65535) * m_header.size_y + m_header.aabb.min.y;
+    Pdest.y = (float(Psrc.y) / 65535) * m_header.size_y + m_header.aabb.vMin.y;
     Pdest.z = float(Psrc.z) * m_header.size;
     CNodePositionCompressor(np, Pdest, m_header);
     np.y(Psrc.y);
@@ -54,19 +54,19 @@ extern void Surface_Init();
 void xrLoad(LPCSTR name, bool draft_mode)
 {
     FS.get_path("$level$")->_set((LPSTR)name);
-    string256 N;
+    string_path file_name;
     if (!draft_mode)
     {
         // shaders
-        string_path N;
-        FS.update_path(N, "$game_data$", "shaders_xrlc.xr");
+        FS.update_path(file_name, "$game_data$", "shaders_xrlc.xr");
         g_shaders_xrlc = new Shader_xrLC_LIB();
-        g_shaders_xrlc->Load(N);
+        g_shaders_xrlc->Load(file_name);
 
         // Load CFORM
         {
-            strconcat(sizeof(N), N, name, "build.cform");
-            IReader* fs = FS.r_open(N);
+            strconcat(sizeof(file_name), file_name, name, "build.cform");
+            IReader* fs = FS.r_open(file_name);
+            R_ASSERT2(fs, "There is no file 'build.cform'!");
             R_ASSERT(fs->find_chunk(0));
 
             hdrCFORM H;
@@ -83,15 +83,14 @@ void xrLoad(LPCSTR name, bool draft_mode)
             R_ASSERT(fs->find_chunk(1));
             fs->r(&*g_rc_faces.begin(), g_rc_faces.size() * sizeof(b_rc_face));
 
-            LevelBB.set(H.aabb);
             FS.r_close(fs);
         }
 
         // Load level data
         {
-            strconcat(sizeof(N), N, name, "build.prj");
-            IReader* fs = FS.r_open(N);
-            IReader* F;
+            strconcat(sizeof(file_name), file_name, name, "build.prj");
+            IReader* fs = FS.r_open(file_name);
+            R_ASSERT2(fs, "There is no file 'build.prj'!");
 
             // Version
             u32 version;
@@ -105,18 +104,21 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
             // Load level data
             transfer("materials", g_materials, *fs, EB_Materials);
-            transfer("shaders_xrlc", g_shader_compile, *fs, EB_Shaders_Compile);
+            //transfer("shaders_xrlc", g_shader_compile, *fs, EB_Shaders_Compile);
 
             // process textures
             Logger.Status("Processing textures...");
             {
                 Surface_Init();
-                F = fs->open_chunk(EB_Textures);
+                IReader* F = fs->open_chunk(EB_Textures);
                 u32 tex_count = F->length() / sizeof(b_texture);
                 for (u32 t = 0; t < tex_count; t++)
                 {
                     Logger.Progress(float(t) / float(tex_count));
 
+                    // В данном месте в случае 64-битной сборки происходит чтение лишних 4 байт из файла потому,
+                    // что читается структура с указателем, размер которого разный для 32 и 64-битных систем.
+                    // Как следствие, продолжение работы компилятора невозможно.
                     b_texture TEX;
                     F->r(&TEX, sizeof(TEX));
 
@@ -146,18 +148,12 @@ void xrLoad(LPCSTR name, bool draft_mode)
                         R_ASSERT2(THM, N);
 
                         // version
-                        u32 version = 0;
-                        R_ASSERT(THM->r_chunk(THM_CHUNK_VERSION, &version));
+                        //u32 version = 0;
+                        //R_ASSERT2(THM->r_chunk(THM_CHUNK_VERSION, &version), N);
+                        //if (version != THM_CURRENT_VERSION) FATAL("Unsupported version of THM file.");
+
                         // analyze thumbnail information
-                        R_ASSERT(THM->find_chunk(THM_CHUNK_TEXTUREPARAM));
-                        THM->r(&BT.THM.fmt, sizeof(STextureParams::ETFormat));
-                        BT.THM.flags.assign(THM->r_u32());
-                        BT.THM.border_color = THM->r_u32();
-                        BT.THM.fade_color = THM->r_u32();
-                        BT.THM.fade_amount = THM->r_u32();
-                        BT.THM.mip_filter = THM->r_u32();
-                        BT.THM.width = THM->r_u32();
-                        BT.THM.height = THM->r_u32();
+                        BT.THM.Load(*THM);
                         BOOL bLOD = FALSE;
                         if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
                             bLOD = TRUE;
@@ -176,13 +172,12 @@ void xrLoad(LPCSTR name, bool draft_mode)
                                 BT.pSurface = Surface_Load(N, w, h);
                                 R_ASSERT2(BT.pSurface, "Can't load surface");
                                 if ((w != BT.dwWidth) || (h != BT.dwHeight))
-                                    Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth,
-                                        BT.dwHeight, w, h);
+                                {
+                                    Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight, w, h);
+                                    BT.dwWidth = BT.THM.width = w;
+                                    BT.dwHeight = BT.THM.height = h;
+                                }
                                 BT.Vflip();
-                            }
-                            else
-                            {
-                                // Free surface memory
                             }
                         }
                     }
@@ -194,10 +189,9 @@ void xrLoad(LPCSTR name, bool draft_mode)
         }
     }
     // Load lights
-    {
-        strconcat(sizeof(N), N, name, "build.prj");
-
-        IReader* F = FS.r_open(N);
+    /*{
+        strconcat(sizeof(file_name), file_name, name, "build.prj");
+        IReader* F = FS.r_open(file_name);
         R_ASSERT2(F, "There is no file 'build.prj'!");
         IReader& fs = *F;
 
@@ -253,16 +247,17 @@ void xrLoad(LPCSTR name, bool draft_mode)
             }
             F->close();
         }
-    }
+    }*/
     // Load initial map from the Level Editor
     {
-        string_path file_name;
         strconcat(sizeof(file_name), file_name, name, "build.aimap");
         IReader* F = FS.r_open(file_name);
-        R_ASSERT2(F, file_name);
+        R_ASSERT2(F, "There is no file 'build.aimap'!");
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_VERSION));
         R_ASSERT(F->r_u16() == E_AIMAP_VERSION);
+
+        Fbox LevelBB;
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_BOX));
         F->r(&LevelBB, sizeof(LevelBB));

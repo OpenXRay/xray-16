@@ -5,7 +5,7 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
-void CSoundRender_Emitter::start(ref_sound* _owner, BOOL _loop, float delay)
+void CSoundRender_Emitter::start(ref_sound* _owner, bool _loop, float delay)
 {
     starting_delay = delay;
 
@@ -49,9 +49,9 @@ void CSoundRender_Emitter::i_stop()
     m_current_state = stStopped;
 }
 
-void CSoundRender_Emitter::stop(BOOL bDeffered)
+void CSoundRender_Emitter::stop(bool isDeffered)
 {
-    if (bDeffered)
+    if (isDeffered)
         bStopping = TRUE;
     else
         i_stop();
@@ -71,7 +71,7 @@ void CSoundRender_Emitter::rewind()
     bRewind = TRUE;
 }
 
-void CSoundRender_Emitter::pause(BOOL bVal, int id)
+void CSoundRender_Emitter::pause(bool bVal, int id)
 {
     if (bVal)
     {

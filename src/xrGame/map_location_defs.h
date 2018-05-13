@@ -24,7 +24,7 @@ struct SLocationKey : public ISerializable, public IPureDestroyableObject
     virtual void destroy();
 };
 
-DEFINE_VECTOR(SLocationKey, Locations, Locations_it);
+using Locations = xr_vector<SLocationKey>;
 
 struct CMapLocationRegistry : public CALifeAbstractRegistry<u16, Locations>
 {

@@ -36,5 +36,3 @@ private:
 };
 
 #pragma warning(pop)
-
-#include "alife_simulator_inline.h"

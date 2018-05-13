@@ -6,6 +6,7 @@
 //	Description : obstacles query
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef OBSTACLES_QUERY_H
 #define OBSTACLES_QUERY_H
 
@@ -13,6 +14,7 @@
 #include "xrCore/Containers/AssociativeVector.hpp"
 
 class CGameObject;
+class IGameObject;
 
 class obstacles_query
 {

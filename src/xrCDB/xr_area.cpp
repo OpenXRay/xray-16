@@ -14,17 +14,17 @@ using namespace collide;
 CObjectSpace::CObjectSpace()
     : xrc("object space")
 #ifdef CONFIG_PROFILE_LOCKS
-      ,
-      Lock(MUTEX_PROFILE_ID(CObjectSpace::Lock))
+      , lock(new Lock(MUTEX_PROFILE_ID(CObjectSpace::Lock)))
+#else
+      , lock(new Lock)
 #endif // CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-      ,
-      m_pRender(0)
+      , m_pRender(0)
 #endif
 {
 #ifdef DEBUG
-    if (GlobalEnv.RenderFactory)
-        m_pRender = CNEW(FactoryPtr<IObjectSpaceRender>)();
+    if (GEnv.RenderFactory)
+        m_pRender = new FactoryPtr<IObjectSpaceRender>();
 
 // sh_debug.create				("debug\\wireframe","$null");
 #endif
@@ -34,13 +34,14 @@ CObjectSpace::CObjectSpace()
 CObjectSpace::~CObjectSpace()
 {
 // moved to ~IGameLevel
-//	Sound->set_geometry_occ		(NULL);
-//	Sound->set_handler			(NULL);
+//	GEnv.Sound->set_geometry_occ		(NULL);
+//	GEnv.Sound->set_handler			(NULL);
 //
 #ifdef DEBUG
     // sh_debug.destroy			();
-    CDELETE(m_pRender);
+    xr_delete(m_pRender);
 #endif
+	delete lock;
 }
 //----------------------------------------------------------------------
 
@@ -48,9 +49,9 @@ CObjectSpace::~CObjectSpace()
 int CObjectSpace::GetNearest(xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObject*>& q_nearest, const Fvector& point,
     float range, IGameObject* ignore_object)
 {
-    q_spatial.clear_not_free();
+    q_spatial.clear();
     // Query objects
-    q_nearest.clear_not_free();
+    q_nearest.clear();
     Fsphere Q;
     Q.set(point, range);
     Fvector B;
@@ -58,11 +59,9 @@ int CObjectSpace::GetNearest(xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObj
     g_SpatialSpace->q_box(q_spatial, 0, STYPE_COLLIDEABLE, point, B);
 
     // Iterate
-    xr_vector<ISpatial*>::iterator it = q_spatial.begin();
-    xr_vector<ISpatial*>::iterator end = q_spatial.end();
-    for (; it != end; it++)
+    for (auto& it : q_spatial)
     {
-        IGameObject* O = (*it)->dcast_GameObject();
+        IGameObject* O = it->dcast_GameObject();
         if (0 == O)
             continue;
         if (O == ignore_object)
@@ -94,10 +93,6 @@ IC int CObjectSpace::GetNearest(xr_vector<IGameObject*>& q_nearest, ICollisionFo
 void CObjectSpace::Load(CDB::build_callback build_callback) { Load("$level$", "level.cform", build_callback); }
 void CObjectSpace::Load(LPCSTR path, LPCSTR fname, CDB::build_callback build_callback)
 {
-#ifdef USE_ARENA_ALLOCATOR
-    Msg("CObjectSpace::Load, g_collision_allocator.get_allocated_size() - %d",
-        int(g_collision_allocator.get_allocated_size() / 1024.0 / 1024));
-#endif // #ifdef USE_ARENA_ALLOCATOR
     IReader* F = FS.r_open(path, fname);
     R_ASSERT(F);
     Load(F, build_callback);
@@ -120,8 +115,8 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
     m_BoundingVolume.set(H.aabb);
     g_SpatialSpace->initialize(m_BoundingVolume);
     g_SpatialSpacePhysic->initialize(m_BoundingVolume);
-    // Sound->set_geometry_occ				( &Static );
-    // Sound->set_handler					( _sound_event );
+    // GEnv.Sound->set_geometry_occ				( &Static );
+    // GEnv.Sound->set_handler					( _sound_event );
 }
 
 //----------------------------------------------------------------------

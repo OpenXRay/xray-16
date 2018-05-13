@@ -1,5 +1,7 @@
+#pragma once
 #ifndef __FRECT
 #define __FRECT
+#include "_vector2.h"
 
 template <class T>
 struct _rect
@@ -55,7 +57,7 @@ public:
         y2 = r.y2;
         return *this;
     };
-    IC SelfRef null()
+    IC SelfRef set_zero()
     {
         x1 = T(0);
         y1 = T(0);
@@ -66,10 +68,10 @@ public:
 
     IC SelfRef invalidate()
     {
-        lt.x = type_max(T);
-        lt.y = type_max(T);
-        rb.x = type_min(T);
-        rb.y = type_min(T);
+        lt.x = type_max<T>;
+        lt.y = type_max<T>;
+        rb.x = type_min<T>;
+        rb.y = type_min<T>;
         return *this;
     };
     IC bool valide() { return lt.x1 < rb.x && lt.y < rb.y; }
@@ -184,10 +186,10 @@ public:
         if (!intersected(b1, b2))
             return (FALSE);
 
-        x1 = _max(b1.x1, b2.x1);
-        y1 = _max(b1.y1, b2.y1);
-        x2 = _min(b1.x2, b2.x2);
-        y2 = _min(b1.y2, b2.y2);
+        x1 = std::max(b1.x1, b2.x1);
+        y1 = std::max(b1.y1, b2.y1);
+        x2 = std::min(b1.x2, b2.x2);
+        y2 = std::min(b1.y2, b2.y2);
         return (TRUE);
     }
 };
@@ -197,7 +199,7 @@ typedef _rect<double> Drect;
 typedef _rect<int> Irect;
 
 template <class T>
-BOOL _valid(const _rect<T>& m)
+bool _valid(const _rect<T>& m)
 {
     return m.lt._valid() && m.rb._valid();
 }

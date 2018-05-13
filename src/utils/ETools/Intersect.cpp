@@ -52,20 +52,22 @@ IC static bool clip(float fDenom, float fNumer, float& rfT0, float& rfT1, bool& 
         return fNumer <= 0.0f;
     }
 }
-IC static bool clip(float fDenom, float fNumer, float& rfT0, float& rfT1, box_axis& ax0, box_axis& ax1, box_axis ax)
+
+IC static bool clip(float fDenom, float fNumer, float& rfT0, float& rfT1, box_axis& ax0, box_axis& ax1, box_axis ax_)
 {
     bool b0 = false, b1 = false;
     if (!clip(fDenom, fNumer, rfT0, rfT1, b0, b1))
         return false;
 
     if (b0)
-        ax0 = ax;
+        ax0 = ax_;
 
     if (b1)
-        ax1 = ax;
+        ax1 = ax_;
 
     return true;
 }
+
 static bool intersect(const Fvector& start, const Fvector& dir, const Fvector& extent, float& rfT0, float& rfT1,
     box_axis& ax0, box_axis& ax1)
 {
@@ -92,10 +94,10 @@ bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction,
     kDirection.set(direction.dotproduct(box.m_rotate.i), direction.dotproduct(box.m_rotate.j),
         direction.dotproduct(box.m_rotate.k));
 
-    float fT0 = 0.0f, fT1 = type_max(float);
+    float fT0 = 0.0f, fT1 = type_max<float>;
     box_axis ax0 = a_none;
     box_axis ax1 = a_none;
-    box_axis ax = a_none;
+    box_axis ax_ = a_none;
     if (intersect(kOrigin, kDirection, box.m_halfsize, fT0, fT1, ax0, ax1))
     {
         bool bPick = false;
@@ -105,14 +107,14 @@ bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction,
             if (fT0 < dist)
             {
                 dist = fT0;
-                ax = ax0;
+                ax_ = ax0;
                 bPick = true;
             }
 
             if (fT1 < dist)
             {
                 dist = fT1;
-                ax = ax1;
+                ax_ = ax1;
                 bPick = true;
             }
         }
@@ -121,14 +123,14 @@ bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction,
             if (fT1 < dist)
             {
                 dist = fT1;
-                ax = ax1;
+                ax_ = ax1;
                 bPick = true;
             }
         }
 
         if (bPick)
         {
-            switch (ax)
+            switch (ax_)
             {
             case a_px: norm.set(box.m_rotate.i); break;
             case a_nx: norm.invert(box.m_rotate.i); break;

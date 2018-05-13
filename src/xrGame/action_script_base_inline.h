@@ -7,6 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrServerEntities/smart_cast.h"
+#include "script_game_object.h"
 
 #define TEMPLATE_SPECIALIZATION template <typename _object_type>
 #define CScriptBaseAction CActionScriptBase<_object_type>

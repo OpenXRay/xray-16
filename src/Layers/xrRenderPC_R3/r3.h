@@ -10,7 +10,7 @@
 #include "Layers/xrRender/WallmarksEngine.h"
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
-#include "light_render_direct.h"
+#include "Layers/xrRender/light_render_direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
@@ -44,7 +44,6 @@ public:
         MMSM_AUTODETECT
     };
 
-public:
     struct _options
     {
         u32 bug : 1;
@@ -135,7 +134,6 @@ public:
         void FrameEnd() {}
     };
 
-public:
     RenderR3Statistics Stats;
     // Sector detection and visibility
     CSector* pLastSector;
@@ -171,7 +169,7 @@ public:
     light_Package LP_normal;
     light_Package LP_pending;
 
-    xr_vector<Fbox3, render_alloc<Fbox3>> main_coarse_structure;
+    xr_vector<Fbox3> main_coarse_structure;
 
     shared_str c_sbase;
     shared_str c_lmaterial;
@@ -217,7 +215,6 @@ public:
     void init_cacades();
     void render_sun_cascades();
 
-public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
     D3DVERTEXELEMENT9* getVB_Format(int id, BOOL _alt = FALSE);
@@ -231,26 +228,28 @@ public:
     int translateSector(IRender_Sector* pSector);
 
     // HW-occlusion culling
-    IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
-    IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
-    IC R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+    u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
+    void occq_end(u32& ID) { HWOCC.occq_end(ID); }
+    R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+
     ICF void apply_object(IRenderable* O)
     {
-        if (0 == O)
+        if (nullptr == O)
             return;
-        if (0 == O->renderable_ROS())
+        if (nullptr == O->renderable_ROS())
             return;
-        CROS_impl& LT = *((CROS_impl*)O->renderable_ROS());
+        CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
         // o_hemi						= 0.5f*LT.get_hemi			()	;
         o_sun = 0.75f * LT.get_sun();
         CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
-    IC void apply_lmaterial()
+
+    void apply_lmaterial()
     {
         R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (0 == C)
+        if (nullptr == C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
         VERIFY(RC_dx10texture == C->type);
@@ -262,13 +261,14 @@ public:
             mtl = ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X], o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X], o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
+        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
+        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
     }
 
-public:
     // feature level
     virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
     virtual bool is_sun_static() { return o.sunstatic; }
@@ -351,10 +351,15 @@ public:
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer);
     virtual void OnFrame();
 
+    void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
+    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
+
     // Render mode
     virtual void rmNear();
     virtual void rmFar();
     virtual void rmNormal();
+
+    u32 active_phase() override { return phase; }
 
     // Constructor/destructor/loader
     CRender();

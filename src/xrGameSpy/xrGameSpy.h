@@ -1,11 +1,4 @@
 #pragma once
-#include "Common/Platform.hpp"
-
-#ifdef XRGAMESPY_EXPORTS
-#define XRGAMESPY_API XR_EXPORT
-#else
-#define XRGAMESPY_API XR_IMPORT
-#endif
 
 #include <GameSpy/Common/gsCommon.h>
 #include <GameSpy/Common/gsAvailable.h>
@@ -18,7 +11,6 @@
 #include <GameSpy/gp/gp.h>
 #include <GameSpy/sake/sake.h>
 #include <GameSpy/sc/sc.h>
-#undef max
 
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "xrGameSpy/GameSpy_Available.h"
@@ -32,3 +24,7 @@ XRGAMESPY_API int GetGameDistribution();
 XRGAMESPY_API void GetGameID(int* GameID, int verID);
 
 void FillSecretKey(char* secretKey);
+
+// hack
+#undef min
+#undef max

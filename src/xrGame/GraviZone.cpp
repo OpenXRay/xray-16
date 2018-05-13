@@ -69,7 +69,7 @@ bool CBaseGraviZone::IdleState()
     {
         if (m_dwTeleTime > m_dwTimeToTele)
         {
-            for (OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+            for (auto it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
             {
                 CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>((*it).object);
 
@@ -84,7 +84,7 @@ bool CBaseGraviZone::IdleState()
         {
             m_dwTeleTime = 0;
 
-            for (OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+            for (auto it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
             {
                 CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>((*it).object);
 

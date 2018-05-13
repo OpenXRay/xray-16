@@ -43,9 +43,9 @@ void CConsole::Register_callbacks()
 void CConsole::Prev_log() // DIK_PRIOR=PAGE_UP
 {
     scroll_delta++;
-    if (scroll_delta > int(LogFile->size()) - 1)
+    if (scroll_delta > int(LogFile.size()) - 1)
     {
-        scroll_delta = LogFile->size() - 1;
+        scroll_delta = LogFile.size() - 1;
     }
 }
 
@@ -60,7 +60,7 @@ void CConsole::Next_log() // DIK_NEXT=PAGE_DOWN
 
 void CConsole::Begin_log() // PAGE_UP+Ctrl
 {
-    scroll_delta = LogFile->size() - 1;
+    scroll_delta = LogFile.size() - 1;
 }
 
 void CConsole::End_log() // PAGE_DOWN+Ctrl

@@ -1,6 +1,6 @@
 #pragma once
-
 #include "xrMessages.h"
+#include "xrCommon/xr_deque.h"
 
 extern BOOL g_bCheckTime;
 extern int g_dwEventDelay;
@@ -65,7 +65,8 @@ public:
     }
     void implication(NET_Packet& P) const
     {
-        CopyMemory(P.B.data, &*data.begin(), (u32)data.size());
+        if (data.size())
+            CopyMemory(P.B.data, &*data.begin(), (u32)data.size());
         P.B.count = (u32)data.size();
         P.r_pos = 0;
     }
@@ -97,7 +98,7 @@ public:
         case 2: EventName = "GE_OWNERSHIP_REJECT [2]"; break;
         case 5: EventName = "GE_DIE [5]"; break;
         case 7: EventName = "GE_DESTROY [7]"; break;
-        default: EventName = itoa(E.type, tmp, 10); break;
+        default: EventName = xr_itoa(E.type, tmp, 10); break;
         }
 
         Msg("Event %s to %d - at %d", *EventName, E.destination, E.timestamp);

@@ -4,6 +4,7 @@
 #include "CameraFirstEye.h"
 #include "xr_level_controller.h"
 #include "xrEngine/xr_object.h"
+#include "xrCore/_quaternion.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

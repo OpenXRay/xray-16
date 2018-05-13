@@ -39,9 +39,8 @@ public:
     }
     IC void clear()
     {
-        xr_vector<T *>::iterator i = blocks.begin(), e = blocks.end();
-        for (; i != e; ++i)
-            xr_free(*i);
+        for (auto& it : blocks)
+            xr_free(it);
         blocks.clear();
         init();
     }
@@ -64,8 +63,8 @@ public:
     {
         if (!current_block)
             return;
-        xr_vector<T*>::iterator i = blocks.begin();
-        xr_vector<T*>::iterator e = blocks.begin() + block_count;
+        auto i = blocks.begin();
+        auto e = blocks.begin() + block_count;
         u32 j;
         for (; i != e; ++i)
         {
@@ -84,8 +83,9 @@ private:
     IC T& back() { return current_block[block_position - 1]; }
     IC T& back_pointer() { return current_block + block_position - 1; }
     IC T& operator[](u32 position) { return *pointer(position); }
-    IC void construct(u32 position) { xr_allocator_t<T>().construct(pointer(position)); }
-    IC void construct_back() { xr_allocator_t<T>().construct(back_pointer()); }
+    // What is xr_allocator_t? This two methods are unused
+    //IC void construct(u32 position) { xr_allocator_t<T>().construct(pointer(position)); }
+    //IC void construct_back() { xr_allocator_t<T>().construct(back_pointer()); }
 };
 
 #endif

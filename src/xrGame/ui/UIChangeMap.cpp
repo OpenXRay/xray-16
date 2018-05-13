@@ -12,8 +12,7 @@
 #include "Common/object_broker.h"
 #include "UIGameCustom.h"
 #include "UIDialogHolder.h"
-
-xr_token game_types[];
+#include "UIFrameWindow.h"
 
 CUIChangeMap::CUIChangeMap()
 {

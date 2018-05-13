@@ -1,18 +1,12 @@
 #pragma once
 
 #include "animation_motion.h"
+#include "xrCore/Animation/SkeletonMotions.hpp" // PlayCallback XXX: fwd. decl. it instead?
+
 //*** Run-time Blend definition *******************************************************************
-#ifdef DEBUG
-class bnon_copy
-{
-protected:
-    bnon_copy() {}
-protected:
-    bnon_copy(const bnon_copy&) {}
-protected:
-    const bnon_copy& operator=(const bnon_copy&) { return *this; }
-};
-#endif
+
+// XXX: This header contains a few WAY too large functions to inline.
+
 class CBlend
 {
 public:
@@ -56,11 +50,11 @@ public:
     IC void update_play(float dt, PlayCallback _Callback);
     IC bool update_falloff(float dt);
     IC bool update(float dt, PlayCallback _Callback);
-    IC ECurvature blend_state() const { return blend; }
-    IC void set_free_state() { blend = eFREE_SLOT; }
-    IC void set_accrue_state() { blend = eAccrue; }
-    IC void set_falloff_state() { blend = eFalloff; }
-    IC void set(const CBlend& r) { *this = r; }
+    ECurvature blend_state() const { return blend; }
+    void set_free_state() { blend = eFREE_SLOT; }
+    void set_accrue_state() { blend = eAccrue; }
+    void set_falloff_state() { blend = eFalloff; }
+    void set(const CBlend& r) { *this = r; }
 #ifdef DEBUG
     CBlend()
         :
@@ -68,7 +62,7 @@ public:
           blendAmount(0),
           timeCurrent(0), timeTotal(0), motionID(), bone_or_part(0), channel(0), blend(eFREE_SLOT), blendAccrue(0),
           blendFalloff(0), blendPower(0), speed(0), playing(0), stop_at_end_callback(0), stop_at_end(0), fall_at_end(0),
-          Callback(0), CallbackParam(0), dwFrame(0)
+          Callback(nullptr), CallbackParam(nullptr), dwFrame(0)
     {
     }
 
@@ -143,8 +137,8 @@ IC bool CBlend::update_time(float dt)
     timeCurrent += quant; // stop@end - time is not going
 
     bool running_fwrd = (quant > 0);
-    float const END_EPS = SAMPLE_SPF + EPS;
-    bool at_end = running_fwrd && (timeCurrent > (timeTotal - END_EPS));
+    float const END_EPS_l = SAMPLE_SPF + EPS;
+    bool at_end = running_fwrd && (timeCurrent > (timeTotal - END_EPS_l));
     bool at_begin = !running_fwrd && (timeCurrent < 0.f);
 
     if (!stop_at_end)
@@ -152,7 +146,7 @@ IC bool CBlend::update_time(float dt)
         if (at_begin)
             timeCurrent += timeTotal;
         if (at_end)
-            timeCurrent -= (timeTotal - END_EPS);
+            timeCurrent -= (timeTotal - END_EPS_l);
         VERIFY(timeCurrent >= 0.f);
         return false;
     }
@@ -161,7 +155,7 @@ IC bool CBlend::update_time(float dt)
 
     if (at_end)
     {
-        timeCurrent = timeTotal - END_EPS; // stop@end - time frozen at the end
+        timeCurrent = timeTotal - END_EPS_l; // stop@end - time frozen at the end
         if (timeCurrent < 0.f)
             timeCurrent = 0.f;
     }

@@ -1,7 +1,7 @@
 #pragma once
-
-#include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
+#include "xrCore/Threading/Lock.hpp"
+#include "xrCore/_std_extensions.h"
 
 class CServerList;
 class CGameSpy_QR2;

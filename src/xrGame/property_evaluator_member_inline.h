@@ -16,22 +16,22 @@ CEvaluator::CPropertyEvaluatorMember(
     CPropertyStorage* storage, _condition_type condition_id, _value_type value, bool equality, LPCSTR evaluator_name)
     : m_condition_id(condition_id), m_value(value), m_equality(equality)
 {
-#ifdef LOG_ACTION
-    m_evaluator_name = evaluator_name;
+#if 1//def LOG_ACTION //Alundaio: m_evaluator_name
+    this->m_evaluator_name = evaluator_name;
 #endif
-    m_storage = storage;
+    this->m_storage = storage;
 }
 
 TEMPLATE_SPECIALIZATION
 void CEvaluator::setup(_object_type* object, CPropertyStorage* storage)
 {
-    inherited::setup(object, m_storage ? m_storage : storage);
+    inherited::setup(object, this->m_storage ? this->m_storage : storage);
 }
 
 TEMPLATE_SPECIALIZATION
 typename CEvaluator::_value_type CEvaluator::evaluate()
 {
-    return ((m_storage->property(m_condition_id) == m_value) == m_equality);
+    return ((this->m_storage->property(m_condition_id) == m_value) == m_equality);
 }
 
 #undef TEMPLATE_SPECIALIZATION

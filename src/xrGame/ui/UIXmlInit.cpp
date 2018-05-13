@@ -120,13 +120,13 @@ bool CUIXmlInit::InitOptionsItem(CUIXml& xml_doc, LPCSTR path, int index, CUIOpt
         {
             CUIOptionsItem::ESystemDepends d = CUIOptionsItem::sdNothing;
 
-            if (0 == stricmp(depends, "vid"))
+            if (0 == xr_stricmp(depends, "vid"))
                 d = CUIOptionsItem::sdVidRestart;
-            else if (0 == stricmp(depends, "snd"))
+            else if (0 == xr_stricmp(depends, "snd"))
                 d = CUIOptionsItem::sdSndRestart;
-            else if (0 == stricmp(depends, "restart"))
+            else if (0 == xr_stricmp(depends, "restart"))
                 d = CUIOptionsItem::sdSystemRestart;
-            else if (0 == stricmp(depends, "runtime"))
+            else if (0 == xr_stricmp(depends, "runtime"))
                 d = CUIOptionsItem::sdApplyOnChange;
             else
                 Msg("! unknown param [%s] in optionsItem [%s]", depends, entry.c_str());
@@ -543,19 +543,19 @@ bool CUIXmlInit::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CUIPro
     {
         mode = CUIProgressBar::om_horz;
     }
-    else if (stricmp(mode_str, "horz") == 0)
+    else if (xr_stricmp(mode_str, "horz") == 0)
     {
         mode = CUIProgressBar::om_horz;
     }
-    else if (stricmp(mode_str, "vert") == 0)
+    else if (xr_stricmp(mode_str, "vert") == 0)
     {
         mode = CUIProgressBar::om_vert;
     }
-    else if (stricmp(mode_str, "back") == 0)
+    else if (xr_stricmp(mode_str, "back") == 0)
     {
         mode = CUIProgressBar::om_back;
     }
-    else if (stricmp(mode_str, "down") == 0)
+    else if (xr_stricmp(mode_str, "down") == 0)
     {
         mode = CUIProgressBar::om_down;
     }
@@ -646,14 +646,14 @@ bool CUIXmlInit::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, CUIP
 
 void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pParentWnd)
 {
-    XML_NODE* _stored_root = xml_doc.GetLocalRoot();
+    XML_NODE _stored_root = xml_doc.GetLocalRoot();
     xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
 
-    XML_NODE* curr_root = xml_doc.GetLocalRoot();
+    XML_NODE curr_root = xml_doc.GetLocalRoot();
     if (!curr_root)
         curr_root = xml_doc.GetRoot();
 
-    XML_NODE* node = curr_root->IterateChildren(NULL);
+    XML_NODE node = curr_root.firstChild();
     int cnt_static = 0;
     int cnt_frameline = 0;
     int cnt_text = 0;
@@ -661,8 +661,8 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
 
     while (node)
     {
-        LPCSTR node_name = node->Value();
-        if (0 == stricmp(node_name, "auto_static"))
+        LPCSTR node_name = node.value();
+        if (0 == xr_stricmp(node_name, "auto_static"))
         {
             CUIStatic* pUIStatic = new CUIStatic();
             InitStatic(xml_doc, "auto_static", cnt_static, pUIStatic);
@@ -673,7 +673,7 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
 
             ++cnt_static;
         }
-        else if (0 == stricmp(node_name, "auto_frameline"))
+        else if (0 == xr_stricmp(node_name, "auto_frameline"))
         {
             CUIFrameLineWnd* pUIFrameline = new CUIFrameLineWnd();
             InitFrameLine(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
@@ -684,11 +684,11 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
 
             ++cnt_frameline;
         }
-        else if (0 == stricmp(node_name, "auto_text"))
+        else if (0 == xr_stricmp(node_name, "auto_text"))
         {
             ++cnt_text;
         }
-        node = curr_root->IterateChildren(node);
+        node = node.nextSibling();
     }
     /*
         CUIStatic* pUIStatic				= NULL;
@@ -714,7 +714,7 @@ void CUIXmlInit::InitAutoFrameLineGroup(CUIXml& xml_doc, LPCSTR path, int index,
     {
         return;
     }
-    XML_NODE* _stored_root = xml_doc.GetLocalRoot();
+    XML_NODE _stored_root = xml_doc.GetLocalRoot();
     xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
 
     CUIFrameLineWnd* pUIFL = NULL;
@@ -809,7 +809,7 @@ bool CUIXmlInit::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUITabC
     int tabsCount = xml_doc.GetNodesNum(path, index, "button");
     int radio = xml_doc.ReadAttribInt(path, index, "radio");
 
-    XML_NODE* tab_node = xml_doc.NavigateToNode(path, index);
+    XML_NODE tab_node = xml_doc.NavigateToNode(path, index);
     xml_doc.SetLocalRoot(tab_node);
 
     CUITabButton* newButton;
@@ -1193,7 +1193,7 @@ bool CUIXmlInit::InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUIScro
     /////////////////////////////////////////////////////////////////////
     int tabsCount = xml_doc.GetNodesNum(path, index, "text");
 
-    XML_NODE* _stored_root = xml_doc.GetLocalRoot();
+    XML_NODE _stored_root = xml_doc.GetLocalRoot();
     xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
 
     for (int i = 0; i < tabsCount; ++i)

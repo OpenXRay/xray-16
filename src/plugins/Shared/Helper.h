@@ -44,7 +44,7 @@ public:
         for (DWORD i = 0; i < input.size(); i++)
             result += (input[i] == ' ') ? '_' : input[i];
         char* res_ptr = (char*)result.c_str();
-        _strlwr(res_ptr);
+        xr_strlwr(res_ptr);
         return result;
     }
     static IC void ConvertMatrix(const Matrix3& _src, Fmatrix& dest)

@@ -18,17 +18,18 @@ CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
 {
     m_caSoundToPlay = caSoundName;
     string_path l_caFileName;
-    VERIFY(::Sound);
+    VERIFY(GEnv.Sound);
     if (FS.exist(l_caFileName, "$game_sounds$", caSoundName, ".ogg"))
         m_sound.create(caSoundName, st_Effect, sound_type);
     else
-        ai().script_engine().script_log(LuaMessageType::Error, "File not found \"%s\"!", l_caFileName);
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "File not found \"%s\"!", l_caFileName);
 }
 
 CScriptSound::~CScriptSound()
 {
-    THROW3(!m_sound._feedback(), "playing sound is not completed, but is destroying",
-        m_sound._handle() ? m_sound._handle()->file_name() : "unknown");
+    if (m_sound._feedback())
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Playing sound is not completed, but is destroying \"%s\"!", 
+            m_sound._handle() ? m_sound._handle()->file_name() : "unknown");
     m_sound.destroy();
 }
 
@@ -40,7 +41,7 @@ Fvector CScriptSound::GetPosition() const
         return (l_tpSoundParams->position);
     else
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "Sound was not launched, can't get position!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Sound was not launched, can't get position!");
         return (Fvector().set(0, 0, 0));
     }
 }

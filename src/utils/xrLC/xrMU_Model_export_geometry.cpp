@@ -34,8 +34,8 @@ void export_geometry(xrMU_Model& mu_model)
     Fvector frac_low;
     float frac_Ysize;
     BB.getcenter(frac_low);
-    frac_low.y = BB.min.y;
-    frac_Ysize = BB.max.y - BB.min.y;
+    frac_low.y = BB.vMin.y;
+    frac_Ysize = BB.vMax.y - BB.vMin.y;
 
     // Begin building
     for (xrMU_Model::v_subdivs_it it = mu_model.m_subdivs.begin(); it != mu_model.m_subdivs.end(); it++)

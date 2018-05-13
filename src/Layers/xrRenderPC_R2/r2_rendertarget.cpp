@@ -11,6 +11,7 @@
 #include "blender_bloom_build.h"
 #include "blender_luminance.h"
 #include "blender_ssao.h"
+#include "blender_fxaa.h"
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb)
 {
@@ -195,7 +196,7 @@ CRenderTarget::CRenderTarget()
     param_noise_fps = 25.f;
     param_noise_scale = 1.f;
 
-    im_noise_time = 1 / 100;
+    im_noise_time = 1 / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 
@@ -218,6 +219,9 @@ CRenderTarget::CRenderTarget()
     b_ssao = new CBlender_SSAO();
     b_luminance = new CBlender_luminance();
     b_combine = new CBlender_combine();
+
+    //FXAA
+    b_fxaa = new CBlender_FXAA();
 
     //  NORMAL
     {
@@ -254,6 +258,8 @@ CRenderTarget::CRenderTarget()
         // generic(LDR) RTs
         rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8);
         rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8);
+        rt_secondVP.create (r2_RT_secondVP, w, h, D3DFMT_A8R8G8B8); //--#SM+#-- +SecondVP+
+
         //  Igor: for volumetric lights
         // rt_Generic_2.create          (r2_RT_generic2,w,h,D3DFMT_A8R8G8B8     );
         //  temp: for higher quality blends
@@ -348,6 +354,11 @@ CRenderTarget::CRenderTarget()
         s_bloom.create(b_bloom, "r2\\bloom");
         f_bloom_factor = 0.5f;
     }
+
+    //FXAA
+    s_fxaa.create(b_fxaa, "r3\\fxaa");
+    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
+
 
     // HBAO
     if (RImplementation.o.ssao_opt_data)
@@ -660,6 +671,7 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_luminance);
     xr_delete(b_bloom);
     xr_delete(b_ssao);
+    xr_delete(b_fxaa); //FXAA
     xr_delete(b_accum_reflected);
     xr_delete(b_accum_spot);
     xr_delete(b_accum_point);

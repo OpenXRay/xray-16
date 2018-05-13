@@ -12,22 +12,22 @@
 #include "property_string_shared_str.hpp"
 #include "property_string_values_value_base.hpp"
 
-public
-ref class property_string_values_value_shared_str_getter : public property_string_shared_str,
-                                                           public property_string_values_value_base
+public ref class property_string_values_value_shared_str_getter
+    : public property_string_shared_str,
+      public property_string_values_value_base
 {
 private:
     typedef property_string_shared_str inherited;
 
 public:
     typedef property_string_values_value_base::collection_type collection_type;
-    typedef editor::property_holder::string_getter_type string_getter_type;
-    typedef editor::property_holder::string_setter_type string_setter_type;
-    typedef editor::property_holder::string_collection_getter_type string_collection_getter_type;
-    typedef editor::property_holder::string_collection_size_getter_type string_collection_size_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_getter_type string_collection_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_size_getter_type string_collection_size_getter_type;
 
 public:
-    property_string_values_value_shared_str_getter(editor::engine* engine, shared_str& value,
+    property_string_values_value_shared_str_getter(XRay::Editor::engine_base* engine, shared_str& value,
         string_collection_getter_type const& collection_getter,
         string_collection_size_getter_type const& collection_size_getter);
     virtual ~property_string_values_value_shared_str_getter();

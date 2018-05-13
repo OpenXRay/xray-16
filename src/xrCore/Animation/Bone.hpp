@@ -1,11 +1,19 @@
-//----------------------------------------------------
+#pragma once
 #ifndef BoneH
 #define BoneH
 
-#include "xrCore/xrCore.h"
+#include "xrCore/_obb.h"
+#include "xrCore/_sphere.h"
+#include "xrCore/_cylinder.h"
+#include "xrCore/_flags.h"
+#include "xrCore/FixedVector.h"
+#include "xrCore/xrstring.h"
+#include "xrCommon/xr_vector.h"
 
 // refs
 class CBone;
+class IReader;
+class IWriter;
 
 #define BI_NONE (u16(-1))
 
@@ -15,8 +23,8 @@ class CBone;
 
 class XRCORE_API CBoneInstance;
 // callback
-typedef void BoneCallbackFunction(CBoneInstance* P);
-typedef BoneCallbackFunction* BoneCallback;
+using BoneCallbackFunction = void(CBoneInstance* P);
+using BoneCallback = BoneCallbackFunction*;
 // typedef void (* BoneCallback) (CBoneInstance* P);
 
 //*** Bone Instance *******************************************************************************
@@ -97,7 +105,7 @@ struct XRCORE_API vertBoned2W // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
     Fvector B;
     float w;
     float u, v;
-    void get_pos(Fvector& p) { p.set(P); }
+    void get_pos(Fvector& p) const { p.set(P); }
 #ifdef DEBUG
     static const u8 bones_count = 2;
     u16 get_bone_id(u8 bone) const
@@ -116,7 +124,7 @@ struct XRCORE_API vertBoned3W // 70 bytes
     Fvector B;
     float w[2];
     float u, v;
-    void get_pos(Fvector& p) { p.set(P); }
+    void get_pos(Fvector& p) const { p.set(P); }
 #ifdef DEBUG
     static const u8 bones_count = 3;
     u16 get_bone_id(u8 bone) const
@@ -135,7 +143,7 @@ struct XRCORE_API vertBoned4W // 76 bytes
     Fvector B;
     float w[3];
     float u, v;
-    void get_pos(Fvector& p) { p.set(P); }
+    void get_pos(Fvector& p) const { p.set(P); }
 #ifdef DEBUG
     static const u8 bones_count = 4;
     u16 get_bone_id(u8 bone) const
@@ -207,18 +215,7 @@ struct XRCORE_API SBoneShape
         sphere.R = 0.f;
         cylinder.invalidate();
     }
-    bool Valid()
-    {
-        switch (type)
-        {
-        case stBox: return !fis_zero(box.m_halfsize.x) && !fis_zero(box.m_halfsize.y) && !fis_zero(box.m_halfsize.z);
-        case stSphere: return !fis_zero(sphere.R);
-        case stCylinder:
-            return !fis_zero(cylinder.m_height) && !fis_zero(cylinder.m_radius) &&
-                !fis_zero(cylinder.m_direction.square_magnitude());
-        };
-        return true;
-    }
+	bool Valid();
 };
 
 struct XRCORE_API SJointIKData
@@ -252,50 +249,8 @@ struct XRCORE_API SJointIKData
         break_torque = 0.f;
     }
     void clamp_by_limits(Fvector& dest_xyz);
-    void Export(IWriter& F)
-    {
-        F.w_u32(type);
-        for (int k = 0; k < 3; k++)
-        {
-            // Kostya Slipchenko say:
-            // направление вращения в ОДЕ отличается от направления вращение в X-Ray
-            // поэтому меняем знак у лимитов
-            // F.w_float (_min(-limits[k].limit.x,-limits[k].limit.y)); // min (swap special for ODE)
-            // F.w_float (_max(-limits[k].limit.x,-limits[k].limit.y)); // max (swap special for ODE)
-
-            VERIFY(_min(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.y);
-            VERIFY(_max(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.x);
-
-            F.w_float(-limits[k].limit.y); // min (swap special for ODE)
-            F.w_float(-limits[k].limit.x); // max (swap special for ODE)
-
-            F.w_float(limits[k].spring_factor);
-            F.w_float(limits[k].damping_factor);
-        }
-        F.w_float(spring_factor);
-        F.w_float(damping_factor);
-
-        F.w_u32(ik_flags.get());
-        F.w_float(break_force);
-        F.w_float(break_torque);
-
-        F.w_float(friction);
-    }
-    bool Import(IReader& F, u16 vers)
-    {
-        type = (EJointType)F.r_u32();
-        F.r(limits, sizeof(SJointLimit) * 3);
-        spring_factor = F.r_float();
-        damping_factor = F.r_float();
-        ik_flags.flags = F.r_u32();
-        break_force = F.r_float();
-        break_torque = F.r_float();
-        if (vers > 0)
-        {
-            friction = F.r_float();
-        }
-        return true;
-    }
+    void Export(IWriter& F);
+    bool Import(IReader& F, u16 vers);
 };
 #pragma pack(pop)
 
@@ -323,7 +278,7 @@ public:
 // static const Fobb dummy ;//= Fobb().identity();
 // refs
 class CBone;
-DEFINE_VECTOR(CBone*, BoneVec, BoneIt);
+using BoneVec = xr_vector<CBone*>;
 
 class XRCORE_API CBone : public CBoneInstance, public IBoneData
 {
@@ -437,7 +392,6 @@ public:
     void ResetData();
     void CopyData(CBone* bone);
 
-#if defined _EDITOR || defined _MAYA_EXPORT
     void ShapeScale(const Fvector& amount);
     void ShapeRotate(const Fvector& amount);
     void ShapeMove(const Fvector& amount);
@@ -449,11 +403,11 @@ public:
     bool Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix& parent);
 
     void Select(BOOL flag) { flags.set(flSelected, flag); }
-    bool Selected() { return !!flags.is(flSelected); }
+    bool Selected() { return flags.is(flSelected); }
     void ClampByLimits();
 
     bool ExportOGF(IWriter& F);
-#endif
+
 private:
     IBoneData& GetChild(u16 id) { return *children[id]; }
     const IBoneData& GetChild(u16 id) const { return *children[id]; }
@@ -507,10 +461,10 @@ public:
 
     vecBones children; // bones which are slaves to this
 
-    DEFINE_VECTOR(u16, FacesVec, FacesVecIt);
-    DEFINE_VECTOR(FacesVec, ChildFacesVec, ChildFacesVecIt);
+    using FacesVec = xr_vector<u16>;
+    using ChildFacesVec = xr_vector<FacesVec>;
     ChildFacesVec child_faces; // shared
-public:
+
     CBoneData(u16 ID) : SelfID(ID) { VERIFY(SelfID != BI_NONE); }
     virtual ~CBoneData() {}
 #ifdef DEBUG
@@ -539,11 +493,12 @@ private:
     virtual shared_str GetMaterialName() const override { return name; }
     float lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
     float hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
+
 public:
     virtual u32 mem_usage()
     {
         u32 sz = sizeof(*this) + sizeof(vecBones::value_type) * children.size();
-        for (ChildFacesVecIt c_it = child_faces.begin(); c_it != child_faces.end(); c_it++)
+        for (auto c_it = child_faces.begin(); c_it != child_faces.end(); c_it++)
             sz += c_it->size() * sizeof(FacesVec::value_type) + sizeof(*c_it);
         return sz;
     }
@@ -559,11 +514,15 @@ enum EBoneCallbackType
 
 IC void CBoneInstance::construct()
 {
-    ZeroMemory(this, sizeof(*this));
     mTransform.identity();
-
     mRenderTransform.identity();
+
+    Callback = NULL;
+    Callback_Param = NULL;
     Callback_overwrite = FALSE;
+    Callback_type = 0;
+
+    ZeroMemory(&param, sizeof(param));
 }
 
 #endif

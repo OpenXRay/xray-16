@@ -13,23 +13,23 @@ CStateMonsterAttackMeleeAbstract::~CStateMonsterAttackMelee() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterAttackMeleeAbstract::execute()
 {
-    object->set_action(ACT_ATTACK);
-    if (object->control().direction().is_face_target(object->EnemyMan.get_enemy(), PI_DIV_3))
-        object->dir().face_target(object->EnemyMan.get_enemy(), 800);
+    this->object->set_action(ACT_ATTACK);
+    if (this->object->control().direction().is_face_target(this->object->EnemyMan.get_enemy(), PI_DIV_3))
+        this->object->dir().face_target(this->object->EnemyMan.get_enemy(), 800);
     else
-        object->dir().face_target(object->EnemyMan.get_enemy(), 0, deg(15));
+        this->object->dir().face_target(this->object->EnemyMan.get_enemy(), 0, deg(15));
 
-    object->set_state_sound(MonsterSound::eMonsterSoundAggressive);
+    this->object->set_state_sound(MonsterSound::eMonsterSoundAggressive);
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackMeleeAbstract::check_start_conditions()
 {
-    return (object->MeleeChecker.can_start_melee(object->EnemyMan.get_enemy()) && object->EnemyMan.see_enemy_now());
+    return (this->object->MeleeChecker.can_start_melee(this->object->EnemyMan.get_enemy()) && this->object->EnemyMan.see_enemy_now());
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackMeleeAbstract::check_completion()
 {
-    return (object->MeleeChecker.should_stop_melee(object->EnemyMan.get_enemy()));
+    return (this->object->MeleeChecker.should_stop_melee(this->object->EnemyMan.get_enemy()));
 }

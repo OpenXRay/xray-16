@@ -8,7 +8,7 @@
 #include "Motion.hpp"
 #include "Include/xrRender/Kinematics.h"
 
-motions_container* g_pMotionsContainer = 0;
+motions_container* g_pMotionsContainer = nullptr;
 
 u16 CPartition::part_id(const shared_str& name) const
 {
@@ -43,11 +43,11 @@ void CPartition::load(IKinematics* V, LPCSTR model_name)
         xr_sprintf(buff, sizeof(buff), "part_%d", i);
 
         CInifile::Sect S = ini.r_section(buff);
-        CInifile::SectCIt it = S.Data.begin();
-        CInifile::SectCIt it_e = S.Data.end();
+        auto it = S.Data.cbegin();
+        auto it_e = S.Data.cend();
         if (S.Data.size())
         {
-            P[i].bones.clear_not_free();
+            P[i].bones.clear();
         }
         for (; it != it_e; ++it)
         {
@@ -152,11 +152,11 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
                 //. m_mdefs.push_back (D);
 
                 if (dwFlags & esmFX)
-                    m_fx.insert(mk_pair(nm, mot_i));
+                    m_fx.insert(std::make_pair(nm, mot_i));
                 else
-                    m_cycle.insert(mk_pair(nm, mot_i));
+                    m_cycle.insert(std::make_pair(nm, mot_i));
 
-                m_motion_map.insert(mk_pair(nm, mot_i));
+                m_motion_map.insert(std::make_pair(nm, mot_i));
             }
         }
         MP->close();
@@ -247,12 +247,12 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
 
 MotionVec* motions_value::bone_motions(shared_str bone_name)
 {
-    BoneMotionMapIt I = m_motions.find(bone_name);
+    auto I = m_motions.find(bone_name);
     // VERIFY (I != m_motions.end());
     if (I == m_motions.end())
-        return (0);
+        return nullptr;
 
-    return (&(*I).second);
+    return &(*I).second;
 }
 //-----------------------------------
 motions_container::motions_container() {}
@@ -270,11 +270,11 @@ motions_container::~motions_container()
 bool motions_container::has(shared_str key) { return (container.find(key) != container.end()); }
 motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* bones)
 {
-    motions_value* result = 0;
-    SharedMotionsMapIt I = container.find(key);
+    motions_value* result = nullptr;
+    auto I = container.find(key);
     if (I != container.end())
         result = I->second;
-    if (0 == result)
+    if (nullptr == result)
     {
         // loading motions
         VERIFY(data);
@@ -282,7 +282,7 @@ motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* 
         result->m_dwReference = 0;
         BOOL bres = result->load(key.c_str(), data, bones);
         if (bres)
-            container.insert(mk_pair(key, result));
+            container.insert(std::make_pair(key, result));
         else
             xr_delete(result);
     }
@@ -290,8 +290,8 @@ motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* 
 }
 void motions_container::clean(bool force_destroy)
 {
-    SharedMotionsMapIt it = container.begin();
-    SharedMotionsMapIt _E = container.end();
+    auto it = container.begin();
+    auto _E = container.end();
     if (force_destroy)
     {
         for (; it != _E; it++)
@@ -308,8 +308,8 @@ void motions_container::clean(bool force_destroy)
             motions_value* sv = it->second;
             if (0 == sv->m_dwReference)
             {
-                SharedMotionsMapIt i_current = it;
-                SharedMotionsMapIt i_next = ++it;
+                auto i_current = it;
+                auto i_next = ++it;
                 xr_delete(sv);
                 container.erase(i_current);
                 it = i_next;
@@ -323,8 +323,8 @@ void motions_container::clean(bool force_destroy)
 }
 void motions_container::dump()
 {
-    SharedMotionsMapIt it = container.begin();
-    SharedMotionsMapIt _E = container.end();
+    auto it = container.begin();
+    auto _E = container.end();
     Log("--- motion container --- begin:");
     u32 sz = sizeof(*this);
     for (u32 k = 0; it != _E; k++, it++)
@@ -368,21 +368,21 @@ bool CMotionDef::StopAtEnd() { return !!(flags & esmStopAtEnd); }
 bool shared_motions::create(shared_str key, IReader* data, vecBones* bones)
 {
     motions_value* v = g_pMotionsContainer->dock(key, data, bones);
-    if (0 != v)
+    if (nullptr != v)
         v->m_dwReference++;
     destroy();
     p_ = v;
-    return (0 != v);
+    return (nullptr != v);
 }
 
 bool shared_motions::create(shared_motions const& rhs)
 {
     motions_value* v = rhs.p_;
-    if (0 != v)
+    if (nullptr != v)
         v->m_dwReference++;
     destroy();
     p_ = v;
-    return (0 != v);
+    return (nullptr != v);
 }
 
 const motion_marks::interval* motion_marks::pick_mark(const float& t) const
@@ -399,7 +399,7 @@ const motion_marks::interval* motion_marks::pick_mark(const float& t) const
         if (I.first > t)
             break;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool motion_marks::is_mark_between(float const& t0, float const& t1) const

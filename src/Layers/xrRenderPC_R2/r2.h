@@ -4,13 +4,13 @@
 #include "Layers/xrRender/PSLibrary.h"
 #include "r2_types.h"
 #include "r2_rendertarget.h"
-#include "Layers/xrRender/hom.h"
-#include "Layers/xrRender/detailmanager.h"
-#include "Layers/xrRender/modelpool.h"
-#include "Layers/xrRender/wallmarksengine.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/DetailManager.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/WallmarksEngine.h"
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
-#include "light_render_direct.h"
+#include "Layers/xrRender/light_render_direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
@@ -136,7 +136,7 @@ public:
     light_Package LP_normal;
     light_Package LP_pending;
 
-    xr_vector<Fbox3, render_alloc<Fbox3>> main_coarse_structure;
+    xr_vector<Fbox3> main_coarse_structure;
 
     shared_str c_sbase;
     shared_str c_lmaterial;
@@ -313,10 +313,15 @@ public:
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer);
     virtual void OnFrame();
 
+    void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
+    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
+
     // Render mode
     virtual void rmNear();
     virtual void rmFar();
     virtual void rmNormal();
+
+    u32 active_phase() override { return phase; }
 
     // Constructor/destructor/loader
     CRender();

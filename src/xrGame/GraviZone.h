@@ -14,7 +14,6 @@
 
 class CBaseGraviZone : public CCustomZone
 {
-private:
     typedef CCustomZone inherited;
 
 public:

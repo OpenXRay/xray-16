@@ -211,7 +211,8 @@ void CUIActorMenu::Update()
     }
     case mmDeadBodySearch:
     {
-        CheckDistance();
+        // Alundaio: remove distance check when opening inventory boxes
+        //CheckDistance(); 
         break;
     }
     default: R_ASSERT(0); break;
@@ -475,23 +476,24 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     CEatableItem* eatable = smart_cast<CEatableItem*>(item);
     CArtefact* artefact = smart_cast<CArtefact*>(item);
 
-    if (weapon)
+    u16 slot_id = item->BaseSlot();
+    if (weapon && (slot_id == INV_SLOT_2 || slot_id == INV_SLOT_3))
     {
         m_InvSlot2Highlight->Show(true);
         m_InvSlot3Highlight->Show(true);
         return;
     }
-    if (helmet)
+    if (helmet && slot_id == HELMET_SLOT)
     {
         m_HelmetSlotHighlight->Show(true);
         return;
     }
-    if (outfit)
+    if (outfit && slot_id == OUTFIT_SLOT)
     {
         m_OutfitSlotHighlight->Show(true);
         return;
     }
-    if (detector)
+    if (detector && slot_id == DETECTOR_SLOT)
     {
         m_DetectorSlotHighlight->Show(true);
         return;
@@ -565,7 +567,7 @@ void CUIActorMenu::highlight_ammo_for_weapon(PIItem weapon_item, CUIDragDropList
     VERIFY(weapon_item);
     VERIFY(ddlist);
     static xr_vector<shared_str> ammo_types;
-    ammo_types.clear_not_free();
+    ammo_types.clear();
 
     CWeapon* weapon = smart_cast<CWeapon*>(weapon_item);
     if (!weapon)

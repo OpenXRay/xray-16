@@ -5,43 +5,36 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment thunderbolts thunderbolt identifier class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED
-#define EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace thunderbolts
 {
 class manager;
 
-class thunderbolt_id : public editor::property_holder_holder, private Noncopyable
+class thunderbolt_id : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     thunderbolt_id(manager const& manager, shared_str const& thunderbolt);
     virtual ~thunderbolt_id();
-    void fill(editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_id.c_str(); }
+    void fill(XRay::Editor::property_holder_collection* collection);
+    inline pcstr id() const { return m_id.c_str(); }
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();
 
 private:
-    LPCSTR const* xr_stdcall collection();
+    pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
-private:
     property_holder_type* m_property_holder;
     manager const& m_manager;
     shared_str m_id;
@@ -49,7 +42,3 @@ private:
 } // namespace thunderbolts
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED

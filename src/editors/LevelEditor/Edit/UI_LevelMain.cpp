@@ -975,9 +975,9 @@ CCommandVar CommandRefreshSnapObjects(CCommandVar p1, CCommandVar p2)
 /*
 CCommandVar CommandRefreshSoundEnvs(CCommandVar p1, CCommandVar p2)
 {
-    ::Sound->refresh_env_library();
+    GEnv.Sound->refresh_env_library();
     return 						TRUE;
-//		::Sound->_restart();
+//		GEnv.Sound->_restart();
 }
 */
 
@@ -1476,7 +1476,7 @@ void CLevelMain::LoadSettings(CInifile* I)
     string_path fn;
     INI_RTP_NAME(fn);
     m_rt_object_props = CInifile::Create(fn, FALSE);
-    m_rt_object_props->save_at_end(FALSE);
+    m_rt_object_props->save_at_end(false);
 
     inherited::LoadSettings(I);
     SSceneSummary::Load(I);
@@ -1501,7 +1501,7 @@ void CLevelMain::restore_rt_flags(CCustomObject* CO)
         u32 fl = m_rt_object_props->r_u32(LTools->m_LastFileName.c_str(), CO->Name);
         CO->m_RT_Flags.set(
             CCustomObject::flRT_Visible | CCustomObject::flRT_Selected | CCustomObject::flRT_SelectedLast, FALSE);
-        CO->m_RT_Flags.or (fl);
+        CO->m_RT_Flags._or (fl);
     }
 }
 

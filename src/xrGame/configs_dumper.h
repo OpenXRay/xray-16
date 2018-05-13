@@ -2,6 +2,7 @@
 #define CONFIGS_DUMPER_INCLUDED
 
 #include "xrCore/Crypto/xr_dsa_signer.h"
+#include "xrEngine/ISheduled.h"
 #include "mp_config_sections.h"
 
 namespace mp_anticheat

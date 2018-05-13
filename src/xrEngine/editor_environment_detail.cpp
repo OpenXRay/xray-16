@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_detail.hpp"
 #include <shlwapi.h>
 
@@ -16,7 +15,7 @@
 
 using editor::environment::detail::logical_string_predicate;
 
-static HRESULT AnsiToUnicode(LPCSTR pszA, LPVOID buffer, u32 const& buffer_size)
+static HRESULT AnsiToUnicode(pcstr pszA, LPVOID buffer, u32 const& buffer_size)
 {
     VERIFY(pszA);
     VERIFY(buffer);
@@ -31,7 +30,7 @@ static HRESULT AnsiToUnicode(LPCSTR pszA, LPVOID buffer, u32 const& buffer_size)
     return (HRESULT_FROM_WIN32(GetLastError()));
 }
 
-bool logical_string_predicate::operator()(LPCSTR const& first, LPCSTR const& second) const
+bool logical_string_predicate::operator()(pcstr const& first, pcstr const& second) const
 {
     u32 buffer_size0 = (xr_strlen(first) + 1) * 2;
     LPCWSTR buffer0 = (LPCWSTR)_alloca(buffer_size0);
@@ -57,11 +56,10 @@ bool logical_string_predicate::operator()(shared_str const& first, shared_str co
     return (StrCmpLogicalW(buffer0, buffer1) < 0);
 }
 
-shared_str editor::environment::detail::real_path(LPCSTR folder, LPCSTR path)
+shared_str editor::environment::detail::real_path(pcstr folder, pcstr path)
 {
     string_path result;
     FS.update_path(result, folder, path);
     return (result);
 }
 
-#endif // #ifdef INGAME_EDITOR

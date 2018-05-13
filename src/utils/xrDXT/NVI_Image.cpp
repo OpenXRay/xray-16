@@ -151,10 +151,10 @@ void NVI_Image::ABGR8_To_ARGB8()
     {
         DWORD col;
         GetPixel_ARGB8(&col, i);
-        DWORD a = (col >> 24) && 0x000000FF;
-        DWORD b = (col >> 16) && 0x000000FF;
-        DWORD g = (col >> 8) && 0x000000FF;
-        DWORD r = (col >> 0) && 0x000000FF;
+        DWORD a = (col >> 24) & 0x000000FF;
+        DWORD b = (col >> 16) & 0x000000FF;
+        DWORD g = (col >> 8) & 0x000000FF;
+        DWORD r = (col >> 0) & 0x000000FF;
         col = (a << 24) | (r << 16) | (g << 8) | b;
         SetPixel_ARGB8(i, col);
     }

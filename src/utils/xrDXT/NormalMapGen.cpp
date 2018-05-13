@@ -9,7 +9,6 @@ using namespace xray_nvi;
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
 #include "xrCore/Media/Image.hpp"
 using namespace XRay::Media;
-#pragma comment(lib, "xrCore.lib")
 #endif
 
 enum KernelType
@@ -59,11 +58,11 @@ Ivector vpack(Fvector src)
     float e_best = flt_max;
     int r = bx, g = by, b = bz;
     int d = 2;
-    for (int x = _max(bx - d, 0); x <= _min(bx + d, 255); x++)
+    for (int x = std::max(bx - d, 0); x <= std::min(bx + d, 255); x++)
     {
-        for (int y = _max(by - d, 0); y <= _min(by + d, 255); y++)
+        for (int y = std::max(by - d, 0); y <= std::min(by + d, 255); y++)
         {
-            for (int z = _max(bz - d, 0); z <= _min(bz + d, 255); z++)
+            for (int z = std::max(bz - d, 0); z <= std::min(bz + d, 255); z++)
             {
                 _v = vunpack(x, y, z);
                 float m = _v.magnitude();
@@ -100,7 +99,7 @@ void CalculateNormalMap(NVI_Image* pSrc, ConvolutionKernel* pKernels, int num_ke
     conv.Initialize(&pSrc, pKernels, num_kernels, wrap);
     int size_x = (int)pSrc->GetWidth();
     int size_y = (int)pSrc->GetHeight();
-    DWORD* pArray = (DWORD*)pSrc->GetImageDataPointer();
+    auto pArray = (DWORD*)pSrc->GetImageDataPointer();
     assert(pArray != NULL);
     // Now run the kernel over the source image area and write out the values.
     // coordinates of source image (not padded)
@@ -508,7 +507,7 @@ u32 hsample(s32 w, s32 h, s32 p, s32 x, s32 y, u8* src)
     return color_get_R(*((u32*)(src + y * p) + x));
 }
 
-#include "ETextureParams.h"
+#include "Layers/xrRender/ETextureParams.h"
 #include "Image_DXTC.h"
 
 extern int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);

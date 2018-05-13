@@ -1,7 +1,4 @@
-#ifndef GAMESPY_SAKE
-#define GAMESPY_SAKE
-
-#include "xrCore/xrCore.h"
+#pragma once
 #include "xrGameSpy/xrGameSpy.h"
 
 namespace gamespy_sake
@@ -28,5 +25,3 @@ private:
 
     void Init();
 }; // class GameSpy_SAKE
-
-#endif //#ifndef GAMESPY_SAKE

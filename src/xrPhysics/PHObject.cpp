@@ -113,7 +113,7 @@ void CPHObject::Collide()
 
 #endif
             qResultVec& result = ph_world->r_spatial;
-            qResultIt i = result.begin(), e = result.end();
+            auto i = result.begin(), e = result.end();
             for (; i != e; ++i)
             {
                 CPHObject* obj2 = smart_cast<CPHObject*>(*i);
@@ -137,7 +137,7 @@ void CPHObject::CollideDynamics()
 {
     g_SpatialSpacePhysic->q_box(ph_world->r_spatial, 0, STYPE_PHYSIC, spatial.sphere.P, AABB);
     qResultVec& result = ph_world->r_spatial;
-    qResultIt i = result.begin(), e = result.end();
+    auto i = result.begin(), e = result.end();
     for (; i != e; ++i)
     {
         CPHObject* obj2 = smart_cast<CPHObject*>(*i);
@@ -152,14 +152,14 @@ void CPHObject::reinit_single()
 {
     IslandReinit();
     qResultVec& result = ph_world->r_spatial;
-    qResultIt i = result.begin(), e = result.end();
+    auto i = result.begin(), e = result.end();
     for (; i != e; ++i)
     {
         CPHObject* obj = smart_cast<CPHObject*>(*i);
         VERIFY(obj);
         obj->IslandReinit();
     }
-    result.clear_not_free();
+    result.clear();
     dJointGroupEmpty(ContactGroup);
     ContactFeedBacks.empty();
     ContactEffectors.empty();
@@ -192,7 +192,7 @@ bool CPHObject::step_single(dReal step)
 void CPHObject::step(float time) // it is still not a true step for object because it collide the object only not
                                  // subsequent collision is doing
 {
-    ph_world->r_spatial.clear_not_free();
+    ph_world->r_spatial.clear();
     reinit_single();
     Collide();
     IslandStep(time);

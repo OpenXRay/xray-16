@@ -9,6 +9,7 @@
 #include "NET_Queue.h"
 #include "file_transfer.h"
 #include "hudmanager.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/iphworld.h"
 
@@ -31,14 +32,14 @@ bool CLevel::net_start_client1()
         *strchr(name_of_server, '/') = 0;
 
     // Startup client
-    /*
-        string256					temp;
-        xr_sprintf						(temp,"%s %s",
-                                    CStringTable().translate("st_client_connecting_to").c_str(), name_of_server);
 
-        g_pGamePersistent->LoadTitle				(temp);
-    */
-    g_pGamePersistent->LoadTitle();
+    string256 temp;
+    xr_sprintf(temp, "%s %s",
+               CStringTable().translate("st_client_connecting_to").c_str(),
+               name_of_server);
+
+    pApp->SetLoadStageTitle(temp);
+    pApp->LoadStage();
     return true;
 }
 
@@ -127,7 +128,7 @@ bool CLevel::net_start_client4()
     if (connected_to_server)
     {
         // Begin spawn
-        //		g_pGamePersistent->LoadTitle		("st_client_spawning");
+        g_pGamePersistent->SetLoadStageTitle("st_client_spawning");
         g_pGamePersistent->LoadTitle();
 
         // Send physics to single or multithreaded mode
@@ -208,11 +209,12 @@ bool CLevel::net_start_client5()
         // HUD
 
         // Textures
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
         {
+            g_pGamePersistent->SetLoadStageTitle("st_loading_textures");
             g_pGamePersistent->LoadTitle();
-            GlobalEnv.Render->DeferredLoad(FALSE);
-            GlobalEnv.Render->ResourcesDeferredUpload();
+            GEnv.Render->DeferredLoad(FALSE);
+            GEnv.Render->ResourcesDeferredUpload();
             LL_CheckTextures();
         }
         sended_request_connection_data = FALSE;
@@ -234,7 +236,7 @@ bool CLevel::net_start_client6()
             pApp->LoadEnd();
             return true;
         }
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
         {
             g_hud->Load();
             g_hud->OnConnected();
@@ -253,7 +255,7 @@ bool CLevel::net_start_client6()
             }
         }
 
-        //		g_pGamePersistent->LoadTitle		("st_client_synchronising");
+        g_pGamePersistent->SetLoadStageTitle("st_client_synchronising");
         g_pGamePersistent->LoadTitle();
         Device.PreCache(60, true, true);
         net_start_result_total = TRUE;

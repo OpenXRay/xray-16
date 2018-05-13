@@ -16,9 +16,11 @@
 #include "xrCDB/ISpatial.h"
 #include "xrSASH.h"
 #include "xrServerEntities/smart_cast.h"
+#include "xr_input.h"
 
 //---------------------------------------------------------------------
 
+ENGINE_API CApplication* pApp = nullptr;
 extern CRenderDevice Device;
 
 #ifdef MASTER_GOLD
@@ -31,7 +33,7 @@ struct _SoundProcessor : public pureFrame
     virtual void OnFrame()
     {
         // Msg ("------------- sound: %d [%3.2f,%3.2f,%3.2f]",u32(Device.dwFrame),VPUSH(Device.vCameraPosition));
-        ::Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
+        GEnv.Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
     }
 } SoundProcessor;
 
@@ -112,7 +114,7 @@ CApplication::CApplication()
     Level_Scan();
 
     // Font
-    pFontSystem = NULL;
+    pFontSystem = nullptr;
 
     // Register us
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 1000);
@@ -155,6 +157,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 {
     if (E == eQuit)
     {
+        if (pInput != NULL)
+            pInput->ClipCursor(false);
+
         g_SASH.EndBenchmark();
 
         PostQuitMessage(0);
@@ -170,8 +175,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         LPSTR op_server = LPSTR(P1);
         LPSTR op_client = LPSTR(P2);
         Level_Current = u32(-1);
-        R_ASSERT(0 == g_pGameLevel);
-        R_ASSERT(0 != g_pGamePersistent);
+        R_ASSERT(nullptr == g_pGameLevel);
+        R_ASSERT(nullptr != g_pGamePersistent);
         Console->Execute("main_menu off");
         Console->Hide();
         //! this line is commented by Dima
@@ -195,6 +200,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         ls_tip_number[0] = '\0';
         ls_tip[0] = '\0';
 
+        if (pInput != NULL && TRUE == Engine.Event.Peek("KERNEL:quit"))
+            pInput->ClipCursor(false);
+
         if (g_pGameLevel)
         {
             Console->Hide();
@@ -208,7 +216,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
                 Console->Execute("main_menu on");
             }
         }
-        R_ASSERT(0 != g_pGamePersistent);
+        R_ASSERT(nullptr != g_pGamePersistent);
         g_pGamePersistent->Disconnect();
     }
     else if (E == eConsole)
@@ -221,8 +229,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     {
         LPSTR demo_file = LPSTR(P1);
 
-        R_ASSERT(0 == g_pGameLevel);
-        R_ASSERT(0 != g_pGamePersistent);
+        R_ASSERT(nullptr == g_pGameLevel);
+        R_ASSERT(nullptr != g_pGamePersistent);
 
         Console->Execute("main_menu off");
         Console->Hide();
@@ -254,11 +262,12 @@ void CApplication::LoadBegin()
     {
         loaded = false;
 
-#ifndef DEDICATED_SERVER
-        _InitializeFont(pFontSystem, "ui_font_letterica18_russian", 0);
+        if (!GEnv.isDedicatedServer)
+        {
+            _InitializeFont(pFontSystem, "ui_font_letterica18_russian", 0);
+            m_pRender->LoadBegin();
+        }
 
-        m_pRender->LoadBegin();
-#endif
         phase_timer.Start();
         load_stage = 0;
     }
@@ -273,7 +282,6 @@ void CApplication::LoadEnd()
         Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
         Console->Execute("stat_memory");
         loaded = true;
-        // DUMP_PHASE;
     }
 }
 
@@ -282,7 +290,7 @@ void CApplication::destroy_loading_shaders()
     m_pRender->destroy_loading_shaders();
     // hLevelLogo.destroy ();
     // sh_progress.destroy ();
-    //. ::Sound->mute (false);
+    //. GEnv.Sound->mute (false);
 }
 
 void CApplication::LoadDraw()
@@ -295,12 +303,17 @@ void CApplication::LoadDraw()
     if (!Device.Begin())
         return;
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         Console->OnRender();
     else
         load_draw_internal();
 
     Device.End();
+}
+
+void CApplication::SetLoadStageTitle(pcstr _ls_title)
+{
+    xr_strcpy(ls_title, _ls_title);
 }
 
 void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
@@ -319,7 +332,7 @@ void CApplication::LoadStage()
     Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
 
     if (g_pGamePersistent->GameType() == 1 && !xr_strcmp(g_pGamePersistent->m_game_params.m_alife, "alife"))
-        max_load_stage = 17;
+        max_load_stage = 18;
     else
         max_load_stage = 14;
     LoadDraw();
@@ -348,7 +361,7 @@ void CApplication::Level_Append(LPCSTR folder)
     {
         sLevelInfo LI;
         LI.folder = xr_strdup(folder);
-        LI.name = 0;
+        LI.name = nullptr;
         Levels.push_back(LI);
     }
 }
@@ -381,7 +394,7 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 
     string16 buff;
     xr_strcat(dest, sizeof(dest), "_");
-    xr_strcat(dest, sizeof(dest), itoa(num + 1, buff, 10));
+    xr_strcat(dest, sizeof(dest), xr_itoa(num + 1, buff, 10));
 }
 
 void CApplication::Level_Set(u32 L)
@@ -423,18 +436,18 @@ void CApplication::Level_Set(u32 L)
 int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 {
     int result = -1;
-    CLocatorAPI::archives_it it = FS.m_archives.begin();
-    CLocatorAPI::archives_it it_e = FS.m_archives.end();
+    auto it = FS.m_archives.begin();
+    auto it_e = FS.m_archives.end();
     bool arch_res = false;
 
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
-        if (A.hSrcFile == NULL)
+        if (A.hSrcFile == nullptr)
         {
             LPCSTR ln = A.header->r_string("header", "level_name");
             LPCSTR lv = A.header->r_string("header", "level_ver");
-            if (0 == stricmp(ln, name) && 0 == stricmp(lv, ver))
+            if (0 == xr_stricmp(ln, name) && 0 == xr_stricmp(lv, ver))
             {
                 FS.LoadArchive(A);
                 arch_res = true;
@@ -449,7 +462,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
     strconcat(sizeof(buffer), buffer, name, "\\");
     for (u32 I = 0; I < Levels.size(); ++I)
     {
-        if (0 == stricmp(buffer, Levels[I].folder))
+        if (0 == xr_stricmp(buffer, Levels[I].folder))
         {
             result = int(I);
             break;
@@ -466,8 +479,8 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 
 CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 {
-    CLocatorAPI::archives_it it = FS.m_archives.begin();
-    CLocatorAPI::archives_it it_e = FS.m_archives.end();
+    auto it = FS.m_archives.begin();
+    auto it_e = FS.m_archives.end();
 
     for (; it != it_e; ++it)
     {
@@ -475,12 +488,12 @@ CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 
         LPCSTR ln = A.header->r_string("header", "level_name");
         LPCSTR lv = A.header->r_string("header", "level_ver");
-        if (0 == stricmp(ln, name) && 0 == stricmp(lv, ver))
+        if (0 == xr_stricmp(ln, name) && 0 == xr_stricmp(lv, ver))
         {
             return A.header;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void CApplication::LoadAllArchives()

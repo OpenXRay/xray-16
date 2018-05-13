@@ -22,6 +22,7 @@
 #include "restriction_space.h"
 #include "xrEngine/profiler.h"
 #include "mt_config.h"
+#include "xrNetServer/NET_Messages.h"
 
 using namespace ALife;
 
@@ -136,6 +137,13 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
     if (m_changing_level)
         return (false);
 
+#ifdef ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS
+    luabind::functor<void> funct;
+    GEnv.ScriptEngine->functor("_G.CALifeUpdateManager__on_before_change_level", funct);
+    if (funct)
+        funct(&net_packet);
+#endif
+
     //	prepare_objects_for_save		();
     // we couldn't use prepare_objects_for_save since we need
     // get updates from client
@@ -214,7 +222,7 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
 #include "xrEngine/IGame_Persistent.h"
 void CALifeUpdateManager::new_game(LPCSTR save_name)
 {
-    //	g_pGamePersistent->LoadTitle		("st_creating_new_game");
+    g_pGamePersistent->SetLoadStageTitle("st_creating_new_game");
     g_pGamePersistent->LoadTitle();
     Msg("* Creating new game...");
 
@@ -244,7 +252,7 @@ void CALifeUpdateManager::new_game(LPCSTR save_name)
 
 void CALifeUpdateManager::load(LPCSTR game_name, bool no_assert, bool new_only)
 {
-    //	g_pGamePersistent->LoadTitle		("st_loading_alife_simulator");
+    g_pGamePersistent->SetLoadStageTitle("st_loading_alife_simulator");
     g_pGamePersistent->LoadTitle();
 
 #ifdef DEBUG
@@ -267,7 +275,7 @@ void CALifeUpdateManager::load(LPCSTR game_name, bool no_assert, bool new_only)
     Msg("* Loading alife simulator is successfully completed (%7.3f Mb)",
         float(Memory.mem_usage() - memory_usage) / 1048576.0);
 #endif
-    //	g_pGamePersistent->LoadTitle		("st_server_connecting");
+    g_pGamePersistent->SetLoadStageTitle("st_server_connecting");
     g_pGamePersistent->LoadTitle(true, g_pGameLevel->name());
 }
 

@@ -44,7 +44,7 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
         RCache.set_ColorWriteEnable();
 }
 
-void CRenderTarget::phase_smap_direct_tsh(light* L, u32 sub_phase)
+void CRenderTarget::phase_smap_direct_tsh(light* /*L*/, u32 /*sub_phase*/)
 {
     VERIFY(RImplementation.o.Tshadows);
     u32 _clr = 0xffffffff; // color_rgba(127,127,12,12);

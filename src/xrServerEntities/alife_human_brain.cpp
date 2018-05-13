@@ -73,7 +73,7 @@ CALifeHumanBrain::~CALifeHumanBrain()
 
 void CALifeHumanBrain::on_state_write(NET_Packet& packet)
 {
-    if (packet.inistream == NULL)
+    if (packet.inistream == nullptr)
     {
         save_data(m_cpEquipmentPreferences, packet);
         save_data(m_cpMainWeaponPreferences, packet);
@@ -112,7 +112,7 @@ void CALifeHumanBrain::on_state_read(NET_Packet& packet)
         load_data(temp, packet);
     }
 
-    if (packet.inistream == NULL)
+    if (packet.inistream == nullptr)
     {
         load_data(m_cpEquipmentPreferences, packet);
         load_data(m_cpMainWeaponPreferences, packet);

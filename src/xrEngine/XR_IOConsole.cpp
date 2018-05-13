@@ -111,13 +111,13 @@ void CConsole::Initialize()
     m_last_cmd = NULL;
 
     m_cmd_history.reserve(m_cmd_history_max + 2);
-    m_cmd_history.clear_not_free();
+    m_cmd_history.clear();
     reset_cmd_history_idx();
 
     m_tips.reserve(MAX_TIPS_COUNT + 1);
-    m_tips.clear_not_free();
+    m_tips.clear();
     m_temp_tips.reserve(MAX_TIPS_COUNT + 1);
-    m_temp_tips.clear_not_free();
+    m_temp_tips.clear();
 
     m_tips_mode = 0;
     m_prev_length_str = 0;
@@ -239,7 +239,7 @@ void CConsole::OnRender()
     {
         bGame = true;
     }
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
     {
         bGame = false;
     }
@@ -329,7 +329,7 @@ void CConsole::OnRender()
     }
 
     // ---------------------
-    u32 log_line = LogFile->size() - 1;
+    u32 log_line = LogFile.size() - 1;
     ypos -= LDIST;
     for (int i = log_line - scroll_delta; i >= 0; --i)
     {
@@ -338,7 +338,7 @@ void CConsole::OnRender()
         {
             break;
         }
-        LPCSTR ls = ((*LogFile)[i]).c_str();
+        LPCSTR ls = LogFile[i].c_str();
 
         if (!ls)
         {
@@ -352,7 +352,7 @@ void CConsole::OnRender()
     }
 
     string16 q;
-    itoa(log_line, q, 10);
+    xr_itoa(log_line, q, 10);
     u32 qn = xr_strlen(q);
     pFont->SetColor(total_font_color);
     pFont->OutI(0.95f - 0.03f * qn, fMaxY - 2.0f * LDIST, "[%d]", log_line);
@@ -368,28 +368,22 @@ void CConsole::DrawBackgrounds(bool bGame)
     Frect r;
     r.set(0.0f, 0.0f, float(Device.dwWidth), ky* float(Device.dwHeight));
 
-    GlobalEnv.UIRender->SetShader(**m_hShader_back);
+    GEnv.UIRender->SetShader(**m_hShader_back);
     // 6 = back, 12 = tips, (VIEW_TIPS_COUNT+1)*6 = highlight_words, 12 = scroll
-    GlobalEnv.UIRender->StartPrimitive(6 + 12 + (VIEW_TIPS_COUNT + 1) * 6 + 12, IUIRender::ptTriList, IUIRender::pttTL);
+    GEnv.UIRender->StartPrimitive(6 + 12 + (VIEW_TIPS_COUNT + 1) * 6 + 12, IUIRender::ptTriList, IUIRender::pttTL);
 
     DrawRect(r, back_color);
 
     if (m_tips.size() == 0 || m_disable_tips)
     {
-        GlobalEnv.UIRender->FlushPrimitive();
+        GEnv.UIRender->FlushPrimitive();
         return;
     }
 
-    LPCSTR max_str = "xxxxx";
-    vecTipsEx::iterator itb = m_tips.begin();
-    vecTipsEx::iterator ite = m_tips.end();
-    for (; itb != ite; ++itb)
-    {
-        if (pFont->SizeOf_((*itb).text.c_str()) > pFont->SizeOf_(max_str))
-        {
-            max_str = (*itb).text.c_str();
-        }
-    }
+    pcstr max_str = "xxxxx";
+    for (auto& it : m_tips)
+        if (pFont->SizeOf_(it.text.c_str()) > pFont->SizeOf_(max_str))
+            max_str = it.text.c_str();
 
     float w1 = pFont->SizeOf_("_");
     float ioc_w = pFont->SizeOf_(ioc_prompt) - w1;
@@ -399,7 +393,7 @@ void CConsole::DrawBackgrounds(bool bGame)
     float list_w = pFont->SizeOf_(max_str) + 2.0f * w1;
 
     float font_h = pFont->CurrentHeight_();
-    float tips_h = _min(m_tips.size(), (u32)VIEW_TIPS_COUNT) * font_h;
+    float tips_h = std::min(m_tips.size(), (size_t)VIEW_TIPS_COUNT) * font_h;
     tips_h += (m_tips.size() > 0) ? 5.0f : 0.0f;
 
     Frect pr, sr;
@@ -435,13 +429,13 @@ void CConsole::DrawBackgrounds(bool bGame)
 
     if (m_select_tip < (int)m_tips.size())
     {
-        Frect r;
+        Frect r2;
         xr_string tmp;
-        vecTipsEx::iterator itb = m_tips.begin() + m_start_tip;
-        vecTipsEx::iterator ite = m_tips.end();
-        for (u32 i = 0; itb != ite; ++itb, ++i) // tips
+        vecTipsEx::iterator itb2 = m_tips.begin() + m_start_tip;
+        vecTipsEx::iterator ite2 = m_tips.end();
+        for (u32 i = 0; itb2 != ite2; ++itb2, ++i) // tips
         {
-            TipString const& ts = (*itb);
+            TipString const& ts = (*itb2);
             if ((ts.HL_start < 0) || (ts.HL_finish < 0) || (ts.HL_start > ts.HL_finish))
             {
                 continue;
@@ -452,20 +446,20 @@ void CConsole::DrawBackgrounds(bool bGame)
                 continue;
             }
 
-            r.null();
+			r2.set_zero();
             tmp.assign(ts.text.c_str(), ts.HL_start);
-            r.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-            r.y1 = pr.y1 + i * font_h;
+			r2.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
+			r2.y1 = pr.y1 + i * font_h;
 
             tmp.assign(ts.text.c_str(), ts.HL_finish);
-            r.x2 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-            r.y2 = r.y1 + font_h;
+			r2.x2 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
+			r2.y2 = r2.y1 + font_h;
 
-            DrawRect(r, tips_word_color);
+            DrawRect(r2, tips_word_color);
 
             if (i >= VIEW_TIPS_COUNT - 1)
             {
-                break; // for itb
+                break; // for itb2
             }
         } // for itb
     } // if
@@ -502,18 +496,18 @@ void CConsole::DrawBackgrounds(bool bGame)
         DrawRect(rs, tips_scroll_pos_color);
     }
 
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 }
 
 void CConsole::DrawRect(Frect const& r, u32 color)
 {
-    GlobalEnv.UIRender->PushPoint(r.x1, r.y1, 0.0f, color, 0.0f, 0.0f);
-    GlobalEnv.UIRender->PushPoint(r.x2, r.y1, 0.0f, color, 1.0f, 0.0f);
-    GlobalEnv.UIRender->PushPoint(r.x2, r.y2, 0.0f, color, 1.0f, 1.0f);
+    GEnv.UIRender->PushPoint(r.x1, r.y1, 0.0f, color, 0.0f, 0.0f);
+    GEnv.UIRender->PushPoint(r.x2, r.y1, 0.0f, color, 1.0f, 0.0f);
+    GEnv.UIRender->PushPoint(r.x2, r.y2, 0.0f, color, 1.0f, 1.0f);
 
-    GlobalEnv.UIRender->PushPoint(r.x1, r.y1, 0.0f, color, 0.0f, 0.0f);
-    GlobalEnv.UIRender->PushPoint(r.x2, r.y2, 0.0f, color, 1.0f, 1.0f);
-    GlobalEnv.UIRender->PushPoint(r.x1, r.y2, 0.0f, color, 0.0f, 1.0f);
+    GEnv.UIRender->PushPoint(r.x1, r.y1, 0.0f, color, 0.0f, 0.0f);
+    GEnv.UIRender->PushPoint(r.x2, r.y2, 0.0f, color, 1.0f, 1.0f);
+    GEnv.UIRender->PushPoint(r.x1, r.y2, 0.0f, color, 0.0f, 1.0f);
 }
 
 void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
@@ -559,7 +553,7 @@ void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
         {
             if (cc->bLowerCaseArgs)
             {
-                strlwr(last);
+                xr_strlwr(last);
             }
             if (last[0] == 0)
             {
@@ -624,14 +618,9 @@ extern CInput* pInput;
 
 void CConsole::Hide()
 {
-    if (!bVisible)
-    {
+    if (!bVisible || g_pGamePersistent && GEnv.isDedicatedServer)
         return;
-    }
-    if (g_pGamePersistent && g_dedicated_server)
-    {
-        return;
-    }
+
     // if ( g_pGameLevel ||
     // ( g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive() ))
 
@@ -765,7 +754,7 @@ bool CConsole::add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v)
         if (name_sz >= in_sz)
         {
             name2.assign(name, in_sz);
-            if (!stricmp(name2.c_str(), in_str))
+            if (!xr_stricmp(name2.c_str(), in_str))
             {
                 shared_str temp;
                 temp._set(name);
@@ -815,8 +804,8 @@ bool CConsole::add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v)
 
 void CConsole::update_tips()
 {
-    m_temp_tips.clear_not_free();
-    m_tips.clear_not_free();
+    m_temp_tips.clear();
+    m_tips.clear();
 
     m_cur_cmd = NULL;
     if (!bVisible)
@@ -904,7 +893,7 @@ void CConsole::update_tips()
 
 void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v)
 {
-    out_v.clear_not_free();
+    out_v.clear();
     u32 in_count = in_v.size();
     if (in_count == 0 || !filter_str)
     {
@@ -913,18 +902,17 @@ void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& ou
 
     bool all = (xr_strlen(filter_str) == 0);
 
-    vecTips::iterator itb = in_v.begin();
-    vecTips::iterator ite = in_v.end();
-    for (; itb != ite; ++itb)
+    //vecTips::iterator itb = in_v.begin();
+    //vecTips::iterator ite = in_v.end();
+    //for (; itb != ite; ++itb)
+    for (auto& it : in_v)
     {
-        shared_str const& str = (*itb);
+        shared_str const& str = it;
         if (all)
-        {
             out_v.push_back(TipString(str));
-        }
         else
         {
-            LPCSTR fd_str = strstr(str.c_str(), filter_str);
+            pcstr fd_str = strstr(str.c_str(), filter_str);
             if (fd_str)
             {
                 int fd_sz = str.size() - xr_strlen(fd_str);

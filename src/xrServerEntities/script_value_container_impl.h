@@ -17,7 +17,7 @@ IC CScriptValueContainer::~CScriptValueContainer() { clear(); }
 IC void CScriptValueContainer::add(CScriptValue* new_value)
 {
 #ifdef XRSE_FACTORY_EXPORTS
-    CScriptValue* value = 0;
+    CScriptValue* value = nullptr;
     xr_vector<CScriptValue*>::const_iterator I = m_values.begin();
     xr_vector<CScriptValue*>::const_iterator E = m_values.end();
     for (; I != E; ++I)

@@ -1,7 +1,7 @@
-
 #pragma once
-
 #include "CameraDefs.h"
+#include "xrCore/xrCore_benchmark_macros.h"
+#include "device.h"
 
 class ENGINE_API CEffectorCam : public SBaseEffector
 {

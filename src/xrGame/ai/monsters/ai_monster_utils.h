@@ -1,8 +1,16 @@
 #pragma once
+#include "xrCore/_vector3d.h"
+#include "xrCommon/math_funcs.h"
+#include "xrCore/xrDebug_macros.h"
+#include "xrCore/xr_ini.h"
+#include "xrCore/xr_trims.h"
+#include "xrEngine/device.h"
 
 // проверить, находится ли объект entity на ноде
 // возвращает позицию объекта, если он находится на ноде, или центр его ноды
 class CEntity;
+class IGameObject;
+
 extern Fvector get_valid_position(const CEntity* entity, const Fvector& actual_position);
 
 // возвращает true, если объект entity находится на ноде

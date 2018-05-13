@@ -2,19 +2,13 @@
 //
 
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrCDB.h"
-
-#ifdef USE_ARENA_ALLOCATOR
-static const u32 s_arena_size = (128 + 16) * 1024 * 1024;
-static char s_fake_array[s_arena_size];
-doug_lea_allocator g_collision_allocator(s_fake_array, s_arena_size, "collision");
-#endif // #ifdef USE_ARENA_ALLOCATOR
+#include "xrCore/Threading/Lock.hpp"
 
 namespace Opcode
 {
-#include "OPC_TreeBuilders.h"
+#include "OPCODE/OPC_TreeBuilders.h"
 } // namespace Opcode
 
 using namespace CDB;
@@ -33,9 +27,11 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 }
 
 // Model building
-MODEL::MODEL()
+MODEL::MODEL() :
 #ifdef CONFIG_PROFILE_LOCKS
-    : cs(MUTEX_PROFILE_ID(MODEL))
+    pcs(new Lock(MUTEX_PROFILE_ID(MODEL)))
+#else
+    pcs(new Lock)
 #endif // CONFIG_PROFILE_LOCKS
 {
     tree = 0;
@@ -49,11 +45,20 @@ MODEL::~MODEL()
 {
     syncronize(); // maybe model still in building
     status = S_INIT;
-    CDELETE(tree);
-    CFREE(tris);
+    xr_delete(tree);
+    xr_free(tris);
     tris_count = 0;
-    CFREE(verts);
+    xr_free(verts);
     verts_count = 0;
+    delete pcs;
+}
+
+void MODEL::syncronize_impl() const
+{
+    Log("! WARNING: syncronized CDB::query");
+    Lock* C = pcs;
+	C->Enter();
+	C->Leave();
 }
 
 struct BTHREAD_params
@@ -72,10 +77,10 @@ void MODEL::build_thread(void* params)
     _initialize_cpu_thread();
     FPU::m64r();
     BTHREAD_params P = *((BTHREAD_params*)params);
-    P.M->cs.Enter();
+    P.M->pcs->Enter();
     P.M->build_internal(P.V, P.Vcnt, P.T, P.Tcnt, P.BC, P.BCP);
     P.M->status = S_READY;
-    P.M->cs.Leave();
+    P.M->pcs->Leave();
     // Msg						("* xrCDB: cform build completed, memory usage: %d K",P.M->memory()/1024);
 }
 
@@ -107,12 +112,12 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
 {
     // verts
     verts_count = Vcnt;
-    verts = CALLOC(Fvector, verts_count);
+    verts = xr_alloc<Fvector>(verts_count);
     CopyMemory(verts, V, verts_count * sizeof(Fvector));
 
     // tris
     tris_count = Tcnt;
-    tris = CALLOC(TRI, tris_count);
+    tris = xr_alloc<TRI>(tris_count);
     CopyMemory(tris, T, tris_count * sizeof(TRI));
 
     // callback
@@ -123,11 +128,11 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     status = S_BUILD;
 
     // Allocate temporary "OPCODE" tris + convert tris to 'pointer' form
-    u32* temp_tris = CALLOC(u32, tris_count * 3);
+    u32* temp_tris = xr_alloc<u32>(tris_count * 3);
     if (0 == temp_tris)
     {
-        CFREE(verts);
-        CFREE(tris);
+        xr_free(verts);
+        xr_free(tris);
         return;
     }
     u32* temp_ptr = temp_tris;
@@ -147,19 +152,18 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
     OPCC.NoLeaf = true;
     OPCC.Quantized = false;
-    // if (Memory.debug_mode) OPCC.KeepOriginal = true;
 
-    tree = CNEW(OPCODE_Model)();
+    tree = new OPCODE_Model();
     if (!tree->Build(OPCC))
     {
-        CFREE(verts);
-        CFREE(tris);
-        CFREE(temp_tris);
+        xr_free(verts);
+        xr_free(tris);
+        xr_free(temp_tris);
         return;
     };
 
     // Free temporary tris
-    CFREE(temp_tris);
+    xr_free(temp_tris);
     return;
 }
 
@@ -191,4 +195,4 @@ RESULT& COLLIDER::r_add()
     return rd.back();
 }
 
-void COLLIDER::r_free() { rd.clear_and_free(); }
+void COLLIDER::r_free() { rd.clear(); }

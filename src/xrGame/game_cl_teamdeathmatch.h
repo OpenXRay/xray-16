@@ -40,7 +40,7 @@ public:
     virtual void OnGameMenuRespond_ChangeTeam(NET_Packet& P);
 
     virtual void OnTeamSelect(int Result);
-    virtual char* getTeamSection(int Team);
+    pcstr getTeamSection(int Team) override;
     virtual void OnTeamChanged();
     virtual void PlayRankChangesSndMessage();
     virtual void OnTeamMenu_Cancel();

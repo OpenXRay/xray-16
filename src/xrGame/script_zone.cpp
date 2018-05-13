@@ -81,7 +81,7 @@ void CScriptZone::OnRender()
 {
     if (!bDebug)
         return;
-    GlobalEnv.DRender->OnFrameEnd();
+    GEnv.DRender->OnFrameEnd();
     // RCache.OnFrameEnd();
     Fvector l_half;
     l_half.set(.5f, .5f, .5f);

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common/Platform.hpp"
-
 #define QRCDKEY_INTEGRATION
 #define SB_ICMP_SUPPORT
 

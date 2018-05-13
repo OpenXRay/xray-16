@@ -16,8 +16,7 @@ void CMincer::OnStateSwitch(EZoneState new_state)
 {
     if (m_eZoneState != eZoneStateBlowout && new_state == eZoneStateBlowout)
     {
-        OBJECT_INFO_VEC_IT it;
-        for (it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+        for (auto it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
         {
             CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>((*it).object);
             if (GO)

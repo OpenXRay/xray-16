@@ -105,7 +105,7 @@ void description::load_loopholes(shared_str const& table_id)
     m_table_id = table_id;
 
     luabind::object loopholes;
-    bool result = ai().script_engine().function_object(temp, loopholes, LUA_TTABLE);
+    bool result = GEnv.ScriptEngine->function_object(temp, loopholes, LUA_TTABLE);
     VERIFY2(result, make_string("bad or missing loopholes table in smart_cover [%s]", table_id.c_str()));
     for (luabind::iterator I(loopholes), E; I != E; ++I)
     {
@@ -153,7 +153,7 @@ void description::load_transitions(shared_str const& table_id)
     xr_strcat(temp, ".transitions");
 
     luabind::object transitions;
-    bool result = ai().script_engine().function_object(temp, transitions, LUA_TTABLE);
+    bool result = GEnv.ScriptEngine->function_object(temp, transitions, LUA_TTABLE);
     VERIFY(result);
     for (luabind::iterator I(transitions), E; I != E; ++I)
     {
@@ -204,13 +204,13 @@ IC void delete_data(const CGraphAbstract<_data_type, _edge_weight_type, _vertex_
 
     Vertices& verts = graph.vertices();
 
-    for (Vertices::iterator vi = verts.begin(); vi != verts.end(); ++vi)
+    for (auto vi = verts.begin(); vi != verts.end(); ++vi)
     {
         Graph::CVertex* vert = (*vi).second;
         delete_data(vert->data());
 
         Edges& edges = const_cast<Edges&>(vert->edges());
-        for (Edges::iterator ei = edges.begin(); ei != edges.end(); ++ei)
+        for (auto ei = edges.begin(); ei != edges.end(); ++ei)
         {
             Graph::CEdge& edge = (*ei);
             delete_data(edge.data());

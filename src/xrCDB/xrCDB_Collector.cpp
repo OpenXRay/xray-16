@@ -1,8 +1,9 @@
 #include "stdafx.h"
 //.#include "xrCore/xrCore.h"
-#pragma hdrstop
+#pragma hdrstop // ???
 
 #include "xrCDB.h"
+#include "xrCore/_fbox.h"
 
 namespace CDB
 {
@@ -14,6 +15,7 @@ u32 Collector::VPack(const Fvector& V, float eps)
     for (; I != E; I++)
         if (I->similar(V, eps))
             return u32(I - verts.begin());
+
     verts.push_back(V);
     return verts.size() - 1;
 }
@@ -156,23 +158,23 @@ void Collector::calc_adjacency(xr_vector<u32>& dest)
     dest.assign(edge_count, u32(-1));
 
     {
-        edge *I = edges, *J;
-        edge* E = edges + edge_count;
-        for (; I != E; ++I)
+        edge* I2 = edges, * J;
+        edge* E2 = edges + edge_count;
+        for (; I2 != E2; ++I2)
         {
-            if (I + 1 == E)
+            if (I2 + 1 == E2)
                 continue;
 
-            J = I + 1;
+            J = I2 + 1;
 
-            if ((*I).vertex_id0 != (*J).vertex_id0)
+            if ((*I2).vertex_id0 != (*J).vertex_id0)
                 continue;
 
-            if ((*I).vertex_id1 != (*J).vertex_id1)
+            if ((*I2).vertex_id1 != (*J).vertex_id1)
                 continue;
 
-            dest[(*I).face_id * 3 + (*I).edge_id] = (*J).face_id;
-            dest[(*J).face_id * 3 + (*J).edge_id] = (*I).face_id;
+            dest[(*I2).face_id * 3 + (*I2).edge_id] = (*J).face_id;
+            dest[(*J).face_id * 3 + (*J).edge_id] = (*I2).face_id;
         }
     }
 #if 0
@@ -302,8 +304,8 @@ void Collector::remove_duplicate_T()
 CollectorPacked::CollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces)
 {
     // Params
-    VMscale.set(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z);
-    VMmin.set(bb.min);
+    VMscale.set(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMax.z - bb.vMin.z);
+    VMmin.set(bb.vMin);
     VMeps.set(VMscale.x / clpMX / 2, VMscale.y / clpMY / 2, VMscale.z / clpMZ / 2);
     VMeps.x = (VMeps.x < EPS_L) ? VMeps.x : EPS_L;
     VMeps.y = (VMeps.y < EPS_L) ? VMeps.y : EPS_L;
@@ -363,8 +365,7 @@ u32 CollectorPacked::VPack(const Fvector& V)
     clamp(iz, (u32)0, clpMZ);
 
     {
-        DWORDList* vl;
-        vl = &(VM[ix][iy][iz]);
+        DWORDList* vl = &(VM[ix][iy][iz]);
         for (DWORDIt it = vl->begin(); it != vl->end(); it++)
             if (verts[*it].similar(V))
             {
@@ -409,12 +410,12 @@ u32 CollectorPacked::VPack(const Fvector& V)
 
 void CollectorPacked::clear()
 {
-    verts.clear_and_free();
-    faces.clear_and_free();
-    flags.clear_and_free();
+    verts.clear();
+    faces.clear();
+    flags.clear();
     for (u32 _x = 0; _x <= clpMX; _x++)
         for (u32 _y = 0; _y <= clpMY; _y++)
             for (u32 _z = 0; _z <= clpMZ; _z++)
-                VM[_x][_y][_z].clear_and_free();
+                VM[_x][_y][_z].clear();
 }
 };

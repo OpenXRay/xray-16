@@ -83,6 +83,31 @@ SCRIPT_EXPORT(CScriptGameObject, (), {
                 value("take_item_from_box", int(GameObject::eInvBoxItemTake)),
                 value("weapon_no_ammo", int(GameObject::eWeaponNoAmmoAvailable)),
 
+                //AVO: custom callbacks
+                // Input
+                value("key_press", int(GameObject::eKeyPress)),
+                value("key_release", int(GameObject::eKeyRelease)),
+                value("key_hold", int(GameObject::eKeyHold)),
+                value("mouse_move", int(GameObject::eMouseMove)),
+                value("mouse_wheel", int(GameObject::eMouseWheel)),
+                // Inventory
+                value("item_to_belt", int(GameObject::eItemToBelt)),
+                value("item_to_slot", int(GameObject::eItemToSlot)),
+                value("item_to_ruck", int(GameObject::eItemToRuck)),
+                // Actor
+                value("actor_before_death", int(GameObject::eActorBeforeDeath)),
+                //-AVO
+
+                // vehicle
+                value("on_attach_vehicle", int(GameObject::eAttachVehicle)),
+                value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
+                value("on_use_vehicle", int(GameObject::eUseVehicle)),
+
+                // weapon 
+                value("weapon_jammed", int(GameObject::eOnWeaponJammed)),
+                value("weapon_zoom_in", int(GameObject::eOnWeaponZoomIn)),
+                value("weapon_zoom_out", int(GameObject::eOnWeaponZoomOut)),
+
                 value("map_location_added", int(GameObject::eMapLocationAdded))],
 
         def("buy_condition", (void (*)(CScriptIniFile*, LPCSTR))(&::buy_condition)),

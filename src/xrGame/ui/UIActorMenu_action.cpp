@@ -143,8 +143,8 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 
     OnItemDropped(CurrentIItem(), new_owner, old_owner);
 
-    UpdateItemsPlace();
     UpdateConditionProgressBars();
+    UpdateItemsPlace();
 
     return true;
 }
@@ -157,6 +157,7 @@ bool CUIActorMenu::OnItemStartDrag(CUICellItem* itm)
 
 bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 {
+    SetCurrentItem(itm);
     InfoCurItem(NULL);
     CUIDragDropListEx* old_owner = itm->OwnerList();
     EDDListType t_old = GetListType(old_owner);
@@ -191,14 +192,15 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
         {
             break;
         }
-        PIItem iitem_to_place = (PIItem)itm->m_pData;
-        if (!ToSlot(itm, false, iitem_to_place->BaseSlot()))
+        PIItem iitem_to_place = static_cast<PIItem>(itm->m_pData);
+        if (!m_pActorInvOwner->inventory().SlotIsPersistent(iitem_to_place->BaseSlot())
+            && m_pActorInvOwner->inventory().ItemFromSlot(iitem_to_place->BaseSlot()) == iitem_to_place)
         {
-            if (!ToBelt(itm, false))
-            {
-                ToSlot(itm, true, iitem_to_place->BaseSlot());
-            }
+            ToBag(itm, false);
         }
+        else if (!ToSlot(itm, false, iitem_to_place->BaseSlot()))
+            if (!ToBelt(itm, false))
+                ToSlot(itm, true, iitem_to_place->BaseSlot());
         break;
     }
     case iActorBelt:
@@ -232,8 +234,8 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 
     }; // switch
 
-    UpdateItemsPlace();
     UpdateConditionProgressBars();
+    UpdateItemsPlace();
 
     return true;
 }

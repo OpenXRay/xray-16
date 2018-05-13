@@ -1,7 +1,4 @@
-#ifndef GAMESPY_ATLAS_INCLUDED
-#define GAMESPY_ATLAS_INCLUDED
-
-#include "xrCore/xrCore.h"
+#pragma once
 #include "xrGameSpy/xrGameSpy.h"
 
 class XRGAMESPY_API CGameSpy_ATLAS
@@ -46,5 +43,3 @@ private:
 
     void Init();
 }; // class CGameSpy_ATLAS
-
-#endif //#ifndef GAMESPY_ATLAS_INCLUDED

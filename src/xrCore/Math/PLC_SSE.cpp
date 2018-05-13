@@ -9,10 +9,10 @@ namespace XRay
 {
 namespace Math
 {
-static const float S_distance = 48;
-static const float S_distance2 = S_distance * S_distance;
-static const float S_fade = 4.5;
-static const float S_fade2 = S_fade * S_fade;
+static constexpr float S_distance = 48;
+static constexpr float S_distance2 = S_distance * S_distance;
+static constexpr float S_fade = 4.5;
+static constexpr float S_fade2 = S_fade * S_fade;
 
 static ICF float PLC_energy_SSE(const Fvector& p, const Fvector& n, const light* L, float e)
 {
@@ -67,6 +67,5 @@ void PLCCalc_SSE(int& c0, int& c1, int& c2, const Fvector& camPos, const Fvector
     a = 1.f - 1.5f * e * (1.f - nc1) * (1.f - nc2);
     c2 = iCeil_SSE(255.f * a);
 }
-
 } // namespace Math
 } // namespace XRay

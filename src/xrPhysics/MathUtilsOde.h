@@ -1,16 +1,17 @@
 #pragma once
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
-#include "Externals/ode/include/ode/common.h"
-#include "Externals/ode/include/ode/odemath.h"
-#include "Externals/ode/include/ode/objects.h"
-#include "Externals/ode/include/ode/rotation.h"
-#include "Externals/ode/include/ode/compatibility.h"
-#include "Externals/ode/include/ode/collision.h"
-#include "Externals/ode/include/ode/matrix.h"
+#include <ode/common.h>
+#include <ode/odemath.h>
+#include <ode/objects.h>
+#include <ode/rotation.h>
+#include <ode/compatibility.h>
+#include <ode/collision.h>
+#include <ode/matrix.h>
 
-#include "mathutils.h"
+#include "MathUtils.h"
 #include "ode_redefine.h"
 
 static const dReal accurate_normalize_epsilon = 1.192092896e-05F;
@@ -114,5 +115,4 @@ float E_NL(dBodyID b1, dBodyID b2, const dReal* norm);
 
 float E_NlS(dBodyID body, const dReal* norm, float norm_sign); // if body c.geom.g1 norm_sign + else -
 
-#pragma warning(default : 4995)
-#pragma warning(default : 4267)
+#pragma warning(pop)

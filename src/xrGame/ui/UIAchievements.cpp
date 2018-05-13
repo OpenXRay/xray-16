@@ -16,8 +16,8 @@ void CUIAchievements::init_from_xml(CUIXml& xml)
 {
     CUIXmlInit::InitWindow(xml, "achievements_itm", 0, this);
 
-    XML_NODE* stored_root = xml.GetLocalRoot();
-    XML_NODE* node = xml.NavigateToNode("achievements_itm", 0);
+    XML_NODE stored_root = xml.GetLocalRoot();
+    XML_NODE node = xml.NavigateToNode("achievements_itm", 0);
     xml.SetLocalRoot(node);
 
     m_name = UIHelper::CreateTextWnd(xml, "name", this);
@@ -34,7 +34,7 @@ void CUIAchievements::Update()
         return;
 
     luabind::functor<bool> f;
-    R_ASSERT(ai().script_engine().functor(m_functor_str, f));
+    R_ASSERT(GEnv.ScriptEngine->functor(m_functor_str, f));
     if (f())
     {
         if (!ParentHasMe())

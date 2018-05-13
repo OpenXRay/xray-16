@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ETools.h"
 #include "xrXRC.h"
+#include "xrCommon/math_funcs_inline.h"
 
 #pragma warning(disable : 4267)
 
@@ -9,13 +10,13 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
-        xrDebug::Initialize(false);
-        Core._initialize("XRayEditorTools", 0, FALSE);
+        //xrDebug::Initialize(false);
+        //Core.Initialize("XRayEditorTools", 0, FALSE);
         // FPU::m64r	();
         break;
     case DLL_THREAD_ATTACH: break;
     case DLL_THREAD_DETACH: break;
-    case DLL_PROCESS_DETACH: Core._destroy(); break;
+    case DLL_PROCESS_DETACH: break;//Core._destroy(); break;
     }
     return TRUE;
 }
@@ -191,7 +192,6 @@ ETOOLS_API CDB::MODEL* __stdcall create_model(Fvector* V, int Vcnt, CDB::TRI* T,
 }
 ETOOLS_API void __stdcall destroy_model(CDB::MODEL*& M) { xr_delete(M); }
 ETOOLS_API CDB::RESULT* __stdcall r_begin() { return XRC.r_begin(); };
-ETOOLS_API CDB::RESULT* __stdcall r_end() { return XRC.r_end(); };
 ETOOLS_API int __stdcall r_count() { return XRC.r_count(); };
 ETOOLS_API void __stdcall ray_options(u32 flags) { XRC.ray_options(flags); }
 ETOOLS_API void __stdcall ray_query(

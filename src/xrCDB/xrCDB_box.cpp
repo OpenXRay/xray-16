@@ -175,29 +175,29 @@ public:
         v2.x = mLeafVerts[2].x - center.x;
 
         // First, test overlap in the {x,y,z}-directions
-        float min, max;
-        // Find min, max of the triangle in x-direction, and test for overlap in X
-        FINDMINMAX(v0.x, v1.x, v2.x, min, max);
-        if (min > extents.x || max < -extents.x)
-            return false;
+        {
+            float min, max;
+            // Find min, max of the triangle in x-direction, and test for overlap in X
+            FINDMINMAX(v0.x, v1.x, v2.x, min, max);
+            if (min > extents.x || max < -extents.x)
+                return false;
+            // Same for Y
+            v0.y = mLeafVerts[0].y - center.y;
+            v1.y = mLeafVerts[1].y - center.y;
+            v2.y = mLeafVerts[2].y - center.y;
 
-        // Same for Y
-        v0.y = mLeafVerts[0].y - center.y;
-        v1.y = mLeafVerts[1].y - center.y;
-        v2.y = mLeafVerts[2].y - center.y;
+            FINDMINMAX(v0.y, v1.y, v2.y, min, max);
+            if (min > extents.y || max < -extents.y)
+                return false;
 
-        FINDMINMAX(v0.y, v1.y, v2.y, min, max);
-        if (min > extents.y || max < -extents.y)
-            return false;
-
-        // Same for Z
-        v0.z = mLeafVerts[0].z - center.z;
-        v1.z = mLeafVerts[1].z - center.z;
-        v2.z = mLeafVerts[2].z - center.z;
-
-        FINDMINMAX(v0.z, v1.z, v2.z, min, max);
-        if (min > extents.z || max < -extents.z)
-            return false;
+            // Same for Z
+            v0.z = mLeafVerts[0].z - center.z;
+            v1.z = mLeafVerts[1].z - center.z;
+            v2.z = mLeafVerts[2].z - center.z;
+            FINDMINMAX(v0.z, v1.z, v2.z, min, max);
+            if (min > extents.z || max < -extents.z)
+                return false;
+        }
 
         // 2) Test if the box intersects the plane of the triangle
         // compute plane equation of triangle: normal*x+d=0

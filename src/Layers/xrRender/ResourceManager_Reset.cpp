@@ -11,22 +11,30 @@
 void CResourceManager::reset_begin()
 {
     // destroy everything, renderer may use
-    GlobalEnv.Render->reset_begin();
+    GEnv.Render->reset_begin();
 
     // destroy state-blocks
     for (u32 _it = 0; _it < v_states.size(); _it++)
+#ifdef USE_OGL
+        v_states[_it]->state.Release();
+#else
         _RELEASE(v_states[_it]->state);
+#endif // USE_OGL
 
     // destroy RTs
-    for (map_RTIt rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
+    for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
         rt_it->second->reset_begin();
     //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
     //  DX10 cut        rtc_it->second->reset_begin();
 
     // destroy DStreams
     RCache.old_QuadIB = RCache.QuadIB;
+#ifdef USE_OGL
+    glDeleteBuffers(1, &RCache.QuadIB);
+#else
     HW.stats_manager.decrement_stats_ib(RCache.QuadIB);
     _RELEASE(RCache.QuadIB);
+#endif // USE_OGL
 
     RCache.Index.reset_begin();
     RCache.Vertex.reset_begin();
@@ -70,7 +78,7 @@ void CResourceManager::reset_end()
 // RT
 #pragma todo("container is created in stack!")
         xr_vector<CRT*> rt;
-        for (map_RTIt rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
+        for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
             rt.push_back(rt_it->second);
         std::sort(rt.begin(), rt.end(), cmp_rt);
         for (u32 _it = 0; _it < rt.size(); _it++)
@@ -89,7 +97,9 @@ void CResourceManager::reset_end()
     // create state-blocks
     {
         for (u32 _it = 0; _it < v_states.size(); _it++)
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+        v_states[_it]->state_code.record(v_states[_it]->state);
+#elif defined(USE_DX10) || defined(USE_DX11)
             v_states[_it]->state = ID3DState::Create(v_states[_it]->state_code);
 #else // USE_DX10
             v_states[_it]->state = v_states[_it]->state_code.record();
@@ -97,7 +107,7 @@ void CResourceManager::reset_end()
     }
 
     // create everything, renderer may use
-    GlobalEnv.Render->reset_end();
+    GEnv.Render->reset_end();
     Dump(true);
 }
 
@@ -106,7 +116,7 @@ void mdump(C c)
 {
     if (0 == c.size())
         return;
-    for (C::iterator I = c.begin(); I != c.end(); I++)
+    for (auto I = c.begin(); I != c.end(); I++)
         Msg("*        : %3d: %s", I->second->dwReference, I->second->cName.c_str());
 }
 

@@ -95,7 +95,7 @@ void vfOptimizeParameters(xr_vector<xr_vector<REAL>>& A, xr_vector<xr_vector<REA
 
     if (dPreviousFunctional < dFunctional)
     {
-        std::transform(daDelta.begin(), daDelta.end(), daDelta.begin(), std::bind2nd(std::multiplies<REAL>(), -1));
+        std::transform(daDelta.begin(), daDelta.end(), daDelta.begin(), std::bind2nd(std::multiplies<REAL>(), -1.f));
         std::transform(C.begin(), C.end(), daDelta.begin(), C.begin(), std::plus<REAL>());
         std::transform(D.begin(), D.end(), daDelta.begin(), D.begin(), std::plus<REAL>());
     }

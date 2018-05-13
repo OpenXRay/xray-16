@@ -29,7 +29,7 @@
 
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
 {
-    dxRender_Visual* V = NULL;
+    dxRender_Visual* V = nullptr;
 
     // Check types
     switch (type)
@@ -82,7 +82,7 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
     string_path name;
 
     // Add default ext if no ext at all
-    if (0 == strext(N))
+    if (nullptr == strext(N))
         strconcat(sizeof(name), name, N, ".ogf");
     else
         xr_strcpy(name, sizeof(name), N);
@@ -198,7 +198,7 @@ CModelPool::~CModelPool()
 
 dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
 {
-    dxRender_Visual* Model = 0;
+    dxRender_Visual* Model = nullptr;
     xr_vector<ModelDef>::iterator I;
     for (I = Models.begin(); I != Models.end(); I++)
     {
@@ -220,7 +220,7 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
     string_path low_name;
     VERIFY(xr_strlen(name) < sizeof(low_name));
     xr_strcpy(low_name, name);
-    strlwr(low_name);
+    xr_strlwr(low_name);
     if (strext(low_name))
         *strext(low_name) = 0;
     //	Msg						("-CREATE %s",low_name);
@@ -240,7 +240,7 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
         // 1. Search for already loaded model (reference, base model)
         dxRender_Visual* Base = Instance_Find(low_name);
 
-        if (0 == Base)
+        if (nullptr == Base)
         {
             // 2. If not found
             bAllowChildrenDuplicate = FALSE;
@@ -256,7 +256,7 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
         }
         // 3. If found - return (cloned) reference
         dxRender_Visual* Model = Instance_Duplicate(Base);
-        Registry.insert(mk_pair(Model, low_name));
+        Registry.insert(std::make_pair(Model, low_name));
         return Model;
     }
 }
@@ -266,14 +266,14 @@ dxRender_Visual* CModelPool::CreateChild(LPCSTR name, IReader* data)
     string256 low_name;
     VERIFY(xr_strlen(name) < 256);
     xr_strcpy(low_name, name);
-    strlwr(low_name);
+    xr_strlwr(low_name);
     if (strext(low_name))
         *strext(low_name) = 0;
 
     // 1. Search for already loaded model
     dxRender_Visual* Base = Instance_Find(low_name);
     //.	if (0==Base) Base	 	= Instance_Load(name,data,FALSE);
-    if (0 == Base)
+    if (nullptr == Base)
     {
         if (data)
             Base = Instance_Load(low_name, data, FALSE);
@@ -303,7 +303,7 @@ void CModelPool::DeleteInternal(dxRender_Visual*& V, BOOL bDiscard)
         if (it != Registry.end())
         {
             // Registry entry found - move it to pool
-            Pool.insert(mk_pair(it->second, V));
+            Pool.insert(std::make_pair(it->second, V));
         }
         else
         {
@@ -311,12 +311,12 @@ void CModelPool::DeleteInternal(dxRender_Visual*& V, BOOL bDiscard)
             xr_delete(V);
         }
     }
-    V = NULL;
+    V = nullptr;
 }
 
 void CModelPool::Delete(dxRender_Visual*& V, BOOL bDiscard)
 {
-    if (NULL == V)
+    if (nullptr == V)
         return;
     if (g_bRendering)
     {
@@ -327,7 +327,7 @@ void CModelPool::Delete(dxRender_Visual*& V, BOOL bDiscard)
     {
         DeleteInternal(V, bDiscard);
     }
-    V = NULL;
+    V = nullptr;
 }
 
 void CModelPool::DeleteQueue()
@@ -386,7 +386,7 @@ void CModelPool::Discard(dxRender_Visual*& V, BOOL b_complete)
         // Registry entry not-found - just special type of visual / particles / etc.
         xr_delete(V);
     }
-    V = NULL;
+    V = nullptr;
 }
 
 void CModelPool::Prefetch()
@@ -396,7 +396,7 @@ void CModelPool::Prefetch()
     string256 section;
     strconcat(sizeof(section), section, "prefetch_visuals_", g_pGamePersistent->m_game_params.m_game_type);
     CInifile::Sect& sect = pSettings->r_section(section);
-    for (CInifile::SectCIt I = sect.Data.begin(); I != sect.Data.end(); I++)
+    for (auto I = sect.Data.cbegin(); I != sect.Data.cend(); I++)
     {
         const CInifile::Item& item = *I;
         dxRender_Visual* V = Create(item.first.c_str());
@@ -482,9 +482,24 @@ void CModelPool::memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem
         dxRender_Visual* ptr = it->model;
         Fvisual* vis_ptr = dynamic_cast<Fvisual*>(ptr);
 
-        if (vis_ptr == NULL)
+        if (vis_ptr == nullptr)
             continue;
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if defined(USE_OGL)
+        GLint IB_size;
+        GLint VB_size;
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vis_ptr->m_fast->p_rm_Indices);
+        CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &IB_size));
+
+        ib_mem_video += IB_size;
+        ib_mem_system += IB_size;
+
+        glBindBuffer(GL_ARRAY_BUFFER, vis_ptr->m_fast->p_rm_Vertices);
+        CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &VB_size));
+
+        vb_mem_video += VB_size;
+        vb_mem_system += VB_size;
+#elif !defined(USE_DX10) && !defined(USE_DX11)
         D3DINDEXBUFFER_DESC IB_desc;
         D3DVERTEXBUFFER_DESC VB_desc;
 
@@ -527,7 +542,7 @@ IC bool _IsBoxVisible(dxRender_Visual* visual, const Fmatrix& transform)
 {
     Fbox bb;
     bb.xform(visual->vis.box, transform);
-    return GlobalEnv.Render->occ_visible(bb);
+    return GEnv.Render->occ_visible(bb);
 }
 IC bool _IsValidShader(dxRender_Visual* visual, u32 priority, bool strictB2F)
 {

@@ -15,6 +15,7 @@
 #include "CharacterPhysicsSupport.h"
 #include "inventory.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -144,7 +145,7 @@ void CMissile::spawn_fake_missile()
     if (!getDestroy())
     {
         CSE_Abstract* object = Level().spawn_item(
-            *cNameSect(), Position(), (g_dedicated_server) ? u32(-1) : ai_location().level_vertex_id(), ID(), true);
+            *cNameSect(), Position(), (GEnv.isDedicatedServer) ? u32(-1) : ai_location().level_vertex_id(), ID(), true);
 
         CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(object);
         VERIFY(alife_object);
@@ -239,9 +240,9 @@ void CMissile::shedule_Update(u32 dt)
     }
 }
 
-void CMissile::State(u32 state)
+void CMissile::State(u32 state, u32 oldState)
 {
-    switch (GetState())
+    switch (state)
     {
     case eShowing:
     {
@@ -259,8 +260,11 @@ void CMissile::State(u32 state)
     {
         if (H_Parent())
         {
-            SetPending(TRUE);
-            PlayHUDMotion("anm_hide", TRUE, this, GetState());
+            if (oldState != eHiding)
+            {
+                SetPending(TRUE);
+                PlayHUDMotion("anm_hide", TRUE, this, GetState());
+            }
         }
     }
     break;
@@ -308,11 +312,11 @@ void CMissile::State(u32 state)
     }
 }
 
-void CMissile::OnStateSwitch(u32 S)
+void CMissile::OnStateSwitch(u32 S, u32 oldState)
 {
     m_dwStateTime = 0;
-    inherited::OnStateSwitch(S);
-    State(S);
+    inherited::OnStateSwitch(S, oldState);
+    State(S, oldState);
 }
 
 void CMissile::OnAnimationEnd(u32 state)

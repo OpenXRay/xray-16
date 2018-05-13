@@ -42,7 +42,7 @@ public:
     static xr_string ExtractFileExt(LPCSTR src);
     static xr_string ExcludeBasePath(LPCSTR full_path, LPCSTR excl_path);
 };
-extern XRCORE_API EFS_Utils* xr_EFS;
+extern XRCORE_API std::unique_ptr<EFS_Utils> xr_EFS;
 #define EFS (*xr_EFS)
 
 #endif /*_INCDEF_FileSystem_H_*/

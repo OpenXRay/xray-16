@@ -4,7 +4,7 @@
 #include "plugins/Shared/bonedef.h"
 #include "plugins/Shared/Face.h"
 
-DEFINE_VECTOR(INode*, INodeVec, INodeIt);
+using INodeVec = xr_vector<INode*>;
 
 //-----------------------------------------------------------------------------
 IC void ERR(LPCSTR s, LPCSTR dop = "") { Msg("!Error: %s%s", s, dop); }
@@ -58,7 +58,7 @@ private:
     BOOL Capture();
     int AddVert(const st_VERT& pTestV)
     {
-        for (ExpVertIt vI = m_ExpVertices.begin(); vI != m_ExpVertices.end(); vI++)
+        for (auto vI = m_ExpVertices.begin(); vI != m_ExpVertices.end(); ++vI)
             if ((*vI)->similar(pTestV))
                 return vI - m_ExpVertices.begin();
 

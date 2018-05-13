@@ -19,12 +19,20 @@ struct IRender_Mesh
     ref_geom rm_geom;
 
     // verts
+#ifdef USE_OGL
+    GLuint p_rm_Vertices;
+#else
     ID3DVertexBuffer* p_rm_Vertices;
+#endif // USE_OGL
     u32 vBase;
     u32 vCount;
 
     // indices
+#ifdef USE_OGL
+    GLuint p_rm_Indices;
+#else
     ID3DIndexBuffer* p_rm_Indices;
+#endif // USE_OGL
     u32 iBase;
     u32 iCount;
     u32 dwPrimitives;
@@ -58,7 +66,7 @@ public:
     vis_data vis; // visibility-data
     ref_shader shader; // pipe state, shared
 
-    virtual void Render(float LOD){}; // LOD - Level Of Detail  [0..1], Ignored
+    virtual void Render(float /*LOD*/) {} // LOD - Level Of Detail  [0..1], Ignored
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Release(); // Shared memory release
     virtual void Copy(dxRender_Visual* from);

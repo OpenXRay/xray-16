@@ -16,6 +16,7 @@
 #pragma hdrstop
 
 #include "MxMat3.h"
+#include "xrCommon/math_funcs_inline.h"
 
 #define ROT(a, i, j, k, l)\
     g = a[i][j];\

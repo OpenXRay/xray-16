@@ -37,7 +37,7 @@ public:
         if (valid())
             return &MotionID::get;
         else
-            return 0;
+            return nullptr;
         //		return(!valid()?0:&MotionID::get);
     }
 };

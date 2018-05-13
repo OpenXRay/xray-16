@@ -9,12 +9,13 @@
 #pragma once
 
 #include "xrAICore/Navigation/game_graph_space.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 
 class CMovementManagerHolder;
 class CPatrolPath;
 
-enum EPatrolStartType;
-enum EPatrolRouteType;
+//enum EPatrolStartType;
+//enum EPatrolRouteType;
 
 class CALifeMonsterPatrolPathManager
 {

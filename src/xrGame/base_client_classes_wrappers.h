@@ -154,7 +154,7 @@ public:
 
     /*	static float			shedule_Scale_static	(base *self)
         {
-            ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error,"You are trying to call a pure virtual function
        ISheduled::shedule_Scale!\nReturning default value 1000.0");
             return	(1000.f);
         }
@@ -189,7 +189,7 @@ public:
 
         static	void	renderable_Render_static		(IRenderable *self)
         {
-            ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error,"You are trying to call a pure virtual function
        IRenderable::renderable_Render!");
         }
 
@@ -289,7 +289,7 @@ public:
 
     static void HitSignal_static(CEntity* self, float P, Fvector& local_dir, IGameObject* who, s16 element)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "You are trying to call a pure virtual function CEntity::HitSignal!");
     }
 
@@ -300,7 +300,7 @@ public:
 
     static void HitImpulse_static(float P, Fvector& vWorldDir, Fvector& vLocalDir)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "You are trying to call a pure virtual function CEntity::HitImpulse!");
     }
 };

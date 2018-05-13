@@ -1,5 +1,7 @@
+#include "pch.h"
 #include "statistics_collector.hpp"
 #include "wpn_collection.hpp"
+#include "tools.hpp"
 
 statistics_collector::statistics_collector(weapon_collection* wpn_collection) { m_wpn_collection = wpn_collection; }
 statistics_collector::~statistics_collector() { delete_data(m_all_params); }
@@ -14,7 +16,7 @@ void statistics_collector::load_settings()
         if (m_wpn_collection->settings->r_line(CSV_SETTINGS, i, &key, &value) && key)
         {
             csv_files::iterator new_file_iter =
-                m_all_params.insert(std::make_pair(shared_str(key), xr_new<params_collection>())).first;
+                m_all_params.insert(std::make_pair(shared_str(key), new params_collection())).first;
             if (value)
             {
                 get_string_collection(value, *new_file_iter->second);
@@ -25,8 +27,10 @@ void statistics_collector::load_settings()
 
 void statistics_collector::save_files()
 {
-    std::for_each(m_all_params.begin(), m_all_params.end(),
-        std::bind1st(std::mem_fun<void, statistics_collector>(&statistics_collector::save_file), this));
+    //std::for_each(m_all_params.begin(), m_all_params.end(),
+    //    std::bind1st(std::mem_fun<void, statistics_collector>(&statistics_collector::save_file), this));
+    for (auto &it : m_all_params)
+        save_file(it);
 }
 
 statistics_collector::csv_files::const_iterator statistics_collector::get_most_acceptable_group(

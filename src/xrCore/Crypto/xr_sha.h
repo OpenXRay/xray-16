@@ -1,9 +1,10 @@
+#pragma once
 #ifndef XR_SHA_INCLUDED
 #define XR_SHA_INCLUDED
 
-#include "xrCore/xrCore.h"
+#include <cryptopp/sha.h>
 
-struct SHAstate_st;
+#include "xrCore/xrCore.h"
 
 namespace crypto
 {
@@ -26,7 +27,7 @@ private:
     u32 m_data_size;
 
     u8 m_result[digest_length];
-    SHAstate_st* m_sha_ctx;
+    CryptoPP::SHA1 m_sha_ctx;
 }; // xr_sha256
 
 } // namespace crypto

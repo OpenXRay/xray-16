@@ -6,8 +6,10 @@ class CEntityAlive;
 class CLevel;
 
 #include "hit_immunity.h"
-#include "Hit.h"
-#include "Level.h"
+#include "game_type.h"
+
+struct SHit;
+
 enum EBoostParams
 {
     eBoostHpRestore = 0,
@@ -30,11 +32,28 @@ enum EBoostParams
     eBoostMaxCount,
 };
 
-static const LPCSTR ef_boosters_section_names[] = {"boost_health_restore", "boost_power_restore",
-    "boost_radiation_restore", "boost_bleeding_restore", "boost_max_weight", "boost_radiation_protection",
-    "boost_telepat_protection", "boost_chemburn_protection", "boost_burn_immunity", "boost_shock_immunity",
-    "boost_radiation_immunity", "boost_telepat_immunity", "boost_chemburn_immunity", "boost_explosion_immunity",
-    "boost_strike_immunity", "boost_fire_wound_immunity", "boost_wound_immunity"};
+// tamlin: XXX: Place this array in a C++ source file, not the header.
+// Xottab_DUTY: Array currently used in eatable_item.cpp and UIBoosterInfo.cpp
+static const pcstr ef_boosters_section_names[] =
+{
+    "boost_health_restore",
+    "boost_power_restore",
+    "boost_radiation_restore",
+    "boost_bleeding_restore",
+    "boost_max_weight",
+    "boost_radiation_protection",
+    "boost_telepat_protection",
+    "boost_chemburn_protection",
+    "boost_burn_immunity",
+    "boost_shock_immunity",
+    "boost_radiation_immunity",
+    "boost_telepat_immunity",
+    "boost_chemburn_immunity",
+    "boost_explosion_immunity",
+    "boost_strike_immunity",
+    "boost_fire_wound_immunity",
+    "boost_wound_immunity"
+};
 
 struct SBooster
 {
@@ -161,7 +180,7 @@ protected:
     //для подсчета состояния открытых ран,
     //запоминается кость куда был нанесен хит
     //и скорость потери крови из раны
-    DEFINE_VECTOR(CWound*, WOUND_VECTOR, WOUND_VECTOR_IT);
+    using WOUND_VECTOR = xr_vector<CWound*>;
     WOUND_VECTOR m_WoundVector;
     //очистка массива ран
 

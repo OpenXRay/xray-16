@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "wpn_collection.hpp"
 
 weapon_collection::weapon_collection() {}
@@ -21,10 +22,10 @@ void weapon_collection::load_all_mp_weapons()
     string_path path_ltx;
 
     FS.update_path(path_ltx, "$patch_config$", "system.ltx");
-    patch_config = xr_new<CInifileEx>(path_ltx, TRUE, TRUE, FALSE);
+    patch_config = new CInifileEx(path_ltx, TRUE, TRUE, FALSE);
 
     FS.update_path(path_ltx, "$game_config$", "system.ltx");
-    priquel_config = xr_new<CInifileEx>(path_ltx, TRUE, TRUE, FALSE);
+    priquel_config = new CInifileEx(path_ltx, TRUE, TRUE, FALSE);
 
     /*FS.update_path			(path_ltx, "$game_config$", "mp\\weapons_mp\\weapons_mp_for_work.ltx");
     work_mp_weapons			= xr_new<CInifileEx>(path_ltx, TRUE, TRUE, FALSE);
@@ -39,7 +40,7 @@ void weapon_collection::load_all_mp_weapons()
     work_mp_outfits			= xr_new<CInifileEx>(path_ltx, TRUE, TRUE, FALSE);*/
 
     FS.update_path(path_ltx, "$app_data_root$", "export_settings.ltx");
-    settings = xr_new<CInifileEx>(path_ltx, TRUE, TRUE, FALSE);
+    settings = new CInifileEx(path_ltx, TRUE, TRUE, FALSE);
     load_settings();
 
     /*new_mp_weapons			= xr_new<CInifileEx>("new_weapons_mp.ltx", FALSE, FALSE, FALSE);
@@ -89,7 +90,7 @@ void weapon_collection::load_settings()
         const char* larg = NULL;
         settings->r_line(EXPORT_SETTINGS_SECT, param, &line, &larg);
         R_ASSERT(line);
-        extract_list.push_back(xr_new<tentity_extract_keys>());
+        extract_list.push_back(new tentity_extract_keys());
         extract_list.back()->first = line;
         new_config.insert(std::make_pair(shared_str(line), xr_vector<CInifileEx::Sect>()));
         if (larg)

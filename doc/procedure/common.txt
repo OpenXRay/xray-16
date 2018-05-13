@@ -16,7 +16,7 @@ File and directory names:
 - VS projects and their root directories should have the same names.
 
 Formatting (for text files in /doc/ directory):
-- Shift width (indentation) is 2 spaces.
+- Indentation is 2 spaces.
 - Never use tabs.
 - Line size is 120 columns.
 - File should begin with 'TITLE: ' followed by document title.

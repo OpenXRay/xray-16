@@ -6,9 +6,9 @@
 #define DetailManagerH
 #pragma once
 
-#include "xrCore/xrpool.h"
-#include "detailformat.h"
-#include "detailmodel.h"
+#include "xrCore/xrPool.h"
+#include "DetailFormat.h"
+#include "DetailModel.h"
 
 #ifdef _EDITOR
 //.	#include	"ESceneClassList.h"
@@ -24,15 +24,38 @@ typedef ObjectMap::iterator ObjectPairIt;
 #else
 const int dm_max_decompress = 7;
 #endif
-const int dm_size = 24; //!
-const int dm_cache1_count = 4; //
-const int dm_cache1_line = dm_size * 2 / dm_cache1_count; //! dm_size*2 must be div dm_cache1_count
+//const int dm_size = 24;
+const int dm_cache1_count = 4;
+//const int dm_cache1_line = dm_size * 2 / dm_cache1_count; //! dm_size*2 must be div dm_cache1_count
 const int dm_max_objects = 64;
 const int dm_obj_in_slot = 4;
+//const int dm_cache_line = dm_size + 1 + dm_size;
+//const int dm_cache_size = dm_cache_line * dm_cache_line;
+//const float dm_fade = float(2 * dm_size) - .5f;
+const float dm_slot_size = DETAIL_SLOT_SIZE;
+
+//AVO: detail radius
+#ifdef DETAIL_RADIUS
+//const u32 dm_max_cache_size = 62001; // assuming max dm_size = 124
+constexpr auto dm_max_cache_size = 62001 * 2; // assuming max dm_size = 248
+extern u32 dm_size;
+extern u32 dm_cache1_line;
+extern u32 dm_cache_line;
+extern u32 dm_cache_size;
+extern float dm_fade;
+extern u32 dm_current_size;// = iFloor((float)ps_r__detail_radius/4)*2; //!
+extern u32 dm_current_cache1_line;// = dm_current_size*2/dm_cache1_count; //! dm_current_size*2 must be div dm_cache1_count
+extern u32 dm_current_cache_line;// = dm_current_size+1+dm_current_size;
+extern u32 dm_current_cache_size;// = dm_current_cache_line*dm_current_cache_line;
+extern float dm_current_fade;// = float(2*dm_current_size)-.5f;
+extern float ps_current_detail_density;
+#else
+const int dm_size = 24;
+const int dm_cache1_line = dm_size * 2 / dm_cache1_count; //! dm_size*2 must be div dm_cache1_count
 const int dm_cache_line = dm_size + 1 + dm_size;
 const int dm_cache_size = dm_cache_line * dm_cache_line;
 const float dm_fade = float(2 * dm_size) - .5f;
-const float dm_slot_size = DETAIL_SLOT_SIZE;
+#endif
 
 class ECORE_API CDetailManager
 {
@@ -49,13 +72,16 @@ public:
         Fvector c_rgb;
 #endif
     };
-    DEFINE_VECTOR(SlotItem*, SlotItemVec, SlotItemVecIt);
+
+    using SlotItemVec = xr_vector<SlotItem*>;
+
     struct SlotPart
     { //
         u32 id; // ID модельки
         SlotItemVec items; // список кустиков
         SlotItemVec r_items[3]; // список кустиков for render
     };
+
     enum SlotType
     {
         stReady = 0, // Ready to use
@@ -63,6 +89,7 @@ public:
 
         stFORCEDWORD = 0xffffffff
     };
+
     struct Slot
     { // распакованый слот размером DETAIL_SLOT_SIZE
         struct
@@ -84,6 +111,7 @@ public:
             vis.clear();
         }
     };
+
     struct CacheSlot1
     {
         u32 empty;
@@ -101,10 +129,8 @@ public:
     typedef DetailVec::iterator DetailIt;
     typedef poolSS<SlotItem, 4096> PSS;
 
-public:
     int dither[16][16];
 
-public:
     // swing values
     struct SSwingValue
     {
@@ -122,23 +148,30 @@ public:
     float m_time_pos;
     float m_global_time_old;
 
-public:
     IReader* dtFS;
     DetailHeader dtH;
     DetailSlot* dtSlots; // note: pointer into VFS
     DetailSlot DS_empty;
 
-public:
     DetailVec objects;
     vis_list m_visibles[3]; // 0=still, 1=Wave1, 2=Wave2
 
 #ifndef _EDITOR
     xrXRC xrc;
 #endif
+    //AVO: detail draw radius
+#ifdef DETAIL_RADIUS
+    CacheSlot1** cache_level1;
+    Slot*** cache; // grid-cache itself
+    svector<Slot*, dm_max_cache_size> cache_task; // non-unpacked slots
+    Slot* cache_pool; // just memory for slots
+#else
     CacheSlot1 cache_level1[dm_cache1_line][dm_cache1_line];
     Slot* cache[dm_cache_line][dm_cache_line]; // grid-cache itself
     svector<Slot*, dm_cache_size> cache_task; // non-unpacked slots
     Slot cache_pool[dm_cache_size]; // just memory for slots
+#endif
+
     int cache_cx;
     int cache_cz;
 
@@ -147,12 +180,11 @@ public:
     void UpdateVisibleM();
     void UpdateVisibleS();
 
-public:
 #ifdef _EDITOR
     virtual ObjectList* GetSnapList() = 0;
 #endif
 
-    IC bool UseVS() { return HW.Caps.geometry_major >= 1; }
+    bool UseVS() { return HW.Caps.geometry_major >= 1; }
     // Software processor
     ref_geom soft_Geom;
     void soft_Load();
@@ -162,8 +194,13 @@ public:
     // Hardware processor
     ref_geom hw_Geom;
     u32 hw_BatchSize;
+#ifdef USE_OGL
+    GLuint hw_VB;
+    GLuint hw_IB;
+#else
     ID3DVertexBuffer* hw_VB;
     ID3DIndexBuffer* hw_IB;
+#endif // USE_OGL
     ref_constant hwc_consts;
     ref_constant hwc_wave;
     ref_constant hwc_wind;
@@ -176,13 +213,12 @@ public:
     void hw_Load_Shaders();
     void hw_Unload();
     void hw_Render();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     void hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
 #else //	USE_DX10
     void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
 #endif //	USE_DX10
 
-public:
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);
 

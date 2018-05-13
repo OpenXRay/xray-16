@@ -27,7 +27,7 @@ light::light(void) : SpatialBase(g_SpatialSpace)
 
     frame_render = 0;
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     ZeroMemory(omnipart, sizeof(omnipart));
     s_spot = NULL;
     s_point = NULL;
@@ -36,26 +36,26 @@ light::light(void) : SpatialBase(g_SpatialSpace)
     vis.query_order = 0;
     vis.visible = true;
     vis.pending = false;
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
 light::~light()
 {
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     for (int f = 0; f < 6; f++)
         xr_delete(omnipart[f]);
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
     set_active(false);
 
 // remove from Lights_LastFrame
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     for (u32 it = 0; it < RImplementation.Lights_LastFrame.size(); it++)
         if (this == RImplementation.Lights_LastFrame[it])
             RImplementation.Lights_LastFrame[it] = 0;
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
 void light::set_texture(LPCSTR name)
 {
     if ((0 == name) || (0 == name[0]))
@@ -74,9 +74,9 @@ void light::set_texture(LPCSTR name)
     // strconcat(sizeof(temp),temp,"_nomsaa",name);
     s_spot.create(RImplementation.Target->b_accum_spot, temp, name);
 
-#if (RENDER != R_R3) && (RENDER != R_R4)
+#if (RENDER != R_R3) && (RENDER != R_R4) && (RENDER != R_GL)
     s_volumetric.create("accum_volumetric", name);
-#else //    (RENDER!=R_R3) && (RENDER!=R_R4)
+#else //    (RENDER!=R_R3) && (RENDER!=R_R4) && (RENDER!=R_GL)
     s_volumetric.create("accum_volumetric_nomsaa", name);
     if (RImplementation.o.dx10_msaa)
     {
@@ -93,7 +93,7 @@ void light::set_texture(LPCSTR name)
                 strconcat(sizeof(temp), temp, "r2\\accum_volumetric_", name), name);
         }
     }
-#endif // (RENDER!=R_R3) || (RENDER!=R_R4)
+#endif // (RENDER!=R_R3) || (RENDER!=R_R4) || (RENDER!=R_GL)
 }
 #endif
 
@@ -226,7 +226,7 @@ vis_data& light::get_homdata()
 
 Fvector light::spatial_sector_point() { return position; }
 //////////////////////////////////////////////////////////////////////////
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
 // Xforms
 void light::xform_calc()
 {
@@ -348,7 +348,7 @@ void light::Export(light_Package& package)
                 L->s_point = s_point;
 
 // Holger - do we need to export msaa stuff as well ?
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
                 if (RImplementation.o.dx10_msaa)
                 {
                     int bound = 1;
@@ -363,7 +363,7 @@ void light::Export(light_Package& package)
                         // L->s_volumetric_msaa[i] = s_volumetric_msaa[i];
                     }
                 }
-#endif // (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
                 //  Igor: add volumetric support
                 L->set_volumetric(flags.bVolumetric);
@@ -396,7 +396,7 @@ void light::set_attenuation_params(float a0, float a1, float a2, float fo)
     falloff = fo;
 }
 
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 extern float ps_r2_slight_fade;

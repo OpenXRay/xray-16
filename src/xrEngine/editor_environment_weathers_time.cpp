@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_weathers_time.hpp"
 #include "ide.hpp"
 #include "editor_environment_weathers_weather.hpp"
@@ -23,9 +22,9 @@
 using editor::environment::weathers::time;
 using editor::environment::weathers::weather;
 
-static inline editor::color create_color(float const& r, float const& g, float const& b)
+static inline XRay::Editor::color create_color(float const& r, float const& g, float const& b)
 {
-    editor::color result;
+    XRay::Editor::color result;
     result.r = r;
     result.g = g;
     result.b = b;
@@ -96,7 +95,7 @@ void time::load(CInifile& config)
 
     // clouds_color = config.r_fvector4(m_identifier, "clouds_color");
 
-    // LPCSTR clouds = config.r_string(m_identifier, "clouds_color");
+    // pcstr clouds = config.r_string(m_identifier, "clouds_color");
     // VERIFY (_GetItemCount(clouds) == 5);
     // string256 temp;
     // ((Fvector&)clouds_color).mul(.5f*(float)atof(_GetItem(clouds,4,temp)));
@@ -134,8 +133,8 @@ void time::save(CInifile& config)
     config.w_fvector4(m_identifier.c_str(), "clouds_color", clouds_color);
 }
 
-LPCSTR time::id_getter() const { return (m_identifier.c_str()); }
-void time::id_setter(LPCSTR value_)
+pcstr time::id_getter() const { return (m_identifier.c_str()); }
+void time::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_identifier._get() == value._get())
@@ -147,11 +146,11 @@ void time::id_setter(LPCSTR value_)
         m_identifier = value;
 }
 
-LPCSTR const* time::ambients_collection() { return (&*m_manager.ambients().ambients_ids().begin()); }
+pcstr const* time::ambients_collection() { return (&*m_manager.ambients().ambients_ids().begin()); }
 u32 time::ambients_collection_size() { return (m_manager.ambients().ambients_ids().size()); }
-LPCSTR const* time::suns_collection() { return (&*m_manager.suns().suns_ids().begin()); }
+pcstr const* time::suns_collection() { return (&*m_manager.suns().suns_ids().begin()); }
 u32 time::suns_collection_size() { return (m_manager.suns().suns_ids().size()); }
-LPCSTR const* time::thunderbolts_collection() { return (&*m_manager.thunderbolts().collections_ids().begin()); }
+pcstr const* time::thunderbolts_collection() { return (&*m_manager.thunderbolts().collections_ids().begin()); }
 u32 time::thunderbolts_collection_size() { return (m_manager.thunderbolts().collections_ids().size()); }
 float time::sun_altitude_getter() const
 {
@@ -181,8 +180,8 @@ void time::sun_longitude_setter(float value)
     sun_dir.setHP(y, deg2rad(value));
 }
 
-LPCSTR time::ambient_getter() const { return (m_ambient.c_str()); }
-void time::ambient_setter(LPCSTR value)
+pcstr time::ambient_getter() const { return (m_ambient.c_str()); }
+void time::ambient_setter(pcstr value)
 {
     if (m_ambient._get() == shared_str(value)._get())
         return;
@@ -191,8 +190,8 @@ void time::ambient_setter(LPCSTR value)
     env_ambient = m_manager.AppendEnvAmb(value);
 }
 
-LPCSTR time::sun_getter() const { return (m_sun.c_str()); }
-void time::sun_setter(LPCSTR value)
+pcstr time::sun_getter() const { return (m_sun.c_str()); }
+void time::sun_setter(pcstr value)
 {
     if (m_sun._get() == shared_str(value)._get())
         return;
@@ -201,8 +200,8 @@ void time::sun_setter(LPCSTR value)
     lens_flare_id = m_manager.eff_LensFlare->AppendDef(m_manager, m_manager.m_suns_config, value);
 }
 
-LPCSTR time::thunderbolt_getter() const { return (m_thunderbolt_collection.c_str()); }
-void time::thunderbolt_setter(LPCSTR value)
+pcstr time::thunderbolt_getter() const { return (m_thunderbolt_collection.c_str()); }
+void time::thunderbolt_setter(pcstr value)
 {
     if (m_thunderbolt_collection._get() == shared_str(value)._get())
         return;
@@ -212,8 +211,8 @@ void time::thunderbolt_setter(LPCSTR value)
         m_manager, m_manager.m_thunderbolt_collections_config, m_manager.m_thunderbolts_config, value);
 }
 
-LPCSTR time::sky_texture_getter() const { return (sky_texture_name.c_str()); }
-void time::sky_texture_setter(LPCSTR value)
+pcstr time::sky_texture_getter() const { return (sky_texture_name.c_str()); }
+void time::sky_texture_setter(pcstr value)
 {
     if (sky_texture_name._get() == shared_str(value)._get())
         return;
@@ -226,8 +225,8 @@ void time::sky_texture_setter(LPCSTR value)
     m_pDescriptor->OnDeviceCreate(*this);
 }
 
-LPCSTR time::clouds_texture_getter() const { return (clouds_texture_name.c_str()); }
-void time::clouds_texture_setter(LPCSTR value)
+pcstr time::clouds_texture_getter() const { return (clouds_texture_name.c_str()); }
+void time::clouds_texture_setter(pcstr value)
 {
     if (clouds_texture_name._get() == shared_str(value)._get())
         return;
@@ -240,36 +239,36 @@ float time::sky_rotation_getter() const { return (rad2deg(sky_rotation)); }
 void time::sky_rotation_setter(float value) { sky_rotation = deg2rad(value); }
 float time::wind_direction_getter() const { return (rad2deg(wind_direction)); }
 void time::wind_direction_setter(float value) { wind_direction = deg2rad(value); }
-void time::fill(editor::property_holder_collection* collection)
+void time::fill(XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_identifier.c_str(), collection, this);
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &time::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &time::id_setter);
 
-    m_property_holder->add_property("id", "properties", "this option is resposible for time interval",
+    m_property_holder->add_property("id", "properties", "this option is responsible for time interval",
         m_identifier.c_str(), string_getter, string_setter);
 
-    m_property_holder->add_property("color", "sun", "this option is resposible for sun color",
-        (editor::color const&)sun_color, (editor::color&)sun_color);
-    m_property_holder->add_property("shafts intensity", "sun", "this option is resposible for sun shafts intensity",
+    m_property_holder->add_property("color", "sun", "this option is responsible for sun color",
+        (XRay::Editor::color const&)sun_color, (XRay::Editor::color&)sun_color);
+    m_property_holder->add_property("shafts intensity", "sun", "this option is responsible for sun shafts intensity",
         m_fSunShaftsIntensity, m_fSunShaftsIntensity, 0.f, 1.f);
 
-    typedef editor::property_holder::float_getter_type float_getter_type;
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type sun_altitude_getter;
     sun_altitude_getter.bind(this, &time::sun_altitude_getter);
 
-    typedef editor::property_holder::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type sun_altitude_setter;
     sun_altitude_setter.bind(this, &time::sun_altitude_setter);
 
-    m_property_holder->add_property("altitude", "sun", "this option is resposible for sun altitude (in degrees)",
+    m_property_holder->add_property("altitude", "sun", "this option is responsible for sun altitude (in degrees)",
         sun_altitude_getter(), sun_altitude_getter, sun_altitude_setter, -360.f, 360.f);
 
     float_getter_type sun_longitude_getter;
@@ -278,20 +277,20 @@ void time::fill(editor::property_holder_collection* collection)
     float_setter_type sun_longitude_setter;
     sun_longitude_setter.bind(this, &time::sun_longitude_setter);
 
-    m_property_holder->add_property("longitude", "sun", "this option is resposible for sun longitude (in degrees)",
+    m_property_holder->add_property("longitude", "sun", "this option is responsible for sun longitude (in degrees)",
         sun_longitude_getter(), sun_longitude_getter, sun_longitude_setter, -360.f, 360.f);
 
-    typedef editor::property_holder::string_collection_getter_type collection_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_getter_type collection_getter_type;
     collection_getter_type collection_getter;
 
-    typedef editor::property_holder::string_collection_size_getter_type collection_size_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
     collection_size_getter_type collection_size_getter;
 
     collection_getter.bind(this, &time::suns_collection);
     collection_size_getter.bind(this, &time::suns_collection_size);
-    m_property_holder->add_property("sun", "sun", "this option is resposible for ambient", m_sun.c_str(), m_sun,
-        collection_getter, collection_size_getter, editor::property_holder::value_editor_combo_box,
-        editor::property_holder::cannot_enter_text);
+    m_property_holder->add_property("sun", "sun", "this option is responsible for ambient", m_sun.c_str(), m_sun,
+        collection_getter, collection_size_getter, XRay::Editor::property_holder_base::value_editor_combo_box,
+        XRay::Editor::property_holder_base::cannot_enter_text);
 
     string_getter_type sky_texture_getter;
     sky_texture_getter.bind(this, &time::sky_texture_getter);
@@ -299,86 +298,86 @@ void time::fill(editor::property_holder_collection* collection)
     string_setter_type sky_texture_setter;
     sky_texture_setter.bind(this, &time::sky_texture_setter);
 
-    m_property_holder->add_property("texture", "hemisphere", "this option is resposible for sky texture",
+    m_property_holder->add_property("texture", "hemisphere", "this option is responsible for sky texture",
         sky_texture_name.c_str(), sky_texture_getter, sky_texture_setter, ".dds", "Texture files (*.dds)|*.dds",
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
-        editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 
-    m_property_holder->add_property("sky color", "hemisphere", "this option is resposible for sky color",
-        (editor::color const&)sky_color, (editor::color&)sky_color);
+    m_property_holder->add_property("sky color", "hemisphere", "this option is responsible for sky color",
+        (XRay::Editor::color const&)sky_color, (XRay::Editor::color&)sky_color);
 
-    m_property_holder->add_property("hemi color", "hemisphere", "this option is resposible for hemisphere color",
-        (editor::color const&)hemi_color, (editor::color&)hemi_color);
+    m_property_holder->add_property("hemi color", "hemisphere", "this option is responsible for hemisphere color",
+        (XRay::Editor::color const&)hemi_color, (XRay::Editor::color&)hemi_color);
 
-    typedef ::editor::property_holder::float_getter_type float_getter_type;
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type float_getter;
 
-    typedef ::editor::property_holder::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type float_setter;
 
     float_getter.bind(this, &time::sky_rotation_getter);
     float_setter.bind(this, &time::sky_rotation_setter);
-    m_property_holder->add_property("sky rotation", "hemisphere", "this option is resposible for sky rotation",
+    m_property_holder->add_property("sky rotation", "hemisphere", "this option is responsible for sky rotation",
         sky_rotation, float_getter, float_setter, -360.0f, 360.f);
 
     string_getter.bind(this, &time::clouds_texture_getter);
     string_setter.bind(this, &time::clouds_texture_setter);
-    m_property_holder->add_property("texture", "clouds", "this option is resposible for clouds texture",
+    m_property_holder->add_property("texture", "clouds", "this option is responsible for clouds texture",
         clouds_texture_name.c_str(), string_getter, string_setter, ".dds", "Texture files (*.dds)|*.dds",
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
-        editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 
-    m_property_holder->add_property("color", "clouds", "this option is resposible for clouds color",
-        (editor::color const&)clouds_color, (editor::color&)clouds_color);
+    m_property_holder->add_property("color", "clouds", "this option is responsible for clouds color",
+        (XRay::Editor::color const&)clouds_color, (XRay::Editor::color&)clouds_color);
 
-    m_property_holder->add_property("transparency", "clouds", "this option is resposible for clouds transparency",
+    m_property_holder->add_property("transparency", "clouds", "this option is responsible for clouds transparency",
         clouds_color.w, clouds_color.w, 0.f, 1.f);
 
-    m_property_holder->add_property("color", "ambient", "this option is resposible for ambient color",
-        (editor::color const&)ambient, (editor::color&)ambient);
+    m_property_holder->add_property("color", "ambient", "this option is responsible for ambient color",
+        (XRay::Editor::color const&)ambient, (XRay::Editor::color&)ambient);
 
     collection_getter.bind(this, &time::ambients_collection);
     collection_size_getter.bind(this, &time::ambients_collection_size);
 
     string_getter.bind(this, &time::ambient_getter);
     string_setter.bind(this, &time::ambient_setter);
-    m_property_holder->add_property("ambient", "ambient", "this option is resposible for ambient", m_ambient.c_str(),
+    m_property_holder->add_property("ambient", "ambient", "this option is responsible for ambient", m_ambient.c_str(),
         string_getter, string_setter, collection_getter, collection_size_getter,
-        editor::property_holder::value_editor_combo_box, editor::property_holder::cannot_enter_text);
+        XRay::Editor::property_holder_base::value_editor_combo_box, XRay::Editor::property_holder_base::cannot_enter_text);
 
-    m_property_holder->add_property("color", "fog", "this option is resposible for fog density (0..1)",
-        (editor::color const&)fog_color, (editor::color&)fog_color);
+    m_property_holder->add_property("color", "fog", "this option is responsible for fog density (0..1)",
+        (XRay::Editor::color const&)fog_color, (XRay::Editor::color&)fog_color);
     m_property_holder->add_property(
-        "far plane", "fog", "this option is resposible for far plane", far_plane, far_plane);
+        "far plane", "fog", "this option is responsible for far plane", far_plane, far_plane);
     m_property_holder->add_property("distance", "fog",
-        "this option is resposible for fog distance (shoudl be less than far plane)", fog_distance, fog_distance);
+        "this option is responsible for fog distance (should be less than far plane)", fog_distance, fog_distance);
     m_property_holder->add_property(
-        "density", "fog", "this option is resposible for fog density (0..1)", fog_density, fog_density, 0.f, 1.f);
-    m_property_holder->add_property("water intensity", "fog", "this option is resposible for water intensity (0..1)",
+        "density", "fog", "this option is responsible for fog density (0..1)", fog_density, fog_density, 0.f, 1.f);
+    m_property_holder->add_property("water intensity", "fog", "this option is responsible for water intensity (0..1)",
         m_fWaterIntensity, m_fWaterIntensity, 0.f, 1.f);
 
-    m_property_holder->add_property("rain color", "rain", "this option is resposible for rain color",
-        (editor::color const&)rain_color, (editor::color&)rain_color);
-    m_property_holder->add_property("rain density", "rain", "this option is resposible for rain density (0..1)",
+    m_property_holder->add_property("rain color", "rain", "this option is responsible for rain color",
+        (XRay::Editor::color const&)rain_color, (XRay::Editor::color&)rain_color);
+    m_property_holder->add_property("rain density", "rain", "this option is responsible for rain density (0..1)",
         rain_density, rain_density, 0.f, 1.f);
 
     collection_getter.bind(this, &time::thunderbolts_collection);
     collection_size_getter.bind(this, &time::thunderbolts_collection_size);
-    m_property_holder->add_property("collection", "thunderbolts", "this option is resposible for ambient",
+    m_property_holder->add_property("collection", "thunderbolts", "this option is responsible for ambient",
         m_thunderbolt_collection.c_str(), m_thunderbolt_collection, collection_getter, collection_size_getter,
-        editor::property_holder::value_editor_combo_box, editor::property_holder::cannot_enter_text);
+        XRay::Editor::property_holder_base::value_editor_combo_box, XRay::Editor::property_holder_base::cannot_enter_text);
 
     m_property_holder->add_property(
-        "duration", "thunderbolts", "this option is resposible for thunderbolt duration", bolt_duration, bolt_duration);
+        "duration", "thunderbolts", "this option is responsible for thunderbolt duration", bolt_duration, bolt_duration);
     m_property_holder->add_property(
-        "period", "thunderbolts", "this option is resposible for thunderbolt period", bolt_period, bolt_period);
+        "period", "thunderbolts", "this option is responsible for thunderbolt period", bolt_period, bolt_period);
 
     float_getter.bind(this, &time::wind_direction_getter);
     float_setter.bind(this, &time::wind_direction_setter);
-    m_property_holder->add_property("direction", "wind", "this option is resposible for wind direction (in degrees)",
+    m_property_holder->add_property("direction", "wind", "this option is responsible for wind direction (in degrees)",
         wind_direction, float_getter, float_setter, -360.f, 360.f);
     m_property_holder->add_property("velocity", "wind",
-        "this option is resposible for wind velocity (meters per second)", wind_velocity, wind_velocity, 0.f, 1000.f);
+        "this option is responsible for wind velocity (meters per second)", wind_velocity, wind_velocity, 0.f, 1000.f);
 }
 
 void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power)
@@ -426,4 +425,3 @@ void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, floa
     inherited::lerp(parent, A, B, f, M, m_power);
 }
 
-#endif // #ifdef INGAME_EDITOR

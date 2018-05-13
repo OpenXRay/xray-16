@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "ISpatial.h"
+#include "xrCore/_fbox.h"
+#include "xrCore/Threading/Lock.hpp"
 
 extern Fvector c_spatial_offset[8];
 
@@ -22,6 +24,7 @@ public:
         box.setb(center, size);
         space = _space;
     }
+
     void walk(ISpatial_NODE* N, Fvector& n_C, float n_R)
     {
         // box
@@ -32,11 +35,9 @@ public:
             return;
 
         // test items
-        xr_vector<ISpatial*>::iterator _it = N->items.begin();
-        xr_vector<ISpatial*>::iterator _end = N->items.end();
-        for (; _it != _end; _it++)
+        for (auto& it : N->items)
         {
-            ISpatial* S = *_it;
+            ISpatial* S = it;
             if (0 == (S->GetSpatialData().type & mask))
                 continue;
 
@@ -69,10 +70,10 @@ public:
 
 void ISpatial_DB::q_box(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvector& _center, const Fvector& _size)
 {
-    cs.Enter();
+    pcs->Enter();
     Stats.Query.Begin();
     q_result = &R;
-    q_result->clear_not_free();
+    q_result->clear();
     if (_o & O_ONLYFIRST)
     {
         walker<true> W(this, _mask, _center, _size);
@@ -84,7 +85,7 @@ void ISpatial_DB::q_box(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvecto
         W.walk(m_root, m_center, m_bounds);
     }
     Stats.Query.End();
-    cs.Leave();
+    pcs->Leave();
 }
 
 void ISpatial_DB::q_sphere(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvector& _center, const float _radius)

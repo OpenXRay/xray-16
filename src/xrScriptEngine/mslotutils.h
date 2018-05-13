@@ -94,7 +94,7 @@ public:
     }
 };
 
-inline HANDLE CreateMailSlotByName(LPSTR slotName)
+inline HANDLE CreateMailSlotByName(LPCSTR slotName)
 {
     HANDLE hSlot = CreateMailslot(slotName,
         0, // no maximum message size
@@ -103,7 +103,7 @@ inline HANDLE CreateMailSlotByName(LPSTR slotName)
     return hSlot;
 }
 
-inline BOOL CheckExisting(LPSTR slotName)
+inline BOOL CheckExisting(LPCSTR slotName)
 {
     HANDLE hFile;
     BOOL res;
@@ -116,7 +116,7 @@ inline BOOL CheckExisting(LPSTR slotName)
     return res;
 }
 
-inline BOOL SendMailslotMessage(LPSTR slotName, CMailSlotMsg& msg)
+inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
 {
     BOOL fResult;
     HANDLE hFile;

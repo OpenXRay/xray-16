@@ -1,5 +1,9 @@
+#pragma once
 #ifndef PHNETSTATE_H
 #define PHNETSTATE_H
+#include "xrCore/_vector3d.h"
+#include "xrCore/_quaternion.h"
+#include "xrCommon/xr_vector.h"
 
 class NET_Packet;
 
@@ -39,7 +43,7 @@ private:
     void read(src& P, const Fvector& min, const Fvector& max);
 };
 
-DEFINE_VECTOR(SPHNetState, PHNETSTATE_VECTOR, PHNETSTATE_I);
+using PHNETSTATE_VECTOR = xr_vector<SPHNetState>;
 
 struct SPHBonesData
 {
@@ -49,7 +53,6 @@ struct SPHBonesData
     Fvector m_min;
     Fvector m_max;
 
-public:
     SPHBonesData();
     void net_Save(NET_Packet& P);
     void net_Load(NET_Packet& P);

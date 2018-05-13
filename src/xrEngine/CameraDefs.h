@@ -1,7 +1,9 @@
+#pragma once
 #ifndef CAMERA_DEFS_H_INCLUDED
 #define CAMERA_DEFS_H_INCLUDED
 
-#pragma once
+#include "xrCore/fastdelegate.h"
+#include "xrCore/_vector3d.h"
 
 struct ENGINE_API SBaseEffector
 {

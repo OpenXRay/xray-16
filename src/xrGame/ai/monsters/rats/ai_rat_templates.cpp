@@ -12,7 +12,7 @@
 #include "xrAICore/Navigation/game_graph.h"
 #include "magic_box3.h"
 #include "Include/xrRender/RenderVisual.h"
-#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location_impl.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "movement_manager.h"
 #include "location_manager.h"

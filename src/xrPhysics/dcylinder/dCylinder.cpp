@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "tri-colliderknoopc/dTriColliderCommon.h"
 #include "dCylinder.h"
 #include "xrPhysics/ode_include.h"
 
@@ -16,8 +17,6 @@ struct dxCylinder
 int dCylinderClassUser = -1;
 
 #define NUMC_MASK (0xffff)
-
-#define CONTACT(p, skip) ((dContactGeom*)(((char*)p) + (skip)))
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////circleIntersection//////////////////////////////////////////////////

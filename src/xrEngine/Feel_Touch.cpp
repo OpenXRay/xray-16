@@ -7,7 +7,7 @@ using namespace Feel;
 Touch::Touch() : pure_relcase(&Touch::feel_touch_relcase) {}
 Touch::~Touch() {}
 bool Touch::feel_touch_contact(IGameObject* O) { return true; }
-void Touch::feel_touch_deny(IGameObject* O, DWORD T)
+void Touch::feel_touch_deny(IGameObject* O, /*DWORD*/ unsigned long T)
 {
     DenyTouch D;
     D.O = O;
@@ -29,7 +29,7 @@ void Touch::feel_touch_update(Fvector& C, float R)
     }
 
     // Find nearest objects
-    q_nearest.clear_not_free();
+    q_nearest.clear();
     q_nearest.reserve(feel_touch.size());
     g_pGameLevel->ObjectSpace.GetNearest(q_nearest, C, R, NULL);
     xr_vector<IGameObject*>::iterator n_begin = q_nearest.begin();

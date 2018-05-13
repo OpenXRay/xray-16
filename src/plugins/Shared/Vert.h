@@ -8,7 +8,8 @@ struct SVertexData
     float weight;
     SVertexData(u32 b, float w) : bone(b), weight(w) { ; }
 };
-DEFINE_VECTOR(SVertexData, VDVec, VDIt);
+
+using VDVec = xr_vector<SVertexData>;
 
 class CVertexDef
 {
@@ -21,7 +22,8 @@ public:
     void SetPosition(Point3& p) { P.set(p.x, p.z, p.y); }
     void Append(u32 bone, float weight) { data.push_back(SVertexData(bone, weight)); }
 };
-DEFINE_VECTOR(CVertexDef*, VertexDefVec, VertexDefIt);
+
+using VertexDefVec = xr_vector<CVertexDef*>;
 
 struct st_VERT
 {
@@ -67,4 +69,4 @@ public:
     }
 };
 
-DEFINE_VECTOR(st_VERT*, ExpVertVec, ExpVertIt);
+using ExpVertVec = xr_vector<st_VERT*>;

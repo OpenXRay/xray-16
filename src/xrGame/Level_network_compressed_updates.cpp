@@ -42,6 +42,7 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
 
     if (OnClient())
         UpdateDeltaUpd(timeServer());
+    // XXX: Is a COPY of IClientStatistic really intended here?!
     IClientStatistic pStat = Level().GetStatistic();
     u32 dTime = 0;
 

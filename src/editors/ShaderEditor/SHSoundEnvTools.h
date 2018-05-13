@@ -40,7 +40,7 @@ public:
 
     void UseEnvironment()
     {
-        Sound->set_user_env(m_Env);
+        GEnv.Sound->set_user_env(m_Env);
     }
 
 public:

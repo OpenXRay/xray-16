@@ -36,12 +36,8 @@
     <ClCompile Include="Material\lambertShader.cpp">
       <Filter>Shader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrEngine\GameMtlLib.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrEngine\GameMtlLib_Engine.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
+    <ClCompile Include="$(SolutionDir)xrEngine\GameMtlLib.cpp" />
+    <ClCompile Include="$(SolutionDir)xrEngine\GameMtlLib_Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\ELog.h">
@@ -50,9 +46,7 @@
     <ClInclude Include="..\Shared\BlenderListLoader.h">
       <Filter>Shared Files\Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrEngine\GameMtlLib.h">
-      <Filter>Shared Files\Engine</Filter>
-    </ClInclude>
+    <ClInclude Include="$(SolutionDir)xrEngine\GameMtlLib.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Material\AElambertShaderTemplate.mel">

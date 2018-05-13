@@ -59,7 +59,7 @@ public:
     typedef System::Attribute Attribute;
 
 public:
-    property_color_base(editor::color const % color, array<System::Attribute ^> ^ attributes);
+    property_color_base(XRay::Editor::color const % color, array<System::Attribute ^> ^ attributes);
     virtual ~property_color_base();
     !property_color_base();
     void red(float value);
@@ -73,8 +73,8 @@ public:
     virtual void Increment(float increment);
 
 public:
-    virtual editor::color get_value_raw() = 0;
-    virtual void set_value_raw(editor::color color) = 0;
+    virtual XRay::Editor::color get_value_raw() = 0;
+    virtual void set_value_raw(XRay::Editor::color color) = 0;
 
 private:
     property_container ^ m_container;

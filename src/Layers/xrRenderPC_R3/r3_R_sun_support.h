@@ -96,7 +96,7 @@ public:
                 Fvector tmp_point = view_frustum_rays[i].P;
 
                 tmp_dist = light_cuboid_polys[align_planes[p]].plane.classify(tmp_point);
-                min_dist = _min(tmp_dist, min_dist);
+                min_dist = std::min(tmp_dist, min_dist);
             }
 
             Fvector shift = light_cuboid_polys[align_planes[p]].plane.n;
@@ -297,7 +297,7 @@ public:
         _edge(int _p0, int _p1, int m) : p0(_p0), p1(_p1), counter(m)
         {
             if (p0 > p1)
-                swap(p0, p1);
+                std::swap(p0, p1);
         }
         bool equal(_edge& E) { return p0 == E.p0 && p1 == E.p1; }
     };

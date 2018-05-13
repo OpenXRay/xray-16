@@ -22,7 +22,7 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
 
     u32 TriElem = 0;
     u32 LineElem = 0;
-    for (CStatGraph::SubGraphVecIt it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
+    for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
     {
         switch (it->style)
         {
@@ -44,9 +44,9 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
     };
 
     u32 dwOffsetTri = 0, dwOffsetLine = 0, dwCount;
-    FVF::TL0uv* pv_Tri_start = NULL;
+    FVF::TL0uv* pv_Tri_start = nullptr;
     FVF::TL0uv* pv_Tri;
-    FVF::TL0uv* pv_Line_start = NULL;
+    FVF::TL0uv* pv_Line_start = nullptr;
     FVF::TL0uv* pv_Line;
 
     if (TriElem)
@@ -55,7 +55,7 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
         pv_Tri = pv_Tri_start;
 
         pv_Tri = pv_Tri_start;
-        for (CStatGraph::SubGraphVecIt it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
+        for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
         {
             switch (it->style)
             {
@@ -73,7 +73,7 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
         pv_Line_start = (FVF::TL0uv*)RCache.Vertex.Lock(LineElem, hGeomLine->vb_stride, dwOffsetLine);
         pv_Line = pv_Line_start;
 
-        for (CStatGraph::SubGraphVecIt it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
+        for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
         {
             switch (it->style)
             {
@@ -212,7 +212,7 @@ void dxStatGraphRender::RenderBars(CStatGraph& owner, FVF::TL0uv** ppv, CStatGra
     float column_width = elem_offs;
     if (column_width > 1)
         column_width--;
-    for (CStatGraph::ElementsDeqIt it = pelements->begin(); it != pelements->end(); it++)
+    for (auto it = pelements->begin(); it != pelements->end(); it++)
     {
         float X = float(it - pelements->begin()) * elem_offs + owner.lt.x;
         float Y0 = base_y;
@@ -243,16 +243,16 @@ void dxStatGraphRender::RenderBars(CStatGraph& owner, FVF::TL0uv** ppv, CStatGra
     };
 }
 
-void dxStatGraphRender::RenderLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::ElementsDeq* pelements)
+void dxStatGraphRender::RenderLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::ElementsDeq* pelements) const
 {
     float elem_offs = float(owner.rb.x - owner.lt.x) / owner.max_item_count;
     float elem_factor = float(owner.rb.y - owner.lt.y) / float(owner.mx - owner.mn);
     float base_y = float(owner.rb.y) + (owner.mn * elem_factor);
 
-    for (CStatGraph::ElementsDeqIt it = pelements->begin() + 1; it != pelements->end() && it != pelements->end() + 1;
+    for (auto it = pelements->begin() + 1; it != pelements->end() && it != pelements->end() + 1;
          it++)
     {
-        CStatGraph::ElementsDeqIt it_prev = it - 1;
+        auto it_prev = it - 1;
         float X0 = float(it_prev - pelements->begin()) * elem_offs + owner.lt.x;
         float Y0 = base_y - it_prev->data * elem_factor;
         (*ppv)->set(X0, Y0, it->color);
@@ -264,16 +264,16 @@ void dxStatGraphRender::RenderLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGr
     }
 };
 
-void dxStatGraphRender::RenderBarLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::ElementsDeq* pelements)
+void dxStatGraphRender::RenderBarLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::ElementsDeq* pelements) const
 {
     float elem_offs = float(owner.rb.x - owner.lt.x) / owner.max_item_count;
     float elem_factor = float(owner.rb.y - owner.lt.y) / float(owner.mx - owner.mn);
     float base_y = float(owner.rb.y) + (owner.mn * elem_factor);
 
-    for (CStatGraph::ElementsDeqIt it = pelements->begin() + 1; it != pelements->end() && it != pelements->end() + 1;
+    for (auto it = pelements->begin() + 1; it != pelements->end() && it != pelements->end() + 1;
          it++)
     {
-        CStatGraph::ElementsDeqIt it_prev = it - 1;
+        auto it_prev = it - 1;
         float X0 = float(it_prev - pelements->begin()) * elem_offs + owner.lt.x + elem_offs;
         float Y0 = base_y - it_prev->data * elem_factor;
         (*ppv)->set(X0, Y0, it->color);
@@ -296,7 +296,7 @@ void dxStatGraphRender::RenderMarkers(CStatGraph& owner, FVF::TL0uv** ppv, CStat
     float elem_factor = float(owner.rb.y - owner.lt.y) / float(owner.mx - owner.mn);
     float base_y = float(owner.rb.y) + (owner.mn * elem_factor);
 
-    for (CStatGraph::MarkersDeqIt it = pmarkers->begin(); it != pmarkers->end() && it != pmarkers->end() + 1; it++)
+    for (auto it = pmarkers->begin(); it != pmarkers->end() && it != pmarkers->end() + 1; it++)
     {
         CStatGraph::SMarker& CurMarker = *it;
         float X0 = 0, Y0 = 0, X1 = 0, Y1 = 0;

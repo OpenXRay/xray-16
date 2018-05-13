@@ -9,13 +9,13 @@
 #include "r_constants.h"
 #include "xrCore/xr_resource.h"
 
-#include "sh_atomic.h"
-#include "sh_texture.h"
-#include "sh_matrix.h"
-#include "sh_constant.h"
-#include "sh_rt.h"
+#include "SH_Atomic.h"
+#include "SH_Texture.h"
+#include "SH_Matrix.h"
+#include "SH_Constant.h"
+#include "SH_RT.h"
 
-typedef xr_vector<shared_str> sh_list;
+using sh_list = xr_vector<shared_str>;
 class CBlender_Compile;
 class IBlender;
 #define SHADER_PASSES_MAX 2
@@ -25,10 +25,10 @@ class IBlender;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std::pair<u32, ref_texture>>
 {
-    typedef xr_vector<std::pair<u32, ref_texture>> inherited_vec;
+    using inherited_vec = xr_vector<std::pair<u32, ref_texture>>;
     ~STextureList();
 
-    IC BOOL equal(const STextureList& base) const
+    BOOL equal(const STextureList& base) const
     {
         if (size() != base.size())
             return FALSE;
@@ -42,7 +42,6 @@ struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std
         return TRUE;
     }
     virtual void clear();
-    virtual void clear_not_free();
 
     // Avoid using this function.
     // If possible use precompiled texture list.
@@ -66,17 +65,27 @@ typedef resptr_core<SConstantList, resptr_base<SConstantList>> ref_constant_list
 struct ECORE_API SGeometry : public xr_resource_flagged
 {
     ref_declaration dcl;
+#ifdef USE_OGL
+	GLuint vb;
+	GLuint ib;
+#else
     ID3DVertexBuffer* vb;
     ID3DIndexBuffer* ib;
+#endif
     u32 vb_stride;
     ~SGeometry();
 };
 
 struct ECORE_API resptrcode_geom : public resptr_base<SGeometry>
 {
+#ifdef USE_OGL
+    void create(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
+    void create(u32 FVF, GLuint vb, GLuint ib);
+#else
     void create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
     void create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-    void destroy() { _set(NULL); }
+#endif // USE_OGL
+    void destroy() { _set(nullptr); }
     u32 stride() const { return _get()->vb_stride; }
 };
 
@@ -87,9 +96,8 @@ struct ECORE_API SPass : public xr_resource_flagged
 {
     ref_state state; // Generic state, like Z-Buffering, samplers, etc
     ref_ps ps; // may be NULL = FFP, in that case "state" must contain TSS setup
-    // may be NULL = FFP, in that case "state" must contain RS setup, *and* FVF-compatible declaration must be used
-    ref_vs vs; 
-#if defined(USE_DX10) || defined(USE_DX11)
+    ref_vs vs; // may be NULL = FFP, in that case "state" must contain RS setup, *and* FVF-compatible declaration must be used
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     ref_gs gs; // may be NULL = don't use geometry shader at all
 #ifdef USE_DX11
     ref_hs hs; // may be NULL = don't use hull shader at all
@@ -114,7 +122,6 @@ typedef resptr_core<SPass, resptr_base<SPass>> ref_pass;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API ShaderElement : public xr_resource_flagged
 {
-public:
     struct Sflags
     {
         u32 iPriority : 2;
@@ -124,7 +131,6 @@ public:
         u32 bWmark : 1;
     };
 
-public:
     Sflags flags;
     svector<ref_pass, SHADER_PASSES_MAX> passes;
 
@@ -133,25 +139,26 @@ public:
     BOOL equal(ShaderElement& S);
     BOOL equal(ShaderElement* S);
 };
-typedef resptr_core<ShaderElement, resptr_base<ShaderElement>> ref_selement;
+using ref_selement = resptr_core<ShaderElement, resptr_base<ShaderElement>>;
 
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API Shader : public xr_resource_flagged
 {
-public:
     ref_selement E[6]; // R1 - 0=norm_lod0(det), 1=norm_lod1(normal), 2=L_point, 3=L_spot, 4=L_for_models,
     // R2 - 0=deffer, 1=norm_lod1(normal), 2=psm, 3=ssm, 4=dsm
     ~Shader();
     BOOL equal(Shader& S);
     BOOL equal(Shader* S);
 };
+
 struct ECORE_API resptrcode_shader : public resptr_base<Shader>
 {
-    void create(LPCSTR s_shader = 0, LPCSTR s_textures = 0, LPCSTR s_constants = 0, LPCSTR s_matrices = 0);
-    void create(IBlender* B, LPCSTR s_shader = 0, LPCSTR s_textures = 0, LPCSTR s_constants = 0, LPCSTR s_matrices = 0);
-    void destroy() { _set(NULL); }
+    void create(LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
+    void create(IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
+    void destroy() { _set(nullptr); }
 };
-typedef resptr_core<Shader, resptrcode_shader> ref_shader;
+
+using ref_shader = resptr_core<Shader, resptrcode_shader>;
 
 enum SE_R1
 {

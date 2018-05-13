@@ -5,37 +5,45 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>ECore</ProjectName>
     <ProjectGuid>{226C6807-BB48-4A07-BF13-806C38FD8FBE}</ProjectGuid>
     <RootNamespace>ECore</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <PropertyGroup Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
@@ -43,40 +51,11 @@
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(xrBinDir)</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(xrBinDir)</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <PreprocessorDefinitions>EDITOR;_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)Editor;$(ProjectDir)Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Editor\ArbitraryList.h" />
@@ -84,12 +63,10 @@
     <ClInclude Include="Editor\D3DUtils.h" />
     <ClInclude Include="Editor\D3DX_Wrapper.h" />
     <ClInclude Include="Editor\device.h" />
-    <ClInclude Include="Editor\DrawUtils.h" />
     <ClInclude Include="Editor\du_box.h" />
     <ClInclude Include="Editor\du_cone.h" />
     <ClInclude Include="Editor\du_cylinder.h" />
     <ClInclude Include="Editor\du_sphere.h" />
-    <ClInclude Include="Editor\du_sphere_part.h" />
     <ClInclude Include="Editor\EDetailModel.h" />
     <ClInclude Include="Editor\EditMesh.h" />
     <ClInclude Include="Editor\EditObject.h" />
@@ -97,7 +74,6 @@
     <ClInclude Include="Editor\ELog.h" />
     <ClInclude Include="Editor\engine.h" />
     <ClInclude Include="Editor\EStats.h" />
-    <ClInclude Include="Editor\ETextureParams.h" />
     <ClInclude Include="Editor\EThumbnail.h" />
     <ClInclude Include="Editor\ExportObjectOGF.h" />
     <ClInclude Include="Editor\ExportSkeleton.h" />
@@ -124,19 +100,12 @@
     <ClInclude Include="Editor\UI_MainCommand.h" />
     <ClInclude Include="Editor\UI_ToolsCustom.h" />
     <ClInclude Include="Engine\ai_sounds.h" />
-    <ClInclude Include="Engine\cl_collector.h" />
-    <ClInclude Include="Engine\cl_intersect.h" />
-    <ClInclude Include="Engine\GameMtlLib.h" />
     <ClInclude Include="Engine\guid_generator.h" />
     <ClInclude Include="Engine\Image.h" />
-    <ClInclude Include="Engine\NVMeshMender.h" />
-    <ClInclude Include="Engine\nv_algebra.h" />
-    <ClInclude Include="Engine\nv_math.h" />
-    <ClInclude Include="Engine\nv_mathdecl.h" />
     <ClInclude Include="Engine\Texture.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Editor\bone.cpp" />
     <ClCompile Include="Editor\BoneEditor.cpp" />
     <ClCompile Include="Editor\ColorPicker.cpp" />
     <ClCompile Include="Editor\c_dinput.cpp" />
@@ -147,7 +116,6 @@
     <ClCompile Include="Editor\du_cone.cpp" />
     <ClCompile Include="Editor\du_cylinder.cpp" />
     <ClCompile Include="Editor\du_sphere.cpp" />
-    <ClCompile Include="Editor\du_sphere_part.cpp" />
     <ClCompile Include="Editor\EDetailModel.cpp" />
     <ClCompile Include="Editor\EditMesh.cpp" />
     <ClCompile Include="Editor\EditMeshIO.cpp" />
@@ -165,7 +133,6 @@
     <ClCompile Include="Editor\ELog.cpp" />
     <ClCompile Include="Editor\Engine.cpp" />
     <ClCompile Include="Editor\EStats.cpp" />
-    <ClCompile Include="Editor\ETextureParams.cpp" />
     <ClCompile Include="Editor\EThumbnail.cpp" />
     <ClCompile Include="Editor\EThumbnailGroup.cpp" />
     <ClCompile Include="Editor\EThumbnailObject.cpp" />
@@ -192,21 +159,17 @@
     <ClCompile Include="Editor\UI_MainCommand.cpp" />
     <ClCompile Include="Editor\UI_MainMail.cpp" />
     <ClCompile Include="Editor\UI_ToolsCustom.cpp" />
-    <ClCompile Include="Editor\xrLoadSurface.cpp" />
     <ClCompile Include="Engine\ai_sounds.cpp" />
-    <ClCompile Include="Engine\bone.cpp">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-    </ClCompile>
-    <ClCompile Include="Engine\cl_collector.cpp" />
-    <ClCompile Include="Engine\GameMtlLib.cpp" />
-    <ClCompile Include="Engine\GameMtlLib_Engine.cpp" />
     <ClCompile Include="Engine\guid_generator.cpp" />
     <ClCompile Include="Engine\Image.cpp" />
-    <ClCompile Include="Engine\NVMeshMender.cpp" />
-    <ClCompile Include="Engine\nv_algebra.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

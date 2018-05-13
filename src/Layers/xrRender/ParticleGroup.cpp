@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrParticles/psystem.h"
 
@@ -22,7 +21,7 @@ CPGDef::CPGDef()
 
 CPGDef::~CPGDef()
 {
-    for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); it++)
+    for (auto it = m_Effects.begin(); it != m_Effects.end(); it++)
         xr_delete(*it);
     m_Effects.clear();
 }
@@ -70,7 +69,7 @@ BOOL CPGDef::Load(IReader& F)
     if (F.find_chunk(PGD_CHUNK_EFFECTS))
     {
         m_Effects.resize(F.r_u32());
-        for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); it++)
+        for (auto it = m_Effects.begin(); it != m_Effects.end(); it++)
         {
             *it = new SEffect();
             F.r_stringZ((*it)->m_EffectName);
@@ -90,14 +89,14 @@ BOOL CPGDef::Load(IReader& F)
 
 BOOL CPGDef::Load2(CInifile& ini)
 {
-    //.	u16 version						= ini.r_u16("_group", "version");
+    //u16 version = ini.r_u16("_group", "version");
     m_Flags.assign(ini.r_u32("_group", "flags"));
 
     m_Effects.resize(ini.r_u32("_group", "effects_count"));
 
     u32 counter = 0;
     string256 buff;
-    for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); ++it, ++counter)
+    for (auto it = m_Effects.begin(); it != m_Effects.end(); ++it, ++counter)
     {
         *it = new SEffect();
 
@@ -130,7 +129,7 @@ void CPGDef::Save(IWriter& F)
 
     F.open_chunk(PGD_CHUNK_EFFECTS);
     F.w_u32(m_Effects.size());
-    for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); it++)
+    for (auto it = m_Effects.begin(); it != m_Effects.end(); it++)
     {
         F.w_stringZ((*it)->m_EffectName);
         F.w_stringZ((*it)->m_OnPlayChildName);
@@ -157,7 +156,7 @@ void CPGDef::Save2(CInifile& ini)
 
     u32 counter = 0;
     string256 buff;
-    for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); ++it, ++counter)
+    for (auto it = m_Effects.begin(); it != m_Effects.end(); ++it, ++counter)
     {
         xr_sprintf(buff, sizeof(buff), "effect_%04d", counter);
 
@@ -165,9 +164,9 @@ void CPGDef::Save2(CInifile& ini)
         ini.w_string(
             buff, "on_play_child", (*it)->m_Flags.test(SEffect::flOnPlayChild) ? (*it)->m_OnPlayChildName.c_str() : "");
         ini.w_string(buff, "on_birth_child",
-            (*it)->m_Flags.test(SEffect::flOnBirthChild) ? (*it)->m_OnBirthChildName.c_str() : "");
+                     (*it)->m_Flags.test(SEffect::flOnBirthChild) ? (*it)->m_OnBirthChildName.c_str() : "");
         ini.w_string(buff, "on_death_child",
-            (*it)->m_Flags.test(SEffect::flOnDeadChild) ? (*it)->m_OnDeadChildName.c_str() : "");
+                     (*it)->m_Flags.test(SEffect::flOnDeadChild) ? (*it)->m_OnDeadChildName.c_str() : "");
         ini.w_float(buff, "time0", (*it)->m_Time0);
         ini.w_float(buff, "time1", (*it)->m_Time1);
         ini.w_u32(buff, "flags", (*it)->m_Flags.get());
@@ -183,19 +182,19 @@ void CParticleGroup::SItem::Clear()
 {
     VisualVec visuals;
     GetVisuals(visuals);
-    for (VisualVecIt it = visuals.begin(); it != visuals.end(); it++)
+    for (auto it = visuals.begin(); it != visuals.end(); it++)
     {
-        // GlobalEnv.Render->model_Delete(*it);
+        // GEnv.Render->model_Delete(*it);
         IRenderVisual* pVisual = smart_cast<IRenderVisual*>(*it);
-        GlobalEnv.Render->model_Delete(pVisual);
-        *it = 0;
+        GEnv.Render->model_Delete(pVisual);
+        *it = nullptr;
     }
 
     //	Igor: zero all pointers! Previous code didn't zero _source_ pointers,
     //	just temporary ones.
-    _effect = 0;
-    _children_related.clear_not_free();
-    _children_free.clear_not_free();
+    _effect = nullptr;
+    _children_related.clear();
+    _children_free.clear();
 }
 void CParticleGroup::SItem::StartRelatedChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m)
 {
@@ -273,56 +272,66 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
     if (E)
         E->Stop(def_stop);
-    VisualVecIt it;
-    for (it = _children_related.begin(); it != _children_related.end(); it++)
+
+    for (auto it = _children_related.begin(); it != _children_related.end(); it++)
         static_cast<CParticleEffect*>(*it)->Stop(def_stop);
-    for (it = _children_free.begin(); it != _children_free.end(); it++)
+    for (auto it = _children_free.begin(); it != _children_free.end(); it++)
         static_cast<CParticleEffect*>(*it)->Stop(def_stop);
+
     // and delete if !deffered
     if (!def_stop)
     {
-        for (it = _children_related.begin(); it != _children_related.end(); it++)
+        for (auto it = _children_related.begin(); it != _children_related.end(); it++)
         {
-            // GlobalEnv.Render->model_Delete(*it);
+            // GEnv.Render->model_Delete(*it);
             IRenderVisual* pVisual = smart_cast<IRenderVisual*>(*it);
-            GlobalEnv.Render->model_Delete(pVisual);
-            *it = 0;
+            GEnv.Render->model_Delete(pVisual);
+            *it = nullptr;
         }
-        for (it = _children_free.begin(); it != _children_free.end(); it++)
+        for (auto it = _children_free.begin(); it != _children_free.end(); it++)
         {
-            // GlobalEnv.Render->model_Delete(*it);
+            // GEnv.Render->model_Delete(*it);
             IRenderVisual* pVisual = smart_cast<IRenderVisual*>(*it);
-            GlobalEnv.Render->model_Delete(pVisual);
-            *it = 0;
+            GEnv.Render->model_Delete(pVisual);
+            *it = nullptr;
         }
+
         _children_related.clear();
         _children_free.clear();
     }
 }
-BOOL CParticleGroup::SItem::IsPlaying()
+bool CParticleGroup::SItem::IsPlaying() const
 {
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    return E ? E->IsPlaying() : FALSE;
+    return E ? E->IsPlaying() : false;
 }
+
 void CParticleGroup::SItem::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)
 {
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
     if (E)
         E->UpdateParent(m, velocity, bXFORM);
 }
+
 //------------------------------------------------------------------------------
+
 void OnGroupParticleBirth(void* owner, u32 param, PAPI::Particle& m, u32 idx)
 {
     CParticleGroup* PG = static_cast<CParticleGroup*>(owner);
     VERIFY(PG);
+
     CParticleEffect* PE = static_cast<CParticleEffect*>(PG->items[param]._effect);
     PS::OnEffectParticleBirth(PE, param, m, idx);
+
     // if have child
     const CPGDef* PGD = PG->GetDefinition();
     VERIFY(PGD);
+
     const CPGDef::SEffect* eff = PGD->m_Effects[param];
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnBirthChild))
         PG->items[param].StartFreeChild(PE, *eff->m_OnBirthChildName, m);
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnPlayChild))
         PG->items[param].StartRelatedChild(PE, *eff->m_OnPlayChildName, m);
 }
@@ -330,38 +339,43 @@ void OnGroupParticleDead(void* owner, u32 param, PAPI::Particle& m, u32 idx)
 {
     CParticleGroup* PG = static_cast<CParticleGroup*>(owner);
     VERIFY(PG);
+
     CParticleEffect* PE = static_cast<CParticleEffect*>(PG->items[param]._effect);
     PS::OnEffectParticleDead(PE, param, m, idx);
+
     // if have child
     const CPGDef* PGD = PG->GetDefinition();
     VERIFY(PGD);
+
     const CPGDef::SEffect* eff = PGD->m_Effects[param];
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnPlayChild))
         PG->items[param].StopRelatedChild(idx);
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnDeadChild))
         PG->items[param].StartFreeChild(PE, *eff->m_OnDeadChildName, m);
 }
 //------------------------------------------------------------------------------
-struct zero_vis_pred : public std::unary_function<dxRender_Visual*, bool>
+struct zero_vis_pred
 {
-    bool operator()(const dxRender_Visual* x) { return x == 0; }
+    bool operator()(const dxRender_Visual* x) { return x == nullptr; }
 };
 void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& box, bool& bPlaying)
 {
-    CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    if (E)
+    CParticleEffect* E1 = static_cast<CParticleEffect*>(_effect);
+    if (E1)
     {
-        E->OnFrame(u_dt);
-        if (E->IsPlaying())
+        E1->OnFrame(u_dt);
+        if (E1->IsPlaying())
         {
             bPlaying = true;
-            if (E->vis.box.is_valid())
-                box.merge(E->vis.box);
+            if (E1->vis.box.is_valid())
+                box.merge(E1->vis.box);
             if (def.m_Flags.is(CPGDef::SEffect::flOnPlayChild) && def.m_OnPlayChildName.size())
             {
                 PAPI::Particle* particles;
                 u32 p_cnt;
-                PAPI::ParticleManager()->GetParticles(E->GetHandleEffect(), particles, p_cnt);
+                PAPI::ParticleManager()->GetParticles(E1->GetHandleEffect(), particles, p_cnt);
                 VERIFY(p_cnt == _children_related.size());
                 if (p_cnt)
                 {
@@ -380,10 +394,10 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
             }
         }
     }
-    VisualVecIt it;
+
     if (!_children_related.empty())
     {
-        for (it = _children_related.begin(); it != _children_related.end(); it++)
+        for (auto it = _children_related.begin(); it != _children_related.end(); it++)
         {
             CParticleEffect* E = static_cast<CParticleEffect*>(*it);
             if (E)
@@ -408,7 +422,7 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
     if (!_children_free.empty())
     {
         u32 rem_cnt = 0;
-        for (it = _children_free.begin(); it != _children_free.end(); it++)
+        for (auto it = _children_free.begin(); it != _children_free.end(); it++)
         {
             CParticleEffect* E = static_cast<CParticleEffect*>(*it);
             if (E)
@@ -423,17 +437,17 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
                 else
                 {
                     rem_cnt++;
-                    // GlobalEnv.Render->model_Delete(*it);
+                    // GEnv.Render->model_Delete(*it);
                     IRenderVisual* pVisual = smart_cast<IRenderVisual*>(*it);
-                    GlobalEnv.Render->model_Delete(pVisual);
-                    *it = 0;
+                    GEnv.Render->model_Delete(pVisual);
+                    *it = nullptr;
                 }
             }
         }
         // remove if stopped
         if (rem_cnt)
         {
-            VisualVecIt new_end = std::remove_if(_children_free.begin(), _children_free.end(), zero_vis_pred());
+            auto new_end = std::remove_if(_children_free.begin(), _children_free.end(), zero_vis_pred());
             _children_free.erase(new_end, _children_free.end());
         }
     }
@@ -443,14 +457,14 @@ void CParticleGroup::SItem::OnDeviceCreate()
 {
     VisualVec visuals;
     GetVisuals(visuals);
-    for (VisualVecIt it = visuals.begin(); it != visuals.end(); it++)
+    for (auto it = visuals.begin(); it != visuals.end(); it++)
         static_cast<CParticleEffect*>(*it)->OnDeviceCreate();
 }
 void CParticleGroup::SItem::OnDeviceDestroy()
 {
     VisualVec visuals;
     GetVisuals(visuals);
-    for (VisualVecIt it = visuals.begin(); it != visuals.end(); it++)
+    for (auto it = visuals.begin(); it != visuals.end(); it++)
         static_cast<CParticleEffect*>(*it)->OnDeviceDestroy();
 }
 u32 CParticleGroup::SItem::ParticlesCount()
@@ -458,7 +472,7 @@ u32 CParticleGroup::SItem::ParticlesCount()
     u32 p_count = 0;
     VisualVec visuals;
     GetVisuals(visuals);
-    for (VisualVecIt it = visuals.begin(); it != visuals.end(); it++)
+    for (auto it = visuals.begin(); it != visuals.end(); it++)
         p_count += static_cast<CParticleEffect*>(*it)->ParticlesCount();
     return p_count;
 }
@@ -474,7 +488,7 @@ CParticleGroup::CParticleGroup()
 
 CParticleGroup::~CParticleGroup()
 {
-    // Msg ("!!! destoy PG");
+    // Msg ("!!! destroy PG");
     for (u32 i = 0; i < items.size(); i++)
         items[i].Clear();
     items.clear();
@@ -513,7 +527,7 @@ void CParticleGroup::OnFrame(u32 u_dt)
         bool bPlaying = false;
         Fbox box;
         box.invalidate();
-        for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
+        for (auto i_it = items.begin(); i_it != items.end(); i_it++)
             i_it->OnFrame(u_dt, *m_Def->m_Effects[i_it - items.begin()], box, bPlaying);
 
         if (m_RT_Flags.is(flRT_DefferedStop) && !bPlaying)
@@ -537,17 +551,19 @@ void CParticleGroup::OnFrame(u32 u_dt)
 void CParticleGroup::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)
 {
     m_InitialPosition = m.c;
-    for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
+    for (auto i_it = items.begin(); i_it != items.end(); i_it++)
         i_it->UpdateParent(m, velocity, bXFORM);
 }
 
 BOOL CParticleGroup::Compile(CPGDef* def)
 {
     m_Def = def;
+
     // destroy existing
-    for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
+    for (auto i_it = items.begin(); i_it != items.end(); i_it++)
         i_it->Clear();
     items.clear();
+
     // create new
     if (m_Def)
     {
@@ -579,33 +595,33 @@ void CParticleGroup::Stop(BOOL bDefferedStop)
     {
         m_RT_Flags.set(flRT_Playing, FALSE);
     }
-    for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
+    for (auto i_it = items.begin(); i_it != items.end(); i_it++)
         i_it->Stop(bDefferedStop);
 }
 
 void CParticleGroup::OnDeviceCreate()
 {
-    for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
+    for (auto i_it = items.begin(); i_it != items.end(); i_it++)
         i_it->OnDeviceCreate();
 }
 
 void CParticleGroup::OnDeviceDestroy()
 {
-    for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
+    for (auto i_it = items.begin(); i_it != items.end(); i_it++)
         i_it->OnDeviceDestroy();
 }
 
 u32 CParticleGroup::ParticlesCount()
 {
     int p_count = 0;
-    for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
+    for (auto i_it = items.begin(); i_it != items.end(); i_it++)
         p_count += i_it->ParticlesCount();
     return p_count;
 }
 
 void CParticleGroup::SetHudMode(BOOL b)
 {
-    for (SItemVecIt i_it = items.begin(); i_it != items.end(); ++i_it)
+    for (auto i_it = items.begin(); i_it != items.end(); ++i_it)
     {
         CParticleEffect* E = static_cast<CParticleEffect*>(i_it->_effect);
         E->SetHudMode(b);
@@ -619,6 +635,5 @@ BOOL CParticleGroup::GetHudMode()
         CParticleEffect* E = static_cast<CParticleEffect*>(items[0]._effect);
         return E->GetHudMode();
     }
-    else
-        return FALSE;
+    return false;
 }

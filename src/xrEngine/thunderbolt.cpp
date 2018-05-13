@@ -62,8 +62,7 @@ void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
     color_anim->fFPS = (float)color_anim->iFrameCount;
 
     // models
-    LPCSTR m_name;
-    m_name = pIni.r_string(sect, "lightning_model");
+    LPCSTR m_name = pIni.r_string(sect, "lightning_model");
     m_pRender->CreateModel(m_name);
 
     /*
@@ -96,7 +95,7 @@ void SThunderboltCollection::load(CInifile* pIni, CInifile* thunderbolts, LPCSTR
 }
 SThunderboltCollection::~SThunderboltCollection()
 {
-    for (DescIt d_it = palette.begin(); d_it != palette.end(); d_it++)
+    for (auto d_it = palette.begin(); d_it != palette.end(); d_it++)
         xr_delete(*d_it);
 
     palette.clear();
@@ -132,8 +131,9 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
 
 CEffect_Thunderbolt::~CEffect_Thunderbolt()
 {
-    for (CollectionVecIt d_it = collection.begin(); d_it != collection.end(); d_it++)
+    for (auto d_it = collection.begin(); d_it != collection.end(); d_it++)
         xr_delete(*d_it);
+
     collection.clear();
     // hGeom_model.destroy ();
     // hGeom_gradient.destroy ();
@@ -144,34 +144,36 @@ shared_str CEffect_Thunderbolt::AppendDef(
 {
     if (!sect || (0 == sect[0]))
         return "";
-    for (CollectionVecIt it = collection.begin(); it != collection.end(); it++)
+
+    for (auto it = collection.begin(); it != collection.end(); it++)
         if ((*it)->section == sect)
             return (*it)->section;
+
     collection.push_back(environment.thunderbolt_collection(pIni, thunderbolts, sect));
     return collection.back()->section;
 }
 
-BOOL CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& dist)
+bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& range)
 {
     BOOL bRes = TRUE;
 #ifdef _EDITOR
-    bRes = Tools->RayPick(s, d, dist, 0, 0);
+    bRes = Tools->RayPick(s, d, range, 0, 0);
 #else
     collide::rq_result RQ;
     IGameObject* E = g_pGameLevel->CurrentViewEntity();
-    bRes = g_pGameLevel->ObjectSpace.RayPick(s, d, dist, collide::rqtBoth, RQ, E);
+    bRes = g_pGameLevel->ObjectSpace.RayPick(s, d, range, collide::rqtBoth, RQ, E);
     if (bRes)
-        dist = RQ.range;
+        range = RQ.range;
     else
     {
         Fvector N = {0.f, -1.f, 0.f};
         Fvector P = {0.f, 0.f, 0.f};
         Fplane PL;
         PL.build(P, N);
-        float dst = dist;
-        if (PL.intersectRayDist(s, d, dst) && (dst <= dist))
+        float dst = range;
+        if (PL.intersectRayDist(s, d, dst) && (dst <= range))
         {
-            dist = dst;
+            range = dst;
             return true;
         }
         else
@@ -271,7 +273,7 @@ void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
         environment.CurrentEnv->sun_color.mad(fClr, environment.p_sun_color);
         environment.CurrentEnv->fog_color.mad(fClr, environment.p_fog_color);
 
-        if (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2)
+        if (GEnv.Render->get_generation() == IRender::GENERATION_R2)
         {
             R_ASSERT(_valid(current_direction));
             g_pGamePersistent->Environment().CurrentEnv->sun_dir = current_direction;

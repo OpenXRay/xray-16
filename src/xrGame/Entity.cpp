@@ -17,6 +17,7 @@
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
+#include "xrNetServer/NET_Messages.h"
 
 #define BODY_REMOVE_TIME 600000
 
@@ -251,12 +252,23 @@ void CEntity::net_Destroy()
     set_ready_to_save();
 }
 
-void CEntity::KillEntity(u16 whoID)
+void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
 {
-    if (this->ID() == Actor()->ID())
+    if (GameID() == eGameIDSingle && this->ID() == Actor()->ID())
     {
+    //AVO: allow scripts to process actor condition and prevent actor's death or kill him if desired.
+    //IMPORTANT: if you wish to kill actor you need to call db.actor:kill(level:object_by_id(whoID), true) in actor_before_death callback, to ensure all objects are properly destroyed
+    // this will bypass below if block and go to normal KillEntity routine.
+#ifdef ACTOR_BEFORE_DEATH_CALLBACK
+        if (bypass_actor_check == false)
+        {
+            Actor()->callback(GameObject::eActorBeforeDeath)(whoID);
+            return;
+        }
+#endif
+    //-AVO
         Actor()->detach_Vehicle();
-        Actor()->use_MountedWeapon(NULL);
+        Actor()->use_MountedWeapon(nullptr);
     }
     if (whoID != ID())
     {

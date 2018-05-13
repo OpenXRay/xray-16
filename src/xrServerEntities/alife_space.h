@@ -1,13 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: alife_space.h
-//	Created 	: 08.01.2002
-//  Modified 	: 08.01.2003
-//	Author		: Dmitriy Iassenev
-//	Description : ALife space
+//  Module      : alife_space.h
+//  Created     : 08.01.2002
+//  Modified    : 08.01.2003
+//  Author      : Dmitriy Iassenev
+//  Description : ALife space
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef XRAY_ALIFE_SPACE
-#define XRAY_ALIFE_SPACE
+#pragma once
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_map.h"
 
 // ALife objects, events and tasks
 #define ALIFE_VERSION 0x0006
@@ -100,7 +101,7 @@ enum EHitType
     eHitTypeStrike,
     eHitTypeExplosion,
     eHitTypeWound_2, // knife's alternative fire
-    //		eHitTypePhysicStrike,
+    //      eHitTypePhysicStrike,
     eHitTypeLightBurn,
     eHitTypeMax,
 };
@@ -157,50 +158,16 @@ enum EWeaponAddonStatus
     eAddonAttachable = 2
 };
 
-IC EHitType g_tfString2HitType(LPCSTR caHitType)
-{
-    if (!stricmp(caHitType, "burn"))
-        return (eHitTypeBurn);
-    else if (!stricmp(caHitType, "light_burn"))
-        return (eHitTypeLightBurn);
-    else if (!stricmp(caHitType, "shock"))
-        return (eHitTypeShock);
-    else if (!stricmp(caHitType, "strike"))
-        return (eHitTypeStrike);
-    else if (!stricmp(caHitType, "wound"))
-        return (eHitTypeWound);
-    else if (!stricmp(caHitType, "radiation"))
-        return (eHitTypeRadiation);
-    else if (!stricmp(caHitType, "telepatic"))
-        return (eHitTypeTelepatic);
-    else if (!stricmp(caHitType, "fire_wound"))
-        return (eHitTypeFireWound);
-    else if (!stricmp(caHitType, "chemical_burn"))
-        return (eHitTypeChemicalBurn);
-    else if (!stricmp(caHitType, "explosion"))
-        return (eHitTypeExplosion);
-    else if (!stricmp(caHitType, "wound_2"))
-        return (eHitTypeWound_2);
-    else
-        FATAL("Unsupported hit type!");
-    NODEFAULT;
-#ifdef DEBUG
-    return (eHitTypeMax);
-#endif
+EHitType g_tfString2HitType(LPCSTR caHitType);
+pcstr g_cafHitType2String(EHitType tHitType);
+
+using INT_VECTOR = xr_vector<int>;
+using OBJECT_VECTOR = xr_vector<_OBJECT_ID>;
+using OBJECT_IT = OBJECT_VECTOR::iterator;
+using ITEM_P_VECTOR = xr_vector<CSE_ALifeInventoryItem*>;
+using WEAPON_P_VECTOR = xr_vector<CSE_ALifeItemWeapon*>;
+using SCHEDULE_P_VECTOR = xr_vector<CSE_ALifeSchedulable*>;
+
+using D_OBJECT_P_MAP = xr_map<_OBJECT_ID, CSE_ALifeDynamicObject*>;
+using STORY_P_MAP = xr_map<_STORY_ID, CSE_ALifeDynamicObject*>;
 }
-#ifndef _EDITOR
-extern xr_token hit_types_token[];
-
-IC LPCSTR g_cafHitType2String(EHitType tHitType) { return get_token_name(hit_types_token, tHitType); }
-#endif
-DEFINE_VECTOR(int, INT_VECTOR, INT_IT);
-DEFINE_VECTOR(_OBJECT_ID, OBJECT_VECTOR, OBJECT_IT);
-DEFINE_VECTOR(CSE_ALifeInventoryItem*, ITEM_P_VECTOR, ITEM_P_IT);
-DEFINE_VECTOR(CSE_ALifeItemWeapon*, WEAPON_P_VECTOR, WEAPON_P_IT);
-DEFINE_VECTOR(CSE_ALifeSchedulable*, SCHEDULE_P_VECTOR, SCHEDULE_P_IT);
-
-DEFINE_MAP(_OBJECT_ID, CSE_ALifeDynamicObject*, D_OBJECT_P_MAP, D_OBJECT_P_PAIR_IT);
-DEFINE_MAP(_STORY_ID, CSE_ALifeDynamicObject*, STORY_P_MAP, STORY_P_PAIR_IT);
-};
-
-#endif // XRAY_ALIFE_SPACE

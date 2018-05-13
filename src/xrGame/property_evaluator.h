@@ -23,7 +23,7 @@ public:
 public:
     _object_type* m_object;
     CPropertyStorage* m_storage;
-#ifdef LOG_ACTION
+#if 1//def LOG_ACTION //Alundaio: m_evaluator_name
     LPCSTR m_evaluator_name;
 #endif
 

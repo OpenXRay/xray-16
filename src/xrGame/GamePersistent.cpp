@@ -41,17 +41,12 @@
 #include "ai_debug.h"
 #endif // _EDITOR
 
-//#ifdef DEBUG_MEMORY_MANAGER
-//	static	void *	ode_alloc	(size_t size)								{ return Memory.mem_alloc(size,"ODE");
-//}
-//	static	void *	ode_realloc	(void *ptr, size_t oldsize, size_t newsize)	{ return
-// Memory.mem_realloc(ptr,newsize,"ODE");	}
-//	static	void	ode_free	(void *ptr, size_t size)					{ return xr_free(ptr); }
-//#else // DEBUG_MEMORY_MANAGER
-//	static	void *	ode_alloc	(size_t size)								{ return xr_malloc(size);			}
-//	static	void *	ode_realloc	(void *ptr, size_t oldsize, size_t newsize)	{ return xr_realloc(ptr,newsize);	}
-//	static	void	ode_free	(void *ptr, size_t size)					{ return xr_free(ptr);				}
-//#endif // DEBUG_MEMORY_MANAGER
+//static	void *	ode_alloc	(size_t size)								{ return xr_malloc(size);			}
+//static	void *	ode_realloc	(void *ptr, size_t oldsize, size_t newsize)	{ return xr_realloc(ptr,newsize);	}
+//static	void	ode_free	(void *ptr, size_t size)					{ return xr_free(ptr);				}
+
+// temporary hack to get rid of the Microsoft-specific "__super"
+using super = IGame_Persistent;
 
 CGamePersistent::CGamePersistent(void)
 {
@@ -155,7 +150,7 @@ void CGamePersistent::OnAppStart()
     // load game materials
     GMLib.Load();
     init_game_globals();
-    __super ::OnAppStart();
+    super::OnAppStart();
     m_pUI_core = new ui_core();
     m_pMainMenu = new CMainMenu();
 }
@@ -168,22 +163,22 @@ void CGamePersistent::OnAppEnd()
     xr_delete(m_pMainMenu);
     xr_delete(m_pUI_core);
 
-    __super ::OnAppEnd();
+    super::OnAppEnd();
 
     clean_game_globals();
 
     GMLib.Unload();
 }
 
-void CGamePersistent::Start(LPCSTR op) { __super ::Start(op); }
+void CGamePersistent::Start(LPCSTR op) { super::Start(op); }
 void CGamePersistent::Disconnect()
 {
     // destroy ambient particles
     CParticlesObject::Destroy(ambient_particles);
 
-    __super ::Disconnect();
+    super::Disconnect();
     // stop all played emitters
-    ::Sound->stop_emitters();
+    GEnv.Sound->stop_emitters();
     m_game_params.m_e_game_type = eGameIDNoGame;
 }
 
@@ -191,7 +186,7 @@ void CGamePersistent::Disconnect()
 
 void CGamePersistent::OnGameStart()
 {
-    __super ::OnGameStart();
+    super::OnGameStart();
     UpdateGameType();
 }
 
@@ -212,7 +207,7 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort)
 
 void CGamePersistent::UpdateGameType()
 {
-    __super ::UpdateGameType();
+    super::UpdateGameType();
 
     m_game_params.m_e_game_type = ParseStringToGameType(m_game_params.m_game_type);
 
@@ -224,7 +219,7 @@ void CGamePersistent::UpdateGameType()
 
 void CGamePersistent::OnGameEnd()
 {
-    __super ::OnGameEnd();
+    super::OnGameEnd();
 
     xr_delete(g_stalker_animation_data_storage);
     xr_delete(g_stalker_velocity_holder);
@@ -232,7 +227,7 @@ void CGamePersistent::OnGameEnd()
 
 void CGamePersistent::WeathersUpdate()
 {
-    if (g_pGameLevel && !g_dedicated_server)
+    if (g_pGameLevel && !GEnv.isDedicatedServer)
     {
         CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
         BOOL bIndoor = TRUE;
@@ -251,8 +246,8 @@ void CGamePersistent::WeathersUpdate()
         if (env_amb)
         {
             CEnvAmbient::SSndChannelVec& vec = current_env->env_ambient->get_snd_channels();
-            CEnvAmbient::SSndChannelVecIt I = vec.begin();
-            CEnvAmbient::SSndChannelVecIt E = vec.end();
+            auto I = vec.begin();
+            auto E = vec.end();
 
             for (u32 idx = 0; I != E; ++I, ++idx)
             {
@@ -432,7 +427,7 @@ void CGamePersistent::start_logo_intro()
     if (Device.dwPrecacheFrame == 0)
     {
         m_intro_event.bind(this, &CGamePersistent::update_logo_intro);
-        if (!g_dedicated_server && 0 == xr_strlen(m_game_params.m_game_or_spawn) && NULL == g_pGameLevel)
+        if (!GEnv.isDedicatedServer && 0 == xr_strlen(m_game_params.m_game_or_spawn) && NULL == g_pGameLevel)
         {
             VERIFY(NULL == m_intro);
             m_intro = new CUISequencer();
@@ -494,7 +489,7 @@ void CGamePersistent::start_game_intro()
     if (g_pGameLevel && g_pGameLevel->bReady && Device.dwPrecacheFrame <= 2)
     {
         m_intro_event.bind(this, &CGamePersistent::update_game_intro);
-        if (0 == stricmp(m_game_params.m_new_or_load, "new"))
+        if (0 == xr_stricmp(m_game_params.m_new_or_load, "new"))
         {
             VERIFY(NULL == m_intro);
             m_intro = new CUISequencer();
@@ -525,6 +520,7 @@ void CGamePersistent::OnFrame()
 {
     if (Device.dwPrecacheFrame == 5 && m_intro_event.empty())
     {
+        SetLoadStageTitle();
         m_intro_event.bind(this, &CGamePersistent::game_loaded);
     }
 
@@ -544,10 +540,10 @@ void CGamePersistent::OnFrame()
 #ifdef DEBUG
     ++m_frame_counter;
 #endif
-    if (!g_dedicated_server && !m_intro_event.empty())
+    if (!GEnv.isDedicatedServer && !m_intro_event.empty())
         m_intro_event();
 
-    if (!g_dedicated_server && Device.dwPrecacheFrame == 0 && !m_intro && m_intro_event.empty())
+    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 0 && !m_intro && m_intro_event.empty())
         load_screen_renderer.stop();
 
     if (!m_pMainMenu->IsActive())
@@ -638,10 +634,13 @@ void CGamePersistent::OnFrame()
         }
 #endif // MASTER_GOLD
     }
-    __super ::OnFrame();
+    super::OnFrame();
 
     if (!Device.Paused())
+    {
         Engine.Sheduler.Update();
+        Engine.Scheduler.ProcessStep();
+    }
 
     // update weathers ambient
     if (!Device.Paused())
@@ -749,16 +748,11 @@ void CGamePersistent::OnAppActivate()
     bIsMP &= !Device.Paused();
 
     if (!bIsMP)
-    {
         Device.Pause(FALSE, !bRestorePause, TRUE, "CGP::OnAppActivate");
-    }
     else
-    {
         Device.Pause(FALSE, TRUE, TRUE, "CGP::OnAppActivate MP");
-    }
 
     bEntryFlag = TRUE;
-    pInput->ClipCursor(!GetUICursor().IsVisible());
 }
 
 void CGamePersistent::OnAppDeactivate()
@@ -810,12 +804,12 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
         bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
         if (is_single)
         {
-            R_ASSERT(ai().script_engine().functor("loadscreen.get_tip_number", m_functor));
+            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_tip_number", m_functor));
             tip_num = m_functor(map_name.c_str());
         }
         else
         {
-            R_ASSERT(ai().script_engine().functor("loadscreen.get_mp_tip_number", m_functor));
+            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_mp_tip_number", m_functor));
             tip_num = m_functor(map_name.c_str());
         }
         //		tip_num = 83;
@@ -830,6 +824,18 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
         pApp->LoadTitleInt(
             CStringTable().translate("ls_header").c_str(), tmp.c_str(), CStringTable().translate(buff).c_str());
     }
+}
+
+void CGamePersistent::SetLoadStageTitle(pcstr ls_title)
+{
+    string256 buff;
+    if (ls_title)
+    {
+        xr_sprintf(buff, "%s%s", CStringTable().translate(ls_title).c_str(), "...");
+        pApp->SetLoadStageTitle(buff);
+    }
+    else
+        pApp->SetLoadStageTitle("");
 }
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }

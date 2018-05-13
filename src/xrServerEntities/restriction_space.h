@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrCore/intrusive_ptr.h"
 
 namespace RestrictionSpace
 {
@@ -14,12 +15,15 @@ struct CTimeIntrusiveBase : public intrusive_base
 {
     u32 m_last_time_dec;
 
-    IC CTimeIntrusiveBase() : m_last_time_dec(0) {}
+    CTimeIntrusiveBase() XR_NOEXCEPT : m_last_time_dec(0) {}
+
     template <typename T>
-    IC void _release(T* object)
+    void release(T*) XR_NOEXCEPT
     {
         m_last_time_dec = Device.dwTimeGlobal;
     }
+
+    using intrusive_base::release;
 };
 
 enum ERestrictorTypes
@@ -31,4 +35,4 @@ enum ERestrictorTypes
     eRestrictorTypeIn = u8(4),
     eRestrictorTypeOut = u8(5),
 };
-};
+}; // namespace RestrictionSpace

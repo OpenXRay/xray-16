@@ -18,6 +18,7 @@ extern void msCreate(LPCSTR name);
 void CEngine::Initialize(void)
 {
     Engine.Sheduler.Initialize();
+    Engine.Scheduler.Initialize();
 #ifdef DEBUG
     msCreate("game");
 #endif
@@ -26,10 +27,6 @@ void CEngine::Initialize(void)
 void CEngine::Destroy()
 {
     Engine.Sheduler.Destroy();
-#ifdef DEBUG_MEMORY_MANAGER
-    extern void dbg_dump_leaks_prepare();
-    if (Memory.debug_mode)
-        dbg_dump_leaks_prepare();
-#endif // DEBUG_MEMORY_MANAGER
+    Engine.Scheduler.Destroy();
     Engine.External.Destroy();
 }

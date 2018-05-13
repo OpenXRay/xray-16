@@ -1,9 +1,11 @@
+#pragma once
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 #include "PhysicsCommon.h"
 #include "ExtendedGeom.h"
 #include "mathutilsode.h"
 #include "xrEngine/iphysicsgeometry.h"
+#include "xrCore/_cylinder.h"
 
 // this is equivalent dMULTIPLYOP0_333 whith consequent transposion of A
 #define dMULTIPLYOP3_333(A, op, B, C)   \

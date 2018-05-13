@@ -143,10 +143,10 @@ void CControlAnimation::play_part(SAnimationPart& part, PlayCallback callback)
     if ((part.get_motion() != m_data.torso.get_motion()) && part.blend)
         m_object->CStepManager::on_animation_start(part.get_motion(), part.blend);
 
-    ANIMATION_EVENT_MAP_IT it = m_anim_events.find(part.get_motion());
+    auto it = m_anim_events.find(part.get_motion());
     if (it != m_anim_events.end())
     {
-        for (ANIMATION_EVENT_VEC_IT event_it = it->second.begin(); event_it != it->second.end(); ++event_it)
+        for (auto event_it = it->second.begin(); event_it != it->second.end(); ++event_it)
         {
             event_it->handled = false;
         }
@@ -156,12 +156,12 @@ void CControlAnimation::play_part(SAnimationPart& part, PlayCallback callback)
 void CControlAnimation::add_anim_event(MotionID motion, float time_perc, u32 id)
 {
     // if there is already event with exact timing - return
-    ANIMATION_EVENT_MAP_IT it = m_anim_events.find(motion);
+    auto it = m_anim_events.find(motion);
     if (it != m_anim_events.end())
     {
         ANIMATION_EVENT_VEC& anim_vec = it->second;
 
-        for (ANIMATION_EVENT_VEC_IT I = anim_vec.begin(); I != anim_vec.end(); ++I)
+        for (auto I = anim_vec.begin(); I != anim_vec.end(); ++I)
         {
             if (fsimilar(I->time_perc, time_perc))
                 return;
@@ -179,13 +179,13 @@ void CControlAnimation::check_events(SAnimationPart& part)
 {
     if (part.get_motion().valid() && part.actual && part.blend)
     {
-        ANIMATION_EVENT_MAP_IT it = m_anim_events.find(part.get_motion());
+        auto it = m_anim_events.find(part.get_motion());
         if (it != m_anim_events.end())
         {
             float cur_perc =
                 float(Device.dwTimeGlobal - part.time_started) / ((part.blend->timeTotal / part.blend->speed) * 1000);
 
-            for (ANIMATION_EVENT_VEC_IT event_it = it->second.begin(); event_it != it->second.end(); ++event_it)
+            for (auto event_it = it->second.begin(); event_it != it->second.end(); ++event_it)
             {
                 SAnimationEvent& event = *event_it;
                 if (!event.handled && (event.time_perc < cur_perc))
@@ -293,4 +293,16 @@ void CControlAnimation::unfreeze()
     {
         m_data.torso.blend->speed = m_saved_torso_speed;
     }
+}
+
+// get motion time, when just MotionID available
+float CControlAnimation::motion_time(MotionID motion_id, IRenderVisual* visual)
+{
+    IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(visual);
+    VERIFY(skeleton_animated);
+    CMotionDef* motion_def = skeleton_animated->LL_GetMotionDef(motion_id);
+    VERIFY(motion_def);
+    CMotion* motion = skeleton_animated->LL_GetRootMotion(motion_id);
+    VERIFY(motion);
+    return (motion->GetLength() / motion_def->Speed());
 }

@@ -96,7 +96,7 @@ bool CEditableObject::ContainsMesh(const CEditableMesh* m)
 CEditableMesh* CEditableObject::FindMeshByName(const char* name, CEditableMesh* Ignore)
 {
     for (EditMeshIt m = m_Meshes.begin(); m != m_Meshes.end(); m++)
-        if ((Ignore != (*m)) && (stricmp((*m)->Name().c_str(), name) == 0))
+        if ((Ignore != (*m)) && (xr_stricmp((*m)->Name().c_str(), name) == 0))
             return (*m);
     return 0;
 }
@@ -194,7 +194,7 @@ void CEditableObject::TranslateToWorld(const Fmatrix& parent)
 CSurface* CEditableObject::FindSurfaceByName(const char* surf_name, int* s_id)
 {
     for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
-        if (stricmp((*s_it)->_Name(), surf_name) == 0)
+        if (xr_stricmp((*s_it)->_Name(), surf_name) == 0)
         {
             if (s_id)
                 *s_id = s_it - m_Surfaces.begin();
@@ -221,7 +221,7 @@ LPCSTR CEditableObject::GenerateSurfaceName(const char* base_name)
 
 bool CEditableObject::VerifyBoneParts()
 {
-    U8Vec b_use(BoneCount(), 0);
+    std::vector<u8> b_use(BoneCount(), 0);
     for (BPIt bp_it = m_BoneParts.begin(); bp_it != m_BoneParts.end(); bp_it++)
         for (int i = 0; i < int(bp_it->bones.size()); i++)
         {

@@ -9,7 +9,6 @@ u64 g_qwStartGameTime = 12 * 60 * 60 * 1000;
 float g_fTimeFactor = pSettings->r_float("alife", "time_factor");
 u64 g_qwEStartGameTime = 12 * 60 * 60 * 1000;
 
-ENGINE_API bool g_dedicated_server;
 EGameIDs ParseStringToGameType(LPCSTR str);
 
 game_PlayerState::game_PlayerState(NET_Packet* account_info)
@@ -37,7 +36,7 @@ game_PlayerState::game_PlayerState(NET_Packet* account_info)
     }
     else
     {
-        if (g_dedicated_server)
+        if (GEnv.isDedicatedServer)
         {
             setFlag(GAME_PLAYER_FLAG_SKIP);
         }
@@ -177,7 +176,7 @@ void game_PlayerState::SetGameID(u16 NewID)
 }
 bool game_PlayerState::HasOldID(u16 ID)
 {
-    OLD_GAME_ID_it ID_i = std::find(mOldIDs.begin(), mOldIDs.end(), ID);
+    auto ID_i = std::find(mOldIDs.begin(), mOldIDs.end(), ID);
     if (ID_i != mOldIDs.end() && *(ID_i) == ID)
         return true;
     return false;
@@ -207,7 +206,7 @@ game_GameState::game_GameState()
 
 CLASS_ID game_GameState::getCLASS_ID(LPCSTR game_type_name, bool isServer)
 {
-    /*	if (!g_dedicated_server)
+    /*	if (!GEnv.isDedicatedServer)
         {
             string_path		S;
             FS.update_path	(S,"$game_config$","script.ltx");
@@ -218,7 +217,7 @@ CLASS_ID game_GameState::getCLASS_ID(LPCSTR game_type_name, bool isServer)
             xr_strcpy(I,l_tpIniFile->r_string("common","game_type_clsid_factory"));
 
             luabind::functor<LPCSTR>	result;
-            R_ASSERT					(ai().script_engine().functor(I,result));
+            R_ASSERT					(GEnv.ScriptEngine->functor(I,result));
             shared_str clsid = result		(game_type_name, isServer);
 
             xr_delete			(l_tpIniFile);

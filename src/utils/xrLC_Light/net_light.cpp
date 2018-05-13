@@ -30,6 +30,7 @@ static struct unload
     }
 } _unload;
 */
+#pragma warning(push)
 #pragma warning(disable : 4995)
 DWORD g_sessionId = DWORD(-1);
 
@@ -150,7 +151,7 @@ class net_task_interface_impl : public net_task_interface
         return true;
     }
 } g_net_task_interface_impl;
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 XRLC_LIGHT_API net_task_interface* g_net_task_interface = &g_net_task_interface_impl;
 /*

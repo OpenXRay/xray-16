@@ -1,4 +1,14 @@
 #pragma once
+#include <algorithm>
+#include "xrCore/xrCore_benchmark_macros.h"
+#include "xrCore/xrstring.h"
+#include "xrCore/_flags.h"
+#include "xrCommon/xr_vector.h"
+#include "Common/Platform.hpp"
+
+// fwd. decl.
+class IReader;
+class IWriter;
 
 #define GAMEMTL_CURRENT_VERSION 0x0001
 
@@ -38,7 +48,7 @@
 
 #ifndef MTL_EXPORT_API
 #ifdef _EDITOR
-#include "ElTree.hpp"
+//#include "ElTree.hpp"
 #define MTL_EXPORT_API ECORE_API
 #else
 #define MTL_EXPORT_API ENGINE_API
@@ -54,6 +64,8 @@ typedef SoundVec::iterator SoundIt;
 typedef xr_vector<shared_str> PSVec;
 typedef PSVec::iterator PSIt;
 #endif
+
+// XXX: Place at least CGameMtlLibrary in a static lib or something? It currently gets instantiated a measurable amount of times.
 
 struct MTL_EXPORT_API SGameMtl
 {
@@ -133,7 +145,8 @@ public:
     void FillProp(PropItemVec& values, ListItem* owner);
 #endif
 };
-DEFINE_VECTOR(SGameMtl*, GameMtlVec, GameMtlIt);
+using GameMtlVec = xr_vector<SGameMtl*>;
+using GameMtlIt = GameMtlVec::iterator;
 
 struct MTL_EXPORT_API SGameMtlPair
 {
@@ -219,7 +232,8 @@ public:
 #endif
 };
 
-DEFINE_VECTOR(SGameMtlPair*, GameMtlPairVec, GameMtlPairIt);
+using GameMtlPairVec = xr_vector<SGameMtlPair*>;
+using GameMtlPairIt = GameMtlPairVec::iterator;
 
 class MTL_EXPORT_API CGameMtlLibrary
 {
@@ -247,7 +261,7 @@ public:
 
     GameMtlIt GetMaterialIt(LPCSTR name)
     {
-        auto pred = [&](const SGameMtl* mtl) { return !strcmpi(mtl->m_Name.c_str(), name); };
+        auto pred = [&](const SGameMtl* mtl) { return !xr_strcmpi(mtl->m_Name.c_str(), name); };
         return std::find_if(materials.begin(), materials.end(), pred);
     }
     GameMtlIt GetMaterialIt(shared_str& name)
@@ -332,5 +346,3 @@ public:
 };
 
 extern MTL_EXPORT_API CGameMtlLibrary GMLib;
-
-#include "Include/xrAPI/xrAPI.h"

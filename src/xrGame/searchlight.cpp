@@ -12,10 +12,10 @@
 
 CProjector::CProjector()
 {
-    light_render = GlobalEnv.Render->light_create();
+    light_render = GEnv.Render->light_create();
     light_render->set_type(IRender_Light::SPOT);
     light_render->set_shadow(true);
-    glow_render = GlobalEnv.Render->glow_create();
+    glow_render = GEnv.Render->glow_create();
     lanim = 0;
     bone_x.id = BI_NONE;
     bone_y.id = BI_NONE;

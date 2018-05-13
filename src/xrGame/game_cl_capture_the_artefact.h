@@ -139,7 +139,7 @@ public:
     virtual void OnVoteStop(NET_Packet& P);
     virtual void OnVoteEnd(NET_Packet& P);
 
-    virtual char* getTeamSection(int Team);
+    virtual pcstr getTeamSection(int Team);
 
     virtual s16 ModifyTeam(s16 Team) { return Team; };
     virtual bool PlayerCanSprint(CActor* pActor);

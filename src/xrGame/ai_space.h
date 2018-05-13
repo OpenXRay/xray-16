@@ -59,8 +59,6 @@ public:
     IC const CALifeSimulator& alife() const;
     IC const CALifeSimulator* get_alife() const;
     IC const CCoverManager& cover_manager() const;
-    // XXX: [ai] delete
-    IC CScriptEngine& script_engine() const;
     IC moving_objects& moving_objects() const;
     IC doors::manager& doors() const;
 };

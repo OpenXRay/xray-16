@@ -1,50 +1,24 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef __INCDEF_STDAFX_H_
-#define __INCDEF_STDAFX_H_
-
 #pragma once
 
-#define _WIN32_WINNT 0x0500
+#include <algorithm>
 
+#include "Common/Common.hpp"
+
+#pragma warning(push)
 #pragma warning(disable : 4995)
+
+using std::min;
+using std::max;
+
 #include "Max.h"
 
 #include "xrCore/xrCore.h"
-#pragma comment(lib, "xrCore.lib")
 #define _BCL
 
-#undef _MIN
-#undef _MAX
-#define _MIN(a, b) (a) < (b) ? (a) : (b)
-#define _MAX(a, b) (a) > (b) ? (a) : (b)
-template <class T>
-T min(T a, T b)
-{
-    return _MIN(a, b);
-}
-template <class T>
-T max(T a, T b)
-{
-    return _MAX(a, b);
-}
-using std::string;
-#undef _MIN
-#undef _MAX
-
-#define FLT_MAX flt_max
-
-#ifdef FLT_MIN
-#undef FLT_MIN
-#endif
-
-#define FLT_MIN flt_max
-
 #include <io.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <fcntl.h>
-#include <sys\utime.h>
+#include <sys/utime.h>
 
 #include "istdplug.h"
 #include "iparamb2.h"
@@ -90,7 +64,8 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 #include <string>
 
 #define AnsiString string
-DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
+using AStringVec = xr_vector<std::string>;
+using std::string;
 
 #include "plugins/Shared/ELog.h"
 
@@ -107,6 +82,4 @@ DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 #define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
 
-#pragma warning(default : 4995)
-
-#endif /*_INCDEF_STDAFX_H_*/
+#pragma warning(pop)

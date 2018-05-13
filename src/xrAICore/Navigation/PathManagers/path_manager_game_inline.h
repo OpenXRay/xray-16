@@ -21,36 +21,36 @@ IC void CGamePathManager::setup(const _Graph* _graph, _DataStorage* _data_storag
     const _index_type& _start_node_index, const _index_type& _goal_node_index, const _Parameters& parameters)
 {
     inherited::setup(_graph, _data_storage, _path, _start_node_index, _goal_node_index, parameters);
-    goal_vertex = graph->vertex(goal_node_index);
+    goal_vertex = this->graph->vertex(this->goal_node_index);
 }
 
 TEMPLATE_SPECIALIZATION
-IC _dist_type CGamePathManager::evaluate(
-    const _index_type& node_index1, const _index_type& node_index2, const _Graph::const_iterator& i) const
+IC _dist_type CGamePathManager::evaluate(const _index_type& /*node_index1*/, const _index_type& /*node_index2*/,
+    const _Graph::const_iterator& i) const
 {
-    VERIFY(graph);
-    return ((*i).distance());
+    VERIFY(this->graph);
+    return (*i).distance();
 }
 
 TEMPLATE_SPECIALIZATION
 IC _dist_type CGamePathManager::estimate(const _index_type& node_index) const
 {
-    VERIFY(graph);
-    return (goal_vertex->game_point().distance_to(graph->vertex(node_index)->game_point()));
+    VERIFY(this->graph);
+    return goal_vertex->game_point().distance_to(this->graph->vertex(node_index)->game_point());
 }
 
 TEMPLATE_SPECIALIZATION
-IC bool CGamePathManager::is_limit_reached(const _iteration_type iteration_count) const
+IC bool CGamePathManager::is_limit_reached(const _iteration_type /*iteration_count*/) const
 {
-    VERIFY(data_storage);
-    return (false);
+    VERIFY(this->data_storage);
+    return false;
 }
 
 TEMPLATE_SPECIALIZATION
 IC bool CGamePathManager::is_accessible(const _index_type& vertex_id) const
 {
-    VERIFY(graph);
-    return (graph->accessible(vertex_id));
+    VERIFY(this->graph);
+    return this->graph->accessible(vertex_id);
 }
 
 #undef TEMPLATE_SPECIALIZATION

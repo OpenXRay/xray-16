@@ -1,19 +1,19 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef __INCDEF_STDAFX_H_
-#define __INCDEF_STDAFX_H_
-
 #pragma once
 
+#include <algorithm>
+
+#include "Common/Common.hpp"
+
 #define ENGINE_API
-#define _WIN32_WINNT 0x0500
 #include "xrCore/xrCore.h"
-#pragma comment(lib, "xrCore.lib")
+#include "xrCore/_fbox.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <assert.h>
+
+using std::min;
+using std::max;
 
 #define REQUIRE_IOSTREAM
 #define _BCL
@@ -116,7 +116,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 //#define AnsiString std::string
 #define AnsiString xr_string
-DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
+using AStringVec = xr_vector<xr_string>;
 
 #define THROW R_ASSERT(0)
 
@@ -132,6 +132,3 @@ DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 #define _game_data_ "$game_data$"
 
 #pragma comment(lib, "d3dx9.lib")
-#pragma comment(lib, "xrQSlim.lib")
-
-#endif /*_INCDEF_STDAFX_H_*/

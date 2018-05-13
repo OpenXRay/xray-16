@@ -43,7 +43,7 @@ private:
     ETeam myTeam;
     MapClientIdToUIPlayer myPlayers;
 
-    XML_NODE* teamXmlNode;
+    XML_NODE teamXmlNode;
     CUIXml* mainUiXml;
 
     TScrollPanels m_scroll_panels;

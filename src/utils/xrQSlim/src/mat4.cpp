@@ -9,6 +9,7 @@
 #pragma hdrstop
 
 #include "mat4.h"
+#include "xrCommon/math_funcs_inline.h"
 
 Mat4 Mat4::I() { return Mat4(Vec4(1, 0, 0, 0), Vec4(0, 1, 0, 0), Vec4(0, 0, 1, 0), Vec4(0, 0, 0, 1)); }
 Mat4 translation_matrix(const Vec3& d)

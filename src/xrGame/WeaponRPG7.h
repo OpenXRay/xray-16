@@ -1,19 +1,18 @@
 #pragma once
 
-#include "weaponpistol.h"
-#include "rocketlauncher.h"
+#include "WeaponCustomPistol.h"
+#include "RocketLauncher.h"
 
 class CWeaponRPG7 : public CWeaponCustomPistol, public CRocketLauncher
 {
-private:
-    typedef CWeaponCustomPistol inherited;
+    using inherited = CWeaponCustomPistol;
 
 public:
     CWeaponRPG7();
     virtual ~CWeaponRPG7();
 
     virtual BOOL net_Spawn(CSE_Abstract* DC);
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void ReloadMagazine();
     virtual void Load(LPCSTR section);

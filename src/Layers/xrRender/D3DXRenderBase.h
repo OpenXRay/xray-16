@@ -24,7 +24,7 @@ public:
     BOOL val_bRecordMP; // record nearest for multi-pass
     R_feedback* val_feedback; // feedback for geometry being rendered
     u32 val_feedback_breakp; // breakpoint
-    xr_vector<Fbox3, render_alloc<Fbox3>>* val_recorder; // coarse structure recorder
+    xr_vector<Fbox3>* val_recorder; // coarse structure recorder
     u32 phase;
     u32 marker;
     bool pmask[2];
@@ -40,6 +40,7 @@ public:
     R_dsgraph::mapHUD_T mapHUD;
     R_dsgraph::mapLOD_T mapLOD;
     R_dsgraph::mapSorted_T mapDistort;
+    R_dsgraph::mapHUD_T    mapHUDSorted;
 
 #if RENDER != R_R1
     R_dsgraph::mapSorted_T mapWmark; // sorted
@@ -48,32 +49,29 @@ public:
 #endif
 
     // Runtime structures
-    xr_vector<R_dsgraph::mapNormalVS::TNode*, render_alloc<R_dsgraph::mapNormalVS::TNode*>> nrmVS;
-#if defined(USE_DX10) || defined(USE_DX11)
-    xr_vector<R_dsgraph::mapNormalGS::TNode*, render_alloc<R_dsgraph::mapNormalGS::TNode*>> nrmGS;
+    xr_vector<R_dsgraph::mapNormalVS::value_type *> nrmVS;
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+    xr_vector<R_dsgraph::mapNormalGS::value_type *> nrmGS;
 #endif //	USE_DX10
-    xr_vector<R_dsgraph::mapNormalPS::TNode*, render_alloc<R_dsgraph::mapNormalPS::TNode*>> nrmPS;
-    xr_vector<R_dsgraph::mapNormalCS::TNode*, render_alloc<R_dsgraph::mapNormalCS::TNode*>> nrmCS;
-    xr_vector<R_dsgraph::mapNormalStates::TNode*, render_alloc<R_dsgraph::mapNormalStates::TNode*>> nrmStates;
-    xr_vector<R_dsgraph::mapNormalTextures::TNode*, render_alloc<R_dsgraph::mapNormalTextures::TNode*>> nrmTextures;
-    xr_vector<R_dsgraph::mapNormalTextures::TNode*, render_alloc<R_dsgraph::mapNormalTextures::TNode*>> nrmTexturesTemp;
+    xr_vector<R_dsgraph::mapNormalPS::value_type *> nrmPS;
+    xr_vector<R_dsgraph::mapNormalCS::value_type *> nrmCS;
+    xr_vector<R_dsgraph::mapNormalStates::value_type *> nrmStates;
+    xr_vector<R_dsgraph::mapNormalTextures::value_type *> nrmTextures;
+    xr_vector<R_dsgraph::mapNormalTextures::value_type *> nrmTexturesTemp;
 
-    xr_vector<R_dsgraph::mapMatrixVS::TNode*, render_alloc<R_dsgraph::mapMatrixVS::TNode*>> matVS;
-#if defined(USE_DX10) || defined(USE_DX11)
-    xr_vector<R_dsgraph::mapMatrixGS::TNode*, render_alloc<R_dsgraph::mapMatrixGS::TNode*>> matGS;
+    xr_vector<R_dsgraph::mapMatrixVS::value_type *> matVS;
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+    xr_vector<R_dsgraph::mapMatrixGS::value_type *> matGS;
 #endif //	USE_DX10
-    xr_vector<R_dsgraph::mapMatrixPS::TNode*, render_alloc<R_dsgraph::mapMatrixPS::TNode*>> matPS;
-    xr_vector<R_dsgraph::mapMatrixCS::TNode*, render_alloc<R_dsgraph::mapMatrixCS::TNode*>> matCS;
-    xr_vector<R_dsgraph::mapMatrixStates::TNode*, render_alloc<R_dsgraph::mapMatrixStates::TNode*>> matStates;
-    xr_vector<R_dsgraph::mapMatrixTextures::TNode*, render_alloc<R_dsgraph::mapMatrixTextures::TNode*>> matTextures;
-    xr_vector<R_dsgraph::mapMatrixTextures::TNode*, render_alloc<R_dsgraph::mapMatrixTextures::TNode*>> matTexturesTemp;
-
-    xr_vector<R_dsgraph::_LodItem, render_alloc<R_dsgraph::_LodItem>> lstLODs;
-    xr_vector<int, render_alloc<int>> lstLODgroups;
+    xr_vector<R_dsgraph::mapMatrixPS::value_type *> matPS;
+    xr_vector<R_dsgraph::mapMatrixCS::value_type *> matCS;
+    xr_vector<R_dsgraph::mapMatrixStates::value_type *> matStates;
+    xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTextures;
+    xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTexturesTemp;
+    xr_vector<int> lstLODgroups;
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
-    xr_vector<dxRender_Visual*, render_alloc<dxRender_Visual*>> lstVisuals;
-    xr_vector<dxRender_Visual*, render_alloc<dxRender_Visual*>> lstRecorded;
+    xr_vector<dxRender_Visual*> lstVisuals;
 
     u32 counter_S;
     u32 counter_D;
@@ -98,7 +96,7 @@ public:
         val_feedback_breakp = id;
         val_feedback = V;
     }
-    void set_Recorder(xr_vector<Fbox3, render_alloc<Fbox3>>* dest)
+    void set_Recorder(xr_vector<Fbox3>* dest)
     {
         val_recorder = dest;
         if (dest)
@@ -110,6 +108,7 @@ public:
         d = counter_D;
     }
     void clear_Counters() { counter_S = counter_D = 0; }
+
 public:
     D3DXRenderBase();
 
@@ -129,33 +128,28 @@ public:
         matTextures.clear();
         matTexturesTemp.clear();
 
-        lstLODs.clear();
         lstLODgroups.clear();
         lstRenderables.clear();
         lstSpatial.clear();
         lstVisuals.clear();
 
-        lstRecorded.clear();
-
-        // mapNormal[0].destroy	();
-        // mapNormal[1].destroy	();
-        // mapMatrix[0].destroy	();
-        // mapMatrix[1].destroy	();
         for (int i = 0; i < SHADER_PASSES_MAX; ++i)
         {
-            mapNormalPasses[0][i].destroy();
-            mapNormalPasses[1][i].destroy();
-            mapMatrixPasses[0][i].destroy();
-            mapMatrixPasses[1][i].destroy();
+            mapNormalPasses[0][i].clear();
+            mapNormalPasses[1][i].clear();
+            mapMatrixPasses[0][i].clear();
+            mapMatrixPasses[1][i].clear();
         }
-        mapSorted.destroy();
-        mapHUD.destroy();
-        mapLOD.destroy();
-        mapDistort.destroy();
+        mapSorted.clear();
+        mapHUD.clear();
+        mapLOD.clear();
+        mapDistort.clear();
+        mapHUDSorted.clear();
 
 #if RENDER != R_R1
-        mapWmark.destroy();
-        mapEmissive.destroy();
+        mapWmark.clear();
+        mapEmissive.clear();
+        mapHUDEmissive.clear();
 #endif
     }
 
@@ -169,7 +163,7 @@ public:
     void r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector& Center);
     void r_dsgraph_insert_static(dxRender_Visual* pVisual);
     // render primitives
-    void r_dsgraph_render_graph(u32 _priority, bool _clear = true);
+    void r_dsgraph_render_graph(u32 _priority);
     void r_dsgraph_render_hud();
     void r_dsgraph_render_hud_ui();
     void r_dsgraph_render_lods(bool _setup_zb, bool _clear);
@@ -182,7 +176,6 @@ public:
     void r_dsgraph_render_subspace(
         IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
     void r_dsgraph_render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
-    virtual u32 memory_usage() override { return g_render_allocator.get_allocated_size(); }
     virtual void Copy(IRender& _in) override;
     //	Gamma correction functions
     virtual void setGamma(float fGamma) override;
@@ -229,5 +222,7 @@ public:
     ref_shader m_SelectionShader;
 
 private:
+#ifndef USE_OGL
     CGammaControl m_Gamma;
+#endif // !USE_OGL
 };

@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "occRasterizer.h"
 
-#if DEBUG
+#ifdef DEBUG 
 #include "xrRender_console.h"
 #endif
 
@@ -54,7 +54,7 @@ IC void propagade_depth(LPVOID p_dest, LPVOID p_src, int dim)
 //////////////////////////////////////////////////////////////////////
 
 occRasterizer::occRasterizer()
-#if DEBUG
+#ifdef DEBUG
     : dbg_HOM_draw_initialized(false)
 #endif
 {
@@ -140,7 +140,7 @@ void occRasterizer::propagade()
 
 void occRasterizer::on_dbg_render()
 {
-#if DEBUG
+#ifdef DEBUG
     if (!ps_r2_ls_flags_ext.is(R_FLAGEXT_HOM_DEPTH_DRAW))
     {
         dbg_HOM_draw_initialized = false;

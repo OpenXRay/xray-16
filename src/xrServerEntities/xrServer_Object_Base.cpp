@@ -12,6 +12,7 @@
 #include "game_base_space.h"
 #include "script_value_container_impl.h"
 #include "clsid_game.h"
+#include "xrCore/xr_token.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -42,7 +43,7 @@ IPropHelper& PHelper()
 LPCSTR script_section = "script";
 LPCSTR current_version = "current_server_entity_version";
 
-IC u16 script_server_object_version()
+/*IC*/ u16 script_server_object_version() // XXX: can't compile Release because of "inline"
 {
     static bool initialized = false;
     static u16 script_version = 0;
@@ -74,13 +75,13 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
     ID = 0xffff;
     ID_Parent = 0xffff;
     ID_Phantom = 0xffff;
-    owner = 0;
+    owner = nullptr;
     m_gameType.SetDefaults();
     //.	s_gameid					= 0;
     s_RP = 0xFE; // Use supplied coords
     s_flags.assign(0);
     s_name = caSection;
-    s_name_replace = 0; // xr_strdup("");
+    s_name_replace = nullptr; // xr_strdup("");
     o_Angle.set(0.f, 0.f, 0.f);
     o_Position.set(0.f, 0.f, 0.f);
     m_bALifeControl = false;
@@ -90,11 +91,11 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
 
     //	m_spawn_probability			= 1.f;
     m_spawn_flags.zero();
-    m_spawn_flags.set(flSpawnEnabled, TRUE);
-    m_spawn_flags.set(flSpawnOnSurgeOnly, TRUE);
-    m_spawn_flags.set(flSpawnSingleItemOnly, TRUE);
-    m_spawn_flags.set(flSpawnIfDestroyedOnly, TRUE);
-    m_spawn_flags.set(flSpawnInfiniteCount, TRUE);
+    m_spawn_flags.set(flSpawnEnabled, true);
+    m_spawn_flags.set(flSpawnOnSurgeOnly, true);
+    m_spawn_flags.set(flSpawnSingleItemOnly, true);
+    m_spawn_flags.set(flSpawnIfDestroyedOnly, true);
+    m_spawn_flags.set(flSpawnInfiniteCount, true);
     //	m_max_spawn_count			= 1;
     //	m_spawn_control				= "";
     //	m_spawn_count				= 0;
@@ -102,12 +103,12 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
     //	m_next_spawn_time			= 0;
     //	m_min_spawn_interval		= 0;
     //	m_max_spawn_interval		= 0;
-    m_ini_file = 0;
+    m_ini_file = nullptr;
 
     if (pSettings->line_exist(caSection, "custom_data"))
     {
         pcstr const raw_file_name = pSettings->r_string(caSection, "custom_data");
-        IReader const* config = 0;
+        IReader const* config = nullptr;
 #ifdef XRGAME_EXPORTS
         if (ai().get_alife())
             config = ai().alife().get_config(raw_file_name);
@@ -151,9 +152,9 @@ CSE_Abstract::~CSE_Abstract()
     xr_delete(m_ini_file);
 }
 
-CSE_Visual* CSE_Abstract::visual() { return (0); }
-IServerEntityShape* CSE_Abstract::shape() { return (0); }
-CSE_Motion* CSE_Abstract::motion() { return (0); }
+CSE_Visual* CSE_Abstract::visual() { return (nullptr); }
+IServerEntityShape* CSE_Abstract::shape() { return (nullptr); }
+CSE_Motion* CSE_Abstract::motion() { return (nullptr); }
 CInifile& CSE_Abstract::spawn_ini()
 {
     if (!m_ini_file)
@@ -180,7 +181,7 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
     tNetPacket.w_u16(ID_Parent);
     tNetPacket.w_u16(ID_Phantom);
 
-    s_flags.set(M_SPAWN_VERSION, TRUE);
+    s_flags.set(M_SPAWN_VERSION, true);
     if (bLocal)
         tNetPacket.w_u16(u16(s_flags.flags | M_SPAWN_OBJECT_LOCAL));
     else
@@ -227,7 +228,7 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
     tNetPacket.w_seek(position, &size, sizeof(u16));
 }
 
-static enum EGameTypes {
+enum EGameTypes {
     GAME_ANY = 0,
     GAME_SINGLE = 1,
     GAME_DEATHMATCH = 2,
@@ -319,8 +320,8 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
         if (m_wVersion > 83)
         {
             tNetPacket.r_u32(); // m_spawn_flags.assign(tNetPacket.r_u32());
-            xr_string temp;
-            tNetPacket.r_stringZ(temp); // tNetPacket.r_stringZ(m_spawn_control);
+            xr_string temp2;
+            tNetPacket.r_stringZ(temp2); // tNetPacket.r_stringZ(m_spawn_control);
             tNetPacket.r_u32(); // m_max_spawn_count);
             // this stuff we do not need even in case of uncomment
             tNetPacket.r_u32(); // m_spawn_count);
@@ -337,7 +338,7 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
     u16 size;
     tNetPacket.r_u16(size); // size
     bool b1 = (m_tClassID == CLSID_SPECTATOR);
-    bool b2 = (size > sizeof(size)) || (tNetPacket.inistream != NULL);
+    bool b2 = (size > sizeof(size)) || (tNetPacket.inistream != nullptr);
     R_ASSERT3((b1 || b2), "cannot read object, which is not successfully saved :(", name_replace());
     STATE_Read(tNetPacket, size);
     return TRUE;
@@ -375,12 +376,12 @@ LPCSTR CSE_Abstract::name_replace() const { return (s_name_replace); }
 Fvector& CSE_Abstract::position() { return (o_Position); }
 Fvector& CSE_Abstract::angle() { return (o_Angle); }
 Flags16& CSE_Abstract::flags() { return (s_flags); }
-xr_token game_types[] = {{"any_game", eGameIDNoGame}, {"single", eGameIDSingle}, {"deathmatch", eGameIDDeathmatch},
+const xr_token game_types[] = {{"any_game", eGameIDNoGame}, {"single", eGameIDSingle}, {"deathmatch", eGameIDDeathmatch},
     {"team_deathmatch", eGameIDTeamDeathmatch}, {"artefacthunt", eGameIDArtefactHunt},
     {"capture_the_artefact", eGameIDCaptureTheArtefact},
     // eGameIDDominationZone
     // eGameIDTeamDominationZone
-    {0, 0}};
+    {nullptr, 0}};
 
 #ifndef XRGAME_EXPORTS
 void CSE_Abstract::FillProps(LPCSTR pref, PropItemVec& items)

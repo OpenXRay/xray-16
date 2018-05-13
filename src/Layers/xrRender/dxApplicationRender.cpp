@@ -13,7 +13,7 @@ void dxApplicationRender::LoadBegin()
     sh_progress.create("hud\\default", "ui\\ui_actor_loadgame_screen");
     hLevelLogo_Add.create("hud\\default", "ui\\ui_actor_widescreen_sidepanels.dds");
 
-    ll_hGeom2.create(FVF::F_TL, RCache.Vertex.Buffer(), NULL);
+    ll_hGeom2.create(FVF::F_TL, RCache.Vertex.Buffer(), 0);
 }
 
 void dxApplicationRender::destroy_loading_shaders()
@@ -24,23 +24,22 @@ void dxApplicationRender::destroy_loading_shaders()
 }
 
 void dxApplicationRender::setLevelLogo(LPCSTR pszLogoName) { hLevelLogo.create("hud\\default", pszLogoName); }
-void dxApplicationRender::KillHW() { ZeroMemory(&HW, sizeof(CHW)); }
 u32 calc_progress_color(u32, u32, int, int);
 
 void dxApplicationRender::load_draw_internal(CApplication& owner)
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //  TODO: DX10: remove this???
     RImplementation.rmNormal();
     RCache.set_RT(HW.pBaseRT);
     RCache.set_ZB(HW.pBaseZB);
 #endif //   USE_DX10
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
 #else //    USE_DX10
-    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0));
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0));
 #endif //   USE_DX10
 
     if (!sh_progress)
@@ -48,7 +47,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
         return;
     }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //  TODO: DX10: remove this
 //  FLOAT ColorRGBA[4] = {0.0f, 0.0f, 1.0f, 0.0f};
 //  HW.pContext->ClearRenderTargetView( RCache.get_RT(), ColorRGBA);
@@ -108,7 +107,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     u32 Offset;
     u32 C = 0xffffffff;
-    FVF::TL* pv = NULL;
+    FVF::TL* pv = nullptr;
     u32 v_cnt = 40;
     pv = (FVF::TL*)RCache.Vertex.Lock(2 * (v_cnt + 1), ll_hGeom2.stride(), Offset);
     FVF::TL* _pv = pv;
@@ -207,8 +206,6 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
     float fTargetWidth = 600.0f * k.x * (b_ws ? 0.8f : 1.0f);
     draw_multiline_text(owner.pFontSystem, fTargetWidth, owner.ls_tip);
 
-    owner.pFontSystem->OnRender();
-
     // draw level-specific screenshot
     if (hLevelLogo)
     {
@@ -234,14 +231,19 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
         logo_tex_coords.rb.set(1.0f, 0.77926f);
 
         draw_face(hLevelLogo, r, logo_tex_coords, Fvector2().set(1, 1));
+        if (ps_rs_loading_stages)
+            owner.pFontSystem->SetColor(color_rgba(180, 180, 180, 200));
     }
+    if (ps_rs_loading_stages)
+        owner.pFontSystem->OutI(0.f, 0.385f, owner.ls_title); // XXX: 0.385f <- hardcoded coordinates
+    owner.pFontSystem->OnRender();
 }
 
 void dxApplicationRender::draw_face(ref_shader& sh, Frect& coords, Frect& tex_coords, const Fvector2& tsz)
 {
     u32 Offset;
     u32 C = 0xffffffff;
-    FVF::TL* pv = NULL;
+    FVF::TL* pv = nullptr;
 
     tex_coords.lt.x /= tsz.x;
     tex_coords.lt.y /= tsz.y;
@@ -294,7 +296,7 @@ void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
 
     LPCSTR ch = pszText;
     float curr_word_len = 0.0f;
-    LPCSTR next_word = NULL;
+    LPCSTR next_word = nullptr;
 
     float curr_len = 0.0f;
     string512 buff;

@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 #include "os_clipboard.h"
+#include "xrCore/_std_extensions.h"
 
 void os_clipboard::copy_to_clipboard(LPCSTR buf)
 {

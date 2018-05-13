@@ -4,6 +4,9 @@
 #include "Common/object_broker.h"
 #include "UICellItem.h"
 #include "UICursor.h"
+//Alundaio
+#include "Inventory.h"
+//-Alundaio
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
 
@@ -261,8 +264,8 @@ void CUIDragDropListEx::Compact()
     CUIWindow::WINDOW_LIST wl = m_container->GetChildWndList();
     ClearAll(false);
 
-    CUIWindow::WINDOW_LIST_it it = wl.begin();
-    CUIWindow::WINDOW_LIST_it it_e = wl.end();
+    auto it = wl.begin();
+    auto it_e = wl.end();
     for (; it != it_e; ++it)
     {
         CUICellItem* itm = smart_cast<CUICellItem*>(*it);
@@ -425,7 +428,7 @@ bool CUIDragDropListEx::IsOwner(CUICellItem* itm) { return m_container->IsChild(
 CUICellItem* CUIDragDropListEx::GetItemIdx(u32 idx)
 {
     R_ASSERT(idx < ItemsCount());
-    WINDOW_LIST_it it = m_container->GetChildWndList().begin();
+    auto it = m_container->GetChildWndList().begin();
     std::advance(it, idx);
     return smart_cast<CUICellItem*>(*it);
 }
@@ -478,32 +481,55 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
     if (!m_pParentDragDropList->IsGrouping())
         return false;
 
-    CUICellItem* i = FindSimilar(itm);
-    R_ASSERT(i != itm);
-    R_ASSERT(0 == itm->ChildsCount());
-    if (i)
+    //Alundaio: Don't stack equipped items
+    extern int g_inv_highlight_equipped;
+    if (g_inv_highlight_equipped)
     {
-        i->PushChild(itm);
-        itm->SetOwnerList(m_pParentDragDropList);
+        const PIItem iitem = static_cast<PIItem>(itm->m_pData);
+        if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+            return false;
     }
+    //-Alundaio
 
-    return (i != NULL);
+    CUICellItem* i = FindSimilar(itm);
+    if (i == nullptr || i == itm || itm->ChildsCount() > 0)
+        return false;
+
+    i->PushChild(itm);
+    itm->SetOwnerList(m_pParentDragDropList);
+
+    return true;
 }
 
 CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto& it : m_ChildWndList)
     {
+        // XXX: Xottab_DUTY: find out why different casts used for different configurations
+        // and maybe use only one cast
 #ifdef DEBUG
-        CUICellItem* i = smart_cast<CUICellItem*>(*it);
+        auto i = smart_cast<CUICellItem*>(it);
 #else
-        CUICellItem* i = (CUICellItem*)(*it);
+        auto i = (CUICellItem*)it;
 #endif
-        R_ASSERT(i != itm);
+        //Alundaio: Don't stack equipped items
+        extern int g_inv_highlight_equipped;
+        if (g_inv_highlight_equipped)
+        {
+            auto iitem = static_cast<PIItem>(i->m_pData);
+            if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+                continue;
+        }
+        //-Alundaio
+
+        if (i == itm)
+            continue;
+
         if (i->EqualTo(itm))
             return i;
     }
-    return NULL;
+
+    return nullptr;
 }
 
 void CUICellContainer::PlaceItemAtPos(CUICellItem* itm, Ivector2& cell_pos)
@@ -546,7 +572,7 @@ void CUICellContainer::PlaceItemAtPos(CUICellItem* itm, Ivector2& cell_pos)
 
 CUICellItem* CUICellContainer::RemoveItem(CUICellItem* itm, bool force_root)
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         CUICellItem* i = (CUICellItem*)(*it);
 
@@ -712,7 +738,7 @@ Ivector2 CUICellContainer::GetItemPos(CUICellItem* itm)
 
 u32 CUICellContainer::GetCellsInRange(const Irect& rect, UI_CELLS_VEC& res)
 {
-    res.clear_not_free();
+    res.clear();
     for (int x = rect.x1; x <= rect.x2; ++x)
         for (int y = rect.y1; y <= rect.y2; ++y)
             res.push_back(GetCellAt(Ivector2().set(x, y)));
@@ -813,8 +839,8 @@ void CUICellContainer::Draw()
     UI().ClientToScreenScaled(drawLT, drawLT.x, drawLT.y);
 
     const Fvector2 pts[6] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
-#define ty 1.0f
-#define tx 0.25f
+    constexpr auto ty = 1.0f;
+    constexpr auto tx = 0.25f;
     const Fvector2 uvs[6] = {{0.0f, 0.0f}, {tx, 0.0f}, {tx, ty}, {0.0f, 0.0f}, {tx, ty}, {0.0f, ty}};
 
     // calculate cell size in screen pixels
@@ -826,7 +852,7 @@ void CUICellContainer::Draw()
 
     // fill cell buffer
     u32 max_prim_cnt = ((tgt_cells.width() + 1) * (tgt_cells.height() + 1) * 6);
-    GlobalEnv.UIRender->StartPrimitive(max_prim_cnt, IUIRender::ptTriList, UI().m_currentPointType);
+    GEnv.UIRender->StartPrimitive(max_prim_cnt, IUIRender::ptTriList, UI().m_currentPointType);
 
     //	u32 cell_i = 0;
     for (int x = 0; x <= tgt_cells.width(); ++x)
@@ -845,16 +871,22 @@ void CUICellContainer::Draw()
             if (!ui_cell.Empty())
             {
                 if (ui_cell.m_item->m_cur_mark)
-                {
                     select_mode = 2;
-                }
                 else if (ui_cell.m_item->m_selected)
-                {
                     select_mode = 1;
-                }
                 else if (ui_cell.m_item->m_select_armament)
-                {
                     select_mode = 3;
+                else
+                {
+                    //Alundaio: Highlight equipped items
+                    extern int g_inv_highlight_equipped;
+                    if (g_inv_highlight_equipped)
+                    {
+                        PIItem iitem = static_cast<PIItem>(ui_cell.m_item->m_pData);
+                        if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+                            select_mode = 2;
+                    }
+                    //-Alundaio
                 }
             }
 
@@ -869,7 +901,7 @@ void CUICellContainer::Draw()
                 // pv->set			(iFloor(drawLT.x + p.x*(f_len.x) + f_len.x*x)-0.5f,
                 //				 iFloor(drawLT.y + p.y*(f_len.y) + f_len.y*y)-0.5f,
                 //				 0xFFFFFFFF,tp.x+uv.x,tp.y+uv.y);
-                GlobalEnv.UIRender->PushPoint(iFloor(rect_offset.x + p.x * (f_len.x)) - 0.5f,
+                GEnv.UIRender->PushPoint(iFloor(rect_offset.x + p.x * (f_len.x)) - 0.5f,
                     iFloor(rect_offset.y + p.y * (f_len.y)) - 0.5f, 0, m_pParentDragDropList->back_color, tp.x + uv.x,
                     tp.y + uv.y);
             } // for k
@@ -877,8 +909,8 @@ void CUICellContainer::Draw()
     } // for x
     UI().PushScissor(clientArea);
 
-    GlobalEnv.UIRender->SetShader(*hShader);
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->SetShader(*hShader);
+    GEnv.UIRender->FlushPrimitive();
 
     // draw shown items in range
     if (m_cells_to_draw.size())

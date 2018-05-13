@@ -212,7 +212,7 @@ void CPHSimpleCharacter::TestPathCallback(
 
 void CPHSimpleCharacter::SetBox(const dVector3& sizes)
 {
-    m_radius = _min(sizes[0], sizes[2]) / 2.f;
+    m_radius = std::min(sizes[0], sizes[2]) / 2.f;
     m_cyl_hight = sizes[1] - 2.f * m_radius;
     if (m_cyl_hight < 0.f)
         m_cyl_hight = 0.01f;
@@ -256,7 +256,7 @@ void CPHSimpleCharacter::Create(dVector3 sizes)
     m_creation_step = ph_world->m_steps_num;
     ////////////////////////////////////////////////////////
 
-    m_radius = _min(sizes[0], sizes[2]) / 2.f;
+    m_radius = std::min(sizes[0], sizes[2]) / 2.f;
     m_current_object_radius = m_radius;
     m_cyl_hight = sizes[1] - 2.f * m_radius;
     if (m_cyl_hight < 0.f)
@@ -924,24 +924,22 @@ bool CPHSimpleCharacter::ValidateWalkOnMesh()
 #endif
 
     // if(XRC.r_end()!=XRC.r_begin()) return false;
-    CDB::RESULT* R_begin = XRC.r_begin();
-    CDB::RESULT* R_end = XRC.r_end();
-    for (CDB::RESULT* Res = R_begin; Res != R_end; ++Res)
+    for (auto &Res : *XRC.r_get())
     {
-        SGameMtl* m = GMLibrary().GetMaterialByIdx(Res->material);
+        SGameMtl* m = GMLibrary().GetMaterialByIdx(Res.material);
         if (m->Flags.test(SGameMtl::flPassable))
             continue;
         // CDB::TRI* T = T_array + Res->id;
         Point vertices[3] = {
-            Point((dReal*)&Res->verts[0]), Point((dReal*)&Res->verts[1]), Point((dReal*)&Res->verts[2])};
+            Point((dReal*)&Res.verts[0]), Point((dReal*)&Res.verts[1]), Point((dReal*)&Res.verts[2])};
         if (__aabb_tri(Point((float*)&center_forbid), Point((float*)&AABB_forbid), vertices))
         {
-            if (test_sides(center_forbid, sd_dir, accel, obb_fb, Res->id))
+            if (test_sides(center_forbid, sd_dir, accel, obb_fb, Res.id))
             {
 #ifdef DEBUG
                 if (debug_output().ph_dbg_draw_mask().test(phDbgCharacterControl))
                 {
-                    debug_output().DBG_DrawTri(Res, color_xrgb(255, 0, 0));
+                    debug_output().DBG_DrawTri(&Res, color_xrgb(255, 0, 0));
                 }
 #endif
                 b_side_contact = true;
@@ -956,22 +954,22 @@ bool CPHSimpleCharacter::ValidateWalkOnMesh()
         }
     }
 
-    for (CDB::RESULT* Res = R_begin; Res != R_end; ++Res)
+    for (auto &Res : *XRC.r_get())
     {
         // CDB::TRI* T = T_array + Res->id;
-        SGameMtl* m = GMLibrary().GetMaterialByIdx(Res->material);
+        SGameMtl* m = GMLibrary().GetMaterialByIdx(Res.material);
         if (m->Flags.test(SGameMtl::flPassable))
             continue;
         Point vertices[3] = {
-            Point((dReal*)&Res->verts[0]), Point((dReal*)&Res->verts[1]), Point((dReal*)&Res->verts[2])};
+            Point((dReal*)&Res.verts[0]), Point((dReal*)&Res.verts[1]), Point((dReal*)&Res.verts[2])};
         if (__aabb_tri(Point((float*)&center), Point((float*)&AABB), vertices))
         {
-            if (test_sides(center, sd_dir, accel, obb, Res->id))
+            if (test_sides(center, sd_dir, accel, obb, Res.id))
             {
 #ifdef DEBUG
                 if (debug_output().ph_dbg_draw_mask().test(phDbgCharacterControl))
                 {
-                    debug_output().DBG_DrawTri(Res, color_xrgb(0, 255, 0));
+                    debug_output().DBG_DrawTri(&Res, color_xrgb(0, 255, 0));
                 }
 #endif
                 return true;

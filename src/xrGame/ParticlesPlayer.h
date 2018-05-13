@@ -8,7 +8,7 @@
 #include "ParticlesObject.h"
 #include "xrCore/Animation/Bone.hpp"
 
-DEFINE_VECTOR(CParticlesObject*, PARTICLES_PTR_VECTOR, PARTICLES_PTR_VECTOR_IT);
+using PARTICLES_PTR_VECTOR = xr_vector<CParticlesObject*>;
 
 class IGameObject;
 class IKinematics;
@@ -24,9 +24,9 @@ public:
         u16 sender_id; // id - объекта, который запустил партиклы
         u32 life_time; //время жизни партикла (-1) - бесконечно
     };
-    DEFINE_VECTOR(SParticlesInfo, ParticlesInfoList, ParticlesInfoListIt);
+    using ParticlesInfoList = xr_vector<SParticlesInfo>;
 
-    //структура для косточки с списком запущенных партиклов
+    //структура для косточки со списком запущенных партиклов
     struct SBoneInfo
     {
         u16 index;
@@ -34,13 +34,12 @@ public:
         ParticlesInfoList particles;
         SParticlesInfo* FindParticles(const shared_str& ps_name);
 
-    public:
         SBoneInfo(u16 idx, const Fvector& offs) : index(idx), offset(offs) { ; }
         SParticlesInfo* AppendParticles(IGameObject* object, const shared_str& ps_name);
         void StopParticles(const shared_str& ps_name, bool bDestroy);
         void StopParticles(u16 sender_id, bool bDestroy);
     };
-    DEFINE_VECTOR(SBoneInfo, BoneInfoVec, BoneInfoVecIt);
+    using BoneInfoVec = xr_vector<SBoneInfo>;
 
 private:
     // список костей
@@ -56,7 +55,7 @@ public:
     {
         if (BI_NONE == bone_index)
             return 0;
-        for (BoneInfoVecIt it = m_Bones.begin(); it != m_Bones.end(); it++)
+        for (auto it = m_Bones.begin(); it != m_Bones.end(); it++)
             if (it->index == bone_index)
                 return &(*it);
         return 0;
@@ -64,7 +63,6 @@ public:
     SBoneInfo* get_nearest_bone_info(IKinematics* K, u16 bone_index);
     Fvector parent_vel;
 
-public:
     CParticlesPlayer(void);
     virtual ~CParticlesPlayer(void);
     void LoadParticles(IKinematics* K);
@@ -97,8 +95,7 @@ public:
         u16 l_PBCount = u16(m_Bones.size());
         if (l_PBCount)
             return m_Bones[(u16)Random.randI(l_PBCount)].index;
-        else
-            return BI_NONE;
+        return BI_NONE;
     }
 
     void SetParentVel(const Fvector& vel) { parent_vel = vel; }

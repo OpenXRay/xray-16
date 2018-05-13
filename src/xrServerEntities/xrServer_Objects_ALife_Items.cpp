@@ -683,7 +683,7 @@ void CSE_ALifeItemWeaponMagazined::FillProps(LPCSTR pref, PropItemVec& items) { 
 CSE_ALifeItemWeaponMagazinedWGL::CSE_ALifeItemWeaponMagazinedWGL(LPCSTR caSection)
     : CSE_ALifeItemWeaponMagazined(caSection)
 {
-    m_bGrenadeMode = 0;
+    m_bGrenadeMode = false;
 }
 
 CSE_ALifeItemWeaponMagazinedWGL::~CSE_ALifeItemWeaponMagazinedWGL() {}
@@ -748,8 +748,9 @@ void CSE_ALifeItemAmmo::FillProps(LPCSTR pref, PropItemVec& values)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeItemAmmo::can_switch_online() const { return inherited::can_switch_online(); }
-bool CSE_ALifeItemAmmo::can_switch_offline() const { return (inherited::can_switch_offline() && a_elapsed != 0); }
+bool CSE_ALifeItemAmmo::can_switch_online() const noexcept { return inherited::can_switch_online(); }
+bool CSE_ALifeItemAmmo::can_switch_offline() const noexcept
+{ return (inherited::can_switch_offline() && a_elapsed != 0); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemDetector
 ////////////////////////////////////////////////////////////////////////////
@@ -931,8 +932,8 @@ void CSE_ALifeItemExplosive::FillProps(LPCSTR pref, PropItemVec& items) { inheri
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeItemBolt::CSE_ALifeItemBolt(LPCSTR caSection) : CSE_ALifeItem(caSection)
 {
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, caSection, "ef_weapon_type", u32(-1));
 }
 
@@ -947,11 +948,11 @@ void CSE_ALifeItemBolt::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_W
 void CSE_ALifeItemBolt::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
 void CSE_ALifeItemBolt::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); };
 void CSE_ALifeItemBolt::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); };
-bool CSE_ALifeItemBolt::can_save() const
+bool CSE_ALifeItemBolt::can_save() const noexcept
 {
-    return (false); //! attached());
+    return false; //! attached());
 }
-bool CSE_ALifeItemBolt::used_ai_locations() const { return false; }
+bool CSE_ALifeItemBolt::used_ai_locations() const noexcept { return false; }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeItemBolt::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
 #endif // #ifndef XRGAME_EXPORTS

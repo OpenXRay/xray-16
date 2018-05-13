@@ -1,14 +1,25 @@
-#ifndef xrstringH
-#define xrstringH
 #pragma once
 
-#include "_std_extensions.h"
+#include <cstdio>
+
+#include "_types.h"
+#include "xrCommon/inlining_macros.h"
+#include "xrMemory.h"
+
+#define BREAK_AT_STRCMP
+#ifndef DEBUG
+#undef BREAK_AT_STRCMP
+#endif
+#ifdef _EDITOR
+#undef BREAK_AT_STRCMP
+#endif
+
+#ifndef BREAK_AT_STRCMP
+#include <string.h>
+#endif
 
 #pragma pack(push, 4)
-//////////////////////////////////////////////////////////////////////////
-typedef const char* str_c;
-
-//////////////////////////////////////////////////////////////////////////
+#pragma warning(push)
 #pragma warning(disable : 4200)
 struct XRCORE_API str_value
 {
@@ -30,37 +41,32 @@ struct XRCORE_API str_hash_function
     IC u32 operator()(str_value const* const value) const { return value->dwCRC; };
 };
 
-#pragma warning(default : 4200)
+#pragma warning(pop)
 
 struct str_container_impl;
 class IWriter;
 //////////////////////////////////////////////////////////////////////////
 class XRCORE_API str_container
 {
-private:
-    Lock cs;
-    str_container_impl* impl;
-
 public:
     str_container();
     ~str_container();
 
-    str_value* dock(str_c value);
+    str_value* dock(pcstr value);
     void clean();
     void dump();
     void dump(IWriter* W);
     void verify();
     u32 stat_economy();
-#ifdef CONFIG_PROFILE_LOCKS
-    str_container() : cs(MUTEX_PROFILE_ID(str_container)) {}
-#endif // CONFIG_PROFILE_LOCKS
+
+private:
+    str_container_impl* impl;
 };
 XRCORE_API extern str_container* g_pStringContainer;
 
 //////////////////////////////////////////////////////////////////////////
 class shared_str
 {
-private:
     str_value* p_;
 
 protected:
@@ -75,7 +81,7 @@ protected:
     }
 
 public:
-    void _set(str_c rhs)
+    void _set(pcstr rhs)
     {
         str_value* v = g_pStringContainer->dock(rhs);
         if (0 != v)
@@ -98,7 +104,7 @@ public:
 public:
     // construction
     shared_str() { p_ = 0; }
-    shared_str(str_c rhs)
+    shared_str(pcstr rhs)
     {
         p_ = 0;
         _set(rhs);
@@ -110,7 +116,7 @@ public:
     }
     ~shared_str() { _dec(); }
     // assignment & accessors
-    shared_str& operator=(str_c rhs)
+    shared_str& operator=(pcstr rhs)
     {
         _set(rhs);
         return (shared_str&)*this;
@@ -120,10 +126,11 @@ public:
         _set(rhs);
         return (shared_str&)*this;
     }
-    str_c operator*() const { return p_ ? p_->value : 0; }
+    // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use 
+    pcstr operator*() const { return p_ ? p_->value : 0; }
     bool operator!() const { return p_ == 0; }
     char operator[](size_t id) { return p_->value[id]; }
-    str_c c_str() const { return p_ ? p_->value : 0; }
+    pcstr c_str() const { return p_ ? p_->value : 0; }
     // misc func
     u32 size() const
     {
@@ -153,6 +160,15 @@ public:
     }
 };
 
+#ifdef BREAK_AT_STRCMP
+XRCORE_API int xr_strcmp(const char* S1, const char* S2);
+#else
+inline int xr_strcmp(const char* S1, const char* S2)
+{
+    return (int)strcmp(S1, S2);
+}
+#endif
+
 // res_ptr == res_ptr
 // res_ptr != res_ptr
 // const res_ptr == ptr
@@ -165,28 +181,24 @@ IC bool operator==(shared_str const& a, shared_str const& b) { return a._get() =
 IC bool operator!=(shared_str const& a, shared_str const& b) { return a._get() != b._get(); }
 IC bool operator<(shared_str const& a, shared_str const& b) { return a._get() < b._get(); }
 IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > b._get(); }
-// externally visible standart functionality
+// externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) { lhs.swap(rhs); }
-IC u32 xr_strlen(shared_str& a) { return a.size(); }
-IC int xr_strcmp(const shared_str& a, const char* b) { return xr_strcmp(*a, b); }
-IC int xr_strcmp(const char* a, const shared_str& b) { return xr_strcmp(a, *b); }
-IC int xr_strcmp(const shared_str& a, const shared_str& b)
+IC u32 xr_strlen(const shared_str& a) noexcept { return a.size(); }
+IC int xr_strcmp(const shared_str& a, const char* b) noexcept { return xr_strcmp(*a, b); }
+IC int xr_strcmp(const char* a, const shared_str& b) noexcept { return xr_strcmp(a, *b); }
+IC int xr_strcmp(const shared_str& a, const shared_str& b) noexcept
 {
     if (a.equal(b))
         return 0;
     else
         return xr_strcmp(*a, *b);
 }
-IC void xr_strlwr(xr_string& src)
-{
-    for (xr_string::iterator it = src.begin(); it != src.end(); it++)
-        *it = xr_string::value_type(tolower(*it));
-}
+
 IC void xr_strlwr(shared_str& src)
 {
     if (*src)
     {
-        LPSTR lp = xr_strdup(*src);
+        char* lp = xr_strdup(*src);
         xr_strlwr(lp);
         src = lp;
         xr_free(lp);
@@ -194,5 +206,3 @@ IC void xr_strlwr(shared_str& src)
 }
 
 #pragma pack(pop)
-
-#endif

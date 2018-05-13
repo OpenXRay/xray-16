@@ -27,7 +27,7 @@ IC CGameLevelCrossTable::CGameLevelCrossTable(LPCSTR fName)
 }
 #endif // AI_COMPILER
 
-IC CGameLevelCrossTable::CGameLevelCrossTable(const void* buffer, const u32& buffer_size)
+IC CGameLevelCrossTable::CGameLevelCrossTable(const void* buffer, const u32& /*buffer_size*/)
 {
     memcpy(&m_tCrossTableHeader, buffer, sizeof(m_tCrossTableHeader));
     buffer = (const u8*)buffer + sizeof(m_tCrossTableHeader);

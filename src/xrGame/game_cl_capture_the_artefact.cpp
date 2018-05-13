@@ -18,6 +18,7 @@
 #include "actor.h"
 #include "weapon.h"
 #include "game_cl_base_weapon_usage_statistic.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrEngine/IGame_Persistent.h"
 #include "ui/UIActorMenu.h"
@@ -107,7 +108,7 @@ void game_cl_CaptureTheArtefact::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if ((Level().IsDemoPlayStarted() || Level().IsDemoPlayFinished()) && m_game_ui)
@@ -242,7 +243,7 @@ void game_cl_CaptureTheArtefact::UpdateMoneyIndicator()
     }
     if (total_money != last_money)
     {
-        itoa(total_money, MoneyStr, 10);
+        xr_itoa(total_money, MoneyStr, 10);
         m_game_ui->ChangeTotalMoneyIndicator(MoneyStr);
         last_money = total_money;
     }
@@ -655,7 +656,7 @@ void game_cl_CaptureTheArtefact::net_import_update(NET_Packet& P)
 bool game_cl_CaptureTheArtefact::InWarmUp() const { return m_inWarmup; }
 CUIGameCustom* game_cl_CaptureTheArtefact::createGameUI()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return NULL;
 
     m_game_ui = smart_cast<CUIGameCTA*>(NEW_INSTANCE(CLSID_GAME_UI_CAPTURETHEARTEFACT));
@@ -732,7 +733,7 @@ void game_cl_CaptureTheArtefact::OnGameMenuRespond_ChangeTeam(NET_Packet& P)
 
 void game_cl_CaptureTheArtefact::UpdateMapLocations()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     // updating firends indicator
     if (!local_player)
@@ -820,7 +821,7 @@ void game_cl_CaptureTheArtefact::OnSpawn(IGameObject* pObj)
 {
     inherited::OnSpawn(pObj);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     CArtefact* pArtefact = smart_cast<CArtefact*>(pObj);
@@ -1244,7 +1245,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     char* player = static_cast<char*>(_alloca(psize));
     char* cmd_name = static_cast<char*>(_alloca(psize));
     char* tcmd_name = cmd_name;
-    static char* scans_format = "%s %s %s %s %s";
+    static constexpr pcstr scans_format = "%s %s %s %s %s";
 
     char* args[MAX_VOTE_PARAMS];
     for (u32 i = 0; i < MAX_VOTE_PARAMS; ++i)
@@ -1288,7 +1289,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     {
         if (!xr_strcmp(cmd_name, ttable[i][0]))
         {
-            str_c ted_str = st.translate(ttable[i][1]).c_str();
+            pcstr ted_str = st.translate(ttable[i][1]).c_str();
             VERIFY(ted_str);
             tcmd_len = xr_strlen(ted_str) + 1;
             tcmd_name = static_cast<char*>(_alloca(tcmd_len));
@@ -1311,7 +1312,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
         xr_strcat(vstr, vstr_size, " ");
         xr_strcat(vstr, vstr_size, st.translate(args[i]).c_str());
     }
-    str_c t_vote_str = st.translate("mp_voting_started").c_str();
+    pcstr t_vote_str = st.translate("mp_voting_started").c_str();
     VERIFY(t_vote_str);
     u32 fin_str_size = xr_strlen(t_vote_str) + vstr_size + xr_strlen(player) + 1;
     char* fin_str = static_cast<char*>(_alloca(fin_str_size));
@@ -1621,7 +1622,8 @@ bool game_cl_CaptureTheArtefact::PlayerCanSprint(CActor* pActor)
 }
 
 bool game_cl_CaptureTheArtefact::CanActivateArtefact() const { return m_bCanActivateArtefact; }
-char* game_cl_CaptureTheArtefact::getTeamSection(int Team)
+
+pcstr game_cl_CaptureTheArtefact::getTeamSection(int Team)
 {
     switch (Team)
     {
@@ -1649,7 +1651,7 @@ void game_cl_CaptureTheArtefact::OnConnected()
     inherited::OnConnected();
     if (m_game_ui)
     {
-        VERIFY(!g_dedicated_server);
+        VERIFY(!GEnv.isDedicatedServer);
         m_game_ui = smart_cast<CUIGameCTA*>(CurrentGameUI());
         m_game_ui->SetClGame(this);
     }

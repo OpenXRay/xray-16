@@ -1,6 +1,7 @@
+#pragma once
 #ifndef xrDebug_macrosH
 #define xrDebug_macrosH
-#pragma once
+#include "xrDebug.h"
 
 #define DEBUG_INFO {__FILE__, __LINE__, __FUNCTION__}
 #define CHECK_OR_EXIT(expr, message)\
@@ -94,9 +95,9 @@
     do\
     {\
         static bool ignoreAlways = false;\
-        HRESULT hr = expr;\
-        if (!ignoreAlways && FAILED(hr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr);\
+        HRESULT hr_ = expr;\
+        if (!ignoreAlways && FAILED(hr_))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr_);\
     } while (false)
 #define CHK_GL(expr)\
     do\
@@ -141,15 +142,4 @@
 #define todo(x) message(__FILE__LINE__" TODO : " #x "\n") 
 #define fixme(x) message(__FILE__LINE__" FIXME: " #x "\n") 
 
-//--------- static assertion
-template <bool>
-struct CompileTimeError;
-template <>
-struct CompileTimeError<true>
-{};
-#define STATIC_CHECK(expr, msg)\
-{\
-    CompileTimeError<((expr)!=0)> ERROR_##msg;\
-    (void)ERROR_##msg;\
-}
 #endif // xrDebug_macrosH

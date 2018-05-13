@@ -28,23 +28,27 @@ public:
     WaveForm _A;
 
     CConstant() { memset(this, 0, sizeof(CConstant)); }
-    IC void set_float(float r, float g, float b, float a)
+
+    void set_float(float r, float g, float b, float a)
     {
         const_float.set(r, g, b, a);
         const_dword = const_float.get();
     }
-    IC void set_float(Fcolor& c)
+
+    void set_float(Fcolor& c)
     {
         const_float.set(c);
         const_dword = const_float.get();
     }
-    IC void set_dword(u32 c)
+
+    void set_dword(u32 c)
     {
         const_float.set(c);
         const_dword = c;
     }
     void Calculate();
-    IC BOOL Similar(CConstant& C) // comare by modes and params
+
+    BOOL Similar(CConstant& C) // comare by modes and params
     {
         if (dwMode != C.dwMode)
             return FALSE;

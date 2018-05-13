@@ -35,7 +35,7 @@ public:
     virtual void FireEnd();
     void LaunchGrenade();
 
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
 
     virtual void switch2_Reload();
     virtual void state_Fire(float dt);
@@ -55,6 +55,7 @@ public:
     virtual bool GetBriefInfo(II_BriefInfo& info);
 
     virtual bool IsNecessaryItem(const shared_str& item_sect);
+    virtual float Weight() const;
 
     //виртуальные функции для проигрывания анимации HUD
     virtual void PlayAnimShow();

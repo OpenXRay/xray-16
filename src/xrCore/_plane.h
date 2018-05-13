@@ -1,5 +1,8 @@
+#pragma once
 #ifndef _PLANE
 #define _PLANE
+#include "_vector3d.h"
+#include "_matrix.h"
 
 template <class T>
 class _plane
@@ -144,7 +147,7 @@ typedef _plane<float> Fplane;
 typedef _plane<double> Dplane;
 
 template <class T>
-BOOL _valid(const _plane<T>& s)
+bool _valid(const _plane<T>& s)
 {
     return _valid(s.n) && _valid(s.d);
 }

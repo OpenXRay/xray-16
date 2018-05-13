@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "configs_dump_verifyer.h"
 
-#pragma comment(lib, "xrCore.lib")
-
 static char const* help_msg =
     "Format: mp_configs_verifyer.exe [--file | --unpack | --io_filter | --help] [file name]\n"
     "Keys:\n"
@@ -29,7 +27,7 @@ void safe_verify(
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        printf("FATAL ERROR (%s): failed to verify data\n");
+        printf("FATAL ERROR: failed to verify data\n");
     }
 }
 
@@ -148,8 +146,7 @@ void run_configs_verifyer_server()
 
 void initialize_core()
 {
-    Core._initialize("mp_configs_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
-    crypto::xr_crypto_init();
+    Core.Initialize("mp_configs_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
 
     string_path fname;
     FS.update_path(fname, "$game_config$", "system.ltx");

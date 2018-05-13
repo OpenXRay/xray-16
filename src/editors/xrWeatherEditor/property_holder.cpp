@@ -12,14 +12,13 @@
 
 using Flobbster::Windows::Forms::PropertySpec;
 using System::String;
-using editor::property_holder_collection;
-using editor::engine;
-using editor::property_holder_holder;
+using XRay::Editor::property_holder_collection;
+using XRay::Editor::property_holder_holder;
 
 typedef property_holder::collection_type collection_type;
 
-property_holder::property_holder(editor::engine* engine, LPCSTR display_name, property_holder_collection* collection,
-    editor::property_holder_holder* holder)
+property_holder::property_holder(XRay::Editor::engine_base* engine, LPCSTR display_name, property_holder_collection* collection,
+    XRay::Editor::property_holder_holder* holder)
     : m_engine(engine), m_display_name(to_string(display_name)), m_collection(collection), m_holder(holder),
       m_disposing(false)
 {
@@ -53,7 +52,7 @@ void property_holder::on_dispose()
 }
 
 property_container ^ property_holder::container() { return (m_container); }
-engine& property_holder::engine()
+XRay::Editor::engine_base& property_holder::engine()
 {
     VERIFY(m_engine);
     return (*m_engine);

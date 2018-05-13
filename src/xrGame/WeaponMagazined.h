@@ -28,6 +28,11 @@ protected:
     ESoundTypes m_eSoundShot;
     ESoundTypes m_eSoundEmptyClick;
     ESoundTypes m_eSoundReload;
+#ifdef NEW_SOUNDS //AVO: new sounds go here
+    ESoundTypes m_eSoundReloadEmpty;
+    ESoundTypes m_eSoundReloadMisfire;
+#endif //-NEW_SOUNDS
+
     bool m_sounds_enabled;
     // General
     //кадр момента пересчета UpdateSounds
@@ -49,7 +54,7 @@ protected:
     virtual void OnEmptyClick();
 
     virtual void OnAnimationEnd(u32 state);
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
 
     virtual void UpdateSounds();
 
@@ -139,15 +144,22 @@ public:
     virtual void OnZoomOut();
     void OnNextFireMode();
     void OnPrevFireMode();
-    bool HasFireModes() { return m_bHasDifferentFireModes; };
-    virtual int GetCurrentFireMode() { return m_aFireModes[m_iCurFireMode]; };
+    bool HasFireModes() { return m_bHasDifferentFireModes; }
+
+    int GetCurrentFireMode() override
+    {
+        //AVO: fixed crash due to original GSC assumption that CWeaponMagazined will always have firemodes specified in configs.
+        if (HasFireModes())
+            return m_aFireModes[m_iCurFireMode];
+        return 1;
+    }
+
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
 protected:
     virtual bool install_upgrade_impl(LPCSTR section, bool test);
 
-protected:
     virtual bool AllowFireWhileWorking() { return false; }
     //виртуальные функции для проигрывания анимации HUD
     virtual void PlayAnimShow();
@@ -163,4 +175,13 @@ protected:
 
     virtual void FireBullet(const Fvector& pos, const Fvector& dir, float fire_disp, const CCartridge& cartridge,
         u16 parent_id, u16 weapon_id, bool send_hit);
+
+    //AVO: for custom added sounds check if sound exists
+    bool WeaponSoundExist(pcstr section, pcstr sound_name) const;
+
+    //Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+    HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
+#endif
+    //-Alundaio
 };

@@ -1,0 +1,8 @@
+#include "common.h"
+#include "iostructs\p_TL.h"
+
+float4 	_main ( p_TL I )
+{
+	float4 r	= tex2D( s_base, I.Tex0 );
+	return r;
+}

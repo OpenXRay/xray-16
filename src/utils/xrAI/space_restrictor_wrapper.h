@@ -8,11 +8,10 @@
 
 #pragma once
 
-#include "shapedata.h"
-
-class CSE_ALifeSpaceRestrictor;
-class CLevelGraph;
-class CGraphEngine;
+#include "xrAICore/Navigation/graph_abstract.h"
+#include "xrAICore/Navigation/graph_engine.h"
+#include "xrServerEntities/shapedata.h"
+#include "xrServerEntities/xrServer_Objects_ALife.h"
 
 class CSpaceRestrictorWrapper
 {

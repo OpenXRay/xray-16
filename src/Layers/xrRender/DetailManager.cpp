@@ -32,14 +32,14 @@ void bwdithermap(int levels, int magic[16][16])
     float N = 255.0f / (levels - 1);
 
     /*
-    * Expand 4x4 dither pattern to 16x16.  4x4 leaves obvious patterning,
-    * and doesn't give us full intensity range (only 17 sublevels).
-    *
-    * magicfact is (N - 1)/16 so that we get numbers in the matrix from 0 to
-    * N - 1: mod N gives numbers in 0 to N - 1, don't ever want all
-    * pixels incremented to the next level (this is reserved for the
-    * pixel value with mod N == 0 at the next level).
-    */
+     * Expand 4x4 dither pattern to 16x16.  4x4 leaves obvious patterning,
+     * and doesn't give us full intensity range (only 17 sublevels).
+     *
+     * magicfact is (N - 1)/16 so that we get numbers in the matrix from 0 to
+     * N - 1: mod N gives numbers in 0 to N - 1, don't ever want all
+     * pixels incremented to the next level (this is reserved for the
+     * pixel value with mod N == 0 at the next level).
+     */
 
     float magicfact = (N - 1) / 16;
     for (int i = 0; i < 4; i++)
@@ -76,10 +76,10 @@ void CDetailManager::SSwingValue::lerp(const SSwingValue& A, const SSwingValue& 
 // XXX stats: add to statistics
 CDetailManager::CDetailManager() : xrc("detail manager")
 {
-    dtFS = 0;
-    dtSlots = 0;
-    soft_Geom = 0;
-    hw_Geom = 0;
+    dtFS = nullptr;
+    dtSlots = nullptr;
+    soft_Geom = nullptr;
+    hw_Geom = nullptr;
     hw_BatchSize = 0;
     hw_VB = 0;
     hw_IB = 0;
@@ -87,11 +87,59 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     m_time_rot_2 = 0;
     m_time_pos = 0;
     m_global_time_old = 0;
+
+#ifdef DETAIL_RADIUS
+    // KD: variable detail radius
+    dm_size = dm_current_size;
+    dm_cache_line = dm_current_cache_line;
+    dm_cache1_line = dm_current_cache1_line;
+    dm_cache_size = dm_current_cache_size;
+    dm_fade = dm_current_fade;
+    ps_r__Detail_density = ps_current_detail_density;
+    cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
+    for (u32 i = 0; i < dm_cache1_line; ++i)
+    {
+        cache_level1[i] = (CacheSlot1*)xr_malloc(dm_cache1_line * sizeof(CacheSlot1));
+        for (u32 j = 0; j < dm_cache1_line; ++j)
+            new(&cache_level1[i][j]) CacheSlot1();
+    }
+    cache = (Slot***)xr_malloc(dm_cache_line * sizeof(Slot**));
+    for (u32 i = 0; i < dm_cache_line; ++i)
+        cache[i] = (Slot**)xr_malloc(dm_cache_line * sizeof(Slot*));
+        
+    cache_pool = (Slot *)xr_malloc(dm_cache_size * sizeof(Slot));
+    
+    for (u32 i = 0; i < dm_cache_size; ++i)
+        new(&cache_pool[i]) Slot();
+    /*
+    CacheSlot1 cache_level1[dm_cache1_line][dm_cache1_line];
+    Slot* cache [dm_cache_line][dm_cache_line]; // grid-cache itself
+    Slot cache_pool [dm_cache_size]; // just memory for slots 
+    */
+#endif
 }
 
-CDetailManager::~CDetailManager() {}
-/*
-*/
+CDetailManager::~CDetailManager()
+{
+#ifdef DETAIL_RADIUS
+    for (u32 i = 0; i < dm_cache_size; ++i)
+        cache_pool[i].~Slot();
+    xr_free(cache_pool);
+
+    for (u32 i = 0; i < dm_cache_line; ++i)
+        xr_free(cache[i]);
+    xr_free(cache);
+
+    for (u32 i = 0; i < dm_cache1_line; ++i)
+    {
+        for (u32 j = 0; j < dm_cache1_line; ++j)
+            cache_level1[i][j].~CacheSlot1();
+        xr_free(cache_level1[i]);
+    }
+    xr_free(cache_level1);
+#endif
+}
+
 #ifndef _EDITOR
 
 /*
@@ -108,7 +156,7 @@ void CDetailManager::Load()
     // Open file stream
     if (!FS.exist("$level$", "level.details"))
     {
-        dtFS = NULL;
+        dtFS = nullptr;
         return;
     }
 
@@ -179,6 +227,7 @@ void CDetailManager::Unload()
         (*it)->Unload();
         xr_delete(*it);
     }
+
     objects.clear();
     m_visibles[0].clear();
     m_visibles[1].clear();
@@ -190,14 +239,10 @@ extern ECORE_API float r_ssaDISCARD;
 
 void CDetailManager::UpdateVisibleM()
 {
-    Fvector EYE = RDEVICE.vCameraPosition_saved;
+    Fvector EYE = Device.vCameraPositionSaved;
 
     CFrustum View;
-    View.CreateFromMatrix(RDEVICE.mFullTransform_saved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-
-    CFrustum View_old;
-    Fmatrix Viewm_old = RDEVICE.mFullTransform;
-    View_old.CreateFromMatrix(Viewm_old, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+    View.CreateFromMatrix(Device.mFullTransformSaved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
     float fade_limit = dm_fade;
     fade_limit = fade_limit * fade_limit;
@@ -276,17 +321,16 @@ void CDetailManager::UpdateVisibleM()
                         if (sp.id == DetailSlot::ID_Empty)
                             continue;
 
-                        sp.r_items[0].clear_not_free();
-                        sp.r_items[1].clear_not_free();
-                        sp.r_items[2].clear_not_free();
+                        sp.r_items[0].clear();
+                        sp.r_items[1].clear();
+                        sp.r_items[2].clear();
 
                         float R = objects[sp.id]->bv_sphere.R;
                         float Rq_drcp = R * R * dist_sq_rcp; // reordered expression for 'ssa' calc
 
-                        SlotItem **siIT = &(*sp.items.begin()), **siEND = &(*sp.items.end());
-                        for (; siIT != siEND; siIT++)
+                        for(auto &siIT : sp.items)
                         {
-                            SlotItem& Item = *(*siIT);
+                            SlotItem& Item = *siIT;
                             float scale = Item.scale_calculated = Item.scale * alpha_i;
                             float ssa = scale * scale * Rq_drcp;
                             if (ssa < r_ssaDISCARD)
@@ -297,7 +341,7 @@ void CDetailManager::UpdateVisibleM()
                             if (ssa > r_ssaCHEAP)
                                 vis_id = Item.vis_ID;
 
-                            sp.r_items[vis_id].push_back(*siIT);
+                            sp.r_items[vis_id].push_back(siIT);
 
                             // 2 visible[vis_id][sp.id].push_back(&Item);
                         }
@@ -330,7 +374,7 @@ void CDetailManager::UpdateVisibleM()
 void CDetailManager::Render()
 {
 #ifndef _EDITOR
-    if (0 == dtFS)
+    if (nullptr == dtFS)
         return;
     if (!psDeviceFlags.is(rsDetails))
         return;
@@ -340,6 +384,7 @@ void CDetailManager::Render()
     MT_SYNC();
 
     RImplementation.BasicStats.DetailRender.Begin();
+    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
 
 #ifndef _EDITOR
     float factor = g_pGamePersistent->Environment().wind_strength_factor;
@@ -355,6 +400,8 @@ void CDetailManager::Render()
     else
         soft_Render();
     RCache.set_CullMode(CULL_CCW);
+
+    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
     RImplementation.BasicStats.DetailRender.End();
     m_frame_rendered = RDEVICE.dwFrame;
 }
@@ -362,9 +409,9 @@ void CDetailManager::Render()
 void __stdcall CDetailManager::MT_CALC()
 {
 #ifndef _EDITOR
-    if (0 == RImplementation.Details)
+    if (nullptr == RImplementation.Details)
         return; // possibly deleted
-    if (0 == dtFS)
+    if (nullptr == dtFS)
         return;
     if (!psDeviceFlags.is(rsDetails))
         return;
@@ -374,7 +421,7 @@ void __stdcall CDetailManager::MT_CALC()
     if (m_frame_calc != RDEVICE.dwFrame)
         if ((m_frame_rendered + 1) == RDEVICE.dwFrame) // already rendered
         {
-            Fvector EYE = RDEVICE.vCameraPosition_saved;
+            Fvector EYE = RDEVICE.vCameraPositionSaved;
 
             int s_x = iFloor(EYE.x / dm_slot_size + .5f);
             int s_z = iFloor(EYE.z / dm_slot_size + .5f);

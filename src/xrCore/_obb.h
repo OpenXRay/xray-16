@@ -1,5 +1,7 @@
+#pragma once
 #ifndef FOBB_H
 #define FOBB_H
+#include "_matrix33.h"
 
 template <class T>
 struct _obb
@@ -153,7 +155,7 @@ typedef _obb<float> Fobb;
 typedef _obb<double> Dobb;
 
 template <class T>
-BOOL _valid(const _obb<T>& m)
+bool _valid(const _obb<T>& m)
 {
     return _valid(m.m_rotate) && _valid(m.m_translate) && _valid(m.m_halfsize);
 }

@@ -200,9 +200,9 @@ void CPseudoGigant::Load(LPCSTR section)
 
     // --------------------------------------------------------------------------------
 
-    ::Sound->create(
+    GEnv.Sound->create(
         m_sound_threaten_hit, pSettings->r_string(section, "sound_threaten_hit"), st_Effect, SOUND_TYPE_WORLD);
-    ::Sound->create(m_sound_start_threaten, pSettings->r_string(section, "sound_threaten_start"), st_Effect,
+    GEnv.Sound->create(m_sound_start_threaten, pSettings->r_string(section, "sound_threaten_start"), st_Effect,
         SOUND_TYPE_MONSTER_ATTACKING);
 
     m_kick_damage = pSettings->r_float(section, "HugeKick_Damage");
@@ -290,7 +290,7 @@ void CPseudoGigant::on_activate_control(ControlCom::EControlType type)
 void CPseudoGigant::on_threaten_execute()
 {
     // разбросить объекты
-    m_nearest.clear_not_free();
+    m_nearest.clear();
     Level().ObjectSpace.GetNearest(m_nearest, Position(), 15.f, NULL);
     for (u32 i = 0; i < m_nearest.size(); i++)
     {

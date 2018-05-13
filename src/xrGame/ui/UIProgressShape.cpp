@@ -27,7 +27,7 @@ void CUIProgressShape::SetPos(int pos, int max)
     if (m_bText)
     {
         string256 _buff;
-        TextItemControl()->SetText(itoa(pos, _buff, 10));
+        TextItemControl()->SetText(xr_itoa(pos, _buff, 10));
     }
 }
 
@@ -64,11 +64,11 @@ void CUIProgressShape::Draw()
     if (m_bText)
         DrawText();
 
-    GlobalEnv.UIRender->SetShader(*GetShader());
+    GEnv.UIRender->SetShader(*GetShader());
     Fvector2 tsize;
-    GlobalEnv.UIRender->GetActiveTextureResolution(tsize);
+    GEnv.UIRender->GetActiveTextureResolution(tsize);
 
-    GlobalEnv.UIRender->StartPrimitive(m_sectorCount * 3, IUIRender::ptTriList, UI().m_currentPointType);
+    GEnv.UIRender->StartPrimitive(m_sectorCount * 3, IUIRender::ptTriList, UI().m_currentPointType);
 
     Frect pos_rect;
     GetAbsoluteRect(pos_rect);
@@ -122,7 +122,7 @@ void CUIProgressShape::Draw()
         float ffff = calc_color(i + 1, m_sectorCount, m_stage, 1.0f, m_blend);
         u32 color = color_argb_f(ffff, 1.0f, 1.0f, 1.0f);
 
-        GlobalEnv.UIRender->PushPoint(center_pos.x, center_pos.y, 0, color, center_tex.x, center_tex.y);
+        GEnv.UIRender->PushPoint(center_pos.x, center_pos.y, 0, color, center_tex.x, center_tex.y);
 
         Fvector2 tp;
         tp.set(prev_pos_pt);
@@ -153,15 +153,15 @@ void CUIProgressShape::Draw()
 
         if (m_bClockwise)
         {
-            GlobalEnv.UIRender->PushPoint(tp1.x, tp1.y, 0, color, tx1.x, tx1.y);
-            GlobalEnv.UIRender->PushPoint(tp.x, tp.y, 0, color, tx.x, tx.y);
+            GEnv.UIRender->PushPoint(tp1.x, tp1.y, 0, color, tx1.x, tx1.y);
+            GEnv.UIRender->PushPoint(tp.x, tp.y, 0, color, tx.x, tx.y);
         }
         else
         {
-            GlobalEnv.UIRender->PushPoint(tp.x, tp.y, 0, color, tx.x, tx.y);
-            GlobalEnv.UIRender->PushPoint(tp1.x, tp1.y, 0, color, tx1.x, tx1.y);
+            GEnv.UIRender->PushPoint(tp.x, tp.y, 0, color, tx.x, tx.y);
+            GEnv.UIRender->PushPoint(tp1.x, tp1.y, 0, color, tx1.x, tx1.y);
         }
     }
 
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 }

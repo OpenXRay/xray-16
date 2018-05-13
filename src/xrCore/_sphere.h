@@ -1,5 +1,7 @@
+#pragma once
 #ifndef _F_SPHERE_H_
 #define _F_SPHERE_H_
+#include "_vector3d.h"
 
 template <class T>
 struct _sphere;
@@ -104,7 +106,7 @@ public:
     {
         int quantity;
         float afT[2];
-        Fsphere::ERP_Result result = intersect(start, dir, dist, quantity, afT);
+        typename Fsphere::ERP_Result result = intersect(start, dir, dist, quantity, afT);
 
         if (result == Fsphere::rpOriginInside || ((result == Fsphere::rpOriginOutside) && (afT[0] < dist)))
         {
@@ -187,7 +189,7 @@ public:
 };
 
 template <class T>
-BOOL _valid(const _sphere<T>& s)
+bool _valid(const _sphere<T>& s)
 {
     return _valid(s.P) && _valid(s.R);
 }

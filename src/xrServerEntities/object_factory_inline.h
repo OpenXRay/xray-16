@@ -6,10 +6,10 @@
 //	Description : Object factory inline functions
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef object_factory_inlineH
 #define object_factory_inlineH
-
-#pragma once
+#include <algorithm>
 
 IC const CObjectFactory& object_factory()
 {
@@ -65,7 +65,7 @@ IC const CObjectItemAbstract* CObjectFactory::item(const CLASS_ID& clsid, bool n
     if ((I == clsids().end()) || ((*I)->clsid() != clsid))
     {
         R_ASSERT(no_assert);
-        return (0);
+        return (nullptr);
     }
     return (*I);
 }

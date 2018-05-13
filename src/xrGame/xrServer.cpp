@@ -22,6 +22,7 @@
 #include "file_transfer.h"
 #include "screenshot_server.h"
 #include "xrServer_info.h"
+#include "xrNetServer/NET_Messages.h"
 #include <functional>
 
 #pragma warning(push)
@@ -49,7 +50,7 @@ void xrClientData::Clear()
 };
 
 xrClientData::~xrClientData() { xr_delete(ps); }
-xrServer::xrServer() : IPureServer(Device.GetTimerGlobal(), g_dedicated_server)
+xrServer::xrServer() : IPureServer(Device.GetTimerGlobal(), GEnv.isDedicatedServer)
 {
     m_file_transfers = NULL;
     m_aDelayedPackets.clear();
@@ -129,7 +130,7 @@ void xrServer::client_Destroy(IClient* C)
     // Delete assosiated entity
     // xrClientData*	D = (xrClientData*)C;
     // CSE_Abstract* E = D->owner;
-    IClient* alife_client = net_players.FindAndEraseClient(std::bind1st(std::equal_to<IClient*>(), C));
+    IClient* alife_client = net_players.FindAndEraseClient(std::bind(std::equal_to<IClient*>(), C, std::placeholders::_1));
     // VERIFY(alife_client);
     if (alife_client)
     {
@@ -646,7 +647,7 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
         shared_str user;
         shared_str pass;
         P.r_stringZ(user);
-        if (0 == stricmp(user.c_str(), "logoff"))
+        if (0 == xr_stricmp(user.c_str(), "logoff"))
         {
             CL->m_admin_rights.m_has_admin_rights = FALSE;
             if (CL->ps)
@@ -782,7 +783,7 @@ void xrServer::SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags)
     net_players.ForFoundClientsDo(ClientExcluderPredicate(exclude), temp_functor);
 }
 //--------------------------------------------------------------------
-CSE_Abstract* xrServer::entity_Create(LPCSTR name) { return F_entity_Create(name); }
+CSE_Abstract* xrServer::entity_Create(pcstr name) { return F_entity_Create(name); }
 void xrServer::entity_Destroy(CSE_Abstract*& P)
 {
 #ifdef DEBUG
@@ -1074,7 +1075,7 @@ void xrServer::GetServerInfo(CServerInfo* si)
     string32 tmp;
     string256 tmp256;
 
-    si->AddItem("Server port", itoa(GetPort(), tmp, 10), RGB(128, 128, 255));
+    si->AddItem("Server port", xr_itoa(GetPort(), tmp, 10), RGB(128, 128, 255));
     LPCSTR time =
         InventoryUtilities::GetTimeAsString(Device.dwTimeGlobal, InventoryUtilities::etpTimeToSecondsAndDay).c_str();
     si->AddItem("Uptime", time, RGB(255, 228, 0));
@@ -1084,13 +1085,13 @@ void xrServer::GetServerInfo(CServerInfo* si)
     if (game->Type() == eGameIDDeathmatch || game->Type() == eGameIDTeamDeathmatch)
     {
         xr_strcat(tmp256, " [");
-        xr_strcat(tmp256, itoa(g_sv_dm_dwFragLimit, tmp, 10));
+        xr_strcat(tmp256, xr_itoa(g_sv_dm_dwFragLimit, tmp, 10));
         xr_strcat(tmp256, "] ");
     }
     else if (game->Type() == eGameIDArtefactHunt || game->Type() == eGameIDCaptureTheArtefact)
     {
         xr_strcat(tmp256, " [");
-        xr_strcat(tmp256, itoa(g_sv_ah_dwArtefactsNum, tmp, 10));
+        xr_strcat(tmp256, xr_itoa(g_sv_ah_dwArtefactsNum, tmp, 10));
         xr_strcat(tmp256, "] ");
         g_sv_ah_iReinforcementTime;
     }
@@ -1098,13 +1099,13 @@ void xrServer::GetServerInfo(CServerInfo* si)
     // if ( g_sv_dm_dwTimeLimit > 0 )
     {
         xr_strcat(tmp256, " time limit [");
-        xr_strcat(tmp256, itoa(g_sv_dm_dwTimeLimit, tmp, 10));
+        xr_strcat(tmp256, xr_itoa(g_sv_dm_dwTimeLimit, tmp, 10));
         xr_strcat(tmp256, "] ");
     }
     if (game->Type() == eGameIDArtefactHunt || game->Type() == eGameIDCaptureTheArtefact)
     {
         xr_strcat(tmp256, " RT [");
-        xr_strcat(tmp256, itoa(g_sv_ah_iReinforcementTime, tmp, 10));
+        xr_strcat(tmp256, xr_itoa(g_sv_ah_iReinforcementTime, tmp, 10));
         xr_strcat(tmp256, "]");
     }
     si->AddItem("Game type", tmp256, RGB(128, 255, 255));
@@ -1117,7 +1118,7 @@ void xrServer::GetServerInfo(CServerInfo* si)
         if (g_sv_mp_iDumpStatsPeriod > 0)
         {
             xr_strcat(tmp256, " statistic [");
-            xr_strcat(tmp256, itoa(g_sv_mp_iDumpStatsPeriod, tmp, 10));
+            xr_strcat(tmp256, xr_itoa(g_sv_mp_iDumpStatsPeriod, tmp, 10));
             xr_strcat(tmp256, "]");
             if (g_bCollectStatisticData)
             {
@@ -1160,7 +1161,7 @@ void xrServer::KickCheaters()
 
 void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_id)
 {
-    if ((cheater_id == SV_Client->ID) && g_dedicated_server)
+    if ((cheater_id == SV_Client->ID) && GEnv.isDedicatedServer)
     {
         return;
     }
@@ -1177,7 +1178,7 @@ void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_
 }
 void xrServer::MakeConfigDump(ClientID const& admin_id, ClientID const& cheater_id)
 {
-    if ((cheater_id == SV_Client->ID) && g_dedicated_server)
+    if ((cheater_id == SV_Client->ID) && GEnv.isDedicatedServer)
     {
         return;
     }

@@ -9,10 +9,13 @@
 namespace PS
 {
 class CPEDef;
-DEFINE_VECTOR(CPEDef*, PEDVec, PEDIt);
+using PEDVec = xr_vector<CPEDef*>;
+using PEDIt = PEDVec::iterator;
 
 class CPGDef;
-DEFINE_VECTOR(CPGDef*, PGDVec, PGDIt);
+using PGDVec = xr_vector<CPGDef*>;
+using PGDIt = PGDVec::iterator;
+
 } // namespace PS
 
 class ECORE_API CPSLibrary : public particles_systems::library_interface
@@ -46,12 +49,12 @@ public:
     PS::PGDIt FindPGDIt(LPCSTR name);
 
     // get object properties methods
-    IC PS::PEDIt FirstPED() { return m_PEDs.begin(); }
-    IC PS::PEDIt LastPED() { return m_PEDs.end(); }
-    IC PS::PGDIt FirstPGD() { return m_PGDs.begin(); }
-    IC PS::PGDIt LastPGD() { return m_PGDs.end(); }
-    PS::CPEDef* AppendPED(PS::CPEDef* src = 0);
-    PS::CPGDef* AppendPGD(PS::CPGDef* src = 0);
+    PS::PEDIt FirstPED() { return m_PEDs.begin(); }
+    PS::PEDIt LastPED() { return m_PEDs.end(); }
+    PS::PGDIt FirstPGD() { return m_PGDs.begin(); }
+    PS::PGDIt LastPGD() { return m_PGDs.end(); }
+    PS::CPEDef* AppendPED(PS::CPEDef* src = nullptr);
+    PS::CPGDef* AppendPGD(PS::CPGDef* src = nullptr);
     void Remove(LPCSTR name);
     void RenamePED(PS::CPEDef* src, LPCSTR new_name);
     void RenamePGD(PS::CPGDef* src, LPCSTR new_name);

@@ -1,9 +1,21 @@
+#pragma once
 // FS.h: interface for the CFS class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #ifndef fsH
 #define fsH
+#include "_types.h"
+#include "_bitwise.h"
+#include "_compressed_normal.h"
+#include "_vector2.h"
+#include "_vector3d.h"
+#include "_vector4.h"
+#include "_color.h"
+#include "xrCommon/math_funcs.h"
+#include "xrCommon/xr_stack.h"
+#include "xrCommon/xr_stack.h"
+//#include "_stl_extensions.h"
 
 #define CFS_CompressMark (1ul << 31ul)
 #define CFS_HeaderChunkID (666)
@@ -29,11 +41,11 @@ private:
     xr_stack<u32> chunk_pos;
 
 public:
-    shared_str fName;
+    xr_string fName;
 
 public:
     IWriter() {}
-    virtual ~IWriter() { R_ASSERT3(chunk_pos.empty(), "Opened chunk not closed.", *fName); }
+    virtual ~IWriter() { R_ASSERT3(chunk_pos.empty(), "Opened chunk not closed.", fName.c_str()); }
     // kernel
     virtual void seek(u32 pos) = 0;
     virtual u32 tell() = 0;

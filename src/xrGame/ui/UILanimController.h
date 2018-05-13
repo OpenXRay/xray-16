@@ -2,6 +2,7 @@
 
 #include "uiwindow.h"
 #include "xrEngine/LightAnimLibrary.h"
+#include "xrCore/_color.h"
 
 class CLAItem;
 

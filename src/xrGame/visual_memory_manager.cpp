@@ -833,17 +833,17 @@ void CVisualMemoryManager::load(IReader& packet)
 #ifdef USE_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= object.m_level_time);
         object.m_level_time = packet.r_u32();
-        object.m_level_time += Device.dwTimeGlobal;
+        object.m_level_time = Device.dwTimeGlobal - object.m_level_time;
 #endif // USE_LEVEL_TIME
 #ifdef USE_LAST_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= object.m_last_level_time);
         object.m_last_level_time = packet.r_u32();
-        object.m_last_level_time += Device.dwTimeGlobal;
+        object.m_last_level_time = Device.dwTimeGlobal - object.m_last_level_time;
 #endif // USE_LAST_LEVEL_TIME
 #ifdef USE_FIRST_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= (*I).m_first_level_time);
         object.m_first_level_time = packet.r_u32();
-        object.m_first_level_time += Device.dwTimeGlobal;
+        object.m_first_level_time = Device.dwTimeGlobal - object.m_first_level_time;
 #endif // USE_FIRST_LEVEL_TIME
         object.m_visible.assign(packet.r_u64());
 
@@ -858,7 +858,7 @@ void CVisualMemoryManager::load(IReader& packet)
         const CClientSpawnManager::CSpawnCallback* spawn_callback =
             Level().client_spawn_manager().callback(delayed_object.m_object_id, m_object->ID());
         if (!spawn_callback || !spawn_callback->m_object_callback)
-            if (!g_dedicated_server)
+            if (!GEnv.isDedicatedServer)
                 Level().client_spawn_manager().add(delayed_object.m_object_id, m_object->ID(), callback);
 #ifdef DEBUG
             else

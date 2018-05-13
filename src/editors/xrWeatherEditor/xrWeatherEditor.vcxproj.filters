@@ -740,7 +740,7 @@
     <ClInclude Include="..\..\Include\editor\interfaces.hpp">
       <Filter>interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\editor\property_holder.hpp">
+    <ClInclude Include="..\..\Include\editor\property_holder_base.hpp">
       <Filter>interfaces</Filter>
     </ClInclude>
   </ItemGroup>

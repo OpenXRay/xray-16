@@ -1,13 +1,16 @@
 #pragma once
 #include "xr_level_controller.h"
-class CUIWindow;
 
+// fwd. decl.
+class CUIWindow;
 struct _12b
 {
-    DWORD _[3];
+    /*DWORD*/ unsigned long _[3];
 };
+template <class T, int granularity> class poolSS;
 extern poolSS<_12b, 128> ui_allocator;
 
+// XXX: remove uialloc
 template <class T>
 class uialloc
 {
@@ -189,7 +192,8 @@ public:
     virtual void Reset();
     void ResetAll();
 
-    DEF_UILIST(WINDOW_LIST, CUIWindow*);
+    using WINDOW_LIST = ui_list<CUIWindow*>;
+
     WINDOW_LIST& GetChildWndList() { return m_ChildWndList; }
     IC bool IsAutoDelete() { return m_bAutoDelete; }
     IC void SetAutoDelete(bool auto_delete) { m_bAutoDelete = auto_delete; }
@@ -206,7 +210,7 @@ public:
 protected:
     IC void SafeRemoveChild(CUIWindow* child)
     {
-        WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), child);
+        auto it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), child);
         if (it != m_ChildWndList.end())
             m_ChildWndList.erase(it);
     };

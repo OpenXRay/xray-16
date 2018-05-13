@@ -1,5 +1,7 @@
+#pragma once
 #ifndef MxDefinesH
 #define MxDefinesH
+#include "xrCommon/math_funcs_inline.h"
 
 ////////////////////////////////////////////////////////////////////////
 const double FEQ_EPS = 1e-6;

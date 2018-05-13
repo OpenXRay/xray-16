@@ -1,5 +1,5 @@
 #pragma once
-#if DEBUG
+#ifdef DEBUG
 #include "xrCore/xrCore.h"
 #include "Include/xrRender/DebugShader.h"
 class CGameGraph;

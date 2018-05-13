@@ -29,7 +29,7 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos, 
 
         if (!wallmarks_vector.empty())
         {
-            GlobalEnv.Render->add_StaticWallmark(&wallmarks_vector, end_point, wallmark_size, pTri, pVerts);
+            GEnv.Render->add_StaticWallmark(&wallmarks_vector, end_point, wallmark_size, pTri, pVerts);
         }
 
         /*
@@ -97,8 +97,6 @@ void CWalmarkManager::StartWorkflow()
 
     CDB::TRI* T_array = Level().ObjectSpace.GetStaticTris();
     Fvector* V_array = Level().ObjectSpace.GetStaticVerts();
-    CDB::RESULT* R_begin = XRC.r_begin();
-    CDB::RESULT* R_end = XRC.r_end();
     //.	Triangle		ntri;
     //.	float			ndist					= phInfinity;
     //.	Fvector			npoint;
@@ -115,7 +113,7 @@ void CWalmarkManager::StartWorkflow()
 
         CTimer T; T.Start();
     */
-    for (CDB::RESULT* Res = R_begin; Res != R_end; ++Res)
+    for (auto &Res : *XRC.r_get())
     {
         //.		DBG_DrawTri(Res, color_xrgb(0,255,0) );
 
@@ -134,7 +132,7 @@ void CWalmarkManager::StartWorkflow()
         //.		float dist					= DistToTri(&tri,cast_fp(m_pos),cast_fp(pdir),cast_fp(end_point),c,V_array);
         Fvector _tri[3];
 
-        CDB::TRI* _t = T_array + Res->id;
+        CDB::TRI* _t = T_array + Res.id;
 
         _tri[0] = V_array[_t->verts[0]];
         _tri[1] = V_array[_t->verts[1]];
@@ -166,7 +164,7 @@ void CWalmarkManager::StartWorkflow()
 
         if (dist <= m_trace_dist)
         {
-            GlobalEnv.Render->add_StaticWallmark(&*m_wallmarks, end_point, m_wallmark_size, _t, V_array);
+            GEnv.Render->add_StaticWallmark(&*m_wallmarks, end_point, m_wallmark_size, _t, V_array);
             ++wm_count;
         }
         else

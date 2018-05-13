@@ -1,20 +1,17 @@
-#ifndef xrPoolH
-#define xrPoolH
-//#pragma once
+#pragma once
+#include "xrDebug_macros.h"
 
 template <class T, int granularity>
 class poolSS
 {
-private:
     T* list;
     xr_vector<T*> blocks;
 
-private:
     T** access(T* P) { return (T**)LPVOID(P); }
     void block_create()
     {
         // Allocate
-        VERIFY(0 == list);
+        VERIFY(nullptr == list);
         list = xr_alloc<T>(granularity);
         blocks.push_back(list);
 
@@ -24,15 +21,15 @@ private:
             T* E = list + it;
             *access(E) = E + 1;
         }
-        *access(list + granularity - 1) = NULL;
+        *access(list + granularity - 1) = nullptr;
     }
 
 public:
-    poolSS() { list = 0; }
+    poolSS() : list(nullptr) {}
     ~poolSS()
     {
-        for (u32 b = 0; b < blocks.size(); b++)
-            xr_free(blocks[b]);
+        for (auto& block : blocks)
+            xr_free(block);
     }
     T* create()
     {
@@ -48,14 +45,13 @@ public:
         P->~T();
         *access(P) = list;
         list = P;
-        P = NULL;
+        P = nullptr;
     }
     void clear()
     {
-        list = 0;
-        for (u32 b = 0; b < blocks.size(); b++)
-            xr_free(blocks[b]);
+        list = nullptr;
+        for (auto& block : blocks)
+            xr_free(block);
         blocks.clear();
     }
 };
-#endif

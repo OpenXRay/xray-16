@@ -10,7 +10,6 @@
 #define ENGINE_INCLUDE_HPP_INCLUDED
 
 #pragma unmanaged
-#include <windows.h>
 #include "include/editor/engine.hpp"
 #pragma managed
 

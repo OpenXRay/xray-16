@@ -2,8 +2,8 @@
 #pragma hdrstop
 
 #include "ResourceManager.h"
-#include "blenders\Blender_Recorder.h"
-#include "blenders\Blender.h"
+#include "blenders/Blender_Recorder.h"
+#include "blenders/Blender.h"
 
 void fix_texture_name(LPSTR fn);
 
@@ -27,7 +27,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     SVS* vs = RImplementation.Resources->_CreateVS(_vs);
     dest.ps = ps;
     dest.vs = vs;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     SGS* gs = RImplementation.Resources->_CreateGS("null");
     dest.gs = gs;
 #ifdef USE_DX11
@@ -40,7 +40,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     ctable.merge(&vs->constants);
 
     // Last Stage - disable
-    if (0 == stricmp(_ps, "null"))
+    if (0 == xr_stricmp(_ps, "null"))
     {
         RS.SetTSS(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         RS.SetTSS(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
@@ -93,7 +93,7 @@ u32 CBlender_Compile::i_Sampler(LPCSTR _name)
 void CBlender_Compile::i_Texture(u32 s, LPCSTR name)
 {
     if (name)
-        passTextures.push_back(mk_pair(s, ref_texture(RImplementation.Resources->_CreateTexture(name))));
+        passTextures.push_back(std::make_pair(s, ref_texture(RImplementation.Resources->_CreateTexture(name))));
 }
 void CBlender_Compile::i_Projective(u32 s, bool b)
 {
@@ -179,7 +179,7 @@ void CBlender_Compile::r_End()
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
-    dest.C = 0;
+    dest.C = nullptr;
 #ifdef _EDITOR
     dest.M = 0;
 #endif

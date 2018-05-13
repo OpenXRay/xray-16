@@ -4,10 +4,11 @@
 #include "tri-colliderknoopc/dTriList.h"
 #include "PHJointDestroyInfo.h"
 ///////////////////////////////////////////////////////////////
+//#pragma warning(push)
 ///#pragma warning(disable:4995)
 ////#include "xrEngine/ode/src/collision_kernel.h"
 
-//#pragma warning(default:4995)
+//#pragma warning(pop)
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"

@@ -9,9 +9,8 @@
 // refs
 class CGameFont;
 
-class ENGINE_API CEStats :
-
-    public CStatsPhysics
+class ENGINE_API CEStats
+    : public CStats //CStatsPhysics
 {
 public:
     float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS

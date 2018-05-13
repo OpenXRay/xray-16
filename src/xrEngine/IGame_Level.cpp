@@ -31,24 +31,24 @@ IGame_Level::~IGame_Level()
 {
     if (strstr(Core.Params, "-nes_texture_storing"))
         // Device.Resources->StoreNecessaryTextures();
-        GlobalEnv.Render->ResourcesStoreNecessaryTextures();
+        GEnv.Render->ResourcesStoreNecessaryTextures();
     xr_delete(pLevel);
 
     // Render-level unload
-    GlobalEnv.Render->level_Unload();
+    GEnv.Render->level_Unload();
     xr_delete(m_pCameras);
     // Unregister
     Device.seqRender.Remove(this);
     Device.seqFrame.Remove(this);
     CCameraManager::ResetPP();
     ///////////////////////////////////////////
-    Sound->set_geometry_occ(NULL);
-    Sound->set_handler(NULL);
+    GEnv.Sound->set_geometry_occ(nullptr);
+    GEnv.Sound->set_handler(nullptr);
     Device.DumpResourcesMemoryUsage();
 
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
-    if (GlobalEnv.Render)
-        GlobalEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+    if (GEnv.Render)
+        GEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
 
     Msg("* [ D3D ]: textures[%d K]", (m_base + m_lmaps) / 1024);
 }
@@ -87,7 +87,7 @@ bool IGame_Level::Load(u32 dwNum)
     pLevel = new CInifile(temp);
 
     // Open
-    // g_pGamePersistent->LoadTitle ("st_opening_stream");
+    g_pGamePersistent->SetLoadStageTitle("st_opening_stream");
     g_pGamePersistent->LoadTitle();
     IReader* LL_Stream = FS.r_open("$level$", "level");
     IReader& fs = *LL_Stream;
@@ -98,12 +98,12 @@ bool IGame_Level::Load(u32 dwNum)
     R_ASSERT2(XRCL_PRODUCTION_VERSION == H.XRLC_version, "Incompatible level version.");
 
     // CForms
-    // g_pGamePersistent->LoadTitle ("st_loading_cform");
+    g_pGamePersistent->SetLoadStageTitle("st_loading_cform");
     g_pGamePersistent->LoadTitle();
     ObjectSpace.Load(build_callback);
-    // Sound->set_geometry_occ ( &Static );
-    Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
-    Sound->set_handler(_sound_event);
+    // GEnv.Sound->set_geometry_occ ( &Static );
+    GEnv.Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
+    GEnv.Sound->set_handler(_sound_event);
 
     pApp->LoadSwitch();
 
@@ -112,7 +112,7 @@ bool IGame_Level::Load(u32 dwNum)
         g_hud = smart_cast<CCustomHUD*>(NEW_INSTANCE(CLSID_HUDMANAGER));
 
     // Render-level Load
-    GlobalEnv.Render->level_Load(LL_Stream);
+    GEnv.Render->level_Load(LL_Stream);
     // tscreate.FrameEnd ();
     // Msg ("* S-CREATE: %f ms, %d times",tscreate.result,tscreate.count);
 
@@ -125,25 +125,27 @@ bool IGame_Level::Load(u32 dwNum)
     // Done
     FS.r_close(LL_Stream);
     bReady = true;
-    if (!g_dedicated_server)
+
+    if (!GEnv.isDedicatedServer)
+    {
         IR_Capture();
-#ifndef DEDICATED_SERVER
-    Device.seqRender.Add(this);
-#endif
+        Device.seqRender.Add(this);
+    }
 
     Device.seqFrame.Add(this);
     return true;
 }
 
-#ifndef _EDITOR
-#include "xrCore/Threading/ttapi.h"
-#endif
-
 int psNET_DedicatedSleep = 5;
 void IGame_Level::OnRender()
 {
-#ifndef DEDICATED_SERVER
-// if (_abs(Device.fTimeDelta)<EPS_S) return;
+    if (GEnv.isDedicatedServer)
+    {
+        Sleep(psNET_DedicatedSleep);
+        return;
+    }
+
+    // if (_abs(Device.fTimeDelta)<EPS_S) return;
 
 #ifdef _GPA_ENABLED
     TAL_ID rtID = TAL_MakeID(1, Core.dwFrame, 0);
@@ -154,24 +156,16 @@ void IGame_Level::OnRender()
 #endif // _GPA_ENABLED
 
     // Level render, only when no client output required
-    if (!g_dedicated_server)
-    {
-        GlobalEnv.Render->Calculate();
-        GlobalEnv.Render->Render();
-    }
-    else
-    {
-        Sleep(psNET_DedicatedSleep);
-    }
+    GEnv.Render->Calculate();
+    GEnv.Render->Render();
 
 #ifdef _GPA_ENABLED
     TAL_RetireID(rtID);
 #endif // _GPA_ENABLED
 
-// Font
-// pApp->pFontSystem->SetSizeI(0.023f);
-// pApp->pFontSystem->OnRender ();
-#endif
+    // Font
+    // pApp->pFontSystem->SetSizeI(0.023f);
+    // pApp->pFontSystem->OnRender();
 }
 
 void IGame_Level::OnFrame()
@@ -268,11 +262,11 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
     Fvector snd_position = p->position;
     if (S->feedback->is_2D())
     {
-        snd_position.add(Sound->listener_position());
+        snd_position.add(GEnv.Sound->listener_position());
     }
 
     VERIFY(p && _valid(range));
-    range = _min(range, p->max_ai_distance);
+    range = std::min(range, p->max_ai_distance);
     VERIFY(_valid(snd_position));
     VERIFY(_valid(p->max_ai_distance));
     VERIFY(_valid(p->volume));
@@ -282,21 +276,19 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
     g_SpatialSpace->q_box(snd_ER, 0, STYPE_REACTTOSOUND, snd_position, bb_size);
 
     // Iterate
-    xr_vector<ISpatial*>::iterator it = snd_ER.begin();
-    xr_vector<ISpatial*>::iterator end = snd_ER.end();
-    for (; it != end; it++)
+    for (auto& it : snd_ER)
     {
-        Feel::Sound* L = (*it)->dcast_FeelSound();
+        Feel::Sound* L = it->dcast_FeelSound();
         if (0 == L)
             continue;
-        IGameObject* CO = (*it)->dcast_GameObject();
+        IGameObject* CO = it->dcast_GameObject();
         VERIFY(CO);
         if (CO->getDestroy())
             continue;
 
         // Energy and signal
-        VERIFY(_valid((*it)->GetSpatialData().sphere.P));
-        float dist = snd_position.distance_to((*it)->GetSpatialData().sphere.P);
+        VERIFY(_valid(it->GetSpatialData().sphere.P));
+        float dist = snd_position.distance_to(it->GetSpatialData().sphere.P);
         if (dist > p->max_ai_distance)
             continue;
         VERIFY(_valid(dist));
@@ -305,7 +297,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
         VERIFY(_valid(Power));
         if (Power > EPS_S)
         {
-            float occ = Sound->get_occlusion_to((*it)->GetSpatialData().sphere.P, snd_position);
+            float occ = GEnv.Sound->get_occlusion_to(it->GetSpatialData().sphere.P, snd_position);
             VERIFY(_valid(occ));
             Power *= occ;
             if (Power > EPS_S)
@@ -315,7 +307,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
             }
         }
     }
-    snd_ER.clear_not_free();
+    snd_ER.clear();
 }
 
 void IGame_Level::SoundEvent_Dispatch()

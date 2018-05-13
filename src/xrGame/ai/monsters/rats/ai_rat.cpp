@@ -487,7 +487,7 @@ void CAI_Rat::UpdateCL()
         CMonsterSquad* squad = monster_squad().get_squad(this);
 
         if (squad &&
-            ((squad->GetLeader() != this && !squad->GetLeader()->g_Alive()) || squad->get_index(this) == u32(-1)))
+            ((squad->GetLeader() != this && !squad->GetLeader()->g_Alive()) || squad->get_index(this) == u8(-1)))
             squad->SetLeader(this);
 
         if (squad && squad->SquadActive() && squad->GetLeader() == this && m_squad_count != squad->squad_alife_count())

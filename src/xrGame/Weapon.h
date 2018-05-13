@@ -26,7 +26,6 @@ class CNightVisionEffector;
 
 class CWeapon : public CHudItemObject, public CShootingObject
 {
-private:
     typedef CHudItemObject inherited;
 
 public:
@@ -128,7 +127,7 @@ public:
     EWeaponSubStates GetReloadState() const { return (EWeaponSubStates)m_sub_state; }
 protected:
     bool m_bTriStateReload;
-    u8 m_sub_state;
+
     // a misfire happens, you'll need to rearm weapon
     bool bMisfire;
 
@@ -136,6 +135,8 @@ protected:
     virtual bool AllowBore();
 
 public:
+    u8 m_sub_state; // Alundaio: made public
+
     bool IsGrenadeLauncherAttached() const;
     bool IsScopeAttached() const;
     bool IsSilencerAttached() const;
@@ -191,7 +192,7 @@ protected:
     {
         bool m_bZoomEnabled; //разрешение режима приближения
         bool m_bHideCrosshairInZoom;
-        //		bool			m_bZoomDofEnabled;
+        bool m_bZoomDofEnabled;
 
         bool m_bIsZoomModeNow; //когда режим приближения включен
         float m_fCurrentZoomFactor; //текущий фактор приближения
@@ -202,9 +203,10 @@ protected:
 
         float m_fZoomRotationFactor;
 
-        //		Fvector			m_ZoomDof;
-        //		Fvector4		m_ReloadDof;
-        BOOL m_bUseDynamicZoom;
+        Fvector m_ZoomDof;
+        Fvector4 m_ReloadDof;
+        Fvector4 m_ReloadEmptyDof;
+        bool m_bUseDynamicZoom;
         shared_str m_sUseZoomPostprocess;
         shared_str m_sUseBinocularVision;
         CBinocularsVision* m_pVision;
@@ -313,7 +315,7 @@ protected:
     virtual void SetDefaults();
 
     virtual bool MovingAnimAllowedNow();
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnAnimationEnd(u32 state);
 
     //трассирование полета пули
@@ -402,7 +404,6 @@ protected:
     CParticlesObject* m_pFlameParticles2;
 
 protected:
-    int GetAmmoCount_forType(shared_str const& ammo_type) const;
     int GetAmmoCount(u8 ammo_type) const;
 
 public:
@@ -449,7 +450,7 @@ public:
         u8						cur_scope;
     */
 
-    DEFINE_VECTOR(shared_str, SCOPES_VECTOR, SCOPES_VECTOR_IT);
+    using SCOPES_VECTOR = xr_vector<shared_str>;
     SCOPES_VECTOR m_scopes;
     u8 m_cur_scope;
 
@@ -466,6 +467,9 @@ public:
 
     bool unlimited_ammo();
     IC bool can_be_strapped() const { return m_can_be_strapped; };
+
+    float GetMagazineWeight(const decltype(m_magazine)& mag) const;
+
 protected:
     u32 m_ef_main_weapon_type;
     u32 m_ef_weapon_type;
@@ -473,6 +477,14 @@ protected:
 public:
     virtual u32 ef_main_weapon_type() const;
     virtual u32 ef_weapon_type() const;
+
+    //Alundaio
+    int GetAmmoCount_forType(shared_str const& ammo_type) const;
+    virtual void set_ef_main_weapon_type(u32 type) { m_ef_main_weapon_type = type; };
+    virtual void set_ef_weapon_type(u32 type) { m_ef_weapon_type = type; };
+    virtual void SetAmmoType(u8 type) { m_ammoType = type; };
+    u8 GetAmmoType() { return m_ammoType; }
+    //-Alundaio
 
 protected:
     // This is because when scope is attached we can't ask scope for these params

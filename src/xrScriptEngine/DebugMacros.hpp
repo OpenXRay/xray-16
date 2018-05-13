@@ -1,5 +1,7 @@
 #pragma once
-#include "xrCore/xrCore.h"
+//#include "xrCore/xrCore.h"
+#include "xrCore/_types.h"
+#include "xrCore/xrDebug.h"
 
 #if XRAY_EXCEPTIONS
 #define THROW(expr)                                                                           \

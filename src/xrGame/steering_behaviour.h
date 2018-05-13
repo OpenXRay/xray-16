@@ -6,9 +6,15 @@
 //	Description : steering behaviour classes
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef STEERING_BEHAVIOUR_INCLUDED
 #define STEERING_BEHAVIOUR_INCLUDED
 
+#include "xrCore/xrDebug_macros.h" // only for the todo on the next line
+#pragma todo("This file is using std:: containers. Everything else uses xr_* specializations.")
+
+#include <vector>
+#include <set>
 #include "xrCore/_vector3d_ext.h"
 
 //----------------------------------------------------------

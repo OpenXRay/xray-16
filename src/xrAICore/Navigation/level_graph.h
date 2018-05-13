@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrAICore/xrAICore.hpp"
+
 #include "Common/LevelStructure.hpp"
 #include "xrAICore/Navigation/level_graph_space.h"
 #include "xrAICore/Navigation/game_graph_space.h"

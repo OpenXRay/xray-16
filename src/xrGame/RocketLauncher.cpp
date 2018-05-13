@@ -10,6 +10,7 @@
 #include "Level.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 
 CRocketLauncher::CRocketLauncher()
 {
@@ -26,7 +27,7 @@ void CRocketLauncher::SpawnRocket(const shared_str& rocket_section, CGameObject*
     R_ASSERT(D);
     CSE_Temporary* l_tpTemporary = smart_cast<CSE_Temporary*>(D);
     R_ASSERT(l_tpTemporary);
-    l_tpTemporary->m_tNodeID = (g_dedicated_server) ? u32(-1) : parent_rocket_launcher->ai_location().level_vertex_id();
+    l_tpTemporary->m_tNodeID = (GEnv.isDedicatedServer) ? u32(-1) : parent_rocket_launcher->ai_location().level_vertex_id();
     D->s_name = rocket_section;
     D->set_name_replace("");
 
@@ -60,8 +61,8 @@ void CRocketLauncher::DetachRocket(u16 rocket_id, bool bLaunch)
         return;
 
     VERIFY(pRocket);
-    ROCKETIT It = std::find(m_rockets.begin(), m_rockets.end(), pRocket);
-    ROCKETIT It_l = std::find(m_launched_rockets.begin(), m_launched_rockets.end(), pRocket);
+    auto It = std::find(m_rockets.begin(), m_rockets.end(), pRocket);
+    auto It_l = std::find(m_launched_rockets.begin(), m_launched_rockets.end(), pRocket);
 
     if (OnServer())
     {
@@ -95,8 +96,7 @@ CCustomRocket* CRocketLauncher::getCurrentRocket()
 {
     if (m_rockets.size())
         return m_rockets.back();
-    else
-        return (CCustomRocket*)0;
+    return (CCustomRocket*)0;
 }
 
 void CRocketLauncher::dropCurrentRocket() { m_rockets.pop_back(); }

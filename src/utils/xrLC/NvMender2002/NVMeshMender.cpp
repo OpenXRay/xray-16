@@ -704,7 +704,7 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             pPositions = (vec3*)(&(positions[0]));
             tex = (vec3*)(&(output[(*texIter).second].floatVector_[0]));
 
-            double _eps = type_epsilon(double) * 10;
+            double _eps = type_epsilon<double> * 10;
             double a, b, c;
             vec3d sxt;
 

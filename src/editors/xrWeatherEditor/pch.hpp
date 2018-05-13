@@ -3,11 +3,17 @@
 //	Created 	: 04.12.2007
 //  Modified 	: 04.12.2007
 //	Author		: Dmitriy Iassenev
-//	Description : preocmpiled header for editor library
+//	Description : precompiled header for editor library
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef PCH_HPP_INCLUDED
-#define PCH_HPP_INCLUDED
+#pragma once
+
+#pragma managed(push, off)
+#include "Common/Common.hpp"
+#include "xrCommon/inlining_macros.h"
+#include "xrCore/xrMemory.h"
+#include "xrCore/xrstring.h"
+#pragma managed(pop)
 
 #ifdef DEBUG
 #define VERIFY(expression) \
@@ -19,23 +25,23 @@
 #define NODEFAULT       \
     do                  \
     {                   \
-        __debugbreak(); \
+        DEBUG_BREAK;    \
     } while (0)
 #else // #ifdef DEBUG
 #define VERIFY(expression) \
     do                     \
     {                      \
     } while (0)
-#define NODEFAULT __assume(0)
+#define NODEFAULT XR_ASSUME(0)
 #endif // #ifdef DEBUG
 
 typedef unsigned int u32;
 typedef char const* LPCSTR;
 typedef char* LPSTR;
 
-#pragma unmanaged
+#pragma managed(push, off)
 #include <malloc.h>
-#pragma managed
+#pragma managed(pop)
 
 #include <stdlib.h>
 #include <vcclr.h>
@@ -65,5 +71,3 @@ inline LPSTR to_string(System::String ^ string)
 }
 
 inline System::String ^ to_string(LPCSTR string) { return (gcnew System::String(string)); }
-
-#endif // #ifndef PCH_HPP_INCLUDED

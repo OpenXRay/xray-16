@@ -17,8 +17,15 @@ using System::String;
 using System::Collections::ArrayList;
 
 #pragma unmanaged
+namespace XRay
+{
+namespace Editor
+{
 class ide_impl;
 extern ide_impl* g_ide;
+}
+}
+
 #pragma managed
 
 property_container::property_container(property_holder* holder, property_container_holder ^ container_holder)
@@ -35,7 +42,7 @@ property_container::!property_container()
     if (!m_holder)
         return;
 
-    if (!g_ide)
+    if (!XRay::Editor::g_ide)
         return;
 
     property_holder* holder = dynamic_cast<property_holder*>(m_holder);
@@ -78,18 +85,17 @@ bool property_container::equal_category(String ^ new_category, String ^ old_cate
 
 String ^ property_container::update_categories(String ^ new_category)
 {
-    for
-        each(PropertySpec ^ i in m_ordered_properties)
-        {
-            String ^ category = i->Category;
-            if (!equal_category(new_category, category))
-                continue;
+    for each(PropertySpec ^ i in m_ordered_properties)
+    {
+        String ^ category = i->Category;
+        if (!equal_category(new_category, category))
+            continue;
 
-            return (category);
-        }
+        return (category);
+    }
 
-    for
-        each(PropertySpec ^ i in m_ordered_properties) i->Category = "\t" + i->Category;
+    for each(PropertySpec ^ i in m_ordered_properties)
+        i->Category = "\t" + i->Category;
 
     return (new_category);
 }
@@ -128,21 +134,19 @@ void property_container::try_update_name(PropertySpec ^ description, String ^ na
 void property_container::update_names(String ^ name)
 {
     bool found = false;
-    for
-        each(PropertySpec ^ i in m_ordered_properties)
-        {
-            if (i->Name != name)
-                continue;
+    for each(PropertySpec ^ i in m_ordered_properties)
+    {
+        if (i->Name != name)
+            continue;
 
-            found = true;
-            break;
-        }
+        found = true;
+        break;
+    }
 
     if (!found)
         return;
 
-    for
-        each(PropertySpec ^ i in m_ordered_properties) try_update_name(i, name);
+    for each(PropertySpec ^ i in m_ordered_properties) try_update_name(i, name);
 }
 
 void property_container::add_property(PropertySpec ^ description, IProperty ^ value)

@@ -35,7 +35,7 @@ bool CScriptGameObject::is_body_turning() const
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CGameObject : cannot access class member is_turning!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject : cannot access class member is_turning!");
         return (false);
     }
 
@@ -60,7 +60,7 @@ u32 CScriptGameObject::add_sound(
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member add!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member add!");
         return (0);
     }
     else
@@ -73,7 +73,7 @@ u32 CScriptGameObject::add_combat_sound(
     CAI_Stalker* const stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member add!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member add!");
         return (0);
     }
     else
@@ -91,7 +91,7 @@ void CScriptGameObject::remove_sound(u32 internal_type)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member add!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member add!");
     else
         monster->sound().remove(internal_type);
 }
@@ -100,7 +100,7 @@ void CScriptGameObject::set_sound_mask(u32 sound_mask)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CSoundPlayer : cannot access class member set_sound_mask!");
     else
     {
@@ -117,7 +117,7 @@ void CScriptGameObject::play_sound(u32 internal_type)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
     else
         monster->sound().play(internal_type);
 }
@@ -126,7 +126,7 @@ void CScriptGameObject::play_sound(u32 internal_type, u32 max_start_time)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
     else
         monster->sound().play(internal_type, max_start_time);
 }
@@ -135,7 +135,7 @@ void CScriptGameObject::play_sound(u32 internal_type, u32 max_start_time, u32 mi
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
     else
         monster->sound().play(internal_type, max_start_time, min_start_time);
 }
@@ -144,7 +144,7 @@ void CScriptGameObject::play_sound(u32 internal_type, u32 max_start_time, u32 mi
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
     else
         monster->sound().play(internal_type, max_start_time, min_start_time, max_stop_time);
 }
@@ -154,7 +154,7 @@ void CScriptGameObject::play_sound(
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
     else
         monster->sound().play(internal_type, max_start_time, min_start_time, max_stop_time, min_stop_time);
 }
@@ -164,7 +164,7 @@ void CScriptGameObject::play_sound(
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSoundPlayer : cannot access class member play!");
     else
         monster->sound().play(internal_type, max_start_time, min_start_time, max_stop_time, min_stop_time, id);
 }
@@ -174,7 +174,7 @@ int CScriptGameObject::active_sound_count(bool only_playing)
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member active_sound_count!");
         return (-1);
     }
@@ -188,7 +188,7 @@ bool CScriptGameObject::wounded() const
     const CAI_Stalker* stalker = smart_cast<const CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member wounded!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member wounded!");
         return (false);
     }
 
@@ -200,7 +200,7 @@ void CScriptGameObject::wounded(bool value)
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member wounded!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member wounded!");
         return;
     }
 
@@ -212,7 +212,7 @@ CSightParams CScriptGameObject::sight_params()
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member sight_params!");
 
         CSightParams result;
@@ -235,7 +235,7 @@ bool CScriptGameObject::critically_wounded()
     CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(&object());
     if (!custom_monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CCustomMonster : cannot access class member critically_wounded!");
         return (false);
     }
@@ -345,7 +345,7 @@ void CScriptGameObject::start_particles(LPCSTR pname, LPCSTR bone)
     if (K->LL_GetBoneVisible(play_bone))
         PP->StartParticles(pname, play_bone, Fvector().set(0, 1, 0), 9999);
     else
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "Cant start particles, bone [%s] is not visible now", bone);
 }
 
@@ -364,6 +364,341 @@ void CScriptGameObject::stop_particles(LPCSTR pname, LPCSTR bone)
     if (K->LL_GetBoneVisible(play_bone))
         PP->StopParticles(9999, play_bone, true);
     else
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "Cant stop particles, bone [%s] is not visible now", bone);
 }
+
+#ifdef GAME_OBJECT_TESTING_EXPORTS
+//AVO: directly set entity health instead of going through normal health property which operates on delta
+void CScriptGameObject::SetHealthEx(float hp)
+{
+    CEntity* obj = smart_cast<CEntity*>(&object());
+    if (!obj) return;
+    clamp(hp, -0.01f, 1.0f);
+    obj->SetfHealth(hp);
+}
+//-AVO
+
+// AVO: functions for testing object class
+// Credits: KD
+//#include "Car.h"
+//#include "helicopter.h"
+#include "Actor.h"
+#include "CustomOutfit.h"
+//#include "CustomZone.h"
+#include "ai/Monsters/BaseMonster/base_monster.h"
+//#include "medkit.h"
+//#include "antirad.h"
+#include "Scope.h"
+#include "Silencer.h"
+//#include "Torch.h"
+#include "GrenadeLauncher.h"
+#include "searchlight.h"
+//#include "WeaponAmmo.h"
+//#include "Grenade.h"
+//#include "BottleItem.h"
+#include "WeaponMagazinedWGrenade.h"
+
+// Xottab_DUTY: commented this macro, because of substituting it
+/*
+#define TEST_OBJECT_CLASS(A, B)\
+bool A() const\
+{\
+    auto l_tpEntity = smart_cast<B*>(&object());\
+    if (!l_tpEntity)\
+        return false;\
+    return true;\
+}\
+*/
+
+/*
+bool CScriptGameObject::isGameObject() const
+{
+    auto l_tpEntity = smart_cast<CGameObject*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isCar() const
+{
+    auto l_tpEntity = smart_cast<CCar*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isHeli() const
+{
+    auto l_tpEntity = smart_cast<CHelicopter*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isHolderCustom() const
+{
+    auto l_tpEntity = smart_cast<CHolderCustom*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+bool CScriptGameObject::isEntityAlive() const
+{
+    auto l_tpEntity = smart_cast<CEntityAlive*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isInventoryItem() const
+{
+    auto l_tpEntity = smart_cast<CInventoryItem*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isInventoryOwner() const
+{
+    auto l_tpEntity = smart_cast<CInventoryOwner*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isActor() const
+{
+    auto l_tpEntity = smart_cast<CActor*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isCustomMonster() const
+{
+    auto l_tpEntity = smart_cast<CCustomMonster*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isWeapon() const
+{
+    auto l_tpEntity = smart_cast<CWeapon*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+/*
+bool CScriptGameObject::isMedkit() const
+{
+    auto l_tpEntity = smart_cast<CMedkit*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isEatableItem() const
+{
+    auto l_tpEntity = smart_cast<CEatableItem*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isAntirad() const
+{
+    auto l_tpEntity = smart_cast<CAntirad*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+bool CScriptGameObject::isCustomOutfit() const
+{
+    auto l_tpEntity = smart_cast<CCustomOutfit*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isScope() const
+{
+    auto l_tpEntity = smart_cast<CScope*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isSilencer() const
+{
+    auto l_tpEntity = smart_cast<CSilencer*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isGrenadeLauncher() const
+{
+    auto l_tpEntity = smart_cast<CGrenadeLauncher*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isWeaponMagazined() const
+{
+    auto l_tpEntity = smart_cast<CWeaponMagazined*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isSpaceRestrictor() const
+{
+    auto l_tpEntity = smart_cast<CSpaceRestrictor*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isStalker() const
+{
+    auto l_tpEntity = smart_cast<CAI_Stalker*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isAnomaly() const
+{
+    auto l_tpEntity = smart_cast<CCustomZone*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isMonster() const
+{
+    auto l_tpEntity = smart_cast<CBaseMonster*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+/*
+bool CScriptGameObject::isExplosive() const
+{
+    auto l_tpEntity = smart_cast<CExplosive*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isScriptZone() const
+{
+    auto l_tpEntity = smart_cast<CScriptZone*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isProjector() const
+{
+    auto l_tpEntity = smart_cast<CProjector*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+bool CScriptGameObject::isTrader() const
+{
+    auto l_tpEntity = smart_cast<CAI_Trader*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isHudItem() const
+{
+    auto l_tpEntity = smart_cast<CHudItem*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+/*
+bool CScriptGameObject::isFoodItem() const
+{
+    auto l_tpEntity = smart_cast<CFoodItem*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+bool CScriptGameObject::isArtefact() const
+{
+    auto l_tpEntity = smart_cast<CArtefact*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isAmmo() const
+{
+    auto l_tpEntity = smart_cast<CWeaponAmmo*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+/*
+bool CScriptGameObject::isMissile() const
+{
+    auto l_tpEntity = smart_cast<CMissile*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isPhysicsShellHolder() const
+{
+    auto l_tpEntity = smart_cast<CPhysicsShellHolder*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isGrenade() const
+{
+    auto l_tpEntity = smart_cast<CGrenade*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isBottleItem() const
+{
+    auto l_tpEntity = smart_cast<CBottleItem*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+/*
+bool CScriptGameObject::isTorch() const
+{
+    auto l_tpEntity = smart_cast<CTorch*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+*/
+
+bool CScriptGameObject::isWeaponGL() const
+{
+    auto l_tpEntity = smart_cast<CWeaponMagazinedWGrenade*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+
+bool CScriptGameObject::isInventoryBox() const
+{
+    auto l_tpEntity = smart_cast<CInventoryBox*>(&object());
+    if (!l_tpEntity) return false;
+    return true;
+}
+#endif
+//-AVO

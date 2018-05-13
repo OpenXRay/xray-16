@@ -11,6 +11,7 @@
 #include "ui/UIPDAWnd.h"
 #include "encyclopedia_article.h"
 #include "ui/UIMapWnd.h"
+#include "xrCore/buffer_vector.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -78,7 +79,7 @@ vGameTasks& CGameTaskManager::GetGameTasks()
 CGameTask* CGameTaskManager::HasGameTask(const shared_str& id, bool only_inprocess)
 {
     FindTaskByID key(id, only_inprocess);
-    vGameTasks_it it = std::find_if(GetGameTasks().begin(), GetGameTasks().end(), key);
+    auto it = std::find_if(GetGameTasks().begin(), GetGameTasks().end(), key);
     if (it != GetGameTasks().end())
         return (*it).game_task;
 
@@ -256,8 +257,8 @@ void CGameTaskManager::MapLocationRelcase(CMapLocation* ml)
 
 CGameTask* CGameTaskManager::HasGameTask(const CMapLocation* ml, bool only_inprocess)
 {
-    vGameTasks_it it = GetGameTasks().begin();
-    vGameTasks_it it_e = GetGameTasks().end();
+    auto it = GetGameTasks().begin();
+    auto it_e = GetGameTasks().end();
 
     for (; it != it_e; ++it)
     {
@@ -349,15 +350,13 @@ u32 CGameTaskManager::GetTaskCount(ETaskState state)
     return res;
 }
 
-char* sTaskStates[] = {"eTaskStateFail", "TaskStateInProgress", "TaskStateCompleted", "TaskStateDummy"};
+constexpr pcstr sTaskStates[] = { "eTaskStateFail", "TaskStateInProgress", "TaskStateCompleted", "TaskStateDummy" };
 
 void CGameTaskManager::DumpTasks()
 {
-    vGameTasks_it it = GetGameTasks().begin();
-    vGameTasks_it it_e = GetGameTasks().end();
-    for (; it != it_e; ++it)
+    for (auto& it : GetGameTasks())
     {
-        const CGameTask* gt = (*it).game_task;
+        const CGameTask* gt = it.game_task;
         Msg(" ID=[%s] state=[%s] prio=[%d] ", gt->m_ID.c_str(), sTaskStates[gt->GetTaskState()], gt->m_priority);
     }
 }

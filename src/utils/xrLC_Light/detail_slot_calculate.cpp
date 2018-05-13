@@ -83,9 +83,9 @@ public:
 const int LIGHT_Count = 7;
 
 //-----------------------------------------------------------------
-__declspec(thread) u64 t_start = 0;
-__declspec(thread) u64 t_time = 0;
-__declspec(thread) u64 t_count = 0;
+thread_local Time t_start;
+thread_local Duration t_time;
+thread_local u64 t_count = 0;
 
 IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
 {
@@ -99,9 +99,9 @@ IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
     }
 
     // 2. Polygon doesn't pick - real database query
-    t_start = CPU::GetCLK();
+    t_start = Clock::now();
     DB.ray_query(&gl_data.RCAST_Model, P, D, r);
-    t_time += CPU::GetCLK() - t_start - CPU::clk_overhead;
+    t_time += Clock::now() - t_start;
     t_count += 1;
 
     // 3. Analyze
@@ -388,8 +388,8 @@ bool detail_slot_calculate(
     DB.box_query(&gl_data.RCAST_Model, bbC, bbD);
 
     box_result.clear();
-    for (CDB::RESULT* I = DB.r_begin(); I != DB.r_end(); I++)
-        box_result.push_back(I->id);
+    for (auto &it : *DB.r_get())
+        box_result.push_back(it.id);
     if (box_result.empty())
         return false;
     // continue;
@@ -416,14 +416,14 @@ bool detail_slot_calculate(
             Fvector t_n;
             t_n.set(0, 1, 0);
             P.z = bbC.z + coeff * float(z);
-            P.y = BB.min.y - 5;
+            P.y = BB.vMin.y - 5;
             Fvector dir;
             dir.set(0, -1, 0);
             Fvector start;
-            start.set(P.x, BB.max.y + EPS, P.z);
+            start.set(P.x, BB.vMax.y + EPS, P.z);
 
             float r_u, r_v, r_range;
-            for (DWORDIt tit = box_result.begin(); tit != box_result.end(); tit++)
+            for (auto tit = box_result.begin(); tit != box_result.end(); tit++)
             {
                 CDB::TRI& T = tris[*tit];
                 Fvector V[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
@@ -440,7 +440,7 @@ bool detail_slot_calculate(
                     }
                 }
             }
-            if (P.y < BB.min.y)
+            if (P.y < BB.vMin.y)
                 continue;
 
             // light point

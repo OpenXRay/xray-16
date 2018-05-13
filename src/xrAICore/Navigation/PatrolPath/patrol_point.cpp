@@ -6,7 +6,7 @@
 //	Description : Patrol point
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "patrol_point.h"
 #include "Navigation/level_graph.h"
 #include "Navigation/level_graph.h"
@@ -15,7 +15,6 @@
 #include "Common/object_broker.h"
 #include "xrScriptEngine/DebugMacros.hpp"
 #include "AISpaceBase.hpp"
-#include "Include/xrAPI/xrAPI.h"
 #ifdef DEBUG
 #include "Navigation/PatrolPath/patrol_path.h"
 #endif
@@ -123,8 +122,8 @@ void CPatrolPoint::save(IWriter& stream)
 
 const u32& CPatrolPoint::level_vertex_id() const
 {
-    const CGameGraph& gameGraph = GlobalEnv.AISpace->game_graph();
-    const CLevelGraph& levelGraph = GlobalEnv.AISpace->level_graph();
+    const CGameGraph& gameGraph = GEnv.AISpace->game_graph();
+    const CLevelGraph& levelGraph = GEnv.AISpace->level_graph();
     if (gameGraph.vertex(m_game_vertex_id)->level_id() == levelGraph.level_id())
         return level_vertex_id(&levelGraph, &gameGraph.cross_table(), &gameGraph);
     return m_level_vertex_id;
@@ -132,8 +131,8 @@ const u32& CPatrolPoint::level_vertex_id() const
 
 const GameGraph::_GRAPH_ID& CPatrolPoint::game_vertex_id() const
 {
-    const CGameGraph& gameGraph = GlobalEnv.AISpace->game_graph();
-    const CLevelGraph& levelGraph = GlobalEnv.AISpace->level_graph();
+    const CGameGraph& gameGraph = GEnv.AISpace->game_graph();
+    const CLevelGraph& levelGraph = GEnv.AISpace->level_graph();
     const CGameGraph::CVertex* vertex = gameGraph.vertex(m_game_vertex_id);
     VERIFY2(vertex,
         make_string(

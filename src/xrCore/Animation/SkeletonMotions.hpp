@@ -4,7 +4,10 @@
 
 #include "Bone.hpp"
 #include "SkeletonMotionDefs.hpp"
-// refs
+#include "xrCore/_quaternion.h"
+#include "xrCore/_vector3d.h"
+
+// fwd. decl.
 class CKinematicsAnimated;
 class CBlend;
 class IKinematics;
@@ -146,16 +149,16 @@ public:
     ICF float Power() { return Dequantize(power); }
     bool StopAtEnd();
 };
-struct accel_str_pred : public std::binary_function<shared_str, shared_str, bool>
+struct accel_str_pred
 {
     IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
 };
 typedef xr_map<shared_str, u16, accel_str_pred> accel_map;
-DEFINE_VECTOR(CMotionDef, MotionDefVec, MotionDefVecIt);
+using MotionDefVec = xr_vector<CMotionDef>;
 
-DEFINE_VECTOR(CMotion, MotionVec, MotionVecIt);
-DEFINE_VECTOR(MotionVec*, BoneMotionsVec, BoneMotionsVecIt);
-DEFINE_MAP(shared_str, MotionVec, BoneMotionMap, BoneMotionMapIt);
+using MotionVec = xr_vector<CMotion>;
+using BoneMotionsVec = xr_vector<MotionVec*>;
+using BoneMotionMap = xr_map<shared_str, MotionVec>;
 
 // partition
 class XRCORE_API CPartDef
@@ -206,10 +209,10 @@ struct XRCORE_API motions_value
     u32 mem_usage()
     {
         u32 sz = sizeof(*this) + m_motion_map.size() * 6 + m_partition.mem_usage();
-        for (MotionDefVecIt it = m_mdefs.begin(); it != m_mdefs.end(); it++)
+        for (auto it = m_mdefs.begin(); it != m_mdefs.end(); it++)
             sz += it->mem_usage();
-        for (BoneMotionMapIt bm_it = m_motions.begin(); bm_it != m_motions.end(); bm_it++)
-            for (MotionVecIt m_it = bm_it->second.begin(); m_it != bm_it->second.end(); m_it++)
+        for (auto bm_it = m_motions.begin(); bm_it != m_motions.end(); bm_it++)
+            for (auto m_it = bm_it->second.begin(); m_it != bm_it->second.end(); m_it++)
                 sz += m_it->mem_usage();
         return sz;
     }
@@ -217,7 +220,7 @@ struct XRCORE_API motions_value
 
 class XRCORE_API motions_container
 {
-    DEFINE_MAP(shared_str, motions_value*, SharedMotionsMap, SharedMotionsMapIt);
+    using SharedMotionsMap = xr_map<shared_str, motions_value*>;
     SharedMotionsMap container;
 
 public:
@@ -233,7 +236,6 @@ extern XRCORE_API motions_container* g_pMotionsContainer;
 
 class XRCORE_API shared_motions
 {
-private:
     motions_value* p_;
 
 protected:

@@ -59,9 +59,9 @@ BOOL CWeaponRPG7::net_Spawn(CSE_Abstract* DC)
     return l_res;
 }
 
-void CWeaponRPG7::OnStateSwitch(u32 S)
+void CWeaponRPG7::OnStateSwitch(u32 S, u32 oldState)
 {
-    inherited::OnStateSwitch(S);
+    inherited::OnStateSwitch(S, oldState);
     UpdateMissileVisibility();
 }
 

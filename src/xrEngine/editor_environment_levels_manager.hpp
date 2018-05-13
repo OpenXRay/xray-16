@@ -5,19 +5,21 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment levels manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED
-#define EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "xrCore/Containers/AssociativeVector.hpp"
 
+namespace XRay
+{
+namespace Editor
+{
+class property_holder_base;
+}
+}
+
 namespace editor
 {
-class property_holder;
-
 namespace environment
 {
 namespace weathers
@@ -37,10 +39,9 @@ public:
     void fill();
 
 private:
-    void fill_levels(CInifile& config, LPCSTR prefix, LPCSTR category);
+    void fill_levels(CInifile& config, pcstr section, pcstr category);
 
-private:
-    LPCSTR const* xr_stdcall collection();
+    pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
 private:
@@ -52,20 +53,16 @@ private:
         }
     }; // struct predicate
 
-    typedef AssociativeVector<shared_str, std::pair<LPCSTR, shared_str>, predicate> levels_container_type;
+    typedef AssociativeVector<shared_str, std::pair<pcstr, shared_str>, predicate> levels_container_type;
 
 private:
     levels_container_type m_levels;
     ::editor::environment::weathers::manager& m_weathers;
     CInifile* m_config_single;
     CInifile* m_config_mp;
-    editor::property_holder* m_property_holder;
+    XRay::Editor::property_holder_base* m_property_holder;
 }; // class levels_manager
-
 } // namespace levels
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED

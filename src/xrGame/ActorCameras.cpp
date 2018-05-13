@@ -73,7 +73,7 @@ void CActor::camUpdateLadder(float dt)
     }
     else
     {
-        cam_yaw += delta * _min(dt * 10.f, 1.f);
+        cam_yaw += delta * std::min(dt * 10.f, 1.f);
     }
 
     IElevatorState* es = character_physics_support()->movement()->ElevatorState();
@@ -83,7 +83,7 @@ void CActor::camUpdateLadder(float dt)
         const float ldown_pitch = cameras[eacFirstEye]->lim_pitch.y;
         float delta = angle_difference_signed(ldown_pitch, cam_pitch);
         if (delta > 0.f)
-            cam_pitch += delta * _min(dt * 10.f, 1.f);
+            cam_pitch += delta * std::min(dt * 10.f, 1.f);
     }
 }
 
@@ -123,11 +123,9 @@ ICF void calc_gl_point(Fvector& pt, const Fmatrix& xform, float radius, float an
 }
 ICF BOOL test_point(const Fvector& pt, xrXRC& xrc, const Fmatrix33& mat, const Fvector& ext)
 {
-    CDB::RESULT* it = xrc.r_begin();
-    CDB::RESULT* end = xrc.r_end();
-    for (; it != end; it++)
+    for (auto &it : *xrc.r_get())
     {
-        CDB::RESULT& O = *it;
+        CDB::RESULT& O = it;
         if (GMLib.GetMaterialByIdx(O.material)->Flags.is(SGameMtl::flPassable))
             continue;
         if (CDB::TestBBoxTri(mat, pt, ext, O.verts, FALSE))
@@ -313,7 +311,14 @@ void CActor::cam_Update(float dt, float fFOV)
     else
         current_ik_cam_shift = 0;
 
-    Fvector point = {0, CameraHeight() + current_ik_cam_shift, 0};
+    // Alex ADD: smooth crouch fix
+    float HeightInterpolationSpeed = 4.f;
+
+    if (CurrentHeight != CameraHeight())
+        CurrentHeight = (CurrentHeight * (1.0f - HeightInterpolationSpeed*dt)) + (CameraHeight() * HeightInterpolationSpeed*dt);
+
+    Fvector point = { 0, CurrentHeight + current_ik_cam_shift, 0 };
+
     Fvector dangle = {0, 0, 0};
     Fmatrix xform;
     xform.setXYZ(0, r_torso.yaw, 0);

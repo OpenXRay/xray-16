@@ -15,9 +15,16 @@
 #include "ai_space.h"
 #include "CustomZone.h"
 #include "xrEngine/xr_collide_form.h"
+#include "xrScriptEngine/Functor.hpp"
+#include "xrEngine/GameFont.h"
 #ifdef DEBUG
 #include "debug_renderer.h"
 #endif
+
+//Alundaio
+#include "RadioactiveZone.h"
+BOOL g_ai_die_in_anomaly = 0;
+//-Alundaio 
 
 CSpaceRestrictor::~CSpaceRestrictor() {}
 void CSpaceRestrictor::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCForm()->getSphere().P); }
@@ -60,7 +67,9 @@ BOOL CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
     if (!result)
         return (FALSE);
 
-    spatial.type &= ~STYPE_VISIBLEFORAI;
+    CCustomZone* zone = smart_cast<CCustomZone*>(this);
+    if (g_ai_die_in_anomaly == 0 || !zone || smart_cast<CRadioactiveZone*>(zone))
+        spatial.type &= ~STYPE_VISIBLEFORAI;
 
     setEnabled(FALSE);
     setVisible(FALSE);
@@ -219,7 +228,7 @@ void CSpaceRestrictor::OnRender()
     if (!(dbg_net_Draw_Flags.is_any(dbg_draw_customzone)))
         return;
     // RCache.OnFrameEnd();
-    GlobalEnv.DRender->OnFrameEnd();
+    GEnv.DRender->OnFrameEnd();
     Fvector l_half;
     l_half.set(.5f, .5f, .5f);
     Fmatrix l_ball, l_box;

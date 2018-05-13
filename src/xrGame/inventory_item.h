@@ -13,6 +13,10 @@
 #include "attachable_item.h"
 #include "xrserver_objects_alife.h"
 #include "xrserver_objects_alife_items.h"
+#include "xrCommon/xr_deque.h"
+#ifdef DEBUG
+#include "xrEngine/pure.h"
+#endif
 
 enum EHandDependence
 {
@@ -39,7 +43,7 @@ class CInventoryOwner;
 struct SHit;
 
 class CSE_ALifeInventoryItem;
-typedef CSE_ALifeInventoryItem::mask_num_items mask_inv_num_items;
+typedef typename CSE_ALifeInventoryItem::mask_num_items mask_inv_num_items;
 
 struct net_update_IItem
 {
@@ -104,6 +108,7 @@ public:
     virtual void OnEvent(NET_Packet& P, u16 type);
 
     virtual bool Useful() const; // !!! Переопределить. (см. в Inventory.cpp)
+    virtual bool IsUsingCondition() const { return m_flags.test(FUsingCondition); }
     virtual bool Attach(PIItem pIItem, bool b_send_event) { return false; }
     virtual bool Detach(PIItem pIItem) { return false; }
     //при детаче спаунится новая вещь при заданно названии секции
@@ -140,6 +145,8 @@ public:
     virtual u32 Cost() const { return m_cost; }
     //			u32					Cost				()	const	{ return m_cost; }
     virtual float Weight() const { return m_weight; }
+    void SetWeight(float w) { m_weight = w; }
+
 public:
     CInventory* m_pInventory;
     shared_str m_section_id;
@@ -279,6 +286,9 @@ public:
     bool has_upgrade_group(const shared_str& upgrade_group_id);
     void add_upgrade(const shared_str& upgrade_id, bool loading);
     bool get_upgrades_str(string2048& res) const;
+#ifdef GAME_OBJECT_EXTENDED_EXPORTS
+    Upgrades_type get_upgrades() { return m_upgrades; } //Alundaio
+#endif
 
     bool equal_upgrades(Upgrades_type const& other_upgrades) const;
 
@@ -300,11 +310,11 @@ protected:
 
     template <typename T>
     IC static bool process_if_exists(
-        LPCSTR section, LPCSTR name, T (CInifile::*method)(LPCSTR, LPCSTR) const, T& value, bool test);
+        pcstr section, pcstr name, T (CInifile::*method)(pcstr, pcstr) const, T& value, bool test);
 
     template <typename T>
     IC static bool process_if_exists_set(
-        LPCSTR section, LPCSTR name, T (CInifile::*method)(LPCSTR, LPCSTR) const, T& value, bool test);
+        pcstr section, pcstr name, T (CInifile::*method)(pcstr, pcstr) const, T& value, bool test);
 
     void net_Export_PH_Params(NET_Packet& P, SPHNetState& State, mask_inv_num_items& num_items);
     void net_Import_PH_Params(NET_Packet& P, net_update_IItem& N, mask_inv_num_items& num_items);

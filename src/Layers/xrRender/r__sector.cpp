@@ -189,7 +189,7 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
         S.assign(&*POLY.begin(), POLY.size());
         D.clear();
         sPoly* P = F.ClipPoly(S, D);
-        if (0 == P)
+        if (nullptr == P)
             continue;
 
         // Scissor and optimized HOM-testing
@@ -303,8 +303,8 @@ void CSector::load(IReader& fs)
         count--;
     }
 
-    if (g_dedicated_server)
-        m_root = 0;
+    if (GEnv.isDedicatedServer)
+        m_root = nullptr;
     else
     {
         // Assign visual

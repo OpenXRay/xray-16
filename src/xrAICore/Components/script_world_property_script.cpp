@@ -6,7 +6,7 @@
 //	Description : Script world property script export
 ////////////////////////////////////////////////////////////////////////////
 
-#include "ScriptPCH.hpp"
+#include "pch.hpp"
 #include "script_world_property.h"
 #include "operator_abstract.h"
 #include "xrScriptEngine/ScriptExporter.hpp"

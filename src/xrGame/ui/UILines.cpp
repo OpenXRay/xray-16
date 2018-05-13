@@ -12,6 +12,7 @@
 #include "UIXmlInit.h"
 #include "uilinestd.h"
 #include "string_table.h"
+#include "xrCore/Text/MbHelpers.h"
 
 CUILines::CUILines()
 {
@@ -177,9 +178,10 @@ void CUILines::ParseText(bool force)
                     m_lines.push_back(tmp_line);
                     tmp_line.Clear();
 // Compiler bug :)
+#pragma warning(push)
 #pragma warning(disable : 4244)
                     uFrom += uPartLen;
-#pragma warning(default : 4244)
+#pragma warning(pop)
                 }
                 strncpy_s(szTempLine, pszText + uFrom, MAX_MB_CHARS);
                 tmp_line.AddSubLine(szTempLine, tcolor);
@@ -209,7 +211,7 @@ void CUILines::ParseText(bool force)
             {
                 bool b_last_ch = (idx == sub_len - 1);
 
-                if (isspace(sbl.m_text[idx]))
+                if (isspace((unsigned char)sbl.m_text[idx]))
                     last_space_idx = idx;
 
                 float w1 = get_str_width(m_pFont, sbl.m_text[idx]);
@@ -452,9 +454,9 @@ u32 CUILines::GetColorFromText(const xr_string& str) const
     }
 
     // try parse values separated by commas
-    comma1_pos = str.find(",", begin);
-    comma2_pos = str.find(",", comma1_pos + 1);
-    comma3_pos = str.find(",", comma2_pos + 1);
+    comma1_pos = str.find(',', begin);
+    comma2_pos = str.find(',', comma1_pos + 1);
+    comma3_pos = str.find(',', comma2_pos + 1);
     if (comma1_pos == npos || comma2_pos == npos || comma3_pos == npos)
         return m_dwTextColor;
 

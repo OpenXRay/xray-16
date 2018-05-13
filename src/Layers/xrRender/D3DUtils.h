@@ -26,10 +26,10 @@ struct SPrimitiveBuffer
     TOnRender OnRender;
     void xr_stdcall RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
     void xr_stdcall RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
-public:
-    SPrimitiveBuffer() : OnRender(0), pGeom(0) { ; }
+
+    SPrimitiveBuffer() : OnRender(nullptr), pGeom(nullptr) {}
     void CreateFromData(
-        D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = 0, u32 _i_cnt = 0);
+        D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = nullptr, u32 _i_cnt = 0);
     void Destroy();
     void Render() { OnRender(); }
 };
@@ -68,16 +68,15 @@ public:
     void DD_DrawFace_push(const Fvector& p0, const Fvector& p1, const Fvector& p2, u32 clr);
     void DD_DrawFace_end();
 
-public:
     CDrawUtilities()
     {
-        vs_L = 0;
-        vs_TL = 0;
-        vs_LIT = 0;
-        m_DD_pv = 0;
-        m_DD_pv_start = 0;
+        vs_L = nullptr;
+        vs_TL = nullptr;
+        vs_LIT = nullptr;
+        m_DD_pv = nullptr;
+        m_DD_pv_start = nullptr;
         m_DD_base = 0;
-        m_Font = 0;
+        m_Font = nullptr;
     }
 
     void OnDeviceCreate();

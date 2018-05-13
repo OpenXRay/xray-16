@@ -18,8 +18,7 @@ class ENGINE_API IGame_ObjectPool
     private:
     POOL map_POOL;
     */
-    typedef xr_vector<IGameObject*> ObjectVec;
-    typedef ObjectVec::iterator ObjectVecIt;
+    using ObjectVec = xr_vector<IGameObject*>;
     ObjectVec m_PrefetchObjects;
 
 public:

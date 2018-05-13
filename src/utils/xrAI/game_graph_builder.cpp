@@ -8,15 +8,10 @@
 
 #include "stdafx.h"
 #include "game_graph_builder.h"
-#include "xrAICore/Navigation/level_graph.h"
-#include "xrAICore/Navigation/graph_abstract.h"
-#include "xrMessages.h"
-#include "xrServer_Objects_ALife.h"
+#include "xrServerEntities/xrServer_Objects_ALife.h"
+#include "xrServerEntities/xrMessages.h"
 #include "factory_api.h"
-#include "xrAICore/Navigation/game_level_cross_table.h"
-#include "xrCrossTable.h"
 #include "guid_generator.h"
-#include "xrAICore/Navigation/graph_engine.h"
 
 CGameGraphBuilder::CGameGraphBuilder()
 {
@@ -89,51 +84,38 @@ void CGameGraphBuilder::load_graph_point(NET_Packet& net_packet)
 
     vertex_type vertex;
     vertex.tLocalPoint = graph_point->o_Position;
-    // check for duplicate graph point positions
+    // Check for duplicate graph point positions
+    for (const auto &i : graph().vertices())
     {
-        graph_type::const_vertex_iterator I = graph().vertices().begin();
-        graph_type::const_vertex_iterator E = graph().vertices().end();
-        for (; I != E; ++I)
+        if (i.second->data().tLocalPoint.distance_to_sqr(vertex.tLocalPoint) < EPS_L)
         {
-            if ((*I).second->data().tLocalPoint.distance_to_sqr(vertex.tLocalPoint) < EPS_L)
-            {
-                Msg("! removing graph point [%s][%f][%f][%f] because it is too close to the another graph point",
-                    entity->name_replace(), VPUSH(entity->o_Position));
-                F_entity_Destroy(entity);
-                return;
-            }
+            Msg("! removing graph point [%s][%f][%f][%f] because it is too close to the another graph point", entity->name_replace(), VPUSH(entity->o_Position));
+            F_entity_Destroy(entity);
+            return;
         }
     }
 
     vertex.tGlobalPoint = graph_point->o_Position;
-    vertex.tNodeID =
-        level_graph().valid_vertex_position(vertex.tLocalPoint) ? level_graph().vertex_id(vertex.tLocalPoint) : u32(-1);
+    vertex.tNodeID = level_graph().valid_vertex_position(vertex.tLocalPoint) ? level_graph().vertex_id(vertex.tLocalPoint) : u32(-1);
     if (!level_graph().valid_vertex_id(vertex.tNodeID))
     {
-        Msg("! removing graph point [%s][%f][%f][%f] because it is outside of the AI map", entity->name_replace(),
-            VPUSH(entity->o_Position));
+        Msg("! removing graph point [%s][%f][%f][%f] because it is outside of the AI map", entity->name_replace(), VPUSH(entity->o_Position));
         F_entity_Destroy(entity);
         return;
     }
 
+    for (const auto &i : graph().vertices())
     {
-        graph_type::const_vertex_iterator I = graph().vertices().begin();
-        graph_type::const_vertex_iterator E = graph().vertices().end();
-        for (; I != E; ++I)
+        if (i.second->data().tNodeID == vertex.tNodeID)
         {
-            if ((*I).second->data().tNodeID == vertex.tNodeID)
-            {
-                Msg("! removing graph point [%s][%f][%f][%f] because it has the same AI node as another graph point",
-                    entity->name_replace(), VPUSH(entity->o_Position));
-                F_entity_Destroy(entity);
-                return;
-            }
+            Msg("! removing graph point [%s][%f][%f][%f] because it has the same AI node as another graph point", entity->name_replace(), VPUSH(entity->o_Position));
+            F_entity_Destroy(entity);
+            return;
         }
     }
 
     vertex.tNeighbourCount = 0;
-    memcpy(vertex.tVertexTypes, graph_point->m_tLocations,
-        GameGraph::LOCATION_TYPE_COUNT * sizeof(GameGraph::_LOCATION_ID));
+    memcpy(vertex.tVertexTypes, graph_point->m_tLocations, GameGraph::LOCATION_TYPE_COUNT * sizeof(GameGraph::_LOCATION_ID));
     vertex.tLevelID = 0;
     vertex.tDeathPointCount = 0;
     vertex.dwPointOffset = 0;
@@ -182,7 +164,6 @@ IC bool sort_predicate_greater(const T& first, const T& second)
 
 void CGameGraphBuilder::mark_vertices(u32 level_vertex_id)
 {
-    CLevelGraph::const_iterator I, E;
     m_mark_stack.reserve(8192);
     m_mark_stack.push_back(level_vertex_id);
 
@@ -190,12 +171,12 @@ void CGameGraphBuilder::mark_vertices(u32 level_vertex_id)
     {
         level_vertex_id = m_mark_stack.back();
         m_mark_stack.resize(m_mark_stack.size() - 1);
-        CLevelGraph::CVertex* node = level_graph().vertex(level_vertex_id);
-        level_graph().begin(level_vertex_id, I, E);
+        auto node = level_graph().vertex(level_vertex_id);
         m_marks[level_vertex_id] = true;
-        for (; I != E; ++I)
+        for (const auto &i : {0, 1, 2, 3})
         {
-            u32 next_level_vertex_id = node->link(I);
+            u32 next_level_vertex_id = node->link(i);
+
             if (!level_graph().valid_vertex_id(next_level_vertex_id))
                 continue;
 
@@ -210,10 +191,8 @@ void CGameGraphBuilder::fill_marks(const float& start, const float& amount)
     Logger.Progress(start);
 
     m_marks.assign(level_graph().header().vertex_count(), false);
-    graph_type::const_vertex_iterator I = graph().vertices().begin();
-    graph_type::const_vertex_iterator E = graph().vertices().end();
-    for (; I != E; ++I)
-        mark_vertices((*I).second->data().level_vertex_id());
+    for (const auto &i : graph().vertices())
+        mark_vertices(i.second->data().level_vertex_id());
     m_marks.flip();
 
     Logger.Progress(start + amount);
@@ -224,17 +203,11 @@ void CGameGraphBuilder::fill_distances(const float& start, const float& amount)
     Logger.Progress(start);
 
     m_distances.resize(graph().vertices().size());
+    for (auto &i : m_distances)
     {
-        DISTANCES::iterator I = m_distances.begin();
-        DISTANCES::iterator E = m_distances.end();
-        for (; I != E; I++)
-        {
-            (*I).resize(level_graph().header().vertex_count());
-            xr_vector<u32>::iterator i = (*I).begin();
-            xr_vector<u32>::iterator e = (*I).end();
-            for (; i != e; i++)
-                *i = u32(-1);
-        }
+        i.resize(level_graph().header().vertex_count());
+        for (auto &j : i)
+            j = u32(-1);
     }
 
     Logger.Progress(start + amount);
@@ -262,21 +235,17 @@ void CGameGraphBuilder::recursive_update(const u32& game_vertex_id, const float&
     Logger.Progress(start);
     for (; !m_current_fringe.empty();)
     {
-        xr_vector<u32>::iterator I = m_current_fringe.begin();
-        xr_vector<u32>::iterator E = m_current_fringe.end();
-        for (; I != E; ++I)
+        for (const auto &i : m_current_fringe)
         {
-            u32* result = &m_results[*I];
-            VERIFY(curr_dist < m_distances[*result][*I]);
+            u32* result = &m_results[i];
+            VERIFY(curr_dist < m_distances[*result][i]);
             *result = game_vertex_id;
 
-            distances[*I] = curr_dist;
-            CLevelGraph::const_iterator i, e;
-            CLevelGraph::CVertex* node = level_graph().vertex(*I);
-            level_graph().begin(*I, i, e);
-            for (; i != e; ++i)
+            distances[i] = curr_dist;
+            CLevelGraph::CVertex* node = level_graph().vertex(i);
+            for (const auto &j : {0, 1, 2, 3})
             {
-                u32 dwNexNodeID = node->link(i);
+                u32 dwNexNodeID = node->link(j);
                 if (!level_graph().valid_vertex_id(dwNexNodeID))
                     continue;
 
@@ -294,10 +263,8 @@ void CGameGraphBuilder::recursive_update(const u32& game_vertex_id, const float&
             }
         }
 
-        I = m_current_fringe.begin();
-        E = m_current_fringe.end();
-        for (; I != E; ++I)
-            m_marks[*I] = false;
+        for (const auto &i : m_current_fringe)
+            m_marks[i] = false;
 
         total_count += m_current_fringe.size();
         m_current_fringe = m_next_fringe;
@@ -316,14 +283,14 @@ void CGameGraphBuilder::iterate_distances(const float& start, const float& amoun
 
     m_results.assign(level_graph().header().vertex_count(), 0);
 
-    float amount_i = amount / float(graph().vertices().size());
-    for (int i = 0, n = (int)graph().vertices().size(); i < n; ++i)
+    auto size = graph().vertices().size();
+    float amount_i = amount / float(size);
+
+    for (auto i = 0; i < size; ++i)
     {
         if (i)
-        {
             for (int k = 0, kn = (int)level_graph().header().vertex_count(); k < kn; ++k)
                 m_distances[i][k] = m_distances[i - 1][k];
-        }
 
         recursive_update(i, start + amount_i * float(i), amount_i);
     }
@@ -360,8 +327,7 @@ void CGameGraphBuilder::save_cross_table(const float& start, const float& amount
         CGameLevelCrossTable::CCell tCrossTableCell;
         tCrossTableCell.tGraphIndex = (GameGraph::_GRAPH_ID)m_results[i];
         VERIFY(graph().header().vertex_count() > tCrossTableCell.tGraphIndex);
-        tCrossTableCell.fDistance =
-            float(m_distances[tCrossTableCell.tGraphIndex][i]) * level_graph().header().cell_size();
+        tCrossTableCell.fDistance = float(m_distances[tCrossTableCell.tGraphIndex][i]) * level_graph().header().cell_size();
         tMemoryStream.w(&tCrossTableCell, sizeof(tCrossTableCell));
     }
 
@@ -427,7 +393,6 @@ void CGameGraphBuilder::fill_neighbours(const u32& game_vertex_id)
 
     u32 level_vertex_id = graph().vertex(game_vertex_id)->data().level_vertex_id();
 
-    CLevelGraph::const_iterator I, E;
     m_mark_stack.reserve(8192);
     m_mark_stack.push_back(level_vertex_id);
 
@@ -435,12 +400,12 @@ void CGameGraphBuilder::fill_neighbours(const u32& game_vertex_id)
     {
         level_vertex_id = m_mark_stack.back();
         m_mark_stack.resize(m_mark_stack.size() - 1);
-        CLevelGraph::CVertex* node = level_graph().vertex(level_vertex_id);
-        level_graph().begin(level_vertex_id, I, E);
+        auto node = level_graph().vertex(level_vertex_id);
         m_marks[level_vertex_id] = true;
-        for (; I != E; ++I)
+        for (const auto &i : {0, 1, 2, 3})
         {
-            u32 next_level_vertex_id = node->link(I);
+            u32 next_level_vertex_id = node->link(i);
+
             if (!level_graph().valid_vertex_id(next_level_vertex_id))
                 continue;
 
@@ -494,20 +459,18 @@ float CGameGraphBuilder::path_distance(const u32& game_vertex_id0, const u32& ga
     Msg("Cannot build path from [%f][%f][%f] to [%f][%f][%f]", VPUSH(vertex0.data().level_point()),
         VPUSH(vertex1.data().level_point()));
     R_ASSERT2(false, "Cannot build path, check AI map");
-    return (flt_max);
+    return flt_max;
 }
 
 void CGameGraphBuilder::generate_edges(const u32& game_vertex_id)
 {
-    graph_type::CVertex* vertex = graph().vertex(game_vertex_id);
+    auto vertex = graph().vertex(game_vertex_id);
 
-    xr_vector<u32>::const_iterator I = m_current_fringe.begin();
-    xr_vector<u32>::const_iterator E = m_current_fringe.end();
-    for (; I != E; ++I)
+    for (const auto &i: m_current_fringe)
     {
-        VERIFY(!vertex->edge(*I));
-        float distance = path_distance(game_vertex_id, *I);
-        graph().add_edge(game_vertex_id, *I, distance);
+        VERIFY(!vertex->edge(i));
+        float distance = path_distance(game_vertex_id, i);
+        graph().add_edge(game_vertex_id, i, distance);
     }
 }
 
@@ -517,12 +480,10 @@ void CGameGraphBuilder::generate_edges(const float& start, const float& amount)
 
     Msg("Generating edges");
 
-    graph_type::const_vertex_iterator I = graph().vertices().begin();
-    graph_type::const_vertex_iterator E = graph().vertices().end();
-    for (; I != E; ++I)
+    for (const auto &i : graph().vertices())
     {
-        fill_neighbours((*I).second->vertex_id());
-        generate_edges((*I).second->vertex_id());
+        fill_neighbours(i.second->vertex_id());
+        generate_edges(i.second->vertex_id());
     }
 
     Msg("%d edges built", graph().edge_count());
@@ -539,23 +500,19 @@ void CGameGraphBuilder::connectivity_check(const float& start, const float& amou
     Logger.Progress(start + amount);
 }
 
-void CGameGraphBuilder::create_tripples(const float& start, const float& amount)
+void CGameGraphBuilder::create_tripples(const float& /*start*/, const float& /*amount*/)
 {
-    graph_type::const_vertex_iterator I = graph().vertices().begin();
-    graph_type::const_vertex_iterator E = graph().vertices().end();
-    for (; I != E; ++I)
+    for (const auto &i: graph().vertices())
     {
-        graph_type::const_iterator i = (*I).second->edges().begin();
-        graph_type::const_iterator e = (*I).second->edges().end();
-        for (; i != e; ++i)
+        for (const auto &j : i.second->edges())
         {
-            if (((*i).vertex_id() < (*I).first) && graph().edge((*i).vertex_id(), (*I).first))
+            if ((j.vertex_id() < i.first) && graph().edge(j.vertex_id(), i.first))
                 continue;
 
-            const graph_type::CEdge* edge = graph().vertex((*i).vertex_id())->edge((*I).first);
+            const graph_type::CEdge* edge = graph().vertex(j.vertex_id())->edge(i.first);
 
-            m_tripples.push_back(std::make_pair(_min((*i).weight(), edge ? edge->weight() : (*i).weight()),
-                std::make_pair((*I).first, (*i).vertex_id())));
+            m_tripples.push_back(std::make_pair(std::min(j.weight(), edge ? edge->weight() : j.weight()),
+                std::make_pair(i.first, j.vertex_id())));
         }
     }
 
@@ -567,24 +524,22 @@ void CGameGraphBuilder::process_tripple(const TRIPPLE& tripple)
     const graph_type::CVertex& vertex0 = *graph().vertex(tripple.second.first);
     const graph_type::CVertex& vertex1 = *graph().vertex(tripple.second.second);
 
-    graph_type::const_iterator I = vertex0.edges().begin();
-    graph_type::const_iterator E = vertex0.edges().end();
-    for (; I != E; ++I)
+    for (const auto &i : vertex0.edges())
     {
-        if ((*I).vertex_id() == tripple.second.second)
+        if (i.vertex_id() == tripple.second.second)
             continue;
 
         const graph_type::CEdge* edge;
 
-        edge = vertex1.edge((*I).vertex_id());
+        edge = vertex1.edge(i.vertex_id());
         if (edge)
         {
-            VERIFY(_min((*I).weight(), graph().edge((*I).vertex_id(), tripple.second.first) ?
-                           graph().edge((*I).vertex_id(), tripple.second.first)->weight() :
-                           (*I).weight()) <= tripple.first);
+            VERIFY(_min(i.weight(), graph().edge(i.vertex_id(), tripple.second.first) ?
+                           graph().edge(i.vertex_id(), tripple.second.first)->weight() :
+                           i.weight()) <= tripple.first);
             VERIFY(_min(edge->weight(), graph().edge(edge->vertex_id(), tripple.second.second) ?
                            graph().edge(edge->vertex_id(), tripple.second.second)->weight() :
-                           (*I).weight()) <= tripple.first);
+                           i.weight()) <= tripple.first);
             if (vertex0.edge(tripple.second.second))
                 graph().remove_edge(tripple.second.first, tripple.second.second);
             if (vertex1.edge(tripple.second.first))
@@ -592,12 +547,12 @@ void CGameGraphBuilder::process_tripple(const TRIPPLE& tripple)
             return;
         }
 
-        edge = graph().vertex((*I).vertex_id())->edge(tripple.second.second);
+        edge = graph().vertex(i.vertex_id())->edge(tripple.second.second);
         if (edge)
         {
-            VERIFY(_min((*I).weight(), graph().edge((*I).vertex_id(), tripple.second.first) ?
-                           graph().edge((*I).vertex_id(), tripple.second.first)->weight() :
-                           (*I).weight()) <= tripple.first);
+            VERIFY(_min(i.weight(), graph().edge(i.vertex_id(), tripple.second.first) ?
+                           graph().edge(i.vertex_id(), tripple.second.first)->weight() :
+                           i.weight()) <= tripple.first);
             VERIFY(edge->weight() <= tripple.first);
             if (vertex0.edge(tripple.second.second))
                 graph().remove_edge(tripple.second.first, tripple.second.second);
@@ -619,10 +574,8 @@ void CGameGraphBuilder::optimize_graph(const float& start, const float& amount)
 
     create_tripples(start + .00f, amount * .50f);
 
-    TRIPPLES::const_iterator I = m_tripples.begin();
-    TRIPPLES::const_iterator E = m_tripples.end();
-    for (; I != E; ++I)
-        process_tripple(*I);
+    for (const auto &i: m_tripples)
+        process_tripple(i);
 
     Msg("edges after optimization : %d", graph().edge_count());
 
@@ -661,14 +614,12 @@ void CGameGraphBuilder::save_graph(const float& start, const float& amount)
     {
         u32 edge_offset = graph().vertices().size() * sizeof(CGameGraph::CVertex);
 
-        graph_type::const_vertex_iterator I = graph().vertices().begin();
-        graph_type::const_vertex_iterator E = graph().vertices().end();
-        for (; I != E; ++I)
+        for (const auto &i: graph().vertices())
         {
-            CGameGraph::CVertex& vertex = (*I).second->data();
+            CGameGraph::CVertex& vertex = i.second->data();
 
-            VERIFY((*I).second->edges().size() < 256);
-            vertex.tNeighbourCount = (u8)(*I).second->edges().size();
+            VERIFY(i.second->edges().size() < 256);
+            vertex.tNeighbourCount = (u8)i.second->edges().size();
             vertex.dwEdgeOffset = edge_offset;
             edge_offset += vertex.tNeighbourCount * sizeof(CGameGraph::CEdge);
 
@@ -677,18 +628,14 @@ void CGameGraphBuilder::save_graph(const float& start, const float& amount)
     }
 
     {
-        graph_type::const_vertex_iterator I = graph().vertices().begin();
-        graph_type::const_vertex_iterator E = graph().vertices().end();
-        for (; I != E; ++I)
+        for (const auto &i : graph().vertices())
         {
-            graph_type::const_iterator i = (*I).second->edges().begin();
-            graph_type::const_iterator e = (*I).second->edges().end();
-            for (; i != e; ++i)
+            for (const auto &j: i.second->edges())
             {
                 GameGraph::CEdge edge;
-                VERIFY((*i).vertex_id() < (u32(1) << (8 * sizeof(GameGraph::_GRAPH_ID))));
-                edge.m_vertex_id = (GameGraph::_GRAPH_ID)(*i).vertex_id();
-                edge.m_path_distance = (*i).weight();
+                VERIFY(j.vertex_id() < (u32(1) << (8 * sizeof(GameGraph::_GRAPH_ID))));
+                edge.m_vertex_id = (GameGraph::_GRAPH_ID)j.vertex_id();
+                edge.m_path_distance = j.weight();
 
                 writer.w(&edge.m_vertex_id, sizeof(edge.m_vertex_id));
                 writer.w_float(edge.m_path_distance);

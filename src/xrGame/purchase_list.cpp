@@ -23,8 +23,8 @@ void CPurchaseList::process(CInifile& ini_file, LPCSTR section, CInventoryOwner&
 
     const CGameObject& game_object = smart_cast<const CGameObject&>(owner);
     CInifile::Sect& S = ini_file.r_section(section);
-    CInifile::SectCIt I = S.Data.begin();
-    CInifile::SectCIt E = S.Data.end();
+    auto I = S.Data.cbegin();
+    auto E = S.Data.cend();
     for (; I != E; ++I)
     {
         VERIFY3((*I).second.size(), "PurchaseList : cannot handle lines in section without values", section);

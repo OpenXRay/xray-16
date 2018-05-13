@@ -16,8 +16,8 @@
 CObjectOGFCollectorPacked::CObjectOGFCollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces)
 {
     // Params
-    m_VMscale.set(bb.max.x - bb.min.x + EPS, bb.max.y - bb.min.y + EPS, bb.max.z - bb.min.z + EPS);
-    m_VMmin.set(bb.min).sub(EPS);
+    m_VMscale.set(bb.vMax.x - bb.vMin.x + EPS, bb.vMax.y - bb.vMin.y + EPS, bb.vMax.z - bb.vMin.z + EPS);
+    m_VMmin.set(bb.vMin).sub(EPS);
     m_VMeps.set(m_VMscale.x / clpOGFMX / 2, m_VMscale.y / clpOGFMY / 2, m_VMscale.z / clpOGFMZ / 2);
     m_VMeps.x = (m_VMeps.x < EPS_L) ? m_VMeps.x : EPS_L;
     m_VMeps.y = (m_VMeps.y < EPS_L) ? m_VMeps.y : EPS_L;
@@ -102,21 +102,21 @@ u16 CObjectOGFCollectorPacked::VPack(SOGFVert& V)
 void CObjectOGFCollectorPacked::ComputeBounding()
 {
     m_Box.invalidate();
-    for (OGFVertIt v_it = m_Verts.begin(); v_it != m_Verts.end(); ++v_it)
-        m_Box.modify(v_it->P);
+    for (auto& v_it : m_Verts)
+        m_Box.modify(v_it.P);
 }
 
 CExportObjectOGF::SSplit::SSplit(CSurface* surf, const Fbox& bb)
 {
     apx_box = bb;
     m_Surf = surf;
-    m_CurrentPart = NULL;
+    m_CurrentPart = nullptr;
 }
 
 CExportObjectOGF::SSplit::~SSplit()
 {
-    for (COGFCPIt it = m_Parts.begin(); it != m_Parts.end(); ++it)
-        xr_delete(*it);
+    for (auto& it : m_Parts)
+        xr_delete(it);
 }
 
 void CExportObjectOGF::SSplit::AppendPart(int apx_vertices, int apx_faces)
@@ -133,8 +133,8 @@ void CExportObjectOGF::SSplit::SavePart(IWriter& F, CObjectOGFCollectorPacked* p
     H.format_version = xrOGF_FormatVersion;
     H.type = (part->m_SWR.size()) ? MT_PROGRESSIVE : MT_NORMAL;
     H.shader_id = 0;
-    H.bb.min = part->m_Box.min;
-    H.bb.max = part->m_Box.max;
+    H.bb.min = part->m_Box.vMin;
+    H.bb.max = part->m_Box.vMax;
     part->m_Box.getsphere(H.bs.c, H.bs.r);
     F.w(&H, sizeof(H));
     F.close_chunk();
@@ -150,9 +150,8 @@ void CExportObjectOGF::SSplit::SavePart(IWriter& F, CObjectOGFCollectorPacked* p
     F.open_chunk(OGF_VERTICES);
     F.w_u32(dwFVF);
     F.w_u32(part->m_Verts.size());
-    for (OGFVertIt v_it = part->m_Verts.begin(); v_it != part->m_Verts.end(); ++v_it)
+    for (auto const& pV : part->m_Verts)
     {
-        SOGFVert const& pV = *v_it;
         F.w(&(pV.P), sizeof(float) * 3); // position (offset)
         F.w(&(pV.N), sizeof(float) * 3); // normal
         F.w_float(pV.UV.x);
@@ -184,9 +183,8 @@ void CExportObjectOGF::SSplit::SavePart(IWriter& F, CObjectOGFCollectorPacked* p
 
 void CExportObjectOGF::SSplit::Save(IWriter& F, int& chunk_id)
 {
-    for (COGFCPIt it = m_Parts.begin(); it != m_Parts.end(); ++it)
+    for (auto& part : m_Parts)
     {
-        CObjectOGFCollectorPacked* part = *it;
         F.open_chunk(chunk_id);
         SavePart(F, part);
         F.close_chunk();
@@ -198,11 +196,11 @@ void CObjectOGFCollectorPacked::MakeProgressive()
 {
     VIPM_Init();
 
-    for (OGFVertIt vert_it = m_Verts.begin(); vert_it != m_Verts.end(); ++vert_it)
-        VIPM_AppendVertex(vert_it->P, vert_it->UV);
+    for (auto& vert_it : m_Verts)
+        VIPM_AppendVertex(vert_it.P, vert_it.UV);
 
-    for (OGFFaceIt f_it = m_Faces.begin(); f_it != m_Faces.end(); ++f_it)
-        VIPM_AppendFace(f_it->v[0], f_it->v[1], f_it->v[2]);
+    for (auto& f_it : m_Faces)
+        VIPM_AppendFace(f_it.v[0], f_it.v[1], f_it.v[2]);
 
     VIPM_Result* R = VIPM_Convert(u32(-1), 1.f, 1);
 
@@ -271,22 +269,22 @@ void CObjectOGFCollectorPacked::OptimizeTextureCoordinates()
 
 void CExportObjectOGF::SSplit::MakeProgressive()
 {
-    for (COGFCPIt it = m_Parts.begin(); it != m_Parts.end(); ++it)
-        (*it)->MakeProgressive();
+    for (auto& it : m_Parts)
+        it->MakeProgressive();
 }
 
 CExportObjectOGF::CExportObjectOGF(CEditableObject* object) { m_Source = object; }
 CExportObjectOGF::~CExportObjectOGF()
 {
-    for (SplitIt it = m_Splits.begin(); it != m_Splits.end(); ++it)
-        xr_delete(*it);
+    for (auto& it : m_Splits)
+        xr_delete(it);
 }
 
 CExportObjectOGF::SSplit* CExportObjectOGF::FindSplit(CSurface* surf)
 {
-    for (SplitIt it = m_Splits.begin(); it != m_Splits.end(); ++it)
-        if ((*it)->m_Surf == surf)
-            return *it;
+    for (auto& it : m_Splits)
+        if (it->m_Surf == surf)
+            return it;
 
     return 0;
 }
@@ -297,10 +295,10 @@ bool CExportObjectOGF::PrepareMESH(CEditableMesh* MESH)
     bool bResult = true;
     MESH->GenerateVNormals(0);
     // fill faces
-    for (SurfFacesPairIt sp_it = MESH->m_SurfFaces.begin(); sp_it != MESH->m_SurfFaces.end(); ++sp_it)
+    for (auto& sp_it : MESH->m_SurfFaces)
     {
-        IntVec& face_lst = sp_it->second;
-        CSurface* surf = sp_it->first;
+        IntVec& face_lst = sp_it.second;
+        CSurface* surf = sp_it.first;
         u32 dwTexCnt = ((surf->_FVF() & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT);
         R_ASSERT(dwTexCnt == 1);
         SSplit* split = FindSplit(surf);
@@ -403,16 +401,16 @@ bool CExportObjectOGF::Prepare(bool gen_tb, CEditableMesh* mesh)
     // calculate TB
     if (gen_tb)
     {
-        for (SplitIt split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
-            (*split_it)->CalculateTB();
+        for (auto& split_it : m_Splits)
+            split_it->CalculateTB();
         //        Log				("Time B: ",T.GetElapsed_sec());
     }
 
     // fill per bone vertices
     if (m_Source->m_objectFlags.is(CEditableObject::eoProgressive))
     {
-        for (SplitIt split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
-            (*split_it)->MakeProgressive();
+        for (auto& split_it : m_Splits)
+            split_it->MakeProgressive();
     }
 
     // Compute bounding...
@@ -434,14 +432,14 @@ bool CExportObjectOGF::Export(IWriter& F, bool gen_tb, CEditableMesh* mesh)
     }
     else
     {
-        // export as hierrarhy mesh
+        // export as hierarchy mesh
         // Header
         ogf_header H;
         H.format_version = xrOGF_FormatVersion;
         H.type = MT_HIERRARHY;
         H.shader_id = 0;
-        H.bb.min = m_Box.min;
-        H.bb.max = m_Box.max;
+        H.bb.min = m_Box.vMin;
+        H.bb.max = m_Box.vMax;
         m_Box.getsphere(H.bs.c, H.bs.r);
         F.w_chunk(OGF_HEADER, &H, sizeof(H));
 
@@ -455,54 +453,41 @@ bool CExportObjectOGF::Export(IWriter& F, bool gen_tb, CEditableMesh* mesh)
         // OGF_CHILDREN
         F.open_chunk(OGF_CHILDREN);
         int chunk = 0;
-        for (SplitIt split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
-            (*split_it)->Save(F, chunk);
+        for (auto& split_it : m_Splits)
+            split_it->Save(F, chunk);
 
         F.close_chunk();
     }
-    SplitIt split_it;
     F.open_chunk(OGF_COLLISION_VERTICES);
-    for (split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
+
+    for (auto& split : m_Splits)
     {
-        SSplit* split = *split_it;
-        COGFCPIt it = split->m_Parts.begin();
-        for (; it != split->m_Parts.end(); ++it)
+        for (auto& part : split->m_Parts)
         {
-            CObjectOGFCollectorPacked* part = *it;
-            // vertices
-            OGFVertVec& VERTS = part->getV_Verts();
-            OGFVertIt v_it = VERTS.begin();
-            for (; v_it != VERTS.end(); ++v_it)
+            for (auto& V : part->getV_Verts())
             {
-                SOGFVert& V = *v_it;
                 F.w(&V.P, sizeof(V.P));
             }
-        } // parts
-    } // splits
+        }
+    }
+
     F.close_chunk();
 
     F.open_chunk(OGF_COLLISION_INDICES);
     u32 v_offs = 0;
-    for (split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
+    for (auto& split : m_Splits)
     {
-        SSplit* split = *split_it;
-        COGFCPIt it = split->m_Parts.begin();
-
-        for (; it != split->m_Parts.end(); ++it)
+        for (auto& part : split->m_Parts)
         {
-            CObjectOGFCollectorPacked* part = *it;
-            OGFFaceVec& FACES = part->getV_Faces();
-            OGFFaceIt f_it = FACES.begin();
-            for (; f_it != FACES.end(); ++f_it)
+            for (auto& face : part->getV_Faces())
             {
-                SOGFFace& Face = *f_it;
-                F.w_u32(v_offs + Face.v[0]);
-                F.w_u32(v_offs + Face.v[1]);
-                F.w_u32(v_offs + Face.v[2]);
+                F.w_u32(v_offs + face.v[0]);
+                F.w_u32(v_offs + face.v[1]);
+                F.w_u32(v_offs + face.v[2]);
             }
             v_offs += part->getV_Verts().size();
-        } // parts
-    } // splits
+        }
+    }
     F.close_chunk();
 
     return true;
@@ -537,9 +522,9 @@ bool CExportObjectOGF::ExportAsWavefrontOBJ(IWriter& F, LPCSTR fn)
     IWriter* Fm = FS.w_open(fn_material.c_str());
 
     // write material file
-    for (SplitIt split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
+    for (auto& split_it : m_Splits)
     {
-        _splitpath((*split_it)->m_Surf->_Texture(), 0, tex_path, tex_name, 0);
+        _splitpath(split_it->m_Surf->_Texture(), nullptr, tex_path, tex_name, 0);
 
         sprintf(tmp, "newmtl %s", tex_name);
         Fm->w_string(tmp);
@@ -561,7 +546,7 @@ bool CExportObjectOGF::ExportAsWavefrontOBJ(IWriter& F, LPCSTR fn)
     F.w_string(tmp);
 
     u32 v_offs = 0;
-    for (SplitIt split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
+    for (auto split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
     {
         _splitpath((*split_it)->m_Surf->_Texture(), 0, 0, tex_name, 0);
         sprintf(tmp, "g %d", split_it - m_Splits.begin());
@@ -571,52 +556,48 @@ bool CExportObjectOGF::ExportAsWavefrontOBJ(IWriter& F, LPCSTR fn)
         Fvector mV;
         Fmatrix mZ;
         mZ.mirrorZ();
-        for (COGFCPIt it = (*split_it)->m_Parts.begin(); it != (*split_it)->m_Parts.end(); ++it)
+        for (auto part : (*split_it)->m_Parts)
         {
-            CObjectOGFCollectorPacked* part = *it;
-            // vertices
             OGFVertVec& VERTS = part->getV_Verts();
-            OGFVertIt v_it;
-            for (v_it = VERTS.begin(); v_it != VERTS.end(); v_it++)
+            // vertices
+            for (auto& v_it : VERTS)
             {
-                mZ.transform_tiny(mV, v_it->P);
+                mZ.transform_tiny(mV, v_it.P);
                 sprintf(tmp, "v %f %f %f", mV.x, mV.y, mV.z);
                 F.w_string(tmp);
             }
-            for (v_it = VERTS.begin(); v_it != VERTS.end(); ++v_it)
+            for (auto& v_it : VERTS)
             {
-                sprintf(tmp, "vt %f %f", v_it->UV.x, _abs(1.f - v_it->UV.y));
+                sprintf(tmp, "vt %f %f", v_it.UV.x, _abs(1.f - v_it.UV.y));
                 F.w_string(tmp);
             }
-            for (v_it = VERTS.begin(); v_it != VERTS.end(); ++v_it)
+            for (auto& v_it : VERTS)
             {
-                mZ.transform_dir(mV, v_it->N);
+                mZ.transform_dir(mV, v_it.N);
                 sprintf(tmp, "vn %f %f %f", mV.x, mV.y, mV.z);
                 F.w_string(tmp);
             }
 
-            for (v_it = VERTS.begin(); v_it != VERTS.end(); ++v_it)
+            for (auto& v_it : VERTS)
             {
-                mZ.transform_dir(mV, v_it->T);
+                mZ.transform_dir(mV, v_it.T);
                 sprintf(tmp, "vg %f %f %f", mV.x, mV.y, mV.z);
                 F.w_string(tmp);
             }
 
-            for (v_it = VERTS.begin(); v_it != VERTS.end(); ++v_it)
+            for (auto& v_it : VERTS)
             {
-                mZ.transform_dir(mV, v_it->B);
+                mZ.transform_dir(mV, v_it.B);
                 sprintf(tmp, "vb %f %f %f", mV.x, mV.y, mV.z);
                 F.w_string(tmp);
             }
 
             // faces
-            OGFFaceVec& FACES = part->getV_Faces();
-            OGFFaceIt f_it;
-            for (f_it = FACES.begin(); f_it != FACES.end(); ++f_it)
+            for (auto& f_it : part->getV_Faces())
             {
-                sprintf(tmp, "f %d/%d/%d %d/%d/%d %d/%d/%d", v_offs + f_it->v[2] + 1, v_offs + f_it->v[2] + 1,
-                    v_offs + f_it->v[2] + 1, v_offs + f_it->v[1] + 1, v_offs + f_it->v[1] + 1, v_offs + f_it->v[1] + 1,
-                    v_offs + f_it->v[0] + 1, v_offs + f_it->v[0] + 1, v_offs + f_it->v[0] + 1);
+                sprintf(tmp, "f %d/%d/%d %d/%d/%d %d/%d/%d", v_offs + f_it.v[2] + 1, v_offs + f_it.v[2] + 1,
+                    v_offs + f_it.v[2] + 1, v_offs + f_it.v[1] + 1, v_offs + f_it.v[1] + 1, v_offs + f_it.v[1] + 1,
+                    v_offs + f_it.v[0] + 1, v_offs + f_it.v[0] + 1, v_offs + f_it.v[0] + 1);
                 F.w_string(tmp);
             }
             v_offs += VERTS.size();

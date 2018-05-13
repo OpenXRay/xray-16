@@ -3,6 +3,12 @@
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/UIRender.h"
 #include "Include/xrRender/UIShader.h"
+#include "xrCore/_plane2.h"
+#include "xrCore/_vector2.h"
+#include "xrCore/_rect.h"
+#include "xrCore/FixedVector.h"
+#include "xrCDB/Frustum.h"
+
 typedef FactoryPtr<IUIShader> ui_shader;
 
 #define UI_BASE_WIDTH 1024.0f

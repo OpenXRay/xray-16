@@ -7,7 +7,7 @@
 typedef u32 CLClassBits;
 typedef u32 CLBits;
 class SpatialBase;
-DEFINE_VECTOR(ISpatial*, qResultVec, qResultIt)
+using qResultVec = xr_vector<ISpatial*>;
 class CPHObject;
 class CPHUpdateObject;
 class CPHMoveStorage;

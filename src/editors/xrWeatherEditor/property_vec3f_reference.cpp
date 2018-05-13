@@ -9,7 +9,7 @@
 #include "pch.hpp"
 #include "property_vec3f_reference.hpp"
 
-using editor::vec3f;
+using XRay::Editor::vec3f;
 
 property_vec3f_reference::property_vec3f_reference(vec3f& value)
     : m_value(new value_holder<vec3f>(value)), inherited(value)

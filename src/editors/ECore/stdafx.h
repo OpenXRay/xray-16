@@ -1,13 +1,10 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef stdafxECOREH
-#define stdafxECOREH
 #pragma once
 
-#pragma warn - pck
+#include "Common/Common.hpp"
 
-#define sqrtf(a) sqrt(a)
+//#pragma warn - pck
+
+//#define sqrtf(a) sqrt(a)
 
 #define smart_cast dynamic_cast
 
@@ -22,15 +19,17 @@
 #define RENDER R_R1
 
 // Std C++ headers
-#include <fastmath.h>
+//#include <fastmath.h>
+//#include "math.h"
 #include <io.h>
 #include <fcntl.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <process.h>
-#include <utime.h>
+#include <sys/utime.h>
 
-// iseful macros
+// useful macros
 // MSC names for functions
+/*
 #ifdef _eof
 #undef _eof
 #endif
@@ -56,16 +55,19 @@ __inline float modff(float a, float* b)
     *b = x;
     return float(y);
 }
-__inline float expf(float val) { return ::exp(val); }
-#include "xrCore/Platform.h"
+__inline float expf(float val) { return ::exp(val); }*/
 
+/*
 #ifdef _ECOREB
 #define ECORE_API XR_EXPORT
 #define ENGINE_API XR_EXPORT
 #else
 #define ECORE_API XR_IMPORT
 #define ENGINE_API XR_IMPORT
-#endif
+#endif*/
+
+#define ECORE_API XR_EXPORT
+#define ENGINE_API XR_IMPORT
 
 #define DLL_API XR_IMPORT
 #define PropertyGP(a, b) __declspec(property(get = a, put = b))
@@ -75,8 +77,42 @@ __inline float expf(float val) { return ::exp(val); }
 
 #define clMsg Msg
 
+enum TMsgDlgType
+{
+    mtWarning,
+    mtError,
+    mtInformation,
+    mtConfirmation,
+    mtCustom
+};
+enum TMsgDlgBtn
+{
+    mbYes,
+    mbNo,
+    mbOK,
+    mbCancel,
+    mbAbort,
+    mbRetry,
+    mbIgnore,
+    mbAll,
+    mbNoToAll,
+    mbYesToAll,
+    mbHelp
+};
+typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
+
 // core
-#include <xrCore/xrCore.h>
+#include "xrCore/xrCore.h"
+#include "xrCore/_stl_extensions.h"
+#include "xrCore/_types.h"
+#include "xrCore/_fbox.h"
+#include "xrCore/xr_token.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_string.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
+
+#define AnsiString xr_string
 
 #ifdef _EDITOR
 class PropValue;
@@ -89,7 +125,7 @@ DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 
 #include "xrCDB/xrCDB.h"
 #include "xrSound/Sound.h"
-#include "xrEngine/PSystem.h"
+#include "xrParticles/psystem.h"
 
 // DirectX headers
 #include <d3d9.h>
@@ -103,31 +139,34 @@ DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 #include "xrCore/FMesh.hpp"
 #include "Common/_d3d_extensions.h"
 
-#include "D3DX_Wrapper.h"
+//#include "D3DX_Wrapper.h"
 
 DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
 
-#include "xrServerEntities\xrEProps.h"
+#include "xrServerEntities/xrEProps.h"
 #include "xrCore/Log.h"
 #include "Editor/engine.h"
 #include "xrEngine/defines.h"
 
 #include "xrPhysics/xrPhysics.h"
 
-struct str_pred : public std::binary_function<char*, char*, bool>
+struct str_pred
 {
-    IC bool operator()(LPCSTR x, LPCSTR y) const { return strcmp(x, y) < 0; }
-};
-struct astr_pred : public std::binary_function<const AnsiString&, const AnsiString&, bool>
-{
-    IC bool operator()(const AnsiString& x, const AnsiString& y) const { return x < y; }
+    bool operator()(LPCSTR x, LPCSTR y) const { return strcmp(x, y) < 0; }
 };
 
+struct astr_pred
+{
+    bool operator()(const AnsiString& x, const AnsiString& y) const { return x < y; }
+};
+
+enum TShiftState { ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble };
+
 #ifdef _EDITOR
-#include "Editor\device.h"
-#include "xrEngine\properties.h"
-#include "Editor\render.h"
+#include "Editor/device.h"
+#include "xrEngine/properties.h"
+#include "Editor/render.h"
 DEFINE_VECTOR(FVF::L, FLvertexVec, FLvertexIt);
 DEFINE_VECTOR(FVF::TL, FTLvertexVec, FTLvertexIt);
 DEFINE_VECTOR(FVF::LIT, FLITvertexVec, FLITvertexIt);
@@ -170,9 +209,6 @@ DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
 #define _omotions_ "$omotions$"
 #define _smotion_ "$smotion$"
 #define _detail_objects_ "$detail_objects$"
-#endif
 
 #define TEX_POINT_ATT "internal\\internal_light_attpoint"
 #define TEX_SPOT_ATT "internal\\internal_light_attclip"
-
-#pragma hdrstop

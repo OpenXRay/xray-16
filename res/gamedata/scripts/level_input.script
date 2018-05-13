@@ -1,0 +1,5 @@
+function on_key_press(key,bind)
+	-- return true on valid action
+
+	return false
+end

@@ -21,12 +21,14 @@
 #include "script_monster_hit_info.h"
 #include "script_entity_action.h"
 #include "action_planner.h"
+#include "detail_path_manager_space.h"
 
 #include "helicopter.h"
 #include "script_zone.h"
 #include "relation_registry.h"
 #include "danger_object.h"
 #include "smart_cover_object.h"
+#include "xrScriptEngine/Functor.hpp"
 
 using namespace luabind;
 using namespace luabind::policy;
@@ -92,6 +94,7 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("change_team", (void (CScriptGameObject::*)(u8, u8, u8))(&CScriptGameObject::ChangeTeam))
         .def("set_visual_memory_enabled", &CScriptGameObject::SetVisualMemoryEnabled)
         .def("kill", &CScriptGameObject::Kill)
+        .def("kill", (void (CScriptGameObject::*)(CScriptGameObject*))(&CScriptGameObject::Kill))
         .def("hit", &CScriptGameObject::Hit)
         .def("play_cycle", (void (CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::play_cycle))
         .def("play_cycle", (void (CScriptGameObject::*)(LPCSTR, bool))(&CScriptGameObject::play_cycle))
@@ -141,6 +144,21 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("get_ammo_in_magazine", &CScriptGameObject::GetAmmoElapsed)
         .def("get_ammo_total", &CScriptGameObject::GetSuitableAmmoTotal)
         .def("set_ammo_elapsed", &CScriptGameObject::SetAmmoElapsed)
+        //Alundaio
+        .def("use", &CScriptGameObject::Use)
+        .def("start_trade", &CScriptGameObject::StartTrade)
+        .def("start_upgrade", &CScriptGameObject::StartUpgrade)
+        .def("get_ammo_type", &CScriptGameObject::GetAmmoType)
+        .def("set_ammo_type", &CScriptGameObject::SetAmmoType)
+        .def("get_ammo_count_for_type", &CScriptGameObject::GetAmmoCount)
+        .def("get_main_weapon_type", &CScriptGameObject::GetMainWeaponType)
+        .def("get_weapon_type", &CScriptGameObject::GetWeaponType)
+        .def("set_main_weapon_type", &CScriptGameObject::SetMainWeaponType)
+        .def("set_weapon_type", &CScriptGameObject::SetWeaponType)
+        .def("has_ammo_type", &CScriptGameObject::HasAmmoType)
+        .def("get_weapon_substate", &CScriptGameObject::GetWeaponSubstate)
+        .def("set_weight", &CScriptGameObject::SetWeight)
+        //-Alundaio
         .def("set_queue_size", &CScriptGameObject::SetQueueSize)
         //		.def("best_hit",					&CScriptGameObject::GetBestHit)
         //		.def("best_sound",					&CScriptGameObject::GetBestSound)

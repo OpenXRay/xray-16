@@ -44,7 +44,7 @@ void CLevelSoundManager::RealRefreshEnvGeometry()
         if ( MakeEnvGeometry(F, false) )
         {
                 IReader R( F.pointer(), F.size() );
-                ::Sound->set_geometry_env( &R );
+                GEnv.Sound->set_geometry_env( &R );
         }
 }
 
@@ -130,7 +130,7 @@ void CLevelSoundManager::OnFrame()
 /*
 void CLevelSoundManager::RefreshEnvLibrary()
 {
-        Sound->refresh_env_library();
+        GEnv.Sound->refresh_env_library();
         RefreshEnvGeometry ();
 }
 */

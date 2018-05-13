@@ -73,7 +73,7 @@ void SBinocVisibleObj::Draw()
 
 void SBinocVisibleObj::Update()
 {
-    m_flags.set(flVisObjNotValid, TRUE);
+    m_flags.set(flVisObjNotValid, true);
 
     if (!m_object->Visual())
         return;
@@ -131,11 +131,11 @@ void SBinocVisibleObj::Update()
         if (mn.similar(cur_rect.lt, 2.f) && mx.similar(cur_rect.rb, 2.f))
         {
             // target locked
-            m_flags.set(flTargetLocked, TRUE);
+            m_flags.set(flTargetLocked, true);
             u32 clr = subst_alpha(m_lt.GetTextureColor(), 255);
 
             //-----------------------------------------------------
-            CActor* pActor = NULL;
+            CActor* pActor = nullptr;
             if (IsGameTypeSingle())
                 pActor = Actor();
             else
@@ -191,17 +191,17 @@ void SBinocVisibleObj::Update()
     m_rt.SetWndPos(Fvector2().set((cur_rect.rb.x), (cur_rect.lt.y)));
     m_rb.SetWndPos(Fvector2().set((cur_rect.rb.x), (cur_rect.rb.y)));
 
-    m_flags.set(flVisObjNotValid, FALSE);
+    m_flags.set(flVisObjNotValid, false);
 }
 
 CBinocularsVision::CBinocularsVision(const shared_str& sect) { Load(sect); }
 CBinocularsVision::~CBinocularsVision() { delete_data(m_active_objects); }
 void CBinocularsVision::Update()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     //-----------------------------------------------------
-    const CActor* pActor = NULL;
+    const CActor* pActor = nullptr;
     if (IsGameTypeSingle())
         pActor = Actor();
     else
@@ -218,7 +218,7 @@ void CBinocularsVision::Update()
 
     VIS_OBJECTS_IT it = m_active_objects.begin();
     for (; it != m_active_objects.end(); ++it)
-        (*it)->m_flags.set(flVisObjNotValid, TRUE);
+        (*it)->m_flags.set(flVisObjNotValid, true);
 
     CVisualMemoryManager::VISIBLES::const_iterator v_it = vVisibles.begin();
     for (; v_it != vVisibles.end(); ++v_it)
@@ -239,18 +239,18 @@ void CBinocularsVision::Update()
 
         if (found != m_active_objects.end())
         {
-            (*found)->m_flags.set(flVisObjNotValid, FALSE);
+            (*found)->m_flags.set(flVisObjNotValid, false);
         }
         else
         {
             m_active_objects.push_back(new SBinocVisibleObj());
             SBinocVisibleObj* new_vis_obj = m_active_objects.back();
-            new_vis_obj->m_flags.set(flVisObjNotValid, FALSE);
+            new_vis_obj->m_flags.set(flVisObjNotValid, false);
             new_vis_obj->m_object = object_;
             new_vis_obj->create_default(m_frame_color.get());
             new_vis_obj->m_upd_speed = m_rotating_speed;
 
-            m_sounds.PlaySound("found_snd", Fvector().set(0, 0, 0), NULL, true);
+            m_sounds.PlaySound("found_snd", Fvector().set(0, 0, 0), nullptr, true);
         }
     }
     std::sort(m_active_objects.begin(), m_active_objects.end());
@@ -266,12 +266,12 @@ void CBinocularsVision::Update()
     {
         SBinocVisibleObj* visObj = (*it);
 
-        BOOL bLocked = visObj->m_flags.test(flTargetLocked);
+        const bool bLocked = visObj->m_flags.test(flTargetLocked);
 
         (*it)->Update();
 
         if (bLocked != visObj->m_flags.test(flTargetLocked))
-            m_sounds.PlaySound("catch_snd", Fvector().set(0, 0, 0), NULL, true);
+            m_sounds.PlaySound("catch_snd", Fvector().set(0, 0, 0), nullptr, true);
     }
 }
 

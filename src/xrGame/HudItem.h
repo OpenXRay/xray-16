@@ -48,7 +48,7 @@ public:
     IC u32 CurrStateTime() const { return Device.dwTimeGlobal - m_dw_curr_state_time; }
     IC void ResetSubStateTime() { m_dw_curr_substate_time = Device.dwTimeGlobal; }
     virtual void SwitchState(u32 S) = 0;
-    virtual void OnStateSwitch(u32 S) = 0;
+    virtual void OnStateSwitch(u32 S, u32 oldState) = 0;
 };
 
 class CHudItem : public CHUDState
@@ -91,7 +91,7 @@ public:
     virtual void OnH_A_Independent();
 
     virtual void PlaySound(LPCSTR alias, const Fvector& position);
-
+    virtual void PlaySound(pcstr alias, const Fvector& position, u8 index); //Alundaio: Play at index
     virtual bool Action(u16 cmd, u32 flags) { return false; }
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 
@@ -110,7 +110,7 @@ public:
     bool IsHiding() const { return GetState() == eHiding; }
     bool IsShowing() const { return GetState() == eShowing; }
     virtual void SwitchState(u32 S);
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
 
     virtual void OnAnimationEnd(u32 state);
     virtual void OnMotionMark(u32 state, const motion_marks&){};
@@ -180,4 +180,6 @@ public:
     virtual void debug_draw_firedeps(){};
 
     virtual CHudItem* cast_hud_item() { return this; }
+    void PlayAnimIdleMovingCrouch(); //AVO: new crouch idle animation
+    bool isHUDAnimationExist(pcstr anim_name);
 };

@@ -18,7 +18,7 @@ bool CTrade::CanTrade()
 {
     CEntity* pEntity;
 
-    m_nearest.clear_not_free();
+    m_nearest.clear();
     Level().ObjectSpace.GetNearest(m_nearest, pThis.base->Position(), 2.f, NULL);
     if (!m_nearest.empty())
     {
@@ -63,11 +63,11 @@ bool CTrade::CanTrade()
     return true;
 }
 
-void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
+void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying, bool bFree)
 {
     // сумма сделки учитывая ценовой коэффициент
     // актер цену не говорит никогда, все делают за него
-    u32 dwTransferMoney = GetItemPrice(pItem, bBuying);
+    u32 dwTransferMoney = GetItemPrice(pItem, bBuying, bFree);
 
     if (bBuying)
     {
@@ -84,7 +84,7 @@ void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
     CGameObject* O2 = smart_cast<CGameObject*>(pThis.inv_owner);
 
     if (!bBuying)
-        swap(O1, O2);
+        std::swap(O1, O2);
 
     NET_Packet P;
     O1->u_EventGen(P, GE_TRADE_SELL, O1->ID());
@@ -136,8 +136,11 @@ CInventory& CTrade::GetTradeInv(SInventoryOwner owner)
 CTrade* CTrade::GetPartnerTrade() { return pPartner.inv_owner->GetTrade(); }
 CInventory* CTrade::GetPartnerInventory() { return &GetTradeInv(pPartner); }
 CInventoryOwner* CTrade::GetPartner() { return pPartner.inv_owner; }
-u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
+u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
 {
+    if (bFree)
+        return 0;
+
     CArtefact* pArtefact = smart_cast<CArtefact*>(pItem);
 
     // computing base_cost
@@ -225,9 +228,9 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
     // use some script discounts
     luabind::functor<float> func;
     if (b_buying)
-        R_ASSERT(ai().script_engine().functor("trade_manager.get_buy_discount", func));
+        R_ASSERT(GEnv.ScriptEngine->functor("trade_manager.get_buy_discount", func));
     else
-        R_ASSERT(ai().script_engine().functor("trade_manager.get_sell_discount", func));
+        R_ASSERT(GEnv.ScriptEngine->functor("trade_manager.get_sell_discount", func));
 
     result = iFloor(result * func(smart_cast<const CGameObject*>(pThis.inv_owner)->ID()));
     // if(result>500)

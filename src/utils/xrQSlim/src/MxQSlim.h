@@ -48,14 +48,13 @@ public:
 
 class MxEdgeQSlim : public MxQSlim
 {
-private:
-    typedef MxSizedDynBlock<MxQSlimEdge*, 6> edge_list;
+    using edge_list = MxSizedDynBlock<MxQSlimEdge*, 6>;
 
     MxBlock<edge_list> edge_links;
 
     //
     // Temporary variables used by methods
-    DEFINE_VECTOR(MxQSlimEdge*, EdgeVec, EdgeVecIt);
+    using EdgeVec = xr_vector<MxQSlimEdge*>;
     EdgeVec edges;
     MxVertexList star, star2;
     MxPairContraction conx_tmp;

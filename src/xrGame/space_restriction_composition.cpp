@@ -95,24 +95,24 @@ void CSpaceRestrictionComposition::initialize()
 
     // computing almost minimum sphere which covers all the almost minimum spheres
     Fbox3 temp;
-    temp.min.x = spheres[0].P.x - spheres[0].R;
-    temp.min.y = spheres[0].P.y - spheres[0].R;
-    temp.min.z = spheres[0].P.z - spheres[0].R;
-    temp.max.x = spheres[0].P.x + spheres[0].R;
-    temp.max.y = spheres[0].P.y + spheres[0].R;
-    temp.max.z = spheres[0].P.z + spheres[0].R;
+    temp.vMin.x = spheres[0].P.x - spheres[0].R;
+    temp.vMin.y = spheres[0].P.y - spheres[0].R;
+    temp.vMin.z = spheres[0].P.z - spheres[0].R;
+    temp.vMax.x = spheres[0].P.x + spheres[0].R;
+    temp.vMax.y = spheres[0].P.y + spheres[0].R;
+    temp.vMax.z = spheres[0].P.z + spheres[0].R;
 
     for (u32 i = 1; i < n; ++i)
     {
-        temp.min.x = _min(temp.min.x, spheres[i].P.x - spheres[i].R);
-        temp.min.y = _min(temp.min.y, spheres[i].P.y - spheres[i].R);
-        temp.min.z = _min(temp.min.z, spheres[i].P.z - spheres[i].R);
-        temp.max.x = _max(temp.max.x, spheres[i].P.x + spheres[i].R);
-        temp.max.y = _max(temp.max.y, spheres[i].P.y + spheres[i].R);
-        temp.max.z = _max(temp.max.z, spheres[i].P.z + spheres[i].R);
+        temp.vMin.x = _min(temp.vMin.x, spheres[i].P.x - spheres[i].R);
+        temp.vMin.y = _min(temp.vMin.y, spheres[i].P.y - spheres[i].R);
+        temp.vMin.z = _min(temp.vMin.z, spheres[i].P.z - spheres[i].R);
+        temp.vMax.x = _max(temp.vMax.x, spheres[i].P.x + spheres[i].R);
+        temp.vMax.y = _max(temp.vMax.y, spheres[i].P.y + spheres[i].R);
+        temp.vMax.z = _max(temp.vMax.z, spheres[i].P.z + spheres[i].R);
     }
 
-    m_sphere.P.mad(temp.min, temp.max, .5f);
+    m_sphere.P.mad(temp.vMin, temp.vMax, .5f);
     m_sphere.R = m_sphere.P.distance_to(spheres[0].P) + spheres[0].R;
 
     for (u32 i = 1; i < n; ++i)

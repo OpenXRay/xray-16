@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrEngine/device.h"
 
 IC refreshable_obstacles_query::refreshable_obstacles_query() { m_last_update_time = 0; }
 IC const float& refreshable_obstacles_query::refresh_radius()

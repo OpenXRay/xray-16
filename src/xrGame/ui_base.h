@@ -1,9 +1,12 @@
 #pragma once
+#include "ui_defs.h"
+#include "xrEngine/pure.h"
+#include "xrEngine/device.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_stack.h"
 
 class CUICursor;
 class CUIGameCustom;
-
-#include "ui_defs.h"
 
 class CDeviceResetNotifier : public pureDeviceReset
 {

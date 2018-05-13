@@ -36,6 +36,19 @@ public:
     virtual void create_physic_shell();
 
     virtual CArtefact* cast_artefact() { return this; }
+
+    float GetHealthPower() const { return m_fHealthRestoreSpeed; }
+    float GetRadiationPower() const { return m_fRadiationRestoreSpeed; }
+    float GetSatietyPower() const { return m_fSatietyRestoreSpeed; }
+    float GetPowerPower() const { return m_fPowerRestoreSpeed; }
+    float GetBleedingPower() const { return m_fBleedingRestoreSpeed; }
+
+    void SetHealthPower(const float value) { m_fHealthRestoreSpeed = value; }
+    void SetRadiationPower(const float value) { m_fRadiationRestoreSpeed = value; }
+    void SetSatietyPower(const float value) { m_fSatietyRestoreSpeed = value; }
+    void SetPowerPower(const float value) { m_fPowerRestoreSpeed = value; }
+    void SetBleedingPower(const float value) { m_fBleedingRestoreSpeed = value; }
+
 protected:
     virtual void UpdateCLChild(){};
     virtual void CreateArtefactActivation();
@@ -96,7 +109,7 @@ public:
     virtual void Show();
     virtual void UpdateXForm();
     virtual bool Action(u16 cmd, u32 flags);
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnAnimationEnd(u32 state);
     virtual bool IsHidden() const { return GetState() == eHidden; }
     // optimization FAST/SLOW mode

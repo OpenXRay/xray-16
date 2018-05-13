@@ -8,6 +8,7 @@
 #include "PDA.h"
 #include "inventoryowner.h"
 #include "xrserver_objects_alife_items.h"
+#include "xrServerEntities/xrMessages.h"
 
 CInfoDocument::CInfoDocument(void) { m_Info = NULL; }
 CInfoDocument::~CInfoDocument(void) {}

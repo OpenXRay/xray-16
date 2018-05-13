@@ -95,7 +95,7 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
     clr.a = 1.f;
     clr.mul_rgb(fBrightness);
 
-    light_render = GlobalEnv.Render->light_create();
+    light_render = GEnv.Render->light_create();
     light_render->set_shadow(!!lamp->flags.is(CSE_ALifeObjectHangingLamp::flCastShadow));
     light_render->set_volumetric(!!lamp->flags.is(CSE_ALifeObjectHangingLamp::flVolumetric));
     light_render->set_type(
@@ -111,7 +111,7 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 
     if (lamp->glow_texture.size())
     {
-        glow_render = GlobalEnv.Render->glow_create();
+        glow_render = GEnv.Render->glow_create();
         glow_render->set_texture(*lamp->glow_texture);
         glow_render->set_color(clr);
         glow_render->set_radius(lamp->glow_radius);
@@ -120,7 +120,7 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
     if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flPointAmbient))
     {
         ambient_power = lamp->m_ambient_power;
-        light_ambient = GlobalEnv.Render->light_create();
+        light_ambient = GEnv.Render->light_create();
         light_ambient->set_type(IRender_Light::POINT);
         light_ambient->set_shadow(false);
         clr.mul_rgb(ambient_power);
@@ -320,8 +320,7 @@ void CHangingLamp::TurnOff()
             make_string("can not Turn Off lamp: %s, visual %s - because all bones become invisible",
                 cNameVisual().c_str(), cName().c_str()));
     }
-    if (!PPhysicsShell()) // if we have physiccs_shell it will call processing deactivate when disable
-        processing_deactivate();
+    processing_deactivate();
     m_bState = 0;
 }
 
@@ -369,12 +368,12 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
             _GetItem(fixed_bones, i, fixed_bone);
             u16 fixed_bone_id = pKinematics->LL_BoneID(fixed_bone);
             R_ASSERT2(BI_NONE != fixed_bone_id, "wrong fixed bone");
-            bone_map.insert(mk_pair(fixed_bone_id, physicsBone()));
+            bone_map.insert(std::make_pair(fixed_bone_id, physicsBone()));
         }
     }
     else
     {
-        bone_map.insert(mk_pair(pKinematics->LL_GetBoneRoot(), physicsBone()));
+        bone_map.insert(std::make_pair(pKinematics->LL_GetBoneRoot(), physicsBone()));
     }
 
     phys_shell_verify_object_model(*this);
@@ -387,7 +386,7 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
     m_pPhysicsShell->SetAirResistance(); // 0.0014f,1.5f
 
     /////////////////////////////////////////////////////////////////////////////
-    BONE_P_PAIR_IT i = bone_map.begin(), e = bone_map.end();
+    auto i = bone_map.begin(), e = bone_map.end();
     for (; i != e; i++)
     {
         CPhysicsElement* fixed_element = i->second.element;

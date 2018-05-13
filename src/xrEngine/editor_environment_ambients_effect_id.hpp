@@ -5,19 +5,13 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment ambients effect identifier class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED
-#define EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace effects
@@ -27,24 +21,24 @@ class manager;
 
 namespace ambients
 {
-class effect_id : public editor::property_holder_holder, private Noncopyable
+class effect_id : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     effect_id(effects::manager const& manager, shared_str const& id);
     virtual ~effect_id();
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_id; }
+
 private:
-    typedef editor::property_holder property_holder_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
 
 public:
     virtual property_holder_type* object();
 
 private:
-    LPCSTR const* xr_stdcall collection();
+    pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
-private:
     property_holder_type* m_property_holder;
     effects::manager const& m_manager;
     shared_str m_id;
@@ -53,6 +47,3 @@ private:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED

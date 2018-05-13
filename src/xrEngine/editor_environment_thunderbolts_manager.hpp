@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment thunderbolts manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_THUNDERBOLTS_MANAGER_HPP_INCLUDED
-#define EDITOR_WEATHER_THUNDERBOLTS_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
@@ -17,10 +13,16 @@
 struct SThunderboltDesc;
 struct SThunderboltCollection;
 
+namespace XRay
+{
+namespace Editor
+{
+class property_holder_base;
+}
+}
+
 namespace editor
 {
-class property_holder;
-
 namespace environment
 {
 class manager;
@@ -38,7 +40,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(editor::property_holder* holder);
+    void fill(XRay::Editor::property_holder_base* holder);
     SThunderboltDesc* description(CInifile& config, shared_str const& section) const;
     SThunderboltCollection* get_collection(shared_str const& section);
 
@@ -49,8 +51,8 @@ public:
 public:
     typedef xr_vector<thunderbolt*> thunderbolt_container_type;
     typedef xr_vector<collection*> collection_container_type;
-    typedef xr_vector<LPSTR> thunderbolts_ids_type;
-    typedef xr_vector<LPSTR> collections_ids_type;
+    typedef xr_vector<pstr> thunderbolts_ids_type;
+    typedef xr_vector<pstr> collections_ids_type;
 
 public:
     thunderbolts_ids_type const& thunderbolts_ids() const;
@@ -64,7 +66,7 @@ private:
     void save_collections();
 
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
     typedef property_collection<thunderbolt_container_type, manager> thunderbolt_collection_type;
     typedef property_collection<collection_container_type, manager> collection_collection_type;
 
@@ -94,6 +96,3 @@ private:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_MANAGER_HPP_INCLUDED

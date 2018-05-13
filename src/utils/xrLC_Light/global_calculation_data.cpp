@@ -129,7 +129,7 @@ void global_claculation_data::xrLoad()
                 LPSTR N = BT.name;
                 if (strchr(N, '.'))
                     *(strchr(N, '.')) = 0;
-                strlwr(N);
+                xr_strlwr(N);
 
                 if (0 == xr_strcmp(N, "level_lods"))
                 {
@@ -138,7 +138,7 @@ void global_claculation_data::xrLoad()
                     BT.dwHeight = 1024;
                     BT.bHasAlpha = TRUE;
                     BT.pSurface = 0;
-                    BT.THM.SetHasSurface(FALSE);
+                    BT.THM.SetHasSurface(false);
                 }
                 else
                 {
@@ -170,7 +170,7 @@ void global_claculation_data::xrLoad()
                     BT.dwHeight = BT.THM.height;
                     BT.bHasAlpha = BT.THM.HasAlphaChannel();
                     BT.pSurface = 0;
-                    BT.THM.SetHasSurface(FALSE);
+                    BT.THM.SetHasSurface(false);
                     if (!bLOD)
                     {
                         if (BT.bHasAlpha || BT.THM.flags.test(STextureParams::flImplicitLighted))
@@ -178,7 +178,7 @@ void global_claculation_data::xrLoad()
                             Logger.clMsg("- loading: %s", N);
                             u32 w = 0, h = 0;
                             BT.pSurface = Surface_Load(N, w, h);
-                            BT.THM.SetHasSurface(TRUE);
+                            BT.THM.SetHasSurface(true);
                             R_ASSERT2(BT.pSurface, "Can't load surface");
                             if ((w != BT.dwWidth) || (h != BT.dwHeight))
                                 Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight,

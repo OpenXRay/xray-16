@@ -24,7 +24,8 @@ struct SIndexDist
     SIndexDist() { ZeroMemory(this, sizeof(SIndexDist)); }
 };
 
-DEFINE_SVECTOR(SIndexDist, 4, SIndexDistVec, SIndexDistIt);
+typedef svector<SIndexDist, 4> SIndexDistVec;
+typedef SIndexDistVec::iterator SIndexDistIt;
 
 DEFINE_MAP(u32, DOVec, ColorIndexMap, ColorIndexPairIt);
 

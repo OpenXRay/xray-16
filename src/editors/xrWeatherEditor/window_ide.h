@@ -1,9 +1,8 @@
 #pragma once
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
-using namespace System::Windows::Forms;
+//using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
 
@@ -11,6 +10,15 @@ namespace editor
 {
 ref class window_ide;
 }
+
+namespace XRay
+{
+namespace Editor
+{
+class ide_base;
+class engine_base;
+} // namespace Editor
+} // namespace XRay
 
 namespace WeifenLuo
 {
@@ -22,9 +30,6 @@ interface class IDockContent;
 
 namespace editor
 {
-class engine;
-class ide;
-
 ref class window_view;
 ref class window_levels;
 ref class window_weather;
@@ -39,11 +44,10 @@ ref class window_weather_editor;
 ///          the designers will not be able to interact properly with localized
 ///          resources associated with this form.
 /// </summary>
-public
-ref class window_ide : public System::Windows::Forms::Form
+public ref class window_ide : public System::Windows::Forms::Form
 {
 public:
-    window_ide(editor::engine* engine)
+    window_ide(XRay::Editor::engine_base* engine)
     {
         InitializeComponent();
         //
@@ -65,9 +69,8 @@ protected:
         }
     }
 
-protected:
-private:
-    WeifenLuo::WinFormsUI::DockPanel ^ Editor;
+private: WeifenLuo::WinFormsUI::Docking::DockPanel^ EditorDock;
+private: WeifenLuo::WinFormsUI::Docking::VS2015LightTheme^ EditorTheme;
 
 private:
     /// <summary>
@@ -82,41 +85,34 @@ private:
     /// </summary>
     void InitializeComponent(void)
     {
-        this->Editor = (gcnew WeifenLuo::WinFormsUI::DockPanel());
+        this->EditorDock = (gcnew WeifenLuo::WinFormsUI::Docking::DockPanel());
+        this->EditorTheme = (gcnew WeifenLuo::WinFormsUI::Docking::VS2015LightTheme());
         this->SuspendLayout();
-        //
-        // Editor
-        //
-        this->Editor->ActiveAutoHideContent = nullptr;
-        this->Editor->Dock = System::Windows::Forms::DockStyle::Fill;
-        this->Editor->DocumentStyle = WeifenLuo::WinFormsUI::DocumentStyles::DockingSdi;
-        this->Editor->Font = (gcnew System::Drawing::Font(
-            L"Tahoma", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::World));
-        this->Editor->Location = System::Drawing::Point(0, 0);
-        this->Editor->Name = L"Editor";
-        this->Editor->Size = System::Drawing::Size(632, 453);
-        this->Editor->TabIndex = 17;
-        //
-        // window_ide
-        //
+        this->EditorDock->Dock = System::Windows::Forms::DockStyle::Fill;
+        this->EditorDock->DocumentStyle = WeifenLuo::WinFormsUI::Docking::DocumentStyle::DockingSdi;
+        this->EditorDock->Font = (gcnew System::Drawing::Font(L"Tahoma", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::World));
+        this->EditorDock->Location = System::Drawing::Point(0, 0);
+        this->EditorDock->Name = L"EditorDock";
+        this->EditorDock->Size = System::Drawing::Size(632, 453);
+        this->EditorDock->TabIndex = 17;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(632, 453);
-        this->Controls->Add(this->Editor);
+        this->Controls->Add(this->EditorDock);
         this->Name = L"window_ide";
         this->StartPosition = System::Windows::Forms::FormStartPosition::Manual;
         this->Text = L"editor";
-        this->Deactivate += gcnew System::EventHandler(this, &window_ide::window_ide_Deactivate);
-        this->SizeChanged += gcnew System::EventHandler(this, &window_ide::window_ide_SizeChanged);
         this->Activated += gcnew System::EventHandler(this, &window_ide::window_ide_Activated);
-        this->FormClosing +=
-            gcnew System::Windows::Forms::FormClosingEventHandler(this, &window_ide::window_ide_FormClosing);
+        this->Deactivate += gcnew System::EventHandler(this, &window_ide::window_ide_Deactivate);
+        this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &window_ide::window_ide_FormClosing);
         this->LocationChanged += gcnew System::EventHandler(this, &window_ide::window_ide_LocationChanged);
+        this->SizeChanged += gcnew System::EventHandler(this, &window_ide::window_ide_SizeChanged);
         this->ResumeLayout(false);
+
     }
 #pragma endregion
 protected:
-    editor::engine* m_engine;
+    XRay::Editor::engine_base* m_engine;
 
 private:
     System::Drawing::Rectangle ^ m_window_rectangle;
@@ -128,12 +124,12 @@ private:
     window_weather_editor ^ m_weather_editor;
 
 protected:
-    editor::ide* m_ide;
+    XRay::Editor::ide_base* m_ide;
 
 public:
-    editor::ide& ide();
+    XRay::Editor::ide_base& ide();
     window_view % view();
-    editor::engine& engine();
+    XRay::Editor::engine_base& engine();
 
 public:
     window_levels % levels();
@@ -142,19 +138,18 @@ public:
     Microsoft::Win32::RegistryKey ^ base_registry_key();
 
 private:
-    void custom_init(editor::engine* engine);
+    void custom_init(XRay::Editor::engine_base* engine);
     void custom_finalize();
     void save_on_exit();
     void load_on_create();
 
 private:
-    WeifenLuo::WinFormsUI::IDockContent ^ reload_content(System::String ^ persist_string);
+    WeifenLuo::WinFormsUI::Docking::IDockContent ^ reload_content(System::String ^ persist_string);
 
-private:
-    Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e);
-    Void window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e);
+private: System::Void window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
 };
 }

@@ -68,7 +68,7 @@ MxVertexID MxBlockModel::alloc_vertex(float x, float y, float z)
 
 MxVertexID MxBlockModel::add_vertex(float x, float y, float z)
 {
-    MxVertexID id = alloc_vertex(x, y, z);
+    auto id = alloc_vertex(x, y, z);
     init_vertex(id);
     return id;
 }
@@ -103,7 +103,7 @@ void MxBlockModel::remove_face(MxFaceID f)
 
 MxFaceID MxBlockModel::add_face(unsigned int v1, unsigned int v2, unsigned int v3, bool will_link)
 {
-    MxFaceID id = alloc_face(v1, v2, v3);
+    auto id = alloc_face(v1, v2, v3);
     if (will_link)
         init_face(id);
     return id;
@@ -154,8 +154,8 @@ static unsigned int binding_size(MxBlockModel& m, unsigned char i)
     switch (i)
     {
     case MX_UNBOUND: return 0;
-    case MX_PERVERTEX: return _max(1, m.vert_count());
-    case MX_PERFACE: return _max(1, m.face_count());
+    case MX_PERVERTEX: return std::max(1u, m.vert_count());
+    case MX_PERFACE: return std::max(1u, m.face_count());
     default: return 0;
     }
 }
@@ -164,8 +164,7 @@ const char* MxBlockModel::binding_name(int b)
 {
     if (b > MX_MAX_BINDING)
         return NULL;
-    else
-        return bindings[b];
+    return bindings[b];
 }
 
 int MxBlockModel::parse_binding(const char* name)
@@ -294,7 +293,7 @@ double MxBlockModel::compute_face_area(MxFaceID f)
 double MxBlockModel::compute_face_perimeter(MxFaceID fid, bool* flags)
 {
     double perim = 0.0;
-    const MxFace& f = face(fid);
+    const auto& f = face(fid);
 
     for (unsigned int i = 0; i < 3; i++)
     {
@@ -310,8 +309,8 @@ double MxBlockModel::compute_face_perimeter(MxFaceID fid, bool* flags)
 
 double MxBlockModel::compute_corner_angle(MxFaceID f, unsigned int i)
 {
-    unsigned int i_prev = (i == 0) ? 2 : i - 1;
-    unsigned int i_next = (i == 2) ? 0 : i + 1;
+    auto i_prev = (i == 0) ? 2 : i - 1;
+    auto i_next = (i == 2) ? 0 : i + 1;
 
     float e_prev[3], e_next[3];
     mxv_unitize(mxv_sub(e_prev, corner(f, (short)i_prev), corner(f, (short)i), 3), 3);

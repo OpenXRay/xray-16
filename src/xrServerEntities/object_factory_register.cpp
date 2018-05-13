@@ -135,7 +135,7 @@
 #include "torridZone.h"
 #include "ZoneVisual.h"
 #include "hairszone.h"
-//. #	include "amebazone.h"
+#include "AmebaZone.h"
 #include "nogravityzone.h"
 #include "simpledetector.h"
 #include "elitedetector.h"
@@ -181,7 +181,6 @@
 #endif // NO_XR_GAME
 
 #ifndef NO_XR_GAME
-ENGINE_API bool g_dedicated_server;
 #define ADD(a, b, c, d) add<a, b>(c, d)
 #define ADD_MP(a, b, c, d, e, f) add(new CObjectItemClientServerSingleMp<a, b, c, d>(e, f))
 #else
@@ -362,7 +361,7 @@ void CObjectFactory::register_classes()
     ADD(CTeamBaseZone, CSE_ALifeTeamBaseZone, CLSID_Z_TEAM_BASE, "team_base_zone");
     ADD(CTorridZone, CSE_ALifeTorridZone, CLSID_Z_TORRID, "torrid_zone");
     ADD(CSpaceRestrictor, CSE_ALifeSpaceRestrictor, CLSID_SPACE_RESTRICTOR, "space_restrictor");
-    //.	ADD(CAmebaZone				,CSE_ALifeZoneVisual			,CLSID_Z_AMEBA					,"ameba_zone");
+    ADD(CAmebaZone, CSE_ALifeZoneVisual, CLSID_Z_AMEBA, "ameba_zone");
     ADD(CNoGravityZone, CSE_ALifeAnomalousZone, CLSID_Z_NOGRAVITY, "nogravity_zone");
     ADD(CZoneCampfire, CSE_ALifeAnomalousZone, CLSID_Z_CAMPFIRE, "zone_campfire");
     // Detectors
@@ -398,7 +397,7 @@ void CObjectFactory::register_classes()
     // because we do not have scripts
     // and script functionality is not
     // needed here
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         return;
 
     ADD(CElectricBall, CSE_ALifeItemArtefact, TEXT2CLSID("SCRPTART"), "artefact_s");
@@ -427,6 +426,8 @@ void CObjectFactory::register_classes()
     ADD(CMosquitoBald, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_MBALD"), "zone_mbald_s");
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_GALAN"), "zone_galant_s");
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_MINCE"), "zone_mincer_s");
+    ADD(CAmebaZone, CSE_ALifeZoneVisual	, TEXT2CLSID("ZS_AMEBA"), "zone_ameba_s");
+    ADD(CNoGravityZone, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_NGRAV"), "zone_nograv_s");
     ADD(CSpaceRestrictor, CSE_ALifeSpaceRestrictor, TEXT2CLSID("SPC_RS_S"), "script_restr");
 #endif // NO_XR_GAME
 }

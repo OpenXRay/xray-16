@@ -6,14 +6,12 @@
 //	Description : collection property editor implementation class
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef PROPERTY_COLLECTION_EDITOR_HPP_INCLUDED
-#define PROPERTY_COLLECTION_EDITOR_HPP_INCLUDED
+#pragma once
 
 ref class property_collection;
 ref class property_container;
 
-public
-ref class property_collection_editor : public System::ComponentModel::Design::CollectionEditor
+public ref class property_collection_editor : public System::ComponentModel::Design::CollectionEditor
 {
 public:
     typedef System::ComponentModel::Design::CollectionEditor inherited;
@@ -26,7 +24,7 @@ public:
 
 public:
     property_collection_editor(Type ^ type);
-    virtual Object ^ EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value) override;
+    virtual Object ^ EditValue(ITypeDescriptorContext ^ context,  System::IServiceProvider ^ provider, Object ^ value) override;
 
 protected:
     virtual Type ^ CreateCollectionItemType() override;
@@ -40,5 +38,3 @@ private:
 private:
     CollectionForm ^ m_collection_form;
 }; // ref class property_collection_editor
-
-#endif // ifndef PROPERTY_COLLECTION_EDITOR_HPP_INCLUDED

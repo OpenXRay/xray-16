@@ -41,7 +41,10 @@ SCRIPT_EXPORT(CScriptSound, (), {
                 (void (CScriptSound::*)(CScriptGameObject*, const Fvector&, float, int))(&CScriptSound::PlayAtPos))
             .def("play_no_feedback", &CScriptSound::PlayNoFeedback)
             .def("stop", &CScriptSound::Stop)
-            .def("stop_deffered", &CScriptSound::StopDeffered)
+            // preserved for backwards compatibility
+            // XXX: review
+            .def("stop_deffered", &CScriptSound::StopDeferred)
+            .def("stop_deferred", &CScriptSound::StopDeferred)
             .def("playing", &CScriptSound::IsPlaying)
             .def("length", &CScriptSound::Length)
             .def("attach_tail", &CScriptSound::AttachTail)];

@@ -14,6 +14,7 @@
 #include "eatable_item_object.h"
 #include "Missile.h"
 #include "game_cl_base_weapon_usage_statistic.h"
+#include "xrNetServer/NET_Messages.h"
 #include "clsid_game.h"
 
 //#define DELAYED_ROUND_TIME	7000
@@ -1248,7 +1249,7 @@ void game_sv_Deathmatch::LoadTeams()
     LoadTeamData("deathmatch_team0");
 };
 
-s32 game_sv_Deathmatch::GetMoneyAmount(const shared_str& caSection, char* caMoneyStr)
+s32 game_sv_Deathmatch::GetMoneyAmount(const shared_str& caSection, pcstr caMoneyStr)
 {
     if (pSettings->line_exist(caSection, caMoneyStr))
         return pSettings->r_s32(caSection, caMoneyStr);
@@ -1494,7 +1495,7 @@ void game_sv_Deathmatch::LoadAnomalySets()
     if (!g_pGameLevel || !Level().pLevel)
         return;
 
-    char* ASetBaseName = GetAnomalySetBaseName();
+    const auto ASetBaseName = GetAnomalySetBaseName();
 
     string1024 SetName, AnomaliesNames, AnomalyName;
     ANOMALIES AnomalySingleSet;
@@ -1528,8 +1529,8 @@ void game_sv_Deathmatch::LoadAnomalySets()
     if (Level().pLevel->line_exist(ASetBaseName, "permanent"))
     {
         xr_strcpy(AnomaliesNames, Level().pLevel->r_string(ASetBaseName, "permanent"));
-        u32 count = _GetItemCount(AnomaliesNames);
-        for (u32 j = 0; j < count; j++)
+        int count = _GetItemCount(AnomaliesNames);
+        for (int j = 0; j < count; j++)
         {
             _GetItem(AnomaliesNames, j, AnomalyName);
             m_AnomaliesPermanent.push_back(AnomalyName);
@@ -1826,7 +1827,7 @@ void game_sv_Deathmatch::OnPlayerConnect(ClientID id_who)
 
     ps_who->resetFlag(GAME_PLAYER_FLAG_SKIP);
 
-    if ((g_dedicated_server || m_bSpectatorMode) && (xrCData == m_server->GetServerClient()))
+    if ((GEnv.isDedicatedServer || m_bSpectatorMode) && (xrCData == m_server->GetServerClient()))
     {
         ps_who->setFlag(GAME_PLAYER_FLAG_SKIP);
         return;
@@ -2035,7 +2036,7 @@ BOOL game_sv_Deathmatch::Is_Anomaly_InLists(CSE_Abstract* E)
         if (pCustomZone->m_owner_id != 0xffffffff) return TRUE;
     }
 
-    ANOMALIES_it It = std::find(m_AnomaliesPermanent.begin(), m_AnomaliesPermanent.end(),E->name_replace());
+    auto It = std::find(m_AnomaliesPermanent.begin(), m_AnomaliesPermanent.end(),E->name_replace());
     if (It != m_AnomaliesPermanent.end())
     {
         return TRUE;
@@ -2044,7 +2045,7 @@ BOOL game_sv_Deathmatch::Is_Anomaly_InLists(CSE_Abstract* E)
     for (u32 j=0; j<m_AnomalySetsList.size(); j++)
     {
         ANOMALIES* Anomalies = &(m_AnomalySetsList[j]);
-        ANOMALIES_it It = std::find(Anomalies->begin(), Anomalies->end(),E->name_replace());
+        auto It = std::find(Anomalies->begin(), Anomalies->end(),E->name_replace());
         if (It != Anomalies->end())
         {
             return TRUE;
@@ -2084,7 +2085,7 @@ void game_sv_Deathmatch::OnPostCreate(u16 eid_who)
     for (u32 j = 0; j < m_AnomalySetsList.size(); j++)
     {
         ANOMALIES* Anomalies = &(m_AnomalySetsList[j]);
-        ANOMALIES_it It = std::find(Anomalies->begin(), Anomalies->end(), pCustomZone->name_replace());
+        auto It = std::find(Anomalies->begin(), Anomalies->end(), pCustomZone->name_replace());
         if (It != Anomalies->end())
         {
             m_AnomalyIDSetsList[j].push_back(eid_who);
@@ -2099,7 +2100,7 @@ void game_sv_Deathmatch::OnPostCreate(u16 eid_who)
         };
     };
     /*
-    ANOMALIES_it It = std::find(m_AnomaliesPermanent.begin(), m_AnomaliesPermanent.end(),pCustomZone->name_replace());
+    auto It = std::find(m_AnomaliesPermanent.begin(), m_AnomaliesPermanent.end(),pCustomZone->name_replace());
     if (It == m_AnomaliesPermanent.end())
     {
         Msg("! Anomaly Not Found in any Set : %s", pCustomZone->name_replace());
@@ -2174,7 +2175,7 @@ void game_sv_Deathmatch::ReadOptions(shared_str& options)
     g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
     //-----------------------------------------------------------------------
     m_bSpectatorMode = false;
-    if (!g_dedicated_server && (get_option_i(*options, "spectr", -1) != -1))
+    if (!GEnv.isDedicatedServer && (get_option_i(*options, "spectr", -1) != -1))
     {
         m_bSpectatorMode = true;
         m_dwSM_SwitchDelta = get_option_i(*options, "spectr", 0) * 1000;

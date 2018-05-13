@@ -5,6 +5,7 @@
 
 #include "ui_base.h"
 #include "Common/Noncopyable.hpp"
+#include "xrEngine/GameFont.h"
 
 typedef CGameFont::EAligment ETextAlignment;
 

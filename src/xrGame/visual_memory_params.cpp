@@ -10,7 +10,7 @@
 #include "visual_memory_params.h"
 #include "memory_space.h"
 
-void CVisionParameters::Load(LPCSTR section, bool not_a_stalker)
+void CVisionParameters::Load(pcstr section, bool not_a_stalker)
 {
     m_transparency_threshold = pSettings->r_float(section, "transparency_threshold");
     m_still_visible_time = READ_IF_EXISTS(pSettings, r_u32, section, "still_visible_time", 0);

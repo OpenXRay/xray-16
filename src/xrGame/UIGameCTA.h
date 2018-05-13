@@ -1,9 +1,12 @@
+#pragma once
 #ifndef UIGAMECTA
 #define UIGAMECTA
 
 #include "UIGameMP.h"
 #include "game_base.h"
 #include "inventory.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCore/buffer_vector.h"
 
 class UITeamPanels;
 
@@ -25,7 +28,6 @@ class CUITextWnd;
 /// This class used to control UI part of client for Capture the Artefact mp game mode.
 class CUIGameCTA : public UIGameMP
 {
-private:
     CUISpawnWnd* m_pUITeamSelectWnd;
     CUIStatic* m_team1_icon;
     CUIStatic* m_team2_icon;
@@ -82,7 +84,7 @@ private:
         };
     };
 
-    DEF_VECTOR(PRESET_ITEMS, PresetItem);
+    using PRESET_ITEMS = xr_vector<PresetItem>;
 
     PRESET_ITEMS PlayerDefItems;
 

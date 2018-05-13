@@ -55,14 +55,13 @@ Object ^ property_converter_integer_enum::ConvertTo(
     property_integer_enum_value ^ real_value = safe_cast<property_integer_enum_value ^>(raw_value);
     int int_value = safe_cast<int>(value);
 
-    for
-        each(ValuePair ^ i in real_value->m_collection)
-        {
-            if (i->first != int_value)
-                continue;
+    for each(ValuePair ^ i in real_value->m_collection)
+    {
+        if (i->first != int_value)
+            continue;
 
-            return (i->second);
-        }
+        return (i->second);
+     }
 
     return (safe_cast<ValuePair ^>(real_value->m_collection[0])->second);
 }

@@ -3,29 +3,28 @@
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-#pragma comment(lib, "xrEngine.lib")
-#pragma comment(lib, "xrScriptEngine.lib")
-
-extern "C" void XR_EXPORT SetupEnv()
+void SetupEnvR1()
 {
-    GlobalEnv.Render = &RImplementation;
-    GlobalEnv.RenderFactory = &RenderFactoryImpl;
-    GlobalEnv.DU = &DUImpl;
-    GlobalEnv.UIRender = &UIRenderImpl;
+    GEnv.Render = &RImplementation;
+    GEnv.RenderFactory = &RenderFactoryImpl;
+    GEnv.DU = &DUImpl;
+    GEnv.UIRender = &UIRenderImpl;
 #ifdef DEBUG
-    GlobalEnv.DRender = &DebugRenderImpl;
+    GEnv.DRender = &DebugRenderImpl;
 #endif
     xrRender_initconsole();
 }
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+// This must not be optimized by compiler
+static const volatile class GEnvHelper
 {
-    switch (ul_reason_for_call)
+public:
+    GEnvHelper()
     {
-    case DLL_PROCESS_ATTACH: SetupEnv(); break;
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH: break;
+        GEnv.SetupR1 = SetupEnvR1;
     }
-    return TRUE;
-}
+    ~GEnvHelper()
+    {
+        GEnv.SetupR1 = nullptr;
+    }
+} helper;

@@ -4,14 +4,14 @@
 #include "hwcaps.h"
 #include "hw.h"
 
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(USE_OGL)
 #include <nvapi.h>
 #include <ags_lib/inc/amd_ags.h>
 #endif
 
 namespace
 {
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(USE_OGL)
 u32 GetNVGpuNum()
 {
     NvLogicalGpuHandle logicalGPUs[NVAPI_MAX_LOGICAL_GPUS];
@@ -114,7 +114,7 @@ u32 GetGpuNum() { return 1; }
 #endif
 }
 
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
 void CHWCaps::Update()
 {
     D3DCAPS9 caps;
@@ -183,7 +183,7 @@ void CHWCaps::Update()
 
     // Detect if stencil available
     bStencil = FALSE;
-    IDirect3DSurface9* surfZS = 0;
+    IDirect3DSurface9* surfZS = nullptr;
     D3DSURFACE_DESC surfDESC;
     CHK_DX(HW.pDevice->GetDepthStencilSurface(&surfZS));
     R_ASSERT(surfZS);

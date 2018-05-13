@@ -4,6 +4,8 @@
 
 #include <assert.h>
 #include "VertexCache.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_list.h"
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -73,7 +75,7 @@ public:
     {
         if (--m_refCount == 0)
         {
-            Memory.mem_free(this);
+            delete this;
         }
     }
 

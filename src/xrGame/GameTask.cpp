@@ -267,7 +267,7 @@ void SScriptTaskHelper::init_functors(xr_vector<shared_str>& v_src, task_state_f
 
     for (u32 idx = 0; it != it_e; ++it, ++idx)
     {
-        bool functor_exists = ai().script_engine().functor(*(*it), v_dest[idx]);
+        bool functor_exists = GEnv.ScriptEngine->functor(*(*it), v_dest[idx]);
         if (!functor_exists)
             Log("Cannot find script function described in task objective  ", *(*it));
     }

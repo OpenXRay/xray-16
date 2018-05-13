@@ -1,5 +1,4 @@
 #pragma once
-#include "Common/Config.hpp"
 
 #if defined(__linux__)
 #define LINUX

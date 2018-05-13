@@ -8,9 +8,7 @@
 
 #pragma once
 
-#include "Common/object_interfaces.h"
-
-class CSE_Abstract;
+#include "xrServerEntities/xrServer_Object_Base.h"
 
 class CServerEntityWrapper : public ISerializable
 {

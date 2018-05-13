@@ -21,6 +21,7 @@
 #include "DemoPlay_Control.h"
 #include "account_manager_console.h"
 #include "xrGameSpy/GameSpy_GP.h"
+#include "xrNetServer/NET_Messages.h"
 
 EGameIDs ParseStringToGameType(LPCSTR str);
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
@@ -90,7 +91,7 @@ extern u32 g_sv_Client_Reconnect_Time;
 int g_dwEventDelay = 0;
 
 extern u32 g_sv_adm_menu_ban_time;
-extern xr_token g_ban_times[];
+extern const xr_token g_ban_times[];
 
 extern int g_sv_adm_menu_ping_limit;
 extern u32 g_sv_cta_dwInvincibleTime;
@@ -272,7 +273,7 @@ public:
     virtual void Execute(LPCSTR arguments)
     {
         string64 cdkey;
-        if (0 == stricmp(arguments, "clear"))
+        if (0 == xr_stricmp(arguments, "clear"))
         {
             cdkey[0] = 0;
         }
@@ -1009,6 +1010,7 @@ public:
         }
         else
         {
+            // size_t ????? u32 maybe?
             size_t player_index = 0;
             if (sscanf_s(args_, "%u", &player_index) != 1)
             {
@@ -1224,7 +1226,7 @@ public:
             exclude_raid_from_args(args, tmp_dest, sizeof(tmp_dest));
             if (xr_strlen(tmp_dest))
             {
-                sscanf_s(tmp_dest, "%s", filter_string);
+                sscanf_s(tmp_dest, "%s", filter_string, sizeof(filter_string));
                 tmp_functor.filter_string = filter_string;
             }
         }
@@ -1321,7 +1323,7 @@ public:
         exclude_raid_from_args(args, tmp_dest, sizeof(tmp_dest));
         if (xr_strlen(tmp_dest))
         {
-            sscanf_s(tmp_dest, "%s", filter_dest);
+            sscanf_s(tmp_dest, "%s", filter_dest, sizeof(filter_dest));
         }
         tmp_sv_game->PrintBanList(filter_dest);
         Level().Server->Print_Banned_Addreses();

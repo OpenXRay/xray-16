@@ -5,19 +5,13 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment ambients sound identifier class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_AMBIENTS_SOUND_HPP_INCLUDED
-#define EDITOR_WEATHER_AMBIENTS_SOUND_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace sound_channels
@@ -27,21 +21,21 @@ class manager;
 
 namespace ambients
 {
-class sound_id : public editor::property_holder_holder, private Noncopyable
+class sound_id : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     sound_id(sound_channels::manager const& manager, shared_str const& sound);
     virtual ~sound_id();
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_id; }
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();
 
 private:
-    LPCSTR const* xr_stdcall collection();
+    pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
 private:
@@ -53,6 +47,3 @@ private:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_AMBIENTS_SOUND_HPP_INCLUDED

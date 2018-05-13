@@ -52,7 +52,7 @@ public:
 
     struct BPPlayItem
     {
-        AnsiString name;
+        xr_string name;
         u16 slot;
     };
 
@@ -93,10 +93,10 @@ public:
     CMotion* FindMotionKeys(LPCSTR name, u16 slot);
 
 private:
-    //    virtual Fmatrix& _BCL ObjectXFORM() { return m_pobject_matrix; }
-    //    virtual Fvector& _BCL ObjectPosition() { return m_pobject_matrix.c; }
-    //    virtual IRenderVisual* _BCL ObjectVisual() { return m_pVisual; }
-    virtual IKinematics* _BCL ObjectKinematics()
+    //    virtual Fmatrix& ObjectXFORM() { return m_pobject_matrix; }
+    //    virtual Fvector& ObjectPosition() { return m_pobject_matrix.c; }
+    //    virtual IRenderVisual* ObjectVisual() { return m_pVisual; }
+    virtual IKinematics* ObjectKinematics()
     {
         if (!m_pVisual)
             return 0;

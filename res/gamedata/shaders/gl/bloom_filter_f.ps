@@ -1,0 +1,15 @@
+#include "common.h"
+#include "iostructs\p_build.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 _main( p_build I )
+{
+	float4        t_0        = tex2D                (s_bloom,I.Tex0);
+	float4        t_1        = tex2D                (s_bloom,I.Tex1);
+	float4        t_2        = tex2D                (s_bloom,I.Tex2);
+	float4        t_3        = tex2D                (s_bloom,I.Tex3);
+
+        // out
+	return  ( (t_0+t_1) + (t_2+t_3) ) / 2;
+}

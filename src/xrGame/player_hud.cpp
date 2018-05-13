@@ -7,8 +7,10 @@
 #include "static_cast_checked.hpp"
 #include "actoreffector.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrCore/xrDebug_macros.h" // only for pragma todo
 
-player_hud* g_player_hud = NULL;
+
+player_hud* g_player_hud = nullptr;
 Fvector _ancor_pos;
 Fvector _wpn_root_pos;
 
@@ -28,17 +30,17 @@ player_hud_motion* player_hud_motion_container::find_motion(const shared_str& na
     {
         const shared_str& s = (true) ? (*it).m_alias_name : (*it).m_base_name;
         if (s == name)
-            return &(*it);
+            return &*it;
     }
-    return NULL;
+    return nullptr;
 }
 
 void player_hud_motion_container::load(IKinematicsAnimated* model, const shared_str& sect)
 {
     CInifile::Sect& _sect = pSettings->r_section(sect);
-    CInifile::SectCIt _b = _sect.Data.begin();
-    CInifile::SectCIt _e = _sect.Data.end();
-    player_hud_motion* pm = NULL;
+    auto _b = _sect.Data.cbegin();
+    auto _e = _sect.Data.cend();
+    player_hud_motion* pm = nullptr;
 
     string512 buff;
     MotionID motion_ID;
@@ -204,8 +206,8 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 bool attachable_hud_item::need_renderable() { return m_parent_hud_item->need_renderable(); }
 void attachable_hud_item::render()
 {
-    GlobalEnv.Render->set_Transform(&m_item_transform);
-    GlobalEnv.Render->add_Visual(m_model->dcast_RenderVisual());
+    GEnv.Render->set_Transform(&m_item_transform);
+    GEnv.Render->add_Visual(m_model->dcast_RenderVisual());
     debug_draw_firedeps();
     m_parent_hud_item->render_hud_mode();
 }
@@ -284,8 +286,8 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 attachable_hud_item::~attachable_hud_item()
 {
     IRenderVisual* v = m_model->dcast_RenderVisual();
-    GlobalEnv.Render->model_Delete(v);
-    m_model = NULL;
+    GEnv.Render->model_Delete(v);
+    m_model = nullptr;
 }
 
 void attachable_hud_item::load(const shared_str& sect_name)
@@ -294,7 +296,7 @@ void attachable_hud_item::load(const shared_str& sect_name)
 
     // Visual
     const shared_str& visual_name = pSettings->r_string(sect_name, "item_visual");
-    m_model = smart_cast<IKinematics*>(GlobalEnv.Render->model_Create(visual_name.c_str()));
+    m_model = smart_cast<IKinematics*>(GEnv.Render->model_Create(visual_name.c_str()));
 
     m_attach_place_idx = pSettings->r_u16(sect_name, "attach_place_idx");
     m_measures.load(sect_name, m_model);
@@ -366,20 +368,21 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
         VERIFY(current_actor);
         CEffectorCam* ec = current_actor->Cameras().GetCamEffector(eCEWeaponAction);
 
-        if (NULL == ec)
+        if (ec)
+            current_actor->Cameras().RemoveCamEffector(eCEWeaponAction);
+
+        string_path ce_path;
+        string_path anm_name;
+#pragma todo("Xottab_DUTY: replace backslashes with slashes")
+        strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
+        if (FS.exist(ce_path, "$game_anims$", anm_name))
         {
-            string_path ce_path;
-            string_path anm_name;
-            strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
-            if (FS.exist(ce_path, "$game_anims$", anm_name))
-            {
-                CAnimatorCamEffector* e = new CAnimatorCamEffector();
-                e->SetType(eCEWeaponAction);
-                e->SetHudAffect(false);
-                e->SetCyclic(false);
-                e->Start(anm_name);
-                current_actor->Cameras().AddCamEffector(e);
-            }
+            CAnimatorCamEffector* e = new CAnimatorCamEffector();
+            e->SetType(eCEWeaponAction);
+            e->SetHudAffect(false);
+            e->SetCyclic(false);
+            e->Start(anm_name);
+            current_actor->Cameras().AddCamEffector(e);
         }
     }
     return ret;
@@ -387,17 +390,17 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 
 player_hud::player_hud()
 {
-    m_model = NULL;
-    m_attached_items[0] = NULL;
-    m_attached_items[1] = NULL;
+    m_model = nullptr;
+    m_attached_items[0] = nullptr;
+    m_attached_items[1] = nullptr;
     m_transform.identity();
 }
 
 player_hud::~player_hud()
 {
     IRenderVisual* v = m_model->dcast_RenderVisual();
-    GlobalEnv.Render->model_Delete(v);
-    m_model = NULL;
+    GEnv.Render->model_Delete(v);
+    m_model = nullptr;
 
     xr_vector<attachable_hud_item*>::iterator it = m_pool.begin();
     xr_vector<attachable_hud_item*>::iterator it_e = m_pool.end();
@@ -413,20 +416,20 @@ void player_hud::load(const shared_str& player_hud_sect)
 {
     if (player_hud_sect == m_sect_name)
         return;
-    bool b_reload = (m_model != NULL);
+    bool b_reload = (m_model != nullptr);
     if (m_model)
     {
         IRenderVisual* v = m_model->dcast_RenderVisual();
-        GlobalEnv.Render->model_Delete(v);
+        GEnv.Render->model_Delete(v);
     }
 
     m_sect_name = player_hud_sect;
     const shared_str& model_name = pSettings->r_string(player_hud_sect, "visual");
-    m_model = smart_cast<IKinematicsAnimated*>(GlobalEnv.Render->model_Create(model_name.c_str()));
+    m_model = smart_cast<IKinematicsAnimated*>(GEnv.Render->model_Create(model_name.c_str()));
 
     CInifile::Sect& _sect = pSettings->r_section(player_hud_sect);
-    CInifile::SectCIt _b = _sect.Data.begin();
-    CInifile::SectCIt _e = _sect.Data.end();
+    auto _b = _sect.Data.cbegin();
+    auto _e = _sect.Data.cend();
     for (; _b != _e; ++_b)
     {
         if (strstr(_b->first.c_str(), "ancor_") == _b->first.c_str())
@@ -486,8 +489,8 @@ void player_hud::render_hud()
     if (!b_r0 && !b_r1)
         return;
 
-    GlobalEnv.Render->set_Transform(&m_transform);
-    GlobalEnv.Render->add_Visual(m_model->dcast_RenderVisual());
+    GEnv.Render->set_Transform(&m_transform);
+    GEnv.Render->add_Visual(m_model->dcast_RenderVisual());
 
     if (m_attached_items[0])
         m_attached_items[0]->render();
@@ -688,13 +691,13 @@ void player_hud::attach_item(CHudItem* item)
 
 void player_hud::detach_item_idx(u16 idx)
 {
-    if (NULL == attached_item(idx))
+    if (nullptr == attached_item(idx))
         return;
 
     m_attached_items[idx]->m_parent_hud_item->on_b_hud_detach();
 
-    m_attached_items[idx]->m_parent_hud_item = NULL;
-    m_attached_items[idx] = NULL;
+    m_attached_items[idx]->m_parent_hud_item = nullptr;
+    m_attached_items[idx] = nullptr;
 
     if (idx == 1 && attached_item(0))
     {
@@ -732,7 +735,7 @@ void player_hud::detach_item_idx(u16 idx)
 
 void player_hud::detach_item(CHudItem* item)
 {
-    if (NULL == item->HudItemData())
+    if (nullptr == item->HudItemData())
         return;
     u16 item_idx = item->HudItemData()->m_attach_place_idx;
 

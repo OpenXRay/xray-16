@@ -76,7 +76,7 @@ bool Image_DXTC::LoadFromFile(LPCSTR filename)
     int next = 1;
     char fileupper[256];
     strcpy_s(fileupper, filename);
-    strupr(fileupper);
+    xr_strupr(fileupper);
     // TRACE( "\n" );
     // TRACE( "\n" );
     bool knownformat = false;
@@ -228,7 +228,7 @@ void Image_DXTC::Decompress()
         for (int x = 0; x < m_nWidth; x++)
         {
             BYTE* ptr = m_pDecompBytes + (y * m_nWidth + x) * 4;
-            swap(ptr[0], ptr[2]);
+            std::swap(ptr[0], ptr[2]);
         }
     }
 }

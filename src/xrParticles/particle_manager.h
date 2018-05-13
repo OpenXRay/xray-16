@@ -1,7 +1,5 @@
-//---------------------------------------------------------------------------
-#ifndef particle_managerH
-#define particle_managerH
-//---------------------------------------------------------------------------
+#pragma once
+
 #include "particle_actions.h"
 
 namespace PAPI
@@ -10,8 +8,8 @@ class CParticleManager : public IParticleManager
 {
     // These are static because all threads access the same effects.
     // All accesses to these should be locked.
-    DEFINE_VECTOR(ParticleEffect*, ParticleEffectVec, ParticleEffectVecIt);
-    DEFINE_VECTOR(ParticleActions*, ParticleActionsVec, ParticleActionsVecIt);
+    using ParticleEffectVec = xr_vector<ParticleEffect*>;
+    using ParticleActionsVec = xr_vector<ParticleActions*>;
     ParticleEffectVec effect_vec;
     ParticleActionsVec m_alist_vec;
 
@@ -23,32 +21,30 @@ public:
     ParticleActions* GetActionListPtr(int alist_id);
 
     // create&destroy
-    virtual int CreateEffect(u32 max_particles);
-    virtual void DestroyEffect(int effect_id);
-    virtual int CreateActionList();
-    virtual void DestroyActionList(int alist_id);
+    int CreateEffect(u32 max_particles) override;
+    void DestroyEffect(int effect_id) override;
+    int CreateActionList() override;
+    void DestroyActionList(int alist_id) override;
 
     // control
-    virtual void PlayEffect(int effect_id, int alist_id);
-    virtual void StopEffect(int effect_id, int alist_id, BOOL deffered = TRUE);
+    void PlayEffect(int effect_id, int alist_id) override;
+    void StopEffect(int effect_id, int alist_id, bool deffered = true) override;
 
     // update&render
-    virtual void Update(int effect_id, int alist_id, float dt);
-    virtual void Render(int effect_id);
-    virtual void Transform(int alist_id, const Fmatrix& m, const Fvector& velocity);
+    void Update(int effect_id, int alist_id, float dt) override;
+    void Render(int effect_id) override;
+    void Transform(int alist_id, const Fmatrix& m, const Fvector& velocity) override;
 
     // effect
-    virtual void RemoveParticle(int effect_id, u32 p_id);
-    virtual void SetMaxParticles(int effect_id, u32 max_particles);
-    virtual void SetCallback(int effect_id, OnBirthParticleCB b, OnDeadParticleCB d, void* owner, u32 param);
-    virtual void GetParticles(int effect_id, Particle*& particles, u32& cnt);
-    virtual u32 GetParticlesCount(int effect_id);
+    void RemoveParticle(int effect_id, u32 p_id) override;
+    void SetMaxParticles(int effect_id, u32 max_particles) override;
+    void SetCallback(int effect_id, OnBirthParticleCB b, OnDeadParticleCB d, void* owner, u32 param) override;
+    void GetParticles(int effect_id, Particle*& particles, u32& cnt) override;
+    u32 GetParticlesCount(int effect_id) override;
 
     // action
-    virtual ParticleAction* CreateAction(PActionEnum action_id);
-    virtual u32 LoadActions(int alist_id, IReader& R);
-    virtual void SaveActions(int alist_id, IWriter& W);
+    ParticleAction* CreateAction(PActionEnum action_id) override;
+    u32 LoadActions(int alist_id, IReader& R) override;
+    void SaveActions(int alist_id, IWriter& W) override;
 };
-};
-//---------------------------------------------------------------------------
-#endif
+} // namespace PAPI

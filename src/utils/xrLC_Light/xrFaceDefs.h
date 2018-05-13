@@ -3,21 +3,21 @@
 struct DataVertex;
 template <typename DataVertexType>
 struct Tface;
-typedef Tface<DataVertex> Face;
+using Face = Tface<DataVertex>;
 
 template <typename DataVertexType>
 struct Tvertex;
-typedef Tvertex<DataVertex> Vertex;
+using Vertex = Tvertex<DataVertex>;
 
-typedef xr_vector<Vertex*> vecVertex;
-typedef vecVertex::iterator vecVertexIt;
+using vecVertex =  xr_vector<Vertex*>;
+using vecVertexIt = vecVertex::iterator;
 
-typedef xr_vector<Face*> vecFace;
-typedef vecFace::iterator vecFaceIt;
-typedef vecFace::const_iterator vecFaceCit;
+using vecFace = xr_vector<Face*> ;
+using vecFaceIt = vecFace::iterator ;
+using vecFaceCit = vecFace::const_iterator;
 
-typedef xr_vector<vecFace*> vec2Face;
-typedef vec2Face::iterator splitIt;
+using vec2Face = xr_vector<vecFace*>;
+using splitIt = vec2Face::iterator;
 
-typedef vecFace vecAdj;
-typedef vecAdj::iterator vecAdjIt;
+using vecAdj = vecFace;
+using vecAdjIt = vecAdj::iterator;

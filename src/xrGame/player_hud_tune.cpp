@@ -10,6 +10,7 @@
 #include "xrEngine/FDemoRecord.h"
 #include "ui_base.h"
 #include "debug_renderer.h"
+#include "xrEngine/GameFont.h"
 
 u32 hud_adj_mode = 0;
 u32 hud_adj_item_idx = 0;

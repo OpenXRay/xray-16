@@ -183,7 +183,7 @@ void CLight_DB::add_light(light* L)
 }
 #endif
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
 void CLight_DB::add_light(light* L)
 {
     if (Device.dwFrame == L->frame_render)
@@ -195,7 +195,7 @@ void CLight_DB::add_light(light* L)
         return;
     L->Export(package);
 }
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
 void CLight_DB::Update()
 {
@@ -250,7 +250,7 @@ void CLight_DB::Update()
             E.sun_color.x * ps_r2_sun_lumscale, E.sun_color.y * ps_r2_sun_lumscale, E.sun_color.z * ps_r2_sun_lumscale);
         sun_adapted->set_range(600.f);
 
-        if (!GlobalEnv.Render->is_sun_static())
+        if (!GEnv.Render->is_sun_static())
         {
             sun_adapted->set_rotation(OD, _sun_original->right);
             sun_adapted->set_position(OP);

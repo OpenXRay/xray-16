@@ -19,8 +19,8 @@ extern ENGINE_API BOOL bShowPauseString;
 
 CUISequenceSimpleItem::~CUISequenceSimpleItem()
 {
-    SubItemVecIt _I = m_subitems.begin();
-    SubItemVecIt _E = m_subitems.end();
+    auto _I = m_subitems.begin();
+    auto _E = m_subitems.end();
     for (; _I != _E; ++_I)
         _I->Stop();
     m_subitems.clear();
@@ -39,19 +39,19 @@ bool CUISequenceSimpleItem::IsPlaying()
 CUIWindow* find_child_window(CUIWindow* parent, const shared_str& _name)
 {
     CUIWindow::WINDOW_LIST& wl = parent->GetChildWndList();
-    CUIWindow::WINDOW_LIST_it _I = wl.begin();
-    CUIWindow::WINDOW_LIST_it _E = wl.end();
+    auto _I = wl.begin();
+    auto _E = wl.end();
     for (; _I != _E; ++_I)
         if ((*_I)->WindowName() == _name)
             return (*_I);
-    return NULL;
+    return nullptr;
 }
 
 void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 {
     CUISequenceItem::Load(xml, idx);
 
-    XML_NODE* _stored_root = xml->GetLocalRoot();
+    XML_NODE _stored_root = xml->GetLocalRoot();
     xml->SetLocalRoot(xml->NavigateToNode("item", idx));
 
     LPCSTR m_snd_name = xml->Read("sound", 0, "");
@@ -66,16 +66,16 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     xr_strcpy(m_pda_section, xml->Read("pda_section", 0, ""));
 
     LPCSTR str = xml->Read("pause_state", 0, "ignore");
-    m_flags.set(etiNeedPauseOn, 0 == _stricmp(str, "on"));
-    m_flags.set(etiNeedPauseOff, 0 == _stricmp(str, "off"));
-    m_flags.set(etiNeedPauseSound, 0 == _stricmp(str, "on"));
+    m_flags.set(etiNeedPauseOn, 0 == xr_stricmp(str, "on"));
+    m_flags.set(etiNeedPauseOff, 0 == xr_stricmp(str, "off"));
+    m_flags.set(etiNeedPauseSound, 0 == xr_stricmp(str, "on"));
 
     str = xml->Read("guard_key", 0, NULL);
     m_continue_dik_guard = -1;
-    if (str && !_stricmp(str, "any"))
+    if (str && !xr_stricmp(str, "any"))
     {
         m_continue_dik_guard = 9999;
-        str = NULL;
+        str = nullptr;
     }
     if (str)
     {
@@ -86,7 +86,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_flags.set(etiCanBeStopped, (m_continue_dik_guard == -1));
 
     LPCSTR str_grab_input = xml->Read("grab_input", 0, "on");
-    m_flags.set(etiGrabInput, (0 == _stricmp(str_grab_input, "on") || 0 == _stricmp(str_grab_input, "1")));
+    m_flags.set(etiGrabInput, (0 == xr_stricmp(str_grab_input, "on") || 0 == xr_stricmp(str_grab_input, "1")));
 
     int actions_count = xml->GetNodesNum(0, 0, "action");
     m_actions.resize(actions_count);
@@ -102,7 +102,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     // ui-components
     m_UIWindow = new CUIWindow();
     m_UIWindow->SetAutoDelete(false);
-    XML_NODE* _lsr = xml->GetLocalRoot();
+    XML_NODE _lsr = xml->GetLocalRoot();
     CUIXmlInit xml_init;
     xml_init.InitWindow(*xml, "main_wnd", 0, m_UIWindow);
     xml->SetLocalRoot(_lsr);
@@ -113,7 +113,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     string64 sname;
     for (int i = 0; i < cnt; ++i)
     {
-        XML_NODE* _sr = xml->GetLocalRoot();
+        XML_NODE _sr = xml->GetLocalRoot();
         xml->SetLocalRoot(xml->NavigateToNode("main_wnd", 0));
 
         xr_sprintf(sname, "auto_static_%d", i);
@@ -132,8 +132,8 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
         if (UI().is_widescreen())
         {
-            XML_NODE* autostatic_node = xml->NavigateToNode("auto_static", i);
-            XML_NODE* ws_rect = xml->NavigateToNode(autostatic_node, "widescreen_rect", 0);
+            XML_NODE autostatic_node = xml->NavigateToNode("auto_static", i);
+            XML_NODE ws_rect = xml->NavigateToNode(autostatic_node, "widescreen_rect", 0);
             if (ws_rect)
             {
                 xml->SetLocalRoot(autostatic_node);
@@ -188,8 +188,8 @@ void CUISequenceSimpleItem::Update()
     float _start = (m_time_start < 0.0f) ? (float(Device.dwTimeContinual) / 1000.0f) : m_time_start;
 
     float gt = float(Device.dwTimeContinual) / 1000.0f;
-    SubItemVecIt _I = m_subitems.begin();
-    SubItemVecIt _E = m_subitems.end();
+    auto _I = m_subitems.begin();
+    auto _E = m_subitems.end();
     for (; _I != _E; ++_I)
     {
         SSubItem& s = *_I;
@@ -250,34 +250,35 @@ void CUISequenceSimpleItem::Start()
         bool bShowPda = false;
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
 
-        if (!stricmp(m_pda_section, "pda_tasks"))
+        if (!ui_game_sp)
+        {
+            Msg("!%s:: failed to get ui_game_sp", __FUNCTION__);
+            return;
+        }
+
+        if (!xr_stricmp(m_pda_section, "pda_tasks"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
             bShowPda = true;
         }
-        else if (!stricmp(m_pda_section, "pda_ranking"))
+        else if (!xr_stricmp(m_pda_section, "pda_ranking"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptRanking");
             bShowPda = true;
         }
-        else if (!stricmp(m_pda_section, "pda_logs"))
+        else if (!xr_stricmp(m_pda_section, "pda_logs"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptLogs");
             bShowPda = true;
         }
-        else if (!stricmp(m_pda_section, "pda_show_second_task_wnd"))
+        else if (!xr_stricmp(m_pda_section, "pda_show_second_task_wnd"))
         {
             ui_game_sp->GetPdaMenu().Show_SecondTaskWnd(true);
             bShowPda = true;
         }
 
-        if (ui_game_sp)
-        {
-            if ((!ui_game_sp->GetPdaMenu().IsShown() && bShowPda) || (ui_game_sp->GetPdaMenu().IsShown() && !bShowPda))
-            {
-                ui_game_sp->GetPdaMenu().HideDialog();
-            }
-        }
+        if ((!ui_game_sp->GetPdaMenu().IsShown() && bShowPda) || (ui_game_sp->GetPdaMenu().IsShown() && !bShowPda))
+            ui_game_sp->GetPdaMenu().HideDialog();
     }
 }
 
@@ -331,7 +332,7 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
         if (b)
         {
             luabind::functor<void> functor_to_call;
-            bool functor_exists = ai().script_engine().functor(itm.m_functor.c_str(), functor_to_call);
+            bool functor_exists = GEnv.ScriptEngine->functor(itm.m_functor.c_str(), functor_to_call);
             THROW3(functor_exists, "Cannot find script function described in tutorial item ", itm.m_functor.c_str());
             functor_to_call();
 

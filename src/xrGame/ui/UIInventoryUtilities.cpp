@@ -39,7 +39,7 @@ ui_shader* g_tmpWMShader = NULL;
 static CUIStatic* GetUIStatic();
 
 typedef std::pair<CHARACTER_RANK_VALUE, shared_str> CharInfoStringID;
-DEF_MAP(CharInfoStrings, CHARACTER_RANK_VALUE, shared_str);
+using CharInfoStrings = xr_map<CHARACTER_RANK_VALUE, shared_str>;
 
 CharInfoStrings* charInfoReputationStrings = NULL;
 CharInfoStrings* charInfoRankStrings = NULL;
@@ -516,14 +516,14 @@ void InventoryUtilities::SendInfoToLuaScripts(shared_str info)
     {
         int mode = 10; // now Menu is Talk Dialog (show)
         luabind::functor<void> funct;
-        R_ASSERT(ai().script_engine().functor("pda.actor_menu_mode", funct));
+        R_ASSERT(GEnv.ScriptEngine->functor("pda.actor_menu_mode", funct));
         funct(mode);
     }
     if (info == shared_str("ui_talk_hide"))
     {
         int mode = 11; // Talk Dialog hide
         luabind::functor<void> funct;
-        R_ASSERT(ai().script_engine().functor("pda.actor_menu_mode", funct));
+        R_ASSERT(GEnv.ScriptEngine->functor("pda.actor_menu_mode", funct));
         funct(mode);
     }
 }
@@ -533,7 +533,7 @@ u32 InventoryUtilities::GetGoodwillColor(CHARACTER_GOODWILL gw)
     u32 res = 0xffc0c0c0;
     if (gw == NEUTRAL_GOODWILL)
     {
-        res = 0xffc0c0c0;
+        res = 0xfffce80b; //0xffc0c0c0;
     }
     else if (gw > 1000)
     {
@@ -569,7 +569,7 @@ u32 InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
     switch (relation)
     {
     case ALife::eRelationTypeFriend: return 0xff00ff00; break;
-    case ALife::eRelationTypeNeutral: return 0xffc0c0c0; break;
+    case ALife::eRelationTypeNeutral: return 0xfffce80b/*0xffc0c0c0*/; break;
     case ALife::eRelationTypeEnemy: return 0xffff0000; break;
     default: NODEFAULT;
     }

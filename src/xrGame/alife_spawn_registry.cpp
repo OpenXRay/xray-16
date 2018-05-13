@@ -90,6 +90,7 @@ void CALifeSpawnRegistry::load(LPCSTR spawn_name)
     load(*m_file);
 }
 
+using lua_State = struct lua_State;
 struct dummy
 {
     int count;

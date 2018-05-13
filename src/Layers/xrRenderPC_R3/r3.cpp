@@ -95,6 +95,18 @@ static class cl_water_intensity : public R_constant_setup
     }
 } binder_water_intensity;
 
+#ifdef TREE_WIND_EFFECT
+static class cl_tree_amplitude_intensity : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
+        float fValue = env.m_fTreeAmplitudeIntensity;
+        RCache.set_c(C, fValue, fValue, fValue, 0);
+    }
+} binder_tree_amplitude_intensity;
+#endif
+
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
     virtual void setup(R_constant* C)
@@ -408,9 +420,9 @@ void CRender::create()
 
     rmNormal();
     marker = 0;
-    D3D10_QUERY_DESC qdesc;
+    D3D_QUERY_DESC qdesc;
     qdesc.MiscFlags = 0;
-    qdesc.Query = D3D10_QUERY_EVENT;
+    qdesc.Query = D3D_QUERY_EVENT;
     ZeroMemory(q_sync_point, sizeof(q_sync_point));
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
@@ -439,7 +451,6 @@ void CRender::destroy()
     //_RELEASE					(q_sync_point[0]);
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         _RELEASE(q_sync_point[i]);
-
     HWOCC.occq_destroy();
     xr_delete(Models);
     xr_delete(Target);
@@ -470,6 +481,14 @@ void CRender::reset_begin()
         Lights_LastFrame.clear();
     }
 
+    //AVO: let's reload details while changed details options on vid_restart
+    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    {
+        Details->Unload();
+        xr_delete(Details);
+    }
+    //-AVO
+
     xr_delete(Target);
     HWOCC.occq_destroy();
     //_RELEASE					(q_sync_point[1]);
@@ -480,9 +499,9 @@ void CRender::reset_begin()
 
 void CRender::reset_end()
 {
-    D3D10_QUERY_DESC qdesc;
+    D3D_QUERY_DESC qdesc;
     qdesc.MiscFlags = 0;
-    qdesc.Query = D3D10_QUERY_EVENT;
+    qdesc.Query = D3D_QUERY_EVENT;
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
@@ -496,6 +515,14 @@ void CRender::reset_end()
 
     Target = new CRenderTarget();
 
+    //AVO: let's reload details while changed details options on vid_restart
+    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    {
+        Details = new CDetailManager();
+        Details->Load();
+    }
+    //-AVO
+
     xrRender_apply_tf();
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 
@@ -503,15 +530,7 @@ void CRender::reset_end()
     // that some data is not ready in the first frame (for example device camera position)
     m_bFirstFrameAfterReset = true;
 }
-/*
-void CRender::OnFrame()
-{
-    Models->DeleteQueue			();
-    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))	{
-        Device.seqParallel.insert	(Device.seqParallel.begin(),
-            fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
-    }
-}*/
+
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
@@ -536,7 +555,7 @@ void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
-    V = 0;
+    V = nullptr;
 }
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
@@ -551,7 +570,7 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         CDetail* D = (CDetail*)F;
         D->Unload();
         xr_delete(D);
-        F = NULL;
+        F = nullptr;
     }
 }
 IRenderVisual* CRender::model_CreatePE(LPCSTR name)
@@ -739,20 +758,7 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
-
-/////////
-#pragma comment(lib, "d3dx9.lib")
-/*
-extern "C"
-{
-LPCSTR WINAPI	D3DXGetPixelShaderProfile	(LPDIRECT3DDEVICE9  pDevice);
-LPCSTR WINAPI	D3DXGetVertexShaderProfile	(LPDIRECT3DDEVICE9	pDevice);
-};
-*/
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm)
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
@@ -882,6 +888,10 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             Msg("! D3DReflectShader hr == 0x%08x", _result);
         }
     }
+    else
+    {
+        NODEFAULT;
+    }
 
     if (disasm)
     {
@@ -900,7 +910,6 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _result;
 }
 
-//--------------------------------------------------------------------------------------------------------------
 class includer : public ID3DInclude
 {
 public:
@@ -908,13 +917,13 @@ public:
         D3D10_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GlobalEnv.Render->getShaderPath(), pFileName);
+        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
-        if (0 == R)
+        if (nullptr == R)
         {
             // possibly in shared directory or somewhere else - open directly
             R = FS.r_open("$game_shaders$", pFileName);
-            if (0 == R)
+            if (nullptr == R)
                 return E_FAIL;
         }
 
@@ -935,6 +944,9 @@ public:
         return D3D_OK;
     }
 };
+
+static inline bool match_shader_id(
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
@@ -1323,14 +1335,16 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(o.dx10_minmax_sm != 0);
     ++len;
 
+    // Be carefull!!!!! this should be at the end to correctly generate
+    // compiled shader name;
     // add a #define for DX10_1 MSAA support
     if (o.dx10_msaa)
     {
-        static char samples[2];
-
         defines[def_it].Name = "USE_MSAA";
         defines[def_it].Definition = "1";
         def_it++;
+
+        static char samples[2];
 
         defines[def_it].Name = "MSAA_SAMPLES";
         samples[0] = char(o.dx10_msaa_samples) + '0';
@@ -1427,34 +1441,35 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         ++len;
     }
 
+    sh_name[len] = '\0';
+
     // finish
-    defines[def_it].Name = 0;
-    defines[def_it].Definition = 0;
+    defines[def_it].Name = nullptr;
+    defines[def_it].Definition = nullptr;
     def_it++;
 
-    //
     if (0 == xr_strcmp(pFunctionName, "main"))
     {
         if ('v' == pTarget[0])
         {
             if (HW.pDevice1 == 0)
-                pTarget = D3D10GetVertexShaderProfile(HW.pDevice); // vertex	"vs_4_0"; //
+                pTarget = D3D10GetVertexShaderProfile(HW.pDevice); // vertex	"vs_4_0";
             else
-                pTarget = "vs_4_1"; // pixel	"ps_4_0"; //
+                pTarget = "vs_4_1"; // pixel	"ps_4_0";
         }
         else if ('p' == pTarget[0])
         {
             if (HW.pDevice1 == 0)
-                pTarget = D3D10GetPixelShaderProfile(HW.pDevice); // pixel	"ps_4_0"; //
+                pTarget = D3D10GetPixelShaderProfile(HW.pDevice); // pixel	"ps_4_0";
             else
-                pTarget = "ps_4_1"; // pixel	"ps_4_0"; //
+                pTarget = "ps_4_1"; // pixel	"ps_4_0";
         }
         else if ('g' == pTarget[0])
         {
             if (HW.pDevice1 == 0)
-                pTarget = D3D10GetGeometryShaderProfile(HW.pDevice); // geometry	"gs_4_0"; //
+                pTarget = D3D10GetGeometryShaderProfile(HW.pDevice); // geometry	"gs_4_0";
             else
-                pTarget = "gs_4_1"; // pixel	"ps_4_0"; //
+                pTarget = "gs_4_1"; // pixel	"ps_4_0";
         }
     }
 
@@ -1511,9 +1526,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         includer Includer;
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
-        _result = D3DCompile(pSrcData, SrcDataLen,
-            "", // NULL, //LPCSTR pFileName,	//	NVPerfHUD bug workaround.
-            defines, &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
+        _result = D3DCompile(pSrcData, SrcDataLen, "", defines, &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
 
         if (SUCCEEDED(_result))
         {
@@ -1523,12 +1536,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
             file->w(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
             FS.w_close(file);
 
-            _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize(),
+            _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
                 file_name, result, o.disasm);
         }
         else
         {
-            //			Msg						( "! shader compilation failed" );
             Log("! ", file_name);
             if (pErrorBuf)
                 Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());

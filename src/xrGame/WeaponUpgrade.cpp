@@ -127,7 +127,7 @@ bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
     result |= process_if_exists(section, "misfire_start_prob", &CInifile::r_float, misfireStartProbability, test);
     result |= process_if_exists(section, "misfire_end_prob", &CInifile::r_float, misfireEndProbability, test);
 
-    BOOL value = m_zoom_params.m_bZoomEnabled;
+    bool value = m_zoom_params.m_bZoomEnabled;
     bool result2 = process_if_exists_set(section, "zoom_enabled", &CInifile::r_bool, value, test);
     if (result2 && !test)
     {
@@ -223,7 +223,7 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
 bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
 {
     bool result = false;
-    // LPCSTR weapon_section = cNameSect().c_str();
+    // pcstr weapon_section = cNameSect().c_str();
 
     // 0 - no addon // 1 - permanent // 2 - attachable
     int temp_int = (int)m_eScopeStatus;
@@ -242,7 +242,7 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
             {
                 if (pSettings->line_exist(section, "scopes_sect"))
                 {
-                    LPCSTR str = pSettings->r_string(section, "scopes_sect");
+                    pcstr str = pSettings->r_string(section, "scopes_sect");
                     for (int i = 0, count = _GetItemCount(str); i < count; ++i)
                     {
                         string128 scope_section;

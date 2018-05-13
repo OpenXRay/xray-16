@@ -56,7 +56,7 @@ Object ^ property_converter_color::ConvertTo(
     if (destination_type == String::typeid)
     {
         property_container ^ container = safe_cast<property_container ^>(value);
-        editor::color color = safe_cast<property_color_base %>(container->container_holder()).get_value_raw();
+        XRay::Editor::color color = safe_cast<property_color_base %>(container->container_holder()).get_value_raw();
         return ("" + property_converter_float().ConvertTo(context, culture, color.r, String::typeid) + " " +
             property_converter_float().ConvertTo(context, culture, color.g, String::typeid) + " " +
             property_converter_float().ConvertTo(context, culture, color.b, String::typeid) + "");
@@ -65,7 +65,7 @@ Object ^ property_converter_color::ConvertTo(
     if (destination_type == Color::typeid)
     {
         property_container ^ container = safe_cast<property_container ^>(value);
-        editor::color color = safe_cast<property_color_base %>(container->container_holder()).get_value_raw();
+        XRay::Editor::color color = safe_cast<property_color_base %>(container->container_holder()).get_value_raw();
         return (Color(color.r, color.g, color.b));
     }
 

@@ -8,9 +8,11 @@
 #define DOORS_ACTOR_H_INCLUDED
 
 #include "Common/Noncopyable.hpp"
+#include "xrCore/buffer_vector.h"
 #include "doors.h"
 
 class CAI_Stalker;
+class CScriptGameObject; //Alundaio: Needed for return type
 
 namespace doors
 {
@@ -24,6 +26,7 @@ public:
     bool update_doors(doors_type const& doors, float average_speed);
     void on_door_destroy(door& door);
     pcstr get_name() const;
+    CScriptGameObject* lua_game_object() const; //Alundaio
 #ifdef DEBUG
     void render() const;
 #endif // #ifdef DEBUG

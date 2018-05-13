@@ -60,7 +60,7 @@ TEMPLATE_SPECIALIZATION
 IC void CGenericPathManager::init_path()
 {
     if (path)
-        path->clear_not_free();
+        path->clear();
 }
 
 TEMPLATE_SPECIALIZATION

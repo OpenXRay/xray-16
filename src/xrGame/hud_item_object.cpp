@@ -24,7 +24,7 @@ bool CHudItemObject::Action(u16 cmd, u32 flags)
 }
 
 void CHudItemObject::SwitchState(u32 S) { CHudItem::SwitchState(S); }
-void CHudItemObject::OnStateSwitch(u32 S) { CHudItem::OnStateSwitch(S); }
+void CHudItemObject::OnStateSwitch(u32 S, u32 oldState) { CHudItem::OnStateSwitch(S, oldState); }
 void CHudItemObject::OnMoveToRuck(const SInvItemPlace& prev)
 {
     CInventoryItemObject::OnMoveToRuck(prev);

@@ -8,11 +8,10 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_manager.hpp"
 #include "editor_environment_suns_sun.hpp"
 #include "Include/editor/ide.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "Common/object_broker.h"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -24,13 +23,13 @@ using editor::environment::detail::logical_string_predicate;
 
 template <>
 void property_collection<manager::container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-editor::property_holder* property_collection<manager::container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<manager::container_type, manager>::create()
 {
     sun* object = new sun(m_holder, generate_unique_id("sun_unique_id_").c_str());
     object->fill(this);
@@ -54,16 +53,14 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), TRUE, TRUE, FALSE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
     m_suns.reserve(sections.size());
-    sections_type::const_iterator i = sections.begin();
-    sections_type::const_iterator e = sections.end();
-    for (; i != e; ++i)
-        add(*config, (*i)->Name);
+
+    for (const auto &i : sections)
+        add(*config, i->Name);
 
     xr_delete(config);
 }
@@ -71,13 +68,10 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), FALSE, FALSE, TRUE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), false, false, true);
 
-    container_type::const_iterator i = m_suns.begin();
-    container_type::const_iterator e = m_suns.end();
-    for (; i != e; ++i)
-        (*i)->save(*config);
+    for (const auto &i : m_suns)
+        i->save(*config);
 
     xr_delete(config);
 }
@@ -100,10 +94,10 @@ void manager::add(CInifile& config, shared_str const& section)
     m_suns.push_back(object);
 }
 
-void manager::fill(editor::property_holder* holder)
+void manager::fill(XRay::Editor::property_holder_base* holder)
 {
     VERIFY(holder);
-    holder->add_property("suns", "suns", "this option is resposible for sound channels", m_collection);
+    holder->add_property("suns", "suns", "this option is responsible for sound channels", m_collection);
 }
 
 shared_str manager::unique_id(shared_str const& id) const
@@ -126,11 +120,9 @@ manager::suns_ids_type const& manager::suns_ids() const
     m_suns_ids.resize(m_suns.size() + 1);
     m_suns_ids[0] = xr_strdup("");
 
-    container_type::const_iterator i = m_suns.begin();
-    container_type::const_iterator e = m_suns.end();
-    suns_ids_type::iterator j = m_suns_ids.begin() + 1;
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->id().c_str());
+    auto j = m_suns_ids.begin() + 1;
+    for (const auto &i : m_suns)
+        *j++ = xr_strdup(i->id().c_str());
 
     std::sort(m_suns_ids.begin(), m_suns_ids.end(), logical_string_predicate());
 
@@ -147,10 +139,9 @@ struct predicate
 
 CLensFlareDescriptor* manager::get_flare(shared_str const& id) const
 {
-    // container_type::const_iterator found = std::find_if(m_suns.begin(), m_suns.end(), predicate(id));
+    // auto found = std::find_if(m_suns.begin(), m_suns.end(), predicate(id));
     // VERIFY (found != m_suns.end());
     // return ((*found)->);
     return (0);
 }
 
-#endif // #ifdef INGAME_EDITOR

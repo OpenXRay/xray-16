@@ -4,6 +4,7 @@
 #include "xrserver_objects.h"
 #include "xrServer_Objects_Alife_Monsters.h"
 #include "Level.h"
+#include "xrNetServer/NET_Messages.h"
 
 void xrServer::Perform_connect_spawn(CSE_Abstract* E, xrClientData* CL, NET_Packet& P)
 {
@@ -125,7 +126,7 @@ void xrServer::OnCL_Connected(IClient* _CL)
     game->OnPlayerConnect(CL->ID);
 }
 
-void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, char* ResultStr)
+void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr)
 {
     NET_Packet P;
     P.w_begin(M_CLIENT_CONNECT_RESULT);
@@ -256,4 +257,4 @@ void xrServer::Check_BuildVersion_Success(IClient* CL)
 {
     CL->flags.bVerified = TRUE;
     SendConnectResult(CL, 1, 0, "All Ok");
-};
+}

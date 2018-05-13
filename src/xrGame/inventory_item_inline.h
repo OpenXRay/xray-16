@@ -12,13 +12,13 @@ IC bool CInventoryItem::useful_for_NPC() const { return (Useful() && m_flags.tes
 IC CInventoryItem::Upgrades_type const& CInventoryItem::upgardes() const { return m_upgrades; }
 template <typename T>
 IC bool CInventoryItem::process_if_exists(
-    LPCSTR section, LPCSTR name, T (CInifile::*method)(LPCSTR, LPCSTR) const, T& value, bool test)
+    pcstr section, pcstr name, T (CInifile::*method)(pcstr, pcstr) const, T& value, bool test)
 {
     if (!pSettings->line_exist(section, name))
     {
         return false;
     }
-    LPCSTR str = pSettings->r_string(section, name);
+    pcstr str = pSettings->r_string(section, name);
     if (!str || !xr_strlen(str))
     {
         return false;
@@ -33,13 +33,13 @@ IC bool CInventoryItem::process_if_exists(
 
 template <typename T>
 IC bool CInventoryItem::process_if_exists_set(
-    LPCSTR section, LPCSTR name, T (CInifile::*method)(LPCSTR, LPCSTR) const, T& value, bool test)
+    pcstr section, pcstr name, T (CInifile::*method)(pcstr, pcstr) const, T& value, bool test)
 {
     if (!pSettings->line_exist(section, name))
     {
         return false;
     }
-    LPCSTR str = pSettings->r_string(section, name);
+    pcstr str = pSettings->r_string(section, name);
     if (!str || !xr_strlen(str))
     {
         return false;

@@ -1,8 +1,11 @@
 //----------------------------------------------------
+#pragma once
 #ifndef MotionH
 #define MotionH
 
 #include "xrCore/Animation/Bone.hpp"
+#include "xrCore/_std_extensions.h"
+#include "xrCommon/xr_vector.h"
 
 // refs
 class CEnvelope;
@@ -40,7 +43,7 @@ struct st_BoneMotion
     void SetName(LPCSTR nm) { name = nm; }
 };
 // vector по костям
-DEFINE_VECTOR(st_BoneMotion, BoneMotionVec, BoneMotionIt);
+using BoneMotionVec = xr_vector<st_BoneMotion>;
 
 //--------------------------------------------------------------------------
 class XRCORE_API CCustomMotion
@@ -59,7 +62,6 @@ protected:
 public:
     shared_str name;
 
-public:
     CCustomMotion();
     CCustomMotion(CCustomMotion* src);
     virtual ~CCustomMotion();

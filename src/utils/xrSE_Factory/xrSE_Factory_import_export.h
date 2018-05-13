@@ -1,7 +1,7 @@
 #ifndef XRSE_FACTORY_IMPORT_EXPORTH
 #define XRSE_FACTORY_IMPORT_EXPORTH
 
-#include "xrCore/Platform.h"
+#include "Common/Common.hpp"
 
 #ifdef XRSE_FACTORY_EXPORTS
 #define FACTORY_API XR_EXPORT

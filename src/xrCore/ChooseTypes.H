@@ -1,5 +1,12 @@
-#ifndef ChooseTypesH
-#define ChooseTypesH
+#pragma once
+#include "xrCore/fastdelegate.h"
+#include "xrCommon/xr_vector.h"
+
+// fwd. decl.
+template <class T>
+struct _rect;
+using Irect = _rect<int>;
+
 
 enum EChooseMode
 {
@@ -39,7 +46,8 @@ struct SChooseItem
     shared_str hint;
     SChooseItem(LPCSTR nm, LPCSTR ht) : name(nm), hint(ht) {}
 };
-DEFINE_VECTOR(SChooseItem, ChooseItemVec, ChooseItemVecIt);
+
+using ChooseItemVec = xr_vector<SChooseItem>;
 
 // typedef
 typedef fastdelegate::FastDelegate2<ChooseItemVec&, void*> TOnChooseFillItems;
@@ -83,5 +91,3 @@ struct SChooseEvents
 };
 
 #define NONE_CAPTION "<none>"
-
-#endif

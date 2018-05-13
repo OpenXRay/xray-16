@@ -12,6 +12,7 @@
 #include "WeaponKnife.h"
 #include "ui\UIBuyWndShared.h"
 #include "game_cl_base_weapon_usage_statistic.h"
+#include "xrNetServer/NET_Messages.h"
 
 BOOL g_SV_Force_Artefact_Spawn = FALSE;
 
@@ -421,7 +422,7 @@ void game_sv_ArtefactHunt::SetRP(CSE_Abstract* E, RPoint* pRP)
     }
 }
 
-struct RemoveBlockedRPointPredicate : public std::unary_function<RPoint*, bool>
+struct RemoveBlockedRPointPredicate
 {
     bool operator()(RPoint* rp) const
     {

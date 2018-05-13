@@ -9,6 +9,7 @@
 #ifdef DEBUG
 #include "PHDebug.h"
 #include "ui_base.h"
+#include "xrEngine/GameFont.h"
 #endif
 #include "hit.h"
 #include "PHDestroyable.h"
@@ -174,7 +175,7 @@ void SActorState::CreateClimb(IKinematicsAnimated* K)
     landing[1] = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_end_1"));
 
     for (int k = 0; k < 12; ++k)
-        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", itoa(k, buf1, 10)));
+        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", xr_itoa(k, buf1, 10)));
 }
 
 void SActorState::Create(IKinematicsAnimated* K, LPCSTR base)
@@ -209,7 +210,7 @@ void SActorState::Create(IKinematicsAnimated* K, LPCSTR base)
     landing[1] = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_end_1"));
 
     for (int k = 0; k < 12; ++k)
-        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", itoa(k, buf1, 10)));
+        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", xr_itoa(k, buf1, 10)));
 }
 
 void SActorSprintState::Create(IKinematicsAnimated* K)
@@ -254,13 +255,13 @@ SVehicleAnimCollection::SVehicleAnimCollection()
 void SVehicleAnimCollection::Create(IKinematicsAnimated* V, u16 num)
 {
     string128 buf, buff1, buff2;
-    strconcat(sizeof(buff1), buff1, itoa(num, buf, 10), "_");
+    strconcat(sizeof(buff1), buff1, xr_itoa(num, buf, 10), "_");
     steer_left = V->ID_Cycle(strconcat(sizeof(buf), buf, "steering_idle_", buff1, "ls"));
     steer_right = V->ID_Cycle(strconcat(sizeof(buf), buf, "steering_idle_", buff1, "rs"));
 
     for (int i = 0; MAX_IDLES > i; ++i)
     {
-        idles[i] = V->ID_Cycle_Safe(strconcat(sizeof(buf), buf, "steering_idle_", buff1, itoa(i, buff2, 10)));
+        idles[i] = V->ID_Cycle_Safe(strconcat(sizeof(buf), buf, "steering_idle_", buff1, xr_itoa(i, buff2, 10)));
         if (idles[i])
             idles_num++;
         else
@@ -272,14 +273,18 @@ void CActor::steer_Vehicle(float angle)
 {
     if (!m_holder)
         return;
-    /*
-        CCar*	car			= smart_cast<CCar*>(m_holder);
-        u16 anim_type       = car->DriverAnimationType();
-        SVehicleAnimCollection& anims=m_vehicle_anims->m_vehicles_type_collections[anim_type];
-        if(angle==0.f) 		smart_cast<IKinematicsAnimated*>	(Visual())->PlayCycle(anims.idles[0]);
-        else if(angle>0.f)	smart_cast<IKinematicsAnimated*>	(Visual())->PlayCycle(anims.steer_right);
-        else				smart_cast<IKinematicsAnimated*>	(Visual())->PlayCycle(anims.steer_left);
-    */
+
+    //Alundaio: Re-enable Car
+    CCar* car = smart_cast<CCar*>(m_holder);
+    u16 anim_type = car->DriverAnimationType();
+    SVehicleAnimCollection& anims = m_vehicle_anims->m_vehicles_type_collections[anim_type];
+    if (angle == 0.f)
+        smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.idles[0]);
+    else if (angle > 0.f)
+        smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.steer_right);
+    else 
+        smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.steer_left);
+    //-Alundaio
 }
 
 void legs_play_callback(CBlend* blend)
@@ -312,7 +317,7 @@ CMotion* FindMotionKeys(MotionID motion_ID, IRenderVisual* V)
 #ifdef DEBUG
 BOOL g_ShowAnimationInfo = TRUE;
 #endif // DEBUG
-char* mov_state[] = {
+constexpr pcstr mov_state[] = {
     "idle", "walk", "run", "sprint",
 };
 void CActor::g_SetAnimation(u32 mstate_rl)

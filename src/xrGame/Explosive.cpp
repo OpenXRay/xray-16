@@ -71,7 +71,7 @@ CExplosive::CExplosive(void)
 
 void CExplosive::LightCreate()
 {
-    m_pLight = GlobalEnv.Render->light_create();
+    m_pLight = GEnv.Render->light_create();
     m_pLight->set_shadow(true);
 }
 
@@ -211,7 +211,7 @@ float CExplosive::ExplosionEffect(collide::rq_results& storage, CExplosive* exp_
     Fvector l_c, l_d;
     l_b1.get_CD(l_c, l_d);
     float effective_volume = l_d.x * l_d.y * l_d.z;
-    float max_s = effective_volume / (_min(_min(l_d.x, l_d.y), l_d.z));
+    float max_s = effective_volume / (std::min(std::min(l_d.x, l_d.y), l_d.z));
     if (blasted_obj->PPhysicsShell() && blasted_obj->PPhysicsShell()->isActive())
     {
         float ph_volume = blasted_obj->PPhysicsShell()->getVolume();
@@ -333,7 +333,7 @@ void CExplosive::Explode()
     //	Msg("---------CExplosive Explode [%d] frame[%d]",cast_game_object()->ID(), Device.dwFrame);
     OnBeforeExplosion();
     //играем звук взрыва
-    Sound->play_at_pos(sndExplode, 0, pos, false);
+    GEnv.Sound->play_at_pos(sndExplode, 0, pos, false);
 
     //показываем эффекты
 
@@ -716,7 +716,7 @@ struct SRemovePred
 };
 void CExplosive::ExplodeWaveProcess()
 {
-    BLASTED_OBJECTS_I I = std::remove_if(m_blasted_objects.begin(), m_blasted_objects.end(), SRemovePred());
+    auto I = std::remove_if(m_blasted_objects.begin(), m_blasted_objects.end(), SRemovePred());
     m_blasted_objects.erase(I, m_blasted_objects.end());
     rq_storage.r_clear();
     u16 i = BLASTED_OBJ_PROCESSED_PER_FRAME;
@@ -748,7 +748,7 @@ void CExplosive::net_Relcase(IGameObject* O)
             m_iCurrentParentID = u16(-1);
     }
 
-    BLASTED_OBJECTS_I I =
+    auto I =
         std::find(m_blasted_objects.begin(), m_blasted_objects.end(), smart_cast<CPhysicsShellHolder*>(O));
     if (m_blasted_objects.end() != I)
     {
@@ -780,3 +780,13 @@ void CExplosive::UpdateExplosionParticles()
 }
 
 bool CExplosive::Useful() const { return m_explosion_flags.flags == 0; }
+
+void random_point_in_object_box(Fvector& out_pos, IGameObject* obj)
+{
+    const Fbox& l_b1 = obj->BoundingBox();
+    Fvector l_c, l_d;
+    l_b1.get_CD(l_c, l_d);
+    out_pos.random_point(l_d);
+    obj->XFORM().transform_tiny(out_pos);
+    out_pos.add(l_c);
+}

@@ -2,11 +2,11 @@
 #ifndef PH_CAPTURE_H
 #define PH_CAPTURE_H
 
-#include "phupdateobject.h"
+#include "PHUpdateObject.h"
 
-#include "phisland.h"
-#include "Externals/ode/include/ode/common.h"
-#include "iphcapture.h"
+#include "PHIsland.h"
+#include <ode/common.h>
+#include "IPHCapture.h"
 class IPhysicsShellHolder;
 class CPHCharacter;
 class CPhysicsElement;

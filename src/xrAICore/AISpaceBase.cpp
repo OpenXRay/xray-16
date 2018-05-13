@@ -1,18 +1,17 @@
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "AISpaceBase.hpp"
 #include "Navigation/game_graph.h"
 #include "Navigation/level_graph.h"
 #include "Navigation/graph_engine.h"
 #include "Navigation/PatrolPath/patrol_path_storage.h"
-#include "Include/xrAPI/xrAPI.h"
 
-AISpaceBase::AISpaceBase() { GlobalEnv.AISpace = this; }
+AISpaceBase::AISpaceBase() { GEnv.AISpace = this; }
 AISpaceBase::~AISpaceBase()
 {
     xr_delete(m_patrol_path_storage);
     xr_delete(m_graph_engine);
     VERIFY(!m_game_graph);
-    GlobalEnv.AISpace = nullptr;
+    GEnv.AISpace = nullptr;
 }
 
 void AISpaceBase::Load(const char* levelName)
@@ -35,7 +34,7 @@ void AISpaceBase::Load(const char* levelName)
 
 void AISpaceBase::Unload(bool reload)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     xr_delete(m_graph_engine);
     xr_delete(m_level_graph);
@@ -45,7 +44,7 @@ void AISpaceBase::Unload(bool reload)
 
 void AISpaceBase::Initialize()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     VERIFY(!m_graph_engine);
     m_graph_engine = new CGraphEngine(1024);
@@ -87,7 +86,7 @@ void AISpaceBase::Validate(u32 levelId) const
 
 void AISpaceBase::patrol_path_storage_raw(IReader& stream)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     xr_delete(m_patrol_path_storage);
     m_patrol_path_storage = new CPatrolPathStorage();
@@ -96,7 +95,7 @@ void AISpaceBase::patrol_path_storage_raw(IReader& stream)
 
 void AISpaceBase::patrol_path_storage(IReader& stream)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     xr_delete(m_patrol_path_storage);
     m_patrol_path_storage = new CPatrolPathStorage();

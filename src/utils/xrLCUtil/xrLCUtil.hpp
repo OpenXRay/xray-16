@@ -1,10 +1,7 @@
 #pragma once
 #include "xrCore/xrCore.h"
-#pragma comment(lib, "xrCore.lib")
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "comctl32.lib")
-
-#include "Common/Platform.hpp"
 
 #ifdef XRLCUTIL_EXPORTS
 #define XRLCUTIL_API XR_EXPORT

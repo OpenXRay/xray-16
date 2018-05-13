@@ -120,7 +120,6 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     inherited::Load(xml, path);
 
     string256 buf;
-    XML_NODE* n = NULL;
 
     Frect base_rect;
     base_rect.x1 = 0;
@@ -131,7 +130,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     Frect _stored_rect = m_UIStaticItem.GetTextureRect();
 
     strconcat(sizeof(buf), buf, path, ":texture_above");
-    n = xml->NavigateToNode(buf, 0);
+    XML_NODE n = xml->NavigateToNode(buf, 0);
     if (n)
     {
         LPCSTR texture = xml->Read(buf, 0, NULL);
@@ -259,8 +258,8 @@ void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path) // complex_spot_template
 {
     inherited::Load(xml, path);
 
-    XML_NODE* stored_root = xml->GetLocalRoot();
-    XML_NODE* node = xml->NavigateToNode(path, 0);
+    XML_NODE stored_root = xml->GetLocalRoot();
+    XML_NODE node = xml->NavigateToNode(path, 0);
     xml->SetLocalRoot(node);
 
     m_left_icon = CreateStaticOrig(*xml, "left_icon");
@@ -329,7 +328,7 @@ void CComplexMapSpot::SetWndSize(const Fvector2& size)
     }
     float k = size.x / m_originSize.x;
 
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         CUIStaticOrig* static_orig = smart_cast<CUIStaticOrig*>(*it);
         if (static_orig)

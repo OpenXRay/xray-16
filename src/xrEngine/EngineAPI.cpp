@@ -4,41 +4,39 @@
 
 #include "stdafx.h"
 #include "EngineAPI.h"
-#include "xrCDB/xrXRC.h"
-#include "xrScriptEngine/script_engine.hpp"
+#include "XR_IOConsole.h"
 
 #include "xrCore/ModuleLookup.hpp"
+#include "xrCore/xr_token.h"
 
-extern xr_token* vid_quality_token;
+extern xr_vector<xr_token> vid_quality_token;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-void __cdecl dummy(void){};
+void __cdecl dummy(void) {}
+
 CEngineAPI::CEngineAPI()
 {
-    hGame = 0;
-    hRender = 0;
-    hTuner = 0;
-    pCreate = 0;
-    pDestroy = 0;
+    hGame = nullptr;
+    hTuner = nullptr;
+    hRenderR1 = nullptr;
+    hRenderR2 = nullptr;
+    hRenderR3 = nullptr;
+    hRenderR4 = nullptr;
+    hRenderRGL = nullptr;
+    pCreate = nullptr;
+    pDestroy = nullptr;
+    tune_enabled = false;
     tune_pause = dummy;
     tune_resume = dummy;
 }
 
 CEngineAPI::~CEngineAPI()
 {
-    // destroy quality token here
-    if (vid_quality_token)
-    {
-        xr_free(vid_quality_token);
-        vid_quality_token = NULL;
-    }
+    vid_quality_token.clear();
 }
-
-extern u32 renderer_value; // con cmd
-ENGINE_API int g_current_renderer = 0;
 
 bool is_enough_address_space_available()
 {
@@ -47,308 +45,237 @@ bool is_enough_address_space_available()
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
 }
 
-#ifndef DEDICATED_SERVER
-
-void CEngineAPI::InitializeNotDedicated()
+void CEngineAPI::SetupCurrentRenderer()
 {
-    LPCSTR r2_name = "xrRender_R2";
-    LPCSTR r3_name = "xrRender_R3";
-    LPCSTR r4_name = "xrRender_R4";
+    GEnv.CurrentRenderer = -1;
+
+    if (psDeviceFlags.test(rsRGL))
+    {
+        if (hRenderRGL->exist())
+        {
+            GEnv.CurrentRenderer = 5;
+            GEnv.SetupCurrentRenderer = GEnv.SetupRGL;
+        }
+        else
+        {
+            psDeviceFlags.set(rsRGL, false);
+            psDeviceFlags.set(rsR4, true);
+        }
+    }
 
     if (psDeviceFlags.test(rsR4))
     {
-        // try to initialize R4
-        hRender = XRay::LoadLibrary(r4_name);
-        if (0 == hRender)
+        if (hRenderR4->exist())
         {
-            // try to load R1
-            Msg("! ...Failed - incompatible hardware/pre-Vista OS.");
-            psDeviceFlags.set(rsR2, TRUE);
+            GEnv.CurrentRenderer = 4;
+            GEnv.SetupCurrentRenderer = GEnv.SetupR4;
+        }
+        else
+        {
+            psDeviceFlags.set(rsR4, false);
+            psDeviceFlags.set(rsR3, true);
         }
     }
 
     if (psDeviceFlags.test(rsR3))
     {
-        // try to initialize R3
-        hRender = XRay::LoadLibrary(r3_name);
-        if (0 == hRender)
+        if (hRenderR3->exist())
         {
-            // try to load R1
-            Msg("! ...Failed - incompatible hardware/pre-Vista OS.");
-            psDeviceFlags.set(rsR2, TRUE);
+            GEnv.CurrentRenderer = 3;
+            GEnv.SetupCurrentRenderer = GEnv.SetupR3;
         }
         else
-            g_current_renderer = 3;
+        {
+            psDeviceFlags.set(rsR3, false);
+            psDeviceFlags.set(rsR2, true);
+        }
     }
 
     if (psDeviceFlags.test(rsR2))
     {
-        // try to initialize R2
-        psDeviceFlags.set(rsR4, FALSE);
-        psDeviceFlags.set(rsR3, FALSE);
-        hRender = XRay::LoadLibrary(r2_name);
-        if (0 == hRender)
+        if (hRenderR2->exist())
         {
-            // try to load R1
-            Msg("! ...Failed - incompatible hardware.");
+            GEnv.CurrentRenderer = 2;
+            GEnv.SetupCurrentRenderer = GEnv.SetupR2;
         }
         else
-            g_current_renderer = 2;
+        {
+            psDeviceFlags.set(rsR2, false);
+            psDeviceFlags.set(rsR1, true);
+        }
+    }
+
+    if (psDeviceFlags.test(rsR1))
+    {
+        if (hRenderR1->exist())
+        {
+            GEnv.CurrentRenderer = 1;
+            GEnv.SetupCurrentRenderer = GEnv.SetupR1;
+        }
+        else
+            psDeviceFlags.set(rsR1, false);
     }
 }
-#endif // DEDICATED_SERVER
+
+void CEngineAPI::InitializeRenderers()
+{
+    SetupCurrentRenderer();
+
+    if (GEnv.SetupCurrentRenderer == nullptr
+        && vid_quality_token[0].id != -1)
+    {
+        // if engine failed to load renderer
+        // but there is at least one available
+        // then try again
+        string32 buf;
+        xr_sprintf(buf, "renderer %s", vid_quality_token[0].name);
+        Console->Execute(buf);
+
+        // Second attempt
+        SetupCurrentRenderer();
+    }
+
+    // ask current renderer to setup GlobalEnv
+    R_ASSERT2(GEnv.SetupCurrentRenderer, "Can't setup renderer");
+    GEnv.SetupCurrentRenderer();
+
+    // Now unload unused renderers
+    // XXX: Unloading disabled due to typeids invalidation
+    /*if (GEnv.CurrentRenderer != 5)
+        hRenderRGL->close();
+    
+    if (GEnv.CurrentRenderer != 4)
+        hRenderR4->close();
+
+    if (GEnv.CurrentRenderer != 3)
+        hRenderR3->close();
+
+    if (GEnv.CurrentRenderer != 2)
+        hRenderR2->close();
+
+    if (GEnv.CurrentRenderer != 1)
+        hRenderR1->close();*/
+}
 
 void CEngineAPI::Initialize(void)
 {
-    //////////////////////////////////////////////////////////////////////////
-    // render
-    LPCSTR r1_name = "xrRender_R1";
+    InitializeRenderers();
 
-#ifndef DEDICATED_SERVER
-    InitializeNotDedicated();
-#endif // DEDICATED_SERVER
+    hGame = XRay::LoadModule("xrGame");
+    R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
 
-    if (0 == hRender)
-    {
-        // try to load R1
-        psDeviceFlags.set(rsR4, FALSE);
-        psDeviceFlags.set(rsR3, FALSE);
-        psDeviceFlags.set(rsR2, FALSE);
-        renderer_value = 0; // con cmd
+    pCreate = (Factory_Create*)hGame->getProcAddress("xrFactory_Create");
+    R_ASSERT(pCreate);
 
-        hRender = XRay::LoadLibrary(r1_name);
-        if (0 == hRender)
-            R_CHK(GetLastError());
-        R_ASSERT(hRender);
-        g_current_renderer = 1;
-    }
-    // ask current renderer to setup GlobalEnv
-    using SetupEnvFunc = void (*)();
-    auto setupEnv = (SetupEnvFunc)XRay::GetProcAddress(hRender, "SetupEnv");
-    R_ASSERT(setupEnv);
-    setupEnv();
-    // game
-    {
-        LPCSTR g_name = "xrGame";
-        hGame = XRay::LoadLibrary(g_name);
-        if (0 == hGame)
-            R_CHK(GetLastError());
-        R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
-        pCreate = (Factory_Create*)XRay::GetProcAddress(hGame, "xrFactory_Create");
-        R_ASSERT(pCreate);
-        pDestroy = (Factory_Destroy*)XRay::GetProcAddress(hGame, "xrFactory_Destroy");
-        R_ASSERT(pDestroy);
-    }
+    pDestroy = (Factory_Destroy*)hGame->getProcAddress("xrFactory_Destroy");
+    R_ASSERT(pDestroy);
 
     //////////////////////////////////////////////////////////////////////////
     // vTune
-    tune_enabled = FALSE;
+    tune_enabled = false;
     if (strstr(Core.Params, "-tune"))
     {
-        LPCSTR g_name = "vTuneAPI";
-        hTuner = XRay::LoadLibrary(g_name);
-        if (0 == hTuner)
-            R_CHK(GetLastError());
-        R_ASSERT2(hTuner, "Intel vTune is not installed");
-        tune_enabled = TRUE;
-        tune_pause = (VTPause*)XRay::GetProcAddress(hTuner, "VTPause");
-        R_ASSERT(tune_pause);
-        tune_resume = (VTResume*)XRay::GetProcAddress(hTuner, "VTResume");
-        R_ASSERT(tune_resume);
+        hTuner = XRay::LoadModule("vTuneAPI");
+        tune_pause = (VTPause*)hTuner->getProcAddress("VTPause");
+        tune_resume = (VTResume*)hTuner->getProcAddress("VTResume");
+
+        if (!tune_pause || !tune_resume)
+        {
+            Log("Can't initialize Intel vTune");
+            tune_pause = dummy;
+            tune_resume = dummy;
+            return;
+        }
+
+        tune_enabled = true;
     }
 }
 
 void CEngineAPI::Destroy(void)
 {
-    if (hGame)
-    {
-        XRay::UnloadLibrary(hGame);
-        hGame = 0;
-    }
-    if (hRender)
-    {
-        XRay::UnloadLibrary(hRender);
-        hRender = 0;
-    }
-    pCreate = 0;
-    pDestroy = 0;
+    hGame = nullptr;
+    hTuner = nullptr;
+    hRenderR1 = nullptr;
+    hRenderR2 = nullptr;
+    hRenderR3 = nullptr;
+    hRenderR4 = nullptr;
+    hRenderRGL = nullptr;
+    pCreate = nullptr;
+    pDestroy = nullptr;
     Engine.Event._destroy();
     XRC.r_clear_compact();
 }
 
-extern "C" {
-typedef bool __cdecl SupportsAdvancedRendering(void);
-typedef bool _declspec(dllexport) SupportsDX10Rendering();
-typedef bool _declspec(dllexport) SupportsDX11Rendering();
-};
-
 void CEngineAPI::CreateRendererList()
 {
-#ifdef DEDICATED_SERVER
+    hRenderR1 = XRay::LoadModule("xrRender_R1");
 
-    vid_quality_token = xr_alloc<xr_token>(2);
-
-    vid_quality_token[0].id = 0;
-    vid_quality_token[0].name = xr_strdup("renderer_r1");
-
-    vid_quality_token[1].id = -1;
-    vid_quality_token[1].name = NULL;
-
-#else
-    // TODO: ask renderers if they are supported!
-    if (vid_quality_token != NULL)
+    xr_vector<xr_token> modes;
+    if (GEnv.isDedicatedServer)
+    {
+        R_ASSERT2(hRenderR1->exist(), "Dedicated server needs xrRender_R1 to work");
+        modes.emplace_back(xr_token("renderer_r1", 0));
+        modes.emplace_back(xr_token(nullptr, -1));
+        vid_quality_token = std::move(modes);
         return;
-    bool bSupports_r2 = false;
-    bool bSupports_r2_5 = false;
-    bool bSupports_r3 = false;
-    bool bSupports_r4 = false;
-
-    LPCSTR r2_name = "xrRender_R2";
-    LPCSTR r3_name = "xrRender_R3";
-    LPCSTR r4_name = "xrRender_R4";
-
-    if (strstr(Core.Params, "-perfhud_hack"))
-    {
-        bSupports_r2 = true;
-        bSupports_r2_5 = true;
-        bSupports_r3 = true;
-        bSupports_r4 = true;
-    }
-    else
-    {
-        // try to initialize R2
-        hRender = XRay::LoadLibrary(r2_name);
-        if (hRender)
-        {
-            bSupports_r2 = true;
-            SupportsAdvancedRendering* test_rendering =
-                (SupportsAdvancedRendering*)XRay::GetProcAddress(hRender, "SupportsAdvancedRendering");
-            R_ASSERT(test_rendering);
-            bSupports_r2_5 = test_rendering();
-        }
-
-        // try to initialize R3
-        Log("Loading DLL:", r3_name);
-        // Hide "d3d10.dll not found" message box for XP
-        SetErrorMode(SEM_FAILCRITICALERRORS);
-        hRender = XRay::LoadLibrary(r3_name);
-        // Restore error handling
-        SetErrorMode(0);
-        if (hRender)
-        {
-            SupportsDX10Rendering* test_dx10_rendering =
-                (SupportsDX10Rendering*)XRay::GetProcAddress(hRender, "SupportsDX10Rendering");
-            R_ASSERT(test_dx10_rendering);
-            bSupports_r3 = test_dx10_rendering();
-        }
-
-        // try to initialize R4
-        Log("Loading DLL:", r4_name);
-        // Hide "d3d10.dll not found" message box for XP
-        SetErrorMode(SEM_FAILCRITICALERRORS);
-        hRender = XRay::LoadLibrary(r4_name);
-        // Restore error handling
-        SetErrorMode(0);
-        if (hRender)
-        {
-            SupportsDX11Rendering* test_dx11_rendering =
-                (SupportsDX11Rendering*)XRay::GetProcAddress(hRender, "SupportsDX11Rendering");
-            R_ASSERT(test_dx11_rendering);
-            bSupports_r4 = test_dx11_rendering();
-        }
     }
 
-    hRender = 0;
-    bool proceed = true;
-    xr_vector<LPCSTR> tmp;
-    tmp.push_back("renderer_r1");
-    if (proceed &= bSupports_r2, proceed)
-    {
-        tmp.push_back("renderer_r2a");
-        tmp.push_back("renderer_r2");
-    }
-    if (proceed &= bSupports_r2_5, proceed)
-        tmp.push_back("renderer_r2.5");
-    if (proceed &= bSupports_r3, proceed)
-        tmp.push_back("renderer_r3");
-    if (proceed &= bSupports_r4, proceed)
-        tmp.push_back("renderer_r4");
-    u32 _cnt = tmp.size() + 1;
-    vid_quality_token = xr_alloc<xr_token>(_cnt);
+    if (!vid_quality_token.empty())
+        return;
 
-    vid_quality_token[_cnt - 1].id = -1;
-    vid_quality_token[_cnt - 1].name = NULL;
+    // Hide "d3d10.dll not found" message box for XP
+    SetErrorMode(SEM_FAILCRITICALERRORS);
 
-#ifdef DEBUG
-    Msg("Available render modes[%d]:", tmp.size());
-#endif // DEBUG
-    for (u32 i = 0; i < tmp.size(); ++i)
+    hRenderR2 = XRay::LoadModule("xrRender_R2");
+    hRenderR3 = XRay::LoadModule("xrRender_R3");
+    hRenderR4 = XRay::LoadModule("xrRender_R4");
+    hRenderRGL = XRay::LoadModule("xrRender_GL");
+
+    // Restore error handling
+    SetErrorMode(0);
+
+    if (hRenderR1->exist())
     {
-        vid_quality_token[i].id = i;
-        vid_quality_token[i].name = tmp[i];
-#ifdef DEBUG
-        Msg("[%s]", tmp[i]);
-#endif // DEBUG
+        modes.emplace_back(xr_token("renderer_r1", 0));
     }
 
-/*
-if(vid_quality_token != NULL) return;
+    if (hRenderR2->exist())
+    {
+        modes.emplace_back(xr_token("renderer_r2a", 1));
+        modes.emplace_back(xr_token("renderer_r2", 2));
+        if (GEnv.CheckR2 && GEnv.CheckR2())
+            modes.emplace_back(xr_token("renderer_r2.5", 3));
+    }
 
-D3DCAPS9 caps;
-CHW _HW;
-_HW.CreateD3D ();
-_HW.pD3D->GetDeviceCaps (D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,&caps);
-_HW.DestroyD3D ();
-u16 ps_ver_major = u16 ( u32(u32(caps.PixelShaderVersion)&u32(0xf << 8ul))>>8 );
+    if (hRenderR3->exist())
+    {
+        if (GEnv.CheckR3 && GEnv.CheckR3())
+            modes.emplace_back(xr_token("renderer_r3", 4));
+        else
+            hRenderR3->close();
+    }
 
-xr_vector<LPCSTR> _tmp;
-u32 i = 0;
-for(; i<5; ++i)
-{
-bool bBreakLoop = false;
-switch (i)
-{
-case 3: //"renderer_r2.5"
-if (ps_ver_major < 3)
-bBreakLoop = true;
-break;
-case 4: //"renderer_r_dx10"
-bBreakLoop = true;
-break;
-default: ;
-}
+    if (hRenderR4->exist())
+    {
+        if (GEnv.CheckR4 && GEnv.CheckR4())
+            modes.emplace_back(xr_token("renderer_r4", 5));
+        else
+            hRenderR4->close();
+    }
 
-if (bBreakLoop) break;
+    if (hRenderRGL->exist())
+    {
+        if (GEnv.CheckRGL && GEnv.CheckRGL())
+            modes.emplace_back(xr_token("renderer_gl", 6));
+        else
+            hRenderRGL->close();
+    }
+    modes.emplace_back(xr_token(nullptr, -1));
 
-_tmp.push_back (NULL);
-LPCSTR val = NULL;
-switch (i)
-{
-case 0: val ="renderer_r1"; break;
-case 1: val ="renderer_r2a"; break;
-case 2: val ="renderer_r2"; break;
-case 3: val ="renderer_r2.5"; break;
-case 4: val ="renderer_r_dx10"; break; // -)
-}
-_tmp.back() = xr_strdup(val);
-}
-u32 _cnt = _tmp.size()+1;
-vid_quality_token = xr_alloc<xr_token>(_cnt);
+    Msg("Available render modes[%d]:", modes.size());
+    for (auto& mode : modes)
+        if (mode.name)
+            Log(mode.name);
 
-vid_quality_token[_cnt-1].id = -1;
-vid_quality_token[_cnt-1].name = NULL;
-
-#ifdef DEBUG
-Msg("Available render modes[%d]:",_tmp.size());
-#endif // DEBUG
-for(u32 i=0; i<_tmp.size();++i)
-{
-vid_quality_token[i].id = i;
-vid_quality_token[i].name = _tmp[i];
-#ifdef DEBUG
-Msg ("[%s]",_tmp[i]);
-#endif // DEBUG
-}
-*/
-#endif //#ifndef DEDICATED_SERVER
+    vid_quality_token = std::move(modes);
 }

@@ -56,7 +56,7 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     pXML->SetLocalRoot(pXML->GetRoot());
 
     // loading from XML
-    XML_NODE* pNode = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+    XML_NODE pNode = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
     THROW3(pNode, "encyclopedia article id=", *item_data.id);
 
     //текст
@@ -116,19 +116,19 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
 
     // Тип статьи
     xr_string atricle_type = pXML->ReadAttrib(pNode, "article_type", "encyclopedia");
-    if (0 == stricmp(atricle_type.c_str(), "encyclopedia"))
+    if (0 == xr_stricmp(atricle_type.c_str(), "encyclopedia"))
     {
         data()->articleType = ARTICLE_DATA::eEncyclopediaArticle;
     }
-    else if (0 == stricmp(atricle_type.c_str(), "journal"))
+    else if (0 == xr_stricmp(atricle_type.c_str(), "journal"))
     {
         data()->articleType = ARTICLE_DATA::eJournalArticle;
     }
-    else if (0 == stricmp(atricle_type.c_str(), "task"))
+    else if (0 == xr_stricmp(atricle_type.c_str(), "task"))
     {
         data()->articleType = ARTICLE_DATA::eTaskArticle;
     }
-    else if (0 == stricmp(atricle_type.c_str(), "info"))
+    else if (0 == xr_stricmp(atricle_type.c_str(), "info"))
     {
         data()->articleType = ARTICLE_DATA::eInfoArticle;
     }

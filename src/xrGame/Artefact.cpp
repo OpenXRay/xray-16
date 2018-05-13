@@ -263,7 +263,7 @@ void CArtefact::StartLights()
         return;
 
     VERIFY(m_pTrailLight == NULL);
-    m_pTrailLight = GlobalEnv.Render->light_create();
+    m_pTrailLight = GEnv.Render->light_create();
     bool const b_light_shadow = !!pSettings->r_bool(cNameSect(), "idle_light_shadow");
 
     m_pTrailLight->set_shadow(b_light_shadow);
@@ -410,15 +410,18 @@ bool CArtefact::Action(u16 cmd, u32 flags)
     return inherited::Action(cmd, flags);
 }
 
-void CArtefact::OnStateSwitch(u32 S)
+void CArtefact::OnStateSwitch(u32 S, u32 oldState)
 {
-    inherited::OnStateSwitch(S);
+    inherited::OnStateSwitch(S, oldState);
     switch (S)
     {
     case eShowing: { PlayHUDMotion("anm_show", FALSE, this, S);
     }
     break;
-    case eHiding: { PlayHUDMotion("anm_hide", FALSE, this, S);
+    case eHiding:
+    {
+        if (oldState != eHiding)
+            PlayHUDMotion("anm_hide", FALSE, this, S);
     }
     break;
     case eActivating: { PlayHUDMotion("anm_activate", FALSE, this, S);

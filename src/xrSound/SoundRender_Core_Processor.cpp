@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
+
 #include "xrEngine/Engine.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
@@ -9,7 +9,7 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, BOOL _loop, float delay)
+CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, bool _loop, float delay)
 {
     VERIFY(S->_p->feedback == 0);
     CSoundRender_Emitter* E = new CSoundRender_Emitter();
@@ -25,17 +25,17 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     if (0 == bReady)
         return;
     Stats.Update.Begin();
-    bLocked = TRUE;
+    isLocked = true;
     float new_tm = Timer.GetElapsed_sec();
     fTimer_Delta = new_tm - fTimer_Value;
-    //.	float dt					= float(Timer_Delta)/1000.f;
+    //float dt = float(Timer_Delta)/1000.f;
     float dt_sec = fTimer_Delta;
     fTimer_Value = new_tm;
 
     s_emitters_u++;
 
     // Firstly update emitters, which are now being rendered
-    // Msg	("! update: r-emitters");
+    // Msg("! update: r-emitters");
     for (it = 0; it < s_targets.size(); it++)
     {
         CSoundRender_Target* T = s_targets[it];
@@ -56,8 +56,8 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         }
     }
 
-    // Update emmitters
-    // Msg	("! update: emitters");
+    // Update emitters
+    // Msg("! update: emitters");
     for (it = 0; it < s_emitters.size(); it++)
     {
         CSoundRender_Emitter* pEmitter = s_emitters[it];
@@ -76,7 +76,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     }
 
     // Get currently rendering emitters
-    // Msg	("! update: targets");
+    // Msg("! update: targets");
     s_targets_defer.clear();
     s_targets_pu++;
     // u32 PU				= s_targets_pu%s_targets.size();
@@ -110,7 +110,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     {
         if (bListenerMoved)
         {
-            bListenerMoved = FALSE;
+            bListenerMoved = false;
             e_target = *get_environment(P);
         }
 
@@ -134,7 +134,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     // Events
     update_events();
 
-    bLocked = FALSE;
+    isLocked = false;
     Stats.Update.End();
 }
 
@@ -147,7 +147,7 @@ void CSoundRender_Core::update_events()
         event& E = s_events[it];
         Handler(E.first, E.second);
     }
-    s_events.clear_not_free();
+    s_events.clear();
 }
 
 void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
@@ -186,7 +186,7 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
             }
             else
             {
-                _I.game_object = 0;
+                _I.game_object = nullptr;
                 _I.game_type = 0;
                 _I.type = st_Effect;
             }
@@ -212,7 +212,7 @@ float CSoundRender_Core::get_occlusion_to(const Fvector& hear_pt, const Fvector&
 {
     float occ_value = 1.f;
 
-    if (0 != geom_SOM)
+    if (nullptr != geom_SOM)
     {
         // Calculate RAY params
         Fvector pos, dir;
@@ -261,7 +261,7 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
     range = dir.magnitude();
     dir.div(range);
 
-    if (0 != geom_MODEL)
+    if (nullptr != geom_MODEL)
     {
         bool bNeedFullTest = true;
         // 1. Check cached polygon
@@ -281,16 +281,16 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
             if (0 != ETOOLS::r_count())
             {
                 // cache polygon
-                const CDB::RESULT* R = ETOOLS::r_begin();
+                const CDB::RESULT* R2 = ETOOLS::r_begin();
 #else
             geom_DB.ray_options(CDB::OPT_ONLYNEAREST);
             geom_DB.ray_query(geom_MODEL, base, dir, range);
             if (0 != geom_DB.r_count())
             {
                 // cache polygon
-                const CDB::RESULT* R = geom_DB.r_begin();
+                const CDB::RESULT* R2 = geom_DB.r_begin();
 #endif
-                const CDB::TRI& T = geom_MODEL->get_tris()[R->id];
+                const CDB::TRI& T = geom_MODEL->get_tris()[R2->id];
                 const Fvector* V = geom_MODEL->get_verts();
                 occ[0].set(V[T.verts[0]]);
                 occ[1].set(V[T.verts[1]]);
@@ -299,7 +299,7 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
             }
         }
     }
-    if (0 != geom_SOM)
+    if (nullptr != geom_SOM)
     {
 #ifdef _EDITOR
         ETOOLS::ray_options(CDB::OPT_CULL);
@@ -316,8 +316,8 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
         {
             for (u32 k = 0; k < r_cnt; k++)
             {
-                CDB::RESULT* R = _B + k;
-                occ_value *= *(float*)&R->dummy;
+                CDB::RESULT* R2 = _B + k;
+                occ_value *= *(float*)&R2->dummy;
             }
         }
     }

@@ -1,12 +1,8 @@
-//----------------------------------------------------
-// file: TextureParam.h
-//----------------------------------------------------
 #ifndef ETextureParamsH
 #define ETextureParamsH
 class INetReader;
 #pragma pack(push, 1)
-// struct ECORE_API STextureParams{
-struct STextureParams
+struct /*ECORE_API*/ STextureParams
 {
     enum ETType
     {
@@ -40,6 +36,7 @@ struct STextureParams
         tbmResereved = 0,
         tbmNone,
         tbmUse,
+        tbmUseParallax,
         tbmForceU32 = u32(-1)
     };
     enum ETMaterial
@@ -119,9 +116,22 @@ struct STextureParams
     shared_str bump_name;
     shared_str ext_normal_map_name;
 
-    STextureParams()
+    STextureParams() { Clear(); }
+    void destroy_shared_str(shared_str& object) { object.~shared_str(); }
+    void construct_shared_str(shared_str& object) { ::new (&object) shared_str(); }
+
+    void Clear()
     {
+        destroy_shared_str(detail_name);
+        destroy_shared_str(bump_name);
+        destroy_shared_str(ext_normal_map_name);
+
         ZeroMemory(this, sizeof(STextureParams));
+
+        construct_shared_str(detail_name);
+        construct_shared_str(bump_name);
+        construct_shared_str(ext_normal_map_name);
+
         flags.set(flGenerateMipMaps | flDitherColor, TRUE);
         mip_filter = kMIPFilterBox;
         width = 0;
@@ -131,14 +141,14 @@ struct STextureParams
         material = tmBlin_Phong;
         bump_virtual_height = 0.05f;
     }
-    IC BOOL HasAlpha()
+
+    BOOL HasAlpha()
     {
         // исходная текстура содержит альфа канал
         return flags.is(flHasAlpha);
     }
-    IC BOOL HasSurface() const { return flags.is(flHasSurface); }
-    IC void SetHasSurface(BOOL val) { flags.set(flHasSurface, val); }
-    IC BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
+
+    BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
     {
         switch (fmt)
         {
@@ -155,20 +165,24 @@ struct STextureParams
     void Save(IWriter& F);
     void read(INetReader& r);
     void write(IWriter& w) const;
+    BOOL HasSurface() const { return flags.is(flHasSurface); }
+    void SetHasSurface(BOOL val) { flags.set(flHasSurface, val); }
 #ifdef _EDITOR
     PropValue::TOnChange OnTypeChangeEvent;
     void __stdcall OnTypeChange(PropValue* v);
     void FillProp(LPCSTR base_name, PropItemVec& items, PropValue::TOnChange OnChangeEvent);
     LPCSTR FormatString();
     u32 MemoryUsage(LPCSTR base_name);
+    BOOL similar(STextureParams& tp1, xr_vector<AnsiString>& sel_params);
+
 #endif
 };
 #pragma pack(pop)
 
 struct xr_token;
-extern xr_token tparam_token[];
-extern xr_token tfmt_token[];
-extern xr_token ttype_token[];
+extern const xr_token tparam_token[];
+extern const xr_token tfmt_token[];
+extern const xr_token ttype_token[];
 
 //----------------------------------------------------
 #define THM_CHUNK_VERSION 0x0810

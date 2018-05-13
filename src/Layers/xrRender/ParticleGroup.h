@@ -1,6 +1,4 @@
-//---------------------------------------------------------------------------
-#ifndef ParticleGroupH
-#define ParticleGroupH
+#pragma once
 
 #include "Layers/xrRender/dxParticleCustom.h"
 
@@ -42,7 +40,8 @@ public:
         BOOL Equal(const SEffect&);
 #endif
     };
-    DEFINE_VECTOR(SEffect*, EffectVec, EffectIt);
+
+    using EffectVec = xr_vector<SEffect*>;
     EffectVec m_Effects;
 #ifdef _EDITOR
     // change Equal if variables changed
@@ -78,18 +77,17 @@ class ECORE_API CParticleGroup : public dxParticleCustom
     Fvector m_InitialPosition;
 
 public:
-    DEFINE_VECTOR(dxRender_Visual*, VisualVec, VisualVecIt);
+    using VisualVec = xr_vector<dxRender_Visual*>;
     struct SItem
     {
         dxRender_Visual* _effect;
         VisualVec _children_related;
         VisualVec _children_free;
 
-    public:
         void Set(dxRender_Visual* e);
         void Clear();
 
-        IC u32 GetVisuals(xr_vector<dxRender_Visual*>& visuals)
+        u32 GetVisuals(xr_vector<dxRender_Visual*>& visuals)
         {
             visuals.reserve(_children_related.size() + _children_free.size() + 1);
             if (_effect)
@@ -110,11 +108,11 @@ public:
         void OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& box, bool& bPlaying);
 
         u32 ParticlesCount();
-        BOOL IsPlaying();
+        bool IsPlaying() const;
         void Play();
         void Stop(BOOL def_stop);
     };
-    DEFINE_VECTOR(SItem, SItemVec, SItemVecIt)
+    using SItemVec = xr_vector<SItem>;
     SItemVec items;
 
 public:
@@ -130,7 +128,7 @@ public:
     virtual ~CParticleGroup();
     virtual void OnFrame(u32 dt);
 
-    virtual void Copy(dxRender_Visual* pFrom) { FATAL("Can't duplicate particle system - NOT IMPLEMENTED"); }
+    virtual void Copy(dxRender_Visual* /*pFrom*/) { FATAL("Can't duplicate particle system - NOT IMPLEMENTED"); }
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
 
@@ -168,6 +166,3 @@ public:
 #define PGD_CHUNK_EFFECTS 0x0004 // obsolete
 #define PGD_CHUNK_TIME_LIMIT 0x0005
 #define PGD_CHUNK_EFFECTS2 0x0007
-
-//---------------------------------------------------------------------------
-#endif

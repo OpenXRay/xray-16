@@ -244,7 +244,11 @@ void stalker_movement_manager_smart_cover::reach_enter_location(u32 const& time_
     if (!object().sight().current_action().target_reached())
         return;
 
-    if (target_params().cover()->can_fire())
+    // morrey
+    // смарткаверы чн-ные не работали. заюзал из чн алгоритм
+    //if (target_params().cover()->can_fire()) // ЗП
+    //if (target_params().cover()->is_combat_cover()) // ЧН
+    if (target_params().cover()->can_fire() || target_params().cover()->is_combat_cover()) // Xottab_DUTY to morrey: а если так попробовать?
     {
         CInventoryItem const* const inventory_item = object().inventory().ActiveItem();
         if (!inventory_item)
@@ -364,7 +368,7 @@ void stalker_movement_manager_smart_cover::loophole_path(smart_cover::cover cons
 
     typedef GraphEngineSpace::CBaseParameters CBaseParameters;
     CBaseParameters parameters(u32(-1), u32(-1), u32(-1));
-    path.clear_not_free();
+    path.clear();
     R_ASSERT2(ai().graph_engine().search(cover.description()->transitions(), source, target, &path, parameters),
         make_string("cannot build path via loopholes [%s] -> [%s] (cover %s)", source_raw.c_str(), target_raw.c_str(),
             cover.description()->table_id().c_str()));

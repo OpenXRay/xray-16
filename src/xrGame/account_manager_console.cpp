@@ -8,6 +8,7 @@
 #include "profile_store.h"
 #include "stats_submitter.h"
 #include "MainMenu.h"
+#include "profile_data_types_script.h"
 
 void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
 {

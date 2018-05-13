@@ -1,210 +1,195 @@
+#pragma once
 #ifndef FTimerH
 #define FTimerH
-#pragma once
+#include "Common/Noncopyable.hpp"
+#include "_types.h"
+#include "xrCommon/xr_vector.h"
+#include "_math.h"
+#include "log.h"
+#include <chrono>
 
 class CTimer_paused;
 
-class XRCORE_API pauseMngr
+class XRCORE_API pauseMngr : Noncopyable
 {
     xr_vector<CTimer_paused*> m_timers;
-    BOOL m_paused;
+    bool paused;
 
 public:
     pauseMngr();
-    BOOL Paused() { return m_paused; };
-    void Pause(BOOL b);
-    void Register(CTimer_paused* t);
-    void UnRegister(CTimer_paused* t);
+    bool Paused() const { return paused; }
+    void Pause(const bool b);
+    void Register(CTimer_paused& t);
+    void UnRegister(CTimer_paused& t);
 };
 
-extern XRCORE_API pauseMngr* g_pauseMngr();
+extern XRCORE_API pauseMngr& g_pauseMngr();
 
 class XRCORE_API CTimerBase
 {
+public:
+    using Clock = std::chrono::high_resolution_clock;
+    using Time = std::chrono::time_point<Clock>;
+    using Duration = Time::duration;
+
 protected:
-    u64 qwStartTime;
-    u64 qwPausedTime;
-    u64 qwPauseAccum;
-    BOOL bPause;
+    Time startTime;
+    Duration pauseDuration;
+    Duration pauseAccum;
+    bool paused;
 
 public:
-    CTimerBase() : qwStartTime(0), qwPausedTime(0), qwPauseAccum(0), bPause(FALSE) {}
-    ICF void Start()
+    constexpr CTimerBase() noexcept : startTime(), pauseDuration(), pauseAccum(), paused(false) {}
+
+    void Start()
     {
-        if (bPause)
-            return;
-        qwStartTime = CPU::QPC() - qwPauseAccum;
+        if (paused) return;
+        startTime = Clock::now() - pauseAccum;
     }
-    ICF u64 GetElapsed_ticks() const
+
+    Duration getElapsedTime() const
     {
-        if (bPause)
-            return qwPausedTime;
-        else
-            return CPU::QPC() - qwStartTime - CPU::qpc_overhead - qwPauseAccum;
+        if (paused) return pauseDuration;
+        return Clock::now() - startTime - pauseAccum;
     }
-    IC u32 GetElapsed_ms() const { return u32(GetElapsed_ticks() * u64(1000) / CPU::qpc_freq); }
-    IC float GetElapsed_sec() const
+
+    u64 GetElapsed_ms() const
     {
-#ifndef _EDITOR
-        FPU::m64r();
-#endif
-        float _result = float(double(GetElapsed_ticks()) / double(CPU::qpc_freq));
-#ifndef _EDITOR
-        FPU::m24r();
-#endif
-        return _result;
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(getElapsedTime()).count();
     }
-    IC void Dump() const { Msg("* Elapsed time (sec): %f", GetElapsed_sec()); }
+
+    float GetElapsed_sec() const
+    {
+        using namespace std::chrono;
+        const auto nanos = duration_cast<nanoseconds>(getElapsedTime()).count();
+        return float(nanos) / 1000000000.0;
+    }
+
+    void Dump() const { Msg("* Elapsed time (sec): %f", GetElapsed_sec()); }
 };
 
 class XRCORE_API CTimer : public CTimerBase
 {
-private:
-    typedef CTimerBase inherited;
+    using super = CTimerBase;
 
-private:
     float m_time_factor;
-    u64 m_real_ticks;
-    u64 m_ticks;
+    Duration realTime;
+    Duration time;
 
-private:
-    IC u64 GetElapsed_ticks(const u64& current_ticks) const
+    Duration getElapsedTime(const Duration current) const
     {
-        u64 delta = current_ticks - m_real_ticks;
-        double delta_d = (double)delta;
-        double time_factor_d = time_factor();
-        double time = delta_d * time_factor_d + .5;
-        u64 result = (u64)time;
-        return (m_ticks + result);
+        const auto delta = current - realTime;
+        const auto deltaD = double(delta.count());
+        const auto time_factor_d = double(time_factor());
+        const double time = deltaD * time_factor_d + .5;
+        const auto result = u64(time);
+        return Duration(result);
     }
 
 public:
-    IC CTimer() : m_time_factor(1.f), m_real_ticks(0), m_ticks(0) {}
-    ICF void Start()
+    constexpr CTimer() noexcept : m_time_factor(1.f), realTime(), time() {}
+
+    void Start() noexcept
     {
-        if (bPause)
-            return;
+        if (paused) return;
 
-        inherited::Start();
-
-        m_real_ticks = 0;
-        m_ticks = 0;
+        super::Start();
     }
 
-    IC const float& time_factor() const { return (m_time_factor); }
-    IC void time_factor(const float& time_factor)
+    float time_factor() const noexcept { return m_time_factor; }
+
+    void time_factor(const float time_factor) noexcept
     {
-        u64 current = inherited::GetElapsed_ticks();
-        m_ticks = GetElapsed_ticks(current);
-        m_real_ticks = current;
+        const auto current = super::getElapsedTime();
+        time = getElapsedTime(current);
+        realTime = current;
         m_time_factor = time_factor;
     }
 
-    IC u64 GetElapsed_ticks() const
+    Duration getElapsedTime() const
     {
-#ifndef _EDITOR
-        FPU::m64r();
-#endif // _EDITOR
-
-        u64 result = GetElapsed_ticks(inherited::GetElapsed_ticks());
-
-#ifndef _EDITOR
-        FPU::m24r();
-#endif // _EDITOR
-
-        return (result);
+        return super::getElapsedTime();
     }
-
-    IC u32 GetElapsed_ms() const { return (u32(GetElapsed_ticks() * u64(1000) / CPU::qpc_freq)); }
-    IC float GetElapsed_sec() const
-    {
-#ifndef _EDITOR
-        FPU::m64r();
-#endif
-        float result = float(double(GetElapsed_ticks()) / double(CPU::qpc_freq));
-#ifndef _EDITOR
-        FPU::m24r();
-#endif
-        return (result);
-    }
-
-    IC void Dump() const { Msg("* Elapsed time (sec): %f", GetElapsed_sec()); }
 };
 
 class XRCORE_API CTimer_paused_ex : public CTimer
 {
-    u64 save_clock;
+    Time save_clock;
 
 public:
-    CTimer_paused_ex() {}
+    CTimer_paused_ex() noexcept : save_clock() {}
     virtual ~CTimer_paused_ex() {}
-    IC BOOL Paused() const { return bPause; }
-    IC void Pause(BOOL b)
-    {
-        if (bPause == b)
-            return;
+    bool Paused() const noexcept { return paused; }
 
-        u64 _current = CPU::QPC() - CPU::qpc_overhead;
+    void Pause(const bool b) noexcept
+    {
+        if (paused == b) return;
+
+        const auto current = Clock::now();
         if (b)
         {
-            save_clock = _current;
-            qwPausedTime = CTimerBase::GetElapsed_ticks();
+            save_clock = current;
+            pauseDuration = CTimerBase::getElapsedTime();
         }
         else
-        {
-            qwPauseAccum += _current - save_clock;
-        }
-        bPause = b;
+            pauseAccum += current - save_clock;
+
+        paused = b;
     }
 };
 
 class XRCORE_API CTimer_paused : public CTimer_paused_ex
 {
 public:
-    CTimer_paused() { g_pauseMngr()->Register(this); }
-    virtual ~CTimer_paused() { g_pauseMngr()->UnRegister(this); }
+    CTimer_paused() { g_pauseMngr().Register(*this); }
+    virtual ~CTimer_paused() { g_pauseMngr().UnRegister(*this); }
 };
 
-extern XRCORE_API BOOL g_bEnableStatGather;
+extern XRCORE_API bool g_bEnableStatGather;
+
 class XRCORE_API CStatTimer
 {
+    using Duration = CTimerBase::Duration;
+
 public:
     CTimer T;
-    u64 accum;
+    Duration accum;
     float result;
     u32 count;
 
-public:
-    CStatTimer();
+    CStatTimer() : T(), accum(), result(.0f), count(0) {}
     void FrameStart();
     void FrameEnd();
 
-    ICF void Begin()
+    void Begin()
     {
         if (!g_bEnableStatGather)
             return;
         count++;
         T.Start();
     }
-    ICF void End()
+
+    void End()
     {
         if (!g_bEnableStatGather)
             return;
-        accum += T.GetElapsed_ticks();
+        accum += T.getElapsedTime();
     }
 
-    ICF u64 GetElapsed_ticks() const { return accum; }
-    IC u32 GetElapsed_ms() const { return u32(GetElapsed_ticks() * u64(1000) / CPU::qpc_freq); }
-    IC float GetElapsed_sec() const
+    Duration getElapsedTime() const { return accum; }
+
+    u64 GetElapsed_ms() const
     {
-#ifndef _EDITOR
-        FPU::m64r();
-#endif
-        float _result = float(double(GetElapsed_ticks()) / double(CPU::qpc_freq));
-#ifndef _EDITOR
-        FPU::m24r();
-#endif
-        return _result;
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(getElapsedTime()).count();
+    }
+
+    float GetElapsed_sec() const
+    {
+        using namespace std::chrono;
+        const auto nanos = duration_cast<nanoseconds>(getElapsedTime()).count();
+        return float(nanos) / 1000000000.0;
     }
 };
 

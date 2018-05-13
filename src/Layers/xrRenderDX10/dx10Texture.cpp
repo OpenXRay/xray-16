@@ -1,17 +1,18 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 #include <D3DX10Tex.h>
 
 void fix_texture_name(LPSTR fn)
 {
     LPSTR _ext = strext(fn);
-    if (_ext && (!stricmp(_ext, ".tga") || !stricmp(_ext, ".dds") || !stricmp(_ext, ".bmp") ||
-        !stricmp(_ext, ".ogm")))
+    if (_ext && (!xr_stricmp(_ext, ".tga") || !xr_stricmp(_ext, ".dds") || !xr_stricmp(_ext, ".bmp") ||
+        !xr_stricmp(_ext, ".ogm")))
     {
         *_ext = 0;
     }
@@ -20,14 +21,14 @@ void fix_texture_name(LPSTR fn)
 int get_texture_load_lod(LPCSTR fn)
 {
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
-    CInifile::SectCIt it_ = sect.Data.begin();
-    CInifile::SectCIt it_e_ = sect.Data.end();
+    auto it_ = sect.Data.cbegin();
+    auto it_e_ = sect.Data.cend();
 
     ENGINE_API bool is_enough_address_space_available();
     static bool enough_address_space_available = is_enough_address_space_available();
 
-    CInifile::SectCIt it = it_;
-    CInifile::SectCIt it_e = it_e_;
+    auto it = it_;
+    auto it_e = it_e_;
 
     for (; it != it_e; ++it)
     {
@@ -426,7 +427,7 @@ _DDS_CUBE:
 _DDS_2D:
 {
     // Check for LMAP and compress if needed
-    strlwr(fn);
+    xr_strlwr(fn);
 
     // Load   SYS-MEM-surface, bound to device restrictions
     // ID3DTexture2D*       T_sysmem;

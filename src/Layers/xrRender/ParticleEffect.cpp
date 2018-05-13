@@ -3,7 +3,7 @@
 #include "ParticleEffect.h"
 #ifndef _EDITOR
 #include <xmmintrin.h>
-#include "xrCore/Threading/ttapi.h"
+#include "xrCore/Threading/ThreadPool.hpp"
 #endif
 
 using namespace PAPI;
@@ -11,6 +11,10 @@ using namespace PS;
 
 const u32 PS::uDT_STEP = 33;
 const float PS::fDT_STEP = float(uDT_STEP) / 1000.f;
+
+#ifdef _MSC_VER
+#pragma warning(disable : 4701) // " potentially uninitialized local variable" (magnitude_sse does initialize it)
+#endif
 
 static void ApplyTexgen(const Fmatrix& mVP)
 {
@@ -59,12 +63,12 @@ CParticleEffect::CParticleEffect()
     m_HandleActionList = ParticleManager()->CreateActionList();
     VERIFY(m_HandleActionList >= 0);
     m_RT_Flags.zero();
-    m_Def = 0;
+    m_Def = nullptr;
     m_fElapsedLimit = 0.f;
     m_MemDT = 0;
     m_InitialPosition.set(0, 0, 0);
-    m_DestroyCallback = 0;
-    m_CollisionCallback = 0;
+    m_DestroyCallback = nullptr;
+    m_CollisionCallback = nullptr;
     m_XFORM.identity();
 }
 CParticleEffect::~CParticleEffect()
@@ -281,18 +285,6 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const 
     pv++;
 }
 
-__forceinline void fsincos(const float angle, float& sine, float& cosine)
-{
-    __asm {
-    fld			DWORD PTR [angle]
-    fsincos
-    mov			eax , DWORD PTR [cosine]
-    fstp		DWORD PTR [eax]
-    mov			eax , DWORD PTR [sine]
-    fstp		DWORD PTR [eax]
-    }
-}
-
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -436,7 +428,7 @@ __forceinline void magnitude_sse(Fvector& vec, float& res)
     _mm_store_ss((float*)&res, tv);
 }
 
-void ParticleRenderStream(LPVOID lpvParams)
+void ParticleRenderStream(void* lpvParams)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("ParticleRenderStream()");
@@ -446,7 +438,9 @@ void ParticleRenderStream(LPVOID lpvParams)
 #endif // _GPA_ENABLED
 
     float sina = 0.0f, cosa = 0.0f;
-    DWORD angle = 0xFFFFFFFF;
+    // Xottab_DUTY: changed angle to be float instead of DWORD
+    // But it must be 0xFFFFFFFF or otherwise some particles won't play
+    float angle = 0xFFFFFFFF;
 
     PRS_PARAMS* pParams = (PRS_PARAMS*)lpvParams;
 
@@ -465,15 +459,11 @@ void ParticleRenderStream(LPVOID lpvParams)
 
         _mm_prefetch((char*)&particles[i + 1], _MM_HINT_NTA);
 
-        if (angle != *((DWORD*)&m.rot.x))
+        if (angle != m.rot.x)
         {
-            angle = *((DWORD*)&m.rot.x);
-            __asm {
-						fld			DWORD PTR [angle]
-						fsincos
-						fstp		DWORD PTR [cosa]
-						fstp		DWORD PTR [sina]
-            }
+            angle = m.rot.x;
+            sina = std::sinf(angle);
+            cosa = std::cosf(angle);
         }
 
         _mm_prefetch(64 + (char*)&particles[i + 1], _MM_HINT_NTA);
@@ -483,13 +473,13 @@ void ParticleRenderStream(LPVOID lpvParams)
 
         float r_x = m.size.x * 0.5f;
         float r_y = m.size.y * 0.5f;
-        float speed;
-        BOOL speed_calculated = FALSE;
+        float speed = 0.f;
+        bool speed_calculated = false;
 
         if (pPE.m_Def->m_Flags.is(CPEDef::dfVelocityScale))
         {
             magnitude_sse(m.vel, speed);
-            speed_calculated = TRUE;
+            speed_calculated = true;
             r_x += speed * pPE.m_Def->m_VelocityScale.x;
             r_y += speed * pPE.m_Def->m_VelocityScale.y;
         }
@@ -593,10 +583,10 @@ void CParticleEffect::Render(float)
             FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
             FVF::LIT* pv = pv_start;
 
-            u32 nWorkers = ttapi_GetWorkerCount();
+            auto nWorkers = ttapi.threads.size();
 
-            if (p_cnt < nWorkers * 20)
-                nWorkers = 1;
+            if (p_cnt < nWorkers)
+                nWorkers = p_cnt;
 
             PRS_PARAMS* prsParams = (PRS_PARAMS*)_alloca(sizeof(PRS_PARAMS) * nWorkers);
 
@@ -616,10 +606,10 @@ void CParticleEffect::Render(float)
                 prsParams[i].p_to = (i == (nWorkers - 1)) ? p_cnt : (prsParams[i].p_from + nStep);
                 prsParams[i].particles = particles;
                 prsParams[i].pPE = this;
-                ttapi_AddWorker(ParticleRenderStream, (LPVOID)&prsParams[i]);
+                ttapi.threads[i]->addJob([=] { ParticleRenderStream((void*)&prsParams[i]); });
             }
 
-            ttapi_Run();
+            ttapi.wait();
 
             dwCount = p_cnt << 2;
 

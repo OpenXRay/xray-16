@@ -8,9 +8,8 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_blend.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 using editor::environment::suns::blend;
 using editor::environment::suns::manager;
@@ -24,16 +23,16 @@ void blend::load(CInifile& config, shared_str const& section)
 }
 
 void blend::fill(
-    manager const& manager, editor::property_holder* holder, editor::property_holder_collection* collection)
+    manager const& manager, XRay::Editor::property_holder_base* holder, XRay::Editor::property_holder_collection* collection)
 {
-    editor::property_holder* properties = holder;
+    XRay::Editor::property_holder_base* properties = holder;
     VERIFY(properties);
 
     properties->add_property(
-        "down time", "blend", "this option is resposible for the blend down time", m_down_time, m_down_time);
-    properties->add_property(
-        "rise time", "blend", "this option is resposible for the blend rise time", m_rise_time, m_rise_time);
-    properties->add_property("time", "blend", "this option is resposible for the blend time", m_time, m_time);
-}
+        "down time", "blend", "this option is responsible for the blend down time", m_down_time, m_down_time);
 
-#endif // #ifdef INGAME_EDITOR
+    properties->add_property(
+        "rise time", "blend", "this option is responsible for the blend rise time", m_rise_time, m_rise_time);
+
+    properties->add_property("time", "blend", "this option is responsible for the blend time", m_time, m_time);
+}

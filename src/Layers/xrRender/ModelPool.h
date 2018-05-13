@@ -14,12 +14,11 @@ struct SEmitter;
 // defs
 class ECORE_API CModelPool
 {
-private:
     friend class CRender;
 
-    struct str_pred : public std::binary_function<const shared_str&, const shared_str&, bool>
+    struct str_pred
     {
-        IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
+        bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
     };
     struct ModelDef
     {
@@ -29,7 +28,7 @@ private:
         ModelDef()
         {
             refs = 0;
-            model = 0;
+            model = nullptr;
         }
     };
 
@@ -38,7 +37,6 @@ private:
     typedef xr_map<dxRender_Visual*, shared_str> REGISTRY;
     typedef REGISTRY::iterator REGISTRY_IT;
 
-private:
     xr_vector<ModelDef> Models; // Reference / Base
     xr_vector<dxRender_Visual*> ModelsToDelete; //
     REGISTRY Registry; // Just pairing of pointer / Name
@@ -61,7 +59,7 @@ public:
 
     dxRender_Visual* CreatePE(PS::CPEDef* source);
     dxRender_Visual* CreatePG(PS::CPGDef* source);
-    dxRender_Visual* Create(LPCSTR name, IReader* data = 0);
+    dxRender_Visual* Create(LPCSTR name, IReader* data = nullptr);
     dxRender_Visual* CreateChild(LPCSTR name, IReader* data);
     void Delete(dxRender_Visual*& V, BOOL bDiscard = FALSE);
     void Discard(dxRender_Visual*& V, BOOL b_complete);

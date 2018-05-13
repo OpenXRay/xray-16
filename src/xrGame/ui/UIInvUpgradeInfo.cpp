@@ -37,8 +37,8 @@ void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
     ui_xml.Load(CONFIG_PATH, UI_PATH, xml_name);
     CUIXmlInit xml_init;
 
-    XML_NODE* stored_root = ui_xml.GetLocalRoot();
-    XML_NODE* node = ui_xml.NavigateToNode("upgrade_info", 0);
+    XML_NODE stored_root = ui_xml.GetLocalRoot();
+    XML_NODE node = ui_xml.NavigateToNode("upgrade_info", 0);
     ui_xml.SetLocalRoot(node);
 
     xml_init.InitWindow(ui_xml, "main_frame", 0, this);
@@ -104,7 +104,7 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
         m_properties_wnd->Show(true);
         luabind::functor<LPCSTR> cost_func;
         LPCSTR cost_func_str = "inventory_upgrades.get_upgrade_cost";
-        R_ASSERT2(ai().script_engine().functor(cost_func_str, cost_func), "Failed to get cost");
+        R_ASSERT2(GEnv.ScriptEngine->functor(cost_func_str, cost_func), "Failed to get cost");
         m_cost->SetText(cost_func(m_upgrade->section()));
         m_cost->Show(true);
 

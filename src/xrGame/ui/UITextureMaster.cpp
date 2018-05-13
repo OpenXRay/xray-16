@@ -13,6 +13,7 @@
 #include "uiabstract.h"
 #include "xrUIXmlParser.h"
 #include "Include/xrRender/UIShader.h"
+#include <iostream>
 
 xr_map<shared_str, TEX_INFO> CUITextureMaster::m_textures;
 xr_map<sh_pair, ui_shader> CUITextureMaster::m_shaders;
@@ -33,10 +34,10 @@ void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file)
 
     for (int fi = 0; fi < files_num; ++fi)
     {
-        XML_NODE* root_node = xml.GetLocalRoot();
+        XML_NODE root_node = xml.GetLocalRoot();
         shared_str file = xml.ReadAttrib("file", fi, "name");
 
-        XML_NODE* node = xml.NavigateToNode("file", fi);
+        XML_NODE node = xml.NavigateToNode("file", fi);
 
         int num = xml.GetNodesNum(node, "texture");
         for (int i = 0; i < num; i++)
@@ -50,7 +51,15 @@ void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file)
             info.rect.y1 = xml.ReadAttribFlt(node, "texture", i, "y");
             info.rect.y2 = xml.ReadAttribFlt(node, "texture", i, "height") + info.rect.y1;
             shared_str id = xml.ReadAttrib(node, "texture", i, "id");
-            m_textures.insert(mk_pair(id, info));
+            /* avo: fix issue when values were not updated (silently skipped) when same key is encountered more than once. This is how std::map is designed. 
+            /* Also used more efficient C++11 std::map::emplace method instead of outdated std::pair::make_pair */
+            /* XXX: avo: note that xxx.insert(mk_pair(v1,v2)) pattern is used extensively throughout solution so there is a good potential for other bug fixes/improvements */
+            if (m_textures.find(id) == m_textures.end())
+                m_textures.emplace(id, info);
+            else
+                m_textures[id] = info;
+            /* avo: end */
+            //m_textures.insert(mk_pair(id,info)); // original GSC insert call
         }
 
         xml.SetLocalRoot(root_node);

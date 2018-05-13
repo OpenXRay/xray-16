@@ -41,7 +41,6 @@ ETOOLS_API CDB::MODEL* __stdcall create_model_clp(CDB::CollectorPacked*);
 ETOOLS_API CDB::MODEL* __stdcall create_model(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt);
 ETOOLS_API void __stdcall destroy_model(CDB::MODEL*&);
 ETOOLS_API CDB::RESULT* __stdcall r_begin();
-ETOOLS_API CDB::RESULT* __stdcall r_end();
 ETOOLS_API int __stdcall r_count();
 ETOOLS_API void __stdcall ray_options(u32 flags);
 ETOOLS_API void __stdcall ray_query(

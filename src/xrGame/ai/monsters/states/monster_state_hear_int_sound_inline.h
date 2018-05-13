@@ -11,31 +11,31 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterHearInterestingSoundAbstract::CStateMonsterHearInterestingSound(_Object* obj) : inherited(obj)
 {
-    add_state(eStateHearInterestingSound_MoveToDest, new CStateMonsterMoveToPoint<_Object>(obj));
-    add_state(eStateHearInterestingSound_LookAround, new CStateMonsterCustomActionLook<_Object>(obj));
+    this->add_state(eStateHearInterestingSound_MoveToDest, new CStateMonsterMoveToPoint<_Object>(obj));
+    this->add_state(eStateHearInterestingSound_LookAround, new CStateMonsterCustomActionLook<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHearInterestingSoundAbstract::reselect_state()
 {
-    if (prev_substate == u32(-1))
+    if (this->prev_substate == u32(-1))
     {
-        if (get_state(eStateHearInterestingSound_MoveToDest)->check_start_conditions())
-            select_state(eStateHearInterestingSound_MoveToDest);
+        if (this->get_state(eStateHearInterestingSound_MoveToDest)->check_start_conditions())
+            this->select_state(eStateHearInterestingSound_MoveToDest);
         else
-            select_state(eStateHearInterestingSound_LookAround);
+            this->select_state(eStateHearInterestingSound_LookAround);
         return;
     }
 
-    select_state(eStateHearInterestingSound_LookAround);
+    this->select_state(eStateHearInterestingSound_LookAround);
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHearInterestingSoundAbstract::setup_substates()
 {
-    state_ptr state = get_state_current();
+    state_ptr state = this->get_state_current();
 
-    if (current_substate == eStateHearInterestingSound_MoveToDest)
+    if (this->current_substate == eStateHearInterestingSound_MoveToDest)
     {
         SStateDataMoveToPoint data;
         data.point = get_target_position();
@@ -46,23 +46,23 @@ void CStateMonsterHearInterestingSoundAbstract::setup_substates()
         data.accel_type = eAT_Calm;
         data.completion_dist = 2.f;
         data.action.sound_type = MonsterSound::eMonsterSoundIdle;
-        data.action.sound_delay = object->db().m_dwIdleSndDelay;
+        data.action.sound_delay = this->object->db().m_dwIdleSndDelay;
 
         state->fill_data_with(&data, sizeof(SStateDataMoveToPoint));
 
         return;
     }
 
-    if (current_substate == eStateHearInterestingSound_LookAround)
+    if (this->current_substate == eStateHearInterestingSound_LookAround)
     {
         SStateDataActionLook data;
         data.action = ACT_LOOK_AROUND;
         data.sound_type = MonsterSound::eMonsterSoundIdle;
-        data.sound_delay = object->db().m_dwIdleSndDelay;
+        data.sound_delay = this->object->db().m_dwIdleSndDelay;
 
         Fvector dir;
-        object->CoverMan->less_cover_direction(dir);
-        data.point.mad(object->Position(), dir, 10.f);
+        this->object->CoverMan->less_cover_direction(dir);
+        data.point.mad(this->object->Position(), dir, 10.f);
 
         state->fill_data_with(&data, sizeof(SStateDataActionLook));
 
@@ -73,14 +73,14 @@ void CStateMonsterHearInterestingSoundAbstract::setup_substates()
 TEMPLATE_SPECIALIZATION
 Fvector CStateMonsterHearInterestingSoundAbstract::get_target_position()
 {
-    Fvector snd_pos = object->SoundMemory.GetSound().position;
-    if (!object->Home->has_home())
+    Fvector snd_pos = this->object->SoundMemory.GetSound().position;
+    if (!this->object->Home->has_home())
         return snd_pos;
 
-    if (object->Home->at_home(snd_pos))
+    if (this->object->Home->at_home(snd_pos))
         return snd_pos;
 
-    return ai().level_graph().vertex_position(object->Home->get_place());
+    return ai().level_graph().vertex_position(this->object->Home->get_place());
 }
 
 #undef TEMPLATE_SPECIALIZATION

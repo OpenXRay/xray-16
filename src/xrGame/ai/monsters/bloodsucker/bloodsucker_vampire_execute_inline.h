@@ -20,17 +20,17 @@ void CStateBloodsuckerVampireExecuteAbstract::initialize()
 {
     inherited::initialize();
 
-    object->CControlledActor::install();
+    this->object->CControlledActor::install();
 
     look_head();
 
     m_action = eActionPrepare;
     time_vampire_started = 0;
 
-    object->set_visibility_state(CAI_Bloodsucker::full_visibility);
+    this->object->set_visibility_state(CAI_Bloodsucker::full_visibility);
 
-    object->m_hits_before_vampire = 0;
-    object->m_sufficient_hits_before_vampire_random = -1 + (rand() % 3);
+    this->object->m_hits_before_vampire = 0;
+    this->object->m_sufficient_hits_before_vampire_random = -1 + (rand() % 3);
 
     HUD().SetRenderable(false);
     NET_Packet P;
@@ -47,9 +47,9 @@ void CStateBloodsuckerVampireExecuteAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::execute()
 {
-    if (!object->CControlledActor::is_turning() && !m_effector_activated)
+    if (!this->object->CControlledActor::is_turning() && !m_effector_activated)
     {
-        object->ActivateVampireEffector();
+        this->object->ActivateVampireEffector();
         m_effector_activated = true;
     }
 
@@ -70,7 +70,7 @@ void CStateBloodsuckerVampireExecuteAbstract::execute()
         break;
 
     case eActionWaitTripleEnd:
-        if (!object->com_man().ta_is_active())
+        if (!this->object->com_man().ta_is_active())
         {
             m_action = eActionCompleted;
         }
@@ -78,29 +78,29 @@ void CStateBloodsuckerVampireExecuteAbstract::execute()
     case eActionCompleted: break;
     }
 
-    object->dir().face_target(object->EnemyMan.get_enemy());
+    this->object->dir().face_target(this->object->EnemyMan.get_enemy());
 
-    Fvector const enemy_to_self = object->EnemyMan.get_enemy()->Position() - object->Position();
+    Fvector const enemy_to_self = this->object->EnemyMan.get_enemy()->Position() - this->object->Position();
     float const dist_to_enemy = magnitude(enemy_to_self);
-    float const vampire_dist = object->get_vampire_distance();
+    float const vampire_dist = this->object->get_vampire_distance();
 
-    if (angle_between_vectors(object->Direction(), enemy_to_self) < deg2rad(20.f) && dist_to_enemy > vampire_dist)
+    if (angle_between_vectors(this->object->Direction(), enemy_to_self) < deg2rad(20.f) && dist_to_enemy > vampire_dist)
     {
-        object->set_action(ACT_RUN);
-        object->anim().accel_activate(eAT_Aggressive);
-        object->anim().accel_set_braking(false);
+        this->object->set_action(ACT_RUN);
+        this->object->anim().accel_activate(eAT_Aggressive);
+        this->object->anim().accel_set_braking(false);
 
-        u32 const target_vertex = object->EnemyMan.get_enemy()->ai_location().level_vertex_id();
+        u32 const target_vertex = this->object->EnemyMan.get_enemy()->ai_location().level_vertex_id();
         Fvector const target_pos = ai().level_graph().vertex_position(target_vertex);
 
-        object->path().set_target_point(target_pos, target_vertex);
-        object->path().set_rebuild_time(100);
-        object->path().set_use_covers(false);
-        object->path().set_distance_to_end(vampire_dist);
+        this->object->path().set_target_point(target_pos, target_vertex);
+        this->object->path().set_rebuild_time(100);
+        this->object->path().set_use_covers(false);
+        this->object->path().set_distance_to_end(vampire_dist);
     }
     else
     {
-        object->set_action(ACT_STAND_IDLE);
+        this->object->set_action(ACT_STAND_IDLE);
     }
 }
 
@@ -121,11 +121,11 @@ void CStateBloodsuckerVampireExecuteAbstract::cleanup()
 {
     Actor()->set_inventory_disabled(false);
 
-    if (object->com_man().ta_is_active())
-        object->com_man().ta_deactivate();
+    if (this->object->com_man().ta_is_active())
+        this->object->com_man().ta_deactivate();
 
-    if (object->CControlledActor::is_controlling())
-        object->CControlledActor::release();
+    if (this->object->CControlledActor::is_controlling())
+        this->object->CControlledActor::release();
 
     show_hud();
 }
@@ -147,35 +147,35 @@ void CStateBloodsuckerVampireExecuteAbstract::critical_finalize()
 TEMPLATE_SPECIALIZATION
 bool CStateBloodsuckerVampireExecuteAbstract::check_start_conditions()
 {
-    const CEntityAlive* enemy = object->EnemyMan.get_enemy();
+    const CEntityAlive* enemy = this->object->EnemyMan.get_enemy();
 
     // проверить дистанцию
     // 	float dist		= object->MeleeChecker.distance_to_enemy	(enemy);
     // 	if ((dist > VAMPIRE_MAX_DIST) || (dist < VAMPIRE_MIN_DIST))	return false;
 
-    if (!object->done_enough_hits_before_vampire())
+    if (!this->object->done_enough_hits_before_vampire())
         return false;
 
     u32 const vertex_id = ai().level_graph().check_position_in_direction(
-        object->ai_location().level_vertex_id(), object->Position(), enemy->Position());
+        this->object->ai_location().level_vertex_id(), this->object->Position(), enemy->Position());
     if (!ai().level_graph().valid_vertex_id(vertex_id))
         return false;
 
-    if (!object->MeleeChecker.can_start_melee(enemy))
+    if (!this->object->MeleeChecker.can_start_melee(enemy))
         return false;
 
     // проверить направление на врага
-    if (!object->control().direction().is_face_target(enemy, PI_DIV_2))
+    if (!this->object->control().direction().is_face_target(enemy, PI_DIV_2))
         return false;
 
-    if (!object->WantVampire())
+    if (!this->object->WantVampire())
         return false;
 
     // является ли враг актером
     if (!smart_cast<CActor const*>(enemy))
         return false;
 
-    if (object->CControlledActor::is_controlling())
+    if (this->object->CControlledActor::is_controlling())
         return false;
 
     const CActor* actor = smart_cast<const CActor*>(enemy);
@@ -195,26 +195,26 @@ bool CStateBloodsuckerVampireExecuteAbstract::check_completion() { return (m_act
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_prepare()
 {
-    object->com_man().ta_activate(object->anim_triple_vampire);
+    this->object->com_man().ta_activate(this->object->anim_triple_vampire);
     time_vampire_started = Device.dwTimeGlobal;
 
-    object->sound().play(CAI_Bloodsucker::eVampireGrasp);
+    this->object->sound().play(CAI_Bloodsucker::eVampireGrasp);
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_continue()
 {
-    const CEntityAlive* enemy = object->EnemyMan.get_enemy();
+    const CEntityAlive* enemy = this->object->EnemyMan.get_enemy();
 
     // if (object->Position().distance_to(Actor()->Position()) > 2.f) {
-    if (!object->MeleeChecker.can_start_melee(enemy))
+    if (!this->object->MeleeChecker.can_start_melee(enemy))
     {
-        object->com_man().ta_deactivate();
+        this->object->com_man().ta_deactivate();
         m_action = eActionCompleted;
         return;
     }
 
-    object->sound().play(CAI_Bloodsucker::eVampireSucking);
+    this->object->sound().play(CAI_Bloodsucker::eVampireSucking);
 
     // проверить на грави удар
     if (time_vampire_started + VAMPIRE_TIME_HOLD < Device.dwTimeGlobal)
@@ -226,9 +226,9 @@ void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_continue()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_hit()
 {
-    object->com_man().ta_pointbreak();
-    object->sound().play(CAI_Bloodsucker::eVampireHit);
-    object->SatisfyVampire();
+    this->object->com_man().ta_pointbreak();
+    this->object->sound().play(CAI_Bloodsucker::eVampireHit);
+    this->object->SatisfyVampire();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -236,14 +236,13 @@ void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_hit()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::look_head()
 {
-    IKinematics* pK = smart_cast<IKinematics*>(object->Visual());
-    Fmatrix bone_transform;
-    bone_transform = pK->LL_GetTransform(pK->LL_BoneID("bip01_head"));
+    IKinematics* pK = smart_cast<IKinematics*>(this->object->Visual());
+    Fmatrix bone_transform = pK->LL_GetTransform(pK->LL_BoneID("bip01_head"));
 
     Fmatrix global_transform;
-    global_transform.mul_43(object->XFORM(), bone_transform);
+    global_transform.mul_43(this->object->XFORM(), bone_transform);
 
-    object->CControlledActor::look_point(global_transform.c);
+    this->object->CControlledActor::look_point(global_transform.c);
 }
 
 #undef TEMPLATE_SPECIALIZATION

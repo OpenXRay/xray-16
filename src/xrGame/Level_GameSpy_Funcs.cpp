@@ -5,6 +5,7 @@
 #include "xrGameSpy/GameSpy_GCD_Client.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "ui/UICDkey.h"
+#include "xrNetServer/NET_Messages.h"
 
 void CLevel::OnGameSpyChallenge(NET_Packet* P)
 {
@@ -29,6 +30,6 @@ void CLevel::OnGameSpyChallenge(NET_Packet* P)
     newP.w_stringZ(ResponseStr);
     Send(newP, net_flags(TRUE, TRUE, TRUE, TRUE));
 
-    //	g_pGamePersistent->LoadTitle("st_validating_cdkey");
+    g_pGamePersistent->SetLoadStageTitle("st_validating_cdkey");
     g_pGamePersistent->LoadTitle();
 };

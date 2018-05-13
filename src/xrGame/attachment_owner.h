@@ -22,7 +22,7 @@ public:
     virtual CGameObject* cast_game_object() = 0;
     virtual CAttachmentOwner* cast_attachment_owner() { return this; }
 public:
-    IC CAttachmentOwner();
+    CAttachmentOwner() {}
     virtual ~CAttachmentOwner();
     virtual void reinit();
     virtual void reload(LPCSTR section);
@@ -34,11 +34,9 @@ public:
     bool attached(const CInventoryItem* inventory_item) const;
     bool attached(shared_str sect_name) const;
     virtual void reattach_items();
-    IC const xr_vector<CAttachableItem*>& attached_objects() const;
+    const xr_vector<CAttachableItem*>& attached_objects() const { return (m_attached_objects); }
 
     CAttachableItem* attachedItem(CLASS_ID clsid) const;
     CAttachableItem* attachedItem(u16 id) const;
     CAttachableItem* attachedItem(shared_str& section) const;
 };
-
-#include "attachment_owner_inline.h"

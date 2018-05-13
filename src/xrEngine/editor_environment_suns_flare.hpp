@@ -5,14 +5,10 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment suns flare class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_FLARE_HPP_INCLUDED
-#define EDITOR_WEATHER_FLARE_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 namespace editor
 {
@@ -20,15 +16,15 @@ namespace environment
 {
 namespace suns
 {
-class flare : public editor::property_holder_holder, private Noncopyable
+class flare : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     flare();
     virtual ~flare();
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
 
 public:
-    typedef editor::property_holder property_holder;
+    typedef XRay::Editor::property_holder_base property_holder;
 
 public:
     virtual property_holder* object();
@@ -47,6 +43,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_FLARE_HPP_INCLUDED

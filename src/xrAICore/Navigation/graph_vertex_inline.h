@@ -5,8 +5,9 @@
 //	Author		: Dmitriy Iassenev
 //	Description : Graph vertex base class template inline functions
 ////////////////////////////////////////////////////////////////////////////
-
 #pragma once
+
+#include "xrCore/xrDebug_macros.h"
 
 #define TEMPLATE_SPECIALIZATION \
     template <typename _data_type, typename _vertex_id_type, typename _graph_type\

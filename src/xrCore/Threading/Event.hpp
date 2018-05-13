@@ -1,23 +1,22 @@
 #pragma once
-#include "xrCore/xrCore.h"
+#include "xrCore/_types.h"
 
 class XRCORE_API Event
 {
-private:
     void* handle;
 
 public:
-    Event();
-    ~Event();
+    Event() noexcept;
+    ~Event() noexcept;
 
     // Reset the event to the unsignalled state.
-    void Reset();
+    void Reset() noexcept;
     // Set the event to the signalled state.
-    void Set();
+    void Set() noexcept;
     // Wait indefinitely for the object to become signalled.
-    void Wait() const;
+    void Wait() const noexcept;
     // Wait, with a time limit, for the object to become signalled.
-    bool Wait(u32 millisecondsTimeout) const;
+    bool Wait(u32 millisecondsTimeout) const noexcept;
 
-    void* GetHandle() const { return handle; }
+    void* GetHandle() const noexcept { return handle; }
 };

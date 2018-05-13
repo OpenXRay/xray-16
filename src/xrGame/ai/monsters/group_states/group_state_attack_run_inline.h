@@ -15,7 +15,7 @@ TEMPLATE_SPECIALIZATION
 void CStateGroupAttackRunAbstract::initialize()
 {
     inherited::initialize();
-    object->path().prepare_builder();
+    this->object->path().prepare_builder();
 
     // interception
     m_intercept_tick = Device.dwTimeGlobal;
@@ -30,7 +30,7 @@ void CStateGroupAttackRunAbstract::initialize()
 
     // prediction
     m_memorized_tick = Device.dwTimeGlobal;
-    m_memorized_pos = object->EnemyMan.get_enemy()->Position();
+    m_memorized_pos = this->object->EnemyMan.get_enemy()->Position();
     m_predicted_vel = cr_fvector3(0.f);
 
     // encirclement
@@ -45,11 +45,11 @@ void CStateGroupAttackRunAbstract::initialize()
     }
 
     m_encircle_dir = m_intercept;
-    CMonsterSquad* squad = monster_squad().get_squad(object);
+    CMonsterSquad* squad = monster_squad().get_squad(this->object);
     if (squad && squad->SquadActive())
     {
         SSquadCommand command;
-        squad->GetCommand(object, command);
+        squad->GetCommand(this->object, command);
         if (command.type == SC_ATTACK)
         {
             m_encircle_dir = command.direction;
@@ -77,7 +77,7 @@ void CStateGroupAttackRunAbstract::execute()
         }
     }
 
-    const Fvector enemy_pos = object->EnemyMan.get_enemy()->Position();
+    const Fvector enemy_pos = this->object->EnemyMan.get_enemy()->Position();
     const int memory_update_ms = 250;
 
     if (Device.dwTimeGlobal > m_memorized_tick + memory_update_ms)
@@ -89,10 +89,10 @@ void CStateGroupAttackRunAbstract::execute()
         m_memorized_pos = enemy_pos;
     }
 
-    const SVelocityParam velocity_run = object->move().get_velocity(MonsterMovement::eVelocityParameterRunNormal);
+    const SVelocityParam velocity_run = this->object->move().get_velocity(MonsterMovement::eVelocityParameterRunNormal);
 
     const float self_vel = velocity_run.velocity.linear;
-    const Fvector self_pos = object->Position();
+    const Fvector self_pos = this->object->Position();
 
     const Fvector self2enemy = enemy_pos - self_pos;
     const float self2enemy_dist = magnitude(self2enemy);
@@ -127,42 +127,42 @@ void CStateGroupAttackRunAbstract::execute()
 
     Fvector target = radial_prediction + m_intercept * self2enemy_dist * 0.5f;
 
-    const u32 old_vertex = object->ai_location().level_vertex_id();
+    const u32 old_vertex = this->object->ai_location().level_vertex_id();
 
     u32 vertex = ai().level_graph().check_position_in_direction(old_vertex, self_pos, target);
 
     if (!ai().level_graph().valid_vertex_id(vertex))
     {
         target = enemy_pos;
-        vertex = object->EnemyMan.get_enemy()->ai_location().level_vertex_id();
+        vertex = this->object->EnemyMan.get_enemy()->ai_location().level_vertex_id();
     }
 
     // установка параметров функциональных блоков
-    object->set_action(ACT_RUN);
+    this->object->set_action(ACT_RUN);
 
-    object->anim().accel_activate(eAT_Aggressive);
-    object->anim().accel_set_braking(false);
-    object->path().set_target_point(target, vertex);
-    object->path().set_rebuild_time(object->get_attack_rebuild_time());
-    object->path().set_use_covers(false);
+    this->object->anim().accel_activate(eAT_Aggressive);
+    this->object->anim().accel_set_braking(false);
+    this->object->path().set_target_point(target, vertex);
+    this->object->path().set_rebuild_time(this->object->get_attack_rebuild_time());
+    this->object->path().set_use_covers(false);
     // object->path().set_cover_params			(0.1f, 30.f, 1.f, 30.f);
-    object->set_state_sound(MonsterSound::eMonsterSoundAggressive);
+    this->object->set_state_sound(MonsterSound::eMonsterSoundAggressive);
 
-    object->path().extrapolate_path(true);
+    this->object->path().extrapolate_path(true);
 
-    object->path().set_try_min_time(self2enemy_dist >= 5.f);
+    this->object->path().set_try_min_time(self2enemy_dist >= 5.f);
 
-    const bool enemy_at_home = object->Home->at_home(enemy_pos);
+    const bool enemy_at_home = this->object->Home->at_home(enemy_pos);
 
-    if (!enemy_at_home || Device.dwTimeGlobal < time_state_started + m_encircle_time)
+    if (!enemy_at_home || Device.dwTimeGlobal < this->time_state_started + m_encircle_time)
     {
-        object->path().set_use_dest_orient(true);
-        object->path().set_dest_direction(m_encircle_dir);
-        object->path().set_try_min_time(false);
+        this->object->path().set_use_dest_orient(true);
+        this->object->path().set_dest_direction(m_encircle_dir);
+        this->object->path().set_try_min_time(false);
     }
     else
     {
-        object->path().set_use_dest_orient(false);
+        this->object->path().set_use_dest_orient(false);
     }
 }
 
@@ -209,21 +209,21 @@ TEMPLATE_SPECIALIZATION
 void CStateGroupAttackRunAbstract::finalize()
 {
     inherited::finalize();
-    object->path().extrapolate_path(false);
+    this->object->path().extrapolate_path(false);
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateGroupAttackRunAbstract::critical_finalize()
 {
     inherited::critical_finalize();
-    object->path().extrapolate_path(false);
+    this->object->path().extrapolate_path(false);
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateGroupAttackRunAbstract::check_completion()
 {
-    float m_fDistMin = object->MeleeChecker.get_min_distance();
-    float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
+    const float m_fDistMin = this->object->MeleeChecker.get_min_distance();
+    const float dist = this->object->MeleeChecker.distance_to_enemy(this->object->EnemyMan.get_enemy());
 
     if (dist < m_fDistMin)
     {
@@ -241,8 +241,8 @@ bool CStateGroupAttackRunAbstract::check_completion()
 TEMPLATE_SPECIALIZATION
 bool CStateGroupAttackRunAbstract::check_start_conditions()
 {
-    float m_fDistMax = object->MeleeChecker.get_max_distance();
-    float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
+    const float m_fDistMax = this->object->MeleeChecker.get_max_distance();
+    const float dist = this->object->MeleeChecker.distance_to_enemy(this->object->EnemyMan.get_enemy());
 
     if (dist > m_fDistMax)
     {

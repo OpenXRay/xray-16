@@ -9,7 +9,7 @@
 #include "pch.hpp"
 #include "property_color.hpp"
 
-using editor::color;
+using XRay::Editor::color;
 
 property_color::property_color(
     color_getter_type const& getter, color_setter_type const& setter, array<System::Attribute ^> ^ attributes)

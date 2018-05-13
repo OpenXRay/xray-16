@@ -13,7 +13,7 @@
 #include "sound_player.h"
 
 // DEBUG purpose only
-char* dbg_action_name_table[] = {"ACT_STAND_IDLE", "ACT_SIT_IDLE", "ACT_LIE_IDLE", "ACT_WALK_FWD", "ACT_WALK_BKWD",
+constexpr pcstr dbg_action_name_table[] = {"ACT_STAND_IDLE", "ACT_SIT_IDLE", "ACT_LIE_IDLE", "ACT_WALK_FWD", "ACT_WALK_BKWD",
     "ACT_RUN", "ACT_EAT", "ACT_SLEEP", "ACT_REST", "ACT_DRAG", "ACT_ATTACK", "ACT_STEAL", "ACT_LOOK_AROUND",
     "ACT_JUMP"};
 
@@ -132,7 +132,7 @@ bool CControlAnimationBase::get_animation_info(EMotionAnim anim, u32 index, Moti
 
     char index_string_buffer[128];
     char* animation_name_buffer;
-    STRCONCAT(animation_name_buffer, anim_it->target_name, itoa(index, index_string_buffer, 10));
+    STRCONCAT(animation_name_buffer, anim_it->target_name, xr_itoa(index, index_string_buffer, 10));
 
     IKinematicsAnimated* animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
     if (!animated)
@@ -221,7 +221,7 @@ void CControlAnimationBase::select_animation(bool anim_end)
     // установить анимацию
     string128 s1, s2;
     MotionID cur_anim = smart_cast<IKinematicsAnimated*>(
-        m_object->Visual())->ID_Cycle_Safe(strconcat(sizeof(s2), s2, *anim_it->target_name, itoa(index, s1, 10)));
+        m_object->Visual())->ID_Cycle_Safe(strconcat(sizeof(s2), s2, *anim_it->target_name, xr_itoa(index, s1, 10)));
     if (!cur_anim.valid())
         FATAL(s2);
 
@@ -232,7 +232,7 @@ void CControlAnimationBase::select_animation(bool anim_end)
 
     // Заполнить текущую анимацию
     string64 st, tmp;
-    strconcat(sizeof(st), st, *anim_it->target_name, itoa(index, tmp, 10));
+    strconcat(sizeof(st), st, *anim_it->target_name, xr_itoa(index, tmp, 10));
     //	xr_sprintf		(st, "%s%d", *anim_it->second.target_name, index);
     m_cur_anim.name = st;
     m_cur_anim.index = u8(index);
@@ -253,7 +253,7 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
     EPState state_from = GetState(cur_from);
     EPState state_to = GetState(to);
 
-    TRANSITION_ANIM_VECTOR_IT I = m_tTransitions.begin();
+    auto I = m_tTransitions.begin();
     bool bVectEmpty = m_tTransitions.empty();
 
     while (!bVectEmpty)
@@ -300,7 +300,7 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 
 void CControlAnimationBase::CheckReplacedAnim()
 {
-    for (REPLACED_ANIM_IT it = m_tReplacedAnims.begin(); m_tReplacedAnims.end() != it; ++it)
+    for (auto it = m_tReplacedAnims.begin(); m_tReplacedAnims.end() != it; ++it)
         if ((cur_anim_info().get_motion() == it->cur_anim) && (*(it->flag) == true))
         {
             cur_anim_info().set_motion(it->new_anim);
@@ -313,7 +313,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
     // искать текущую анимацию в AA_VECTOR
     MotionID motion = smart_cast<IKinematicsAnimated*>(m_object->Visual())->LL_MotionID(anim_name);
 
-    for (AA_VECTOR_IT it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
+    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
     {
         if (it->motion == motion)
             return (*it);
@@ -326,7 +326,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
 SAAParam& CControlAnimationBase::AA_GetParams(MotionID motion, float time_perc)
 {
     // искать текущую анимацию в AA_VECTOR
-    for (AA_VECTOR_IT it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
+    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
     {
         if ((it->motion == motion) && (it->time == time_perc))
             return (*it);
@@ -503,7 +503,7 @@ void CControlAnimationBase::UpdateAnimCount()
 {
     IKinematicsAnimated* skel = smart_cast<IKinematicsAnimated*>(m_object->Visual());
 
-    for (ANIM_ITEM_VECTOR_IT it = m_anim_storage.begin(); it != m_anim_storage.end(); it++)
+    for (auto it = m_anim_storage.begin(); it != m_anim_storage.end(); it++)
     {
         if (!(*it))
             continue;
@@ -517,7 +517,7 @@ void CControlAnimationBase::UpdateAnimCount()
 
         for (int i = 0;; ++i)
         {
-            strconcat(sizeof(s_temp), s_temp, *((*it)->target_name), itoa(i, s, 10));
+            strconcat(sizeof(s_temp), s_temp, *((*it)->target_name), xr_itoa(i, s, 10));
             LPCSTR name = s_temp;
             MotionID id = skel->ID_Cycle_Safe(name);
 
@@ -546,19 +546,19 @@ CMotionDef* CControlAnimationBase::get_motion_def(SAnimItem* it, u32 index)
     string128 s1, s2;
     IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
     const MotionID& motion_id =
-        skeleton_animated->ID_Cycle_Safe(strconcat(sizeof(s2), s2, *it->target_name, itoa(index, s1, 10)));
+        skeleton_animated->ID_Cycle_Safe(strconcat(sizeof(s2), s2, *it->target_name, xr_itoa(index, s1, 10)));
     return (skeleton_animated->LL_GetMotionDef(motion_id));
 }
 
 void CControlAnimationBase::AddAnimTranslation(const MotionID& motion, LPCSTR str)
 {
-    m_anim_motion_map.insert(mk_pair(motion, str));
+    m_anim_motion_map.insert(std::make_pair(motion, str));
 }
 shared_str CControlAnimationBase::GetAnimTranslation(const MotionID& motion)
 {
     shared_str ret_value;
 
-    ANIM_TO_MOTION_MAP_IT anim_it = m_anim_motion_map.find(motion);
+    auto anim_it = m_anim_motion_map.find(motion);
     if (anim_it != m_anim_motion_map.end())
         ret_value = anim_it->second;
 
@@ -585,7 +585,7 @@ MotionID CControlAnimationBase::get_motion_id(EMotionAnim a, u32 index)
 
     string128 s1, s2;
     return (smart_cast<IKinematicsAnimated*>(m_object->Visual())
-                ->ID_Cycle_Safe(strconcat(sizeof(s2), s2, *anim_it->target_name, itoa(index, s1, 10))));
+                ->ID_Cycle_Safe(strconcat(sizeof(s2), s2, *anim_it->target_name, xr_itoa(index, s1, 10))));
 }
 
 void CControlAnimationBase::stop_now()

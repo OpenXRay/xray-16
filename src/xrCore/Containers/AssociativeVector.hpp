@@ -7,11 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrCore/xrCore.h"
-#include "AssociativeVectorComparer.hpp"
+
 #include <algorithm>
 #include <functional>
 #include <utility>
+
+#include "xrCore/xrCore.h"
+#include "xrCommon/xr_vector.h"
+#include "AssociativeVectorComparer.hpp"
 
 template <typename TKey, typename TValue, typename TKeyComparer = std::less<TKey>>
 class AssociativeVector : protected xr_vector<std::pair<TKey, TValue>>,
@@ -104,7 +107,7 @@ IC void swap(AssociativeVector<TKey, TValue, TKeyComparer>& left, AssociativeVec
 #define _associative_vector AssociativeVector<TKey, TValue, TKeyComparer>
 
 TEMPLATE_SPECIALIZATION
-IC _associative_vector::AssociativeVector(const key_compare& predicate, const allocator_type& allocator)
+IC _associative_vector::AssociativeVector(const key_compare& predicate, const allocator_type& /*allocator*/)
     : TComparer(predicate)
 {
 }
@@ -227,32 +230,32 @@ TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::iterator _associative_vector::lower_bound(const key_type& key)
 {
     actualize();
-    TComparer& self = *this;
-    return std::lower_bound(begin(), end(), key, self);
+    TComparer& self_ = *this;
+    return std::lower_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::const_iterator _associative_vector::lower_bound(const key_type& key) const
 {
     actualize();
-    const TComparer& self = *this;
-    return std::lower_bound(begin(), end(), key, self);
+    const TComparer& self_ = *this;
+    return std::lower_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::iterator _associative_vector::upper_bound(const key_type& key)
 {
     actualize();
-    TComparer& self = *this;
-    return std::upper_bound(begin(), end(), key, self);
+    TComparer& self_ = *this;
+    return std::upper_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::const_iterator _associative_vector::upper_bound(const key_type& key) const
 {
     actualize();
-    const TComparer& self = *this;
-    return std::upper_bound(begin(), end(), key, self);
+    const TComparer& self_ = *this;
+    return std::upper_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION
@@ -261,7 +264,7 @@ IC typename _associative_vector::insert_result _associative_vector::insert(const
     actualize();
     bool found = true;
     iterator I = lower_bound(value.first);
-    if (I == end() || operator()(value.first, (*I).first))
+    if (I == end() || (*this)(value.first, (*I).first))
     {
         I = inherited::insert(I, value);
         found = false;
@@ -274,8 +277,8 @@ IC typename _associative_vector::insert_result _associative_vector::insert(const
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::iterator _associative_vector::insert(iterator where, const value_type& value)
 {
-    if (where != end() && operator()(*where, value) && (where - begin()) == size() &&
-        !operator()(value, *(where + 1)) && operator()(*(where + 1), value))
+    if (where != end() && (*this)(*where, value) && (where - begin()) == size() &&
+        !(*this)(value, *(where + 1)) && (*this)(*(where + 1), value))
     {
         return inherited::insert(where, value);
     }
@@ -303,7 +306,7 @@ IC typename _associative_vector::iterator _associative_vector::find(const key_ty
     iterator I = lower_bound(key);
     if (I == end())
         return end();
-    if (operator()(key, (*I).first))
+    if ((*this)(key, (*I).first))
         return end();
     return I;
 }
@@ -315,7 +318,7 @@ IC typename _associative_vector::const_iterator _associative_vector::find(const 
     const_iterator I = lower_bound(key);
     if (I == end())
         return end();
-    if (operator()(key, (*I).first))
+    if ((*this)(key, (*I).first))
         return end();
     return I;
 }
@@ -334,7 +337,7 @@ IC typename _associative_vector::equal_range_result _associative_vector::equal_r
     iterator I = lower_bound(key);
     if (I == end())
         return equal_range_result(end(), end());
-    if (operator()(key, (*I).first))
+    if ((*this)(key, (*I).first))
         return equal_range_result(I, I);
     VERIFY(!operator()(key, (*I).first));
     return equal_range_result(I, I + 1);
@@ -347,7 +350,7 @@ IC typename _associative_vector::const_equal_range_result _associative_vector::e
     const_iterator I = lower_bound(key);
     if (I == end())
         return const_equal_range_result(end(), end());
-    if (operator()(key, (*I).first))
+    if ((*this)(key, (*I).first))
         return const_equal_range_result(I, I);
     VERIFY(!operator()(key, (*I).first));
     return const_equal_range_result(I, I + 1);

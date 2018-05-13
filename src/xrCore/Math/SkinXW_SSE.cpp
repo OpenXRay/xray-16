@@ -12,6 +12,7 @@ namespace XRay
 {
 namespace Math
 {
+#ifdef XR_X86
 #define transform_dir(idx, res, SX, SY, SZ, T1) \
     \
 __asm movzx eax,                                \
@@ -408,6 +409,6 @@ void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
     }
 }
-
-} // namespace Util3D
+#endif
+} // namespace Math
 } // namespace XRay

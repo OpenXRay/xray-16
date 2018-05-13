@@ -4,6 +4,8 @@
 #ifndef stdafxH
 #define stdafxH
 
+#include "Common/Common.hpp"
+
 #pragma once
 
 #pragma warn - pck

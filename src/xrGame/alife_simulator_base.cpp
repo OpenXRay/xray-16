@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: alife_simulator_base.cpp
-//	Created 	: 25.12.2002
-//  Modified 	: 12.05.2004
-//	Author		: Dmitriy Iassenev
-//	Description : ALife Simulator base class
+//  Module      : alife_simulator_base.cpp
+//  Created     : 25.12.2002
+//  Modified    : 12.05.2004
+//  Author      : Dmitriy Iassenev
+//  Description : ALife Simulator base class
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
@@ -22,6 +22,10 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "inventory_upgrade_manager.h"
 #include "Level.h"
+
+#ifdef DEBUG
+#include "alife_simulator_base_inline.h"
+#endif
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -94,7 +98,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
     R_ASSERT3(abstract, "Cannot find item with section", section);
 
     abstract->s_name = section;
-    //.	abstract->s_gameid			= u8(GAME_SINGLE);
+    //. abstract->s_gameid          = u8(GAME_SINGLE);
     abstract->s_RP = 0xff;
     abstract->ID = server().PerformIDgen(0xffff);
     abstract->ID_Parent = parent_id;
@@ -111,7 +115,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
     if (abstract->ID < 10)
         xr_strcat(s_name_replace, "0");
     string16 S1;
-    xr_strcat(s_name_replace, itoa(abstract->ID, S1, 10));
+    xr_strcat(s_name_replace, xr_itoa(abstract->ID, S1, 10));
     abstract->set_name_replace(s_name_replace);
 
     CSE_ALifeDynamicObject* dynamic_object = smart_cast<CSE_ALifeDynamicObject*>(abstract);
@@ -132,7 +136,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
     dynamic_object->spawn_supplies();
     dynamic_object->on_spawn();
 
-    //	Msg							("LSS : SPAWN : [%s],[%s], level
+    //  Msg                         ("LSS : SPAWN : [%s],[%s], level
     //%s",*dynamic_object->s_name,dynamic_object->name_replace(),*ai().game_graph().header().level(ai().game_graph().vertex(dynamic_object->m_tGraphID)->level_id()).name());
     return (dynamic_object);
 }
@@ -168,7 +172,7 @@ CSE_Abstract* CALifeSimulatorBase::create(CSE_ALifeGroupAbstract* tpALifeGroupAb
     if (k->ID < 10)
         xr_strcat(s_name_replace, "0");
     string16 S1;
-    xr_strcat(s_name_replace, itoa(k->ID, S1, 10));
+    xr_strcat(s_name_replace, xr_itoa(k->ID, S1, 10));
     k->set_name_replace(s_name_replace);
 
     register_object(k, true);
@@ -240,7 +244,7 @@ void CALifeSimulatorBase::create(CSE_ALifeObject* object)
     VERIFY(dynamic_object->m_bOnline);
 
 #ifdef DEBUG
-//	Msg							("Creating object from client spawn
+//  Msg                         ("Creating object from client spawn
 //[%d][%d][%s][%s]",dynamic_object->ID,dynamic_object->ID_Parent,dynamic_object->name(),dynamic_object->name_replace());
 #endif
 

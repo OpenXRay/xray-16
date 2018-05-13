@@ -5,21 +5,15 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment thunderbolts collection identifier class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_THUNDERBOLTS_COLLECTION_ID_HPP_INCLUDED
-#define EDITOR_WEATHER_THUNDERBOLTS_COLLECTION_ID_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "property_collection_forward.hpp"
 #include "thunderbolt.h"
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace thunderbolts
@@ -27,21 +21,21 @@ namespace thunderbolts
 class manager;
 class thunderbolt_id;
 
-class collection : public SThunderboltCollection, public editor::property_holder_holder, private Noncopyable
+class collection : public SThunderboltCollection, public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     collection(manager const& manager, shared_str const& id);
     virtual ~collection();
     void load(CInifile& config);
     void save(CInifile& config);
-    void fill(editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return section.c_str(); }
+    void fill(XRay::Editor::property_holder_collection* collection);
+    inline pcstr id() const { return section.c_str(); }
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();
@@ -62,6 +56,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_COLLECTION_ID_HPP_INCLUDED

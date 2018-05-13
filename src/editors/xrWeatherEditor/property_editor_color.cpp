@@ -31,7 +31,7 @@ void property_editor_color::PaintValue(PaintValueEventArgs ^ arguments)
         return;
 
     property_container ^ container = safe_cast<property_container ^>(arguments->Value);
-    editor::color color = safe_cast<property_color_base %>(container->container_holder()).get_value_raw();
+    XRay::Editor::color color = safe_cast<property_color_base %>(container->container_holder()).get_value_raw();
     Graphics ^ graphics = arguments->Graphics;
 
     SolidBrush ^ brush = gcnew SolidBrush(
@@ -69,7 +69,7 @@ Object ^ property_editor_color::EditValue(ITypeDescriptorContext ^ context, ISer
 
     ColorDialog ^ dialog = gcnew ColorDialog();
     dialog->FullOpen = true;
-    editor::color color = real_value->get_value_raw();
+    XRay::Editor::color color = real_value->get_value_raw();
     dialog->Color =
         System::Drawing::Color::FromArgb(255, int(255.f * color.r), int(255.f * color.g), int(255.f * color.b));
     if (dialog->ShowDialog() != System::Windows::Forms::DialogResult::Cancel)

@@ -14,9 +14,9 @@ void CBlender_DESC::Setup(LPCSTR N)
 {
     // Name
     VERIFY(xr_strlen(N) < 128);
-    VERIFY(0 == strchr(N, '.'));
+    VERIFY(nullptr == strchr(N, '.'));
     xr_strcpy(cName, N);
-    strlwr(cName);
+    xr_strlwr(cName);
 
     xr_strcpy(cComputer, Core.CompName); // Computer
 #ifndef _EDITOR

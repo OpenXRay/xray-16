@@ -3,6 +3,8 @@
 #include "net_global_data.h"
 #include "hxgrid/Interface/IAgent.h"
 #include "hxgrid/Interface/hxgridinterface.h"
+#include "xrCore/Threading/Lock.hpp"
+
 namespace lc_net
 {
 class global_data_cleanup

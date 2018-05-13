@@ -6,6 +6,7 @@
 #define AFX_IMAGE_H__4281EEAB_9522_40E5_A90D_831A40E1A344__INCLUDED_
 #pragma once
 
+[[deprecated]]
 class ENGINE_API CImage
 {
 public:

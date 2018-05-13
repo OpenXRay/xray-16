@@ -1,15 +1,18 @@
 #include "stdafx.h"
 #include "HudItem.h"
 #include "physic_item.h"
-#include "actor.h"
-#include "actoreffector.h"
+#include "Actor.h"
+#include "ActorEffector.h"
 #include "Missile.h"
-#include "xrmessages.h"
+#include "xrMessages.h"
 #include "Level.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "xrEngine/CameraBase.h"
 #include "player_hud.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
+#include "xrNetServer/NET_Messages.h"
+
+#include "ui_base.h"
 
 CHudItem::CHudItem()
 {
@@ -46,10 +49,17 @@ void CHudItem::PlaySound(LPCSTR alias, const Fvector& position)
     m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode());
 }
 
+//Alundaio: Play at index
+void CHudItem::PlaySound(pcstr alias, const Fvector& position, u8 index)
+{
+    m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode(), false, index);
+}
+//-Alundaio
+
 void CHudItem::renderable_Render()
 {
     UpdateXForm();
-    BOOL _hud_render = GlobalEnv.Render->get_HUD() && GetHUDmode();
+    BOOL _hud_render = GEnv.Render->get_HUD() && GetHUDmode();
 
     if (_hud_render && !IsHidden())
     {
@@ -97,13 +107,13 @@ void CHudItem::OnEvent(NET_Packet& P, u16 type)
     {
         u8 S;
         P.r_u8(S);
-        OnStateSwitch(u32(S));
+        OnStateSwitch(u32(S), GetState());
     }
     break;
     }
 }
 
-void CHudItem::OnStateSwitch(u32 S)
+void CHudItem::OnStateSwitch(u32 S, u32 oldState)
 {
     SetState(S);
 
@@ -299,7 +309,7 @@ BOOL CHudItem::GetHUDmode()
     if (object().H_Parent())
     {
         CActor* A = smart_cast<CActor*>(object().H_Parent());
-        return (A && A->HUDview() && HudItemData() && HudItemData());
+        return (A && A->HUDview() && HudItemData());
     }
     else
         return FALSE;
@@ -327,18 +337,51 @@ bool CHudItem::TryPlayAnimIdle()
                 PlayAnimIdleSprint();
                 return true;
             }
-            else if (!st.bCrouch && pActor->AnyMove())
+            if (pActor->AnyMove())
             {
-                PlayAnimIdleMoving();
-                return true;
+                if (!st.bCrouch)
+                {
+                    PlayAnimIdleMoving();
+                    return true;
+                }
+#ifdef NEW_ANIMS //AVO: new crouch idle animation
+                if (st.bCrouch && isHUDAnimationExist("anm_idle_moving_crouch"))
+                {
+                    PlayAnimIdleMovingCrouch();
+                    return true;
+                }
+#endif //-NEW_ANIMS
             }
         }
     }
     return false;
 }
 
-void CHudItem::PlayAnimIdleMoving() { PlayHUDMotion("anm_idle_moving", TRUE, NULL, GetState()); }
-void CHudItem::PlayAnimIdleSprint() { PlayHUDMotion("anm_idle_sprint", TRUE, NULL, GetState()); }
+//AVO: check if animation exists
+bool CHudItem::isHUDAnimationExist(pcstr anim_name)
+{
+    if (HudItemData()) // First person
+    {
+        string256 anim_name_r;
+        bool is_16x9 = UI().is_widescreen();
+        u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
+        xr_sprintf(anim_name_r, "%s%s", anim_name, (attach_place_idx == 1 && is_16x9) ? "_16x9" : "");
+        player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
+        if (anm)
+            return true;
+    }
+    else // Third person
+        if (g_player_hud->motion_length(anim_name, HudSection(), m_current_motion_def) > 100)
+            return true;
+#ifdef DEBUG
+    Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudSection().c_str());
+#endif
+    return false;
+}
+
+void CHudItem::PlayAnimIdleMovingCrouch() { PlayHUDMotion("anm_idle_moving_crouch", true, nullptr, GetState()); }
+void CHudItem::PlayAnimIdleMoving() { PlayHUDMotion("anm_idle_moving", true, nullptr, GetState()); }
+void CHudItem::PlayAnimIdleSprint() { PlayHUDMotion("anm_idle_sprint", true, nullptr, GetState()); }
 void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 {
     if (GetState() == eIdle && !m_bStopAtEndAnimIsRunning)

@@ -24,8 +24,8 @@ class ECORE_API CUI_Camera
     Fvector m_Target;
 
 protected:
-    friendclass CEditorRenderDevice;
-    friendclass TUI;
+    friend class CEditorRenderDevice;
+    friend class TUI;
 
     float m_Znear;
     float m_Zfar;

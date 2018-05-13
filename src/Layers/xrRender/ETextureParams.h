@@ -114,9 +114,10 @@ struct ECORE_API STextureParams
     shared_str ext_normal_map_name;
 
     STextureParams() { Clear(); }
-    IC void destroy_shared_str(shared_str& object) { object.~shared_str(); }
-    IC void construct_shared_str(shared_str& object) { ::new (&object) shared_str(); }
-    IC void Clear()
+    void destroy_shared_str(shared_str& object) { object.~shared_str(); }
+    void construct_shared_str(shared_str& object) { ::new (&object) shared_str(); }
+
+    void Clear()
     {
         destroy_shared_str(detail_name);
         destroy_shared_str(bump_name);
@@ -138,12 +139,13 @@ struct ECORE_API STextureParams
         bump_virtual_height = 0.05f;
     }
 
-    IC BOOL HasAlpha()
+    BOOL HasAlpha()
     {
         // исходная текстура содержит альфа канал
         return flags.is(flHasAlpha);
     }
-    IC BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
+
+    BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
     {
         switch (fmt)
         {
@@ -171,9 +173,9 @@ struct ECORE_API STextureParams
 #pragma pack(pop)
 
 struct xr_token;
-extern xr_token tparam_token[];
-extern xr_token tfmt_token[];
-extern xr_token ttype_token[];
+extern const xr_token tparam_token[];
+extern const xr_token tfmt_token[];
+extern const xr_token ttype_token[];
 
 //----------------------------------------------------
 #define THM_CHUNK_VERSION 0x0810

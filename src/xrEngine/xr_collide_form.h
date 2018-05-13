@@ -1,7 +1,11 @@
+#pragma once
 #ifndef __XR_COLLIDE_FORM_H__
 #define __XR_COLLIDE_FORM_H__
 
 #include "xrCDB/xr_collide_defs.h"
+#include "xrCore/_obb.h"
+#include "xrCore/_cylinder.h"
+#include "xrCore/_sphere.h"
 
 // refs
 class ENGINE_API IGameObject;
@@ -86,7 +90,6 @@ protected:
     IGameObject* owner; // владелец
     u32 dwQueryID;
 
-protected:
     Fbox bv_box; // (Local) BBox объекта
     Fsphere bv_sphere; // (Local) Sphere
 private:
@@ -130,13 +133,12 @@ public:
         u16 type;
         u16 elem_id;
 
-    public:
         SElement() : elem_id(u16(-1)), type(0) {}
         SElement(u16 id, u16 t) : elem_id(id), type(t) {}
         BOOL valid() const { return (elem_id != (u16(-1))) && (type != 0); }
         void center(Fvector& center) const;
     };
-    DEFINE_VECTOR(SElement, ElementVec, ElementVecIt);
+    using ElementVec = xr_vector<SElement>;
 
 private:
     u64 vis_mask;
@@ -165,7 +167,6 @@ public:
 
 class ENGINE_API CCF_EventBox : public ICollisionForm
 {
-private:
     Fplane Planes[6];
 
 public:
@@ -196,7 +197,6 @@ public:
     };
     xr_vector<shape_def> shapes;
 
-public:
     CCF_Shape(IGameObject* _owner);
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);

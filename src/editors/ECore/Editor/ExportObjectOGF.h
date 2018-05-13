@@ -4,6 +4,8 @@
 #define ExportObjectOGFH
 
 #include "utils/ETools/PropSlimTools.h"
+#include "xrCore/_fbox.h"
+
 //---------------------------------------------------------------------------
 const int clpOGFMX = 48, clpOGFMY = 16, clpOGFMZ = 48;
 //---------------------------------------------------------------------------
@@ -37,8 +39,8 @@ struct SOGFVert
         UV.set(uv);
     }
 
-    BOOL similar_pos(SOGFVert& V) { return P.similar(V.P, EPS_L); }
-    BOOL similar(SOGFVert& V)
+    bool similar_pos(SOGFVert& V) { return P.similar(V.P, EPS_L); }
+    bool similar(SOGFVert& V)
     {
         if (!P.similar(V.P, EPS_L))
             return FALSE;
@@ -55,8 +57,8 @@ struct SOGFFace
     WORD v[3];
 };
 
-DEFINE_VECTOR(SOGFVert, OGFVertVec, OGFVertIt);
-DEFINE_VECTOR(SOGFFace, OGFFaceVec, OGFFaceIt);
+using OGFVertVec = xr_vector<SOGFVert>;
+using OGFFaceVec = xr_vector<SOGFFace>;
 
 class CObjectOGFCollectorPacked
 {
@@ -78,25 +80,18 @@ public:
     void ComputeBounding();
     void OptimizeTextureCoordinates();
 
-public:
     CObjectOGFCollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces);
     void CalculateTB();
     void MakeProgressive();
-    IC
 
-        bool
-        check(SOGFFace& F)
+    bool check(SOGFFace& F)
     {
         if ((F.v[0] == F.v[1]) || (F.v[0] == F.v[2]) || (F.v[1] == F.v[2]))
             return false;
-        else
-            return true;
+        return true;
     }
 
-    IC
-
-        bool
-        add_face(SOGFVert& v0, SOGFVert& v1, SOGFVert& v2)
+    bool add_face(SOGFVert& v0, SOGFVert& v1, SOGFVert& v2)
     {
         if (v0.P.similar(v1.P, EPS) || v0.P.similar(v2.P, EPS) || v1.P.similar(v2.P, EPS))
         {
@@ -128,15 +123,15 @@ public:
         return true;
     }
 
-    IC OGFVertVec& getV_Verts() { return m_Verts; }
-    IC OGFFaceVec& getV_Faces() { return m_Faces; }
-    IC SOGFVert* getVert() { return &m_Verts.front(); }
-    IC u32 getVS() { return m_Verts.size(); }
-    IC u32 getTS() { return m_Faces.size(); }
+    OGFVertVec& getV_Verts() { return m_Verts; }
+    OGFFaceVec& getV_Faces() { return m_Faces; }
+    SOGFVert* getVert() { return &m_Verts.front(); }
+    u32 getVS() { return m_Verts.size(); }
+    u32 getTS() { return m_Faces.size(); }
 };
 
 //----------------------------------------------------
-DEFINE_VECTOR(CObjectOGFCollectorPacked*, COGFCPVec, COGFCPIt)
+using COGFCPVec = xr_vector<CObjectOGFCollectorPacked*>;
 
 class ECORE_API CExportObjectOGF
 {
@@ -157,7 +152,7 @@ class ECORE_API CExportObjectOGF
 
         void CalculateTB()
         {
-            for (COGFCPIt it = m_Parts.begin(); it != m_Parts.end(); it++)
+            for (auto it = m_Parts.begin(); it != m_Parts.end(); ++it)
                 (*it)->CalculateTB();
         }
         void MakeProgressive();
@@ -166,7 +161,7 @@ class ECORE_API CExportObjectOGF
         void ComputeBounding()
         {
             m_Box.invalidate();
-            for (COGFCPIt it = m_Parts.begin(); it != m_Parts.end(); it++)
+            for (auto it = m_Parts.begin(); it != m_Parts.end(); it++)
             {
                 CObjectOGFCollectorPacked* part = *it;
                 part->ComputeBounding();
@@ -174,7 +169,7 @@ class ECORE_API CExportObjectOGF
             }
         }
     };
-    DEFINE_VECTOR(SSplit*, SplitVec, SplitIt);
+    using SplitVec = xr_vector<SSplit*>;
     SplitVec m_Splits;
     CEditableObject* m_Source;
     Fbox m_Box;
@@ -184,7 +179,7 @@ class ECORE_API CExportObjectOGF
     void ComputeBounding()
     {
         m_Box.invalidate();
-        for (SplitIt it = m_Splits.begin(); it != m_Splits.end(); it++)
+        for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
         {
             (*it)->ComputeBounding();
             m_Box.merge((*it)->m_Box);

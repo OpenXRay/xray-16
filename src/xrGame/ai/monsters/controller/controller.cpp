@@ -90,9 +90,9 @@ void CController::Load(LPCSTR section)
     // anim().accel_chain_add		(eAnimWalkFwd,		eAnimRun);
     // anim().accel_chain_add		(eAnimWalkDamaged,	eAnimRunDamaged);
 
-    ::Sound->create(
+    GEnv.Sound->create(
         control_start_sound, pSettings->r_string(section, "sound_control_start"), st_Effect, SOUND_TYPE_WORLD);
-    ::Sound->create(control_hit_sound, pSettings->r_string(section, "sound_control_hit"), st_Effect, SOUND_TYPE_WORLD);
+    GEnv.Sound->create(control_hit_sound, pSettings->r_string(section, "sound_control_hit"), st_Effect, SOUND_TYPE_WORLD);
 
     anim().AddReplacedAnim(&m_bDamaged, eAnimStandIdle, eAnimStandDamaged);
     anim().AddReplacedAnim(&m_bDamaged, eAnimRun, eAnimRunDamaged);

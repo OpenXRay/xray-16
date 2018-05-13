@@ -146,7 +146,7 @@ void CActor::PickupModeUpdate()
 }
 
 #include "xrEngine/CameraBase.h"
-BOOL g_b_COD_PickUpMode = TRUE;
+BOOL g_b_COD_PickUpMode = TRUE; // XXX: allow to change this via console
 void CActor::PickupModeUpdate_COD()
 {
     if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode)
@@ -161,7 +161,7 @@ void CActor::PickupModeUpdate_COD()
     CFrustum frustum;
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    ISpatialResult.clear_not_free();
+    ISpatialResult.clear();
     g_SpatialSpace->q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
 
     float maxlen = 1000.0f;
@@ -339,7 +339,7 @@ void CActor::Feel_Grenade_Update(float rad)
     Fvector pos_actor;
     Center(pos_actor);
 
-    q_nearest.clear_not_free();
+    q_nearest.clear();
     g_pGameLevel->ObjectSpace.GetNearest(q_nearest, pos_actor, rad, NULL);
 
     xr_vector<IGameObject*>::iterator it_b = q_nearest.begin();

@@ -3,7 +3,7 @@
 #include "configs_common.h"
 #include "xrCore/ppmd_compressor.h"
 #include "xrCore/xr_ini.h"
-
+#include "xrCore/buffer_vector.h"
 #include "GameObject.h"
 #include "Level.h"
 #include "actor_mp_client.h"
@@ -200,8 +200,7 @@ void configs_dumper::dump_config(complete_callback_t complete_cb)
         return;
     }
 
-    DWORD process_affinity_mask;
-    DWORD tmp_dword;
+    ULONG_PTR process_affinity_mask, tmp_dword;
     GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &tmp_dword);
     bool single_core = (btwCount1(static_cast<u32>(process_affinity_mask)) == 1);
     if (single_core)

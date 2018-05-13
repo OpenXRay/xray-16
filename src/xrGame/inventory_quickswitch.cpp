@@ -203,7 +203,7 @@ static char const* teamdata_section = "deathmatch_team0";
 
 void CInventory::InitPriorityGroupsForQSwitch()
 {
-    STATIC_CHECK(epg_groups_count == CInventory::qs_priorities_count, groups_count_problem);
+    static_assert(epg_groups_count == qs_priorities_count, "Groups count problem.");
     for (int i = epg_pistols; i < epg_groups_count; ++i)
     {
         m_groups[i].init_group(teamdata_section, groups_names[i]);

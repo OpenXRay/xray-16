@@ -4,20 +4,11 @@
     <Filter Include="Compiler">
       <UniqueIdentifier>{1bd9343c-03aa-41e8-9a44-9eaa4704f675}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Compiler\quad_tree">
-      <UniqueIdentifier>{27399017-520a-480b-b510-0343930ecb3a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Compiler\cover_point">
-      <UniqueIdentifier>{884eac5e-d7ac-4d82-ab77-e54413c977e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Compiler\Kernel">
       <UniqueIdentifier>{d7047094-b5bb-4398-830d-7f17b82d8030}</UniqueIdentifier>
     </Filter>
     <Filter Include="ALife">
       <UniqueIdentifier>{d720c170-292f-489f-8660-5e5f3f895e3d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Cross">
-      <UniqueIdentifier>{89d213ba-d4f4-436e-831f-afd1d39dcb08}</UniqueIdentifier>
     </Filter>
     <Filter Include="ALife\Graph">
       <UniqueIdentifier>{f4a43bfd-7b1d-42d7-8fa1-7283b213c52e}</UniqueIdentifier>
@@ -27,24 +18,6 @@
     </Filter>
     <Filter Include="ALife\Shared">
       <UniqueIdentifier>{e75d6553-69f1-4700-b0cf-72e8e5898ad0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Shared\ALife">
-      <UniqueIdentifier>{a0f06d81-79e9-43a1-b4ca-5a1611a1bf27}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Shared\ALife\alife_human_brain">
-      <UniqueIdentifier>{ec866a81-8661-4135-9ea7-eb730959aa67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Shared\ALife\alife_monster_brain">
-      <UniqueIdentifier>{74f06c02-e8b2-4352-b54e-af5995ccbe44}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Shared\ALife\alife_space">
-      <UniqueIdentifier>{3a488e61-c224-448f-9d67-69aefc25652c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Shared\ServerEntities">
-      <UniqueIdentifier>{ce59ae81-40ee-48c6-ada9-5dee5f01841d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Shared\Server">
-      <UniqueIdentifier>{7e6bd109-2dca-4b59-942a-0d0d4ec571aa}</UniqueIdentifier>
     </Filter>
     <Filter Include="ALife\Shared\Common">
       <UniqueIdentifier>{9f4c9b4e-64b7-478f-9b0b-82b9ee2006f4}</UniqueIdentifier>
@@ -63,9 +36,6 @@
     </Filter>
     <Filter Include="ALife\Spawn\server_entity_wrapper">
       <UniqueIdentifier>{abd194f2-1c4c-45a2-a498-344b990c1c61}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ALife\Spawn\spawn_patcher">
-      <UniqueIdentifier>{bb8ce383-823f-4aed-ba06-4f466aa15ff3}</UniqueIdentifier>
     </Filter>
     <Filter Include="ALife\Verify">
       <UniqueIdentifier>{1662641a-fb1b-4795-bf6e-272cfc78c210}</UniqueIdentifier>
@@ -99,52 +69,13 @@
     <ClCompile Include="xrAI.cpp">
       <Filter>Compiler\Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="xrCrossTable.cpp">
-      <Filter>ALife\Cross</Filter>
-    </ClCompile>
     <ClCompile Include="game_graph_builder.cpp">
       <Filter>ALife\Graph</Filter>
     </ClCompile>
     <ClCompile Include="xr_graph_merge.cpp">
       <Filter>ALife\Merge</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\alife_human_brain.cpp">
-      <Filter>ALife\Shared\ALife\alife_human_brain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\alife_monster_brain.cpp">
-      <Filter>ALife\Shared\ALife\alife_monster_brain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\alife_space.cpp">
-      <Filter>ALife\Shared\ALife\alife_space</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\xrServer_Object_Base.cpp">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects.cpp">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_Abstract.cpp">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife.cpp">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife_Items.cpp">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife_Monsters.cpp">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\PHNetState.cpp">
-      <Filter>ALife\Shared\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\PHSynchronize.cpp">
-      <Filter>ALife\Shared\Server</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\smart_cast.cpp">
-      <Filter>ALife\Shared\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\smart_cast_stats.cpp">
       <Filter>ALife\Shared\Common</Filter>
     </ClCompile>
     <ClCompile Include="game_spawn_constructor.cpp">
@@ -159,40 +90,22 @@
     <ClCompile Include="server_entity_wrapper.cpp">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="spawn_patcher.cpp">
-      <Filter>ALife\Spawn\spawn_patcher</Filter>
-    </ClCompile>
     <ClCompile Include="verify_level_graph.cpp">
       <Filter>ALife\Verify</Filter>
     </ClCompile>
     <ClCompile Include="guid_generator.cpp">
       <Filter>ALife\guid_generator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp">
+      <Filter>Compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AIMapExport.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="compiler.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="ETextureParams.h">
       <Filter>Compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\Shader_xrLC.h">
       <Filter>Compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="quadtree.h">
-      <Filter>Compiler\quad_tree</Filter>
-    </ClInclude>
-    <ClInclude Include="quadtree_inline.h">
-      <Filter>Compiler\quad_tree</Filter>
-    </ClInclude>
-    <ClInclude Include="cover_point.h">
-      <Filter>Compiler\cover_point</Filter>
-    </ClInclude>
-    <ClInclude Include="cover_point_inline.h">
-      <Filter>Compiler\cover_point</Filter>
     </ClInclude>
     <ClInclude Include="factory_api.h">
       <Filter>Compiler\Kernel</Filter>
@@ -202,12 +115,6 @@
     </ClInclude>
     <ClInclude Include="xrAI.h">
       <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="xrShaderTypes.h">
-      <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="xrCrossTable.h">
-      <Filter>ALife\Cross</Filter>
     </ClInclude>
     <ClInclude Include="game_graph_builder.h">
       <Filter>ALife\Graph</Filter>
@@ -220,90 +127,6 @@
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\restriction_space.h">
       <Filter>ALife\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\alife_human_brain.h">
-      <Filter>ALife\Shared\ALife\alife_human_brain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\alife_human_brain_inline.h">
-      <Filter>ALife\Shared\ALife\alife_human_brain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\alife_monster_brain.h">
-      <Filter>ALife\Shared\ALife\alife_monster_brain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\alife_monster_brain_inline.h">
-      <Filter>ALife\Shared\ALife\alife_monster_brain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\alife_space.h">
-      <Filter>ALife\Shared\ALife\alife_space</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\character_info_defs.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\InfoPortionDefs.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\inventory_space.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\ItemListTypes.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\PropertiesListTypes.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_value_container.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_value_container_impl.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\ShapeData.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\WaveForm.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrEProps.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Object_Base.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_Abstract.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_All.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_Items.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_Monsters.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="PropertiesListHelper.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\game_base_space.h">
-      <Filter>ALife\Shared\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\PHNetState.h">
-      <Filter>ALife\Shared\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\PHSynchronize.h">
-      <Filter>ALife\Shared\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\xrMessages.h">
-      <Filter>ALife\Shared\Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\clsid_game.h">
       <Filter>ALife\Shared\Common</Filter>
@@ -347,14 +170,14 @@
     <ClInclude Include="server_entity_wrapper_inline.h">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="spawn_patcher.h">
-      <Filter>ALife\Spawn\spawn_patcher</Filter>
-    </ClInclude>
     <ClInclude Include="guid_generator.h">
       <Filter>ALife\guid_generator</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Layers\xrRender\ETextureParams.h">
+      <Filter>Compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -108,7 +108,7 @@ public:
             FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX3 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE3(1) |
                 D3DFVF_TEXCOORDSIZE3(2)
         };
-        Vertex::Vertex() :
+        Vertex() :
             pos(0.0f, 0.0f, 0.0f), normal(0.0f, 0.0f, 0.0f), s(0.0f), t(0.0f),
             tangent(0.0f, 0.0f, 0.0f), binormal(0.0f, 0.0f, 0.0f)
         {}

@@ -49,7 +49,7 @@ void CUIStatsPlayerList::Init(CUIXml& xml_doc, LPCSTR path)
 
     // init item structure
     int tabsCount = xml_doc.GetNodesNum(path, 0, "field");
-    XML_NODE* tab_node = xml_doc.NavigateToNode(path, 0);
+    XML_NODE tab_node = xml_doc.NavigateToNode(path, 0);
     xml_doc.SetLocalRoot(tab_node);
 
     for (int i = 0; i < tabsCount; ++i)
@@ -205,7 +205,7 @@ void CUIStatsPlayerList::Update()
     if (m_prev_upd_time > Device.dwTimeContinual - 100)
         return;
 
-    DEFINE_VECTOR(game_PlayerState*, ItemVec, ItemIt);
+    using ItemVec = xr_vector<game_PlayerState*>;
     ItemVec items;
 
     m_prev_upd_time = Device.dwTimeContinual;
@@ -286,8 +286,8 @@ void CUIStatsPlayerList::Update()
 
     R_ASSERT(items.size() == m_pad->GetChildWndList().size());
 
-    WINDOW_LIST_it it = m_pad->GetChildWndList().begin();
-    ItemIt itit = items.begin();
+    auto it = m_pad->GetChildWndList().begin();
+    auto itit = items.begin();
 
     for (; it != m_pad->GetChildWndList().end(); it++, itit++)
     {

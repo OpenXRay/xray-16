@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_thunderbolts_collection.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -18,17 +17,16 @@
 using editor::environment::thunderbolts::thunderbolt_id;
 using editor::environment::thunderbolts::collection;
 using editor::environment::thunderbolts::manager;
-using editor::property_holder;
 
 template <>
 void property_collection<collection::container_type, collection>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
 
 template <>
-editor::property_holder* property_collection<collection::container_type, collection>::create()
+XRay::Editor::property_holder_base* property_collection<collection::container_type, collection>::create()
 {
     thunderbolt_id* object = new thunderbolt_id(m_holder.m_manager, "");
     object->fill(this);
@@ -59,29 +57,25 @@ void collection::load(CInifile& config)
 {
     CInifile::Sect& items = config.r_section(section);
     m_ids.reserve(items.Data.size());
-    typedef CInifile::Items items_type;
-    items_type::const_iterator i = items.Data.begin();
-    items_type::const_iterator e = items.Data.end();
-    for (; i != e; ++i)
+
+    for (const auto &i : items.Data)
     {
-        thunderbolt_id* object = new thunderbolt_id(m_manager, (*i).first);
+        thunderbolt_id* object = new thunderbolt_id(m_manager, i.first);
         object->fill(m_collection);
         m_ids.push_back(object);
 
-        palette.push_back(m_manager.description(config, (*i).first));
+        palette.push_back(m_manager.description(config, i.first));
     }
 }
 
 void collection::save(CInifile& config)
 {
-    container_type::const_iterator i = m_ids.begin();
-    container_type::const_iterator e = m_ids.end();
-    for (; i != e; ++i)
-        config.w_string(section.c_str(), (*i)->id(), "");
+    for (const auto &i : m_ids)
+        config.w_string(section.c_str(), i->id(), "");
 }
 
-LPCSTR collection::id_getter() const { return (section.c_str()); }
-void collection::id_setter(LPCSTR value_)
+pcstr collection::id_getter() const { return (section.c_str()); }
+void collection::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (section._get() == value._get())
@@ -90,24 +84,24 @@ void collection::id_setter(LPCSTR value_)
     section = m_manager.unique_collection_id(value);
 }
 
-void collection::fill(editor::property_holder_collection* collection)
+void collection::fill(XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(section.c_str());
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &collection::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &collection::id_setter);
 
-    m_property_holder->add_property("id", "properties", "this option is resposible for collection id", section.c_str(),
+    m_property_holder->add_property("id", "properties", "this option is responsible for collection id", section.c_str(),
         string_getter, string_setter);
+
     m_property_holder->add_property(
-        "thunderbolts", "properties", "this option is resposible for thunderbolts", m_collection);
+        "thunderbolts", "properties", "this option is responsible for thunderbolts", m_collection);
 }
 
-property_holder* collection::object() { return (m_property_holder); }
-#endif // #ifdef INGAME_EDITOR
+XRay::Editor::property_holder_base* collection::object() { return m_property_holder; }

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{DAFD6D98-3DCD-40AD-BC85-EC71797B6767}</ProjectGuid>
+    <RootNamespace>OPCODE</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>OPCODE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>OPCODE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <ClCompile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>OPCODE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <ClCompile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>OPCODE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>OPCODE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>OPCODE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Opcode.cpp" />
+    <ClCompile Include="OPC_AABB.cpp" />
+    <ClCompile Include="OPC_AABBCollider.cpp" />
+    <ClCompile Include="OPC_AABBTree.cpp" />
+    <ClCompile Include="OPC_Collider.cpp" />
+    <ClCompile Include="OPC_Common.cpp" />
+    <ClCompile Include="OPC_Container.cpp" />
+    <ClCompile Include="OPC_Matrix3x3.cpp" />
+    <ClCompile Include="OPC_Matrix4x4.cpp" />
+    <ClCompile Include="OPC_Model.cpp" />
+    <ClCompile Include="OPC_OBB.cpp" />
+    <ClCompile Include="OPC_OBBCollider.cpp" />
+    <ClCompile Include="OPC_OptimizedTree.cpp" />
+    <ClCompile Include="OPC_Plane.cpp" />
+    <ClCompile Include="OPC_PlanesCollider.cpp" />
+    <ClCompile Include="OPC_Point.cpp" />
+    <ClCompile Include="OPC_Ray.cpp" />
+    <ClCompile Include="OPC_RayCollider.cpp" />
+    <ClCompile Include="OPC_SphereCollider.cpp" />
+    <ClCompile Include="OPC_TreeBuilders.cpp" />
+    <ClCompile Include="OPC_TreeCollider.cpp" />
+    <ClCompile Include="OPC_Triangle.cpp" />
+    <ClCompile Include="OPC_VolumeCollider.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Opcode.h" />
+    <ClInclude Include="OPC_AABB.h" />
+    <ClInclude Include="OPC_AABBCollider.h" />
+    <ClInclude Include="OPC_AABBTree.h" />
+    <ClInclude Include="OPC_BoundingSphere.h" />
+    <ClInclude Include="OPC_BoxBoxOverlap.h" />
+    <ClInclude Include="OPC_BVTCache.h" />
+    <ClInclude Include="OPC_Collider.h" />
+    <ClInclude Include="OPC_Common.h" />
+    <ClInclude Include="OPC_Container.h" />
+    <ClInclude Include="OPC_FPU.h" />
+    <ClInclude Include="OPC_Matrix3x3.h" />
+    <ClInclude Include="OPC_Matrix4x4.h" />
+    <ClInclude Include="OPC_MemoryMacros.h" />
+    <ClInclude Include="OPC_Model.h" />
+    <ClInclude Include="OPC_OBB.h" />
+    <ClInclude Include="OPC_OBBCollider.h" />
+    <ClInclude Include="OPC_OptimizedTree.h" />
+    <ClInclude Include="OPC_Plane.h" />
+    <ClInclude Include="OPC_PlanesAABBOverlap.h" />
+    <ClInclude Include="OPC_PlanesCollider.h" />
+    <ClInclude Include="OPC_PlanesTriOverlap.h" />
+    <ClInclude Include="OPC_Point.h" />
+    <ClInclude Include="OPC_Preprocessor.h" />
+    <ClInclude Include="OPC_Ray.h" />
+    <ClInclude Include="OPC_RayAABBOverlap.h" />
+    <ClInclude Include="OPC_RayCollider.h" />
+    <ClInclude Include="OPC_RayTriOverlap.h" />
+    <ClInclude Include="OPC_Settings.h" />
+    <ClInclude Include="OPC_SphereAABBOverlap.h" />
+    <ClInclude Include="OPC_SphereCollider.h" />
+    <ClInclude Include="OPC_SphereTriOverlap.h" />
+    <ClInclude Include="OPC_TreeBuilders.h" />
+    <ClInclude Include="OPC_TreeCollider.h" />
+    <ClInclude Include="OPC_Triangle.h" />
+    <ClInclude Include="OPC_TriBoxOverlap.h" />
+    <ClInclude Include="OPC_TriTriOverlap.h" />
+    <ClInclude Include="OPC_Types.h" />
+    <ClInclude Include="OPC_VolumeCollider.h" />
+    <ClInclude Include="pch.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

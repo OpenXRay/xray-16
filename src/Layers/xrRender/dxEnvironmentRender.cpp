@@ -8,15 +8,18 @@
 //////////////////////////////////////////////////////////////////////////
 // half box def
 static Fvector3 hbox_verts[24] = {
-    {-1.f, -1.f, -1.f}, {-1.f, -1.01f, -1.f}, // down
-    {1.f, -1.f, -1.f}, {1.f, -1.01f, -1.f}, // down
-    {-1.f, -1.f, 1.f}, {-1.f, -1.01f, 1.f}, // down
-    {1.f, -1.f, 1.f}, {1.f, -1.01f, 1.f}, // down
-    {-1.f, 2.f, -1.f}, {-1.f, 1.f, -1.f}, {1.f, 2.f, -1.f}, {1.f, 1.f, -1.f}, {-1.f, 2.f, 1.f}, {-1.f, 1.f, 1.f},
-    {1.f, 2.f, 1.f}, {1.f, 1.f, 1.f}, {-1.f, 0.f, -1.f}, {-1.f, -1.f, -1.f}, // half
-    {1.f, 0.f, -1.f}, {1.f, -1.f, -1.f}, // half
-    {1.f, 0.f, 1.f}, {1.f, -1.f, 1.f}, // half
-    {-1.f, 0.f, 1.f}, {-1.f, -1.f, 1.f} // half
+    {-1.f, -1.f, -1.f }, {-1.f, -1.01f, -1.f},  // down
+    {1.f, -1.f, -1.f }, {1.f, -1.01f, -1.f},    // down
+    {-1.f, -1.f, 1.f},{-1.f, -1.01f, 1.f},      // down
+    {1.f, -1.f, 1.f},{1.f, -1.01f, 1.f},        // down
+    {-1.f, 1.f, -1.f}, {-1.f, 1.f, -1.f},
+    {1.f, 1.f, -1.f}, {1.f, 1.f, -1.f},
+    {-1.f, 1.f, 1.f}, {-1.f, 1.f, 1.f},
+    {1.f, 1.f, 1.f }, { 1.f, 1.f, 1.f},
+    {-1.f, 0.f, -1.f}, {-1.f, -1.f, -1.f},  // half
+    {1.f, 0.f, -1.f}, {1.f, -1.f, -1.f},    // half
+    {1.f, 0.f, 1.f}, {1.f, -1.f, 1.f},      // half
+    {-1.f, 0.f, 1.f}, {-1.f, -1.f, 1.f}     // half
 };
 static u16 hbox_faces[20 * 3] = {0, 2, 3, 3, 1, 0, 4, 5, 7, 7, 6, 4, 0, 1, 9, 9, 8, 0, 8, 9, 5, 5, 4, 8, 1, 3, 10, 10,
     9, 1, 9, 10, 7, 7, 5, 9, 3, 2, 11, 11, 10, 3, 10, 11, 6, 6, 7, 10, 2, 0, 8, 8, 11, 2, 11, 8, 4, 4, 6, 11};
@@ -69,7 +72,7 @@ void dxEnvDescriptorMixerRender::Destroy()
 
 void dxEnvDescriptorMixerRender::Clear()
 {
-    std::pair<u32, ref_texture> zero = mk_pair(u32(0), ref_texture(0));
+    std::pair<u32, ref_texture> zero = std::make_pair(u32(0), ref_texture(nullptr));
     sky_r_textures.clear();
     sky_r_textures.push_back(zero);
     sky_r_textures.push_back(zero);
@@ -92,17 +95,17 @@ void dxEnvDescriptorMixerRender::lerp(IEnvDescriptorRender* inA, IEnvDescriptorR
     dxEnvDescriptorRender* pB = (dxEnvDescriptorRender*)inB;
 
     sky_r_textures.clear();
-    sky_r_textures.push_back(mk_pair(0, pA->sky_texture));
-    sky_r_textures.push_back(mk_pair(1, pB->sky_texture));
+    sky_r_textures.push_back(std::make_pair(0, pA->sky_texture));
+    sky_r_textures.push_back(std::make_pair(1, pB->sky_texture));
 
     sky_r_textures_env.clear();
 
-    sky_r_textures_env.push_back(mk_pair(0, pA->sky_texture_env));
-    sky_r_textures_env.push_back(mk_pair(1, pB->sky_texture_env));
+    sky_r_textures_env.push_back(std::make_pair(0, pA->sky_texture_env));
+    sky_r_textures_env.push_back(std::make_pair(1, pB->sky_texture_env));
 
     clouds_r_textures.clear();
-    clouds_r_textures.push_back(mk_pair(0, pA->clouds_texture));
-    clouds_r_textures.push_back(mk_pair(1, pB->clouds_texture));
+    clouds_r_textures.push_back(std::make_pair(0, pA->clouds_texture));
+    clouds_r_textures.push_back(std::make_pair(1, pB->clouds_texture));
 }
 
 void dxEnvDescriptorRender::OnDeviceCreate(CEnvDescriptor& owner)
@@ -134,26 +137,33 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 {
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
 
-    if (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2)
+    if (GEnv.Render->get_generation() == IRender::GENERATION_R2)
     {
         //. very very ugly hack
         if (HW.Caps.raster_major >= 3 && HW.Caps.geometry.bVTF)
         {
             // tonemapping in VS
-            mixRen.sky_r_textures.push_back(mk_pair(u32(CTexture::rstVertex), tonemap)); //. hack
-            mixRen.sky_r_textures_env.push_back(mk_pair(u32(CTexture::rstVertex), tonemap)); //. hack
-            mixRen.clouds_r_textures.push_back(mk_pair(u32(CTexture::rstVertex), tonemap)); //. hack
+            mixRen.sky_r_textures.push_back(std::make_pair(u32(CTexture::rstVertex), tonemap)); //. hack
+            mixRen.sky_r_textures_env.push_back(std::make_pair(u32(CTexture::rstVertex), tonemap)); //. hack
+            mixRen.clouds_r_textures.push_back(std::make_pair(u32(CTexture::rstVertex), tonemap)); //. hack
         }
         else
         {
             // tonemapping in PS
-            mixRen.sky_r_textures.push_back(mk_pair(2, tonemap)); //. hack
-            mixRen.sky_r_textures_env.push_back(mk_pair(2, tonemap)); //. hack
-            mixRen.clouds_r_textures.push_back(mk_pair(2, tonemap)); //. hack
+            mixRen.sky_r_textures.push_back(std::make_pair(2, tonemap)); //. hack
+            mixRen.sky_r_textures_env.push_back(std::make_pair(2, tonemap)); //. hack
+            mixRen.clouds_r_textures.push_back(std::make_pair(2, tonemap)); //. hack
         }
     }
 
     //. Setup skybox textures, somewhat ugly
+#ifdef USE_OGL
+    GLuint e0 = mixRen.sky_r_textures[0].second->surface_get();
+    GLuint e1 = mixRen.sky_r_textures[1].second->surface_get();
+
+    tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
+    tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
+#else
     ID3DBaseTexture* e0 = mixRen.sky_r_textures[0].second->surface_get();
     ID3DBaseTexture* e1 = mixRen.sky_r_textures[1].second->surface_get();
 
@@ -161,9 +171,10 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
     _RELEASE(e0);
     tsky1->surface_set(e1);
     _RELEASE(e1);
+#endif // USE_OGL
 
 // ******************** Environment params (setting)
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
 #else //	USE_DX10
 
@@ -185,7 +196,7 @@ void dxEnvironmentRender::OnLoad()
     tonemap = RImplementation.Resources->_CreateTexture("$user$tonemap"); //. hack
 }
 
-void dxEnvironmentRender::OnUnload() { tonemap = 0; }
+void dxEnvironmentRender::OnUnload() { tonemap = nullptr; }
 void dxEnvironmentRender::RenderSky(CEnvironment& env)
 {
     // clouds_sh.create		("clouds","null");
@@ -203,7 +214,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
         clouds_geom.create(v_clouds_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
         env.bNeed_re_create_env = FALSE;
     }
-    GlobalEnv.Render->rmFar();
+    GEnv.Render->rmFar();
 
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
 
@@ -236,7 +247,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
     // Sun
-    GlobalEnv.Render->rmNormal();
+    GEnv.Render->rmNormal();
 #if RENDER != R_R1
     //
     // This hack is done to make sure that the state is set for sure:
@@ -254,7 +265,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
 {
-    GlobalEnv.Render->rmFar();
+    GEnv.Render->rmFar();
 
     Fmatrix mXFORM, mScale;
     mScale.scale(10, 0.4f, 10);
@@ -279,7 +290,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
 
     // Fill vertex buffer
     v_clouds* pv = (v_clouds*)RCache.Vertex.Lock(env.CloudsVerts.size(), clouds_geom.stride(), v_offset);
-    for (FvectorIt it = env.CloudsVerts.begin(); it != env.CloudsVerts.end(); it++, pv++)
+    for (auto it = env.CloudsVerts.begin(); it != env.CloudsVerts.end(); it++, pv++)
         pv->set(*it, C0, C1);
     RCache.Vertex.Unlock(env.CloudsVerts.size(), clouds_geom.stride());
 
@@ -291,7 +302,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_Textures(&mixRen.clouds_r_textures);
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, env.CloudsVerts.size(), i_offset, env.CloudsIndices.size() / 3);
 
-    GlobalEnv.Render->rmNormal();
+    GEnv.Render->rmNormal();
 }
 
 void dxEnvironmentRender::OnDeviceCreate()
@@ -304,8 +315,13 @@ void dxEnvironmentRender::OnDeviceCreate()
 
 void dxEnvironmentRender::OnDeviceDestroy()
 {
-    tsky0->surface_set(NULL);
-    tsky1->surface_set(NULL);
+#ifdef USE_OGL
+    tsky0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    tsky1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+#else
+    tsky0->surface_set(nullptr);
+    tsky1->surface_set(nullptr);
+#endif // USE_OGL
 
     sh_2sky.destroy();
     sh_2geom.destroy();

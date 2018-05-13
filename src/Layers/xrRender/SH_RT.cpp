@@ -19,7 +19,7 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
 {
     if (pSurface)
         return;
@@ -68,7 +68,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
         usage = D3DUSAGE_RENDERTARGET;
 
     // Validate render-target usage
-    _hr = HW.pD3D->CheckDeviceFormat(HW.DevAdapter, HW.DevT, HW.Caps.fTarget, usage, D3DRTYPE_TEXTURE, f);
+    _hr = HW.pD3D->CheckDeviceFormat(HW.DevAdapter, HW.m_DriverType, HW.Caps.fTarget, usage, D3DRTYPE_TEXTURE, f);
     if (FAILED(_hr))
         return;
 
@@ -104,7 +104,7 @@ void CRT::destroy()
 }
 void CRT::reset_begin() { destroy(); }
 void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f));
 }
@@ -150,7 +150,7 @@ void CRTC::create	(LPCSTR Name, u32 size,	D3DFORMAT f)
     // Validate render-target usage
     _hr = HW.pD3D->CheckDeviceFormat(
         HW.DevAdapter,
-        HW.DevT,
+        HW.m_DriverType,
         HW.Caps.fTarget,
         D3DUSAGE_RENDERTARGET,
         D3DRTYPE_CUBETEXTURE,

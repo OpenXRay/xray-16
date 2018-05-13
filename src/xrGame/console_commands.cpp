@@ -38,6 +38,7 @@
 #include "MainMenu.h"
 #include "saved_game_wrapper.h"
 #include "xrAICore/Navigation/level_graph.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "cameralook.h"
 #include "character_hit_animations_params.h"
@@ -96,10 +97,15 @@ extern int g_upgrades_log;
 extern float g_smart_cover_animation_speed_factor;
 
 extern BOOL g_ai_use_old_vision;
-float g_aim_predict_time = 0.44f;
+float g_aim_predict_time = 0.40f;
 int g_keypress_on_start = 1;
 
 ENGINE_API extern float g_console_sensitive;
+
+//Alundaio
+extern BOOL g_ai_die_in_anomaly;
+int g_inv_highlight_equipped = 0;
+//-Alundaio
 
 void register_mp_console_commands();
 //-----------------------------------------------------------
@@ -143,22 +149,13 @@ static void full_memory_stats()
 {
     Memory.mem_compact();
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
-    GlobalEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+    GEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
     log_vminfo();
     size_t _process_heap = ::Memory.mem_usage();
-#ifndef PURE_ALLOC
-    u32 _game_lua = CScriptEngine::GetMemoryUsage();
-    u32 _render = GlobalEnv.Render->memory_usage();
-#endif
     int _eco_strings = (int)g_pStringContainer->stat_economy();
     int _eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
     Msg("* [ D3D ]: textures[%d K]", (m_base + m_lmaps) / 1024);
-#ifdef PURE_ALLOC
     Msg("* [x-ray]: process heap[%u K]", _process_heap / 1024);
-#else
-    Msg("* [x-ray]: process heap[%u K], game lua[%d K], render[%d K]", _process_heap / 1024, _game_lua / 1024,
-        _render / 1024);
-#endif
     Msg("* [x-ray]: economy: strings[%d K], smem[%d K]", _eco_strings / 1024, _eco_smem);
 #ifdef FS_DEBUG
     Msg("* [x-ray]: file mapping: memory[%d K], count[%d]", g_file_mapped_memory / 1024, g_file_mapped_count);
@@ -176,16 +173,7 @@ public:
     };
     virtual void Execute(LPCSTR args) { full_memory_stats(); }
 };
-#ifdef DEBUG
-class CCC_MemCheckpoint : public IConsole_Command
-{
-public:
-    CCC_MemCheckpoint(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = FALSE; };
-    virtual void Execute(LPCSTR args) { memory_monitor::make_checkpoint(args); }
-    virtual void Save(IWriter* F) {}
-};
 
-#endif // #ifdef DEBUG
 // console commands
 class CCC_GameDifficulty : public CCC_Token
 {
@@ -486,7 +474,7 @@ bool valid_saved_game_name(LPCSTR file_name)
 void get_files_list(xr_vector<shared_str>& files, LPCSTR dir, LPCSTR file_ext)
 {
     VERIFY(dir && file_ext);
-    files.clear_not_free();
+    files.clear();
 
     FS_Path* P = FS.get_path(dir);
     P->m_Flags.set(FS_Path::flNeedRescan, TRUE);
@@ -500,8 +488,8 @@ void get_files_list(xr_vector<shared_str>& files, LPCSTR dir, LPCSTR file_ext)
     FS.file_list(files_set, dir, FS_ListFiles, fext);
     u32 len_str_ext = xr_strlen(file_ext);
 
-    FS_FileSetIt itb = files_set.begin();
-    FS_FileSetIt ite = files_set.end();
+    auto itb = files_set.begin();
+    auto ite = files_set.end();
 
     for (; itb != ite; ++itb)
     {
@@ -748,7 +736,7 @@ public:
     CCC_ClearLog(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR)
     {
-        LogFile->clear_not_free();
+        LogFile.clear();
         FlushLog();
         Msg("* Log file has been cleaned successfully!");
     }
@@ -856,7 +844,7 @@ public:
     {
         if (strstr(cName, "script_debug_break") == cName)
         {
-            CScriptDebugger* d = ai().script_engine().debugger();
+            CScriptDebugger* d = GEnv.ScriptEngine->debugger();
             if (d)
             {
                 if (d->Active())
@@ -869,11 +857,11 @@ public:
         }
         else if (strstr(cName, "script_debug_stop") == cName)
         {
-            ai().script_engine().stopDebugger();
+            GEnv.ScriptEngine->stopDebugger();
         }
         else if (strstr(cName, "script_debug_restart") == cName)
         {
-            ai().script_engine().restartDebugger();
+            GEnv.ScriptEngine->restartDebugger();
         };
     };
 
@@ -896,14 +884,14 @@ class CCC_ScriptLuaStudioConnect : public IConsole_Command
 {
 public:
     CCC_ScriptLuaStudioConnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { ai().script_engine().try_connect_to_debugger(); };
+    virtual void Execute(LPCSTR args) { GEnv.ScriptEngine->try_connect_to_debugger(); };
 };
 
 class CCC_ScriptLuaStudioDisconnect : public IConsole_Command
 {
 public:
     CCC_ScriptLuaStudioDisconnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { ai().script_engine().disconnect_from_debugger(); };
+    virtual void Execute(LPCSTR args) { GEnv.ScriptEngine->disconnect_from_debugger(); };
 };
 #endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 
@@ -1219,8 +1207,8 @@ public:
             P->m_Flags.set(FS_Path::flNeedRescan, TRUE);
             FS.rescan_pathes();
             // run script
-            if (ai().script_engine().script_process(ScriptProcessor::Level))
-                ai().script_engine().script_process(ScriptProcessor::Level)->add_script(args, false, true);
+            if (GEnv.ScriptEngine->script_process(ScriptProcessor::Level))
+                GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->add_script(args, false, true);
         }
     }
 
@@ -1239,28 +1227,28 @@ public:
             Log("* Specify string to run!");
         else
         {
-            if (ai().script_engine().script_process(ScriptProcessor::Level))
+            if (GEnv.ScriptEngine->script_process(ScriptProcessor::Level))
             {
-                ai().script_engine().script_process(ScriptProcessor::Level)->add_script(args, true, true);
+                GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->add_script(args, true, true);
                 return;
             }
 
             string4096 S;
             shared_str m_script_name = "console command";
             xr_sprintf(S, "%s\n", args);
-            int l_iErrorCode = luaL_loadbuffer(ai().script_engine().lua(), S, xr_strlen(S), "@console_command");
+            int l_iErrorCode = luaL_loadbuffer(GEnv.ScriptEngine->lua(), S, xr_strlen(S), "@console_command");
             if (!l_iErrorCode)
             {
-                l_iErrorCode = lua_pcall(ai().script_engine().lua(), 0, 0, 0);
+                l_iErrorCode = lua_pcall(GEnv.ScriptEngine->lua(), 0, 0, 0);
                 if (l_iErrorCode)
                 {
-                    ai().script_engine().print_output(ai().script_engine().lua(), *m_script_name, l_iErrorCode);
-                    ai().script_engine().on_error(ai().script_engine().lua());
+                    GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), *m_script_name, l_iErrorCode);
+                    GEnv.ScriptEngine->on_error(GEnv.ScriptEngine->lua());
                     return;
                 }
             }
 
-            ai().script_engine().print_output(ai().script_engine().lua(), *m_script_name, l_iErrorCode);
+            GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), *m_script_name, l_iErrorCode);
         }
     } // void	Execute
 
@@ -1512,24 +1500,6 @@ public:
     }
 };
 
-#ifdef DEBUG_MEMORY_MANAGER
-
-class CCC_MemAllocShowStats : public IConsole_Command
-{
-public:
-    CCC_MemAllocShowStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR) { mem_alloc_show_stats(); }
-};
-
-class CCC_MemAllocClearStats : public IConsole_Command
-{
-public:
-    CCC_MemAllocClearStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR) { mem_alloc_clear_stats(); }
-};
-
-#endif // DEBUG_MEMORY_MANAGER
-
 class CCC_DumpModelBones : public IConsole_Command
 {
 public:
@@ -1557,11 +1527,11 @@ public:
             return;
         }
 
-        IRenderVisual* visual = GlobalEnv.Render->model_Create(arguments);
+        IRenderVisual* visual = GEnv.Render->model_Create(arguments);
         IKinematics* kinematics = smart_cast<IKinematics*>(visual);
         if (!kinematics)
         {
-            GlobalEnv.Render->model_Delete(visual);
+            GEnv.Render->model_Delete(visual);
             Msg("! Invalid visual type \"%s\" (not a IKinematics)", arguments);
             return;
         }
@@ -1570,7 +1540,7 @@ public:
         for (u16 i = 0, n = kinematics->LL_BoneCount(); i < n; ++i)
             Msg("%s", *kinematics->LL_GetData(i).name);
 
-        GlobalEnv.Render->model_Delete(visual);
+        GEnv.Render->model_Delete(visual);
     }
 };
 
@@ -1747,9 +1717,6 @@ void CCC_RegisterCommands()
     g_OptConCom.Init();
 
     CMD1(CCC_MemStats, "stat_memory");
-#ifdef DEBUG
-    CMD1(CCC_MemCheckpoint, "stat_memory_checkpoint");
-#endif //#ifdef DEBUG
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
@@ -1790,7 +1757,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
 
-#ifdef DEBUG
+#if !defined(MASTER_GOLD) || defined(DEBUG)
     CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
 #endif // DEBUG
@@ -1877,13 +1844,6 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "hit_anims_tune", &tune_hit_anims, 0, 1);
 /////////////////////////////////////////////HIT ANIMATION END////////////////////////////////////////////////////
 
-#ifdef DEBUG_MEMORY_MANAGER
-    CMD3(CCC_Mask, "debug_on_frame_gather_stats", &psAI_Flags, aiDebugOnFrameAllocs);
-    CMD4(CCC_Float, "debug_on_frame_gather_stats_frequency", &debug_on_frame_gather_stats_frequency, 0.f, 1.f);
-    CMD1(CCC_MemAllocShowStats, "debug_on_frame_show_stats");
-    CMD1(CCC_MemAllocClearStats, "debug_on_frame_clear_stats");
-#endif // DEBUG_MEMORY_MANAGER
-
     CMD1(CCC_DumpModelBones, "debug_dump_model_bones");
 
     CMD1(CCC_DrawGameGraphAll, "ai_draw_game_graph_all");
@@ -1941,6 +1901,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
+    CMD3(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");
@@ -2149,6 +2110,8 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Integer, "ai_use_old_vision", &g_ai_use_old_vision, 0, 1);
 
+    CMD4(CCC_Integer, "ai_die_in_anomaly", &g_ai_die_in_anomaly, 0, 1); //Alundaio
+
     CMD4(CCC_Float, "ai_aim_predict_time", &g_aim_predict_time, 0.f, 10.f);
 
 #ifdef DEBUG
@@ -2161,10 +2124,11 @@ void CCC_RegisterCommands()
 #ifdef DEBUG
     extern BOOL g_ai_dbg_sight;
     CMD4(CCC_Integer, "ai_dbg_sight", &g_ai_dbg_sight, 0, 1);
+#endif // #ifdef DEBUG
 
+    //Alundaio: Scoped outside DEBUG
     extern BOOL g_ai_aim_use_smooth_aim;
     CMD4(CCC_Integer, "ai_aim_use_smooth_aim", &g_ai_aim_use_smooth_aim, 0, 1);
-#endif // #ifdef DEBUG
 
     extern float g_ai_aim_min_speed;
     CMD4(CCC_Float, "ai_aim_min_speed", &g_ai_aim_min_speed, 0.f, 10.f * PI);

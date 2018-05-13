@@ -81,9 +81,9 @@ void CBurer::Load(LPCSTR section)
     particle_gravi_prepare = pSettings->r_string(section, "Particle_Gravi_Prepare");
     particle_tele_object = pSettings->r_string(section, "Particle_Tele_Object");
 
-    ::Sound->create(sound_gravi_wave, pSettings->r_string(section, "sound_gravi_wave"), st_Effect, SOUND_TYPE_WORLD);
-    ::Sound->create(sound_tele_hold, pSettings->r_string(section, "sound_tele_hold"), st_Effect, SOUND_TYPE_WORLD);
-    ::Sound->create(sound_tele_throw, pSettings->r_string(section, "sound_tele_throw"), st_Effect, SOUND_TYPE_WORLD);
+    GEnv.Sound->create(sound_gravi_wave, pSettings->r_string(section, "sound_gravi_wave"), st_Effect, SOUND_TYPE_WORLD);
+    GEnv.Sound->create(sound_tele_hold, pSettings->r_string(section, "sound_tele_hold"), st_Effect, SOUND_TYPE_WORLD);
+    GEnv.Sound->create(sound_tele_throw, pSettings->r_string(section, "sound_tele_throw"), st_Effect, SOUND_TYPE_WORLD);
 
     m_gravi.cooldown = pSettings->r_u32(section, "Gravi_Cooldown");
     m_gravi.min_dist = pSettings->r_float(section, "Gravi_MinDist");
@@ -364,7 +364,7 @@ void CBurer::UpdateGraviObject()
     ps->Play(false);
 
     // hit objects
-    m_nearest.clear_not_free();
+    m_nearest.clear();
     Level().ObjectSpace.GetNearest(m_nearest, m_gravi_object.cur_pos, m_gravi.radius, NULL);
     // xr_vector<IGameObject*> &m_nearest = Level().ObjectSpace.q_nearest;
 
@@ -388,7 +388,7 @@ void CBurer::UpdateGraviObject()
         sound_gravi_wave.set_position(snd_pos);
     }
     else
-        ::Sound->play_at_pos(sound_gravi_wave, 0, snd_pos);
+        GEnv.Sound->play_at_pos(sound_gravi_wave, 0, snd_pos);
 }
 
 void CBurer::UpdateCL()

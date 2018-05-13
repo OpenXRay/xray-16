@@ -37,8 +37,9 @@ public:
     void set_factor(u16 channel, float factor);
 
 public:
-    IC const channal_rule& rule(u16 channel) { return rules[channel]; }
-    IC void get_def(u16 channel, channel_def& def)
+    const channal_rule& rule(u16 channel) { return rules[channel]; }
+
+    void get_def(u16 channel, channel_def& def)
     {
         VERIFY(channel < max);
         def.rule = rules[channel];

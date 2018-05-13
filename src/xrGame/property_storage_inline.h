@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrScriptEngine/DebugMacros.hpp"
 
 IC void CPropertyStorage::set_property(const _condition_type& condition_id, const _value_type& value)
 {

@@ -1,8 +1,11 @@
-#ifndef xr_collide_defsH
-#define xr_collide_defsH
-//#pragma once
+#pragma once
 
-#include "xrcdb.h"
+#include <algorithm>
+
+#include "xrCDB.h"
+#include "xrCore/_vector3d.h"
+#include "xrCore/_matrix.h"
+#include "xrCommon/math_funcs_inline.h"
 
 class IGameObject;
 namespace collide
@@ -19,11 +22,13 @@ struct tri
     Fvector N;
     float d;
 };
+
 struct elipsoid
 {
     Fmatrix mL2W; // convertion from sphere(000,1) to real space
     Fmatrix mW2L; // convertion from real space to sphere(000,1)
 };
+
 struct ray_cache
 {
     // previous state
@@ -34,6 +39,7 @@ struct ray_cache
 
     // cached vertices
     Fvector verts[3];
+
     ray_cache()
     {
         start.set(0, 0, 0);
@@ -44,6 +50,7 @@ struct ray_cache
         verts[1].set(0, 0, 0);
         verts[2].set(0, 0, 0);
     }
+
     void set(const Fvector& _start, const Fvector& _dir, const float _range, const BOOL _result)
     {
         start = _start;
@@ -51,6 +58,7 @@ struct ray_cache
         range = _range;
         result = _result;
     }
+
     BOOL similar(const Fvector& _start, const Fvector& _dir, const float _range)
     {
         if (!_start.similar(start))
@@ -62,6 +70,7 @@ struct ray_cache
         return TRUE;
     }
 };
+
 enum rq_target
 {
     rqtNone = (0),
@@ -72,6 +81,7 @@ enum rq_target
     rqtBoth = (rqtObject | rqtStatic),
     rqtDyn = (rqtObject | rqtShape | rqtObstacle)
 };
+
 struct ray_defs
 {
     Fvector start;
@@ -79,6 +89,7 @@ struct ray_defs
     float range;
     u32 flags;
     rq_target tgt;
+
     ray_defs(const Fvector& _start, const Fvector& _dir, float _range, u32 _flags, rq_target _tgt)
     {
         start = _start;
@@ -93,6 +104,7 @@ struct rq_result
     IGameObject* O; // if NULL - static
     float range; // range to intersection
     int element; // номер кости/номер треугольника
+
     IC rq_result& set(IGameObject* _O, float _range, int _element)
     {
         O = _O;
@@ -100,6 +112,7 @@ struct rq_result
         element = _element;
         return *this;
     }
+
     IC BOOL set_if_less(CDB::RESULT* I)
     {
         if (I->range < range)
@@ -132,13 +145,15 @@ struct rq_result
     }
     IC BOOL valid() { return (element >= 0); }
 };
-DEFINE_VECTOR(rq_result, rqVec, rqIt);
+
+using rqVec = xr_vector<rq_result>;
 
 class rq_results
 {
 protected:
     rqVec results;
     static bool r_sort_pred(const rq_result& a, const rq_result& b) { return a.range < b.range; }
+
 public:
     IC BOOL append_result(IGameObject* _who, float _range, int _element, BOOL bNearest)
     {
@@ -161,20 +176,23 @@ public:
         rq.O = _who;
         return TRUE;
     }
+
     IC void append_result(rq_result& res)
     {
         if (0 == results.capacity())
             results.reserve(8);
         results.push_back(res);
     }
+
     IC int r_count() { return results.size(); }
     IC rq_result* r_begin() { return &*results.begin(); }
-    IC rq_result* r_end() { return &*results.end(); }
-    IC void r_clear() { results.clear_not_free(); }
+    //IC rq_result* r_end() { return &*results.end(); }
+    IC rqVec* r_get() { return &results; }
+    IC void r_clear() { results.clear(); }
     IC void r_sort() { std::sort(results.begin(), results.end(), r_sort_pred); }
     IC rqVec& r_results() { return results; }
 };
+
 typedef BOOL rq_callback(rq_result& result, LPVOID user_data);
 typedef BOOL test_callback(const ray_defs& rd, IGameObject* object, LPVOID user_data);
-};
-#endif
+}

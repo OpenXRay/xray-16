@@ -505,8 +505,8 @@ IC
     bool
     get_bool(LPCSTR a, var& val)
 {
-    bool b0 = (0 == stricmp(a, "false"));
-    bool b1 = (0 == stricmp(a, "true"));
+    bool b0 = (0 == xr_stricmp(a, "false"));
+    bool b1 = (0 == xr_stricmp(a, "true"));
     if (b0 == b1)
         return false;
     val = (BOOL)b1;
@@ -951,7 +951,7 @@ bool InitCommandTemplates()
             F.type = PFunction::ftState;
             if (!(bRes = F.LoadTemplate(PStateCommands[k])))
                 break;
-            ct.insert(mk_pair(F.command, F));
+            ct.insert(std::make_pair(F.command, F));
         }
         if (!bRes)
             break;
@@ -962,7 +962,7 @@ bool InitCommandTemplates()
             F.type = PS::PFunction::ftAction;
             if (!(bRes = F.LoadTemplate(PActionCommands[k])))
                 break;
-            ct.insert(mk_pair(F.command, F));
+            ct.insert(std::make_pair(F.command, F));
         }
     } while (0);
     if (!bRes)

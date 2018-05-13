@@ -1,9 +1,8 @@
 template <typename TypeListElement>
 void game_state_accumulator::init_acpv_list()
 {
-    STATIC_CHECK(Loki::TL::is_Typelist<TypeListElement>::value,
-        Type_Must_Have_a_Loki_Type_List_type_use__ADD_ACCUMULATIVE_STATE__macro_define);
-
+    static_assert(Loki::TL::is_Typelist<TypeListElement>::value,
+        "Type must have a Loki Type List type use ADD_ACCUMULATIVE_STATE macro define.");
     init_acpv_list<TypeListElement::Tail>();
 
     player_state_param* tmp_obj_inst = new typename TypeListElement::Head::value_type(this);

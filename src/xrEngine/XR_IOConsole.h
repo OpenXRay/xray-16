@@ -53,7 +53,7 @@ struct TipString
 class ENGINE_API CConsole : public pureRender, public pureFrame, public pureScreenResolutionChanged
 {
 public:
-    struct str_pred : public std::binary_function<char*, char*, bool>
+    struct str_pred
     {
         IC bool operator()(const char* x, const char* y) const { return (xr_strcmp(x, y) < 0); }
     };
@@ -130,7 +130,7 @@ public:
     int GetInteger(LPCSTR cmd, int& min, int& max) const;
     LPCSTR GetString(LPCSTR cmd) const;
     LPCSTR GetToken(LPCSTR cmd) const;
-    xr_token* GetXRToken(LPCSTR cmd) const;
+    const xr_token* GetXRToken(LPCSTR cmd) const;
     Fvector GetFVector(LPCSTR cmd) const;
     Fvector* GetFVectorPtr(LPCSTR cmd) const;
     IConsole_Command* GetCommand(LPCSTR cmd) const;

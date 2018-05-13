@@ -5,14 +5,10 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment effects effect class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED
-#define EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "Environment.h"
 
 namespace editor
@@ -25,27 +21,27 @@ namespace effects
 {
 class manager;
 
-class effect : public CEnvAmbient::SEffect, public editor::property_holder_holder, private Noncopyable
+class effect : public CEnvAmbient::SEffect, public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     effect(manager const& manager, shared_str const& id);
     virtual ~effect();
     void load(CInifile& config);
     void save(CInifile& config);
-    void fill(editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_id.c_str(); }
+    void fill(XRay::Editor::property_holder_collection* collection);
+    inline pcstr id() const { return m_id.c_str(); }
+
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
     float xr_stdcall wind_blast_longitude_getter() const;
     void xr_stdcall wind_blast_longitude_setter(float value);
 
-    LPCSTR xr_stdcall sound_getter();
-    void xr_stdcall sound_setter(LPCSTR value);
+    pcstr xr_stdcall sound_getter();
+    void xr_stdcall sound_setter(pcstr value);
 
-private:
-    typedef editor::property_holder property_holder_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
 
 public:
     virtual property_holder_type* object();
@@ -63,6 +59,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED

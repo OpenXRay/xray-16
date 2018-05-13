@@ -19,9 +19,9 @@
 #include "UI/UIGameTutorial.h"
 #include "ui/UIPdaWnd.h"
 #include "xrNetServer/NET_AuthCheck.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/physicscommon.h"
-ENGINE_API bool g_dedicated_server;
 
 const int max_objects_size = 2 * 1024;
 const int max_objects_size_in_save = 8 * 1024;
@@ -76,28 +76,28 @@ void CLevel::remove_objects()
     ph_commander().clear();
     ph_commander_scripts().clear();
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         space_restriction_manager().clear();
 
     psDeviceFlags.set(rsDisableObjectsAsCrows, b_stored);
     g_b_ClearGameCaptions = true;
 
-    if (!g_dedicated_server)
-        ai().script_engine().collect_all_garbage();
+    if (!GEnv.isDedicatedServer)
+        GEnv.ScriptEngine->collect_all_garbage();
 
     stalker_animation_data_storage().clear();
 
-    VERIFY(GlobalEnv.Render);
-    GlobalEnv.Render->models_Clear(FALSE);
+    VERIFY(GEnv.Render);
+    GEnv.Render->models_Clear(FALSE);
 
-    GlobalEnv.Render->clear_static_wallmarks();
+    GEnv.Render->clear_static_wallmarks();
 
 #ifdef DEBUG
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         if (!client_spawn_manager().registry().empty())
             client_spawn_manager().dump();
 #endif // DEBUG
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         VERIFY(client_spawn_manager().registry().empty());
         client_spawn_manager().clear();
@@ -163,8 +163,8 @@ void CLevel::net_Stop()
         xr_delete(Server);
     }
 
-    if (!g_dedicated_server)
-        ai().script_engine().collect_all_garbage();
+    if (!GEnv.isDedicatedServer)
+        GEnv.ScriptEngine->collect_all_garbage();
 
 #ifdef DEBUG
     show_animation_stats();

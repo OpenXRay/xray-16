@@ -49,7 +49,7 @@ public:
 
 public:
     NVI_Image();
-    ~NVI_Image();
+    virtual ~NVI_Image();
     virtual HRESULT Initialize(int width, int height, NVI_PIXEL_FORMAT format);
     virtual HRESULT Initialize(int width, int height, NVI_PIXEL_FORMAT format, u8* data);
     virtual HRESULT Free();
@@ -135,7 +135,7 @@ private:
 
 public:
     NVI_ImageBordered();
-    ~NVI_ImageBordered();
+    ~NVI_ImageBordered() override;
     HRESULT Initialize(NVI_Image** hSrcImage, const RECT* border, bool wrap);
     HRESULT Free();
     // i,j relative to src image, so i,j = 0 fetches from

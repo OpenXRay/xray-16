@@ -49,7 +49,7 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
     R_ASSERT(C->type == RC_dx10texture);
     u32 stage = C->samp.index;
 
-    passTextures.push_back(mk_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
+    passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
 }
 
 void CBlender_Compile::i_dx10Address(u32 s, u32 address)
@@ -160,7 +160,7 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
         i_dx10Address(stage, D3DTADDRESS_CLAMP);
         i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFILTER, TRUE);
-        RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, D3D_COMPARISON_LESS_EQUAL);
+        RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 
     if (0 == xr_strcmp(ResourceName, "smp_jitter"))
@@ -173,7 +173,7 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
 }
 
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
-    D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+                              D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
     ctable.clear();
@@ -203,7 +203,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     ctable.merge(&gs->constants);
 
     // Last Stage - disable
-    if (0 == stricmp(_ps, "null"))
+    if (0 == xr_stricmp(_ps, "null"))
     {
         RS.SetTSS(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         RS.SetTSS(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);

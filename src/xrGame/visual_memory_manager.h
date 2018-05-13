@@ -10,10 +10,14 @@
 
 #include "visual_memory_params.h"
 #include "memory_space.h"
+#include "xrCommon/xr_vector.h"
 
 class CCustomMonster;
 class CAI_Stalker;
 class vision_client;
+class IGameObject;
+class IReader;
+class NET_Packet;
 
 class CVisualMemoryManager
 {

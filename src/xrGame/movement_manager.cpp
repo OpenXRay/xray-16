@@ -23,6 +23,7 @@
 #include "detail_path_builder.h"
 #include "xrEngine/profiler.h"
 #include "mt_config.h"
+#include "xrNetServer/NET_Messages.h"
 
 // Lain: added
 #include "steering_behaviour.h"

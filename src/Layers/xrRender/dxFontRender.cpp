@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxFontRender.h"
-
 #include "xrEngine/GameFont.h"
+#include "xrCore/Text/MbHelpers.h"
 
 dxFontRender::dxFontRender() {}
 dxFontRender::~dxFontRender()
@@ -63,7 +63,7 @@ void dxFontRender::OnRender(CGameFont& owner)
             CGameFont::String& PS = owner.strings[i];
             wchar_t wsStr[MAX_MB_CHARS];
 
-            int len = owner.IsMultibyte() ? mbhMulti2Wide(wsStr, NULL, MAX_MB_CHARS, PS.string) : xr_strlen(PS.string);
+            int len = owner.IsMultibyte() ? mbhMulti2Wide(wsStr, nullptr, MAX_MB_CHARS, PS.string) : xr_strlen(PS.string);
 
             if (len)
             {

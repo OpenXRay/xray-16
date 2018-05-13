@@ -9,9 +9,6 @@
 #include "pch.hpp"
 #include "script_thread.hpp"
 #include "script_engine.hpp"
-#include "Include/xrAPI/xrAPI.h"
-
-// #include "Common/Platform.hpp"
 
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO

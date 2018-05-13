@@ -1,9 +1,17 @@
+#pragma once
 #ifndef xrsharedmemH
 #define xrsharedmemH
-#pragma once
+
+//#include "_stl_extensions.h"
+#include "xrCommon/xr_vector.h"
+#include "Common/Noncopyable.hpp"
+
+// fwd. decl.
+class Lock;
 
 #pragma pack(push, 4)
 //////////////////////////////////////////////////////////////////////////
+#pragma warning(push)
 #pragma warning(disable : 4200)
 struct XRCORE_API smem_value
 {
@@ -46,25 +54,25 @@ IC bool smem_equal(const smem_value* A, u32 dwCRC, u32 dwLength, u8* ptr)
         return false;
     return 0 == memcmp(A->value, ptr, dwLength);
 };
-#pragma warning(default : 4200)
+#pragma warning(pop)
 
 //////////////////////////////////////////////////////////////////////////
-class XRCORE_API smem_container
+class XRCORE_API smem_container : Noncopyable
 {
-private:
-    typedef xr_vector<smem_value*> cdb;
-    Lock cs;
-    cdb container;
 
 public:
+    smem_container();
+    ~smem_container();
+
     smem_value* dock(u32 dwCRC, u32 dwLength, void* ptr);
     void clean();
     void dump();
     u32 stat_economy();
-#ifdef CONFIG_PROFILE_LOCKS
-    smem_container() : cs(MUTEX_PROFILE_ID(smem_container)) {}
-#endif // CONFIG_PROFILE_LOCKS
-    ~smem_container();
+
+private:
+    typedef xr_vector<smem_value*> cdb;
+    Lock* pcs;
+    cdb container;
 };
 XRCORE_API extern smem_container* g_pSharedMemoryContainer;
 
@@ -156,6 +164,7 @@ public:
 // ptr != const res_ptr
 // res_ptr < res_ptr
 // res_ptr > res_ptr
+// XXX: Make these comparison operators complete (if they are even required). Missing <= and >=.
 template <class T>
 IC bool operator==(ref_smem<T> const& a, ref_smem<T> const& b)
 {
@@ -164,7 +173,7 @@ IC bool operator==(ref_smem<T> const& a, ref_smem<T> const& b)
 template <class T>
 IC bool operator!=(ref_smem<T> const& a, ref_smem<T> const& b)
 {
-    return a._get() != b._get();
+    return !(a==b);
 }
 template <class T>
 IC bool operator<(ref_smem<T> const& a, ref_smem<T> const& b)
@@ -177,7 +186,7 @@ IC bool operator>(ref_smem<T> const& a, ref_smem<T> const& b)
     return a._get() > b._get();
 }
 
-// externally visible standart functionality
+// externally visible standard functionality
 template <class T>
 IC void swap(ref_smem<T>& lhs, ref_smem<T>& rhs)
 {

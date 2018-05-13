@@ -151,7 +151,7 @@ public:
     virtual bool use_center_to_aim() const { return true; }
     SAnimationTripleData anim_triple_control;
 
-    virtual char* get_monster_class_name() { return "controller"; }
+    pcstr get_monster_class_name() override { return "controller"; }
 private:
     float m_stamina_hit;
 

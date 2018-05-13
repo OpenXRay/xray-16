@@ -1,11 +1,15 @@
 #pragma once
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
 using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
+
+namespace editor
+{
+ref class window_levels;
+}
 
 namespace editor
 {
@@ -20,7 +24,7 @@ ref class window_ide;
 ///          resources associated with this form.
 /// </summary>
 public
-ref class window_levels : public WeifenLuo::WinFormsUI::DockContent
+ref class window_levels : public WeifenLuo::WinFormsUI::Docking::DockContent
 {
 public:
     window_levels(window_ide ^ ide) : m_ide(ide)
@@ -43,12 +47,9 @@ protected:
         }
     }
 
-private:
-    XRay::SdkControls::PropertyGrid ^ PropertyGrid;
+protected:
+private: XRay::SdkControls::PropertyGrid ^ PropertyGrid;
 
-protected:
-protected:
-protected:
 private:
     /// <summary>
     /// Required designer variable.
@@ -64,33 +65,27 @@ private:
     {
         this->PropertyGrid = (gcnew XRay::SdkControls::PropertyGrid());
         this->SuspendLayout();
-        //
-        // PropertyGrid
-        //
         this->PropertyGrid->Dock = System::Windows::Forms::DockStyle::Fill;
         this->PropertyGrid->Location = System::Drawing::Point(0, 0);
         this->PropertyGrid->Name = L"PropertyGrid";
         this->PropertyGrid->Size = System::Drawing::Size(292, 273);
         this->PropertyGrid->TabIndex = 0;
         this->PropertyGrid->ToolbarVisible = false;
-        //
-        // window_levels
-        //
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(292, 273);
         this->Controls->Add(this->PropertyGrid);
-        this->DockableAreas = static_cast<WeifenLuo::WinFormsUI::DockAreas>(
-            ((((WeifenLuo::WinFormsUI::DockAreas::Float | WeifenLuo::WinFormsUI::DockAreas::DockLeft) |
-                  WeifenLuo::WinFormsUI::DockAreas::DockRight) |
-                 WeifenLuo::WinFormsUI::DockAreas::DockTop) |
-                WeifenLuo::WinFormsUI::DockAreas::DockBottom));
+        this->DockAreas = static_cast<WeifenLuo::WinFormsUI::Docking::DockAreas>(((((WeifenLuo::WinFormsUI::Docking::DockAreas::Float | WeifenLuo::WinFormsUI::Docking::DockAreas::DockLeft)
+            | WeifenLuo::WinFormsUI::Docking::DockAreas::DockRight)
+            | WeifenLuo::WinFormsUI::Docking::DockAreas::DockTop)
+            | WeifenLuo::WinFormsUI::Docking::DockAreas::DockBottom));
         this->HideOnClose = true;
         this->Name = L"window_levels";
         this->TabText = L"level weathers";
         this->Text = L"level weathers";
         this->Leave += gcnew System::EventHandler(this, &window_levels::window_levels_Leave);
         this->ResumeLayout(false);
+
     }
 #pragma endregion
 private:
@@ -99,7 +94,6 @@ private:
 public:
     inline ::PropertyGrid ^ property_grid() { return this->PropertyGrid; }
 
-        private : Void window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e);
 }; // ref class window_levels
-
 } // namespace editor

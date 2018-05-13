@@ -1,13 +1,10 @@
-#ifndef SoundRender_CoreH
-#define SoundRender_CoreH
 #pragma once
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Cache.h"
-#include "soundrender_environment.h"
 
-class CSoundRender_Core : public CSound_manager_interface
+class CSoundRender_Core : public ISoundManager
 {
 protected:
     struct SoundStatistics
@@ -20,29 +17,27 @@ protected:
     };
 
 private:
-    volatile BOOL bLocked;
+    volatile bool isLocked;
 
 protected:
-    virtual void _create_data(ref_sound_data& S, LPCSTR fName, esound_type sound_type, int game_type);
-    virtual void _destroy_data(ref_sound_data& S);
+    void _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type) override;
+    void _destroy_data(ref_sound_data& S) override;
 
-protected:
-    BOOL bListenerMoved;
+    bool bListenerMoved;
 
     CSoundRender_Environment e_current;
     CSoundRender_Environment e_target;
     SoundStatistics Stats;
 
 public:
-    typedef std::pair<ref_sound_data_ptr, float> event;
+    using event = std::pair<ref_sound_data_ptr, float>;
     xr_vector<event> s_events;
 
-public:
-    BOOL bPresent;
-    BOOL bUserEnvironment;
-    BOOL bEAX; // Boolean variable to indicate presence of EAX Extension
-    BOOL bDeferredEAX;
-    BOOL bReady;
+    bool bPresent;
+    bool bUserEnvironment;
+    bool bEAX; // Boolean variable to indicate presence of EAX Extension
+    bool bDeferredEAX;
+    bool bReady;
 
     CTimer Timer;
     float fTimer_Value;
@@ -50,7 +45,7 @@ public:
     sound_event* Handler;
 
 protected:
-// Collider
+    // Collider
 #ifndef _EDITOR
     CDB::COLLIDER geom_DB;
 #endif
@@ -84,34 +79,34 @@ public:
     virtual ~CSoundRender_Core();
 
     // General
-    virtual void _initialize() = 0;
-    virtual void _clear() = 0;
-    virtual void _restart();
+    void _initialize() override = 0;
+    void _clear() override = 0;
+    void _restart() override;
 
     // Sound interface
     void verify_refsound(ref_sound& S);
-    virtual void create(ref_sound& S, LPCSTR fName, esound_type sound_type, int game_type);
-    virtual void attach_tail(ref_sound& S, LPCSTR fName);
+    void create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type) override;
+    void attach_tail(ref_sound& S, pcstr fName) override;
 
-    virtual void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type);
-    virtual void destroy(ref_sound& S);
-    virtual void stop_emitters();
-    virtual int pause_emitters(bool val);
+    void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) override;
+    void destroy(ref_sound& S) override;
+    void stop_emitters() override;
+    int pause_emitters(bool val) override;
 
-    virtual void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f);
-    virtual void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f);
-    virtual void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = 0,
-        float* vol = 0, float* freq = 0, Fvector2* range = 0);
-    virtual void set_master_volume(float f) = 0;
-    virtual void set_geometry_env(IReader* I);
-    virtual void set_geometry_som(IReader* I);
-    virtual void set_geometry_occ(CDB::MODEL* M);
-    virtual void set_handler(sound_event* E);
+    void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f) override;
+    void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) override;
+    void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr,
+                          float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) override;
+    void set_master_volume(float f) override = 0;
+    void set_geometry_env(IReader* I) override;
+    void set_geometry_som(IReader* I) override;
+    void set_geometry_occ(CDB::MODEL* M) override;
+    void set_handler(sound_event* E) override;
 
-    virtual void update(const Fvector& P, const Fvector& D, const Fvector& N);
+    void update(const Fvector& P, const Fvector& D, const Fvector& N) override;
     virtual void update_events();
-    virtual void statistic(CSound_stats* dest, CSound_stats_ext* ext);
-    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+    void statistic(CSound_stats* dest, CSound_stats_ext* ext) override;
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     // listener
     //	virtual const Fvector&				listener_position		( )=0;
@@ -121,26 +116,25 @@ public:
     void i_eax_listener_set(CSound_environment* E);
     void i_eax_listener_get(CSound_environment* E);
 
-#ifdef _EDITOR
     virtual SoundEnvironment_LIB* get_env_library() { return s_environment; }
     virtual void refresh_env_library();
     virtual void set_user_env(CSound_environment* E);
     virtual void refresh_sources();
     virtual void set_environment(u32 id, CSound_environment** dst_env);
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env);
-#endif
+
 public:
-    CSoundRender_Source* i_create_source(LPCSTR name);
+    CSoundRender_Source* i_create_source(pcstr name);
     void i_destroy_source(CSoundRender_Source* S);
-    CSoundRender_Emitter* i_play(ref_sound* S, BOOL _loop, float delay);
+    CSoundRender_Emitter* i_play(ref_sound* S, bool _loop, float delay);
     void i_start(CSoundRender_Emitter* E);
     void i_stop(CSoundRender_Emitter* E);
     void i_rewind(CSoundRender_Emitter* E);
-    BOOL i_allow_play(CSoundRender_Emitter* E);
-    virtual BOOL i_locked() { return bLocked; }
-    virtual void object_relcase(IGameObject* obj);
+    bool i_allow_play(CSoundRender_Emitter* E);
+    bool i_locked() override { return isLocked; }
+    void object_relcase(IGameObject* obj) override;
 
-    virtual float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f);
+    float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
     float get_occlusion(Fvector& P, float R, Fvector* occ);
     CSoundRender_Environment* get_environment(const Fvector& P);
 
@@ -148,5 +142,5 @@ public:
     void env_unload();
     void env_apply();
 };
+
 extern CSoundRender_Core* SoundRender;
-#endif

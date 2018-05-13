@@ -68,7 +68,7 @@ public:
 
 protected:
     void OnKeyboardCommonFileClick(ButtonValue* value, bool& bModif, bool& bSafe);
-    void__stdcall OnClose();
+    void OnClose();
     void ApplyValues();
 
     virtual void Load(CInifile*);

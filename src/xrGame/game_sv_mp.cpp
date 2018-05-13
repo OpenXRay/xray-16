@@ -19,6 +19,8 @@
 #include "WeaponKnife.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "xrGameSpyServer.h"
+#include "xrNetServer/NET_Messages.h"
+#include "xrCore/xr_token.h"
 
 #include "game_sv_mp_vote_flags.h"
 #include "player_name_modifyer.h"
@@ -42,7 +44,7 @@ u32 g_sv_adm_menu_ban_time = 1;
 int g_sv_adm_menu_ping_limit = 25;
 //-----------------------------------------------------------------
 
-extern xr_token round_end_result_str[];
+extern const xr_token round_end_result_str[];
 
 #include "ui\UIBuyWndShared.h"
 
@@ -897,7 +899,7 @@ void game_sv_mp::SpawnWeapon4Actor(u16 actorId, LPCSTR N, u8 Addons, game_Player
 
 void game_sv_mp::OnDestroyObject(u16 eid_who)
 {
-    CORPSE_LIST_it it = std::find(m_CorpseList.begin(), m_CorpseList.end(), eid_who);
+    auto it = std::find(m_CorpseList.begin(), m_CorpseList.end(), eid_who);
     if (it != m_CorpseList.end())
     {
         m_CorpseList.erase(it);
@@ -963,8 +965,8 @@ void game_sv_mp::OnPrevMap()
 
 struct _votecommands
 {
-    char* name;
-    char* command;
+    pcstr name;
+    pcstr command;
     u16 flag;
 };
 
@@ -1033,7 +1035,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
     m_bVotingReal = false;
     while (votecommands[i].command)
     {
-        if (!stricmp(votecommands[i].name, CommandName))
+        if (!xr_stricmp(votecommands[i].name, CommandName))
         {
             m_bVotingReal = true;
             if (!IsVotingEnabled(votecommands[i].flag))
@@ -1054,7 +1056,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
     m_uVoteStartTime = CurTime;
     if (m_bVotingReal)
     {
-        if (!stricmp(votecommands[i].name, "changeweather"))
+        if (!xr_stricmp(votecommands[i].name, "changeweather"))
         {
             string256 WeatherTime = "", WeatherName = "";
             sscanf(CommandParams, "%255s %255s", WeatherName, WeatherTime);
@@ -1062,7 +1064,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             m_pVoteCommand.printf("%s %s", votecommands[i].command, WeatherTime);
             xr_sprintf(resVoteCommand, "%s %s", votecommands[i].name, WeatherName);
         }
-        else if (!stricmp(votecommands[i].name, "changemap"))
+        else if (!xr_stricmp(votecommands[i].name, "changemap"))
         {
             string256 LevelName;
             string256 LevelVersion;
@@ -1078,7 +1080,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             m_pVoteCommand = sv_vote_command;
             xr_sprintf(resVoteCommand, "%s %s [%s]", votecommands[i].name, LevelName, LevelVersion);
         }
-        else if (!stricmp(votecommands[i].name, "kick"))
+        else if (!xr_stricmp(votecommands[i].name, "kick"))
         {
             SearcherClientByName tmp_predicate(CommandParams);
             IClient* tmp_client = m_server->FindClient(tmp_predicate);
@@ -1092,7 +1094,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             }
             xr_strcpy(resVoteCommand, VoteCommand);
         }
-        else if (!stricmp(votecommands[i].name, "ban"))
+        else if (!xr_stricmp(votecommands[i].name, "ban"))
         {
             string256 tmp_victim_name;
             s32 ban_time = ExcludeBanTimeFromVoteStr(CommandParams, tmp_victim_name, sizeof(tmp_victim_name));
@@ -1340,7 +1342,7 @@ void game_sv_mp::SetPlayersDefItems(game_PlayerState* ps)
     char tmp[5];
     for (int i = 1; i <= ps->rank; i++)
     {
-        strconcat(sizeof(RankStr), RankStr, "rank_", itoa(i, tmp, 10));
+        strconcat(sizeof(RankStr), RankStr, "rank_", xr_itoa(i, tmp, 10));
         if (!pSettings->section_exist(RankStr))
             continue;
         for (u32 it = 0; it < ps->pItemList.size(); it++)
@@ -1930,8 +1932,8 @@ void game_sv_mp::DumpOnlineStatistic()
     xr_sprintf(str_buff, "%s", CStringTable().translate(type_name()).c_str());
     ini.w_string(current_section.c_str(), "game_mode", str_buff);
 
-    MAP_ROTATION_LIST_it it = m_pMapRotation_List.begin();
-    MAP_ROTATION_LIST_it it_e = m_pMapRotation_List.end();
+    auto it = m_pMapRotation_List.begin();
+    auto it_e = m_pMapRotation_List.end();
     for (u32 idx = 0; it != it_e; ++it, ++idx)
     {
         string16 num_buf;
@@ -1954,7 +1956,7 @@ void game_sv_mp::DumpOnlineStatistic()
             if (!l_pC->ps)
                 return;
 
-            if (m_server->GetServerClient() == l_pC && g_dedicated_server)
+            if (m_server->GetServerClient() == l_pC && GEnv.isDedicatedServer)
                 return;
 
             if (!l_pC->net_Ready)
@@ -2146,7 +2148,7 @@ void game_sv_mp::DumpRoundStatistics()
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
 
-            if (m_server->GetServerClient() == l_pC && g_dedicated_server)
+            if (m_server->GetServerClient() == l_pC && GEnv.isDedicatedServer)
                 return;
             if (!l_pC->m_cdkey_digest.size())
                 return;

@@ -148,7 +148,7 @@ bool ESoundSource::LoadLTX(CInifile& ini, LPCSTR sect_name)
     case stStaticSource:
         if (m_Flags.is(flPlaying))
             Play();
-        //.    	if (m_Flags.is(flSimulating)) 	Simulate();
+        //.     if (m_Flags.is(flSimulating))   Simulate();
         break;
     default: THROW;
     }
@@ -255,7 +255,7 @@ bool ESoundSource::LoadStream(IReader& F)
     case stStaticSource:
         if (m_Flags.is(flPlaying))
             Play();
-        //.    	if (m_Flags.is(flSimulating)) 	Simulate();
+        //.     if (m_Flags.is(flSimulating))   Simulate();
         break;
     default: THROW;
     }
@@ -351,8 +351,8 @@ void ESoundSource::FillProp(LPCSTR pref, PropItemVec& values)
     PHelper().CreateCaption(values, PrepareKey(pref, "Game\\Pause delta\\Hint"), "Zero - play sound looped.");
     PHelper().CreateTime(values, PrepareKey(pref, "Game\\Pause delta\\From"), &m_RandomPause.x);
     PHelper().CreateTime(values, PrepareKey(pref, "Game\\Pause delta\\To"), &m_RandomPause.y);
-    //	V=PHelper().CreateFlag32		(values,PHelper().PrepareKey(pref,"Looped"),	&m_Flags, flLooped);
-    //    V->OnChangeEvent			= OnChangeSource;
+    //  V=PHelper().CreateFlag32        (values,PHelper().PrepareKey(pref,"Looped"),    &m_Flags, flLooped);
+    //    V->OnChangeEvent          = OnChangeSource;
 }
 
 //----------------------------------------------------
@@ -386,7 +386,7 @@ void ESoundSource::OnFrame()
     case stSimulate:
     {
         /*
-                m_Flags.set			(flSimulating,TRUE);
+                m_Flags.set         (flSimulating,TRUE);
                 if ((fis_zero(m_ActiveTime.x)&&fis_zero(m_ActiveTime.y))||
                     ((g_pGamePersistent->Environment().GetGameTime()>m_ActiveTime.x)&&(g_pGamePersistent->Environment().GetGameTime()<m_ActiveTime.y)))
                     {
@@ -394,35 +394,35 @@ void ESoundSource::OnFrame()
                     {
                         if (fis_zero(m_RandomPause.x)&&fis_zero(m_RandomPause.y))
                         {
-                            m_Source.play			(0,sm_Looped);
-                            m_Source.set_params		(&m_Params);
-                            m_StopTime				= 0xFFFFFFFF;
+                            m_Source.play           (0,sm_Looped);
+                            m_Source.set_params     (&m_Params);
+                            m_StopTime              = 0xFFFFFFFF;
                         }else{
                             if (EDevice.dwTimeGlobal>=m_NextTime)
                             {
-                                bool bFullPlay		= fis_zero(m_PlayTime.x)&&fis_zero(m_PlayTime.y);
-                                m_Source.play		(0,bFullPlay?0:sm_Looped);
-                                m_Source.set_params	(&m_Params);
+                                bool bFullPlay      = fis_zero(m_PlayTime.x)&&fis_zero(m_PlayTime.y);
+                                m_Source.play       (0,bFullPlay?0:sm_Looped);
+                                m_Source.set_params (&m_Params);
                                 if (bFullPlay)
                                 {
-                                    m_StopTime		= 0xFFFFFFFF;
-                                    m_NextTime		=
+                                    m_StopTime      = 0xFFFFFFFF;
+                                    m_NextTime      =
            EDevice.dwTimeGlobal+iFloor(m_Source.get_length_sec()/1000.0f)+Random.randF(m_RandomPause.x,m_RandomPause.y)*1000;
                                 }else{
-                                    m_StopTime		=
+                                    m_StopTime      =
            bFullPlay?0:EDevice.dwTimeGlobal+Random.randF(m_PlayTime.x,m_PlayTime.y)*1000;
-                                    m_NextTime		= m_StopTime+Random.randF(m_RandomPause.x,m_RandomPause.y)*1000;
+                                    m_NextTime      = m_StopTime+Random.randF(m_RandomPause.x,m_RandomPause.y)*1000;
                                 }
                             }
                         }
                     }else{
                         if (EDevice.dwTimeGlobal>=m_StopTime)
-                            m_Source.stop_deffered();
+                            m_Source.stop_deferred();
                     }
 
                 }else{
                     if (0!=m_Source._feedback())
-                        m_Source.stop_deffered();
+                        m_Source.stop_deferred();
                 }
         */
     }

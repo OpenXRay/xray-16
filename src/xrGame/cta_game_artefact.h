@@ -20,7 +20,7 @@ public:
     virtual ~CtaGameArtefact();
 
     virtual bool Action(s32 cmd, u32 flags);
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnAnimationEnd(u32 state);
     virtual void UpdateCLChild();
     virtual bool CanTake() const;

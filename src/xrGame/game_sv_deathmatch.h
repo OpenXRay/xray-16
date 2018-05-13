@@ -49,8 +49,8 @@ protected:
     virtual void ConsoleCommands_Create();
     virtual void ConsoleCommands_Clear();
     /////////////////////////////////////////////////////////////
-    DEF_VECTOR(ANOMALIES, xr_string);
-    DEF_VECTOR(ANOMALY_SETS, ANOMALIES);
+    using ANOMALIES = xr_vector<xr_string>;
+    using ANOMALY_SETS = xr_vector<ANOMALIES>;
 
     ANOMALIES m_AnomaliesPermanent;
     ANOMALY_SETS m_AnomalySetsList;
@@ -58,8 +58,8 @@ protected:
     u32 m_dwLastAnomalySetID;
     u32 m_dwLastAnomalyStartTime;
 
-    DEF_VECTOR(ANOMALIES_ID, u16);
-    DEF_VECTOR(ANOMALY_SETS_ID, ANOMALIES_ID);
+    using ANOMALIES_ID = xr_vector<u16>;
+    using ANOMALY_SETS_ID = xr_vector<ANOMALIES_ID>;
 
     ANOMALY_SETS_ID m_AnomalyIDSetsList;
 
@@ -174,7 +174,7 @@ public:
     virtual void LoadDefItemsForTeam(
         const shared_str& caSection, /*TEAM_WPN_LIST *pWpnList,*/ DEF_ITEMS_LIST* pDefItems);
 
-    virtual char* GetAnomalySetBaseName() { return "deathmatch_game_anomaly_sets"; };
+    virtual pcstr GetAnomalySetBaseName() { return "deathmatch_game_anomaly_sets"; };
     virtual void LoadAnomalySets();
 
     void LoadItemRespawns();
@@ -185,7 +185,7 @@ public:
     void RemoveItemFromActor(CSE_Abstract* pItem);
     //----- Money routines -----------------------------------------------------------------
     virtual void Money_SetStart(ClientID id_who);
-    virtual s32 GetMoneyAmount(const shared_str& caSection, char* caMoneyStr);
+    virtual s32 GetMoneyAmount(const shared_str& caSection, pcstr caMoneyStr);
     int GetTeamScore(u32 idx);
     void SetTeamScore(u32 idx, int val);
     game_PlayerState* GetWinningPlayer();

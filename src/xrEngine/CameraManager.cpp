@@ -54,15 +54,16 @@ CCameraManager::CCameraManager(bool bApplyOnUpdate)
 
 CCameraManager::~CCameraManager()
 {
-    for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
+    for (auto it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
         xr_delete(*it);
-    for (EffectorPPIt it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
+
+    for (auto it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
         xr_delete(*it);
 }
 
 CEffectorCam* CCameraManager::GetCamEffector(ECamEffectorType type)
 {
-    for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
+    for (auto it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
         if ((*it)->eType == type)
         {
             return *it;
@@ -78,8 +79,8 @@ CEffectorCam* CCameraManager::AddCamEffector(CEffectorCam* ef)
 
 void CCameraManager::UpdateDeffered()
 {
-    EffectorCamIt it = m_EffectorsCam_added_deffered.begin();
-    EffectorCamIt it_e = m_EffectorsCam_added_deffered.end();
+    auto it = m_EffectorsCam_added_deffered.begin();
+    auto it_e = m_EffectorsCam_added_deffered.end();
     for (; it != it_e; ++it)
     {
         RemoveCamEffector((*it)->eType);
@@ -95,7 +96,7 @@ void CCameraManager::UpdateDeffered()
 
 void CCameraManager::RemoveCamEffector(ECamEffectorType type)
 {
-    for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
+    for (auto it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
         if ((*it)->eType == type)
         {
             OnEffectorReleased(*it);
@@ -106,7 +107,7 @@ void CCameraManager::RemoveCamEffector(ECamEffectorType type)
 
 CEffectorPP* CCameraManager::GetPPEffector(EEffectorPPType type)
 {
-    for (EffectorPPIt it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
+    for (auto it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
         if ((*it)->Type() == type)
             return *it;
     return 0;
@@ -141,7 +142,7 @@ CEffectorPP* CCameraManager::AddPPEffector(CEffectorPP* ef)
 
 void CCameraManager::RemovePPEffector(EEffectorPPType type)
 {
-    for (EffectorPPIt it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
+    for (auto it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
         if ((*it)->Type() == type)
         {
             if ((*it)->FreeOnRemove())
@@ -221,23 +222,19 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
 
 bool CCameraManager::ProcessCameraEffector(CEffectorCam* eff)
 {
+    // Do NOT delete effector here! It's unsafe because:
+    // 1. Leads to failed iterators in UpdateCamEffectors
+    // 2. Child classes with overrided ProcessCameraEffector would be surprised if eff becames invalid pointer
+    // The best way - return 'false' when the effector should be deleted, and delete it in ProcessCameraEffector
+
     bool res = false;
     if (eff->Valid() && eff->ProcessCam(m_cam_info))
     {
         res = true;
     }
-    else
+    else if (eff->AllowProcessingIfInvalid())
     {
-        if (eff->AllowProcessingIfInvalid())
-        {
-            eff->ProcessIfInvalid(m_cam_info);
-            res = true;
-        }
-
-        EffectorCamVec::iterator it = std::find(m_EffectorsCam.begin(), m_EffectorsCam.end(), eff);
-
-        m_EffectorsCam.erase(it);
-        OnEffectorReleased(eff);
+        eff->ProcessIfInvalid(m_cam_info);
     }
     return res;
 }
@@ -246,9 +243,22 @@ void CCameraManager::UpdateCamEffectors()
 {
     if (m_EffectorsCam.empty())
         return;
-    EffectorCamVec::reverse_iterator rit = m_EffectorsCam.rbegin();
-    for (; rit != m_EffectorsCam.rend(); ++rit)
-        ProcessCameraEffector(*rit);
+
+    auto r_it = m_EffectorsCam.rbegin();
+    while (r_it != m_EffectorsCam.rend())
+    {
+        if (ProcessCameraEffector(*r_it))
+            ++r_it;
+        else
+        {
+            // Dereferencing reverse iterator returns previous element of the list, r_it.base() returns current element
+            // So, we should use base()-1 iterator to delete just processed element. 'Previous' element would be 
+            // automatically changed after deletion, so r_it would dereferencing to another value, no need to change it
+            OnEffectorReleased(*r_it);
+            auto r_to_del = r_it.base();
+            m_EffectorsCam.erase(--r_to_del);
+        }
+    }
 
     m_cam_info.d.normalize();
     m_cam_info.n.normalize();
@@ -316,7 +326,22 @@ void CCameraManager::ApplyDevice(float _viewport_near)
     // projection
     Device.fFOV = m_cam_info.fFov;
     Device.fASPECT = m_cam_info.fAspect;
-    Device.mProject.build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, _viewport_near, m_cam_info.fFar);
+
+    //--#SM+# Begin-- +SecondVP+
+    // Пересчитываем FOV для второго вьюпорта [Recalculate scene FOV for SecondVP frame]
+    if (Device.m_SecondViewport.IsSVPFrame())
+    {
+        // Для второго вьюпорта FOV выставляем здесь
+        Device.fFOV *= g_pGamePersistent->m_pGShaderConstants->hud_params.y;
+
+        // Предупреждаем что мы изменили настройки камеры
+        Device.m_SecondViewport.isCamReady = true;
+    }
+    else
+        Device.m_SecondViewport.isCamReady = false;
+
+    Device.mProject.build_projection(deg2rad(Device.fFOV), m_cam_info.fAspect, _viewport_near, m_cam_info.fFar);
+    //--#SM+# End--
 
     if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu->IsActive())
         ResetPP();
@@ -324,7 +349,7 @@ void CCameraManager::ApplyDevice(float _viewport_near)
     {
         pp_affected.validate("apply device");
         // postprocess
-        IRender_Target* T = GlobalEnv.Render->getTarget();
+        IRender_Target* T = GEnv.Render->getTarget();
         T->set_duality_h(pp_affected.duality.h);
         T->set_duality_v(pp_affected.duality.v);
         T->set_blur(pp_affected.blur);
@@ -348,7 +373,7 @@ void CCameraManager::ApplyDevice(float _viewport_near)
 
 void CCameraManager::ResetPP()
 {
-    IRender_Target* T = GlobalEnv.Render->getTarget();
+    IRender_Target* T = GEnv.Render->getTarget();
     T->set_duality_h(pp_identity.duality.h);
     T->set_duality_v(pp_identity.duality.v);
     T->set_blur(pp_identity.blur);

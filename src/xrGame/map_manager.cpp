@@ -129,7 +129,7 @@ void CMapManager::Destroy(CMapLocation* ml) { m_deffered_destroy_queue.push_back
 void CMapManager::RemoveMapLocation(const shared_str& spot_type, u16 id)
 {
     FindLocationBySpotID key(spot_type, id);
-    Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
+    auto it = std::find_if(Locations().begin(), Locations().end(), key);
     if (it != Locations().end())
     {
         if (IsGameTypeSingle())
@@ -143,7 +143,7 @@ void CMapManager::RemoveMapLocation(const shared_str& spot_type, u16 id)
 void CMapManager::RemoveMapLocationByObjectID(u16 id) // call on destroy object
 {
     FindLocationByID key(id);
-    Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
+    auto it = std::find_if(Locations().begin(), Locations().end(), key);
     while (it != Locations().end())
     {
         if (IsGameTypeSingle())
@@ -160,7 +160,7 @@ void CMapManager::RemoveMapLocation(CMapLocation* ml)
 {
     FindLocation key(ml);
 
-    Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
+    auto it = std::find_if(Locations().begin(), Locations().end(), key);
     if (it != Locations().end())
     {
         if (IsGameTypeSingle())
@@ -173,9 +173,9 @@ void CMapManager::RemoveMapLocation(CMapLocation* ml)
 
 bool CMapManager::GetMapLocationsForObject(u16 id, xr_vector<CMapLocation*>& res)
 {
-    res.clear_not_free();
-    Locations_it it = Locations().begin();
-    Locations_it it_e = Locations().end();
+    res.clear();
+    auto it = Locations().begin();
+    auto it_e = Locations().end();
     for (; it != it_e; ++it)
     {
         if ((*it).actual && (*it).object_id == id)
@@ -194,7 +194,7 @@ bool CMapManager::HasMapLocation(const shared_str& spot_type, u16 id)
 CMapLocation* CMapManager::GetMapLocation(const shared_str& spot_type, u16 id)
 {
     FindLocationBySpotID key(spot_type, id);
-    Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
+    auto it = std::find_if(Locations().begin(), Locations().end(), key);
     if (it != Locations().end())
         return (*it).location;
 
@@ -204,7 +204,7 @@ CMapLocation* CMapManager::GetMapLocation(const shared_str& spot_type, u16 id)
 void CMapManager::GetMapLocations(const shared_str& spot_type, u16 id, xr_vector<CMapLocation*>& res)
 {
     FindLocationBySpotID key(spot_type, id);
-    Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
+    auto it = std::find_if(Locations().begin(), Locations().end(), key);
 
     while (it != Locations().end())
     {
@@ -217,8 +217,8 @@ void CMapManager::Update()
 {
     delete_data(m_deffered_destroy_queue); // from prev frame
 
-    Locations_it it = Locations().begin();
-    Locations_it it_e = Locations().end();
+    auto it = Locations().begin();
+    auto it_e = Locations().end();
 
     for (u32 idx = 0; it != it_e; ++it, ++idx)
     {
@@ -242,8 +242,8 @@ void CMapManager::Update()
 
 void CMapManager::DisableAllPointers()
 {
-    Locations_it it = Locations().begin();
-    Locations_it it_e = Locations().end();
+    auto it = Locations().begin();
+    auto it_e = Locations().end();
 
     for (; it != it_e; ++it)
         (*it).location->DisablePointer();
@@ -266,8 +266,8 @@ void CMapManager::OnObjectDestroyNotify(u16 id) { RemoveMapLocationByObjectID(id
 void CMapManager::Dump()
 {
     Msg("begin of map_locations dump");
-    Locations_it it = Locations().begin();
-    Locations_it it_e = Locations().end();
+    auto it = Locations().begin();
+    auto it_e = Locations().end();
     for (; it != it_e; ++it)
     {
         Msg("spot_type=[%s] object_id=[%d]", *((*it).spot_type), (*it).object_id);

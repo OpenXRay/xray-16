@@ -4,6 +4,7 @@
 #include "MainMenu.h"
 #include "Include/xrRender/DebugRender.h"
 #include "Include/xrRender/UIRender.h"
+#include "xrCore/xrPool.h"
 
 poolSS<_12b, 128> ui_allocator;
 
@@ -34,7 +35,7 @@ BOOL g_show_wnd_rect2 = FALSE;
 void clean_wnd_rects()
 {
 #ifdef DEBUG
-    GlobalEnv.DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow);
+    GEnv.DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow);
 #endif // DEBUG
 }
 
@@ -43,19 +44,19 @@ void draw_rect(Frect& r, u32 color)
 {
 #ifdef DEBUG
 
-    GlobalEnv.DRender->SetDebugShader(IDebugRender::dbgShaderWindow);
+    GEnv.DRender->SetDebugShader(IDebugRender::dbgShaderWindow);
 
     //.	GlobalEnv.UIRender->StartLineStrip	(5);
-    GlobalEnv.UIRender->StartPrimitive(5, IUIRender::ptLineStrip, UI().m_currentPointType);
+    GEnv.UIRender->StartPrimitive(5, IUIRender::ptLineStrip, UI().m_currentPointType);
 
-    GlobalEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.rb.x, r.lt.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.rb.x, r.rb.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.lt.x, r.rb.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.rb.x, r.lt.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.rb.x, r.rb.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.lt.x, r.rb.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
 
     //.	GlobalEnv.UIRender->FlushLineStrip();
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 
 #endif // DEBUG
 }
@@ -148,7 +149,7 @@ CUIWindow::~CUIWindow()
 
 void CUIWindow::Draw()
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         if (!(*it)->IsShown())
             continue;
@@ -192,7 +193,7 @@ void CUIWindow::Update()
         }
     }
 
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         if (!(*it)->IsShown())
             continue;
@@ -221,7 +222,7 @@ void CUIWindow::DetachChild(CUIWindow* pChild)
         SetCapture(pChild, false);
 
     //.	SafeRemoveChild			(pChild);
-    WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), pChild);
+    auto it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), pChild);
     R_ASSERT(it != m_ChildWndList.end());
     m_ChildWndList.erase(it);
 
@@ -487,7 +488,7 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 void CUIWindow::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     //оповестить дочерние окна
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         if ((*it)->IsEnabled())
             (*it)->SendMessage(pWnd, msg, pData);
@@ -525,7 +526,7 @@ CUIWindow* CUIWindow::GetChildMouseHandler()
 void CUIWindow::Reset() { m_pMouseCapturer = NULL; }
 void CUIWindow::ResetAll()
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         (*it)->Reset();
     }
@@ -563,7 +564,7 @@ void CUIWindow::SetParent(CUIWindow* pNewParent)
 
 void CUIWindow::ShowChildren(bool show)
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
         (*it)->Show(show);
 }
 

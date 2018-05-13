@@ -19,24 +19,13 @@
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #include <ddraw.h>
 #include <d3d9.h>
-#include <audiodefs.h>
+#include <mmreg.h>
 #include <dsound.h>
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x800
 #endif
 #include <dinput.h>
 #include <dinputd.h>
-#endif
-
-struct DXGI_RGBA;
-
-#include <d3d10_1.h>
-#include <d3d11_1.h>
-
-#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
-#include <wincodec.h>
-#include <d2derr.h>
-#include <dwrite.h>
 #endif
 
 #define XAUDIO2_E_INVALID_CALL 0x88960001

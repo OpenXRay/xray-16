@@ -4,7 +4,7 @@
 
 // extern Fvector du_cone_vertices			[DU_CONE_NUMVERTEX];
 
-BOOL tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fvector& v2)
+bool tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fvector& v2)
 {
     Fvector e0, e1;
     return CDB::TestSphereTri(SC, R, v0, e0.sub(v1, v0), e1.sub(v2, v0));
@@ -37,18 +37,18 @@ void CRenderTarget::enable_dbt_bounds(light* L)
         Device.mFullTransform.transform(pt);
         bbp.modify(pt);
     }
-    u_DBT_enable(bbp.min.z, bbp.max.z);
+    u_DBT_enable(bbp.vMin.z, bbp.vMax.z);
 }
 
 // nv-DBT
-BOOL CRenderTarget::u_DBT_enable(float zMin, float zMax)
+bool CRenderTarget::u_DBT_enable(float /*zMin*/, float /*zMax*/)
 {
     if (!RImplementation.o.nvdbt)
-        return FALSE;
+        return false;
     if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
-        return FALSE;
+        return false;
 
-    return FALSE;
+    return false;
 
     //	TODO: DX10: Check if DX10 supports this feature
     // enable cheat
@@ -56,7 +56,7 @@ BOOL CRenderTarget::u_DBT_enable(float zMin, float zMax)
     // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z,*(DWORD*)&zMin);
     // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W,*(DWORD*)&zMax);
 
-    // return TRUE;
+    // return true;
 }
 
 void CRenderTarget::u_DBT_disable()
@@ -66,12 +66,12 @@ void CRenderTarget::u_DBT_disable()
     //	HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X,0);
 }
 
-BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
+bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 {
     // Msg	("%d: %x type(%d), pos(%f,%f,%f)",Device.dwFrame,u32(L),u32(L->flags.type),VPUSH(L->position));
 
     // Near plane intersection
-    BOOL near_intersect = FALSE;
+    bool near_intersect = false;
     {
         Fmatrix& M = Device.mFullTransform;
         Fvector4 plane;
@@ -85,14 +85,14 @@ BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
         P.n.set(plane.x, plane.y, plane.z);
         P.d = plane.w;
         float p_dist = P.classify(L->spatial.sphere.P) - L->spatial.sphere.R;
-        near_intersect = (p_dist <= 0);
+        near_intersect = p_dist <= 0;
     }
 #ifdef DEBUG
     if (1)
     {
         Fsphere S;
         S.set(L->spatial.sphere.P, L->spatial.sphere.R);
-        dbg_spheres.push_back(mk_pair(S, L->color));
+        dbg_spheres.push_back(std::make_pair(S, L->color));
     }
 #endif
 

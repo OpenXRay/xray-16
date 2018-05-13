@@ -1,28 +1,27 @@
-#ifndef __XR_AREA_H__
-#define __XR_AREA_H__
-
+#pragma once
 #include "xr_collide_defs.h"
-
-// refs
-class ISpatial;
-class ICollisionForm;
-class IGameObject;
-
+#include "Common/Noncopyable.hpp"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/ObjectSpaceRender.h"
 #include "xrXRC.h"
+#include "xrCDB.h"
+#include "xrCore/_fbox.h"
 
-#include "xrcdb.h"
+// fwd. decl.
+class ISpatial;
+class ICollisionForm;
+class IGameObject;
+class Lock;
 
 //-----------------------------------------------------------------------------------------------------------
 // Space Area
 //-----------------------------------------------------------------------------------------------------------
 struct hdrCFORM;
-class XRCDB_API CObjectSpace
+class XRCDB_API CObjectSpace : Noncopyable
 {
 private:
     // Debug
-    Lock lock;
+    Lock* lock;
     CDB::MODEL Static;
     Fbox m_BoundingVolume;
     xrXRC xrc; // MT: dangerous
@@ -88,5 +87,3 @@ public:
 #endif
     void DumpStatistics(IGameFont& font, IPerformanceAlert* alert);
 };
-
-#endif //__XR_AREA_H__

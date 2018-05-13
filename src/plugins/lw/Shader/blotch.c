@@ -24,6 +24,7 @@ data, and it should be resolved in later builds.
 #include <math.h>
 #include "LW_Shader.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4996)
 
 #ifndef PI
@@ -478,4 +479,4 @@ Interface(long version, GlobalFunc* global, LWInterface* local, void* serverData
 ServerRecord ServerDesc[] = {
 {LWSHADER_HCLASS, SH_PLUGIN_NAME, Handler}, {LWSHADER_ICLASS, SH_PLUGIN_NAME, Interface}, {NULL}};
 
-#pragma warning(default : 4996)
+#pragma warning(pop)

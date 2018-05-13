@@ -1,16 +1,15 @@
+#pragma once
 #ifndef _CPS_Instance_H_
 #define _CPS_Instance_H_
 
 #include "xrCDB/ISpatial.h"
 #include "ISheduled.h"
 #include "IRenderable.h"
+#include "xrCore/_bitwise.h"
 
 class ENGINE_API CPS_Instance : public SpatialBase, public ScheduledBase, public RenderableBase
 {
     friend class IGame_Persistent;
-
-    template <bool _is_pm, typename T>
-    friend struct xr_special_free;
 
 private:
     bool m_destroy_on_game_load;

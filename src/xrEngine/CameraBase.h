@@ -38,6 +38,8 @@ public:
     float f_fov;
     float f_aspect;
 
+    bool m_bInputDisabled; //--#SM+#-- Флаг, запрещающий любые повороты камеры игроком [flag for disable all user input]
+
     IC Fvector Position() const { return vPosition; }
     IC Fvector Direction() const { return vDirection; }
     IC Fvector Up() const { return vNormal; }
@@ -83,6 +85,33 @@ public:
     virtual float CheckLimYaw();
     virtual float CheckLimPitch();
     virtual float CheckLimRoll();
+
+private: //--#SM+#--
+    float saved_yaw, saved_pitch, saved_roll;
+    Fvector vSavedPosition;
+    Fvector vSavedDirection;
+    Fvector vSavedNormal;
+
+public: //--#SM+#--
+    virtual void SaveCamVec()
+    {
+        saved_yaw = yaw;
+        saved_pitch = pitch;
+        saved_roll = roll;
+        vSavedPosition = vPosition;
+        vSavedDirection = vDirection;
+        vSavedNormal = vNormal;
+    }
+    virtual void RestoreCamVec()
+    {
+        yaw = saved_yaw;
+        pitch = saved_pitch;
+        roll = saved_roll;
+        vPosition = vSavedPosition;
+        vDirection = vSavedDirection;
+        vNormal = vSavedNormal;
+    }
+    virtual IGameObject* GetOwner() { return parent; }
 };
 
 template <typename T>

@@ -1,16 +1,21 @@
+// Entry point is in xr_3da/entry_point.cpp
 #include "stdafx.h"
+#include "main.h"
+#include "xr_3da/resource.h"
+
+#include <process.h>
+#include <locale.h>
+
 #include "IGame_Persistent.h"
 #include "xrNetServer/NET_AuthCheck.h"
 #include "xr_input.h"
 #include "XR_IOConsole.h"
 #include "x_ray.h"
 #include "std_classes.h"
-#include "resource.h"
+
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
 #include "Text_Console.h"
-#include <process.h>
-#include <locale.h>
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"
 
@@ -19,9 +24,6 @@
 #endif
 
 // global variables
-// XXX: use g_dedicated_server from xrAPI
-ENGINE_API bool g_dedicated_server = false;
-ENGINE_API CApplication* pApp = nullptr;
 ENGINE_API CInifile* pGameIni = nullptr;
 ENGINE_API bool g_bBenchmark = false;
 string512 g_sBenchmarkName;
@@ -31,18 +33,15 @@ ENGINE_API string_path g_sLaunchWorkingFolder;
 
 namespace
 {
-HWND logoWindow = nullptr;
-
-void RunBenchmark(const char* name);
+void RunBenchmark(pcstr name);
 }
 
-void InitEngine()
+ENGINE_API void InitEngine()
 {
     Engine.Initialize();
     Device.Initialize();
 }
 
-static void InitEngineExt() { Engine.External.Initialize(); }
 namespace
 {
 struct PathIncludePred
@@ -52,7 +51,7 @@ private:
 
 public:
     explicit PathIncludePred(const xr_auth_strings_t* ignoredPaths) : ignored(ignoredPaths) {}
-    bool xr_stdcall IsIncluded(const char* path)
+    bool xr_stdcall IsIncluded(pcstr path)
     {
         if (!ignored)
             return true;
@@ -61,7 +60,7 @@ public:
 };
 }
 
-void InitSettings()
+ENGINE_API void InitSettings()
 {
     string_path fname;
     FS.update_path(fname, "$game_config$", "system.ltx");
@@ -83,13 +82,13 @@ void InitSettings()
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 }
 
-void InitConsole()
+ENGINE_API void InitConsole()
 {
-#ifdef DEDICATED_SERVER
-    Console = new CTextConsole();
-#else
-    Console = new CConsole();
-#endif
+    if (GEnv.isDedicatedServer)
+        Console = new CTextConsole();
+    else
+        Console = new CConsole();
+
     Console->Initialize();
     xr_strcpy(Console->ConfigFile, "user.ltx");
     if (strstr(Core.Params, "-ltx "))
@@ -100,30 +99,32 @@ void InitConsole()
     }
 }
 
-void InitInput()
+ENGINE_API void InitInput()
 {
     bool captureInput = !strstr(Core.Params, "-i");
     pInput = new CInput(captureInput);
 }
 
-void destroyInput() { xr_delete(pInput); }
-void InitSound() { CSound_manager_interface::_create(); }
-void destroySound() { CSound_manager_interface::_destroy(); }
-void destroySettings()
+ENGINE_API void destroyInput() { xr_delete(pInput); }
+ENGINE_API void InitSound() { ISoundManager::_create(); }
+ENGINE_API void destroySound() { ISoundManager::_destroy(); }
+ENGINE_API void destroySettings()
 {
     auto s = const_cast<CInifile**>(&pSettings);
     xr_delete(*s);
+    auto sa = const_cast<CInifile**>(&pSettingsAuth);
+    xr_delete(*sa);
     xr_delete(pGameIni);
 }
 
-void destroyConsole()
+ENGINE_API void destroyConsole()
 {
     Console->Execute("cfg_save");
     Console->Destroy();
     xr_delete(Console);
 }
 
-void destroyEngine()
+ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
@@ -158,19 +159,20 @@ void CheckPrivilegySlowdown()
 #endif
 }
 
-void Startup()
+ENGINE_API void Startup()
 {
     execUserScript();
     InitSound();
+
     // ...command line for auto start
-    const char* startArgs = strstr(Core.Params, "-start ");
+    pcstr startArgs = strstr(Core.Params, "-start ");
     if (startArgs)
         Console->Execute(startArgs + 1);
-    const char* loadArgs = strstr(Core.Params, "-load ");
+    pcstr loadArgs = strstr(Core.Params, "-load ");
     if (loadArgs)
         Console->Execute(loadArgs + 1);
+
     // Initialize APP
-    ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
     Device.Create();
     LALib.OnCreate();
     pApp = new CApplication();
@@ -178,11 +180,8 @@ void Startup()
     R_ASSERT(g_pGamePersistent);
     g_SpatialSpace = new ISpatial_DB("Spatial obj");
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
-    // Destroy LOGO
-    DestroyWindow(logoWindow);
-    logoWindow = NULL;
+
     // Main cycle
-    Memory.mem_usage();
     Device.Run();
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
@@ -203,135 +202,21 @@ void Startup()
     destroySound();
 }
 
-static BOOL CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
+ENGINE_API int RunApplication()
 {
-    switch (msg)
+    R_ASSERT2(Core.Params, "Core must be initialized");
+
+#ifdef NO_MULTI_INSTANCES
+    if (!GEnv.isDedicatedServer)
     {
-    case WM_DESTROY: break;
-    case WM_CLOSE: DestroyWindow(hw); break;
-    case WM_COMMAND:
-        if (LOWORD(wp) == IDCANCEL)
-            DestroyWindow(hw);
-        break;
-    default: return FALSE;
+        CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
+        if (GetLastError() == ERROR_ALREADY_EXISTS)
+            return 2;
     }
-    return TRUE;
-}
-
-class StickyKeyFilter
-{
-private:
-    BOOL screensaverState;
-    STICKYKEYS stickyKeys;
-    FILTERKEYS filterKeys;
-    TOGGLEKEYS toggleKeys;
-    DWORD stickyKeysFlags;
-    DWORD filterKeysFlags;
-    DWORD toggleKeysFlags;
-
-public:
-    StickyKeyFilter()
-    {
-        screensaverState = FALSE;
-        SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, &screensaverState, 0);
-        if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, NULL, 0);
-        stickyKeysFlags = 0;
-        filterKeysFlags = 0;
-        toggleKeysFlags = 0;
-        stickyKeys = {};
-        filterKeys = {};
-        toggleKeys = {};
-        stickyKeys.cbSize = sizeof(stickyKeys);
-        filterKeys.cbSize = sizeof(filterKeys);
-        toggleKeys.cbSize = sizeof(toggleKeys);
-        SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
-        SystemParametersInfo(SPI_GETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
-        SystemParametersInfo(SPI_GETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
-        if (stickyKeys.dwFlags & SKF_AVAILABLE)
-        {
-            stickyKeysFlags = stickyKeys.dwFlags;
-            stickyKeys.dwFlags = 0;
-            SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
-        }
-        if (filterKeys.dwFlags & FKF_AVAILABLE)
-        {
-            filterKeysFlags = filterKeys.dwFlags;
-            filterKeys.dwFlags = 0;
-            SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
-        }
-        if (toggleKeys.dwFlags & TKF_AVAILABLE)
-        {
-            toggleKeysFlags = toggleKeys.dwFlags;
-            toggleKeys.dwFlags = 0;
-            SystemParametersInfo(SPI_SETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
-        }
-    }
-
-    ~StickyKeyFilter()
-    {
-        if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, TRUE, NULL, 0);
-        if (stickyKeysFlags)
-        {
-            stickyKeys.dwFlags = stickyKeysFlags;
-            SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
-        }
-        if (filterKeysFlags)
-        {
-            filterKeys.dwFlags = filterKeysFlags;
-            SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
-        }
-        if (toggleKeysFlags)
-        {
-            toggleKeys.dwFlags = toggleKeysFlags;
-            SystemParametersInfo(SPI_SETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
-        }
-    }
-};
-
-int RunApplication(const char* commandLine)
-{
-#ifdef DEDICATED_SERVER
-    g_dedicated_server = true;
 #endif
-    xrDebug::Initialize(g_dedicated_server);
-    if (!IsDebuggerPresent())
-    {
-        u32 heapFragmentation = 2;
-        BOOL result = HeapSetInformation(
-            GetProcessHeap(), HeapCompatibilityInformation, &heapFragmentation, sizeof(heapFragmentation));
-        VERIFY2(result, "can't set process heap low fragmentation");
-        (void)result;
-    }
-#if !defined(DEDICATED_SERVER) && defined(NO_MULTI_INSTANCES)
-    CreateMutex(NULL, TRUE, "Local\\STALKER-COP");
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-        return 2;
-#endif
-    SetThreadAffinityMask(GetCurrentThread(), 1);
-    logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), 0, LogoWndProc);
-    HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
-    RECT logoRect;
-    GetWindowRect(logoPicture, &logoRect);
-#ifndef DEBUG
-    HWND prevWindow = HWND_TOPMOST;
-#else
-    HWND prevWindow = HWND_NOTOPMOST;
-#endif
-    SetWindowPos(logoWindow, prevWindow, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top,
-        SWP_NOMOVE | SWP_SHOWWINDOW);
-    UpdateWindow(logoWindow);
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
-    const char* fsltx = "-fsltx ";
-    string_path fsgame = "";
-    if (strstr(commandLine, fsltx))
-    {
-        u32 sz = xr_strlen(fsltx);
-        sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
-    }
-    Core._initialize("xray", NULL, TRUE, *fsgame ? fsgame : nullptr);
+
     InitSettings();
     // Adjust player & computer name for Asian
     if (pSettings->line_exist("string_table", "no_native_input"))
@@ -339,18 +224,15 @@ int RunApplication(const char* commandLine)
         xr_strcpy(Core.UserName, sizeof(Core.UserName), "Player");
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
-#ifndef DEDICATED_SERVER
-    StickyKeyFilter filter;
-    (void)filter;
-#endif
+
     FPU::m24r();
     InitEngine();
     InitInput();
     InitConsole();
     Engine.External.CreateRendererList();
-    Msg("command line %s", commandLine);
-    LPCSTR benchName = "-batch_benchmark ";
-    if (strstr(commandLine, benchName))
+
+    pcstr benchName = "-batch_benchmark ";
+    if (strstr(Core.Params, benchName))
     {
         u32 sz = xr_strlen(benchName);
         string64 benchmarkName;
@@ -358,8 +240,9 @@ int RunApplication(const char* commandLine)
         RunBenchmark(benchmarkName);
         return 0;
     }
-    LPCSTR sashName = "-openautomate ";
-    if (strstr(commandLine, sashName))
+
+    pcstr sashName = "-openautomate ";
+    if (strstr(Core.Params, sashName))
     {
         u32 sz = xr_strlen(sashName);
         string512 sashArg;
@@ -368,28 +251,34 @@ int RunApplication(const char* commandLine)
         g_SASH.MainLoop();
         return 0;
     }
-#ifndef DEDICATED_SERVER
-    if (strstr(Core.Params, "-r4"))
-        Console->Execute("renderer renderer_r4");
-    else if (strstr(Core.Params, "-r3"))
-        Console->Execute("renderer renderer_r3");
-    else if (strstr(Core.Params, "-r2.5"))
-        Console->Execute("renderer renderer_r2.5");
-    else if (strstr(Core.Params, "-r2a"))
-        Console->Execute("renderer renderer_r2a");
-    else if (strstr(Core.Params, "-r2"))
-        Console->Execute("renderer renderer_r2");
-    else
+
+    if (!GEnv.isDedicatedServer)
     {
-        CCC_LoadCFG_custom cmd("renderer ");
-        cmd.Execute(Console->ConfigFile);
+        if (strstr(Core.Params, "-gl"))
+            Console->Execute("renderer renderer_gl");
+        else if (strstr(Core.Params, "-r4"))
+            Console->Execute("renderer renderer_r4");
+        else if (strstr(Core.Params, "-r3"))
+            Console->Execute("renderer renderer_r3");
+        else if (strstr(Core.Params, "-r2.5"))
+            Console->Execute("renderer renderer_r2.5");
+        else if (strstr(Core.Params, "-r2a"))
+            Console->Execute("renderer renderer_r2a");
+        else if (strstr(Core.Params, "-r2"))
+            Console->Execute("renderer renderer_r2");
+        else if (strstr(Core.Params, "-r1"))
+            Console->Execute("renderer renderer_r1");
+        else
+        {
+            CCC_LoadCFG_custom cmd("renderer ");
+            cmd.Execute(Console->ConfigFile);
+        }
     }
-#else
-    Console->Execute("renderer renderer_r1");
-#endif
-    InitEngineExt(); // load xrRender and xrGame
+    else
+        Console->Execute("renderer renderer_r1");
+
+    Engine.External.Initialize();
     Startup();
-    Core._destroy();
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
@@ -398,15 +287,15 @@ int RunApplication(const char* commandLine)
         si.cb = sizeof(si);
         PROCESS_INFORMATION pi = {};
         // We use CreateProcess to setup working folder
-        const char* tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
-        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, NULL, NULL, FALSE, 0, NULL, tempDir, &si, &pi);
+        pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
+        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
     }
     return 0;
 }
 
 namespace
 {
-void RunBenchmark(const char* name)
+void RunBenchmark(pcstr name)
 {
     g_bBenchmark = true;
     string_path cfgPath;
@@ -437,27 +326,4 @@ void RunBenchmark(const char* name)
         Startup();
     }
 }
-
-int StackoverflowFilter(int exceptionCode)
-{
-    if (exceptionCode == EXCEPTION_STACK_OVERFLOW)
-        return EXCEPTION_EXECUTE_HANDLER;
-    return EXCEPTION_CONTINUE_SEARCH;
-}
-}
-
-int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int cmdShow)
-{
-    int result = 0;
-    // BugTrap can't handle stack overflow exception, so handle it here
-    __try
-    {
-        result = RunApplication(commandLine);
-    }
-    __except (StackoverflowFilter(GetExceptionCode()))
-    {
-        _resetstkoflw();
-        FATAL("stack overflow");
-    }
-    return result;
 }

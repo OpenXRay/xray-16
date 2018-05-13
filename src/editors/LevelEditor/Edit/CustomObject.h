@@ -118,7 +118,7 @@ protected:
     {
         string256 tmp;
         strcpy(tmp, N);
-        strlwr(tmp);
+        xr_strlwr(tmp);
         FName = tmp;
     }
 

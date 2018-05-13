@@ -1,10 +1,37 @@
 #pragma once
-
-#include "xrCore.h"
+#include <memory>
 
 namespace XRay
 {
-XRCORE_API HMODULE LoadLibrary(const char* libraryFileName, bool log = true);
-XRCORE_API void UnloadLibrary(HMODULE libraryHandle);
-XRCORE_API void* GetProcAddress(HMODULE libraryHandle, const char* procName);
+class XRCORE_API ModuleHandle
+{
+    void* handle;
+    bool dontUnload;
+
+public:
+    ModuleHandle(const bool dontUnload = false);
+    ModuleHandle(pcstr moduleName, bool dontUnload = false);
+    ~ModuleHandle();
+
+    void* open(pcstr moduleName);
+    void close();
+
+    bool exist() const;
+
+    void* operator()() const;
+
+    void* getProcAddress(pcstr procName) const;
+};
+
+using Module = std::unique_ptr<ModuleHandle>;
+
+inline auto LoadModule(bool dontUnload = false)
+{
+    return std::make_unique<ModuleHandle>(dontUnload);
+}
+
+inline auto LoadModule(pcstr moduleName, bool dontUnload = false)
+{
+    return std::make_unique<ModuleHandle>(moduleName, dontUnload);
+}
 }

@@ -1,42 +1,21 @@
-// xrRender_R2.cpp : Defines the entry point for the DLL application.
-//
 #include "stdafx.h"
 #include "Layers/xrRender/dxRenderFactory.h"
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-#pragma comment(lib, "xrEngine.lib")
-#pragma comment(lib, "xrScriptEngine.lib")
-
-extern "C" void XR_EXPORT SetupEnv()
+void SetupEnvR3()
 {
-    GlobalEnv.Render = &RImplementation;
-    GlobalEnv.RenderFactory = &RenderFactoryImpl;
-    GlobalEnv.DU = &DUImpl;
-    GlobalEnv.UIRender = &UIRenderImpl;
+    GEnv.Render = &RImplementation;
+    GEnv.RenderFactory = &RenderFactoryImpl;
+    GEnv.DU = &DUImpl;
+    GEnv.UIRender = &UIRenderImpl;
 #ifdef DEBUG
-    GlobalEnv.DRender = &DebugRenderImpl;
+    GEnv.DRender = &DebugRenderImpl;
 #endif
     xrRender_initconsole();
 }
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH: SetupEnv(); break;
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH: break;
-    }
-    return TRUE;
-}
-
-extern "C" {
-bool _declspec(dllexport) SupportsDX10Rendering();
-};
-
-bool _declspec(dllexport) SupportsDX10Rendering()
+bool SupportsDX10Rendering()
 {
     return xrRender_test_hw() ? true : false;
     /*
@@ -53,3 +32,19 @@ bool _declspec(dllexport) SupportsDX10Rendering()
         return true;
     */
 }
+
+// This must not be optimized by compiler
+static const volatile class GEnvHelper
+{
+public:
+    GEnvHelper()
+    {
+        GEnv.CheckR3 = SupportsDX10Rendering;
+        GEnv.SetupR3 = SetupEnvR3;
+    }
+    ~GEnvHelper()
+    {
+        GEnv.CheckR3 = nullptr;
+        GEnv.SetupR3 = nullptr;
+    }
+} helper;

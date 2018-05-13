@@ -72,7 +72,7 @@ void CPda::shedule_Update(u32 dt)
 
 void CPda::UpdateActiveContacts()
 {
-    m_active_contacts.clear_not_free();
+    m_active_contacts.clear();
     xr_vector<IGameObject*>::iterator it = feel_touch.begin();
     for (; it != feel_touch.end(); ++it)
     {
@@ -165,7 +165,7 @@ CInventoryOwner* CPda::GetOriginalOwner()
 
 void CPda::ActivePDAContacts(xr_vector<CPda*>& res)
 {
-    res.clear_not_free();
+    res.clear();
     xr_vector<IGameObject*>::iterator it = m_active_contacts.begin();
     xr_vector<IGameObject*>::iterator it_e = m_active_contacts.end();
 
@@ -216,7 +216,7 @@ void CPda::PlayScriptFunction()
     if (xr_strcmp(m_functor_str, ""))
     {
         luabind::functor<void> m_functor;
-        R_ASSERT(ai().script_engine().functor(m_functor_str.c_str(), m_functor));
+        R_ASSERT(GEnv.ScriptEngine->functor(m_functor_str.c_str(), m_functor));
         m_functor();
     }
 }

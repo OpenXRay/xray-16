@@ -8,7 +8,7 @@
 
 #include "pch_script.h"
 #include "Level.h"
-#include "actor.h"
+#include "Actor.h"
 #include "script_game_object.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 #include "xrServer.h"
@@ -37,11 +37,16 @@
 #include "alife_object_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-
+#include "HUDManager.h"
+#include "raypick.h"
+#include "xrCDB/xr_collide_defs.h"
+#ifdef NAMESPACE_LEVEL_EXPORTS
+#include "xrNetServer/NET_Messages.h"
+#endif
 using namespace luabind;
 using namespace luabind::policy;
 
-LPCSTR command_line() { return (Core.Params); }
+LPCSTR command_line() { return Core.Params; }
 bool IsDynamicMusic() { return !!psActorFlags.test(AF_DYNAMIC_MUSIC); }
 bool IsImportantSave() { return !!psActorFlags.test(AF_IMPORTANT_SAVE); }
 #ifdef DEBUG
@@ -61,7 +66,7 @@ CScriptGameObject* tpfGetActor()
 {
     static bool first_time = true;
     if (first_time)
-        ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.actor function!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Do not use level.actor function!");
     first_time = false;
 
     CActor* l_tpActor = smart_cast<CActor*>(Level().CurrentEntity());
@@ -75,7 +80,7 @@ CScriptGameObject* get_object_by_name(LPCSTR caObjectName)
 {
     static bool first_time = true;
     if (first_time)
-        ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.object function!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Do not use level.object function!");
     first_time = false;
 
     CGameObject* l_tpGameObject = smart_cast<CGameObject*>(Level().Objects.FindObjectByName(caObjectName));
@@ -95,51 +100,36 @@ CScriptGameObject* get_object_by_id(u16 id)
     return pGameObject->lua_game_object();
 }
 
-LPCSTR get_weather() { return (*g_pGamePersistent->Environment().GetWeather()); }
-void set_weather(LPCSTR weather_name, bool forced)
+LPCSTR get_weather() { return *g_pGamePersistent->Environment().GetWeather(); }
+void set_weather(pcstr const weather_name, const bool forced)
 {
-#ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif // #ifdef INGAME_EDITOR
         g_pGamePersistent->Environment().SetWeather(weather_name, forced);
 }
 
-bool set_weather_fx(LPCSTR weather_name)
+bool set_weather_fx(pcstr const weather_name)
 {
-#ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif // #ifdef INGAME_EDITOR
-        return (g_pGamePersistent->Environment().SetWeatherFX(weather_name));
+        return g_pGamePersistent->Environment().SetWeatherFX(weather_name);
 
-#ifdef INGAME_EDITOR
-    return (false);
-#endif // #ifdef INGAME_EDITOR
+    return false;
 }
 
-bool start_weather_fx_from_time(LPCSTR weather_name, float time)
+bool start_weather_fx_from_time(pcstr const weather_name, const float time)
 {
-#ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif // #ifdef INGAME_EDITOR
-        return (g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time));
+        return g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time);
 
-#ifdef INGAME_EDITOR
-    return (false);
-#endif // #ifdef INGAME_EDITOR
+    return false;
 }
 
 bool is_wfx_playing() { return (g_pGamePersistent->Environment().IsWFXPlaying()); }
 float get_wfx_time() { return (g_pGamePersistent->Environment().wfx_time); }
 void stop_weather_fx() { g_pGamePersistent->Environment().StopWFX(); }
-void set_time_factor(float time_factor)
+void set_time_factor(const float time_factor)
 {
-    if (!OnServer())
+    if (!OnServer() || Device.editor())
         return;
-
-#ifdef INGAME_EDITOR
-    if (Device.editor())
-        return;
-#endif // #ifdef INGAME_EDITOR
 
     Level().Server->GetGameState()->SetGameTimeFactor(time_factor);
 }
@@ -547,7 +537,7 @@ int g_get_general_goodwill_between(u16 from, u16 to)
 
     if (!from_obj || !to_obj)
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "RELATION_REGISTRY::get_general_goodwill_between  : cannot convert obj to CSE_ALifeTraderAbstract!");
         return (0);
     }
@@ -559,7 +549,7 @@ int g_get_general_goodwill_between(u16 from, u16 to)
 }
 
 u32 vertex_id(Fvector position) { return (ai().level_graph().vertex_id(position)); }
-u32 render_get_dx_level() { return GlobalEnv.Render->get_dx_level(); }
+u32 render_get_dx_level() { return GEnv.Render->get_dx_level(); }
 CUISequencer* g_tutorial = NULL;
 CUISequencer* g_tutorial2 = NULL;
 
@@ -585,6 +575,90 @@ void stop_tutorial()
 
 LPCSTR translate_string(LPCSTR str) { return *CStringTable().translate(str); }
 bool has_active_tutotial() { return (g_tutorial != NULL); }
+
+//Alundaio: namespace level exports extension
+#ifdef NAMESPACE_LEVEL_EXPORTS
+//ability to update level netpacket
+void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool bHighPriority = false, bool bSendImmediately = false)
+{
+    Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, bSendImmediately));
+}
+
+//can spawn entities like bolts, phantoms, ammo, etc. which normally crash when using alife():create()
+void spawn_section(pcstr sSection, Fvector3 vPosition, u32 LevelVertexID, u16 ParentID, bool bReturnItem = false)
+{
+    Level().spawn_item(sSection, vPosition, LevelVertexID, ParentID, bReturnItem);
+}
+
+//ability to get the target game_object at crosshair
+CScriptGameObject* g_get_target_obj()
+{
+    collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+    if (RQ.O)
+    {
+        CGameObject* game_object = static_cast<CGameObject*>(RQ.O);
+        if (game_object)
+            return game_object->lua_game_object();
+    }
+    return nullptr;
+}
+
+float g_get_target_dist()
+{
+    collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+    if (RQ.range)
+        return RQ.range;
+    return 0.f;
+}
+
+u32 g_get_target_element()
+{
+	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+	if (RQ.element)
+		return RQ.element;
+
+	return 0;
+}
+
+u8 get_active_cam()
+{
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (actor)
+        return (u8)actor->active_cam();
+
+    return 255;
+}
+
+void set_active_cam(u8 mode)
+{
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (actor && mode <= eacMaxCam)
+        actor->cam_Set((EActorCameras)mode);
+}
+#endif
+//-Alundaio
+
+// KD: raypick	
+bool ray_pick(const Fvector& start, const Fvector& dir, float range,
+              collide::rq_target tgt, script_rq_result& script_R,
+              CScriptGameObject* ignore_object)
+{
+    collide::rq_result R;
+    IGameObject* ignore = nullptr;
+    if (ignore_object)
+        ignore = smart_cast<IGameObject*>(&(ignore_object->object()));
+    if (Level().ObjectSpace.RayPick(start, dir, range, tgt, R, ignore))
+    {
+        script_R.set(R);
+        return true;
+    }
+    return false;
+}
+
+// XXX nitrocaster: one can export enum like class, without defining dummy type
+template<typename T>
+struct EnumCallbackType {};
+
 IC static void CLevel_Export(lua_State* luaState)
 {
     class_<CEnvDescriptor>("CEnvDescriptor")
@@ -594,6 +668,18 @@ IC static void CLevel_Export(lua_State* luaState)
         class_<CEnvironment>("CEnvironment").def("current", current_environment);
 
     module(luaState, "level")[
+        //Alundaio: Extend level namespace exports
+#ifdef NAMESPACE_LEVEL_EXPORTS
+        def("send", &g_send) , //allow the ability to send netpacket to level
+        //def("ray_pick",g_ray_pick),
+        def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
+        def("get_target_dist", &g_get_target_dist),
+        def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
+        def("spawn_item", &spawn_section),
+        def("get_active_cam", &get_active_cam),
+        def("set_active_cam", &set_active_cam),
+#endif
+        //Alundaio: END
         // obsolete\deprecated
         def("object_by_id", get_object_by_id),
 #ifdef DEBUG
@@ -655,10 +741,44 @@ IC static void CLevel_Export(lua_State* luaState)
 
         def("vertex_id", &vertex_id),
 
-        def("game_id", &GameID)],
+        def("game_id", &GameID),
+        def("ray_pick", &ray_pick)],
 
         module(luaState, "actor_stats")[def("add_points", &add_actor_points),
             def("add_points_str", &add_actor_points_str), def("get_points", &get_actor_points)];
+
+    module(luaState)
+    [
+        class_<CRayPick>("ray_pick")
+        .def(constructor<>())
+        .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
+        .def("set_position", &CRayPick::set_position)
+        .def("set_direction", &CRayPick::set_direction)
+        .def("set_range", &CRayPick::set_range)
+        .def("set_flags", &CRayPick::set_flags)
+        .def("set_ignore_object", &CRayPick::set_ignore_object)
+        .def("query", &CRayPick::query)
+        .def("get_result", &CRayPick::get_result)
+        .def("get_object", &CRayPick::get_object)
+        .def("get_distance", &CRayPick::get_distance)
+        .def("get_element", &CRayPick::get_element),
+        class_<script_rq_result>("rq_result")
+        .def_readonly("object", &script_rq_result::O)
+        .def_readonly("range", &script_rq_result::range)
+        .def_readonly("element", &script_rq_result::element)
+        .def(constructor<>()),
+        class_<EnumCallbackType<collide::rq_target>>("rq_target")
+        .enum_("targets")
+        [
+            value("rqtNone", int(collide::rqtNone)),
+            value("rqtObject", int(collide::rqtObject)),
+            value("rqtStatic", int(collide::rqtStatic)),
+            value("rqtShape", int(collide::rqtShape)),
+            value("rqtObstacle", int(collide::rqtObstacle)),
+            value("rqtBoth", int(collide::rqtBoth)),
+            value("rqtDyn", int(collide::rqtDyn))
+        ]
+    ];
 
     module(luaState)[def("command_line", &command_line), def("IsGameTypeSingle", &IsGameTypeSingle),
         def("IsDynamicMusic", &IsDynamicMusic), def("render_get_dx_level", &render_get_dx_level),

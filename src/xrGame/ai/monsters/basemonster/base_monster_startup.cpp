@@ -449,10 +449,10 @@ void CBaseMonster::settings_read(CInifile const* ini, LPCSTR section, SMonsterSe
         if (ini->line_exist(ppi_section, "color_base"))
             sscanf(ini->r_string(ppi_section, "color_base"), "%f,%f,%f", &data.m_attack_effector.ppi.color_base.r,
                 &data.m_attack_effector.ppi.color_base.g, &data.m_attack_effector.ppi.color_base.b);
-        if (ini->line_exist(ppi_section, "color_base"))
+        if (ini->line_exist(ppi_section, "color_gray"))
             sscanf(ini->r_string(ppi_section, "color_gray"), "%f,%f,%f", &data.m_attack_effector.ppi.color_gray.r,
                 &data.m_attack_effector.ppi.color_gray.g, &data.m_attack_effector.ppi.color_gray.b);
-        if (ini->line_exist(ppi_section, "color_base"))
+        if (ini->line_exist(ppi_section, "color_add"))
             sscanf(ini->r_string(ppi_section, "color_add"), "%f,%f,%f", &data.m_attack_effector.ppi.color_add.r,
                 &data.m_attack_effector.ppi.color_add.g, &data.m_attack_effector.ppi.color_add.b);
 
@@ -531,8 +531,8 @@ void CBaseMonster::fill_bones_body_parts(LPCSTR body_part, CriticalWoundType wou
     VERIFY(kinematics);
 
     CInifile::Sect& body_part_section = pSettings->r_section(body_parts_section);
-    CInifile::SectCIt I = body_part_section.Data.begin();
-    CInifile::SectCIt E = body_part_section.Data.end();
+    auto I = body_part_section.Data.cbegin();
+    auto E = body_part_section.Data.cend();
     for (; I != E; ++I)
         m_bones_body_parts.insert(std::make_pair(kinematics->LL_BoneID((*I).first), u32(wound_type)));
 }

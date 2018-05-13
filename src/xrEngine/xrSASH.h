@@ -50,9 +50,9 @@ private:
     void ReleaseEngine();
 
     // OA option handling
-    void DescribeOption(char* pszOptionName, const oaOptionDependency& Dependency);
-    oaOptionDataType GetOptionType(char* pszOptionName);
-    void GetOption(char* pszOptionName);
+    void DescribeOption(pcstr pszOptionName, const oaOptionDependency& Dependency);
+    oaOptionDataType GetOptionType(pcstr pszOptionName);
+    void GetOption(pcstr pszOptionName);
     void SetOption(oaNamedOption* pOption);
 
     // OA Error report

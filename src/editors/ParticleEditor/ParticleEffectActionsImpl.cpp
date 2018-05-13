@@ -11,7 +11,7 @@
 using namespace PAPI;
 #define PARTICLE_ACTION_VERSION 0x0001
 //---------------------------------------------------------------------------
-xr_token2 actions_token[] = {{"Avoid", "Steer particles away from a domain of space.", PAAvoidID},
+const xr_token2 actions_token[] = {{"Avoid", "Steer particles away from a domain of space.", PAAvoidID},
     {"Bounce", "Bounce particles off a domain of space.", PABounceID},
     {"Copy VertexB", "Set the secondary position from current position.", PACopyVertexBID},
     {"Damping", "Simulate air by slowing down particle velocities.", PADampingID},

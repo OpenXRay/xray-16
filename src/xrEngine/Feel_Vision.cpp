@@ -95,11 +95,11 @@ void Vision::feel_vision_query(Fmatrix& mFull, Fvector& P)
     Frustum.CreateFromMatrix(mFull, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     // Traverse object database
-    r_spatial.clear_not_free();
+    r_spatial.clear();
     g_SpatialSpace->q_frustum(r_spatial, 0, STYPE_VISIBLEFORAI, Frustum);
 
     // Determine visibility for dynamic part of scene
-    seen.clear_and_reserve();
+    seen.clear();
     for (u32 o_it = 0; o_it < r_spatial.size(); o_it++)
     {
         ISpatial* spatial = r_spatial[o_it];
@@ -126,9 +126,9 @@ void Vision::feel_vision_update(IGameObject* parent, Fvector& P, float dt, float
 
         {
             diff.resize(_max(seen.size(), query.size()));
-            xr_vector<IGameObject*>::iterator E =
+            xr_vector<IGameObject*>::iterator E2 =
                 std::set_difference(seen.begin(), seen.end(), query.begin(), query.end(), diff.begin());
-            diff.resize(E - diff.begin());
+            diff.resize(E2 - diff.begin());
             for (u32 i = 0; i < diff.size(); i++)
                 o_new(diff[i]);
         }
@@ -222,7 +222,7 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
                 }
             }
             // Log("Vis",feel_params.vis);
-            r_spatial.clear_not_free();
+            r_spatial.clear();
             g_SpatialSpace->q_ray(r_spatial, 0, STYPE_VISIBLEFORAI, P, D, f);
 
             RD.flags = CDB::OPT_ONLYFIRST;

@@ -7,7 +7,6 @@
 // Copyright 2005 GSC Game World
 
 #include "StdAfx.h"
-bool IsGameTypeSingle();
 #include "UIMessagesWindow.h"
 #include "UIGameLog.h"
 #include "UIChatWnd.h"
@@ -16,6 +15,7 @@ bool IsGameTypeSingle();
 #include "UIInventoryUtilities.h"
 #include "game_news.h"
 #include "UIPdaMsgListItem.h"
+#include "xrGame/game_type.h"
 
 CUIMessagesWindow::CUIMessagesWindow() : m_pChatLog(NULL), m_pChatWnd(NULL), m_pGameLog(NULL)
 {
@@ -80,7 +80,7 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
 
         m_in_pending_mode = false;
 
-        XML_NODE* pending_chat_list = xml.NavigateToNode(CHAT_LOG_LIST_PENDING);
+        XML_NODE pending_chat_list = xml.NavigateToNode(CHAT_LOG_LIST_PENDING);
 
         if (pending_chat_list)
         {

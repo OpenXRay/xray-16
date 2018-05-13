@@ -217,7 +217,7 @@ void SPHBonesData::net_Save(NET_Packet& P)
     P.w_vec3(get_min());
     P.w_vec3(get_max());
     P.w_u16((u16)bones.size()); // bones number;
-    PHNETSTATE_I i = bones.begin(), e = bones.end();
+    auto i = bones.begin(), e = bones.end();
     for (; e != i; i++)
     {
         (*i).net_Save(P, get_min(), get_max());

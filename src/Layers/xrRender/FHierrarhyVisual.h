@@ -22,6 +22,12 @@ public:
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
+    virtual IRenderVisual* getSubModel(u8 idx) //--#SM+#--
+    {
+        if (children.size() > idx)
+            return children[idx];
+        return NULL;
+    }
 };
 
 #endif // FHierrarhyVisualH

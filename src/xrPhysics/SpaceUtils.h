@@ -1,10 +1,10 @@
 #ifndef SPACE_UTILS_H
 #define SPACE_UTILS_H
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
-#include "Externals/ode/ode/src/collision_kernel.h"
-#pragma warning(default : 4995)
-#pragma warning(default : 4267)
+#include "ode/ode/src/collision_kernel.h"
+#pragma warning(pop)
 
 IC void spatialParsFromDGeom(dGeomID d_space, Fvector& center, Fvector& AABB, float& radius)
 {
