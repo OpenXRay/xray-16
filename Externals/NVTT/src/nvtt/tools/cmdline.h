@@ -24,7 +24,7 @@
 #ifndef CMDLINE_H
 #define CMDLINE_H
 
-#include <Debug.h>
+#include <nvcore/Debug.h>
 
 #include <stdio.h> // stderr
 #include <stdlib.h>	// exit

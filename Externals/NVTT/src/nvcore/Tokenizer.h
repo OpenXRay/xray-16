@@ -3,10 +3,10 @@
 #ifndef NV_CORE_TOKENIZER_H
 #define NV_CORE_TOKENIZER_H
 
-#include <nvcore.h>
-#include <Stream.h>
-#include <TextReader.h>
-#include <StrLib.h>
+#include <nvcore/nvcore.h>
+#include <nvcore/Stream.h>
+#include <nvcore/TextReader.h>
+#include <nvcore/StrLib.h>
 
 namespace nv
 {

@@ -3,8 +3,8 @@
 #ifndef NV_MATH_MONTECARLO_H
 #define NV_MATH_MONTECARLO_H
 
-#include <Vector.h>
-#include <Random.h>
+#include <nvmath/Vector.h>
+#include <nvmath/Random.h>
 
 namespace nv
 {

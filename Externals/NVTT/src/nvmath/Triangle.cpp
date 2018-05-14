@@ -1,11 +1,11 @@
-// This code is in the public domain -- Ignacio Castaï¿½o <castanyo@yahoo.es>
+// This code is in the public domain -- Ignacio Castaño <castanyo@yahoo.es>
 
-#include <Triangle.h>
+#include <nvmath/Triangle.h>
 
 using namespace nv;
 
 
-/// Tomas Mï¿½ller, barycentric ray-triangle test.
+/// Tomas Möller, barycentric ray-triangle test.
 bool rayTest_Moller(const Triangle & t, Vector3::Arg orig, Vector3::Arg dir, float * out_t, float * out_u, float * out_v)
 {
 	// find vectors for two edges sharing vert0 

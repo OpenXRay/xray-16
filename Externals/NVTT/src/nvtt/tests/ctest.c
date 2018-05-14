@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-#include <nvtt_wrapper.h>
+#include <nvtt/nvtt_wrapper.h>
 
 
 int main(void)

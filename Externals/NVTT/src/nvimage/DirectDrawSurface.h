@@ -24,7 +24,7 @@
 #ifndef NV_IMAGE_DIRECTDRAWSURFACE_H
 #define NV_IMAGE_DIRECTDRAWSURFACE_H
 
-#include <nvimage.h>
+#include <nvimage/nvimage.h>
 
 namespace nv
 {

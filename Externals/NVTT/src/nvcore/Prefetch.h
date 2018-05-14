@@ -3,7 +3,7 @@
 #ifndef NV_CORE_PREFETCH_H
 #define NV_CORE_PREFETCH_H
 
-#include <nvcore.h>
+#include <nvcore/nvcore.h>
 
 // nvPrefetch
 #if NV_CC_GNUC

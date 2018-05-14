@@ -1,11 +1,11 @@
-// This code is in the public domain -- Ignacio Castaï¿½o <castanyo@yahoo.es>
+// This code is in the public domain -- Ignacio Castaño <castanyo@yahoo.es>
 
 #ifndef NV_MATH_TRIANGLE_H
 #define NV_MATH_TRIANGLE_H
 
-#include <nvmath.h>
-#include <Vector.h>
-#include <Box.h>
+#include <nvmath/nvmath.h>
+#include <nvmath/Vector.h>
+#include <nvmath/Box.h>
 
 namespace nv
 {
@@ -44,7 +44,7 @@ namespace nv
 	};
 
 
-	// Tomas Akenine-Mï¿½ller box-triangle test.
+	// Tomas Akenine-Möller box-triangle test.
 	NVMATH_API bool triBoxOverlap(Vector3::Arg boxcenter, Vector3::Arg boxhalfsize, const Triangle & triangle);
 	NVMATH_API bool triBoxOverlapNoBounds(Vector3::Arg boxcenter, Vector3::Arg boxhalfsize, const Triangle & triangle);
 

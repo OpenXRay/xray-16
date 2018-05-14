@@ -3,7 +3,7 @@
 #ifndef NV_CORE_MEMORY_H
 #define NV_CORE_MEMORY_H
 
-#include <nvcore.h>
+#include <nvcore/nvcore.h>
 
 #include <stdlib.h> // malloc(), realloc() and free()
 #include <stddef.h>	// size_t

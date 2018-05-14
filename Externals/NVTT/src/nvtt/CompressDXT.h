@@ -24,7 +24,7 @@
 #ifndef NV_TT_COMPRESSDXT_H
 #define NV_TT_COMPRESSDXT_H
 
-#include <nvimage.h>
+#include <nvimage/nvimage.h>
 #include "nvtt.h"
 
 namespace nv

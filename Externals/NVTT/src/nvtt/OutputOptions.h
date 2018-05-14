@@ -24,8 +24,8 @@
 #ifndef NV_TT_OUTPUTOPTIONS_H
 #define NV_TT_OUTPUTOPTIONS_H
 
-#include <StrLib.h>
-#include <StdStream.h>
+#include <nvcore/StrLib.h>
+#include <nvcore/StdStream.h>
 #include "nvtt.h"
 
 namespace nvtt

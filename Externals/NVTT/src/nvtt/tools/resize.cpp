@@ -21,19 +21,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <Ptr.h>
-#include <StrLib.h>
-#include <StdStream.h>
-#include <Containers.h>
+#include <nvcore/Ptr.h>
+#include <nvcore/StrLib.h>
+#include <nvcore/StdStream.h>
+#include <nvcore/Containers.h>
 
-#include <Image.h>
-#include <ImageIO.h>
-#include <FloatImage.h>
-#include <Filter.h>
-#include <DirectDrawSurface.h>
+#include <nvimage/Image.h>
+#include <nvimage/ImageIO.h>
+#include <nvimage/FloatImage.h>
+#include <nvimage/Filter.h>
+#include <nvimage/DirectDrawSurface.h>
 
-#include <Color.h>
-#include <Vector.h>
+#include <nvmath/Color.h>
+#include <nvmath/Vector.h>
 
 #include <math.h>
 

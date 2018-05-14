@@ -3,8 +3,8 @@
 #ifndef NV_MATH_QUATERNION_H
 #define NV_MATH_QUATERNION_H
 
-#include <nvmath.h>
-#include <Vector.h>
+#include <nvmath/nvmath.h>
+#include <nvmath/Vector.h>
 
 namespace nv
 {

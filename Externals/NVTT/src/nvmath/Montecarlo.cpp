@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <Montecarlo.h>
+#include <nvmath/Montecarlo.h>
 
 using namespace nv;
 

@@ -21,16 +21,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <Debug.h>
-#include <Containers.h>
-#include <Color.h>
-#include <Image.h>
-#include <ColorBlock.h>
-#include <BlockDXT.h>
-#include <CompressionOptions.h>
-#include <OutputOptions.h>
-#include <QuickCompressDXT.h>
-#include <OptimalCompressDXT.h>
+#include <nvcore/Debug.h>
+#include <nvcore/Containers.h>
+#include <nvmath/Color.h>
+#include <nvimage/Image.h>
+#include <nvimage/ColorBlock.h>
+#include <nvimage/BlockDXT.h>
+#include <nvtt/CompressionOptions.h>
+#include <nvtt/OutputOptions.h>
+#include <nvtt/QuickCompressDXT.h>
+#include <nvtt/OptimalCompressDXT.h>
 
 #include "CudaCompressDXT.h"
 #include "CudaUtils.h"

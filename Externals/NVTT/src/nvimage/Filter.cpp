@@ -35,8 +35,8 @@
 
 #include "Filter.h"
 
-#include <Vector.h>	// Vector4
-#include <Containers.h>	// swap
+#include <nvmath/Vector.h>	// Vector4
+#include <nvcore/Containers.h>	// swap
 
 using namespace nv;
 
