@@ -13,9 +13,9 @@
 
 #include "xrCore/FTimer.h"
 #include "Stats.h"
+#include "xrCommon/xr_list.h"
 #include "xrCore/Threading/Event.hpp"
 #include "xrCore/fastdelegate.h"
-#include "xrCommon/xr_list.h"
 #include "xrCore/ModuleLookup.hpp"
 
 #define VIEWPORT_NEAR 0.2f
@@ -25,7 +25,6 @@
 #include "Include/editor/interfaces.hpp"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
-
 
 class engine_impl;
 

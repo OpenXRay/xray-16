@@ -469,7 +469,7 @@ void CRender::Calculate()
         PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
-        // Determine visibility for static geometry hierrarhy
+        // Determine visibility for static geometry hierarchy
         if (psDeviceFlags.test(rsDrawStatic))
         {
             for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
@@ -645,7 +645,7 @@ void CRender::Render()
     r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
     HOM.Disable();
-    L_Dynamic->render(0); // addititional light sources
+    L_Dynamic->render(0); // additional light sources
     if (Wallmarks)
     {
         g_r = 0;
