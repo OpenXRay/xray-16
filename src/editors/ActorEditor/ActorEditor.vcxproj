@@ -65,7 +65,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Splash.cpp" />
     <ClCompile Include="stdafx.cpp">
-        <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TopBar.cpp" />
     <ClCompile Include="UI_ActorMain.cpp" />

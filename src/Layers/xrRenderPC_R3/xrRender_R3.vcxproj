@@ -30,7 +30,6 @@
     <ProjectGuid>{3F383D3C-FCD8-4170-990B-EB4833F09248}</ProjectGuid>
     <RootNamespace>xrRender_R3</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
