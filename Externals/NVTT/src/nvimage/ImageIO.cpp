@@ -1,13 +1,13 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <Ptr.h>
-#include <Containers.h>
-#include <StrLib.h>
-#include <StdStream.h>
+#include <nvcore/Ptr.h>
+#include <nvcore/Containers.h>
+#include <nvcore/StrLib.h>
+#include <nvcore/StdStream.h>
 
-#include <TextWriter.h>
+#include <nvcore/TextWriter.h>
 
-#include <Color.h>
+#include <nvmath/Color.h>
 
 #include "ImageIO.h"
 #include "Image.h"
@@ -135,7 +135,7 @@ FloatImage * nv::ImageIO::loadFloat(const char * fileName)
 	StdInputStream stream(fileName);
 	
 	if (stream.isError()) {
-		return NULL;
+		return false;
 	}
 	
 	return loadFloat(fileName, stream);
@@ -233,7 +233,7 @@ Image * nv::ImageIO::loadTGA(Stream & s)
 		case TGA_TYPE_INDEXED:
 			if( tga.colormap_type!=1 || tga.colormap_size!=24 || tga.colormap_length>256 ) {
 				nvDebug( "*** ImageIO::loadTGA: Error, only 24bit paletted images are supported.\n" );
-				return NULL;
+				return false;
 			}
 			pal = true;
 			break;
@@ -254,7 +254,7 @@ Image * nv::ImageIO::loadTGA(Stream & s)
 
 		default:
 			nvDebug( "*** ImageIO::loadTGA: Error, unsupported image type.\n" );
-			return NULL;
+			return false;
 	}
 
 	const uint pixel_size = (tga.pixel_size/8);

@@ -21,15 +21,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <Debug.h>
-#include <Containers.h> // max
-#include <StdStream.h>
+#include <nvcore/Debug.h>
+#include <nvcore/Containers.h> // max
+#include <nvcore/StdStream.h>
 
-#include <DirectDrawSurface.h>
-#include <ColorBlock.h>
-#include <Image.h>
-#include <BlockDXT.h>
-#include <PixelFormat.h>
+#include <nvimage/DirectDrawSurface.h>
+#include <nvimage/ColorBlock.h>
+#include <nvimage/Image.h>
+#include <nvimage/BlockDXT.h>
+#include <nvimage/PixelFormat.h>
 
 #include <string.h> // memset
 

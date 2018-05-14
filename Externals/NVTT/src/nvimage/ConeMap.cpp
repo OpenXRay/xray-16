@@ -21,14 +21,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <Ptr.h>
+#include <nvcore/Ptr.h>
 
-#include <Color.h>
+#include <nvmath/Color.h>
 
-#include <NormalMap.h>
-#include <Filter.h>
-#include <FloatImage.h>
-#include <Image.h>
+#include <nvimage/NormalMap.h>
+#include <nvimage/Filter.h>
+#include <nvimage/FloatImage.h>
+#include <nvimage/Image.h>
 
 using namespace nv;
 

@@ -3,8 +3,8 @@
 #ifndef NV_MATH_COLOR_H
 #define NV_MATH_COLOR_H
 
-#include <Debug.h>
-#include <Vector.h>
+#include <nvcore/Debug.h>
+#include <nvmath/Vector.h>
 
 namespace nv
 {

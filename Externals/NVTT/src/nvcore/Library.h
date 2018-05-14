@@ -3,7 +3,7 @@
 #ifndef NV_CORE_LIBRARY_H
 #define NV_CORE_LIBRARY_H
 
-#include <nvcore.h>
+#include <nvcore/nvcore.h>
 
 #if NV_OS_WIN32
 #define LIBRARY_NAME(name)	#name ".dll"

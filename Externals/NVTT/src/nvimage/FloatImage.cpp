@@ -4,11 +4,11 @@
 #include "Filter.h"
 #include "Image.h"
 
-#include <Color.h>
-#include <Matrix.h>
+#include <nvmath/Color.h>
+#include <nvmath/Matrix.h>
 
-#include <Containers.h>
-#include <Ptr.h>
+#include <nvcore/Containers.h>
+#include <nvcore/Ptr.h>
 
 #include <math.h>
 

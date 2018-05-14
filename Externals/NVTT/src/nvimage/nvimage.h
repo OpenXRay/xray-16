@@ -3,7 +3,7 @@
 #ifndef NV_IMAGE_H
 #define NV_IMAGE_H
 
-#include <nvcore.h>
+#include <nvcore/nvcore.h>
 
 // Function linkage
 #if NVIMAGE_SHARED

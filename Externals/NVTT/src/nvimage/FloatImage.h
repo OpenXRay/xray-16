@@ -3,12 +3,12 @@
 #ifndef NV_IMAGE_FLOATIMAGE_H
 #define NV_IMAGE_FLOATIMAGE_H
 
-#include <nvimage.h>
+#include <nvimage/nvimage.h>
 
-#include <Vector.h>
+#include <nvmath/Vector.h>
 
-#include <Debug.h>
-#include <Containers.h> // clamp
+#include <nvcore/Debug.h>
+#include <nvcore/Containers.h> // clamp
 
 #include <stdlib.h> // abs
 

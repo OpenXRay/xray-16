@@ -8,6 +8,7 @@ bin_plugs/
 intermediate/
 intermediate_plugs/
 lib/
+src/Externals/
 *.aps
 *.user
 *.PVS-Studio.*

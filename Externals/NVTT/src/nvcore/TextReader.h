@@ -3,9 +3,9 @@
 #ifndef NVCORE_TEXTREADER_H
 #define NVCORE_TEXTREADER_H
 
-#include <nvcore.h>
-#include <Stream.h>
-#include <Containers.h>
+#include <nvcore/nvcore.h>
+#include <nvcore/Stream.h>
+#include <nvcore/Containers.h>
 
 namespace nv
 {

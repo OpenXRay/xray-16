@@ -12,13 +12,13 @@ http://www.efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
 @@ This code needs to be reviewed, I'm not sure it's correct.
 */
 
-#include <Quantize.h>
-#include <Image.h>
-#include <PixelFormat.h>
+#include <nvimage/Quantize.h>
+#include <nvimage/Image.h>
+#include <nvimage/PixelFormat.h>
 
-#include <Color.h>
+#include <nvmath/Color.h>
 
-#include <Containers.h> // swap
+#include <nvcore/Containers.h> // swap
 
 
 using namespace nv;

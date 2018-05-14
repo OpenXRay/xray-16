@@ -3,8 +3,8 @@
 #ifndef NV_MATH_H
 #define NV_MATH_H
 
-#include <nvcore.h>
-#include <Debug.h>
+#include <nvcore/nvcore.h>
+#include <nvcore/Debug.h>
 
 #include <math.h>
 

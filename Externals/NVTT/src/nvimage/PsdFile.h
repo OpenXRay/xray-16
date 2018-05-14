@@ -3,7 +3,7 @@
 #ifndef NV_IMAGE_PSDFILE_H
 #define NV_IMAGE_PSDFILE_H
 
-#include <Stream.h>
+#include <nvcore/Stream.h>
 
 namespace nv
 {

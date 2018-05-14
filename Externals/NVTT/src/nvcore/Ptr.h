@@ -3,8 +3,8 @@
 #ifndef NV_CORE_PTR_H
 #define NV_CORE_PTR_H
 
-#include <nvcore.h>
-#include <Debug.h>
+#include <nvcore/nvcore.h>
+#include <nvcore/Debug.h>
 
 #include <stdio.h>	// NULL
 

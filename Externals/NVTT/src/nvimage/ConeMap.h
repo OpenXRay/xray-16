@@ -24,8 +24,8 @@
 #ifndef NV_IMAGE_CONEMAP_H
 #define NV_IMAGE_CONEMAP_H
 
-#include <Vector.h>
-#include <nvimage.h>
+#include <nvmath/Vector.h>
+#include <nvimage/nvimage.h>
 
 namespace nv
 {

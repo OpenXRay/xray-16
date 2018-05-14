@@ -1,7 +1,7 @@
 #ifndef NV_STDSTREAM_H
 #define NV_STDSTREAM_H
 
-#include <Stream.h>
+#include <nvcore/Stream.h>
 
 #include <stdio.h> // fopen
 #include <string.h> // memcpy

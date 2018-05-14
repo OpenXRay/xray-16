@@ -3,8 +3,8 @@
 #ifndef NV_IMAGE_FILTER_H
 #define NV_IMAGE_FILTER_H
 
-#include <nvimage.h>
-#include <Debug.h>
+#include <nvimage/nvimage.h>
+#include <nvcore/Debug.h>
 
 namespace nv
 {

@@ -1,6 +1,6 @@
 // This code is in the public domain -- Ignacio Castaño <castanyo@yahoo.es>
 
-#include <Triangle.h>
+#include <nvmath/Triangle.h>
 
 using namespace nv;
 

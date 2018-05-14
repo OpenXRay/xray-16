@@ -21,11 +21,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <Memory.h>
+#include <nvcore/Memory.h>
 
-#include <Image.h>
-#include <ColorBlock.h>
-#include <BlockDXT.h>
+#include <nvimage/Image.h>
+#include <nvimage/ColorBlock.h>
+#include <nvimage/BlockDXT.h>
 
 #include "nvtt.h"
 #include "CompressDXT.h"

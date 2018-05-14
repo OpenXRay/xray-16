@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <StrLib.h>
+#include <nvcore/StrLib.h>
 
 #include <math.h>	// log
 #include <stdio.h>	// vsnprintf

@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <Basis.h>
+#include <nvmath/Basis.h>
 
 using namespace nv;
 

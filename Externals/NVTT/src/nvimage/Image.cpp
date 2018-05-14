@@ -1,12 +1,12 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <Debug.h>
-#include <Ptr.h>
+#include <nvcore/Debug.h>
+#include <nvcore/Ptr.h>
 
-#include <Color.h>
+#include <nvmath/Color.h>
 
-#include <Image.h>
-#include <ImageIO.h>
+#include <nvimage/Image.h>
+#include <nvimage/ImageIO.h>
 
 
 using namespace nv;

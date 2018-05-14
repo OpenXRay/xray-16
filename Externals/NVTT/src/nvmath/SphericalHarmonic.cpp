@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <SphericalHarmonic.h>
+#include <nvmath/SphericalHarmonic.h>
 
 using namespace nv;
 
