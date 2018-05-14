@@ -1,5 +1,5 @@
-[submodule "Externals/LuaJIT"]
-	path = Externals/LuaJIT
+[submodule "Externals/luajit"]
+	path = Externals/luajit
 	url = https://github.com/Xottab-DUTY/LuaJIT.git
 [submodule "Externals/luabind"]
 	path = Externals/luabind
