@@ -2,12 +2,10 @@ set(SOURCES
   clsid.cpp
   cpuid.cpp
   crc32.cpp
-  doug_lea_allocator.cpp
   dump_string.cpp
-#  FileSystem.cpp
-#  FileSystem_borland.cpp
-##  FileSystem_posix.cpp
-#  file_stream_reader.cpp
+  file_stream_reader.cpp
+  FileSystem.cpp
+  FileSystem_borland.cpp
   FMesh.cpp
   FS.cpp
   FTimer.cpp
@@ -16,52 +14,81 @@ set(SOURCES
   LocatorAPI_defs.cpp
   log.cpp
   LzHuf.cpp
-  memory_allocation_stats.cpp
-  memory_monitor.cpp
-  memory_usage.cpp
+  lzo_compressor.cpp
   Model.cpp
+  ModuleLookup.cpp
   NET_utils.cpp
   os_clipboard.cpp
   ppmd_compressor.cpp
   stdafx.cpp
-#  stream_reader.cpp
+  stream_reader.cpp
   string_concatenations.cpp
+  xr_ini.cpp
+  xr_shared.cpp
+  xr_token.cpp
+  xr_trims.cpp
   xrCore.cpp
-  ModuleLookup.cpp
   xrDebug.cpp
   xrMemory.cpp
-#  xrMemory_align.cpp
-  xrMemory_debug.cpp
-  xrMemory_POOL.cpp
-#  xrMemory_subst_borland.cpp
-#  xrMemory_subst_msvc.cpp
-##  xrMemory_subst_posix.cpp
   xrsharedmem.cpp
   xrstring.cpp
-  Xr_ini.cpp
-  xr_shared.cpp
-  xr_trims.cpp
   _compressed_normal.cpp
   _math.cpp
   _sphere.cpp
   _std_extensions.cpp
+#  clsid.cpp
+#  cpuid.cpp
+#  crc32.cpp
+#  doug_lea_allocator.cpp
+#  dump_string.cpp
+#  FMesh.cpp
+#  FS.cpp
+#  FTimer.cpp
+#  LocatorAPI.cpp
+#  LocatorAPI_auth.cpp
+#  LocatorAPI_defs.cpp
+#  log.cpp
+#  LzHuf.cpp
+#  memory_allocation_stats.cpp
+#  memory_monitor.cpp
+#  memory_usage.cpp
+#  Model.cpp
+#  NET_utils.cpp
+#  os_clipboard.cpp
+#  ppmd_compressor.cpp
+#  stdafx.cpp
+#  string_concatenations.cpp
+#  xrCore.cpp
+#  ModuleLookup.cpp
+#  xrDebug.cpp
+#  xrMemory.cpp
+#  xrMemory_debug.cpp
+#  xrMemory_POOL.cpp
+#  xrsharedmem.cpp
+#  xrstring.cpp
+#  Xr_ini.cpp
+#  xr_shared.cpp
+#  xr_trims.cpp
+#  _compressed_normal.cpp
+#  _math.cpp
+#  _sphere.cpp
+#  _std_extensions.cpp
 )
 
 set(HEADERS
   buffer_vector.h
   buffer_vector_inline.h
   cdecl_cast.hpp
+  client_id.h
   clsid.h
   Coder.hpp
   compression_ppmd_stream.h
   compression_ppmd_stream_inline.h
   cpuid.h
-  doug_lea_allocator.h
   dump_string.h
   fastdelegate.h
   file_stream_reader.h
-  FixedMap.h
-  FixedSet.h
+  FileSystem.h
   FixedVector.h
   FMesh.hpp
   FS.h
@@ -69,18 +96,18 @@ set(HEADERS
   FS_internal.h
   FTimer.h
   intrusive_ptr.h
-  intrusive_ptr_inline.h
   LocatorAPI.h
   LocatorAPI_defs.h
   log.h
   lzhuf.h
-  memory_allocator_options.h
-  memory_monitor.h
+  lzo_compressor.h
+  math_constants.h
+  ModuleLookup.hpp
   net_utils.h
   os_clipboard.h
   PPMd.h
-  PPMdType.h
   ppmd_compressor.h
+  PPMdType.h
   resource.h
   stdafx.h
   Stream_Reader.h
@@ -89,24 +116,21 @@ set(HEADERS
   string_concatenations_inline.h
   SubAlloc.hpp
   vector.h
-  xrCore.h
-  ModuleLookup.hpp
-  xrDebug.h
-  xrDebug_macros.h
-  xrMemory.h
-  xrMemory_align.h
-  xrMemory_POOL.h
-  xrMemory_pure.h
-# xrMemory_subst_borland.h
-# xrMemory_subst_msvc.h
-##  xrMemory_subst_posix.h
-  xrPool.h
-  xrsharedmem.h
-  xrstring.h
   xr_ini.h
   xr_resource.h
   xr_shared.h
+  xr_shortcut.h
+  xr_token.h
   xr_trims.h
+  xr_vector_defs.h
+  xrCore.h
+  xrCore_benchmark_macros.h
+  xrDebug.h
+  xrDebug_macros.h
+  xrMemory.h
+  xrPool.h
+  xrsharedmem.h
+  xrstring.h
   _bitwise.h
   _color.h
   _compressed_normal.h
@@ -166,7 +190,6 @@ set(CONTAINERS_HEADER
 )
 
 set(CRYPTO_SOURCES
-  Crypto/crypto.cpp
   Crypto/xr_dsa.cpp
   Crypto/xr_dsa_signer.cpp
   Crypto/xr_dsa_verifyer.cpp
@@ -174,7 +197,6 @@ set(CRYPTO_SOURCES
 )
 
 set(CRYPTO_HEADERS
-  Crypto/crypto.h
   Crypto/xr_dsa.h
   Crypto/xr_dsa_signer.h
   Crypto/xr_dsa_verifyer.h
@@ -264,16 +286,10 @@ set(THREADING_HEADERS
 )
 
 set(XML_SOURCES
-  XML/tinystr.cpp
-  XML/tinyxml.cpp
-  XML/tinyxmlerror.cpp
-  XML/tinyxmlparser.cpp
   XML/XMLDocument.cpp
 )
 
 set(XML_HEADERS
-  XML/tinystr.h
-  XML/tinyxml.h
   XML/XMLDocument.hpp
 )
 
