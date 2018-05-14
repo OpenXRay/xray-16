@@ -3,8 +3,8 @@
 #ifndef NV_CORE_BITARRAY_H
 #define NV_CORE_BITARRAY_H
 
-#include <nvcore.h>
-#include <Containers.h>
+#include <nvcore/nvcore.h>
+#include <nvcore/Containers.h>
 
 namespace nv
 {
