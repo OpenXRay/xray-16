@@ -6,12 +6,12 @@ image:
 - Visual Studio 2017
 - Previous Visual Studio 2017
 configuration:
-- Debug
 - Release
 - Mixed
+- Debug
 platform:
-- x64
 - x86
+- x64
 before_build:
 - cmd: git submodule update --init --recursive
 build:
