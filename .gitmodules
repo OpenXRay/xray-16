@@ -1,6 +1,6 @@
 [submodule "Externals/luajit"]
 	path = Externals/luajit
-	url = https://github.com/vincent-t/LuaJIT.git
+	url = https://github.com/q4a/LuaJIT.git
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/Xottab-DUTY/luabind-deboostified.git
