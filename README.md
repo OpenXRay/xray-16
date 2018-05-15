@@ -14,18 +14,11 @@ Build instructions (Windows): [doc/howto/build.txt](doc/howto/build.txt)
 Build instructions (Linux): [doc/howto/build-linux.txt](doc/howto/build-linux.txt)
 
 Current status (Linux):
-[ 66%] Building CXX object Externals/cximage/CMakeFiles/cximage.dir/ximaenc.cpp.o
-In file included from /home/1/xray-16/Externals/cximage/ximage.h:57:0,
-                 from /home/1/xray-16/Externals/cximage/ximaenc.cpp:6:
-/home/1/xray-16/Externals/cximage/xiofile.h:21:12: error: ‘LPCTSTR’ has not been declared
-  bool Open(LPCTSTR filename, LPCTSTR mode)
-
-Old status (Linux):
 Build Failed:
-[ 82%] Building CXX object xrCore/CMakeFiles/xrCore.dir/clsid.cpp.o
-xray-16/src/xrCore/_types.h:14:24: error: expected initializer before ?s64?
- typedef signed __int64 s64;
-                        ^~~
+[ 86%] Building CXX object src/xrCore/CMakeFiles/xrCore.dir/clsid.cpp.o
+xray-16/src/xrCore/_std_extensions.h:82:15: error: ?_fpclass? was not declared in this scope
+     int cls = _fpclass(double(x));
+               ^~~~~~~~
 
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).

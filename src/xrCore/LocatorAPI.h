@@ -2,7 +2,11 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
+
+#if _WIN32||_WIN64
 #include <io.h>
+#endif
+
 #pragma warning(pop)
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"

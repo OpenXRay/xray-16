@@ -44,13 +44,14 @@
 #endif // frequently in release code due to large amount of VERIFY
 
 // Our headers
+#if _WIN32||_WIN64
 #include "xrDebug.h"
+#endif
 //#include "vector.h"
 
 #include "clsid.h"
 //#include "Threading/Lock.hpp"
 #include "xrMemory.h"
-#include "xrDebug.h"
 
 //#include "_stl_extensions.h"
 #include "_std_extensions.h"

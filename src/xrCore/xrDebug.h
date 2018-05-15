@@ -6,10 +6,12 @@
 
 #include <string>
 
+#if NV_OS_WIN32
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared
 #include <DbgHelp.h>
 #pragma warning(pop)
+#endif
 
 class ErrorLocation
 {
