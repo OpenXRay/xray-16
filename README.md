@@ -18,10 +18,10 @@ Building: mkdir bin && cd bin && cmake ../src
 
 Current status (Linux):
 Build Failed:
-[ 82%] Building CXX object xrCore/CMakeFiles/xrCore.dir/clsid.cpp.o
-xray-16/src/xrCore/_types.h:14:24: error: expected initializer before ?s64?
- typedef signed __int64 s64;
-                        ^~~
+[ 86%] Building CXX object src/xrCore/CMakeFiles/xrCore.dir/clsid.cpp.o
+xray-16/src/xrCore/_std_extensions.h:82:15: error: ?_fpclass? was not declared in this scope
+     int cls = _fpclass(double(x));
+               ^~~~~~~~
 
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
