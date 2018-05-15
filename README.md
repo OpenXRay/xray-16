@@ -1,4 +1,4 @@
-X-Ray Engine 1.6 expansion [![Build status](https://ci.appveyor.com/api/projects/status/vxccu3mfu33sp04i?svg=true)](https://ci.appveyor.com/project/Xottab-DUTY/xray-16)
+X-Ray Engine 1.6 expansion [![Build status](https://ci.appveyor.com/api/projects/status/j6i53o71vu607r0c?svg=true)](https://ci.appveyor.com/project/q4arus/xray-16)
 ==========================
 
 This repository contains X-Ray Engine sources based on version 1.6.02.
