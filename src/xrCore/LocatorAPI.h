@@ -3,7 +3,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4995)
 
-#if _WIN32||_WIN64
+#if _WIN32 || _WIN64
 #include <io.h>
 #endif
 
