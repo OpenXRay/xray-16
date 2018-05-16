@@ -6,7 +6,8 @@ compiler:
 os:
 - linux
 before_script:
-  - sudo apt-get install lua5.1-dev libssl-dev libtheora-dev libogg-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+  - sudo apt-get install libegl1-mesa-dev libgles2-mesa-dev
+  - sudo apt-get install cmake lua5.1-dev libssl-dev libtheora-dev libogg-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
   - mkdir bin
   - cd bin
   - cmake ..
@@ -18,7 +19,6 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-7
-    - cmake
 branches:
   only:
   - xd_dev
