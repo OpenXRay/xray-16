@@ -1,0 +1,25 @@
+language: cpp
+sudo: required
+dist: trusty
+compiler:
+- gcc
+os:
+- linux
+script:
+- if [ $TRAVIS_OS_NAME == linux ]; then mkdir bin && cd bin && cmake .. && make fi
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-7
+    - cmake
+branches:
+  only:
+  - xd_dev
+  - "/^v\\d+\\./"
+notifications:
+  email: false
+env:
+  global:
+  - LANG="en_US.UTF-8"
