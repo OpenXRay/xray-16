@@ -5,8 +5,13 @@ compiler:
 - gcc
 os:
 - linux
+before_script:
+  - sudo apt-get install lua5.1-dev libssl-dev libtheora-dev libogg-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+  - mkdir bin
+  - cd bin
+  - cmake ..
 script:
-- if [ $TRAVIS_OS_NAME == linux ]; then mkdir bin && cd bin && cmake .. && make fi
+- if [ $TRAVIS_OS_NAME == linux ]; make; fi
 addons:
   apt:
     sources:
