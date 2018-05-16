@@ -5,8 +5,12 @@ compiler:
 - gcc
 os:
 - linux
+before_script:
+  - mkdir bin
+  - cd bin
+  - cmake ..
 script:
-- if [ $TRAVIS_OS_NAME == linux ]; then mkdir bin && cd bin && cmake .. && make fi
+- if [ $TRAVIS_OS_NAME == linux ]; make; fi
 addons:
   apt:
     sources:
