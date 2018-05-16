@@ -1,9 +1,10 @@
 [submodule "Externals/luajit"]
 	path = Externals/luajit
 	url = https://github.com/q4a/LuaJIT.git
+	branch = xray
 [submodule "Externals/luabind"]
 	path = Externals/luabind
-	url = https://github.com/Xottab-DUTY/luabind-deboostified.git
+	url = https://github.com/q4a/luabind-deboostified.git
 	branch = xray
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
