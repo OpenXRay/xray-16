@@ -1,6 +1,7 @@
-# exclude all dot files except .git files
+# exclude all dot files except .git and travis files
 .*
 !.git*
+!.travis.yml
 
 # exclude binaries and temporary files
 bin/
