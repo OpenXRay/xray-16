@@ -6,6 +6,7 @@ compiler:
 os:
 - linux
 before_script:
+  - sudo apt-get install lua5.1-dev libssl-dev libtheora-dev libogg-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
   - mkdir bin
   - cd bin
   - cmake ..
