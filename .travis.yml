@@ -12,7 +12,7 @@ before_script:
   - cd bin
   - cmake ..
 script:
-- if [ $TRAVIS_OS_NAME == linux ]; make; fi
+- if [ $TRAVIS_OS_NAME == linux ]; then make; fi
 addons:
   apt:
     sources:
