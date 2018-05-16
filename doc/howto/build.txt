@@ -2,12 +2,23 @@ TITLE: X-Ray 1.6 build and setup instructions
 
 Build:
 ------
-Currently, the only compiler supported is Visual C++ 2015. If you don't have Visual Studio yet, you can
+Currently, the only compiler supported is Visual C++ 2017. If you don't have Visual Studio yet, you can
 download and install Visual Studio 2017 Community Edition - it's absolutely free for open source projects.
 
-By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in
-the src\Externals directory.
+By default, all libraries mentioned below (except Windows SDK) are assumed to be in
+the src\Externals directory. You can download all these libraries (except Windows SDK) with compiled binaries here:
+https://drive.google.com/file/d/0B2mH6ffKfXjCMjRfRTZsVlBtUVE
 
+Windows SDK is available from Visual Studio 2017 installer. You will definitely need to install the following items:
+* Windows 8.1 SDK (or newer)
+* Visual C++ MFC for x86 and x64
+* NuGet package manager
+
+You will need following extension to save files in Visual Studio with encoding UTF-8 without BOM:
+https://marketplace.visualstudio.com/items?itemName=hbuexinxin.ForceUTF8NoBOM
+
+Libraries:
+------
 To build X-Ray Engine you'll need following libraries:
 * OpenSSL: https://www.openssl.org/source
   - Prebuilt binaries can be downloaded here: https://slproweb.com/products/Win32OpenSSL.html
@@ -24,14 +35,11 @@ To build X-Ray Engine you'll need following libraries:
 * libvorbis-1.2.3: http://xiph.org/downloads
 * Autodesk Maya 2008/2009 SDK
 * Autodesk 3DS Max 6.0 SDK
-* Windows SDK: http://www.microsoft.com/en-us/download/details.aspx?id=8279
-* DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
+* Windows SDK
+* DirectX SDK June 2010 (DOES NOT NEED ANYMORE ?): http://www.microsoft.com/en-us/download/details.aspx?id=6812
   - replace dxguid.lib with the one from Windows SDK
     (for DirectPlay GUIDs)
 XXX nitrocaster: add LuaJIT & LuaBind instructions
-
-You can download all these libraries (except Windows/DirectX SDK) with compiled binaries here:
-https://drive.google.com/file/d/0B2mH6ffKfXjCMjRfRTZsVlBtUVE
 
 Setup:
 ------
