@@ -209,7 +209,6 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
-        FS.r_close(file);
 
         if (strstr(data, "main_vs_1_1"))
         {
@@ -223,8 +222,10 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         }
 
         Msg("compiling shader %s", name);
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target,
+        HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry, c_target,
             D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, (void*&)_vs);
+
+        FS.r_close(file);
 
         if (FAILED(_hr))
         {
@@ -284,7 +285,6 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
-        FS.r_close(file);
 
         // Select target
         LPCSTR c_target = "ps_2_0";
@@ -316,8 +316,10 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         }
 
         Msg("compiling shader %s", name);
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target,
+        HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry, c_target,
             D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, (void*&)_ps);
+
+        FS.r_close(file);
 
         if (FAILED(_hr))
         {
