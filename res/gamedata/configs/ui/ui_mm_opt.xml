@@ -444,7 +444,7 @@
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_music_volume</text>
         </cap_musicvolume>
         <track_musicvolume x="175" y="36" width="235" height="16">
-            <options_item entry="snd_volume_music" group="mm_opt_sound"/>
+            <options_item entry="snd_volume_music" group="mm_opt_sound" depend="runtime"/>
         </track_musicvolume>
 
         <cap_snd_device x="15" y="63" width="135" height="24">
