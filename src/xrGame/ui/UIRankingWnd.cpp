@@ -26,13 +26,13 @@
 #include "ui_base.h"
 
 #ifdef COC_EDITION
-#   define PDA_RANKING_XML "pda_ranking.xml"
+#define PDA_RANKING_XML "pda_ranking.xml"
 #else
-#   ifdef CALLOFCHERNOBYL_RANKING
-#       define PDA_RANKING_XML "pda_ranking_coc.xml"
-#   else
-#       define PDA_RANKING_XML "pda_ranking.xml"
-#   endif
+#ifdef CALLOFCHERNOBYL_RANKING
+#define PDA_RANKING_XML "pda_ranking_coc.xml"
+#else
+#define PDA_RANKING_XML "pda_ranking.xml"
+#endif
 #endif
 
 CUIRankingWnd::CUIRankingWnd()
