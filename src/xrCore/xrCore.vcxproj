@@ -309,6 +309,7 @@
     <ClCompile Include="Debug\dxerr.cpp" />
     <ClCompile Include="Debug\MiniDump.cpp" />
     <ClCompile Include="dump_string.cpp" />
+    <ClCompile Include="FileCRC32.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="FileSystem_borland.cpp" />
     <ClCompile Include="file_stream_reader.cpp" />
@@ -446,6 +447,7 @@
     <ClInclude Include="dump_string.h" />
     <ClInclude Include="fastdelegate.h" />
     <CustomBuild Include="FileSystem.h" />
+    <ClInclude Include="FileCRC32.h" />
     <ClInclude Include="file_stream_reader.h" />
     <ClInclude Include="FixedVector.h" />
     <ClInclude Include="FMesh.hpp" />

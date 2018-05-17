@@ -352,7 +352,7 @@ class cl_entity_data : public R_constant_setup //--#SM+#--
 };
 static cl_entity_data binder_entity_data;
 
-static class cl_screen_params : public R_constant_setup
+class cl_screen_params : public R_constant_setup
 {
     Fvector4	result;
     virtual void setup(R_constant* C)

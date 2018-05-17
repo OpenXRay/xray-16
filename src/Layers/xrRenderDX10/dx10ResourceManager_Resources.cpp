@@ -176,7 +176,6 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
-        FS.r_close(file);
 
         // Select target
         LPCSTR c_target = "vs_2_0";
@@ -198,7 +197,9 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         }
 
         HRESULT const _hr = GEnv.Render->shader_compile(
-            name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
+            name, file, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
+
+        FS.r_close(file);
 
         VERIFY(SUCCEEDED(_hr));
 
@@ -300,7 +301,6 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
-        FS.r_close(file);
 
         // Select target
         LPCSTR c_target = "ps_2_0";
@@ -332,7 +332,9 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         }
 
         HRESULT const _hr = GEnv.Render->shader_compile(
-            name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);
+            name, file, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);
+
+        FS.r_close(file);
 
         VERIFY(SUCCEEDED(_hr));
 
@@ -399,7 +401,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
         LPCSTR c_target = "gs_4_0";
         LPCSTR c_entry = "main";
 
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
+        HRESULT const _hr = GEnv.Render->shader_compile(name, file,
             c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs);
 
         VERIFY(SUCCEEDED(_hr));

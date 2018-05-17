@@ -306,6 +306,9 @@
     <ClCompile Include="Threading\ScopeLock.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
+    <ClCompile Include="FileCRC32.cpp">
+      <Filter>FS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -674,6 +677,9 @@
     <ClInclude Include="Threading\ScopeLock.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
+    <ClInclude Include="FileCRC32.h">
+      <Filter>FS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">
@@ -689,5 +695,8 @@
     <None Include="Debug\DXTrace.inl">
       <Filter>Debug core\DxErr</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

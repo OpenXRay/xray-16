@@ -283,8 +283,8 @@ public:
     virtual void level_Unload();
 
     ID3DBaseTexture* texture_load(LPCSTR fname, u32& msize, bool bStaging = false);
-    virtual HRESULT shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
-        LPCSTR pTarget, DWORD Flags, void*& result);
+    virtual HRESULT shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags,
+        void*& result);
 
     // Information
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
