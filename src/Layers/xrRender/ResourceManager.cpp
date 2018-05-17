@@ -348,22 +348,11 @@ void CResourceManager::DeferredUpload()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef MASTER_GOLD
-    Msg("%s, amount of textures: %d", __FUNCTION__, m_textures.size());
-
-    CTimer timer;
-    timer.Start();
-#endif
-
 #ifndef USE_OGL
     tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
 #else
     for (auto& texture : m_textures)
         texture.second->Load();
-#endif
-
-#ifndef MASTER_GOLD
-    Msg("%s, texture loading time: %d ms", __FUNCTION__, timer.GetElapsed_ms());
 #endif
 }
 /*
