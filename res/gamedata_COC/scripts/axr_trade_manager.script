@@ -131,7 +131,7 @@ function npc_trade_buy_sell(npc)
 					--printf("trading %s",sec)
 					-- npc_statistic
 					if (se_obj) then 
-						local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
+						local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 						if (m_data) then
 							m_data.items_sold = m_data.items_sold and m_data.items_sold + 1 or 1
 						end

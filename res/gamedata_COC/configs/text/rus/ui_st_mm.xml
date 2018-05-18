@@ -31,13 +31,13 @@
 		<text>ТИП ИГРЫ</text>
 	</string>
 	<string id="gd_master">
-		<text>реально</text>
+		<text>мастер</text>
 	</string>
 	<string id="gd_novice">
-		<text>легко</text>
+		<text>новичок</text>
 	</string>
 	<string id="gd_veteran">
-		<text>трудно</text>
+		<text>ветеран</text>
 	</string>
 	<string id="icon">
 		<text>ЗНАЧКИ</text>
@@ -46,22 +46,22 @@
 		<text>КАРТА</text>
 	</string>
 	<string id="renderer_r1">
-		<text>Статичное освещение DX8</text>
+		<text>Статичное освещение</text>
 	</string>
 	<string id="renderer_r2a">
-		<text>Динамическое освещение DX9</text>
+		<text>Динам. освещение объектов</text>
 	</string>
 	<string id="renderer_r2">
-		<text>Полное динам.освещение DX9</text>
+		<text>Полное динамич. освещение</text>
 	</string>
 	<string id="renderer_r2.5">
-		<text>Улучш.динамич.освещение DX9</text>
+		<text>Улучш. полное освещение</text>
 	</string>
 	<string id="renderer_r3">
-		<text>Улуч.динамич.освещение DX10</text>
+		<text>Ул. полное освещение (DX10)</text>
 	</string>
 	<string id="renderer_r4">
-		<text>Улуч.динамич.освещение DX11</text>
+		<text>Ул. полное освещение (DX11)</text>
 	</string>
 	<string id="st_opt_high">
 		<text>высоко</text>
@@ -196,7 +196,7 @@
 		<text>Выйти из профиля</text>
 	</string>
 	<string id="ui_mm_master">
-		<text>Реально</text>
+		<text>Мастер</text>
 	</string>
 	<string id="ui_mm_master_volume">
 		<text>Громкость</text>
@@ -229,7 +229,7 @@
 		<text>Новая игра</text>
 	</string>
 	<string id="ui_mm_novice">
-		<text>Легко</text>
+		<text>Новичок</text>
 	</string>
 	<string id="ui_mm_npc_torch">
 		<text>Свет фонариков NPC</text>
@@ -337,7 +337,7 @@
 		<text>Качество звука</text>
 	</string>
 	<string id="ui_mm_stalker">
-		<text>Нормально</text>
+		<text>Сталкер</text>
 	</string>
 	<string id="ui_mm_sun_quality">
 		<text>Качество теней</text>
@@ -358,7 +358,7 @@
 		<text>Распознавание NPC</text>
 	</string>
 	<string id="ui_mm_veteran">
-		<text>Трудно</text>
+		<text>Ветеран</text>
 	</string>
 	<string id="ui_mm_video">
 		<text>Видео</text>
@@ -412,7 +412,7 @@
 		<text>Вкл. интерфейс</text>
 	</string>
 	<string id="gd_stalker">
-		<text>нормально</text>
+		<text>сталкер</text>
 	</string>
 	<string id="st_opt_extreme">
 		<text>макс. высоко</text>
@@ -425,7 +425,7 @@
 		<text>Тесселяция</text>
 	</string>
 	<string id="ui_mm_confirm_changes">
-		<text>Применить совершённые изменения? Все изменения будут отменены через</text>
+		<text>Применить совершенные изменения? Все изменения будут отменены через</text>
 	</string>
 	<string id="st_cap_check_story">
 		<text>Тайна Зоны</text>
@@ -439,11 +439,14 @@
 	<string id="st_cap_check_azazel_mode">
 		<text>Жизнь после жизни</text>
 	</string>
+	<string id="st_cap_check_hardcore_aim">
+		<text>Меткие НПС</text>
+	</string>
 	<string id="ui_mm_debug_hud">
 		<text>Debug Hud</text>
 	</string>
 	<string id="ui_mm_debug_map_hud">
-		<text>Debug режим глоб.карты</text>
+		<text>Debug HUD Mapspots</text>
 	</string>
 	<string id="ui_mm_radio_mod">
 		<text>Музыка радио</text>
@@ -461,7 +464,7 @@
 		<text>Спаун вертолёта</text>
 	</string>
 	<string id="ui_mm_ai_die_in_anomaly">
-		<text>НПС гибнут в аномалиях</text>
+		<text>Смерть НПС в аномалиях</text>
 	</string>
 	<string id="ui_mm_dynamic_news">
 		<text>Динамические новости</text>
@@ -485,7 +488,7 @@
 		<text>Данные о противнике</text>
 	</string>
 	<string id="ui_mm_quicksave_cnt">
-		<text>Быстрые сохранения</text>
+		<text>Быстрое сохранение</text>
 	</string>
 	<string id="ui_mm_actor_hud">
 		<text>Динамический HUD</text>
@@ -522,20 +525,5 @@
 	</string>
 	<string id="ui_mm_cod_pickup_mode">
 		<text>Автоподбор лута</text>
-	</string>
-	<string id="ui_mm_invert_zoom">
-		<text>Инвертировать зум</text>
-	</string>
-	<string id="ui_mm_detail_scale">
-		<text>Прорисовка травы</text>
-	</string>
-	<string id="ui_mm_enhanced_recoil">
-		<text>Усиленная отдача</text>
-	</string>
-	<string id="eng">
-		<text>English</text>
-	</string>
-	<string id="rus">
-		<text>Русский</text>
 	</string>
 </string_table>

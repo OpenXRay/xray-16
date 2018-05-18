@@ -43,20 +43,17 @@ hit_fraction_monster = 1
 ;------------------------------------------------------------------------
 
 fire_max_distance			=	0
-fire_max_power				=	0
+fire_max_power				=	0.1
 fire_linear_factor			=	1
 fire_quadratic_factor		=	1
 pp_effector_name			= 	postprocess_thermal
-pp_highest_at				= 	0.2
+pp_highest_at				= 	0.02
 
 
-psy_max_distance			=	50
-psy_max_power				=	0.1
-psy_linear_factor			=	1
+psy_max_distance			=	0
+psy_max_power				=	5
+psy_linear_factor			=	0.05
 psy_quadratic_factor		=	0
-psy_sound					=	
-psy_pp_effector_name		= 	psy_antenna
-psy_pp_highest_at			= 	0.1
 
 radiation_max_distance		=	0
 radiation_max_power			=	0.02
@@ -96,8 +93,8 @@ ph_skel_shot_up_factor        = 0.25
 Velocity_Stand			= 0,		5.0,			5.0,		0.2,	0.5
 Velocity_WalkFwdNormal	= 1.7,		2.0,			2.0,		0.2,	2.0
 Velocity_WalkFwdDamaged	= 1.5,		3.0,			3.0,		0.8,	2.0
-Velocity_RunFwdNormal	= 4.5,		3.0,			3.0,		0.4,	1.0
-Velocity_RunFwdDamaged	= 3.0,  	3.2,			3.2,		0.4,	1
+Velocity_RunFwdNormal	= 4.0,		3.0,			3.0,		0.4,	1.0
+Velocity_RunFwdDamaged	= 2.5,  	3.2,			3.2,		0.4,	1
 Velocity_Drag			= 0.6,		3.0,			3.0,		1,		1
 Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
 
@@ -108,7 +105,7 @@ Velocity_Invisible_Angular		= 3.5
 ; acceleration
 Accel_Generic			= 	1.5
 Accel_Calm				= 	2.5
-Accel_Aggressive		= 	7.5
+Accel_Aggressive		= 	3.0
 
 Height_Change_Velocity	=	0.5
 Height_Change_Min_Time	=	3000
@@ -169,7 +166,7 @@ eat_freq			=	5.0
 eat_slice			=	0.01
 eat_slice_weight	=	10.0
 
-satiety_threshold	= 0.5							; below this value monster feels hunger
+satiety_threshold	= 0.5							; below this value monster fill hunger
 
 ;---------------------------------------------------------
 ; Sounds and sound parameters
@@ -212,7 +209,7 @@ Morale_Stable_Speed				= 0.3
 Morale_Despondent_Threashold	= 0.5
 
 ;-------------------------------------------------------------------------
-; Other Stuff
+; Other Stuff (refactoring needed)
 ;-------------------------------------------------------------------------
 DamagedThreshold		= 0.4
 
@@ -403,18 +400,18 @@ immunities_sect		= poltergeist_tele_immunities
 Tele_Fly_Time					= 0.30
 Tele_Fly_Velocity				= 30
 
-Tele_Find_Radius				= 50
-Tele_Object_Min_Mass			= 10
+Tele_Find_Radius				= 30
+Tele_Object_Min_Mass			= 20
 Tele_Object_Max_Mass			= 5000
-Tele_Object_Count				= 4
-Tele_Hold_Time					= 1000
-Tele_Wait_Time					= 1000
+Tele_Object_Count				= 2
+Tele_Hold_Time					= 2000
+Tele_Wait_Time					= 4000
 Tele_Delay_Between_Objects_Time	= 1000
 Tele_Distance					= 50
-Tele_Object_Height				= 2.5
+Tele_Object_Height				= 3
 Tele_Time_Object_Keep			= 6000
 Tele_Raise_Speed				= 5
-Tele_Delay_Between_Objects_Raise_Time	= 500
+Tele_Delay_Between_Objects_Raise_Time	= 1000
 Tele_Collision_Damage				= 0.4
 
 
@@ -454,11 +451,8 @@ $spawn               = "monsters\poltergeists\poltergeist_normal_flame"
 rank					= 12
 spec_rank				= normal
 
-fire_max_distance			=	10
+fire_max_distance			=	5
 fire_max_power				=	0.1
-
-psy_max_distance			=	0
-psy_max_power				=	0
 
 detection_pp_effector_name  =	poltergeist_detection_effector
 detection_near_range_factor	=	2
@@ -482,7 +476,7 @@ flame_particles_stop	= static\monsters_fire_stop
 flame_fire_time_delay	= 1000 ;2400							; don't change - for programmers only
 flame_fire_time_play	= 6000
 flame_length			= 8.0
-flame_hit_value			= 0.3
+flame_hit_value			= 0.7
 flame_hit_delay			= 200
 flames_count			= 3
 flames_delay			= 2000	;3500	;2000
@@ -567,7 +561,7 @@ rank					= 12
 spec_rank				= normal
 
 fire_max_distance			=	0
-fire_max_power				=	0
+fire_max_power				=	0.1
 
 detection_pp_effector_name  =	poltergeist_detection_effector
 detection_near_range_factor	=	2

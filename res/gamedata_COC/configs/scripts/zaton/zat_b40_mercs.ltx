@@ -5,12 +5,12 @@ on_info =  {=fighting_actor} %+zat_b40_merc_in_combat%
 
 [camper@zat_b40_mercs_gen]
 radius = 50 
-def_state_moving = assault
+def_state_moving = sprint
 combat_ignore_cond =  false
 corpse_detection_enabled = false
 
 [walker@zat_b40_mercs_gen]
-def_state_moving = assault
+def_state_moving = sprint
 def_state_standing = hide
 
 [remark@zat_b40_danger_gen]
@@ -26,19 +26,21 @@ def_state_standing = sit_knee
 out_restr = zat_surge_hide_b40
 
 [logic@zat_b40_mercs_gen]
-suitable = true
-prior = 90
+suitable = {=npc_community(killer)} true
+prior = 200
+on_hit = hit@zat_b40_mercs_hit_gen
 
 ; logic
+
 [logic@zat_b40_guard_leader_01]:logic@zat_b40_mercs_gen
-suitable = true ;{=check_npc_name(zat_b40_merc_squad_leader_1)} true
-prior = 91
+suitable = {=check_npc_name(zat_b40_merc_squad_leader_1)} true
+prior = 300
 active = camper@zat_b40_guard_leader_01
 known_info = known_info@zat_b40_guard_leader_01
 
 [logic@zat_b40_guard_leader_02]:logic@zat_b40_mercs_gen
-suitable = true ;{=check_npc_name(zat_b40_merc_squad_leader_2)} true
-prior = 91
+suitable = {=check_npc_name(zat_b40_merc_squad_leader_2)} true
+prior = 300
 active = camper@zat_b40_guard_leader_02
 known_info = known_info@zat_b40_guard_leader_02
 

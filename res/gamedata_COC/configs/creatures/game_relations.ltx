@@ -9,7 +9,7 @@ reputation		= terrible, -1999, really_bad, -1499, very_bad, -999, bad, -499, neu
 
 rating_names		= st_rank_novice, 999, st_rank_trainee, 2999, st_rank_experienced, 5999, st_rank_professional, 9999, st_rank_veteran, 14999, st_rank_expert, 20999, st_rank_master, 27999, st_rank_legend
 reputation_names	= st_reputation_terrible, -1999, st_reputation_really_bad, -1499, st_reputation_very_bad, -999, st_reputation_bad, -499, st_reputation_neutral, 499, st_reputation_good, 999, st_reputation_very_good, 1499, st_reputation_really_good, 1999, st_reputation_excellent
-goodwill_names      = st_goodwill_enemy, -999, st_goodwill_indifferent, 999, st_goodwill_friendly
+goodwill_names      = st_goodwill_enemy, 0, st_goodwill_indifferent, 1000, st_goodwill_friendly
 
 ;пороговые значения для отношения персонажей
 attitude_neutal_threshold = -999		;когда attitude меньше значения, то выставляется ALife::eRelationEnemy
@@ -21,7 +21,7 @@ goodwill_neutal = 0
 goodwill_friend = 1000
 
 ;названия группировок (порядок должен совпадать с communities_relations)
-communities		= actor, 0, bandit, 1, dolg, 2, ecolog, 3, freedom, 4, killer, 5, army, 6, monolith, 7, monster, 8, stalker, 9, zombied, 10, csky, 11, trader, 12, actor_stalker, 13, actor_bandit, 14, actor_dolg, 15, actor_freedom, 16, actor_csky, 17, actor_ecolog, 18, actor_killer, 19, actor_army, 20, actor_monolith, 21, actor_zombied, 22, arena_enemy, 23, renegade, 24
+communities		= actor, 0, bandit, 1, dolg, 2, ecolog, 3, freedom, 4, killer, 5, army, 6, monolith, 7, monster, 8, stalker, 9, zombied, 10, csky, 11, trader, 12, actor_stalker, 13, actor_bandit, 14, actor_dolg, 15, actor_freedom, 16, actor_csky, 17, actor_ecolog, 18, actor_killer, 19, actor_army, 20, actor_monolith, 21, actor_zombied, 22, arena_enemy, 23
 
 ;	отношение персонажа к актеру (или другому NPC) вычисляется по формуле
 ;	attitude = personal_goodwill +				//личное отношение персонажа к актеру (если раньше не встречались, то 0)
@@ -32,34 +32,32 @@ communities		= actor, 0, bandit, 1, dolg, 2, ecolog, 3, freedom, 4, killer, 5, a
 ;   столбцы и строки дописывать в алфавитном порядке!
 
 [communities_relations]
-;=============================================================================================================================================================================================
-;                actor, bandi,  dolg, ecolo, freed, kille,  army, monol, monst, stalk, zombi, csky,  trade, ac_st, ac_ba, ac_do, ac_fr, ac_cs, ac_ec, ac_ki, ac_ar, ac_mo, ac_zo, arena, reneg
-;=============================================================================================================================================================================================
-actor          =     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0
-bandit         =     0,  3000, -3000, -3000,     0, -3000, -3000, -3000, -3000, -3000, -3000, -3000,     0, -1000,  1000, -1000,     0, -1000, -1000, -1000, -1000, -3000, -3000,     0,     0
-dolg           =     0, -3000,  3000,     0, -3000, -3000,     0, -3000, -3000,     0, -3000,     0,     0,     0, -1000,  1000, -3000,     0,     0, -1000,     0, -3000, -3000,     0, -3000
-ecolog         =     0, -3000,     0,  3000,     0,     0,     0, -3000, -3000,     0, -3000,     0,     0,     0, -1000,     0,     0,     0,  1000,     0,     0, -3000, -3000,     0, -3000
-freedom        =     0,     0, -3000,     0,  3000, -3000, -3000, -3000, -3000,     0, -3000, -3000,     0,     0,     0, -3000,  1000, -1000,     0, -1000, -1000, -3000, -3000,     0,     0
-killer         =     0, -3000, -3000,     0, -3000,  3000, -3000, -3000, -3000,     0, -3000,     0,     0,     0, -1000, -1000, -1000,     0,     0,  1000, -1000, -3000, -3000,     0, -3000
-army           =     0, -3000,     0,     0, -3000, -3000,  3000, -3000, -3000, -3000, -3000, -3000,     0, -1000, -1000,     0, -1000, -1000,     0, -1000,  1000, -3000, -3000,     0, -3000
-monolith       =     0, -3000, -3000, -3000, -3000, -3000, -3000,  3000, -3000, -3000,     0, -3000,     0, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,  1000,     0,     0, -3000
-monster        =     0, -3000, -3000, -3000, -3000, -3000, -3000, -3000,     0, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,     0, -3000
-stalker        =     0, -3000,     0,     0,     0,     0, -3000, -3000, -3000,     0, -3000,     0,     0,     0, -1000,     0,     0,     0,     0,     0, -1000, -3000, -3000,     0, -3000
-zombied        =     0, -3000, -3000, -3000, -3000, -3000, -3000,     0, -3000, -3000,     0, -3000,     0, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,     0,     0,     0, -3000
-csky           =     0, -3000,     0,     0, -3000,     0, -3000, -3000, -3000,     0, -3000,  3000,     0,     0, -1000,     0, -1000,  1000,     0,     0, -1000, -3000, -3000,     0, -3000
-trader         =     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0
-actor_stalker  =     0, -1000,     0,     0,     0,     0, -1000, -3000, -3000,     0, -3000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -1000
-actor_bandit   =     0,  1000, -1000, -1000,     0, -1000, -1000, -3000, -3000, -1000, -3000, -1000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000,     0
-actor_dolg     =     0, -1000,  1000,     0, -3000, -1000,     0, -3000, -3000,     0, -3000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -1000
-actor_freedom  =     0,     0, -3000,     0,  1000, -1000, -1000, -3000, -3000,     0, -3000, -1000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000,     0
-actor_csky     =     0, -1000,     0,     0, -1000,     0, -1000, -3000, -3000,     0, -3000,  1000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -1000
-actor_ecolog   =     0, -1000,     0,  1000,     0,     0,     0, -3000, -3000,     0, -3000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -1000
-actor_killer   =     0, -1000, -1000,     0, -1000,  1000, -1000, -3000, -3000,     0, -3000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -1000
-actor_army     =     0, -1000,     0,     0, -1000, -1000,     0, -3000, -3000, -1000, -3000, -1000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -1000
-actor_monolith =     0, -3000, -3000, -3000, -3000, -3000, -3000,  1000, -3000, -3000,     0, -3000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -3000
-actor_zombied  =     0, -3000, -3000, -3000, -3000, -3000, -3000,     0, -3000, -3000,     0, -3000,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -3000
-arena_enemy    =     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,     0,     0
-renegade       =     0,     0, -3000, -3000,     0, -3000, -3000, -3000, -3000, -3000, -3000, -3000,     0, -1000,     0, -1000,     0, -1000, -1000, -1000, -1000, -3000, -3000,     0,  3000
+;              |actor|bandit| dolg|ecolog|freedom|killer|    army|monolith|monster|stalker| zombied|  csky |trader| actor_stalker | actor_bandit | actor_dolg | actor_freedom | actor_csky | actor_ecolog | actor_killer | actor_army | actor_monolith | actor_zombied | arena_enemy
+;===================================================================================================================================================================================================================================================================================
+actor         =     0, -1100,	 0,     0,   	0, -2000,   -1000,   -5000,  -5000,      0,   -5000,     0,   0,			0,			0,				0,				0,			0,			0,				0,				0,				0,			-5000,			-5000
+bandit        = -1100,  5000,-5000, -1000,  	0, -5000,   -5000,   -5000,  -5000,  -1000,   -5000, -1000,   0,		-1100,		  1000,			-5000,			    0,		-1000,		-1000,			-1000,			-5000,			-5000,			-5000,				0
+dolg          =     0, -5000, 5000,     0,  -5000, -5000,       0,   -5000,  -5000,      0,   -5000,     0,   0,			0,		-5000,			  1000,			-5000,		 	0,			0,			-1000,			    0,			-5000,			-5000,				0
+ecolog        =     0, -1000,    0,  5000,  	0,     0,       0,   -5000,  -5000,      0,   -5000,     0,   0,			0,	    -1000,				0,				0,			0,		 1000,				0,				0,			-5000,			-5000,				0
+freedom       =     0, 	   0,-5000,  	0,   5000, -1000,   -5000,   -5000,  -5000,      0,   -5000, -1000,   0,			0,		    0,			-5000,			  1000,		-1000,			0,			-1000,			-5000,			-5000,			-5000,				0
+killer        = -5000, -5000,-5000,     0,  -1000,     0,   -5000,   -5000,  -5000,      0,   -5000,     0,   0,		    0,		-5000,			-5000,			-5000,		    0,			0,			 1000,			-5000,			-5000,			-5000,				0
+army      	  = -1000, -5000,    0,     0,  -5000, -5000,    1000,   -5000,  -5000,  -1000,   -5000, -1000,   0,		-1100,		-5000,				0,			-2000,		-1000,			0,			-1000,			 1000,			-5000,			-5000,				0
+monolith      = -5000, -5000,-5000, -5000,  -5000, -5000,   -5000,    1000,  -5000,  -5000,       0, -5000,   0,		-5000,		-5000,			-5000,			-5000,		-5000,		-5000,			-5000,			-5000,			 1000,			 1000,				0
+monster       = -5000, -5000,-5000, -5000,  -5000, -5000,   -5000,   -5000,      0,  -5000,   -5000, -5000,   0,		-5000,		-5000,			-5000,			-5000,		-5000,		-5000,			-5000,			-5000,			-5000,				0,				0
+stalker       =     0, -1000,    0,     0,      0, 	   0,   -1000,   -5000,  -5000,   	 0,   -5000,     0,   0,		    0,		-1000,				0,				0,			0,			0,				0,			-1000,			-5000,			-5000,				0
+zombied       = -5000, -5000,-5000, -5000,  -5000, -5000,   -5000,       0,  -5000,  -5000,    5000, -5000,   1,		-5000,		-5000,			-5000,			-5000,		-5000,		-5000,			-5000,			-5000,				0,			 1000,				0
+csky          =     0, -1000,    0,     0,  -1000,     0,   -1000,   -5000,  -5000,      0,   -5000,  5000,   0,			0,		-1000,				0,			-1000,		 1000,			0,			    0,			-1000,			-5000,			-5000,				0
+trader        =     0,     0,    0,     0,      0,     0,       0,       0,      0,      0,       0,     0,   0,			0,			0,				0,				0,			0,			0,				0,				0,				0,			-5000,				0
+actor_stalker = 	0, -1000,    0,     0,      0,     0,   -1000,   -5000,  -5000,      0,   -5000,     0,   0,			0,		 	0,				0,				0,			0,			0,				0,				0,				0,			-5000,				0
+actor_bandit  = 	0,  1000,-5000, -1000,      0, -5000,   -5000,   -5000,  -5000,  -1000,   -5000, -1000,   0,			0,		 1000,				0,				0,			0,			0,				0,				0,				0,			-5000,				0
+actor_dolg    = 	0, -5000,  1000,    0,  -5000, -5000,       0,   -5000,  -5000,      0,   -5000,     0,   0,			0,		 	0,			 1000,				0,			0,			0,				0,				0,				0,			-5000,				0
+actor_freedom = 	0,     0,-5000,     0,   1000, -1000,   -1000,   -5000,  -5000,      0,   -5000, -1000,   0,			0,		 	0,				0,			 1000,			0,			0,				0,				0,				0,			-5000,				0
+actor_csky    = 	0, -1000,    0,     0,  -1000,     0,   -1000,   -5000,  -5000,      0,   -5000,  1000,   0,			0,		 	0,				0,				0,		 1000,			0,				0,				0,				0,			-5000,				0
+actor_ecolog  = 	0, -1000,    0,  1000,  	0,     0,       0,   -5000,  -5000,      0,   -5000,     0,   0,			0,		 	0,				0,				0,			0,		 1000,				0,				0,				0,			-5000,				0
+actor_killer  = 	0, -5000,-5000,     0,  -1000,  1000,   -5000,   -5000,  -5000,      0,   -5000,     0,   0,			0,		 	0,				0,				0,			0,			0,			 1000,				0,				0,			-5000,				0
+actor_army    = 	0, -5000,	 0,     0,  -5000, -5000,    1000,   -5000,  -5000,  -1000,   -5000, -1000,   0,			0,		 	0,				0,				0,			0,			0,				0,			 1000,				0,			-5000,				0
+actor_monolith= 	0, -5000,-5000, -5000,  -5000, -5000,   -5000,    1000,  -5000,  -5000,    	  0, -5000,   0,			0,		 	0,				0,				0,			0,			0,				0,				0,			 1000,				0,				0
+actor_zombied = -5000, -5000,-5000, -5000,  -5000, -5000,   -5000,    1000,  -5000,  -5000,    1000, -5000,   0,		-5000,		-5000,			-5000,			-5000,		-5000,		-5000,			-5000,			-5000,				0,			 1000,				0
+arena_enemy   = -5000,     0,    0,     0,      0,     0,       0,       0,      0,      0,       0,     0,   0,		-5000,		-5000,			-5000,			-5000,		-5000,		-5000,			-5000,			-5000,			-5000,			-5000,				0
 
 [rank_relations]
 ;			  	novice, trainee, experienced, professional, veteran, expert, master, legend
@@ -135,7 +133,6 @@ actor_stalker	=		0.0
 actor_csky		=		0.0
 actor_zombied 	= 		0.0
 arena_enemy		=		0.0
-renegade		=		0.0
 
 
 
@@ -150,77 +147,70 @@ community_goodwill_limits			= -3000, 3000
 ;-------------------------------------------------------
 
 ;-----
-; Attacking stalkers who aren't shooting at you.
-; Engine does a check to determine the actor to target relation.
-; If target is enemy then it uses the "danger_" values, otherwise the "free_" values.
-; See relation_registry_actions.cpp at roughly around line 130 for a better understanding.
-
-; As far as I can tell the "free_enemy_" values end up not being used, and neither are any
-; of the "danger_" values for cases when the target has neutral or friendly relations.
-
-; I think they exist because it's easier to just include them than it is to add a work-around to ignore them.
-; Otherwise if it can't find the values (although unused) the engine will crash the game when reading this section.
-
-; The "danger_" values are set to -1, as I suppose if actor is trying to improve their
-; goodwill with a hostile faction it will gradually chip back into the red slightly for
-; each person in that faction that you kill.
-
-; Reputation values are implemented (I think), but CoC has its own scripted rank/rep system for this
-; sort of stuff anyway so there isn't really any point in setting them to anything.
-
-;-----
-
-free_community_member_attack_goodwill  	= -500
-free_friend_attack_goodwill				= -2000
-free_neutral_attack_goodwill			= -1000
-free_enemy_attack_goodwill				= 0
-
-free_friend_attack_reputation			= -75
-free_neutral_attack_reputation			= -50
-free_enemy_attack_reputation			= 0
-
-danger_community_member_attack_goodwill = -1
-danger_friend_attack_goodwill			= -1
-danger_neutral_attack_goodwill			= -1
-danger_enemy_attack_goodwill			= -1
-
-danger_friend_attack_reputation			= 0
-danger_neutral_attack_reputation		= 0
-danger_enemy_attack_reputation			= 0
-
-;-----
 ; Killing other stalkers.
 ;-----
 
-community_member_kill_goodwill  		= -1000
-friend_kill_goodwill					= -1000
-neutral_kill_goodwill					= -1000
-enemy_kill_goodwill						= -1
+community_member_kill_goodwill  		= -1000	; Same faction
+friend_kill_goodwill					= -1000	; Friendly
+neutral_kill_goodwill					= -1000	; Neutral
+enemy_kill_goodwill						= -1	; Enemy
 
-; These values are now set in dxr_statistics.script.
-friend_kill_reputation					= 0
-neutral_kill_reputation					= 0
-enemy_kill_reputation					= 0
+; These values are now set in xr_statistic.script.
+friend_kill_reputation					= 0	; Friendly
+neutral_kill_reputation					= 0	; Neutral
+enemy_kill_reputation					= 0	; Enemy
 
 ;-----
-; Assisting stalkers in combat against mutants.
+; Assisting stalkers in combat.
 ;-----
 
-community_member_fight_help_goodwill	= 200
-friend_fight_help_goodwill   			= 200
-neutral_fight_help_goodwill	 			= 200
-enemy_fight_help_goodwill    			= 1
+community_member_fight_help_goodwill	= 500	; Same faction
+friend_fight_help_goodwill   			= 200	; Friendly
+neutral_fight_help_goodwill	 			= 200	; Neutral
+enemy_fight_help_goodwill    			= 1		; Enemy
 
-friend_fight_help_reputation  			= 0
-neutral_fight_help_reputation 			= 0
-enemy_fight_help_reputation	  			= 0
+friend_fight_help_reputation  			= 100	; Friendly
+neutral_fight_help_reputation 			= 50	; Neutral
+enemy_fight_help_reputation	  			= 0		; Enemy
+
+;-----
+; Attacking stalkers who ARE NOT shooting at you.
+;-----
+
+free_community_member_attack_goodwill  	= -500	; Same faction
+free_friend_attack_goodwill				= -2000 ; Friendly
+free_neutral_attack_goodwill			= -1000	; Neutral
+free_enemy_attack_goodwill				= -1	; Enemy
+
+free_friend_attack_reputation			= -75	; Friendly
+free_neutral_attack_reputation			= -50	; Neutral
+free_enemy_attack_reputation			= 0		; Enemy
+
+;-----
+; Attacking stalkers who ARE shooting at you.
+; You're already fighting them so the penalties are reduced.
+; Example: You assassinate a loner and his buddies start shooting at you.
+;-----
+
+danger_community_member_attack_goodwill = -1	; Same faction
+danger_friend_attack_goodwill			= -1	; Friendly
+danger_neutral_attack_goodwill			= -1	; Neutral
+danger_enemy_attack_goodwill			= -1 	; Enemy
+
+danger_friend_attack_reputation			= 0		; Friendly
+danger_neutral_attack_reputation		= 0		; Neutral
+danger_enemy_attack_reputation			= 0		; Enemy
 
 ;--------------------------------------------------
 ;(сек) минимальное время через которое снова будет зарегистрировано
 ;сообщение об атаке на персонажа, и соответственно вычтеся attack_goodwill и attack_reputation
 ;(работает аналогично и при помощи другим персонажам в бою)
 min_attack_delta_time = 1
-fight_remember_time = 0.2
+fight_remember_time = 0.2		;(cae) a?aiy eioi?ia i?i a?aeo aoaao iiiieou ?aano?
+
+;свойства, которые изменяются у сталкеров в
+;зависимости от их ранга
+;коэффициенты линейно интерполируются для рангов от 0 (novice) до 100 (experienced)
 
 ; Section is not used by the game.
 ; However it is directly referenced in-engine.
@@ -228,12 +218,16 @@ fight_remember_time = 0.2
 [ranks_properties]
 immunities_novice_k			= 1.0
 immunities_experienced_k	= 1.0
-
 visibility_novice_k			= 1.0
 visibility_experienced_k	= 1.0
-
 dispersion_novice_k			= 1.0
-dispersion_experienced_k	= 1.0
+dispersion_experienced_k	= 0.8
+
+
+; диапазон изменения рангов при регистрации в новом смарт террейне
+[smart_terrain_rank_change]
+min = 1
+max = 2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; for monsters

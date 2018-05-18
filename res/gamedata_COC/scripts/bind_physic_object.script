@@ -149,7 +149,7 @@ function generic_physics_binder:death_callback(victim, who)
 	local ini = victim:spawn_ini()
 	if (ini and ini:section_exist("drop_box")) then
 		if (who and who:id() == 0) then 
-			dxr_statistics.increment_statistic("boxes_smashed")
+			xr_statistic.inc_counter("boxes_smashed")
 		end
 		xr_box.get_box_manager():spawn_items(victim,who,ini)
 	else
@@ -157,7 +157,7 @@ function generic_physics_binder:death_callback(victim, who)
 		local is_box = (visual == [[dynamics\box\box_metall_01]] or visual == [[dynamics\box\box_wood_01]] or visual == [[dynamics\box\box_wood_02]])
 		if (is_box) then
 			if (who and who:id() == 0) then 
-				dxr_statistics.increment_statistic("boxes_smashed")
+				xr_statistic.inc_counter("boxes_smashed")
 			end
 			if ((math.random(1,100)/100) < 0.5) then
 				xr_box.get_box_manager():spawn_items(victim,who)

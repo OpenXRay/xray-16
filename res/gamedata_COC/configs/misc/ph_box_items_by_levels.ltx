@@ -29,13 +29,13 @@ af_dummy_spring			= 0
 af_fuzz_kolobok			= 0
 
 ;Аммуниция
-ammo_9x18_fmj			= 0
+ammo_9x18_fmj			= 1
 ammo_9x18_pmm			= 0
 ammo_9x19_pbp			= 0
-ammo_9x19_fmj			= 0
+ammo_9x19_fmj			= 1
 ammo_11.43x23_hydro		= 0
 ammo_11.43x23_fmj		= 0
-ammo_12x70_buck			= 0
+ammo_12x70_buck			= 1
 ammo_12x76_zhekan		= 0
 ammo_5.45x39_ap			= 0
 ammo_5.45x39_fmj		= 0
@@ -92,9 +92,9 @@ helm_tactic				= 0
 helm_battle				= 0
 
 ;Медикаменты
-bandage					= 0
-medkit					= 0
-medkit_army				= 0
+bandage					= 1
+medkit					= 1
+medkit_army				= 1
 medkit_scientic			= 0
 antirad					= 0
 
@@ -107,42 +107,104 @@ drug_radioprotector		= 0
 drug_anabiotic			= 0
 
 ;Еда
-bread					= 0
-kolbasa					= 0
-conserva				= 0
-vodka					= 0
-energy_drink			= 0
+bread					= 1
+kolbasa					= 1
+conserva				= 1
+vodka					= 1
+energy_drink			= 1
 
 
 [k00_marsh]:default
 [jupiter]:default
+ammo_9x18_fmj			= 0
+ammo_9x18_pmm			= 1
+ammo_9x19_pbp			= 1
+ammo_9x19_fmj			= 0
+ammo_11.43x23_fmj		= 1
+ammo_12x70_buck			= 1
+ammo_12x76_zhekan		= 1
+ammo_5.45x39_fmj		= 1
+ammo_5.56x45_ss190		= 1
+grenade_rgd5			= 1
+ammo_9x39_pab9			= 1
 [l10_red_forest]:default
 [l10_limansk]:default
 [l11_hospital]:default
+ammo_9x18_fmj			= 0
+ammo_9x19_fmj			= 0
+ammo_11.43x23_hydro		= 1
+ammo_11.43x23_fmj		= 1
+ammo_12x70_buck			= 0
+ammo_5.45x39_ap			= 1
+ammo_5.45x39_fmj		= 1
+ammo_9x39_ap			= 1
+ammo_9x39_pab9			= 1
+ammo_5.56x45_ss190		= 1
+ammo_5.56x45_ap			= 1
+grenade_f1				= 1
+grenade_rgd5			= 1
+medkit_scientic			= 1
+antirad					= 1
 [l01_escape]:default
 [l02_garbage]:default
 [l03_agroprom]:default
-[l03u_agr_underground]:default
+ammo_5.45x39_fmj		= 1
+[l03u_agr_underground]:l03_agroprom
+ammo_9x18_pmm			= 1
+ammo_9x19_pbp			= 1
 [l04_darkvalley]:default
-[l04u_labx18]:default
-[l05_bar]:default
-[l06_rostok]:default
+ammo_5.45x39_fmj		= 1
+ammo_5.56x45_ss190		= 1
+ammo_12x76_zhekan		= 1
+[l04u_labx18]:l04_darkvalley
+ammo_9x18_pmm			= 1
+ammo_9x19_pbp			= 1
+[l05_bar]:l03_agroprom
+[l06_rostok]:l04_darkvalley
 [l07_military]:default
-[l08_yantar]:default
-[l08u_brainlab]:default
-[l10_radar]:default
-[l10u_bunker]:default
+ammo_9x18_fmj			= 1
+ammo_9x18_pmm			= 1
+ammo_9x19_pbp			= 1
+ammo_9x19_fmj			= 1
+ammo_11.43x23_fmj		= 1
+ammo_12x70_buck			= 1
+ammo_12x76_zhekan		= 1
+ammo_5.45x39_fmj		= 1
+ammo_9x39_pab9			= 1
+ammo_5.56x45_ss190		= 1
+medkit_scientic			= 1
+antirad					= 1
+[l08_yantar]:l04_darkvalley
+[l08u_brainlab]:l04u_labx18
+[l10_radar]:l07_military
+[l10u_bunker]:l07_military
 [l11_pripyat]:default
-[l12_stancia]:default
-[l12u_sarcofag]:default
-[l12u_control_monolith]:default
-[l12_stancia_2]:default
-[stancia_2]:default
-[k02_trucks_cemetery]:default
-[k01_darkscape]:default
-[l09_deadcity]:default
-[l13_generators]:default
-[zaton]:default
-[jupiter_underground]:default
-[labx8]:default
-[l13u_warlab]:default
+ammo_9x18_fmj			= 0
+ammo_9x19_fmj			= 0
+ammo_11.43x23_hydro		= 0
+ammo_11.43x23_fmj		= 1
+ammo_12x70_buck			= 1
+ammo_5.45x39_ap			= 1
+ammo_5.45x39_fmj		= 1
+ammo_9x39_ap			= 1
+ammo_9x39_pab9			= 1
+ammo_5.56x45_ss190		= 1
+ammo_5.56x45_ap			= 1
+ammo_7.62x54_7h1		= 1
+grenade_f1				= 1
+grenade_rgd5			= 1
+ammo_gauss				= 1
+[l12_stancia]:l11_pripyat
+ammo_11.43x23_hydro		= 1
+[l12u_sarcofag]:l12_stancia
+[l12u_control_monolith]:l12_stancia
+[l12_stancia_2]:l12_stancia
+[stancia_2]:l12_stancia
+[k02_trucks_cemetery]:l04_darkvalley
+[k01_darkscape]:l04_darkvalley
+[l09_deadcity]:l04_darkvalley
+[l13_generators]:l12_stancia
+[zaton]:jupiter
+[jupiter_underground]:l07_military
+[labx8]:l12_stancia
+[l13u_warlab]:l12_stancia

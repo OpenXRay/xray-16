@@ -1,13 +1,12 @@
--- the ratio of the character to the actor (or other NPC) is calculated by the formula:
--- attitude = personal_goodwill + 				- personal attitude of the character to the actor (if not previously met, then 0)
--- community_goodwill + 						- the relation of the grouping of the character to the actor personally (if there were no contacts before, 0)
--- community_to_community + 					- the relation of the grouping of the character to the grouping of the actor from [communities_relations]
--- reputation_goodwill + 						- the relation of the character's reputation to the reputation of the actor from [reputation_relations]
--- rank_goodwill 								- the relation of rank of the character to the rank of the actor from [rank_relations]
-
-FRIENDS = 1000
-NEUTRALS = 0
-ENEMIES = -1000
+--	отношение персонажа к актеру (или другому NPC) вычисляется по формуле:
+--	attitude = personal_goodwill +				-- личное отношение персонажа к актеру (если раньше не встречались, то 0)
+--			   community_goodwill +				-- отношение группировки персонажа лично к актеру (если раньше контактов не было, то 0)
+--			   community_to_community +			-- отношение группировки персонажа к группировке актера из [communities_relations]
+--             reputation_goodwill +			-- отношение репутации персонажа к репутации актера из [reputation_relations]
+--			   rank_goodwill					-- отношение ранга персонажа к рангу актера из [rank_relations]
+ FRIENDS = 1000
+ NEUTRALS = 0
+ ENEMIES = -1000
 default_sympathy = 0.01
 game_relations_by_num = {	[0] = "friend",
 							[1] = "neutral",
@@ -172,14 +171,9 @@ end
 
 function set_community_goodwill_for_faction(faction)
 	local communities = alun_utils.get_communities_list()
-	for community,v in pairs(communities) do
+	for i,community in pairs(communities) do 
 		relation_registry.set_community_goodwill(community, 0, relation_registry.community_relation(community,faction))
 	end
-end
-
-function is_valid(faction)
-	local communities = alun_utils.get_communities_list()
-	return communities[faction] ~= nil
 end
 
 function check_all_squad_members(squad_name, relation)

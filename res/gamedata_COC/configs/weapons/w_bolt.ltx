@@ -34,25 +34,29 @@ throw_point                              = 0.4, 0.3, 0.1
 visual                                   = dynamics\devices\dev_bolt\dev_bolt.ogf
 
 [bolt_hud]:hud_base
-anm_bore                                 = bolt_bore
-anm_hide                                 = bolt_holster
-anm_idle                                 = bolt_idle
-anm_idle_moving                          = bolt_move
-anm_idle_moving_crouch                   = bolt_crouch
-anm_idle_sprint                          = bolt_sprint
-anm_show                                 = bolt_draw
-anm_throw                                = bolt_throw_end
-anm_throw_begin                          = bolt_throw_start
-anm_throw_idle                           = bolt_throw_idle
+anm_bore                                 = dev_bolt_idle_bore
+anm_hide                                 = dev_bolt_holster
+anm_idle                                 = dev_bolt_idle
+anm_idle_moving                          = dev_bolt_idle_moving
+anm_idle_sprint                          = dev_bolt_idle_sprint
+anm_show                                 = dev_bolt_draw
+anm_throw                                = dev_bolt_shoot_end
+anm_throw_begin                          = dev_bolt_shoot_start
+anm_throw_idle                           = dev_bolt_shoot_idle
 attach_place_idx                         = 0
 fire_bone                                = wpn_body
 fire_point                               = 0,0,0
-hands_orientation                        = 2,2,0
-hands_orientation_16x9                   = 2,2,0
-hands_position                           = 0.033,-0.1895,0.039
-hands_position_16x9                      = 0.033,-0.1895,0.039
+hands_orientation                        = -0.500000,1.000000,1.149999
+hands_orientation_16x9                   = 2.349998,2.749999,2.849998
+hands_position                           = -0.021000,-0.160000,0.002500
+hands_position_16x9                      = 0.033000,-0.189500,0.039000
 item_orientation                         = 0 , 0 ,0
 item_position                            = 0 , 0 ,0
 item_visual                              = dynamics\devices\dev_bolt\dev_bolt_hud
 throw_dir                                = 0,0,1
 throw_point                              = 0.0,0.4,0.3
+
+[script_hud_motion]:bolt
+animation_slot                           = 13
+hud                                      = bolt_hud
+slot                                     = 12

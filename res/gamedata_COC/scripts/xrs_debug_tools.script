@@ -19,9 +19,9 @@ by Alundaio
 ---------------------------------------------------------------------------------------------------------
 
 local toggle_hud_list = 	{
-							["right"]  = { "actor_condition_hud", "current_test_hud","actor_inside_zone_hud","feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["top"]  = { "actor_condition_hud", "current_test_hud","actor_inside_zone_hud","feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
 							["left"] = { "team_squad_group_hud","surge_hud","arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
-							["top"] = { "actor_slot_hud","stalker_condition_hud","space_restrictor_hud","npc_memory_hud","npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
+							["right"] = { "stalker_condition_hud","space_restrictor_hud","npc_memory_hud","npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
 							}
 --------------------------------------------------------------------------------------------------
 
@@ -166,7 +166,6 @@ function activate_feature()
 	actions_by_stalker_ids[3865] = "action_walker"
 	actions_by_stalker_ids[453] = "action_animpoint"
 	actions_by_stalker_ids[454] = "action_reach_animpoint"
-	actions_by_stalker_ids[stalker_ids.action_in_smart_cover] = "action_in_smart_cover"
 	actions_by_stalker_ids[xr_actions_id.stohe_camper_base + 1] = "camper_patrol"
 	actions_by_stalker_ids[xr_actions_id.sidor_act_patrol + 1] = "action_commander"
 	--alundaio schemes
@@ -217,10 +216,7 @@ function hud_tool:__init(custom_static)
 end
 
 function hud_tool:add_msg(text,value,...)
-	text = tostring(text)
-	value = tostring(value)
-	self.msg = self.msg..strformat( (text ~= "nil" and text..": %s\\n" or "\\n"), strformat(value ~= nil and value or "",...)  )
-	self.msg = self.msg:sub(1,3000)
+	self.msg = self.msg..strformat(text..": %s\\n",value)
 end
 
 function hud_tool:set_header(header)
@@ -231,6 +227,7 @@ function hud_tool:display(disable)
 	if (disable) then 
 		return 
 	end 
+	
 	local hud = get_hud()
 	local cus = hud and hud:GetCustomStatic(self.custom_static)
 	if (cus) then
@@ -805,7 +802,7 @@ function actor_inside_zone_hud_show(hud)
 		-- local itr = function(id)
 			-- local st = id and db.storage[id]
 			-- local o = st and st.object 
-			-- if (o and o:is_SpaceRestrictor()) then
+			-- if (o and o:cast_SpaceRestrictor()) then
 				-- hud:add_msg(o:name(),strformat("ID=%s Section=%s",id,st.active_section))
 			-- end
 		-- end
@@ -1052,51 +1049,10 @@ function actor_info_hud_show(hud)
 	hud:display()
 end 
 
-function actor_slot_hud_show(hud)
-	hud:set_header("-[Actor Slots]-")
-	
-	for i=1,14 do 
-		local name
-		if (i == 1) then 
-			name = "Knife"
-		elseif (i == 2) then 
-			name = "Pistol"
-		elseif (i == 3) then 
-			name = "Automatic"
-		elseif (i == 4) then 
-			name = "Grenade"
-		elseif (i == 5) then 
-			name = "Binocular"
-		elseif (i == 6) then 
-			name = "Bolt"
-		elseif (i == 7) then 
-			name = "Outfit"
-		elseif (i == 8) then 
-			name = "PDA"
-		elseif (i == 9) then 
-			name = "Detector"
-		elseif (i == 10) then 
-			name = "Torch"
-		elseif (i == 11) then 
-			name = "Artefact"
-		elseif (i == 12) then 
-			name = "Helmet"
-		elseif (i == 13) then 
-			name = "Backpack"
-		elseif (i == 14) then 
-			name = "Script"
-		end
-		
-		local itm = db.actor:item_in_slot(i)
-		hud:add_msg(name,itm and itm:name())
-	end
-	hud:display()
-end 
-
 function actor_condition_hud_show(hud)
 	hud:set_header("-[Actor Condition]-")
 	
-	local actor_condition = db.actor:cast_GameObject():conditions()
+	local actor_condition = db.actor:cast_Actor():conditions()
 	local properties = {
 		"m_fAccelK",
 		"m_fJumpPower",
@@ -1137,34 +1093,6 @@ function actor_condition_hud_show(hud)
 		hud:add_msg(functors[i],actor_condition[ functors[i] ] and actor_condition[ functors[i] ](actor_condition))
 	end
 	
-	if (actor_condition.BoosterForEach) then -- todo: remove me when dlls synced
-		hud:add_msg("","---- Active Boosters ----")
-		
-		local boosterTypeToName = {
-			[CEntityCondition.eBoostHpRestore] = "eBoostHpRestore",
-			[CEntityCondition.eBoostPowerRestore] = "eBoostPowerRestore",
-			[CEntityCondition.eBoostRadiationRestore] = "eBoostRadiationRestore",
-			[CEntityCondition.eBoostBleedingRestore] = "eBoostBleedingRestore",
-			[CEntityCondition.eBoostMaxWeight] = "eBoostMaxWeight",
-			[CEntityCondition.eBoostRadiationProtection] = "eBoostRadiationProtection",
-			[CEntityCondition.eBoostTelepaticProtection] = "eBoostTelepaticProtection",
-			[CEntityCondition.eBoostChemicalBurnProtection] = "eBoostChemicalBurnProtection",
-			[CEntityCondition.eBoostBurnImmunity] = "eBoostBurnImmunity",
-			[CEntityCondition.eBoostShockImmunity] = "eBoostShockImmunity",
-			[CEntityCondition.eBoostRadiationImmunity] = "eBoostRadiationImmunity",
-			[CEntityCondition.eBoostTelepaticImmunity] = "eBoostTelepaticImmunity",
-			[CEntityCondition.eBoostChemicalBurnImmunity] = "eBoostChemicalBurnImmunity",
-			[CEntityCondition.eBoostExplImmunity] = "eBoostExplImmunity",
-			[CEntityCondition.eBoostStrikeImmunity] = "eBoostStrikeImmunity",
-			[CEntityCondition.eBoostFireWoundImmunity] = "eBoostFireWoundImmunity",
-			[CEntityCondition.eBoostWoundImmunity] = "eBoostWoundImmunity"
-		}
-		
-		actor_condition:BoosterForEach(function(booster_type,booster_time,booster_value) 
-			hud:add_msg(boosterTypeToName[booster_type],strformat("%s: %s",booster_time,booster_value))
-		end)
-	end
-
 	hud:display()
 end 
 
@@ -1172,8 +1100,8 @@ function stalker_condition_hud_show(hud)
 	hud:set_header("-[Stalker Condition]-")
 	
 	local near = get_debug_npc()
-	if (near and near:is_Stalker() and near:alive()) then
-		local entity_condition = near:cast_GameObject():conditions()
+	if (near and near:alive()) then
+		local entity_condition = near:cast_Stalker():conditions()
 		local functors = {
 			"BleedingSpeed",
 			"GetEntityMorale",
@@ -1216,12 +1144,10 @@ function npc_memory_hud_show(hud)
 		hud:add_msg("","-------Visual-------")
 		for o in near:memory_visible_objects() do
 			local obj = o:object()
-			if (obj) then
-				hud:add_msg("",obj:name() .. " | " .. near:memory_time(obj))
-			end
+			hud:add_msg("",obj and obj:name())
 		end
 		hud:add_msg("","-------Sound-------")
-		for o in near:memory_sound_objects() do
+		for o in near:memory_visible_objects() do
 			local obj = o:object()
 			hud:add_msg("",obj and obj:name())
 		end
@@ -1292,8 +1218,10 @@ function position_hud_show(hud)
 		__tmr_pos_hud = nil
 		_g_o_count = 0
 		local sim = alife()
-		for id, se_obj in sim:objects() do
-			_g_o_count = _g_o_count + 1
+		for i=1,65534 do
+			if (sim:object(i) ~= nil) then
+				_g_o_count = _g_o_count + 1
+			end
 		end
 	end
 	hud:add_msg("GameObject IDs",_g_o_count)
@@ -1459,7 +1387,7 @@ function stalker_info_hud_show(hud)
 						return squad.position:distance_to_sqr(smart.position) <= 625
 					end
 
-					return squad.always_arrived or squad.position:distance_to_sqr(smart.position) <= smart.arrive_dist
+					return squad.always_arrived or squad.position:distance_to_sqr(smart.position) <= smart.arrive_dist^2
 				end 
 
 				return obj_pos:distance_to_sqr(smart.position) <= 2500
@@ -1476,8 +1404,7 @@ function stalker_info_hud_show(hud)
 		hud:add_msg("A.Section",st.active_section)
 		hud:add_msg("Logic",st.section_logic)
 		hud:add_msg("Ini",st.ini_filename)
-		hud:add_msg("current_state",st.state_mgr.current_state)
-		hud:add_msg("target_state",st.state_mgr.target_state)
+		hud:add_msg("AnimState",state_mgr.get_state(near))
 
 		local pt_index = near.get_current_point_index and near:get_current_point_index()
 		if (pt_index and pt_index ~= 4294967296) then 
@@ -1571,26 +1498,6 @@ function team_squad_group_hud_show(hud)
 			hud:add_msg("Group",se_obj.group)
 		end
 	end 
-	
-	hud:add_msg("---Nearest Smart Gulag---")
-	if (smart_terrain.nearest_to_actor_smart and smart_terrain.nearest_to_actor_smart.id) then
-		local smart = alife_object(smart_terrain.nearest_to_actor_smart.id)
-		if (smart) then
-			hud:add_msg("------NPC_INFO-------")
-			for id,v in pairs(smart.npc_info) do
-				if (v.se_obj) then
-					hud:add_msg("Name",v.se_obj:name())
-				end
-			end
-			hud:add_msg("------ARRIVING_NPC-------")
-			for id,se_obj in pairs(smart.arriving_npc) do
-				if (se_obj) then
-					hud:add_msg("Name","%s (%s m)",se_obj:name(),se_obj.position:distance_to(smart.position))
-				end
-			end
-		end 
-	end
-		
 	hud:display()
 end
 
@@ -1611,7 +1518,7 @@ function enemy_hud_show(hud)
 			}
 
 			hud:add_msg("Name", near:name())
-			hud:add_msg("Actor Relation",relation[near:relation(db.actor)] .. " (" .. near:general_goodwill(db.actor) .. ")")
+			hud:add_msg("Actor Relation",relation[near:relation(db.actor)])
 
 			if (st.script_combat_type) then
 				hud:add_msg("Script Combat",st.script_combat_type)
@@ -1685,7 +1592,8 @@ function enemy_hud_show(hud)
 						local bd_type = st.danger.type
 						hud:add_msg("Type",bd_type and danger_types[bd_type])
 						local danger_time = st.danger.danger_time
-						local timr = danger_time and danger_time - time_global()
+						local inertion = st.danger.inertion
+						local timr = inertion and danger_time and (danger_time + inertion) - time_global()
 						hud:add_msg("Timer",timr and timr > 0 and timr or 0)
 					end
 				end
@@ -2028,27 +1936,22 @@ axr_keybind.bind("DIK_NUMPADENTER",function(p)
 		return 
 	end 
 	if (p==1) then
-		for story_id,id in pairs(story_objects.object_id_by_story_id) do 
-			printf("%s = %s",story_id,id)
-		end 
-		
-		-- local heli
-		-- for id,o in pairs(db.heli) do
-			-- heli = o
-			-- break
-		-- end
-		-- if (heli) then
-			-- local veh = db.actor:get_attached_vehicle()
-			-- if not (veh) then
-				-- db.actor:attach_vehicle(heli)
-			-- elseif (veh:is_Heli()) then 
-				-- db.actor:detach_vehicle()
-			-- else 
-				-- db.actor:detach_vehicle()
-				-- db.actor:attach_vehicle(heli)
-			-- end
-		-- end	
-		
+		local heli
+		for id,o in pairs(db.heli) do
+			heli = o
+			break
+		end
+		if (heli) then
+			local veh = db.actor:get_attached_vehicle()
+			if not (veh) then
+				db.actor:attach_vehicle(heli)
+			elseif (veh:cast_Heli()) then 
+				db.actor:detach_vehicle()
+			else 
+				db.actor:detach_vehicle()
+				db.actor:attach_vehicle(heli)
+			end
+		end	
 		-- local npc = level.get_target_obj()
 		-- if (npc and IsStalker(npc)) then 
 			-- debug_visual_ltx = debug_visual_ltx or ini_file_ex("debug_visual.ltx",true)

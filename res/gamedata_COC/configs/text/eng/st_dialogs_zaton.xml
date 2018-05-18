@@ -100,46 +100,4 @@
 		<text>I've got a third one, if you need more.</text>
 	</string>
 	
-	<string id="zat_b52_robbery_port_bandits_1_0">
-		<text>Hey! Have any money I can borrow?</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_1">
-		<text>Uhh...No.</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_11">
-		<text>Hey man, why so greedy? Give us some loot...</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_111">
-		<text>I don't owe you anything.</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_111111">
-		<text>Yeah, all right. We ain't no bitches.</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_1111111">
-		<text>Bye.</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_11112">
-		<text>No!</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_111121">
-		<text>Think carefully now. If you've got half a brain, you'll know it's best to play nice when you're outnumbered.</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_1111211">
-		<text>I said no!</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_2">
-		<text>...Okay.</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_1111">
-		<text>I don't give a shit. Hand it over!</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_1111212">
-		<text>Okay, here you go.</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_21">
-		<text>Hand over your money, moron!</text>
-	</string>
-	<string id="zat_b52_robbery_port_bandits_1_11111">
-		<text>Easy, easy... Here you go.</text>
-	</string>
 </string_table>

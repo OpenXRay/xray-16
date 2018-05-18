@@ -7,7 +7,7 @@ move	= temp
 function get_smart_cover_cover_barricade_1()
 	return {
 			loopholes = {
-				smart_covers_loophole_barricade_1.get_barricade_1("br_1",	vector():set(0,0,0),	vector():set(0,0,1),	vector():set(1,0,0))
+				smart_covers_loophole_barricade_1.get_barricade_1("br_1",	VEC_ZERO,	vector():set(0,0,1),	vector():set(1,0,0))
 			},
 
 			transitions = {

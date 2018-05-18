@@ -66,10 +66,11 @@ function evaluator_contact:evaluate()
 			return false
 		end
 		
+		if (self.a.gtfo == true) then 
+			return true 
+		end 
+		
 		if (self.object:has_info("npcx_is_companion") or not get_object_story_id(self.object:id())) and not (self.object:is_talking()) then
-			if (self.a.gtfo == true) then
-				return true
-			end
 			if (db.actor:position():distance_to_sqr(self.object:position()) < 1.5) and not (good_acts[alun_utils.get_current_action_id(self.object)]) then
 				self.a.dtimer = not self.a.dtimer and time_global() + 4000 or self.a.dtimer
 				if (time_global() > self.a.dtimer) then

@@ -10,8 +10,8 @@ spawn_heli_weak
 
 [spawn_heli_strong]
 spawn_helicopter = simulation_helicopter_strong
-spawn_num = {!down_to_earth_functor !heli_exist_on_level} 1, 0
+spawn_num = {-achieved_down_to_earth !heli_exist_on_level} 1, 0
 
 [spawn_heli_weak]
 spawn_helicopter = simulation_helicopter_weak
-spawn_num = {=down_to_earth_functor !heli_exist_on_level} 1, 0
+spawn_num = {+achieved_down_to_earth !heli_exist_on_level} 1, 0

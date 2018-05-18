@@ -1,0 +1,142 @@
+<string_table>
+	
+	<!-- --------------->
+	<!----- SIGHTS ----->
+	<!------------------>
+
+	<string id="st_dxr_addon_sight_1p29">
+        <text>1P29</text>
+    </string>
+    <string id="st_dxr_addon_sight_1p29_descr">
+        <text>The 1P29 is a medium to long range telescopic sight designed primarily for Kalashnikov-style rifles.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_ac10632">
+        <text>Barska AC10632</text>
+    </string>
+    <string id="st_dxr_addon_sight_ac10632_descr">
+        <text>The Barska AC10632 is a short range high performance reflex sight, however it boasts extremely high visibility due to a large lens and thin frame.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_ac11090">
+        <text>Barska AC11090</text>
+    </string>
+    <string id="st_dxr_addon_sight_ac11090_descr">
+        <text>The Barska AC11090 is a medium range cheap tube-style optical sight with decent visibility, it is most useful when attached to a shotgun when firing slug rounds.</text>
+	</string>
+	
+    <string id="st_dxr_addon_sight_acog">
+        <text>Trijicon ACOG</text>
+    </string>
+    <string id="st_dxr_addon_sight_acog_descr">
+        <text>The Trijicon ACOG is a long range telescopic sight intended for much greater accuracy and visibility on targets at great distance.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_c-more">
+        <text>C-MORE</text>
+    </string>
+    <string id="st_dxr_addon_sight_c-more_descr">
+        <text>The C-MORE is a short range high performance reflex sight with great visibility.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_eot">
+        <text>EOTech 512</text>
+    </string>
+    <string id="st_dxr_addon_sight_eot_descr">
+        <text>The EOTech 512 is a very common short to medium range reflex sight with good visibility.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_ekp">
+        <text>Kobra EKP-8-02</text>
+    </string>
+    <string id="st_dxr_addon_sight_ekp_descr">
+        <text>The Kobra EKP-8-02 is a short range reflex sight with decent visibility. Exclusively used by eastern weaponry.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_kobra">
+        <text>Kobra EKP-1S-03</text>
+    </string>
+    <string id="st_dxr_addon_sight_kobra_descr">
+        <text>The Kobra EKP-1S-03 sight is a short to medium range reflex sight with great visibility. Exclusively used by eastern weaponry.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_po4x34">
+        <text>Kronos PO 4x34</text>
+    </string>
+    <string id="st_dxr_addon_sight_po4x34_descr">
+        <text>The Kronos PO 4x34 is a long-range telescopic sight which has largely been replaced by the PSO and its variants.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_pso">
+        <text>PSO-1</text>
+    </string>
+    <string id="st_dxr_addon_sight_pso_descr">
+        <text>The PSO-1 is a long range telescopic sight designed primarily for Kalashnikov-style rifles.</text>
+    </string>
+	
+	<string id="st_dxr_addon_sight_pso1m">
+        <text>PSO-1M2</text>
+    </string>
+    <string id="st_dxr_addon_sight_pso1m_descr">
+        <text>The PSO-1M2 is a variant of the PSO long range telescopic sight, and is designed for use with 9x39 mm calibre rifles.</text>
+    </string>
+	
+    <string id="st_dxr_addon_sight_pu">
+        <text>PU</text>
+    </string>
+    <string id="st_dxr_addon_sight_pu_descr">
+        <text>The PU is a telescopic sight designed primarily for World War II era Soviet weaponry.</text>
+    </string>
+	
+	<!-------------------------->
+	<!----- VANILLA SCOPES ----->
+	<!-------------------------->
+
+	<string id="st_dxr_addon_scope_descr">
+		<text>A common Soviet-made 5.0x fixed zoom optical scope with a range scale. Attached to weapons by means of a dovetail mount, which is standard in Warsaw Pact countries.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_detector_descr">
+		<text>A 5.0x fixed zoom optical scope with a built-in heat visor used to identify heat sources typical of the human body. Designed for use by special forces. Attached to weapons by means of a dovetail mount.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_night_vision_descr">
+		<text>An image intensifier night vision 5.0x fixed zoom scope for combat in darkness. Attached to weapons by means of a dovetail mount.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_susat_custom_descr">
+		<text>An adjustable long-range 1.6-4x zoom scope that can use automatic adjustment to provide greater fire effectiveness. Attached to weapons by means of the NATO-standard Picatinny rail.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_susat_descr">
+		<text>A 4x fixed zoom scope produced primarily in Western countries. Attached to weapons by means of the NATO-standard Picatinny rail. Often used for accurate fire from small arms at medium to long range.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_susat_dusk_descr">
+		<text>An optical SUSAT 1.6x higher contrast scope for combat in reduced lighting conditions. Attached to weapons by means of the NATO-standard Picatinny rail.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_susat_night_vision_descr">
+		<text>A 4.0x fixed zoom scope with a night vision device for long range combat in darkness. Attached to weapons by means of the NATO-standard Picatinny rail.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_susat_x1.6_descr">
+		<text>An optical SUSAT 1.6x scope for combat at short to medium range. Attached to weapons by means of the NATO-standard Picatinny rail.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<string id="st_dxr_addon_scope_x2.7_descr">
+		<text>A 2.7x optical scope for urban combat at medium range. Attached to weapons by means of a dovetail mount.\n \n%c[255,255,255,0]Unused because of an installed weapon pack.</text>
+	</string>
+	
+	<!--------------------------------->
+	<!----- SILENCERS & LAUNCHERS ----->
+	<!--------------------------------->
+	
+    <string id="st_dxr_addon_launcher_ag36">
+        <text>AG36</text>
+    </string>
+    <string id="st_dxr_addon_launcher_ag36_descr">
+        <text>The AG36 is a single-shot grenade launcher and was designed primarily for installation on the G36 family of assault rifle</text>
+    </string>
+	
+</string_table>

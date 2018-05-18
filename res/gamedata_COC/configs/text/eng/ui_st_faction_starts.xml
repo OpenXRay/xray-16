@@ -73,6 +73,10 @@
 		<text>Northern Factory (Dark Valley)</text>
 	</string>
 
+	<string id="ui_st_processing_station">
+		<text>Processing Station (Zaton)</text>
+	</string>
+
 	<string id="ui_st_pumping_station">
 		<text>Pumping Station (Great Swamp)</text>
 	</string>
@@ -103,10 +107,6 @@
 
 	<string id="ui_st_sports_center">
 		<text>Sports Center (Dead City)</text>
-	</string>
-
-	<string id="ui_st_substation_workshops">
-		<text>Substation Workshops (Zaton)</text>
 	</string>
 
 	<string id="ui_st_train_hangar">

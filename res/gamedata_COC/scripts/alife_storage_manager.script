@@ -29,7 +29,7 @@ m_data.actor_contacts = {}
 
 local function on_pstor_load_all(obj,packet)
 	local id = obj:id()
-	local state = get_game_object_state(obj)
+	local state = get_game_object_state(obj,false)
 	if (state and db.storage[id]) then
 		if (state.pstor_all) then
 			db.storage[id].pstor = state.pstor_all
@@ -161,27 +161,29 @@ function decode(t)
 	return marshal.decode(t)
 end
 
--- storage based on ID. name only for debug
+-- storage based on ID but verified by object name
 function get_game_object_state(obj,create_if_dont_exist)
 	local id = obj:id()
+	local name = obj:name()
 	if not (m_data.game_object[id]) then
 		if not (create_if_dont_exist) then
 			return 
 		end
 		m_data.game_object[id] = {}
-		m_data.game_object[id].name = obj:name()
+		m_data.game_object[id].name = name
 	end
 	return m_data.game_object[id]
-end
+end	
 
 function get_se_obj_state(se_obj,create_if_dont_exist)
 	local id = se_obj.id
+	local name = se_obj:name()
 	if not (m_data.se_object[id]) then
 		if not (create_if_dont_exist) then
 			return 
 		end
 		m_data.se_object[id] = {}
-		m_data.se_object[id].name = se_obj:name()
+		m_data.se_object[id].name = name
 	end
 	return m_data.se_object[id]
 end

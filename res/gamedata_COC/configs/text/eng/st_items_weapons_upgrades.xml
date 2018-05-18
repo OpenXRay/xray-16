@@ -19,7 +19,7 @@
 		<text>4x optical scope</text>
 	</string>
 	<string id="st_prop_silencer">
-		<text>Suppressor</text>
+		<text>Silencer</text>
 	</string>
 	<string id="st_prop_underbarrel_slot">
 		<text>under-barrel mount</text>
@@ -28,7 +28,7 @@
 		<text>Weight</text>
 	</string>
 	<string id="st_up_add_a1_descr">
-		<text>External threading allows a suppressor to be installed.</text>
+		<text>External threading allows a silencer to be installed.</text>
 	</string>
 	<string id="st_up_add_a1_name">
 		<text>External threading of the barrel</text>
@@ -1432,10 +1432,10 @@
 		<text>Longitudinal fullers of the barrel section </text>
 	</string>
 	<string id="st_up_stvs_c1_descr">
-		<text>Integrated suppressor and flash suppressor, essential for stealth fire.</text>
+		<text>Integrated silencer and flash suppressor, essential for stealth fire.</text>
 	</string>
 	<string id="st_up_stvs_c1_name">
-		<text>Installation of an integrated suppressor</text>
+		<text>Installation of an integrated silencer</text>
 	</string>
 	<string id="st_up_stvs_c2_descr">
 		<text>Sinusoidal rifling of the barrel chamber is usually performed on assault weapons to increase their rate of fire.</text>
@@ -1957,7 +1957,7 @@
 		<text>Optical scope mount</text>
 	</string>
 	<string id="st_int_silencer">
-		<text>Integrated suppressor</text>
+		<text>Integrated silencer</text>
 	</string>
 	<string id="st_prop_grenade_launcher">
 		<text>Under-barrel grenade launcher</text>
@@ -2036,14 +2036,5 @@
 	</string>
 	<string id="st_up_kom_a5_name">
 		<text>Rubberised cloth under-layer</text>
-	</string>
-	<string id="st_prop_binoc_7.5x">
-		<text>x7.5 zoom</text>
-	</string>
-	<string id="st_up_binoc_a1_name">
-		<text>7.5x maximum zoom</text>
-	</string>
-	<string id="st_up_binoc_a1_desc">
-		<text>Higher magnification lenses.</text>
 	</string>
 </string_table>

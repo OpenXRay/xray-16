@@ -130,7 +130,7 @@
     <snd_config>characters_voice\human_02\military\</snd_config>
     <rank>13728</rank>
     <reputation>451</reputation>
-    <visual>actors\stalker_unique\stalker_soldier_kovalski</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_3_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_fort \n
@@ -197,7 +197,7 @@
     <snd_config>characters_voice\human_01\military\</snd_config>
     <rank>6430</rank>
     <reputation>69</reputation>
-    <visual>actors\stalker_unique\stalker_soldier_sokolov</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_1_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_ak74u \n
@@ -239,7 +239,7 @@
     <snd_config>characters_voice\human_03\military\</snd_config>
     <rank>8428</rank>
     <reputation>159</reputation>
-    <visual>actors\stalker_unique\stalker_soldier_sokolov_2</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_ecolog_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_ak74u \n
@@ -268,7 +268,7 @@
     <snd_config>characters_voice\human_01\military\</snd_config>
     <rank>8586</rank>
     <reputation>447</reputation>
-    <visual>actors\stalker_unique\stalker_soldier_sokolov</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_1_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_abakan \n
@@ -518,7 +518,7 @@
     <snd_config>characters_voice\human_02\military\</snd_config>
     <rank>9686</rank>
     <reputation>270</reputation>
-    <visual>actors\stalker_unique\stalker_soldier_rogovets</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_2_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_abakan = 1 \n
@@ -551,7 +551,7 @@
     <snd_config>characters_voice\human_03\stalker\</snd_config>
     <rank>28322</rank>
     <reputation>2160</reputation>
-    <visual>actors\stalker_unique\stalker_merc_durad</visual>
+    <visual>actors\stalker_merc\stalker_merc_2_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_ak74 \n
@@ -574,7 +574,7 @@
     <snd_config>characters_voice\human_02\stalker\</snd_config>
     <rank>494</rank>
     <reputation>147</reputation>
-    <visual>actors\stalker_unique\stalker_hero_degtyarev</visual>
+    <visual>actors\stalker_hero\stalker_hero_1</visual>
     <supplies>
         [spawn] \n
         device_torch \n
@@ -597,7 +597,7 @@
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <rank>11416</rank>
     <reputation>629</reputation>
-    <visual>actors\stalker_unique\stalker_neutral_vano_2</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_1</visual>
     <supplies>
         [spawn] \n
         device_torch \n
@@ -621,7 +621,7 @@
     <snd_config>characters_voice\human_01\military\</snd_config>
     <rank>8992</rank>
     <reputation>123</reputation>
-    <visual>actors\stalker_unique\stalker_soldier_sokolov_2</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_ecolog_face_1</visual>
     <supplies>
         [spawn] \n
         device_torch \n
@@ -645,7 +645,7 @@
     <snd_config>characters_voice\human_02\dolg\</snd_config>
     <rank>17766</rank>
     <reputation>104</reputation>
-    <visual>actors\stalker_unique\stalker_dolg_zulus</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_1_face_1</visual>
     <supplies>
         [spawn] \n
         device_torch \n
@@ -670,7 +670,7 @@
     <snd_config>characters_voice\human_02\stalker\</snd_config>
     <rank>10324</rank>
     <reputation>430</reputation>
-    <visual>actors\stalker_unique\stalker_monolith_brodyaga</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_1_face_1</visual>
     <supplies>
         [spawn] \n
         device_torch \n
@@ -990,9 +990,11 @@
     <reputation>1153</reputation>
     <visual>actors\stalker_monolith\stalker_monolith_2</visual>
     <supplies>
-#include "gameplay\loadouts\monolith_base.ltx"
-#include "gameplay\loadouts\monolith_sniper.ltx"
         [spawn] \n
+        wpn_svd = 1 \n
+        ammo_7.62x54_7h1 = 3 \n
+        wpn_colt1911 = 1 \n
+        ammo_11.43x23_fmj = 1 \n
 #include "gameplay\character_food.xml"
 #include "gameplay\character_drugs_2.xml"
     </supplies>
@@ -1064,7 +1066,7 @@
     <snd_config>characters_voice\human_02\stalker\</snd_config>
     <rank>976</rank>
     <reputation>136</reputation>
-    <visual>actors\stalker_unique\stalker_hero_strelok</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_2</visual>
     <supplies>
         [spawn] \n
         device_torch \n
@@ -1157,7 +1159,7 @@
     <rank>18778</rank>
     <reputation>2309</reputation>
     <money min="1000000" max="1000000" infinitive="1"/>
-    <visual>actors\stalker_unique\stalker_freedom_yar</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_face_2</visual>
     <supplies>
         [spawn] \n
         wpn_svd = 1 \n
@@ -1185,7 +1187,7 @@
     <rank>23692</rank>
     <reputation>380</reputation>
     <money min="1000000" max="1000000" infinitive="1"/>
-    <visual>actors\stalker_unique\stalker_monolith_trade</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_2_face_1</visual>
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <supplies></supplies>
 #include "gameplay\character_criticals.xml"
@@ -1208,7 +1210,7 @@
         <mechanic_mode>1</mechanic_mode>
         <rank>17396</rank>
         <reputation>-900</reputation>
-        <visual>actors\stalker_unique\stalker_monolith_tech</visual>
+        <visual>actors\stalker_monolith\stalker_monolith_2_face_2</visual>
         <snd_config>characters_voice\human_01\monolith\</snd_config>
     <supplies></supplies>
 #include "gameplay\character_criticals.xml"

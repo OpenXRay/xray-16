@@ -53,12 +53,19 @@ function actor_on_net_spawn()
 	
 	-- some hacks
 	local sim = alife()
-	for id, se_obj in sim:objects() do
-		-- hack to remove phantoms
-		if (se_obj:clsid() == clsid.phantom) then
-			--printf("release phantom hack!")
-			sim:release(se_obj,true)
+	local remove_outfits = not db.actor:has_info("remove_outfits_hack")
+	for i=1,65534 do
+		local se_obj = sim:object(i)
+		if (se_obj) then
+			-- hack to remove phantoms
+			if (se_obj:clsid() == clsid.phantom) then
+				--printf("release phantom hack!")
+				sim:release(se_obj,true)
+			end
 		end
+	end
+	if (remove_outfits) then
+		db.actor:give_info_portion("remove_outfits_hack")
 	end
 	
 	SendScriptCallback("on_game_load",binder)

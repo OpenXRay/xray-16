@@ -292,7 +292,7 @@
 		<text>Emission imminent, proceed to shelter immediately!</text>
 	</string>
 	<string id="hide_from_surge_descr_2_a">
-		<text>You shouldn't leave shelter during an emission.</text>
+		<text>You are not allowed to leave the shelter during an emission.</text>
 	</string>
 	<string id="hide_from_surge_name_1">
 		<text>Emission: Find shelter</text>
@@ -311,7 +311,7 @@
 		<text>The level of radiation is dangerous. You should hide from the radioactive fallout.</text>
 	</string>
 	<string id="hide_from_fallout_rad_descr_2_a">
-		<text>You shouldn't leave shelter during a radioactive fallout.</text>
+		<text>You shouldn't leave the shelter during the radioactive fallout.</text>
 	</string>
 	<string id="hide_from_fallout_rad_name_1">
 		<text>Radioactive fallout: Find shelter</text>
@@ -336,7 +336,7 @@
 		<text>The level of contamination is dangerous. You should hide from the chemical fallout.</text>
 	</string>
 	<string id="hide_from_fallout_acid_descr_2_a">
-		<text>You shouldn't leave shelter during a chemical fallout.</text>
+		<text>You shouldn't leave the shelter during the chemical fallout.</text>
 	</string>
 	<string id="hide_from_fallout_acid_name_1">
 		<text>Chemical fallout: Find shelter</text>
@@ -361,7 +361,7 @@
 		<text>You should hide from the psi-storm.</text>
 	</string>
 	<string id="hide_from_psi_storm_descr_2_a">
-		<text>You shouldn't leave shelter during a psi-storm.</text>
+		<text>You shouldn't leave the shelter during the psi-storm.</text>
 	</string>
 	<string id="hide_from_psi_storm_name_1">
 		<text>Psi-storm: Find shelter</text>

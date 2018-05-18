@@ -40,7 +40,7 @@ weapon_usage		 = 0						; boolean
 stamina_hit		=	0.2;
 
 hit_fraction_monster = 0.4
-skin_armor = 0.25
+skin_armor = 0.15
 
 ;------------------------------------------------------------------------
 ; Influences
@@ -53,8 +53,8 @@ fire_quadratic_factor	=	0.025
 
 psy_linear_factor		=	0.5
 psy_quadratic_factor	=	0.0
-psy_max_distance		=	20.0
-psy_max_power			=	0.5
+psy_max_distance		=	12.0
+psy_max_power			=	0.2
 psy_sound				=	anomaly\psy_voices_1_l		;monsters\controller\controller_presence_l
 psy_pp_effector_name	= 	psy_antenna 				;postprocess_psi
 psy_pp_highest_at		= 	0.1
@@ -82,7 +82,7 @@ destroyed_vis_name	 = dynamics\Dead_Body\skelet_crash
 ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
 ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
 ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
-ph_skeleton_ddelay	     	  = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+ph_skeleton_ddelay	     	  = 15.0 ;¬рем€ изменени€ значени€ трени€ в суставе с момента создани€ шелла, сек
 
 ph_skel_fatal_impulse_factor  = 6.0
 ph_after_death_velocity_factor= 0.75
@@ -95,7 +95,7 @@ ph_skel_shot_up_factor        = 0.25
 ; speed factors			linear | angular_real | angular_path | min |  max
 
 Velocity_Stand			= 0,		2.4,			2.4,		1,		1
-Velocity_WalkFwdNormal	= 1.6,		6.0,			6.0,		0.02,	2.0
+Velocity_WalkFwdNormal	= 1.5,		6.0,			6.0,		0.02,	2.0
 Velocity_RunFwdNormal	= 5.0,		4.6,			4.6,		0.25,	1
 Velocity_WalkFwdDamaged	= 1.5,		6.0,			6.0,		0.5,	2.0
 Velocity_RunFwdDamaged	= 4.0,  	4.0,			4.0,		0.2,	1
@@ -171,7 +171,7 @@ eat_freq			=	5.0		; частота укусов в сек
 eat_slice			=	0.04	; увеличение сытости при 1 укусе
 eat_slice_weight	=	10.0	; уменьшение еды у трупа
 
-satiety_threshold		= 0.5							; below this value monster feels hunger
+satiety_threshold		= 0.5							; below this value monster fill hunger
 ;-------------------------------------------------------------------------
 ; Morale
 ;-------------------------------------------------------------------------
@@ -229,7 +229,7 @@ critical_wound_bones_torso	= controller_critical_wound_bones_torso
 critical_wound_anim_legs	= stand_attack_0
 critical_wound_bones_legs	= controller_critical_wound_bones_legs
 
-DamagedThreshold		= 0.2
+DamagedThreshold		= 0.1
 
 material				= creatures\medium
 
@@ -242,7 +242,7 @@ LegsCount				= 2
 damage					= m_controller_damage
 
 ;---------- FIRE---------;
-tube_damage		    		= 0.33
+tube_damage		    		= 0.25
 tube_condition_see_duration = 10	;50
 tube_condition_min_delay    = 2000 ;10000
 tube_condition_min_distance = 5
@@ -273,7 +273,7 @@ Control_Hit					= weapons\generic_weapon_controller
 
 ;species of monster
 species						= controller
-rank						= 17
+rank						= 18
 spec_rank					= normal
 community					= controller
 
@@ -281,10 +281,13 @@ community					= controller
 ; Vision
 ;-------------------------------------------------------------------------
 eye_fov				 = 110	;150
-eye_range			 = 70	;100
+eye_range			 = 60	;100
 
 vision_free_section			= controller_vision_free
 vision_danger_section		= controller_vision_danger
+
+; «Ќј„≈Ќ»я visibility_threshold ƒќЋ∆Ќџ Ѕџ“№ –ј¬Ќџ дл€ денжера и фри,
+; иначе возникают артефакты с потерей видимости при переходе от денжера во фри.
 
 [controller_vision_free]
 min_view_distance   		= 0.4				; min range of cone based on eye_range
@@ -423,7 +426,7 @@ color_add		= 0.00,0.00,0.015
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Right hand Strike
-stand_attack_0 =	  	0.45,		0.55,		   70,        2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  3.0
+stand_attack_0 =	  	0.45,		0.55,		   100,        2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  3.0
 ;RightLeft combo strike
 stand_attack_1 =	  	0.25,		0.5,		    75,        2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  3.0
 ;stand_attack_1 =	  	0.45,		0.55,		    100,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,				  3.0
@@ -459,7 +462,8 @@ visual				= monsters\controller\controller_1
 corpse_visual		 = monsters\controller\controller_dead
 icon				= ui_npc_monster_controller
 spec_rank			= normal
-rank				= 17
+rank				= 18
+community			= controller
 
 ;*********************************************************************************
 ; NORMAL PROFILE 2
@@ -470,10 +474,11 @@ visual				= monsters\controller\controller2a
 corpse_visual			= monsters\controller\controller2a
 icon				= ui_npc_monster_controller
 panic_threshold			= 0.1
-rank				= 17
+rank				= 18
 immunities_sect		= controller_immunities
 attack_params		= m_controller_attack_params
 spec_rank			= normal
+community			= controller
 
 ;*********************
 ; NORMAL PSY 

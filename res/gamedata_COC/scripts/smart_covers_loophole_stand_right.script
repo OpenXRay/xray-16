@@ -4,13 +4,11 @@ function get_loophole(id, fov_direction, position, enter_direction)
         return {        id = id,
                                 fov_position = pos,
                                 fov_direction = fov_direction,
-								danger_fov_direction  = vector():set(-1,0,0),
                                 enter_direction = enter_dir,
                                 enterable = true,
                                 exitable = true,
                                 usable = true,
                                 fov        = 90.0,
-								danger_fov = 110.0,
                                 range = 50.0,
                                 actions = {
                                         idle = {

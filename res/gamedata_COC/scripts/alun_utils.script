@@ -336,25 +336,18 @@ function get_reputation_name(value)
 end
 
 local communities
-function get_communities_list(new_table)
-	if not (new_table) then
-		if communities then
-			return communities
-		end
+function get_communities_list()
+	if communities then
+		return communities
 	end
-	
 	local tmp = parse_list(system_ini(),"game_relations","communities")
-	local t = {}
+	communities = {}
 	for i,cn in ipairs(tmp) do
 		if not tonumber(cn) then
-			t[cn] = true
+			communities[#communities+1] = cn
 		end
 	end
-	
-	if not (new_table) then 
-		communities = t
-	end
-	return t
+	return communities
 end
 
 function execute_script_on_squad(obj,script_to_execute,...)
@@ -397,8 +390,9 @@ function nearest_object(s,offline)
 	local nearest
 	local min_dist
 	local is_match
-	for id, obj in alife():objects() do
-		if (obj and id ~= 0) then
+	for i=1, 65534 do
+		local obj = alife_object(i)
+		if (obj) then
 			is_match = false
 			if (type(s) == "string" and string.find(obj:name(),s)) then
 				is_match = true
@@ -1425,9 +1419,9 @@ end
 ---- utils 
 function XmlFindNodeWithAttribute(n,node_name,prop_name,val)
 	local node = n.ChildNodes
-	local p,c
+	local deepest,p,c
 	local stack = {}
-	while true do
+	while not deepest do
 		if (node and #node > 0) then
 			for i=1,#node do
 				if (node[i].Name == node_name and node[i].Attributes[prop_name] == val) then
@@ -1444,7 +1438,7 @@ function XmlFindNodeWithAttribute(n,node_name,prop_name,val)
 			node = stack[#stack]
 			stack[#stack] = nil
 		else
-			break
+			deepest = true
 		end
 	end
 end

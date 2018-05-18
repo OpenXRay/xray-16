@@ -11,8 +11,8 @@ icon					= ui_npc_monster_snork
 spawn_phantom 		= m_phantom_snork
 can_spawn_phantom 	= false
 
-hit_fraction_monster = 0.5
-skin_armor = 0.5
+hit_fraction_monster = 0.3
+skin_armor = 0.15
 
 ;------------------------------------------------------------------------
 ; Influences
@@ -95,7 +95,7 @@ ph_skel_shot_up_factor        = 0.25
 Velocity_Stand		    = 0,		5.5,			5.2,		1,		1
 Velocity_WalkFwdNormal	= 1.05,		3.5,			3.2,		0.02,	2.0
 Velocity_WalkFwdDamaged	= 0.9,		3.5,			3.2,		0.02,	2.0
-Velocity_RunFwdNormal	= 5.5,		3.5,			3.2,		0.4,	1
+Velocity_RunFwdNormal	= 4.5,		3.5,			3.2,		0.4,	1
 Velocity_RunFwdDamaged	= 2.5,		3.5,			3.2,		0.2,	1
 Velocity_Drag			= 1.0,		1.0,			1.0,		1,		1
 Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
@@ -110,8 +110,8 @@ Accel_Aggressive		= 12.0
 ;--------------------------------------------------------------------------
 ; Attack parameters
 ;--------------------------------------------------------------------------
-MinAttackDist			= 1.9	;0.5
-MaxAttackDist			= 2.9	;3.8
+MinAttackDist			= 1.8	;0.5
+MaxAttackDist			= 3.0	;3.8
 as_min_dist				= 1.9
 as_step					= 0
 hit_type				= wound				; type of attack
@@ -166,7 +166,7 @@ min_wound_size				= 0.01
 
 
 ;Health from which to play injured animation
-DamagedThreshold		= 0.25
+DamagedThreshold		= 0.2
 
 ;Sleep Settings
 sleep_health			= 1.0		;1.5				;úþ¤¯¯ø¡øõýªv ¸úþ¨þ¸ªõù ø÷üõýõýø  ÿð¨ðüõª¨þò òþ ò¨õü  ¸ýð
@@ -180,7 +180,7 @@ eat_freq				=	5.0							; ¢ð¸ªþªð ºúº¸þò ò ¸õú
 eat_slice				=	0.01						; ºòõûø¢õýøõ ¸vªþ¸ªø ÿ¨ø 1 ºúº¸õ
 eat_slice_weight		=	10.0						; ºüõý¹°õýøõ õôv º ª¨ºÿð
 
-satiety_threshold		= 0.5							; below this value monster feels hunger
+satiety_threshold		= 0.5							; below this value monster fill hunger
 
 ;-------------------------------------------------------------------------
 ; Morale
@@ -230,7 +230,7 @@ SoundThreshold						= 0.02             ; range [0..1]
 max_hear_dist						= 60
 
 ;-------------------------------------------------------------------------
-; Other Stuff
+; Other Stuff (refactoring needed)
 ;-------------------------------------------------------------------------
 material				= creatures\medium
 DynamicObjectsCount		= 32
@@ -242,12 +242,12 @@ critical_wound_decrease_quant	= 0.
 
 LegsCount				= 2
 
-DayTime_Begin			= 0
-DayTime_End				= 21
-Min_Satiety				= 0.4
-Max_Satiety				= 1.0
+DayTime_Begin			= 0			; ýð¢ðûð ôý  ôû  üþý¸ª¨ð
+DayTime_End				= 21		; úþýõ¡ ôý  ôû  üþý¸ª¨ð
+Min_Satiety				= 0.4		; üøý. ýþ¨üð ¸vªþ¸ªø (üõý¹°õ - ºöõ óþûþôývù)
+Max_Satiety				= 1.0		; üðú¸. ýþ¨üð ¸vªþ¸ªø (ñþû¹°õ - þ¢õý¹ ¸vªvù)
 
-distance_to_corpse		= 1.2
+distance_to_corpse		= 1.2		; ôø¸ª. ôþ ª¨ºÿð, ÿ¨ø úþªþ¨þù þý ÿõ¨õ¿þôøª ò ¸þ¸ªþ ýøõ õôv
 
 ;species of monster
 species						= snork
@@ -262,7 +262,7 @@ immunities_sect				= snork_immunities
 ; Vision
 ;-------------------------------------------------------------------------
 eye_fov						= 110	;140
-eye_range					= 60	;50
+eye_range					= 50	;50
 
 vision_free_section			= snork_vision_free
 vision_danger_section		= snork_vision_danger
@@ -273,25 +273,25 @@ vision_danger_section		= snork_vision_danger
 [snork_vision_free]
 min_view_distance   		= 0.4				; min range of cone based on eye_range
 max_view_distance	 		= 0.7				; max range of cone based on eye_range
-visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+visibility_threshold	 	= 25				;Threshold in which object becomes visible based on factors
 always_visible_distance 	= 0					;Distance object is always considered visible (float)
 time_quant					= 0.005				;step increment to for sight calculations
-decrease_value				= 0.01 				;Decrease over time to overall threshold
+decrease_value				= 0.1 				;Decrease over time to overall threshold
 velocity_factor		     	= 0.6				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
 luminocity_factor			= 0.8				;Low value = easier to see at night
-transparency_threshold	 	= 0.4 			    ;Low value = easier to see through objects
+transparency_threshold	 	= 0.3 			    ;Low value = easier to see through objects
 still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 [snork_vision_danger]
 min_view_distance   		= 0.4				; min range of cone based on eye_range
 max_view_distance	 		= 1.0				; max range of cone based on eye_range
-visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+visibility_threshold	 	= 25				;Threshold in which object becomes visible based on factors
 always_visible_distance 	= 0					;Distance object is always considered visible (float)
 time_quant					= 0.0055			;step increment to for sight calculations
-decrease_value				= 0.01				;Decrease over time to overall threshold
+decrease_value				= 0.1				;Decrease over time to overall threshold
 velocity_factor		     	= 1.0				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
 luminocity_factor			= 0.8				;Low value = easier to see at night
-transparency_threshold	 	= 0.4				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
+transparency_threshold	 	= 0.3				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
 still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 ;=================================================================================
@@ -306,7 +306,7 @@ bip01_pelvis 		= 1.0, -1, 0.1
 bip01_spine 		= 1.0, -1, 0.1
 bip01_spine1 		= 1.0, -1, 0.1
 bip01_neck 			= 1.0, -1, 0.5
-bip01_head 			= 2.5, -1, 0.1, 10
+bip01_head 			= 2.0, -1, 0.1, 10
 
 [m_snork_attack_effector]
 duality_h			= 0.05;0.01
@@ -356,7 +356,7 @@ radiation_immunity		= 0.0
 telepatic_immunity		= 0.0
 chemical_burn_immunity	= 0.7
 explosion_immunity		= 0.7
-fire_wound_immunity		= 0.8
+fire_wound_immunity		= 0.7
 
 
 ;*********************************************************************************
@@ -368,10 +368,12 @@ visual				= monsters\snork\snork4
 corpse_visual			= monsters\snork\snorkdead4
 icon				= ui_npc_monster_snork
 panic_threshold		= 0.5
-rank				= 9
+rank				= 8
 immunities_sect		= snork_immunities_weak
 attack_params		= snork_attack_params_weak
 spec_rank			= weak
+community			= snork
+MaxHealthValue					= 0.8			; range [0..200]
 
 [snork_immunities_weak]
 burn_immunity			= 0.8
@@ -382,18 +384,18 @@ radiation_immunity		= 0.0
 telepatic_immunity		= 0.0
 chemical_burn_immunity	= 0.8
 explosion_immunity		= 0.8
-fire_wound_immunity		= 1
+fire_wound_immunity		= 0.9
 
 [snork_attack_params_weak]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.30,		0.55,			35,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
-stand_attack_2_1 =	  	0.30,		0.55,			35,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_attack_0 =	  	0.30,		0.45,			35,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_attack_2_1 =	  	0.30,		0.45,			35,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,		3.5
 
 
-stand_run_attack_left_0  =	  	0.40,		0.65,			45,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
-stand_run_attack_right_0  =	  	0.40,		0.65,			45,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_left_0  =	  	0.40,		0.5,			45,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_right_0  =	  	0.40,		0.5,			45,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
 
 ;*********************************************************************************
 ; WEAK PROFILE 2
@@ -404,10 +406,12 @@ visual				= monsters\snork\snork5
 corpse_visual			= monsters\snork\snorkdead5
 icon				= ui_npc_monster_snork
 panic_threshold		= 0.5
-rank				= 9
+rank				= 8
 immunities_sect		= snork_immunities_weak
 attack_params		= snork_attack_params_weak
 spec_rank			= weak
+community			= snork
+MaxHealthValue					= 0.8			; range [0..200]
 
 ;*********************************************************************************
 ; WEAK PROFILE 3
@@ -418,10 +422,12 @@ visual				= monsters\snork\snork6
 corpse_visual			= monsters\snork\snorkdead6
 icon				= ui_npc_monster_snork
 panic_threshold		= 0.5
-rank				= 9
+rank				= 8
 immunities_sect		= snork_immunities_weak
 attack_params		= snork_attack_params_weak
 spec_rank			= weak
+community			= snork
+MaxHealthValue					= 0.8			; range [0..200]
 
 ;*********************************************************************************
 ; NORMAL PROFILE
@@ -436,6 +442,8 @@ rank				= 9
 immunities_sect		= snork_immunities_normal
 attack_params		= snork_attack_params_normal
 spec_rank			= normal
+community			= snork
+MaxHealthValue					= 1.0			; range [0..200]
 
 [snork_immunities_normal]
 burn_immunity			= 0.7
@@ -452,11 +460,11 @@ fire_wound_immunity		= 0.8
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.30,		0.6,			40,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,				3.5
-stand_attack_2_1 =	  	0.30,		0.6,			40,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,				3.5
+stand_attack_0 =	  	0.30,		0.5,			40,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,				3.5
+stand_attack_2_1 =	  	0.30,		0.5,			40,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,				3.5
 
-stand_run_attack_left_0  =	  	0.40,		0.7,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
-stand_run_attack_right_0  =	  	0.40,		0.7,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_left_0  =	  	0.40,		0.55,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_right_0  =	  	0.40,		0.55,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
 
 ;*********************************************************************************
 ; NORMAL PROFILE 2
@@ -471,6 +479,8 @@ rank				= 9
 immunities_sect		= snork_immunities_normal
 attack_params		= snork_attack_params_normal
 spec_rank			= normal
+community			= snork
+MaxHealthValue					= 1.0			; range [0..200]
 
 ;*********************************************************************************
 ; NORMAL PROFILE 3
@@ -485,6 +495,8 @@ rank				= 9
 immunities_sect		= snork_immunities_normal
 attack_params		= snork_attack_params_normal
 spec_rank			= normal
+community			= snork
+MaxHealthValue					= 1.0			; range [0..200]
 
 ;*********************************************************************************
 ; STRONG PROFILE
@@ -499,6 +511,8 @@ rank				= 10
 immunities_sect		= snork_immunities_strong
 attack_params		= snork_attack_params_strong
 spec_rank			= strong
+community			= snork
+MaxHealthValue					= 1.33			; range [0..200]
 
 [snork_immunities_strong]
 burn_immunity			= 0.6
@@ -515,11 +529,11 @@ fire_wound_immunity		= 0.7
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.30,		0.6,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,				3.5
-stand_attack_2_1 =	  	0.30,		0.6,			50,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,				3.5
+stand_attack_0 =	  	0.30,		0.55,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,				3.5
+stand_attack_2_1 =	  	0.30,		0.55,			50,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,				3.5
 
-stand_run_attack_left_0  =	  	0.40,		0.75,			60,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
-stand_run_attack_right_0  =	  	0.40,		0.75,			60,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_left_0  =	  	0.40,		0.6,			60,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_right_0  =	  	0.40,		0.6,			60,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
 
 ;*********************************************************************************
 ; STRONG PROFILE 2
@@ -534,6 +548,8 @@ rank				= 10
 immunities_sect		= snork_immunities_strong
 attack_params		= snork_attack_params_strong
 spec_rank			= strong
+community			= snork
+MaxHealthValue					= 1.33			; range [0..200]
 
 ;*********************************************************************************
 ; STRONG PROFILE 3
@@ -548,6 +564,8 @@ rank				= 10
 immunities_sect		= snork_immunities_strong
 attack_params		= snork_attack_params_strong
 spec_rank			= strong
+community			= snork
+MaxHealthValue					= 1.33			; range [0..200]
 
 ;=================================================================================
 ; Terrain
@@ -562,19 +580,26 @@ spec_rank			= strong
 [snork_indoor]:snork_weak
 $spawn			= "monsters\snorks\snork_indoor"
 monster_type	= indoor
+community		= snork
+MaxHealthValue					= 1.0			; range [0..200]
 
 [snork_outdoor]:snork_weak
 $spawn			= "monsters\snorks\snork_outdoor"
 monster_type	= outdoor
+community		= snork
+MaxHealthValue					= 1.0			; range [0..200]
 
 [snork_indoor_strong]:snork_strong
 $spawn			= "monsters\snorks\snork_indoor_strong"
+MaxHealthValue					= 1.33			; range [0..200]
 
 [snork_indoor_normal]:snork_normal
 $spawn			= "monsters\snorks\snork_indoor_normal"
+MaxHealthValue					= 1.0			; range [0..200]
 
 [snork_indoor_weak]:snork_weak
 $spawn			= "monsters\snorks\snork_indoor_weak"
+MaxHealthValue					= 0.8			; range [0..200]
 
 [snork_arena]:snork_strong
 $spawn				= "monsters\arena\snork_arena"

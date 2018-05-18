@@ -248,7 +248,7 @@ function repair_ui:OnPartsListItemClicked()
 
 	self.picture_parts:SetWndPos(vector2():set(self.picture_parts.x-w/2, self.picture_parts.y-h/2))
 
-	self.caption_parts:SetText(game.translate_string("ui_st_disassemble"))
+	self.caption_parts:SetText("Disassemble")
 end
 
 function repair_ui:OnPartsListItemDbClicked()

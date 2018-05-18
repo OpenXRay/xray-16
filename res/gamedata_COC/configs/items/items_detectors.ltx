@@ -1,126 +1,118 @@
 ;===================================== Detector HUDs
 [detector_base_hud]:hud_base
-attach_place_idx		= 1
+attach_place_idx                         = 1
 
 ;--from beretta
-hands_position			= 0.033,-0.1895,0.039
-hands_orientation		= 2,2,0
-hands_position_16x9		= 0.033,-0.1895,0.039
-hands_orientation_16x9	= 2,2,0
+hands_position                           = -0.021000,-0.160000,0.002500
+hands_orientation                        = -0.500000,1.000000,1.149999
+hands_position_16x9                      = 0.033000,-0.189500,0.039000
+hands_orientation_16x9                   = 2.349998,2.749999,2.849998
 
-aim_hud_offset_pos		= 0,0,0
-aim_hud_offset_rot		= 0,0,0
+aim_hud_offset_pos                       = 0,0,0
+aim_hud_offset_rot                       = 0,0,0
 
-gl_hud_offset_pos			= 0,0,0
-gl_hud_offset_rot			= 0,0,0
+gl_hud_offset_pos                        = 0,0,0
+gl_hud_offset_rot                        = 0,0,0
 
-lean_hud_offset_pos		= 0,0,0
-lean_hud_offset_rot		= 0,0,0
+lean_hud_offset_pos                      = 0,0,0
+lean_hud_offset_rot                      = 0,0,0
 
 [detector_simple_hud]:detector_base_hud
+item_position                            = -0.072424,0.030392,-0.012213
+item_orientation                         = 324.640503,-189.627350,-183.009415
 
-item_position				= -0.072424,0.030392,-0.012213
-item_orientation			= 324.640503,-189.627350,-183.009415
+item_visual                              = dynamics\devices\dev_detector_1\dev_detector_1_hud
 
-item_visual                   	= dynamics\devices\dev_detector_1\dev_detector_1_hud
+fire_point                               = 0,0,-0.05
+fire_bone                                = light_bone_2
+fire_point2                              = 0,0,0
+fire_bone2                               = light_bone_1
 
-fire_point			= 0,0,-0.05
-fire_bone      	      		= light_bone_2
-fire_point2			= 0,0,0
-fire_bone2			= light_bone_1
+anm_show                                 = dev_detector_1_draw
+anm_show_fast                            = dev_detector_1_draw	                                       ;_quick
+anm_hide                                 = dev_detector_1_holster
+anm_hide_fast                            = dev_detector_1_holster_quick
+anm_idle                                 = dev_detector_1_idle
+anm_idle_moving                          = dev_detector_1_idle_moving
+anm_idle_sprint                          = dev_detector_1_idle_moving
 
-anm_show					= d1_draw, draw
-anm_show_fast				= d1_draw, draw
-anm_hide					= d1_holster, holster
-anm_hide_fast				= d1_holster, holster
-anm_idle					= d1_idle, idle
-anm_idle_moving				= d1_move, move
-anm_idle_moving_crouch		= d1_crouch, move
-anm_idle_sprint				= d1_sprint, sprint
+anm_show_16x9                            = dev_detector_1_draw_ws, dev_detector_1_draw
+anm_show_fast_16x9                       = dev_detector_1_draw_ws	                                       ;_quick
+anm_hide_16x9                            = dev_detector_1_holster_ws, dev_detector_1_holster
+anm_hide_fast_16x9                       = dev_detector_1_holster_ws_quick
+anm_idle_16x9                            = dev_detector_1_idle_ws, dev_detector_1_idle
+anm_idle_moving_16x9                     = dev_detector_1_idle_moving_ws, dev_detector_1_idle_moving
+anm_idle_sprint_16x9                     = dev_detector_1_idle_moving_ws, dev_detector_1_idle_moving
 
-anm_show_16x9				= d1_draw, draw
-anm_show_fast_16x9			= d1_draw, draw
-anm_hide_16x9				= d1_holster, holster
-anm_hide_fast_16x9			= d1_holster, holster
-anm_idle_16x9				= d1_idle, idle
-anm_idle_moving_16x9		= d1_move, move
-anm_idle_moving_crouch_16x9	= d1_crouch, move
-anm_idle_sprint_16x9		= d1_sprint, sprint
-
-flash_light_range		= 0.1
-onoff_light_range		= 0.1
+flash_light_range                        = 0.1
+onoff_light_range                        = 0.1
 
 [detector_advanced_hud]:detector_base_hud
 
-item_position				= -0.078949,0.039172,-0.019197
-item_orientation			= 320.606964,-194.089020,-186.572464
+item_position                            = -0.078949,0.039172,-0.019197
+item_orientation                         = 320.606964,-194.089020,-186.572464
 
-item_visual                   	= dynamics\devices\dev_detector_2\dev_detector_2_hud
+item_visual                              = dynamics\devices\dev_detector_2\dev_detector_2_hud
 
-anm_show				= d2_draw, draw
-anm_show_fast			= d2_draw, draw
-anm_hide				= d2_holster, holster
-anm_hide_fast			= d2_holster, holster
-anm_idle				= d2_idle, idle
-anm_idle_moving			= d2_move, move
-anm_idle_moving_crouch	= d2_crouch, move
-anm_idle_sprint			= d2_sprint, sprint
+anm_show                                 = dev_detector_2_draw
+anm_show_fast                            = dev_detector_2_draw	                                       ;_quick
+anm_hide                                 = dev_detector_2_holster
+anm_hide_fast                            = dev_detector_2_holster_quick
+anm_idle                                 = dev_detector_2_idle
+anm_idle_moving                          = dev_detector_2_idle_moving
+anm_idle_sprint                          = dev_detector_2_idle_moving
 
-anm_show_16x9				= d2_draw, draw
-anm_show_fast_16x9			= d2_draw, draw
-anm_hide_16x9				= d2_holster, holster
-anm_hide_fast_16x9			= d2_holster, holster
-anm_idle_16x9				= d2_idle, idle
-anm_idle_moving_16x9		= d2_move, move
-anm_idle_moving_crouch_16x9	= d2_crouch, move
-anm_idle_sprint_16x9		= d2_sprint, sprint
+anm_show_16x9                            = dev_detector_2_draw_ws, dev_detector_2_draw
+anm_show_fast_16x9                       = dev_detector_2_draw_ws	                                       ;_quick
+anm_hide_16x9                            = dev_detector_2_holster_ws, dev_detector_2_holster
+anm_hide_fast_16x9                       = dev_detector_2_holster_ws_quick
+anm_idle_16x9                            = dev_detector_2_idle_ws, dev_detector_2_idle
+anm_idle_moving_16x9                     = dev_detector_2_idle_moving_ws, dev_detector_2_idle_moving
+anm_idle_sprint_16x9                     = dev_detector_2_idle_moving_ws, dev_detector_2_idle_moving
 
 [detector_elite_hud]:detector_base_hud
-item_position				= -0.071685,0.036188,-0.009934
-item_orientation			= 314.589233,-186.420761,-189.323669
+item_position                            = -0.071685,0.036188,-0.009934
+item_orientation                         = 314.589233,-186.420761,-189.323669
 
-item_visual                   	= dynamics\devices\dev_detector_3\dev_detector_3_hud
+item_visual                              = dynamics\devices\dev_detector_3\dev_detector_3_hud
 
-anm_show					= d3_draw, draw
-anm_show_fast				= d3_draw, draw
-anm_hide					= d3_holster, holster
-anm_hide_fast				= d3_holster, holster
-anm_idle					= d3_idle, idle
-anm_idle_moving				= d3_move, move
-anm_idle_moving_crouch		= d3_crouch, move
-anm_idle_sprint				= d3_sprint, sprint
-	
-anm_show_16x9				= d3_draw, draw
-anm_show_fast_16x9			= d3_draw, draw
-anm_hide_16x9				= d3_holster, holster
-anm_hide_fast_16x9			= d3_holster, holster
-anm_idle_16x9				= d3_idle, idle
-anm_idle_moving_16x9		= d3_move, move
-anm_idle_moving_crouch_16x9	= d3_crouch, move
-anm_idle_sprint_16x9		= d3_sprint, sprint
+anm_show                                 = dev_detector_3_draw
+anm_show_fast                            = dev_detector_3_draw	                                       ;_quick
+anm_hide                                 = dev_detector_3_holster
+anm_hide_fast                            = dev_detector_3_holster_quick
+anm_idle                                 = dev_detector_3_idle
+anm_idle_moving                          = dev_detector_3_idle_moving
+anm_idle_sprint                          = dev_detector_3_idle_moving
+
+anm_show_16x9                            = dev_detector_3_draw_ws, dev_detector_3_draw
+anm_show_fast_16x9                       = dev_detector_3_draw_ws	                                       ;_quick
+anm_hide_16x9                            = dev_detector_3_holster_ws, dev_detector_3_holster
+anm_hide_fast_16x9                       = dev_detector_3_holster_ws_quick
+anm_idle_16x9                            = dev_detector_3_idle_ws, dev_detector_3_idle
+anm_idle_moving_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
+anm_idle_sprint_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
 
 [detector_scientific_hud]:detector_base_hud
-item_position				= -0.071685,0.036188,-0.009934
-item_orientation			= 314.589233,-186.420761,-189.323669
+item_position                            = -0.071685,0.036188,-0.009934
+item_orientation                         = 314.589233,-186.420761,-189.323669
 
-item_visual                   	= dynamics\devices\dev_detector_4\dev_detector_4_hud
+item_visual                              = dynamics\devices\dev_detector_4\dev_detector_4_hud
 
-anm_show				= d3_draw, draw
-anm_show_fast			= d3_draw, draw
-anm_hide				= d3_holster, holster
-anm_hide_fast			= d3_holster, holster
-anm_idle				= d3_idle, idle
-anm_idle_moving			= d3_move, move
-anm_idle_sprint			= d3_sprint, sprint
+anm_show                                 = dev_detector_3_draw
+anm_show_fast                            = dev_detector_3_draw	                                       ;_quick
+anm_hide                                 = dev_detector_3_holster
+anm_hide_fast                            = dev_detector_3_holster_quick
+anm_idle                                 = dev_detector_3_idle
+anm_idle_moving                          = dev_detector_3_idle_moving
+anm_idle_sprint                          = dev_detector_3_idle_moving
 
-anm_show_16x9			= d3_draw, draw
-anm_show_fast_16x9		= d3_draw, draw
-anm_hide_16x9			= d3_holster, holster
-anm_hide_fast_16x9		= d3_holster, holster
-anm_idle_16x9			= d3_idle, idle
-anm_idle_moving_16x9	= d3_move, move
-anm_idle_sprint_16x9	= d3_sprint, sprint
-
+anm_show_16x9                            = dev_detector_3_draw_ws, dev_detector_3_draw
+anm_show_fast_16x9                       = dev_detector_3_draw_ws	                                       ;_quick
+anm_hide_16x9                            = dev_detector_3_holster_ws, dev_detector_3_holster
+anm_hide_fast_16x9                       = dev_detector_3_holster_ws_quick
+anm_idle_16x9                            = dev_detector_3_idle_ws, dev_detector_3_idle
+anm_idle_moving_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
+anm_idle_sprint_16x9                     = dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
 ;============================================= Detectors
 [detector_simple]:identity_immunities
 GroupControlSection                      = spawn_group
@@ -131,9 +123,7 @@ cform                                    = skeleton
 visual                                   = dynamics\devices\dev_detector_1\dev_detector_1.ogf
 
 ;use_condition	= true
-;decay_rate 	= 0.0001 ; broken engine feature (decrement condition)
-
-discharge_rate							 = 0.0025 ; condition lost every two seconds
+;decay_rate 		= 0.0001 ;decrement condition
 
 hud                                      = detector_simple_hud
 animation_slot                           = 7
@@ -150,9 +140,8 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 2
 inv_grid_y                               = 5
-cost                                     = 1500
+cost                                     = 500
 default_to_ruck                          = false
-
 
 af_radius                                = 30
 af_vis_radius                            = 3
@@ -160,7 +149,7 @@ af_vis_radius                            = 3
 af_class_1                               = af_cristall
 af_sound_1_                              = detectors\art_beep1
 af_freq_1                                = 0.05, 2
-af_class_2                               = af_night_star
+af_class_2                               = af_fireball
 af_sound_2_                              = detectors\art_beep1
 af_freq_2                                = 0.05, 2
 
@@ -222,6 +211,9 @@ $spawn                                   = "devices\detector_advanced"
 class                                    = DET_ADVA
 visual                                   = dynamics\devices\dev_detector_2\dev_detector_2.ogf
 
+;use_condition	= true
+;decay_rate 		= 0.00005 ;decrement condition
+
 inv_name                                 = st_detector2
 inv_name_short                           = st_detector2
 description                              = st_detector2_descr
@@ -230,7 +222,7 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 3
 inv_grid_y                               = 5
-cost                                     = 5000
+cost                                     = 1000
 hud                                      = detector_advanced_hud
 
 af_radius                                = 30
@@ -240,7 +232,7 @@ af_class_15                              = af_dummy_glassbeads
 af_sound_15_                             = detectors\art_beep1
 af_freq_15                               = 0.05, 2
 
-af_class_16                              = af_fireball
+af_class_16                              = af_night_star
 af_sound_16_                             = detectors\art_beep1
 af_freq_16                               = 0.05, 2
 
@@ -264,15 +256,15 @@ af_class_21                              = af_dummy_battery
 af_sound_21_                             = detectors\art_beep1
 af_freq_21                               = 0.05, 2
 
-af_class_22                              = af_ameba_slug
+af_class_22                              = af_dummy_spring
 af_sound_22_                             = detectors\art_beep1
 af_freq_22                               = 0.05, 2
 
-af_class_23                              = af_rusty_kristall
+af_class_23                              = af_ameba_slug
 af_sound_23_                             = detectors\art_beep1
 af_freq_23                               = 0.05, 2
 
-af_class_24                              = af_gravi
+af_class_24                              = af_rusty_kristall
 af_sound_24_                             = detectors\art_beep1
 af_freq_24                               = 0.05, 2
 
@@ -289,7 +281,7 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 4
 inv_grid_y                               = 5
-cost                                     = 20000
+cost                                     = 2000
 
 ; elite x="0.00096" y="0.0035"
 ui_p                                     = -0.02904,0.01,0.0364
@@ -298,15 +290,15 @@ ui_r                                     = 0,90,0
 af_radius                                = 30
 af_vis_radius                            = 5
 
-af_class_25                              = af_dummy_spring
+af_class_25                              = af_eye
 af_sound_25_                             = detectors\art_beep1
 af_freq_25                               = 0.05, 2
 
-af_class_26                              = af_eye
+af_class_26                              = af_fire
 af_sound_26_                             = detectors\art_beep1
 af_freq_26                               = 0.05, 2
 
-af_class_27                              = af_fire
+af_class_27                              = af_gravi
 af_sound_27_                             = detectors\art_beep1
 af_freq_27                               = 0.05, 2
 
@@ -342,6 +334,9 @@ af_freq_34                               = 0.05, 2
 $spawn                                   = "devices\detector_scientific"
 class                                    = DET_SCIE
 
+;use_condition	= true
+;decay_rate 		= 0.00004 ;decrement condition
+
 visual                                   = dynamics\devices\dev_detector_4\dev_detector_4.ogf
 
 inv_name                                 = st_detector4
@@ -353,7 +348,7 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 5
 inv_grid_y                               = 5
-cost                                     = 75000
+cost                                     = 15500
 
 ; elite x="0.00096" y="0.0035"
 ui_p                                     = -0.02904,0.01,0.0364

@@ -8,7 +8,7 @@ function get_smart_cover()
 	return {
 			need_weapon = false,
 			loopholes = {
-				smart_covers_loophole_animpoint_sit_knee.get_loophole("animpoint_sit_knee",	vector():set(0,0,0), vector():set(0,0,-1),	vector():set(0,0,-1))
+				smart_covers_loophole_animpoint_sit_knee.get_loophole("animpoint_sit_knee",	VEC_ZERO, vector():set(0,0,-1),	vector():set(0,0,-1))
 			},
 
 	

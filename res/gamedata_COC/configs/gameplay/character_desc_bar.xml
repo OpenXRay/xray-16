@@ -12,14 +12,11 @@
     <money min="1000000" max="1000000" infinitive="1"></money>
     <rank>28980</rank>
     <reputation>2408</reputation>
-    <visual>actors\stalker_unique\stalker_trader_barman</visual>
+    <visual>actors\barman\barman</visual>
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <crouch_type>-1</crouch_type>
     <supplies></supplies>
         <start_dialog>bar_visitors_barman_stalker_trader_start_dialog</start_dialog>
-    	<actor_dialog>dm_ordered_task_dialog</actor_dialog>
-    	<actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
-    	<actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
 		<actor_dialog>dm_broker_dialog</actor_dialog>
         <actor_dialog>actor_break_dialog</actor_dialog>
         </specific_character>
@@ -35,7 +32,7 @@
         <money min="200" max="600" infinitive="0"></money>
         <rank>14654</rank>
         <reputation>976</reputation>
-        <visual>actors\stalker_unique\stalker_bar_security</visual>
+        <visual>actors\stalker_neutral\stalker_bar_security</visual>
         <snd_config>characters_voice\human_01\stalker\</snd_config>
         <crouch_type>-1</crouch_type>
         <supplies>
@@ -58,7 +55,7 @@
     <money min="200" max="600" infinitive="0"></money>
     <rank>13032</rank>
     <reputation>817</reputation>
-    <visual>actors\stalker_unique\stalker_bar_security</visual>
+    <visual>actors\stalker_neutral\stalker_bar_security</visual>
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <crouch_type>-1</crouch_type>
     <supplies>
@@ -81,7 +78,7 @@
     <money min="5000" max="10000" infinitive="0"></money>
     <rank>21092</rank>
     <reputation>1215</reputation>
-    <visual>actors\stalker_unique\stalker_dolg_voronin</visual>
+    <visual>actors\stalker_dolg\stalker_do_komandir</visual>
     <snd_config>characters_voice\human_01\dolg\</snd_config>
     <crouch_type>0</crouch_type>
     <supplies>
@@ -110,7 +107,7 @@
     <money min="600" max="2000" infinitive="0"></money>
     <rank>16068</rank>
     <reputation>524</reputation>
-    <visual>actors\stalker_unique\stalker_dolg_kitsenko</visual>
+    <visual>actors\dolg\stalker_do_balon_1</visual>
     <snd_config>characters_voice\human_01\dolg\</snd_config>
     <crouch_type>0</crouch_type>
     <supplies>
@@ -197,7 +194,7 @@
     <money min="1000000" max="1000000" infinitive="1"></money>
     <rank>15352</rank>
     <reputation>270</reputation>
-    <visual>actors\stalker_unique\stalker_dolg_petrenko</visual>
+    <visual>actors\stalker_dolg\stalker_do_balon_3</visual>
     <snd_config>characters_voice\human_01\dolg\</snd_config>
     <crouch_type>0</crouch_type>
     <supplies>
@@ -231,7 +228,7 @@
     <rank>3384</rank>
     <reputation>376</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_unique\stalker_dolg_tech</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_mehanik</visual>
     <supplies></supplies>
 #include "gameplay\character_criticals.xml"
         <start_dialog>bar_visitors_stalker_mechanic_start</start_dialog>
@@ -256,7 +253,7 @@
         <money min="600" max="2000" infinitive="0"></money>
         <rank>6580</rank>
         <reputation>265</reputation>
-        <visual>actors\stalker_unique\stalker_neutral_arnie</visual>
+        <visual>actors\neytral\stalker_neytral_balon_6</visual>
         <snd_config>characters_voice\human_01\stalker\</snd_config>
         <crouch_type>-1</crouch_type>
         <supplies>
@@ -285,7 +282,7 @@
     <money min="200" max="600" infinitive="0"></money>
     <rank>12850</rank>
     <reputation>847</reputation>
-    <visual>actors\stalker_unique\stalker_bar_security</visual>
+    <visual>actors\stalker_neutral\stalker_bar_security</visual>
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <crouch_type>-1</crouch_type>
     <supplies>
@@ -370,7 +367,7 @@
     
     <!--------------------STALKER 3_1 and 3_2---------------------->
     <specific_character id="bar_arena_stalker_3_1" team_default = "1">
-    <name>bar_swede_name</name>
+    <name>GENERATE_NAME_stalker</name>
     <icon>ui_inGame2_neutral_2_mask</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>bar_arena_stalker</bio>
@@ -638,7 +635,7 @@
     <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
     <rank>1394</rank>
     <reputation>2189</reputation>
-    <visual>actors\stalker_bandit\stalker_bandit_5</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5a</visual>
     <snd_config>characters_voice\human_02\bandit\</snd_config>
     <crouch_type>-1</crouch_type>
     <supplies>

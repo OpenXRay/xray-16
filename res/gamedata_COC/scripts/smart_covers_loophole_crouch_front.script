@@ -11,7 +11,7 @@ function get_loophole(id, fov_direction, position, enter_direction)
                                 usable = true,
                                 fov        = 90.0,
 								danger_fov = 110.0,
-                                range = 200.0,
+                                range = 70.0,
                                 actions = {
                                         idle = {
                                                 animations = {

@@ -155,10 +155,10 @@ function action_patrol:execute()
 		
 		if (self.stand) then 
 			npc:set_body_state(move.standing)
-			--state_mgr.set_state(npc,self.st.sniper and "threat_sniper_fire" or "threat_fire", nil, nil, {look_object = be}, state_mgr.fast_set_true)
+			--state_mgr.set_state(npc,self.st.sniper and "threat_sniper_fire" or "threat_fire", nil, nil, {look_object = be}, {fast_set = true})
 		else 
 			npc:set_body_state(move.crouch)
-			--state_mgr.set_state(npc,self.st.sniper and "hide_sniper_fire" or "hide_fire", nil, nil, {look_object = be}, state_mgr.fast_set_true)
+			--state_mgr.set_state(npc,self.st.sniper and "hide_sniper_fire" or "hide_fire", nil, nil, {look_object = be}, {fast_set = true})
 		end
 		
 		local bw = npc:best_weapon()
@@ -175,7 +175,7 @@ function action_patrol:execute()
 				--printf("result=%s",result.object and result.object:name())
 				if (result.object and result.object:id() ~= npc:id()) then 
 					-- tries avoid friendly fire
-					if (IsStalker(result.object) == false or  not result.object:is_Stalker() or npc:relation(result.object) == game_object.enemy) then
+					if (IsStalker(result.object) == false or result.object:cast_Stalker() == nil or npc:relation(result.object) == game_object.enemy) then
 						npc:set_item(object.fire1,bw,3,math.random(0,2000))
 						return
 					end
@@ -399,7 +399,7 @@ function action_patrol:on_place()
 		return false
 	end
 
-	local path = self.st.path_walk and patrol(self.st.path_walk)
+	local path = patrol(self.st.path_walk)
 	if path ~= nil then
 		for k = 0, path:count() - 1 do
 			if utils.stalker_at_waypoint(self.object, patrol(self.st.path_walk), k) then

@@ -13,11 +13,6 @@ end
 class "ph_item_box"
 function ph_item_box:__init()
 	local death_ini = ini_file("misc\\ph_box_generic.ltx")
-	
-	local diff = axr_main.config:r_value("mm_options","multi_loot",2) or 1
-	local diff_multi = (diff - 0.2) or 0.8
-
-
 	local community_list = { "def_box", "small_box_generic", "small_box_ussr", "small_box_nato", "small_box_army", "small_box_science", "big_box_generic", "big_box_dungeons", "big_box_arsenal"}
 	for k,v in pairs(community_list) do
 		item_by_community[v] = {}
@@ -26,8 +21,7 @@ function ph_item_box:__init()
 			local id, value = "", ""
 			for i=0,n-1 do
 				result, id, value = death_ini:r_line(v,i,"","")
-				local temp = not (death_ini:line_exist("exclude_from_multi",id)) and diff_multi or 1
-				item_by_community[v][id] = tonumber(value)*temp or 0
+				item_by_community[v][id] = tonumber(value) or 0
 			end
 		end
 	end
@@ -42,12 +36,11 @@ function ph_item_box:__init()
 	local id, value = "", ""
 	for i=0,n-1 do
 		result, id, value = death_ini:r_line(level_name,i,"","")
-		mul_by_level[id] = tonumber(value) or 0
+		mul_by_level[id] = tonumber(value)
 	end
 
 	local item_count_section = "item_count_" .. level.get_game_difficulty()
 	local n = death_ini:line_count(item_count_section)
-	death_manager.SetDiffModifications()
 	for i=0,n-1 do
 		result, id, value	= death_ini:r_line(item_count_section,i,"","")
 
@@ -55,11 +48,8 @@ function ph_item_box:__init()
 		local min = t[1] or 1
 		local max = t[2] or min
 
-		local multi = axr_main.config:r_value("mm_options","multi_loot",2) or 1
-		local cnt_multi_1 = multi or 1
-		local cnt_multi_2 = multi or 1
-		min = tonumber(min) * cnt_multi_1 * (mul_by_level[id] or 0)
-		max = tonumber(max) * cnt_multi_2 * (mul_by_level[id] or 0)
+		min = tonumber(min) * (mul_by_level[id] or 0)
+		max = tonumber(max) * (mul_by_level[id] or 0)
 
 		count_by_level[id] = {min,max}
 	end
@@ -124,10 +114,10 @@ function create_obligatory_items(obj, spawn_ini)
 	local items = parse_names(spawn_ini:r_string_ex("drop_box", "items"))
 	local size_t = #items
 	if (size_t > 0) then
-		local pos = vector():set(0,0,0)
-		pos.x = obj:position().x
-		pos.z = obj:position().z
-		pos.y = obj:position().y + 0.3
+		local position = vector():set(0,0,0)
+		position.x = obj:position().x
+		position.z = obj:position().z
+		position.y = obj:position().y + 0.3
 			
 		local sim = alife()
 		local sys_ini = system_ini()
@@ -136,7 +126,7 @@ function create_obligatory_items(obj, spawn_ini)
 			if not (sys_ini:section_exist(section) and sys_ini:line_exist(section,"cform")) then 
 				return 
 			end
-			sim:create(section,pos,obj:level_vertex_id(),obj:game_vertex_id())
+			sim:create(section,position,obj:level_vertex_id(),obj:game_vertex_id())
 		end
 	end
 end

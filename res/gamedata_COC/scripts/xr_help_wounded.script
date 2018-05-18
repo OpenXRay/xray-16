@@ -5,6 +5,11 @@
 	modified_by: Alundaio
 --]]
 ----------------------------------------------------------------------------------------------------------------------
+
+--------------------
+local alife, level = alife, level
+--------------------
+
 local ini = ini_file("ai_tweaks\\xr_help_wounded.ltx")
 local HelpInCombat = ini:r_bool_ex("settings","help_in_combat",true)
 local UseNewAnim = ini:r_bool_ex("settings","use_new_anim",true)
@@ -216,10 +221,6 @@ function evaluator_wounded_exist:evaluate()
 		return false
 	end
 	
-	if (npc:in_smart_cover()) then 
-		return false
-	end
-	
 	if (xr_danger.has_danger(npc)) then
 		return false
 	end
@@ -303,15 +304,15 @@ function action_help_wounded:execute()
 			--end
 
 			if (npc:active_item() and npc:best_weapon() and npc:weapon_unstrapped()) then
-				state_mgr.set_state(npc, "help_victim_"..AnimCombat,nil,nil,nil,state_mgr.fast_set_true)
+				state_mgr.set_state(npc, "help_victim_"..AnimCombat,nil,nil,nil,{fast_set = true})
 			else
-				state_mgr.set_state(npc, "help_victim_"..AnimFree,nil,nil,nil,state_mgr.fast_set_true)
+				state_mgr.set_state(npc, "help_victim_"..AnimFree,nil,nil,nil,{fast_set = true})
 			end
 			
 			-- increase stalker rank for helping an ally
 			npc:set_character_rank(npc:character_rank()+math.random(10,20))
 		else
-			state_mgr.set_state(npc, "help_wounded",nil,nil,nil,state_mgr.fast_set_true)
+			state_mgr.set_state(npc, "help_wounded",nil,nil,nil,{fast_set = true})
 		end
 	else
 		if (npc:path_type() ~= game_object.level_path) then 
@@ -395,8 +396,8 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 		action = manager:action(stalker_ids.action_combat_planner)
 		action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
 
-		action = manager:action(xr_actions_id.state_mgr + 1)
-		action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
+		--action = manager:action(xr_actions_id.state_mgr + 1)
+		--action:add_precondition( wp(xr_evaluators_id.wounded_exist,false) )
 	end
 
 	local p = {

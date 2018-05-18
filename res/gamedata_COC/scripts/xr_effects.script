@@ -42,17 +42,11 @@ function find_smart_under_faction_control_ex(actor,npc,p)
 	
 	local sim = alife()
 	local gg = game_graph()
-	--local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
+	local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
 		
-	local actor_gvid = sim:actor().m_game_vertex_id
-	
-	local function check_dist(t,a,b)
-		return utils.graph_distance(actor_gvid,t[a].m_game_vertex_id) < utils.graph_distance(actor_gvid,t[b].m_game_vertex_id)
-	end
-	
 	local target_id
-	for name,smart in spairs(SIMBOARD.smarts_by_names,check_dist) do
-		if (simulation_objects.available_by_id[smart.id] == true) then
+	for name,smart in pairs(SIMBOARD.smarts_by_names) do 
+		if (simulation_objects.available_by_id[smart.id] == true) then 
 			local smrt = SIMBOARD.smarts[smart.id]
 			if (smrt) then 
 				for k,v in pairs(smrt.squads) do
@@ -60,48 +54,6 @@ function find_smart_under_faction_control_ex(actor,npc,p)
 					if (squad and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
 						for i=2,#p do
 							if (p[i] == "monster" and is_squad_monster[squad.player_id] or squad.player_id == p[i]) then
-								utils.save_var(db.actor,p[1],smart.id)
-								return
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
--- same as _ex but checks all enemy factions to p[2]
-function find_smart_under_faction_control_enemy(actor,npc,p)
-	if not (p[1]) then
-		return 
-	end 
-	
-	local sim = alife()
-	local gg = game_graph()
-	local actor_gvid = sim:actor().m_game_vertex_id
-	
-	local function check_dist(t,a,b)
-		return utils.graph_distance(actor_gvid,t[a].m_game_vertex_id) < utils.graph_distance(actor_gvid,t[b].m_game_vertex_id)
-	end
-	
-	local com_list = alun_utils.get_communities_list(true)
-	for comm,v in pairs(com_list) do
-		if not (game_relations.is_factions_enemies(p[2],comm)) then
-			com_list[comm] = nil
-		end
-	end
-	
-	local target_id
-	for name,smart in spairs(SIMBOARD.smarts_by_names,check_dist) do
-		if (simulation_objects.available_by_id[smart.id] == true) then
-			local smrt = SIMBOARD.smarts[smart.id]
-			if (smrt) then 
-				for k,v in pairs(smrt.squads) do
-					local squad = alife_object(k)
-					if (squad and squad.current_target_id and squad.current_target_id == smart.id and not squad:get_script_target()) then
-						for comm,vv in pairs(com_list) do
-							if (comm ~= "monster" and squad.player_id == comm) then
 								utils.save_var(db.actor,p[1],smart.id)
 								return
 							end
@@ -180,11 +132,11 @@ end
 
 --param 1 task_id
 --param 2+ factions that can be targetted; can be list
-local bounty_cache = {}
 function on_init_bounty_hunt(actor,npc,p)
 	axr_task_manager.bounties_by_id[p[1]] = nil 
 	
-	local valid_targets = {["enemy"]={},["neutral"]={}}
+	local valid_targets = {}
+	local size_t = 0
 	local sim = alife()
 	local comm
 	local sfind = string.find
@@ -192,74 +144,37 @@ function on_init_bounty_hunt(actor,npc,p)
 	local faction_lookup = {}
 	for i=2,#p do 
 		faction_lookup[p[i]] = true
-	end
+	end 
 	
-	local target_id
-	local r
-	
-	local function find_stalker(id,se_obj)
+	for i=1,65534 do 
+		local se_obj = sim:object(i)
 		-- find random sim stalker
-		if (id ~= 0 and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and sfind(se_obj:section_name(),"sim_default") and get_object_story_id(id) == nil) and (se_obj.group_id ~= 65535 and get_object_story_id(se_obj.group_id) == nil) then
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and sfind(se_obj:section_name(),"sim_default") and get_object_story_id(i) == nil) and (se_obj.group_id == nil or se_obj.group_id == 65535 or get_object_story_id(se_obj.group_id) == nil) then
 			comm = alife_character_community(se_obj)
-			if (faction_lookup[comm] == true) then
-				local relation = game_relations.get_squad_goodwill_to_actor_by_id(se_obj.group_id)
-				if (valid_targets[relation]) then
-					return valid_targets[relation]
-				end
+			if (faction_lookup[comm] == true) then 
+				size_t = size_t + 1 
+				valid_targets[size_t] = i
 			end
 		end
 	end
 	
-	-- make sure cached ids are still valid
-	if (bounty_cache[p[1]]) then 
-		for i=#bounty_cache[p[1]],1,-1 do
-			local id = bounty_cache[p[1]][i]
-			local se_obj = sim:object(id)
-			if (se_obj and find_stalker(id,se_obj) == nil) then
-				table.remove(bounty_cache[p[1]],i)
-			end
-		end
-	end
-		
-	-- show up to only 3 targets
-	if (bounty_cache[p[1]] == nil or #bounty_cache[p[1]] < 3) then
-		for id, se_obj in sim:objects() do
-			local t = find_stalker(id,se_obj)
-			if (t) then
-				table.insert(t,id)
-			end
-		end
-		
-		-- random chance to prioritize neutral target over enemy
-		local typ = "enemy"
-		local rnd = math.random(1,100)
-		if (rnd < 20) then 
-			typ = "neutral"
-		end
-		
-		target_id = valid_targets[typ][math.random(#valid_targets[typ])] or valid_targets.enemy[math.random(#valid_targets.enemy)] or valid_targets.neutral[math.random(#valid_targets.neutral)]
-		if (target_id) then 
-			if not (bounty_cache[p[1]]) then 
-				bounty_cache[p[1]] = {}
-			end
-			table.insert(bounty_cache[p[1]],target_id)
-		end
-	else
-		target_id = bounty_cache[p[1]][math.random(#bounty_cache[p[1]])]
+	if (size_t <= 0) then
+		printf("on_init_bounty_hunt failed, no targets")
+		return 
 	end
 	
-	if (target_id == nil or target_id == 0) then
-		return
+	local target_id = valid_targets[math.random(size_t)]
+	if not(target_id) then
+		return 
 	end
-		
+	
 	axr_task_manager.bounties_by_id[p[1]] = target_id
 
 	local function postpone_for_next_frame(target_id)
 		local se_obj = sim:object(target_id)
 		if (se_obj) then
-			local level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
 			local news_caption = game.translate_string(task_manager.task_ini:r_string_ex(p[1], "title")) or "error"
-			local news_text = game.translate_string("st_mm_faction_cap_character_name") .. " " .. se_obj:character_name() .. "\\n " .. game.translate_string("st_mm_faction_cap_faction") .. " " .. game.translate_string(se_obj:community()) .. "\\n " .. game.translate_string("st_location") .. " " .. game.translate_string(level_name)
+			local news_text = game.translate_string("st_mm_faction_cap_character_name") .. " " .. se_obj:character_name() .. "\\n " .. game.translate_string("st_mm_faction_cap_faction") .. " " .. game.translate_string(se_obj:community())
 			db.actor:give_talk_message2(news_caption, news_text, se_obj:character_icon(), "iconed_answer_item")
 		end
 		return true
@@ -268,8 +183,7 @@ function on_init_bounty_hunt(actor,npc,p)
 end 
 
 function fail_task_dec_goodwill(actor,npc,p)
-	local multi = (axr_main.config:r_value("mm_options","multi_rewards_goodwill",2) or 1)
-	local amt = tonumber(p[1])*multi or 50
+	local amt = tonumber(p[1]) or 50
 	for i=2,#p do 
 		inc_faction_goodwill_to_actor(db.actor, nil, {p[i], -(amt)})
 	end
@@ -278,69 +192,24 @@ end
 -- param1 - amount of goodwill to increase
 -- param2+ - community
 function complete_task_inc_goodwill(actor,npc,p)
-	local multi = (axr_main.config:r_value("mm_options","multi_rewards_goodwill",2) or 1)
-	local amt = tonumber(p[1])*multi or 50
+	local amt = tonumber(p[1]) or 50
 	for i=2,#p do 
 		inc_faction_goodwill_to_actor(db.actor, nil, {p[i], amt})
 	end
 end
 
 function reward_money(actor,npc,p)
-	local multi = (axr_main.config:r_value("mm_options","multi_rewards_money",2) or 1)
-	dialogs.relocate_money(db.actor,tonumber(p[1] or 500)*multi,"in")
-end
-
--- param1 - task_id
--- param2 - base amount
--- param3 - factor   (ex. factor of 25 times 40 monster rating = 1000 RU)
-function reward_by_rank(actor,npc,p)
-	local rank = utils.load_var(db.actor,p[1].."_target_id_rank",1)
-	local amt = tonumber(p[2]) + tonumber(rank) * (tonumber(p[3]) or 500)
-	dialogs.relocate_money(db.actor,amt,"in")
+	dialogs.relocate_money(db.actor,tonumber(p[1] or 500),"in")
 end
 
 function reward_stash(actor,npc,p)
 	if (p and p[1] ~= "true") or ((math.random(1,100)/100) <= 0.5) then
-		local bonus = {}
-
-		for i=2,#p do
-			table.insert(bonus,p[i])
+		local bonus
+		if ((math.random(1,100)/100) <= 0.35) then
+			local t = {"itm_repairkit_tier_1","itm_repairkit_tier_1","itm_repairkit_tier_1","itm_repairkit_tier_2","itm_repairkit_tier_2","itm_repairkit_tier_3"}
+			bonus = {t[math.random(#t)]}
 		end
-
-		if ((math.random(1,100)/100) <= 0.25) then
-			local t = {"itm_repairkit_tier_1","itm_repairkit_tier_1","itm_repairkit_tier_2","itm_repairkit_tier_2","itm_repairkit_tier_3"}
-			table.insert(bonus,t[math.random(#t)])
-		end
-		
 		coc_treasure_manager.create_random_stash(nil,nil,bonus)
-	end
-end
-
--- create_stash(story_id:hint:section1:section2:section3:section4:section5)
--- param1 story_id
--- param2 hint
--- param3+ section
-function create_stash(actor,npc,p)
-	local box = get_story_object(p[1])
-	if not (box) then 
-		return 
-	end
-	
-	local t = {}
-	for i=2,#p do
-		if (system_ini():section_exist(p[i])) then
-			table.insert(t,p[i])
-		else 
-			printf("create_stash | trying to spawn item that doesn't exist %s",p[i])
-		end
-	end
-	
-	if (#t > 0) then
-		local id = box:id()
-		coc_treasure_manager.caches[id] = table.concat(t,",")
-		
-		level.map_add_object_spot_ser(id, "treasure", game.translate_string(hint or "st_ui_pda_secret"))
-		news_manager.send_treasure(0)
 	end
 end
 
@@ -349,72 +218,24 @@ function reward_item_cost_mult_and_remove(actor,npc,p)
 	if not (sec) then 
 		return 
 	end 
-	
-	local mult = tonumber(p[2]) or 1
-	local amt = utils.load_var(db.actor,p[1].."_count") or 1
-	local cur_amt = amt
-	local total_cost = 0
-	local function add_up_items(itm)
-		if (itm:section() == sec and cur_amt > 0) then
-			local multi = (axr_main.config:r_value("mm_options","multi_rewards_money",2) or 1)
-			total_cost = total_cost + mult*itm:cost()*itm:condition()*multi
-			cur_amt = cur_amt - 1
-		end
-		if (cur_amt <= 0) then
-			return true
-		end
-		return false
-	end
-	db.actor:inventory_for_each(add_up_items)
-	
-	if (total_cost <= 0) then
-		total_cost = 50
-	end
-	
-	dialogs.relocate_money(db.actor, total_cost ,"in")
-	
-	local trade_npc = inventory_upgrades.victim_id and db.storage[inventory_upgrades.victim_id] and db.storage[inventory_upgrades.victim_id].object
-	if (trade_npc) then 
-		local function transfer_object_item(itm)
-			if (itm:section() == sec and amt > 0) then
-				db.actor:transfer_item(itm, trade_npc)
-				amt = amt - 1
-			end
-			if (amt <= 0) then 
-				return true
-			end
-			return false
-		end
-		db.actor:inventory_for_each(transfer_object_item)
-	else
-		remove_item(actor, npc, {sec,amt})	
-	end
+	local item = db.actor:object(sec)
+	if not (item) then 
+		return 
+	end 
+	dialogs.relocate_money(db.actor, (tonumber(p[2]) or 1)*item:cost()*item:condition() ,"in")
+	remove_item(actor, npc, {sec,p[3]})
 end 
 
 function reward_random_item(actor,npc,p)
-	if (#p > 0) then
-		local item_list = {}
-		local i = #p
-		while i > 1 do 
-			local section = p[i-1]
-			if (system_ini():section_exist(section)) then
-				item_list[section] = tonumber(p[i]) or 1
+	if (#p > 0) then 
+		local section = p[math.random(#p)]
+		if (system_ini():section_exist(section)) then
+			local se_item = alife():create(section,vector():set(0,0,0),0,0,0)
+			local cls = se_item:clsid()
+			if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then
+				se_item.condition = math.random(60,90)/100
 			end
-			table.remove(p,i)
-			i = i - 2
-		end
-		local section = p[math.random(1,#p)]
-		local amt = item_list[section]
-		if (amt) then
-			for j=1,amt do
-				local se_item = alife():create(section,vector():set(0,0,0),0,0,0)
-				local cls = se_item:clsid()
-				if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then
-					local multi = (axr_main.config:r_value("mm_options","multi_wpn_coniditions",2) or 1)
-					se_item.condition = utils.clamp((math.random(80,90)/100)*multi,0.5,1)
-				end
-			end
-			news_manager.relocate_item(db.actor,"in",section,amt)
+			news_manager.relocate_item(db.actor, "in", section)
 		end
 	end
 end
@@ -522,13 +343,13 @@ function setup_rare_mutant_fetch_task(actor,npc,p)
 		dialogs._FETCH_TEXT = game.translate_string(system_ini():r_string_ex(part,"inv_name") or "")
 	else
 		local parts = { 
-		"mutant_part_controller_brain",
+		"mutant_part_controller_glass",
 		"mutant_part_controller_hand",
 		"mutant_part_burer_hand",
 		"mutant_part_pseudogigant_eye",
 		"mutant_part_pseudogigant_hand",
 		"mutant_part_chimera_claw",
-		"mutant_part_chimera_teeth"
+		"mutant_part_chimera_kogot"
 		}
 		part = parts[math.random(#parts)]
 		utils.save_var(db.actor,p[1],part)
@@ -545,7 +366,6 @@ function setup_artefact_fetch_task(actor,npc,p)
 	else
 		local arts = {
 		"af_cristall",
-		"af_drops",
 		"af_fireball",
 		"af_dummy_glassbeads",
 		"af_eye",
@@ -567,7 +387,6 @@ function setup_artefact_fetch_task(actor,npc,p)
 		"af_electra_moonlight",
 		"af_dummy_battery",
 		"af_dummy_dummy",
-		"af_dummy_spring",
 		"af_ice",
 		"af_rusty_thorn",
 		"af_rusty_kristall",
@@ -656,22 +475,7 @@ function remove_fetch_item(actor,npc,p)
 	local section = utils.load_var(db.actor,p[1])
 	if (section and db.actor:object(section)) then
 		local amt = p[2] or utils.load_var(db.actor,p[1].."_count") or 1
-		local trade_npc = inventory_upgrades.victim_id and db.storage[inventory_upgrades.victim_id] and db.storage[inventory_upgrades.victim_id].object
-		if (trade_npc) then 
-			local function transfer_object_item(itm)
-				if (itm:section() == section and amt > 0) then
-					db.actor:transfer_item(itm, trade_npc)
-					amt = amt - 1
-				end
-				if (amt <= 0) then 
-					return true
-				end
-				return false
-			end
-			db.actor:inventory_for_each(transfer_object_item)
-		else
-			remove_item(actor, npc, {section,amt})	
-		end
+		remove_item(actor, npc, {section,amt})
 	end
 end
 
@@ -1156,7 +960,7 @@ local function reset_animation(npc)
 	state_mgr.animstate:set_state(nil, true)
 	state_mgr.animstate:set_control()
 
-	state_mgr:set_state("idle", nil, nil, nil, state_mgr.fast_set_true)
+	state_mgr:set_state("idle", nil, nil, nil, {fast_set = true})
 
 --	planner:update()
 --	planner:update()
@@ -1505,14 +1309,12 @@ function hit_obj(actor, npc, p)
 	h.impulse = p[4]
 
 	if p[5] then
-		sid = get_story_object(p[5])
+		sid = get_story_object(sid)
 		if sid then
 			h.direction = vec_sub(sid:position(), obj:position())
-		else
-			local path = patrol(p[5])
-			if (path) then
-				h.direction = vec_sub(path:point(0), obj:position())
-			end
+		end
+		if not sid then
+			h.direction = vec_sub(patrol(p[5]):point(0), obj:position())
 		end
 	else
 		h.direction = vec_sub(npc:position(), obj:position())
@@ -1538,14 +1340,12 @@ function hit_obj_chemical(actor, npc, p)
 	h.impulse = p[4]
 
 	if p[5] then
-		sid = get_story_object(p[5])
+		sid = get_story_object(sid)
 		if sid then
 			h.direction = vec_sub(sid:position(), obj:position())
-		else
-			local path = patrol(p[5])
-			if (path) then
-				h.direction = vec_sub(path:point(0), obj:position())
-			end
+		end
+		if not sid then
+			h.direction = vec_sub(patrol(p[5]):point(0), obj:position())
 		end
 	else
 		h.direction = vec_sub(npc:position(), obj:position())
@@ -1571,14 +1371,12 @@ function hit_obj_fire_wound(actor, npc, p)
 	h.impulse = p[4]
 
 	if p[5] then
-		sid = get_story_object(p[5])
+		sid = get_story_object(sid)
 		if sid then
 			h.direction = vec_sub(sid:position(), obj:position())
-		else
-			local path = patrol(p[5])
-			if (path) then
-				h.direction = vec_sub(path:point(0), obj:position())
-			end
+		end
+		if not sid then
+			h.direction = vec_sub(patrol(p[5]):point(0), obj:position())
 		end
 	else
 		h.direction = vec_sub(npc:position(), obj:position())
@@ -1668,7 +1466,6 @@ function hit_npc_from_npc(actor, npc, p)
 	h.impulse = 0.03
 	hitted_npc:hit(h)
 end
-]]--
 
 function hit_actor(actor, npc, p)
 	local h = hit()
@@ -1680,7 +1477,7 @@ function hit_actor(actor, npc, p)
 	h.impulse = 0.001
 	actor:hit(h)
 end
-
+]]--
 
 function restore_health_portion(actor, npc)
     local health = npc.health
@@ -1692,10 +1489,6 @@ end
 function restore_health(actor, npc)
 	--printf("HEALTH RESTORE")
 	npc.health = 1
-end
-
-function set_health_wounded(actor, npc)
-		npc:set_health_ex(0.2)
 end
 
 function make_enemy(actor, npc, p)
@@ -2826,11 +2619,11 @@ function dec_faction_goodwill_to_actor(actor, npc, p)
 end
 
 
-
+--[[
 function add_custom_static(actor, npc, p)
 	if p[1] ~= nil and p[2] ~= nil then
 		get_hud():AddCustomStatic(p[1], true)
-		get_hud():GetCustomStatic(p[1]):wnd():TextControl():SetTextST(p[2])
+		get_hud():GetCustomStatic(p[1]):wnd():SetTextST(p[2])
 	else
 		printf("Invalid parameters in function add_custom_static!!!")
 	end
@@ -2843,7 +2636,7 @@ function remove_custom_static(actor, npc, p)
 		printf("Invalid parameters in function remove_custom_static!!!")
 	end
 end
-
+]]--
 
 function kill_actor(actor, npc)
 	db.actor:kill(db.actor)
@@ -3060,89 +2853,6 @@ function remove_map_spot(actor, npc, p)
 end
 ]]--
 
--- add map spot from logic
--- param 1 is story_id of object to show on pda map
--- param 2 is ui icon tag from map_spots.xml
--- param 3 is name of ui_st_pda.xml string
-function add_map_spot(actor, npc, p)
-	if(p[1]==nil) then
-		printf("Story id for add map spot function is not set")
-	else
---		local story_id = tonumber(p[1]) --original SOC/CS
-		local story_id = p[1]
---		local id = id_by_sid(story_id) --original SOC/CS
-		local id = get_story_object_id(story_id)
-		if(id==nil) then
-			local obj = alife_object(p[1])
-			id = obj and obj.id
-		end
-		if(id~=nil) then
-			if(p[2]==nil) then
-				p[2] = "primary_object"
-			end
-			if(p[3]==nil) then
-				p[3] = "default"
-			end
-			if level.map_has_object_spot(id, p[2]) == 0 then
-				level.map_add_object_spot_ser(id, p[2], p[3])
-			end
-		else
-			printf("Wrong story id or name [%s] for map spot function", tostring(story_id))
-		end
-	end
-end
-
--- remove map spot from logic
--- param 1 is story_id of object to show on pda map
--- param 2 is ui icon tag from map_spots.xml
-function remove_map_spot(actor, npc, p)
-	if(p[1]==nil) then
-		printf("Story id for add map spot function is not set")
-	else
---		local story_id = tonumber(p[1]) --original SOC/CS
-		local story_id = p[1]
---		local id = id_by_sid(story_id) --original SOC/CS
-		local id = get_story_object_id(story_id)
-		if(id==nil) then
-			local obj = alife_object(p[1])
-			id = obj and obj.id
-		end
-		if(id~=nil) then
-			if(p[2]==nil) then
-				p[2] = "primary_object"
-			end
-			if level.map_has_object_spot(id, p[2]) ~= 0 then
-				level.map_remove_object_spot(id, p[2])
-			end
-		else
-			printf("Wrong story id or name [%s] for map spot function", tostring(story_id))
-		end
-	end
-end
-
-function show_csky_squads_on_map(actor, npc)
-	local csky_squads_tbl =
-	{	{target="csky_sim_squad_novice",   hint="csky"},
-		{target="csky_sim_squad_advanced", hint="csky"},
-		{target="csky_sim_squad_veteran",  hint="csky"}
-	}
-	if (squad.player_id == "csky") then 
-		for k,v in pairs(csky_squads_tbl) do
-			local obj_id = get_story_squad(v.target)
-			if(obj_id) then
-			level.map_add_object_spot_ser(obj_id, "alife_presentation_squad_friend_1", v.hint)
-			end
-		end
-	end
-end
-
-function make_actor_visible_to_npc(actor, npc, p)
-	local act = db.actor
-	if act then
-		npc:make_object_visible_somewhen(act)
-	end
-end
-
 -- Anomal fields support
 function enable_anomaly(actor, npc, p)
 	if p[1] == nil then
@@ -3195,12 +2905,12 @@ function add_cs_text(actor, npc, p)
 	if p[1] then
 		local hud = get_hud()
 		if (hud) then
-			local cs_text = hud:GetCustomStatic("red_text_on_screen_center")
+			local cs_text = hud:GetCustomStatic("text_on_screen_center")
 			if cs_text then
-				hud:RemoveCustomStatic("red_text_on_screen_center")
+				hud:RemoveCustomStatic("text_on_screen_center")
 			end
-			hud:AddCustomStatic("red_text_on_screen_center", true)
-			cs_text = hud:GetCustomStatic("red_text_on_screen_center")
+			hud:AddCustomStatic("text_on_screen_center", true)
+			cs_text = hud:GetCustomStatic("text_on_screen_center")
 			cs_text:wnd():TextControl():SetText(game.translate_string(p[1]))
 		end
 	end
@@ -3209,9 +2919,9 @@ end
 function del_cs_text(actor, npc, p)
 	local hud = get_hud()
 	if (hud) then
-		cs_text = hud:GetCustomStatic("red_text_on_screen_center")
+		cs_text = hud:GetCustomStatic("text_on_screen_center")
 		if cs_text then
-			hud:RemoveCustomStatic("red_text_on_screen_center")
+			hud:RemoveCustomStatic("text_on_screen_center")
 		end
 	end
 end
@@ -4551,8 +4261,10 @@ function make_a_wish(actor,npc,p)
 	
 	action_list[3] = function()
 		local sim = alife()
-		for id, squad in sim:objects() do
-			if (squad:clsid() == clsid.online_offline_group_s) then 
+		local squad
+		for i=1,65534 do
+			squad = sim:object(i)
+			if (squad and squad:clsid() == clsid.online_offline_group_s) then 
 				SIMBOARD:assign_squad_to_smart(squad, nil)
 				squad:remove_squad()
 			end
@@ -4635,7 +4347,8 @@ end
 
 function clear_logic(actor,npc,p)
 	local st = db.storage[npc:id()]
-	st.ini, st.ini_filename = xr_logic.get_customdata_or_ini_file(npc, "<customdata>")
+	st.ini_filename = "<customdata>"
+	st.ini = xr_logic.get_customdata_or_ini_file(npc, st.ini_filename)
 	st.active_section = nil
 	st.active_scheme = nil
 	st.section_logic = "logic"
@@ -4660,6 +4373,10 @@ function set_new_scheme_and_logic(actor,npc,p)
 	-- Switch to new section
 	xr_logic.switch_to_section(npc, st.ini, new_section)
 	st.overrides = xr_logic.cfg_get_overrides(st.ini, new_section, npc)
+end
+
+function set_script_danger(actor,npc,p)
+	xr_danger.set_script_danger(npc,p and tonumber(p[1]) or 5000)
 end
 
 function spawn_npc_at_position(actor,npc,p)
@@ -4808,11 +4525,9 @@ function yan_saharov_message(actor, npc, p)
 	elseif (p[1] == 2) then
 		news_manager.send_tip(db.actor, "st_yan_saharov_message_2", nil, "saharov", 20000, nil)
 	elseif (p[1] == 3) then
-		news_manager.send_tip(db.actor, "st_yan_saharov_message_3", nil, "saharov", 15000, nil)
+		 news_manager.send_tip(db.actor, "st_yan_saharov_message_3", nil, "saharov", 15000, nil)
 	elseif (p[1] == "free_upgrade") then
-		news_manager.send_tip(db.actor, "st_yan_saharov_message_free_upgrade", nil, "saharov", 15000, nil)
-	elseif (p[1] == "about_storm") then 
-		news_manager.send_tip(db.actor, "st_yan_saharov_message_about_storm", nil, "saharov", 15000, nil)
+		 news_manager.send_tip(db.actor, "st_yan_saharov_message_free_upgrade", nil, "saharov", 15000, nil)
 	end
 end
 
@@ -4918,7 +4633,7 @@ function disable_monolith_zones(actor,npc,p)
 		["zone_monolith"] = true
 	}
 	local sim = alife()
-	for i=1,65534 do
+	for i=1,65534 do 
 		local se_obj = sim:object(i)
 		if (se_obj and remove_sections[se_obj:section_name()]) then 
 			sim:release(se_obj,true)

@@ -37,11 +37,17 @@ local valid_map_spots = {
 
 -- Table to put things that you wish only the specific count can ever only spawn
 local always_in_existence = {
-	["detector_advanced"] = 8,
-	["detector_simple"] = 15,
-	["itm_repairkit_tier_1"] = 6,
-	["itm_repairkit_tier_2"] = 4,
-	["itm_repairkit_tier_3"] = 2,
+	["af_compass"] = 1,
+	["detector_advanced"] = 10,
+	["detector_elite"] = 4,
+	["detector_scientific"] = 1,
+	["detector_simple"] = 20,
+	["equ_military_pack"] = 5,
+	["equ_tourist_pack"] = 3,
+	["itm_repairkit_tier_1"] = 10,
+	["itm_repairkit_tier_2"] = 7,
+	["itm_repairkit_tier_3"] = 4,
+	["wpn_gauss"] = 1
 }
 ------------------------------------------------------------------------------------------------------------------
 --							PRIVATE
@@ -53,22 +59,24 @@ local function on_game_load()
 	
 	local ignore_list = {
 		["bar_inv_box"] = true,
-		["bar_inventory_box_2"] = true,
-		["val_recover_item_2_spawn"] = true
+		["bar_inventory_box_2"] = true
 	}
 
 	local sim = alife()
-	for id, se_obj in alife():objects() do
-		if (IsInvbox(nil,se_obj:clsid()) and not ignore_list[se_obj:name()]) then
-			caches[se_obj.id] = false
-			caches_count = caches_count + 1
-		--elseif (se_obj:spawn_ini() and se_obj:spawn_ini():section_exist("drop_box")) then 
-		--	box_caches[se_obj.id] = false
-		--	box_caches_count = caches_count + 1
+	for i=1, 65534 do
+		local se_obj = sim:object(i)
+		if (se_obj) then
+			if (IsInvbox(nil,se_obj:clsid()) and not ignore_list[se_obj:name()]) then
+				caches[se_obj.id] = false
+				caches_count = caches_count + 1
+			--elseif (se_obj:spawn_ini() and se_obj:spawn_ini():section_exist("drop_box")) then 
+			--	box_caches[se_obj.id] = false
+			--	box_caches_count = caches_count + 1
+			end
 		end
 	end
 
-	for i=1, math.floor(caches_count/3) do
+	for i=1, math.floor(caches_count/2) do
 		create_random_stash(true,"stash")
 	end
 	
@@ -98,7 +106,7 @@ local function actor_on_item_take_from_box(box,itm)
 		
 		-- Remove the cache from the treasure manager.
 		caches[box:id()] = false
-		dxr_statistics.increment_statistic("stashes_found")
+		xr_statistic.inc_counter("stashes_found")
 		news_manager.send_treasure(1)
 	end
 	
@@ -200,7 +208,7 @@ function create_random_stash(no_spot,hint,bonus_items, map_spot)
 	local spawned_item = bonus_items or {}
 	local max_weight = math.random(80,130)
 	
-	if (dxr_achievements.has_achievement("rag_and_bone")) then
+	if (has_alife_info("achieved_rag_and_bone")) then
 		max_weight = max_weight + 30
 	end
 	
@@ -245,7 +253,7 @@ function create_random_stash(no_spot,hint,bonus_items, map_spot)
 	end
 
 	--\\ FOR DEBUG
-    local cost_lvls = {750,1500,4000,8000,13000,18000,40000}
+    local cost_lvls = {500,1000,3000,5000,9000,15000,25000}
     if (DEV_DEBUG_DEV) and not sorted then 
     -- iterate most expensive to least expensive by group.
         local tsortc,tsorto,tsortw,tsorta,tsorts,tsort = {},{},{},{},{},{}
@@ -323,40 +331,40 @@ function create_random_stash(no_spot,hint,bonus_items, map_spot)
 			if not (skip) then
 				if (bBackpack) then 
 					if (section == "equ_tourist_pack") then 
-						try_spawn_item(section,1,1,0.0,80)
+						try_spawn_item(section,1,1,0.03,80)
 					elseif (section == "equ_military_pack") then
-						try_spawn_item(section,1,1,0.0,80)
+						try_spawn_item(section,1,1,0.05,80)
 					else
 						try_spawn_item(section,1,1,0.10,50)
 					end
 				elseif (bDetector) then
 					local v = ini:r_string_ex(section,"class","")
 					if (v == "DET_SCIE") then
-						try_spawn_item(section,1,1,0.0,80)
+						try_spawn_item(section,1,1,0.005,80)
 					elseif (v == "DET_ELIT") then 
-						try_spawn_item(section,1,1,0.0,60)
+						try_spawn_item(section,1,1,0.05,60)
 					elseif (v == "DET_ADVA") then
-						try_spawn_item(section,1,1,0.0,50)
+						try_spawn_item(section,1,1,0.10,50)
 					else 
-						try_spawn_item(section,1,1,0.0,40)
+						try_spawn_item(section,1,1,0.15,40)
 					end
 				elseif (bToolkit) then 
 					if (section == "itm_repairkit_tier_3") then 
-						try_spawn_item(section,1,1,0.0,80)
+						try_spawn_item(section,1,1,0.04,80)
 					elseif (section == "itm_repairkit_tier_2") then
-						try_spawn_item(section,1,1,0.0,80)
+						try_spawn_item(section,1,1,0.08,80)
 					else
-						try_spawn_item(section,1,1,0.0,50)
+						try_spawn_item(section,1,1,0.12,50)
 					end
 				else
 					-- decide for each section based on chance, weight and item classification
 					if (cost <= cost_lvls[1]) then
 						if (is_consumable(section)) then
-							try_spawn_item(section,1,2,0.50,40)
+							try_spawn_item(section,1,3,0.50,40)
 						elseif (is_ammo(section)) then
-							try_spawn_item(section,1,1,0.30,50)
+							try_spawn_item(section,1,1,0.20,50)
 						elseif (bOutfit) then
-							try_spawn_item(section,1,1,0.03,40)
+							try_spawn_item(section,1,1,0.05,40)
 						elseif (bWeapon) then
 							try_spawn_item(section,1,1,0.05,50)
 						else
@@ -368,7 +376,7 @@ function create_random_stash(no_spot,hint,bonus_items, map_spot)
 						elseif (is_ammo(section)) then
 							try_spawn_item(section,1,1,0.10,60)
 						elseif (bOutfit) then
-							try_spawn_item(section,1,1,0.03,40)
+							try_spawn_item(section,1,1,0.04,40)
 						elseif (bWeapon) then
 							try_spawn_item(section,1,1,0.05,60)
 						else
@@ -380,7 +388,7 @@ function create_random_stash(no_spot,hint,bonus_items, map_spot)
 						elseif (is_ammo(section)) then
 							try_spawn_item(section,1,1,0.05,60)
 						elseif (bOutfit) then
-							try_spawn_item(section,1,1,0.02,40)
+							try_spawn_item(section,1,1,0.03,40)
 						elseif (bWeapon) then
 							try_spawn_item(section,1,1,0.02,70)
 						elseif (bArtefact) then
@@ -522,10 +530,10 @@ function try_spawn_treasure(box)
 				create_ammo(sec,box:position(),box:level_vertex_id(),box:game_vertex_id(),id,math.random(10,20))
 			else
 			
-				-- STCoP Weapon Pack / Arsenal Overhaul 3
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
 				-- Switches the weapon to a sighted variant if available.
 				if (math.random() <= 0.3) then
-					local sights = alun_utils.parse_list(ini, sec, "scopes")
+					local sights = alun_utils.parse_list(ini, sec, "sights")
 					if (#sights > 0) then
 						sight = sights[math.random(#sights)]
 						local variant_section = sec .. "_" .. sight
@@ -606,7 +614,7 @@ function get_valid_item_sections()
 								local class = ini:r_string_ex(section,"class")
 								if (class == "G_FAKE") then
 								else
-									-- STCoP Weapon Pack / Arsenal Overhaul 3
+									-- Chernobyl Weapon Pack / Arsenal Overhaul 3
 									-- blacklist everything but base weapon, try_spawn_treasure will handle the randomization of sights
 									local parent_section = ini:r_string_ex(section,"parent_section")
 									if (parent_section == nil or parent_section == "" or parent_section == section) then

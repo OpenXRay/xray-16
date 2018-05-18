@@ -100,6 +100,8 @@ function trader_object_binder:net_destroy()
 		m_data.game_object[self.object:id()] = nil
 	end
 	
+	trade_manager.on_npc_death(self.object)
+	
 	self.object:set_callback(callback.use_object,nil)
 	
 	object_binder.net_destroy(self)
@@ -150,6 +152,8 @@ function trader_object_binder:save_state(m_data)
 	local state = alife_storage_manager.get_game_object_state(self.object,true)
 
 	state.xr_logic = empty_table(state.xr_logic)
+	
+	--state.xr_logic.job_ini = st.job_ini
 	state.xr_logic.ini_filename = st.ini_filename
 	state.xr_logic.section_logic = st.section_logic
 	state.xr_logic.active_section = st.active_section
@@ -158,6 +162,7 @@ function trader_object_binder:save_state(m_data)
 	state.xr_logic.activation_game_time = st.activation_game_time
 
 	--xr_sound.npc_save_state(id,state)
+	trade_manager.save_state(id,state)
 	
 	db.storage[id].pstor = db.storage[id].pstor or {}
 	--alun_utils.debug_write(strformat("trader_object_binder:save_state %s AFTER",id))
@@ -165,7 +170,7 @@ end
 
 function trader_object_binder:load_state()
 	local state = alife_storage_manager.get_game_object_state(self.object)
-	if not (state) then 
+	if not (state and state.xr_logic) then 
 		return 
 	end
 
@@ -174,16 +179,17 @@ function trader_object_binder:load_state()
 	local st = db.storage[id]
 	st.object = self.object
 	--alun_utils.debug_write(strformat("trader_object_binder:load_state %s BEFORE",id))
-	if (state.xr_logic) then
-		st.loaded_ini_filename = state.xr_logic.ini_filename
-		st.loaded_section_logic = state.xr_logic.section_logic
-		st.loaded_active_section = state.xr_logic.active_section
-		st.loaded_gulag_name = state.xr_logic.gulag_name or ""
-		st.activation_time = time_global() + (state.xr_logic.activation_time or 0)
-		st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
-		state.xr_logic = nil
-	end
+	--st.job_ini = state.xr_logic.job_ini
+	st.loaded_ini_filename = state.xr_logic.ini_filename
+	st.loaded_section_logic = state.xr_logic.section_logic
+	st.loaded_active_section = state.xr_logic.active_section
+	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
+	st.activation_time = time_global() + (state.xr_logic.activation_time or 0)
+	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
+	state.xr_logic = nil
 	--xr_sound.npc_load_state(id,state)
+	
+	trade_manager.load_state(id,state)
 	
 	if (state.pstor_all) then 
 		db.storage[id].pstor = state.pstor_all

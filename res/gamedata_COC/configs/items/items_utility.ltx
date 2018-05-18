@@ -23,7 +23,7 @@ allow_take_count						 = 2
 [itm_sleepbag]:booster
 GroupControlSection                      = spawn_group
 discovery_dependency                     =
-$spawn                                   = "equipments\sleepbag"
+$spawn                                   = "food and drugs\antirad"
 $prefetch                                = 32
 cform                                    = skeleton
 visual                                   = dynamics\equipments\item_sleepbag.ogf
@@ -35,7 +35,7 @@ inv_grid_width                           = 2
 inv_grid_height                          = 2
 inv_grid_x                               = 18
 inv_grid_y                               = 10
-cost                                     = 1000
+cost                                     = 1580
 eat_health                               = 0
 eat_satiety                              = 0
 eat_power                                = 0
@@ -49,7 +49,7 @@ placeable_section                        = ph_sleepbag ;Section of placeable phy
 [itm_deployable_mgun]:booster
 GroupControlSection                      = spawn_group
 discovery_dependency                     =
-$spawn                                   = "weapons\deployable_mgun"
+$spawn                                   = "food and drugs\antirad"
 $prefetch                                = 32
 cform                                    = skeleton
 visual                                   = dynamics\weapons\wpn_mounted\wpn_mounted_pkm_trenoga.ogf
@@ -86,8 +86,3 @@ inv_grid_x				= 3
 inv_grid_y				= 40
 description				= st_matches_descr
 cost					= 210
-
-[itm_battery_detector]:matches
-$spawn 					= "misc\battery_detector"
-use_condition       	= false
-max_uses            	= 1

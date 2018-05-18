@@ -63,13 +63,11 @@ function actor_menu_mode(mode)
 				if sound_theme and sound_theme.reset then
 					sound_theme:reset(id)
 				end
-				local se_obj = alife_object(id)
-				if (se_obj) then
-					local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
-					if (m_data) then
-						m_data.is_actor_contact = true
-					end
+				local m_data = alife_storage_manager.get_state()
+				if not (m_data.actor_contacts) then 
+					m_data.actor_contacts = {}
 				end
+				m_data.actor_contacts[id] = true
 				break
 			end
 		end
@@ -101,39 +99,39 @@ function get_stat(index) -- index= int        return string
 	if(index==0) then
 		return get_time_elapsed()
 	elseif(index==1) then
-		return tostring(dxr_statistics.get_statistic_count("emissions"))
+		return tostring(xr_statistic.actor_statistic.surges)
 	elseif(index==2) then
-		return tostring(dxr_statistics.get_statistic_count("tasks_completed"))
+		return tostring(xr_statistic.actor_statistic.tasks_completed)
 	elseif(index==3) then
-		return tostring(dxr_statistics.get_statistic_count("killed_monsters"))
+		return tostring(xr_statistic.actor_statistic.killed_monsters)
 	elseif(index==4) then
-		return tostring(dxr_statistics.get_statistic_count("killed_stalkers"))
+		return tostring(xr_statistic.actor_statistic.killed_stalkers)
 	elseif(index==5) then
-		return tostring(dxr_statistics.get_statistic_count("boxes_smashed"))
+		return tostring(xr_statistic.actor_statistic.boxes_smashed)
 	elseif(index==6) then
-		return tostring(dxr_statistics.get_statistic_count("stashes_found"))
+		return tostring(xr_statistic.actor_statistic.stashes_found)
 	elseif(index==7) then
-		return tostring(dxr_statistics.get_statistic_count("psi_storms"))
+		return tostring(xr_statistic.actor_statistic.storms)
 	elseif(index==8) then
-		return tostring(dxr_statistics.get_statistic_count("pdas_delivered"))
+		return tostring(xr_statistic.actor_statistic.pdas_delivered)
 	elseif(index==9) then
-		return tostring(dxr_statistics.get_statistic_count("helicopters_downed"))
+		return tostring(xr_statistic.actor_statistic.heli_kills)
 	elseif(index==10) then
-		return tostring(dxr_statistics.get_statistic_count("artefacts_detected"))
+		return tostring(xr_statistic.actor_statistic.artefacts_detected)
 	elseif(index==11) then
-		return tostring(dxr_statistics.get_statistic_count("help_wounded"))
+		return tostring(xr_statistic.actor_statistic.help_wounded)
 	elseif(index==12) then 
-		return tostring(dxr_statistics.get_statistic_count("level_changes"))
+		return tostring(xr_statistic.actor_statistic.level_changes)
 	elseif(index==13) then 
-		return tostring(dxr_statistics.get_statistic_count("enemies_surrendered"))
+		return tostring(xr_statistic.actor_statistic.enemies_surrendered)
 	elseif(index==14) then 
-		return tostring(dxr_statistics.get_statistic_count("field_dressings"))
+		return tostring(xr_statistic.actor_statistic.field_dressings)
 	elseif(index==15) then 
-		return (dxr_encyclopedia.get_articles_unlocked_count() .. "/" .. dxr_encyclopedia.get_articles_count())
+		return (dxr_encyclopedia.get_unlocked_articles_count() .. "/" .. dxr_encyclopedia.get_articles_count())
 	elseif(index==16) then 
-		return (dxr_achievements.get_achievements_unlocked_count() .. "/" .. dxr_achievements.get_achievements_count())
+		return (xr_statistic.actor_statistic.achievements .. "/" .. dxr_achievements.get_achievements_available())
 	elseif(index==17) then 
-		return (dxr_statistics.get_actor_visited_levels_count() .. "/32")
+		return (xr_statistic.get_levels_visited_count() .. "/32")
 	elseif(index==18) then 
 		return (db.actor:money() .. " RU")
 	end
@@ -160,6 +158,39 @@ function fill_primary_objects()
 		local obj_id = get_story_object_id(v.target)
 		if (obj_id and level.map_has_object_spot(obj_id,"primary_object") == 0) then
 			level.map_add_object_spot_ser(obj_id, "primary_object", v.hint)
+		end
+	end
+	
+	local sleep_zones_tbl =
+	{	"mar_a3_sr_sleep_id",
+		"agr_sr_sleep_wagon_id",
+		"agr_sr_sleep_tunnel_id",
+		"agr_army_sleep_id",
+		"esc_basement_sleep_area_id",
+		"esc_secret_sleep_id",
+		"ds_farmhouse_sleep_id",
+		"val_abandoned_house_sleep_id",
+		"val_vagon_sleep_id",
+		"gar_dolg_sleep_id",
+		"gar_angar_sleep_id",
+		"bar_actor_sleep_zone_id",
+		"yan_bunker_sleep_restrictor_id",
+		"ros_vagon_sleep_id",
+		"mil_freedom_sleep_id",
+		"mil_smart_terran_2_4_sleep_id",
+		"rad_sleep_room_id",
+		"cit_merc_sleep_id",
+		"pri_monolith_sleep_id",
+		"pri_room27_sleep_id",
+		"zat_a2_sr_sleep_id",
+		"jup_a6_sr_sleep_id",
+		"pri_a16_sr_sleep_id",
+		"pripyat_secret_sleep_sr"
+	}
+	for i=1,#sleep_zones_tbl do
+		local obj_id = get_story_object_id(sleep_zones_tbl[i])
+		if (level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")==0) then
+			level.map_add_object_spot_ser(obj_id, "ui_pda2_actor_sleep_location", "st_ui_pda_sleep_place")
 		end
 	end
 end
@@ -191,11 +222,12 @@ function calculate_rankings()
 	local t = {}
 	local sim = alife()
 	-- add actor to list
-	t[0] = sim:actor():rank()
+	t[0] = alife():actor():rank()
 	
 	-- check all stalker server objects
-	for id, se_obj in sim:objects() do
-		if (id ~= 0 and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and se_obj:community() ~= "zombied" and se_obj:community() ~= "trader") then
+	for i=1,65534 do
+		local se_obj = sim:object(i)
+		if (se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and se_obj:community() ~= "zombied" and se_obj:community() ~= "trader") then
 			-- Check if object has a story id, if it does they are probably unique
 			local sid = story_objects.story_id_by_object_id[se_obj.id]
 			if not (sid) then

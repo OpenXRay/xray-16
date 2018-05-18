@@ -16,9 +16,6 @@
 		<text>Greetings, stalker.</text>
 	</string>
 <!-- yan_stalker_sakharov -->
-	<string id="st_yan_saharov_message_about_storm">
-		<text>Stalker, help us! Our bunker is under attack by zombies! You should be able to survive this weak emission!</text>
-	</string>
 	<string id="st_yan_saharov_message_free_upgrade">
 		<text>Stalker, you saved us! Our bunker would have met certain doom if you didn't step in to help. To show my gratitude come to me for a free ugprade to your psi-helmet!</text>
 	</string>

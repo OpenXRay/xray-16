@@ -325,7 +325,7 @@ function text_trade_npc_pda(a,b)
         if chk and tbl[pda_t] then
 			tbl[pda_t] = tbl[pda_t] + 1
             actor:transfer_item(itm,npc)
-            dxr_statistics.increment_statistic("pdas_delivered")
+            xr_statistic.inc_counter("pdas_delivered")
         end
     end
     db.actor:iterate_inventory(itr,db.actor)
@@ -344,7 +344,7 @@ function text_trade_npc_pda(a,b)
             news_manager.relocate_item(db.actor, "out", "itm_pda_"..j, count)
 
             for i=1, count do
-                total_value = total_value + (mul * math.random(500,600))
+                total_value = total_value + (mul * math.random(250,500))
 
                 if (math.random(1,100) <= mul2) then
                     pda_bonus_coords = pda_bonus_coords + 1
@@ -367,7 +367,7 @@ function text_trade_npc_pda(a,b)
         end
     end
 
-    if (dxr_achievements.has_achievement("infopreneur")) then
+    if (has_alife_info("achieved_infopreneur")) then
         total_value = total_value + math.floor(total_value / 20)
     end
 
@@ -448,11 +448,6 @@ function surrender_victim_answers_bounty(a,b)
 	end
 
 	local r = math.random(1,10)
-	local sur -- check if surrendered
-	if (r >= 1) and (r <= 9) then -- surrender here (1 to 9 will just returned dialog)
-		set_victim_surrendered(a,b) 
-		sur = true
-	end
 	if (r == 1 or r == 2) then
 		r = (math.random(1,100)/100)
 		local sec = "itm_pda_common"
@@ -474,13 +469,9 @@ function surrender_victim_answers_bounty(a,b)
 		return game.translate_string("st_surrender_victim_answer_"..prefix.."_bounty_5")
 	end
 
-	if ((math.random(1,100)/100) < 0.5) then -- you can't force npc to surrender here, this is for healing.
+	if ((math.random(1,100)/100) < 0.5) then
 		alife():create("medkit_script",npc:position(),0,0,npc:id())
 		xr_wounded.unlock_medkit(npc)
-	else
-		if (not sur) then
-			set_victim_surrendered(a,b) 
-		end
 	end
 
 	return game.translate_string("st_surrender_victim_answer_5")
@@ -490,34 +481,25 @@ function surrender_victim_answers_1(a,b)
 	local npc = dialogs.who_is_npc(a,b)
 
 	local r = math.random(1,5)
-	
-	if (db.storage[npc:id()].items_to_actor) then
-		set_victim_surrendered(a,b)
-		return game.translate_string("st_surrender_victim_answer_5")
-	end
 
 	if (coc_treasure_manager) and (r <= 2) then
 
 		local function itr(npc,itm)
 			if (IsWeapon(itm)) then
-				local condition = ((math.random(40) + 30) / 100)
-				itm:set_condition(condition)
 				npc:transfer_item(itm,db.actor)
 			end
 		end
 
 		npc:iterate_inventory(itr,npc)
-		db.storage[npc:id()].items_to_actor = true
 
 		if (coc_treasure_manager) then
 			coc_treasure_manager.create_random_stash(nil, strformat(game.translate_string("st_itm_stash_of_character"),npc:character_name()) )
-			if (dxr_achievements.has_achievement("silver_or_lead") and ((math.random(1,100)/100) <= 0.33)) then
+			if (has_alife_info("achieved_silver_or_lead") and ((math.random(1,100)/100) <= 0.33)) then
 				coc_treasure_manager.create_random_stash(nil,strformat(game.translate_string("st_itm_stash_of_character"),npc:character_name()))
 			end
 		end
-		
-		set_victim_surrendered(a,b)
-		if (coc_treasure_manager and coc_treasure_manager.last_secret) then
+
+	if (coc_treasure_manager and coc_treasure_manager.last_secret) then
 			return game.translate_string("st_surrender_victim_answer_"..math.random(3))
 		else
 			return game.translate_string("st_surrender_victim_answer_5")
@@ -531,14 +513,12 @@ function surrender_victim_answers_1(a,b)
 			sec = "itm_pda_uncommon"
 		end
 		relocate_item_section_to_actor(a, b, sec, 1)
-		set_victim_surrendered(a,b)
 		return game.translate_string("st_surrender_victim_answer_4")
-	elseif (r == 5) then -- you can't force npc to surrender here, this is for healing then attacking the player
+	elseif (r == 5) then
 		alife():create("medkit_script",npc:position(),0,0,npc:id())
 		xr_wounded.unlock_medkit(npc)
 		return game.translate_string("st_surrender_victim_answer_5")
 	end
-	set_victim_surrendered(a,b)
 	return game.translate_string("st_surrender_victim_answer_5")
 end
 
@@ -553,6 +533,8 @@ function surrender_victim_answers_2(a,b)
 		end
 	end
 
+	xr_statistic.inc_counter("help_wounded")
+
 	npc:iterate_inventory(itr,npc)
 
 	--if (math.random() <= 0.8) then
@@ -561,7 +543,6 @@ function surrender_victim_answers_2(a,b)
 
 	db.storage[npc:id()].panicked_to_actor = true
 
-	set_victim_surrendered(a,b)
 	return game.translate_string("st_surrender_victim_answer_6")
 end
 
@@ -669,7 +650,8 @@ function transfer_medkit(first_speaker, second_speaker)
 		npc:set_relation(game_object.friend,db.actor)
 	end
 
-	dxr_statistics.increment_statistic("wounded_helped")
+	xr_statistic.inc_actor_reputation(1)
+	xr_statistic.inc_counter("help_wounded")
 end
 function transfer_bandage(first_speaker, second_speaker)
 	dialogs.relocate_item_section(second_speaker, "bandage", "out")
@@ -847,11 +829,6 @@ end
 function npc_bandit(first_speaker, second_speaker)
 	local npc = who_is_npc(first_speaker, second_speaker)
 	return character_community(npc) == "bandit"
-end
-
-function npc_renegade(first_speaker, second_speaker)
-	local npc = who_is_npc(first_speaker, second_speaker)
-	return character_community(npc) == "renegade"
 end
 
 function npc_freedom(first_speaker, second_speaker)

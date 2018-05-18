@@ -9,7 +9,7 @@ hp_fight = 0 | false
 
 [logic@pri_b35_merc_leader]
 active = walker@leader_walk
-suitable = {=check_npc_name(pri_b35_merc_leader)} true
+suitable = {=check_npc_name(pri_b35_merc_leader)}
 prior = 200
 on_death = death
 on_hit = hit
@@ -66,7 +66,7 @@ on_info = {-pri_b35_attack_started =has_actor_enemy} %+pri_b35_attack_started%
 
 [logic@pri_b35_merc_1]
 active = walker@merc_1
-suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)} true
+suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)}
 prior = 200
 on_combat = combat
 
@@ -77,7 +77,7 @@ on_info2 = {+pri_b35_rendevous_done -pri_b35_attack_started} walker@merc_after_n
 
 [logic@pri_b35_merc_2]
 active = walker@merc_2
-suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)} true
+suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)}
 prior = 200
 on_combat = combat
 
@@ -88,7 +88,7 @@ on_info2 = {+pri_b35_rendevous_done -pri_b35_attack_started} walker@merc_after_n
 
 [logic@pri_b35_merc_3]
 active = walker@merc_3
-suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)} true
+suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)}
 prior = 200
 on_combat = combat
 
@@ -100,7 +100,7 @@ danger = danger@no_danger
 
 [logic@pri_b35_merc_4]
 active = walker@merc_4
-suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)} true
+suitable = {!check_npc_name(pri_b35_merc_leader) !check_npc_name(pri_b35_merc_grenade_launcher) =target_squad_name(pri_b35_mercs_squad)}
 prior = 200
 on_combat = combat
 
@@ -129,7 +129,7 @@ wounded = wounded@no_wound
 
 [logic@pri_b35_merc_5]
 active = walker@merc_5
-suitable = {=check_npc_name(pri_b35_merc_grenade_launcher_1)} true
+suitable = {=check_npc_name(pri_b35_merc_grenade_launcher_1)}
 prior = 200
 on_combat = combat
 
@@ -149,7 +149,7 @@ on_info = {!actor_in_zone(pri_b35_sr_actor_position)} walker@mercs_grenade_after
 
 [logic@pri_b35_merc_6]
 active = walker@merc_6
-suitable = {=check_npc_name(pri_b35_merc_grenade_launcher_2)} true
+suitable = {=check_npc_name(pri_b35_merc_grenade_launcher_2)}
 prior = 200
 on_combat = combat
 

@@ -9,16 +9,16 @@
 	<texture id="ui_inGame2_sky_panorama" x="0" y="413" width="591" height="118" />
 	<texture id="ui_inGame2_marker" x="624" y="277" width="30" height="118" />
 
-	<texture id="ui_wp_prop_scope_1.5x" x="730" y="509" width="19" height="19" />
+	<texture id="ui_wp_prop_scope_1.5x" x="730" y="510" width="19" height="19" />
 	<texture id="ui_wp_prop_autolockscope" x="692" y="528" width="19" height="19" />
 	<texture id="ui_wp_prop_scope_6x" x="711" y="528" width="19" height="19" />
 	<texture id="ui_wp_prop_scope_5x" x="730" y="528" width="19" height="19" />
-	<texture id="ui_wp_prop_scope_attach" x="692" y="547" width="19" height="19" />
-	<texture id="ui_wp_prop_scope" x="711" y="547" width="19" height="19" />
+	<texture id="ui_wp_prop_scope_attach" x="692" y="548" width="19" height="19" />
+	<texture id="ui_wp_prop_scope" x="711" y="548" width="19" height="19" />
 	<texture id="ui_wp_prop_contrast" x="730" y="547" width="19" height="19" />
 	<texture id="ui_wp_prop_nightvision" x="692" y="566" width="19" height="19" />
-	<texture id="ui_wp_prop_autofire" x="711" y="566" width="19" height="19" />
-	<texture id="ui_wp_prop_3xfire" x="730" y="566" width="19" height="19" />
+	<texture id="ui_wp_prop_autofire" x="711" y="567" width="19" height="19" />
+	<texture id="ui_wp_prop_3xfire" x="730" y="567" width="19" height="19" />
 	<texture id="ui_wp_prop_skorostrelnost" x="673" y="433" width="19" height="19" />
 	<texture id="ui_wp_prop_otdacha" x="673" y="452" width="19" height="19" />
 	<texture id="ui_wp_prop_nadezhnost" x="673" y="471" width="19" height="19" />
@@ -29,7 +29,6 @@
 	<texture id="ui_wp_prop_optics" x="673" y="566" width="19" height="19" />
 	<texture id="ui_wp_prop_damage" x="654" y="566" width="19" height="19" />
 	<texture id="ui_wp_prop_scope_10x" x="654" y="528" width="19" height="19" />
-	<texture id="ui_wp_prop_binoc_7.5x" x="654" y="509" width="19" height="19" />
 
 
 	<texture id="ui_am_prop_radio_restore" x="806" y="433" width="19" height="19" />

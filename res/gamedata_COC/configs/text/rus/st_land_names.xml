@@ -10,10 +10,10 @@
 		<text>Аномалия «Гибельный погост»</text>
 	</string>
 	<string id="st_ds_2c_02_anomaly_spot_name">
-		<text>Аномалия «Сияющий мост»</text>
+		<text>Сияющий мост</text>
 	</string>
 	<string id="st_ds_2c_03_anomaly_spot_name">
-		<text>Аномалия «Безымянная высота»</text>
+		<text>Безымянная высота</text>
 	</string>
 	<string id="st_ds_2c_04_anomaly_spot_name">
 		<text>Аномалия «Опасные камни»</text>
@@ -67,7 +67,7 @@
 		<text>Аномалия «Парилка»</text>
 	</string>
 	<string id="st_yan_2c_01_cd_anomaly_spot_name">
-		<text>Аномалия «Бетонная свалка»</text>
+		<text>Бетонная свалка</text>
 	</string>
 	<string id="st_x16_lab_2c_01_fb_anomy_spot_name">
 		<text>Аномалия «Жернов»</text>
@@ -79,7 +79,7 @@
 		<text>Аномальный холм</text>
 	</string>
 	<string id="st_lim_2c_01_ls_anomaly_spot_name">
-		<text>Аномалия «Искажённое пространство»</text>
+		<text>Искажённое пространство</text>
 	</string>
 	<string id="st_lim_2c_02_ib_anomaly_spot_name">
 		<text>Аномалия «Генератор»</text>
@@ -127,7 +127,7 @@
 		<text>Аномалия «Забытое кладбище»</text>
 	</string>
   <string id="st_mar_smart_terrain_11_3_anomaly_spot_name">
-    <text>Аномалия «Болотный распадок»</text>
+    <text>Аномалия «Болотный Распадок»</text>
   </string>
   <string id="st_mar_smart_terrain_12_2_anomaly_spot_name">
     <text>Аномалия «Мёртвая зона»</text>
@@ -136,10 +136,10 @@
     <text>Аномалия «Разрядник»</text>
   </string>
   <string id="st_mar_smart_terrain_base_anomaly_spot_name">
-    <text>Аномалия «Злая топь»</text>
+    <text>Западная Топь</text>
   </string>
   <string id="st_mar_smart_terrain_8_8_anomaly_spot_name">
-    <text>Аномалия «Медленный огонь»</text>
+    <text>Нижнее Пепелище</text>
   </string>
    <string id="st_mar_smart_terrain_3_7_anomaly_spot_name">
     <text>Аномалия «Гравиполе»</text>
@@ -181,16 +181,16 @@
     <text>Аномалия «Зона ЭМИ»</text>
   </string>
   <string id="st_agr_smart_terrain_5_7_anomaly_spot_name">
-    <text>Аномалия «Опасный склон»</text>
+    <text>«Аномальная Лощина»</text>
   </string>
   <string id="st_agr_smart_terrain_5_2_anomaly_spot_name">
     <text>Аномалия «Птичья карусель»</text>
   </string>
   <string id="st_agr_smart_terrain_1_2_anomaly_spot_name">
-    <text>Токсичное болото</text>
+    <text>Болото</text>
   </string>  
   <string id="st_val_smart_terrain_9_10_anomaly_spot_name">
-    <text>Аномалия «Тёмный разлом»</text>
+    <text>Аномалия «Тёмный Разлом»</text>
   </string>
   <string id="st_val_smart_terrain_6_4_anomaly_spot_name">
     <text>Поле аномалий «Воронка»</text>
@@ -235,7 +235,7 @@
     <text>Аномалия «Симбионт»</text>
   </string>
   <string id="st_red_smart_terrain_4_5_anomaly_spot_name">
-    <text>Аномалия «Сверхпроводник»</text>
+    <text>Чёртова стоянка</text>
   </string>
   <string id="st_red_smart_terrain_monsters_anomaly_spot_name">
     <text>Аномалия «Давилка»</text>
@@ -244,16 +244,16 @@
     <text>Аномалия «Шахты»</text>
   </string>
   <string id="st_red_smart_terrain_6_6_anomaly_spot_name">
-    <text>Аномалия «Вертушка»</text>
+    <text>Поляна трупов</text>
   </string>
   <string id="st_red_smart_terrain_3_1_anomaly_spot_name">
     <text>Аномалия «Подземная гроза»</text>
   </string>
   <string id="st_gen_smart_terrain_urod_anomaly_spot_name">
-    <text>Аномальный каньон</text>
+    <text>Аномальный Каньон</text>
   </string>
   <string id="st_trc_sim_13_anomal_zone_spot_name">
-    <text>Аномалия «Отбойник»</text>
+    <text>Поли-аномальный район</text>
   </string>
 	<string id="st_zat_b55_name">
 		<text>Аномалия «Коготь»</text>
@@ -367,7 +367,7 @@
 		<text>Аномальная роща</text>
 	</string>
 	<string id="st_jup_grove_name">
-		<text>Аномальная роща</text>
+		<text>Аномальная Роща</text>
 	</string>
 	<string id="st_jup_b32_name">
 		<text>Стоянка</text>

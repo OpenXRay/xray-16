@@ -6,7 +6,7 @@ local run_min_time = 2000
 
 local keep_state_min_time = 1500 -- переключившись в состояние (бег, ходьба, спринт), не переключаться в другое N ms
 
-local default_wait_time = 5000
+local default_wait_time = 10000
 local default_state_standing = "guard"
 local default_state_moving1 = "patrol"
 local default_state_moving2 = "patrol"
@@ -439,13 +439,15 @@ function move_mgr:update_standing_state(look_pos, snd)
 	
 	-- absurd, but it's just to avoid continous table creation
 	local old_pos = self.target.look_position
-	self.target.look_position = look_pos
-	self.cbs.func = function() self:time_callback() end -- wrapper is necessary for self.time_callback(self)
-	self.cbs.turn_end_func = function() self:turn_end_callback() end
+	self.target.look_position = look_pos 
+	self.cbs.obj = self
+	self.cbs.func = self.time_callback
+	self.cbs.turn_end_func = self.turn_end_callback
 	
 	state_mgr.set_state(self.object, self.ovr_state_standing or self.cur_state_standing,self.cbs,self.pt_wait_time,self.target,nil,snd)
 		
 	self.target.look_position = old_pos
+	self.cbs.obj = nil
 	self.cbs.func = nil
 	self.cbs.turn_end_func = nil
 end
@@ -472,12 +474,18 @@ function move_mgr:time_callback()
 		--' просто вызвать update_movement_state, потому что мы УЖЕ были в
 		--' конечной точке пути и дальше идти некуда, а reset_scheme сбросит
 		--' настройки movement manager-а и выберет ближайшую точку, куда и пойдет.
-		self:reset(self.path_walk, self.path_walk_info,self.path_look, self.path_look_info,self.team,self.suggested_state,self.move_cb_info,self.no_validation)
+		self:reset(self.path_walk, self.path_walk_info,
+			self.path_look, self.path_look_info,
+			self.team,
+			self.suggested_state,
+			self.move_cb_info,
+			self.no_validation)
 	else
 		self:update_movement_state() -- идти дальше
 		local syn = self.path_look_info and self.path_look_info[self.last_look_index] and self.path_look_info[self.last_look_index]["syn"]
 		if syn then
-			printf("object '%s': path_walk '%s': syn flag used on non-terminal waypoint",self.object:name(), self.path_walk)
+			printf("object '%s': path_walk '%s': syn flag used on non-terminal waypoint",
+				self.object:name(), self.path_walk)
 		end
 	end
 end
@@ -526,7 +534,9 @@ function move_mgr:turn_end_callback()
 
 	if self.retval_after_rotation then
 		if not self.move_cb_info then
-			printf("object '%s': path_look '%s': ret flag is set, but callback function wasn't registered in move_mgr:reset()",self.object:name(), self.path_look)
+			printf("object '%s': path_look '%s': ret flag is set, but " ..
+				"callback function wasn't registered in move_mgr:reset()",
+				self.object:name(), self.path_look)
 		end
 		--' Отключаем таймер путем установки того же самого состояния, но без таймера,
 		--' затем вызываем callback.
@@ -539,10 +549,13 @@ function move_mgr:turn_end_callback()
 		state_mgr.set_state(self.object, self.cur_state_standing, nil, nil, nil)
 		--' 2) Вызываем callback
 		if not self.move_cb_info then
-			printf("object '%s': path_look '%s': ret flag is set, but callback function wasn't registered in move_mgr:reset()",self.object:name(), self.path_look)
+			printf("object '%s': path_look '%s': ret flag is set, but " ..
+				"callback function wasn't registered in move_mgr:reset()",
+				self.object:name(), self.path_look)
 		end
 
-		if self.move_cb_info.func(self.move_cb_info.obj, this.arrival_after_rotation, self.retval_after_rotation, self.last_index) then
+		if self.move_cb_info.func(self.move_cb_info.obj, this.arrival_after_rotation, self.retval_after_rotation, self.last_index)
+		then
 			--' Callback решил перехватить управление перемещением, не восстанавливаем таймер
 			return
 		end

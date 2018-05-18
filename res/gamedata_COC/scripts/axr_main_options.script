@@ -1,5 +1,7 @@
 -- Extensions to Game Options
--- IMPORTANT! SEE opt_menu_on_init to add a new game options (new as of 5/28/2016)
+
+
+--- IMPORTANT! SEE opt_menu_on_init to add a new game options (new as of 5/28/2016)
 
 function opt_menu_on_init(menu)
 	-- simply add new line and a ui_mm_<name> in ui_st_mm.xml to create a new option. Script automatically does the rest for you
@@ -13,8 +15,30 @@ function opt_menu_on_init(menu)
 			end
 		end
 	end}
+	
+	-- localization
+	local localization_list = {}
+	local flist = getFS():file_list_open("$game_text$",bit_or(FS.FS_ListFolders,FS.FS_RootOnly))
+	local f_cnt = flist:Size()
+	for	it=0, f_cnt-1 do
+		localization_list[#localization_list+1] = flist:GetAt(it):sub(1,-2)
+	end
+	menu.gameplay_options["localization"] = {default="eng", debug_only=false, typ="list", list=localization_list, on_accept=function(handler,optMgr,ctrl)
+		local language = ctrl:GetText()
+		if (language and language ~= "") then
+			local loc_ini = ini_file_ex("localization.ltx",true)
+			if (loc_ini:r_value("string_table","language") ~= language) then
+				loc_ini:w_value("string_table","language",language)
+				loc_ini:save()
+				--menu.b__require_restart = true
+				reload_system_ini()
+				game.reload_language()
+			end
+		end
+	end}
 	-- debug_hud_map
-	menu.gameplay_ui_options["debug_map_hud"]		= {default=false, 	debug_only=true, 	typ="check",on_accept=function(handler,optMgr,ctrl)
+	menu.gameplay_ui_options["debug_map_hud"]			= {default=false, 	debug_only=true, 	typ="check",
+		on_accept=function(handler,optMgr,ctrl)
 			if (level.present() and ui_map_debug_ex) then
 				if (ctrl:GetCheck()) then
 					ui_map_debug_ex.activate_feature()
@@ -22,7 +46,8 @@ function opt_menu_on_init(menu)
 					ui_map_debug_ex.deactivate_feature()
 				end
 			end
-		end}	
+		end
+	}	
 	-- slot Hud
 	if (slot_hud) then
 		menu.gameplay_ui_options["slot_hud"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
@@ -55,13 +80,13 @@ function opt_menu_on_init(menu)
 	-- show_enemy_health
 	menu.gameplay_ui_options["show_enemy_health"]	= {default=false, 	debug_only=true, 	typ="check"}
 	-- radio_mod
-	menu.gameplay_options["radio_mod"]				= {default=true, 	debug_only=false, 	typ="check"}
+	menu.gameplay_options["radio_mod"]			= {default=true, 	debug_only=false, 	typ="check"}
 	-- mechanic_feature
-	menu.gameplay_options["mechanic_feature"]		= {default=false, 	debug_only=false, 	typ="check"}
+	menu.gameplay_options["mechanic_feature"]	= {default=false, 	debug_only=false, 	typ="check"}
 	-- heli_engine_sound
-	menu.gameplay_options["heli_engine_sound"]		= {default=true, 	debug_only=false, 	typ="check"}
+	menu.gameplay_options["heli_engine_sound"]	= {default=true, 	debug_only=false, 	typ="check"}
 	-- heli_spawn
-	menu.gameplay_options["heli_spawn"]				= {default=true, 	debug_only=false, 	typ="check"}
+	menu.gameplay_options["heli_spawn"]			= {default=true, 	debug_only=false, 	typ="check"}
 	-- dynamic_news
 	menu.gameplay_ui_options["dynamic_news"]		= {default=true, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
 		if (level.present() and dynamic_news_manager) then 
@@ -73,7 +98,7 @@ function opt_menu_on_init(menu)
 		end	
 	end}
 	-- sleep_deprived
-	menu.gameplay_options["sleep_deprived"]			= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+	menu.gameplay_options["sleep_deprived"]		= {default=false, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
 		if (level.present() and sleep_dep) then
 			if (ctrl:GetCheck()) then
 				sleep_dep.activate_feature()
@@ -83,7 +108,7 @@ function opt_menu_on_init(menu)
 		end
 	end}
 	-- art_degrade
-	menu.gameplay_options["art_degrade"]			= {default=true, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
+	menu.gameplay_options["art_degrade"]		= {default=true, 	debug_only=false, 	typ="check", on_accept=function(handler,optMgr,ctrl)
 		if (level.present() and artefact_degradation) then
 			if (ctrl:GetCheck()) then
 				artefact_degradation.activate_feature()
@@ -92,67 +117,46 @@ function opt_menu_on_init(menu)
 			end
 		end
 	end}
-	-- detector_charge
-	menu.gameplay_options["detector_charge"]		= {default=true, 	debug_only=true, 	typ="check", on_accept=function(handler,optMgr,ctrl)
-		if (level.present() and detector_charge) then
-			if (ctrl:GetCheck()) then
-				detector_charge.activate_feature()
-			else
-				detector_charge.deactivate_feature()
-			end
-		end
-	end}
-	-- enhanced_recoil
-	menu.gameplay_options["enhanced_recoil"]		= {default=false,	debug_only=false,	typ="check", on_accept=function(handler, optMgr, ctrl)
-		if (ctrl:GetCheck()) then
-			dxr_enhanced_recoil.activate_feature()
-		else
-			dxr_enhanced_recoil.deactivate_feature()
-		end
-	end}
-	-- weapon_hide
-	menu.gameplay_options["weapon_hide"]			= {default=false,	debug_only=false,	typ="check", on_accept=function(handler,optMgr,ctrl)
-		if (ctrl:GetCheck()) then
-			hide_wpn.activate_feature()
-		else
-			hide_wpn.deactivate_feature()
-		end
-	end}
+	
 	-- I do not recommend allowing a factor greater than 1.5 because there are not enough smart terrain jobs
-	menu.gameplay_options["alife_mutant_pop"]		= {default=1.0,		debug_only=false,	typ="list", list={0.25,0.50,1.0,1.5}}
-	menu.gameplay_options["alife_stalker_pop"]		= {default=0.5,		debug_only=false,	typ="list", list={0.25,0.50,1.0,1.5}}
+	menu.gameplay_options["alife_mutant_pop"]			= {default=0.5, 	debug_only=false, 	typ="list", list={0.25,0.50,1.0,1.5}}
+	menu.gameplay_options["alife_stalker_pop"]			= {default=0.5, 	debug_only=false, 	typ="list", list={0.25,0.50,1.0,1.5}}
+	
 	-- excl_dist
 	-- note: shouldn't be greater than switch distance or no simulation squads will come online. Instead it should create a border zone between excl_dist and switch_distance where stuff can come online
 	-- so that when actor walks stuff will naturally come online but if squad teleports very close to actor it will stay offline until player walks far enough away.
-	menu.gameplay_options["excl_dist"]				= {default=25,		debug_only=false,	typ="list", list={0,25,50,100}}  
+	menu.gameplay_options["excl_dist"]			= {default=25, 		debug_only=false, 	typ="list", list={0,25,50,100}}  
 	-- number of rotating quicksaves
-	menu.gameplay_options["quicksave_cnt"]			= {default=5,		debug_only=false,	typ="list", list={1,5,10,20}}
+	menu.gameplay_options["quicksave_cnt"]		= {default=5, 		debug_only=false, 	typ="list", list={1,5,10,20}}
 	-- character portraits
 	if (db.actor) then -- Options will only show while in-game
 		local l = get_character_icon_list()
 		local selected = nil 
 		
-		menu.gameplay_ui_options["char_portrait"]	= {default=db.actor_binder.character_icon or "ui_inGame2_Strelok", debug_only=false, typ="list", list=l, on_accept=function(handler,optMgr,ctrl)
-			if (selected) then
-				db.actor_binder.character_icon = ctrl:GetText()
-				if (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false)) then
-					local outfit = db.actor:item_in_slot(7)
-					if (outfit == nil) then
+		menu.gameplay_ui_options["char_portrait"]	= {default=db.actor_binder.character_icon or "ui_inGame2_Strelok", debug_only=false, typ="list", list=l, 
+			on_accept=function(handler,optMgr,ctrl)
+				if (selected) then
+					db.actor_binder.character_icon = ctrl:GetText()
+					if (axr_main.config:r_value("mm_options","enable_outfit_portrait",1,false)) then
+						local outfit = db.actor:item_in_slot(7)
+						if (outfit == nil) then
+							db.actor:set_character_icon(db.actor_binder.character_icon)
+						end
+					else 
 						db.actor:set_character_icon(db.actor_binder.character_icon)
 					end
-				else 
-					db.actor:set_character_icon(db.actor_binder.character_icon)
+				end
+			end, 
+			on_list_item_select=function(handler,ctrl)
+				selected = ctrl:GetText()
+				if (handler.char_icon) then
+					handler.char_icon:InitTexture(selected)
 				end
 			end
-		end, 
-		on_list_item_select=function(handler,ctrl)
-			selected = l[ctrl:GetCurrentIdx()+1]--ctrl:GetText()
-			if (handler.char_icon) then
-				handler.char_icon:InitTexture(selected)
-			end
-		end}
+		}
 		
-		menu.gameplay_ui_options["outfit_portrait"]	= {default=false,	debug_only=false,	typ="check", on_accept=function(handler,optMgr,ctrl)
+		menu.gameplay_ui_options["outfit_portrait"]	= {default=false, 	debug_only=false, 	typ="check", 
+			on_accept=function(handler,optMgr,ctrl)
 				if (ctrl:GetCheck()) then
 					local outfit = db.actor:item_in_slot(7)
 					if (outfit) then 
@@ -164,25 +168,8 @@ function opt_menu_on_init(menu)
 				else 
 					db.actor:set_character_icon(db.actor_binder.character_icon or "ui_inGame2_Strelok")
 				end
-		end}
-		
-		-- multiplier for condition of dropped or earned weapons
-		menu.gameplay_options["multi_wpn_conditions"]	= {default=1.0,	debug_only=true,	typ="list", list={0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2},	on_accept=function(handler,optMgr,ctrl)
-			alife_storage_manager.get_state().economy_wpn = axr_main.config:r_value("mm_options","multi_wpn_conditions",2,1)
-		end}
-		-- multiplier for money rewards
-		menu.gameplay_options["multi_rewards_money"]	= {default=1.0,	debug_only=true, 	typ="list", list={0.50,0.75,1.0,1.25,1.5,2.0,3.0},	on_accept=function(handler,optMgr,ctrl)
-			alife_storage_manager.get_state().economy_money = axr_main.config:r_value("mm_options","multi_rewards_money",2,1)
-		end}
-		-- multiplier for earned goodwill 
-		menu.gameplay_options["multi_rewards_goodwill"]	= {default=1.0,	debug_only=true, 	typ="list", list={0.50,0.75,1.0,1.25,1.5,2.0,3.0},	on_accept=function(handler,optMgr,ctrl)
-			alife_storage_manager.get_state().economy_goodwill = axr_main.config:r_value("mm_options","multi_rewards_goodwill",2,1)
-		end}
-		-- multiplier for loots from corpses
-		menu.gameplay_options["multi_loot"]				= {default=1.0,	debug_only=true, 	typ="list", list={0.5,0.8,1.0,1.2,1.5,2.0}, on_accept=function(handler,optMgr,ctrl)
-			alife_storage_manager.get_state().economy_loot = axr_main.config:r_value("mm_options","multi_loot",2,1)
-		end}
-	
+			end
+		}
 	end
 	
 	write_default_config(menu.gameplay_options)
@@ -230,8 +217,7 @@ function on_accept(tab_table,menu,optMgr,console)
 				elseif (type(v.default) == "number") then 
 					axr_main.config:w_value("mm_options",name,tonumber(v.ctrl:GetText()) or v.default)
 				else 
-					local value = v.list[v.ctrl:GetCurrentIdx()+1]
-					axr_main.config:w_value("mm_options",name,value)
+					axr_main.config:w_value("mm_options",name,v.ctrl:GetText())
 				end
 			end
 			
@@ -255,7 +241,7 @@ function on_set_values(tab_table,menu,optMgr)
 				elseif (type(v.default) == "number") then 
 					v.ctrl:SetText(axr_main.config:r_value("mm_options",name,2,v.default))
 				else 
-					v.ctrl:SetText(game.translate_string(axr_main.config:r_value("mm_options",name,0,v.default)))
+					v.ctrl:SetText(axr_main.config:r_value("mm_options",name,0,v.default))
 				end
 			end
 			if (v.on_set_values) then 

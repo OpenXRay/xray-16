@@ -2,29 +2,28 @@
 cost 		= 1000
 value		= +10
 
-fire_wound_protection  			= 0.02
-bones_koeff_protection_add  	= actor_armor_add_002
+fire_wound_protection  			= 0.04
+bones_koeff_protection_add  	= actor_armor_add_1
 
 [up_sect_firstc_svoboda_rad_outfit]
 cost 		= 2000
 value		= +20
 
-fire_wound_protection  			= 0.04
-bones_koeff_protection_add  	= actor_armor_add_004
+fire_wound_protection  			= 0.06
+bones_koeff_protection_add  	= actor_armor_add_2
 
 [up_sect_firstd_svoboda_rad_outfit]
 cost 		= 2000
 value		= +25
 
-immunities_sect_add 			= sect_rad_outfit_immunities_add
+immunities_sect_add 			= sect_svoboda_rad_outfit_immunities_add
 
 [up_sect_firste_svoboda_rad_outfit]
 cost 		= 4000
 value		= +30
 
-fire_wound_protection  			= 0.06
-bones_koeff_protection_add 		= actor_armor_add_006
-hit_fraction_actor				= -0.04
+fire_wound_protection  			= 0.08
+bones_koeff_protection_add 		= actor_armor_add_3
 
 [up_sect_firstf_svoboda_rad_outfit]
 cost 		= 4000
@@ -39,36 +38,36 @@ wound_protection				= 0.05
 cost 		= 1000
 value		= -10
 
-hit_fraction_actor				= -0.03
-strike_protection 				= 0.03
-explosion_protection 			= 0.03
-wound_protection				= 0.025
+hit_fraction_actor				= -0.04
+strike_protection 				= 0.04
+explosion_protection 			= 0.04
+wound_protection				= 0.03
 
 [up_sect_seconc_svoboda_rad_outfit]
 cost 		= 2000
 value		= +20
 
-shock_protection                = 0.05
+shock_protection                = 0.1
 
 [up_sect_second_svoboda_rad_outfit]
 cost 		= 2000
 value		= +20
 
-burn_protection 				= 0.008
+burn_protection 				= 0.01
 
 [up_sect_secone_svoboda_rad_outfit]
 cost 		= 4000
 value		= +30
 
-burn_protection 				= 0.008
-chemical_burn_protection	    = 0.008
+burn_protection 				= 0.0075
+chemical_burn_protection	    = 0.0075
 
 [up_sect_seconf_svoboda_rad_outfit]
 cost 		= 4000
 value		= +30
 
-chemical_burn_protection 	    = 0.008
-radiation_protection 		 	= 0.001
+chemical_burn_protection 	    = 0.0075
+radiation_protection 		 	= 0.003
 
 [up_sect_thirda_svoboda_rad_outfit]
 cost 		= 1250
@@ -86,8 +85,8 @@ artefact_count					= 1
 cost 		= 2500
 value		= -10
 
-inv_weight  					= -4
-power_loss						= -0.02
+inv_weight  					= -5
+power_loss						= -0.03
 
 [up_sect_thirde_svoboda_rad_outfit]
 cost 		= 5000
@@ -107,7 +106,7 @@ cost 		= 1000
 value		= +10
 
 chemical_burn_protection        = 0.005
-radiation_protection 			= 0.0003
+radiation_protection 			= 0.0015
 
 [up_sect_fourtc_svoboda_rad_outfit]
 cost 		= 2500
@@ -125,7 +124,7 @@ nightvision_sect				= effector_nightvision_2
 cost 		= 4500
 value 		= +30
 
-telepatic_protection  			= 0.015
+telepatic_protection  			= 0.02
 
 
 [up_firsta_svoboda_rad_outfit]
@@ -193,7 +192,7 @@ scheme_index            = 2, 0
 known                   = 1
 effects                 =
 section                 = up_sect_firste_svoboda_rad_outfit
-property                = prop_armor, prop_damage
+property                = prop_armor
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b

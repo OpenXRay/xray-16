@@ -8,7 +8,7 @@ function get_smart_cover()
 	return {
 			need_weapon = false,
 			loopholes = {
-				smart_covers_loophole_anim_pri_a22.get_loophole("anim_pri_a22",	vector():set(0,0,0), vector():set(0,0,-1),	vector():set(0,0,-1))
+				smart_covers_loophole_anim_pri_a22.get_loophole("anim_pri_a22",	VEC_ZERO, vector():set(0,0,-1),	vector():set(0,0,-1))
 			},
 
 

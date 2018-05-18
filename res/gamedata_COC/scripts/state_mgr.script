@@ -6,15 +6,12 @@
 ----------------------------------------------------------------------------------------------------------------------
 --function printf()
 --end
-fast_set_true = {fast_set = true} -- avoid gc
 
 combat_action_ids = {
 						-- basically if your scheme sets body/movement states manually and doesn't use set_state, then you need it here
 						[stalker_ids.action_combat_planner] = true,
 						[stalker_ids.action_danger_planner] = true,
 						--[stalker_ids.action_anomaly_planner] = true,
-						[axr_npc_vs_box.actid] = true,
-						[axr_fight_from_cover.actid] = true,
 						[xrs_facer.actid_facer] = true,
 						[xrs_facer.actid_steal_up_facer] = true,
 						[xr_danger.actid] = true
@@ -29,7 +26,7 @@ no_idle_alife_ids = {	[xr_actions_id.stohe_meet_base + 1] = true
 -- Should be faster than mgr.planner:action(id):evaluate() right?
 
 local function eval_movement(mgr,npc)
-	return (state_lib.states[mgr.target_state].movement == nil or state_lib.states[mgr.target_state].movement == npc:target_movement_type()) -- and not npc:is_body_turning()
+	return (state_lib.states[mgr.target_state].movement == nil or state_lib.states[mgr.target_state].movement == npc:target_movement_type()) and not npc:is_body_turning()
 end
 
 local function eval_animstate_locked(mgr)
@@ -192,47 +189,36 @@ end
 class "act_state_mgr_to_idle" (action_base)
 function act_state_mgr_to_idle:__init(name,state_manager) super (nil, name)
 	self.st = state_manager
+	self.fast_set_true = {fast_set = true} -- avoid gc
 end
 function act_state_mgr_to_idle:initialize()
 	action_base.initialize(self)
-	
-	if (self.object:path_type() ~= game_object.level_path) then
-		self.object:inactualize_patrol_path()
-		self.object:set_path_type(game_object.level_path)
-	end
+
+	self.object:inactualize_patrol_path()
+	self.object:set_path_type(game_object.level_path)
 	utils.send_to_nearest_accessible_vertex( self.object, self.object:level_vertex_id() )
 
---	if (self.object:best_enemy() or self.object:best_danger()) then
-		self.object:clear_animations()
-		self.st.animation:set_state(nil, true)
-		self.st.animation:set_control()
-		self.st.animstate:set_state(nil,true)
-		self.st.animstate:set_control()
-		self.st:set_state("idle", nil, nil, nil, fast_set_true)
---	else 
---		self.st.set_state("idle")
---	end
+	if (self.object:best_enemy() or self.object:best_danger()) then
+		self.st:set_state("idle", nil, nil, nil, self.fast_set_true)
+		return
+	end
+
+	self.st:set_state("idle")
 end
 
 function act_state_mgr_to_idle:execute()
-	action_base.execute(self)
-	
-	if (self.object:path_type() ~= game_object.level_path) then
-		self.object:inactualize_patrol_path()
-		self.object:set_path_type(game_object.level_path)
-	end
+	--alun_utils.debug_write(strformat("act_state_mgr_to_idle:execute %s",self.object:name()))
+	self.object:inactualize_patrol_path()
+	self.object:set_path_type(game_object.level_path)
 	utils.send_to_nearest_accessible_vertex( self.object, self.object:level_vertex_id() )
 
---	if (self.object:best_enemy() or self.object:best_danger()) then
-		self.object:clear_animations()
-		self.st.animation:set_state(nil, true)
-		self.st.animation:set_control()
-		self.st.animstate:set_state(nil,true)
-		self.st.animstate:set_control()
-		self.st:set_state("idle", nil, nil, nil, fast_set_true)
---	else 
---		self.st.set_state("idle")
---	end
+	if (self.object:best_enemy() or self.object:best_danger()) then
+		self.st:set_state("idle", nil, nil, nil, self.fast_set_true)
+	else 
+		self.st:set_state("idle")
+	end
+	
+	action_base.execute(self)
 end
 
 function act_state_mgr_to_idle:finalize()
@@ -317,15 +303,16 @@ end
 function act_state_mgr_end:execute()
 	action_base.execute(self)
 	--alun_utils.debug_write(strformat("act_state_mgr_end:weapon_update %s",self.object:name()))
-	if (self.st.callback.func and self.st.callback.timeout) then
-		local tg = time_global()
+	if self.st.callback and self.st.callback.timeout then
 		if self.st.callback.begin == nil then
 			self.st.callback.begin = time_global()
-		elseif tg - self.st.callback.begin >= self.st.callback.timeout then
-			self.st.callback.func()
-			self.st.callback.begin = nil
-			self.st.callback.func = nil
-			self.st.callback.timeout = nil
+		end
+
+		if time_global() - self.st.callback.begin >= self.st.callback.timeout then
+			if self.st.callback.func ~= nil then
+				self.st.callback.func(self.st.callback.obj)
+			end
+			self.st.callback = nil
 		end
 	end
 	
@@ -378,7 +365,6 @@ end
 --' Сам менеджер
 class "state_manager"
 function state_manager:__init(npc)
-	self.npc = npc
 	state_mgr_goap.goap_graph(self, npc)
 	self.target_state = "idle"
 	self.current_direction = nil
@@ -386,7 +372,6 @@ function state_manager:__init(npc)
 	self.combat = false
 	self.alife = true
 	self.need_reweapon = false
-	self.callback = {}
 end
 function state_manager:set_state(state_name, callback, timeout, target, extra)
 	if (DEV_DEBUG and db.storage[self.npc:id()].debug_state) then 
@@ -439,32 +424,30 @@ function state_manager:set_state(state_name, callback, timeout, target, extra)
 		self.fast_set = nil
 	end
 
-	self.callback.turn_end_func = callback and callback.turn_end_func or nil -- because it's used separately in state_mgr_direction unlike below
-	
 	if (callback) then
-		self.callback.begin = nil
-		self.callback.func = callback.func
-		self.callback.timeout = timeout
-	else 
-		self.callback.begin = nil
-		self.callback.func = nil
-		self.callback.timeout = nil
+		self.callback = callback
+		if (timeout and timeout >= 0) then
+			self.callback.timeout = timeout
+			self.callback.begin = nil
+		else
+			self.callback.func = nil
+			self.callback.timeout = nil
+		end
 	end
 end
 function state_manager:get_state()
 	return self.target_state
 end
 function state_manager:update()
-	if (self.callback.func and self.callback.timeout and self.animation.states.current_state == state_lib.states[self.target_state].animation) then
+	if (self.callback and self.callback.func and self.animation.states.current_state == state_lib.states[self.target_state].animation) then
 		local tg = time_global()
 		if not (self.callback.begin) then
 			self.callback.begin = tg
 		else
 			if (tg - self.callback.begin >= self.callback.timeout) then
-				self.callback.func()
+				self.callback.func(self.callback.obj)
 				self.callback.begin = nil
 				self.callback.func = nil
-				self.callback.timeout = nil
 			end
 		end
 	end
@@ -595,7 +578,7 @@ function bind_manager(object)
 
 	action = manager:action(xr_actions_id.alife)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 2,true))
-	action:add_effect(wp(xr_evaluators_id.state_mgr + 2,false))
+	--action:add_effect(wp(xr_evaluators_id.state_mgr + 2,false))
 
 	--[[
 	action = manager:action(stalker_ids.action_gather_items)
@@ -604,7 +587,7 @@ function bind_manager(object)
 
 	action = manager:action(stalker_ids.action_combat_planner)
 	action:add_precondition(wp(xr_evaluators_id.state_mgr + 1,true))
-	action:add_effect(wp(xr_evaluators_id.state_mgr + 1,false))
+	--action:add_effect(wp(xr_evaluators_id.state_mgr + 1,false))
 	
 	--local combat_action_planner = cast_planner(action)
 	--combat_action_planner:remove_action(stalker_ids.action_kill_enemy_if_not_visible)

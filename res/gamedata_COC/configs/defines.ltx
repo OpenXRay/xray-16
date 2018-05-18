@@ -133,10 +133,16 @@ script_binding 							 = bind_item.bind
 immunities_sect				= sect_zero_immunities
 
 [weapon_probability]
-hit_probability_gd_novice	= 1
-hit_probability_gd_stalker	= 1
-hit_probability_gd_veteran	= 1
-hit_probability_gd_master	= 1
+hit_probability_gd_novice	= 0.20
+hit_probability_gd_stalker	= 0.30
+hit_probability_gd_veteran	= 0.40
+hit_probability_gd_master	= 0.50
+
+[weapon_probability_2]
+hit_probability_gd_novice	= 0.50
+hit_probability_gd_stalker	= 0.60
+hit_probability_gd_veteran	= 0.70
+hit_probability_gd_master	= 0.80
 
 [default_weapon_params]:identity_immunities
 use_aim_bullet				= false
@@ -156,7 +162,7 @@ sprint_allowed              = true
 control_inertion_factor     = 1.0
 zoom_rotate_time            = 0.25
 script_binding				= bind_item.bind_weapon ;To keep track of special scope
-ironsight_zoom_factor		= 1.25		;Really only used for Grenade Launcher Attachments
+ironsight_zoom_factor		= 1.1		;Really only used for Grenade Launcher Attachments
 
 [common_ph_friction_params_on_npc_death] ; Parameters for setting change of friction at the time of the death of a character
 

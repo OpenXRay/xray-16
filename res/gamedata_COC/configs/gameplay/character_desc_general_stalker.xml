@@ -492,7 +492,7 @@
     <rank>198</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>-2156</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_1</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_1_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_1.ltx"
@@ -515,7 +515,7 @@
     <rank>976</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>-1559</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral1a</visual>
+    <visual>actors\stalker_neutral\stalker_neutral1a_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_1.ltx"
@@ -561,7 +561,7 @@
     <rank>430</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>1751</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral1b</visual>
+    <visual>actors\stalker_neutral\stalker_neutral1b_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_1.ltx"
@@ -584,7 +584,7 @@
     <rank>928</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>-2310</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral1c</visual>
+    <visual>actors\stalker_neutral\stalker_neutral1c_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_1.ltx"
@@ -607,7 +607,7 @@
     <rank>454</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>-2097</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral1d</visual>
+    <visual>actors\stalker_neutral\stalker_neutral1d_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_1.ltx"
@@ -630,7 +630,7 @@
     <rank>772</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>-1258</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral1e</visual>
+    <visual>actors\stalker_neutral\stalker_neutral1e_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_1.ltx"
@@ -653,7 +653,7 @@
     <rank>142</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>111</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral1f</visual>
+    <visual>actors\stalker_neutral\stalker_neutral1f_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_1.ltx"
@@ -966,7 +966,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_15" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -975,7 +975,7 @@
     <rank>4680</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-1005</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_2_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2mask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -989,7 +989,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_16" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -998,7 +998,7 @@
     <rank>3636</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1165</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2a_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2amask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1012,7 +1012,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_17" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -1021,7 +1021,7 @@
     <rank>5404</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>800</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2b_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2bmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1035,7 +1035,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_18" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -1044,7 +1044,7 @@
     <rank>3818</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-1105</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2c_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2cmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1058,7 +1058,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_19" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -1067,7 +1067,7 @@
     <rank>3994</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-374</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2d_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2dmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1113,7 +1113,7 @@
     <rank>5514</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1755</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2mask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1136,7 +1136,7 @@
     <rank>5358</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>2036</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2a_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2amask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1159,7 +1159,7 @@
     <rank>5442</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1497</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2b_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2bmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1182,7 +1182,7 @@
     <rank>3298</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>2014</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2c_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2cmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1205,7 +1205,7 @@
     <rank>4592</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-214</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2d_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2dmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1380,7 +1380,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_31" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -1389,7 +1389,7 @@
     <rank>5784</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1076</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2e_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2emask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1403,7 +1403,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_32" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -1412,7 +1412,7 @@
     <rank>4268</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-2467</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2f_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2fmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1435,7 +1435,7 @@
     <rank>5546</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>2090</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2f_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2fmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -1458,7 +1458,7 @@
     <rank>5990</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1745</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2e_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2emask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2139,7 +2139,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_1_default_61" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_1</class>
@@ -2148,7 +2148,7 @@
     <rank>4744</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-1555</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2g_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2gmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2171,7 +2171,7 @@
     <rank>4800</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-2050</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2gmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2194,7 +2194,7 @@
     <rank>5404</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>74</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2240,7 +2240,7 @@
     <rank>5836</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-1461</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2b_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2b_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2263,7 +2263,7 @@
     <rank>3666</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1514</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2c_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2c_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2286,7 +2286,7 @@
     <rank>4640</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-726</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2d_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2d_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2309,7 +2309,7 @@
     <rank>5332</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-128</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2e_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2e_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2332,7 +2332,7 @@
     <rank>3238</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1730</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2f_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2f_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2378,7 +2378,7 @@
     <rank>5962</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1556</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2424,7 +2424,7 @@
     <rank>5244</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>957</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2b_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2b_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2447,7 +2447,7 @@
     <rank>5260</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>2389</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2c_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2c_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2470,7 +2470,7 @@
     <rank>3490</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-1995</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2d_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2d_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2493,7 +2493,7 @@
     <rank>3018</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>1037</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2e_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2e_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2516,7 +2516,7 @@
     <rank>5514</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-163</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2f_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2f_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2539,7 +2539,7 @@
     <rank>3202</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-1701</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2g_mas2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2562,7 +2562,7 @@
     <rank>5974</rank>
     <money min="1000" max="2000" infinitive="0"/>
     <reputation>-182</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2g_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2783,7 +2783,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_15" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -2792,7 +2792,7 @@
     <rank>4526</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>1359</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_2_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2mask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2806,7 +2806,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_16" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -2815,7 +2815,7 @@
     <rank>3624</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>1461</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2a_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2amask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2829,7 +2829,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_17" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -2838,7 +2838,7 @@
     <rank>5066</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>691</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2b_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2bmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2852,7 +2852,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_18" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -2861,7 +2861,7 @@
     <rank>4268</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-210</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2c_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2cmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2875,7 +2875,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_19" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -2884,7 +2884,7 @@
     <rank>3086</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>179</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2d_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2dmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2930,7 +2930,7 @@
     <rank>4040</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>894</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2mask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2953,7 +2953,7 @@
     <rank>4692</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-738</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2a_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2amask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2976,7 +2976,7 @@
     <rank>3060</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-2063</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2b_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2bmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -2999,7 +2999,7 @@
     <rank>4928</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>370</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2c_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2cmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -3022,7 +3022,7 @@
     <rank>3120</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-2407</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2d_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2dmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -3174,7 +3174,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_30" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -3183,7 +3183,7 @@
     <rank>4844</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>1655</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2e_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2emask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -3206,7 +3206,7 @@
     <rank>3850</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-1324</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2e_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2emask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -3243,7 +3243,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_33" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -3252,7 +3252,7 @@
     <rank>3256</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>2444</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2f_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2fmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -3275,7 +3275,7 @@
     <rank>5338</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>1088</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2f_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2fmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -3956,7 +3956,7 @@
     </specific_character>
 <specific_character id="sim_default_stalker_2_default_61" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_neutral_2_bala</icon>
+    <icon>ui_inGame2_neutral_2mask1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_stalker_2</class>
@@ -3965,7 +3965,7 @@
     <rank>3906</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-2353</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2g_bala</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2gmask1</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -3988,7 +3988,7 @@
     <rank>5858</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>954</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2gmask2</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -4034,7 +4034,7 @@
     <rank>5922</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-571</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -4080,7 +4080,7 @@
     <rank>3476</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>262</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2b_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2b_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -4103,7 +4103,7 @@
     <rank>5608</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-830</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2c_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2c_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -4126,7 +4126,7 @@
     <rank>5958</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-313</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2d_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2d_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -4149,7 +4149,7 @@
     <rank>4180</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-509</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2e_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2e_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -4195,7 +4195,7 @@
     <rank>3592</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>948</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2f_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2f_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"
@@ -4218,7 +4218,7 @@
     <rank>5776</rank>
     <money min="1500" max="3500" infinitive="0"/>
     <reputation>-107</reputation>
-    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <visual>actors\stalker_neutral\stalker_neutral2g_mas3</visual>
     <supplies>
 #include "gameplay\loadouts\stalker_base.ltx"
 #include "gameplay\loadouts\stalker_tier_2.ltx"

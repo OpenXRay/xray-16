@@ -101,8 +101,10 @@ function eva_state_mgr_direction:evaluate()
 end
 function eva_state_mgr_direction:callback()
 	if self.st.callback and self.st.callback.turn_end_func then
-		self.st.callback.turn_end_func()
-		self.st.callback.turn_end_func = nil
+		self.st.callback.turn_end_func(self.st.callback.obj)
+		if self.st.callback ~= nil	then
+			self.st.callback.turn_end_func = nil
+		end
 	end
 end
 

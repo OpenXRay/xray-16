@@ -57,16 +57,6 @@
             </phrase>
         </phrase_list>
     </dialog>
-    <dialog id="dm_orders_dialog">
-        <precondition>dialogs_orders.has_orders</precondition>
-		<precondition>dialogs_orders.dont_has_order_cond</precondition>
-        <init_func>dialog_manager.dm_init_dynamic_orders_dialog</init_func>
-    </dialog>
-    <dialog id="dm_orders_processing_dialog">
-        <precondition>dialogs_orders.has_orders</precondition>
-		<precondition>dialogs_orders.has_order_cond</precondition>
-        <init_func>dialog_manager.dm_init_dynamic_orders_processing_dialog</init_func>
-    </dialog>
 	<!-- Alundaio -->
 	<dialog id="dm_ashot_and_yar_dialog">
 		<precondition>dialogs_jupiter.is_message_receiver</precondition>

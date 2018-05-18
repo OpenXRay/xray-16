@@ -6,7 +6,7 @@ function eva_state_mgr_movement:__init(name, st) super (nil, name)
 	self.st = st
 end
 function eva_state_mgr_movement:evaluate()
-	return state_lib.states[self.st.target_state].movement == nil or state_lib.states[self.st.target_state].movement == self.object:target_movement_type() --and not self.object:is_body_turning()
+	return state_lib.states[self.st.target_state].movement == nil or state_lib.states[self.st.target_state].movement == self.object:target_movement_type() and not self.object:is_body_turning()
 end
 --' нужно ли нам идти
 class "eva_state_mgr_movement_walk" (property_evaluator)

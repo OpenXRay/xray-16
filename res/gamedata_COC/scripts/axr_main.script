@@ -22,10 +22,6 @@ end
 -- You must register a callback before or during on_game_load (ie. bind_actor net_spawn)
 -- All unused callbacks will have their table deleted from intercepts (see on_game_load for implementation)
 local intercepts = {
-	-- se_*.script
-	server_entity_on_register				= {},
-	server_entity_on_unregister				= {},
-	
 	-- _g.script
 	on_before_item_use			= {},
 	actor_on_before_hit			= {},
@@ -36,7 +32,6 @@ local intercepts = {
 	CUIActorMenu_OnItemDropped		= {},
 	CUIActorMenu_OnItemFocusReceive = {},
 	CUIActorMenu_OnItemFocusLost 	= {},
-	CUIActorMenu_CanMoveToPartner	= {},
 	
 	-- ui_main_menu.script
 	main_menu_on_keyboard		= {},
@@ -75,8 +70,8 @@ local intercepts = {
 	se_stalker_on_spawn			= {},
 
 	-- se_actor.script
-	--se_actor_on_register		= {},			-- use server_entity_on_register check "se_actor" as type_name
-	--se_actor_on_unregister		= {},		-- use server_entity_on_unregister
+	se_actor_on_register		= {},
+	se_actor_on_unregister		= {},
 	se_actor_on_STATE_Write		= {},
 	se_actor_on_STATE_Read		= {},
 	
@@ -95,10 +90,9 @@ local intercepts = {
 	-- sim_squad_scripted.script
 	squad_on_npc_death			= {},
 	squad_on_update				= {},
-	squad_on_first_update		= {},
 	squad_on_add_npc			= {},
-	--squad_on_register			= {},			-- use server_entity_on_register check "sim_squad_scripted" as type_name
-	--squad_on_unregister			= {},		-- use server_entity_on_unregister
+	squad_on_register			= {},
+	squad_on_unregister			= {},
 
 	-- smart_terrain.script 
 	smart_terrain_on_update		= {},
@@ -293,37 +287,4 @@ end
 
 function actor_on_weapon_zoom_out()
 	weapon_is_zoomed = false
-end
-
-------------------
--- server_entity_on_register
-------------------
-function server_entity_on_register(se_obj,type_name)
-	local id = se_obj.id
-	if (id == 0) then
-		story_objects.register(id,"actor")
-	else
-		story_objects.check_spawn_ini_for_story_id(se_obj)
-	end
-end
-
-------------------
--- server_entity_on_unregister
-------------------
--- good place to remove ids from persistent tables
-function server_entity_on_unregister(se_obj,type_name)
-	local id = se_obj.id
-	local m_data = alife_storage_manager.get_state()
-	if (m_data) then 
-		if (m_data.companion_borrow_item) then
-			m_data.companion_borrow_item[id] = nil 
-		end
-		if (m_data.se_object) then
-			m_data.se_object[id] = nil
-		end
-		if (m_data.game_object) then
-			m_data.game_object[id] = nil
-		end
-	end
-	story_objects.unregister(id)
 end

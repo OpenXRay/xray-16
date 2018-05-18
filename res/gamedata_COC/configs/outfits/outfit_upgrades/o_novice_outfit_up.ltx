@@ -2,8 +2,8 @@
 cost 		= 300
 value	    = +10
 
-fire_wound_protection  			= +0.02
-bones_koeff_protection_add  	= actor_armor_add_002
+fire_wound_protection  			= +0.04
+bones_koeff_protection_add  	= actor_armor_add_1
 
 [up_sect_firstc_novice_outfit]
 cost 		= 600
@@ -19,8 +19,7 @@ cost 		= 1500
 value		= +30
 
 fire_wound_protection  			= +0.06
-bones_koeff_protection_add  	= actor_armor_add_006
-hit_fraction_actor				= -0.05
+bones_koeff_protection_add  	= actor_armor_add_3
 inv_weight						= +0.25
 power_loss						= +0.01
 
@@ -34,8 +33,8 @@ immunities_sect_add 				= sect_novice_outfit_immunities_add
 cost 		= 600
 value       = +20 
 
-chemical_burn_protection  		= +0.004
-shock_protection           		= +0.1
+chemical_burn_protection  		= +0.01
+shock_protection           		= +0.105
 
 [up_sect_second_novice_outfit]
 cost 		= 600
@@ -49,7 +48,7 @@ value       = +5
 
 additional_inventory_weight 	= +5
 additional_inventory_weight2 	= +5
-power_loss	                    = -0.02
+power_loss	                    = -0.03
 
 [up_firsta_novice_outfit]
 scheme_index            = 0, 0
@@ -96,7 +95,7 @@ scheme_index            = 2, 0
 known                   = 1
 effects                 = 
 section                 = up_sect_firste_novice_outfit
-property                = prop_armor, prop_damage, prop_weightoutfit
+property                = prop_armor, prop_weightoutfit
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b

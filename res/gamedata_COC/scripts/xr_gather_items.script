@@ -159,7 +159,7 @@ function gather_item(npc)
 		local se_obj = alife_object(id)
 		-- npc_statistic
 		if (se_obj) then 
-			local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
+			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 			if (m_data) then
 				m_data.artefacts_found = m_data.artefacts_found and m_data.artefacts_found + 1 or 1
 			end

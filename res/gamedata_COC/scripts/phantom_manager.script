@@ -62,7 +62,7 @@ local function monster_on_update(npc,st)
 	end
 	
 	local sec = system_ini():r_string_ex(npc:section(),"spawn_phantom")
-	if (sec and sec ~= "" and phantom_manager.dynamic_phantom_count(sec) > 2) then 
+	if (sec and sec ~= "" and phantom_manager.dynamic_phantom_count(sec) >= 4) then 
 		return
 	end
 	

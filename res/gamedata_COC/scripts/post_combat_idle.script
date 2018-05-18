@@ -31,8 +31,8 @@ function evaluator_combat_enemy:evaluate()
 			--self.st.timer = tg
 		elseif (xr_conditions.surge_started() ~= true and db.storage[npc:id()].active_scheme ~= "camper") then
 			local overrides = db.storage[npc:id()].overrides
-			local min = (overrides and overrides.min_post_combat_time or 20) * 1000
-			local max = (overrides and overrides.max_post_combat_time or 25) * 1000
+			local min = (overrides and overrides.min_post_combat_time*1000) or 20000
+			local max = (overrides and overrides.max_post_combat_time*1000) or 25000
 			self.st.timer = tg + math.random(min, max)
 		else 
 			--self.st.timer = tg
@@ -165,7 +165,7 @@ function action_post_combat_wait:execute()
 	state = anims[math.random(#anims)]
 	self.st.animation:set_state(state)
 	self.st.animation:set_control()
-		
+	
 	local dir = npc:direction()
 	npc:set_sight(look.direction,vector():set(-dir.x,-dir.y,-dir.z))
 

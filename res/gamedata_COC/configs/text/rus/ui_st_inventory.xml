@@ -331,13 +331,10 @@
 		<text>Заряд</text>
 	</string>
 	<string id="ui_st_usable_parts">
-		<text>Доступны запчасти</text>
+		<text>Доступно</text>
 	</string>
 	<string id="ui_st_repairable_equipment">
 		<text>Требует ремонта</text>
-	</string>
-	<string id="ui_st_disassemble">
-		<text>Разборка</text>
 	</string>
 	<string id="ui_st_create_stash">
 		<text>Создать тайник</text>

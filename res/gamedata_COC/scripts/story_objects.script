@@ -25,11 +25,9 @@ end
 function check_spawn_ini_for_story_id(se_obj)
 	--printf("checking obj[%s] for story_id!!!",se_obj:name())
 	local spawn_ini = se_obj:spawn_ini()
-	if not (spawn_ini) then 
-		--printf("check_spawn_ini_for_story_id: no spawn ini for %s",se_obj:name())
-	elseif (spawn_ini:section_exist("story_object")) then
-		local result, id, value	= spawn_ini:r_line("story_object",0,"","")
-		--printf("check_spawn_ini_for_story_id: %s | %s = %s",se_obj:name(),id,value)
+	if (spawn_ini and spawn_ini:section_exist("story_object")) then
+		local result, id, value
+		result, id, value	= spawn_ini:r_line("story_object",0,"","")
 		if (id and id ~= "") then
 			-- support for:
 			-- [story_object]
@@ -45,6 +43,7 @@ function check_spawn_ini_for_story_id(se_obj)
 		end
 		return
 	end
+
 	local story_id = system_ini():r_string_ex(se_obj:section_name(),"story_id")
 	if story_id ~= nil then
 		register(se_obj.id , story_id)

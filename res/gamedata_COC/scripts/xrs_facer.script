@@ -89,10 +89,6 @@ function evaluator_facer:evaluate()
 		return false 
 	end
 	
-	if (npc:in_smart_cover()) then 
-		return false
-	end
-	
 	if self.st.abtime > tg then
 		return false
 	end

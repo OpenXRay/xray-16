@@ -33,6 +33,9 @@ function sim_squad_scripted:__init(section) super (section)
 	self.current_target_id	= nil
 	self.assigned_target_id	= nil
 	self:init_squad()
+	--if (USE_MARSHAL) then
+	--	RegisterScriptCallback("save_state",self.save_state,self)
+	--end
 	self.first_update 		= false
 end
 
@@ -121,8 +124,7 @@ function sim_squad_scripted:update()
 	cse_alife_online_offline_group.update(self)
 	
 	if not (self.first_update) then 
-		self.first_update = true
-		SendScriptCallback("squad_on_first_update",self)
+		self.first_update = true 
 	end
 
 	self:refresh()
@@ -172,12 +174,12 @@ local function can_help_actor(squad)
 end
 
 local function get_help_target_id(squad)
-	if (IsSurvivalMode() and squad.online and squad.dist_to_actor <= 250) then
+	if (IsSurvivalMode() and squad.dist_to_actor <= 300) then
 		if (squad.player_id == "zombied" or is_squad_monster[squad.player_id]) then
 			return 0
 		end
 	end
-	return squad.task_target_id
+	return
 end
 
 -- This update is called for all squads with a scripted smart_terrain target
@@ -199,12 +201,6 @@ function sim_squad_scripted:specific_update(script_target_id)
 	end
 	
 	if (self.current_action) then
-	
-		-- in such case assigned is changed (such as get_help_target_id) but current action is 1 (reached)
-		if (self.current_action == 1 and self.assigned_target_id ~= self.current_target_id) then 
-			self.current_action = 0
-		end
-		
 		-- If current action is not finished, then return
 		if (self.current_action == 0) then
 			-- if not (self.online) then
@@ -247,17 +243,10 @@ function sim_squad_scripted:generic_update()
 		return -- so that squad doesn't continously try to find target which lowers FPS
 	end 
 	
-	local forced_id = get_help_target_id(self)
-	self.assigned_target_id = forced_id or self.assigned_target_id or self.current_target_id
+	self.assigned_target_id = get_help_target_id(self) or self.assigned_target_id or self.current_target_id
 	
 	if (self.current_action) then
-		
-		-- in such case assigned is changed (such as get_help_target_id) but current action is 1 (reached)
-		if (self.current_action == 1 and self.assigned_target_id ~= self.current_target_id) then
-			self.current_action = 0
-		end
-	
-		local se_target = self.assigned_target_id == self.id and self or simulation_objects.get_server_entity(self.assigned_target_id)
+		local se_target = simulation_objects.get_server_entity(self.assigned_target_id)
 		-- Evaluate current assigned target; make sure it is still valid
 		if (se_target and se_target:target_precondition(self,true)) then
 			-- If current action is not finished, then return
@@ -275,9 +264,6 @@ function sim_squad_scripted:generic_update()
 				end
 				return
 			elseif (self.current_action == 1 and self.current_target_id == self.assigned_target_id) then
-				if (forced_id) then
-					return -- infinite stay time
-				end
 				if (se_target.locked == true) or (self.stay_time and game.get_game_time():diffSec(self.stay_time) < self.idle_time) then 
 					return
 				end
@@ -294,9 +280,8 @@ function sim_squad_scripted:generic_update()
 		-- we have to clear AFTER on_reach_target, not BEFORE so we can get location mask of old smart
 		self.assigned_target_id = nil
 		self.current_target_id = nil
-		self.task_target_id = nil
 		self.current_action = nil
-		self.__lock = db.actor.afterFirstUpdate -- keep trying until first update
+		self.__lock = true
 		return 
 	end
 
@@ -304,7 +289,6 @@ function sim_squad_scripted:generic_update()
 	
 	self.assigned_target_id = target.id
 	self.current_target_id = nil
-	self.task_target_id = nil
 	self.current_action = 0
 	
 	local sim = alife()
@@ -720,7 +704,7 @@ local function reset_animation(npc)
 	state_mgr.animstate:set_state(nil, true)
 	state_mgr.animstate:set_control()
 
-	state_mgr:set_state("idle", nil, nil, nil, state_mgr.fast_set_true)
+	state_mgr:set_state("idle", nil, nil, nil, {fast_set = true})
 
 	state_mgr:update()
 	state_mgr:update()
@@ -796,12 +780,6 @@ end
 --[[
 function sim_squad_scripted:save_state(m_data)
 	--alun_utils.debug_write(strformat("%s:%s sim_squad_scripted:save_state BEFORE",self:name(),self.id))
-	if (self:npc_count() == 0) then 
-		return
-	end
-	if not (m_data.sim_squad_scripted) then 
-		m_data.sim_squad_scripted = {}
-	end
 	m_data.sim_squad_scripted[self.id] = {}
 	m_data.sim_squad_scripted[self.id].name = self:name() -- debugging only
 	m_data.sim_squad_scripted[self.id].current_target_id = self.current_target_id
@@ -815,15 +793,12 @@ function sim_squad_scripted:load_state(m_data)
 	if not (m_data.sim_squad_scripted and m_data.sim_squad_scripted[self.id]) then 
 		return 
 	end
-	if (self:npc_count() == 0) then
-		return
-	end
 	--alun_utils.debug_write("sim_squad_scripted:load_state BEFORE")
 	self.current_target_id = m_data.sim_squad_scripted[self.id].current_target_id
 	self.respawn_point_id = m_data.sim_squad_scripted[self.id].respawn_point_id
 	self.respawn_point_prop_section = m_data.sim_squad_scripted[self.id].respawn_point_prop_section
 	self.smart_id = m_data.sim_squad_scripted[self.id].smart_id
-	--m_data.sim_squad_scripted[self.id] = nil
+	m_data.sim_squad_scripted[self.id] = nil
 	--alun_utils.debug_write("sim_squad_scripted:load_state AFTER")
 end 
 --]]
@@ -892,15 +867,16 @@ end
 function sim_squad_scripted:on_register()
 	--alun_utils.debug_write( strformat("%s:on_register start",self:name()) )
 	cse_alife_online_offline_group.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"sim_squad_scripted")
+	story_objects.check_spawn_ini_for_story_id(self)
 	sim_board.get_sim_board().squads[self.id] = true
 	--simulation_objects.register(self)
-
+	SendScriptCallback("squad_on_register",self)
 	--alun_utils.debug_write( strformat("%s:on_register end",self:name()) )
 end
 function sim_squad_scripted:on_unregister()
 	--alun_utils.debug_write("sim_squad_scripted:on_unregister")
-	SendScriptCallback("server_entity_on_unregister",self,"sim_squad_scripted")
+	SendScriptCallback("squad_on_unregister",self)
+	story_objects.unregister(self.id)
 	SIMBOARD.squads[self.id] = nil
 	SIMBOARD:assign_squad_to_smart(self, nil)
 	--simulation_objects.unregister(self)
@@ -913,6 +889,9 @@ function sim_squad_scripted:on_unregister()
 			smart.already_spawned[self.respawn_point_prop_section].num = smart.already_spawned[self.respawn_point_prop_section].num - 1
 		end
 	end
+	--if (USE_MARSHAL) then 
+	--	UnregisterScriptCallback("save_state",self)
+	--end
 	cse_alife_online_offline_group.on_unregister(self)
 end
 
@@ -931,9 +910,9 @@ function sim_squad_scripted:check_online_status()
 	elseif not (level_weathers.valid_levels[level.name()]) then -- underground levels
 		-- don't enforce any rule
 	else
-		if (self.online ~= true and is_squad_monster[self.player_id]) then -- monster behaviors
+		if (is_squad_monster[self.player_id]) then -- monster behaviors
 			local hour = level.get_time_hours()
-			if (self.player_id == "monster_predatory_day" or self.player_id == "monster_special_day") then 
+			if (self.player_id == "monster_predatory_day") then 
 				-- Monster will not come online during the hours of (9PM till 5AM)
 				if (hour <= 5 or hour >= 22) then
 					b = false 
@@ -943,7 +922,7 @@ function sim_squad_scripted:check_online_status()
 				if (hour <= 5 or hour >= 19) then
 					b = false
 				end
-			elseif (self.player_id == "monster_predatory_night" or self.player_id == "monster_special_night") then 
+			elseif (self.player_id == "monster_predatory_night") then 
 				-- Monster will not come online during the hours of (5AM till 7PM)
 				if (hour >= 5 and hour <= 19) then
 					b = false
@@ -954,13 +933,8 @@ function sim_squad_scripted:check_online_status()
 					b = false
 				end
 			end
-			if (b == false) then
-				self.assigned_target_id = self.id
-				self.current_target_id = self.id
-				self.current_action = 0
-			end
 		end
-		if (b == nil and db.actor) then
+		if (db.actor) then
 			if (db.actor:has_info("enforce_online_exclusion")) then -- For story needs
 				if (self.online) then -- exclude from coming online except if already online or storied
 					if (self.was_forced_offline or self.position:distance_to(db.actor:position()) >= 2500) then
@@ -1119,17 +1093,14 @@ function sim_squad_scripted:get_squad_props()
 
 		if (self.current_action) then
 			if (self.current_action == 0) then 
-				t = t .. "Trying to Reach Target\\n"
+				t = t .. "Trying to Reach Target"
 			elseif (self.current_action == 1) then 
 				t = t .. "Stay On Target"
-				if (self.stay_time) then
-					t = strformat("%s = %s (%s)\\n",t,tostring(self.idle_time - game.get_game_time():diffSec(self.stay_time)),self.idle_time)
-				end
 			end
-		end
 			
-		if (self.__lock) then
-			t = t .. "[locked]" -- cannot find target
+			if (self.current_action == 1 and self.stay_time) then
+				t = strformat("%s = %s (%s)",t,tostring(self.idle_time - game.get_game_time():diffSec(self.stay_time)),self.idle_time)
+			end
 		end
 
 		return t
@@ -1160,7 +1131,7 @@ function sim_squad_scripted:get_current_task()
 end
 
 function sim_squad_scripted:am_i_reached(squad)
-	return self:npc_count() == 0 or self.id == squad.id
+	return self:npc_count() == 0
 end
 
 function sim_squad_scripted:on_after_reach(squad)

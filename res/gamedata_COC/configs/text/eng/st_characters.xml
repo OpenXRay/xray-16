@@ -340,7 +340,7 @@
 		<text>Ivan Trodnik</text>
   </string>
    <string id="marsh_doctor_name">
-		<text>Doctor</text>
+		<text>Doc</text>
   </string>
   <string id="mar_smart_terrain_base_stalker_leader_marsh_name">
 		<text>Cold</text>
@@ -399,14 +399,11 @@
 	<string id="yan_semenov_bio">
 		<text>Research assistant at the mobile lab. No details available.</text>
 	</string>
-	<string id="yan_cherenkov_name">
-		<text>Professor Cherenkov</text>
-	</string>
 	<string id="yan_semenov_name">
-		<text>Professor Semenov</text>
+		<text>Assistant Semenov</text>
 	</string>
 	<string id="yan_vasilyev_name">
-		<text>Professor Vasiliev</text>
+		<text>Vasiliev</text>
 	</string>
 	<string id="yan_vasilyev_bio">
 		<text>Research assistant at the mobile lab. No details available.</text>
@@ -623,9 +620,6 @@
 	</string>
 	<string id="bar_beast_name">
 		<text>Beast</text>
-	</string>
-	<string id="bar_swede_name">
-		<text>Swede</text>
 	</string>
 	<string id="yan_ghost_name">
 		<text>Ghost</text>

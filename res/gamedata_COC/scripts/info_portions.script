@@ -29,8 +29,8 @@ local info_switches = {
 	["bar_arena_fight"]					= "%-bar_arena_reset%",
 	["bar_arena_reset"]					= "%-bar_arena_fight_1_reward -bar_arena_fight_2_reward -bar_arena_fight_3_reward -bar_arena_fight_4_reward -bar_arena_fight_5_reward -bar_arena_fight_6_reward -bar_arena_fight_7_reward -bar_arena_fight_8_reward%",
 	["bar_arena_start"]					= "%-bar_old_arena_reset%",
-	["bar_old_arena_reset"]				= "%-bar_arena_start -bar_arena_1000_r -bar_arena_2000_r -bar_arena_3000_r -bar_arena_5000_r -bar_arena_20_p -bar_arena_50_p -bar_arena_100_p -bar_arena_fight_10 -bar_arena_fight_20 -bar_arena_fight_30 -bar_arena_fight_40 -bar_arena_fight_50 -bar_arena_fight_60 -bar_arena_fight_70 -bar_arena_fight_80 -bar_arena_fight_90 -bar_arena_start_introduce -bar_arena_spawn_monstr -bar_arena_monstr_ready -bar_arena_monstr_dead -bar_arena_actor_victory -bar_arena_actor_lose -bar_arena_actor_afraid -bar_arena_actor_dead -bar_arena_pseudodog_choosen -bar_arena_snork_choosen -bar_arena_bloodsucker_choosen -bar_arena_burer_choosen -bar_arena_savage_choosen%",
-	["yan_scientist_die"]	 			= "%-yan_scientist_door_1_open -yan_scientist_door_2_open%"
+	["bar_old_arena_reset"]				= "%-bar_arena_start -bar_arena_1000_r -bar_arena_2000_r -bar_arena_3000_r -bar_arena_5000_r -bar_arena_20_p -bar_arena_50_p -bar_arena_100_p -bar_arena_fight_10 -bar_arena_fight_20 -bar_arena_fight_30 -bar_arena_fight_40 -bar_arena_fight_50 -bar_arena_fight_60 -bar_arena_fight_70 -bar_arena_fight_80 -bar_arena_fight_90 -bar_arena_start_introduce -bar_arena_spawn_monstr -bar_arena_monstr_ready -bar_arena_monstr_dead -bar_arena_actor_victory -bar_arena_actor_lose -bar_arena_actor_afraid -bar_arena_actor_dead -bar_arena_pseudodog_choosen -bar_arena_snork_choosen -bar_arena_bloodsucker_choosen -bar_arena_burer_choosen -bar_arena_savage_choosen%"
+
 }
 
 local function proceed()

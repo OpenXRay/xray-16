@@ -3,7 +3,7 @@ function on_game_start()
 	RegisterScriptCallback("on_key_release",on_key_release)
 	RegisterScriptCallback("actor_on_item_take_from_box",actor_on_item_take_from_box)
 	
-	local ini = ini_file("plugins\\itms_manager.ltx")
+	local ini = ini_file("plugins\\item_mods.ltx")
 	keep_items = alun_utils.collect_section(ini,"actor_backpack_keep_items",true)
 end
 

@@ -99,7 +99,7 @@
 	
     <auto_check x="840" y="540" width="30" height="30" stretch="1">
         <texture>ui_inGame2_checkbox</texture>
-        <text x="-10" y="0" font="letterica16" r="170" g="170" b="170">pda_companions_auto</text>
+        <text x="-10" y="3" font="letterica16" r="170" g="170" b="170">pda_companions_auto</text>
     </auto_check>
 	
 	<companion_frame x="35" y="537" width="955" height="171" stretch="1">

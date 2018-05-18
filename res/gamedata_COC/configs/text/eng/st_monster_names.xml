@@ -36,9 +36,4 @@
 	<string id="bar_arena_snork">
 		<text>Snork</text>
 	</string>
-
-	<string id="ui_st_heli_health">
-		<text>Helicopter</text>
-	</string>
-
 </string_table>

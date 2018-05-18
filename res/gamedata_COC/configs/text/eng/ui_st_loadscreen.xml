@@ -2,35 +2,35 @@
 <string_table>
 
 	<string id="ls_header">
-		<text>USEFUL INFORMATION</text>
+		<text>NIMBLE'S HANDBOOK</text>
 	</string>
 	
 	<string id="ls_tip_number">
-		<text>Fact #</text>
+		<text>Excerpt #</text>
 	</string>
 	
 	<string id="ls_tip_1">
-		<text>Rank has eight different levels and can be increased through almost any in-game activity. Certain features may require reaching a high rank before they can be used or fully unlocked.</text>
+		<text>Rank has eight different levels starting at 'Rookie' and finishing at 'Legend'. It can be increased through almost any in-game activity, and certain features may require reaching a high rank before they can be used.</text>
 	</string>
 	
 	<string id="ls_tip_2">
-		<text>Achievements can be unlocked through in-game accomplishments or by reaching statistical milestones. Every achievement is unlocked with an appropriate reward.</text>
+		<text>Achievements can be unlocked through certain in-game accomplishments or by reaching statistical milestones. Every achievement is unlocked with an appropriate reward which can be viewed in the PDA.</text>
 	</string>
 	
 	<string id="ls_tip_3">
-		<text>Basic, advanced, and expert tools are required by most technicians in order to perform certain upgrades on weapons and outfits. Such items can often be found in stashes received as rewards for completing tasks.</text>
+		<text>Basic, advanced and expert tools are required by most mechanics in order to perform certain upgrades on weapons and outfits. Such items can often be found in stashes received as rewards for completing tasks.</text>
 	</string>
 	
 	<string id="ls_tip_4">
-		<text>Sleep deprivation is an optional feature where the passage of time and usage of consumables will eventually require you to rest. Failing to do so may have dire consequences.</text>
+		<text>Sleep deprivation is an optional feature where the passage of time and using consumables will gradually drain the player - eventually requiring them to rest when prompted. Failing to do so may have dire consequences.</text>
 	</string>
 	
 	<string id="ls_tip_5">
-		<text>Helicopter gunships can be seen patrolling many of the Zone's locations. When engaged in combat, members of the helicopter's faction may often call on it for air support to help destroy attacking or defending forces.</text>
+		<text>Helicopter gunships can be seen patrolling many of the Zone's locations. When engaged in combat members of the helicopter's faction may often call on it for air support to help destroy attacking or defending forces.</text>
 	</string>
 	
 	<string id="ls_tip_6">
-		<text>Ironman mode gives a true sense of mortality. When your character is killed all saves for that specific playthrough are deleted and can never be restored. Pick your faction and starting location wisely.</text>
+		<text>Ironman mode gives a true sense of mortality. When the player is killed all saves for that specific character are deleted and can never be restored. Pick your faction and starting location wisely.</text>
 	</string>
 	
 	<string id="ls_tip_7">
@@ -38,7 +38,7 @@
 	</string>
 	
 	<string id="ls_tip_8">
-		<text>Backpacks can be bought or found and then used to create a custom stash. Stashes created by you are never de-spawned nor are they ever looted by other stalkers. They are permanent until all items are removed.</text>
+		<text>Backpacks can be bought or found and then used to create a custom stash. Stashes created by the player are never de-spawned nor are they ever looted by other stalkers. They are permanent until all items are removed.</text>
 	</string>
 	
 	<string id="ls_tip_9">
@@ -46,7 +46,7 @@
 	</string>
 	
 	<string id="ls_tip_10">
-		<text>Truck Cemetery is a large graveyard of irradiated agricultural, civilian, and military vehicles. As a great place to hide a stash, an eagle-eyed stalker may find many valuables within the wreckage.</text>
+		<text>Truck Cemetery is a large graveyard of irradiated agricultural, civilian and military vehicles. As a great place to hide a stash, an eagle-eyed stalker may find many valuables among the wreckage.</text>
 	</string>
 	
 	<string id="ls_tip_11">
@@ -54,159 +54,54 @@
 	</string>
 	
 	<string id="ls_tip_12">
-		<text>Completing tasks for factions will increase your goodwill with them. As it increases, their traders will gradually offer you greater discounts and more valuable items.</text>
+		<text>Completing tasks for factions will increase your goodwill with them. As it increases their traders will gradually offer you greater discounts on their goods and services.</text>
 	</string>
 	
 	<string id="ls_tip_13">
-		<text>Most tasks can be cancelled after you agree to complete them. You can do this by speaking with the stalker who gave you the task. Cancelling a task will decrease your reputation and goodwill.</text>
+		<text>As you achieve more in-game your rank will increase, the available ranks are as follows: 'Rookie', 'Trainee', 'Experienced', 'Professional', 'Veteran', 'Expert', 'Master' and 'Legend'.</text>
 	</string>
 	
 	<string id="ls_tip_14">
-		<text>Reputation is gained and lost by helping or harming non-hostile stalkers respectively.</text>
+		<text>Most tasks can be cancelled after you agree to complete them. You can do this by speaking with the stalker who gave you the task. Just remember that cancelling a task will decrease your reputation and goodwill.</text>
 	</string>
 	
 	<string id="ls_tip_15">
-		<text>Remember to ask regular stalkers if they have any jobs available. Just because they aren't anybody important doesn't mean they won't be willing to pay you to do their dirty work.</text>
+		<text>Reputation is a representation of how a stalker is viewed by their faction. It is gained and lost by helping or harming non-hostile stalkers respectively.</text>
 	</string>
 	
 	<string id="ls_tip_16">
-		<text>Rostok's arena hosts two types of competitions: traditional fights where stalkers battle each other for cash rewards, and challenges, where they attempt to kill increasingly harder mutants.</text>
+		<text>Reputation is dynamic and can frequently change, the available reputations are as follows: 'Terrible', 'Dreary', 'Awful', 'Bad', 'Neutral', 'Good', 'Great', 'Brilliant' and 'Excellent'.</text>
 	</string>
 	
 	<string id="ls_tip_17">
-		<text>Online exclusion radius creates a no-spawn zone around you; preventing mutants and other stalkers spawning unfairly and dangerously close.</text>
+		<text>Darkscape is a large forest between Cordon and Dark Valley. While there are few reasons to visit, it is frequently used as a hideout by loners and bandits with a bounty placed on their heads.</text>
 	</string>
 	
 	<string id="ls_tip_18">
-		<text>Freedom completely occupies Yanov station in Jupiter after a mysterious stalker assisted them several years ago. Some of their well-known members have since relocated to their new northern base.</text>
+		<text>Remember to ask regular stalkers if they have any jobs available. Just because they aren't anybody important doesn't mean they won't be willing to pay you to do their dirty work.</text>
 	</string>
 	
 	<string id="ls_tip_19">
-		<text>The 'Completionist' achievement is received for unlocking all other available achievements.</text>
+		<text>Rostok's arena hosts two types of competitions: the traditional fights where stalkers battle each other for cash rewards, or challenges where they attempt to kill increasingly harder mutants.</text>
 	</string>
 	
 	<string id="ls_tip_20">
-		<text>It is much easier to avoid detection when travelling during the night or through heavy rain. However, you risk encountering fierce nocturnal mutants.</text>
+		<text>Online exclusion radius can be set via the game options and defaults to 25m. It creates a no-spawn area around the player preventing mutants and other stalkers spawning unfairly and dangerously close.</text>
 	</string>
 	
 	<string id="ls_tip_21">
-		<text>You won't be able to issue orders to companions if you leave them behind. Companions in Wait or Patrol modes will not travel with you when you move into a different level.</text>
+		<text>Freedom completely occupies Yanov Station in Jupiter after a mysterious stalker assisted them several years ago. Some of their well-known members have since relocated to their new northern base.</text>
 	</string>
 	
 	<string id="ls_tip_22">
-		<text>Vodka is a useful alternative to anti-radiation drugs if they are in short supply. It also weighs quite a lot and increases your hunger when used.</text>
+		<text>The 'Completionist' achievement is received for unlocking all other available achievements. How many achievements are available to you depends on your faction and whether or not story mode is enabled.</text>
 	</string>
 	
 	<string id="ls_tip_23">
-		<text>Not sure how to earn that achievement? Don't know what this feature does? The 'Guide' tab of your PDA has all essential articles unlocked right from the start when you create your character.</text>
+		<text>It is much easier to avoid detection when travelling during the night or through heavy rain. However, you risk encountering fierce nocturnal mutants.</text>
 	</string>
 	
 	<string id="ls_tip_24">
-		<text>Due to differing chemical composition, tracers in Western-made ammunition will glow red, whereas those of Eastern origin will glow green. This may help indicate what kind of weapon your enemy is using.</text>
+		<text>You won't be able to issue orders to companions if you leave them behind. Companions in Wait or Patrol modes will not travel with you to new map locations.</text>
 	</string>
-	
-	<string id="ls_tip_25">
-		<text>Other stalkers may sometimes load their weapons with armour-piercing ammunition. These rounds will punch through weak materials and damage those hiding behind.</text>
-	</string>
-	
-	<string id="ls_tip_26">
-		<text>Buckshot will have little effect against body armour unless you aim for the head. However, it will completely decimate anyone wearing nothing but a simple jacket.</text>
-	</string>
-	
-	<string id="ls_tip_27">
-		<text>Tactics and terrain are just as important to winning a fight as your choice of weapon and ammunition. Spending the time to create an ambush could give you a massive advantage.</text>
-	</string>
-	
-	<string id="ls_tip_28">
-		<text>Traders restock their supplies every 48-hours. They will also refuse to buy any equipment from you if its condition falls below 75 percent.</text>
-	</string>
-	
-	<string id="ls_tip_29">
-		<text>Avoid standing next to red barrels in a fight as they will explode when shot. However, if a hostile stalker should wander next to one a few well placed bullets will send them flying.</text>
-	</string>
-	
-	<string id="ls_tip_30">
-		<text>Turning on your flashlight will alert any nearby enemies to your location. Shining it directly in their eyes at close range may make it harder for them to shoot you.</text>
-	</string>
-	
-	<string id="ls_tip_31">
-		<text>Can't find tools for a technician to upgrade your gear? Legend has it that an elderly man in the Red Forest doesn't require them, but charges a small fortune for his services.</text>
-	</string>
-	
-	<string id="ls_tip_32">
-		<text>Most stalkers go through what they call the "hobo phase", which describes a period of poor equipment and limited finances when first exploring the Zone.</text>
-	</string>
-	
-	<string id="ls_tip_33">
-		<text>You can right-click weapons to unload them of their ammunition and remove any scopes, suppressors, and grenade launchers which they might have attached.</text>
-	</string>
-	
-	<string id="ls_tip_34">
-		<text>Mutant parts can be sold to the Ecologists at their scientific laboratories. Ordinary stalkers won't have any interest in purchasing them from you.</text>
-	</string>
-	
-	<string id="ls_tip_35">
-		<text>Each faction has their own unique arsenal. Because of this, weapons and ammunitions considered uncommon in one region of the Zone will likely be very prominent in others.</text>
-	</string>
-	
-	<string id="ls_tip_36">
-		<text>Collect cheap weapons in good condition, pay a technician to repair them fully, and then sell them to a trader to make a small but easy profit.</text>
-	</string>
-	
-	<string id="ls_tip_37">
-		<text>Plant a butterfly mine near a hostile stalker's fallen ally - when he tries to loot he will blow himself up in the process.</text>
-	</string>
-	
-	<string id="ls_tip_38">
-		<text>Eating food won't heal you but will instead cure your hunger. Being hungry reduces your energy regeneration.</text>
-	</string>
-	
-	<string id="ls_tip_39">
-		<text>Grenades and most other explosive objects will fragment when detonated. The shrapnel produced can reach much farther than the initial explosion's kill radius.</text>
-	</string>
-	
-	<string id="ls_tip_40">
-		<text>You can kick physical objects such as crates and boxes, and even small mutants with a low body mass. Bind this ability to a key in the controls menu to use it.</text>
-	</string>
-	
-	<string id="ls_tip_41">
-		<text>Found a cool area and would like to revisit it later? You can double-click almost anywhere on the world map to mark locations.</text>
-	</string>
-	
-	<string id="ls_tip_42">
-		<text>Try to be aware of how much noise you are creating - mutants and other stalkers will hear you if you don't move about with caution in mind.</text>
-	</string>
-	
-	<string id="ls_tip_43">
-		<text>Not sure if the path ahead is safe? Throw a bolt in that direction to see if any anomalies react to it.</text>
-	</string>
-	
-	<string id="ls_tip_44">
-		<text>Use your binoculars to scout out the area surrounding you. Any nearby entities will be indicated by a rectangle.</text>
-	</string>
-	
-	<string id="ls_tip_45">
-		<text>Want to challenge your proficiency with weapons? Enable the enhanced recoil feature for more realistic multi-directional recoil.</text>
-	</string>
-	
-	<string id="ls_tip_46">
-		<text>Protective equipment doesn't make radiation a non-issue, but it does reduce its effects, allowing you to spend more time in contaminated areas.</text>
-	</string>
-	
-	<string id="ls_tip_47">
-		<text>Your relation to another stalker can often be identified by the usage of colour on the interface. Neutrals appear yellow, friendlies appear green, and enemies appear red.</text>
-	</string>
-	
-	<string id="ls_tip_48">
-		<text>Bodies can be dragged out of sight by looking towards them and pressing the key prompts on-screen.</text>
-	</string>
-	
-	<string id="ls_tip_49">
-		<text>Stalkers will heal themselves during battle if they have a medical kit in their inventory, but will require the assistance of another if they are mortally wounded.</text>
-	</string>
-	
-	<string id="ls_tip_50">
-		<text>Don't become too focused on a specific target, their allies will use this to their advantage by trying to flank you.</text>
-	</string>
-	
 </string_table>

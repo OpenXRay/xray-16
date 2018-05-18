@@ -41,7 +41,7 @@
     <rank>31506</rank>
     <reputation>2485</reputation>
     <money min="10000" max="10000" infinitive="0" />
-    <visual>actors\stalker_unique\stalker_doc</visual>
+    <visual>actors\izgoy\izgoy</visual>
     <supplies>
         [spawn] \n
         cit_doctors_key = 1 \n
@@ -67,7 +67,7 @@
     <rank>12280</rank>
     <reputation>1246</reputation>
     <money min="1000000" max="1000000" infinitive="1" />
-    <visual>actors\stalker_nebo\stalker_nebo_s_bala</visual>
+    <visual>actors\stalker_nebo\stalker_nebo_smask1</visual>
     <supplies>
         [spawn] \n
         wpn_sig550 \n
@@ -101,7 +101,7 @@
     <rank>21786</rank>
     <reputation>1559</reputation>
     <money min="1000000" max="1000000" infinitive="1" />
-    <visual>actors\stalker_unique\stalker_nebo_trade</visual>
+    <visual>actors\stalker_nebo\stalker_trader_nebo</visual>
     <supplies></supplies>
 #include "gameplay\character_criticals.xml"
         <start_dialog>mar_base_owl_stalker_trader_start_dialog</start_dialog>
@@ -128,7 +128,7 @@
         <rank>14994</rank>
         <reputation>1891</reputation>
         <money min="10000" max="10000" infinitive="0" />
-        <visual>actors\stalker_unique\stalker_nebo_novikov</visual>
+        <visual>actors\stalker_nebo\stalker_nebo_2_face_3</visual>
         <supplies>
         [spawn] \n
         wpn_fort \n
@@ -160,7 +160,7 @@
     <snd_config>characters_voice\human_01\csky\</snd_config>
     <rank>27344</rank>
     <reputation>2314</reputation>
-    <visual>actors\stalker_unique\stalker_nebo_cold</visual>
+    <visual>actors\stalker_nebo\stalker_nebo_2_face_4</visual>
     <supplies>
         [spawn] \n
         wpn_desert_eagle = 1 \n

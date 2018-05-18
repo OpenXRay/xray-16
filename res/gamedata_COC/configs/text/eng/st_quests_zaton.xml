@@ -29,18 +29,18 @@
 	<string id="zat_a2_stalker_barmen_task_2_fetch_finish">
 		<text>Good hunting stalker! Have a drink on the house!</text>
 	</string>
-	<!-- ASSASSINATION FOR OWL TASK -->
-	<string id="zat_b30_owl_stalker_trader_task_1_name">
+	<!-- ASSASSINATION FOR BEARD TASK -->
+	<string id="zat_a2_stalker_barmen_task_3_name">
 		<text>Diplomat</text>
 	</string>
-	<string id="zat_b30_owl_stalker_trader_task_1_text">
+	<string id="zat_a2_stalker_barmen_task_3_text">
 		<text>Convince the military commander to call off his search for a fellow stalker.</text>
 	</string>
-	<string id="zat_b30_owl_stalker_trader_task_1_about">
-		<text>There's a guy, Spetsnaz is looking for him. He's been hiding out here for weeks. They say he ran through the Brain Scorcher to escape them. I don't know how he survived, though he ain't quite right in the head any-more. Anyway, you want to help the poor fellow? I happen to know where the military commander who wants him is stationed. Maybe you can convince him to leave the guy alone.</text>
+	<string id="zat_a2_stalker_barmen_task_3_about">
+		<text>You see that guy in the corner there? Spetsnaz is looking for him. He's been hiding out here for weeks. They say he ran through the Brain Scorcher to escape them. I don't know how he survived, though he ain't quite right in the head any-more. Anyway, you want to help the poor fellow? I happen to know where the military commander who wants him is stationed. Maybe you can convince him to leave the guy alone.</text>
 	</string>
-	<string id="zat_b30_owl_stalker_trader_task_1_finish">
-		<text>Well, you killed him. That's the job done.</text>
+	<string id="zat_a2_stalker_barmen_task_3_finish">
+		<text>Ah, you killed him! Well, that's effective diplomacy! Good man! Free drinks for you!</text>
 	</string>
 	<!-- FIND LEVEL 1 TOOLKIT FOR CARDAN TASK -->
 	<string id="zat_a2_stalker_mechanic_task_1_name">

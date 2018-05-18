@@ -6,11 +6,19 @@ end
 
 function se_artefact:on_register()
 	cse_alife_item_artefact.on_register(self)
-	SendScriptCallback("server_entity_on_register",self,"se_artefact")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 end
 
 function se_artefact:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_artefact")
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	story_objects.unregister(self.id)
 	cse_alife_item_artefact.on_unregister(self)
 end
 --------------------

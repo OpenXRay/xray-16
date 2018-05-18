@@ -78,7 +78,7 @@ on_info = %+pri_a17_mon_preacher_dead =stop_sound%
 
 [logic@pri_a17_monolith_ambusher_1]
 
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_1)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_1)}
 prior = 70
 active = walker@ambusher_1_start
 on_death = death
@@ -105,7 +105,7 @@ on_info = %=inc_counter(pri_a17_monolith_amb_death)%
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_2]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_2)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_2)}
 prior = 70
 active = walker@ambusher_2_start
 on_death = death
@@ -129,7 +129,7 @@ out_restr = pri_a17_tunnel_buttom
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_3]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_3)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_3)}
 prior = 70
 active = walker@ambusher_3_start
 on_death = death
@@ -153,7 +153,7 @@ out_restr = pri_a17_monolith_attack_zone
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_4]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_4)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_4)}
 prior = 70
 active = walker@ambusher_4_start
 on_death = death
@@ -177,7 +177,7 @@ out_restr = pri_a17_monolith_attack_zone
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_5]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_5)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_5)}
 prior = 70
 active = walker@ambusher_5_start
 on_death = death
@@ -201,7 +201,7 @@ out_restr = pri_a17_hosp_build_1
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_6]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_6)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_6)}
 prior = 70
 active = walker@ambusher_6
 on_death = death
@@ -215,7 +215,7 @@ def_state_moving3 = assault
 
 ;----------------------------------------------------------
 [logic@pri_a17_monolith_ambusher_7]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_7)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_7)}
 prior = 70
 active = walker@ambusher_7
 on_death = death
@@ -230,7 +230,7 @@ def_state_moving3 = assault
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_8]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_8)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_8)}
 prior = 70
 active = walker@ambusher_8
 on_death = death
@@ -246,7 +246,7 @@ out_restr = pri_a17_hosp_build_1
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_9]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_9)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_9)}
 prior = 70
 active = walker@ambusher_9
 on_death = death
@@ -261,7 +261,7 @@ def_state_moving3 = assault
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_ambusher_10]
-suitable = {=check_npc_name(pri_a17_monolith_ambusher_10)} true
+suitable = {=check_npc_name(pri_a17_monolith_ambusher_10)}
 prior = 70
 active = walker@ambusher_10
 on_death = death
@@ -276,7 +276,7 @@ out_restr = pri_a17_monolith_attack_zone
 
 ;----------------------------------------------------------
 [logic@pri_a17_monolith_patrol_1]
-suitable = {-pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_1)} true
+suitable = {-pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_1)}
 prior = 70
 active = walker@patrol_1_start
 on_death = death@patrol_1
@@ -342,7 +342,7 @@ pri_a17_mon_ambush_start
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_patrol_2]
-suitable = {-pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_2)} true
+suitable = {-pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_2)}
 prior = 70
 active = walker@patrol_2_start
 on_death = death@patrol_2
@@ -397,7 +397,7 @@ on_info = %=inc_counter(pri_a17_monolith_death:1) +pri_a17_mon_atk +pri_a17_mon_
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_patrol_lead]
-suitable = {-pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_lead)} true
+suitable = {-pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_lead)}
 prior = 70
 active = walker@patrol_lead_start
 on_death = death@patrol_3
@@ -459,7 +459,7 @@ on_info = %=inc_counter(pri_a17_monolith_death:1) +pri_a17_mon_atk  +pri_a17_mon
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_patrol_1_dead]
-suitable = {+pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_1)} true
+suitable = {+pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_1)}
 prior = 70
 active = walker@patrol_1_dead
 on_combat = combat
@@ -482,7 +482,7 @@ on_game_timer = 5 | nil %=kill_npc%
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_patrol_2_dead]
-suitable = {+pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_2)} true
+suitable = {+pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_2)}
 prior = 70
 active = walker@patrol_2_dead
 on_combat = combat
@@ -505,7 +505,7 @@ on_game_timer = 5 | nil %=kill_npc%
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_patrol_lead_dead]
-suitable = {+pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_lead)} true
+suitable = {+pri_a17_actor_leaver =check_npc_name(pri_a17_monolith_patrol_lead)}
 prior = 70
 active = walker@patrol_3_dead
 on_combat = combat
@@ -528,7 +528,7 @@ on_game_timer = 5 | nil %=kill_npc%
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_sniper_1]
-suitable = {=check_npc_name(pri_a17_monolith_sniper_1)} true
+suitable = {=check_npc_name(pri_a17_monolith_sniper_1)}
 prior = 70
 active = walker@take_pos_1_start
 on_death = death
@@ -561,7 +561,7 @@ no_retreat = true
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_sniper_2]
-suitable = {=check_npc_name(pri_a17_monolith_sniper_2)} true
+suitable = {=check_npc_name(pri_a17_monolith_sniper_2)}
 prior = 70
 active = walker@take_pos_2_start
 on_death = death
@@ -593,7 +593,7 @@ no_retreat = true
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_sniper_3]
-suitable = {=check_npc_name(pri_a17_monolith_sniper_3)} true
+suitable = {=check_npc_name(pri_a17_monolith_sniper_3)}
 prior = 70
 active = walker@take_pos_3
 on_death = death
@@ -618,7 +618,7 @@ no_retreat = true
 ;----------------------------------------------------------
 
 [logic@pri_a17_monolith_sniper_4]
-suitable = {=check_npc_name(pri_a17_monolith_sniper_4)} true
+suitable = {=check_npc_name(pri_a17_monolith_sniper_4)}
 prior = 70
 active = walker@take_pos_4
 on_death = death

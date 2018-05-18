@@ -493,8 +493,6 @@ function action_beh:beh_path()
 				if (mgr) then
 					mgr.animation:set_state(nil,true)
 					mgr.animation:set_control()
-					mgr.animstate:set_state(nil,true)
-					mgr.animstate:set_control()
 				end
 			end
 		else

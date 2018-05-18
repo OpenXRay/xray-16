@@ -129,7 +129,7 @@ function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
 	end
 	
 	local c_add = ini:r_float_ex(section,"repair_add_condition") or 0.15
-	if (dxr_achievements.has_achievement("mechanized_warfare")) then 
+	if (has_alife_info("achieved_mechanized_warfare")) then 
 		c_add = c_add + 0.10
 	end
 	
@@ -256,7 +256,7 @@ function monster_on_actor_use_callback(obj,who)
 				loot_mutant(nil,obj:clsid(),t)
 				for sec,v in pairs(t) do
 					for i=1,v.count do
-						dxr_statistics.increment_statistic("field_dressings")
+						xr_statistic.inc_counter("field_dressings")
 					end
 					news_manager.relocate_item(db.actor, "in", sec, v.count)
 				end
@@ -404,7 +404,7 @@ function loot_mutant(obj,cls,t,npc)
 		[clsid.cat_s]			= "cat",
 		[clsid.chimera_s]		= "chimera",
 		[clsid.controller_s]	= "controller",
-		[clsid.crow]			= "crow",
+		--[clsid.crow]			= "crow",			-- only because in binder it is not saved
 		[clsid.dog_s]			= "dog",
 		[clsid.flesh_s]			= "flesh",
 		[clsid.fracture_s]		= "fracture",
@@ -421,11 +421,6 @@ function loot_mutant(obj,cls,t,npc)
 	}
 
 	local loot_table = alun_utils.collect_section(ini,clsid_to_section[cls])
-	
-	-- Unlock relevant mutant article in guide.
-	if not npc then
-		dxr_encyclopedia.detect_mutant_interaction(clsid_to_section[cls])
-	end
 
 	local loot,sec
 	for i=1,#loot_table do
@@ -441,7 +436,7 @@ function loot_mutant(obj,cls,t,npc)
 					--printf("loot_mutant: section=%s",loot[1])
 					local se_obj = alife():create(loot[1],npc and npc:position() or db.actor:position(),0,0,npc and npc:id() or 0)
 					if (se_obj) then
-						if(dxr_achievements.has_achievement("well_dressed") and ((math.random(1,100)/100) <= 0.2)) then
+						if(has_alife_info("achieved_well_dressed") and ((math.random(1,100)/100) <= 0.2)) then
 							--printf("bonus loot")
 							alife():create(loot[1],npc and npc:position() or db.actor:position(),0,0,npc and npc:id() or 0)
 						end

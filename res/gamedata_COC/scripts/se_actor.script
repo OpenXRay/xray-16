@@ -7,9 +7,11 @@ end
 
 function se_actor:on_register()
 	cse_alife_creature_actor.on_register(self)
+	story_objects.register(self.id, "actor")
 	simulation_objects.register(self)
-	SendScriptCallback("server_entity_on_register",self,"se_actor")
 	self.m_registred = true
+	--Alundaio
+	SendScriptCallback("se_actor_on_register",self)
 
 	if not self.start_position_filled then
 		SIMBOARD:fill_start_position()
@@ -18,8 +20,10 @@ function se_actor:on_register()
 end
 
 function se_actor:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_actor")
+	story_objects.unregister(self.id)
 	simulation_objects.unregister(self)
+	--Alundaio
+	SendScriptCallback("se_actor_on_unregister",self)
 	cse_alife_creature_actor.on_unregister(self)
 end
 

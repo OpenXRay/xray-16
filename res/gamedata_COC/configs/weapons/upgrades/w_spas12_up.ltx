@@ -1,31 +1,40 @@
 [up_sect_firsta_spas12]
+;Надежность(1)10%
+;---------------
 cost		      		= 750
 value					= +10
 
-condition_queue_shot_dec	= -0.00005
-condition_shot_dec      	= -0.00005
-misfire_start_prob	     	= -0.0005
-misfire_end_prob	     	= -0.005
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
 fire_dispersion_condition_factor	= -0.25
 
 [up_sect_firstc_spas12]
+;Настильность(2)20%
+;------------------
 cost		      		= 1500
 value					= +20
 
-bullet_speed            = +60
+bullet_speed            = +80
+hit_impulse      		= +10
 fire_dispersion_base	= -0.01
 
 [up_sect_firstd_spas12]
+;Надежность(2)15%
+;---------------
 cost		      		= 1500
 value					= +15
 
-condition_queue_shot_dec	= -0.0001
-condition_shot_dec      	= -0.0001
-misfire_start_prob	     	= -0.0005
-misfire_end_prob	     	= -0.005
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.00015 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.00015 ;0.0011
 fire_dispersion_condition_factor	= -0.25
 
 [up_sect_firste_spas12]
+;Точность(3)30%
+;---------------
 cost		      		= 3000
 value					= +30
 
@@ -33,79 +42,115 @@ fire_dispersion_base	= -0.08
 fire_dispersion_condition_factor	= -0.25
 
 [up_sect_firstf_spas12]
+;Скорострельность(3)25%
+;----------------------
 cost		      		= 3000
 value					= +25
 
-rpm                     = +45
+rpm                     = +35
 
 [up_sect_secona_spas12]
+;Уменьшение веса
+;---------------
 cost		      		= 750
-value					= -1.1
+value					= -1.4
 
-inv_weight = -1.1
+inv_weight = -1.4
+crosshair_inertion			= -0.5
+
+PDM_disp_vel_factor 		= -0.2
+PDM_disp_accel_factor 		= -0.2
 
 [up_sect_seconc_spas12]
+;Удобство(2)15%
+;--------------
 cost		      		= 1500
 value					= +15
 
-crosshair_inertion			= -1.75
+crosshair_inertion			= -1
 
-PDM_disp_vel_factor 		= -0.75
-PDM_disp_accel_factor 		= -0.75
+PDM_disp_base 				= -0.15
+PDM_disp_vel_factor 		= -0.4
+PDM_disp_accel_factor 		= -0.4
 
 [up_sect_second_spas12]
+;Отдача(2)-20%
+;------------
 cost		      		= 1500
 value					= -20
 
-cam_dispersion              = -0.4
-cam_step_angle_horz        	= -0.4
+
+cam_dispersion              = -1
+cam_dispersion_inc         	= -1
+cam_step_angle_horz        	= -0.5
+
+zoom_cam_dispersion          = -1
+zoom_cam_dispersion_inc      = -1
+zoom_cam_step_angle_horz     = -0.5
+
 
 [up_sect_thirda_spas12]
+;Надежность(1)10%
+;---------------
 cost		      		= 750
 value					= +10
 
-condition_queue_shot_dec	= -0.00005
-condition_shot_dec      	= -0.00005
-misfire_start_prob	     	= -0.0005
-misfire_end_prob	     	= -0.005
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
 fire_dispersion_condition_factor	= -0.25
 
 [up_sect_thirdc_spas12]
+;Точность(2)20%
+;---------------
 cost		      		= 1500
 value					= +20
 
 fire_dispersion_base	= -0.05
 
 [up_sect_thirdd_spas12]
-cost		      		= 4500
+;Скорострельность(2)15%
+;----------------------
+cost		      		= 1500
 value					= +25
 
-rpm                     = +15
-fire_modes              = 1, -1
+rpm                     = +25
 
 [up_sect_thirde_spas12]
+;Надежность(3)30%
+;---------------
 cost		      		= 3000
 value					= +10
 
-condition_queue_shot_dec	= -0.00015
-condition_shot_dec      	= -0.00015
-misfire_start_prob	     	= -0.001
-misfire_end_prob	     	= -0.01
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0002 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0002 ;0.0011
 fire_dispersion_condition_factor	= -0.25
 
 [up_sect_thirdf_spas12]
+;Отдача(3)-30%
+;------------
 cost		      		= 3000
 value					= -20
 
-cam_dispersion              = -0.6
-cam_step_angle_horz        	= -0.6
+cam_dispersion              = -1.5
+cam_dispersion_inc         	= -1.5
+cam_step_angle_horz        	= -1
+
+zoom_cam_dispersion          = -1.5
+zoom_cam_dispersion_inc      = -1.75		;0.6
+zoom_cam_step_angle_horz     = -1
+
 
 [up_sect_fourta_spas12]
+;Расширенный объем магазина
+;----------------------
 cost		      		= 2000
 value					= +2
 
 ammo_mag_size		 		= 2
-
 
 [up_firsta_spas12]
 scheme_index            = 0, 0
@@ -329,7 +374,7 @@ scheme_index            = 1, 5
 known                   = 1
 effects                 = up_gr_thirdef_spas12
 section                 = up_sect_thirdd_spas12
-property                = prop_rpm, prop_autofire
+property                = prop_rpm
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b
@@ -341,8 +386,8 @@ effect_parameter        = on_weapon_upgrade_something_here
 prereq_functor          = inventory_upgrades.prereq_functor_a
 prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
 prereq_params           = 
-name                    = st_up_autd_c3_name
-description             = st_up_autd_c3_descr
+name                    = st_up_autd_b3_name
+description             = st_up_autd_b3_descr
 icon                    = ui_inGame2_upgrade_SPSA14_11
 
 [up_thirde_spas12]

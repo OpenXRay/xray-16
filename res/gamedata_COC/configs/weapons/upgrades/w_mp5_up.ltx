@@ -1,142 +1,203 @@
+;ќтдача(1)-10%
+;------------
 [up_sect_firsta_mp5]
 cost		      		= 500
 value					= -10
 
-cam_dispersion              = -0.06
-cam_step_angle_horz        	= -0.06
+cam_dispersion              = -0.08		;0.5
+cam_dispersion_inc         	= -0.04		;0.5
+cam_step_angle_horz        	= -0.2		;1.5 [0.73 в остатке]
 
+zoom_cam_dispersion          = -0.1		;0.5 [0.093 в остатке]
+zoom_cam_dispersion_inc      = -0.05		;0.5
+zoom_cam_step_angle_horz     = -0.3 	;1.0 [0.505 в остатке]
+
+;“очность(2)20%
 [up_sect_firstc_mp5]
 cost		      		= 1000
 value					= +20
 fire_dispersion_base    = -0.05
-fire_dispersion_condition_factor    = -0.3
+fire_dispersion_condition_factor    = -0.3 ;15
 
+;—корострельность(2)15%
+;----------------------
 [up_sect_firstd_mp5]
 cost		      		= 1000
 value					= +15
 
-rpm                     = +75
+rpm                     = +70
 
+
+;—корострельность(3)25%
+;----------------------
 [up_sect_firste_mp5]
 cost		      		= 2000
 value					= +25
 
 rpm                     = +100
 
+;—корострельность(1)10%
+;----------------------
 [up_sect_secona_mp5]
 cost		      		= 500
 value					= +10
-rpm                     = +50
+rpm                     = +50 ;700
 
+;Ќадежность(2)15%
+;---------------
 [up_sect_seconc_mp5]
 cost		      		= 1000
 value					= +15
 
-fire_dispersion_condition_factor    = -0.55
-condition_queue_shot_dec	= -0.0001
-condition_shot_dec      	= -0.0001
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -0.55 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.00015 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.00015 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
 misfire_start_prob	     	= -0.001
-misfire_end_prob	     	= -0.01
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.016 ;0.03
 
+;“очность(3)30%
 [up_sect_secone_mp5]
 cost		      		= 2000
 value					= +30
 fire_dispersion_base    = -0.09
-fire_dispersion_condition_factor    = -0.5
+fire_dispersion_condition_factor    = -0.5 ;15
 
+;ќтдача(3)-30%
+;------------
 [up_sect_seconf_mp5]
 cost		      		= 2000
 value					= -30
 
-cam_dispersion              = -0.18
-cam_step_angle_horz        	= -0.18
+cam_dispersion              = -0.18		;0.5
+cam_dispersion_inc         	= -0.08		;0.5
+cam_step_angle_horz        	= -0.4		;1.5 [0.73 в остатке]
 
+zoom_cam_dispersion          = -0.2		;0.5 [0.093 в остатке]
+zoom_cam_dispersion_inc      = -0.1		;0.5
+zoom_cam_step_angle_horz     = -0.5 	;1.0 [0.505 в остатке]
+
+;ќтдача(1)-10%
+;------------
 [up_sect_thirda_mp5]
 cost		      		= 500
 value					= -10
 
-cam_dispersion              = -0.06
-cam_step_angle_horz        	= -0.06
+cam_dispersion              = -0.08		;0.5
+cam_dispersion_inc         	= -0.04		;0.5
+cam_step_angle_horz        	= -0.2		;1.5 [0.73 в остатке]
 
+zoom_cam_dispersion          = -0.1		;0.5 [0.093 в остатке]
+zoom_cam_dispersion_inc      = -0.05		;0.5
+zoom_cam_step_angle_horz     = -0.3 	;1.0 [0.505 в остатке]
+
+;”добство(2)15%
+;--------------
 [up_sect_thirdc_mp5]
 cost		      		= 1000
 value					= +15
 
-crosshair_inertion		   = -0.5
+crosshair_inertion		   = -0.35
+ 
+PDM_disp_base 				= -0.07
+PDM_disp_vel_factor 		= -0.2
+PDM_disp_accel_factor 		= -0.2
 
-PDM_disp_vel_factor 		= -0.3
-PDM_disp_accel_factor 		= -0.3
-
+;Ќадежность(2)15%
+;---------------
 [up_sect_thirdd_mp5]
 cost		      		= 1000
 value					= +15
 
-fire_dispersion_condition_factor    = -0.55
-condition_queue_shot_dec	= -0.0001
-condition_shot_dec      	= -0.0001
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -0.55 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.00015 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.00015 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
 misfire_start_prob	     	= -0.001
-misfire_end_prob	     	= -0.01
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.016 ;0.03
 
+;—корострельность(3)25%
+;----------------------
 [up_sect_thirde_mp5]
 cost		      		= 2000
 value					= +25
 
 rpm                     = +100
 
+;Ќадежность(1)10%
+;---------------
 [up_sect_fourta_mp5]
 cost		      		= 500
 value					= +10
 
-fire_dispersion_condition_factor    = -0.33
-condition_queue_shot_dec	= -0.00005
-condition_shot_dec      	= -0.00005
-misfire_start_prob	     	= -0.0005
-misfire_end_prob	     	= -0.005
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -0.33 ;15
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0008
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.008 ;0.03
 
+;—корострельность(2)15%
+;----------------------
 [up_sect_fourtc_mp5]
 cost		      		= 1000
 value					= +15
 
-rpm                     = +75
+rpm                     = +70
 
+
+;”добство(3)25%
+;--------------
 [up_sect_fourte_mp5]
 cost		      		= 2000
 value					= +25
 
-crosshair_inertion		   = -0.75
+crosshair_inertion		   = -0.5
  
-PDM_disp_vel_factor 		= -0.45
-PDM_disp_accel_factor 		= -0.45
+PDM_disp_base 				= -0.1
+PDM_disp_vel_factor 		= -0.3
+PDM_disp_accel_factor 		= -0.3
 
+;Ќастильность(3)30%
+;------------------
 [up_sect_fourtf_mp5]
 cost		      		= 2000
 value					= +30
-bullet_speed			= +80
-fire_dispersion_base    = -0.015
+bullet_speed			= +75
+fire_dispersion_base    = -0.02
 
+;ќбъем магазина +10
+;--------------------
 [up_sect_fiftha_mp5]
 cost		      		= 2000
 value					= +10
 ammo_mag_size        	= 10
 
+;—мена калибра 9x18
+;-------------
 [up_sect_fifthc_mp5]
-cost		      		= 1500
+cost		      		= 2500
 value					= "9x18"
 ammo_class		 		= ammo_9x18_fmj, ammo_9x18_pmm
 
-bullet_speed		 	= -50
-cam_dispersion         		= -0.1
-cam_step_angle_horz			= -0.05
-fire_dispersion_base		= +0.02
-hit_power					= -0.02
-
-condition_queue_shot_dec	= 0.0001
-condition_shot_dec      	= 0.0001
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
 misfire_start_prob	     	= 0.0005
-misfire_end_prob	     	= 0.005
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.005 ;0.03
 
-rpm                     = -50
-
+;---END----
 
 [up_firsta_mp5]
 scheme_index            = 0, 0
@@ -493,7 +554,7 @@ scheme_index            = 1, 6
 known                   = 1
 effects                 =
 section                 = up_sect_fifthc_mp5
-property                = prop_calibre, prop_bullet_speed, prop_rpm
+property                = prop_calibre
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = true

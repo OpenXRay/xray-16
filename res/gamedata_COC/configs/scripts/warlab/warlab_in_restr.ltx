@@ -1,8 +1,5 @@
 [logic]
-active = sr_idle@check_story
-
-[sr_idle@check_story]
-on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@spawn
+active = sr_idle@spawn
 
 [sr_idle@spawn]
 on_info = {+warlab_start_teleport} sr_idle@spawn1

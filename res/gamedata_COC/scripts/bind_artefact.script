@@ -70,7 +70,7 @@ function artefact_binder:save(stpk)
 	object_binder.save(self,stpk)
 	local se_obj = alife_object(self.object:id())
 	if (se_obj) then
-		local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
+		local m_data = alife_storage_manager.get_se_obj_state(se_obj)
 		if (m_data) then 
 			m_data.offline_condition = self.object:condition()
 		end

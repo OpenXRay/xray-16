@@ -40,8 +40,8 @@ bone_eye_right	     = bip01_ponytail2
 
 weapon_usage		 = 0						; boolean
 
-hit_fraction_monster = 0.4
-skin_armor = 0.35
+hit_fraction_monster = 0.3
+skin_armor = 0.25
 
 ;------------------------------------------------------------------------
 ; Influences
@@ -95,7 +95,7 @@ ph_skel_shot_up_factor        = 0.25
 ; speed factors			linear | angular_real | angular_path | min |  max
 Velocity_Stand			= 0,		1.4,			1.4,		1,		1
 Velocity_RunFwdNormal	= 7.0,		2.0,			2.0,		0.05,	1.0
-Velocity_RunFwdDamaged	= 4.3,  	2.0,			2.0,		0.5,	1.0
+Velocity_RunFwdDamaged	= 5.0,  	2.0,			2.0,		0.5,	1.0
 Velocity_WalkFwdNormal	= 5.0,		2.0,			2.0,		0.1,	1.0
 Velocity_WalkFwdDamaged	= 2.2,		3.0,			3.0,		0.1,	2.2
 Velocity_Drag			= 0.6,		0.8,			0.8,		1,		1
@@ -104,13 +104,13 @@ Velocity_Steal			= 1.8,		3.0,			3.0,		1,		1
 ; acceleration
 Accel_Generic			= 1.5
 Accel_Calm				= 2.5
-Accel_Aggressive		= 16.5
+Accel_Aggressive		= 14.5
 
 ;--------------------------------------------------------------------------
 ; Attack parameters
 ;--------------------------------------------------------------------------
-MinAttackDist		= 1.6
-MaxAttackDist		= 2.0
+MinAttackDist		= 1.4
+MaxAttackDist		= 2.2
 
 as_min_dist				= 1.0
 as_step					= 0.2
@@ -120,7 +120,7 @@ DayTime_End			= 22		; ъіэхЎ фэ  фv  ьіэїЄЁр
 Min_Satiety			= 0.00055	;0.3	;0.6		; ьшэ. эіЁьр їvЄіїЄш (ьхэі-х - іцх уіvіфэv	)
 Max_Satiety			= 0.9		; ьръї. эіЁьр їvЄіїЄш (сіvі-х - іўхэі їvЄv	)
 
-distance_to_corpse	= 1.8		; фшїЄ. фі ЄЁіяр, яЁш ъіЄіЁі	 іэ яхЁхїіфшЄ т їіїЄі эшх хфv
+distance_to_corpse	= 0.9		; фшїЄ. фі ЄЁіяр, яЁш ъіЄіЁі	 іэ яхЁхїіфшЄ т їіїЄі эшх хфv
 
 ;terrain				 = 255,255,255,255,30,40
 terrain				 = pseudodogs_terrain
@@ -131,21 +131,22 @@ Melee_Rotation_Factor	= 2.6
 ;-------------------------------------------------------------------------
 ; Entity Conditions
 ;-------------------------------------------------------------------------
-satiety_v 			= 0.0001	;скорость уменьшения сvтости со временем
-radiation_v 		= 0.00001	;скорость уменьшения радиации
-satiety_power_v 	= 0.005		;увеличение силv при уменьшении сvтости
-satiety_health_v 	= 0.00001	;увеличение здоровья при уменьшении сvтости
-satiety_critical 	= -1.0		;критическое значения сvтости (в процентах от 0..1) когда здоровье начианает уменьшаться
-radiation_health_v 	= 0.01		;уменьшение здоровья при воздействии радиации
-morale_v			= 0.1		;скорость восстановления морали
-health_hit_part 	= 1.0		;процент хита, уходя	ий на отнимание здоровья
-power_hit_part 		= 1.0		;процент хита, уходя	ий на отнимание силv
-psy_health_v		= 0.1		;скорость восстановления psy-здоровья
+satiety_v 		= 0.0001				;0.01			;скорость уменьшения сvтости со временем
+radiation_v 		= 0.00001		;0.004			;скорость уменьшения радиации
+satiety_power_v 	= 0.005		;0.01			;увеличение силv при уменьшении сvтости
+satiety_health_v 	= 0.00001	;0.03			;увеличение здоровья при уменьшении сvтости
+satiety_critical 	= -1.0		;0.25			;критическое значения сvтости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v 	= 0.01	;0.006			;уменьшение здоровья при воздействии радиации
+morale_v		= 0.1					;скорость восстановления морали
+health_hit_part 	= 1.0		;0.8			;процент хита, уходя	ий на отнимание здоровья
+power_hit_part 		= 1.0		;0.9			;процент хита, уходя	ий на отнимание силv
+psy_health_v = 0.1						;скорость восстановления psy-здоровья
+
 
 immunities_sect				= pseudodog_immunities
 
 ;открvтvе ранv
-bleeding_v					= 0.03						;потеря крови при номинальной ране в секунду
+bleeding_v					= 0.05						;потеря крови при номинальной ране в секунду
 wound_incarnation_v			= 0.04				;крутизна кривой заживления (какой процент ранv останется после заживления в игровуі секунду)
 min_wound_size				= 0.01
 
@@ -160,7 +161,7 @@ eat_freq			=	5.0		; ўрїЄіЄр іъіїіт т їхъ
 eat_slice			=	0.01	; ітхvшўхэшх їvЄіїЄш яЁш 1 іъіїх
 eat_slice_weight	=	10.0	; іьхэі-хэшх хфv і ЄЁіяр
 
-satiety_threshold	= 0.5 ; below this value monster feels hunger
+satiety_threshold	= 0.5							; below this value monster fill hunger
 
 ;---------------------------------------------------------
 ; Sounds and sound parameters
@@ -193,7 +194,7 @@ distant_idle_sound_range	= 100.0
 
 
 SoundThreshold		 = 0.05						; range [0..1]
-max_hear_dist		 = 100
+max_hear_dist		 = 120
 
 ;-------------------------------------------------------------------------
 ; Morale
@@ -220,9 +221,9 @@ jump_max_height				= 3.5
 jump_auto_aim_factor		= 0.2
 
 ;-------------------------------------------------------------------------
-; Other Stuff
+; Other Stuff (refactoring needed)
 ;-------------------------------------------------------------------------
-DamagedThreshold		= 0.3
+DamagedThreshold		= 0.2
 critical_wound_threshold		= -1
 critical_wound_decrease_quant	= 0.
 
@@ -245,15 +246,15 @@ anger_loud_threshold	= 0.7
 
 ;species of monster
 species					= pseudodog
-rank					= 8
+rank					= 7
 spec_rank				= weak
 community				= pseudodog
 
 ;-------------------------------------------------------------------------
 ; Vision
 ;-------------------------------------------------------------------------
-eye_fov				 = 140	;150
-eye_range			 = 70	;100
+eye_fov				 = 110	;150
+eye_range			 = 60	;100
 
 
 vision_free_section			= pseudodog_vision_free
@@ -265,25 +266,25 @@ vision_danger_section		= pseudodog_vision_danger
 [pseudodog_vision_free]
 min_view_distance   		= 0.4				; min range of cone based on eye_range
 max_view_distance	 		= 0.7				; max range of cone based on eye_range
-visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+visibility_threshold	 	= 20				;Threshold in which object becomes visible based on factors
 always_visible_distance 	= 0					;Distance object is always considered visible (float)
 time_quant					= 0.005				;step increment to for sight calculations
-decrease_value				= 0.01 				;Decrease over time to overall threshold
+decrease_value				= 0.1 				;Decrease over time to overall threshold
 velocity_factor		     	= 0.6				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
-luminocity_factor			= 0.7				;Low value = easier to see at night
-transparency_threshold	 	= 0.4 			    ;Low value = easier to see through objects
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.3 			    ;Low value = easier to see through objects
 still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 [pseudodog_vision_danger]
 min_view_distance   		= 0.4				; min range of cone based on eye_range
 max_view_distance	 		= 1.0				; max range of cone based on eye_range
-visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+visibility_threshold	 	= 20				;Threshold in which object becomes visible based on factors
 always_visible_distance 	= 0					;Distance object is always considered visible (float)
 time_quant					= 0.0055			;step increment to for sight calculations
-decrease_value				= 0.01				;Decrease over time to overall threshold
+decrease_value				= 0.1				;Decrease over time to overall threshold
 velocity_factor		     	= 1.0				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
-luminocity_factor			= 0.7				;Low value = easier to see at night
-transparency_threshold	 	= 0.4				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.3				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
 still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 [m_pseudodog_attack_params]
@@ -291,7 +292,7 @@ still_visible_time          = 0					;The time (milliseconds) that the object is 
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Bite
-stand_attack_0	=	  	0.35,		0.6,		    100,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  2.5
+stand_attack_0	=	  	0.35,		1.2,		    100,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  2.5
 ;Jump attack
 run_jamp_1		=		0.55,		0.6,		    120,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.0
 
@@ -345,8 +346,8 @@ wound_immunity			= 0.5
 radiation_immunity		= 0.0
 telepatic_immunity		= 0.0
 chemical_burn_immunity	= 0.7
-explosion_immunity		= 0.6
-fire_wound_immunity		= 0.9
+explosion_immunity		= 0.7
+fire_wound_immunity		= 0.7
 
 ;=================================================================================
 ; PSEUDO-DOG Damage
@@ -383,10 +384,11 @@ visual				= monsters\pseudodog\pseudodog
 corpse_visual		 = monsters\pseudodog\pseudodog_dead
 icon				= ui_npc_monster_pseudodog
 panic_threshold		= 0; 0.2
-rank				= 8
+rank				= 7
 immunities_sect		= pseudodog_immunities_normal
 attack_params		= pseudodog_attack_params_normal
 spec_rank			= normal
+community			= pseudodog
 
 [pseudodog_immunities_normal]
 burn_immunity			= 0.7
@@ -396,17 +398,17 @@ wound_immunity			= 0.5
 radiation_immunity		= 0.0
 telepatic_immunity		= 0.0
 chemical_burn_immunity	= 0.7
-explosion_immunity		= 0.6
-fire_wound_immunity		= 0.9
+explosion_immunity		= 0.7
+fire_wound_immunity		= 0.7
 
 [pseudodog_attack_params_normal]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Bite
-stand_attack_0	=	  	0.45,		0.5,		    50,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  1.6
+stand_attack_0	=	  	0.45,		0.5,		    50,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  2.2
 ;Jump attack
-run_jamp_1		=		0.55,		0.6,		    100,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.0
+run_jamp_1		=		0.55,		0.55,		    200,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.2
 
 
 ;---------------------------------------------------------------------------------
@@ -473,7 +475,7 @@ $spawn				= "monsters\psy_dog\psy_dog_phantom"
 visual				= monsters\pseudodog\pseudodog_grey
 icon				= ui_npc_monster_pseudodog_grey
 class               = SM_DOG_F
-rank				= 2
+rank				= 1
 ; revert to CoP
 ;jump_delay					= 3000 ;3000
 ;jump_factor					= 3
@@ -493,9 +495,9 @@ hit_type = telepatic
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Bite
-stand_attack_0	=	  	0.45,		0.4,		    10,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  1.6
+stand_attack_0	=	  	0.45,		0.4,		    10,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  2
 ;Jump attack
-run_jamp_1		=		0.55,		0.5,			10,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.0
+run_jamp_1		=		0.55,		0.45,			10,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.1
 
 ;=========================================================================================
 [zat_b18_dog]:pseudodog_normal
@@ -549,7 +551,7 @@ visual				= monsters\pseudodog\pseudodog_small
 corpse_visual		 = monsters\pseudodog\pseudodog_small_dead
 panic_threshold		= 0.05
 spec_rank				= weak
-rank = 8
+rank = 5
 
 immunities_sect		= pseudodog_immunities_weak
 attack_params		= pseudodog_attack_params_weak
@@ -562,17 +564,17 @@ wound_immunity			= 0.6
 radiation_immunity		= 0.0
 telepatic_immunity		= 0.0
 chemical_burn_immunity	= 0.8
-explosion_immunity		= 0.7
-fire_wound_immunity		= 1
+explosion_immunity		= 0.8
+fire_wound_immunity		= 0.85
 
 [pseudodog_attack_params_weak]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Bite
-stand_attack_0	=	  	0.45,		0.45,		    40,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  1.6
+stand_attack_0	=	  	0.45,		0.45,		    40,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  2.1
 ;Jump attack
-run_jamp_1		=		0.55,		0.55,		    90,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.0
+run_jamp_1		=		0.55,		0.5,		    250,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.1
 
 [pseudodog_weak]:pseudodog_weak_base
 $spawn				= "monsters\pseudodog\pseudodog_weak"
@@ -596,7 +598,7 @@ corpse_visual		 = monsters\pseudodog\pseudodog_big_dead
 Health			     = 300						; option for ALife Simulator
 panic_threshold		= 0.00
 spec_rank				= strong
-rank = 9
+rank = 10
 
 immunities_sect		= pseudodog_immunities_strong
 attack_params		= pseudodog_attack_params_strong
@@ -609,8 +611,8 @@ wound_immunity			= 0.4
 radiation_immunity		= 0.0
 telepatic_immunity		= 0.0
 chemical_burn_immunity	= 0.6
-explosion_immunity		= 0.5
-fire_wound_immunity		= 0.8
+explosion_immunity		= 0.6
+fire_wound_immunity		= 0.6
 
 
 [pseudodog_attack_params_strong]
@@ -618,9 +620,9 @@ fire_wound_immunity		= 0.8
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Bite
-stand_attack_0	=	  	0.45,		0.55,		    60,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  1.6
+stand_attack_0	=	  	0.45,		0.55,		    65,        0.0, 1.0, 1.0,		 -1.0, 1.0, -1.0, 1.0,								  2.3
 ;Jump attack
-run_jamp_1		=		0.55,		0.65,		    110,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.0
+run_jamp_1		=		0.55,		0.6,		    350,        0.0, 1.0, 4.0,		 -1.8, 1.8, -1.8, 1.8,								  1.3
 
 [pseudodog_strong]:pseudodog_strong_base
 $spawn				= "monsters\pseudodog\pseudodog_strong"
@@ -637,5 +639,5 @@ MaxHealthValue		     = 1.33			; range [0..200]
 [pseudodog_arena]:pseudodog_strong
 $spawn				= "monsters\arena\pseudodog_arena"
 visual				= monsters\pseudodog\pseudodog_grey
-panic_threshold		= 0.0
+panic_threshold		= 0.05
 species				= arena_monstr

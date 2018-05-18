@@ -8,7 +8,11 @@ evaid = 188120
 --------------------------------------
 
 local is_box = { 
-	["dynamics\\box\\box_wood_01"] = true
+	--["dynamics\\box\\box_1a"] = true,
+	--["dynamics\\box\\box_1b"] = true,
+	--["dynamics\\box\\box_1c"] = true,
+	["dynamics\\box\\box_wood_01"] = true,
+	["dynamics\\box\\box_wood_02"] = true
 }
 selected = {}
 -----------------------------------------------------------------------------------------
@@ -110,17 +114,24 @@ function action_npc_vs_box:execute()
 		return
 	end
 	
-	-- if (self.object:position():distance_to_sqr(obj:position()) > 1.5) then 
-		-- utils.send_to_nearest_accessible_vertex(self.object,obj:level_vertex_id())
-		-- return
-	-- end
+	if (self.object:position():distance_to_sqr(obj:position()) > 1.5) then 
+		utils.send_to_nearest_accessible_vertex(self.object,obj:level_vertex_id())
+		return
+	end
 	
-	utils.send_to_nearest_accessible_vertex(self.object,self.object:level_vertex_id())
+	self.object:set_dest_level_vertex_id(self.object:level_vertex_id())
 	
 	local pos = vector():set(obj:position())
 	pos.y = pos.y + 0.15
 	
 	local st = db.storage[self.object:id()].state_mgr
+	self.object:clear_animations()
+	st:set_state("idle", nil, nil, nil, {fast_set = true})
+	st.animation:set_state(nil, true)
+	st.animation:set_control()
+	st.animstate:set_state(nil,true)
+	st.animstate:set_control()
+	
 	self.object:set_mental_state(anim.danger)
 	self.object:set_body_state(move.crouch)
 	self.object:set_movement_type(move.stand)
@@ -210,8 +221,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local manager = npc:motivation_action_manager()
 	local action	
 	local p = {
-				stalker_ids.action_combat_planner,
-				stalker_ids.action_danger_planner,
+				stalker_ids.action_combat_planner, 
 				--xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife

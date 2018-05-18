@@ -52,10 +52,11 @@ turn_on_campfire = true
 
 ;loner mechanic
 [logic@esc_smart_terrain_5_7_loner_mechanic]
-suitable = {!squad_exist(esc_smart_terrain_5_7_loner_mechanic_stalker_squad)} true, {=check_npc_name(esc_smart_terrain_5_7_loner_mechanic_stalker)} true, false
+suitable = {=check_npc_name(esc_smart_terrain_5_7_loner_mechanic_stalker)} true
 prior = 200
 active = animpoint@stand
 level_spot = mechanic
+can_select_weapon = false
 
 [animpoint@stand]
 cover_name = esc_smart_terrain_5_7_smart_cover_mechanic
@@ -83,7 +84,6 @@ close_snd_distance = 3
 use = {=actor_enemy} false, true
 meet_on_talking = false
 allow_break = false
-meet_dialog = {!check_npc_name(esc_smart_terrain_5_7_loner_mechanic_stalker)} dm_add_repair
 
 
 

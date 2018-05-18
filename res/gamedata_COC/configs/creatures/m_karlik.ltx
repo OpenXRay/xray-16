@@ -14,7 +14,7 @@ spawn_phantom 					=	m_phantom_karlik
 can_spawn_phantom 				=	true
 
 hit_fraction_monster = 0.25
-skin_armor = 0.4
+skin_armor = 0.25
 
 ; Influences.
 fire_linear_factor				=	0
@@ -22,9 +22,9 @@ fire_max_distance				=	0
 fire_max_power					=	5
 fire_quadratic_factor			=	0.025
 
-psy_linear_factor				=	0.5
-psy_max_distance				=	25
-psy_max_power					=	0.4
+psy_linear_factor				=	1
+psy_max_distance				=	15
+psy_max_power					=	0.1
 psy_pp_effector_name			=	psy_antenna
 psy_pp_highest_at				=	0.1
 psy_quadratic_factor			=	0
@@ -110,9 +110,9 @@ satiety_health_v				=	0.00007
 satiety_power_v					=	0.001
 satiety_v						=	0.0001
 
-bleeding_v						=	0.02
-min_wound_size					=	0.03
-wound_incarnation_v				=	0.01
+bleeding_v						=	0.05
+min_wound_size					=	0.01
+wound_incarnation_v				=	0.04
 
 sleep_health					=	1.0
 sleep_power						=	1.0
@@ -200,7 +200,7 @@ LegsCount						=	2
 spec_rank						=	normal
 species							=	karlik
 
-rank							=	18
+rank							=	17
 community						=	karlik
 monster_type					=	indoor
 
@@ -215,7 +215,7 @@ vision_free_section				=	karlik_vision_free
 vision_danger_section			=	karlik_vision_danger
 
 ; Shield ability
-shield_cooldown					=	5000
+shield_cooldown					=	3000
 shield_time						=	5000
 shield_keep_particle			=	anomaly2\burer_shield_01
 shield_keep_particle_period		=	300
@@ -242,7 +242,7 @@ Gravi_Time_To_Hold				=	1200
 Gravi_Radius					=	3.0
 Gravi_Impulse_To_Objects		=	60.0
 Gravi_Impulse_To_Enemy			=	1500.0
-Gravi_Hit_Power					=	0.9
+Gravi_Hit_Power					=	0.6
 
 sound_gravi_attack				=	monsters\karlik\karlik_attack_
 sound_gravi_wave				=	monsters\burer\burer_gravi_wave_0
@@ -316,8 +316,8 @@ stand_walk_fwd_0 				=	1,		0.01,	1,		0.25,	0.7
 [m_karlik_damage]
 ; Bone name							hit_scale	-1	wound_scale
 default							=	1.0,		-1,		0.3
-bip01_head 						=	1.5,		-1,		0.5
-bip01_neck 						=	1.0,		-1,		1.0
+bip01_head 						=	2.0,		-1,		0.5
+bip01_neck 						=	1.5,		-1,		1.5
 bip01_pelvis 					=	1.0,		-1,		0.5
 bip01_spine 					=	1.0,		-1,		0.5
 bip01_spine1 					=	1.0,		-1,		0.5
@@ -331,8 +331,8 @@ wound_immunity					=	0.5
 radiation_immunity				=	0.0
 telepatic_immunity				=	0.0
 chemical_burn_immunity			=	0.5
-explosion_immunity				=	0.7
-fire_wound_immunity				=	0.7
+explosion_immunity				=	0.75
+fire_wound_immunity				=	0.75
 
 [karlik_vision_free]
 min_view_distance   			=	0.7

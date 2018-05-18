@@ -10,7 +10,7 @@
 		
 		<texture id="ui_mm_faction_army" 	x="0" y="128" 		width="64" height="64" />
 		<texture id="ui_mm_faction_ecolog" 	x="64" y="128" 		width="64" height="64" />
-		<texture id="ui_mm_faction_monolith" x="128" y="128" 	width="64" height="64" />
+		<texture id="ui_mm_faction_monolith"x="128" y="128" 	width="64" height="64" />
 		
 		<texture id="ui_mm_faction_stalker_inactive" 	x="192" y="0" 		width="64" height="64" />
 		<texture id="ui_mm_faction_bandit_inactive" 	x="256" y="0" 		width="64" height="64" />

@@ -9,13 +9,13 @@ class "pda_relations_tab" (CUIScriptWnd)
 function pda_relations_tab:__init() super()
 	self.list = {
 		"stalker",
-		"bandit",
 		"dolg",
 		"freedom",
 		"csky",
-		"killer",
 		"ecolog",
+		"killer",
 		"army",
+		"bandit",
 		"monolith"
 	}
 	

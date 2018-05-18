@@ -46,8 +46,8 @@ task_complete_descr = mar_base_owl_stalker_trader_task_3_finish
 on_init = %=setup_companion_task(ecolog_companion_task_1:mar_smart_terrain_base) =setup_task_target_anomaly -ecolog_companion_task_1_started -ecolog_companion_task_1_force_started%
 precondition = {!squad_exist(ecolog_companion_task_1)} true, false
 repeat_timeout = 172800
-on_complete = %=complete_task_inc_goodwill(50:csky:ecolog) =remove_special_task_squad(ecolog_companion_task_1) =reward_stash(true) =reset_task_target_anomaly =reward_random_item(af_ameba_slug:1:af_dummy_glassbeads:1:af_fireball:1:af_soul:1:af_rusty_kristall:1:af_dummy_battery:1:detector_advanced:1)%
-on_fail = %=fail_task_dec_goodwill(50:csky:ecolog) =remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_1) =reward_stash(true) =reset_task_target_anomaly =reward_random_item(af_ameba_slug:af_dummy_glassbeads:af_fireball:af_soul:af_rusty_kristall:af_dummy_battery:detector_advanced)%
+on_fail = %=fail_task_dec_goodwill(25:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
 on_cancel = %=remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
 condlist_0 = {!squad_exist(ecolog_companion_task_1)} fail
 
@@ -69,7 +69,7 @@ on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_1_id:m
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
 repeat_timeout = 86400
 stage_complete = 1
-on_complete = %=reward_random_money(2000:3000) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_1) =complete_task_inc_goodwill(25:csky) =pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
+on_complete = %=reward_random_money(4000:4500) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_1) =complete_task_inc_goodwill(50:csky) =pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
 on_fail = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id) =fail_task_dec_goodwill(25:csky)%
 on_cancel = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
 
@@ -92,7 +92,7 @@ status_functor_params = bandit
 on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_2_id:bandit)%
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:bandit)} true, false
 stage_complete = 1
-on_complete = %=reward_random_money(3000:4000) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_2) =complete_task_inc_goodwill(25:csky) =pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
+on_complete = %=reward_random_money(4000:5000) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_2) =complete_task_inc_goodwill(50:csky) =pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
 on_fail = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id) =fail_task_dec_goodwill(25:csky)%
 on_cancel = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
 
@@ -116,7 +116,7 @@ repeat_timeout = 43200
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mar_base_stalker_barmen_task_3_fetch_finish
-on_complete = %=complete_task_inc_goodwill(25:csky) =reward_stash(true) =reward_item_cost_mult_and_remove(mar_base_stalker_barmen_task_3_fetch:3) =reward_random_item(ammo_12x70_buck:1:ammo_5.56x45_ss190:1:ammo_5.45x39_fmj:1) =inc_task_stage(mar_base_stalker_barmen_task_3)%
+on_complete = %=complete_task_inc_goodwill(50:csky) =reward_stash(true) =reward_item_cost_mult_and_remove(mar_base_stalker_barmen_task_3_fetch:5) =inc_task_stage(mar_base_stalker_barmen_task_3)%
 
 
 ;--------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mar_base_stalker_tech_task_1_fetch_finish
-on_complete = %+mar_base_stalker_tech_upgrade_tier_1 =complete_task_inc_goodwill(25:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_tech_task_1_fetch:1.0) =inc_task_stage(mar_base_stalker_tech_task_1)%
+on_complete = %+mar_base_stalker_tech_upgrade_tier_1 =complete_task_inc_goodwill(50:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_tech_task_1_fetch:1.0) =inc_task_stage(mar_base_stalker_tech_task_1)%
 precondition = {-mar_base_stalker_tech_upgrade_tier_1} true, false
 
 
@@ -159,7 +159,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = mar_base_stalker_tech_task_2_fetch_finish
-on_complete = %+mar_base_stalker_tech_upgrade_tier_2 =complete_task_inc_goodwill(25:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_tech_task_2_fetch:1.0) =inc_task_stage(mar_base_stalker_tech_task_2)%
+on_complete = %+mar_base_stalker_tech_upgrade_tier_2 =complete_task_inc_goodwill(50:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_tech_task_2_fetch:1.0) =inc_task_stage(mar_base_stalker_tech_task_2)%
 precondition = {+mar_base_stalker_tech_upgrade_tier_1 -mar_base_stalker_tech_upgrade_tier_2} true, false
 
 

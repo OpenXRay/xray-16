@@ -16,7 +16,7 @@ on_init = %=find_smart_under_faction_control(val_smart_terrain_7_4_bandit_trader
 precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
 repeat_timeout = 86400
 stage_complete = 1
-on_complete = %=reward_random_money(2000:3000) =reward_stash(true) =inc_task_stage(val_smart_terrain_7_4_bandit_trader_stalker_task_1) =complete_task_inc_goodwill(25:bandit) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_id) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_target_id)%
+on_complete = %==reward_random_money(4500:5500) =reward_stash(true) =inc_task_stage(val_smart_terrain_7_4_bandit_trader_stalker_task_1) =complete_task_inc_goodwill(50:bandit) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_id) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_target_id)%
 on_fail = %=pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_id) =fail_task_dec_goodwill(25:bandit) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_target_id)%
 on_cancel = %=pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_id) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_1_target_id)%
 
@@ -34,13 +34,13 @@ job_descr = val_smart_terrain_7_4_bandit_trader_stalker_task_2_about
 task_complete_descr = val_smart_terrain_7_4_bandit_trader_stalker_task_2_finish
 repeat_timeout = 86400
 target_functor = general_under_faction_control
-status_functor = check_smart_under_faction_control_staged_enemy
-status_functor_params = bandit
+status_functor = check_smart_under_faction_control_staged
+status_functor_params = stalker,army,dolg,killer,csky,monolith
 stage_complete = 1
-on_init = %=find_smart_under_faction_control_enemy(val_smart_terrain_7_4_bandit_trader_stalker_task_2_id:bandit)%
-precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_enemy(1:nil:false:bandit)} true, false
-on_complete = %=inc_task_stage(val_smart_terrain_7_4_bandit_trader_stalker_task_2) =complete_task_inc_goodwill(50:bandit) =reward_random_money(5000:6500) =reward_stash(true) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_id) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_target_id)%
-on_fail = %=pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_id) =fail_task_dec_goodwill(50:bandit) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_target_id)%
+on_init = %=find_smart_under_faction_control_ex(val_smart_terrain_7_4_bandit_trader_stalker_task_2_id:stalker:army:dolg:killer:csky:monolith)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:stalker:army:dolg:killer:csky:monolith)} true, false
+on_complete = %=inc_task_stage(val_smart_terrain_7_4_bandit_trader_stalker_task_2) =complete_task_inc_goodwill(50:bandit) =reward_random_money(7500:8500) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_id) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_target_id)%
+on_fail = %=pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_id) =fail_task_dec_goodwill(25:bandit) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_target_id)%
 on_cancel = %=pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_id) =pstor_reset(val_smart_terrain_7_4_bandit_trader_stalker_task_2_target_id)%
 
 
@@ -59,8 +59,8 @@ target_functor = val_smart_terrain_7_4_bandit_trader_stalker_task_target
 on_init = %=setup_companion_task(bandit_companion_task_1:val_smart_terrain_7_4) -bandit_companion_task_1_started -bandit_companion_task_1_force_started%
 precondition = {!squad_exist(bandit_companion_task_1)} true, false
 repeat_timeout = 86400
-on_complete = %=reward_random_money(2000:3000) =complete_task_inc_goodwill(50:bandit) =reward_stash(true) =remove_special_task_squad(bandit_companion_task_1)%
-on_fail = %=fail_task_dec_goodwill(50:bandit) =remove_special_task_squad(bandit_companion_task_1)%
+on_complete = %=reward_random_money(6500:7500) =complete_task_inc_goodwill(50:bandit) =reward_stash(true) =remove_special_task_squad(bandit_companion_task_1)%
+on_fail = %=fail_task_dec_goodwill(25:bandit) =remove_special_task_squad(bandit_companion_task_1)%
 on_cancel = %=remove_special_task_squad(bandit_companion_task_1)%
 condlist_0 = {!squad_exist(bandit_companion_task_1)} fail
 
@@ -81,7 +81,7 @@ status_functor = bounty_task
 target_functor = general_bounty_task
 stage_complete = 1
 on_job_descr = %=on_init_bounty_hunt(val_smart_terrain_7_4_bandit_trader_stalker_task_4:stalker:killer:dolg:csky:army)%
-on_complete = %=reward_random_money(7000:8500) =reward_stash(true) =inc_task_stage(val_smart_terrain_7_4_bandit_trader_stalker_task_4) =complete_task_inc_goodwill(50:bandit)%
+on_complete = %=reward_random_money(9000:11000) =reward_stash(true) =inc_task_stage(val_smart_terrain_7_4_bandit_trader_stalker_task_4) =complete_task_inc_goodwill(50:bandit)%
 precondition = true
 
 
@@ -103,7 +103,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = val_smart_terrain_7_3_bandit_mechanic_stalker_task_1_fetch_finish
-on_complete = %+val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_1 =complete_task_inc_goodwill(25:bandit) =reward_item_cost_mult_and_remove(val_smart_terrain_7_3_bandit_mechanic_stalker_task_1_fetch:1.0) =inc_task_stage(val_smart_terrain_7_3_bandit_mechanic_stalker_task_1)%
+on_complete = %+val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_1 =complete_task_inc_goodwill(50:bandit) =reward_item_cost_mult_and_remove(val_smart_terrain_7_3_bandit_mechanic_stalker_task_1_fetch:1.0) =inc_task_stage(val_smart_terrain_7_3_bandit_mechanic_stalker_task_1)%
 precondition = {-val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_1} true, false
 
 
@@ -125,7 +125,7 @@ stage_complete = 1
 status_functor = actor_has_fetch_item
 target_functor = general_fetch_task
 task_complete_descr = val_smart_terrain_7_3_bandit_mechanic_stalker_task_2_fetch_finish
-on_complete = %+val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_2 =complete_task_inc_goodwill(25:bandit) =reward_item_cost_mult_and_remove(val_smart_terrain_7_3_bandit_mechanic_stalker_task_2_fetch:1.0) =inc_task_stage(val_smart_terrain_7_3_bandit_mechanic_stalker_task_2)%
+on_complete = %+val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_2 =complete_task_inc_goodwill(50:bandit) =reward_item_cost_mult_and_remove(val_smart_terrain_7_3_bandit_mechanic_stalker_task_2_fetch:1.0) =inc_task_stage(val_smart_terrain_7_3_bandit_mechanic_stalker_task_2)%
 precondition = {+val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_1 -val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_2} true, false
 
 

@@ -57,7 +57,6 @@ function DynamicNewsManager:__init()
 		["dolg"]    		= true,
 		["freedom"]  		= true,
 		["bandit"]   		= true,
-		["renegade"]   		= true,
 	}
 
 	self.queue = {
@@ -70,8 +69,7 @@ function DynamicNewsManager:__init()
 		["ecolog"]   		= {},
 		["dolg"]    		= {},
 		["freedom"]  		= {},
-		["bandit"]   		= {},
-		["renegade"]   		= {}
+		["bandit"]   		= {}
 	}
 	
 	self.spammer = {	
@@ -522,7 +520,7 @@ function DynamicNewsManager:SeenDeathOfStalker(victim,who,comm)
 	local a = #sentences > 0 and sentences[math.random(#sentences)]
 	local b = dynamic_news_helper.GetCommunityDescription(who,math.random(1,2))
 	local c = dynamic_news_helper.GetWeaponDescription(who,math.random(4,8))
-	local d = dynamic_news_helper.GetCommunityDescription(victim,math.random(3,4))
+	local d = dynamic_news_helper.GetCommunityDescription(sender,math.random(3,4))
 	local e = dynamic_news_helper.GetPointDescription(victim)
 	
 	local msg = strformat("%s %s %s %s %s.",a,b,c,d,e)
@@ -581,8 +579,8 @@ function DynamicNewsManager:SeenDeathByMutant(victim,who,comm)
 	local start = {}
 	local string_count = 1 
 	while true do 
-		local tr_s = game.translate_string("st_dyn_news_builder_hear_"..string_count)
-		if (tr_s == "st_dyn_news_builder_hear_"..string_count) then 
+		local tr_s = game.translate_string("st_dyn_news_builder_sight_"..string_count)
+		if (tr_s == "st_dyn_news_builder_sight_"..string_count) then 
 			break 
 		else 
 			table.insert(start,tr_s)

@@ -1,8 +1,5 @@
 [logic]
-active = sr_idle@check_story
-
-[sr_idle@check_story]
-on_info = {+story_mode_disabled} sr_idle@_nil, sr_idle
+active = sr_idle
 
 [sr_idle]
 on_info = {+warlab_main_polter_dead} sr_idle@_nil, {+warlab_main_polter_scene_start} sr_idle@2

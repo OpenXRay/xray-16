@@ -40,10 +40,10 @@
 		<text>We are looking for certain kinds of artefacts. If you are interested, I will tell you what we need.</text>
 	</string>
 	<string id="jup_b6_scientist_tech_task_2_fetch_about">
-		<text>I need you to bring us back a %s. You ever heard of it?</text>
+		<text>I need you to bring us back a %s. You ever heard of it? We have something we can give you in return that I think you will find useful.</text>
 	</string>
 	<string id="jup_b6_scientist_tech_task_2_fetch_finish">
-		<text>Great! You've found exactly what we are looking for. Here's your payment.</text>
+		<text>Great! You've found exactly what we are looking for. Take this suit, it offers great protection against the Zone and I'm sure you can command a good price for it.</text>
 	</string>
 	<!-- ELIMINATE MUTANTS FOR TRAPPER TASK -->
 	<string id="jup_b220_trapper_task_1_name">

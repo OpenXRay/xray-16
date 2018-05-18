@@ -1,8 +1,5 @@
 [logic]
-active = ph_door@check_story
-
-[ph_door@check_story]
-on_info = {+story_mode_disabled} ph_door@unlocked_closed, ph_door@locked
+active = ph_door@locked
 
 [ph_door@locked]
 locked = true
@@ -26,13 +23,4 @@ on_info = {+warlab_finish_decoding} ph_door@unlocked %+warlab_door_opened =stop_
 [ph_door@unlocked]
 locked = false
 closed = false
-tip_open = tip_door_open
-tip_close = tip_door_close
-on_use = ph_door@unlocked_closed
-
-[ph_door@unlocked_closed]
-locked = false
-closed = true
-tip_open = tip_door_open
-tip_close = tip_door_close
-on_use = ph_door@unlocked
+show_tips = false

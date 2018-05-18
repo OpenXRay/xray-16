@@ -13,7 +13,7 @@
     <rank>17236</rank>
     <reputation>-549</reputation>
     <money min="1000000" max="1000000" infinitive="1" />
-    <visual>actors\stalker_unique\stalker_bandit_owl</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_3_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_ak74u \n
@@ -25,9 +25,6 @@
 #include "gameplay\character_drugs.xml"
     </supplies>
 #include "gameplay\character_criticals.xml"
-    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
-    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
-    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
 	<actor_dialog>dm_broker_dialog</actor_dialog>
     <actor_dialog>actor_break_dialog</actor_dialog>
     </specific_character>
@@ -45,7 +42,7 @@
     <rank>12720</rank>
     <reputation>674</reputation>
     <money min="1000" max="1000" infinitive="0" />
-    <visual>actors\stalker_unique\stalker_neutral_gonta</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_6</visual>
     <supplies>
         [spawn] \n
         wpn_ak74 = 1 \n
@@ -190,7 +187,7 @@
     <rank>12412</rank>
     <reputation>1013</reputation>
     <money min="8000" max="8000" infinitive="0" />
-    <visual>actors\stalker_unique\stalker_neutral_gluhar</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_2</visual>
     <supplies>
         [spawn] \n
         wpn_ak74u \n
@@ -217,7 +214,7 @@
     <rank>11856</rank>
     <reputation>1496</reputation>
     <money min="8000" max="8000" infinitive="0" />
-    <visual>actors\stalker_unique\stalker_neutral_gluhar</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_2</visual>
     <supplies>
         [spawn] \n
         wpn_ak74u \n
@@ -491,6 +488,37 @@
 #include "gameplay\character_dialogs.xml"
     </specific_character>
     
+    <!--бандит Султан_fake-->
+    <specific_character id="zat_b7_bandit_boss_sultan" team_default="1">
+    <name>st_zat_b7_bandit_boss_sultan_name</name>
+    <icon>ui_inGame2_Sultan</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>zat_b7_bandit_boss_sultan</class>
+    <community>bandit</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <rank>23014</rank>
+    <reputation>-2192</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit_3_face_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_desert_eagle = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>zat_b7_bandit_boss_sultan_intro</start_dialog>
+	<actor_dialog>zat_b7_bandit_boss_sultan_about</actor_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>zat_b7_bandit_boss_sultan_about</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
     <!--командир сталкеров-->
     <specific_character id="zat_b5_stalker_commander" team_default="1">
     <name>GENERATE_NAME_stalker</name>
@@ -670,7 +698,7 @@
     <rank>20460</rank>
     <reputation>1075</reputation>
     <money min="1000000" max="1000000" infinitive="1" />
-    <visual>actors\stalker_unique\stalker_neutral_boroda</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_3_face_1</visual>
     <supplies>
         [spawn] \n
         wpn_sig550 \n
@@ -703,7 +731,7 @@
     <money min="1000000" max="1000000" infinitive="1" />
     <rank>3230</rank>
     <reputation>460</reputation>
-    <visual>actors\stalker_unique\stalker_neutral_medic</visual>
+    <visual>actors\stalker_neutral\stalker_medic_3_face_1</visual>
     <supplies>
         [spawn] \n
         ammo_9x19_fmj = 1 \n
@@ -731,7 +759,7 @@
     <snd_config>characters_voice\human_02\stalker\</snd_config>
     <rank>19944</rank>
     <reputation>2406</reputation>
-    <visual>actors\stalker_unique\stalker_neutral_kardan</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_1</visual>
     <supplies></supplies>
 #include "gameplay\character_criticals.xml"
         <start_dialog>zat_b3_stalker_tech_start</start_dialog>
@@ -1354,7 +1382,7 @@
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <rank>9712</rank>
     <reputation>6</reputation>
-    <visual>actors\stalker_unique\stalker_neutral_noah</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_3_face_2</visual>
     <supplies>
         [spawn] \n
         wpn_spas12 = 1 \n
@@ -1409,7 +1437,7 @@
     <snd_config>characters_voice\human_02\stalker\</snd_config>
     <rank>9628</rank>
     <reputation>2025</reputation>
-    <visual>actors\stalker_unique\stalker_neutral_lotsman</visual>
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_5</visual>
     <supplies>
         [spawn] \n
         wpn_desert_eagle = 1 \n
@@ -1494,7 +1522,7 @@
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <rank>8584</rank>
     <reputation>300</reputation>
-    <visual>actors\stalker_unique\stalker_neutral_noah</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_3_face_2</visual>
     <supplies>
         [spawn] \n
         wpn_spas12 = 1 \n

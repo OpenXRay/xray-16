@@ -85,7 +85,7 @@
 		<text>Условные обозначения</text>
 	</string>
 	<string id="pda_stat_1">
-		<text>Время в Зоне:</text>
+		<text>Время в зоне:</text>
 	</string>
 	<string id="pda_stat_2">
 		<text>Пережито выбросов:</text>
@@ -241,7 +241,7 @@
 		<text>Личный ящик</text>
 	</string>
 	<string id="filter_primary_objects_text">
-		<text>Аномальные зоны</text>
+		<text>Важные территории</text>
 	</string>
 	<string id="filter_quest_npcs_text">
 		<text>Важные объекты</text>
@@ -260,9 +260,6 @@
 	</string>
 	<string id="st_ui_pda_secret_searched">
 		<text>Тайник (частично разграблен)</text>
-	</string>
-	<string id="st_ui_pda_secret_tourist">
-		<text>Тайник туриста</text>
 	</string>
 	<string id="st_ui_pda_sleep_place">
 		<text>Место сна</text>

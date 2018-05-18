@@ -1,6 +1,6 @@
 <specific_character id="sim_default_military_0_default_0" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1</icon>
+    <icon>ui_inGame2_soldier_1_camo_paint</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -21,7 +21,7 @@
     </specific_character>
 <specific_character id="sim_default_military_0_default_1" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1</icon>
+    <icon>ui_inGame2_soldier_1_camo_paint</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -42,7 +42,7 @@
     </specific_character>
 <specific_character id="sim_default_military_0_default_2" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1_camo</icon>
+    <icon>ui_inGame2_soldier_1_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -63,7 +63,7 @@
     </specific_character>
 <specific_character id="sim_default_military_0_default_3" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1</icon>
+    <icon>ui_inGame2_soldier_1_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -84,7 +84,7 @@
     </specific_character>
 <specific_character id="sim_default_military_0_default_4" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1_camo</icon>
+    <icon>ui_inGame2_soldier_1_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -105,7 +105,7 @@
     </specific_character>
 <specific_character id="sim_default_military_0_default_5" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1_camo_paint</icon>
+    <icon>ui_inGame2_soldier_1_camo_paint</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -126,7 +126,7 @@
     </specific_character>
 <specific_character id="sim_default_military_0_default_6" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1_camo</icon>
+    <icon>ui_inGame2_soldier_1_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -147,7 +147,7 @@
     </specific_character>
 <specific_character id="sim_default_military_0_default_7" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Soldier_1</icon>
+    <icon>ui_inGame2_soldier_1_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_0</class>
@@ -189,15 +189,15 @@
     </specific_character>
 <specific_character id="sim_default_military_1_default_1" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_Soldier_3</icon>
+    <icon>ui_inGame2_Soldier_2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_1</class>
     <community>army</community> <terrain_sect>stalker_terrain</terrain_sect>
-    <snd_config>characters_voice\human_03\military\</snd_config>
+    <snd_config>characters_voice\human_02\military\</snd_config>
     <rank>7194</rank>
     <reputation>-1786</reputation>
-    <visual>actors\stalker_soldier\stalker_soldier_3</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
     <supplies>
 #include "gameplay\loadouts\army_base.ltx"
 #include "gameplay\loadouts\army_tier_2.ltx"
@@ -210,15 +210,15 @@
     </specific_character>
 <specific_character id="sim_default_military_2_default_0" team_default = "1">
     <name>GENERATE_NAME_senior_sergeant</name>
-    <icon>ui_inGame2_Soldier_3</icon>
+    <icon>ui_inGame2_Soldier_2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_2</class>
     <community>army</community> <terrain_sect>stalker_terrain</terrain_sect>
-    <snd_config>characters_voice\human_03\military\</snd_config>
+    <snd_config>characters_voice\human_02\military\</snd_config>
     <rank>6870</rank>
     <reputation>298</reputation>
-    <visual>actors\stalker_soldier\stalker_soldier_3</visual>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
     <supplies>
 #include "gameplay\loadouts\army_base.ltx"
 #include "gameplay\loadouts\army_tier_2.ltx"
@@ -273,7 +273,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_1" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret</icon>
+    <icon>ui_inGame2_soldier_3_beret</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_3</class>
@@ -294,7 +294,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_10" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -315,7 +315,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_11" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -336,7 +336,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_12" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -357,7 +357,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_13" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -378,7 +378,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_14" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret</icon>
+    <icon>ui_inGame2_soldier_3_beret</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -399,7 +399,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_15" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_1_camo_paint</icon>
+    <icon>ui_inGame2_soldier_1_camo_paint</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -420,7 +420,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_16" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_camo</icon>
+    <icon>ui_inGame2_soldier_3_beret_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -441,7 +441,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_17" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_camo</icon>
+    <icon>ui_inGame2_soldier_3_beret_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -462,7 +462,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_18" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_camo</icon>
+    <icon>ui_inGame2_soldier_3_beret_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -483,7 +483,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_19" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_camo</icon>
+    <icon>ui_inGame2_soldier_3_beret_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -504,7 +504,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_2" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_camo</icon>
+    <icon>ui_inGame2_soldier_3_beret_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_3</class>
@@ -525,7 +525,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_20" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -546,7 +546,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_21" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue_camo</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -567,7 +567,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_22" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -588,7 +588,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_23" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -609,7 +609,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_24" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -630,7 +630,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_25" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -651,7 +651,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_3" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret</icon>
+    <icon>ui_inGame2_soldier_3_beret</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_3</class>
@@ -672,7 +672,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_4" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret</icon>
+    <icon>ui_inGame2_soldier_3_beret</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_3</class>
@@ -693,7 +693,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_5" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret</icon>
+    <icon>ui_inGame2_soldier_3_beret</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_3</class>
@@ -714,7 +714,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_6" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret</icon>
+    <icon>ui_inGame2_soldier_3_beret</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќпытный сталкер. ƒетальна€ информаци€ отсутствует.</bio>
     <class>sim_default_military_3</class>
@@ -756,7 +756,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_8" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -777,7 +777,7 @@
     </specific_character>
 <specific_character id="sim_default_military_3_default_9" team_default = "1">
     <name>GENERATE_NAME_lieutenant</name>
-    <icon>ui_inGame2_Soldier_3_beret_blue_camo</icon>
+    <icon>ui_inGame2_soldier_3_beret_blue_camo</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>ќБEтный сталБEБE ƒеталБEБE информацБE ъCсутствуеБE</bio>
     <class>sim_default_military_3</class>
@@ -809,7 +809,7 @@
     <visual>actors\stalker_soldier\stalker_soldier_2</visual>
     <supplies>
 #include "gameplay\loadouts\army_base.ltx"
-#include "gameplay\loadouts\army_sniper.ltx"
+#include "gameplay\loadouts\army_tier_2.ltx"
         [spawn] \n
 #include "gameplay\character_food.xml"
 #include "gameplay\character_drugs.xml"

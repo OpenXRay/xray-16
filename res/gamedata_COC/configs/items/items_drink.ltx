@@ -12,7 +12,7 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 18
 inv_grid_y                               = 2
-cost                                     = 400
+cost                                     = 40
 
 attach_angle_offset                      = 0.000000, 0.000000, 0.000000
 attach_position_offset                   = 0.087266, -0.078540, 0.052360
@@ -36,23 +36,20 @@ use_sound                                = interface\inv_vodka
 use_condition                            = true
 max_uses                                 = 3
 remove_after_use                         = true
-empty_weight                             = 0.3
+empty_weight                             = 0.4
 allow_repair                             = false
 
-hide_time_wpn = 3
-
-[vodka_script]:vodka
+[vodka_script]:vodka ; ia eniieuciaaou
 $spawn                                   = "food and drugs\vodka_script"
 inv_weight                               = 0
 
-[energy_drink]:booster_script
+[energy_drink]:vodka
 $spawn                                   = "food and drugs\energy_drink"
-cform                                    = skeleton
 inv_name                                 = st_energy_drink
 inv_name_short                           = st_energy_drink
 visual                                   = dynamics\devices\dev_drink_stalker\dev_drink_stalker
 description                              = st_energy_drink_descr
-cost                                     = 250
+cost                                     = 50
 
 inv_grid_width                           = 1
 inv_grid_height                          = 1
@@ -65,10 +62,6 @@ attach_position_offset                   = 0.087266, -0.078540, 0.052360
 attach_bone_name                         = bip01_r_hand
 auto_attach                              = false
 
-bone_name                                = bip01_r_hand
-position_offset                          = 0.0,0.0,0.0
-angle_offset                             = 1.570790,1.570790,3.92699
-
 boost_time                               = 90.0
 boost_radiation_restore                  = 0
 boost_power_restore                      = 0.004
@@ -77,6 +70,5 @@ eat_alcohol                              = 0.0
 eat_satiety                              = 0.0
 
 use_sound                                = interface\inv_softdrink
-use_condition                            = false
-;max_uses                                 = 2
-empty_weight                             = 0.05
+empty_weight                             = 0.01
+max_uses                                 = 2

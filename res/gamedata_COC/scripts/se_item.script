@@ -7,11 +7,11 @@ end
 function se_outfit:on_register()
 	cse_alife_item_custom_outfit.on_register( self )
 	-- Проверяем кастомдату обьекта на наличие стори айди.
-	SendScriptCallback("server_entity_on_register",self,"se_outfit")
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_outfit:on_unregister()
 	--' Отрегистрация в таскменеджере
-	SendScriptCallback("server_entity_on_unregister",self,"se_outfit")
+	story_objects.unregister(self.id)
 	cse_alife_item_custom_outfit.on_unregister( self )
 end
 function se_outfit:can_switch_online()
@@ -32,10 +32,19 @@ function se_weapon:__init (section) super (section)
 end
 function se_weapon:on_register()
 	cse_alife_item_weapon.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_weapon")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 end
 function se_weapon:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_weapon")
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item_weapon.on_unregister( self )
 end
 function se_weapon:can_switch_online()
@@ -56,10 +65,19 @@ function se_weapon_shotgun:__init (section) super (section)
 end
 function se_weapon_shotgun:on_register()
 	cse_alife_item_weapon_shotgun.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_weapon_shotgun")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
+		-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 end
 function se_weapon_shotgun:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_weapon_shotgun")
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item_weapon_shotgun.on_unregister( self )
 end
 function se_weapon_shotgun:can_switch_online()
@@ -80,10 +98,19 @@ function se_weapon_automatic_shotgun:__init (section) super (section)
 end
 function se_weapon_automatic_shotgun:on_register()
 	cse_alife_item_weapon_auto_shotgun.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_weapon_automatic_shotgun")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
+		-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 end
 function se_weapon_automatic_shotgun:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_weapon_automatic_shotgun")	
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item_weapon_auto_shotgun.on_unregister( self )
 end
 function se_weapon_automatic_shotgun:can_switch_online()
@@ -104,10 +131,10 @@ function se_helmet:__init (section) super (section)
 end
 function se_helmet:on_register()
 	cse_alife_item_helmet.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_helmet")
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_helmet:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_helmet")
+	story_objects.unregister(self.id)
 	cse_alife_item_helmet.on_unregister( self )
 end
 function se_helmet:can_switch_online()
@@ -120,10 +147,19 @@ function se_weapon_magazined:__init (section) super (section)
 end
 function se_weapon_magazined:on_register()
 	cse_alife_item_weapon_magazined.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_weapon_magazined")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 end
 function se_weapon_magazined:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_weapon_magazined")
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item_weapon_magazined.on_unregister( self )
 end
 function se_weapon_magazined:can_switch_online()
@@ -145,10 +181,19 @@ function se_weapon_magazined_w_gl:__init (section) super (section)
 end
 function se_weapon_magazined_w_gl:on_register()
 	cse_alife_item_weapon_magazined_w_gl.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_weapon_magazined_w_gl")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 end
 function se_weapon_magazined_w_gl:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_weapon_magazined_w_gl")
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item_weapon_magazined_w_gl.on_unregister( self )
 end
 function se_weapon_magazined_w_gl:can_switch_online()
@@ -170,10 +215,13 @@ function se_item:__init (section) super (section)
 end
 function se_item:on_register()
 	cse_alife_item.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_item")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
 end
 function se_item:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_item")
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item.on_unregister( self )
 end
 function se_item:can_switch_online()
@@ -198,10 +246,13 @@ function se_item_torch:__init (section) super (section)
 end
 function se_item_torch:on_register()
 	cse_alife_item_torch.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_item_torch")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
 end
 function se_item_torch:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_item_torch")
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item_torch.on_unregister( self )
 end
 function se_item_torch:can_switch_online()
@@ -223,10 +274,11 @@ function se_physic:__init (section) super (section)
 end
 function se_physic:on_register()
 	cse_alife_object_physic.on_register(self)
-	SendScriptCallback("server_entity_on_register",self,"se_physic")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_physic:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_physic")
+	story_objects.unregister(self.id)
 	cse_alife_object_physic.on_unregister(self)
 end
 function se_physic:keep_saved_data_anyway()
@@ -248,10 +300,11 @@ function se_lamp:__init (section) super (section)
 end
 function se_lamp:on_register()
 	cse_alife_object_hanging_lamp.on_register(self)
-	SendScriptCallback("server_entity_on_register",self,"se_lamp")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_lamp:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_lamp")
+	story_objects.unregister(self.id)
 	cse_alife_object_hanging_lamp.on_unregister(self)
 end
 function se_lamp:keep_saved_data_anyway()
@@ -276,10 +329,11 @@ function se_ammo:__init (section) super (section)
 end
 function se_ammo:on_register()
 	cse_alife_item_ammo.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_ammo")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_ammo:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_ammo")
+	story_objects.unregister(self.id)
 	cse_alife_item_ammo.on_unregister(self)
 end
 function se_ammo:can_switch_online()
@@ -301,10 +355,11 @@ function se_grenade:__init (section) super (section)
 end
 function se_grenade:on_register()
 	cse_alife_item_grenade.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_grenade")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_grenade:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_grenade")
+	story_objects.unregister(self.id)
 	cse_alife_item_grenade.on_unregister(self)
 end
 function se_grenade:can_switch_online()
@@ -320,10 +375,17 @@ function se_eatable:__init (section) super (section)
 end
 function se_eatable:on_register()
 	cse_alife_item.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_eatable")
+	story_objects.check_spawn_ini_for_story_id(self)
+	
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
 end
 function se_eatable:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_eatable")
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	story_objects.unregister(self.id)
 	cse_alife_item.on_unregister(self)
 end
 function se_eatable:can_switch_online()
@@ -345,10 +407,11 @@ function se_invbox:__init (section) super (section)
 end
 function se_invbox:on_register()
 	cse_alife_inventory_box.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_invbox")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_invbox:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_invbox")
+	story_objects.unregister(self.id)
 	cse_alife_inventory_box.on_unregister(self)
 end
 function se_invbox:can_switch_online()
@@ -367,10 +430,11 @@ function se_explosive:__init (section) super (section)
 end
 function se_explosive:on_register()
 	cse_alife_item_explosive.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_explosive")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_explosive:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_explosive")
+	story_objects.unregister(self.id)
 	cse_alife_item_explosive.on_unregister(self)
 end
 function se_explosive:can_switch_online()
@@ -391,10 +455,11 @@ function se_pda:__init (section) super (section)
 end
 function se_pda:on_register()
 	cse_alife_item_pda.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_pda")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_pda:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_pda")
+	story_objects.unregister(self.id)
 	cse_alife_item_pda.on_unregister(self)
 end
 function se_pda:can_switch_online()
@@ -416,10 +481,13 @@ function se_detector:__init (section) super (section)
 end
 function se_detector:on_register()
 	cse_alife_item_detector.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_detector")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	-- Собираем статистику по предметам.
 end
 function se_detector:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_detector")
+	--' Отрегистрация в таскменеджере
+	story_objects.unregister(self.id)
 	cse_alife_item_detector.on_unregister( self )
 end
 function se_detector:can_switch_online()
@@ -440,10 +508,10 @@ function se_mgun:__init (section) super (section)
 end
 function se_mgun:on_register()
 	cse_alife_mounted_weapon.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_mgun")
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 function se_mgun:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_mgun")
+	story_objects.unregister(self.id)
 	cse_alife_mounted_weapon.on_unregister( self )
 end
 function se_mgun:can_switch_online()

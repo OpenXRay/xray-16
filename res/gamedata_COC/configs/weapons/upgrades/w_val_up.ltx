@@ -1,144 +1,217 @@
 [up_sect_firsta_val]
-cost		      		= 1100
+;Надежность(1)10%
+;---------------
+cost		      		= 1200
 value					= +10
 
-fire_dispersion_condition_factor    = -0.25
-condition_queue_shot_dec	= -0.00005
-condition_shot_dec      	= -0.00005
-misfire_start_prob	     	= -0.0005
-misfire_end_prob	     	= -0.005
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -0.25 ;15
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0008
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.008 ;0.03.03
 
 [up_sect_firstc_val]
-cost		      		= 2200
+;Отдача(2)-20%
+;------------
+cost		      		= 2400
 value					= -20
 
 cam_dispersion              = -0.10
+cam_dispersion_inc         	= -0.05
 cam_step_angle_horz        	= -0.10
 
+zoom_cam_dispersion         = -0.1
+zoom_cam_dispersion_inc     = -0.05
+zoom_cam_step_angle_horz    = -0.09
+
+
 [up_sect_firstd_val]
-cost		      		= 2200
+;Настильность(2)20%
+;------------------
+cost		      		= 2400
 value					= +20
 
 bullet_speed            = +50
-fire_dispersion_base	= -0.01
+fire_dispersion_base	= -0.01 ;0.7
 
 [up_sect_firste_val]
-cost		      		= 4400
+;Скорострельность(3)25%
+;----------------------
+cost		      		= 4800
 value					= +30
 
-rpm          = +100
+rpm          = +85
 
 [up_sect_firstf_val]
-cost		      		= 4400
+;Точность(3)30%
+;---------------
+cost		      		= 4800
 value					= +30
 
-fire_dispersion_base	= -0.045
-fire_dispersion_condition_factor    = -0.25
+fire_dispersion_base	= -0.04 ;0.7
+fire_dispersion_condition_factor    = -0.25 ;15
 
 [up_sect_secona_val]
-cost		      		= 1100
+;Отдача(1)-10%
+;------------
+cost		      		= 1200
 value					= -10
 
-cam_dispersion              = -0.05
-cam_step_angle_horz        	= -0.05
+cam_dispersion              = -0.06
+cam_dispersion_inc         	= -0.03
+cam_step_angle_horz        	= -0.06
+
+zoom_cam_dispersion         = -0.06
+zoom_cam_dispersion_inc     = -0.03
+zoom_cam_step_angle_horz    = -0.05
 
 [up_sect_seconc_val]
-cost		      		= 2200
+;Удобство(2)15%
+;--------------
+cost		      		= 2400
 value					= +15
 
 crosshair_inertion		   = -0.5
  
-PDM_disp_vel_factor 		= -0.35
-PDM_disp_accel_factor 		= -0.35
+PDM_disp_base 				= -0.11
+PDM_disp_vel_factor 		= -0.4
+PDM_disp_accel_factor 		= -0.4
 
 [up_sect_secone_val]
-cost		      		= 4400
+;Удобство(3)25%
+;--------------
+cost		      		= 4800
 value					= +25
 
-crosshair_inertion		   = -0.75
-
-PDM_disp_vel_factor 		= -0.55
-PDM_disp_accel_factor 		= -0.55
+crosshair_inertion		   = -1
+ 
+PDM_disp_base 				= -0.17
+PDM_disp_vel_factor 		= -0.6
+PDM_disp_accel_factor 		= -0.6
 
 [up_sect_seconf_val]
-cost		      		= 4400
+;Отдача(3)-30%
+;------------
+cost		      		= 4800
 value					= -30
 
-cam_dispersion              = -0.15
-cam_step_angle_horz        	= -0.15
+cam_dispersion              = -0.16
+cam_dispersion_inc         	= -0.08
+cam_step_angle_horz        	= -0.16
+
+zoom_cam_dispersion         = -0.16
+zoom_cam_dispersion_inc     = -0.08
+zoom_cam_step_angle_horz    = -0.15
 
 [up_sect_thirda_val]
-cost		      		= 1100
+;Настильность(1)10%
+;------------------
+cost		      		= 1200
 value					= +10
 
 bullet_speed            = +30
-fire_dispersion_base    = -0.005
+fire_dispersion_base    = -0.01
 
 [up_sect_thirdc_val]
-cost		      		= 2200
+;Надежность(2)20%
+;---------------
+cost		      		= 2400
 value					= +20
 
-fire_dispersion_condition_factor    = -0.5
-condition_queue_shot_dec	= -0.0001
-condition_shot_dec      	= -0.0001
-misfire_start_prob	     	= -0.001
-misfire_end_prob	     	= -0.01
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -0.5 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.00015 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0018
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.014 ;0.03
 
 [up_sect_thirdd_val]
-cost		      		= 2200
+;Точность(2)20%
+;---------------
+cost		      		= 2400
 value					= +20
 
-fire_dispersion_base	= -0.025
-fire_dispersion_condition_factor    = -0.15
+fire_dispersion_base	= -0.02 ;0.7
+fire_dispersion_condition_factor    = -0.15 ;15
 
 [up_sect_thirde_val]
-cost		      		= 4400
+;Скорострельность(3)25%
+;----------------------
+cost		      		= 4800
 value					= +25
 
-rpm          = +100
+rpm          = +85
+
 
 [up_sect_thirdf_val]
-cost		      		= 4400
+;Настильность(3)30%
+;------------------
+cost		      		= 4800
 value					= +30
 
 bullet_speed          = +70
-fire_dispersion_base  = -0.015
+fire_dispersion_base  = -0.02
 
 [up_sect_fourta_val]
-cost		      		= 1100
+;Скорострельность(1)10%
+;------------------
+cost		      		= 1200
 value					= +10
 
-rpm          = +40
+rpm          = +50
+
 
 [up_sect_fourtc_val]
-cost		      		= 2200
+;Надежность(2)20%
+;---------------
+cost		      		= 2400
 value					= +15
 
-fire_dispersion_condition_factor    = -0.5
-condition_queue_shot_dec	= -0.0001
-condition_shot_dec      	= -0.0001
-misfire_start_prob	     	= -0.001
-misfire_end_prob	     	= -0.01
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -0.5 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.00015 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0018
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.014 ;0.03
 
 [up_sect_fourte_val]
-cost		      		= 4400
+;Точность(3)30%
+;---------------
+cost		      		= 4800
 value					= +30
 
-fire_dispersion_base	= -0.045
-fire_dispersion_condition_factor    = -0.25
+fire_dispersion_base	= -0.04 ;0.7
+fire_dispersion_condition_factor    = -0.25 ;15
 
 [up_sect_fourtf_val]
-cost		      		= 4400
+;Отдача(3)-30%
+;------------
+cost		      		= 4800
 value					= -30
 
-cam_dispersion              = -0.15
-cam_step_angle_horz        	= -0.15
+cam_dispersion              = -0.16
+cam_dispersion_inc         	= -0.08
+cam_step_angle_horz        	= -0.16
+
+zoom_cam_dispersion         = -0.16
+zoom_cam_dispersion_inc     = -0.08
+zoom_cam_step_angle_horz    = -0.15
 
 [up_sect_fiftha_val]
-cost		      		= 2500
+;Увеличен патронтаж
+;------------
+cost		      		= 3200
 value					= +10
 ammo_mag_size        	= +10 
-
 
 [up_firsta_val]
 scheme_index            = 0, 0

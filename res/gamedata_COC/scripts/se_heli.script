@@ -13,7 +13,7 @@ end
 function se_heli:on_register()
 	cse_alife_helicopter.on_register(self)
 	-- Проверяем кастомдату обьекта на наличие стори айди.
-	SendScriptCallback("server_entity_on_register",self,"se_heli")
+	story_objects.check_spawn_ini_for_story_id(self)
 	se_helicopters[self.id] = self
 	local ltx = system_ini()
 	self.player_id = ltx:r_string_ex(self:section_name(),"player_id") or "heli"
@@ -21,7 +21,7 @@ function se_heli:on_register()
 end
 
 function se_heli:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_heli")
+	story_objects.unregister(self.id)
 		
 	se_helicopters[self.id] = nil
 

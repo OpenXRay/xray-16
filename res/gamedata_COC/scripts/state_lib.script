@@ -697,13 +697,6 @@ states = {
 				animstate = nil,
 				animation = "cr_medical_2"
 			},
-	eat_medkit = {weapon = "unstrapped",
-				movement = move.stand,
-				mental = anim.danger,
-				bodystate = move.standing,
-				animstate = nil,
-				animation = "eat_medkit"
-			},
 	light_campfire = {weapon = "strapped",
 				movement = move.stand,
 				mental = anim.danger,

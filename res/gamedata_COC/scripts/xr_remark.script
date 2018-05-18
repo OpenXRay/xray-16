@@ -23,7 +23,6 @@ end
 class "action_remark_activity" (action_base)
 function action_remark_activity:__init (npc_name, action_name, storage) super(nil, action_name)
 	self.st = storage
-	self.cbs = { func = function() self:time_callback() end }
 end
 function action_remark_activity:initialize()
 	action_base.initialize(self)
@@ -85,14 +84,15 @@ function action_remark_activity:update()
 			end
 		end
 			
+		local cb = { obj = self, func = self.time_callback }
 		local target = self:get_target()
 		if target == nil then
-			state_mgr.set_state(self.object, new_state, self.cbs, 0)
+			state_mgr.set_state(self.object, new_state, cb, 0)
 			self.state = state_animation
 			return
 		end
 
-		state_mgr.set_state(self.object, new_state, self.cbs, 0, target)
+		state_mgr.set_state(self.object, new_state, cb, 0, target)
 		self.state = state_animation
 
 	--' Ожидание колбека от стейтменеджера

@@ -63,9 +63,12 @@ end
 function se_stalker:on_register()
 	--alun_utils.debug_write("\nse_stalker:on_register "..self:name().." START")
 	cse_alife_human_stalker.on_register( self )
-	SendScriptCallback("server_entity_on_register",self,"se_stalker")
+	
+	-- persistent storage
+	alife_storage_manager.get_se_obj_state(self,true)
+	
 	-- Проверяем кастомдату обьекта на наличие стори айди.
-	--story_objects.check_spawn_ini_for_story_id(self)
+	story_objects.check_spawn_ini_for_story_id(self)
 
 	if db.offline_objects[self.id] == nil then
 		db.offline_objects[self.id] = {}
@@ -96,8 +99,18 @@ function se_stalker:on_unregister()
 		end
 	end
 	db.offline_objects[self.id] = nil
-	trade_manager.unregister(self.id)
-	SendScriptCallback("server_entity_on_unregister",self,"se_stalker")
+	-- If object unregisters before saving, it means it was removed from game
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then
+		m_data.se_object[self.id] = nil
+	end
+	if (m_data.actor_contacts) then
+		m_data.actor_contacts[self.id] = nil
+	end
+	if (m_data.game_object) then 
+		m_data.game_object[self.id] = nil
+	end
+	story_objects.unregister(self.id)
 	cse_alife_human_stalker.on_unregister(self)
 end
 --------------------
@@ -121,8 +134,10 @@ function se_stalker:on_death(killer)
 	if (level.map_has_object_spot(self.id,"red_location") == 1) then
 		level.map_remove_object_spot(self.id, "red_location")
 	end
-	
-	trade_manager.unregister(self.id)
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.actor_contacts) then
+		m_data.actor_contacts[self.id] = nil
+	end
 end
 --------------------
 function se_stalker:update()
@@ -136,16 +151,23 @@ function se_trader:__init (section) super (section)
 end
 
 function se_trader:on_register()
-	--story_objects.check_spawn_ini_for_story_id(self)
-	SendScriptCallback("server_entity_on_register",self,"se_trader")
+	story_objects.check_spawn_ini_for_story_id(self)
 	cse_alife_trader.on_register(self)
 end
 
 function se_trader:on_unregister()
-	trade_manager.unregister(self.id)
-	--story_objects.unregister(self.id)
-	SendScriptCallback("server_entity_on_unregister",self,"se_trader")
+	story_objects.unregister(self.id)
 	cse_alife_trader.on_unregister(self)
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.se_object) then 
+		m_data.se_object[self.id] = nil
+	end
+	if (m_data.game_object) then 
+		m_data.game_object[self.id] = nil
+	end
+	if (m_data.actor_contacts) then
+		m_data.actor_contacts[self.id] = nil
+	end
 end
 
 function se_trader:keep_saved_data_anyway()

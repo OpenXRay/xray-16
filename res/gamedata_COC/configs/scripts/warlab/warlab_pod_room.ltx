@@ -1,8 +1,5 @@
 [logic]
-active = sr_idle@check_story
-
-[sr_idle@check_story]
-on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@1
+active = sr_idle@1
 
 [sr_idle@1]
 on_actor_inside = sr_idle %+warlab_pod_room_door_find%

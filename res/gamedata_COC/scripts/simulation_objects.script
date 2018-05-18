@@ -7,13 +7,24 @@ local ALLOW_NPC_LEVEL_TRANSITION = true
 
 -- setup default squad behaviors
 local default_squad_behaviour = {	
-	["base"] 			= 20,
+	["actor"]			= 0,
+	["all"]				= 1,
+	["base"] 			= 1,
+	["lair"]			= 0,
 	["resource"] 		= 2,
+	["squad"] 			= 0,
+	["surge"]			= 3,
 	["territory"]		= 1
 }
 
 local default_monster_behaviour = {	
-	["lair"]			= 10,
+	["actor"]			= 0,
+	["base"] 			= 0,
+	["lair"]			= 1,
+	["monster"]			= 1,
+	["resource"] 		= 0,
+	["squad"] 			= 0,
+	["surge"]			= 0,
 	["territory"]		= 1
 }
 
@@ -35,19 +46,31 @@ function on_game_start()
 			return false 
 		end
 		
-		available_by_id[se_obj.id] = se_obj.sim_avail == nil or xr_logic.pick_section_from_condlist(nil, se_obj, se_obj.sim_avail) ~= "false" or false
-		
+		if (se_obj.sim_avail) then 
+			if (xr_logic.pick_section_from_condlist(nil, se_obj, se_obj.sim_avail) == "true") then 
+				available_by_id[se_obj.id] = true
+			else 
+				available_by_id[se_obj.id] = false
+			end
+		else -- default true if no condlist
+			available_by_id[se_obj.id] = true
+		end
+	
 		return false
 	end
 	AddUniqueCall(main_loop) -- Why waste CPU on main thread per object update, we use PH Commander thread here. 
 end
 
 function register(se_obj)
-	get_props(se_obj)
-	available_by_id[se_obj.id] = se_obj.sim_avail == nil or xr_logic.pick_section_from_condlist(nil, se_obj, se_obj.sim_avail) ~= "false" or false
 	object_registry_size = object_registry_size + 1
 	object_registry[object_registry_size] = se_obj
-end
+	get_props(se_obj)
+	if (xr_logic.pick_section_from_condlist(nil, se_obj, se_obj.sim_avail) == "true") then
+		available_by_id[se_obj.id] = true
+	else
+		available_by_id[se_obj.id] = false
+	end
+end 
 
 function unregister(se_obj)
 	for i=object_registry_size,1,-1 do 
@@ -93,7 +116,7 @@ function get_props(se_obj)
 	for j=0,n-1 do
 		local result, prop_name, prop_condlist = props_ini:r_line_ex(props_section,j,"","")
 		if prop_name == "sim_avail" then
-			se_obj.sim_avail = prop_condlist and prop_condlist ~= "" and prop_condlist ~= "true" and xr_logic.parse_condlist(nil, "simulation_object", "sim_avail", prop_condlist)
+			se_obj.sim_avail = xr_logic.parse_condlist(nil, "simulation_object", "sim_avail", prop_condlist)
 		else
 			se_obj.props[prop_name] = tonumber(prop_condlist)
 		end

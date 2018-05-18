@@ -226,7 +226,7 @@
 		<text>Zoom -</text>
 	</string>
 	<string id="st_ui_pda_legend_mechanic">
-		<text>Technician</text>
+		<text>Mechanic</text>
 	</string>
 	<string id="st_ui_pda_legend_medic">
 		<text>Medic</text>
@@ -241,7 +241,7 @@
 		<text>Personal storage</text>
 	</string>
 	<string id="filter_primary_objects_text">
-		<text>Anomalous areas</text>
+		<text>Important areas</text>
 	</string>
 	<string id="filter_quest_npcs_text">
 		<text>Important objects</text>
@@ -260,9 +260,6 @@
 	</string>
 	<string id="st_ui_pda_secret_searched">
 		<text>Stash (Partially looted)</text>
-	</string>
-	<string id="st_ui_pda_secret_tourist">
-		<text>Tourist's stash</text>
 	</string>
 	<string id="st_ui_pda_sleep_place">
 		<text>Bed</text>

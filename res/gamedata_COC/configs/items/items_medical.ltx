@@ -10,19 +10,17 @@ description                              = st_bandage_descr
 inv_name                                 = st_bandage
 inv_name_short                           = st_bandage
 inv_weight                               = 0.05 ;0.2               
-cost                                     = 150
+cost                                     = 80
 
 inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 17
 inv_grid_y                               = 1
 
-boost_time                               = 5.0
-boost_bleeding_restore                   = 0.015
+boost_time                               = 10.0
+boost_bleeding_restore                   = 0.01
 
 use_sound                                = interface\inv_bandage
-
-hide_time_wpn = 3
 
 ;antirad new
 [antirad]:booster
@@ -37,16 +35,15 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 16
 inv_grid_y                               = 1
-cost                                     = 500
+cost                                     = 250
 
-eat_health                               = -0.05
+;eatable item
+;eat_radiation = -0.5
 
 boost_time                               = 10.0
 boost_radiation_restore                  = 0.01
 
 use_sound                                = interface\inv_pills
-
-hide_time_wpn = 3
 
 [medkit]:booster_script
 $spawn                                   = "food and drugs\medkit"
@@ -60,21 +57,19 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 8
 inv_grid_y                               = 2
-cost                                     = 500
+cost                                     = 250
 
-boost_time                               = 16.0
-boost_health_restore                     = 0.004
+boost_time                               = 20.0
+boost_health_restore                     = 0.005
 boost_radiation_restore                  = 0.0
 boost_bleeding_restore                   = 0.001
 
 use_sound                                = interface\inv_medkit
 
-;use_condition                            = true
-;max_uses                                 = 2
+use_condition                            = true
+max_uses                                 = 2
 remove_after_use                         = true
 empty_weight                             = 0.02
-
-hide_time_wpn = 5
 
 [medkit_army]:booster_script
 $spawn                                   = "food and drugs\medkit_army"
@@ -88,21 +83,19 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 9
 inv_grid_y                               = 2
-cost                                     = 1000
+cost                                     = 650
 
 boost_time                               = 10.0
-boost_health_restore                     = 0.008
+boost_health_restore                     = 0.01
 boost_radiation_restore                  = 0.0
-boost_bleeding_restore                   = 0.003
+boost_bleeding_restore                   = 0.002
 
 use_sound                                = interface\inv_medkit
 
-;use_condition                            = true
-;max_uses                                 = 2
+use_condition                            = true
+max_uses                                 = 2
 remove_after_use                         = true
 empty_weight                             = 0.02
-
-hide_time_wpn = 5
 
 [medkit_scientic]:booster_script
 $spawn                                   = "food and drugs\medkit_scientic"
@@ -116,18 +109,16 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 10
 inv_grid_y                               = 2
-cost                                     = 1350
+cost                                     = 800
 
-boost_time                               = 12.0
-boost_health_restore                     = 0.006
+boost_time                               = 20.0
+boost_health_restore                     = 0.005
 boost_radiation_restore                  = 0.01
-boost_bleeding_restore                   = 0.002
+boost_bleeding_restore                   = 0.001
 
 use_sound                                = interface\inv_medkit
 
-;use_condition                            = true
-;max_uses                                 = 2
+use_condition                            = true
+max_uses                                 = 2
 remove_after_use                         = true
 empty_weight                             = 0.02
-
-hide_time_wpn = 5

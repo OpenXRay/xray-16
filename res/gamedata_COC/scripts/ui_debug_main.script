@@ -88,7 +88,6 @@ function get_spawn_table(name)
 		["ON_OFF_S"] = "Squads",
 
 		["EQ_BAKPK"] = "Outfits",
-		["EQ_PATCH"] = "Items (Misc.)",
 		["II_ATTCH"] = "Items (Misc.)",
 		["II_BTTCH"] = "Items (Misc.)",
 
@@ -644,7 +643,7 @@ function debug_ui:OnBtnReloadIni()
 		local st = db.storage[tonumber(txt)]
 		if (st) then
 			st.ini = nil
-			st.ini, st.ini_filename = xr_logic.get_customdata_or_ini_file(st.object, st.ini_filename)
+			st.ini = xr_logic.get_customdata_or_ini_file(st.object, st.ini_filename)
 			xr_logic.switch_to_section(st.object,nil,nil)
 			self:SendOutput("INI reload performed on %s.",obj:name())
 		end
@@ -1913,7 +1912,7 @@ function debug_ui_attach:OnStateListSelect()
 	
 	db.storage[npc:id()].debug_state = state
 	
-	state_mgr.set_state(npc, state,nil, nil, nil, state_mgr.fast_set_true)
+	state_mgr.set_state(npc, state,nil, nil, nil, { fast_set = true })
 end 
 
 function debug_ui_attach:OnWeaponListSelect()

@@ -10,7 +10,7 @@
     <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
     <rank>522</rank>
     <reputation>127</reputation>
-    <visual>actors\stalker_unique\stalker_ccon_rep</visual>
+    <visual>actors\ucheniy\ucheniy_1_strong</visual>
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <supplies>
     </supplies>

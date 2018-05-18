@@ -14,13 +14,11 @@ function opt_gameplay:InitControls(x, y, xml, handler)
 
 	handler.gameplay_options = {}
 	handler.gameplay_options["difficulty"] 			= {typ="list", tag="tab_gameplay:list_difficulty"}
-	handler.gameplay_options["localization"] 			= {typ="list", tag="tab_gameplay:list_localization"}
 	handler.gameplay_options["ai_die_in_anomaly"]	= {typ="check", tag="tab_gameplay:check_ai_die_in_anomaly"}
 	handler.gameplay_options["important_save"]		= {typ="check", tag="tab_gameplay:check_important_save"}
 	handler.gameplay_options["crouch_toggle"]		= {typ="check", tag="tab_gameplay:check_crouch_toggle"}
 	handler.gameplay_options["show_tracers"]		= {typ="check", tag="tab_gameplay:check_show_tracers"}
 	handler.gameplay_options["cod_pickup_mode"]		= {typ="check", tag="tab_gameplay:check_cod_pickup_mode"}
-	handler.gameplay_options["invert_zoom"]			= {typ="check", tag="tab_gameplay:check_invert_zoom"}
 end
 
 class "opt_gameplay_ui" (CUIWindow)

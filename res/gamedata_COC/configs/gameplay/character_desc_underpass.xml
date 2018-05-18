@@ -122,10 +122,13 @@
     <reputation>-185</reputation>
     <visual>actors\stalker_monolith\stalker_monolith_2</visual>
     <supplies>
-#include "gameplay\loadouts\monolith_base.ltx"
-#include "gameplay\loadouts\monolith_sniper.ltx"
         [spawn] \n
         device_torch \n
+        wpn_svd = 1 \n
+        ammo_7.62x54_7h1 = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+        grenade_rgd5 = 1 \n
 #include "gameplay\character_food.xml"
 #include "gameplay\character_drugs_3.xml"
 #include "gameplay\character_drugs_sci.xml"
@@ -146,9 +149,11 @@
     <reputation>-378</reputation>
     <visual>actors\stalker_monolith\stalker_monolith_1</visual>
     <supplies>
-#include "gameplay\loadouts\monolith_base.ltx"
-#include "gameplay\loadouts\monolith_sniper.ltx"
         [spawn] \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 = 1 \n
+        wpn_sig220 = 1 \n
+        ammo_11.43x23_fmj = 1 \n
 #include "gameplay\character_food.xml"
 #include "gameplay\character_drugs_3.xml"
 #include "gameplay\character_drugs_sci.xml"

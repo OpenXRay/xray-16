@@ -44,9 +44,9 @@ function on_game_start()
 	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 end
 
-function is_enemy(obj,enemy,no_memory,is_danger_check)
+function is_enemy(obj,enemy,no_memory)
 	--alun_utils.debug_write("eval_is_enemy")
-	if (device().precache_frame > 1) then
+	if(device().precache_frame > 1) then
 		return false -- fix actor dying before game loads from enemies. Also fixes strange crash on game load when in combat sometimes.
 	end
 	
@@ -99,10 +99,19 @@ function is_enemy(obj,enemy,no_memory,is_danger_check)
 	if (obj_is_stalker) then
 		if (no_memory ~= true) then
 			local tg = time_global()
-			local time_in_memory = math.abs(tg - obj:memory_time(enemy))
-			if (ene_id == 0 and time_in_memory > 120000 or time_in_memory > 60000) then
-				obj:enable_memory_object(enemy,false)
-				return false
+			local time_in_memory = tg - obj:memory_time(enemy)
+			if (time_in_memory < 0) then 
+				--obj:enable_memory_object(enemy,false)
+				time_in_memory = time_in_memory + utils.load_var(obj,"mem_time_offset",0)
+				if (ene_id == 0 and time_in_memory < -120000 or time_in_memory < -60000) then 
+					return false 
+				end
+			else 
+				if (ene_id == 0 and time_in_memory > 120000 or time_in_memory > 60000) then
+					--obj:enable_memory_object(enemy,false)
+					utils.save_var(obj,"mem_time_offset",tg)
+					return false
+				end
 			end
 		end
 	end
@@ -218,15 +227,13 @@ function is_enemy(obj,enemy,no_memory,is_danger_check)
 	end
 
 	if (is_actor) then
-		if not (is_danger_check) then
-			local dist = pos1:distance_to_sqr(pos2)
-			if (dist > 22500) then -- limit combat ignore to 150m unless of course actor attacks
+		local dist = pos1:distance_to_sqr(pos2)
+		if (dist > 22500) then -- limit combat ignore to 150m unless of course actor attacks
+			return false
+		elseif (dist > 10000) then	
+			if (level.get_time_hours() < 4 or level.get_time_hours() > 19 or level.rain_factor() >= 0.4) then 
+				-- limit combat range to 100m during night hours or heavy rain for stalker v actor
 				return false
-			elseif (dist > 10000) then	
-				if (level.get_time_hours() < 4 or level.get_time_hours() > 19 or level.rain_factor() >= 0.4) then 
-					-- limit combat range to 100m during night hours or heavy rain for stalker v actor
-					return false
-				end
 			end
 		end
 	elseif (is_monster) then

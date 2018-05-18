@@ -158,7 +158,7 @@ function options_dialog:InitDynamicOptions(tab)
 				-- setup the list
 				if (t.list) then
 					for i,v in ipairs(t.list) do 
-						ctrl:AddItem(game.translate_string(v),i-1)
+						ctrl:AddItem(v,i-1)
 					end
 				end
 		

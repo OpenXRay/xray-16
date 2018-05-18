@@ -142,7 +142,7 @@ end
 --------------------------------------------------------------------
 local function precond_exclusive(se_obj,smart,job)
 	local result = xr_logic.pick_section_from_condlist(db.actor, se_obj, job.precondition_params.condlist)
-	return result == "true"
+	return result == "true" or result == ""
 end
 
 local function precond_heli_hide(se_obj,smart,job)
@@ -983,8 +983,8 @@ active = mob_home@%s
 [mob_home@%s]
 gulag_point = true
 home_min_radius = 10
-home_mid_radius = 33
-home_max_radius = 75
+home_mid_radius = 20
+home_max_radius = 30
 ]]
 
 		job_ltx = strformat(job_ltx,name,name,name)
@@ -1204,7 +1204,7 @@ end
 -- called in smart_terrain.script
 ---------------------------------------------------------------------------------------
 local str_builder = {}
-function load_job(smart,debug_save)
+function load_job(smart)
 	-- Reset Unique ID counter for each smart_terrain
 	ids = 0
 
@@ -1281,27 +1281,6 @@ use_text                       = nil
 	-- create monster jobs
 	init_monster_jobs(smart,monster_jobs,gname,str_builder)
 
-	-- generate the INI file
-	local new_ini = create_ini_file(table.concat(str_builder,"\n"))
-	db.dynamic_ltx[gname] = new_ini
-	smart.ltx = db.dynamic_ltx[gname]
-	smart.ltx_name = "*"..gname
-	
-	iempty_table(str_builder)
-	
-	-- debug cmd gulag export
-	if (debug_save) then
-		local path = ""
-		local name = smart:name()
-		local a,b = string.find(name,"_")
-		if (a) then
-			path = name:sub(1,b-1) .. "\\"
-		end
-		path = path .. name .. ".ltx"
-		new_ini:save_as(getFS():update_path('$game_config$', '').."\\gulag\\"..path)
-		return
-	end
-	
 	-- reference newly created job tables
 	smart.stalker_jobs = stalker_jobs
 	smart.monster_jobs = monster_jobs
@@ -1329,4 +1308,11 @@ use_text                       = nil
 	table.sort(smart.stalker_jobs,	function(a,b) return get_job_prior(a) > get_job_prior(b) end)
 	table.sort(smart.monster_jobs,	function(a,b) return get_job_prior(a) > get_job_prior(b) end)
 	table.sort(smart.heli_jobs,		function(a,b) return get_job_prior(a) > get_job_prior(b) end)
+
+	-- generate the INI file
+	db.dynamic_ltx[gname] = create_ini_file(table.concat(str_builder,"\n"))
+	smart.ltx = db.dynamic_ltx[gname]
+	smart.ltx_name = "*"..gname
+	
+	iempty_table(str_builder)
 end

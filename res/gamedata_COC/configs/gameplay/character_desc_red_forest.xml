@@ -12,7 +12,7 @@
         <rank>28902</rank>
         <reputation>2425</reputation>
         <money min="5000" max="20000" infinitive="0"/>
-        <visual>actors\stalker_unique\stalker_lesnik</visual>
+        <visual>actors\stalker_lesnik\stalker_lesnik_1</visual>
         <supplies>
         [spawn] \n
 #include "gameplay\character_items.xml"

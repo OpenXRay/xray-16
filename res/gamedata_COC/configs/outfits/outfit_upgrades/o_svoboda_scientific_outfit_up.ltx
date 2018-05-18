@@ -3,16 +3,16 @@ cost 		= 750
 value		= +10
 
 fire_wound_protection  				= 0.04
-bones_koeff_protection_add  		= actor_armor_add_004
+bones_koeff_protection_add  		= actor_armor_add_1
 
 [up_sect_firstc_svoboda_scientific_outfit]
 cost 		= 1500
 value		= -20
 
-hit_fraction_actor					= -0.06
-strike_protection 					= 0.06
-explosion_protection 				= 0.06
-wound_protection					= 0.05
+hit_fraction_actor					= -0.05
+strike_protection 					= 0.05
+explosion_protection 				= 0.05
+wound_protection					= 0.04
 
 [up_sect_firstd_svoboda_scientific_outfit]
 cost 		= 1500
@@ -24,18 +24,17 @@ immunities_sect_add 				= sect_svoboda_scientific_outfit_immunities_add
 cost 		= 3000
 value		= +30
 
-fire_wound_protection  				= 0.06
-bones_koeff_protection_add  		= actor_armor_add_006
-hit_fraction_actor					= -0.05
+fire_wound_protection  				= 0.08
+bones_koeff_protection_add  		= actor_armor_add_3
 inv_weight							= +0.30
-power_loss							= +0.01
+power_loss							= +0.015
 
 [up_sect_firstf_svoboda_scientific_outfit]
 cost 		= 3000
 value		= -5
 
-inv_weight  						= -3
-power_loss							= -0.015
+inv_weight  						= -5
+power_loss							= -0.03
 
 [up_sect_secona_svoboda_scientific_outfit]
 cost 		= 750
@@ -47,19 +46,19 @@ immunities_sect_add 				= sect_svoboda_scientific_outfit_immunities_add
 cost 		= 1200
 value		= +20
 
-shock_protection           			 = 0.05
+shock_protection           			 = 0.1
 
 [up_sect_second_svoboda_scientific_outfit]
 cost 		= 1200
 value		= +20
 
-burn_protection 					= 0.008
+burn_protection 					= 0.01
 
 [up_sect_secone_svoboda_scientific_outfit]
-cost 		= 2600
+cost 		= 2400
 value		= +30
 
-burn_protection 					= 0.012
+burn_protection 					= 0.01
 chemical_burn_protection    		= 0.01
 
 [up_sect_seconf_svoboda_scientific_outfit]
@@ -67,7 +66,7 @@ cost 		= 2400
 value		= +30
 
 shock_protection            		= 0.1
-radiation_protection 				= 0.001
+radiation_protection 				= 0.003
 
 [up_sect_thirda_svoboda_scientific_outfit]
 cost 		= 750
@@ -99,7 +98,7 @@ artefact_count						= 2
 cost 		= 600
 value		= +10
 
-radiation_protection 				= 0.0003
+radiation_protection 				= 0.0015
 chemical_burn_protection            = 0.005
 
 [up_sect_fourtc_svoboda_scientific_outfit]
@@ -113,13 +112,13 @@ cost 		= 3300
 value 		= +4
 
 bleeding_restore_speed				= 0.004
-health_restore_speed			= 0.00015
+health_restore_speed				= 0.0004
 
 [up_sect_fiftha_svoboda_scientific_outfit]
 cost 		= 600
 value		= +10
 
-radiation_protection 				= 0.0003
+radiation_protection 				= 0.0015
 chemical_burn_protection        	= 0.005
 
 [up_sect_fifthc_svoboda_scientific_outfit]
@@ -138,8 +137,8 @@ telepatic_protection  				= 0.015
 cost 		= 3300
 value 		= +3
 
-power_restore_speed					= 0.0016
-power_loss							= -0.03
+power_restore_speed					= 0.002
+power_loss							= -0.04
 
 
 [up_firsta_svoboda_scientific_outfit]
@@ -207,7 +206,7 @@ scheme_index            = 2, 0
 known                   = 1
 effects                 = 
 section                 = up_sect_firste_svoboda_scientific_outfit
-property                = prop_armor, prop_damage, prop_weightoutfit
+property                = prop_armor, prop_weightoutfit
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b

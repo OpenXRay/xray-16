@@ -64,7 +64,7 @@ local function npc_on_update(npc,st)
 		end
 
 		st.victim_surrender = db.actor:id()
-		dxr_statistics.increment_statistic("enemies_surrendered")
+		xr_statistic.inc_counter("enemies_surrendered")
 	end
 end
 
@@ -240,16 +240,15 @@ function act_kill_wounded:execute()
 		return
 	end
 	
-	local dir = vec_sub(alun_utils.safe_bone_pos(vo,"bip01_spine"),alun_utils.safe_bone_pos(npc,"bip01_r_finger02"))
-	
 	if not (st.vertex_id) then
 		local vid = get_rand_vertex(npc,vo)
 		if (validate(npc,vid) and level.vertex_position(vid):distance_to_sqr(vo:position()) >= MinDistance) then
 			st.vertex_id = vid
 			st.vertex_position = level.vertex_position(st.vertex_id)
 		end
-		state_mgr.set_state(npc,"threat",nil,nil,{look_dir = dir})
 	end
+	
+	local dir = vec_sub(alun_utils.safe_bone_pos(vo,"bip01_spine"),alun_utils.safe_bone_pos(npc,"bip01_r_finger02"))
 	
 	local tg = time_global()
 	if (st.timer and tg > st.timer) then
@@ -272,7 +271,7 @@ function act_kill_wounded:execute()
 			db.used_level_vertex_ids[st.vertex_id] = npc:id()
 			self:begin_kill_wounded(vo)
 		else
-			state_mgr.set_state(npc,"assault",nil,nil,{look_position = vo:position()},state_mgr.fast_set_true)
+			state_mgr.set_state(npc,"assault",nil,nil,{look_position = vo:position()},{fast_set = true})
 			if (db.used_level_vertex_ids[st.vertex_id]) then
 				db.used_level_vertex_ids[st.vertex_id] = nil
 			end
@@ -398,7 +397,6 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 				stalker_ids.action_combat_planner,
 			--	stalker_ids.action_danger_planner,
 				xr_actions_id.stohe_meet_base+1,
-				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
 	}

@@ -5,11 +5,12 @@ end
 --------------------
 function se_level_changer:on_register()
 	cse_alife_level_changer.on_register(self)
-	SendScriptCallback("server_entity_on_register",self,"se_level_changer")
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
 end
 --------------------
 function se_level_changer:on_unregister()
-	SendScriptCallback("server_entity_on_unregister",self,"se_level_changer")
+	story_objects.unregister(self.id)
 	cse_alife_level_changer.on_unregister(self)
 end
 --------------------

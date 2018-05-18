@@ -8,7 +8,7 @@
 		Such thing is 'okay' in db.storage, but that is because on net_destroy db.storage[id] is set nil. So if you are keeping track of objects directly in a table, instead of ID 
 		then you absolutely must rid of every single reference to the userdata so that it can be destroy and garbage collected. Otherwise you end up with undetectable issues.
 --]]
-GAME_VERSION = "1.5b r7"
+GAME_VERSION = "1.5b r6"
 
 if string.find(command_line(), "-dbg") then
 	DEV_DEBUG = true
@@ -16,6 +16,8 @@ if string.find(command_line(), "-dbg") then
 		DEV_DEBUG_DEV = true
 	end
 end
+
+USE_INI_MEMOIZE = true
 
 -------------------------------------------------------------------------------------------------
 -- Use marshal library for saving persistent data (like xr_logic pstor)
@@ -32,6 +34,7 @@ amb_vol = 0
 ----------------------------------------------------------------------
 
 function start_game_callback()
+	math.randomseed(os.time())
 	printf("Call of Chernobyl version %s",GAME_VERSION)
 	if (USE_MARSHAL) then
 		printf("using marshal library")
@@ -145,12 +148,6 @@ end
 function ResetTimeEvent(ev_id,act_id,timer)
 	if (ev_queue[ev_id] and ev_queue[ev_id][act_id]) then
 		ev_queue[ev_id][act_id].timer = time_global() + timer*1000
-	end
-end
-
-function ReturnTimeEventTime(ev_id,act_id)
-	if (ev_queue[ev_id] and ev_queue[ev_id][act_id]) and ev_queue[ev_id][act_id].timer then
-		return (ev_queue[ev_id][act_id].timer - time_global())/1000
 	end
 end
 
@@ -268,7 +265,7 @@ function JumpToLevel(new_level)
 	end
 
 	-- in case level has no smarts then just teleport to first found gvid for level
-	for gvid=0, 5332 do
+	for gvid=0, 4860 do
 		if gg:valid_vertex_id(gvid) then
 			cvertex = gg:vertex(gvid)
 			lvl = sim:level_name(cvertex:level_id())
@@ -305,22 +302,9 @@ function TeleportSquad(squad,pos,lvid,gvid)
 	end
 end
 
-function IsAzazelMode()
-	return axr_main.config and axr_main.config:r_value("character_creation","new_game_azazel_mode",1) == true or alife_storage_manager.get_state().enable_azazel_mode == true
-end
-
-function IsHardcoreMode()
-	return axr_main.config and axr_main.config:r_value("character_creation","new_game_hardcore_mode",1) == true or alife_storage_manager.get_state().uuid ~= nil
-end
-
-function IsStoryMode()
-	return axr_main.config and axr_main.config:r_value("character_creation","new_game_story_mode",1) == true or not has_alife_info("story_mode_disabled")
-end
-
 function IsSurvivalMode()
 	return axr_main.config and axr_main.config:r_value("character_creation","new_game_survival_mode",1) == true or alife_storage_manager.get_state().enable_survival_mode == true
 end
-
 --------------------------------------------------------------------
 -- Serialization of userdata for Marshal Library
 --------------------------------------------------------------------
@@ -1047,15 +1031,12 @@ is_squad_monster = {
 		["monster_vegetarian"] 		= true,
 		["monster_zombied_day"] 	= true,
 		["monster_zombied_night"] 	= true,
-		["monster_special_day"] 	= true,
-		["monster_special_night"] 	= true,
-		["monster"]					= true,
-		["zoo_monster"]				= true
+		["monster_special"] 		= true,
+		["monster"]					= true
 }
 squad_community_by_behaviour = {
 		["stalker"]							= "stalker",
 		["bandit"]							= "bandit",
-		["renegade"]						= "renegade",
         ["csky"]							= "csky",
 		["dolg"]							= "dolg",
 		["freedom"]							= "freedom",
@@ -1070,9 +1051,7 @@ squad_community_by_behaviour = {
 		["monster_vegetarian"]				= "monster",
 		["monster_zombied_day"]				= "monster",
 		["monster_zombied_night"]			= "monster",
-		["monster_special_day"]				= "monster",
-		["monster_special_night"]			= "monster",
-		["zoo_monster"]						= "monster"
+		["monster_special"]					= "monster"
 }
 -------------------------------------------------------------------------------------------
 function get_object_community(obj)
@@ -1433,7 +1412,7 @@ function CActor__BeforeHitCallback(actor,shit,bone_id)
 	end
 	
 	if (shit.power > 0) then 
-		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:is_Stalker() and shit.draftsman:relation(db.actor) == game_object.friend) then 
+		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:cast_Stalker() and shit.draftsman:relation(db.actor) == game_object.friend) then 
 			return false 
 		end
 	end
@@ -1448,7 +1427,7 @@ end
 function CAI_Stalker__BeforeHitCallback(npc,shit,bone_id)
 	-- friendly fire
 	if (shit.power > 0) then 
-		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:is_Stalker() and shit.draftsman:relation(npc) == game_object.friend) then 
+		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:cast_Stalker() and shit.draftsman:relation(npc) == game_object.friend) then 
 			return false
 		end
 	end
@@ -1456,6 +1435,17 @@ function CAI_Stalker__BeforeHitCallback(npc,shit,bone_id)
 	SendScriptCallback("npc_on_before_hit",shit,bone_id,flags)
 	return flags.ret_value
 end 
+
+-- called in CSE_ALifeDynamicObject::on_unregister()
+-- good place to remove ids from persistent tables
+function CSE_ALifeDynamicObject_on_unregister(id)
+	local m_data = alife_storage_manager.get_state()
+	if (m_data) then 
+		if (m_data.companion_borrow_item) then
+			m_data.companion_borrow_item[id] = nil 
+		end
+	end
+end
 
 get_console():execute("r__clear_models_on_unload 0")
 function CALifeUpdateManager__on_before_change_level(packet)
@@ -1559,35 +1549,113 @@ function string.gsplit(s, sep, plain)
 end
 
 -- INI Extensions
-function ini_file.r_string_ex(ini,s,k,def)
-	--callstack()
-	--printf("r_string_ex(%s,%s)",s,k)
-	if not (ini:section_exist(s) and ini:line_exist(s,k)) then
-		return def
-	end
-	return ini:r_string(s,k) or def
+local ini_cache = { [system_ini()] = {} }
+function clear_ini_cache(ini)
+	ini_cache[ini] = empty_table(ini_cache[ini])
 end
-function ini_file.r_float_ex(ini,s,k,def)
-	--callstack()
-	--printf("r_float_ex(%s,%s)",s,k)
-	if not (ini:section_exist(s) and ini:line_exist(s,k)) then
-		return def
+if (USE_INI_MEMOIZE) then
+	-- memoize ini results
+	local function r_memoize(ini,s,k,def,typ)
+		if not (s) then
+			callstack()
+		end
+		
+		if (ini_cache[ini]) then
+			local key = s.."&"..k
+			if (ini_cache[ini][key]) then
+				return ini_cache[ini][key]
+			end
+		end
+		
+		if not (ini:section_exist(s) and ini:line_exist(s,k)) then
+			return def
+		end
+		
+		local result = ini:r_string(s,k)
+		if (result) then
+			if (typ == 0) then
+				result = result == "true" or result == "1" or false
+			elseif (typ == 1) then
+				result = tonumber(result)
+			end
+			
+			if (result ~= nil) then
+				if (ini_cache[ini]) then
+					local key = s.."&"..k
+					if (ini_cache[ini][key]) then
+						ini_cache[ini][key] = result
+					end
+				end
+			end
+		end
+		
+		return result == nil and def or result
 	end
-	return ini:r_float(s,k) or def
-end
--- It is wise to use the def with r_bool_ex, because false and nil are consider 'not'. def is only returned on nil
-function ini_file.r_bool_ex(ini,s,k,def)
-	--callstack()
-	if not (ini:section_exist(s) and ini:line_exist(s,k)) then
-		return def
+
+	function ini_file.r_string_ex(ini,s,k,def)
+		return r_memoize(ini,s,k,def)
 	end
-	--printf("r_bool_ex(%s,%s)",s,k)
-	local v = ini:r_string(s,k)
-	return v == nil and def or v == "true" or v == "1" or false
-end
-function ini_file.r_line_ex(ini,s,k)
-	--callstack()
-	return ini:r_line(s,k,"","")
+
+	-- It is wise to use the def with r_bool_ex, because false and nil are consider 'not'. def is only returned on nil
+	function ini_file.r_bool_ex(ini,s,k,def)
+		return r_memoize(ini,s,k,def,0)
+	end
+	function ini_file.r_float_ex(ini,s,k,def)
+		return r_memoize(ini,s,k,def,1)
+	end
+	function ini_file.r_line_ex(ini,s,k)
+		if not (ini_cache[ini]) then
+			ini_cache[ini] = {}
+		end
+		
+		if (ini_cache[ini]) then
+			local key = s .. "&" .. k
+			if (ini_cache[ini][key]) then
+				return unpack(ini_cache[ini][key])
+			end
+		end
+		
+		local a,b,c = ini:r_line(s,k,"","")
+		
+		if (ini_cache[ini]) then
+			local key = s.."&"..k
+			if (ini_cache[ini][key]) then
+				ini_cache[ini][key] = {a,b,c}
+			end
+		end
+		
+		return a,b,c
+	end
+else
+	function ini_file.r_string_ex(ini,s,k,def)
+		--callstack()
+		--printf("r_string_ex(%s,%s)",s,k)
+		if not (ini:section_exist(s) and ini:line_exist(s,k)) then
+			return def
+		end
+		return ini:r_string(s,k) or def
+	end
+	function ini_file.r_float_ex(ini,s,k,def)
+		--callstack()
+		--printf("r_float_ex(%s,%s)",s,k)
+		if not (ini:section_exist(s) and ini:line_exist(s,k)) then
+			return def
+		end
+		return ini:r_float(s,k) or def
+	end
+	function ini_file.r_bool_ex(ini,s,k,def)
+		--callstack()
+		if not (ini:section_exist(s) and ini:line_exist(s,k)) then
+			return def
+		end
+		--printf("r_bool_ex(%s,%s)",s,k)
+		local v = ini:r_string(s,k)
+		return v == nil and def or v == "true" or v == "1" or false
+	end
+	function ini_file.r_line_ex(ini,s,k)
+		--callstack()
+		return ini:r_line(s,k,"","")
+	end
 end
 function ini_file.r_string_to_condlist(ini,s,k,def)
 	local src = ini:r_string_ex(s,k) or def
@@ -1601,13 +1669,7 @@ function ini_file.r_list(ini,s,k,def)
 		return parse_names(src)
 	end
 end
-function ini_file.r_mult(ini,s,k,...)
-	local src = ini:r_string_ex(s,k)
-	if (src) then
-		return unpack(parse_names(src))
-	end
-	return ...
-end
+
 -----------------------------------------
 -- New INI wrapper to replace alun_utils.cfg_file
 class "ini_file_ex"
@@ -1717,14 +1779,6 @@ function ini_file_ex:r_list(s,k,def)
 	if (src) then
 		return parse_names(src)
 	end
-end
-
-function ini_file_ex:r_mult(s,k,...)
-	local src = self:r_string_ex(s,k) or def
-	if (src) then
-		return unpack(parse_names(src))
-	end
-	return ...
 end
 -----------------------------------------
 -- Constants

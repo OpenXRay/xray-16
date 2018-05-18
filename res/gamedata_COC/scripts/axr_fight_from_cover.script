@@ -141,7 +141,7 @@ function action_fight_from_cover:initialize()
 	local npc = self.object
 	local st = db.storage[npc:id()].state_mgr
 	npc:clear_animations()
-	st:set_state("idle", nil, nil, nil, state_mgr.fast_set_true)
+	st:set_state("idle", nil, nil, nil, {fast_set = true})
 	st.animation:set_state(nil, true)
 	st.animation:set_control()
 	st.animstate:set_state(nil,true)
@@ -258,9 +258,9 @@ function action_fight_from_cover:execute()
 			
 			if (see) then
 				local dir = ene_pos and vec_sub(ene_pos, alun_utils.safe_bone_pos(npc,"bip01_r_finger02")) or nil
-				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy},state_mgr.fast_set_true)
+				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy},{fast_set = true})
 			else
-				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},state_mgr.fast_set_true)
+				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 			end
 	
 			self.st.__keep_point_until = self.st.__keep_point_until or tg + math.random(3000,8000)
@@ -294,9 +294,9 @@ function action_fight_from_cover:execute()
 			
 			if (see) then
 				local dir = ene_pos and vec_sub(ene_pos,alun_utils.safe_bone_pos(npc,"bip01_r_finger02")) or nil
-				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy},state_mgr.fast_set_true)
+				state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy},{fast_set = true})
 			else 
-				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},state_mgr.fast_set_true)
+				state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
 			end
 
 			lmove(npc,self.st.vid,self.st)

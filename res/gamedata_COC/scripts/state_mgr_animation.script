@@ -369,7 +369,7 @@ end
 -- Вызов коллбека, обычно в этот момент нужен выбор новой анимации.
 function animation:animation_callback(skip_multianim_check)
 	--printf("[%s][%s] ANIM CALLBACK time[%s] count[%s]", self.npc:name(), self.name, time_global(), self.npc:animation_count())
-	if (self.npc:animation_count() > 0) then
+	if(self.npc:animation_count() > 0) then
 		return
 	end
 

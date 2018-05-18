@@ -97,10 +97,6 @@ function evaluator_radio_in_heli:evaluate()
 		return false 
 	end
 	
-	if (xr_conditions.surge_started()) then
-		return false
-	end
-	
 	local squad = get_object_squad(npc)
 	if not (squad) then 
 		return false 
@@ -123,16 +119,8 @@ function evaluator_radio_in_heli:evaluate()
 		return false 
 	end
 	
-	if (IsWounded(be)) then 
-		return false
-	end
-	
-	if (self.st.keep_until) then 
-		return true 
-	end
-	
-	if (self.st.dont_spam) then 
-		return false 
+	if (xr_conditions.surge_started()) then 
+		return 
 	end
 	
 	local comm = character_community(npc)
@@ -155,9 +143,6 @@ end
 function action_radio_in_heli:initialize()
 	action_base.initialize(self)
 	local npc = self.object
-	if (npc:path_type() ~= game_object.level_path) then 
-		npc:set_path_type(game_object.level_path)
-	end
 	npc:set_desired_position()
 	npc:set_desired_direction()
 end
@@ -175,28 +160,24 @@ function action_radio_in_heli:execute()
 	action_base.execute(self)
 
 	--alun_utils.debug_write("act_radio_in_heli")
-	local tg = time_global()
-	if (self.st.keep_until) then 
-		if (tg < self.st.keep_until) then
-		else
-			self.st.keep_until = nil
-		end
-		return
-	end
 	
 	local npc = self.object
 	local be = npc:best_enemy()
 	if not (be) then 
 		return 
 	end 
-		
+	
+	-- ensure and enforce path type
+	if (npc:path_type() ~= game_object.level_path) then 
+		npc:set_path_type(game_object.level_path)
+	end
+	
 	if (self.st.vid == nil) then
 		self:try_go_cover(npc,be:position())
 	end
 	
 	if (self.st.vid == nil or npc:level_vertex_id() == self.st.vid or npc:position():distance_to_sqr(level.vertex_position(self.st.vid)) <= 3) then
-		
-		self.st.keep_until = tg+6000
+		local tg = time_global()
 		self.st.state = not self.st.state and random_choice("guard_rac","hide_rac") or self.st.state
 		state_mgr.set_state(npc,self.st.state)
 		
@@ -236,13 +217,11 @@ function action_radio_in_heli:execute()
 			end
 		end
 	else 
-		state_mgr.set_state(npc,"assault")
 		self.st.vid = utils.send_to_nearest_accessible_vertex(npc,self.st.vid)
 	end
 end
 
 function action_radio_in_heli:finalize()
-	self.st.keep_until = nil
     action_base.finalize(self)
 end
 
@@ -287,10 +266,6 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	if (_G.schemes["gl"]) then
 		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
 	end
-
-	if (_G.schemes["npc_vs_box"]) then 
-		temp.action:add_precondition(world_property(axr_npc_vs_box.evaid,false))
-	end
 	
 	--[[
 	if (_G.schemes["facer"]) then
@@ -303,7 +278,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local action	
 	local p = {
 				stalker_ids.action_combat_planner, 
-				xr_actions_id.state_mgr + 1,
+				--xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
 	}
