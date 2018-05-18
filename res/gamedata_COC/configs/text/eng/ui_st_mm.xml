@@ -523,4 +523,19 @@
 	<string id="ui_mm_cod_pickup_mode">
 		<text>AoE pickup mode</text>
 	</string>
+	<string id="eng">
+		<text>English</text>
+	</string>
+	<string id="rus">
+		<text>Русский</text>
+	</string>
+	<string id="ui_mm_r2_sun_shafts_mode">
+		<text>Sun rays mode</text>
+	</string>
+	<string id="volumetric">
+		<text>Volumetric</text>
+	</string>
+	<string id="screen_space">
+		<text>Screen Space</text>
+	</string>
 </string_table>

@@ -1,0 +1,99 @@
+#include "common.h"
+#include "lmodel.h"
+#include "shadow.h"
+
+#ifndef ISAMPLE
+#define ISAMPLE 0
+#endif
+
+#ifdef USE_SUNFILTER
+#ifdef GBUFFER_OPTIMIZATION
+#ifdef MSAA_OPTIMIZATION
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR, float4 pos2d : SV_Position, uint iSample : SV_SAMPLEINDEX  ) : SV_Target
+#else
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR, float4 pos2d : SV_Position  ) : SV_Target
+#endif
+#else
+#ifdef MSAA_OPTIMIZATION
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR, uint iSample : SV_SAMPLEINDEX) : SV_Target
+#else
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR  ) : SV_Target
+#endif
+#endif
+{
+	//float4 _P = tex2D( s_position, tc );
+#ifdef GBUFFER_OPTIMIZATION
+#ifdef MSAA_OPTIMIZATION
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, iSample );
+#else
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, ISAMPLE );
+#endif
+#else
+#ifdef MSAA_OPTIMIZATION
+	gbuffer_data gbd = gbuffer_load_data( tc, iSample );
+#else
+	gbuffer_data gbd = gbuffer_load_data( tc, ISAMPLE );
+#endif
+#endif
+	float4 _P = float4( gbd.P, 1.f);
+
+	float4 PS = mul( m_shadow,  _P );
+
+	float s	= shadowtest_sun( PS, tcJ ) * sunmask( _P );
+
+	return s;
+}
+#else
+#ifdef GBUFFER_OPTIMIZATION
+#ifdef MSAA_OPTIMIZATION
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR, float4 pos2d : SV_Position, uint iSample : SV_SAMPLEINDEX ) : SV_Target
+#else
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR, float4 pos2d : SV_Position ) : SV_Target
+#endif
+#else
+#ifdef MSAA_OPTIMIZATION
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, uint iSample : SV_SAMPLEINDEX  ) : SV_Target
+#else
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
+#endif
+#endif
+{
+	//float4 	_P	= tex2D( s_position, tc );
+	//float4	_N	= tex2D( s_normal, tc );
+
+#ifdef GBUFFER_OPTIMIZATION
+#ifdef MSAA_OPTIMIZATION
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, iSample );
+#else
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, ISAMPLE );
+#endif
+#else
+#ifdef MSAA_OPTIMIZATION
+	gbuffer_data gbd = gbuffer_load_data( tc, iSample );
+#else
+	gbuffer_data gbd = gbuffer_load_data( tc, ISAMPLE );
+#endif
+#endif
+	float4 _P = float4( gbd.P, gbd.mtl );
+	float4  _N = float4( gbd.N, gbd.hemi );
+
+	// ----- light-model
+	float	m	= xmaterial;
+# ifndef USE_R2_STATIC_SUN
+			m 	= _P.w;
+# endif
+	float4	light	= plight_infinity ( m, _P, _N, Ldynamic_dir );
+
+	// ----- shadow
+  	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.f);
+	float4 	PS	= mul( m_shadow, P4 );
+	float 	s 	= sunmask( P4 );
+	#ifdef 	USE_SJITTER
+	  		s 	*= shadowtest_sun( PS, tcJ );
+	#else
+	  		s 	*= shadow( PS );
+	#endif
+
+	return 		blend( Ldynamic_color * light * s, tc );
+}
+#endif

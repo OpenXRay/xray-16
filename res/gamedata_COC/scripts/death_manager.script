@@ -174,7 +174,7 @@ function keep_item(npc, item)
 		return
 	end
 	
-	if (item:cast_Ammo() == nil and xr_corpse_detection.lootable_table and xr_corpse_detection.lootable_table[section] and math.random(1,100) < 65) then
+	if (not item:is_Ammo() and xr_corpse_detection.lootable_table and xr_corpse_detection.lootable_table[section] and math.random(1,100) < 65) then
 		return
 	end
 	

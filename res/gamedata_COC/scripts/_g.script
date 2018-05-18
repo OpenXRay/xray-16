@@ -1412,7 +1412,7 @@ function CActor__BeforeHitCallback(actor,shit,bone_id)
 	end
 	
 	if (shit.power > 0) then 
-		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:cast_Stalker() and shit.draftsman:relation(db.actor) == game_object.friend) then 
+		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:is_Stalker() and shit.draftsman:relation(db.actor) == game_object.friend) then 
 			return false 
 		end
 	end
@@ -1427,7 +1427,7 @@ end
 function CAI_Stalker__BeforeHitCallback(npc,shit,bone_id)
 	-- friendly fire
 	if (shit.power > 0) then 
-		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:cast_Stalker() and shit.draftsman:relation(npc) == game_object.friend) then 
+		if (shit.draftsman and shit.draftsman:id() ~= 0 and shit.draftsman:is_Stalker() and shit.draftsman:relation(npc) == game_object.friend) then 
 			return false
 		end
 	end

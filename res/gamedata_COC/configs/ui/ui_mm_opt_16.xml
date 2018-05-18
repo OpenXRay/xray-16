@@ -362,6 +362,18 @@
 	            <d r="70" g="70" b="70"/>
 		    </text_color>
         </combo_sun_shafts>
+		
+		<cap_r2_sun_shafts_mode x="15" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_sun_shafts_mode</text>
+        </cap_r2_sun_shafts_mode>
+        <list_r2_sun_shafts_mode x="147" y="0" width="188" height="20" list_length="2" always_show_scroll="0">
+            <options_item entry="r2_sunshafts_mode" group="mm_opt_video"/>
+            <list_font r="170" g="170" b="170" font="letterica16"/>
+            <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_r2_sun_shafts_mode>
 
         <cap_ao x="15" y="3" width="108" height="76">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssao_text</text>

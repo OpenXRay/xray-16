@@ -1,0 +1,14 @@
+#include "common.h"
+
+struct 	v2p
+{
+  	half4	c0:		COLOR0;		// color
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+half4 	main_ps_1_1	( v2p I )	: COLOR
+{
+	// out
+	return  I.c0;
+}
