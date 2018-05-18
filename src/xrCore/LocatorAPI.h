@@ -1,11 +1,12 @@
 #pragma once
 
+#ifdef(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
 #include <io.h>
-#endif
 #pragma warning(pop)
+#endif
+
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
 //#include "xrCore/Threading/Lock.hpp"
