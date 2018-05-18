@@ -4,11 +4,11 @@ pull_requests:
 skip_tags: true
 image:
 - Visual Studio 2017
-- Previous Visual Studio 2017
 configuration:
-- Debug
-- Release
 - Mixed
+- Release
+- Mixed_COC
+- Release_COC
 platform:
 - x64
 - x86
@@ -22,25 +22,29 @@ after_build:
 - cmd: xrbuild.cmd
 test: off
 artifacts:
-- path: res/xdOpenXRay.Dx86.7z
-  name: xdOpenXRay.Dx86.7z
-- path: res/xdOpenXRay.Dx64.7z
-  name: xdOpenXRay.Dx64.7z
-- path: res/xdOpenXRay.Mx86.7z
-  name: xdOpenXRay.Mx86.7z
-- path: res/xdOpenXRay.Mx64.7z
-  name: xdOpenXRay.Mx64.7z
-- path: res/xdOpenXRay.Rx86.7z
-  name: xdOpenXRay.Rx86.7z
-- path: res/xdOpenXRay.Rx64.7z
-  name: xdOpenXRay.Rx64.7z
+- path: res/OpenXRay.Mx86.7z
+  name: OpenXRay.Mx86.7z
+- path: res/OpenXRay.Mx64.7z
+  name: OpenXRay.Mx64.7z
+- path: res/OpenXRay.Rx86.7z
+  name: OpenXRay.Rx86.7z
+- path: res/OpenXRay.Rx64.7z
+  name: OpenXRay.Rx64.7z
+- path: res/OpenXRay_CoC.Mx86.7z
+  name: OpenXRay_CoC.Mx86.7z
+- path: res/OpenXRay_CoC.Mx64.7z
+  name: OpenXRay_CoC.Mx64.7z
+- path: res/OpenXRay_CoC.Rx86.7z
+  name: OpenXRay_CoC.Rx86.7z
+- path: res/OpenXRay_CoC.Rx64.7z
+  name: OpenXRay_CoC.Rx64.7z
 deploy:
 - provider: GitHub
-  tag: xd$(appveyor_build_version)
-  release: xdOpenXRay (build $(appveyor_build_version))
+  tag: OXR_CoC$(appveyor_build_version)
+  release: OXR_CoC (build $(appveyor_build_version))
   description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
-    secure: UAusA7Nky/sPD8phs1KqV7T0FipjuVgYIioj41JnPjYAX7HMPGe293sdXYM0qjPd
-  artifact: xdOpenXRay.Dx86.7z, xdOpenXRay.Dx64.7z, xdOpenXRay.Mx86.7z, xdOpenXRay.Mx64.7z, xdOpenXRay.Rx86.7z, xdOpenXRay.Rx64.7z
+    secure: 9iDOYVjThQ3nK0u2621weCBYrqi7YZgoE9p1AJ3JHn+hJtlQN/kxE9ccC/EDqHxa
+  artifact: OpenXRay.Mx86.7z, OpenXRay.Mx64.7z, OpenXRay.Rx86.7z, OpenXRay.Rx64.7z, OpenXRay_CoC.Mx86.7z, OpenXRay_CoC.Mx64.7z, OpenXRay_CoC.Rx86.7z, OpenXRay_CoC.Rx64.7z
   draft: true
   force_update: true
