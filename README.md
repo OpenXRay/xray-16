@@ -16,14 +16,6 @@ Dependencies (Ubuntu 18.04): sudo apt install git cmake lua5.1-dev libssl-dev li
 Init: git submodule update --init --recursive
 Building: mkdir bin && cd bin && cmake ../src
 
-Current status (Linux):
-Build Failed:
-[ 86%] Building CXX object src/xrCore/CMakeFiles/xrCore.dir/clsid.cpp.o
-xray-16/src/xrCore/_std_extensions.h:82:15: error: ?_fpclass? was not declared in this scope
-     int cls = _fpclass(double(x));
-               ^~~~~~~~
-
-
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
 
 Pull requests appreciated! However, the following things should be taken into consideration:
