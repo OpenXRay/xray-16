@@ -44,7 +44,7 @@
 #endif // frequently in release code due to large amount of VERIFY
 
 // Our headers
-#if _WIN32||_WIN64
+#ifdef WINDOWS
 #include "xrDebug.h"
 #endif
 //#include "vector.h"

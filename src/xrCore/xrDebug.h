@@ -6,7 +6,7 @@
 
 #include <string>
 
-#if _WIN32 || _WIN64
+#ifdef WINDOWS
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared
 #include <DbgHelp.h>
