@@ -456,9 +456,9 @@ u32 CUILines::GetColorFromText(const xr_string& str) const
     }
 
     // try parse values separated by commas
-    comma1_pos = str.find(",", begin);
-    comma2_pos = str.find(",", comma1_pos + 1);
-    comma3_pos = str.find(",", comma2_pos + 1);
+    comma1_pos = str.find(',', begin);
+    comma2_pos = str.find(',', comma1_pos + 1);
+    comma3_pos = str.find(',', comma2_pos + 1);
     if (comma1_pos == npos || comma2_pos == npos || comma3_pos == npos)
         return m_dwTextColor;
 

@@ -148,6 +148,16 @@ void CRender::reset_end()
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
+
+    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
+    {
+        // MT-details (@front)
+        Device.seqParallel.insert(
+            Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
+
+        // MT-HOM (@front)
+        Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
+    }
 }
 
 // Перед началом рендера мира --#SM+#-- +SecondVP+
@@ -432,8 +442,11 @@ void CRender::Calculate()
     // Frustum & HOM rendering
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
     View = nullptr;
-    HOM.Enable();
-    HOM.Render(ViewBase);
+    if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
+    {
+        HOM.Enable();
+        HOM.Render(ViewBase);
+    }
     gm_SetNearer(FALSE);
     phase = PHASE_NORMAL;
 
@@ -475,7 +488,7 @@ void CRender::Calculate()
         PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
-        // Determine visibility for static geometry hierrarhy
+        // Determine visibility for static geometry hierarchy
         if (psDeviceFlags.test(rsDrawStatic))
         {
             for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
@@ -603,7 +616,7 @@ void CRender::Calculate()
             }
         }
 
-        // Calculate miscelaneous stuff
+        // Calculate miscellaneous stuff
         BasicStats.ShadowsCalc.Begin();
         L_Shadows->calculate();
         BasicStats.ShadowsCalc.End();
@@ -652,7 +665,7 @@ void CRender::Render()
     r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
     HOM.Disable();
-    L_Dynamic->render(0); // addititional light sources
+    L_Dynamic->render(0); // additional light sources
     if (Wallmarks)
     {
         g_r = 0;
@@ -668,7 +681,7 @@ void CRender::Render()
     BasicStats.ShadowsRender.End();
     r_dsgraph_render_lods(false, true); // lods - FB
     r_dsgraph_render_graph(1); // normal level, secondary priority
-    L_Dynamic->render(1); // addititional light sources, secondary priority
+    L_Dynamic->render(1); // additional light sources, secondary priority
     PortalTraverser.fade_render(); // faded-portals
     r_dsgraph_render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();

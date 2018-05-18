@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "ModelPool.h"
 
@@ -395,7 +394,7 @@ void CModelPool::Prefetch()
     // prefetch visuals
     string256 section;
     strconcat(sizeof(section), section, "prefetch_visuals_", g_pGamePersistent->m_game_params.m_game_type);
-    CInifile::Sect& sect = pSettings->r_section(section);
+    const CInifile::Sect& sect = pSettings->r_section(section);
     for (auto I = sect.Data.cbegin(); I != sect.Data.cend(); I++)
     {
         const CInifile::Item& item = *I;

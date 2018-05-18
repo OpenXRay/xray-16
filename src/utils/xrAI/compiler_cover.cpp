@@ -6,6 +6,7 @@
 #include "xrGame/quadtree.h"
 #include "xrGame/cover_point.h"
 #include "Common/object_broker.h"
+#include "xrCommon/xr_unordered_map.h"
 
 Shader_xrLC_LIB* g_shaders_xrlc;
 xr_vector<b_material> g_materials;
@@ -167,17 +168,17 @@ class Query
 public:
     Nearest q_List;
     Nearest q_Clear;
-    Marks q_Marks;
+    xr_unordered_map<u32, bool> q_Marks;
     Fvector q_Base;
 
-    IC void Begin(int count)
+    IC void Begin(const int count)
     {
         q_List.reserve(8192);
         q_Clear.reserve(8192);
-        q_Marks.assign(count, false);
+        q_Marks.reserve(count);
     }
 
-    IC void Init(Fvector& P)
+    IC void Init(const Fvector& P)
     {
         q_Base.set(P);
         q_List.clear();
@@ -187,8 +188,6 @@ public:
     IC void Perform(u32 ID)
     {
         if (ID == InvalidNode)
-            return;
-        if (ID >= q_Marks.size())
             return;
         if (q_Marks[ID])
             return;
@@ -211,8 +210,7 @@ public:
 
     IC void Clear()
     {
-        for (auto &i : q_Clear)
-            q_Marks[i] = false;
+        q_Marks.clear();
     }
 };
 struct RC

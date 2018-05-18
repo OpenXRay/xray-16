@@ -250,6 +250,12 @@ void CUISequenceSimpleItem::Start()
         bool bShowPda = false;
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
 
+        if (!ui_game_sp)
+        {
+            Msg("!%s:: failed to get ui_game_sp", __FUNCTION__);
+            return;
+        }
+
         if (!xr_stricmp(m_pda_section, "pda_tasks"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
@@ -271,13 +277,8 @@ void CUISequenceSimpleItem::Start()
             bShowPda = true;
         }
 
-        if (ui_game_sp)
-        {
-            if ((!ui_game_sp->GetPdaMenu().IsShown() && bShowPda) || (ui_game_sp->GetPdaMenu().IsShown() && !bShowPda))
-            {
-                ui_game_sp->GetPdaMenu().HideDialog();
-            }
-        }
+        if ((!ui_game_sp->GetPdaMenu().IsShown() && bShowPda) || (ui_game_sp->GetPdaMenu().IsShown() && !bShowPda))
+            ui_game_sp->GetPdaMenu().HideDialog();
     }
 }
 

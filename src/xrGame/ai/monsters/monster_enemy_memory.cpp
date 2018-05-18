@@ -32,10 +32,8 @@ void CMonsterEnemyMemory::update()
     VERIFY(monster->g_Alive());
 
     CMonsterHitMemory& monster_hit_memory = monster->HitMemory;
-
-    typedef CObjectManager<const CEntityAlive>::OBJECTS objects_list;
-
-    objects_list const& objects = monster->memory().enemy().objects();
+    
+    auto const& objects = monster->memory().enemy().objects();
 
     if (monster_hit_memory.is_hit() && time() < monster_hit_memory.get_last_hit_time() + 1000)
     {
@@ -57,7 +55,11 @@ void CMonsterEnemyMemory::update()
         }
     }
 
-    if (monster->SoundMemory.IsRememberSound())
+    // XXX: monster doesn't react to sounds when Actor doesn't see him
+    // Probably this was made for optimization
+    // But this conflicts with the ALife idea
+    if (monster->SoundMemory.IsRememberSound() && g_actor
+        && g_actor->memory().visual().visible_now(monster))
     {
         SoundElem sound;
         bool dangerous;
@@ -66,12 +68,11 @@ void CMonsterEnemyMemory::update()
         {
             if (CEntityAlive const* enemy = smart_cast<CEntityAlive const*>(sound.who))
             {
-                float const xz_dist = monster->Position().distance_to_xz(g_actor->Position());
-                float const y_dist = _abs(monster->Position().y - g_actor->Position().y);
+                float const xz_dist = monster->Position().distance_to_xz(enemy->Position());
+                float const y_dist = _abs(monster->Position().y - enemy->Position().y);
 
                 if (monster->CCustomMonster::useful(&monster->memory().enemy(), enemy) && y_dist < 10 &&
-                    xz_dist < monster->get_feel_enemy_who_made_sound_max_distance() &&
-                    g_actor->memory().visual().visible_now(monster))
+                    xz_dist < monster->get_feel_enemy_who_made_sound_max_distance())
                 {
                     add_enemy(enemy);
 
@@ -86,17 +87,17 @@ void CMonsterEnemyMemory::update()
         }
     }
 
-    for (objects_list::const_iterator I = objects.begin(); I != objects.end(); ++I)
-    {
-        const CEntityAlive* enemy = *I;
-        const bool feel_enemy =
-            monster->Position().distance_to(enemy->Position()) < monster->get_feel_enemy_max_distance();
+    float const feel_enemy_max_distance = monster->get_feel_enemy_max_distance();
 
-        if (feel_enemy || monster->memory().visual().visible_now(*I))
-            add_enemy(*I);
+    for (const auto& enemy : objects)
+    {
+        const bool feel_enemy =
+            monster->Position().distance_to(enemy->Position()) < feel_enemy_max_distance;
+
+        if (feel_enemy || monster->memory().visual().visible_now(enemy))
+            add_enemy(enemy);
     }
 
-    float const feel_enemy_max_distance = monster->get_feel_enemy_max_distance();
     if (g_actor)
     {
         float const xz_dist = monster->Position().distance_to_xz(g_actor->Position());
@@ -113,11 +114,13 @@ void CMonsterEnemyMemory::update()
     remove_non_actual();
 
     // обновить опасность
-    for (ENEMIES_MAP_IT it = m_objects.begin(); it != m_objects.end(); it++)
+    // XXX: review with below example
+    // for (auto& [entity, memory] : m_objects)
+    for (auto& it : m_objects)
     {
-        u8 relation_value = u8(monster->tfGetRelationType(it->first));
-        float dist = monster->Position().distance_to(it->second.position);
-        it->second.danger = (1 + relation_value * relation_value * relation_value) / (1 + dist);
+        const u8 relation_value = u8(monster->tfGetRelationType(it.first));
+        const float dist = monster->Position().distance_to(it.second.position);
+        it.second.danger = (1 + relation_value * relation_value * relation_value) / (1 + dist);
     }
 }
 
@@ -129,6 +132,7 @@ void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy)
     enemy_info.time = Device.dwTimeGlobal;
     enemy_info.danger = 0.f;
 
+    // XXX: review
     ENEMIES_MAP_IT it = m_objects.find(enemy);
     if (it != m_objects.end())
     {
@@ -185,10 +189,10 @@ void CMonsterEnemyMemory::remove_non_actual()
 
 const CEntityAlive* CMonsterEnemyMemory::get_enemy()
 {
-    ENEMIES_MAP_IT it = find_best_enemy();
+    const auto it = find_best_enemy();
     if (it != m_objects.end())
         return it->first;
-    return (0);
+    return nullptr;
 }
 
 SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
@@ -196,7 +200,7 @@ SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
     SMonsterEnemy ret_val;
     ret_val.time = 0;
 
-    ENEMIES_MAP_IT it = find_best_enemy();
+    const auto it = find_best_enemy();
     if (it != m_objects.end())
         ret_val = it->second;
 
@@ -241,9 +245,7 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 void CMonsterEnemyMemory::remove_links(IGameObject* O)
 {
     if (monster)
-    {
         monster->EnemyMan.remove_links(O);
-    }
 
     for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
     {
