@@ -34,11 +34,3 @@ artifacts:
   name: xdOpenXRay.Rx86.7z
 - path: res/xdOpenXRay.Rx64.7z
   name: xdOpenXRay.Rx64.7z
-deploy:
-- provider: GitHub
-  tag: xd$(appveyor_build_version)
-  release: xdOpenXRay (build $(appveyor_build_version))
-  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
-  artifact: xdOpenXRay.Dx86.7z, xdOpenXRay.Dx64.7z, xdOpenXRay.Mx86.7z, xdOpenXRay.Mx64.7z, xdOpenXRay.Rx86.7z, xdOpenXRay.Rx64.7z
-  draft: true
-  force_update: true
