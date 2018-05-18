@@ -782,8 +782,7 @@ struct SHADER_MACRO
 
 HRESULT CRender::shader_compile(
     LPCSTR name,
-    DWORD const* pSrcData,
-    UINT SrcDataLen,
+    IReader* fs,
     LPCSTR pFunctionName,
     LPCSTR pTarget,
     DWORD Flags,
@@ -804,7 +803,7 @@ HRESULT CRender::shader_compile(
     VERIFY(!Flags);
 
     // open included files
-    load_includes((LPCSTR)pSrcData, SrcDataLen, source, includes);
+    load_includes((LPCSTR)fs->pointer(), fs->length(), source, includes);
 
     char sh_name[MAX_PATH] = "";
     u32 len = 0;

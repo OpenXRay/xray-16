@@ -208,16 +208,13 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         FS.update_path(cname, "$game_shaders$", cname);
         file = FS.r_open(cname);
     }
-    u32 const size = file->length();
-    char* const data = (LPSTR)_alloca(size + 1);
-    CopyMemory ( data, file->pointer(), size );
-    data[size] = 0;
-    FS.r_close(file);
 
     // Select target
     _vs->vs = glCreateShader(GL_VERTEX_SHADER);
     void* _result = &_vs->vs;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, nullptr, nullptr, NULL, _result);
+    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, NULL, _result);
+
+    FS.r_close(file);
 
     VERIFY(SUCCEEDED(_hr));
 
@@ -303,16 +300,13 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         file = FS.r_open(cname);
     }
     R_ASSERT2 ( file, cname );
-    u32 const size = file->length();
-    char* const data = (LPSTR)_alloca(size + 1);
-    CopyMemory ( data, file->pointer(), size );
-    data[size] = 0;
-    FS.r_close(file);
 
     // Select target
     _ps->ps = glCreateShader(GL_FRAGMENT_SHADER);
     void* _result = &_ps->ps;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, nullptr, nullptr, NULL, _result);
+    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, NULL, _result);
+
+    FS.r_close(file);
 
     VERIFY(SUCCEEDED(_hr));
 
@@ -390,8 +384,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     // Select target
     _gs->gs = glCreateShader(GL_GEOMETRY_SHADER);
     void* _result = &_gs->gs;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(), nullptr,
-                                                    nullptr, NULL, _result);
+    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, NULL, _result);
 
     VERIFY(SUCCEEDED(_hr));
 
