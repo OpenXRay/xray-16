@@ -16,7 +16,14 @@ IC CStreamReader& CStreamReader::operator=(const CStreamReader&)
 }
 
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
-IC void CStreamReader::unmap() { UnmapViewOfFile(m_current_map_view_of_file); }
+IC void CStreamReader::unmap()
+{
+#ifdef WINDOWS
+    UnmapViewOfFile(m_current_map_view_of_file);
+#else
+#warning TODO: Port CStreamReader::unmap()
+#endif
+}
 IC void CStreamReader::remap(const u32& new_offset)
 {
     unmap();

@@ -5,9 +5,11 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#ifdef WINDOWS
 #include "cderr.h"
 #include "commdlg.h"
 #include "vfw.h"
+#endif
 
 std::unique_ptr<EFS_Utils> xr_EFS;
 //----------------------------------------------------

@@ -3,11 +3,12 @@ set(SOURCES
   cpuid.cpp
   crc32.cpp
   dump_string.cpp
-  file_stream_reader.cpp
-  FileSystem.cpp
-  FileSystem_borland.cpp
+#  file_stream_reader.cpp
+#  FileSystem.cpp
+#  FileSystem_borland.cpp
+##  FileSystem_posix.cpp
   FMesh.cpp
-  FS.cpp
+#  FS.cpp
   FTimer.cpp
   LocatorAPI.cpp
   LocatorAPI_auth.cpp
@@ -36,43 +37,6 @@ set(SOURCES
   _math.cpp
   _sphere.cpp
   _std_extensions.cpp
-#  clsid.cpp
-#  cpuid.cpp
-#  crc32.cpp
-#  doug_lea_allocator.cpp
-#  dump_string.cpp
-#  FMesh.cpp
-#  FS.cpp
-#  FTimer.cpp
-#  LocatorAPI.cpp
-#  LocatorAPI_auth.cpp
-#  LocatorAPI_defs.cpp
-#  log.cpp
-#  LzHuf.cpp
-#  memory_allocation_stats.cpp
-#  memory_monitor.cpp
-#  memory_usage.cpp
-#  Model.cpp
-#  NET_utils.cpp
-#  os_clipboard.cpp
-#  ppmd_compressor.cpp
-#  stdafx.cpp
-#  string_concatenations.cpp
-#  xrCore.cpp
-#  ModuleLookup.cpp
-#  xrDebug.cpp
-#  xrMemory.cpp
-#  xrMemory_debug.cpp
-#  xrMemory_POOL.cpp
-#  xrsharedmem.cpp
-#  xrstring.cpp
-#  Xr_ini.cpp
-#  xr_shared.cpp
-#  xr_trims.cpp
-#  _compressed_normal.cpp
-#  _math.cpp
-#  _sphere.cpp
-#  _std_extensions.cpp
 )
 
 set(HEADERS
@@ -110,7 +74,7 @@ set(HEADERS
   PPMdType.h
   resource.h
   stdafx.h
-  Stream_Reader.h
+  stream_reader.h
   stream_reader_inline.h
   string_concatenations.h
   string_concatenations_inline.h

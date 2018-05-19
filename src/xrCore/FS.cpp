@@ -1,14 +1,27 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "fs_internal.h"
+#include "FS_internal.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#ifdef WINDOWS
 #include <io.h>
 #include <direct.h>
 #include <fcntl.h>
 #include <sys\stat.h>
+#else
+/*
+#include <sys/stat.h>
+
+long _filelength(char *f)
+{
+    struct stat st;
+    stat(f, &st);
+    return st.st_size;
+}
+*/
+#endif
 #pragma warning(pop)
 
 #ifdef M_BORLAND

@@ -7,11 +7,13 @@
 
 #include "FileSystem.h"
 
+#ifdef WINDOWS
 #include <io.h>
 #include <fcntl.h>
 #include <sys\stat.h>
 
 #include <Shlobj.h>
+#endif
 
 //#pragma comment(lib, "OSDialogB.lib")
 

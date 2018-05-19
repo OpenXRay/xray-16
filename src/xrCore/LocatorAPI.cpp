@@ -7,9 +7,11 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#ifdef WINDOWS
 #include <direct.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#endif
 #pragma warning(pop)
 
 #include "FS_internal.h"
