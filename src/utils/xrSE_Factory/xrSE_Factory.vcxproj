@@ -182,9 +182,6 @@
     <ClInclude Include="..\..\xrServerEntities\ShapeData.h" />
     <ClInclude Include="..\..\xrServerEntities\shared_data.h" />
     <ClInclude Include="..\..\xrServerEntities\smart_cast.h" />
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl0.h" />
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl1.h" />
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl2.h" />
     <ClInclude Include="..\..\xrServerEntities\specific_character.h" />
     <ClInclude Include="..\..\xrServerEntities\xml_str_id_loader.h" />
     <ClInclude Include="..\..\xrServerEntities\xrEProps.h" />
@@ -546,8 +543,6 @@
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\smart_cast.cpp" />
-    <ClCompile Include="..\..\xrServerEntities\smart_cast_stats.cpp" />
     <ClCompile Include="..\..\xrServerEntities\specific_character.cpp" />
     <ClCompile Include="..\..\xrServerEntities\xrServer_Factory.cpp" />
     <ClCompile Include="..\..\xrServerEntities\xrServer_Objects.cpp" />

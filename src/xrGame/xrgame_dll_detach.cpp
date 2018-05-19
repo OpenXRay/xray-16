@@ -30,9 +30,6 @@ typedef xr_vector<std::pair<shared_str, int>> STORY_PAIRS;
 extern STORY_PAIRS story_ids;
 extern STORY_PAIRS spawn_story_ids;
 
-extern void show_smart_cast_stats();
-extern void clear_smart_cast_stats();
-extern void release_smart_cast_stats();
 extern void dump_list_wnd();
 extern void dump_list_lines();
 extern void dump_list_sublines();
@@ -119,7 +116,6 @@ void clean_game_globals()
 #ifdef DEBUG
     // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
     // xr_delete										(g_profiler);
-    release_smart_cast_stats();
 #endif
 
     RELATION_REGISTRY::clear_relation_registry();

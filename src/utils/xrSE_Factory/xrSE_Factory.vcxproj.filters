@@ -234,15 +234,6 @@
     <ClInclude Include="..\..\xrServerEntities\smart_cast.h">
       <Filter>Common\SmartCast</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl0.h">
-      <Filter>Common\SmartCast</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl1.h">
-      <Filter>Common\SmartCast</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl2.h">
-      <Filter>Common\SmartCast</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_ini_file.h">
       <Filter>Scripts\ScriptClasses\ScriptIniFile</Filter>
     </ClInclude>
@@ -428,12 +419,6 @@
     <ClCompile Include="..\..\xrServerEntities\object_item_script.cpp">
       <Filter>Common\ObjectFactory\object_item_script</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\smart_cast.cpp">
-      <Filter>Common\SmartCast</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\smart_cast_stats.cpp">
-      <Filter>Common\SmartCast</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\script_fmatrix_script.cpp">
       <Filter>Scripts\ScriptClasses\ScriptFmatrix</Filter>
     </ClCompile>
@@ -566,5 +551,8 @@
     <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_Alife_Smartcovers_script.cpp">
       <Filter>ServerStuff\ServerEntities\objects_alife_smartcover</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

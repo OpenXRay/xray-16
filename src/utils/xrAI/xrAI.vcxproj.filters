@@ -75,9 +75,6 @@
     <ClCompile Include="xr_graph_merge.cpp">
       <Filter>ALife\Merge</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\smart_cast.cpp">
-      <Filter>ALife\Shared\Common</Filter>
-    </ClCompile>
     <ClCompile Include="game_spawn_constructor.cpp">
       <Filter>ALife\Spawn\game_spawn_constructor</Filter>
     </ClCompile>
@@ -134,15 +131,6 @@
     <ClInclude Include="..\..\xrServerEntities\smart_cast.h">
       <Filter>ALife\Shared\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl0.h">
-      <Filter>ALife\Shared\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl1.h">
-      <Filter>ALife\Shared\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl2.h">
-      <Filter>ALife\Shared\Common</Filter>
-    </ClInclude>
     <ClInclude Include="spawn_constructor_space.h">
       <Filter>ALife\Spawn</Filter>
     </ClInclude>
@@ -184,5 +172,8 @@
     <ResourceCompile Include="resource.rc">
       <Filter>Resources</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

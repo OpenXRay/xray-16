@@ -97,7 +97,7 @@ void CSoundRender_TargetA::update()
 {
     inherited::update();
 
-    ALint processed;
+    ALint processed = 0;
     // Get status
     A_CHK(alGetSourcei(pSource, AL_BUFFERS_PROCESSED, &processed));
 
@@ -105,6 +105,12 @@ void CSoundRender_TargetA::update()
     {
         while (processed)
         {
+            ALuint BufferID;
+            A_CHK(alSourceUnqueueBuffers(pSource, 1, &BufferID));
+            fill_block(BufferID);
+            A_CHK(alSourceQueueBuffers(pSource, 1, &BufferID));
+            --processed;
+
             // kcat: If there's a long enough freeze and the sources underrun, they go to an AL_STOPPED state.
             // That update function will correctly see this and remove/refill/requeue the buffers, but doesn't restart the source
             // (that's in the separate else block that didn't run this time).Because the source remains AL_STOPPED,
@@ -115,11 +121,6 @@ void CSoundRender_TargetA::update()
             if (state == AL_STOPPED)
                 A_CHK(alSourcePlay(pSource));
             //
-            ALuint BufferID;
-            A_CHK(alSourceUnqueueBuffers(pSource, 1, &BufferID));
-            fill_block(BufferID);
-            A_CHK(alSourceQueueBuffers(pSource, 1, &BufferID));
-            --processed;
         }
     }
     else

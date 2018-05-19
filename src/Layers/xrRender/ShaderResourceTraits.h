@@ -121,7 +121,7 @@ inline T* CResourceManager::CreateShader(const char* name)
         LPCSTR c_entry = "main";
 
         // Compile
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
+        HRESULT const _hr = GEnv.Render->shader_compile(name, file,
             c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)sh);
 
         FS.r_close(file);

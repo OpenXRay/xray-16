@@ -64,10 +64,6 @@ string_path g_last_saved_game;
 extern float air_resistance_epsilon;
 #endif // #ifdef DEBUG
 
-extern void show_smart_cast_stats();
-extern void clear_smart_cast_stats();
-extern void release_smart_cast_stats();
-
 extern u64 g_qwStartGameTime;
 extern u64 g_qwEStartGameTime;
 
@@ -1153,17 +1149,6 @@ public:
 
 #ifdef DEBUG
 
-struct CCC_ShowSmartCastStats : public IConsole_Command
-{
-    CCC_ShowSmartCastStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { show_smart_cast_stats(); }
-};
-
-struct CCC_ClearSmartCastStats : public IConsole_Command
-{
-    CCC_ClearSmartCastStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { clear_smart_cast_stats(); }
-};
 /*
 struct CCC_NoClip : public CCC_Mask
 {
@@ -1944,9 +1929,6 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
 
 #ifdef DEBUG
-    CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");
-    CMD1(CCC_ClearSmartCastStats, "clear_smart_cast_stats");
-
     CMD3(CCC_Mask, "dbg_draw_actor_alive", &dbg_net_Draw_Flags, dbg_draw_actor_alive);
     CMD3(CCC_Mask, "dbg_draw_actor_dead", &dbg_net_Draw_Flags, dbg_draw_actor_dead);
     CMD3(CCC_Mask, "dbg_draw_customzone", &dbg_net_Draw_Flags, dbg_draw_customzone);
