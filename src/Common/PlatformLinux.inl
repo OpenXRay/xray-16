@@ -106,16 +106,17 @@ typedef unsigned int UINT;
 typedef int INT;
 typedef long LONG;
 typedef unsigned long ULONG;
-typedef unsigned long& ULONG_PTR;
-typedef long long int LARGE_INTEGER;
-typedef unsigned long long int ULARGE_INTEGER;
+typedef unsigned long ULONG_PTR, *PULONG_PTR;
+//typedef unsigned long& ULONG_PTR;
+//typedef long long int LARGE_INTEGER;
+//typedef unsigned long long int ULARGE_INTEGER;
 
 typedef unsigned short WORD;
 typedef unsigned short* LPWORD;
 typedef unsigned long DWORD;
 typedef unsigned long* LPDWORD;
 typedef const void *LPCVOID;
-typedef long long int *PLARGE_INTEGER;
+//typedef long long int *PLARGE_INTEGER;
 
 typedef wchar_t WCHAR;
 
