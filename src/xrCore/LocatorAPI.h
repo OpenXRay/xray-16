@@ -1,11 +1,14 @@
 #pragma once
 
-#ifdef WINDOWS
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#ifdef WINDOWS
 #include <io.h>
-#pragma warning(pop)
+#else
+#define _finddata_t _finddata64i32_t
 #endif
+#pragma warning(pop)
+
 
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
