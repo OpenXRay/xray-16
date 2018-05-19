@@ -102,12 +102,19 @@ typedef unsigned char* LPBYTE;
 typedef unsigned int UINT;
 typedef int INT;
 typedef long LONG;
+typedef unsigned long ULONG;
+typedef unsigned long& ULONG_PTR;
+typedef long long int LARGE_INTEGER;
+typedef unsigned long long int ULARGE_INTEGER;
 
 typedef unsigned short WORD;
 typedef unsigned short* LPWORD;
 typedef unsigned long DWORD;
 typedef unsigned long* LPDWORD;
 typedef const void *LPCVOID;
+typedef long long int *PLARGE_INTEGER;
+
+typedef wchar_t WCHAR;
 
 #define WAVE_FORMAT_PCM  0x0001
 
@@ -119,7 +126,7 @@ typedef struct {
     WORD  nBlockAlign;
     WORD  wBitsPerSample;
     WORD  cbSize;
-} WAVEFORMATEX;
+} WAVEFORMATEX, *LPWAVEFORMATEX;
 
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
@@ -184,6 +191,7 @@ typedef dirent DirEntryType;
 
 #define _stricmp stricmp
 #define strcmpi stricmp
+#define lstrcpy strcpy
 #define stricmp strcasecmp
 #define strncpy_s(dest, size, source, num) strncpy(dest, source, num)
 #define strcpy_s(dest, num, source) strcpy(dest, source)
