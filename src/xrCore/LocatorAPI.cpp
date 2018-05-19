@@ -9,9 +9,11 @@
 #pragma warning(disable : 4995)
 #ifdef WINDOWS
 #include <direct.h>
-#include <fcntl.h>
 #include <sys/stat.h>
+#else
+#include <sys/mman.h> 
 #endif
+#include <fcntl.h>
 #pragma warning(pop)
 
 #include "FS_internal.h"
@@ -159,10 +161,14 @@ CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
 #endif // CONFIG_PROFILE_LOCKS
 {
     m_Flags.zero();
+#ifdef WINDOWS
     // get page size
     SYSTEM_INFO sys_inf;
     GetSystemInfo(&sys_inf);
     dwAllocGranularity = sys_inf.dwAllocationGranularity;
+#else
+    dwAllocGranularity = sysconf(_SC_PAGE_SIZE);
+#endif
     m_iLockRescan = 0;
     dwOpenCounter = 0;
 }
@@ -253,16 +259,30 @@ IReader* open_chunk(void* ptr, u32 ID)
 {
     u32 dwType, dwSize;
     DWORD read_byte;
+#ifdef WINDOWS
     u32 pt = SetFilePointer(ptr, 0, nullptr, FILE_BEGIN);
     VERIFY(pt != INVALID_SET_FILE_POINTER);
+#else
+    rewind(ptr);
+#endif
     while (true)
     {
+#ifdef WINDOWS
         bool res = ReadFile(ptr, &dwType, 4, &read_byte, nullptr);
+#else
+        read_byte = read(ptr, &dwType, 4);
+        bool res = true;
+#endif
         if (read_byte == 0)
             return nullptr;
         //. VERIFY(res&&(read_byte==4));
 
+#ifdef WINDOWS
         res = ReadFile(ptr, &dwSize, 4, &read_byte, nullptr);
+#else
+        read_byte = read(ptr, &dwSize, 4);
+        res = true;
+#endif
         if (read_byte == 0)
             return nullptr;
         //. VERIFY(res&&(read_byte==4));
@@ -270,7 +290,12 @@ IReader* open_chunk(void* ptr, u32 ID)
         if ((dwType & ~CFS_CompressMark) == ID)
         {
             u8* src_data = xr_alloc<u8>(dwSize);
+#ifdef WINDOWS
             res = ReadFile(ptr, src_data, dwSize, &read_byte, nullptr);
+#else
+            read_byte = read(ptr, src_data, dwSize);
+            res = true;
+#endif
             VERIFY(res && (read_byte == dwSize));
             if (dwType & CFS_CompressMark)
             {
@@ -282,9 +307,11 @@ IReader* open_chunk(void* ptr, u32 ID)
             }
             return new CTempReader(src_data, dwSize, 0);
         }
+#ifdef WINDOWS
         pt = SetFilePointer(ptr, dwSize, nullptr, FILE_CURRENT);
         if (pt == INVALID_SET_FILE_POINTER)
             return nullptr;
+#endif
     }
     return nullptr;
 };
@@ -383,20 +410,35 @@ void CLocatorAPI::archive::open()
     if (hSrcFile && hSrcMap)
         return;
 
+#ifdef WINDOWS
     hSrcFile = CreateFile(*path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
     R_ASSERT(hSrcFile != INVALID_HANDLE_VALUE);
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
     size = GetFileSize(hSrcFile, nullptr);
     R_ASSERT(size > 0);
+#else
+    hSrcFile = ::open(*path, O_RDONLY|O_NONBLOCK);
+    struct stat statbuf;
+    int rc = fstat(hSrcFile, &statbuf);
+    hSrcMap = mmap(0, statbuf.st_size, PROT_READ, MAP_SHARED, hSrcFile, 0);
+    size = (rc == 0 ? statbuf.st_size : -1);
+#endif
 }
 
 void CLocatorAPI::archive::close()
 {
+#ifdef WINDOWS
     CloseHandle(hSrcMap);
     hSrcMap = nullptr;
     CloseHandle(hSrcFile);
     hSrcFile = nullptr;
+#else
+    munmap(hSrcMap, size);
+    hSrcMap = nullptr;
+    ::close(hSrcFile);
+    hSrcFile = nullptr;
+#endif
 }
 
 void CLocatorAPI::ProcessArchive(pcstr _path)

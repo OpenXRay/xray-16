@@ -4,11 +4,29 @@
 #pragma warning(disable : 4995)
 #ifdef WINDOWS
 #include <io.h>
-#else
-#define _finddata_t _finddata64i32_t
-#endif
-#pragma warning(pop)
+#else // WINDOWS
+#include <inttypes.h>
+#include <sys/types.h> /* To get time_t. */
 
+#ifndef FILENAME_MAX
+#define FILENAME_MAX (260)
+#endif
+
+#define _finddata_t _finddata64i32_t
+typedef int64_t __int64;
+typedef __int64 __time64_t;
+typedef unsigned long _fsize_t;
+
+struct _finddata64i32_t {
+    unsigned attrib;
+    __time64_t time_create;
+    __time64_t time_access;
+    __time64_t time_write;
+    _fsize_t size;
+    char name[FILENAME_MAX];
+};
+#endif // WINDOWS
+#pragma warning(pop)
 
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
