@@ -1657,7 +1657,7 @@ struct TES_PARAMS
     float magnitude;
 };
 
-void PATurbulenceExecuteStream(LPVOID lpvParams)
+void PATurbulenceExecuteStream(TES_PARAMS* pParams)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("PATurbulenceExecuteStream()");
@@ -1670,8 +1670,6 @@ void PATurbulenceExecuteStream(LPVOID lpvParams)
     pVector vX;
     pVector vY;
     pVector vZ;
-
-    TES_PARAMS* pParams = (TES_PARAMS*)lpvParams;
 
     u32 p_from = pParams->p_from;
     u32 p_to = pParams->p_to;
@@ -1781,7 +1779,7 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
         tesParams[i].frequency = frequency;
         tesParams[i].octaves = octaves;
         tesParams[i].magnitude = magnitude;
-        ttapi.threads[i]->addJob([=] { PATurbulenceExecuteStream((void*)&tesParams[i]); });
+        ttapi.threads[i]->addJob([=] { PATurbulenceExecuteStream(&tesParams[i]); });
     }
 
     ttapi.wait();

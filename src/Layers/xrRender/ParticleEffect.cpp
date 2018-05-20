@@ -428,7 +428,7 @@ __forceinline void magnitude_sse(Fvector& vec, float& res)
     _mm_store_ss((float*)&res, tv);
 }
 
-void ParticleRenderStream(void* lpvParams)
+void ParticleRenderStream(PRS_PARAMS* pParams)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("ParticleRenderStream()");
@@ -441,8 +441,6 @@ void ParticleRenderStream(void* lpvParams)
     // Xottab_DUTY: changed angle to be float instead of DWORD
     // But it must be 0xFFFFFFFF or otherwise some particles won't play
     float angle = 0xFFFFFFFF;
-
-    PRS_PARAMS* pParams = (PRS_PARAMS*)lpvParams;
 
     FVF::LIT* pv = pParams->pv;
     u32 p_from = pParams->p_from;
@@ -606,7 +604,7 @@ void CParticleEffect::Render(float)
                 prsParams[i].p_to = (i == (nWorkers - 1)) ? p_cnt : (prsParams[i].p_from + nStep);
                 prsParams[i].particles = particles;
                 prsParams[i].pPE = this;
-                ttapi.threads[i]->addJob([=] { ParticleRenderStream((void*)&prsParams[i]); });
+                ttapi.threads[i]->addJob([=] { ParticleRenderStream(&prsParams[i]); });
             }
 
             ttapi.wait();
