@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Common/Common.hpp"
+#include "Common/FSMacros.hpp"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -79,6 +80,5 @@ using std::string;
 #endif
 
 #define GAMEMTL_NONE u32(-1)
-#define _game_data_ "$game_data$"
 
 #pragma warning(pop)
