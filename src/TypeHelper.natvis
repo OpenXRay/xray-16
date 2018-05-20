@@ -40,6 +40,11 @@
     <StringView>scheduled_name</StringView>
   </Type>
 
+  <Type Name="XRay::Sheduler::Item">
+    <DisplayString>{ScheduledName}</DisplayString>
+    <StringView>ScheduledName</StringView>
+  </Type>
+
   <Type Name="CAI_Stalker">
     <DisplayString>{NameObject.p_->value, s}, $(Type)</DisplayString>
   </Type>
