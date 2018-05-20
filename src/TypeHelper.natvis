@@ -40,6 +40,11 @@
     <StringView>scheduled_name</StringView>
   </Type>
 
+  <Type Name="XRay::Sheduler::Item">
+    <DisplayString>{ScheduledName}</DisplayString>
+    <StringView>ScheduledName</StringView>
+  </Type>
+
   <Type Name="CAI_Stalker">
     <DisplayString>{NameObject.p_->value, s}, $(Type)</DisplayString>
   </Type>
@@ -54,5 +59,13 @@
   
   <Type Name="FS_Path">
     <DisplayString>{m_Path, s}</DisplayString>
+  </Type>
+
+  <Type Name="Shader">
+    <DisplayString>{cName.p_->value, s}, $(Type)</DisplayString>
+  </Type>
+
+  <Type Name="MessageObject">
+    <DisplayString>{Object}</DisplayString>
   </Type>
 </AutoVisualizer>

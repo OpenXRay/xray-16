@@ -164,7 +164,7 @@ CInifile& CSE_Abstract::spawn_ini()
 #pragma warning(push)
 #pragma warning(disable : 4238)
         m_ini_file =
-            new CInifile(&IReader((void*)(*m_ini_string), xr_strlen(m_ini_string)), FS.get_path("$game_config$")->m_Path);
+            new CInifile(&IReader((void*)m_ini_string.c_str(), m_ini_string.size()), FS.get_path(_game_config_)->m_Path);
 #pragma warning(pop)
     return (*m_ini_file);
 }

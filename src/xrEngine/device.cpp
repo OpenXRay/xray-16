@@ -135,7 +135,7 @@ void CRenderDevice::RenderThreadProc(void* context)
             renderTotalReal.Begin();
             if (device.b_is_Active && device.Begin())
             {
-                device.seqRender.Process(rp_Render);
+                device.seqRender.Process();
                 device.CalcFrameStats();
                 device.Statistic->Show();
                 device.End(); // Present goes here
@@ -163,7 +163,7 @@ void CRenderDevice::SecondaryThreadProc(void* context)
         for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
             device.seqParallel[pit]();
         device.seqParallel.clear();
-        device.seqFrameMT.Process(rp_Frame);
+        device.seqFrameMT.Process();
         device.syncFrameDone.Set();
     }
 }
@@ -295,7 +295,7 @@ void CRenderDevice::on_idle()
         renderTotalReal.Begin();
         if (b_is_Active && Begin())
         {
-            seqRender.Process(rp_Render);
+            seqRender.Process();
             CalcFrameStats();
             Statistic->Show();
             End(); // Present goes here
@@ -384,13 +384,13 @@ void CRenderDevice::Run()
         g_dwFPSlimit = 241;
     
     // Message cycle
-    seqAppStart.Process(rp_AppStart);
+    seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
     ShowWindow(m_hWnd, SW_SHOWNORMAL);
     pInput->ClipCursor(true);
     message_loop();
-    seqAppEnd.Process(rp_AppEnd);
+    seqAppEnd.Process();
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
     //renderProcessFrame.Set();
@@ -448,7 +448,7 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.Begin();
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
-    Device.seqFrame.Process(rp_Frame);
+    Device.seqFrame.Process();
     g_bLoaded = TRUE;
     // else
     // seqFrame.Process(rp_Frame);
@@ -526,13 +526,13 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
         Device.b_is_Active = isGameActive;
         if (Device.b_is_Active)
         {
-            Device.seqAppActivate.Process(rp_AppActivate);
+            Device.seqAppActivate.Process();
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
         }
         else
         {
             app_inactive_time_start = TimerMM.GetElapsed_ms();
-            Device.seqAppDeactivate.Process(rp_AppDeactivate);
+            Device.seqAppDeactivate.Process();
         }
     }
 }

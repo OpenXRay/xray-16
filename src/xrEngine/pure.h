@@ -8,16 +8,19 @@
 #define REG_PRIORITY_CAPTURE 0x7ffffffful
 #define REG_PRIORITY_INVALID 0xfffffffful
 
-using MessageFunction = void __fastcall(void* obj);
-#define DECLARE_MESSAGE(name)            \
-    extern ENGINE_API MessageFunction rp_##name; \
-    struct ENGINE_API pure##name         \
-    {                                    \
-        virtual void On##name() = 0;     \
-    }
+struct IPure
+{
+    virtual ~IPure() = default;
+    virtual void OnPure() = 0;
+};
 
-#define DECLARE_RP(name) \
-    void __fastcall rp_##name(void* p) { ((pure##name*)p)->On##name(); }
+#define DECLARE_MESSAGE(name)\
+struct pure##name : IPure\
+{\
+    virtual void On##name() = 0;\
+private:\
+    void OnPure() override { On##name(); }\
+};
 
 DECLARE_MESSAGE(Frame); // XXX: rename to FrameStart
 DECLARE_MESSAGE(FrameEnd);
@@ -31,7 +34,7 @@ DECLARE_MESSAGE(ScreenResolutionChanged);
 
 struct MessageObject
 {
-    void* Object;
+    IPure* Object;
     int Prio;
     u32 Flags;
 };
@@ -91,7 +94,7 @@ public:
             Resort();
     }
 
-    void Process(MessageFunction* func)
+    void Process()
     {
         if (messages.empty())
             return;
@@ -99,12 +102,12 @@ public:
         inProcess = true;
 
         if (messages[0].Prio == REG_PRIORITY_CAPTURE)
-            func(messages[0].Object);
+            messages[0].Object->OnPure();
         else
         {
             for (auto& message : messages)
                 if (message.Prio != REG_PRIORITY_INVALID)
-                    func(message.Object);
+                    message.Object->OnPure();
         }
 
         if (changed)
