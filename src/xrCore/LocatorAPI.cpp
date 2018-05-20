@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #else
 #include <sys/mman.h> 
+#include <fstream>
 #endif
 #include <fcntl.h>
 #pragma warning(pop)
@@ -571,15 +572,27 @@ bool ignore_name(const char* _name)
 
 bool ignore_path(const char* _path)
 {
+#ifdef WINDOWS
     HANDLE h = CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 
     if (h != INVALID_HANDLE_VALUE)
     {
         CloseHandle(h);
-        return false;
+        return false; // file exists
     }
     else
         return true;
+#else
+    if (std::ifstream(_path))
+        return false; // file exists
+    else
+        return true;
+    //if( access( fname, F_OK ) != -1 ) {
+    //    // file exists
+    //} else {
+    //    // file doesn't exist
+    //}
+#endif
 }
 
 bool CLocatorAPI::Recurse(pcstr path)
