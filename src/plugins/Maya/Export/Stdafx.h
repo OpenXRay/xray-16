@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Common/Common.hpp"
+#include "Common/FSMacros.hpp"
 
 #define ENGINE_API
 #include "xrCore/xrCore.h"
@@ -129,6 +130,5 @@ using AStringVec = xr_vector<xr_string>;
 #endif
 
 #define GAMEMTL_NONE u32(-1)
-#define _game_data_ "$game_data$"
 
 #pragma comment(lib, "d3dx9.lib")

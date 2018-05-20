@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Common.hpp"
+#include "Common/FSMacros.hpp"
 
 #include "xrCore/xrCore.h"
 
@@ -63,4 +64,3 @@ using AStringVec = xr_vector<std::string>;
 #endif
 
 #define GAMEMTL_NONE u32(-1)
-#define _game_data_ "$game_data$"
