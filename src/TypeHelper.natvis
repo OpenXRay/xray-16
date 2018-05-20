@@ -55,4 +55,8 @@
   <Type Name="FS_Path">
     <DisplayString>{m_Path, s}</DisplayString>
   </Type>
+
+  <Type Name="Shader">
+    <DisplayString>{cName.p_->value, s}, $(Type)</DisplayString>
+  </Type>  
 </AutoVisualizer>
