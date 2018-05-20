@@ -296,7 +296,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
-        R_ASSERT2(file, cname);
+        R_ASSERT3(file, "Shader file doesnt exist:", cname);
         u32 const size = file->length();
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
@@ -395,7 +395,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
-        R_ASSERT2(file, cname);
+        R_ASSERT3(file, "Shader file doesnt exist:", cname);
 
         // Select target
         LPCSTR c_target = "gs_4_0";

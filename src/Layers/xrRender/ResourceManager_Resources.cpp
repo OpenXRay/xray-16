@@ -189,10 +189,6 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         string_path cname;
         strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), _name, ".vs");
         FS.update_path(cname, "$game_shaders$", cname);
-        //		LPCSTR						target		= NULL;
-
-        IReader* fs = FS.r_open(cname);
-        R_ASSERT3(fs, "shader file doesnt exist", cname);
 
         // Select target
         LPCSTR c_target = "vs_2_0";
@@ -204,7 +200,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 
         // duplicate and zero-terminate
         IReader* file = FS.r_open(cname);
-        R_ASSERT2(file, cname);
+        R_ASSERT3(file, "Shader file doesnt exist:", cname);
         u32 const size = file->length();
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
@@ -280,7 +276,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
 
         // duplicate and zero-terminate
         IReader* file = FS.r_open(cname);
-        R_ASSERT2(file, cname);
+        R_ASSERT3(file, "Shader file doesnt exist:", cname);
         u32 const size = file->length();
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);

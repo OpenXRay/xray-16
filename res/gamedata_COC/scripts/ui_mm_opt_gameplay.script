@@ -14,6 +14,7 @@ function opt_gameplay:InitControls(x, y, xml, handler)
 
 	handler.gameplay_options = {}
 	handler.gameplay_options["difficulty"] 			= {typ="list", tag="tab_gameplay:list_difficulty"}
+	handler.gameplay_options["localization"] 			= {typ="list", tag="tab_gameplay:list_localization"}
 	handler.gameplay_options["ai_die_in_anomaly"]	= {typ="check", tag="tab_gameplay:check_ai_die_in_anomaly"}
 	handler.gameplay_options["important_save"]		= {typ="check", tag="tab_gameplay:check_important_save"}
 	handler.gameplay_options["crouch_toggle"]		= {typ="check", tag="tab_gameplay:check_crouch_toggle"}

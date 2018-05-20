@@ -388,8 +388,10 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         case IDCANCEL:
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
-            DEBUG_BREAK;
 #endif
+            if (IsDebuggerPresent())
+                DEBUG_BREAK;
+
             needTerminate = true;
             break;
         case IDTRYAGAIN: ErrorAfterDialog = false;
@@ -399,9 +401,8 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
             ignoreAlways = true;
             break;
         default:
-#ifndef COC_EDITION
-            DEBUG_BREAK;
-#endif
+            if (IsDebuggerPresent())
+                DEBUG_BREAK;
             break;
         }
 #else // !USE_OWN_ERROR_MESSAGE_WINDOW

@@ -1,7 +1,5 @@
 md res\bins\ 
 
-if %CONFIGURATION%==Debug if %PLATFORM%==x86 goto :DX86 
-if %CONFIGURATION%==Debug if %PLATFORM%==x64 goto :DX64 
 if %CONFIGURATION%==Mixed if %PLATFORM%==x86 goto :MX86 
 if %CONFIGURATION%==Mixed if %PLATFORM%==x64 goto :MX64 
 if %CONFIGURATION%==Mixed_COC if %PLATFORM%==x86 goto :MX_CoC86 
@@ -12,34 +10,6 @@ if %CONFIGURATION%==Release_COC if %PLATFORM%==x86 goto :RX_CoC86
 if %CONFIGURATION%==Release_COC if %PLATFORM%==x64 goto :RX_CoC64 
 
 echo FAIL
-goto :END 
-
-:DX86 
-cd _build\bin\Win32\Debug 
-copy *.dll ..\..\..\..\res\bins\ 
-copy *.exe ..\..\..\..\res\bins\ 
-cd ..\ 
-copy OpenXRay.exe ..\..\..\res\ 
-cd ..\..\..\ 
-copy License.txt .\res\ 
-copy README.md .\res\ 
-cd res\ 
-rd /s /q gamedata_COC 
-7z a xdOpenXRay.Dx86.7z .\* 
-goto :END 
-
-:DX64 
-cd _build\bin\Win64\Debug 
-copy *.dll ..\..\..\..\res\bins\ 
-copy *.exe ..\..\..\..\res\bins\ 
-cd ..\ 
-copy OpenXRay.exe ..\..\..\res\ 
-cd ..\..\..\ 
-copy License.txt .\res\ 
-copy README.md .\res\ 
-cd res\ 
-rd /s /q gamedata_COC 
-7z a xdOpenXRay.Dx64.7z .\* 
 goto :END 
 
 :MX86 
@@ -53,7 +23,7 @@ copy License.txt .\res\
 copy README.md .\res\ 
 cd res\ 
 rd /s /q gamedata_COC 
-7z a xdOpenXRay.Mx86.7z .\* 
+7z a OpenXRay.Mx86.7z .\* 
 goto :END 
 
 :MX64 
@@ -67,7 +37,7 @@ copy License.txt .\res\
 copy README.md .\res\ 
 cd res\ 
 rd /s /q gamedata_COC 
-7z a xdOpenXRay.Mx64.7z .\* 
+7z a OpenXRay.Mx64.7z .\* 
 goto :END 
 
 :MX_CoC86 
@@ -82,7 +52,7 @@ copy README.md .\res\
 cd res\ 
 rd /s /q gamedata 
 ren gamedata_COC gamedata 
-7z a xdOpenXRay.Mx_CoC86.7z .\* 
+7z a OpenXRay_CoC.Mx86.7z .\* 
 goto :END 
 
 :MX_CoC64 
@@ -97,7 +67,7 @@ copy README.md .\res\
 cd res\ 
 rd /s /q gamedata 
 ren gamedata_COC gamedata 
-7z a xdOpenXRay.Mx_CoC64.7z .\* 
+7z a OpenXRay_CoC.Mx64.7z .\* 
 goto :END 
 
 :RX86 
@@ -111,7 +81,7 @@ copy License.txt .\res\
 copy README.md .\res\ 
 cd res\ 
 rd /s /q gamedata_COC 
-7z a xdOpenXRay.Rx86.7z .\* 
+7z a OpenXRay.Rx86.7z .\* 
 goto :END 
 
 :RX64 
@@ -125,7 +95,7 @@ copy License.txt .\res\
 copy README.md .\res\ 
 cd res\ 
 rd /s /q gamedata_COC 
-7z a xdOpenXRay.Rx64.7z .\* 
+7z a OpenXRay.Rx64.7z .\* 
 goto :END 
 
 :RX_CoC86 
@@ -140,7 +110,7 @@ copy README.md .\res\
 cd res\ 
 rd /s /q gamedata 
 ren gamedata_COC gamedata 
-7z a xdOpenXRay.Rx_CoC86.7z .\* 
+7z a OpenXRay_CoC.Rx86.7z .\* 
 goto :END 
 
 :RX_CoC64 
@@ -155,7 +125,7 @@ copy README.md .\res\
 cd res\ 
 rd /s /q gamedata 
 ren gamedata_COC gamedata 
-7z a xdOpenXRay.Rx_CoC64.7z .\* 
+7z a OpenXRay_CoC.Rx64.7z .\* 
 goto :END 
 
 :END 

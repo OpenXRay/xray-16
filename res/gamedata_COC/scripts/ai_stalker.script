@@ -413,3 +413,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 	end
 	return true
 end
+
+function evaluate_cover_point(npc,point)
+	return true
+end
