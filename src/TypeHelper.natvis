@@ -63,5 +63,9 @@
 
   <Type Name="Shader">
     <DisplayString>{cName.p_->value, s}, $(Type)</DisplayString>
-  </Type>  
+  </Type>
+
+  <Type Name="MessageObject">
+    <DisplayString>{Object}</DisplayString>
+  </Type>
 </AutoVisualizer>

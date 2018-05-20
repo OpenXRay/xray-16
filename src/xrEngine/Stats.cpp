@@ -17,9 +17,6 @@
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
 
-// stats
-DECLARE_RP(Stats);
-
 class optimizer
 {
     float average_;

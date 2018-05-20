@@ -60,9 +60,9 @@ void CRenderDevice::Reset(bool precache)
     // TODO: Remove this! It may hide crash
     Memory.mem_compact();
 
-    seqDeviceReset.Process(rp_DeviceReset);
+    seqDeviceReset.Process();
     if (dwWidth_before != dwWidth || dwHeight_before != dwHeight)
-        seqResolutionChanged.Process(rp_ScreenResolutionChanged);
+        seqResolutionChanged.Process();
 
     if (!GEnv.isDedicatedServer)
         pInput->ClipCursor(true);
