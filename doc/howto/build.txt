@@ -53,3 +53,11 @@ Setup:
   game installation directory to this script. Once done, you can find .xrbinup_xxx scripts in the reporitory root:
   use them later to install newly built binaries to the corresponding game binary directory.
 - Now you can build the engine!
+
+Debug/Run from Visual Studio:
+------
+In solution "engine" properties in Visual Studio set:
+- Startup Project: Single startup project = xr_3da
+
+In Project "xr_3da" properties set:
+- Debugging: Working Directory = C:\PATH\TO\StalkerCallOfPripyat\ (which contains fsgame.ltx)
