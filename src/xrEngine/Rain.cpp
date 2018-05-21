@@ -125,6 +125,9 @@ void CEffect_Rain::RenewItem(Item& dest, float height, BOOL bHit)
     }
 }
 
+void CEffect_Rain::SetInvalidateState() { state = stIdle; }
+void CEffect_Rain::StopAmbient() { snd_Ambient.stop(); }
+
 void CEffect_Rain::OnFrame()
 {
 #ifndef _EDITOR

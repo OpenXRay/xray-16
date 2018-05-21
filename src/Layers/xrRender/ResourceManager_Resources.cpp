@@ -217,7 +217,9 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
             c_entry = "main_vs_2_0";
         }
 
-        Msg("compiling shader %s", name);
+        if (Core.ParamFlags.test(Core.verboselog))
+            Msg("compiling shader %s", name);
+
         HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry, c_target,
             D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, (void*&)_vs);
 
@@ -311,7 +313,8 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
             c_entry = "main_ps_2_0";
         }
 
-        Msg("compiling shader %s", name);
+        if (Core.ParamFlags.test(Core.verboselog))
+            Msg("compiling shader %s", name);
         HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry, c_target,
             D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, (void*&)_ps);
 

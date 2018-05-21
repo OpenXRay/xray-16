@@ -22,6 +22,7 @@ CEatableItem::CEatableItem()
     m_physic_item = 0;
     m_iMaxUses = 1;
     m_bRemoveAfterUse = true;
+    m_bConsumeChargeOnUse = true;
 }
 
 CEatableItem::~CEatableItem() {}
@@ -40,6 +41,7 @@ void CEatableItem::Load(LPCSTR section)
         m_iMaxUses = 1;
 
     m_bRemoveAfterUse = READ_IF_EXISTS(pSettings, r_bool, section, "remove_after_use", true);
+    m_bConsumeChargeOnUse = READ_IF_EXISTS(pSettings, r_bool, section, "consume_charge_on_use", true);
     m_fWeightFull = m_weight;
     m_fWeightEmpty = READ_IF_EXISTS(pSettings, r_float, section, "empty_weight", 0.0f);
 }

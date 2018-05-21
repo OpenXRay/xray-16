@@ -114,35 +114,32 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
 
 void xrCore::initParamFlags()
 {
-    if (strstr(Params, "-dbg"))
-        ParamFlags.set(ParamFlag::dbg, TRUE);
-
-    if (strstr(Params, "-dbgdev"))
-        ParamFlags.set(ParamFlag::dbgdev, TRUE);
-
-    if (strstr(Params, "-dbgact"))
-        ParamFlags.set(ParamFlag::dbgact, TRUE);
+    if (strstr(Params, "-verboselog"))
+        ParamFlags.set(ParamFlag::verboselog, true);
 
     if (strstr(Params, "-dbgbullet"))
-        ParamFlags.set(ParamFlag::dbgbullet, TRUE);
+        ParamFlags.set(ParamFlag::dbgbullet, true);
 
-    if (strstr(Params, "-dbganim"))
-        ParamFlags.set(ParamFlag::dbganim, TRUE);
+    if (strstr(Params, "-dev"))
+        ParamFlags.set(ParamFlag::dev, true);
 
     if (strstr(Params, "-nofpslock"))
-        ParamFlags.set(ParamFlag::nofpslock, TRUE);
+        ParamFlags.set(ParamFlag::nofpslock, true);
 
     if (strstr(Params, "-fpslock60"))
-        ParamFlags.set(ParamFlag::fpslock60, TRUE);
+        ParamFlags.set(ParamFlag::fpslock60, true);
 
     if (strstr(Params, "-fpslock120"))
-        ParamFlags.set(ParamFlag::fpslock120, TRUE);
+        ParamFlags.set(ParamFlag::fpslock120, true);
 
     if (strstr(Params, "-fpslock144"))
-        ParamFlags.set(ParamFlag::fpslock144, TRUE);
+        ParamFlags.set(ParamFlag::fpslock144, true);
 
     if (strstr(Params, "-fpslock240"))
-        ParamFlags.set(ParamFlag::fpslock240, TRUE);
+        ParamFlags.set(ParamFlag::fpslock240, true);
+
+    if (strstr(Params, "-genbump"))
+        ParamFlags.set(ParamFlag::genbump, true);
 }
 
 #ifndef _EDITOR

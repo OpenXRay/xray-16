@@ -129,9 +129,6 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
             temp[size] = 0;
             m_ini_string = temp;
 
-            if (Core.ParamFlags.is(Core.dbgdev))
-                Msg("%s try loading custom data from %s [%d]", caSection, raw_file_name, size);
-
 #ifdef XRGAME_EXPORTS
             if (NULL == ai().get_alife())
 #endif // #ifdef XRGAME_EXPORTS

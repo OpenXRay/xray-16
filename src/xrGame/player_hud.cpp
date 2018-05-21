@@ -13,8 +13,8 @@
 player_hud* g_player_hud = nullptr;
 Fvector _ancor_pos;
 Fvector _wpn_root_pos;
-Fvector player_hud::m_hud_offset_pos;
-Fvector player_hud::m_hand_offset_pos;
+Fvector m_hud_offset_pos = { 0.f, 0.f, 0.f }; //only in hud adj mode
+Fvector m_hand_offset_pos = { 0.f, 0.f, 0.f };
 
 float CalcMotionSpeed(const shared_str& anim_name)
 {
@@ -105,7 +105,7 @@ void player_hud_motion_container::load(IKinematicsAnimated* model, const shared_
 Fvector& attachable_hud_item::hands_attach_pos()
 {
     Fvector v;
-    v.set(m_measures.m_hands_attach[0]).add(player_hud::m_hand_offset_pos);
+    v.set(m_measures.m_hands_attach[0]).add(m_hand_offset_pos);
     return v;
 }
 Fvector& attachable_hud_item::hands_attach_rot() { return m_measures.m_hands_attach[1]; }
@@ -113,7 +113,7 @@ Fvector& attachable_hud_item::hands_offset_pos()
 {
     u8 idx = m_parent_hud_item->GetCurrentHudOffsetIdx();
     Fvector v;
-    v.set(m_measures.m_hands_offset[0][idx]).add(player_hud::m_hud_offset_pos);
+    v.set(m_measures.m_hands_offset[0][idx]).add(m_hud_offset_pos);
     return v;
 }
 
@@ -123,7 +123,7 @@ Fvector& attachable_hud_item::hands_offset_rot()
     return m_measures.m_hands_offset[1][idx];
 }
 
-void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent)
+bool attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent)
 {
     u16 bone_id;
     BOOL bVisibleNow;
@@ -131,7 +131,7 @@ void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVi
     if (bone_id == BI_NONE)
     {
         if (bSilent)
-            return;
+            return false;
         R_ASSERT2(0, make_string("model [%s] has no bone [%s]", pSettings->r_string(m_sect_name, "item_visual"),
                          bone_name.c_str())
                          .c_str());
@@ -139,6 +139,8 @@ void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVi
     bVisibleNow = m_model->LL_GetBoneVisible(bone_id);
     if (bVisibleNow != bVisibility)
         m_model->LL_SetBoneVisible(bone_id, bVisibility, TRUE);
+
+    return true;
 }
 
 void attachable_hud_item::update(bool bForce)
@@ -408,8 +410,6 @@ player_hud::player_hud()
     m_attached_items[1] = nullptr;
     m_transform.identity();
     m_attach_offset.identity();
-    m_hud_offset_pos.set(0.f, 0.f, 0.f);
-    m_hand_offset_pos.set(0.f, 0.f, 0.f);
 }
 
 player_hud::~player_hud()

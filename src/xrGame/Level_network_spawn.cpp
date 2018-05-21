@@ -99,7 +99,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
     }
 
     //Alundaio: Knowing last object to spawn can be very useful to debugging
-    if (Core.ParamFlags.test(Core.dbgdev))
+    if (Core.ParamFlags.test(Core.verboselog))
         Msg("Try Spawning object Name:[%s] Section:[%s] ID:[%d] ParentID:[%d]", E->name_replace(), *E->s_name, E->ID, E->ID_Parent);
 
     if (!O->net_Spawn(E))
@@ -150,7 +150,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 
     Game().OnSpawn(O);
 
-    if (Core.ParamFlags.test(Core.dbgdev))
+    if (Core.ParamFlags.test(Core.verboselog))
         Msg("[%d] net_Spawn successful", E->ID);
 }
 

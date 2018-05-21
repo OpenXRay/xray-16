@@ -56,7 +56,6 @@
 #include "LevelGraphDebugRender.hpp"
 #include "CharacterPhysicsSupport.h"
 #endif // DEBUG
-#include "player_hud.h"
 
 string_path g_last_saved_game;
 
@@ -71,6 +70,9 @@ ENGINE_API
 extern float psHUD_FOV;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
+
+extern Fvector m_hud_offset_pos;
+extern Fvector m_hand_offset_pos;
 
 extern int x_m_x;
 extern int x_m_z;
@@ -1911,7 +1913,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_FloatBlock, "ph_tri_query_ex_aabb_rate", &ph_console::ph_tri_query_ex_aabb_rate, 1.01f, 3.f);
 #endif // DEBUG
 
-    if (Core.ParamFlags.test(Core.dbg))
+    if (Core.ParamFlags.test(Core.dev))
     {
         CMD1(CCC_JumpToLevel, "jump_to_level");
         CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
@@ -2092,8 +2094,8 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Vector3, "psp_cam_offset", &CCameraLook2::m_cam_offset, Fvector().set(-1000, -1000, -1000),
         Fvector().set(1000, 1000, 1000));
-    CMD4(CCC_Vector3, "hud_offset_pos", &player_hud::m_hud_offset_pos, Fvector().set(-1000, -1000, -1000), Fvector().set(1000, 1000, 1000));
-    CMD4(CCC_Vector3, "hand_offset_pos", &player_hud::m_hand_offset_pos, Fvector().set(-1000, -1000, -1000), Fvector().set(1000, 1000, 1000));
+    CMD4(CCC_Vector3, "hud_offset_pos", &m_hud_offset_pos, Fvector().set(-1000, -1000, -1000), Fvector().set(1000, 1000, 1000));
+    CMD4(CCC_Vector3, "hand_offset_pos", &m_hand_offset_pos, Fvector().set(-1000, -1000, -1000), Fvector().set(1000, 1000, 1000));
 
     CMD1(CCC_GSCheckForUpdates, "check_for_updates");
 #ifdef DEBUG

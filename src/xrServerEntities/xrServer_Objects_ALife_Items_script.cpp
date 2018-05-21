@@ -30,8 +30,8 @@ SCRIPT_EXPORT(CSE_ALifeInventoryItem, (),
     [
         class_<CSE_ALifeInventoryItem>("cse_alife_inventory_item")
             //.def(constructor<pcstr>())
-            .def("has_upgrade", &CSE_ALifeInventoryItem::has_upgrade)
-            .def("add_upgrade", &CSE_ALifeInventoryItem::add_upgrade)
+            .def("has_upgrade", &has_upgrade_script)
+            .def("add_upgrade", &add_upgrade_script)
             .def_readwrite("condition", &CSE_ALifeInventoryItem::m_fCondition)
     ];
 });

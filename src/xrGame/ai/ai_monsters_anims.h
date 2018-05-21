@@ -29,7 +29,7 @@ public:
 
     IC void Load(IKinematicsAnimated* tpKinematics, LPCSTR caBaseName)
     {
-        bool bDbg = Core.ParamFlags.test(Core.dbganim);
+        bool bDbg = Core.ParamFlags.test(Core.verboselog);
         A.clear();
         string256 S;
         int j = 0;

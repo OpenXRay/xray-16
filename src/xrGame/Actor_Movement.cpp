@@ -519,7 +519,7 @@ void CActor::g_cl_Orientate(u32 mstate_rl, float dt)
     {
         // if camera rotated more than 45 degrees - align model with it
         float ty = angle_normalize(r_torso.yaw);
-        if (_abs(r_model_yaw - ty) > PI_DIV_4)
+        if (_abs(r_model_yaw - ty) > PI_DIV_4 / 3.f)
         {
             r_model_yaw_dest = ty;
             //

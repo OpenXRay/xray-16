@@ -1115,10 +1115,11 @@ bool CInventory::Eat(PIItem pIItem)
     }
         
 
-    if (pItemToEat->GetMaxUses() < 255) // If uses 255, then skip the decrement for infinite usages
+    if (pItemToEat->GetMaxUses() < 255 && pItemToEat->CanConsumeCharge()) // If uses 255, then skip the decrement for infinite usages
     {
         u8 remaining = pItemToEat->GetRemainingUses();
-        pItemToEat->SetRemainingUses(remaining - 1);
+        if (remaining > 0)
+            pItemToEat->SetRemainingUses(remaining - 1);
     }
 
     if (pItemToEat->Empty() && pItemToEat->CanDelete())

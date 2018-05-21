@@ -885,7 +885,7 @@ void xrRender_initconsole()
     //float ps_r2_dof_near = 0.f; // 0.f
     //float ps_r2_dof_focus = 1.4f; // 1.4f
 
-    if (Core.ParamFlags.test(xrCore::dbgdev))
+    if (Core.ParamFlags.test(xrCore::dev))
         CMD4(CCC_SunshaftsIntensity, "r__sunshafts_intensity", &ccSunshaftsIntensity, 0.f, 1.f);
 
     CMD3(CCC_Token, "r2_sunshafts_mode", &ps_sunshafts_mode, sunshafts_mode_token);

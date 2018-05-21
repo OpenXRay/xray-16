@@ -468,4 +468,25 @@ struct	v2p_ssss
 	float4 HPos : SV_Position;	// Clip-space position 	(for rasterization)
 };
 
+// SMAA
+struct v_SMAA
+{
+	float4 P		: POSITION;
+	float2 	Tex0	: TEXCOORD0;
+	float4	Tex1	: TEXCOORD1;
+	float4 	Tex2	: TEXCOORD2;
+	float4	Tex3	: TEXCOORD3;
+	float4	Tex4	: TEXCOORD4;
+};
+
+struct v2p_SMAA
+{
+	float2 	Tex0	: TEXCOORD0;
+	float4	Tex1	: TEXCOORD1;
+	float4 	Tex2	: TEXCOORD2;
+	float4	Tex3	: TEXCOORD3;
+	float4	Tex4	: TEXCOORD4;
+	float4 	HPos	: SV_Position;	// Clip-space position 	(for rasterization)
+};
+
 #endif	//	common_iostructs_h_included

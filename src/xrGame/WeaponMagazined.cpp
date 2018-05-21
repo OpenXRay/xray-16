@@ -587,11 +587,13 @@ void CWeaponMagazined::state_Fire(float dt)
         while (!m_magazine.empty() && fShotTimeCounter < 0 && (IsWorking() || m_bFireSingleShot) &&
             (m_iQueueSize < 0 || m_iShotNum < m_iQueueSize))
         {
+#ifndef COC_EDITION
             if (CheckForMisfire())
             {
                 StopShooting();
                 return;
             }
+#endif
 
             m_bFireSingleShot = false;
 
@@ -611,6 +613,14 @@ void CWeaponMagazined::state_Fire(float dt)
                 FireTrace(p1, d);
             else
                 FireTrace(m_vStartPos, m_vStartDir);
+
+#ifdef COC_EDITION
+            if (CheckForMisfire())
+            {
+                StopShooting();
+                return;
+            }
+#endif
         }
 
         if (m_iShotNum == m_iQueueSize)

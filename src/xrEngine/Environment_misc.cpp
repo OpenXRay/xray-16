@@ -445,7 +445,7 @@ void CEnvDescriptorMixer::lerp(
     wind_velocity = fi * A.wind_velocity + f * B.wind_velocity;
     wind_direction = fi * A.wind_direction + f * B.wind_direction;
 
-    if (Core.ParamFlags.test(xrCore::dbgdev) && ccSunshaftsIntensity > 0.f)
+    if (Core.ParamFlags.test(xrCore::dev) && ccSunshaftsIntensity > 0.f)
         m_fSunShaftsIntensity = ccSunshaftsIntensity;
     else
         m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;

@@ -15,6 +15,7 @@ protected:
 
     u8 m_iMaxUses;
     bool m_bRemoveAfterUse;
+    bool m_bConsumeChargeOnUse;
     float m_fWeightFull;
     float m_fWeightEmpty;
 
@@ -37,6 +38,7 @@ public:
     virtual bool UseBy(CEntityAlive* npc);
     virtual bool Empty() const { return GetRemainingUses() == 0; }
     bool CanDelete() const { return m_bRemoveAfterUse == true; }
+    bool CanConsumeCharge() const { return m_bConsumeChargeOnUse; };
     virtual u8 GetMaxUses() { return m_iMaxUses; }
     virtual u8 GetRemainingUses() const { return (u8)roundf(((float)m_iMaxUses)*m_fCondition); }
     void SetRemainingUses(u8 value) { m_fCondition = ((float)value / (float)m_iMaxUses); clamp(m_fCondition, 0.f, 1.f); };

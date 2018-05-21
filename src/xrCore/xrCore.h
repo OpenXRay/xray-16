@@ -132,16 +132,15 @@ public:
 
     Flags16 ParamFlags; //Alun: TODO: Add all params
     enum ParamFlag {
-        dbg = (1 << 0),
-        dbgact = (1 << 1),
-        dbganim = (1 << 2),
-        dbgdev = (1 << 3),
-        fpslock60 = (1 << 4),
-        fpslock120 = (1 << 5),
-        fpslock144 = (1 << 6),
-        fpslock240 = (1 << 7),
-        nofpslock = (1 << 8),
-        dbgbullet = (1 << 9),
+        verboselog = (1 << 0),
+        fpslock60 = (1 << 1),
+        fpslock120 = (1 << 2),
+        fpslock144 = (1 << 3),
+        fpslock240 = (1 << 4),
+        nofpslock = (1 << 5),
+        dbgbullet = (1 << 6),
+        genbump = (1 << 7),
+        dev = (1 << 8),
     };
 
     void Initialize(

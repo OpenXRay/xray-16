@@ -87,6 +87,8 @@ public:
     void set_arrow(float value); // 0..1
     void show_static(bool status, u8 number = 1);
 
+    shared_str m_hint_description_base;
+
 }; // class ui_actor_state_item
 
 #endif // UI_ACTOR_STATE_INFO_H_INCLUDED

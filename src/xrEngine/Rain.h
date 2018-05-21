@@ -90,6 +90,9 @@ public:
 
     void Render();
     void OnFrame();
+
+    void StopAmbient();
+    void SetInvalidateState();
 };
 
 #endif // RainH

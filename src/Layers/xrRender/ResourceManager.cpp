@@ -425,6 +425,7 @@ void CResourceManager::_DumpMemoryUsage()
     }
 
     // dump
+    if (Core.ParamFlags.test(Core.verboselog))
     {
         xr_multimap<u32, std::pair<u32, shared_str>>::iterator I = mtex.begin();
         xr_multimap<u32, std::pair<u32, shared_str>>::iterator E = mtex.end();

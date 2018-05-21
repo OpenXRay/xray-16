@@ -448,7 +448,7 @@ void CCustomZone::UpdateWorkload(u32 dt)
 
     if (Level().CurrentEntity())
     {
-        Fvector P = Device.vCameraPosition;
+        Fvector P = Level().CurrentControlEntity()->Position();
         P.y -= 0.9f;
         float radius = 1.0f;
         CalcDistanceTo(P, m_fDistanceToCurEntity, radius);
@@ -527,9 +527,9 @@ void CCustomZone::shedule_Update(u32 dt)
         inherited::shedule_Update(dt);
 
         // check "fast-mode" border
-        float cam_distance = Device.vCameraPosition.distance_to(P) - s.R;
+        float act_distance = Level().CurrentControlEntity()->Position().distance_to(P) - s.R;
 
-        if (cam_distance > FASTMODE_DISTANCE && !m_zone_flags.test(eAlwaysFastmode))
+        if (act_distance > FASTMODE_DISTANCE && !m_zone_flags.test(eAlwaysFastmode))
             o_switch_2_slow();
         else
             o_switch_2_fast();
