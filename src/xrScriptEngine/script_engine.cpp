@@ -1141,6 +1141,10 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
 {
     if (!xr_strlen(function_to_call))
         return false;
+
+    if (Core.ParamFlags.test(Core.verboselog))
+        Msg("lua func call: %s", function_to_call);
+
     string256 name_space, function;
     parse_script_namespace(function_to_call, name_space, sizeof(name_space), function, sizeof(function));
     if (xr_strcmp(name_space, GlobalNamespace))

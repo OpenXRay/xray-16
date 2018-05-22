@@ -16,15 +16,13 @@
 extern bool shared_str_initialized;
 
 #ifdef __BORLANDC__
-#   include "d3d9.h"
-#   include "d3dx9.h"
-#   include "D3DX_Wrapper.h"
-#   pragma comment(lib, "EToolsB.lib")
-#   define USE_BUG_TRAP
+#include "d3d9.h"
+#include "d3dx9.h"
+#include "D3DX_Wrapper.h"
+#pragma comment(lib, "EToolsB.lib")
+#define USE_BUG_TRAP
 #else
-#   ifndef COC_EDITION
-#       define USE_BUG_TRAP
-#   endif
+#define USE_BUG_TRAP
 static BOOL bException = FALSE;
 #endif
 
@@ -41,7 +39,7 @@ static BOOL bException = FALSE;
 #include <errorrep.h> // ReportFault
 #pragma comment(lib, "FaultRep.lib")
 
-#if defined(DEBUG) || defined(COC_EDITION)
+#if defined(DEBUG)
 #define USE_OWN_ERROR_MESSAGE_WINDOW
 #else
 #define USE_OWN_MINI_DUMP
@@ -360,17 +358,17 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #endif
     if (OnCrash)
         OnCrash();
-#ifndef COC_DEBUG_BEHAVIOUR
+//#ifndef COC_DEBUG_BEHAVIOUR
     if (OnDialog)
         OnDialog(true);
-#endif
+//#endif
     FlushLog();
-
+    /*
 #ifdef COC_DEBUG_BEHAVIOUR
     while (ShowCursor(true) < 0);
     ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
 #endif
-
+    */
     if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     else
@@ -412,17 +410,16 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         DEBUG_BREAK;
 #endif
     }
-#ifndef COC_DEBUG_BEHAVIOUR
     if (OnDialog)
         OnDialog(false);
-#endif
 
     lock.Leave();
-
+    /*
 #ifdef COC_EDITION
     if (needTerminate)
         TerminateProcess(GetCurrentProcess(), 1);
 #endif
+    */
 }
 
 void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
@@ -578,8 +575,7 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
 #endif
 #endif
     BT_SetDumpType(minidumpFlags);
-    //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
-    BT_SetSupportEMail("openxray@yahoo.com");
+    BT_SetSupportEMail("openxraycoc@gmail.com");
 }
 #endif // USE_BUG_TRAP
 
