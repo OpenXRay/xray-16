@@ -19,6 +19,7 @@ char* timestamp(string64& dest)
     * the operating system is queried to obtain the default value
     * for the variable.
     */
+#if defined(WINDOWS)
     _tzset();
     u32 it;
 
@@ -35,5 +36,6 @@ char* timestamp(string64& dest)
         if (':' == temp[it])
             temp[it] = '-';
     xr_strcat(dest, sizeof(dest), temp);
+#endif
     return dest;
 }

@@ -19,6 +19,7 @@ unsgined int query_processor_info(processor_info* pinfo)
 
 #undef _CPUID_DEBUG
 
+#if defined(WINDOWS)
 DWORD countSetBits(ULONG_PTR bitMask)
 {
     DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
@@ -34,11 +35,13 @@ DWORD countSetBits(ULONG_PTR bitMask)
 
     return bitSetCount;
 }
+#endif
 
 unsigned int query_processor_info(processor_info* pinfo)
 {
     ZeroMemory(pinfo, sizeof(processor_info));
 
+#if defined(WINDOWS)
     std::bitset<32> f_1_ECX;
     std::bitset<32> f_1_EDX;
     /*std::bitset<32> f_7_EBX;
@@ -166,6 +169,7 @@ unsigned int query_processor_info(processor_info* pinfo)
     pinfo->n_threads = logicalProcessorCount;
     pinfo->affinity_mask = pa_mask_save;
     pinfo->n_cores = processorCoreCount;
+#endif
 
     return pinfo->features;
 }

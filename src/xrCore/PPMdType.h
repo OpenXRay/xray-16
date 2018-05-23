@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 
+#if defined(WINDOWS)
 #define _WIN32_ENVIRONMENT_
 //#define _DOS32_ENVIRONMENT_
 //#define _POSIX_ENVIRONMENT_
@@ -24,17 +25,18 @@ defined(_UNKNOWN_ENVIRONMENT_) != \
           \                                                                                                                     \
           \ \                                                                                                                              \
           != 1 */
-
+#endif
 #if defined(_WIN32_ENVIRONMENT_)
 #include <windows.h>
 #else /* _DOS32_ENVIRONMENT_ || _POSIX_ENVIRONMENT_ || _UNKNOWN_ENVIRONMENT_ */
-typedef int BOOL;
-#define FALSE 0
-#define TRUE 1
-typedef unsigned char BYTE;
-typedef unsigned short WORD;
-typedef unsigned long DWORD;
-typedef unsigned int UINT;
+#include "stdafx.h"
+//typedef int BOOL;
+//#define FALSE 0
+//#define TRUE 1
+//typedef unsigned char BYTE;
+//typedef unsigned short WORD;
+//typedef unsigned long DWORD;
+//typedef unsigned int UINT;
 #endif /* defined(_WIN32_ENVIRONMENT_)  */
 
 const DWORD PPMdSignature = 0x84ACAF8F, Variant = 'I';
