@@ -30,20 +30,18 @@ install:
 build_script:
 - git submodule update --init --recursive
 - if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[Win32] (
-    SET PATH=C:\MinGW\bin;%PATH% &&
     MKDIR bin &&
     cmake .. &&
     make
   )
 - if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[x64] (
-    SET PATH=C:\mingw64\bin;%PATH% &&
     MKDIR bin &&
     cmake .. &&
-    make &&
+    make
   )
 - if [%tbs_tools%]==[msvc] (
     msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-    )
+  )
 test: off
 artifacts:
 - path: res/xdOpenXRay.Dx86.7z
