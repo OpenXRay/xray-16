@@ -30,13 +30,17 @@ install:
 build_script:
 - git submodule update --init --recursive
 - if [%tbs_tools%]==[mingw] (
-    SET PATH=C:\MinGW\bin;%PATH% &&
+    ECHO '%cd%' &&
+    ECHO '*** Building %tbs_tools%\%tbs_arch%' &&
+    SET "PATH=C:\MinGW\bin;%PATH%" &&
     MKDIR bin &&
     CD bin &&
     cmake .. -G "MinGW Makefiles"&&
     mingw32-make
   )
 - if [%tbs_tools%]==[msvc] (
+    ECHO '%cd%' &&
+    ECHO '*** Building %tbs_tools%\%tbs_arch%\%tbs_config%' &&
     msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   )
 test: off
