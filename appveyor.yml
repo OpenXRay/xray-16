@@ -32,7 +32,10 @@ build_script:
 - if [%tbs_tools%]==[mingw] (
     ECHO '%cd%' &&
     ECHO '*** Building %tbs_tools%\%tbs_arch%' &&
+    ECHO %PATH%
     SET "PATH=C:\mingw\bin;C:\mingw\msys\1.0\bin;%PATH%" &&
+    SET PATH=%PATH:C:\Program Files\Git\usr\bin=%
+    ECHO %PATH%
     MKDIR bin &&
     CD bin &&
     cmake .. -G "MinGW Makefiles"&&
