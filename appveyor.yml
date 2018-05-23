@@ -29,10 +29,9 @@ install:
     }
 build_script:
 - git submodule update --init --recursive
+- ECHO %PATH%
 - if [%tbs_tools%]==[mingw] (
-    ECHO %PATH%  &&
     SET "PATH=C:\mingw\bin;%PATH%" &&
-    ECHO %PATH% &&
     MKDIR bin &&
     CD bin &&
     cmake .. -G "MinGW Makefiles"&&
