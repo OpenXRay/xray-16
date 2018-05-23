@@ -31,11 +31,13 @@ build_script:
 - git submodule update --init --recursive
 - if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[Win32] (
     MKDIR bin &&
+    CD bin &&
     cmake .. &&
     make
   )
 - if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[x64] (
     MKDIR bin &&
+    CD bin &&
     cmake .. &&
     make
   )
