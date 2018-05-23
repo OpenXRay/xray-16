@@ -20,6 +20,7 @@
 #include "xrCore/Threading/Lock.hpp"
 #if defined(LINUX)
 #include "xrstring.h"
+#include <glob.h>
 #endif
 
 const u32 BIG_FILE_READER_WINDOW_SIZE = 1024 * 1024;
@@ -606,14 +607,33 @@ bool CLocatorAPI::Recurse(pcstr path)
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, "*.*");
     _finddata_t findData;
+#ifdef WINDOWS
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
         return false;
+#elif defined(LINUX)
+    glob_t globbuf;
+
+    globbuf.gl_offs = 256;
+    int result = glob(scanPath, GLOB_NOSORT, NULL, &globbuf);
+
+    if(0 != result)
+        return false;
+
+    intptr_t handle = globbuf.gl_pathc - 1;
+#endif
+
     rec_files.reserve(256);
     size_t oldSize = rec_files.size();
     intptr_t done = handle;
     while (done != -1)
     {
+#if defined(LINUX)
+    	xr_strcpy(findData.name, sizeof globbuf.gl_pathv[handle - done], globbuf.gl_pathv[handle - done]);
+        struct stat fi;
+        stat(findData.name, &fi);
+        findData.size = fi.st_size;
+#endif
         string1024 fullPath;
         bool ignore = false;
         if (m_Flags.test(flNeedCheck))
@@ -628,9 +648,17 @@ bool CLocatorAPI::Recurse(pcstr path)
         }
         if (!ignore)
             rec_files.push_back(findData);
+#ifdef WINDOWS
         done = _findnext(handle, &findData);
+#elif defined(LINUX)
+        done--;
+#endif
     }
+#ifdef WINDOWS
     _findclose(handle);
+#elif defined(LINUX)
+    globfree(&globbuf);
+#endif
     size_t newSize = rec_files.size();
     if (newSize > oldSize)
     {
@@ -642,6 +670,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     // insert self
     if (path && path[0] != 0)
         Register(path, 0xffffffff, 0, 0, 0, 0, 0);
+
     return true;
 }
 
