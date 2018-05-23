@@ -39,7 +39,7 @@ static BOOL bException = FALSE;
 #include <errorrep.h> // ReportFault
 #pragma comment(lib, "FaultRep.lib")
 
-#if defined(DEBUG)
+#if defined(DEBUG) || defined(COC_DEBUG)
 #define USE_OWN_ERROR_MESSAGE_WINDOW
 #else
 #define USE_OWN_MINI_DUMP
@@ -358,37 +358,28 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #endif
     if (OnCrash)
         OnCrash();
-//#ifndef COC_DEBUG_BEHAVIOUR
     if (OnDialog)
         OnDialog(true);
-//#endif
+
     FlushLog();
-    /*
-#ifdef COC_DEBUG_BEHAVIOUR
+
     while (ShowCursor(true) < 0);
     ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
-#endif
-    */
+
     if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-#ifdef COC_DEBUG_BEHAVIOUR
         int result = MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal error",
                                 MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
-#else
-        int result = MessageBox(NULL, assertionInfo, "Fatal error",
-            MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
-#endif
         switch (result)
         {
         case IDCANCEL:
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
-            if (IsDebuggerPresent())
-                DEBUG_BREAK;
+            DEBUG_BREAK;
 
             needTerminate = true;
             break;
@@ -399,8 +390,7 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
             ignoreAlways = true;
             break;
         default:
-            if (IsDebuggerPresent())
-                DEBUG_BREAK;
+            DEBUG_BREAK;
             break;
         }
 #else // !USE_OWN_ERROR_MESSAGE_WINDOW
@@ -414,12 +404,11 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         OnDialog(false);
 
     lock.Leave();
-    /*
-#ifdef COC_EDITION
+
+#if defined(DEBUG) || defined(COC_DEBUG)
     if (needTerminate)
         TerminateProcess(GetCurrentProcess(), 1);
 #endif
-    */
 }
 
 void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
