@@ -23,7 +23,7 @@ environment:
     tbs_config: Release
 install:
 - ps: >-
-    if($env:tbs_tools -eq 'mingw' -and $env:tbs_arch -eq 'x64') {
+    if($env:tbs_tools -eq 'mingw' -and $env:tbs_arch -eq 'x64xDISABLE') {
      invoke 'curl' '-L -o mw64.7z "http://libgd.blob.core.windows.net/mingw/x86_64-4.9.1-release-posix-seh-rt_v3-rev1.7z"';
      invoke '7z' 'x -oC:\ mw64.7z';
     }
@@ -32,13 +32,13 @@ build_script:
 - if [%tbs_tools%]==[mingw] (
     ECHO '%cd%' &&
     ECHO '*** Building %tbs_tools%\%tbs_arch%' &&
-    SET "PATH=C:\MinGW\bin;%PATH%" &&
+    SET "PATH=C:\mingw\bin;C:\mingw\msys\1.0\bin;%PATH%" &&
     MKDIR bin &&
     CD bin &&
     cmake .. -G "MinGW Makefiles"&&
     mingw32-make
   )
-- if [%tbs_tools%]==[msvc] (
+- if [%tbs_tools%]==[msvcDISABLE] (
     ECHO '%cd%' &&
     ECHO '*** Building %tbs_tools%\%tbs_arch%\%tbs_config%' &&
     msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
