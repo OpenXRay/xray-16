@@ -3,7 +3,6 @@
 #include "xrCore/_cylinder.h"
 #include <ode/common.h>
 
-XRPHYSICS_API const float phInfinity = dInfinity;
 /*
 #include "MathUtils.h"
 enum EBoxSideNearestPointCode

@@ -555,7 +555,6 @@
     <ClInclude Include="profiler_inline.h">
       <Filter>General\Profiler</Filter>
     </ClInclude>
-    <ClInclude Include="main.h" />
     <ClInclude Include="splash.h">
       <Filter>General</Filter>
     </ClInclude>
@@ -564,6 +563,9 @@
     </ClInclude>
     <ClInclude Include="ShadersExternalData.h">
       <Filter>Render\Visibility</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
