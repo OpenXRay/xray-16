@@ -2,34 +2,60 @@ version: '{build}'
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
-image:
-- Visual Studio 2017
-- Previous Visual Studio 2017
-configuration:
-- Debug
-- Release
-- Mixed
-platform:
-- x64
-- x86
-before_build:
-- cmd: git submodule update --init --recursive
-build:
-  project: src/engine.sln
-  parallel: true
-  verbosity: minimal
-after_build:
-- cmd: xrbuild.cmd
+image: Visual Studio 2017
+environment:
+  matrix:
+  - tbs_arch: Win32
+    tbs_tools: mingw
+  - tbs_arch: x64
+    tbs_tools: mingw
+  - tbs_arch: Win32
+    tbs_tools: msvc
+    tbs_config: Debug
+  - tbs_arch: Win32
+    tbs_tools: msvc
+    tbs_config: Release
+  - tbs_arch: x64
+    tbs_tools: msvc
+    tbs_config: Debug
+  - tbs_arch: x64
+    tbs_tools: msvc
+    tbs_config: Release
+install:
+- ps: >-
+    if($env:tbs_tools -eq 'mingw' -and $env:tbs_arch -eq 'x64') {
+     invoke 'curl' '-L -o mw64.7z "http://libgd.blob.core.windows.net/mingw/x86_64-4.9.1-release-posix-seh-rt_v3-rev1.7z"';
+     invoke '7z' 'x -oC:\ mw64.7z';
+    }
+build_script:
+- git submodule update --init --recursive
+- if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[Win32] (
+    SET PATH=C:\MinGW\bin;%PATH% &&
+    ECHO %cd% &&
+    ECHO *** Building %tbs_tools%\%tbs_arch% &&
+    MKDIR bin &&
+    cmake .. &&
+    make
+  )
+- if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[x64] (
+    SET PATH=C:\mingw64\bin;%PATH% &&
+    ECHO %cd% &&
+    ECHO *** Building %tbs_tools%\%tbs_arch% &&
+    MKDIR bin &&
+    cmake .. &&
+    make &&
+  )
+- if [%tbs_tools%]==[msvc] (
+    ECHO %cd% &&
+    ECHO *** Building %tbs_tools%\%tbs_arch%\%tbs_config% &&
+    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    )
 test: off
 artifacts:
 - path: res/xdOpenXRay.Dx86.7z
   name: xdOpenXRay.Dx86.7z
 - path: res/xdOpenXRay.Dx64.7z
   name: xdOpenXRay.Dx64.7z
-- path: res/xdOpenXRay.Mx86.7z
-  name: xdOpenXRay.Mx86.7z
-- path: res/xdOpenXRay.Mx64.7z
-  name: xdOpenXRay.Mx64.7z
 - path: res/xdOpenXRay.Rx86.7z
   name: xdOpenXRay.Rx86.7z
 - path: res/xdOpenXRay.Rx64.7z
