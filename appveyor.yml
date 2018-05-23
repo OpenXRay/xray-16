@@ -31,9 +31,9 @@ build_script:
 - git submodule update --init --recursive
 - if [%tbs_tools%]==[mingw] (
     ECHO '%cd%' &&
-    ECHO '*** Building %tbs_tools%\%tbs_arch%' &&
+    ECHO '%tbs_tools%\%tbs_arch%' &&
     ECHO %PATH%  &&
-    SET "PATH=C:\mingw\bin;C:\mingw\msys\1.0\bin;%PATH%" &&
+    SET "PATH=C:\mingw\bin;%PATH%" &&
     ECHO %PATH% &&
     MKDIR bin &&
     CD bin &&
