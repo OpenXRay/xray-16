@@ -5,14 +5,14 @@ skip_tags: true
 image: Visual Studio 2017
 environment:
   matrix:
-  - tbs_arch: Win32
+  - tbs_arch: x86
     tbs_tools: mingw
   - tbs_arch: x64
     tbs_tools: mingw
-  - tbs_arch: Win32
+  - tbs_arch: x86
     tbs_tools: msvc
     tbs_config: Debug
-  - tbs_arch: Win32
+  - tbs_arch: x86
     tbs_tools: msvc
     tbs_config: Release
   - tbs_arch: x64
@@ -29,17 +29,12 @@ install:
     }
 build_script:
 - git submodule update --init --recursive
-- if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[Win32] (
+- if [%tbs_tools%]==[mingw] (
+    SET PATH=C:\MinGW\bin;%PATH% &&
     MKDIR bin &&
     CD bin &&
-    cmake .. &&
-    make
-  )
-- if [%tbs_tools%]==[mingw] if [%tbs_arch%]==[x64] (
-    MKDIR bin &&
-    CD bin &&
-    cmake .. &&
-    make
+    cmake .. -G "MinGW Makefiles"&&
+    mingw32-make
   )
 - if [%tbs_tools%]==[msvc] (
     msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
