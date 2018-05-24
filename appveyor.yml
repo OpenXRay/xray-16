@@ -37,7 +37,6 @@ build_script:
     SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%"
   )
 - ECHO %PATH%
-#    cmake .. -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -G "MinGW Makefiles" &&
 - if [%tbs_tools%]==[mingw] (
     MKDIR bin &&
     CD bin &&
