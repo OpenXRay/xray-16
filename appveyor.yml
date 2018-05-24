@@ -27,20 +27,21 @@ build_script:
 #- ECHO %PATH%
 - git submodule update --init --recursive
 
-# Add mingw-w64 to PATH
 # Remove sh.exe from the path otherwise CMake will complain:
 # "sh.exe was found in your PATH, here: C:/Program Files/Git/usr/bin/sh.exe"
 # and the MinGW build will not work (the Visual Studio build does not care).
+- SET "PATH=%PATH:C:\Program Files\Git\usr\bin=%"
 
+# Add mingw-w64 to PATH
 - if [%tbs_tools%]==[mingw] (
-    SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%" &&
-    SET "PATH=%PATH:C:\Program Files\Git\usr\bin=%"
+    SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%"
   )
 - ECHO %PATH%
 - if [%tbs_tools%]==[mingw] (
     MKDIR bin &&
     CD bin &&
-    cmake .. -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -G "MinGW Makefiles" &&
+#    cmake .. -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -G "MinGW Makefiles" &&
+    cmake .. -G "MinGW Makefiles" &&
     mingw32-make
   )
 - if [%tbs_tools%]==[msvcDISABLE] (
