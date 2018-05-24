@@ -29,6 +29,7 @@ install:
     }
 build_script:
 - git submodule update --init --recursive
+- C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin\g++ --version
 - ECHO %PATH%
 - if [%tbs_tools%]==[mingw] (
     SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%" &&
