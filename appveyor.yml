@@ -33,12 +33,13 @@ build_script:
 - ECHO %PATH%
 - git submodule update --init --recursive
 - if [%tbs_tools%]==[mingw] (
-    SET "PATH=%PATH:C:\Program Files\Git\usr\bin=%" &&
-    SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%" &&
-    MKDIR bin &&
-    CD bin &&
-    cmake .. -G "MinGW Makefiles"&&
-    mingw32-make
+    - SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%"
+    - SET "PATH=%PATH:C:\Program Files\Git\usr\bin=%"
+    - ECHO %PATH%
+    - MKDIR bin
+    - CD bin
+    - cmake .. -G "MinGW Makefiles"
+    - mingw32-make
   )
 - if [%tbs_tools%]==[msvcDISABLE] (
     ECHO '%cd%' &&
