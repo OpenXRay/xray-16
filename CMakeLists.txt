@@ -4,7 +4,6 @@ project(OpenXRay)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 IF(MINGW)
-SET(CMAKE_MAKE_PROGRAM mingw32-make)
 ENDIF(MINGW)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive --std=c++17")
