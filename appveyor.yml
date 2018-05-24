@@ -21,12 +21,6 @@ environment:
   - tbs_arch: x64
     tbs_tools: msvc
     tbs_config: Release
-install:
-- ps: >-
-    if($env:tbs_tools -eq 'mingw' -and $env:tbs_arch -eq 'x64xDISABLE') {
-     invoke 'curl' '-L -o mw64.7z "http://libgd.blob.core.windows.net/mingw/x86_64-4.9.1-release-posix-seh-rt_v3-rev1.7z"';
-     invoke '7z' 'x -oC:\ mw64.7z';
-    }
 build_script:
 - C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin\mingw32-make --version
 - C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin\g++ --version
