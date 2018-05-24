@@ -698,7 +698,11 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     setup_fs_path(fs_name, fs_path);
 
     string_path full_current_directory;
+#if defined(WINDOWS)
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
+#elif defined(LINUX)
+    realpath(fs_path, full_current_directory);
+#endif
 
     FS_Path* path = new FS_Path(full_current_directory, "", "", "", 0);
 #ifdef DEBUG
