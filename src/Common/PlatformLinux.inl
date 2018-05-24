@@ -238,6 +238,8 @@ inline int _filelength(int fd)
 #undef max
 #define __max(a, b) std::max(a, b)
 #define __min(a, b) std::min(a, b)
+#define _utime utime
+#define _utimbuf utimbuf
 
 #define xr_itoa SDL_itoa
 
