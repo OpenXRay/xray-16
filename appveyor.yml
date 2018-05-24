@@ -40,7 +40,7 @@ build_script:
 - if [%tbs_tools%]==[mingw] (
     MKDIR bin &&
     CD bin &&
-    cmake .. -G "MinGW Makefiles" &&
+     CC=gcc CXX=g++ cmake .. -DCMAKE_MAKE_PROGRAM=mingw32-make -G "MinGW Makefiles" &&
     mingw32-make
   )
 - if [%tbs_tools%]==[msvcDISABLE] (
