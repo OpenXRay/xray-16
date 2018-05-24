@@ -1,5 +1,8 @@
 #ifndef STREAM_READER_INLINE_H
 #define STREAM_READER_INLINE_H
+#ifdef LINUX
+#include <sys/mman.h>
+#endif
 
 IC CStreamReader::CStreamReader() {}
 IC CStreamReader::CStreamReader(const CStreamReader& object)
@@ -19,7 +22,7 @@ IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_map
 #if defined(WINDOWS)
 IC void CStreamReader::unmap() { UnmapViewOfFile(m_current_map_view_of_file); }
 #else
-IC void CStreamReader::unmap() { ; }
+IC void CStreamReader::unmap() { ::munmap(const_cast<u8*>(m_current_map_view_of_file), m_current_window_size); }
 #endif
 IC void CStreamReader::remap(const u32& new_offset)
 {

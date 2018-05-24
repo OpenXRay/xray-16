@@ -520,7 +520,7 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
     ::fstat(hSrcFile, &file_info);
     Size = (int)file_info.st_size;
     R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
-    data = (char*)::mmap(NULL, 0, PROT_READ | PROT_WRITE, MAP_SHARED, hSrcFile, 0);
+    data = (char*)::mmap(NULL, Size, PROT_READ | PROT_WRITE, MAP_SHARED, hSrcFile, 0);
 #endif
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);
@@ -563,7 +563,7 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
     ::fstat(hSrcFile, &file_info);
     Size = (int)file_info.st_size;
     R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
-    data = (char*)::mmap(NULL, 0, PROT_READ, MAP_SHARED, hSrcFile, 0);
+    data = (char*)::mmap(NULL, Size, PROT_READ, MAP_SHARED, hSrcFile, 0);
 #endif
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 

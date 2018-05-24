@@ -44,7 +44,7 @@ void CStreamReader::map(const u32& new_offset)
         (u8*)MapViewOfFile(m_file_mapping_handle, FILE_MAP_READ, 0, start_offset, m_current_window_size);
 #elif defined(LINUX)
     m_current_map_view_of_file =
-        (u8*)mmap(NULL, m_current_window_size, PROT_READ, MAP_SHARED, m_file_mapping_handle, start_offset); // TODO проверить не могу до полной сборки под Linux
+        (u8*)::mmap(NULL, m_current_window_size, PROT_READ, MAP_SHARED, m_file_mapping_handle, start_offset); // TODO проверить не могу до полной сборки под Linux
 #endif
     m_current_pointer = m_current_map_view_of_file;
 
