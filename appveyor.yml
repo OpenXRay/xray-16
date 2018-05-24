@@ -31,7 +31,7 @@ build_script:
 - git submodule update --init --recursive
 - ECHO %PATH%
 - if [%tbs_tools%]==[mingw] (
-    SET "PATH=C:\mingw\bin;C:\mingw\msys\1.0\bin;%PATH%" &&
+    SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%" &&
     SET "PATH=%PATH:C:\Program Files\Git\usr\bin=%" &&
     MKDIR bin &&
     CD bin &&
