@@ -3,7 +3,20 @@
 
 class XRCORE_API Event
 {
+#if defined(WINDOWS)
     void* handle;
+#elif defined(LINUX)
+	struct EventHandle
+	{
+		pthread_mutex_t mutex;
+		pthread_cond_t cond;
+		bool signaled;
+	};
+    pthread_mutex_t handle;
+
+private:
+	EventHandle m_id;
+#endif
 
 public:
     Event() noexcept;
