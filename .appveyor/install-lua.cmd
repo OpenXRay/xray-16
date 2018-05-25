@@ -11,7 +11,7 @@ set VER_53=5.3.3
 set ZIP_51=lua-%VER_51%_Win32_bin.zip
 set ZIP_52=lua-%VER_52%_Win32_bin.zip
 set ZIP_53=lua-%VER_53%_Win32_bin.zip
-set ZIP_51_DEV=lua-%VER_51%_Win32_dll15_lib.zip
+set ZIP_51_DEV=lua-%VER_51%_Win32_dllw4_lib.zip
 
 :cinst
 @echo off
