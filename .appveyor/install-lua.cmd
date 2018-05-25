@@ -24,6 +24,7 @@ if NOT EXIST "C:\Program Files (x86)\Lua\5.1\lua.exe" (
     @echo on
     echo Using cached version of Lua
 )
+refreshenv
 set LUA="C:\Program Files (x86)\Lua\5.1\lua.exe"
 @echo off
 goto :EOF
