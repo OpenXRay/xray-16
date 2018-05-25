@@ -102,7 +102,7 @@ void xrMemory::mem_compact()
         g_pSharedMemoryContainer->clean();
 
 #if defined(WINDOWS)
-if (strstr(Core.Params, "-swap_on_compact"))
+    if (strstr(Core.Params, "-swap_on_compact"))
         SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
 #endif
 }
