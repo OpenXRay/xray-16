@@ -24,8 +24,8 @@ FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f)
     set(nm, f.size, f.time_write, (f.attrib & _A_SUBDIR) ? flSubDir : 0);
 }
 #else
-FS_File::FS_File(const _FINDDATA_T& f) { ; }
-FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f) { ; }
+FS_File::FS_File(const _FINDDATA_T& f) {}
+FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f) {}
 #endif
 
 
