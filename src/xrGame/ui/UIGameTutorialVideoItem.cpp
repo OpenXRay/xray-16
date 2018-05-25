@@ -93,7 +93,7 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
     if (snd_name && snd_name[0])
     {
         m_sound.create(snd_name, st_Effect, sg_Undefined);
-        VERIFY(m_sound._handle());
+        VERIFY(m_sound._handle() || strstr(Core.Params, "-nosound"));
     }
     xml->SetLocalRoot(_stored_root);
 }
