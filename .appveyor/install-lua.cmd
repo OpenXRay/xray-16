@@ -43,7 +43,7 @@ if NOT EXIST "lua51\lua5.1.exe" (
 if NOT EXIST "lua51\lua5.1.lib" (
     @echo on
     echo Fetching Lua_DEV v5.1 from internet
-    curl -fLsS -o %ZIP_51_DEV% http://sourceforge.net/projects/luabinaries/files/%VER_51%/Windows%20Libraries/Dynamic/%ZIP_51_DEV%/download
+    curl -fLsS -o %ZIP_51_DEV% http://sourceforge.net/projects/luabinaries/files/%VER_51%/Windows%%20Libraries/Dynamic/%ZIP_51_DEV%/download
     unzip -d lua51 %ZIP_51_DEV%
 ) else (
     echo Using cached version of Lua_DEV v5.1
