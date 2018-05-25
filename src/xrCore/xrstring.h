@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <locale>
 
 #include "_types.h"
 #include "xrCommon/inlining_macros.h"
@@ -205,8 +206,8 @@ IC void xr_strlwr(shared_str& src)
         int i = 0;
         while(lp[i])
         {
-        	lp[i] = (char) toupper(lp[i]);// TODO rewrite locale-independent toupper_l()
-        	i++;
+            lp[i] = (char) std::toupper(lp[i], std::locale());
+            i++;
         }
 #endif
         src = lp;
