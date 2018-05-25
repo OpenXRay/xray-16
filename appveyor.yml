@@ -22,7 +22,7 @@ environment:
     tbs_tools: msvc
     tbs_config: Release
 install:
-- SET LUAENV=lua51
+- SET LUAENV=cinst
 - cmd: .appveyor\install-lua.cmd
 
 build_script:
