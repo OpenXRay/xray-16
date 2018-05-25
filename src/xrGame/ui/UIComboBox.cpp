@@ -123,18 +123,23 @@ void CUIComboBox::SetCurrentOptValue()
     m_list_box.Clear();
     const xr_token* tok = GetOptToken();
 
-    while (tok->name)
+    if (tok)
     {
-        if (m_disabled.end() == std::find(m_disabled.begin(), m_disabled.end(), tok->id))
+        while (tok->name)
         {
-            AddItem_(tok->name, tok->id);
+            if (m_disabled.end() == std::find(m_disabled.begin(), m_disabled.end(), tok->id))
+            {
+                AddItem_(tok->name, tok->id);
+            }
+            tok++;
         }
-        tok++;
-    }
 
-    LPCSTR cur_val = *CStringTable().translate(GetOptTokenValue());
-    m_text.SetText(cur_val);
-    m_list_box.SetSelectedText(cur_val);
+        LPCSTR cur_val = *CStringTable().translate(GetOptTokenValue());
+        m_text.SetText(cur_val);
+        m_list_box.SetSelectedText(cur_val);
+    }
+    else
+        m_text.SetText("-");
 
     CUIListBoxItem* itm = m_list_box.GetSelectedItem();
     if (itm)

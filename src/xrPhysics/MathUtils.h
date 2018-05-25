@@ -8,7 +8,7 @@
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif
-extern XRPHYSICS_API const float phInfinity;
+constexpr float phInfinity = std::numeric_limits<float>::infinity();
 
 template <class T> struct _quaternion;
 typedef _quaternion<float> Fquaternion;

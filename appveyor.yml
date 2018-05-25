@@ -22,7 +22,7 @@ environment:
     tbs_tools: msvc
     tbs_config: Release
 install:
-- SET LUAENV=cinst
+- SET LUAENV=lua51
 - cmd: .appveyor\install-lua.cmd
 
 build_script:
@@ -54,11 +54,11 @@ build_script:
   )
 test: off
 artifacts:
-- path: res/xdOpenXRay.Dx86.7z
-  name: xdOpenXRay.Dx86.7z
-- path: res/xdOpenXRay.Dx64.7z
-  name: xdOpenXRay.Dx64.7z
-- path: res/xdOpenXRay.Rx86.7z
-  name: xdOpenXRay.Rx86.7z
-- path: res/xdOpenXRay.Rx64.7z
-  name: xdOpenXRay.Rx64.7z
+- path: res/OpenXRay.Dx86.7z
+  name: OpenXRay.Dx86.7z
+- path: res/OpenXRay.Dx64.7z
+  name: OpenXRay.Dx64.7z
+- path: res/OpenXRay.Rx86.7z
+  name: OpenXRay.Rx86.7z
+- path: res/OpenXRay.Rx64.7z
+  name: OpenXRay.Rx64.7z

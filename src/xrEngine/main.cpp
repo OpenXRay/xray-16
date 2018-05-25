@@ -1,7 +1,6 @@
 // Entry point is in xr_3da/entry_point.cpp
 #include "stdafx.h"
 #include "main.h"
-#include "xr_3da/resource.h"
 
 #include <process.h>
 #include <locale.h>
@@ -33,6 +32,7 @@ ENGINE_API string_path g_sLaunchWorkingFolder;
 
 namespace
 {
+bool CheckBenchmark();
 void RunBenchmark(pcstr name);
 }
 
@@ -231,26 +231,8 @@ ENGINE_API int RunApplication()
     InitConsole();
     Engine.External.CreateRendererList();
 
-    pcstr benchName = "-batch_benchmark ";
-    if (strstr(Core.Params, benchName))
-    {
-        u32 sz = xr_strlen(benchName);
-        string64 benchmarkName;
-        sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
-        RunBenchmark(benchmarkName);
+    if (CheckBenchmark())
         return 0;
-    }
-
-    pcstr sashName = "-openautomate ";
-    if (strstr(Core.Params, sashName))
-    {
-        u32 sz = xr_strlen(sashName);
-        string512 sashArg;
-        sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-        g_SASH.Init(sashArg);
-        g_SASH.MainLoop();
-        return 0;
-    }
 
     if (!GEnv.isDedicatedServer)
     {
@@ -295,13 +277,38 @@ ENGINE_API int RunApplication()
 
 namespace
 {
+bool CheckBenchmark()
+{
+    pcstr benchName = "-batch_benchmark ";
+    if (strstr(Core.Params, benchName))
+    {
+        const u32 sz = xr_strlen(benchName);
+        string64 benchmarkName;
+        sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
+        RunBenchmark(benchmarkName);
+        return true;
+    }
+
+    pcstr sashName = "-openautomate ";
+    if (strstr(Core.Params, sashName))
+    {
+        const u32 sz = xr_strlen(sashName);
+        string512 sashArg;
+        sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
+        g_SASH.Init(sashArg);
+        g_SASH.MainLoop();
+        return true;
+    }
+
+    return false;
+}
 void RunBenchmark(pcstr name)
 {
     g_bBenchmark = true;
     string_path cfgPath;
     FS.update_path(cfgPath, "$app_data_root$", name);
     CInifile ini(cfgPath);
-    u32 benchmarkCount = ini.line_count("benchmark");
+    const u32 benchmarkCount = ini.line_count("benchmark");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
         LPCSTR benchmarkName, t;

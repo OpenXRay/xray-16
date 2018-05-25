@@ -18,7 +18,7 @@ cd ..\..\..\
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
-7z a xdOpenXRay.Dx86.7z .\* 
+7z a OpenXRay.Dx86.7z .\* 
 goto :END 
 
 :DX64 
@@ -29,7 +29,7 @@ cd ..\..\..\
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
-7z a xdOpenXRay.Dx64.7z .\* 
+7z a OpenXRay.Dx64.7z .\* 
 goto :END 
 
 :MX86 
@@ -40,7 +40,7 @@ cd ..\..\..\
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
-7z a xdOpenXRay.Mx86.7z .\* 
+7z a OpenXRay.Mx86.7z .\* 
 goto :END 
 
 :MX64 
@@ -51,7 +51,7 @@ cd ..\..\..\
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
-7z a xdOpenXRay.Mx64.7z .\* 
+7z a OpenXRay.Mx64.7z .\* 
 goto :END 
 
 :RX86 
@@ -62,7 +62,7 @@ cd ..\..\..\
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
-7z a xdOpenXRay.Rx86.7z .\* 
+7z a OpenXRay.Rx86.7z .\* 
 goto :END 
 
 :RX64 
@@ -73,7 +73,7 @@ cd ..\..\..\
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
-7z a xdOpenXRay.Rx64.7z .\* 
+7z a OpenXRay.Rx64.7z .\* 
 goto :END 
 
 :END 
