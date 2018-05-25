@@ -389,8 +389,8 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     if (OnDialog)
         OnDialog(true);
     FlushLog();
-    if (Core.PluginMode)
 #if defined(WINDOWS)
+    if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     else
     {
@@ -420,9 +420,10 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         DEBUG_BREAK;
 #endif
     }
+#endif
     if (OnDialog)
         OnDialog(false);
-#endif
+
     lock.Leave();
 }
 
