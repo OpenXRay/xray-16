@@ -1,4 +1,4 @@
-REM https://github.com/bluebird75/luaunit/blob/80e5b37e0f3e0016dcf7dff0004a4d065cd4ee61/.appveyor/install-lua.cmd
+REM based on https://github.com/bluebird75/luaunit/blob/80e5b37e0f3e0016dcf7dff0004a4d065cd4ee61/.appveyor/install-lua.cmd
 REM BSD license: https://github.com/bluebird75/luaunit/blob/7382208f9e7ff433e0bf3feeb1990bcab1de9877/LICENSE.txt
 
 REM This is a batch file to help with setting up the desired Lua environment.
@@ -11,6 +11,7 @@ set VER_53=5.3.3
 set ZIP_51=lua-%VER_51%_Win32_bin.zip
 set ZIP_52=lua-%VER_52%_Win32_bin.zip
 set ZIP_53=lua-%VER_53%_Win32_bin.zip
+set ZIP_51_DEV=lua-%VER_51%_Win32_dll15_lib.zip
 
 :cinst
 @echo off
@@ -38,6 +39,14 @@ if NOT EXIST "lua51\lua5.1.exe" (
     unzip -d lua51 %ZIP_51%
 ) else (
     echo Using cached version of Lua v5.1
+)
+if NOT EXIST "lua51\lua5.1.lib" (
+    @echo on
+    echo Fetching Lua_DEV v5.1 from internet
+    curl -fLsS -o %ZIP_51_DEV% http://sourceforge.net/projects/luabinaries/files/%VER_51%/Windows%20Libraries/Dynamic/%ZIP_51_DEV%/download
+    unzip -d lua51 %ZIP_51_DEV%
+) else (
+    echo Using cached version of Lua_DEV v5.1
 )
 set LUA=lua51\lua5.1.exe
 @echo off
