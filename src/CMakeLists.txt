@@ -22,13 +22,6 @@ add_definitions(
 
 add_compile_options(-std=c++14 -fpermissive)
 
-#find_package(Lua51 REQUIRED)
-#find_package(OpenSSL REQUIRED)
-#find_package(Theora REQUIRED)
-#find_package(OGG REQUIRED)
-#find_package(SDL2 REQUIRED)
-#find_package(LZO REQUIRED)
-
 add_library(tbb SHARED IMPORTED GLOBAL)
 add_library(lzo SHARED IMPORTED GLOBAL)
 add_library(pugixml SHARED IMPORTED GLOBAL)
