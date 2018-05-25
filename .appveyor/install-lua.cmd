@@ -49,7 +49,8 @@ if NOT EXIST "lua51_dev\lua5.1.lib" (
     echo Using cached version of Lua_DEV v5.1
 )
 set LUA=lua51\lua5.1.exe
-set LUA_DEV=%cd%\lua51_dev
+REM set LUA_DEV=%cd%\lua51_dev
+set "PATH=%cd%\lua51_dev;%PATH%"
 @echo off
 goto :EOF
 
