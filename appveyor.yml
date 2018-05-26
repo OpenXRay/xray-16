@@ -54,9 +54,8 @@ build_script:
 
 #create artifacts
 after_build:
-- if [%tbs_tools%]==[msvc] (
-    xrbuild.cmd
-  )
+- cmd: if [%tbs_tools%]==[msvc] xrbuild.cmd
+
 test: off
 artifacts:
 - path: res/OpenXRay.Dx86.7z
