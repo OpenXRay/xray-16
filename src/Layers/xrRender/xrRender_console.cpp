@@ -156,9 +156,6 @@ float ps_r2_ls_dsm_kernel = .7f; // r2-only
 float ps_r2_ls_psm_kernel = .7f; // r2-only
 float ps_r2_ls_ssm_kernel = .7f; // r2-only
 float ps_r2_ls_bloom_threshold = .00001f; // r2-only
-Fvector ps_r2_aa_barier = {.8f, .1f, 0}; // r2-only
-Fvector ps_r2_aa_weight = {.25f, .25f, 0}; // r2-only
-float ps_r2_aa_kernel = .5f; // r2-only
 float ps_r2_mblur = .0f; // .5f
 int ps_r2_GI_depth = 1; // 1..5
 int ps_r2_GI_photons = 16; // 8..64
@@ -809,7 +806,6 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r2_sun", &ps_r2_ls_flags, R2FLAG_SUN);
     CMD3(CCC_Mask, "r2_sun_details", &ps_r2_ls_flags, R2FLAG_SUN_DETAILS);
     CMD3(CCC_Mask, "r2_sun_focus", &ps_r2_ls_flags, R2FLAG_SUN_FOCUS);
-    //CMD3(CCC_Mask, "r2_sun_static", &ps_r2_ls_flags, R2FLAG_SUN_STATIC);
     //CMD3(CCC_Mask, "r2_exp_splitscene", &ps_r2_ls_flags, R2FLAG_EXP_SPLIT_SCENE);
     //CMD3(CCC_Mask, "r2_exp_donttest_uns", &ps_r2_ls_flags, R2FLAG_EXP_DONT_TEST_UNSHADOWED);
     CMD3(CCC_Mask, "r2_exp_donttest_shad", &ps_r2_ls_flags, R2FLAG_EXP_DONT_TEST_SHADOWED);
@@ -830,8 +826,6 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_sun_lumscale_hemi", &ps_r2_sun_lumscale_hemi, 0.0, +3.0);
     CMD4(CCC_Float, "r2_sun_lumscale_amb", &ps_r2_sun_lumscale_amb, 0.0, +3.0);
 
-    CMD3(CCC_Mask, "r2_aa", &ps_r2_ls_flags, R2FLAG_AA);
-    CMD4(CCC_Float, "r2_aa_kernel", &ps_r2_aa_kernel, 0.3f, 0.7f);
     CMD4(CCC_Float, "r2_mblur", &ps_r2_mblur, 0.0f, 1.0f);
 
     CMD3(CCC_Mask, "r2_gi", &ps_r2_ls_flags, R2FLAG_GI);
@@ -861,14 +855,6 @@ void xrRender_initconsole()
     //  CMD4(CCC_Float,     "r2_parallax_range",    &ps_r2_df_parallax_range,   5.0f,   175.0f  );
 
     CMD4(CCC_Float, "r2_slight_fade", &ps_r2_slight_fade, .2f, 1.f);
-
-    tw_min.set(0, 0, 0);
-    tw_max.set(1, 1, 1);
-    CMD4(CCC_Vector3, "r2_aa_break", &ps_r2_aa_barier, tw_min, tw_max);
-
-    tw_min.set(0, 0, 0);
-    tw_max.set(1, 1, 1);
-    CMD4(CCC_Vector3, "r2_aa_weight", &ps_r2_aa_weight, tw_min, tw_max);
 
     // Igor: Depth of field
     tw_min.set(-10000, -10000, 0);

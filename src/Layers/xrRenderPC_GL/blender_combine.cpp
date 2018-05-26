@@ -33,16 +33,7 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 
         C.r_End();
         break;
-    case 1: // aa-edge-detection + AA :)
-        C.r_Pass("stub_notransform_aa_AA", "combine_2_AA", FALSE, FALSE, FALSE);
-        C.r_Sampler_rtf("s_position", r2_RT_P);
-        C.r_Sampler_rtf("s_normal", r2_RT_N);
-        C.r_Sampler_clf("s_image", r2_RT_generic0);
-        C.r_Sampler_clf("s_bloom", r2_RT_bloom1);
-        C.r_Sampler_clf("s_distort", r2_RT_generic1);
-        C.r_End();
-        break;
-    case 2: // non-AA
+    case 1: // non-AA
         //	Can use simpler VS (need only Tex0)
         C.r_Pass("stub_notransform_aa_AA", "combine_2_NAA", FALSE, FALSE, FALSE);
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -52,16 +43,7 @@ void CBlender_combine::Compile(CBlender_Compile& C)
         C.r_Sampler_clf("s_distort", r2_RT_generic1);
         C.r_End();
         break;
-    case 3: // aa-edge-detection + AA :) + DISTORTION
-        C.r_Pass("stub_notransform_aa_AA", "combine_2_AA_D", FALSE, FALSE, FALSE);
-        C.r_Sampler_rtf("s_position", r2_RT_P);
-        C.r_Sampler_rtf("s_normal", r2_RT_N);
-        C.r_Sampler_clf("s_image", r2_RT_generic0);
-        C.r_Sampler_clf("s_bloom", r2_RT_bloom1);
-        C.r_Sampler_clf("s_distort", r2_RT_generic1);
-        C.r_End();
-        break;
-    case 4: // non-AA + DISTORTION
+    case 2: // non-AA + DISTORTION
         //	Can use simpler VS (need only Tex0)
         C.r_Pass("stub_notransform_aa_AA", "combine_2_NAA_D", FALSE, FALSE, FALSE);
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -112,16 +94,7 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 
         C.r_End();
         break;
-    case 1: // aa-edge-detection + AA :)
-        C.r_Pass("stub_notransform_aa_AA", "combine_2_AA", FALSE, FALSE, FALSE);
-        C.r_Sampler_rtf("s_position", r2_RT_P);
-        C.r_Sampler_rtf("s_normal", r2_RT_N);
-        C.r_Sampler_clf("s_image", r2_RT_generic0);
-        C.r_Sampler_clf("s_bloom", r2_RT_bloom1);
-        C.r_Sampler_clf("s_distort", r2_RT_generic1);
-        C.r_End();
-        break;
-    case 2: // non-AA
+    case 1: // non-AA
         //	Can use simpler VS (need only Tex0)
         C.r_Pass("stub_notransform_aa_AA", "combine_2_NAA", FALSE, FALSE, TRUE);
         C.r_Sampler_rtf("s_position", r2_RT_P);
@@ -131,16 +104,7 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_clf("s_distort", r2_RT_generic1);
         C.r_End();
         break;
-    case 3: // aa-edge-detection + AA :) + DISTORTION
-        C.r_Pass("stub_notransform_aa_AA", "combine_2_AA_D", FALSE, FALSE, FALSE);
-        C.r_Sampler_rtf("s_position", r2_RT_P);
-        C.r_Sampler_rtf("s_normal", r2_RT_N);
-        C.r_Sampler_clf("s_image", r2_RT_generic0);
-        C.r_Sampler_clf("s_bloom", r2_RT_bloom1);
-        C.r_Sampler_clf("s_distort", r2_RT_generic1);
-        C.r_End();
-        break;
-    case 4: // non-AA + DISTORTION
+    case 2: // non-AA + DISTORTION
         //	Can use simpler VS (need only Tex0)
         C.r_Pass("stub_notransform_aa_AA", "combine_2_NAA_D", FALSE, FALSE, TRUE);
         C.r_Sampler_rtf("s_position", r2_RT_P);
