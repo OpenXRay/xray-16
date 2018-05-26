@@ -104,7 +104,7 @@ public:
             messages[0].Object->OnPure();
         else
         {
-            for (auto& message : messages)
+            for (const auto& message : messages)
                 if (message.Prio != REG_PRIORITY_INVALID)
                     message.Object->OnPure();
         }
