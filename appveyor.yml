@@ -5,22 +5,22 @@ skip_tags: true
 image: Visual Studio 2017
 environment:
   matrix:
-  - tbs_arch: x86
-    tbs_tools: mingw
-#  - tbs_arch: x64
-#    tbs_tools: mingw
-  - tbs_arch: x86
-    tbs_tools: msvc
-    tbs_config: Debug
-  - tbs_arch: x86
-    tbs_tools: msvc
-    tbs_config: Release
-  - tbs_arch: x64
-    tbs_tools: msvc
-    tbs_config: Debug
-  - tbs_arch: x64
-    tbs_tools: msvc
-    tbs_config: Release
+  - PLATFORM: x86
+    BUILD_SYSTEM: mingw
+#  - PLATFORM: x64
+#    BUILD_SYSTEM: mingw
+  - PLATFORM: x86
+    BUILD_SYSTEM: msvc
+    CONFIGURATION: Debug
+  - PLATFORM: x86
+    BUILD_SYSTEM: msvc
+    CONFIGURATION: Release
+  - PLATFORM: x64
+    BUILD_SYSTEM: msvc
+    CONFIGURATION: Debug
+  - PLATFORM: x64
+    BUILD_SYSTEM: msvc
+    CONFIGURATION: Release
 install:
 #- SET LUAENV=lua51
 #- cmd: .appveyor\install-lua.cmd
@@ -36,18 +36,18 @@ build_script:
 - SET "PATH=%PATH:C:\Program Files\Git\usr\bin=%"
 
 # Add mingw-w64 to PATH
-- if [%tbs_tools%]==[mingw] (
+- if [%BUILD_SYSTEM%]==[mingw] (
     SET "PATH=C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%"
   )
 - ECHO %PATH%
-- if [%tbs_tools%]==[mingw] (
+- if [%BUILD_SYSTEM%]==[mingw] (
     MKDIR bin &&
     CD bin &&
     cmake .. -G "MinGW Makefiles" &&
     mingw32-make
   )
-- if [%tbs_tools%]==[msvc] (
-    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- if [%BUILD_SYSTEM%]==[msvc] (
+    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%PLATFORM% /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   )
 
 #create artifacts
