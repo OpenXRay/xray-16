@@ -1,0 +1,12 @@
+#include "common.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+half4 	main	( v_shadow_direct I )	: COLOR
+{
+#ifdef	USE_HWSMAP
+	return 0;
+#else
+	return I.depth;
+#endif
+}

@@ -1,0 +1,141 @@
+--------------------------------------------------------------------------------
+Running performance on file test\p2B_deffer_impl_flat_d.ps
+-------------------- NV40 --------------------
+Target: GeForce 6800 Ultra (NV40) :: Unified Compiler: v65.04
+IPU0 ------ Simplified schedule: --------
+
+Pass |  Unit  |  uOp |  PC:  Op
+-----+--------+------+-------------------------
+   1 |   SCT0 |  div |   0:  TEXh h0, f[TEX0], TEX1;
+     |    TEX |  tex |   0:  TEXh h0, f[TEX0], TEX1;
+     |   SCB0 |  dp4 |   1:  DP4h h1.x, h0, const.xxxx;
+     |   SCB1 |  nop |   1:  DP4h h1.x, h0, const.xxxx;
+     |        |      |
+   2 | SCT0/1 |  div |   3:  DIVh h1, h0, h1;
+     |   SCB1 |  mul |   4:  MOVh h6.w, const.---x;
+     |        |      |
+   3 |   SCT0 |  div |   6:  TEXh h0.yzw, f[TEX5], TEX6;
+     |    TEX |  tex |   6:  TEXh h0.yzw, f[TEX5], TEX6;
+     |   SCB0 |  add |   7:  ADDh h2.xyz, h0.wzy-, const.xxx-;
+     |        |      |
+   4 |   SCT0 |  div |   9:  TEXh h0.yzw, f[TEX5], TEX7;
+     |    TEX |  tex |   9:  TEXh h0.yzw, f[TEX5], TEX7;
+     |   SCB0 |  add |  10:  ADDh h0.xyz, h0.wzy-, const.xxx-;
+     |        |      |
+   5 |   SCT0 |  mul |  12:  MULh h0.xyz, h0, h1.yyy-;
+     |   SCB0 |  mad |  13:  MADh h4.xyz, h2, h1.xxx-, h0;
+     |        |      |
+   6 |   SCT0 |  div |  14:  TEXh h0.yzw, f[TEX5], TEX9;
+     |    TEX |  tex |  14:  TEXh h0.yzw, f[TEX5], TEX9;
+     |   SCB0 |  add |  15:  ADDh h2.xyz, h0.wzy-, const.xxx-;
+     |        |      |
+   7 |   SCT0 |  div |  17:  TEXh h0.yzw, f[TEX5], TEX8;
+     |    TEX |  tex |  17:  TEXh h0.yzw, f[TEX5], TEX8;
+     |   SCB0 |  add |  18:  ADDh h3.xyz, h0.wzy-, const.xxx-;
+     |   SCB1 |  mul |  20:  MOVh h0.w, const;
+     |        |      |
+   8 |   SCT0 |  mul |  22:  MADh h3.xyz, h3, h1.zzz-, h4;
+     |   SCB0 |  mad |  22:  MADh h3.xyz, h3, h1.zzz-, h4;
+     |        |      |
+   9 |   SCT0 |  div |  23:  TEXh h0.xyz, f[TEX5], TEX3;
+     |    TEX |  tex |  23:  TEXh h0.xyz, f[TEX5], TEX3;
+     |   SCB0 |  mad |  24:  MADh h2.xyz, h2, h1.www-, h3;
+     |        |      |
+  10 |   SCT0 |  div |  25:  TEXh h3.xyz, f[TEX5], TEX2;
+     |    TEX |  tex |  25:  TEXh h3.xyz, f[TEX5], TEX2;
+     |   SCB0 |  mul |  26:  MULh h0.xyz, h0, h1.yyy-;
+     |        |      |
+  11 | SCT0/1 |  div |  27:  MOVr r3.xzw, f[TEX2].x-yz;
+     |   SCB0 |  mad |  29:  MADh h3.xyz, h3, h1.xxx-, h0;
+     |   SCB1 |  mul |  28:  MULh/2 h2.w, h2.---z, r3;
+     |        |      |
+  12 |   SCT0 |  div |  30:  TEXh h0.xyz, f[TEX5], TEX4;
+     |    TEX |  tex |  30:  TEXh h0.xyz, f[TEX5], TEX4;
+     |   SCB0 |  mad |  31:  MADh h1.xyz, h0, h1.zzz-, h3;
+     |        |      |
+  13 |   SCT0 |  mul |  32:  MULh h3.xyz, h2, const.xxy-;
+     |   SCB1 |  mul |  34:  MULr r3.w, h2.---x, r3.---x;
+     |        |      |
+  14 |   SCT0 |  div |  35:  TEXh h0.xyz, f[TEX5], TEX5;
+     |    TEX |  tex |  35:  TEXh h0.xyz, f[TEX5], TEX5;
+     |   SCB0 |  mad |  36:  MADh h0.xyz, h0, h1.www-, h1;
+     |        |      |
+  15 |   SCT0 |  div |  37:  DP3h h4.y, f[TEX3], h3;
+     |   SCB0 |  dp3 |  37:  DP3h h4.y, f[TEX3], h3;
+     |   SCB1 |  mad |  38:  MADr h3.w, r3.---z, h2.---y, r3;
+     |        |      |
+  16 |   SCT0 |  div |  39:  DP3h h4.z, f[TEX4], h3;
+     |   SCB0 |  dp3 |  39:  DP3h h4.z, f[TEX4], h3;
+     |        |      |
+  17 |   SCT0 |  div |  40:  TEXh h1, f[TEX0], TEX0;
+     |    TEX |  tex |  40:  TEXh h1, f[TEX0], TEX0;
+     |   SCB0 |  add |  41:  ADDh h4.x, h2.w---, h3.w---;
+     |   SCB1 |  mul |  42:  MOVh h4.w, h1;
+     |        |      |
+  18 |   SCT1 |  mov |  43:  NRMh h4.xyz, h4;
+     |    SRB |  nrm |  43:  NRMh h4.xyz, h4;
+     |   SCB0 |  mul |  44:  MULh*2 h6.xyz, h1, h0;
+     |        |      |
+  19 |   SCT0 |  div |  45:  MADh h0.xyz, h4, const.xxx-, f[TEX1];
+     |   SCB0 |  mad |  45:  MADh h0.xyz, h4, const.xxx-, f[TEX1];
+
+Pass   SCT  TEX  SCB
+   1:  50% 100% 100%
+   2: 100%   0%  25%
+   3:  50% 100%  75%
+   4:  50% 100%  75%
+   5:  75%   0%  75%
+   6:  50% 100%  75%
+   7:  50% 100% 100%
+   8:  75%   0%  75%
+   9:  50% 100%  75%
+  10:  50% 100%  75%
+  11:  75%   0% 100%
+  12:  50% 100%  75%
+  13:  75%   0%  25%
+  14:  50% 100%  75%
+  15:  75%   0%  75%
+  16:  75%   0%  75%
+  17:  50% 100%  50%
+  18:   0%   0%  75%
+  19:  75%   0%  75%
+  20:   0%   0%   0%
+
+MEAN:  56%  50%  68%
+
+Pass   SCT0  SCT1   TEX  SCB0  SCB1
+   1:  100%    0%  100%  100%  100%
+   2:  100%  100%    0%    0%  100%
+   3:  100%    0%  100%  100%    0%
+   4:  100%    0%  100%  100%    0%
+   5:  100%    0%    0%  100%    0%
+   6:  100%    0%  100%  100%    0%
+   7:  100%    0%  100%  100%  100%
+   8:  100%    0%    0%  100%    0%
+   9:  100%    0%  100%  100%    0%
+  10:  100%    0%  100%  100%    0%
+  11:  100%  100%    0%  100%  100%
+  12:  100%    0%  100%  100%    0%
+  13:  100%    0%    0%    0%  100%
+  14:  100%    0%  100%  100%    0%
+  15:  100%    0%    0%  100%    0%
+  16:  100%    0%    0%  100%    0%
+  17:  100%    0%  100%  100%  100%
+  18:    0%    0%    0%  100%    0%
+  19:  100%    0%    0%  100%    0%
+  20:    0%    0%    0%    0%    0%
+
+MEAN:   90%   10%   50%   85%   30%
+Cycles: 20.00 :: R Regs Used: 4 :: R Regs Max Index (0 based): 3
+--------------------------------------------------------------------------------
+Running performance on file test\p2b_deffer_impl_flat_d.ps
+-------------------- NV40 --------------------
+Target: GeForce 6800 Ultra (NV40) :: Unified Compiler: v81.95
+Cycles: 19.00 :: R Regs Used: 4 :: R Regs Max Index (0 based): 3
+Pixel throughput (assuming 1 cycle texture lookup) 336.84 MP/s
+--------------------------------------------------------------------------------
+Running performance on file test\p2b_deffer_impl_flat_d.ps
+-------------------- G70 --------------------
+Target: GeForce 7800 GT (G70) :: Unified Compiler: v81.95
+Cycles: 18.00 :: R Regs Used: 4 :: R Regs Max Index (0 based): 3
+Pixel throughput (assuming 1 cycle texture lookup) 533.33 MP/s
