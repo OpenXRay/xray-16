@@ -206,11 +206,13 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
 
+#if RENDER==R_R1
         if (strstr(data, "main_vs_1_1"))
         {
             c_target = "vs_1_1";
             c_entry = "main_vs_1_1";
         }
+#endif
         if (strstr(data, "main_vs_2_0"))
         {
             c_target = "vs_2_0";
@@ -285,8 +287,9 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         data[size] = 0;
 
         // Select target
-        LPCSTR c_target = "ps_2_0";
+        LPCSTR c_target = "ps_3_0";
         LPCSTR c_entry = "main";
+#if RENDER==R_R1
         if (strstr(data, "main_ps_1_1"))
         {
             c_target = "ps_1_1";
@@ -307,6 +310,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
             c_target = "ps_1_4";
             c_entry = "main_ps_1_4";
         }
+#endif
         if (strstr(data, "main_ps_2_0"))
         {
             c_target = "ps_2_0";

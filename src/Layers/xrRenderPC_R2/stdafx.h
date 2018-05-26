@@ -9,6 +9,7 @@
 #include "xrEngine/stdafx.h"
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <D3DCompiler.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"

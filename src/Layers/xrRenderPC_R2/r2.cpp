@@ -702,12 +702,12 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
     if (disasm)
     {
-        ID3DXBuffer* disasm = nullptr;
-        D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
+        ID3DBlob* disasm = nullptr;
+        D3DDisassemble(buffer, buffer_size, FALSE, nullptr, &disasm);
         string_path dname;
         strconcat(sizeof(dname), dname, "disasm\\", file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
         IWriter* W = FS.w_open("$logs$", dname);
-        W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
+        W->w(disasm->GetBufferPointer(), (u32)disasm->GetBufferSize());
         FS.w_close(W);
         _RELEASE(disasm);
     }
@@ -715,11 +715,11 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _result;
 }
 
-class includer : public ID3DXInclude
+class includer : public ID3DInclude
 {
 public:
-    HRESULT __stdcall Open(
-        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+    virtual HRESULT __stdcall Open(
+        D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
         strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
@@ -756,7 +756,7 @@ static inline bool match_shader_id(
 HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags,
     void*& result)
 {
-    D3DXMACRO defines[128];
+    D3D_SHADER_MACRO defines[128];
     int def_it = 0;
     char c_smapsize[32];
     char c_gloss[32];
@@ -1165,14 +1165,14 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
         }
 
         includer Includer;
-        LPD3DXBUFFER pShaderBuf = nullptr;
-        LPD3DXBUFFER pErrorBuf = nullptr;
+        LPD3DBLOB pShaderBuf = nullptr;
+        LPD3DBLOB pErrorBuf = nullptr;
         LPD3DXCONSTANTTABLE pConstants = nullptr;
         LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)&Includer;
+        DWORD compileFlags = Flags | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
-        //_result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
-        _result = D3DXCompileShader((LPCSTR)fs->pointer(), fs->length(), defines, pInclude, pFunctionName, pTarget,
-            Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, &pShaderBuf, &pErrorBuf, &pConstants);
+        _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget, compileFlags, 0,
+            &pShaderBuf, &pErrorBuf);
 
 #if 0
         if (pErrorBuf)

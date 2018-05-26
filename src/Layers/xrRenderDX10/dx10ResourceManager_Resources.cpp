@@ -178,23 +178,8 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         data[size] = 0;
 
         // Select target
-        LPCSTR c_target = "vs_2_0";
+        LPCSTR c_target = "vs_4_0";
         LPCSTR c_entry = "main";
-        if (HW.Caps.geometry_major >= 2)
-            c_target = "vs_2_0";
-        else
-            c_target = "vs_1_1";
-
-        if (strstr(data, "main_vs_1_1"))
-        {
-            c_target = "vs_1_1";
-            c_entry = "main_vs_1_1";
-        }
-        if (strstr(data, "main_vs_2_0"))
-        {
-            c_target = "vs_2_0";
-            c_entry = "main_vs_2_0";
-        }
 
         HRESULT const _hr = GEnv.Render->shader_compile(
             name, file, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
@@ -297,39 +282,10 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
             file = FS.r_open(cname);
         }
         R_ASSERT3(file, "Shader file doesnt exist:", cname);
-        u32 const size = file->length();
-        char* const data = (LPSTR)_alloca(size + 1);
-        CopyMemory(data, file->pointer(), size);
-        data[size] = 0;
 
         // Select target
-        LPCSTR c_target = "ps_2_0";
+        LPCSTR c_target = "ps_4_0";
         LPCSTR c_entry = "main";
-        if (strstr(data, "main_ps_1_1"))
-        {
-            c_target = "ps_1_1";
-            c_entry = "main_ps_1_1";
-        }
-        if (strstr(data, "main_ps_1_2"))
-        {
-            c_target = "ps_1_2";
-            c_entry = "main_ps_1_2";
-        }
-        if (strstr(data, "main_ps_1_3"))
-        {
-            c_target = "ps_1_3";
-            c_entry = "main_ps_1_3";
-        }
-        if (strstr(data, "main_ps_1_4"))
-        {
-            c_target = "ps_1_4";
-            c_entry = "main_ps_1_4";
-        }
-        if (strstr(data, "main_ps_2_0"))
-        {
-            c_target = "ps_2_0";
-            c_entry = "main_ps_2_0";
-        }
 
         HRESULT const _hr = GEnv.Render->shader_compile(
             name, file, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);

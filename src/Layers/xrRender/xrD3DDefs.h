@@ -33,11 +33,11 @@ typedef enum D3D_COMPARISON_FUNC {
 
 typedef IDirect3DVertexShader9 ID3DVertexShader;
 typedef IDirect3DPixelShader9 ID3DPixelShader;
-typedef ID3DXBuffer ID3DBlob;
-typedef D3DXMACRO D3D_SHADER_MACRO;
+//typedef ID3DXBuffer ID3DBlob;
+//typedef D3DXMACRO D3D_SHADER_MACRO;
 typedef IDirect3DQuery9 ID3DQuery;
 typedef D3DVIEWPORT9 D3D_VIEWPORT;
-typedef ID3DXInclude ID3DInclude;
+//typedef ID3DXInclude ID3DInclude;
 typedef IDirect3DTexture9 ID3DTexture2D;
 typedef IDirect3DSurface9 ID3DRenderTargetView;
 typedef IDirect3DSurface9 ID3DDepthStencilView;
