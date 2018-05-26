@@ -19,7 +19,7 @@ build:
   parallel: true
   verbosity: minimal
 after_build:
-- cmd: xrbuild.cmd
+- cmd: xr_pack_build.cmd
 test: off
 artifacts:
 - path: res/OpenXRay.Dx86.7z
