@@ -13,29 +13,29 @@ struct         _input      {
 };
 
 struct        _out                {
-        half4	low	: COLOR0;
-        half4	high	: COLOR1;
+        float4	low	: COLOR0;
+        float4	high	: COLOR1;
 };
 
 _out         main                ( _input I )
 {
         // final tone-mapping
 #ifdef        USE_VTF
-        half          	tm_scale        = I.tc0.w;	// interpolated from VS
+        float          	tm_scale        = I.tc0.w;	// interpolated from VS
 #else
-        half         	tm_scale        = tex2D(s_tonemap,I.tc0).x;
+        float         	tm_scale        = tex2D(s_tonemap,I.tc0).x;
 #endif
 	_out	o;
-	half4	color;
+	float4	color;
 
 	color = tex2D(s_vollight, I.tc0);
 
 	tonemap(o.low, o.high, color, tm_scale );
 
-//	o.low = half4(1,0,0,0);
+//	o.low = float4(1,0,0,0);
 
-//	o.high = half4(0,0,0,0);
-//	o.low = half4(0,0,0,0);
+//	o.high = float4(0,0,0,0);
+//	o.low = float4(0,0,0,0);
 
 	return o;
 }

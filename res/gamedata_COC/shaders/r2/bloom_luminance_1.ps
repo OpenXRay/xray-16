@@ -15,8 +15,8 @@ struct 	v2p
 //////////////////////////////////////////////////////////////////////////////////////////
 #define	LUMINANCE_BASE		0.0001h
 
-half	luminance	(float2	tc)	{
-	half3	source 	= tex2D(s_image,tc);
+float	luminance	(float2	tc)	{
+	float3	source 	= tex2D(s_image,tc);
 	return 	dot		(source, LUMINANCE_VECTOR*def_hdr );
 }
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -25,10 +25,10 @@ half	luminance	(float2	tc)	{
 //	a):	256x256 => 64x64p	with log 
 //	b):	64x64p	=> 8x8p
 //	c):	8x8p	=> 1x1p		with exp
-half4 	main		( v2p I )	: COLOR
+float4 	main		( v2p I )	: COLOR
 {
 	// first 8 bilinear samples (8x4 = 32 pixels)
-	half4 	final;
+	float4 	final;
 		final.x =	luminance(I.tc0);
 		final.y = 	luminance(I.tc1);
 		final.z = 	luminance(I.tc2);

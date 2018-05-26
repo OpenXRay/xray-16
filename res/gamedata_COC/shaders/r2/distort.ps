@@ -10,12 +10,12 @@ uniform sampler2D 	s_distort;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
-half4 	main	( v2p I )	: COLOR
+float4 	main	( v2p I )	: COLOR
 {
-	half2 	distort	= tex2D		(s_distort, I.tc);
-	half2	offset	= (distort.xy-.5h)*def_distort;
-	half3	image 	= tex2D		(s_base,	I.tc + offset);
+	float2 	distort	= tex2D		(s_distort, I.tc);
+	float2	offset	= (distort.xy-.5h)*def_distort;
+	float3	image 	= tex2D		(s_base,	I.tc + offset);
 
 	// out
-	return  half4	(image,1);					// +mov
+	return  float4	(image,1);					// +mov
 }

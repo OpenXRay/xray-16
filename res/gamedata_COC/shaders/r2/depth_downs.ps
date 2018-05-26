@@ -1,6 +1,6 @@
 #include "common.h"
 
-uniform half3x4                        m_v2w                ;
+uniform float3x4                        m_v2w                ;
 uniform	float4		screen_res;
 
 struct	_input
@@ -24,7 +24,7 @@ float4	main(_input I) : COLOR0
 {
         //float4 	P	= tex2D         (s_position,      I.tc0);                // position.(mtl or sun)
 
-	// FIXME: Should add a half-texel offset to I.tc0 here
+	// FIXME: Should add a float-texel offset to I.tc0 here
 	// This would fix horizontal line issue
 	float4 	P0	= tex2D         (s_position,      I.tc0 + 0.5f * screen_res.zw );                // position.(mtl or sun)
 	float4 	P1	= tex2D         (s_position,      I.tc0 - 0.5f * screen_res.zw );                // position.(mtl or sun)

@@ -2,7 +2,7 @@
 #include	"skin.h"
 
 #if defined(USE_PARALLAX) || defined(USE_STEEPPARALLAX)
-	uniform half3x4	    m_invW;
+	uniform float3x4	    m_invW;
 #endif 	//	defined(USE_PARALLAX) || defined(USE_STEEPPARALLAX)
 
 p_bumped	_main	( v_model I )
@@ -18,9 +18,9 @@ p_bumped	_main	( v_model I )
 
 	//  Hemi cube lighting
 	float3	Nw	= mul		((float3x3)m_W, (float3)I.N);
-	half3   hc_pos	= (half3)hemi_cube_pos_faces;
-	half3	hc_neg	= (half3)hemi_cube_neg_faces;
-	half3   hc_mixed= (Nw < 0) ? hc_neg : hc_pos;
+	float3   hc_pos	= (float3)hemi_cube_pos_faces;
+	float3	hc_neg	= (float3)hemi_cube_neg_faces;
+	float3   hc_mixed= (Nw < 0) ? hc_neg : hc_pos;
 	float	hemi_val= dot( hc_mixed, abs(Nw) );
 	hemi_val	= saturate(hemi_val);
 

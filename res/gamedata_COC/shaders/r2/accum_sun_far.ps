@@ -14,15 +14,15 @@ float4 	main		( float2 tc : TEXCOORD0, float4 tcJ : TEXCOORD1 ) : COLOR
 #ifndef	SUN_QUALITY
 #ifdef	USE_HWSMAP
 	#ifdef USE_FETCH4
-		half 	s 	= sunmask(_P)*sample_hw_f4	(PS, float4(0,0,0,0) );
+		float 	s 	= sunmask(_P)*sample_hw_f4	(PS, float4(0,0,0,0) );
 	#else
-		half 	s 	= sunmask(_P)*sample_hw_pcf	(PS, float4(0,0,0,0) );
+		float 	s 	= sunmask(_P)*sample_hw_pcf	(PS, float4(0,0,0,0) );
 	#endif
 #else
-	half 	s 	= sunmask(_P)*sample_sw	(PS.xy / PS.w, float2(0,0), PS.z);
+	float 	s 	= sunmask(_P)*sample_sw	(PS.xy / PS.w, float2(0,0), PS.z);
 #endif
 #else	//	SUN_QUALITY
-	half 	s 	= sunmask(_P);
+	float 	s 	= sunmask(_P);
 	#if SUN_QUALITY==1
 		s 	*= shadow		(PS);
 	#elif SUN_QUALITY==2
@@ -36,14 +36,14 @@ float4 	main		( float2 tc : TEXCOORD0, float4 tcJ : TEXCOORD1 ) : COLOR
 float4 	main		( float2 tc : TEXCOORD0, float4 tcJ : TEXCOORD1 ) : COLOR
 {
   float4 _P		= tex2D 	(s_position, 	tc);
-  half4  _N		= tex2D 	(s_normal,   	tc);
+  float4  _N		= tex2D 	(s_normal,   	tc);
 
 	// ----- light-model
-	half 	m	= xmaterial	;
+	float 	m	= xmaterial	;
 # ifndef USE_R2_STATIC_SUN
 			m 	= _P.w		;
 # endif
-	half4	light 	= plight_infinity (m,_P,_N,Ldynamic_dir);
+	float4	light 	= plight_infinity (m,_P,_N,Ldynamic_dir);
 
 	// ----- shadow
   	float4 	P4 	= float4	(_P.x,_P.y,_P.z,1);
@@ -52,15 +52,15 @@ float4 	main		( float2 tc : TEXCOORD0, float4 tcJ : TEXCOORD1 ) : COLOR
 #ifndef	SUN_QUALITY
 #ifdef	USE_HWSMAP
 	#ifdef USE_FETCH4
-		half 	s 	= sunmask(P4)*sample_hw_f4	(PS, float4(0,0,0,0) );
+		float 	s 	= sunmask(P4)*sample_hw_f4	(PS, float4(0,0,0,0) );
 	#else
-		half 	s 	= sunmask(P4)*sample_hw_pcf	(PS, float4(0,0,0,0) );
+		float 	s 	= sunmask(P4)*sample_hw_pcf	(PS, float4(0,0,0,0) );
 	#endif
 #else
-	half 	s 	= sunmask(P4)*sample_sw	(PS.xy / PS.w, float2(0,0), PS.z);
+	float 	s 	= sunmask(P4)*sample_sw	(PS.xy / PS.w, float2(0,0), PS.z);
 #endif
 #else	//	SUN_QUALITY
-	half 	s 	= sunmask(P4);
+	float 	s 	= sunmask(P4);
 	#if SUN_QUALITY==1
 		s 	*= shadow		(PS);
 	#elif SUN_QUALITY==2

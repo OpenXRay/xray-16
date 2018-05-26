@@ -1,6 +1,6 @@
 #include "common.h"
 
-half4 	main	( half4 C:COLOR0 )	: COLOR
+float4 	main	( float4 C:COLOR0 )	: COLOR
 {
 	return	C;
 }

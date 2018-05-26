@@ -2,7 +2,7 @@
 
 #ifndef	SSAO_QUALITY
 
-half	calc_ssao( half3 P, half3 N, half2 tc, half2 tcJ)
+float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ)
 {
 	return 1.0h;
 }
@@ -12,14 +12,14 @@ half	calc_ssao( half3 P, half3 N, half2 tc, half2 tcJ)
 #if SSAO_QUALITY == 3
 #define RINGS 3
 #define DIRS 8
-static const half rads[4] =
+static const float rads[4] =
 { //I know it will be more focused in the cener, but that's OK
     0.20000f,
 	0.57735f,
 	0.81650f,
 	1.00000f
 };
-static const half angles[9] =
+static const float angles[9] =
 {
 	0.0000f,
 	0.7854f,
@@ -34,14 +34,14 @@ static const half angles[9] =
 #elif SSAO_QUALITY == 2
 #define RINGS  3
 #define DIRS 4
-static const half rads[4] =
+static const float rads[4] =
 { //I know it will be more focused in the cener, but that's OK
     0.20000f,
 	0.57735f,
 	0.81650f,
 	1.00000f
 };
-static const half angles[5] =
+static const float angles[5] =
 {
 	0.0000f,
 	1.5708f,
@@ -52,13 +52,13 @@ static const half angles[5] =
 #elif SSAO_QUALITY == 1
 #define RINGS 2
 #define DIRS 4
-static const half rads[3] =
+static const float rads[3] =
 { //I know it will be more focused in the cener, but that's OK
     0.2000f,
     0.7071f,
 	1.0000f,
 };
-static const half angles[5] =
+static const float angles[5] =
 {
 	0.0000f,
 	1.5708f,
@@ -82,39 +82,39 @@ float3 uv_to_eye(float2 uv, float eye_z)
 //	P	screen space position of the original point
 //	N	screen space normal of the original point
 //	tc	G-buffer coordinates of the original point
-half	calc_ssao( half3 P, half3 N, half2 tc, half2 tcJ)
+float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ)
 {
 	const float ssao_noise_tile_factor = ssao_params.x;
 	const float ssao_kernel_size = ssao_params.y;
 
-	half point_depth = P.z;
+	float point_depth = P.z;
 	if (point_depth<0.01) point_depth = 100000.0h;	//	filter for the sky
-//	half2 	scale 	= half2	(.5f / 1024.h, .5f / 768.h)*100/point_depth;
-//	half2 	scale 	= half2	(.5f / 1024.h, .5f / 768.h)*100/max(point_depth,1.3);
-//	half2 	scale 	= half2	(.5f / 1024.h, .5f / 768.h)*70/point_depth;
-//	half2 	scale 	= half2	(.5f / 1024.h, .5f / 768.h)*150/max(point_depth,1.3);
+//	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h)*100/point_depth;
+//	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h)*100/max(point_depth,1.3);
+//	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h)*70/point_depth;
+//	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h)*150/max(point_depth,1.3);
 //	Looks better but triggers some strange hardware(?) bug.
-	half2 	scale 	= half2	(.5f / 1024.h, .5f / 768.h)*ssao_kernel_size/max(point_depth,1.3);
-//	half2 	scale 	= half2	(.5f / 1024.h, .5f / 768.h)*min( ssao_kernel_size/point_depth , ssao_kernel_size/1.3 );
+	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h)*ssao_kernel_size/max(point_depth,1.3);
+//	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h)*min( ssao_kernel_size/point_depth , ssao_kernel_size/1.3 );
 
 	// sample 
-	half 	occ	= 0.1h;	
-	half num_dir	= 0.1h;
-//	half 	occ	= 1.0h;
-//	half num_dir	= 1.0h;
+	float 	occ	= 0.1h;	
+	float num_dir	= 0.1h;
+//	float 	occ	= 1.0h;
+//	float num_dir	= 1.0h;
 
 ////////////////////////////////
 //	jittering
 
-//	half2	Mirror = tex2D( jitter0, tcJ );
-//	half2	Mirror = half2(1,1);
+//	float2	Mirror = tex2D( jitter0, tcJ );
+//	float2	Mirror = float2(1,1);
 	float3 tc1	= mul( m_v2w, float4(P,1) );
 	tc1 *= ssao_noise_tile_factor;
 //	tc1 *= 2;
 //	tc1 *= 4;
 	tc1.xz += tc1.y;
-	half2	SmallTap = tex2D( jitter0, tc1.xz );
-//	half2	Mirror = tex2D( jitter0, tc1.xz );
+	float2	SmallTap = tex2D( jitter0, tc1.xz );
+//	float2	Mirror = tex2D( jitter0, tc1.xz );
 //	Mirror	= normalize(Mirror);
 
 for (int rad=0; rad < RINGS; rad++)
@@ -132,16 +132,16 @@ for (int rad=0; rad < RINGS; rad++)
 				tap		*= scale;
 				tap		+= tc;
 #ifndef SSAO_OPT_DATA
-		half3	tap_pos	= tex2D	(s_position,tap);
+		float3	tap_pos	= tex2D	(s_position,tap);
 #else // SSAO_OPT_DATA
 		float	z	= tex2Dlod(s_half_depth,float4(tap, 0, 0));
-		half3	tap_pos	= uv_to_eye(tap, z);
+		float3	tap_pos	= uv_to_eye(tap, z);
 #endif // SSAO_OPT_DATA
-		half3 	dir 	= tap_pos-P.xyz;
-		half	dist	= length(dir);
+		float3 	dir 	= tap_pos-P.xyz;
+		float	dist	= length(dir);
 			dir 	= normalize(dir);
-		half 	infl 	= saturate(dot( dir, N.xyz));
-		half 	occ_factor = saturate(dist);
+		float 	infl 	= saturate(dot( dir, N.xyz));
+		float 	occ_factor = saturate(dist);
 
 		{
 //			occ += lerp( 1, occ_factor, infl);

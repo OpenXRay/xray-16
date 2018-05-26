@@ -8,7 +8,7 @@ uniform samplerCUBE 	env_s1		;
 uniform float4 		env_color	;	// color.w  = lerp factor
 uniform float3x4		m_v2w		;
 
-void	hmodel 		(out float3 hdiffuse, out float3 hspecular, float m, float h, float s, float3 point, float3 normal)
+void	hmodel 		(out float3 hdiffuse, out float3 hspecular, float m, float h, float s, float3 point_, float3 normal)
 {
 	// hscale - something like diffuse reflection
 	float3 	nw 	= mul 		(m_v2w,normal);
@@ -18,7 +18,7 @@ void	hmodel 		(out float3 hdiffuse, out float3 hspecular, float m, float h, floa
 #endif
 
 	// reflection vector
-	float3 	v2point	= mul		(m_v2w,normalize(point));
+	float3 	v2point	= mul		(m_v2w,normalize(point_));
 	float3	vreflect= reflect 	(v2point,nw);
 	float 	hspec 	= .5h+.5h*dot	(vreflect,v2point);
 
@@ -38,13 +38,13 @@ void	hmodel 		(out float3 hdiffuse, out float3 hspecular, float m, float h, floa
 	hspecular	= env_s	*light.w 	* s		;
 }
 
-void 	hmodel_table	(out float3 hdiffuse, out float3 hspecular, float m, float h, float s, float3 point, float3 normal)
+void 	hmodel_table	(out float3 hdiffuse, out float3 hspecular, float m, float h, float s, float3 point_, float3 normal)
 {
 	// hscale - something like diffuse reflection
 	float 	hscale 	= h;
 
 	// reflection vector
-	float3 	v2point	= normalize	(point);
+	float3 	v2point	= normalize	(point_);
 	float3	vreflect= reflect 	(v2point,normal);
 	float 	hspec 	= .5h+.5h*dot	(vreflect,v2point);
 
