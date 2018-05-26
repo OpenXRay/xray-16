@@ -61,9 +61,7 @@ u32 GetNVGpuNum()
     }
 
     if (iGpuNum > 1)
-    {
         Msg("* NVidia MGPU: %d-Way SLI detected.", iGpuNum);
-    }
 
     return iGpuNum;
 }
@@ -75,8 +73,8 @@ u32 GetATIGpuNum()
     AGSReturnCode status = agsInit(&ags, &gpuInfo);
     if (status != AGS_SUCCESS)
     {
-        Msg("! AGS: Initialization failed (%d)", status);
-        return 1;
+        Msg("* AGS: Initialization failed (%d)", status);
+        return 0;
     }
     int crossfireGpuCount = 1;
     status = agsGetCrossfireGPUCount(ags, &crossfireGpuCount);
@@ -94,16 +92,14 @@ u32 GetATIGpuNum()
 u32 GetGpuNum()
 {
     u32 res = GetNVGpuNum();
-
     res = _max(res, GetATIGpuNum());
-
-    res = _max(res, 2);
-
     res = _min(res, CHWCaps::MAX_GPUS);
 
-    //	It's vital to have at least one GPU, else
-    //	code will fail.
-    VERIFY(res > 0);
+    if (res == 0)
+    {
+        Log("! Cannot find graphic adapter. Assuming that you have one...");
+        res = 1;
+    }
 
     Msg("* Starting rendering as %d-GPU.", res);
 
