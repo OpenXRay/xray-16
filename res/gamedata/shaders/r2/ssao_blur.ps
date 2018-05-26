@@ -2,7 +2,7 @@ uniform	float4		screen_res;
 uniform	sampler2D	s_occ;
 
 
-half ssao_blur_ps(half2 centerTC)
+float ssao_blur_ps(float2 centerTC)
 {
   // low weight center sample - will be used on edges
    float  fSumWeight = 0.025f;

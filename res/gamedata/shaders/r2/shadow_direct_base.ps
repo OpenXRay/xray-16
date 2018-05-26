@@ -2,7 +2,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
-half4 	main	( v_shadow_direct I )	: COLOR
+float4 	main	( v_shadow_direct I )	: COLOR
 {
 #ifdef	USE_HWSMAP
 	return 0;

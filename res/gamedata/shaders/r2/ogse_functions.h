@@ -35,11 +35,11 @@ uniform float4 ogse_c_rain;			// x - rmap dist, y - flood level, z - wet level, 
 uniform float4 ogse_c_various;		// x - moonroad flag from weather*/
 
 #ifndef SKY_WITH_DEPTH
-half is_sky(float depth)		{return step(depth, SKY_EPS);}
-half is_not_sky(float depth)	{return step(SKY_EPS, depth);}
+float is_sky(float depth)		{return step(depth, SKY_EPS);}
+float is_not_sky(float depth)	{return step(SKY_EPS, depth);}
 #else
-half is_sky(float depth)		{return step(abs(depth - SKY_DEPTH), SKY_EPS);}
-half is_not_sky(float depth)	{return step(SKY_EPS, abs(depth - SKY_DEPTH));}
+float is_sky(float depth)		{return step(abs(depth - SKY_DEPTH), SKY_EPS);}
+float is_not_sky(float depth)	{return step(SKY_EPS, abs(depth - SKY_DEPTH));}
 #endif
 
 float4 proj_to_screen(float4 proj)

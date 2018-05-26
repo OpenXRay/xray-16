@@ -8,10 +8,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 struct	surface_bumped
 {
-	half4	base;
-	half3	normal;
-	half	gloss;
-	half	height;
+	float4	base;
+	float3	normal;
+	float	gloss;
+	float	height;
 
 };
 
@@ -99,7 +99,7 @@ void UpdateTC( inout p_bumped I)
 								 I.M1.y, I.M2.y, I.M3.y,
 								 I.M1.z, I.M2.z, I.M3.z), -I.position.xyz);
 	
-	half	height	= tex2D( s_bumpX, I.tcdh).w;	//
+	float	height	= tex2D( s_bumpX, I.tcdh).w;	//
 			//height  /= 2;
 			//height  *= 0.8;
 			height	= height*(parallax.x) + (parallax.y);	//
@@ -124,8 +124,8 @@ surface_bumped sload_i( p_bumped I)
 
 	UpdateTC(I);	//	All kinds of parallax are applied here.
 
-	half4 	Nu	= tex2D( s_bump, I.tcdh);		// IN:	normal.gloss
-	half4 	NuE	= tex2D( s_bumpX, I.tcdh);	// IN:	normal_error.height
+	float4 	Nu	= tex2D( s_bump, I.tcdh);		// IN:	normal.gloss
+	float4 	NuE	= tex2D( s_bumpX, I.tcdh);	// IN:	normal_error.height
 
 	S.base		= tbase(I.tcdh);				//	IN:  rgb.a
 	S.normal	= Nu.wzy + (NuE.xyz - 1.0h);	//	(Nu.wzyx - .5h) + (E-.5)
@@ -134,18 +134,18 @@ surface_bumped sload_i( p_bumped I)
 
 #ifdef        USE_TDETAIL
 #ifdef        USE_TDETAIL_BUMP
-	half4 NDetail		= tex2D( s_detailBump, I.tcdbump);
-	half4 NDetailX		= tex2D( s_detailBumpX, I.tcdbump);
+	float4 NDetail		= tex2D( s_detailBump, I.tcdbump);
+	float4 NDetailX		= tex2D( s_detailBumpX, I.tcdbump);
 	S.gloss				= S.gloss * NDetail.x * 2;
 	//S.normal			+= NDetail.wzy-.5;
 	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0h; //	(Nu.wzyx - .5h) + (E-.5)
 
-	half4 detail		= tex2D( s_detail, I.tcdbump);
+	float4 detail		= tex2D( s_detail, I.tcdbump);
 	S.base.rgb			= S.base.rgb * detail.rgb * 2;
 
 //	S.base.rgb			= float3(1,0,0);
 #else        //	USE_TDETAIL_BUMP
-	half4 detail		= tex2D( s_detail, I.tcdbump);
+	float4 detail		= tex2D( s_detail, I.tcdbump);
 	S.base.rgb			= S.base.rgb * detail.rgb * 2;
 	S.gloss				= S.gloss * detail.w * 2;
 #endif        //	USE_TDETAIL_BUMP

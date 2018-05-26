@@ -14,20 +14,20 @@ uniform float4              m_lmap        [2]        ;
 float4         main         ( float4 tc : TEXCOORD0, float4 tcJ : TEXCOORD1 ) : COLOR
 {
 	float4 _P               = tex2Dproj         (s_position,         tc);
-	half4  _N               = tex2Dproj         (s_normal,           tc);
+	float4  _N               = tex2Dproj         (s_normal,           tc);
 
-	half 	m	= xmaterial	;
+	float 	m	= xmaterial	;
 # ifndef USE_R2_STATIC_SUN
 			m 	= _P.w		;
 # endif
         // ----- light-model
-      	half        		rsqr;
-        half4        		light   = plight_local         	(m, _P, _N, Ldynamic_pos, Ldynamic_pos.w, rsqr);
+      	float        		rsqr;
+        float4        		light   = plight_local         	(m, _P, _N, Ldynamic_pos, Ldynamic_pos.w, rsqr);
 
         // ----- shadow
-		half4          		P4      = half4                	(_P.x,_P.y,_P.z,1);
+		float4          		P4      = float4                	(_P.x,_P.y,_P.z,1);
         float4         		PS      = mul                	(m_shadow,         P4);
-        half         		s		= 1.h;
+        float         		s		= 1.h;
         #ifdef  USE_SHADOW
                 #ifdef         USE_SJITTER
                   s         = shadowtest        (PS,tcJ);
@@ -37,7 +37,7 @@ float4         main         ( float4 tc : TEXCOORD0, float4 tcJ : TEXCOORD1 ) : 
         #endif
 
         // ----- lightmap
-        half4         lightmap= 1.h;
+        float4         lightmap= 1.h;
         #ifdef        USE_LMAP
                 #ifdef         USE_LMAPXFORM
               			PS.x         		= dot         	(P4, m_lmap[0]);

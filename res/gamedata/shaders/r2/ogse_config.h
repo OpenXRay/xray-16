@@ -159,7 +159,7 @@
 	#define TRANSLUCENT_TORCH_ATT_FACTOR float(0.001231148)		// calculated as 1/(torch_range*torch_range*0.95*0.95)
 	#define TRANSLUCENT_TORCH_COLOR float4(0.6,0.64,0.60,0.8)	// color of torch light
 	#define TRANSLUCENT_TORCH_POSITION float3(0.00,0.0,0)		// position of torch light in view space
-	#define TRANSLUCENT_TORCH_ANGLE_COS float(0.8434)			// cosinus of a half of a torch cone angle
+	#define TRANSLUCENT_TORCH_ANGLE_COS float(0.8434)			// cosinus of a float of a torch cone angle
 
 /////////////////////////////////////////////////////////////
 // Интерактивные детекторы

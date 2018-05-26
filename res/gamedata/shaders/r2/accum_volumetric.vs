@@ -8,8 +8,8 @@ struct vf
 	float4 	hpos		: POSITION;
 	float3 	lightToPos	: TEXCOORD0;		// light center to plane vector
 	float3 	vPos		: TEXCOORD1;		// position in camera space
-	half 	fDensity	: TEXCOORD2;		// plane density alon Z axis
-//	half2	tNoise 		: TEXCOORD3;		// projective noise
+	float 	fDensity	: TEXCOORD2;		// plane density alon Z axis
+//	float2	tNoise 		: TEXCOORD3;		// projective noise
 };
 
 vf main (v_static v)

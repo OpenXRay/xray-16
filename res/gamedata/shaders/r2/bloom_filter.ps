@@ -13,17 +13,17 @@ struct 	v2p
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
-uniform half4 		weight[2];
+uniform float4 		weight[2];
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
 // Separable gauss filter: 	2*7 + 1 + 7*2 = 29 samples
 // Samples:			0-central, -1, -2,..., -7, 1, 2,... 7
 // Approximated i-count:	15t + 15a + 7a(d) + 1(out) = 38, HLSL compiled to 38 :)
-half4 	main		( v2p I )	: COLOR
+float4 	main		( v2p I )	: COLOR
 {
 	// central
-	half4 accum 	=	weight[1].w * tex2D	(s_bloom, I.tc0);
+	float4 accum 	=	weight[1].w * tex2D	(s_bloom, I.tc0);
 
 	// left (7)
 	// right (7) - no swizles on 'texld', so this is dep-read infact

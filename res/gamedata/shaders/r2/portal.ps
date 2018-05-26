@@ -1,14 +1,14 @@
 #include "common.h"
 
-half4 	main	( half4 C:COLOR0 )	: COLOR
+float4 	main	( float4 C:COLOR0 )	: COLOR
 {
-		half4	result;
+		float4	result;
 
 #ifdef        USE_VTF
         result.rgb	= C;
 #else
-		half4	high;
-        half    scale	= tex2D(s_tonemap,half2(.5h,.5h)).x;
+		float4	high;
+        float    scale	= tex2D(s_tonemap,float2(.5h,.5h)).x;
 //		tonemap			(result, high, C, scale*0.9);
 		tonemap			(result, high, C, scale);
 #endif
