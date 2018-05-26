@@ -22,13 +22,12 @@ environment:
     tbs_tools: msvc
     tbs_config: Release
 install:
-- SET LUAENV=lua51
-- cmd: .appveyor\install-lua.cmd
+#- SET LUAENV=lua51
+#- cmd: .appveyor\install-lua.cmd
 
 build_script:
 - C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin\mingw32-make --version
 - C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin\g++ --version
-#- ECHO %PATH%
 - git submodule update --init --recursive
 
 # Remove sh.exe from the path otherwise CMake will complain:
@@ -47,7 +46,7 @@ build_script:
     cmake .. -G "MinGW Makefiles" &&
     mingw32-make
   )
-- if [%tbs_tools%]==[msvcDISABLE] (
+- if [%tbs_tools%]==[msvc] (
     ECHO '%cd%' &&
     ECHO '*** Building %tbs_tools%\%tbs_arch%\%tbs_config%' &&
     msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
