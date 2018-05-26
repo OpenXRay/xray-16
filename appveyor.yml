@@ -47,14 +47,13 @@ build_script:
     mingw32-make
   )
 - if [%tbs_tools%]==[msvc] (
-    ECHO '%cd%' &&
-    ECHO '*** Building %tbs_tools%\%tbs_arch%\%tbs_config%' &&
-    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" &&
+    xrbuild.cmd
   )
 
 #create artifacts
-after_build:
-- cmd: if [%tbs_tools%]==[msvc] xrbuild.cmd
+#after_build:
+#- if [%tbs_tools%]==[msvc] xrbuild.cmd
 
 test: off
 artifacts:
