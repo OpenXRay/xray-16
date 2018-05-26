@@ -36,7 +36,6 @@ struct MessageObject
 {
     IPure* Object;
     int Prio;
-    u32 Flags;
 };
 
 template<class T>
@@ -57,12 +56,12 @@ public:
 
     void Clear() { messages.clear(); }
 
-    void Add(T* object, const int priority = REG_PRIORITY_NORMAL, const u32 flags = 0)
+    constexpr void Add(T* object, const int priority = REG_PRIORITY_NORMAL)
     {
-        Add({ object, priority, flags });
+        Add({ object, priority });
     }
 
-    void Add(MessageObject newMessage)
+    void Add(MessageObject&& newMessage)
     {
 #ifdef DEBUG
         VERIFY(newMessage.Object);
@@ -105,7 +104,7 @@ public:
             messages[0].Object->OnPure();
         else
         {
-            for (auto& message : messages)
+            for (const auto& message : messages)
                 if (message.Prio != REG_PRIORITY_INVALID)
                     message.Object->OnPure();
         }

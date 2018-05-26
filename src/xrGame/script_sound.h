@@ -16,6 +16,7 @@ class CScriptSound
 {
     mutable ref_sound m_sound;
     shared_str m_caSoundToPlay;
+    bool m_bIsNoSound = false;
 
     friend class CScriptSoundAction;
 
