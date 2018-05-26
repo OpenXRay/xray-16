@@ -50,6 +50,7 @@ build_script:
     ECHO '%cd%' &&
     ECHO '*** Building %tbs_tools%\%tbs_arch%\%tbs_config%' &&
     msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    xrbuild.cmd
   )
 test: off
 artifacts:
