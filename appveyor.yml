@@ -7,8 +7,8 @@ environment:
   matrix:
   - tbs_arch: x86
     tbs_tools: mingw
-  - tbs_arch: x64
-    tbs_tools: mingw
+#  - tbs_arch: x64
+#    tbs_tools: mingw
   - tbs_arch: x86
     tbs_tools: msvc
     tbs_config: Debug
@@ -49,7 +49,12 @@ build_script:
 - if [%tbs_tools%]==[msvc] (
     ECHO '%cd%' &&
     ECHO '*** Building %tbs_tools%\%tbs_arch%\%tbs_config%' &&
-    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" &&
+    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%tbs_arch% /p:Configuration=%tbs_config% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  )
+
+#create artifacts
+after_build:
+- if [%tbs_tools%]==[msvc] (
     xrbuild.cmd
   )
 test: off
