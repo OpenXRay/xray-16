@@ -229,10 +229,7 @@ void CEngineAPI::CreateRendererList()
     hRenderR2 = XRay::LoadModule("xrRender_R2");
     hRenderR3 = XRay::LoadModule("xrRender_R3");
     hRenderR4 = XRay::LoadModule("xrRender_R4");
-
-    const bool allowOGL = !!strstr(Core.Params, "-gl");
-    if (allowOGL)
-        hRenderRGL = XRay::LoadModule("xrRender_GL");
+    hRenderRGL = XRay::LoadModule("xrRender_GL");
 
     // Restore error handling
     SetErrorMode(0);
@@ -266,7 +263,7 @@ void CEngineAPI::CreateRendererList()
             hRenderR4->close();
     }
 
-    if (allowOGL && hRenderRGL->exist())
+    if (hRenderRGL->exist())
     {
         if (GEnv.CheckRGL && GEnv.CheckRGL())
             modes.emplace_back(xr_token("renderer_gl", 6));
@@ -276,7 +273,7 @@ void CEngineAPI::CreateRendererList()
     modes.emplace_back(xr_token(nullptr, -1));
 
     Msg("Available render modes[%d]:", modes.size());
-    for (auto& mode : modes)
+    for (const auto& mode : modes)
         if (mode.name)
             Log(mode.name);
 
