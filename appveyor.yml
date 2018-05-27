@@ -52,7 +52,7 @@ build_script:
 
 #create artifacts
 after_build:
-- xrbuild.cmd
+- xr_pack_build.cmd
 
 test: off
 artifacts:
