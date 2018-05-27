@@ -197,7 +197,9 @@ void CreateLog(BOOL nl)
         IWriter* f = FS.w_open(logFName);
         if (f == NULL)
         {
+#if defined(WINDOWS)
             MessageBox(NULL, "Can't create log file.", "Error", MB_ICONERROR);
+#endif
             abort();
         }
         FS.w_close(f);

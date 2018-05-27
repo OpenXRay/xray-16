@@ -22,9 +22,9 @@ void* ModuleHandle::open(pcstr moduleName)
         close();
     
     Log("Loading DLL:", moduleName);
-
+#if defined(WINDOWS)
     handle = ::LoadLibrary(moduleName);
-
+#endif
     if (handle == nullptr)
         Msg("! Failed to load DLL: %d", GetLastError());
 
@@ -35,8 +35,9 @@ void ModuleHandle::close()
 {
     if (dontUnload)
         return;
-
+#if defined(WINDOWS)
     FreeLibrary(static_cast<HMODULE>(handle));
+#endif
     handle = nullptr;
 }
 
@@ -52,6 +53,8 @@ void* ModuleHandle::operator()() const
 
 void* ModuleHandle::getProcAddress(pcstr procName) const
 {
+#if defined(WINDOWS)
     return GetProcAddress(static_cast<HMODULE>(handle), procName);
+#endif
 }
 }

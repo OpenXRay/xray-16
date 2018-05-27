@@ -58,6 +58,14 @@ IC int xr_sprintf(char* dest, size_t sizeOfBuffer, const char* format, ...)
 }
 #endif // _EDITOR
 
+#if defined(LINUX)
+IC int vsnprintf_s( char *buffer, size_t size, size_t count, const char *format, va_list list)
+{
+	//TODO add bound check
+	return vsnprintf(buffer, size, format, list);
+}
+#endif
+
 // generic
 template <class T>
 IC T _min(T a, T b)
@@ -79,10 +87,11 @@ IC bool _valid(const float x) noexcept
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
+#if defined(WINDOWS)
     int cls = _fpclass(double(x));
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
-
+#endif
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
     _FPCLASS_NZ Negative zero ( – 0)
@@ -97,10 +106,11 @@ IC bool _valid(const double x)
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
+#if defined(WINDOWS)
     int cls = _fpclass(x);
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
-
+#endif
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
     _FPCLASS_NZ Negative zero ( – 0)

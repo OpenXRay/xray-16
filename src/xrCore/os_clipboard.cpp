@@ -12,6 +12,7 @@
 
 void os_clipboard::copy_to_clipboard(LPCSTR buf)
 {
+#if defined(WINDOWS)
     if (!OpenClipboard(0))
         return;
     u32 handle_size = (xr_strlen(buf) + 1) * sizeof(char);
@@ -28,13 +29,14 @@ void os_clipboard::copy_to_clipboard(LPCSTR buf)
     EmptyClipboard();
     SetClipboardData(CF_TEXT, handle);
     CloseClipboard();
+#endif
 }
 
 void os_clipboard::paste_from_clipboard(LPSTR buffer, u32 const& buffer_size)
 {
     VERIFY(buffer);
     VERIFY(buffer_size > 0);
-
+#if defined(WINDOWS)
     if (!OpenClipboard(0))
         return;
 
@@ -56,10 +58,12 @@ void os_clipboard::paste_from_clipboard(LPSTR buffer, u32 const& buffer_size)
 
     GlobalUnlock(hmem);
     CloseClipboard();
+#endif
 }
 
 void os_clipboard::update_clipboard(LPCSTR string)
 {
+#if defined(WINDOWS)
     if (!OpenClipboard(0))
         return;
 
@@ -89,4 +93,5 @@ void os_clipboard::update_clipboard(LPCSTR string)
 #ifdef _EDITOR
     xr_free(buffer);
 #endif // #ifdef _EDITOR
+#endif
 }

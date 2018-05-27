@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "stream_reader.h"
 #include "xrCore/_std_extensions.h"
+#ifdef LINUX
+#include <sys/mman.h>
+#endif
 
 void CStreamReader::construct(const HANDLE& file_mapping_handle, const u32& start_offset, const u32& file_size,
     const u32& archive_size, const u32& window_size)
@@ -36,8 +39,13 @@ void CStreamReader::map(const u32& new_offset)
         end_offset = m_archive_size;
 
     m_current_window_size = end_offset - start_offset;
+#if defined(WINDOWS)
     m_current_map_view_of_file =
         (u8*)MapViewOfFile(m_file_mapping_handle, FILE_MAP_READ, 0, start_offset, m_current_window_size);
+#elif defined(LINUX)
+    m_current_map_view_of_file =
+        (u8*)::mmap(NULL, m_current_window_size, PROT_READ, MAP_SHARED, m_file_mapping_handle, start_offset); // TODO проверить не могу до полной сборки под Linux
+#endif
     m_current_pointer = m_current_map_view_of_file;
 
     u32 difference = pure_start_offset - start_offset;

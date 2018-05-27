@@ -1,12 +1,11 @@
 //----------------------------------------------------
 // file: FileSystem.cpp
 //----------------------------------------------------
-
 #include "stdafx.h"
 #pragma hdrstop
 
 #include "FileSystem.h"
-
+#ifdef WINDOWS
 #include <io.h>
 #include <fcntl.h>
 #include <sys\stat.h>
@@ -87,3 +86,4 @@ xr_string EFS_Utils::AppendFolderToName(xr_string& tex_name, int depth, BOOL ful
     tex_name = AppendFolderToName(nm, sizeof(nm), depth, full_name);
     return tex_name;
 }
+#endif

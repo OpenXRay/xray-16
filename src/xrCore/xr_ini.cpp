@@ -6,6 +6,233 @@
 XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;
 
+#if defined(LINUX)
+#include <stdint.h>
+#define MSVCRT_EINVAL	22
+#define MSVCRT_ERANGE	34
+
+#define MSVCRT_UI64_MAX   (((uint64_t)0xffffffff << 32) | 0xffffffff)
+
+/**
+ * from wine@dlls/msvcrt/string.c
+ *
+ * @param fileName
+ * @param readOnly
+ * @return
+ */
+int _cdecl _i64toa_s(int64_t value, char *str, size_t size, int radix)
+{
+    uint64_t val;
+    unsigned int digit;
+    int is_negative;
+    char buffer[65], *pos;
+    size_t len;
+
+    if (!(str != NULL))
+        return MSVCRT_EINVAL;
+    if (!(size > 0))
+        return MSVCRT_EINVAL;
+    if (!(radix >= 2 && radix <= 36))
+    {
+        str[0] = '\0';
+        return MSVCRT_EINVAL;
+    }
+
+    if (value < 0 && radix == 10)
+    {
+        is_negative = 1;
+        val = -value;
+    }
+    else
+    {
+        is_negative = 0;
+        val = value;
+    }
+
+    pos = buffer + 64;
+    *pos = '\0';
+
+    do
+    {
+        digit = val % radix;
+        val /= radix;
+
+        if (digit < 10)
+            *--pos = '0' + digit;
+        else
+            *--pos = 'a' + digit - 10;
+    } while (val != 0);
+
+    if (is_negative)
+        *--pos = '-';
+
+    len = buffer + 65 - pos;
+    if (len > size)
+    {
+        size_t i;
+        char *p = str;
+
+        /* Copy the temporary buffer backwards up to the available number of
+         * characters. Don't copy the negative sign if present. */
+
+        if (is_negative)
+        {
+            p++;
+            size--;
+        }
+
+        for (pos = buffer + 63, i = 0; i < size; i++)
+            *p++ = *pos--;
+
+        str[0] = '\0';
+        return MSVCRT_ERANGE;
+    }
+
+    memcpy(str, pos, len);
+    return 0;
+}
+
+int _cdecl _ui64toa_s(uint64_t value, char *str, size_t size, int radix)
+{
+    char buffer[65], *pos;
+    int digit;
+
+    if (!(str != NULL))
+        return MSVCRT_EINVAL;
+    if (!(size > 0))
+        return MSVCRT_EINVAL;
+    if (!(radix >= 2 && radix <= 36))
+    {
+        str[0] = '\0';
+        return MSVCRT_EINVAL;
+    }
+
+    pos = buffer + 64;
+    *pos = '\0';
+
+    do
+    {
+        digit = value % radix;
+        value /= radix;
+
+        if (digit < 10)
+            *--pos = '0' + digit;
+        else
+            *--pos = 'a' + digit - 10;
+    } while (value != 0);
+
+    if (buffer - pos + 65 > size)
+    {
+        return MSVCRT_EINVAL;
+    }
+
+    memcpy(str, pos, buffer - pos + 65);
+    return 0;
+}
+
+LARGE_INTEGER _cdecl _atoi64(const char *str)
+{
+    ULARGE_INTEGER RunningTotal = 0;
+    char bMinus = 0;
+
+    while (*str == ' ' || (*str >= '\011' && *str <= '\015'))
+    {
+        str++;
+    } /* while */
+
+    if (*str == '+')
+        str++;
+    else if (*str == '-')
+    {
+        bMinus = 1;
+        str++;
+    } /* if */
+
+    while (*str >= '0' && *str <= '9')
+    {
+        RunningTotal = RunningTotal * 10 + *str - '0';
+        str++;
+    } /* while */
+
+    return bMinus ? -RunningTotal : RunningTotal;
+}
+
+uint64_t _cdecl _strtoui64_l(const char *nptr, char **endptr, int base, locale_t locale)
+{
+    BOOL negative = FALSE;
+    uint64_t ret = 0;
+
+    if (!(nptr != NULL))
+        return 0;
+    if (!(base == 0 || base >= 2))
+        return 0;
+    if (!(base <= 36))
+        return 0;
+
+    while (isspace(*nptr))
+        nptr++;
+
+    if (*nptr == '-')
+    {
+        negative = TRUE;
+        nptr++;
+    }
+    else if (*nptr == '+')
+        nptr++;
+
+    if ((base == 0 || base == 16) && *nptr == '0' && tolower(*(nptr + 1)) == 'x')
+    {
+        base = 16;
+        nptr += 2;
+    }
+
+    if (base == 0)
+    {
+        if (*nptr == '0')
+            base = 8;
+        else
+            base = 10;
+    }
+
+    while (*nptr)
+    {
+        char cur = tolower(*nptr);
+        int v;
+
+        if (isdigit(cur))
+        {
+            if (cur >= '0' + base)
+                break;
+            v = *nptr - '0';
+        }
+        else
+        {
+            if (cur < 'a' || cur >= 'a' + base - 10)
+                break;
+            v = cur - 'a' + 10;
+        }
+
+        nptr++;
+
+        if (ret > MSVCRT_UI64_MAX / base || ret * base > MSVCRT_UI64_MAX - v)
+            ret = MSVCRT_UI64_MAX;
+        else
+            ret = ret * base + v;
+    }
+
+    if (endptr)
+        *endptr = (char*) nptr;
+
+    return negative ? -ret : ret;
+}
+
+uint64_t _cdecl _strtoui64(const char *nptr, char **endptr, int base)
+{
+    return _strtoui64_l(nptr, endptr, base, NULL);
+}
+#endif
+
+
 CInifile* CInifile::Create(pcstr fileName, bool readOnly)
 {
     return new CInifile(fileName, readOnly);
