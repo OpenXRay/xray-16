@@ -745,18 +745,18 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
 
     const auto s_script_debugger_module = XRay::LoadModule(CS_LUA_STUDIO_BACKEND_FILE_NAME);
     SetErrorMode(old_error_mode);
-    if (!s_script_debugger_module->exist())
+    if (!s_script_debugger_module->IsLoaded())
     {
         Msg("! cannot load %s dynamic library", CS_LUA_STUDIO_BACKEND_FILE_NAME);
         return;
     }
 
     s_create_world = 
-        (create_world_function_type)s_script_debugger_module->getProcAddress("_cs_lua_studio_backend_create_world@12");
+        (create_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_create_world@12");
     R_ASSERT2(s_create_world, "can't find function \"cs_lua_studio_backend_create_world\"");
 
     s_destroy_world = 
-        (destroy_world_function_type)s_script_debugger_module->getProcAddress("_cs_lua_studio_backend_destroy_world@4");
+        (destroy_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_destroy_world@4");
     R_ASSERT2(s_destroy_world, "can't find function \"cs_lua_studio_backend_destroy_world\" in the library");
 
     engine = new lua_studio_engine();

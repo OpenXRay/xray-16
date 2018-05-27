@@ -8,18 +8,18 @@ ModuleHandle::ModuleHandle(const bool dontUnload) : handle(nullptr), dontUnload(
 
 ModuleHandle::ModuleHandle(pcstr moduleName, bool dontUnload /*= false*/) : handle(nullptr), dontUnload(dontUnload)
 {
-    open(moduleName);
+    Open(moduleName);
 }
 
 ModuleHandle::~ModuleHandle()
 {
-    close();
+    Сlose();
 }
 
-void* ModuleHandle::open(pcstr moduleName)
+void* ModuleHandle::Open(pcstr moduleName)
 {
-    if (exist())
-        close();
+    if (IsLoaded())
+        Сlose();
     
     Log("Loading DLL:", moduleName);
 
@@ -40,7 +40,7 @@ void* ModuleHandle::open(pcstr moduleName)
     return handle;
 }
 
-void ModuleHandle::close()
+void ModuleHandle::Сlose()
 {
     if (dontUnload)
         return;
@@ -65,7 +65,7 @@ void ModuleHandle::close()
     handle = nullptr;
 }
 
-bool ModuleHandle::exist() const
+bool ModuleHandle::IsLoaded() const
 {
     return handle != nullptr;
 }
@@ -75,7 +75,7 @@ void* ModuleHandle::operator()() const
     return handle;
 }
 
-void* ModuleHandle::getProcAddress(pcstr procName) const
+void* ModuleHandle::GetProcAddress(pcstr procName) const
 {
     void* proc = nullptr;
 
