@@ -854,9 +854,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     {
         SGS* sgs_result = (SGS*)result;
 #ifdef USE_DX11
-        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->gs);
+        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->sh);
 #else // #ifdef USE_DX11
-        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, &sgs_result->gs);
+        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, &sgs_result->sh);
 #endif // #ifdef USE_DX11
         if (!SUCCEEDED(_result))
         {

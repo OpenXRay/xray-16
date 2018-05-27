@@ -322,7 +322,7 @@ public:
 #else
     ICF void set_GS(ID3DGeometryShader* _gs, LPCSTR _n = nullptr);
 #endif // USE_OGL
-    ICF void set_GS(ref_gs& _gs) { set_GS(_gs->gs, _gs->cName.c_str()); }
+    ICF void set_GS(ref_gs& _gs) { set_GS(_gs->sh, _gs->cName.c_str()); }
 
 #	ifdef USE_DX11
     ICF void set_HS(ID3D11HullShader* _hs, LPCSTR _n = nullptr);

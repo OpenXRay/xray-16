@@ -370,7 +370,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
         m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
         if (0 == xr_stricmp(name, "null"))
         {
-            _gs->gs = NULL;
+            _gs->sh = NULL;
             return _gs;
         }
 
