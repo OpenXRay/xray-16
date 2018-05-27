@@ -19,7 +19,10 @@ environment:
 #- cmd: .appveyor\install-lua.cmd
 
 build_script:
-- git submodule update --init --recursive
+- if [%BUILDSYSTEM%]==[MSVC] git submodule update --init --recursive
+- if [%BUILDSYSTEM%]==[MinGW] if [%PLATFORM%]==[x86] if [%CONFIGURATION%]==[Debug] (
+    git submodule update --init --recursive
+  )
 
 # Remove sh.exe from the path otherwise CMake will complain:
 # "sh.exe was found in your PATH, here: C:/Program Files/Git/usr/bin/sh.exe"
@@ -30,7 +33,7 @@ build_script:
 - if [%BUILDSYSTEM%]==[MinGW] SET "PATH=C:\MinGW-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\MinGW64\bin;%PATH%"
 
 - ECHO %PATH%
-- if [%BUILDSYSTEM%]==[MinGW] && [%PLATFORM%] = [x86] && [%CONFIGURATION%] = [Debug] (
+- if [%BUILDSYSTEM%]==[MinGW] if [%PLATFORM%]==[x86] if [%CONFIGURATION%]==[Debug] (
     MinGW32-make --version &&
     g++ --version &&
     MKDIR bin &&
@@ -44,7 +47,10 @@ build_script:
 
 #create artifacts
 after_build:
-- xr_pack_build.cmd
+- if [%BUILDSYSTEM%]==[MSVC] xr_pack_build.cmd
+- if [%BUILDSYSTEM%]==[MinGW] if [%PLATFORM%]==[x86] if [%CONFIGURATION%]==[Debug] (
+    xr_pack_build.cmd
+  )
 
 test: off
 artifacts:
