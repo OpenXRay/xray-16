@@ -11,7 +11,7 @@
 Поэтому всё-же стоит переопределять для большинства случаев операторы new и delete.
 А для остального мы будем полагать (и надеяться), что прокси справится без проблем.
 */
-#if defined(WINDOWS) // Не знаю, как это на виндах работает, но на линуксе ломается линковка из-за множественного объявления __TBB_malloc_proxy_helper_object
+#if defined(WINDOWS) // I have not idea how it works on Windows, but Linux build fails with error 'multiple declaration of __TBB_malloc_proxy_helper_object'
 #include "tbb/tbbmalloc_proxy.h"
 #endif
 
