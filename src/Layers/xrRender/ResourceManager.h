@@ -37,6 +37,7 @@ public:
     using map_RT = xr_map<const char*, CRT*, str_pred>;
     //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
+
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     using map_GS = xr_map<const char*, SGS*, str_pred>;
 #endif //	USE_DX10
@@ -59,9 +60,17 @@ private:
     //	DX10 cut map_RTC												m_rtargets_c;
     map_VS m_vs;
     map_PS m_ps;
+
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     map_GS m_gs;
-#endif //	USE_DX10
+#endif
+
+#if defined(USE_DX11)
+    map_DS m_ds;
+    map_HS m_hs;
+    map_CS m_cs;
+#endif
+
     map_TD m_td;
 
     xr_vector<SState*> v_states;
@@ -239,11 +248,7 @@ public:
     void Dump(bool bBrief);
 
 private:
-#ifdef USE_DX11
-    map_DS m_ds;
-    map_HS m_hs;
-    map_CS m_cs;
-
+#if defined(USE_DX10) || defined(USE_DX11)
     template <typename T>
     T& GetShaderMap();
 
@@ -252,8 +257,7 @@ private:
 
     template <typename T>
     void DestroyShader(const T* sh);
-
-#endif //	USE_DX10
+#endif
 };
 
 #endif // ResourceManagerH

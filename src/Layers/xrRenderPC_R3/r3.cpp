@@ -12,6 +12,7 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 #include "D3DX10Core.h"
 
 CRender RImplementation;
@@ -758,8 +759,40 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
+template <typename T>
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+    T*& result, bool const disasm)
+{
+    // XXX: disasm it
+
+    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
+
+    ID3DShaderReflection* pReflection = 0;
+
+#ifdef USE_DX11
+    HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+#else
+    HRESULT const _hr = D3D10ReflectShader(buffer, buffer_size, &pReflection);
+#endif
+
+    if (SUCCEEDED(_hr) && pReflection)
+    {
+        // Parse constant table data
+        result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
+
+        _RELEASE(pReflection);
+    }
+    else
+    {
+        Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+    }
+
+    return _hr;
+}
+
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
+    // XXX: what's going on with casts here???
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
     {
@@ -852,41 +885,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     }
     else if (pTarget[0] == 'g')
     {
-        SGS* sgs_result = (SGS*)result;
-#ifdef USE_DX11
-        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->sh);
-#else // #ifdef USE_DX11
-        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, &sgs_result->sh);
-#endif // #ifdef USE_DX11
-        if (!SUCCEEDED(_result))
-        {
-            Log("! GS: ", file_name);
-            Msg("! CreateGeometryShaderhr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        ID3DShaderReflection* pReflection = 0;
-
-#ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-#else
-        _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
-#endif
-
-        //	Parse constant, texture, sampler binding
-        //	Store input signature blob
-        if (SUCCEEDED(_result) && pReflection)
-        {
-            //	Let constant table parse it's data
-            sgs_result->constants.parse(pReflection, RC_dest_geometry);
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DReflectShader hr == 0x%08x", _result);
-        }
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SGS*&)result, disasm);
     }
     else
     {
