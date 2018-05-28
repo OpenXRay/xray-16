@@ -314,7 +314,7 @@ public:
 #else
     ICF void set_PS(ID3DPixelShader* _ps, LPCSTR _n = nullptr);
 #endif // USE_OGL
-    ICF void set_PS(ref_ps& _ps) { set_PS(_ps->ps, _ps->cName.c_str()); }
+    ICF void set_PS(ref_ps& _ps) { set_PS(_ps->sh, _ps->cName.c_str()); }
 
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 #ifdef USE_OGL

@@ -813,49 +813,18 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
     {
-        SPS* sps_result = (SPS*)result;
-#ifdef USE_DX11
-        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->ps);
-#else // #ifdef USE_DX11
-        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, &sps_result->ps);
-#endif // #ifdef USE_DX11
-        if (!SUCCEEDED(_result))
-        {
-            Log("! PS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        ID3DShaderReflection* pReflection = 0;
-
-#ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-#else
-        _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
-#endif
-
-        //	Parse constant, texture, sampler binding
-        //	Store input signature blob
-        if (SUCCEEDED(_result) && pReflection)
-        {
-            //	Let constant table parse it's data
-            sps_result->constants.parse(pReflection, RC_dest_pixel);
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DReflectShader hr == 0x%08x", _result);
-        }
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
     }
     else if (pTarget[0] == 'v')
     {
+        // XXX: try to use code below
+        // _result = create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+
         SVS* svs_result = (SVS*)result;
 #ifdef USE_DX11
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->sh);
 #else // #ifdef USE_DX11
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->sh);
 #endif // #ifdef USE_DX11
 
         if (!SUCCEEDED(_result))

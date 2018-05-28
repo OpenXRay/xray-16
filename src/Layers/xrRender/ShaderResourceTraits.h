@@ -1,11 +1,114 @@
 #pragma once
 
-#if defined(USE_DX10) || defined(USE_DX11)
-
 #include "ResourceManager.h"
 
 template <typename T>
 struct ShaderTypeTraits;
+
+template <>
+struct ShaderTypeTraits<SVS>
+{
+    typedef CResourceManager::map_VS MapType;
+    typedef ID3DVertexShader DXIface;
+
+    static inline const char* GetShaderExt() { return ".vs"; }
+    static inline const char* GetCompilationTarget()
+    {
+        return "vs_2_0";
+    }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
+    {
+        if (HW.Caps.geometry_major >= 2)
+            target = "vs_2_0";
+        else
+            target = "vs_1_1";
+
+        if (strstr(data, "main_vs_1_1"))
+        {
+            target = "vs_1_1";
+            entry = "main_vs_1_1";
+        }
+
+        if (strstr(data, "main_vs_2_0"))
+        {
+            target = "vs_2_0";
+            entry = "main_vs_2_0";
+        }
+    }
+
+    static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
+    {
+        DXIface* vs = 0;
+#ifdef USE_DX11
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, 0, &vs));
+#elif defined(USE_DX10)
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, &vs));
+#else
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, &vs));
+#endif
+        return vs;
+    }
+
+    static inline u32 GetShaderDest() { return RC_dest_vertex; }
+};
+
+template <>
+struct ShaderTypeTraits<SPS>
+{
+    typedef CResourceManager::map_PS MapType;
+    typedef ID3DPixelShader DXIface;
+
+    static inline const char* GetShaderExt() { return ".ps"; }
+    static inline const char* GetCompilationTarget()
+    {
+        return "ps_2_0";
+    }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
+    {
+        if (strstr(data, "main_ps_1_1"))
+        {
+            target = "ps_1_1";
+            entry = "main_ps_1_1";
+        }
+        if (strstr(data, "main_ps_1_2"))
+        {
+            target = "ps_1_2";
+            entry = "main_ps_1_2";
+        }
+        if (strstr(data, "main_ps_1_3"))
+        {
+            target = "ps_1_3";
+            entry = "main_ps_1_3";
+        }
+        if (strstr(data, "main_ps_1_4"))
+        {
+            target = "ps_1_4";
+            entry = "main_ps_1_4";
+        }
+        if (strstr(data, "main_ps_2_0"))
+        {
+            target = "ps_2_0";
+            entry = "main_ps_2_0";
+        }
+    }
+
+    static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
+    {
+        DXIface* ps = 0;
+#ifdef USE_DX11
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, 0, &ps));
+#elif defined(USE_DX10)
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, &ps));
+#else
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, &ps));
+#endif
+        return ps;
+    }
+
+    static inline u32 GetShaderDest() { return RC_dest_pixel; }
+};
 
 #if defined(USE_DX10) || defined(USE_DX11)
 template <>
@@ -34,6 +137,13 @@ struct ShaderTypeTraits<SGS>
         NODEFAULT;
         return "gs_4_0";
     }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* gs = 0;
@@ -58,6 +168,13 @@ struct ShaderTypeTraits<SHS>
 
     static inline const char* GetShaderExt() { return ".hs"; }
     static inline const char* GetCompilationTarget() { return "hs_5_0"; }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* hs = 0;
@@ -76,6 +193,13 @@ struct ShaderTypeTraits<SDS>
 
     static inline const char* GetShaderExt() { return ".ds"; }
     static inline const char* GetCompilationTarget() { return "ds_5_0"; }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* hs = 0;
@@ -94,6 +218,13 @@ struct ShaderTypeTraits<SCS>
 
     static inline const char* GetShaderExt() { return ".cs"; }
     static inline const char* GetCompilationTarget() { return "cs_5_0"; }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* cs = 0;
@@ -104,6 +235,18 @@ struct ShaderTypeTraits<SCS>
     static inline u32 GetShaderDest() { return RC_dest_compute; }
 };
 #endif
+
+template <>
+inline CResourceManager::map_PS& CResourceManager::GetShaderMap()
+{
+    return m_ps;
+}
+
+template <>
+inline CResourceManager::map_VS& CResourceManager::GetShaderMap()
+{
+    return m_vs;
+}
 
 #if defined(USE_DX10) || defined(USE_DX11)
 template <>
@@ -134,7 +277,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 #endif
 
 template <typename T>
-inline T* CResourceManager::CreateShader(const char* name)
+inline T* CResourceManager::CreateShader(const char* name, const bool searchForEntryAndTarget /*= false*/)
 {
     ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
@@ -167,7 +310,7 @@ inline T* CResourceManager::CreateShader(const char* name)
             ShaderTypeTraits<T>::GetShaderExt());
         FS.update_path(cname, "$game_shaders$", cname);
 
-        // duplicate and zero-terminate
+        // Try to open
         IReader* file = FS.r_open(cname);
         if (!file && strstr(Core.Params, "-lack_of_shaders"))
         {
@@ -180,15 +323,31 @@ inline T* CResourceManager::CreateShader(const char* name)
         }
         R_ASSERT2(file, cname);
 
+        // Duplicate and zero-terminate
+        const auto size = file->length();
+        char* const data = (LPSTR)_alloca(size + 1);
+        CopyMemory(data, file->pointer(), size);
+        data[size] = 0;
+        FS.r_close(file);
+
         // Select target
         LPCSTR c_target = ShaderTypeTraits<T>::GetCompilationTarget();
         LPCSTR c_entry = "main";
+        
+        if (searchForEntryAndTarget)
+            ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
+
+#ifdef USE_OGL
+        DWORD flags = NULL;
+#elif defined(USE_DX10) || defined(USE_DX11)
+        DWORD flags = D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
+#else
+        DWORD flags = D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR;
+#endif
 
         // Compile
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
-            c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)sh);
-
-        FS.r_close(file);
+        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size,
+            c_entry, c_target, flags, (void*&)sh);
 
         VERIFY(SUCCEEDED(_hr));
 
@@ -214,7 +373,5 @@ inline void CResourceManager::DestroyShader(const T* sh)
         sh_map.erase(iterator);
         return;
     }
-    Msg("! ERROR: Failed to find compiled geometry shader '%s'", *sh->cName);
+    Msg("! ERROR: Failed to find compiled shader '%s'", sh->cName.c_str());
 }
-
-#endif
