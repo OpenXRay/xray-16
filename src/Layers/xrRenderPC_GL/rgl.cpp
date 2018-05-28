@@ -14,6 +14,7 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 CRender RImplementation;
 

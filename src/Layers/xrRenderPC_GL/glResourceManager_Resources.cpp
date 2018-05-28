@@ -9,8 +9,8 @@
 #include "../xrRender/tss.h"
 #include "../xrRender/blenders/blender.h"
 #include "../xrRender/blenders/blender_recorder.h"
-
 #include "../xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 void fix_texture_name(LPSTR fn);
 
@@ -242,19 +242,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     return _vs;
 }
 
-void CResourceManager::_DeleteVS(const SVS* vs)
-{
-    if (0 == (vs->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
-    LPSTR N = LPSTR(*vs->cName);
-    map_VS::iterator I = m_vs.find(N);
-    if (I != m_vs.end())
-    {
-        m_vs.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled vertex-shader '%s'", *vs->cName);
-}
-
+void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 //--------------------------------------------------------------------------------------------------------------
 SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
@@ -337,18 +325,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     return _ps;
 }
 
-void CResourceManager::_DeletePS(const SPS* ps)
-{
-    if (0 == (ps->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
-    LPSTR N = LPSTR(*ps->cName);
-    map_PS::iterator I = m_ps.find(N);
-    if (I != m_ps.end())
-    {
-        m_ps.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled pixel-shader '%s'", *ps->cName);
-}
+void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 //--------------------------------------------------------------------------------------------------------------
 SGS* CResourceManager::_CreateGS(LPCSTR name)
@@ -418,18 +395,16 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     return _gs;
 }
 
-void CResourceManager::_DeleteGS(const SGS* gs)
-{
-    if (0 == (gs->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
-    LPSTR N = LPSTR(*gs->cName);
-    map_GS::iterator I = m_gs.find(N);
-    if (I != m_gs.end())
-    {
-        m_gs.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled geometry shader '%s'", *gs->cName);
-}
+void CResourceManager::_DeleteGS(const SGS* gs) { DestroyShader(gs); }
+
+SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
+void CResourceManager::_DeleteHS(const SHS* HS) { DestroyShader(HS); }
+
+SDS* CResourceManager::_CreateDS(LPCSTR Name) { return CreateShader<SDS>(Name); }
+void CResourceManager::_DeleteDS(const SDS* DS) { DestroyShader(DS); }
+
+SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); }
+void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)
 {
