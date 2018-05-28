@@ -13,13 +13,13 @@ ModuleHandle::ModuleHandle(pcstr moduleName, bool dontUnload /*= false*/) : hand
 
 ModuleHandle::~ModuleHandle()
 {
-    Сlose();
+    Close();
 }
 
 void* ModuleHandle::Open(pcstr moduleName)
 {
     if (IsLoaded())
-        Сlose();
+        Close();
     
     Log("Loading DLL:", moduleName);
 
@@ -40,7 +40,7 @@ void* ModuleHandle::Open(pcstr moduleName)
     return handle;
 }
 
-void ModuleHandle::Сlose()
+void ModuleHandle::Close()
 {
     if (dontUnload)
         return;
@@ -49,7 +49,7 @@ void ModuleHandle::Сlose()
 
 #ifdef WINDOWS
     closed = FreeLibrary(static_cast<HMODULE>(handle)) != 0;
-defined(LINUX)
+#elif defined(LINUX)
     closed = dlclose(handle) == 0;
 #endif
 

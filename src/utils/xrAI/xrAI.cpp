@@ -121,8 +121,6 @@ void execute(LPSTR cmd)
 
             CGameSpawnConstructor(name, output, start, !!no_separator_check);
 
-            hFactory->Close();
-
             create_entity = nullptr;
             destroy_entity = nullptr;
         }

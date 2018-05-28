@@ -252,7 +252,7 @@ void CEngineAPI::CreateRendererList()
         if (GEnv.CheckR3 && GEnv.CheckR3())
             modes.emplace_back(xr_token("renderer_r3", 4));
         else
-            hRenderR3->Сlose();
+            hRenderR3->Close();
     }
 
     if (hRenderR4->IsLoaded())
@@ -260,7 +260,7 @@ void CEngineAPI::CreateRendererList()
         if (GEnv.CheckR4 && GEnv.CheckR4())
             modes.emplace_back(xr_token("renderer_r4", 5));
         else
-            hRenderR4->Сlose();
+            hRenderR4->Close();
     }
 
     if (hRenderRGL->IsLoaded())
@@ -268,7 +268,7 @@ void CEngineAPI::CreateRendererList()
         if (GEnv.CheckRGL && GEnv.CheckRGL())
             modes.emplace_back(xr_token("renderer_gl", 6));
         else
-            hRenderRGL->Сlose();
+            hRenderRGL->Close();
     }
     modes.emplace_back(xr_token(nullptr, -1));
 
