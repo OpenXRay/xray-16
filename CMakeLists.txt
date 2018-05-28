@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive --std=c++17")
 
 add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION -DM_NOSTDCONTAINERS_EXT -DUSE_OGL)
 
-set(LUA_INCLUDE_DIR Externals/luajit/src)
+set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 set(LUA_LIBRARIES luajit)
 set(LUA_FOUND 1)
 if (NOT WIN32)
