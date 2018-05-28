@@ -817,6 +817,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     }
     else if (pTarget[0] == 'v')
     {
+        // XXX: try to use code below
+        // _result = create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+
         SVS* svs_result = (SVS*)result;
 #ifdef USE_DX11
         _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->sh);

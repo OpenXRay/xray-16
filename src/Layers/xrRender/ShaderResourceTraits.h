@@ -6,6 +6,54 @@ template <typename T>
 struct ShaderTypeTraits;
 
 template <>
+struct ShaderTypeTraits<SVS>
+{
+    typedef CResourceManager::map_VS MapType;
+    typedef ID3DVertexShader DXIface;
+
+    static inline const char* GetShaderExt() { return ".vs"; }
+    static inline const char* GetCompilationTarget()
+    {
+        return "vs_2_0";
+    }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
+    {
+        if (HW.Caps.geometry_major >= 2)
+            target = "vs_2_0";
+        else
+            target = "vs_1_1";
+
+        if (strstr(data, "main_vs_1_1"))
+        {
+            target = "vs_1_1";
+            entry = "main_vs_1_1";
+        }
+
+        if (strstr(data, "main_vs_2_0"))
+        {
+            target = "vs_2_0";
+            entry = "main_vs_2_0";
+        }
+    }
+
+    static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
+    {
+        DXIface* vs = 0;
+#ifdef USE_DX11
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, 0, &vs));
+#elif defined(USE_DX10)
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, &vs));
+#else
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, &vs));
+#endif
+        return vs;
+    }
+
+    static inline u32 GetShaderDest() { return RC_dest_vertex; }
+};
+
+template <>
 struct ShaderTypeTraits<SPS>
 {
     typedef CResourceManager::map_PS MapType;
@@ -194,6 +242,12 @@ inline CResourceManager::map_PS& CResourceManager::GetShaderMap()
     return m_ps;
 }
 
+template <>
+inline CResourceManager::map_VS& CResourceManager::GetShaderMap()
+{
+    return m_vs;
+}
+
 #if defined(USE_DX10) || defined(USE_DX11)
 template <>
 inline CResourceManager::map_GS& CResourceManager::GetShaderMap()
@@ -256,7 +310,7 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
             ShaderTypeTraits<T>::GetShaderExt());
         FS.update_path(cname, "$game_shaders$", cname);
 
-        // duplicate and zero-terminate
+        // Try to open
         IReader* file = FS.r_open(cname);
         if (!file && strstr(Core.Params, "-lack_of_shaders"))
         {
@@ -269,6 +323,7 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
         }
         R_ASSERT2(file, cname);
 
+        // Duplicate and zero-terminate
         const auto size = file->length();
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);

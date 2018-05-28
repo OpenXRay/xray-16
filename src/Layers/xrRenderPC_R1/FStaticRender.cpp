@@ -758,8 +758,6 @@ template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)
 {
-    // XXX: disasm it
-
     result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
 
     LPCVOID data = nullptr;
@@ -789,27 +787,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     }
     else if (pTarget[0] == 'v')
     {
-        SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->sh);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! VS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        LPCVOID data = nullptr;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            svs_result->constants.parse(pConstants, 0x2);
-        }
-        else
-        {
-            Log("! VS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
     }
     else
     {

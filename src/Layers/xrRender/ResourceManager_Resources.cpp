@@ -157,7 +157,6 @@ void CResourceManager::_DeleteDecl(const SDeclaration* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-#ifndef _EDITOR
 SVS* CResourceManager::_CreateVS(LPCSTR _name)
 {
     string_path name;
@@ -172,86 +171,11 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         xr_strcat(name, "_3");
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
-    LPSTR N = LPSTR(name);
-    map_VS::iterator I = m_vs.find(N);
-    if (I != m_vs.end())
-        return I->second;
-    else
-    {
-        SVS* _vs = new SVS();
-        _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
-        if (0 == xr_stricmp(_name, "null"))
-        {
-            _vs->sh = nullptr;
-            return _vs;
-        }
-
-        string_path cname;
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), _name, ".vs");
-        FS.update_path(cname, "$game_shaders$", cname);
-        //		LPCSTR						target		= NULL;
-
-        IReader* fs = FS.r_open(cname);
-        R_ASSERT3(fs, "shader file doesnt exist", cname);
-
-        // Select target
-        LPCSTR c_target = "vs_2_0";
-        LPCSTR c_entry = "main";
-        if (HW.Caps.geometry_major >= 2)
-            c_target = "vs_2_0";
-        else
-            c_target = "vs_1_1";
-
-        // duplicate and zero-terminate
-        IReader* file = FS.r_open(cname);
-        R_ASSERT2(file, cname);
-        u32 const size = file->length();
-        char* const data = (LPSTR)_alloca(size + 1);
-        CopyMemory(data, file->pointer(), size);
-        data[size] = 0;
-        FS.r_close(file);
-
-        if (strstr(data, "main_vs_1_1"))
-        {
-            c_target = "vs_1_1";
-            c_entry = "main_vs_1_1";
-        }
-        if (strstr(data, "main_vs_2_0"))
-        {
-            c_target = "vs_2_0";
-            c_entry = "main_vs_2_0";
-        }
-
-        Msg("compiling shader %s", name);
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target,
-            D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, (void*&)_vs);
-
-        if (FAILED(_hr))
-        {
-            FlushLog();
-        }
-
-        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
-
-        return _vs;
-    }
+    
+    return CreateShader<SVS>(name, true);
 }
-#endif
 
-void CResourceManager::_DeleteVS(const SVS* vs)
-{
-    if (0 == (vs->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    LPSTR N = LPSTR(*vs->cName);
-    map_VS::iterator I = m_vs.find(N);
-    if (I != m_vs.end())
-    {
-        m_vs.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled vertex-shader '%s'", *vs->cName);
-}
+void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 
 SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, true); }
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
