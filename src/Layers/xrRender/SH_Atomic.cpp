@@ -53,10 +53,11 @@ SVS::~SVS()
 SPS::~SPS()
 {
 #ifdef USE_OGL
-    CHK_GL(glDeleteProgram(ps));
+    CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(ps);
-#endif // USE_OGL
+    _RELEASE(sh);
+#endif
+    
     RImplementation.Resources->_DeletePS(this);
 }
 

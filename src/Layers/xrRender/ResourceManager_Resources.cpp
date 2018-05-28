@@ -267,7 +267,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
         if (0 == xr_stricmp(name, "null"))
         {
-            _ps->ps = nullptr;
+            _ps->sh = nullptr;
             return _ps;
         }
 

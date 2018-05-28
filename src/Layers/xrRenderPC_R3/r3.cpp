@@ -798,9 +798,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     {
         SPS* sps_result = (SPS*)result;
 #ifdef USE_DX11
-        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->ps);
+        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->sh);
 #else // #ifdef USE_DX11
-        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, &sps_result->ps);
+        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, &sps_result->sh);
 #endif // #ifdef USE_DX11
         if (!SUCCEEDED(_result))
         {

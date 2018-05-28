@@ -44,9 +44,9 @@ typedef resptr_core<SVS, resptr_base<SVS>> ref_vs;
 struct ECORE_API SPS : public xr_resource_named
 {
 #ifdef USE_OGL
-    GLuint ps;
+    GLuint sh;
 #else
-    ID3DPixelShader* ps;
+    ID3DPixelShader* sh;
 #endif
     R_constant_table constants;
     ~SPS();

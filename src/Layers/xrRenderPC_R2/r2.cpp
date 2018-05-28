@@ -634,7 +634,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     if (pTarget[0] == 'p')
     {
         SPS* sps_result = (SPS*)result;
-        _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->ps);
+        _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->sh);
         if (!SUCCEEDED(_result))
         {
             Log("! PS: ", file_name);

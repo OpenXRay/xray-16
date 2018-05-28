@@ -128,14 +128,14 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
 #ifdef USE_OGL
         auto &Nvs = map[pass.vs->vs];
         auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
         auto &Nvs = map[&*pass.vs];
         auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Nps = Ngs[pass.ps->sh];
 #else
         auto &Nvs = map[pass.vs->vs];
-        auto &Nps = Nvs[pass.ps->ps];
+        auto &Nps = Nvs[pass.ps->sh];
 #endif
 
 #ifdef USE_DX11
@@ -275,14 +275,14 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 #ifdef USE_OGL
         auto &Nvs = map[pass.vs->vs];
         auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
         auto &Nvs = map[&*pass.vs];
         auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Nps = Ngs[pass.ps->sh];
 #else
         auto &Nvs = map[pass.vs->vs];
-        auto &Nps = Nvs[pass.ps->ps];
+        auto &Nps = Nvs[pass.ps->sh];
 #endif
 
 #ifdef USE_DX11

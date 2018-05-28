@@ -310,8 +310,8 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     FS.r_close(file);
 
     // Select target
-    _ps->ps = glCreateShader(GL_FRAGMENT_SHADER);
-    void* _result = &_ps->ps;
+    _ps->sh = glCreateShader(GL_FRAGMENT_SHADER);
+    void* _result = &_ps->sh;
     HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, nullptr, nullptr, NULL, _result);
 
     VERIFY(SUCCEEDED(_hr));
