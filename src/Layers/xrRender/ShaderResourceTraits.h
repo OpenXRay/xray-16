@@ -34,6 +34,13 @@ struct ShaderTypeTraits<SGS>
         NODEFAULT;
         return "gs_4_0";
     }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* gs = 0;
@@ -58,6 +65,13 @@ struct ShaderTypeTraits<SHS>
 
     static inline const char* GetShaderExt() { return ".hs"; }
     static inline const char* GetCompilationTarget() { return "hs_5_0"; }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* hs = 0;
@@ -76,6 +90,13 @@ struct ShaderTypeTraits<SDS>
 
     static inline const char* GetShaderExt() { return ".ds"; }
     static inline const char* GetCompilationTarget() { return "ds_5_0"; }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* hs = 0;
@@ -94,6 +115,13 @@ struct ShaderTypeTraits<SCS>
 
     static inline const char* GetShaderExt() { return ".cs"; }
     static inline const char* GetCompilationTarget() { return "cs_5_0"; }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
+    {
+        target = GetCompilationTarget();
+        entry = "main";
+    }
+
     static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
     {
         DXIface* cs = 0;
@@ -134,7 +162,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 #endif
 
 template <typename T>
-inline T* CResourceManager::CreateShader(const char* name)
+inline T* CResourceManager::CreateShader(const char* name, const bool searchForEntryAndTarget /*= false*/)
 {
     ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
@@ -180,15 +208,22 @@ inline T* CResourceManager::CreateShader(const char* name)
         }
         R_ASSERT2(file, cname);
 
+        const auto size = file->length();
+        char* const data = (LPSTR)_alloca(size + 1);
+        CopyMemory(data, file->pointer(), size);
+        data[size] = 0;
+        FS.r_close(file);
+
         // Select target
         LPCSTR c_target = ShaderTypeTraits<T>::GetCompilationTarget();
         LPCSTR c_entry = "main";
+        
+        if (searchForEntryAndTarget)
+            ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
         // Compile
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
+        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size,
             c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)sh);
-
-        FS.r_close(file);
 
         VERIFY(SUCCEEDED(_hr));
 
