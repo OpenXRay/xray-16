@@ -14,7 +14,7 @@ public:
     ~ModuleHandle();
 
     void* Open(pcstr moduleName);
-    void Сlose();
+    void Close();
 
     bool IsLoaded() const;
 

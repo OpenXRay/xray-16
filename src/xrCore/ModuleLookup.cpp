@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "ModuleLookup.hpp"
+#ifdef LINUX
+#include <dlfcn.h>
+#endif
 
 namespace XRay
 {
@@ -13,20 +16,20 @@ ModuleHandle::ModuleHandle(pcstr moduleName, bool dontUnload /*= false*/) : hand
 
 ModuleHandle::~ModuleHandle()
 {
-    Сlose();
+    Close();
 }
 
 void* ModuleHandle::Open(pcstr moduleName)
 {
     if (IsLoaded())
-        Сlose();
+        Close();
     
     Log("Loading DLL:", moduleName);
 
 #ifdef WINDOWS
     handle = LoadLibraryA(moduleName);
 #elif defined(LINUX)
-    handle = dlopen(name, RTLD_LAZY);
+    handle = dlopen(moduleName, RTLD_LAZY);
 #endif
     if (handle == nullptr)
     {
@@ -40,7 +43,7 @@ void* ModuleHandle::Open(pcstr moduleName)
     return handle;
 }
 
-void ModuleHandle::Сlose()
+void ModuleHandle::Close()
 {
     if (dontUnload)
         return;
@@ -49,7 +52,7 @@ void ModuleHandle::Сlose()
 
 #ifdef WINDOWS
     closed = FreeLibrary(static_cast<HMODULE>(handle)) != 0;
-defined(LINUX)
+#elif defined(LINUX)
     closed = dlclose(handle) == 0;
 #endif
 
@@ -82,7 +85,7 @@ void* ModuleHandle::GetProcAddress(pcstr procName) const
 #ifdef WINDOWS
     proc = ::GetProcAddress(static_cast<HMODULE>(handle), procName);
 #elif defined(LINUX)
-    proc = dlsym(handle, procedure);
+    proc = dlsym(handle, procName);
 #endif
 
     if (proc == nullptr)

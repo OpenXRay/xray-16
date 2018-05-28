@@ -202,7 +202,7 @@ typedef dirent DirEntryType;
 #define _alloca alloca
 #define _snprintf snprintf
 #define sprintf_s(buffer, buffer_size, stringbuffer, ...) sprintf(buffer, stringbuffer, ##__VA_ARGS__)
-#define GetProcAddress(handle, name) dlsym(handle, name)
+//#define GetProcAddress(handle, name) dlsym(handle, name)
 #define _chdir chdir
 #define _strnicmp strnicmp
 #define strnicmp strncasecmp
@@ -217,6 +217,8 @@ typedef dirent DirEntryType;
 #define _open open
 #define _close close
 #define _sopen open
+#define _utime utime
+#define _utimbuf utimbuf
 #define _sopen_s(handle, filename, ...) open(filename, O_RDONLY)
 inline int _filelength(int fd)
 {
@@ -238,8 +240,6 @@ inline int _filelength(int fd)
 #undef max
 #define __max(a, b) std::max(a, b)
 #define __min(a, b) std::min(a, b)
-#define _utime utime
-#define _utimbuf utimbuf
 
 #define xr_itoa SDL_itoa
 
