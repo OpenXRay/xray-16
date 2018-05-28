@@ -208,20 +208,18 @@ void CEngineAPI::Destroy(void)
 
 void CEngineAPI::CreateRendererList()
 {
+    if (!vid_quality_token.empty())
+        return;
+
     hRenderR1 = XRay::LoadModule("xrRender_R1");
 
-    xr_vector<xr_token> modes;
     if (GEnv.isDedicatedServer)
     {
         R_ASSERT2(hRenderR1->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
-        modes.emplace_back(xr_token("renderer_r1", 0));
-        modes.emplace_back(xr_token(nullptr, -1));
-        vid_quality_token = std::move(modes);
+        vid_quality_token.emplace_back(xr_token("renderer_r1", 0));
+        vid_quality_token.emplace_back(xr_token(nullptr, -1));
         return;
     }
-
-    if (!vid_quality_token.empty())
-        return;
 
     // Hide "d3d10.dll not found" message box for XP
     SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -233,6 +231,8 @@ void CEngineAPI::CreateRendererList()
 
     // Restore error handling
     SetErrorMode(0);
+
+    auto& modes = vid_quality_token;
 
     if (hRenderR1->IsLoaded())
     {
@@ -276,6 +276,4 @@ void CEngineAPI::CreateRendererList()
     for (const auto& mode : modes)
         if (mode.name)
             Log(mode.name);
-
-    vid_quality_token = std::move(modes);
 }
