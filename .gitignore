@@ -1,6 +1,8 @@
-# exclude all dot files except .git files
+# exclude all dot files except .git and travis files
 .*
 !.git*
+!.appveyor*
+!.travis.yml
 
 # exclude binaries and temporary files
 bin/
@@ -8,6 +10,7 @@ bin_plugs/
 intermediate/
 intermediate_plugs/
 lib/
+src/Externals/
 *.aps
 *.user
 *.PVS-Studio.*

@@ -2,33 +2,58 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
+#ifdef WINDOWS
 #include <io.h>
+#else // WINDOWS
+#include <inttypes.h>
+#include <sys/types.h> /* To get time_t. */
+
+#define _A_HIDDEN 0x02
+#define _A_SUBDIR 0x10
+
+#ifndef FILENAME_MAX
+#define FILENAME_MAX (260)
 #endif
+
+#ifdef XR_X64
+#define _finddata_t _finddata64i32_t
+#elif XR_X86
+#define _finddata_t _finddata32_t
+#endif // XR_X64 or XR_X86
+
+typedef int64_t __int64;
+typedef __int64 __time64_t;
+typedef long __time32_t;
+typedef unsigned long _fsize_t;
+
+struct _finddata64i32_t {
+    unsigned attrib;
+    __time64_t time_create;
+    __time64_t time_access;
+    __time64_t time_write;
+    _fsize_t size;
+    char name[FILENAME_MAX];
+};
+
+struct _finddata32_t
+{
+    unsigned attrib;
+    __time32_t time_create;
+    __time32_t time_access;
+    __time32_t time_write;
+    _fsize_t size;
+    char name[FILENAME_MAX];
+};
+
+#endif // WINDOWS
 #pragma warning(pop)
+
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
 //#include "xrCore/Threading/Lock.hpp"
 #include "xrCommon/xr_map.h"
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
-
-#if defined(LINUX)
-#include <stdint.h>
-#define _A_HIDDEN      0x02
-#define _A_SUBDIR 0x00000010
-
-struct _finddata64i32_t {
-  unsigned int      attrib;
-  int64_t time_create;
-  int64_t time_access;
-  int64_t time_write;
-  size_t   size;
-  char              name[260];
-};
-
-#define _finddata_t     _finddata64i32_t
-#endif
 
 class CStreamReader;
 class Lock;

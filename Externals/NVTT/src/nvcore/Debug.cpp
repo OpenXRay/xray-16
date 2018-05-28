@@ -28,6 +28,8 @@
 #endif
 
 #if NV_OS_LINUX && defined(HAVE_EXECINFO_H)
+#	include <sys/types.h>
+#	include <unistd.h> // getpid
 #	include <execinfo.h> // backtrace
 #	if NV_CC_GNUC // defined(HAVE_CXXABI_H)
 #		include <cxxabi.h>

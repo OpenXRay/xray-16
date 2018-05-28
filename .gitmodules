@@ -1,9 +1,11 @@
-[submodule "Externals/LuaJIT"]
-	path = Externals/LuaJIT
-	url = https://github.com/Xottab-DUTY/LuaJIT.git
+[submodule "Externals/luajit"]
+	path = Externals/luajit
+	url = https://github.com/q4a/LuaJIT.git
+	branch = xray
 [submodule "Externals/luabind"]
 	path = Externals/luabind
-	url = https://github.com/Xottab-DUTY/luabind-deboostified.git
+	url = https://github.com/q4a/luabind-deboostified.git
+	branch = xray
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
 	url = https://github.com/nitrocaster/GameSpy.git
@@ -60,7 +62,8 @@
 	url = https://github.com/zeux/pugixml.git
 [submodule "Externals/glew"]
 	path = Externals/glew
-	url = https://github.com/Armada651/glew
+	url = https://github.com/Armada651/glew.git
+	branch = build
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
