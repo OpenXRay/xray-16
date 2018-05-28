@@ -135,7 +135,7 @@ FloatImage * nv::ImageIO::loadFloat(const char * fileName)
 	StdInputStream stream(fileName);
 	
 	if (stream.isError()) {
-		return false;
+		return NULL;
 	}
 	
 	return loadFloat(fileName, stream);
@@ -233,7 +233,7 @@ Image * nv::ImageIO::loadTGA(Stream & s)
 		case TGA_TYPE_INDEXED:
 			if( tga.colormap_type!=1 || tga.colormap_size!=24 || tga.colormap_length>256 ) {
 				nvDebug( "*** ImageIO::loadTGA: Error, only 24bit paletted images are supported.\n" );
-				return false;
+				return NULL;
 			}
 			pal = true;
 			break;
@@ -254,7 +254,7 @@ Image * nv::ImageIO::loadTGA(Stream & s)
 
 		default:
 			nvDebug( "*** ImageIO::loadTGA: Error, unsupported image type.\n" );
-			return false;
+			return NULL;
 	}
 
 	const uint pixel_size = (tga.pixel_size/8);

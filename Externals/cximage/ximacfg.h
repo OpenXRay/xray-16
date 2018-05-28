@@ -1,5 +1,8 @@
 #if !defined(__ximaCFG_h)
 #define __ximaCFG_h
+#if !defined(WIN32)
+#include <cstddef>
+#endif
 
 extern "C" void*	cxalloc(size_t size);
 extern "C" void		cxfree(void* ptr);

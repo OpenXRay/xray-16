@@ -120,7 +120,7 @@ public:
         Tvector kDirection;
         kDirection.set(dir.dotproduct(m_rotate.i), dir.dotproduct(m_rotate.j), dir.dotproduct(m_rotate.k));
 
-        T fT0 = 0.0f, fT1 = type_max(T);
+        T fT0 = 0.0f, fT1 = type_max<T>;
         if (intersect(kOrigin, kDirection, m_halfsize, fT0, fT1))
         {
             bool bPick = false;
