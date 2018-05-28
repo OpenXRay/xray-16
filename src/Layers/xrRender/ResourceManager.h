@@ -40,8 +40,9 @@ public:
 
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     using map_GS = xr_map<const char*, SGS*, str_pred>;
-#endif //	USE_DX10
-#ifdef USE_DX11
+#endif
+
+#if defined(USE_DX11)
     using map_HS = xr_map<const char*, SHS*, str_pred>;
     using map_DS = xr_map<const char*, SDS*, str_pred>;
     using map_CS = xr_map<const char*, SCS*, str_pred>;
@@ -163,7 +164,7 @@ public:
     void _DeleteGS(const SGS* GS);
 #endif //	USE_DX10
 
-#ifdef USE_DX11
+#if defined(USE_DX11)
     SHS* _CreateHS(LPCSTR Name);
     void _DeleteHS(const SHS* HS);
 
@@ -172,7 +173,7 @@ public:
 
     SCS* _CreateCS(LPCSTR Name);
     void _DeleteCS(const SCS* CS);
-#endif //	USE_DX10
+#endif
 
     SPS* _CreatePS(LPCSTR Name);
     void _DeletePS(const SPS* PS);
@@ -189,7 +190,8 @@ public:
 
 #ifdef USE_OGL
     SDeclaration* _CreateDecl (u32 FVF);
-#endif // USE_OGL
+#endif
+
     SDeclaration* _CreateDecl(D3DVERTEXELEMENT9* dcl);
     void _DeleteDecl(const SDeclaration* dcl);
 
@@ -237,7 +239,8 @@ public:
 #else
     SGeometry* CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
     SGeometry* CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-#endif // USE_OGL
+#endif
+
     void DeleteGeom(const SGeometry* VS);
     void DeferredLoad(BOOL E) { bDeferredLoad = E; }
     void DeferredUpload();
