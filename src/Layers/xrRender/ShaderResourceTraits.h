@@ -9,6 +9,63 @@ struct ShaderTypeTraits;
 
 #if defined(USE_DX10) || defined(USE_DX11)
 template <>
+struct ShaderTypeTraits<SPS>
+{
+    typedef CResourceManager::map_PS MapType;
+    typedef ID3DPixelShader DXIface;
+
+    static inline const char* GetShaderExt() { return ".ps"; }
+    static inline const char* GetCompilationTarget()
+    {
+        return "ps_2_0";
+    }
+
+    static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
+    {
+        if (strstr(data, "main_ps_1_1"))
+        {
+            target = "ps_1_1";
+            entry = "main_ps_1_1";
+        }
+        if (strstr(data, "main_ps_1_2"))
+        {
+            target = "ps_1_2";
+            entry = "main_ps_1_2";
+        }
+        if (strstr(data, "main_ps_1_3"))
+        {
+            target = "ps_1_3";
+            entry = "main_ps_1_3";
+        }
+        if (strstr(data, "main_ps_1_4"))
+        {
+            target = "ps_1_4";
+            entry = "main_ps_1_4";
+        }
+        if (strstr(data, "main_ps_2_0"))
+        {
+            target = "ps_2_0";
+            entry = "main_ps_2_0";
+        }
+    }
+
+    static inline DXIface* CreateHWShader(DWORD const* buffer, size_t size)
+    {
+        DXIface* ps = 0;
+#ifdef USE_DX11
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, 0, &ps));
+#elif defined(USE_DX10)
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, &ps));
+#else
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, &ps);
+#endif
+        return ps;
+    }
+
+    static inline u32 GetShaderDest() { return RC_dest_pixel; }
+};
+
+template <>
 struct ShaderTypeTraits<SGS>
 {
     typedef CResourceManager::map_GS MapType;
@@ -132,6 +189,12 @@ struct ShaderTypeTraits<SCS>
     static inline u32 GetShaderDest() { return RC_dest_compute; }
 };
 #endif
+
+template <>
+inline CResourceManager::map_PS& CResourceManager::GetShaderMap()
+{
+    return m_ps;
+}
 
 #if defined(USE_DX10) || defined(USE_DX11)
 template <>
