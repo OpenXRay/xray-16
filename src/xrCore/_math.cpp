@@ -6,6 +6,7 @@
 #include <process.h>
 #include <powerbase.h>
 #elif defined(LINUX)
+#include <x86intrin.h> // __rdtsc
 #include <fpu_control.h>
 #include <pthread.h>
 #endif
