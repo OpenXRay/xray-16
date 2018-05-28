@@ -215,7 +215,7 @@ IC void xr_strlwr(shared_str& src)
     }
 }
 
-/*IC char * xr_strlwr(char * src)
+IC char * xr_strlwr(char * src)
 {
     int i = 0;
     while(src[i])
@@ -224,6 +224,6 @@ IC void xr_strlwr(shared_str& src)
     	i++;
     }
     return src;
-}*/
+}
 
 #pragma pack(pop)
