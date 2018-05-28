@@ -42,7 +42,7 @@ public:
     using map_GS = xr_map<const char*, SGS*, str_pred>;
 #endif
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_OGL)
     using map_HS = xr_map<const char*, SHS*, str_pred>;
     using map_DS = xr_map<const char*, SDS*, str_pred>;
     using map_CS = xr_map<const char*, SCS*, str_pred>;
@@ -66,7 +66,7 @@ private:
     map_GS m_gs;
 #endif
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_OGL)
     map_DS m_ds;
     map_HS m_hs;
     map_CS m_cs;
@@ -164,7 +164,7 @@ public:
     void _DeleteGS(const SGS* GS);
 #endif //	USE_DX10
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_OGL)
     SHS* _CreateHS(LPCSTR Name);
     void _DeleteHS(const SHS* HS);
 

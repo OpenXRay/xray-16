@@ -60,10 +60,6 @@
 [submodule "Externals/pugixml"]
 	path = Externals/pugixml
 	url = https://github.com/zeux/pugixml.git
-[submodule "Externals/glew"]
-	path = Externals/glew
-	url = https://github.com/Armada651/glew.git
-	branch = build
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git

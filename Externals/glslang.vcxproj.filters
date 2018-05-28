@@ -85,6 +85,9 @@
     <ClCompile Include="glslang\glslang\MachineIndependent\Versions.cpp">
       <Filter>MachineIndependent</Filter>
     </ClCompile>
+    <ClCompile Include="glslang\glslang\MachineIndependent\attribute.cpp">
+      <Filter>MachineIndependent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glslang\glslang\Public\ShaderLang.h">
@@ -175,6 +178,9 @@
       <Filter>MachineIndependent</Filter>
     </ClInclude>
     <ClInclude Include="glslang\glslang\MachineIndependent\Versions.h">
+      <Filter>MachineIndependent</Filter>
+    </ClInclude>
+    <ClInclude Include="glslang\glslang\MachineIndependent\attribute.h">
       <Filter>MachineIndependent</Filter>
     </ClInclude>
   </ItemGroup>

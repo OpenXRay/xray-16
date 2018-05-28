@@ -771,28 +771,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         result->constants.parse(pConstants, ShaderTypeTraits<T>::GetShaderDest());
     }
     else
-    {
         Msg("! D3DXFindShaderComment %s hr == 0x%08x", file_name, _hr);
-    }
-
-    return _hr;
-}
-
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
-{
-    HRESULT _result = E_FAIL;
-    if (pTarget[0] == 'p')
-    {
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
-    }
-    else if (pTarget[0] == 'v')
-    {
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
-    }
-    else
-    {
-        NODEFAULT;
-    }
 
     if (disasm)
     {
@@ -806,7 +785,19 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         _RELEASE(disasm);
     }
 
-    return _result;
+    return _hr;
+}
+
+inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+{
+    if (pTarget[0] == 'p')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+    
+    if (pTarget[0] == 'v')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+    
+    NODEFAULT;
+    return E_FAIL;
 }
 
 class includer : public ID3DXInclude

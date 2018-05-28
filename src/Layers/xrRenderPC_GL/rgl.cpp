@@ -14,6 +14,7 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 CRender RImplementation;
 
@@ -225,7 +226,7 @@ void CRender::create()
     o.nvdbt = false;
     if (o.nvdbt) Msg("* NV-DBT supported and used");
 
-    // options (smap-pool-size) // skyloader: if you want to resize smaps, then do not forget to change them in shaders too (common_defines.h)
+    // options (smap-pool-size)
     if (strstr(Core.Params, "-smap1536")) o.smapsize = 1536;
     if (strstr(Core.Params, "-smap2048")) o.smapsize = 2048;
     if (strstr(Core.Params, "-smap2560")) o.smapsize = 2560;
@@ -798,22 +799,13 @@ HRESULT CRender::shader_compile(
     u32 len = 0;
     // options
     {
-		// skyloader: smap size changed to smap quality because something wrong happens with the conversion of defines to float data on amd videocards
-		u8 uSmapQuality = 2;
-		switch (o.smapsize)
-		{
-			case 1536: uSmapQuality = 1; break;
-			case 2048: uSmapQuality = 2; break;
-			case 2560: uSmapQuality = 3; break;
-			case 3072: uSmapQuality = 4; break;
-			case 4096: uSmapQuality = 5; break;
-		}
-        xr_sprintf						(c_smapsize, "%d", uSmapQuality);
-        defines[def_it].Name			= "SMAP_QUALITY";
-        defines[def_it].Definition		= c_smapsize;
+        xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));
+        defines[def_it].Name = "SMAP_size";
+        defines[def_it].Definition = c_smapsize;
         def_it++;
-        xr_strcat						(sh_name, c_smapsize);
-        ++len;
+        VERIFY(xr_strlen(c_smapsize) == 4);
+        xr_strcat(sh_name, c_smapsize);
+        len += 4;
     }
 
     if (o.fp16_filter)
