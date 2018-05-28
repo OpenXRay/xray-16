@@ -8,7 +8,7 @@ ModuleHandle::ModuleHandle(const bool dontUnload) : handle(nullptr), dontUnload(
 
 ModuleHandle::ModuleHandle(pcstr moduleName, bool dontUnload /*= false*/) : handle(nullptr), dontUnload(dontUnload)
 {
-    Open(moduleName);
+    this->Open(moduleName);
 }
 
 ModuleHandle::~ModuleHandle()
@@ -49,7 +49,7 @@ void ModuleHandle::Сlose()
 
 #ifdef WINDOWS
     closed = FreeLibrary(static_cast<HMODULE>(handle)) != 0;
-#else
+defined(LINUX)
     closed = dlclose(handle) == 0;
 #endif
 
@@ -57,7 +57,7 @@ void ModuleHandle::Сlose()
     {
 #ifdef WINDOWS
         Msg("! Failed to close DLL: 0x%d", GetLastError());
-#elif LINUX
+#elif defined(LINUX)
         Msg("! Failed to close DLL: 0x%d", dlerror());
 #endif
     }
@@ -89,7 +89,7 @@ void* ModuleHandle::GetProcAddress(pcstr procName) const
     {
 #ifdef WINDOWS
         Msg("! Failed to load procedure [%s] from DLL: 0x%d", procName, GetLastError());
-#elif LINUX
+#elif defined(LINUX)
         Msg("! Failed to load procedure [%s] from DLL: 0x%d", procName, dlerror());
 #endif
     }
