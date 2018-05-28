@@ -251,7 +251,6 @@ public:
     void Dump(bool bBrief);
 
 private:
-#if defined(USE_DX10) || defined(USE_DX11)
     template <typename T>
     T& GetShaderMap();
 
@@ -260,7 +259,6 @@ private:
 
     template <typename T>
     void DestroyShader(const T* sh);
-#endif
 };
 
 #endif // ResourceManagerH
