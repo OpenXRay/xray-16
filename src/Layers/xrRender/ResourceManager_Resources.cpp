@@ -182,7 +182,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         if (0 == xr_stricmp(_name, "null"))
         {
-            _vs->vs = nullptr;
+            _vs->sh = nullptr;
             return _vs;
         }
 

@@ -143,7 +143,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         SVS* _vs = new SVS();
         _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
-        //_vs->vs				= NULL;
+        //_vs->sh				= NULL;
         //_vs->signature		= NULL;
         if (0 == xr_stricmp(_name, "null"))
         {

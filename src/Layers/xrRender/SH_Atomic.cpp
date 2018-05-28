@@ -28,7 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////
 //  SVS
-SVS::SVS() : vs(0)
+SVS::SVS() : sh(0)
 #if defined(USE_DX10) || defined(USE_DX11)
 //  ,signature(0)
 #endif // USE_DX10
@@ -44,9 +44,9 @@ SVS::~SVS()
 #endif
 
 #ifdef USE_OGL
-    CHK_GL(glDeleteProgram(vs));
+    CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(vs);
+    _RELEASE(sh);
 #endif
 }
 

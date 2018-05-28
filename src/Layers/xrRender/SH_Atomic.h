@@ -27,9 +27,9 @@ typedef resptr_core<SInputSignature, resptr_base<SInputSignature>> ref_input_sig
 struct ECORE_API SVS : public xr_resource_named
 {
 #ifdef USE_OGL
-    GLuint vs;
+    GLuint sh;
 #else
-    ID3DVertexShader* vs;
+    ID3DVertexShader* sh;
 #endif
     R_constant_table constants;
 #if defined(USE_DX10) || defined(USE_DX11)

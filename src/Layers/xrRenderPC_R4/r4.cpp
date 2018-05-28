@@ -819,9 +819,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     {
         SVS* svs_result = (SVS*)result;
 #ifdef USE_DX11
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->sh);
 #else // #ifdef USE_DX11
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->sh);
 #endif // #ifdef USE_DX11
 
         if (!SUCCEEDED(_result))

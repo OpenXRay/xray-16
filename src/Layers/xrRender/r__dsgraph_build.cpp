@@ -126,7 +126,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         auto &map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
 
 #ifdef USE_OGL
-        auto &Nvs = map[pass.vs->vs];
+        auto &Nvs = map[pass.vs->sh];
         auto &Ngs = Nvs[pass.gs->sh];
         auto &Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
@@ -134,7 +134,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         auto &Ngs = Nvs[pass.gs->sh];
         auto &Nps = Ngs[pass.ps->sh];
 #else
-        auto &Nvs = map[pass.vs->vs];
+        auto &Nvs = map[pass.vs->sh];
         auto &Nps = Nvs[pass.ps->sh];
 #endif
 
@@ -273,7 +273,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         auto &map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
 
 #ifdef USE_OGL
-        auto &Nvs = map[pass.vs->vs];
+        auto &Nvs = map[pass.vs->sh];
         auto &Ngs = Nvs[pass.gs->sh];
         auto &Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
@@ -281,7 +281,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         auto &Ngs = Nvs[pass.gs->sh];
         auto &Nps = Ngs[pass.ps->sh];
 #else
-        auto &Nvs = map[pass.vs->vs];
+        auto &Nvs = map[pass.vs->sh];
         auto &Nps = Nvs[pass.ps->sh];
 #endif
 

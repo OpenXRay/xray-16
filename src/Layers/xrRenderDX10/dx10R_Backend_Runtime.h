@@ -484,13 +484,13 @@ IC void CBackend::ApplyVertexLayout()
 ICF void CBackend::set_VS(ref_vs& _vs)
 {
     m_pInputSignature = _vs->signature->signature;
-    set_VS(_vs->vs, _vs->cName.c_str());
+    set_VS(_vs->sh, _vs->cName.c_str());
 }
 
 ICF void CBackend::set_VS(SVS* _vs)
 {
     m_pInputSignature = _vs->signature->signature;
-    set_VS(_vs->vs, _vs->cName.c_str());
+    set_VS(_vs->sh, _vs->cName.c_str());
 }
 
 IC bool CBackend::CBuffersNeedUpdate(

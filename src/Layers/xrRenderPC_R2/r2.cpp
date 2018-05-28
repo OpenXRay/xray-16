@@ -658,7 +658,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     else if (pTarget[0] == 'v')
     {
         SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->sh);
         if (!SUCCEEDED(_result))
         {
             Log("! VS: ", file_name);
