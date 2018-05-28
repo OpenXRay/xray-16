@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.0)
 project(OpenXRay)
 
+include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive --std=c++17")

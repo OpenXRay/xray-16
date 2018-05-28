@@ -361,7 +361,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
     if (0 == xr_stricmp(name, "null"))
     {
-        _gs->gs = NULL;
+        _gs->sh = NULL;
         return _gs;
     }
 
@@ -388,8 +388,8 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     R_ASSERT2 ( file, cname );
 
     // Select target
-    _gs->gs = glCreateShader(GL_GEOMETRY_SHADER);
-    void* _result = &_gs->gs;
+    _gs->sh = glCreateShader(GL_GEOMETRY_SHADER);
+    void* _result = &_gs->sh;
     HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(), nullptr,
                                                     nullptr, NULL, _result);
 

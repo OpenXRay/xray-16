@@ -1,5 +1,8 @@
 #ifndef STREAM_READER_INLINE_H
 #define STREAM_READER_INLINE_H
+#ifdef LINUX
+#include <sys/mman.h>
+#endif
 
 IC CStreamReader::CStreamReader() {}
 IC CStreamReader::CStreamReader(const CStreamReader& object)
@@ -16,14 +19,11 @@ IC CStreamReader& CStreamReader::operator=(const CStreamReader&)
 }
 
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
-IC void CStreamReader::unmap()
-{
-#ifdef WINDOWS
-    UnmapViewOfFile(m_current_map_view_of_file);
+#if defined(WINDOWS)
+IC void CStreamReader::unmap() { UnmapViewOfFile(m_current_map_view_of_file); }
 #else
-#warning TODO: Port CStreamReader::unmap()
+IC void CStreamReader::unmap() { ::munmap(const_cast<u8*>(m_current_map_view_of_file), m_current_window_size); }
 #endif
-}
 IC void CStreamReader::remap(const u32& new_offset)
 {
     unmap();

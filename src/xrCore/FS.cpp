@@ -5,23 +5,15 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#ifdef WINDOWS
+#if defined(WINDOWS)
 #include <io.h>
 #include <direct.h>
-#include <fcntl.h>
-#include <sys\stat.h>
-#else
-/*
-#include <sys/stat.h>
-
-long _filelength(char *f)
-{
-    struct stat st;
-    stat(f, &st);
-    return st.st_size;
-}
-*/
+#elif defined(LINUX)
+#include <sys/mman.h>
 #endif
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #pragma warning(pop)
 
 #ifdef M_BORLAND
@@ -429,7 +421,9 @@ void IReader::r_string(char* dest, u32 tgt_sz)
     char* src = (char*)data + Pos;
     u32 sz = advance_term_string();
     R_ASSERT2(sz < (tgt_sz - 1), "Dest string less than needed.");
+#if defined(WINDOWS)
     R_ASSERT(!IsBadReadPtr((void*)src, sz));
+#endif
 
 #ifdef _EDITOR
     CopyMemory(dest, src, sz);
@@ -483,8 +477,11 @@ CPackReader::~CPackReader()
 #ifdef FS_DEBUG
     unregister_file_mapping(base_address, Size);
 #endif // DEBUG
-
+#if defined(WINDOWS)
     UnmapViewOfFile(base_address);
+#elif defined(LINUX)
+    ::munmap(base_address, Size);
+#endif
 };
 //---------------------------------------------------
 // file stream
@@ -504,6 +501,7 @@ CCompressedReader::CCompressedReader(const char* name, const char* sign)
 CCompressedReader::~CCompressedReader() { xr_free(data); };
 CVirtualFileRW::CVirtualFileRW(const char* cFileName)
 {
+#if defined(WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
@@ -515,7 +513,15 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
-
+#elif defined(LINUX)
+    hSrcFile = ::open(cFileName, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
+    struct stat file_info;
+    ::fstat(hSrcFile, &file_info);
+    Size = (int)file_info.st_size;
+    R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
+    data = (char*)::mmap(NULL, Size, PROT_READ | PROT_WRITE, MAP_SHARED, hSrcFile, 0);
+#endif
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);
 #endif // DEBUG
@@ -526,14 +532,20 @@ CVirtualFileRW::~CVirtualFileRW()
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
 #endif // DEBUG
-
+#if defined(WINDOWS)
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
+#elif defined(LINUX)
+    ::munmap((void*)data, Size);
+    ::close(hSrcFile);
+    hSrcFile = -1;
+#endif
 }
 
 CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 {
+#if defined(WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
@@ -544,6 +556,15 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
     R_ASSERT3(hSrcMap != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
+#elif defined(LINUX)
+    hSrcFile = ::open(cFileName, O_RDONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
+    struct stat file_info;
+    ::fstat(hSrcFile, &file_info);
+    Size = (int)file_info.st_size;
+    R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
+    data = (char*)::mmap(NULL, Size, PROT_READ, MAP_SHARED, hSrcFile, 0);
+#endif
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 
 #ifdef FS_DEBUG
@@ -556,8 +577,13 @@ CVirtualFileReader::~CVirtualFileReader()
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
 #endif // DEBUG
-
+#if defined(WINDOWS)
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
+#elif defined(LINUX)
+    ::munmap((void*)data, Size);
+    ::close(hSrcFile);
+    hSrcFile = -1;
+#endif
 }

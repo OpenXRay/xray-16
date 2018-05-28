@@ -3,8 +3,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#if defined(WINDOWS)
 #include <mmsystem.h>
 #include <objbase.h>
+#endif
 #include "xrCore.h"
 #include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
@@ -25,14 +27,23 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
+#if defined(WINDOWS)
         Params = xr_strdup(GetCommandLine());
+#elif  defined(LINUX)
+        Params = xr_strdup(""); //TODO handle /proc/self/cmdline
+#endif
+
+#if defined(WINDOWS)
         if (!strstr(Params, "-weather"))
             CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+#endif
 
         string_path fn, dr, di;
 
         // application path
+#if defined(WINDOWS)
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
+#endif
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 
@@ -46,14 +57,18 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         }
 #endif
 
+#if defined(WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
+#endif
 
+#if defined(WINDOWS)
         // User/Comp Name
         DWORD sz_user = sizeof(UserName);
         GetUserName(UserName, &sz_user);
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
+#endif
 
         Memory._initialize();
 
@@ -188,6 +203,7 @@ void xrCore::CalculateBuildId()
         buildId -= daysInMonth[i];
 }
 
+#if defined(WINDOWS)
 #ifdef _EDITOR
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #else
@@ -216,3 +232,4 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     }
     return TRUE;
 }
+#endif

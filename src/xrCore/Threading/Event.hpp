@@ -3,7 +3,20 @@
 
 class XRCORE_API Event
 {
+#if defined(WINDOWS)
     void* handle;
+#elif defined(LINUX)
+    struct EventHandle
+    {
+        pthread_mutex_t mutex;
+        pthread_cond_t cond;
+        bool signaled;
+    };
+    pthread_mutex_t handle;
+
+private:
+    EventHandle m_id;
+#endif
 
 public:
     Event() noexcept;
@@ -14,9 +27,9 @@ public:
     // Set the event to the signalled state.
     void Set() noexcept;
     // Wait indefinitely for the object to become signalled.
-    void Wait() const noexcept;
+    void Wait() noexcept;
     // Wait, with a time limit, for the object to become signalled.
-    bool Wait(u32 millisecondsTimeout) const noexcept;
+    bool Wait(u32 millisecondsTimeout) noexcept;
 
-    void* GetHandle() const noexcept { return handle; }
+    void* GetHandle() noexcept { return handle; }
 };

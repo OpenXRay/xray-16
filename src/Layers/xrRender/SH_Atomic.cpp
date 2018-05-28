@@ -66,9 +66,9 @@ SPS::~SPS()
 SGS::~SGS()
 {
 #ifdef USE_OGL
-    CHK_GL(glDeleteProgram(gs));
+    CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(gs);
+    _RELEASE(sh);
 #endif // USE_OGL
     RImplementation.Resources->_DeleteGS(this);
 }

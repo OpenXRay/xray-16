@@ -58,9 +58,9 @@ typedef resptr_core<SPS, resptr_base<SPS>> ref_ps;
 struct ECORE_API SGS : public xr_resource_named
 {
 #ifdef USE_OGL
-    GLuint gs;
+    GLuint sh;
 #else
-    ID3DGeometryShader* gs;
+    ID3DGeometryShader* sh;
 #endif
     R_constant_table constants;
     ~SGS();

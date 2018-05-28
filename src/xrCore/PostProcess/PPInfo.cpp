@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "PPInfo.hpp"
 
 SPPInfo& SPPInfo::add(const SPPInfo& ppi)

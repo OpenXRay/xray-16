@@ -3,9 +3,11 @@
 #pragma once
 
 #include "lzhuf.h"
-#ifdef WINDOWS
+#if defined(WINDOWS)
 #include <io.h>
+#endif
 #include <fcntl.h>
+#if defined(WINDOWS)
 #include <sys\stat.h>
 #include <share.h>
 #endif
@@ -48,14 +50,14 @@ public:
         {
             fclose(hf);
             // release RO attrib
-#ifdef WINDOWS
+#if defined(WINDOWS)
             DWORD dwAttr = GetFileAttributes(fName.c_str());
             if ((dwAttr != u32(-1)) && (dwAttr & FILE_ATTRIBUTE_READONLY))
             {
                 dwAttr &= ~FILE_ATTRIBUTE_READONLY;
                 SetFileAttributes(fName.c_str(), dwAttr);
             }
-#endif // Probably not needed.
+#endif
         }
     }
     // kernel

@@ -1,6 +1,19 @@
 #include "stdafx.h"
 #include "string_concatenations.h"
 
+#if defined(LINUX)
+#define EXCEPTION_STACK_OVERFLOW	((DWORD) 0xC00000FD)
+#define EXCEPTION_EXECUTE_HANDLER	1
+#define EXCEPTION_CONTINUE_SEARCH	0
+
+int _cdecl _resetstkoflw(void)
+{
+    int stack_addr;
+
+    return 0;
+}
+#endif
+
 namespace xray
 {
 namespace core
@@ -69,6 +82,7 @@ int stack_overflow_exception_filter(int exception_code)
 
 void check_stack_overflow(u32 stack_increment)
 {
+#if defined(WINDOWS)
     __try
     {
         void* p = _alloca(stack_increment);
@@ -78,6 +92,7 @@ void check_stack_overflow(u32 stack_increment)
     {
         _resetstkoflw();
     }
+#endif
 }
 
 void string_tupples::error_process() const

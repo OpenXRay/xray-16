@@ -46,6 +46,7 @@ void __cpuidex(int regs[4], int i, int j)
 }
 #endif
 
+#ifdef WINDOWS
 DWORD countSetBits(ULONG_PTR bitMask)
 {
     DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
@@ -61,6 +62,7 @@ DWORD countSetBits(ULONG_PTR bitMask)
 
     return bitSetCount;
 }
+#endif
 
 unsigned int query_processor_info(processor_info* pinfo)
 {
@@ -169,7 +171,6 @@ unsigned int query_processor_info(processor_info* pinfo)
 #endif // WINDOWS
 
 #ifdef WINDOWS
-
     DWORD returnedLength = 0;
     DWORD byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
@@ -199,9 +200,7 @@ unsigned int query_processor_info(processor_info* pinfo)
         byteOffset += sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
         ptr++;
     }
-
-#else // WINDOWS
-
+#elif defined(LINUX)
     int logicalProcessorCount = std::thread::hardware_concurrency();
 
     //not sure about processorCoreCount - is it really cores or threads
@@ -226,7 +225,8 @@ unsigned int query_processor_info(processor_info* pinfo)
     //3rd another implementation
     //https://stackoverflow.com/questions/2901694/programmatically-detect-number-of-physical-processors-cores-or-if-hyper-threadin
 
-#endif // WINDOWS
+#endif
+
 
     if (logicalProcessorCount != processorCoreCount) pinfo->features |= static_cast<u32>(CpuFeature::HT);
 

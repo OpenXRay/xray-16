@@ -31,13 +31,13 @@ CScriptPropertiesListHelper* g_property_list_helper = nullptr;
 void load_prop_helper()
 {
     prop_helper_module = XRay::LoadModule(prop_helper_library);
-    if (!prop_helper_module->exist())
+    if (!prop_helper_module->IsLoaded())
     {
         Msg("! Cannot find library %s", prop_helper_library);
         return;
     }
 
-    _PHelper = (TPHelper)prop_helper_module->getProcAddress(prop_helper_func);
+    _PHelper = (TPHelper)prop_helper_module->GetProcAddress(prop_helper_func);
     if (!_PHelper)
     {
         Msg("! Cannot find entry point of the function %s in the library %s", prop_helper_func, prop_helper_func);

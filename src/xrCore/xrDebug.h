@@ -5,8 +5,9 @@
 #include "Threading/Lock.hpp"
 
 #include <string>
-
-#ifdef WINDOWS
+#if defined(LINUX)
+#include <cstdio>
+#elif defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared
 #include <DbgHelp.h>
@@ -86,12 +87,12 @@ private:
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
     static void SaveMiniDump(EXCEPTION_POINTERS* exPtrs);
-    #ifdef WINDOWS
+#if defined(WINDOWS)
     static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
     static bool GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr);
-    #endif
     static bool InitializeSymbolEngine();
     static void DeinitializeSymbolEngine(void);
+#endif //WINDOWS
 };
 
 // for debug purposes only

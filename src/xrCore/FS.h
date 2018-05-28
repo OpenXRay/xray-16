@@ -14,8 +14,6 @@
 #include "_color.h"
 #include "xrCommon/math_funcs.h"
 #include "xrCommon/xr_stack.h"
-#include "xrCommon/xr_stack.h"
-//#include "_stl_extensions.h"
 
 #define CFS_CompressMark (1ul << 31ul)
 #define CFS_HeaderChunkID (666)

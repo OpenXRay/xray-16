@@ -13,14 +13,14 @@ public:
     ModuleHandle(pcstr moduleName, bool dontUnload = false);
     ~ModuleHandle();
 
-    void* open(pcstr moduleName);
-    void close();
+    void* Open(pcstr moduleName);
+    void Close();
 
-    bool exist() const;
+    bool IsLoaded() const;
 
     void* operator()() const;
 
-    void* getProcAddress(pcstr procName) const;
+    void* GetProcAddress(pcstr procName) const;
 };
 
 using Module = std::unique_ptr<ModuleHandle>;

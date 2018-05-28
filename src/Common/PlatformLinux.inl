@@ -44,11 +44,14 @@
 #define __cdecl
 #define __stdcall
 #define __fastcall
+
 //#define __declspec
 #define __forceinline FORCE_INLINE
-#define __pragma
+#define __pragma(...) _Pragma(#__VA_ARGS__)
 #define __declspec(x)
 #define CALLBACK
+
+#define __except(X) catch(X)
 
 /*
 static inline long InterlockedExchange(volatile long *val, long new_val)
@@ -60,11 +63,6 @@ static inline long InterlockedExchange(volatile long *val, long new_val)
     return old_val;
 }
 */
-//TODO: Implement more platform independend atomic operations: https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Common/Atomic_GCC.h
-inline void InterlockedExchange(volatile unsigned int& target, unsigned int value)
-{
-    __sync_add_and_fetch(&target, value);
-}
 
 inline pthread_t GetCurrentThreadId()
 {
@@ -89,9 +87,14 @@ inline unsigned long GetLastError()
     return 0;
 }
 
+inline int GetExceptionCode()
+{
+    return 0;
+}
+
 #define xr_unlink unlink
 
-typedef int BOOL;
+typedef char BOOL;
 typedef char* LPSTR;
 typedef char* PSTR;
 typedef char* LPTSTR;
@@ -103,17 +106,16 @@ typedef unsigned int UINT;
 typedef int INT;
 typedef long LONG;
 typedef unsigned long ULONG;
-typedef unsigned long ULONG_PTR, *PULONG_PTR;
-//typedef unsigned long& ULONG_PTR;
-//typedef long long int LARGE_INTEGER;
-//typedef unsigned long long int ULARGE_INTEGER;
+typedef unsigned long& ULONG_PTR;
+typedef long long int LARGE_INTEGER;
+typedef unsigned long long int ULARGE_INTEGER;
 
 typedef unsigned short WORD;
 typedef unsigned short* LPWORD;
 typedef unsigned long DWORD;
 typedef unsigned long* LPDWORD;
 typedef const void *LPCVOID;
-//typedef long long int *PLARGE_INTEGER;
+typedef long long int *PLARGE_INTEGER;
 
 typedef wchar_t WCHAR;
 
@@ -142,7 +144,7 @@ typedef unsigned int UINT_PTR;
 typedef long LONG_PTR;
 #endif // XR_X64
 
-typedef void *HANDLE;
+typedef int HANDLE;
 typedef void *HMODULE;
 typedef void *LPVOID;
 typedef UINT_PTR WPARAM;
@@ -216,6 +218,12 @@ typedef dirent DirEntryType;
 #define _close close
 #define _sopen open
 #define _sopen_s(handle, filename, ...) open(filename, O_RDONLY)
+inline int _filelength(int fd)
+{
+    struct stat file_info;
+    ::fstat(fd, &file_info);
+    return file_info.st_size;
+}
 #define _fdopen fdopen
 #define _rmdir rmdir
 #define _write write
@@ -230,6 +238,10 @@ typedef dirent DirEntryType;
 #undef max
 #define __max(a, b) std::max(a, b)
 #define __min(a, b) std::min(a, b)
+#define _utime utime
+#define _utimbuf utimbuf
+
+#define xr_itoa SDL_itoa
 
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
@@ -241,14 +253,7 @@ typedef dirent DirEntryType;
 #define S_FALSE 0x10000000
 #define E_FAIL 0x80004005
 
-#define STUBBED(txt) do { \
-  static bool already_seen = false; \
-  if (!already_seen) { \
-    already_seen = true; \
-    fprintf(stderr, "STUBBED: %s in %s, line %d.\n", txt, __FILE__, __LINE__); \
-  } \
-} while (0)
-
-#if __EXCEPTIONS
-#define _CPPUNWIND 1
-#endif
+#define _MAX_DRIVE	3
+#define _MAX_DIR	256
+#define _MAX_FNAME	256
+#define _MAX_EXT	256

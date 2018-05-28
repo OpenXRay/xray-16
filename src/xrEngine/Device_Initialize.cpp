@@ -12,13 +12,13 @@ extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 void CRenderDevice::initialize_weather_editor()
 {
     m_editor_module = XRay::LoadModule("xrWeatherEditor");
-    if (!m_editor_module->exist())
+    if (!m_editor_module->IsLoaded())
         return;
 
-    m_editor_initialize = (initialize_function_ptr)m_editor_module->getProcAddress("initialize");
+    m_editor_initialize = (initialize_function_ptr)m_editor_module->GetProcAddress("initialize");
     VERIFY(m_editor_initialize);
 
-    m_editor_finalize = (finalize_function_ptr)m_editor_module->getProcAddress("finalize");
+    m_editor_finalize = (finalize_function_ptr)m_editor_module->GetProcAddress("finalize");
     VERIFY(m_editor_finalize);
 
     m_engine = new engine_impl();
