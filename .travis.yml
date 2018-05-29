@@ -23,6 +23,7 @@ addons:
     - g++-7
 branches:
   only:
+  - linux
   - xd_dev
   - "/^v\\d+\\./"
 notifications:
