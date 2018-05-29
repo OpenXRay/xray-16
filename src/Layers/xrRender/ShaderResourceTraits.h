@@ -362,8 +362,12 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
 
         // Try to open
         IReader* file = FS.r_open(cname);
-        if (!file && strstr(Core.Params, "-lack_of_shaders"))
+        bool fallback = strstr(Core.Params, "-lack_of_shaders");
+        if (!file && fallback)
         {
+        fallback:
+            fallback = false;
+
             string1024 tmp;
             xr_sprintf(tmp, "CreateShader: %s is missing. Replacing it with stub_default%s", cname, ShaderTypeTraits<T>::GetShaderExt());
             Msg(tmp);
@@ -400,6 +404,9 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
             c_entry, c_target, flags, (void*&)sh);
 
         VERIFY(SUCCEEDED(_hr));
+
+        if (FAILED(_hr) && fallback)
+            goto fallback;
 
         CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
