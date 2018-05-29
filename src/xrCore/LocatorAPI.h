@@ -124,7 +124,7 @@ private:
     using files_set = xr_set<file, file_pred>;
     using files_it = files_set::iterator;
 
-    using FFVec = xr_vector<_finddata64i32_t>;
+    using FFVec = xr_vector<_finddata_t>;
     FFVec rec_files;
 
     int m_iLockRescan;
