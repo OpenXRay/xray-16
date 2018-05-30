@@ -49,7 +49,7 @@ extern "C" {
  * @return an identifier
  * @ingroup world
  */
-dWorldID dWorldCreate(void);
+ODE_API dWorldID dWorldCreate(void);
 
 
 /**
@@ -61,7 +61,7 @@ dWorldID dWorldCreate(void);
  * @ingroup world
  * @param world the identifier for the world the be destroyed.
  */
-void dWorldDestroy (dWorldID world);
+ODE_API void dWorldDestroy (dWorldID world);
 
 
 /**
@@ -72,14 +72,14 @@ void dWorldDestroy (dWorldID world);
  *
  * @ingroup world
  */
-void dWorldSetGravity (dWorldID, dReal x, dReal y, dReal z);
+ODE_API void dWorldSetGravity (dWorldID, dReal x, dReal y, dReal z);
 
 
 /**
  * @brief Get the gravity vector for a given world.
  * @ingroup world
  */
-void dWorldGetGravity (dWorldID, dVector3 gravity);
+ODE_API void dWorldGetGravity (dWorldID, dVector3 gravity);
 
 
 /**
@@ -89,14 +89,14 @@ void dWorldGetGravity (dWorldID, dVector3 gravity);
  * @param dWorldID the identifier of the world.
  * @param erp Typical values are in the range 0.1--0.8. The default is 0.2.
  */
-void dWorldSetERP (dWorldID, dReal erp);
+ODE_API void dWorldSetERP (dWorldID, dReal erp);
 
 /**
  * @brief Get the error reduction parameter.
  * @ingroup world
  * @return ERP value
  */
-dReal dWorldGetERP (dWorldID);
+ODE_API dReal dWorldGetERP (dWorldID);
 
 
 /**
@@ -106,7 +106,7 @@ dReal dWorldGetERP (dWorldID);
  * The default is 10^-5 if single precision is being used, or 10^-10
  * if double precision is being used.
  */
-void dWorldSetCFM (dWorldID, dReal cfm);
+ODE_API void dWorldSetCFM (dWorldID, dReal cfm);
 
 
 /**
@@ -114,7 +114,7 @@ void dWorldSetCFM (dWorldID, dReal cfm);
  * @ingroup world
  * @return CFM value
  */
-dReal dWorldGetCFM (dWorldID);
+ODE_API dReal dWorldGetCFM (dWorldID);
 
 
 /**
@@ -127,7 +127,7 @@ dReal dWorldGetCFM (dWorldID);
  * @ingroup world
  * @param stepsize The number of seconds that the simulation has to advance.
  */
-void dWorldStep (dWorldID, dReal stepsize);
+ODE_API void dWorldStep (dWorldID, dReal stepsize);
 
 
 /**
@@ -144,7 +144,7 @@ void dWorldStep (dWorldID, dReal stepsize);
  * computation may depend on integrator parameters that are set as
  * properties of the world.
  */
-void dWorldImpulseToForce
+ODE_API void dWorldImpulseToForce 
 (
   dWorldID, dReal stepsize,
   dReal ix, dReal iy, dReal iz, dVector3 force
@@ -182,7 +182,7 @@ void dWorldImpulseToForce
  * Increasing the number of QuickStep iterations may help a little bit, but
  * it is not going to help much if your system is really near singular.
  */
-void dWorldQuickStep (dWorldID w, dReal stepsize);
+ODE_API void dWorldQuickStep (dWorldID w, dReal stepsize);
 
 
 /**
@@ -194,7 +194,7 @@ void dWorldQuickStep (dWorldID w, dReal stepsize);
  * longer to compute.
  * @param num The default is 20 iterations.
  */
-void dWorldSetQuickStepNumIterations (dWorldID, int num);
+ODE_API void dWorldSetQuickStepNumIterations (dWorldID, int num);
 
 
 /**
@@ -203,21 +203,21 @@ void dWorldSetQuickStepNumIterations (dWorldID, int num);
  * @ingroup world
  * @return nr of iterations
  */
-int dWorldGetQuickStepNumIterations (dWorldID);
+ODE_API int dWorldGetQuickStepNumIterations (dWorldID);
 
 /**
  * @brief Set the SOR over-relaxation parameter
  * @ingroup world
  * @param over_relaxation value to use by SOR
  */
-void dWorldSetQuickStepW (dWorldID, dReal over_relaxation);
+ODE_API void dWorldSetQuickStepW (dWorldID, dReal over_relaxation);
 
 /**
  * @brief Get the SOR over-relaxation parameter
  * @ingroup world
  * @returns the over-relaxation setting
  */
-dReal dWorldGetQuickStepW (dWorldID);
+ODE_API dReal dWorldGetQuickStepW (dWorldID);
 
 /* World contact parameter functions */
 
@@ -229,14 +229,14 @@ dReal dWorldGetQuickStepW (dWorldID);
  * @remarks
  * Reducing this value can help prevent "popping" of deeply embedded objects.
  */
-void dWorldSetContactMaxCorrectingVel (dWorldID, dReal vel);
+ODE_API void dWorldSetContactMaxCorrectingVel (dWorldID, dReal vel);
 
 /**
  * @brief Get the maximum correcting velocity that contacts are allowed
  * to generated.
  * @ingroup world
  */
-dReal dWorldGetContactMaxCorrectingVel (dWorldID);
+ODE_API dReal dWorldGetContactMaxCorrectingVel (dWorldID);
 
 /**
  * @brief Set the depth of the surface layer around all geometry objects.
@@ -249,14 +249,14 @@ dReal dWorldGetContactMaxCorrectingVel (dWorldID);
  * Increasing this to some small value (e.g. 0.001) can help prevent 
  * jittering problems due to contacts being repeatedly made and broken.
  */
-void dWorldSetContactSurfaceLayer (dWorldID, dReal depth);
+ODE_API void dWorldSetContactSurfaceLayer (dWorldID, dReal depth);
 
 /**
  * @brief Get the depth of the surface layer around all geometry objects.
  * @ingroup world
  * @returns the depth
  */
-dReal dWorldGetContactSurfaceLayer (dWorldID);
+ODE_API dReal dWorldGetContactSurfaceLayer (dWorldID);
 
 /* StepFast1 functions */
 
@@ -266,7 +266,8 @@ dReal dWorldGetContactSurfaceLayer (dWorldID);
  * @param maxiterations The number of iterations to perform.
  * @ingroup world
  */
-void dWorldStepFast1(dWorldID, dReal stepsize, int maxiterations);
+ODE_API void dWorldStepFast1(dWorldID, dReal stepsize, int maxiterations);
+
 
 /**
  * @defgroup disable Automatic Enabling and Disabling
@@ -299,83 +300,83 @@ void dWorldStepFast1(dWorldID, dReal stepsize, int maxiterations);
  * @brief Set the AutoEnableDepth parameter used by the StepFast1 algorithm.
  * @ingroup disable
  */
-void dWorldSetAutoEnableDepthSF1(dWorldID, int autoEnableDepth);
+ODE_API void dWorldSetAutoEnableDepthSF1(dWorldID, int autoEnableDepth);
 
 /**
  * @brief Get the AutoEnableDepth parameter used by the StepFast1 algorithm.
  * @ingroup disable
  */
-int dWorldGetAutoEnableDepthSF1(dWorldID);
+ODE_API int dWorldGetAutoEnableDepthSF1(dWorldID);
 
 /**
  * @brief Get auto disable linear threshold for newly created bodies.
  * @ingroup disable
  * @return the threshold
  */
-dReal dWorldGetAutoDisableLinearThreshold (dWorldID);
+ODE_API dReal dWorldGetAutoDisableLinearThreshold (dWorldID);
 
 /**
  * @brief Set auto disable linear threshold for newly created bodies.
  * @param linear_threshold default is 0.01
  * @ingroup disable
  */
-void  dWorldSetAutoDisableLinearThreshold (dWorldID, dReal linear_threshold);
+ODE_API void  dWorldSetAutoDisableLinearThreshold (dWorldID, dReal linear_threshold);
 
 /**
  * @brief Get auto disable angular threshold for newly created bodies.
  * @ingroup disable
  * @return the threshold
  */
-dReal dWorldGetAutoDisableAngularThreshold (dWorldID);
+ODE_API dReal dWorldGetAutoDisableAngularThreshold (dWorldID);
 
 /**
  * @brief Set auto disable angular threshold for newly created bodies.
  * @param linear_threshold default is 0.01
  * @ingroup disable
  */
-void dWorldSetAutoDisableAngularThreshold (dWorldID, dReal angular_threshold);
+ODE_API void dWorldSetAutoDisableAngularThreshold (dWorldID, dReal angular_threshold);
 
 /**
  * @brief Get auto disable steps for newly created bodies.
  * @ingroup disable
  * @return nr of steps
  */
-int dWorldGetAutoDisableSteps (dWorldID);
+ODE_API int dWorldGetAutoDisableSteps (dWorldID);
 
 /**
  * @brief Set auto disable steps for newly created bodies.
  * @ingroup disable
  * @param steps default is 10
  */
-void dWorldSetAutoDisableSteps (dWorldID, int steps);
+ODE_API void dWorldSetAutoDisableSteps (dWorldID, int steps);
 
 /**
  * @brief Get auto disable time for newly created bodies.
  * @ingroup disable
  * @return nr of seconds
  */
-dReal dWorldGetAutoDisableTime (dWorldID);
+ODE_API dReal dWorldGetAutoDisableTime (dWorldID);
 
 /**
  * @brief Set auto disable time for newly created bodies.
  * @ingroup disable
  * @param time default is 0 seconds
  */
-void dWorldSetAutoDisableTime (dWorldID, dReal time);
+ODE_API void dWorldSetAutoDisableTime (dWorldID, dReal time);
 
 /**
  * @brief Get auto disable flag for newly created bodies.
  * @ingroup disable
  * @return 0 or 1
  */
-int dWorldGetAutoDisableFlag (dWorldID);
+ODE_API int dWorldGetAutoDisableFlag (dWorldID);
 
 /**
  * @brief Set auto disable flag for newly created bodies.
  * @ingroup disable
  * @param do_auto_disable default is false.
  */
-void dWorldSetAutoDisableFlag (dWorldID, int do_auto_disable);
+ODE_API void dWorldSetAutoDisableFlag (dWorldID, int do_auto_disable);
 
 
 
@@ -418,70 +419,70 @@ void dWorldSetAutoDisableFlag (dWorldID, int do_auto_disable);
  * @ingroup bodies
  * @return the threshold
  */
-dReal dBodyGetAutoDisableLinearThreshold (dBodyID);
+ODE_API dReal dBodyGetAutoDisableLinearThreshold (dBodyID);
 
 /**
  * @brief Set auto disable linear threshold.
  * @ingroup bodies
  * @return the threshold
  */
-void  dBodySetAutoDisableLinearThreshold (dBodyID, dReal linear_threshold);
+ODE_API void  dBodySetAutoDisableLinearThreshold (dBodyID, dReal linear_threshold);
 
 /**
  * @brief Get auto disable angular threshold.
  * @ingroup bodies
  * @return the threshold
  */
-dReal dBodyGetAutoDisableAngularThreshold (dBodyID);
+ODE_API dReal dBodyGetAutoDisableAngularThreshold (dBodyID);
 
 /**
  * @brief Set auto disable angular threshold.
  * @ingroup bodies
  * @return the threshold
  */
-void  dBodySetAutoDisableAngularThreshold (dBodyID, dReal angular_threshold);
+ODE_API void  dBodySetAutoDisableAngularThreshold (dBodyID, dReal angular_threshold);
 
 /**
  * @brief Get auto disable steps.
  * @ingroup bodies
  * @return the nr of steps
  */
-int   dBodyGetAutoDisableSteps (dBodyID);
+ODE_API int dBodyGetAutoDisableSteps (dBodyID);
 
 /**
  * @brief Set auto disable steps.
  * @ingroup bodies
  * @param steps the nr of steps.
  */
-void  dBodySetAutoDisableSteps (dBodyID, int steps);
+ODE_API void dBodySetAutoDisableSteps (dBodyID, int steps);
 
 /**
  * @brief Get auto disable time.
  * @ingroup bodies
  * @return nr of seconds
  */
-dReal dBodyGetAutoDisableTime (dBodyID);
+ODE_API dReal dBodyGetAutoDisableTime (dBodyID);
 
 /**
  * @brief Set auto disable time.
  * @ingroup bodies
  * @param time nr of seconds.
  */
-void  dBodySetAutoDisableTime (dBodyID, dReal time);
+ODE_API void  dBodySetAutoDisableTime (dBodyID, dReal time);
 
 /**
  * @brief Get auto disable flag.
  * @ingroup bodies
  * @return 0 or 1
  */
-int   dBodyGetAutoDisableFlag (dBodyID);
+ODE_API int dBodyGetAutoDisableFlag (dBodyID);
 
 /**
  * @brief Set auto disable flag.
  * @ingroup bodies
  * @param do_auto_disable 0 or 1
  */
-void  dBodySetAutoDisableFlag (dBodyID, int do_auto_disable);
+ODE_API void dBodySetAutoDisableFlag (dBodyID, int do_auto_disable);
 
 /**
  * @brief Set auto disable defaults.
@@ -489,7 +490,7 @@ void  dBodySetAutoDisableFlag (dBodyID, int do_auto_disable);
  * Set the values for the body to those set as default for the world.
  * @ingroup bodies
  */
-void  dBodySetAutoDisableDefaults (dBodyID);
+ODE_API void  dBodySetAutoDisableDefaults (dBodyID);
 
 
 
@@ -499,7 +500,7 @@ void  dBodySetAutoDisableDefaults (dBodyID);
  * Default mass parameters are at position (0,0,0).
  * @ingroup bodies
  */
-dBodyID dBodyCreate (dWorldID);
+ODE_API dBodyID dBodyCreate (dWorldID);
 
 /**
  * @brief Destroy a body.
@@ -509,7 +510,7 @@ dBodyID dBodyCreate (dWorldID);
  * deleted.
  * @ingroup bodies
  */
-void dBodyDestroy (dBodyID);
+ODE_API void dBodyDestroy (dBodyID);
 
 void dWorldAddBody     (dWorldID,dBodyID); // X-Ray custom probably
 void dWorldAddJoint    (dWorldID,dJointID); // X-Ray custom probably
@@ -521,14 +522,14 @@ void dWorldRemoveJoint (dWorldID,dJointID); // X-Ray custom probably
  * @ingroup bodies
  * @param data arbitraty pointer
  */
-void  dBodySetData (dBodyID, void *data);
+ODE_API void  dBodySetData (dBodyID, void *data);
 
 /**
  * @brief Get the body's user-data pointer.
  * @ingroup bodies
  * @return a pointer to the user's data.
  */
-void *dBodyGetData (dBodyID);
+ODE_API void *dBodyGetData (dBodyID);
 
 /**
  * @brief Set position of a body.
@@ -538,7 +539,7 @@ void *dBodyGetData (dBodyID);
  * that are present.
  * @ingroup bodies
  */
-void dBodySetPosition   (dBodyID, dReal x, dReal y, dReal z);
+ODE_API void dBodySetPosition   (dBodyID, dReal x, dReal y, dReal z);
 
 /**
  * @brief Set the orientation of a body.
@@ -548,7 +549,7 @@ void dBodySetPosition   (dBodyID, dReal x, dReal y, dReal z);
  * if the new configuration is inconsistent with the joints/constraints 
  * that are present.
  */
-void dBodySetRotation   (dBodyID, const dMatrix3 R);
+ODE_API void dBodySetRotation   (dBodyID, const dMatrix3 R);
 
 /**
  * @brief Set the orientation of a body.
@@ -558,19 +559,19 @@ void dBodySetRotation   (dBodyID, const dMatrix3 R);
  * if the new configuration is inconsistent with the joints/constraints 
  * that are present.
  */
-void dBodySetQuaternion (dBodyID, const dQuaternion q);
+ODE_API void dBodySetQuaternion (dBodyID, const dQuaternion q);
 
 /**
  * @brief Set the linear velocity of a body.
  * @ingroup bodies
  */
-void dBodySetLinearVel  (dBodyID, dReal x, dReal y, dReal z);
+ODE_API void dBodySetLinearVel  (dBodyID, dReal x, dReal y, dReal z);
 
 /**
  * @brief Set the angular velocity of a body.
  * @ingroup bodies
  */
-void dBodySetAngularVel (dBodyID, dReal x, dReal y, dReal z);
+ODE_API void dBodySetAngularVel (dBodyID, dReal x, dReal y, dReal z);
 
 /**
  * @brief Get the position of a body.
@@ -580,93 +581,93 @@ void dBodySetAngularVel (dBodyID, dReal x, dReal y, dReal z);
  * so the vectors are valid until any changes are made to the rigid body 
  * system structure.
  */
-const dReal * dBodyGetPosition   (dBodyID);
+ODE_API const dReal * dBodyGetPosition   (dBodyID);
 
 /**
  * @brief Get the rotation of a body.
  * @ingroup bodies
  * @return pointer to a 4x3 rotation matrix.
  */
-const dReal * dBodyGetRotation   (dBodyID);	/* ptr to 4x3 rot matrix */
+ODE_API const dReal * dBodyGetRotation   (dBodyID); /* ptr to 4x3 rot matrix */
 
 /**
  * @brief Get the rotation of a body.
  * @ingroup bodies
  * @return pointer to 4 scalars that represent the quaternion.
  */
-const dReal * dBodyGetQuaternion (dBodyID);
+ODE_API const dReal * dBodyGetQuaternion (dBodyID);
 
 /**
  * @brief Get the linear velocity of a body.
  * @ingroup bodies
  */
-const dReal * dBodyGetLinearVel  (dBodyID);
+ODE_API const dReal * dBodyGetLinearVel  (dBodyID);
 
 /**
  * @brief Get the angular velocity of a body.
  * @ingroup bodies
  */
-const dReal * dBodyGetAngularVel (dBodyID);
+ODE_API const dReal * dBodyGetAngularVel (dBodyID);
 
 /**
  * @brief Set the mass of a body.
  * @ingroup bodies
  */
-void dBodySetMass (dBodyID, const dMass *mass);
+ODE_API void dBodySetMass (dBodyID, const dMass *mass);
 
 /**
  * @brief Get the mass of a body.
  * @ingroup bodies
  */
-void dBodyGetMass (dBodyID, dMass *mass);
+ODE_API void dBodyGetMass (dBodyID, dMass *mass);
 
 /**
  * @brief Add force at centre of mass of body in absolute coordinates.
  * @ingroup bodies
  */
-void dBodyAddForce            (dBodyID, dReal fx, dReal fy, dReal fz);
+ODE_API void dBodyAddForce            (dBodyID, dReal fx, dReal fy, dReal fz);
 
 /**
  * @brief Add torque at centre of mass of body in absolute coordinates.
  * @ingroup bodies
  */
-void dBodyAddTorque           (dBodyID, dReal fx, dReal fy, dReal fz);
+ODE_API void dBodyAddTorque           (dBodyID, dReal fx, dReal fy, dReal fz);
 
 /**
  * @brief Add force at centre of mass of body in coordinates relative to body.
  * @ingroup bodies
  */
-void dBodyAddRelForce         (dBodyID, dReal fx, dReal fy, dReal fz);
+ODE_API void dBodyAddRelForce         (dBodyID, dReal fx, dReal fy, dReal fz);
 
 /**
  * @brief Add torque at centre of mass of body in coordinates relative to body.
  * @ingroup bodies
  */
-void dBodyAddRelTorque        (dBodyID, dReal fx, dReal fy, dReal fz);
+ODE_API void dBodyAddRelTorque        (dBodyID, dReal fx, dReal fy, dReal fz);
 
 /**
  * @brief Add force at specified point in body in global coordinates.
  * @ingroup bodies
  */
-void dBodyAddForceAtPos       (dBodyID, dReal fx, dReal fy, dReal fz,
+ODE_API void dBodyAddForceAtPos       (dBodyID, dReal fx, dReal fy, dReal fz,
 			                dReal px, dReal py, dReal pz);
 /**
  * @brief Add force at specified point in body in local coordinates.
  * @ingroup bodies
  */
-void dBodyAddForceAtRelPos    (dBodyID, dReal fx, dReal fy, dReal fz,
+ODE_API void dBodyAddForceAtRelPos    (dBodyID, dReal fx, dReal fy, dReal fz,
 			                dReal px, dReal py, dReal pz);
 /**
  * @brief Add force at specified point in body in global coordinates.
  * @ingroup bodies
  */
-void dBodyAddRelForceAtPos    (dBodyID, dReal fx, dReal fy, dReal fz,
+ODE_API void dBodyAddRelForceAtPos    (dBodyID, dReal fx, dReal fy, dReal fz,
 			                dReal px, dReal py, dReal pz);
 /**
  * @brief Add force at specified point in body in local coordinates.
  * @ingroup bodies
  */
-void dBodyAddRelForceAtRelPos (dBodyID, dReal fx, dReal fy, dReal fz,
+ODE_API void dBodyAddRelForceAtRelPos (dBodyID, dReal fx, dReal fy, dReal fz,
 			                dReal px, dReal py, dReal pz);
 
 /**
@@ -678,7 +679,7 @@ void dBodyAddRelForceAtRelPos (dBodyID, dReal fx, dReal fy, dReal fz,
  * body system.
  * @ingroup bodies
  */
-const dReal * dBodyGetForce   (dBodyID);
+ODE_API const dReal * dBodyGetForce   (dBodyID);
 
 /**
  * @brief Return the current accumulated torque vector.
@@ -689,7 +690,7 @@ const dReal * dBodyGetForce   (dBodyID);
  * body system.
  * @ingroup bodies
  */
-const dReal * dBodyGetTorque  (dBodyID);
+ODE_API const dReal * dBodyGetTorque  (dBodyID);
 
 /**
  * @brief Set the body force accumulation vector.
@@ -699,7 +700,7 @@ const dReal * dBodyGetTorque  (dBodyID);
  * were called on them while they were deactivated.
  * @ingroup bodies
  */
-void dBodySetForce  (dBodyID b, dReal x, dReal y, dReal z);
+ODE_API void dBodySetForce  (dBodyID b, dReal x, dReal y, dReal z);
 
 /**
  * @brief Set the body torque accumulation vector.
@@ -709,14 +710,14 @@ void dBodySetForce  (dBodyID b, dReal x, dReal y, dReal z);
  * were called on them while they were deactivated.
  * @ingroup bodies
  */
-void dBodySetTorque (dBodyID b, dReal x, dReal y, dReal z);
+ODE_API void dBodySetTorque (dBodyID b, dReal x, dReal y, dReal z);
 
 /**
  * @brief Get world position of a relative point on body.
  * @ingroup bodies
  * @param result will contain the result.
  */
-void dBodyGetRelPointPos
+ODE_API void dBodyGetRelPointPos 
 (
   dBodyID, dReal px, dReal py, dReal pz,
   dVector3 result
@@ -727,7 +728,7 @@ void dBodyGetRelPointPos
  * @ingroup bodies
  * @param result will contain the result.
  */
-void dBodyGetRelPointVel
+ODE_API void dBodyGetRelPointVel
 (
   dBodyID, dReal px, dReal py, dReal pz,
   dVector3 result
@@ -739,7 +740,7 @@ void dBodyGetRelPointVel
  * @ingroup bodies
  * @param result will contain the result.
  */
-void dBodyGetPointVel
+ODE_API void dBodyGetPointVel
 (
   dBodyID, dReal px, dReal py, dReal pz,
   dVector3 result
@@ -753,7 +754,7 @@ void dBodyGetPointVel
  * @ingroup bodies
  * @param result will contain the result.
  */
-void dBodyGetPosRelPoint
+ODE_API void dBodyGetPosRelPoint 
 (
   dBodyID, dReal px, dReal py, dReal pz,
   dVector3 result
@@ -764,7 +765,7 @@ void dBodyGetPosRelPoint
  * @ingroup bodies
  * @param result will contain the result.
  */
-void dBodyVectorToWorld
+ODE_API void dBodyVectorToWorld
 (
   dBodyID, dReal px, dReal py, dReal pz,
   dVector3 result
@@ -775,7 +776,7 @@ void dBodyVectorToWorld
  * @ingroup bodies
  * @param result will contain the result.
  */
-void dBodyVectorFromWorld
+ODE_API void dBodyVectorFromWorld 
 (
   dBodyID, dReal px, dReal py, dReal pz,
   dVector3 result
@@ -798,7 +799,7 @@ void dBodyVectorFromWorld
  * error in a simulation, and the finite mode will only fix one of those
  * sources of error.
  */
-void dBodySetFiniteRotationMode (dBodyID, int mode);
+ODE_API void dBodySetFiniteRotationMode (dBodyID, int mode);
 
 /**
  * @brief sets the finite rotation axis for a body.
@@ -816,28 +817,28 @@ void dBodySetFiniteRotationMode (dBodyID, int mode);
  * you can call this function with the wheel's hinge axis as the argument to
  * try and improve its behavior.
  */
-void dBodySetFiniteRotationAxis (dBodyID, dReal x, dReal y, dReal z);
+ODE_API void dBodySetFiniteRotationAxis (dBodyID, dReal x, dReal y, dReal z);
 
 /**
  * @brief Get the way a body's orientation is updated each timestep.
  * @ingroup bodies
  * @return the mode 0 (infitesimal) or 1 (finite).
  */
-int dBodyGetFiniteRotationMode (dBodyID);
+ODE_API int dBodyGetFiniteRotationMode (dBodyID);
 
 /**
  * @brief Get the finite rotation axis.
  * @param result will contain the axis.
  * @ingroup bodies
  */
-void dBodyGetFiniteRotationAxis (dBodyID, dVector3 result);
+ODE_API void dBodyGetFiniteRotationAxis (dBodyID, dVector3 result);
 
 /**
  * @brief Get the number of joints that are attached to this body.
  * @ingroup bodies
  * @return nr of joints
  */
-int dBodyGetNumJoints (dBodyID b);
+ODE_API int dBodyGetNumJoints (dBodyID b);
 
 /**
  * @brief Return a joint attached to this body, given by index.
@@ -845,14 +846,14 @@ int dBodyGetNumJoints (dBodyID b);
  * @param index valid range is  0 to n-1 where n is the value returned by
  * dBodyGetNumJoints().
  */
-dJointID dBodyGetJoint (dBodyID, int index);
+ODE_API dJointID dBodyGetJoint (dBodyID, int index);
 
 /**
  * @brief Manually enable a body.
  * @param dBodyID identification of body.
  * @ingroup bodies
  */
-void dBodyEnable (dBodyID);
+ODE_API void dBodyEnable (dBodyID);
 
 /**
  * @brief Manually disable a body.
@@ -861,14 +862,14 @@ void dBodyEnable (dBodyID);
  * A disabled body that is connected through a joint to an enabled body will
  * be automatically re-enabled at the next simulation step.
  */
-void dBodyDisable (dBodyID);
+ODE_API void dBodyDisable (dBodyID);
 
 /**
  * @brief Check wether a body is enabled.
  * @ingroup bodies
  * @return 1 if a body is currently enabled or 0 if it is disabled.
  */
-int dBodyIsEnabled (dBodyID);
+ODE_API int dBodyIsEnabled (dBodyID);
 
 /**
  * @brief Set whether the body is influenced by the world's gravity or not.
@@ -877,14 +878,14 @@ int dBodyIsEnabled (dBodyID);
  * @remarks
  * Newly created bodies are always influenced by the world's gravity.
  */
-void dBodySetGravityMode (dBodyID b, int mode);
+ODE_API void dBodySetGravityMode (dBodyID b, int mode);
 
 /**
  * @brief Get whether the body is influenced by the world's gravity or not.
  * @ingroup bodies
  * @return nonzero means gravity affects this body.
  */
-int dBodyGetGravityMode (dBodyID b);
+ODE_API int dBodyGetGravityMode (dBodyID b);
 
 
 
@@ -963,7 +964,7 @@ int dBodyGetGravityMode (dBodyID b);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateBall (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateBall (dWorldID, dJointGroupID);
 
 /**
  * @brief Create a new joint of the hinge type.
@@ -971,7 +972,7 @@ dJointID dJointCreateBall (dWorldID, dJointGroupID);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateHinge (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateHinge (dWorldID, dJointGroupID);
 
 /**
  * @brief Create a new joint of the slider type.
@@ -979,7 +980,7 @@ dJointID dJointCreateHinge (dWorldID, dJointGroupID);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateSlider (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateSlider (dWorldID, dJointGroupID);
 
 /**
  * @brief Create a new joint of the contact type.
@@ -987,8 +988,8 @@ dJointID dJointCreateSlider (dWorldID, dJointGroupID);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateContact (dWorldID, dJointGroupID, const dContact *);
-dJointID dJointCreateContactSpecial (dWorldID, dJointGroupID, const dContact *);
+ODE_API dJointID dJointCreateContact (dWorldID, dJointGroupID, const dContact *);
+dJointID dJointCreateContactSpecial (dWorldID, dJointGroupID, const dContact *); // XXX: GSC custom?
 
 /**
  * @brief Create a new joint of the hinge2 type.
@@ -996,7 +997,7 @@ dJointID dJointCreateContactSpecial (dWorldID, dJointGroupID, const dContact *);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateHinge2 (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateHinge2 (dWorldID, dJointGroupID);
 
 /**
  * @brief Create a new joint of the universal type.
@@ -1004,7 +1005,7 @@ dJointID dJointCreateHinge2 (dWorldID, dJointGroupID);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateUniversal (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateUniversal (dWorldID, dJointGroupID);
 
 /**
  * @brief Create a new joint of the fixed type.
@@ -1012,9 +1013,9 @@ dJointID dJointCreateUniversal (dWorldID, dJointGroupID);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateFixed (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateFixed (dWorldID, dJointGroupID);
 
-dJointID dJointCreateNull (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateNull (dWorldID, dJointGroupID);
 
 /**
  * @brief Create a new joint of the A-motor type.
@@ -1022,7 +1023,8 @@ dJointID dJointCreateNull (dWorldID, dJointGroupID);
  * @param dJointGroupID set to 0 to allocate the joint normally.
  * If it is nonzero the joint is allocated in the given joint group.
  */
-dJointID dJointCreateAMotor (dWorldID, dJointGroupID);
+ODE_API dJointID dJointCreateAMotor (dWorldID, dJointGroupID);
+
 
 /**
  * @brief Destroy a joint.
@@ -1032,7 +1034,7 @@ dJointID dJointCreateAMotor (dWorldID, dJointGroupID);
  * However, if the joint is a member of a group then this function has no
  * effect - to destroy that joint the group must be emptied or destroyed.
  */
-void dJointDestroy (dJointID);
+ODE_API void dJointDestroy (dJointID);
 
 
 /**
@@ -1040,7 +1042,7 @@ void dJointDestroy (dJointID);
  * @ingroup joints
  * @param max_size deprecated. Set to 0.
  */
-dJointGroupID dJointGroupCreate (int max_size);
+ODE_API dJointGroupID dJointGroupCreate (int max_size);
 
 /**
  * @brief Destroy a joint group.
@@ -1048,7 +1050,7 @@ dJointGroupID dJointGroupCreate (int max_size);
  * 
  * All joints in the joint group will be destroyed.
  */
-void dJointGroupDestroy (dJointGroupID);
+ODE_API void dJointGroupDestroy (dJointGroupID);
 
 /**
  * @brief Empty a joint group.
@@ -1057,7 +1059,8 @@ void dJointGroupDestroy (dJointGroupID);
  * All joints in the joint group will be destroyed,
  * but the joint group itself will not be destroyed.
  */
-void dJointGroupEmpty (dJointGroupID);
+ODE_API void dJointGroupEmpty (dJointGroupID);
+
 /**
  * @brief Attach the joint to some new bodies.
  * @ingroup joints
@@ -1071,19 +1074,19 @@ void dJointGroupEmpty (dJointGroupID);
  * @remarks
  * Some joints, like hinge-2 need to be attached to two bodies to work.
  */
-void dJointAttach (dJointID, dBodyID body1, dBodyID body2);
+ODE_API void dJointAttach (dJointID, dBodyID body1, dBodyID body2);
 
 /**
  * @brief Set the user-data pointer
  * @ingroup joints
  */
-void dJointSetData (dJointID, void *data);
+ODE_API void dJointSetData (dJointID, void *data);
 
 /**
  * @brief Get the user-data pointer
  * @ingroup joints
  */
-void *dJointGetData (dJointID);
+ODE_API void *dJointGetData (dJointID);
 
 /**
  * @brief Get the type of the joint
@@ -1099,7 +1102,7 @@ void *dJointGetData (dJointID);
  * \li JointTypeAMotor
  * \li JointTypeLMotor
  */
-int dJointGetType (dJointID);
+ODE_API int dJointGetType (dJointID);
 
 /**
  * @brief Return the bodies that this joint connects.
@@ -1111,7 +1114,7 @@ int dJointGetType (dJointID);
  * If both body IDs are zero, the joint is in ``limbo'' and has no effect on
  * the simulation.
  */
-dBodyID dJointGetBody (dJointID, int index);
+ODE_API dBodyID dJointGetBody (dJointID, int index);
 
 /**
  * @brief Sets the datastructure that is to receive the feedback.
@@ -1120,13 +1123,13 @@ dBodyID dJointGetBody (dJointID, int index);
  * much force an individual joint exerts. 
  * @ingroup joints
  */
-void dJointSetFeedback (dJointID, dJointFeedback *);
+ODE_API void dJointSetFeedback (dJointID, dJointFeedback *);
 
 /**
  * @brief Gets the datastructure that is to receive the feedback.
  * @ingroup joints
  */
-dJointFeedback *dJointGetFeedback (dJointID);
+ODE_API dJointFeedback *dJointGetFeedback (dJointID);
 
 /** 
  * @brief Set the joint anchor point. 
@@ -1135,24 +1138,26 @@ dJointFeedback *dJointGetFeedback (dJointID);
  * The joint will try to keep this point on each body
  * together. The input is specified in world coordinates.
  */
-void dJointSetBallAnchor (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetBallAnchor (dJointID, dReal x, dReal y, dReal z);
+
 /**
  * @brief Set hinge anchor parameter.
  * @ingroup joints
  */
-void dJointSetHingeAnchor (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetHingeAnchor (dJointID, dReal x, dReal y, dReal z);
+
 
 /**
  * @brief Set hinge axis.
  * @ingroup joints
  */
-void dJointSetHingeAxis (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetHingeAxis (dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set joint parameter
  * @ingroup joints
  */
-void dJointSetHingeParam (dJointID, int parameter, dReal value);
+ODE_API void dJointSetHingeParam (dJointID, int parameter, dReal value);
 
 /**
  * @brief Applies the torque about the hinge axis.
@@ -1162,18 +1167,19 @@ void dJointSetHingeParam (dJointID, int parameter, dReal value);
  * direction to body 2. This function is just a wrapper for dBodyAddTorque()}
  * @ingroup joints
  */
-void dJointAddHingeTorque(dJointID joint, dReal torque);
+ODE_API void dJointAddHingeTorque(dJointID joint, dReal torque);
 
 /**
  * @brief set the joint axis
  * @ingroup joints
  */
-void dJointSetSliderAxis (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetSliderAxis (dJointID, dReal x, dReal y, dReal z);
+
 /**
  * @brief set joint parameter
  * @ingroup joints
  */
-void dJointSetSliderParam (dJointID, int parameter, dReal value);
+ODE_API void dJointSetSliderParam (dJointID, int parameter, dReal value);
 
 /**
  * @brief Applies the given force in the slider's direction. 
@@ -1183,31 +1189,31 @@ void dJointSetSliderParam (dJointID, int parameter, dReal value);
  * direction to body2.  This function is just a wrapper for dBodyAddForce().
  * @ingroup joints
  */
-void dJointAddSliderForce(dJointID joint, dReal force);
+ODE_API void dJointAddSliderForce(dJointID joint, dReal force);
 
 /**
  * @brief set anchor
  * @ingroup joints
  */
-void dJointSetHinge2Anchor (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetHinge2Anchor (dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set axis
  * @ingroup joints
  */
-void dJointSetHinge2Axis1 (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetHinge2Axis1 (dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set axis
  * @ingroup joints
  */
-void dJointSetHinge2Axis2 (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetHinge2Axis2 (dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set joint parameter
  * @ingroup joints
  */
-void dJointSetHinge2Param (dJointID, int parameter, dReal value);
+ODE_API void dJointSetHinge2Param (dJointID, int parameter, dReal value);
 
 /**
  * @brief Applies torque1 about the hinge2's axis 1, torque2 about the 
@@ -1215,31 +1221,31 @@ void dJointSetHinge2Param (dJointID, int parameter, dReal value);
  * @remarks  This function is just a wrapper for dBodyAddTorque().
  * @ingroup joints
  */
-void dJointAddHinge2Torques(dJointID joint, dReal torque1, dReal torque2);
+ODE_API void dJointAddHinge2Torques(dJointID joint, dReal torque1, dReal torque2);
 
 /**
  * @brief set anchor
  * @ingroup joints
  */
-void dJointSetUniversalAnchor (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetUniversalAnchor (dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set axis
  * @ingroup joints
  */
-void dJointSetUniversalAxis1 (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetUniversalAxis1 (dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set axis
  * @ingroup joints
  */
-void dJointSetUniversalAxis2 (dJointID, dReal x, dReal y, dReal z);
+ODE_API void dJointSetUniversalAxis2 (dJointID, dReal x, dReal y, dReal z);
 
 /**
  * @brief set joint parameter
  * @ingroup joints
  */
-void dJointSetUniversalParam (dJointID, int parameter, dReal value);
+ODE_API void dJointSetUniversalParam (dJointID, int parameter, dReal value);
 
 /**
  * @brief Applies torque1 about the universal's axis 1, torque2 about the
@@ -1247,7 +1253,7 @@ void dJointSetUniversalParam (dJointID, int parameter, dReal value);
  * @remarks This function is just a wrapper for dBodyAddTorque().
  * @ingroup joints
  */
-void dJointAddUniversalTorques(dJointID joint, dReal torque1, dReal torque2);
+ODE_API void dJointAddUniversalTorques(dJointID joint, dReal torque1, dReal torque2);
 
 /**
  * @brief Call this on the fixed joint after it has been attached to 
@@ -1255,21 +1261,21 @@ void dJointAddUniversalTorques(dJointID joint, dReal torque1, dReal torque2);
  * rotation between the bodies.
  * @ingroup joints
  */
-void dJointSetFixed (dJointID);
-void dJointSetFixedQuaternionPos (dJointID joint, dQuaternion quaternion, dReal* pos);
+ODE_API void dJointSetFixed (dJointID);
+void dJointSetFixedQuaternionPos (dJointID joint, dQuaternion quaternion, dReal* pos); // XXX: GSC custom?
 
 /**
  * @brief set the nr of axes
  * @param num 0..3
  * @ingroup joints
  */
-void dJointSetAMotorNumAxes (dJointID, int num);
+ODE_API void dJointSetAMotorNumAxes (dJointID, int num);
 
 /**
  * @brief set axis
  * @ingroup joints
  */
-void dJointSetAMotorAxis (dJointID, int anum, int rel,
+ODE_API void dJointSetAMotorAxis (dJointID, int anum, int rel,
 			  dReal x, dReal y, dReal z);
 
 /**
@@ -1281,19 +1287,19 @@ void dJointSetAMotorAxis (dJointID, int anum, int rel,
  * but it is not needed for axis motors.
  * @ingroup joints
  */
-void dJointSetAMotorAngle (dJointID, int anum, dReal angle);
+ODE_API void dJointSetAMotorAngle (dJointID, int anum, dReal angle);
 
 /**
  * @brief set joint parameter
  * @ingroup joints
  */
-void dJointSetAMotorParam (dJointID, int parameter, dReal value);
+ODE_API void dJointSetAMotorParam (dJointID, int parameter, dReal value);
 
 /**
  * @brief set mode
  * @ingroup joints
  */
-void dJointSetAMotorMode (dJointID, int mode);
+ODE_API void dJointSetAMotorMode (dJointID, int mode);
 
 /**
  * @brief Applies torque0 about the AMotor's axis 0, torque1 about the 
@@ -1303,7 +1309,7 @@ void dJointSetAMotorMode (dJointID, int mode);
  * This function is just a wrapper for dBodyAddTorque().
  * @ingroup joints
  */
-void dJointAddAMotorTorques (dJointID, dReal torque1, dReal torque2, dReal torque3);
+ODE_API void dJointAddAMotorTorques (dJointID, dReal torque1, dReal torque2, dReal torque3);
 
 /**
  * @brief Get the joint anchor point, in world coordinates.
@@ -1311,7 +1317,7 @@ void dJointAddAMotorTorques (dJointID, dReal torque1, dReal torque2, dReal torqu
  * This returns the point on body 1. If the joint is perfectly satisfied, 
  * this will be the same as the point on body 2.
  */
-void dJointGetBallAnchor (dJointID, dVector3 result);
+ODE_API void dJointGetBallAnchor (dJointID, dVector3 result);
 
 /**
  * @brief Get the joint anchor point, in world coordinates.
@@ -1323,7 +1329,7 @@ void dJointGetBallAnchor (dJointID, dVector3 result);
  * within roundoff errors. dJointGetBallAnchor2() can be used, along with 
  * dJointGetBallAnchor(), to see how far the joint has come apart.
  */
-void dJointGetBallAnchor2 (dJointID, dVector3 result);
+ODE_API void dJointGetBallAnchor2 (dJointID, dVector3 result);
 
 /**
  * @brief Get the hinge anchor point, in world coordinates.
@@ -1332,7 +1338,7 @@ void dJointGetBallAnchor2 (dJointID, dVector3 result);
  * this will be the same as the point on body 2.
  * @ingroup joints
  */
-void dJointGetHingeAnchor (dJointID, dVector3 result);
+ODE_API void dJointGetHingeAnchor (dJointID, dVector3 result);
 
 /**
  * @brief Get the joint anchor point, in world coordinates. 
@@ -1342,19 +1348,19 @@ void dJointGetHingeAnchor (dJointID, dVector3 result);
  * This can be used, for example, to see how far the joint has come apart.
  * @ingroup joints
  */
-void dJointGetHingeAnchor2 (dJointID, dVector3 result);
+ODE_API void dJointGetHingeAnchor2 (dJointID, dVector3 result);
 
 /**
  * @brief get axis
  * @ingroup joints
  */
-void dJointGetHingeAxis (dJointID, dVector3 result);
+ODE_API void dJointGetHingeAxis (dJointID, dVector3 result);
 
 /**
  * @brief get joint parameter
  * @ingroup joints
  */
-dReal dJointGetHingeParam (dJointID, int parameter);
+ODE_API dReal dJointGetHingeParam (dJointID, int parameter);
 
 /**
  * @brief Get the hinge angle.
@@ -1366,13 +1372,13 @@ dReal dJointGetHingeParam (dJointID, int parameter);
  * bodies is examined and that position will be the zero angle.
  * @ingroup joints
  */
-dReal dJointGetHingeAngle (dJointID);
+ODE_API dReal dJointGetHingeAngle (dJointID);
 
 /**
  * @brief Get the hinge angle time derivative.
  * @ingroup joints
  */
-dReal dJointGetHingeAngleRate (dJointID);
+ODE_API dReal dJointGetHingeAngleRate (dJointID);
 
 /**
  * @brief Get the slider linear position (i.e. the slider's extension)
@@ -1381,25 +1387,25 @@ dReal dJointGetHingeAngleRate (dJointID);
  * examined and that position will be the zero position.
  * @ingroup joints
  */
-dReal dJointGetSliderPosition (dJointID);
+ODE_API dReal dJointGetSliderPosition (dJointID);
 
 /**
  * @brief Get the slider linear position's time derivative.
  * @ingroup joints
  */
-dReal dJointGetSliderPositionRate (dJointID);
+ODE_API dReal dJointGetSliderPositionRate (dJointID);
 
 /**
  * @brief Get the slider axis
  * @ingroup joints
  */
-void dJointGetSliderAxis (dJointID, dVector3 result);
+ODE_API void dJointGetSliderAxis (dJointID, dVector3 result);
 
 /**
  * @brief get joint parameter
  * @ingroup joints
  */
-dReal dJointGetSliderParam (dJointID, int parameter);
+ODE_API dReal dJointGetSliderParam (dJointID, int parameter);
 
 /**
  * @brief Get the joint anchor point, in world coordinates. 
@@ -1407,7 +1413,7 @@ dReal dJointGetSliderParam (dJointID, int parameter);
  * this will be the same as the point on body 2.
  * @ingroup joints
  */
-void dJointGetHinge2Anchor (dJointID, dVector3 result);
+ODE_API void dJointGetHinge2Anchor (dJointID, dVector3 result);
 
 /**
  * @brief Get the joint anchor point, in world coordinates.
@@ -1417,43 +1423,43 @@ void dJointGetHinge2Anchor (dJointID, dVector3 result);
  * This can be used, for example, to see how far the joint has come apart.
  * @ingroup joints
  */
-void dJointGetHinge2Anchor2 (dJointID, dVector3 result);
+ODE_API void dJointGetHinge2Anchor2 (dJointID, dVector3 result);
 
 /**
  * @brief Get joint axis
  * @ingroup joints
  */
-void dJointGetHinge2Axis1 (dJointID, dVector3 result);
+ODE_API void dJointGetHinge2Axis1 (dJointID, dVector3 result);
 
 /**
  * @brief Get joint axis
  * @ingroup joints
  */
-void dJointGetHinge2Axis2 (dJointID, dVector3 result);
+ODE_API void dJointGetHinge2Axis2 (dJointID, dVector3 result);
 
 /**
  * @brief get joint parameter
  * @ingroup joints
  */
-dReal dJointGetHinge2Param (dJointID, int parameter);
+ODE_API dReal dJointGetHinge2Param (dJointID, int parameter);
 
 /**
  * @brief Get angle
  * @ingroup joints
  */
-dReal dJointGetHinge2Angle1 (dJointID);
+ODE_API dReal dJointGetHinge2Angle1 (dJointID);
 
 /**
  * @brief Get time derivative of angle
  * @ingroup joints
  */
-dReal dJointGetHinge2Angle1Rate (dJointID);
+ODE_API dReal dJointGetHinge2Angle1Rate (dJointID);
 
 /**
  * @brief Get time derivative of angle
  * @ingroup joints
  */
-dReal dJointGetHinge2Angle2Rate (dJointID);
+ODE_API dReal dJointGetHinge2Angle2Rate (dJointID);
 
 /**
  * @brief Get the joint anchor point, in world coordinates.
@@ -1461,7 +1467,7 @@ dReal dJointGetHinge2Angle2Rate (dJointID);
  * this will be the same as the point on body 2.
  * @ingroup joints
  */
-void dJointGetUniversalAnchor (dJointID, dVector3 result);
+ODE_API void dJointGetUniversalAnchor (dJointID, dVector3 result);
 
 /**
  * @brief Get the joint anchor point, in world coordinates. 
@@ -1476,50 +1482,50 @@ void dJointGetUniversalAnchor (dJointID, dVector3 result);
  * dJointGetUniversalAnchor(), to see how far the joint has come apart.
  * @ingroup joints
  */
-void dJointGetUniversalAnchor2 (dJointID, dVector3 result);
+ODE_API void dJointGetUniversalAnchor2 (dJointID, dVector3 result);
 
 /**
  * @brief Get axis
  * @ingroup joints
  */
-void dJointGetUniversalAxis1 (dJointID, dVector3 result);
+ODE_API void dJointGetUniversalAxis1 (dJointID, dVector3 result);
 
 /**
  * @brief Get axis
  * @ingroup joints
  */
-void dJointGetUniversalAxis2 (dJointID, dVector3 result);
+ODE_API void dJointGetUniversalAxis2 (dJointID, dVector3 result);
 
 
 /**
  * @brief get joint parameter
  * @ingroup joints
  */
-dReal dJointGetUniversalParam (dJointID, int parameter);
+ODE_API dReal dJointGetUniversalParam (dJointID, int parameter);
 
 /**
  * @brief Get angle
  * @ingroup joints
  */
-dReal dJointGetUniversalAngle1 (dJointID);
+ODE_API dReal dJointGetUniversalAngle1 (dJointID);
 
 /**
  * @brief Get angle
  * @ingroup joints
  */
-dReal dJointGetUniversalAngle2 (dJointID);
+ODE_API dReal dJointGetUniversalAngle2 (dJointID);
 
 /**
  * @brief Get time derivative of angle
  * @ingroup joints
  */
-dReal dJointGetUniversalAngle1Rate (dJointID);
+ODE_API dReal dJointGetUniversalAngle1Rate (dJointID);
 
 /**
  * @brief Get time derivative of angle
  * @ingroup joints
  */
-dReal dJointGetUniversalAngle2Rate (dJointID);
+ODE_API dReal dJointGetUniversalAngle2Rate (dJointID);
 
 /**
  * @brief Get the number of angular axes that will be controlled by the
@@ -1529,7 +1535,7 @@ dReal dJointGetUniversalAngle2Rate (dJointID);
  * This is automatically set to 3 in dAMotorEuler mode.
  * @ingroup joints
  */
-int dJointGetAMotorNumAxes (dJointID);
+ODE_API int dJointGetAMotorNumAxes (dJointID);
 
 /**
  * @brief Get the AMotor axes.
@@ -1540,7 +1546,7 @@ int dJointGetAMotorNumAxes (dJointID);
  * \li 2: The axis is anchored to the second body.
  * @ingroup joints
  */
-void dJointGetAMotorAxis (dJointID, int anum, dVector3 result);
+ODE_API void dJointGetAMotorAxis (dJointID, int anum, dVector3 result);
 
 /**
  * @brief Get axis
@@ -1558,7 +1564,7 @@ void dJointGetAMotorAxis (dJointID, int anum, dVector3 result);
 	to the second body.
  * @ingroup joints
  */
-int dJointGetAMotorAxisRel (dJointID, int anum);
+ODE_API int dJointGetAMotorAxisRel (dJointID, int anum);
 
 /**
  * @brief Get the current angle for axis.
@@ -1568,7 +1574,7 @@ int dJointGetAMotorAxisRel (dJointID, int anum);
  * In dAMotorEuler mode this is the corresponding euler angle.
  * @ingroup joints
  */
-dReal dJointGetAMotorAngle (dJointID, int anum);
+ODE_API dReal dJointGetAMotorAngle (dJointID, int anum);
 
 /**
  * @brief Get the current angle rate for axis anum.
@@ -1578,13 +1584,13 @@ dReal dJointGetAMotorAngle (dJointID, int anum);
  * In dAMotorEuler mode this is the corresponding euler angle rate.
  * @ingroup joints
  */
-dReal dJointGetAMotorAngleRate (dJointID, int anum);
+ODE_API dReal dJointGetAMotorAngleRate (dJointID, int anum);
 
 /**
  * @brief get joint parameter
  * @ingroup joints
  */
-dReal dJointGetAMotorParam (dJointID, int parameter);
+ODE_API dReal dJointGetAMotorParam (dJointID, int parameter);
 
 /**
  * @brief Get the angular motor mode. 
@@ -1599,7 +1605,7 @@ dReal dJointGetAMotorParam (dJointID, int parameter);
  * of the bodies will correspond to all euler angles at zero.
  * @ingroup joints
  */
-int dJointGetAMotorMode (dJointID);
+ODE_API int dJointGetAMotorMode (dJointID);
 
 
 /**
@@ -1608,7 +1614,7 @@ int dJointGetAMotorMode (dJointID);
  * a joint, otherwise return 0.
  * @ingroup joints
  */
-int dAreConnected (dBodyID, dBodyID);
+ODE_API int dAreConnected (dBodyID, dBodyID);
 
 /**
  * @brief Utility function
@@ -1621,7 +1627,7 @@ int dAreConnected (dBodyID, dBodyID);
  * bodies that already have contacts.
  * @ingroup joints
  */
-int dAreConnectedExcluding (dBodyID, dBodyID, int joint_type);
+ODE_API int dAreConnectedExcluding (dBodyID, dBodyID, int joint_type);
 
 
 #ifdef __cplusplus

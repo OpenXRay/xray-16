@@ -62,7 +62,7 @@ extern "C" {
  * @param geom the geom to be destroyed.
  * @ingroup collide
  */
-void dGeomDestroy (dGeomID geom);
+ODE_API void dGeomDestroy (dGeomID geom);
 
 
 /**
@@ -72,7 +72,7 @@ void dGeomDestroy (dGeomID geom);
  * @param data the data pointer to be stored
  * @ingroup collide
  */
-void dGeomSetData (dGeomID geom, void* data);
+ODE_API void dGeomSetData (dGeomID geom, void* data);
 
 
 /**
@@ -81,7 +81,7 @@ void dGeomSetData (dGeomID geom, void* data);
  * @param geom the geom containing the data
  * @ingroup collide
  */
-void *dGeomGetData (dGeomID geom);
+ODE_API void *dGeomGetData (dGeomID geom);
 
 
 /**
@@ -102,7 +102,7 @@ void *dGeomGetData (dGeomID geom);
  * @param body the body to attach to the geom
  * @ingroup collide
  */
-void dGeomSetBody (dGeomID geom, dBodyID body);
+ODE_API void dGeomSetBody (dGeomID geom, dBodyID body);
 
 
 /**
@@ -111,7 +111,7 @@ void dGeomSetBody (dGeomID geom, dBodyID body);
  * @sa dGeomSetBody
  * @ingroup collide
  */
-dBodyID dGeomGetBody (dGeomID geom);
+ODE_API dBodyID dGeomGetBody (dGeomID geom);
 
 
 /**
@@ -128,7 +128,7 @@ dBodyID dGeomGetBody (dGeomID geom);
  * @sa dBodySetPosition
  * @ingroup collide
  */
-void dGeomSetPosition (dGeomID geom, dReal x, dReal y, dReal z);
+ODE_API void dGeomSetPosition (dGeomID geom, dReal x, dReal y, dReal z);
 
 
 /**
@@ -143,7 +143,7 @@ void dGeomSetPosition (dGeomID geom, dReal x, dReal y, dReal z);
  * @sa dBodySetRotation
  * @ingroup collide
  */
-void dGeomSetRotation (dGeomID geom, const dMatrix3 R);
+ODE_API void dGeomSetRotation (dGeomID geom, const dMatrix3 R);
 
 
 /**
@@ -159,7 +159,7 @@ void dGeomSetRotation (dGeomID geom, const dMatrix3 R);
  * @sa dBodySetQuaternion
  * @ingroup collide
  */
-void dGeomSetQuaternion (dGeomID geom, const dQuaternion Q);
+ODE_API void dGeomSetQuaternion (dGeomID geom, const dQuaternion Q);
 
 
 /**
@@ -178,7 +178,7 @@ void dGeomSetQuaternion (dGeomID geom, const dQuaternion Q);
  * @sa dBodyGetPosition
  * @ingroup collide
  */
-const dReal * dGeomGetPosition (dGeomID geom);
+ODE_API const dReal * dGeomGetPosition (dGeomID geom);
 
 
 /**
@@ -197,7 +197,7 @@ const dReal * dGeomGetPosition (dGeomID geom);
  * @sa dBodyGetRotation
  * @ingroup collide
  */
-const dReal * dGeomGetRotation (dGeomID geom);
+ODE_API const dReal * dGeomGetRotation (dGeomID geom);
 
 
 /**
@@ -213,7 +213,7 @@ const dReal * dGeomGetRotation (dGeomID geom);
  * @sa dBodyGetQuaternion
  * @ingroup collide
  */
-void dGeomGetQuaternion (dGeomID geom, dQuaternion result);
+ODE_API void dGeomGetQuaternion (dGeomID geom, dQuaternion result);
 
 
 /**
@@ -232,7 +232,7 @@ void dGeomGetQuaternion (dGeomID geom, dQuaternion result);
  * @param aabb the returned bounding box
  * @ingroup collide
  */
-void dGeomGetAABB (dGeomID geom, dReal aabb[6]);
+ODE_API void dGeomGetAABB (dGeomID geom, dReal aabb[6]);
 
 
 /**
@@ -241,7 +241,7 @@ void dGeomGetAABB (dGeomID geom, dReal aabb[6]);
  * @returns Non-zero if the geom is a space, zero otherwise.
  * @ingroup collide
  */
-int dGeomIsSpace (dGeomID geom);
+ODE_API int dGeomIsSpace (dGeomID geom);
 
 
 /**
@@ -251,7 +251,7 @@ int dGeomIsSpace (dGeomID geom);
  *          not contained by a space.
  * @ingroup collide
  */
-dSpaceID dGeomGetSpace (dGeomID);
+ODE_API dSpaceID dGeomGetSpace (dGeomID);
 
 
 /**
@@ -278,7 +278,7 @@ dSpaceID dGeomGetSpace (dGeomID);
  * @returns The geom class ID.
  * @ingroup collide
  */
-int dGeomGetClass (dGeomID geom);
+ODE_API int dGeomGetClass (dGeomID geom);
 
 
 /**
@@ -293,7 +293,7 @@ int dGeomGetClass (dGeomID geom);
  * @param bits the new bitfield value
  * @ingroup collide
  */
-void dGeomSetCategoryBits (dGeomID geom, unsigned long bits);
+ODE_API void dGeomSetCategoryBits (dGeomID geom, unsigned long bits);
 
 
 /**
@@ -308,7 +308,7 @@ void dGeomSetCategoryBits (dGeomID geom, unsigned long bits);
  * @param bits the new bitfield value
  * @ingroup collide
  */
-void dGeomSetCollideBits (dGeomID geom, unsigned long bits);
+ODE_API void dGeomSetCollideBits (dGeomID geom, unsigned long bits);
 
 
 /**
@@ -319,7 +319,7 @@ void dGeomSetCollideBits (dGeomID geom, unsigned long bits);
  * @sa dGeomSetCategoryBits
  * @ingroup collide
  */
-unsigned long dGeomGetCategoryBits (dGeomID);
+ODE_API unsigned long dGeomGetCategoryBits (dGeomID);
 
 
 /**
@@ -330,7 +330,7 @@ unsigned long dGeomGetCategoryBits (dGeomID);
  * @sa dGeomSetCollideBits
  * @ingroup collide
  */
-unsigned long dGeomGetCollideBits (dGeomID);
+ODE_API unsigned long dGeomGetCollideBits (dGeomID);
 
 
 /**
@@ -345,7 +345,7 @@ unsigned long dGeomGetCollideBits (dGeomID);
  * @sa dGeomIsEnabled
  * @ingroup collide
  */
-void dGeomEnable (dGeomID geom);
+ODE_API void dGeomEnable (dGeomID geom);
 
 
 /**
@@ -360,7 +360,7 @@ void dGeomEnable (dGeomID geom);
  * @sa dGeomIsEnabled
  * @ingroup collide
  */
-void dGeomDisable (dGeomID geom);
+ODE_API void dGeomDisable (dGeomID geom);
 
 
 /**
@@ -376,17 +376,17 @@ void dGeomDisable (dGeomID geom);
  * @sa dGeomIsEnabled
  * @ingroup collide
  */
-int dGeomIsEnabled (dGeomID geom);
+ODE_API int dGeomIsEnabled (dGeomID geom);
 
 
 
 /* ************************************************************************ */
 /* collision detection */
 
-int dCollide (dGeomID o1, dGeomID o2, int flags, dContactGeom *contact,
+ODE_API int dCollide (dGeomID o1, dGeomID o2, int flags, dContactGeom *contact,
 	      int skip);
-void dSpaceCollide (dSpaceID space, void *data, dNearCallback *callback);
-void dSpaceCollide2 (dGeomID o1, dGeomID o2, void *data,
+ODE_API void dSpaceCollide (dSpaceID space, void *data, dNearCallback *callback);
+ODE_API void dSpaceCollide2 (dGeomID o1, dGeomID o2, void *data,
 		     dNearCallback *callback);
 
 /* ************************************************************************ */
@@ -401,7 +401,7 @@ enum {
 enum {
   dSphereClass = 0,
   dBoxClass,
-  dCCylinderClass,
+  dCCylinderClass, // XXX: Cylinder was renamed to Capsule
   dCylinderClass,
   dPlaneClass,
   dRayClass,
@@ -420,66 +420,68 @@ enum {
 };
 
 
-dGeomID dCreateSphere (dSpaceID space, dReal radius);
-void dGeomSphereSetRadius (dGeomID sphere, dReal radius);
-dReal dGeomSphereGetRadius (dGeomID sphere);
-dReal dGeomSpherePointDepth (dGeomID sphere, dReal x, dReal y, dReal z);
+ODE_API dGeomID dCreateSphere (dSpaceID space, dReal radius);
+ODE_API void dGeomSphereSetRadius (dGeomID sphere, dReal radius);
+ODE_API dReal dGeomSphereGetRadius (dGeomID sphere);
+ODE_API dReal dGeomSpherePointDepth (dGeomID sphere, dReal x, dReal y, dReal z);
 
-dGeomID dCreateBox (dSpaceID space, dReal lx, dReal ly, dReal lz);
-void dGeomBoxSetLengths (dGeomID box, dReal lx, dReal ly, dReal lz);
-void dGeomBoxGetLengths (dGeomID box, dVector3 result);
-dReal dGeomBoxPointDepth (dGeomID box, dReal x, dReal y, dReal z);
+ODE_API dGeomID dCreateBox (dSpaceID space, dReal lx, dReal ly, dReal lz);
+ODE_API void dGeomBoxSetLengths (dGeomID box, dReal lx, dReal ly, dReal lz);
+ODE_API void dGeomBoxGetLengths (dGeomID box, dVector3 result);
+ODE_API dReal dGeomBoxPointDepth (dGeomID box, dReal x, dReal y, dReal z);
 
-dGeomID dCreatePlane (dSpaceID space, dReal a, dReal b, dReal c, dReal d);
-void dGeomPlaneSetParams (dGeomID plane, dReal a, dReal b, dReal c, dReal d);
-void dGeomPlaneGetParams (dGeomID plane, dVector4 result);
-dReal dGeomPlanePointDepth (dGeomID plane, dReal x, dReal y, dReal z);
+ODE_API dGeomID dCreatePlane (dSpaceID space, dReal a, dReal b, dReal c, dReal d);
+ODE_API void dGeomPlaneSetParams (dGeomID plane, dReal a, dReal b, dReal c, dReal d);
+ODE_API void dGeomPlaneGetParams (dGeomID plane, dVector4 result);
+ODE_API dReal dGeomPlanePointDepth (dGeomID plane, dReal x, dReal y, dReal z);
 
+// XXX: Cylinder was renamed to Capsule
 dGeomID dCreateCCylinder (dSpaceID space, dReal radius, dReal length);
 void dGeomCCylinderSetParams (dGeomID ccylinder, dReal radius, dReal length);
 void dGeomCCylinderGetParams (dGeomID ccylinder, dReal *radius, dReal *length);
+
 dReal dGeomCCylinderPointDepth (dGeomID ccylinder, dReal x, dReal y, dReal z);
 
-dGeomID dCreateRay (dSpaceID space, dReal length);
-void dGeomRaySetLength (dGeomID ray, dReal length);
-dReal dGeomRayGetLength (dGeomID ray);
-void dGeomRaySet (dGeomID ray, dReal px, dReal py, dReal pz,
+ODE_API dGeomID dCreateRay (dSpaceID space, dReal length);
+ODE_API void dGeomRaySetLength (dGeomID ray, dReal length);
+ODE_API dReal dGeomRayGetLength (dGeomID ray);
+ODE_API void dGeomRaySet (dGeomID ray, dReal px, dReal py, dReal pz,
 		  dReal dx, dReal dy, dReal dz);
-void dGeomRayGet (dGeomID ray, dVector3 start, dVector3 dir);
+ODE_API void dGeomRayGet (dGeomID ray, dVector3 start, dVector3 dir);
 
 /*
  * Set/get ray flags that influence ray collision detection.
  * These flags are currently only noticed by the trimesh collider, because
  * they can make a major differences there.
  */
-void dGeomRaySetParams (dGeomID g, int FirstContact, int BackfaceCull);
-void dGeomRayGetParams (dGeomID g, int *FirstContact, int *BackfaceCull);
-void dGeomRaySetClosestHit (dGeomID g, int closestHit);
-int dGeomRayGetClosestHit (dGeomID g);
+ODE_API void dGeomRaySetParams (dGeomID g, int FirstContact, int BackfaceCull);
+ODE_API void dGeomRayGetParams (dGeomID g, int *FirstContact, int *BackfaceCull);
+ODE_API void dGeomRaySetClosestHit (dGeomID g, int closestHit);
+ODE_API int dGeomRayGetClosestHit (dGeomID g);
 
 #include "collision_trimesh.h"
 
-dGeomID dCreateGeomTransform (dSpaceID space);
-void dGeomTransformSetGeom (dGeomID g, dGeomID obj);
-dGeomID dGeomTransformGetGeom (dGeomID g);
-void dGeomTransformSetCleanup (dGeomID g, int mode);
-int dGeomTransformGetCleanup (dGeomID g);
-void dGeomTransformSetInfo (dGeomID g, int mode);
-int dGeomTransformGetInfo (dGeomID g);
+ODE_API dGeomID dCreateGeomTransform (dSpaceID space);
+ODE_API void dGeomTransformSetGeom (dGeomID g, dGeomID obj);
+ODE_API dGeomID dGeomTransformGetGeom (dGeomID g);
+ODE_API void dGeomTransformSetCleanup (dGeomID g, int mode);
+ODE_API int dGeomTransformGetCleanup (dGeomID g);
+ODE_API void dGeomTransformSetInfo (dGeomID g, int mode);
+ODE_API int dGeomTransformGetInfo (dGeomID g);
 
 /* ************************************************************************ */
 /* utility functions */
 
-void dClosestLineSegmentPoints (const dVector3 a1, const dVector3 a2,
+ODE_API void dClosestLineSegmentPoints (const dVector3 a1, const dVector3 a2,
 				const dVector3 b1, const dVector3 b2,
 				dVector3 cp1, dVector3 cp2);
 
-int dBoxTouchesBox (const dVector3 _p1, const dMatrix3 R1,
+ODE_API int dBoxTouchesBox (const dVector3 _p1, const dMatrix3 R1,
 		    const dVector3 side1, const dVector3 _p2,
 		    const dMatrix3 R2, const dVector3 side2);
 
-void dInfiniteAABB (dGeomID geom, dReal aabb[6]);
-void dCloseODE(void);
+ODE_API void dInfiniteAABB (dGeomID geom, dReal aabb[6]);
+ODE_API void dCloseODE(void);
 
 /* ************************************************************************ */
 /* custom classes */
@@ -499,9 +501,9 @@ typedef struct dGeomClass {
   dGeomDtorFn *dtor;
 } dGeomClass;
 
-int dCreateGeomClass (const dGeomClass *classptr);
-void * dGeomGetClassData (dGeomID);
-dGeomID dCreateGeom (int classnum);
+ODE_API int dCreateGeomClass (const dGeomClass *classptr);
+ODE_API void * dGeomGetClassData (dGeomID);
+ODE_API dGeomID dCreateGeom (int classnum);
 
 /* ************************************************************************ */
 

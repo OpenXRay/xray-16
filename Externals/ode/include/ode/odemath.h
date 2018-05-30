@@ -219,10 +219,10 @@ extern "C" {
 /*
  * normalize 3x1 and 4x1 vectors (i.e. scale them to unit length)
  */
-void dNormalize3_slow (dVector3 a);
-void dNormalize4 (dVector4 a);
+ODE_API void dNormalize3_slow (dVector3 a); // XXX: original
+ODE_API void dNormalize4 (dVector4 a);
 
-__forceinline void dNormalize3 (dVector3 a)
+__forceinline void dNormalize3 (dVector3 a) // XXX: GSC custom
 {
 	dReal	sqr_magnitude	= a[0]*a[0] + a[1]*a[1] + a[2]*a[2];
 	dReal	epsilon			= 1.192092896e-05F;
@@ -243,7 +243,7 @@ __forceinline void dNormalize3 (dVector3 a)
  * q wont be.
  */
 
-void dPlaneSpace (const dVector3 n, dVector3 p, dVector3 q);
+ODE_API void dPlaneSpace (const dVector3 n, dVector3 p, dVector3 q);
 
 #ifdef __cplusplus
 }

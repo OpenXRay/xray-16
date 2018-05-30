@@ -47,6 +47,7 @@ int dCollideBoxBox (dxGeom *o1, dxGeom *o2, int flags,
 		    dContactGeom *contact, int skip);
 int dCollideBoxPlane (dxGeom *o1, dxGeom *o2,
 		      int flags, dContactGeom *contact, int skip);
+// XXX: Cylinder was renamed to Capsule
 int dCollideCCylinderSphere (dxGeom *o1, dxGeom *o2, int flags,
 			     dContactGeom *contact, int skip);
 int dCollideCCylinderBox (dxGeom *o1, dxGeom *o2, int flags,

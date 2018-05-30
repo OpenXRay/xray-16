@@ -26,7 +26,7 @@
 #include <ode/common.h>
 
 
-void dWorldExportDIF (dWorldID w, FILE *file, const char *world_name);
+ODE_API void dWorldExportDIF (dWorldID w, FILE *file, const char *world_name);
 
 
 #endif

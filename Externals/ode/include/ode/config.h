@@ -35,7 +35,18 @@ extern "C" {
 
 #endif
 
-
+/* Define a DLL export symbol for those platforms that need it */
+#if defined(ODE_PLATFORM_WINDOWS)
+  #if defined(ODE_DLL)
+    #define ODE_API __declspec(dllexport)
+  #elif !defined(ODE_LIB)
+    #define ODE_DLL_API __declspec(dllimport)
+  #endif
+#endif
+    
+#if !defined(ODE_API)
+  #define ODE_API
+#endif
 
 #include <stdio.h>
 

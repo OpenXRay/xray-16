@@ -251,7 +251,7 @@ public:
     { dGeomPlaneGetParams (_id,result); }
 };
 
-
+// XXX: Cylinder was renamed to Capsule
 class dCCylinder : public dGeom {
   // intentionally undefined, don't use these
   dCCylinder (dCCylinder &);
