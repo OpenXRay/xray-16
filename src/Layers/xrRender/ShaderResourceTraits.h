@@ -373,6 +373,14 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
 
         // Try to open
         IReader* file = FS.r_open(cname);
+        if (!file)
+        {
+            // Cut last two chars and try again
+            // Needed for R1 vertex shaders
+            cname[xr_strlen(cname) - 2] = '\0';
+            file = FS.r_open(cname);
+        }
+
         bool fallback = strstr(Core.Params, "-lack_of_shaders");
         if (!file && fallback)
         {
