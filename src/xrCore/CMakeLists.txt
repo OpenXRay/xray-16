@@ -10,7 +10,7 @@ add_dir (
 	"Text"
 	"Threading"
 	"XML"
-        )
+        xrCore)
 
 message( "path "  ${CMAKE_CURRENT_SOURCE_DIR} ) 
 
