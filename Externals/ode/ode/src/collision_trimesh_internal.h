@@ -99,15 +99,15 @@ struct dxTriMesh : public dxGeom{
 	dArray<BoxTC> BoxTCCache;
 	static OBBCache defaultBoxCache;
 	
-	struct CCylinderTC : public LSSCache{
+	struct CapsuleTC : public LSSCache{
 		dxGeom* Geom;
 	};
-	dArray<CCylinderTC> CCylinderTCCache;
-	static LSSCache defaultCCylinderCache;
+	dArray<CapsuleTC> CapsuleTCCache;
+	static LSSCache defaultCapsuleCache;
 
 	bool doSphereTC;
 	bool doBoxTC;
-	bool doCCylinderTC;
+	bool doCapsuleTC;
 
 	// Functions
 	dxTriMesh(dSpaceID Space, dTriMeshDataID Data);
