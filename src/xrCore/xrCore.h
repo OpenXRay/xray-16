@@ -98,7 +98,9 @@ using RTokenVec = xr_vector<xr_rtoken>;
 #include "FileSystem.h"
 #include "FTimer.h"
 #include "fastdelegate.h"
+#ifdef WINDOWS
 #include "intrusive_ptr.h"
+#endif
 
 #include "net_utils.h"
 

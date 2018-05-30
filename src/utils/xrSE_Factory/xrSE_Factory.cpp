@@ -63,7 +63,7 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
         xr_delete(g_ai_space);
         xr_delete(g_object_factory);
         if (prop_helper_module)
-            prop_helper_module->close();
+            prop_helper_module = nullptr;
         //Core._destroy();
         break;
     }

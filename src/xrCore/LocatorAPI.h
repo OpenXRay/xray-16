@@ -2,7 +2,9 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#if defined(WINDOWS)
 #include <io.h>
+#endif
 #pragma warning(pop)
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
@@ -10,6 +12,23 @@
 #include "xrCommon/xr_map.h"
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
+
+#if defined(LINUX)
+#include <stdint.h>
+#define _A_HIDDEN      0x02
+#define _A_SUBDIR 0x00000010
+
+struct _finddata64i32_t {
+  unsigned int      attrib;
+  int64_t time_create;
+  int64_t time_access;
+  int64_t time_write;
+  size_t   size;
+  char              name[260];
+};
+
+#define _finddata_t     _finddata64i32_t
+#endif
 
 class CStreamReader;
 class Lock;

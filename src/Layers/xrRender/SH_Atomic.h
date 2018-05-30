@@ -27,9 +27,9 @@ typedef resptr_core<SInputSignature, resptr_base<SInputSignature>> ref_input_sig
 struct ECORE_API SVS : public xr_resource_named
 {
 #ifdef USE_OGL
-    GLuint vs;
+    GLuint sh;
 #else
-    ID3DVertexShader* vs;
+    ID3DVertexShader* sh;
 #endif
     R_constant_table constants;
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -44,9 +44,9 @@ typedef resptr_core<SVS, resptr_base<SVS>> ref_vs;
 struct ECORE_API SPS : public xr_resource_named
 {
 #ifdef USE_OGL
-    GLuint ps;
+    GLuint sh;
 #else
-    ID3DPixelShader* ps;
+    ID3DPixelShader* sh;
 #endif
     R_constant_table constants;
     ~SPS();
@@ -58,9 +58,9 @@ typedef resptr_core<SPS, resptr_base<SPS>> ref_ps;
 struct ECORE_API SGS : public xr_resource_named
 {
 #ifdef USE_OGL
-    GLuint gs;
+    GLuint sh;
 #else
-    ID3DGeometryShader* gs;
+    ID3DGeometryShader* sh;
 #endif
     R_constant_table constants;
     ~SGS();
@@ -69,7 +69,6 @@ typedef resptr_core<SGS, resptr_base<SGS>> ref_gs;
 #endif //	USE_DX10
 
 #if defined(USE_DX11) || defined(USE_OGL)
-
 struct ECORE_API SHS : public xr_resource_named
 {
 #ifdef USE_OGL

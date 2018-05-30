@@ -1,6 +1,16 @@
 #include "stdafx.h"
 #include "ppmd_compressor.h"
-#include "ppmd.h"
+#include "PPMd.h"
+
+#if defined(LINUX)
+
+LONG InterlockedExchange(LONG volatile *dest, LONG val)
+{
+       LONG ret;
+    __asm__ __volatile__( "lock; xchg %0,(%1)" : "=r" (ret) :"r" (dest), "0" (val) : "memory" );
+    return ret;
+}
+#endif
 
 const u32 suballocator_size = 32;
 const u32 order_model = 8;

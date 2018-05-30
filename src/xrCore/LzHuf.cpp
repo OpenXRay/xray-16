@@ -3,8 +3,9 @@
 
 #include "stdafx.h"
 #pragma hdrstop
-
+#if defined(WINDOWS)
 #include <io.h>
+#endif
 #include <fcntl.h>
 #include <sys/stat.h>
 

@@ -28,7 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////
 //  SVS
-SVS::SVS() : vs(0)
+SVS::SVS() : sh(0)
 #if defined(USE_DX10) || defined(USE_DX11)
 //  ,signature(0)
 #endif // USE_DX10
@@ -37,15 +37,17 @@ SVS::SVS() : vs(0)
 SVS::~SVS()
 {
     RImplementation.Resources->_DeleteVS(this);
+
 #if defined(USE_DX10) || defined(USE_DX11)
     //_RELEASE(signature);
     //	Now it is release automatically
-#endif //USE_DX10
+#endif
+
 #ifdef USE_OGL
-    CHK_GL(glDeleteProgram(vs));
+    CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(vs);
-#endif // USE_OGL
+    _RELEASE(sh);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -53,10 +55,11 @@ SVS::~SVS()
 SPS::~SPS()
 {
 #ifdef USE_OGL
-    CHK_GL(glDeleteProgram(ps));
+    CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(ps);
-#endif // USE_OGL
+    _RELEASE(sh);
+#endif
+    
     RImplementation.Resources->_DeletePS(this);
 }
 
@@ -66,29 +69,45 @@ SPS::~SPS()
 SGS::~SGS()
 {
 #ifdef USE_OGL
-    CHK_GL(glDeleteProgram(gs));
+    CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(gs);
-#endif // USE_OGL
+    _RELEASE(sh);
+#endif
+
     RImplementation.Resources->_DeleteGS(this);
 }
 
-#ifdef USE_DX11
+#if defined(USE_DX11)
 SHS::~SHS()
 {
+#ifdef USE_OGL
+    CHK_GL(glDeleteProgram(sh));
+#else
     _RELEASE(sh);
+#endif
+
     RImplementation.Resources->_DeleteHS(this);
 }
 
 SDS::~SDS()
 {
+#ifdef USE_OGL
+    CHK_GL(glDeleteProgram(sh));
+#else
     _RELEASE(sh);
+#endif
+
     RImplementation.Resources->_DeleteDS(this);
 }
 
 SCS::~SCS()
 {
+#ifdef USE_OGL
+    CHK_GL(glDeleteProgram(sh));
+#else
     _RELEASE(sh);
+#endif
+
     RImplementation.Resources->_DeleteCS(this);
 }
 #endif

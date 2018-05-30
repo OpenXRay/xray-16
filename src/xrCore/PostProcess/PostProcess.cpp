@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "PostProcess.hpp"
 
 // postprocess value LOAD method implementation

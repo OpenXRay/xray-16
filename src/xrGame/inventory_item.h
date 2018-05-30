@@ -111,7 +111,7 @@ public:
 
     virtual bool Useful() const; // !!! Переопределить. (см. в Inventory.cpp)
     virtual bool IsUsingCondition() const { return m_flags.test(FUsingCondition); }
-    virtual bool CanStack() const { return (m_flags.test(FCanStack) > 0); };
+    virtual bool CanStack() const { return m_flags.test(FCanStack); };
 
     virtual bool Attach(PIItem pIItem, bool b_send_event) { return false; }
     virtual bool Detach(PIItem pIItem) { return false; }

@@ -796,11 +796,16 @@ template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)
 {
-    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
+    HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
+    if (!SUCCEEDED(_hr))
+    {
+        Log("! Shader: ", file_name);
+        Msg("! CreateHWShader hr == 0x%08x", _hr);
+        return E_FAIL;
+    }
 
     ID3DShaderReflection* pReflection = 0;
-
-    HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+    _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
     if (SUCCEEDED(_hr) && pReflection)
     {
         // Parse constant table data
@@ -810,7 +815,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     }
     else
     {
-        Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+        Log("! Shader: ", file_name);
+        Msg("! D3DReflectShader hr == 0x%08x", _hr);
     }
 
     return _hr;
@@ -818,44 +824,21 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
+    // XXX: what's going on with casts here???
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
-    {
-        SPS* sps_result = (SPS*)result;
-        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->ps);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! PS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        ID3DShaderReflection* pReflection = 0;
-        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-
-        //	Parse constant, texture, sampler binding
-        //	Store input signature blob
-        if (SUCCEEDED(_result) && pReflection)
-        {
-            //	Let constant table parse it's data
-            sps_result->constants.parse(pReflection, RC_dest_pixel);
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DReflectShader hr == 0x%08x", _result);
-        }
-    }
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
     else if (pTarget[0] == 'v')
     {
+        // XXX: try to use code below
+        // _result = create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+
         SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->sh);
         if (!SUCCEEDED(_result))
         {
             Log("! VS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
+            Msg("! CreateVertexShader hr == 0x%08x", _result);
             return E_FAIL;
         }
 
@@ -891,50 +874,15 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         }
     }
     else if (pTarget[0] == 'g')
-    {
-        SGS* sgs_result = (SGS*)result;
-        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->gs);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! GS: ", file_name);
-            Msg("! CreateGeometryShaderhr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        ID3DShaderReflection* pReflection = 0;
-        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-
-        //	Parse constant, texture, sampler binding
-        //	Store input signature blob
-        if (SUCCEEDED(_result) && pReflection)
-        {
-            //	Let constant table parse it's data
-            sgs_result->constants.parse(pReflection, RC_dest_geometry);
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DReflectShader hr == 0x%08x", _result);
-        }
-    }
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SGS*&)result, disasm);
     else if (pTarget[0] == 'c')
-    {
         _result = create_shader(pTarget, buffer, buffer_size, file_name, (SCS*&)result, disasm);
-    }
     else if (pTarget[0] == 'h')
-    {
         _result = create_shader(pTarget, buffer, buffer_size, file_name, (SHS*&)result, disasm);
-    }
     else if (pTarget[0] == 'd')
-    {
         _result = create_shader(pTarget, buffer, buffer_size, file_name, (SDS*&)result, disasm);
-    }
     else
-    {
         NODEFAULT;
-    }
 
     if (disasm)
     {

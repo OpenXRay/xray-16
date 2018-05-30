@@ -100,6 +100,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="glslang\glslang\MachineIndependent\attribute.cpp" />
     <ClCompile Include="glslang\glslang\MachineIndependent\Constant.cpp" />
     <ClCompile Include="glslang\glslang\MachineIndependent\glslang_tab.cpp" />
     <ClCompile Include="glslang\glslang\MachineIndependent\InfoSink.cpp" />
@@ -126,6 +127,7 @@
     <ClCompile Include="glslang\glslang\MachineIndependent\ShaderLang.cpp" />
     <ClCompile Include="glslang\glslang\MachineIndependent\SymbolTable.cpp" />
     <ClCompile Include="glslang\glslang\MachineIndependent\Versions.cpp" />
+    <ClInclude Include="glslang\glslang\MachineIndependent\attribute.h" />
     <ClInclude Include="glslang\glslang\MachineIndependent\glslang_tab.cpp.h" />
     <ClInclude Include="glslang\glslang\MachineIndependent\gl_types.h" />
     <ClInclude Include="glslang\glslang\MachineIndependent\Initialize.h" />
@@ -160,6 +162,9 @@
     <ClCompile Include="glslang\glslang\GenericCodeGen\Link.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="glslang\glslang\MachineIndependent\glslang.y" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="HLSL.vcxproj">
       <Project>{63ceee7d-2a82-3fdb-af79-23f77bb29ac1}</Project>
     </ProjectReference>
@@ -169,9 +174,6 @@
     <ProjectReference Include="OSDependent.vcxproj">
       <Project>{0165b392-9e93-3aa3-89f3-20acb545095d}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="glslang\glslang\MachineIndependent\glslang.y" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
-#include "NET_utils.h"
+#include "net_utils.h"
 #include "xrCommon/math_funcs.h"
 #include "xrCore/_compressed_normal.h"
 

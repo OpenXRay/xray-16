@@ -4,10 +4,12 @@
 #include "LocatorAPI_defs.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#if defined(WINDOWS)
 #include <io.h>
 #include <direct.h>
-#include <fcntl.h>
 #include <sys\stat.h>
+#endif
+#include <fcntl.h>
 #pragma warning(pop)
 
 //////////////////////////////////////////////////////////////////////
@@ -15,11 +17,17 @@
 //////////////////////////////////////////////////////////////////////
 FS_File::FS_File(const xr_string& nm, long sz, time_t modif, unsigned attr) { set(nm, sz, modif, attr); }
 FS_File::FS_File(const xr_string& nm) { set(nm, 0, 0, 0); }
+#if defined(WINDOWS)
 FS_File::FS_File(const _FINDDATA_T& f) { set(f.name, f.size, f.time_write, (f.attrib & _A_SUBDIR) ? flSubDir : 0); }
 FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f)
 {
     set(nm, f.size, f.time_write, (f.attrib & _A_SUBDIR) ? flSubDir : 0);
 }
+#else
+FS_File::FS_File(const _FINDDATA_T& f) {}
+FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f) {}
+#endif
+
 
 void FS_File::set(const xr_string& nm, long sz, time_t modif, unsigned attr)
 {

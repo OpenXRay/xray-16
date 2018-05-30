@@ -12,6 +12,7 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #include "xrCore/FileCRC32.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 CRender RImplementation;
 
@@ -644,61 +645,29 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+template <typename T>
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+    T*& result, bool const disasm)
 {
-    HRESULT _result = E_FAIL;
-    if (pTarget[0] == 'p')
+    HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
+    if (!SUCCEEDED(_hr))
     {
-        SPS* sps_result = (SPS*)result;
-        _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->ps);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! PS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        LPCVOID data = nullptr;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            sps_result->constants.parse(pConstants, 0x1);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
+        Log("! Shader: ", file_name);
+        Msg("! CreateHWShader hr == 0x%08x", _hr);
+        return E_FAIL;
     }
-    else if (pTarget[0] == 'v')
-    {
-        SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! VS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
 
-        LPCVOID data = nullptr;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            svs_result->constants.parse(pConstants, 0x2);
-        }
-        else
-        {
-            Log("! VS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
+    LPCVOID data = nullptr;
+    _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+
+    if (SUCCEEDED(_hr) && data)
+    {
+        // Parse constant table data
+        LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
+        result->constants.parse(pConstants, ShaderTypeTraits<T>::GetShaderDest());
     }
     else
-    {
-        NODEFAULT;
-    }
+        Msg("! D3DXFindShaderComment %s hr == 0x%08x", file_name, _hr);
 
     if (disasm)
     {
@@ -712,7 +681,18 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         _RELEASE(disasm);
     }
 
-    return _result;
+    return _hr;
+}
+
+inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+{
+    if (pTarget[0] == 'p')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+    else if (pTarget[0] == 'v')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+
+    NODEFAULT;
+    return E_FAIL;
 }
 
 class includer : public ID3DInclude
@@ -1195,7 +1175,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
             FS.w_close(file);
 
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
-                file_name, result, o.disasm);
+                                    file_name, result, o.disasm);
         }
         else
         {
@@ -1236,10 +1216,6 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 0
-	strcpy_s					( result, "" );
-	return						false;
-#else // #if 1
 #ifdef DEBUG
     LPCSTR temp = "";
     bool found = false;
@@ -1271,5 +1247,4 @@ static inline bool match_shader_id(
 
     return false;
 #endif // #ifdef DEBUG
-#endif // #if 1
 }

@@ -51,7 +51,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsRGL))
     {
-        if (hRenderRGL->exist())
+        if (hRenderRGL->IsLoaded())
         {
             GEnv.CurrentRenderer = 5;
             GEnv.SetupCurrentRenderer = GEnv.SetupRGL;
@@ -65,7 +65,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR4))
     {
-        if (hRenderR4->exist())
+        if (hRenderR4->IsLoaded())
         {
             GEnv.CurrentRenderer = 4;
             GEnv.SetupCurrentRenderer = GEnv.SetupR4;
@@ -79,7 +79,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR3))
     {
-        if (hRenderR3->exist())
+        if (hRenderR3->IsLoaded())
         {
             GEnv.CurrentRenderer = 3;
             GEnv.SetupCurrentRenderer = GEnv.SetupR3;
@@ -93,7 +93,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR2))
     {
-        if (hRenderR2->exist())
+        if (hRenderR2->IsLoaded())
         {
             GEnv.CurrentRenderer = 2;
             GEnv.SetupCurrentRenderer = GEnv.SetupR2;
@@ -107,7 +107,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR1))
     {
-        if (hRenderR1->exist())
+        if (hRenderR1->IsLoaded())
         {
             GEnv.CurrentRenderer = 1;
             GEnv.SetupCurrentRenderer = GEnv.SetupR1;
@@ -164,10 +164,10 @@ void CEngineAPI::Initialize(void)
     hGame = XRay::LoadModule("xrGame");
     R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
 
-    pCreate = (Factory_Create*)hGame->getProcAddress("xrFactory_Create");
+    pCreate = (Factory_Create*)hGame->GetProcAddress("xrFactory_Create");
     R_ASSERT(pCreate);
 
-    pDestroy = (Factory_Destroy*)hGame->getProcAddress("xrFactory_Destroy");
+    pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
     R_ASSERT(pDestroy);
 
     //////////////////////////////////////////////////////////////////////////
@@ -176,8 +176,8 @@ void CEngineAPI::Initialize(void)
     if (strstr(Core.Params, "-tune"))
     {
         hTuner = XRay::LoadModule("vTuneAPI");
-        tune_pause = (VTPause*)hTuner->getProcAddress("VTPause");
-        tune_resume = (VTResume*)hTuner->getProcAddress("VTResume");
+        tune_pause = (VTPause*)hTuner->GetProcAddress("VTPause");
+        tune_resume = (VTResume*)hTuner->GetProcAddress("VTResume");
 
         if (!tune_pause || !tune_resume)
         {
@@ -208,20 +208,18 @@ void CEngineAPI::Destroy(void)
 
 void CEngineAPI::CreateRendererList()
 {
-    hRenderR1 = XRay::LoadModule("xrRender_R1");
-
-    xr_vector<xr_token> modes;
-    if (GEnv.isDedicatedServer)
-    {
-        R_ASSERT2(hRenderR1->exist(), "Dedicated server needs xrRender_R1 to work");
-        modes.emplace_back(xr_token("renderer_r1", 0));
-        modes.emplace_back(xr_token(nullptr, -1));
-        vid_quality_token = std::move(modes);
-        return;
-    }
-
     if (!vid_quality_token.empty())
         return;
+
+    hRenderR1 = XRay::LoadModule("xrRender_R1");
+
+    if (GEnv.isDedicatedServer)
+    {
+        R_ASSERT2(hRenderR1->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
+        vid_quality_token.emplace_back(xr_token("renderer_r1", 0));
+        vid_quality_token.emplace_back(xr_token(nullptr, -1));
+        return;
+    }
 
     // Hide "d3d10.dll not found" message box for XP
     SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -229,20 +227,19 @@ void CEngineAPI::CreateRendererList()
     hRenderR2 = XRay::LoadModule("xrRender_R2");
     hRenderR3 = XRay::LoadModule("xrRender_R3");
     hRenderR4 = XRay::LoadModule("xrRender_R4");
-
-    const bool allowOGL = !!strstr(Core.Params, "-gl");
-    if (allowOGL)
-        hRenderRGL = XRay::LoadModule("xrRender_GL");
+    hRenderRGL = XRay::LoadModule("xrRender_GL");
 
     // Restore error handling
     SetErrorMode(0);
 
-    if (hRenderR1->exist())
+    auto& modes = vid_quality_token;
+
+    if (hRenderR1->IsLoaded())
     {
         modes.emplace_back(xr_token("renderer_r1", 0));
     }
 
-    if (hRenderR2->exist())
+    if (hRenderR2->IsLoaded())
     {
         modes.emplace_back(xr_token("renderer_r2a", 1));
         modes.emplace_back(xr_token("renderer_r2", 2));
@@ -250,35 +247,33 @@ void CEngineAPI::CreateRendererList()
             modes.emplace_back(xr_token("renderer_r2.5", 3));
     }
 
-    if (hRenderR3->exist())
+    if (hRenderR3->IsLoaded())
     {
         if (GEnv.CheckR3 && GEnv.CheckR3())
             modes.emplace_back(xr_token("renderer_r3", 4));
         else
-            hRenderR3->close();
+            hRenderR3->Close();
     }
 
-    if (hRenderR4->exist())
+    if (hRenderR4->IsLoaded())
     {
         if (GEnv.CheckR4 && GEnv.CheckR4())
             modes.emplace_back(xr_token("renderer_r4", 5));
         else
-            hRenderR4->close();
+            hRenderR4->Close();
     }
 
-    if (allowOGL && hRenderRGL->exist())
+    if (hRenderRGL->IsLoaded())
     {
         if (GEnv.CheckRGL && GEnv.CheckRGL())
             modes.emplace_back(xr_token("renderer_gl", 6));
         else
-            hRenderRGL->close();
+            hRenderRGL->Close();
     }
     modes.emplace_back(xr_token(nullptr, -1));
 
     Msg("Available render modes[%d]:", modes.size());
-    for (auto& mode : modes)
+    for (const auto& mode : modes)
         if (mode.name)
             Log(mode.name);
-
-    vid_quality_token = std::move(modes);
 }

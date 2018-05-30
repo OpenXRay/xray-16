@@ -1,9 +1,14 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#if defined(WINDOWS)
 #include <intrin.h> // __rdtsc
 #include <process.h>
 #include <powerbase.h>
+#elif defined(LINUX)
+#include <fpu_control.h>
+#include <pthread.h>
+#endif
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
@@ -20,6 +25,38 @@ XRCORE_API Fmatrix Fidentity;
 XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
+#if defined(LINUX)
+#define nsec_per_sec	1000*1000*1000
+/**
+ * From https://stackoverflow.com/questions/12468331/queryperformancecounter-linux-equivalent
+ * @return
+ */
+void QueryPerformanceCounter(PLARGE_INTEGER result)
+{
+	u64 nsec_count, nsec_per_tick;
+    /*
+     * clock_gettime() returns the number of secs. We translate that to number of nanosecs.
+     * clock_getres() returns number of seconds per tick. We translate that to number of nanosecs per tick.
+     * Number of nanosecs divided by number of nanosecs per tick - will give the number of ticks.
+     */
+     struct timespec ts1, ts2;
+
+     if (clock_gettime(CLOCK_MONOTONIC, &ts1) != 0) {
+         return;
+     }
+
+     nsec_count = ts1.tv_nsec + ts1.tv_sec * nsec_per_sec;
+
+     if (clock_getres(CLOCK_MONOTONIC, &ts2) != 0) {
+         return;
+     }
+
+     nsec_per_tick = ts2.tv_nsec + ts2.tv_sec * nsec_per_sec;
+
+     *result = (nsec_count / nsec_per_tick);
+}
+#endif
+
 /*
 Функции управления точностью вычислений с плавающей точкой.
 Более подробную информацию можно получить здесь:
@@ -32,43 +69,91 @@ namespace FPU
 {
 XRCORE_API void m24()
 {
+#if defined(WINDOWS)
     _controlfp(_PC_24, MCW_PC);
     _controlfp(_RC_CHOP, MCW_RC);
+#elif defined(LINUX)
+    fpu_control_t fpu_cw;
+    _FPU_GETCW(fpu_cw);
+    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE;
+    _FPU_SETCW(fpu_cw);
+#endif
 }
 
 XRCORE_API void m24r()
 {
+#if defined(WINDOWS)
     _controlfp(_PC_24, MCW_PC);
     _controlfp(_RC_NEAR, MCW_RC);
+#elif defined(LINUX)
+    fpu_control_t fpu_cw;
+    _FPU_GETCW(fpu_cw);
+    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE | _FPU_RC_NEAREST;
+    _FPU_SETCW(fpu_cw);
+#endif
 }
 
 XRCORE_API void m53()
 {
+#if defined(WINDOWS)
     _controlfp(_PC_53, MCW_PC);
     _controlfp(_RC_CHOP, MCW_RC);
+#elif defined(LINUX)
+    fpu_control_t fpu_cw;
+    _FPU_GETCW(fpu_cw);
+    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE;
+    _FPU_SETCW(fpu_cw);
+#endif
 }
 
 XRCORE_API void m53r()
 {
+#if defined(WINDOWS)
     _controlfp(_PC_53, MCW_PC);
     _controlfp(_RC_NEAR, MCW_RC);
+#elif defined(LINUX)
+    fpu_control_t fpu_cw;
+    _FPU_GETCW(fpu_cw);
+    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE | _FPU_RC_NEAREST;
+    _FPU_SETCW(fpu_cw);
+#endif
 }
 
 XRCORE_API void m64()
 {
+#if defined(WINDOWS)
     _controlfp(_PC_64, MCW_PC);
     _controlfp(_RC_CHOP, MCW_RC);
+#elif defined(LINUX)
+    fpu_control_t fpu_cw;
+    _FPU_GETCW(fpu_cw);
+    fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED;
+    _FPU_SETCW(fpu_cw);
+#endif
 }
 
 XRCORE_API void m64r()
 {
+#if defined(WINDOWS)
     _controlfp(_PC_64, MCW_PC);
     _controlfp(_RC_NEAR, MCW_RC);
+#elif defined(LINUX)
+    fpu_control_t fpu_cw;
+    _FPU_GETCW(fpu_cw);
+    fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED | _FPU_RC_NEAREST;
+    _FPU_SETCW(fpu_cw);
+#endif
 }
 
 void initialize()
 {
+#if defined(WINDOWS)
     _clearfp();
+#elif defined(LINUX)
+    fpu_control_t fpu_cw;
+    fpu_cw = _FPU_DEFAULT;
+    _FPU_SETCW(fpu_cw);
+#endif
 
     // По-умолчанию для плагинов экспорта из 3D-редакторов включена высокая точность вычислений с плавающей точкой
     if (Core.PluginMode)
@@ -76,7 +161,11 @@ void initialize()
     else
         m24r();
 
+#if defined(WINDOWS)
     ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
+#elif defined(LINUX)
+    ::Random.seed(u32(CPU::GetCLK() % ((u64)0x1 << 32)));
+#endif
 }
 };
 
@@ -135,6 +224,7 @@ void _initialize_cpu()
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d", CPU::ID.n_cores, CPU::ID.n_threads);
 
+#if defined(WINDOWS)
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
     const size_t cpusCount = sysInfo.dwNumberOfProcessors;
@@ -151,7 +241,7 @@ void _initialize_cpu()
     }
 
     Log("");
-
+#endif
     Fidentity.identity(); // Identity matrix
     Didentity.identity(); // Identity matrix
     pvInitializeStatics(); // Lookup table for compressed normals
@@ -186,6 +276,7 @@ void _initialize_cpu_thread()
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+#if defined(WINDOWS)
         if (_denormals_are_zero_supported)
         {
             __try
@@ -197,6 +288,7 @@ void _initialize_cpu_thread()
                 _denormals_are_zero_supported = FALSE;
             }
         }
+#endif
     }
 }
 
@@ -217,6 +309,7 @@ void thread_name(const char* name)
     tn.szName = name;
     tn.dwThreadID = DWORD(-1);
     tn.dwFlags = 0;
+#if defined(WINDOWS)
     __try
     {
         RaiseException(0x406D1388, 0, sizeof(tn) / sizeof(DWORD), (ULONG_PTR*)&tn);
@@ -224,6 +317,7 @@ void thread_name(const char* name)
     __except (EXCEPTION_CONTINUE_EXECUTION)
     {
     }
+#endif
 }
 #pragma pack(pop)
 
@@ -255,7 +349,15 @@ void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* argli
     startup->entry = entry;
     startup->name = (char*)name;
     startup->args = arglist;
+#if defined(WINDOWS)
     _beginthread(thread_entry, stack, startup);
+#elif defined(LINUX)
+    pthread_t handle;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_create(&handle, &attr, NULL, arglist); //TODO convert entry
+    pthread_attr_destroy(&attr);
+#endif
 }
 
 void spline1(float t, Fvector* p, Fvector* ret)

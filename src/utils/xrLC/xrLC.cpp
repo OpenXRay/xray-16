@@ -95,7 +95,7 @@ void Startup(LPSTR lpCmdLine)
         Logger.Phase("Project options...");
         const auto L = XRay::LoadModule("xrLC_Options");
 
-        const auto O = (xrOptions*)L->getProcAddress("_frmScenePropertiesRun");
+        const auto O = (xrOptions*)L->GetProcAddress("_frmScenePropertiesRun");
         R_ASSERT(O);
 
         const int R = O(&Params, version, false);
