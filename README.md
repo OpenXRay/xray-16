@@ -5,7 +5,7 @@ X-Ray Engine 1.6 expansion
 
 |Platform|Build Status|
 |--------|------|
-| Linux |[![Build Status](https://api.travis-ci.org/q4a/xray-16.svg?branch=xd_dev)](https://travis-ci.org/q4a/xray-16)|
+| Linux |[![Build Status](https://api.travis-ci.org/q4a/xray-16.svg?branch=linux)](https://travis-ci.org/q4a/xray-16)|
 | Windows |[![Build status](https://ci.appveyor.com/api/projects/status/beb4c2xtyru4galx?svg=true)](https://ci.appveyor.com/project/q4a/xray-16)|
 
 This repository contains X-Ray Engine sources based on version 1.6.02.
