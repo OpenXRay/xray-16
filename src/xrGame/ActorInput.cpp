@@ -89,7 +89,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
     else if (inventory().Action((u16)cmd, CMD_START))
         return;
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(COC_DEBUG)
     if (psActorFlags.test(AF_NO_CLIP))
     {
         NoClipFly(cmd);
@@ -279,7 +279,7 @@ void CActor::IR_OnKeyboardHold(int cmd)
         return;
     }
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(COC_DEBUG)
     if (psActorFlags.test(AF_NO_CLIP) &&
         (cmd == kFWD || cmd == kBACK || cmd == kL_STRAFE || cmd == kR_STRAFE || cmd == kJUMP || cmd == kCROUCH))
     {

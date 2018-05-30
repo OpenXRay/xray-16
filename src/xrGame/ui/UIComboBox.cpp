@@ -123,23 +123,20 @@ void CUIComboBox::SetCurrentOptValue()
     m_list_box.Clear();
     const xr_token* tok = GetOptToken();
 
-    if (tok)
-    {
-        while (tok->name)
-        {
-            if (m_disabled.end() == std::find(m_disabled.begin(), m_disabled.end(), tok->id))
-            {
-                AddItem_(tok->name, tok->id);
-            }
-            tok++;
-        }
+    R_ASSERT3(tok, "Option token doesnt exist:", m_entry.c_str());
 
-        LPCSTR cur_val = *CStringTable().translate(GetOptTokenValue());
-        m_text.SetText(cur_val);
-        m_list_box.SetSelectedText(cur_val);
+    while (tok->name)
+    {
+        if (m_disabled.end() == std::find(m_disabled.begin(), m_disabled.end(), tok->id))
+        {
+            AddItem_(tok->name, tok->id);
+        }
+        tok++;
     }
-    else
-        m_text.SetText("-");
+
+    LPCSTR cur_val = *CStringTable().translate(GetOptTokenValue());
+    m_text.SetText(cur_val);
+    m_list_box.SetSelectedText(cur_val);
 
     CUIListBoxItem* itm = m_list_box.GetSelectedItem();
     if (itm)
