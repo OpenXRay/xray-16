@@ -50,7 +50,6 @@
 #include "clsid.h"
 //#include "Threading/Lock.hpp"
 #include "xrMemory.h"
-#include "xrDebug.h"
 
 //#include "_stl_extensions.h"
 #include "_std_extensions.h"

@@ -8,7 +8,9 @@
 #define PUGIXML_NO_XPATH
 #define PUGIXML_HAS_LONG_LONG
 #include "pugixml.hpp"
+#ifdef DEBUG // debug & mixed
 #include "xrCommon/xr_vector.h"
+#endif
 #include "xrCore/xrstring.h"
 
 static constexpr pcstr CONFIG_PATH = "$game_config$";

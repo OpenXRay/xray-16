@@ -1,0 +1,7 @@
+add_subdirectory(LuaJIT)
+add_subdirectory(luabind)
+add_subdirectory(lzo)
+add_subdirectory(cximage)
+add_subdirectory(NVTT)
+#add_subdirectory(gli)
+#add_subdirectory(glew)

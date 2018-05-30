@@ -115,9 +115,9 @@ inline bool isZero(const float f, const float epsilon = NV_EPSILON)
 
 inline bool isFinite(const float f)
 {
-#if NV_OS_WIN32
+#if NV_OS_WIN32 && !NV_CC_GNUC
 	return _finite(f) != 0;
-#elif NV_OS_DARWIN
+#elif NV_OS_DARWIN || NV_CC_GNUC
 	return isfinite(f);
 #elif NV_OS_LINUX
 	return finitef(f);
@@ -130,9 +130,9 @@ inline bool isFinite(const float f)
 
 inline bool isNan(const float f)
 {
-#if NV_OS_WIN32
+#if NV_OS_WIN32 && !NV_CC_GNUC
 	return _isnan(f) != 0;
-#elif NV_OS_DARWIN
+#elif NV_OS_DARWIN || NV_CC_GNUC
 	return isnan(f);
 #elif NV_OS_LINUX
 	return isnanf(f);
