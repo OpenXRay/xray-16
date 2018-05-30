@@ -30,17 +30,17 @@ enum icon_type
     icon_type_class_instance = unsigned int(4),
     icon_type_unknown = unsigned int(0),
 #else
-    icon_type_nil = unsigned int(0),
-    icon_type_boolean = unsigned int(1),
-    icon_type_number = unsigned int(2),
-    icon_type_string = unsigned int(3),
-    icon_type_table = unsigned int(4),
-    icon_type_function = unsigned int(5),
-    icon_type_coroutine = unsigned int(6),
-    icon_type_class = unsigned int(7),
-    icon_type_class_base = unsigned int(8),
-    icon_type_class_instance = unsigned int(9),
-    icon_type_unknown = unsigned int(10),
+    icon_type_nil = (unsigned int) (0),
+    icon_type_boolean = (unsigned int) (1),
+    icon_type_number = (unsigned int) (2),
+    icon_type_string = (unsigned int) (3),
+    icon_type_table = (unsigned int) (4),
+    icon_type_function = (unsigned int) (5),
+    icon_type_coroutine = (unsigned int) (6),
+    icon_type_class = (unsigned int) (7),
+    icon_type_class_base = (unsigned int) (8),
+    icon_type_class_instance = (unsigned int) (9),
+    icon_type_unknown = (unsigned int) (10),
 #endif
 };
 

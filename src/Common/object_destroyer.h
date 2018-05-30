@@ -72,12 +72,12 @@ struct CDestroyer
     struct CHelper1
     {
         template <bool a>
-        static void delete_data(T&)
+        static void delete_data(std::enable_if_t<!a, T&>)
         {
         }
 
-        template <>
-        static void delete_data<true>(T& data)
+        template <bool a>
+        static void delete_data(std::enable_if_t<a, T&> data)
         {
             data.destroy();
         }
@@ -87,13 +87,13 @@ struct CDestroyer
     struct CHelper2
     {
         template <bool a>
-        static void delete_data(T& data)
+        static void delete_data(std::enable_if_t<!a, T&> data)
         {
-            CHelper1<T>::delete_data<object_type_traits::is_base_and_derived<IPureDestroyableObject, T>::value>(data);
+            CHelper1<T>::template delete_data<object_type_traits::is_base_and_derived<IPureDestroyableObject, T>::value>(data);
         }
 
-        template <>
-        static void delete_data<true>(T& data)
+        template <bool a>
+        static void delete_data(std::enable_if_t<a, T&> data)
         {
             if (data)
                 CDestroyer::delete_data(*data);
@@ -116,13 +116,13 @@ struct CDestroyer
     struct CHelper4
     {
         template <bool a>
-        static void delete_data(T& data)
+        static void delete_data(std::enable_if_t<!a, T&> data)
         {
-            CHelper2<T>::delete_data<object_type_traits::is_pointer<T>::value>(data);
+            CHelper2<T>::template delete_data<object_type_traits::is_pointer<T>::value>(data);
         }
 
-        template <>
-        static void delete_data<true>(T& data)
+        template <bool a>
+        static void delete_data(std::enable_if_t<a, T&> data)
         {
             CHelper3::delete_data(data);
         }
@@ -131,7 +131,7 @@ struct CDestroyer
     template <typename T>
     static void delete_data(T& data)
     {
-        CHelper4<T>::delete_data<object_type_traits::is_stl_container<T>::value>(data);
+        CHelper4<T>::template delete_data<object_type_traits::is_stl_container<T>::value>(data);
     }
 };
 

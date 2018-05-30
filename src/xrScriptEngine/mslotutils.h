@@ -96,23 +96,29 @@ public:
 
 inline HANDLE CreateMailSlotByName(LPCSTR slotName)
 {
+#if defined(WINDOWS)
     HANDLE hSlot = CreateMailslot(slotName,
         0, // no maximum message size
         MAILSLOT_WAIT_FOREVER, // no time-out for operations
         (LPSECURITY_ATTRIBUTES)NULL); // no security attributes
     return hSlot;
+#elif defined(LINUX)
+    return NULL;
+#endif
 }
 
 inline BOOL CheckExisting(LPCSTR slotName)
 {
     HANDLE hFile;
     BOOL res;
+#if defined(WINDOWS)
     hFile = CreateFile(slotName, GENERIC_WRITE,
         FILE_SHARE_READ, // required to write to a mailslot
         (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
     res = hFile != INVALID_HANDLE_VALUE;
     if (res)
         CloseHandle(hFile);
+#endif
     return res;
 }
 
@@ -121,6 +127,7 @@ inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
     BOOL fResult;
     HANDLE hFile;
     DWORD cbWritten;
+#if defined(WINDOWS)
     hFile = CreateFile(slotName, GENERIC_WRITE,
         FILE_SHARE_READ, // required to write to a mailslot
         (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
@@ -131,6 +138,7 @@ inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
     R_ASSERT(fResult);
     fResult = CloseHandle(hFile);
     R_ASSERT(fResult);
+#endif
     return fResult;
 }
 
@@ -138,6 +146,7 @@ inline BOOL CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
 {
     DWORD cbMessage, cMessage, cbRead;
     BOOL fResult;
+#if defined(WINDOWS)
     HANDLE hEvent;
     OVERLAPPED ov;
     cbMessage = cMessage = cbRead = 0;
@@ -163,5 +172,6 @@ inline BOOL CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
     msg.SetLen(cbRead);
     R_ASSERT(fResult);
     CloseHandle(hEvent);
+#endif
     return fResult;
 }
