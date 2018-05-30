@@ -37,23 +37,23 @@ typedef struct dStopwatch {
   unsigned long cc[2];		/* clock count since last `start' */
 } dStopwatch;
 
-void dStopwatchReset (dStopwatch *);
-void dStopwatchStart (dStopwatch *);
-void dStopwatchStop  (dStopwatch *);
-double dStopwatchTime (dStopwatch *);	/* returns total time in secs */
+ODE_API void dStopwatchReset (dStopwatch *);
+ODE_API void dStopwatchStart (dStopwatch *);
+ODE_API void dStopwatchStop  (dStopwatch *);
+ODE_API double dStopwatchTime (dStopwatch *);	/* returns total time in secs */
 
 
 /* code timers */
 
-void dTimerStart (const char *description);	/* pass a static string here */
-void dTimerNow (const char *description);	/* pass a static string here */
-void dTimerEnd();
+ODE_API void dTimerStart (const char *description);	/* pass a static string here */
+ODE_API void dTimerNow (const char *description);	/* pass a static string here */
+ODE_API void dTimerEnd(void);
 
 /* print out a timer report. if `average' is nonzero, print out the average
  * time for each slot (this is only meaningful if the same start-now-end
  * calls are being made repeatedly.
  */
-void dTimerReport (FILE *fout, int average);
+ODE_API void dTimerReport (FILE *fout, int average);
 
 
 /* resolution */
@@ -61,12 +61,12 @@ void dTimerReport (FILE *fout, int average);
 /* returns the timer ticks per second implied by the timing hardware or API.
  * the actual timer resolution may not be this great.
  */
-double dTimerTicksPerSecond();
+ODE_API double dTimerTicksPerSecond(void);
 
 /* returns an estimate of the actual timer resolution, in seconds. this may
  * be greater than 1/ticks_per_second.
  */
-double dTimerResolution();
+ODE_API double dTimerResolution(void);
 
 
 #ifdef __cplusplus

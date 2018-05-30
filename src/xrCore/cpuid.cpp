@@ -203,7 +203,28 @@ unsigned int query_processor_info(processor_info* pinfo)
 #elif defined(LINUX)
     int logicalProcessorCount = std::thread::hardware_concurrency();
 
+    //not sure about processorCoreCount - is it really cores or threads
+    //https://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
     int processorCoreCount = sysconf(_SC_NPROCESSORS_ONLN);
+
+    //2nd implementation
+    //
+    //#include <hwloc.h>
+    //// Allocate, initialize, and perform topology detection
+    //hwloc_topology_t topology;
+    //hwloc_topology_init(&topology);
+    //hwloc_topology_load(topology);
+    //
+    //// Try to get the number of CPU cores from topology
+    //int depth = hwloc_get_type_depth(topology, HWLOC_OBJ_CORE);
+    //int processorCoreCount = hwloc_get_nbobjs_by_depth(topology, depth);
+    //
+    //// Destroy topology object and return
+    //hwloc_topology_destroy(topology);
+
+    //3rd another implementation
+    //https://stackoverflow.com/questions/2901694/programmatically-detect-number-of-physical-processors-cores-or-if-hyper-threadin
+
 #endif
 
 

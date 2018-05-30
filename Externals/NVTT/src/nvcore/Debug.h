@@ -30,6 +30,19 @@
 
 #else // NV_NO_ASSERT
 
+#   if NV_CC_MSVC
+        // @@ Does this work in msvc-6 and earlier?
+#       define nvDebugBreak()       __debugbreak()
+//#       define nvDebugBreak()        __asm { int 3 }
+#   elif NV_OS_ORBIS
+#       define nvDebugBreak()       __debugbreak()
+#   elif NV_CC_GNUC
+#       define nvDebugBreak()       __builtin_trap()
+#   else
+#       error "No nvDebugBreak()!"
+#   endif
+
+/*
 #	if NV_CC_MSVC
 		// @@ Does this work in msvc-6 and earlier?
 		// @@ Do I have to include <intrin.h> ?
@@ -39,13 +52,14 @@
 #		define nvDebugBreak()		__asm__ volatile ("trap");
 #	elif NV_CC_GNUC && NV_CPU_X86 && NV_OS_DARWIN
 #		define nvDebugBreak()		__asm__ volatile ("int3");
-#	elif NV_CC_GNUC && NV_CPU_X86 
+#	elif NV_CC_GNUC && NV_CPU_X86
 #		define nvDebugBreak()		__asm__ ( "int %0" : :"I"(3) )
 #	else
 #		include <signal.h>
 #		define nvDebugBreak()		raise(SIGTRAP); 
 		// define nvDebugBreak() 		*((int *)(0)) = 0
 #	endif
+*/
 
 #	define nvAssertMacro(exp) \
 		do { \

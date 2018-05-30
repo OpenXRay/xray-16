@@ -5,6 +5,10 @@
 
 #include "ximage.h"
 
+#if !defined(WIN32)
+#define _tcsnicmp(a,b,c) strcasecmp(a,b)
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * \return the color used for transparency, and/or for background color
@@ -538,7 +542,7 @@ void CxImage::SetOffset(long x,long y)
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * \sa SetJpegQuality, GetJpegQualityF
- * \author [DP]; changes [Stefan Schürmans]
+ * \author [DP]; changes [Stefan SchÃ¼rmans]
  */
 BYTE CxImage::GetJpegQuality() const
 {
@@ -547,7 +551,7 @@ BYTE CxImage::GetJpegQuality() const
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * \sa SetJpegQuality, GetJpegQuality
- * \author [Stefan Schürmans]
+ * \author [Stefan SchÃ¼rmans]
  */
 float CxImage::GetJpegQualityF() const
 {
@@ -557,7 +561,7 @@ float CxImage::GetJpegQualityF() const
 /**
  * quality level for JPEG and JPEG2000
  * \param q: can be from 0 to 100
- * \author [DP]; changes [Stefan Schürmans]
+ * \author [DP]; changes [Stefan SchÃ¼rmans]
  */
 void CxImage::SetJpegQuality(BYTE q){
 	info.fQuality = (float)q;
@@ -567,7 +571,7 @@ void CxImage::SetJpegQuality(BYTE q){
  * quality level for JPEG and JPEG2000
  * necessary for JPEG2000 when quality is between 0.0 and 1.0
  * \param q: can be from 0.0 to 100.0
- * \author [Stefan Schürmans]
+ * \author [Stefan SchÃ¼rmans]
  */
 void CxImage::SetJpegQualityF(float q){
 	if (q>0) info.fQuality = q;

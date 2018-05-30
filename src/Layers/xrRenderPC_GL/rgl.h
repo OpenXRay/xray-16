@@ -106,7 +106,7 @@ public:
         float forcegloss_v;
     } o;
 
-    struct RenderR3Statistics
+    struct RenderR4Statistics
     {
         u32 l_total;
         u32 l_visible;
@@ -115,13 +115,10 @@ public:
         s32 s_used;
         s32 s_merged;
         s32 s_finalclip;
-        u32 o_queries;
-        u32 o_culled;
         u32 ic_total;
         u32 ic_culled;
 
-        RenderR3Statistics() { FrameStart(); }
-
+        RenderR4Statistics() { FrameStart(); }
         void FrameStart()
         {
             l_total = 0;
@@ -131,8 +128,6 @@ public:
             s_used = 0;
             s_merged = 0;
             s_finalclip = 0;
-            o_queries = 0;
-            o_culled = 0;
             ic_total = 0;
             ic_culled = 0;
         }
@@ -141,7 +136,7 @@ public:
     };
 
 public:
-    RenderR3Statistics Stats;
+    RenderR4Statistics Stats;
     // Sector detection and visibility
     CSector* pLastSector;
     Fvector vLastCameraPos;
@@ -156,7 +151,7 @@ public:
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
     xr_vector<ref_shader> Shaders;
-    typedef svector<D3DVERTEXELEMENT9,MAXD3DDECLLENGTH + 1> VertexDeclarator;
+    typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<GLuint> nVB, xVB;
     xr_vector<GLuint> nIB, xIB;

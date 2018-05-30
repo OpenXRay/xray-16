@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 2.8.0)
+project(nvtt)
+add_definitions(-DHAVE_SIGNAL_H -DHAVE_EXECINFO_H)
+add_subdirectory(src/nvcore)
+add_subdirectory(src/nvimage)
+add_subdirectory(src/nvmath)
+add_subdirectory(src/nvtt)

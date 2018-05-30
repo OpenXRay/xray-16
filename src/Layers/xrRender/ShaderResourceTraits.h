@@ -316,7 +316,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 #endif
 
 template <typename T>
-inline T* CResourceManager::CreateShader(const char* name, const bool searchForEntryAndTarget /*= false*/)
+inline T* CResourceManager::CreateShader(const char* name, const char* filename /*= nullptr*/, const bool searchForEntryAndTarget /*= false*/)
 {
     ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
@@ -338,15 +338,20 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
 
         // Remove ( and everything after it
         string_path shName;
-        const char* pchr = strchr(name, '(');
-        ptrdiff_t strSize = pchr ? pchr - name : xr_strlen(name);
-        strncpy(shName, name, strSize);
-        shName[strSize] = 0;
+        {
+            if (filename == nullptr)
+                filename = name;
+
+            pcstr pchr = strchr(filename, '(');
+            ptrdiff_t size = pchr ? pchr - filename : xr_strlen(filename);
+            strncpy(shName, filename, size);
+            shName[size] = 0;
+        }
 
         // Open file
         string_path cname;
         pcstr shaderExt = ShaderTypeTraits<T>::GetShaderExt();
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*name*/ shName, shaderExt);
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), shName, shaderExt);
         FS.update_path(cname, "$game_shaders$", cname);
 
         // Try to open
