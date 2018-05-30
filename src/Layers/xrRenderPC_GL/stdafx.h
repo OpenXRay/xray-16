@@ -14,7 +14,6 @@
 #include <gl/GLU.h>
 #include <gl/glext.h>
 #include <gl/wglext.h>
-#include <ShaderLang.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
