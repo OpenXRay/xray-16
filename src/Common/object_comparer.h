@@ -18,13 +18,13 @@ struct CComparer
     struct CHelper
     {
         template <bool a>
-        IC static bool compare(const T& a1, const T& a2, const P& p)
+        IC static bool compare(std::enable_if_t<!a, const T&> a1, const T& a2, const P& p)
         {
             return p(a1, a2);
         }
 
-        template <>
-        IC static bool compare<true>(const T& a1, const T& a2, const P& p)
+        template <bool a>
+        IC static bool compare(std::enable_if_t<a, const T&> a1, const T& a2, const P& p)
         {
             return CComparer::compare(*a1, *a2, p);
         }
@@ -119,8 +119,8 @@ struct CComparer
             if (a1.size() != a2.size())
                 return p();
 
-            T::const_iterator I = a1.begin(), J = a2.begin();
-            T::const_iterator E = a1.end();
+            typename T::const_iterator I = a1.begin(), J = a2.begin();
+            typename T::const_iterator E = a1.end();
             for (; I != E; ++I, ++J)
                 if (!CComparer::compare(*I, *J, p))
                     return false;
@@ -132,13 +132,13 @@ struct CComparer
     struct CHelper4
     {
         template <bool a>
-        IC static bool compare(const T& a1, const T& a2, const P& p)
+        IC static bool compare(std::enable_if_t<!a, const T&> a1, const T& a2, const P& p)
         {
-            return CHelper<T>::compare<object_type_traits::is_pointer<T>::value>(a1, a2, p);
+            return CHelper<T>::template compare<object_type_traits::is_pointer<T>::value>(a1, a2, p);
         }
 
-        template <>
-        IC static bool compare<true>(const T& a1, const T& a2, const P& p)
+        template <bool a>
+        IC static bool compare(std::enable_if_t<a, const T&> a1, const T& a2, const P& p)
         {
             return CHelper3::compare(a1, a2, p);
         }
@@ -147,7 +147,7 @@ struct CComparer
     template <typename T>
     IC static bool compare(const T& a1, const T& a2, const P& p)
     {
-        return CHelper4<T>::compare<object_type_traits::is_stl_container<T>::value>(a1, a2, p);
+        return CHelper4<T>::template compare<object_type_traits::is_stl_container<T>::value>(a1, a2, p);
     }
 };
 
