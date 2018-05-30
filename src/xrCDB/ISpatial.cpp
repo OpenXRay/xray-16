@@ -6,7 +6,7 @@
 #include "xrEngine/xr_object.h"
 #include "xrEngine/PS_Instance.h"
 #endif
-#include "xrEngine/Device.h"
+#include "xrEngine/device.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrCore/Threading/Lock.hpp"

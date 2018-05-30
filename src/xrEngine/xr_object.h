@@ -26,7 +26,9 @@ class CInifile;
 #define CROW_RADIUS2 (60.f)
 
 class IPhysicsShell;
+#if defined(WINDOWS)
 xr_pure_interface IObjectPhysicsCollision;
+#endif
 
 class CAttachmentOwner;
 class CInventoryOwner;
@@ -186,7 +188,9 @@ public:
     virtual IRenderVisual* Visual() const = 0;
     virtual void OnChangeVisual() = 0;
     virtual IPhysicsShell* physics_shell() = 0;
+#if defined(WINDOWS)
     virtual const IObjectPhysicsCollision* physics_collision() = 0;
+#endif
     // Name management
     virtual shared_str cName() const = 0;
     virtual void cName_set(shared_str N) = 0;
