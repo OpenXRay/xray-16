@@ -2,7 +2,7 @@
 add_subdirectory(Layers)
 #add_subdirectory(xrMisc)
 #add_subdirectory(xrAICore)
-#add_subdirectory(xrCDB)
+add_subdirectory(xrCDB)
 add_subdirectory(xrCore)
 #add_subdirectory(xrEngine)
 #add_subdirectory(xrGame)
