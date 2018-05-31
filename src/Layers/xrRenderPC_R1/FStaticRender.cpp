@@ -769,7 +769,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     if (!SUCCEEDED(_hr))
     {
         Log("! Shader: ", file_name);
-        Msg("! CreateHWShader hr == 0x%08x", _result);
+        Msg("! CreateHWShader hr == 0x%08x", _hr);
         return E_FAIL;
     }
 
