@@ -71,8 +71,10 @@ public:
     u32 cache_bytes_per_line;
 
 protected:
+#if defined(WINDOWS)
     virtual void i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) = 0;
     virtual void i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) = 0;
+#endif
 
 public:
     CSoundRender_Core();
@@ -111,11 +113,12 @@ public:
     // listener
     //	virtual const Fvector&				listener_position		( )=0;
     virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) = 0;
+#if defined(WINDOWS)
     // eax listener
     void i_eax_commit_setting();
     void i_eax_listener_set(CSound_environment* E);
     void i_eax_listener_get(CSound_environment* E);
-
+#endif
     virtual SoundEnvironment_LIB* get_env_library() { return s_environment; }
     virtual void refresh_env_library();
     virtual void set_user_env(CSound_environment* E);

@@ -26,10 +26,12 @@
 #include "OpenALDeviceList.h"
 #include "xrCore/xr_token.h"
 
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <objbase.h>
 #pragma warning(pop)
+#endif
 
 #ifdef _EDITOR
 log_fn_ptr_type* pLog = nullptr;
@@ -38,7 +40,9 @@ log_fn_ptr_type* pLog = nullptr;
 void __cdecl al_log(char* msg) { Log(msg); }
 ALDeviceList::ALDeviceList()
 {
+#if defined(WINDOWS)
     pLog = al_log;
+#endif
     snd_device_id = (u32)-1;
     Enumerate();
 }
@@ -66,7 +70,9 @@ void ALDeviceList::Enumerate()
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
 
+#if defined(WINDOWS)
     CoUninitialize();
+#endif
     // grab function pointers for 1.0-API functions, and if successful proceed to enumerate all devices
     if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
     {
@@ -86,11 +92,13 @@ void ALDeviceList::Enumerate()
         // Also we assume that if "Generic Hardware" exists, than "Generic Software" is also exists
         // Maybe wrong
 
+#if defined(WINDOWS) //Maybe in Linux this not?
         if (0 == xr_stricmp(m_defaultDeviceName, AL_GENERIC_HARDWARE))
         {
             xr_strcpy(m_defaultDeviceName, AL_GENERIC_SOFTWARE);
             Msg("SOUND: OpenAL: default SndDevice name set to %s", m_defaultDeviceName);
         }
+#endif
 
         index = 0;
         // go through device list (each device terminated with a single NULL, list terminated with double NULL)
@@ -169,8 +177,10 @@ void ALDeviceList::Enumerate()
             GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no",
             GetDeviceDesc(j).props.xram ? "yes" : "no");
     }
+#if defined(WINDOWS)
     if (!strstr(GetCommandLine(), "-weather"))
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+#endif
 }
 
 pcstr ALDeviceList::GetDeviceName(u32 index) const { return snd_devices_token[index].name; }

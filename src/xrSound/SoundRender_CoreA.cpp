@@ -11,12 +11,14 @@ CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
     pDevice = nullptr;
     pDeviceList = nullptr;
     pContext = nullptr;
+#if defined(WINDOWS)
     eaxSet = nullptr;
     eaxGet = nullptr;
+#endif
 }
 
 CSoundRender_CoreA::~CSoundRender_CoreA() {}
-
+#if defined(WINDOWS)
 bool CSoundRender_CoreA::EAXQuerySupport(bool isDeferred, const GUID* guid, u32 prop, void* val, u32 sz)
 {
     if (AL_NO_ERROR != eaxGet(guid, prop, 0, val, sz))
@@ -67,6 +69,7 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
         return false;
     return true;
 }
+#endif
 
 void CSoundRender_CoreA::_restart() { inherited::_restart(); }
 void CSoundRender_CoreA::_initialize()
@@ -115,9 +118,9 @@ void CSoundRender_CoreA::_initialize()
     A_CHK(alListener3f(AL_POSITION, 0.f, 0.f, 0.f));
     A_CHK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
     Fvector orient[2] = {{0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}};
-    A_CHK(alListenerfv(AL_ORIENTATION, &orient[0].x));
+    A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&orient[0].x));
     A_CHK(alListenerf(AL_GAIN, 1.f));
-
+#if defined(WINDOWS)
     // Check for EAX extension
     bEAX = deviceDesc.props.eax && !deviceDesc.props.eax_unwanted;
 
@@ -133,7 +136,7 @@ void CSoundRender_CoreA::_initialize()
         bDeferredEAX = EAXTestSupport(true);
         bEAX = EAXTestSupport(false);
     }
-
+#endif
     inherited::_initialize();
 
     // Pre-create targets
@@ -182,8 +185,10 @@ void CSoundRender_CoreA::_clear()
     xr_delete(pDeviceList);
 }
 
+#if defined(WINDOWS)
 void CSoundRender_CoreA::i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) { eaxSet(guid, prop, 0, val, sz); }
 void CSoundRender_CoreA::i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) { eaxGet(guid, prop, 0, val, sz); }
+#endif
 void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
 {
     inherited::update_listener(P, D, N, dt);
@@ -198,5 +203,5 @@ void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, con
 
     A_CHK(alListener3f(AL_POSITION, Listener.position.x, Listener.position.y, -Listener.position.z));
     A_CHK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
-    A_CHK(alListenerfv(AL_ORIENTATION, &Listener.orientation[0].x));
+    A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&Listener.orientation[0].x));
 }
