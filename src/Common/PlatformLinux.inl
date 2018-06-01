@@ -241,7 +241,7 @@ inline int _filelength(int fd)
 #define __max(a, b) std::max(a, b)
 #define __min(a, b) std::min(a, b)
 
-#define xr_itoa SDL_itoa
+#define itoa SDL_itoa
 
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
