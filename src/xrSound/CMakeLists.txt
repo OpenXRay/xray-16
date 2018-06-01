@@ -24,4 +24,5 @@ list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./MusicS
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore ogg vorbis vorbisfile openal xrAPI xrCDB)
+#target_link_libraries(${PROJECT_NAME} xrCore ogg vorbis vorbisfile openal xrAPI xrCDB)
+target_link_libraries(${PROJECT_NAME} xrCore xrAPI xrCDB)
