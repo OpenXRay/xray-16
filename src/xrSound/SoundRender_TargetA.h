@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Soundrender_Target.h"
-#include "Soundrender_CoreA.h"
+#include "SoundRender_Target.h"
+#include "SoundRender_CoreA.h"
 
 class CSoundRender_TargetA : public CSoundRender_Target
 {
