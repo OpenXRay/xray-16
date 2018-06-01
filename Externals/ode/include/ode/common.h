@@ -26,6 +26,10 @@
 #include <ode/config.h>
 #include <ode/error.h>
 
+#ifdef LINUX
+#include <alloca.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
