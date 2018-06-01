@@ -18,14 +18,14 @@ struct CSaver
     struct CHelper1
     {
         template <bool a>
-        IC static void save_data(std::enable_if_t<!a>, const T& data, M& stream, const P& /*p*/)
+        IC static void save_data(std::enable_if_t<!a, const T&> data, M& stream, const P& /*p*/)
         {
             static_assert(!std::is_polymorphic<T>::value, "Cannot save polymorphic classes as binary data.");
             stream.w(&data, sizeof(T));
         }
 
         template <bool a>
-        IC static void save_data(std::enable_if_t<a>, const T& data, M& stream, const P& /*p*/)
+        IC static void save_data(std::enable_if_t<a, const T&> data, M& stream, const P& /*p*/)
         {
             T* data1 = const_cast<T*>(&data);
             data1->save(stream);
@@ -36,13 +36,13 @@ struct CSaver
     struct CHelper
     {
         template <bool pointer>
-        IC static void save_data(std::enable_if_t<!pointer>, const T& data, M& stream, const P& p)
+        IC static void save_data(std::enable_if_t<!pointer, const T&> data, M& stream, const P& p)
         {
             CHelper1<T>::template save_data<object_type_traits::is_base_and_derived<ISerializable, T>::value>(data, stream, p);
         }
 
         template <bool pointer>
-        IC static void save_data(std::enable_if_t<pointer>, const T& data, M& stream, const P& p)
+        IC static void save_data(std::enable_if_t<pointer, const T&> data, M& stream, const P& p)
         {
             CSaver<M, P>::save_data(*data, stream, p);
         }
