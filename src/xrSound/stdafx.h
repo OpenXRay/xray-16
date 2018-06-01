@@ -20,10 +20,6 @@
 #define NONEWIC
 #define NOBITMAP
 #include <mmreg.h>
-#elif defined(LINUX)
-//TODO ALSA or Pulse?
-#include "Common/Util.hpp"
-#include <AL/al.h>
 #endif
 
 #include <vorbis/codec.h>
