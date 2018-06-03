@@ -30,7 +30,6 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{87D068EC-1789-4F09-A9EC-54CF276955E0}</ProjectGuid>
     <RootNamespace>XRay.Editor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
