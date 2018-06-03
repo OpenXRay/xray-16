@@ -44,17 +44,19 @@ struct ShaderTypeTraits<SVS>
 
     static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
     {
-        HWShaderType vs = 0;
+        HWShaderType sh = 0;
+
 #ifdef USE_OGL
-        vs = glCreateShader(GL_VERTEX_SHADER);
+        sh = glCreateShader(GL_VERTEX_SHADER);
 #elif defined(USE_DX11)
-        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, 0, &vs));
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, 0, &sh));
 #elif defined(USE_DX10)
-        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, &vs));
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, &sh));
 #else
-        R_CHK(HW.pDevice->CreateVertexShader(buffer, &vs));
+        R_CHK(HW.pDevice->CreateVertexShader(buffer, &sh));
 #endif
-        return vs;
+
+        return sh;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_vertex; }
@@ -108,17 +110,19 @@ struct ShaderTypeTraits<SPS>
 
     static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
     {
-        HWShaderType ps = 0;
+        HWShaderType sh = 0;
+
 #ifdef USE_OGL
-        ps = glCreateShader(GL_FRAGMENT_SHADER);
+        sh = glCreateShader(GL_FRAGMENT_SHADER);
 #elif defined(USE_DX11)
-        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, 0, &ps));
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, 0, &sh));
 #elif defined(USE_DX10)
-        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, &ps));
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, &sh));
 #else
-        R_CHK(HW.pDevice->CreatePixelShader(buffer, &ps));
+        R_CHK(HW.pDevice->CreatePixelShader(buffer, &sh));
 #endif
-        return ps;
+
+        return sh;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_pixel; }
@@ -166,15 +170,17 @@ struct ShaderTypeTraits<SGS>
 
     static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
     {
-        HWShaderType gs = 0;
+        HWShaderType sh = 0;
+
 #ifdef USE_OGL
-        gs = glCreateShader(GL_GEOMETRY_SHADER);
+        sh = glCreateShader(GL_GEOMETRY_SHADER);
 #elif defined(USE_DX11)
-        R_CHK(HW.pDevice->CreateGeometryShader(buffer, size, 0, &gs));
+        R_CHK(HW.pDevice->CreateGeometryShader(buffer, size, 0, &sh));
 #else
-        R_CHK(HW.pDevice->CreateGeometryShader(buffer, size, &gs));
+        R_CHK(HW.pDevice->CreateGeometryShader(buffer, size, &sh));
 #endif
-        return gs;
+
+        return sh;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_geometry; }
@@ -204,13 +210,15 @@ struct ShaderTypeTraits<SHS>
 
     static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
     {
-        HWShaderType hs = 0;
+        HWShaderType sh = 0;
+
 #ifdef USE_OGL
-        hs = glCreateShader(GL_TESS_CONTROL_SHADER);
+        sh = glCreateShader(GL_TESS_CONTROL_SHADER);
 #else
-        R_CHK(HW.pDevice->CreateHullShader(buffer, size, NULL, &hs));
+        R_CHK(HW.pDevice->CreateHullShader(buffer, size, NULL, &sh));
 #endif
-        return hs;
+
+        return sh;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_hull; }
@@ -238,13 +246,15 @@ struct ShaderTypeTraits<SDS>
 
     static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
     {
-        HWShaderType hs = 0;
+        HWShaderType sh = 0;
+
 #ifdef USE_OGL
-        hs = glCreateShader(GL_TESS_EVALUATION_SHADER);
+        sh = glCreateShader(GL_TESS_EVALUATION_SHADER);
 #else
-        R_CHK(HW.pDevice->CreateDomainShader(buffer, size, NULL, &hs));
+        R_CHK(HW.pDevice->CreateDomainShader(buffer, size, NULL, &sh));
 #endif
-        return hs;
+
+        return sh;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_domain; }
@@ -272,14 +282,15 @@ struct ShaderTypeTraits<SCS>
 
     static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
     {
-        HWShaderType cs = 0;
+        HWShaderType sh = 0;
         
 #ifdef USE_OGL
-        cs = glCreateShader(GL_COMPUTE_SHADER);
+        sh = glCreateShader(GL_COMPUTE_SHADER);
 #else
-        R_CHK(HW.pDevice->CreateComputeShader(buffer, size, NULL, &cs));
+        R_CHK(HW.pDevice->CreateComputeShader(buffer, size, NULL, &sh));
 #endif
-        return cs;
+
+        return sh;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_compute; }
@@ -327,7 +338,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 #endif
 
 template <typename T>
-inline T* CResourceManager::CreateShader(const char* name, const bool searchForEntryAndTarget /*= false*/)
+inline T* CResourceManager::CreateShader(const char* name, const char* filename /*= nullptr*/, const bool searchForEntryAndTarget /*= false*/)
 {
     ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
@@ -349,21 +360,31 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
 
         // Remove ( and everything after it
         string_path shName;
-        const char* pchr = strchr(name, '(');
-        ptrdiff_t strSize = pchr ? pchr - name : xr_strlen(name);
-        strncpy(shName, name, strSize);
-        shName[strSize] = 0;
+        {
+            if (filename == nullptr)
+                filename = name;
+
+            pcstr pchr = strchr(filename, '(');
+            ptrdiff_t size = pchr ? pchr - filename : xr_strlen(filename);
+            strncpy(shName, filename, size);
+            shName[size] = 0;
+        }
 
         // Open file
         string_path cname;
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*name*/ shName,
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), shName,
             ShaderTypeTraits<T>::GetShaderExt());
         FS.update_path(cname, "$game_shaders$", cname);
 
         // Try to open
         IReader* file = FS.r_open(cname);
-        if (!file && strstr(Core.Params, "-lack_of_shaders"))
+
+        bool fallback = strstr(Core.Params, "-lack_of_shaders");
+        if (!file && fallback)
         {
+        fallback:
+            fallback = false;
+
             string1024 tmp;
             xr_sprintf(tmp, "CreateShader: %s is missing. Replacing it with stub_default%s", cname, ShaderTypeTraits<T>::GetShaderExt());
             Msg(tmp);
@@ -400,6 +421,9 @@ inline T* CResourceManager::CreateShader(const char* name, const bool searchForE
             c_entry, c_target, flags, (void*&)sh);
 
         VERIFY(SUCCEEDED(_hr));
+
+        if (FAILED(_hr) && fallback)
+            goto fallback;
 
         CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 

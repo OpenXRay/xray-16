@@ -59,9 +59,9 @@ struct dxBox : public dxGeom {
 };
 
 
-struct dxCCylinder : public dxGeom {
+struct dxCapsule : public dxGeom {
   dReal radius,lz;	// radius, length along z axis
-  dxCCylinder (dSpaceID space, dReal _radius, dReal _length);
+  dxCapsule (dSpaceID space, dReal _radius, dReal _length);
   void computeAABB();
 };
 
@@ -215,17 +215,17 @@ dReal dGeomBoxPointDepth (dGeomID g, dReal x, dReal y, dReal z)
 //****************************************************************************
 // capped cylinder public API
 
-dxCCylinder::dxCCylinder (dSpaceID space, dReal _radius, dReal _length) :
+dxCapsule::dxCapsule (dSpaceID space, dReal _radius, dReal _length) :
   dxGeom (space,1)
 {
   dAASSERT (_radius > 0 && _length > 0);
-  type = dCCylinderClass;
+  type = dCapsuleClass;
   radius = _radius;
   lz = _length;
 }
 
 
-void dxCCylinder::computeAABB()
+void dxCapsule::computeAABB()
 {
   dReal xrange = dFabs(R[2]  * lz) * REAL(0.5) + radius;
   dReal yrange = dFabs(R[6]  * lz) * REAL(0.5) + radius;
@@ -239,36 +239,36 @@ void dxCCylinder::computeAABB()
 }
 
 
-dGeomID dCreateCCylinder (dSpaceID space, dReal radius, dReal length)
+dGeomID dCreateCapsule (dSpaceID space, dReal radius, dReal length)
 {
-  return new dxCCylinder (space,radius,length);
+  return new dxCapsule (space,radius,length);
 }
 
 
-void dGeomCCylinderSetParams (dGeomID g, dReal radius, dReal length)
+void dGeomCapsuleSetParams (dGeomID g, dReal radius, dReal length)
 {
-  dUASSERT (g && g->type == dCCylinderClass,"argument not a ccylinder");
+  dUASSERT (g && g->type == dCapsuleClass,"argument not a ccylinder");
   dAASSERT (radius > 0 && length > 0);
-  dxCCylinder *c = (dxCCylinder*) g;
+  dxCapsule *c = (dxCapsule*) g;
   c->radius = radius;
   c->lz = length;
   dGeomMoved (g);
 }
 
 
-void dGeomCCylinderGetParams (dGeomID g, dReal *radius, dReal *length)
+void dGeomCapsuleGetParams (dGeomID g, dReal *radius, dReal *length)
 {
-  dUASSERT (g && g->type == dCCylinderClass,"argument not a ccylinder");
-  dxCCylinder *c = (dxCCylinder*) g;
+  dUASSERT (g && g->type == dCapsuleClass,"argument not a ccylinder");
+  dxCapsule *c = (dxCapsule*) g;
   *radius = c->radius;
   *length = c->lz;
 }
 
 
-dReal dGeomCCylinderPointDepth (dGeomID g, dReal x, dReal y, dReal z)
+dReal dGeomCapsulePointDepth (dGeomID g, dReal x, dReal y, dReal z)
 {
-  dUASSERT (g && g->type == dCCylinderClass,"argument not a ccylinder");
-  dxCCylinder *c = (dxCCylinder*) g;
+  dUASSERT (g && g->type == dCapsuleClass,"argument not a ccylinder");
+  dxCapsule *c = (dxCapsule*) g;
   dVector3 a;
   a[0] = x - c->pos[0];
   a[1] = y - c->pos[1];
@@ -1519,13 +1519,13 @@ int dCollideBoxPlane (dxGeom *o1, dxGeom *o2,
 }
 
 
-int dCollideCCylinderSphere (dxGeom *o1, dxGeom *o2, int flags,
+int dCollideCapsuleSphere (dxGeom *o1, dxGeom *o2, int flags,
 			     dContactGeom *contact, int skip)
 {
   dIASSERT (skip >= (int)sizeof(dContactGeom));
-  dIASSERT (o1->type == dCCylinderClass);
+  dIASSERT (o1->type == dCapsuleClass);
   dIASSERT (o2->type == dSphereClass);
-  dxCCylinder *ccyl = (dxCCylinder*) o1;
+  dxCapsule *ccyl = (dxCapsule*) o1;
   dxSphere *sphere = (dxSphere*) o2;
 
   contact->g1 = o1;
@@ -1549,13 +1549,13 @@ int dCollideCCylinderSphere (dxGeom *o1, dxGeom *o2, int flags,
 }
 
 
-int dCollideCCylinderBox (dxGeom *o1, dxGeom *o2, int flags,
+int dCollideCapsuleBox (dxGeom *o1, dxGeom *o2, int flags,
 			  dContactGeom *contact, int skip)
 {
   dIASSERT (skip >= (int)sizeof(dContactGeom));
-  dIASSERT (o1->type == dCCylinderClass);
+  dIASSERT (o1->type == dCapsuleClass);
   dIASSERT (o2->type == dBoxClass);
-  dxCCylinder *cyl = (dxCCylinder*) o1;
+  dxCapsule *cyl = (dxCapsule*) o1;
   dxBox *box = (dxBox*) o2;
 
   contact->g1 = o1;
@@ -1586,17 +1586,17 @@ int dCollideCCylinderBox (dxGeom *o1, dxGeom *o2, int flags,
 }
 
 
-int dCollideCCylinderCCylinder (dxGeom *o1, dxGeom *o2,
+int dCollideCapsuleCapsule (dxGeom *o1, dxGeom *o2,
 				int flags, dContactGeom *contact, int skip)
 {
   int i;
   const dReal tolerance = REAL(1e-5);
 
   dIASSERT (skip >= (int)sizeof(dContactGeom));
-  dIASSERT (o1->type == dCCylinderClass);
-  dIASSERT (o2->type == dCCylinderClass);
-  dxCCylinder *cyl1 = (dxCCylinder*) o1;
-  dxCCylinder *cyl2 = (dxCCylinder*) o2;
+  dIASSERT (o1->type == dCapsuleClass);
+  dIASSERT (o2->type == dCapsuleClass);
+  dxCapsule *cyl1 = (dxCapsule*) o1;
+  dxCapsule *cyl2 = (dxCapsule*) o2;
 
   contact->g1 = o1;
   contact->g2 = o2;
@@ -1698,13 +1698,13 @@ int dCollideCCylinderCCylinder (dxGeom *o1, dxGeom *o2,
 }
 
 
-int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags,
+int dCollideCapsulePlane (dxGeom *o1, dxGeom *o2, int flags,
 			    dContactGeom *contact, int skip)
 {
   dIASSERT (skip >= (int)sizeof(dContactGeom));
-  dIASSERT (o1->type == dCCylinderClass);
+  dIASSERT (o1->type == dCapsuleClass);
   dIASSERT (o2->type == dPlaneClass);
-  dxCCylinder *ccyl = (dxCCylinder*) o1;
+  dxCapsule *ccyl = (dxCapsule*) o1;
   dxPlane *plane = (dxPlane*) o2;
 
   // collide the deepest capping sphere with the plane
@@ -1905,14 +1905,14 @@ int dCollideRayBox (dxGeom *o1, dxGeom *o2, int flags,
 }
 
 
-int dCollideRayCCylinder (dxGeom *o1, dxGeom *o2,
+int dCollideRayCapsule (dxGeom *o1, dxGeom *o2,
 			  int flags, dContactGeom *contact, int skip)
 {
   dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dRayClass);
-//  dIASSERT (o2->type == dCCylinderClass);
+//  dIASSERT (o2->type == dCapsuleClass);
   dxRay *ray = (dxRay*) o1;
-  dxCCylinder *ccyl = (dxCCylinder*) o2;
+  dxCapsule *ccyl = (dxCapsule*) o2;
 
   contact->g1 = ray;
   contact->g2 = ccyl;

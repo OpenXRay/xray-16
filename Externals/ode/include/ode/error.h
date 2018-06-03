@@ -39,21 +39,21 @@ typedef void dMessageFunction (int errnum, const char *msg, va_list ap);
 /* set a new error, debug or warning handler. if fn is 0, the default handlers
  * are used.
  */
-void dSetErrorHandler (dMessageFunction *fn);
-void dSetDebugHandler (dMessageFunction *fn);
-void dSetMessageHandler (dMessageFunction *fn);
+ODE_API void dSetErrorHandler (dMessageFunction *fn);
+ODE_API void dSetDebugHandler (dMessageFunction *fn);
+ODE_API void dSetMessageHandler (dMessageFunction *fn);
 
 /* return the current error, debug or warning handler. if the return value is
  * 0, the default handlers are in place.
  */
-dMessageFunction *dGetErrorHandler();
-dMessageFunction *dGetDebugHandler();
-dMessageFunction *dGetMessageHandler();
+ODE_API dMessageFunction *dGetErrorHandler(void);
+ODE_API dMessageFunction *dGetDebugHandler(void);
+ODE_API dMessageFunction *dGetMessageHandler(void);
 
 /* generate a fatal error, debug trap or a message. */
-void _cdecl dError (int num, const char *msg, ...);
-void _cdecl dDebug (int num, const char *msg, ...);
-void _cdecl dMessage (int num, const char *msg, ...);
+ODE_API void dError (int num, const char *msg, ...);
+ODE_API void dDebug (int num, const char *msg, ...);
+ODE_API void dMessage (int num, const char *msg, ...);
 
 
 #ifdef __cplusplus

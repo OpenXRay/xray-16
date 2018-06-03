@@ -252,25 +252,25 @@ public:
 };
 
 
-class dCCylinder : public dGeom {
+class dCapsule : public dGeom {
   // intentionally undefined, don't use these
-  dCCylinder (dCCylinder &);
-  void operator= (dCCylinder &);
+  dCapsule (dCapsule &);
+  void operator= (dCapsule &);
 
 public:
-  dCCylinder() { }
-  dCCylinder (dSpaceID space, dReal radius, dReal length)
-    { _id = dCreateCCylinder (space,radius,length); }
+  dCapsule() { }
+  dCapsule (dSpaceID space, dReal radius, dReal length)
+    { _id = dCreateCapsule (space,radius,length); }
 
   void create (dSpaceID space, dReal radius, dReal length) {
     if (_id) dGeomDestroy (_id);
-    _id = dCreateCCylinder (space,radius,length);
+    _id = dCreateCapsule (space,radius,length);
   }
 
   void setParams (dReal radius, dReal length)
-    { dGeomCCylinderSetParams (_id, radius, length); }
+    { dGeomCapsuleSetParams (_id, radius, length); }
   void getParams (dReal *radius, dReal *length) const
-    { dGeomCCylinderGetParams (_id,radius,length); }
+    { dGeomCapsuleGetParams (_id,radius,length); }
 };
 
 

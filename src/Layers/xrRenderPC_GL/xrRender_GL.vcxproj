@@ -77,7 +77,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -472,12 +472,6 @@
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\glslang.vcxproj">
-      <Project>{8559bc92-bc07-32ef-beed-0c50fe6ca3c3}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\SPIRV.vcxproj">
-      <Project>{3af44175-2eed-3c67-b324-93b1572b7edd}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>

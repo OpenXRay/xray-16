@@ -255,7 +255,7 @@ private:
     T& GetShaderMap();
 
     template <typename T>
-    T* CreateShader(const char* name, const bool searchForEntryAndTarget = false);
+    T* CreateShader(const char* name, const char* filename = nullptr, const bool searchForEntryAndTarget = false);
 
     template <typename T>
     void DestroyShader(const T* sh);

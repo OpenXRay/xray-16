@@ -34,24 +34,24 @@ struct dContactGeom;
 typedef void dNearCallback (void *data, dGeomID o1, dGeomID o2);
 
 
-dSpaceID dSimpleSpaceCreate (dSpaceID space);
-dSpaceID dHashSpaceCreate (dSpaceID space);
-dSpaceID dQuadTreeSpaceCreate (dSpaceID space, dVector3 Center, dVector3 Extents, int Depth);
+ODE_API dSpaceID dSimpleSpaceCreate (dSpaceID space);
+ODE_API dSpaceID dHashSpaceCreate (dSpaceID space);
+ODE_API dSpaceID dQuadTreeSpaceCreate (dSpaceID space, dVector3 Center, dVector3 Extents, int Depth);
 
-void dSpaceDestroy (dSpaceID);
+ODE_API void dSpaceDestroy (dSpaceID);
 
-void dHashSpaceSetLevels (dSpaceID space, int minlevel, int maxlevel);
-void dHashSpaceGetLevels (dSpaceID space, int *minlevel, int *maxlevel);
+ODE_API void dHashSpaceSetLevels (dSpaceID space, int minlevel, int maxlevel);
+ODE_API void dHashSpaceGetLevels (dSpaceID space, int *minlevel, int *maxlevel);
 
-void dSpaceSetCleanup (dSpaceID space, int mode);
-int dSpaceGetCleanup (dSpaceID space);
+ODE_API void dSpaceSetCleanup (dSpaceID space, int mode);
+ODE_API int dSpaceGetCleanup (dSpaceID space);
 
-void dSpaceAdd (dSpaceID, dGeomID);
-void dSpaceRemove (dSpaceID, dGeomID);
-int dSpaceQuery (dSpaceID, dGeomID);
-void dSpaceClean (dSpaceID);
-int dSpaceGetNumGeoms (dSpaceID);
-dGeomID dSpaceGetGeom (dSpaceID, int i);
+ODE_API void dSpaceAdd (dSpaceID, dGeomID);
+ODE_API void dSpaceRemove (dSpaceID, dGeomID);
+ODE_API int dSpaceQuery (dSpaceID, dGeomID);
+ODE_API void dSpaceClean (dSpaceID);
+ODE_API int dSpaceGetNumGeoms (dSpaceID);
+ODE_API dGeomID dSpaceGetGeom (dSpaceID, int i);
 
 
 #ifdef __cplusplus

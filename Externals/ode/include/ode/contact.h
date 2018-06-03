@@ -64,13 +64,25 @@ typedef struct dSurfaceParameters {
 } dSurfaceParameters;
 
 
-/* contact info set by collision functions */
-
+/**
+ * @brief Describe the contact point between two geoms.
+ *
+ * If two bodies touch, or if a body touches a static feature in its 
+ * environment, the contact is represented by one or more "contact 
+ * points", described by dContactGeom.
+ *
+ * The convention is that if body 1 is moved along the normal vector by 
+ * a distance depth (or equivalently if body 2 is moved the same distance 
+ * in the opposite direction) then the contact depth will be reduced to 
+ * zero. This means that the normal vector points "in" to body 1.
+ *
+ * @ingroup collide
+ */
 typedef struct dContactGeom {
-  dVector3 pos;
-  dVector3 normal;
-  dReal depth;
-  dGeomID g1,g2;
+  dVector3 pos;          ///< contact position
+  dVector3 normal;       ///< normal vector
+  dReal depth;           ///< penetration depth
+  dGeomID g1,g2;         ///< the colliding geoms
 } dContactGeom;
 
 

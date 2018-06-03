@@ -93,7 +93,11 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
+<<<<<<< HEAD
       <LanguageStandard>stdcpp14</LanguageStandard>
+=======
+      <LanguageStandard>stdcpp17</LanguageStandard>
+>>>>>>> upstream/xd_dev
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

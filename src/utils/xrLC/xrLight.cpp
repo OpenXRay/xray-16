@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "build.h"
+#include <random>
 
 #include "utils/xrLC_Light/xrdeflector.h"
 #include "utils/xrLCUtil/xrThread.hpp"
@@ -73,7 +74,9 @@ void CBuild::LMapsLocal()
 
 // Randomize deflectors
 #ifndef NET_CMP
-    std::random_shuffle(lc_global_data()->g_deflectors().begin(), lc_global_data()->g_deflectors().end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(lc_global_data()->g_deflectors().begin(), lc_global_data()->g_deflectors().end(), g);
 #endif
 
 #ifndef NET_CMP

@@ -1,7 +1,3 @@
-[submodule "Externals/luajit"]
-	path = Externals/luajit
-	url = https://github.com/q4a/LuaJIT.git
-	branch = xray
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/q4a/luabind-deboostified.git
@@ -63,6 +59,3 @@
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
-[submodule "Externals/glslang"]
-	path = Externals/glslang
-	url = https://github.com/KhronosGroup/glslang.git

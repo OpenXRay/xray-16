@@ -70,9 +70,9 @@ dClosestLineSegmentPoints
 dCollide
 dCollideRaySphere
 dCollideRayBox
-dCollideRayCCylinder
+dCollideRayCapsule
 dCreateBox
-dCreateCCylinder
+dCreateCapsule
 dCreateGeom
 dCreateGeomClass
 dCreateGeomTransform
@@ -85,9 +85,9 @@ dFactorLDLT
 dGeomBoxGetLengths
 dGeomBoxPointDepth
 dGeomBoxSetLengths
-dGeomCCylinderGetParams
-dGeomCCylinderPointDepth
-dGeomCCylinderSetParams
+dGeomCapsuleGetParams
+dGeomCapsulePointDepth
+dGeomCapsuleSetParams
 dGeomDestroy
 dGeomDisable
 dGeomEnable
@@ -227,8 +227,8 @@ dMassAdjust
 dMassRotate
 dMassSetBox
 dMassSetBoxTotal
-dMassSetCappedCylinder
-dMassSetCappedCylinderTotal
+dMassSetCapsule
+dMassSetCapsuleTotal
 dMassSetCylinder
 dMassSetCylinderTotal
 dMassSetParameters

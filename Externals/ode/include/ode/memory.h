@@ -38,19 +38,19 @@ typedef void dFreeFunction (void *ptr, size_t size);
 
 /* set new memory management functions. if fn is 0, the default handlers are
  * used. */
-void dSetAllocHandler (dAllocFunction *fn);
-void dSetReallocHandler (dReallocFunction *fn);
-void dSetFreeHandler (dFreeFunction *fn);
+ODE_API void dSetAllocHandler (dAllocFunction *fn);
+ODE_API void dSetReallocHandler (dReallocFunction *fn);
+ODE_API void dSetFreeHandler (dFreeFunction *fn);
 
 /* get current memory management functions */
-dAllocFunction *dGetAllocHandler ();
-dReallocFunction *dGetReallocHandler ();
-dFreeFunction *dGetFreeHandler ();
+ODE_API dAllocFunction *dGetAllocHandler (void);
+ODE_API dReallocFunction *dGetReallocHandler (void);
+ODE_API dFreeFunction *dGetFreeHandler (void);
 
 /* allocate and free memory. */
-void * dAlloc (size_t size);
-void * dRealloc (void *ptr, size_t oldsize, size_t newsize);
-void dFree (void *ptr, size_t size);
+ODE_API void * dAlloc (size_t size);
+ODE_API void * dRealloc (void *ptr, size_t oldsize, size_t newsize);
+ODE_API void dFree (void *ptr, size_t size);
 
 #ifdef __cplusplus
 }

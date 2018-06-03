@@ -64,7 +64,7 @@ void dCloseODE();
 /* class numbers */
 extern GLOBAL_SHAREDLIB_SPEC int dSphereClass;
 extern GLOBAL_SHAREDLIB_SPEC int dBoxClass;
-extern GLOBAL_SHAREDLIB_SPEC int dCCylinderClass;
+extern GLOBAL_SHAREDLIB_SPEC int dCapsuleClass;
 extern GLOBAL_SHAREDLIB_SPEC int dPlaneClass;
 extern GLOBAL_SHAREDLIB_SPEC int dGeomGroupClass;
 extern GLOBAL_SHAREDLIB_SPEC int dGeomTransformClass;
@@ -73,21 +73,21 @@ extern GLOBAL_SHAREDLIB_SPEC int dGeomTransformClass;
 dGeomID dCreateSphere (dSpaceID space, dReal radius);
 dGeomID dCreateBox (dSpaceID space, dReal lx, dReal ly, dReal lz);
 dGeomID dCreatePlane (dSpaceID space, dReal a, dReal b, dReal c, dReal d);
-dGeomID dCreateCCylinder (dSpaceID space, dReal radius, dReal length);
+dGeomID dCreateCapsule (dSpaceID space, dReal radius, dReal length);
 dGeomID dCreateGeomGroup (dSpaceID space);
 
 /* set geometry parameters */
 void dGeomSphereSetRadius (dGeomID sphere, dReal radius);
 void dGeomBoxSetLengths (dGeomID box, dReal lx, dReal ly, dReal lz);
 void dGeomPlaneSetParams (dGeomID plane, dReal a, dReal b, dReal c, dReal d);
-void dGeomCCylinderSetParams (dGeomID ccylinder, dReal radius, dReal length);
+void dGeomCapsuleSetParams (dGeomID ccylinder, dReal radius, dReal length);
 
 /* get geometry parameters */
 int   dGeomGetClass (dGeomID);
 dReal dGeomSphereGetRadius (dGeomID sphere);
 void  dGeomBoxGetLengths (dGeomID box, dVector3 result);
 void  dGeomPlaneGetParams (dGeomID plane, dVector4 result);
-void  dGeomCCylinderGetParams (dGeomID ccylinder,
+void  dGeomCapsuleGetParams (dGeomID ccylinder,
 			       dReal *radius, dReal *length);
 
 /* general functions */

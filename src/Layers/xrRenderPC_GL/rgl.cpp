@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include <glslang/SPIRV/GlslangToSpv.h>
-
 #include "rgl.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/xr_object.h"
@@ -123,8 +121,6 @@ extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
 // Just two static storage
 void CRender::create()
 {
-    glslang::InitializeProcess();
-
     Device.seqFrame.Add(this,REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
@@ -397,7 +393,6 @@ void CRender::destroy()
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
     r_dsgraph_destroy();
-    glslang::FinalizeProcess();
 }
 
 void CRender::reset_begin()

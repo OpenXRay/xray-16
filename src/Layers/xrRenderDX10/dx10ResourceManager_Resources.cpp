@@ -135,7 +135,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
     
-    return CreateShader<SVS>(name, true);
+    return CreateShader<SVS>(name, _name, true);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs)
@@ -189,7 +189,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     if (7 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_7");
 
-    return CreateShader<SPS>(name, true);
+    return CreateShader<SPS>(name, _name, true);
 }
 
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
