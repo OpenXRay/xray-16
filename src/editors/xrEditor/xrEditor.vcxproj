@@ -30,7 +30,6 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{BE4B23E7-2CA8-4607-A473-116C4242F23D}</ProjectGuid>
     <RootNamespace>xrEditor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
