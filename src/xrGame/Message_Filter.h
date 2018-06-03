@@ -24,9 +24,7 @@ private:
     struct msg_type_subtype_t
     {
         msg_type_subtype_t(u16 const type = 0, u32 const subtype = 0, u32 const recv_time = 0)
-            : msg_type(type), msg_subtype(subtype), msg_receive_time(recv_time)
-        {
-        }
+            : msg_type(type), dest_obj_id(0), msg_subtype(subtype), msg_receive_time(recv_time) {}
 
         u16 msg_type;
         u16 dest_obj_id;

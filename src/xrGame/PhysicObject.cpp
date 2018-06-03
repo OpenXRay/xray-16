@@ -19,10 +19,8 @@
 #endif
 BOOL dbg_draw_doors = false;
 CPhysicObject::CPhysicObject(void)
-    : m_anim_blend(0), m_type(epotBox), m_mass(10.f), m_collision_hit_callback(0), bones_snd_player(0),
-      m_net_updateData(0)
-{
-}
+    : m_type(epotBox), m_mass(10.f), m_collision_hit_callback(nullptr), m_anim_blend(nullptr),
+      bones_snd_player(nullptr), m_net_updateData(nullptr), m_just_after_spawn(false), m_activated(false) {}
 
 CPhysicObject::~CPhysicObject(void) { xr_delete(m_net_updateData); }
 BOOL CPhysicObject::net_Spawn(CSE_Abstract* DC)

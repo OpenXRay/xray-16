@@ -127,10 +127,10 @@ public:
 
         params(vec_arg factor, float arrive_range, float change_vel_range, float arrive_vel,
             float min_factor_dist = base::s_min_factor_dist)
-            : base::params(factor, min_factor_dist), arrive_range(arrive_range), change_vel_range(change_vel_range),
-              arrive_vel(arrive_vel)
-        {
-        }
+            : base::params(factor, min_factor_dist), min_range2dest(0),
+              arrive_range(arrive_range), vel(0),
+              change_vel_range(change_vel_range),
+              arrive_vel(arrive_vel) {}
 
         virtual bool update() = 0;
         virtual ~params() {}

@@ -48,7 +48,7 @@ IC void OrientToNorm(const Fvector& normal, Fmatrix& form, Fobb& box)
     }
 }
 
-CClimableObject::CClimableObject() : m_pStaticShell(NULL), m_material(u16(-1)) {}
+CClimableObject::CClimableObject() : m_pStaticShell(nullptr), m_radius(0), m_material(u16(-1)) {}
 CClimableObject::~CClimableObject() {}
 void CClimableObject::Load(LPCSTR section) { inherited::Load(section); }
 BOOL CClimableObject::net_Spawn(CSE_Abstract* DC)

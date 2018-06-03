@@ -268,6 +268,7 @@ void bone_table::net_load(NET_Packet* P)
 }
 
 Player_Statistic::Player_Statistic(LPCSTR Name)
+    : last_alive_update_time(0), m_dwCurMoneyRoundDelta(0)
 {
     PName = Name;
     PID = 0;
@@ -280,7 +281,7 @@ Player_Statistic::Player_Statistic(LPCSTR Name)
     ZeroMemory(m_dwNumRespawned, sizeof(m_dwNumRespawned));
     ZeroMemory(m_dwArtefacts, sizeof(m_dwArtefacts));
     ZeroMemory(m_dwSpecialKills, sizeof(m_dwSpecialKills));
-};
+}
 
 Player_Statistic::~Player_Statistic() { aWeaponStats.clear(); };
 u32 Player_Statistic::create_victims_table(victims_table& victims_table)

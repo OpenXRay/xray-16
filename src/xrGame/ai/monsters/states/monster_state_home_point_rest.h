@@ -11,7 +11,7 @@ protected:
     u32 m_target_node;
 
 public:
-    CStateMonsterRestMoveToHomePoint(_Object* obj) : inherited(obj) {}
+    CStateMonsterRestMoveToHomePoint(_Object* obj) : inherited(obj), m_target_node(0) {}
     virtual void initialize();
     virtual void execute();
     virtual bool check_start_conditions();

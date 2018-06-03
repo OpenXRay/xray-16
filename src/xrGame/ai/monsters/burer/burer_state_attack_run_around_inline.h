@@ -9,7 +9,8 @@
 #define DIST_QUANT 10.f
 
 TEMPLATE_SPECIALIZATION
-CStateBurerAttackRunAroundAbstract::CStateBurerAttackRunAround(_Object* obj) : inherited(obj) {}
+CStateBurerAttackRunAroundAbstract::CStateBurerAttackRunAround(_Object* obj) : inherited(obj), time_started(0) {}
+
 TEMPLATE_SPECIALIZATION
 void CStateBurerAttackRunAroundAbstract::initialize()
 {

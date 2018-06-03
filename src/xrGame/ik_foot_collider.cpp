@@ -23,12 +23,14 @@ static const Fplane invalide_plane = {-FLT_MAX, -FLT_MAX, -FLT_MAX, -FLT_MAX};
 struct ik_pick_result
 {
     ik_pick_result(ik_foot_geom::e_collide_point _point)
-        : p(invalide_plane), point(_point), position(Fvector().set(-FLT_MAX, -FLT_MAX, -FLT_MAX))
+        : p(invalide_plane), position(Fvector().set(-FLT_MAX, -FLT_MAX, -FLT_MAX)),
+          point(_point), range(0)
     {
         triangle[0] = Fvector().set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
         triangle[1] = Fvector().set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
         triangle[2] = Fvector().set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
     }
+
     Fplane p;
     Fvector triangle[3];
     Fvector position;

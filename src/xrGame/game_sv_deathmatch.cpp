@@ -45,7 +45,9 @@ BOOL game_sv_Deathmatch::IsAnomaliesEnabled() { return g_sv_dm_bAnomaliesEnabled
 u32 game_sv_Deathmatch::GetAnomaliesTime() { return g_sv_dm_dwAnomalySetLengthTime; };
 //-----------------------------------------------------------------
 
-game_sv_Deathmatch::game_sv_Deathmatch() : pure_relcase(&game_sv_Deathmatch::net_Relcase)
+game_sv_Deathmatch::game_sv_Deathmatch()
+    : pure_relcase(&game_sv_Deathmatch::net_Relcase), m_roundEndDelay(0),
+      m_TeamEliminatedDelay(0), pWinnigPlayerName(nullptr), m_dwSM_SwitchDelta(0)
 {
     m_type = eGameIDDeathmatch;
 
@@ -58,7 +60,7 @@ game_sv_Deathmatch::game_sv_Deathmatch() : pure_relcase(&game_sv_Deathmatch::net
 
     m_bSpectatorMode = false;
     m_dwSM_CurViewEntity = 0;
-    m_pSM_CurViewEntity = NULL;
+    m_pSM_CurViewEntity = nullptr;
     m_dwSM_LastSwitchTime = 0;
 
     //-------------------------------

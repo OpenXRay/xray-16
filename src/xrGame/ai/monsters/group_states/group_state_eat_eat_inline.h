@@ -8,7 +8,9 @@
 #define TIME_TO_EAT 20000
 
 TEMPLATE_SPECIALIZATION
-CStateGroupEatingAbstract::CStateGroupEating(_Object* obj) : inherited(obj) {}
+CStateGroupEatingAbstract::CStateGroupEating(_Object* obj)
+    : inherited(obj), corpse(nullptr), time_last_eat(0) {}
+
 TEMPLATE_SPECIALIZATION
 CStateGroupEatingAbstract::~CStateGroupEating() {}
 TEMPLATE_SPECIALIZATION

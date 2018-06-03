@@ -79,7 +79,10 @@ s32 game_sv_CaptureTheArtefact::Get_ScoreLimit() { return g_sv_ah_dwArtefactsNum
 BOOL game_sv_CaptureTheArtefact::Get_BearerCanSprint() { return !g_sv_ah_bBearerCantSprint; };
 u32 game_sv_CaptureTheArtefact::GetWarmUpTime() { return g_sv_dm_dwWarmUp_MaxTime; };
 s32 game_sv_CaptureTheArtefact::GetTimeLimit() { return g_sv_dm_dwTimeLimit; };
+
 game_sv_CaptureTheArtefact::game_sv_CaptureTheArtefact()
+    : m_dwLastAnomalyStartTime(0), m_iMoney_for_BuySpawn(0),
+      nextReinforcementTime(0), currentTime(0)
 {
     m_type = eGameIDCaptureTheArtefact;
     roundStarted = FALSE;
@@ -92,7 +95,7 @@ game_sv_CaptureTheArtefact::game_sv_CaptureTheArtefact()
     m_dwSM_SwitchDelta = 0;
     m_dwSM_LastSwitchTime = 0;
     m_dwSM_CurViewEntity = 0;
-    m_pSM_CurViewEntity = NULL;
+    m_pSM_CurViewEntity = nullptr;
 }
 
 game_sv_CaptureTheArtefact::~game_sv_CaptureTheArtefact() {}
@@ -742,9 +745,9 @@ void game_sv_CaptureTheArtefact::BalanceTeams()
             xrClientData* LowestPlayer;
             s16 LowestScore;
             s16 MaxTeam;
-            lowest_player_searcher()
+            lowest_player_searcher() : MaxTeam(0)
             {
-                LowestPlayer = NULL;
+                LowestPlayer = nullptr;
                 LowestScore = 32767;
             }
 

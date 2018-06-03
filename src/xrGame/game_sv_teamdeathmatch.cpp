@@ -123,11 +123,12 @@ struct lowest_player_functor // for autoteam balance
     s16 lowest_score;
     s16 MaxTeam;
     xrClientData* lowest_player;
-    lowest_player_functor()
+    lowest_player_functor() : MaxTeam(0)
     {
         lowest_score = 32767;
-        lowest_player = NULL;
+        lowest_player = nullptr;
     }
+
     void operator()(IClient* client)
     {
         xrClientData* l_pC = static_cast<xrClientData*>(client);

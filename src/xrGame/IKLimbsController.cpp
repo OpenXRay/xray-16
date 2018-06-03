@@ -16,7 +16,9 @@
 #include "PHDebug.h"
 #endif // DEBUG
 
-CIKLimbsController::CIKLimbsController() : m_object(0), m_legs_blend(0) {}
+CIKLimbsController::CIKLimbsController()
+    : m_legs_blend(0), m_object(nullptr), anim_name(nullptr), anim_set_name(nullptr) {}
+
 void CIKLimbsController::Create(CGameObject* O)
 {
     VERIFY(O);
