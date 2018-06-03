@@ -452,14 +452,16 @@ _DDS_2D:
 #else
     D3DX10_IMAGE_LOAD_INFO LoadInfo;
 #endif
-    // LoadInfo.FirstMipLevel = img_loaded_lod;
     LoadInfo.Width = IMG.Width;
     LoadInfo.Height = IMG.Height;
 
+    // x64 crash workaround
+#ifdef XR_X64
+    LoadInfo.FirstMipLevel = img_loaded_lod;
+#else
     if (img_loaded_lod)
-    {
         Reduce(LoadInfo.Width, LoadInfo.Height, IMG.MipLevels, img_loaded_lod);
-    }
+#endif
 
     // LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
     if (bStaging)
