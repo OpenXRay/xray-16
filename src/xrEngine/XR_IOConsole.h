@@ -122,6 +122,12 @@ public:
 
     void Execute(LPCSTR cmd);
     void ExecuteScript(LPCSTR str);
+
+    /*
+        Execute console command
+        cmd - command with name and args
+        record_cmd - Logging the entered command to the console
+    */
     void ExecuteCommand(LPCSTR cmd, bool record_cmd = true);
     void SelectCommand();
 

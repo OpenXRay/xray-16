@@ -41,8 +41,8 @@ public:
 protected:
     LPCSTR cName;
     bool bEnabled;
-    bool bLowerCaseArgs;
-    bool bEmptyArgsHandled;
+    bool bLowerCaseArgs;    // Convert arguments to lower case.
+    bool bEmptyArgsHandled; // Execute command without args.
 
     vecLRU m_LRU;
 
@@ -82,7 +82,6 @@ public:
     BENCH_SEC_SCRAMBLEVTBL2
 
     virtual void fill_tips(vecTips& tips, u32 /*mode*/) { add_LRU_to_tips(tips); }
-    // vecLRU& LRU () { return m_LRU; }
     virtual void add_to_LRU(shared_str const& arg);
     void add_LRU_to_tips(vecTips& tips);
 

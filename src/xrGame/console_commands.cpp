@@ -1734,6 +1734,21 @@ public:
     }
 };
 
+// Change weather immediately
+class CCC_SetWeather : public IConsole_Command
+{
+public:
+    CCC_SetWeather(LPCSTR N) : IConsole_Command(N) {};
+    virtual void Execute(LPCSTR args)
+    {
+        if (!xr_strlen(args))
+            return;
+
+        if (!Device.editor())
+            g_pGamePersistent->Environment().SetWeather(args, true);
+    }
+};
+
 void CCC_RegisterCommands()
 {
     // options
@@ -1922,6 +1937,7 @@ void CCC_RegisterCommands()
         CMD1(CCC_Script, "run_script");
         CMD1(CCC_ScriptCommand, "run_string");
         CMD3(CCC_Mask, "g_no_clip", &psActorFlags, AF_NO_CLIP);
+        CMD1(CCC_SetWeather, "set_weather");
     }
 
     CMD3(CCC_Mask, "g_use_tracers", &psActorFlags, AF_USE_TRACERS);

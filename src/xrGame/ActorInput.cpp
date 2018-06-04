@@ -735,7 +735,7 @@ void CActor::actorKick()
 }
 #endif
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(COC_DEBUG)
 void CActor::NoClipFly(int cmd)
 {
     Fvector cur_pos; // = Position();

@@ -680,7 +680,7 @@ public:
     virtual void OnPrevWeaponSlot();
     void SwitchNightVision();
     void SwitchTorch();
-#ifdef DEBUG
+#if defined(DEBUG) || defined(COC_DEBUG)
     void NoClipFly(int cmd);
 #endif // DEBUG
 
