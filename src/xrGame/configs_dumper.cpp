@@ -13,7 +13,10 @@
 
 namespace mp_anticheat
 {
-configs_dumper::configs_dumper() : m_start_time(0)
+configs_dumper::configs_dumper()
+#ifdef DEBUG
+    : m_start_time(0)
+#endif
 {
     m_state = ds_not_active;
     m_buffer_for_compress = nullptr;

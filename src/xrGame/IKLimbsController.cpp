@@ -17,7 +17,11 @@
 #endif // DEBUG
 
 CIKLimbsController::CIKLimbsController()
-    : m_legs_blend(0), m_object(nullptr), anim_name(nullptr), anim_set_name(nullptr) {}
+#ifdef DEBUG
+    : m_legs_blend(nullptr), m_object(nullptr), anim_name(nullptr), anim_set_name(nullptr) {}
+#else
+    : m_legs_blend(nullptr), m_object(nullptr) {}
+#endif
 
 void CIKLimbsController::Create(CGameObject* O)
 {
