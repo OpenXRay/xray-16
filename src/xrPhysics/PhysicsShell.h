@@ -4,12 +4,12 @@
 
 #include "PHDefs.h"
 #include "PhysicsCommon.h"
-#include "icollidevalidator.h"
+#include "ICollideValidator.h"
 #include "xrServerEntities/alife_space.h"
 #include "xrCore/_flags.h"
 #include "xrCore/xr_vector_defs.h"
 
-#include "xrEngine/iphysicsshell.h"
+#include "xrEngine/IPhysicsShell.h"
 #include "iphysics_scripted.h"
 
 // fwd. decl.

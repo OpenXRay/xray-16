@@ -8,7 +8,7 @@
 
 #include <ode/common.h>
 #include <ode/collision.h>
-#include "physicscommon.h"
+#include "PhysicsCommon.h"
 #include "MathUtils.h"
 #ifdef DEBUG
 #include "debug_output.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "physicsexternalcommon.h"
+#include "PhysicsExternalCommon.h"
 #include "iphysics_scripted.h"
 #include "xrCore/FTimer.h"
 #include "xrCDB/xrCDB.h" // build_callback

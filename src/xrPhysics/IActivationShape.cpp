@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "iactivationshape.h"
-#include "phactivationshape.h"
-#include "physics.h"
-#include "iphysicsshellholder.h"
-#include "phcollidevalidator.h"
+#include "IActivationShape.h"
+#include "PHActivationShape.h"
+#include "Physics.h"
+#include "IPhysicsShellHolder.h"
+#include "PHCollideValidator.h"
 void ActivateShapeExplosive(IPhysicsShellHolder* self_obj, const Fvector& size, Fvector& out_size, Fvector& in_out_pos)
 {
     //////////////

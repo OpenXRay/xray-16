@@ -1,7 +1,7 @@
 #ifndef PH_VALIDE_VALUES
 #define PH_VALIDE_VALUES
 
-#include "mathutilsode.h"
+#include "MathUtilsOde.h"
 #include "ph_valid_ode.h"
 class CSafeValue
 {

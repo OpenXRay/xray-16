@@ -18,6 +18,6 @@ public:
     virtual bool GetAndResetInitiated() = 0;
 
 protected:
-    virtual ~ICollisionDamageInfo() = 0 {}
+    virtual ~ICollisionDamageInfo() = 0;
 };
 #endif
