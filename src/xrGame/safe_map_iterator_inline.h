@@ -32,7 +32,9 @@ IC void CSSafeMapIterator::add(const _key_type& id, _data_type* value, bool no_a
     _const_iterator I = m_objects.find(id);
     if (I != m_objects.end())
     {
+#if defined(DEBUG) || defined(COC_DEBUG)
         THROW2(no_assert, "Specified object has been already found in the registry!");
+#endif
         return;
     }
 
@@ -50,7 +52,9 @@ IC void CSSafeMapIterator::remove(const _key_type& id, bool no_assert)
     _iterator I = m_objects.find(id);
     if (I == m_objects.end())
     {
+#if defined(DEBUG) || defined(COC_DEBUG)
         THROW2(no_assert, "Specified object hasn't been found in the registry!");
+#endif
         return;
     }
 
