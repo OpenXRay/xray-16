@@ -1,17 +1,17 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "PHCapture.h"
-#include "phcharacter.h"
+#include "PHCharacter.h"
 #include "Physics.h"
 #include "ExtendedGeom.h"
 
 #include "Include/xrRender/Kinematics.h"
-#include "iphysicsshellholder.h"
+#include "IPhysicsShellHolder.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrEngine/device.h"
-#include "mathutilsode.h"
-#include "phelement.h"
+#include "MathUtilsOde.h"
+#include "PHElement.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////

@@ -56,7 +56,7 @@ class IWriter;
 #endif
 
 #ifndef GM_NON_GAME
-#include "xrSound/Sound.h"
+#include "xrSound/sound.h"
 #include "Include/xrRender/WallMarkArray.h"
 #include "Include/xrRender/RenderFactory.h"
 typedef xr_vector<ref_sound> SoundVec;

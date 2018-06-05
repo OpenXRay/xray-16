@@ -5,6 +5,7 @@
 #include "PHObject.h"
 #include "PHInterpolation.h"
 #include "xrServerEntities/PHSynchronize.h"
+#include "xrServerEntities/alife_space.h"
 #include "PHDisabling.h"
 
 #include "xrEngine/IPhysicsShell.h"

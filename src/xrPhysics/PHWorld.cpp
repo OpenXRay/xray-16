@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
 #include "PHWorld.h"
-#include "tri-colliderknoopc/dTriList.h"
+#include "tri-colliderKNoOPC/dTriList.h"
 #include "PhysicsCommon.h"
 
 #include "ExtendedGeom.h"
-#include "draymotions.h"
+#include "dRayMotions.h"
 #include "PHCollideValidator.h"
 #include "xrEngine/GameMtlLib.h"
-#include "xrEngine/Device.h"
+#include "xrEngine/device.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
@@ -18,13 +18,13 @@
 #endif
 
 #include "xrServerEntities/PHSynchronize.h"
-#include "xrServerEntities/phnetstate.h"
-#include "geometrybits.h"
+#include "xrServerEntities/PHNetState.h"
+#include "GeometryBits.h"
 #include "console_vars.h"
 #include "xrEngine/device.h"
 #include "xrEngine/defines.h"
 #include "xrCDB/xr_area.h"
-#include "xrCore/fs_internal.h"
+#include "xrCore/FS_internal.h"
 #ifdef DEBUG
 //				void DBG_ObjAfterPhDataUpdate	( CPHObject *obj );
 //				void DBG_ObjBeforePhDataUpdate	( CPHObject *obj );

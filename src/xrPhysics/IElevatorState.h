@@ -19,5 +19,5 @@ public:
     virtual void NetRelcase(IPhysicsShellHolder* O) = 0;
 
 protected:
-    virtual ~IElevatorState() = 0 {}
+    virtual ~IElevatorState() = 0;
 };

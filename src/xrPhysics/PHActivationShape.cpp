@@ -3,9 +3,9 @@
 
 #include "Physics.h"
 #include "MathUtils.h"
-#include "phvalidevalues.h"
+#include "PHValideValues.h"
 
-#include "Extendedgeom.h"
+#include "ExtendedGeom.h"
 #include "SpaceUtils.h"
 #include "MathUtils.h"
 #include "xrEngine/GameMtlLib.h"
@@ -19,7 +19,7 @@
 
 #include "PHDynamicData.h"
 #include "xrServerEntities/PHSynchronize.h"
-#include "xrServerEntities/phnetstate.h"
+#include "xrServerEntities/PHNetState.h"
 static float max_depth = 0.f;
 static float friction_factor = 0.f;
 static const float cfm = 1.e-10f;
