@@ -92,7 +92,16 @@ IC bool _valid(const float x) noexcept
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
-    #pragma todo("Find Linux alternative for _fpclass. Check https://github.com/mirror/mingw-w64/blob/master/mingw-w64-headers/crt/math.h");
+    int cls = std::fpclassify((double )x);
+    switch (cls)
+    {
+    case FP_NAN:
+    case FP_INFINITE:
+    case FP_SUBNORMAL:
+        return false;
+    default:
+        break;
+    }
 
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
@@ -100,8 +109,8 @@ IC bool _valid(const float x) noexcept
     _FPCLASS_PZ Positive 0 (+0)
     _FPCLASS_PN Positive normalized non-zero
     */
-    return true;
 #endif
+    return true;
 }
 
 // double
@@ -114,16 +123,24 @@ IC bool _valid(const double x)
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
-    #pragma todo("Find Linux alternative for _fpclass. Check https://github.com/mirror/mingw-w64/blob/master/mingw-w64-headers/crt/math.h");
-
+    int cls = std::fpclassify((double )x);
+    switch (cls)
+    {
+    case FP_NAN:
+    case FP_INFINITE:
+    case FP_SUBNORMAL:
+        return false;
+    default:
+        break;
+    }
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
     _FPCLASS_NZ Negative zero ( ??? 0)
     _FPCLASS_PZ Positive 0 (+0)
     _FPCLASS_PN Positive normalized non-zero
     */
-    return true;
 #endif
+    return true;
 }
 
 // XXX: "magic" specializations, that really require profiling to see if they are worth this effort.

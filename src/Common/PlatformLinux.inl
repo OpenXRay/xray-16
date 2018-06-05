@@ -196,8 +196,8 @@ typedef dirent DirEntryType;
 #define strcmpi stricmp
 #define lstrcpy strcpy
 #define stricmp strcasecmp
-#define strncpy_s(dest, size, source, num) strncpy(dest, source, num)
-#define strcpy_s(dest, num, source) strcpy(dest, source)
+#define strncpy_s(dest, size, source, num) (NULL == strncpy(dest, source, num))
+#define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
 #define _vsnprintf vsnprintf
 #define _alloca alloca
 #define _snprintf snprintf
