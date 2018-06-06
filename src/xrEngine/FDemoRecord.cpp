@@ -3,7 +3,7 @@
 #include "x_ray.h"
 
 #include "GameFont.h"
-#include "fDemoRecord.h"
+#include "FDemoRecord.h"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "xr_object.h"

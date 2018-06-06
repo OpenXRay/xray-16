@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xrtheora_stream.h"
+#include "xrTheora_Stream.h"
 
 #ifdef _EDITOR
 //# pragma comment(lib, "x:\\oggB.lib")

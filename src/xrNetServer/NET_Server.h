@@ -1,6 +1,6 @@
 #pragma once
 
-#include "net_shared.h"
+#include "NET_Shared.h"
 #include "ip_filter.h"
 #include "NET_Common.h"
 #include "NET_PlayersMonitor.h"

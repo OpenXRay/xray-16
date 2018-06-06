@@ -24,7 +24,7 @@
 #include "xrCore/log.h"
 #endif
 #include "device.h"
-#include "xrCore/fs.h"
+#include "xrCore/FS.h"
 
 #include "xrCDB/xrXRC.h"
 
