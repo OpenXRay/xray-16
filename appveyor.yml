@@ -12,7 +12,7 @@ platform:
 - x86
 environment:
   matrix:
-  - BUILDSYSTEM: MinGW
+#  - BUILDSYSTEM: MinGW
   - BUILDSYSTEM: MSVC
 #install:
 #- SET LUAENV=lua51
