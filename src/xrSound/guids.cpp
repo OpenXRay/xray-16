@@ -1,7 +1,7 @@
 #pragma hdrstop
 
 #define INITGUID
-#if defined(WINDOWS)
+#if defined(_WIN32)
 #include <dsound.h>
 #include <eax/eax.h>
 #endif
