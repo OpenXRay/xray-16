@@ -5,7 +5,7 @@
 #include "IInputReceiver.h"
 #include "xr_object_list.h"
 #include "xrCDB/xr_area.h"
-#include "xrSound/Sound.h"
+#include "xrSound/sound.h"
 #include "xrCore/FixedVector.h"
 #include "EngineAPI.h"
 #include "EventAPI.h"
