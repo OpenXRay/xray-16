@@ -1,4 +1,4 @@
-#add_subdirectory(utils)
+add_subdirectory(utils)
 add_subdirectory(Layers)
 #add_subdirectory(xrMisc)
 #add_subdirectory(xrAICore)
