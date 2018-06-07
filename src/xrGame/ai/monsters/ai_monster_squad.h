@@ -27,7 +27,7 @@ struct SMemberGoal
     Fvector position;
     u32 node;
 
-    SMemberGoal()
+    SMemberGoal() : node(0)
     {
         type = MG_None;
         entity = 0;

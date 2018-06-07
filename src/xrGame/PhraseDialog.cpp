@@ -15,13 +15,13 @@ SPhraseDialogData::SPhraseDialogData()
 }
 
 SPhraseDialogData::~SPhraseDialogData() {}
-CPhraseDialog::CPhraseDialog()
+CPhraseDialog::CPhraseDialog() : m_bFirstIsSpeaking(false)
 {
     m_SaidPhraseID = "";
     m_bFinished = false;
-    m_pSpeakerFirst = NULL;
-    m_pSpeakerSecond = NULL;
-    m_DialogId = NULL;
+    m_pSpeakerFirst = nullptr;
+    m_pSpeakerSecond = nullptr;
+    m_DialogId = nullptr;
 }
 
 CPhraseDialog::~CPhraseDialog() {}

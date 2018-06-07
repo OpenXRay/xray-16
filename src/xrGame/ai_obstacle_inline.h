@@ -9,7 +9,7 @@
 #ifndef AI_OBSTACLE_INLINE_H
 #define AI_OBSTACLE_INLINE_H
 
-IC ai_obstacle::ai_obstacle(CGameObject* object)
+IC ai_obstacle::ai_obstacle(CGameObject* object) : m_crc(0)
 {
     m_object = object;
     m_actual = false;

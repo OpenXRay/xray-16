@@ -21,6 +21,8 @@ CUILines::CUILines()
     m_eVTextAlign = valTop;
     m_dwTextColor = 0xffffffff;
     m_TextOffset.set(0.0f, 0.0f);
+    m_wndSize.set(0.f, 0.f);
+    m_wndPos.set(0.f, 0.f);
     m_text = "";
     uFlags.zero();
     uFlags.set(flNeedReparse, FALSE);

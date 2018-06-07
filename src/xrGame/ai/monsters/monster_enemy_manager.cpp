@@ -9,9 +9,11 @@
 #include "actor_memory.h"
 
 CMonsterEnemyManager::CMonsterEnemyManager()
+    : vertex(0), time_last_seen(0), expediency(false), 
+      enemy_see_me(false), m_script_enemy(nullptr)
 {
-    monster = 0;
-    enemy = 0;
+    monster = nullptr;
+    enemy = nullptr;
     flags.zero();
     forced = false;
     prev_enemy = 0;

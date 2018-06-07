@@ -22,9 +22,9 @@ CALifeSpawnRegistry::CALifeSpawnRegistry(LPCSTR section)
 {
     m_spawn_name = "";
     seed(u32(CPU::QPC() & 0xffffffff));
-    m_game_graph = 0;
-    m_chunk = 0;
-    m_file = 0;
+    m_game_graph = nullptr;
+    m_chunk = nullptr;
+    m_file = nullptr;
 }
 
 CALifeSpawnRegistry::~CALifeSpawnRegistry()

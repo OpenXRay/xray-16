@@ -33,7 +33,7 @@ public:
 
         const CEntityAlive* enemy;
 
-        GraviObject()
+        GraviObject() : time_last_update(0)
         {
             active = false;
             enemy = 0;

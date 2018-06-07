@@ -12,7 +12,8 @@
 #define TIME_IN_STATE 8000
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterRestFunAbstract::CStateMonsterRestFun(_Object* obj) : inherited(obj) {}
+CStateMonsterRestFunAbstract::CStateMonsterRestFun(_Object* obj) : inherited(obj), time_last_hit(0) {}
+
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestFunAbstract::initialize()
 {

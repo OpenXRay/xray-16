@@ -20,6 +20,7 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow), {
                          .def(constructor<>())
                          .def("TextControl", &CUIStatic::TextItemControl)
                          .def("InitTexture", &CUIStatic::InitTexture)
+                         .def("InitTextureEx", &CUIStatic::InitTextureEx)
                          .def("SetTextureRect", &CUIStatic::SetTextureRect_script)
                          .def("SetStretchTexture", &CUIStatic::SetStretchTexture)
                          .def("GetTextureRect", &CUIStatic::GetTextureRect_script)];

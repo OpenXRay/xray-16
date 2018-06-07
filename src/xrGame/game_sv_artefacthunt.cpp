@@ -1140,11 +1140,12 @@ bool game_sv_ArtefactHunt::CheckAlivePlayersInTeam(s16 Team)
         u32 cnt_alive;
         u32 cnt_exist;
         s16 Team;
-        alife_players_counter_in_team()
+        alife_players_counter_in_team() : Team(0)
         {
             cnt_alive = 0;
             cnt_exist = 0;
         }
+
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
@@ -1183,6 +1184,7 @@ void game_sv_ArtefactHunt::MoveAllAlivePlayers()
         game_sv_ArtefactHunt* m_owner;
 
         alife_players_teleporter()
+            : m_server(nullptr), m_owner(nullptr)
         {
             AliveCount = 0;
             tmpP.B.count = 0;

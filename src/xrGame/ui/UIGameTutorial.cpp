@@ -97,6 +97,10 @@ bool CUISequenceItem::Stop(bool bForce)
 CUISequencer::CUISequencer() { m_flags.zero(); }
 void CUISequencer::Start(LPCSTR tutor_name)
 {
+    // Skip any tutorial except "game_loaded", since we need to show "st_press_any_key" hint
+    if (load_screen_renderer.IsActive() && xr_strcmp(tutor_name, "game_loaded") != 0)
+        return;
+    
     VERIFY(m_sequencer_items.size() == 0);
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 

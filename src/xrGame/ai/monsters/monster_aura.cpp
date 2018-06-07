@@ -6,20 +6,21 @@
 
 namespace detail
 {
-static pcstr const s_pp_effector_name_string = "_pp_effector_name";
-static pcstr const s_pp_highest_at_string = "_pp_highest_at";
-static pcstr const s_linear_factor_string = "_linear_factor";
-static pcstr const s_quadratic_factor_string = "_quadratic_factor";
-static pcstr const s_max_power_string = "_max_power";
-static pcstr const s_max_distance_string = "_max_distance";
-static pcstr const s_sound_string = "_sound";
-static pcstr const s_detect_sound_string = "_detect_sound";
-static pcstr const s_enable_for_dead_string = "_enable_for_dead";
-
+constexpr pcstr const s_pp_effector_name_string = "_pp_effector_name";
+constexpr pcstr const s_pp_highest_at_string = "_pp_highest_at";
+constexpr pcstr const s_linear_factor_string = "_linear_factor";
+constexpr pcstr const s_quadratic_factor_string = "_quadratic_factor";
+constexpr pcstr const s_max_power_string = "_max_power";
+constexpr pcstr const s_max_distance_string = "_max_distance";
+constexpr pcstr const s_sound_string = "_sound";
+constexpr pcstr const s_detect_sound_string = "_detect_sound";
+constexpr pcstr const s_enable_for_dead_string = "_enable_for_dead";
 } // namespace detail
 
 monster_aura::monster_aura(CBaseMonster* const object, pcstr const name)
-    : m_object(object), m_pp_effector_name(NULL), m_pp_index(0)
+    : m_object(object), m_linear_factor(0), m_quadratic_factor(0),
+      m_max_power(0), m_max_distance(0), m_pp_highest_at(0),
+      m_pp_effector_name(nullptr), m_pp_index(0)
 {
     xr_strcpy(m_name, sizeof(m_name), name);
     m_detect_snd_time = 0.0f;

@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC CScriptObjectAction::CScriptObjectAction()
+IC CScriptObjectAction::CScriptObjectAction() : m_dwQueueSize(0)
 {
     m_tpObject = 0;
     m_tGoalType = MonsterSpace::eObjectActionIdle;

@@ -11,7 +11,8 @@
 #define CStateChimeraThreatenAbstract CStateChimeraThreaten<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateChimeraThreatenAbstract::CStateChimeraThreaten(_Object* obj) : inherited(obj)
+CStateChimeraThreatenAbstract::CStateChimeraThreaten(_Object* obj)
+    : inherited(obj), m_last_time_threaten(0)
 {
     add_state(eStateWalk, new CStateChimeraThreatenWalk<_Object>(obj));
     add_state(eStateThreaten, new CStateChimeraThreatenRoar<_Object>(obj));

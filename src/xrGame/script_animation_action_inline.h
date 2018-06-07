@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC CScriptAnimationAction::CScriptAnimationAction()
+IC CScriptAnimationAction::CScriptAnimationAction() : anim_index(0)
 {
     m_tMentalState = MonsterSpace::eMentalStateDanger;
     m_tGoalType = eGoalTypeMental;
@@ -32,6 +32,7 @@ IC CScriptAnimationAction::CScriptAnimationAction(MonsterSpace::EMentalState tMe
 // Monster
 // -------------------------------------------------------------------------------------------------
 IC CScriptAnimationAction::CScriptAnimationAction(MonsterSpace::EScriptMonsterAnimAction tAnimAction, int index)
+    : m_tMentalState(), m_tGoalType()
 {
     m_tAnimAction = tAnimAction;
     m_bCompleted = false;

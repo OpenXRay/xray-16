@@ -28,7 +28,7 @@ private:
     friend inherited;
 
 public:
-    CHARACTER_REPUTATION() : m_current_value(NO_REPUTATION){};
+    CHARACTER_REPUTATION() : m_current_value(NO_REPUTATION), m_current_index(0) {}
     ~CHARACTER_REPUTATION(){};
 
     void set(CHARACTER_REPUTATION_VALUE);

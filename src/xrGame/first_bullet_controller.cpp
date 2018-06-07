@@ -3,6 +3,7 @@
 #include "Level.h"
 
 first_bullet_controller::first_bullet_controller()
+    : m_actor_velocity_limit(0), m_use_first_bullet(false)
 {
     m_last_short_time = 0;
     m_shot_timeout = 0;

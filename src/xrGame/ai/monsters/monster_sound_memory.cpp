@@ -34,12 +34,13 @@ TSoundDangerValue tagSoundElement::ConvertSoundType(ESoundTypes stype)
     return NONE_DANGEROUS_SOUND;
 }
 
-CMonsterSoundMemory::CMonsterSoundMemory()
+CMonsterSoundMemory::CMonsterSoundMemory() : time_memory(0), monster(nullptr)
 {
     Sounds.reserve(20);
     m_time_help_sound = 0;
     m_help_node = u32(-1);
 }
+
 CMonsterSoundMemory::~CMonsterSoundMemory() {}
 void CMonsterSoundMemory::init_external(CBaseMonster* M, TTime mem_time)
 {
