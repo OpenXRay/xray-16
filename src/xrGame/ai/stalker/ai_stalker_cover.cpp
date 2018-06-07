@@ -138,14 +138,19 @@ const CCoverPoint* CAI_Stalker::find_best_cover(const Fvector& position_to_cover
     }
 
     luabind::functor<bool> funct;
-    R_ASSERT(GEnv.ScriptEngine->functor("ai_stalker.evaluate_cover_point", funct));
+    //R_ASSERT(GEnv.ScriptEngine->functor("ai_stalker.evaluate_cover_point", funct));
 
     m_ce_best->setup(position_to_cover_from, minimum_enemy_distance, maximum_enemy_distance, minimum_enemy_distance);
     const CCoverPoint* point =
         ai().cover_manager().best_cover(Position(), 10.f, *m_ce_best, CStalkerMovementRestrictor(this, true));
     if (point)
     {
-        if (funct(this->cast_game_object()->lua_game_object(), point) == true)
+        if (GEnv.ScriptEngine->functor("ai_stalker.evaluate_cover_point", funct))
+        {
+            if (funct(this->cast_game_object()->lua_game_object(), point) == true)
+                return point;
+        }
+        else
             return point;
     }
 
@@ -156,7 +161,12 @@ const CCoverPoint* CAI_Stalker::find_best_cover(const Fvector& position_to_cover
     point = ai().cover_manager().best_cover(Position(), 30.f, *m_ce_best, CStalkerMovementRestrictor(this, true));
     if (point)
     {
-        if (funct(this->cast_game_object()->lua_game_object(), point) == true)
+        if (GEnv.ScriptEngine->functor("ai_stalker.evaluate_cover_point", funct))
+        {
+            if (funct(this->cast_game_object()->lua_game_object(), point) == true)
+                return point;
+        }
+        else
             return point;
     }
     return 0;
@@ -253,8 +263,12 @@ void CAI_Stalker::update_best_cover_actuality(const Fvector& position_to_cover_f
     if (point)
     {
         luabind::functor<bool> funct;
-        R_ASSERT(GEnv.ScriptEngine->functor("ai_stalker.evaluate_cover_point", funct));
-        if (funct(this->cast_game_object()->lua_game_object(), point) == true)
+        if (GEnv.ScriptEngine->functor("ai_stalker.evaluate_cover_point", funct))
+        {
+            if (funct(this->cast_game_object()->lua_game_object(), point) == true)
+                m_best_cover = point;
+        }
+        else
             m_best_cover = point;
     }
 }

@@ -695,11 +695,19 @@ inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return E_FAIL;
 }
 
+#ifdef R2_SHADERS_BACKWARDS_COMPATIBILITY
+class includer : public ID3DXInclude
+{
+public:
+    HRESULT __stdcall Open(
+        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+#else
 class includer : public ID3DInclude
 {
 public:
     virtual HRESULT __stdcall Open(
         D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+#endif
     {
         string_path pname;
         strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
@@ -736,7 +744,11 @@ static inline bool match_shader_id(
 HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags,
     void*& result)
 {
+#ifdef R2_SHADERS_BACKWARDS_COMPATIBILITY
+    D3DXMACRO defines[128];
+#else
     D3D_SHADER_MACRO defines[128];
+#endif
     int def_it = 0;
     char c_smapsize[32];
     char c_gloss[32];
@@ -1145,14 +1157,24 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
         }
 
         includer Includer;
+#ifdef R2_SHADERS_BACKWARDS_COMPATIBILITY
+        LPD3DXBUFFER pShaderBuf = nullptr;
+        LPD3DXBUFFER pErrorBuf = nullptr;
+#else
         LPD3DBLOB pShaderBuf = nullptr;
         LPD3DBLOB pErrorBuf = nullptr;
+#endif
         LPD3DXCONSTANTTABLE pConstants = nullptr;
         LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)&Includer;
         DWORD compileFlags = Flags | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
+#ifdef R2_SHADERS_BACKWARDS_COMPATIBILITY
+        _result = D3DXCompileShader((LPCSTR)fs->pointer(), fs->length(), defines, pInclude, pFunctionName, pTarget,
+            Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, &pShaderBuf, &pErrorBuf, &pConstants);
+#else
         _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget, compileFlags, 0,
             &pShaderBuf, &pErrorBuf);
+#endif
 
 #if 0
         if (pErrorBuf)

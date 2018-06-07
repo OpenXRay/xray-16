@@ -50,6 +50,7 @@
 #   define COC_DEBUG_BEHAVIOUR // Enables CoC debug behaviour when the game crashes
 #   define NON_FATAL_VERIFY
 #   define ACTOR_BEFORE_DEATH_CALLBACK // For extending the life of the actor to fake death or do other tasks that need to happen before actor is dead
+#   define R2_SHADERS_BACKWARDS_COMPATIBILITY
 #endif
 
 /* LAYERED_SND_SHOOT by Alundaio

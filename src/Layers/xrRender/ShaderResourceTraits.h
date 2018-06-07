@@ -29,7 +29,7 @@ struct ShaderTypeTraits<SVS>
         else
             target = "vs_1_1";
 
-#if RENDER==R_R1
+#if RENDER==R_R1 || defined(R2_SHADERS_BACKWARDS_COMPATIBILITY)
         if (strstr(data, "main_vs_1_1"))
         {
             target = "vs_1_1";
@@ -85,7 +85,7 @@ struct ShaderTypeTraits<SPS>
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
     {
-#if RENDER==R_R1
+#if RENDER==R_R1 || defined(R2_SHADERS_BACKWARDS_COMPATIBILITY)
         if (strstr(data, "main_ps_1_1"))
         {
             target = "ps_1_1";

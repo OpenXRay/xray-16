@@ -466,9 +466,9 @@ void CRenderTarget::phase_combine()
 
         // Draw COLOR
         if (!RImplementation.o.dx10_msaa)
-            RCache.set_Element(s_combine->E[bDistort ? 4 : 2]); // look at blender_combine.cpp
+            RCache.set_Element(s_combine->E[bDistort ? 2 : 1]); // look at blender_combine.cpp
         else
-            RCache.set_Element(s_combine_msaa[0]->E[bDistort ? 4 : 2]); // look at blender_combine.cpp
+            RCache.set_Element(s_combine_msaa[0]->E[bDistort ? 2 : 1]); // look at blender_combine.cpp
 
         RCache.set_c("m_current", m_current);
         RCache.set_c("m_previous", m_previous);

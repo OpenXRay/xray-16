@@ -5,10 +5,11 @@ skip_tags: true
 image:
 - Visual Studio 2017
 configuration:
-- Mixed
+- Release_COC
 - Release
 - Mixed_COC
-- Release_COC
+- Mixed
+- Debug
 platform:
 - x64
 - x86
@@ -22,6 +23,10 @@ after_build:
 - cmd: xrbuild.cmd
 test: off
 artifacts:
+- path: res/OpenXRay.Dx86.7z
+  name: OpenXRay.Dx86.7z
+- path: res/OpenXRay.Dx64.7z
+  name: OpenXRay.Dx64.7z
 - path: res/OpenXRay.Mx86.7z
   name: OpenXRay.Mx86.7z
 - path: res/OpenXRay.Mx64.7z
