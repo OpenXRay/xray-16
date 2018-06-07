@@ -4,7 +4,6 @@
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/q4a/luabind-deboostified.git
-	branch = xray
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
 	url = https://github.com/nitrocaster/GameSpy.git
