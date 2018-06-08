@@ -20,4 +20,4 @@ add_definitions(-DENGINE_BUILD)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore luabind xrAPI xrSound xrScriptEngine LuaJIT xrCDB xrPhysics)
+target_link_libraries(${PROJECT_NAME} xrCore luabind xrAPI xrSound xrScriptEngine luajit theora ${OGG_LIBRARIES} xrNetServer xrCDB xrPhysics openal)

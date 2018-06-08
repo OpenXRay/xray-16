@@ -131,6 +131,28 @@ typedef struct {
     WORD  cbSize;
 } WAVEFORMATEX, *LPWAVEFORMATEX;
 
+typedef struct tagSTICKYKEYS
+{
+    DWORD   cbSize;
+    DWORD   dwFlags;
+} STICKYKEYS, *LPSTICKYKEYS;
+
+typedef struct tagFILTERKEYS
+{
+    UINT   cbSize;
+    DWORD  dwFlags;
+    DWORD  iWaitMSec;
+    DWORD  iDelayMSec;
+    DWORD  iRepeatMSec;
+    DWORD  iBounceMSec;
+} FILTERKEYS, *LPFILTERKEYS;
+
+typedef struct tagTOGGLEKEYS
+{
+    DWORD   cbSize;
+    DWORD   dwFlags;
+} TOGGLEKEYS, *LPTOGGLEKEYS;
+
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
 
