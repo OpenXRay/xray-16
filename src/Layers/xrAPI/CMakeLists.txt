@@ -1,5 +1,8 @@
+project(xrAPI)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CURRENT_SOURCE_DIR}/../../../sdk/include)
 
-add_library(xrAPI SHARED "xrAPI.cpp" "stdafx.h")
+add_definitions(-DXRAPI_EXPORTS)
 
-set_target_properties(xrAPI PROPERTIES PREFIX "")
+add_library(${PROJECT_NAME} SHARED "xrAPI.cpp" "stdafx.h")
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")

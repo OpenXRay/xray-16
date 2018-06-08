@@ -22,4 +22,10 @@ add_definitions(-DXRCORE_EXPORTS)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIB} ${OPENSSL_LIBRARIES} ${LZO_LIBRARY} ${CRYPTO_LIBRARY} ${PUGIXML_LIBRARY})
+#Заглушки, пока не починю find_package
+set(CRYPTO_LIBRARY crypto++)
+set(PUGIXML_LIBRARY pugixml)
+set(TBB_LIBRARIES tbb tbbmalloc_proxy tbbmalloc)
+set(SDL2_LIB SDL2)
+
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIB} ${LZO_LIBRARY} ${CRYPTO_LIBRARY} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
