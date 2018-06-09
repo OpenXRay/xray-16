@@ -26,7 +26,7 @@ public:
 
 typedef NodePosition CPosition;
 
-class CVertex : private NodeCompressed
+class CVertex : public NodeCompressed
 {
 private:
     friend class CRenumbererConverter;

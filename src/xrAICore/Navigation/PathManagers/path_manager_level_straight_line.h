@@ -19,7 +19,7 @@ class CPathManager<CLevelGraph, _DataStorage, SStraightLineParams<_dist_type, _i
 protected:
     typedef CLevelGraph _Graph;
     typedef SStraightLineParams<_dist_type, _index_type, _iteration_type> _Parameters;
-    typedef typename CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type, _iteration_type>,
+    typedef CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type, _iteration_type>,
         _dist_type, _index_type, _iteration_type>
         inherited;
 

@@ -20,7 +20,7 @@ class CPathManager<CGameGraph, _DataStorage, SGameLevel<_dist_type, _index_type,
 protected:
     typedef CGameGraph _Graph;
     typedef SGameLevel<_dist_type, _index_type, _iteration_type> _Parameters;
-    typedef typename CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type, _iteration_type>,
+    typedef CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type, _iteration_type>,
         _dist_type, _index_type, _iteration_type>
         inherited;
 
