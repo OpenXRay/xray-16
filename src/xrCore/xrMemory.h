@@ -20,9 +20,9 @@ class XRCORE_API xrMemory
     // Additional 16 bytes of memory almost like in original xr_aligned_offset_malloc
     // But for DEBUG we don't need this if we want to find memory problems
 #ifdef DEBUG
-    constexpr size_t reserved = 0;
+    size_t reserved = 0;
 #else
-    constexpr size_t reserved = 16;
+    size_t reserved = 16;
 #endif
 
 public:
