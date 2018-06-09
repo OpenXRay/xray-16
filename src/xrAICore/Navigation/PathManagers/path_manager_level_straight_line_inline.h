@@ -38,8 +38,8 @@ IC void CLevelStraightLinePathManager::create_path(T& vertex)
 
     Fvector tPosition = m_parameters->m_start_point;
 
-    xr_vector<_index_type>::iterator I = path->begin();
-    xr_vector<_index_type>::iterator E = path->end();
+	typename xr_vector<_index_type>::iterator I = path->begin();
+	typename xr_vector<_index_type>::iterator E = path->end();
     _index_type& dwNode = *I;
     for (++I; I != E; ++I)
     {

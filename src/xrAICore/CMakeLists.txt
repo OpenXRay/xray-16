@@ -16,8 +16,11 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
 	)
 
-#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.cpp")
-#list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.h")
+#foreach(header ${${PROJECT_NAME}__INCLUDES})
+#	if (${header} MATCHES _inline.h$)
+#		list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES ${header})
+#	endif()
+#endforeach()
 
 add_definitions(-DXRAICORE_EXPORTS -DAI_COMPILER -D_SECURE_SCL=0)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})

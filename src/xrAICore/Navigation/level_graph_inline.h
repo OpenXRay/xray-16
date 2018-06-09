@@ -466,8 +466,8 @@ IC void CLevelGraph::assign_y_values(xr_vector<T>& path)
     const CVertex* _vertex;
     u32 prev_id = u32(-1);
 
-    xr_vector<T>::iterator I = path.begin();
-    xr_vector<T>::iterator E = path.end();
+    typename xr_vector<T>::iterator I = path.begin();
+    typename xr_vector<T>::iterator E = path.end();
     for (; I != E; ++I)
     {
         if (prev_id != (*I).get_vertex_id())
