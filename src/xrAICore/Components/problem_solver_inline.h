@@ -75,8 +75,8 @@ IC void CProblemSolverAbstract::add_operator(const _edge_type& operator_id, _ope
     typename OPERATOR_VECTOR::iterator I = std::lower_bound(m_operators.begin(), m_operators.end(), operator_id);
     THROW((I == m_operators.end()) || ((*I).m_operator_id != operator_id));
 #ifdef DEBUG
-    validate_properties(_operator->conditions());
-    validate_properties(_operator->effects());
+    validate_properties(_op->conditions());
+    validate_properties(_op->effects());
 #endif
     m_actuality = false;
     m_operators.insert(I, SOperator(operator_id, _op));
