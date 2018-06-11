@@ -231,7 +231,7 @@ void CCar::SpawnInitPhysics(CSE_Abstract* D)
     SetDefaultNetState(so);
     CPHUpdateObject::Activate();
 
-    m_pPhysicsShell->applyImpulse(Fvector().set(0.f, -1.f, 0.f), 0.1f);
+	//m_pPhysicsShell->applyImpulse(Fvector().set(0.f, -1.f, 0.f), 0.1f);
 }
 
 void CCar::net_Destroy()
