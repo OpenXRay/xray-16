@@ -25,20 +25,14 @@ struct CDataStorageBucketList
     template <typename TManagerDataStorage>
     class CDataStorage : public TManagerDataStorage
     {
-    public:
-        using Inherited = TManagerDataStorage;
-        using Vertex = typename TManagerDataStorage::Vertex;
-        using Distance = typename Vertex::Distance;
-        using Index = typename Vertex::Index;
-
     protected:
-        Distance m_max_distance;
-        Vertex m_list_data[2];
-        Vertex* m_list_head;
-        Vertex* m_list_tail;
-        Distance m_min_bucket_value;
-        Distance m_max_bucket_value;
-        Vertex* m_buckets[BucketCount];
+        typename TManagerDataStorage::Vertex::Distance m_max_distance;
+        typename TManagerDataStorage::Vertex m_list_data[2];
+        typename TManagerDataStorage::Vertex* m_list_head;
+        typename TManagerDataStorage::Vertex* m_list_tail;
+        typename TManagerDataStorage::Vertex::Distance m_min_bucket_value;
+        typename TManagerDataStorage::Vertex::Distance m_max_bucket_value;
+        typename TManagerDataStorage::Vertex* m_buckets[BucketCount];
         u32 m_min_bucket_id;
 
     public:
@@ -47,15 +41,15 @@ struct CDataStorageBucketList
         inline void init();
         inline void add_best_closed();
         inline bool is_opened_empty();
-        inline u32 compute_bucket_id(Vertex& vertex) const;
+        inline u32 compute_bucket_id(typename TManagerDataStorage::Vertex& vertex) const;
         inline void verify_buckets() const;
-        inline void add_to_bucket(Vertex& vertex, u32 bucket_id);
-        inline void add_opened(Vertex& vertex);
-        inline void decrease_opened(Vertex& vertex, const Distance value);
+        inline void add_to_bucket(typename TManagerDataStorage::Vertex& vertex, u32 bucket_id);
+        inline void add_opened(typename TManagerDataStorage::Vertex& vertex);
+        inline void decrease_opened(typename TManagerDataStorage::Vertex& vertex, const typename TManagerDataStorage::Vertex::Distance value);
         inline void remove_best_opened();
-        inline Vertex& get_best();
-        inline void set_min_bucket_value(const Distance min_bucket_value);
-        inline void set_max_bucket_value(const Distance max_bucket_value);
+        inline typename TManagerDataStorage::Vertex& get_best();
+        inline void set_min_bucket_value(const typename TManagerDataStorage::Vertex::Distance min_bucket_value);
+        inline void set_max_bucket_value(const typename TManagerDataStorage::Vertex::Distance max_bucket_value);
     };
 };
 

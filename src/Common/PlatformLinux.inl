@@ -220,7 +220,9 @@ typedef dirent DirEntryType;
 #define stricmp strcasecmp
 #define strncpy_s(dest, size, source, num) (NULL == strncpy(dest, source, num))
 #define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
+#define strcat_s(dest, num, source) (dest == strcat(dest, source))
 #define _vsnprintf vsnprintf
+#define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
 #define _alloca alloca
 #define _snprintf snprintf
 #define sprintf_s(buffer, buffer_size, stringbuffer, ...) sprintf(buffer, stringbuffer, ##__VA_ARGS__)

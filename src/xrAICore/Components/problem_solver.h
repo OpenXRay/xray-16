@@ -30,7 +30,6 @@ private:
         self_type;
 
 public:
-    typedef _operator_condition COperatorCondition;
     typedef _operator COperator;
     typedef _condition_state CState;
     typedef _condition_evaluator CConditionEvaluator;
@@ -39,10 +38,9 @@ public:
     typedef _condition_evaluator_ptr _condition_evaluator_ptr;
 #endif
     typedef typename _operator_condition::_condition_type _condition_type;
-    typedef typename _operator_condition::_value_type _value_type;
-    typedef typename _operator::_edge_value_type _edge_value_type;
+    typedef typename _operator_condition::_value_type value_type;
+    typedef typename _operator::_edge_value_type edge_value_type;
     typedef CState _index_type;
-    typedef _operator_id_type _edge_type;
 
     struct SOperator
     {
@@ -64,7 +62,7 @@ public:
 protected:
     OPERATOR_VECTOR m_operators;
     EVALUATORS m_evaluators;
-    xr_vector<_edge_type> m_solution;
+    xr_vector<_operator_id_type> m_solution;
     CState m_target_state;
     mutable CState m_current_state;
     mutable CState m_temp;
@@ -88,23 +86,20 @@ private:
     IC bool is_goal_reached_impl(const _index_type& vertex_index) const;
     IC bool is_goal_reached_impl(const _index_type& vertex_index, bool) const;
 
-    IC _edge_value_type estimate_edge_weight_impl(const _index_type& vertex_index) const;
-    IC _edge_value_type estimate_edge_weight_impl(const _index_type& vertex_index, bool) const;
+    IC edge_value_type estimate_edge_weight_impl(const _index_type& vertex_index) const;
+    IC edge_value_type estimate_edge_weight_impl(const _index_type& vertex_index, bool) const;
 
 private:
-    template <bool>
     struct helper
     {
-        static IC _edge_value_type estimate_edge_weight_impl(self_type const& self, const _index_type& vertex_index)
+        template <bool a>
+        static IC edge_value_type estimate_edge_weight_impl(std::enable_if_t<a, self_type const&> self, const _index_type& vertex_index)
         {
             return self.estimate_edge_weight_impl(vertex_index);
         }
-    }; // struct helper
 
-    template <>
-    struct helper<true>
-    {
-        static IC _edge_value_type estimate_edge_weight_impl(self_type const& self, const _index_type& vertex_index)
+        template <bool a>
+        static IC edge_value_type estimate_edge_weight_impl(std::enable_if_t<!a, self_type const&> self, const _index_type& vertex_index)
         {
             return self.estimate_edge_weight_impl(vertex_index, true);
         }
@@ -124,18 +119,18 @@ public:
     IC bool actual() const;
 
     // graph interface
-    IC _edge_value_type get_edge_weight(
+    IC edge_value_type get_edge_weight(
         const _index_type& vertex_index0, const _index_type& vertex_index1, const const_iterator& i) const;
     IC bool is_accessible(const _index_type& vertex_index) const;
     IC const _index_type& value(const _index_type& vertex_index, const_iterator& i, bool reverse_search) const;
     IC void begin(const _index_type& vertex_index, const_iterator& b, const_iterator& e) const;
     IC bool is_goal_reached(const _index_type& vertex_index) const;
-    IC _edge_value_type estimate_edge_weight(const _index_type& vertex_index) const;
+    IC edge_value_type estimate_edge_weight(const _index_type& vertex_index) const;
 
     // operator interface
-    IC virtual void add_operator(const _edge_type& operator_id, _operator_ptr _op);
-    IC virtual void remove_operator(const _edge_type& operator_id);
-    IC _operator_ptr get_operator(const _edge_type& operator_id);
+    IC virtual void add_operator(const _operator_id_type& operator_id, _operator_ptr _op);
+    IC virtual void remove_operator(const _operator_id_type& operator_id);
+    IC _operator_ptr get_operator(const _operator_id_type& operator_id);
     IC const OPERATOR_VECTOR& operators() const;
 
     // state interface
@@ -148,12 +143,12 @@ public:
     IC virtual void remove_evaluator(const _condition_type& condition_id);
     IC _condition_evaluator_ptr evaluator(const _condition_type& condition_id) const;
     IC const EVALUATORS& evaluators() const;
-    IC void evaluate_condition(typename xr_vector<COperatorCondition>::const_iterator& I,
-        typename xr_vector<COperatorCondition>::const_iterator& E, const _condition_type& condition_id) const;
+    IC void evaluate_condition(typename xr_vector<_operator_condition>::const_iterator& I,
+        typename xr_vector<_operator_condition>::const_iterator& E, const _condition_type& condition_id) const;
 
     // solver interface
     IC void solve();
-    IC const xr_vector<_edge_type>& solution() const;
+    IC const xr_vector<_operator_id_type>& solution() const;
     virtual void clear();
 };
 

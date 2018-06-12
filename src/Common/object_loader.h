@@ -38,7 +38,7 @@ struct CLoader
         template <bool pointer>
         static void load_data(std::enable_if_t<!pointer, T&> data, M& stream, const P& p)
         {
-            CHelper1<T>::load_data<object_type_traits::is_base_and_derived<ISerializable, T>::value>(data, stream, p);
+            CHelper1<T>::template load_data<object_type_traits::is_base_and_derived<ISerializable, T>::value>(data, stream, p);
         }
 
         template <bool pointer>
@@ -117,7 +117,7 @@ struct CLoader
         template <bool a>
         static void load_data(std::enable_if_t<!a, T&> data, M& stream, const P& p)
         {
-            CHelper<T>::load_data<object_type_traits::is_pointer<T>::value>(data, stream, p);
+            CHelper<T>::template load_data<object_type_traits::is_pointer<T>::value>(data, stream, p);
         }
 
         template <bool a>

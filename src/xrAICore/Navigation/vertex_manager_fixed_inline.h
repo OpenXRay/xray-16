@@ -19,7 +19,7 @@ TEMPLATE_SPECIALIZATION
 inline CFixedVertexManager::CDataStorage(const u32 vertex_count)
     : CDataStorageBase(vertex_count), CDataStorageAllocator()
 {
-    m_current_path_id = PathId(0);
+    m_current_path_id = TPathId(0);
     m_max_node_count = vertex_count;
     m_indexes = xr_alloc<IndexVertex>(vertex_count);
     ZeroMemory(m_indexes, vertex_count * sizeof(IndexVertex));
@@ -41,22 +41,22 @@ inline void CFixedVertexManager::init()
 }
 
 TEMPLATE_SPECIALIZATION
-inline bool CFixedVertexManager::is_opened(const Vertex& vertex) const { return !!vertex.opened(); }
+inline bool CFixedVertexManager::is_opened(const TCompoundVertex& vertex) const { return !!vertex.opened(); }
 TEMPLATE_SPECIALIZATION
-inline bool CFixedVertexManager::is_visited(const Index& vertex_id) const
+inline bool CFixedVertexManager::is_visited(const TIndex& vertex_id) const
 {
     VERIFY(vertex_id < m_max_node_count);
     return m_indexes[vertex_id].m_path_id == m_current_path_id;
 }
 
 TEMPLATE_SPECIALIZATION
-inline bool CFixedVertexManager::is_closed(const Vertex& vertex) const
+inline bool CFixedVertexManager::is_closed(const TCompoundVertex& vertex) const
 {
     return is_visited(vertex) && !is_opened(vertex);
 }
 
 TEMPLATE_SPECIALIZATION
-inline typename CFixedVertexManager::Vertex& CFixedVertexManager::get_node(const Index& vertex_id) const
+inline TCompoundVertex& CFixedVertexManager::get_node(const TIndex& vertex_id) const
 {
     VERIFY(vertex_id < m_max_node_count);
     VERIFY(is_visited(vertex_id));
@@ -64,7 +64,7 @@ inline typename CFixedVertexManager::Vertex& CFixedVertexManager::get_node(const
 }
 
 TEMPLATE_SPECIALIZATION
-inline typename CFixedVertexManager::Vertex& CFixedVertexManager::create_vertex(Vertex& vertex, const Index& vertex_id)
+inline TCompoundVertex& CFixedVertexManager::create_vertex(TCompoundVertex& vertex, const TIndex& vertex_id)
 {
     VERIFY(vertex_id < m_max_node_count);
     m_indexes[vertex_id].m_vertex = &vertex;
@@ -74,10 +74,10 @@ inline typename CFixedVertexManager::Vertex& CFixedVertexManager::create_vertex(
 }
 
 TEMPLATE_SPECIALIZATION
-inline void CFixedVertexManager::add_opened(Vertex& vertex) { vertex._opened = 1; }
+inline void CFixedVertexManager::add_opened(TCompoundVertex& vertex) { vertex._opened = 1; }
 TEMPLATE_SPECIALIZATION
-inline void CFixedVertexManager::add_closed(Vertex& vertex) { vertex._opened = 0; }
+inline void CFixedVertexManager::add_closed(TCompoundVertex& vertex) { vertex._opened = 0; }
 TEMPLATE_SPECIALIZATION
-inline typename CFixedVertexManager::PathId CFixedVertexManager::current_path_id() const { return m_current_path_id; }
+inline TPathId CFixedVertexManager::current_path_id() const { return m_current_path_id; }
 #undef TEMPLATE_SPECIALIZATION
 #undef CFixedVertexManager

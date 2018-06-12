@@ -11,10 +11,12 @@
 #include "xrAICore/Navigation/a_star.h"
 #include "xrAICore/Navigation/edge_path.h"
 #include "xrAICore/Navigation/vertex_manager_fixed.h"
-#include "xrAICore/Navigation/vertex_manager_hash_fixed.h"
 #include "xrAICore/Navigation/vertex_allocator_fixed.h"
 #include "xrAICore/Navigation/data_storage_bucket_list.h"
+#ifndef AI_COMPILER
+#include "xrAICore/Navigation/vertex_manager_hash_fixed.h"
 #include "xrAICore/Navigation/data_storage_binary_heap.h"
+#endif
 #include "xrAICore/Navigation/PathManagers/path_manager.h"
 #include "xrAICore/Navigation/graph_engine_space.h"
 #include "xrEngine/profiler.h"

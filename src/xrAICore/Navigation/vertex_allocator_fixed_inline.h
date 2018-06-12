@@ -23,7 +23,7 @@ inline void CFixedVertexAllocator::init() { m_vertex_count = 0; }
 TEMPLATE_SPECIALIZATION
 inline u32 CFixedVertexAllocator::get_visited_node_count() const { return m_vertex_count; }
 TEMPLATE_SPECIALIZATION
-inline typename CFixedVertexAllocator::Vertex& CFixedVertexAllocator::create_vertex()
+inline TCompoundVertex& CFixedVertexAllocator::create_vertex()
 {
     VERIFY(m_vertex_count < ReserveSize - 1);
     return *(m_vertices.begin() + m_vertex_count++);
