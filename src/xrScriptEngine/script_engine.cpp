@@ -596,6 +596,39 @@ luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
     }
 }
 
+struct raii_guard : private Noncopyable
+{
+    CScriptEngine* m_script_engine;
+    int m_error_code;
+    const char*& m_error_description;
+
+    raii_guard(CScriptEngine* scriptEngine, int error_code, const char*& error_description)
+        : m_script_engine(scriptEngine), m_error_code(error_code), m_error_description(error_description)
+    {}
+
+    ~raii_guard()
+    {
+#ifdef DEBUG
+        const bool lua_studio_connected = !!m_script_engine->debugger();
+        if (!lua_studio_connected)
+#endif
+        {
+#ifdef DEBUG
+            static const bool break_on_assert = !!strstr(Core.Params, "-break_on_assert");
+#else
+            static const bool break_on_assert = true; //Alundaio: Can't get a proper stack trace with this enabled
+#endif
+            if (!m_error_code)
+                return; // Check "lua_pcall_failed" before changing this!
+
+            if (break_on_assert)
+                R_ASSERT2(!m_error_code, m_error_description);
+            else
+                Msg("! SCRIPT ERROR: %s", m_error_description);
+        }
+    }
+};
+
 bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int errorCode, pcstr caErrorText)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
@@ -604,6 +637,7 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
         print_error(L, errorCode);
     scriptEngine->print_stack(L);
     pcstr S = "see call_stack for details!";
+    raii_guard guard(scriptEngine, errorCode, caErrorText ? caErrorText : S);
     if (!lua_isstring(L, -1))
         return false;
     S = lua_tostring(L, -1);
