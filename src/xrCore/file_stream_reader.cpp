@@ -14,15 +14,15 @@ void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
 
     HANDLE file_mapping_handle = CreateFileMapping(m_file_handle, 0, PAGE_READONLY, 0, 0, 0);
     VERIFY(file_mapping_handle != INVALID_HANDLE_VALUE);
-
+    inherited::construct(file_mapping_handle, 0, file_size, file_size, window_size);
 #elif defined(LINUX)
     m_file_handle = ::open(file_name, O_RDONLY);
     VERIFY(m_file_handle != -1);
     struct stat file_info;
     ::fstat(m_file_handle, &file_info);
     u32 file_size = (u32)file_info.st_size;
+    inherited::construct(m_file_handle, 0, file_size, file_size, window_size);
 #endif
-    inherited::construct(&m_file_handle, 0, file_size, file_size, window_size);
 }
 
 void CFileStreamReader::destroy()

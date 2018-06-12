@@ -203,20 +203,17 @@ void CScriptEngine::print_stack(lua_State* L)
         {
             lua_getinfo(L, "nSlu", &l_tDebugInfo);
             if (!l_tDebugInfo.name)
-            {
-                script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
-                    l_tDebugInfo.currentline, "");
-            }
+                Msg("%2d : [%s] %s(%d)", i, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline);
             else if (!xr_strcmp(l_tDebugInfo.what, "C"))
-                script_log(LuaMessageType::Error, "%2d : [C  ] %s", i, l_tDebugInfo.name);
+                Msg("%2d : [C  ] %s", i, l_tDebugInfo.name);
             else
             {
-                script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
+                Msg("%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
                     l_tDebugInfo.currentline, l_tDebugInfo.name);
             }
 
             // Giperion: verbose log
-            Log("\nLua state dump:\n\tLocals: ");
+            Log("Lua state dump locals: ");
             pcstr name = nullptr;
             int VarID = 1;
             try
@@ -232,7 +229,7 @@ void CScriptEngine::print_stack(lua_State* L)
             {
                 Log("Can't dump lua state - Engine corrupted");
             }
-            Log("\tEnd\nEnd of Lua state dump.\n");
+            Log("End of Lua state dump.\n");
             // -Giperion
         }
     }
@@ -268,6 +265,7 @@ void CScriptEngine::LogTable(lua_State* luaState, pcstr S, int level)
 
 void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level)
 {
+    using namespace luabind::detail;
     const int ntype = lua_type(luaState, -1);
     const pcstr type = lua_typename(luaState, ntype);
 
@@ -318,15 +316,25 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level)
     // case LUA_TLIGHTUSERDATA:
     case LUA_TUSERDATA:
     {
-        lua_getmetatable(luaState, -1); // Maybe we can do this in another way
-        if (lua_istable(luaState, -1))
+        object_rep* object = get_instance(luaState, -1);
+        if (!object)
         {
-            Msg("%s Userdata: %s", tabBuffer, name);
-            LogTable(luaState, name, level + 1);
-            lua_pop(luaState, 1); //Remove userobject
-            return;
+            xr_strcpy(value, "Error! Can't get instance!");
+            break;
         }
-        //[[fallthrough]]
+
+        class_rep* rep = object->crep();
+        if (!rep)
+        {
+            xr_strcpy(value, "Error! Class userdata is null!");
+            break;
+        }
+
+        pcstr className = rep->name();
+        if (className)
+            xr_sprintf(value, "'%s'", className);
+
+        break;
     }
 
     default:
@@ -588,39 +596,6 @@ luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
     }
 }
 
-struct raii_guard : private Noncopyable
-{
-    CScriptEngine* m_script_engine;
-    int m_error_code;
-    const char*& m_error_description;
-
-    raii_guard(CScriptEngine* scriptEngine, int error_code, const char*& error_description)
-        : m_script_engine(scriptEngine), m_error_code(error_code), m_error_description(error_description)
-    {}
-
-    ~raii_guard()
-    {
-#ifdef DEBUG
-        const bool lua_studio_connected = !!m_script_engine->debugger();
-        if (!lua_studio_connected)
-#endif
-        {
-#ifdef DEBUG
-            static const bool break_on_assert = !!strstr(Core.Params, "-break_on_assert");
-#else
-            static const bool break_on_assert = true; //Alundaio: Can't get a proper stack trace with this enabled
-#endif
-            if (!m_error_code)
-                return; // Check "lua_pcall_failed" before changing this!
-
-            if (break_on_assert)
-                R_ASSERT2(!m_error_code, m_error_description);
-            else
-                Msg("! SCRIPT ERROR: %s", m_error_description);
-        }
-    }
-};
-
 bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int errorCode, pcstr caErrorText)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
@@ -629,7 +604,6 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
         print_error(L, errorCode);
     scriptEngine->print_stack(L);
     pcstr S = "see call_stack for details!";
-    raii_guard guard(scriptEngine, errorCode, caErrorText ? caErrorText : S);
     if (!lua_isstring(L, -1))
         return false;
     S = lua_tostring(L, -1);
@@ -648,8 +622,6 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
     {
         if (!errorCode)
             scriptEngine->script_log(LuaMessageType::Info, "Output from %s", caScriptFileName);
-        // it's needed?
-        //scriptEngine->script_log(errorCode ? LuaMessageType::Error : LuaMessageType::Message, "%s", S);
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
         if (debugger() && debugger()->Active())
         {
@@ -851,11 +823,7 @@ void CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCod
     print_output(L, scriptName, errorCode, err);
     on_error(L);
 
-#if 1 //!XRAY_EXCEPTIONS
     xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
-#else
-    throw err;
-#endif
 }
 
 int CScriptEngine::lua_panic(lua_State* L)
