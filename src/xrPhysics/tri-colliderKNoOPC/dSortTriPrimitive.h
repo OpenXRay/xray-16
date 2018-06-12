@@ -13,7 +13,6 @@
 #include "xrPhysics/debug_output.h"
 #endif
 
-
 IC bool negative_tri_set_ignored_by_positive_tri(
     const Triangle& neg_tri, const Triangle& pos_tri, const Fvector* V_array)
 {
@@ -191,18 +190,18 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
         debug_output().dbg_saved_tries_for_active_objects()++;
 #endif
         // if(ignored_tries[I-B])continue;
-		CDB::TRI* Tr = T_array + *I;
-		const Point vertices[3] = {Point((dReal*)&V_array[Tr->verts[0]]), Point((dReal*)&V_array[Tr->verts[1]]),
-			Point((dReal*)&V_array[Tr->verts[2]])};
+        CDB::TRI* Tr = T_array + *I;
+        const Point vertices[3] = {Point((dReal*)&V_array[Tr->verts[0]]), Point((dReal*)&V_array[Tr->verts[1]]),
+            Point((dReal*)&V_array[Tr->verts[2]])};
         if (!aabb_tri_aabb(Point(p), Point((float*)&AABB), vertices))
-            continue;
+        continue;
 #ifdef DEBUG
         if (debug_output().ph_dbg_draw_mask().test(phDBgDrawIntersectedTries))
-			debug_output().DBG_DrawTri(Tr, V_array, color_xrgb(0, 255, 0));
+            debug_output().DBG_DrawTri(Tr, V_array, color_xrgb(0, 255, 0));
         debug_output().dbg_tries_num()++;
 #endif
         Triangle tri;
-		CalculateTri(Tr, p, tri, vertices);
+        CalculateTri(Tr, p, tri, vertices);
         if (tri.dist < 0.f)
         {
 #ifdef DEBUG
@@ -215,9 +214,9 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
                 {
 #ifdef DEBUG
                     if (debug_output().ph_dbg_draw_mask().test(phDBgDrawTriesChangesSign))
-						debug_output().DBG_DrawTri(Tr, V_array, color_xrgb(0, 255, 0));
+                        debug_output().DBG_DrawTri(Tr, V_array, color_xrgb(0, 255, 0));
 #endif
-					SGameMtl* material = GMLibrary().GetMaterialByIdx(Tr->material);
+                    SGameMtl* material = GMLibrary().GetMaterialByIdx(Tr->material);
                     VERIFY(material);
                     bool b_passable = !!material->Flags.test(SGameMtl::flPassable);
                     bool contain_pos =
@@ -304,7 +303,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
         {
 #ifdef DEBUG
             if (debug_output().ph_dbg_draw_mask().test(phDBgDrawPositiveTries))
-				debug_output().DBG_DrawTri(Tr, V_array, color_xrgb(255, 0, 0));
+                debug_output().DBG_DrawTri(Tr, V_array, color_xrgb(255, 0, 0));
 #endif
             if (ret > flags - 10)
                 continue;
@@ -314,7 +313,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
             if (no_last_pos)
                 pos_tries.push_back(tri);
         }
-	}
+    }
 
     // if(intersect) ret=0;
     //xr_vector<Triangle>::iterator i;

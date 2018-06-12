@@ -85,7 +85,7 @@ IC T _sqr(T a)
 
 IC bool _valid(const float x) noexcept
 {
-    // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
+    // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
 #if defined(WINDOWS) && defined(_MSC_VER)
     int cls = _fpclass(double(x));
@@ -105,7 +105,7 @@ IC bool _valid(const float x) noexcept
 
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
-    _FPCLASS_NZ Negative zero ( ??? 0)
+    _FPCLASS_NZ Negative zero ( – 0)
     _FPCLASS_PZ Positive 0 (+0)
     _FPCLASS_PN Positive normalized non-zero
     */
@@ -116,7 +116,7 @@ IC bool _valid(const float x) noexcept
 // double
 IC bool _valid(const double x)
 {
-    // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
+    // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
 #if defined(WINDOWS) && defined(_MSC_VER)
     int cls = _fpclass(x);
@@ -135,7 +135,7 @@ IC bool _valid(const double x)
     }
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
-    _FPCLASS_NZ Negative zero ( ??? 0)
+    _FPCLASS_NZ Negative zero ( – 0)
     _FPCLASS_PZ Positive 0 (+0)
     _FPCLASS_PN Positive normalized non-zero
     */
