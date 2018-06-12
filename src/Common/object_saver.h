@@ -170,7 +170,7 @@ struct CSaver
     template <typename T>
     IC static void save_data(const T& data, M& stream, const P& p)
     {
-        CHelper4<T>::save_data<object_type_traits::is_stl_container<T>::value>(data, stream, p);
+        CHelper4<T>::template save_data<object_type_traits::is_stl_container<T>::value>(data, stream, p);
     }
 };
 
