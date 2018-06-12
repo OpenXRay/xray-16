@@ -150,3 +150,10 @@ void CInventoryItemObject::modify_holder_params(float& range, float& fov) const
 u32 CInventoryItemObject::ef_weapon_type() const { return (0); }
 bool CInventoryItemObject::NeedToDestroyObject() const { return CInventoryItem::NeedToDestroyObject(); }
 bool CInventoryItemObject::Useful() const { return (CInventoryItem::Useful()); }
+
+bool CInventoryItemObject::install_upgrade_impl(LPCSTR section, bool test)
+{
+	bool result = CScriptBinder::install_upgrade_impl(section, test);
+	result |= CInventoryItem::install_upgrade_impl(section, test);
+	return result;
+}

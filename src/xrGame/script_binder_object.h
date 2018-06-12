@@ -32,4 +32,6 @@ public:
     virtual void load(IReader* input_packet);
     virtual bool net_SaveRelevant();
     virtual void net_Relcase(CScriptGameObject* object);
+	virtual bool install_upgrade_impl(LPCSTR section, bool test);
+
 };

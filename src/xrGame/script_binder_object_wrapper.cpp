@@ -99,3 +99,14 @@ void CScriptBinderObjectWrapper::net_Relcase_static(
 {
     script_binder_object->CScriptBinderObject::net_Relcase(object);
 }
+
+
+bool CScriptBinderObjectWrapper::install_upgrade_impl(LPCSTR section, bool test)
+{
+	return (luabind::call_member<bool>(this, "install_upgrade_impl", section, test));
+}
+
+bool CScriptBinderObjectWrapper::install_upgrade_impl_static(CScriptBinderObject *script_binder_object, LPCSTR section, bool test)
+{
+	return (script_binder_object->CScriptBinderObject::install_upgrade_impl(section, test));
+}

@@ -224,3 +224,17 @@ void CScriptBinder::net_Relcase(IGameObject* object)
         }
     }
 }
+
+bool CScriptBinder::install_upgrade_impl(LPCSTR section, bool test)
+{
+	bool result = false;
+	if (m_object) {
+		try {
+			result = m_object->install_upgrade_impl(section,test);
+		}
+		catch (...) {
+			clear();
+		}
+	}
+	return result;
+}

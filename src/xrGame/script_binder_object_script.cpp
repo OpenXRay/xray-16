@@ -33,6 +33,8 @@ SCRIPT_EXPORT(CScriptBinderObject, (), {
             .def("net_save_relevant", &CScriptBinderObject::net_SaveRelevant,
                  &CScriptBinderObjectWrapper::net_SaveRelevant_static)
             .def("net_Relcase", &CScriptBinderObject::net_Relcase, &CScriptBinderObjectWrapper::net_Relcase_static)
+				.def("install_upgrade_impl",		&CScriptBinderObject::install_upgrade_impl,	&CScriptBinderObjectWrapper::install_upgrade_impl)
+
     ];
 });
 // clang-format on

@@ -30,3 +30,8 @@ void CScriptBinderObject::save(NET_Packet* output_packet) {}
 void CScriptBinderObject::load(IReader* input_packet) {}
 bool CScriptBinderObject::net_SaveRelevant() { return (false); }
 void CScriptBinderObject::net_Relcase(CScriptGameObject* object) {}
+
+bool CScriptBinderObject::install_upgrade_impl(LPCSTR section, bool test)
+{
+	return false;
+}

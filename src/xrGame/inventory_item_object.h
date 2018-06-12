@@ -78,6 +78,8 @@ public:
 
 protected:
     virtual bool use_parent_ai_locations() const { return CAttachableItem::use_parent_ai_locations(); }
+	virtual bool install_upgrade_impl(LPCSTR section, bool test);
+
 };
 
 #include "inventory_item_object_inline.h"

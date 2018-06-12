@@ -85,9 +85,11 @@ CGameObject::CGameObject() : SpatialBase(g_SpatialSpace), scriptBinder(this)
 
     m_callbacks = new CALLBACK_MAP();
     m_anim_mov_ctrl = 0;
+	m_story_id = ALife::_STORY_ID(-1);
+	m_bObjectRemoved = false;
 
-    m_bNonscriptUsable = true;
-    set_tip_text_default();
+	m_bNonscriptUsable = true;
+	m_sTipText = NULL;
 }
 
 CGameObject::~CGameObject()
