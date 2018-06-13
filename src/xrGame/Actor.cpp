@@ -84,6 +84,7 @@ const float respawn_auto = 7.f;
 #include "ActorBackpack.h"
 #include "script_hit.h"
 #include "xrScriptEngine/script_engine.hpp"
+#include "helicopter.h"
 //-Alundaio
 
 static float IReceived = 0;
@@ -1344,9 +1345,12 @@ void CActor::shedule_Update(u32 DT)
             m_DangerSnd.stop();
     }
 
-    //если в режиме HUD, то сама модель актера не рисуется
-    if (!character_physics_support()->IsRemoved())
-        setVisible(!HUDview());
+	//если в режиме HUD, то сама модель актера не рисуется
+	if (!character_physics_support()->IsRemoved())
+	{
+		CHelicopter* heli = smart_cast<CHelicopter*>(m_holder);
+		setVisible(!HUDview() && !heli);
+	}
 
     //что актер видит перед собой
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
