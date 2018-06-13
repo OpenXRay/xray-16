@@ -499,7 +499,7 @@ public:
     int iMagazineSize; // size (in bullets) of magazine
     int iMagazineSize2;
     bool m_bGrenadeMode;
-
+	float					m_APk;
     xr_vector<shared_str> m_ammoTypes;
     /*
         struct SScopes

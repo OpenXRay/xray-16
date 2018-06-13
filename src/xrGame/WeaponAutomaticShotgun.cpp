@@ -207,22 +207,22 @@ u8 CWeaponAutomaticShotgun::AddCartridge(u8 cnt)
     m_pCurrentAmmo = smart_cast<CWeaponAmmo*>(m_pInventory->GetAny(m_ammoTypes[m_ammoType.type1].c_str()));
     VERIFY((u32)m_ammoElapsed.type1 == m_magazine.size());
 
-    if (m_DefaultCartridge.m_LocalAmmoType != m_ammoType.type1)
-        m_DefaultCartridge.Load(m_ammoTypes[m_ammoType.type1].c_str(), m_ammoType.type1);
-    CCartridge l_cartridge = m_DefaultCartridge;
-    while (cnt)
-    {
-        if (!unlimited_ammo())
-        {
-            if (!m_pCurrentAmmo->Get(l_cartridge))
-                break;
-        }
-        --cnt;
-        ++m_ammoElapsed.type1;
-        l_cartridge.m_LocalAmmoType = m_ammoType.type1;
-        m_magazine.push_back(l_cartridge);
-        //		m_fCurrentCartirdgeDisp = l_cartridge.m_kDisp;
-    }
+
+	if (m_DefaultCartridge.m_LocalAmmoType != m_ammoType.type1)
+		m_DefaultCartridge.Load(m_ammoTypes[m_ammoType.type1].c_str(), m_ammoType.type1, m_APk);
+	CCartridge l_cartridge = m_DefaultCartridge;
+	while(cnt)
+	{
+		if (!unlimited_ammo())
+		{
+			if (!m_pCurrentAmmo->Get(l_cartridge)) break;
+		}
+		--cnt;
+		++m_ammoElapsed.type1;
+		l_cartridge.m_LocalAmmoType = m_ammoType.type1;
+		m_magazine.push_back(l_cartridge);
+//		m_fCurrentCartirdgeDisp = l_cartridge.m_kDisp;
+	}
 
     VERIFY((u32)m_ammoElapsed.type1 == m_magazine.size());
 
@@ -259,6 +259,6 @@ void CWeaponAutomaticShotgun::net_Import(NET_Packet& P)
 #ifdef DEBUG
         Msg("! %s reload to %s", *l_cartridge.m_ammoSect, m_ammoTypes[LocalAmmoType].c_str());
 #endif
-        l_cartridge.Load(m_ammoTypes[LocalAmmoType].c_str(), LocalAmmoType);
-    }
+		l_cartridge.Load( m_ammoTypes[LocalAmmoType].c_str(), LocalAmmoType, m_APk );
+	}
 }

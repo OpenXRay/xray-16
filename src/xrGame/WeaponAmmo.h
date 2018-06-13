@@ -27,9 +27,9 @@ struct SCartridgeParam
 class CCartridge : public IAnticheatDumpable
 {
 public:
-    CCartridge();
-    void Load(LPCSTR section, u8 LocalAmmoType);
-    float Weight() const;
+	CCartridge();
+	void Load(LPCSTR section, u8 LocalAmmoType, float ap_mod = 1.0f);
+	float Weight() const;
 
     shared_str m_ammoSect;
     enum

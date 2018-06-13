@@ -23,7 +23,7 @@ CCartridge::CCartridge()
     m_4to1_tracer = false;
 }
 
-void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
+void CCartridge::Load(LPCSTR section, u8 LocalAmmoType, float ap_mod) 
 {
     m_ammoSect = section;
     m_LocalAmmoType = LocalAmmoType;
@@ -34,6 +34,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     param_s.kImpulse = pSettings->r_float(section, "k_impulse");
     // m_kPierce				= pSettings->r_float(section, "k_pierce");
     param_s.kAP = pSettings->r_float(section, "k_ap");
+	param_s.kAP *= ap_mod;
     param_s.k_cam_dispersion = READ_IF_EXISTS(pSettings, r_float, section, "k_cam_dispersion", 1.0f);
     param_s.u8ColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracer_color_ID", 0);
 

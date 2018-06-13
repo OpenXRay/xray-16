@@ -401,7 +401,8 @@ void CWeaponMagazined::ReloadMagazine()
     VERIFY((u32)m_ammoElapsed.type1 == m_magazine.size());
 
     if (m_DefaultCartridge.m_LocalAmmoType != m_ammoType.type1)
-        m_DefaultCartridge.Load(m_ammoTypes[m_ammoType.type1].c_str(), m_ammoType.type1);
+		m_DefaultCartridge.Load(m_ammoTypes[m_ammoType.type1].c_str(), m_ammoType.type1, m_APk);
+
     CCartridge l_cartridge = m_DefaultCartridge;
     while (m_ammoElapsed.type1 < iMagazineSize)
     {
