@@ -200,7 +200,6 @@ enum
     R2FLAGEXT_WIREFRAME = (1 << 6),
     R_FLAGEXT_HOM_DEPTH_DRAW = (1 << 7),
     R2FLAGEXT_SUN_ZCULLING = (1 << 8),
-    R2FLAGEXT_SUN_OLD = (1 << 9),
 };
 
 enum

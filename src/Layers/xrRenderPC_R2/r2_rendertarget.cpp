@@ -295,10 +295,7 @@ CRenderTarget::CRenderTarget()
         s_accum_direct.create(b_accum_direct, "r2\\accum_direct");
         s_accum_direct_cascade.create(b_accum_direct_cascade, "r2\\accum_direct_cascade");
         if (RImplementation.o.advancedpp)
-        {
-            s_accum_direct_volumetric.create("accum_volumetric_sun");
             s_accum_direct_volumetric_cascade.create("accum_volumetric_sun_cascade");
-        }
     }
     else
     {
@@ -311,10 +308,7 @@ CRenderTarget::CRenderTarget()
         s_accum_direct.create(b_accum_direct, "r2\\accum_direct");
         s_accum_direct_cascade.create(b_accum_direct_cascade, "r2\\accum_direct_cascade");
         if (RImplementation.o.advancedpp)
-        {
-            s_accum_direct_volumetric.create("accum_volumetric_sun");
             s_accum_direct_volumetric_cascade.create("accum_volumetric_sun_cascade");
-        }
     }
 
     // POINT

@@ -213,9 +213,6 @@ public:
     void render_smap_direct(Fmatrix& mCombined);
     void render_indirect(light* L);
     void render_lights(light_Package& LP);
-    void render_sun();
-    void render_sun_near();
-    void render_sun_filtered();
     void render_menu();
     void render_rain();
 

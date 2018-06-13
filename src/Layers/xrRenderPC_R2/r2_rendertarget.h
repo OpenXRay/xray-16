@@ -100,7 +100,6 @@ private:
     ref_shader s_accum_mask;
     ref_shader s_accum_direct;
     ref_shader s_accum_direct_cascade;
-    ref_shader s_accum_direct_volumetric;
     ref_shader s_accum_direct_volumetric_cascade;
     ref_shader s_accum_point;
     ref_shader s_accum_spot;
@@ -242,7 +241,6 @@ public:
     void disable_aniso();
 
     void draw_volume(light* L);
-    void accum_direct(u32 sub_phase);
     void accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias);
     void accum_direct_f(u32 sub_phase);
     void accum_direct_lum();
