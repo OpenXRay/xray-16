@@ -107,21 +107,8 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     cameras[eacFirstEye] = new CCameraFirstEye(this, CCameraBase::flKeepPitch);
     cameras[eacFirstEye]->Load("actor_firsteye_cam");
 
-    if (strstr(Core.Params, "-psp"))
-        psActorFlags.set(AF_PSP, TRUE);
-    else
-        psActorFlags.set(AF_PSP, FALSE);
-
-    if (psActorFlags.test(AF_PSP))
-    {
-        cameras[eacLookAt] = new CCameraLook2(this);
-        cameras[eacLookAt]->Load("actor_look_cam_psp");
-    }
-    else
-    {
-        cameras[eacLookAt] = new CCameraLook(this);
-        cameras[eacLookAt]->Load("actor_look_cam");
-    }
+    cameras[eacLookAt] = new CCameraLook2(this);
+    cameras[eacLookAt]->Load("actor_look_cam_psp");
     cameras[eacFreeLook] = new CCameraLook(this);
     cameras[eacFreeLook]->Load("actor_free_cam");
     cameras[eacFixedLookAt] = new CCameraFixedLook(this);
@@ -302,36 +289,6 @@ void CActor::Load(LPCSTR section)
     }
     //////////////////////////////////////////////////////////////////////////
 
-    // m_PhysicMovementControl: General
-    // m_PhysicMovementControl->SetParent		(this);
-
-    /*
-    Fbox	bb;Fvector	vBOX_center,vBOX_size;
-    // m_PhysicMovementControl: BOX
-    vBOX_center= pSettings->r_fvector3	(section,"ph_box2_center"	);
-    vBOX_size	= pSettings->r_fvector3	(section,"ph_box2_size"		);
-    bb.set	(vBOX_center,vBOX_center); bb.grow(vBOX_size);
-    character_physics_support()->movement()->SetBox		(2,bb);
-
-    // m_PhysicMovementControl: BOX
-    vBOX_center= pSettings->r_fvector3	(section,"ph_box1_center"	);
-    vBOX_size	= pSettings->r_fvector3	(section,"ph_box1_size"		);
-    bb.set	(vBOX_center,vBOX_center); bb.grow(vBOX_size);
-    character_physics_support()->movement()->SetBox		(1,bb);
-
-    // m_PhysicMovementControl: BOX
-    vBOX_center= pSettings->r_fvector3	(section,"ph_box0_center"	);
-    vBOX_size	= pSettings->r_fvector3	(section,"ph_box0_size"		);
-    bb.set	(vBOX_center,vBOX_center); bb.grow(vBOX_size);
-    character_physics_support()->movement()->SetBox		(0,bb);
-    */
-
-    //// m_PhysicMovementControl: Foots
-    // Fvector	vFOOT_center= pSettings->r_fvector3	(section,"ph_foot_center"	);
-    // Fvector	vFOOT_size	= pSettings->r_fvector3	(section,"ph_foot_size"		);
-    // bb.set	(vFOOT_center,vFOOT_center); bb.grow(vFOOT_size);
-    ////m_PhysicMovementControl->SetFoots	(vFOOT_center,vFOOT_size);
-
     // m_PhysicMovementControl: Crash speed and mass
     float cs_min = pSettings->r_float(section, "ph_crash_speed_min");
     float cs_max = pSettings->r_float(section, "ph_crash_speed_max");
@@ -411,10 +368,8 @@ void CActor::Load(LPCSTR section)
                 pSettings->r_string(section, "heavy_danger_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
         }
     }
-    if (psActorFlags.test(AF_PSP))
-        cam_Set(eacLookAt);
-    else
-        cam_Set(eacFirstEye);
+
+    cam_Set(eacFirstEye);
 
     // sheduler
     shedule.t_min = shedule.t_max = 1;
