@@ -709,7 +709,7 @@ void CCC_Register()
     // CMD4(CCC_Integer, "rs_ib_size", &rsDIB_Size, 32, 4096);
 
     // Texture manager
-    CMD4(CCC_Integer, "texture_lod", &psTextureLOD, 0, 4);
+    CMD4(CCC_Integer, "texture_lod", &psTextureLOD, 0, 2);
     CMD4(CCC_Integer, "net_dedicated_sleep", &psNET_DedicatedSleep, 0, 64);
 
     // General video control
