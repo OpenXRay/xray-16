@@ -48,9 +48,12 @@
 #   define COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER // need editing xr_* scripts!
 #   define COC_SPRINT_FIX
 #   define COC_DEBUG_BEHAVIOUR // Enables CoC debug behaviour when the game crashes
-#   define NON_FATAL_VERIFY
 #   define ACTOR_BEFORE_DEATH_CALLBACK // For extending the life of the actor to fake death or do other tasks that need to happen before actor is dead
 #   define R2_SHADERS_BACKWARDS_COMPATIBILITY
+#endif
+
+#ifdef COC_DEBUG
+#   define NON_FATAL_VERIFY
 #endif
 
 /* LAYERED_SND_SHOOT by Alundaio

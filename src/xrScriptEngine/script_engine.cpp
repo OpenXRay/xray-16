@@ -352,7 +352,7 @@ int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
     int result = vscript_log(message, caFormat, marker);
     va_end(marker);
 
-#if defined(DEBUG)
+#if defined(DEBUG) || defined(COC_EDITION)
     if (message == LuaMessageType::Error)
         print_stack();
 #endif

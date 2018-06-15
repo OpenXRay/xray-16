@@ -145,7 +145,7 @@ void CRender::create()
     m_MSAASample = -1;
 
     // hardware
-    o.smapsize = 1536;
+    o.smapsize = ps_r2_smap_size;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
@@ -282,24 +282,6 @@ void CRender::create()
     o.nvdbt = false;
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
-
-    // options (smap-pool-size)
-    if (strstr(Core.Params, "-smap256"))
-        o.smapsize = 256;
-    if (strstr(Core.Params, "-smap512"))
-        o.smapsize = 512;
-    if (strstr(Core.Params, "-smap1024"))
-        o.smapsize = 1024;
-    if (strstr(Core.Params, "-smap1536"))
-        o.smapsize = 1536;
-    if (strstr(Core.Params, "-smap2048"))
-        o.smapsize = 2048;
-    if (strstr(Core.Params, "-smap2560"))
-        o.smapsize = 2560;
-    if (strstr(Core.Params, "-smap3072"))
-        o.smapsize = 3072;
-    if (strstr(Core.Params, "-smap4096"))
-        o.smapsize = 4096;
 
     // gloss
     char* g = strstr(Core.Params, "-gloss ");

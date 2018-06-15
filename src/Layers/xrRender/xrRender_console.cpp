@@ -40,30 +40,65 @@ xr_token sunshafts_mode_token[] = {
 };
 
 u32 ps_r_ssao = 3;
-const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
+const xr_token qssao_token[] = {
+    {"st_opt_off", 0},
+    {"st_opt_low", 1},
+    {"st_opt_medium", 2},
+    {"st_opt_high", 3},
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 4},
 #endif
-    {nullptr, 0}};
+    {nullptr, 0}
+};
 
 u32 ps_r_sun_quality = 1; // = 0;
-const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
+const xr_token qsun_quality_token[] = {
+    {"st_opt_low", 0},
+    {"st_opt_medium", 1},
+    {"st_opt_high", 2},
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-    {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
+    {"st_opt_ultra", 3},
+    {"st_opt_extreme", 4},
 #endif // USE_DX10
-    {nullptr, 0}};
+    {nullptr, 0}
+};
 
 u32 ps_r3_msaa = 0; // = 0;
-const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2},
+const xr_token qmsaa_token[] = {
+    {"st_opt_off", 0},
+    {"2x", 1},
+    {"4x", 2},
     //{"8x", 3},
-    {nullptr, 0}};
+    {nullptr, 0}
+};
 
 u32 ps_r3_msaa_atest = 0; // = 0;
 const xr_token qmsaa__atest_token[] = {
-    {"st_opt_off", 0}, {"st_opt_atest_msaa_dx10_0", 1}, {"st_opt_atest_msaa_dx10_1", 2}, {nullptr, 0}};
+    {"st_opt_off", 0},
+    {"st_opt_atest_msaa_dx10_0", 1},
+    {"st_opt_atest_msaa_dx10_1", 2},
+    {nullptr, 0}
+};
 
 u32 ps_r3_minmax_sm = 3; // = 0;
-const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autodetect", 3}, {nullptr, 0}};
+const xr_token qminmax_sm_token[] = {
+    {"off", 0},
+    {"on", 1},
+    {"auto", 2},
+    {"autodetect", 3},
+    {nullptr, 0}
+};
+
+u32 ps_r2_smap_size = 1536; // 1536 - default
+const xr_token qsmap_size_token[] = {
+    { "512x512", 512 },
+    { "1024x1024", 1024 },
+    { "1536x1536", 1536 },
+    { "2048x2048", 2048 },
+    { "4096x4096", 4096 },
+    { "8192x8192", 8192 },
+    { nullptr, 0 }
+};
 
 int ps_r2_fxaa = 0;
 int ps_rs_loading_stages = 0;
@@ -896,6 +931,8 @@ void xrRender_initconsole()
     //Igor: need restart
     CMD3(CCC_Mask, "r2_soft_water", &ps_r2_ls_flags, R2FLAG_SOFT_WATER);
     CMD3(CCC_Mask, "r2_soft_particles", &ps_r2_ls_flags, R2FLAG_SOFT_PARTICLES);
+
+    CMD3(CCC_Token, "r2_smap_size", &ps_r2_smap_size, qsmap_size_token);
 
     //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);
