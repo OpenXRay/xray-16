@@ -6,7 +6,7 @@
 #include "Include/xrRender/RenderVisual.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 
-CPhantom::CPhantom()
+CPhantom::CPhantom() : m_fly_particles(nullptr), m_enemy(nullptr)
 {
     fSpeed = 4.f;
     fASpeed = 1.7f;

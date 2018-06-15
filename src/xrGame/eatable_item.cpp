@@ -17,7 +17,7 @@
 #include "UIGameCustom.h"
 #include "ui/UIActorMenu.h"
 
-CEatableItem::CEatableItem()
+CEatableItem::CEatableItem() : m_fWeightFull(0), m_fWeightEmpty(0)
 {
     m_physic_item = 0;
     m_iMaxUses = 1;

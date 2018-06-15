@@ -3,7 +3,7 @@
 #include "BaseMonster/base_monster.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 
-CMonsterCorpseManager::CMonsterCorpseManager()
+CMonsterCorpseManager::CMonsterCorpseManager(): vertex(0), time_last_seen(0)
 {
     monster = 0;
     corpse = 0;

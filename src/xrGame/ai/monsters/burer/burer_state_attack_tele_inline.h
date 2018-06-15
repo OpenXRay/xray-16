@@ -6,7 +6,9 @@
 #define MAX_TIME_CHECK_FAILURE 6000
 
 template <typename Object>
-CStateBurerAttackTele<Object>::CStateBurerAttackTele(Object* obj) : inherited(obj)
+CStateBurerAttackTele<Object>::CStateBurerAttackTele(Object* obj)
+    : inherited(obj), selected_object(nullptr), time_started(0),
+      m_action(), m_end_tick(0), m_initial_health(0)
 {
     m_anim_end_tick = 0;
     m_last_grenade_scan = 0;

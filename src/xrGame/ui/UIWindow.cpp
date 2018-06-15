@@ -4,9 +4,6 @@
 #include "MainMenu.h"
 #include "Include/xrRender/DebugRender.h"
 #include "Include/xrRender/UIRender.h"
-#include "xrCore/xrPool.h"
-
-poolSS<_12b, 128> ui_allocator;
 
 // #define LOG_ALL_WNDS
 #ifdef LOG_ALL_WNDS

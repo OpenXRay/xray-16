@@ -45,12 +45,15 @@ float CEntityAlive::m_fStartBurnWoundSize = 0.3f;
 //размер раны, чтоб остановить партиклы
 float CEntityAlive::m_fStopBurnWoundSize = 0.1f;
 
-STR_VECTOR* CEntityAlive::m_pFireParticlesVector = NULL;
+STR_VECTOR* CEntityAlive::m_pFireParticlesVector = nullptr;
 
 /////////////////////////////////////////////
 // CEntityAlive
 /////////////////////////////////////////////
-CEntityAlive::CEntityAlive() : m_hit_bone_surface_areas_actual(false)
+CEntityAlive::CEntityAlive()
+    : m_bMobility(false), m_fAccuracy(0), m_fIntelligence(0),
+      m_entity_condition(nullptr), m_ef_creature_type(0),
+      m_hit_bone_surface_areas_actual(false)
 {
     monster_community = new MONSTER_COMMUNITY();
 

@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC CMemberEnemy::CMemberEnemy(const CEntityAlive* object, squad_mask_type mask)
+IC CMemberEnemy::CMemberEnemy(const CEntityAlive* object, squad_mask_type mask) : m_level_time(0)
 {
     m_object = object;
     m_mask.assign(mask);

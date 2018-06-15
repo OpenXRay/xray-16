@@ -20,7 +20,7 @@
         _condition_evaluator_ptr>
 
 TEMPLATE_SPECIALIZATION
-IC CPlanner::CActionPlanner() : m_initialized(false), m_solving(false)
+IC CPlanner::CActionPlanner() : m_initialized(false), m_loaded(false), m_solving(false)
 {
 #ifdef LOG_ACTION
     m_use_log = false;

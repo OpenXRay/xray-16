@@ -9,7 +9,7 @@
 #include "xrEngine/xr_object.h"
 
 SHit::SHit(float powerA, Fvector& dirA, IGameObject* whoA, u16 elementA, Fvector p_in_bone_spaceA, float impulseA,
-    ALife::EHitType hit_typeA, float armor_piercingA, bool AimBullet)
+    ALife::EHitType hit_typeA, float armor_piercingA, bool AimBullet) : Time(0), DestID(0), weaponID(0)
 {
     power = powerA;
     dir.set(dirA);

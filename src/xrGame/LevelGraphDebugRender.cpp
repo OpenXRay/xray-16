@@ -45,7 +45,7 @@
 #include "debug_renderer.h"
 #include "xrEngine/GameFont.h"
 
-LevelGraphDebugRender::LevelGraphDebugRender()
+LevelGraphDebugRender::LevelGraphDebugRender() : gameGraph(nullptr), levelGraph(nullptr)
 {
     debugShader->create("debug\\ai_nodes", "$null");
     currentLevelId = -1;

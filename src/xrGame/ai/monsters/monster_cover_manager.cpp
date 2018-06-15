@@ -62,7 +62,7 @@ public:
 // CCoverEvaluator Implementation
 //////////////////////////////////////////////////////////////////////////
 
-CCoverEvaluator::CCoverEvaluator(CRestrictedObject* object) : inherited(object)
+CCoverEvaluator::CCoverEvaluator(CRestrictedObject* object) : inherited(object), m_object(nullptr)
 {
     m_dest_position.set(flt_max, flt_max, flt_max);
     m_deviation = flt_max;
