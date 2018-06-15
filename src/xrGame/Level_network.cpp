@@ -441,74 +441,56 @@ void CLevel::OnBuildVersionChallenge()
 
 void CLevel::OnConnectResult(NET_Packet* P)
 {
-    // multiple results can be sent during connection they should be "AND-ed"
-    m_bConnectResultReceived = true;
-    u8 result = P->r_u8();
-    u8 res1 = P->r_u8();
-    string512 ResultStr;
-    P->r_stringZ_s(ResultStr);
-    ClientID tmp_client_id;
-    P->r_clientID(tmp_client_id);
-    SetClientID(tmp_client_id);
-    if (!result)
-    {
-        m_bConnectResult = false;
-        switch (res1)
-        {
-        case ecr_data_verification_failed: // Standart error
-        {
-            if (strstr(ResultStr, "Data verification failed. Cheater?"))
-                MainMenu()->SetErrorDialog(CMainMenu::ErrDifferentVersion);
-        }
-        break;
-        case ecr_cdkey_validation_failed: // GameSpy CDKey
-        {
-            if (!xr_strcmp(ResultStr, "Invalid CD Key"))
-                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInvalid); //, ResultStr);
-            if (!xr_strcmp(ResultStr, "CD Key in use"))
-                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInUse); //, ResultStr);
-            if (!xr_strcmp(ResultStr, "Your CD Key is disabled. Contact customer service."))
-                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyDisabled); //, ResultStr);
-        }
-        break;
-        case ecr_password_verification_failed: // login+password
-        {
-            MainMenu()->SetErrorDialog(CMainMenu::ErrInvalidPassword);
-        }
-        break;
-        case ecr_have_been_banned:
-        {
-            if (!xr_strlen(ResultStr))
-            {
-                MainMenu()->OnSessionTerminate(CStringTable().translate("st_you_have_been_banned").c_str());
-            }
-            else
-            {
-                MainMenu()->OnSessionTerminate(CStringTable().translate(ResultStr).c_str());
-            }
-        }
-        break;
-        case ecr_profile_error:
-        {
-            if (!xr_strlen(ResultStr))
-            {
-                MainMenu()->OnSessionTerminate(CStringTable().translate("st_profile_error").c_str());
-            }
-            else
-            {
-                MainMenu()->OnSessionTerminate(CStringTable().translate(ResultStr).c_str());
-            }
-        }
-        }
-    };
-    m_sConnectResult = ResultStr;
-    if (IsDemoSave() && result)
-    {
-        P->r_u8(); // server client or not
-        shared_str server_options;
-        P->r_stringZ(server_options);
-        StartSaveDemo(server_options);
-    }
+	// multiple results can be sent during connection they should be "AND-ed"
+	m_bConnectResultReceived	= true;
+	u8	result					= P->r_u8();
+	u8  res1					= P->r_u8();
+	string512 ResultStr;	
+	P->r_stringZ_s				(ResultStr);
+	ClientID tmp_client_id;
+	P->r_clientID				(tmp_client_id);
+	SetClientID					(tmp_client_id);
+	if (!result)				
+	{
+		m_bConnectResult	= false			;	
+		switch (res1)
+		{
+		case ecr_data_verification_failed:		//Standart error
+			{
+				if (strstr(ResultStr, "Data verification failed. Cheater?"))
+					MainMenu()->SetErrorDialog(CMainMenu::ErrDifferentVersion);
+			}break;
+		case ecr_cdkey_validation_failed:		//GameSpy CDKey
+			{
+				if (!xr_strcmp(ResultStr, "Invalid CD Key"))
+					MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInvalid);//, ResultStr);
+				if (!xr_strcmp(ResultStr, "CD Key in use"))
+					MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInUse);//, ResultStr);
+				if (!xr_strcmp(ResultStr, "Your CD Key is disabled. Contact customer service."))
+					MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyDisabled);//, ResultStr);
+			}break;		
+		case ecr_password_verification_failed:		//login+password
+			{
+				MainMenu()->SetErrorDialog(CMainMenu::ErrInvalidPassword);
+			}break;
+		case ecr_have_been_banned:
+			{
+
+			}break;
+		case ecr_profile_error:
+			{
+				
+			}break;
+		}
+	};	
+	m_sConnectResult			= ResultStr;
+	if (IsDemoSave() && result)
+	{
+		P->r_u8(); //server client or not
+		shared_str server_options;
+		P->r_stringZ(server_options);
+		StartSaveDemo(server_options);
+	}
 };
 
 void CLevel::ClearAllObjects()

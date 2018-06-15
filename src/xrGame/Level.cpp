@@ -35,7 +35,6 @@
 #include "level_sounds.h"
 #include "car.h"
 #include "trade_parameters.h"
-#include "game_cl_base_weapon_usage_statistic.h"
 #include "MainMenu.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "actor.h"
@@ -64,7 +63,7 @@
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
 
-float g_cl_lvInterp = 0.1;
+float g_cl_lvInterp = 0.1f;
 u32 lvInterpSteps = 0;
 
 CLevel::CLevel()
@@ -990,7 +989,7 @@ void CLevel::OnAlifeSimulatorLoaded()
     GameTaskManager().ResetStorage();
 }
 
-void CLevel::OnSessionTerminate(pcstr reason) { MainMenu()->OnSessionTerminate(reason); }
+void CLevel::OnSessionTerminate(pcstr reason) {  }
 u32 GameID() { return Game().Type(); }
 CZoneList* CLevel::create_hud_zones_list()
 {

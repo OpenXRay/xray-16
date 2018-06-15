@@ -28,7 +28,6 @@
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
 #include "UICursor.h"
-#include "MPPlayersBag.h"
 #include "player_hud.h"
 #include "CustomDetector.h"
 #include "PDA.h"
@@ -452,18 +451,14 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 
     curr_list = pBagList;
 
-    itb = ruck_list.begin();
-    ite = ruck_list.end();
-    for (; itb != ite; ++itb)
-    {
-        CMPPlayersBag* bag = smart_cast<CMPPlayersBag*>(&(*itb)->object());
-        if (bag)
-            continue;
-
-        CUICellItem* itm = create_cell_item(*itb);
-        curr_list->SetItem(itm);
-        if (m_currMenuMode == mmTrade && m_pPartnerInvOwner)
-            ColorizeItem(itm, !CanMoveToPartner(*itb));
+	itb = ruck_list.begin();
+	ite = ruck_list.end();
+	for ( ; itb != ite; ++itb )
+	{
+		CUICellItem* itm = create_cell_item( *itb );
+		curr_list->SetItem(itm);
+		if (m_currMenuMode == mmTrade && m_pPartnerInvOwner)
+			ColorizeItem(itm, !CanMoveToPartner(*itb));
 
         // CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(*itb);
         // if(outfit)

@@ -3,8 +3,8 @@
 #include "actor.h"
 #include "actorEffector.h"
 #include "inventory.h"
-#include "Level.h"
-#include "sleepeffector.h"
+#include "level.h"
+
 #include "game_base_space.h"
 #include "autosave_manager.h"
 #include "xrserver.h"

@@ -27,6 +27,7 @@
 #include "UIMessageBoxEx.h"
 #include "UIPropertiesBox.h"
 #include "UIMainIngameWnd.h"
+//#include "script_engine.h"
 
 bool CUIActorMenu::AllowItemDrops(EDDListType from, EDDListType to)
 {

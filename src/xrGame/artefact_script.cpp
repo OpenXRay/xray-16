@@ -13,7 +13,6 @@
 #include "ElectricBall.h"
 #include "RustyHairArtifact.h"
 #include "GalantineArtifact.h"
-#include "cta_game_artefact.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

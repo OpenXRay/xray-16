@@ -11,7 +11,6 @@
 #include "Weapon.h"
 #include "Inventory.h"
 
-#include "SleepEffector.h"
 #include "ActorEffector.h"
 #include "Level.h"
 #include "xrCDB/Intersect.hpp"
