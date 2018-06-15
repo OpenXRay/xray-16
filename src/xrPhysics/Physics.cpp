@@ -248,7 +248,7 @@ IC static int CollideIntoGroup(
         }
 
         if (pushing_neg)
-            surface.mu = std::numeric_limits<dReal>::infinity();
+            surface.mu = dInfinity;
 
         if (do_collide && collided_contacts < MAX_CONTACTS)
         {
