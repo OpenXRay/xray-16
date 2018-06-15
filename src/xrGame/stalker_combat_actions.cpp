@@ -58,7 +58,7 @@ static const u32 s_wait_enemy_in_smart_cover_time = 30 * 1000;
 using namespace StalkerSpace;
 using namespace StalkerDecisionSpace;
 
-typedef CStalkerActionBase::_edge_value_type _edge_value_type;
+typedef CStalkerActionBase::edge_value_type _edge_value_type;
 
 #ifdef _DEBUG
 //#	define SILENT_COMBAT

@@ -143,14 +143,14 @@ IC const typename CProblemSolverAbstract::CState& CProblemSolverAbstract::target
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CProblemSolverAbstract::add_evaluator(const _condition_type& condition_id, _condition_evaluator_ptr evaluator)
+IC void CProblemSolverAbstract::add_evaluator(const condition_type& condition_id, _condition_evaluator_ptr evaluator)
 {
     THROW(evaluators().end() == evaluators().find(condition_id));
     m_evaluators.insert(std::make_pair(condition_id, evaluator));
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CProblemSolverAbstract::remove_evaluator(const _condition_type& condition_id)
+IC void CProblemSolverAbstract::remove_evaluator(const condition_type& condition_id)
 {
     typename EVALUATORS::iterator I = m_evaluators.find(condition_id);
     THROW(I != m_evaluators.end());
@@ -168,7 +168,7 @@ IC void CProblemSolverAbstract::remove_evaluator(const _condition_type& conditio
 
 TEMPLATE_SPECIALIZATION
 IC _condition_evaluator_ptr CProblemSolverAbstract::evaluator(
-    const _condition_type& condition_id) const
+    const condition_type& condition_id) const
 {
     typename EVALUATORS::const_iterator I = evaluators().find(condition_id);
     THROW(evaluators().end() != I);
@@ -183,7 +183,7 @@ IC const typename CProblemSolverAbstract::EVALUATORS& CProblemSolverAbstract::ev
 
 TEMPLATE_SPECIALIZATION
 IC void CProblemSolverAbstract::evaluate_condition(typename xr_vector<_operator_condition>::const_iterator& I,
-    typename xr_vector<_operator_condition>::const_iterator& E, const _condition_type& condition_id) const
+    typename xr_vector<_operator_condition>::const_iterator& E, const condition_type& condition_id) const
 {
     size_t index = I - m_current_state.conditions().begin();
     m_current_state.add_condition(I, _operator_condition(condition_id, evaluator(condition_id)->evaluate()));

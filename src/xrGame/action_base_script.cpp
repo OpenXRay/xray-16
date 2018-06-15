@@ -28,10 +28,10 @@ IC static void CScriptActionBase_Export(lua_State* luaState)
                       .def("add_effect", (void (CScriptActionBase::*)(const CScriptActionBase::COperatorCondition&))(
                                              &CScriptActionBase::add_effect))
                       .def("remove_precondition",
-                          (void (CScriptActionBase::*)(const CScriptActionBase::COperatorCondition::_condition_type&))(
+                          (void (CScriptActionBase::*)(const CScriptActionBase::COperatorCondition::condition_type&))(
                               &CScriptActionBase::remove_condition))
                       .def("remove_effect",
-                          (void (CScriptActionBase::*)(const CScriptActionBase::COperatorCondition::_condition_type&))(
+                          (void (CScriptActionBase::*)(const CScriptActionBase::COperatorCondition::condition_type&))(
                               &CScriptActionBase::remove_effect))
                       .def("setup", &CScriptActionBase::setup, &CScriptActionWrapper::setup_static)
                       .def("initialize", &CScriptActionBase::initialize, &CScriptActionWrapper::initialize_static)

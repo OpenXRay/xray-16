@@ -65,7 +65,7 @@ IC void CAbstractOperator::add_condition(const COperatorCondition& condition)
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CAbstractOperator::remove_condition(const typename COperatorCondition::_condition_type& condition)
+IC void CAbstractOperator::remove_condition(const typename COperatorCondition::condition_type& condition)
 {
     actual(false);
     m_conditions.remove_condition(condition);
@@ -79,7 +79,7 @@ IC void CAbstractOperator::add_effect(const COperatorCondition& effect)
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CAbstractOperator::remove_effect(const typename COperatorCondition::_condition_type& effect)
+IC void CAbstractOperator::remove_effect(const typename COperatorCondition::condition_type& effect)
 {
     actual(false);
     m_effects.remove_condition(effect);
