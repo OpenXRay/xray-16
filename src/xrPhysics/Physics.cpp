@@ -419,12 +419,12 @@ void BodyCutForce(dBodyID body, float l_limit, float w_limit)
     dMatrix3 tmp, invI, I;
 
     // compute inertia tensor in global frame
-    dMULTIPLY2_333(tmp, m.I, body->R);
-    dMULTIPLY0_333(I, body->R, tmp);
+    dMULTIPLY2_333(tmp, m.I, body->posr.R);
+    dMULTIPLY0_333(I, body->posr.R, tmp);
 
     // compute inverse inertia tensor in global frame
-    dMULTIPLY2_333(tmp, body->invI, body->R);
-    dMULTIPLY0_333(invI, body->R, tmp);
+    dMULTIPLY2_333(tmp, body->invI, body->posr.R);
+    dMULTIPLY0_333(invI, body->posr.R, tmp);
 
     // angular accel
     dVector3 wa;

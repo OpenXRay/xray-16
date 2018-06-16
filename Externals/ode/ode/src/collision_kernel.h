@@ -46,14 +46,6 @@ internal data structures and functions for collision detection.
 //****************************************************************************
 // geometry object base class
 
-// position vector and rotation matrix for geometry objects that are not
-// connected to bodies.
-
-struct dxPosR {
-  dVector3 pos;
-  dMatrix3 R;
-};
-
 
 // geom flags.
 //

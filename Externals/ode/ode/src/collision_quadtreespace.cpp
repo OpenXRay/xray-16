@@ -351,7 +351,7 @@ dxQuadTreeSpace::dxQuadTreeSpace(dSpaceID _space, dVector3 Center, dVector3 Exte
 
 	int BlockCount = 0;
 	for (int i = 0; i <= Depth; i++){
-		BlockCount += (int)powf(SPLITS, i);
+		BlockCount += (int)pow((dReal)SPLITS, i);
 	}
 
 	Blocks = (Block*)dAlloc(BlockCount * sizeof(Block));
@@ -384,7 +384,7 @@ dxQuadTreeSpace::~dxQuadTreeSpace(){
 
 	int BlockCount = 0;
 	for (int i = 0; i < Depth; i++){
-		BlockCount += (int)powf(SPLITS, i);
+		BlockCount += (int)pow((dReal)SPLITS, i);
 	}
 
 	dFree(Blocks, BlockCount * sizeof(Block));
@@ -495,7 +495,8 @@ void dxQuadTreeSpace::remove(dxGeom* g){
 	for (int i = 0; i < DirtyList.size(); i++){
 		if (DirtyList[i] == g){
 			DirtyList.remove(i);
-			break;
+			// (mg) there can be multiple instances of a dirty object on stack  be sure to remove ALL and not just first, for this we decrement i
+			--i;
 		}
 	}
 	
