@@ -183,7 +183,7 @@ public:
         void SetSteerLimits(float hi, float lo);
 
         virtual void ApplyDamage(u16 level);
-        SWheel(CCar* acar) : radius(0)
+        SWheel(CCar* acar) : radius(0.f)
         {
             bone_id = BI_NONE;
             car = acar;

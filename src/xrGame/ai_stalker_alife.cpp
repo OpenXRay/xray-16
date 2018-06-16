@@ -24,8 +24,6 @@
 #include "trade_parameters.h"
 #include "clsid_game.h"
 
-extern u32 get_rank(const shared_str& section);
-
 static const int MAX_AMMO_ATTACH_COUNT = 1;
 static const int enough_ammo_box_count = 1;
 
@@ -346,12 +344,7 @@ bool CAI_Stalker::conflicted(
     if (weapon->ef_weapon_type() != new_weapon->ef_weapon_type())
         return (weapon->Cost() >= new_weapon->Cost());
 
-    u32 weapon_rank = get_rank(weapon->cNameSect());
-
-    if (weapon_rank != (u32)new_weapon_rank)
-        return (weapon_rank >= (u32)new_weapon_rank);
-
-    return (true);
+	return					(true);
 }
 
 bool CAI_Stalker::can_take(CInventoryItem const* item)
@@ -360,13 +353,12 @@ bool CAI_Stalker::can_take(CInventoryItem const* item)
     if (!new_weapon)
         return (false);
 
-    bool new_weapon_enough_ammo = enough_ammo(new_weapon);
-    u32 new_weapon_rank = get_rank(new_weapon->cNameSect());
+	bool						new_weapon_enough_ammo = enough_ammo(new_weapon);
 
     TIItemContainer::iterator I = inventory().m_all.begin();
     TIItemContainer::iterator E = inventory().m_all.end();
     for (; I != E; ++I)
-        if (conflicted(*I, new_weapon, new_weapon_enough_ammo, new_weapon_rank))
+        if (conflicted(*I, new_weapon, new_weapon_enough_ammo, 0))
             return (false);
 
     return (true);

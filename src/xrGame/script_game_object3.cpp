@@ -1541,27 +1541,17 @@ float CScriptGameObject::GetLuminocity()
 void CScriptGameObject::ForceSetPosition(Fvector pos) { ForceSetPosition(pos, false); }
 void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate)
 {
-    CPhysicsShellHolder* sh = object().cast_physics_shell_holder();
-    if (!sh)
-        return;
-
-    CPhysicsShell* shell = sh->PPhysicsShell();
-    if (shell)
-    {
-        if (bActivate)
-            sh->activate_physic_shell();
-
-        Fmatrix M = object().XFORM();
-        M.c = pos;
-        M.set(M);
-
-        shell->SetGlTransformDynamic(M);
-        if (sh->character_physics_support())
-            sh->character_physics_support()->ForceTransform(M);
-    }
-    else
-        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "force_set_position: object %s has no physics shell!",
-                                        *object().cName());
+	Fmatrix M = object().XFORM();
+	M.translate(pos);
+	object().ForceTransform(M);
+	CPhysicsShellHolder* sh = object().cast_physics_shell_holder();
+	if (sh)
+	{
+		if (bActivate)
+			sh->activate_physic_shell();
+		if (sh->PPhysicsShell())
+			sh->PPhysicsShell()->SetTransform(M, mh_unspecified);
+	}
 }
 
 void CScriptGameObject::SetRemainingUses(u8 value)
