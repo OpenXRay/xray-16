@@ -1,0 +1,41 @@
+class "opt_gameplay" (CUIWindow)
+
+function opt_gameplay:__init() super()
+end
+
+function opt_gameplay:__finalize()
+
+end
+
+function opt_gameplay:InitControls(x, y, xml, handler)
+
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+	self:SetAutoDelete(true)
+
+--	self.bk = xml:InitFrame("frame_gameplay", self)
+
+	xml:InitStatic("tab_gameplay:cap_difficulty",			self)
+	xml:InitStatic("tab_gameplay:cap_check_tips",			self)
+	xml:InitStatic("tab_gameplay:cap_check_crosshair",		self)
+	xml:InitStatic("tab_gameplay:cap_check_dyn_crosshair",	self)
+	xml:InitStatic("tab_gameplay:cap_check_show_weapon",	self)
+	xml:InitStatic("tab_gameplay:cap_check_dist",			self)
+	xml:InitStatic("tab_gameplay:cap_check_important_save",	self)
+	xml:InitStatic("tab_gameplay:cap_check_crouch_toggle",	self)
+	xml:InitStatic("tab_gameplay:cap_check_hud_draw",	self)
+
+	xml:InitCheck("tab_gameplay:check_tips",			self)
+	xml:InitCheck("tab_gameplay:check_crosshair",		self)
+	xml:InitCheck("tab_gameplay:check_dyn_crosshair", 	self)
+	xml:InitCheck("tab_gameplay:check_show_weapon", 	self)
+	xml:InitCheck("tab_gameplay:check_dist", 			self)
+	xml:InitCheck("tab_gameplay:check_important_save", 	self)
+	xml:InitCheck("tab_gameplay:check_crouch_toggle",	self)
+	xml:InitCheck("tab_gameplay:check_hud_draw",	self)
+	xml:InitComboBox("tab_gameplay:list_difficulty",	self)
+
+	local btn
+	btn = xml:Init3tButton	("tab_gameplay:btn_check_updates", self)
+	handler:Register		(btn, "btn_check_updates")
+end
