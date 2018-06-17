@@ -329,7 +329,9 @@ float CEntityCondition::HitPowerEffect(float power_loss)
     CHelmet* pHelmet = (CHelmet*)pInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
 #ifdef COC_BACKPACK
     CBackpack* pBackpack = (CBackpack*)pInvOwner->inventory().ItemFromSlot(BACKPACK_SLOT);
-    return power_loss * (0.5f + (pOutfit ? pOutfit->m_fPowerLoss : EPS) + (pHelmet ? pHelmet->m_fPowerLoss : EPS) + (pBackpack ? pBackpack->m_fPowerLoss : EPS));
+    return power_loss *
+        (0.5f + (pOutfit ? pOutfit->m_fPowerLoss : EPS) + (pHelmet ? pHelmet->m_fPowerLoss : EPS) +
+            (pBackpack ? pBackpack->m_fPowerLoss : EPS));
 #else
     return power_loss * (0.5f + (pOutfit ? pOutfit->m_fPowerLoss : EPS) + (pHelmet ? pHelmet->m_fPowerLoss : EPS));
 #endif
@@ -345,24 +347,15 @@ CWound* CEntityCondition::AddWound(float hit_power, ALife::EHitType hit_type, u1
     for (; it != m_WoundVector.end(); it++)
     {
         if ((*it)->GetBoneNum() == element)
-            break;
+        {
+            (*it)->AddHit(hit_power * ::Random.randF(0.5f, 1.5f), hit_type);
+            return (*it);
+        }
     }
 
-    CWound* pWound = NULL;
-
-    //новая рана
-    if (it == m_WoundVector.end())
-    {
-        pWound = new CWound(element);
-        pWound->AddHit(hit_power * ::Random.randF(0.5f, 1.5f), hit_type);
-        m_WoundVector.push_back(pWound);
-    }
-    //старая
-    else
-    {
-        pWound = *it;
-        pWound->AddHit(hit_power * ::Random.randF(0.5f, 1.5f), hit_type);
-    }
+    CWound* pWound = new CWound(element);
+    pWound->AddHit(hit_power * ::Random.randF(0.5f, 1.5f), hit_type);
+    m_WoundVector.push_back(pWound);
 
     VERIFY(pWound);
     return pWound;

@@ -56,7 +56,7 @@ IC static void CEntityCondition_Export(lua_State* luaState)
 
 void BoosterForEach(CActorCondition* conditions, const luabind::functor<bool> &funct)
 {
-    CEntityCondition::BOOSTER_MAP cur_booster_influences = conditions->GetCurBoosterInfluences();
+    CEntityCondition::BOOSTER_MAP& cur_booster_influences = conditions->GetCurBoosterInfluences();
     CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
     CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
     for (; it != it_e; ++it)
@@ -73,9 +73,13 @@ bool ApplyBooster_script(CActorCondition* cond, const SBooster& B, LPCSTR sect)
 
 void ClearAllBoosters(CActorCondition* conditions)
 {
-    CEntityCondition::BOOSTER_MAP cur_booster_influences = conditions->GetCurBoosterInfluences();
-    if (cur_booster_influences.size())
-        cur_booster_influences.clear();
+    CEntityCondition::BOOSTER_MAP& cur_booster_influences = conditions->GetCurBoosterInfluences();
+    CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
+    CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
+    for (; it != it_e; ++it)
+    {
+        conditions->DisableBoostParameters((*it).second);
+    }
 }
 
 IC static void CActorCondition_Export(lua_State* luaState)

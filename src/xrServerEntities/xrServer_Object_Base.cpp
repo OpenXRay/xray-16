@@ -72,6 +72,7 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
     m_editor_flags.zero();
     RespawnTime = 0;
     net_Ready = FALSE;
+	net_Processed = FALSE;
     ID = 0xffff;
     ID_Parent = 0xffff;
     ID_Phantom = 0xffff;

@@ -327,7 +327,6 @@ void xrServer::SendUpdatesToAll()
     if (IsGameTypeSingle())
         return;
 
-    KickCheaters();
 
     // sending game_update
     fastdelegate::FastDelegate1<IClient*, void> sendtofd;
@@ -633,36 +632,7 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
     return IPureServer::OnMessage(P, sender);
 }
 
-bool xrServer::CheckAdminRights(const shared_str& user, const shared_str& pass, string512& reason)
-{
-    bool res = false;
-    string_path fn;
-    FS.update_path(fn, "$app_data_root$", "radmins.ltx");
-    if (FS.exist(fn))
-    {
-        CInifile ini(fn);
-        if (ini.line_exist("radmins", user.c_str()))
-        {
-            if (ini.r_string("radmins", user.c_str()) == pass)
-            {
-                xr_strcpy(reason, sizeof(reason), "Access permitted.");
-                res = true;
-            }
-            else
-            {
-                xr_strcpy(reason, sizeof(reason), "Access denied. Wrong password.");
-            }
-        }
-        else
-            xr_strcpy(reason, sizeof(reason), "Access denied. No such user.");
-    }
-    else
-        xr_strcpy(reason, sizeof(reason), "Access denied.");
-
-    return res;
-}
-
-void xrServer::SendTo_LL(ClientID ID, void* data, u32 size, u32 dwFlags, u32 dwTimeout)
+void xrServer::SendTo_LL			(ClientID ID, void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 {
     if ((SV_Client && SV_Client->ID == ID) || (psNET_direct_connect))
     {
@@ -908,55 +878,6 @@ void xrServer::AddDelayedPacket(NET_Packet& Packet, ClientID Sender)
     DelayedPackestCS.Leave();
 }
 
-u32 g_sv_dwMaxClientPing = 2000;
-u32 g_sv_time_for_ping_check = 15000; // 15 sec
-u8 g_sv_maxPingWarningsCount = 5;
-
-void xrServer::PerformCheckClientsForMaxPing()
-{
-    struct MaxPingClientDisconnector
-    {
-        xrServer* m_owner;
-        MaxPingClientDisconnector(xrServer* owner) : m_owner(owner) {}
-        void operator()(IClient* client)
-        {
-            xrClientData* Client = static_cast<xrClientData*>(client);
-            game_PlayerState* ps = Client->ps;
-            if (!ps)
-                return;
-
-            if (client == m_owner->GetServerClient())
-                return;
-
-            if (ps->ping > g_sv_dwMaxClientPing &&
-                Client->m_ping_warn.m_dwLastMaxPingWarningTime + g_sv_time_for_ping_check < Device.dwTimeGlobal)
-            {
-                ++Client->m_ping_warn.m_maxPingWarnings;
-                Client->m_ping_warn.m_dwLastMaxPingWarningTime = Device.dwTimeGlobal;
-
-                if (Client->m_ping_warn.m_maxPingWarnings >= g_sv_maxPingWarningsCount)
-                { // kick
-                    LPSTR reason;
-                    STRCONCAT(reason, CStringTable().translate("st_kicked_by_server").c_str());
-                    Level().Server->DisconnectClient(Client, reason);
-                }
-                else
-                { // send warning
-                    NET_Packet P;
-                    P.w_begin(M_CLIENT_WARN);
-                    P.w_u8(1); // 1 means max-ping-warning
-                    P.w_u16(ps->ping);
-                    P.w_u8(Client->m_ping_warn.m_maxPingWarnings);
-                    P.w_u8(g_sv_maxPingWarningsCount);
-                    m_owner->SendTo(Client->ID, P, net_flags(FALSE, TRUE));
-                }
-            }
-        }
-    };
-    MaxPingClientDisconnector temp_functor(this);
-    ForEachClientDoSender(temp_functor);
-}
-
 //xr_token game_types[];
 void xrServer::GetServerInfo( CServerInfo* si )
 {
@@ -988,23 +909,6 @@ void xrServer::GetServerInfo( CServerInfo* si )
 
 		si->AddItem( "Game time", tmp256, RGB(205,228,178) );
 	}
-}
-
-void xrServer::AddCheater(shared_str const& reason, ClientID const& cheaterID)
-{
-}
-
-void xrServer::KickCheaters()
-{
-}
-
-void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_id)
-{
-	Msg("! ERROR: SV: not enough file transfer proxies for downloading screenshot, please try later ...");
-}
-void xrServer::MakeConfigDump(ClientID const& admin_id, ClientID const& cheater_id)
-{
-	Msg("! ERROR: SV: not enough file transfer proxies for downloading file, please try later ...");
 }
 
 struct PlayerInfoWriter

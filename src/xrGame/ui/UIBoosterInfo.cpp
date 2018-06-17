@@ -96,7 +96,7 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
         return;
     }
 
-    CEntityCondition::BOOSTER_MAP boosters = actor->conditions().GetCurBoosterInfluences();
+	CEntityCondition::BOOSTER_MAP& boosters = actor->conditions().GetCurBoosterInfluences();
 
     float val = 0.0f, max_val = 1.0f;
     Fvector2 pos;

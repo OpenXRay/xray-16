@@ -65,12 +65,12 @@ public:
     CUITextWnd* m_QuickSlotText4;
 
 protected:
-    // 5 СЃС‚Р°С‚РёРєРѕРІ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёРєРѕРЅРѕРє:
-    // - СЃР»РѕРјР°РЅРЅРѕРіРѕ РѕСЂСѓР¶РёСЏ(only mp)
-    // - СЂР°РґРёР°С†РёРё
-    // - СЂР°РЅРµРЅРёСЏ
-    // - РіРѕР»РѕРґР°
-    // - СѓСЃС‚Р°Р»РѕСЃС‚Рё
+    // 5 статиков для отображения иконок:
+    // - сломанного оружия(only mp)
+    // - радиации
+    // - ранения
+    // - голода
+    // - усталости
     CUIStatic* UIWeaponJammedIcon;
     //	CUIStatic			UIRadiaitionIcon;
     //	CUIStatic			UIWoundIcon;
@@ -85,7 +85,7 @@ protected:
     CUIWindow* m_pMPLogWnd;
 
 public:
-    // Р•РЅСѓРјС‹ СЃРѕРѕС‚РІРµС‚СЃРІСѓСЋС‰РёРµ РїСЂРµРґСѓРїСЂРµР¶РґР°СЋС‰РёРј РёРєРѕРЅРєР°Рј
+    // Енумы соответсвующие предупреждающим иконкам
     enum EWarningIcons
     {
         ewiAll = 0,
@@ -101,16 +101,16 @@ public:
 
     void SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog);
 
-    // Р—Р°РґР°РµРј С†РІРµС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµР№ РёРєРѕРЅРєРµ
+    // Задаем цвет соответствующей иконке
     void SetWarningIconColor(EWarningIcons icon, const u32 cl);
     void TurnOffWarningIcon(EWarningIcons icon);
 
-    // РџРѕСЂРѕРіРё РёР·РјРµРЅРµРЅРёСЏ С†РІРµС‚Р° РёРЅРґРёРєР°С‚РѕСЂРѕРІ, Р·Р°РіСЂСѓР¶Р°РµРјС‹Рµ РёР· system.ltx
+    // Пороги изменения цвета индикаторов, загружаемые из system.ltx
     typedef xr_map<EWarningIcons, xr_vector<float>> Thresholds;
     typedef Thresholds::iterator Thresholds_it;
     Thresholds m_Thresholds;
 
-    // Р•РЅСѓРј РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ РІРѕР·РјРѕР¶РЅС‹С… РјРёРіР°СЋС‰РёС… РёРєРѕРЅРѕРє
+    // Енум перечисления возможных мигающих иконок
     enum EFlashingIcons
     {
         efiPdaTask = 0,
@@ -124,7 +124,7 @@ public:
 
     void ReceiveNews(GAME_NEWS_DATA* news);
     void UpdateMainIndicators();
-    void UpdateBoosterIndicators(const xr_map<EBoostParams, SBooster> influences);
+    void UpdateBoosterIndicators(const xr_map<EBoostParams, SBooster>& influences);
 
 protected:
     void UpdateQuickSlots();
@@ -134,16 +134,16 @@ protected:
     void UpdateFlashingIcons();
     //	void				UpdateActiveItemInfo			();
 
-    //	void				SetAmmoIcon						(const shared_str& seСЃt_name);
+    //	void				SetAmmoIcon						(const shared_str& seсt_name);
 
-    // first - РёРєРѕРЅРєР°, second - Р°РЅРёРјР°С†РёСЏ
+    // first - иконка, second - анимация
     using FlashingIcons = xr_map<EFlashingIcons, CUIStatic*>;
     FlashingIcons m_FlashingIcons;
 
     //	CMissile*			m_pGrenade;
     //	CInventoryItem*		m_pItem;
 
-    // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РїРѕРґСЃРєР°Р·РѕРє РїСЂРё РЅР°РІРµРґРµРЅРёРё РїСЂРёС†РµР»Р° РЅР° РѕР±СЉРµРєС‚
+    // Отображение подсказок при наведении прицела на объект
     void RenderQuickInfos();
 
 public:

@@ -8,20 +8,14 @@
 
 void xrServer::Perform_connect_spawn(CSE_Abstract* E, xrClientData* CL, NET_Packet& P)
 {
-    P.B.count = 0;
-    xr_vector<u16>::iterator it = std::find(conn_spawned_ids.begin(), conn_spawned_ids.end(), E->ID);
-    if (it != conn_spawned_ids.end())
-    {
-        //.		Msg("Rejecting redundant SPAWN data [%d]", E->ID);
-        return;
-    }
+	if (E->net_Processed)
+		return;
+	if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))	
+		return;
+	
+	E->net_Processed = TRUE;
 
-    conn_spawned_ids.push_back(E->ID);
-
-    if (E->net_Processed)
-        return;
-    if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))
-        return;
+	P.B.count = 0;
 
     //.	Msg("Perform connect spawn [%d][%s]", E->ID, E->s_name.c_str());
 
@@ -31,16 +25,16 @@ void xrServer::Perform_connect_spawn(CSE_Abstract* E, xrClientData* CL, NET_Pack
         Perform_connect_spawn(Parent, CL, P);
 
 	// Process
-	Flags16			save = E->s_flags;
-	//-------------------------------------------------
-	E->s_flags.set	(M_SPAWN_UPDATE,TRUE);
+	Flags16 save = E->s_flags;
+	E->s_flags.set(M_SPAWN_UPDATE,TRUE);
+	
 	if (0==E->owner)	
 	{
 		// PROCESS NAME; Name this entity
 		if (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER))
 		{
-			CL->owner			= E;
-			E->set_name_replace	(CL->ps?CL->ps->getName():"player");
+			CL->owner = E;
+			E->set_name_replace(CL->ps?CL->ps->getName():"player");
 		}
 
         // Associate
@@ -64,7 +58,6 @@ void xrServer::Perform_connect_spawn(CSE_Abstract* E, xrClientData* CL, NET_Pack
     //-----------------------------------------------------
     E->s_flags = save;
     SendTo(CL->ID, P, net_flags(TRUE, TRUE));
-    E->net_Processed = TRUE;
 }
 
 void xrServer::SendConfigFinished(ClientID const& clientId)
@@ -76,13 +69,13 @@ void xrServer::SendConfigFinished(ClientID const& clientId)
 
 void xrServer::SendConnectionData(IClient* _CL)
 {
-	conn_spawned_ids.clear();
-	xrClientData*	CL				= (xrClientData*)_CL;
-	NET_Packet		P;
+	xrClientData* CL = (xrClientData*)_CL;
+	NET_Packet P;
 	// Replicate current entities on to this client
 	xrS_entities::iterator	I=entities.begin(),E=entities.end();
-	for (; I!=E; ++I)						I->second->net_Processed	= FALSE;
-	for (I=entities.begin(); I!=E; ++I)		Perform_connect_spawn		(I->second,CL,P);
+	for (; I!=E; ++I)		
+		Perform_connect_spawn(I->second,CL,P);
+
 	SendConfigFinished(CL->ID);
 };
 

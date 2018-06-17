@@ -170,109 +170,16 @@ string64& game_sv_GameState::get_option_s(LPCSTR lst, LPCSTR name, LPCSTR def)
 }
 void game_sv_GameState::signal_Syncronize() { sv_force_sync = TRUE; }
 // Network
-
-struct player_exporter
+void game_sv_GameState::net_Export_State						(NET_Packet& P, ClientID to)
 {
-    u16 counter;
-    ClientID to_client;
-    NET_Packet* p_to_send;
-    game_PlayerState* to_ps;
-
-    player_exporter(ClientID to, game_PlayerState* to_playerstate, NET_Packet* P)
-    {
-        counter = 0;
-        to_client = to;
-        p_to_send = P;
-        to_ps = to_playerstate;
-    };
-    void __stdcall count_players(IClient* client)
-    {
-        xrClientData* tmp_client = static_cast<xrClientData*>(client);
-        if (!tmp_client->net_Ready || (tmp_client->ps->IsSkip() && tmp_client->ID != to_client))
-        {
-            return;
-        }
-        ++counter;
-    }
-    void __stdcall export_players(IClient* client)
-    {
-        xrClientData* tmp_client = static_cast<xrClientData*>(client);
-        if (!tmp_client->net_Ready || (tmp_client->ps->IsSkip() && tmp_client->ID != to_client))
-        {
-            return;
-        }
-
-        game_PlayerState* curr_ps = tmp_client->ps;
-
-        u16 tmp_flags = curr_ps->flags__;
-        if (to_ps == curr_ps)
-            curr_ps->setFlag(GAME_PLAYER_FLAG_LOCAL);
-
-        p_to_send->w_clientID(client->ID);
-        curr_ps->net_Export(*p_to_send, TRUE);
-        curr_ps->flags__ = tmp_flags;
-    }
-};
-
-void game_sv_GameState::net_Export_State(NET_Packet& P, ClientID to)
-{
-	P.w_clientID	(to);
-	P.w_s32			(m_type);
-	P.w_u16			(m_phase);
-	P.w_s32			(m_round);
-	P.w_u32			(m_start_time);
-	P.w_u8			(u8(0));
-	P.w_u8			(u8(net_sv_control_hit));
-	P.w_u8			(u8(0));
-
-    // Players
-    //	u32	p_count			= get_players_count() - ((GEnv.isDedicatedServer)? 1 : 0);
-
-    xrClientData* tmp_client = static_cast<xrClientData*>(m_server->GetClientByID(to));
-    game_PlayerState* tmp_ps = tmp_client->ps;
-
-    player_exporter tmp_functor(to, tmp_ps, &P);
-    fastdelegate::FastDelegate1<IClient*, void> pcounter;
-    pcounter.bind(&tmp_functor, &player_exporter::count_players);
-    fastdelegate::FastDelegate1<IClient*, void> exporter;
-    exporter.bind(&tmp_functor, &player_exporter::export_players);
-
-    m_server->ForEachClientDo(pcounter);
-    P.w_u16(tmp_functor.counter);
-    m_server->ForEachClientDo(exporter);
-
-    net_Export_GameTime(P);
 }
 
 void game_sv_GameState::net_Export_Update(NET_Packet& P, ClientID id_to, ClientID id)
 {
-    game_PlayerState* A = get_id(id);
-    if (A)
-    {
-        u16 bk_flags = A->flags__;
-        if (id == id_to)
-        {
-            A->setFlag(GAME_PLAYER_FLAG_LOCAL);
-        }
-
-        P.w_clientID(id);
-        A->net_Export(P);
-        A->flags__ = bk_flags;
-    };
-    net_Export_GameTime(P);
 };
 
 void game_sv_GameState::net_Export_GameTime(NET_Packet& P)
 {
-    //#pragma todo("It should be done via single message, why always pass this data?")
-    //#if 0
-    // Syncronize GameTime
-    P.w_u64(GetGameTime());
-    P.w_float(GetGameTimeFactor());
-    // Syncronize EnvironmentGameTime
-    P.w_u64(GetEnvironmentGameTime());
-    P.w_float(GetEnvironmentGameTimeFactor());
-    //#endif
 };
 
 void game_sv_GameState::OnPlayerConnect(ClientID /**id_who/**/) { signal_Syncronize(); }

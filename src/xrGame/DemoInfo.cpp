@@ -124,7 +124,6 @@ void demo_info::load_from_game()
 	m_map_name		= Level().name();
 	m_map_version	= Level().version();
 	m_game_type		= "single";
-	string32		tmp_score_dest;
 	m_game_score	= 0;
 	m_author_name	= "unknown";
 	u32	pcount		= 0;

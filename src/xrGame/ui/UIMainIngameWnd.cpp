@@ -64,9 +64,7 @@ const u32 g_clWhite = 0xffffffff;
 
 #define MAININGAME_XML "maingame.xml"
 
-CUIMainIngameWnd::CUIMainIngameWnd()
-    : /*m_pGrenade(NULL),m_pItem(NULL),*/ m_pPickUpItem(NULL), m_pMPChatWnd(NULL), UIArtefactIcon(NULL),
-      m_pMPLogWnd(NULL)
+CUIMainIngameWnd::CUIMainIngameWnd(): /*m_pGrenade(NULL),m_pItem(NULL),*/ m_pPickUpItem(NULL), m_pMPChatWnd(NULL), UIArtefactIcon(NULL), m_pMPLogWnd(NULL)
 {
     UIZoneMap = new CUIZoneMap();
 }
@@ -898,7 +896,7 @@ void CUIMainIngameWnd::DrawMainIndicatorsForInventory()
     m_ui_hud_states->DrawZoneIndicators();
 }
 
-void CUIMainIngameWnd::UpdateBoosterIndicators(const xr_map<EBoostParams, SBooster> influences)
+void CUIMainIngameWnd::UpdateBoosterIndicators(const xr_map<EBoostParams, SBooster>& influences)
 {
     m_ind_boost_psy->Show(false);
     m_ind_boost_radia->Show(false);
