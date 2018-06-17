@@ -121,6 +121,7 @@ public:
     {
         ID = -1;
         m_Name = "unknown";
+		m_Desc = "unknown";
         Flags.zero();
         // factors
         fFlotationFactor = 1.f;

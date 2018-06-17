@@ -220,7 +220,7 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     m_fSunShaftsIntensity = 0;
     m_fWaterIntensity = 1;
 
-    m_fTreeAmplitudeIntensity = 0.01;
+    m_fTreeAmplitudeIntensity = 0.01f;
 
     lens_flare_id = "";
     tb_id = "";

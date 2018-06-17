@@ -698,6 +698,14 @@ void CHelicopter::OnKeyboardHold(int cmd)
 
 Fvector* CHelicopter::getPathAltitude(Fvector& pos, float base_alt)
 {
-    m_movement.getPathAltitude(pos, base_alt);
-    return &pos;
+	m_movement.getPathAltitude(pos, base_alt);
+	return &pos;
+}
+
+void CHelicopter::ForceTransform(const Fmatrix& m)
+{
+	XFORM().set(m);
+	PPhysicsShell()->SetTransform(XFORM(), mh_unspecified);
+	m_movement.desiredPoint = m.c;
+	m_movement.currP = m.c;
 }

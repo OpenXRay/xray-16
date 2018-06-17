@@ -7,7 +7,46 @@
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 
-SHeliMovementState::~SHeliMovementState() {}
+
+SHeliMovementState::SHeliMovementState()
+{
+	parent = NULL;
+	type = eMovNone;
+	currPatrolPath = NULL;
+	currPatrolVertex = NULL;
+	patrol_begin_idx = 0;
+	patrol_path_name = "";
+	need_to_del_path = false;
+	safe_altitude_add = 0.f;
+	maxLinearSpeed = 0.f;
+	LinearAcc_fw = 0.f;
+	LinearAcc_bk = 0.f;
+	isAdnAcc = 0.f;
+	HeadingSpK = 0.f; 
+	HeadingSpB = 0.f;
+	PitchSpK = 0.f; 
+	PitchSpB = 0.f; 
+	AngSP = 0.f; 
+	AngSH = 0.f;
+	speedInDestPoint = 0.f;
+	min_altitude = 0.f;
+	desiredPoint = { 0.f, 0.f, 0.f };
+	curLinearSpeed = 0.f;
+	curLinearAcc = 0.f;
+	currP = desiredPoint;
+	currPathH = 0.f;;
+	currPathP = 0.f;;
+	round_center = { 0.f, 0.f, 0.f };
+	round_radius = 0.f;
+	round_reverse = false;
+	onPointRangeDist = 0.f;
+}
+
+SHeliMovementState::~SHeliMovementState()
+{
+
+}
+
 void SHeliMovementState::net_Destroy()
 {
     if (need_to_del_path && currPatrolPath)
