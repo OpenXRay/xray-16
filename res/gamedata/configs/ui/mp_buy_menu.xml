@@ -140,7 +140,7 @@
 
     <lst_medkit x="480" y="189" width="86" height="43"
             cell_width="43" cell_height="43" rows_num="1" cols_num="2"
-            custom_placement="0" group_similar="1"/>`
+            custom_placement="0" group_similar="1"/>
 
     <lst_granade x="480" y="232" width="86" height="86"
             cell_width="43" cell_height="43" rows_num="2" cols_num="2"
