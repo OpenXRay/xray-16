@@ -13,9 +13,7 @@
 #include "ui/UIOptionsManagerScript.h"
 #include "ui/UIMapInfo.h"
 #include "ScriptXmlInit.h"
-#include "login_manager.h"
-#include "account_manager.h"
-#include "profile_store.h"
+
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
@@ -27,23 +25,9 @@ SCRIPT_EXPORT(UIRegistrator, (), {
                          .enum_("EAligment")[value("alLeft", int(CGameFont::alLeft)),
                              value("alRight", int(CGameFont::alRight)), value("alCenter", int(CGameFont::alCenter))],
 
-        class_<Patch_Dawnload_Progress>("Patch_Dawnload_Progress")
-            .def("GetInProgress", &Patch_Dawnload_Progress::GetInProgress)
-            .def("GetStatus", &Patch_Dawnload_Progress::GetStatus)
-            .def("GetFlieName", &Patch_Dawnload_Progress::GetFlieName)
-            .def("GetProgress", &Patch_Dawnload_Progress::GetProgress),
-
-        class_<CMainMenu>("CMainMenu")
-            .def("GetPatchProgress", &CMainMenu::GetPatchProgress)
-            .def("CancelDownload", &CMainMenu::CancelDownload)
-            .def("ValidateCDKey", &CMainMenu::ValidateCDKey)
-            .def("GetGSVer", &CMainMenu::GetGSVer)
-            .def("GetCDKey", &CMainMenu::GetCDKeyFromRegistry)
-            .def("GetPlayerName", &CMainMenu::GetPlayerName)
-            .def("GetDemoInfo", &CMainMenu::GetDemoInfo)
-            .def("GetLoginMngr", &CMainMenu::GetLoginMngr)
-            .def("GetAccountMngr", &CMainMenu::GetAccountMngr)
-            .def("GetProfileStore", &CMainMenu::GetProfileStore)];
+		class_<CMainMenu>("CMainMenu")
+			.def("GetDemoInfo",				&CMainMenu::GetDemoInfo)
+	];
 
     module(luaState, "main_menu")[def("get_main_menu", &MainMenu)];
 });

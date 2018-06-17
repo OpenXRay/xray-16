@@ -5,9 +5,8 @@
 
 class CUILines : public CDeviceResetNotifier
 {
-    friend class CUICustomEdit;
-    friend class CUICDkey;
-
+	 friend class CUICustomEdit;
+	 //friend class CUICDkey;
 public:
     CUILines();
     virtual ~CUILines();

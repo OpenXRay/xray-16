@@ -1986,8 +1986,7 @@ void CActor::OnCriticalHitHealthLoss()
     P.w_u8(u8(SpecialHit));
     u_EventSend(P);
     //-------------------------------------------
-    if (GameID() != eGameIDSingle)
-        Game().m_WeaponUsageStatistic->OnBullet_Check_Result(true);
+
 };
 
 void CActor::OnPlayHeadShotParticle(NET_Packet P)

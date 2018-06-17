@@ -52,7 +52,7 @@ enum ESquadCommandType
 
 struct SSquadCommand
 {
-    ESquadCommandType type; // С‚РёРї РєРѕРјР°РЅРґС‹
+    ESquadCommandType type; // тип команды
 
     const CEntity* entity;
     Fvector position;
@@ -72,10 +72,10 @@ private:
     CEntity* leader;
     using MEMBER_GOAL_MAP = xr_map<CEntity*, SMemberGoal>;
 
-    // РєР°СЂС‚Р° С†РµР»РµР№ С‡Р»РµРЅРѕРІ РіСЂСѓРїРїС‹ (РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ СЃРѕ СЃС‚РѕСЂРѕРЅС‹ РѕР±СЉРµРєС‚Р°)
+    // карта целей членов группы (обновляется со стороны объекта)
     MEMBER_GOAL_MAP m_goals;
 
-    // РєР°СЂС‚Р° РєРѕРјРјР°РЅРґ С‡Р»РµРЅРѕРІ РіСЂСѓРїРїС‹ (РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ СЃРѕ СЃС‚РѕСЂРѕРЅС‹ squad manager)
+    // карта комманд членов группы (обновляется со стороны squad manager)
     MEMBER_COMMAND_MAP m_commands;
 
     using NODES_VECTOR = xr_vector<u32>;
@@ -124,14 +124,14 @@ public:
     u8 get_index(CEntity* m_object) const;
 
     ///////////////////////////////////////////////////////////////////////////////////////
-    //  РћР±С‰РёРµ РґР°РЅРЅС‹Рµ
+    //  Общие данные
     //////////////////////////////////////////////////////////////////////////////////////
 
     using ENTITY_VEC = xr_vector<CEntity*>;
     ENTITY_VEC m_temp_entities;
 
     ///////////////////////////////////////////////////////////////////////////////////////
-    //  РђС‚Р°РєР° РіСЂСѓРїРїРѕР№ РјРѕРЅСЃС‚СЂРѕРІ
+    //  Атака группой монстров
     //////////////////////////////////////////////////////////////////////////////////////
 
     using ENEMY_MAP = xr_map<const CEntity*, ENTITY_VEC>;
@@ -158,7 +158,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////////////////////////////////
-    //  РіСЂСѓРїРїРѕРІРѕР№ idle
+    //  групповой idle
     //////////////////////////////////////////////////////////////////////////////////////
     ENTITY_VEC front, back, left, right;
 
@@ -187,6 +187,7 @@ public:
     MEMBER_COMMAND_MAP* get_commands() { return &m_commands; }
     bool home_in_danger() { return Device.dwTimeGlobal < m_home_danger_end_tick; }
     void set_home_in_danger() { m_home_danger_end_tick = Device.dwTimeGlobal + m_home_danger_mode_time; }
+
 private:
     // danger mode is turns on when monsters hear dangerous sound or get a hit
     // danger mode turns off after m_danger_mode_time miliseconds

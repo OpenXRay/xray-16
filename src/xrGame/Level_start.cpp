@@ -3,8 +3,8 @@
 #include "Level_Bullet_Manager.h"
 #include "xrserver.h"
 #include "game_cl_base.h"
+#include "game_sv_base.h"
 #include "xrmessages.h"
-#include "xrGameSpyServer.h"
 #include "xrEngine/x_ray.h"
 #include "xrEngine/device.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -12,8 +12,6 @@
 #include "MainMenu.h"
 #include "string_table.h"
 #include "UIGameCustom.h"
-#include "ui/UICDkey.h"
-#include "xrNetServer/NET_Messages.h"
 
 int g_cl_save_demo = 0;
 
@@ -29,14 +27,12 @@ bool CLevel::net_Start(const char* op_server, const char* op_client)
 
     pApp->LoadBegin();
 
-    string64 player_name;
-    GetPlayerName_FromRegistry(player_name, sizeof(player_name));
-
-    if (xr_strlen(player_name) == 0)
-    {
-        xr_strcpy(player_name, xr_strlen(Core.UserName) ? Core.UserName : Core.CompName);
-    }
-    VERIFY(xr_strlen(player_name));
+	string64	player_name = "callofchernobyl";
+	if ( xr_strlen(player_name) == 0 )
+	{
+		xr_strcpy( player_name, xr_strlen(Core.UserName) ? Core.UserName : Core.CompName );
+	}
+	VERIFY( xr_strlen(player_name) );
 
     // make Client Name if options doesn't have it
     LPCSTR NameStart = strstr(op_client, "/name=");
@@ -106,17 +102,10 @@ bool CLevel::net_start1()
         g_pGamePersistent->SetLoadStageTitle("st_server_starting");
         g_pGamePersistent->LoadTitle();
 
-        typedef IGame_Persistent::params params;
-        params& p = g_pGamePersistent->m_game_params;
-        // Connect
-        if (!xr_strcmp(p.m_game_type, "single"))
-        {
-            Server = new xrServer();
-        }
-        else
-        {
-            Server = new xrGameSpyServer();
-        }
+		typedef IGame_Persistent::params params;
+		params							&p = g_pGamePersistent->m_game_params;
+		// Connect
+		Server					= new xrServer();
 
         if (xr_strcmp(p.m_alife, "alife"))
         {
@@ -188,22 +177,12 @@ bool CLevel::net_start3()
             else
                 xr_strcpy(PasswordStr, PSW);
 
-            string4096 tmp;
-            xr_sprintf(tmp, "%s/psw=%s", m_caClientOptions.c_str(), PasswordStr);
-            m_caClientOptions = tmp;
-        };
-    };
-    // setting players GameSpy CDKey if it comes from command line
-    if (strstr(m_caClientOptions.c_str(), "/cdkey="))
-    {
-        string64 CDKey;
-        const char* start = strstr(m_caClientOptions.c_str(), "/cdkey=") + xr_strlen("/cdkey=");
-        sscanf(start, "%[^/]", CDKey);
-        string128 cmd;
-        xr_sprintf(cmd, "cdkey %s", xr_strupr(CDKey));
-        Console->Execute(cmd);
-    }
-    return true;
+			string4096	tmp;
+			xr_sprintf(tmp, "%s/psw=%s", m_caClientOptions.c_str(), PasswordStr);
+			m_caClientOptions = tmp;
+		};
+	};
+	return true;
 }
 
 bool CLevel::net_start4()
@@ -266,7 +245,6 @@ bool CLevel::net_start6()
             DEL_INSTANCE(g_pGameLevel);
             Console->Execute("main_menu on");
 
-            MainMenu()->SwitchToMultiplayerMenu();
         }
         else if (!map_data.m_map_loaded && map_data.m_name.size() &&
             m_bConnectResult) // if (map_data.m_name == "") - level not loaded, see CLevel::net_start_client3
@@ -280,40 +258,30 @@ bool CLevel::net_start6()
             STRCONCAT(level_id_string, st.translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
             STRCONCAT(dialog_string, level_id_string, st.translate("ui_st_map_not_found"));
 
-            DEL_INSTANCE(g_pGameLevel);
-            Console->Execute("main_menu on");
-
-            if (!GEnv.isDedicatedServer)
-            {
-                MainMenu()->SwitchToMultiplayerMenu();
-                MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
-            }
-        }
-        else if (map_data.IsInvalidClientChecksum())
-        {
-            LPCSTR level_id_string = NULL;
-            LPCSTR dialog_string = NULL;
-            LPCSTR download_url = !!map_data.m_map_download_url ? map_data.m_map_download_url.c_str() : "";
-            CStringTable st;
-            LPCSTR tmp_map_ver = !!map_data.m_map_version ? map_data.m_map_version.c_str() : "";
+			DEL_INSTANCE	(g_pGameLevel);
+			Console->Execute("main_menu on");
+		}
+		else
+		if (map_data.IsInvalidClientChecksum())
+		{
+			LPCSTR level_id_string = NULL;
+			LPCSTR dialog_string = NULL;
+			LPCSTR download_url = !!map_data.m_map_download_url ? map_data.m_map_download_url.c_str() : "";
+			CStringTable	st;
+			LPCSTR tmp_map_ver = !!map_data.m_map_version ? map_data.m_map_version.c_str() : "";
 
             STRCONCAT(level_id_string, st.translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
             STRCONCAT(dialog_string, level_id_string, st.translate("ui_st_map_data_corrupted"));
 
-            g_pGameLevel->net_Stop();
-            DEL_INSTANCE(g_pGameLevel);
-            Console->Execute("main_menu on");
-            if (!GEnv.isDedicatedServer)
-            {
-                MainMenu()->SwitchToMultiplayerMenu();
-                MainMenu()->Show_DownloadMPMap(dialog_string, download_url);
-            }
-        }
-        else
-        {
-            DEL_INSTANCE(g_pGameLevel);
-            Console->Execute("main_menu on");
-        }
+			g_pGameLevel->net_Stop();
+			DEL_INSTANCE	(g_pGameLevel);
+			Console->Execute("main_menu on");
+		}
+		else 
+		{
+			DEL_INSTANCE	(g_pGameLevel);
+			Console->Execute("main_menu on");
+		}
 
         return true;
     }

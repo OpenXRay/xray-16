@@ -29,7 +29,6 @@
 #include "ai/monsters/BaseMonster/base_monster.h"
 #include "date_time.h"
 #include "mt_config.h"
-#include "ui/UIOptConCom.h"
 #include "UIGameSP.h"
 #include "ui/UIActorMenu.h"
 #include "ui/UIStatic.h"
@@ -43,9 +42,6 @@
 #include "cameralook.h"
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
-
-#include "xrGameSpy/GameSpy_Full.h"
-#include "xrGameSpy/GameSpy_Patching.h"
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
@@ -112,7 +108,6 @@ extern u32 gLanguage;
 extern xr_vector<xr_token> gLanguagesToken;
 #endif
 
-void register_mp_console_commands();
 //-----------------------------------------------------------
 
 BOOL g_bCheckTime = FALSE;
@@ -148,7 +143,6 @@ enum E_COMMON_FLAGS
     flAiUseTorchDynamicLights = 1
 };
 
-CUIOptConCom g_OptConCom;
 
 static void full_memory_stats()
 {
@@ -1656,34 +1650,10 @@ public:
 class CCC_GSCheckForUpdates : public IConsole_Command
 {
 public:
-    CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR arguments)
-    {
-        if (!MainMenu())
-            return;
-        /*
-        CGameSpy_Available GSA;
-        shared_str result_string;
-        if (!GSA.CheckAvailableServices(result_string))
-        {
-            Msg(*result_string);
-//			return;
-        };
-        CGameSpy_Patching GameSpyPatching;
-        */
-        bool InformOfNoPatch = true;
-        if (arguments && *arguments)
-        {
-            int bInfo = 1;
-            sscanf(arguments, "%d", &bInfo);
-            InformOfNoPatch = (bInfo != 0);
-        }
-
-        //		GameSpyPatching.CheckForPatch(InformOfNoPatch);
-        CGameSpy_Patching::PatchCheckCallback cb;
-        cb.bind(MainMenu(), &CMainMenu::OnPatchCheck);
-        MainMenu()->GetGS()->GetGameSpyPatching()->CheckForPatch(InformOfNoPatch, cb);
-    }
+	CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+	virtual void Execute(LPCSTR arguments)
+	{
+	}
 };
 
 class CCC_Net_SV_GuaranteedPacketMode : public CCC_Integer
@@ -1752,7 +1722,6 @@ public:
 void CCC_RegisterCommands()
 {
     // options
-    g_OptConCom.Init();
 
     CMD1(CCC_MemStats, "stat_memory");
     // game
@@ -2191,5 +2160,4 @@ void CCC_RegisterCommands()
     CMD3(CCC_String, "slot_3", g_quick_use_slots[3], 32);
 
     CMD4(CCC_Integer, "keypress_on_start", &g_keypress_on_start, 0, 1);
-    register_mp_console_commands();
 }

@@ -24,7 +24,6 @@
 #include "UIHint.h"
 #include "UIBtnHint.h"
 #include "UITaskWnd.h"
-#include "UIFactionWarWnd.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
 #include "UIScriptWnd.h"

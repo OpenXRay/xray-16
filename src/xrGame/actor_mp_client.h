@@ -28,7 +28,6 @@ public:
     virtual BOOL net_Relevant();
     virtual void OnEvent(NET_Packet& packet, u16 type);
     virtual void Die(IGameObject* killer);
-    virtual void DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const;
     shared_str const GetAnticheatSectionName() const { return "mp_actor"; };
     virtual void On_SetEntity();
     virtual void On_LostEntity();

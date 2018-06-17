@@ -20,10 +20,7 @@ class CUIEditBox;
 class CUIMultiTextStatic;
 class CUIAnimatedStatic;
 class CUISleepStatic;
-class CServerList;
-class CUIMapList;
 class CUITrackBar;
-class CUIMapInfo;
 class CUIMMShniaga;
 class CUIScrollView;
 class CUIListBox;
@@ -52,12 +49,7 @@ public:
     CUI3tButton* Init3tButton(LPCSTR path, CUIWindow* parent);
 
     CUITabControl* InitTab(LPCSTR path, CUIWindow* parent);
-    CServerList* InitServerList(LPCSTR path, CUIWindow* parent);
-    CUIMapList* InitMapList(LPCSTR path, CUIWindow* parent);
-    CUIMapInfo* InitMapInfo(LPCSTR path, CUIWindow* parent);
     CUITrackBar* InitTrackBar(LPCSTR path, CUIWindow* parent);
-    CUIEditBox* InitCDkey(LPCSTR path, CUIWindow* parent);
-    CUIEditBox* InitMPPlayerName(LPCSTR path, CUIWindow* parent);
     CUIMMShniaga* InitMMShniaga(LPCSTR path, CUIWindow* parent);
     CUIWindow* InitKeyBinding(LPCSTR path, CUIWindow* parent);
     CUIScrollView* InitScrollView(LPCSTR path, CUIWindow* parent);

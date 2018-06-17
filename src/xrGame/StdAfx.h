@@ -111,13 +111,13 @@
 #include "xrGame/UICursor.h"
 #include "xrGame/UIDialogHolder.h" // ~135, somewhat heavy to compile
 #include "xrGame/UIStaticItem.h" // ~190, and quite heavy to compile
-#include "xrGame/ui/Restrictions.h"
+//#include "xrGame/ui/Restrictions.h"
 #include "xrGame/ui/UI_IB_Static.h" // ~60, very heavy to compile
 #include "xrGame/ui/UI3tButton.h" // ~60, very heavy to compile
 #include "xrGame/ui/UIActorMenu.h"
 #include "xrGame/ui/UIButton.h" // ~80, very heavy to compile
-#include "xrGame/ui/UIBuyWndBase.h"
-#include "xrGame/ui/UIBuyWndShared.h"
+//#include "xrGame/ui/UIBuyWndBase.h"
+//#include "xrGame/ui/UIBuyWndShared.h"
 #include "xrGame/ui/UICellItem.h"
 #include "xrGame/ui/UICustomEdit.h"
 #include "xrGame/ui/UIDialogWnd.h" // ~100
@@ -164,7 +164,7 @@
 #include "xrGame/CameraEffector.h" // ~75, very heavy to compile
 #include "xrGame/alife_simulator.h" // ~80
 #include "xrGame/alife_update_manager.h"
-#include "xrGame/ammunition_groups.h"
+//#include "xrGame/ammunition_groups.h"
 #include "xrGame/animation_utils.h"
 #include "xrGame/Artefact.h" // ~50
 #include "xrGame/character_hit_animations.h"
@@ -208,12 +208,12 @@
 #include "xrGame/stalker_movement_manager_smart_cover.h" // ~60, INCREDIBLY heavy to compile
 #include "xrGame/stalker_base_action.h" // ~30, INCREDIBLY heavy to compile
 #include "xrGame/stalker_decision_space.h" // ~60, only enum's
-#include "xrGame/Spectator.h" // ~60, INCREDIBLY heavy to compile
-#include "xrGame/game_cl_mp.h" // ~60, INCREDIBLY heavy to compile
+//#include "xrGame/Spectator.h" // ~60, INCREDIBLY heavy to compile
+//#include "xrGame/game_cl_mp.h" // ~60, INCREDIBLY heavy to compile
 #include "xrGame/game_events_handler.h" // ~30, INCREDIBLY heavy to compile
 #include "xrGame/steering_behaviour.h" // ~30, measurable compile time
 #include "xrGame/UIGameCustom.h" // ~85, quite heavy to compile
-#include "xrGame/UIGameMP.h"
+//#include "xrGame/UIGameMP.h"
 #include "xrGame/UIGameSP.h"
 #include "xrGame/wallmark_manager.h" // ~60, measurable compile time
 #include "xrGame/WeaponCustomPistol.h" // ~30, INCREDIBLY heavy to compile

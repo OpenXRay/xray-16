@@ -13,8 +13,7 @@
 
 #include "level_bullet_manager.h"
 
-#include "game_cl_mp.h"
-#include "reward_event_generator.h"
+
 
 #define FLAME_TIME 0.05f
 
@@ -87,10 +86,7 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
                 m_first_bullet_controller.make_shot();
             }
         }
-        game_cl_mp* tmp_mp_game = smart_cast<game_cl_mp*>(&Game());
-        VERIFY(tmp_mp_game);
-        if (tmp_mp_game->get_reward_generator())
-            tmp_mp_game->get_reward_generator()->OnWeapon_Fire(H_Parent()->ID(), ID());
+
     }
     if (fsimilar(fire_disp, 0.f))
     {

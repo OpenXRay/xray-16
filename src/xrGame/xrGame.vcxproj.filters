@@ -6351,9 +6351,6 @@
     <ClInclude Include="ui\UIGameLog.h">
       <Filter>UI\Multiplayer\HUD\GameLog</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UISpeechMenu.h">
-      <Filter>UI\Multiplayer\HUD\SpeechMenu</Filter>
-    </ClInclude>
     <ClInclude Include="ui\KillMessageStruct.h">
       <Filter>UI\Multiplayer\HUD\common</Filter>
     </ClInclude>
@@ -6390,14 +6387,8 @@
     <ClInclude Include="ui\UISpawnWnd.h">
       <Filter>UI\Multiplayer\team_skin_info\Spawn</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UISkinSelector.h">
-      <Filter>UI\Multiplayer\team_skin_info\SkinSelector</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIStatix.h">
       <Filter>UI\Multiplayer\team_skin_info\SkinSelector</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIServerInfo.h">
-      <Filter>UI\Multiplayer\team_skin_info\ServerInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIChangeMap.h">
       <Filter>UI\Multiplayer\Voting</Filter>
@@ -9850,9 +9841,6 @@
     <ClCompile Include="ui\UIGameLog.cpp">
       <Filter>UI\Multiplayer\HUD\GameLog</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UISpeechMenu.cpp">
-      <Filter>UI\Multiplayer\HUD\SpeechMenu</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIPdaKillMessage.cpp">
       <Filter>UI\Multiplayer\HUD\common</Filter>
     </ClCompile>
@@ -9901,14 +9889,8 @@
     <ClCompile Include="ui\UISpawnWnd.cpp">
       <Filter>UI\Multiplayer\team_skin_info\Spawn</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UISkinSelector.cpp">
-      <Filter>UI\Multiplayer\team_skin_info\SkinSelector</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIStatix.cpp">
       <Filter>UI\Multiplayer\team_skin_info\SkinSelector</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIServerInfo.cpp">
-      <Filter>UI\Multiplayer\team_skin_info\ServerInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIChangeMap.cpp">
       <Filter>UI\Multiplayer\Voting</Filter>

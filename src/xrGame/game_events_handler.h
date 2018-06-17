@@ -1,7 +1,7 @@
 #ifndef GAME_EVENTS_HANDLER_INCLUDED
 #define GAME_EVENTS_HANDLER_INCLUDED
 
-#include "game_cl_base_weapon_usage_statistic.h"
+//#include "game_cl_base_weapon_usage_statistic.h"
 
 namespace award_system
 {

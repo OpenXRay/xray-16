@@ -47,7 +47,6 @@ protected:
     void CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path);
     void ShowMain();
     void ShowNewGame();
-    void ShowNetworkGame();
     float pos(float x1, float x2, u32 t);
 
     CUIStatic* m_shniaga;

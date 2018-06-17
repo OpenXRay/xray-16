@@ -55,8 +55,7 @@ IC CSObjectItemClientServerSingleMp::CObjectItemClientServerSingleMp(const CLASS
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServerSingleMp::client_object() const
 {
-    ObjectFactory::ClientObjectBaseClass* result =
-        IsGameTypeSingle() ? new _client_type_single() : new _client_type_mp();
+    ObjectFactory::ClientObjectBaseClass* result = new _client_type_single();
 
     return (result->_construct());
 }

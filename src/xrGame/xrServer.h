@@ -72,15 +72,7 @@ struct CheaterToKick
 };
 typedef xr_vector<CheaterToKick> cheaters_t;
 
-namespace file_transfer
-{
-class server_site;
-}; // namespace file_transfer
-
-class clientdata_proxy;
-class server_info_uploader;
-
-class xrServer : public IPureServer
+class xrServer	: public IPureServer  
 {
 private:
     xrS_entities entities;
@@ -88,10 +80,7 @@ private:
     xr_vector<u16> conn_spawned_ids;
     cheaters_t m_cheaters;
 
-    file_transfer::server_site* m_file_transfers;
-    clientdata_proxy* m_screenshot_proxies[MAX_PLAYERS_COUNT * 2];
-    void initialize_screenshot_proxies();
-    void deinitialize_screenshot_proxies();
+ 
 
     typedef server_updates_compressor::send_ready_updates_t::const_iterator update_iterator_t;
     update_iterator_t m_update_begin;
@@ -103,16 +92,7 @@ private:
     u32 m_last_updates_size;
     u32 m_last_update_time;
 
-    void SendServerInfoToClient(ClientID const& new_client);
-    server_info_uploader& GetServerInfoUploader();
 
-    void LoadServerInfo();
-
-    typedef xr_vector<server_info_uploader*> info_uploaders_t;
-
-    info_uploaders_t m_info_uploaders;
-    IReader* m_server_logo;
-    IReader* m_server_rules;
 
     struct DelayedPacket
     {
@@ -202,8 +182,6 @@ protected:
     virtual IClient* new_client(SClientConnectData* cl_data);
 
     virtual bool Check_ServerAccess(IClient* CL, string512& reason) { return true; }
-    virtual bool NeedToCheckClient_GameSpy_CDKey(IClient* CL) { return false; }
-    virtual void Check_GameSpy_CDKey_Success(IClient* CL);
     void RequestClientDigest(IClient* CL);
     void ProcessClientDigest(xrClientData* xrCL, NET_Packet* P);
     void KickCheaters();

@@ -9,7 +9,6 @@
 #include "StdAfx.h"
 #include "UIMessagesWindow.h"
 #include "UIGameLog.h"
-#include "UIChatWnd.h"
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
 #include "UIInventoryUtilities.h"
@@ -27,22 +26,20 @@ void CUIMessagesWindow::AddLogMessage(KillMessageStruct& msg) { m_pGameLog->AddL
 void CUIMessagesWindow::AddLogMessage(const shared_str& msg) { m_pGameLog->AddLogMessage(*msg); }
 void CUIMessagesWindow::PendingMode(bool const is_pending_mode)
 {
-    if (is_pending_mode)
-    {
-        if (m_in_pending_mode)
-            return;
-
-        m_pChatWnd->PendingMode(is_pending_mode);
-        m_pChatLog->SetWndRect(m_pending_chat_log_rect);
-        m_in_pending_mode = true;
-        return;
-    }
-    if (!m_in_pending_mode)
-        return;
-
-    m_pChatWnd->PendingMode(is_pending_mode);
-    m_pChatLog->SetWndRect(m_inprogress_chat_log_rect);
-    m_in_pending_mode = false;
+	if (is_pending_mode)
+	{
+		if (m_in_pending_mode)
+			return;
+		
+		m_pChatLog->SetWndRect	(m_pending_chat_log_rect);
+		m_in_pending_mode		= true;
+		return;
+	}
+	if (!m_in_pending_mode)
+		return;
+	
+	m_pChatLog->SetWndRect		(m_inprogress_chat_log_rect);
+	m_in_pending_mode			= false;
 }
 
 #define CHAT_LOG_LIST_PENDING "chat_log_list_pending"
@@ -67,9 +64,7 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
         m_pChatLog->SetAutoDelete(true);
         m_pChatLog->Show(true);
         AttachChild(m_pChatLog);
-        m_pChatWnd = new CUIChatWnd();
-        m_pChatWnd->SetAutoDelete(true);
-        AttachChild(m_pChatWnd);
+
 
         CUIXmlInit::InitScrollView(xml, "mp_log_list", 0, m_pGameLog);
         CUIXmlInit::InitFont(xml, "mp_log_list:font", 0, color, pFont);
@@ -96,7 +91,7 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
         CUIXmlInit::InitFont(xml, "chat_log_list:font", 0, color, pFont);
         m_pChatLog->SetTextAtrib(pFont, color);
 
-        m_pChatWnd->Init(xml);
+
     }
 }
 
@@ -125,7 +120,10 @@ void CUIMessagesWindow::AddIconedPdaMessage(GAME_NEWS_DATA* news)
     m_pGameLog->SendMessage(pItem, CHILD_CHANGED_SIZE);
 }
 
-void CUIMessagesWindow::AddChatMessage(shared_str msg, shared_str author) { m_pChatLog->AddChatMessage(*msg, *author); }
+void CUIMessagesWindow::AddChatMessage(shared_str msg, shared_str author)
+{
+
+}
 /*
 void CUIMessagesWindow::SetChatOwner(game_cl_GameState* owner)
 {
@@ -135,10 +133,8 @@ void CUIMessagesWindow::SetChatOwner(game_cl_GameState* owner)
 */
 void CUIMessagesWindow::Show(bool show)
 {
-    if (m_pChatWnd)
-        m_pChatWnd->Show(show);
-    if (m_pGameLog)
-        m_pGameLog->Show(show);
-    if (m_pChatLog)
-        m_pChatLog->Show(show);
+	if (m_pGameLog)
+		m_pGameLog->Show(show);
+	if (m_pChatLog)
+		m_pChatLog->Show(show);
 }

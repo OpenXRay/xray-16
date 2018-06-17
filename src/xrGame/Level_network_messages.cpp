@@ -366,7 +366,7 @@ void CLevel::ClientReceive()
         case M_SV_MAP_NAME: { map_data.ReceiveServerMapSync(*P);
         }
         break;
-        case M_SV_DIGEST: { SendClientDigestToServer();
+        case M_SV_DIGEST: { 
         }
         break;
         case M_CHANGE_LEVEL_GAME:
@@ -436,10 +436,7 @@ void CLevel::ClientReceive()
         break;
         case M_BULLET_CHECK_RESPOND:
         {
-            if (!game)
-                break;
-            if (GameID() != eGameIDSingle)
-                Game().m_WeaponUsageStatistic->On_Check_Respond(P);
+
         }
         break;
         case M_STATISTIC_UPDATE:

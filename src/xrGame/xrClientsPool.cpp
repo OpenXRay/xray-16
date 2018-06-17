@@ -4,7 +4,7 @@
 
 extern u32 g_sv_Client_Reconnect_Time;
 
-xrClientsPool::xrClientsPool() { m_dclients.reserve(MAX_PLAYERS_COUNT); }
+xrClientsPool::xrClientsPool() { m_dclients.reserve(32); }
 xrClientsPool::~xrClientsPool() { Clear(); }
 void xrClientsPool::Clear()
 {

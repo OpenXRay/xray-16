@@ -9,7 +9,6 @@
 #include "UIGameLog.h"
 #include "UIXmlInit.h"
 #include "UIPdaMsgListItem.h"
-#include "UIPdaKillMessage.h"
 #include "UILines.h"
 
 CUIGameLog::CUIGameLog()
@@ -42,12 +41,7 @@ CUIPdaMsgListItem* CUIGameLog::AddPdaMessage()
 
 CUIPdaKillMessage* CUIGameLog::AddLogMessage(KillMessageStruct& msg)
 {
-    CUIPdaKillMessage* pItem = new CUIPdaKillMessage();
-    pItem->SetWidth(GetDesiredChildWidth());
-    pItem->SetHeight(kill_msg_height);
-    pItem->Init(msg, m_pFont);
-    AddWindow(pItem, true);
-    return pItem;
+	return						(0);
 }
 
 void CUIGameLog::AddChatMessage(LPCSTR msg, LPCSTR author)

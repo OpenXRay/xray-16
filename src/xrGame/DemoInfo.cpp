@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include "game_sv_mp.h"
-#include "game_cl_mp.h"
 #include "Level.h"
 #include "DemoInfo.h"
 #include "xrCore/stream_reader.h"
@@ -64,29 +62,16 @@ void demo_player_info::write_to_file(IWriter* file_to_write) const
 
 void demo_player_info::load_from_player(game_PlayerState* player_state)
 {
-    m_name = player_state->getName();
-    m_frags = player_state->m_iRivalKills;
-    m_artefacts = static_cast<u16>(player_state->af_count);
-    m_deaths = player_state->m_iDeaths;
-    m_spots = m_frags - (player_state->m_iTeamKills * 2) - player_state->m_iSelfKills + (m_artefacts * 3);
-    m_rank = player_state->rank;
-
-    game_cl_mp* tmp_game = smart_cast<game_cl_mp*>(&Game());
-    R_ASSERT(tmp_game);
-    s16 tmp_team = tmp_game->ModifyTeam(player_state->team);
-    if (tmp_team < 0)
-    {
-        tmp_team = 2; // spectator
-    }
-    if ((tmp_game->Type() == eGameIDDeathmatch) && (tmp_team != 2))
-    {
-        tmp_team = 0; // in deathmatch if player is not spectator, he is in green team
-    }
-    m_team = static_cast<u8>(tmp_team);
+	m_name		= player_state->getName();
+	m_frags		= player_state->m_iRivalKills;
+	m_artefacts	= static_cast<u16>(player_state->af_count);
+	m_deaths	= player_state->m_iDeaths;
+	m_spots		= m_frags - (player_state->m_iTeamKills * 2) - player_state->m_iSelfKills + (m_artefacts * 3);
+	m_rank		= player_state->rank;
+	m_team		= 0;
 }
 
-u32 const demo_info::max_demo_info_size =
-    (demo_player_info::demo_info_max_size * MAX_PLAYERS_COUNT) + (DEMOSTRING_MAX_SIZE * 5) + sizeof(u32);
+u32 const demo_info::max_demo_info_size = (demo_player_info::demo_info_max_size * 32) +	(DEMOSTRING_MAX_SIZE * 5) + sizeof(u32);
 
 demo_info::demo_info() {}
 demo_info::~demo_info() { delete_data(m_players); }
@@ -102,9 +87,9 @@ void demo_info::read_from_file(CStreamReader* file_to_read)
 
     m_players_count = file_to_read->r_u32();
 
-    R_ASSERT(m_players_count < MAX_PLAYERS_COUNT);
-
-    delete_data(m_players);
+	R_ASSERT				(m_players_count < 32);
+	
+	delete_data				(m_players);
 
     m_players.reserve(m_players_count);
     for (u32 i = 0; i < m_players_count; ++i)
@@ -136,34 +121,14 @@ void demo_info::sort_players(sorting_less_comparator sorting_comparator)
 
 void demo_info::load_from_game()
 {
-    m_map_name = Level().name();
-    m_map_version = Level().version();
-    game_cl_mp* tmp_game = smart_cast<game_cl_mp*>(&Game());
-    R_ASSERT2(tmp_game, "client game not present");
-    m_game_type = GameTypeToString(tmp_game->Type(), true);
-    string32 tmp_score_dest;
-    m_game_score = tmp_game->GetGameScore(tmp_score_dest);
-    if (tmp_game->local_player && (xr_strlen(tmp_game->local_player->getName()) > 0))
-    {
-        m_author_name = tmp_game->local_player->getName();
-    }
-    else
-    {
-        m_author_name = "unknown";
-    }
-
-    u32 pcount = tmp_game->GetPlayersCount();
-
-    delete_data(m_players);
-    m_players.reserve(pcount);
-    for (u32 i = 0; i < pcount; ++i)
-    {
-        game_PlayerState* tmp_player = tmp_game->GetPlayerByOrderID(i);
-        R_ASSERT2(tmp_player, "player not exist");
-        demo_player_info* new_player = new demo_player_info();
-        new_player->load_from_player(tmp_player);
-        m_players.push_back(new_player);
-    }
+	m_map_name		= Level().name();
+	m_map_version	= Level().version();
+	m_game_type		= "single";
+	string32		tmp_score_dest;
+	m_game_score	= 0;
+	m_author_name	= "unknown";
+	u32	pcount		= 0;
+	delete_data			(m_players);
 }
 
 demo_player_info const* demo_info::get_player(u32 player_index) const
@@ -172,26 +137,5 @@ demo_player_info const* demo_info::get_player(u32 player_index) const
     return m_players[player_index];
 }
 
-using namespace luabind;
+#pragma optimize("s",on)
 
-SCRIPT_EXPORT(demo_player_info, (), {
-    module(luaState)[class_<demo_player_info>("demo_player_info")
-                         .def("get_name", &demo_player_info::get_name)
-                         .def("get_frags", &demo_player_info::get_frags)
-                         .def("get_deaths", &demo_player_info::get_deaths)
-                         .def("get_artefacts", &demo_player_info::get_artefacts)
-                         .def("get_spots", &demo_player_info::get_spots)
-                         .def("get_team", &demo_player_info::get_team)
-                         .def("get_rank", &demo_player_info::get_rank)];
-});
-
-SCRIPT_EXPORT(demo_info, (), {
-    module(luaState)[class_<demo_info>("demo_info")
-                         .def("get_map_name", &demo_info::get_map_name)
-                         .def("get_map_version", &demo_info::get_map_version)
-                         .def("get_game_type", &demo_info::get_game_type)
-                         .def("get_game_score", &demo_info::get_game_score)
-                         .def("get_author_name", &demo_info::get_author_name)
-                         .def("get_players_count", &demo_info::get_players_count)
-                         .def("get_player", &demo_info::get_player)];
-});

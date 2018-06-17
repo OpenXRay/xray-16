@@ -26,7 +26,6 @@ class CUISleepStatic;
 class CUIOptionsItem;
 class CUIScrollView;
 class CUIListBox;
-class CUIStatsPlayerList;
 class CUIDragDropListEx;
 class CUIComboBox;
 class CUITabButtonMP;

@@ -13,10 +13,11 @@ EGameIDs ParseStringToGameType(LPCSTR str);
 
 game_PlayerState::game_PlayerState(NET_Packet* account_info)
 {
-    skin = 0;
-    m_online_time = 0;
-    team = 0;
-    money_for_round = 0;
+	GameID				= 0;
+	skin				= 0;
+	m_online_time		= 0;
+	team				= 0;
+	money_for_round		= 0;	
 
     experience_Real = 0;
     rank = 0;
@@ -28,23 +29,7 @@ game_PlayerState::game_PlayerState(NET_Packet* account_info)
     RespawnTime = 0;
     m_bPayForSpawn = false;
 
-    clear();
-
-    if (account_info)
-    {
-        net_Import(*account_info);
-    }
-    else
-    {
-        if (GEnv.isDedicatedServer)
-        {
-            setFlag(GAME_PLAYER_FLAG_SKIP);
-        }
-        else
-        {
-            m_account.load_account();
-        }
-    }
+	clear				();
 }
 
 void game_PlayerState::clear()
@@ -85,84 +70,15 @@ void game_PlayerState::setFlag(u16 f) { flags__ |= f; }
 void game_PlayerState::resetFlag(u16 f) { flags__ &= ~(f); }
 void game_PlayerState::net_Export(NET_Packet& P, BOOL Full)
 {
-    P.w_u8(Full ? 1 : 0);
-
-    P.w_u8(team);
-    P.w_s16(m_iRivalKills);
-    P.w_s16(m_iSelfKills);
-    P.w_s16(m_iTeamKills);
-    P.w_s16(m_iDeaths);
-    P.w_s32(money_for_round);
-    P.w_u8(rank);
-    P.w_u8(af_count);
-    P.w_u16(flags__);
-    P.w_u16(ping);
-
-    P.w_u16(GameID);
-    P.w_s8(skin);
-    P.w_u8(m_bCurrentVoteAgreed);
-
-    P.w_u32(Device.dwTimeGlobal - DeathTime);
-    if (Full)
-    {
-        m_account.net_Export(P);
-    }
+   
 };
 
 void game_PlayerState::net_Import(NET_Packet& P)
 {
-    BOOL bFullUpdate = !!P.r_u8();
-
-    P.r_u8(team);
-
-    P.r_s16(m_iRivalKills);
-    P.r_s16(m_iSelfKills);
-    P.r_s16(m_iTeamKills);
-    P.r_s16(m_iDeaths);
-
-    P.r_s32(money_for_round);
-    P.r_u8(rank);
-    P.r_u8(af_count);
-    P.r_u16(flags__);
-    P.r_u16(ping);
-
-    P.r_u16(GameID);
-    P.r_s8(skin);
-    P.r_u8(m_bCurrentVoteAgreed);
-
-    DeathTime = P.r_u32();
-    if (bFullUpdate)
-    {
-        m_account.net_Import(P);
-    }
 };
 
 void game_PlayerState::skip_Import(NET_Packet& P)
 {
-    BOOL bFullUpdate = !!P.r_u8();
-
-    P.r_u8(); //	team	);
-
-    P.r_s16(); //	m_iRivalKills	);
-    P.r_s16(); //	m_iSelfKills	);
-    P.r_s16(); //	m_iTeamKills	);
-    P.r_s16(); //	m_iDeaths		);
-
-    P.r_s32(); //	money_for_round	);
-    P.r_u8(); //	rank		);
-    P.r_u8(); //	af_count	);
-    P.r_u16(); //	flags__	);
-    P.r_u16(); //	ping	);
-
-    P.r_u16(); //	GameID	);
-    P.r_s8(); //	skin	);
-    P.r_u8(); //	m_bCurrentVoteAgreed	);
-
-    P.r_u32(); // DeathTime
-    if (bFullUpdate)
-    {
-        player_account::skip_Import(P);
-    }
 }
 
 void game_PlayerState::SetGameID(u16 NewID)
@@ -190,10 +106,10 @@ game_TeamState::game_TeamState()
 
 game_GameState::game_GameState()
 {
-    m_type = EGameIDs(u32(0));
-    m_phase = GAME_PHASE_NONE;
-    m_round = -1;
-    m_round_start_time_str[0] = 0;
+	m_type						= eGameIDSingle;// EGameIDs(u32(0));
+	m_phase						= GAME_PHASE_NONE;
+	m_round						= -1;
+	m_round_start_time_str[0]	= 0;
 
     VERIFY(g_pGameLevel);
     m_qwStartProcessorTime = Level().timeServer_Async();

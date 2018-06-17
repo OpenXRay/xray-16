@@ -19,17 +19,6 @@ public:
     bool m_bAct;
 };
 
-class priority_group
-{
-public:
-    priority_group();
-    void init_group(shared_str const& game_section, shared_str const& line);
-    bool is_item_in_group(shared_str const& section_name) const;
-
-private:
-    xr_set<shared_str> m_sections;
-}; // class priority_group
-
 typedef xr_vector<CInventorySlot> TISlotArr;
 
 class CInventory
@@ -64,19 +53,13 @@ public:
 
     bool CanTakeItem(CInventoryItem* inventory_item) const;
 
-    void Activate(u16 slot, /*EActivationReason reason=eGeneral, */ bool bForce = false);
-    void ActivateDeffered();
-    PIItem GetNextActiveGrenade();
-    bool ActivateNextGrenage();
-
-    static u32 const qs_priorities_count = 5;
-    PIItem GetNextItemInActiveSlot(u8 const priority_value, bool ignore_ammo);
-    bool ActivateNextItemInActiveSlot();
-    priority_group& GetPriorityGroup(u8 const priority_value, u16 slot);
-    void InitPriorityGroupsForQSwitch();
-
-    PIItem ActiveItem() const { return (m_iActiveSlot == NO_ACTIVE_SLOT) ? NULL : ItemFromSlot(m_iActiveSlot); }
-    PIItem ItemFromSlot(u16 slot) const;
+	void					Activate			(u16 slot, /*EActivationReason reason=eGeneral, */bool bForce=false);
+	void					ActivateDeffered();
+	PIItem					GetNextActiveGrenade();
+	bool					ActivateNextGrenage();
+	
+	PIItem					ActiveItem			()const					{return (m_iActiveSlot==NO_ACTIVE_SLOT)?NULL:ItemFromSlot(m_iActiveSlot);}
+	PIItem					ItemFromSlot		(u16 slot) const;
 
     bool Action(u16 cmd, u32 flags);
     void ActiveWeapon(u16 slot);
@@ -180,17 +163,8 @@ protected:
     void SendActionEvent(u16 cmd, u32 flags);
 
 private:
-    priority_group* m_slot2_priorities[qs_priorities_count];
-    priority_group* m_slot3_priorities[qs_priorities_count];
-
-    priority_group m_groups[qs_priorities_count];
-    priority_group m_null_priority;
-    typedef xr_set<PIItem> except_next_items_t;
-    except_next_items_t m_next_items_exceptions;
-    u32 m_next_item_iteration_time;
-
-    std::vector<u8> m_blocked_slots;
-    bool IsSlotBlocked(u16 slot_id) const;
-    void TryActivatePrevSlot();
-    void TryDeactivateActiveSlot();
+	std::vector<u8> m_blocked_slots;
+	bool				IsSlotBlocked(u16 slot_id) const;
+	void				TryActivatePrevSlot		();
+	void				TryDeactivateActiveSlot	();
 };

@@ -5,6 +5,7 @@
 #include "xrserver_objects.h"
 #include "game_base.h"
 #include "game_cl_base.h"
+#include "game_sv_base.h"
 #include "ai_space.h"
 #include "alife_object_registry.h"
 #include "xrNetServer/NET_Messages.h"

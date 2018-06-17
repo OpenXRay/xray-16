@@ -8,14 +8,10 @@
 #include "ui\UIComboBox.h"
 #include "ui\UITabControl.h"
 #include "ui\UIFrameWindow.h"
-#include "ui\UILabel.h"
-#include "ui\ServerList.h"
-#include "ui\UIMapList.h"
 #include "ui\UIKeyBinding.h"
 #include "ui\UIEditBox.h"
 #include "ui\UIAnimatedStatic.h"
 #include "ui\UITrackBar.h"
-#include "ui\UICDkey.h"
 #include "ui\UIMapInfo.h"
 #include "ui\UIMMShniaga.h"
 #include "ui\UIScrollView.h"
@@ -188,21 +184,6 @@ CUITabControl* CScriptXmlInit::InitTab(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
-CServerList* CScriptXmlInit::InitServerList(LPCSTR path, CUIWindow* parent)
-{
-    CServerList* pWnd = new CServerList();
-    pWnd->InitFromXml(m_xml, path);
-    _attach_child(pWnd, parent);
-    return pWnd;
-}
-
-CUIMapList* CScriptXmlInit::InitMapList(LPCSTR path, CUIWindow* parent)
-{
-    CUIMapList* pWnd = new CUIMapList();
-    pWnd->InitFromXml(m_xml, path);
-    _attach_child(pWnd, parent);
-    return pWnd;
-}
 
 CUIMMShniaga* CScriptXmlInit::InitMMShniaga(LPCSTR path, CUIWindow* parent)
 {
@@ -212,21 +193,11 @@ CUIMMShniaga* CScriptXmlInit::InitMMShniaga(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
-CUIMapInfo* CScriptXmlInit::InitMapInfo(LPCSTR path, CUIWindow* parent)
-{
-    CUIMapInfo* pWnd = new CUIMapInfo();
-    CUIXmlInit::InitWindow(m_xml, path, 0, pWnd);
-    pWnd->InitMapInfo(pWnd->GetWndPos(), pWnd->GetWndSize());
-    _attach_child(pWnd, parent);
-    return pWnd;
-}
-
-CUIWindow* CScriptXmlInit::InitKeyBinding(LPCSTR path, CUIWindow* parent)
-{
-    CUIKeyBinding* pWnd = new CUIKeyBinding();
-    pWnd->InitFromXml(m_xml, path);
-    _attach_child(pWnd, parent);
-    return pWnd;
+CUIWindow* CScriptXmlInit::InitKeyBinding(LPCSTR path, CUIWindow* parent){
+	CUIKeyBinding* pWnd				= new CUIKeyBinding();
+	pWnd->InitFromXml				(m_xml, path);	
+	_attach_child					(pWnd, parent);
+	return							pWnd;
 }
 
 CUITrackBar* CScriptXmlInit::InitTrackBar(LPCSTR path, CUIWindow* parent)
@@ -245,23 +216,7 @@ CUIProgressBar* CScriptXmlInit::InitProgressBar(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
-CUIEditBox* CScriptXmlInit::InitCDkey(LPCSTR path, CUIWindow* parent)
-{
-    CUICDkey* pWnd = new CUICDkey();
-    CUIXmlInit::InitEditBox(m_xml, path, 0, pWnd);
-    pWnd->assign_callbacks();
-    _attach_child(pWnd, parent);
-    pWnd->SetCurrentOptValue();
-    return pWnd;
-}
 
-CUIEditBox* CScriptXmlInit::InitMPPlayerName(LPCSTR path, CUIWindow* parent)
-{
-    CUIMPPlayerName* pWnd = new CUIMPPlayerName();
-    CUIXmlInit::InitEditBox(m_xml, path, 0, pWnd);
-    _attach_child(pWnd, parent);
-    return pWnd;
-}
 
 SCRIPT_EXPORT(CScriptXmlInit, (), {
     module(luaState)[class_<CScriptXmlInit>("CScriptXmlInit")
@@ -284,12 +239,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (), {
                          .def("InitSpinText", &CScriptXmlInit::InitSpinText)
                          .def("InitComboBox", &CScriptXmlInit::InitComboBox)
                          .def("InitTab", &CScriptXmlInit::InitTab)
-                         .def("InitServerList", &CScriptXmlInit::InitServerList)
-                         .def("InitMapList", &CScriptXmlInit::InitMapList)
-                         .def("InitMapInfo", &CScriptXmlInit::InitMapInfo)
                          .def("InitTrackBar", &CScriptXmlInit::InitTrackBar)
-                         .def("InitCDkey", &CScriptXmlInit::InitCDkey)
-                         .def("InitMPPlayerName", &CScriptXmlInit::InitMPPlayerName)
                          .def("InitKeyBinding", &CScriptXmlInit::InitKeyBinding)
                          .def("InitMMShniaga", &CScriptXmlInit::InitMMShniaga)
                          .def("InitScrollView", &CScriptXmlInit::InitScrollView)

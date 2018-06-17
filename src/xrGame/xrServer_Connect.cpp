@@ -1,16 +1,10 @@
 #include "stdafx.h"
 #include "xrserver.h"
 #include "game_sv_single.h"
-#include "game_sv_deathmatch.h"
-#include "game_sv_teamdeathmatch.h"
-#include "game_sv_artefacthunt.h"
 #include "xrMessages.h"
-#include "game_cl_artefacthunt.h"
 #include "game_cl_single.h"
 #include "MainMenu.h"
 #include "xrEngine/x_ray.h"
-#include "file_transfer.h"
-#include "screenshot_server.h"
 #include "xrNetServer/NET_AuthCheck.h"
 #include "xrNetServer/NET_Messages.h"
 
@@ -56,23 +50,12 @@ xrServer::EConnect xrServer::Connect(shared_str& session_name, GameDescriptionDa
         *strchr(type, '/') = 0;
     game = NULL;
 
-    CLASS_ID clsid = game_GameState::getCLASS_ID(type, true);
-    game = smart_cast<game_sv_GameState*>(NEW_INSTANCE(clsid));
+	CLASS_ID clsid			= game_GameState::getCLASS_ID(type,true);
+	game					= smart_cast<game_sv_GameState*> (NEW_INSTANCE(clsid));
+	
+	// Options
+	if (0==game)			return ErrConnect;
 
-    // Options
-    if (0 == game)
-        return ErrConnect;
-    //	game->type				= type_id;
-    if (game->Type() != eGameIDSingle)
-    {
-        m_file_transfers = new file_transfer::server_site();
-        initialize_screenshot_proxies();
-        LoadServerInfo();
-        xr_auth_strings_t tmp_ignore;
-        xr_auth_strings_t tmp_check;
-        fill_auth_check_params(tmp_ignore, tmp_check);
-        FS.auth_generate(tmp_ignore, tmp_check);
-    }
 #ifdef DEBUG
     Msg("* Created server_game %s", game->type_name());
 #endif
@@ -125,60 +108,25 @@ void xrServer::AttachNewClient(IClient* CL)
         Server_Client_Check(CL);
     }
 
-    // gen message
-    if (!NeedToCheckClient_GameSpy_CDKey(CL))
-    {
-        //-------------------------------------------------------------
-        Check_GameSpy_CDKey_Success(CL);
-    }
-
-    // xrClientData * CL_D=(xrClientData*)(CL);
-    // ip_address				ClAddress;
-    // GetClientAddress		(CL->ID, ClAddress);
-    CL->m_guid[0] = 0;
+	RequestClientDigest(CL);
+	//xrClientData * CL_D=(xrClientData*)(CL); 
+	//ip_address				ClAddress;
+	//GetClientAddress		(CL->ID, ClAddress);
+	CL->m_guid[0]=0;
 }
 
 void xrServer::RequestClientDigest(IClient* CL)
 {
-    if (IsGameTypeSingle() || (CL == GetServerClient()))
-    {
-        Check_BuildVersion_Success(CL);
-        return;
-    }
-    xrClientData* tmp_client = smart_cast<xrClientData*>(CL);
-    VERIFY(tmp_client);
-    PerformSecretKeysSync(tmp_client);
-
-    NET_Packet P;
-    P.w_begin(M_SV_DIGEST);
-    SendTo(CL->ID, P);
+	Check_BuildVersion_Success(CL);	
+	return;
 }
-#define NET_BANNED_STR "Player banned by server!"
+
 void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
 {
-    R_ASSERT(xrCL);
-    IClient* tmp_client = static_cast<IClient*>(xrCL);
-    game_sv_mp* server_game = smart_cast<game_sv_mp*>(game);
-    P->r_stringZ(xrCL->m_cdkey_digest);
-    shared_str admin_name;
-    if (server_game->IsPlayerBanned(xrCL->m_cdkey_digest.c_str(), admin_name))
-    {
-        R_ASSERT2(tmp_client != GetServerClient(), "can't disconnect server client");
-        Msg("--- Client [%s] tried to connect - rejecting connection (he is banned by %s) ...",
-            tmp_client->m_cAddress.to_string().c_str(), admin_name.size() ? admin_name.c_str() : "Server");
-        LPSTR message_to_user;
-        if (admin_name.size())
-        {
-            STRCONCAT(message_to_user, "mp_you_have_been_banned_by ", admin_name.c_str());
-        }
-        else
-        {
-            STRCONCAT(message_to_user, "");
-        }
-        SendConnectResult(tmp_client, 0, ecr_have_been_banned, message_to_user);
-        return;
-    }
-    GetPooledState(xrCL);
-    PerformSecretKeysSync(xrCL);
-    Check_BuildVersion_Success(tmp_client);
+	R_ASSERT(xrCL);
+	IClient* tmp_client = static_cast<IClient*>(xrCL);
+	P->r_stringZ(xrCL->m_cdkey_digest);
+	GetPooledState				(xrCL);
+	PerformSecretKeysSync		(xrCL);
+	Check_BuildVersion_Success	(tmp_client);	
 }

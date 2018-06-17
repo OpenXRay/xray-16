@@ -20,7 +20,7 @@
 #include "clsid_game.h"
 #include "static_cast_checked.hpp"
 #include "player_hud.h"
-#include "xrNetServer/NET_Messages.h"
+#include "Grenade.h"
 
 using namespace InventoryUtilities;
 
@@ -88,13 +88,9 @@ CInventory::CInventory()
     m_bSlotsUseful = true;
     m_bBeltUseful = false;
 
-    m_fTotalWeight = -1.f;
-    m_dwModifyFrame = 0;
-    m_drop_last_frame = false;
-
-    InitPriorityGroupsForQSwitch();
-    m_next_item_iteration_time = 0;
-    m_change_after_deactivate = false;
+	m_fTotalWeight								= -1.f;
+	m_dwModifyFrame								= 0;
+	m_drop_last_frame							= false;
 }
 
 CInventory::~CInventory() {}
@@ -770,11 +766,7 @@ void CInventory::ActiveWeapon(u16 slot)
     // weapon is in active slot
     if (GetActiveSlot() == slot && ActiveItem())
     {
-        if (IsGameTypeSingle())
-            Activate(NO_ACTIVE_SLOT);
-        else
-            ActivateNextItemInActiveSlot();
-
+        Activate(NO_ACTIVE_SLOT);
         return;
     }
     Activate(slot);
@@ -1537,4 +1529,97 @@ bool CInventory::IsSlotBlocked(PIItem const iitem) const
 {
     VERIFY(iitem);
     return IsSlotBlocked(iitem->BaseSlot());
+}
+
+void CInventory::ActivateDeffered()
+{
+	m_change_after_deactivate = true;
+	Activate(NO_ACTIVE_SLOT);
+}
+
+PIItem CInventory::GetNextActiveGrenade()
+{
+	// (c) NanoBot
+	xr_vector<shared_str> types_sect_grn;        // текущий список секций гранат
+	// Находим список секций гранат разных типов в активе
+	// в m_belt или m_ruck нет гранаты которую актор держит в руках, т.е. this
+	types_sect_grn.push_back(ActiveItem()->cast_game_object()->cNameSect());
+	int count_types = 1;    // текущие количество типов гранат в активе
+	TIItemContainer::iterator it = m_ruck.begin();
+	TIItemContainer::iterator it_e = m_ruck.end();
+	for (; it != it_e; ++it)
+	{
+		CGrenade *pGrenade = smart_cast<CGrenade*>(*it);
+		if (pGrenade)
+		{
+			// составляем список типов гранат (с) НаноБот
+			xr_vector<shared_str>::const_iterator I = types_sect_grn.begin();
+			xr_vector<shared_str>::const_iterator E = types_sect_grn.end();
+			bool new_type = true;
+			for (; I != E; ++I)
+			{
+				if (!xr_strcmp(pGrenade->cNameSect(), *I)) // если совпадают
+					new_type = false;
+			}
+			if (new_type)    // новый тип гранаты?, добавляем
+			{
+				types_sect_grn.push_back(pGrenade->cNameSect());
+				count_types++;
+			}
+		}
+	}
+	// Если типов больше 1 то, сортируем список по алфавиту
+	// и находим номер текущей гранаты в списке.
+	if (count_types > 1)
+	{
+		int curr_num = 0;        // номер типа текущей гранаты
+		std::sort(types_sect_grn.begin(), types_sect_grn.end());
+		xr_vector<shared_str>::const_iterator I = types_sect_grn.begin();
+		xr_vector<shared_str>::const_iterator E = types_sect_grn.end();
+		for (; I != E; ++I)
+		{
+			if (!xr_strcmp(ActiveItem()->cast_game_object()->cNameSect(), *I)) // если совпадают
+				break;
+			curr_num++;
+		}
+		int next_num = curr_num + 1;    // номер секции следующей гранаты
+		if (next_num >= count_types)
+			next_num = 0;
+
+		shared_str sect_next_grn = types_sect_grn[next_num];    // секция следущей гранаты
+		// Ищем в активе гранату с секцией следущего типа
+		it = m_ruck.begin();
+		it_e = m_ruck.end();
+		for (; it != it_e; ++it)
+		{
+			CGrenade *pGrenade = smart_cast<CGrenade*>(*it);
+			if (pGrenade && !xr_strcmp(pGrenade->cNameSect(), sect_next_grn))
+				return *it;
+		}
+	}
+
+	return nullptr;
+}
+
+bool CInventory::ActivateNextGrenage()
+{
+	if (m_iActiveSlot == NO_ACTIVE_SLOT)
+		return false;
+
+	IGameObject* pActor_owner = smart_cast<IGameObject*>(m_pOwner);
+	if (Level().CurrentViewEntity() != pActor_owner)
+		return false;
+
+	PIItem new_item = GetNextActiveGrenade();
+	if (!new_item)
+		return false;
+
+	PIItem current_item = ActiveItem();
+	if (current_item)
+	{
+		m_change_after_deactivate = false;
+		Ruck(current_item);
+		Slot(new_item->BaseSlot(), new_item);
+	}
+	return true;
 }

@@ -9,7 +9,6 @@
 #include "UIProgressBar.h"
 #include "UIProgressShape.h"
 #include "UITabControl.h"
-#include "UILabel.h"
 #include "UIAnimatedStatic.h"
 #include "uixmlinit.h"
 #include "UIListBox.h"
