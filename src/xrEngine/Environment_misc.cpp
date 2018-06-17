@@ -218,9 +218,7 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     m_fSunShaftsIntensity = 0;
     m_fWaterIntensity = 1;
 
-#ifdef TREE_WIND_EFFECT
     m_fTreeAmplitudeIntensity = 0.01;
-#endif
 
     lens_flare_id = "";
     tb_id = "";
@@ -299,10 +297,8 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
     if (config.line_exist(m_identifier.c_str(), "water_intensity"))
         m_fWaterIntensity = config.r_float(m_identifier.c_str(), "water_intensity");
 
-#ifdef TREE_WIND_EFFECT
     if (config.line_exist(m_identifier.c_str(), "tree_amplitude_intensity"))
         m_fTreeAmplitudeIntensity = config.r_float(m_identifier.c_str(), "tree_amplitude_intensity");
-#endif
 
     C_CHECK(clouds_color);
     C_CHECK(sky_color);
@@ -445,9 +441,7 @@ void CEnvDescriptorMixer::lerp(
     m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
     m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
 
-#ifdef TREE_WIND_EFFECT
     m_fTreeAmplitudeIntensity = fi * A.m_fTreeAmplitudeIntensity + f * B.m_fTreeAmplitudeIntensity;
-#endif
 
     // colors
     //. sky_color.lerp (A.sky_color,B.sky_color,f).add(Mdf.sky_color).mul(modif_power);
