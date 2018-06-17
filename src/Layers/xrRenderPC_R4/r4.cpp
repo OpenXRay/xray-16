@@ -139,7 +139,7 @@ void CRender::create()
     m_MSAASample = -1;
 
     // hardware
-    o.smapsize = 2048;
+    o.smapsize = ps_r2_smapsize;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
@@ -278,6 +278,8 @@ void CRender::create()
         Msg("* NV-DBT supported and used");
 
     // options (smap-pool-size)
+    if (strstr(Core.Params, "-smap1024"))
+        o.smapsize = 1024;
     if (strstr(Core.Params, "-smap1536"))
         o.smapsize = 1536;
     if (strstr(Core.Params, "-smap2048"))
@@ -288,6 +290,8 @@ void CRender::create()
         o.smapsize = 3072;
     if (strstr(Core.Params, "-smap4096"))
         o.smapsize = 4096;
+    if (strstr(Core.Params, "-smap8192"))
+        o.smapsize = 8192;
 
     // gloss
     char* g = strstr(Core.Params, "-gloss ");
@@ -968,7 +972,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
-        VERIFY(xr_strlen(c_smapsize) == 4);
+        VERIFY(xr_strlen(c_smapsize) == 4 || atoi(c_smapsize) < 16384);
         xr_strcat(sh_name, c_smapsize);
         len += 4;
     }
