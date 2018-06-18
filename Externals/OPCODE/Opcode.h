@@ -58,7 +58,7 @@ using namespace IceCore;
 #endif
 
 #ifndef __ICEMATHS_H__
-#include <Math.h>
+#include <math.h>
 #define ICEMATHS_API OPCODE_API
 namespace IceMaths
 {

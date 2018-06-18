@@ -32,7 +32,11 @@ protected:
 #ifdef _EDITOR
     virtual ~iphysics_scripted_class() {}
 #else
+#if defined(WINDOWS)
     virtual ~iphysics_scripted_class() = 0 {}
+#elif defined(LINUX)
+    virtual ~iphysics_scripted_class() = 0;
+#endif
 #endif
 };
 

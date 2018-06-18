@@ -1,6 +1,14 @@
 #ifndef STRING_CONCATENATIONS_H
 #define STRING_CONCATENATIONS_H
 
+#if defined(LINUX)
+#define EXCEPTION_STACK_OVERFLOW	((DWORD) 0xC00000FD)
+#define EXCEPTION_EXECUTE_HANDLER	1
+#define EXCEPTION_CONTINUE_SEARCH	0
+
+int _cdecl _resetstkoflw(void);
+#endif
+
 #if 1//ndef _EDITOR
 
 pstr XRCORE_API strconcat(int dest_sz, pstr dest, pcstr S1, pcstr S2);

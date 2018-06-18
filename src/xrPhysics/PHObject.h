@@ -1,7 +1,7 @@
 #pragma once
 #ifndef CPHOBJECT
 #define CPHOBJECT
-#include "xrCDB/ispatial.h"
+#include "xrCDB/ISpatial.h"
 #include "PHItemList.h"
 #include "PHIsland.h"
 typedef u32 CLClassBits;

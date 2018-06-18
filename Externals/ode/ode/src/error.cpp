@@ -81,6 +81,7 @@ static void printMessage (int num, const char *msg1, const char *msg2,
 // unix
 
 #ifndef WIN32
+#include <stdlib.h>
 
 extern "C" void dError (int num, const char *msg, ...)
 {

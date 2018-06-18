@@ -1,5 +1,5 @@
 #pragma once
-#include "xrScriptEngine/xrScriptEngine.hpp"
+#include "xrScriptEngine.hpp"
 
 struct lua_State;
 

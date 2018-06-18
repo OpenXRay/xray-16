@@ -18,6 +18,10 @@ public:
     virtual bool GetAndResetInitiated() = 0;
 
 protected:
+#if defined(WINDOWS)
     virtual ~ICollisionDamageInfo() = 0 {}
+#elif defined(LINUX)
+    virtual ~ICollisionDamageInfo() = 0;
+#endif
 };
 #endif

@@ -5,10 +5,12 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 #include "SoundRender_Emitter.h"
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <eax/eax.h>
 #pragma warning(pop)
+#endif
 
 int psSoundTargets = 32;
 Flags32 psSoundFlags = {ss_Hardware | ss_EAX};
@@ -473,7 +475,7 @@ void CSoundRender_Core::env_apply()
 }
 
 void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) {}
-
+#if defined(WINDOWS)
 void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
 {
     VERIFY(bEAX);
@@ -538,13 +540,16 @@ void CSoundRender_Core::i_eax_listener_get(CSound_environment* _E)
     E->EnvironmentDiffusion = (float)ep.flEnvironmentDiffusion;
     E->AirAbsorptionHF = (float)ep.flAirAbsorptionHF;
 }
+#endif
 
+#if defined(WINDOWS)
 void CSoundRender_Core::i_eax_commit_setting()
 {
     // commit eax
     if (bDeferredEAX)
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_COMMITDEFERREDSETTINGS, nullptr, 0);
 }
+#endif
 
 void CSoundRender_Core::object_relcase(IGameObject* obj)
 {
@@ -600,6 +605,7 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
     {
         CSoundRender_Environment* SE = static_cast<CSoundRender_Environment*>(src_env);
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
+#if defined(WINDOWS)
         // set environment
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
             DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &SE->EnvironmentSize,
@@ -610,6 +616,7 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
             DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &DE->EnvironmentSize,
             sizeof(DE->EnvironmentSize));
         i_eax_listener_get(DE);
+#endif
     }
 }
 void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
@@ -617,9 +624,11 @@ void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
     if (bEAX)
     {
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
+#if defined(WINDOWS)
         // set environment
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
             DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &id, sizeof(id));
         i_eax_listener_get(DE);
+#endif
     }
 }

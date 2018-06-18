@@ -1,9 +1,14 @@
 #pragma once
-#include "physicsexternalcommon.h"
+#include "PhysicsExternalCommon.h"
 class IPHStaticGeomShell
 {
 protected:
+#if defined(WINDOWS)
     virtual ~IPHStaticGeomShell() = 0 {}
+#elif defined(LINUX)
+    virtual ~IPHStaticGeomShell() = 0;
+#endif
+    
     //	virtual void						set_ObjectContactCallback	(ObjectContactCallbackFun* callback);
 };
 

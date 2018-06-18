@@ -1,7 +1,13 @@
 #include "stdafx.h"
 #include "resource.h"
+#if defined(WINDOWS)
 #include "StickyKeyFilter.hpp"
-
+#elif defined(LINUX)
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <getopt.h>
+#endif
 #include "xrEngine/main.h"
 #include "xrEngine/splash.h"
 
@@ -21,10 +27,11 @@ int entry_point(pcstr commandLine)
         GEnv.isDedicatedServer = true;
 
     xrDebug::Initialize(GEnv.isDedicatedServer);
-
+#ifdef WINDOWS
     StickyKeyFilter filter;
     if (!GEnv.isDedicatedServer)
         filter.initialize();
+#endif
 
     pcstr fsltx = "-fsltx ";
     string_path fsgame = "";
@@ -42,6 +49,7 @@ int entry_point(pcstr commandLine)
     return result;
 }
 
+#if defined(WINDOWS)
 int StackoverflowFilter(const int exceptionCode)
 {
     if (exceptionCode == EXCEPTION_STACK_OVERFLOW)
@@ -64,3 +72,40 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
     }
     return result;
 }
+#elif defined(LINUX)
+int main(int argc, char *argv[])
+{
+    int result = EXIT_FAILURE;
+
+    try
+    {
+        char* commandLine = NULL;
+        int i;
+        if(argc > 1)
+        {
+            size_t sum = 0;
+            for(i = 1; i < argc; ++i)
+                sum += strlen(argv[i]) + 1;
+
+            commandLine = malloc(sum);
+            memset(commandLine, 0, sum);
+
+            for(i = 1; i < argc; ++i)
+            {
+                strcat(commandLine, argv[i]);
+                strcat(commandLine, " ");
+            }
+        }
+
+        result = entry_point(commandLine);
+
+        free(commandLine);
+    }
+    catch (...)
+    {
+        _resetstkoflw();
+        FATAL("stack overflow");
+    }
+    return result;
+}
+#endif

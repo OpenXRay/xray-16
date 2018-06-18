@@ -3,8 +3,8 @@
 #include "SpaceUtils.h"
 
 #include "IPhysicsShellHolder.h"
-#include "phcharacter.h"
-#include "iclimableobject.h"
+#include "PHCharacter.h"
+#include "IClimableObject.h"
 
 #include "Include/xrRender/Kinematics.h"
 #include "PHCollideValidator.h"

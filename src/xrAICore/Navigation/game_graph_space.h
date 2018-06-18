@@ -10,7 +10,7 @@
 
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "xrCore/FixedVector.h"
-#include "Common/LevelStructure.hpp"
+#include "Common/GUID.hpp"
 
 namespace GameGraph
 {

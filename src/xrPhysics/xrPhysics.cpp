@@ -13,6 +13,7 @@ static void* ode_alloc(size_t size) { return xr_malloc(size); }
 static void* ode_realloc(void* ptr, size_t oldsize, size_t newsize) { return xr_realloc(ptr, newsize); }
 static void ode_free(void* ptr, size_t size) { return xr_free(ptr); }
 
+#if defined(WINDOWS)
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     lpReserved;
@@ -29,6 +30,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     }
     return TRUE;
 }
+#endif //WINDOWS
 
 #ifdef _MANAGED
 #pragma managed(pop)

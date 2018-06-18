@@ -106,16 +106,17 @@ typedef unsigned int UINT;
 typedef int INT;
 typedef long LONG;
 typedef unsigned long ULONG;
-typedef unsigned long& ULONG_PTR;
-typedef long long int LARGE_INTEGER;
-typedef unsigned long long int ULARGE_INTEGER;
+typedef unsigned long ULONG_PTR, *PULONG_PTR;
+//typedef unsigned long& ULONG_PTR;
+//typedef long long int LARGE_INTEGER;
+//typedef unsigned long long int ULARGE_INTEGER;
 
 typedef unsigned short WORD;
 typedef unsigned short* LPWORD;
 typedef unsigned long DWORD;
 typedef unsigned long* LPDWORD;
 typedef const void *LPCVOID;
-typedef long long int *PLARGE_INTEGER;
+//typedef long long int *PLARGE_INTEGER;
 
 typedef wchar_t WCHAR;
 
@@ -130,6 +131,28 @@ typedef struct {
     WORD  wBitsPerSample;
     WORD  cbSize;
 } WAVEFORMATEX, *LPWAVEFORMATEX;
+
+typedef struct tagSTICKYKEYS
+{
+    DWORD   cbSize;
+    DWORD   dwFlags;
+} STICKYKEYS, *LPSTICKYKEYS;
+
+typedef struct tagFILTERKEYS
+{
+    UINT   cbSize;
+    DWORD  dwFlags;
+    DWORD  iWaitMSec;
+    DWORD  iDelayMSec;
+    DWORD  iRepeatMSec;
+    DWORD  iBounceMSec;
+} FILTERKEYS, *LPFILTERKEYS;
+
+typedef struct tagTOGGLEKEYS
+{
+    DWORD   cbSize;
+    DWORD   dwFlags;
+} TOGGLEKEYS, *LPTOGGLEKEYS;
 
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
@@ -196,8 +219,8 @@ typedef dirent DirEntryType;
 #define strcmpi stricmp
 #define lstrcpy strcpy
 #define stricmp strcasecmp
-#define strncpy_s(dest, size, source, num) strncpy(dest, source, num)
-#define strcpy_s(dest, num, source) strcpy(dest, source)
+#define strncpy_s(dest, size, source, num) (NULL == strncpy(dest, source, num))
+#define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
 #define _vsnprintf vsnprintf
 #define _alloca alloca
 #define _snprintf snprintf
@@ -241,7 +264,7 @@ inline int _filelength(int fd)
 #define __max(a, b) std::max(a, b)
 #define __min(a, b) std::min(a, b)
 
-#define xr_itoa SDL_itoa
+#define itoa SDL_itoa
 
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)

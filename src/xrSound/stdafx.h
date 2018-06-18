@@ -4,6 +4,7 @@
 #include "xrCore/xrCore.h"
 #include "xrCore/_std_extensions.h"
 
+#if defined(WINDOWS)
 // mmsystem.h
 #define MMNOSOUND
 #define MMNOMIDI
@@ -19,12 +20,13 @@
 #define NONEWIC
 #define NOBITMAP
 #include <mmreg.h>
+#endif
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
 #include "xrCDB/xrCDB.h"
-#include "Sound.h"
+#include "sound.h"
 
 #include "xrCore/xr_resource.h"
 

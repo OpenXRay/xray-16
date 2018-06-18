@@ -5,7 +5,17 @@
 #if defined(WINDOWS)
 #include <intrin.h> // __rdtsc
 #include <process.h>
+
+#if defined(_MSC_VER)
 #include <powerbase.h>
+#elif defined(__GNUC__)
+#include <float.h> // _controlfp
+//#include_next <float.h>
+//how to include mingw32\i686-w64-mingw32\include\float.h
+//instead of mingw32\lib\gcc\i686-w64-mingw32\7.3.0\include\float.h
+//?
+#endif
+
 #elif defined(LINUX)
 #include <x86intrin.h> // __rdtsc
 #include <fpu_control.h>

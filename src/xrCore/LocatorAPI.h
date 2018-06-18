@@ -1,11 +1,12 @@
 #pragma once
 
+#ifdef(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
 #include <io.h>
-#endif
 #pragma warning(pop)
+#endif
+
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
 //#include "xrCore/Threading/Lock.hpp"
@@ -123,7 +124,7 @@ private:
     using files_set = xr_set<file, file_pred>;
     using files_it = files_set::iterator;
 
-    using FFVec = xr_vector<_finddata64i32_t>;
+    using FFVec = xr_vector<_finddata_t>;
     FFVec rec_files;
 
     int m_iLockRescan;

@@ -1,7 +1,11 @@
 #ifndef __XR_STREAM_SOUND_H__
 #define __XR_STREAM_SOUND_H__
 
+#ifdef WINDOWS
 #include <msacm.h>
+#elif defined(LINUX)
+#define DSBSTATUS_PLAYING           0x00000001
+#endif
 
 // refs
 class ENGINE_API IReader;
@@ -39,11 +43,13 @@ private:
     u32 dwStatus;
     BOOL isPause;
 
+#if defined(WINDOWS)
     IDirectSoundBuffer* pBuffer;
 
     // ADPCM
     HACMSTREAM hAcmStream;
     ACMSTREAMHEADER stream;
+#endif
     WAVEFORMATEX* pwfx;
     WAVEFORMATEX* psrc;
     u32 dwFMT_Size;

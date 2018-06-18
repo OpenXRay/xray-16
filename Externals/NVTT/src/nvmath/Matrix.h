@@ -518,7 +518,7 @@ inline Matrix mul(Matrix::Arg a, Matrix::Arg b)
 		v1.Normalize();
 
 		Matrix R = Matrix::Identity;
-		R[0, 0] = v3.X; // Not sure this is in the correct order...
+		R[0, 0] = v3.X; // Not sure this is in the correct order...
 		R[1, 0] = v3.Y;
 		R[2, 0] = v3.Z;
 		R[0, 1] = v1.X;

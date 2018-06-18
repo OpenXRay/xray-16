@@ -19,7 +19,7 @@ class CPathManager<CLevelGraph, _DataStorage, SBaseParameters<_dist_type, _index
 protected:
     typedef CLevelGraph _Graph;
     typedef SBaseParameters<_dist_type, _index_type, _iteration_type> _Parameters;
-    typedef typename CPathManagerGeneric<_Graph, _DataStorage, _Parameters, _dist_type, _index_type, _iteration_type>
+    typedef CPathManagerGeneric<_Graph, _DataStorage, _Parameters, _dist_type, _index_type, _iteration_type>
         inherited;
 
 protected:

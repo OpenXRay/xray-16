@@ -87,17 +87,29 @@ IC bool _valid(const float x) noexcept
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
-#if defined(WINDOWS)
+#if defined(WINDOWS) && defined(_MSC_VER)
     int cls = _fpclass(double(x));
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
-#endif
+#else
+    int cls = std::fpclassify((double )x);
+    switch (cls)
+    {
+    case FP_NAN:
+    case FP_INFINITE:
+    case FP_SUBNORMAL:
+        return false;
+    default:
+        break;
+    }
+
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
     _FPCLASS_NZ Negative zero ( – 0)
     _FPCLASS_PZ Positive 0 (+0)
     _FPCLASS_PN Positive normalized non-zero
     */
+#endif
     return true;
 }
 
@@ -106,17 +118,28 @@ IC bool _valid(const double x)
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
-#if defined(WINDOWS)
+#if defined(WINDOWS) && defined(_MSC_VER)
     int cls = _fpclass(x);
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
-#endif
+#else
+    int cls = std::fpclassify((double )x);
+    switch (cls)
+    {
+    case FP_NAN:
+    case FP_INFINITE:
+    case FP_SUBNORMAL:
+        return false;
+    default:
+        break;
+    }
     /* *****other cases are*****
     _FPCLASS_NN Negative normalized non-zero
     _FPCLASS_NZ Negative zero ( – 0)
     _FPCLASS_PZ Positive 0 (+0)
     _FPCLASS_PN Positive normalized non-zero
     */
+#endif
     return true;
 }
 

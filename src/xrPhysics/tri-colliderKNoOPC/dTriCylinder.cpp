@@ -3,7 +3,7 @@
 #include "xrPhysics/dCylinder/dCylinder.h"
 #include "dTriCylinder.h"
 #include "xrPhysics/MathUtils.h"
-#include "dcTrilistCollider.h"
+#include "dcTriListCollider.h"
 #include "xrPhysics/PHWorld.h"
 #include "xrCDB/xr_area.h"
 
