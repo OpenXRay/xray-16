@@ -213,20 +213,20 @@ walk_power              = 0.00002  ;0.000012                                ;уме
 walk_weight_power       = 0.0002   ;0.0001;                        ;умешьшение силы за секнду во время ходьбы с учетом веса ноши, для максимального допустимого веса
 overweight_walk_k       = 5			;9        ;10                                ;коэффициент влияние перегрузки ноши (умножается на walk_weight_power)
 accel_k                 = 3			;5                                        ;коэффициент на бег (умножается walk_power, walk_weight_power)
-sprint_k                = 100 ;75        ;коэффициент на "sprint" бег (умножается walk_power, walk_weight_power)
+sprint_k                = 50 ;75        ;коэффициент на "sprint" бег (умножается walk_power, walk_weight_power)
 
 ; хромота
 limping_health_begin =        0.1                ;порог здоровья меньше которого актер начинает хромать
 limping_health_end   =        0.2                ;порог здоровья больше которого актер перестает хромать
-limping_power_begin  =        0.1                ;порог силы меньше которого актер начинает хромать
-limping_power_end         =        0.2                ;порог силы больше которого актер перестает хромать
+limping_power_begin  =        0.05                ;порог силы меньше которого актер начинает хромать
+limping_power_end         =        0.1                ;порог силы больше которого актер перестает хромать
 use_limping_state         = on
 
-cant_walk_power_begin =        0.01        ;порог силы меньше которого актер не может двигаться
-cant_walk_power_end   =        0.10        ;порог силы больше которого актер сможет двигаться
+cant_walk_power_begin =        0.001        ;порог силы меньше которого актер не может двигаться
+cant_walk_power_end   =        0.05        ;порог силы больше которого актер сможет двигаться
 
-cant_sprint_power_begin =        0.10        ;порог силы меньше которого актер не может бежать в спринте
-cant_sprint_power_end   =        0.30        ;порог силы больше которого актер сможет бежать в спринте
+cant_sprint_power_begin =        0.05        ;порог силы меньше которого актер не может бежать в спринте
+cant_sprint_power_end   =        0.10        ;порог силы больше которого актер сможет бежать в спринте
 
 can_sleep_callback                        = dream.can_sleep_callback
 sleep_video_name_callback        = dream.sleep_video_name_callback
