@@ -182,8 +182,9 @@ protected:
 	//и скорость потери крови из раны
 public:
 	using WOUND_VECTOR = xr_vector<CWound*>;
-	WOUND_VECTOR			m_WoundVector;
 protected:
+	WOUND_VECTOR			m_WoundVector;
+
 	//очистка массива ран
 	
 

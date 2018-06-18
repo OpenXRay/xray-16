@@ -29,7 +29,7 @@ void IConsole_Command::InvalidSyntax()
     g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
     g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
 }
-
+float view_port_near_koef = 0.5f;
 //-----------------------------------------------------------------------
 
 void IConsole_Command::add_to_LRU(shared_str const& arg)
@@ -660,14 +660,8 @@ void CCC_Register()
 #endif // DEBUG
 
 #ifdef DEBUG
-    CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);
-
     CMD1(CCC_DbgStrCheck, "dbg_str_check");
     CMD1(CCC_DbgStrDump, "dbg_str_dump");
-
-    CMD3(CCC_Mask, "mt_sound", &psDeviceFlags, mtSound);
-    CMD3(CCC_Mask, "mt_physics", &psDeviceFlags, mtPhysics);
-    CMD3(CCC_Mask, "mt_network", &psDeviceFlags, mtNetwork);
 
     // Events
     CMD1(CCC_E_Dump, "e_list");
@@ -684,6 +678,10 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
     CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
 #endif
+	CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);
+	CMD3(CCC_Mask, "mt_sound", &psDeviceFlags, mtSound);
+	CMD3(CCC_Mask, "mt_physics", &psDeviceFlags, mtPhysics);
+	CMD3(CCC_Mask, "mt_network", &psDeviceFlags, mtNetwork);
 
     // Render device states
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
@@ -702,6 +700,7 @@ void CCC_Register()
 // CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128 );
 #endif // DEBUG
 
+	CMD4(CCC_Float, "rs_near_plane", &view_port_near_koef, 0.01, 5.0);
     CMD2(CCC_Gamma, "rs_c_gamma", &ps_gamma);
     CMD2(CCC_Gamma, "rs_c_brightness", &ps_brightness);
     CMD2(CCC_Gamma, "rs_c_contrast", &ps_contrast);
@@ -771,13 +770,6 @@ void CCC_Register()
 #endif
 
     CMD1(CCC_ExclusiveMode, "input_exclusive_mode");
-
-    extern int g_svTextConsoleUpdateRate;
-    CMD4(CCC_Integer, "sv_console_update_rate", &g_svTextConsoleUpdateRate, 1, 100);
-
-    extern int g_svDedicateServerUpdateReate;
-    CMD4(CCC_Integer, "sv_dedicated_server_update_rate", &g_svDedicateServerUpdateReate, 1, 1000);
-
     CMD1(CCC_HideConsole, "hide");
 
 #ifdef DEBUG

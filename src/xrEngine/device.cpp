@@ -215,7 +215,6 @@ void CRenderDevice::CalcFrameStats()
     stats.RenderTotal.FrameStart();
 }
 
-int g_svDedicateServerUpdateReate = 100;
 
 ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
@@ -310,11 +309,7 @@ void CRenderDevice::on_idle()
     
     if (GEnv.isDedicatedServer)
     {
-        const auto FrameEndTime = TimerGlobal.GetElapsed_ms();
-        const auto FrameTime = (FrameEndTime - frameStartTime);
-        const auto DSUpdateDelta = 1000 / g_svDedicateServerUpdateReate;
-        if (FrameTime < DSUpdateDelta)
-            Sleep(DSUpdateDelta - FrameTime);
+        FATAL("Я думал код здесь можно спокойно удалить @Debrovski");
     }
     
     if (!b_is_Active)
