@@ -44,13 +44,13 @@ public:
     void Start()
     {
         if (paused) return;
-        startTime = Clock::now() - pauseAccum;
+        startTime = Now() - pauseAccum;
     }
 
-    Duration getElapsedTime() const
+    virtual Duration getElapsedTime() const
     {
         if (paused) return pauseDuration;
-        return Clock::now() - startTime - pauseAccum;
+        return Now() - startTime - pauseAccum;
     }
 
     u64 GetElapsed_ms() const
@@ -62,9 +62,10 @@ public:
     float GetElapsed_sec() const
     {
         using namespace std::chrono;
-        const auto nanos = duration_cast<nanoseconds>(getElapsedTime()).count();
-        return float(nanos) / 1000000000.0;
+        return duration_cast<duration<float>>(getElapsedTime()).count();
     }
+
+    Time Now() const { return Clock::now(); }
 
     void Dump() const { Msg("* Elapsed time (sec): %f", GetElapsed_sec()); }
 };
@@ -77,23 +78,24 @@ class XRCORE_API CTimer : public CTimerBase
     Duration realTime;
     Duration time;
 
-    Duration getElapsedTime(const Duration current) const
+    inline Duration getElapsedTime(const Duration& current) const
     {
         const auto delta = current - realTime;
-        const auto deltaD = double(delta.count());
-        const auto time_factor_d = double(time_factor());
-        const double time = deltaD * time_factor_d + .5;
+        const double deltaD = double(delta.count());
+        const double time = deltaD * m_time_factor + .5;
         const auto result = u64(time);
-        return Duration(result);
+        return Duration(this->time.count() + result);
     }
 
 public:
-    constexpr CTimer() noexcept : m_time_factor(1.f), realTime(), time() {}
+    constexpr CTimer() noexcept : m_time_factor(1.f), realTime(0), time(0) {}
 
     void Start() noexcept
     {
         if (paused) return;
 
+        realTime = std::chrono::nanoseconds(0);
+        time = std::chrono::nanoseconds(0);
         super::Start();
     }
 
@@ -101,15 +103,15 @@ public:
 
     void time_factor(const float time_factor) noexcept
     {
-        const auto current = super::getElapsedTime();
+        const Duration current = super::getElapsedTime();
         time = getElapsedTime(current);
         realTime = current;
         m_time_factor = time_factor;
     }
 
-    Duration getElapsedTime() const
+    virtual Duration getElapsedTime() const
     {
-        return super::getElapsedTime();
+        return getElapsedTime(super::getElapsedTime());
     }
 };
 
@@ -126,7 +128,7 @@ public:
     {
         if (paused == b) return;
 
-        const auto current = Clock::now();
+        const auto current = Now();
         if (b)
         {
             save_clock = current;
@@ -188,8 +190,7 @@ public:
     float GetElapsed_sec() const
     {
         using namespace std::chrono;
-        const auto nanos = duration_cast<nanoseconds>(getElapsedTime()).count();
-        return float(nanos) / 1000000000.0;
+        return duration_cast<duration<float>>(getElapsedTime()).count();
     }
 };
 
