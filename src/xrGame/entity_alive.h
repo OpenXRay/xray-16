@@ -92,8 +92,7 @@ public:
     virtual void set_collision_hit_callback(ICollisionHitCallback* cc);
 
 protected:
-    using WOUND_VECTOR = xr_vector<CWound*>;
-    WOUND_VECTOR m_ParticleWounds;
+
 
     virtual void StartFireParticles(CWound* pWound);
     virtual void UpdateFireParticles();
@@ -114,7 +113,6 @@ protected:
 public:
     static void UnloadBloodyWallmarks();
 
-    void ClearBloodWounds() { m_BloodWounds.clear(); };
 protected:
     virtual void PlaceBloodWallmark(const Fvector& dir, const Fvector& start_pos, float trace_dist, float wallmark_size,
         IWallMarkArray* pwallmarks_vector);
@@ -129,7 +127,7 @@ protected:
     //текстурки капель крови
     static FactoryPtr<IWallMarkArray>* m_pBloodDropsVector;
     //список ран с которых капает кровь
-
+    using WOUND_VECTOR = xr_vector<CWound*>;
     WOUND_VECTOR m_BloodWounds;
     //размер раны, чтоб начала капать кровь
     static float m_fStartBloodWoundSize;
@@ -137,9 +135,9 @@ protected:
     static float m_fStopBloodWoundSize;
     static float m_fBloodDropSize;
 
-    //обновление ран, и рисование отметок от капающей крови
-    virtual void StartBloodDrops(CWound* pWound);
-    virtual void UpdateBloodDrops();
+	//обновление ран, и рисование отметок от капающей крови
+	virtual void				UpdateBloodDrops		();
+
 
     //отношения между существами и персонажами в зоне
 public:

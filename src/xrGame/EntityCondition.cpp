@@ -113,6 +113,8 @@ void CEntityCondition::LoadCondition(LPCSTR entity_section)
     m_fKillHitTreshold = READ_IF_EXISTS(pSettings, r_float, section, "killing_hit_treshold", 0.0f);
     m_fLastChanceHealth = READ_IF_EXISTS(pSettings, r_float, section, "last_chance_health", 0.0f);
     m_fInvulnerableTimeDelta = READ_IF_EXISTS(pSettings, r_float, section, "invulnerable_time", 0.0f) / 1000.f;
+	m_fBleedSpeedK = READ_IF_EXISTS(pSettings, r_float, section, "bleed_speed_k", (float)(1 / 3));
+
 }
 
 void CEntityCondition::LoadTwoHitsDeathParams(LPCSTR section)
@@ -468,6 +470,7 @@ float CEntityCondition::BleedingSpeed()
 
     for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
         bleeding_speed += (*it)->TotalSize();
+	bleeding_speed *= m_fBleedSpeedK;
 	clamp(bleeding_speed, 0.0f, 10.f);
     return bleeding_speed;
 }

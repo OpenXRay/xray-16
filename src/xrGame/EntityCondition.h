@@ -171,24 +171,28 @@ protected:
 
     void UpdateEntityMorale();
 
-    //изменение силы хита в зависимости от надетого костюма
-    //(только для InventoryOwner)
-    float HitOutfitEffect(float hit_power, ALife::EHitType hit_type, s16 element, float ap, bool& add_wound);
-    //изменение потери сил в зависимости от надетого костюма
-    float HitPowerEffect(float power_loss);
+	//изменение силы хита в зависимости от надетого костюма
+	//(только для InventoryOwner)
+	float					HitOutfitEffect			(float hit_power, ALife::EHitType hit_type, s16 element, float ap, bool& add_wound );
+	//изменение потери сил в зависимости от надетого костюма
+	float					HitPowerEffect			(float power_loss);
+	
+	//для подсчета состояния открытых ран,
+	//запоминается кость куда был нанесен хит
+	//и скорость потери крови из раны
+public:
+	using WOUND_VECTOR = xr_vector<CWound*>;
+	WOUND_VECTOR			m_WoundVector;
+protected:
+	//очистка массива ран
+	
 
-    //для подсчета состояния открытых ран,
-    //запоминается кость куда был нанесен хит
-    //и скорость потери крови из раны
-    using WOUND_VECTOR = xr_vector<CWound*>;
-    WOUND_VECTOR m_WoundVector;
-    //очистка массива ран
-
-    //все величины от 0 до 1
-    float m_fPower; //сила
-    float m_fRadiation; //доза радиактивного облучения
-    float m_fPsyHealth; //здоровье
-    float m_fEntityMorale; //мораль
+	//все величины от 0 до 1			
+	float m_fPower;					//сила
+	float m_fRadiation;				//доза радиактивного облучения
+	float m_fPsyHealth;				//здоровье
+	float m_fEntityMorale;			//мораль
+	float m_fBleedSpeedK;
 
     //максимальные величины
     //	float m_fSatietyMax;

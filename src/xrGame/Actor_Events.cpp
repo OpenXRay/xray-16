@@ -303,7 +303,6 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
     {
         conditions().MaxPower();
         conditions().ClearWounds();
-        ClearBloodWounds();
     }
     break;
     case GE_ACTOR_MAX_HEALTH: { SetfHealth(GetMaxHealth());
