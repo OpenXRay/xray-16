@@ -1,4 +1,7 @@
 #include "StdAfx.h"
+
+#include <limits>
+
 #include "PHDynamicData.h"
 #include "Physics.h"
 #include "tri-colliderknoopc/dTriList.h"
@@ -22,7 +25,6 @@ extern CPHWorld* ph_world;
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"
-// union dInfBytes dInfinityValue = {{0,0,0x80,0x7f}};
 // PhysicsStepTimeCallback		*physics_step_time_callback				= 0;
 
 const float default_w_limit = 9.8174770f; //(M_PI/16.f/(fixed_step=0.02f));
@@ -248,7 +250,7 @@ IC static int CollideIntoGroup(
         }
 
         if (pushing_neg)
-            surface.mu = dInfinity;
+            surface.mu = std::numeric_limits<dReal>::max();
 
         if (do_collide && collided_contacts < MAX_CONTACTS)
         {
