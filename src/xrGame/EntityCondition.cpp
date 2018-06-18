@@ -171,7 +171,7 @@ void CEntityCondition::ChangeBleeding(const float percent)
     for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
     {
         (*it)->Incarnation(percent, m_fMinWoundSize);
-        if (0 == (*it)->TotalSize())
+		if (fis_zero((*it)->TotalSize()))
             (*it)->SetDestroy(true);
     }
 }
@@ -464,12 +464,12 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
 
 float CEntityCondition::BleedingSpeed()
 {
-    float bleeding_speed = 0;
+    float bleeding_speed = 0.f;
 
     for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
         bleeding_speed += (*it)->TotalSize();
-
-    return (m_WoundVector.empty() ? 0.f : bleeding_speed / m_WoundVector.size());
+	clamp(bleeding_speed, 0.0f, 10.f);
+    return bleeding_speed;
 }
 
 void CEntityCondition::UpdateHealth()
