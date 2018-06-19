@@ -53,7 +53,6 @@ FACTORY_PTR_INSTANCIATE(ConsoleRender)
 #ifdef DEBUG
 FACTORY_PTR_INSTANCIATE(ObjectSpaceRender)
 #endif // DEBUG
-FACTORY_PTR_INSTANCIATE(ApplicationRender)
 FACTORY_PTR_INSTANCIATE(WallMarkArray)
 #endif // _EDITOR
 

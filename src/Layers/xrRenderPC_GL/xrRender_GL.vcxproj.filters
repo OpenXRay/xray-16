@@ -115,9 +115,6 @@
     <Filter Include="Interface implementations\FactoryPtr">
       <UniqueIdentifier>{bd83057b-fe05-4671-9dcb-e52c5866614f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\ApplicationRender">
-      <UniqueIdentifier>{544c43d2-59ee-4924-bde9-d59a3641f526}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interface implementations\RainRender">
       <UniqueIdentifier>{f58d239e-7b11-475e-bf30-1957df1291cb}</UniqueIdentifier>
     </Filter>
@@ -530,9 +527,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxLensFlareRender.cpp">
       <Filter>Interface implementations\LensFlare</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\dxApplicationRender.cpp">
-      <Filter>Interface implementations\ApplicationRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\dxRainRender.cpp">
       <Filter>Interface implementations\RainRender</Filter>
@@ -1006,12 +1000,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h">
       <Filter>Interface implementations\FactoryPtr</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\ApplicationRender.h">
-      <Filter>Interface implementations\ApplicationRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\dxApplicationRender.h">
-      <Filter>Interface implementations\ApplicationRender</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\RainRender.h">
       <Filter>Interface implementations\RainRender</Filter>

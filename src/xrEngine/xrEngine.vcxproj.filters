@@ -235,6 +235,9 @@
     <Filter Include="General\Profiler">
       <UniqueIdentifier>{b310210e-3620-4a9a-a6a8-02077cc6f0f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces\ILoadingScreen">
+      <UniqueIdentifier>{84e3429f-eb46-4db1-bd1c-9af2413b1de0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -566,6 +569,9 @@
     </ClInclude>
     <ClInclude Include="main.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="ILoadingScreen.h">
+      <Filter>Interfaces\ILoadingScreen</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

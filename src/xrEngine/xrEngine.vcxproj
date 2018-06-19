@@ -322,6 +322,7 @@
     <ClInclude Include="IGame_ObjectPool.h" />
     <ClInclude Include="IGame_Persistent.h" />
     <ClInclude Include="IInputReceiver.h" />
+    <ClInclude Include="ILoadingScreen.h" />
     <ClInclude Include="IObjectPhysicsCollision.h" />
     <ClInclude Include="IPerformanceAlert.hpp" />
     <ClInclude Include="IPHdebug.h" />

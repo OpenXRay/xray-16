@@ -1571,6 +1571,7 @@
     <ClInclude Include="ui\UIListBoxItem.h" />
     <ClInclude Include="ui\UIListBoxItemMsgChain.h" />
     <ClInclude Include="ui\UIListItemServer.h" />
+    <ClInclude Include="ui\UILoadingScreen.h" />
     <ClInclude Include="ui\UILogsWnd.h" />
     <ClInclude Include="ui\UIMainIngameWnd.h" />
     <ClInclude Include="ui\UIMap.h" />
@@ -3477,6 +3478,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="ui\UILoadingScreen.cpp" />
     <ClCompile Include="ui\UILogsWnd.cpp" />
     <ClCompile Include="ui\UIMainIngameWnd.cpp" />
     <ClCompile Include="ui\UIMap.cpp" />

@@ -31,6 +31,8 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrEngine/xr_input.h"
+#include "xrEngine/x_ray.h"
+#include "ui/UILoadingScreen.h"
 
 #ifndef MASTER_GOLD
 #include "custommonster.h"
@@ -107,6 +109,12 @@ CGamePersistent::~CGamePersistent(void)
     Device.seqFrame.Remove(this);
     Engine.Event.Handler_Detach(eDemoStart, this);
     Engine.Event.Handler_Detach(eQuickLoad, this);
+}
+
+void CGamePersistent::PreStart(LPCSTR op)
+{
+    pApp->SetLoadingScreen(new UILoadingScreen());
+    super::PreStart(op);
 }
 
 void CGamePersistent::RegisterModel(IRenderVisual* V)

@@ -16,7 +16,6 @@
 #endif // _EDITOR
 
 #include "dxFontRender.h"
-#include "dxApplicationRender.h"
 #include "dxWallMarkArray.h"
 #include "dxUISequenceVideoItem.h"
 #include "dxUIShader.h"
@@ -37,7 +36,6 @@ RENDER_FACTORY_IMPLEMENT(ConsoleRender)
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #endif // DEBUG
-RENDER_FACTORY_IMPLEMENT(ApplicationRender)
 RENDER_FACTORY_IMPLEMENT(WallMarkArray)
 #endif // _EDITOR
 
