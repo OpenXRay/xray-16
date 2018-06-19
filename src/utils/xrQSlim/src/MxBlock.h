@@ -1,8 +1,4 @@
-#ifndef MXBLOCK_INCLUDED // -*- C++ -*-
-#define MXBLOCK_INCLUDED
-#if !defined(__GNUC__)
 #pragma once
-#endif
 
 /************************************************************************
 
@@ -124,6 +120,3 @@ public:
     iterator end() { return begin() + size(); }
     const_iterator end() const { return begin() + size(); }
 };
-
-// MXBLOCK_INCLUDED
-#endif

@@ -34,14 +34,12 @@ public:
 
 extern XRCORE_API xrMemory Memory;
 
-#if defined(WINDOWS)
 #undef ZeroMemory
 #undef CopyMemory
 #undef FillMemory
 #define ZeroMemory(a, b) memset(a, 0, b)
 #define CopyMemory(a, b, c) memcpy(a, b, c)
 #define FillMemory(a, b, c) memset(a, c, b)
-#endif
 
 /*
 Начиная со стандарта C++11 нет необходимости объявлять все формы операторов new и delete.
