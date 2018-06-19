@@ -2296,6 +2296,9 @@
     <Filter Include="UI\Common\PDA\FractionWar">
       <UniqueIdentifier>{49c6af0a-ea09-4212-bc7f-7cbcca7c5810}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Common\LoadingScreen">
+      <UniqueIdentifier>{d9b405a9-3bb7-4739-bfc6-60b1a7c278cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6674,6 +6677,9 @@
     <ClInclude Include="..\xrEngine\WaveForm.h">
       <Filter>Core\Server\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UILoadingScreen.h">
+      <Filter>UI\Common\LoadingScreen</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10208,6 +10214,9 @@
     <ClCompile Include="game_type.cpp" />
     <ClCompile Include="ai\monsters\state.cpp">
       <Filter>AI\AMonsters\common\components\State</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UILoadingScreen.cpp">
+      <Filter>UI\Common\LoadingScreen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
