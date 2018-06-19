@@ -39,9 +39,9 @@ private:
 
 public:
     virtual property_holder_type* object();
+    typedef xr_vector<thunderbolt_id*> container_type;
 
 private:
-    typedef xr_vector<thunderbolt_id*> container_type;
     typedef property_collection<container_type, collection> collection_type;
 
 private:

@@ -11,9 +11,10 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/OpenAutomate/inc
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/FreeImage/Dist/x64
 	${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
+    /usr/include/SDL2
 	)
 
-#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./editor_environment_manager_properties.cpp")
 #list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.h")
 
 add_definitions(-DENGINE_BUILD)

@@ -31,6 +31,7 @@ class flare;
 class flares : private Noncopyable
 {
 public:
+    typedef xr_vector<flare*> flares_type;
     flares();
     virtual ~flares();
     void load(CInifile& config, shared_str const& section);
@@ -38,7 +39,6 @@ public:
     void fill(manager const& manager, XRay::Editor::property_holder_base* holder, XRay::Editor::property_holder_collection* collection);
 
 private:
-    typedef xr_vector<flare*> flares_type;
     typedef XRay::Editor::property_holder_collection property_holder_collection;
 
 public:

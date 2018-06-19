@@ -317,7 +317,7 @@ char const* engine_impl::weather_current_time() const
 void engine_impl::weather_current_time(char const* time)
 {
     u32 hours, minutes, seconds;
-    sscanf_s(time, "%d:%d:%d", &hours, &minutes, &seconds);
+    sscanf(time, "%d:%d:%d", &hours, &minutes, &seconds);
     bool paused = g_pGamePersistent->Environment().m_paused;
 
     g_pGamePersistent->Environment().m_paused = false;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "xrCore/_types.h"
+
 xr_pure_interface IPhDebugRender
 {
     virtual void open_cashed_draw() = 0;

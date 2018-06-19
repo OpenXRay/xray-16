@@ -266,6 +266,7 @@ inline int _filelength(int fd)
 #define __min(a, b) std::min(a, b)
 
 #define itoa SDL_itoa
+#define _itoa_s(value, buffer, radix) SDL_itoa(value, buffer, radix)
 
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
