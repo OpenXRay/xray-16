@@ -62,6 +62,10 @@ void CUIProgressBar::UpdateProgressBar()
         }
         else
             m_UIProgressItem.SetTextureColor(m_maxColor.get());
+
+        // XXX: Implement color smoothing
+        if (colorSmoothing)
+            R_ASSERT2(false, "color smoothing is not implemented.");
     }
 }
 
@@ -112,6 +116,10 @@ void CUIProgressBar::Draw()
     case om_vert: progress_rect.set(0, GetHeight() - m_CurrentLength, GetWidth(), GetHeight()); break;
     case om_back: progress_rect.set(GetWidth() - m_CurrentLength * 1.01f, 0, GetWidth(), GetHeight()); break;
     case om_down: progress_rect.set(0, 0, GetWidth(), m_CurrentLength); break;
+    // XXX: Implement two-way progress bar
+    case om_twoway: R_ASSERT2(false, "two_way mode is not implemented."); break;
+    case om_vtwoway: R_ASSERT2(false, "vert_two_way mode is not implemented."); break;
+    case om_tocenter: R_ASSERT2(false, "from_edges_to_center mode is not implemented."); break;
     default: NODEFAULT; break;
     }
 
