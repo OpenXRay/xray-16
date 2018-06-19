@@ -313,8 +313,8 @@ void dGeomSetBody (dxGeom *g, dxBody *b)
 
   if (b) {
     if (!g->body) dFree (g->pos,sizeof(dxPosR));
-    g->pos = b->pos;
-    g->R = b->R;
+    g->pos = b->posr.pos;
+    g->R = b->posr.R;
     dGeomMoved (g);
     if (g->body != b) {
       g->bodyRemove();
@@ -326,8 +326,8 @@ void dGeomSetBody (dxGeom *g, dxBody *b)
       dxPosR *pr = (dxPosR*) dAlloc (sizeof(dxPosR));
       g->pos = pr->pos;
       g->R = pr->R;
-      memcpy (g->pos,g->body->pos,sizeof(dVector3));
-      memcpy (g->R,g->body->R,sizeof(dMatrix3));
+      memcpy (g->pos,g->body->posr.pos,sizeof(dVector3));
+      memcpy (g->R,g->body->posr.R,sizeof(dMatrix3));
       g->bodyRemove();
     }
     // dGeomMoved() should not be called if the body is being set to 0, as the

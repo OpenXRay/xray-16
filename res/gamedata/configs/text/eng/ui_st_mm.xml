@@ -426,6 +426,9 @@
 	<string id="ui_mm_alternative">
 		<text>Alternative</text>
 	</string>
+	<string id="ui_mm_always_active">
+		<text>Always active</text>
+	</string>
 	<string id="ui_mm_anisotropic">
 		<text>Anisotropic filtering</text>
 	</string>
@@ -470,6 +473,9 @@
 	</string>
 	<string id="ui_mm_detail_density">
 		<text>Grass detail density</text>
+	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Grass detail radius</text>
 	</string>
 	<string id="ui_mm_difficulty">
 		<text>Difficulty</text>
@@ -524,6 +530,9 @@
 	</string>
 	<string id="ui_mm_load_game">
 		<text>Load game</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Show loading stages</text>
 	</string>
 	<string id="ui_mm_logout">
 		<text>Quit profile</text>
@@ -594,6 +603,9 @@
 	<string id="ui_mm_r2_detail_bump">
 		<text>Detail bump</text>
 	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
 	<string id="ui_mm_r2_steep_parallax">
 		<text>Steep parallax</text>
 	</string>
@@ -605,6 +617,9 @@
 	</string>
 	<string id="ui_mm_r2_sun_quality">
 		<text>Sun quality</text>
+	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Shadow map quality</text>
 	</string>
 	<string id="ui_mm_r3_DX10_1">
 		<text>Use DX10.1</text>

@@ -23,7 +23,6 @@
 #include <ode/config.h>
 #include <ode/error.h>
 
-#pragma warning(disable:4996)
 
 static dMessageFunction *error_function = 0;
 static dMessageFunction *debug_function = 0;
@@ -119,10 +118,17 @@ extern "C" void dMessage (int num, const char *msg, ...)
 
 #ifdef WIN32
 
+// isn't cygwin annoying!
+#ifdef CYGWIN
+#define _snprintf snprintf
+#define _vsnprintf vsnprintf
+#endif
+
+
 #include "windows.h"
 
-//#ifdef _DEBUG_
-void _cdecl dError (int num, const char *msg, ...)
+
+extern "C" void dError (int num, const char *msg, ...)
 {
   va_list ap;
   va_start (ap,msg);
@@ -138,29 +144,29 @@ void _cdecl dError (int num, const char *msg, ...)
 }
 
 
-void _cdecl dDebug (int num, const char *msg, ...)
+extern "C" void dDebug (int num, const char *msg, ...)
 {
   va_list ap;
   va_start (ap,msg);
   if (debug_function) debug_function (num,msg,ap);
   else {
     char s[1000],title[100];
-    _snprintf	(title,sizeof(title),"ODE INTERNAL ERROR %d",num);
-    _vsnprintf	(s,sizeof(s),msg,ap);
+    _snprintf (title,sizeof(title),"ODE INTERNAL ERROR %d",num);
+    _vsnprintf (s,sizeof(s),msg,ap);
     s[sizeof(s)-1] = 0;
     MessageBox(0,s,title,MB_OK | MB_ICONSTOP);
   }
   abort();
 }
 
-void _cdecl dMessage (int num, const char *msg, ...)
+
+extern "C" void dMessage (int num, const char *msg, ...)
 {
   va_list ap;
   va_start (ap,msg);
   if (message_function) message_function (num,msg,ap);
   else printMessage (num,"ODE Message",msg,ap);
 }
-//#endif
 
 
 #endif

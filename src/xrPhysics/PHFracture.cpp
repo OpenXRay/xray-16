@@ -461,15 +461,15 @@ bool CPHFracture::Update(CPHElement* element)
     dMatrix3 glI1, glI2, glInvI, tmp;
 
     // compute inertia tensors in global frame
-    dMULTIPLY2_333(tmp, body->invI, body->R);
-    dMULTIPLY0_333(glInvI, body->R, tmp);
+    dMULTIPLY2_333(tmp, body->invI, body->posr.R);
+    dMULTIPLY0_333(glInvI, body->posr.R, tmp);
 
-    dMULTIPLY2_333(tmp, m_firstM.I, body->R);
-    dMULTIPLY0_333(glI1, body->R, tmp);
+    dMULTIPLY2_333(tmp, m_firstM.I, body->posr.R);
+    dMULTIPLY0_333(glI1, body->posr.R, tmp);
 
-    dMULTIPLY2_333(tmp, m_secondM.I, body->R);
-    dMULTIPLY0_333(glI2, body->R, tmp);
-    // both parts have eqiual start angular vel same as have body so we ignore it
+    dMULTIPLY2_333(tmp, m_secondM.I, body->posr.R);
+    dMULTIPLY0_333(glI2, body->posr.R, tmp);
+    // both parts have equal start angular vel same as have body so we ignore it
 
     // compute breaking torque
     /// break_torque=glI2*glInvI*first_part_torque-glI1*glInvI*second_part_torque+crossproduct(second_in_bone,second_part_force)-crossproduct(first_in_bone,first_part_force)

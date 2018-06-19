@@ -106,7 +106,6 @@ static class cl_water_intensity : public R_constant_setup
     }
 } binder_water_intensity;
 
-#ifdef TREE_WIND_EFFECT
 static class cl_tree_amplitude_intensity : public R_constant_setup
 {
     void setup(R_constant* C) override
@@ -116,7 +115,6 @@ static class cl_tree_amplitude_intensity : public R_constant_setup
         RCache.set_c(C, fValue, fValue, fValue, 0);
     }
 } binder_tree_amplitude_intensity;
-#endif
 
 static class cl_sun_shafts_intensity : public R_constant_setup
 {

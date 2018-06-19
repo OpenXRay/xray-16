@@ -1802,12 +1802,10 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
     CMD4(CCC_Float, "scope_fov", &g_scope_fov, 5.0f, 180.0f);
 
-// Demo
-#if 1 // ndef MASTER_GOLD
+    // Demo
     CMD1(CCC_DemoPlay, "demo_play");
     CMD1(CCC_DemoRecord, "demo_record");
     CMD1(CCC_DemoRecordSetPos, "demo_set_cam_position");
-#endif // #ifndef MASTER_GOLD
 
 #ifndef MASTER_GOLD
     // ai

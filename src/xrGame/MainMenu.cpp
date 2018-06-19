@@ -167,7 +167,7 @@ void CMainMenu::ReadTextureInfo()
 
 void CMainMenu::Activate(bool bActivate)
 {
-    if (!!m_Flags.test(flActive) == bActivate)
+    if (m_Flags.test(flActive) == bActivate)
         return;
     if (m_Flags.test(flGameSaveScreenshot))
         return;

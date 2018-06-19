@@ -12,6 +12,9 @@ extern ECORE_API BOOL ps_grass_shadow;
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
 extern ECORE_API const xr_token qsun_shafts_token[];
 
+extern ECORE_API u32 ps_r2_smapsize;
+extern ECORE_API const xr_token qsmapsize_token[];
+
 extern ECORE_API u32 ps_r_ssao; //	=	0;
 extern ECORE_API const xr_token qssao_token[];
 

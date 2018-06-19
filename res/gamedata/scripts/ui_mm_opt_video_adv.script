@@ -38,12 +38,20 @@ function mode_less_3(render_id)
 	return render_id<4
 end
 
+function mode_3(render_id)
+	return render_id==4
+end
+
 function mode_ge_3(render_id)
 	return render_id>=4
 end
 
 function mode_4(render_id)
 	return render_id==5
+end
+
+function mode_ge_4(render_id)
+	return render_id>=5
 end
 
 function opt_video_adv:InitControls(x, y, xml, handler)
@@ -88,11 +96,26 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	ctl = xml:InitComboBox("video_adv:combo_ssample", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
 
+--  XXX: Fix UI size
+--	_st = xml:InitStatic("video_adv:templ_item", nil)
+--	xml:InitStatic("video_adv:cap_r3_msaa_alphatest", _st)
+--	ctl = xml:InitComboBox("video_adv:combo_r3_msaa_alphatest", _st)
+--	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r2_fxaa", _st)
+	ctl = xml:InitCheck("video_adv:check_r2_fxaa", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
+
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_detail_density", _st)
 	xml:InitTrackBar("video_adv:track_detail_density", _st)
 	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
 
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_detail_radius", _st)
+	xml:InitTrackBar("video_adv:track_detail_radius", _st)
+	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r2_sun", _st)
@@ -108,6 +131,11 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	xml:InitStatic("video_adv:cap_particles_distance", _st)
 	ctl = xml:InitTrackBar("video_adv:track_particles_distance", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_2a, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r2_smap_size", _st)
+	ctl = xml:InitComboBox("video_adv:list_r2_smap_size", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_npc_torch", _st)
@@ -195,6 +223,17 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	ctl = xml:InitCheck("video_adv:check_r3_volumetric_smoke", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
 
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r3_msaa_opt", _st)
+	ctl = xml:InitCheck("video_adv:check_r3_msaa_opt", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
+
+--  XXX: Fix UI size
+--	_st = xml:InitStatic("video_adv:templ_item", nil)
+--	xml:InitStatic("video_adv:cap_r3_gbuffer_opt", _st)
+--	ctl = xml:InitCheck("video_adv:check_r3_gbuffer_opt", _st)
+--	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
+
 -- r4_enable_tessellation		only r4
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r4_tessellation", _st)
@@ -209,6 +248,11 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_60hz", _st)
 	xml:InitCheck("video_adv:check_60hz", _st)
+	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_always_active", _st)
+	xml:InitCheck("video_adv:check_always_active", _st)
 	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
 
 	btn = xml:Init3tButton("video_adv:btn_to_simply", self)

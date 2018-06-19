@@ -352,7 +352,7 @@ public:
 #endif // USE_DX10
     }
 
-    CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -0.5f, +0.5f){};
+    CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f) {}
     virtual void Execute(LPCSTR args)
     {
         CCC_Float::Execute(args);

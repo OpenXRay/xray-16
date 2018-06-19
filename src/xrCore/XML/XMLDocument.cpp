@@ -74,7 +74,8 @@ void XMLDocument::Load(pcstr path, pcstr xml_filename)
     {
         string1024 str;
         xr_sprintf(str, "XML Error! File: %s Description: %s:%u", m_xml_file_name, m_Doc.error(), m_Doc.errorOffset());
-        R_ASSERT2(false, str);
+        char* offsetted = (char*)W.pointer() + m_Doc.errorOffset();
+        R_ASSERT3(false, str, offsetted ? offsetted : "wrong offset");
     }
 
     m_root = m_Doc.firstChildElement();

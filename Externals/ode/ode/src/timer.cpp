@@ -103,31 +103,54 @@ double dTimerTicksPerSecond()
 
 #define PENTIUM_HZ (500e6)
 
-
 static inline void getClockCount (unsigned long cc[2])
 {
+#ifndef X86_64_SYSTEM	
   asm volatile (
 	"rdtsc\n"
 	"movl %%eax,(%%esi)\n"
 	"movl %%edx,4(%%esi)\n"
 	: : "S" (cc) : "%eax","%edx","cc","memory");
+#else
+  asm volatile (
+	"rdtsc\n"
+	"movl %%eax,(%%rsi)\n"
+	"movl %%edx,4(%%rsi)\n"
+	: : "S" (cc) : "%eax","%edx","cc","memory");
+#endif  
 }
 
 
 static inline void serialize()
 {
+#ifndef X86_64_SYSTEM
   asm volatile (
 	"mov $0,%%eax\n"
+	"push %%ebx\n"
 	"cpuid\n"
-	: : : "%eax","%ebx","%ecx","%edx","cc","memory");
+	"pop %%ebx\n"
+	: : : "%eax","%ecx","%edx","cc","memory");
+#else
+  asm volatile (
+	"mov $0,%%rax\n"
+	"push %%rbx\n"
+	"cpuid\n"
+	"pop %%rbx\n"
+	: : : "%rax","%rcx","%rdx","cc","memory");
+#endif
 }
 
 
 static inline double loadClockCount (unsigned long a[2])
 {
   double ret;
+#ifndef X86_64_SYSTEM
   asm volatile ("fildll %1; fstpl %0" : "=m" (ret) : "m" (a[0]) :
 		"cc","memory");
+#else
+  asm volatile ("fildll %1; fstpl %0" : "=m" (ret) : "m" (a[0]) :
+		"cc","memory");
+#endif  
   return ret;
 }
 
@@ -339,7 +362,6 @@ static void fprintDoubleWithPrefix (FILE *f, double a, char *fmt)
   fprintf (f,"n");
 }
 
-#ifdef _DEBUG
 void dTimerReport (FILE *fout, int average)
 {
   int i;
@@ -396,4 +418,3 @@ void dTimerReport (FILE *fout, int average)
   }
   fprintf (fout,"\n");
 }
-#endif
