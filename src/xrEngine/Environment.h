@@ -168,9 +168,8 @@ public:
     float m_fSunShaftsIntensity;
     float m_fWaterIntensity;
 
-#ifdef TREE_WIND_EFFECT
     float m_fTreeAmplitudeIntensity;
-#endif
+
 
     // int lens_flare_id;
     // int tb_id;

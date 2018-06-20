@@ -6,6 +6,9 @@
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
 extern ECORE_API const xr_token qsun_shafts_token[];
 
+extern ECORE_API u32 ps_r2_smapsize;
+extern ECORE_API const xr_token qsmapsize_token[];
+
 extern ECORE_API u32 ps_r_ssao; //	=	0;
 extern ECORE_API const xr_token qssao_token[];
 
@@ -25,7 +28,6 @@ extern ECORE_API u32 ps_r3_minmax_sm; //	=	0;
 extern ECORE_API const xr_token qminmax_sm_token[];
 
 extern ECORE_API int ps_r2_fxaa;
-extern ECORE_API int ps_rs_loading_stages;
 
 extern ENGINE_API int ps_r__Supersample;
 extern ECORE_API int ps_r__LightSleepFrames;

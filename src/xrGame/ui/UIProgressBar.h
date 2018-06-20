@@ -16,6 +16,9 @@ protected:
         om_vert = 1,
         om_back = 2,
         om_down = 3,
+        om_twoway = 4,
+        om_vtwoway = 5,
+        om_tocenter = 6,
         om_count
     } m_orient_mode;
 
@@ -33,6 +36,7 @@ protected:
 public:
     bool m_bUseColor;
     bool m_bUseGradient; //Alundaio: if false then use only solid color with m_maxColor
+    bool colorSmoothing;
     Fcolor m_minColor;
     Fcolor m_middleColor;
     Fcolor m_maxColor;

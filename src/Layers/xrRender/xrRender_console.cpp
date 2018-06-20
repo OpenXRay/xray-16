@@ -7,6 +7,30 @@
 u32 ps_Preset = 2;
 const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
 
+u32 ps_r2_smapsize = 2048;
+const xr_token qsmapsize_token[] =
+{
+#ifndef MASTER_GOLD
+    { "256", 256 }, // Too bad
+    { "512", 512 }, // But works
+#endif
+    { "1024", 1024 },
+    { "1032", 1032 },
+    { "1536", 1536 },
+    { "2048", 2048 },
+    { "2560", 2560 },
+    { "3072", 3072 },
+    { "3584", 3584 },
+    { "4096", 4096 },
+    { "6144", 6144 },
+    { "8192", 8192 },
+    { "10240", 10240 },
+    { "12288", 12288 },
+    { "14336", 14336 },
+    { "16384", 16384 },
+    { nullptr, 0 }
+};
+
 u32 ps_r_ssao_mode = 2;
 const xr_token qssao_mode_token[] = {{"disabled", 0}, {"default", 1}, {"hdao", 2}, {"hbao", 3}, {nullptr, 0}};
 
@@ -40,7 +64,6 @@ u32 ps_r3_minmax_sm = 3; // = 0;
 const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autodetect", 3}, {nullptr, 0}};
 
 int ps_r2_fxaa = 0;
-int ps_rs_loading_stages = 0;
 
 // “Off”
 // “DX10.0 style [Standard]”
@@ -285,7 +308,7 @@ public:
 #endif // USE_DX10
     }
 
-    CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -0.5f, +0.5f){};
+    CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f) {}
     virtual void Execute(LPCSTR args)
     {
         CCC_Float::Execute(args);
@@ -653,7 +676,6 @@ void xrRender_initconsole()
 {
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
 
-    CMD4(CCC_Integer, "rs_loadingstages", &ps_rs_loading_stages, 0, 1);
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
 #ifdef DEBUG
     CMD1(CCC_DumpResources, "dump_resources");
@@ -819,6 +841,7 @@ void xrRender_initconsole()
     //  CMD4(CCC_Float,     "r2_parallax_range",    &ps_r2_df_parallax_range,   5.0f,   175.0f  );
 
     CMD4(CCC_Float, "r2_slight_fade", &ps_r2_slight_fade, .2f, 1.f);
+    CMD3(CCC_Token, "r2_smap_size", &ps_r2_smapsize, qsmapsize_token);
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);

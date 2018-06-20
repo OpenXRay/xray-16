@@ -175,8 +175,15 @@
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_detail_density</text>
         </cap_detail_density>
         <track_detail_density x="144" y="6" width="188" height="16" step="0.02" invert="1">
-            <options_item entry="r__detail_density" group="mm_opt_video_adv"/>
+            <options_item entry="r__detail_density" group="mm_opt_video_adv" depend="vid"/>
         </track_detail_density>
+
+        <cap_detail_radius x="16" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_detail_radius</text>
+        </cap_detail_radius>
+        <track_detail_radius x="144" y="6" width="188" height="16" step="10" is_integer="1">
+            <options_item entry="r__detail_radius" group="mm_opt_video_adv" depend="vid"/>
+        </track_detail_radius>
 
         <cap_texture_lod x="16" y="3" width="108" height="24" >
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_texture_quality</text>
@@ -231,6 +238,14 @@
             <options_item entry="r2_detail_bump" group="mm_opt_video"/>
         </check_r2_detail_bump>
 
+        <cap_r2_fxaa x="16" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_fxaa</text>
+        </cap_r2_fxaa>
+        <check_r2_fxaa x="133" y="0" width="35" stretch="1" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r2_fxaa" group="mm_opt_video" depend="runtime"/>
+        </check_r2_fxaa>
+
         <cap_r2_steep_parallax x="16" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_steep_parallax</text>
         </cap_r2_steep_parallax>
@@ -238,6 +253,18 @@
 	        <texture>ui_inGame2_checkbox</texture>
             <options_item entry="r2_steep_parallax" group="mm_opt_video"/>
         </check_r2_steep_parallax>
+
+        <cap_r2_smap_size x="16" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_smap_size</text>
+        </cap_r2_smap_size>
+        <list_r2_smap_size x="144" y="0" width="188" height="20" list_length="8">
+            <options_item entry="r2_smap_size" group="mm_opt_video" depend="restart"/>
+            <list_font r="170" g="170" b="170" font="letterica16"/>
+		    <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+		    </text_color>
+        </list_r2_smap_size>
 
         <cap_r2_sun_quality x="16" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_sun_quality</text>
@@ -306,6 +333,13 @@
             <options_item entry="rs_refresh_60hz" group="mm_opt_video_adv" depend="vid"/>
         </check_60hz>
 
+        <cap_always_active x="16" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_always_active</text>
+        </cap_always_active>
+        <check_always_active x="133" y="0" width="35" stretch="1" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="always_active" group="mm_opt_video_adv" is_integer="1"/>
+        </check_always_active>
 
         <cap_sun_shafts x="16" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_sun_shafts</text>
@@ -409,6 +443,14 @@
 	            <d r="70" g="70" b="70"/>
 		    </text_color>
         </combo_r3_msaa_alphatest>
+
+        <cap_r3_gbuffer_opt x="16" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r3_gbuffer_opt</text>
+        </cap_r3_gbuffer_opt>
+        <check_r3_gbuffer_opt x="133" y="0" width="35" stretch="1" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r3_msaa_opt" group="mm_opt_video_adv"/>
+        </check_r3_gbuffer_opt>
 
         <cap_r3_msaa_opt x="16" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r3_DX10_1</text>
@@ -555,6 +597,14 @@
         <texture>ui_inGame2_checkbox</texture>
         <options_item entry="hud_draw" group="mm_opt_gameplay"/>
       </check_hud_draw>
+
+        <cap_check_loadingstages x="12" y="273" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_loadingstages</text>
+        </cap_check_loadingstages>
+        <check_loadingstages x="129" y="270" width="35" stretch="1" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="rs_loadingstages" group="mm_opt_gameplay" is_integer="1"/>
+        </check_loadingstages>
 
       <btn_check_updates x="270" y="322" width="86" height="24" stretch="1">
             <text align="c" font="letterica16">ui_mm_check_updates</text>

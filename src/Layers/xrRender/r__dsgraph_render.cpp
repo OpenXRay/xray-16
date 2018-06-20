@@ -625,16 +625,18 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh
     lstVisuals.clear();
     lstVisuals.push_back(((CSector*)S)->root());
 
-    for (auto &it : lstVisuals)
+    for (size_t test = 0; test < lstVisuals.size(); ++test)
     {
+        dxRender_Visual* V = lstVisuals[test];
+
         // Visual is 100% visible - simply add it
-        switch (it->Type)
+        switch (V->Type)
         {
         case MT_HIERRARHY:
         {
             // Add all children
-            FHierrarhyVisual* pV = (FHierrarhyVisual*)it;
-            for (auto &i : pV->children)
+            FHierrarhyVisual* pV = (FHierrarhyVisual*)V;
+            for (auto& i : pV->children)
             {
                 dxRender_Visual* T = i;
                 if (BB.intersect(T->vis.box))
@@ -646,9 +648,9 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh
         case MT_SKELETON_RIGID:
         {
             // Add all children	(s)
-            CKinematics* pV = (CKinematics*)it;
+            CKinematics* pV = (CKinematics*)V;
             pV->CalculateBones(TRUE);
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
             {
                 dxRender_Visual* T = i;
                 if (BB.intersect(T->vis.box))
@@ -658,8 +660,8 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh
         break;
         case MT_LOD:
         {
-            FLOD* pV = (FLOD*)it;
-            for (auto &i : pV->children)
+            FLOD* pV = (FLOD*)V;
+            for (auto& i : pV->children)
             {
                 dxRender_Visual* T = i;
                 if (BB.intersect(T->vis.box))
@@ -670,13 +672,13 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh
         default:
         {
             // Renderable visual
-            ShaderElement* E2 = it->shader->E[sh]._get();
+            ShaderElement* E2 = V->shader->E[sh]._get();
             if (E2 && !(E2->flags.bDistort))
             {
                 for (u32 pass = 0; pass < E2->passes.size(); pass++)
                 {
                     RCache.set_Element(E2, pass);
-                    it->Render(-1.f);
+                    V->Render(-1.f);
                 }
             }
         }

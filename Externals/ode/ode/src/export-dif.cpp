@@ -448,7 +448,7 @@ void dWorldExportDIF (dWorldID w, FILE *file, const char *prefix)
 		b->tag = num;
 		fprintf (file,"%sbody[%d] = dynamics.body {\n\tworld = %sworld,\n",prefix,num,prefix);
 		c.indent++;
-		c.print ("pos",b->pos);
+		c.print ("pos",b->posr.pos);
 		c.print ("q",b->q,4);
 		c.print ("lvel",b->lvel);
 		c.print ("avel",b->avel);

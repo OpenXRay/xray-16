@@ -1,0 +1,10 @@
+<w>
+    <file name="ui\ui_actor_loadgame_screen">
+        <texture id="ui_mm_loading_screen" x="0" y="0" width="1024" height="768" />
+        <texture id="ui_mm_loading_progress_bar" x="0" y="772" width="506" height="4" />
+    </file>
+    <file name="ui\ui_actor_widescreen_sidepanels">
+        <texture id="ui_mm_loading_left_widepanel" x="0" y="0" width="128" height="768" />
+        <texture id="ui_mm_loading_right_widepanel" x="128" y="0" width="128" height="768" />
+   </file>
+</w>

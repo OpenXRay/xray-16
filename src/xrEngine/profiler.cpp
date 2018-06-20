@@ -87,7 +87,6 @@ IC	void CProfiler::convert_string	(LPCSTR str, shared_str &out, u32 max_string_s
 	out							= m_temp;
 }
 
-// TODO [imdex]: replace qpc_freq by std::chrono
 void CProfiler::setup_timer			(LPCSTR timer_id, const u64 &timer_time, const u32 &call_count)
 {
 	string256					m_temp;

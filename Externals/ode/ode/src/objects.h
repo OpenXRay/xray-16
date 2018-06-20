@@ -87,6 +87,15 @@ struct dxContactParameters {
 };
 
 
+
+// position vector and rotation matrix for geometry objects that are not
+// connected to bodies.
+
+struct dxPosR {
+  dVector3 pos;
+  dMatrix3 R;
+};
+
 struct dxBody : public dObject {
   dxJointNode *firstjoint;	// list of attached joints
   int flags;			// some dxBodyFlagXXX flags
@@ -94,9 +103,8 @@ struct dxBody : public dObject {
   dMass mass;			// mass parameters about POR
   dMatrix3 invI;		// inverse of mass.I
   dReal invMass;		// 1 / mass.mass
-  dVector3 pos;			// position of POR (point of reference)
+  dxPosR posr;			// position and orientation of point of reference
   dQuaternion q;		// orientation quaternion
-  dMatrix3 R;			// rotation matrix, always corresponds to q
   dVector3 lvel,avel;		// linear and angular velocity of POR
   dVector3 facc,tacc;		// force and torque accumulators
   dVector3 finite_rot_axis;	// finite rotation axis, unit length or 0=none

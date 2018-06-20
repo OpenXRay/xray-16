@@ -243,11 +243,11 @@ void dInternalStepIsland_x1 (dxWorld *world, dxBody * const *body, int nb,
   for (i=0; i<nb; i++) {
     dReal tmp[12];
     // compute inertia tensor in global frame
-    dMULTIPLY2_333 (tmp,body[i]->mass.I,body[i]->R);
-    dMULTIPLY0_333 (I+i*12,body[i]->R,tmp);
+    dMULTIPLY2_333 (tmp,body[i]->mass.I,body[i]->posr.R);
+    dMULTIPLY0_333 (I+i*12,body[i]->posr.R,tmp);
     // compute inverse inertia tensor in global frame
-    dMULTIPLY2_333 (tmp,body[i]->invI,body[i]->R);
-    dMULTIPLY0_333 (invI+i*12,body[i]->R,tmp);
+    dMULTIPLY2_333 (tmp,body[i]->invI,body[i]->posr.R);
+    dMULTIPLY0_333 (invI+i*12,body[i]->posr.R,tmp);
     // compute rotational force
     dMULTIPLY0_331 (tmp,I+i*12,body[i]->avel);
     dCROSS (body[i]->tacc,-=,body[i]->avel,tmp);
@@ -555,11 +555,11 @@ void dInternalStepIsland_x2 (dxWorld *world, dxBody * const *body, int nb,
   for (i=0; i<nb; i++) {
     dReal tmp[12];
     // compute inertia tensor in global frame
-    dMULTIPLY2_333 (tmp,body[i]->mass.I,body[i]->R);
-    dMULTIPLY0_333 (I+i*12,body[i]->R,tmp);
+    dMULTIPLY2_333 (tmp,body[i]->mass.I,body[i]->posr.R);
+    dMULTIPLY0_333 (I+i*12,body[i]->posr.R,tmp);
     // compute inverse inertia tensor in global frame
-    dMULTIPLY2_333 (tmp,body[i]->invI,body[i]->R);
-    dMULTIPLY0_333 (invI+i*12,body[i]->R,tmp);
+    dMULTIPLY2_333 (tmp,body[i]->invI,body[i]->posr.R);
+    dMULTIPLY0_333 (invI+i*12,body[i]->posr.R,tmp);
     // compute rotational force
     dMULTIPLY0_331 (tmp,I+i*12,body[i]->avel);
     dCROSS (body[i]->tacc,-=,body[i]->avel,tmp);

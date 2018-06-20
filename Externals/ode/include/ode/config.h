@@ -60,40 +60,29 @@ extern "C" {
 
 #include <math.h>
 
-
-
-#if defined(WIN32) && (defined(MSVC) || defined(MINGW))
-
-static union { unsigned char __c[4]; float __f; } __ode_huge_valf =
-
-  {{0,0,0x80,0x7f}};
-
-#define _INFINITY4 (__ode_huge_valf.__f)
-
-static union { unsigned char __c[8]; double __d; } __ode_huge_val =
-
-  {{0,0,0,0,0,0,0xf0,0x7f }};
-
-#define _INFINITY8 (__ode_huge_val.__d)
-
+/* Define the dInfinity macro */
+#ifdef INFINITY
+#ifdef dSINGLE
+#define dInfinity ((float)INFINITY)
 #else
-
-#define _INFINITY8 HUGE_VAL
-
-#define _INFINITY4 HUGE_VALF
-
+#define dInfinity ((double)INFINITY)
 #endif
-
-
-
-#if defined(dSINGLE)
-
-#define dInfinity _INFINITY4
-
+#elif defined(HUGE_VAL)
+#ifdef dSINGLE
+#ifdef HUGE_VALF
+#define dInfinity HUGE_VALF
 #else
-
-#define dInfinity _INFINITY8
-
+#define dInfinity ((float)HUGE_VAL)
+#endif
+#else
+#define dInfinity HUGE_VAL
+#endif
+#else
+#ifdef dSINGLE
+#define dInfinity ((float)(1.0/0.0))
+#else
+#define dInfinity (1.0/0.0)
+#endif
 #endif
 
 
