@@ -278,23 +278,8 @@ void CGrenade::UpdateCL()
 
 bool CGrenade::Action(u16 cmd, u32 flags)
 {
-    if (inherited::Action(cmd, flags))
-        return true;
-
-    switch (cmd)
-    {
-    //переключение типа гранаты
-    case kWPN_NEXT:
-    {
-        if (flags & CMD_START)
-        {
-            if (m_pInventory)
-                m_pInventory->ActivateDeffered();
-        }
-        return true;
-    };
-    }
-    return false;
+	if(inherited::Action(cmd, flags)) return true;
+	return false;
 }
 
 bool CGrenade::NeedToDestroyObject() const

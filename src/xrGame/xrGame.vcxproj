@@ -1878,7 +1878,6 @@
     <ClCompile Include="ActorHelmet.cpp" />
     <ClCompile Include="ActorInput.cpp" />
     <ClCompile Include="ActorNightVision.cpp" />
-    <ClCompile Include="ActorVehicle.cpp" />
     <ClCompile Include="actor_communication.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>

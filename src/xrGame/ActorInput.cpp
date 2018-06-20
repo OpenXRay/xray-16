@@ -11,7 +11,6 @@
 
 #include "hit.h"
 #include "PHDestroyable.h"
-#include "Car.h"
 #include "UIGameSP.h"
 #include "inventory.h"
 #include "Level.h"
@@ -32,6 +31,7 @@
 #include "clsid_game.h"
 #include "hudmanager.h"
 #include "Weapon.h"
+#include "holder_custom.h"
 
 extern u32 hud_adj_mode;
 
@@ -357,13 +357,8 @@ bool CActor::use_Holder(CHolderCustom* holder)
 {
     if (m_holder)
     {
-        bool b = false;
-        CGameObject* holderGO = smart_cast<CGameObject*>(m_holder);
+        bool b = b = use_HolderEx(nullptr, false);
 
-        if (smart_cast<CCar*>(holderGO))
-            b = use_Vehicle(nullptr);
-        else
-            b = use_HolderEx(nullptr, false);
 
         if (inventory().ActiveItem())
         {
@@ -376,11 +371,8 @@ bool CActor::use_Holder(CHolderCustom* holder)
     }
     else
     {
-        bool b = false;
-        if (smart_cast<CCar*>(holder))
-            b = use_Vehicle(holder);
-        else
-            b = use_HolderEx(holder, false);
+        bool b = use_HolderEx(holder, false);
+
 
         if (b)
         { // used succesfully

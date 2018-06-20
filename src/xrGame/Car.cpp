@@ -1765,11 +1765,8 @@ void CCar::CarExplode()
     CActor* A = OwnerActor();
     if (A)
     {
-        if (!m_doors.empty())
-            m_doors.begin()->second.GetExitPosition(m_exit_position);
-        else
-            m_exit_position.set(Position());
-        A->detach_Vehicle();
+		A->use_HolderEx(nullptr, false);
+
         if (A->g_Alive() <= 0.f)
             A->character_physics_support()->movement()->DestroyCharacter();
     }
@@ -2057,4 +2054,10 @@ bool CCar::isActiveEngine()
 {
     return b_engine_on;
 }
-/***** added by Ray Twitty (aka Shadows) END *****/
+/*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
+Fvector CCar::ExitPosition()
+{
+	if (!m_doors.empty())m_doors.begin()->second.GetExitPosition(m_exit_position);
+	else m_exit_position.set(Position());
+	return m_exit_position;
+}

@@ -8251,9 +8251,6 @@
     <ClCompile Include="ActorInput.cpp">
       <Filter>Core\Client\Objects\actor\base</Filter>
     </ClCompile>
-    <ClCompile Include="ActorVehicle.cpp">
-      <Filter>Core\Client\Objects\actor\base</Filter>
-    </ClCompile>
     <ClCompile Include="fire_disp_controller.cpp">
       <Filter>Core\Client\Objects\actor\base</Filter>
     </ClCompile>
