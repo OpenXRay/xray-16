@@ -12,8 +12,8 @@ if(CCACHE_FOUND)
 endif(CCACHE_FOUND)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive --std=c++17")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive") Это на будущее
-#set(CMAKE_CXX_STANDARD 14) #Иначе ублюдочный симак добавляет -std=gnu++11 и ломает сборку
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive") This is for the future versions
+#set(CMAKE_CXX_STANDARD 14) #Otherwise adds -std=gnu++11 and breaks successful building
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -23,7 +23,8 @@ set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 set(LUA_LIBRARIES luajit)
 set(LUA_FOUND 1)
 if (NOT WIN32)
-find_package(OpenSSL REQUIRED)
+find_package(Crypto++ REQUIRED)
+find_package(PugiXML REQUIRED)
 find_package(Theora REQUIRED)
 find_package(OGG REQUIRED)
 find_package(SDL2 REQUIRED)
