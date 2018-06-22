@@ -6,6 +6,8 @@
 #include "inventory.h"
 #include "Level.h"
 #include "actor.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
 
 CWeaponAutomaticShotgun::CWeaponAutomaticShotgun()
 {
@@ -51,6 +53,9 @@ void CWeaponAutomaticShotgun::OnAnimationEnd(u32 state)
 {
     if (!m_bTriStateReload || state != eReload)
         return inherited::OnAnimationEnd(state);
+	CActor* A = smart_cast<CActor*>(H_Parent());
+	if (A)
+		A->callback(GameObject::eActorHudAnimationEnd)(smart_cast<CGameObject*>(this)->lua_game_object(), this->hud_sect.c_str(), this->m_current_motion.c_str(), state, this->animation_slot());
 
     switch (m_sub_state)
     {
