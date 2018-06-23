@@ -532,7 +532,7 @@
 		<text>Загрузить игру</text>
 	</string>
 	<string id="ui_mm_loadingstages">
-		<text>Показывать стадии загрузки</text>
+		<text>Стадии загрузки</text>
 	</string>
 	<string id="ui_mm_logout">
 		<text>Выйти из профиля</text>

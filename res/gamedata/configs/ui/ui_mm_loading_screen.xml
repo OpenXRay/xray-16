@@ -8,8 +8,8 @@
     <loading_logo x="0" y="173" width="1024" height="399">
     </loading_logo>
 
-    <loading_progress_background x="260" y="599" width="405" height="4">
-        <texture width="405" height="4" color="black" a="255">ui_mm_loading_progress_bar</texture>
+    <loading_progress_background x="260" y="599" width="506" height="4">
+        <texture color="black" a="255">ui_mm_loading_progress_bar</texture>
     </loading_progress_background>
 
     <loading_progress x="260" y="599" width="506" height="4" horz="1" min="0" max="100" pos="0" inertion="5.0">
@@ -22,7 +22,7 @@
     </loading_progress>
 
     <loading_progress_percent x="260" y="574" width="506" height="20">
-        <text align="c" r="170" g="170" b="170" font="letterica18"/>
+        <text align="c" r="170" g="170" b="170" a="0" font="letterica18"/>
     </loading_progress_percent>
 
     <loading_stage x="260" y="530" width="506" height="20">

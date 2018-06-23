@@ -176,10 +176,10 @@
         </track_detail_density>
 
         <cap_detail_radius x="20" y="3" width="135" height="24">
-            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_detail_density</text>
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_detail_radius</text>
         </cap_detail_radius>
         <track_detail_radius x="180" y="6" width="235" height="16" step="10" is_integer="1">
-            <options_item entry="r__detail_density" group="mm_opt_video_adv" depend="vid"/>
+            <options_item entry="r__detail_radius" group="mm_opt_video_adv" depend="vid"/>
         </track_detail_radius>
 
         <cap_texture_lod x="20" y="3" width="135" height="24" >
@@ -595,10 +595,10 @@
         <options_item entry="hud_draw" group="mm_opt_gameplay"/>
       </check_hud_draw>
 
-        <cap_check_loadingstages x="15" y="243" width="135" height="24">
+        <cap_check_loadingstages x="15" y="273" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_loadingstages</text>
         </cap_check_loadingstages>
-        <check_loadingstages x="162" y="240" width="44" height="29">
+        <check_loadingstages x="162" y="270" width="44" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
             <options_item entry="rs_loadingstages" group="mm_opt_gameplay" is_integer="1"/>
         </check_loadingstages>
