@@ -2,6 +2,7 @@
 #include "InventoryOwner.h"
 #include "GameObject.h"
 #include "Inventory.h"
+#include "inventory_space.h"
 using namespace luabind;
 
 
@@ -23,6 +24,37 @@ static void CInventoryOwner_Export(lua_State* luaState)
 			.def("InBelt", &CInventory::InBelt)
 			.def("InRuck", &CInventory::InRuck)
 			.def("ItemFromSlot", &CInventory::ItemFromSlot)
+			.enum_("slots")
+			[
+				luabind::value("NO_ACTIVE_SLOT", NO_ACTIVE_SLOT),
+				luabind::value("KNIFE_SLOT", KNIFE_SLOT),
+				luabind::value("INV_SLOT_2", INV_SLOT_2),
+				luabind::value("INV_SLOT_3", INV_SLOT_3),
+				luabind::value("GRENADE_SLOT", GRENADE_SLOT),
+				luabind::value("BINOCULAR_SLOT", BINOCULAR_SLOT),
+				luabind::value("BOLT_SLOT", BOLT_SLOT),
+				luabind::value("OUTFIT_SLOT", OUTFIT_SLOT),
+				luabind::value("PDA_SLOT", PDA_SLOT),
+				luabind::value("DETECTOR_SLOT", DETECTOR_SLOT),
+				luabind::value("TORCH_SLOT", TORCH_SLOT),
+				luabind::value("ARTEFACT_SLOT", ARTEFACT_SLOT),
+				luabind::value("HELMET_SLOT", HELMET_SLOT),
+				luabind::value("BACKPACK_SLOT", BACKPACK_SLOT),
+				luabind::value("PATCH_SLOT", PATCH_SLOT),
+#ifdef MORE_INVENTORY_SLOTS
+				luabind::value("CUSTOM_SLOT_1", CUSTOM_SLOT_1),
+				luabind::value("CUSTOM_SLOT_2", CUSTOM_SLOT_2),
+				luabind::value("CUSTOM_SLOT_3", CUSTOM_SLOT_3),
+				luabind::value("CUSTOM_SLOT_4", CUSTOM_SLOT_4),
+				luabind::value("CUSTOM_SLOT_5", CUSTOM_SLOT_5),
+				luabind::value("CUSTOM_SLOT_6", CUSTOM_SLOT_6),
+				luabind::value("CUSTOM_SLOT_7", CUSTOM_SLOT_7),
+				luabind::value("CUSTOM_SLOT_8", CUSTOM_SLOT_8),
+				luabind::value("CUSTOM_SLOT_9", CUSTOM_SLOT_9),
+				luabind::value("CUSTOM_SLOT_10", CUSTOM_SLOT_10),
+#endif
+				luabind::value("LAST_SLOT", LAST_SLOT)
+			]
 			,
 			class_<CInventoryOwner>("CInventoryOwner")
 			//.def(constructor<>())
