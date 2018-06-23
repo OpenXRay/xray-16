@@ -23,7 +23,6 @@ protected:
     ref_light light_render;
     ref_light light_omni;
     ref_glow glow_render;
-    Fvector m_focus;
     shared_str m_light_section;
     Fvector m_torch_offset;
     Fvector m_omni_offset;
