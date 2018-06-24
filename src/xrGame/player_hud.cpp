@@ -16,6 +16,8 @@ Fvector _wpn_root_pos;
 Fvector m_hud_offset_pos = { 0.f, 0.f, 0.f }; //only in hud adj mode
 Fvector m_hand_offset_pos = { 0.f, 0.f, 0.f };
 
+extern BOOL g_use_aim_inertion = 1;
+
 float CalcMotionSpeed(const shared_str& anim_name)
 {
     if (!IsGameTypeSingle() && (anim_name == "anm_show" || anim_name == "anm_hide"))
@@ -630,7 +632,34 @@ void player_hud::update_inertion(Fmatrix& trans)
         Fvector& origin = trans.c;
         xform = trans;
 
-        static Fvector st_last_dir = {0, 0, 0};
+
+		static Fvector						st_last_dir = { 0, 0, 0 };
+#pragma todo("Этот код есть у Алундайо, но почему-то нету у нас. Нужно разобраться @Debrovski")
+		//// load params
+		//float m_pitch_offset_r = PITCH_OFFSET_R;
+		//float m_pitch_offset_n = PITCH_OFFSET_N;
+		//float m_pitch_offset_d = PITCH_OFFSET_D;
+		//float m_pitch_low_limit = PITCH_LOW_LIMIT;
+		//float m_origin_offset = ORIGIN_OFFSET;
+		//float m_origin_offset_aim = ORIGIN_OFFSET_AIM;
+		//float m_tendto_speed = TENDTO_SPEED;
+		//float m_tendto_speed_aim = TENDTO_SPEED_AIM;
+
+		//if (g_use_aim_inertion && pMainHud)
+		//{ // Load the inertia parameters from the main Hud
+		//	CHudItem* itm = pMainHud->m_parent_hud_item;
+		//	if (itm)
+		//	{
+		//		m_pitch_offset_r = itm->m_inertion_params.m_pitch_offset_r;
+		//		m_pitch_offset_n = itm->m_inertion_params.m_pitch_offset_n;
+		//		m_pitch_offset_d = itm->m_inertion_params.m_pitch_offset_d;
+		//		m_pitch_low_limit = itm->m_inertion_params.m_pitch_low_limit;
+		//		m_origin_offset = itm->m_inertion_params.m_origin_offset;
+		//		m_origin_offset_aim = itm->m_inertion_params.m_origin_offset_aim;
+		//		m_tendto_speed = itm->m_inertion_params.m_tendto_speed;
+		//		m_tendto_speed_aim = itm->m_inertion_params.m_tendto_speed_aim;
+		//	}
+		//}
 
         // calc difference
         Fvector diff_dir;

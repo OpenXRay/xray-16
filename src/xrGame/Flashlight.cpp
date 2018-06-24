@@ -358,7 +358,10 @@ void CFlashlight::UpdateCL()
 		return;
 
 	if (!HudItemData())
+	{
+		Switch(false);
 		return;
+	}
 
 	firedeps dep;
 	HudItemData()->setup_firedeps(dep);
