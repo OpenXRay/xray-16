@@ -551,17 +551,21 @@ bool CUIXmlInit::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CUIPro
     {
         mode = CUIProgressBar::om_down;
     }
-    else if (xr_stricmp(mode_str, "two_way") == 0)
+    else if (xr_stricmp(mode_str, "from_center") == 0)
     {
-        mode = CUIProgressBar::om_twoway;
+        mode = CUIProgressBar::om_fromcenter;
     }
-    else if (xr_stricmp(mode_str, "vert_two_way") == 0)
+    else if (xr_stricmp(mode_str, "vert_from_center") == 0)
     {
-        mode = CUIProgressBar::om_vtwoway;
+        mode = CUIProgressBar::om_vfromcenter;
     }
     else if (xr_stricmp(mode_str, "to_center") == 0)
     {
         mode = CUIProgressBar::om_tocenter;
+    }
+    else if (xr_stricmp(mode_str, "vert_to_center") == 0)
+    {
+        mode = CUIProgressBar::om_vtocenter;
     }
 
     pWnd->InitProgressBar(pos, size, mode);
