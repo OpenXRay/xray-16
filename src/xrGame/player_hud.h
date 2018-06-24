@@ -50,6 +50,8 @@ struct hud_item_measures
     Fvector m_fire_point_offset;
     u16 m_fire_bone2;
     Fvector m_fire_point2_offset;
+	Fvector							m_fire_direction;
+
     u16 m_shell_bone;
     Fvector m_shell_point_offset;
 

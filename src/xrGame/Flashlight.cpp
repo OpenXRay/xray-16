@@ -6,8 +6,8 @@
 #include "hudsound.h"
 #include "ai_sounds.h"
 #include "../xrEngine/LightAnimLibrary.h"
-//#include "Actor.h"
 #include "../xrEngine/camerabase.h"
+#include "../xrengine/xr_collide_form.h"
 
 //ENGINE_API int g_current_renderer;
 
@@ -155,6 +155,7 @@ void CFlashlight::OnStateSwitch(u32 S, u32 oldState)
 	case eShowing:
 	{
 		g_player_hud->attach_item(this);
+		TurnDeviceInternal(true);
 		m_sounds.PlaySound("sndShow", Fvector().set(0, 0, 0), this, true, false);
 		PlayHUDMotion(m_bFastAnimMode ? "anm_show_fast" : "anm_show", FALSE/*TRUE*/, this, GetState());
 		SetPending(TRUE);
@@ -163,7 +164,6 @@ void CFlashlight::OnStateSwitch(u32 S, u32 oldState)
 	{
 		if (oldState != eHiding)
 		{
-			TurnDeviceInternal(false);
 			m_sounds.PlaySound("sndHide", Fvector().set(0, 0, 0), this, true, false);
 			PlayHUDMotion(m_bFastAnimMode ? "anm_hide_fast" : "anm_hide", FALSE/*TRUE*/, this, GetState());
 			SetPending(TRUE);
@@ -185,10 +185,10 @@ void CFlashlight::OnAnimationEnd(u32 state)
 	case eShowing:
 	{
 		SwitchState(eIdle);
-		TurnDeviceInternal(true);
 	} break;
 	case eHiding:
 	{
+		TurnDeviceInternal(false);
 		SwitchState(eHidden);
 		g_player_hud->detach_item(this);
 	} break;
@@ -212,6 +212,9 @@ void CFlashlight::OnHiddenItem()
 BOOL CFlashlight::net_Spawn(CSE_Abstract* DC)
 {
 	TurnDeviceInternal(false);
+
+	//collidable.model = new CCF_Skeleton(this);
+
 	if (!inherited::net_Spawn(DC))
 		return FALSE;
 
@@ -265,7 +268,6 @@ void CFlashlight::Load(LPCSTR section)
 	light_trace_bone = READ_IF_EXISTS(pSettings, r_string, section, "light_trace_bone", "");
 
 	m_light_section = READ_IF_EXISTS(pSettings, r_string, section, "light_section", "torch_definition");
-
 
 	m_torch_offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "torch_offset", Fvector3().set(0.f, 0.f, 0.f ));
 	m_omni_offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "omni_offset", Fvector3().set(0.f, 0.f, 0.f));
@@ -346,113 +348,28 @@ void CFlashlight::UpdateCL()
 	if (H_Parent() != Level().CurrentEntity())			
 		return;
 
+	CActor* actor = smart_cast<CActor*>(H_Parent());
+	if (!actor)
+		return;
+
 	UpdateVisibility();
 
 	if (!m_switched_on || !IsWorking())			
 		return;
 
-	CBoneInstance &BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(guid_bone);
-	Fmatrix M;
-
-	if (H_Parent())
-	{
-		CActor*			actor = smart_cast<CActor*>(H_Parent());
-		if (actor)		smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
-
-		if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition)<_sqr(100.f)) {
-			// near camera
-			smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones();
-			M.mul_43(XFORM(), BI.mTransform);
-		}
-		else {
-			// approximately the same
-			M = H_Parent()->XFORM();
-			H_Parent()->Center(M.c);
-			M.c.y += H_Parent()->Radius()*2.f / 3.f;
-		}
-
-		if (actor)
-		{
-			if (actor->active_cam() == eacLookAt)
-			{
-				m_prev_hp.x = angle_inertion_var(m_prev_hp.x, -actor->cam_Active()->yaw, m_torch_inertion_speed_min, m_torch_inertion_speed_max, PI_DIV_6, Device.fTimeDelta);
-				m_prev_hp.y = angle_inertion_var(m_prev_hp.y, -actor->cam_Active()->pitch, m_torch_inertion_speed_min, m_torch_inertion_speed_max, PI_DIV_6, Device.fTimeDelta);
-			}
-			else {
-				m_prev_hp.x = angle_inertion_var(m_prev_hp.x, -actor->cam_FirstEye()->yaw, m_torch_inertion_speed_min, m_torch_inertion_speed_max, PI_DIV_6, Device.fTimeDelta);
-				m_prev_hp.y = angle_inertion_var(m_prev_hp.y, -actor->cam_FirstEye()->pitch, m_torch_inertion_speed_min, m_torch_inertion_speed_max, PI_DIV_6, Device.fTimeDelta);
-			}
-
-			Fvector dir, right, up;
-			dir.setHP(m_prev_hp.x + m_delta_h, m_prev_hp.y);
-			Fvector::generate_orthonormal_basis_normalized(dir, up, right);
-
-			Fvector _fp;
-			if (HudItemData())
-			{
-				firedeps _current_firedeps;
-				HudItemData()->setup_firedeps(_current_firedeps);
-				_fp.set(_current_firedeps.vLastFP);
-			}
-			else
-			{
-				_fp.set(0, 0, 0);
-				IKinematics* K = smart_cast<IKinematics*>(Visual());
-				Fmatrix& fire_mat = K->LL_GetTransform(K->LL_BoneID("light_bone_2"));
-				fire_mat.transform_tiny(_fp);
-				XFORM().transform_tiny(_fp);
-			}
-
-			Fvector offset = _fp;
-			offset.mad(M.i, m_torch_offset.x);
-			offset.mad(M.j, m_torch_offset.y);
-			offset.mad(M.k, m_torch_offset.z);
-			light_render->set_position(offset);
-
-			offset = _fp;
-			offset.mad(M.i, m_omni_offset.x);
-			offset.mad(M.j, m_omni_offset.y);
-			offset.mad(M.k, m_omni_offset.z);
-
-			light_omni->set_position(offset);
-			glow_render->set_position(_fp);
-			light_render->set_rotation(dir, right);
-			light_omni->set_rotation(dir, right);
-			glow_render->set_direction(dir);
-		}// if(actor)
-		else
-		{
-			if (can_use_dynamic_lights())
-			{
-				light_render->set_position(M.c);
-				light_render->set_rotation(M.k, M.i);
-
-				Fvector offset = M.c;
-				offset.mad(M.i, m_omni_offset.x);
-				offset.mad(M.j, m_omni_offset.y);
-				offset.mad(M.k, m_omni_offset.z);
-				light_omni->set_position(M.c);
-				light_omni->set_rotation(M.k, M.i);
-			}//if (can_use_dynamic_lights()) 
-
-			glow_render->set_position(M.c);
-			glow_render->set_direction(M.k);
-		}
-	}//if(HParent())
-	else
-	{
-		if (getVisible() && m_pPhysicsShell)
-		{
-			M.mul(XFORM(), BI.mTransform);
-			m_switched_on = false;
-			light_render->set_active(false);
-			light_omni->set_active(false);
-			glow_render->set_active(false);
-		}//if (getVisible() && m_pPhysicsShell)  
-	}
-
-	if (!m_switched_on)					
+	if (!HudItemData())
 		return;
+
+	firedeps dep;
+	HudItemData()->setup_firedeps(dep);
+
+	light_render->set_position(dep.vLastFP);
+	light_omni->set_position(dep.vLastFP);
+	glow_render->set_position(dep.vLastFP);
+
+	light_render->set_rotation(dep.m_FireParticlesXForm.k, dep.m_FireParticlesXForm.i);
+	light_omni->set_rotation(dep.m_FireParticlesXForm.k, dep.m_FireParticlesXForm.i);
+	glow_render->set_direction(dep.m_FireParticlesXForm.k);
 
 	// calc color animator
 	if (!lanim)							
@@ -490,6 +407,20 @@ void CFlashlight::OnH_B_Independent(bool just_before_destroy)
 	}
 }
 
+void CFlashlight::create_physic_shell()
+{
+	CPhysicsShellHolder::create_physic_shell();
+}
+
+void CFlashlight::activate_physic_shell()
+{
+	CPhysicsShellHolder::activate_physic_shell();
+}
+
+void CFlashlight::setup_physic_shell()
+{
+	CPhysicsShellHolder::setup_physic_shell();
+}
 
 void CFlashlight::OnMoveToRuck(const SInvItemPlace& prev)
 {

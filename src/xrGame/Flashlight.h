@@ -63,6 +63,10 @@ public:
 	void			ShowDevice(bool bFastMode);
 	virtual bool	CheckCompatibility(CHudItem* itm);
 
+	virtual void	create_physic_shell();
+	virtual void	activate_physic_shell();
+	virtual void	setup_physic_shell();
+
 	void	Switch();
 	void	Switch(bool light_on);
 	bool	torch_active() const;

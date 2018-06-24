@@ -297,27 +297,17 @@ void CTorch::UpdateCL()
                 offset.mad(M.k, m_torch_offset.z);
                 light_render->set_position(offset);
 
-                if (true /*false*/)
-                {
-                    offset = M.c;
-                    offset.mad(M.i, m_omni_offset.x);
-                    offset.mad(M.j, m_omni_offset.y);
-                    offset.mad(M.k, m_omni_offset.z);
-                    light_omni->set_position(offset);
-                }
-            } // if (true)
-            glow_render->set_position(M.c);
+			offset = M.c; 
+			offset.mad(M.i,m_omni_offset.x);
+			offset.mad(M.j,m_omni_offset.y);
+			offset.mad(M.k,m_omni_offset.z);
+			light_omni->set_position(offset);
 
-            if (true)
-            {
-                light_render->set_rotation(dir, right);
+			glow_render->set_position(M.c);
 
-                if (true /*false*/)
-                {
-                    light_omni->set_rotation(dir, right);
-                }
-            } // if (true)
-            glow_render->set_direction(dir);
+			light_render->set_rotation(dir, right);
+			light_omni->set_rotation(dir, right);
+			glow_render->set_direction(dir);
 
         } // if(actor)
         else
@@ -372,6 +362,7 @@ void CTorch::UpdateCL()
         light_omni->set_color(fclr);
     }
     glow_render->set_color(fclr);
+    }
 }
 
 void CTorch::create_physic_shell() { CPhysicsShellHolder::create_physic_shell(); }
