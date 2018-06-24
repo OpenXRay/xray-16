@@ -1,8 +1,8 @@
 <w>
 	<background width="1024" height="768">
-	    <auto_static width="1024" height="768">
-	      <texture>ui_mm_loading_screen</texture>
-	    </auto_static>
+        <auto_static width="1024" height="768">
+            <texture>ui_mm_loading_screen</texture>
+        </auto_static>
 	</background>
 
     <loading_logo x="0" y="173" width="1024" height="399">
