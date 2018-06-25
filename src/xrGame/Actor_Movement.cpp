@@ -607,16 +607,12 @@ bool isActorAccelerated(u32 mstate, bool ZoomMode)
     else
         res = true;
 
-    if (mstate & (mcClimb | mcJump | mcLanding | mcLanding2))
-        return res;
+	if (mstate&(mcCrouch | mcClimb | mcJump | mcLanding | mcLanding2))
+		return res;
+	if (mstate & mcLookout || ZoomMode)
+		return false;
 
-    if (ZoomMode)
-        return false;
-    if (mstate & mcCrouch)
-        return res;
-    if (mstate & mcLookout)
-        return false;
-    return res;
+	return res;
 }
 
 bool CActor::CanAccelerate()

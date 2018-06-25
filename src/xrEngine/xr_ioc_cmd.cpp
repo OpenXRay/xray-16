@@ -29,7 +29,6 @@ void IConsole_Command::InvalidSyntax()
     g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
     g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
 }
-float view_port_near_koef = 0.5f;
 //-----------------------------------------------------------------------
 
 void IConsole_Command::add_to_LRU(shared_str const& arg)
@@ -700,7 +699,6 @@ void CCC_Register()
 // CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128 );
 #endif // DEBUG
 
-	CMD4(CCC_Float, "rs_near_plane", &view_port_near_koef, 0.01, 5.0);
     CMD2(CCC_Gamma, "rs_c_gamma", &ps_gamma);
     CMD2(CCC_Gamma, "rs_c_brightness", &ps_brightness);
     CMD2(CCC_Gamma, "rs_c_contrast", &ps_contrast);

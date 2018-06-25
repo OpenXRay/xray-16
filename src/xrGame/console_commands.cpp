@@ -2082,7 +2082,6 @@ void CCC_RegisterCommands()
     CMD4(CCC_Vector3, "hud_offset_pos", &m_hud_offset_pos, Fvector().set(-1000, -1000, -1000), Fvector().set(1000, 1000, 1000));
     CMD4(CCC_Vector3, "hand_offset_pos", &m_hand_offset_pos, Fvector().set(-1000, -1000, -1000), Fvector().set(1000, 1000, 1000));
 
-    CMD1(CCC_GSCheckForUpdates, "check_for_updates");
 #ifdef DEBUG
     CMD1(CCC_Crash, "crash");
     CMD1(CCC_DumpObjects, "dump_all_objects");

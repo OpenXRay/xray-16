@@ -313,8 +313,6 @@ void CCameraManager::UpdatePPEffectors()
     pp_affected.validate("after applying pp");
 }
 
-
-extern float view_port_near_koef;
 void CCameraManager::ApplyDevice(float _viewport_near)
 {
     // Device params
@@ -342,7 +340,7 @@ void CCameraManager::ApplyDevice(float _viewport_near)
     else
         Device.m_SecondViewport.isCamReady = false;
 
-	Device.mProject.build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, _viewport_near* view_port_near_koef, m_cam_info.fFar);
+	Device.mProject.build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, _viewport_near, m_cam_info.fFar);
     //--#SM+# End--
 
     if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu->IsActive())
