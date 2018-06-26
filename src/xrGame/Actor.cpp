@@ -84,6 +84,7 @@ const float respawn_auto = 7.f;
 #include "script_hit.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "helicopter.h"
+#include "Flashlight.h"
 //-Alundaio
 
 static float IReceived = 0;
@@ -1434,6 +1435,11 @@ void CActor::renderable_Render()
 {
     VERIFY(_valid(XFORM()));
     inherited::renderable_Render();
+	//Alun: Due to glitchy shadows this is forced
+	CFlashlight* flashlight = smart_cast<CFlashlight*>(inventory().ItemFromSlot(DETECTOR_SLOT));
+	if (flashlight && flashlight->torch_active())
+		return;
+
 
     if ((cam_active == eacFirstEye && // first eye cam
             GEnv.Render->get_generation() == GEnv.Render->GENERATION_R2 && // R2

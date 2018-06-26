@@ -359,7 +359,7 @@ void CFlashlight::UpdateCL()
 
 	if (!HudItemData())
 	{
-		Switch(false);
+		TurnDeviceInternal(false);
 		return;
 	}
 

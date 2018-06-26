@@ -16,6 +16,8 @@
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
+#include "Flashlight.h"
+#include "Inventory.h"
 
 extern CUIGameCustom* CurrentGameUI() { return HUD().GetGameUI(); }
 CFontManager::CFontManager()
@@ -220,6 +222,10 @@ void CHUDManager::Render_Actor_Shadow() // added by KD
 
     // KD: we need to render actor shadow only in first eye cam mode because
     // in other modes actor model already in scene graph and renders well
+	//Alun: Due to glitchy shadows this is forced
+	CFlashlight* flashlight = smart_cast<CFlashlight*>(actor->inventory().ItemFromSlot(DETECTOR_SLOT));
+	if (flashlight && flashlight->torch_active())
+		return;
     if (actor->active_cam() != eacFirstEye) return;
     GEnv.Render->set_Object(object->H_Root());
     object->renderable_Render();
