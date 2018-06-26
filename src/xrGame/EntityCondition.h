@@ -130,11 +130,8 @@ public:
     virtual void ChangeAlcohol(const float value){};
 
     IC void MaxPower() { m_fPower = m_fPowerMax; };
-    IC void SetMaxPower(const float val)
-    {
-        m_fPowerMax = val;
-        clamp(m_fPowerMax, 0.1f, 1.0f);
-    };
+    IC void SetMaxPower(const float val) { m_fPowerMax = val; clamp(m_fPowerMax, 0.1f, 1.0f); if (m_fPowerMax < m_fPower) MaxPower(); };
+
     IC float GetMaxPower() const { return m_fPowerMax; };
     void ChangeBleeding(const float percent);
 
