@@ -242,32 +242,19 @@ void CActorCondition::UpdateCondition()
                 RemoveEffector(m_object, effAlcohol);
         }
 
-        string512 pp_sect_name;
-        shared_str ln = Level().name();
-        if (ln.size())
-        {
-            CEffectorPP* ppe = object().Cameras().GetPPEffector((EEffectorPPType)effPsyHealth);
-
-            strconcat(sizeof(pp_sect_name), pp_sect_name, "effector_psy_health", "_", *ln);
-            if (!pSettings->section_exist(pp_sect_name))
-                xr_strcpy(pp_sect_name, "effector_psy_health");
-
-            if (!fsimilar(GetPsyHealth(), 1.0f, 0.05f))
-            {
-                if (!ppe)
-                {
-                    AddEffector(m_object, effPsyHealth, pp_sect_name, GET_KOEFF_FUNC(this, &CActorCondition::GetPsy));
-                }
-            }
-            else
-            {
-                if (ppe)
-                    RemoveEffector(m_object, effPsyHealth);
-            }
-        }
-        //-		if(fis_zero(GetPsyHealth()))
-        //-			SetHealth( 0.0f );
-    };
+	CEffectorPP* ppe = object().Cameras().GetPPEffector((EEffectorPPType)effPsyHealth);
+	if (!fsimilar(GetPsyHealth(), 1.0f, 0.05f))
+	{
+		if (!ppe)
+		{
+			AddEffector(m_object, effPsyHealth, "effector_psy_health", GET_KOEFF_FUNC(this, &CActorCondition::GetPsy));
+		}
+	}
+	else
+	{
+		if (ppe)
+			RemoveEffector(m_object, effPsyHealth);
+	}
 
     UpdateSatiety();
     UpdateBoosters();
@@ -292,7 +279,7 @@ void CActorCondition::UpdateCondition()
 
     AffectDamage_InjuriousMaterialAndMonstersInfluence();
 }
-
+}
 void CActorCondition::UpdateBoosters()
 {
     for (u8 i = 0; i < eBoostMaxCount; i++)
