@@ -345,7 +345,8 @@ void CUIArtefactParams::SetInfo(const CCustomOutfit* pInvItem)
     }
     SetHeight(h);
 }
-void CUIArtefactParams::SetInfo(const CHelmet* pInvItem) {}
+
+void CUIArtefactParams::SetInfo(const CHelmet* pInvItem) { DetachAll(); }
 void CUIArtefactParams::SetInfo(const CBackpack* pInvItem)
 {
     DetachAll();
