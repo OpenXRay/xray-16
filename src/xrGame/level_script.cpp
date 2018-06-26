@@ -250,7 +250,13 @@ void map_change_spot_hint(u16 id, LPCSTR spot_type, LPCSTR text)
 void map_remove_object_spot(u16 id, LPCSTR spot_type) { Level().MapManager().RemoveMapLocation(spot_type, id); }
 u16 map_has_object_spot(u16 id, LPCSTR spot_type) { return Level().MapManager().HasMapLocation(spot_type, id); }
 bool patrol_path_exists(LPCSTR patrol_path) { return (!!ai().patrol_paths().path(patrol_path, true)); }
-LPCSTR get_name() { return (*Level().name()); }
+LPCSTR get_name() {
+	if (Level().name().size())
+		return Level().name().c_str();
+
+	//Alun: This fixes level.name() being an empty string when checking it while server entities are being registered
+	return ai().game_graph().header().level(ai().level_graph().level_id()).name().c_str();
+}
 void prefetch_sound(LPCSTR name) { Level().PrefetchSound(name); }
 CClientSpawnManager& get_client_spawn_manager() { return (Level().client_spawn_manager()); }
 
