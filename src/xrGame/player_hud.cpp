@@ -16,8 +16,6 @@ Fvector _wpn_root_pos;
 Fvector m_hud_offset_pos = { 0.f, 0.f, 0.f }; //only in hud adj mode
 Fvector m_hand_offset_pos = { 0.f, 0.f, 0.f };
 
-extern BOOL g_use_aim_inertion = 1;
-
 float CalcMotionSpeed(const shared_str& anim_name)
 {
     if (!IsGameTypeSingle() && (anim_name == "anm_show" || anim_name == "anm_hide"))
@@ -645,7 +643,7 @@ void player_hud::update_inertion(Fmatrix& trans)
 		//float m_tendto_speed = TENDTO_SPEED;
 		//float m_tendto_speed_aim = TENDTO_SPEED_AIM;
 
-		//if (g_use_aim_inertion && pMainHud)
+		//if (pMainHud)
 		//{ // Load the inertia parameters from the main Hud
 		//	CHudItem* itm = pMainHud->m_parent_hud_item;
 		//	if (itm)

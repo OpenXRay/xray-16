@@ -1423,6 +1423,8 @@ float CWeapon::CurrentZoomFactor()
     return IsScopeAttached() ? m_zoom_params.m_fScopeZoomFactor : m_zoom_params.m_fIronSightZoomFactor;
 };
 
+extern BOOL g_use_aim_inertion = 1;
+
 void CWeapon::OnZoomIn()
 {
     m_zoom_params.m_bIsZoomModeNow = true;
@@ -1431,7 +1433,7 @@ void CWeapon::OnZoomIn()
     else
         m_zoom_params.m_fCurrentZoomFactor = CurrentZoomFactor();
 
-    //EnableHudInertion(FALSE);
+	EnableHudInertion(g_use_aim_inertion);
 
     if (m_zoom_params.m_bZoomDofEnabled && !IsScopeAttached())
         GamePersistent().SetEffectorDOF(m_zoom_params.m_ZoomDof);
@@ -1455,9 +1457,10 @@ void CWeapon::OnZoomIn()
 void CWeapon::OnZoomOut()
 {
     m_zoom_params.m_bIsZoomModeNow = false;
-    m_fRTZoomFactor = GetZoomFactor(); // store current
-    m_zoom_params.m_fCurrentZoomFactor = 1.f;
-    //EnableHudInertion(TRUE);
+    m_fRTZoomFactor = GetZoomFactor();//store current
+    m_zoom_params.m_fCurrentZoomFactor = 1.0;
+   
+	EnableHudInertion(TRUE);
 
     GamePersistent().RestoreEffectorDOF();
 
