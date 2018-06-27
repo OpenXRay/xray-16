@@ -22,7 +22,7 @@ add_definitions(-DXRCORE_EXPORTS)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-#Заглушки, пока не починю find_package
+#this is a temporary solution until find_package will not be fixed
 set(CRYPTO_LIBRARY crypto++)
 set(PUGIXML_LIBRARY pugixml)
 set(TBB_LIBRARIES tbb tbbmalloc_proxy tbbmalloc)
