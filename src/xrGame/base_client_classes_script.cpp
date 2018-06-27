@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////
+ï»¿////////////////////////////////////////////////////////////////////////////
 //	Module 		: base_client_classes_script.cpp
 //	Created 	: 20.12.2004
 //  Modified 	: 20.12.2004
@@ -99,7 +99,7 @@ SCRIPT_EXPORT(CBlend, (), {
 });
 // clang-format on
 
-#pragma todo("Òóò íóæíî êîãäà-íèáóäü ñäåëàòü ðåôàêòîðèíã @Debrovski")
+#pragma todo("Ð¢ÑƒÑ‚ Ð½ÑƒÐ¶Ð½Ð¾ ÐºÐ¾Ð³Ð´Ð°-Ð½Ð¸Ð±ÑƒÐ´ÑŒ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ Ñ€ÐµÑ„Ð°ÐºÑ‚Ð¾Ñ€Ð¸Ð½Ð³ @Debrovski")
 
 LPCSTR CPatrolPoint::getName(CPatrolPoint *pp) const {
 	return pp->m_name.c_str();
@@ -130,6 +130,8 @@ SCRIPT_EXPORT(CPatrolPath, (), {
 			.def("add_point", &CPatrolPath::add_point)
 			.def("point", (CPatrolPoint(CPatrolPath::*) (u32)) (&CPatrolPath::point))
 			.def("add_vertex", &CPatrolPath::add_vertex)
+			.def("remove_vertex", &CPatrolPath::add_vertex)
+			.def("vertex_count", &CPatrolPath::vertex_count)
 	];
 });
 
