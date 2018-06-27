@@ -10,8 +10,7 @@ private:
     xr_vector<ref_light> v_hemi;
 
 public:
-    ref_light sun_original;
-    ref_light sun_adapted;
+    ref_light sun;
     light_Package package;
 
 public:
