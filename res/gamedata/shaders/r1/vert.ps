@@ -1,0 +1,31 @@
+#include "common.h"
+
+struct 	v2p
+{
+ 	half2 	tc0: 	TEXCOORD0;	// base
+#ifdef T_DETAILS
+ 	half2 	tcd: 	TEXCOORD1;	// detail
+  	half4	c0:		COLOR0;		// xyz=all lighting, w=dt*
+	half4	c1:		COLOR1;		// dt+
+#else
+  	half3	c0:		COLOR0;		// all lighting
+#endif
+};
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+half4 main_ps_1_1(v2p I) : COLOR
+{
+	half4 t_base 	= tex2D(s_base,I.tc0);
+	half3 final 	= t_base*I.c0.xyz*2;
+
+#ifdef T_DETAILS
+	half3 t_dt 		= tex2D(s_detail,I.tcd).xyz;
+	half3 detail	= t_dt*I.c0.w + I.c1.w;
+		  final    *= detail*2;
+#endif
+
+	// out
+	return half4(final, t_base.a);
+}

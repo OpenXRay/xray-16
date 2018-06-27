@@ -90,8 +90,8 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
     }
     else
     {
-        if (C.L_textures.size() < 2)
-            xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader, base tex: %s", *C.L_textures[0]);
+        R_ASSERT3(C.L_textures.size() >= 2, "Not enought textures for shader, base tex: %s", *C.L_textures[0]);
+
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
@@ -109,17 +109,19 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
             C.r_End();
             break;
         case SE_R1_LPOINT:
-            C.r_Pass("impl_point", "add_point", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
+            C.r_Pass("impl_point_dt", "add_point_dt", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler_clf("s_lmap", TEX_POINT_ATT);
             C.r_Sampler_clf("s_att", TEX_POINT_ATT);
+            C.r_Sampler("s_detail", oT2_Name);
             C.r_End();
             break;
         case SE_R1_LSPOT:
-            C.r_Pass("impl_spot", "add_spot", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
+            C.r_Pass("impl_spot_dt", "add_spot_dt", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler_clf("s_lmap", "internal\\internal_light_att", true);
             C.r_Sampler_clf("s_att", TEX_SPOT_ATT);
+            C.r_Sampler("s_detail", oT2_Name);
             C.r_End();
             break;
         case SE_R1_LMODELS:
