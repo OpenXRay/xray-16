@@ -1,0 +1,29 @@
+language: cpp
+cache: ccache
+sudo: required
+dist: trusty
+compiler:
+- g++
+install: export CXX="g++-7"
+os:
+- linux
+before_script:
+  - g++ --version
+  - sudo apt-get install libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev
+  - sudo apt-get install cmake lua5.1-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+  - mkdir bin
+  - cd bin
+  - cmake ..
+script:
+- if [ $TRAVIS_OS_NAME == linux ]; then make && file src/xrCore/xrCore.so; fi
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-7
+notifications:
+  email: false
+env:
+  global:
+  - LANG="en_US.UTF-8"
