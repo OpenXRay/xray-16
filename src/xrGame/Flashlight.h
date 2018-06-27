@@ -32,7 +32,7 @@ protected:
 	float			m_torch_inertion_speed_min;
 
 	bool			CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
-	void 			TurnDeviceInternal(bool b);
+	void 			TurnDeviceInternal(bool b, bool b_play_sound = true);
 	void			UpdateVisibility();
 public:
 	CFlashlight();
@@ -68,6 +68,6 @@ public:
 	virtual void	setup_physic_shell();
 
 	void	Switch();
-	void	Switch(bool light_on);
+	void	Switch(bool light_on, bool b_play_sound = true);
 	bool	torch_active() const;
 };

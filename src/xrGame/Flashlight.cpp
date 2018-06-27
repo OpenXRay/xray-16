@@ -359,7 +359,7 @@ void CFlashlight::UpdateCL()
 
 	if (!HudItemData())
 	{
-		TurnDeviceInternal(false);
+		TurnDeviceInternal(false,false);
 		return;
 	}
 
@@ -442,10 +442,10 @@ void CFlashlight::OnMoveToSlot(const SInvItemPlace& prev)
 	inherited::OnMoveToSlot(prev);
 }
 
-void CFlashlight::TurnDeviceInternal(bool b)
+void CFlashlight::TurnDeviceInternal(bool b, bool b_play_sound)
 {
 	m_bWorking = b;
-	Switch(b);
+	Switch(b,b_play_sound);
 }
 
 inline bool CFlashlight::can_use_dynamic_lights()
@@ -467,19 +467,19 @@ void CFlashlight::Switch()
 	Switch(bActive);
 }
 
-void CFlashlight::Switch(bool light_on)
+void CFlashlight::Switch(bool light_on, bool b_play_sound)
 {
 	CActor* pActor = smart_cast<CActor*>(H_Parent());
 	if (pActor)
 	{
 		if (light_on && !m_switched_on)
 		{
-			if (m_sounds.FindSoundItem("SndTurnOn", false))
+			if (b_play_sound && m_sounds.FindSoundItem("SndTurnOn", false))
 				m_sounds.PlaySound("SndTurnOn", pActor->Position(), NULL, !!pActor->HUDview());
 		}
 		else if (!light_on && m_switched_on)
 		{
-			if (m_sounds.FindSoundItem("SndTurnOff", false))
+			if (b_play_sound && m_sounds.FindSoundItem("SndTurnOff", false))
 				m_sounds.PlaySound("SndTurnOff", pActor->Position(), NULL, !!pActor->HUDview());
 		}
 	}
