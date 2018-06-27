@@ -328,7 +328,6 @@ void CRender::create()
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         R_CHK(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT, &q_sync_point[i]));
 
-    xrRender_apply_tf();
     ::PortalTraverser.initialize();
 }
 
@@ -403,8 +402,6 @@ void CRender::reset_end()
         Details->Load();
     }
     //-AVO
-
-    xrRender_apply_tf();
 
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
