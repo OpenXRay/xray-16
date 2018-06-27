@@ -115,6 +115,7 @@ public:
     virtual void load(IReader& input_packet);
 
     IC float GetPower() const { return m_fPower; }
+	IC void	 SetPower(float val) { m_fPower = val; clamp(m_fPower, 0.f, m_fPowerMax); }
     IC float GetRadiation() const { return m_fRadiation; }
     IC float GetPsyHealth() const { return m_fPsyHealth; }
     IC float GetSatiety() const { return 1.0f; }
@@ -130,7 +131,7 @@ public:
     virtual void ChangeAlcohol(const float value){};
 
     IC void MaxPower() { m_fPower = m_fPowerMax; };
-    IC void SetMaxPower(const float val) { m_fPowerMax = val; clamp(m_fPowerMax, 0.1f, 1.0f); if (m_fPowerMax < m_fPower) MaxPower(); };
+	IC void	SetMaxPower(const float val) { m_fPowerMax = val; clamp(m_fPowerMax, 0.1f, 1.0f); clamp(m_fPower, 0.f, m_fPowerMax); };
 
     IC float GetMaxPower() const { return m_fPowerMax; };
     void ChangeBleeding(const float percent);
