@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PHContactBodyEffector.h"
 #include "ExtendedGeom.h"
-#include "tri-colliderKNoOPC/dTriList.h"
+#include "tri-colliderknoopc/dTriList.h"
 #include "PhysicsCommon.h"
 #include "xrEngine/GameMtlLib.h"
 #include "MathUtilsOde.h"

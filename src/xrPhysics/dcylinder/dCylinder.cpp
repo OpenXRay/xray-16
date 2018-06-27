@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <xrPhysics/tri-colliderKNoOPC/dTriColliderCommon.h>
+#include <xrPhysics/tri-colliderknoopc/dTriColliderCommon.h>
 #include "dCylinder.h"
 #include "xrPhysics/ode_include.h"
 
