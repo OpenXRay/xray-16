@@ -15,3 +15,9 @@ IC RestrictionSpace::ERestrictorTypes CSpaceRestrictor::restrictor_type() const
 {
     return RestrictionSpace::ERestrictorTypes(m_space_restrictor_type);
 }
+
+
+IC void CSpaceRestrictor::change_restrictor_type(RestrictionSpace::ERestrictorTypes restrictor_type)
+{
+	m_space_restrictor_type = u8(restrictor_type);
+}
