@@ -20,7 +20,7 @@ vf main (v_vert v)
 		
 		P 	= watermove	(P);
 
-	float2 	tc_base	= unpack_tc_base	(v.uv,v.T.w,v.B.w);		// copy tc
+	float2 	tc_base	= unpack_tc_base	(v.uv0,v.T.w,v.B.w);		// copy tc
 
 	float 	amount	;
 	float3 	tc_refl	= waterrefl 		(amount, P,N);

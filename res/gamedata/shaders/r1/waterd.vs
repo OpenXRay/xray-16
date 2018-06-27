@@ -18,7 +18,7 @@ vf main (v_vert v)
 	float3 	N 	= unpack_normal		(v.N);
 		P 	= watermove		(P);
 
-	o.tbase		= unpack_tc_base	(v.uv,v.T.w,v.B.w);		// copy tc
+	o.tbase		= unpack_tc_base	(v.uv0,v.T.w,v.B.w);		// copy tc
 	o.tdist0	= watermove_tc 		(o.tbase*W_DISTORT_BASE_TILE_0, P.xz, W_DISTORT_AMP_0);
 	o.tdist1	= watermove_tc 		(o.tbase*W_DISTORT_BASE_TILE_1, P.xz, W_DISTORT_AMP_1);
 	o.hpos 		= mul			(m_VP, P);			// xform, input in world coords

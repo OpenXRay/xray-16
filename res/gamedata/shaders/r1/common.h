@@ -67,7 +67,7 @@ struct	v_vert
 	float4 	T		: TANGENT;
 	float4 	B		: BINORMAL;
 	float4	color	: COLOR0;		// (r,g,b,dir-occlusion)
-	float2 	uv		: TEXCOORD0;	// (u0,v0)
+	float2 	uv0		: TEXCOORD0;	// (u0,v0)
 };
 struct 	v_model
 {
@@ -91,7 +91,10 @@ struct 	vf_spot
 	float2 tc0	: TEXCOORD0;	// base
 	float4 tc1	: TEXCOORD1;	// lmap, projected
 	float2 tc2	: TEXCOORD2;	// att + clipper
-	float4 color	: COLOR0;
+#ifdef DL_DETAILS
+	float2 tcd	: TEXCOORD3;	// details
+#endif
+	float4 color: COLOR0;
 };
 struct 	vf_point
 {
@@ -99,7 +102,10 @@ struct 	vf_point
 	float2 tc0	: TEXCOORD0;	// base
 	float2 tc1	: TEXCOORD1;	// att1 + clipper
 	float2 tc2	: TEXCOORD2;	// att2 + clipper
-	float4 color	: COLOR0;
+#ifdef DL_DETAILS
+	float2 tcd	: TEXCOORD3;	// details
+#endif
+	float4 color: COLOR0;
 };
 //////////////////////////////////////////////////////////////////////////////////////////
 uniform sampler2D 	s_base;

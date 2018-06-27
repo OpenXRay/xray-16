@@ -19,7 +19,7 @@ vf main (v_vert v)
 	float3 	N 	= 	unpack_normal	(v.N);
 	float4 	P 	= 	wmark_shift		(v.P,N);
 	o.hpos 		= 	mul				(m_VP, P);				// xform, input in world coords
-	o.tc0		= 	unpack_tc_base	(v.uv,v.T.w,v.B.w);		// copy tc
+	o.tc0		= 	unpack_tc_base	(v.uv0,v.T.w,v.B.w);		// copy tc
 
 	float3 		L_rgb 	= v.color.xyz;						// precalculated RGB lighting
 	float3 		L_hemi 	= v_hemi(N)*v.N.w;					// hemisphere
