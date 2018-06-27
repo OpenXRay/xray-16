@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ExtendedGeom.h"
-#include "dCylinder/dCylinder.h"
+#include "dcylinder/dCylinder.h"
 bool IsCyliderContact(const dContact& c)
 {
     int geomClass = -1;
