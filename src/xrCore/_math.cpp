@@ -72,7 +72,9 @@ namespace FPU
 XRCORE_API void m24()
 {
 #if defined(WINDOWS)
+#ifndef XR_X64
     _controlfp(_PC_24, MCW_PC);
+#endif
     _controlfp(_RC_CHOP, MCW_RC);
 #elif defined(LINUX)
     fpu_control_t fpu_cw;
@@ -85,7 +87,9 @@ XRCORE_API void m24()
 XRCORE_API void m24r()
 {
 #if defined(WINDOWS)
+#ifndef XR_X64
     _controlfp(_PC_24, MCW_PC);
+#endif
     _controlfp(_RC_NEAR, MCW_RC);
 #elif defined(LINUX)
     fpu_control_t fpu_cw;
@@ -98,7 +102,9 @@ XRCORE_API void m24r()
 XRCORE_API void m53()
 {
 #if defined(WINDOWS)
+#ifndef XR_X64
     _controlfp(_PC_53, MCW_PC);
+#endif
     _controlfp(_RC_CHOP, MCW_RC);
 #elif defined(LINUX)
     fpu_control_t fpu_cw;
@@ -111,7 +117,9 @@ XRCORE_API void m53()
 XRCORE_API void m53r()
 {
 #if defined(WINDOWS)
+#ifndef XR_X64
     _controlfp(_PC_53, MCW_PC);
+#endif
     _controlfp(_RC_NEAR, MCW_RC);
 #elif defined(LINUX)
     fpu_control_t fpu_cw;
@@ -124,7 +132,9 @@ XRCORE_API void m53r()
 XRCORE_API void m64()
 {
 #if defined(WINDOWS)
+#ifndef XR_X64
     _controlfp(_PC_64, MCW_PC);
+#endif
     _controlfp(_RC_CHOP, MCW_RC);
 #elif defined(LINUX)
     fpu_control_t fpu_cw;
@@ -137,7 +147,9 @@ XRCORE_API void m64()
 XRCORE_API void m64r()
 {
 #if defined(WINDOWS)
+#ifndef XR_X64
     _controlfp(_PC_64, MCW_PC);
+#endif
     _controlfp(_RC_NEAR, MCW_RC);
 #elif defined(LINUX)
     fpu_control_t fpu_cw;
@@ -247,8 +259,10 @@ void Detect()
     clk_per_milisec = clk_per_second / 1000;
     clk_per_microsec = clk_per_milisec / 1000;
 
+#ifndef XR_X64
     _control87(_PC_64, MCW_PC);
-    // _control87 ( _RC_CHOP, MCW_RC );
+#endif
+
     double a, b;
     a = 1;
     b = double(clk_per_second);
