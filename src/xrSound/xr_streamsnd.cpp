@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "soundrender.h"
-#include "soundrender_core.h"
+#include "SoundRender.h"
+#include "SoundRender_Core.h"
 #include "xr_streamsnd.h"
 
 const u32 dwDestBufSize = 44 * 1024;
