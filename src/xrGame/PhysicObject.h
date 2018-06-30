@@ -48,7 +48,10 @@ struct net_updatePhData
 
 class CPhysicObject : public CPhysicsShellHolder, public CPHSkeleton
 {
-    typedef CPhysicsShellHolder inherited;
+protected:
+    using inherited = CPhysicsShellHolder;
+
+private:
     EPOType m_type;
     float m_mass;
     ICollisionHitCallback* m_collision_hit_callback;

@@ -71,7 +71,8 @@ private:
 template <typename _Object>
 class CStateMove : public CState<_Object>
 {
-    typedef CState<_Object> inherited;
+protected:
+    using inherited = CState<_Object>;
 
 public:
     CStateMove(_Object* obj, void* data = 0) : inherited(obj, data) {}

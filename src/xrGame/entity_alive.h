@@ -14,7 +14,10 @@ class CVisualMemoryManager;
 class CBlend;
 class CEntityAlive : public CEntity
 {
-    typedef CEntity inherited;
+protected:
+    using inherited = CEntity;
+
+private:
     u32 m_used_time;
 
 public:
