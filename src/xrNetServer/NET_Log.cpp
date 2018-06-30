@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "net_log.h"
+#include "NET_Log.h"
 #include "xrCore/Threading/Lock.hpp"
 //---------------------------------------------------------
 string64 PacketName[] = {"M_UPDATE", // DUAL: Update state
