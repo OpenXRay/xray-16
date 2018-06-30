@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PHObject.h"
-#include "phcollidevalidator.h"
+#include "PHCollideValidator.h"
 
 CGID CPHCollideValidator::freeGroupID = 0;
 _flags<CLClassBits> CPHCollideValidator::ClassFlags = {CLClassBits(0)};
@@ -61,10 +61,9 @@ void CPHCollideValidator::SetRagDollClassNotCollide(CPHObject& obj)
     obj.collide_class_bits().set(cbNCClassRagDoll, TRUE);
 }
 
-//Относит физический объект к классу анимированных объектов
+//Relates a physical object to the class of animated objects
 void CPHCollideValidator::SetAnimatedClass(CPHObject& obj) { obj.collide_class_bits().set(cbClassAnimated, TRUE); }
-//Задаёт игнорирование коллизий данного физического
-//объекта с анимированными телами
+//Sets ignoring collision of the physical object with animated objects (bodies)
 void CPHCollideValidator::SetAnimatedClassNotCollide(CPHObject& obj)
 {
     obj.collide_class_bits().set(cbNCClassAnimated, TRUE);

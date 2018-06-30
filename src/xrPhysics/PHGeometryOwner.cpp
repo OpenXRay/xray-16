@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PHGeometryOwner.h"
-#include "phworld.h"
+#include "PHWorld.h"
 
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"

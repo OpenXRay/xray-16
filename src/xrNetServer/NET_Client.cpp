@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "NET_Common.h"
-#include "net_Client.h"
-#include "net_Server.h"
-#include "net_Messages.h"
+#include "NET_Client.h"
+#include "NET_Server.h"
+#include "NET_Messages.h"
 #include "NET_Log.h"
 #include "xrCore/Threading/Lock.hpp"
 

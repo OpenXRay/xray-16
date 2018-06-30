@@ -2,7 +2,7 @@
 
 #include "phvalide.h"
 #include "MathUtils.h"
-#include "iphysicsshellholder.h"
+#include "IPhysicsShellHolder.h"
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif

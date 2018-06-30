@@ -3,7 +3,7 @@
 #include "xrScriptEngine/xrScriptEngine.hpp"
 #include "script_lua_helper.hpp"
 #include "script_debugger_threads.hpp"
-#include "script_CallStack.hpp"
+#include "script_callStack.hpp"
 #include "script_debugger_messages.hpp"
 
 class CMailSlotMsg;

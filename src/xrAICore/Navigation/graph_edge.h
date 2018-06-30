@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <loki/emptytype.h>
+#include <loki/EmptyType.h>
 
 template <typename _edge_weight_type, typename _vertex_type>
 class CEdgeBase

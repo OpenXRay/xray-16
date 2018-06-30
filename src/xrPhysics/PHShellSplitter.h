@@ -3,7 +3,7 @@
 #include "PHDefs.h"
 
 #include "PHFracture.h"
-#include "phupdateobject.h"
+#include "PHUpdateObject.h"
 class CPHShellSplitter;
 
 class CPHShell;

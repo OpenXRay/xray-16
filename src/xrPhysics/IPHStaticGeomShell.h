@@ -1,5 +1,5 @@
 #pragma once
-#include "physicsexternalcommon.h"
+#include "PhysicsExternalCommon.h"
 class IPHStaticGeomShell
 {
 protected:

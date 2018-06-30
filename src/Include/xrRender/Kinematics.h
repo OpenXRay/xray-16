@@ -3,7 +3,7 @@
 #pragma once
 
 #include "RenderVisual.h"
-#include "Layers\xrRender\KinematicsAddBoneTransform.hpp" //--#SM+#--
+#include "Layers/xrRender/KinematicsAddBoneTransform.hpp" //--#SM+#--
 
 typedef void (*UpdateCallback)(IKinematics* P);
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
-#include "physicsshell.h"
+#include "PhysicsShell.h"
 #include "PHDynamicData.h"
 #include "Physics.h"
 #include "PHJoint.h"
@@ -9,7 +9,7 @@
 #include "PHJointDestroyInfo.h"
 #include "PHSplitedShell.h"
 
-#include "iphysicsshellholder.h"
+#include "IPhysicsShellHolder.h"
 
 #include "phvalide.h"
 

@@ -238,7 +238,7 @@ IC void volume_lerp(float& c, float t, float s, float dt)
     c += (diff / diff_a) * mot;
 }
 
-#include "xrServerEntities\ai_sounds.h"
+#include "xrServerEntities/ai_sounds.h"
 
 bool CSoundRender_Emitter::update_culling(float dt)
 {
