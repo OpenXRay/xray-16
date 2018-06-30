@@ -4,7 +4,7 @@
 #include "ExtendedGeom.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrEngine/xr_object_list.h"
-#include "tri-colliderKNoOPC\__aabb_tri.h"
+#include "tri-colliderknoopc/__aabb_tri.h"
 #include "PHSimpleCharacter.h"
 #include "PHContactBodyEffector.h"
 
@@ -15,14 +15,14 @@
 
 #include "xrEngine/GameMtlLib.h"
 
-#include "iphysicsshellholder.h"
+#include "IPhysicsShellHolder.h"
 #include "Include/xrRender/Kinematics.h"
 #include "PHSimpleCharacterInline.h"
 #include "DamageSource.h"
 #include "PHCollideValidator.h"
 #include "CalculateTriangle.h"
 
-#include "geometry.h"
+#include "Geometry.h"
 
 #include "xrCore/Animation/Bone.hpp"
 #include "xrEngine/xr_object.h"
@@ -1519,7 +1519,7 @@ void CPHSimpleCharacter::InitContact(dContact* c, bool& do_collide, u16 material
     bool object = (dGeomGetBody(g1) && dGeomGetBody(g2));
     b_on_object = b_on_object || object;
 
-    ////////////////////////нужно сместить колижен!!
+    ////////////////////////it is necessary to shift the collision!!
     //////////////
     FootProcess(c, do_collide, bo1);
     if (!do_collide)

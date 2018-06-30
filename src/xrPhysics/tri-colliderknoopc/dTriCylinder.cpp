@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "dTriColliderCommon.h"
-#include "xrPhysics/dCylinder/dCylinder.h"
+#include "xrPhysics/dcylinder/dCylinder.h"
 #include "dTriCylinder.h"
 #include "xrPhysics/MathUtils.h"
-#include "dcTrilistCollider.h"
+#include "dcTriListCollider.h"
 #include "xrPhysics/PHWorld.h"
 #include "xrCDB/xr_area.h"
 

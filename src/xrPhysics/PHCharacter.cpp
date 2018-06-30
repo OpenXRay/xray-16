@@ -1,19 +1,19 @@
 #include "stdafx.h"
 
-#include "phcharacter.h"
+#include "PHCharacter.h"
 #include "PHDynamicData.h"
 #include "Physics.h"
 #include "ExtendedGeom.h"
-#include "iphysicsshellholder.h"
+#include "IPhysicsShellHolder.h"
 
 #include "xrCDB/Intersect.hpp"
 #include "xrEngine/GameMtlLib.h"
 
-#include "tri-colliderKNoOPC\__aabb_tri.h"
+#include "tri-colliderknoopc/__aabb_tri.h"
 #include "ode/ode/src/util.h"
 #include "ph_valid_ode.h"
-#include "Phaicharacter.h"
-#include "phactorcharacter.h"
+#include "PHAICharacter.h"
+#include "PHActorCharacter.h"
 
 CPHCharacter::CPHCharacter(void) : CPHDisablingTranslational()
 {

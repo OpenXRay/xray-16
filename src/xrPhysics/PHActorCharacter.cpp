@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "phactorcharacter.h"
-#include "Extendedgeom.h"
+#include "PHActorCharacter.h"
+#include "ExtendedGeom.h"
 #include "PhysicsCommon.h"
 
 #include "IPhysicsShellHolder.h"

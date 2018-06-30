@@ -2,7 +2,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "dTriCollideK.h"
 #include "dSortTriPrimitive.h"
-#include "xrPhysics/dCylinder/dCylinder.h"
+#include "xrPhysics/dcylinder/dCylinder.h"
 #include "xrPhysics/MathUtils.h"
 #ifdef DEBUG
 #include "xrPhysics/debug_output.h"

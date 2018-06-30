@@ -4,9 +4,9 @@
 #include "Physics.h"
 #include "ExtendedGeom.h"
 #include "xrCDB/Intersect.hpp"
-#include "tri-colliderKNoOPC\__aabb_tri.h"
+#include "tri-colliderknoopc/__aabb_tri.h"
 
-#include "phaicharacter.h"
+#include "PHAICharacter.h"
 #include "xrEngine/device.h"
 
 #ifdef DEBUG
