@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "PHDynamicData.h"
 #include "Physics.h"
-#include "tri-colliderKNoOPC/dTriList.h"
+#include "tri-colliderknoopc/dTriList.h"
 #include "PHShellSplitter.h"
 #include "PHFracture.h"
 #include "PHJointDestroyInfo.h"

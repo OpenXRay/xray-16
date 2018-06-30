@@ -2,6 +2,7 @@ TITLE: X-Ray 1.6 build and setup on Linux
 
 Required packages:
 ------
+TBB
 Crypto++
 pugixml
 Theora
@@ -12,7 +13,7 @@ JPEG
 
 
 Ubuntu 18.04 build dependencies:
-sudo apt install git cmake libcrypto++-dev libpugixml-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+sudo apt install git cmake libtbb-dev libcrypto++-dev libpugixml-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
 
 Build commands:
 ------

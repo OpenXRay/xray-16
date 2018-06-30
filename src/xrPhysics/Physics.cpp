@@ -4,7 +4,7 @@
 
 #include "PHDynamicData.h"
 #include "Physics.h"
-#include "tri-colliderKNoOPC/dTriList.h"
+#include "tri-colliderknoopc/dTriList.h"
 #include "PHContactBodyEffector.h"
 #include "xrEngine/GameMtlLib.h"
 

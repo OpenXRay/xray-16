@@ -4,7 +4,7 @@
 #include "ExtendedGeom.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrEngine/xr_object_list.h"
-#include "tri-colliderKNoOPC/__aabb_tri.h"
+#include "tri-colliderknoopc/__aabb_tri.h"
 #include "PHSimpleCharacter.h"
 #include "PHContactBodyEffector.h"
 

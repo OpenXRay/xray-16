@@ -2,8 +2,8 @@ project(xrPhysics)
 
 list(APPEND DIRS
 	"."
-	"tri-colliderKNoOPC"
-	"dCylinder"
+	"tri-colliderknoopc"
+	"dcylinder"
 	)
 
 add_dir("${DIRS}")
@@ -14,7 +14,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
 	)
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tri-colliderKNoOPC/dcTriListCollider.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tri-colliderknoopc/dcTriListCollider.cpp")
 #list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.h")
 
 add_definitions(-DXRPHYSICS_EXPORTS -DdSINGLE -D_SECURE_SCL=0)

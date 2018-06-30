@@ -22,11 +22,11 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-7
-branches:
-  only:
-  - linux
-  - xd_dev
-  - "/^v\\d+\\./"
+#branches:
+#  only:
+#  - linux
+#  - xd_dev
+#  - "/^v\\d+\\./"
 notifications:
   email: false
 env:

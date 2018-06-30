@@ -9,7 +9,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrEngine/GameMtlLib.h"
 
-#include "tri-colliderKNoOPC/__aabb_tri.h"
+#include "tri-colliderknoopc/__aabb_tri.h"
 #include "ode/ode/src/util.h"
 #include "ph_valid_ode.h"
 #include "PHAICharacter.h"

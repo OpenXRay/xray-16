@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dCylinder/dCylinder.h"
+#include "dcylinder/dCylinder.h"
 #include "PhysicsShell.h"
 #include "PHObject.h"
 #include "PHInterpolation.h"

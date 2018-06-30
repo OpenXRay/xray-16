@@ -11,6 +11,7 @@ the src\Externals directory.
 Windows SDK is available from Visual Studio 2017 installer. You will definitely need to install the following items:
 * Windows 8.1 SDK (or newer)
 * Visual C++ MFC for x86 and x64
+* C++/CLI support
 * NuGet package manager
 
 You will need following extension to save files in Visual Studio with encoding UTF-8 without BOM:

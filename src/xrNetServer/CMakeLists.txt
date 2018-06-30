@@ -11,7 +11,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
 	)
 
-#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tri-colliderKNoOPC/dcTriListCollider.cpp")
+#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tri-colliderknoopc/dcTriListCollider.cpp")
 #list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.h")
 
 add_definitions(-DXRNETSERVER_EXPORTS)
