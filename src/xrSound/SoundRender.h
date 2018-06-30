@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sound.h"
+#include "Sound.h"
 
 class CSoundRender_Core;
 class CSoundRender_Source;
