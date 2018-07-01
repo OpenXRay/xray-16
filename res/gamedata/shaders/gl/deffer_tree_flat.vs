@@ -19,14 +19,14 @@ v2p_flat _main (v_tree I)
 	float3 	pos		= mul		(m_xform, I.P);
 
 	//
-	float 	base 	= m_xform._42;			// take base height from matrix
+	float 	base 	= m_xform[3][1];			// take base height from matrix
 	float 	dp		= calc_cyclic  (wave.w+dot(pos,float3(wave)));
 	float 	H 		= pos.y - base;			// height of vertex (scaled, rotated, etc.)
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)
 	float 	inten 	= H * dp;			// intensity
 	float2 	result	= calc_xz_wave	(wind.xz*inten, frac);
 #ifdef		USE_TREEWAVE
-			result	= 0;
+			result	= float2(0);
 #endif
 	float4 	f_pos 	= float4(pos.x+result.x, pos.y, pos.z+result.y, 1);
 

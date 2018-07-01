@@ -7,7 +7,7 @@ v2p_TL _main (v_TL I)
 
 	O.Tex0		= I.Tex0;
 	O.HPos		= I.P;
-	O.P.w		= 1;
-	O.P			= mul( m_WVP, O.P );
+	O.HPos.w	= 1;
+	O.HPos		= mul( m_WVP, O.HPos );
 	return 		O;
 }
