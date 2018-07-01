@@ -10,7 +10,7 @@
 #include "xrServerEntities/smart_cast.h"
 
 #include "xrCDB/xrCDB.h"
-#include "xrSound/sound.h"
+#include "xrSound/Sound.h"
 #include "xrEngine/GameMtlLib.h"
 #include "xrCore/_std_extensions.h"
 

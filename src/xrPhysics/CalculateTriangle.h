@@ -2,7 +2,7 @@
 #include "MathUtils.h"
 
 #include "Geometry.h"
-#include "tri-colliderknoopc/dtricollidermath.h"
+#include "tri-colliderknoopc/dTriColliderMath.h"
 
 #include "ode_redefine.h"
 #include "xrCDB/xr_area.h"

@@ -1,4 +1,6 @@
-add_dir (
+project(xrCore)
+
+list(APPEND DIRS
 	"."
 	"Animation"
 	"Compression"
@@ -10,13 +12,20 @@ add_dir (
 	"Text"
 	"Threading"
 	"XML"
-        )
+	)
 
-message( "path "  ${CMAKE_CURRENT_SOURCE_DIR} ) 
+add_dir("${DIRS}")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/pugixml/src ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include)
 
-add_library(xrCore SHARED ${XRCORE__SOURCES} ${XRCORE__INCLUDES})
+add_definitions(-DXRCORE_EXPORTS)
+add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
-set_target_properties(xrCore PROPERTIES PREFIX "")
-target_link_libraries(xrCore ${SDL2_LIB} ${OPENSSL_LIBRARIES} ${LZO_LIBRARY} ${CRYPTO_LIBRARY} ${PUGIXML_LIBRARY})
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+#this is a temporary solution until find_package will not be fixed
+set(CRYPTO_LIBRARY crypto++)
+set(PUGIXML_LIBRARY pugixml)
+set(TBB_LIBRARIES tbb tbbmalloc_proxy tbbmalloc)
+set(SDL2_LIB SDL2)
+
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIB} ${LZO_LIBRARY} ${CRYPTO_LIBRARY} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
