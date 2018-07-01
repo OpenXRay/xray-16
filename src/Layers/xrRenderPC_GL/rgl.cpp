@@ -127,7 +127,7 @@ void CRender::create()
     m_MSAASample = -1;
 
     // hardware
-    o.smapsize = 2048;
+    o.smapsize = ps_r2_smapsize;
     o.mrt = HW.Caps.raster.dwMRT_count >= 3;
     o.mrtmixdepth = HW.Caps.raster.b_MRT_mixdepth;
 
