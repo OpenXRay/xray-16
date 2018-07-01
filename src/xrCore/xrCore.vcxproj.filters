@@ -109,6 +109,9 @@
     <Filter Include="Memory">
       <UniqueIdentifier>{0173b19d-898c-495c-8d22-2cc3d8436008}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Compression\lzo">
+      <UniqueIdentifier>{c6342a66-65de-47b5-afe5-c51a7383edc0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -192,12 +195,6 @@
     <ClCompile Include="xrstring.cpp">
       <Filter>shared memory/string library</Filter>
     </ClCompile>
-    <ClCompile Include="ppmd_compressor.cpp">
-      <Filter>Compression\ppmd</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Compression\ppmd\core</Filter>
-    </ClCompile>
     <ClCompile Include="LzHuf.cpp">
       <Filter>Compression\lz</Filter>
     </ClCompile>
@@ -276,15 +273,6 @@
     <ClCompile Include="XML\XMLDocument.cpp">
       <Filter>XML</Filter>
     </ClCompile>
-    <ClCompile Include="Compression\lzo_compressor.cpp">
-      <Filter>Compression</Filter>
-    </ClCompile>
-    <ClCompile Include="Compression\rt_compressor.cpp">
-      <Filter>Compression</Filter>
-    </ClCompile>
-    <ClCompile Include="Compression\rt_compressor9.cpp">
-      <Filter>Compression</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
@@ -305,6 +293,21 @@
     </ClCompile>
     <ClCompile Include="Threading\ScopeLock.cpp">
       <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\Model.cpp">
+      <Filter>Compression\ppmd\core</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\ppmd_compressor.cpp">
+      <Filter>Compression\ppmd</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\rt_compressor9.cpp">
+      <Filter>Compression\lzo</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\lzo_compressor.cpp">
+      <Filter>Compression\lzo</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\rt_compressor.cpp">
+      <Filter>Compression\lzo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -482,27 +485,6 @@
     <ClInclude Include="intrusive_ptr.h">
       <Filter>intrusive_ptr</Filter>
     </ClInclude>
-    <ClInclude Include="ppmd_compressor.h">
-      <Filter>Compression\ppmd</Filter>
-    </ClInclude>
-    <ClInclude Include="PPMd.h">
-      <Filter>Compression\ppmd\common</Filter>
-    </ClInclude>
-    <ClInclude Include="PPMdType.h">
-      <Filter>Compression\ppmd\common</Filter>
-    </ClInclude>
-    <ClInclude Include="Coder.hpp">
-      <Filter>Compression\ppmd\core</Filter>
-    </ClInclude>
-    <ClInclude Include="SubAlloc.hpp">
-      <Filter>Compression\ppmd\core\allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="compression_ppmd_stream.h">
-      <Filter>Compression\ppmd\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="compression_ppmd_stream_inline.h">
-      <Filter>Compression\ppmd\stream</Filter>
-    </ClInclude>
     <ClInclude Include="lzhuf.h">
       <Filter>Compression\lz</Filter>
     </ClInclude>
@@ -635,12 +617,6 @@
     <ClInclude Include="XML\XMLDocument.hpp">
       <Filter>XML</Filter>
     </ClInclude>
-    <ClInclude Include="Compression\lzo_compressor.h">
-      <Filter>Compression</Filter>
-    </ClInclude>
-    <ClInclude Include="Compression\rt_compressor.h">
-      <Filter>Compression</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>PCH</Filter>
     </ClInclude>
@@ -673,6 +649,33 @@
     </ClInclude>
     <ClInclude Include="Threading\ScopeLock.hpp">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\SubAlloc.hpp">
+      <Filter>Compression\ppmd\core\allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\Coder.hpp">
+      <Filter>Compression\ppmd\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\PPMd.h">
+      <Filter>Compression\ppmd\common</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\PPMdType.h">
+      <Filter>Compression\ppmd\common</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\compression_ppmd_stream.h">
+      <Filter>Compression\ppmd\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\compression_ppmd_stream_inline.h">
+      <Filter>Compression\ppmd\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\ppmd_compressor.h">
+      <Filter>Compression\ppmd</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\lzo_compressor.h">
+      <Filter>Compression\lzo</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\rt_compressor.h">
+      <Filter>Compression\lzo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

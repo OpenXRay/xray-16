@@ -32,7 +32,7 @@
 #include "RegistryFuncs.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "screenshot_server.h"
-#include "xrCore/ppmd_compressor.h"
+#include "xrCore/Compression/ppmd_compressor.h"
 #include "xrCore/Compression/rt_compressor.h"
 #include "game_cl_mp_snd_messages.h"
 
