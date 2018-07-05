@@ -119,7 +119,6 @@ public:
     MessageRegistry<pureScreenResolutionChanged> seqResolutionChanged;
 
     SDL_Window* m_sdlWnd;
-    // HWND m_hWnd;
 };
 
 class ENGINE_API CRenderDeviceBase : public IRenderDevice, public CRenderDeviceData
@@ -165,7 +164,6 @@ private:
     void _SetupStates();
 
 public:
-    // HWND m_hWnd;
     SDL_Window* m_sdlWnd;
     SDL_Renderer* m_sdlRndr;
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);

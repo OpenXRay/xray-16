@@ -331,17 +331,16 @@ void CRenderDevice::message_loop()
 
   
     SDL_PumpEvents();
-    /*
+    
     SDL_Event event;
 
-    SDL_PeepEvents(&event, 16, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+    SDL_PeepEvents(&event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT);
     while (SDL_QUIT != event.type)
     {
-        if (SDL_PeepEvents(&event, 16, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT))
+        if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT))
         {
             switch (event.type)
             {
-            case SDL_KEYDOWN: continue;
             case SDL_WINDOWEVENT:
                 switch (event.window.event)
                 {
@@ -355,7 +354,9 @@ void CRenderDevice::message_loop()
                     SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
                     continue;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
-                case SDL_WINDOWEVENT_TAKE_FOCUS:
+                case SDL_WINDOWEVENT_SHOWN:
+                case SDL_WINDOWEVENT_EXPOSED:
+                //case SDL_WINDOWEVENT_TAKE_FOCUS:
                     if (editor())
                     {
                         Device.b_is_Active = TRUE;
@@ -374,9 +375,11 @@ void CRenderDevice::message_loop()
 
         on_idle();
     }
-    */
+    
+    /*
     while (true)
         on_idle();
+        */
     
 }
 

@@ -5,6 +5,7 @@
 #include "ui/UIBtnHint.h"
 #include "xrEngine/IInputReceiver.h"
 #include "xrEngine/xr_input.h"
+#include "SDL_syswm.h"
 
 #define C_DEFAULT color_xrgb(0xff, 0xff, 0xff)
 
@@ -126,7 +127,23 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     POINT p;
     p.x = iFloor(vPos.x / (UI_BASE_WIDTH / (float)Device.m_rcWindowClient.w));
     p.y = iFloor(vPos.y / (UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h));
-    //if (m_b_use_win_cursor)
-    //    ClientToScreen(Device.m_hWnd, (LPPOINT)&p);
+    if (m_b_use_win_cursor)
+    {
+        SDL_SysWMinfo info;
+        SDL_VERSION(&info.version);
+        if (SDL_GetWindowWMInfo(Device.m_sdlWnd, &info)) 
+        {
+            switch (info.subsystem) 
+            {
+                case SDL_SYSWM_WINDOWS :
+                    ClientToScreen(info.info.win.window, (LPPOINT)&p);
+                break;
+                default : break;
+            }
+        }
+        else 
+            Log("Couldn't get window information: %s", SDL_GetError());
+    }
+        
     SetCursorPos(p.x, p.y);
 }
