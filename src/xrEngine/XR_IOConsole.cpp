@@ -614,8 +614,6 @@ void CConsole::Show()
     Device.seqFrame.Add(this);
 }
 
-extern CInput* pInput;
-
 void CConsole::Hide()
 {
     if (!bVisible || g_pGamePersistent && GEnv.isDedicatedServer)
@@ -624,7 +622,7 @@ void CConsole::Hide()
     // if ( g_pGameLevel ||
     // ( g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive() ))
 
-    if (pInput->get_exclusive_mode())
+    //if (pInput->get_exclusive_mode())
     {
         SetCursorPos(m_mouse_pos.x, m_mouse_pos.y);
     }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <dinput.h>
+#include <SDL.h>
 #include "xrEngine/xr_ioconsole.h"
 #include "xrEngine/xr_input.h"
 #include "xrEngine/xr_ioc_cmd.h"
@@ -49,32 +50,41 @@ _action actions[] = {{"left", kLEFT, _both}, {"right", kRIGHT, _both}, {"up", kU
 
     {NULL, kLASTACTION, _both}};
 
-_keyboard keyboards[] = {{"kESCAPE", DIK_ESCAPE}, {"k1", DIK_1}, {"k2", DIK_2}, {"k3", DIK_3}, {"k4", DIK_4},
-    {"k5", DIK_5}, {"k6", DIK_6}, {"k7", DIK_7}, {"k8", DIK_8}, {"k9", DIK_9}, {"k0", DIK_0}, {"kMINUS", DIK_MINUS},
-    {"kEQUALS", DIK_EQUALS}, {"kBACK", DIK_BACK}, {"kTAB", DIK_TAB}, {"kQ", DIK_Q}, {"kW", DIK_W}, {"kE", DIK_E},
-    {"kR", DIK_R}, {"kT", DIK_T}, {"kY", DIK_Y}, {"kU", DIK_U}, {"kI", DIK_I}, {"kO", DIK_O}, {"kP", DIK_P},
-    {"kLBRACKET", DIK_LBRACKET}, {"kRBRACKET", DIK_RBRACKET}, {"kRETURN", DIK_RETURN}, {"kLCONTROL", DIK_LCONTROL},
-    {"kA", DIK_A}, {"kS", DIK_S}, {"kD", DIK_D}, {"kF", DIK_F}, {"kG", DIK_G}, {"kH", DIK_H}, {"kJ", DIK_J},
-    {"kK", DIK_K}, {"kL", DIK_L}, {"kSEMICOLON", DIK_SEMICOLON}, {"kAPOSTROPHE", DIK_APOSTROPHE}, {"kGRAVE", DIK_GRAVE},
-    {"kLSHIFT", DIK_LSHIFT}, {"kBACKSLASH", DIK_BACKSLASH}, {"kZ", DIK_Z}, {"kX", DIK_X}, {"kC", DIK_C}, {"kV", DIK_V},
-    {"kB", DIK_B}, {"kN", DIK_N}, {"kM", DIK_M}, {"kCOMMA", DIK_COMMA}, {"kPERIOD", DIK_PERIOD}, {"kSLASH", DIK_SLASH},
-    {"kRSHIFT", DIK_RSHIFT}, {"kMULTIPLY", DIK_MULTIPLY}, {"kLMENU", DIK_LMENU}, {"kSPACE", DIK_SPACE},
-    {"kCAPITAL", DIK_CAPITAL}, {"kF1", DIK_F1}, {"kF2", DIK_F2}, {"kF3", DIK_F3}, {"kF4", DIK_F4}, {"kF5", DIK_F5},
-    {"kF6", DIK_F6}, {"kF7", DIK_F7}, {"kF8", DIK_F8}, {"kF9", DIK_F9}, {"kF10", DIK_F10}, {"kNUMLOCK", DIK_NUMLOCK},
-    {"kSCROLL", DIK_SCROLL}, {"kNUMPAD7", DIK_NUMPAD7}, {"kNUMPAD8", DIK_NUMPAD8}, {"kNUMPAD9", DIK_NUMPAD9},
-    {"kSUBTRACT", DIK_SUBTRACT}, {"kNUMPAD4", DIK_NUMPAD4}, {"kNUMPAD5", DIK_NUMPAD5}, {"kNUMPAD6", DIK_NUMPAD6},
-    {"kADD", DIK_ADD}, {"kNUMPAD1", DIK_NUMPAD1}, {"kNUMPAD2", DIK_NUMPAD2}, {"kNUMPAD3", DIK_NUMPAD3},
-    {"kNUMPAD0", DIK_NUMPAD0}, {"kDECIMAL", DIK_DECIMAL}, {"kF11", DIK_F11}, {"kF12", DIK_F12}, {"kF13", DIK_F13},
-    {"kF14", DIK_F14}, {"kF15", DIK_F15}, {"kKANA", DIK_KANA}, {"kCONVERT", DIK_CONVERT}, {"kNOCONVERT", DIK_NOCONVERT},
-    {"kYEN", DIK_YEN}, {"kNUMPADEQUALS", DIK_NUMPADEQUALS}, {"kCIRCUMFLEX", DIK_CIRCUMFLEX}, {"kAT", DIK_AT},
-    {"kCOLON", DIK_COLON}, {"kUNDERLINE", DIK_UNDERLINE}, {"kKANJI", DIK_KANJI}, {"kSTOP", DIK_STOP}, {"kAX", DIK_AX},
-    {"kUNLABELED", DIK_UNLABELED}, {"kNUMPADENTER", DIK_NUMPADENTER}, {"kRCONTROL", DIK_RCONTROL},
-    {"kNUMPADCOMMA", DIK_NUMPADCOMMA}, {"kDIVIDE", DIK_DIVIDE}, {"kSYSRQ", DIK_SYSRQ}, {"kRMENU", DIK_RMENU},
-    {"kHOME", DIK_HOME}, {"kUP", DIK_UP}, {"kPRIOR", DIK_PRIOR}, {"kLEFT", DIK_LEFT}, {"kRIGHT", DIK_RIGHT},
-    {"kEND", DIK_END}, {"kDOWN", DIK_DOWN}, {"kNEXT", DIK_NEXT}, {"kINSERT", DIK_INSERT}, {"kDELETE", DIK_DELETE},
-    {"kLWIN", DIK_LWIN}, {"kRWIN", DIK_RWIN}, {"kAPPS", DIK_APPS}, {"kPAUSE", DIK_PAUSE}, {"mouse1", MOUSE_1},
-    {"mouse2", MOUSE_2}, {"mouse3", MOUSE_3}, {"mouse4", MOUSE_4}, {"mouse5", MOUSE_5}, {"mouse6", MOUSE_6},
-    {"mouse7", MOUSE_7}, {"mouse8", MOUSE_8}, {NULL, 0}};
+_keyboard keyboards[] = {{"kESCAPE", SDL_SCANCODE_ESCAPE}, {"k1", SDL_SCANCODE_1}, {"k2", SDL_SCANCODE_2},
+    {"k3", SDL_SCANCODE_3}, {"k4", SDL_SCANCODE_4}, {"k5", SDL_SCANCODE_5}, {"k6", SDL_SCANCODE_6},
+    {"k7", SDL_SCANCODE_7}, {"k8", SDL_SCANCODE_8}, {"k9", SDL_SCANCODE_9}, {"k0", SDL_SCANCODE_0},
+    {"kMINUS", SDL_SCANCODE_MINUS}, {"kEQUALS", SDL_SCANCODE_EQUALS}, {"kBACK", SDL_SCANCODE_BACKSPACE},
+    {"kTAB", SDL_SCANCODE_TAB}, {"kQ", SDL_SCANCODE_Q}, {"kW", SDL_SCANCODE_W}, {"kE", SDL_SCANCODE_E},
+    {"kR", SDL_SCANCODE_R}, {"kT", SDL_SCANCODE_T}, {"kY", SDL_SCANCODE_Y}, {"kU", SDL_SCANCODE_U},
+    {"kI", SDL_SCANCODE_I}, {"kO", SDL_SCANCODE_O}, {"kP", SDL_SCANCODE_P}, {"kLBRACKET", SDL_SCANCODE_LEFTBRACKET},
+    {"kRBRACKET", SDL_SCANCODE_RIGHTBRACKET}, {"kRETURN", SDL_SCANCODE_RETURN}, {"kLCONTROL", SDL_SCANCODE_LCTRL},
+    {"kA", SDL_SCANCODE_A}, {"kS", SDL_SCANCODE_S}, {"kD", SDL_SCANCODE_D}, {"kF", SDL_SCANCODE_F},
+    {"kG", SDL_SCANCODE_G}, {"kH", SDL_SCANCODE_H}, {"kJ", SDL_SCANCODE_J}, {"kK", SDL_SCANCODE_K},
+    {"kL", SDL_SCANCODE_L}, {"kSEMICOLON", SDL_SCANCODE_SEMICOLON}, {"kAPOSTROPHE", SDL_SCANCODE_APOSTROPHE},
+    {"kGRAVE", SDL_SCANCODE_GRAVE}, {"kLSHIFT", SDL_SCANCODE_LSHIFT}, {"kBACKSLASH", SDL_SCANCODE_BACKSLASH},
+    {"kZ", SDL_SCANCODE_Z}, {"kX", SDL_SCANCODE_X}, {"kC", SDL_SCANCODE_C}, {"kV", SDL_SCANCODE_V},
+    {"kB", SDL_SCANCODE_B}, {"kN", SDL_SCANCODE_N}, {"kM", SDL_SCANCODE_M}, {"kCOMMA", SDL_SCANCODE_COMMA},
+    {"kPERIOD", SDL_SCANCODE_PERIOD}, {"kSLASH", SDL_SCANCODE_SLASH}, {"kRSHIFT", SDL_SCANCODE_RSHIFT},
+    {"kMULTIPLY", SDL_SCANCODE_KP_MULTIPLY}, {"kLMENU", SDL_SCANCODE_LALT}, {"kSPACE", SDL_SCANCODE_SPACE},
+    {"kCAPITAL", SDL_SCANCODE_CAPSLOCK}, {"kF1", SDL_SCANCODE_F1}, {"kF2", SDL_SCANCODE_F2}, {"kF3", SDL_SCANCODE_F3},
+    {"kF4", SDL_SCANCODE_F4}, {"kF5", SDL_SCANCODE_F5}, {"kF6", SDL_SCANCODE_F6}, {"kF7", SDL_SCANCODE_F7},
+    {"kF8", SDL_SCANCODE_F8}, {"kF9", SDL_SCANCODE_F9}, {"kF10", SDL_SCANCODE_F10},
+    {"kNUMLOCK", SDL_SCANCODE_NUMLOCKCLEAR}, {"kSCROLL", SDL_SCANCODE_SCROLLLOCK}, {"kNUMPAD7", SDL_SCANCODE_KP_7},
+    {"kNUMPAD8", SDL_SCANCODE_KP_8}, {"kNUMPAD9", SDL_SCANCODE_KP_9}, {"kSUBTRACT", SDL_SCANCODE_KP_MINUS},
+    {"kNUMPAD4", SDL_SCANCODE_KP_4}, {"kNUMPAD5", SDL_SCANCODE_KP_5}, {"kNUMPAD6", SDL_SCANCODE_KP_6},
+    {"kADD", SDL_SCANCODE_KP_PLUS}, {"kNUMPAD1", SDL_SCANCODE_KP_1}, {"kNUMPAD2", SDL_SCANCODE_KP_2},
+    {"kNUMPAD3", SDL_SCANCODE_KP_3}, {"kNUMPAD0", SDL_SCANCODE_KP_0}, {"kDECIMAL", SDL_SCANCODE_KP_DECIMAL},
+    {"kF11", SDL_SCANCODE_F11}, {"kF12", SDL_SCANCODE_F12}, {"kF13", SDL_SCANCODE_F13}, {"kF14", SDL_SCANCODE_F14},
+    {"kF15", SDL_SCANCODE_F15}, {"kNUMPADEQUALS", SDL_SCANCODE_KP_EQUALS}, {"kCIRCUMFLEX", SDL_SCANCODE_GRAVE},
+    {"kAT", SDL_SCANCODE_KP_AT}, {"kCOLON", SDL_SCANCODE_KP_COLON}, {"kSTOP", SDL_SCANCODE_STOP},
+    {"kRCONTROL", SDL_SCANCODE_RCTRL}, {"kNUMPADCOMMA", SDL_SCANCODE_KP_COMMA}, {"kDIVIDE", SDL_SCANCODE_KP_DIVIDE},
+    {"kSYSRQ", SDL_SCANCODE_SYSREQ}, {"kRMENU", SDL_SCANCODE_RALT}, {"kHOME", SDL_SCANCODE_HOME},
+    {"kUP", SDL_SCANCODE_UP}, {"kPRIOR", SDL_SCANCODE_PRIOR}, {"kLEFT", SDL_SCANCODE_LEFT},
+    {"kRIGHT", SDL_SCANCODE_RIGHT}, {"kEND", SDL_SCANCODE_END}, {"kDOWN", SDL_SCANCODE_DOWN},
+    {"kNEXT", SDL_SCANCODE_AUDIONEXT}, {"kINSERT", SDL_SCANCODE_INSERT}, {"kDELETE", SDL_SCANCODE_DELETE},
+    {"kLWIN", SDL_SCANCODE_LGUI}, {"kRWIN", SDL_SCANCODE_RGUI}, {"kAPPS", SDL_SCANCODE_APPLICATION},
+    {"kPAUSE", SDL_SCANCODE_PAUSE}, {"mouse1", MOUSE_1}, {"mouse2", MOUSE_2}, {"mouse3", MOUSE_3}, {"mouse4", MOUSE_4},
+    {"mouse5", MOUSE_5}, {"mouse6", MOUSE_6}, {"mouse7", MOUSE_7}, {"mouse8", MOUSE_8}, {NULL, 0}};
 
 void initialize_bindings()
 {
@@ -113,7 +123,7 @@ void remap_keys()
     {
         buff[0] = 0;
         _keyboard& kb = keyboards[idx];
-        bool res = pInput->get_dik_name(kb.dik, buff, sizeof(buff));
+        bool res = pInput->get_key_name(kb.dik, buff, sizeof(buff));
         if (res)
             kb.key_local_name = buff;
         else

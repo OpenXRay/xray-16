@@ -265,8 +265,8 @@ IC void set_limits(float& min, float& max, SJointLimit& l)
     max = -l.limit.x;
     min += M_PI;
     max += M_PI;
-    clamp(min, 0.f, 2 * M_PI);
-    clamp(max, 0.f, 2 * M_PI);
+    clamp<float>(min, 0.f, 2 * M_PI);
+    clamp<float>(max, 0.f, 2 * M_PI);
 }
 
 IC void free_limits(float& min, float& max)

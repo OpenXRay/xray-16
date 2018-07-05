@@ -56,7 +56,7 @@ void IInputReceiver::IR_GetMousePosReal(HWND hwnd, Ivector2& p)
     if (hwnd)
         ScreenToClient(hwnd, (LPPOINT)&p);
 }
-void IInputReceiver::IR_GetMousePosReal(Ivector2& p) { IR_GetMousePosReal(RDEVICE.m_hWnd, p); }
+void IInputReceiver::IR_GetMousePosReal(Ivector2& p) { /*IR_GetMousePosReal(RDEVICE.m_sdlWnd, p)*/; }
 void IInputReceiver::IR_GetMousePosIndependent(Fvector2& f)
 {
     Ivector2 p;

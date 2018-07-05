@@ -2,6 +2,9 @@
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
 #include "xrCDB/xrXRC.h"
+#include <SDL.h>
+#include <SDL_syswm.h>
+
 
 extern XRCDB_API BOOL* cdb_bDebug;
 
@@ -35,9 +38,7 @@ void CRenderDevice::Create()
     fFOV = 90.f;
     fASPECT = 1.f;
     const bool noEd = !editor();
-    GEnv.Render->Create(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
-    GetWindowRect(m_hWnd, &m_rcWindowBounds);
-    GetClientRect(m_hWnd, &m_rcWindowClient);
+    GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
     Memory.mem_compact();
     b_is_Ready = TRUE;
     _SetupStates();

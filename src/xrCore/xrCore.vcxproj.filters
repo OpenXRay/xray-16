@@ -689,5 +689,9 @@
     <None Include="Debug\DXTrace.inl">
       <Filter>Debug core\DxErr</Filter>
     </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

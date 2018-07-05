@@ -133,9 +133,11 @@ CApplication::CApplication()
     loadingScreen = nullptr;
 }
 
+extern CInput* pInput;
+
 CApplication::~CApplication()
 {
-    Console->Hide();
+    //Console->Hide();
 
     // font
     xr_delete(pFontSystem);

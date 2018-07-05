@@ -25,6 +25,7 @@
 #include "Include/editor/interfaces.hpp"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
+#include <SDL.h>
 
 class engine_impl;
 
@@ -62,10 +63,10 @@ public:
     u32 dwHeight;
 
     // Real application window resolution
-    RECT m_rcWindowBounds;
+    SDL_Rect m_rcWindowBounds;
 
-    // Real game window resolution 
-    RECT m_rcWindowClient;
+    // Real game window resolution
+    SDL_Rect m_rcWindowClient;
 
     u32 dwPrecacheFrame;
     BOOL b_is_Ready;
@@ -117,7 +118,8 @@ public:
     MessageRegistry<pureFrame> seqFrame;
     MessageRegistry<pureScreenResolutionChanged> seqResolutionChanged;
 
-    HWND m_hWnd;
+    SDL_Window* m_sdlWnd;
+    // HWND m_hWnd;
 };
 
 class ENGINE_API CRenderDeviceBase : public IRenderDevice, public CRenderDeviceData
@@ -135,18 +137,19 @@ public:
     class ENGINE_API CSecondVPParams //--#SM+#-- +SecondVP+
     {
         bool isActive; // Флаг активации рендера во второй вьюпорт
-        u8 frameDelay;  // На каком кадре с момента прошлого рендера во второй вьюпорт мы начнём новый
-                          //(не может быть меньше 2 - каждый второй кадр, чем больше тем более низкий FPS во втором вьюпорте)
-    
+        u8 frameDelay; // На каком кадре с момента прошлого рендера во второй вьюпорт мы начнём новый
+                       //(не может быть меньше 2 - каждый второй кадр, чем больше тем более низкий FPS во втором
+                       //вьюпорте)
+
     public:
         bool isCamReady; // Флаг готовности камеры (FOV, позиция, и т.п) к рендеру второго вьюпорта
 
         IC bool IsSVPActive() { return isActive; }
         IC void SetSVPActive(bool bState) { isActive = bState; }
-        bool    IsSVPFrame();
+        bool IsSVPFrame();
 
         IC u8 GetSVPFrameDelay() { return frameDelay; }
-        void  SetSVPFrameDelay(u8 iDelay)
+        void SetSVPFrameDelay(u8 iDelay)
         {
             frameDelay = iDelay;
             clamp<u8>(frameDelay, 2, u8(-1));
@@ -163,6 +166,8 @@ private:
 
 public:
     // HWND m_hWnd;
+    SDL_Window* m_sdlWnd;
+    SDL_Renderer* m_sdlRndr;
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 
     // u32 dwFrame;
@@ -202,16 +207,15 @@ public:
     MessageRegistry<pureFrame> seqFrameMT;
     MessageRegistry<pureDeviceReset> seqDeviceReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
-	CSecondVPParams m_SecondViewport;	//--#SM+#-- +SecondVP+
+    CSecondVPParams m_SecondViewport; //--#SM+#-- +SecondVP+
 
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
-        : m_dwWindowStyle(0), fWidth_2(0), fHeight_2(0),
-          m_editor_module(nullptr), m_editor_initialize(nullptr),
+        : m_dwWindowStyle(0), fWidth_2(0), fHeight_2(0), m_editor_module(nullptr), m_editor_initialize(nullptr),
           m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
     {
-        m_hWnd = NULL;
+        m_sdlWnd = NULL;
         b_is_Active = FALSE;
         b_is_Ready = FALSE;
         Timer.Start();

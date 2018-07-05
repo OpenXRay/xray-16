@@ -10,6 +10,7 @@
 #define MMNOMIXER
 #define MMNOJOY
 #include <mmsystem.h>
+#include <SDL.h>
 #pragma warning(pop)
 
 #include "x_ray.h"
@@ -95,9 +96,8 @@ void CRenderDevice::End(void)
             CheckPrivilegySlowdown();
             if (g_pGamePersistent->GameType() == 1) // haCk
             {
-                WINDOWINFO wi;
-                GetWindowInfo(m_hWnd, &wi);
-                if (wi.dwWindowStatus != WS_ACTIVECAPTION)
+                Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
+                if (flags & SDL_WINDOW_INPUT_GRABBED)
                     Pause(TRUE, TRUE, TRUE, "application start");
             }
         }
@@ -271,7 +271,7 @@ void CRenderDevice::on_idle()
     mViewSaved = mView;
     mProjectSaved = mProject;
 
-    //renderProcessFrame.Set(); // allow render thread to do its job
+    // renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
 
     const auto frameEndTime = TimerGlobal.GetElapsed_ms();
@@ -308,7 +308,7 @@ void CRenderDevice::on_idle()
         Sleep(updateDelta - frameTime);
 
     syncFrameDone.Wait(); // wait until secondary thread finish its job
-    //renderFrameDone.Wait(); // wait until render thread finish its job
+    // renderFrameDone.Wait(); // wait until render thread finish its job
 
     if (!b_is_Active)
         Sleep(1);
@@ -329,18 +329,55 @@ void CRenderDevice::message_loop()
         return;
     }
 
-    MSG msg;
-    PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
-    while (msg.message != WM_QUIT)
+  
+    SDL_PumpEvents();
+    /*
+    SDL_Event event;
+
+    SDL_PeepEvents(&event, 16, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+    while (SDL_QUIT != event.type)
     {
-        if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+        if (SDL_PeepEvents(&event, 16, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-            continue;
+            switch (event.type)
+            {
+            case SDL_KEYDOWN: continue;
+            case SDL_WINDOWEVENT:
+                switch (event.window.event)
+                {
+                case SDL_WINDOWEVENT_MOVED:
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                case SDL_WINDOWEVENT_MAXIMIZED:
+                    SDL_Log("Window %d moved to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
+                    continue;
+                case SDL_WINDOWEVENT_CLOSE:
+                    event.type = SDL_QUIT;
+                    SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+                    continue;
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+                case SDL_WINDOWEVENT_TAKE_FOCUS:
+                    if (editor())
+                    {
+                        Device.b_is_Active = TRUE;
+                        continue;
+                    }
+                    OnWM_Activate(event.window.data1, event.window.data2);
+                    SDL_Log("Window %d is offered a focus", event.window.windowID);
+                    continue;
+#endif
+                default: SDL_Log("Window %d got unknown event %d", event.window.windowID, event.window.event); continue;
+                }
+                continue;
+            default: Log("Recieve window %d event", event.type); continue;
+            }
         }
+
         on_idle();
     }
+    */
+    while (true)
+        on_idle();
+    
 }
 
 void CRenderDevice::Run()
@@ -362,19 +399,19 @@ void CRenderDevice::Run()
     // Start all threads
     mt_bMustExit = FALSE;
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-    //thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
+    // thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
     // Message cycle
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
-    ShowWindow(m_hWnd, SW_SHOWNORMAL);
+    SDL_ShowWindow(m_sdlWnd);
     pInput->ClipCursor(true);
     message_loop();
     seqAppEnd.Process();
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
-    //renderProcessFrame.Set();
-    //renderThreadExit.Wait();
+    // renderProcessFrame.Set();
+    // renderThreadExit.Wait();
     syncProcessFrame.Set();
     syncThreadExit.Wait();
 
@@ -448,12 +485,11 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     if (bOn)
     {
         if (!Paused())
-            bShowPauseString =
-                editor() ? FALSE :
+            bShowPauseString = editor() ? FALSE :
 #ifdef DEBUG
-                           !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
+                                          !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
 #endif // DEBUG
-                                                                        TRUE;
+                                                                                       TRUE;
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
         {
             g_pauseMngr().Pause(TRUE);
@@ -535,16 +571,10 @@ CRenderDevice* get_device() { return &Device; }
 u32 script_time_global() { return Device.dwTimeGlobal; }
 u32 script_time_global_async() { return Device.TimerAsync_MMT(); }
 
-SCRIPT_EXPORT(Device, (),
-{
+SCRIPT_EXPORT(Device, (), {
     using namespace luabind;
-    module(luaState)
-    [
-        def("time_global", &script_time_global),
-        def("time_global_async", &script_time_global_async),
-        def("device", &get_device),
-        def("is_enough_address_space_available", &is_enough_address_space_available)
-    ];
+    module(luaState)[def("time_global", &script_time_global), def("time_global_async", &script_time_global_async),
+        def("device", &get_device), def("is_enough_address_space_available", &is_enough_address_space_available)];
 });
 
 CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}
