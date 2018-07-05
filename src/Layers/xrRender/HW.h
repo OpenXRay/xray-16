@@ -68,9 +68,9 @@ public:
 
     CHWCaps Caps;
 
-    HWND m_hWnd;
+    SDL_Window* m_hWnd;
     HDC m_hDC;
-    HGLRC m_hRC;
+    SDL_GLContext m_hRC;
 #elif defined(USE_DX11)
 public:
     IDXGIFactory1* m_pFactory = nullptr;

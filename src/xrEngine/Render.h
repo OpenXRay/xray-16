@@ -5,7 +5,7 @@
 #include "vis_common.h"
 #include "Include/xrRender/FactoryPtr.h"
 #include "xrCore/xr_resource.h"
-#include "SDL.h"
+#include <SDL.h>
 
 class IUIShader;
 typedef FactoryPtr<IUIShader> wm_shader;

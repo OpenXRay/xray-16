@@ -48,16 +48,20 @@ void CRenderDevice::Initialize()
 
     if (!m_sdlWnd)
     {
-        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-            640, 480, SDL_WINDOW_BORDERLESS);
+        Uint32 flags = SDL_WINDOW_BORDERLESS;
+
+        if (strstr(Core.Params, "-gl"))
+            flags |= SDL_WINDOW_OPENGL;
+
+        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, flags);
         
         if (!m_sdlWnd)
             Log("Unable to create window: %s", SDL_GetError());
 
-        m_sdlRndr = SDL_CreateRenderer(m_sdlWnd, -1, SDL_RENDERER_ACCELERATED);
+        //m_sdlRndr = SDL_CreateRenderer(m_sdlWnd, -1, SDL_RENDERER_ACCELERATED);
 
-        SDL_RenderClear(m_sdlRndr);
-        SDL_RenderPresent(m_sdlRndr);
+        //SDL_RenderClear(m_sdlRndr);
+        //SDL_RenderPresent(m_sdlRndr);
     }
     // Save window properties
     

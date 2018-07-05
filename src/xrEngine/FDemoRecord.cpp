@@ -307,7 +307,7 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
     }
     else
     {
-        if (IR_GetKeyState(DIK_F1))
+        if (IR_GetKeyState(SDL_SCANCODE_F1))
         {
             pApp->pFontSystem->SetColor(color_rgba(255, 0, 0, 255));
             pApp->pFontSystem->SetAligment(CGameFont::alCenter);
@@ -337,17 +337,17 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
         float speed = m_fSpeed1, ang_speed = m_fAngSpeed1;
 
-        if (IR_GetKeyState(DIK_LSHIFT))
+        if (IR_GetKeyState(SDL_SCANCODE_LSHIFT))
         {
             speed = m_fSpeed0;
             ang_speed = m_fAngSpeed0;
         }
-        else if (IR_GetKeyState(DIK_LALT))
+        else if (IR_GetKeyState(SDL_SCANCODE_LALT))
         {
             speed = m_fSpeed2;
             ang_speed = m_fAngSpeed2;
         }
-        else if (IR_GetKeyState(DIK_LCONTROL))
+        else if (IR_GetKeyState(SDL_SCANCODE_LCTRL))
         {
             speed = m_fSpeed3;
             ang_speed = m_fAngSpeed3;
@@ -402,7 +402,7 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
 void CDemoRecord::IR_OnKeyboardPress(int dik)
 {
-    if (dik == DIK_MULTIPLY)
+    if (dik == SDL_SCANCODE_KP_MULTIPLY)
         m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
 
     if (m_b_redirect_input_to_level)
@@ -410,21 +410,21 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
         g_pGameLevel->IR_OnKeyboardPress(dik);
         return;
     }
-    if (dik == DIK_GRAVE)
+    if (dik == SDL_SCANCODE_GRAVE)
         Console->Show();
-    if (dik == DIK_SPACE)
+    if (dik == SDL_SCANCODE_SPACE)
         RecordKey();
-    if (dik == DIK_BACK)
+    if (dik == SDL_SCANCODE_BACKSPACE)
         MakeCubemap();
-    if (dik == DIK_F11)
-        MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
-    if (dik == DIK_F12)
+    if (dik == SDL_SCANCODE_F11)
+        MakeLevelMapScreenshot(IR_GetKeyState(SDL_SCANCODE_LCTRL));
+    if (dik == SDL_SCANCODE_F12)
         MakeScreenshot();
-    if (dik == DIK_ESCAPE)
+    if (dik == SDL_SCANCODE_ESCAPE)
         fLifeTime = -1;
 
 #ifdef DEBUG // ndef MASTER_GOLD // Xottab_DUTY: Teleport to demo cam in Debug configuration
-    if (dik == DIK_RETURN)
+    if (dik == SDL_SCANCODE_RETURN)
     {
         if (g_pGameLevel->CurrentEntity())
         {
@@ -434,7 +434,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     }
 #endif
 
-    if (dik == DIK_PAUSE)
+    if (dik == SDL_SCANCODE_PAUSE)
         Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
 }
 
@@ -457,41 +457,41 @@ void CDemoRecord::IR_OnKeyboardHold(int dik)
 
     switch (dik)
     {
-    case DIK_A:
-    case DIK_NUMPAD1:
-    case DIK_LEFT:
+    case SDL_SCANCODE_A:
+    case SDL_SCANCODE_KP_1:
+    case SDL_SCANCODE_LEFT:
         vT_delta.x -= 1.0f;
         break; // Slide Left
-    case DIK_D:
-    case DIK_NUMPAD3:
-    case DIK_RIGHT:
+    case SDL_SCANCODE_D:
+    case SDL_SCANCODE_KP_3:
+    case SDL_SCANCODE_RIGHT:
         vT_delta.x += 1.0f;
         break; // Slide Right
-    case DIK_S:
+    case SDL_SCANCODE_S:
         vT_delta.y -= 1.0f;
         break; // Slide Down
-    case DIK_W:
+    case SDL_SCANCODE_W:
         vT_delta.y += 1.0f;
         break; // Slide Up
     // rotate
-    case DIK_NUMPAD2:
+    case SDL_SCANCODE_KP_2:
         vR_delta.x -= 1.0f;
         break; // Pitch Down
-    case DIK_NUMPAD8:
+    case SDL_SCANCODE_KP_8:
         vR_delta.x += 1.0f;
         break; // Pitch Up
-    case DIK_E:
-    case DIK_NUMPAD6:
+    case SDL_SCANCODE_E:
+    case SDL_SCANCODE_KP_6:
         vR_delta.y += 1.0f;
         break; // Turn Left
-    case DIK_Q:
-    case DIK_NUMPAD4:
+    case SDL_SCANCODE_Q:
+    case SDL_SCANCODE_KP_4:
         vR_delta.y -= 1.0f;
         break; // Turn Right
-    case DIK_NUMPAD9:
+    case SDL_SCANCODE_KP_9:
         vR_delta.z -= 2.0f;
         break; // Turn Right
-    case DIK_NUMPAD7:
+    case SDL_SCANCODE_KP_7:
         vR_delta.z += 2.0f;
         break; // Turn Right
     }

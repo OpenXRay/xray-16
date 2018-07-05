@@ -41,72 +41,39 @@ CHW::~CHW() {}
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-void CHW::CreateDevice(HWND hWnd, bool move_window)
+void CHW::CreateDevice(SDL_Window *hWnd, bool move_window)
 {
     m_hWnd = hWnd;
     m_move_window = move_window;
 
     R_ASSERT(m_hWnd);
 
-    PIXELFORMATDESCRIPTOR pfd =
-    {
-        sizeof(PIXELFORMATDESCRIPTOR),
-        1,
-        PFD_DRAW_TO_WINDOW |
-        PFD_SUPPORT_OPENGL |
-        PFD_DOUBLEBUFFER, // Flags
-        PFD_TYPE_RGBA, // The kind of framebuffer. RGBA or palette.
-        32, // Color depth of the framebuffer.
-        0, 0, 0, 0, 0, 0,
-        0,
-        0,
-        0,
-        0, 0, 0, 0,
-        24, // Number of bits for the depthbuffer
-        8, // Number of bits for the stencilbuffer
-        0, // Number of Aux buffers in the framebuffer.
-        PFD_MAIN_PLANE,
-        0,
-        0, 0, 0
-    };
-
     // Get the device context
-    m_hDC = GetDC(m_hWnd);
-    if (m_hDC == nullptr)
+    Uint32 pixelFormat = SDL_GetWindowPixelFormat(m_hWnd);
+    if (SDL_PIXELFORMAT_UNKNOWN == pixelFormat)
     {
-        Msg("Could not get device context.");
+        Msg("Could not get pixel format: %s", SDL_GetError());
         return;
     }
 
-    // Choose the closest pixel format
-    int iPixelFormat = ChoosePixelFormat(m_hDC, &pfd);
-    if (iPixelFormat == 0)
-    {
-        Msg("No pixel format found.");
-        return;
-    }
+    //TODO Choose the closest pixel format
 
-    // Apply the pixel format to the device context
-    if (!SetPixelFormat(m_hDC, iPixelFormat, &pfd))
-    {
-        Msg("Could not set pixel format.");
-        return;
-    }
+    //TODO Apply the pixel format to the device context
 
     // Create the context
-    m_hRC = wglCreateContext(m_hDC);
+    m_hRC = SDL_GL_CreateContext(m_hWnd);
     if (m_hRC == nullptr)
     {
-        Msg("Could not create drawing context.");
+        Msg("Could not create drawing context: %s", SDL_GetError());
         return;
     }
 
     // Make the new context the current context for this thread
     // NOTE: This assumes the thread calling Create() is the only
     // thread that will use the context.
-    if (!wglMakeCurrent(m_hDC, m_hRC))
+    if (SDL_GL_MakeCurrent(m_hWnd, m_hRC) != 0)
     {
-        Msg("Could not make context current.");
+        Msg("Could not make context current. %s", SDL_GetError());
         return;
     }
 
@@ -139,21 +106,12 @@ void CHW::DestroyDevice()
 {
     if (m_hRC)
     {
-        if (!wglMakeCurrent(nullptr, nullptr))
-            Msg("Could not release drawing context.");
+        if (SDL_GL_MakeCurrent(nullptr, nullptr) != 0)
+            Msg("Could not release drawing context: %s", SDL_GetError());
 
-        if (!wglDeleteContext(m_hRC))
-            Msg("Could not delete context.");
+        SDL_GL_DeleteContext(m_hRC);
 
         m_hRC = nullptr;
-    }
-
-    if (m_hDC)
-    {
-        if (!ReleaseDC(m_hWnd, m_hDC))
-            Msg("Could not release device context.");
-
-        m_hDC = nullptr;
     }
 
     free_vid_mode_list();
@@ -162,7 +120,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 // Resetting device
 //////////////////////////////////////////////////////////////////////
-void CHW::Reset(HWND hwnd)
+void CHW::Reset(SDL_Window* hwnd)
 {
     BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
 
@@ -176,7 +134,7 @@ void CHW::Reset(HWND hwnd)
     UpdateViews();
 
     updateWindowProps(hwnd);
-    ShowWindow(hwnd, SW_SHOWNORMAL);
+    SDL_ShowWindow(hwnd);
 }
 
 void CHW::updateWindowProps(SDL_Window* m_sdlWnd)
