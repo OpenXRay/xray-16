@@ -121,8 +121,13 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     case kTORCH:
     {
-        SwitchTorch();
-        break;
+		SwitchTorch();
+
+		CFlashlight* flashlight = smart_cast<CFlashlight*>(inventory().ItemFromSlot(DETECTOR_SLOT));
+		if (flashlight)
+			flashlight->ToggleSwitch();
+
+		break;
     }
 
     case kDETECTOR:

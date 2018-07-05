@@ -11,30 +11,29 @@ private:
 protected:
 	bool			m_bFastAnimMode;
 	bool			m_bNeedActivation;
-	bool			m_bWorking;
 
 	float			fBrightness;
 	CLAItem*		lanim;
 
-	u16				guid_bone;
 	shared_str		light_trace_bone;
 
-	float			m_delta_h;
-	Fvector2		m_prev_hp;
 	bool			m_switched_on;
 	ref_light		light_render;
 	ref_light		light_omni;
 	ref_glow		glow_render;
 	shared_str		m_light_section;
-	Fvector			m_torch_offset;
-	Fvector			m_omni_offset;
-	float			m_torch_inertion_speed_max;
-	float			m_torch_inertion_speed_min;
 
 	bool			CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
-	void 			TurnDeviceInternal(bool b, bool b_play_sound = true);
 	void			UpdateVisibility();
 public:
+	enum EFlashlightStates
+	{
+		eToggle = eLastBaseState + 1,
+		eSwitchOn,
+		eSwitchOff,
+		eIdleZoom,
+	};
+
 	CFlashlight();
 	virtual			~CFlashlight();
 
@@ -70,4 +69,5 @@ public:
 	void	Switch();
 	void	Switch(bool light_on, bool b_play_sound = true);
 	bool	torch_active() const;
+	void	ToggleSwitch();
 };

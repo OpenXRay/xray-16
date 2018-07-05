@@ -15,7 +15,6 @@ CFlashlight::CFlashlight()
 {
 	m_bFastAnimMode = false;
 	m_bNeedActivation = false;
-	m_bWorking = false;
     
 	light_render = GEnv.Render->light_create();
 	light_render->set_type(IRender_Light::SPOT);
@@ -29,20 +28,12 @@ CFlashlight::CFlashlight()
 	lanim = 0;
 	fBrightness = 1.f;
 
-	m_prev_hp.set(0, 0);
-	m_delta_h = 0;
-
-	m_torch_offset = { 0.f, 0.f, 0.f };
-	m_omni_offset = { 0.f, 0.f, 0.f };
-	m_torch_inertion_speed_max = 7.5f;
-	m_torch_inertion_speed_min = 0.5f;
-
 	m_light_section = "torch_definition";
 }
 
 CFlashlight::~CFlashlight()
 {
-	TurnDeviceInternal(false);
+	Switch(false,false);
 	light_render.destroy();
 	light_omni.destroy();
 	glow_render.destroy();
@@ -82,11 +73,7 @@ bool CFlashlight::CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate)
 	{
 		CWeapon* W = smart_cast<CWeapon*>(itm);
 		if (W)
-			bres = bres &&
-			(W->GetState() != CHUDState::eBore) &&
-			(W->GetState() != CWeapon::eReload) &&
-			(W->GetState() != CWeapon::eSwitch) &&
-			!W->IsZoomed();
+			bres = bres && (W->GetState() != CHUDState::eBore) && (W->GetState() != CWeapon::eReload) && (W->GetState() != CWeapon::eSwitch) /*&& !W->IsZoomed()*/;
 	}
 	return bres;
 }
@@ -142,7 +129,7 @@ void CFlashlight::ToggleDevice(bool bFastMode)
 	}
 	else
 		if (GetState() == eIdle)
-			SwitchState(eHiding);
+			SwitchState(eSwitchOff);
 
 }
 
@@ -152,28 +139,39 @@ void CFlashlight::OnStateSwitch(u32 S, u32 oldState)
 
 	switch (S)
 	{
-	case eShowing:
-	{
-		g_player_hud->attach_item(this);
-		TurnDeviceInternal(true);
-		m_sounds.PlaySound("sndShow", Fvector().set(0, 0, 0), this, true, false);
-		PlayHUDMotion(m_bFastAnimMode ? "anm_show_fast" : "anm_show", FALSE/*TRUE*/, this, GetState());
-		SetPending(TRUE);
-	}break;
-	case eHiding:
-	{
-		if (oldState != eHiding)
+		case eShowing:
 		{
-			m_sounds.PlaySound("sndHide", Fvector().set(0, 0, 0), this, true, false);
-			PlayHUDMotion(m_bFastAnimMode ? "anm_hide_fast" : "anm_hide", FALSE/*TRUE*/, this, GetState());
+			g_player_hud->attach_item(this);
+			m_sounds.PlaySound("sndShow", Fvector().set(0, 0, 0), this, true, false);
+			PlayHUDMotion(m_bFastAnimMode ? "anm_show_fast" : "anm_show", FALSE/*TRUE*/, this, GetState());
 			SetPending(TRUE);
-		}
-	}break;
-	case eIdle:
-	{
-		PlayAnimIdle();
-		SetPending(FALSE);
-	}break;
+		}break;
+		case eHiding:
+		{
+			if (oldState != eHiding)
+			{
+				m_sounds.PlaySound("sndHide", Fvector().set(0, 0, 0), this, true, false);
+				PlayHUDMotion(m_bFastAnimMode ? "anm_hide_fast" : "anm_hide", FALSE/*TRUE*/, this, GetState());
+				SetPending(TRUE);
+			}
+		}break;
+		case eIdle:
+		{
+			PlayAnimIdle();
+			SetPending(FALSE);
+		}break;
+		case eToggle:
+		case eSwitchOn:
+		case eSwitchOff:
+		{
+			PlayHUDMotion("anm_toggle", TRUE, this, GetState());
+			SetPending(TRUE);
+		}break;
+		case eIdleZoom:
+		{
+			PlayHUDMotion("anm_zoom", TRUE, NULL, GetState());
+			SetPending(FALSE);
+		}break;
 	}
 }
 
@@ -182,16 +180,30 @@ void CFlashlight::OnAnimationEnd(u32 state)
 	inherited::OnAnimationEnd(state);
 	switch (state)
 	{
-	case eShowing:
-	{
-		SwitchState(eIdle);
-	} break;
-	case eHiding:
-	{
-		TurnDeviceInternal(false);
-		SwitchState(eHidden);
-		g_player_hud->detach_item(this);
-	} break;
+		case eShowing:
+		{
+			SwitchState(eSwitchOn);
+		} break;
+		case eHiding:
+		{
+			SwitchState(eHidden);
+			g_player_hud->detach_item(this);
+		} break;
+		case eToggle:
+		{
+			Switch(!m_switched_on);
+			SwitchState(eIdle);
+		} break;
+		case eSwitchOn:
+		{
+			Switch(true);
+			SwitchState(eIdle);
+		} break;
+		case eSwitchOff:
+		{
+			Switch(false);
+			SwitchState(eHiding);
+		} break;
 	}
 }
 
@@ -211,9 +223,7 @@ void CFlashlight::OnHiddenItem()
 
 BOOL CFlashlight::net_Spawn(CSE_Abstract* DC)
 {
-	TurnDeviceInternal(false);
-
-	//collidable.model = new CCF_Skeleton(this);
+	Switch(false, false);
 
 	if (!inherited::net_Spawn(DC))
 		return FALSE;
@@ -222,10 +232,7 @@ BOOL CFlashlight::net_Spawn(CSE_Abstract* DC)
 	b_r2 |= !!psDeviceFlags.test(rsR3);
 	b_r2 |= !!psDeviceFlags.test(rsR4);
 
-	IKinematics* K = smart_cast<IKinematics*>(Visual());
-
 	lanim = LALib.FindItem(pSettings->r_string(m_light_section, "color_animator"));
-	guid_bone = K->LL_BoneID(pSettings->r_string(m_light_section, "guide_bone"));	VERIFY(guid_bone != BI_NONE);
 
 	Fcolor clr = pSettings->r_fcolor(m_light_section, (b_r2) ? "color_r2" : "color");
 	fBrightness = clr.intensity();
@@ -252,8 +259,6 @@ BOOL CFlashlight::net_Spawn(CSE_Abstract* DC)
 	light_render->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "type", 2)));
 	light_omni->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "omni_type", 1)));
 
-	m_delta_h = PI_DIV_2 - atan((range*0.5f) / _abs(m_torch_offset.x));
-
 	return TRUE;
 }
 
@@ -268,35 +273,18 @@ void CFlashlight::Load(LPCSTR section)
 	light_trace_bone = READ_IF_EXISTS(pSettings, r_string, section, "light_trace_bone", "");
 
 	m_light_section = READ_IF_EXISTS(pSettings, r_string, section, "light_section", "torch_definition");
-
-	m_torch_offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "torch_offset", Fvector3().set(0.f, 0.f, 0.f ));
-	m_omni_offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "omni_offset", Fvector3().set(0.f, 0.f, 0.f));
-	m_torch_inertion_speed_max = READ_IF_EXISTS(pSettings, r_float, section, "torch_inertion_speed_max", 7.5f);
-	m_torch_inertion_speed_min = READ_IF_EXISTS(pSettings, r_float, section, "torch_inertion_speed_min", 0.5f);
-
-	// Disabling shift by x and z axes for 1st render, 
-	// because we don't have dynamic lighting in it. 
-	if (GEnv.CurrentRenderer == 1)
-	{
-		m_torch_offset.x = 0;
-		m_torch_offset.z = 0;
-	}
 }
 
 
 void CFlashlight::shedule_Update(u32 dt)
 {
 	inherited::shedule_Update(dt);
-
-	if (!IsWorking())			return;
-
-	Position().set(H_Parent()->Position());
 }
 
 
 bool CFlashlight::IsWorking()
 {
-	return m_bWorking && H_Parent() && H_Parent() == Level().CurrentViewEntity();
+	return m_switched_on && H_Parent() && H_Parent() == Level().CurrentViewEntity();
 }
 
 void CFlashlight::UpdateVisibility()
@@ -305,6 +293,17 @@ void CFlashlight::UpdateVisibility()
 	attachable_hud_item* i0 = g_player_hud->attached_item(0);
 	if (i0 && HudItemData())
 	{
+		if (light_trace_bone.size())
+		{
+			u16 bone_id = HudItemData()->m_model->LL_BoneID(light_trace_bone);
+			if (bone_id != BI_NONE)
+			{
+				bool visi = HudItemData()->m_model->LL_GetBoneVisible(bone_id);
+				if (visi != m_switched_on)
+					HudItemData()->m_model->LL_SetBoneVisible(bone_id, m_switched_on, TRUE);
+			}
+		}
+
 		bool bClimb = ((Actor()->MovingState()&mcClimb) != 0);
 		if (bClimb)
 		{
@@ -317,10 +316,19 @@ void CFlashlight::UpdateVisibility()
 			if (wpn)
 			{
 				u32 state = wpn->GetState();
-				if (wpn->IsZoomed() || state == CWeapon::eReload || state == CWeapon::eSwitch)
+				if (state == CWeapon::eReload || state == CWeapon::eSwitch)
 				{
 					HideDevice(true);
 					m_bNeedActivation = true;
+				}
+				else if (wpn->IsZoomed())
+				{
+					if (GetState() != eIdleZoom)
+						SwitchState(eIdleZoom);
+				}
+				else if (GetState() == eIdleZoom && GetState() != eIdle)
+				{
+					SwitchState(eIdle);
 				}
 			}
 		}
@@ -328,16 +336,16 @@ void CFlashlight::UpdateVisibility()
 	else
 		if (m_bNeedActivation)
 		{
-		attachable_hud_item* i0 = g_player_hud->attached_item(0);
-		bool bClimb = ((Actor()->MovingState()&mcClimb) != 0);
-		if (!bClimb)
-		{
-			CHudItem* huditem = (i0) ? i0->m_parent_hud_item : NULL;
-			bool bChecked = !huditem || CheckCompatibilityInt(huditem, 0);
+			attachable_hud_item* i0 = g_player_hud->attached_item(0);
+			bool bClimb = ((Actor()->MovingState()&mcClimb) != 0);
+			if (!bClimb)
+			{
+				CHudItem* huditem = (i0) ? i0->m_parent_hud_item : NULL;
+				bool bChecked = !huditem || CheckCompatibilityInt(huditem, 0);
 
-			if (bChecked)
-				ShowDevice(true);
-		}
+				if (bChecked)
+					ShowDevice(true);
+			}
 		}
 }
 
@@ -354,12 +362,12 @@ void CFlashlight::UpdateCL()
 
 	UpdateVisibility();
 
-	if (!m_switched_on || !IsWorking())			
+	if (!IsWorking())
 		return;
 
 	if (!HudItemData())
 	{
-		TurnDeviceInternal(false,false);
+		Switch(false, false);
 		return;
 	}
 
@@ -405,7 +413,7 @@ void CFlashlight::OnH_B_Independent(bool just_before_destroy)
 	if (GetState() != eHidden)
 	{
 		// Detaching hud item and animation stop in OnH_A_Independent
-		TurnDeviceInternal(false);
+		Switch(false, false);
 		SwitchState(eHidden);
 	}
 }
@@ -433,19 +441,13 @@ void CFlashlight::OnMoveToRuck(const SInvItemPlace& prev)
 		SwitchState(eHidden);
 		g_player_hud->detach_item(this);
 	}
-	TurnDeviceInternal(false);
+	Switch(false);
 	StopCurrentAnimWithoutCallback();
 }
 
 void CFlashlight::OnMoveToSlot(const SInvItemPlace& prev)
 {
 	inherited::OnMoveToSlot(prev);
-}
-
-void CFlashlight::TurnDeviceInternal(bool b, bool b_play_sound)
-{
-	m_bWorking = b;
-	Switch(b,b_play_sound);
 }
 
 inline bool CFlashlight::can_use_dynamic_lights()
@@ -462,9 +464,7 @@ inline bool CFlashlight::can_use_dynamic_lights()
 
 void CFlashlight::Switch()
 {
-	if (OnClient())			return;
-	bool bActive = !m_switched_on && m_bWorking;
-	Switch(bActive);
+	Switch(!m_switched_on);
 }
 
 void CFlashlight::Switch(bool light_on, bool b_play_sound)
@@ -488,23 +488,23 @@ void CFlashlight::Switch(bool light_on, bool b_play_sound)
 	if (can_use_dynamic_lights())
 	{
 		light_render->set_active(light_on);
-
-		// CActor *pA = smart_cast<CActor *>(H_Parent());
-		//if(!pA)
 		light_omni->set_active(light_on);
 	}
 	glow_render->set_active(light_on);
-
-	if (light_trace_bone.size())
-	{
-		IKinematics* pVisual = smart_cast<IKinematics*>(Visual()); VERIFY(pVisual);
-		u16 bi = pVisual->LL_BoneID(light_trace_bone);
-
-		pVisual->LL_SetBoneVisible(bi, light_on, TRUE);
-		pVisual->CalculateBones(TRUE);
-	}
 }
 bool CFlashlight::torch_active() const
 {
-	return (m_switched_on);
+	return m_switched_on;
+}
+
+void CFlashlight::ToggleSwitch()
+{
+	if (!IsPending())
+	{
+		u32 state = GetState();
+		if (state == eIdle || state == eIdleZoom)
+		{
+			SwitchState(eToggle);
+		}
+	}
 }
