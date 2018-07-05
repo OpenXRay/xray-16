@@ -187,11 +187,23 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
     result2 = process_if_exists_set(section, "immunities_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
         CHitImmunity::LoadImmunities(str, pSettings);
+	result |= result2;
+
 
     result2 = process_if_exists_set(section, "immunities_sect_add", &CInifile::r_string, str, test);
     if (result2 && !test)
         CHitImmunity::AddImmunities(str, pSettings);
+	result |= result2;
 
+	result2 = process_if_exists_set(section, "inv_name", &CInifile::r_string, str, test);
+	if (result2 && !test)
+		m_name = str;
+	result |= result2;
+
+	result2 = process_if_exists_set(section, "inv_name_short", &CInifile::r_string, str, test);
+	if (result2 && !test)
+		m_nameShort = str;
+	result |= result2;
     return result;
 }
 

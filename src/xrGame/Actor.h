@@ -416,6 +416,7 @@ protected:
 
 public:
     float m_fWalkAccel;
+	float m_fOverweightWalkAccel;
     float m_fJumpSpeed;
     float m_fRunFactor;
     float m_fRunBackFactor;
@@ -450,7 +451,8 @@ public:
     bool IsZoomAimingMode() const { return m_bZoomAimingMode; }
     virtual float MaxCarryWeight() const;
     float MaxWalkWeight() const;
-    float get_additional_weight() const;
+    float get_additional_weight() const; //MaxWalkWeight
+	float get_additional_weight2() const;	//MaxCarryWeight
 
 protected:
     CFireDispertionController m_fdisp_controller;

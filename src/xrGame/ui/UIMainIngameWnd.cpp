@@ -736,16 +736,23 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Overweight icon
     float cur_weight = pActor->inventory().TotalWeight();
     float max_weight = pActor->MaxWalkWeight();
+	float max_carry_weight = pActor->MaxCarryWeight();
+
     m_ind_overweight->Show(false);
-    if (cur_weight >= max_weight - 10.0f && IsGameTypeSingle())
+	if (cur_weight >= max_carry_weight)
     {
         m_ind_overweight->Show(true);
-        if (cur_weight > max_weight)
+		if (cur_weight >= max_weight)
             m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_red");
         // else if(cur_weight>max_weight-10.0f)
         //	m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
         else
-            m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
+		{
+			if (max_carry_weight / max_weight >= 0.5f)
+				m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
+			else
+				m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_green");
+		}
     }
 }
 

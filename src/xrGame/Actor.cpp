@@ -138,6 +138,7 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     m_fCrouchFactor = 0.2f;
     m_fClimbFactor = 1.f;
     m_fCamHeightFactor = 0.87f;
+	m_fOverweightWalkAccel = 1.f;
 
     m_fFallTime = s_fFallTime;
     m_bAnimTorsoPlayed = false;
@@ -316,6 +317,7 @@ void CActor::Load(LPCSTR section)
     set_box(section, *character_physics_support()->movement(), 0);
 
     m_fWalkAccel = pSettings->r_float(section, "walk_accel");
+	m_fOverweightWalkAccel = READ_IF_EXISTS(pSettings, r_float, section, "overweight_walk_accel", 1.0f);
     m_fJumpSpeed = pSettings->r_float(section, "jump_speed");
     m_fRunFactor = pSettings->r_float(section, "run_coef");
     m_fRunBackFactor = pSettings->r_float(section, "run_back_coef");

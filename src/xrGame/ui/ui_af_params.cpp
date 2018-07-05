@@ -29,14 +29,23 @@ CUIArtefactParams::CUIArtefactParams()
         m_restore_item[i] = nullptr;
     }
     m_additional_weight = nullptr;
+	m_disp_condition = nullptr;
+	m_fJumpSpeed = nullptr;
+	m_fWalkAccel = nullptr;
+	m_fOverweightWalkAccel = nullptr;
+	m_Prop_line = nullptr;
 }
 
 CUIArtefactParams::~CUIArtefactParams()
 {
-    delete_data(m_immunity_item);
-    delete_data(m_restore_item);
-    xr_delete(m_additional_weight);
-    xr_delete(m_Prop_line);
+	delete_data	( m_immunity_item );
+	delete_data	( m_restore_item );
+	xr_delete	( m_additional_weight );
+	xr_delete(m_disp_condition);
+	xr_delete(m_fJumpSpeed);
+	xr_delete(m_fWalkAccel);
+	xr_delete(m_fOverweightWalkAccel);
+	xr_delete	( m_Prop_line );
 }
 
 constexpr pcstr af_immunity_section_names[] = // ALife::EInfluenceType
@@ -226,28 +235,28 @@ void CUIArtefactParams::SetInfo(const CArtefact* pInvItem)
         AttachChild(m_immunity_item[i]);
     }
 
-    {
-        float val = pInvItem->m_fJumpSpeed;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fJumpSpeed->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fJumpSpeed->GetWndPos());
-            pos.y = h;
-            m_fJumpSpeed->SetWndPos(pos);
-            h += m_fJumpSpeed->GetWndSize().y;
-            AttachChild(m_fJumpSpeed);
-        }
-        val = pInvItem->m_fWalkAccel;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fWalkAccel->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fWalkAccel->GetWndPos());
-            pos.y = h;
-            m_fWalkAccel->SetWndPos(pos);
-            h += m_fWalkAccel->GetWndSize().y;
-            AttachChild(m_fWalkAccel);
-        }
-    }
+	{
+		float val = pInvItem->m_fJumpSpeed;
+		if (val != 1.f)
+		{
+			m_fJumpSpeed->SetValue(val*pInvItem->GetCondition());
+			pos.set(m_fJumpSpeed->GetWndPos());
+			pos.y = h;
+			m_fJumpSpeed->SetWndPos(pos);
+			h += m_fJumpSpeed->GetWndSize().y;
+			AttachChild(m_fJumpSpeed);
+		}
+		val = pInvItem->m_fWalkAccel;
+		if (val != 1.f)
+		{
+			m_fWalkAccel->SetValue(val*pInvItem->GetCondition());
+			pos.set(m_fWalkAccel->GetWndPos());
+			pos.y = h;
+			m_fWalkAccel->SetWndPos(pos);
+			h += m_fWalkAccel->GetWndSize().y;
+			AttachChild(m_fWalkAccel);
+		}
+	}
 
     {
         val = pSettings->r_float(af_section, "additional_inventory_weight");
@@ -287,125 +296,141 @@ void CUIArtefactParams::SetInfo(const CArtefact* pInvItem)
 
 void CUIArtefactParams::SetInfo(const CCustomOutfit* pInvItem)
 {
-    DetachAll();
-    AttachChild(m_Prop_line);
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor)
-    {
-        return;
-    }
-    const shared_str& af_section = pInvItem->cNameSect();
-    float val = 0.0f;
-    Fvector2 pos;
-    float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
-    {
-        float val = pInvItem->m_fJumpSpeed;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fJumpSpeed->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fJumpSpeed->GetWndPos());
-            pos.y = h;
-            m_fJumpSpeed->SetWndPos(pos);
-            h += m_fJumpSpeed->GetWndSize().y;
-            AttachChild(m_fJumpSpeed);
-        }
-        val = pInvItem->m_fWalkAccel;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fWalkAccel->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fWalkAccel->GetWndPos());
-            pos.y = h;
-            m_fWalkAccel->SetWndPos(pos);
-            h += m_fWalkAccel->GetWndSize().y;
-            AttachChild(m_fWalkAccel);
-        }
-        val = pInvItem->m_fOverweightWalkK;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fOverweightWalkAccel->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fOverweightWalkAccel->GetWndPos());
-            pos.y = h;
-            m_fOverweightWalkAccel->SetWndPos(pos);
-            h += m_fOverweightWalkAccel->GetWndSize().y;
-            AttachChild(m_fOverweightWalkAccel);
-        }
-    }
-    {
-        val = pSettings->r_float(af_section, "additional_inventory_weight");
-        if (!fis_zero(val))
-        {
-            val *= pInvItem->GetCondition();
-            m_additional_weight->SetValue(val);
-            pos.set(m_additional_weight->GetWndPos());
-            pos.y = h;
-            m_additional_weight->SetWndPos(pos);
-            h += m_additional_weight->GetWndSize().y;
-            AttachChild(m_additional_weight);
-        }
-    }
-    SetHeight(h);
+	DetachAll();
+	AttachChild(m_Prop_line);
+
+	CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+	if (!actor)
+	{
+		return;
+	}
+
+	const shared_str& af_section = pInvItem->cNameSect();
+
+	float val = 0.0f;
+	Fvector2 pos;
+	float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+
+	{
+		float val = pInvItem->m_fJumpSpeed;
+		if (val != 1.f)
+		{
+			m_fJumpSpeed->SetValue(val);
+			pos.set(m_fJumpSpeed->GetWndPos());
+			pos.y = h;
+			m_fJumpSpeed->SetWndPos(pos);
+			h += m_fJumpSpeed->GetWndSize().y;
+			AttachChild(m_fJumpSpeed);
+		}
+		val = pInvItem->m_fWalkAccel;
+		if (val != 1.f)
+		{
+			m_fWalkAccel->SetValue(val - 1.f);
+			pos.set(m_fWalkAccel->GetWndPos());
+			pos.y = h;
+			m_fWalkAccel->SetWndPos(pos);
+			h += m_fWalkAccel->GetWndSize().y;
+			AttachChild(m_fWalkAccel);
+		}
+		val = pInvItem->m_fOverweightWalkK;
+		if (val != 1.f)
+		{
+			m_fOverweightWalkAccel->SetValue(val - 1.f);
+			pos.set(m_fOverweightWalkAccel->GetWndPos());
+			pos.y = h;
+			m_fOverweightWalkAccel->SetWndPos(pos);
+			h += m_fOverweightWalkAccel->GetWndSize().y;
+			AttachChild(m_fOverweightWalkAccel);
+		}
+	}
+
+	{
+		val = pSettings->r_float(af_section, "additional_inventory_weight");
+		if (!fis_zero(val))
+		{
+			//val *= pInvItem->GetCondition();
+			m_additional_weight->SetValue(val);
+
+			pos.set(m_additional_weight->GetWndPos());
+			pos.y = h;
+			m_additional_weight->SetWndPos(pos);
+
+			h += m_additional_weight->GetWndSize().y;
+			AttachChild(m_additional_weight);
+		}
+	}
+
+	SetHeight(h);
 }
 
 void CUIArtefactParams::SetInfo(const CHelmet* pInvItem) { DetachAll(); }
 void CUIArtefactParams::SetInfo(const CBackpack* pInvItem)
 {
-    DetachAll();
-    AttachChild(m_Prop_line);
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor)
-    {
-        return;
-    }
-    const shared_str& af_section = pInvItem->cNameSect();
-    float val = 0.0f, max_val = 1.0f;
-    Fvector2 pos;
-    float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
-    {
-        float val = pInvItem->m_fJumpSpeed;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fJumpSpeed->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fJumpSpeed->GetWndPos());
-            pos.y = h;
-            m_fJumpSpeed->SetWndPos(pos);
-            h += m_fJumpSpeed->GetWndSize().y;
-            AttachChild(m_fJumpSpeed);
-        }
-        val = pInvItem->m_fWalkAccel;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fWalkAccel->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fWalkAccel->GetWndPos());
-            pos.y = h;
-            m_fWalkAccel->SetWndPos(pos);
-            h += m_fWalkAccel->GetWndSize().y;
-            AttachChild(m_fWalkAccel);
-        }
-        val = pInvItem->m_fOverweightWalkK;
-        if (_abs(val) < 1.f - EPS)
-        {
-            m_fOverweightWalkAccel->SetValue(val * pInvItem->GetCondition());
-            pos.set(m_fOverweightWalkAccel->GetWndPos());
-            pos.y = h;
-            m_fOverweightWalkAccel->SetWndPos(pos);
-            h += m_fOverweightWalkAccel->GetWndSize().y;
-            AttachChild(m_fOverweightWalkAccel);
-        }
-    }
-    {
-        val = pSettings->r_float(af_section, "additional_inventory_weight");
-        if (!fis_zero(val))
-        {
-            // val *= pInvItem->GetCondition();
-            m_additional_weight->SetValue(val);
-            pos.set(m_additional_weight->GetWndPos());
-            pos.y = h;
-            m_additional_weight->SetWndPos(pos);
-            h += m_additional_weight->GetWndSize().y;
-            AttachChild(m_additional_weight);
-        }
-    }
-    SetHeight(h);
+	DetachAll();
+	AttachChild(m_Prop_line);
+
+	CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+	if (!actor)
+	{
+		return;
+	}
+
+	const shared_str& af_section = pInvItem->cNameSect();
+
+	float val = 0.0f, max_val = 1.0f;
+	Fvector2 pos;
+	float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+
+	{
+		float val = pInvItem->m_fJumpSpeed;
+		if (val != 1.f)
+		{
+			m_fJumpSpeed->SetValue(val);
+			pos.set(m_fJumpSpeed->GetWndPos());
+			pos.y = h;
+			m_fJumpSpeed->SetWndPos(pos);
+			h += m_fJumpSpeed->GetWndSize().y;
+			AttachChild(m_fJumpSpeed);
+		}
+		val = pInvItem->m_fWalkAccel;
+		if (val != 1.f)
+		{
+			m_fWalkAccel->SetValue(val - 1.f);
+			pos.set(m_fWalkAccel->GetWndPos());
+			pos.y = h;
+			m_fWalkAccel->SetWndPos(pos);
+			h += m_fWalkAccel->GetWndSize().y;
+			AttachChild(m_fWalkAccel);
+		}
+		val = pInvItem->m_fOverweightWalkK;
+		if (val != 1.f)
+		{
+			m_fOverweightWalkAccel->SetValue(val - 1.f);
+			pos.set(m_fOverweightWalkAccel->GetWndPos());
+			pos.y = h;
+			m_fOverweightWalkAccel->SetWndPos(pos);
+			h += m_fOverweightWalkAccel->GetWndSize().y;
+			AttachChild(m_fOverweightWalkAccel);
+		}
+	}
+
+	{
+		val = pSettings->r_float(af_section, "additional_inventory_weight");
+		if (!fis_zero(val))
+		{
+			//val *= pInvItem->GetCondition();
+			m_additional_weight->SetValue(val);
+
+			pos.set(m_additional_weight->GetWndPos());
+			pos.y = h;
+			m_additional_weight->SetWndPos(pos);
+
+			h += m_additional_weight->GetWndSize().y;
+			AttachChild(m_additional_weight);
+		}
+	}
+
+	SetHeight(h);
 }
 /// ----------------------------------------------------------------
 
