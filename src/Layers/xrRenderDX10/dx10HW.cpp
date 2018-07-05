@@ -64,7 +64,7 @@ void CHW::DestroyD3D()
     _RELEASE(m_pFactory);
 }
 
-void CHW::CreateDevice(HWND m_hWnd, bool move_window)
+void CHW::CreateDevice(SDL_Window* hWnd, bool move_window)
 {
     m_move_window = move_window;
     CreateD3D();
@@ -110,7 +110,20 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
     // Windoze
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-    sd.OutputWindow = m_hWnd;
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+    {
+        switch (info.subsystem)
+        {
+        case SDL_SYSWM_WINDOWS:
+            sd.OutputWindow = info.info.win.window;
+            break;
+        default: break;
+        }
+    }
+    else
+        Log("Couldn't get window information: %s", SDL_GetError());
     sd.Windowed = bWindowed;
 
     // Depth/stencil (DX10 don't need this?)

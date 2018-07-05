@@ -900,4 +900,10 @@
     <Text Include="features.txt" />
     <Text Include="TODO.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

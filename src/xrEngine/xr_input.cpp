@@ -21,7 +21,6 @@ float stop_vibration_time = flt_max;
 
 #define MOUSEBUFFERSIZE 64
 #define KEYBOARDBUFFERSIZE 64
-#define _KEYDOWN(name, key) (name[key] & 0x80)
 
 static bool g_exclusive = true;
 static void on_error_dialog(bool before)
@@ -43,39 +42,22 @@ CInput::CInput(BOOL bExclusive, int deviceForInit)
     g_exclusive = !!bExclusive;
 
     Log("Starting INPUT device...");
-
     pDI = NULL;
     pMouse = NULL;
-    pKeyboard = NULL;
 
     //=====================Mouse
     mouse_property.mouse_dt = 25;
-
     ZeroMemory(mouseState, sizeof(mouseState));
     ZeroMemory(KBState, sizeof(KBState));
     ZeroMemory(timeStamp, sizeof(timeStamp));
     ZeroMemory(timeSave, sizeof(timeStamp));
     ZeroMemory(offs, sizeof(offs));
 
-    //===================== Dummy pack
-    iCapture(&dummyController);
-
-    if (!pDI)
-        CHK_DX(DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&pDI, NULL));
-
-    //. u32 kb_input_flags = ((bExclusive)?DISCL_EXCLUSIVE:DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND;
-    u32 kb_input_flags = ((bExclusive) ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND;
-
-    //. u32 mouse_input_flags = ((bExclusive)?DISCL_EXCLUSIVE:DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY,
-    u32 mouse_input_flags = ((bExclusive) ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY;
-
-    // KEYBOARD
-    if (deviceForInit & keyboard_device_key)
-        CHK_DX(CreateInputDevice(&pKeyboard, GUID_SysKeyboard, &c_dfDIKeyboard, kb_input_flags, KEYBOARDBUFFERSIZE));
-
-    // MOUSE
-    if (deviceForInit & mouse_device_key)
-        CHK_DX(CreateInputDevice(&pMouse, GUID_SysMouse, &c_dfDIMouse2, mouse_input_flags, MOUSEBUFFERSIZE));
+    //if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    //{
+    //    Log("Unable to initialize SDL: %s", SDL_GetError());
+    //}
+        
 
     xrDebug::SetDialogHandler(on_error_dialog);
 
@@ -102,13 +84,8 @@ CInput::~CInput(void)
         _RELEASE(pMouse);
     }
 
-    if (pKeyboard)
-    {
-        pKeyboard->Unacquire();
-        _RELEASE(pKeyboard);
-    }
-
     _SHOW_REF("Input: ", pDI);
+    //SDL_Quit();
     _RELEASE(pDI);
 }
 
@@ -128,16 +105,16 @@ HRESULT CInput::CreateInputDevice(
     // reported.
     CHK_DX((*device)->SetDataFormat(pdidDataFormat));
 
-// Set the cooperativity level to let DirectInput know how this device
-// should interact with the system and with other DirectInput applications.
-    if (!Device.editor())
-    {
-        HRESULT _hr = (*device)->SetCooperativeLevel(RDEVICE.m_hWnd, dwFlags);
-        if (FAILED(_hr) && (_hr == E_NOTIMPL))
-            Msg("! INPUT: Can't set coop level. Emulation???");
-        else
-            R_CHK(_hr);
-    }
+    // Set the cooperativity level to let DirectInput know how this device
+    // should interact with the system and with other DirectInput applications.
+    //if (!Device.editor())
+    //{
+    //    HRESULT _hr = (*device)->SetCooperativeLevel(RDEVICE.m_sdlWnd, dwFlags);
+    //    if (FAILED(_hr) && (_hr == E_NOTIMPL))
+    //        Msg("! INPUT: Can't set coop level. Emulation???");
+    //    else
+    //        R_CHK(_hr);
+    //}
 
     // setup the buffer size for the keyboard data
     DIPROPDWORD dipdw;
@@ -163,8 +140,6 @@ void CInput::SetAllAcquire(BOOL bAcquire)
 {
     if (pMouse)
         bAcquire ? pMouse->Acquire() : pMouse->Unacquire();
-    if (pKeyboard)
-        bAcquire ? pKeyboard->Acquire() : pKeyboard->Unacquire();
 }
 
 void CInput::SetMouseAcquire(BOOL bAcquire)
@@ -172,98 +147,45 @@ void CInput::SetMouseAcquire(BOOL bAcquire)
     if (pMouse)
         bAcquire ? pMouse->Acquire() : pMouse->Unacquire();
 }
-void CInput::SetKBDAcquire(BOOL bAcquire)
-{
-    if (pKeyboard)
-        bAcquire ? pKeyboard->Acquire() : pKeyboard->Unacquire();
-}
+void CInput::SetKBDAcquire(BOOL bAcquire) {}
 //-----------------------------------------------------------------------
-BOOL b_altF4 = FALSE;
-void CInput::KeyUpdate()
+void CInput::KeyUpdate(SDL_Event* event)
 {
-    if (b_altF4)
-        return;
-
-    HRESULT hr;
-    DWORD dwElements = KEYBOARDBUFFERSIZE;
-    DIDEVICEOBJECTDATA od[KEYBOARDBUFFERSIZE];
-    DWORD key = 0;
-
-    VERIFY(pKeyboard);
-
-    hr = pKeyboard->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), &od[0], &dwElements, 0);
-    if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
-    {
-        hr = pKeyboard->Acquire();
-        if (hr != S_OK)
-            return;
-
-        hr = pKeyboard->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), &od[0], &dwElements, 0);
-        if (hr != S_OK)
-            return;
-    }
-
     bool b_dik_pause_was_pressed = false;
-    for (u32 idx = 0; idx < dwElements; idx++)
-    {
-        if (od[idx].dwOfs == DIK_PAUSE)
-        {
-            if (od[idx].dwData & 0x80)
-                b_dik_pause_was_pressed = true;
 
-            if (b_dik_pause_was_pressed && !(od[idx].dwData & 0x80))
-            {
-                od[idx].uAppData = 666;
-                continue; // skip one-frame pause key on-off switch
-            }
-        }
-        KBState[od[idx].dwOfs] = od[idx].dwData & 0x80;
+    if (SDL_SCANCODE_PAUSE == event->key.keysym.scancode)
+    {
+        if (SDL_KEYDOWN == event->key.type)
+            b_dik_pause_was_pressed = true;
     }
 
 #ifndef _EDITOR
     bool b_alt_tab = false;
 
-    if (!b_altF4 && KBState[DIK_F4] && (KBState[DIK_RMENU] || KBState[DIK_LMENU]))
-    {
-        b_altF4 = TRUE;
-        Engine.Event.Defer("KERNEL:disconnect");
-        Engine.Event.Defer("KERNEL:quit");
-    }
-
-#endif
-    if (b_altF4)
-        return;
-
-#ifndef _EDITOR
     if (Device.dwPrecacheFrame == 0)
 #endif
     {
-        for (u32 i = 0; i < dwElements; i++)
-        {
-            if (od[i].uAppData == 666) // ignored action
-                continue;
+        const Uint8* state = SDL_GetKeyboardState(NULL);
 
-            key = od[i].dwOfs;
-            if (od[i].dwData & 0x80)
-                cbStack.back()->IR_OnKeyboardPress(key);
-            else
-            {
-                cbStack.back()->IR_OnKeyboardRelease(key);
+        if (SDL_KEYDOWN == event->key.type)
+            cbStack.back()->IR_OnKeyboardPress(event->key.keysym.scancode);
+        else if (SDL_KEYUP == event->key.type)
+        {
+            cbStack.back()->IR_OnKeyboardRelease(event->key.keysym.scancode);
 #ifndef _EDITOR
-                if (key == DIK_TAB && (iGetAsyncKeyState(DIK_RMENU) || iGetAsyncKeyState(DIK_LMENU)))
-                    b_alt_tab = true;
+            if (SDL_SCANCODE_TAB == event->key.keysym.scancode && KMOD_ALT == SDL_GetModState())
+                b_alt_tab = true;
 #endif
-            }
         }
 
         for (u32 i = 0; i < COUNT_KB_BUTTONS; i++)
-            if (KBState[i])
+            if (state[i])
                 cbStack.back()->IR_OnKeyboardHold(i);
     }
 
 #ifndef _EDITOR
     if (b_alt_tab)
-        SendMessage(Device.m_hWnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+        SDL_MinimizeWindow(Device.m_sdlWnd);
 #endif
     /*
     #ifndef _EDITOR
@@ -302,28 +224,18 @@ void CInput::KeyUpdate()
     #endif
     */
 }
-bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
+
+bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
 {
-    DIPROPSTRING keyname;
-    keyname.diph.dwSize = sizeof(DIPROPSTRING);
-    keyname.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-    keyname.diph.dwObj = static_cast<DWORD>(dik);
-    keyname.diph.dwHow = DIPH_BYOFFSET;
-    HRESULT hr = pKeyboard->GetProperty(DIPROP_KEYNAME, &keyname.diph);
-    if (FAILED(hr))
-        return false;
-
-    const wchar_t* wct = keyname.wsz;
-    if (0 == wcslen(wct))
-        return false;
-
-    int cnt = WideCharToMultiByte(CP_ACP, 0, keyname.wsz, -1, dest_str, dest_sz, NULL, NULL);
-    if (cnt == -1)
+    const char* keyname = SDL_GetKeyName(dik);
+    if (0 == strlen(keyname))
     {
-        Msg("! cant convert dik_name for dik[%d], prop=[%S]", dik, keyname.wsz);
+        Msg("! cant convert dik_name for dik[%d]", dik);
         return false;
     }
-    return (cnt != -1);
+    strcpy_s(dest_str, dest_sz, keyname);
+
+    return true;
 }
 
 #define MOUSE_1 (0xED + 100)
@@ -347,16 +259,21 @@ void CInput::ClipCursor(bool clip)
 {
     if (clip)
     {
-        ::ClipCursor(&Device.m_rcWindowClient);
-        while (ShowCursor(FALSE) >= 0) {}
+        SDL_RenderSetClipRect(Device.m_sdlRndr, &Device.m_rcWindowClient);
+        while (ShowCursor(FALSE) >= 0)
+        {
+        }
     }
     else
     {
         ::ClipCursor(nullptr);
-        while (ShowCursor(TRUE) <= 0) {}
+        while (ShowCursor(TRUE) <= 0)
+        {
+        }
     }
 }
 
+// void CInput::MouseUpdate(SDL_Event *event)
 void CInput::MouseUpdate()
 {
     HRESULT hr;
@@ -511,8 +428,7 @@ void CInput::MouseUpdate()
     DIMOUSESTATE2 MouseState;
     hr = pMouse->GetDeviceState(sizeof(MouseState), &MouseState);
 
-    auto RecheckMouseButtonFunc = [&](int i)
-    {
+    auto RecheckMouseButtonFunc = [&](int i) {
         if (MouseState.rgbButtons[i] & 0x80 && mouseState[i] == FALSE)
         {
             mouseState[i] = TRUE;
@@ -533,8 +449,7 @@ void CInput::MouseUpdate()
     }
     //-Giperion
 
-    auto isButtonOnHold = [&](int i)
-    {
+    auto isButtonOnHold = [&](int i) {
         if (mouseState[i] && mouse_prev[i])
             cbStack.back()->IR_OnMouseHold(i);
     };
@@ -565,8 +480,6 @@ void CInput::iCapture(IInputReceiver* p)
     VERIFY(p);
     if (pMouse)
         MouseUpdate();
-    if (pKeyboard)
-        KeyUpdate();
 
     // change focus
     if (!cbStack.empty())
@@ -632,13 +545,51 @@ void CInput::OnAppDeactivate(void)
 
 void CInput::OnFrame(void)
 {
+    SDL_Event event;
+
     stats.FrameStart();
     stats.FrameTime.Begin();
     dwCurTime = RDEVICE.TimerAsync_MMT();
-    if (pKeyboard)
-        KeyUpdate();
-    if (pMouse)
-        MouseUpdate();
+
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+        case SDL_KEYDOWN:
+        case SDL_KEYUP: KeyUpdate(&event); continue;
+
+        case SDL_MOUSEMOTION:
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEWHEEL:
+            // MouseUpdate(&event);
+            //MouseUpdate();
+            continue;
+        case SDL_WINDOWEVENT:
+            switch (event.window.event)
+            {
+            case SDL_WINDOWEVENT_CLOSE:
+                event.type = SDL_QUIT;
+                SDL_PushEvent(&event);
+                continue;
+            case SDL_WINDOWEVENT_ENTER:
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+            case SDL_WINDOWEVENT_TAKE_FOCUS:
+                RDEVICE.OnWM_Activate(event.window.data1, event.window.data2);
+                continue;
+#endif
+            default: SDL_Log("Window %d got unknown event %d", event.window.windowID, event.window.event); continue;
+            }
+            continue;
+        case SDL_QUIT:
+            Engine.Event.Defer("KERNEL:disconnect");
+            Engine.Event.Defer("KERNEL:quit");
+            break;
+
+        default: continue;
+        }
+    }
+
     stats.FrameTime.End();
     stats.FrameEnd();
 }
@@ -651,25 +602,13 @@ IInputReceiver* CInput::CurrentIR()
         return NULL;
 }
 
-void CInput::unacquire()
-{
-    pKeyboard->Unacquire();
-    pMouse->Unacquire();
-}
+void CInput::unacquire() { if (pMouse) pMouse->Unacquire(); }
 
 void CInput::acquire(const bool& exclusive)
 {
-    pKeyboard->SetCooperativeLevel(
-        Device.editor() ? Device.editor()->main_handle() :
-                          RDEVICE.m_hWnd,
-        (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND);
-    pKeyboard->Acquire();
-
-    pMouse->SetCooperativeLevel(
-        Device.editor() ? Device.editor()->main_handle() :
-                          RDEVICE.m_hWnd,
-        (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY);
-    pMouse->Acquire();
+    //pMouse->SetCooperativeLevel(Device.editor() ? Device.editor()->main_handle() : RDEVICE.m_sdlWnd,
+    //    (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY);
+    //pMouse->Acquire();
 }
 
 void CInput::exclusive_mode(const bool& exclusive)

@@ -4,6 +4,8 @@
 #include "IGame_Persistent.h"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
+#include <SDL.h>
+#include <SDL_syswm.h>
 
 void CRenderDevice::Destroy()
 {
@@ -43,9 +45,7 @@ void CRenderDevice::Reset(bool precache)
 
     const auto tm_start = TimerAsync();
 
-    GEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
-    GetWindowRect(m_hWnd, &m_rcWindowBounds);
-    GetClientRect(m_hWnd, &m_rcWindowClient);
+    GEnv.Render->Reset(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     if (g_pGamePersistent)
         g_pGamePersistent->Environment().bNeed_re_create_env = true;

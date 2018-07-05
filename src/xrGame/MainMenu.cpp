@@ -9,6 +9,7 @@
 #include "ui\UITextureMaster.h"
 #include "ui\UIXmlInit.h"
 #include <dinput.h>
+#include <SDL.h>
 #include "ui\UIBtnHint.h"
 #include "UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
@@ -343,7 +344,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         Console->Show();
         return;
     }
-    if (DIK_F12 == dik)
+    if (SDL_SCANCODE_F12 == dik)
     {
         GEnv.Render->Screenshot();
         return;

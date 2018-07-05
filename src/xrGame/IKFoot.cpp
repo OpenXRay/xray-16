@@ -281,7 +281,7 @@ ik_goal_matrix::e_collide_state CIKFoot::rotate(
     clamp(s, 0.f, 1.f);
     float angle = asinf(-s);
     VERIFY(_valid(angle));
-    clamp(angle, -M_PI / 6, M_PI / 6);
+    clamp<float>(angle, -M_PI / 6, M_PI / 6);
     ik_goal_matrix::e_collide_state cl_state = ik_goal_matrix::cl_undefined;
     if (!fis_zero(s))
     {

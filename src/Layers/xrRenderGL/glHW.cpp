@@ -179,9 +179,9 @@ void CHW::Reset(HWND hwnd)
     ShowWindow(hwnd, SW_SHOWNORMAL);
 }
 
-void CHW::updateWindowProps(HWND m_hWnd)
+void CHW::updateWindowProps(SDL_Window* m_sdlWnd)
 {
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     u32 dwWindowStyle = 0;
     // Set window properties depending on what mode were in.
@@ -189,11 +189,8 @@ void CHW::updateWindowProps(HWND m_hWnd)
     {
         if (m_move_window)
         {
-            const bool drawBorders = strstr(Core.Params, "-draw_borders");
-            dwWindowStyle = WS_VISIBLE;
-            if (drawBorders)
-                dwWindowStyle |= WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
-            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
+            if (NULL != strstr(Core.Params, "-draw_borders"))
+                SDL_SetWindowBordered(m_sdlWnd, SDL_TRUE);
             // When moving from fullscreen to windowed mode, it is important to
             // adjust the window size after recreating the device rather than
             // beforehand to ensure that you get the window size you want.  For
@@ -203,45 +200,29 @@ void CHW::updateWindowProps(HWND m_hWnd)
             // changed to 1024x768, because windows cannot be larger than the
             // desktop.
 
-            RECT m_rcWindowBounds;
-            float fYOffset = 0.f;
             bool centerScreen = false;
-            if (strstr(Core.Params, "-center_screen"))
+            if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
                 centerScreen = true;
+
+            SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
 
             if (centerScreen)
             {
-                RECT DesktopRect;
-                GetClientRect(GetDesktopWindow(), &DesktopRect);
-
-                SetRect(&m_rcWindowBounds,
-                    (DesktopRect.right - psCurrentVidMode[0]) / 2,
-                    (DesktopRect.bottom - psCurrentVidMode[1]) / 2,
-                    (DesktopRect.right + psCurrentVidMode[0]) / 2,
-                    (DesktopRect.bottom + psCurrentVidMode[1]) / 2);
+                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
             }
             else
             {
-                if (drawBorders)
-                    fYOffset = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
-                SetRect(&m_rcWindowBounds, 0, 0, psCurrentVidMode[0], psCurrentVidMode[1]);
+                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
             }
-
-            AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
-
-            SetWindowPos(m_hWnd, HWND_NOTOPMOST,
-                         m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
-                         m_rcWindowBounds.right - m_rcWindowBounds.left,
-                         m_rcWindowBounds.bottom - m_rcWindowBounds.top,
-                         SWP_HIDEWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
         }
     }
     else
     {
-        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
+        SDL_ShowWindow(m_sdlWnd);
     }
 
-    SetForegroundWindow(m_hWnd);
+    if (!GEnv.isDedicatedServer)
+        SDL_SetWindowGrab(m_sdlWnd, SDL_TRUE);
 }
 
 struct uniqueRenderingMode

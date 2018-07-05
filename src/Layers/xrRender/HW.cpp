@@ -36,7 +36,7 @@ void CHW::DestroyD3D()
     _RELEASE(pD3D);
 }
 
-void CHW::CreateDevice(HWND m_hWnd, bool move_window)
+void CHW::CreateDevice(SDL_Window* m_sdlWnd, bool move_window)
 {
     m_move_window = move_window;
     CreateD3D();
@@ -136,7 +136,22 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
     // Windoze
     P.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
-    P.hDeviceWindow = m_hWnd;
+
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+    {
+        switch (info.subsystem)
+        {
+        case SDL_SYSWM_WINDOWS:
+            P.hDeviceWindow = info.info.win.window;
+            break;
+        default: break;
+        }
+    }
+    else
+        Log("Couldn't get window information: %s", SDL_GetError());
+
     P.Windowed = bWindowed;
 
     // Depth/stencil
@@ -158,13 +173,13 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
     // Create the device
     const auto GPU = selectGPU();
-    auto result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, m_hWnd,
+    auto result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
         GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
         &P, &pDevice);
 
     if (FAILED(result))
     {
-        result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, m_hWnd,
+        result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
             GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
             &P, &pDevice);
     }
@@ -199,7 +214,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 
-    updateWindowProps(m_hWnd);
+    updateWindowProps(m_sdlWnd);
     fill_vid_mode_list(this);
 }
 
@@ -225,7 +240,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 // Resetting device
 //////////////////////////////////////////////////////////////////////
-void CHW::Reset(HWND hwnd)
+void CHW::Reset(SDL_Window* m_sdlWnd)
 {
 #ifdef DEBUG
     _RELEASE(dwDebugSB);
@@ -270,8 +285,8 @@ void CHW::Reset(HWND hwnd)
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
 
-    updateWindowProps(hwnd);
-    ShowWindow(hwnd, SW_SHOWNORMAL);
+    updateWindowProps(m_sdlWnd);
+    SDL_ShowWindow(m_sdlWnd);
 }
 
 D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
@@ -451,7 +466,7 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
     return TRUE;
 }
 
-void CHW::updateWindowProps(HWND m_hWnd)
+void CHW::updateWindowProps(SDL_Window *m_sdlWnd)
 {
     bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
@@ -464,11 +479,8 @@ void CHW::updateWindowProps(HWND m_hWnd)
     {
         if (m_move_window)
         {
-            const bool drawBorders = strstr(Core.Params, "-draw_borders");
-            dwWindowStyle = WS_VISIBLE;
-            if (drawBorders)
-                dwWindowStyle |= WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
-            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
+            if(NULL != strstr(Core.Params, "-draw_borders"))
+                SDL_SetWindowBordered(m_sdlWnd, SDL_TRUE);
             // When moving from fullscreen to windowed mode, it is important to
             // adjust the window size after recreating the device rather than
             // beforehand to ensure that you get the window size you want.  For
@@ -478,47 +490,29 @@ void CHW::updateWindowProps(HWND m_hWnd)
             // changed to 1024x768, because windows cannot be larger than the
             // desktop.
 
-            RECT m_rcWindowBounds;
-            float fYOffset = 0.f;
             bool centerScreen = false;
             if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
                 centerScreen = true;
 
+            SDL_SetWindowSize(m_sdlWnd, DevPP.BackBufferWidth, DevPP.BackBufferHeight);
+
             if (centerScreen)
             {
-                RECT DesktopRect;
-
-                GetClientRect(GetDesktopWindow(), &DesktopRect);
-
-                SetRect(&m_rcWindowBounds,
-                    (DesktopRect.right - DevPP.BackBufferWidth) / 2,
-                    (DesktopRect.bottom - DevPP.BackBufferHeight) / 2,
-                    (DesktopRect.right + DevPP.BackBufferWidth) / 2,
-                    (DesktopRect.bottom + DevPP.BackBufferHeight) / 2);
+                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
             }
             else
             {
-                if (drawBorders)
-                    fYOffset = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
-                SetRect(&m_rcWindowBounds, 0, 0, DevPP.BackBufferWidth, DevPP.BackBufferHeight);
-            };
-
-            AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
-
-            SetWindowPos(m_hWnd, HWND_NOTOPMOST,
-                m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
-                m_rcWindowBounds.right - m_rcWindowBounds.left,
-                m_rcWindowBounds.bottom - m_rcWindowBounds.top,
-                SWP_HIDEWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
+            }
         }
     }
     else
     {
-        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
+        SDL_ShowWindow(m_sdlWnd);
     }
 
     if (!GEnv.isDedicatedServer)
-        SetForegroundWindow(m_hWnd);
+        SDL_SetWindowGrab(m_sdlWnd, SDL_TRUE);
 }
 
 struct uniqueRenderingMode

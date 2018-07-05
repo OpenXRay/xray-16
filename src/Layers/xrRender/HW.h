@@ -2,6 +2,8 @@
 
 #include "HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
+#include "SDL.h"
+#include "SDL_syswm.h"
 
 #if !defined(_MAYA_EXPORT) && !defined(USE_OGL)
 #include "stats_manager.h"
@@ -23,11 +25,11 @@ public:
     void DestroyD3D();
 #endif // !USE_OGL
 
-    void CreateDevice(HWND hw, bool move_window);
+    void CreateDevice(SDL_Window* m_sdlWnd, bool move_window);
 
     void DestroyDevice();
 
-    void Reset(HWND hw);
+    void Reset(SDL_Window* m_sdlWnd);
 
 #ifndef USE_OGL
     void selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed);
@@ -38,10 +40,10 @@ public:
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 #endif // !USE_OGL
 
-    void updateWindowProps(HWND hw);
+    void updateWindowProps(SDL_Window* m_sdlWnd);
 #ifdef DEBUG
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-    void Validate(void) {};
+    void Validate(void){};
 #else //	USE_DX10
     void Validate(void)
     {
@@ -71,11 +73,11 @@ public:
     HGLRC m_hRC;
 #elif defined(USE_DX11)
 public:
-    IDXGIFactory1*       m_pFactory = nullptr;
-    IDXGIAdapter1*       m_pAdapter = nullptr; //	pD3D equivalent
-    ID3D11Device*           pDevice = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D11DeviceContext*   pContext = nullptr; //	combine with DX9 pDevice via typedef
-    IDXGISwapChain*    m_pSwapChain = nullptr;
+    IDXGIFactory1* m_pFactory = nullptr;
+    IDXGIAdapter1* m_pAdapter = nullptr; //	pD3D equivalent
+    ID3D11Device* pDevice = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D11DeviceContext* pContext = nullptr; //	combine with DX9 pDevice via typedef
+    IDXGISwapChain* m_pSwapChain = nullptr;
     ID3D11RenderTargetView* pBaseRT = nullptr; //	combine with DX9 pBaseRT via typedef
     ID3D11DepthStencilView* pBaseZB = nullptr;
 
@@ -86,13 +88,13 @@ public:
     D3D_FEATURE_LEVEL FeatureLevel;
 #elif defined(USE_DX10)
 public:
-    IDXGIFactory1*       m_pFactory = nullptr;
-    IDXGIAdapter1*       m_pAdapter = nullptr; //	pD3D equivalent
-    ID3D10Device1*         pDevice1 = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D10Device*           pDevice = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D10Device1*        pContext1 = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D10Device*          pContext = nullptr; //	combine with DX9 pDevice via typedef
-    IDXGISwapChain*    m_pSwapChain = nullptr;
+    IDXGIFactory1* m_pFactory = nullptr;
+    IDXGIAdapter1* m_pAdapter = nullptr; //	pD3D equivalent
+    ID3D10Device1* pDevice1 = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D10Device* pDevice = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D10Device1* pContext1 = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D10Device* pContext = nullptr; //	combine with DX9 pDevice via typedef
+    IDXGISwapChain* m_pSwapChain = nullptr;
     ID3D10RenderTargetView* pBaseRT = nullptr; //	combine with DX9 pBaseRT via typedef
     ID3D10DepthStencilView* pBaseZB = nullptr;
 
@@ -109,8 +111,8 @@ private:
     XRay::Module hD3D = nullptr;
 
 public:
-    IDirect3D9*           pD3D = nullptr; // D3D
-    IDirect3DDevice9*  pDevice = nullptr; // render device
+    IDirect3D9* pD3D = nullptr; // D3D
+    IDirect3DDevice9* pDevice = nullptr; // render device
     IDirect3DSurface9* pBaseRT = nullptr;
     IDirect3DSurface9* pBaseZB = nullptr;
 
@@ -142,7 +144,7 @@ public:
     HRESULT Present(UINT SyncInterval, UINT Flags);
 #endif // USE_OGL
 
-    int maxRefreshRate = 200; //ECO_RENDER add
+    int maxRefreshRate = 200; // ECO_RENDER add
 
 private:
     bool m_move_window = true;

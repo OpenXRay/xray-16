@@ -3,6 +3,7 @@
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
+#include <SDL.h>
 
 class ENGINE_API IInputReceiver;
 
@@ -52,7 +53,6 @@ private:
     BENCH_SEC_SCRAMBLEMEMBER1
     LPDIRECTINPUT8 pDI; // The DInput object
     LPDIRECTINPUTDEVICE8 pMouse; // The DIDevice7 interface
-    LPDIRECTINPUTDEVICE8 pKeyboard; // The DIDevice7 interface
     //----------------------
     u32 timeStamp[COUNT_MOUSE_AXIS];
     u32 timeSave[COUNT_MOUSE_AXIS];
@@ -61,15 +61,15 @@ private:
 
     //----------------------
     BOOL KBState[COUNT_KB_BUTTONS];
-
     HRESULT CreateInputDevice(
         LPDIRECTINPUTDEVICE8* device, GUID guidDevice, const DIDATAFORMAT* pdidDataFormat, u32 dwFlags, u32 buf_size);
 
-    // xr_stack<IInputReceiver*> cbStack;
+
     xr_vector<IInputReceiver*> cbStack;
 
+    //void MouseUpdate(SDL_Event *event);
     void MouseUpdate();
-    void KeyUpdate();
+    void KeyUpdate(SDL_Event *event);
 
     InputStatistics stats;
 
@@ -105,7 +105,7 @@ public:
     IC bool get_exclusive_mode();
     void unacquire();
     void acquire(const bool& exclusive);
-    bool get_dik_name(int dik, LPSTR dest, int dest_sz);
+    bool get_key_name(int dik, LPSTR dest, int dest_sz);
 
     void feedback(u16 s1, u16 s2, float time);
 };
