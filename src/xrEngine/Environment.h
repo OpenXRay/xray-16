@@ -10,7 +10,7 @@
 #include "xrCore/xrCore_benchmark_macros.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
-#include "xrSound/sound.h"
+#include "xrSound/Sound.h"
 
 // refs
 class ENGINE_API IRender_Visual;

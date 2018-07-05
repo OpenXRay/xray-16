@@ -2,7 +2,6 @@
 #define __XR_INPUT__
 
 #define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
 #include <SDL.h>
 
 class ENGINE_API IInputReceiver;
@@ -28,19 +27,7 @@ public:
         COUNT_MOUSE_AXIS = 3,
         COUNT_KB_BUTTONS = 256
     };
-    struct sxr_mouse
-    {
-        DIDEVCAPS capabilities;
-        DIDEVICEINSTANCE deviceInfo;
-        DIDEVICEOBJECTINSTANCE objectInfo;
-        u32 mouse_dt;
-    };
-    struct sxr_key
-    {
-        DIDEVCAPS capabilities;
-        DIDEVICEINSTANCE deviceInfo;
-        DIDEVICEOBJECTINSTANCE objectInfo;
-    };
+
     struct InputStatistics
     {
         CStatTimer FrameTime;
@@ -51,9 +38,7 @@ public:
 
 private:
     BENCH_SEC_SCRAMBLEMEMBER1
-    LPDIRECTINPUT8 pDI; // The DInput object
-    LPDIRECTINPUTDEVICE8 pMouse; // The DIDevice7 interface
-    //----------------------
+
     u32 timeStamp[COUNT_MOUSE_AXIS];
     u32 timeSave[COUNT_MOUSE_AXIS];
     int offs[COUNT_MOUSE_AXIS];
@@ -61,9 +46,6 @@ private:
 
     //----------------------
     BOOL KBState[COUNT_KB_BUTTONS];
-    HRESULT CreateInputDevice(
-        LPDIRECTINPUTDEVICE8* device, GUID guidDevice, const DIDATAFORMAT* pdidDataFormat, u32 dwFlags, u32 buf_size);
-
 
     xr_vector<IInputReceiver*> cbStack;
 
@@ -74,8 +56,6 @@ private:
     InputStatistics stats;
 
 public:
-    sxr_mouse mouse_property;
-    sxr_key key_property;
     u32 dwCurTime;
 
     const InputStatistics& GetStats() const { return stats; }

@@ -121,9 +121,9 @@ private:
 private:
     enum
     {
-        DIK_COUNT = 256
+        SDL_SCANCODE_COUNT = 256
     };
-    Base* m_actions[DIK_COUNT];
+    Base* m_actions[SDL_SCANCODE_COUNT];
 
     char* m_edit_str;
     char* m_undo_buf;

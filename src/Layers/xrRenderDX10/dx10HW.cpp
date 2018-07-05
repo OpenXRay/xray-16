@@ -64,7 +64,7 @@ void CHW::DestroyD3D()
     _RELEASE(m_pFactory);
 }
 
-void CHW::CreateDevice(SDL_Window* hWnd, bool move_window)
+void CHW::CreateDevice(SDL_Window* m_sdlWnd, bool move_window)
 {
     m_move_window = move_window;
     CreateD3D();
@@ -196,7 +196,7 @@ void CHW::CreateDevice(SDL_Window* hWnd, bool move_window)
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     //Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 #ifndef _EDITOR
-    updateWindowProps(m_hWnd);
+    updateWindowProps(m_sdlWnd);
     fill_vid_mode_list(this);
 #endif
 }
@@ -240,7 +240,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 // Resetting device
 //////////////////////////////////////////////////////////////////////
-void CHW::Reset(HWND hwnd)
+void CHW::Reset(SDL_Window* m_sdlWnd)
 {
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
     BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
@@ -265,8 +265,8 @@ void CHW::Reset(HWND hwnd)
         cd.BufferCount, desc.Width, desc.Height, desc.Format, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
     UpdateViews();
 
-    updateWindowProps(hwnd);
-    ShowWindow(hwnd, SW_SHOWNORMAL);
+    updateWindowProps(m_sdlWnd);
+    SDL_ShowWindow(m_sdlWnd);
 }
 
 D3DFORMAT CHW::selectDepthStencil(D3DFORMAT /*fTarget*/)
@@ -352,7 +352,7 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
     return TRUE;
 }
 
-void CHW::updateWindowProps(HWND m_hWnd)
+void CHW::updateWindowProps(SDL_Window* m_sdlWnd)
 {
     bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
@@ -362,11 +362,8 @@ void CHW::updateWindowProps(HWND m_hWnd)
     {
         if (m_move_window)
         {
-            const bool drawBorders = strstr(Core.Params, "-draw_borders");
-            dwWindowStyle = WS_VISIBLE;
-            if (drawBorders)
-                dwWindowStyle |= WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
-            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
+            if (NULL != strstr(Core.Params, "-draw_borders"))
+                SDL_SetWindowBordered(m_sdlWnd, SDL_TRUE);
             // When moving from fullscreen to windowed mode, it is important to
             // adjust the window size after recreating the device rather than
             // beforehand to ensure that you get the window size you want.  For
@@ -376,45 +373,29 @@ void CHW::updateWindowProps(HWND m_hWnd)
             // changed to 1024x768, because windows cannot be larger than the
             // desktop.
 
-            RECT m_rcWindowBounds;
-            float fYOffset = 0.f;
             bool centerScreen = false;
-            if (strstr(Core.Params, "-center_screen"))
+            if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
                 centerScreen = true;
+
+            SDL_SetWindowSize(m_sdlWnd, m_ChainDesc.BufferDesc.Width, m_ChainDesc.BufferDesc.Height);
 
             if (centerScreen)
             {
-                RECT DesktopRect;
-                GetClientRect(GetDesktopWindow(), &DesktopRect);
-
-                SetRect(&m_rcWindowBounds,
-                    (DesktopRect.right - m_ChainDesc.BufferDesc.Width) / 2,
-                    (DesktopRect.bottom - m_ChainDesc.BufferDesc.Height) / 2,
-                    (DesktopRect.right + m_ChainDesc.BufferDesc.Width) / 2,
-                    (DesktopRect.bottom + m_ChainDesc.BufferDesc.Height) / 2);
+                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
             }
             else
             {
-                if (drawBorders)
-                    fYOffset = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
-                SetRect(&m_rcWindowBounds, 0, 0, m_ChainDesc.BufferDesc.Width, m_ChainDesc.BufferDesc.Height);
-            };
-
-            AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
-
-            SetWindowPos(m_hWnd, HWND_NOTOPMOST,
-                         m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
-                         m_rcWindowBounds.right - m_rcWindowBounds.left,
-                         m_rcWindowBounds.bottom - m_rcWindowBounds.top,
-                         SWP_HIDEWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
+            }
         }
     }
     else
     {
-        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
+        SDL_ShowWindow(m_sdlWnd);
     }
 
-    SetForegroundWindow(m_hWnd);
+    if (!GEnv.isDedicatedServer)
+        SDL_SetWindowGrab(m_sdlWnd, SDL_TRUE);
 }
 
 struct uniqueRenderingMode
