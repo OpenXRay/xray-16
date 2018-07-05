@@ -193,17 +193,14 @@ void CInput::ClipCursor(bool clip)
 {
     if (clip)
     {
+        //::ClipCursor(&Device.m_rcWindowClient);
         SDL_RenderSetClipRect(Device.m_sdlRndr, &Device.m_rcWindowClient);
-        while (ShowCursor(FALSE) >= 0)
-        {
-        }
+        SDL_ShowCursor(SDL_DISABLE);
     }
     else
     {
-        ::ClipCursor(nullptr);
-        while (ShowCursor(TRUE) <= 0)
-        {
-        }
+        //::ClipCursor(nullptr);
+        SDL_ShowCursor(SDL_ENABLE);
     }
 }
 
@@ -317,22 +314,22 @@ void CInput::OnFrame(void)
             // MouseUpdate(&event);
             //MouseUpdate();
             continue;
-        case SDL_WINDOWEVENT:
-            switch (event.window.event)
-            {
-            case SDL_WINDOWEVENT_CLOSE:
-                event.type = SDL_QUIT;
-                SDL_PushEvent(&event);
-                continue;
-            case SDL_WINDOWEVENT_ENTER:
-#if SDL_VERSION_ATLEAST(2, 0, 5)
-            case SDL_WINDOWEVENT_TAKE_FOCUS:
-                RDEVICE.OnWM_Activate(event.window.data1, event.window.data2);
-                continue;
-#endif
-            default: SDL_Log("Window %d got unknown event %d", event.window.windowID, event.window.event); continue;
-            }
-            continue;
+//        case SDL_WINDOWEVENT:
+//            switch (event.window.event)
+//            {
+//            case SDL_WINDOWEVENT_CLOSE:
+//                event.type = SDL_QUIT;
+//                SDL_PushEvent(&event);
+//                continue;
+//            case SDL_WINDOWEVENT_ENTER:
+//#if SDL_VERSION_ATLEAST(2, 0, 5)
+//            case SDL_WINDOWEVENT_TAKE_FOCUS:
+//                RDEVICE.OnWM_Activate(event.window.data1, event.window.data2);
+//                continue;
+//#endif
+//            default: SDL_Log("Window %d got unknown event %d", event.window.windowID, event.window.event); continue;
+//            }
+//            continue;
         case SDL_QUIT:
             Engine.Event.Defer("KERNEL:disconnect");
             Engine.Event.Defer("KERNEL:quit");

@@ -48,7 +48,7 @@ void CRenderDevice::Initialize()
 
     if (!m_sdlWnd)
     {
-        Uint32 flags = SDL_WINDOW_BORDERLESS;
+        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP;
 
         if (strstr(Core.Params, "-gl"))
             flags |= SDL_WINDOW_OPENGL;

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Text_Console.h"
 #include "line_editor.h"
+#include "SDL_syswm.h"
 
 extern char const* const ioc_prompt;
 extern char const* const ch_cursor;
@@ -140,7 +141,20 @@ void CTextConsole::Initialize()
 {
     inherited::Initialize();
 
-    //m_pMainWnd = &Device.m_hWnd;
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(Device.m_sdlWnd, &info))
+    {
+        switch (info.subsystem)
+        {
+        case SDL_SYSWM_WINDOWS:
+            m_pMainWnd = &info.info.win.window;
+            break;
+        default: break;
+        }
+    }
+    else
+        Log("Couldn't get window information: %s", SDL_GetError());
     m_dwLastUpdateTime = Device.dwTimeGlobal;
     m_last_time = Device.dwTimeGlobal;
 
