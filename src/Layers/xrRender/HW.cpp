@@ -109,7 +109,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd, bool move_window)
         fDepth = selectDepthStencil(fTarget);
     }
 
-    if ((D3DFMT_UNKNOWN == fTarget) || (D3DFMT_UNKNOWN == fTarget))
+    if (D3DFMT_UNKNOWN == fTarget)
     {
         Msg("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
