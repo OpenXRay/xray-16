@@ -8,8 +8,6 @@
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
-extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 void CRenderDevice::initialize_weather_editor()
 {
     m_editor_module = XRay::LoadModule("xrWeatherEditor");
@@ -48,7 +46,10 @@ void CRenderDevice::Initialize()
 
     if (!m_sdlWnd)
     {
-        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP;
+        Uint32 flags = SDL_WINDOW_BORDERLESS;
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+        flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+#endif
 
         if (strstr(Core.Params, "-gl"))
             flags |= SDL_WINDOW_OPENGL;

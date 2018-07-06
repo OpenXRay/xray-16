@@ -1,5 +1,5 @@
 #pragma once
-#include "xrSound/sound.h"
+#include "xrSound/Sound.h"
 
 // fwd. decl.
 class IGameObject;

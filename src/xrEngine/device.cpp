@@ -9,7 +9,9 @@
 #define MMNOAUX
 #define MMNOMIXER
 #define MMNOJOY
+#if defined(WINDOWS)
 #include <mmsystem.h>
+#endif
 #include <SDL.h>
 #pragma warning(pop)
 
@@ -329,9 +331,8 @@ void CRenderDevice::message_loop()
         return;
     }
 
-  
     SDL_PumpEvents();
-    
+
     SDL_Event event;
 
     SDL_PeepEvents(&event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT);
@@ -356,7 +357,7 @@ void CRenderDevice::message_loop()
 #if SDL_VERSION_ATLEAST(2, 0, 5)
                 case SDL_WINDOWEVENT_SHOWN:
                 case SDL_WINDOWEVENT_EXPOSED:
-                //case SDL_WINDOWEVENT_TAKE_FOCUS:
+                    // case SDL_WINDOWEVENT_TAKE_FOCUS:
                     if (editor())
                     {
                         Device.b_is_Active = TRUE;
@@ -375,12 +376,11 @@ void CRenderDevice::message_loop()
 
         on_idle();
     }
-    
+
     /*
     while (true)
         on_idle();
         */
-    
 }
 
 void CRenderDevice::Run()
@@ -531,7 +531,7 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     u16 fActive = LOWORD(wParam);
     const BOOL fMinimized = (BOOL)HIWORD(wParam);
 
-    const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
+    const BOOL isWndActive = (fActive != WA_INACTIVE && (!fMinimized)) ? TRUE : FALSE;
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
         pInput->ClipCursor(true);
     else

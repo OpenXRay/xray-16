@@ -2,6 +2,7 @@
 
 #include "xrCore/_types.h"
 
+#if defined(WINDOWS)
 xr_pure_interface IPhDebugRender
 {
     virtual void open_cashed_draw() = 0;
@@ -10,3 +11,4 @@ xr_pure_interface IPhDebugRender
 };
 
 extern ENGINE_API IPhDebugRender* ph_debug_render;
+#endif

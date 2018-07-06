@@ -9,6 +9,7 @@
 #define EDIT_ACTIONS_H_INCLUDED
 
 #include "Common/Noncopyable.hpp"
+#include "line_edit_control.h"
 
 namespace text_editor
 {

@@ -40,3 +40,8 @@ extern XRCORE_API void _initialize_cpu_thread();
 using thread_t = void(void*);
 extern XRCORE_API void thread_name(const char* name);
 extern XRCORE_API void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* arglist);
+
+#if defined(LINUX)
+void QueryPerformanceCounter(PLARGE_INTEGER result);
+DWORD timeGetTime();
+#endif
