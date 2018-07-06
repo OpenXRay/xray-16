@@ -206,9 +206,10 @@ public:
         xr_strcat(cfg_full_name, ".ltx");
 
         BOOL b_allow = TRUE;
+#if defined(WINDOWS)
         if (FS.exist(cfg_full_name))
             b_allow = SetFileAttributes(cfg_full_name, FILE_ATTRIBUTE_NORMAL);
-
+#endif
         if (b_allow)
         {
             IWriter* F = FS.w_open(cfg_full_name);

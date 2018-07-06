@@ -40,9 +40,13 @@ CEngineAPI::~CEngineAPI()
 
 bool is_enough_address_space_available()
 {
+#if defined(WINDOWS)
     SYSTEM_INFO system_info;
     GetSystemInfo(&system_info);
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
+#else
+    return TRUE; // In linux allocated memory limited only by pointer size
+#endif
 }
 
 void CEngineAPI::SetupCurrentRenderer()

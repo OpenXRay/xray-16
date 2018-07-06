@@ -11,14 +11,17 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/OpenAutomate/inc
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/FreeImage/Dist/x64
 	${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind
     /usr/include/SDL2
 	)
 
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./tntQAVI.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./editor_environment_manager_properties.cpp")
-#list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.h")
+
+list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./tntQAVI.h")
 
 add_definitions(-DENGINE_BUILD)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore luabind xrAPI xrSound xrScriptEngine luajit theora ${OGG_LIBRARIES} xrNetServer xrCDB xrPhysics openal)
+target_link_libraries(${PROJECT_NAME} xrCore luabind xrAPI xrSound xrScriptEngine luajit theora ${OGG_LIBRARIES} xrNetServer xrCDB xrPhysics openal lockfile)

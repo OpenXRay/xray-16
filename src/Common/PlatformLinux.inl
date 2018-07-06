@@ -50,6 +50,23 @@
 #define __pragma(...) _Pragma(#__VA_ARGS__)
 #define __declspec(x)
 #define CALLBACK
+#define TEXT(x) strdup(x)
+
+inline char *_strlwr_l(char *str, locale_t loc)
+{
+//TODO
+}
+
+inline char *_strupr_l(char *str, locale_t loc)
+{
+//TODO
+}
+
+#define VOID void
+#define HKL void *
+#define ActivateKeyboardLayout(x, y) {}
+#define GetCursorPos(point) {}
+#define ScreenToClient(hwnd, p) {}
 
 #define __except(X) catch(X)
 
@@ -94,7 +111,7 @@ inline int GetExceptionCode()
 
 #define xr_unlink unlink
 
-typedef char BOOL;
+typedef bool BOOL;
 typedef char* LPSTR;
 typedef char* PSTR;
 typedef char* LPTSTR;
@@ -130,6 +147,28 @@ typedef struct {
     WORD  wBitsPerSample;
     WORD  cbSize;
 } WAVEFORMATEX, *LPWAVEFORMATEX;
+
+typedef struct tagSTICKYKEYS
+{
+    DWORD   cbSize;
+    DWORD   dwFlags;
+} STICKYKEYS, *LPSTICKYKEYS;
+
+typedef struct tagFILTERKEYS
+{
+    UINT   cbSize;
+    DWORD  dwFlags;
+    DWORD  iWaitMSec;
+    DWORD  iDelayMSec;
+    DWORD  iRepeatMSec;
+    DWORD  iBounceMSec;
+} FILTERKEYS, *LPFILTERKEYS;
+
+typedef struct tagTOGGLEKEYS
+{
+    DWORD   cbSize;
+    DWORD   dwFlags;
+} TOGGLEKEYS, *LPTOGGLEKEYS;
 
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
@@ -172,10 +211,15 @@ typedef struct tagPOINT {
     long y;
 } POINT, *PPOINT, *LPPOINT;
 
+#define DWORD_PTR UINT_PTR
 #define WM_USER 0x0400
+#define WA_INACTIVE 0
+#define HIWORD(l)              ((WORD)((DWORD_PTR)(l) >> 16))
+#define LOWORD(l)              ((WORD)((DWORD_PTR)(l) & 0xFFFF))
 
-#define TRUE 1
-#define FALSE 0
+
+#define TRUE true
+#define FALSE false
 #define NONE 0
 #define CONST const
 
@@ -196,9 +240,12 @@ typedef dirent DirEntryType;
 #define strcmpi stricmp
 #define lstrcpy strcpy
 #define stricmp strcasecmp
-#define strncpy_s(dest, size, source, num) strncpy(dest, source, num)
-#define strcpy_s(dest, num, source) strcpy(dest, source)
+#define strupr SDL_strupr
+#define strncpy_s(dest, size, source, num) (NULL == strncpy(dest, source, num))
+#define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
+#define strcat_s(dest, num, source) (dest == strcat(dest, source))
 #define _vsnprintf vsnprintf
+#define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
 #define _alloca alloca
 #define _snprintf snprintf
 #define sprintf_s(buffer, buffer_size, stringbuffer, ...) sprintf(buffer, stringbuffer, ##__VA_ARGS__)
@@ -241,7 +288,11 @@ inline int _filelength(int fd)
 #define __max(a, b) std::max(a, b)
 #define __min(a, b) std::min(a, b)
 
-#define xr_itoa SDL_itoa
+#define itoa SDL_itoa
+#define _itoa_s(value, buffer, radix) SDL_itoa(value, buffer, radix)
+#define _locale_t locale_t
+#define _isalpha_l isalpha_l
+#define _create_locale(category, arg) newlocale(category, arg, (locale_t) 0)
 
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
@@ -257,3 +308,6 @@ inline int _filelength(int fd)
 #define _MAX_DIR	256
 #define _MAX_FNAME	256
 #define _MAX_EXT	256
+
+#define SEM_FAILCRITICALERRORS 1
+#define SetErrorMode(x) {x=x}
