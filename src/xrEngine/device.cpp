@@ -346,9 +346,10 @@ void CRenderDevice::message_loop()
                 switch (event.window.event)
                 {
                 case SDL_WINDOWEVENT_MOVED:
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
-                case SDL_WINDOWEVENT_MAXIMIZED:
                     SDL_Log("Window %d moved to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
+                    continue;
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    SDL_Log("Window %d resized to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
                     continue;
                 case SDL_WINDOWEVENT_CLOSE:
                     event.type = SDL_QUIT;
@@ -356,21 +357,30 @@ void CRenderDevice::message_loop()
                     continue;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
                 case SDL_WINDOWEVENT_SHOWN:
-                case SDL_WINDOWEVENT_EXPOSED:
-                    // case SDL_WINDOWEVENT_TAKE_FOCUS:
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
                     if (editor())
                     {
                         Device.b_is_Active = TRUE;
                         continue;
                     }
-                    OnWM_Activate(event.window.data1, event.window.data2);
+                    OnWM_Activate(1, event.window.data2);
                     SDL_Log("Window %d is offered a focus", event.window.windowID);
                     continue;
+                case SDL_WINDOWEVENT_HIDDEN:
+                case SDL_WINDOWEVENT_FOCUS_LOST: 
+                    OnWM_Activate(0, event.window.data2);
+                    SDL_Log("Window %d is lost a focus", event.window.windowID);
+                    continue;
 #endif
-                default: SDL_Log("Window %d got unknown event %d", event.window.windowID, event.window.event); continue;
+                default:
+                    SDL_Log("Window %d got unknown event %d with %d %d", event.window.windowID, event.window.event,
+                        event.window.data1, event.window.data2);
+                    continue;
                 }
                 continue;
-            default: Log("Recieve window %d event", event.type); continue;
+            default: 
+                SDL_Log("Window event %d to %d,%d", event.type, event.window.data1, event.window.data2);
+                continue;
             }
         }
 
@@ -528,10 +538,8 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
-    u16 fActive = LOWORD(wParam);
-    const BOOL fMinimized = (BOOL)HIWORD(wParam);
+    const BOOL isWndActive = (1 == wParam) ? TRUE : FALSE;
 
-    const BOOL isWndActive = (fActive != WA_INACTIVE && (!fMinimized)) ? TRUE : FALSE;
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
         pInput->ClipCursor(true);
     else
