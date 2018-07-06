@@ -39,6 +39,9 @@ void CRenderDevice::Initialize()
     if (strstr(Core.Params, "-weather"))
         initialize_weather_editor();
 
+    //SetEnvironmentVariable("SDL_VIDEODRIVER", "windows"); 
+    SetEnvironmentVariable("SDL_AUDIODRIVER", "directsound"); 
+    
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -55,14 +58,8 @@ void CRenderDevice::Initialize()
             flags |= SDL_WINDOW_OPENGL;
 
         m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, flags);
-        
-        if (!m_sdlWnd)
-            Log("Unable to create window: %s", SDL_GetError());
-
-        //m_sdlRndr = SDL_CreateRenderer(m_sdlWnd, -1, SDL_RENDERER_ACCELERATED);
-
-        //SDL_RenderClear(m_sdlRndr);
-        //SDL_RenderPresent(m_sdlRndr);
+       
+        R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
     }
     // Save window properties
     
