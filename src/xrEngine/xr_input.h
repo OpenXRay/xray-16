@@ -49,8 +49,7 @@ private:
 
     xr_vector<IInputReceiver*> cbStack;
 
-    //void MouseUpdate(SDL_Event *event);
-    void MouseUpdate();
+    void MouseUpdate(SDL_Event *event);
     void KeyUpdate(SDL_Event *event);
 
     InputStatistics stats;
