@@ -173,9 +173,9 @@ void CUIDemoPlayControl::InitAllPlayers()
     m_all_players->Hide();
 }
 
-bool CUIDemoPlayControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUIDemoPlayControl::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
-    if ((dik == DIK_LCONTROL) && (keyboard_action == WINDOW_KEY_RELEASED))
+    if ((dik == SDL_SCANCODE_LCTRL) && (keyboard_action == WINDOW_KEY_RELEASED))
     {
         m_last_curr_pos = GetUICursor().GetCursorPosition();
         m_rewind_type->Hide();

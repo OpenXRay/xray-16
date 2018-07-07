@@ -55,15 +55,15 @@ void CUISpeechMenu::InitList(LPCSTR section_name)
     }
 }
 
-bool CUISpeechMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUISpeechMenu::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
-    if (dik < DIK_1 || dik > DIK_0)
+    if (dik < SDL_SCANCODE_1 || dik > SDL_SCANCODE_0)
         return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 
     game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
 
     HideDialog();
-    game->OnMessageSelected(this, static_cast<u8>(dik - DIK_1));
+    game->OnMessageSelected(this, static_cast<u8>(dik - SDL_SCANCODE_1));
 
     return true;
 }

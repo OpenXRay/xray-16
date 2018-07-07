@@ -26,8 +26,8 @@ public:
     bool IsServerInfoShown();
     bool ShowServerInfo(); // shows only if it has some info ...
 
-    virtual bool IR_UIOnKeyboardPress(int dik);
-    virtual bool IR_UIOnKeyboardRelease(int dik);
+    virtual bool IR_UIOnKeyboardPress(SDL_Scancode dik);
+    virtual bool IR_UIOnKeyboardRelease(SDL_Scancode dik);
     virtual void SetClGame(game_cl_GameState* g);
 
 protected:

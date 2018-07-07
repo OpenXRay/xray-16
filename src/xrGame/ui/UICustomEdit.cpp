@@ -40,11 +40,11 @@ text_editor::line_edit_control const& CUICustomEdit::ec() const
 
 void CUICustomEdit::Register_callbacks()
 {
-    ec().assign_callback(DIK_ESCAPE, text_editor::ks_free, Callback(this, &CUICustomEdit::press_escape));
-    ec().assign_callback(DIK_RETURN, text_editor::ks_free, Callback(this, &CUICustomEdit::press_commit));
-    ec().assign_callback(DIK_NUMPADENTER, text_editor::ks_free, Callback(this, &CUICustomEdit::press_commit));
-    ec().assign_callback(DIK_GRAVE, text_editor::ks_free, Callback(this, &CUICustomEdit::nothing));
-    ec().assign_callback(DIK_TAB, text_editor::ks_free, Callback(this, &CUICustomEdit::press_tab));
+    ec().assign_callback(SDL_SCANCODE_ESCAPE, text_editor::ks_free, Callback(this, &CUICustomEdit::press_escape));
+    ec().assign_callback(SDL_SCANCODE_RETURN, text_editor::ks_free, Callback(this, &CUICustomEdit::press_commit));
+    ec().assign_callback(SDL_SCANCODE_KP_ENTER, text_editor::ks_free, Callback(this, &CUICustomEdit::press_commit));
+    ec().assign_callback(SDL_SCANCODE_GRAVE, text_editor::ks_free, Callback(this, &CUICustomEdit::nothing));
+    ec().assign_callback(SDL_SCANCODE_TAB, text_editor::ks_free, Callback(this, &CUICustomEdit::press_tab));
 }
 
 void CUICustomEdit::Init(u32 max_char_count, bool number_only_mode, bool read_mode, bool fn_mode)
@@ -116,7 +116,7 @@ bool CUICustomEdit::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return false;
 }
 
-bool CUICustomEdit::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUICustomEdit::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
     if (!m_bInputFocus)
     {
@@ -137,7 +137,7 @@ bool CUICustomEdit::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUICustomEdit::OnKeyboardHold(int dik)
+bool CUICustomEdit::OnKeyboardHold(SDL_Scancode dik)
 {
     if (!m_bInputFocus)
     {

@@ -41,20 +41,20 @@ void ButtonListDialog::Initialize(int buttonCount)
 
 void ButtonListDialog::OnCancel() { HideDialog(); }
 const ButtonListDialog::NamedButton& ButtonListDialog::GetButton(int i) const { return buttons[i]; }
-bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
+bool ButtonListDialog::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboardAction)
 {
     CUIDialogWnd::OnKeyboardAction(dik, keyboardAction);
     if (WINDOW_KEY_PRESSED == keyboardAction)
     {
-        if (DIK_ESCAPE == dik)
+        if (SDL_SCANCODE_ESCAPE == dik)
         {
             OnCancel();
             return true;
         }
         int btnCount = buttons.size();
-        if (dik >= DIK_1 && dik <= DIK_1 - 1 + btnCount && btnCount <= 9) // handle 1..9 keys only
+        if (dik >= SDL_SCANCODE_1 && dik <= SDL_SCANCODE_1 - 1 + btnCount && btnCount <= 9) // handle 1..9 keys only
         {
-            OnButtonClick(dik - DIK_1);
+            OnButtonClick(dik - SDL_SCANCODE_1);
             return true;
         }
     }

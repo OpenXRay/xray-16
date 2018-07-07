@@ -25,9 +25,7 @@ void UIGameMP::ShowDemoPlayControl()
     GetUICursor().SetUICursorPosition(m_pDemoPlayControl->GetLastCursorPos());
 }
 
-#include <dinput.h>
-
-bool UIGameMP::IR_UIOnKeyboardPress(int dik)
+bool UIGameMP::IR_UIOnKeyboardPress(SDL_Scancode dik)
 {
     if (is_binded(kCROUCH, dik) && Level().IsDemoPlay())
     {
@@ -35,7 +33,7 @@ bool UIGameMP::IR_UIOnKeyboardPress(int dik)
         return true;
     }
 #ifdef DEBUG
-    if (dik == DIK_T)
+    if (dik == SDL_SCANCODE_T)
     {
         m_game->AddRewardTask(0); // mp_award_massacre
     }
@@ -43,7 +41,7 @@ bool UIGameMP::IR_UIOnKeyboardPress(int dik)
     return inherited::IR_UIOnKeyboardPress(dik);
 }
 
-bool UIGameMP::IR_UIOnKeyboardRelease(int dik) { return inherited::IR_UIOnKeyboardRelease(dik); }
+bool UIGameMP::IR_UIOnKeyboardRelease(SDL_Scancode dik) { return inherited::IR_UIOnKeyboardRelease(dik); }
 /*
 bool UIGameMP::IsMapDescShown()
 {

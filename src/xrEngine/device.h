@@ -165,7 +165,6 @@ private:
 
 public:
     SDL_Window* m_sdlWnd;
-    SDL_Renderer* m_sdlRndr;
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 
     // u32 dwFrame;

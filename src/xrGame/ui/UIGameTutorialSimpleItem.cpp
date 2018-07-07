@@ -313,7 +313,7 @@ bool CUISequenceSimpleItem::Stop(bool bForce)
     return true;
 }
 
-void CUISequenceSimpleItem::OnKeyboardPress(int dik)
+void CUISequenceSimpleItem::OnKeyboardPress(SDL_Scancode dik)
 {
     if (!m_flags.test(etiCanBeStopped))
     {
@@ -356,5 +356,5 @@ void CUISequenceSimpleItem::OnMousePress(int btn)
     case 2: dik = MOUSE_3; break;
     default: return;
     }
-    OnKeyboardPress(dik);
+    OnKeyboardPress((SDL_Scancode) dik);
 }

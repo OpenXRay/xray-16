@@ -100,6 +100,20 @@ void CleanupUIStyleToken()
         xr_free(UI_PATH);
 }
 
+bool allow_intro()
+{
+#ifdef MASTER_GOLD
+    if (g_SASH.IsRunning())
+#else // #ifdef MASTER_GOLD
+    if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
+#endif // #ifdef MASTER_GOLD
+    {
+        return false;
+    }
+    else
+        return true;
+}
+
 CGamePersistent::CGamePersistent(void)
 {
     m_bPickableDOF = false;
@@ -119,7 +133,12 @@ CGamePersistent::CGamePersistent(void)
     m_pUI_core = NULL;
     m_pMainMenu = NULL;
     m_intro = NULL;
-    m_intro_event.bind(this, &CGamePersistent::start_logo_intro);
+
+    if (allow_intro())
+        m_intro_event.bind(this, &CGamePersistent::start_logo_intro);
+    else
+        m_intro_event.bind(this, &CGamePersistent::game_loaded);
+    
 #ifdef DEBUG
     m_frame_counter = 0;
     m_last_stats_frame = u32(-2);
@@ -462,20 +481,6 @@ void CGamePersistent::WeathersUpdate()
         if (ambient_particles && !ambient_particles->IsPlaying())
             CParticlesObject::Destroy(ambient_particles);
     }
-}
-
-bool allow_intro()
-{
-#ifdef MASTER_GOLD
-    if (g_SASH.IsRunning())
-#else // #ifdef MASTER_GOLD
-    if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
-#endif // #ifdef MASTER_GOLD
-    {
-        return false;
-    }
-    else
-        return true;
 }
 
 void CGamePersistent::start_logo_intro()

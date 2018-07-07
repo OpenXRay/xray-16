@@ -137,7 +137,7 @@ void CUIFixedScrollBar::ClampByViewRect()
 #include "UICursor.h"
 
 u32 last_hold_tm = 0;
-bool CUIFixedScrollBar::OnKeyboardHold(int dik)
+bool CUIFixedScrollBar::OnKeyboardHold(SDL_Scancode dik)
 {
     if (dik == MOUSE_1 && (last_hold_tm + m_hold_delay) < Device.dwTimeContinual)
     {
