@@ -52,6 +52,7 @@ CInput::CInput(BOOL bExclusive, int deviceForInit)
     //===================== Dummy pack
     iCapture(&dummyController);
 
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 
     xrDebug::SetDialogHandler(on_error_dialog);
 
@@ -197,19 +198,18 @@ void CInput::ClipCursor(bool clip)
 {
     if (clip)
     {
-        //::ClipCursor(&Device.m_rcWindowClient);
         SDL_ShowCursor(SDL_DISABLE);
     }
     else
     {
-        //::ClipCursor(nullptr);
         SDL_ShowCursor(SDL_ENABLE);
     }
 }
 
-// void CInput::MouseUpdate(SDL_Event *event)
-void CInput::MouseUpdate()
+void CInput::MouseUpdate(SDL_Event *event)
 {
+    DWORD dwElements = MOUSEBUFFERSIZE;
+
 #ifndef _EDITOR
     if (Device.dwPrecacheFrame)
         return;
@@ -224,14 +224,34 @@ void CInput::MouseUpdate()
     mouse_prev[5] = mouseState[5];
     mouse_prev[6] = mouseState[6];
     mouse_prev[7] = mouseState[7];
+
+    offs[0] = offs[1] = offs[2] = 0;
+
+    switch (event->type)
+    {
+    case SDL_MOUSEMOTION:
+        timeStamp[0] = event->motion.timestamp;
+        cbStack.back()->IR_OnMouseMove(event->motion.xrel, event->motion.yrel);
+        break;
+    case SDL_MOUSEBUTTONUP: 
+        cbStack.back()->IR_OnMouseRelease(event->button.button); 
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        cbStack.back()->IR_OnMousePress(event->button.button); 
+        break;
+    case SDL_MOUSEWHEEL:
+        timeStamp[2] = event->wheel.timestamp;
+        cbStack.back()->IR_OnMouseWheel(event->wheel.direction); 
+        break;
+    default: break;
+    }
+
 }
 
 //-------------------------------------------------------
 void CInput::iCapture(IInputReceiver* p)
 {
     VERIFY(p);
-    
-    MouseUpdate();
 
     // change focus
     if (!cbStack.empty())
@@ -251,9 +271,7 @@ void CInput::iRelease(IInputReceiver* p)
     {
         cbStack.back()->IR_OnDeactivate();
         cbStack.pop_back();
-
-        if (!cbStack.empty())
-            cbStack.back()->IR_OnActivate();
+        cbStack.back()->IR_OnActivate();
     }
     else
     {
@@ -315,7 +333,7 @@ void CInput::OnFrame(void)
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEWHEEL:
-            // MouseUpdate(&event);
+            MouseUpdate(&event);
             //MouseUpdate();
             continue;
 //        case SDL_WINDOWEVENT:
