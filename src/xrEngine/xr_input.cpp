@@ -49,6 +49,10 @@ CInput::CInput(BOOL bExclusive, int deviceForInit)
     ZeroMemory(timeSave, sizeof(timeStamp));
     ZeroMemory(offs, sizeof(offs));
 
+    //===================== Dummy pack
+    iCapture(&dummyController);
+
+
     xrDebug::SetDialogHandler(on_error_dialog);
 
 #ifdef ENGINE_BUILD
