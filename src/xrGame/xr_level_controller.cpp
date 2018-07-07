@@ -19,7 +19,7 @@ _action actions[] = {{"left", kLEFT, _both}, {"right", kRIGHT, _both}, {"up", kU
 
     {"cam_1", kCAM_1, _both}, {"cam_2", kCAM_2, _both}, {"cam_3", kCAM_3, _both}, {"cam_zoom_in", kCAM_ZOOM_IN, _both},
     {"cam_zoom_out", kCAM_ZOOM_OUT, _both},
-
+	{ "flashlight",			kFLASH					,_both},	//Romann
     {"torch", kTORCH, _both}, {"night_vision", kNIGHT_VISION, _both}, {"show_detector", kDETECTOR, _sp},
 
     {"wpn_1", kWPN_1, _both}, {"wpn_2", kWPN_2, _both}, {"wpn_3", kWPN_3, _both}, {"wpn_4", kWPN_4, _both},

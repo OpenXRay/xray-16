@@ -150,9 +150,14 @@
 	<string id="kb_team_menu">
 		<text>Team selection menu</text>
 	</string>
-	<string id="kb_torch">
-		<text>Flashlight</text>
+	 <!-- Romann -->
+	<string id="kb_flashlight">
+		<text>Hend Flashlight</text>
 	</string>
+	<string id="kb_torch">
+		<text>Head Flashlight</text>
+	</string>
+	 <!-- Romann -->
 	<string id="kb_turn_engine">
 		<text>Activate</text>
 	</string>

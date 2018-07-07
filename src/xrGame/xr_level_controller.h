@@ -27,7 +27,7 @@ enum EGameActions
     kCAM_3,
     kCAM_ZOOM_IN,
     kCAM_ZOOM_OUT,
-
+	kFLASH,	//Romann
     kTORCH,
     kNIGHT_VISION,
     kDETECTOR,

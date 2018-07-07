@@ -700,19 +700,21 @@ bool CInventory::Action(u16 cmd, u32 flags)
         }
         break;
 
-        case kWPN_NEXT:
-        case kWPN_RELOAD:
-        case kWPN_FIRE:
-        case kWPN_FUNC:
-        case kWPN_FIREMODE_NEXT:
-        case kWPN_FIREMODE_PREV:
-        case kWPN_ZOOM:
-        case kTORCH:
-        case kNIGHT_VISION: { SendActionEvent(cmd, flags);
-        }
-        break;
-        }
-    }
+		case kWPN_NEXT:
+		case kWPN_RELOAD:
+		case kWPN_FIRE:
+		case kWPN_FUNC:
+		case kWPN_FIREMODE_NEXT:
+		case kWPN_FIREMODE_PREV:
+		case kWPN_ZOOM	 : 
+		case kTORCH:
+		case kFLASH:		//Romann
+		case kNIGHT_VISION:
+			{
+				SendActionEvent(cmd, flags);
+			}break;
+		}
+	}
 
     if (ActiveItem() && ActiveItem()->Action(cmd, flags))
         return true;

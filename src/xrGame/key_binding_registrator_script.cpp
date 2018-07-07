@@ -27,7 +27,8 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kUP", int(kUP)), value("kDOWN", int(kDOWN)), value("kJUMP", int(kJUMP)),
                 value("kCROUCH", int(kCROUCH)), value("kACCEL", int(kACCEL)), value("kCAM_1", int(kCAM_1)),
                 value("kCAM_2", int(kCAM_2)), value("kCAM_3", int(kCAM_3)), value("kCAM_ZOOM_IN", int(kCAM_ZOOM_IN)),
-                value("kCAM_ZOOM_OUT", int(kCAM_ZOOM_OUT)), value("kTORCH", int(kTORCH)),
+                value("kCAM_ZOOM_OUT", int(kCAM_ZOOM_OUT)), value("kTORCH", int(kTORCH)), value("kFLASH", int(kFLASH)),	//Romann
+
                 value("kNIGHT_VISION", int(kNIGHT_VISION)), value("kWPN_1", int(kWPN_1)), value("kWPN_2", int(kWPN_2)),
                 value("kWPN_3", int(kWPN_3)), value("kWPN_4", int(kWPN_4)), value("kWPN_5", int(kWPN_5)),
                 value("kWPN_6", int(kWPN_6)), value("kARTEFACT", int(kARTEFACT)), value("kWPN_NEXT", int(kWPN_NEXT)),

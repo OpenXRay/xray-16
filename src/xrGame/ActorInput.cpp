@@ -119,17 +119,20 @@ void CActor::IR_OnKeyboardPress(int cmd)
         SwitchNightVision();
         break;
     }
-    case kTORCH:
-    {
+	case kTORCH:
+	{
 		SwitchTorch();
-
+		break;
+	}
+	//Romann
+	case kFLASH:
+	{
 		CFlashlight* flashlight = smart_cast<CFlashlight*>(inventory().ItemFromSlot(DETECTOR_SLOT));
 		if (flashlight)
 			flashlight->ToggleSwitch();
-
 		break;
-    }
-
+	}
+	//Romann
     case kDETECTOR:
     {
         PIItem det_active = inventory().ItemFromSlot(DETECTOR_SLOT);
