@@ -471,12 +471,12 @@ hud                                      = device_flashlight_hud
 slot                                     = 8
 animation_slot                           = 7
 default_to_ruck                          = false
-cost                                     = 1000
-inv_weight                               = 0.4
-inv_grid_width                           = 1
+cost                                     = 2000
+inv_weight                               = 0.2
+inv_grid_width                           = 2
 inv_grid_height                          = 1
-inv_grid_x                               = 5
-inv_grid_y                               = 39
+inv_grid_x                               = 1
+inv_grid_y                               = 46
 inv_name                                 = st_device_flashlight_name
 inv_name_short                           = st_device_flashlight_name
 description                              = st_device_flashlight_desc
@@ -500,7 +500,7 @@ attach_position_offset                   = 0.134, -0.007, 0.09
 
 [device_flashlight_hud]:detector_base_hud
 item_position 							 = -0.053, 0.027, 0.015
-item_orientation 						 = -8, -10.5,50
+item_orientation 						 = -8, -11.5,50
 item_visual                              = dynamics\devices\dev_tactical_torch\dev_tactical_torch_hud
 fire_point                               = 0,0,0
 fire_direction							 = 0,0,1			;Note: engine default is 0,0,1
@@ -528,8 +528,8 @@ anm_zoom_16x9							 = tactical_torch_zoom, tactical_torch_zoom
 
 [flashlight_definition]
 type                                     = 2 ; type  0-Direct 1-Point 2-Spot 3-OMNIPART 4-Reflected
-range                                    = 25 ; range                 <in meters>
-range_r2                                 = 25 ; range                 <in meters>
+range                                    = 20 ; range                 <in meters>
+range_r2                                 = 20 ; range                 <in meters>
 color                                    = 0.8,0.7,0.8,0.2 ; four color components <r,g,b,a> 0.f<X<3.f
 color_r2                                 = 1.0,0.9,1.0,0.9 ; four color components <r,g,b,a> 0.f<X<3.f
 color_animator                           = empty ; color animator name   (empty - not using animator) //light_torch_01
@@ -539,14 +539,14 @@ volumetric_intensity                     = 0.10
 volumetric_distance                      = 0.25
 
 omni_type                                = 1 ; type  0-Direct 1-Point 2-Spot 3-OMNIPART 4-Reflected
-omni_range                               = 1 ; range                 <in meters>
+omni_range                               = 2 ; range                 <in meters>
 omni_range_r2                            = 0.5 ; range                 <in meters>
 omni_color                               = 0.35,0.3,0.35,0.1 ; four color components <r,g,b,a> 0.f<X<3.f
 omni_color_r2                            = 0.45,0.4,0.45,0.1 ; four color components <r,g,b,a> 0.f<X<3.f
 
-spot_texture                             = internal\internal_light_torch_r2 ; spot texture name     (using only in Second Render)
-spot_angle                               = 60 ; spot angle            <in gradus>
+spot_texture                             = internal\internal_tactical_torch ; spot texture name     (using only in Second Render)
+spot_angle                               = 65 ; spot angle            <in gradus>
 
-glow_texture                             = glow\glow_torch_r2 ; glow texture name     (required)
+glow_texture                             = glow\glow_tactical_torch ; glow texture name     (required)
 glow_radius                              = 0.2 ; glow radius           <in meters>
 guide_bone                               = lights_bone ; guid bone name        (required)
