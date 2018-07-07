@@ -303,23 +303,23 @@ ALife::_TIME_ID CUILogsWnd::GetShiftPeriod(ALife::_TIME_ID datetime, int shift_d
     return datetime;
 }
 
-bool CUILogsWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUILogsWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
         switch (dik)
         {
-        case DIK_UP:
-        case DIK_DOWN:
-        case DIK_PRIOR:
-        case DIK_NEXT:
+        case SDL_SCANCODE_UP:
+        case SDL_SCANCODE_DOWN:
+        case SDL_SCANCODE_PAGEUP:
+        case SDL_SCANCODE_PAGEDOWN:
         {
             on_scroll_keys(dik);
             return true;
         }
         break;
-        case DIK_RCONTROL:
-        case DIK_LCONTROL:
+        case SDL_SCANCODE_RCTRL:
+        case SDL_SCANCODE_LCTRL:
         {
             m_ctrl_press = true;
             return true;
@@ -331,14 +331,14 @@ bool CUILogsWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
-bool CUILogsWnd::OnKeyboardHold(int dik)
+bool CUILogsWnd::OnKeyboardHold(SDL_Scancode dik)
 {
     switch (dik)
     {
-    case DIK_UP:
-    case DIK_DOWN:
-    case DIK_PRIOR:
-    case DIK_NEXT:
+    case SDL_SCANCODE_UP:
+    case SDL_SCANCODE_DOWN:
+    case SDL_SCANCODE_PAGEUP:
+    case SDL_SCANCODE_PAGEDOWN:
     {
         on_scroll_keys(dik);
         return true;
@@ -354,7 +354,7 @@ void CUILogsWnd::on_scroll_keys(int dik)
 
     switch (dik)
     {
-    case DIK_UP:
+    case SDL_SCANCODE_UP:
     {
         int orig = m_list->ScrollBar()->GetStepSize();
         m_list->ScrollBar()->SetStepSize(1);
@@ -362,7 +362,7 @@ void CUILogsWnd::on_scroll_keys(int dik)
         m_list->ScrollBar()->SetStepSize(orig);
         break;
     }
-    case DIK_DOWN:
+    case SDL_SCANCODE_DOWN:
     {
         int orig = m_list->ScrollBar()->GetStepSize();
         m_list->ScrollBar()->SetStepSize(1);
@@ -370,7 +370,7 @@ void CUILogsWnd::on_scroll_keys(int dik)
         m_list->ScrollBar()->SetStepSize(orig);
         break;
     }
-    case DIK_PRIOR:
+    case SDL_SCANCODE_PAGEUP:
     {
         if (m_ctrl_press)
         {
@@ -380,7 +380,7 @@ void CUILogsWnd::on_scroll_keys(int dik)
         m_list->ScrollBar()->TryScrollDec();
         break;
     }
-    case DIK_NEXT:
+    case SDL_SCANCODE_PAGEDOWN:
     {
         if (m_ctrl_press)
         {

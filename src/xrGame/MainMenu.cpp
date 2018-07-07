@@ -341,7 +341,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     if (!IsActive())
         return;
 
-    if (is_binded(kCONSOLE, dik))
+    if (is_binded(kCONSOLE, (SDL_Scancode)dik))
     {
         Console->Show();
         return;
@@ -352,7 +352,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         return;
     }
 
-    CDialogHolder::IR_UIOnKeyboardPress(dik);
+    CDialogHolder::IR_UIOnKeyboardPress((SDL_Scancode)dik);
 };
 
 void CMainMenu::IR_OnKeyboardRelease(int dik)
@@ -360,7 +360,7 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     if (!IsActive())
         return;
 
-    CDialogHolder::IR_UIOnKeyboardRelease(dik);
+    CDialogHolder::IR_UIOnKeyboardRelease((SDL_Scancode)dik);
 };
 
 void CMainMenu::IR_OnKeyboardHold(int dik)
@@ -368,7 +368,7 @@ void CMainMenu::IR_OnKeyboardHold(int dik)
     if (!IsActive())
         return;
 
-    CDialogHolder::IR_UIOnKeyboardHold(dik);
+    CDialogHolder::IR_UIOnKeyboardHold((SDL_Scancode)dik);
 };
 
 void CMainMenu::IR_OnMouseWheel(int direction)

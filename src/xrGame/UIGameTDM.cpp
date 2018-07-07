@@ -78,11 +78,11 @@ void CUIGameTDM::UnLoad()
 }
 
 CUIGameTDM::~CUIGameTDM() {}
-bool CUIGameTDM::IR_UIOnKeyboardPress(int dik)
+bool CUIGameTDM::IR_UIOnKeyboardPress(SDL_Scancode dik)
 {
     switch (dik)
     {
-    case DIK_CAPSLOCK:
+    case SDL_SCANCODE_CAPSLOCK:
     {
         if (m_game)
         {
@@ -98,11 +98,11 @@ bool CUIGameTDM::IR_UIOnKeyboardPress(int dik)
     return inherited::IR_UIOnKeyboardPress(dik);
 }
 
-bool CUIGameTDM::IR_UIOnKeyboardRelease(int dik)
+bool CUIGameTDM::IR_UIOnKeyboardRelease(SDL_Scancode dik)
 {
     switch (dik)
     {
-    case DIK_CAPSLOCK:
+    case SDL_SCANCODE_CAPSLOCK:
     {
         if (m_game)
         {

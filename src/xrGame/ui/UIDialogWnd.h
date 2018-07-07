@@ -18,8 +18,8 @@ public:
 
     virtual void Show(bool status);
 
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    virtual bool OnKeyboardHold(int dik);
+    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardHold(SDL_Scancode dik);
 
     CDialogHolder* GetHolder() { return m_pParentHolder; };
     void SetHolder(CDialogHolder* h) { m_pParentHolder = h; };

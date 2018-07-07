@@ -10,7 +10,7 @@ public:
     virtual ~CUISpeechMenu();
     void InitList(LPCSTR section_name);
     virtual bool NeedCursor() const { return false; }
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
     virtual bool StopAnyMove() { return false; }
 private:
     CUIScrollView* m_pList;

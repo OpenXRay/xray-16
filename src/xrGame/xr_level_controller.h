@@ -92,7 +92,7 @@ enum EGameActions
 struct _keyboard
 {
     pcstr key_name;
-    int dik;
+    SDL_Scancode dik;
     xr_string key_local_name;
 };
 enum _key_group
@@ -113,10 +113,10 @@ struct _action
     _key_group key_group;
 };
 
-pcstr dik_to_keyname(int _dik);
-int keyname_to_dik(pcstr _name);
+pcstr dik_to_keyname(SDL_Scancode _dik);
+SDL_Scancode keyname_to_dik(pcstr _name);
 _keyboard* keyname_to_ptr(pcstr _name);
-_keyboard* dik_to_ptr(int _dik, bool bSafe);
+_keyboard* dik_to_ptr(SDL_Scancode _dik, bool bSafe);
 
 pcstr id_to_action_name(EGameActions _id);
 EGameActions action_name_to_id(pcstr _name);
@@ -135,9 +135,9 @@ struct _binding
 
 extern _binding g_key_bindings[];
 
-bool is_binded(EGameActions action_id, int dik);
-int get_action_dik(EGameActions action_id, int idx = -1);
-EGameActions get_binded_action(int dik);
+bool is_binded(EGameActions action_id, SDL_Scancode dik);
+SDL_Scancode get_action_dik(EGameActions action_id, int idx = -1);
+EGameActions get_binded_action(SDL_Scancode dik);
 
 extern void CCC_RegisterInput();
 
@@ -151,9 +151,9 @@ class ConsoleBindCmds
 public:
     xr_map<int, _conCmd> m_bindConsoleCmds;
 
-    void bind(int dik, LPCSTR N);
-    void unbind(int dik);
-    bool execute(int dik);
+    void bind(SDL_Scancode dik, LPCSTR N);
+    void unbind(SDL_Scancode dik);
+    bool execute(SDL_Scancode dik);
     void clear();
     void save(IWriter* F);
 };

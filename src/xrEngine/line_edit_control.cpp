@@ -73,7 +73,7 @@ line_edit_control::line_edit_control(u32 str_buffer_size)
     m_buf2 = nullptr;
     m_buf3 = nullptr;
 
-    for (u32 i = 0; i < SDL_SCANCODE_COUNT; ++i)
+    for (u32 i = 0; i < SDL_NUM_SCANCODES; ++i)
         m_actions[i] = nullptr;
 
     init(str_buffer_size);
@@ -191,7 +191,7 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
 
     clear_states();
 
-    for (u32 i = 0; i < SDL_SCANCODE_COUNT; ++i)
+    for (u32 i = 0; i < SDL_NUM_SCANCODES; ++i)
     {
         xr_delete(m_actions[i]);
         m_actions[i] = nullptr;
@@ -359,7 +359,7 @@ void line_edit_control::assign_char_pairs(init_mode mode)
     create_char_pair(SDL_SCANCODE_Z, 'z', 'Z', true);
 }
 
-void line_edit_control::create_key_state(u32 const dik, key_state state)
+void line_edit_control::create_key_state(SDL_Scancode const dik, key_state state)
 {
     Base* prev = m_actions[dik];
     // if ( m_actions[dik] )
@@ -369,7 +369,7 @@ void line_edit_control::create_key_state(u32 const dik, key_state state)
     m_actions[dik] = new text_editor::key_state_base(state, prev);
 }
 
-void line_edit_control::create_char_pair(u32 const dik, char c, char c_shift, bool translate)
+void line_edit_control::create_char_pair(SDL_Scancode const dik, char c, char c_shift, bool translate)
 {
     if (m_actions[dik])
     {
@@ -379,9 +379,9 @@ void line_edit_control::create_char_pair(u32 const dik, char c, char c_shift, bo
     m_actions[dik] = new text_editor::type_pair(dik, c, c_shift, translate);
 }
 
-void line_edit_control::assign_callback(u32 const dik, key_state state, Callback const& callback)
+void line_edit_control::assign_callback(SDL_Scancode const dik, key_state state, Callback const& callback)
 {
-    VERIFY(dik < SDL_SCANCODE_COUNT);
+    VERIFY(dik < SDL_NUM_SCANCODES);
     Base* prev_action = m_actions[dik];
     m_actions[dik] = new text_editor::callback_base(callback, state);
     m_actions[dik]->on_assign(prev_action);
@@ -405,9 +405,9 @@ void line_edit_control::set_edit(pcstr str)
 
 // ========================================================
 
-void line_edit_control::on_key_press(int dik)
+void line_edit_control::on_key_press(SDL_Scancode dik)
 {
-    if (SDL_SCANCODE_COUNT <= dik)
+    if (SDL_NUM_SCANCODES <= dik)
     {
         return;
     }
@@ -451,7 +451,7 @@ void line_edit_control::on_key_press(int dik)
 
 // -------------------------------------------------------------------------------------------------
 
-void line_edit_control::on_key_hold(int dik)
+void line_edit_control::on_key_hold(SDL_Scancode dik)
 {
     update_key_states();
     update_bufs();
@@ -478,7 +478,7 @@ void line_edit_control::on_key_hold(int dik)
     }
 }
 
-void line_edit_control::on_key_release(int dik)
+void line_edit_control::on_key_release(SDL_Scancode dik)
 {
     m_accel = 1.0f;
     m_rep_time = 0.0f;

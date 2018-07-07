@@ -535,7 +535,7 @@ void CActor::OnNextWeaponSlot()
                 IR_OnKeyboardPress(kARTEFACT);
             }
             else
-                IR_OnKeyboardPress(kWPN_1 + i);
+                IR_OnKeyboardPress((EGameActions) (kWPN_1 + i));
             return;
         }
     }
@@ -571,7 +571,7 @@ void CActor::OnPrevWeaponSlot()
                 IR_OnKeyboardPress(kARTEFACT);
             }
             else
-                IR_OnKeyboardPress(kWPN_1 + i);
+                IR_OnKeyboardPress((EGameActions) (kWPN_1 + i));
             return;
         }
     }

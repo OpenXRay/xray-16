@@ -12,16 +12,16 @@
 #include <dinput.h>
 #include "UICellCustomItems.h"
 
-bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUIMpTradeWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
 #ifdef DEBUG
     // for debug only
-    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPAD7)
+    if (keyboard_action == WINDOW_KEY_PRESSED && dik == SDL_SCANCODE_KP_7)
     {
         if (GetRank() > 0)
             SetRank(clampr(u32(GetRank() - 1), u32(0), u32(4)));
     }
-    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPAD8)
+    if (keyboard_action == WINDOW_KEY_PRESSED && dik == SDL_SCANCODE_KP_8)
     {
         SetRank(clampr(u32(GetRank() + 1), u32(0), u32(4)));
     }
@@ -37,21 +37,21 @@ bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (dik == DIK_Q)
+        if (dik == SDL_SCANCODE_Q)
         {
             OnBtnPistolAmmoClicked(NULL, NULL);
         }
-        else if (dik == DIK_W)
+        else if (dik == SDL_SCANCODE_W)
         {
             OnBtnRifleAmmoClicked(NULL, NULL);
         }
-        else if (dik == DIK_E)
+        else if (dik == SDL_SCANCODE_E)
         {
             OnBtnRifleAmmo2Clicked(NULL, NULL);
         }
     }
 
-    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPADPLUS)
+    if (keyboard_action == WINDOW_KEY_PRESSED && dik == SDL_SCANCODE_KP_PLUS)
     {
         return true;
     }

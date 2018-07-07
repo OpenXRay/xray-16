@@ -159,9 +159,9 @@ void CInput::KeyUpdate(SDL_Event* event)
     */
 }
 
-bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
+bool CInput::get_key_name(SDL_Scancode dik, LPSTR dest_str, int dest_sz)
 {
-    const char* keyname = SDL_GetKeyName(dik);
+    const char* keyname = SDL_GetKeyName(SDL_GetKeyFromScancode(dik));
     if (0 == strlen(keyname))
     {
         Msg("! cant convert dik_name for dik[%d]", dik);
@@ -194,7 +194,6 @@ void CInput::ClipCursor(bool clip)
     if (clip)
     {
         //::ClipCursor(&Device.m_rcWindowClient);
-        SDL_RenderSetClipRect(Device.m_sdlRndr, &Device.m_rcWindowClient);
         SDL_ShowCursor(SDL_DISABLE);
     }
     else
@@ -248,8 +247,9 @@ void CInput::iRelease(IInputReceiver* p)
     {
         cbStack.back()->IR_OnDeactivate();
         cbStack.pop_back();
-        IInputReceiver* ir = cbStack.back();
-        ir->IR_OnActivate();
+
+        if (!cbStack.empty())
+            cbStack.back()->IR_OnActivate();
     }
     else
     {

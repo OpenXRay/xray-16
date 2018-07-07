@@ -95,7 +95,7 @@ public:
 
     //
     virtual void Update();
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
 
     virtual void Init(const shared_str& sectionName, const shared_str& sectionPrice);
     virtual void BindDragDropListEvents(CUIDragDropListEx* lst, bool bDrag);

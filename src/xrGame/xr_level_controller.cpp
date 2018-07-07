@@ -83,8 +83,10 @@ _keyboard keyboards[] = {{"kESCAPE", SDL_SCANCODE_ESCAPE}, {"k1", SDL_SCANCODE_1
     {"kRIGHT", SDL_SCANCODE_RIGHT}, {"kEND", SDL_SCANCODE_END}, {"kDOWN", SDL_SCANCODE_DOWN},
     {"kNEXT", SDL_SCANCODE_AUDIONEXT}, {"kINSERT", SDL_SCANCODE_INSERT}, {"kDELETE", SDL_SCANCODE_DELETE},
     {"kLWIN", SDL_SCANCODE_LGUI}, {"kRWIN", SDL_SCANCODE_RGUI}, {"kAPPS", SDL_SCANCODE_APPLICATION},
-    {"kPAUSE", SDL_SCANCODE_PAUSE}, {"mouse1", MOUSE_1}, {"mouse2", MOUSE_2}, {"mouse3", MOUSE_3}, {"mouse4", MOUSE_4},
-    {"mouse5", MOUSE_5}, {"mouse6", MOUSE_6}, {"mouse7", MOUSE_7}, {"mouse8", MOUSE_8}, {NULL, 0}};
+    {"kPAUSE", SDL_SCANCODE_PAUSE}, 
+//    {"mouse1", MOUSE_1}, {"mouse2", MOUSE_2}, {"mouse3", MOUSE_3}, {"mouse4", MOUSE_4},
+//    {"mouse5", MOUSE_5}, {"mouse6", MOUSE_6}, {"mouse7", MOUSE_7}, {"mouse8", MOUSE_8}, 
+    {NULL, SDL_SCANCODE_UNKNOWN}};
 
 void initialize_bindings()
 {
@@ -169,7 +171,7 @@ _action* action_name_to_ptr(pcstr _name)
     return NULL;
 }
 
-pcstr dik_to_keyname(int _dik)
+pcstr dik_to_keyname(SDL_Scancode _dik)
 {
     _keyboard* kb = dik_to_ptr(_dik, true);
     if (kb)
@@ -178,7 +180,7 @@ pcstr dik_to_keyname(int _dik)
         return NULL;
 }
 
-_keyboard* dik_to_ptr(int _dik, bool bSafe)
+_keyboard* dik_to_ptr(SDL_Scancode _dik, bool bSafe)
 {
     int idx = 0;
     while (keyboards[idx].key_name)
@@ -193,7 +195,7 @@ _keyboard* dik_to_ptr(int _dik, bool bSafe)
     return NULL;
 }
 
-int keyname_to_dik(pcstr _name)
+SDL_Scancode keyname_to_dik(pcstr _name)
 {
     _keyboard* _kb = keyname_to_ptr(_name);
     return _kb->dik;
@@ -220,7 +222,7 @@ bool is_group_not_conflicted(_key_group g1, _key_group g2)
 }
 
 bool is_group_matching(_key_group g1, _key_group g2) { return ((g1 == g2) || (g1 == _both) || (g2 == _both)); }
-bool is_binded(EGameActions _action_id, int _dik)
+bool is_binded(EGameActions _action_id, SDL_Scancode _dik)
 {
     _binding* pbinding = &g_key_bindings[_action_id];
     if (pbinding->m_keyboard[0] && pbinding->m_keyboard[0]->dik == _dik)
@@ -232,7 +234,7 @@ bool is_binded(EGameActions _action_id, int _dik)
     return false;
 }
 
-int get_action_dik(EGameActions _action_id, int idx)
+SDL_Scancode get_action_dik(EGameActions _action_id, int idx)
 {
     _binding* pbinding = &g_key_bindings[_action_id];
 
@@ -249,10 +251,10 @@ int get_action_dik(EGameActions _action_id, int idx)
         if (pbinding->m_keyboard[idx])
             return pbinding->m_keyboard[idx]->dik;
     }
-    return 0;
+    return SDL_SCANCODE_UNKNOWN;
 }
 
-EGameActions get_binded_action(int _dik)
+EGameActions get_binded_action(SDL_Scancode _dik)
 {
     for (int idx = 0; idx < bindings_count; ++idx)
     {
@@ -476,7 +478,7 @@ public:
         _GetItems(args, 0, cnt - 1, console_command, ' ');
         _GetItem(args, cnt - 1, key, ' ');
 
-        int dik = keyname_to_dik(key);
+        SDL_Scancode dik = keyname_to_dik(key);
         bindConsoleCmds.bind(dik, console_command);
     }
 
@@ -489,17 +491,17 @@ public:
     CCC_UnBindConsoleCmd(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = FALSE; };
     virtual void Execute(LPCSTR args)
     {
-        int _dik = keyname_to_dik(args);
+        SDL_Scancode _dik = keyname_to_dik(args);
         bindConsoleCmds.unbind(_dik);
     }
 };
 
-void ConsoleBindCmds::bind(int dik, LPCSTR N)
+void ConsoleBindCmds::bind(SDL_Scancode dik, LPCSTR N)
 {
     _conCmd& c = m_bindConsoleCmds[dik];
     c.cmd = N;
 }
-void ConsoleBindCmds::unbind(int dik)
+void ConsoleBindCmds::unbind(SDL_Scancode dik)
 {
     xr_map<int, _conCmd>::iterator it = m_bindConsoleCmds.find(dik);
     if (it == m_bindConsoleCmds.end())
@@ -509,7 +511,7 @@ void ConsoleBindCmds::unbind(int dik)
 }
 
 void ConsoleBindCmds::clear() { m_bindConsoleCmds.clear(); }
-bool ConsoleBindCmds::execute(int dik)
+bool ConsoleBindCmds::execute(SDL_Scancode dik)
 {
     xr_map<int, _conCmd>::iterator it = m_bindConsoleCmds.find(dik);
     if (it == m_bindConsoleCmds.end())
@@ -525,7 +527,7 @@ void ConsoleBindCmds::save(IWriter* F)
 
     for (; it != m_bindConsoleCmds.end(); ++it)
     {
-        pcstr keyname = dik_to_keyname(it->first);
+        pcstr keyname = dik_to_keyname((SDL_Scancode) it->first);
         F->w_printf("bind_console %s %s\n", *it->second.cmd, keyname);
     }
 }

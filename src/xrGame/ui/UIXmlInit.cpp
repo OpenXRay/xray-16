@@ -24,7 +24,7 @@
 #include "UItabButtonMP.h"
 #include "UILines.h"
 
-extern int keyname_to_dik(LPCSTR);
+extern SDL_Scancode keyname_to_dik(LPCSTR);
 
 #define ARIAL_FONT_NAME "arial"
 
@@ -345,7 +345,7 @@ bool CUIXmlInit::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines* pLi
     return true;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
-extern int keyname_to_dik(LPCSTR);
+extern SDL_Scancode keyname_to_dik(LPCSTR);
 
 bool CUIXmlInit::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButton* pWnd)
 {
@@ -397,13 +397,13 @@ bool CUIXmlInit::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButt
     LPCSTR accel = xml_doc.ReadAttrib(path, index, "accel", NULL);
     if (accel)
     {
-        int acc = keyname_to_dik(accel);
+        int acc = (int) keyname_to_dik(accel);
         pWnd->SetAccelerator(acc, 0);
     }
     accel = xml_doc.ReadAttrib(path, index, "accel_ext", NULL);
     if (accel)
     {
-        int acc = keyname_to_dik(accel);
+        int acc = (int) keyname_to_dik(accel);
         pWnd->SetAccelerator(acc, 1);
     }
 

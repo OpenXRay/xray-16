@@ -777,14 +777,14 @@ void CUIGameCTA::SetVoteTimeResultMsg(LPCSTR str)
         m_voteStatusWnd->SetVoteTimeResultMsg(str);
 }
 
-bool CUIGameCTA::IR_UIOnKeyboardPress(int dik)
+bool CUIGameCTA::IR_UIOnKeyboardPress(SDL_Scancode dik)
 {
     if (inherited::IR_UIOnKeyboardPress(dik))
         return true;
 
     switch (dik)
     {
-    case DIK_CAPSLOCK:
+    case SDL_SCANCODE_CAPSLOCK:
     {
         if (m_game)
         {
@@ -815,14 +815,14 @@ bool CUIGameCTA::IR_UIOnKeyboardPress(int dik)
     return false;
 }
 
-bool CUIGameCTA::IR_UIOnKeyboardRelease(int dik)
+bool CUIGameCTA::IR_UIOnKeyboardRelease(SDL_Scancode dik)
 {
     if (inherited::IR_UIOnKeyboardRelease(dik))
         return true;
 
     switch (dik)
     {
-    case DIK_CAPSLOCK:
+    case SDL_SCANCODE_CAPSLOCK:
     {
         if (m_game)
         {

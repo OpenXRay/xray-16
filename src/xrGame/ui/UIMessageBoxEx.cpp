@@ -72,17 +72,17 @@ void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NUL
 
 LPCSTR CUIMessageBoxEx::GetHost() { return m_pMessageBox->GetHost(); }
 LPCSTR CUIMessageBoxEx::GetPassword() { return m_pMessageBox->GetPassword(); }
-bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUIMessageBoxEx::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (dik == DIK_NUMPADENTER || dik == DIK_RETURN || dik == DIK_SPACE)
+        if (dik == SDL_SCANCODE_KP_ENTER || dik == SDL_SCANCODE_RETURN || dik == SDL_SCANCODE_SPACE)
         {
             m_pMessageBox->OnYesOk();
             return true;
             /*
                     }else
-                        if ( dik == DIK_ESCAPE )
+                        if ( dik == SDL_SCANCODE_ESCAPE )
                     {
                         CUIMessageBox::E_MESSAGEBOX_STYLE style = m_pMessageBox->GetBoxStyle();
                         if(style != CUIMessageBox::MESSAGEBOX_INFO)

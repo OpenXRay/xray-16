@@ -24,9 +24,10 @@ CUICDkey::CUICDkey()
 
 void CUICDkey::assign_callbacks()
 {
-    m_editor_control->assign_callback(DIK_V, text_editor::ks_Ctrl, Callback(this, &CUICDkey::paste_from_clipboard));
     m_editor_control->assign_callback(
-        DIK_INSERT, text_editor::ks_Shift, Callback(this, &CUICDkey::paste_from_clipboard));
+        SDL_SCANCODE_V, text_editor::ks_Ctrl, Callback(this, &CUICDkey::paste_from_clipboard));
+    m_editor_control->assign_callback(
+        SDL_SCANCODE_INSERT, text_editor::ks_Shift, Callback(this, &CUICDkey::paste_from_clipboard));
 }
 
 struct inappropriate_characters

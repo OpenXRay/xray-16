@@ -100,9 +100,9 @@ void CUIMpAdminMenu::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     };
 }
-bool CUIMpAdminMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUIMpAdminMenu::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
-    if (dik == DIK_ESCAPE && keyboard_action == WINDOW_KEY_PRESSED)
+    if (dik == SDL_SCANCODE_ESCAPE && keyboard_action == WINDOW_KEY_PRESSED)
     {
         if (m_pActiveDialog == m_pServerAdm && m_pServerAdm->IsBackBtnShown())
             m_pServerAdm->OnBackBtn();

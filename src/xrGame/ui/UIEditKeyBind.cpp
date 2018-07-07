@@ -81,7 +81,7 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
     {
         string64 message;
 
-        m_keyboard = dik_to_ptr(mouse_btn, true);
+        //m_keyboard = dik_to_ptr(mouse_btn, true);
         if (!m_keyboard)
             return true;
         SetValue();
@@ -101,7 +101,7 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
     return CUIStatic::OnMouseDown(mouse_btn);
 }
 
-bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+bool CUIEditKeyBind::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
 {
     if (dik == MOUSE_1 || dik == MOUSE_2 || dik == MOUSE_3)
         return false;

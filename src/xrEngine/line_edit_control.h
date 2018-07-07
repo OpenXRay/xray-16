@@ -55,12 +55,12 @@ public:
     ~line_edit_control();
 
     void clear_states();
-    void on_key_press(int dik);
-    void on_key_hold(int dik);
-    void on_key_release(int dik);
+    void on_key_press(SDL_Scancode dik);
+    void on_key_hold(SDL_Scancode dik);
+    void on_key_release(SDL_Scancode dik);
     void on_frame();
 
-    void assign_callback(u32 const dik, key_state state, Callback const& callback);
+    void assign_callback(SDL_Scancode const dik, key_state state, Callback const& callback);
 
     void insert_character(char c);
 
@@ -106,8 +106,8 @@ private:
     void xr_stdcall SwitchKL();
 
     void assign_char_pairs(init_mode mode);
-    void create_key_state(u32 const dik, key_state state);
-    void create_char_pair(u32 const dik, char c, char c_shift, bool translate = false);
+    void create_key_state(SDL_Scancode const dik, key_state state);
+    void create_char_pair(SDL_Scancode const dik, char c, char c_shift, bool translate = false);
 
     void clear_inserted();
     bool empty_inserted();
@@ -119,11 +119,7 @@ private:
     void clamp_cur_pos();
 
 private:
-    enum
-    {
-        SDL_SCANCODE_COUNT = 256
-    };
-    Base* m_actions[SDL_SCANCODE_COUNT];
+    Base* m_actions[SDL_NUM_SCANCODES];
 
     char* m_edit_str;
     char* m_undo_buf;
