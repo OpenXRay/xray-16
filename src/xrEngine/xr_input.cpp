@@ -164,21 +164,24 @@ void CInput::KeyUpdate(SDL_Event* event)
     */
 }
 
-bool CInput::get_key_name(SDL_Scancode dik, LPSTR dest_str, int dest_sz)
+bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
 {
-    const char* keyname = SDL_GetKeyName(SDL_GetKeyFromScancode(dik));
-    if (0 == strlen(keyname))
+    if (dik < SDL_NUM_SCANCODES)
     {
-        Msg("! cant convert dik_name for dik[%d]", dik);
-        return false;
+        const char* keyname = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
+        if (0 == strlen(keyname))
+        {
+            Msg("! cant convert dik_name for dik[%d]", dik);
+            return false;
+        }
+        strcpy_s(dest_str, dest_sz, keyname);
     }
-    strcpy_s(dest_str, dest_sz, keyname);
 
     return true;
 }
 
-#define MOUSE_1 (0xED + 100)
-#define MOUSE_8 (0xED + 107)
+#define MOUSE_1 (SDL_NUM_SCANCODES + SDL_BUTTON_LEFT)
+#define MOUSE_8 (SDL_NUM_SCANCODES + 8)
 
 BOOL CInput::iGetAsyncKeyState(int dik)
 {

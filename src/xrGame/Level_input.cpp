@@ -72,7 +72,7 @@ void CLevel::IR_OnMouseWheel(int direction)
     }
 }
 
-static int mouse_button_2_key[] = {MOUSE_1, MOUSE_2, MOUSE_3};
+static int mouse_button_2_key[] = {SDL_NUM_SCANCODES, MOUSE_1, MOUSE_2, MOUSE_3};
 
 void CLevel::IR_OnMousePress(int btn) {IR_OnKeyboardPress(mouse_button_2_key[btn]); }
 void CLevel::IR_OnMouseRelease(int btn) {IR_OnKeyboardRelease(mouse_button_2_key[btn]); }

@@ -84,7 +84,7 @@ public:
     IC bool get_exclusive_mode();
     void unacquire();
     void acquire(const bool& exclusive);
-    bool get_key_name(SDL_Scancode dik, LPSTR dest, int dest_sz);
+    bool get_key_name(int dik, LPSTR dest, int dest_sz);
 
     void feedback(u16 s1, u16 s2, float time);
 };

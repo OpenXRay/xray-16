@@ -84,8 +84,8 @@ _keyboard keyboards[] = {{"kESCAPE", SDL_SCANCODE_ESCAPE}, {"k1", SDL_SCANCODE_1
     {"kNEXT", SDL_SCANCODE_AUDIONEXT}, {"kINSERT", SDL_SCANCODE_INSERT}, {"kDELETE", SDL_SCANCODE_DELETE},
     {"kLWIN", SDL_SCANCODE_LGUI}, {"kRWIN", SDL_SCANCODE_RGUI}, {"kAPPS", SDL_SCANCODE_APPLICATION},
     {"kPAUSE", SDL_SCANCODE_PAUSE}, 
-//    {"mouse1", MOUSE_1}, {"mouse2", MOUSE_2}, {"mouse3", MOUSE_3}, {"mouse4", MOUSE_4},
-//    {"mouse5", MOUSE_5}, {"mouse6", MOUSE_6}, {"mouse7", MOUSE_7}, {"mouse8", MOUSE_8}, 
+    {"mouse1", MOUSE_1}, {"mouse2", MOUSE_2}, {"mouse3", MOUSE_3}, {"mouse4", MOUSE_4},
+    {"mouse5", MOUSE_5}, {"mouse6", MOUSE_6}, {"mouse7", MOUSE_7}, {"mouse8", MOUSE_8}, 
     {NULL, SDL_SCANCODE_UNKNOWN}};
 
 void initialize_bindings()
@@ -195,7 +195,7 @@ _keyboard* dik_to_ptr(SDL_Scancode _dik, bool bSafe)
     return NULL;
 }
 
-SDL_Scancode keyname_to_dik(pcstr _name)
+int keyname_to_dik(pcstr _name)
 {
     _keyboard* _kb = keyname_to_ptr(_name);
     return _kb->dik;
@@ -234,7 +234,7 @@ bool is_binded(EGameActions _action_id, SDL_Scancode _dik)
     return false;
 }
 
-SDL_Scancode get_action_dik(EGameActions _action_id, int idx)
+int get_action_dik(EGameActions _action_id, int idx)
 {
     _binding* pbinding = &g_key_bindings[_action_id];
 
@@ -478,7 +478,7 @@ public:
         _GetItems(args, 0, cnt - 1, console_command, ' ');
         _GetItem(args, cnt - 1, key, ' ');
 
-        SDL_Scancode dik = keyname_to_dik(key);
+        int dik = keyname_to_dik(key);
         bindConsoleCmds.bind(dik, console_command);
     }
 
@@ -491,17 +491,17 @@ public:
     CCC_UnBindConsoleCmd(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = FALSE; };
     virtual void Execute(LPCSTR args)
     {
-        SDL_Scancode _dik = keyname_to_dik(args);
+        int _dik = keyname_to_dik(args);
         bindConsoleCmds.unbind(_dik);
     }
 };
 
-void ConsoleBindCmds::bind(SDL_Scancode dik, LPCSTR N)
+void ConsoleBindCmds::bind(int dik, LPCSTR N)
 {
     _conCmd& c = m_bindConsoleCmds[dik];
     c.cmd = N;
 }
-void ConsoleBindCmds::unbind(SDL_Scancode dik)
+void ConsoleBindCmds::unbind(int dik)
 {
     xr_map<int, _conCmd>::iterator it = m_bindConsoleCmds.find(dik);
     if (it == m_bindConsoleCmds.end())
@@ -511,7 +511,7 @@ void ConsoleBindCmds::unbind(SDL_Scancode dik)
 }
 
 void ConsoleBindCmds::clear() { m_bindConsoleCmds.clear(); }
-bool ConsoleBindCmds::execute(SDL_Scancode dik)
+bool ConsoleBindCmds::execute(int dik)
 {
     xr_map<int, _conCmd>::iterator it = m_bindConsoleCmds.find(dik);
     if (it == m_bindConsoleCmds.end())
