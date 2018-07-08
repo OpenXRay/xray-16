@@ -504,6 +504,12 @@
 	<string id="ui_mm_gameplay">
 		<text>Игра</text>
 	</string>
+	<string id="ui_mm_ui_style">
+		<text>Стиль интерфейса</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Зов Припяти</text>
+	</string>
 	<string id="ui_mm_gamma">
 		<text>Гамма</text>
 	</string>

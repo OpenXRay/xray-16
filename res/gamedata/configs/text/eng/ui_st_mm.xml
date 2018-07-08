@@ -504,6 +504,12 @@
 	<string id="ui_mm_gameplay">
 		<text>Game</text>
 	</string>
+	<string id="ui_mm_ui_style">
+		<text>Interface style</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Call of Pripyat</text>
+	</string>
 	<string id="ui_mm_gamma">
 		<text>Gamma</text>
 	</string>
