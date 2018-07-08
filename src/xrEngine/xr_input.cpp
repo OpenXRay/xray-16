@@ -65,6 +65,7 @@ CInput::CInput(BOOL bExclusive, int deviceForInit)
 
 CInput::~CInput(void)
 {
+    SDL_SetRelativeMouseMode(SDL_FALSE);
 #ifdef ENGINE_BUILD
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
@@ -79,89 +80,67 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("*** INPUT:    %2.2fms", pInput->GetStats().FrameTime.result);
 }
 
-void CInput::SetAllAcquire(BOOL bAcquire)
-{
-}
+void CInput::SetAllAcquire(BOOL bAcquire) {}
 
-void CInput::SetMouseAcquire(BOOL bAcquire)
-{
-}
+void CInput::SetMouseAcquire(BOOL bAcquire) {}
 void CInput::SetKBDAcquire(BOOL bAcquire) {}
 //-----------------------------------------------------------------------
-void CInput::KeyUpdate(SDL_Event* event)
+BOOL b_altF4 = FALSE;
+void CInput::KeyUpdate()
 {
+    if (b_altF4)
+        return;
+
     bool b_dik_pause_was_pressed = false;
 
-    if (SDL_SCANCODE_PAUSE == event->key.keysym.scancode)
-    {
-        if (SDL_KEYDOWN == event->key.type)
-            b_dik_pause_was_pressed = true;
-    }
-
+    const Uint8* state = SDL_GetKeyboardState(NULL);
 #ifndef _EDITOR
     bool b_alt_tab = false;
 
+    if (!b_altF4 && state[SDL_SCANCODE_F4] && (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT]))
+    {
+        b_altF4 = TRUE;
+        Engine.Event.Defer("KERNEL:disconnect");
+        Engine.Event.Defer("KERNEL:quit");
+        SDL_Event ev;
+        ev.type = SDL_QUIT;
+        SDL_PushEvent(&ev);
+    }
+#endif
+    if (b_altF4)
+        return;
+
+#ifndef _EDITOR
     if (Device.dwPrecacheFrame == 0)
 #endif
     {
-        const Uint8* state = SDL_GetKeyboardState(NULL);
-
-        if (SDL_KEYDOWN == event->key.type)
-            cbStack.back()->IR_OnKeyboardPress(event->key.keysym.scancode);
-        else if (SDL_KEYUP == event->key.type)
+        for (u32 i = 0; i < COUNT_KB_BUTTONS; i++)
         {
-            cbStack.back()->IR_OnKeyboardRelease(event->key.keysym.scancode);
+            if (state[i])
+                cbStack.back()->IR_OnKeyboardPress(i);
+            else
+            {
+                cbStack.back()->IR_OnKeyboardRelease(i);
 #ifndef _EDITOR
-            if (SDL_SCANCODE_TAB == event->key.keysym.scancode && KMOD_ALT == SDL_GetModState())
-                b_alt_tab = true;
+                if (SDL_SCANCODE_TAB == state[i] &&
+                    (iGetAsyncKeyState(SDL_SCANCODE_LALT) || iGetAsyncKeyState(SDL_SCANCODE_RALT)))
+                    b_alt_tab = true;
 #endif
+            }
         }
 
         for (u32 i = 0; i < COUNT_KB_BUTTONS; i++)
-            if (state[i])
+            if (KBState[i] && state[i])
                 cbStack.back()->IR_OnKeyboardHold(i);
+
+        for (u32 idx = 0; idx < COUNT_KB_BUTTONS; idx++)
+            KBState[idx] = state[idx];
     }
 
 #ifndef _EDITOR
     if (b_alt_tab)
         SDL_MinimizeWindow(Device.m_sdlWnd);
 #endif
-    /*
-    #ifndef _EDITOR
-    //update xinput if exist
-    for( DWORD iUserIndex=0; iUserIndex<DXUT_MAX_CONTROLLERS; iUserIndex++ )
-    {
-    DXUTGetGamepadState( iUserIndex, &g_GamePads[iUserIndex], true, false );
-
-    if( !g_GamePads[iUserIndex].bConnected )
-    continue; // unplugged?
-
-    bool new_b, old_b;
-    new_b = !!(g_GamePads[iUserIndex].wPressedButtons & XINPUT_GAMEPAD_A);
-    old_b = !!(g_GamePads[iUserIndex].wLastButtons & XINPUT_GAMEPAD_A);
-
-    if(new_b != old_b)
-    {
-    if(old_b)
-    cbStack.back()->IR_OnMousePress(0);
-    else
-    cbStack.back()->IR_OnMouseRelease(0);
-    }
-    int dx,dy;
-    dx = iFloor(g_GamePads[iUserIndex].fThumbRX*6);
-    dy = iFloor(g_GamePads[iUserIndex].fThumbRY*6);
-    if(dx || dy)
-    cbStack.back()->IR_OnMouseMove ( dx, dy );
-    }
-
-    if(Device.fTimeGlobal > stop_vibration_time)
-    {
-    stop_vibration_time = flt_max;
-    set_vibration (0, 0);
-    }
-    //xinput
-    #endif
-    */
 }
 
 bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
@@ -209,15 +188,62 @@ void CInput::ClipCursor(bool clip)
     }
 }
 
-void CInput::MouseUpdate(SDL_Event *event)
+void CInput::MouseUpdate(SDL_Event* event)
 {
-    DWORD dwElements = MOUSEBUFFERSIZE;
-
 #ifndef _EDITOR
     if (Device.dwPrecacheFrame)
         return;
 #endif
     BOOL mouse_prev[COUNT_MOUSE_BUTTONS];
+
+    offs[0] = offs[1] = offs[2] = 0;
+
+    switch (event->type)
+    {
+    case SDL_MOUSEMOTION:
+    {
+        offs[0] += event->motion.xrel;
+        offs[1] += event->motion.yrel;
+        timeStamp[0] = event->motion.timestamp;
+        timeStamp[1] = event->motion.timestamp;
+        if (offs[0] || offs[1])
+            cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
+    }
+    break;
+    case SDL_MOUSEBUTTONUP:
+        mouseState[event->button.button] = FALSE;
+        cbStack.back()->IR_OnKeyboardRelease(SDL_NUM_SCANCODES + event->button.button);
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        mouseState[event->button.button] = TRUE;
+        cbStack.back()->IR_OnKeyboardPress(SDL_NUM_SCANCODES + event->button.button);
+        break;
+    case SDL_MOUSEWHEEL:
+        offs[2] += event->wheel.direction;
+        timeStamp[2] = event->wheel.timestamp;
+        if (offs[2])
+            cbStack.back()->IR_OnMouseWheel(offs[2]);
+        break;
+    default:
+        if (timeStamp[1] && ((dwCurTime - timeStamp[1]) >= 25))
+            cbStack.back()->IR_OnMouseStop(1, timeStamp[1] = 0);
+        if (timeStamp[0] && ((dwCurTime - timeStamp[0]) >= 25))
+            cbStack.back()->IR_OnMouseStop(0, timeStamp[0] = 0);
+        break;
+    }
+
+    auto isButtonOnHold = [&](int i) {
+        if (mouseState[i] && mouse_prev[i])
+            cbStack.back()->IR_OnMouseHold(i);
+    };
+
+    isButtonOnHold(0);
+    isButtonOnHold(1);
+    isButtonOnHold(2);
+    isButtonOnHold(3);
+    isButtonOnHold(4);
+    isButtonOnHold(5);
+    isButtonOnHold(6);
 
     mouse_prev[0] = mouseState[0];
     mouse_prev[1] = mouseState[1];
@@ -227,28 +253,6 @@ void CInput::MouseUpdate(SDL_Event *event)
     mouse_prev[5] = mouseState[5];
     mouse_prev[6] = mouseState[6];
     mouse_prev[7] = mouseState[7];
-
-    offs[0] = offs[1] = offs[2] = 0;
-
-    switch (event->type)
-    {
-    case SDL_MOUSEMOTION:
-        timeStamp[0] = event->motion.timestamp;
-        cbStack.back()->IR_OnMouseMove(event->motion.xrel, event->motion.yrel);
-        break;
-    case SDL_MOUSEBUTTONUP: 
-        cbStack.back()->IR_OnMouseRelease(event->button.button); 
-        break;
-    case SDL_MOUSEBUTTONDOWN:
-        cbStack.back()->IR_OnMousePress(event->button.button); 
-        break;
-    case SDL_MOUSEWHEEL:
-        timeStamp[2] = event->wheel.timestamp;
-        cbStack.back()->IR_OnMouseWheel(event->wheel.direction); 
-        break;
-    default: break;
-    }
-
 }
 
 //-------------------------------------------------------
@@ -327,41 +331,29 @@ void CInput::OnFrame(void)
 
     while (SDL_PollEvent(&event))
     {
+        BOOL b_break_cycle = false;
         switch (event.type)
         {
         case SDL_KEYDOWN:
-        case SDL_KEYUP: KeyUpdate(&event); continue;
+        case SDL_KEYUP: KeyUpdate(); continue;
 
         case SDL_MOUSEMOTION:
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEWHEEL:
             MouseUpdate(&event);
-            //MouseUpdate();
             continue;
-//        case SDL_WINDOWEVENT:
-//            switch (event.window.event)
-//            {
-//            case SDL_WINDOWEVENT_CLOSE:
-//                event.type = SDL_QUIT;
-//                SDL_PushEvent(&event);
-//                continue;
-//            case SDL_WINDOWEVENT_ENTER:
-//#if SDL_VERSION_ATLEAST(2, 0, 5)
-//            case SDL_WINDOWEVENT_TAKE_FOCUS:
-//                RDEVICE.OnWM_Activate(event.window.data1, event.window.data2);
-//                continue;
-//#endif
-//            default: SDL_Log("Window %d got unknown event %d", event.window.windowID, event.window.event); continue;
-//            }
-//            continue;
-        case SDL_QUIT:
-            Engine.Event.Defer("KERNEL:disconnect");
-            Engine.Event.Defer("KERNEL:quit");
+        case SDL_QUIT: // go to outside event loop
+            event.type = SDL_QUIT;
+            SDL_PushEvent(&event);
+            b_break_cycle = TRUE;
             break;
 
         default: continue;
         }
+
+        if (b_break_cycle)
+            break;
     }
 
     stats.FrameTime.End();
@@ -380,9 +372,9 @@ void CInput::unacquire() {}
 
 void CInput::acquire(const bool& exclusive)
 {
-    //pMouse->SetCooperativeLevel(Device.editor() ? Device.editor()->main_handle() : RDEVICE.m_sdlWnd,
+    // pMouse->SetCooperativeLevel(Device.editor() ? Device.editor()->main_handle() : RDEVICE.m_sdlWnd,
     //    (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY);
-    //pMouse->Acquire();
+    // pMouse->Acquire();
 }
 
 void CInput::exclusive_mode(const bool& exclusive)

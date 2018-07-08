@@ -65,7 +65,6 @@ inline char *_strupr_l(char *str, locale_t loc)
 #define VOID void
 #define HKL void *
 #define ActivateKeyboardLayout(x, y) {}
-#define GetCursorPos(point) {}
 #define ScreenToClient(hwnd, p) {}
 
 #define __except(X) catch(X)

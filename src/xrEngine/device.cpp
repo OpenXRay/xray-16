@@ -353,8 +353,7 @@ void CRenderDevice::message_loop()
                     continue;
                 case SDL_WINDOWEVENT_CLOSE:
                     event.type = SDL_QUIT;
-                    SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
-                    continue;
+                    break;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
                 case SDL_WINDOWEVENT_SHOWN:
                 case SDL_WINDOWEVENT_FOCUS_GAINED:

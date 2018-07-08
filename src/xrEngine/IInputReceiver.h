@@ -19,7 +19,7 @@ class ENGINE_API IInputReceiver
 public:
     static void IR_GetLastMouseDelta(Ivector2& p);
     static void IR_GetMousePosScreen(Ivector2& p);
-    static void IR_GetMousePosReal(HWND hwnd, Ivector2& p);
+    static void IR_GetMousePosReal(SDL_Window *m_sdlWnd, Ivector2& p);
     static void IR_GetMousePosReal(Ivector2& p);
     static void IR_GetMousePosIndependent(Fvector2& f);
     static void IR_GetMousePosIndependentCrop(Fvector2& f);

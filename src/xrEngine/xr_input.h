@@ -25,7 +25,7 @@ public:
     {
         COUNT_MOUSE_BUTTONS = 8,
         COUNT_MOUSE_AXIS = 3,
-        COUNT_KB_BUTTONS = SDL_NUM_SCANCODES
+        COUNT_KB_BUTTONS = SDL_SCANCODE_MODE
     };
 
     struct InputStatistics
@@ -50,7 +50,7 @@ private:
     xr_vector<IInputReceiver*> cbStack;
 
     void MouseUpdate(SDL_Event *event);
-    void KeyUpdate(SDL_Event *event);
+    void KeyUpdate();
 
     InputStatistics stats;
 
