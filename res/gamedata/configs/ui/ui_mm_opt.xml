@@ -454,7 +454,7 @@
         </cap_r3_msaa_opt>
         <check_r3_msaa_opt x="167" y="0" width="44" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="r3_msaa_opt" group="mm_opt_video_adv" depend="vid"/>
+            <options_item entry="r3_use_dx10_1" group="mm_opt_video_adv" depend="vid"/>
         </check_r3_msaa_opt>
 
         <cap_r4_tessellation x="20" y="3" width="135" height="24">
