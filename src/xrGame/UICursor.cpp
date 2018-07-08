@@ -56,9 +56,9 @@ void CUICursor::InitInternal()
     m_static->SetWndSize(sz);
     m_static->SetStretchTexture(true);
 
-    u32 screen_size_x = GetSystemMetrics(SM_CXSCREEN);
-    u32 screen_size_y = GetSystemMetrics(SM_CYSCREEN);
-    m_b_use_win_cursor = (screen_size_y >= Device.dwHeight && screen_size_x >= Device.dwWidth);
+    u32 screen_size_x = Device.m_rcWindowClient.w;
+    u32 screen_size_y = Device.m_rcWindowClient.h;
+    m_b_use_win_cursor = (screen_size_y > Device.dwHeight && screen_size_x > Device.dwWidth);
 }
 
 //--------------------------------------------------------------------
@@ -127,23 +127,6 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     POINT p;
     p.x = iFloor(vPos.x / (UI_BASE_WIDTH / (float)Device.m_rcWindowClient.w));
     p.y = iFloor(vPos.y / (UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h));
-    if (m_b_use_win_cursor)
-    {
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(Device.m_sdlWnd, &info)) 
-        {
-            switch (info.subsystem) 
-            {
-                case SDL_SYSWM_WINDOWS :
-                    ClientToScreen(info.info.win.window, (LPPOINT)&p);
-                break;
-                default : break;
-            }
-        }
-        else 
-            Log("Couldn't get window information: %s", SDL_GetError());
-    }
         
-    SetCursorPos(p.x, p.y);
+    SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
 }

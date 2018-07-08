@@ -39,9 +39,6 @@ void CRenderDevice::Initialize()
     if (strstr(Core.Params, "-weather"))
         initialize_weather_editor();
 
-    //SetEnvironmentVariable("SDL_VIDEODRIVER", "windows"); 
-    SetEnvironmentVariable("SDL_AUDIODRIVER", "directsound"); 
-    
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -62,14 +59,16 @@ void CRenderDevice::Initialize()
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
     }
     // Save window properties
-    
     m_dwWindowStyle = SDL_GetWindowFlags(m_sdlWnd);
     if (SDL_GetDisplayBounds(0, &m_rcWindowBounds) != 0)
     {
-        Log("SDL_GetDisplayBounds failed: %s", SDL_GetError());
+        Log("SDL_GetDisplayBounds m_rcWindowBounds failed: %s", SDL_GetError());
     }
 
-    //GetClientRect(m_hWnd, &m_rcWindowClient);
+    if (SDL_GetDisplayBounds(0, &m_rcWindowClient) != 0)
+    {
+        Log("SDL_GetDisplayBounds m_rcWindowClient failed: %s", SDL_GetError());
+    }
 }
 
 void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
