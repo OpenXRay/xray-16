@@ -13,8 +13,8 @@
 #endif
 #include "xrCore/xrstring.h"
 
-static constexpr pcstr CONFIG_PATH = "$game_config$";
-static constexpr pcstr UI_PATH = "ui";
+// XXX: interesting idea is to have variable configs folder. Need we?
+static constexpr pcstr CONFIG_PATH = _game_config_;
 
 class XML_NODE
 {
