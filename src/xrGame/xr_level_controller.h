@@ -92,7 +92,7 @@ enum EGameActions
 struct _keyboard
 {
     pcstr key_name;
-    SDL_Scancode dik;
+    int dik;
     xr_string key_local_name;
 };
 enum _key_group
@@ -114,7 +114,7 @@ struct _action
 };
 
 pcstr dik_to_keyname(SDL_Scancode _dik);
-SDL_Scancode keyname_to_dik(pcstr _name);
+int keyname_to_dik(pcstr _name);
 _keyboard* keyname_to_ptr(pcstr _name);
 _keyboard* dik_to_ptr(SDL_Scancode _dik, bool bSafe);
 
@@ -136,7 +136,7 @@ struct _binding
 extern _binding g_key_bindings[];
 
 bool is_binded(EGameActions action_id, SDL_Scancode dik);
-SDL_Scancode get_action_dik(EGameActions action_id, int idx = -1);
+int get_action_dik(EGameActions action_id, int idx = -1);
 EGameActions get_binded_action(SDL_Scancode dik);
 
 extern void CCC_RegisterInput();
@@ -151,9 +151,9 @@ class ConsoleBindCmds
 public:
     xr_map<int, _conCmd> m_bindConsoleCmds;
 
-    void bind(SDL_Scancode dik, LPCSTR N);
-    void unbind(SDL_Scancode dik);
-    bool execute(SDL_Scancode dik);
+    void bind(int dik, LPCSTR N);
+    void unbind(int dik);
+    bool execute(int dik);
     void clear();
     void save(IWriter* F);
 };
@@ -162,13 +162,13 @@ void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz);
 
 extern ConsoleBindCmds bindConsoleCmds;
 
-// 0xED - max vavue in DIK* enum
-#define MOUSE_1 (0xED + 100)
-#define MOUSE_2 (0xED + 101)
-#define MOUSE_3 (0xED + 102)
+// SDL_NUM_SCANCODES - max vavue in SDL_SCANCODE_* enum
+#define MOUSE_1 (SDL_NUM_SCANCODES + SDL_BUTTON_LEFT)
+#define MOUSE_2 (SDL_NUM_SCANCODES + SDL_BUTTON_MIDDLE)
+#define MOUSE_3 (SDL_NUM_SCANCODES + SDL_BUTTON_RIGHT)
 
-#define MOUSE_4 (0xED + 103)
-#define MOUSE_5 (0xED + 104)
-#define MOUSE_6 (0xED + 105)
-#define MOUSE_7 (0xED + 106)
-#define MOUSE_8 (0xED + 107)
+#define MOUSE_4 (SDL_NUM_SCANCODES + SDL_BUTTON_X1)
+#define MOUSE_5 (SDL_NUM_SCANCODES + SDL_BUTTON_X2)
+#define MOUSE_6 (SDL_NUM_SCANCODES + 6)
+#define MOUSE_7 (SDL_NUM_SCANCODES + 7)
+#define MOUSE_8 (SDL_NUM_SCANCODES + 8)

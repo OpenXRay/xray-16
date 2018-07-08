@@ -943,7 +943,7 @@ void CActor::UpdateCL()
     {
         if (CurrentGameUI() && NULL == CurrentGameUI()->TopInputReceiver())
         {
-            SDL_Scancode dik = get_action_dik(kUSE, 0);
+            int dik = get_action_dik(kUSE, 0);
             if (dik && pInput->iGetAsyncKeyState(dik))
                 m_bPickupMode = true;
 
