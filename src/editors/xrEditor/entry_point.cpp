@@ -5,6 +5,7 @@
 #include "xrEngine/device.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
+#include "SDL.h"
 
 
 using namespace XRay;
@@ -25,11 +26,11 @@ void UIThreadProc(void*)
     Core.Initialize("OpenXRayEditor", LogCallback(ELogCallback, windowIDE->Log().Handle.ToPointer()), true);
 
 #ifdef XR_X64
-    Device.m_hWnd = (HWND)windowIDE->View().GetViewHandle().ToInt64();
+    Device.m_sdlWnd = (SDL_Window *)windowIDE->View().GetViewHandle().ToInt64();
 #else
     Device.m_hWnd = (HWND)windowIDE->View().GetViewHandle().ToInt32();
 #endif
-    VERIFY(Device.m_hWnd != INVALID_HANDLE_VALUE);
+    VERIFY(Device.m_sdlWnd != nullptr);
 
     UICreated.Set();
     ReadyToShowUI.Wait();
