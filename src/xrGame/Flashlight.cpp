@@ -161,9 +161,31 @@ void CFlashlight::OnStateSwitch(u32 S, u32 oldState)
 			SetPending(FALSE);
 		}break;
 		case eToggle:
+		{
+			CActor* pActor = smart_cast<CActor*>(H_Parent());
+			if (pActor)
+			{
+				if (!m_switched_on)
+					m_sounds.PlaySound("SndTurnOn", pActor->Position(), NULL, !!pActor->HUDview());
+				else
+					m_sounds.PlaySound("SndTurnOff", pActor->Position(), NULL, !!pActor->HUDview());
+			}
+			PlayHUDMotion("anm_toggle", TRUE, this, GetState());
+			SetPending(TRUE);
+		}break;
 		case eSwitchOn:
+		{
+			CActor* pActor = smart_cast<CActor*>(H_Parent());
+			if (pActor)
+				m_sounds.PlaySound("SndTurnOn", pActor->Position(), NULL, !!pActor->HUDview());
+			PlayHUDMotion("anm_toggle", TRUE, this, GetState());
+			SetPending(TRUE);
+		}break;
 		case eSwitchOff:
 		{
+			CActor* pActor = smart_cast<CActor*>(H_Parent());
+			if (pActor)
+				m_sounds.PlaySound("SndTurnOff", pActor->Position(), NULL, !!pActor->HUDview());
 			PlayHUDMotion("anm_toggle", TRUE, this, GetState());
 			SetPending(TRUE);
 		}break;
@@ -191,17 +213,17 @@ void CFlashlight::OnAnimationEnd(u32 state)
 		} break;
 		case eToggle:
 		{
-			Switch(!m_switched_on);
+			Switch(!m_switched_on,false);
 			SwitchState(eIdle);
 		} break;
 		case eSwitchOn:
 		{
-			Switch(true);
+			Switch(true,false);
 			SwitchState(eIdle);
 		} break;
 		case eSwitchOff:
 		{
-			Switch(false);
+			Switch(false,false);
 			SwitchState(eHiding);
 		} break;
 	}
