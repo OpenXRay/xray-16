@@ -243,30 +243,40 @@ void CInput::OnFrame(void)
 
     while (SDL_PollEvent(&event))
     {
-#ifndef _EDITOR
-        if (Device.dwPrecacheFrame)
-            continue;
-#endif
         BOOL b_break_cycle = false;
+
         switch (event.type)
         {
         case SDL_KEYDOWN:
         {
-            cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
-
-            if (0 != event.key.repeat)
-                cbStack.back()->IR_OnKeyboardHold(event.key.keysym.scancode);
-
             KBState[event.key.keysym.scancode] = TRUE;
+#ifndef _EDITOR
+            if (Device.dwPrecacheFrame == 0)
+#endif
+            {
+                cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
+
+                for (u32 i = 0; i < COUNT_KB_BUTTONS; i++)
+                    if (KBState[i])
+                        cbStack.back()->IR_OnKeyboardHold(i);
+            }
         }
         break;
         case SDL_KEYUP:
         {
-            cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
             KBState[event.key.keysym.scancode] = FALSE;
+#ifndef _EDITOR
+            if (Device.dwPrecacheFrame == 0)
+#endif
+            {
+                cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
+            }
         }
         break;
         case SDL_MOUSEMOTION:
+#ifndef _EDITOR
+            if (Device.dwPrecacheFrame == 0)
+#endif
         {
             timeStamp[0] = event.motion.timestamp;
             timeStamp[1] = event.motion.timestamp;
@@ -274,25 +284,35 @@ void CInput::OnFrame(void)
         }
         break;
         case SDL_MOUSEBUTTONUP:
+#ifndef _EDITOR
+            if (Device.dwPrecacheFrame == 0)
+#endif
         {
-            cbStack.back()->IR_OnMouseRelease(event.button.button);
             mouseState[event.button.button] = FALSE;
+            // cbStack.back()->IR_OnMouseRelease(event.button.button);
+            cbStack.back()->IR_OnKeyboardRelease(SDL_NUM_SCANCODES + event.button.button);
         }
         break;
         case SDL_MOUSEBUTTONDOWN:
+#ifndef _EDITOR
+            if (Device.dwPrecacheFrame == 0)
+#endif
         {
-            cbStack.back()->IR_OnMousePress(event.button.button);
+            mouseState[event.button.button] = TRUE;
+            // cbStack.back()->IR_OnMousePress(event.button.button);
+            cbStack.back()->IR_OnKeyboardPress(SDL_NUM_SCANCODES + event.button.button);
 
             if (mouseState[event.button.button])
                 cbStack.back()->IR_OnMouseHold(event.button.button);
-
-            mouseState[event.button.button] = TRUE;
         }
         break;
         case SDL_MOUSEWHEEL:
+#ifndef _EDITOR
+            if (Device.dwPrecacheFrame == 0)
+#endif
         {
             timeStamp[2] = event.wheel.timestamp;
-            cbStack.back()->IR_OnMouseWheel(event.wheel.direction);
+            cbStack.back()->IR_OnMouseWheel(event.wheel.y);
         }
         break;
         case SDL_QUIT: // go to outside event loop

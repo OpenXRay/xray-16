@@ -79,7 +79,9 @@ SCRIPT_EXPORT(KeyBindings, (), {
                 value("DIK_SYSRQ", int(DIK_SYSRQ)), value("DIK_HOME", int(DIK_HOME)),
                 value("DIK_PRIOR", int(DIK_PRIOR)), value("DIK_RIGHT", int(DIK_RIGHT)),
                 value("DIK_DOWN", int(DIK_DOWN)), value("DIK_INSERT", int(DIK_INSERT)),
-                value("DIK_LWIN", int(DIK_LWIN)), value("DIK_APPS", int(DIK_APPS)), value("MOUSE_1", int(MOUSE_1)),
-                value("MOUSE_3", int(MOUSE_3)), value("DIK_RETURN", int(DIK_RETURN)),
+                value("DIK_LWIN", int(DIK_LWIN)), value("DIK_APPS", int(DIK_APPS)), 
+                value("MOUSE_1", int(MOUSE_1)), value("MOUSE_2", int(MOUSE_2)), 
+                value("MOUSE_3", int(MOUSE_3)), value("MOUSE_4", int(MOUSE_4)), value("MOUSE_5", int(MOUSE_5)),
+                value("DIK_RETURN", int(DIK_RETURN)),
                 value("DIK_NUMPADENTER", int(DIK_NUMPADENTER))]];
 });
