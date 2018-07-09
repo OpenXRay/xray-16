@@ -309,4 +309,4 @@ inline int _filelength(int fd)
 #define _MAX_EXT	256
 
 #define SEM_FAILCRITICALERRORS 1
-#define SetErrorMode(x) {x=x}
+#define SetErrorMode(x) {}
