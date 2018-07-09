@@ -251,7 +251,7 @@ bool CDialogHolder::IR_UIOnKeyboardPress(SDL_Scancode dik)
     {
         Fvector2 cp = GetUICursor().GetCursorPosition();
         EUIMessages action =
-            (dik == MOUSE_1) ? WINDOW_LBUTTON_DOWN : (dik == MOUSE_2) ? WINDOW_RBUTTON_DOWN : WINDOW_CBUTTON_DOWN;
+            (dik == MOUSE_1) ? WINDOW_LBUTTON_DOWN : (dik == MOUSE_2) ? WINDOW_CBUTTON_DOWN : WINDOW_RBUTTON_DOWN;
         if (TIR->OnMouseAction(cp.x, cp.y, action))
             return true;
     }

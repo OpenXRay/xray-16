@@ -234,7 +234,7 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (WINDOW_KEY_PRESSED != keyboard_action)
     {
-        if (dik == DIK_TAB)
+        if (dik == SDL_SCANCODE_TAB)
         {
             ShowChildren(true);
             game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -245,7 +245,7 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (dik == DIK_TAB)
+    if (dik == SDL_SCANCODE_TAB)
     {
         ShowChildren(false);
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -258,9 +258,9 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     if (right_border > 9)
         right_border = 9;
 
-    if (dik >= DIK_1 && dik < (int)right_border + DIK_1)
+    if (dik >= SDL_SCANCODE_1 && dik < (int)right_border + SDL_SCANCODE_1)
     {
-        int NewIndex = dik - DIK_1;
+        int NewIndex = dik - SDL_SCANCODE_1;
         //		Msg("Selected %d", NewIndex);
         //		for (u32 i=0; i<m_skinsEnabled.size(); i++)
         //			Msg("Enabled - %d", m_skinsEnabled[i]);
@@ -277,12 +277,12 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     switch (dik)
     {
-    case DIK_ESCAPE: OnBtnCancel(); return true;
-    case DIK_SPACE: // do autoselect
+    case SDL_SCANCODE_ESCAPE: OnBtnCancel(); return true;
+    case SDL_SCANCODE_SPACE: // do autoselect
         m_iActiveIndex = -1;
-    case DIK_RETURN: OnBtnOK(); return true;
-    case DIK_LEFT: OnKeyLeft(); return true;
-    case DIK_RIGHT: OnKeyRight(); return true;
+    case SDL_SCANCODE_RETURN: OnBtnOK(); return true;
+    case SDL_SCANCODE_LEFT: OnKeyLeft(); return true;
+    case SDL_SCANCODE_RIGHT: OnKeyRight(); return true;
     }
 
     return false;

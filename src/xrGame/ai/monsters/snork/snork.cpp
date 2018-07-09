@@ -315,7 +315,7 @@ void CSnork::debug_on_key(int key)
 
     switch (key)
     {
-    case DIK_1: m_target_node = actor->ai_location().level_vertex_id();
+    case SDL_SCANCODE_1: m_target_node = actor->ai_location().level_vertex_id();
     }
 }
 #endif

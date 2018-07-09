@@ -159,8 +159,8 @@ bool CUIServerInfo::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     switch (dik)
     {
-    case DIK_SPACE:
-    case DIK_RETURN:
+    case SDL_SCANCODE_SPACE:
+    case SDL_SCANCODE_RETURN:
     {
         OnNextBtnClick(NULL, 0);
         return true;

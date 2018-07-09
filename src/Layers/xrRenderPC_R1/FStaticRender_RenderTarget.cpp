@@ -235,7 +235,7 @@ BOOL CRenderTarget::Perform()
 void CRenderTarget::Begin()
 {
     /*
-    if (g_pGameLevel->IR_GetKeyState(DIK_LSHIFT))
+    if (g_pGameLevel->IR_GetKeyState(SDL_SCANCODE_LSHIFT))
     {
         Msg                 ("[%5d]------------------------",Device.dwFrame);
         SHOW                (param_blur)
