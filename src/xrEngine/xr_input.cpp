@@ -154,7 +154,11 @@ BOOL CInput::iGetAsyncKeyState(int dik)
         return FALSE; // unknown key ???
 }
 
-BOOL CInput::iGetAsyncBtnState(int btn) { return !!mouseState[btn]; }
+BOOL CInput::iGetAsyncBtnState(int btn)
+{
+    if (btn <= COUNT_MOUSE_BUTTONS)
+        return !!mouseState[btn + 1]; 
+}
 void CInput::ClipCursor(bool clip)
 {
     if (clip)
@@ -283,7 +287,6 @@ void CInput::OnFrame(void)
 #endif
             {
                 mouseState[event.button.button] = FALSE;
-                // cbStack.back()->IR_OnMouseRelease(event.button.button);
                 cbStack.back()->IR_OnKeyboardRelease(SDL_NUM_SCANCODES + event.button.button);
             }
             break;
@@ -293,11 +296,7 @@ void CInput::OnFrame(void)
 #endif
             {
                 mouseState[event.button.button] = TRUE;
-                // cbStack.back()->IR_OnMousePress(event.button.button);
                 cbStack.back()->IR_OnKeyboardPress(SDL_NUM_SCANCODES + event.button.button);
-
-                if (mouseState[event.button.button])
-                    cbStack.back()->IR_OnMouseHold(event.button.button);
             }
             break;
         case SDL_MOUSEWHEEL:
