@@ -18,7 +18,7 @@ environment:
 #- SET LUAENV=lua51
 #- cmd: .appveyor\install-lua.cmd
 before_build:
-  nuget restore
+  nuget restore src\engine.sln
 cache:
   - packages -> **\packages.config
 
