@@ -17,7 +17,7 @@ environment:
 #install:
 #- SET LUAENV=lua51
 #- cmd: .appveyor\install-lua.cmd
-nuget:
+before_build:
   nuget restore
 cache:
   - packages -> **\packages.config
