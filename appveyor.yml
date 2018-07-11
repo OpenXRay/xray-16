@@ -17,6 +17,10 @@ environment:
 #install:
 #- SET LUAENV=lua51
 #- cmd: .appveyor\install-lua.cmd
+nuget:
+  nuget restore
+cache:
+  - packages -> **\packages.config
 
 build_script:
 - if [%BUILDSYSTEM%]==[MSVC] git submodule update --init --recursive
