@@ -28,7 +28,7 @@ void UIThreadProc(void*)
 #ifdef XR_X64
     Device.m_sdlWnd = (SDL_Window *)windowIDE->View().GetViewHandle().ToInt64();
 #else
-    Device.m_hWnd = (HWND)windowIDE->View().GetViewHandle().ToInt32();
+    Device.m_sdlWnd = (SDL_Window*)windowIDE->View().GetViewHandle().ToInt32();
 #endif
     VERIFY(Device.m_sdlWnd != nullptr);
 
