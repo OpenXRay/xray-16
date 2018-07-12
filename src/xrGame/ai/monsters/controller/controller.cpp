@@ -34,10 +34,6 @@
 #include "ai/Monsters/Controller/controller_psy_hit.h"
 #include "ai/Monsters/monster_cover_manager.h"
 
-#ifdef _DEBUG
-#include <dinput.h>
-#endif
-
 const u32 _pmt_psy_attack_delay = 2000;
 const float _pmt_psy_attack_min_angle = deg(5);
 

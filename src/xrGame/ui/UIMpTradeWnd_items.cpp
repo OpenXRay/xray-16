@@ -852,8 +852,6 @@ void CUIMpTradeWnd::DumpPreset(ETradePreset idx)
 #endif // #ifndef MASTER_GOLD
 }
 
-#include <dinput.h>
-
 void CUICellItemTradeMenuDraw::OnDraw(CUICellItem* cell)
 {
     Fvector2 pos;

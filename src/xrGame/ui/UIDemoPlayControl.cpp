@@ -5,7 +5,6 @@
 #include "UIPropertiesBox.h"
 #include "UIListBox.h"
 #include "UIListBoxItem.h"
-#include <dinput.h>
 #include "UIDemoPlayControl.h"
 #include "UICursor.h"
 #include "xrEngine/XR_IOConsole.h"

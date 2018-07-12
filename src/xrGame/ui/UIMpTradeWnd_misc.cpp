@@ -9,7 +9,6 @@
 #include "inventory_item.h"
 #include "PhysicsShellHolder.h"
 #include "Common/object_broker.h"
-#include <dinput.h>
 #include "UICellCustomItems.h"
 
 bool CUIMpTradeWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)

@@ -8,7 +8,6 @@
 #include "UIGameCustom.h"
 #include "Level.h"
 #include "game_cl_mp.h"
-#include <dinput.h>
 #include "ximage.h"
 #include "xmemfile.h"
 

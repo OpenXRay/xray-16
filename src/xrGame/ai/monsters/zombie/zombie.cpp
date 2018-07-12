@@ -9,10 +9,6 @@
 #include "ai/monsters/control_animation_base.h"
 #include "ai/monsters/control_movement_base.h"
 
-#ifdef _DEBUG
-#include <dinput.h>
-#endif
-
 CZombie::CZombie()
 {
     StateMan = new CStateManagerZombie(this);

@@ -21,9 +21,6 @@
 #include "ActorCondition.h"
 #include "PHDestroyable.h"
 #include "CharacterPhysicsSupport.h"
-#ifdef DEBUG
-#include <dinput.h>
-#endif // DEBUG
 
 namespace detail
 {

@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "UIGameCTA.h"
 
-#include <dinput.h>
-
 #include "UITeamPanels.h"
 
 #include "game_cl_base.h"
