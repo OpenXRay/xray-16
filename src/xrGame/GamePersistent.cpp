@@ -165,7 +165,8 @@ CGamePersistent::~CGamePersistent(void)
 
 void CGamePersistent::PreStart(LPCSTR op)
 {
-    pApp->SetLoadingScreen(new UILoadingScreen());
+    if (!GEnv.isDedicatedServer)
+        pApp->SetLoadingScreen(new UILoadingScreen());
     super::PreStart(op);
 }
 

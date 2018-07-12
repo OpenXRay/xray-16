@@ -84,7 +84,7 @@ u32 ip_filter::load()
 
 bool ip_filter::is_ip_present(u32 ip_address)
 {
-    if (m_all_subnets.size() == 0)
+    if (m_all_subnets.empty())
         return true;
     subnet_item tmp_fake_item;
     hton_bo(ip_address, tmp_fake_item);
