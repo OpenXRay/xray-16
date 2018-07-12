@@ -10,7 +10,6 @@
 #include "game_cl_teamdeathmatch.h"
 #include "UIMapInfo.h"
 #include "xr_level_controller.h"
-#include <dinput.h>
 #include "UIStatsPlayerList.h"
 
 CUIMapDesc::CUIMapDesc()

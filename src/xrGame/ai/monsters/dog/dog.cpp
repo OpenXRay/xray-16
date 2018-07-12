@@ -16,10 +16,6 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "Actor.h"
 
-#ifdef _DEBUG
-#include <dinput.h>
-#endif
-
 CAI_Dog::CAI_Dog()
 {
     StateMan = new CStateManagerDog(this);

@@ -8,7 +8,6 @@
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "player_name_modifyer.h"
 #include "xrGameSpy/GameSpy_GP.h"
-#include <dinput.h>
 #include "xrCore/os_clipboard.h"
 
 string64 gsCDKey = "";

@@ -5,7 +5,6 @@
 #include "UICellItem.h"
 #include "UIDragDropListEx.h"
 #include "UICellCustomItems.h"
-#include <dinput.h>
 #include "game_cl_deathmatch.h"
 #include "game_cl_capture_the_artefact.h"
 

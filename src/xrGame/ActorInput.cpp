@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <dinput.h>
 #include "Actor.h"
 #include "Torch.h"
 #include "trade.h"
@@ -469,7 +468,7 @@ void CActor::ActorUse()
         if (object)
             element = (u16)RQ.element;
 
-        if (object && Level().IR_GetKeyState(DIK_LSHIFT))
+        if (object && Level().IR_GetKeyState(SDL_SCANCODE_LSHIFT))
         {
             bool b_allow = !!pSettings->line_exist("ph_capture_visuals", object->cNameVisual());
             if (b_allow && !character_physics_support()->movement()->PHCapture())
@@ -660,9 +659,9 @@ void CActor::NoClipFly(int cmd)
     Fvector cur_pos; // = Position();
     cur_pos.set(0, 0, 0);
     float scale = 1.0f;
-    if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
         scale = 0.25f;
-    else if (pInput->iGetAsyncKeyState(DIK_LMENU))
+    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI))
         scale = 4.0f;
 
     switch (cmd)

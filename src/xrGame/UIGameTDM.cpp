@@ -6,7 +6,6 @@
 #include "game_cl_TeamDeathmatch.h"
 
 #include "ui/TeamInfo.h"
-#include <dinput.h>
 
 #include "Common/object_broker.h"
 
