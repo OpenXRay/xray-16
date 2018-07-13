@@ -331,11 +331,11 @@ void CRenderDevice::message_loop()
         return;
     }
 
-    SDL_PumpEvents();
-
     SDL_Event event;
 
+    SDL_PumpEvents();
     SDL_PeepEvents(&event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT);
+
     while (SDL_QUIT != event.type)
     {
         if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT))
@@ -347,49 +347,42 @@ void CRenderDevice::message_loop()
                 {
                 case SDL_WINDOWEVENT_MOVED:
                     SDL_Log("Window %d moved to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
-                    continue;
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    SDL_Log("Window %d resized to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
-                    continue;
-                case SDL_WINDOWEVENT_CLOSE:
-                    event.type = SDL_QUIT;
                     break;
-#if SDL_VERSION_ATLEAST(2, 0, 5)
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    SDL_Log(
+                        "Window %d resized to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
+                    break;
+                case SDL_WINDOWEVENT_CLOSE: event.type = SDL_QUIT; break;
                 case SDL_WINDOWEVENT_SHOWN:
-                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                    SDL_Log("Window %d has been shown", event.window.windowID);
+
                     if (editor())
                     {
                         Device.b_is_Active = TRUE;
-                        continue;
+                        break;
                     }
                     OnWM_Activate(1, event.window.data2);
-                    SDL_Log("Window %d is offered a focus", event.window.windowID);
-                    continue;
+                    break;
                 case SDL_WINDOWEVENT_HIDDEN:
-                case SDL_WINDOWEVENT_FOCUS_LOST: 
                     OnWM_Activate(0, event.window.data2);
-                    SDL_Log("Window %d is lost a focus", event.window.windowID);
-                    continue;
-#endif
+                    SDL_Log("Window %d has been hidden", event.window.windowID);
+                    break;
                 default:
                     SDL_Log("Window %d got unknown event %d with %d %d", event.window.windowID, event.window.event,
                         event.window.data1, event.window.data2);
-                    continue;
+                    break;
                 }
-                continue;
-            default: 
-                SDL_Log("Window event %d to %d,%d", event.type, event.window.data1, event.window.data2);
-                continue;
+                break;
+            case SDL_QUIT:
+                SDL_DestroyWindow(m_sdlWnd);
+                SDL_Quit();
+                break;
+            default: SDL_Log("Window event %d to %d,%d", event.type, event.window.data1, event.window.data2); break;
             }
         }
 
         on_idle();
     }
-
-    /*
-    while (true)
-        on_idle();
-        */
 }
 
 void CRenderDevice::Run()
