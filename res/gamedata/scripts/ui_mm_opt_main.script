@@ -135,6 +135,30 @@ function options_dialog:UpdateDependControls()
 	self:OnAOOptionChange()
 end
 
+function options_dialog:OnDynWetSurfNearUpdate()
+    local near = self.track_r3_dyn_wet_surf_near:GetFValue()
+    local far = self.track_r3_dyn_wet_surf_far:GetFValue()
+
+    if (near > far) then
+        local console = get_console()
+        console:execute("r3_dynamic_wet_surfaces_far " .. near + 1)
+    end
+
+    self.track_r3_dyn_wet_surf_far:SetCurrentValue()
+end
+
+function options_dialog:OnDynWetSurfFarUpdate()
+    local near = self.track_r3_dyn_wet_surf_near:GetFValue()
+    local far = self.track_r3_dyn_wet_surf_far:GetFValue()
+    
+    if (far < near) then
+        local console = get_console()
+        console:execute("r3_dynamic_wet_surfaces_near " .. far - 1)
+    end
+
+    self.track_r3_dyn_wet_surf_near:SetCurrentValue()
+end
+
 function options_dialog:InitCallBacks()
 	self:AddCallback("tab",					ui_events.TAB_CHANGED,		self.OnTabChange,			self)
 	self:AddCallback("btn_advanced_graphic",ui_events.BUTTON_CLICKED,	self.OnBtnAdvGraphic,		self)
@@ -149,6 +173,9 @@ function options_dialog:InitCallBacks()
 	self:AddCallback("combo_renderer",		ui_events.LIST_ITEM_SELECT,	self.UpdateDependControls,	self)
 	self:AddCallback("btn_cancel_download",	ui_events.BUTTON_CLICKED,	self.OnBtn_CancelDownload,	self)
 	self:AddCallback("tab_ao_opt",			ui_events.TAB_CHANGED,		self.OnAOOptionChange,		self)
+	self:AddCallback("track_r3_dyn_wet_surf_near", ui_events.BUTTON_CLICKED, self.OnDynWetSurfNearUpdate, self)
+	self:AddCallback("track_r3_dyn_wet_surf_far", ui_events.BUTTON_CLICKED,  self.OnDynWetSurfFarUpdate, self)
+
 
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_YES_CLICKED, self.OnApplyChanges, self)
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_NO_CLICKED, self.OnDiscardChanges,self)

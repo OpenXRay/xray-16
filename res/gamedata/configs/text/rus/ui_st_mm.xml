@@ -636,6 +636,18 @@
 	<string id="ui_mm_r3_dynamic_wet_surfaces">
 		<text>Намокание плоскостей</text>
 	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Оптимизация намокания</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Намокание вблизи</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Намокание вдали</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Качество намокания</text>
+	</string>
 	<string id="ui_mm_r3_gbuffer_opt">
 		<text>Оптимизировать геометр. буфер</text>
 	</string>

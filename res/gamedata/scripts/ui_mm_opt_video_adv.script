@@ -210,6 +210,30 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	ctl = xml:InitCheck ("video_adv:check_r3_dynamic_wet_surfaces", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
 
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r3_dynamic_wet_surfaces_opt", _st)
+	ctl = xml:InitCheck ("video_adv:check_r3_dynamic_wet_surfaces_opt", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r3_dynamic_wet_surfaces_near", _st)
+	ctl = xml:InitTrackBar("video_adv:track_r3_dynamic_wet_surfaces_near", _st)
+	handler.track_r3_dyn_wet_surf_near = ctl
+	handler:Register(ctl, "track_r3_dyn_wet_surf_near")
+	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r3_dynamic_wet_surfaces_far", _st)
+	ctl = xml:InitTrackBar("video_adv:track_r3_dynamic_wet_surfaces_far", _st)
+	handler.track_r3_dyn_wet_surf_far = ctl
+	handler:Register(ctl, "track_r3_dyn_wet_surf_far")
+	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r3_dynamic_wet_surfaces_sm_res", _st)
+	ctl = xml:InitTrackBar("video_adv:track_r3_dynamic_wet_surfaces_sm_res", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
+
 -- r3_volumetric_smoke		>r25
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r3_volumetric_smoke", _st)
