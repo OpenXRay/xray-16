@@ -48,17 +48,12 @@ void CHW::CreateDevice(SDL_Window *hWnd, bool move_window)
 
     R_ASSERT(m_hWnd);
 
-    // Get the device context
-    Uint32 pixelFormat = SDL_GetWindowPixelFormat(m_hWnd);
-    if (SDL_PIXELFORMAT_UNKNOWN == pixelFormat)
-    {
-        Msg("Could not get pixel format: %s", SDL_GetError());
-        return;
-    }
-
-    //TODO Choose the closest pixel format
-
-    //TODO Apply the pixel format to the device context
+    //Choose the closest pixel format
+    SDL_DisplayMode mode;
+    SDL_GetWindowDisplayMode(m_hWnd, &mode);
+    mode.format = SDL_PIXELFORMAT_RGBA8888;
+    // Apply the pixel format to the device context
+    SDL_SetWindowDisplayMode(m_hWnd, &mode);
 
     // Create the context
     m_hRC = SDL_GL_CreateContext(m_hWnd);
@@ -76,6 +71,10 @@ void CHW::CreateDevice(SDL_Window *hWnd, bool move_window)
         Msg("Could not make context current. %s", SDL_GetError());
         return;
     }
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     // Initialize OpenGL Extension Wrangler
     if (glewInit() != GLEW_OK)
@@ -176,6 +175,8 @@ void CHW::updateWindowProps(SDL_Window* m_sdlWnd)
     }
     else
     {
+        SDL_SetWindowPosition(m_sdlWnd, 0, 0);
+        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
         SDL_ShowWindow(m_sdlWnd);
     }
 
@@ -299,5 +300,6 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
 {
     RImplementation.Target->phase_flip();
-    return SwapBuffers(m_hDC) ? S_OK : E_FAIL;
+    SDL_GL_SwapWindow(m_hWnd);
+    return S_OK;
 }
