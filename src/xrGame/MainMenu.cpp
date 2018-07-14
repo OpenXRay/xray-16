@@ -95,15 +95,13 @@ CMainMenu::~CMainMenu()
 
 void CMainMenu::ReadTextureInfo()
 {
+    string_path buf;
     FS_FileSet fset;
-    FS.file_list(fset, "$game_config$", FS_ListFiles, "ui\\textures_descr\\*.xml");
-    auto fit = fset.begin();
-    auto fit_e = fset.end();
-
-    for (; fit != fit_e; ++fit)
+    FS.file_list(fset, "$game_config$", FS_ListFiles, strconcat(sizeof(buf), buf, UI_PATH, "\\", "textures_descr\\*.xml"));
+    for (const auto& file : fset)
     {
         string_path fn1, fn2, fn3;
-        _splitpath((*fit).name.c_str(), fn1, fn2, fn3, 0);
+        _splitpath(file.name.c_str(), fn1, fn2, fn3, 0);
         xr_strcat(fn3, ".xml");
 
         CUITextureMaster::ParseShTexInfo(fn3);
