@@ -13,11 +13,6 @@
 #include "SDL_opengl.h"
 #include <GL/glu.h>
 #include "SDL_opengl_glext.h"
-#if defined(WINDOWS)
-#include <gl/wglext.h>
-#elif defined(LINUX)
-#include <GL/glxext.h>
-#endif
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
