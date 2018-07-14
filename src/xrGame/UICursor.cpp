@@ -56,9 +56,14 @@ void CUICursor::InitInternal()
     m_static->SetWndSize(sz);
     m_static->SetStretchTexture(true);
 
-    u32 screen_size_x = Device.m_rcWindowClient.w;
-    u32 screen_size_y = Device.m_rcWindowClient.h;
-    m_b_use_win_cursor = (screen_size_y > Device.dwHeight && screen_size_x > Device.dwWidth);
+    SDL_Rect display;
+    if (SDL_GetDisplayBounds(0, &display) != 0)
+    {
+        Log("SDL_GetDisplayBounds display failed: %s", SDL_GetError());
+    }
+    u32 screen_size_x = display.w - display.x;
+    u32 screen_size_y = display.h - display.y;
+    m_b_use_win_cursor = (screen_size_y >= Device.dwHeight && screen_size_x >= Device.dwWidth);
 }
 
 //--------------------------------------------------------------------
