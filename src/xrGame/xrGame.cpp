@@ -13,6 +13,7 @@
 #include "xrEngine/profiler.h"
 
 extern void FillUIStyleToken();
+extern void CleanupUIStyleToken();
 
 extern "C" {
 DLL_API IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
@@ -51,7 +52,10 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
         break;
     }
 
-    case DLL_PROCESS_DETACH: { break;
+    case DLL_PROCESS_DETACH:
+    {
+        CleanupUIStyleToken();
+        break;
     }
     }
     return (TRUE);

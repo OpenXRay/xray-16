@@ -224,7 +224,6 @@ void CGamePersistent::OnAppEnd()
     clean_game_globals();
 
     GMLib.Unload();
-    CleanupUIStyleToken();
 }
 
 void CGamePersistent::Start(LPCSTR op) { inherited::Start(op); }
