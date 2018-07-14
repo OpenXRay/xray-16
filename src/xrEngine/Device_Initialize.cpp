@@ -46,13 +46,10 @@ void CRenderDevice::Initialize()
 
     if (!m_sdlWnd)
     {
-        Uint32 flags = SDL_WINDOW_BORDERLESS;
+        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 #endif
-
-        if (strstr(Core.Params, "-gl"))
-            flags |= SDL_WINDOW_OPENGL;
 
         m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, flags);
        

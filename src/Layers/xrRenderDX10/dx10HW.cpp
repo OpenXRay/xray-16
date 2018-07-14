@@ -118,6 +118,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd, bool move_window)
         {
         case SDL_SYSWM_WINDOWS:
             sd.OutputWindow = info.info.win.window;
+            SDL_SetWindowSize(m_sdlWnd, sd.BufferDesc.Width, sd.BufferDesc.Height); //workaround for r3 and r4
             break;
         default: break;
         }
