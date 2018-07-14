@@ -62,9 +62,6 @@ public:
     u32 dwWidth;
     u32 dwHeight;
 
-    // Real application window resolution
-    SDL_Rect m_rcWindowBounds;
-
     // Real game window resolution
     SDL_Rect m_rcWindowClient;
 

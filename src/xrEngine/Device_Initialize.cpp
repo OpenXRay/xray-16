@@ -60,15 +60,12 @@ void CRenderDevice::Initialize()
     }
     // Save window properties
     m_dwWindowStyle = SDL_GetWindowFlags(m_sdlWnd);
-    if (SDL_GetDisplayBounds(0, &m_rcWindowBounds) != 0)
-    {
-        Log("SDL_GetDisplayBounds m_rcWindowBounds failed: %s", SDL_GetError());
-    }
 
-    if (SDL_GetDisplayBounds(0, &m_rcWindowClient) != 0)
-    {
-        Log("SDL_GetDisplayBounds m_rcWindowClient failed: %s", SDL_GetError());
-    }
+    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
+    int w = 0, h = 0;
+    SDL_GetWindowSize(m_sdlWnd, &w, &h);
+    m_rcWindowClient.w = m_rcWindowClient.x + w;
+    m_rcWindowClient.h = m_rcWindowClient.y + h;
 }
 
 void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)

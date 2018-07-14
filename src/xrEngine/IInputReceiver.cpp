@@ -52,7 +52,7 @@ BOOL IInputReceiver::IR_GetBtnState(int btn)
 
 void IInputReceiver::IR_GetMousePosScreen(Ivector2& p) 
 { 
-    SDL_GetGlobalMouseState(&p.x, &p.y);
+    SDL_GetMouseState(&p.x, &p.y);
 }
 
 void IInputReceiver::IR_GetMousePosReal(SDL_Window *m_sdlWnd, Ivector2& p)

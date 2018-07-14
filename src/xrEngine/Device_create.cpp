@@ -39,6 +39,11 @@ void CRenderDevice::Create()
     fASPECT = 1.f;
     const bool noEd = !editor();
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
+    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
+    int w = 0, h = 0;
+    SDL_GetWindowSize(m_sdlWnd, &w, &h);
+    m_rcWindowClient.w = m_rcWindowClient.x + w;
+    m_rcWindowClient.h = m_rcWindowClient.y + h;
     Memory.mem_compact();
     b_is_Ready = TRUE;
     _SetupStates();
