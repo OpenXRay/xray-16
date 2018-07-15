@@ -20,6 +20,38 @@ XRCORE_API xrCore Core;
 
 static u32 init_counter = 0;
 
+#define DO_EXPAND(VAL) VAL##1
+#define EXPAND(VAL) DO_EXPAND(VAL)
+
+#if EXPAND(CI) == 1
+#undef CI
+#endif
+
+#define HELPER(s) #s
+#define TO_STRING(s) HELPER(s)
+
+void PrintCI()
+{
+#if defined(CI)
+    pcstr name = nullptr;
+    pcstr buildId = nullptr;
+    pcstr builder = nullptr;
+    pcstr commit = nullptr;
+#if defined(APPVEYOR)
+    name = "AppVeyor";
+    buildId = TO_STRING(APPVEYOR_BUILD_VERSION);
+    builder = TO_STRING(APPVEYOR_ACCOUNT_NAME);
+    commit = TO_STRING(APPVEYOR_REPO_COMMIT);
+#else
+#pragma TODO("PrintCI for other CIs")
+    return;
+#endif
+    Msg("%s build %s from commit %s (built by %s)", name, buildId, commit, builder);
+#else
+    Log("This is a custom build");
+#endif
+}
+
 void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
@@ -75,6 +107,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         Memory._initialize();
 
         Msg("%s %s build %d, %s\n", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
+        PrintCI();
         Msg("command line %s\n", Params);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
