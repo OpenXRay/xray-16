@@ -31,6 +31,9 @@ void CRenderDevice::Destroy()
     seqDeviceReset.Clear();
     seqParallel.clear();
     xr_delete(Statistic);
+
+    SDL_DestroyWindow(m_sdlWnd);
+    SDL_Quit();
 }
 
 #include "IGame_Level.h"

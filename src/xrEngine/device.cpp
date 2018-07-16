@@ -367,10 +367,6 @@ void CRenderDevice::message_loop()
                     break;
                 }
                 break;
-            case SDL_QUIT:
-                SDL_DestroyWindow(m_sdlWnd);
-                SDL_Quit();
-                break;
             default: SDL_Log("Window event %d to %d,%d", event.type, event.window.data1, event.window.data2); break;
             }
         }
