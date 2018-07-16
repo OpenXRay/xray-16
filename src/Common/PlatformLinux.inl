@@ -52,25 +52,25 @@
 #define CALLBACK
 #define TEXT(x) strdup(x)
 
-inline char *_strlwr_l(char *str, locale_t loc)
+inline char* _strlwr_l(char* str, locale_t loc)
 {
 //TODO
 }
 
-inline char *_strupr_l(char *str, locale_t loc)
+inline char* _strupr_l(char* str, locale_t loc)
 {
 //TODO
 }
 
 #define VOID void
-#define HKL void *
+#define HKL void*
 #define ActivateKeyboardLayout(x, y) {}
 #define ScreenToClient(hwnd, p) {}
 
 #define __except(X) catch(X)
 
 /*
-static inline long InterlockedExchange(volatile long *val, long new_val)
+static inline long InterlockedExchange(volatile long* val, long new_val)
 {
   long old_val;
   do {
@@ -91,11 +91,11 @@ inline void Sleep(int ms)
 }
 
 inline void _splitpath (
-        const char *path,  // Path Input
-        char *drive,       // Drive     : Output
-        char *dir,         // Directory : Output
-        char *fname,       // Filename  : Output
-        char *ext          // Extension : Output
+        const char* path,  // Path Input
+        char* drive,       // Drive     : Output
+        char* dir,         // Directory : Output
+        char* fname,       // Filename  : Output
+        char* ext          // Extension : Output
 ){}
 
 inline unsigned long GetLastError()
@@ -130,8 +130,8 @@ typedef unsigned short WORD;
 typedef unsigned short* LPWORD;
 typedef unsigned long DWORD;
 typedef unsigned long* LPDWORD;
-typedef const void *LPCVOID;
-typedef long long int *PLARGE_INTEGER;
+typedef const void* LPCVOID;
+typedef long long int* PLARGE_INTEGER;
 
 typedef wchar_t WCHAR;
 
@@ -183,17 +183,17 @@ typedef long LONG_PTR;
 #endif // XR_X64
 
 typedef int HANDLE;
-typedef void *HMODULE;
-typedef void *LPVOID;
+typedef void* HMODULE;
+typedef void* LPVOID;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef long HRESULT;
 typedef long LRESULT;
 typedef long _W64;
-//typedef void *HWND;
-typedef SDL_Window *HWND;
-typedef void *HDC;
-//typedef void *HGLRC;
+//typedef void* HWND;
+typedef SDL_Window* HWND;
+typedef void* HDC;
+//typedef void* HGLRC;
 typedef SDL_GLContext HGLRC;
 typedef float FLOAT;
 typedef unsigned char UINT8;
