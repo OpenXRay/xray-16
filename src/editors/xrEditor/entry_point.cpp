@@ -26,7 +26,7 @@ void UIThreadProc(void*)
     Core.Initialize("OpenXRayEditor", LogCallback(ELogCallback, windowIDE->Log().Handle.ToPointer()), true);
 
 #ifdef XR_X64
-    Device.m_sdlWnd = (SDL_Window *)windowIDE->View().GetViewHandle().ToInt64();
+    Device.m_sdlWnd = (SDL_Window*)windowIDE->View().GetViewHandle().ToInt64();
 #else
     Device.m_sdlWnd = (SDL_Window*)windowIDE->View().GetViewHandle().ToInt32();
 #endif

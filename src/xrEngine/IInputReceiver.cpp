@@ -55,7 +55,7 @@ void IInputReceiver::IR_GetMousePosScreen(Ivector2& p)
     SDL_GetMouseState(&p.x, &p.y);
 }
 
-void IInputReceiver::IR_GetMousePosReal(SDL_Window *m_sdlWnd, Ivector2& p)
+void IInputReceiver::IR_GetMousePosReal(SDL_Window* m_sdlWnd, Ivector2& p)
 {
     IR_GetMousePosScreen(p);
 }
