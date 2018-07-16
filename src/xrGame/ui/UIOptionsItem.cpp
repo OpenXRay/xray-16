@@ -75,6 +75,8 @@ void CUIOptionsItem::SaveOptValue()
         m_optionsManager.DoVidRestart();
     else if (m_dep == sdSndRestart)
         m_optionsManager.DoSndRestart();
+    else if (m_dep == sdUIRestart)
+        m_optionsManager.DoUIRestart();
     else if (m_dep == sdSystemRestart)
         m_optionsManager.DoSystemRestart();
 }

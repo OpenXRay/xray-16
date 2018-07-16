@@ -12,6 +12,7 @@ public:
         sdNothing,
         sdVidRestart,
         sdSndRestart,
+        sdUIRestart,
         sdSystemRestart,
         sdApplyOnChange
     };

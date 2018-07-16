@@ -103,10 +103,15 @@ void CUIOptionsManager::OptionsPostAccept()
     if (m_restart_flags & e_snd_restart)
         Console->Execute("snd_restart");
 
+    if (m_restart_flags & e_ui_restart)
+        Console->Execute("ui_restart");
+
     m_restart_flags &= ~e_vid_restart;
     m_restart_flags &= ~e_snd_restart;
+    m_restart_flags &= ~e_ui_restart;
 }
 
 void CUIOptionsManager::DoVidRestart() { m_restart_flags |= e_vid_restart; }
 void CUIOptionsManager::DoSndRestart() { m_restart_flags |= e_snd_restart; }
+void CUIOptionsManager::DoUIRestart() { m_restart_flags |= e_ui_restart; }
 void CUIOptionsManager::DoSystemRestart() { m_restart_flags |= e_system_restart; }
