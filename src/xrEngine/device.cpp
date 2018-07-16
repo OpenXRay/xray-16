@@ -348,9 +348,11 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_MOVED:
                     SDL_Log("Window %d moved to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
                     break;
+                case SDL_WINDOWEVENT_RESIZED:
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                     SDL_Log(
                         "Window %d resized to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
+                    OnWM_Activate(1, event.window.data2);
                     break;
                 case SDL_WINDOWEVENT_CLOSE: event.type = SDL_QUIT; break;
                 case SDL_WINDOWEVENT_SHOWN:
@@ -399,7 +401,6 @@ void CRenderDevice::Run()
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
-    SDL_FlushEvents(SDL_FIRSTEVENT, SDL_SYSWMEVENT);
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
     pInput->ClipCursor(true);
