@@ -5,7 +5,6 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 
-
 extern XRCDB_API BOOL* cdb_bDebug;
 
 void CRenderDevice::_SetupStates()
@@ -39,11 +38,6 @@ void CRenderDevice::Create()
     fASPECT = 1.f;
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
     UpdateWindowProps();
-    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
-    int w = 0, h = 0;
-    SDL_GetWindowSize(m_sdlWnd, &w, &h);
-    m_rcWindowClient.w = m_rcWindowClient.x + w;
-    m_rcWindowClient.h = m_rcWindowClient.y + h;
     Memory.mem_compact();
     b_is_Ready = TRUE;
     _SetupStates();
@@ -73,7 +67,7 @@ void CRenderDevice::UpdateWindowProps()
         else
         {
             int top = 0, left = 0, right = 0, bottom = 0;
-            //SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
+            // SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
 #ifdef WINDOWS
             // XXX: Currently SDL_GetWindowBordersSize is supported only on X11
             // For now we must use method below.
@@ -83,6 +77,29 @@ void CRenderDevice::UpdateWindowProps()
 #pragma TODO("Implement for other platforms")
 #endif
             SDL_SetWindowPosition(m_sdlWnd, left, top);
+        }
+
+        SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
+        int w = 0, h = 0;
+        SDL_GetWindowSize(m_sdlWnd, &w, &h);
+        m_rcWindowClient.w = m_rcWindowClient.x + w;
+        m_rcWindowClient.h = m_rcWindowClient.y + h;
+    }
+    else
+    {
+        SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+        SDL_DisplayMode mode;
+        SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
+        mode.w = dwWidth;
+        mode.h = dwHeight;
+
+        if(SDL_SetWindowDisplayMode(m_sdlWnd, &mode) != 0)
+            Log("Cannot setup video mode:", SDL_GetError());
+        else
+        {
+            SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
+            m_rcWindowClient.w = mode.w;
+            m_rcWindowClient.h = mode.h;
         }
     }
 

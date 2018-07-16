@@ -17,24 +17,18 @@ void free_vid_mode_list();
 
 CHW HW;
 
-void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLenum severity,
-                              GLsizei /*length*/, const GLchar* message, const void* /*userParam*/)
+void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLenum severity, GLsizei /*length*/,
+    const GLchar* message, const void* /*userParam*/)
 {
     if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
         Log(message, id);
 }
 
-CHW::CHW() :
-    pDevice(this),
-    pContext(this),
-    m_pSwapChain(this),
-    pBaseRT(0),
-    pBaseZB(0),
-    pPP(0),
-    pFB(0),
-    m_hWnd(nullptr),
-    m_hDC(nullptr),
-    m_hRC(nullptr) {}
+CHW::CHW()
+    : pDevice(this), pContext(this), m_pSwapChain(this), pBaseRT(0), pBaseZB(0), pPP(0), pFB(0), m_hWnd(nullptr),
+      m_hDC(nullptr), m_hRC(nullptr)
+{
+}
 
 CHW::~CHW() {}
 //////////////////////////////////////////////////////////////////////
@@ -46,7 +40,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     R_ASSERT(m_hWnd);
 
-    //Choose the closest pixel format
+    // Choose the closest pixel format
     SDL_DisplayMode mode;
     SDL_GetWindowDisplayMode(m_hWnd, &mode);
     mode.format = SDL_PIXELFORMAT_RGBA8888;
@@ -82,8 +76,8 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     }
 
 #ifdef DEBUG
-	CHK_GL(glEnable(GL_DEBUG_OUTPUT));
-	CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    CHK_GL(glEnable(GL_DEBUG_OUTPUT));
+    CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
 #endif // DEBUG
 
     // Clip control ensures compatibility with D3D device coordinates.
@@ -151,17 +145,23 @@ void fill_vid_mode_list(CHW* /*_hw*/)
 
     int i = 0;
     auto& AVM = AvailableVideoModes;
-    while (EnumDisplaySettings(nullptr, iModeNum++, &dmi) != 0)
+
+    int num_modes = SDL_GetNumDisplayModes(0);
+    Log("found video modes:", num_modes);
+
+    for (i = 0; i < num_modes; i++)
     {
+        SDL_DisplayMode mode;
+        SDL_GetDisplayMode(0, i, &mode);
+
         string32 str;
 
-        xr_sprintf(str, sizeof(str), "%dx%d", dmi.dmPelsWidth, dmi.dmPelsHeight);
+        xr_sprintf(str, sizeof(str), "%dx%d", mode.w, mode.h);
 
         if (AVM.cend() != find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
             continue;
 
         AVM.emplace_back(xr_token(xr_strdup(str), i));
-        ++i;
     }
     AVM.emplace_back(xr_token(nullptr, -1));
 
@@ -190,7 +190,6 @@ void CHW::UpdateViews()
     CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseZB));
     CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
 }
-
 
 void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
 {
@@ -221,7 +220,6 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
         mask |= (u32)GL_DEPTH_BUFFER_BIT;
     if (ClearFlags & D3D_CLEAR_STENCIL)
         mask |= (u32)GL_STENCIL_BUFFER_BIT;
-
 
     glPushAttrib(mask);
     if (ClearFlags & D3D_CLEAR_DEPTH)
