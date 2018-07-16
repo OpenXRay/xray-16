@@ -25,11 +25,11 @@ public:
     void DestroyD3D();
 #endif // !USE_OGL
 
-    void CreateDevice(SDL_Window* m_sdlWnd, bool move_window);
+    void CreateDevice(SDL_Window* m_sdlWnd);
 
     void DestroyDevice();
 
-    void Reset(SDL_Window* m_sdlWnd);
+    void Reset();
 
 #ifndef USE_OGL
     void selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed);
@@ -40,7 +40,6 @@ public:
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 #endif // !USE_OGL
 
-    void updateWindowProps(SDL_Window* m_sdlWnd);
 #ifdef DEBUG
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     void Validate(void){};
@@ -145,9 +144,6 @@ public:
 #endif // USE_OGL
 
     int maxRefreshRate = 200; // ECO_RENDER add
-
-private:
-    bool m_move_window = true;
 };
 
 extern ECORE_API CHW HW;

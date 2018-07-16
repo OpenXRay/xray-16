@@ -249,6 +249,8 @@ public:
     void Destroy(void);
     void Reset(bool precache = true);
 
+    void UpdateWindowProps();
+
     void Initialize(void);
     void ShutDown(void);
     virtual const RenderDeviceStatictics& GetStats() const override { return stats; }

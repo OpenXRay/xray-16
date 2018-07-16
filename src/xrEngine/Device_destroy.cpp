@@ -46,6 +46,13 @@ void CRenderDevice::Reset(bool precache)
     const auto tm_start = TimerAsync();
 
     GEnv.Render->Reset(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
+    UpdateWindowProps();
+
+    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
+    int w = 0, h = 0;
+    SDL_GetWindowSize(m_sdlWnd, &w, &h);
+    m_rcWindowClient.w = m_rcWindowClient.x + w;
+    m_rcWindowClient.h = m_rcWindowClient.y + h;
 
     if (g_pGamePersistent)
         g_pGamePersistent->Environment().bNeed_re_create_env = true;
