@@ -46,12 +46,12 @@ void CRenderDevice::Initialize()
 
     if (!m_sdlWnd)
     {
-        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL;
+        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 #endif
 
-        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, flags);
+        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 640, 480, flags);
        
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
     }

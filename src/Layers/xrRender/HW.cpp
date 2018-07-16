@@ -36,13 +36,12 @@ void CHW::DestroyD3D()
     _RELEASE(pD3D);
 }
 
-void CHW::CreateDevice(SDL_Window* m_sdlWnd, bool move_window)
+void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
-    m_move_window = move_window;
     CreateD3D();
 
     bool bWindowed = !psDeviceFlags.is(rsFullscreen);
-    if (GEnv.isDedicatedServer)
+    if (GEnv.isDedicatedServer || Device.editor())
         bWindowed = true;
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
@@ -214,7 +213,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd, bool move_window)
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 
-    updateWindowProps(m_sdlWnd);
     fill_vid_mode_list(this);
 }
 
@@ -240,7 +238,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 // Resetting device
 //////////////////////////////////////////////////////////////////////
-void CHW::Reset(SDL_Window* m_sdlWnd)
+void CHW::Reset()
 {
 #ifdef DEBUG
     _RELEASE(dwDebugSB);
@@ -284,9 +282,6 @@ void CHW::Reset(SDL_Window* m_sdlWnd)
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
-
-    updateWindowProps(m_sdlWnd);
-    SDL_ShowWindow(m_sdlWnd);
 }
 
 D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
@@ -464,55 +459,6 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
     if (FAILED(result))
         return FALSE;
     return TRUE;
-}
-
-void CHW::updateWindowProps(SDL_Window *m_sdlWnd)
-{
-    bool bWindowed = !psDeviceFlags.is(rsFullscreen);
-
-    if (GEnv.isDedicatedServer)
-        bWindowed = true;
-
-    u32 dwWindowStyle = 0;
-    // Set window properties depending on what mode were in.
-    if (bWindowed)
-    {
-        if (m_move_window)
-        {
-            if(NULL != strstr(Core.Params, "-draw_borders"))
-                SDL_SetWindowBordered(m_sdlWnd, SDL_TRUE);
-            // When moving from fullscreen to windowed mode, it is important to
-            // adjust the window size after recreating the device rather than
-            // beforehand to ensure that you get the window size you want.  For
-            // example, when switching from 640x480 fullscreen to windowed with
-            // a 1000x600 window on a 1024x768 desktop, it is impossible to set
-            // the window size to 1000x600 until after the display mode has
-            // changed to 1024x768, because windows cannot be larger than the
-            // desktop.
-
-            bool centerScreen = false;
-            if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
-                centerScreen = true;
-
-            SDL_SetWindowSize(m_sdlWnd, DevPP.BackBufferWidth, DevPP.BackBufferHeight);
-
-            if (centerScreen)
-            {
-                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-            }
-            else
-            {
-                SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED);
-            }
-        }
-    }
-    else
-    {
-        SDL_ShowWindow(m_sdlWnd);
-    }
-
-    if (!GEnv.isDedicatedServer)
-        SDL_SetWindowGrab(m_sdlWnd, SDL_TRUE);
 }
 
 struct uniqueRenderingMode

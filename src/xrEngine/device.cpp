@@ -355,12 +355,6 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_CLOSE: event.type = SDL_QUIT; break;
                 case SDL_WINDOWEVENT_SHOWN:
                     SDL_Log("Window %d has been shown", event.window.windowID);
-
-                    if (editor())
-                    {
-                        Device.b_is_Active = TRUE;
-                        break;
-                    }
                     OnWM_Activate(1, event.window.data2);
                     break;
                 case SDL_WINDOWEVENT_HIDDEN:
@@ -409,7 +403,9 @@ void CRenderDevice::Run()
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
+    SDL_FlushEvents(SDL_FIRSTEVENT, SDL_SYSWMEVENT);
     SDL_ShowWindow(m_sdlWnd);
+    SDL_RaiseWindow(m_sdlWnd);
     pInput->ClipCursor(true);
     message_loop();
     seqAppEnd.Process();
