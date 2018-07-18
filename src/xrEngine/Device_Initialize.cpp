@@ -39,10 +39,7 @@ void CRenderDevice::Initialize()
     if (strstr(Core.Params, "-weather"))
         initialize_weather_editor();
 
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-    {
-        Log("Unable to initialize SDL: %s", SDL_GetError());
-    }
+    R_ASSERT3(SDL_Init(SDL_INIT_EVERYTHING) == 0, "Unable to initialize SDL", SDL_GetError());
 
     if (!m_sdlWnd)
     {
@@ -51,18 +48,10 @@ void CRenderDevice::Initialize()
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 #endif
 
-        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 640, 480, flags);
+        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 0, 0, flags);
        
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
     }
-    // Save window properties
-    m_dwWindowStyle = SDL_GetWindowFlags(m_sdlWnd);
-
-    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
-    int w = 0, h = 0;
-    SDL_GetWindowSize(m_sdlWnd, &w, &h);
-    m_rcWindowClient.w = m_rcWindowClient.x + w;
-    m_rcWindowClient.h = m_rcWindowClient.y + h;
 }
 
 void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)

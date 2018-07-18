@@ -154,7 +154,6 @@ public:
 
 private:
     // Main objects used for creating and rendering the 3D scene
-    u32 m_dwWindowStyle;
     CTimer TimerMM;
     RenderDeviceStatictics stats;
 
@@ -206,7 +205,7 @@ public:
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
-        : m_dwWindowStyle(0), fWidth_2(0), fHeight_2(0), m_editor_module(nullptr), m_editor_initialize(nullptr),
+        : fWidth_2(0), fHeight_2(0), m_editor_module(nullptr), m_editor_initialize(nullptr),
           m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
     {
         m_sdlWnd = NULL;
@@ -249,7 +248,9 @@ public:
     void Destroy(void);
     void Reset(bool precache = true);
 
-    void UpdateWindowProps();
+    void UpdateWindowProps(bool windowed);
+    void UpdateWindowRect();
+    void SelectResolution(bool windowed);
 
     void Initialize(void);
     void ShutDown(void);

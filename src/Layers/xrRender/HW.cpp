@@ -5,11 +5,6 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
-extern ENGINE_API xr_vector<xr_token> AvailableVideoModes;
-
-void fill_vid_mode_list(CHW* _hw);
-void free_vid_mode_list();
-
 CHW HW;
 
 CHW::CHW() {}
@@ -40,9 +35,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    bool bWindowed = !psDeviceFlags.is(rsFullscreen);
-    if (GEnv.isDedicatedServer || Device.editor())
-        bWindowed = true;
+    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -123,7 +116,8 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     D3DPRESENT_PARAMETERS& P = DevPP;
     ZeroMemory(&P, sizeof(P));
 
-    selectResolution(P.BackBufferWidth, P.BackBufferHeight, bWindowed);
+    DevPP.BackBufferWidth = Device.dwWidth;
+    DevPP.BackBufferHeight = Device.dwHeight;
 
     // Back buffer
     P.BackBufferFormat = fTarget;
@@ -160,15 +154,9 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Refresh rate
     if (bWindowed)
-    {
         P.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-        P.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
-    }
     else
-    {
         P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        P.FullScreen_RefreshRateInHz = selectRefresh(P.BackBufferWidth, P.BackBufferHeight, fTarget);
-    }
 
     // Create the device
     const auto GPU = selectGPU();
@@ -212,8 +200,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
-
-    fill_vid_mode_list(this);
 }
 
 void CHW::DestroyDevice()
@@ -231,8 +217,6 @@ void CHW::DestroyDevice()
     _RELEASE(HW.pDevice);
 
     DestroyD3D();
-
-    free_vid_mode_list();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -248,24 +232,17 @@ void CHW::Reset()
     _RELEASE(pBaseZB);
     _RELEASE(pBaseRT);
 
-    bool bWindowed = true;
-    if (!GEnv.isDedicatedServer)
-        bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
-    selectResolution(DevPP.BackBufferWidth, DevPP.BackBufferHeight, bWindowed);
+    DevPP.BackBufferWidth = Device.dwWidth;
+    DevPP.BackBufferHeight = Device.dwHeight;
     // Windoze
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
-    {
         DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        DevPP.FullScreen_RefreshRateInHz = selectRefresh(DevPP.BackBufferWidth, DevPP.BackBufferHeight, Caps.fTarget);
-    }
     else
-    {
         DevPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-        DevPP.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
-    }
 
     while (true)
     {
@@ -309,38 +286,6 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
         }
     }
     return D3DFMT_UNKNOWN;
-}
-
-void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
-{
-    fill_vid_mode_list(this);
-
-    if (GEnv.isDedicatedServer)
-    {
-        dwWidth = 640;
-        dwHeight = 480;
-        return;
-    }
-
-    if (bWindowed)
-    {
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
-    }
-    else // check
-    {
-        string64 buff;
-        xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
-
-        if (_ParseItem(buff, AvailableVideoModes.data()) == u32(-1)) // not found
-        { // select safe
-            xr_sprintf(buff, sizeof(buff), "vid_mode %s", AvailableVideoModes[0].name);
-            Console->Execute(buff);
-        }
-
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
-    }
 }
 
 u32 CHW::selectPresentInterval()
@@ -431,28 +376,6 @@ u32 CHW::selectGPU()
     return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 }
 
-u32 CHW::selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt)
-{
-    if (psDeviceFlags.is(rsRefresh60hz))
-        return D3DPRESENT_RATE_DEFAULT;
-
-    auto selected = D3DPRESENT_RATE_DEFAULT;
-    const auto count = pD3D->GetAdapterModeCount(DevAdapter, fmt);
-    for (u32 I = 0; I < count; I++)
-    {
-        D3DDISPLAYMODE Mode;
-        pD3D->EnumAdapterModes(DevAdapter, fmt, I, &Mode);
-        if (Mode.Width == dwWidth && Mode.Height == dwHeight)
-        {
-            //if (Mode.RefreshRate > selected)
-            //    selected = Mode.RefreshRate;
-            if (Mode.RefreshRate <= maxRefreshRate && Mode.RefreshRate>selected)
-                selected = Mode.RefreshRate;  //ECO_RENDER modif.
-        }
-    }
-    return selected;
-}
-
 BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 {
     auto result = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
@@ -467,46 +390,3 @@ struct uniqueRenderingMode
     pcstr value;
     bool operator()(const xr_token other) const { return !xr_stricmp(value, other.name);}
 };
-
-void free_vid_mode_list()
-{
-    for (auto& mode : AvailableVideoModes)
-        xr_free(mode.name);
-    AvailableVideoModes.clear();
-}
-
-void fill_vid_mode_list(CHW* _hw)
-{
-    if (!AvailableVideoModes.empty())
-        return;
-
-    xr_vector<D3DDISPLAYMODE> displayModes;
-
-    // Get the number of display modes available
-    const auto cnt = _hw->pD3D->GetAdapterModeCount(_hw->DevAdapter, _hw->Caps.fTarget);
-
-    // Get the list of display modes
-    displayModes.resize(cnt);
-    for (auto i = 0; i < cnt; ++i)
-        _hw->pD3D->EnumAdapterModes(_hw->DevAdapter, _hw->Caps.fTarget, i, &displayModes[i]);
-
-    int i = 0;
-    auto& AVM = AvailableVideoModes;
-    for (const auto& it : displayModes)
-    {
-        string32 str;
-
-        xr_sprintf(str, sizeof(str), "%dx%d", it.Width, it.Height);
-
-        if (AVM.cend() != std::find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
-            continue;
-
-        AVM.emplace_back(xr_token(xr_strdup(str), i));
-        ++i;
-    }
-    AVM.emplace_back(xr_token(nullptr, -1));
-
-    Msg("Available video modes[%d]:", AVM.size());
-    for (const auto& mode : AVM)
-        Msg("[%s]", mode.name);
-}

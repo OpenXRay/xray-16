@@ -10,11 +10,6 @@
 #include "Include/xrAPI/xrAPI.h"
 #include "xrCore/xr_token.h"
 
-extern ENGINE_API xr_vector<xr_token> AvailableVideoModes;
-
-void fill_vid_mode_list(CHW* _hw);
-void free_vid_mode_list();
-
 CHW HW;
 
 void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLenum severity, GLsizei /*length*/,
@@ -86,7 +81,6 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     //	Create render target and depth-stencil views here
     UpdateViews();
-    fill_vid_mode_list(this);
 }
 
 void CHW::DestroyDevice()
@@ -100,8 +94,6 @@ void CHW::DestroyDevice()
 
         m_hRC = nullptr;
     }
-
-    free_vid_mode_list();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -117,57 +109,6 @@ void CHW::Reset()
     CHK_GL(glDeleteTextures(1, &pBaseZB));
 
     UpdateViews();
-}
-
-struct uniqueRenderingMode
-{
-    uniqueRenderingMode(pcstr v) : value(v) {}
-    pcstr value;
-    bool operator()(const xr_token other) const { return !xr_stricmp(value, other.name); }
-};
-
-void free_vid_mode_list()
-{
-    for (auto& mode : AvailableVideoModes)
-        xr_free(mode.name);
-    AvailableVideoModes.clear();
-}
-
-void fill_vid_mode_list(CHW* /*_hw*/)
-{
-    if (!AvailableVideoModes.empty())
-        return;
-
-    DWORD iModeNum = 0;
-    DEVMODE dmi;
-    ZeroMemory(&dmi, sizeof dmi);
-    dmi.dmSize = sizeof dmi;
-
-    int i = 0;
-    auto& AVM = AvailableVideoModes;
-
-    int num_modes = SDL_GetNumDisplayModes(0);
-    Log("found video modes:", num_modes);
-
-    for (i = 0; i < num_modes; i++)
-    {
-        SDL_DisplayMode mode;
-        SDL_GetDisplayMode(0, i, &mode);
-
-        string32 str;
-
-        xr_sprintf(str, sizeof(str), "%dx%d", mode.w, mode.h);
-
-        if (AVM.cend() != find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
-            continue;
-
-        AVM.emplace_back(xr_token(xr_strdup(str), i));
-    }
-    AVM.emplace_back(xr_token(nullptr, -1));
-
-    Msg("Available video modes[%d]:", AVM.size());
-    for (const auto& mode : AVM)
-        Msg("[%s]", mode.name);
 }
 
 void CHW::UpdateViews()

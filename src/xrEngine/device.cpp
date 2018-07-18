@@ -28,6 +28,7 @@
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
 
@@ -343,33 +344,47 @@ void CRenderDevice::message_loop()
             switch (event.type)
             {
             case SDL_WINDOWEVENT:
+            {
                 switch (event.window.event)
                 {
                 case SDL_WINDOWEVENT_MOVED:
-                    SDL_Log("Window %d moved to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
+                    UpdateWindowRect();
                     break;
+                /*case SDL_WINDOWEVENT_RESIZED:
+                    string32 buff;
+                    xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
+                    Console->Execute(buff);
+                    [[fallthrough]];*/
+
+                case SDL_WINDOWEVENT_EXPOSED:
+                    Reset(true);
+                    break;
+
                 case SDL_WINDOWEVENT_RESIZED:
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    SDL_Log(
-                        "Window %d resized to %d,%d", event.window.windowID, event.window.data1, event.window.data2);
+                    UpdateWindowRect();
                     OnWM_Activate(1, event.window.data2);
                     break;
-                case SDL_WINDOWEVENT_CLOSE: event.type = SDL_QUIT; break;
+
                 case SDL_WINDOWEVENT_SHOWN:
-                    SDL_Log("Window %d has been shown", event.window.windowID);
+                case SDL_WINDOWEVENT_ENTER:
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                case SDL_WINDOWEVENT_RESTORED:
+                case SDL_WINDOWEVENT_MAXIMIZED:
                     OnWM_Activate(1, event.window.data2);
                     break;
+
                 case SDL_WINDOWEVENT_HIDDEN:
+                case SDL_WINDOWEVENT_LEAVE:
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                case SDL_WINDOWEVENT_MINIMIZED:
                     OnWM_Activate(0, event.window.data2);
-                    SDL_Log("Window %d has been hidden", event.window.windowID);
                     break;
-                default:
-                    SDL_Log("Window %d got unknown event %d with %d %d", event.window.windowID, event.window.event,
-                        event.window.data1, event.window.data2);
-                    break;
+
+                case SDL_WINDOWEVENT_CLOSE:
+                    event.type = SDL_QUIT;
                 }
-                break;
-            default: SDL_Log("Window event %d to %d,%d", event.type, event.window.data1, event.window.data2); break;
+            }
             }
         }
 
