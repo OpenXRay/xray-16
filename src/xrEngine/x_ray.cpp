@@ -166,7 +166,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 
         SDL_Event event;
         event.type = SDL_QUIT;
-        SDL_PeepEvents(&event, 1,SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+        SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 
         for (u32 i = 0; i < Levels.size(); i++)
         {

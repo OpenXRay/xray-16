@@ -164,10 +164,12 @@ void CInput::ClipCursor(bool clip)
     if (clip)
     {
         SDL_ShowCursor(SDL_DISABLE);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
     }
     else
     {
         SDL_ShowCursor(SDL_ENABLE);
+        SDL_SetRelativeMouseMode(SDL_FALSE);
     }
 }
 

@@ -32,11 +32,9 @@ public:
     void Reset();
 
 #ifndef USE_OGL
-    void selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed);
     D3DFORMAT selectDepthStencil(D3DFORMAT);
     u32 selectPresentInterval();
     u32 selectGPU();
-    u32 selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt);
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 #endif // !USE_OGL
 
@@ -130,8 +128,6 @@ public:
     void UpdateViews();
 #endif
 #if defined(USE_DX10) || defined(USE_DX11)
-    DXGI_RATIONAL selectRefresh(u32 dwWidth, u32 dwHeight, DXGI_FORMAT fmt);
-
     virtual void OnAppActivate();
     virtual void OnAppDeactivate();
 #endif //	USE_DX10
@@ -142,8 +138,6 @@ public:
     void ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil);
     HRESULT Present(UINT SyncInterval, UINT Flags);
 #endif // USE_OGL
-
-    int maxRefreshRate = 200; // ECO_RENDER add
 };
 
 extern ECORE_API CHW HW;
