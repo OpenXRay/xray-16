@@ -350,21 +350,22 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_MOVED:
                     UpdateWindowRect();
                     break;
-                /*case SDL_WINDOWEVENT_RESIZED:
-                    string32 buff;
-                    xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
-                    Console->Execute(buff);
-                    [[fallthrough]];*/
-
-                case SDL_WINDOWEVENT_EXPOSED:
-                    Reset(true);
-                    break;
 
                 case SDL_WINDOWEVENT_RESIZED:
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    UpdateWindowRect();
-                    OnWM_Activate(1, event.window.data2);
+                {
+                    if (!psDeviceFlags.is(rsFullscreen))
+                    {
+                        string32 buff;
+                        xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
+                        Console->Execute(buff);
+                        Reset();
+                    }
+                    else
+                        UpdateWindowRect();
+
                     break;
+                }
 
                 case SDL_WINDOWEVENT_SHOWN:
                 case SDL_WINDOWEVENT_ENTER:
@@ -389,6 +390,7 @@ void CRenderDevice::message_loop()
         }
 
         on_idle();
+        SDL_PumpEvents();
     }
 }
 
@@ -416,6 +418,7 @@ void CRenderDevice::Run()
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
+    SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
     pInput->ClipCursor(true);

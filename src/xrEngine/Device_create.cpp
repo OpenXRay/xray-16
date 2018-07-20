@@ -130,6 +130,7 @@ void CRenderDevice::UpdateWindowProps(bool windowed)
         SDL_SetWindowGrab(m_sdlWnd, SDL_TRUE);
 
     UpdateWindowRect();
+    SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
 }
 
 
