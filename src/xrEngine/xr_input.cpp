@@ -247,10 +247,8 @@ void CInput::OnFrame(void)
     stats.FrameTime.Begin();
     dwCurTime = RDEVICE.TimerAsync_MMT();
 
-    while (SDL_PollEvent(&event))
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_MOUSEWHEEL))
     {
-        BOOL b_break_cycle = false;
-
         switch (event.type)
         {
         case SDL_KEYDOWN: { 
@@ -310,16 +308,7 @@ void CInput::OnFrame(void)
                 cbStack.back()->IR_OnMouseWheel(event.wheel.y);
             }
             break;
-        case SDL_QUIT: // go to outside event loop
-            event.type = SDL_QUIT;
-            SDL_PushEvent(&event);
-            b_break_cycle = TRUE;
-            break;
-        default: break;
         }
-
-        if (b_break_cycle)
-            break;
     }
 
 #ifndef _EDITOR
