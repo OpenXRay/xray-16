@@ -355,7 +355,7 @@ void CExplosive::Explode()
     OnBeforeExplosion();
     //играем звук взрыва
 #ifdef LAYERED_SND_SHOOT
-	m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
+    m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<IGameObject*>(this), false, false, (u8)-1);
 #else
 	GEnv.Sound->play_at_pos(sndExplode, 0, pos, false);
 #endif	
