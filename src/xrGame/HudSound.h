@@ -55,11 +55,10 @@ class HUD_SOUND_COLLECTION
 
 public:
     ~HUD_SOUND_COLLECTION();
-
-#ifdef LAYERED_SND_SHOOT
-    shared_str m_alias; //Alundaio: For use when it's part of a layered Collection
+#ifdef	LAYERED_SND_SHOOT
+	HUD_SOUND_COLLECTION() :m_alias(NULL) {};
+	shared_str		m_alias; //Alundaio: For use when it's part of a layered Collection
 #endif
-
     xr_vector<HUD_SOUND_ITEM> m_sound_items; //Alundaio: made public
 
     HUD_SOUND_ITEM* FindSoundItem(LPCSTR alias, bool b_assert); //AVO: made public to check if sound is loaded
@@ -79,17 +78,16 @@ public:
 #ifdef LAYERED_SND_SHOOT
 class HUD_SOUND_COLLECTION_LAYERED
 {
-    xr_vector<HUD_SOUND_COLLECTION> m_sound_items;
-
+	xr_vector<HUD_SOUND_COLLECTION>	m_sound_items;
 public:
-    ~HUD_SOUND_COLLECTION_LAYERED();
-    HUD_SOUND_ITEM* FindSoundItem(pcstr alias, bool b_assert);
-    void PlaySound(pcstr alias, const Fvector& position, const IGameObject* parent, bool hud_mode, bool looped = false,
-                   u8 index = u8(-1));
-    void StopSound(pcstr alias);
-    void StopAllSounds();
-    void LoadSound(pcstr section, pcstr line, pcstr alias, bool exclusive = false, int type = sg_SourceType);
-    void SetPosition(pcstr alias, const Fvector& pos);
+	~HUD_SOUND_COLLECTION_LAYERED();
+	HUD_SOUND_ITEM*				FindSoundItem(LPCSTR alias, bool b_assert);
+    void PlaySound(LPCSTR alias, const Fvector& position, const IGameObject* parent, bool hud_mode, bool looped = false, u8 index = u8(-1));
+	void						StopSound(LPCSTR alias);
+	void						StopAllSounds();
+	void						LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
+	void						LoadSound(CInifile const *ini, LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
+	void						SetPosition(LPCSTR alias, const Fvector& pos);
 };
 #endif
-//-Alundaio 
+//-Alundaio
