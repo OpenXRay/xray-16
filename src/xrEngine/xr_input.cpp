@@ -165,41 +165,28 @@ void CInput::MouseUpdate()
     }
 }
 
-BOOL b_altF4 = FALSE;
 void CInput::KeyUpdate()
 {
-    if (b_altF4)
-        return;
-
-    const Uint8* state = SDL_GetKeyboardState(NULL);
-#ifndef _EDITOR
-    bool b_alt_tab = false;
-
-    if (!b_altF4 && state[SDL_SCANCODE_F4] && (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT]))
+    SDL_Event event;
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED))
     {
-        b_altF4 = TRUE;
-        Engine.Event.Defer("KERNEL:disconnect");
-        Engine.Event.Defer("KERNEL:quit");
-        SDL_Event ev;
-        ev.type = SDL_QUIT;
-        SDL_PushEvent(&ev);
-    }
-#endif
+        switch (event.type)
+        {
+        case SDL_KEYDOWN:
+            KBState[event.key.keysym.scancode] = true;
+            cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
+            break;
 
-#ifndef _EDITOR
-    if (Device.dwPrecacheFrame == 0)
-#endif
-    {
-#ifndef _EDITOR
-        if (state[SDL_SCANCODE_TAB] && (iGetAsyncKeyState(SDL_SCANCODE_LALT) || iGetAsyncKeyState(SDL_SCANCODE_RALT)))
-            b_alt_tab = true;
-#endif
+        case SDL_KEYUP:
+            KBState[event.key.keysym.scancode] = false;
+            cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
+            break;
+        }
     }
 
-#ifndef _EDITOR
-    if (b_alt_tab)
-        SDL_MinimizeWindow(Device.m_sdlWnd);
-#endif
+    for (u32 i = 0; i < COUNT_KB_BUTTONS; ++i)
+        if (KBState[i])
+            cbStack.back()->IR_OnKeyboardHold(i);
 }
 
 bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
@@ -322,8 +309,6 @@ void CInput::OnAppDeactivate(void)
 
 void CInput::OnFrame(void)
 {
-    SDL_Event event;
-
     stats.FrameStart();
     stats.FrameTime.Begin();
     dwCurTime = RDEVICE.TimerAsync_MMT();
@@ -331,42 +316,7 @@ void CInput::OnFrame(void)
     if (Device.dwPrecacheFrame == 0)
     {
         MouseUpdate();
-    }
-
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED))
-    {
-        switch (event.type)
-        {
-        case SDL_KEYDOWN: { 
-            KBState[event.key.keysym.scancode] = TRUE;
-#ifndef _EDITOR
-            if (Device.dwPrecacheFrame == 0)
-#endif
-            {
-                cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
-            }
-        }
-        break;
-        case SDL_KEYUP: { 
-            KBState[event.key.keysym.scancode] = FALSE;
-#ifndef _EDITOR
-            if (Device.dwPrecacheFrame == 0)
-#endif
-            {
-                cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
-            }
-        }
-        break;
-        }
-    }
-
-#ifndef _EDITOR
-    if (Device.dwPrecacheFrame == 0)
-#endif
-    {
-        for (u32 i = 0; i < COUNT_KB_BUTTONS; i++)
-            if (KBState[i])
-                cbStack.back()->IR_OnKeyboardHold(i);
+        KeyUpdate();
     }
 
     stats.FrameTime.End();
