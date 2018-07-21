@@ -199,18 +199,18 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
 }
 
-void CActor::IR_OnMouseWheel(int direction)
+void CActor::IR_OnMouseWheel(int x, int y)
 {
     if (hud_adj_mode)
     {
-        g_player_hud->tune(Ivector().set(0, 0, direction));
+        g_player_hud->tune(Ivector().set(0, 0, x));
         return;
     }
 
-    if (inventory().Action((direction > 0) ? (u16)kWPN_ZOOM_DEC : (u16)kWPN_ZOOM_INC, CMD_START))
+    if (inventory().Action((x > 0) ? (u16)kWPN_ZOOM_DEC : (u16)kWPN_ZOOM_INC, CMD_START))
         return;
 
-    if (direction > 0)
+    if (x > 0)
         OnNextWeaponSlot();
     else
         OnPrevWeaponSlot();

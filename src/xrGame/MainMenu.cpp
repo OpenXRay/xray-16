@@ -369,12 +369,12 @@ void CMainMenu::IR_OnKeyboardHold(int dik)
     CDialogHolder::IR_UIOnKeyboardHold((SDL_Scancode)dik);
 };
 
-void CMainMenu::IR_OnMouseWheel(int direction)
+void CMainMenu::IR_OnMouseWheel(int x, int y)
 {
     if (!IsActive())
         return;
 
-    CDialogHolder::IR_UIOnMouseWheel(direction);
+    CDialogHolder::IR_UIOnMouseWheel(x, y);
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }

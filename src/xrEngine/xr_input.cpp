@@ -125,6 +125,7 @@ void CInput::MouseUpdate()
             cbStack.back()->IR_OnMousePress(event.button.button - 1);
             break;
         case SDL_MOUSEWHEEL:
+            mouseMoved = true;
             timeStamp[2] = dwCurTime + event.wheel.timestamp;
             timeStamp[3] = dwCurTime + event.wheel.timestamp;
             offs[2] += event.wheel.y;
@@ -152,8 +153,8 @@ void CInput::MouseUpdate()
     {
         if (offs[0] || offs[1])
             cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
-        if (offs[2])
-            cbStack.back()->IR_OnMouseWheel(offs[2]);
+        if (offs[2] || offs[3])
+            cbStack.back()->IR_OnMouseWheel(offs[2], offs[3]);
     }
     else
     {
