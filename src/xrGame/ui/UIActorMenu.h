@@ -333,7 +333,7 @@ public:
     virtual void Update();
     virtual void Show(bool status);
 
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
 
     void CallMessageBoxYesNo(LPCSTR text);

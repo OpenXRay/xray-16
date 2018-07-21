@@ -309,7 +309,7 @@ bool CUIActorMenu::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return true; // no click`s
 }
 
-bool CUIActorMenu::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     InfoCurItem(NULL);
     if (is_binded(kDROP, dik))

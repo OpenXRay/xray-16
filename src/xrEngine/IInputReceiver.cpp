@@ -28,7 +28,7 @@ void IInputReceiver::IR_OnDeactivate(void)
     int i;
     for (i = 0; i < CInput::COUNT_KB_BUTTONS; i++)
         if (IR_GetKeyState(i))
-            IR_OnKeyboardRelease((SDL_Scancode)i);
+            IR_OnKeyboardRelease(i);
 
     for (i = 0; i < CInput::COUNT_MOUSE_BUTTONS; i++)
         if (IR_GetBtnState(i))

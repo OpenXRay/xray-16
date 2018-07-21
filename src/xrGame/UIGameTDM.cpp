@@ -77,7 +77,7 @@ void CUIGameTDM::UnLoad()
 }
 
 CUIGameTDM::~CUIGameTDM() {}
-bool CUIGameTDM::IR_UIOnKeyboardPress(SDL_Scancode dik)
+bool CUIGameTDM::IR_UIOnKeyboardPress(int dik)
 {
     switch (dik)
     {
@@ -97,7 +97,7 @@ bool CUIGameTDM::IR_UIOnKeyboardPress(SDL_Scancode dik)
     return inherited::IR_UIOnKeyboardPress(dik);
 }
 
-bool CUIGameTDM::IR_UIOnKeyboardRelease(SDL_Scancode dik)
+bool CUIGameTDM::IR_UIOnKeyboardRelease(int dik)
 {
     switch (dik)
     {

@@ -77,8 +77,8 @@ public:
     virtual void Update();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
-    virtual bool OnKeyboardHold(SDL_Scancode dik);
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardHold(int dik);
 
     IC void UpdateNews() { m_need_reload = true; }
     void xr_stdcall PerformWork();

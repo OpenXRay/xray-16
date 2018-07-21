@@ -21,7 +21,7 @@ public:
 
     virtual void Init();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     void SetVisibleForBtn(ETEAMMENU_BTN btn, bool state);
     void SetCurTeam(int team);
 

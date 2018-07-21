@@ -45,9 +45,9 @@ void callback_base::on_key_press(line_edit_control* const control)
 
 // -------------------------------------------------------------------------------------------------
 
-type_pair::type_pair(SDL_Scancode dik, char c, char c_shift, bool b_translate) { init(dik, c, c_shift, b_translate); }
+type_pair::type_pair(int dik, char c, char c_shift, bool b_translate) { init(dik, c, c_shift, b_translate); }
 type_pair::~type_pair() {}
-void type_pair::init(SDL_Scancode dik, char c, char c_shift, bool b_translate)
+void type_pair::init(int dik, char c, char c_shift, bool b_translate)
 {
     m_translate = b_translate;
     m_dik = dik;

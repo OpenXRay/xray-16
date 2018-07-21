@@ -114,7 +114,7 @@ void CUISpawnWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool CUISpawnWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (WINDOW_KEY_PRESSED != keyboard_action)
     {

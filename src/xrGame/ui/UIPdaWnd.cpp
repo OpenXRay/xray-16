@@ -323,7 +323,7 @@ void RearrangeTabButtons(CUITabControl* pTab)
     pTab->SetWndPos(pos);
 }
 
-bool CUIPdaWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (is_binded(kACTIVE_JOBS, dik))
     {

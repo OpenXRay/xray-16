@@ -31,7 +31,7 @@ protected:
     void Initialize(int buttonCount);
     const NamedButton& GetButton(int i) const;
     // CUIDialogWnd
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboardAction) override;
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboardAction) override;
     // ~CUIDialogWnd
     // CUIWindow
     virtual void SendMessage(CUIWindow* wnd, s16 msg, void* data = nullptr) override;

@@ -337,7 +337,7 @@ void CUIMMShniaga::OnBtnClick()
         GetMessageTarget()->SendMessage(m_selected, BUTTON_CLICKED);
 }
 
-bool CUIMMShniaga::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (WINDOW_KEY_PRESSED == keyboard_action)
     {

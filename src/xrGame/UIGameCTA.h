@@ -115,8 +115,8 @@ public:
     virtual void OnFrame();
     virtual void Render();
 
-    virtual bool IR_UIOnKeyboardPress(SDL_Scancode dik);
-    virtual bool IR_UIOnKeyboardRelease(SDL_Scancode dik);
+    virtual bool IR_UIOnKeyboardPress(int dik);
+    virtual bool IR_UIOnKeyboardRelease(int dik);
 
     bool IsTeamPanelsShown();
     void ShowTeamPanels(bool bShow);

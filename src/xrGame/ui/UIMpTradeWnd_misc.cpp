@@ -11,7 +11,7 @@
 #include "Common/object_broker.h"
 #include "UICellCustomItems.h"
 
-bool CUIMpTradeWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
 #ifdef DEBUG
     // for debug only

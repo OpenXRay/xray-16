@@ -409,7 +409,7 @@ void CUIWindow::SetCapture(CUIWindow* pChildWindow, bool capture_status)
 }
 
 //реакция на клавиатуру
-bool CUIWindow::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIWindow::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     bool result;
 
@@ -438,7 +438,7 @@ bool CUIWindow::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIWindow::OnKeyboardHold(SDL_Scancode dik)
+bool CUIWindow::OnKeyboardHold(int dik)
 {
     bool result;
 

@@ -63,7 +63,7 @@ public:
     virtual bool OnMouseDown(int mouse_btn);
     virtual bool OnMouseDownEx();
     virtual void OnMouseUp(int mouse_btn);
-    virtual bool OnKeyboardHold(SDL_Scancode dik);
+    virtual bool OnKeyboardHold(int dik);
 
     virtual void Draw();
 

@@ -91,7 +91,7 @@ void CUIVotingCategory::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
 }
 
-bool CUIVotingCategory::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIVotingCategory::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 

@@ -25,7 +25,7 @@ void UIGameMP::ShowDemoPlayControl()
     GetUICursor().SetUICursorPosition(m_pDemoPlayControl->GetLastCursorPos());
 }
 
-bool UIGameMP::IR_UIOnKeyboardPress(SDL_Scancode dik)
+bool UIGameMP::IR_UIOnKeyboardPress(int dik)
 {
     if (is_binded(kCROUCH, dik) && Level().IsDemoPlay())
     {
@@ -41,7 +41,7 @@ bool UIGameMP::IR_UIOnKeyboardPress(SDL_Scancode dik)
     return inherited::IR_UIOnKeyboardPress(dik);
 }
 
-bool UIGameMP::IR_UIOnKeyboardRelease(SDL_Scancode dik) { return inherited::IR_UIOnKeyboardRelease(dik); }
+bool UIGameMP::IR_UIOnKeyboardRelease(int dik) { return inherited::IR_UIOnKeyboardRelease(dik); }
 /*
 bool UIGameMP::IsMapDescShown()
 {

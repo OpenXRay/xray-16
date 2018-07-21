@@ -239,7 +239,7 @@ void CDialogHolder::CleanInternals()
     GetUICursor().Hide();
 }
 
-bool CDialogHolder::IR_UIOnKeyboardPress(SDL_Scancode dik)
+bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
 {
     CUIDialogWnd* TIR = TopInputReceiver();
     if (!TIR)
@@ -279,7 +279,7 @@ bool CDialogHolder::IR_UIOnKeyboardPress(SDL_Scancode dik)
     return true;
 }
 
-bool CDialogHolder::IR_UIOnKeyboardRelease(SDL_Scancode dik)
+bool CDialogHolder::IR_UIOnKeyboardRelease(int dik)
 {
     CUIDialogWnd* TIR = TopInputReceiver();
     if (!TIR)
@@ -314,7 +314,7 @@ bool CDialogHolder::IR_UIOnKeyboardRelease(SDL_Scancode dik)
     return true;
 }
 
-bool CDialogHolder::IR_UIOnKeyboardHold(SDL_Scancode dik)
+bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
 {
     CUIDialogWnd* TIR = TopInputReceiver();
     if (!TIR)

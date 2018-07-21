@@ -34,7 +34,7 @@ public:
     virtual void Update();
     virtual bool OnMouseDown(int mouse_btn);
     virtual void OnFocusLost();
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
 
     virtual void SetText(LPCSTR text);
     void SetEditMode(bool b);

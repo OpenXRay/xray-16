@@ -341,7 +341,7 @@ void CUITalkWnd::SwitchToUpgrade()
     }
 }
 
-bool CUITalkWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
