@@ -62,6 +62,6 @@ public:
     virtual bool IR_UIOnKeyboardPress(SDL_Scancode dik);
     virtual bool IR_UIOnKeyboardRelease(SDL_Scancode dik);
     virtual bool IR_UIOnMouseMove(int dx, int dy);
-    virtual bool IR_UIOnMouseWheel(int direction);
+    virtual bool IR_UIOnMouseWheel(int x, int y);
     virtual bool IR_UIOnKeyboardHold(SDL_Scancode dik);
 };

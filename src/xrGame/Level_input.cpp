@@ -43,7 +43,7 @@ extern float g_fTimeFactor;
 
 #define CURRENT_ENTITY() (game ? ((GameID() == eGameIDSingle) ? CurrentEntity() : CurrentControlEntity()) : NULL)
 
-void CLevel::IR_OnMouseWheel(int direction)
+void CLevel::IR_OnMouseWheel(int x, int y)
 {
     if (g_bDisableAllInput)
         return;
@@ -51,10 +51,10 @@ void CLevel::IR_OnMouseWheel(int direction)
 #ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
-        g_actor->callback(GameObject::eMouseWheel)(direction);
+        g_actor->callback(GameObject::eMouseWheel)(x);
     /* avo: end */
 #endif
-    if (CurrentGameUI()->IR_UIOnMouseWheel(direction))
+    if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
         return;
     if (Device.Paused()
 #ifdef DEBUG
@@ -67,7 +67,7 @@ void CLevel::IR_OnMouseWheel(int direction)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnMouseWheel(direction);
+            IR->IR_OnMouseWheel(x, y);
     }
 }
 
