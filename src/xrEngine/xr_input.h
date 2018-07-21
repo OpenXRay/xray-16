@@ -24,8 +24,8 @@ public:
     enum
     {
         COUNT_MOUSE_BUTTONS = 8,
-        COUNT_MOUSE_AXIS = 3,
-        COUNT_KB_BUTTONS = SDL_SCANCODE_MODE
+        COUNT_MOUSE_AXIS = 4,
+        COUNT_KB_BUTTONS = SDL_NUM_SCANCODES
     };
 
     struct InputStatistics
@@ -41,35 +41,37 @@ private:
 
     u32 timeStamp[COUNT_MOUSE_AXIS];
     u32 timeSave[COUNT_MOUSE_AXIS];
-    int offs[COUNT_MOUSE_AXIS];
-    BOOL mouseState[COUNT_MOUSE_BUTTONS];
 
-    //----------------------
-    BOOL KBState[COUNT_KB_BUTTONS];
+    int offs[COUNT_MOUSE_AXIS];
+
+    bool mouseState[COUNT_MOUSE_BUTTONS];
+    bool KBState[COUNT_KB_BUTTONS];
 
     xr_vector<IInputReceiver*> cbStack;
 
+    void MouseUpdate();
     void KeyUpdate();
 
     InputStatistics stats;
 
 public:
     u32 dwCurTime;
+    u32 MouseDelta;
 
     const InputStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
-    void SetAllAcquire(BOOL bAcquire = TRUE);
-    void SetMouseAcquire(BOOL bAcquire);
-    void SetKBDAcquire(BOOL bAcquire);
+    void SetAllAcquire(bool bAcquire = true);
+    void SetMouseAcquire(bool bAcquire);
+    void SetKBDAcquire(bool bAcquire);
 
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
-    BOOL iGetAsyncKeyState(int dik);
-    BOOL iGetAsyncBtnState(int btn);
+    bool iGetAsyncKeyState(int dik);
+    bool iGetAsyncBtnState(int btn);
     void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
     void ClipCursor(bool clip);
 
-    CInput(BOOL bExclusive = true, int deviceForInit = default_key);
+    CInput(bool exclusive = true, int deviceForInit = default_key);
     ~CInput();
 
     virtual void OnFrame(void);
