@@ -300,13 +300,12 @@ bool CMainMenu::IsActive() { return !!m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
 
 // IInputReceiver
-static int mouse_button_2_key[] = { MOUSE_1, MOUSE_2, MOUSE_3, MOUSE_4, MOUSE_5, MOUSE_6, MOUSE_7, MOUSE_8 };
 void CMainMenu::IR_OnMousePress(int btn)
 {
     if (!IsActive())
         return;
 
-    IR_OnKeyboardPress(mouse_button_2_key[btn]);
+    IR_OnKeyboardPress(MouseButtonToKey[btn]);
 };
 
 void CMainMenu::IR_OnMouseRelease(int btn)
@@ -314,7 +313,7 @@ void CMainMenu::IR_OnMouseRelease(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardRelease(mouse_button_2_key[btn]);
+    IR_OnKeyboardRelease(MouseButtonToKey[btn]);
 };
 
 void CMainMenu::IR_OnMouseHold(int btn)
@@ -322,7 +321,7 @@ void CMainMenu::IR_OnMouseHold(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardHold(mouse_button_2_key[btn]);
+    IR_OnKeyboardHold(MouseButtonToKey[btn]);
 };
 
 void CMainMenu::IR_OnMouseMove(int x, int y)
