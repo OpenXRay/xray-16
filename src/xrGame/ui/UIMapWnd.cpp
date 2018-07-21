@@ -360,7 +360,7 @@ void CUIMapWnd::DrawHint()
     }
 }
 
-bool CUIMapWnd::OnKeyboardHold(SDL_Scancode dik)
+bool CUIMapWnd::OnKeyboardHold(int dik)
 {
     switch (dik)
     {
@@ -388,7 +388,7 @@ bool CUIMapWnd::OnKeyboardHold(SDL_Scancode dik)
     return inherited::OnKeyboardHold(dik);
 }
 
-bool CUIMapWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     switch (dik)
     {

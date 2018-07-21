@@ -46,7 +46,7 @@ public:
     void NeedUpdateQuestions();
     //инициализации начального диалога собеседника
     void InitOthersStartDialog();
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     void SwitchToTrade();
     void SwitchToUpgrade();
     void AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);

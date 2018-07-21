@@ -77,7 +77,7 @@ void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
     FillUpList();
 }
 
-bool CUIChangeMap::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIChangeMap::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (dik == SDL_SCANCODE_ESCAPE)
     {

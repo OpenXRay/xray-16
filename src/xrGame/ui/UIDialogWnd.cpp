@@ -17,14 +17,14 @@ void CUIDialogWnd::Show(bool status)
         ResetAll();
 }
 
-bool CUIDialogWnd::OnKeyboardHold(SDL_Scancode dik)
+bool CUIDialogWnd::OnKeyboardHold(int dik)
 {
     if (!IR_process())
         return false;
     return inherited::OnKeyboardHold(dik);
 }
 
-bool CUIDialogWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIDialogWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (!IR_process())
         return false;

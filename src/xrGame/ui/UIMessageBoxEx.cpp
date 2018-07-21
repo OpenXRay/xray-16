@@ -71,7 +71,7 @@ void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NUL
 
 LPCSTR CUIMessageBoxEx::GetHost() { return m_pMessageBox->GetHost(); }
 LPCSTR CUIMessageBoxEx::GetPassword() { return m_pMessageBox->GetPassword(); }
-bool CUIMessageBoxEx::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {

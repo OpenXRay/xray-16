@@ -116,7 +116,7 @@ bool CUICustomEdit::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return false;
 }
 
-bool CUICustomEdit::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUICustomEdit::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (!m_bInputFocus)
     {
@@ -137,7 +137,7 @@ bool CUICustomEdit::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_acti
     return false;
 }
 
-bool CUICustomEdit::OnKeyboardHold(SDL_Scancode dik)
+bool CUICustomEdit::OnKeyboardHold(int dik)
 {
     if (!m_bInputFocus)
     {

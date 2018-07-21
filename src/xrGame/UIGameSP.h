@@ -24,7 +24,7 @@ public:
     virtual ~CUIGameSP();
 
     virtual void SetClGame(game_cl_GameState* g);
-    virtual bool IR_UIOnKeyboardPress(SDL_Scancode dik);
+    virtual bool IR_UIOnKeyboardPress(int dik);
     virtual void OnFrame();
 
     void StartTalk(bool disable_break);
@@ -69,5 +69,5 @@ public:
     virtual bool WorkInPause() const { return true; }
     virtual void Show(bool status);
     virtual void Hide();
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
 };

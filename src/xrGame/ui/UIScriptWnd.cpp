@@ -42,7 +42,7 @@ void CUIDialogWndEx::AddCallback(
     c->m_event = evt;
 }
 
-bool CUIDialogWndEx::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIDialogWndEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

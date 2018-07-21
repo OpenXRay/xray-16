@@ -59,9 +59,9 @@ public:
     virtual void StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators);
     virtual void StopDialog(CUIDialogWnd* pDialog);
     virtual bool IgnorePause() { return false; }
-    virtual bool IR_UIOnKeyboardPress(SDL_Scancode dik);
-    virtual bool IR_UIOnKeyboardRelease(SDL_Scancode dik);
+    virtual bool IR_UIOnKeyboardPress(int dik);
+    virtual bool IR_UIOnKeyboardRelease(int dik);
     virtual bool IR_UIOnMouseMove(int dx, int dy);
     virtual bool IR_UIOnMouseWheel(int x, int y);
-    virtual bool IR_UIOnKeyboardHold(SDL_Scancode dik);
+    virtual bool IR_UIOnKeyboardHold(int dik);
 };

@@ -40,7 +40,7 @@ void ButtonListDialog::Initialize(int buttonCount)
 
 void ButtonListDialog::OnCancel() { HideDialog(); }
 const ButtonListDialog::NamedButton& ButtonListDialog::GetButton(int i) const { return buttons[i]; }
-bool ButtonListDialog::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboardAction)
+bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
 {
     CUIDialogWnd::OnKeyboardAction(dik, keyboardAction);
     if (WINDOW_KEY_PRESSED == keyboardAction)

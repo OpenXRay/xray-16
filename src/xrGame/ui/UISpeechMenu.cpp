@@ -54,7 +54,7 @@ void CUISpeechMenu::InitList(LPCSTR section_name)
     }
 }
 
-bool CUISpeechMenu::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUISpeechMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (dik < SDL_SCANCODE_1 || dik > SDL_SCANCODE_0)
         return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);

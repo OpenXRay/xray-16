@@ -9,83 +9,215 @@
 _binding g_key_bindings[bindings_count];
 _key_group g_current_keygroup = _sp;
 
-_action actions[] = {{"left", kLEFT, _both}, {"right", kRIGHT, _both}, {"up", kUP, _both}, {"down", kDOWN, _both},
-    {"jump", kJUMP, _both}, {"crouch", kCROUCH, _both}, {"accel", kACCEL, _both},
-    {"sprint_toggle", kSPRINT_TOGGLE, _both},
+_action actions[] =
+{
+    { "left", kLEFT, _both },
+    { "right", kRIGHT, _both },
+    { "up", kUP, _both },
+    { "down", kDOWN, _both },
+    { "jump", kJUMP, _both },
+    { "crouch", kCROUCH, _both },
+    { "accel", kACCEL, _both },
+    { "sprint_toggle", kSPRINT_TOGGLE, _both },
 
-    {"forward", kFWD, _both}, {"back", kBACK, _both}, {"lstrafe", kL_STRAFE, _both}, {"rstrafe", kR_STRAFE, _both},
+    { "forward", kFWD, _both },
+    { "back", kBACK, _both },
+    { "lstrafe", kL_STRAFE, _both },
+    { "rstrafe", kR_STRAFE, _both },
 
-    {"llookout", kL_LOOKOUT, _both}, {"rlookout", kR_LOOKOUT, _both},
+    { "llookout", kL_LOOKOUT, _both },
+    { "rlookout", kR_LOOKOUT, _both },
 
-    {"cam_1", kCAM_1, _both}, {"cam_2", kCAM_2, _both}, {"cam_3", kCAM_3, _both}, {"cam_zoom_in", kCAM_ZOOM_IN, _both},
-    {"cam_zoom_out", kCAM_ZOOM_OUT, _both},
+    { "cam_1", kCAM_1, _both },
+    { "cam_2", kCAM_2, _both },
+    { "cam_3", kCAM_3, _both },
+    { "cam_zoom_in", kCAM_ZOOM_IN, _both },
+    { "cam_zoom_out", kCAM_ZOOM_OUT, _both },
 
-    {"torch", kTORCH, _both}, {"night_vision", kNIGHT_VISION, _both}, {"show_detector", kDETECTOR, _sp},
+    { "torch", kTORCH, _both },
+    { "night_vision", kNIGHT_VISION, _both },
+    { "show_detector", kDETECTOR, _sp },
 
-    {"wpn_1", kWPN_1, _both}, {"wpn_2", kWPN_2, _both}, {"wpn_3", kWPN_3, _both}, {"wpn_4", kWPN_4, _both},
-    {"wpn_5", kWPN_5, _both}, {"wpn_6", kWPN_6, _both}, {"artefact", kARTEFACT, _both /*_mp*/},
-    {"wpn_next", kWPN_NEXT, _both}, // means next ammo type
-    {"wpn_fire", kWPN_FIRE, _both}, {"wpn_zoom", kWPN_ZOOM, _both}, {"wpn_zoom_inc", kWPN_ZOOM_INC, _both},
-    {"wpn_zoom_dec", kWPN_ZOOM_DEC, _both}, {"wpn_reload", kWPN_RELOAD, _both}, {"wpn_func", kWPN_FUNC, _both},
-    {"wpn_firemode_prev", kWPN_FIREMODE_PREV, _both}, {"wpn_firemode_next", kWPN_FIREMODE_NEXT, _both},
+    { "wpn_1", kWPN_1, _both },
+    { "wpn_2", kWPN_2, _both },
+    { "wpn_3", kWPN_3, _both },
+    { "wpn_4", kWPN_4, _both },
+    { "wpn_5", kWPN_5, _both },
+    { "wpn_6", kWPN_6, _both },
+    { "artefact", kARTEFACT, _both /*_mp*/},
+    { "wpn_next", kWPN_NEXT, _both }, // means next ammo type
+    { "wpn_fire", kWPN_FIRE, _both },
+    { "wpn_zoom", kWPN_ZOOM, _both },
+    { "wpn_zoom_inc", kWPN_ZOOM_INC, _both },
+    { "wpn_zoom_dec", kWPN_ZOOM_DEC, _both },
+    { "wpn_reload", kWPN_RELOAD, _both },
+    { "wpn_func", kWPN_FUNC, _both },
+    { "wpn_firemode_prev", kWPN_FIREMODE_PREV, _both },
+    { "wpn_firemode_next", kWPN_FIREMODE_NEXT, _both },
 
-    {"pause", kPAUSE, _both}, {"drop", kDROP, _both}, {"use", kUSE, _both}, {"scores", kSCORES, _both},
-    {"chat", kCHAT, _mp}, {"chat_team", kCHAT_TEAM, _mp}, {"screenshot", kSCREENSHOT, _both}, {"quit", kQUIT, _both},
-    {"console", kCONSOLE, _both}, {"inventory", kINVENTORY, _both}, {"buy_menu", kBUY, _mp}, {"skin_menu", kSKIN, _mp},
-    {"team_menu", kTEAM, _mp}, {"active_jobs", kACTIVE_JOBS, _sp},
+    { "pause", kPAUSE, _both },
+    { "drop", kDROP, _both },
+    { "use", kUSE, _both },
+    { "scores", kSCORES, _both },
+    { "chat", kCHAT, _mp },
+    { "chat_team", kCHAT_TEAM, _mp },
+    { "screenshot", kSCREENSHOT, _both },
+    { "quit", kQUIT, _both },
+    { "console", kCONSOLE, _both },
+    { "inventory", kINVENTORY, _both },
+    { "buy_menu", kBUY, _mp },
+    { "skin_menu", kSKIN, _mp },
+    { "team_menu", kTEAM, _mp },
+    { "active_jobs", kACTIVE_JOBS, _sp },
 
-    {"vote_begin", kVOTE_BEGIN, _mp}, {"show_admin_menu", kSHOW_ADMIN_MENU, _mp}, {"vote", kVOTE, _mp},
-    {"vote_yes", kVOTEYES, _mp}, {"vote_no", kVOTENO, _mp},
+    { "vote_begin", kVOTE_BEGIN, _mp },
+    { "show_admin_menu", kSHOW_ADMIN_MENU, _mp },
+    { "vote", kVOTE, _mp },
+    { "vote_yes", kVOTEYES, _mp },
+    { "vote_no", kVOTENO, _mp },
 
-    {"next_slot", kNEXT_SLOT, _both}, {"prev_slot", kPREV_SLOT, _both},
+    { "next_slot", kNEXT_SLOT, _both },
+    { "prev_slot", kPREV_SLOT, _both },
 
-    {"speech_menu_0", kSPEECH_MENU_0, _mp}, {"speech_menu_1", kSPEECH_MENU_1, _mp},
+    { "speech_menu_0", kSPEECH_MENU_0, _mp },
+    { "speech_menu_1", kSPEECH_MENU_1, _mp },
 
-    {"quick_use_1", kQUICK_USE_1, _both}, {"quick_use_2", kQUICK_USE_2, _both}, {"quick_use_3", kQUICK_USE_3, _both},
-    {"quick_use_4", kQUICK_USE_4, _both},
+    { "quick_use_1", kQUICK_USE_1, _both },
+    { "quick_use_2", kQUICK_USE_2, _both },
+    { "quick_use_3", kQUICK_USE_3, _both },
+    { "quick_use_4", kQUICK_USE_4, _both },
 
-    {"quick_save", kQUICK_SAVE, _sp}, {"quick_load", kQUICK_LOAD, _sp},
-    //	{ "alife_command",		kALIFE_CMD				,_sp},
+    { "quick_save", kQUICK_SAVE, _sp },
+    { "quick_load", kQUICK_LOAD, _sp },
+    //{ "alife_command", kALIFE_CMD, _sp },
 
-    {NULL, kLASTACTION, _both}};
+    { nullptr, kLASTACTION, _both}
+};
 
-_keyboard keyboards[] = {{"kESCAPE", SDL_SCANCODE_ESCAPE}, {"k1", SDL_SCANCODE_1}, {"k2", SDL_SCANCODE_2},
-    {"k3", SDL_SCANCODE_3}, {"k4", SDL_SCANCODE_4}, {"k5", SDL_SCANCODE_5}, {"k6", SDL_SCANCODE_6},
-    {"k7", SDL_SCANCODE_7}, {"k8", SDL_SCANCODE_8}, {"k9", SDL_SCANCODE_9}, {"k0", SDL_SCANCODE_0},
-    {"kMINUS", SDL_SCANCODE_MINUS}, {"kEQUALS", SDL_SCANCODE_EQUALS}, {"kBACK", SDL_SCANCODE_BACKSPACE},
-    {"kTAB", SDL_SCANCODE_TAB}, {"kQ", SDL_SCANCODE_Q}, {"kW", SDL_SCANCODE_W}, {"kE", SDL_SCANCODE_E},
-    {"kR", SDL_SCANCODE_R}, {"kT", SDL_SCANCODE_T}, {"kY", SDL_SCANCODE_Y}, {"kU", SDL_SCANCODE_U},
-    {"kI", SDL_SCANCODE_I}, {"kO", SDL_SCANCODE_O}, {"kP", SDL_SCANCODE_P}, {"kLBRACKET", SDL_SCANCODE_LEFTBRACKET},
-    {"kRBRACKET", SDL_SCANCODE_RIGHTBRACKET}, {"kRETURN", SDL_SCANCODE_RETURN}, {"kLCONTROL", SDL_SCANCODE_LCTRL},
-    {"kA", SDL_SCANCODE_A}, {"kS", SDL_SCANCODE_S}, {"kD", SDL_SCANCODE_D}, {"kF", SDL_SCANCODE_F},
-    {"kG", SDL_SCANCODE_G}, {"kH", SDL_SCANCODE_H}, {"kJ", SDL_SCANCODE_J}, {"kK", SDL_SCANCODE_K},
-    {"kL", SDL_SCANCODE_L}, {"kSEMICOLON", SDL_SCANCODE_SEMICOLON}, {"kAPOSTROPHE", SDL_SCANCODE_APOSTROPHE},
-    {"kGRAVE", SDL_SCANCODE_GRAVE}, {"kLSHIFT", SDL_SCANCODE_LSHIFT}, {"kBACKSLASH", SDL_SCANCODE_BACKSLASH},
-    {"kZ", SDL_SCANCODE_Z}, {"kX", SDL_SCANCODE_X}, {"kC", SDL_SCANCODE_C}, {"kV", SDL_SCANCODE_V},
-    {"kB", SDL_SCANCODE_B}, {"kN", SDL_SCANCODE_N}, {"kM", SDL_SCANCODE_M}, {"kCOMMA", SDL_SCANCODE_COMMA},
-    {"kPERIOD", SDL_SCANCODE_PERIOD}, {"kSLASH", SDL_SCANCODE_SLASH}, {"kRSHIFT", SDL_SCANCODE_RSHIFT},
-    {"kMULTIPLY", SDL_SCANCODE_KP_MULTIPLY}, {"kLMENU", SDL_SCANCODE_LALT}, {"kSPACE", SDL_SCANCODE_SPACE},
-    {"kCAPITAL", SDL_SCANCODE_CAPSLOCK}, {"kF1", SDL_SCANCODE_F1}, {"kF2", SDL_SCANCODE_F2}, {"kF3", SDL_SCANCODE_F3},
-    {"kF4", SDL_SCANCODE_F4}, {"kF5", SDL_SCANCODE_F5}, {"kF6", SDL_SCANCODE_F6}, {"kF7", SDL_SCANCODE_F7},
-    {"kF8", SDL_SCANCODE_F8}, {"kF9", SDL_SCANCODE_F9}, {"kF10", SDL_SCANCODE_F10},
-    {"kNUMLOCK", SDL_SCANCODE_NUMLOCKCLEAR}, {"kSCROLL", SDL_SCANCODE_SCROLLLOCK}, {"kNUMPAD7", SDL_SCANCODE_KP_7},
-    {"kNUMPAD8", SDL_SCANCODE_KP_8}, {"kNUMPAD9", SDL_SCANCODE_KP_9}, {"kSUBTRACT", SDL_SCANCODE_KP_MINUS},
-    {"kNUMPAD4", SDL_SCANCODE_KP_4}, {"kNUMPAD5", SDL_SCANCODE_KP_5}, {"kNUMPAD6", SDL_SCANCODE_KP_6},
-    {"kADD", SDL_SCANCODE_KP_PLUS}, {"kNUMPAD1", SDL_SCANCODE_KP_1}, {"kNUMPAD2", SDL_SCANCODE_KP_2},
-    {"kNUMPAD3", SDL_SCANCODE_KP_3}, {"kNUMPAD0", SDL_SCANCODE_KP_0}, {"kDECIMAL", SDL_SCANCODE_KP_DECIMAL},
-    {"kF11", SDL_SCANCODE_F11}, {"kF12", SDL_SCANCODE_F12}, {"kF13", SDL_SCANCODE_F13}, {"kF14", SDL_SCANCODE_F14},
-    {"kF15", SDL_SCANCODE_F15}, {"kNUMPADEQUALS", SDL_SCANCODE_KP_EQUALS}, {"kCIRCUMFLEX", SDL_SCANCODE_PAGEDOWN},
-    {"kAT", SDL_SCANCODE_KP_AT}, {"kCOLON", SDL_SCANCODE_KP_COLON}, {"kSTOP", SDL_SCANCODE_STOP},
-    {"kRCONTROL", SDL_SCANCODE_RCTRL}, {"kNUMPADCOMMA", SDL_SCANCODE_KP_COMMA}, {"kDIVIDE", SDL_SCANCODE_KP_DIVIDE},
-    {"kSYSRQ", SDL_SCANCODE_SYSREQ}, {"kRMENU", SDL_SCANCODE_RALT}, {"kHOME", SDL_SCANCODE_HOME},
-    {"kUP", SDL_SCANCODE_UP}, {"kPRIOR", SDL_SCANCODE_PAGEUP}, {"kLEFT", SDL_SCANCODE_LEFT},
-    {"kRIGHT", SDL_SCANCODE_RIGHT}, {"kEND", SDL_SCANCODE_END}, {"kDOWN", SDL_SCANCODE_DOWN},
-    {"kNEXT", SDL_SCANCODE_AUDIONEXT}, {"kINSERT", SDL_SCANCODE_INSERT}, {"kDELETE", SDL_SCANCODE_DELETE},
-    {"kLWIN", SDL_SCANCODE_LGUI}, {"kRWIN", SDL_SCANCODE_RGUI}, {"kAPPS", SDL_SCANCODE_APPLICATION},
-    {"kPAUSE", SDL_SCANCODE_PAUSE}, 
-    {"mouse1", MOUSE_1}, {"mouse2", MOUSE_2}, {"mouse3", MOUSE_3}, {"mouse4", MOUSE_4},
-    {"mouse5", MOUSE_5}, {"mouse6", MOUSE_6}, {"mouse7", MOUSE_7}, {"mouse8", MOUSE_8}, 
-    {NULL, SDL_SCANCODE_UNKNOWN}};
+_keyboard keyboards[] =
+{
+    { "kESCAPE", SDL_SCANCODE_ESCAPE },
+    { "k1", SDL_SCANCODE_1 },
+    { "k2", SDL_SCANCODE_2 },
+    { "k3", SDL_SCANCODE_3 },
+    { "k4", SDL_SCANCODE_4 },
+    { "k5", SDL_SCANCODE_5 },
+    { "k6", SDL_SCANCODE_6 },
+    { "k7", SDL_SCANCODE_7 },
+    { "k8", SDL_SCANCODE_8 },
+    { "k9", SDL_SCANCODE_9 },
+    { "k0", SDL_SCANCODE_0 },
+    { "kMINUS", SDL_SCANCODE_MINUS },
+    { "kEQUALS", SDL_SCANCODE_EQUALS },
+    { "kBACK", SDL_SCANCODE_BACKSPACE },
+    { "kTAB", SDL_SCANCODE_TAB },
+    { "kQ", SDL_SCANCODE_Q },
+    { "kW", SDL_SCANCODE_W },
+    { "kE", SDL_SCANCODE_E },
+    { "kR", SDL_SCANCODE_R },
+    { "kT", SDL_SCANCODE_T },
+    { "kY", SDL_SCANCODE_Y },
+    { "kU", SDL_SCANCODE_U },
+    { "kI", SDL_SCANCODE_I },
+    { "kO", SDL_SCANCODE_O },
+    { "kP", SDL_SCANCODE_P },
+    { "kLBRACKET", SDL_SCANCODE_LEFTBRACKET },
+    { "kRBRACKET", SDL_SCANCODE_RIGHTBRACKET },
+    { "kRETURN", SDL_SCANCODE_RETURN },
+    { "kLCONTROL", SDL_SCANCODE_LCTRL },
+    { "kA", SDL_SCANCODE_A },
+    { "kS", SDL_SCANCODE_S },
+    { "kD", SDL_SCANCODE_D },
+    { "kF", SDL_SCANCODE_F },
+    { "kG", SDL_SCANCODE_G },
+    { "kH", SDL_SCANCODE_H },
+    { "kJ", SDL_SCANCODE_J },
+    { "kK", SDL_SCANCODE_K },
+    { "kL", SDL_SCANCODE_L },
+    { "kSEMICOLON", SDL_SCANCODE_SEMICOLON },
+    { "kAPOSTROPHE", SDL_SCANCODE_APOSTROPHE },
+    { "kGRAVE", SDL_SCANCODE_GRAVE },
+    { "kLSHIFT", SDL_SCANCODE_LSHIFT },
+    { "kBACKSLASH", SDL_SCANCODE_BACKSLASH },
+    { "kZ", SDL_SCANCODE_Z },
+    { "kX", SDL_SCANCODE_X },
+    { "kC", SDL_SCANCODE_C },
+    { "kV", SDL_SCANCODE_V },
+    { "kB", SDL_SCANCODE_B },
+    { "kN", SDL_SCANCODE_N },
+    { "kM", SDL_SCANCODE_M },
+    { "kCOMMA", SDL_SCANCODE_COMMA },
+    { "kPERIOD", SDL_SCANCODE_PERIOD },
+    { "kSLASH", SDL_SCANCODE_SLASH },
+    { "kRSHIFT", SDL_SCANCODE_RSHIFT },
+    { "kMULTIPLY", SDL_SCANCODE_KP_MULTIPLY },
+    { "kLMENU", SDL_SCANCODE_LALT },
+    { "kSPACE", SDL_SCANCODE_SPACE },
+    { "kCAPITAL", SDL_SCANCODE_CAPSLOCK },
+    { "kF1", SDL_SCANCODE_F1 },
+    { "kF2", SDL_SCANCODE_F2 },
+    { "kF3", SDL_SCANCODE_F3 },
+    { "kF4", SDL_SCANCODE_F4 },
+    { "kF5", SDL_SCANCODE_F5 },
+    { "kF6", SDL_SCANCODE_F6 },
+    { "kF7", SDL_SCANCODE_F7 },
+    { "kF8", SDL_SCANCODE_F8 },
+    { "kF9", SDL_SCANCODE_F9 },
+    { "kF10", SDL_SCANCODE_F10 },
+    { "kNUMLOCK", SDL_SCANCODE_NUMLOCKCLEAR },
+    { "kSCROLL", SDL_SCANCODE_SCROLLLOCK },
+    { "kNUMPAD7", SDL_SCANCODE_KP_7 },
+    { "kNUMPAD8", SDL_SCANCODE_KP_8 },
+    { "kNUMPAD9", SDL_SCANCODE_KP_9 },
+    { "kSUBTRACT", SDL_SCANCODE_KP_MINUS },
+    { "kNUMPAD4", SDL_SCANCODE_KP_4 },
+    { "kNUMPAD5", SDL_SCANCODE_KP_5 },
+    { "kNUMPAD6", SDL_SCANCODE_KP_6 },
+    { "kADD", SDL_SCANCODE_KP_PLUS },
+    { "kNUMPAD1", SDL_SCANCODE_KP_1 },
+    { "kNUMPAD2", SDL_SCANCODE_KP_2 },
+    { "kNUMPAD3", SDL_SCANCODE_KP_3 },
+    { "kNUMPAD0", SDL_SCANCODE_KP_0 },
+    { "kDECIMAL", SDL_SCANCODE_KP_DECIMAL },
+    { "kF11", SDL_SCANCODE_F11 },
+    { "kF12", SDL_SCANCODE_F12 },
+    { "kF13", SDL_SCANCODE_F13 },
+    { "kF14", SDL_SCANCODE_F14 },
+    { "kF15", SDL_SCANCODE_F15 },
+    { "kNUMPADEQUALS", SDL_SCANCODE_KP_EQUALS },
+    { "kCIRCUMFLEX", SDL_SCANCODE_PAGEDOWN },
+    { "kAT", SDL_SCANCODE_KP_AT },
+    { "kCOLON", SDL_SCANCODE_KP_COLON },
+    { "kSTOP", SDL_SCANCODE_STOP },
+    { "kRCONTROL", SDL_SCANCODE_RCTRL },
+    { "kNUMPADCOMMA", SDL_SCANCODE_KP_COMMA },
+    { "kDIVIDE", SDL_SCANCODE_KP_DIVIDE },
+    { "kSYSRQ", SDL_SCANCODE_SYSREQ },
+    { "kRMENU", SDL_SCANCODE_RALT },
+    { "kHOME", SDL_SCANCODE_HOME },
+    { "kUP", SDL_SCANCODE_UP },
+    { "kPRIOR", SDL_SCANCODE_PAGEUP },
+    { "kLEFT", SDL_SCANCODE_LEFT },
+    { "kRIGHT", SDL_SCANCODE_RIGHT },
+    { "kEND", SDL_SCANCODE_END },
+    { "kDOWN", SDL_SCANCODE_DOWN },
+    { "kNEXT", SDL_SCANCODE_AUDIONEXT },
+    { "kINSERT", SDL_SCANCODE_INSERT },
+    { "kDELETE", SDL_SCANCODE_DELETE },
+    { "kLWIN", SDL_SCANCODE_LGUI },
+    { "kRWIN", SDL_SCANCODE_RGUI },
+    { "kAPPS", SDL_SCANCODE_APPLICATION },
+    { "kPAUSE", SDL_SCANCODE_PAUSE }, 
+    { "mouse1", MOUSE_1 },
+    { "mouse2", MOUSE_2 },
+    { "mouse3", MOUSE_3 },
+    { "mouse4", MOUSE_4 },
+    { "mouse5", MOUSE_5 },
+    { "mouse6", MOUSE_6 },
+    { "mouse7", MOUSE_7 }, 
+    { "mouse8", MOUSE_8 }, 
+    { nullptr, SDL_SCANCODE_UNKNOWN }
+};
 
 void initialize_bindings()
 {
@@ -170,7 +302,7 @@ _action* action_name_to_ptr(pcstr _name)
     return NULL;
 }
 
-pcstr dik_to_keyname(SDL_Scancode _dik)
+pcstr dik_to_keyname(int _dik)
 {
     _keyboard* kb = dik_to_ptr(_dik, true);
     if (kb)
@@ -179,7 +311,7 @@ pcstr dik_to_keyname(SDL_Scancode _dik)
         return NULL;
 }
 
-_keyboard* dik_to_ptr(SDL_Scancode _dik, bool bSafe)
+_keyboard* dik_to_ptr(int _dik, bool bSafe)
 {
     int idx = 0;
     while (keyboards[idx].key_name)
@@ -221,7 +353,7 @@ bool is_group_not_conflicted(_key_group g1, _key_group g2)
 }
 
 bool is_group_matching(_key_group g1, _key_group g2) { return ((g1 == g2) || (g1 == _both) || (g2 == _both)); }
-bool is_binded(EGameActions _action_id, SDL_Scancode _dik)
+bool is_binded(EGameActions _action_id, int _dik)
 {
     _binding* pbinding = &g_key_bindings[_action_id];
     if (pbinding->m_keyboard[0] && pbinding->m_keyboard[0]->dik == _dik)
@@ -253,7 +385,7 @@ int get_action_dik(EGameActions _action_id, int idx)
     return SDL_SCANCODE_UNKNOWN;
 }
 
-EGameActions get_binded_action(SDL_Scancode _dik)
+EGameActions get_binded_action(int _dik)
 {
     for (int idx = 0; idx < bindings_count; ++idx)
     {
@@ -526,7 +658,7 @@ void ConsoleBindCmds::save(IWriter* F)
 
     for (; it != m_bindConsoleCmds.end(); ++it)
     {
-        pcstr keyname = dik_to_keyname((SDL_Scancode) it->first);
+        pcstr keyname = dik_to_keyname(it->first);
         F->w_printf("bind_console %s %s\n", *it->second.cmd, keyname);
     }
 }

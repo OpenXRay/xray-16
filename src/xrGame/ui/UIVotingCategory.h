@@ -20,7 +20,7 @@ public:
     CUIVotingCategory();
     virtual ~CUIVotingCategory();
 
-    virtual bool OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action);
+    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
 
     void OnBtn(int i);

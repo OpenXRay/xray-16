@@ -64,7 +64,7 @@ void CUISequenceItem::Load(CUIXml* xml, int idx)
 bool CUISequenceItem::AllowKey(int dik)
 {
     xr_vector<int>::iterator it =
-        std::find(m_disabled_actions.begin(), m_disabled_actions.end(), get_binded_action((SDL_Scancode) dik));
+        std::find(m_disabled_actions.begin(), m_disabled_actions.end(), get_binded_action(dik));
     if (it == m_disabled_actions.end())
         return true;
     else
@@ -396,13 +396,13 @@ void CUISequencer::IR_OnMouseWheel(int x, int y)
 void CUISequencer::IR_OnKeyboardPress(int dik)
 {
     if (m_sequencer_items.size())
-        m_sequencer_items.front()->OnKeyboardPress((SDL_Scancode) dik);
+        m_sequencer_items.front()->OnKeyboardPress(dik);
 
     bool b = true;
     if (m_sequencer_items.size())
         b &= m_sequencer_items.front()->AllowKey(dik);
 
-    bool binded = is_binded(kQUIT, (SDL_Scancode) dik);
+    bool binded = is_binded(kQUIT, dik);
     if (b && binded)
     {
         Stop();
@@ -438,7 +438,7 @@ void CUISequencer::IR_OnActivate()
     {
         if (IR_GetKeyState(i))
         {
-            EGameActions action = get_binded_action((SDL_Scancode) i);
+            EGameActions action = get_binded_action(i);
             switch (action)
             {
             case kFWD:

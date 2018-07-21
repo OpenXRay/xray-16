@@ -122,7 +122,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     bool b_ui_exist = !!CurrentGameUI();
 
-    EGameActions _curr = get_binded_action((SDL_Scancode) key);
+    EGameActions _curr = get_binded_action(key);
 
 #ifdef INPUT_CALLBACKS
     /* avo: script callback */
@@ -167,7 +167,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     {
         if (b_ui_exist && CurrentGameUI()->TopInputReceiver())
         {
-            if (CurrentGameUI()->IR_UIOnKeyboardPress((SDL_Scancode) key))
+            if (CurrentGameUI()->IR_UIOnKeyboardPress(key))
                 return; // special case for mp and main_menu
             CurrentGameUI()->TopInputReceiver()->HideDialog();
         }
@@ -183,7 +183,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (!bReady || !b_ui_exist)
         return;
 
-    if (b_ui_exist && CurrentGameUI()->IR_UIOnKeyboardPress((SDL_Scancode) key))
+    if (b_ui_exist && CurrentGameUI()->IR_UIOnKeyboardPress(key))
         return;
 
     if (Device.Paused() && !IsDemoPlay()
@@ -193,7 +193,7 @@ void CLevel::IR_OnKeyboardPress(int key)
             )
         return;
 
-    if (game && game->OnKeyboardPress(get_binded_action((SDL_Scancode) key)))
+    if (game && game->OnKeyboardPress(get_binded_action(key)))
         return;
 
     if (_curr == kQUICK_SAVE && IsGameTypeSingle())
@@ -475,14 +475,14 @@ void CLevel::IR_OnKeyboardPress(int key)
     }
 #endif // MASTER_GOLD
 
-    if (bindConsoleCmds.execute((SDL_Scancode)key))
+    if (bindConsoleCmds.execute(key))
         return;
 
     if (CURRENT_ENTITY())
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardPress(get_binded_action((SDL_Scancode)key));
+            IR->IR_OnKeyboardPress(get_binded_action(key));
     }
 
 #ifdef _DEBUG
@@ -508,9 +508,9 @@ void CLevel::IR_OnKeyboardRelease(int key)
     /* avo: end */
 #endif
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease((SDL_Scancode) key))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
         return;
-    if (game && game->OnKeyboardRelease(get_binded_action((SDL_Scancode)key)))
+    if (game && game->OnKeyboardRelease(get_binded_action(key)))
         return;
     if (Device.Paused()
 #ifdef DEBUG
@@ -523,7 +523,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardRelease(get_binded_action((SDL_Scancode)key));
+            IR->IR_OnKeyboardRelease(get_binded_action(key));
     }
 }
 
@@ -568,7 +568,7 @@ void CLevel::IR_OnKeyboardHold(int key)
 
 #endif // DEBUG
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardHold((SDL_Scancode)key))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardHold(key))
         return;
     if (Device.Paused() && !Level().IsDemoPlay()
 #ifdef DEBUG
@@ -580,7 +580,7 @@ void CLevel::IR_OnKeyboardHold(int key)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardHold(get_binded_action((SDL_Scancode)key));
+            IR->IR_OnKeyboardHold(get_binded_action(key));
     }
 }
 
@@ -594,7 +594,7 @@ void CLevel::IR_OnActivate()
     {
         if (IR_GetKeyState(i))
         {
-            EGameActions action = get_binded_action((SDL_Scancode) i);
+            EGameActions action = get_binded_action(i);
             switch (action)
             {
             case kFWD:

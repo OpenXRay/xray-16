@@ -157,7 +157,7 @@ bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return false;
 };
 
-bool CUICellItem::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUICellItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (WINDOW_KEY_PRESSED == keyboard_action)
     {

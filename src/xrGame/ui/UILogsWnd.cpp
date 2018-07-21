@@ -303,7 +303,7 @@ ALife::_TIME_ID CUILogsWnd::GetShiftPeriod(ALife::_TIME_ID datetime, int shift_d
     return datetime;
 }
 
-bool CUILogsWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUILogsWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
@@ -331,7 +331,7 @@ bool CUILogsWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
-bool CUILogsWnd::OnKeyboardHold(SDL_Scancode dik)
+bool CUILogsWnd::OnKeyboardHold(int dik)
 {
     switch (dik)
     {

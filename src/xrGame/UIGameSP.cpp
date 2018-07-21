@@ -85,7 +85,7 @@ void CUIGameSP::OnFrame()
     }
 }
 
-bool CUIGameSP::IR_UIOnKeyboardPress(SDL_Scancode dik)
+bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
 {
     if (inherited::IR_UIOnKeyboardPress(dik))
         return true;
@@ -275,7 +275,7 @@ void CChangeLevelWnd::OnCancel()
         Actor()->MoveActor(m_position_cancel, m_angles_cancel);
 }
 
-bool CChangeLevelWnd::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CChangeLevelWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {

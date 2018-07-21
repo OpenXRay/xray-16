@@ -99,7 +99,7 @@ public:
 
     virtual void Update();
     virtual void OnRender() = 0;
-    virtual void OnKeyboardPress(SDL_Scancode dik) = 0;
+    virtual void OnKeyboardPress(int dik) = 0;
     virtual void OnMousePress(int btn) = 0;
 
     virtual bool IsPlaying() = 0;
@@ -152,7 +152,7 @@ public:
 
     virtual void Update();
     virtual void OnRender();
-    virtual void OnKeyboardPress(SDL_Scancode dik);
+    virtual void OnKeyboardPress(int dik);
     virtual void OnMousePress(int btn);
 
     virtual bool IsPlaying();
@@ -189,7 +189,7 @@ public:
 
     virtual void Update();
     virtual void OnRender();
-    virtual void OnKeyboardPress(SDL_Scancode dik) {}
+    virtual void OnKeyboardPress(int dik) {}
     virtual void OnMousePress(int btn){};
 
     virtual bool IsPlaying();

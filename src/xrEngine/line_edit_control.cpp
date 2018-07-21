@@ -359,7 +359,7 @@ void line_edit_control::assign_char_pairs(init_mode mode)
     create_char_pair(SDL_SCANCODE_Z, 'z', 'Z', true);
 }
 
-void line_edit_control::create_key_state(SDL_Scancode const dik, key_state state)
+void line_edit_control::create_key_state(int const dik, key_state state)
 {
     Base* prev = m_actions[dik];
     // if ( m_actions[dik] )
@@ -369,7 +369,7 @@ void line_edit_control::create_key_state(SDL_Scancode const dik, key_state state
     m_actions[dik] = new text_editor::key_state_base(state, prev);
 }
 
-void line_edit_control::create_char_pair(SDL_Scancode const dik, char c, char c_shift, bool translate)
+void line_edit_control::create_char_pair(int const dik, char c, char c_shift, bool translate)
 {
     if (m_actions[dik])
     {
@@ -379,7 +379,7 @@ void line_edit_control::create_char_pair(SDL_Scancode const dik, char c, char c_
     m_actions[dik] = new text_editor::type_pair(dik, c, c_shift, translate);
 }
 
-void line_edit_control::assign_callback(SDL_Scancode const dik, key_state state, Callback const& callback)
+void line_edit_control::assign_callback(int const dik, key_state state, Callback const& callback)
 {
     VERIFY(dik < SDL_NUM_SCANCODES);
     Base* prev_action = m_actions[dik];
@@ -405,7 +405,7 @@ void line_edit_control::set_edit(pcstr str)
 
 // ========================================================
 
-void line_edit_control::on_key_press(SDL_Scancode dik)
+void line_edit_control::on_key_press(int dik)
 {
     if (SDL_NUM_SCANCODES <= dik)
     {
@@ -451,7 +451,7 @@ void line_edit_control::on_key_press(SDL_Scancode dik)
 
 // -------------------------------------------------------------------------------------------------
 
-void line_edit_control::on_key_hold(SDL_Scancode dik)
+void line_edit_control::on_key_hold(int dik)
 {
     update_key_states();
     update_bufs();
@@ -478,7 +478,7 @@ void line_edit_control::on_key_hold(SDL_Scancode dik)
     }
 }
 
-void line_edit_control::on_key_release(SDL_Scancode dik)
+void line_edit_control::on_key_release(int dik)
 {
     m_accel = 1.0f;
     m_rep_time = 0.0f;

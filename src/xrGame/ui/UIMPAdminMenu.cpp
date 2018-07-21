@@ -99,7 +99,7 @@ void CUIMpAdminMenu::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     };
 }
-bool CUIMpAdminMenu::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIMpAdminMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (dik == SDL_SCANCODE_ESCAPE && keyboard_action == WINDOW_KEY_PRESSED)
     {

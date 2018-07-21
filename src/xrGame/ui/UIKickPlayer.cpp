@@ -83,7 +83,7 @@ void CUIKickPlayer::InitKick(CUIXml& xml_doc)
     m_ban_sec_label->Show(false);
 }
 
-bool CUIKickPlayer::OnKeyboardAction(SDL_Scancode dik, EUIMessages keyboard_action)
+bool CUIKickPlayer::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (dik == SDL_SCANCODE_ESCAPE)
     {
