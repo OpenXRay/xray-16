@@ -172,3 +172,5 @@ extern ConsoleBindCmds bindConsoleCmds;
 #define MOUSE_6 (SDL_NUM_SCANCODES + 6)
 #define MOUSE_7 (SDL_NUM_SCANCODES + 7)
 #define MOUSE_8 (SDL_NUM_SCANCODES + 8)
+
+constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5, MOUSE_6, MOUSE_7, MOUSE_8 };
