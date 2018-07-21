@@ -37,11 +37,13 @@ static void on_error_dialog(bool before)
     pInput->acquire(true);
 }
 
-CInput::CInput(BOOL bExclusive, int deviceForInit)
+CInput::CInput(bool exclusive, int deviceForInit)
 {
-    g_exclusive = !!bExclusive;
+    g_exclusive = exclusive;
 
     Log("Starting INPUT device...");
+
+    MouseDelta = 25;
 
     ZeroMemory(mouseState, sizeof(mouseState));
     ZeroMemory(KBState, sizeof(KBState));
@@ -80,11 +82,88 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("*** INPUT:    %2.2fms", pInput->GetStats().FrameTime.result);
 }
 
-void CInput::SetAllAcquire(BOOL bAcquire) {}
+void CInput::SetAllAcquire(bool bAcquire) {}
 
-void CInput::SetMouseAcquire(BOOL bAcquire) {}
-void CInput::SetKBDAcquire(BOOL bAcquire) {}
-//-----------------------------------------------------------------------
+void CInput::SetMouseAcquire(bool bAcquire) {}
+void CInput::SetKBDAcquire(bool bAcquire) {}
+
+
+void CInput::MouseUpdate()
+{
+    SDL_Event event;
+
+    bool mouse_prev[COUNT_MOUSE_BUTTONS];
+
+    mouse_prev[0] = mouseState[0];
+    mouse_prev[1] = mouseState[1];
+    mouse_prev[2] = mouseState[2];
+    mouse_prev[3] = mouseState[3];
+    mouse_prev[4] = mouseState[4];
+    mouse_prev[5] = mouseState[5];
+    mouse_prev[6] = mouseState[6];
+    mouse_prev[7] = mouseState[7];
+
+    bool mouseMoved = false;
+    offs[0] = offs[1] = offs[2] = 0;
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL))
+    {
+        switch (event.type)
+        {
+        case SDL_MOUSEMOTION:
+            mouseMoved = true;
+            timeStamp[0] = dwCurTime + event.motion.timestamp;
+            timeStamp[1] = dwCurTime + event.motion.timestamp;
+            offs[0] += event.motion.xrel;
+            offs[1] += event.motion.yrel;
+            break;
+        case SDL_MOUSEBUTTONUP:
+            mouseState[event.button.button - 1] = false;
+            cbStack.back()->IR_OnMouseRelease(event.button.button - 1);
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            mouseState[event.button.button - 1] = true;
+            cbStack.back()->IR_OnMousePress(event.button.button - 1);
+            break;
+        case SDL_MOUSEWHEEL:
+            timeStamp[2] = dwCurTime + event.wheel.timestamp;
+            timeStamp[3] = dwCurTime + event.wheel.timestamp;
+            offs[2] += event.wheel.y;
+            offs[3] += event.wheel.x;
+            break;
+        }
+    }
+
+    auto isButtonOnHold = [&](int i)
+    {
+        if (mouseState[i] && mouse_prev[i])
+            cbStack.back()->IR_OnMouseHold(i);
+    };
+
+    isButtonOnHold(0);
+    isButtonOnHold(1);
+    isButtonOnHold(2);
+    isButtonOnHold(3);
+    isButtonOnHold(4);
+    isButtonOnHold(5);
+    isButtonOnHold(6);
+    isButtonOnHold(7);
+
+    if (mouseMoved)
+    {
+        if (offs[0] || offs[1])
+            cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
+        if (offs[2])
+            cbStack.back()->IR_OnMouseWheel(offs[2]);
+    }
+    else
+    {
+        if (timeStamp[1] && dwCurTime - timeStamp[1] >= MouseDelta)
+            cbStack.back()->IR_OnMouseStop(0, timeStamp[1] = 0);
+        if (timeStamp[0] && dwCurTime - timeStamp[0] >= MouseDelta)
+            cbStack.back()->IR_OnMouseStop(0, timeStamp[0] = 0);
+    }
+}
+
 BOOL b_altF4 = FALSE;
 void CInput::KeyUpdate()
 {
@@ -141,23 +220,24 @@ bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
 #define MOUSE_1 (SDL_NUM_SCANCODES + SDL_BUTTON_LEFT)
 #define MOUSE_8 (SDL_NUM_SCANCODES + 8)
 
-BOOL CInput::iGetAsyncKeyState(int dik)
+bool CInput::iGetAsyncKeyState(int dik)
 {
     if (dik < COUNT_KB_BUTTONS)
-        return !!KBState[dik];
-    else if (dik >= MOUSE_1 && dik <= MOUSE_8)
+        return KBState[dik];
+
+    if (dik >= MOUSE_1 && dik <= MOUSE_8)
     {
-        int mk = dik - MOUSE_1;
+        const int mk = dik - MOUSE_1;
         return iGetAsyncBtnState(mk);
     }
-    else
-        return FALSE; // unknown key ???
+
+    // unknown key ???
+    return false;
 }
 
-BOOL CInput::iGetAsyncBtnState(int btn)
+bool CInput::iGetAsyncBtnState(int btn)
 {
-    if (btn <= COUNT_MOUSE_BUTTONS)
-        return !!mouseState[btn + 1]; 
+    return mouseState[btn];
 }
 void CInput::ClipCursor(bool clip)
 {
@@ -247,7 +327,12 @@ void CInput::OnFrame(void)
     stats.FrameTime.Begin();
     dwCurTime = RDEVICE.TimerAsync_MMT();
 
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_MOUSEWHEEL))
+    if (Device.dwPrecacheFrame == 0)
+    {
+        MouseUpdate();
+    }
+
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED))
     {
         switch (event.type)
         {
@@ -271,43 +356,6 @@ void CInput::OnFrame(void)
             }
         }
         break;
-        case SDL_MOUSEMOTION:
-#ifndef _EDITOR
-            if (Device.dwPrecacheFrame == 0)
-#endif
-            {
-                timeStamp[0] = event.motion.timestamp;
-                timeStamp[1] = event.motion.timestamp;
-                cbStack.back()->IR_OnMouseMove(event.motion.xrel, event.motion.yrel);
-            }
-            break;
-        case SDL_MOUSEBUTTONUP:
-#ifndef _EDITOR
-            if (Device.dwPrecacheFrame == 0)
-#endif
-            {
-                mouseState[event.button.button] = FALSE;
-                cbStack.back()->IR_OnKeyboardRelease(SDL_NUM_SCANCODES + event.button.button);
-            }
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-#ifndef _EDITOR
-            if (Device.dwPrecacheFrame == 0)
-#endif
-            {
-                mouseState[event.button.button] = TRUE;
-                cbStack.back()->IR_OnKeyboardPress(SDL_NUM_SCANCODES + event.button.button);
-            }
-            break;
-        case SDL_MOUSEWHEEL:
-#ifndef _EDITOR
-            if (Device.dwPrecacheFrame == 0)
-#endif
-            {
-                timeStamp[2] = event.wheel.timestamp;
-                cbStack.back()->IR_OnMouseWheel(event.wheel.y);
-            }
-            break;
         }
     }
 
