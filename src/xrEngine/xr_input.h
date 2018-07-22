@@ -39,13 +39,12 @@ public:
 private:
     BENCH_SEC_SCRAMBLEMEMBER1
 
-    u32 timeStamp[COUNT_MOUSE_AXIS];
-    u32 timeSave[COUNT_MOUSE_AXIS];
+    u32 mouseTimeStamp[COUNT_MOUSE_AXIS];
 
     int offs[COUNT_MOUSE_AXIS];
 
     bool mouseState[COUNT_MOUSE_BUTTONS];
-    bool KBState[COUNT_KB_BUTTONS];
+    bool keyboardState[COUNT_KB_BUTTONS];
 
     xr_vector<IInputReceiver*> cbStack;
 

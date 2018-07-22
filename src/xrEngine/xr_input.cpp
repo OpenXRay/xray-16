@@ -46,9 +46,8 @@ CInput::CInput(bool exclusive, int deviceForInit)
     MouseDelta = 25;
 
     ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(KBState, sizeof(KBState));
-    ZeroMemory(timeStamp, sizeof(timeStamp));
-    ZeroMemory(timeSave, sizeof(timeStamp));
+    ZeroMemory(keyboardState, sizeof(keyboardState));
+    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 
     //===================== Dummy pack
@@ -111,8 +110,8 @@ void CInput::MouseUpdate()
         {
         case SDL_MOUSEMOTION:
             mouseMoved = true;
-            timeStamp[0] = dwCurTime + event.motion.timestamp;
-            timeStamp[1] = dwCurTime + event.motion.timestamp;
+            mouseTimeStamp[0] = dwCurTime + event.motion.timestamp;
+            mouseTimeStamp[1] = dwCurTime + event.motion.timestamp;
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
             break;
@@ -126,8 +125,8 @@ void CInput::MouseUpdate()
             break;
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
-            timeStamp[2] = dwCurTime + event.wheel.timestamp;
-            timeStamp[3] = dwCurTime + event.wheel.timestamp;
+            mouseTimeStamp[2] = dwCurTime + event.wheel.timestamp;
+            mouseTimeStamp[3] = dwCurTime + event.wheel.timestamp;
             offs[2] += event.wheel.y;
             offs[3] += event.wheel.x;
             break;
@@ -158,10 +157,10 @@ void CInput::MouseUpdate()
     }
     else
     {
-        if (timeStamp[1] && dwCurTime - timeStamp[1] >= MouseDelta)
-            cbStack.back()->IR_OnMouseStop(0, timeStamp[1] = 0);
-        if (timeStamp[0] && dwCurTime - timeStamp[0] >= MouseDelta)
-            cbStack.back()->IR_OnMouseStop(0, timeStamp[0] = 0);
+        if (mouseTimeStamp[1] && dwCurTime - mouseTimeStamp[1] >= MouseDelta)
+            cbStack.back()->IR_OnMouseStop(0, mouseTimeStamp[1] = 0);
+        if (mouseTimeStamp[0] && dwCurTime - mouseTimeStamp[0] >= MouseDelta)
+            cbStack.back()->IR_OnMouseStop(0, mouseTimeStamp[0] = 0);
     }
 }
 
@@ -175,19 +174,19 @@ void CInput::KeyUpdate()
         case SDL_KEYDOWN:
             if (event.key.repeat)
                 continue;
-            KBState[event.key.keysym.scancode] = true;
+            keyboardState[event.key.keysym.scancode] = true;
             cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
             break;
 
         case SDL_KEYUP:
-            KBState[event.key.keysym.scancode] = false;
+            keyboardState[event.key.keysym.scancode] = false;
             cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
             break;
         }
     }
 
     for (u32 i = 0; i < COUNT_KB_BUTTONS; ++i)
-        if (KBState[i])
+        if (keyboardState[i])
             cbStack.back()->IR_OnKeyboardHold(i);
 }
 
@@ -201,7 +200,7 @@ bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
             Msg("! cant convert dik_name for dik[%d]", dik);
             return false;
         }
-        strcpy_s(dest_str, dest_sz, keyname);
+        xr_strcpy(dest_str, dest_sz, keyname);
     }
 
     return true;
@@ -213,7 +212,7 @@ bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
 bool CInput::iGetAsyncKeyState(int dik)
 {
     if (dik < COUNT_KB_BUTTONS)
-        return KBState[dik];
+        return keyboardState[dik];
 
     if (dik >= MOUSE_1 && dik <= MOUSE_8)
     {
@@ -255,8 +254,7 @@ void CInput::iCapture(IInputReceiver* p)
     cbStack.back()->IR_OnActivate();
 
     // prepare for _new_ controller
-    ZeroMemory(timeStamp, sizeof(timeStamp));
-    ZeroMemory(timeSave, sizeof(timeStamp));
+    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
 
@@ -290,9 +288,8 @@ void CInput::OnAppActivate(void)
 
     SetAllAcquire(true);
     ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(KBState, sizeof(KBState));
-    ZeroMemory(timeStamp, sizeof(timeStamp));
-    ZeroMemory(timeSave, sizeof(timeStamp));
+    ZeroMemory(keyboardState, sizeof(keyboardState));
+    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
 
@@ -303,9 +300,8 @@ void CInput::OnAppDeactivate(void)
 
     SetAllAcquire(false);
     ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(KBState, sizeof(KBState));
-    ZeroMemory(timeStamp, sizeof(timeStamp));
-    ZeroMemory(timeSave, sizeof(timeStamp));
+    ZeroMemory(keyboardState, sizeof(keyboardState));
+    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
 
