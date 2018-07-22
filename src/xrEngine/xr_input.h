@@ -1,8 +1,40 @@
 #ifndef __XR_INPUT__
 #define __XR_INPUT__
 
-#define DIRECTINPUT_VERSION 0x0800
 #include <SDL.h>
+
+// SDL_NUM_SCANCODES - max vavue in SDL_SCANCODE_* enum
+#define MOUSE_1 (SDL_NUM_SCANCODES + SDL_BUTTON_LEFT)
+#define MOUSE_2 (SDL_NUM_SCANCODES + SDL_BUTTON_RIGHT)
+#define MOUSE_3 (SDL_NUM_SCANCODES + SDL_BUTTON_MIDDLE)
+
+#define MOUSE_4 (SDL_NUM_SCANCODES + SDL_BUTTON_X1)
+#define MOUSE_5 (SDL_NUM_SCANCODES + SDL_BUTTON_X2)
+#define MOUSE_6 (SDL_NUM_SCANCODES + 6)
+#define MOUSE_7 (SDL_NUM_SCANCODES + 7)
+#define MOUSE_8 (SDL_NUM_SCANCODES + 8)
+
+constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5, MOUSE_6, MOUSE_7, MOUSE_8 };
+
+inline int KeyToMouseButton(const int dik, const bool fromZero = true)
+{
+    int i = 0;
+    if (!fromZero)
+        ++i;
+
+    switch (dik)
+    {
+    case MOUSE_1: return 0 + i;
+    case MOUSE_2: return 1 + i;
+    case MOUSE_3: return 2 + i;
+    case MOUSE_4: return 3 + i;
+    case MOUSE_5: return 4 + i;
+    case MOUSE_6: return 5 + i;
+    case MOUSE_7: return 6 + i;
+    case MOUSE_8: return 7 + i;
+    default: return dik - SDL_NUM_SCANCODES + i;
+    }
+}
 
 class ENGINE_API IInputReceiver;
 
@@ -84,7 +116,7 @@ public:
     IC bool get_exclusive_mode();
     void unacquire();
     void acquire(const bool& exclusive);
-    bool get_key_name(int dik, LPSTR dest, int dest_sz);
+    bool get_dik_name(int dik, LPSTR dest, int dest_sz);
 
     void feedback(u16 s1, u16 s2, float time);
 };

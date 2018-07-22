@@ -187,26 +187,45 @@ void CInput::KeyUpdate()
             cbStack.back()->IR_OnKeyboardHold(i);
 }
 
-bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
+pcstr KeyToMouseButtonName(const int dik)
 {
-    if (dik < SDL_NUM_SCANCODES)
+    switch (dik)
     {
-        const char* keyname = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
-        if (0 == strlen(keyname))
-        {
-            Msg("! cant convert dik_name for dik[%d]", dik);
-            return false;
-        }
-        xr_strcpy(dest_str, dest_sz, keyname);
+    case MOUSE_1: return "Left mouse";
+    case MOUSE_2: return "Right mouse";
+    case MOUSE_3: return "Center mouse";
+    case MOUSE_4: return "Fourth mouse";
+    case MOUSE_5: return "Fifth mouse";
+    case MOUSE_6: return "Sixth mouse";
+    case MOUSE_7: return "Seventh mouse";
+    case MOUSE_8: return "Eighth mouse";
+    default: return "Unknown mouse";
     }
-    else
-        xr_sprintf(dest_str, dest_sz, "MOUSE%d", dik - SDL_NUM_SCANCODES);
-
-    return true;
 }
 
-#define MOUSE_1 (SDL_NUM_SCANCODES + SDL_BUTTON_LEFT)
-#define MOUSE_8 (SDL_NUM_SCANCODES + 8)
+bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
+{
+    pcstr keyname;
+    
+    if (dik < SDL_NUM_SCANCODES)
+        keyname = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
+    else
+        keyname = KeyToMouseButtonName(dik);
+
+    if (0 == strlen(keyname))
+    {
+        if (dik == SDL_SCANCODE_UNKNOWN)
+            keyname = "Unknown";
+        else
+        {
+            Msg("! Can't convert dik_name for dik[%d]", dik);
+            return false;
+        }
+    }
+
+    xr_strcpy(dest_str, dest_sz, keyname);
+    return true;
+}
 
 bool CInput::iGetAsyncKeyState(int dik)
 {
