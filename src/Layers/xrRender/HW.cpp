@@ -383,10 +383,3 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
         return FALSE;
     return TRUE;
 }
-
-struct uniqueRenderingMode
-{
-    uniqueRenderingMode(pcstr v) : value(v) {}
-    pcstr value;
-    bool operator()(const xr_token other) const { return !xr_stricmp(value, other.name);}
-};
