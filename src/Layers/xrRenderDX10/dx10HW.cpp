@@ -125,7 +125,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
         }
     }
     else
-        Log("Couldn't get window information: %s", SDL_GetError());
+        Log("Couldn't get window information: ", SDL_GetError());
     sd.Windowed = bWindowed;
 
     // Depth/stencil (DX10 don't need this?)
