@@ -58,7 +58,6 @@ void CRenderDevice::Create()
         psDeviceFlags.set(rsFullscreen, false);
 
     FillVidModesToken(Vid_SelectedMonitor);
-    SelectResolution(!psDeviceFlags.is(rsFullscreen));
     UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
@@ -73,49 +72,20 @@ void CRenderDevice::Create()
     PreCache(0, false, false);
 }
 
-void CRenderDevice::UpdateWindowProps(bool windowed)
+void CRenderDevice::UpdateWindowProps(const bool windowed)
 {
     SelectResolution(windowed);
 
     SDL_SetWindowFullscreen(m_sdlWnd, windowed ? 0 : SDL_WINDOW_FULLSCREEN);
-    SDL_Rect rect;
 
     // Set window properties depending on what mode were in.
     if (windowed)
-    {
-        const bool drawBorders = strstr(Core.Params, "-draw_borders");
-        if (drawBorders)
-            SDL_SetWindowBordered(m_sdlWnd, SDL_TRUE);
-
         SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
-
-        if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
-            SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-        else
-        {
-            SDL_GetDisplayUsableBounds(Vid_SelectedMonitor, &rect);
-
-            int top = 0, left = 0, right = 0, bottom = 0;
-            // SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
-#ifdef WINDOWS
-            // XXX: Currently SDL_GetWindowBordersSize is supported only on X11
-            // For now we must use method below.
-            if (drawBorders)
-                top = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
-#else
-#pragma TODO("Implement for other platforms")
-#endif
-            SDL_SetWindowPosition(m_sdlWnd, rect.x + left, rect.y + top);
-        }
-
-        SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
-        int w = 0, h = 0;
-        SDL_GetWindowSize(m_sdlWnd, &w, &h);
-        m_rcWindowClient.w = m_rcWindowClient.x + w;
-        m_rcWindowClient.h = m_rcWindowClient.y + h;
-    }
     else
     {
+        // XXX: fix monitor selection
+        // it appears to be buggy
+        SDL_Rect rect;
         SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
         SDL_DisplayMode mode;
@@ -126,31 +96,35 @@ void CRenderDevice::UpdateWindowProps(bool windowed)
         SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
     }
 
-    if (!GEnv.isDedicatedServer)
-        SDL_SetWindowGrab(m_sdlWnd, SDL_TRUE);
-
-    UpdateWindowRect();
+    UpdateWindowRects();
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
 }
 
 
-void CRenderDevice::UpdateWindowRect()
+void CRenderDevice::UpdateWindowRects()
 {
-    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowClient.x, &m_rcWindowClient.y);
+    m_rcWindowClient.x = 0;
+    m_rcWindowClient.y = 0;
     SDL_GetWindowSize(m_sdlWnd, &m_rcWindowClient.w, &m_rcWindowClient.h);
-    m_rcWindowClient.w += m_rcWindowClient.x;
-    m_rcWindowClient.h += m_rcWindowClient.y;
+
+    SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowBounds.x, &m_rcWindowBounds.y);
+    SDL_GetWindowSize(m_sdlWnd, &m_rcWindowBounds.w, &m_rcWindowBounds.h);
+    m_rcWindowBounds.w += m_rcWindowBounds.x;
+    m_rcWindowBounds.h += m_rcWindowBounds.y;
+
+    // Do we need code below?
+    int top, left, bottom, right;
+    SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
+    m_rcWindowBounds.x -= left;
+    m_rcWindowBounds.y -= top;
+    m_rcWindowBounds.w += right;
+    m_rcWindowBounds.h += bottom;
+    // XXX: check if we need this code when SDL_GetWindowBordersSize
+    // will be available for Windows
 }
 
-void CRenderDevice::SelectResolution(bool windowed)
+void CRenderDevice::SelectResolution(const bool windowed)
 {
-    if (GEnv.isDedicatedServer)
-    {
-        dwWidth = 640;
-        dwHeight = 480;
-        return;
-    }
-
     if (windowed)
     {
         dwWidth = psCurrentVidMode[0];
@@ -172,7 +146,7 @@ void CRenderDevice::SelectResolution(bool windowed)
             if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
                 xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", closest.w, closest.h);
             else
-                xr_sprintf(buff, sizeof(buff), "vid_mode %s", VidModesToken[0].name);
+                xr_sprintf(buff, sizeof(buff), "vid_mode %s", VidModesToken.back());
 
             Console->Execute(buff);
         }

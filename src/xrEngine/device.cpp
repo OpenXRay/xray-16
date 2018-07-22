@@ -348,7 +348,7 @@ void CRenderDevice::message_loop()
                 switch (event.window.event)
                 {
                 case SDL_WINDOWEVENT_MOVED:
-                    UpdateWindowRect();
+                    UpdateWindowRects();
                     break;
 
                 case SDL_WINDOWEVENT_RESIZED:
@@ -362,13 +362,12 @@ void CRenderDevice::message_loop()
                         Reset();
                     }
                     else
-                        UpdateWindowRect();
+                        UpdateWindowRects();
 
                     break;
                 }
 
                 case SDL_WINDOWEVENT_SHOWN:
-                case SDL_WINDOWEVENT_ENTER:
                 case SDL_WINDOWEVENT_FOCUS_GAINED:
                 case SDL_WINDOWEVENT_RESTORED:
                 case SDL_WINDOWEVENT_MAXIMIZED:
@@ -376,7 +375,6 @@ void CRenderDevice::message_loop()
                     break;
 
                 case SDL_WINDOWEVENT_HIDDEN:
-                case SDL_WINDOWEVENT_LEAVE:
                 case SDL_WINDOWEVENT_FOCUS_LOST:
                 case SDL_WINDOWEVENT_MINIMIZED:
                     OnWM_Activate(0, event.window.data2);
@@ -418,6 +416,9 @@ void CRenderDevice::Run()
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
+    if (GEnv.isDedicatedServer)
+        SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_HideWindow(m_sdlWnd);
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);

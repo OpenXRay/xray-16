@@ -63,7 +63,7 @@ void CUICursor::InitInternal()
     const u32 screen_size_y = display.h - display.y;
     m_b_use_win_cursor = screen_size_y >= Device.dwHeight && screen_size_x >= Device.dwWidth;
     if (m_b_use_win_cursor) // sanity
-        Device.UpdateWindowRect();
+        Device.UpdateWindowRects();
 }
 
 //--------------------------------------------------------------------

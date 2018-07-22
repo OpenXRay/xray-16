@@ -657,6 +657,16 @@ public:
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "hide console"); }
 };
 
+class CCC_CenterScreen : public IConsole_Command
+{
+public:
+    CCC_CenterScreen(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+    void Execute(pcstr args) override
+    {
+        SDL_SetWindowPosition(Device.m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    }
+};
+
 ENGINE_API float psHUD_FOV = 0.45f;
 
 // extern int psSkeletonUpdate;
@@ -787,6 +797,7 @@ void CCC_Register()
     CMD2(CCC_Float, "cam_inert", &psCamInert);
     CMD2(CCC_Float, "cam_slide_inert", &psCamSlideInert);
 
+    CMD1(CCC_CenterScreen, "center_screen");
     CMD4(CCC_Integer, "always_active", &ps_always_active, 0, 1);
 
     CMD1(CCC_r2, "renderer");

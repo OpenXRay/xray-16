@@ -62,6 +62,9 @@ public:
     u32 dwWidth;
     u32 dwHeight;
 
+    // Real application window resolution
+    SDL_Rect m_rcWindowBounds;
+
     // Real game window resolution
     SDL_Rect m_rcWindowClient;
 
@@ -248,9 +251,9 @@ public:
     void Destroy(void);
     void Reset(bool precache = true);
 
-    void UpdateWindowProps(bool windowed);
-    void UpdateWindowRect();
-    void SelectResolution(bool windowed);
+    void UpdateWindowProps(const bool windowed);
+    void UpdateWindowRects();
+    void SelectResolution(const bool windowed);
 
     void Initialize(void);
     void ShutDown(void);
