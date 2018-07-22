@@ -173,6 +173,8 @@ void CInput::KeyUpdate()
         switch (event.type)
         {
         case SDL_KEYDOWN:
+            if (event.key.repeat)
+                continue;
             KBState[event.key.keysym.scancode] = true;
             cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
             break;
