@@ -199,6 +199,8 @@ bool CInput::get_key_name(int dik, LPSTR dest_str, int dest_sz)
         }
         xr_strcpy(dest_str, dest_sz, keyname);
     }
+    else
+        xr_sprintf(dest_str, dest_sz, "MOUSE%d", dik - SDL_NUM_SCANCODES);
 
     return true;
 }
