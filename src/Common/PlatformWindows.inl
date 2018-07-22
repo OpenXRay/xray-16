@@ -1,7 +1,6 @@
 #define VC_EXTRALEAN // Exclude rarely-used stuff from Windows headers
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #define IDIRECTPLAY2_OR_GREATER // ?
-#define DIRECTINPUT_VERSION 0x0800 //
 
 #ifndef _WIN32_WINNT
 // Request Windows 7 functionality

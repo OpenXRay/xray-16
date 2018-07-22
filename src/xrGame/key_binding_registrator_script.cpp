@@ -225,25 +225,25 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("DIK_NUMPADCOMMA", int(SDL_SCANCODE_KP_COMMA)),
                 value("DIK_NUMPADEQUALSAS400", int(SDL_SCANCODE_KP_EQUALSAS400)),
 
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL1)),
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL2)),
+                value("DIK_INTERNATIONAL1", int(SDL_SCANCODE_INTERNATIONAL1)), // Give a better name?
+                value("DIK_INTERNATIONAL2", int(SDL_SCANCODE_INTERNATIONAL2)), // Give a better name?
                 value("DIK_YEN", int(SDL_SCANCODE_INTERNATIONAL3)),
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL4)),
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL5)),
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL6)),
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL7)),
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL8)),
-                //value("DIK_", int(SDL_SCANCODE_INTERNATIONAL9)),
+                value("DIK_INTERNATIONAL4", int(SDL_SCANCODE_INTERNATIONAL4)), // Give a better name?
+                value("DIK_INTERNATIONAL5", int(SDL_SCANCODE_INTERNATIONAL5)), // Give a better name?
+                value("DIK_INTERNATIONAL6", int(SDL_SCANCODE_INTERNATIONAL6)), // Give a better name?
+                value("DIK_INTERNATIONAL7", int(SDL_SCANCODE_INTERNATIONAL7)), // Give a better name?
+                value("DIK_INTERNATIONAL8", int(SDL_SCANCODE_INTERNATIONAL8)), // Give a better name?
+                value("DIK_INTERNATIONAL9", int(SDL_SCANCODE_INTERNATIONAL9)), // Give a better name?
 
-                //value("DIK_", int(SDL_SCANCODE_LANG1)),
-                //value("DIK_", int(SDL_SCANCODE_LANG2)),
+                value("DIK_HANGUL", int(SDL_SCANCODE_LANG1)),
+                value("DIK_HANJA", int(SDL_SCANCODE_LANG2)),
                 value("DIK_KATAKANA", int(SDL_SCANCODE_LANG3)),
                 value("DIK_HIRAGANA", int(SDL_SCANCODE_LANG4)),
-                //value("DIK_", int(SDL_SCANCODE_LANG5)),
-                //value("DIK_", int(SDL_SCANCODE_LANG6)),
-                //value("DIK_", int(SDL_SCANCODE_LANG7)),
-                //value("DIK_", int(SDL_SCANCODE_LANG8)),
-                //value("DIK_", int(SDL_SCANCODE_LANG9)),
+                value("DIK_ZENHANKAKU", int(SDL_SCANCODE_LANG5)),
+                value("DIK_LANG6", int(SDL_SCANCODE_LANG6)), // Give a better name?
+                value("DIK_LANG7", int(SDL_SCANCODE_LANG7)), // Give a better name?
+                value("DIK_LANG8", int(SDL_SCANCODE_LANG8)), // Give a better name?
+                value("DIK_LANG9", int(SDL_SCANCODE_LANG9)), // Give a better name?
 
                 value("DIK_ALTERASE", int(SDL_SCANCODE_ALTERASE)),
                 value("DIK_CANCEL", int(SDL_SCANCODE_CANCEL)),
