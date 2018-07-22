@@ -204,7 +204,11 @@ void FillMonitorsToken()
     monitors.reserve(displayCount + 1);
 
     for (int i = 0; i < displayCount; ++i)
-        monitors.emplace_back(xr_strdup(SDL_GetDisplayName(i)), i);
+    {
+        string512 buf;
+        xr_sprintf(buf, sizeof(buf), "%d. %s", i + 1, SDL_GetDisplayName(i));
+        monitors.emplace_back(xr_strdup(buf), i);
+    }
 
     monitors.emplace_back(nullptr, -1);
 }
@@ -216,7 +220,6 @@ void FillVidModesToken(u32 monitorID)
 
     if (!modes.empty())
         FreeVidModesToken();
-
 
     if (!rates.empty())
         FreeRefreshRateToken();
