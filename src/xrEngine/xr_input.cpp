@@ -53,8 +53,6 @@ CInput::CInput(bool exclusive, int deviceForInit)
     //===================== Dummy pack
     iCapture(&dummyController);
 
-    SDL_SetRelativeMouseMode(SDL_TRUE);
-
     xrDebug::SetDialogHandler(on_error_dialog);
 
 #ifdef ENGINE_BUILD
@@ -66,7 +64,6 @@ CInput::CInput(bool exclusive, int deviceForInit)
 
 CInput::~CInput(void)
 {
-    SDL_SetRelativeMouseMode(SDL_FALSE);
 #ifdef ENGINE_BUILD
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
@@ -232,12 +229,12 @@ void CInput::ClipCursor(bool clip)
 {
     if (clip)
     {
-        SDL_ShowCursor(SDL_DISABLE);
+        SDL_SetWindowGrab(Device.m_sdlWnd, SDL_TRUE);
         SDL_SetRelativeMouseMode(SDL_TRUE);
     }
     else
     {
-        SDL_ShowCursor(SDL_ENABLE);
+        SDL_SetWindowGrab(Device.m_sdlWnd, SDL_FALSE);
         SDL_SetRelativeMouseMode(SDL_FALSE);
     }
 }

@@ -36,6 +36,7 @@
 #include "profile_store.h"
 #include "stats_submitter.h"
 #include "atlas_submit_queue.h"
+#include "xrEngine/xr_input.h"
 
 // fwd. decl.
 extern ENGINE_API BOOL bShowPauseString;
@@ -335,6 +336,7 @@ void CMainMenu::IR_OnMouseMove(int x, int y)
 
 void CMainMenu::IR_OnMouseStop(int x, int y){};
 
+bool IWantMyMouseBackScreamed = false;
 void CMainMenu::IR_OnKeyboardPress(int dik)
 {
     if (!IsActive())
@@ -345,6 +347,14 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         Console->Show();
         return;
     }
+
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)
+        && pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RGUI))
+    {
+        IWantMyMouseBackScreamed = true;
+        pInput->ClipCursor(false);
+    }
+
     if (SDL_SCANCODE_F12 == dik)
     {
         GEnv.Render->Screenshot();
@@ -358,6 +368,13 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
 {
     if (!IsActive())
         return;
+
+    if (IWantMyMouseBackScreamed)
+    {
+        IWantMyMouseBackScreamed = false;
+        pInput->ClipCursor(true);
+    }
+
 
     CDialogHolder::IR_UIOnKeyboardRelease(dik);
 };
