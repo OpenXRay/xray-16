@@ -81,7 +81,7 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
     {
         string64 message;
 
-        //m_keyboard = dik_to_ptr(mouse_btn, true);
+        m_keyboard = dik_to_ptr(mouse_btn, true);
         if (!m_keyboard)
             return true;
         SetValue();
