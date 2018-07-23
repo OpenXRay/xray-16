@@ -41,7 +41,7 @@ void CRenderDevice::Initialize()
     if (strstr(Core.Params, "-weather"))
         initialize_weather_editor();
 
-    R_ASSERT3(SDL_Init(SDL_INIT_EVERYTHING) == 0, "Unable to initialize SDL", SDL_GetError());
+    R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
 
     if (!m_sdlWnd)
     {

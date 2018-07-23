@@ -86,7 +86,7 @@ void CInput::SetKBDAcquire(bool bAcquire) {}
 
 void CInput::MouseUpdate()
 {
-    SDL_Event event;
+    SDL_PumpEvents();
 
     bool mouse_prev[COUNT_MOUSE_BUTTONS];
 
@@ -101,6 +101,8 @@ void CInput::MouseUpdate()
 
     bool mouseMoved = false;
     offs[0] = offs[1] = offs[2] = 0;
+
+    SDL_Event event;
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL))
     {
         switch (event.type)
@@ -163,6 +165,8 @@ void CInput::MouseUpdate()
 
 void CInput::KeyUpdate()
 {
+    SDL_PumpEvents();
+
     SDL_Event event;
     while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED))
     {
@@ -331,8 +335,8 @@ void CInput::OnFrame(void)
 
     if (Device.dwPrecacheFrame == 0)
     {
-        MouseUpdate();
         KeyUpdate();
+        MouseUpdate();
     }
 
     stats.FrameTime.End();
