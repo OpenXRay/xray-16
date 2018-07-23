@@ -30,11 +30,14 @@ static void on_error_dialog(bool before)
 
     if (before)
     {
+        pInput->ClipCursor(false);
         pInput->unacquire();
-        return;
     }
-
-    pInput->acquire(true);
+    else
+    {
+        pInput->ClipCursor(true);
+        pInput->acquire(true);
+    }
 }
 
 CInput::CInput(bool exclusive, int deviceForInit)
