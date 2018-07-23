@@ -107,7 +107,7 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* area, v
     // Allow drag from any point except window center
     // For this case, 'hit' is a size of a square in the center
     if ((area->x > centerX + hit || area->x < centerX - hit)
-        && (area->y > centerY + hit || area->y < centerY - hit))
+        || (area->y > centerY + hit || area->y < centerY - hit))
         return SDL_HITTEST_DRAGGABLE;
 
     return SDL_HITTEST_NORMAL;

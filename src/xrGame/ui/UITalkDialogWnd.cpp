@@ -159,7 +159,7 @@ void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_
         string16 buff;
         xr_sprintf(buff, "%d.", (number == 10) ? 0 : number);
         itm->m_num_text->SetText(buff);
-        itm->m_text->SetAccelerator(SDL_SCANCODE_ESCAPE + number, 0);
+        itm->m_text->SetAccelerator(SDL_SCANCODE_1 - 1 + number, 0);
     }
     if (b_finalizer)
     {

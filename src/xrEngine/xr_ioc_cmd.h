@@ -158,6 +158,11 @@ public:
     virtual void Execute(LPCSTR args)
     {
         const xr_token* tok = GetToken();
+        if (!tok)
+        {
+            Msg("! token [%s] is null", cName);
+            return;
+        }
         while (tok->name)
         {
             if (xr_stricmp(tok->name, args) == 0)

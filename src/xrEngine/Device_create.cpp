@@ -41,6 +41,7 @@ void CRenderDevice::Create()
 {
     if (b_is_Ready)
         return; // prevent double call
+
     Statistic = new CStats();
     bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
     bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
@@ -63,6 +64,7 @@ void CRenderDevice::Create()
 
     Memory.mem_compact();
     b_is_Ready = TRUE;
+
     _SetupStates();
     string_path fname;
     FS.update_path(fname, "$game_data$", "shaders.xr");
@@ -76,13 +78,25 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 {
     SelectResolution(windowed);
 
-    SDL_SetWindowFullscreen(m_sdlWnd, windowed ? 0 : SDL_WINDOW_FULLSCREEN);
-
-    // Set window properties depending on what mode were in.
     if (windowed)
+    {
+        u32 width, height;
+        sscanf(VidModesToken.back().name, "%dx%d", &width, &height);
+
+        const bool drawBorders = strstr(Core.Params, "-draw_borders");
+
+        bool desktopResolution = false;
+        if (b_is_Ready && !drawBorders && psCurrentVidMode[0] == width && psCurrentVidMode[1] == height)
+            desktopResolution = true;
+
+        SDL_SetWindowFullscreen(m_sdlWnd, desktopResolution ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
         SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
+        SDL_SetWindowBordered(m_sdlWnd, drawBorders ? SDL_TRUE : SDL_FALSE);
+    }
     else
     {
+        SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+
         // XXX: fix monitor selection
         // it appears to be buggy
         SDL_Rect rect;
