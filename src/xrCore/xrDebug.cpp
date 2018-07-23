@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include <SDL.h>
+#include <SDL_syswm.h>
+
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "log.h"
@@ -58,11 +61,11 @@ static BOOL bException = FALSE;
 #endif
 
 #if defined XR_X64
-#	define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
+#define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
 #elif defined XR_X86
-#	define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
+#define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
 #else
-#	error CPU architecture is not supported.
+#error CPU architecture is not supported.
 #endif
 
 namespace
@@ -92,6 +95,83 @@ ICN void* GetInstructionPtr()
 }
 }
 
+enum MessageBoxResult
+{
+    resultUndefined = -1,
+    resultContinue = 0,
+    resultTryAgain = 1,
+    resultCancel = 2
+};
+
+constexpr SDL_MessageBoxButtonData buttons[] =
+{
+    /* .flags, .buttonid, .text */
+    { 0, resultContinue, "Continue"  },
+    { 0, resultTryAgain, "Try again" },
+    { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT |
+      SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,
+         resultCancel, "Cancel"      }
+};
+
+SDL_MessageBoxData messageboxdata =
+{
+    SDL_MESSAGEBOX_ERROR,
+    nullptr,
+    "Fatal error",
+    "Vse clomalocb, tashite novyy dvizhok",
+    SDL_arraysize(buttons),
+    buttons,
+    nullptr
+};
+
+int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
+{
+#ifdef WINDOWS // because Windows default Message box is fancy
+    HWND hwnd = nullptr;
+
+    if (applicationWindow)
+    {
+        SDL_SysWMinfo info;
+        SDL_VERSION(&info.version);
+        if (SDL_GetWindowWMInfo(applicationWindow, &info))
+        {
+            switch (info.subsystem)
+            {
+            case SDL_SYSWM_WINDOWS:
+                hwnd = info.info.win.window;
+                break;
+            default: break;
+            }
+        }
+    }
+
+    if (simple)
+        return MessageBox(hwnd, message, title, MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+
+    const int result = MessageBox(hwnd, message, title,
+        MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
+
+    switch (result)
+    {
+    case IDCANCEL: return resultCancel;
+    case IDTRYAGAIN: return resultTryAgain;
+    case IDCONTINUE: return resultContinue;
+    default: return resultUndefined;
+    }
+#else
+    if (simple)
+        return SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, applicationWindow);
+
+    messageboxdata.window = applicationWindow;
+    messageboxdata.title = title;
+    messageboxdata.message = message;
+    int button = resultUndefined;
+    SDL_ShowMessageBox(&messageboxdata, &button);
+    return button;
+#endif
+}
+
+SDL_Window* xrDebug::applicationWindow = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
 xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
@@ -103,9 +183,9 @@ bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
 
 #if defined(WINDOWS)
-void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
+void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
 #elif defined(LINUX)
-void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, 0, fileName); }
+void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
 #endif
 
 #if defined(WINDOWS)
@@ -245,7 +325,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
     stackFrame.AddrFrame.Mode = AddrModeFlat;
     stackFrame.AddrFrame.Offset = threadCtx->Ebp;
 #else
-#	error CPU architecture is not supported.
+#error CPU architecture is not supported.
 #endif
 
     while (GetNextStackFrameString(&stackFrame, threadCtx, frameStr) && traceResult.size() <= maxFramesCount)
@@ -377,7 +457,7 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     string4096 assertionInfo;
     GatherInfo(assertionInfo, loc, expr, desc, arg1, arg2);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    strcat(assertionInfo,
+    xr_strcat(assertionInfo,
            "\r\n"
            "Press CANCEL to abort execution\r\n"
            "Press TRY AGAIN to continue execution\r\n"
@@ -389,25 +469,29 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     if (OnDialog)
         OnDialog(true);
     FlushLog();
-#if defined(WINDOWS)
     if (Core.PluginMode)
-        MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        ShowMessage("X-Ray error", assertionInfo);
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        int result = MessageBox(NULL, assertionInfo, "Fatal error",
-                                MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
-        switch (result)
+        switch (ShowMessage("Fatal error", assertionInfo, false))
         {
-        case IDCANCEL:
+        case resultUndefined:
+            xr_strcat(assertionInfo, SDL_GetError());
+            [[fallthrough]];
+
+        case resultCancel:
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
             DEBUG_BREAK;
             break;
-        case IDTRYAGAIN: ErrorAfterDialog = false;
+
+        case resultTryAgain:
+            ErrorAfterDialog = false;
             break;
-        case IDCONTINUE:
+
+        case resultContinue:
             ErrorAfterDialog = false;
             ignoreAlways = true;
             break;
@@ -420,7 +504,6 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         DEBUG_BREAK;
 #endif
     }
-#endif
     if (OnDialog)
         OnDialog(false);
 
@@ -436,8 +519,8 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 void xrDebug::DoExit(const std::string& message)
 {
     FlushLog();
+    ShowMessage("Error", message.c_str());
 #if defined(WINDOWS)
-    MessageBox(NULL, message.c_str(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     TerminateProcess(GetCurrentProcess(), 1);
 #endif
 }
@@ -491,13 +574,13 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
             string256 currentDir;
             _getcwd(currentDir, sizeof(currentDir));
             string256 relDir;
-            strcpy_s(relDir, logDir);
+            xr_strcpy(relDir, logDir);
             strconcat(sizeof(logDir), logDir, currentDir, "\\", relDir);
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        strcpy_s(logDir, "logs");
+        xr_strcpy(logDir, "logs");
     }
     string_path temp;
     strconcat(sizeof(temp), temp, logDir, log_name());
@@ -573,7 +656,7 @@ void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
         string_path temp;
-        strcpy_s(temp, dumpPath);
+        xr_strcpy(temp, dumpPath);
         sprintf(dumpPath, "logs/%s", temp);
     }
     WriteMiniDump(MINIDUMP_TYPE(MiniDumpFilterMemory | MiniDumpScanMemory), dumpPath, GetCurrentThreadId(), exPtrs);
@@ -628,7 +711,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         {
             if (shared_str_initialized)
                 Msg("\n%s", errMsg);
-            strcat(errMsg, "\r\n");
+            xr_strcat(errMsg, "\r\n");
 #ifdef DEBUG
             if (!IsDebuggerPresent())
                 os_clipboard::update_clipboard(buffer);
@@ -646,10 +729,9 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     {
         if (OnDialog)
             OnDialog(true);
-        MessageBox(NULL,
-                   "Fatal error occurred\n\n"
-                   "Press OK to abort program execution",
-                   "Fatal error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        constexpr pcstr msg = "Fatal error occurred\n\n"
+            "Press OK to abort program execution";
+        ShowMessage("Fatal error", msg);
     }
 #endif
     ReportFault(exPtrs, 0);
@@ -671,11 +753,11 @@ void _terminate()
 #if defined(WINDOWS)
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
+#endif
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, nullptr, "Unexpected application termination");
-    strcat(assertionInfo, "Press OK to abort execution\r\n");
-    MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
-#endif
+    xr_strcat(assertionInfo, "Press OK to abort execution\r\n");
+    ShowMessage("Fatal Error", assertionInfo);
     exit(-1);
 }
 #endif // USE_BUG_TRAP

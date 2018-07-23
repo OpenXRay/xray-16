@@ -53,6 +53,7 @@ void CRenderDevice::Initialize()
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
+        xrDebug::SetApplicationWindow(m_sdlWnd);
     }
 }
 
