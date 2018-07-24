@@ -110,25 +110,31 @@ inline int GetExceptionCode()
 
 #define xr_unlink unlink
 
-typedef bool BOOL;
+#include <inttypes.h>
+typedef int32_t BOOL;
+typedef uint8_t BYTE;
+typedef uint16_t WORD;
+typedef uint32_t DWORD;
+typedef int32_t LONG;
+#ifndef _LIBRAW_TYPES_H
+typedef int64_t INT64;
+typedef uint64_t UINT64;
+#endif
+
 typedef char* LPSTR;
 typedef char* PSTR;
 typedef char* LPTSTR;
 typedef const char* LPCSTR;
 typedef const char* LPCTSTR;
-typedef unsigned char BYTE;
 typedef unsigned char* LPBYTE;
 typedef unsigned int UINT;
 typedef int INT;
-typedef long LONG;
 typedef unsigned long ULONG;
 typedef unsigned long& ULONG_PTR;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
 
-typedef unsigned short WORD;
 typedef unsigned short* LPWORD;
-typedef unsigned long DWORD;
 typedef unsigned long* LPDWORD;
 typedef const void* LPCVOID;
 typedef long long int* PLARGE_INTEGER;
@@ -193,8 +199,6 @@ typedef long _W64;
 //typedef void* HWND;
 typedef SDL_Window* HWND;
 typedef void* HDC;
-//typedef void* HGLRC;
-typedef SDL_GLContext HGLRC;
 typedef float FLOAT;
 typedef unsigned char UINT8;
 

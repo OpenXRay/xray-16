@@ -126,6 +126,7 @@ void CRenderDevice::UpdateWindowRects()
     m_rcWindowBounds.w += m_rcWindowBounds.x;
     m_rcWindowBounds.h += m_rcWindowBounds.y;
 
+#if SDL_VERSION_ATLEAST(2,0,5)
     // Do we need code below?
     int top, left, bottom, right;
     SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
@@ -135,6 +136,7 @@ void CRenderDevice::UpdateWindowRects()
     m_rcWindowBounds.h += bottom;
     // XXX: check if we need this code when SDL_GetWindowBordersSize
     // will be available for Windows
+#endif
 }
 
 void CRenderDevice::SelectResolution(const bool windowed)

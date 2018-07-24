@@ -601,7 +601,7 @@ void CConsole::Show()
     }
     bVisible = true;
 
-    GetCursorPos(&m_mouse_pos);
+    SDL_GetGlobalMouseState((int *) &m_mouse_pos.x, (int *) &m_mouse_pos.y); // Replace with SDL_GetMouseState in case retrieve window-relative coordinates
 
     ec().clear_states();
     scroll_delta = 0;
@@ -626,7 +626,7 @@ void CConsole::Hide()
 
     if (pInput->get_exclusive_mode())
     {
-        SetCursorPos(m_mouse_pos.x, m_mouse_pos.y);
+        SDL_WarpMouseGlobal(m_mouse_pos.x, m_mouse_pos.y); // Replace with SDL_WarpMouseInWindow in case set window-relative coordinates
     }
 
     bVisible = false;

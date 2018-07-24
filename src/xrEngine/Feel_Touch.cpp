@@ -7,7 +7,7 @@ using namespace Feel;
 Touch::Touch() : pure_relcase(&Touch::feel_touch_relcase) {}
 Touch::~Touch() {}
 bool Touch::feel_touch_contact(IGameObject* O) { return true; }
-void Touch::feel_touch_deny(IGameObject* O, /*DWORD*/ unsigned long T)
+void Touch::feel_touch_deny(IGameObject* O, DWORD T)
 {
     DenyTouch D;
     D.O = O;
