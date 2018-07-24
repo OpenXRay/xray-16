@@ -105,9 +105,9 @@ void CTextConsole::CreateLogWnd()
     lf.lfUnderline = 0;
     lf.lfStrikeOut = 0;
     lf.lfCharSet = DEFAULT_CHARSET;
-    lf.lfOutPrecision = OUT_STRING_PRECIS;
+    lf.lfOutPrecision = OUT_TT_PRECIS;
     lf.lfClipPrecision = CLIP_STROKE_PRECIS;
-    lf.lfQuality = DRAFT_QUALITY;
+    lf.lfQuality = CLEARTYPE_NATURAL_QUALITY;
     lf.lfPitchAndFamily = VARIABLE_PITCH | FF_SWISS;
     xr_sprintf(lf.lfFaceName, sizeof(lf.lfFaceName), "");
 

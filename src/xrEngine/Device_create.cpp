@@ -141,7 +141,14 @@ void CRenderDevice::UpdateWindowRects()
 
 void CRenderDevice::SelectResolution(const bool windowed)
 {
-    if (windowed)
+    // Dedicated server hardcoded resolution
+    // XXX: to be removed
+    if (GEnv.isDedicatedServer)
+    {
+        dwWidth = psCurrentVidMode[0] = 640;
+        dwHeight = psCurrentVidMode[1] = 480;
+    }
+    else if (windowed)
     {
         dwWidth = psCurrentVidMode[0];
         dwHeight = psCurrentVidMode[1];
