@@ -59,7 +59,7 @@ IC int xr_sprintf(char* dest, size_t sizeOfBuffer, const char* format, ...)
 #endif // _EDITOR
 
 #if defined(LINUX)
-IC int vsnprintf_s( char *buffer, size_t size, size_t count, const char *format, va_list list)
+IC int vsnprintf_s(char* buffer, size_t size, size_t count, const char* format, va_list list)
 {
 	//TODO add bound check
 	return vsnprintf(buffer, size, format, list);
@@ -156,16 +156,30 @@ inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR so
     return strcpy_s(destination, destination_size, source);
 }
 
+template <int count>
+inline int xr_strcpy(char(&destination)[count], LPCSTR source)
+{
+    return xr_strcpy(destination, count, source);
+}
+
 inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
 {
     return strcat_s(destination, buffer_size, source);
+}
+
+template <int count>
+inline int xr_strcat(char(&destination)[count], LPCSTR source)
+{
+    return xr_strcat(destination, count, source);
 }
 
 inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
-    return vsprintf_s(destination, buffer_size, format_string, args);
+    const int result = vsprintf_s(destination, buffer_size, format_string, args);
+    va_end(args);
+    return result;
 }
 
 template <int count>
@@ -173,7 +187,9 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 {
     va_list args;
     va_start(args, format_string);
-    return vsprintf_s(destination, count, format_string, args);
+    const int result = vsprintf_s(destination, count, format_string, args);
+    va_end(args);
+    return result;
 }
 #else // #ifndef MASTER_GOLD
 
@@ -201,7 +217,9 @@ inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCST
 {
     va_list args;
     va_start(args, format_string);
-    return vsnprintf_s(destination, buffer_size, buffer_size - 1, format_string, args);
+    const int result = vsnprintf_s(destination, buffer_size, buffer_size - 1, format_string, args);
+    va_end(args);
+    return result;
 }
 
 template <int count>
@@ -209,21 +227,11 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 {
     va_list args;
     va_start(args, format_string);
-    return vsnprintf_s(destination, count, count - 1, format_string, args);
+    const int result = vsnprintf_s(destination, count, count - 1, format_string, args);
+    va_end(args);
+    return result;
 }
 #endif // #ifndef MASTER_GOLD
-
-template <int count>
-inline int xr_strcpy(char (&destination)[count], LPCSTR source)
-{
-    return xr_strcpy(destination, count, source);
-}
-
-template <int count>
-inline int xr_strcat(char (&destination)[count], LPCSTR source)
-{
-    return xr_strcat(destination, count, source);
-}
 //#endif // #ifndef _EDITOR
 
 inline void MemFill32(void* dst, u32 value, size_t dstSize)
