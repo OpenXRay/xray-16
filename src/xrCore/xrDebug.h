@@ -71,8 +71,8 @@ public:
     static void SetDialogHandler(DialogHandler handler) { OnDialog = handler; }
     static const char* ErrorToString(long code);
     static void SetBugReportFile(const char* fileName);
-    static void GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
-                           const char* arg1 = nullptr, const char* arg2 = nullptr);
+    static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
+                           const char* desc, const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void Fatal(const ErrorLocation& loc, const char* format, ...);
     static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
