@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <SDL.h>
-#include <SDL_syswm.h>
+#include "SDL.h"
+#include "SDL_syswm.h"
 
 #include "xrDebug.h"
 #include "os_clipboard.h"
