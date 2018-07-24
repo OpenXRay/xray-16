@@ -46,7 +46,11 @@ void CRenderDevice::Initialize()
     if (!m_sdlWnd)
     {
         const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
-            SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_OPENGL;
+            SDL_WINDOW_RESIZABLE
+#if SDL_VERSION_ATLEAST(2,0,5)
+                | SDL_WINDOW_ALWAYS_ON_TOP
+#endif
+                | SDL_WINDOW_OPENGL;
 
         m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 256, 192, flags);
        

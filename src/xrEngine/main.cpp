@@ -18,7 +18,11 @@
 
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
+#if defined(WINDOWS)
 #include "Text_Console.h"
+#elif defined(LINUX)
+#define CTextConsole CConsole
+#endif
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"
 
