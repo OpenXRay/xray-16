@@ -785,7 +785,7 @@ CRenderTarget::CRenderTarget()
             for (int it1 = 0; it1 < TEX_jitter_count - 1; it1++)
             {
                 string_path name;
-                sprintf(name, "%s%d",r2_jitter, it1);
+                xr_sprintf(name, "%s%d", r2_jitter, it1);
                 CHK_GL (glBindTexture(GL_TEXTURE_2D, t_noise_surf[it1]));
                 CHK_GL (glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
                 t_noise[it1] = RImplementation.Resources->_CreateTexture(name);
@@ -821,7 +821,7 @@ CRenderTarget::CRenderTarget()
             // generate HBAO jitter texture (last)
             int it = TEX_jitter_count - 1;
             string_path name;
-            sprintf(name, "%s%d",r2_jitter, it);
+            xr_sprintf(name, "%s%d", r2_jitter, it);
             CHK_GL (glBindTexture(GL_TEXTURE_2D, t_noise_surf[it]));
             CHK_GL (glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, TEX_jitter, TEX_jitter));
             t_noise[it] = RImplementation.Resources->_CreateTexture(name);
