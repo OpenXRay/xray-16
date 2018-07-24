@@ -248,14 +248,14 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     strcpy_s(name, _name);
-    if (0 == GEnv.Render->m_MSAASample) strcat(name, "_0");
-    if (1 == GEnv.Render->m_MSAASample) strcat(name, "_1");
-    if (2 == GEnv.Render->m_MSAASample) strcat(name, "_2");
-    if (3 == GEnv.Render->m_MSAASample) strcat(name, "_3");
-    if (4 == GEnv.Render->m_MSAASample) strcat(name, "_4");
-    if (5 == GEnv.Render->m_MSAASample) strcat(name, "_5");
-    if (6 == GEnv.Render->m_MSAASample) strcat(name, "_6");
-    if (7 == GEnv.Render->m_MSAASample) strcat(name, "_7");
+    if (0 == GEnv.Render->m_MSAASample) xr_strcat(name, "_0");
+    if (1 == GEnv.Render->m_MSAASample) xr_strcat(name, "_1");
+    if (2 == GEnv.Render->m_MSAASample) xr_strcat(name, "_2");
+    if (3 == GEnv.Render->m_MSAASample) xr_strcat(name, "_3");
+    if (4 == GEnv.Render->m_MSAASample) xr_strcat(name, "_4");
+    if (5 == GEnv.Render->m_MSAASample) xr_strcat(name, "_5");
+    if (6 == GEnv.Render->m_MSAASample) xr_strcat(name, "_6");
+    if (7 == GEnv.Render->m_MSAASample) xr_strcat(name, "_7");
     LPSTR N = LPSTR(name);
     map_PS::iterator I = m_ps.find(N);
     if (I != m_ps.end()) return I->second;
