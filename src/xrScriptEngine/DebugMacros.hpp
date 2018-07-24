@@ -11,7 +11,7 @@ do                                                                              
         if (!(expr))                                                                          \
         {                                                                                     \
             string4096 assertionInfo;                                                         \
-            xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, #expr, nullptr, nullptr, nullptr); \
+            xrDebug::GatherInfo(assertionInfo, sizeof(assertionInfo), DEBUG_INFO, #expr, nullptr, nullptr, nullptr); \
             throw assertionInfo;                                                              \
         }                                                                                     \
     \
@@ -24,7 +24,7 @@ do                                                                              
         if (!(expr))                                                                       \
         {                                                                                  \
             string4096 assertionInfo;                                                      \
-            xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, #expr, msg0, nullptr, nullptr); \
+            xrDebug::GatherInfo(assertionInfo, sizeof(assertionInfo), DEBUG_INFO, #expr, msg0, nullptr, nullptr); \
             throw assertionInfo;                                                           \
         }                                                                                  \
     \
@@ -37,7 +37,7 @@ do                                                                              
         if (!(expr))                                                                    \
         {                                                                               \
             string4096 assertionInfo;                                                   \
-            xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, #expr, msg0, msg1, nullptr); \
+            xrDebug::GatherInfo(assertionInfo, sizeof(assertionInfo), DEBUG_INFO, #expr, msg0, msg1, nullptr); \
             throw assertionInfo;                                                        \
         }                                                                               \
     \
