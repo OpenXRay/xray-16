@@ -125,13 +125,13 @@ void line_edit_control::update_key_states()
 {
     m_key_state.zero();
 
-    set_key_state(ks_LShift, !!pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT));
-    set_key_state(ks_RShift, !!pInput->iGetAsyncKeyState(SDL_SCANCODE_RSHIFT));
-    set_key_state(ks_LCtrl, !!pInput->iGetAsyncKeyState(SDL_SCANCODE_LCTRL));
-    set_key_state(ks_RCtrl, !!pInput->iGetAsyncKeyState(SDL_SCANCODE_RCTRL));
-    set_key_state(ks_LAlt, !!pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT));
-    set_key_state(ks_RAlt, !!pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT));
-    set_key_state(ks_CapsLock, text_editor::get_caps_lock_state());
+    set_key_state(ks_LShift, pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT));
+    set_key_state(ks_RShift, pInput->iGetAsyncKeyState(SDL_SCANCODE_RSHIFT));
+    set_key_state(ks_LCtrl, pInput->iGetAsyncKeyState(SDL_SCANCODE_LCTRL));
+    set_key_state(ks_RCtrl, pInput->iGetAsyncKeyState(SDL_SCANCODE_RCTRL));
+    set_key_state(ks_LAlt, pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT));
+    set_key_state(ks_RAlt, pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT));
+    set_key_state(ks_CapsLock, SDL_GetModState() & KMOD_CAPS);
 }
 
 void line_edit_control::clear_states()
@@ -489,7 +489,7 @@ void line_edit_control::on_frame()
 {
     update_key_states();
 
-    u32 fr_time = Device.dwTimeContinual;
+    const auto fr_time = Device.dwTimeContinual;
     float dt = (fr_time - m_last_frame_time) * 0.001f;
     if (dt > 0.06666f)
     {
@@ -774,7 +774,6 @@ void remove_spaces(pstr str)
     --i;
 
     if (i < str_size)
-
         strncpy_s(str, str_size, new_str, i);
 }
 

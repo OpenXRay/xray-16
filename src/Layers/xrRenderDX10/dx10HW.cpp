@@ -126,6 +126,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     }
     else
         Log("Couldn't get window information: ", SDL_GetError());
+
     sd.Windowed = bWindowed;
 
     // Depth/stencil (DX10 don't need this?)
@@ -138,7 +139,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     UINT createDeviceFlags = 0;
 #ifdef DEBUG
-// createDeviceFlags |= D3Dxx_CREATE_DEVICE_DEBUG;
+    // createDeviceFlags |= D3Dxx_CREATE_DEVICE_DEBUG;
 #endif
     HRESULT R;
 #ifdef USE_DX11

@@ -137,7 +137,7 @@ void attach_adjust_mode_keyb(int dik)
         return;
 
     bool b_move = !!(pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT));
-    bool b_rot = !!(pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI));
+    bool b_rot = !!(pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT));
 
     int axis = -1;
     if (pInput->iGetAsyncKeyState(SDL_SCANCODE_Z))

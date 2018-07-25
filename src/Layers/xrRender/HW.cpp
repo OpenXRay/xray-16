@@ -101,9 +101,9 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
         fDepth = selectDepthStencil(fTarget);
     }
 
-    if (D3DFMT_UNKNOWN == fTarget)
+    if (D3DFMT_UNKNOWN == fTarget || D3DFMT_UNKNOWN == fDepth)
     {
-        Msg("Failed to initialize graphics hardware.\n"
+        Log("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
             "Can not find matching format for back buffer.");
         FlushLog();
@@ -143,7 +143,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
         }
     }
     else
-        Log("Couldn't get window information: %s", SDL_GetError());
+        Log("! Couldn't get window information: ", SDL_GetError());
 
     P.Windowed = bWindowed;
 

@@ -534,7 +534,7 @@ void CActor::OnNextWeaponSlot()
                 IR_OnKeyboardPress(kARTEFACT);
             }
             else
-                IR_OnKeyboardPress((EGameActions) (kWPN_1 + i));
+                IR_OnKeyboardPress(kWPN_1 + i);
             return;
         }
     }
@@ -570,7 +570,7 @@ void CActor::OnPrevWeaponSlot()
                 IR_OnKeyboardPress(kARTEFACT);
             }
             else
-                IR_OnKeyboardPress((EGameActions) (kWPN_1 + i));
+                IR_OnKeyboardPress(kWPN_1 + i);
             return;
         }
     }
@@ -661,7 +661,7 @@ void CActor::NoClipFly(int cmd)
     float scale = 1.0f;
     if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
         scale = 0.25f;
-    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI))
+    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT))
         scale = 4.0f;
 
     switch (cmd)
