@@ -238,9 +238,6 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
         assign_callback(SDL_SCANCODE_BACKSPACE, ks_Ctrl, Callback(this, &line_edit_control::delete_word_back));
         assign_callback(SDL_SCANCODE_DELETE, ks_Ctrl, Callback(this, &line_edit_control::delete_word_forward));
 
-        assign_callback(SDL_SCANCODE_LSHIFT, ks_Ctrl, Callback(this, &line_edit_control::SwitchKL));
-        assign_callback(SDL_SCANCODE_LSHIFT, ks_Alt, Callback(this, &line_edit_control::SwitchKL));
-
     } // if mode
 
     create_key_state(SDL_SCANCODE_LSHIFT, ks_LShift);
@@ -740,7 +737,6 @@ void line_edit_control::compute_positions()
 }
 
 void line_edit_control::clamp_cur_pos() { clamp(m_cur_pos, 0, (int)xr_strlen(m_edit_str)); }
-void line_edit_control::SwitchKL() { ActivateKeyboardLayout((HKL)HKL_NEXT, 0); }
 // -------------------------------------------------------------------------------------------------
 
 void remove_spaces(pstr str)
