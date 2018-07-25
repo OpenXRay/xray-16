@@ -186,6 +186,10 @@ void CInput::KeyUpdate()
             keyboardState[event.key.keysym.scancode] = false;
             cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
             break;
+
+        case SDL_TEXTINPUT: 
+            Msg("Input: [%s]\n", event.text.text);
+            break;
         }
     }
 
