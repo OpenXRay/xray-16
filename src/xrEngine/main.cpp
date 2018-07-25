@@ -22,6 +22,7 @@
 #include "Text_Console.h"
 #elif defined(LINUX)
 #define CTextConsole CConsole
+#pragma todo("Implement text console or it's alternative")
 #endif
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"

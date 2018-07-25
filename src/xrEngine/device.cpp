@@ -230,9 +230,9 @@ void CRenderDevice::on_idle()
     }
 
     if (psDeviceFlags.test(rsStatistic))
-        g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
+        g_bEnableStatGather = true; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
-        g_bEnableStatGather = FALSE;
+        g_bEnableStatGather = false;
 
     if (g_loading_events.size())
     {
@@ -505,17 +505,19 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     if (bOn)
     {
         if (!Paused())
-            bShowPauseString = editor() ? FALSE :
+        {
+            bShowPauseString = editor() ? FALSE : TRUE;
 #ifdef DEBUG
-                                          !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
-#endif // DEBUG
-                                                                                       TRUE;
+            if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
+                bShowPauseString = FALSE;
+#endif
+        }
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
         {
-            g_pauseMngr().Pause(TRUE);
+            g_pauseMngr().Pause(true);
 #ifdef DEBUG
-            if (!xr_strcmp(reason, "li_pause_key_no_clip"))
-                TimerGlobal.Pause(FALSE);
+            if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
+                TimerGlobal.Pause(false);
 #endif
         }
         if (bSound && GEnv.Sound)
@@ -526,7 +528,7 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
         if (bTimer && g_pauseMngr().Paused())
         {
             fTimeDelta = EPS_S + EPS_S;
-            g_pauseMngr().Pause(FALSE);
+            g_pauseMngr().Pause(false);
         }
         if (bSound)
         {
@@ -545,7 +547,10 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
-    const BOOL isWndActive = (1 == wParam) ? TRUE : FALSE;
+    u16 fActive = LOWORD(wParam);
+    const BOOL fMinimized = (BOOL)HIWORD(wParam);
+
+    const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
 
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
         pInput->ClipCursor(true);
@@ -589,10 +594,16 @@ CRenderDevice* get_device() { return &Device; }
 u32 script_time_global() { return Device.dwTimeGlobal; }
 u32 script_time_global_async() { return Device.TimerAsync_MMT(); }
 
-SCRIPT_EXPORT(Device, (), {
+SCRIPT_EXPORT(Device, (),
+{
     using namespace luabind;
-    module(luaState)[def("time_global", &script_time_global), def("time_global_async", &script_time_global_async),
-        def("device", &get_device), def("is_enough_address_space_available", &is_enough_address_space_available)];
+    module(luaState)
+    [
+        def("time_global", &script_time_global),
+        def("time_global_async", &script_time_global_async),
+        def("device", &get_device),
+        def("is_enough_address_space_available", &is_enough_address_space_available)
+    ];
 });
 
 CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}
