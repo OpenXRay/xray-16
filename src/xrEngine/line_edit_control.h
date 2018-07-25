@@ -103,6 +103,7 @@ private:
     void xr_stdcall delete_selected_forward();
     void xr_stdcall delete_word_back();
     void xr_stdcall delete_word_forward();
+    void xr_stdcall SwitchKL();
 
     void assign_char_pairs(init_mode mode);
     void create_key_state(int const dik, key_state state);
