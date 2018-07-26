@@ -58,6 +58,8 @@ CInput::CInput(bool exclusive, int deviceForInit)
 
     xrDebug::SetDialogHandler(on_error_dialog);
 
+    SDL_StopTextInput(); // sanity
+
 #ifdef ENGINE_BUILD
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
@@ -171,7 +173,7 @@ void CInput::KeyUpdate()
     SDL_PumpEvents();
 
     SDL_Event event;
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED))
+    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYUP))
     {
         switch (event.type)
         {

@@ -10,6 +10,7 @@
 #include "line_edit_control.h"
 #include "xr_input.h"
 #include <locale.h>
+#include <codecvt>
 
 namespace text_editor
 {
@@ -55,6 +56,17 @@ void type_pair::init(int dik, char c, char c_shift, bool b_translate)
     m_char_shift = c_shift;
 }
 
+xr_string utf8_to_string(const char* utf8str, const std::locale& loc)
+{
+    // UTF-8 to wstring
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> wconv;
+    std::wstring wstr = wconv.from_bytes(utf8str);
+    // wstring to string
+    std::vector<char> buf(wstr.size());
+    std::use_facet<std::ctype<wchar_t>>(loc).narrow(wstr.data(), wstr.data() + wstr.size(), '?', buf.data());
+    return xr_string(buf.data(), buf.size());
+}
+
 void type_pair::on_key_press(line_edit_control* const control)
 {
     char c = 0;
@@ -62,32 +74,30 @@ void type_pair::on_key_press(line_edit_control* const control)
     {
         c = m_char;
         char c_shift = m_char_shift;
-        string128 buff;
-        buff[0] = 0;
 
-        /*
-        //setlocale( LC_ALL, "" ); // User-default
-
-        // The following 3 lines looks useless
-
-        LPSTR loc;
-        STRCONCAT ( loc, ".", xr_itoa( GetACP(), code_page, 10 ) );
-        setlocale ( LC_ALL, loc );*/
-
-        static _locale_t current_locale = _create_locale(LC_ALL, "");
-
-        if (pInput->get_dik_name(m_dik, buff, sizeof(buff)))
+        SDL_Event event;
+        while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_TEXTEDITING, SDL_TEXTINPUT))
         {
-            if (_isalpha_l(buff[0], current_locale) || buff[0] == char(-1)) // "я" = -1
+            switch (event.type)
             {
-                _strlwr_l(buff, current_locale);
-                c = buff[0];
-                _strupr_l(buff, current_locale);
-                c_shift = buff[0];
+            case SDL_TEXTINPUT:
+            {
+                const std::locale locale("");
+                auto str = utf8_to_string(event.text.text, locale);
+
+                if (std::isalpha(str[0], locale) || str[0] == char(-1)) // "я" = -1
+                {
+                    c = std::tolower(str[0], locale);
+                    c_shift = std::toupper(str[0], locale);
+                }
+                break;
+            }
+
+            case SDL_TEXTEDITING:
+                // XXX: use this?
+                break;
             }
         }
-
-        // setlocale( LC_ALL, "C" ); // restore to ANSI
 
         if (control->get_key_state(ks_Shift) != control->get_key_state(ks_CapsLock))
         {
