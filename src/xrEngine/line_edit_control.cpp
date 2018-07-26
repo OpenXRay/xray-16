@@ -98,29 +98,6 @@ line_edit_control::~line_edit_control()
     delete_data(actions);
 }
 
-static inline bool get_caps_lock_state()
-{
-#if 0
-    static bool first_time = true;
-    static bool is_windows_vista_or_later = false;
-    if (first_time)
-    {
-        first_time = false;
-        OSVERSIONINFO version_info;
-        ZeroMemory(&version_info, sizeof(version_info));
-        version_info.dwOSVersionInfoSize = sizeof(version_info);
-        GetVersionEx(&version_info);
-        is_windows_vista_or_later = version_info.dwMajorVersion >= 6;
-    }
-
-    if (is_windows_vista_or_later)
-        return !!(GetKeyState(VK_CAPITAL) & 1);
-    else
-#else // #if 0
-    return false;
-#endif // #if 0
-}
-
 void line_edit_control::update_key_states()
 {
     m_key_state.zero();
@@ -740,7 +717,13 @@ void line_edit_control::compute_positions()
 }
 
 void line_edit_control::clamp_cur_pos() { clamp(m_cur_pos, 0, (int)xr_strlen(m_edit_str)); }
-void line_edit_control::SwitchKL() { ActivateKeyboardLayout((HKL)HKL_NEXT, 0); }
+void line_edit_control::SwitchKL()
+{
+#ifdef WINDOWS
+    if (pInput->get_exclusive_mode())
+        ActivateKeyboardLayout((HKL)HKL_NEXT, 0);
+#endif
+}
 // -------------------------------------------------------------------------------------------------
 
 void remove_spaces(pstr str)
