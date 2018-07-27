@@ -49,7 +49,6 @@ class CMainMenu : public IMainMenu,
                   public CDialogHolder,
                   public CUIWndCallback,
                   public CDeviceResetNotifier
-
 {
     CUIDialogWnd* m_startDialog;
 
@@ -136,7 +135,7 @@ public:
     virtual ~CMainMenu();
 
     virtual void Activate(bool bActive);
-    virtual bool IsActive();
+    bool IsActive() const override;
     virtual bool CanSkipSceneRendering();
 
     virtual bool IgnorePause() { return true; }

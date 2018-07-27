@@ -297,7 +297,7 @@ bool CMainMenu::ReloadUI()
     return true;
 }
 
-bool CMainMenu::IsActive() { return !!m_Flags.test(flActive); }
+bool CMainMenu::IsActive() const { return m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
 
 // IInputReceiver
