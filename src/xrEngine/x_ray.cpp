@@ -159,8 +159,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 {
     if (E == eQuit)
     {
-        if (pInput != NULL)
-            pInput->ClipCursor(false);
+        if (pInput != nullptr)
+            pInput->GrabInput(false);
 
         g_SASH.EndBenchmark();
 
@@ -200,8 +200,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     }
     else if (E == eDisconnect)
     {
-        if (pInput != NULL && TRUE == Engine.Event.Peek("KERNEL:quit"))
-            pInput->ClipCursor(false);
+        if (pInput != nullptr && TRUE == Engine.Event.Peek("KERNEL:quit"))
+            pInput->GrabInput(false);
 
         if (g_pGameLevel)
         {

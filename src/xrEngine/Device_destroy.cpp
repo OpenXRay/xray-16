@@ -16,7 +16,6 @@ void CRenderDevice::Destroy()
     if (!b_is_Ready)
         return;
     Log("Destroying Direct3D...");
-    pInput->ClipCursor(false);
     GEnv.Render->ValidateHW();
     GEnv.DU->OnDeviceDestroy();
     b_is_Ready = false;
@@ -51,7 +50,7 @@ void CRenderDevice::Reset(bool precache)
 {
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
-    pInput->ClipCursor(false);
+    pInput->GrabInput(false);
 
     const auto tm_start = TimerAsync();
 
@@ -76,5 +75,5 @@ void CRenderDevice::Reset(bool precache)
         seqResolutionChanged.Process();
 
     if (!GEnv.isDedicatedServer)
-        pInput->ClipCursor(true);
+        pInput->GrabInput(true);
 }
