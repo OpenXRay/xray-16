@@ -383,6 +383,14 @@ void CRenderDevice::message_loop()
                     OnWM_Activate(0, event.window.data2);
                     break;
 
+                case SDL_WINDOWEVENT_ENTER:
+                    SDL_ShowCursor(SDL_FALSE);
+                    break;
+
+                case SDL_WINDOWEVENT_LEAVE:
+                    SDL_ShowCursor(SDL_TRUE);
+                    break;
+
                 case SDL_WINDOWEVENT_CLOSE:
                     event.type = SDL_QUIT;
                 }
@@ -425,7 +433,7 @@ void CRenderDevice::Run()
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
-    pInput->ClipCursor(true);
+    pInput->GrabInput(true);
     message_loop();
     seqAppEnd.Process();
     // Stop Balance-Thread
@@ -553,9 +561,9 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
 
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
-        pInput->ClipCursor(true);
+        pInput->GrabInput(true);
     else
-        pInput->ClipCursor(false);
+        pInput->GrabInput(false);
 
     extern int ps_always_active;
     const BOOL isGameActive = ps_always_active || isWndActive;

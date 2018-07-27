@@ -720,7 +720,10 @@ void line_edit_control::clamp_cur_pos() { clamp(m_cur_pos, 0, (int)xr_strlen(m_e
 void line_edit_control::SwitchKL()
 {
 #ifdef WINDOWS
-    if (pInput->get_exclusive_mode())
+    // XXX: do we even need this?
+    // Check if SDL_HINT_GRAB_KEYBOARD works
+    // and enable in case if we will need this
+    if (false && pInput->IsExclusiveMode())
         ActivateKeyboardLayout((HKL)HKL_NEXT, 0);
 #endif
 }

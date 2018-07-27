@@ -4,6 +4,7 @@
 
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
+#include "xr_input.h"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
@@ -72,15 +73,18 @@ void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* area, void* /*data*/)
 {
+    if (pInput->InputIsGrabbed())
+        return SDL_HITTEST_NORMAL;
+
     const auto& rect = Device.m_rcWindowClient;
 
     // size of additional interactive area (in pixels)
     constexpr int hit = 15;
 
-    const bool leftSide = area->x < rect.x + hit;
-    const bool topSide = area->y < rect.y + hit;
-    const bool bottomSide = area->y > rect.h - hit;
-    const bool rightSide = area->x > rect.w - hit;
+    const bool leftSide = area->x <= rect.x + hit;
+    const bool topSide = area->y <= rect.y + hit;
+    const bool bottomSide = area->y >= rect.h - hit;
+    const bool rightSide = area->x >= rect.w - hit;
 
     if (leftSide && topSide)
         return SDL_HITTEST_RESIZE_TOPLEFT;
@@ -106,14 +110,5 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* area, v
     if (leftSide)
         return SDL_HITTEST_RESIZE_LEFT;
 
-    const int centerX = rect.w / 2;
-    const int centerY = rect.h / 2;
-
-    // Allow drag from any point except window center
-    // For this case, 'hit' is a size of a square in the center
-    if ((area->x > centerX + hit || area->x < centerX - hit)
-        || (area->y > centerY + hit || area->y < centerY - hit))
-        return SDL_HITTEST_DRAGGABLE;
-
-    return SDL_HITTEST_NORMAL;
+    return SDL_HITTEST_DRAGGABLE;
 }

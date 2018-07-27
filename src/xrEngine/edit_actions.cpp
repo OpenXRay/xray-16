@@ -9,7 +9,6 @@
 #include "edit_actions.h"
 #include "line_edit_control.h"
 #include "xr_input.h"
-#include <locale.h>
 #include <codecvt>
 
 namespace text_editor
@@ -76,7 +75,7 @@ void type_pair::on_key_press(line_edit_control* const control)
         char c_shift = m_char_shift;
 
         SDL_Event event;
-        while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_TEXTEDITING, SDL_TEXTINPUT))
+        while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_TEXTINPUT, SDL_TEXTINPUT))
         {
             switch (event.type)
             {
@@ -92,10 +91,6 @@ void type_pair::on_key_press(line_edit_control* const control)
                 }
                 break;
             }
-
-            case SDL_TEXTEDITING:
-                // XXX: use this?
-                break;
             }
         }
 

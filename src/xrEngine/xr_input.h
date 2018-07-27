@@ -38,19 +38,10 @@ inline int KeyToMouseButton(const int dik, const bool fromZero = true)
 
 class ENGINE_API IInputReceiver;
 
-//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-//описание класса
-const int mouse_device_key = 1;
-const int keyboard_device_key = 2;
-const int all_device_key = mouse_device_key | keyboard_device_key;
-const int default_key = mouse_device_key | keyboard_device_key;
-
 class ENGINE_API CInput
-#ifndef M_BORLAND
     : public pureFrame,
       public pureAppActivate,
       public pureAppDeactivate
-#endif
 {
 public:
     enum
@@ -84,6 +75,8 @@ private:
     void KeyUpdate();
 
     InputStatistics stats;
+    bool exclusiveInput;
+    bool inputGrabbed;
 
 public:
     u32 dwCurTime;
@@ -91,31 +84,28 @@ public:
 
     const InputStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
-    void SetAllAcquire(bool bAcquire = true);
-    void SetMouseAcquire(bool bAcquire);
-    void SetKBDAcquire(bool bAcquire);
 
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
     bool iGetAsyncKeyState(int dik);
     bool iGetAsyncBtnState(int btn);
     void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
-    void ClipCursor(bool clip);
+    void ClipCursor(const bool clip);
+    void GrabInput(const bool grab);
+    bool InputIsGrabbed() const;
 
-    CInput(bool exclusive = true, int deviceForInit = default_key);
+    CInput(const bool exclusive = true);
     ~CInput();
 
-    virtual void OnFrame(void);
-    virtual void OnAppActivate(void);
-    virtual void OnAppDeactivate(void);
+    virtual void OnFrame();
+    virtual void OnAppActivate();
+    virtual void OnAppDeactivate();
 
     IInputReceiver* CurrentIR();
 
 public:
-    void exclusive_mode(const bool& exclusive);
-    IC bool get_exclusive_mode();
-    void unacquire();
-    void acquire(const bool& exclusive);
+    void ExclusiveMode(const bool exclusive);
+    bool IsExclusiveMode() const;
     bool get_dik_name(int dik, LPSTR dest, int dest_sz);
 
     void feedback(u16 s1, u16 s2, float time);

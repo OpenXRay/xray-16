@@ -19,30 +19,20 @@ ENGINE_API Flags32 psMouseInvert = {FALSE};
 
 float stop_vibration_time = flt_max;
 
-#define MOUSEBUFFERSIZE 64
-#define KEYBOARDBUFFERSIZE 64
-
-static bool g_exclusive = true;
 static void on_error_dialog(bool before)
 {
-    if (!pInput || !g_exclusive || Device.editor())
+    if (!pInput || !pInput->IsExclusiveMode() || Device.editor())
         return;
 
     if (before)
-    {
-        pInput->ClipCursor(false);
-        pInput->unacquire();
-    }
+        pInput->GrabInput(false);
     else
-    {
-        pInput->ClipCursor(true);
-        pInput->acquire(true);
-    }
+        pInput->GrabInput(true);
 }
 
-CInput::CInput(bool exclusive, int deviceForInit)
+CInput::CInput(const bool exclusive)
 {
-    g_exclusive = exclusive;
+    exclusiveInput = exclusive;
 
     Log("Starting INPUT device...");
 
@@ -58,22 +48,20 @@ CInput::CInput(bool exclusive, int deviceForInit)
 
     xrDebug::SetDialogHandler(on_error_dialog);
 
+    SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, "1");
     SDL_StopTextInput(); // sanity
 
-#ifdef ENGINE_BUILD
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH);
-#endif
 }
 
-CInput::~CInput(void)
+CInput::~CInput()
 {
-#ifdef ENGINE_BUILD
+    GrabInput(false);
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
     Device.seqAppActivate.Remove(this);
-#endif
 }
 
 //-----------------------------------------------------------------------
@@ -82,12 +70,6 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     font.OutNext("*** INPUT:    %2.2fms", pInput->GetStats().FrameTime.result);
 }
-
-void CInput::SetAllAcquire(bool bAcquire) {}
-
-void CInput::SetMouseAcquire(bool bAcquire) {}
-void CInput::SetKBDAcquire(bool bAcquire) {}
-
 
 void CInput::MouseUpdate()
 {
@@ -255,21 +237,37 @@ bool CInput::iGetAsyncBtnState(int btn)
 {
     return mouseState[btn];
 }
-void CInput::ClipCursor(bool clip)
+
+void CInput::ClipCursor(const bool clip)
 {
     if (clip)
     {
-        SDL_SetWindowGrab(Device.m_sdlWnd, SDL_TRUE);
+        SDL_ShowCursor(SDL_TRUE);
         SDL_SetRelativeMouseMode(SDL_TRUE);
     }
     else
     {
-        SDL_SetWindowGrab(Device.m_sdlWnd, SDL_FALSE);
+        SDL_ShowCursor(SDL_FALSE);
         SDL_SetRelativeMouseMode(SDL_FALSE);
     }
 }
 
-//-------------------------------------------------------
+void CInput::GrabInput(const bool grab)
+{
+    ClipCursor(grab);
+
+    if (IsExclusiveMode())
+        SDL_SetWindowGrab(Device.m_sdlWnd, grab ? SDL_TRUE : SDL_FALSE);
+
+    inputGrabbed = grab;
+
+}
+
+bool CInput::InputIsGrabbed() const
+{
+    return inputGrabbed;
+}
+
 void CInput::iCapture(IInputReceiver* p)
 {
     VERIFY(p);
@@ -313,7 +311,6 @@ void CInput::OnAppActivate(void)
     if (CurrentIR())
         CurrentIR()->IR_OnActivate();
 
-    SetAllAcquire(true);
     ZeroMemory(mouseState, sizeof(mouseState));
     ZeroMemory(keyboardState, sizeof(keyboardState));
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
@@ -325,7 +322,6 @@ void CInput::OnAppDeactivate(void)
     if (CurrentIR())
         CurrentIR()->IR_OnDeactivate();
 
-    SetAllAcquire(false);
     ZeroMemory(mouseState, sizeof(mouseState));
     ZeroMemory(keyboardState, sizeof(keyboardState));
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
@@ -352,26 +348,18 @@ IInputReceiver* CInput::CurrentIR()
 {
     if (cbStack.size())
         return cbStack.back();
-    else
-        return NULL;
+    return nullptr;
 }
 
-void CInput::unacquire() {}
-
-void CInput::acquire(const bool& exclusive)
+void CInput::ExclusiveMode(const bool exclusive)
 {
-    // pMouse->SetCooperativeLevel(Device.editor() ? Device.editor()->main_handle() : RDEVICE.m_sdlWnd,
-    //    (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY);
-    // pMouse->Acquire();
+    GrabInput(false);
+    exclusiveInput = exclusive;
+    GrabInput(true);
 }
 
-void CInput::exclusive_mode(const bool& exclusive)
-{
-    g_exclusive = exclusive;
-    unacquire();
-    acquire(exclusive);
-}
-bool CInput::get_exclusive_mode() { return g_exclusive; }
+bool CInput::IsExclusiveMode() const { return exclusiveInput; }
+
 void CInput::feedback(u16 s1, u16 s2, float time)
 {
     stop_vibration_time = RDEVICE.fTimeGlobal + time;

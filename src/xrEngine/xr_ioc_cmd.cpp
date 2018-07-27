@@ -642,7 +642,7 @@ public:
         else
             InvalidSyntax();
 
-        pInput->exclusive_mode(value);
+        pInput->ExclusiveMode(value);
     }
 
     virtual void Save(IWriter* F) {}

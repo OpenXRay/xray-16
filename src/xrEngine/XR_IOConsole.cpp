@@ -624,7 +624,7 @@ void CConsole::Hide()
     // if ( g_pGameLevel ||
     // ( g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive() ))
 
-    if (pInput->get_exclusive_mode())
+    if (pInput->IsExclusiveMode())
     {
         SDL_WarpMouseGlobal(m_mouse_pos.x, m_mouse_pos.y); // Replace with SDL_WarpMouseInWindow in case set window-relative coordinates
     }

@@ -352,7 +352,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RGUI)))
     {
         IWantMyMouseBackScreamed = true;
-        pInput->ClipCursor(false);
+        pInput->GrabInput(false);
     }
 
     if (SDL_SCANCODE_F12 == dik)
@@ -372,7 +372,7 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     if (IWantMyMouseBackScreamed)
     {
         IWantMyMouseBackScreamed = false;
-        pInput->ClipCursor(true);
+        pInput->GrabInput(true);
     }
 
 
