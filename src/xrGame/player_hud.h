@@ -55,6 +55,19 @@ struct hud_item_measures
     Fvector m_hands_attach[2]; // pos,rot
 
     void load(const shared_str& sect_name, IKinematics* K);
+	
+    struct inertion_params
+    {
+        float m_pitch_offset_r;
+        float m_pitch_offset_n;
+        float m_pitch_offset_d;
+        float m_pitch_low_limit;
+        float m_origin_offset;
+        float m_origin_offset_aim;
+        float m_tendto_speed;
+        float m_tendto_speed_aim;
+    };
+    inertion_params m_inertion_params; //--#SM+#--	
 };
 
 struct attachable_hud_item
