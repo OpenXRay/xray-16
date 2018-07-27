@@ -27,8 +27,8 @@ void CRenderDevice::initialize_weather_editor()
     m_editor_initialize(m_editor, m_engine);
     VERIFY(m_editor);
 
-    //m_hWnd = m_editor->view_handle();
-    VERIFY(m_sdlWnd != INVALID_HANDLE_VALUE);
+    m_sdlWnd = SDL_CreateWindowFrom(m_editor->view_handle());
+    R_ASSERT3(m_sdlWnd, "Unable to create SDL window from editor", SDL_GetError());
 
     GEnv.isEditor = true;
 }
@@ -39,10 +39,10 @@ void CRenderDevice::Initialize()
     TimerGlobal.Start();
     TimerMM.Start();
 
+    R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
+
     if (strstr(Core.Params, "-weather"))
         initialize_weather_editor();
-
-    R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
 
     if (!m_sdlWnd)
     {
