@@ -27,6 +27,7 @@ uniform float3 		eye_position;
 uniform half3		eye_direction;
 uniform half3		eye_normal;
 uniform	float4 		dt_params;
+uniform float4		parallax;
 
 half3 	unpack_normal	(half3 v)	{ return 2*v-1;			}
 half3 	unpack_bx2	(half3 v)	{ return 2*v-1; 		}

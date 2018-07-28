@@ -37,8 +37,6 @@
 #ifndef SMAP_size
 #define SMAP_size        1024
 #endif
-#define PARALLAX_H 0.02
-#define parallax float2(PARALLAX_H, -PARALLAX_H/2)
 
 #ifdef        USE_R2_STATIC_SUN
 #  define xmaterial half(1.0h/4.h)
