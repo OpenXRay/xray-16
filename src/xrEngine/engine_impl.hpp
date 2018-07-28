@@ -24,6 +24,7 @@ private:
     virtual void pause(bool const& value);
     virtual void capture_input(bool const& value);
     virtual void disconnect();
+    bool quit_requested() const override;
 
     virtual void value(LPCSTR value, shared_str& result);
     virtual LPCSTR value(shared_str const& value);
