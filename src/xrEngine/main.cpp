@@ -203,13 +203,19 @@ ENGINE_API void Startup()
     Engine.Event.Dump();
     // Destroying
     destroyInput();
+#if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
+#endif
         destroySettings();
     LALib.OnDestroy();
+#if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
+#endif
         destroyConsole();
+#if !defined(LINUX)
     else
         Console->Destroy();
+#endif
     destroyEngine();
     destroySound();
 }
@@ -315,8 +321,10 @@ bool CheckBenchmark()
         const u32 sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
+#if !defined(LOINUX)
         g_SASH.Init(sashArg);
         g_SASH.MainLoop();
+#endif
         return true;
     }
 

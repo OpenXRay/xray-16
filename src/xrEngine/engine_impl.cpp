@@ -25,12 +25,6 @@ engine_impl::~engine_impl()
     capture_input(false);
     xr_delete(m_input_receiver);
 }
-
-bool engine_impl::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
-{
-    return (Device.on_message(hWnd, uMsg, wParam, lParam, result));
-}
-
 void engine_impl::on_idle() { Device.on_idle(); }
 void engine_impl::on_resize()
 {

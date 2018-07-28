@@ -773,9 +773,6 @@
     <ClCompile Include="Device_overdraw.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="Device_wndproc.cpp">
-      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
-    </ClCompile>
     <ClCompile Include="StatGraph.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>

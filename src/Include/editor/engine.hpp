@@ -19,7 +19,6 @@ class property_holder_base;
 class engine_base
 {
 public:
-    virtual bool on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result) = 0;
     virtual void on_idle() = 0;
     virtual void on_resize() = 0;
     virtual void pause(bool const& value) = 0;

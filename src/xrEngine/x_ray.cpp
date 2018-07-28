@@ -161,9 +161,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     {
         if (pInput != nullptr)
             pInput->GrabInput(false);
-
+#if !defined(LINUX)
         g_SASH.EndBenchmark();
-
+#endif
         SDL_Event event;
         event.type = SDL_QUIT;
         SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);

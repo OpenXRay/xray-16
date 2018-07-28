@@ -342,7 +342,7 @@ SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
     CONTEXT currentThreadCtx = {};
 
-    RtlCaptureContext(&currentThreadCtx); /// GetThreadContext can't be used on the current thread 
+    RtlCaptureContext(&currentThreadCtx); /// GetThreadContext can't be used on the current thread
     currentThreadCtx.ContextFlags = CONTEXT_FULL;
 
     return BuildStackTrace(&currentThreadCtx, maxFramesCount);
@@ -756,7 +756,7 @@ void _terminate()
         exit(-1);
 #endif
     string4096 assertionInfo;
-    xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, nullptr, "Unexpected application termination");
+    xrDebug::GatherInfo(assertionInfo,sizeof(assertionInfo), DEBUG_INFO, nullptr, "Unexpected application termination");
     xr_strcat(assertionInfo, "Press OK to abort execution\r\n");
     xrDebug::ShowMessage("Fatal Error", assertionInfo);
     exit(-1);

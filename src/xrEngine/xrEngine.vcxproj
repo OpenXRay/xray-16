@@ -295,7 +295,6 @@
     <ClCompile Include="Device_Initialize.cpp" />
     <ClCompile Include="Device_Misc.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />
-    <ClCompile Include="Device_wndproc.cpp" />
     <ClCompile Include="editor_environment_ambients_ambient.cpp" />
     <ClCompile Include="editor_environment_ambients_effect_id.cpp" />
     <ClCompile Include="editor_environment_ambients_manager.cpp" />
