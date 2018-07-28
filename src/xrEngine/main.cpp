@@ -110,7 +110,7 @@ ENGINE_API void InitConsole()
 
 ENGINE_API void InitInput()
 {
-    bool captureInput = !strstr(Core.Params, "-i");
+    bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
     pInput = new CInput(captureInput);
 }
 
@@ -321,7 +321,7 @@ bool CheckBenchmark()
         const u32 sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-#if !defined(LOINUX)
+#if !defined(LINUX)
         g_SASH.Init(sashArg);
         g_SASH.MainLoop();
 #endif

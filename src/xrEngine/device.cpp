@@ -100,7 +100,7 @@ void CRenderDevice::End(void)
             if (g_pGamePersistent->GameType() == 1) // haCk
             {
                 Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
-                if (flags & SDL_WINDOW_INPUT_GRABBED)
+                if (flags & SDL_WINDOW_INPUT_FOCUS)
                     Pause(TRUE, TRUE, TRUE, "application start");
             }
         }

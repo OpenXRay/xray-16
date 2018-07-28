@@ -25,7 +25,12 @@ engine_impl::~engine_impl()
     capture_input(false);
     xr_delete(m_input_receiver);
 }
-void engine_impl::on_idle() { Device.on_idle(); }
+
+void engine_impl::on_idle()
+{
+    SDL_PumpEvents();
+    Device.on_idle();
+}
 void engine_impl::on_resize()
 {
     if (Console)
@@ -54,6 +59,12 @@ void engine_impl::capture_input(bool const& value)
 }
 
 void engine_impl::disconnect() { Console->Execute("quit"); }
+
+bool engine_impl::quit_requested() const
+{
+    return SDL_QuitRequested();
+}
+
 void engine_impl::value(LPCSTR value, shared_str& result) { result = value; }
 LPCSTR engine_impl::value(shared_str const& value) { return (value.c_str()); }
 void engine_impl::weather(LPCSTR value)
