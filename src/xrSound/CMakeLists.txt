@@ -25,4 +25,4 @@ add_definitions(-DXRSOUND_EXPORTS -DdSINGLE -D_SECURE_SCL=0)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrAPI xrCDB ${OGG_LIBRARIES} openal vorbis vorbisfile)
+target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrAPI xrCDB ${OGG_LIBRARIES} openal vorbis vorbisfile)

@@ -2,6 +2,8 @@
 #ifndef __V2D__
 #define __V2D__
 #include "xrCommon/inlining_macros.h"
+#include "xrCore/math_constants.h"
+
 
 #ifdef min
 # undef min

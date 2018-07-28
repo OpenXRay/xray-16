@@ -31,4 +31,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 #this is a temporary solution until find_package will not be fixed
 set(TBB_LIBRARIES tbb tbbmalloc_proxy tbbmalloc)
 
-target_link_libraries(${PROJECT_NAME} ${SDL_LIBRARIES} ${LZO_LIBRARY} crypto++ ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} xrMiscMath ${SDL_LIBRARIES} ${LZO_LIBRARY} ${CRYPTO++_LIBRARIES} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
