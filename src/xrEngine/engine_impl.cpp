@@ -31,7 +31,11 @@ bool engine_impl::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
     return (Device.on_message(hWnd, uMsg, wParam, lParam, result));
 }
 
-void engine_impl::on_idle() { Device.on_idle(); }
+void engine_impl::on_idle()
+{
+    SDL_PumpEvents();
+    Device.on_idle();
+}
 void engine_impl::on_resize()
 {
     if (Console)
@@ -60,6 +64,12 @@ void engine_impl::capture_input(bool const& value)
 }
 
 void engine_impl::disconnect() { Console->Execute("quit"); }
+
+bool engine_impl::quit_requested() const
+{
+    return SDL_QuitRequested();
+}
+
 void engine_impl::value(LPCSTR value, shared_str& result) { result = value; }
 LPCSTR engine_impl::value(shared_str const& value) { return (value.c_str()); }
 void engine_impl::weather(LPCSTR value)
