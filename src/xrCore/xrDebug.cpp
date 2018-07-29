@@ -337,15 +337,21 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 
     return traceResult;
 }
+#endif // defined(WINDOWS)
 
 SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
+#if defined(WINDOWS)
     CONTEXT currentThreadCtx = {};
 
     RtlCaptureContext(&currentThreadCtx); /// GetThreadContext can't be used on the current thread
     currentThreadCtx.ContextFlags = CONTEXT_FULL;
 
     return BuildStackTrace(&currentThreadCtx, maxFramesCount);
+#else
+#pragma todo("Implement stack trace for Linux")
+    return {"Implement stack trace for Linux"};
+#endif
 }
 
 void xrDebug::LogStackTrace(const char* header)
@@ -357,7 +363,6 @@ void xrDebug::LogStackTrace(const char* header)
         Msg("%s", frame.c_str());
     }
 }
-#endif // defined(WINDOWS)
 
 
 void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
@@ -563,9 +568,9 @@ int out_of_memory_handler(size_t size)
 
 extern LPCSTR log_name();
 
-#ifdef USE_BUG_TRAP
-void WINAPI xrDebug::PreErrorHandler(INT_PTR)
+void xrDebug::PreErrorHandler(INT_PTR)
 {
+#if defined(USE_BUG_TRAP) && defined(WINDOWS)
     if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady))
         return;
     string_path logDir;
@@ -587,7 +592,6 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     }
     string_path temp;
     strconcat(sizeof(temp), temp, logDir, log_name());
-#if defined(WINDOWS)
     BT_AddLogFile(temp);
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
@@ -604,7 +608,7 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 
 void xrDebug::SetupExceptionHandler(const bool& dedicated)
 {
-#if defined(WINDOWS)
+#if defined(USE_BUG_TRAP) && defined(WINDOWS)
     // disable 'appname has stopped working' popup dialog
     UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
     SetErrorMode(prevMode | SEM_NOGPFAULTERRORBOX);
@@ -641,7 +645,6 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
     BT_SetSupportEMail("openxray@yahoo.com");
 #endif
 }
-#endif // USE_BUG_TRAP
 
 #ifdef USE_OWN_MINI_DUMP
 void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
