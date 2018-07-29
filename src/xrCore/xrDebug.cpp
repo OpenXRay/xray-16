@@ -413,6 +413,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     buffer += xr_sprintf(buffer, bufferSize, "stack trace:\n\n");
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
+#if defined(WINDOWS)
     xr_vector<xr_string> stackTrace = BuildStackTrace();
     for (size_t i = 2; i < stackTrace.size(); i++)
     {
@@ -422,6 +423,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, bufferSize, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
+#endif
     if (shared_str_initialized)
         FlushLog();
     os_clipboard::copy_to_clipboard(assertionInfo);
@@ -836,7 +838,9 @@ void xrDebug::Initialize(const bool& dedicated)
 {
     *BugReportFile = 0;
     OnThreadSpawn();
+#ifdef USE_BUG_TRAP
     SetupExceptionHandler(dedicated);
+#endif
     // exception handler to all "unhandled" exceptions
 #if defined(WINDOWS)
     PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);

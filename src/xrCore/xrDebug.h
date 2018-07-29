@@ -85,12 +85,16 @@ public:
     static int ShowMessage(pcstr title, pcstr message, bool simple = true);
 
     static void LogStackTrace(const char* header);
+#if defined(WINDOWS)
     static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = 512);
+#endif
 private:
     static bool symEngineInitialized;
     static Lock dbgHelpLock;
     static void FormatLastError(char* buffer, const size_t& bufferSize);
+#ifdef USE_BUG_TRAP
     static void SetupExceptionHandler(const bool& dedicated);
+#endif
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
     static void SaveMiniDump(EXCEPTION_POINTERS* exPtrs);
