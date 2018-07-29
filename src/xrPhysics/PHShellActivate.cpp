@@ -21,6 +21,7 @@
 #include "ExtendedGeom.h"
 
 #include "PHElement.h"
+#include "PHElementInline.h"
 #include "PHShell.h"
 void CPHShell::activate(bool disable)
 {

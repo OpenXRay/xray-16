@@ -36,7 +36,7 @@ public:
 #if defined(WINDOWS)
     virtual ~property_holder_holder() = 0 {}
 #elif defined(LINUX)
-    virtual ~property_holder_holder() = 0;
+    virtual ~property_holder_holder() {}
 #endif
 };
 

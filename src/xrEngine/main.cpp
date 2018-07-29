@@ -64,7 +64,11 @@ public:
     {
         if (!ignored)
             return true;
-        return allow_to_include_path(*ignored, path);
+#if !defined(LINUX)
+        return allow_to_include_path(*ignored, path);  //TODO port xrNetServer to Linux
+#else
+        return false; // Noidea what happenning
+#endif
     }
 };
 }
@@ -80,7 +84,9 @@ ENGINE_API void InitSettings()
     CHECK_OR_EXIT(pSettings->section_count(),
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
     xr_auth_strings_t ignoredPaths, checkedPaths;
-    fill_auth_check_params(ignoredPaths, checkedPaths);
+#if !defined(LINUX)
+    fill_auth_check_params(ignoredPaths, checkedPaths); //TODO port xrNetServer to Linux
+#endif
     PathIncludePred includePred(&ignoredPaths);
     CInifile::allow_include_func_t includeFilter;
     includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
