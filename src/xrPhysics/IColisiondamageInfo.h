@@ -21,7 +21,7 @@ protected:
 #if defined(WINDOWS)
     virtual ~ICollisionDamageInfo() = 0 {}
 #elif defined(LINUX)
-    virtual ~ICollisionDamageInfo() = 0;
+    virtual ~ICollisionDamageInfo() {}
 #endif
 };
 #endif

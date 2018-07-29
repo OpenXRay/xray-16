@@ -35,7 +35,7 @@ protected:
 #if defined(WINDOWS)
     virtual ~iphysics_scripted_class() = 0 {}
 #elif defined(LINUX)
-    virtual ~iphysics_scripted_class() = 0;
+    virtual ~iphysics_scripted_class() {}
 #endif
 #endif
 };

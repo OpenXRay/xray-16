@@ -11,7 +11,7 @@ protected:
 #if defined(WINDOWS)
     virtual ~IPHCapture() = 0 {}
 #elif defined(LINUX)
-    virtual ~IPHCapture() = 0;
+    virtual ~IPHCapture() {}
 #endif
 };
 class CPHCharacter;

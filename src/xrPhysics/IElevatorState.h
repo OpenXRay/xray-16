@@ -22,6 +22,6 @@ protected:
 #if defined(WINDOWS)
     virtual ~IElevatorState() = 0 {}
 #elif defined(LINUX)
-    virtual ~IElevatorState() = 0;
+    virtual ~IElevatorState() {}
 #endif
 };

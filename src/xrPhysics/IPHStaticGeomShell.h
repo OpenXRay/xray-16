@@ -6,9 +6,9 @@ protected:
 #if defined(WINDOWS)
     virtual ~IPHStaticGeomShell() = 0 {}
 #elif defined(LINUX)
-    virtual ~IPHStaticGeomShell() = 0;
+    virtual ~IPHStaticGeomShell() {}
 #endif
-    
+
     //	virtual void						set_ObjectContactCallback	(ObjectContactCallbackFun* callback);
 };
 
