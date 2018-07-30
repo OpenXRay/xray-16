@@ -22,6 +22,7 @@ void CRenderDevice::initialize_weather_editor()
 
     m_editor_finalize = (finalize_function_ptr)m_editor_module->GetProcAddress("finalize");
     VERIFY(m_editor_finalize);
+
     m_engine = new engine_impl();
     m_editor_initialize(m_editor, m_engine);
     VERIFY(m_editor);

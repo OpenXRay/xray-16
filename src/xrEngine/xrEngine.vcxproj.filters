@@ -890,6 +890,9 @@
     <ClCompile Include="splash.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Device_wndproc.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />

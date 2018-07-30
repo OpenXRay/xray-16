@@ -216,19 +216,9 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 }
 #else // #ifndef MASTER_GOLD
 
-inline int xr_strcpy(LPSTR destination, LPCSTR source)
-{
-    return strcpy(destination, source);
-}
-
 inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
 {
     return strncpy_s(destination, destination_size, source, destination_size);
-}
-
-inline int xr_strcat(LPSTR destination, LPCSTR source)
-{
-    return strcat(destination, source);
 }
 
 inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)

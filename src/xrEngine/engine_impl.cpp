@@ -26,6 +26,11 @@ engine_impl::~engine_impl()
     xr_delete(m_input_receiver);
 }
 
+bool engine_impl::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+{
+    return (Device.on_message(hWnd, uMsg, wParam, lParam, result));
+}
+
 void engine_impl::on_idle()
 {
     SDL_PumpEvents();
