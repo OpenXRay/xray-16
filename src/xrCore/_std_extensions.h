@@ -156,21 +156,9 @@ inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR so
     return strcpy_s(destination, destination_size, source);
 }
 
-template <int count>
-inline int xr_strcpy(char(&destination)[count], LPCSTR source)
-{
-    return xr_strcpy(destination, count, source);
-}
-
 inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
 {
     return strcat_s(destination, buffer_size, source);
-}
-
-template <int count>
-inline int xr_strcat(char(&destination)[count], LPCSTR source)
-{
-    return xr_strcat(destination, count, source);
 }
 
 inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...)
@@ -232,6 +220,18 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
     return result;
 }
 #endif // #ifndef MASTER_GOLD
+
+template <int count>
+inline int xr_strcpy(char(&destination)[count], LPCSTR source)
+{
+    return xr_strcpy(destination, count, source);
+}
+
+template <int count>
+inline int xr_strcat(char(&destination)[count], LPCSTR source)
+{
+    return xr_strcat(destination, count, source);
+}
 //#endif // #ifndef _EDITOR
 
 inline void MemFill32(void* dst, u32 value, size_t dstSize)
