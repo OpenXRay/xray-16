@@ -22,9 +22,10 @@ void CRenderDevice::initialize_weather_editor()
 
     m_editor_finalize = (finalize_function_ptr)m_editor_module->GetProcAddress("finalize");
     VERIFY(m_editor_finalize);
-
+#if !defined(LINUX)
     m_engine = new engine_impl();
     m_editor_initialize(m_editor, m_engine);
+#endif
     VERIFY(m_editor);
 
     m_sdlWnd = SDL_CreateWindowFrom(m_editor->view_handle());

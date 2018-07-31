@@ -30,6 +30,8 @@ find_package(OGG REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(LZO REQUIRED)
 find_package(JPEG REQUIRED)
+#this is a temporary solution until find_package will not be fixed
+set(TBB_LIBRARIES tbb tbbmalloc_proxy tbbmalloc)
 endif()
 
 include_directories(${LUA_INCLUDE_DIR})
