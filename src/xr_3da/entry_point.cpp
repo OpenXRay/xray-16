@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        char* commandLine = NULL;
+        char* commandLine = "";
         int i;
         if(argc > 1)
         {
