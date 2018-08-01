@@ -4,7 +4,7 @@ sudo: required
 dist: xenial
 compiler:
 - g++
-install: export CXX="g++-7"
+install: export CXX="g++-5"
 os:
 - linux
 before_script:
@@ -21,7 +21,7 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - g++-7
+    - g++-5
 #branches:
 #  only:
 #  - linux
