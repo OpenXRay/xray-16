@@ -15,7 +15,9 @@
 #include "std_classes.h"
 #include "GameFont.h"
 #include "xrCDB/ISpatial.h"
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 #include "xrServerEntities/smart_cast.h"
 #include "xr_input.h"
 

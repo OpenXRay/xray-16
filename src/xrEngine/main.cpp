@@ -24,7 +24,9 @@
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 #include "xr_ioc_cmd.h"
 
 #ifdef MASTER_GOLD

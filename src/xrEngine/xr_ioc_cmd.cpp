@@ -4,7 +4,9 @@
 #include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 
 #include "CameraManager.h"
 #include "Environment.h"

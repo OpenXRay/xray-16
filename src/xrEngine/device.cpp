@@ -25,7 +25,9 @@
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
 
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
