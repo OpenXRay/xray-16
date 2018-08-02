@@ -335,7 +335,7 @@ void ISpatial_DB::q_ray(
     Stats.Query.Begin();
     q_result = &R;
     q_result->clear();
-    if (CPU::ID.hasFeature(CpuFeature::Sse))
+    if (SDL_HasSSE())
     {
         if (_o & O_ONLYFIRST)
         {
