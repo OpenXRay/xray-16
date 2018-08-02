@@ -108,7 +108,13 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& hFile)
 #else // EDITOR
 static int open_internal(LPCSTR fn, int& handle)
 {
+#if defined(WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
+#elif defined(LINUX)
+    handle = open(fn, _O_RDONLY);
+
+    return (handle == -1);
+#endif
 }
 
 bool file_handle_internal(LPCSTR file_name, u32& size, int& file_handle)

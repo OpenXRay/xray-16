@@ -57,9 +57,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         }
 #endif
 
-#if defined(WINDOWS)
-        GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
-#endif
+        SDL_strlcpy(WorkingPath, SDL_GetBasePath(), sizeof(WorkingPath));
 
 #if defined(WINDOWS)
         // User/Comp Name
