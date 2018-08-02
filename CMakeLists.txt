@@ -19,12 +19,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive --std=c++17")
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+    set(LUA_LIBRARIES luajit)
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "RELWITHDEBINFO")
+    set(LUA_LIBRARIES luajit)
+else()
+    set(LUA_LIBRARIES luajit-debug)
 endif()
+
+message("CMake build ${CMAKE_BUILD_TYPE}")
 
 add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION -DM_NOSTDCONTAINERS_EXT -DUSE_OGL)
 
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
-set(LUA_LIBRARIES luajit)
+
 set(LUA_FOUND 1)
 if (NOT WIN32)
 find_package(Crypto++ REQUIRED)
