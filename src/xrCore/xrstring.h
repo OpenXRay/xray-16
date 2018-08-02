@@ -206,7 +206,7 @@ IC void xr_strlwr(shared_str& src)
         int i = 0;
         while(lp[i])
         {
-            lp[i] = (char) std::toupper(lp[i], std::locale());
+            lp[i] = (char) std::tolower(lp[i], std::locale());
             i++;
         }
 #endif
@@ -217,13 +217,7 @@ IC void xr_strlwr(shared_str& src)
 
 IC char * xr_strlwr(char * src)
 {
-    int i = 0;
-    while(src[i])
-    {
-    	src[i] = (char) toupper(src[i]);// TODO rewrite locale-independent toupper_l()
-    	i++;
-    }
-    return src;
+    return SDL_strlwr(src);
 }
 
 #pragma pack(pop)
