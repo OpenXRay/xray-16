@@ -7,6 +7,7 @@
 #pragma warning(pop)
 
 #include "xrCDB.h"
+#include "SDL.h"
 
 using namespace CDB;
 using namespace Opcode;

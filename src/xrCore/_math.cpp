@@ -23,8 +23,9 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <chrono>
-#include <thread>
 #endif
+#include <thread>
+#include "SDL.h"
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {

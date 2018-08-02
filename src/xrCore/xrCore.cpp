@@ -11,6 +11,7 @@
 #include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
+#include "SDL.h"
 
 #pragma comment(lib, "winmm.lib")
 

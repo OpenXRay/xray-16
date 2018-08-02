@@ -2,6 +2,7 @@
 #include "ISpatial.h"
 #include "xrCore/_fbox.h"
 #include "xrCore/Threading/Lock.hpp"
+#include "SDL.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <xmmintrin.h>
