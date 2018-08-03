@@ -9,7 +9,7 @@
 #include "edit_actions.h"
 #include "line_edit_control.h"
 #include "xr_input.h"
-#include <codecvt>
+#include "xrCore/Text/MbHelpers.h"
 
 namespace text_editor
 {
@@ -55,17 +55,6 @@ void type_pair::init(int dik, char c, char c_shift, bool b_translate)
     m_char_shift = c_shift;
 }
 
-xr_string utf8_to_string(const char* utf8str, const std::locale& loc)
-{
-    // UTF-8 to wstring
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> wconv;
-    std::wstring wstr = wconv.from_bytes(utf8str);
-    // wstring to string
-    std::vector<char> buf(wstr.size());
-    std::use_facet<std::ctype<wchar_t>>(loc).narrow(wstr.data(), wstr.data() + wstr.size(), '?', buf.data());
-    return xr_string(buf.data(), buf.size());
-}
-
 void type_pair::on_key_press(line_edit_control* const control)
 {
     char c = 0;
@@ -82,7 +71,7 @@ void type_pair::on_key_press(line_edit_control* const control)
             case SDL_TEXTINPUT:
             {
                 const std::locale locale("");
-                auto str = utf8_to_string(event.text.text, locale);
+                auto str = StringFromUTF8(event.text.text, locale);
 
                 if (std::isalpha(str[0], locale) || str[0] == char(-1)) // "я" = -1
                 {

@@ -6,6 +6,7 @@
 #include "Include/editor/ide.hpp"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
+#include "xrCore/Text/MbHelpers.h"
 
 #ifndef _EDITOR
 #include "xr_input_xinput.h"
@@ -196,14 +197,14 @@ pcstr KeyToMouseButtonName(const int dik)
 
 bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
 {
-    pcstr keyname;
-    
+    xr_string keyname;
+
     if (dik < SDL_NUM_SCANCODES)
-        keyname = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
+        keyname = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)));
     else
         keyname = KeyToMouseButtonName(dik);
 
-    if (0 == strlen(keyname))
+    if (keyname.empty())
     {
         if (dik == SDL_SCANCODE_UNKNOWN)
             keyname = "Unknown";
@@ -214,7 +215,7 @@ bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
         }
     }
 
-    xr_strcpy(dest_str, dest_sz, keyname);
+    xr_strcpy(dest_str, dest_sz, keyname.c_str());
     return true;
 }
 
