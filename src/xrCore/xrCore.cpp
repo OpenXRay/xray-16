@@ -3,8 +3,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <SDL.h>
-
 #if defined(WINDOWS)
 #include <mmsystem.h>
 #include <objbase.h>

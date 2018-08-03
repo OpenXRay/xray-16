@@ -8,7 +8,6 @@
 #include "xr_Level_controller.h"
 #include "ui\UITextureMaster.h"
 #include "ui\UIXmlInit.h"
-#include <SDL.h>
 #include "ui\UIBtnHint.h"
 #include "UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"

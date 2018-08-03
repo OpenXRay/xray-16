@@ -5,7 +5,6 @@
 #include "ui/UIBtnHint.h"
 #include "xrEngine/IInputReceiver.h"
 #include "xrEngine/xr_input.h"
-#include "SDL_syswm.h"
 
 #define C_DEFAULT color_xrgb(0xff, 0xff, 0xff)
 

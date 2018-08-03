@@ -5,8 +5,6 @@
 #include "xrEngine/device.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
-#include "SDL.h"
-
 
 using namespace XRay;
 using namespace XRay::Editor;

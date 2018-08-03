@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <SDL.h>
 #include "xrEngine/xr_ioconsole.h"
 #include "xrEngine/xr_input.h"
 #include "xrEngine/xr_ioc_cmd.h"

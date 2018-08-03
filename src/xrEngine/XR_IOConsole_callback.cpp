@@ -11,7 +11,6 @@
 #include "line_editor.h"
 #include "xr_input.h"
 #include "xr_ioc_cmd.h"
-#include "SDL.h"
 
 void CConsole::Register_callbacks()
 {

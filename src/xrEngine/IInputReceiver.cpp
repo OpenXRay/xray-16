@@ -3,7 +3,6 @@
 
 #include "xr_input.h"
 #include "IInputReceiver.h"
-#include "SDL_syswm.h"
 
 void IInputReceiver::IR_Capture(void)
 {

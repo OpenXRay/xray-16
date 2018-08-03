@@ -25,7 +25,6 @@
 #include "Include/editor/interfaces.hpp"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
-#include <SDL.h>
 
 class engine_impl;
 
