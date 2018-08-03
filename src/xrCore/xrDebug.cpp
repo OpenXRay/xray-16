@@ -95,6 +95,7 @@ ICN void* GetInstructionPtr()
 }
 }
 
+// XXX: Probably rename this to AssertionResult?
 enum MessageBoxResult
 {
     resultUndefined = -1,
@@ -169,6 +170,23 @@ int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
     SDL_ShowMessageBox(&messageboxdata, &button);
     return button;
 #endif
+}
+
+SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
+    void*                 userdata)
+{
+    if (data->always_ignore)
+        return SDL_ASSERTION_ALWAYS_IGNORE;
+
+    constexpr pcstr desc = "SDL2 assert triggered";
+    bool alwaysIgnore = false;
+    xrDebug::Fail(alwaysIgnore, {data->filename, data->linenum, data->function}, data->condition, desc);
+
+    if (alwaysIgnore)
+        return SDL_ASSERTION_ALWAYS_IGNORE;
+
+    // XXX: change Fail return type from void to 'enum MessageBoxResult'
+    return SDL_ASSERTION_IGNORE;
 }
 
 SDL_Window* xrDebug::applicationWindow = nullptr;
@@ -837,6 +855,7 @@ void xrDebug::Initialize(const bool& dedicated)
     *BugReportFile = 0;
     OnThreadSpawn();
     SetupExceptionHandler(dedicated);
+    SDL_SetAssertionHandler(SDLAssertionHandler, nullptr);
     // exception handler to all "unhandled" exceptions
 #if defined(WINDOWS)
     PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);
