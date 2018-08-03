@@ -173,7 +173,7 @@ int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
 }
 
 SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
-    void*                 userdata)
+    void* /*userdata*/)
 {
     if (data->always_ignore)
         return SDL_ASSERTION_ALWAYS_IGNORE;

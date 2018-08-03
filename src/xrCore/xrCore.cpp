@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include <SDL.h>
+
 #if defined(WINDOWS)
 #include <mmsystem.h>
 #include <objbase.h>
@@ -50,6 +52,107 @@ void PrintCI()
 #else
     Log("This is a custom build");
 #endif
+}
+
+void SDLLogOutput(void* /*userdata*/,
+    int category,
+    SDL_LogPriority priority,
+    const char* message)
+{
+    pcstr from;
+    switch (category)
+    {
+    case SDL_LOG_CATEGORY_APPLICATION:
+        from = "application";
+        break;
+
+    case SDL_LOG_CATEGORY_ERROR:
+        from = "error";
+        break;
+
+    case SDL_LOG_CATEGORY_ASSERT:
+        from = "assert";
+        break;
+
+    case SDL_LOG_CATEGORY_SYSTEM:
+        from = "system";
+        break;
+
+    case SDL_LOG_CATEGORY_AUDIO:
+        from = "audio";
+        break;
+
+    case SDL_LOG_CATEGORY_VIDEO:
+        from = "video";
+        break;
+
+    case SDL_LOG_CATEGORY_RENDER:
+        from = "render";
+        break;
+
+    case SDL_LOG_CATEGORY_INPUT:
+        from = "input";
+        break;
+
+    case SDL_LOG_CATEGORY_TEST:
+        from = "test";
+        break;
+
+    case SDL_LOG_CATEGORY_CUSTOM:
+        from = "custom";
+        break;
+
+    default:
+        from = "unknown";
+        break;
+    }
+
+    char mark;
+    pcstr type;
+    switch (priority)
+    {
+    case SDL_LOG_PRIORITY_VERBOSE:
+        mark = '%';
+        type = "verbose";
+        break;
+
+    case SDL_LOG_PRIORITY_DEBUG:
+        mark = '#';
+        type = "debug";
+        break;
+
+    case SDL_LOG_PRIORITY_INFO:
+        mark = '=';
+        type = "info";
+        break;
+
+    case SDL_LOG_PRIORITY_WARN:
+        mark = '~';
+        type = "warn";
+        break;
+
+    case SDL_LOG_PRIORITY_ERROR:
+        mark = '!';
+        type = "error";
+        break;
+
+    case SDL_LOG_PRIORITY_CRITICAL:
+        mark = '$';
+        type = "critical";
+        break;
+
+    default:
+        mark = ' ';
+        type = "unknown";
+        break;
+    }
+
+    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
+    const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
+    pstr buf = (pstr)_alloca(size);
+
+    xr_sprintf(buf, size, format, mark, from, type, message);
+    Log(buf);
 }
 
 void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
@@ -106,6 +209,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
 
         Memory._initialize();
 
+        SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
         Msg("%s %s build %d, %s\n", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
         PrintCI();
         Msg("command line %s\n", Params);
