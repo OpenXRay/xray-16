@@ -22,7 +22,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(LUA_LIBRARIES luajit)
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "RELWITHDEBINFO")
     set(LUA_LIBRARIES luajit)
-else()
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
     set(LUA_LIBRARIES luajit-debug)
 endif()
 
