@@ -1,19 +1,25 @@
 version: '{build}'
+
 pull_requests:
   do_not_increment_build_number: true
+
 skip_tags: true
+
 image:
 - Visual Studio 2017
-- Previous Visual Studio 2017
+
 configuration:
 - Debug
 - Mixed
 - Release
+
 platform:
 - x64
 - x86
+
 cache:
 - packages -> **\packages.config
+
 before_build:
 - cmd: >-
     nuget restore src\engine.sln
@@ -24,9 +30,12 @@ build:
   project: src/engine.sln
   parallel: true
   verbosity: minimal
+
 after_build:
 - cmd: xr_pack_build.cmd
+
 test: off
+
 artifacts:
 - path: res/OpenXRay.Dx86.7z
   name: OpenXRay.Dx86.7z
@@ -40,6 +49,7 @@ artifacts:
   name: OpenXRay.Rx86.7z
 - path: res/OpenXRay.Rx64.7z
   name: OpenXRay.Rx64.7z
+
 deploy:
 - provider: GitHub
   tag: $(appveyor_build_version)
