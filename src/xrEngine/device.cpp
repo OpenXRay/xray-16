@@ -9,7 +9,9 @@
 #define MMNOAUX
 #define MMNOMIXER
 #define MMNOJOY
+#if defined(WINDOWS)
 #include <mmsystem.h>
+#endif
 #pragma warning(pop)
 
 #include "x_ray.h"
@@ -25,6 +27,7 @@
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
 
@@ -95,9 +98,8 @@ void CRenderDevice::End(void)
             CheckPrivilegySlowdown();
             if (g_pGamePersistent->GameType() == 1) // haCk
             {
-                WINDOWINFO wi;
-                GetWindowInfo(m_hWnd, &wi);
-                if (wi.dwWindowStatus != WS_ACTIVECAPTION)
+                Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
+                if (flags & SDL_WINDOW_INPUT_FOCUS)
                     Pause(TRUE, TRUE, TRUE, "application start");
             }
         }
@@ -227,9 +229,9 @@ void CRenderDevice::on_idle()
     }
 
     if (psDeviceFlags.test(rsStatistic))
-        g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
+        g_bEnableStatGather = true; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
-        g_bEnableStatGather = FALSE;
+        g_bEnableStatGather = false;
 
     if (g_loading_events.size())
     {
@@ -271,7 +273,7 @@ void CRenderDevice::on_idle()
     mViewSaved = mView;
     mProjectSaved = mProject;
 
-    //renderProcessFrame.Set(); // allow render thread to do its job
+    // renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
 
     const auto frameEndTime = TimerGlobal.GetElapsed_ms();
@@ -308,7 +310,7 @@ void CRenderDevice::on_idle()
         Sleep(updateDelta - frameTime);
 
     syncFrameDone.Wait(); // wait until secondary thread finish its job
-    //renderFrameDone.Wait(); // wait until render thread finish its job
+    // renderFrameDone.Wait(); // wait until render thread finish its job
 
     if (!b_is_Active)
         Sleep(1);
@@ -329,17 +331,74 @@ void CRenderDevice::message_loop()
         return;
     }
 
-    MSG msg;
-    PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
-    while (msg.message != WM_QUIT)
+    SDL_Event event;
+
+    SDL_PumpEvents();
+    SDL_PeepEvents(&event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT);
+
+    while (SDL_QUIT != event.type)
     {
-        if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+        if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-            continue;
+            switch (event.type)
+            {
+            case SDL_WINDOWEVENT:
+            {
+                switch (event.window.event)
+                {
+                case SDL_WINDOWEVENT_MOVED:
+                    UpdateWindowRects();
+                    break;
+
+                case SDL_WINDOWEVENT_RESIZED:
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                {
+                    if (!psDeviceFlags.is(rsFullscreen))
+                    {
+                        if (psCurrentVidMode[0] == event.window.data1 && psCurrentVidMode[1] == event.window.data2)
+                            break; // we don't need to reset device if resolution wasn't really changed
+
+                        string32 buff;
+                        xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
+                        Console->Execute(buff);
+                        Reset();
+                    }
+                    else
+                        UpdateWindowRects();
+
+                    break;
+                }
+
+                case SDL_WINDOWEVENT_SHOWN:
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                case SDL_WINDOWEVENT_RESTORED:
+                case SDL_WINDOWEVENT_MAXIMIZED:
+                    OnWM_Activate(1, event.window.data2);
+                    break;
+
+                case SDL_WINDOWEVENT_HIDDEN:
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                case SDL_WINDOWEVENT_MINIMIZED:
+                    OnWM_Activate(0, event.window.data2);
+                    break;
+
+                case SDL_WINDOWEVENT_ENTER:
+                    SDL_ShowCursor(SDL_FALSE);
+                    break;
+
+                case SDL_WINDOWEVENT_LEAVE:
+                    SDL_ShowCursor(SDL_TRUE);
+                    break;
+
+                case SDL_WINDOWEVENT_CLOSE:
+                    event.type = SDL_QUIT;
+                }
+            }
+            }
         }
+
         on_idle();
+        SDL_PumpEvents();
     }
 }
 
@@ -362,19 +421,24 @@ void CRenderDevice::Run()
     // Start all threads
     mt_bMustExit = FALSE;
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-    //thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
+    // thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
     // Message cycle
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
-    ShowWindow(m_hWnd, SW_SHOWNORMAL);
-    pInput->ClipCursor(true);
+    if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
+        SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_HideWindow(m_sdlWnd);
+    SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
+    SDL_ShowWindow(m_sdlWnd);
+    SDL_RaiseWindow(m_sdlWnd);
+    pInput->GrabInput(true);
     message_loop();
     seqAppEnd.Process();
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
-    //renderProcessFrame.Set();
-    //renderThreadExit.Wait();
+    // renderProcessFrame.Set();
+    // renderThreadExit.Wait();
     syncProcessFrame.Set();
     syncThreadExit.Wait();
 
@@ -448,18 +512,19 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     if (bOn)
     {
         if (!Paused())
-            bShowPauseString =
-                editor() ? FALSE :
+        {
+            bShowPauseString = editor() ? FALSE : TRUE;
 #ifdef DEBUG
-                           !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
-#endif // DEBUG
-                                                                        TRUE;
+            if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
+                bShowPauseString = FALSE;
+#endif
+        }
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
         {
-            g_pauseMngr().Pause(TRUE);
+            g_pauseMngr().Pause(true);
 #ifdef DEBUG
-            if (!xr_strcmp(reason, "li_pause_key_no_clip"))
-                TimerGlobal.Pause(FALSE);
+            if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
+                TimerGlobal.Pause(false);
 #endif
         }
         if (bSound && GEnv.Sound)
@@ -470,7 +535,7 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
         if (bTimer && g_pauseMngr().Paused())
         {
             fTimeDelta = EPS_S + EPS_S;
-            g_pauseMngr().Pause(FALSE);
+            g_pauseMngr().Pause(false);
         }
         if (bSound)
         {
@@ -493,10 +558,11 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     const BOOL fMinimized = (BOOL)HIWORD(wParam);
 
     const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
+
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
-        pInput->ClipCursor(true);
+        pInput->GrabInput(true);
     else
-        pInput->ClipCursor(false);
+        pInput->GrabInput(false);
 
     extern int ps_always_active;
     const BOOL isGameActive = ps_always_active || isWndActive;

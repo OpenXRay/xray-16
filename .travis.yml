@@ -9,7 +9,7 @@ os:
 - linux
 before_script:
   - g++ --version
-  - sudo apt-get install libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev
+  - sudo apt-get install libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev
   - sudo apt-get install cmake lua5.1-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
   - mkdir bin
   - cd bin

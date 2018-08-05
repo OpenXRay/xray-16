@@ -2,7 +2,11 @@
 #include "stdafx.h"
 #include "main.h"
 
+#if defined(WINDOWS)
 #include <process.h>
+#elif defined(LINUX)
+#include <lockfile.h>
+#endif
 #include <locale.h>
 
 #include "IGame_Persistent.h"
@@ -14,7 +18,12 @@
 
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
+#if defined(WINDOWS)
 #include "Text_Console.h"
+#elif defined(LINUX)
+#define CTextConsole CConsole
+#pragma todo("Implement text console or it's alternative")
+#endif
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"
 
@@ -101,7 +110,7 @@ ENGINE_API void InitConsole()
 
 ENGINE_API void InitInput()
 {
-    bool captureInput = !strstr(Core.Params, "-i");
+    bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
     pInput = new CInput(captureInput);
 }
 
@@ -128,6 +137,9 @@ ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
+#if defined(LINUX)
+    lockfile_remove("/var/lock/stalker-cop.lock");
+#endif
 }
 
 void execUserScript()
@@ -209,9 +221,15 @@ ENGINE_API int RunApplication()
 #ifdef NO_MULTI_INSTANCES
     if (!GEnv.isDedicatedServer)
     {
+#if defined(WINDOWS)
         CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
             return 2;
+#elif defined(LINUX)
+        int lock_res = lockfile_create("/var/lock/stalker-cop.lock", 0, L_PID);
+        if(L_ERROR == lock_res)
+            return 2;
+#endif
     }
 #endif
     *g_sLaunchOnExit_app = 0;
@@ -264,6 +282,7 @@ ENGINE_API int RunApplication()
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
+#if defined(WINDOWS)
         // CreateProcess need to return results to next two structures
         STARTUPINFO si = {};
         si.cb = sizeof(si);
@@ -271,6 +290,7 @@ ENGINE_API int RunApplication()
         // We use CreateProcess to setup working folder
         pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
         CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
+#endif
     }
     return 0;
 }

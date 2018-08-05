@@ -12,8 +12,14 @@ configuration:
 platform:
 - x64
 - x86
+cache:
+- packages -> **\packages.config
 before_build:
-- cmd: git submodule update --init --recursive
+- cmd: >-
+    nuget restore src\engine.sln
+
+    git submodule update --init --recursive
+
 build:
   project: src/engine.sln
   parallel: true

@@ -14,33 +14,33 @@
 
 void CConsole::Register_callbacks()
 {
-    ec().assign_callback(DIK_PRIOR, text_editor::ks_free, Callback(this, &CConsole::Prev_log));
-    ec().assign_callback(DIK_NEXT, text_editor::ks_free, Callback(this, &CConsole::Next_log));
-    ec().assign_callback(DIK_PRIOR, text_editor::ks_Ctrl, Callback(this, &CConsole::Begin_log));
-    ec().assign_callback(DIK_NEXT, text_editor::ks_Ctrl, Callback(this, &CConsole::End_log));
+    ec().assign_callback(SDL_SCANCODE_PAGEUP, text_editor::ks_free, Callback(this, &CConsole::Prev_log));
+    ec().assign_callback(SDL_SCANCODE_PAGEDOWN, text_editor::ks_free, Callback(this, &CConsole::Next_log));
+    ec().assign_callback(SDL_SCANCODE_PAGEUP, text_editor::ks_Ctrl, Callback(this, &CConsole::Begin_log));
+    ec().assign_callback(SDL_SCANCODE_PAGEDOWN, text_editor::ks_Ctrl, Callback(this, &CConsole::End_log));
 
-    ec().assign_callback(DIK_TAB, text_editor::ks_free, Callback(this, &CConsole::Find_cmd));
-    ec().assign_callback(DIK_TAB, text_editor::ks_Shift, Callback(this, &CConsole::Find_cmd_back));
-    ec().assign_callback(DIK_TAB, text_editor::ks_Alt, Callback(this, &CConsole::GamePause));
+    ec().assign_callback(SDL_SCANCODE_TAB, text_editor::ks_free, Callback(this, &CConsole::Find_cmd));
+    ec().assign_callback(SDL_SCANCODE_TAB, text_editor::ks_Shift, Callback(this, &CConsole::Find_cmd_back));
+    ec().assign_callback(SDL_SCANCODE_TAB, text_editor::ks_Alt, Callback(this, &CConsole::GamePause));
 
-    ec().assign_callback(DIK_UP, text_editor::ks_free, Callback(this, &CConsole::Prev_tip));
-    ec().assign_callback(DIK_DOWN, text_editor::ks_free, Callback(this, &CConsole::Next_tip));
-    ec().assign_callback(DIK_UP, text_editor::ks_Ctrl, Callback(this, &CConsole::Prev_cmd));
-    ec().assign_callback(DIK_DOWN, text_editor::ks_Ctrl, Callback(this, &CConsole::Next_cmd));
+    ec().assign_callback(SDL_SCANCODE_UP, text_editor::ks_free, Callback(this, &CConsole::Prev_tip));
+    ec().assign_callback(SDL_SCANCODE_DOWN, text_editor::ks_free, Callback(this, &CConsole::Next_tip));
+    ec().assign_callback(SDL_SCANCODE_UP, text_editor::ks_Ctrl, Callback(this, &CConsole::Prev_cmd));
+    ec().assign_callback(SDL_SCANCODE_DOWN, text_editor::ks_Ctrl, Callback(this, &CConsole::Next_cmd));
 
-    ec().assign_callback(DIK_HOME, text_editor::ks_Alt, Callback(this, &CConsole::Begin_tips));
-    ec().assign_callback(DIK_END, text_editor::ks_Alt, Callback(this, &CConsole::End_tips));
-    ec().assign_callback(DIK_PRIOR, text_editor::ks_Alt, Callback(this, &CConsole::PageUp_tips));
-    ec().assign_callback(DIK_NEXT, text_editor::ks_Alt, Callback(this, &CConsole::PageDown_tips));
+    ec().assign_callback(SDL_SCANCODE_HOME, text_editor::ks_Alt, Callback(this, &CConsole::Begin_tips));
+    ec().assign_callback(SDL_SCANCODE_END, text_editor::ks_Alt, Callback(this, &CConsole::End_tips));
+    ec().assign_callback(SDL_SCANCODE_PAGEUP, text_editor::ks_Alt, Callback(this, &CConsole::PageUp_tips));
+    ec().assign_callback(SDL_SCANCODE_PAGEDOWN, text_editor::ks_Alt, Callback(this, &CConsole::PageDown_tips));
 
-    ec().assign_callback(DIK_RETURN, text_editor::ks_free, Callback(this, &CConsole::Execute_cmd));
-    ec().assign_callback(DIK_NUMPADENTER, text_editor::ks_free, Callback(this, &CConsole::Execute_cmd));
+    ec().assign_callback(SDL_SCANCODE_RETURN, text_editor::ks_free, Callback(this, &CConsole::Execute_cmd));
+    ec().assign_callback(SDL_SCANCODE_KP_ENTER, text_editor::ks_free, Callback(this, &CConsole::Execute_cmd));
 
-    ec().assign_callback(DIK_ESCAPE, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd_esc));
-    ec().assign_callback(DIK_GRAVE, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
+    ec().assign_callback(SDL_SCANCODE_ESCAPE, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd_esc));
+    ec().assign_callback(SDL_SCANCODE_GRAVE, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
 }
 
-void CConsole::Prev_log() // DIK_PRIOR=PAGE_UP
+void CConsole::Prev_log() // SDL_SCANCODE_PRIOR=PAGE_UP
 {
     scroll_delta++;
     if (scroll_delta > int(LogFile.size()) - 1)
@@ -49,7 +49,7 @@ void CConsole::Prev_log() // DIK_PRIOR=PAGE_UP
     }
 }
 
-void CConsole::Next_log() // DIK_NEXT=PAGE_DOWN
+void CConsole::Next_log() // SDL_SCANCODE_NEXT=PAGE_DOWN
 {
     scroll_delta--;
     if (scroll_delta < 0)
@@ -68,7 +68,7 @@ void CConsole::End_log() // PAGE_DOWN+Ctrl
     scroll_delta = 0;
 }
 
-void CConsole::Find_cmd() // DIK_TAB
+void CConsole::Find_cmd() // SDL_SCANCODE_TAB
 {
     shared_str out_str;
 
@@ -79,7 +79,7 @@ void CConsole::Find_cmd() // DIK_TAB
     }
 }
 
-void CConsole::Find_cmd_back() // DIK_TAB+shift
+void CConsole::Find_cmd_back() // SDL_SCANCODE_TAB+shift
 {
     LPCSTR edt = ec().str_edit();
     LPCSTR radmin_cmd_name = "ra ";
@@ -101,19 +101,19 @@ void CConsole::Find_cmd_back() // DIK_TAB+shift
     }
 }
 
-void CConsole::Prev_cmd() // DIK_UP + Ctrl
+void CConsole::Prev_cmd() // SDL_SCANCODE_UP + Ctrl
 {
     prev_cmd_history_idx();
     SelectCommand();
 }
 
-void CConsole::Next_cmd() // DIK_DOWN + Ctrl
+void CConsole::Next_cmd() // SDL_SCANCODE_DOWN + Ctrl
 {
     next_cmd_history_idx();
     SelectCommand();
 }
 
-void CConsole::Prev_tip() // DIK_UP
+void CConsole::Prev_tip() // SDL_SCANCODE_UP
 {
     if (xr_strlen(ec().str_edit()) == 0)
     {
@@ -124,7 +124,7 @@ void CConsole::Prev_tip() // DIK_UP
     prev_selected_tip();
 }
 
-void CConsole::Next_tip() // DIK_DOWN + Ctrl
+void CConsole::Next_tip() // SDL_SCANCODE_DOWN + Ctrl
 {
     if (xr_strlen(ec().str_edit()) == 0)
     {
@@ -160,7 +160,7 @@ void CConsole::PageDown_tips()
     check_next_selected_tip();
 }
 
-void CConsole::Execute_cmd() // DIK_RETURN, DIK_NUMPADENTER
+void CConsole::Execute_cmd() // SDL_SCANCODE_RETURN, SDL_SCANCODE_KP_ENTER
 {
     if (0 <= m_select_tip && m_select_tip < (int)m_tips.size())
     {

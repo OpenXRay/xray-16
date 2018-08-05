@@ -5,7 +5,6 @@
 #include "UIPropertiesBox.h"
 #include "UIListBox.h"
 #include "UIListBoxItem.h"
-#include <dinput.h>
 #include "UIDemoPlayControl.h"
 #include "UICursor.h"
 #include "xrEngine/XR_IOConsole.h"
@@ -175,7 +174,7 @@ void CUIDemoPlayControl::InitAllPlayers()
 
 bool CUIDemoPlayControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if ((dik == DIK_LCONTROL) && (keyboard_action == WINDOW_KEY_RELEASED))
+    if ((dik == SDL_SCANCODE_LCTRL) && (keyboard_action == WINDOW_KEY_RELEASED))
     {
         m_last_curr_pos = GetUICursor().GetCursorPosition();
         m_rewind_type->Hide();

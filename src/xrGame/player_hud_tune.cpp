@@ -21,29 +21,29 @@ float _delta_rot = 0.05f;
 
 bool is_attachable_item_tuning_mode()
 {
-    return pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_Z) ||
-        pInput->iGetAsyncKeyState(DIK_X) || pInput->iGetAsyncKeyState(DIK_C);
+    return pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_Z) ||
+        pInput->iGetAsyncKeyState(SDL_SCANCODE_X) || pInput->iGetAsyncKeyState(SDL_SCANCODE_C);
 }
 
 void tune_remap(const Ivector& in_values, Ivector& out_values)
 {
-    if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
     {
         out_values = in_values;
     }
-    else if (pInput->iGetAsyncKeyState(DIK_Z))
+    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_Z))
     { // strict by X
         out_values.x = in_values.y;
         out_values.y = 0;
         out_values.z = 0;
     }
-    else if (pInput->iGetAsyncKeyState(DIK_X))
+    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_X))
     { // strict by Y
         out_values.x = 0;
         out_values.y = in_values.y;
         out_values.z = 0;
     }
-    else if (pInput->iGetAsyncKeyState(DIK_C))
+    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_C))
     { // strict by Z
         out_values.x = 0;
         out_values.y = 0;
@@ -314,7 +314,7 @@ void hud_draw_adjust_mode()
         return;
 
     LPCSTR _text = NULL;
-    if (pInput->iGetAsyncKeyState(DIK_LSHIFT) && hud_adj_mode)
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT) && hud_adj_mode)
         _text =
             "press SHIFT+NUM 0-return 1-hud_pos 2-hud_rot 3-itm_pos 4-itm_rot 5-fire_point 6-fire_2_point "
             "7-shell_point "
@@ -347,34 +347,34 @@ void hud_draw_adjust_mode()
 
 void hud_adjust_mode_keyb(int dik)
 {
-    if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
     {
-        if (dik == DIK_NUMPAD0)
+        if (dik == SDL_SCANCODE_KP_0)
             hud_adj_mode = 0;
-        if (dik == DIK_NUMPAD1)
+        if (dik == SDL_SCANCODE_KP_1)
             hud_adj_mode = 1;
-        if (dik == DIK_NUMPAD2)
+        if (dik == SDL_SCANCODE_KP_2)
             hud_adj_mode = 2;
-        if (dik == DIK_NUMPAD3)
+        if (dik == SDL_SCANCODE_KP_3)
             hud_adj_mode = 3;
-        if (dik == DIK_NUMPAD4)
+        if (dik == SDL_SCANCODE_KP_4)
             hud_adj_mode = 4;
-        if (dik == DIK_NUMPAD5)
+        if (dik == SDL_SCANCODE_KP_5)
             hud_adj_mode = 5;
-        if (dik == DIK_NUMPAD6)
+        if (dik == SDL_SCANCODE_KP_6)
             hud_adj_mode = 6;
-        if (dik == DIK_NUMPAD7)
+        if (dik == SDL_SCANCODE_KP_7)
             hud_adj_mode = 7;
-        if (dik == DIK_NUMPAD8)
+        if (dik == SDL_SCANCODE_KP_8)
             hud_adj_mode = 8;
-        if (dik == DIK_NUMPAD9)
+        if (dik == SDL_SCANCODE_KP_9)
             hud_adj_mode = 9;
     }
-    if (pInput->iGetAsyncKeyState(DIK_LCONTROL))
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LCTRL))
     {
-        if (dik == DIK_NUMPAD0)
+        if (dik == SDL_SCANCODE_KP_0)
             hud_adj_item_idx = 0;
-        if (dik == DIK_NUMPAD1)
+        if (dik == SDL_SCANCODE_KP_1)
             hud_adj_item_idx = 1;
     }
 }

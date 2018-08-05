@@ -77,10 +77,9 @@ void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
     FillUpList();
 }
 
-#include <dinput.h>
 bool CUIChangeMap::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == DIK_ESCAPE)
+    if (dik == SDL_SCANCODE_ESCAPE)
     {
         OnBtnCancel();
         return true;

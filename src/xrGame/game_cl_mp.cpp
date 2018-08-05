@@ -5,7 +5,6 @@
 #include "Actor.h"
 #include "ExplosiveItem.h"
 #include "Level.h"
-#include <dinput.h>
 #include "CustomZone.h"
 #include "game_base_kill_type.h"
 #include "game_base_menu_events.h"

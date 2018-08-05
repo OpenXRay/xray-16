@@ -5,7 +5,6 @@
 #include "UICellItem.h"
 #include "UIDragDropListEx.h"
 #include "UICellCustomItems.h"
-#include <dinput.h>
 #include "game_cl_deathmatch.h"
 #include "game_cl_capture_the_artefact.h"
 
@@ -54,7 +53,7 @@ bool CUIMpTradeWnd::TryToSellItem(SBuyItemInfo* sell_itm, bool do_destroy, SBuyI
             _new_owner->SetItem(iinfo->m_cell_item);
             int accel_idx = m_store_hierarchy->CurrentLevel().GetItemIdx(iinfo->m_name_sect);
             VERIFY(accel_idx != -1);
-            iinfo->m_cell_item->SetAccelerator((accel_idx > 10) ? 0 : DIK_1 + accel_idx);
+            iinfo->m_cell_item->SetAccelerator((accel_idx > 10) ? 0 : SDL_SCANCODE_1 + accel_idx);
             iinfo->m_cell_item->SetCustomDraw(new CUICellItemTradeMenuDraw(this, iinfo));
         }
     }
@@ -272,7 +271,7 @@ void CUIMpTradeWnd::RenewShopItem(const shared_str& sect_name, bool b_just_bough
         if (pitem->m_cell_item->OwnerList() != pList)
         {
             int accel_idx = m_store_hierarchy->CurrentLevel().GetItemIdx(sect_name);
-            pitem->m_cell_item->SetAccelerator((accel_idx > 9) ? 0 : DIK_1 + accel_idx);
+            pitem->m_cell_item->SetAccelerator((accel_idx > 9) ? 0 : SDL_SCANCODE_1 + accel_idx);
 
             pitem->m_cell_item->SetCustomDraw(new CUICellItemTradeMenuDraw(this, pitem));
             pList->SetItem(pitem->m_cell_item);

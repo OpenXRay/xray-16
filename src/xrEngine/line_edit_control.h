@@ -60,7 +60,7 @@ public:
     void on_key_release(int dik);
     void on_frame();
 
-    void assign_callback(u32 const dik, key_state state, Callback const& callback);
+    void assign_callback(int const dik, key_state state, Callback const& callback);
 
     void insert_character(char c);
 
@@ -106,8 +106,8 @@ private:
     void xr_stdcall SwitchKL();
 
     void assign_char_pairs(init_mode mode);
-    void create_key_state(u32 const dik, key_state state);
-    void create_char_pair(u32 const dik, char c, char c_shift, bool translate = false);
+    void create_key_state(int const dik, key_state state);
+    void create_char_pair(int const dik, char c, char c_shift, bool translate = false);
 
     void clear_inserted();
     bool empty_inserted();
@@ -119,11 +119,7 @@ private:
     void clamp_cur_pos();
 
 private:
-    enum
-    {
-        DIK_COUNT = 256
-    };
-    Base* m_actions[DIK_COUNT];
+    Base* m_actions[SDL_NUM_SCANCODES];
 
     char* m_edit_str;
     char* m_undo_buf;

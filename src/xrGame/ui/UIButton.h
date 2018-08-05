@@ -39,8 +39,8 @@ public:
     // Поведение кнопки как переключателя реализовано пока только в режиме NORMAL_PRESS
     void SetButtonAsSwitch(bool bAsSwitch) { m_bIsSwitch = bAsSwitch; }
     // Работа с акселератором
-    // Код акселератора берется из файла dinput.h, из DirectX SDK.
-    // Например: кнопка A - код 0x1E(DIK_A)
+    // Код акселератора берётся из файла SDL_scancode.h, из SDL2.
+    // Например: кнопка A - код 4 (SDL_SCANCODE_A)
     void SetAccelerator(int iAccel, int idx);
     const int GetAccelerator(int idx) const;
     bool IsAccelerator(int iAccel) const;

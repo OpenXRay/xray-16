@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <dinput.h>
 #include "xrEngine/XR_IOConsole.h"
 #include "entity_alive.h"
 #include "game_sv_single.h"
@@ -44,7 +43,7 @@ extern float g_fTimeFactor;
 
 #define CURRENT_ENTITY() (game ? ((GameID() == eGameIDSingle) ? CurrentEntity() : CurrentControlEntity()) : NULL)
 
-void CLevel::IR_OnMouseWheel(int direction)
+void CLevel::IR_OnMouseWheel(int x, int y)
 {
     if (g_bDisableAllInput)
         return;
@@ -52,10 +51,10 @@ void CLevel::IR_OnMouseWheel(int direction)
 #ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
-        g_actor->callback(GameObject::eMouseWheel)(direction);
+        g_actor->callback(GameObject::eMouseWheel)(x);
     /* avo: end */
 #endif
-    if (CurrentGameUI()->IR_UIOnMouseWheel(direction))
+    if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
         return;
     if (Device.Paused()
 #ifdef DEBUG
@@ -68,15 +67,13 @@ void CLevel::IR_OnMouseWheel(int direction)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnMouseWheel(direction);
+            IR->IR_OnMouseWheel(x, y);
     }
 }
 
-static int mouse_button_2_key[] = {MOUSE_1, MOUSE_2, MOUSE_3};
-
-void CLevel::IR_OnMousePress(int btn) { IR_OnKeyboardPress(mouse_button_2_key[btn]); }
-void CLevel::IR_OnMouseRelease(int btn) { IR_OnKeyboardRelease(mouse_button_2_key[btn]); }
-void CLevel::IR_OnMouseHold(int btn) { IR_OnKeyboardHold(mouse_button_2_key[btn]); }
+void CLevel::IR_OnMousePress(int btn) {IR_OnKeyboardPress(MouseButtonToKey[btn]); }
+void CLevel::IR_OnMouseRelease(int btn) {IR_OnKeyboardRelease(MouseButtonToKey[btn]); }
+void CLevel::IR_OnMouseHold(int btn) {IR_OnKeyboardHold(MouseButtonToKey[btn]); }
 void CLevel::IR_OnMouseMove(int dx, int dy)
 {
     if (g_bDisableAllInput)
@@ -120,7 +117,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (Device.dwPrecacheFrame)
         return;
 
-    if (Device.editor() && (pInput->iGetAsyncKeyState(DIK_LALT) || pInput->iGetAsyncKeyState(DIK_RALT)))
+    if (Device.editor() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
         return;
 
     bool b_ui_exist = !!CurrentGameUI();
@@ -224,7 +221,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 #ifndef MASTER_GOLD
     switch (key)
     {
-    case DIK_F7:
+    case SDL_SCANCODE_F7:
     {
         if (GameID() != eGameIDSingle)
             return;
@@ -236,7 +233,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         Send(net_packet, net_flags(TRUE));
         return;
     }
-    case DIK_DIVIDE:
+    case SDL_SCANCODE_KP_DIVIDE:
     {
         if (!Server)
             break;
@@ -252,7 +249,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 
         break;
     }
-    case DIK_MULTIPLY:
+    case SDL_SCANCODE_KP_MULTIPLY:
     {
         if (!Server)
             break;
@@ -268,7 +265,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         break;
     }
 #ifdef DEBUG
-    case DIK_SUBTRACT:
+    case SDL_SCANCODE_KP_MINUS:
     {
         if (!Server)
             break;
@@ -281,14 +278,14 @@ void CLevel::IR_OnKeyboardPress(int key)
         break;
     }
 #endif // DEBUG
-    case DIK_NUMPAD5:
+    case SDL_SCANCODE_KP_5:
     {
         if (GameID() != eGameIDSingle)
         {
             Msg("For this game type Demo Record is disabled.");
             ///				return;
         };
-        if (!pInput->iGetAsyncKeyState(DIK_LSHIFT))
+        if (!pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
         {
             Console->Hide();
             Console->Execute("demo_record 1");
@@ -299,12 +296,12 @@ void CLevel::IR_OnKeyboardPress(int key)
 #ifdef DEBUG
 
     // Lain: added TEMP!!!
-    case DIK_UP:
+    case SDL_SCANCODE_UP:
     {
         g_separate_factor /= 0.9f;
         break;
     }
-    case DIK_DOWN:
+    case SDL_SCANCODE_DOWN:
     {
         g_separate_factor *= 0.9f;
         if (g_separate_factor < 0.1f)
@@ -313,7 +310,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         }
         break;
     }
-    case DIK_LEFT:
+    case SDL_SCANCODE_LEFT:
     {
         g_separate_radius *= 0.9f;
         if (g_separate_radius < 0)
@@ -322,29 +319,29 @@ void CLevel::IR_OnKeyboardPress(int key)
         }
         break;
     }
-    case DIK_RIGHT:
+    case SDL_SCANCODE_RIGHT:
     {
         g_separate_radius /= 0.9f;
         break;
     }
 
-    case DIK_RETURN:
+    case SDL_SCANCODE_RETURN:
     {
         bDebug = !bDebug;
         return;
     }
-    case DIK_BACK:
+    case SDL_SCANCODE_BACKSPACE:
         if (GameID() == eGameIDSingle)
             GEnv.DRender->NextSceneMode();
         // HW.Caps.SceneMode			= (HW.Caps.SceneMode+1)%3;
         return;
 
-    case DIK_F4:
+    case SDL_SCANCODE_F4:
     {
-        if (pInput->iGetAsyncKeyState(DIK_LALT))
+        if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT))
             break;
 
-        if (pInput->iGetAsyncKeyState(DIK_RALT))
+        if (pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT))
             break;
 
         bool bOk = false;
@@ -413,7 +410,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         return;
     }
     // Lain: added
-    case DIK_F5:
+    case SDL_SCANCODE_F5:
     {
         if (CBaseMonster* pBM = smart_cast<CBaseMonster*>(CurrentEntity()))
         {
@@ -427,7 +424,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         if (GameID() != eGameIDSingle)
             break;
 
-        if (pInput->iGetAsyncKeyState(DIK_LALT))
+        if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT))
         {
             if (smart_cast<CActor*>(CurrentEntity()))
                 try_change_current_entity();
@@ -440,7 +437,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 /**/
 #endif
 #ifdef DEBUG
-    case DIK_F9:
+    case SDL_SCANCODE_F9:
     {
         //		if (!ai().get_alife())
         //			break;
@@ -448,7 +445,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         break;
     }
         return;
-//	case DIK_F10:{
+//	case SDL_SCANCODE_F10:{
 //		ai().level_graph().set_dest_point();
 //		ai().level_graph().build_detail_path();
 //		if (!Objects.FindObjectByName("m_stalker_e0000") || !Objects.FindObjectByName("localhost/dima"))
@@ -463,7 +460,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 //		functor(0,false);
 //	}
 //		return;
-//	case DIK_F11:
+//	case SDL_SCANCODE_F11:
 //		ai().level_graph().build_detail_path();
 //		if (!Objects.FindObjectByName("m_stalker_e0000") || !Objects.FindObjectByName("localhost/dima"))
 //			return;
@@ -544,7 +541,7 @@ void CLevel::IR_OnKeyboardHold(int key)
 
 #ifdef DEBUG
     // Lain: added
-    if (key == DIK_UP)
+    if (key == SDL_SCANCODE_UP)
     {
         static u32 time = Device.dwTimeGlobal;
         if (Device.dwTimeGlobal - time > 20)
@@ -556,7 +553,7 @@ void CLevel::IR_OnKeyboardHold(int key)
             }
         }
     }
-    else if (key == DIK_DOWN)
+    else if (key == SDL_SCANCODE_DOWN)
     {
         static u32 time = Device.dwTimeGlobal;
         if (Device.dwTimeGlobal - time > 20)
@@ -612,7 +609,9 @@ void CLevel::IR_OnActivate()
             case kACCEL:
             case kL_LOOKOUT:
             case kR_LOOKOUT:
-            case kWPN_FIRE: { IR_OnKeyboardPress(i);
+            case kWPN_FIRE: 
+            {
+                IR_OnKeyboardPress(i);
             }
             break;
             };

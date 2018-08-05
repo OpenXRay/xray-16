@@ -298,7 +298,7 @@ public:
     virtual void IR_OnMouseHold(int btn);
     virtual void IR_OnMouseMove(int, int);
     virtual void IR_OnMouseStop(int, int);
-    virtual void IR_OnMouseWheel(int direction);
+    virtual void IR_OnMouseWheel(int x, int y);
     virtual void IR_OnActivate(void);
     int get_RPID(LPCSTR name);
     // Game

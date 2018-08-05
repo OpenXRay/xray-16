@@ -10,7 +10,6 @@
 #include "ai/monsters/control_movement_base.h"
 #include "PHMovementControl.h"
 #ifdef _DEBUG
-#include <dinput.h>
 #include "Actor.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "level_debug.h"
@@ -315,7 +314,7 @@ void CSnork::debug_on_key(int key)
 
     switch (key)
     {
-    case DIK_1: m_target_node = actor->ai_location().level_vertex_id();
+    case SDL_SCANCODE_1: m_target_node = actor->ai_location().level_vertex_id();
     }
 }
 #endif

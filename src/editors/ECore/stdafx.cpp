@@ -4,7 +4,6 @@
 // external dependencies
 
 #define INITGUID
-#include <dinput.h>
 
 #ifndef _ECOREB
 #pragma comment(lib, "xrECoreB.lib")
@@ -15,7 +14,6 @@
 #pragma comment(lib, "xrCoreB.lib")
 #pragma comment(lib, "xrSoundB.lib")
 
-#pragma comment(lib, "dinput8B.lib")
 #pragma comment(lib, "freeimageB.lib")
 //#pragma comment(lib,"d3d9.lib")
 #pragma comment(lib, "dxtB.lib")

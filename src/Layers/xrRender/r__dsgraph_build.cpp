@@ -804,7 +804,7 @@ void D3DXRenderBase::DestroyHW()
     HW.DestroyDevice();
 }
 
-void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
+void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
 #if defined(DEBUG) && !defined(USE_OGL)
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
@@ -812,7 +812,7 @@ void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth
 
     Resources->reset_begin();
     Memory.mem_compact();
-    HW.Reset(hWnd);
+    HW.Reset();
 
 #if defined(USE_OGL)
     dwWidth = psCurrentVidMode[0];
@@ -901,9 +901,9 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     }
 }
 
-void D3DXRenderBase::Create(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2, bool move_window)
+void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-    HW.CreateDevice(hWnd, move_window);
+    HW.CreateDevice(hWnd);
 #if defined(USE_OGL)
     dwWidth = psCurrentVidMode[0];
     dwHeight = psCurrentVidMode[1];

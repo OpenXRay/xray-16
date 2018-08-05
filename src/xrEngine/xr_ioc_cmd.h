@@ -157,7 +157,12 @@ public:
 
     virtual void Execute(LPCSTR args)
     {
-        const xr_token* tok = tokens;
+        const xr_token* tok = GetToken();
+        if (!tok)
+        {
+            Msg("! token [%s] is null", cName);
+            return;
+        }
         while (tok->name)
         {
             if (xr_stricmp(tok->name, args) == 0)
@@ -172,7 +177,7 @@ public:
     }
     virtual void Status(TStatus& S)
     {
-        const xr_token* tok = tokens;
+        const xr_token* tok = GetToken();
         while (tok->name)
         {
             if (tok->id == (int)(*value))
@@ -188,7 +193,7 @@ public:
     virtual void Info(TInfo& I)
     {
         I[0] = 0;
-        const xr_token* tok = tokens;
+        const xr_token* tok = GetToken();
         while (tok->name)
         {
             if (I[0])

@@ -9,7 +9,8 @@
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/xr_token.h"
 
-extern xr_vector<xr_token> vid_quality_token;
+extern void FillMonitorsToken();
+extern xr_vector<xr_token> VidQualityToken;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -35,14 +36,18 @@ CEngineAPI::CEngineAPI()
 
 CEngineAPI::~CEngineAPI()
 {
-    vid_quality_token.clear();
+    VidQualityToken.clear();
 }
 
 bool is_enough_address_space_available()
 {
+#if defined(WINDOWS)
     SYSTEM_INFO system_info;
     GetSystemInfo(&system_info);
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
+#else
+    return TRUE; // In linux allocated memory limited only by pointer size
+#endif
 }
 
 void CEngineAPI::SetupCurrentRenderer()
@@ -122,13 +127,13 @@ void CEngineAPI::InitializeRenderers()
     SetupCurrentRenderer();
 
     if (GEnv.SetupCurrentRenderer == nullptr
-        && vid_quality_token[0].id != -1)
+        && VidQualityToken[0].id != -1)
     {
         // if engine failed to load renderer
         // but there is at least one available
         // then try again
         string32 buf;
-        xr_sprintf(buf, "renderer %s", vid_quality_token[0].name);
+        xr_sprintf(buf, "renderer %s", VidQualityToken[0].name);
         Console->Execute(buf);
 
         // Second attempt
@@ -155,6 +160,8 @@ void CEngineAPI::InitializeRenderers()
 
     if (GEnv.CurrentRenderer != 1)
         hRenderR1->close();*/
+
+    FillMonitorsToken();
 }
 
 void CEngineAPI::Initialize(void)
@@ -208,7 +215,7 @@ void CEngineAPI::Destroy(void)
 
 void CEngineAPI::CreateRendererList()
 {
-    if (!vid_quality_token.empty())
+    if (!VidQualityToken.empty())
         return;
 
     hRenderR1 = XRay::LoadModule("xrRender_R1");
@@ -216,8 +223,8 @@ void CEngineAPI::CreateRendererList()
     if (GEnv.isDedicatedServer)
     {
         R_ASSERT2(hRenderR1->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
-        vid_quality_token.emplace_back(xr_token("renderer_r1", 0));
-        vid_quality_token.emplace_back(xr_token(nullptr, -1));
+        VidQualityToken.emplace_back("renderer_r1", 0);
+        VidQualityToken.emplace_back(nullptr, -1);
         return;
     }
 
@@ -232,25 +239,25 @@ void CEngineAPI::CreateRendererList()
     // Restore error handling
     SetErrorMode(0);
 
-    auto& modes = vid_quality_token;
+    auto& modes = VidQualityToken;
 
     if (hRenderR1->IsLoaded())
     {
-        modes.emplace_back(xr_token("renderer_r1", 0));
+        modes.emplace_back("renderer_r1", 0);
     }
 
     if (hRenderR2->IsLoaded())
     {
-        modes.emplace_back(xr_token("renderer_r2a", 1));
-        modes.emplace_back(xr_token("renderer_r2", 2));
+        modes.emplace_back("renderer_r2a", 1);
+        modes.emplace_back("renderer_r2", 2);
         if (GEnv.CheckR2 && GEnv.CheckR2())
-            modes.emplace_back(xr_token("renderer_r2.5", 3));
+            modes.emplace_back("renderer_r2.5", 3);
     }
 
     if (hRenderR3->IsLoaded())
     {
         if (GEnv.CheckR3 && GEnv.CheckR3())
-            modes.emplace_back(xr_token("renderer_r3", 4));
+            modes.emplace_back("renderer_r3", 4);
         else
             hRenderR3->Close();
     }
@@ -258,7 +265,7 @@ void CEngineAPI::CreateRendererList()
     if (hRenderR4->IsLoaded())
     {
         if (GEnv.CheckR4 && GEnv.CheckR4())
-            modes.emplace_back(xr_token("renderer_r4", 5));
+            modes.emplace_back("renderer_r4", 5);
         else
             hRenderR4->Close();
     }
@@ -266,11 +273,11 @@ void CEngineAPI::CreateRendererList()
     if (hRenderRGL->IsLoaded())
     {
         if (GEnv.CheckRGL && GEnv.CheckRGL())
-            modes.emplace_back(xr_token("renderer_gl", 6));
+            modes.emplace_back("renderer_gl", 6);
         else
             hRenderRGL->Close();
     }
-    modes.emplace_back(xr_token(nullptr, -1));
+    modes.emplace_back(nullptr, -1);
 
     Msg("Available render modes[%d]:", modes.size());
     for (const auto& mode : modes)

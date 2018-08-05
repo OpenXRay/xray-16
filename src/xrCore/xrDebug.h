@@ -14,6 +14,7 @@
 #pragma warning(pop)
 #endif
 
+struct SDL_Window;
 class ErrorLocation
 {
 public:
@@ -46,6 +47,7 @@ public:
     using UnhandledExceptionFilter = LONG(WINAPI*)(EXCEPTION_POINTERS* exPtrs);
 
 private:
+    static SDL_Window* applicationWindow;
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
     static CrashHandler OnCrash;
@@ -58,6 +60,9 @@ public:
     static void Initialize(const bool& dedicated);
     static void Destroy();
     static void OnThreadSpawn();
+
+    static SDL_Window* GetApplicationWindow() { return applicationWindow; }
+    static void SetApplicationWindow(SDL_Window* window) { applicationWindow = window; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
     static CrashHandler GetCrashHandler() { return OnCrash; }
@@ -66,8 +71,8 @@ public:
     static void SetDialogHandler(DialogHandler handler) { OnDialog = handler; }
     static const char* ErrorToString(long code);
     static void SetBugReportFile(const char* fileName);
-    static void GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
-                           const char* arg1 = nullptr, const char* arg2 = nullptr);
+    static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
+                           const char* desc, const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void Fatal(const ErrorLocation& loc, const char* format, ...);
     static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
@@ -76,6 +81,8 @@ public:
     static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void DoExit(const std::string& message);
+
+    static int ShowMessage(pcstr title, pcstr message, bool simple = true);
 
     static void LogStackTrace(const char* header);
     static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = 512);

@@ -229,13 +229,12 @@ BOOL CRenderTarget::Perform()
                               (frame_distort == (Device.dwFrame - 1)));
 }
 
-#include <dinput.h>
 #define SHOW(a) Log(#a, a);
 #define SHOWX(a) Msg("%s %x", #a, a);
 void CRenderTarget::Begin()
 {
     /*
-    if (g_pGameLevel->IR_GetKeyState(DIK_LSHIFT))
+    if (g_pGameLevel->IR_GetKeyState(SDL_SCANCODE_LSHIFT))
     {
         Msg                 ("[%5d]------------------------",Device.dwFrame);
         SHOW                (param_blur)

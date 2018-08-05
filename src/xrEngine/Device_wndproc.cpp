@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#if defined(WINDOWS)
 bool CRenderDevice::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
     switch (uMsg)
@@ -53,6 +54,7 @@ bool CRenderDevice::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
     return (false);
 }
+
 //-----------------------------------------------------------------------------
 // Name: WndProc()
 // Desc: Static msg handler which passes messages to the application class.
@@ -65,3 +67,4 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     return (DefWindowProc(hWnd, uMsg, wParam, lParam));
 }
+#endif

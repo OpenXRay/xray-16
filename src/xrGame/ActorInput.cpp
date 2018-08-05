@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <dinput.h>
 #include "Actor.h"
 #include "Torch.h"
 #include "trade.h"
@@ -37,7 +36,7 @@ extern u32 hud_adj_mode;
 
 void CActor::IR_OnKeyboardPress(int cmd)
 {
-    if (hud_adj_mode && pInput->iGetAsyncKeyState(DIK_LSHIFT))
+    if (hud_adj_mode && pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
         return;
 
     if (Remote())
@@ -200,18 +199,18 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
 }
 
-void CActor::IR_OnMouseWheel(int direction)
+void CActor::IR_OnMouseWheel(int x, int y)
 {
     if (hud_adj_mode)
     {
-        g_player_hud->tune(Ivector().set(0, 0, direction));
+        g_player_hud->tune(Ivector().set(0, 0, x));
         return;
     }
 
-    if (inventory().Action((direction > 0) ? (u16)kWPN_ZOOM_DEC : (u16)kWPN_ZOOM_INC, CMD_START))
+    if (inventory().Action((x > 0) ? (u16)kWPN_ZOOM_DEC : (u16)kWPN_ZOOM_INC, CMD_START))
         return;
 
-    if (direction > 0)
+    if (x > 0)
         OnNextWeaponSlot();
     else
         OnPrevWeaponSlot();
@@ -219,7 +218,7 @@ void CActor::IR_OnMouseWheel(int direction)
 
 void CActor::IR_OnKeyboardRelease(int cmd)
 {
-    if (hud_adj_mode && pInput->iGetAsyncKeyState(DIK_LSHIFT))
+    if (hud_adj_mode && pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
         return;
 
     if (Remote())
@@ -254,7 +253,7 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 
 void CActor::IR_OnKeyboardHold(int cmd)
 {
-    if (hud_adj_mode && pInput->iGetAsyncKeyState(DIK_LSHIFT))
+    if (hud_adj_mode && pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
         return;
 
     if (Remote() || !g_Alive())
@@ -469,7 +468,7 @@ void CActor::ActorUse()
         if (object)
             element = (u16)RQ.element;
 
-        if (object && Level().IR_GetKeyState(DIK_LSHIFT))
+        if (object && Level().IR_GetKeyState(SDL_SCANCODE_LSHIFT))
         {
             bool b_allow = !!pSettings->line_exist("ph_capture_visuals", object->cNameVisual());
             if (b_allow && !character_physics_support()->movement()->PHCapture())
@@ -660,9 +659,9 @@ void CActor::NoClipFly(int cmd)
     Fvector cur_pos; // = Position();
     cur_pos.set(0, 0, 0);
     float scale = 1.0f;
-    if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
+    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
         scale = 0.25f;
-    else if (pInput->iGetAsyncKeyState(DIK_LMENU))
+    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT))
         scale = 4.0f;
 
     switch (cmd)

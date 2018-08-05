@@ -10,10 +10,9 @@
 
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
-#include <gl/glext.h>
-#include <gl/wglext.h>
+#include "SDL_opengl.h"
+#include <GL/glu.h>
+#include "SDL_opengl_glext.h"
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
@@ -38,8 +37,8 @@
 #include "xrEngine/Render.h"
 #include "Common/_d3d_extensions.h"
 #include "xrEngine/IGame_Level.h"
-#include "Layers/xrRender/blenders/blender.h"
-#include "Layers/xrRender/blenders/blender_clsid.h"
+#include "Layers/xrRender/blenders/Blender.h"
+#include "Layers/xrRender/blenders/Blender_CLSID.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "rgl.h"
 

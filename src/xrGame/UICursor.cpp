@@ -55,9 +55,14 @@ void CUICursor::InitInternal()
     m_static->SetWndSize(sz);
     m_static->SetStretchTexture(true);
 
-    u32 screen_size_x = GetSystemMetrics(SM_CXSCREEN);
-    u32 screen_size_y = GetSystemMetrics(SM_CYSCREEN);
-    m_b_use_win_cursor = (screen_size_y >= Device.dwHeight && screen_size_x >= Device.dwWidth);
+    SDL_Rect display;
+    R_ASSERT3(SDL_GetDisplayBounds(0, &display) == 0, "SDL_GetDisplayBounds display failed: ", SDL_GetError());
+
+    const u32 screen_size_x = display.w - display.x;
+    const u32 screen_size_y = display.h - display.y;
+    m_b_use_win_cursor = screen_size_y >= Device.dwHeight && screen_size_x >= Device.dwWidth;
+    if (m_b_use_win_cursor) // sanity
+        Device.UpdateWindowRects();
 }
 
 //--------------------------------------------------------------------
@@ -107,8 +112,8 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
     {
         Ivector2 pti;
         IInputReceiver::IR_GetMousePosReal(pti);
-        vPos.x = (float)pti.x * (UI_BASE_WIDTH / (float)Device.m_rcWindowClient.right);
-        vPos.y = (float)pti.y * (UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.bottom);
+        vPos.x = (float)pti.x * (UI_BASE_WIDTH / (float)Device.m_rcWindowClient.w);
+        vPos.y = (float)pti.y * (UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h);
     }
     else
     {
@@ -124,9 +129,8 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
 {
     vPos = pos;
     POINT p;
-    p.x = iFloor(vPos.x / (UI_BASE_WIDTH / (float)Device.m_rcWindowClient.right));
-    p.y = iFloor(vPos.y / (UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.bottom));
-    if (m_b_use_win_cursor)
-        ClientToScreen(Device.m_hWnd, (LPPOINT)&p);
-    SetCursorPos(p.x, p.y);
+    p.x = iFloor(vPos.x / (UI_BASE_WIDTH / (float)Device.m_rcWindowClient.w));
+    p.y = iFloor(vPos.y / (UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h));
+        
+    SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
 }

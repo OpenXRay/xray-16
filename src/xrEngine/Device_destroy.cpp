@@ -5,12 +5,15 @@
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 
+extern void FreeMonitorsToken();
+extern void FreeVidModesToken();
+extern void FreeRefreshRateToken();
+
 void CRenderDevice::Destroy()
 {
     if (!b_is_Ready)
         return;
     Log("Destroying Direct3D...");
-    pInput->ClipCursor(false);
     GEnv.Render->ValidateHW();
     GEnv.DU->OnDeviceDestroy();
     b_is_Ready = false;
@@ -19,6 +22,9 @@ void CRenderDevice::Destroy()
     GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
     GEnv.Render->DestroyHW();
+    FreeRefreshRateToken();
+    FreeVidModesToken();
+    FreeMonitorsToken();
     seqRender.Clear();
     seqAppActivate.Clear();
     seqAppDeactivate.Clear();
@@ -29,6 +35,9 @@ void CRenderDevice::Destroy()
     seqDeviceReset.Clear();
     seqParallel.clear();
     xr_delete(Statistic);
+
+    SDL_DestroyWindow(m_sdlWnd);
+    SDL_Quit();
 }
 
 #include "IGame_Level.h"
@@ -39,13 +48,12 @@ void CRenderDevice::Reset(bool precache)
 {
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
-    pInput->ClipCursor(false);
+    pInput->GrabInput(false);
 
     const auto tm_start = TimerAsync();
 
-    GEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
-    GetWindowRect(m_hWnd, &m_rcWindowBounds);
-    GetClientRect(m_hWnd, &m_rcWindowClient);
+    UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
+    GEnv.Render->Reset(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     if (g_pGamePersistent)
         g_pGamePersistent->Environment().bNeed_re_create_env = true;
@@ -65,5 +73,5 @@ void CRenderDevice::Reset(bool precache)
         seqResolutionChanged.Process();
 
     if (!GEnv.isDedicatedServer)
-        pInput->ClipCursor(true);
+        pInput->GrabInput(true);
 }

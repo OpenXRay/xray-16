@@ -91,21 +91,19 @@ void CUIVotingCategory::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
 }
 
-#include <dinput.h>
-
 bool CUIVotingCategory::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 
     if (WINDOW_KEY_PRESSED == keyboard_action)
     {
-        if (DIK_ESCAPE == dik)
+        if (SDL_SCANCODE_ESCAPE == dik)
         {
             OnBtnCancel();
             return true;
         }
-        if (dik >= DIK_1 && dik <= DIK_7)
-            OnBtn(dik - DIK_1);
+        if (dik >= SDL_SCANCODE_1 && dik <= SDL_SCANCODE_7)
+            OnBtn(dik - SDL_SCANCODE_1);
         return true;
     }
     return false;

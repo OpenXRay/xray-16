@@ -14,8 +14,14 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
-ENGINE_API xr_vector<xr_token> AvailableVideoModes;
-xr_vector<xr_token> vid_quality_token;
+extern void FillVidModesToken(u32 monitorID);
+extern void FillRefreshRateToken();
+ENGINE_API u32 Vid_SelectedMonitor = 0;
+ENGINE_API u32 Vid_SelectedRefreshRate = 60;
+ENGINE_API xr_vector<xr_token> VidMonitorsToken;
+ENGINE_API xr_vector<xr_token> VidModesToken;
+ENGINE_API xr_vector<xr_token> VidRefreshRateToken;
+xr_vector<xr_token> VidQualityToken;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 
@@ -206,9 +212,10 @@ public:
         xr_strcat(cfg_full_name, ".ltx");
 
         BOOL b_allow = TRUE;
+#if defined(WINDOWS)
         if (FS.exist(cfg_full_name))
             b_allow = SetFileAttributes(cfg_full_name, FILE_ATTRIBUTE_NORMAL);
-
+#endif
         if (b_allow)
         {
             IWriter* F = FS.w_open(cfg_full_name);
@@ -370,7 +377,7 @@ public:
 };
 class CCC_VidMode : public CCC_Token
 {
-    u32 _dummy;
+    u32 _dummy = 0;
 
 public:
     CCC_VidMode(LPCSTR N) : CCC_Token(N, &_dummy, NULL) { bEmptyArgsHandled = FALSE; };
@@ -382,6 +389,7 @@ public:
         {
             psCurrentVidMode[0] = _w;
             psCurrentVidMode[1] = _h;
+            FillRefreshRateToken();
         }
         else
         {
@@ -390,7 +398,7 @@ public:
         }
     }
     virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
-    const xr_token* GetToken() noexcept override { return AvailableVideoModes.data(); }
+    const xr_token* GetToken() noexcept override { return VidModesToken.data(); }
     virtual void Info(TInfo& I) { xr_strcpy(I, sizeof(I), "change screen resolution WxH"); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -420,6 +428,30 @@ public:
             tok++;
         }
     }
+};
+//-----------------------------------------------------------------------
+class CCC_VidMonitor : public CCC_Token
+{    
+public:
+    CCC_VidMonitor(pcstr name) : CCC_Token(name, &Vid_SelectedMonitor, nullptr)
+    {
+        bEmptyArgsHandled = false;
+    }
+
+    void Execute(pcstr args) override
+    {
+        CCC_Token::Execute(args);
+        FillVidModesToken(Vid_SelectedMonitor);
+    }
+
+    const xr_token* GetToken() noexcept override { return VidMonitorsToken.data(); }
+};
+//-----------------------------------------------------------------------
+class CCC_VidRefresh : public CCC_Token
+{
+public:
+    CCC_VidRefresh(pcstr name) : CCC_Token(name, &Vid_SelectedRefreshRate, nullptr) { bEmptyArgsHandled = false; }
+    const xr_token* GetToken() noexcept override { return VidRefreshRateToken.data(); }
 };
 //-----------------------------------------------------------------------
 class CCC_SND_Restart : public IConsole_Command
@@ -512,7 +544,7 @@ public:
     virtual ~CCC_r2() {}
     virtual void Execute(LPCSTR args)
     {
-        tokens = vid_quality_token.data();
+        tokens = VidQualityToken.data();
 
         inherited::Execute(args);
         // 0 - r1
@@ -534,13 +566,13 @@ public:
     virtual void Save(IWriter* F)
     {
         // fill_render_mode_list ();
-        tokens = vid_quality_token.data();
+        tokens = VidQualityToken.data();
         inherited::Save(F);
     }
 
     const xr_token* GetToken() noexcept override
     {
-        tokens = vid_quality_token.data();
+        tokens = VidQualityToken.data();
         return inherited::GetToken();
     }
 };
@@ -610,7 +642,7 @@ public:
         else
             InvalidSyntax();
 
-        pInput->exclusive_mode(value);
+        pInput->ExclusiveMode(value);
     }
 
     virtual void Save(IWriter* F) {}
@@ -623,6 +655,16 @@ public:
     virtual void Execute(LPCSTR args) { Console->Hide(); }
     virtual void Status(TStatus& S) { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "hide console"); }
+};
+
+class CCC_CenterScreen : public IConsole_Command
+{
+public:
+    CCC_CenterScreen(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+    void Execute(pcstr args) override
+    {
+        SDL_SetWindowPosition(Device.m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    }
 };
 
 ENGINE_API float psHUD_FOV = 0.45f;
@@ -645,6 +687,7 @@ extern int ps_rs_loading_stages;
 ENGINE_API int ps_always_active = 0;
 
 ENGINE_API int ps_r__Supersample = 1;
+
 void CCC_Register()
 {
     // General
@@ -716,6 +759,8 @@ void CCC_Register()
 
     // General video control
     CMD1(CCC_VidMode, "vid_mode");
+    CMD1(CCC_VidMonitor, "vid_monitor");
+    CMD1(CCC_VidRefresh, "vid_refresh")
 
 #ifdef DEBUG
     CMD3(CCC_Token, "vid_bpp", &psCurrentBPP, vid_bpp_token);
@@ -752,6 +797,7 @@ void CCC_Register()
     CMD2(CCC_Float, "cam_inert", &psCamInert);
     CMD2(CCC_Float, "cam_slide_inert", &psCamSlideInert);
 
+    CMD1(CCC_CenterScreen, "center_screen");
     CMD4(CCC_Integer, "always_active", &ps_always_active, 0, 1);
 
     CMD1(CCC_r2, "renderer");

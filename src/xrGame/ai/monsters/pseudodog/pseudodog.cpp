@@ -10,7 +10,6 @@
 #include "ai/monsters/control_movement_base.h"
 
 #ifdef _DEBUG
-#include <dinput.h>
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "level_debug.h"
 #include "xrAICore/Navigation/level_graph.h"

@@ -387,10 +387,10 @@ void CUISequencer::IR_OnKeyboardHold(int dik)
         m_pStoredInputReceiver->IR_OnKeyboardHold(dik);
 }
 
-void CUISequencer::IR_OnMouseWheel(int direction)
+void CUISequencer::IR_OnMouseWheel(int x, int y)
 {
     if (!GrabInput() && m_pStoredInputReceiver)
-        m_pStoredInputReceiver->IR_OnMouseWheel(direction);
+        m_pStoredInputReceiver->IR_OnMouseWheel(x, y);
 }
 
 void CUISequencer::IR_OnKeyboardPress(int dik)
@@ -453,7 +453,9 @@ void CUISequencer::IR_OnActivate()
             case kACCEL:
             case kL_LOOKOUT:
             case kR_LOOKOUT:
-            case kWPN_FIRE: { IR_OnKeyboardPress(i);
+            case kWPN_FIRE: 
+            {
+                IR_OnKeyboardPress(i);
             }
             break;
             };
