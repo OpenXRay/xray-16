@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "GameFont.h"
-#include "xrCore/Text/MbHelpers.h"
+#include "xrCore/Text/StringConversion.hpp"
 #ifndef _EDITOR
 #include "Render.h"
 #endif

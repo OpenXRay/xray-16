@@ -9,7 +9,7 @@
 #include "edit_actions.h"
 #include "line_edit_control.h"
 #include "xr_input.h"
-#include "xrCore/Text/MbHelpers.h"
+#include "xrCore/Text/StringConversion.hpp"
 
 namespace text_editor
 {

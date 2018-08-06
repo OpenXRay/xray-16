@@ -6,7 +6,7 @@
 #include "Include/editor/ide.hpp"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
-#include "xrCore/Text/MbHelpers.h"
+#include "xrCore/Text/StringConversion.hpp"
 
 #ifndef _EDITOR
 #include "xr_input_xinput.h"

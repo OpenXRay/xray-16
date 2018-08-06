@@ -240,9 +240,6 @@
     <ClCompile Include="Math\MathUtil.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Text\MbHelpers.cpp">
-      <Filter>Text</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\Lock.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
@@ -308,6 +305,9 @@
     </ClCompile>
     <ClCompile Include="Compression\rt_compressor.cpp">
       <Filter>Compression\lzo</Filter>
+    </ClCompile>
+    <ClCompile Include="Text\StringConversion.cpp">
+      <Filter>Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -545,9 +545,6 @@
     <ClInclude Include="Containers\AssociativeVector.hpp">
       <Filter>Containers</Filter>
     </ClInclude>
-    <ClInclude Include="Text\MbHelpers.h">
-      <Filter>Text</Filter>
-    </ClInclude>
     <ClInclude Include="Threading\Lock.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
@@ -676,6 +673,9 @@
     </ClInclude>
     <ClInclude Include="Compression\rt_compressor.h">
       <Filter>Compression\lzo</Filter>
+    </ClInclude>
+    <ClInclude Include="Text\StringConversion.hpp">
+      <Filter>Text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

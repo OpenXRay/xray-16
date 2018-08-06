@@ -1,7 +1,6 @@
 #pragma once
 #include "xrCore/xrCore.h"
 
-// XXX: rename this file to StringConversion.hpp
 // XXX: use c++11 functions
 
 #define MAX_MB_CHARS 4096

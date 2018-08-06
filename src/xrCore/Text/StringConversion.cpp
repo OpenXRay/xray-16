@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "MbHelpers.h"
+#include "StringConversion.hpp"
 #include <codecvt>
 
 // XXX: use c++11 functions and kill that DUMP_CONVERSION!!!11
