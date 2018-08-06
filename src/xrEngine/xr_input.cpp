@@ -8,9 +8,6 @@
 #include "PerformanceAlert.hpp"
 #include "xrCore/Text/StringConversion.hpp"
 
-#ifndef _EDITOR
-#include "xr_input_xinput.h"
-#endif
 CInput* pInput = NULL;
 IInputReceiver dummyController;
 

@@ -1,5 +1,4 @@
-#ifndef __XR_INPUT__
-#define __XR_INPUT__
+#pragma once
 
 // SDL_NUM_SCANCODES - max vavue in SDL_SCANCODE_* enum
 #define MOUSE_1 (SDL_NUM_SCANCODES + SDL_BUTTON_LEFT)
@@ -110,5 +109,3 @@ public:
 };
 
 extern ENGINE_API CInput* pInput;
-
-#endif //__XR_INPUT__
