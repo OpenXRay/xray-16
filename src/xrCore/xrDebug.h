@@ -93,7 +93,6 @@ private:
     static void SetupExceptionHandler(const bool& dedicated);
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
-    static void SaveMiniDump(EXCEPTION_POINTERS* exPtrs);
 #if defined(WINDOWS)
     static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
     static bool GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr);
