@@ -13,6 +13,18 @@
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 
+#if __has_include(".GitInfo.hpp")
+#include ".GitInfo.hpp"
+#endif
+
+#ifndef GIT_INFO_CURRENT_BRANCH
+#define GIT_INFO_CURRENT_BRANCH unknown
+#endif
+
+#ifndef GIT_INFO_CURRENT_COMMIT
+#define GIT_INFO_CURRENT_COMMIT unknown
+#endif
+
 #include "Compression/compression_ppmd_stream.h"
 extern compression::ppmd::stream* trained_model;
 
@@ -23,33 +35,51 @@ static u32 init_counter = 0;
 #define DO_EXPAND(VAL) VAL##1
 #define EXPAND(VAL) DO_EXPAND(VAL)
 
+#ifdef CI
 #if EXPAND(CI) == 1
 #undef CI
+#endif
 #endif
 
 #define HELPER(s) #s
 #define TO_STRING(s) HELPER(s)
 
-void PrintCI()
+void PrintBuildInfo()
 {
-#if defined(CI)
-    pcstr name = nullptr;
+    pcstr name = "Custom";
     pcstr buildId = nullptr;
     pcstr builder = nullptr;
-    pcstr commit = nullptr;
+    pcstr commit = TO_STRING(GIT_INFO_CURRENT_COMMIT);
+    pcstr branch = TO_STRING(GIT_INFO_CURRENT_BRANCH);
+
+#if defined(CI)
 #if defined(APPVEYOR)
     name = "AppVeyor";
     buildId = TO_STRING(APPVEYOR_BUILD_VERSION);
     builder = TO_STRING(APPVEYOR_ACCOUNT_NAME);
-    commit = TO_STRING(APPVEYOR_REPO_COMMIT);
+#elif defined(TRAVIS)
+    name = "Travis";
+    buildId = TO_STRING(TRAVIS_BUILD_NUMBER);
 #else
 #pragma TODO("PrintCI for other CIs")
-    return;
+    name = "CI";
+    builder = "Unknown CI";
 #endif
-    Msg("%s build %s from commit %s (built by %s)", name, buildId, commit, builder);
-#else
-    Log("This is a custom build");
 #endif
+
+    string512 buf;
+    strconcat(sizeof(buf), buf, name, " build "); // "%s build "
+
+    if (buildId)
+        strconcat(sizeof(buf), buf, buf, buildId, " "); // "id "
+
+    strconcat(sizeof(buf), buf, buf, "from commit[", commit, "]"); // "from commit[hash]"
+    strconcat(sizeof(buf), buf, buf, " branch[", branch, "]"); // " branch[name]"
+
+    if (builder)
+        strconcat(sizeof(buf), buf, buf, " (built by ", builder, ")"); // " (built by builder)"
+    
+    Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
 void SDLLogOutput(void* /*userdata*/,
@@ -208,9 +238,9 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         Memory._initialize();
 
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
-        Msg("%s %s build %d, %s\n", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
-        PrintCI();
-        Msg("command line %s\n", Params);
+        Msg("%s %s build %d, %s", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
+        PrintBuildInfo();
+        Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
         ttapi.initialize();
