@@ -14,6 +14,7 @@ include_directories(
     ${OGG_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/openal/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
+    ${SDL_INCLUDE_DIRS}
     )
 
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.cpp")

@@ -3,6 +3,7 @@
 
 #include "Motion.hpp"
 #include "xrCore/Animation/Envelope.hpp"
+#include "SDL.h"
 
 #define EOBJ_OMOTION 0x1100
 #define EOBJ_SMOTION 0x1200

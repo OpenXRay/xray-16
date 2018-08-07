@@ -6,6 +6,7 @@
 #include <float.h>
 #include <stdio.h>
 #include "xrCommon/math_funcs_inline.h"
+#include "SDL.h"
 //#include "xr_token.h"
 
 #ifdef abs
@@ -256,6 +257,17 @@ inline int xr_strcat(char(&destination)[count], LPCSTR source)
     return xr_strcat(destination, count, source);
 }
 //#endif // #ifndef _EDITOR
+
+#if defined(LINUX)
+
+#define itoa SDL_itoa
+#define _itoa_s(value, buffer, radix) SDL_itoa(value, buffer, radix)
+
+inline void Sleep(int ms)
+{
+    SDL_Delay(ms);
+}
+#endif
 
 inline void MemFill32(void* dst, u32 value, size_t dstSize)
 {

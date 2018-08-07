@@ -13,6 +13,7 @@
 #endif
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "SDL.h"
 
 #pragma warning(pop)
 
@@ -121,7 +122,7 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& file_handle)
 {
     if (open_internal(file_name, file_handle))
     {
-        Sleep(1);
+        SDL_Delay(1);
         if (open_internal(file_name, file_handle))
             return (false);
     }

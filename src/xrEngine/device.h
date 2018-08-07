@@ -164,7 +164,6 @@ private:
 
 public:
     SDL_Window* m_sdlWnd;
-    LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 
     // u32 dwFrame;
     // u32 dwPrecacheFrame;

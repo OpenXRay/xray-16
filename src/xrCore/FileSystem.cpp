@@ -111,12 +111,15 @@ void MakeFilter(string1024& dest, LPCSTR info, LPCSTR ext)
 // start_flt_ext = -1-all 0..n-indices
 //------------------------------------------------------------------------------
 
+#if defined(WINDOWS)
+
 // Vista uses this hook for old-style save dialog
 UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
 {
     // let default hook work on this message
     return 0;
 }
+#endif
 
 bool EFS_Utils::GetOpenNameInternal(
     LPCSTR initial, LPSTR buffer, int sz_buf, bool bMulti, LPCSTR offset, int start_flt_ext)

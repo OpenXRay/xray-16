@@ -19,6 +19,7 @@
 #include "file_stream_reader.h"
 #include "xrCore/Threading/Lock.hpp"
 #if defined(LINUX)
+#include "SDL.h"
 #include "xrstring.h"
 #include <glob.h>
 #endif
@@ -179,7 +180,7 @@ CLocatorAPI::~CLocatorAPI()
 {
     VERIFY(0 == m_iLockRescan);
     _dump_open_files(1);
-	delete m_auth_lock;
+    delete m_auth_lock;
 }
 
 const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
@@ -629,7 +630,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     while (done != -1)
     {
 #if defined(LINUX)
-    	xr_strcpy(findData.name, sizeof globbuf.gl_pathv[handle - done], globbuf.gl_pathv[handle - done]);
+        xr_strcpy(findData.name, sizeof globbuf.gl_pathv[handle - done], globbuf.gl_pathv[handle - done]);
         struct stat fi;
         stat(findData.name, &fi);
         findData.size = fi.st_size;

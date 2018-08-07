@@ -1,13 +1,18 @@
 project(xrScriptEngine)
 
 list(APPEND DIRS
-	"."
-	"LuaStudio"
-	)
+    "."
+    "LuaStudio"
+    )
 
 add_dir("${DIRS}")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include )
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
+    ${SDL_INCLUDE_DIRS}
+    )
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 

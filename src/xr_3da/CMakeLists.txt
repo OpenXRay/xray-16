@@ -1,16 +1,17 @@
 project(xr_3da)
 
 list(APPEND DIRS
-	"."
-	)
+    "."
+    )
 
 add_dir("${DIRS}")
 
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/.. 
-	${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/ode/include
-	${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
-	)
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/ode/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
+    ${SDL_INCLUDE_DIRS}
+    )
 
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./StickyKeyFilter.hpp")
 

@@ -21,9 +21,6 @@
 #include <dirent.h>
 #include <utime.h>
 
-#include <SDL2/SDL.h>
-#define CONFIG_USE_SDL
-
 #define _LINUX // for GameSpy
 
 #if !defined(__INTEL_COMPILER)
@@ -83,11 +80,6 @@ static inline long InterlockedExchange(volatile long* val, long new_val)
 inline pthread_t GetCurrentThreadId()
 {
     return pthread_self();
-}
-
-inline void Sleep(int ms)
-{
-    SDL_Delay(ms);
 }
 
 inline void _splitpath (
@@ -196,8 +188,7 @@ typedef LONG_PTR LPARAM;
 typedef long HRESULT;
 typedef long LRESULT;
 typedef long _W64;
-//typedef void* HWND;
-typedef SDL_Window* HWND;
+typedef void* HWND;
 typedef void* HDC;
 typedef float FLOAT;
 typedef unsigned char UINT8;
@@ -291,8 +282,6 @@ inline int _filelength(int fd)
 #define __max(a, b) std::max(a, b)
 #define __min(a, b) std::min(a, b)
 
-#define itoa SDL_itoa
-#define _itoa_s(value, buffer, radix) SDL_itoa(value, buffer, radix)
 #define _locale_t locale_t
 #define _isalpha_l isalpha_l
 #define _create_locale(category, arg) newlocale(category, arg, (locale_t) 0)

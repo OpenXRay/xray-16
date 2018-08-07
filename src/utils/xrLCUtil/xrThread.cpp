@@ -1,5 +1,6 @@
 #include "pch.hpp"
 #include "xrThread.hpp"
+#include "SDL.h"
 
 void CThread::StubLog(const char*, ...) {}
 void CThread::startup(void* P)
@@ -30,7 +31,7 @@ void CThreadManager::wait(u32 sleep_time)
         return;
     for (;;)
     {
-        Sleep(sleep_time);
+        SDL_Delay(sleep_time);
 
         perf[0] = 0;
         float sumProgress = 0;
