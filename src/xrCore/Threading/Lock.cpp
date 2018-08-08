@@ -4,13 +4,23 @@
 
 struct LockImpl
 {
-    std::recursive_mutex mutex;
-};
+#ifdef WINDOWS
+    CRITICAL_SECTION cs;
 
-Lock::~Lock()
-{
-    delete impl;
-}
+    LockImpl() { InitializeCriticalSection(&cs); }
+    ~LockImpl() { DeleteCriticalSection(&cs); }
+
+    ICF void Lock() { EnterCriticalSection(&cs); }
+    ICF void Unlock() { LeaveCriticalSection(&cs); }
+    ICF bool TryLock() { return !!TryEnterCriticalSection(&cs); }
+#else
+    std::recursive_mutex mutex;
+
+    ICF void Lock() { mutex.lock(); }
+    ICF void Unlock() { mutex.unlock(); }
+    ICF bool TryLock() { return mutex.try_lock(); }
+#endif
+};
 
 #ifdef CONFIG_PROFILE_LOCKS
 static add_profile_portion_callback add_profile_portion = 0;
@@ -55,25 +65,27 @@ void Lock::Enter()
 #else
 Lock::Lock() : impl(new LockImpl), lockCounter(0) {}
 
+Lock::~Lock() { delete impl; }
+
 void Lock::Enter()
 {
-    impl->mutex.lock();
+    impl->Lock();
     lockCounter++;
 }
 #endif // CONFIG_PROFILE_LOCKS
 
 bool Lock::TryEnter()
 {
-    bool locked = impl->mutex.try_lock();
+    const bool locked = impl->TryLock();
     if (locked)
-        lockCounter++;
+        ++lockCounter;
     return locked;
 }
 
 void Lock::Leave()
 {
-    impl->mutex.unlock();
-    lockCounter--;
+    impl->Unlock();
+    --lockCounter;
 }
 
 #ifdef DEBUG
