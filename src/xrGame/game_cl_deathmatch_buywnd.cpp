@@ -244,7 +244,7 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
                 pCurBuyMenu->ItemToRuck(pItem->object().cNameSect(), Addons);
             }
         };
-        for (auto item : add_ammo)
+        for (const auto& item : add_ammo)
             AdditionalAmmoInserter(item);
     }
     else

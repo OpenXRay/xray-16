@@ -135,7 +135,7 @@ XRCORE_API void _dump_open_files(int mode)
 {
     if (mode == 1)
     {
-        for (auto file : g_open_files)
+        for (const auto& file : g_open_files)
         {
             Log("----opened files");
             if (file._reader != nullptr)
@@ -145,9 +145,8 @@ XRCORE_API void _dump_open_files(int mode)
     else
     {
         Log("----un-used");
-        for (auto itr : g_open_files)
+        for (const auto& file : g_open_files)
         {
-            auto file = itr;
             if (file._reader == nullptr)
                 Msg("[%d] fname:%s", file._used, file._fn.c_str());
         }
@@ -894,7 +893,7 @@ void CLocatorAPI::_destroy()
 {
     CloseLog();
 
-    for (auto it : m_files)
+    for (auto& it : m_files)
     {
         auto str = pstr(it.name);
         xr_free(str);
