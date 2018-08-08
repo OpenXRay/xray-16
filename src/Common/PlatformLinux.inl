@@ -82,6 +82,11 @@ inline pthread_t GetCurrentThreadId()
     return pthread_self();
 }
 
+inline void Sleep(int ms)
+{
+    usleep(ms * 1000);
+}
+
 inline void _splitpath (
         const char* path,  // Path Input
         char* drive,       // Drive     : Output
@@ -229,6 +234,10 @@ typedef dirent DirEntryType;
 #define O_BINARY 0
 #define O_SEQUENTIAL 0
 #define SH_DENYWR 0
+
+
+#define itoa SDL_itoa
+#define _itoa_s SDL_itoa
 
 #define _stricmp stricmp
 #define strcmpi stricmp
