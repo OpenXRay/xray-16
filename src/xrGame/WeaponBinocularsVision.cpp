@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WeaponBinocularsVision.h"
 #include "WeaponBinoculars.h"
-#include "ui\UIFrameWindow.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
 #include "entity_alive.h"
 #include "visual_memory_manager.h"
 #include "actor.h"

@@ -1,9 +1,9 @@
 #ifndef UITEAMPANELS
 #define UITEAMPANELS
 
-#include "ui/UIWindow.h"
+#include "xrUICore/Windows/UIWindow.h"
 #include "UIPanelsClassFactory.h"
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "ui/UIXmlInit.h"
 
 class UITeamState;

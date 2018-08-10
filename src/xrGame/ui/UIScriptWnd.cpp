@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "UIScriptWnd.h"
 #include "Common/object_broker.h"
-#include "callback_info.h"
+#include "xrUICore/Callbacks/callback_info.h"
 
 CUIDialogWndEx::CUIDialogWndEx() {}
 CUIDialogWndEx::~CUIDialogWndEx() { delete_data(m_callbacks); }

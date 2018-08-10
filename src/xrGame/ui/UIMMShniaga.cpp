@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "UIMMShniaga.h"
-#include "UICursor.h"
-#include "UIStatic.h"
-#include "UIScrollView.h"
+#include "xrUICore/Cursor/UICursor.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "UIXmlInit.h"
 #include "MMsound.h"
 #include "game_base_space.h"
@@ -17,6 +17,31 @@
 
 extern string_path g_last_saved_game;
 
+CUIMMMagnifer::CUIMMMagnifer() : m_bPP(false) {}
+CUIMMMagnifer::~CUIMMMagnifer()
+{
+    if (GetPPMode())
+        MainMenu()->UnregisterPPDraw(this);
+}
+
+void CUIMMMagnifer::SetPPMode()
+{
+    m_bPP = true;
+    MainMenu()->RegisterPPDraw(this);
+    Show(false);
+};
+
+void CUIMMMagnifer::ResetPPMode()
+{
+    if (GetPPMode())
+    {
+        MainMenu()->UnregisterPPDraw(this);
+        m_bPP = false;
+    }
+}
+
+////////////////////////////////////////////
+
 CUIMMShniaga::CUIMMShniaga()
 {
     m_sound = new CMMSound();
@@ -25,7 +50,7 @@ CUIMMShniaga::CUIMMShniaga()
     AttachChild(m_view);
     m_shniaga = new CUIStatic();
     AttachChild(m_shniaga);
-    m_magnifier = new CUIStatic();
+    m_magnifier = new CUIMMMagnifer();
     m_shniaga->AttachChild(m_magnifier);
     m_magnifier->SetPPMode();
     m_mag_pos = 0;

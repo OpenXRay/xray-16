@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "UIMPChangeMapAdm.h"
 #include "UIXmlInit.h"
-#include "UIListBox.h"
-#include "UIListBoxItem.h"
-#include "UIStatic.h"
-#include "UI3tButton.h"
+#include "xrUICore/ListBox/UIListBox.h"
+#include "xrUICore/ListBox/UIListBoxItem.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UIDialogWnd.h"
 #include "Level.h"
 #include "xrEngine/xr_ioconsole.h"
@@ -102,7 +102,7 @@ void CUIMpChangeMapAdm::FillUpList()
     u32 cnt = M.m_map_names.size();
     for (u32 i = 0; i < cnt; ++i)
     {
-        CUIListBoxItem* itm = lst->AddTextItem(CStringTable().translate(M.m_map_names[i].map_name).c_str());
+        CUIListBoxItem* itm = lst->AddTextItem(StringTable().translate(M.m_map_names[i].map_name).c_str());
         itm->Enable(true);
     }
 }

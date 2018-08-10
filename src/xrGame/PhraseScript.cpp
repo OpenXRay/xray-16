@@ -7,7 +7,7 @@
 #include "infoportion.h"
 #include "inventoryowner.h"
 #include "ai_debug.h"
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "actor.h"
 
 //загрузка из XML файла

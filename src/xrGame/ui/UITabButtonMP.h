@@ -1,5 +1,5 @@
 #pragma once
-#include "UITabButton.h"
+#include "xrUICore/TabControl/UITabButton.h"
 
 class CUITabButtonMP : public CUITabButton
 {

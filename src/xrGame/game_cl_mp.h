@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game_cl_base.h"
-#include "ui_defs.h"
+#include "xrUICore/ui_defs.h"
 #include "Spectator.h"
 #include "file_transfer.h"
 #include "screenshot_manager.h"

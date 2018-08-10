@@ -3,7 +3,7 @@
 #include "UIAchivementsIndicator.h"
 #include "ui/UIDemoPlayControl.h"
 #include "ui/UIServerInfo.h"
-#include "UICursor.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "Level.h"
 #include "game_cl_mp.h"
 

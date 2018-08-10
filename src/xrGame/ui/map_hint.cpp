@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "map_hint.h"
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UIXmlInit.h"
 #include "map_location.h"
 #include "map_spot.h"
@@ -119,7 +119,7 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
         string512 buff, buff2;
         InventoryUtilities::GetTimePeriodAsString(buff, sizeof(buff), Level().GetGameTime(), task->m_TimeToComplete);
 
-        strconcat(sizeof(buff2), buff2, CStringTable().translate("ui_st_time_remains").c_str(), " ", buff);
+        strconcat(sizeof(buff2), buff2, StringTable().translate("ui_st_time_remains").c_str(), " ", buff);
         S->TextItemControl()->SetText(buff2);
     }
     pos = S->GetWndPos();

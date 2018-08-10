@@ -4,7 +4,7 @@
 #include "team_base_zone.h"
 #include "Level.h"
 #include "game_cl_ArtefactHunt.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIMoneyIndicator.h"

@@ -7,7 +7,7 @@
 #include "pch_script.h"
 #include "doors_door.h"
 #include "physicobject.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"
 #include "doors.h"
 #include "doors_actor.h"

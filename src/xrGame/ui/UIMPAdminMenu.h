@@ -1,8 +1,8 @@
 #pragma once
 
 #include "UIDialogWnd.h"
-#include "UIWndCallback.h"
-#include "UIMessageBox.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
+#include "xrUICore/MessageBox/UIMessageBox.h"
 
 class CUIStatic;
 class CUITabControl;

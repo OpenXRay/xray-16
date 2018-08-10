@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "UIStatsIcon.h"
-#include "UITextureMaster.h"
+#include "xrUICore/XML/UITextureMaster.h"
 #include "UIInventoryUtilities.h"
 
 #include "Include/xrRender/UIShader.h"

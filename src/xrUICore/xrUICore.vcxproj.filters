@@ -1,0 +1,431 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="arrow">
+      <UniqueIdentifier>{2c4605d6-d85a-4a2b-b9e8-caaa34c51732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Buttons">
+      <UniqueIdentifier>{6bf658bd-b309-4948-affa-ba0651ef9a19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComboBox">
+      <UniqueIdentifier>{f9ee2ff4-00bf-4896-97b2-fc3aa5495da5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EditBox">
+      <UniqueIdentifier>{dc322116-1803-4f16-9e44-23ab18aa76ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hint">
+      <UniqueIdentifier>{23ef7748-6827-46d5-9d66-e520ba6b80e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InteractiveBackground">
+      <UniqueIdentifier>{04778887-db2f-4107-8021-0992d1092b12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lines">
+      <UniqueIdentifier>{112e2de6-7862-45a6-8ed4-da4ef7038408}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ListBox">
+      <UniqueIdentifier>{21d3bc62-8128-4944-be2e-daa914424f01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MessageBox">
+      <UniqueIdentifier>{4dffbd4b-dc59-492a-aa4c-dba13d613e16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProgressBar">
+      <UniqueIdentifier>{b3070c87-ea88-489e-8bc0-5ea24ab6ce51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PropertiesBox">
+      <UniqueIdentifier>{3e8610b3-1915-40af-83d6-00b2fb6aec05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScrollBar">
+      <UniqueIdentifier>{b4220112-9a21-4d06-b706-9368d0fc91dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScrollView">
+      <UniqueIdentifier>{753cc68e-2da8-4dec-a993-310e93054da1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpinBox">
+      <UniqueIdentifier>{e352fa71-8c90-4ed6-872c-b1865c8acfba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Static">
+      <UniqueIdentifier>{6f52116b-6102-4390-9f3c-137fbf22f744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TabControl">
+      <UniqueIdentifier>{a2648ace-c298-4d95-ae19-80af269a9c74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TrackBar">
+      <UniqueIdentifier>{618b8ca3-a4e2-4f7e-9c77-4effa1e15b35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{63861209-c6b5-4f82-9afb-490d5f76bc1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML">
+      <UniqueIdentifier>{e071b646-1ee5-4467-ad2f-00f8ac7d37ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{9cd05982-0d31-4641-afb2-8b6deca5afb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cursor">
+      <UniqueIdentifier>{f5a509a4-cb23-4a22-aae7-4d8e6030d127}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Options">
+      <UniqueIdentifier>{804a137f-667e-4ec3-9fb4-22ee8f929ba3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Callbacks">
+      <UniqueIdentifier>{49658579-42e7-425d-b701-eddd1b219e84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FontManager">
+      <UniqueIdentifier>{6a4dc39a-f6c8-45f8-9505-11e65cb12e49}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="arrow\ui_arrow.cpp">
+      <Filter>arrow</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="Static\UIAnimatedStatic.cpp">
+      <Filter>Static</Filter>
+    </ClCompile>
+    <ClCompile Include="Static\UILanimController.cpp">
+      <Filter>Static</Filter>
+    </ClCompile>
+    <ClCompile Include="Static\UIStatic.cpp">
+      <Filter>Static</Filter>
+    </ClCompile>
+    <ClCompile Include="Static\UIStatic_script.cpp">
+      <Filter>Static</Filter>
+    </ClCompile>
+    <ClCompile Include="Static\UIStaticItem.cpp">
+      <Filter>Static</Filter>
+    </ClCompile>
+    <ClCompile Include="Cursor\UICursor.cpp">
+      <Filter>Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\UIFrameLineWnd.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\UIFrameWindow.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\UIWindow.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons\UI3tButton.cpp">
+      <Filter>Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons\UIBtnHint.cpp">
+      <Filter>Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons\UIButton.cpp">
+      <Filter>Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons\UIButton_script.cpp">
+      <Filter>Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons\UICheckButton.cpp">
+      <Filter>Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="Buttons\UIRadioButton.cpp">
+      <Filter>Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboBox\UIComboBox.cpp">
+      <Filter>ComboBox</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboBox\UIComboBox_script.cpp">
+      <Filter>ComboBox</Filter>
+    </ClCompile>
+    <ClCompile Include="ui_base.cpp" />
+    <ClCompile Include="Options\UIOptionsItem.cpp">
+      <Filter>Options</Filter>
+    </ClCompile>
+    <ClCompile Include="Options\UIOptionsManager.cpp">
+      <Filter>Options</Filter>
+    </ClCompile>
+    <ClCompile Include="EditBox\UICustomEdit.cpp">
+      <Filter>EditBox</Filter>
+    </ClCompile>
+    <ClCompile Include="EditBox\UIEditBox.cpp">
+      <Filter>EditBox</Filter>
+    </ClCompile>
+    <ClCompile Include="EditBox\UIEditBox_script.cpp">
+      <Filter>EditBox</Filter>
+    </ClCompile>
+    <ClCompile Include="EditBox\UIEditBoxEx.cpp">
+      <Filter>EditBox</Filter>
+    </ClCompile>
+    <ClCompile Include="Hint\UIHint.cpp">
+      <Filter>Hint</Filter>
+    </ClCompile>
+    <ClCompile Include="InteractiveBackground\UI_IB_Static.cpp">
+      <Filter>InteractiveBackground</Filter>
+    </ClCompile>
+    <ClCompile Include="Lines\UILine.cpp">
+      <Filter>Lines</Filter>
+    </ClCompile>
+    <ClCompile Include="Lines\UILines.cpp">
+      <Filter>Lines</Filter>
+    </ClCompile>
+    <ClCompile Include="Lines\UISubLine.cpp">
+      <Filter>Lines</Filter>
+    </ClCompile>
+    <ClCompile Include="ListBox\UIListBox.cpp">
+      <Filter>ListBox</Filter>
+    </ClCompile>
+    <ClCompile Include="ListBox\UIListBox_script.cpp">
+      <Filter>ListBox</Filter>
+    </ClCompile>
+    <ClCompile Include="ListBox\UIListBoxItem.cpp">
+      <Filter>ListBox</Filter>
+    </ClCompile>
+    <ClCompile Include="ListBox\UIListBoxItemMsgChain.cpp">
+      <Filter>ListBox</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressBar\UIDoubleProgressBar.cpp">
+      <Filter>ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressBar\UIProgressBar.cpp">
+      <Filter>ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressBar\UIProgressBar_script.cpp">
+      <Filter>ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressBar\UIProgressShape.cpp">
+      <Filter>ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesBox\UIPropertiesBox.cpp">
+      <Filter>PropertiesBox</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesBox\UIPropertiesBox_script.cpp">
+      <Filter>PropertiesBox</Filter>
+    </ClCompile>
+    <ClCompile Include="Callbacks\UIWndCallback.cpp">
+      <Filter>Callbacks</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageBox\UIMessageBox.cpp">
+      <Filter>MessageBox</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageBox\UIMessageBox_script.cpp">
+      <Filter>MessageBox</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrollBar\UIFixedScrollBar.cpp">
+      <Filter>ScrollBar</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrollBar\UIScrollBar.cpp">
+      <Filter>ScrollBar</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrollBar\UIScrollBox.cpp">
+      <Filter>ScrollBar</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrollView\UIScrollView.cpp">
+      <Filter>ScrollView</Filter>
+    </ClCompile>
+    <ClCompile Include="SpinBox\UICustomSpin.cpp">
+      <Filter>SpinBox</Filter>
+    </ClCompile>
+    <ClCompile Include="SpinBox\UISpinNum.cpp">
+      <Filter>SpinBox</Filter>
+    </ClCompile>
+    <ClCompile Include="SpinBox\UISpinText.cpp">
+      <Filter>SpinBox</Filter>
+    </ClCompile>
+    <ClCompile Include="TabControl\UITabButton.cpp">
+      <Filter>TabControl</Filter>
+    </ClCompile>
+    <ClCompile Include="TabControl\UITabControl.cpp">
+      <Filter>TabControl</Filter>
+    </ClCompile>
+    <ClCompile Include="TabControl\UITabControl_script.cpp">
+      <Filter>TabControl</Filter>
+    </ClCompile>
+    <ClCompile Include="TrackBar\UITrackBar.cpp">
+      <Filter>TrackBar</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\UITextureMaster.cpp">
+      <Filter>XML</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\xrUIXmlParser.cpp">
+      <Filter>XML</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\UIXmlInitBase.cpp">
+      <Filter>XML</Filter>
+    </ClCompile>
+    <ClCompile Include="FontManager\FontManager.cpp">
+      <Filter>FontManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\UIWindow_script.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Options\UIOptionsManagerScript.cpp">
+      <Filter>Options</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="arrow\ui_arrow.h">
+      <Filter>arrow</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.hpp">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="Static\UIAnimatedStatic.h">
+      <Filter>Static</Filter>
+    </ClInclude>
+    <ClInclude Include="Static\UILanimController.h">
+      <Filter>Static</Filter>
+    </ClInclude>
+    <ClInclude Include="Static\UIStatic.h">
+      <Filter>Static</Filter>
+    </ClInclude>
+    <ClInclude Include="Static\UIStaticItem.h">
+      <Filter>Static</Filter>
+    </ClInclude>
+    <ClInclude Include="Cursor\UICursor.h">
+      <Filter>Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="ui_defs.h" />
+    <ClInclude Include="Windows\UIFrameLineWnd.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\UIFrameWindow.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\UIWindow.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons\UI3tButton.h">
+      <Filter>Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons\UIBtnHint.h">
+      <Filter>Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons\UIButton.h">
+      <Filter>Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons\UICheckButton.h">
+      <Filter>Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons\UIRadioButton.h">
+      <Filter>Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboBox\UIComboBox.h">
+      <Filter>ComboBox</Filter>
+    </ClInclude>
+    <ClInclude Include="uiabstract.h" />
+    <ClInclude Include="UIMessages.h" />
+    <ClInclude Include="ui_base.h" />
+    <ClInclude Include="Options\UIOptionsItem.h">
+      <Filter>Options</Filter>
+    </ClInclude>
+    <ClInclude Include="Options\UIOptionsManager.h">
+      <Filter>Options</Filter>
+    </ClInclude>
+    <ClInclude Include="EditBox\UICustomEdit.h">
+      <Filter>EditBox</Filter>
+    </ClInclude>
+    <ClInclude Include="EditBox\UIEditBox.h">
+      <Filter>EditBox</Filter>
+    </ClInclude>
+    <ClInclude Include="EditBox\UIEditBoxEx.h">
+      <Filter>EditBox</Filter>
+    </ClInclude>
+    <ClInclude Include="Hint\UIHint.h">
+      <Filter>Hint</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractiveBackground\UI_IB_Static.h">
+      <Filter>InteractiveBackground</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractiveBackground\UIInteractiveBackground.h">
+      <Filter>InteractiveBackground</Filter>
+    </ClInclude>
+    <ClInclude Include="Lines\UILine.h">
+      <Filter>Lines</Filter>
+    </ClInclude>
+    <ClInclude Include="Lines\UILines.h">
+      <Filter>Lines</Filter>
+    </ClInclude>
+    <ClInclude Include="Lines\uilinestd.h">
+      <Filter>Lines</Filter>
+    </ClInclude>
+    <ClInclude Include="Lines\UISubLine.h">
+      <Filter>Lines</Filter>
+    </ClInclude>
+    <ClInclude Include="ListBox\UIListBox.h">
+      <Filter>ListBox</Filter>
+    </ClInclude>
+    <ClInclude Include="ListBox\UIListBoxItem.h">
+      <Filter>ListBox</Filter>
+    </ClInclude>
+    <ClInclude Include="ListBox\UIListBoxItemMsgChain.h">
+      <Filter>ListBox</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressBar\UIDoubleProgressBar.h">
+      <Filter>ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressBar\UIProgressBar.h">
+      <Filter>ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressBar\UIProgressShape.h">
+      <Filter>ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesBox\UIPropertiesBox.h">
+      <Filter>PropertiesBox</Filter>
+    </ClInclude>
+    <ClInclude Include="Callbacks\callback_info.h">
+      <Filter>Callbacks</Filter>
+    </ClInclude>
+    <ClInclude Include="Callbacks\UIWndCallback.h">
+      <Filter>Callbacks</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageBox\UIMessageBox.h">
+      <Filter>MessageBox</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollBar\UIFixedScrollBar.h">
+      <Filter>ScrollBar</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollBar\UIScrollBar.h">
+      <Filter>ScrollBar</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollBar\UIScrollBox.h">
+      <Filter>ScrollBar</Filter>
+    </ClInclude>
+    <ClInclude Include="ScrollView\UIScrollView.h">
+      <Filter>ScrollView</Filter>
+    </ClInclude>
+    <ClInclude Include="SpinBox\UICustomSpin.h">
+      <Filter>SpinBox</Filter>
+    </ClInclude>
+    <ClInclude Include="SpinBox\UISpinNum.h">
+      <Filter>SpinBox</Filter>
+    </ClInclude>
+    <ClInclude Include="SpinBox\UISpinText.h">
+      <Filter>SpinBox</Filter>
+    </ClInclude>
+    <ClInclude Include="TabControl\UITabButton.h">
+      <Filter>TabControl</Filter>
+    </ClInclude>
+    <ClInclude Include="TabControl\UITabControl.h">
+      <Filter>TabControl</Filter>
+    </ClInclude>
+    <ClInclude Include="TrackBar\UITrackBar.h">
+      <Filter>TrackBar</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\UITextureMaster.h">
+      <Filter>XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\xrUIXmlParser.h">
+      <Filter>XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\UIXmlInitBase.h">
+      <Filter>XML</Filter>
+    </ClInclude>
+    <ClInclude Include="FontManager\FontManager.h">
+      <Filter>FontManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Options\UIOptionsManagerScript.h">
+      <Filter>Options</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

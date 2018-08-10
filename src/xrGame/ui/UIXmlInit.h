@@ -1,43 +1,13 @@
 #pragma once
+#include "xrUICore/XML/UIXmlInitBase.h"
 
-#include "xrUIXmlParser.h"
-#include "xrCore/_rect.h"
-#include "xrCommon/xr_map.h"
-
-class ITextureOwner;
-class CUIWindow;
-class CUIFrameWindow;
-class CUIStaticItem;
-class CUIStatic;
-class CUICheckButton;
-class CUICustomSpin;
-class CUIButton;
-class CUI3tButton;
 class CUIDragDropList;
-class CUIProgressBar;
-class CUIProgressShape;
-class CUITabControl;
-class CUIFrameLineWnd;
-class CUIEditBoxEx;
-class CUIEditBox;
-class CUICustomEdit;
-class CUIAnimatedStatic;
 class CUISleepStatic;
-class CUIOptionsItem;
-class CUIScrollView;
-class CUIListBox;
-class CUIStatsPlayerList;
-class CUIDragDropListEx;
-class CUIComboBox;
 class CUITabButtonMP;
-class CUITrackBar;
-class UIHintWindow;
-class CUILines;
-class CUITextWnd;
-class CGameFont;
 
-class CUIXmlInit
+class CUIXmlInit : public CUIXmlInitBase
 {
+    using baseClass = CUIXmlInitBase;
 public:
     CUIXmlInit();
     virtual ~CUIXmlInit();
@@ -80,23 +50,15 @@ public:
     static void InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pParentWnd);
     static void InitAutoFrameLineGroup(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pParentWnd);
 
-    static float ApplyAlignX(float coord, u32 align);
-    static float ApplyAlignY(float coord, u32 align);
-    static void ApplyAlign(float& x, float& y, u32 align);
-
     // Initialize and store predefined colors
-    using ColorDefs = xr_map<shared_str, u32>;
+    using ColorDefs = baseClass::ColorDefs;
 
     static const ColorDefs* GetColorDefs()
     {
-        R_ASSERT(m_pColorDefs);
-        return m_pColorDefs;
+        baseClass::GetColorDefs();
     }
 
     static void InitColorDefs();
-    static void DeleteColorDefs() { xr_delete(m_pColorDefs); }
+    static void DeleteColorDefs() { baseClass::DeleteColorDefs(); }
     static void AssignColor(LPCSTR name, u32 clr);
-
-private:
-    static ColorDefs* m_pColorDefs;
 };

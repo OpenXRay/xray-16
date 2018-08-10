@@ -3,7 +3,7 @@
 #include "UITeamState.h"
 #include "UITeamPanels.h"
 
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "ui/UIStatsIcon.h"
 
 #include "game_cl_capture_the_artefact.h"
@@ -132,9 +132,8 @@ void UIPlayerItem::GetTextParamValue(
     }
     else if (param_name.equal("mp_status"))
     {
-        CStringTable st;
         if (ps->testFlag(GAME_PLAYER_FLAG_READY))
-            xr_strcpy(dest.begin(), dest.size(), st.translate("st_mp_ready").c_str());
+            xr_strcpy(dest.begin(), dest.size(), StringTable().translate("st_mp_ready").c_str());
     }
     else if (param_name.equal("mp_ping"))
     {

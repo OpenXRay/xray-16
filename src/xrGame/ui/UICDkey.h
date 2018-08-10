@@ -1,6 +1,6 @@
 //
 #pragma once
-#include "UIEditBox.h"
+#include "xrUICore/EditBox/UIEditBox.h"
 
 class CUICDkey : public CUIEditBox
 {

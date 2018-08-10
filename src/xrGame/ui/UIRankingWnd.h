@@ -6,9 +6,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "UIWindow.h"
-#include "UIWndCallback.h"
-
+#include "xrUICore/Windows/UIWindow.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
 #include "UIAchievements.h"
 
 class CUIStatic;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIVoteStatusWnd.h"
 #include "UIXmlInit.h"
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 
 void UIVoteStatusWnd::InitFromXML(CUIXml& xml_doc)
 {

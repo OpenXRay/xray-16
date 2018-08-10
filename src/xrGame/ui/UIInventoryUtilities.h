@@ -1,7 +1,7 @@
 #pragma once
 #include "inventory_item.h"
 #include "character_info_defs.h"
-#include "ui_defs.h"
+#include "xrUICore/ui_defs.h"
 
 class CUITextWnd;
 

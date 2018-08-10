@@ -2,7 +2,7 @@
 
 #include "UIBuyWndShared.h"
 #include "UIBuyWndBase.h"
-#include "UIWndCallback.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
 #include "restrictions.h"
 #include "UIMpItemsStoreWnd.h"
 
