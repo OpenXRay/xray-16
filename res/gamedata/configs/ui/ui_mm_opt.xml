@@ -297,7 +297,7 @@
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r3_dynamic_wet_surfaces_near</text>
         </cap_r3_dynamic_wet_surfaces_near>
 
-        <track_r3_dynamic_wet_surfaces_near x="175" y="97" width="235" height="16">
+        <track_r3_dynamic_wet_surfaces_near x="180" y="6" width="235" height="16">
             <options_item entry="r3_dynamic_wet_surfaces_near" group="mm_opt_video" depend="runtime"/>
         </track_r3_dynamic_wet_surfaces_near>
 
@@ -305,7 +305,7 @@
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r3_dynamic_wet_surfaces_far</text>
         </cap_r3_dynamic_wet_surfaces_far>
 
-        <track_r3_dynamic_wet_surfaces_far x="175" y="97" width="235" height="16">
+        <track_r3_dynamic_wet_surfaces_far x="180" y="6" width="235" height="16">
             <options_item entry="r3_dynamic_wet_surfaces_far" group="mm_opt_video" depend="runtime"/>
         </track_r3_dynamic_wet_surfaces_far>
 
@@ -313,7 +313,7 @@
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r3_dynamic_wet_surfaces_sm_res</text>
         </cap_r3_dynamic_wet_surfaces_sm_res>
 
-        <track_r3_dynamic_wet_surfaces_sm_res x="175" y="97" width="235" height="16" step="16" is_integer="1">
+        <track_r3_dynamic_wet_surfaces_sm_res x="180" y="6" width="235" height="16" step="16" is_integer="1">
             <options_item entry="r3_dynamic_wet_surfaces_sm_res" group="mm_opt_video" depend="runtime"/>
         </track_r3_dynamic_wet_surfaces_sm_res>
 
