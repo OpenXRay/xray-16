@@ -3,7 +3,7 @@
 #include "file_transfer.h"
 #include "Level.h"
 #include "xrServer.h"
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrCore/buffer_vector.h"
 #ifdef DEBUG

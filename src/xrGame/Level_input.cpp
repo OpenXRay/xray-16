@@ -13,7 +13,7 @@
 #include "Inventory.h"
 #include "xrServer.h"
 #include "autosave_manager.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 
 #include "Actor.h"
 #include "HudItem.h"

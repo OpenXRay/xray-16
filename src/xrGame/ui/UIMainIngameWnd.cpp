@@ -35,13 +35,14 @@
 #include "attachable_item.h"
 #include "xrEngine/xr_input.h"
 #endif
-#include "UIScrollView.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "map_hint.h"
 #include "game_news.h"
 #include "static_cast_checked.hpp"
 #include "game_cl_capture_the_artefact.h"
 #include "UIHudStatesWnd.h"
 #include "UIActorMenu.h"
+#include "xrUICore/ProgressBar/UIProgressShape.h"
 
 void test_draw();
 void test_key(int dik);
@@ -71,7 +72,6 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     UIZoneMap = new CUIZoneMap();
 }
 
-#include "UIProgressShape.h"
 extern CUIProgressShape* g_MissileForceShape;
 
 CUIMainIngameWnd::~CUIMainIngameWnd()
@@ -773,25 +773,25 @@ void CUIMainIngameWnd::UpdateMainIndicators()
 void CUIMainIngameWnd::UpdateQuickSlots()
 {
     string32 tmp;
-    LPCSTR str = CStringTable().translate("quick_use_str_1").c_str();
+    LPCSTR str = StringTable().translate("quick_use_str_1").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';
     m_QuickSlotText1->SetTextST(tmp);
 
-    str = CStringTable().translate("quick_use_str_2").c_str();
+    str = StringTable().translate("quick_use_str_2").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';
     m_QuickSlotText2->SetTextST(tmp);
 
-    str = CStringTable().translate("quick_use_str_3").c_str();
+    str = StringTable().translate("quick_use_str_3").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';
     m_QuickSlotText3->SetTextST(tmp);
 
-    str = CStringTable().translate("quick_use_str_4").c_str();
+    str = StringTable().translate("quick_use_str_4").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';

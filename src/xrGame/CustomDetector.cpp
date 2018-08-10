@@ -7,7 +7,7 @@
 #include "map_manager.h"
 #include "ActorEffector.h"
 #include "actor.h"
-#include "ui/UIWindow.h"
+#include "xrUICore/Windows/UIWindow.h"
 #include "player_hud.h"
 #include "weapon.h"
 

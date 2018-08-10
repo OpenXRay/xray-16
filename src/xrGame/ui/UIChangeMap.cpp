@@ -2,9 +2,9 @@
 #include "UIChangeMap.h"
 #include "UIVotingCategory.h"
 #include "UIXmlInit.h"
-#include "UI3tButton.h"
-#include "UIListBox.h"
-#include "UIListBoxItem.h"
+#include "xrUICore/Buttons/UI3tButton.h"
+#include "xrUICore/ListBox/UIListBox.h"
+#include "xrUICore/ListBox/UIListBoxItem.h"
 #include "Level.h"
 #include "game_cl_teamdeathmatch.h"
 #include "xrEngine/xr_ioconsole.h"
@@ -12,7 +12,7 @@
 #include "Common/object_broker.h"
 #include "UIGameCustom.h"
 #include "UIDialogHolder.h"
-#include "UIFrameWindow.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
 
 CUIChangeMap::CUIChangeMap()
 {
@@ -150,7 +150,7 @@ void CUIChangeMap::FillUpList()
     u32 cnt = M.m_map_names.size();
     for (u32 i = 0; i < cnt; ++i)
     {
-        CUIListBoxItem* itm = lst->AddTextItem(CStringTable().translate(M.m_map_names[i].map_name).c_str());
+        CUIListBoxItem* itm = lst->AddTextItem(StringTable().translate(M.m_map_names[i].map_name).c_str());
         itm->Enable(true); // m_pExtraContentFilter->IsDataEnabled(M.m_map_names[i].map_name.c_str()));
     }
 }

@@ -1,10 +1,10 @@
 #include "pch_script.h"
 #include "uiiteminfo.h"
-#include "uistatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UIXmlInit.h"
-#include "UIProgressBar.h"
-#include "UIScrollView.h"
-#include "UIFrameWindow.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "string_table.h"
@@ -206,7 +206,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
     }
     if (UIWeight)
     {
-        LPCSTR kg_str = CStringTable().translate("st_kg").c_str();
+        LPCSTR kg_str = StringTable().translate("st_kg").c_str();
         float weight = pInvItem->Weight();
 
         if (!weight)
@@ -265,7 +265,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
             UITradeTip->Show(false);
         else
         {
-            UITradeTip->SetText(CStringTable().translate(trade_tip).c_str());
+            UITradeTip->SetText(StringTable().translate(trade_tip).c_str());
             UITradeTip->AdjustHeightToText();
             UITradeTip->SetWndPos(pos);
             UITradeTip->Show(true);

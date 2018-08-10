@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIScrollView.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "UIStatsPlayerList.h"
 
 class CUIXml;

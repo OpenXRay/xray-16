@@ -248,6 +248,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrECore", "editors\xrECore\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEditor", "editors\xrEditor\xrEditor.vcxproj", "{BE4B23E7-2CA8-4607-A473-116C4242F23D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrUICore", "xrUICore\xrUICore.vcxproj", "{37B3642C-B706-4C93-BC54-BADADC8FC9B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1125,6 +1127,18 @@ Global
 		{BE4B23E7-2CA8-4607-A473-116C4242F23D}.Release|x64.Build.0 = Release|x64
 		{BE4B23E7-2CA8-4607-A473-116C4242F23D}.Release|x86.ActiveCfg = Release|Win32
 		{BE4B23E7-2CA8-4607-A473-116C4242F23D}.Release|x86.Build.0 = Release|Win32
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Debug|x64.ActiveCfg = Debug|x64
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Debug|x64.Build.0 = Debug|x64
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Debug|x86.ActiveCfg = Debug|Win32
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Debug|x86.Build.0 = Debug|Win32
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Mixed|x64.ActiveCfg = Mixed|x64
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Mixed|x64.Build.0 = Mixed|x64
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Mixed|x86.ActiveCfg = Mixed|Win32
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Mixed|x86.Build.0 = Mixed|Win32
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Release|x64.ActiveCfg = Release|x64
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Release|x64.Build.0 = Release|x64
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Release|x86.ActiveCfg = Release|Win32
+		{37B3642C-B706-4C93-BC54-BADADC8FC9B1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

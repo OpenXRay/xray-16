@@ -12,8 +12,8 @@ class demo_info_loader;
 #include "xrEngine/IInputReceiver.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "UIDialogHolder.h"
-#include "ui/UIWndCallback.h"
-#include "ui_base.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
+#include "xrUICore/ui_base.h"
 #include "DemoInfo.h"
 
 namespace gamespy_gp

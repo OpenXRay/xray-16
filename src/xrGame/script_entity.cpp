@@ -26,7 +26,7 @@
 #include "visual_memory_manager.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "movement_manager.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 
 void __stdcall ActionCallback(IKinematics* tpKinematics);

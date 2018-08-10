@@ -3,7 +3,7 @@
 
 #include "UIXmlInit.h"
 #include "UIMpItemsStoreWnd.h"
-#include "UITabControl.h"
+#include "xrUICore/TabControl/UITabControl.h"
 #include "UITabButtonMP.h"
 #include "UIDragDropListEx.h"
 #include "UIItemInfo.h"

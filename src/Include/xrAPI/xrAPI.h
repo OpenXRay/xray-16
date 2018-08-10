@@ -11,6 +11,7 @@ class CRender;
 class CScriptEngine;
 class AISpaceBase;
 class ISoundManager;
+class ui_core;
 
 class XRAPI_API EngineGlobalEnvironment
 {
@@ -27,6 +28,7 @@ public:
     CScriptEngine* ScriptEngine;
     AISpaceBase* AISpace;
     ISoundManager* Sound;
+    ui_core* UICore;
 
     bool isEditor;
     bool isDedicatedServer;

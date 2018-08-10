@@ -251,7 +251,7 @@ void game_cl_CaptureTheArtefact::UpdateMoneyIndicator()
 
 void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
 {
-    CStringTable st;
+    CStringTable& st = StringTable();
     string1024 Text;
     // string512 tmp;
     //	LPSTR	Color_Teams[3]		= {"%c[255,255,255,255]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
@@ -1087,7 +1087,6 @@ bool game_cl_CaptureTheArtefact::NeedToSendReady_Actor(int key, game_PlayerState
 
 bool game_cl_CaptureTheArtefact::NeedToSendReady_Spectator(int key, game_PlayerState* ps)
 {
-    CStringTable st;
     bool res = inherited::NeedToSendReady_Spectator(key, ps);
     u32 gphase = Phase();
     if ((gphase == GAME_PHASE_INPROGRESS) && (key == kJUMP) && (!m_game_ui->IsBuySpawnShown()))
@@ -1238,8 +1237,6 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     if (!m_game_ui)
         return;
 
-    CStringTable st;
-
     u32 psize = P.B.count + 1;
     char* command = static_cast<char*>(_alloca(psize));
     char* player = static_cast<char*>(_alloca(psize));
@@ -1289,7 +1286,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     {
         if (!xr_strcmp(cmd_name, ttable[i][0]))
         {
-            pcstr ted_str = st.translate(ttable[i][1]).c_str();
+            pcstr ted_str = StringTable().translate(ttable[i][1]).c_str();
             VERIFY(ted_str);
             tcmd_len = xr_strlen(ted_str) + 1;
             tcmd_name = static_cast<char*>(_alloca(tcmd_len));
@@ -1310,9 +1307,9 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
         Msg("---Next cat iteration state: %s", vstr);
 #endif
         xr_strcat(vstr, vstr_size, " ");
-        xr_strcat(vstr, vstr_size, st.translate(args[i]).c_str());
+        xr_strcat(vstr, vstr_size, StringTable().translate(args[i]).c_str());
     }
-    pcstr t_vote_str = st.translate("mp_voting_started").c_str();
+    pcstr t_vote_str = StringTable().translate("mp_voting_started").c_str();
     VERIFY(t_vote_str);
     u32 fin_str_size = xr_strlen(t_vote_str) + vstr_size + xr_strlen(player) + 1;
     char* fin_str = static_cast<char*>(_alloca(fin_str_size));
@@ -1356,7 +1353,6 @@ void game_cl_CaptureTheArtefact::UpdateVotingTime(u32 current_time)
 {
     if (IsVotingEnabled() && IsVotingActive() && (m_dwVoteEndTime >= current_time))
     {
-        CStringTable st;
         u32 TimeLeft = m_dwVoteEndTime - current_time;
         string1024 VoteTimeResStr;
         u32 SecsLeft = (TimeLeft % 60000) / 1000;
@@ -1372,7 +1368,7 @@ void game_cl_CaptureTheArtefact::UpdateVotingTime(u32 current_time)
                 NumAgreed++;
         }
 
-        xr_sprintf(VoteTimeResStr, st.translate("mp_timeleft").c_str(), MinitsLeft, SecsLeft,
+        xr_sprintf(VoteTimeResStr, StringTable().translate("mp_timeleft").c_str(), MinitsLeft, SecsLeft,
             float(NumAgreed) / players.size());
         if (m_game_ui)
             m_game_ui->SetVoteTimeResultMsg(VoteTimeResStr);

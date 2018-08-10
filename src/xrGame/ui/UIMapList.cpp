@@ -1,14 +1,14 @@
 #include "StdAfx.h"
 #include "UIMapList.h"
-#include "UIListBox.h"
-#include "UIFrameWindow.h"
-#include "UIFrameLineWnd.h"
-#include "UI3tButton.h"
-#include "UISpinText.h"
+#include "xrUICore/ListBox/UIListBox.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/Buttons/UI3tButton.h"
+#include "xrUICore/SpinBox/UISpinText.h"
 #include "UIXmlInit.h"
 #include "UIMapInfo.h"
-#include "UIComboBox.h"
-#include "UIListBoxItem.h"
+#include "xrUICore/ComboBox/UIComboBox.h"
+#include "xrUICore/ListBox/UIListBoxItem.h"
 #include "xrEngine/xr_ioconsole.h"
 #include "string_table.h"
 #include "Common/object_broker.h"
@@ -154,13 +154,13 @@ EGameIDs CUIMapList::GetCurGameType()
     if (combo_ms)
     {
         text = combo_ms->GetText();
-        if (0 == xr_strcmp(text, CStringTable().translate(get_token_name(g_GameModes, eGameIDDeathmatch))))
+        if (0 == xr_strcmp(text, StringTable().translate(get_token_name(g_GameModes, eGameIDDeathmatch))))
             return eGameIDDeathmatch;
-        else if (0 == xr_strcmp(text, CStringTable().translate(get_token_name(g_GameModes, eGameIDTeamDeathmatch))))
+        else if (0 == xr_strcmp(text, StringTable().translate(get_token_name(g_GameModes, eGameIDTeamDeathmatch))))
             return eGameIDTeamDeathmatch;
-        else if (0 == xr_strcmp(text, CStringTable().translate(get_token_name(g_GameModes, eGameIDArtefactHunt))))
+        else if (0 == xr_strcmp(text, StringTable().translate(get_token_name(g_GameModes, eGameIDArtefactHunt))))
             return eGameIDArtefactHunt;
-        else if (0 == xr_strcmp(text, CStringTable().translate(get_token_name(g_GameModes, eGameIDCaptureTheArtefact))))
+        else if (0 == xr_strcmp(text, StringTable().translate(get_token_name(g_GameModes, eGameIDCaptureTheArtefact))))
             return eGameIDCaptureTheArtefact;
         else
             NODEFAULT;
@@ -281,7 +281,7 @@ void CUIMapList::SetModeSelector(CUIWindow* ms) { m_pModeSelector = ms; }
 void CUIMapList::SetMapPic(CUIStatic* map_pic) { m_pMapPic = map_pic; }
 void CUIMapList::SetMapInfo(CUIMapInfo* map_info) { m_pMapInfo = map_info; }
 void CUIMapList::SetServerParams(LPCSTR params) { m_srv_params = params; }
-#include "uilistboxitem.h"
+#include "xrUICore/ListBox/UIListBoxItem.h"
 void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id)
 {
     R_ASSERT2(m_pWeatherSelector, "m_pWeatherSelector == NULL");
@@ -318,7 +318,7 @@ void CUIMapList::UpdateMapList(EGameIDs GameType)
     u32 cnt = M.m_map_names.size();
     for (u32 i = 0; i < cnt; ++i)
     {
-        CUIListBoxItem* itm = m_pList1->AddTextItem(CStringTable().translate(M.m_map_names[i].map_name).c_str());
+        CUIListBoxItem* itm = m_pList1->AddTextItem(StringTable().translate(M.m_map_names[i].map_name).c_str());
         itm->SetData((void*)(__int64)i);
         itm->Enable(true);
     }

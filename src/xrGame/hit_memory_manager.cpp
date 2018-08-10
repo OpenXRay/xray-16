@@ -12,7 +12,7 @@
 #include "custommonster.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/level_graph.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
