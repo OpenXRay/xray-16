@@ -117,6 +117,8 @@ public:
     IC const u32& death_point_count() const;
     IC const xrGUID& guid() const;
     IC const LEVEL_MAP& levels() const;
+    IC bool level_exist(const _LEVEL_ID& id) const;
+    IC bool level_exist(pcstr level_name) const;
     IC const SLevel& level(const _LEVEL_ID& id) const;
     IC const SLevel& level(LPCSTR level_name) const;
     IC const SLevel* level(LPCSTR level_name, bool) const;
