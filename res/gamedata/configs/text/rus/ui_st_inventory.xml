@@ -93,6 +93,9 @@
 	<string id="st_undress_outfit">
 		<text>снять костюм</text>
 	</string>
+	<string id="st_unequio">
+		<text>убрать в рюкзак</text>
+	</string>
 	<string id="st_unload_magazine">
 		<text>разрядить</text>
 	</string>
