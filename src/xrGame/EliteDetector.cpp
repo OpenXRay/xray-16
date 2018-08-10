@@ -3,8 +3,8 @@
 #include "player_hud.h"
 #include "Include/xrRender/UIRender.h"
 #include "ui/UIXmlInit.h"
-#include "ui/xrUIXmlParser.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "ui/ArtefactDetectorUI.h"
 
 CEliteDetector::CEliteDetector() { m_artefacts.m_af_rank = 3; }

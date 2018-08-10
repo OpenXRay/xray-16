@@ -1,7 +1,7 @@
 #pragma once
 
 #include "alife_space.h"
-#include "string_table_defs.h"
+#include "xrEngine/StringTable/IStringTableDefs.h"
 #include "Common/object_interfaces.h"
 
 #define DEFAULT_NEWS_SHOW_TIME 5000

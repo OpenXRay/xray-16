@@ -2,7 +2,7 @@
 #include "UIDialogHolder.h"
 #include "ui/UIDialogWnd.h"
 #include "UIGameCustom.h"
-#include "UICursor.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "Level.h"
 #include "actor.h"
 #include "xr_level_controller.h"

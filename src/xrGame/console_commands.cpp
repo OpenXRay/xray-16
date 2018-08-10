@@ -31,7 +31,7 @@
 #include "mt_config.h"
 #include "UIGameSP.h"
 #include "ui/UIActorMenu.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "zone_effector.h"
 #include "GameTask.h"
 #include "MainMenu.h"
@@ -47,7 +47,6 @@
 #include "xrPhysics/console_vars.h"
 #ifdef DEBUG
 #include "PHDebug.h"
-#include "ui/UIDebugFonts.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "LevelGraphDebugRender.hpp"
 #include "CharacterPhysicsSupport.h"
@@ -83,7 +82,7 @@ extern BOOL g_ShowAnimationInfo;
 extern BOOL g_bShowHitSectors;
 // extern	BOOL	g_bDebugDumpPhysicsStep	;
 extern ESingleGameDifficulty g_SingleGameDifficulty;
-extern BOOL g_show_wnd_rect2;
+XRUICORE_API extern BOOL g_show_wnd_rect2;
 //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
@@ -107,10 +106,8 @@ extern BOOL g_invert_zoom;
 int g_inv_highlight_equipped = 0;
 //-Alundaio
 
-#ifdef COC_EDITION
 extern u32 gLanguage;
 extern xr_vector<xr_token> gLanguagesToken;
-#endif
 
 //-----------------------------------------------------------
 
@@ -207,25 +204,41 @@ public:
     virtual void Info(TInfo& I) { xr_strcpy(I, "game difficulty"); }
 };
 
-#ifdef COC_EDITION
 class CCC_GameLanguage : public CCC_Token
 {
 public:
-    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&gLanguage, NULL)
-    {
-        CStringTable();
-        tokens = gLanguagesToken.data();
-    };
+    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&gLanguage, NULL) {};
 
     virtual void Execute(LPCSTR args)
     {
         tokens = gLanguagesToken.data();
 
         CCC_Token::Execute(args);
-        CStringTable().ReloadLanguage();
+        StringTable().ReloadLanguage();
+
+        if (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive())
+            MainMenu()->setLanguageChanged(true);
+
+        if (!g_pGameLevel)
+            return;
+
+        for (u16 id = 0; id < 0xffff; id++)
+        {
+            CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(id));
+            if (!pGameObject)
+                continue;
+
+            if (CInventoryItem* p = smart_cast<CInventoryItem*>(pGameObject))
+                p->reloadNames();
+        }
+    }
+
+    const xr_token* GetToken() noexcept override
+    {
+        tokens = gLanguagesToken.data();
+        return CCC_Token::GetToken();
     }
 };
-#endif
 
 #ifdef DEBUG
 class CCC_ALifePath : public IConsole_Command
@@ -584,7 +597,7 @@ public:
 #endif
         StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true);
         LPSTR save_name;
-        STRCONCAT(save_name, CStringTable().translate("st_game_saved").c_str(), ": ", S);
+        STRCONCAT(save_name, StringTable().translate("st_game_saved").c_str(), ": ", S);
         _s->wnd()->TextItemControl()->SetText(save_name);
 
         xr_strcat(S, ".dds");
@@ -968,17 +981,6 @@ public:
         }
     }
     virtual void Info(TInfo& I) { xr_strcpy(I, "dumps all creature names"); }
-};
-
-class CCC_DebugFonts : public IConsole_Command
-{
-public:
-    CCC_DebugFonts(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
-    virtual void Execute(LPCSTR args)
-    {
-        // BUG: leak
-        (new CUIDebugFonts())->ShowDialog(true);
-    }
 };
 
 class CCC_DebugNode : public IConsole_Command
@@ -1753,9 +1755,7 @@ void CCC_RegisterCommands()
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
-#ifdef COC_EDITION
     CMD1(CCC_GameLanguage, "g_language");
-#endif
 
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
@@ -1899,7 +1899,6 @@ void CCC_RegisterCommands()
 #endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 
     CMD1(CCC_ShowMonsterInfo, "ai_monster_info");
-    CMD1(CCC_DebugFonts, "debug_fonts");
     CMD1(CCC_TuneAttachableItem, "dbg_adjust_attachable_item");
 
     CMD1(CCC_ShowAnimationStats, "ai_show_animation_stats");

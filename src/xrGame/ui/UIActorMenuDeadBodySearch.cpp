@@ -3,10 +3,10 @@
 #include "UIDragDropListEx.h"
 #include "UICharacterInfo.h"
 #include "UIInventoryUtilities.h"
-#include "UI3tButton.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UICellItem.h"
 #include "UICellItemFactory.h"
-#include "UIFrameLineWnd.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrMessages.h"
 #include "alife_registry_wrappers.h"
 #include "GameObject.h"
@@ -205,7 +205,7 @@ void CUIActorMenu::UpdateDeadBodyBag()
 {
     string64 buf;
 
-    LPCSTR kg_str = CStringTable().translate("st_kg").c_str();
+    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
     float total = CalcItemsWeight(m_pDeadBodyBagList);
     xr_sprintf(buf, "%.1f %s", total, kg_str);
     m_PartnerWeight->SetText(buf);

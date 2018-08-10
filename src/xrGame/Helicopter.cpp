@@ -6,11 +6,11 @@
 #include "ai_sounds.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 #include "script_game_object.h"
 #include "xrEngine/LightAnimLibrary.h"
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 
 #include "holder_custom.h"
 #include "cameralook.h"
@@ -19,7 +19,7 @@
 #include "ActorEffector.h"
 #include "CharacterPhysicsSupport.h"
 #include "xr_level_controller.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 
 #ifdef DEBUG
 #include "xrEngine/GameFont.h"

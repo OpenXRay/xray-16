@@ -12,9 +12,9 @@
 #include "xrCore/Animation/SkeletonMotions.hpp"
 #include "xrNetServer/NET_Messages.h"
 
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"
 
 extern const float PITCH_OFFSET_R = 0.00f;		// barrel movement sideways (to the left) with vertical camera turns

@@ -7,7 +7,7 @@
 #include "entity_alive.h"
 #include "ui/UIInventoryUtilities.h"
 #include "UI/UIXmlInit.h"
-#include "UI/UItextureMaster.h"
+#include "xrUICore/XML/UITextureMaster.h"
 
 #include "InfoPortion.h"
 #include "PhraseDialog.h"
@@ -30,11 +30,7 @@ typedef xr_vector<std::pair<shared_str, int>> STORY_PAIRS;
 extern STORY_PAIRS story_ids;
 extern STORY_PAIRS spawn_story_ids;
 
-extern void dump_list_wnd();
-extern void dump_list_lines();
-extern void dump_list_sublines();
 extern void clean_wnd_rects();
-extern void dump_list_xmls();
 extern void CreateUIGeom();
 extern void DestroyUIGeom();
 extern void InitHudSoundSettings();
@@ -79,12 +75,6 @@ void clean_game_globals()
 
     if (!GEnv.isDedicatedServer)
     {
-        //.		CInfoPortion::DeleteSharedData					();
-        //.		CInfoPortion::DeleteIdToIndexData				();
-
-        //.		CEncyclopediaArticle::DeleteSharedData			();
-        //.		CEncyclopediaArticle::DeleteIdToIndexData		();
-
         CPhraseDialog::DeleteSharedData();
         CPhraseDialog::DeleteIdToIndexData();
 
@@ -104,8 +94,6 @@ void clean_game_globals()
     // static shader for blood
     CEntityAlive::UnloadBloodyWallmarks();
     CEntityAlive::UnloadFireParticles();
-    //очищение памяти таблицы строк
-    CStringTable::Destroy();
     // Очищение таблицы цветов
     CUIXmlInit::DeleteColorDefs();
     // Очищение таблицы идентификаторов рангов и отношений сталкеров
@@ -120,12 +108,8 @@ void clean_game_globals()
 
     RELATION_REGISTRY::clear_relation_registry();
 
-    dump_list_wnd();
-    dump_list_lines();
-    dump_list_sublines();
     clean_wnd_rects();
     xr_delete(g_uiSpotXml);
-    dump_list_xmls();
     DestroyUIGeom();
     xr_delete(pWpnScopeXml);
     CUITextureMaster::FreeTexInfo();

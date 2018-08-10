@@ -1,7 +1,7 @@
 #pragma once
 #ifdef COC_USER_SPOT
 #include "UIDialogWnd.h"
-#include "UIWndCallback.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
 
 class CUIXml;
 class CUI3tButton;

@@ -1,18 +1,23 @@
 #include "stdafx.h"
 #include "string_table.h"
 #include "xrEngine/xr_ioconsole.h"
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "xr_level_controller.h"
-#include "MainMenu.h"
+
+CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 
 STRING_TABLE_DATA* CStringTable::pData = NULL;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
-#ifdef COC_EDITION
+
 u32 gLanguage = -1;
 xr_vector<xr_token> gLanguagesToken;
-#endif
 
-CStringTable::CStringTable() { Init(); }
+CStringTable::CStringTable()
+{
+    pData = nullptr;
+}
+
+CStringTable::~CStringTable() { Destroy(); }
 void CStringTable::Destroy() { xr_delete(pData); }
 void CStringTable::rescan()
 {
@@ -29,14 +34,12 @@ void CStringTable::Init()
 
     pData = new STRING_TABLE_DATA();
 
-#ifdef COC_EDITION
     if (gLanguagesToken.size() == 0)
     {
         u32 lineCount = pSettings->line_count("Languages");
-        LPCSTR lineName, lineVal;
-        if (lineCount == 0)
-            R_ASSERT2(false, "Section \"Languages\" is empty!");
+        R_ASSERT2(lineCount != 0, "Section \"Languages\" is empty!");
 
+        LPCSTR lineName, lineVal;
         for (u16 i = 0; i < lineCount; i++)
         {
             pSettings->r_line("Languages", i, &lineName, &lineVal);
@@ -46,30 +49,24 @@ void CStringTable::Init()
     }
     
     //имя языка, если не задано (NULL), то первый <text> в <string> в XML
-    if (gLanguage != -1)
+    if (gLanguage != (u32)-1)
         pData->m_sLanguage = gLanguagesToken.at(gLanguage).name;
     else
     {
-        
         pData->m_sLanguage = pSettings->r_string("string_table", "language");
+        bool found = false;
         for (const auto& it : gLanguagesToken)
         {
             if (it.name && it.name == pData->m_sLanguage)
             {
-                /*string64 buf;
-                xr_strcpy(buf, "g_language ");
-                xr_strcat(buf, it.name);
-
-                Console->Execute(buf);*/
-
                 gLanguage = it.id;
+                found = true;
                 break;
             }
         }
+
+        R_ASSERT2(found, "Check localization.ltx");
     }
-#else
-    pData->m_sLanguage = pSettings->r_string("string_table", "language");
-#endif
     
     //---
     FS_FileSet fset;
@@ -140,44 +137,21 @@ void CStringTable::ReparseKeyBindings()
 
 void CStringTable::ReloadLanguage()
 {
-#ifdef COC_EDITION
     if (0 == xr_strcmp(gLanguagesToken.at(gLanguage).name, pData->m_sLanguage.c_str()))
         return;
-#else
-    if (0 == xr_strcmp(pSettings->r_string("string_table", "language"), pData->m_sLanguage.c_str()))
-        return;
-#endif
 
     xr_delete(pData);
 
     Init();
-
-    if (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive())
-        MainMenu()->setLanguageChanged(true);
-
-    if (!g_pGameLevel)
-        return;
-
-    for (u16 id = 0; id < 0xffff; id++)
-    {
-        CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(id));
-        if (!pGameObject)
-            continue;
-
-        if (CInventoryItem* p = smart_cast<CInventoryItem*>(pGameObject))
-            p->reloadNames();
-    }
 }
 
 STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
 {
-    //	LPCSTR str = "1 $$action_left$$ 2 $$action_right$$ 3 $$action_left$$ 4";
     xr_string res;
     int k = 0;
     const char* b;
 #define ACTION_STR "$$ACTION_"
 
-//.	int LEN				= (int)xr_strlen(ACTION_STR);
 #define LEN 9
 
     string256 buff;

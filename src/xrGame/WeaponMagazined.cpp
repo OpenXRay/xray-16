@@ -16,9 +16,9 @@
 #include "Common/object_broker.h"
 #include "string_table.h"
 #include "ui/UIXmlInit.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "game_object_space.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"
 #include "HudSound.h"
 
@@ -1494,13 +1494,13 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     if (ae != 0 && m_magazine.size() != 0)
     {
         LPCSTR ammo_type = m_ammoTypes[m_magazine.back().m_LocalAmmoType].c_str();
-        info.name = CStringTable().translate(pSettings->r_string(ammo_type, "inv_name_short"));
+        info.name = StringTable().translate(pSettings->r_string(ammo_type, "inv_name_short"));
         info.icon = ammo_type;
     }
     else
     {
         LPCSTR ammo_type = m_ammoTypes[m_ammoType.type1].c_str();
-        info.name = CStringTable().translate(pSettings->r_string(ammo_type, "inv_name_short"));
+        info.name = StringTable().translate(pSettings->r_string(ammo_type, "inv_name_short"));
         info.icon = ammo_type;
     }
     return true;

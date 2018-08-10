@@ -20,7 +20,7 @@
 #include "actorcondition.h"
 #include "actor_input_handler.h"
 #include "string_table.h"
-#include "UI/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UI/UIActorMenu.h"
 #include "UI/UIDragDropReferenceList.h"
 #include "CharacterPhysicsSupport.h"
@@ -208,7 +208,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
 
                 StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true);
                 string1024 str;
-                strconcat(sizeof(str), str, *CStringTable().translate("st_item_used"), ": ", itm->NameItem());
+                strconcat(sizeof(str), str, *StringTable().translate("st_item_used"), ": ", itm->NameItem());
                 _s->wnd()->TextItemControl()->SetText(str);
 
                 CurrentGameUI()->GetActorMenu().m_pQuickSlot->ReloadReferences(this);

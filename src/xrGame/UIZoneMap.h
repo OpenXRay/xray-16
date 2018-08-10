@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 
 class CActor;
 class CUIMiniMap;

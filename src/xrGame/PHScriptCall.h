@@ -3,7 +3,7 @@
 #include "phcommander.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrScriptEngine/script_space_forward.hpp"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "xrEngine/xr_object.h"
 
 class CPHScriptCondition : public CPHCondition, public CPHReqComparerV

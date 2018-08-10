@@ -9,7 +9,7 @@
 #include "xml_str_id_loader.h"
 #include "shared_data.h"
 
-#include "ui\uistatic.h"
+#include "xrUICore/Static/UIStatic.h"
 
 //////////////////////////////////////////////////////////////////////////
 // SInfoPortionData: данные для InfoProtion

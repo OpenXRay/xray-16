@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "UITalkDialogWnd.h"
 
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
-#include "UIScrollView.h"
-#include "UI3tButton.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UITalkWnd.h"
 #include "UIInventoryUtilities.h"
-#include "UIBtnHint.h"
+#include "xrUICore/Buttons/UIBtnHint.h"
 
 #include "game_news.h"
 #include "Level.h"

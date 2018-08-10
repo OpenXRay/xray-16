@@ -1,7 +1,6 @@
 #pragma once
-#include "UIWindow.h"
-
-#include "UIDoubleProgressBar.h"
+#include "xrUICore/Windows/UIWindow.h"
+#include "xrUICore/ProgressBar/UIDoubleProgressBar.h"
 
 class CUIXml;
 class CInventoryItem;

@@ -34,7 +34,7 @@ bool CLevel::net_start_client1()
 
     string256 temp;
     xr_sprintf(temp, "%s %s",
-               CStringTable().translate("st_client_connecting_to").c_str(),
+               StringTable().translate("st_client_connecting_to").c_str(),
                name_of_server);
 
     pApp->SetLoadStageTitle(temp);

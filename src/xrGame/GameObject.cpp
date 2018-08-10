@@ -22,7 +22,7 @@
 #include "ai_debug.h"
 #include "xrEngine/IGame_Level.h"
 #include "Level.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "xrPhysics/MathUtils.h"
 
 #include "xrAICore/Navigation/game_level_cross_table.h"
@@ -31,7 +31,7 @@
 #include "animation_movement_controller.h"
 #include "xrEngine/xr_collide_form.h"
 #include "script_game_object.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 #include "doors_door.h"
 #include "doors.h"

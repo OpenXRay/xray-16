@@ -6,7 +6,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/LightAnimLibrary.h"
 
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "ai/stalker/ai_stalker.h"
 #include "CustomZone.h"
 #include "xrPhysics/MathUtils.h"

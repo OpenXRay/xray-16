@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "UIActorMenu.h"
 #include "UIXmlInit.h"
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UICharacterInfo.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
 #include "UIActorStateInfo.h"
 #include "UIItemInfo.h"
-#include "UIFrameLineWnd.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "UIMessageBoxEx.h"
-#include "UIPropertiesBox.h"
-#include "UI3tButton.h"
+#include "xrUICore/PropertiesBox/UIPropertiesBox.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 
 #include "UIInventoryUpgradeWnd.h"
 #include "UIInvUpgradeInfo.h"
@@ -18,10 +18,10 @@
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "Common/object_broker.h"
-#include "UIWndCallback.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
 #include "UIHelper.h"
-#include "UIProgressBar.h"
-#include "ui_base.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/ui_base.h"
 #include "string_table.h"
 
 CUIActorMenu::CUIActorMenu()
@@ -362,25 +362,25 @@ void CUIActorMenu::InitCallbacks()
 void CUIActorMenu::UpdateButtonsLayout()
 {
     string32 tmp;
-    LPCSTR str = CStringTable().translate("quick_use_str_1").c_str();
+    LPCSTR str = StringTable().translate("quick_use_str_1").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';
     m_QuickSlot1->SetTextST(tmp);
 
-    str = CStringTable().translate("quick_use_str_2").c_str();
+    str = StringTable().translate("quick_use_str_2").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';
     m_QuickSlot2->SetTextST(tmp);
 
-    str = CStringTable().translate("quick_use_str_3").c_str();
+    str = StringTable().translate("quick_use_str_3").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';
     m_QuickSlot3->SetTextST(tmp);
 
-    str = CStringTable().translate("quick_use_str_4").c_str();
+    str = StringTable().translate("quick_use_str_4").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
     if (tmp[2] == ',')
         tmp[1] = '\0';

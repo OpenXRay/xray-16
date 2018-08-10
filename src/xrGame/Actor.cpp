@@ -59,7 +59,7 @@
 #include "actor_memory.h"
 #include "Script_Game_Object.h"
 #include "Game_Object_Space.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "InventoryBox.h"
 #include "location_manager.h"
 #include "player_hud.h"
@@ -404,7 +404,6 @@ void CActor::Load(LPCSTR section)
     m_AutoPickUp_AABB_Offset =
         READ_IF_EXISTS(pSettings, r_fvector3, section, "AutoPickUp_AABB_offs", Fvector().set(0, 0, 0));
 
-    CStringTable string_table;
     m_sCharacterUseAction = "character_use";
     m_sDeadCharacterUseAction = "dead_character_use";
     m_sDeadCharacterUseOrDragAction = "dead_character_use_or_drag";
@@ -1362,7 +1361,7 @@ void CActor::shedule_Update(u32 DT)
         {
             if (game_object->tip_text())
             {
-                m_sDefaultObjAction = CStringTable().translate(game_object->tip_text());
+                m_sDefaultObjAction = StringTable().translate(game_object->tip_text());
             }
             else
             {

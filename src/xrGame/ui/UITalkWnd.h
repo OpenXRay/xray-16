@@ -1,9 +1,9 @@
 #pragma once
 #include "UIDialogWnd.h"
-#include "UIStatic.h"
-#include "UIButton.h"
-#include "UIEditBox.h"
-#include "UIFrameWindow.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Buttons/UIButton.h"
+#include "xrUICore/EditBox/UIEditBox.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
 #include "PhraseDialogDefs.h"
 
 class CActor;

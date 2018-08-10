@@ -776,7 +776,6 @@
     <ClInclude Include="bone_groups.h" />
     <ClInclude Include="BottleItem.h" />
     <ClInclude Include="BreakableObject.h" />
-    <ClInclude Include="callback_info.h" />
     <ClInclude Include="CameraEffector.h" />
     <ClInclude Include="CameraFirstEye.h" />
     <ClInclude Include="CameraLook.h" />
@@ -1161,7 +1160,6 @@
     <ClInclude Include="script_binder_object.h" />
     <ClInclude Include="script_binder_object_wrapper.h" />
     <ClInclude Include="script_bind_macroses.h" />
-    <ClInclude Include="script_callback_ex.h" />
     <ClInclude Include="script_effector.h" />
     <ClInclude Include="script_effector_inline.h" />
     <ClInclude Include="script_effector_wrapper.h" />
@@ -1354,7 +1352,6 @@
     <ClInclude Include="step_manager.h" />
     <ClInclude Include="step_manager_defs.h" />
     <ClInclude Include="string_table.h" />
-    <ClInclude Include="string_table_defs.h" />
     <ClInclude Include="team_base_zone.h" />
     <ClInclude Include="team_hierarchy_holder.h" />
     <ClInclude Include="team_hierarchy_holder_inline.h" />
@@ -1375,54 +1372,34 @@
     <ClInclude Include="trade_parameters.h" />
     <ClInclude Include="trade_parameters_inline.h" />
     <ClInclude Include="trajectories.h" />
-    <ClInclude Include="UICursor.h" />
     <ClInclude Include="UIDialogHolder.h" />
     <ClInclude Include="UIGameCustom.h" />
     <ClInclude Include="UIGameSP.h" />
-    <ClInclude Include="UIStaticItem.h" />
     <ClInclude Include="UIZoneMap.h" />
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
     <ClInclude Include="ui\FactionState.h" />
     <ClInclude Include="ui\FractionState.h" />
     <ClInclude Include="ui\map_hint.h" />
     <ClInclude Include="ui\MMSound.h" />
-    <ClInclude Include="ui\UI3tButton.h" />
-    <ClInclude Include="ui\uiabstract.h" />
     <ClInclude Include="ui\UIAchievements.h" />
     <ClInclude Include="ui\UIPdaSpot.h" />
     <ClInclude Include="ui\UIRankingsCoC.h" />
     <ClInclude Include="ui\UIActorMenu.h" />
     <ClInclude Include="ui\UIActorStateInfo.h" />
-    <ClInclude Include="ui\UIAnimatedStatic.h" />
     <ClInclude Include="ui\UIBoosterInfo.h" />
-    <ClInclude Include="ui\UIBtnHint.h" />
-    <ClInclude Include="ui\UIButton.h" />
     <ClInclude Include="ui\UICarPanel.h" />
     <ClInclude Include="ui\UICellCustomItems.h" />
     <ClInclude Include="ui\UICellItem.h" />
     <ClInclude Include="ui\UICellItemFactory.h" />
     <ClInclude Include="ui\UICharacterInfo.h" />
-    <ClInclude Include="ui\UICheckButton.h" />
-    <ClInclude Include="ui\UIComboBox.h" />
-    <ClInclude Include="ui\UICustomEdit.h" />
-    <ClInclude Include="ui\UICustomSpin.h" />
-    <ClInclude Include="ui\UIDebugFonts.h" />
     <ClInclude Include="ui\UIDialogWnd.h" />
-    <ClInclude Include="ui\UIDoubleProgressBar.h" />
     <ClInclude Include="ui\UIDragDropListEx.h" />
     <ClInclude Include="ui\UIDragDropReferenceList.h" />
-    <ClInclude Include="ui\UIEditBox.h" />
-    <ClInclude Include="ui\UIEditBoxEx.h" />
     <ClInclude Include="ui\UIEditKeyBind.h" />
-    <ClInclude Include="ui\UIFixedScrollBar.h" />
-    <ClInclude Include="ui\UIFrameLineWnd.h" />
-    <ClInclude Include="ui\UIFrameWindow.h" />
     <ClInclude Include="ui\UIGameLog.h" />
     <ClInclude Include="ui\UIGameTutorial.h" />
     <ClInclude Include="ui\UIHelper.h" />
-    <ClInclude Include="ui\UIHint.h" />
     <ClInclude Include="ui\UIHudStatesWnd.h" />
-    <ClInclude Include="ui\UIInteractiveBackground.h" />
     <ClInclude Include="ui\UIInventoryUpgradeWnd.h" />
     <ClInclude Include="ui\UIInventoryUtilities.h" />
     <ClInclude Include="ui\UIInvUpgrade.h" />
@@ -1430,13 +1407,6 @@
     <ClInclude Include="ui\UIInvUpgradeProperty.h" />
     <ClInclude Include="ui\UIItemInfo.h" />
     <ClInclude Include="ui\UIKeyBinding.h" />
-    <ClInclude Include="ui\UILanimController.h" />
-    <ClInclude Include="ui\UILine.h" />
-    <ClInclude Include="ui\UILines.h" />
-    <ClInclude Include="ui\uilinestd.h" />
-    <ClInclude Include="ui\UIListBox.h" />
-    <ClInclude Include="ui\UIListBoxItem.h" />
-    <ClInclude Include="ui\UIListBoxItemMsgChain.h" />
     <ClInclude Include="ui\UILoadingScreen.h" />
     <ClInclude Include="ui\UILogsWnd.h" />
     <ClInclude Include="ui\UIMainIngameWnd.h" />
@@ -1445,53 +1415,27 @@
     <ClInclude Include="ui\UIMapWnd.h" />
     <ClInclude Include="ui\UIMapWndActions.h" />
     <ClInclude Include="ui\UIMapWndActionsSpace.h" />
-    <ClInclude Include="ui\UIMessageBox.h" />
     <ClInclude Include="ui\UIMessageBoxEx.h" />
-    <ClInclude Include="ui\UIMessages.h" />
     <ClInclude Include="ui\UIMessagesWindow.h" />
     <ClInclude Include="ui\UIMMShniaga.h" />
     <ClInclude Include="ui\UIMoneyIndicator.h" />
     <ClInclude Include="ui\UIMotionIcon.h" />
     <ClInclude Include="ui\UINewsItemWnd.h" />
-    <ClInclude Include="ui\UIOptionsItem.h" />
-    <ClInclude Include="ui\UIOptionsManager.h" />
-    <ClInclude Include="ui\UIOptionsManagerScript.h" />
     <ClInclude Include="ui\UIOutfitInfo.h" />
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
     <ClInclude Include="ui\UIPdaWnd.h" />
-    <ClInclude Include="ui\UIProgressBar.h" />
-    <ClInclude Include="ui\UIProgressShape.h" />
-    <ClInclude Include="ui\UIPropertiesBox.h" />
-    <ClInclude Include="ui\UIRadioButton.h" />
     <ClInclude Include="ui\UIRankingWnd.h" />
     <ClInclude Include="ui\UIScriptWnd.h" />
     <ClInclude Include="ui\uiscriptwnd_script.h" />
-    <ClInclude Include="ui\UIScrollBar.h" />
-    <ClInclude Include="ui\UIScrollBox.h" />
-    <ClInclude Include="ui\UIScrollView.h" />
     <ClInclude Include="ui\UISecondTaskWnd.h" />
-    <ClInclude Include="ui\UISpinNum.h" />
-    <ClInclude Include="ui\UISpinText.h" />
-    <ClInclude Include="ui\UIStatic.h" />
-    <ClInclude Include="ui\UISubLine.h" />
-    <ClInclude Include="ui\UITabButton.h" />
-    <ClInclude Include="ui\UITabControl.h" />
+    <ClInclude Include="ui\UISleepStatic.h" />
     <ClInclude Include="ui\UITalkDialogWnd.h" />
     <ClInclude Include="ui\UITalkWnd.h" />
     <ClInclude Include="ui\UITaskWnd.h" />
-    <ClInclude Include="ui\UITextureMaster.h" />
-    <ClInclude Include="ui\UITrackBar.h" />
     <ClInclude Include="ui\UIWarState.h" />
-    <ClInclude Include="ui\UIWindow.h" />
-    <ClInclude Include="ui\UIWndCallback.h" />
     <ClInclude Include="ui\UIWpnParams.h" />
     <ClInclude Include="ui\UIXmlInit.h" />
     <ClInclude Include="ui\ui_af_params.h" />
-    <ClInclude Include="ui\ui_arrow.h" />
-    <ClInclude Include="ui\UI_IB_Static.h" />
-    <ClInclude Include="ui\xrUIXmlParser.h" />
-    <ClInclude Include="ui_base.h" />
-    <ClInclude Include="ui_defs.h" />
     <ClInclude Include="vision_client.h" />
     <ClInclude Include="vision_client_inline.h" />
     <ClInclude Include="visual_memory_manager.h" />
@@ -3124,7 +3068,6 @@
     </ClCompile>
     <ClCompile Include="trade_parameters.cpp" />
     <ClCompile Include="trajectories.cpp" />
-    <ClCompile Include="UICursor.cpp" />
     <ClCompile Include="UIDialogHolder.cpp" />
     <ClCompile Include="UIGameCustom.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3138,12 +3081,10 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="UIStaticItem.cpp" />
     <ClCompile Include="UIZoneMap.cpp" />
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
     <ClCompile Include="ui\map_hint.cpp" />
     <ClCompile Include="ui\MMSound.cpp" />
-    <ClCompile Include="ui\UI3tButton.cpp" />
     <ClCompile Include="ui\UIAchievements.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3171,41 +3112,16 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ui\UIActorStateInfo.cpp" />
-    <ClCompile Include="ui\UIAnimatedStatic.cpp" />
     <ClCompile Include="ui\UIBoosterInfo.cpp" />
-    <ClCompile Include="ui\UIBtnHint.cpp" />
-    <ClCompile Include="ui\UIButton.cpp" />
-    <ClCompile Include="ui\UIButton_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="ui\UICarPanel.cpp" />
     <ClCompile Include="ui\UICellCustomItems.cpp" />
     <ClCompile Include="ui\UICellItem.cpp" />
     <ClCompile Include="ui\UICellItemFactory.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
-    <ClCompile Include="ui\UICheckButton.cpp" />
-    <ClCompile Include="ui\UIComboBox.cpp" />
-    <ClCompile Include="ui\UIComboBox_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="ui\UICustomEdit.cpp" />
-    <ClCompile Include="ui\UICustomSpin.cpp" />
     <ClCompile Include="ui\UIDialogWnd.cpp" />
-    <ClCompile Include="ui\UIDoubleProgressBar.cpp" />
     <ClCompile Include="ui\UIDragDropListEx.cpp" />
     <ClCompile Include="ui\UIDragDropReferenceList.cpp" />
-    <ClCompile Include="ui\UIEditBox.cpp" />
-    <ClCompile Include="ui\UIEditBoxEx.cpp" />
-    <ClCompile Include="ui\UIEditBox_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
-    <ClCompile Include="ui\UIFixedScrollBar.cpp" />
-    <ClCompile Include="ui\UIFrameLineWnd.cpp" />
-    <ClCompile Include="ui\UIFrameWindow.cpp" />
     <ClCompile Include="ui\UIGameLog.cpp" />
     <ClCompile Include="ui\UIGameTutorial.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3220,7 +3136,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ui\UIHelper.cpp" />
-    <ClCompile Include="ui\UIHint.cpp" />
     <ClCompile Include="ui\UIHudStatesWnd.cpp" />
     <ClCompile Include="ui\UIInventoryUpgradeWnd.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3251,16 +3166,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ui\UIKeyBinding.cpp" />
-    <ClCompile Include="ui\UILanimController.cpp" />
-    <ClCompile Include="ui\UILine.cpp" />
-    <ClCompile Include="ui\UILines.cpp" />
-    <ClCompile Include="ui\UIListBox.cpp" />
-    <ClCompile Include="ui\UIListBoxItem.cpp" />
-    <ClCompile Include="ui\UIListBoxItemMsgChain.cpp" />
-    <ClCompile Include="ui\UIListBox_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="ui\UILoadingScreen.cpp" />
     <ClCompile Include="ui\UILogsWnd.cpp" />
     <ClCompile Include="ui\UIMainIngameWnd.cpp" />
@@ -3269,37 +3174,14 @@
     <ClCompile Include="ui\UIMapWnd.cpp" />
     <ClCompile Include="ui\UIMapWnd2.cpp" />
     <ClCompile Include="ui\UIMapWndActions.cpp" />
-    <ClCompile Include="ui\UIMessageBox.cpp" />
     <ClCompile Include="ui\UIMessageBoxEx.cpp" />
-    <ClCompile Include="ui\UIMessageBox_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="ui\UIMessagesWindow.cpp" />
     <ClCompile Include="ui\UIMMShniaga.cpp" />
     <ClCompile Include="ui\UIMotionIcon.cpp" />
     <ClCompile Include="ui\UINewsItemWnd.cpp" />
-    <ClCompile Include="ui\UIOptionsItem.cpp" />
-    <ClCompile Include="ui\UIOptionsManager.cpp" />
-    <ClCompile Include="ui\UIOptionsManagerScript.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="ui\UIOutfitInfo.cpp" />
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
     <ClCompile Include="ui\UIPdaWnd.cpp" />
-    <ClCompile Include="ui\UIProgressBar.cpp" />
-    <ClCompile Include="ui\UIProgressBar_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="ui\UIProgressShape.cpp" />
-    <ClCompile Include="ui\UIPropertiesBox.cpp" />
-    <ClCompile Include="ui\UIPropertiesBox_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="ui\UIRadioButton.cpp" />
     <ClCompile Include="ui\UIRankingWnd.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3316,35 +3198,12 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="ui\UIScrollBar.cpp" />
-    <ClCompile Include="ui\UIScrollBox.cpp" />
-    <ClCompile Include="ui\UIScrollView.cpp" />
     <ClCompile Include="ui\UISecondTaskWnd.cpp" />
-    <ClCompile Include="ui\UISpinNum.cpp" />
-    <ClCompile Include="ui\UISpinText.cpp" />
-    <ClCompile Include="ui\UIStatic.cpp" />
-    <ClCompile Include="ui\UIStatic_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="ui\UISubLine.cpp" />
-    <ClCompile Include="ui\UITabButton.cpp" />
-    <ClCompile Include="ui\UITabControl.cpp" />
-    <ClCompile Include="ui\UITabControl_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
+    <ClCompile Include="ui\UISleepStatic.cpp" />
     <ClCompile Include="ui\UITalkDialogWnd.cpp" />
     <ClCompile Include="ui\UITalkWnd.cpp" />
     <ClCompile Include="ui\UITaskWnd.cpp" />
-    <ClCompile Include="ui\UITextureMaster.cpp" />
-    <ClCompile Include="ui\UITrackBar.cpp" />
-    <ClCompile Include="ui\UIWindow.cpp" />
     <ClCompile Include="ui\UIWindow_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="ui\UIWndCallback.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -3354,10 +3213,6 @@
     </ClCompile>
     <ClCompile Include="ui\UIXmlInit.cpp" />
     <ClCompile Include="ui\ui_af_params.cpp" />
-    <ClCompile Include="ui\ui_arrow.cpp" />
-    <ClCompile Include="ui\UI_IB_Static.cpp" />
-    <ClCompile Include="ui\xrUIXmlParser.cpp" />
-    <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="ui_export_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3489,6 +3344,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Externals\LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrUICore\xrUICore.vcxproj">
+      <Project>{37b3642c-b706-4c93-bc54-badadc8fc9b1}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

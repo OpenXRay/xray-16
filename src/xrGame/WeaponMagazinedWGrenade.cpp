@@ -909,7 +909,6 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
 
     string32 int_str;
 
-
     if (m_bGrenadeMode || !IsGrenadeLauncherAttached())
     {
         info.grenade = "";

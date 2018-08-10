@@ -11,7 +11,7 @@
 #include "Inventory.h"
 #include "Actor.h"
 #include "UIGameSP.h"
-#include "UI3tButton.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "inventory_upgrade.h"
 #include "UITalkWnd.h"
 

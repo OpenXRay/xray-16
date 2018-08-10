@@ -11,7 +11,7 @@
 #include "sound_player.h"
 #include "ai_monster_space.h"
 #include "UIGameCustom.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "ai/Monsters/monster_velocity_space.h"
 #include "level_debug.h"
 #include "game_object_space.h"

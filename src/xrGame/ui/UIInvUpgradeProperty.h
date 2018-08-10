@@ -9,7 +9,7 @@
 #ifndef UI_INVENTORY_UPGRADE_PROPERTY_H_INCLUDED
 #define UI_INVENTORY_UPGRADE_PROPERTY_H_INCLUDED
 
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "inventory_item.h"
 #include "inventory_upgrade_property.h"
 

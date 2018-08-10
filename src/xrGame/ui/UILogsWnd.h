@@ -8,12 +8,12 @@
 #ifndef UI_PDA_LOGS_WND_H_INCLUDED
 #define UI_PDA_LOGS_WND_H_INCLUDED
 
-#include "UIWindow.h"
-#include "UIWndCallback.h"
+#include "xrUICore/Windows/UIWindow.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
 
 #include "ai_space.h"
 #include "xrServerEntities/alife_space.h"
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 
 class CUIStatic;
 class CUITextWnd;

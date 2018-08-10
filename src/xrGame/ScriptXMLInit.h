@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui\xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 
 class CUIWindow;
 class CUIFrameWindow;

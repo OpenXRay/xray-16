@@ -8,7 +8,7 @@
 #include "Level.h"
 #ifdef DEBUG
 #include "PHDebug.h"
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 #include "xrEngine/GameFont.h"
 #endif
 #include "hit.h"

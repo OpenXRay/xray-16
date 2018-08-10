@@ -1,10 +1,10 @@
 #include "pch_script.h"
 #include "UIActorMenu.h"
-#include "UI3tButton.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
 #include "UICharacterInfo.h"
-#include "UIFrameLineWnd.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "UICellItem.h"
 #include "UIInventoryUtilities.h"
 #include "UICellItemFactory.h"
@@ -380,7 +380,7 @@ void CUIActorMenu::UpdatePartnerBag()
         m_PartnerMoney->SetText(buf);
     }
 
-    LPCSTR kg_str = CStringTable().translate("st_kg").c_str();
+    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
     float total = CalcItemsWeight(m_pTradePartnerBagList);
     xr_sprintf(buf, "%.1f %s", total, kg_str);
     m_PartnerWeight->SetText(buf);
@@ -395,7 +395,7 @@ void CUIActorMenu::UpdatePartnerBag()
 
 void CUIActorMenu::UpdatePrices()
 {
-    LPCSTR kg_str = CStringTable().translate("st_kg").c_str();
+    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
 
     UpdateActor();
     UpdatePartnerBag();

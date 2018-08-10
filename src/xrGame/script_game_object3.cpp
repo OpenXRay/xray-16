@@ -46,7 +46,7 @@
 #include "CharacterPhysicsSupport.h"
 #include "player_hud.h"
 #include "eatable_item.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "xrEngine/feel_touch.h"
 #include "WeaponAmmo.h"
 #include "WeaponMagazinedWGrenade.h"

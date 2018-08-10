@@ -1,12 +1,12 @@
 #include "pch_script.h"
 #ifdef CALLOFCHERNOBYL_RANKING
 #include "UIRankingsCoC.h"
-#include "UIScrollView.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
-#include "UIHint.h"
-#include "UIStatic.h"
-#include "UICursor.h"
+#include "xrUICore/Hint/UIHint.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "string_table.h"
@@ -132,7 +132,7 @@ void CUIRankingsCoC::SetDescription(pcstr desc)
 
 void CUIRankingsCoC::SetHint(pcstr hint)
 {
-    m_hint->set_text(CStringTable().translate(hint).c_str());
+    m_hint->set_text(StringTable().translate(hint).c_str());
 }
 
 void CUIRankingsCoC::SetIcon(pcstr icon)

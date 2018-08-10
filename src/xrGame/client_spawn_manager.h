@@ -9,7 +9,7 @@
 #pragma once
 
 #include "alife_space.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 
 class CGameObject;
 
