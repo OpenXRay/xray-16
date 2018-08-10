@@ -408,17 +408,20 @@ public:
 class CCC_DemoRecord : public IConsole_Command
 {
 public:
-    CCC_DemoRecord(LPCSTR N) : IConsole_Command(N){};
+    CCC_DemoRecord(LPCSTR N) : IConsole_Command(N) {}
     virtual void Execute(LPCSTR args)
     {
-#ifndef DEBUG
-// if (GameID() != eGameIDSingle)
-//{
-//	Msg("For this game type Demo Record is disabled.");
-//	return;
-//};
-#endif
+        if (!g_pGameLevel) // level not loaded
+        {
+            Log("Demo Record is disabled when level is not loaded.");
+            return;
+        }
+
         Console->Hide();
+
+        // close main menu if it is open
+        if (MainMenu()->IsActive())
+            MainMenu()->Activate(false);
 
         LPSTR fn_;
         STRCONCAT(fn_, args, ".xrdemo");
