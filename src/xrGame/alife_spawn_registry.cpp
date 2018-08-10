@@ -145,7 +145,7 @@ void CALifeSpawnRegistry::load(IReader& file_stream, xrGUID* save_guid)
 
     VERIFY(!m_game_graph);
     m_game_graph = new CGameGraph(*m_chunk);
-    ai().game_graph(m_game_graph);
+    ai().SetGameGraph(m_game_graph);
 
     R_ASSERT2((header().graph_guid() == ai().game_graph().header().guid()) || ignore_save_incompatibility(),
         "Spawn doesn't correspond to the graph : REBUILD SPAWN!");
