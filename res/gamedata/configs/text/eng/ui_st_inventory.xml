@@ -93,7 +93,7 @@
 	<string id="st_undress_outfit">
 		<text>remove suit</text>
 	</string>
-	<string id="st_unequio">
+	<string id="st_unequip">
 		<text>unequip</text>
 	</string>
 	<string id="st_unload_magazine">
