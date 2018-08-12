@@ -206,49 +206,47 @@ Shader* CResourceManager::_cpp_Create(
 
     // Compile element	(LOD0 - HQ)
     {
-        C.iElement = 0;
+        C.iElement = SE_R1_NORMAL_HQ;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        //.		C.bDetail			= _GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[0] = _CreateElement(E);
+        S.E[C.iElement] = _CreateElement(E);
     }
 
     // Compile element	(LOD1)
     {
-        C.iElement = 1;
-        //.		C.bDetail			= _GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
+        C.iElement = SE_R1_NORMAL_LQ;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[1] = _CreateElement(E);
+        S.E[C.iElement] = _CreateElement(E);
     }
 
     // Compile element
     {
-        C.iElement = 2;
-        C.bDetail = FALSE;
+        C.iElement = SE_R1_LPOINT;
+        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[2] = _CreateElement(E);
+        S.E[C.iElement] = _CreateElement(E);
     }
 
     // Compile element
     {
-        C.iElement = 3;
-        C.bDetail = FALSE;
+        C.iElement = SE_R1_LSPOT;
+        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[3] = _CreateElement(E);
+        S.E[C.iElement] = _CreateElement(E);
     }
 
     // Compile element
     {
-        C.iElement = 4;
+        C.iElement = SE_R1_LMODELS;
         C.bDetail = TRUE; //.$$$ HACK :)
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[4] = _CreateElement(E);
+        S.E[C.iElement] = _CreateElement(E);
     }
 
     // Compile element
@@ -257,7 +255,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = FALSE;
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[5] = _CreateElement(E);
+        S.E[C.iElement] = _CreateElement(E);
     }
 
     // Search equal in shaders array

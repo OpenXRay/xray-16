@@ -1959,9 +1959,9 @@ void game_sv_CaptureTheArtefact::OnDetachItem(CSE_ActorMP* actor, CSE_Abstract* 
 
         if (EventPack.B.count > 2)
             u_EventSend(EventPack);
-        for (auto item : to_destroy)
+        for (const auto& item : to_destroy)
             DestroyGameItem(item);
-        for (auto item : to_reject)
+        for (const auto& item : to_reject)
             RejectGameItem(item);
     };
 }

@@ -439,7 +439,6 @@ void CRender::create()
         R_CHK(HW.pDevice->CreateQuery(&qdesc, &q_sync_point[i]));
     q_sync_point[0]->End();
 
-    xrRender_apply_tf();
     ::PortalTraverser.initialize();
     FluidManager.Initialize(70, 70, 70);
     //	FluidManager.Initialize( 100, 100, 100 );
@@ -527,7 +526,6 @@ void CRender::reset_end()
     }
     //-AVO
 
-    xrRender_apply_tf();
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 
     // Set this flag true to skip the first render frame,
@@ -1549,7 +1547,7 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 0
+#if 1
 	strcpy_s					( result, "" );
 	return						false;
 #else // #if 1

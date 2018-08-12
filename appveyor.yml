@@ -1,62 +1,41 @@
 version: '{build}'
+
 pull_requests:
   do_not_increment_build_number: true
+
 skip_tags: true
-image: Visual Studio 2017
+
+image:
+- Visual Studio 2017
+
 configuration:
 - Debug
 - Mixed
 - Release
+
 platform:
 - x64
 - x86
-environment:
-  matrix:
-#  - BUILDSYSTEM: MinGW
-  - BUILDSYSTEM: MSVC
-#install:
-#- SET LUAENV=lua51
-#- cmd: .appveyor\install-lua.cmd
-before_build:
-  nuget restore src\engine.sln
+
 cache:
-  - packages -> **\packages.config
+- packages -> **\packages.config
 
-build_script:
-- if [%BUILDSYSTEM%]==[MSVC] git submodule update --init --recursive
-- if [%BUILDSYSTEM%]==[MinGW] if [%PLATFORM%]==[x86] if [%CONFIGURATION%]==[Debug] (
+before_build:
+- cmd: >-
+    nuget restore src\engine.sln
+
     git submodule update --init --recursive
-  )
 
-# Remove sh.exe from the path otherwise CMake will complain:
-# "sh.exe was found in your PATH, here: C:/Program Files/Git/usr/bin/sh.exe"
-# and the MinGW build will not work (the Visual Studio build does not care).
-- if [%BUILDSYSTEM%]==[MinGW] SET "PATH=%PATH:C:\Program Files\Git\usr\bin=%"
+build:
+  project: src/engine.sln
+  parallel: true
+  verbosity: minimal
 
-# Add MinGW-w64 to PATH
-- if [%BUILDSYSTEM%]==[MinGW] SET "PATH=C:\MinGW-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\MinGW64\bin;%PATH%"
-
-- ECHO %PATH%
-- if [%BUILDSYSTEM%]==[MinGW] if [%PLATFORM%]==[x86] if [%CONFIGURATION%]==[Debug] (
-    MinGW32-make --version &&
-    g++ --version &&
-    MKDIR bin &&
-    CD bin &&
-    cmake .. -G "MinGW Makefiles" &&
-    MinGW32-make
-  )
-- if [%BUILDSYSTEM%]==[MSVC] (
-    msbuild "src\engine.sln" /m /verbosity:minimal /property:PlatformToolset=v141 /t:Clean,Build /p:Platform=%PLATFORM% /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-  )
-
-#create artifacts
 after_build:
-- if [%BUILDSYSTEM%]==[MSVC] xr_pack_build.cmd
-- if [%BUILDSYSTEM%]==[MinGW] if [%PLATFORM%]==[x86] if [%CONFIGURATION%]==[Debug] (
-    xr_pack_build.cmd
-  )
+- cmd: xr_pack_build.cmd
 
 test: off
+
 artifacts:
 - path: res/OpenXRay.Dx86.7z
   name: OpenXRay.Dx86.7z

@@ -1,5 +1,8 @@
 #include "stdafx.h"
-#include "MbHelpers.h"
+#include "StringConversion.hpp"
+#include <codecvt>
+
+// XXX: use c++11 functions and kill that DUMP_CONVERSION!!!11
 
 #define BITS1_MASK 0x80 // 10000000b
 #define BITS2_MASK 0xC0 // 11000000b
@@ -126,4 +129,22 @@ u16 mbhMulti2Wide(wchar_t* WideStr, wchar_t* WidePos, u16 WideStrSize, const cha
     if (WideStr)
         WideStr[0] = dpos;
     return dpos;
+}
+
+xr_string StringFromUTF8(const char* in, const std::locale& locale /*= std::locale("")*/)
+{
+    using wcvt = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>;
+    auto wstr = wcvt{}.from_bytes(in);
+    xr_string result(wstr.size(), '\0');
+    std::use_facet<std::ctype<wchar_t>>(locale).narrow(wstr.data(), wstr.data() + wstr.size(), '?', &result[0]);
+    return result;
+}
+
+xr_string StringToUTF8(const char* in, const std::locale& locale /*= std::locale("")*/)
+{
+    using wcvt = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>;
+    std::wstring wstr(xr_strlen(in), L'\0');
+    std::use_facet<std::ctype<wchar_t>>(locale).widen(in, in + xr_strlen(in), &wstr[0]);
+    std::string result = wcvt{}.to_bytes(wstr.data(), wstr.data() + wstr.size());
+    return result.data();
 }

@@ -144,7 +144,7 @@ _out _main ( _input I, uint iSample )
 #endif // SM_5
 #else // USE_HDAO
 #ifdef USE_HBAO
-	float occ = calc_hbao( P.z, N.xyz, I.tc0.xy, I.pos2d );
+    float occ = float(calc_hbao(P.z, N.xyz, I.tc0.xy, I.pos2d));
 #else // USE_HBAO
 	float occ = calc_ssao( CS_P(P.xyz, N.xyz, I.tc0.xy, I.tcJ, I.pos2d, ISAMPLE ) );
 #endif

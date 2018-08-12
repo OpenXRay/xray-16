@@ -235,7 +235,6 @@ typedef dirent DirEntryType;
 #define O_SEQUENTIAL 0
 #define SH_DENYWR 0
 
-
 #define itoa SDL_itoa
 #define _itoa_s SDL_itoa
 

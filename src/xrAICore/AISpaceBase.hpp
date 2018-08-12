@@ -25,11 +25,6 @@ protected:
     void patrol_path_storage_raw(IReader& stream);
     void patrol_path_storage(IReader& stream);
     void SetGameGraph(CGameGraph* gameGraph);
-    [[deprecated("This function is deprecated. Use AISpaceBase::SetGameGraph() instead.")]] void game_graph(
-        CGameGraph* g)
-    {
-        SetGameGraph(g);
-    }
 
 public:
     ~AISpaceBase();

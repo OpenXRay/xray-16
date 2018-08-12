@@ -1,3 +1,5 @@
+xrCore/.GitInfo.hpp
+
 # exclude binaries and temporary files
 ipch/
 packages/

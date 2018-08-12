@@ -77,6 +77,13 @@ private:
     void LightDestroy();
 
 protected:
+
+    //Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+    HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
+#endif
+    //-Alundaio
+
     CWalmarkManager m_wallmark_manager;
     // ID персонажа который иницировал действие
     u16 m_iCurrentParentID;

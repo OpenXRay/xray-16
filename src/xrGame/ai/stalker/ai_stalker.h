@@ -75,8 +75,8 @@ class CRestrictedObject;
 
 class CAI_Stalker : public CCustomMonster, public CObjectHandler, public CAI_PhraseDialogManager, public CStepManager
 {
-private:
-    typedef CCustomMonster inherited;
+protected:
+    using inherited = CCustomMonster;
 
 public:
     using inherited::useful;

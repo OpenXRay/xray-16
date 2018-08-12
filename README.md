@@ -1,4 +1,4 @@
-X-Ray Engine 1.6 expansion
+X-Ray Engine 1.6 expansion [![Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)
 ==========================
 
 ### Build Status:
@@ -28,5 +28,5 @@ Pull requests appreciated! However, the following things should be taken into co
 * Major changes should be discussed before implementation
 * Follow the [procedures](doc/procedure)
 
-Be advised that this project is not sanctioned by GSC Game World in any way ? and they remain the copyright holders
+Be advised that this project is not sanctioned by GSC Game World in any way – and they remain the copyright holders
 of all the original source code.

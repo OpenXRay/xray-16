@@ -143,7 +143,7 @@ void CRenderTarget::phase_combine()
 
         // sun-params
         {
-            light* fuckingsun = (light*)RImplementation.Lights.sun_adapted._get();
+            light* fuckingsun = (light*)RImplementation.Lights.sun._get();
             Fvector L_dir, L_clr;
             float L_spec;
             L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
@@ -549,7 +549,7 @@ void CRenderTarget::phase_combine_volumetric()
 
         // sun-params
         {
-            light* fuckingsun = (light*)RImplementation.Lights.sun_adapted._get();
+            light* fuckingsun = (light*)RImplementation.Lights.sun._get();
             Fvector L_dir, L_clr;
             float L_spec;
             L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);

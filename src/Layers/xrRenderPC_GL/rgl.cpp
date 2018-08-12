@@ -127,7 +127,7 @@ void CRender::create()
     m_MSAASample = -1;
 
     // hardware
-    o.smapsize = 2048;
+    o.smapsize = ps_r2_smapsize;
     o.mrt = HW.Caps.raster.dwMRT_count >= 3;
     o.mrtmixdepth = HW.Caps.raster.b_MRT_mixdepth;
 
@@ -369,7 +369,6 @@ void CRender::create()
     //R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[0]));
     //R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[1]));
 
-    xrRender_apply_tf();
     PortalTraverser.initialize();
     //	TODO: OGL: Implement FluidManager.
     //	FluidManager.Initialize( 70, 70, 70 );
@@ -432,7 +431,6 @@ void CRender::reset_end()
 
     Target = new CRenderTarget();
 
-    xrRender_apply_tf();
     //FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 
     // Set this flag true to skip the first render frame,

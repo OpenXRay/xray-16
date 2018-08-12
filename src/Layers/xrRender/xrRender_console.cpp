@@ -100,11 +100,11 @@ float ps_r__ssaDONTSORT = 32.f; // RO
 float ps_r__ssaHZBvsTEX = 96.f; // RO
 
 int ps_r__tf_Anisotropic = 8;
+float ps_r__tf_Mipbias = 0.0f;
 
 // R1
 float ps_r1_ssaLOD_A = 64.f;
 float ps_r1_ssaLOD_B = 48.f;
-float ps_r1_tf_Mipbias = 0.0f;
 Flags32 ps_r1_flags = {R1FLAG_DLIGHTS}; // r1-only
 float ps_r1_lmodel_lerp = 0.1f;
 float ps_r1_dlights_clip = 40.f;
@@ -119,7 +119,6 @@ int ps_r1_SoftwareSkinning = 0; // r1-only
 // R2
 float ps_r2_ssaLOD_A = 64.f;
 float ps_r2_ssaLOD_B = 48.f;
-float ps_r2_tf_Mipbias = 0.0f;
 
 // R2-specific
 Flags32 ps_r2_ls_flags = {R2FLAG_SUN
@@ -190,8 +189,9 @@ Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
 
-float ps_r3_dyn_wet_surf_near = 10.f; // 10.0f
-float ps_r3_dyn_wet_surf_far = 30.f; // 30.0f
+int ps_r3_dyn_wet_surf_opt = 1;
+float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
+float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
 //AVO: detail draw radius
@@ -299,9 +299,10 @@ public:
         if (nullptr == HW.pDevice)
             return;
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-// TODO: DX10: Implement mip bias control
-//VERIFY(!"apply not implmemented.");
+#if defined(USE_OGL)
+            // TODO: OGL: Implement mipmap bias control.
+#elif defined(USE_DX10) || defined(USE_DX11)
+        SSManager.SetMipLODBias(*value);
 #else // USE_DX10
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)value)));
@@ -710,6 +711,7 @@ void xrRender_initconsole()
 
     //CMD4(CCC_Float, "r__detail_density", &ps_r__Detail_density, .05f, 0.99f);
     CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.04f, 0.6f); //AVO: extended from 0.2f to 0.04f and replaced variable
+    CMD3(CCC_Mask, "r2_detail_shadow", &ps_r2_ls_flags, R2FLAG_DETAIL_SHADOW);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
@@ -725,12 +727,12 @@ void xrRender_initconsole()
 #endif // DEBUG
 
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
+    CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
 
     // R1
     CMD4(CCC_Float, "r1_ssa_lod_a", &ps_r1_ssaLOD_A, 16, 96);
     CMD4(CCC_Float, "r1_ssa_lod_b", &ps_r1_ssaLOD_B, 16, 64);
     CMD4(CCC_Float, "r1_lmodel_lerp", &ps_r1_lmodel_lerp, 0, 0.333f);
-    CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r1_tf_Mipbias); // {-3 +3}
     CMD3(CCC_Mask, "r1_dlights", &ps_r1_flags, R1FLAG_DLIGHTS);
     CMD4(CCC_Float, "r1_dlights_clip", &ps_r1_dlights_clip, 10.f, 150.f);
     CMD4(CCC_Float, "r1_pps_u", &ps_r1_pps_u, -1.f, +1.f);
@@ -751,7 +753,6 @@ void xrRender_initconsole()
     // R2
     CMD4(CCC_Float, "r2_ssa_lod_a", &ps_r2_ssaLOD_A, 16, 96);
     CMD4(CCC_Float, "r2_ssa_lod_b", &ps_r2_ssaLOD_B, 32, 64);
-    CMD2(CCC_tf_MipBias, "r2_tf_mipbias", &ps_r2_tf_Mipbias);
 
     // R2-specific
     CMD2(CCC_R2GM, "r2em", &ps_r2_gmaterial);
@@ -787,7 +788,6 @@ void xrRender_initconsole()
 #endif // DEBUG
 
     CMD3(CCC_Mask, "r2_sun", &ps_r2_ls_flags, R2FLAG_SUN);
-    CMD3(CCC_Mask, "r2_sun_details", &ps_r2_ls_flags, R2FLAG_SUN_DETAILS);
     CMD3(CCC_Mask, "r2_sun_focus", &ps_r2_ls_flags, R2FLAG_SUN_FOCUS);
     //CMD3(CCC_Mask, "r2_sun_static", &ps_r2_ls_flags, R2FLAG_SUN_STATIC);
     //CMD3(CCC_Mask, "r2_exp_splitscene", &ps_r2_ls_flags, R2FLAG_EXP_SPLIT_SCENE);
@@ -910,7 +910,8 @@ void xrRender_initconsole()
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
-    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 10, 70);
+    CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_opt", &ps_r3_dyn_wet_surf_opt, 0, 1);
+    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);
     CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 30, 100);
     CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_sm_res", &ps_r3_dyn_wet_surf_sm_res, 64, 2048);
 
@@ -918,16 +919,6 @@ void xrRender_initconsole()
     CMD1(CCC_memory_stats, "render_memory_stats");
 
     //CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
-}
-
-void xrRender_apply_tf()
-{
-    Console->Execute("r__tf_aniso");
-#if RENDER == R_R1
-    Console->Execute("r1_tf_mipbias");
-#else
-    Console->Execute("r2_tf_mipbias");
-#endif
 }
 
 #endif

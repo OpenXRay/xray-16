@@ -100,7 +100,6 @@ void CRender::create()
     PSLibrary.OnCreate();
     //.	HWOCC.occq_create			(occq_size);
 
-    xrRender_apply_tf();
     ::PortalTraverser.initialize();
 }
 
@@ -134,11 +133,17 @@ void CRender::reset_begin()
 
 void CRender::reset_end()
 {
-    xrRender_apply_tf();
     //.	HWOCC.occq_create			(occq_size);
     Target = new CRenderTarget();
     if (L_Projector)
         L_Projector->invalidate();
+
+    // let's reload details while changed details options on vid_restart
+    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    {
+        Details = new CDetailManager();
+        Details->Load();
+    }
 
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
@@ -1032,7 +1037,7 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 0
+#if 1
 	strcpy_s					( result, "" );
 	return						false;
 #else // #if 1

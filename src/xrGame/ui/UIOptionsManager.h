@@ -18,6 +18,7 @@ public:
     void OptionsPostAccept();
     void DoVidRestart();
     void DoSndRestart();
+    void DoUIRestart();
     void DoSystemRestart();
 
     bool NeedSystemRestart() { return 0 != (m_restart_flags & e_system_restart); }
@@ -39,7 +40,8 @@ protected:
     {
         e_vid_restart = (1 << 0),
         e_snd_restart = (1 << 1),
-        e_system_restart = (1 << 2)
+        e_ui_restart = (1 << 2),
+        e_system_restart = (1 << 3)
     };
     u16 m_restart_flags;
 };

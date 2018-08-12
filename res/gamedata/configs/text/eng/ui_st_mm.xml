@@ -504,6 +504,12 @@
 	<string id="ui_mm_gameplay">
 		<text>Game</text>
 	</string>
+	<string id="ui_mm_ui_style">
+		<text>Interface style</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Call of Pripyat</text>
+	</string>
 	<string id="ui_mm_gamma">
 		<text>Gamma</text>
 	</string>
@@ -629,6 +635,18 @@
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces">
 		<text>Wet surfaces</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Wet surfaces optimization</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Wet surfaces near dist.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Wet surfaces far dist.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Wet surfaces quality</text>
 	</string>
 	<string id="ui_mm_r3_gbuffer_opt">
 		<text>Optimize geometric buffer</text>

@@ -56,8 +56,6 @@ static BOOL bException = FALSE;
 
 #ifdef DEBUG
 #define USE_OWN_ERROR_MESSAGE_WINDOW
-#else
-#define USE_OWN_MINI_DUMP
 #endif
 
 #if defined XR_X64
@@ -95,6 +93,7 @@ ICN void* GetInstructionPtr()
 }
 }
 
+// XXX: Probably rename this to AssertionResult?
 enum MessageBoxResult
 {
     resultUndefined = -1,
@@ -169,6 +168,23 @@ int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
     SDL_ShowMessageBox(&messageboxdata, &button);
     return button;
 #endif
+}
+
+SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
+    void* /*userdata*/)
+{
+    if (data->always_ignore)
+        return SDL_ASSERTION_ALWAYS_IGNORE;
+
+    constexpr pcstr desc = "SDL2 assert triggered";
+    bool alwaysIgnore = false;
+    xrDebug::Fail(alwaysIgnore, {data->filename, data->linenum, data->function}, data->condition, desc);
+
+    if (alwaysIgnore)
+        return SDL_ASSERTION_ALWAYS_IGNORE;
+
+    // XXX: change Fail return type from void to 'enum MessageBoxResult'
+    return SDL_ASSERTION_IGNORE;
 }
 
 SDL_Window* xrDebug::applicationWindow = nullptr;
@@ -568,7 +584,7 @@ int out_of_memory_handler(size_t size)
 
 extern LPCSTR log_name();
 
-void xrDebug::PreErrorHandler(INT_PTR)
+void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 {
 #if defined(USE_BUG_TRAP) && defined(WINDOWS)
     if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady))
@@ -609,11 +625,14 @@ void xrDebug::PreErrorHandler(INT_PTR)
 void xrDebug::SetupExceptionHandler(const bool& dedicated)
 {
 #if defined(USE_BUG_TRAP) && defined(WINDOWS)
+    const auto commandLine = GetCommandLine();
+
     // disable 'appname has stopped working' popup dialog
-    UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+    const auto prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
     SetErrorMode(prevMode | SEM_NOGPFAULTERRORBOX);
     BT_InstallSehFilter();
-    if (!dedicated && !strstr(GetCommandLine(), "-silent_error_mode"))
+
+    if (!dedicated && !strstr(commandLine, "-silent_error_mode"))
         BT_SetActivityType(BTA_SHOWUI);
     else
         BT_SetActivityType(BTA_SAVEREPORT);
@@ -627,48 +646,21 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
     BT_SetAppName("X-Ray Engine");
     BT_SetReportFormat(BTRF_TEXT);
     BT_SetFlags(BTF_DETAILEDMODE | BTF_ATTACHREPORT);
+
 #ifdef MASTER_GOLD
-#ifdef _EDITOR // MASTER_GOLD && EDITOR
-    auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs;
-#else // MASTER_GOLD && !EDITOR
-    auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
-#endif
+    auto minidumpFlags = MiniDumpFilterMemory | MiniDumpScanMemory;
+
+    if (strstr(commandLine, "-detailed_minidump"))
+        minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #else
-#ifdef EDITOR // !MASTER_GOLD && EDITOR
-    auto minidumpFlags = MiniDumpWithDataSegs;
-#else // !MASTER_GOLD && !EDITOR
-    auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
+    const auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #endif
-#endif
+    
     BT_SetDumpType(minidumpFlags);
     //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
     BT_SetSupportEMail("openxray@yahoo.com");
 #endif
 }
-
-#ifdef USE_OWN_MINI_DUMP
-void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
-{
-#if defined(WINDOWS)
-    string64 dateStr;
-    timestamp(dateStr);
-    string_path dumpPath;
-    xr_sprintf(dumpPath, sizeof(dumpPath), "%s_%s_%s.mdmp", Core.ApplicationName, Core.UserName, dateStr);
-    __try
-    {
-        if (FS.path_exist("$logs$"))
-            FS.update_path(dumpPath, "$logs$", dumpPath);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        string_path temp;
-        xr_strcpy(temp, dumpPath);
-        xr_sprintf(dumpPath, sizeof(dumpPath), "logs/%s", temp);
-    }
-    WriteMiniDump(MINIDUMP_TYPE(MiniDumpFilterMemory | MiniDumpScanMemory), dumpPath, GetCurrentThreadId(), exPtrs);
-#endif
-}
-#endif
 
 void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 {
@@ -843,8 +835,9 @@ void xrDebug::Initialize(const bool& dedicated)
     OnThreadSpawn();
 #ifdef USE_BUG_TRAP
     SetupExceptionHandler(dedicated);
-#endif
+    SDL_SetAssertionHandler(SDLAssertionHandler, nullptr);
     // exception handler to all "unhandled" exceptions
+#endif
 #if defined(WINDOWS)
     PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);
 #endif

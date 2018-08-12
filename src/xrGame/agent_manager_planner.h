@@ -15,8 +15,8 @@ class IGameObject;
 
 class CAgentManagerPlanner : public CActionPlanner<CAgentManager>
 {
-private:
-    typedef CActionPlanner<CAgentManager> inherited;
+protected:
+    using inherited = CActionPlanner<CAgentManager>;
 
 public:
     virtual void setup(CAgentManager* object);

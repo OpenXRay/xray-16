@@ -4,8 +4,8 @@
 #include "xrCore/xr_token.h"
 #include "xrCDB/xrXRC.h"
 #include "XR_IOConsole.h"
-#include <SDL.h>
-#include <SDL_syswm.h>
+#include "SDL.h"	
+#include "SDL_syswm.h"
 
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;
@@ -80,16 +80,18 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 
     if (windowed)
     {
+        // Get the maximal available resolution (penultimate token in VidModesToken)
         u32 width, height;
-        sscanf(VidModesToken.back().name, "%dx%d", &width, &height);
+        sscanf(VidModesToken[VidModesToken.size() - 2].name, "%dx%d", &width, &height);
 
         const bool drawBorders = strstr(Core.Params, "-draw_borders");
 
-        bool desktopResolution = false;
+        bool maximalResolution = false;
         if (b_is_Ready && !drawBorders && psCurrentVidMode[0] == width && psCurrentVidMode[1] == height)
-            desktopResolution = true;
+            maximalResolution = true;
 
-        SDL_SetWindowFullscreen(m_sdlWnd, desktopResolution ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+        // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
+        SDL_SetWindowFullscreen(m_sdlWnd, maximalResolution ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
         SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
         SDL_SetWindowBordered(m_sdlWnd, drawBorders ? SDL_TRUE : SDL_FALSE);
     }
@@ -225,6 +227,8 @@ void FillVidModesToken(u32 monitorID)
     R_ASSERT3(modeCount > 0, "Failed to find display modes", SDL_GetError());
     modes.reserve(modeCount + 1);
 
+    Msg("Available video modes[%d]:", modes.size());
+
     SDL_DisplayMode displayMode;
     for (int i = modeCount - 1; i >= 0; --i)
     {
@@ -234,7 +238,10 @@ void FillVidModesToken(u32 monitorID)
         xr_sprintf(str, sizeof(str), "%dx%d", displayMode.w, displayMode.h);
 
         if (modes.cend() == std::find_if(modes.cbegin(), modes.cend(), uniqueRenderingMode(str)))
+        {
             modes.emplace_back(xr_strdup(str), i);
+            Msg("[%s]", str);
+        }
 
         // For the first time we can fill refresh rate token here
         if (displayMode.w == psCurrentVidMode[0] && displayMode.h == psCurrentVidMode[1])
@@ -245,11 +252,8 @@ void FillVidModesToken(u32 monitorID)
         }
     }
 
+    modes.emplace_back(nullptr, -1);
     rates.emplace_back(nullptr, -1);
-
-    Msg("Available video modes[%d]:", modes.size());
-    for (const auto& mode : modes)
-        Msg("[%s]", mode.name);
 }
 
 void FillRefreshRateToken()

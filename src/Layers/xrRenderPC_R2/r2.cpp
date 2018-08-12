@@ -328,7 +328,6 @@ void CRender::create()
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         R_CHK(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT, &q_sync_point[i]));
 
-    xrRender_apply_tf();
     ::PortalTraverser.initialize();
 }
 
@@ -403,8 +402,6 @@ void CRender::reset_end()
         Details->Load();
     }
     //-AVO
-
-    xrRender_apply_tf();
 
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
@@ -1182,7 +1179,7 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 0
+#if 1
 	strcpy_s					( result, "" );
 	return						false;
 #else // #if 1

@@ -83,7 +83,11 @@ xrServer::~xrServer()
 
 CSE_Abstract* xrServer::ID_to_entity(u16 ID)
 {
-    // #pragma todo("??? to all : ID_to_entity - must be replaced to 'game->entity_from_eid()'")
+    // XXX: research this situation. Do we need this?
+    // game->entity_from_eid() calls this function anyway
+
+    #pragma todo("??? to all : ID_to_entity - must be replaced to 'game->entity_from_eid()'")
+
     if (0xffff == ID)
         return 0;
     xrS_entities::iterator I = entities.find(ID);

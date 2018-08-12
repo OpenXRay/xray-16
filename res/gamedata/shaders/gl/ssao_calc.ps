@@ -12,18 +12,20 @@ Texture2D s_half_depth;
 #include "ssao_hbao.ps"
 #endif	//	USE_HBAO
 
+out float4 SV_Target;
+
 struct	_input
 {
-	float4	tc0		: TEXCOORD0;	// tc.xy, tc.w = tonemap scale
-	float2	tcJ		: TEXCOORD1;	// jitter coords
-	float4	pos2d	: SV_Position;
+    float4 tc0;   // : TEXCOORD0; // tc.xy, tc.w = tonemap scale
+    float2 tcJ;   // : TEXCOORD1; // jitter coords
+    float4 pos2d; // : SV_Position;
 };
 
-float4 main ( _input I 
+void _main (_input I
 #ifdef	MSAA_OPTIMIZATION	
-	,uint	iSample	: SV_SAMPLEINDEX
-#endif	//	MSAA_OPTIMIZATION	
-) : SV_Target0
+    , uint iSample : SV_SAMPLEINDEX
+#endif
+)
 {
 	gbuffer_data gbd0 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
 	gbuffer_data gbd1 = gbuffer_load_data( GLD_P(I.tc0.xy - 0.5f * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
@@ -51,11 +53,11 @@ float4 main ( _input I
 	float4	N = float4( gbd0.N, gbd0.hemi );		// normal.hemi
 
 #ifndef USE_HBAO
-	float occ = calc_ssao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE) );
+	float occ = calc_ssao( CS_P(P, N, float2(I.tc0), float2(I.tcJ), I.pos2d, ISAMPLE) );
 #else
 	//	Is not supported now
 	float occ = 1.0f;//hbao_calc(P, N, I.tc0, I.pos2d);
 #endif
 
-	return  float4(occ, occ, occ, occ);
+	SV_Target = float4(occ, occ, occ, occ);
 }

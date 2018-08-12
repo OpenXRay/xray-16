@@ -140,6 +140,8 @@ public:
     virtual void on_b_hud_detach();
     IC BOOL HudInertionEnabled() const { return m_huditem_flags.test(fl_inertion_enable); }
     IC BOOL HudInertionAllowed() const { return m_huditem_flags.test(fl_inertion_allow); }
+    virtual float GetInertionFactor() { return 1.f; }; //--#SM+#--
+    virtual float GetInertionPowerFactor() { return 1.f; }; //--#SM+#--
     virtual void render_hud_mode(){};
     virtual bool need_renderable() { return true; };
     virtual void render_item_3d_ui() {}

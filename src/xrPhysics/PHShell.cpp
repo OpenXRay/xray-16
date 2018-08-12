@@ -1410,10 +1410,10 @@ void CPHShell::SetIgnoreStatic() { CPHCollideValidator::SetStaticNotCollide(*thi
 void CPHShell::SetIgnoreDynamic() { CPHCollideValidator::SetDynamicNotCollide(*this); }
 void CPHShell::SetRagDoll() { CPHCollideValidator::SetRagDollClass(*this); }
 void CPHShell::SetIgnoreRagDoll() { CPHCollideValidator::SetRagDollClassNotCollide(*this); }
-//Делает данный физический объек анимированным
+//Makes this physical object animated
 void CPHShell::CreateShellAnimator(CInifile const* ini, LPCSTR section)
 {
-    //Для фильтра коллизий относим данный объект к классу анимированных
+    //For the collision filter, we refer this object to the class of animated objects
     CPHCollideValidator::SetAnimatedClass(*this);
     m_pPhysicsShellAnimatorC = new CPhysicsShellAnimator(this, ini, section);
     VERIFY(PhysicsRefObject());
@@ -1421,17 +1421,17 @@ void CPHShell::CreateShellAnimator(CInifile const* ini, LPCSTR section)
     // m_pPhysicsShellAnimatorC->ResetCallbacks();
 }
 
-//Настраивает фильтр коллизий на игнорирование столкновенний данного
-//физического объекта с анимированным физическим объектом
+//Configures the collision filter to ignore the collision
+//of this physical object with an animated physical object
 void CPHShell::SetIgnoreAnimated()
 {
-    //Для фильтра коллизий указываем, что данный
-    //физический объект игнорирует анимированные физические тела
+    //For the collision filter, we indicate that this
+    //physical object ignores the animated physical objects (bodies)
 
     CPHCollideValidator::SetAnimatedClassNotCollide(*this);
 }
 
-//Выдает информацию о том является ли данный объект анимированным
+//Displays information about whether the object is animated
 
 void CPHShell::SetSmall() { CPHCollideValidator::SetClassSmall(*this); }
 void CPHShell::SetIgnoreSmall() { CPHCollideValidator::SetClassSmallNotCollide(*this); }

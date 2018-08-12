@@ -25,7 +25,7 @@
 #include "Include/editor/interfaces.hpp"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
-#include <SDL.h>
+#include "SDL.h"
 
 class engine_impl;
 
@@ -164,7 +164,9 @@ private:
 
 public:
     SDL_Window* m_sdlWnd;
-
+#if defined(WINDOWS)
+    LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
+#endif
     // u32 dwFrame;
     // u32 dwPrecacheFrame;
     u32 dwPrecacheTotal;

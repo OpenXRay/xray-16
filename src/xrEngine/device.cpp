@@ -12,7 +12,7 @@
 #if defined(WINDOWS)
 #include <mmsystem.h>
 #endif
-#include <SDL.h>
+#include "SDL.h"
 #pragma warning(pop)
 
 #include "x_ray.h"

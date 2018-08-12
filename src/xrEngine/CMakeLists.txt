@@ -31,4 +31,4 @@ add_definitions(-DENGINE_BUILD)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath luabind xrAPI xrSound xrScriptEngine ${LUA_LIBRARIES} theora ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARY} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath luabind xrAPI xrSound xrScriptEngine ${LUA_LIBRARIES} ${THEORA_LIBRARY} ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARY} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES})

@@ -8,7 +8,7 @@
 #include "xr_Level_controller.h"
 #include "ui\UITextureMaster.h"
 #include "ui\UIXmlInit.h"
-#include <SDL.h>
+#include "SDL.h"
 #include "ui\UIBtnHint.h"
 #include "UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
@@ -150,15 +150,13 @@ CMainMenu::~CMainMenu()
 
 void CMainMenu::ReadTextureInfo()
 {
+    string_path buf;
     FS_FileSet fset;
-    FS.file_list(fset, "$game_config$", FS_ListFiles, "ui\\textures_descr\\*.xml");
-    auto fit = fset.begin();
-    auto fit_e = fset.end();
-
-    for (; fit != fit_e; ++fit)
+    FS.file_list(fset, "$game_config$", FS_ListFiles, strconcat(sizeof(buf), buf, UI_PATH, "\\", "textures_descr\\*.xml"));
+    for (const auto& file : fset)
     {
         string_path fn1, fn2, fn3;
-        _splitpath((*fit).name.c_str(), fn1, fn2, fn3, 0);
+        _splitpath(file.name.c_str(), fn1, fn2, fn3, 0);
         xr_strcat(fn3, ".xml");
 
         CUITextureMaster::ParseShTexInfo(fn3);
@@ -353,6 +351,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
+        SDL_SetWindowOpacity(Device.m_sdlWnd, 0.9f);
     }
 
     if (SDL_SCANCODE_F12 == dik)
@@ -373,6 +372,7 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
+        SDL_SetWindowOpacity(Device.m_sdlWnd, 1.f);
     }
 
 

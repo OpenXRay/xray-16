@@ -5,6 +5,8 @@
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_stack.h"
 
+extern pcstr UI_PATH;
+
 class CUICursor;
 class CUIGameCustom;
 

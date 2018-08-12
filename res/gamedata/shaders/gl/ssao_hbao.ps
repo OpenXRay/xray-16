@@ -45,8 +45,8 @@ const float M_PI = 3.1415926f;
 //----------------------------------------------------------------------------------
 struct PostProc_VSOut
 {
-    float4 pos   : SV_Position;
-    float2 texUV : TEXCOORD0;
+    float4 pos;   // : SV_Position;
+    float2 texUV; // : TEXCOORD0;
 };
 
 //----------------------------------------------------------------------------------
@@ -315,9 +315,10 @@ float horizon_occlusion2_4way(float2 deltaUV0,
         float4 r    = sqrt( d2_3 ) * g_inv_R.xxxx;
         float4 fo   = float4( falloff( r.x ), falloff( r.y ),
                               falloff( r.z ), falloff( r.w ) );
-        float4 flag = ( d2_3 < g_sqr_R.xxxx ? float4(1.0f).xxxx : float4(0.0f).xxxx );
+
+        float4 flag = (d2_3 < g_sqr_R.xxxx) ? float4(1.0f).xxxx : float4(0.0f).xxxx;
         
-        flag *= ( tanS3 > tanH3  ? float4(1.0f).xxxx : float4(0.0f).xxxx );
+        flag *= (tanS3 > tanH3) ? float4(1.0f).xxxx : float4(0.0f).xxxx;
         
         ao3  += dot( flag, fo * ( sinS - sinH3 ) );
         tanH3 = ( flag > float4(0.0f).xxxx ? tanS3 : tanH3 );
@@ -340,7 +341,7 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
 
 // (cos(alpha),sin(alpha),jitter)
 #ifndef HBAO_WORLD_JITTER
-    float3 rand_Dir = texelFetch(jitter4, int2(int(pos2d.x&63), int(pos2d.y&63)), 0).xyz;
+    float3 rand_Dir = texelFetch(jitter4, int2(int(pos2d.x) & 63, int(pos2d.y) & 63), 0).xyz;
 #else
     float3 tc1	= mul( m_v2w, float4(P,1) );
     tc1 *= ssao_noise_tile_factor;
@@ -350,13 +351,13 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
 
 
 	// footprint optimization
-	float maxNumSteps = g_MaxFootprintUV / step_size;
+    float maxNumSteps = g_MaxFootprintUV / float(step_size);
 	if (maxNumSteps < numSteps)
 	{
 		numSteps = floor(maxNumSteps + rand_Dir.z);
         	numSteps = max(numSteps, 1);
-	        step_size = g_MaxFootprintUV / numSteps;
-    	}
+        step_size = float2(g_MaxFootprintUV / numSteps);
+    }
 
     float4 tangentPlane = float4(N, dot(P, N));
     float3 Pr = tangent_eye_pos(tc0 + float2(g_InvResolution.x, 0), tangentPlane);
@@ -369,11 +370,11 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
 
     
     // Loop for all directions
-    float ao4 = 0;
+    float ao4 = 0.f;
     float alpha = 2.0f * M_PI / g_NumDir;
     float delta = g_NumDir / numDirs;
     
-    int   iNumDir = ceil( int( g_NumDir / delta ) );
+    int iNumDir = int(ceil(g_NumDir / delta));
     
 #ifndef VECTORIZED_CODE    
     for (int i = 0; i < iNumDir; ++i ) {  
@@ -431,7 +432,7 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
 
 	float WeaponAttenuation = smoothstep( 0.8, 0.9, length( P.xyz ));
 
-    return 1.0 - ao4 / g_NumDir * (g_Contrast*WeaponAttenuation);
+    return float4(1.0 - ao4 / g_NumDir * (g_Contrast * WeaponAttenuation));
 }
 
 #endif	//	SSAO_QUALITY

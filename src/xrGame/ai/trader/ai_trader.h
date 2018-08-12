@@ -23,7 +23,8 @@ class CTraderAnimation;
 
 class CAI_Trader : public CEntityAlive, public CInventoryOwner, public CScriptEntity, public CAI_PhraseDialogManager
 {
-    typedef CEntityAlive inherited;
+protected:
+    using inherited = CEntityAlive;
 
 private:
     bool m_busy_now;

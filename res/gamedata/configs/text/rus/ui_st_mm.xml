@@ -504,6 +504,12 @@
 	<string id="ui_mm_gameplay">
 		<text>Игра</text>
 	</string>
+	<string id="ui_mm_ui_style">
+		<text>Стиль интерфейса</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Зов Припяти</text>
+	</string>
 	<string id="ui_mm_gamma">
 		<text>Гамма</text>
 	</string>
@@ -532,7 +538,7 @@
 		<text>Загрузить игру</text>
 	</string>
 	<string id="ui_mm_loadingstages">
-		<text>Показывать стадии загрузки</text>
+		<text>Стадии загрузки</text>
 	</string>
 	<string id="ui_mm_logout">
 		<text>Выйти из профиля</text>
@@ -629,6 +635,18 @@
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces">
 		<text>Намокание плоскостей</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Оптимизация намокания</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Намокание вблизи</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Намокание вдали</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Качество намокания</text>
 	</string>
 	<string id="ui_mm_r3_gbuffer_opt">
 		<text>Оптимизировать геометр. буфер</text>

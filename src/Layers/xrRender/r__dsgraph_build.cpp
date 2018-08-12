@@ -837,15 +837,16 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-//  TODO: DX10: Implement Resetting of render states into default mode
-// VERIFY(!"D3DXRenderBase::SetupStates not implemented.");
+#if defined(USE_OGL)
+    // TODO: OGL: Implement SetupStates().
+#elif defined(USE_DX10) || defined(USE_DX11)
+    SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);
+    SSManager.SetMipLODBias(ps_r__tf_Mipbias);
 #else //    USE_DX10
     for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
     {
-        float fBias = -.5f;
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, 4));
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *(LPDWORD)&fBias));
+        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, ps_r__tf_Anisotropic));
+        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *(LPDWORD)&ps_r__tf_Mipbias));
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR));
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR));
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR));

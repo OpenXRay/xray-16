@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xr_3da/resource.h"
-#include <SDL.h>
+#include "SDL.h"
 
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
