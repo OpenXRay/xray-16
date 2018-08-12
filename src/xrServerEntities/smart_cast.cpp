@@ -6,7 +6,7 @@
 //	Description : Smart dynamic cast
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #ifndef PURE_DYNAMIC_CAST
 #ifdef XRGAME_EXPORTS

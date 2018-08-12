@@ -6,7 +6,7 @@
 //	Description : ALife monster brain class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_monster_brain.h"
 #include "Common/object_broker.h"
 #include "xrServer_Objects_ALife_Monsters.h"
@@ -137,15 +137,15 @@ void CALifeMonsterBrain::select_task(const bool forced)
 void CALifeMonsterBrain::update(const bool forced)
 {
 #if 0 // def DEBUG
-	if (!Level().MapManager().HasMapLocation("debug_stalker",object().ID)) {
-		CMapLocation				*map_location = 
-			Level().MapManager().AddMapLocation(
-				"debug_stalker",
-				object().ID
-			);
+    if (!Level().MapManager().HasMapLocation("debug_stalker",object().ID)) {
+        CMapLocation				*map_location =
+            Level().MapManager().AddMapLocation(
+                "debug_stalker",
+                object().ID
+            );
 
-		map_location->SetHint		(object().name_replace());
-	}
+        map_location->SetHint		(object().name_replace());
+    }
 #endif
 
     select_task(forced);

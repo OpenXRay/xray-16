@@ -6,7 +6,7 @@
 //	Description : Server base object
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_Objects.h"
 #include "xrMessages.h"
 #include "game_base_space.h"

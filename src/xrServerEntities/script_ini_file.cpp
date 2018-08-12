@@ -6,7 +6,7 @@
 //	Description : Script ini file class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
