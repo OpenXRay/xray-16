@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "interactive_animation.h"
 
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/ExtendedGeom.h"
-#include "xrPhysics/mathutils.h"
+#include "xrPhysics/MathUtils.h"
 
 #include "Include/xrRender/KinematicsAnimated.h"
 

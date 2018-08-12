@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIAchivementsIndicator.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIGameLog.h"

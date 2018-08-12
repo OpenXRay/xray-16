@@ -1,5 +1,5 @@
 #pragma once
-#include "ai/Monsters/control_combase.h"
+#include "ai/monsters/control_combase.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 
 class CPsyHitEffectorCam;

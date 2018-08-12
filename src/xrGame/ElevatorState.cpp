@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ElevatorState.h"
 #include "ClimableObject.h"
 #include "PHCharacter.h"

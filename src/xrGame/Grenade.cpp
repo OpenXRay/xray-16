@@ -1,16 +1,16 @@
-#include "stdafx.h"
-#include "grenade.h"
+#include "StdAfx.h"
+#include "Grenade.h"
 #include "xrPhysics/PhysicsShell.h"
 //.#include "WeaponHUD.h"
-#include "entity.h"
+#include "Entity.h"
 #include "ParticlesObject.h"
-#include "actor.h"
-#include "inventory.h"
+#include "Actor.h"
+#include "Inventory.h"
 #include "Level.h"
-#include "xrmessages.h"
+#include "xrMessages.h"
 #include "xr_level_controller.h"
 #include "game_cl_base.h"
-#include "xrserver_objects_alife.h"
+#include "xrServer_Objects_ALife.h"
 
 #define GRENADE_REMOVE_TIME 30000
 const float default_grenade_detonation_threshold_hit = 100;

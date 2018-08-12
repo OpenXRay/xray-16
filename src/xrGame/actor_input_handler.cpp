@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "actor_input_handler.h"
-#include "actor.h"
+#include "Actor.h"
 #include "Level.h"
 
 void CActorInputHandler::reinit() { m_actor = 0; }

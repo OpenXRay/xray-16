@@ -1,11 +1,11 @@
 #include "pch_script.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
-#include "xrEngine/customhud.h"
-#include "xrEngine/fdemorecord.h"
-#include "xrEngine/fdemoplay.h"
+#include "xrEngine/CustomHUD.h"
+#include "xrEngine/FDemoRecord.h"
+#include "xrEngine/FDemoPlay.h"
 #include "xrMessages.h"
-#include "xrserver.h"
+#include "xrServer.h"
 #include "Level.h"
 #include "xrScriptEngine/script_debugger.hpp"
 #include "ai_debug.h"
@@ -13,20 +13,20 @@
 #include "game_cl_base.h"
 #include "game_cl_single.h"
 #include "game_sv_single.h"
-#include "hit.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
-#include "actor.h"
+#include "Actor.h"
 #include "Actor_Flags.h"
-#include "customzone.h"
+#include "CustomZone.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrScriptEngine/script_process.hpp"
 #include "xrServer_Objects.h"
 #include "ui/UIMainIngameWnd.h"
-#include "xrPhysics/iphworld.h"
+#include "xrPhysics/IPHWorld.h"
 #include "string_table.h"
 #include "autosave_manager.h"
 #include "ai_space.h"
-#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "date_time.h"
 #include "mt_config.h"
 #include "ui/UIOptConCom.h"
@@ -40,7 +40,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrNetServer/NET_Messages.h"
 
-#include "cameralook.h"
+#include "CameraLook.h"
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
 
@@ -516,10 +516,10 @@ public:
     virtual void Execute(LPCSTR args)
     {
 #if 0
-		if (!Level().autosave_manager().ready_for_autosave()) {
-			Msg		("! Cannot save the game right now!");
-			return;
-		}
+        if (!Level().autosave_manager().ready_for_autosave()) {
+            Msg		("! Cannot save the game right now!");
+            return;
+        }
 #endif
         if (!IsGameTypeSingle())
         {

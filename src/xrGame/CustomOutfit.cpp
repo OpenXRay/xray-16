@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "customoutfit.h"
+#include "CustomOutfit.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "inventory_space.h"
 #include "Inventory.h"
@@ -189,7 +189,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
 }
 
 BOOL CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection->getBonePassBullet(s16(boneID)); }
-#include "torch.h"
+#include "Torch.h"
 void CCustomOutfit::OnMoveToSlot(const SInvItemPlace& prev)
 {
     if (m_pInventory)

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "monster_corpse_manager.h"
 #include "BaseMonster/base_monster.h"
 #include "xrAICore/Navigation/ai_object_location.h"

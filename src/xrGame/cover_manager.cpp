@@ -6,7 +6,7 @@
 //	Description : Cover manager class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "tbb/parallel_for.h"
 #include "tbb/blocked_range.h"
 #include "xrAICore/Navigation/level_graph.h"

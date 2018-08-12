@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai/monsters/control_path_builder_base.h"
 #include "BaseMonster/base_monster.h"
 #include "xrAICore/Navigation/level_graph.h"

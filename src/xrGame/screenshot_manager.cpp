@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "screenshot_manager.h"
 #include "Level.h"
 #include "game_cl_mp.h"

@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include "xrEngine/engineapi.h"
-#include "xrCDB/ispatial.h"
-#include "xrEngine/isheduled.h"
-#include "xrEngine/irenderable.h"
-#include "xrEngine/icollidable.h"
+#include "xrEngine/EngineAPI.h"
+#include "xrCDB/ISpatial.h"
+#include "xrEngine/ISheduled.h"
+#include "xrEngine/IRenderable.h"
+#include "xrEngine/ICollidable.h"
 #include "xrEngine/xr_object.h"
-#include "entity.h"
+#include "Entity.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include <loki/typelist.h>
-#include <loki/hierarchygenerators.h>
+#include <loki/Typelist.h>
+#include <loki/HierarchyGenerators.h>
 #include "xrServer_Object_Base.h"
 
 template <typename _1, typename _2>

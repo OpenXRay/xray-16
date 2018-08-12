@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "uiscrollbar.h"
 #include "UI3tButton.h"
 #include "UIScrollBox.h"

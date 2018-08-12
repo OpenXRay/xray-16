@@ -1,11 +1,11 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIMPServerAdm.h"
 #include "UIXmlInit.h"
 #include "UI3tButton.h"
 #include "UIEditBox.h"
 #include "UISpinNum.h"
 #include "UICheckButton.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "UIDialogWnd.h"
 
 CUIMpServerAdm::CUIMpServerAdm()

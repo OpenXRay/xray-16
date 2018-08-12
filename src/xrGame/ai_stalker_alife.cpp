@@ -6,18 +6,18 @@
 //	Description : Stalker ALife functions
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai/stalker/ai_stalker.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "alife_space.h"
-#include "inventory.h"
-#include "pda.h"
+#include "Inventory.h"
+#include "PDA.h"
 #include "eatable_item.h"
 #include "medkit.h"
-#include "weapon.h"
+#include "Weapon.h"
 #include "Grenade.h"
-#include "customdetector.h"
+#include "CustomDetector.h"
 #include "ef_storage.h"
 #include "ef_primary.h"
 #include "ef_pattern.h"

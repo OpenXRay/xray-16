@@ -8,12 +8,12 @@
 
 #include "pch_script.h"
 #include "danger_manager.h"
-#include "custommonster.h"
+#include "CustomMonster.h"
 #include "memory_space.h"
 #include "xrEngine/profiler.h"
 #include "memory_manager.h"
 #include "enemy_manager.h"
-#include "actor.h"
+#include "Actor.h"
 #include "Common/object_broker.h"
 
 struct CDangerPredicate

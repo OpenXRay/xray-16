@@ -10,7 +10,7 @@
 #define AIMERS_BONE_H_INCLUDED
 
 #include "aimers_base.h"
-#include "Include/xrRender/kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "animation_movement_controller.h"
 #include "game_object_space.h"
 

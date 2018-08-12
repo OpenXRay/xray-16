@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "player_state_achilles_heel.h"
 #include "game_state_accumulator.h"
 #include "game_cl_base.h"

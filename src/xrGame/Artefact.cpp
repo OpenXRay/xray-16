@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "artefact.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "PhysicsShellHolder.h"
@@ -7,11 +7,11 @@
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 
-#include "inventory.h"
+#include "Inventory.h"
 #include "Level.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrServer_Objects_ALife_Monsters.h"
-#include "xrPhysics/iphworld.h"
+#include "xrPhysics/IPHWorld.h"
 #include "restriction_space.h"
 #include "xrEngine/IGame_Persistent.h"
 

@@ -6,7 +6,7 @@
 //	Description : Stalker animation manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_animation_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_animation_data_storage.h"

@@ -8,8 +8,8 @@
 /////////////////////////////////////////////////////
 #pragma once
 
-#include "gravizone.h"
-#include "telewhirlwind.h"
+#include "GraviZone.h"
+#include "TeleWhirlwind.h"
 #include "PhysicsShellHolder.h"
 #include "PHDestroyable.h"
 

@@ -6,10 +6,10 @@
 //	Description : Item manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "item_manager.h"
 #include "inventory_item.h"
-#include "custommonster.h"
+#include "CustomMonster.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "restricted_object.h"

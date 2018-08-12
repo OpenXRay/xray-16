@@ -6,9 +6,9 @@
 //	Description : XRay Script effector class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "script_effector.h"
-#include "actor.h"
+#include "Actor.h"
 #include "ActorEffector.h"
 
 CScriptEffector::~CScriptEffector() { Msg("CScriptEffector::~CScriptEffector() called"); }

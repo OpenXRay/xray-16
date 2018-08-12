@@ -17,7 +17,7 @@
 #include "trade_parameters.h"
 #include "inventory_item_object.h"
 #include "string_table.h"
-#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "UIGameSP.h"

@@ -6,7 +6,7 @@
 //	Description : rat state manager class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "rat_state_manager.h"
 #include "Common/object_broker.h"
 #include "rat_state_base.h"

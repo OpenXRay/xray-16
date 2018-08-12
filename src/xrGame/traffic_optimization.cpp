@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "traffic_optimization.h"
 
 namespace compression

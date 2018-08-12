@@ -6,7 +6,7 @@
 //	Description : ALife trader abstract class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "alife_simulator.h"
 #include "specific_character.h"

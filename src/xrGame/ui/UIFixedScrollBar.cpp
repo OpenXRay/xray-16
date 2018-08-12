@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "UIFixedScrollbar.h"
+#include "StdAfx.h"
+#include "UIFixedScrollBar.h"
 #include "UI3tButton.h"
 #include "UIFrameLineWnd.h"
 #include "UIScrollBox.h"

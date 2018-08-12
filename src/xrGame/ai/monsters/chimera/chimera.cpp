@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "chimera.h"
 #include "chimera_state_manager.h"
 #include "detail_path_manager.h"

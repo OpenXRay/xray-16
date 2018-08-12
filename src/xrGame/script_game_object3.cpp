@@ -17,9 +17,9 @@
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_animation_manager.h"
 #include "stalker_planner.h"
-#include "weapon.h"
-#include "inventory.h"
-#include "customzone.h"
+#include "Weapon.h"
+#include "Inventory.h"
+#include "CustomZone.h"
 #include "patrol_path_manager.h"
 #include "object_handler_planner.h"
 #include "object_handler_space.h"
@@ -32,7 +32,7 @@
 #include "movement_manager_space.h"
 #include "detail_path_manager_space.h"
 #include "level_debug.h"
-#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "trade_parameters.h"
 #include "script_ini_file.h"
 #include "sound_player.h"
@@ -47,7 +47,7 @@
 #include "player_hud.h"
 #include "eatable_item.h"
 #include "script_callback_ex.h"
-#include "xrEngine/feel_touch.h"
+#include "xrEngine/Feel_Touch.h"
 #endif
 //-Alundaio
 

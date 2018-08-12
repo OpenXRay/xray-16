@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "configs_dumper.h"
 #include "configs_common.h"
 #include "xrCore/Compression/ppmd_compressor.h"
@@ -7,8 +7,8 @@
 #include "GameObject.h"
 #include "Level.h"
 #include "actor_mp_client.h"
-#include "inventory.h"
-#include "weapon.h"
+#include "Inventory.h"
+#include "Weapon.h"
 #include "game_cl_mp.h"
 
 namespace mp_anticheat

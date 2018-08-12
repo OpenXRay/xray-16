@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "PHCollisionDamageReceiver.h"
 #include "PhysicObject.h"
-#include "hit.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
 #include "hit_immunity.h"
 #include "damage_manager.h"

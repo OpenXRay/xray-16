@@ -6,7 +6,7 @@
 //	Description : ALife spawn registry
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_spawn_registry.h"
 #include "Common/object_broker.h"
 #include "game_base.h"

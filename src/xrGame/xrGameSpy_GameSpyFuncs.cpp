@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrGameSpyServer.h"
 #include "xrMessages.h"
 #include "gamespy/GameSpy_QR2_callbacks.h"

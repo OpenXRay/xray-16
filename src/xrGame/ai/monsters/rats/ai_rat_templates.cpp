@@ -6,8 +6,8 @@
 //	Description : Templates for monster "Rat"
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "ai/Monsters/rats/ai_rat.h"
+#include "StdAfx.h"
+#include "ai/monsters/rats/ai_rat.h"
 #include "ai/ai_monsters_misc.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "magic_box3.h"
@@ -22,8 +22,8 @@
 #include "restricted_object.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "debug_renderer.h"
-#include "ai/Monsters/ai_monster_squad_manager.h"
-#include "ai/Monsters/ai_monster_squad.h"
+#include "ai/monsters/ai_monster_squad_manager.h"
+#include "ai/monsters/ai_monster_squad.h"
 
 IC bool CAI_Rat::bfCheckIfOutsideAIMap(Fvector& tTemp1)
 {

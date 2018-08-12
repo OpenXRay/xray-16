@@ -6,8 +6,8 @@
 #define HangingLampH
 #pragma once
 
-#include "gameobject.h"
-#include "physicsshellholder.h"
+#include "GameObject.h"
+#include "PhysicsShellHolder.h"
 #include "PHSkeleton.h"
 
 // refs

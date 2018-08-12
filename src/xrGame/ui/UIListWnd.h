@@ -1,9 +1,9 @@
 #pragma once
-#include "uiwindow.h"
-#include "uilistitem.h"
-#include "uiscrollbar.h"
+#include "UIWindow.h"
+#include "UIListItem.h"
+#include "UIScrollBar.h"
 
-#include "../../xrServerEntities/script_export_space.h"
+#include "../../xrServerEntities/script_export_space.h"  // Unexisting file !?!?
 
 #define DEFAULT_ITEM_HEIGHT 30
 

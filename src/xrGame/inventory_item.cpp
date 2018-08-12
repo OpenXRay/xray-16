@@ -9,9 +9,9 @@
 #include "pch_script.h"
 #include "inventory_item.h"
 #include "inventory_item_impl.h"
-#include "inventory.h"
+#include "Inventory.h"
 
-#include "physicsshellholder.h"
+#include "PhysicsShellHolder.h"
 #include "entity_alive.h"
 #include "Level.h"
 #include "game_cl_base.h"

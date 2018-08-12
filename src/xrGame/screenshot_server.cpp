@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "screenshot_server.h"
 #include "xrMessages.h"
 #include "Level.h"

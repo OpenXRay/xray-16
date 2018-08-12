@@ -6,11 +6,11 @@
 //	Description : XRay Script sound class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "script_sound.h"
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
-#include "gameobject.h"
+#include "GameObject.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 

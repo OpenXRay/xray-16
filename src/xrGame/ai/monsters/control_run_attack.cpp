@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_run_attack.h"
 #include "BaseMonster/base_monster.h"
 #include "monster_velocity_space.h"

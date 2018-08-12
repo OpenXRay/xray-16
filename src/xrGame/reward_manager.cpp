@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "reward_manager.h"
 #include "game_cl_mp.h"
 #include "UIGameMP.h"

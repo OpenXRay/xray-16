@@ -2,12 +2,12 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "spectator.h"
+#include "StdAfx.h"
+#include "Spectator.h"
 #include "effectorfall.h"
 #include "CameraLook.h"
 #include "spectator_camera_first_eye.h"
-#include "actor.h"
+#include "Actor.h"
 #include "xrServer_Objects.h"
 #include "game_cl_base.h"
 #include "Level.h"
@@ -18,7 +18,7 @@
 #include "group_hierarchy_holder.h"
 #include "xrEngine/CameraManager.h"
 #include "Inventory.h"
-#include "huditem.h"
+#include "HudItem.h"
 #include "game_cl_mp.h"
 #include "string_table.h"
 #include "map_manager.h"

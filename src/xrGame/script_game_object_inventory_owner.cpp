@@ -28,9 +28,9 @@
 #include "ui/UItalkWnd.h"
 #include "Inventory.h"
 #include "InfoPortion.h"
-#include "AI/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "WeaponMagazined.h"
-#include "Ai/Stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "stalker_animation_manager.h"
@@ -53,7 +53,7 @@
 #include "inventory_item.h"
 #include "CustomOutfit.h"
 #include "inventory_item_impl.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServerEntities/inventory_space.h"
 //-Alundaio
@@ -761,7 +761,7 @@ LPCSTR CScriptGameObject::sound_voice_prefix() const
     return pInventoryOwner->SpecificCharacter().sound_voice_prefix();
 }
 
-#include "GameTaskManager.h"
+#include "GametaskManager.h"
 ETaskState CScriptGameObject::GetGameTaskState(LPCSTR task_id)
 {
     shared_str shared_name = task_id;

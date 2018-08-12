@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "event_conditions_collection.h"
 #include "Common/object_broker.h"
 #include "game_state_accumulator.h"

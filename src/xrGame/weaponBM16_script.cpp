@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "WeaponBM16.h"
+#include "weaponBM16.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

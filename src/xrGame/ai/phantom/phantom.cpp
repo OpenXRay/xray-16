@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "phantom.h"
 #include "Level.h"
 #include "xrServerEntities/xrserver_objects_alife_monsters.h"

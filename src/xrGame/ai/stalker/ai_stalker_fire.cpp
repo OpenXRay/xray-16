@@ -42,7 +42,7 @@
 #include "restricted_object.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "Missile.h"
-#include "xrPhysics/iphworld.h"
+#include "xrPhysics/IPHWorld.h"
 #include "stalker_animation_names.h"
 #include "agent_corpse_manager.h"
 #include "CharacterPhysicsSupport.h"

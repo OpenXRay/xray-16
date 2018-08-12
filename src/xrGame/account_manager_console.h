@@ -1,7 +1,7 @@
 #ifndef ACCOUNT_MANAGER_CONSOLE
 #define ACCOUNT_MANAGER_CONSOLE
 
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 
 class CCC_CreateGameSpyAccount : public IConsole_Command

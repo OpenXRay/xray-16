@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "WeaponBinocularsVision.h"
 #include "WeaponBinoculars.h"
-#include "ui\UIFrameWindow.h"
+#include "ui/UIFrameWindow.h"
 #include "entity_alive.h"
 #include "visual_memory_manager.h"
-#include "actor.h"
+#include "Actor.h"
 #include "actor_memory.h"
 #include "relation_registry.h"
 #include "Common/object_broker.h"
@@ -12,7 +12,7 @@
 #include "game_base_space.h"
 #include "Level.h"
 #include "game_cl_base.h"
-#include "AI/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "xrEngine/IGame_Persistent.h"
 
 #define RECT_SIZE 11

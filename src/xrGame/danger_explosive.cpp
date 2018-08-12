@@ -6,10 +6,10 @@
 //	Description : Danger explosive class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "danger_explosive.h"
-#include "gameobject.h"
-#include "explosive.h"
+#include "GameObject.h"
+#include "Explosive.h"
 
 bool CDangerExplosive::operator==(const u16& object_id) const
 {

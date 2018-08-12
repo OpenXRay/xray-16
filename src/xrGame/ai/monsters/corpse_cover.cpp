@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "corpse_cover.h"
 #include "cover_point.h"
 #include "ai_space.h"

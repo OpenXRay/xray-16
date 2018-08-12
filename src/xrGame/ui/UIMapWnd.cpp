@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIMapWnd.h"
 #include "UIMap.h"
 #include "UIXmlInit.h"
@@ -16,7 +16,7 @@
 #include "UIMapWndActionsSpace.h"
 #include "UIHint.h"
 #include "map_hint.h"
-#include "uicursor.h"
+#include "UICursor.h"
 #include "xrEngine/xr_input.h" //remove me !!!
 
 CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(

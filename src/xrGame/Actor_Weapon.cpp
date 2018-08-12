@@ -1,13 +1,13 @@
 // Actor_Weapon.cpp:	 для работы с оружием
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "actor.h"
-#include "actoreffector.h"
+#include "Actor.h"
+#include "ActorEffector.h"
 #include "Missile.h"
-#include "inventory.h"
-#include "weapon.h"
+#include "Inventory.h"
+#include "Weapon.h"
 #include "map_manager.h"
 #include "Level.h"
 #include "CharacterPhysicsSupport.h"

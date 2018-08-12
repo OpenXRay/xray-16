@@ -6,7 +6,7 @@
 //	Description : Stalker ALife planner
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_alife_planner.h"
 #include "stalker_alife_actions.h"
 #include "stalker_alife_task_actions.h"

@@ -1,24 +1,24 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_cl_deathmatch.h"
 #include "xrMessages.h"
 #include "UIGameDM.h"
 #include "Spectator.h"
 #include "Level.h"
 #include "xr_level_controller.h"
-#include "actor.h"
+#include "Actor.h"
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
 #include "ui/UIPdaWnd.h"
 #include "ui/UIMapDesc.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIVote.h"
-#include "gamepersistent.h"
+#include "GamePersistent.h"
 #include "string_table.h"
 #include "map_manager.h"
 #include "map_location.h"
 #include "clsid_game.h"
 #include "ui/UIActorMenu.h"
-#include "weapon.h"
+#include "Weapon.h"
 
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "reward_event_generator.h"
@@ -29,9 +29,9 @@
 #include "ActorCondition.h"
 
 #ifdef _new_buy_wnd
-#include "ui\UIMpTradeWnd.h"
+#include "ui/UIMpTradeWnd.h"
 #else
-#include "ui\UIBuyWnd.h"
+#include "ui/UIBuyWnd.h"
 #endif
 
 #define TEAM0_MENU "deathmatch_team0"

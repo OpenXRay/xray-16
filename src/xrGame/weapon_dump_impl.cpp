@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Weapon.h"
 
 void CWeapon::DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const

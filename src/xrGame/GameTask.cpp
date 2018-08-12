@@ -7,7 +7,7 @@
 #include "map_manager.h"
 
 #include "Level.h"
-#include "actor.h"
+#include "Actor.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "script_callback_ex.h"
 #include "script_game_object.h"

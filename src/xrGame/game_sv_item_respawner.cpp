@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_sv_item_respawner.h"
 #include "game_sv_base.h"
 #include "Level.h"

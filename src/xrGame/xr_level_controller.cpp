@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "SDL.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_input.h"
 #include "xrEngine/xr_ioc_cmd.h"
 #include "xr_level_controller.h"

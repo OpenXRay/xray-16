@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "WeaponAmmo.h"
 
 void CCartridge::DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const

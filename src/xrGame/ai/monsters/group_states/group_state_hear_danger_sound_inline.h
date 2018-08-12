@@ -1,7 +1,7 @@
 #pragma once
-#include "ai/Monsters/states/state_move_to_point.h"
-#include "ai/Monsters/states/monster_state_home_point_danger.h"
-#include "ai/Monsters/ai_monster_squad.h"
+#include "ai/monsters/states/state_move_to_point.h"
+#include "ai/monsters/states/monster_state_home_point_danger.h"
+#include "ai/monsters/ai_monster_squad.h"
 #include "Entity.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 

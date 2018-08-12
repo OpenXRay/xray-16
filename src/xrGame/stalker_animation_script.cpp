@@ -24,15 +24,15 @@ void CStalkerAnimationManager::script_play_callback(CBlend* blend)
     const SCRIPT_ANIMATIONS& animations = animation_manager.script_animations();
 
 #if 0
-	Msg							(
-		"%6d Script callback [%s]",
-		Device.dwTimeGlobal,
-		animations.empty()
-		?
-		"unknown"
-		:
-		animation_manager.m_skeleton_animated->LL_MotionDefName_dbg(animations.front().animation())
-	);
+    Msg							(
+        "%6d Script callback [%s]",
+        Device.dwTimeGlobal,
+        animations.empty()
+        ?
+        "unknown"
+        :
+        animation_manager.m_skeleton_animated->LL_MotionDefName_dbg(animations.front().animation())
+    );
 #endif
 
     if (pair.animation() && !animations.empty() && (pair.animation() == animations.front().animation()))

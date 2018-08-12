@@ -6,7 +6,7 @@
 //	Description : Script object class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "script_object.h"
 
 CScriptObject::CScriptObject() {}

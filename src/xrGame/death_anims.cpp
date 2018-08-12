@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "death_anims.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "entity_alive.h"

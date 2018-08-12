@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "xrserver.h"
-#include "xrserver_objects.h"
+#include "StdAfx.h"
+#include "xrServer.h"
+#include "xrServer_Objects.h"
 #include "xrNetServer/NET_Messages.h"
 
 bool xrServer::Process_event_reject(

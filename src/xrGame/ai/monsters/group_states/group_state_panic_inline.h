@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ai/Monsters/states/state_data.h"
-#include "ai/Monsters/states/state_move_to_point.h"
-#include "ai/Monsters/states/state_look_unprotected_area.h"
+#include "ai/monsters/states/state_data.h"
+#include "ai/monsters/states/state_move_to_point.h"
+#include "ai/monsters/states/state_look_unprotected_area.h"
 #include "group_state_panic_run.h"
-#include "ai/Monsters/states/monster_state_home_point_attack.h"
+#include "ai/monsters/states/monster_state_home_point_attack.h"
 
 #define TEMPLATE_SPECIALIZATION \
     template <typename _Object\

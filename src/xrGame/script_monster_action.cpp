@@ -6,7 +6,7 @@
 //	Description : Script monster action class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "script_monster_action.h"
 #include "script_game_object.h"
 

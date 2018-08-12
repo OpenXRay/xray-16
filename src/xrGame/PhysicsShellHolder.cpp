@@ -11,14 +11,14 @@
 #include "CustomRocket.h"
 #include "Grenade.h"
 
-#include "xrPhysics/iphworld.h"
-#include "xrPhysics/iActivationShape.h"
+#include "xrPhysics/IPHWorld.h"
+#include "xrPhysics/IActivationShape.h"
 
 #include "CharacterPhysicsSupport.h"
-#include "phmovementcontrol.h"
+#include "PHMovementControl.h"
 #include "physics_shell_animated.h"
-#include "phcollisiondamagereceiver.h"
-#include "xrEngine/iphysicsshell.h"
+#include "PHCollisionDamageReceiver.h"
+#include "xrEngine/IPhysicsShell.h"
 #ifdef DEBUG
 #include "xrEngine/objectdump.h"
 #endif

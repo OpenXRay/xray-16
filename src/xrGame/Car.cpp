@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "car.h"
+#include "StdAfx.h"
+#include "Car.h"
 //#if 0
 
 #include "ParticlesObject.h"
@@ -11,14 +11,14 @@
 
 #include "PHDestroyable.h"
 
-#include "cameralook.h"
-#include "camerafirsteye.h"
+#include "CameraLook.h"
+#include "CameraFirstEye.h"
 #include "Actor.h"
 #include "ActorEffector.h"
 #include "math.h"
 #include "script_entity_action.h"
-#include "inventory.h"
-#include "xrserver_objects_alife_items.h"
+#include "Inventory.h"
+#include "xrServer_Objects_ALife_Items.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Level.h"
 #include "ui/UIMainIngameWnd.h"

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "black_list.h"
 #include "Level.h"
 #include "game_cl_base.h"

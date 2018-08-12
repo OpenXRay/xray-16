@@ -2,8 +2,8 @@
 // с галочкой и без
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include ".\uicheckbutton.h"
+#include "StdAfx.h"
+#include "UICheckButton.h"
 #include "UIXmlInit.h"
 #include "UIHint.h"
 #include "xrEngine/xr_input.h"

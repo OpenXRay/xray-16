@@ -7,7 +7,7 @@
 #include "UIListBoxItem.h"
 #include "Level.h"
 #include "game_cl_teamdeathmatch.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "UIMapList.h"
 #include "Common/object_broker.h"
 #include "UIGameCustom.h"

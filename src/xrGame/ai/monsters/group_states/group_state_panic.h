@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 
 template <typename _Object>
 class CStateGroupPanic : public CState<_Object>

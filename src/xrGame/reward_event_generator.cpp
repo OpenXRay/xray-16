@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "reward_event_generator.h"
 #include "game_state_accumulator.h"
 #include "game_base.h"

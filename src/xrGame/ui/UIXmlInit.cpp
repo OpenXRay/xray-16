@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIXmlInit.h"
 #include "Level.h"
 #include "string_table.h"

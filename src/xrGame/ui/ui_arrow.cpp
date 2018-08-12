@@ -1,5 +1,5 @@
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "ui_arrow.h"
 #include "UIXmlInit.h"

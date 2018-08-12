@@ -2,11 +2,11 @@
 
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Entity.h"
-#include "actor.h"
-#include "xrserver_objects_alife_monsters.h"
-#include "entity.h"
+#include "Actor.h"
+#include "xrServer_Objects_ALife_Monsters.h"
+#include "Entity.h"
 #include "Level.h"
 #include "seniority_hierarchy_holder.h"
 #include "team_hierarchy_holder.h"

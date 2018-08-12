@@ -1,14 +1,14 @@
 #include "pch_script.h"
 
 #include "WeaponMagazined.h"
-#include "actor.h"
+#include "Actor.h"
 #include "ParticlesObject.h"
-#include "scope.h"
-#include "silencer.h"
+#include "Scope.h"
+#include "Silencer.h"
 #include "GrenadeLauncher.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "InventoryOwner.h"
-#include "xrserver_objects_alife_items.h"
+#include "xrServer_Objects_ALife_Items.h"
 #include "ActorEffector.h"
 #include "EffectorZoomInertion.h"
 #include "xr_level_controller.h"
@@ -458,8 +458,8 @@ void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
     case eHiding:
         if (owner)
             m_sounds_enabled = owner->CanPlayShHdRldSounds();
-		if (oldState != eHiding)
-			switch2_Hiding();
+        if (oldState != eHiding)
+            switch2_Hiding();
         break;
     case eHidden: switch2_Hidden(); break;
     }
@@ -872,7 +872,7 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
 
     if (pScope && m_eScopeStatus == ALife::eAddonAttachable &&
         (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 /*&&
-				(m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
+                (m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
     {
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)
@@ -930,7 +930,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 
     if (pScope && m_eScopeStatus == ALife::eAddonAttachable &&
         (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 /*&&
-	   (m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
+       (m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
     {
         auto it = m_scopes.begin();
         for (; it != m_scopes.end(); it++)

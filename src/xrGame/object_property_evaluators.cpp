@@ -6,14 +6,14 @@
 //	Description : Object property evaluators
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "object_property_evaluators.h"
-#include "weapon.h"
+#include "Weapon.h"
 #include "ai/stalker/ai_stalker.h"
-#include "inventory.h"
-#include "missile.h"
-#include "fooditem.h"
-#include "weaponmagazined.h"
+#include "Inventory.h"
+#include "Missile.h"
+#include "FoodItem.h"
+#include "WeaponMagazined.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CObjectPropertyEvaluatorState

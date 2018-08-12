@@ -10,7 +10,7 @@
 #ifndef SMART_COVER_OBJECT_H_INCLUDED
 #define SMART_COVER_OBJECT_H_INCLUDED
 
-#include "gameobject.h"
+#include "GameObject.h"
 #include "Common/Noncopyable.hpp"
 
 namespace smart_cover

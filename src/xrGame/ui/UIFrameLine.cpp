@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIFrameLine.h"
-#include "../hudmanager.h"
+#include "../HUDManager.h"
 #include "UITextureMaster.h"
 
 CUIFrameLine::CUIFrameLine() : uFlags(0), iSize(0), bHorizontalOrientation(true), bStretchTexture(false)

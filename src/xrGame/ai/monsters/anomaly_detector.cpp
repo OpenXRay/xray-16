@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "anomaly_detector.h"
 #include "BaseMonster/base_monster.h"
 #include "restricted_object.h"

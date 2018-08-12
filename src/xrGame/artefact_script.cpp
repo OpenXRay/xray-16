@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "artefact.h"
+#include "Artefact.h"
 #include "MercuryBall.h"
 #include "GraviArtifact.h"
 #include "BlackDrops.h"

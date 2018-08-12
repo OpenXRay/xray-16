@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Level.h"
 #include "xrServerMapSync.h"
 #include "xrCore/stream_reader.h"
 #include "MainMenu.h"
 #include "string_table.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrNetServer/NET_Messages.h"
 
 static const u32 r_buffer_size = 131072; // 128 Kb

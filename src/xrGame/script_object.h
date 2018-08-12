@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "gameobject.h"
+#include "GameObject.h"
 #include "script_entity.h"
 
 class CScriptObject : public CGameObject, public CScriptEntity

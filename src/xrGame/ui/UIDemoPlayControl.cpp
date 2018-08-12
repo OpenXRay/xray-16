@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIXmlInit.h"
 #include "UI3tButton.h"
 #include "UIProgressBar.h"
@@ -10,8 +10,8 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "string_table.h"
 #include "Level.h"
-#include "demoinfo.h"
-#include "demoplay_control.h"
+#include "DemoInfo.h"
+#include "DemoPlay_Control.h"
 
 CUIDemoPlayControl::CUIDemoPlayControl()
 {

@@ -6,7 +6,7 @@
 //	Description : Agent location manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "agent_location_manager.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"

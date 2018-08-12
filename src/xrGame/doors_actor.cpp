@@ -4,7 +4,7 @@
 //	Copyright (C) GSC Game World - 2009
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "doors_actor.h"
 #include "doors_door.h"
 #include "ai/stalker/ai_stalker.h"

@@ -1,7 +1,7 @@
 #include "pch_script.h"
-#include "gamepersistent.h"
+#include "GamePersistent.h"
 #include "xrCore/FMesh.hpp"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/GameMtlLib.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/profiler.h"
@@ -15,8 +15,8 @@
 #include "stalker_velocity_holder.h"
 
 #include "ActorEffector.h"
-#include "actor.h"
-#include "spectator.h"
+#include "Actor.h"
+#include "Spectator.h"
 
 #include "UI/UItextureMaster.h"
 
@@ -26,9 +26,9 @@
 
 #include "holder_custom.h"
 #include "game_cl_base.h"
-#include "xrserver_objects_alife_monsters.h"
+#include "xrServer_Objects_ALife_Monsters.h"
 #include "xrServerEntities/xrServer_Object_Base.h"
-#include "UI/UIGameTutorial.h"
+#include "ui/UIGameTutorial.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrEngine/xr_input.h"
@@ -36,7 +36,7 @@
 #include "ui/UILoadingScreen.h"
 
 #ifndef MASTER_GOLD
-#include "custommonster.h"
+#include "CustomMonster.h"
 #endif // MASTER_GOLD
 
 #ifndef _EDITOR
@@ -913,7 +913,7 @@ void CGamePersistent::SetEffectorDOF(const Fvector& needed_dof)
 }
 
 void CGamePersistent::RestoreEffectorDOF() { SetEffectorDOF(m_dof[3]); }
-#include "hudmanager.h"
+#include "HUDManager.h"
 
 //	m_dof		[4];	// 0-dest 1-current 2-from 3-original
 void CGamePersistent::UpdateDof()
@@ -943,7 +943,7 @@ void CGamePersistent::UpdateDof()
     (m_dof[0].z < m_dof[2].z) ? clamp(m_dof[1].z, m_dof[0].z, m_dof[2].z) : clamp(m_dof[1].z, m_dof[2].z, m_dof[0].z);
 }
 
-#include "ui\uimainingamewnd.h"
+#include "ui/uimainingamewnd.h"
 void CGamePersistent::OnSectorChanged(int sector)
 {
     if (CurrentGameUI())

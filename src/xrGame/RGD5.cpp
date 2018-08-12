@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "rgd5.h"
+#include "RGD5.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 CRGD5::CRGD5(void) {}

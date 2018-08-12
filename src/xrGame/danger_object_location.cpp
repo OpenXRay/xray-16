@@ -6,9 +6,9 @@
 //	Description : Danger object location
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "danger_object_location.h"
-#include "gameobject.h"
+#include "GameObject.h"
 
 const Fvector& CDangerObjectLocation::position() const { return (m_object->Position()); }
 bool CDangerObjectLocation::useful() const { return (true); }

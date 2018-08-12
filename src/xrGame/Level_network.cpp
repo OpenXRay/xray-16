@@ -1,11 +1,11 @@
 #include "pch_script.h"
 #include "Level.h"
 #include "Level_Bullet_Manager.h"
-#include "xrserver.h"
-#include "xrmessages.h"
+#include "xrServer.h"
+#include "xrMessages.h"
 #include "game_cl_base.h"
 #include "PHCommander.h"
-#include "net_queue.h"
+#include "NET_Queue.h"
 #include "MainMenu.h"
 #include "space_restriction_manager.h"
 #include "ai_space.h"
@@ -16,12 +16,12 @@
 #include "UIGameCustom.h"
 #include "string_table.h"
 #include "file_transfer.h"
-#include "UI/UIGameTutorial.h"
+#include "ui/UIGameTutorial.h"
 #include "ui/UIPdaWnd.h"
 #include "xrNetServer/NET_AuthCheck.h"
 #include "xrNetServer/NET_Messages.h"
 
-#include "xrPhysics/physicscommon.h"
+#include "xrPhysics/PhysicsCommon.h"
 
 const int max_objects_size = 2 * 1024;
 const int max_objects_size_in_save = 8 * 1024;

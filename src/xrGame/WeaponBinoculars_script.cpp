@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "weaponbinoculars.h"
+#include "WeaponBinoculars.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

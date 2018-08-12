@@ -1,6 +1,6 @@
 #pragma once
 #include "UIGameLog.h"
-#include "hudsound.h"
+#include "HudSound.h"
 #include "xrServerEntities/alife_space.h"
 #include "EntityCondition.h"
 

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "actor_mp_server.h"
 
 #include "xrPhysics/phvalide.h"

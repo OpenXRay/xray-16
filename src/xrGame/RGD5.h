@@ -1,6 +1,6 @@
 #pragma once
 
-#include "grenade.h"
+#include "Grenade.h"
 
 class CRGD5 : public CGrenade
 {

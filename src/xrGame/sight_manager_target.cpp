@@ -6,7 +6,7 @@
 //	Description : sight manager target functions
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "sight_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
@@ -36,7 +36,7 @@ void CSightManager::SetPointLookAngles(
     pitch *= -1;
 }
 
-#include "actor.h"
+#include "Actor.h"
 void aim_target(shared_str const& aim_bone_id, Fvector& result, const CGameObject* object);
 
 bool CSightManager::aim_target(Fvector& my_position, Fvector& aim_target, const CGameObject* object) const

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_direction_base.h"
 #include "basemonster/base_monster.h"
 #include "detail_path_manager.h"

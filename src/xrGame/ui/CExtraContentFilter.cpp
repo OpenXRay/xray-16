@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "CExtraContentFilter.h"
 #include "../RegistryFuncs.h"
 #include "object_broker.h"

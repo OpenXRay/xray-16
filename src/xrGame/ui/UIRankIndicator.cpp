@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIRankIndicator.h"
 #include "UIXmlInit.h"
 #include "UIStatic.h"

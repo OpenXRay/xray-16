@@ -1,11 +1,11 @@
-﻿#include "stdafx.h"
+﻿#include "StdAfx.h"
 #include "player_hud.h"
 #include "HudItem.h"
 #include "ui_base.h"
-#include "actor.h"
+#include "Actor.h"
 #include "physic_item.h"
 #include "static_cast_checked.hpp"
-#include "actoreffector.h"
+#include "ActorEffector.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/xrDebug_macros.h" // only for pragma todo
 

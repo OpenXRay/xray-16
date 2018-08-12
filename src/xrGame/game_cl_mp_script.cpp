@@ -2,10 +2,10 @@
 #include "game_cl_mp_script.h"
 #include "xrServer_script_macroses.h"
 #include "UIGameCustom.h"
-#include "level.h"
+#include "Level.h"
 #include "GameObject.h"
 #include "script_game_object.h"
-#include "xrmessages.h"
+#include "xrMessages.h"
 #include "date_time.h"
 #include "ui/UIDialogWnd.h"
 

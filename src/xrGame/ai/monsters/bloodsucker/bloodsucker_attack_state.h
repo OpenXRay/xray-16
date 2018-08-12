@@ -1,5 +1,5 @@
 #pragma once
-#include "ai/Monsters/states/monster_state_attack.h"
+#include "ai/monsters/states/monster_state_attack.h"
 
 template <typename _Object>
 class CBloodsuckerStateAttack : public CStateMonsterAttack<_Object>

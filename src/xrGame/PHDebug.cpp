@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #ifdef DEBUG
 
 #include "xrEngine/StatGraph.h"
@@ -7,13 +7,13 @@
 #include "xrPhysics/MathUtils.h"
 
 #include "xrPhysics/ExtendedGeom.h"
-#include "xrPhysics/iphworld.h"
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/IPHWorld.h"
+#include "xrPhysics/PhysicsShell.h"
 
 #include "Level.h"
 
 #include "debug_renderer.h"
-#include "physicsshellholder.h"
+#include "PhysicsShellHolder.h"
 
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"

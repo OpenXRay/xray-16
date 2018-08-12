@@ -3,18 +3,18 @@
 //						(оружие и осколочные гранаты)
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "ShootingObject.h"
 
 #include "ParticlesObject.h"
 #include "WeaponAmmo.h"
 
-#include "actor.h"
-#include "spectator.h"
+#include "Actor.h"
+#include "Spectator.h"
 #include "game_cl_base.h"
 #include "Level.h"
-#include "level_bullet_manager.h"
+#include "Level_Bullet_Manager.h"
 #include "game_cl_single.h"
 
 #define HIT_POWER_EPSILON 0.05f

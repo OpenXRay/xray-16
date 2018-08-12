@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "customoutfit.h"
+#include "CustomOutfit.h"
 
 class CScientificOutfit : public CCustomOutfit
 {

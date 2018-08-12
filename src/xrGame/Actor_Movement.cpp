@@ -1,8 +1,8 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "actor.h"
-#include "inventory.h"
-#include "weapon.h"
+#include "Actor.h"
+#include "Inventory.h"
+#include "Weapon.h"
 #include "xrEngine/CameraBase.h"
 #include "xrMessages.h"
 
@@ -13,7 +13,7 @@
 #include "game_cl_base.h"
 #include "WeaponMagazined.h"
 #include "CharacterPhysicsSupport.h"
-#include "actoreffector.h"
+#include "ActorEffector.h"
 #include "static_cast_checked.hpp"
 #include "player_hud.h"
 
@@ -649,7 +649,7 @@ float CActor::MaxWalkWeight() const
     max_w += get_additional_weight();
     return max_w;
 }
-#include "artefact.h"
+#include "Artefact.h"
 float CActor::get_additional_weight() const
 {
     float res = 0.0f;

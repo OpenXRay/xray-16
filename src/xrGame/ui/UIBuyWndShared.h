@@ -11,7 +11,7 @@ typedef CUIBuyWnd BUY_WND_TYPE;
 #endif
 
 #include "xrCore/Containers/AssociativeVector.hpp"
-#include "restrictions.h"
+#include "Restrictions.h"
 
 struct string_lex_less
 {

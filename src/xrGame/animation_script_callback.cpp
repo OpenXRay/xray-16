@@ -2,7 +2,7 @@
 
 #include "animation_script_callback.h"
 #include "script_callback_ex.h"
-#include "gameobject.h"
+#include "GameObject.h"
 #include "game_object_space.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 

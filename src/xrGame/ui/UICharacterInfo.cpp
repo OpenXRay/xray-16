@@ -1,8 +1,8 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "UIInventoryUtilities.h"
 
-#include "uicharacterinfo.h"
+#include "UICharacterInfo.h"
 #include "Actor.h"
 #include "Level.h"
 #include "xrServerEntities/character_info.h"
@@ -12,7 +12,7 @@
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
 
-#include "uistatic.h"
+#include "UIStatic.h"
 #include "UIScrollView.h"
 
 #include "alife_simulator.h"

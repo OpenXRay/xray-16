@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "player_state_ammo_elapsed.h"
 #include "game_state_accumulator.h"
-#include "weapon.h"
+#include "Weapon.h"
 
 namespace award_system
 {

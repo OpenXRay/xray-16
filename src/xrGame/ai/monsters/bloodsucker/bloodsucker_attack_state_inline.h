@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/Monsters/states/state_move_to_point.h"
+#include "ai/monsters/states/state_move_to_point.h"
 
 #define TEMPLATE_SPECIALIZATION \
     template <typename _Object\

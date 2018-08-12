@@ -1,5 +1,5 @@
 #pragma once
-#include "ui\uistatic.h"
+#include "ui/UIStatic.h"
 #include "HudSound.h"
 
 class IGameObject;

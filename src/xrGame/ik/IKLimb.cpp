@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "IKLimb.h"
 #include "Common/Noncopyable.hpp"
 #include "Include/xrRender/Kinematics.h"

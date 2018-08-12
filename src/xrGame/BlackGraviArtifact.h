@@ -6,7 +6,7 @@
 
 #pragma once
 #include "GraviArtifact.h"
-#include "xrEngine/feel_touch.h"
+#include "xrEngine/Feel_Touch.h"
 #include "PhysicsShellHolder.h"
 #include "xrCDB/xr_collide_defs.h"
 

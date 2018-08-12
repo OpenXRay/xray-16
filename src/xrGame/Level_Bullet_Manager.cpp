@@ -2,12 +2,12 @@
 //								все пули и осколки передаются сюда
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Level.h"
 #include "Level_Bullet_Manager.h"
 #include "game_cl_base.h"
 #include "Actor.h"
-#include "gamepersistent.h"
+#include "GamePersistent.h"
 #include "mt_config.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "game_cl_mp.h"
@@ -87,9 +87,9 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
 
 CBulletManager::CBulletManager()
 #if 0 // def CONFIG_PROFILE_LOCKS
-	: m_Lock(MUTEX_PROFILE_ID(CBulletManager))
+    : m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
-		,m_thread_id(GetCurrentThreadId())
+        ,m_thread_id(GetCurrentThreadId())
 #endif // #ifdef DEBUG
 #else // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
@@ -688,21 +688,21 @@ bool CBulletManager::process_bullet(collide::rq_results& storage, SBullet& bulle
     bullet.tracer_start_position = bullet.bullet_pos;
 
 #if 0 // def DEBUG
-	extern BOOL g_bDrawBulletHit;
-	if (g_bDrawBulletHit)
-	{
-		Msg	(
-			"free fly velocity: %f",
-			trajectory_velocity(
-				bullet.start_velocity,
-				gravity,
-				air_resistance,
-				fis_zero(air_resistance) ?
-				0.f :
-				(1.f/air_resistance - air_resistance_epsilon)
-			).magnitude()
-		);
-	}
+    extern BOOL g_bDrawBulletHit;
+    if (g_bDrawBulletHit)
+    {
+        Msg	(
+            "free fly velocity: %f",
+            trajectory_velocity(
+                bullet.start_velocity,
+                gravity,
+                air_resistance,
+                fis_zero(air_resistance) ?
+                0.f :
+                (1.f/air_resistance - air_resistance_epsilon)
+            ).magnitude()
+        );
+    }
 #endif
 
     Fvector const& start_position = bullet.bullet_pos;
@@ -945,11 +945,11 @@ void CBulletManager::RegisterEvent(
     EventType Type, BOOL _dynamic, SBullet* bullet, const Fvector& end_point, collide::rq_result& R, u16 tgt_material)
 {
 #if 0 // def DEBUG
-	if (m_Events.size() > 1000) {
-		static bool breakpoint = true;
-		if (breakpoint)
-			DEBUG_BREAK;
-	}
+    if (m_Events.size() > 1000) {
+        static bool breakpoint = true;
+        if (breakpoint)
+            DEBUG_BREAK;
+    }
 #endif // #ifdef DEBUG
 
     m_Events.push_back(_event());

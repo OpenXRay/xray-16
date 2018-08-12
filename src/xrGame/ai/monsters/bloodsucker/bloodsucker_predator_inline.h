@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ai/Monsters/states/state_move_to_point.h"
-#include "ai/Monsters/states/state_look_point.h"
-#include "ai/Monsters/states/state_custom_action.h"
+#include "ai/monsters/states/state_move_to_point.h"
+#include "ai/monsters/states/state_look_point.h"
+#include "ai/monsters/states/state_custom_action.h"
 #include "cover_point.h"
 #include "ai/monsters/monster_cover_manager.h"
-#include "ai/Monsters/monster_home.h"
+#include "ai/monsters/monster_home.h"
 
 #include "Actor.h"
 #include "actor_memory.h"

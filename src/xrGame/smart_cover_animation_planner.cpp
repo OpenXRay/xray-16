@@ -15,7 +15,7 @@
 #include "stalker_property_evaluators.h"
 #include "smart_cover_planner_actions.h"
 #include "smart_cover_loophole_planner_actions.h"
-#include "hit.h"
+#include "Hit.h"
 #include "smart_cover_planner_target_selector.h"
 #include "stalker_animation_manager.h"
 #include "stalker_movement_manager_smart_cover.h"

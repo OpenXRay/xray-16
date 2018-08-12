@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "configs_dump_verifyer.h"
 #include "configs_common.h"
 #include "configs_dumper.h"

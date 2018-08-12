@@ -1,6 +1,6 @@
 #pragma once
 
-#include "weaponcustompistol.h"
+#include "WeaponCustomPistol.h"
 
 class CWeaponShotgun : public CWeaponCustomPistol
 {

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stats_submitter.h"
 
 namespace gamespy_profile

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "pseudodog.h"
 #include "pseudodog_state_manager.h"
 #include "Include/xrRender/KinematicsAnimated.h"

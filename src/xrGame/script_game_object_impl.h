@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "gameobject.h"
+#include "GameObject.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 

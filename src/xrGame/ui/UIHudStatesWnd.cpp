@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIHudStatesWnd.h"
 #include "Actor.h"
 #include "ActorCondition.h"
@@ -15,7 +15,7 @@
 #include "ui_arrow.h"
 #include "UIInventoryUtilities.h"
 #include "CustomDetector.h"
-#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "PDA.h"
 #include "WeaponMagazinedWGrenade.h"
 

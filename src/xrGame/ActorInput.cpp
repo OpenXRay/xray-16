@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Actor.h"
 #include "Torch.h"
 #include "trade.h"
@@ -8,11 +8,11 @@
 #include "PHDebug.h"
 #endif
 
-#include "hit.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
 #include "Car.h"
 #include "UIGameSP.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "Level.h"
 #include "game_cl_base.h"
 #include "xr_level_controller.h"
@@ -29,7 +29,7 @@
 #include "flare.h"
 #include "CustomDetector.h"
 #include "clsid_game.h"
-#include "hudmanager.h"
+#include "HUDManager.h"
 #include "Weapon.h"
 
 extern u32 hud_adj_mode;

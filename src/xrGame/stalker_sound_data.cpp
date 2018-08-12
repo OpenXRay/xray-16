@@ -6,7 +6,7 @@
 //	Description : Stalker sound data
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_sound_data.h"
 #include "sound_user_data_visitor.h"
 #include "ai/stalker/ai_stalker.h"

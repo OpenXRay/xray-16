@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "login_manager.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 

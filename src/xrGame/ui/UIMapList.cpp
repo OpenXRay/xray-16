@@ -9,7 +9,7 @@
 #include "UIMapInfo.h"
 #include "UIComboBox.h"
 #include "UIListBoxItem.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "string_table.h"
 #include "Common/object_broker.h"
 #include "game_base.h"

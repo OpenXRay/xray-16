@@ -1,6 +1,6 @@
 #pragma once
 #include "xrPhysics/iphysics_scripted.h"
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/PhysicsShell.h"
 
 class CPhysicsElement;
 

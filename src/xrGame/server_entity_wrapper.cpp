@@ -6,10 +6,10 @@
 //  Description : Server entity wrapper
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "server_entity_wrapper.h"
 #include "xrServer_Objects.h"
-#include "xrmessages.h"
+#include "xrMessages.h"
 
 #ifdef AI_COMPILER
 #include "factory_api.h"

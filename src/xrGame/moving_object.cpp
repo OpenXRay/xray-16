@@ -6,7 +6,7 @@
 //	Description : moving objects
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "moving_object.h"
 #include "ai_space.h"
 #include "moving_objects.h"

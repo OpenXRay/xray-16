@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIMPChangeMapAdm.h"
 #include "UIXmlInit.h"
 #include "UIListBox.h"
@@ -7,7 +7,7 @@
 #include "UI3tButton.h"
 #include "UIDialogWnd.h"
 #include "Level.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "UIGameCustom.h"
 #include "string_table.h"
 

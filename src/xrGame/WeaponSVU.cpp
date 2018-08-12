@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "weaponsvu.h"
+#include "WeaponSVU.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponSVU::CWeaponSVU(void) {}

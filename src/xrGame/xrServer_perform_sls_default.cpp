@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "xrserver.h"
-#include "xrmessages.h"
+#include "StdAfx.h"
+#include "xrServer.h"
+#include "xrMessages.h"
 
 #if 1 // def DEBUG
 #define USE_DESIGNER_KEY

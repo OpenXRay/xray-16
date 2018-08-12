@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "uieditbox.h"
+#include "StdAfx.h"
+#include "UIEditBox.h"
 #include "UIFrameLineWnd.h"
 
 CUIEditBox::CUIEditBox() : m_frameLine(NULL) {}

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_threaten.h"
 #include "BaseMonster/base_monster.h"
 #include "control_animation_base.h"

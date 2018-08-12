@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "rewarding_events_handlers.h"
 #include "reward_event_handler.h"
 #include "Common/object_broker.h"

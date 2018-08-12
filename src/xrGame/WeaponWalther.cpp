@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "weaponwalther.h"
+#include "WeaponWalther.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponWalther::CWeaponWalther(void) {}

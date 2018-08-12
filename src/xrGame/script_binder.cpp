@@ -13,7 +13,7 @@
 #include "xrServer_Objects_ALife.h"
 #include "script_binder_object.h"
 #include "script_game_object.h"
-#include "gameobject.h"
+#include "GameObject.h"
 #include "Level.h"
 
 // comment next string when commiting

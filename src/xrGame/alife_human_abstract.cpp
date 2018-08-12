@@ -6,8 +6,8 @@
 //	Description : ALife human abstract class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "xrServer_objects_ALife_Monsters.h"
+#include "StdAfx.h"
+#include "xrServer_Objects_ALife_Monsters.h"
 #include "alife_human_brain.h"
 #include "alife_human_object_handler.h"
 #include "ai_space.h"

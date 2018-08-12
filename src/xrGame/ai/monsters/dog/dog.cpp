@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "dog.h"
 #include "dog_state_manager.h"
 #include "ai/monsters/monster_velocity_space.h"
@@ -6,9 +6,9 @@
 #include "ai/monsters/control_movement_base.h"
 #include "date_time.h"
 #include "Include/xrRender/KinematicsAnimated.h"
-#include "ai/Monsters/monster_home.h"
-#include "ai/Monsters/ai_monster_squad.h"
-#include "ai/Monsters/ai_monster_squad_manager.h"
+#include "ai/monsters/monster_home.h"
+#include "ai/monsters/ai_monster_squad.h"
+#include "ai/monsters/ai_monster_squad_manager.h"
 #include "CharacterPhysicsSupport.h"
 
 #include "xrAICore/Navigation/level_graph.h"

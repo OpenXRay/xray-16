@@ -12,13 +12,13 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UIMessagesWindow.h"
 #include "ui/UIHudStatesWnd.h"
-#include "actor.h"
-#include "inventory.h"
+#include "Actor.h"
+#include "Inventory.h"
 #include "game_cl_base.h"
 
 #include "xrEngine/x_ray.h"
 
-#include "ui\UICellItem.h" //Alundaio
+#include "ui/UICellItem.h" //Alundaio
 //#include "script_game_object.h" //Alundaio
 
 EGameIDs ParseStringToGameType(const char* str);

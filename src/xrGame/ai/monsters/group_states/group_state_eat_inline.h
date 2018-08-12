@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ai/Monsters/states/state_data.h"
-#include "ai/Monsters/states/state_move_to_point.h"
-#include "ai/Monsters/states/state_hide_from_point.h"
-#include "ai/Monsters/states/state_custom_action.h"
+#include "ai/monsters/states/state_data.h"
+#include "ai/monsters/states/state_move_to_point.h"
+#include "ai/monsters/states/state_hide_from_point.h"
+#include "ai/monsters/states/state_custom_action.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "PHMovementControl.h"
 #include "CharacterPhysicsSupport.h"

@@ -1,14 +1,14 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_space.h"
-#include "hit.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
-#include "mincer.h"
-#include "xrmessages.h"
+#include "Mincer.h"
+#include "xrMessages.h"
 #include "Level.h"
 #include "CustomZone.h"
 #include "entity_alive.h"
 #include "PHDestroyableNotificate.h"
-#include "actor.h"
+#include "Actor.h"
 
 CMincer::CMincer(void) { m_fActorBlowoutRadiusPercent = 0.5f; }
 CMincer::~CMincer(void) {}

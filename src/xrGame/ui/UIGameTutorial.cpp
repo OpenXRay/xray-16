@@ -8,7 +8,7 @@
 #include "xr_level_controller.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "UIGameCustom.h"
 #include "UIActorMenu.h"
 #include "UIPdaWnd.h"
@@ -100,7 +100,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
     // Skip any tutorial except "game_loaded", since we need to show "st_press_any_key" hint
     if (load_screen_renderer.IsActive() && xr_strcmp(tutor_name, "game_loaded") != 0)
         return;
-    
+
     VERIFY(m_sequencer_items.size() == 0);
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
@@ -453,7 +453,7 @@ void CUISequencer::IR_OnActivate()
             case kACCEL:
             case kL_LOOKOUT:
             case kR_LOOKOUT:
-            case kWPN_FIRE: 
+            case kWPN_FIRE:
             {
                 IR_OnKeyboardPress(i);
             }

@@ -15,9 +15,9 @@
 #include "stalker_animation_manager.h"
 #include "smart_cover_planner_actions.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "smart_cover.h"
-#include "huditem.h"
+#include "HudItem.h"
 
 float g_smart_cover_animation_speed_factor = 1.f;
 

@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "weaponusp45.h"
+#include "WeaponUSP45.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponUSP45::CWeaponUSP45() {}

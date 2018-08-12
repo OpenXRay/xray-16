@@ -6,7 +6,7 @@
 //	Description : moving objects with static objects, i.e stable dynamic objects
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "moving_objects.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"

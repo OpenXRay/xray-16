@@ -1,6 +1,6 @@
 #ifndef PHYSICS_SKELETON_OBJECT_H
 #define PHYSICS_SKELETON_OBJECT_H
-#include "physicsshellholder.h"
+#include "PhysicsShellHolder.h"
 #include "PHSkeleton.h"
 
 class CSE_ALifePHSkeletonObject;

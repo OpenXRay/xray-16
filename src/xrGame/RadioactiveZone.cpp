@@ -1,9 +1,9 @@
-#include "stdafx.h"
-#include "radioactivezone.h"
+#include "StdAfx.h"
+#include "RadioactiveZone.h"
 #include "Level.h"
-#include "xrmessages.h"
+#include "xrMessages.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "actor.h"
+#include "Actor.h"
 #include "game_base_space.h"
 #include "Hit.h"
 #include "xrEngine/xr_collide_form.h"
@@ -75,7 +75,7 @@ void CRadioactiveZone::feel_touch_new(IGameObject* O)
     };
 };
 
-#include "actor.h"
+#include "Actor.h"
 bool CRadioactiveZone::feel_touch_contact(IGameObject* O)
 {
     CActor* A = smart_cast<CActor*>(O);

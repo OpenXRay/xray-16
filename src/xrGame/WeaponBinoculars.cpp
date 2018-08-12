@@ -1,13 +1,13 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "WeaponBinoculars.h"
 
 #include "xr_level_controller.h"
 
 #include "Level.h"
-#include "ui\UIFrameWindow.h"
+#include "ui/UIFrameWindow.h"
 #include "WeaponBinocularsVision.h"
 #include "Common/object_broker.h"
-#include "inventory.h"
+#include "Inventory.h"
 
 CWeaponBinoculars::CWeaponBinoculars()
 {

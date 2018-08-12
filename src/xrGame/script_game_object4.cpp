@@ -20,8 +20,8 @@
 #include "sight_manager.h"
 #include "inventoryBox.h"
 #include "ZoneCampfire.h"
-#include "physicobject.h"
-#include "artefact.h"
+#include "PhysicObject.h"
+#include "Artefact.h"
 #include "stalker_sound_data.h"
 
 class CWeapon;
@@ -386,7 +386,7 @@ void CScriptGameObject::SetHealthEx(float hp)
 #include "Actor.h"
 #include "CustomOutfit.h"
 //#include "CustomZone.h"
-#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/BaseMonster/base_monster.h"
 //#include "medkit.h"
 //#include "antirad.h"
 #include "Scope.h"

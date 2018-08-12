@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "entity_alive.h"
 #include "game_sv_single.h"
@@ -18,7 +18,7 @@
 #include "Actor.h"
 #include "HudItem.h"
 #include "UIGameCustom.h"
-#include "UI/UIDialogWnd.h"
+#include "ui/UIDialogWnd.h"
 #include "xrEngine/xr_input.h"
 #include "xrEngine/xr_object.h"
 #include "saved_game_wrapper.h"
@@ -27,7 +27,7 @@
 #include "Include/xrRender/DebugRender.h"
 
 #ifdef DEBUG
-#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 
 // Lain: add
 #include "level_debug.h"
@@ -609,7 +609,7 @@ void CLevel::IR_OnActivate()
             case kACCEL:
             case kL_LOOKOUT:
             case kR_LOOKOUT:
-            case kWPN_FIRE: 
+            case kWPN_FIRE:
             {
                 IR_OnKeyboardPress(i);
             }

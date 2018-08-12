@@ -6,7 +6,7 @@
 //	Description : ALife Simulator update manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_update_manager.h"
 #include "alife_simulator_header.h"
 #include "alife_time_manager.h"
@@ -15,7 +15,7 @@
 #include "alife_spawn_registry.h"
 #include "alife_object_registry.h"
 #include "ef_storage.h"
-#include "xrserver.h"
+#include "xrServer.h"
 #include "Level.h"
 #include "xrAICore/Navigation/graph_engine.h"
 #include "xrEngine/x_ray.h"

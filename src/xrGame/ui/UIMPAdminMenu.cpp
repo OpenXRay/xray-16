@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIMPAdminMenu.h"
 #include "UIMPPlayersAdm.h"
 #include "UIMPServerAdm.h"
@@ -10,7 +10,7 @@
 #include "UI3tButton.h"
 #include "UIMessageBox.h"
 #include "UIMessageBoxEx.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 
 CUIMpAdminMenu::CUIMpAdminMenu()
 {

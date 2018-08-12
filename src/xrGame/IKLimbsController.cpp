@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "IKLimbsController.h"
 
-#include "IK/IKLimb.h"
-#include "physicsshellholder.h"
+#include "ik/IKLimb.h"
+#include "PhysicsShellHolder.h"
 
 #include "ik_anim_state.h"
 #include "xrPhysics/MathUtils.h"

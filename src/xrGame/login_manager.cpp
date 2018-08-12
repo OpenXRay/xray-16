@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "login_manager.h"
 #include "account_manager.h"
 #include "MainMenu.h"
@@ -12,7 +12,9 @@
 #include "ui/UICDkey.h"
 #include "secure_messaging.h"
 
+#if defined(WINDOWS)
 #include <shellapi.h>
+#endif
 //#pragma comment(lib, "shell32.lib")
 
 namespace gamespy_gp

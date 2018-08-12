@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "monster_event_manager.h"
 
 CMonsterEventManager::CMonsterEventManager() {}

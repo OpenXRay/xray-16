@@ -6,11 +6,11 @@
 //	Description : Level change object
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "level_changer.h"
-#include "hit.h"
-#include "actor.h"
-#include "xrserver_objects_alife.h"
+#include "Hit.h"
+#include "Actor.h"
+#include "xrServer_Objects_ALife.h"
 #include "Level.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/ai_object_location_impl.h"

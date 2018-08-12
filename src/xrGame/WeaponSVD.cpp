@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "weaponsvd.h"
+#include "WeaponSVD.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponSVD::CWeaponSVD(void) {}

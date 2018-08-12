@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrMessages.h"
 #include "xrGameSpyServer.h"
 #include "xrEngine/IGame_Persistent.h"

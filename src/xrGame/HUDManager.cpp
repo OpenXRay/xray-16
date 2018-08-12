@@ -1,13 +1,13 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "HUDManager.h"
-#include "hudtarget.h"
-#include "actor.h"
+#include "HUDTarget.h"
+#include "Actor.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/xr_input.h"
 #include "GamePersistent.h"
 #include "MainMenu.h"
-#include "grenade.h"
-#include "spectator.h"
+#include "Grenade.h"
+#include "Spectator.h"
 #include "Car.h"
 #include "UIGameCustom.h"
 #include "UICursor.h"
@@ -65,11 +65,11 @@ LPCSTR CFontManager::GetFontTexName(LPCSTR section)
     int def_idx = 1; // default 1024x768
     int idx = def_idx;
 #if 0
-	u32 w = Device.dwWidth;
+    u32 w = Device.dwWidth;
 
-	if(w<=800)		idx = 0;
-	else if(w<=1280)idx = 1;
-	else 			idx = 2;
+    if(w<=800)		idx = 0;
+    else if(w<=1280)idx = 1;
+    else 			idx = 2;
 #else
     u32 h = Device.dwHeight;
 
@@ -313,7 +313,7 @@ void CHUDManager::SetHitmarkType(LPCSTR tex_name) { HitMarker.InitShader(tex_nam
 void CHUDManager::SetGrenadeMarkType(LPCSTR tex_name) { HitMarker.InitShader_Grenade(tex_name); }
 // ------------------------------------------------------------------------------------
 
-#include "ui\UIMainInGameWnd.h"
+#include "ui/UIMainInGameWnd.h"
 extern CUIXml* pWpnScopeXml;
 
 void CHUDManager::Load()

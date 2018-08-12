@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "telekinesis.h"
 #include "entity_alive.h"
 #include "xrPhysics/PhysicsShell.h"

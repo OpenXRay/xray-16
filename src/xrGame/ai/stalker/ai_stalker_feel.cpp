@@ -6,7 +6,7 @@
 //	Description : Feelings for monster "Stalker"
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai_stalker.h"
 #include "inventory_item.h"
 #include "memory_manager.h"

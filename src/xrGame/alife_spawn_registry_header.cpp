@@ -6,7 +6,7 @@
 //	Description : ALife spawn registry header
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_spawn_registry_header.h"
 #include "alife_space.h"
 #include "Common/LevelStructure.hpp"

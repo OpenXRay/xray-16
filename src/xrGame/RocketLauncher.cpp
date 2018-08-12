@@ -3,10 +3,10 @@
 //						стреляющих гранатами и ракетами
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "RocketLauncher.h"
 #include "CustomRocket.h"
-#include "xrserver_objects_alife_items.h"
+#include "xrServer_Objects_ALife_Items.h"
 #include "Level.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrEngine/IGame_Persistent.h"

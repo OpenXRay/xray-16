@@ -1,9 +1,9 @@
 #pragma once
 
-#include "shootingobject.h"
-#include "weaponammo.h"
-#include "rocketlauncher.h"
-#include "entity.h"
+#include "ShootingObject.h"
+#include "WeaponAmmo.h"
+#include "RocketLauncher.h"
+#include "Entity.h"
 #include "phskeleton.h"
 #include "hit_immunity.h"
 #include "memory_manager.h"

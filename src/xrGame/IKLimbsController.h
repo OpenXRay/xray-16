@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IK/IKLimb.h"
+#include "ik/IKLimb.h"
 #include "pose_extrapolation.h"
 #include "ik_object_shift.h"
 class IKinematicsAnimated;

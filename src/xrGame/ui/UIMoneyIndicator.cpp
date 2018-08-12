@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIMoneyIndicator.h"
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"

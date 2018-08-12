@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UITalkWnd.h"
 #include "UITalkDialogWnd.h"
 #include "Actor.h"

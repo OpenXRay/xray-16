@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

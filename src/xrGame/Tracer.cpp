@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Tracer.h"
-#include "xrEngine/render.h"
+#include "xrEngine/Render.h"
 
 #include "Include/xrRender/UIShader.h"
 #include "Include/xrRender/UIRender.h"

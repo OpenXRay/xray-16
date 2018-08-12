@@ -1,8 +1,8 @@
 #pragma once
 #include "game_cl_mp.h"
 
-#include "ui\UIBuyWndShared.h"
-#include "ui\UIBuyWndBase.h"
+#include "ui/UIBuyWndShared.h"
+#include "ui/UIBuyWndBase.h"
 #include "xrCore/buffer_vector.h"
 
 class CUISkinSelectorWnd;

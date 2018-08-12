@@ -6,7 +6,7 @@
 //	Description : ALife group registry
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_group_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 

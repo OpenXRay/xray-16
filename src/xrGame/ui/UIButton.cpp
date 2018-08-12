@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIButton.h"
 #include "UIBtnHint.h"
 #include "UICursor.h"

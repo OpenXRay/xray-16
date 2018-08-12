@@ -3,7 +3,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "monster_community.h"
 
 #define MONSTER_RELATIONS_SECT "monster_communities"

@@ -2,13 +2,13 @@
 #include "PhraseScript.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
-#include "gameobject.h"
+#include "GameObject.h"
 #include "script_game_object.h"
-#include "infoportion.h"
-#include "inventoryowner.h"
+#include "InfoPortion.h"
+#include "InventoryOwner.h"
 #include "ai_debug.h"
 #include "ui/xrUIXmlParser.h"
-#include "actor.h"
+#include "Actor.h"
 
 //загрузка из XML файла
 void CDialogScriptHelper::Load(CUIXml* uiXml, XML_NODE phrase_node)

@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHCommander.h"
 
-#include "phsimplecalls.h"
+#include "PHSimpleCalls.h"
 #ifdef DEBUG
 
 // extern CPHWorld	*ph_world;

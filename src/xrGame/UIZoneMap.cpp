@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "uizonemap.h"
 
 #include "InfoPortion.h"
@@ -8,7 +8,7 @@
 #include "Level.h"
 #include "game_cl_base.h"
 
-#include "actor.h"
+#include "Actor.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/game_graph.h"
 

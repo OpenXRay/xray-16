@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "CarWeapon.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "PhysicsShellHolder.h"
@@ -6,7 +6,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "Common/object_broker.h"
 #include "ai_sounds.h"
-#include "weaponAmmo.h"
+#include "WeaponAmmo.h"
 #include "xr_level_controller.h"
 #include "game_object_space.h"
 

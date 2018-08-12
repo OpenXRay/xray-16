@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrEngine/feel_touch.h"
+#include "xrEngine/Feel_Touch.h"
 #include "inventory_item_object.h"
 
 #include "InfoPortionDefs.h"

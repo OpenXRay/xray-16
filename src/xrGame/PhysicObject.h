@@ -1,11 +1,11 @@
 #pragma once
 
-#include "gameobject.h"
-#include "physicsshellholder.h"
-#include "physicsskeletonobject.h"
+#include "GameObject.h"
+#include "PhysicsShellHolder.h"
+#include "PhysicsSkeletonObject.h"
 #include "PHSkeleton.h"
 #include "animation_script_callback.h"
-#include "xrserver_objects_alife.h"
+#include "xrServer_Objects_ALife.h"
 #include "xrCommon/xr_deque.h"
 
 class CSE_ALifeObjectPhysic;

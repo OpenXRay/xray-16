@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai_monster_squad.h"
 #include "Entity.h"
 #include "xrAICore/Navigation/ai_object_location.h"

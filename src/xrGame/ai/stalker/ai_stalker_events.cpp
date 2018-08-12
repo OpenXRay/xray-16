@@ -6,7 +6,7 @@
 //	Description : Events handling for monster "Stalker"
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai_stalker.h"
 #include "PDA.h"
 #include "Inventory.h"

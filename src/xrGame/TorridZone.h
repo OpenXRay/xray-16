@@ -1,5 +1,5 @@
 #pragma once
-#include "mosquitobald.h"
+#include "MosquitoBald.h"
 
 class CObjectAnimator;
 

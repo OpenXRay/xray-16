@@ -4,9 +4,9 @@
 
 #include "alife_space.h"
 #include "PHSkeleton.h"
-#include "Entity_Alive.h"
+#include "entity_alive.h"
 #include "PHSoundPlayer.h"
-#include "Phdestroyable.h"
+#include "PHDestroyable.h"
 #include "character_hit_animations.h"
 #include "death_anims.h"
 #include "character_shell_control.h"

@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////
 
 #pragma once
-#include "artefact.h"
+#include "Artefact.h"
 
 class CNeedles : public CArtefact
 {

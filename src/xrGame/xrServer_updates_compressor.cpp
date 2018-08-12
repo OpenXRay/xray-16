@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Level.h"
 #include "xrServer_updates_compressor.h"
 #include "xrCore/Compression/ppmd_compressor.h"

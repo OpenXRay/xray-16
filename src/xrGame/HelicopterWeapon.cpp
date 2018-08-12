@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "helicopter.h"
 #include "ExplosiveRocket.h"
 #include "xrMessages.h"

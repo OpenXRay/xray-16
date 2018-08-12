@@ -1,7 +1,7 @@
 #ifndef MONSTER_STATE_ATTACK_ON_RUN_H
 #define MONSTER_STATE_ATTACK_ON_RUN_H
 
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 
 #include "ai/weighted_random.h"
 

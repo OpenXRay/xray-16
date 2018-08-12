@@ -4,8 +4,8 @@
 #include "burer_state_attack_gravi.h"
 #include "burer_state_attack_shield.h"
 #include "burer_state_attack_melee.h"
-#include "ai/Monsters/states/state_look_point.h"
-#include "ai/Monsters/states/state_move_to_restrictor.h"
+#include "ai/monsters/states/state_look_point.h"
+#include "ai/monsters/states/state_move_to_restrictor.h"
 #include "burer_state_attack_run_around.h"
 #include "burer_state_attack_antiaim.h"
 

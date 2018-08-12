@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "uiprogressbar.h"
 
 CUIProgressBar::CUIProgressBar(void)

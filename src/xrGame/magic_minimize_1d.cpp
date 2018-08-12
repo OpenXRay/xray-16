@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "magic_minimize_1d.h"
 
 //----------------------------------------------------------------------------

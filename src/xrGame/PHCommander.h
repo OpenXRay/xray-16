@@ -1,7 +1,7 @@
 #pragma once
 #ifndef PH_COMMANDER_H
 #define PH_COMMANDER_H
-#include "xrPhysics/iphworld.h"
+#include "xrPhysics/IPHWorld.h"
 #include "xrCore/Threading/Lock.hpp"
 
 class CPHReqBase;

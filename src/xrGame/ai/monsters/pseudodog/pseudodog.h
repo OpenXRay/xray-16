@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/BaseMonster/base_monster.h"
 
 class CAI_PseudoDog : public CBaseMonster
 {

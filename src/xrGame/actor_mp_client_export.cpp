@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "actor_mp_client.h"
 #include "CharacterPhysicsSupport.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "xrPhysics/phvalide.h"
 
 ///	DONE (111 bytes cut from 138 bytes = 27 bytes, total 511.11% or 19.56%)

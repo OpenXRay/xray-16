@@ -6,7 +6,7 @@
 //	Description : Team hierarchy holder
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "team_hierarchy_holder.h"
 #include "squad_hierarchy_holder.h"
 #include "Common/object_broker.h"

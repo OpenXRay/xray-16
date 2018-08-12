@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "torch.h"
+#include "Torch.h"
 #include "PDA.h"
 #include "SimpleDetector.h"
 #include "EliteDetector.h"

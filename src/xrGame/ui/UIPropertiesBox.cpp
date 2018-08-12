@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIPropertiesBox.h"
 #include "Level.h"
 #include "UIListBoxItem.h"

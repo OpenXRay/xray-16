@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_cl_mp.h"
 #include "xr_level_controller.h"
 #include "xrMessages.h"
@@ -26,7 +26,7 @@
 
 #include "string_table.h"
 #include "clsid_game.h"
-#include "mainmenu.h"
+#include "MainMenu.h"
 #include "WeaponKnife.h"
 #include "RegistryFuncs.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
@@ -84,13 +84,13 @@ game_cl_mp::game_cl_mp()
     //-----------------------------------------------------------
     //-----------------------------------------------------------
     /*	pBuySpawnMsgBox		= new CUIMessageBoxEx();
-	//.	pBuySpawnMsgBox->SetWorkPhase(GAME_PHASE_INPROGRESS);
-	pBuySpawnMsgBox->Init("message_box_buy_spawn");
-	pBuySpawnMsgBox->AddCallback("msg_box", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &game_cl_mp::OnBuySpawn));
-	string1024	BuySpawnText;
-	xr_sprintf(BuySpawnText, "You can buy a spawn for %d $. Press Yes to pay.", 
-		abs(m_iSpawn_Cost));
-	pBuySpawnMsgBox->SetText(BuySpawnText);
+    //.	pBuySpawnMsgBox->SetWorkPhase(GAME_PHASE_INPROGRESS);
+    pBuySpawnMsgBox->Init("message_box_buy_spawn");
+    pBuySpawnMsgBox->AddCallback("msg_box", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &game_cl_mp::OnBuySpawn));
+    string1024	BuySpawnText;
+    xr_sprintf(BuySpawnText, "You can buy a spawn for %d $. Press Yes to pay.",
+        abs(m_iSpawn_Cost));
+    pBuySpawnMsgBox->SetText(BuySpawnText);
 */ //-----------------------------------------------------------
     m_reward_generator = NULL;
     m_ready_to_open_buy_menu = true;

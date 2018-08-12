@@ -7,7 +7,7 @@
 #define AFX_XRSERVER_H__65728A25_16FC_4A7B_8CCE_D798CA5EC64E__INCLUDED_
 #pragma once
 
-#include "xrNetServer/net_server.h"
+#include "xrNetServer/NET_Server.h"
 #include "game_sv_base.h"
 #include "id_generator.h"
 #include "xrEngine/mp_logging.h"

@@ -13,7 +13,7 @@
 #include "xrCore/Animation/Motion.hpp"
 #include "Include/xrRender/Kinematics.h"
 #include "script_entity_action.h"
-#include "weapon.h"
+#include "Weapon.h"
 #include "ParticlesObject.h"
 #include "script_game_object.h"
 #include "xrScriptEngine/script_engine.hpp"

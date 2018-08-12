@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIMPPlayersAdm.h"
 #include "UIXmlInit.h"
 #include "UIListBox.h"
@@ -11,7 +11,7 @@
 #include "xrServer.h"
 #include "game_cl_base.h"
 #include "game_cl_mp.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "string_table.h"
 #include "xrCore/xr_token.h"
 

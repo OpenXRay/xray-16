@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "actor.h"
+#include "Actor.h"
 #include "level_changer.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 

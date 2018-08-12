@@ -6,7 +6,7 @@
 //	Description : Stalker motivation action manager class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_planner.h"
 #include "stalker_property_evaluators.h"
 #include "stalker_danger_property_evaluators.h"

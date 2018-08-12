@@ -3,7 +3,7 @@
 // ZudaArtefact - артефакт "зуда"
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ZudaArtifact.h"
 #include "xrPhysics/PhysicsShell.h"
 

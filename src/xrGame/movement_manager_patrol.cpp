@@ -12,7 +12,7 @@
 #include "level_path_manager.h"
 #include "detail_path_manager.h"
 #include "xrAICore/Navigation/ai_object_location.h"
-#include "custommonster.h"
+#include "CustomMonster.h"
 #include "level_path_builder.h"
 #include "detail_path_builder.h"
 #include "mt_config.h"

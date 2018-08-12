@@ -5,7 +5,7 @@
 //	Description : UI Hint (for UIHintWindow) window class implementation
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIHint.h"
 
 #include "UIStatic.h"

@@ -1,7 +1,7 @@
-#include "stdafx.h"
-#include "inventory.h"
-#include "weapon.h"
-#include "actor.h"
+#include "StdAfx.h"
+#include "Inventory.h"
+#include "Weapon.h"
+#include "Actor.h"
 #include "xrCore/xr_ini.h"
 
 static u32 const ammo_to_cost_map_koef = 3;

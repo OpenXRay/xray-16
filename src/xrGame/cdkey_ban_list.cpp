@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "cdkey_ban_list.h"
 #include "Common/object_broker.h"
 

@@ -3,7 +3,7 @@
 //									другим персонажам
 //////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "relation_registry.h"
 #include "xrGame/game_type.h"
 

@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "raypick.h"
-#include "level.h"
+#include "Level.h"
 
 CRayPick::CRayPick()
 {

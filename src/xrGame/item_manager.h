@@ -9,7 +9,7 @@
 #pragma once
 
 #include "object_manager.h"
-#include "gameobject.h"
+#include "GameObject.h"
 
 class CCustomMonster;
 

@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "uilistwnd.h"
+#include "StdAfx.h"
+#include "UIListWnd.h"
 //.#include "uiscrollbar.h"
 #include "UIFrameLineWnd.h"
 

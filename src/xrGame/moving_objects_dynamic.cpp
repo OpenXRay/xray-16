@@ -6,7 +6,7 @@
 //	Description : moving objects with dynamic objects, i.e. objects with predictable behaviour
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "moving_objects.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"

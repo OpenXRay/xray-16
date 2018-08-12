@@ -6,8 +6,8 @@
 //	Description : Animations, Bone transformations and Sounds for monster "Rat"
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "ai/Monsters/rats/ai_rat.h"
+#include "StdAfx.h"
+#include "ai/monsters/rats/ai_rat.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "ai_debug.h"
 #include "movement_manager.h"

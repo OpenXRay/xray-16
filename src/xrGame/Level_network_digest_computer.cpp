@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Level.h"
 #include <GameSpy/md5.h>
 #include "xrNetServer/NET_Messages.h"

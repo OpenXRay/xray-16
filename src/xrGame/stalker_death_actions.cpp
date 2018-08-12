@@ -6,7 +6,7 @@
 //	Description : Stalker death action classes
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_death_actions.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_decision_space.h"
@@ -15,12 +15,12 @@
 #include "movement_manager_space.h"
 #include "detail_path_manager_space.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "inventory.h"
-#include "weapon.h"
+#include "Inventory.h"
+#include "Weapon.h"
 #include "xr_level_controller.h"
 #include "clsid_game.h"
 #include "CharacterPhysicsSupport.h"
-#include "weaponmagazined.h"
+#include "WeaponMagazined.h"
 
 using namespace StalkerDecisionSpace;
 

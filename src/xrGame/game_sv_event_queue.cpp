@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_sv_event_queue.h"
 #include "xrCore/Threading/Lock.hpp"
 

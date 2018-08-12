@@ -4,15 +4,15 @@
 // такой же как и обычный, но при получении хита
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "BlackGraviArtifact.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "entity_alive.h"
 #include "ParticlesObject.h"
-#include "phmovementcontrol.h"
-#include "xrmessages.h"
-#include "physicsshellholder.h"
-#include "explosive.h"
+#include "PHMovementControl.h"
+#include "xrMessages.h"
+#include "PhysicsShellHolder.h"
+#include "Explosive.h"
 #include "xrPhysics/IPHWorld.h"
 #include "CharacterPhysicsSupport.h"
 // extern CPHWorld*	ph_world;
