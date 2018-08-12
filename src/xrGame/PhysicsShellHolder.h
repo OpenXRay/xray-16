@@ -47,7 +47,7 @@ public:
     virtual bool ActivationSpeedOverriden(Fvector& dest, bool clear_override) { return false; }
     IC CPhysicsShell*& PPhysicsShell() { return m_pPhysicsShell; }
     IC CPhysicsShellHolder* PhysicsShellHolder() { return this; }
-    virtual const IObjectPhysicsCollision* physics_collision();
+    virtual const IObjectPhysicsCollision* physics_collision() {}
     virtual const IPhysicsShell* physics_shell() const;
     virtual IPhysicsShell* physics_shell();
     virtual const IPhysicsElement* physics_character() const;
