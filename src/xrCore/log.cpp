@@ -44,7 +44,7 @@ void AddOne(const char* split)
 {
     logCS.Enter();
 
-#ifdef DEBUG
+#ifdef WINDOWS
     OutputDebugString(split);
     OutputDebugString("\n");
 #endif
