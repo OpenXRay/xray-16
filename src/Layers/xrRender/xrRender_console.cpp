@@ -22,11 +22,17 @@ const xr_token qsmapsize_token[] =
     { "3072", 3072 },
     { "3584", 3584 },
     { "4096", 4096 },
+    { "5120", 5120 },
     { "6144", 6144 },
+    { "7168", 7168 },
     { "8192", 8192 },
+    { "9216", 9216 },
     { "10240", 10240 },
+    { "11264", 11264 },
     { "12288", 12288 },
+    { "13312", 13312 },
     { "14336", 14336 },
+    { "15360", 15360 },
     { "16384", 16384 },
     { nullptr, 0 }
 };
@@ -912,7 +918,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
     CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_opt", &ps_r3_dyn_wet_surf_opt, 0, 1);
     CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);
-    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 30, 100);
+    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 20, 100);
     CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_sm_res", &ps_r3_dyn_wet_surf_sm_res, 64, 2048);
 
     CMD3(CCC_Mask, "r3_volumetric_smoke", &ps_r2_ls_flags, R3FLAG_VOLUMETRIC_SMOKE);
