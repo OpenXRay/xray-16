@@ -5,6 +5,7 @@ list(APPEND DIRS
     "ai"
     "ik"
     "ui"
+    "../xrServerEntities"
     )
 
 add_dir("${DIRS}")

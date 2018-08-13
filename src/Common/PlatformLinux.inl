@@ -187,6 +187,7 @@ typedef long LONG_PTR;
 
 typedef int HANDLE;
 typedef void* HMODULE;
+typedef void* PVOID;
 typedef void* LPVOID;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;

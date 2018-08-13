@@ -108,7 +108,7 @@ typename CSIni_Table::ITEM_TABLE& CSIni_Table::table()
 
     for (auto i = table_ini.Data.cbegin(); table_ini.Data.cend() != i; ++i)
     {
-        T_INI_LOADER::index_type cur_index = T_INI_LOADER::IdToIndex((*i).first, type_max<T_INI_LOADER::index_type>);
+        typename T_INI_LOADER::index_type cur_index = T_INI_LOADER::IdToIndex((*i).first, type_max<T_INI_LOADER::index_type>);
 
         if (type_max<T_INI_LOADER::index_type> == cur_index)
             xrDebug::Fatal(DEBUG_INFO, "wrong community %s in section [%s]", (*i).first, table_sect);
