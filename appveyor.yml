@@ -18,7 +18,7 @@ platform:
 - x86
 
 cache:
-- packages -> **\packages.config
+- src/packages -> **/packages.config
 
 before_build:
 - cmd: >-
