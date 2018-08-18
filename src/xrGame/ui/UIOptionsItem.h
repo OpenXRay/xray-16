@@ -25,8 +25,8 @@ public:
     static CUIOptionsManager* GetOptionsManager() { return &m_optionsManager; }
     virtual void OnMessage(LPCSTR message);
 
-    virtual void SetCurrentOptValue() = 0; // opt->current
-    virtual void SaveBackUpOptValue() = 0; // current->backup
+    virtual void SetCurrentOptValue() {} // opt->current
+    virtual void SaveBackUpOptValue() {} // current->backup
     virtual void SaveOptValue() = 0; // current->opt
     virtual void UndoOptValue() = 0; // backup->current
     virtual bool IsChangedOptValue() const = 0; // backup!=current
