@@ -48,8 +48,15 @@ FS_Path::FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt, LPCSTR _FilterCaptio
     xr_strcpy(temp, sizeof(temp), _Root);
     if (_Add)
         xr_strcat(temp, _Add);
-    if (temp[0] && temp[xr_strlen(temp) - 1] != '\\')
-        xr_strcat(temp, "\\");
+#if defined(LINUX)
+    char *ptr = strchr(temp, '\\');
+    while (ptr) {
+        *ptr = '/';
+        ptr = strchr(ptr, '\\');
+    }
+#endif
+    if (temp[0] && temp[xr_strlen(temp) - 1] != _DELIMITER)
+        xr_strcat(temp, DELIMITER);
     m_Path = xr_strlwr(xr_strdup(temp));
     m_DefExt = _DefExt ? xr_strlwr(xr_strdup(_DefExt)) : 0;
     m_FilterCaption = _FilterCaption ? xr_strlwr(xr_strdup(_FilterCaption)) : 0;

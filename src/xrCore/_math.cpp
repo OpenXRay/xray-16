@@ -326,14 +326,16 @@ void _initialize_cpu()
 
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
+    if (SDL_HasAltiVec()) xr_strcat(features, ", AltiVec");
     if (SDL_HasMMX()) xr_strcat(features, ", MMX");
     if (SDL_Has3DNow()) xr_strcat(features, ", 3DNow!");
     if (SDL_HasSSE()) xr_strcat(features, ", SSE");
     if (SDL_HasSSE2()) xr_strcat(features, ", SSE2");
     if (SDL_HasSSE3()) xr_strcat(features, ", SSE3");
-    if (SDL_HasRDTSC()) xr_strcat(features, ", RDTSC");
     if (SDL_HasSSE41()) xr_strcat(features, ", SSE4.1");
     if (SDL_HasSSE42()) xr_strcat(features, ", SSE4.2");
+    if (SDL_HasAVX()) xr_strcat(features, ", AVX");
+    if (SDL_HasAVX2()) xr_strcat(features, ", AVX2");
 
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d", std::thread::hardware_concurrency(), SDL_GetCPUCount());

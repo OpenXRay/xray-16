@@ -87,13 +87,29 @@ inline void Sleep(int ms)
     usleep(ms * 1000);
 }
 
+ #include <libgen.h>
 inline void _splitpath (
         const char* path,  // Path Input
         char* drive,       // Drive     : Output
         char* dir,         // Directory : Output
         char* fname,       // Filename  : Output
         char* ext          // Extension : Output
-){}
+){
+    if(drive)
+        strcpy(drive, "");
+
+    if(dir)
+        strcpy(dir, dirname(path));
+
+    if(fname)
+        strcpy(fname, basename(path));
+}
+
+#include <iostream>
+inline void OutputDebugString(char *str) // for linux debugger
+{
+    std::cerr << str;
+}
 
 inline unsigned long GetLastError()
 {
