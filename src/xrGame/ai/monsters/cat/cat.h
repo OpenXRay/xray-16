@@ -20,5 +20,12 @@ public:
 
     virtual void HitEntityInJump(const CEntity* pEntity);
 
+	//-------------------------------------------------------------------Romann
+	virtual	bool	is_relation_enemy	(const CEntityAlive *tpEntityAlive) const;
+	xr_vector<shared_str>				m_friend_community_overrides;
+	void								load_friend_community_overrides	(LPCSTR section);
+	bool								is_community_friend_overrides	(const CEntityAlive *tpEntityAlive) const;
+	//-------------------------------------------------------------------Romann
+
     pcstr get_monster_class_name() override { return "cat"; }
 };

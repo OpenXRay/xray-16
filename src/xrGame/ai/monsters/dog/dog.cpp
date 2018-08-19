@@ -16,6 +16,13 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "Actor.h"
 
+#include "../../../Inventory.h"
+#include "../../../monster_community.h"
+#include "../../../character_community.h"
+#include "../../../InventoryOwner.h"
+#include "../../../../xrServerEntities/character_info.h"
+
+
 #ifdef _DEBUG
 #include <dinput.h>
 #endif
@@ -201,8 +208,78 @@ void CAI_Dog::Load(LPCSTR section)
 #ifdef DEBUG
     anim().accel_chain_test();
 #endif
+
+	load_friend_community_overrides(section);  //Romann
+
     PostLoad(section);
 }
+
+	//-------------------------------------------------------------------Romann
+void CAI_Dog::load_friend_community_overrides(LPCSTR section)
+{
+	LPCSTR src = pSettings->r_string(section,"Friend_Community_Overrides");
+	
+	// parse src
+	int item_count = _GetItemCount(src);
+	m_friend_community_overrides.resize(item_count);
+	for (int i=0; i<item_count; i++) {
+		string128	st;
+		_GetItem	(src,i,st);
+		m_friend_community_overrides[i] = st;
+	}
+}
+
+bool CAI_Dog::is_community_friend_overrides(const CEntityAlive *entity_alive) const
+{
+	const CInventoryOwner	*IO = smart_cast<const CInventoryOwner*>(entity_alive);
+	if (!IO) return false;
+	if (const_cast<CEntityAlive *>(entity_alive)->cast_base_monster()) return false;
+	
+	return (
+		std::find(
+			m_friend_community_overrides.begin(),
+			m_friend_community_overrides.end(),
+			IO->CharacterInfo().Community().id()
+		)
+		!=
+		m_friend_community_overrides.end()
+	);
+}
+
+bool CAI_Dog::is_relation_enemy(const CEntityAlive *tpEntityAlive) const
+{
+	//	MONSTER_COMMUNITY_ID
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "bandit") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "dolg") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "ecolog") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "freedom") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "killer") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "army") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "monolith") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "stalker") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "zombied") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "csky") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "trader") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_stalker") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_bandit") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_dolg") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_freedom") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_csky") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_ecolog") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_killer") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_army") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "actor_monolith") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "stalker_zombied") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "arena_enemy") == 0) return false;
+	if (xr_strcmp(*(tpEntityAlive->cNameSect()), "renegade") == 0) return false;
+	if (is_community_friend_overrides(tpEntityAlive)) return false;
+
+	return inherited::is_relation_enemy(tpEntityAlive);
+}
+
+
+	//-------------------------------------------------------------------Romann
 
 void CAI_Dog::reinit()
 {

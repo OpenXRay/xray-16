@@ -25,6 +25,13 @@ public:
     virtual bool can_use_agressive_jump(const IGameObject*);
     pcstr get_monster_class_name() override { return "dog"; }
 
+	//-------------------------------------------------------------------Romann
+	virtual	bool	is_relation_enemy	(const CEntityAlive *tpEntityAlive) const;
+	xr_vector<shared_str>				m_friend_community_overrides;
+	void								load_friend_community_overrides	(LPCSTR section);
+	bool								is_community_friend_overrides	(const CEntityAlive *tpEntityAlive) const;
+	//-------------------------------------------------------------------Romann
+
 public:
     void set_current_animation(u32 curr_anim = -1);
     void start_animation();
