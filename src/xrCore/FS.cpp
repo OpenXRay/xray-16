@@ -520,7 +520,7 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
-    hSrcFile = ::open(cFileName, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    hSrcFile = ::open(cFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);
@@ -563,7 +563,7 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
 #elif defined(LINUX)
-    hSrcFile = ::open(cFileName, O_RDONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    hSrcFile = ::open(cFileName, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);

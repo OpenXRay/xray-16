@@ -79,7 +79,7 @@ void PrintBuildInfo()
 
     if (builder)
         strconcat(sizeof(buf), buf, buf, " (built by ", builder, ")"); // " (built by builder)"
-    
+
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
@@ -184,7 +184,7 @@ void SDLLogOutput(void* /*userdata*/,
     Log(buf);
 }
 
-void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
+void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
@@ -193,11 +193,8 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
-#if defined(WINDOWS)
-        Params = xr_strdup(GetCommandLine());
-#elif  defined(LINUX)
-        Params = xr_strdup(""); //TODO handle /proc/self/cmdline
-#endif
+
+        Params = xr_strdup (commandLine);
 
 #if defined(WINDOWS)
         if (!strstr(Params, "-weather"))

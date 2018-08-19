@@ -193,7 +193,7 @@ const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
 const CLocatorAPI::file* CLocatorAPI::Register(
     pcstr name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif)
 {
-    // Msg("Register[%d] [%s]",vfs,name);
+    Msg("Register[%d] [%s]",vfs,name);
     string256 temp_file_name;
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
     xr_strlwr(temp_file_name);
@@ -265,7 +265,7 @@ IReader* open_chunk(void* ptr, u32 ID)
     u32 pt = SetFilePointer(ptr, 0, nullptr, FILE_BEGIN);
     VERIFY(pt != INVALID_SET_FILE_POINTER);
 #else
-    ::rewind(ptr);
+    ::lseek(ptr, 0L, SEEK_SET);
 #endif
     while (true)
     {
@@ -314,7 +314,7 @@ IReader* open_chunk(void* ptr, u32 ID)
         if (pt == INVALID_SET_FILE_POINTER)
             return nullptr;
 #else
-        if(-1 == ::fseek(ptr, dwSize, SEEK_CUR))
+        if(-1 == ::lseek(ptr, dwSize, SEEK_CUR))
             return nullptr;
 #endif
     }
@@ -422,7 +422,7 @@ void CLocatorAPI::archive::open()
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
     size = GetFileSize(hSrcFile, nullptr);
 #elif defined(LINUX)
-    hSrcFile = ::open(*path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    hSrcFile = ::open(*path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     R_ASSERT(hSrcFile != -1);
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);
@@ -513,9 +513,12 @@ bool CLocatorAPI::load_all_unloaded_archives()
 void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 {
     string_path N;
+#if defined(WINDOWS)
     xr_strcpy(N, sizeof N, path);
     xr_strcat(N, entry.name);
-    xr_strlwr(N);
+#elif defined(LINUX)
+    xr_strcpy(N, sizeof N, entry.name);
+#endif
 
     if (entry.attrib & _A_HIDDEN)
         return;
@@ -629,7 +632,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     while (done != -1)
     {
 #if defined(LINUX)
-        xr_strcpy(findData.name, sizeof globbuf.gl_pathv[handle - done], globbuf.gl_pathv[handle - done]);
+        xr_strcpy(findData.name, globbuf.gl_pathv[handle - done]);
         struct stat fi;
         stat(findData.name, &fi);
         findData.size = fi.st_size;
@@ -638,9 +641,14 @@ bool CLocatorAPI::Recurse(pcstr path)
         bool ignore = false;
         if (m_Flags.test(flNeedCheck))
         {
+#ifdef WINDOWS
             xr_strcpy(fullPath, sizeof fullPath, path);
             xr_strcat(fullPath, findData.name);
             ignore = ignore_name(findData.name) || ignore_path(fullPath);
+#elif defined(LINUX)
+            xr_strcpy(fullPath, sizeof fullPath, findData.name); // glob return full path to file
+            ignore = ignore_name(findData.name);
+#endif
         }
         else
         {
@@ -704,6 +712,8 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     if (SDL_strlen(fs_path) != 0)
     {
         char *tmp_path = realpath(fs_path, NULL);
+        CHECK_OR_EXIT(tmp_path && tmp_path[0],
+            make_string("Cannot get realpath for \"%s\": %s", fs_path, strerror(errno)));
         SDL_strlcpy(full_current_directory, tmp_path, sizeof full_current_directory);
         free(tmp_path);
     }

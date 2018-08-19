@@ -57,11 +57,11 @@ FS_Path::FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt, LPCSTR _FilterCaptio
 #endif
     if (temp[0] && temp[xr_strlen(temp) - 1] != _DELIMITER)
         xr_strcat(temp, DELIMITER);
-    m_Path = xr_strlwr(xr_strdup(temp));
+    m_Path = xr_strdup(temp);
     m_DefExt = _DefExt ? xr_strlwr(xr_strdup(_DefExt)) : 0;
     m_FilterCaption = _FilterCaption ? xr_strlwr(xr_strdup(_FilterCaption)) : 0;
     m_Add = _Add ? xr_strlwr(xr_strdup(_Add)) : 0;
-    m_Root = _Root ? xr_strlwr(xr_strdup(_Root)) : 0;
+    m_Root = _Root ? xr_strdup(_Root) : 0;
     m_Flags.assign(flags);
 #ifdef _EDITOR
     // Editor(s)/User(s) wants pathes already created in "real" file system :)
@@ -91,7 +91,7 @@ void FS_Path::_set(LPCSTR add)
     if (temp[xr_strlen(temp) - 1] != '\\')
         xr_strcat(temp, "\\");
     xr_free(m_Path);
-    m_Path = xr_strlwr(xr_strdup(temp));
+    m_Path = xr_strdup(temp);
 }
 
 void FS_Path::_set_root(LPCSTR root)
@@ -101,14 +101,14 @@ void FS_Path::_set_root(LPCSTR root)
     if (m_Root[0] && m_Root[xr_strlen(m_Root) - 1] != '\\')
         xr_strcat(temp, "\\");
     xr_free(m_Root);
-    m_Root = xr_strlwr(xr_strdup(temp));
+    m_Root = xr_strdup(temp);
 
     // m_Path
     strconcat(sizeof(temp), temp, m_Root, m_Add ? m_Add : "");
     if (*temp && temp[xr_strlen(temp) - 1] != '\\')
         xr_strcat(temp, "\\");
     xr_free(m_Path);
-    m_Path = xr_strlwr(xr_strdup(temp));
+    m_Path = xr_strdup(temp);
 }
 
 LPCSTR FS_Path::_update(string_path& dest, LPCSTR src) const

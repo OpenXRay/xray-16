@@ -275,9 +275,7 @@ void Detect()
     clk_overhead /= 256;
 
     // Detect QPC Overhead
-#if defined(WINDOWS)  //TODO Linux can doesn`t have ticks (tikless systems). Need think about it
-    QueryPerformanceFrequency((PLARGE_INTEGER)&qpc_freq);
-#endif
+    qpc_freq = SDL_GetPerformanceFrequency();
     qpc_overhead = 0;
     for (int i = 0; i < 256; i++)
     {
