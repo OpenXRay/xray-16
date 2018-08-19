@@ -95,14 +95,22 @@ inline void _splitpath (
         char* fname,       // Filename  : Output
         char* ext          // Extension : Output
 ){
+    char *tmp = NULL;
+    tmp = realpath(path, NULL);
+
     if(drive)
         strcpy(drive, "");
 
-    if(dir)
-        strcpy(dir, dirname(path));
+    if(dir) {
+        strcpy(dir, dirname(tmp));
+        if (dir[0] && dir[strlen(dir) - 1] != '/')
+            strcat(dir, "/");
+    }
 
     if(fname)
-        strcpy(fname, basename(path));
+        strcpy(fname, basename(tmp));
+
+    free(tmp);
 }
 
 #include <iostream>

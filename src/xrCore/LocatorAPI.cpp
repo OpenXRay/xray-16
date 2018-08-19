@@ -193,10 +193,9 @@ const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
 const CLocatorAPI::file* CLocatorAPI::Register(
     pcstr name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif)
 {
-    Msg("Register[%d] [%s]",vfs,name);
+    //Msg("Register[%d] [%s]",vfs,name);
     string256 temp_file_name;
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
-    xr_strlwr(temp_file_name);
 
     // Register file
     file desc;
@@ -403,7 +402,13 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         buffer += sizeof ptr;
 
         strconcat(sizeof full, full, fs_entry_point, name);
-
+#if defined(LINUX)
+        char *tmp_ptr = strchr(full, '\\');
+        while (tmp_ptr) {
+            *tmp_ptr = '/';
+            tmp_ptr = strchr(tmp_ptr, '\\');
+        }
+#endif
         Register(full, A.vfs_idx, crc, ptr, size_real, size_compr, 0);
     }
     hdr->close();
@@ -531,7 +536,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
             return;
         if (0 == xr_strcmp(entry.name, ".."))
             return;
-        xr_strcat(N, "\\");
+        xr_strcat(N, DELIMITER);
         Register(N, 0xffffffff, 0, 0, entry.size, entry.size, (u32)entry.time_write);
         Recurse(N);
     }
@@ -1254,7 +1259,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
 
     VERIFY3(ptr, "cannot create file mapping on file", fname);
 
-    string512 temp;
+    string1024 temp;
     xr_sprintf(temp, sizeof temp, "%s:%s", *A.path, fname);
 
 #ifdef FS_DEBUG
@@ -1388,7 +1393,6 @@ bool CLocatorAPI::check_for_file(pcstr path, pcstr _fname, string_path& fname, c
 
     // correct path
     xr_strcpy(fname, _fname);
-    xr_strlwr(fname);
     if (path && path[0])
         update_path(fname, path, fname);
 
