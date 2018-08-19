@@ -193,8 +193,10 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
-
-        Params = xr_strdup (commandLine);
+        if (commandLine)
+            Params = xr_strdup (commandLine);
+        else
+            Params = xr_strdup("");
 
 #if defined(WINDOWS)
         if (!strstr(Params, "-weather"))
