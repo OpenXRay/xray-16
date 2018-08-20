@@ -67,7 +67,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
     printf("Initializing core...\n");
-    Core.Initialize("mp_screenshots_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
+    Core.Initialize("mp_screenshots_info", nullptr, LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
 
 #ifdef DEBUG
     if (strstr(argv[1], "--gen_params"))

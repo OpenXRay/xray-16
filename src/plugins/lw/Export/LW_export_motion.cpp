@@ -29,7 +29,7 @@ extern "C" {
 //-----------------------------------------------------------------------------------------
 void __cdecl SaveObjectMotion(GlobalFunc* global)
 {
-    Core.Initialize("XRayPlugin", LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
+    Core.Initialize("XRayPlugin", nullptr, LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
     FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
     // get bone ID
     bool bErr = false;

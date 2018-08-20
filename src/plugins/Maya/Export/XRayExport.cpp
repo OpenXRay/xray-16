@@ -44,7 +44,7 @@ void uninitialize(void*)
 MStatus initializePlugin(MObject obj)
 {
     INIT_OBJ = obj;
-    Core.Initialize("XRayMayaPlugin", LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
+    Core.Initialize("XRayMayaPlugin", nullptr, LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
     FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
 
     MFnPlugin plugin(obj, "GSC Game World", "1.00", "Any");
