@@ -87,7 +87,7 @@ inline void Sleep(int ms)
     usleep(ms * 1000);
 }
 
- #include <libgen.h>
+#include <libgen.h>
 inline void _splitpath (
         const char* path,  // Path Input
         char* drive,       // Drive     : Output
@@ -95,8 +95,9 @@ inline void _splitpath (
         char* fname,       // Filename  : Output
         char* ext          // Extension : Output
 ){
-    char *tmp = NULL;
-    tmp = realpath(path, NULL);
+    char tmp[PATH_MAX] = {0};
+    if(!realpath(path, tmp))
+        strcpy(tmp, path);
 
     if(drive)
         strcpy(drive, "");
@@ -109,8 +110,6 @@ inline void _splitpath (
 
     if(fname)
         strcpy(fname, basename(tmp));
-
-    free(tmp);
 }
 
 #include <iostream>
