@@ -51,6 +51,7 @@ static BOOL bException = FALSE;
 #elif defined(LINUX)
 #include <sys/user.h>
 #include <sys/ptrace.h>
+#include <execinfo.h>
 #endif
 #pragma comment(lib, "FaultRep.lib")
 
@@ -444,6 +445,20 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, bufferSize, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
+#elif defined(LINUX)
+    void *array[20];
+    int nptrs = backtrace(array, 20);     // get void*'s for all entries on the stack
+    char **strings = backtrace_symbols(array, nptrs);
+
+    if(strings)
+        for (size_t i = 0; i < nptrs; i++)
+        {
+            if (shared_str_initialized)
+                Log(strings[i]);
+    #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+            buffer += xr_sprintf(buffer, bufferSize, "%s\n", strings[i]);
+    #endif // USE_OWN_ERROR_MESSAGE_WINDOW
+        }
 #endif
     if (shared_str_initialized)
         FlushLog();
