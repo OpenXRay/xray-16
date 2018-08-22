@@ -457,6 +457,8 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                     tmp_ptr = strchr(tmp_ptr, '\\');
                 }
 #endif
+                xr_strlwr(inc_name); // compensate removed xr_strlwr on path
+
                 string_path fn;
                 strconcat(sizeof fn, fn, path, inc_name);
                 const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
@@ -690,7 +692,9 @@ CInifile::Sect& CInifile::r_section(pcstr S) const
     xr_strcpy(section, sizeof section, S);
     xr_strlwr(section);
     auto I = std::lower_bound(DATA.cbegin(), DATA.cend(), section, sect_pred);
-    if (!(I != DATA.cend() && xr_strcmp(*(*I)->Name, section) == 0))
+    if (I == DATA.cend())
+        xrDebug::Fatal(DEBUG_INFO, "Can't find section '%s'.", S);
+    else if (xr_strcmp(*(*I)->Name, section))
     {
         // g_pStringContainer->verify();
 
@@ -703,8 +707,7 @@ CInifile::Sect& CInifile::r_section(pcstr S) const
         // F->w_string ("shared strings:");
         // g_pStringContainer->dump(F);
         // FS.w_close (F);
-
-        xrDebug::Fatal(DEBUG_INFO, "Can't open section '%s'. Please attach [*.ini_log] file to your bug report", S);
+        xrDebug::Fatal(DEBUG_INFO, "Can't open section '%s' (only '%s' avail). Please attach [*.ini_log] file to your bug report", section, *(*I)->Name);
     }
     return **I;
 }

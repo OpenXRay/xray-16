@@ -32,7 +32,6 @@ FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f) {}
 void FS_File::set(const xr_string& nm, long sz, time_t modif, unsigned attr)
 {
     name = nm;
-    xr_strlwr(name);
     size = sz;
     time_write = modif;
     attrib = attr;
@@ -58,9 +57,9 @@ FS_Path::FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt, LPCSTR _FilterCaptio
     if (temp[0] && temp[xr_strlen(temp) - 1] != _DELIMITER)
         xr_strcat(temp, DELIMITER);
     m_Path = xr_strdup(temp);
-    m_DefExt = _DefExt ? xr_strlwr(xr_strdup(_DefExt)) : 0;
+    m_DefExt = _DefExt ? xr_strdup(_DefExt) : 0;
     m_FilterCaption = _FilterCaption ? xr_strlwr(xr_strdup(_FilterCaption)) : 0;
-    m_Add = _Add ? xr_strlwr(xr_strdup(_Add)) : 0;
+    m_Add = _Add ? xr_strdup(_Add) : 0;
     m_Root = _Root ? xr_strdup(_Root) : 0;
     m_Flags.assign(flags);
 #ifdef _EDITOR
@@ -83,7 +82,7 @@ void FS_Path::_set(LPCSTR add)
     // m_Add
     R_ASSERT(add);
     xr_free(m_Add);
-    m_Add = xr_strlwr(xr_strdup(add));
+    m_Add = xr_strdup(add);
 
     // m_Path
     string_path temp;
