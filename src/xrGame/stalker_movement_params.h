@@ -16,23 +16,23 @@ enum EBodyState;
 enum EMovementType;
 enum EMentalState;
 enum EPathType;
-};
+}
 
 namespace MovementManager
 {
 enum EPathType;
-};
+}
 
 namespace DetailPathManager
 {
 enum EDetailPathType;
-};
+}
 
 namespace smart_cover
 {
 class cover;
 class loophole;
-};
+}
 
 class CGameObject;
 class stalker_movement_manager_smart_cover;

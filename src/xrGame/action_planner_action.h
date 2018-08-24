@@ -25,7 +25,7 @@ protected:
 
 public:
     using COperatorCondition = typename inherited_action::COperatorCondition;
-    using _world_operator = typename inherited_planner::_world_operator;
+    using _world_operator = typename inherited_planner::world_operator;
 
 #ifdef LOG_ACTION
 public:

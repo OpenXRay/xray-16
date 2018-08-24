@@ -34,12 +34,12 @@ public:
     using _condition_type = typename CProblemSolver::condition_type;
     using _edge_type = typename CProblemSolver::edge_type;
     using _value_type = typename CProblemSolver::value_type;
-    using _operator_ptr = typename CProblemSolver::_operator_ptr;
+    using _operator_ptr = typename CProblemSolver::operator_ptr;
     typedef CProblemSolver inherited;
     typedef typename inherited::edge_type _action_id_type;
     typedef GraphEngineSpace::CWorldProperty CWorldProperty;
     typedef GraphEngineSpace::CWorldState CWorldState;
-    typedef _world_operator _world_operator;
+    typedef _world_operator world_operator;
 
 protected:
     bool m_initialized;

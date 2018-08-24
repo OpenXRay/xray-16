@@ -63,7 +63,7 @@ struct CVisibleObject;
 struct CSoundObject;
 struct CHitObject;
 struct CNotYetVisibleObject;
-};
+}
 
 namespace MonsterSpace
 {
@@ -82,12 +82,12 @@ enum EScriptSoundAnim;
 enum EMonsterSounds;
 enum EMonsterHeadAnimType;
 struct SBoneRotation;
-};
+}
 
 namespace GameObject
 {
 enum ECallbackType;
-};
+}
 
 class CGameObject;
 class CScriptHit;
@@ -320,7 +320,7 @@ public:
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time);
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type);
 
-    void AddIconedTalkMessage_old(LPCSTR text, LPCSTR texture_name, LPCSTR templ_name){};
+    void AddIconedTalkMessage_old(LPCSTR text, LPCSTR texture_name, LPCSTR templ_name){}
     void AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
     //предикаты наличия/отсутствия порции информации у персонажа
     bool HasInfo(LPCSTR info_id);

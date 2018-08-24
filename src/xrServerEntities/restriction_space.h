@@ -35,4 +35,4 @@ enum ERestrictorTypes
     eRestrictorTypeIn = u8(4),
     eRestrictorTypeOut = u8(5),
 };
-}; // namespace RestrictionSpace
+} // namespace RestrictionSpace

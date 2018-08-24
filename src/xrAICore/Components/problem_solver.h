@@ -33,8 +33,8 @@ public:
     typedef _operator COperator;
     typedef _condition_state CState;
     typedef _condition_evaluator CConditionEvaluator;
+    typedef _operator_ptr operator_ptr;
 #ifdef WINDOWS
-    typedef _operator_ptr _operator_ptr;
     typedef _condition_evaluator_ptr _condition_evaluator_ptr;
 #endif
     typedef typename _operator_condition::condition_type condition_type;
