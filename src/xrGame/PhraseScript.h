@@ -34,7 +34,7 @@ public:
     void AddDontHasInfo(LPCSTR str);
     void AddGiveInfo(LPCSTR str);
     void AddDisableInfo(LPCSTR str);
-    void SetScriptText(LPCSTR str) { m_sScriptTextFunc = str; };
+    void SetScriptText(LPCSTR str) { m_sScriptTextFunc = str; }
     LPCSTR GetScriptText(LPCSTR str_to_translate, const CGameObject* pSpeakerGO1, const CGameObject* pSpeakerGO2,
         LPCSTR dialog_id, LPCSTR phrase_id);
 
@@ -52,7 +52,6 @@ protected:
 
     //скриптовые действия, которые активируется после того как
     //говорится фраза
-    using ACTION_NAME_VECTOR = xr_vector<shared_str>;
     ACTION_NAME_VECTOR m_ScriptActions;
 
     using INFO_VECTOR = xr_vector<shared_str>;
@@ -62,7 +61,6 @@ protected:
 
     //список скриптовых предикатов, выполнение, которых необходимо
     //для того чтоб фраза стала доступной
-    using PRECONDITION_VECTOR = xr_vector<shared_str>;
 
     PRECONDITION_VECTOR m_Preconditions;
     //проверка наличия/отсутствия информации

@@ -19,7 +19,7 @@
 #include "PDA.h"
 #include "InfoPortion.h"
 #include "memory_manager.h"
-#include "ai_phrasedialogmanager.h"
+#include "AI_PhraseDialogManager.h"
 #include "xrMessages.h"
 #include "CustomMonster.h"
 #include "memory_manager.h"

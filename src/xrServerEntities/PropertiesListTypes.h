@@ -93,7 +93,7 @@ template <class T>
 void set_value(T& val, const T& _val)
 {
     val = _val;
-};
+}
 
 template <class T>
 class CustomValue : public PropValue
@@ -153,7 +153,9 @@ public:
 
 private:
     PropValueVec values;
+#ifdef WINDOWS
     TProperties* m_Owner;
+#endif
     // events
 public:
     typedef fastdelegate::FastDelegate1<PropItem*> TOnPropItemFocused;
@@ -189,8 +191,10 @@ public:
     {
         for (auto it = values.begin(); values.end() != it; ++it)
             xr_delete(*it);
-    };
+    }
+#ifdef WINDOWS
     TProperties* Owner() { return m_Owner; }
+#endif
     void SetName(const shared_str& name) { key = name; }
 
     void ResetValues()
@@ -682,16 +686,16 @@ public:
             return HaveCaption() ? caption[GetValueEx() ? 1 : 0].c_str() : "";
         return draw_val;
     }
-    virtual bool Equal(PropValue* val) { return !!value->equal(*((FlagValue<T>*)val)->value, mask); }
-    virtual const T& GetValue() { return *value; }
-    virtual void ResetValue() { value->set(mask, init_value.is(mask)); }
-    virtual bool GetValueEx() { return !!value->is(mask); }
+    virtual bool Equal(PropValue* val) { return !!this->value->equal(*((FlagValue<T>*)val)->value, mask); }
+    virtual const T& GetValue() { return *this->value; }
+    virtual void ResetValue() { this->value->set(mask,  this->init_value.is(mask)); }
+    virtual bool GetValueEx() { return !!this->value->is(mask); }
 
     bool ApplyValue(const T& val)
     {
-        if (!val.equal(*value, mask))
+        if (!val.equal(*this->value, mask))
         {
-            value->set(mask, val.is(mask));
+            this->value->set(mask, val.is(mask));
             return true;
         }
         return false;
@@ -720,16 +724,16 @@ template <class T>
 class TokenValue : public CustomValue<T>, public TokenValueCustom
 {
 public:
-    TokenValue(T* val, xr_token* _token) : TokenValueCustom(_token), CustomValue<T>(val){};
+    TokenValue(T* val, xr_token* _token) : TokenValueCustom(_token), CustomValue<T>(val){}
     virtual xr_string GetDrawText(TOnDrawTextEvent OnDrawText)
     {
         xr_string draw_val;
         if (!OnDrawText.empty())
             OnDrawText(this, draw_val);
         else
-            for (int i = 0; token[i].name; i++)
-                if (token[i].id == (int)GetValue())
-                    return token[i].name;
+            for (int i = 0; this->token[i].name; i++)
+                if (this->token[i].id == (int)GetValue())
+                    return this->token[i].name;
         return draw_val;
     }
 };
