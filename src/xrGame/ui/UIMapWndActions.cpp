@@ -148,7 +148,7 @@ void CMapActionPlanner::setup(CUIMapWnd* object)
     add_evaluator(ePropMapIdle, new CEvaluatorMapConst(false, "ePropMapIdle"));
 
     // final world state
-    _world_operator* action = new CMapActionIdle("eOperatorMapIdle");
+    world_operator* action = new CMapActionIdle("eOperatorMapIdle");
     add_condition(action, ePropMapResized, true);
     add_condition(action, ePropTargetMapShown, true);
     add_condition(action, ePropMapIdle, false);
