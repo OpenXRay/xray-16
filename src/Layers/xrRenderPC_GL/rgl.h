@@ -8,9 +8,9 @@
 #include "Layers/xrRender/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
-#include "smap_allocator.h"
-#include "Layers/xrRender/light_db.h"
-#include "Layers/xrRender/light_render_direct.h"
+#include "SMAP_Allocator.h"
+#include "Layers/xrRender/Light_DB.h"
+#include "Layers/xrRender/Light_Render_Direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
@@ -363,8 +363,8 @@ public:
     void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
     void OnFrame() override;
 
-    void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
-    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
+    void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects
+    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
     // Render mode
     void rmNear() override;

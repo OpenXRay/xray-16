@@ -4,9 +4,9 @@
 #include "xrCDB/ISpatial.h"
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
-#include "light_package.h"
+#include "Light_Package.h"
 #include "light_smapvis.h"
-#include "light_GI.h"
+#include "light_gi.h"
 #endif //(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
 class light : public IRender_Light, public SpatialBase
