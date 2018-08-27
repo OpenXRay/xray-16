@@ -7,10 +7,12 @@
 #endif
 
 #include "xrEngine/stdafx.h"
+#if defined(WINDOWS)
 #include <d3d9.h>
 #include <d3dx9.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
+#endif
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 #include "Layers/xrRender/HW.h"
 #include "Layers/xrRender/Shader.h"

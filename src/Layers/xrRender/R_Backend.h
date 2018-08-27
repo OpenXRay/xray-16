@@ -10,11 +10,11 @@
 #define PGO(a)
 #endif
 
-#include "r_DStreams.h"
+#include "R_DStreams.h"
 #include "r_constants_cache.h"
-#include "r_backend_xform.h"
-#include "r_backend_hemi.h"
-#include "r_backend_tree.h"
+#include "R_Backend_xform.h"
+#include "R_Backend_hemi.h"
+#include "R_Backend_tree.h"
 
 #ifdef USE_DX11
 #include "Layers/xrRenderPC_R4/r_backend_lod.h"
@@ -601,7 +601,7 @@ public:
     void dbg_DrawEllipse(Fmatrix& T, u32 C);
 #endif
 
-    CBackend() { Invalidate(); };
+    CBackend() { Invalidate(); }
 
 #if defined(USE_DX10) || defined(USE_DX11)
 private:
