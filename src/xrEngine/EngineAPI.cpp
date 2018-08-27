@@ -228,12 +228,14 @@ void CEngineAPI::CreateRendererList()
         return;
     }
 
+#if defined(WINDOWS)
     // Hide "d3d10.dll not found" message box for XP
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
     hRenderR2 = XRay::LoadModule("xrRender_R2");
     hRenderR3 = XRay::LoadModule("xrRender_R3");
     hRenderR4 = XRay::LoadModule("xrRender_R4");
+#endif
     hRenderRGL = XRay::LoadModule("xrRender_GL");
 
     // Restore error handling
@@ -246,6 +248,7 @@ void CEngineAPI::CreateRendererList()
         modes.emplace_back("renderer_r1", 0);
     }
 
+#if defined(WINDOWS)
     if (hRenderR2->IsLoaded())
     {
         modes.emplace_back("renderer_r2a", 1);
@@ -269,6 +272,7 @@ void CEngineAPI::CreateRendererList()
         else
             hRenderR4->Close();
     }
+#endif
 
     if (hRenderRGL->IsLoaded())
     {
