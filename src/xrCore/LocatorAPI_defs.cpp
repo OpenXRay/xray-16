@@ -116,6 +116,7 @@ LPCSTR FS_Path::_update(string_path& dest, LPCSTR src) const
     R_ASSERT(src);
     string_path temp;
     xr_strcpy(temp, sizeof(temp), src);
+    xr_strlwr(temp);
     strconcat(sizeof(dest), dest, m_Path, temp);
     return dest;
 }
