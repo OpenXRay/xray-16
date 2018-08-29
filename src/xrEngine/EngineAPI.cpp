@@ -68,6 +68,7 @@ void CEngineAPI::SetupCurrentRenderer()
         }
     }
 
+#if defined(WINDOWS)
     if (psDeviceFlags.test(rsR4))
     {
         if (hRenderR4->IsLoaded())
@@ -109,6 +110,7 @@ void CEngineAPI::SetupCurrentRenderer()
             psDeviceFlags.set(rsR1, true);
         }
     }
+#endif
 
     if (psDeviceFlags.test(rsR1))
     {
