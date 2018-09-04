@@ -2,6 +2,7 @@
 #include "UIDialogWnd.h"
 #include "UIDialogHolder.h"
 #include "GamePersistent.h"
+#include "UIMessageBoxEx.h"
 #include "UILabel.h"
 #include "UIMMShniaga.h"
 #include "UISleepStatic.h"
@@ -19,20 +20,41 @@ SCRIPT_EXPORT(CDialogHolder, (), {
 });
 
 SCRIPT_EXPORT(CUIDialogWnd, (CUIWindow), {
-    module(luaState)[class_<CUIDialogWnd, CUIWindow>("CUIDialogWnd")
-                         .def("ShowDialog", &CUIDialogWnd::ShowDialog)
-                         .def("HideDialog", &CUIDialogWnd::HideDialog)
-                         .def("GetHolder", &CUIDialogWnd::GetHolder)];
+    module(luaState)
+    [
+        class_<CUIDialogWnd, CUIWindow>("CUIDialogWnd")
+            .def("ShowDialog", &CUIDialogWnd::ShowDialog)
+            .def("HideDialog", &CUIDialogWnd::HideDialog)
+            .def("GetHolder", &CUIDialogWnd::GetHolder)
+    ];
+});
+
+SCRIPT_EXPORT(CUIMessageBoxEx, (CUIDialogWnd), {
+    module(luaState)
+    [
+        class_<CUIMessageBoxEx, CUIDialogWnd>("CUIMessageBoxEx")
+            .def(constructor<>())
+            .def("InitMessageBox", &CUIMessageBoxEx::InitMessageBox)
+            .def("SetText", &CUIMessageBoxEx::SetText)
+            .def("GetHost", &CUIMessageBoxEx::GetHost)
+            .def("GetPassword", &CUIMessageBoxEx::GetPassword)
+    ];
 });
 
 SCRIPT_EXPORT(CUIMMShniaga, (CUIWindow), {
-    module(luaState)[class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
-                         .enum_("enum_page_id")[value("epi_main", CUIMMShniaga::epi_main),
-                             value("epi_new_game", CUIMMShniaga::epi_new_game),
-                             value("epi_new_network_game", CUIMMShniaga::epi_new_network_game)]
-                         .def("SetVisibleMagnifier", &CUIMMShniaga::SetVisibleMagnifier)
-                         .def("SetPage", &CUIMMShniaga::SetPage)
-                         .def("ShowPage", &CUIMMShniaga::ShowPage)];
+    module(luaState)
+    [
+        class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
+        .enum_("enum_page_id")
+        [
+            value("epi_main", CUIMMShniaga::epi_main),
+            value("epi_new_game", CUIMMShniaga::epi_new_game),
+            value("epi_new_network_game", CUIMMShniaga::epi_new_network_game)
+        ]
+        .def("SetVisibleMagnifier", &CUIMMShniaga::SetVisibleMagnifier)
+        .def("SetPage", &CUIMMShniaga::SetPage)
+        .def("ShowPage", &CUIMMShniaga::ShowPage)
+    ];
 });
 
 SCRIPT_EXPORT(CUISleepStatic, (CUIStatic),
