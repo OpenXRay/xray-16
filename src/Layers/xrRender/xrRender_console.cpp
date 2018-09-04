@@ -7,6 +7,36 @@
 u32 ps_Preset = 2;
 const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
 
+u32 ps_r2_smapsize = 2048;
+const xr_token qsmapsize_token[] =
+{
+#ifndef MASTER_GOLD
+    { "256", 256 }, // Too bad
+    { "512", 512 }, // But works
+#endif
+    { "1024", 1024 },
+    { "1032", 1032 },
+    { "1536", 1536 },
+    { "2048", 2048 },
+    { "2560", 2560 },
+    { "3072", 3072 },
+    { "3584", 3584 },
+    { "4096", 4096 },
+    { "5120", 5120 },
+    { "6144", 6144 },
+    { "7168", 7168 },
+    { "8192", 8192 },
+    { "9216", 9216 },
+    { "10240", 10240 },
+    { "11264", 11264 },
+    { "12288", 12288 },
+    { "13312", 13312 },
+    { "14336", 14336 },
+    { "15360", 15360 },
+    { "16384", 16384 },
+    { nullptr, 0 }
+};
+
 u32 ps_r_ssao_mode = 2;
 const xr_token qssao_mode_token[] = {{"disabled", 0}, {"default", 1}, {"hdao", 2}, {"hbao", 3}, {nullptr, 0}};
 
@@ -40,7 +70,6 @@ u32 ps_r3_minmax_sm = 3; // = 0;
 const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autodetect", 3}, {nullptr, 0}};
 
 int ps_r2_fxaa = 0;
-int ps_rs_loading_stages = 0;
 
 // “Off”
 // “DX10.0 style [Standard]”
@@ -77,11 +106,11 @@ float ps_r__ssaDONTSORT = 32.f; // RO
 float ps_r__ssaHZBvsTEX = 96.f; // RO
 
 int ps_r__tf_Anisotropic = 8;
+float ps_r__tf_Mipbias = 0.0f;
 
 // R1
 float ps_r1_ssaLOD_A = 64.f;
 float ps_r1_ssaLOD_B = 48.f;
-float ps_r1_tf_Mipbias = 0.0f;
 Flags32 ps_r1_flags = {R1FLAG_DLIGHTS}; // r1-only
 float ps_r1_lmodel_lerp = 0.1f;
 float ps_r1_dlights_clip = 40.f;
@@ -96,7 +125,6 @@ int ps_r1_SoftwareSkinning = 0; // r1-only
 // R2
 float ps_r2_ssaLOD_A = 64.f;
 float ps_r2_ssaLOD_B = 48.f;
-float ps_r2_tf_Mipbias = 0.0f;
 
 // R2-specific
 Flags32 ps_r2_ls_flags = {R2FLAG_SUN
@@ -167,8 +195,9 @@ Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
 
-float ps_r3_dyn_wet_surf_near = 10.f; // 10.0f
-float ps_r3_dyn_wet_surf_far = 30.f; // 30.0f
+int ps_r3_dyn_wet_surf_opt = 1;
+float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
+float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
 //AVO: detail draw radius
@@ -276,16 +305,17 @@ public:
         if (nullptr == HW.pDevice)
             return;
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-// TODO: DX10: Implement mip bias control
-//VERIFY(!"apply not implmemented.");
+#if defined(USE_OGL)
+            // TODO: OGL: Implement mipmap bias control.
+#elif defined(USE_DX10) || defined(USE_DX11)
+        SSManager.SetMipLODBias(*value);
 #else // USE_DX10
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)value)));
 #endif // USE_DX10
     }
 
-    CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -0.5f, +0.5f){};
+    CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f) {}
     virtual void Execute(LPCSTR args)
     {
         CCC_Float::Execute(args);
@@ -653,7 +683,6 @@ void xrRender_initconsole()
 {
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
 
-    CMD4(CCC_Integer, "rs_loadingstages", &ps_rs_loading_stages, 0, 1);
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
 #ifdef DEBUG
     CMD1(CCC_DumpResources, "dump_resources");
@@ -688,6 +717,7 @@ void xrRender_initconsole()
 
     //CMD4(CCC_Float, "r__detail_density", &ps_r__Detail_density, .05f, 0.99f);
     CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.04f, 0.6f); //AVO: extended from 0.2f to 0.04f and replaced variable
+    CMD3(CCC_Mask, "r2_detail_shadow", &ps_r2_ls_flags, R2FLAG_DETAIL_SHADOW);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
@@ -703,12 +733,12 @@ void xrRender_initconsole()
 #endif // DEBUG
 
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
+    CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
 
     // R1
     CMD4(CCC_Float, "r1_ssa_lod_a", &ps_r1_ssaLOD_A, 16, 96);
     CMD4(CCC_Float, "r1_ssa_lod_b", &ps_r1_ssaLOD_B, 16, 64);
     CMD4(CCC_Float, "r1_lmodel_lerp", &ps_r1_lmodel_lerp, 0, 0.333f);
-    CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r1_tf_Mipbias); // {-3 +3}
     CMD3(CCC_Mask, "r1_dlights", &ps_r1_flags, R1FLAG_DLIGHTS);
     CMD4(CCC_Float, "r1_dlights_clip", &ps_r1_dlights_clip, 10.f, 150.f);
     CMD4(CCC_Float, "r1_pps_u", &ps_r1_pps_u, -1.f, +1.f);
@@ -729,7 +759,6 @@ void xrRender_initconsole()
     // R2
     CMD4(CCC_Float, "r2_ssa_lod_a", &ps_r2_ssaLOD_A, 16, 96);
     CMD4(CCC_Float, "r2_ssa_lod_b", &ps_r2_ssaLOD_B, 32, 64);
-    CMD2(CCC_tf_MipBias, "r2_tf_mipbias", &ps_r2_tf_Mipbias);
 
     // R2-specific
     CMD2(CCC_R2GM, "r2em", &ps_r2_gmaterial);
@@ -765,7 +794,6 @@ void xrRender_initconsole()
 #endif // DEBUG
 
     CMD3(CCC_Mask, "r2_sun", &ps_r2_ls_flags, R2FLAG_SUN);
-    CMD3(CCC_Mask, "r2_sun_details", &ps_r2_ls_flags, R2FLAG_SUN_DETAILS);
     CMD3(CCC_Mask, "r2_sun_focus", &ps_r2_ls_flags, R2FLAG_SUN_FOCUS);
     //CMD3(CCC_Mask, "r2_sun_static", &ps_r2_ls_flags, R2FLAG_SUN_STATIC);
     //CMD3(CCC_Mask, "r2_exp_splitscene", &ps_r2_ls_flags, R2FLAG_EXP_SPLIT_SCENE);
@@ -819,6 +847,7 @@ void xrRender_initconsole()
     //  CMD4(CCC_Float,     "r2_parallax_range",    &ps_r2_df_parallax_range,   5.0f,   175.0f  );
 
     CMD4(CCC_Float, "r2_slight_fade", &ps_r2_slight_fade, .2f, 1.f);
+    CMD3(CCC_Token, "r2_smap_size", &ps_r2_smapsize, qsmapsize_token);
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
@@ -887,24 +916,15 @@ void xrRender_initconsole()
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
-    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 10, 70);
-    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 30, 100);
+    CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_opt", &ps_r3_dyn_wet_surf_opt, 0, 1);
+    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);
+    CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 20, 100);
     CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_sm_res", &ps_r3_dyn_wet_surf_sm_res, 64, 2048);
 
     CMD3(CCC_Mask, "r3_volumetric_smoke", &ps_r2_ls_flags, R3FLAG_VOLUMETRIC_SMOKE);
     CMD1(CCC_memory_stats, "render_memory_stats");
 
     //CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
-}
-
-void xrRender_apply_tf()
-{
-    Console->Execute("r__tf_aniso");
-#if RENDER == R_R1
-    Console->Execute("r1_tf_mipbias");
-#else
-    Console->Execute("r2_tf_mipbias");
-#endif
 }
 
 #endif

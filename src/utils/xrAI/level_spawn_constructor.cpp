@@ -12,6 +12,7 @@
 #include "xrServerEntities/clsid_game.h"
 #include "xrServerEntities/xrMessages.h"
 #include "factory_api.h"
+#include <random>
 
 #define IGNORE_ZERO_SPAWN_POSITIONS
 
@@ -482,7 +483,9 @@ void CLevelSpawnConstructor::generate_artefact_spawn_positions()
 #endif
         }
         else*/
-        std::random_shuffle(l_tpaStack.begin(), l_tpaStack.end());
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(l_tpaStack.begin(), l_tpaStack.end(), g);
 
         zone->m_artefact_position_offset = m_level_points.size();
         m_level_points.resize(zone->m_artefact_position_offset + zone->m_artefact_spawn_count);

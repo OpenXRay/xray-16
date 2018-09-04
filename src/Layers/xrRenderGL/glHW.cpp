@@ -5,117 +5,63 @@
 #pragma hdrstop
 
 #include "Layers/xrRender/HW.h"
+#include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "Include/xrAPI/xrAPI.h"
 #include "xrCore/xr_token.h"
 
-#ifndef _EDITOR
-void fill_vid_mode_list(CHW* _hw);
-void free_vid_mode_list();
-
-void fill_render_mode_list();
-void free_render_mode_list();
-#else
-void	fill_vid_mode_list			(CHW* _hw)	{}
-void	free_vid_mode_list			()			{}
-void	fill_render_mode_list		()			{}
-void	free_render_mode_list		()			{}
-#endif
-
 CHW HW;
 
-void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLenum severity,
-                              GLsizei /*length*/, const GLchar* message, const void* /*userParam*/)
+void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLenum severity, GLsizei /*length*/,
+    const GLchar* message, const void* /*userParam*/)
 {
     if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
         Log(message, id);
 }
 
-CHW::CHW() :
-    pDevice(this),
-    pContext(this),
-    m_pSwapChain(this),
-    pBaseRT(0),
-    pBaseZB(0),
-    pPP(0),
-    pFB(0),
-    m_hWnd(nullptr),
-    m_hDC(nullptr),
-    m_hRC(nullptr),
-    m_move_window(true) {}
+CHW::CHW()
+    : pDevice(this), pContext(this), m_pSwapChain(this), pBaseRT(0), pBaseZB(0), pPP(0), pFB(0), m_hWnd(nullptr),
+      m_hDC(nullptr), m_hRC(nullptr)
+{
+}
 
 CHW::~CHW() {}
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-void CHW::CreateDevice(HWND hWnd, bool move_window)
+void CHW::CreateDevice(SDL_Window* hWnd)
 {
     m_hWnd = hWnd;
-    m_move_window = move_window;
 
     R_ASSERT(m_hWnd);
 
-    PIXELFORMATDESCRIPTOR pfd =
-    {
-        sizeof(PIXELFORMATDESCRIPTOR),
-        1,
-        PFD_DRAW_TO_WINDOW |
-        PFD_SUPPORT_OPENGL |
-        PFD_DOUBLEBUFFER, // Flags
-        PFD_TYPE_RGBA, // The kind of framebuffer. RGBA or palette.
-        32, // Color depth of the framebuffer.
-        0, 0, 0, 0, 0, 0,
-        0,
-        0,
-        0,
-        0, 0, 0, 0,
-        24, // Number of bits for the depthbuffer
-        8, // Number of bits for the stencilbuffer
-        0, // Number of Aux buffers in the framebuffer.
-        PFD_MAIN_PLANE,
-        0,
-        0, 0, 0
-    };
-
-    // Get the device context
-    m_hDC = GetDC(m_hWnd);
-    if (m_hDC == nullptr)
-    {
-        Msg("Could not get device context.");
-        return;
-    }
-
     // Choose the closest pixel format
-    int iPixelFormat = ChoosePixelFormat(m_hDC, &pfd);
-    if (iPixelFormat == 0)
-    {
-        Msg("No pixel format found.");
-        return;
-    }
-
+    SDL_DisplayMode mode;
+    SDL_GetWindowDisplayMode(m_hWnd, &mode);
+    mode.format = SDL_PIXELFORMAT_RGBA8888;
     // Apply the pixel format to the device context
-    if (!SetPixelFormat(m_hDC, iPixelFormat, &pfd))
-    {
-        Msg("Could not set pixel format.");
-        return;
-    }
+    SDL_SetWindowDisplayMode(m_hWnd, &mode);
 
     // Create the context
-    m_hRC = wglCreateContext(m_hDC);
+    m_hRC = SDL_GL_CreateContext(m_hWnd);
     if (m_hRC == nullptr)
     {
-        Msg("Could not create drawing context.");
+        Msg("Could not create drawing context: %s", SDL_GetError());
         return;
     }
 
     // Make the new context the current context for this thread
     // NOTE: This assumes the thread calling Create() is the only
     // thread that will use the context.
-    if (!wglMakeCurrent(m_hDC, m_hRC))
+    if (SDL_GL_MakeCurrent(m_hWnd, m_hRC) != 0)
     {
-        Msg("Could not make context current.");
+        Msg("Could not make context current. %s", SDL_GetError());
         return;
     }
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     // Initialize OpenGL Extension Wrangler
     if (glewInit() != GLEW_OK)
@@ -125,8 +71,8 @@ void CHW::CreateDevice(HWND hWnd, bool move_window)
     }
 
 #ifdef DEBUG
-	CHK_GL(glEnable(GL_DEBUG_OUTPUT));
-	CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    CHK_GL(glEnable(GL_DEBUG_OUTPUT));
+    CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
 #endif // DEBUG
 
     // Clip control ensures compatibility with D3D device coordinates.
@@ -135,48 +81,26 @@ void CHW::CreateDevice(HWND hWnd, bool move_window)
 
     //	Create render target and depth-stencil views here
     UpdateViews();
-
-#ifndef _EDITOR
-    updateWindowProps(m_hWnd);
-    fill_vid_mode_list(this);
-#endif
-
-    InitResources(resources);
 }
 
 void CHW::DestroyDevice()
 {
     if (m_hRC)
     {
-        if (!wglMakeCurrent(nullptr, nullptr))
-            Msg("Could not release drawing context.");
+        if (SDL_GL_MakeCurrent(nullptr, nullptr) != 0)
+            Msg("Could not release drawing context: %s", SDL_GetError());
 
-        if (!wglDeleteContext(m_hRC))
-            Msg("Could not delete context.");
+        SDL_GL_DeleteContext(m_hRC);
 
         m_hRC = nullptr;
     }
-
-    if (m_hDC)
-    {
-        if (!ReleaseDC(m_hWnd, m_hDC))
-            Msg("Could not release device context.");
-
-        m_hDC = nullptr;
-    }
-
-#ifndef _EDITOR
-    free_vid_mode_list();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
 // Resetting device
 //////////////////////////////////////////////////////////////////////
-void CHW::Reset(HWND hwnd)
+void CHW::Reset()
 {
-    BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
-
     CHK_GL(glDeleteProgramPipelines(1, &pPP));
     CHK_GL(glDeleteFramebuffers(1, &pFB));
     CHK_GL(glDeleteFramebuffers(1, &pCFB));
@@ -185,239 +109,7 @@ void CHW::Reset(HWND hwnd)
     CHK_GL(glDeleteTextures(1, &pBaseZB));
 
     UpdateViews();
-
-    updateWindowProps(hwnd);
-    ShowWindow(hwnd, SW_SHOWNORMAL);
 }
-
-void CHW::updateWindowProps(HWND m_hWnd)
-{
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
-
-    u32 dwWindowStyle = 0;
-    // Set window properties depending on what mode were in.
-    if (bWindowed)
-    {
-        if (m_move_window)
-        {
-            const bool drawBorders = strstr(Core.Params, "-draw_borders");
-            dwWindowStyle = WS_VISIBLE;
-            if (drawBorders)
-                dwWindowStyle |= WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
-            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
-            // When moving from fullscreen to windowed mode, it is important to
-            // adjust the window size after recreating the device rather than
-            // beforehand to ensure that you get the window size you want.  For
-            // example, when switching from 640x480 fullscreen to windowed with
-            // a 1000x600 window on a 1024x768 desktop, it is impossible to set
-            // the window size to 1000x600 until after the display mode has
-            // changed to 1024x768, because windows cannot be larger than the
-            // desktop.
-
-            RECT m_rcWindowBounds;
-            float fYOffset = 0.f;
-            bool centerScreen = false;
-            if (strstr(Core.Params, "-center_screen"))
-                centerScreen = true;
-
-            if (centerScreen)
-            {
-                RECT DesktopRect;
-                GetClientRect(GetDesktopWindow(), &DesktopRect);
-
-                SetRect(&m_rcWindowBounds,
-                    (DesktopRect.right - psCurrentVidMode[0]) / 2,
-                    (DesktopRect.bottom - psCurrentVidMode[1]) / 2,
-                    (DesktopRect.right + psCurrentVidMode[0]) / 2,
-                    (DesktopRect.bottom + psCurrentVidMode[1]) / 2);
-            }
-            else
-            {
-                if (drawBorders)
-                    fYOffset = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
-                SetRect(&m_rcWindowBounds, 0, 0, psCurrentVidMode[0], psCurrentVidMode[1]);
-            }
-
-            AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
-
-            SetWindowPos(m_hWnd, HWND_NOTOPMOST,
-                         m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
-                         m_rcWindowBounds.right - m_rcWindowBounds.left,
-                         m_rcWindowBounds.bottom - m_rcWindowBounds.top,
-                         SWP_HIDEWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
-        }
-    }
-    else
-    {
-        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
-    }
-
-    ShowCursor(FALSE);
-    SetForegroundWindow(m_hWnd);
-}
-
-struct _uniq_mode
-{
-    _uniq_mode(LPCSTR v): _val(v) {}
-    LPCSTR _val;
-    bool operator()(LPCSTR _other) { return !xr_stricmp(_val, _other); }
-};
-
-#ifndef _EDITOR
-
-void free_vid_mode_list()
-{
-    for (int i = 0; GEnv.vid_mode_token[i].name; i++)
-    {
-        xr_free(GEnv.vid_mode_token[i].name);
-    }
-    xr_free(GEnv.vid_mode_token);
-    GEnv.vid_mode_token = nullptr;
-}
-
-void fill_vid_mode_list(CHW* /*_hw*/)
-{
-    if (GEnv.vid_mode_token != nullptr) return;
-    xr_vector<LPCSTR> _tmp;
-
-    DWORD iModeNum = 0;
-    DEVMODE dmi;
-    ZeroMemory(&dmi, sizeof dmi);
-    dmi.dmSize = sizeof dmi;
-
-    while (EnumDisplaySettings(nullptr, iModeNum++, &dmi) != 0)
-    {
-        string32 str;
-
-        if (dmi.dmPelsWidth < 800)
-            continue;
-
-        sprintf_s(str, sizeof str, "%dx%d", dmi.dmPelsWidth, dmi.dmPelsHeight);
-
-        if (_tmp.end() != find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
-            continue;
-
-        _tmp.push_back(nullptr);
-        _tmp.back() = xr_strdup(str);
-    }
-
-    u32 _cnt = _tmp.size() + 1;
-
-    GEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
-
-    GEnv.vid_mode_token[_cnt - 1].id = -1;
-    GEnv.vid_mode_token[_cnt - 1].name = nullptr;
-
-#ifdef DEBUG
-	Msg("Available video modes[%d]:", _tmp.size());
-#endif // DEBUG
-    for (u32 i = 0; i < _tmp.size(); ++i)
-    {
-        GEnv.vid_mode_token[i].id = i;
-        GEnv.vid_mode_token[i].name = _tmp[i];
-#ifdef DEBUG
-		Msg("[%s]", _tmp[i]);
-#endif // DEBUG
-    }
-}
-
-
-void CHW::InitResources(TBuiltInResource& Resources)
-{
-    Resources.maxLights = 32;
-    Resources.maxClipPlanes = 6;
-    Resources.maxTextureUnits = 32;
-    Resources.maxTextureCoords = 32;
-    Resources.maxVertexAttribs = 64;
-    Resources.maxVertexUniformComponents = 4096;
-    Resources.maxVaryingFloats = 64;
-    Resources.maxVertexTextureImageUnits = 32;
-    Resources.maxCombinedTextureImageUnits = 80;
-    Resources.maxTextureImageUnits = 32;
-    Resources.maxFragmentUniformComponents = 4096;
-    Resources.maxDrawBuffers = 32;
-    Resources.maxVertexUniformVectors = 128;
-    Resources.maxVaryingVectors = 8;
-    Resources.maxFragmentUniformVectors = 16;
-    Resources.maxVertexOutputVectors = 16;
-    Resources.maxFragmentInputVectors = 15;
-    Resources.minProgramTexelOffset = -8;
-    Resources.maxProgramTexelOffset = 7;
-    Resources.maxClipDistances = 8;
-    Resources.maxComputeWorkGroupCountX = 65535;
-    Resources.maxComputeWorkGroupCountY = 65535;
-    Resources.maxComputeWorkGroupCountZ = 65535;
-    Resources.maxComputeWorkGroupSizeX = 1024;
-    Resources.maxComputeWorkGroupSizeY = 1024;
-    Resources.maxComputeWorkGroupSizeZ = 64;
-    Resources.maxComputeUniformComponents = 1024;
-    Resources.maxComputeTextureImageUnits = 16;
-    Resources.maxComputeImageUniforms = 8;
-    Resources.maxComputeAtomicCounters = 8;
-    Resources.maxComputeAtomicCounterBuffers = 1;
-    Resources.maxVaryingComponents = 60;
-    Resources.maxVertexOutputComponents = 64;
-    Resources.maxGeometryInputComponents = 64;
-    Resources.maxGeometryOutputComponents = 128;
-    Resources.maxFragmentInputComponents = 128;
-    Resources.maxImageUnits = 8;
-    Resources.maxCombinedImageUnitsAndFragmentOutputs = 8;
-    Resources.maxCombinedShaderOutputResources = 8;
-    Resources.maxImageSamples = 0;
-    Resources.maxVertexImageUniforms = 0;
-    Resources.maxTessControlImageUniforms = 0;
-    Resources.maxTessEvaluationImageUniforms = 0;
-    Resources.maxGeometryImageUniforms = 0;
-    Resources.maxFragmentImageUniforms = 8;
-    Resources.maxCombinedImageUniforms = 8;
-    Resources.maxGeometryTextureImageUnits = 16;
-    Resources.maxGeometryOutputVertices = 256;
-    Resources.maxGeometryTotalOutputComponents = 1024;
-    Resources.maxGeometryUniformComponents = 1024;
-    Resources.maxGeometryVaryingComponents = 64;
-    Resources.maxTessControlInputComponents = 128;
-    Resources.maxTessControlOutputComponents = 128;
-    Resources.maxTessControlTextureImageUnits = 16;
-    Resources.maxTessControlUniformComponents = 1024;
-    Resources.maxTessControlTotalOutputComponents = 4096;
-    Resources.maxTessEvaluationInputComponents = 128;
-    Resources.maxTessEvaluationOutputComponents = 128;
-    Resources.maxTessEvaluationTextureImageUnits = 16;
-    Resources.maxTessEvaluationUniformComponents = 1024;
-    Resources.maxTessPatchComponents = 120;
-    Resources.maxPatchVertices = 32;
-    Resources.maxTessGenLevel = 64;
-    Resources.maxViewports = 16;
-    Resources.maxVertexAtomicCounters = 0;
-    Resources.maxTessControlAtomicCounters = 0;
-    Resources.maxTessEvaluationAtomicCounters = 0;
-    Resources.maxGeometryAtomicCounters = 0;
-    Resources.maxFragmentAtomicCounters = 8;
-    Resources.maxCombinedAtomicCounters = 8;
-    Resources.maxAtomicCounterBindings = 1;
-    Resources.maxVertexAtomicCounterBuffers = 0;
-    Resources.maxTessControlAtomicCounterBuffers = 0;
-    Resources.maxTessEvaluationAtomicCounterBuffers = 0;
-    Resources.maxGeometryAtomicCounterBuffers = 0;
-    Resources.maxFragmentAtomicCounterBuffers = 1;
-    Resources.maxCombinedAtomicCounterBuffers = 1;
-    Resources.maxAtomicCounterBufferSize = 16384;
-    Resources.maxTransformFeedbackBuffers = 4;
-    Resources.maxTransformFeedbackInterleavedComponents = 64;
-    Resources.maxCullDistances = 8;
-    Resources.maxCombinedClipAndCullDistances = 8;
-    Resources.maxSamples = 4;
-    Resources.limits.nonInductiveForLoops = 1;
-    Resources.limits.whileLoops = 1;
-    Resources.limits.doWhileLoops = 1;
-    Resources.limits.generalUniformIndexing = 1;
-    Resources.limits.generalAttributeMatrixVectorIndexing = 1;
-    Resources.limits.generalVaryingIndexing = 1;
-    Resources.limits.generalSamplerIndexing = 1;
-    Resources.limits.generalVariableIndexing = 1;
-    Resources.limits.generalConstantMatrixVectorIndexing = 1;
-}
-
 
 void CHW::UpdateViews()
 {
@@ -439,7 +131,6 @@ void CHW::UpdateViews()
     CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseZB));
     CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
 }
-
 
 void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
 {
@@ -471,7 +162,6 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
     if (ClearFlags & D3D_CLEAR_STENCIL)
         mask |= (u32)GL_STENCIL_BUFFER_BIT;
 
-
     glPushAttrib(mask);
     if (ClearFlags & D3D_CLEAR_DEPTH)
     {
@@ -490,6 +180,6 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
 {
     RImplementation.Target->phase_flip();
-    return SwapBuffers(m_hDC) ? S_OK : E_FAIL;
+    SDL_GL_SwapWindow(m_hWnd);
+    return S_OK;
 }
-#endif

@@ -25,6 +25,7 @@ public:
     virtual void pause(bool const& value) = 0;
     virtual void capture_input(bool const& value) = 0;
     virtual void disconnect() = 0;
+    virtual bool quit_requested() const = 0;
     // shared_str support
     virtual void value(LPCSTR value, shared_str& result) = 0;
     virtual LPCSTR value(shared_str const& value) = 0;

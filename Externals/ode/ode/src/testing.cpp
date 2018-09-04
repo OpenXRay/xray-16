@@ -31,7 +31,6 @@ static const dReal tol = 1.0e-9;
 static const dReal tol = 1.0e-5f;
 #endif
 
-#ifdef _DEBUG
 
 // matrix header on the stack
 
@@ -156,7 +155,7 @@ static void myDebug (int num, const char *msg, va_list ap)
 }
 
 
-extern "C" void dTestMatrixComparison()
+extern "C" ODE_API void dTestMatrixComparison()
 {
   volatile int i;
   printf ("dTestMatrixComparison()\n");
@@ -242,5 +241,3 @@ extern "C" void dTestMatrixComparison()
   }
   dSetDebugHandler (orig_debug);
 }
-
-#endif

@@ -285,12 +285,6 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const 
     pv++;
 }
 
-__forceinline void fsincos(const float angle, float& sine, float& cosine)
-{
-    sine = std::sinf(angle);
-    cosine = std::cosf(angle);
-}
-
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -434,7 +428,7 @@ __forceinline void magnitude_sse(Fvector& vec, float& res)
     _mm_store_ss((float*)&res, tv);
 }
 
-void ParticleRenderStream(void* lpvParams)
+void ParticleRenderStream(PRS_PARAMS* pParams)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("ParticleRenderStream()");
@@ -444,9 +438,9 @@ void ParticleRenderStream(void* lpvParams)
 #endif // _GPA_ENABLED
 
     float sina = 0.0f, cosa = 0.0f;
-    DWORD angle = 0xFFFFFFFF;
-
-    PRS_PARAMS* pParams = (PRS_PARAMS*)lpvParams;
+    // Xottab_DUTY: changed angle to be float instead of DWORD
+    // But it must be 0xFFFFFFFF or otherwise some particles won't play
+    float angle = 0xFFFFFFFF;
 
     FVF::LIT* pv = pParams->pv;
     u32 p_from = pParams->p_from;
@@ -463,9 +457,9 @@ void ParticleRenderStream(void* lpvParams)
 
         _mm_prefetch((char*)&particles[i + 1], _MM_HINT_NTA);
 
-        if (angle != *((DWORD*)&m.rot.x))
+        if (angle != m.rot.x)
         {
-            angle = *((DWORD*)&m.rot.x);
+            angle = m.rot.x;
             sina = std::sinf(angle);
             cosa = std::cosf(angle);
         }
@@ -477,13 +471,13 @@ void ParticleRenderStream(void* lpvParams)
 
         float r_x = m.size.x * 0.5f;
         float r_y = m.size.y * 0.5f;
-        float speed;
-        BOOL speed_calculated = FALSE;
+        float speed = 0.f;
+        bool speed_calculated = false;
 
         if (pPE.m_Def->m_Flags.is(CPEDef::dfVelocityScale))
         {
             magnitude_sse(m.vel, speed);
-            speed_calculated = TRUE;
+            speed_calculated = true;
             r_x += speed * pPE.m_Def->m_VelocityScale.x;
             r_y += speed * pPE.m_Def->m_VelocityScale.y;
         }
@@ -610,7 +604,7 @@ void CParticleEffect::Render(float)
                 prsParams[i].p_to = (i == (nWorkers - 1)) ? p_cnt : (prsParams[i].p_from + nStep);
                 prsParams[i].particles = particles;
                 prsParams[i].pPE = this;
-                ttapi.threads[i]->addJob([=] { ParticleRenderStream((void*)&prsParams[i]); });
+                ttapi.threads[i]->addJob([=] { ParticleRenderStream(&prsParams[i]); });
             }
 
             ttapi.wait();

@@ -12,7 +12,7 @@
 #include "UIXmlInit.h"
 #include "uilinestd.h"
 #include "string_table.h"
-#include "xrCore/Text/MbHelpers.h"
+#include "xrCore/Text/StringConversion.hpp"
 
 CUILines::CUILines()
 {
@@ -21,6 +21,8 @@ CUILines::CUILines()
     m_eVTextAlign = valTop;
     m_dwTextColor = 0xffffffff;
     m_TextOffset.set(0.0f, 0.0f);
+    m_wndSize.set(0.f, 0.f);
+    m_wndPos.set(0.f, 0.f);
     m_text = "";
     uFlags.zero();
     uFlags.set(flNeedReparse, FALSE);
@@ -454,9 +456,9 @@ u32 CUILines::GetColorFromText(const xr_string& str) const
     }
 
     // try parse values separated by commas
-    comma1_pos = str.find(",", begin);
-    comma2_pos = str.find(",", comma1_pos + 1);
-    comma3_pos = str.find(",", comma2_pos + 1);
+    comma1_pos = str.find(',', begin);
+    comma2_pos = str.find(',', comma1_pos + 1);
+    comma3_pos = str.find(',', comma2_pos + 1);
     if (comma1_pos == npos || comma2_pos == npos || comma3_pos == npos)
         return m_dwTextColor;
 

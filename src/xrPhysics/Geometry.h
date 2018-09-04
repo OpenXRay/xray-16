@@ -3,8 +3,8 @@
 #define GEOMETRY_H
 #include "PhysicsCommon.h"
 #include "ExtendedGeom.h"
-#include "mathutilsode.h"
-#include "xrEngine/iphysicsgeometry.h"
+#include "MathUtilsOde.h"
+#include "xrEngine/IPhysicsGeometry.h"
 #include "xrCore/_cylinder.h"
 
 // this is equivalent dMULTIPLYOP0_333 whith consequent transposion of A

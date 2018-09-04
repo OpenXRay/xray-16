@@ -47,7 +47,7 @@ public:
     virtual void IR_OnKeyboardRelease(int dik);
     virtual void IR_OnKeyboardHold(int dik);
 
-    virtual void IR_OnMouseWheel(int direction);
+    virtual void IR_OnMouseWheel(int x, int y);
     virtual void IR_OnActivate(void);
     bool Persistent() { return !!m_flags.test(etsPersistent); }
     fastdelegate::FastDelegate0<> m_on_destroy_event;

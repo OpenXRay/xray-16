@@ -8,7 +8,8 @@
 #define TIME_TO_EAT 20000
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterEatingAbstract::CStateMonsterEating(_Object* obj) : inherited(obj) {}
+CStateMonsterEatingAbstract::CStateMonsterEating(_Object* obj) : inherited(obj), corpse(nullptr), time_last_eat(0) {}
+
 TEMPLATE_SPECIALIZATION
 CStateMonsterEatingAbstract::~CStateMonsterEating() {}
 TEMPLATE_SPECIALIZATION

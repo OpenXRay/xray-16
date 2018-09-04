@@ -3,36 +3,212 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#if defined(WINDOWS)
 #include <mmsystem.h>
 #include <objbase.h>
+#pragma comment(lib, "winmm.lib")
+#endif
 #include "xrCore.h"
 #include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 
-#pragma comment(lib, "winmm.lib")
+#if __has_include(".GitInfo.hpp")
+#include ".GitInfo.hpp"
+#endif
+
+#ifndef GIT_INFO_CURRENT_BRANCH
+#define GIT_INFO_CURRENT_BRANCH unknown
+#endif
+
+#ifndef GIT_INFO_CURRENT_COMMIT
+#define GIT_INFO_CURRENT_COMMIT unknown
+#endif
+
+#include "Compression/compression_ppmd_stream.h"
+extern compression::ppmd::stream* trained_model;
 
 XRCORE_API xrCore Core;
 
 static u32 init_counter = 0;
 
+#define DO_EXPAND(VAL) VAL##1
+#define EXPAND(VAL) DO_EXPAND(VAL)
+
+#ifdef CI
+#if EXPAND(CI) == 1
+#undef CI
+#endif
+#endif
+
+#define HELPER(s) #s
+#define TO_STRING(s) HELPER(s)
+
+void PrintBuildInfo()
+{
+    pcstr name = "Custom";
+    pcstr buildId = nullptr;
+    pcstr builder = nullptr;
+    pcstr commit = TO_STRING(GIT_INFO_CURRENT_COMMIT);
+    pcstr branch = TO_STRING(GIT_INFO_CURRENT_BRANCH);
+
+#if defined(CI)
+#if defined(APPVEYOR)
+    name = "AppVeyor";
+    buildId = TO_STRING(APPVEYOR_BUILD_VERSION);
+    builder = TO_STRING(APPVEYOR_ACCOUNT_NAME);
+#elif defined(TRAVIS)
+    name = "Travis";
+    buildId = TO_STRING(TRAVIS_BUILD_NUMBER);
+#else
+#pragma TODO("PrintCI for other CIs")
+    name = "CI";
+    builder = "Unknown CI";
+#endif
+#endif
+
+    string512 buf;
+    strconcat(sizeof(buf), buf, name, " build "); // "%s build "
+
+    if (buildId)
+        strconcat(sizeof(buf), buf, buf, buildId, " "); // "id "
+
+    strconcat(sizeof(buf), buf, buf, "from commit[", commit, "]"); // "from commit[hash]"
+    strconcat(sizeof(buf), buf, buf, " branch[", branch, "]"); // " branch[name]"
+
+    if (builder)
+        strconcat(sizeof(buf), buf, buf, " (built by ", builder, ")"); // " (built by builder)"
+    
+    Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
+}
+
+void SDLLogOutput(void* /*userdata*/,
+    int category,
+    SDL_LogPriority priority,
+    const char* message)
+{
+    pcstr from;
+    switch (category)
+    {
+    case SDL_LOG_CATEGORY_APPLICATION:
+        from = "application";
+        break;
+
+    case SDL_LOG_CATEGORY_ERROR:
+        from = "error";
+        break;
+
+    case SDL_LOG_CATEGORY_ASSERT:
+        from = "assert";
+        break;
+
+    case SDL_LOG_CATEGORY_SYSTEM:
+        from = "system";
+        break;
+
+    case SDL_LOG_CATEGORY_AUDIO:
+        from = "audio";
+        break;
+
+    case SDL_LOG_CATEGORY_VIDEO:
+        from = "video";
+        break;
+
+    case SDL_LOG_CATEGORY_RENDER:
+        from = "render";
+        break;
+
+    case SDL_LOG_CATEGORY_INPUT:
+        from = "input";
+        break;
+
+    case SDL_LOG_CATEGORY_TEST:
+        from = "test";
+        break;
+
+    case SDL_LOG_CATEGORY_CUSTOM:
+        from = "custom";
+        break;
+
+    default:
+        from = "unknown";
+        break;
+    }
+
+    char mark;
+    pcstr type;
+    switch (priority)
+    {
+    case SDL_LOG_PRIORITY_VERBOSE:
+        mark = '%';
+        type = "verbose";
+        break;
+
+    case SDL_LOG_PRIORITY_DEBUG:
+        mark = '#';
+        type = "debug";
+        break;
+
+    case SDL_LOG_PRIORITY_INFO:
+        mark = '=';
+        type = "info";
+        break;
+
+    case SDL_LOG_PRIORITY_WARN:
+        mark = '~';
+        type = "warn";
+        break;
+
+    case SDL_LOG_PRIORITY_ERROR:
+        mark = '!';
+        type = "error";
+        break;
+
+    case SDL_LOG_PRIORITY_CRITICAL:
+        mark = '$';
+        type = "critical";
+        break;
+
+    default:
+        mark = ' ';
+        type = "unknown";
+        break;
+    }
+
+    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
+    const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
+    pstr buf = (pstr)_alloca(size);
+
+    xr_sprintf(buf, size, format, mark, from, type, message);
+    Log(buf);
+}
+
 void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
-    CalculateBuildId();
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
     {
+        CalculateBuildId();
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
+#if defined(WINDOWS)
         Params = xr_strdup(GetCommandLine());
+#elif  defined(LINUX)
+        Params = xr_strdup(""); //TODO handle /proc/self/cmdline
+#endif
+
+#if defined(WINDOWS)
         if (!strstr(Params, "-weather"))
             CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+#endif
 
         string_path fn, dr, di;
 
         // application path
+#if defined(WINDOWS)
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
+#endif
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 
@@ -46,19 +222,25 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         }
 #endif
 
+#if defined(WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
+#endif
 
+#if defined(WINDOWS)
         // User/Comp Name
         DWORD sz_user = sizeof(UserName);
         GetUserName(UserName, &sz_user);
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
+#endif
 
         Memory._initialize();
 
-        Msg("%s %s build %d, %s\n", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
-        Msg("command line %s\n", Params);
+        SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
+        Msg("%s %s build %d, %s", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
+        PrintBuildInfo();
+        Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
         ttapi.initialize();
@@ -108,10 +290,6 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
     init_counter++;
 }
 
-#ifndef _EDITOR
-#include "compression_ppmd_stream.h"
-extern compression::ppmd::stream* trained_model;
-#endif
 void xrCore::_destroy()
 {
     --init_counter;
@@ -123,14 +301,12 @@ void xrCore::_destroy()
         xr_FS.reset();
         xr_EFS.reset();
 
-#ifndef _EDITOR
         if (trained_model)
         {
             void* buffer = trained_model->buffer();
             xr_free(buffer);
             xr_delete(trained_model);
         }
-#endif
         xr_free(Params);
         Memory._destroy();
     }
@@ -188,6 +364,7 @@ void xrCore::CalculateBuildId()
         buildId -= daysInMonth[i];
 }
 
+#if defined(WINDOWS)
 #ifdef _EDITOR
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #else
@@ -216,3 +393,4 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     }
     return TRUE;
 }
+#endif

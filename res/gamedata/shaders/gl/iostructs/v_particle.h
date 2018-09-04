@@ -44,6 +44,8 @@ void main()
 
 	v2p_particle_tc = O.tc;
 	v2p_particle_c = O.c;
+#ifdef	USE_SOFT_PARTICLES
 	v2p_particle_tctexgen = O.tctexgen;
+#endif
 	gl_Position = O.hpos;
 }

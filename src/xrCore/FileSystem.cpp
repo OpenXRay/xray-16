@@ -5,9 +5,11 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#if defined(WINDOWS)
 #include "cderr.h"
 #include "commdlg.h"
 #include "vfw.h"
+#endif
 
 std::unique_ptr<EFS_Utils> xr_EFS;
 //----------------------------------------------------
@@ -120,6 +122,7 @@ bool EFS_Utils::GetOpenNameInternal(
     LPCSTR initial, LPSTR buffer, int sz_buf, bool bMulti, LPCSTR offset, int start_flt_ext)
 {
     VERIFY(buffer && (sz_buf > 0));
+#if defined(WINDOWS)
     FS_Path& P = *FS.get_path(initial);
     string1024 flt;
     MakeFilter(flt, P.m_FilterCaption ? P.m_FilterCaption : "", P.m_DefExt);
@@ -177,6 +180,7 @@ bool EFS_Utils::GetOpenNameInternal(
         case FNERR_BUFFERTOOSMALL: Log("Too many files selected."); break;
         }
     }
+
     if (bRes && bMulti)
     {
         Log("buff=", buffer);
@@ -204,13 +208,16 @@ bool EFS_Utils::GetOpenNameInternal(
     }
     xr_strlwr(buffer);
     return bRes;
+#else
+    return true;
+#endif
 }
 
 bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, int start_flt_ext)
 {
     // unsigned int dwVersion = GetVersion();
     // unsigned int dwWindowsMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-
+#if defined(WINDOWS)
     FS_Path& P = *FS.get_path(initial);
     string1024 flt;
 
@@ -267,6 +274,9 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
     }
     xr_strlwr(buffer);
     return bRes;
+#else
+    return true;
+#endif
 }
 //----------------------------------------------------
 LPCSTR EFS_Utils::AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int depth, BOOL full_name)

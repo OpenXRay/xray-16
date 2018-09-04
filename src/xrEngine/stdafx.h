@@ -24,16 +24,15 @@
 #include "xrCore/log.h"
 #endif
 #include "device.h"
-#include "xrCore/fs.h"
+#include "xrCore/FS.h"
 
 #include "xrCDB/xrXRC.h"
 
-#include "xrSound/sound.h"
+#include "xrSound/Sound.h"
 
 extern ENGINE_API CInifile* pGameIni;
 
 #pragma comment(lib, "winmm.lib")
-#pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 // XXX: move to script engine headers
 #ifndef DEBUG

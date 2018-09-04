@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "UIDebugFonts.h"
 #include "UIDialogHolder.h"
-#include "dinput.h"
 
 CUIDebugFonts::CUIDebugFonts()
 {
@@ -22,10 +21,10 @@ void CUIDebugFonts::InitDebugFonts(Frect r)
 
 bool CUIDebugFonts::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (DIK_ESCAPE == dik)
+    if (SDL_SCANCODE_ESCAPE == dik)
         HideDialog();
 
-    if (DIK_F12 == dik)
+    if (SDL_SCANCODE_F12 == dik)
         return false;
 
     return true;

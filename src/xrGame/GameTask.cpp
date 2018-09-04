@@ -20,16 +20,17 @@
 #include "ui/uitexturemaster.h"
 
 CGameTask::CGameTask()
+    : m_map_object_id(0), m_TimeToComplete(0), m_priority(0)
 {
     m_ReceiveTime = 0;
     m_FinishTime = 0;
     m_timer_finish = 0;
-    m_Title = NULL;
-    m_Description = NULL;
-    m_ID = NULL;
+    m_Title = nullptr;
+    m_Description = nullptr;
+    m_ID = nullptr;
     m_task_type = eTaskTypeDummy;
     m_task_state = eTaskStateDummy;
-    m_linked_map_location = NULL;
+    m_linked_map_location = nullptr;
     m_read = false;
 }
 

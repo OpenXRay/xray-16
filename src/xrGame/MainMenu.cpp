@@ -8,7 +8,6 @@
 #include "xr_Level_controller.h"
 #include "ui\UITextureMaster.h"
 #include "ui\UIXmlInit.h"
-#include <dinput.h>
 #include "ui\UIBtnHint.h"
 #include "UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
@@ -36,6 +35,7 @@
 #include "profile_store.h"
 #include "stats_submitter.h"
 #include "atlas_submit_queue.h"
+#include "xrEngine/xr_input.h"
 
 // fwd. decl.
 extern ENGINE_API BOOL bShowPauseString;
@@ -149,15 +149,13 @@ CMainMenu::~CMainMenu()
 
 void CMainMenu::ReadTextureInfo()
 {
+    string_path buf;
     FS_FileSet fset;
-    FS.file_list(fset, "$game_config$", FS_ListFiles, "ui\\textures_descr\\*.xml");
-    auto fit = fset.begin();
-    auto fit_e = fset.end();
-
-    for (; fit != fit_e; ++fit)
+    FS.file_list(fset, "$game_config$", FS_ListFiles, strconcat(sizeof(buf), buf, UI_PATH, "\\", "textures_descr\\*.xml"));
+    for (const auto& file : fset)
     {
         string_path fn1, fn2, fn3;
-        _splitpath((*fit).name.c_str(), fn1, fn2, fn3, 0);
+        _splitpath(file.name.c_str(), fn1, fn2, fn3, 0);
         xr_strcat(fn3, ".xml");
 
         CUITextureMaster::ParseShTexInfo(fn3);
@@ -166,7 +164,7 @@ void CMainMenu::ReadTextureInfo()
 
 void CMainMenu::Activate(bool bActivate)
 {
-    if (!!m_Flags.test(flActive) == bActivate)
+    if (m_Flags.test(flActive) == bActivate)
         return;
     if (m_Flags.test(flGameSaveScreenshot))
         return;
@@ -298,16 +296,16 @@ bool CMainMenu::ReloadUI()
     return true;
 }
 
-bool CMainMenu::IsActive() { return !!m_Flags.test(flActive); }
+bool CMainMenu::IsActive() const { return m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
+
 // IInputReceiver
-static int mouse_button_2_key[] = {MOUSE_1, MOUSE_2, MOUSE_3};
 void CMainMenu::IR_OnMousePress(int btn)
 {
     if (!IsActive())
         return;
 
-    IR_OnKeyboardPress(mouse_button_2_key[btn]);
+    IR_OnKeyboardPress(MouseButtonToKey[btn]);
 };
 
 void CMainMenu::IR_OnMouseRelease(int btn)
@@ -315,7 +313,7 @@ void CMainMenu::IR_OnMouseRelease(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardRelease(mouse_button_2_key[btn]);
+    IR_OnKeyboardRelease(MouseButtonToKey[btn]);
 };
 
 void CMainMenu::IR_OnMouseHold(int btn)
@@ -323,7 +321,7 @@ void CMainMenu::IR_OnMouseHold(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardHold(mouse_button_2_key[btn]);
+    IR_OnKeyboardHold(MouseButtonToKey[btn]);
 };
 
 void CMainMenu::IR_OnMouseMove(int x, int y)
@@ -335,6 +333,7 @@ void CMainMenu::IR_OnMouseMove(int x, int y)
 
 void CMainMenu::IR_OnMouseStop(int x, int y){};
 
+bool IWantMyMouseBackScreamed = false;
 void CMainMenu::IR_OnKeyboardPress(int dik)
 {
     if (!IsActive())
@@ -345,7 +344,16 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         Console->Show();
         return;
     }
-    if (DIK_F12 == dik)
+
+    if ((pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT))
+        && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RGUI)))
+    {
+        IWantMyMouseBackScreamed = true;
+        pInput->GrabInput(false);
+        SDL_SetWindowOpacity(Device.m_sdlWnd, 0.9f);
+    }
+
+    if (SDL_SCANCODE_F12 == dik)
     {
         GEnv.Render->Screenshot();
         return;
@@ -359,6 +367,14 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     if (!IsActive())
         return;
 
+    if (IWantMyMouseBackScreamed)
+    {
+        IWantMyMouseBackScreamed = false;
+        pInput->GrabInput(true);
+        SDL_SetWindowOpacity(Device.m_sdlWnd, 1.f);
+    }
+
+
     CDialogHolder::IR_UIOnKeyboardRelease(dik);
 };
 
@@ -370,12 +386,12 @@ void CMainMenu::IR_OnKeyboardHold(int dik)
     CDialogHolder::IR_UIOnKeyboardHold(dik);
 };
 
-void CMainMenu::IR_OnMouseWheel(int direction)
+void CMainMenu::IR_OnMouseWheel(int x, int y)
 {
     if (!IsActive())
         return;
 
-    CDialogHolder::IR_UIOnMouseWheel(direction);
+    CDialogHolder::IR_UIOnMouseWheel(x, y);
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }

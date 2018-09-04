@@ -11,6 +11,7 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 CRender RImplementation;
 
@@ -84,7 +85,6 @@ static class cl_water_intensity : public R_constant_setup
     }
 } binder_water_intensity;
 
-#ifdef TREE_WIND_EFFECT
 static class cl_tree_amplitude_intensity : public R_constant_setup
 {
     void setup(R_constant* C) override
@@ -94,7 +94,7 @@ static class cl_tree_amplitude_intensity : public R_constant_setup
         RCache.set_c(C, fValue, fValue, fValue, 0);
     }
 } binder_tree_amplitude_intensity;
-#endif
+// XXX: do we need to register this binder?
 
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
@@ -117,7 +117,7 @@ void CRender::create()
     m_skinning = -1;
 
     // hardware
-    o.smapsize = 2048;
+    o.smapsize = ps_r2_smapsize;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
@@ -253,6 +253,8 @@ void CRender::create()
         Msg("* NV-DBT supported and used");
 
     // options (smap-pool-size)
+    if (strstr(Core.Params, "-smap1024"))
+        o.smapsize = 1024;
     if (strstr(Core.Params, "-smap1536"))
         o.smapsize = 1536;
     if (strstr(Core.Params, "-smap2048"))
@@ -263,6 +265,8 @@ void CRender::create()
         o.smapsize = 3072;
     if (strstr(Core.Params, "-smap4096"))
         o.smapsize = 4096;
+    if (strstr(Core.Params, "-smap8192"))
+        o.smapsize = 8192;
 
     // gloss
     char* g = strstr(Core.Params, "-gloss ");
@@ -324,7 +328,6 @@ void CRender::create()
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         R_CHK(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT, &q_sync_point[i]));
 
-    xrRender_apply_tf();
     ::PortalTraverser.initialize();
 }
 
@@ -400,8 +403,6 @@ void CRender::reset_end()
     }
     //-AVO
 
-    xrRender_apply_tf();
-
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
     m_bFirstFrameAfterReset = true;
@@ -420,9 +421,6 @@ void CRender::OnFrame()
         Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
     }
 }
-
-void CRender::BeforeWorldRender() {}
-void CRender::AfterWorldRender() {}
 
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
@@ -631,61 +629,24 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+template <typename T>
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+    T*& result, bool const disasm)
 {
-    HRESULT _result = E_FAIL;
-    if (pTarget[0] == 'p')
-    {
-        SPS* sps_result = (SPS*)result;
-        _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->ps);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! PS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
+    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
 
-        LPCVOID data = nullptr;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            sps_result->constants.parse(pConstants, 0x1);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
-    }
-    else if (pTarget[0] == 'v')
-    {
-        SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! VS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
+    LPCVOID data = nullptr;
 
-        LPCVOID data = nullptr;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            svs_result->constants.parse(pConstants, 0x2);
-        }
-        else
-        {
-            Log("! VS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
+    HRESULT const _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+
+    if (SUCCEEDED(_hr) && data)
+    {
+        // Parse constant table data
+        LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
+        result->constants.parse(pConstants, ShaderTypeTraits<T>::GetShaderDest());
     }
     else
-    {
-        NODEFAULT;
-    }
+        Msg("! D3DXFindShaderComment %s hr == 0x%08x", file_name, _hr);
 
     if (disasm)
     {
@@ -699,7 +660,19 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         _RELEASE(disasm);
     }
 
-    return _result;
+    return _hr;
+}
+
+inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+{
+    if (pTarget[0] == 'p')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+ 
+    if (pTarget[0] == 'v')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+
+    NODEFAULT;
+    return E_FAIL;
 }
 
 class includer : public ID3DXInclude
@@ -741,7 +714,7 @@ static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
-    LPCSTR pTarget, DWORD Flags, void*& result)
+                                LPCSTR pTarget, DWORD Flags, void*& result)
 {
     D3DXMACRO defines[128];
     int def_it = 0;
@@ -759,7 +732,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
-        VERIFY(xr_strlen(c_smapsize) == 4);
+        VERIFY(xr_strlen(c_smapsize) == 4 || atoi(c_smapsize) < 16384);
         xr_strcat(sh_name, c_smapsize);
         len += 4;
     }
@@ -1155,7 +1128,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)&Includer;
 
         _result = D3DXCompileShader((LPCSTR)pSrcData, SrcDataLen, defines, pInclude, pFunctionName, pTarget,
-            Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, &pShaderBuf, &pErrorBuf, &pConstants);
+                                    Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, &pShaderBuf, &pErrorBuf, &pConstants);
         if (SUCCEEDED(_result))
         {
             IWriter* file = FS.w_open(file_name);
@@ -1165,7 +1138,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
             FS.w_close(file);
 
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
-                file_name, result, o.disasm);
+                                    file_name, result, o.disasm);
         }
         else
         {
@@ -1206,7 +1179,7 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 0
+#if 1
 	strcpy_s					( result, "" );
 	return						false;
 #else // #if 1

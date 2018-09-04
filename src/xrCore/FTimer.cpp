@@ -3,15 +3,22 @@
 
 XRCORE_API bool g_bEnableStatGather = false;
 
-void CStatTimer::FrameStart()
+CStatTimer::CStatTimer()
 {
-    accum = Duration();
+    accum = 0;
+    result = 0.f;
     count = 0;
 }
 
-void CStatTimer::FrameEnd() {
-    
-    const float time = GetElapsed_sec();
+void CStatTimer::FrameStart()
+{
+    accum = 0;
+    count = 0;
+}
+
+void CStatTimer::FrameEnd()
+{
+    const float time = 1000.f * float(double(accum) / double(CPU::qpc_freq));
     if (time > result)
         result = time;
     else
@@ -24,7 +31,7 @@ XRCORE_API pauseMngr& g_pauseMngr()
     return manager;
 }
 
-pauseMngr::pauseMngr() : paused(FALSE) { m_timers.reserve(3); }
+pauseMngr::pauseMngr() : paused(false) { m_timers.reserve(3); }
 void pauseMngr::Pause(const bool b)
 {
     if (paused == b)

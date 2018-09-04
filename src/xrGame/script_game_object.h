@@ -190,7 +190,11 @@ public:
     _DECLARE_FUNCTION10(Squad, int);
     _DECLARE_FUNCTION10(Group, int);
 
-    void Kill(CScriptGameObject* who, bool bypass_actor_check = false /*AVO: added for actor before death callback*/);
+    // XXX: this is a workaround, since luabind can't determine default function arguments...
+    // There is more places, not only this one
+    // Look here: https://github.com/qweasdd136963/OXR_CoC/commit/c37d8f4e49c92fe226a5958954cc9a6a1ab18c93
+    void Kill(CScriptGameObject* who) { Kill(who, false); }
+    void Kill(CScriptGameObject* who, bool bypass_actor_check /*= false*/ /*AVO: added for actor before death callback*/);
 
     // CEntityAlive
     _DECLARE_FUNCTION10(GetFOV, float);

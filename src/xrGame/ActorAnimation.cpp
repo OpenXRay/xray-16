@@ -315,7 +315,7 @@ CMotion* FindMotionKeys(MotionID motion_ID, IRenderVisual* V)
 }
 
 #ifdef DEBUG
-BOOL g_ShowAnimationInfo = TRUE;
+BOOL g_ShowAnimationInfo = FALSE;
 #endif // DEBUG
 constexpr pcstr mov_state[] = {
     "idle", "walk", "run", "sprint",
@@ -644,26 +644,40 @@ void CActor::g_SetAnimation(u32 mstate_rl)
 #endif
 
 #ifdef DEBUG
-    if ((Level().CurrentControlEntity() == this) && g_ShowAnimationInfo)
+    if (g_ShowAnimationInfo && Level().CurrentControlEntity() == this)
     {
+        auto movement = character_physics_support()->movement();
+        auto pFontStat = UI().Font().pFontStat;
+        u32 color = pFontStat->GetColor();
+        pFontStat->SetColor(0xffffffff);
+        pFontStat->OutSet(170, 530);
+
         string128 buf;
         ConvState(mstate_rl, &buf);
-        UI().Font().pFontStat->OutNext("MSTATE:     [%s]", buf);
-        /*
-                switch (m_PhysicMovementControl->Environment())
-                {
-                case CPHMovementControl::peOnGround:	xr_strcpy(buf,"ground");			break;
-                case CPHMovementControl::peInAir:		xr_strcpy(buf,"air");				break;
-                case CPHMovementControl::peAtWall:		xr_strcpy(buf,"wall");				break;
-                }
-                UI().Font().pFontStat->OutNext	(buf);
-                UI().Font().pFontStat->OutNext	("Accel     [%3.2f, %3.2f, %3.2f]",VPUSH(NET_SavedAccel));
-                UI().Font().pFontStat->OutNext	("V         [%3.2f, %3.2f,
-           %3.2f]",VPUSH(m_PhysicMovementControl->GetVelocity()));
-                UI().Font().pFontStat->OutNext	("vertex ID   %d",ai_location().level_vertex_id());
+        pFontStat->OutNext("Movement state:       [%s]", buf);
+        switch (movement->Environment())
+        {
+        case CPHMovementControl::peOnGround:
+            pFontStat->OutNext("Movement environment: [OnGround]");
+            break;
+        case CPHMovementControl::peInAir:
+            pFontStat->OutNext("Movement environment: [InAir]");
+            break;
+        case CPHMovementControl::peAtWall:
+            pFontStat->OutNext("Movement environment: [AtWall]");
+            break;
+        }
 
-                Game().m_WeaponUsageStatistic->Draw();
-                */
+        pFontStat->OutNext("Vertex ID:            [%d]", ai_location().level_vertex_id());
+        pFontStat->OutNext("Position:             [%3.2f, %3.2f, %3.2f]", VPUSH(Position()));
+        pFontStat->OutNext("Accel:                [%3.2f, %3.2f, %3.2f]", VPUSH(NET_SavedAccel));
+        pFontStat->OutNext("Velocity:             [%3.2f, %3.2f, %3.2f]", VPUSH(movement->GetVelocity()));
+        pFontStat->OutNext("Vel Magnitude:        [%3.2f]", movement->GetVelocityMagnitude());
+        pFontStat->OutNext("Vel Actual:           [%3.2f]", movement->GetVelocityActual());
+
+        pFontStat->SetColor(color);
+
+        //Game().m_WeaponUsageStatistic->Draw();
     };
 #endif
 

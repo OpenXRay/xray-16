@@ -12,7 +12,6 @@
 #include "ui/UIMapDesc.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIVote.h"
-#include "dinput.h"
 #include "gamepersistent.h"
 #include "string_table.h"
 #include "map_manager.h"

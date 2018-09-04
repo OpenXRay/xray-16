@@ -7,7 +7,8 @@
 #define CStateMonsterFindEnemyRunAbstract CStateMonsterFindEnemyRun<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterFindEnemyRunAbstract::CStateMonsterFindEnemyRun(_Object* obj) : inherited(obj) {}
+CStateMonsterFindEnemyRunAbstract::CStateMonsterFindEnemyRun(_Object* obj) : inherited(obj), target_vertex(0) {}
+
 TEMPLATE_SPECIALIZATION
 CStateMonsterFindEnemyRunAbstract::~CStateMonsterFindEnemyRun() {}
 TEMPLATE_SPECIALIZATION

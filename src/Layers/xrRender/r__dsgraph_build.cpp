@@ -126,16 +126,16 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         auto &map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
 
 #ifdef USE_OGL
-        auto &Nvs = map[pass.vs->vs];
-        auto &Ngs = Nvs[pass.gs->gs];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Nvs = map[pass.vs->sh];
+        auto &Ngs = Nvs[pass.gs->sh];
+        auto &Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
         auto &Nvs = map[&*pass.vs];
-        auto &Ngs = Nvs[pass.gs->gs];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Ngs = Nvs[pass.gs->sh];
+        auto &Nps = Ngs[pass.ps->sh];
 #else
-        auto &Nvs = map[pass.vs->vs];
-        auto &Nps = Nvs[pass.ps->ps];
+        auto &Nvs = map[pass.vs->sh];
+        auto &Nps = Nvs[pass.ps->sh];
 #endif
 
 #ifdef USE_DX11
@@ -273,16 +273,16 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         auto &map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
 
 #ifdef USE_OGL
-        auto &Nvs = map[pass.vs->vs];
-        auto &Ngs = Nvs[pass.gs->gs];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Nvs = map[pass.vs->sh];
+        auto &Ngs = Nvs[pass.gs->sh];
+        auto &Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
         auto &Nvs = map[&*pass.vs];
-        auto &Ngs = Nvs[pass.gs->gs];
-        auto &Nps = Ngs[pass.ps->ps];
+        auto &Ngs = Nvs[pass.gs->sh];
+        auto &Nps = Ngs[pass.ps->sh];
 #else
-        auto &Nvs = map[pass.vs->vs];
-        auto &Nps = Nvs[pass.ps->ps];
+        auto &Nvs = map[pass.vs->sh];
+        auto &Nps = Nvs[pass.ps->sh];
 #endif
 
 #ifdef USE_DX11
@@ -457,7 +457,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         for (auto &i : pV->children)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                                                   // [use shader data from parent model, rather than it childrens]
+                                                         // [use shader data from parent model, rather than it childrens]
             add_leafs_Static(i);
         }
     }
@@ -471,7 +471,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         for (auto &i : pV->children)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                                                   // [use shader data from parent model, rather than it childrens]
+                                                         // [use shader data from parent model, rather than it childrens]
             add_leafs_Static(i);
         }
     }
@@ -804,7 +804,7 @@ void D3DXRenderBase::DestroyHW()
     HW.DestroyDevice();
 }
 
-void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
+void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
 #if defined(DEBUG) && !defined(USE_OGL)
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
@@ -812,7 +812,7 @@ void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth
 
     Resources->reset_begin();
     Memory.mem_compact();
-    HW.Reset(hWnd);
+    HW.Reset();
 
 #if defined(USE_OGL)
     dwWidth = psCurrentVidMode[0];
@@ -837,15 +837,16 @@ void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-//  TODO: DX10: Implement Resetting of render states into default mode
-// VERIFY(!"D3DXRenderBase::SetupStates not implemented.");
+#if defined(USE_OGL)
+    // TODO: OGL: Implement SetupStates().
+#elif defined(USE_DX10) || defined(USE_DX11)
+    SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);
+    SSManager.SetMipLODBias(ps_r__tf_Mipbias);
 #else //    USE_DX10
     for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
     {
-        float fBias = -.5f;
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, 4));
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *(LPDWORD)&fBias));
+        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, ps_r__tf_Anisotropic));
+        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *(LPDWORD)&ps_r__tf_Mipbias));
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR));
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR));
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR));
@@ -900,9 +901,9 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     }
 }
 
-void D3DXRenderBase::Create(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2, bool move_window)
+void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-    HW.CreateDevice(hWnd, move_window);
+    HW.CreateDevice(hWnd);
 #if defined(USE_OGL)
     dwWidth = psCurrentVidMode[0];
     dwHeight = psCurrentVidMode[1];

@@ -243,7 +243,7 @@ ICF void CBackend::set_CullMode(u32 _mode)
     }
 }
 
-ICF void CBackend::set_VS(ref_vs& _vs) { set_VS(_vs->vs, _vs->cName.c_str()); }
+ICF void CBackend::set_VS(ref_vs& _vs) { set_VS(_vs->sh, _vs->cName.c_str()); }
 IC void CBackend::set_Constants(R_constant_table* C)
 {
     // caching

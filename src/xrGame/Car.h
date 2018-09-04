@@ -183,7 +183,7 @@ public:
         void SetSteerLimits(float hi, float lo);
 
         virtual void ApplyDamage(u16 level);
-        SWheel(CCar* acar)
+        SWheel(CCar* acar) : radius(0)
         {
             bone_id = BI_NONE;
             car = acar;
@@ -321,6 +321,9 @@ public:
         };
         eState state;
         SDoor(CCar* acar)
+            : update(false), pos_open(0),
+              opened_angle(0), closed_angle(0),
+              open_time(0)
         {
             bone_id = BI_NONE;
             pcar = acar;

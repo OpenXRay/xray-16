@@ -340,8 +340,9 @@ bool operator==(const D3D_SAMPLER_DESC& desc1, const D3D_SAMPLER_DESC& desc2)
         return false;
     if (desc1.AddressW != desc2.AddressW)
         return false;
-    if (desc1.MipLODBias != desc2.MipLODBias)
-        return false;
+    //  RZ
+    //  if (desc1.MipLODBias != desc2.MipLODBias)
+    //    return false;
     //	Ignore anisotropy since it's set up automatically by the manager
     //	if( desc1.MaxAnisotropy != desc2.MaxAnisotropy) return false;
     if (desc1.ComparisonFunc != desc2.ComparisonFunc)
@@ -457,7 +458,8 @@ u32 GetHash(const D3D_SAMPLER_DESC& desc)
     Hash.AddData(&desc.AddressU, sizeof(desc.AddressU));
     Hash.AddData(&desc.AddressV, sizeof(desc.AddressV));
     Hash.AddData(&desc.AddressW, sizeof(desc.AddressW));
-    Hash.AddData(&desc.MipLODBias, sizeof(desc.MipLODBias));
+    //  RZ
+    //  Hash.AddData(&desc.MipLODBias, sizeof(desc.MipLODBias));
     //	Ignore anisotropy since it's set up automatically by the manager
     //	Hash.AddData( &desc.MaxAnisotropy, sizeof(desc.MaxAnisotropy) );
     Hash.AddData(&desc.ComparisonFunc, sizeof(desc.ComparisonFunc));

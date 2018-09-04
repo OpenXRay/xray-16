@@ -1,24 +1,12 @@
 #include "stdafx.h"
 
 #include "Layers/xrRender/HW.h"
+#include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
 #include "StateManager/dx10SamplerStateCache.h"
 #include "StateManager/dx10StateCache.h"
-
-#ifndef _EDITOR
-void fill_vid_mode_list(CHW* _hw);
-void free_vid_mode_list();
-
-void fill_render_mode_list();
-void free_render_mode_list();
-#else
-void fill_vid_mode_list(CHW* _hw) {}
-void free_vid_mode_list() {}
-void fill_render_mode_list() {}
-void free_render_mode_list() {}
-#endif
 
 CHW HW;
 
@@ -71,12 +59,11 @@ void CHW::DestroyD3D()
     _RELEASE(m_pFactory);
 }
 
-void CHW::CreateDevice(HWND m_hWnd, bool move_window)
+void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
-    m_move_window = move_window;
     CreateD3D();
 
-    bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     m_DriverType = Caps.bForceGPU_REF ? D3D_DRIVER_TYPE_REFERENCE : D3D_DRIVER_TYPE_HARDWARE;
 
@@ -101,7 +88,8 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;
     ZeroMemory(&sd, sizeof(sd));
 
-    selectResolution(sd.BufferDesc.Width, sd.BufferDesc.Height, bWindowed);
+    sd.BufferDesc.Width = Device.dwWidth;
+    sd.BufferDesc.Height = Device.dwHeight;
 
     // Back buffer
     //. P.BackBufferWidth       = dwWidth;
@@ -116,8 +104,29 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     sd.SampleDesc.Quality = 0;
 
     // Windoze
+    /* XXX:
+       Probably the reason of weird tearing
+       glitches reported by Shoker in windowed
+       mode with VSync enabled.
+       XXX: Fix this windoze stuff!!!
+    */
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-    sd.OutputWindow = m_hWnd;
+
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+    {
+        switch (info.subsystem)
+        {
+        case SDL_SYSWM_WINDOWS:
+            sd.OutputWindow = info.info.win.window;
+            break;
+        default: break;
+        }
+    }
+    else
+        Log("Couldn't get window information: ", SDL_GetError());
+
     sd.Windowed = bWindowed;
 
     // Depth/stencil (DX10 don't need this?)
@@ -125,23 +134,12 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     //P.AutoDepthStencilFormat = fDepth;
     //P.Flags = 0; //. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
 
-    // Refresh rate
-    if (bWindowed)
-    {
-        sd.BufferDesc.RefreshRate.Numerator = 60;
-        sd.BufferDesc.RefreshRate.Denominator = 1;
-    }
-    else
-    {
-        sd.BufferDesc.RefreshRate = selectRefresh(sd.BufferDesc.Width, sd.BufferDesc.Height, sd.BufferDesc.Format);
-    }
-
     //  Additional set up
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
     UINT createDeviceFlags = 0;
 #ifdef DEBUG
-// createDeviceFlags |= D3Dxx_CREATE_DEVICE_DEBUG;
+    // createDeviceFlags |= D3Dxx_CREATE_DEVICE_DEBUG;
 #endif
     HRESULT R;
 #ifdef USE_DX11
@@ -186,13 +184,9 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     //  Create render target and depth-stencil views here
     UpdateViews();
 
-    size_t memory = Desc.DedicatedVideoMemory;
+    const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     //Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
-#ifndef _EDITOR
-    updateWindowProps(m_hWnd);
-    fill_vid_mode_list(this);
-#endif
 }
 
 void CHW::DestroyDevice()
@@ -227,30 +221,21 @@ void CHW::DestroyDevice()
     _RELEASE(HW.pDevice);
 
     DestroyD3D();
-
-#ifndef _EDITOR
-    free_vid_mode_list();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
 // Resetting device
 //////////////////////////////////////////////////////////////////////
-void CHW::Reset(HWND hwnd)
+void CHW::Reset()
 {
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
-    BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
     cd.Windowed = bWindowed;
     m_pSwapChain->SetFullscreenState(!bWindowed, NULL);
     DXGI_MODE_DESC& desc = m_ChainDesc.BufferDesc;
-    selectResolution(desc.Width, desc.Height, bWindowed);
-    if (bWindowed)
-    {
-        desc.RefreshRate.Numerator = 60;
-        desc.RefreshRate.Denominator = 1;
-    }
-    else
-        desc.RefreshRate = selectRefresh(desc.Width, desc.Height, desc.Format);
+    desc.Width = Device.dwWidth;
+    desc.Height = Device.dwHeight;
+
     CHK_DX(m_pSwapChain->ResizeTarget(&desc));
 
     _SHOW_REF("refCount:pBaseZB", pBaseZB);
@@ -260,9 +245,6 @@ void CHW::Reset(HWND hwnd)
     CHK_DX(m_pSwapChain->ResizeBuffers(
         cd.BufferCount, desc.Width, desc.Height, desc.Format, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
     UpdateViews();
-
-    updateWindowProps(hwnd);
-    ShowWindow(hwnd, SW_SHOWNORMAL);
 }
 
 D3DFORMAT CHW::selectDepthStencil(D3DFORMAT /*fTarget*/)
@@ -272,230 +254,11 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT /*fTarget*/)
     return D3DFMT_D24S8;
 }
 
-void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
-{
-    fill_vid_mode_list(this);
-
-    if (bWindowed)
-    {
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
-    }
-    else // check
-    {
-        string64 buff;
-        xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
-
-        if (_ParseItem(buff, GEnv.vid_mode_token) == u32(-1)) // not found
-        { // select safe
-            xr_sprintf(buff, sizeof(buff), "vid_mode %s", GEnv.vid_mode_token[0].name);
-            Console->Execute(buff);
-        }
-
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
-    }
-}
-
-DXGI_RATIONAL CHW::selectRefresh(u32 dwWidth, u32 dwHeight, DXGI_FORMAT fmt)
-{
-    if (psDeviceFlags.is(rsRefresh60hz))
-    {
-        return DXGI_RATIONAL({ 60, 1 });
-    }
-    else
-    {
-        xr_vector<DXGI_MODE_DESC> modes;
-
-        IDXGIOutput* pOutput;
-        m_pAdapter->EnumOutputs(0, &pOutput);
-        VERIFY(pOutput);
-
-        UINT num = 0;
-        DXGI_FORMAT format = fmt;
-        UINT flags = 0;
-
-        // Get the number of display modes available
-        pOutput->GetDisplayModeList(format, flags, &num, nullptr);
-
-        // Get the list of display modes
-        modes.resize(num);
-        pOutput->GetDisplayModeList(format, flags, &num, &modes.front());
-
-        _RELEASE(pOutput);
-
-        float CurrentFreq = 60.0f;
-        DXGI_RATIONAL res = { 60, 1 };
-
-        for (auto &i : modes)
-        {
-            if ((i.Width == dwWidth) && (i.Height == dwHeight))
-            {
-                VERIFY(i.RefreshRate.Denominator);
-                float TempFreq = float(i.RefreshRate.Numerator) / float(i.RefreshRate.Denominator);
-                if (TempFreq > CurrentFreq)
-                {
-                    CurrentFreq = TempFreq;
-                    res = i.RefreshRate;
-                }
-            }
-        }
-
-        return res;
-    }
-}
-
 BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 {
     // TODO: DX10: implement stub for this code.
     VERIFY(!"Implement CHW::support");
     return TRUE;
-}
-
-void CHW::updateWindowProps(HWND m_hWnd)
-{
-    bool bWindowed = !psDeviceFlags.is(rsFullscreen);
-
-    u32 dwWindowStyle = 0;
-    // Set window properties depending on what mode were in.
-    if (bWindowed)
-    {
-        if (m_move_window)
-        {
-            const bool drawBorders = strstr(Core.Params, "-draw_borders");
-            dwWindowStyle = WS_VISIBLE;
-            if (drawBorders)
-                dwWindowStyle |= WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
-            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
-            // When moving from fullscreen to windowed mode, it is important to
-            // adjust the window size after recreating the device rather than
-            // beforehand to ensure that you get the window size you want.  For
-            // example, when switching from 640x480 fullscreen to windowed with
-            // a 1000x600 window on a 1024x768 desktop, it is impossible to set
-            // the window size to 1000x600 until after the display mode has
-            // changed to 1024x768, because windows cannot be larger than the
-            // desktop.
-
-            RECT m_rcWindowBounds;
-            float fYOffset = 0.f;
-            bool centerScreen = false;
-            if (strstr(Core.Params, "-center_screen"))
-                centerScreen = true;
-
-            if (centerScreen)
-            {
-                RECT DesktopRect;
-                GetClientRect(GetDesktopWindow(), &DesktopRect);
-
-                SetRect(&m_rcWindowBounds,
-                    (DesktopRect.right - m_ChainDesc.BufferDesc.Width) / 2,
-                    (DesktopRect.bottom - m_ChainDesc.BufferDesc.Height) / 2,
-                    (DesktopRect.right + m_ChainDesc.BufferDesc.Width) / 2,
-                    (DesktopRect.bottom + m_ChainDesc.BufferDesc.Height) / 2);
-            }
-            else
-            {
-                if (drawBorders)
-                    fYOffset = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
-                SetRect(&m_rcWindowBounds, 0, 0, m_ChainDesc.BufferDesc.Width, m_ChainDesc.BufferDesc.Height);
-            };
-
-            AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
-
-            SetWindowPos(m_hWnd, HWND_NOTOPMOST,
-                         m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
-                         m_rcWindowBounds.right - m_rcWindowBounds.left,
-                         m_rcWindowBounds.bottom - m_rcWindowBounds.top,
-                         SWP_HIDEWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
-        }
-    }
-    else
-    {
-        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
-    }
-
-    ShowCursor(FALSE);
-    SetForegroundWindow(m_hWnd);
-}
-
-struct _uniq_mode
-{
-    _uniq_mode(LPCSTR v) : _val(v) {}
-    LPCSTR _val;
-    bool operator()(LPCSTR _other) { return !xr_stricmp(_val, _other); }
-};
-
-#ifndef _EDITOR
-
-void free_vid_mode_list()
-{
-    for (int i = 0; GEnv.vid_mode_token[i].name; i++)
-    {
-        xr_free(GEnv.vid_mode_token[i].name);
-    }
-    xr_free(GEnv.vid_mode_token);
-    GEnv.vid_mode_token = nullptr;
-}
-
-void fill_vid_mode_list(CHW* _hw)
-{
-    if (GEnv.vid_mode_token != nullptr)
-        return;
-    xr_vector<LPCSTR> _tmp;
-    xr_vector<DXGI_MODE_DESC> modes;
-
-    IDXGIOutput* pOutput;
-    //_hw->m_pSwapChain->GetContainingOutput(&pOutput);
-    _hw->m_pAdapter->EnumOutputs(0, &pOutput);
-    VERIFY(pOutput);
-
-    UINT cnt = 0;
-    DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    UINT flags = 0;
-
-    // Get the number of display modes available
-    pOutput->GetDisplayModeList(format, flags, &cnt, nullptr);
-
-    // Get the list of display modes
-    modes.resize(cnt);
-    pOutput->GetDisplayModeList(format, flags, &cnt, &modes.front());
-
-    _RELEASE(pOutput);
-
-    for (auto &i : modes)
-    {
-        string32 str;
-
-        if (i.Width < 800)
-            continue;
-
-        xr_sprintf(str, sizeof(str), "%dx%d", i.Width, i.Height);
-
-        if (_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
-            continue;
-
-        _tmp.push_back(nullptr);
-        _tmp.back() = xr_strdup(str);
-    }
-
-    u32 _cnt = _tmp.size() + 1;
-
-    GEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
-
-    GEnv.vid_mode_token[_cnt - 1].id = -1;
-    GEnv.vid_mode_token[_cnt - 1].name = nullptr;
-
-#ifdef DEBUG
-    Msg("Available video modes[%d]:", _tmp.size());
-#endif // DEBUG
-    for (auto i = 0; i < _tmp.size(); ++i)
-    {
-        GEnv.vid_mode_token[i].id = i;
-        GEnv.vid_mode_token[i].name = _tmp[i];
-#ifdef DEBUG
-        Msg("[%s]", _tmp[i]);
-#endif // DEBUG
-    }
 }
 
 void CHW::UpdateViews()
@@ -540,4 +303,3 @@ void CHW::UpdateViews()
 
     _RELEASE(pDepthStencil);
 }
-#endif

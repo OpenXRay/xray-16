@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "PHDynamicData.h"
 #include "Physics.h"
 #include "tri-colliderknoopc/dTriList.h"
@@ -1562,9 +1562,9 @@ static void dBodyGetPointForce(dBodyID b, dReal px, dReal py, dReal pz, dVector3
 {
     VERIFY(b);
     dVector3 p;
-    p[0] = px - b->pos[0];
-    p[1] = py - b->pos[1];
-    p[2] = pz - b->pos[2];
+    p[0] = px - b->posr.pos[0];
+    p[1] = py - b->posr.pos[1];
+    p[2] = pz - b->posr.pos[2];
     p[3] = 0;
     result[0] = b->facc[0];
     result[1] = b->facc[1];

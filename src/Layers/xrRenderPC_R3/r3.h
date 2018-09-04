@@ -350,8 +350,6 @@ public:
     virtual void ScreenshotAsyncBegin();
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer);
     virtual void OnFrame();
-    virtual void BeforeWorldRender(); //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
-    virtual void AfterWorldRender();  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
 
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI

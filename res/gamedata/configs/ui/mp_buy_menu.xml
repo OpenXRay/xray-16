@@ -1,0 +1,159 @@
+<w>
+	<items_hierarchy>
+		<level name="root" btn_ref ="">
+			<level name="pistols" btn_ref="btn_tab_pistols" />
+			<level name="primary_weapons" btn_ref="btn_tab_primary">
+				<level name="shotgun" btn_ref="btn_bag_shotgun" horz_al="0"/>
+				<level name="assault" btn_ref="btn_bag_assault" horz_al="0"/>
+				<level name="sniper_rifles" btn_ref="btn_bag_sniper" horz_al="0"/>
+				<level name="heavy_weapons" btn_ref="btn_bag_heavy" horz_al="0"/>
+			</level>
+			<level name="granades" btn_ref="btn_tab_granades" horz_al="1"/>
+			<level name="outfits" btn_ref="btn_tab_outfits" horz_al="1"/>
+			<level name="equipment" btn_ref="btn_tab_equipment" horz_al="1"/>
+		</level>
+	</items_hierarchy>
+
+	<main x="0" y="0" width="1024" height="768">
+		<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+			<texture>ui_inGame2_Mp_buyscreen_main_window</texture>
+		</auto_static>
+
+		<auto_static x="864" y="6" width="86" height="52">
+			<texture>ui_inGame2_Mp_buyscreen_depositinfo_screen</texture>
+		</auto_static>
+
+		<auto_static x="866" y="204" width="86" height="51">
+			<texture>ui_inGame2_Mp_buyscreen_priceinfo_screen</texture>
+		</auto_static>
+		<auto_static x="866" y="292" width="86" height="51">
+			<texture>ui_inGame2_Mp_buyscreen_priceinfo_screen</texture>
+		</auto_static>
+		<auto_static x="866" y="380" width="86" height="51">
+			<texture>ui_inGame2_Mp_buyscreen_priceinfo_screen</texture>
+		</auto_static>
+		<auto_static x="866" y="468" width="86" height="51">
+			<texture>ui_inGame2_Mp_buyscreen_priceinfo_screen</texture>
+		</auto_static>
+
+		<auto_static x="952" y="203" width="40" height="53">
+			<texture>ui_inGame2_Mp_buyscreen_save_buttone_background_panel_nocorner</texture>
+		</auto_static>
+		<auto_static x="952" y="291" width="40" height="53">
+			<texture>ui_inGame2_Mp_buyscreen_save_buttone_background_panel</texture>
+		</auto_static>
+		<auto_static x="952" y="379" width="40" height="53">
+			<texture>ui_inGame2_Mp_buyscreen_save_buttone_background_panel</texture>
+		</auto_static>
+		<auto_static x="952" y="467" width="40" height="53">
+			<texture>ui_inGame2_Mp_buyscreen_save_buttone_background_panel</texture>
+		</auto_static>
+<!--
+		<auto_static x="860" y="4" width="60" height="65">
+			<texture>ui_hud_frame_rank</texture>
+		</auto_static>
+-->
+	</main>
+
+	<item_color_restr_rank	r="128" g="0" b="0" a="128"/>
+	<item_color_restr_money r="255" g="255" b="0" a="128"/>
+	<item_color_normal	r="255" g="255" b="255" a="255"/>
+
+	<money_color_positive	r="135" g="123" b="116" a="255"/>
+	<money_color_negative	r="255" g="0" b="0" a="255"/>
+
+	<static_player_money x="854" y="9" width="112" height="34">
+		<text font="graffiti32" r="255" g="255" b="255" align="c"/>
+	</static_player_money>
+<!--
+	<static_diff_money x="914" y="65" width="112" height="34">
+		<text font="graffiti32" color="ui_green" align="c" vert_align="c"/>
+	</static_diff_money>
+-->
+	<static_curr_items_money x="740" y="4" width="97" height="26">
+		<text font="graffiti22" r="255" g="255" b="255" a="170" vert_align="c" align="c"/>
+	</static_curr_items_money>
+
+	<static_preset_money_last x="854" y="478" width="112" height="27">
+		<text font="graffiti32" a="170" align="c" vert_align="c"/>
+	</static_preset_money_last>
+
+	<static_preset_money_1 x="854" y="215" width="112" height="27">
+		<text font="graffiti32" a="170" align="c" vert_align="c"/>
+	</static_preset_money_1>
+
+	<static_preset_money_2 x="854" y="303" width="112" height="27">
+		<text font="graffiti32" a="170" align="c" vert_align="c"/>
+	</static_preset_money_2>
+
+	<static_preset_money_3 x="854" y="391" width="112" height="27">
+		<text font="graffiti32" a="170" align="c" vert_align="c"/>
+	</static_preset_money_3>
+
+	<static_preset_money_def x="854" y="605" width="112" height="27">
+		<text font="graffiti32" a="170" align="c" vert_align="c"/>
+	</static_preset_money_def>
+
+	<static_player_rank x="954" y="12" width="46" height="47" stretch="1"/>
+
+	<static_item_rank x="308" y="608" width="46" height="47" stretch="1"/>
+
+	<static_info x="0" y="730" width="755" height="34" light_anim="buy_menu_info" la_cyclic="0" la_texture="0" la_alpha="1">
+		<text font="letterica18" align="c" vert_align="c"/>
+	</static_info>
+
+	<static_money_change x="914" y="71" width="100" height="34" light_anim="buy_menu_info" la_cyclic="0" la_texture="0" la_alpha="1">
+		<text font="letterica18" r="231" g="153" b="22" align="c" vert_align="c"/>
+	</static_money_change>
+
+	<shop_wnd x="65" y="0" width="300" height="570"/>
+
+    <lst_player_bag x="385" y="368" width="447" height="129"
+            cell_width="43" cell_height="43" rows_num="5" cols_num="10"
+            unlimited="1" group_similar="1"/>
+
+    <lst_shop x="18" y="47" width="274" height="473"
+            cell_width="43" cell_height="43" rows_num="10" cols_num="6"
+            unlimited="1" group_similar="1" custom_placement="0"/>
+
+
+    <lst_pistol x="385" y="47" width="172" height="86"
+            cell_width="43" cell_height="43" rows_num="2" cols_num="4"
+            custom_placement="0"/>
+
+    <lst_pistol_ammo x="385" y="136" width="172" height="43"
+            cell_width="43" cell_height="43" rows_num="1" cols_num="4"
+            custom_placement="0" group_similar="1"/>
+
+
+    <lst_rifle x="576" y="46" width="258" height="86"
+            cell_width="43" cell_height="43" rows_num="2" cols_num="6"
+            custom_placement="0"/>
+
+    <lst_rifle_ammo x="576" y="136" width="258" height="43"
+            cell_width="43" cell_height="43" rows_num="1" cols_num="6"
+            custom_placement="0" group_similar="1"/>
+
+    <lst_outfit x="385" y="189" width="86" height="129"
+            cell_width="43" cell_height="43" rows_num="3" cols_num="2"
+            custom_placement="0"/>
+
+    <lst_medkit x="480" y="189" width="86" height="43"
+            cell_width="43" cell_height="43" rows_num="1" cols_num="2"
+            custom_placement="0" group_similar="1"/>
+
+    <lst_granade x="480" y="232" width="86" height="86"
+            cell_width="43" cell_height="43" rows_num="2" cols_num="2"
+            custom_placement="0" group_similar="1"/>
+
+    <lst_others x="576" y="189" width="258" height="129"
+            cell_width="43" cell_height="43" rows_num="3" cols_num="6"
+            group_similar="1"/>
+
+
+	<tab_control x="0" y="0" width="65" height="565">
+		<window_name>tab_control</window_name>
+	</tab_control>
+
+#include "ui\mp_buy_menu_buttons.xml"
+</w>

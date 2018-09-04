@@ -18,6 +18,7 @@ extern void msCreate(LPCSTR name);
 void CEngine::Initialize(void)
 {
     Engine.Sheduler.Initialize();
+    Engine.Scheduler.Initialize();
 #ifdef DEBUG
     msCreate("game");
 #endif
@@ -26,5 +27,6 @@ void CEngine::Initialize(void)
 void CEngine::Destroy()
 {
     Engine.Sheduler.Destroy();
+    Engine.Scheduler.Destroy();
     Engine.External.Destroy();
 }

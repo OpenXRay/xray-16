@@ -83,8 +83,8 @@ public:
 const int LIGHT_Count = 7;
 
 //-----------------------------------------------------------------
-thread_local Time t_start;
-thread_local Duration t_time;
+thread_local u64 t_start = 0;
+thread_local u64 t_time = 0;
 thread_local u64 t_count = 0;
 
 IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
@@ -99,9 +99,9 @@ IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
     }
 
     // 2. Polygon doesn't pick - real database query
-    t_start = Clock::now();
+    t_start = CPU::GetCLK();
     DB.ray_query(&gl_data.RCAST_Model, P, D, r);
-    t_time += Clock::now() - t_start;
+    t_time += CPU::GetCLK() - t_start - CPU::clk_overhead;
     t_count += 1;
 
     // 3. Analyze

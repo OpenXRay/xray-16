@@ -186,11 +186,11 @@ public:
     virtual void OnDeviceDestroy(bool bKeepTextures) override;
     virtual void ValidateHW() override;
     virtual void DestroyHW() override;
-    virtual void Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
+    virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
     //	Init
     virtual void SetupStates() override;
     virtual void OnDeviceCreate(const char* shName) override;
-    virtual void Create(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2, bool) override;
+    virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
     virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) override;
     //	Overdraw
     virtual void overdrawBegin() override;

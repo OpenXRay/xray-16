@@ -53,7 +53,8 @@ class anti_aim_ability;
 
 class CBaseMonster : public CCustomMonster, public CStepManager
 {
-    typedef CCustomMonster inherited;
+protected:
+    using inherited = CCustomMonster;
 
 public:
     CBaseMonster();
@@ -72,6 +73,7 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual CBaseMonster* cast_base_monster() { return this; }
     virtual CGameObject* cast_game_object() { return this; }
+
 public:
     virtual BOOL renderable_ShadowReceive() { return TRUE; }
     virtual void Die(IGameObject* who);

@@ -12,6 +12,7 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 #include "D3DX10Core.h"
 
 CRender RImplementation;
@@ -95,7 +96,6 @@ static class cl_water_intensity : public R_constant_setup
     }
 } binder_water_intensity;
 
-#ifdef TREE_WIND_EFFECT
 static class cl_tree_amplitude_intensity : public R_constant_setup
 {
     void setup(R_constant* C) override
@@ -105,7 +105,7 @@ static class cl_tree_amplitude_intensity : public R_constant_setup
         RCache.set_c(C, fValue, fValue, fValue, 0);
     }
 } binder_tree_amplitude_intensity;
-#endif
+// XXX: do we need to register this binder?
 
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
@@ -134,7 +134,7 @@ void CRender::create()
     m_MSAASample = -1;
 
     // hardware
-    o.smapsize = 2048;
+    o.smapsize = ps_r2_smapsize;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
@@ -273,6 +273,8 @@ void CRender::create()
         Msg("* NV-DBT supported and used");
 
     // options (smap-pool-size)
+    if (strstr(Core.Params, "-smap1024"))
+        o.smapsize = 1024;
     if (strstr(Core.Params, "-smap1536"))
         o.smapsize = 1536;
     if (strstr(Core.Params, "-smap2048"))
@@ -283,6 +285,8 @@ void CRender::create()
         o.smapsize = 3072;
     if (strstr(Core.Params, "-smap4096"))
         o.smapsize = 4096;
+    if (strstr(Core.Params, "-smap8192"))
+        o.smapsize = 8192;
 
     // gloss
     char* g = strstr(Core.Params, "-gloss ");
@@ -435,7 +439,6 @@ void CRender::create()
         R_CHK(HW.pDevice->CreateQuery(&qdesc, &q_sync_point[i]));
     q_sync_point[0]->End();
 
-    xrRender_apply_tf();
     ::PortalTraverser.initialize();
     FluidManager.Initialize(70, 70, 70);
     //	FluidManager.Initialize( 100, 100, 100 );
@@ -523,7 +526,6 @@ void CRender::reset_end()
     }
     //-AVO
 
-    xrRender_apply_tf();
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 
     // Set this flag true to skip the first render frame,
@@ -544,9 +546,6 @@ void CRender::OnFrame()
         Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
     }
 }
-
-void CRender::BeforeWorldRender() {}
-void CRender::AfterWorldRender() {}
 
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
@@ -761,54 +760,55 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
+template <typename T>
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+    T*& result, bool const disasm)
+{
+    // XXX: disasm it
+
+    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
+
+    ID3DShaderReflection* pReflection = 0;
+
+#ifdef USE_DX11
+    HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+#else
+    HRESULT const _hr = D3D10ReflectShader(buffer, buffer_size, &pReflection);
+#endif
+
+    if (SUCCEEDED(_hr) && pReflection)
+    {
+        // Parse constant table data
+        result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
+
+        _RELEASE(pReflection);
+    }
+    else
+    {
+        Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+    }
+
+    return _hr;
+}
+
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
+    // XXX: what's going on with casts here???
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
     {
-        SPS* sps_result = (SPS*)result;
-#ifdef USE_DX11
-        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->ps);
-#else // #ifdef USE_DX11
-        _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, &sps_result->ps);
-#endif // #ifdef USE_DX11
-        if (!SUCCEEDED(_result))
-        {
-            Log("! PS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        ID3DShaderReflection* pReflection = 0;
-
-#ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-#else
-        _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
-#endif
-
-        //	Parse constant, texture, sampler binding
-        //	Store input signature blob
-        if (SUCCEEDED(_result) && pReflection)
-        {
-            //	Let constant table parse it's data
-            sps_result->constants.parse(pReflection, RC_dest_pixel);
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DReflectShader hr == 0x%08x", _result);
-        }
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
     }
     else if (pTarget[0] == 'v')
     {
+        // XXX: try to use code below
+        // _result = create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+
         SVS* svs_result = (SVS*)result;
 #ifdef USE_DX11
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->sh);
 #else // #ifdef USE_DX11
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->vs);
+        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->sh);
 #endif // #ifdef USE_DX11
 
         if (!SUCCEEDED(_result))
@@ -855,41 +855,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     }
     else if (pTarget[0] == 'g')
     {
-        SGS* sgs_result = (SGS*)result;
-#ifdef USE_DX11
-        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->gs);
-#else // #ifdef USE_DX11
-        _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, &sgs_result->gs);
-#endif // #ifdef USE_DX11
-        if (!SUCCEEDED(_result))
-        {
-            Log("! GS: ", file_name);
-            Msg("! CreateGeometryShaderhr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        ID3DShaderReflection* pReflection = 0;
-
-#ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-#else
-        _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
-#endif
-
-        //	Parse constant, texture, sampler binding
-        //	Store input signature blob
-        if (SUCCEEDED(_result) && pReflection)
-        {
-            //	Let constant table parse it's data
-            sgs_result->constants.parse(pReflection, RC_dest_geometry);
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DReflectShader hr == 0x%08x", _result);
-        }
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SGS*&)result, disasm);
     }
     else
     {
@@ -970,7 +936,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
-        VERIFY(xr_strlen(c_smapsize) == 4);
+        VERIFY(xr_strlen(c_smapsize) == 4 || atoi(c_smapsize) < 16384);
         xr_strcat(sh_name, c_smapsize);
         len += 4;
     }
@@ -1581,7 +1547,7 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 0
+#if 1
 	strcpy_s					( result, "" );
 	return						false;
 #else // #if 1

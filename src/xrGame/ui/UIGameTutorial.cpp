@@ -97,6 +97,10 @@ bool CUISequenceItem::Stop(bool bForce)
 CUISequencer::CUISequencer() { m_flags.zero(); }
 void CUISequencer::Start(LPCSTR tutor_name)
 {
+    // Skip any tutorial except "game_loaded", since we need to show "st_press_any_key" hint
+    if (load_screen_renderer.IsActive() && xr_strcmp(tutor_name, "game_loaded") != 0)
+        return;
+    
     VERIFY(m_sequencer_items.size() == 0);
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
@@ -383,10 +387,10 @@ void CUISequencer::IR_OnKeyboardHold(int dik)
         m_pStoredInputReceiver->IR_OnKeyboardHold(dik);
 }
 
-void CUISequencer::IR_OnMouseWheel(int direction)
+void CUISequencer::IR_OnMouseWheel(int x, int y)
 {
     if (!GrabInput() && m_pStoredInputReceiver)
-        m_pStoredInputReceiver->IR_OnMouseWheel(direction);
+        m_pStoredInputReceiver->IR_OnMouseWheel(x, y);
 }
 
 void CUISequencer::IR_OnKeyboardPress(int dik)
@@ -449,7 +453,9 @@ void CUISequencer::IR_OnActivate()
             case kACCEL:
             case kL_LOOKOUT:
             case kR_LOOKOUT:
-            case kWPN_FIRE: { IR_OnKeyboardPress(i);
+            case kWPN_FIRE: 
+            {
+                IR_OnKeyboardPress(i);
             }
             break;
             };

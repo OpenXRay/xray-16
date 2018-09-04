@@ -37,10 +37,12 @@ public:
     using map_RT = xr_map<const char*, CRT*, str_pred>;
     //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
+
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     using map_GS = xr_map<const char*, SGS*, str_pred>;
-#endif //	USE_DX10
-#ifdef USE_DX11
+#endif
+
+#if defined(USE_DX11) || defined(USE_OGL)
     using map_HS = xr_map<const char*, SHS*, str_pred>;
     using map_DS = xr_map<const char*, SDS*, str_pred>;
     using map_CS = xr_map<const char*, SCS*, str_pred>;
@@ -59,9 +61,17 @@ private:
     //	DX10 cut map_RTC												m_rtargets_c;
     map_VS m_vs;
     map_PS m_ps;
+
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     map_GS m_gs;
-#endif //	USE_DX10
+#endif
+
+#if defined(USE_DX11) || defined(USE_OGL)
+    map_DS m_ds;
+    map_HS m_hs;
+    map_CS m_cs;
+#endif
+
     map_TD m_td;
 
     xr_vector<SState*> v_states;
@@ -154,7 +164,7 @@ public:
     void _DeleteGS(const SGS* GS);
 #endif //	USE_DX10
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_OGL)
     SHS* _CreateHS(LPCSTR Name);
     void _DeleteHS(const SHS* HS);
 
@@ -163,7 +173,7 @@ public:
 
     SCS* _CreateCS(LPCSTR Name);
     void _DeleteCS(const SCS* CS);
-#endif //	USE_DX10
+#endif
 
     SPS* _CreatePS(LPCSTR Name);
     void _DeletePS(const SPS* PS);
@@ -180,7 +190,8 @@ public:
 
 #ifdef USE_OGL
     SDeclaration* _CreateDecl (u32 FVF);
-#endif // USE_OGL
+#endif
+
     SDeclaration* _CreateDecl(D3DVERTEXELEMENT9* dcl);
     void _DeleteDecl(const SDeclaration* dcl);
 
@@ -228,7 +239,8 @@ public:
 #else
     SGeometry* CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
     SGeometry* CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-#endif // USE_OGL
+#endif
+
     void DeleteGeom(const SGeometry* VS);
     void DeferredLoad(BOOL E) { bDeferredLoad = E; }
     void DeferredUpload();
@@ -239,21 +251,14 @@ public:
     void Dump(bool bBrief);
 
 private:
-#ifdef USE_DX11
-    map_DS m_ds;
-    map_HS m_hs;
-    map_CS m_cs;
-
     template <typename T>
     T& GetShaderMap();
 
     template <typename T>
-    T* CreateShader(const char* name);
+    T* CreateShader(const char* name, const char* filename = nullptr, const bool searchForEntryAndTarget = false);
 
     template <typename T>
     void DestroyShader(const T* sh);
-
-#endif //	USE_DX10
 };
 
 #endif // ResourceManagerH

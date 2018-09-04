@@ -11,6 +11,7 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 CRender RImplementation;
 
@@ -99,7 +100,6 @@ void CRender::create()
     PSLibrary.OnCreate();
     //.	HWOCC.occq_create			(occq_size);
 
-    xrRender_apply_tf();
     ::PortalTraverser.initialize();
 }
 
@@ -133,11 +133,17 @@ void CRender::reset_begin()
 
 void CRender::reset_end()
 {
-    xrRender_apply_tf();
     //.	HWOCC.occq_create			(occq_size);
     Target = new CRenderTarget();
     if (L_Projector)
         L_Projector->invalidate();
+
+    // let's reload details while changed details options on vid_restart
+    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    {
+        Details = new CDetailManager();
+        Details->Load();
+    }
 
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
@@ -147,6 +153,16 @@ void CRender::reset_end()
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
+
+    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
+    {
+        // MT-details (@front)
+        Device.seqParallel.insert(
+            Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
+
+        // MT-HOM (@front)
+        Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
+    }
 }
 
 // Перед началом рендера мира --#SM+#-- +SecondVP+
@@ -426,8 +442,11 @@ void CRender::Calculate()
     // Frustum & HOM rendering
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
     View = nullptr;
-    HOM.Enable();
-    HOM.Render(ViewBase);
+    if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
+    {
+        HOM.Enable();
+        HOM.Render(ViewBase);
+    }
     gm_SetNearer(FALSE);
     phase = PHASE_NORMAL;
 
@@ -469,7 +488,7 @@ void CRender::Calculate()
         PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
-        // Determine visibility for static geometry hierrarhy
+        // Determine visibility for static geometry hierarchy
         if (psDeviceFlags.test(rsDrawStatic))
         {
             for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
@@ -597,7 +616,7 @@ void CRender::Calculate()
             }
         }
 
-        // Calculate miscelaneous stuff
+        // Calculate miscellaneous stuff
         BasicStats.ShadowsCalc.Begin();
         L_Shadows->calculate();
         BasicStats.ShadowsCalc.End();
@@ -645,7 +664,7 @@ void CRender::Render()
     r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
     HOM.Disable();
-    L_Dynamic->render(0); // addititional light sources
+    L_Dynamic->render(0); // additional light sources
     if (Wallmarks)
     {
         g_r = 0;
@@ -661,7 +680,7 @@ void CRender::Render()
     BasicStats.ShadowsRender.End();
     r_dsgraph_render_lods(false, true); // lods - FB
     r_dsgraph_render_graph(1); // normal level, secondary priority
-    L_Dynamic->render(1); // addititional light sources, secondary priority
+    L_Dynamic->render(1); // additional light sources, secondary priority
     PortalTraverser.fade_render(); // faded-portals
     r_dsgraph_render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();
@@ -740,61 +759,24 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+template <typename T>
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+    T*& result, bool const disasm)
 {
-    HRESULT _result = E_FAIL;
-    if (pTarget[0] == 'p')
-    {
-        SPS* sps_result = (SPS*)result;
-        _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->ps);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! PS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
+    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
 
-        LPCVOID data = nullptr;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            sps_result->constants.parse(pConstants, 0x1);
-        }
-        else
-        {
-            Log("! PS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
-    }
-    else if (pTarget[0] == 'v')
-    {
-        SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
-        if (!SUCCEEDED(_result))
-        {
-            Log("! VS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
+    LPCVOID data = nullptr;
 
-        LPCVOID data = nullptr;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
-        if (SUCCEEDED(_result) && data)
-        {
-            LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-            svs_result->constants.parse(pConstants, 0x2);
-        }
-        else
-        {
-            Log("! VS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
-        }
+    HRESULT const _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+
+    if (SUCCEEDED(_hr) && data)
+    {
+        // Parse constant table data
+        LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
+        result->constants.parse(pConstants, ShaderTypeTraits<T>::GetShaderDest());
     }
     else
-    {
-        NODEFAULT;
-    }
+        Msg("! D3DXFindShaderComment %s hr == 0x%08x", file_name, _hr);
 
     if (disasm)
     {
@@ -808,7 +790,19 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         _RELEASE(disasm);
     }
 
-    return _result;
+    return _hr;
+}
+
+inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
+{
+    if (pTarget[0] == 'p')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+    
+    if (pTarget[0] == 'v')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+    
+    NODEFAULT;
+    return E_FAIL;
 }
 
 class includer : public ID3DXInclude
@@ -1043,7 +1037,7 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 0
+#if 1
 	strcpy_s					( result, "" );
 	return						false;
 #else // #if 1

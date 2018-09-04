@@ -107,6 +107,20 @@ IC const GameGraph::_GRAPH_ID& GameGraph::CHeader::vertex_count() const { return
 IC const u32& GameGraph::CHeader::edge_count() const { return (m_edge_count); }
 IC const u32& GameGraph::CHeader::death_point_count() const { return (m_death_point_count); }
 IC const GameGraph::LEVEL_MAP& GameGraph::CHeader::levels() const { return (m_levels); }
+
+IC bool GameGraph::CHeader::level_exist(const _LEVEL_ID& id) const
+{
+    return levels().find(id) != levels().end();
+}
+
+IC bool GameGraph::CHeader::level_exist(pcstr level_name) const
+{
+    for (const auto& level : levels())
+        if (xr_strcmp(level.second.name(), level_name) == 0)
+            return true;
+    return false;
+}
+
 IC const GameGraph::SLevel& GameGraph::CHeader::level(const _LEVEL_ID& id) const
 {
     LEVEL_MAP::const_iterator I = levels().find(id);

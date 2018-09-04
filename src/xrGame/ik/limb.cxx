@@ -738,8 +738,7 @@ int Limb::try_singularities(int solves, float& swivel_angle, float x[])
 //
 // Assumes that either SetGoal or SetGoalPos has been called first
 //
-// XXX: Shouldn't the phInfinity declaration be in a header for xrPhysics?
-extern XRPHYSICS_API const float phInfinity;
+
 int Limb::Solve(float x[], float* new_swivel, float* new_pos)
 {
     int success;

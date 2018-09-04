@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
-#include "movementboxdynamicactivate.h"
+#include "MovementBoxDynamicActivate.h"
 
 #include "ExtendedGeom.h"
 #include "MathUtils.h"
 #include "Physics.h"
 #include "ph_valid_ode.h"
 #include "MathUtilsOde.h"
-#include "iphysicsshellholder.h"
-#include "phcharacter.h"
+#include "IPhysicsShellHolder.h"
+#include "PHCharacter.h"
 #include "xrEngine/GameMtlLib.h"
 
 ObjectContactCallbackFun* saved_callback = 0;

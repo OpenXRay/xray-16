@@ -1,7 +1,7 @@
 #ifndef ELEVATOR_STAETE
 #define ELEVATOR_STAETE
 
-#include "ielevatorstate.h"
+#include "IElevatorState.h"
 class CPHCharacter;
 struct dContact;
 struct SGameMtl;

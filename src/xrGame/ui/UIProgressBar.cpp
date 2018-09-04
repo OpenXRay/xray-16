@@ -39,16 +39,26 @@ void CUIProgressBar::UpdateProgressBar()
 
     float fCurrentLength = m_ProgressPos.x * progressbar_unit;
 
-    if (m_orient_mode == om_horz || m_orient_mode == om_back)
+    switch (m_orient_mode)
     {
+    case om_horz:
+    case om_back:
+    case om_fromcenter:
         m_CurrentLength = GetWidth() * fCurrentLength;
-    }
-    else if (m_orient_mode == om_vert || m_orient_mode == om_down)
-    {
+        break;
+
+    case om_vert:
+    case om_down:
+    case om_vfromcenter:
         m_CurrentLength = GetHeight() * fCurrentLength;
-    }
-    else
-    {
+        break;
+
+    case om_tocenter:
+    case om_vtocenter:
+        R_ASSERT2(false, "to_center mode is not implemented.");
+        break;
+
+    default:
         m_CurrentLength = 0.0f;
     }
 
@@ -62,6 +72,10 @@ void CUIProgressBar::UpdateProgressBar()
         }
         else
             m_UIProgressItem.SetTextureColor(m_maxColor.get());
+
+        // XXX: Implement color smoothing
+        if (colorSmoothing)
+            R_ASSERT2(false, "color smoothing is not implemented.");
     }
 }
 
@@ -112,6 +126,21 @@ void CUIProgressBar::Draw()
     case om_vert: progress_rect.set(0, GetHeight() - m_CurrentLength, GetWidth(), GetHeight()); break;
     case om_back: progress_rect.set(GetWidth() - m_CurrentLength * 1.01f, 0, GetWidth(), GetHeight()); break;
     case om_down: progress_rect.set(0, 0, GetWidth(), m_CurrentLength); break;
+    case om_fromcenter: 
+    {
+        const float center = GetWidth() / 2.f;
+        progress_rect.set(center - m_CurrentLength, 0, center + m_CurrentLength, GetHeight());
+        break;
+    }
+    case om_vfromcenter:
+    {
+        const float center = GetHeight() / 2.f;
+        progress_rect.set(0, center - m_CurrentLength, GetWidth(), center + m_CurrentLength);
+        break;
+    }
+    // XXX: Implement to_center mode
+    case om_tocenter:
+    case om_vtocenter: R_ASSERT2(false, "to_center mode is not implemented."); break;
     default: NODEFAULT; break;
     }
 

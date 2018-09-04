@@ -196,7 +196,7 @@ CRenderTarget::CRenderTarget()
     param_noise_fps = 25.f;
     param_noise_scale = 1.f;
 
-    im_noise_time = 1 / 100.0f;
+    im_noise_time = 1.f / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 
@@ -355,6 +355,11 @@ CRenderTarget::CRenderTarget()
         f_bloom_factor = 0.5f;
     }
 
+    //FXAA
+    s_fxaa.create(b_fxaa, "r3\\fxaa");
+    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
+
+
     // HBAO
     if (RImplementation.o.ssao_opt_data)
     {
@@ -375,10 +380,6 @@ CRenderTarget::CRenderTarget()
         rt_half_depth.create(r2_RT_half_depth, w, h, fmt);
         s_ssao.create(b_ssao, "r2\\ssao");
     }
-
-    //FXAA
-    s_fxaa.create(b_fxaa, "r3\\fxaa");
-    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // SSAO
     if (RImplementation.o.ssao_blur_on)

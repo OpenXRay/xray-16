@@ -46,9 +46,11 @@ int g_sv_adm_menu_ping_limit = 25;
 
 extern const xr_token round_end_result_str[];
 
-#include "ui\UIBuyWndShared.h"
+#include "ui/UIBuyWndShared.h"
 
-game_sv_mp::game_sv_mp() : inherited()
+game_sv_mp::game_sv_mp()
+    : inherited(), m_bRankUp_Allowed(false), m_bVotingReal(false),
+      m_uVoteStartTime(0), m_u8SpectatorModes(0)
 {
     m_strWeaponsData = new CItemMgr();
     m_bVotingActive = false;

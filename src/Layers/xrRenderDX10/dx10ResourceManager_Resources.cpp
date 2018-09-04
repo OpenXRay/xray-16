@@ -20,6 +20,9 @@
 #include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
+SGS* CResourceManager::_CreateGS(LPCSTR Name) { return CreateShader<SGS>(Name); }
+void CResourceManager::_DeleteGS(const SGS* GS) { DestroyShader(GS); }
+
 #ifdef USE_DX11
 SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
 void CResourceManager::_DeleteHS(const SHS* HS) { DestroyShader(HS); }
@@ -131,85 +134,15 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         xr_strcat(name, "_3");
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
-    LPSTR N = LPSTR(name);
-    map_VS::iterator I = m_vs.find(N);
-    if (I != m_vs.end())
-        return I->second;
-    else
-    {
-        SVS* _vs = new SVS();
-        _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
-        //_vs->vs				= NULL;
-        //_vs->signature		= NULL;
-        if (0 == xr_stricmp(_name, "null"))
-        {
-            return _vs;
-        }
-
-        string_path shName;
-        {
-            const char* pchr = strchr(_name, '(');
-            ptrdiff_t size = pchr ? pchr - _name : xr_strlen(_name);
-            strncpy(shName, _name, size);
-            shName[size] = 0;
-        }
-
-        string_path cname;
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*_name*/ shName, ".vs");
-        FS.update_path(cname, "$game_shaders$", cname);
-        //		LPCSTR						target		= NULL;
-
-        // duplicate and zero-terminate
-        IReader* file = FS.r_open(cname);
-        //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-        if (!file)
-        {
-            string1024 tmp;
-            xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.vs", cname);
-            Msg(tmp);
-            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".vs");
-            FS.update_path(cname, "$game_shaders$", cname);
-            file = FS.r_open(cname);
-        }
-        u32 const size = file->length();
-        char* const data = (LPSTR)_alloca(size + 1);
-        CopyMemory(data, file->pointer(), size);
-        data[size] = 0;
-        FS.r_close(file);
-
-        // Select target
-        LPCSTR c_target = "vs_2_0";
-        LPCSTR c_entry = "main";
-        if (HW.Caps.geometry_major >= 2)
-            c_target = "vs_2_0";
-        else
-            c_target = "vs_1_1";
-
-        if (strstr(data, "main_vs_1_1"))
-        {
-            c_target = "vs_1_1";
-            c_entry = "main_vs_1_1";
-        }
-        if (strstr(data, "main_vs_2_0"))
-        {
-            c_target = "vs_2_0";
-            c_entry = "main_vs_2_0";
-        }
-
-        HRESULT const _hr = GEnv.Render->shader_compile(
-            name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
-
-        VERIFY(SUCCEEDED(_hr));
-
-        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
-
-        return _vs;
-    }
+    
+    return CreateShader<SVS>(name, _name, true);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs)
 {
+    // XXX: try to use code below
+    // DestroyShader(vs);
+
     if (0 == (vs->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
     LPSTR N = LPSTR(*vs->cName);
@@ -255,176 +188,11 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         xr_strcat(name, "_6");
     if (7 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_7");
-    LPSTR N = LPSTR(name);
-    map_PS::iterator I = m_ps.find(N);
-    if (I != m_ps.end())
-        return I->second;
-    else
-    {
-        SPS* _ps = new SPS();
-        _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
-        if (0 == xr_stricmp(_name, "null"))
-        {
-            _ps->ps = NULL;
-            return _ps;
-        }
 
-        string_path shName;
-        const char* pchr = strchr(_name, '(');
-        ptrdiff_t strSize = pchr ? pchr - _name : xr_strlen(_name);
-        strncpy(shName, _name, strSize);
-        shName[strSize] = 0;
-
-        // Open file
-        string_path cname;
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*_name*/ shName, ".ps");
-        FS.update_path(cname, "$game_shaders$", cname);
-
-        // duplicate and zero-terminate
-        IReader* file = FS.r_open(cname);
-        //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-        if (!file)
-        {
-            string1024 tmp;
-            //	TODO: HACK: Test failure
-            // Memory.mem_compact();
-            xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.ps", cname);
-            Msg(tmp);
-            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".ps");
-            FS.update_path(cname, "$game_shaders$", cname);
-            file = FS.r_open(cname);
-        }
-        R_ASSERT2(file, cname);
-        u32 const size = file->length();
-        char* const data = (LPSTR)_alloca(size + 1);
-        CopyMemory(data, file->pointer(), size);
-        data[size] = 0;
-        FS.r_close(file);
-
-        // Select target
-        LPCSTR c_target = "ps_2_0";
-        LPCSTR c_entry = "main";
-        if (strstr(data, "main_ps_1_1"))
-        {
-            c_target = "ps_1_1";
-            c_entry = "main_ps_1_1";
-        }
-        if (strstr(data, "main_ps_1_2"))
-        {
-            c_target = "ps_1_2";
-            c_entry = "main_ps_1_2";
-        }
-        if (strstr(data, "main_ps_1_3"))
-        {
-            c_target = "ps_1_3";
-            c_entry = "main_ps_1_3";
-        }
-        if (strstr(data, "main_ps_1_4"))
-        {
-            c_target = "ps_1_4";
-            c_entry = "main_ps_1_4";
-        }
-        if (strstr(data, "main_ps_2_0"))
-        {
-            c_target = "ps_2_0";
-            c_entry = "main_ps_2_0";
-        }
-
-        HRESULT const _hr = GEnv.Render->shader_compile(
-            name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);
-
-        VERIFY(SUCCEEDED(_hr));
-
-        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
-
-        return _ps;
-    }
+    return CreateShader<SPS>(name, _name, true);
 }
 
-void CResourceManager::_DeletePS(const SPS* ps)
-{
-    if (0 == (ps->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    LPSTR N = LPSTR(*ps->cName);
-    map_PS::iterator I = m_ps.find(N);
-    if (I != m_ps.end())
-    {
-        m_ps.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled pixel-shader '%s'", *ps->cName);
-}
-
-//--------------------------------------------------------------------------------------------------------------
-SGS* CResourceManager::_CreateGS(LPCSTR name)
-{
-    LPSTR N = LPSTR(name);
-    map_GS::iterator I = m_gs.find(N);
-    if (I != m_gs.end())
-        return I->second;
-    else
-    {
-        SGS* _gs = new SGS();
-        _gs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
-        if (0 == xr_stricmp(name, "null"))
-        {
-            _gs->gs = NULL;
-            return _gs;
-        }
-
-        // Open file
-        string_path cname;
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), name, ".gs");
-        FS.update_path(cname, "$game_shaders$", cname);
-
-        // duplicate and zero-terminate
-        IReader* file = FS.r_open(cname);
-        //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-        if (!file)
-        {
-            string1024 tmp;
-            //	TODO: HACK: Test failure
-            // Memory.mem_compact();
-            xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.gs", cname);
-            Msg(tmp);
-            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".gs");
-            FS.update_path(cname, "$game_shaders$", cname);
-            file = FS.r_open(cname);
-        }
-        R_ASSERT2(file, cname);
-
-        // Select target
-        LPCSTR c_target = "gs_4_0";
-        LPCSTR c_entry = "main";
-
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
-            c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs);
-
-        VERIFY(SUCCEEDED(_hr));
-
-        FS.r_close(file);
-
-        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
-
-        return _gs;
-    }
-}
-void CResourceManager::_DeleteGS(const SGS* gs)
-{
-    if (0 == (gs->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    LPSTR N = LPSTR(*gs->cName);
-    map_GS::iterator I = m_gs.find(N);
-    if (I != m_gs.end())
-    {
-        m_gs.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled geometry shader '%s'", *gs->cName);
-}
-
+void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 //--------------------------------------------------------------------------------------------------------------
 static BOOL dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
 {

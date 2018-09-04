@@ -21,8 +21,6 @@
 
 /* Visual */
 #define DETAIL_RADIUS // detail draw radius (by K.D.)
-#define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
-#define TREE_WIND_EFFECT // configurable tree sway, can be used to have trees sway more during storms or lightly on clear days.
 
 /* Tweaks: */
 //#define FP_DEATH // first person death view

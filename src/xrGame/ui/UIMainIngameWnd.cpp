@@ -2,7 +2,6 @@
 #include "UIMainIngameWnd.h"
 #include "UIMessagesWindow.h"
 #include "UIZoneMap.h"
-#include <dinput.h>
 #include "Actor.h"
 #include "ActorCondition.h"
 #include "EntityCondition.h"

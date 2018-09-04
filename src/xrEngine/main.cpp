@@ -1,9 +1,12 @@
 // Entry point is in xr_3da/entry_point.cpp
 #include "stdafx.h"
 #include "main.h"
-#include "xr_3da/resource.h"
 
+#if defined(WINDOWS)
 #include <process.h>
+#elif defined(LINUX)
+#include <lockfile.h>
+#endif
 #include <locale.h>
 
 #include "IGame_Persistent.h"
@@ -15,10 +18,14 @@
 
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
+#if defined(WINDOWS)
 #include "Text_Console.h"
+#elif defined(LINUX)
+#define CTextConsole CConsole
+#pragma todo("Implement text console or it's alternative")
+#endif
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"
-#include "splash.h"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -34,6 +41,7 @@ ENGINE_API string_path g_sLaunchWorkingFolder;
 
 namespace
 {
+bool CheckBenchmark();
 void RunBenchmark(pcstr name);
 }
 
@@ -102,7 +110,7 @@ ENGINE_API void InitConsole()
 
 ENGINE_API void InitInput()
 {
-    bool captureInput = !strstr(Core.Params, "-i");
+    bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
     pInput = new CInput(captureInput);
 }
 
@@ -129,6 +137,9 @@ ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
+#if defined(LINUX)
+    lockfile_remove("/var/lock/stalker-cop.lock");
+#endif
 }
 
 void execUserScript()
@@ -183,7 +194,6 @@ ENGINE_API void Startup()
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
 
     // Main cycle
-    splash::hide();
     Device.Run();
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
@@ -211,9 +221,15 @@ ENGINE_API int RunApplication()
 #ifdef NO_MULTI_INSTANCES
     if (!GEnv.isDedicatedServer)
     {
+#if defined(WINDOWS)
         CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
             return 2;
+#elif defined(LINUX)
+        int lock_res = lockfile_create("/var/lock/stalker-cop.lock", 0, L_PID);
+        if(L_ERROR == lock_res)
+            return 2;
+#endif
     }
 #endif
     *g_sLaunchOnExit_app = 0;
@@ -233,26 +249,8 @@ ENGINE_API int RunApplication()
     InitConsole();
     Engine.External.CreateRendererList();
 
-    pcstr benchName = "-batch_benchmark ";
-    if (strstr(Core.Params, benchName))
-    {
-        u32 sz = xr_strlen(benchName);
-        string64 benchmarkName;
-        sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
-        RunBenchmark(benchmarkName);
+    if (CheckBenchmark())
         return 0;
-    }
-
-    pcstr sashName = "-openautomate ";
-    if (strstr(Core.Params, sashName))
-    {
-        u32 sz = xr_strlen(sashName);
-        string512 sashArg;
-        sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-        g_SASH.Init(sashArg);
-        g_SASH.MainLoop();
-        return 0;
-    }
 
     if (!GEnv.isDedicatedServer)
     {
@@ -284,6 +282,7 @@ ENGINE_API int RunApplication()
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
+#if defined(WINDOWS)
         // CreateProcess need to return results to next two structures
         STARTUPINFO si = {};
         si.cb = sizeof(si);
@@ -291,19 +290,45 @@ ENGINE_API int RunApplication()
         // We use CreateProcess to setup working folder
         pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
         CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
+#endif
     }
     return 0;
 }
 
 namespace
 {
+bool CheckBenchmark()
+{
+    pcstr benchName = "-batch_benchmark ";
+    if (strstr(Core.Params, benchName))
+    {
+        const u32 sz = xr_strlen(benchName);
+        string64 benchmarkName;
+        sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
+        RunBenchmark(benchmarkName);
+        return true;
+    }
+
+    pcstr sashName = "-openautomate ";
+    if (strstr(Core.Params, sashName))
+    {
+        const u32 sz = xr_strlen(sashName);
+        string512 sashArg;
+        sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
+        g_SASH.Init(sashArg);
+        g_SASH.MainLoop();
+        return true;
+    }
+
+    return false;
+}
 void RunBenchmark(pcstr name)
 {
     g_bBenchmark = true;
     string_path cfgPath;
     FS.update_path(cfgPath, "$app_data_root$", name);
     CInifile ini(cfgPath);
-    u32 benchmarkCount = ini.line_count("benchmark");
+    const u32 benchmarkCount = ini.line_count("benchmark");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
         LPCSTR benchmarkName, t;

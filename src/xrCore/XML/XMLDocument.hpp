@@ -8,11 +8,13 @@
 #define PUGIXML_NO_XPATH
 #define PUGIXML_HAS_LONG_LONG
 #include "pugixml.hpp"
+#ifdef DEBUG // debug & mixed
 #include "xrCommon/xr_vector.h"
+#endif
 #include "xrCore/xrstring.h"
 
-static constexpr pcstr CONFIG_PATH = "$game_config$";
-static constexpr pcstr UI_PATH = "ui";
+// XXX: interesting idea is to have variable configs folder. Need we?
+static constexpr pcstr CONFIG_PATH = _game_config_;
 
 class XML_NODE
 {

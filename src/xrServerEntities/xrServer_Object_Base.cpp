@@ -160,8 +160,9 @@ CInifile& CSE_Abstract::spawn_ini()
     if (!m_ini_file)
 #pragma warning(push)
 #pragma warning(disable : 4238)
+        // XXX: what a casting mess.. Do we need to use shared_str for m_ini_string?
         m_ini_file =
-            new CInifile(&IReader((void*)(*(m_ini_string)), m_ini_string.size()), FS.get_path("$game_config$")->m_Path);
+            new CInifile(&IReader((void*)(*(m_ini_string)), m_ini_string.size()), FS.get_path(_game_config_)->m_Path);
 #pragma warning(pop)
     return (*m_ini_file);
 }

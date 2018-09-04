@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "configs_dumper.h"
 #include "configs_common.h"
-#include "xrCore/ppmd_compressor.h"
+#include "xrCore/Compression/ppmd_compressor.h"
 #include "xrCore/xr_ini.h"
 #include "xrCore/buffer_vector.h"
 #include "GameObject.h"
@@ -14,14 +14,17 @@
 namespace mp_anticheat
 {
 configs_dumper::configs_dumper()
+#ifdef DEBUG
+    : m_start_time(0)
+#endif
 {
     m_state = ds_not_active;
-    m_buffer_for_compress = NULL;
+    m_buffer_for_compress = nullptr;
     m_buffer_for_compress_size = 0;
     m_buffer_for_compress_capacity = 0;
 
-    m_make_start_event = NULL;
-    m_make_done_event = NULL;
+    m_make_start_event = nullptr;
+    m_make_done_event = nullptr;
 
     static u8 const sign_random_init[4] = {42, 42, 42, 42};
     m_dump_signer.sign(sign_random_init, sizeof(sign_random_init));

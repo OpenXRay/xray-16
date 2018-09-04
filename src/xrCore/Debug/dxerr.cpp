@@ -21,11 +21,6 @@
 #include <d3d9.h>
 #include <mmreg.h>
 #include <dsound.h>
-#ifndef DIRECTINPUT_VERSION
-#define DIRECTINPUT_VERSION 0x800
-#endif
-#include <dinput.h>
-#include <dinputd.h>
 #endif
 
 #define XAUDIO2_E_INVALID_CALL 0x88960001

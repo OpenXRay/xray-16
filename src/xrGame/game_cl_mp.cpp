@@ -5,7 +5,6 @@
 #include "Actor.h"
 #include "ExplosiveItem.h"
 #include "Level.h"
-#include <dinput.h>
 #include "CustomZone.h"
 #include "game_base_kill_type.h"
 #include "game_base_menu_events.h"
@@ -32,7 +31,7 @@
 #include "RegistryFuncs.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "screenshot_server.h"
-#include "xrCore/ppmd_compressor.h"
+#include "xrCore/Compression/ppmd_compressor.h"
 #include "xrCore/Compression/rt_compressor.h"
 #include "game_cl_mp_snd_messages.h"
 

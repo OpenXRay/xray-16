@@ -33,39 +33,42 @@ struct dMass;
 typedef struct dMass dMass;
 
 
-void dMassSetZero (dMass *);
+ODE_API void dMassSetZero (dMass *);
 
-void dMassSetParameters (dMass *, dReal themass,
+ODE_API void dMassSetParameters (dMass *, dReal themass,
 			 dReal cgx, dReal cgy, dReal cgz,
 			 dReal I11, dReal I22, dReal I33,
 			 dReal I12, dReal I13, dReal I23);
 
-void dMassSetSphere (dMass *, dReal density, dReal radius);
-void dMassSetSphereTotal (dMass *, dReal total_mass, dReal radius);
+ODE_API void dMassSetSphere (dMass *, dReal density, dReal radius);
+ODE_API void dMassSetSphereTotal (dMass *, dReal total_mass, dReal radius);
 
-void dMassSetCappedCylinder (dMass *, dReal density, int direction,
-			     dReal radius, dReal length);
-void dMassSetCappedCylinderTotal (dMass *, dReal total_mass, int direction,
-				  dReal radius, dReal length);
+ODE_API void dMassSetCapsule (dMass *, dReal density, int direction,
+		  	dReal radius, dReal length);
+ODE_API void dMassSetCapsuleTotal (dMass *, dReal total_mass, int direction,
+			dReal radius, dReal length);
 
-void dMassSetCylinder (dMass *, dReal density, int direction,
+ODE_API void dMassSetCylinder (dMass *, dReal density, int direction,
 		       dReal radius, dReal length);
-void dMassSetCylinderTotal (dMass *, dReal total_mass, int direction,
+ODE_API void dMassSetCylinderTotal (dMass *, dReal total_mass, int direction,
 			    dReal radius, dReal length);
 
-void dMassSetBox (dMass *, dReal density,
+ODE_API void dMassSetBox (dMass *, dReal density,
 		  dReal lx, dReal ly, dReal lz);
-void dMassSetBoxTotal (dMass *, dReal total_mass,
+ODE_API void dMassSetBoxTotal (dMass *, dReal total_mass,
 		       dReal lx, dReal ly, dReal lz);
 
-void dMassAdjust (dMass *, dReal newmass);
+ODE_API void dMassAdjust (dMass *, dReal newmass);
 
-void dMassTranslate (dMass *, dReal x, dReal y, dReal z);
+ODE_API void dMassTranslate (dMass *, dReal x, dReal y, dReal z);
 
-void dMassRotate (dMass *, const dMatrix3 R);
+ODE_API void dMassRotate (dMass *, const dMatrix3 R);
 
-void dMassAdd (dMass *a, const dMass *b);
+ODE_API void dMassAdd (dMass *a, const dMass *b);
 
+// Backwards compatible API
+#define dMassSetCappedCylinder dMassSetCapsule
+#define dMassSetCappedCylinderTotal dMassSetCapsuleTotal
 
 
 struct dMass {
@@ -84,8 +87,10 @@ struct dMass {
     { dMassSetParameters (this,themass,cgx,cgy,cgz,I11,I22,I33,I12,I13,I23); }
   void setSphere (dReal density, dReal radius)
     { dMassSetSphere (this,density,radius); }
-  void setCappedCylinder (dReal density, int direction, dReal a, dReal b)
+  void setCapsule (dReal density, int direction, dReal a, dReal b)
     { dMassSetCappedCylinder (this,density,direction,a,b); }
+  void setCappedCylinder (dReal density, int direction, dReal a, dReal b)
+    { setCapsule(density, direction, a, b); }
   void setBox (dReal density, dReal lx, dReal ly, dReal lz)
     { dMassSetBox (this,density,lx,ly,lz); }
   void adjust (dReal newmass)

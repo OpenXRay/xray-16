@@ -19,6 +19,34 @@ unsgined int query_processor_info(processor_info* pinfo)
 
 #undef _CPUID_DEBUG
 
+void nativeCpuId(int regs[4], int i)
+{
+#ifdef WINDOWS
+    __cpuid((int *)regs, (int)i);
+#elif defined(LINUX) && defined(GCC)
+    __cpuid((int)i, (int *)regs);
+#elif defined(LINUX)
+    asm volatile("cpuid" :
+    "=eax" (regs[0]),
+    "=ebx" (regs[1]),
+    "=ecx" (regs[2]),
+    "=edx" (regs[3])
+    : "eax" (i));
+#else
+#error Cpuid is not implemented
+#endif
+}
+
+#ifndef WINDOWS
+#include <thread>
+
+void __cpuidex(int regs[4], int i, int j)
+{
+    nativeCpuId(regs, i);
+}
+#endif
+
+#ifdef WINDOWS
 DWORD countSetBits(ULONG_PTR bitMask)
 {
     DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
@@ -34,6 +62,7 @@ DWORD countSetBits(ULONG_PTR bitMask)
 
     return bitSetCount;
 }
+#endif
 
 unsigned int query_processor_info(processor_info* pinfo)
 {
@@ -49,7 +78,7 @@ unsigned int query_processor_info(processor_info* pinfo)
     xr_vector<std::array<int, 4>> data;
     std::array<int, 4> cpui;
 
-    __cpuid(cpui.data(), 0);
+    nativeCpuId(cpui.data(), 0);
     const int nIds = cpui[0];
 
     for (int i = 0; i <= nIds; ++i)
@@ -80,7 +109,7 @@ unsigned int query_processor_info(processor_info* pinfo)
     f_7_ECX = data[7][2];
     }*/
 
-    __cpuid(cpui.data(), 0x80000000);
+    nativeCpuId(cpui.data(), 0x80000000);
     const int nExIds_ = cpui[0];
     data.clear();
 
@@ -117,7 +146,7 @@ unsigned int query_processor_info(processor_info* pinfo)
     if (f_1_ECX[19]) pinfo->features |= static_cast<u32>(CpuFeature::Sse41);
     if (f_1_ECX[20]) pinfo->features |= static_cast<u32>(CpuFeature::Sse42);
 
-    __cpuid(cpui.data(), 1);
+    nativeCpuId(cpui.data(), 1);
 
     const bool hasMWait = (cpui[2] & 0x8) > 0;
     if (hasMWait) pinfo->features |= static_cast<u32>(CpuFeature::MWait);
@@ -127,9 +156,21 @@ unsigned int query_processor_info(processor_info* pinfo)
     pinfo->stepping = cpui[0] & 0xf;
 
     // Calculate available processors
+#ifdef WINDOWS
     ULONG_PTR pa_mask_save, sa_mask_stub = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
+#elif defined(LINUX)
+    unsigned int pa_mask_save = 0;
+    cpu_set_t my_set;
+    CPU_ZERO(&my_set);
+    sched_getaffinity(0, sizeof(cpu_set_t), &my_set);
+    pa_mask_save = CPU_COUNT(&my_set);
+#else
+#warning "No Function to obtain process affinity"
+    unsigned int pa_mask_save = 0;
+#endif // WINDOWS
 
+#ifdef WINDOWS
     DWORD returnedLength = 0;
     DWORD byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
@@ -159,6 +200,33 @@ unsigned int query_processor_info(processor_info* pinfo)
         byteOffset += sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
         ptr++;
     }
+#elif defined(LINUX)
+    int logicalProcessorCount = std::thread::hardware_concurrency();
+
+    //not sure about processorCoreCount - is it really cores or threads
+    //https://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
+    int processorCoreCount = sysconf(_SC_NPROCESSORS_ONLN);
+
+    //2nd implementation
+    //
+    //#include <hwloc.h>
+    //// Allocate, initialize, and perform topology detection
+    //hwloc_topology_t topology;
+    //hwloc_topology_init(&topology);
+    //hwloc_topology_load(topology);
+    //
+    //// Try to get the number of CPU cores from topology
+    //int depth = hwloc_get_type_depth(topology, HWLOC_OBJ_CORE);
+    //int processorCoreCount = hwloc_get_nbobjs_by_depth(topology, depth);
+    //
+    //// Destroy topology object and return
+    //hwloc_topology_destroy(topology);
+
+    //3rd another implementation
+    //https://stackoverflow.com/questions/2901694/programmatically-detect-number-of-physical-processors-cores-or-if-hyper-threadin
+
+#endif
+
 
     if (logicalProcessorCount != processorCoreCount) pinfo->features |= static_cast<u32>(CpuFeature::HT);
 

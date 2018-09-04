@@ -1,8 +1,7 @@
-#ifndef TRAFFIC_OPTIMIZATION_INCLUDED
-#define TRAFFIC_OPTIMIZATION_INCLUDED
+#pragma once
 
-#include "xrCore/compression_ppmd_stream.h"
-#include "xrCore/lzo_compressor.h"
+#include "xrCore/Compression/compression_ppmd_stream.h"
+#include "xrCore/Compression/lzo_compressor.h"
 
 namespace compression
 {
@@ -11,7 +10,7 @@ namespace ppmd
 class stream;
 }; // namespace ppmd
 
-typedef compression::ppmd::stream ppmd_trained_stream;
+using ppmd_trained_stream = ppmd::stream;
 void init_ppmd_trained_stream(ppmd_trained_stream*& dest);
 void deinit_ppmd_trained_stream(ppmd_trained_stream*& src);
 
@@ -35,5 +34,3 @@ enum enum_traffic_optimization
 }; // enum enum_traffic_optimization
 
 extern u32 g_sv_traffic_optimization_level;
-
-#endif //#ifndef TRAFFIC_OPTIMIZATION_INCLUDED

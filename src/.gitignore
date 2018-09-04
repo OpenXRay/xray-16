@@ -1,5 +1,8 @@
+xrCore/.GitInfo.hpp
+
 # exclude binaries and temporary files
 ipch/
+packages/
 
 # User-specific files
 *.suo

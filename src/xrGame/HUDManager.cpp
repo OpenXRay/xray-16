@@ -124,7 +124,7 @@ void CFontManager::Render()
 }
 void CFontManager::OnDeviceReset() { InitializeFonts(); }
 //--------------------------------------------------------------------
-CHUDManager::CHUDManager() : pUIGame(NULL), m_pHUDTarget(new CHUDTarget()) {}
+CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(new CHUDTarget()), b_online(false) {}
 //--------------------------------------------------------------------
 CHUDManager::~CHUDManager()
 {

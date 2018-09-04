@@ -1,7 +1,7 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#include "dCylinder/dCylinder.h"
+#include "dcylinder/dCylinder.h"
 #include "PhysicsShell.h"
 #include "PHObject.h"
 #include "PHInterpolation.h"

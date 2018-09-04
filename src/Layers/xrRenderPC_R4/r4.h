@@ -97,7 +97,7 @@ public:
         u32 dx10_msaa : 1; //	DX10.0 path
         u32 dx10_msaa_hybrid : 1; //	DX10.0 main path with DX10.1 A-test msaa allowed
         u32 dx10_msaa_opt : 1; //	DX10.1 path
-        u32 dx10_gbuffer_opt : 1; //
+        u32 dx10_gbuffer_opt : 1; //	
         u32 dx10_sm4_1 : 1; //	DX10.1 path
         u32 dx10_msaa_alphatest : 2; //	A-test mode
         u32 dx10_msaa_samples : 4;
@@ -356,8 +356,6 @@ public:
     virtual void ScreenshotAsyncBegin();
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer);
     virtual void OnFrame();
-    virtual void BeforeWorldRender(); //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
-    virtual void AfterWorldRender();  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
 
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
@@ -375,6 +373,7 @@ public:
 
     void addShaderOption(const char* name, const char* value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+
 private:
     xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
 

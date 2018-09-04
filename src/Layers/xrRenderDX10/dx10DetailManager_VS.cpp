@@ -229,8 +229,6 @@ void CDetailManager::hw_Render_dump(
                     RCache.stat.r.s_details.add(dwCNT_verts);
                 }
             }
-            // Clean up
-            vis.clear();
         }
         vOffset += hw_BatchSize * Object.number_vertices;
         iOffset += hw_BatchSize * Object.number_indices;

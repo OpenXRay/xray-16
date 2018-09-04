@@ -426,6 +426,9 @@
 	<string id="ui_mm_alternative">
 		<text>Alternative</text>
 	</string>
+	<string id="ui_mm_always_active">
+		<text>Always active</text>
+	</string>
 	<string id="ui_mm_anisotropic">
 		<text>Anisotropic filtering</text>
 	</string>
@@ -471,6 +474,9 @@
 	<string id="ui_mm_detail_density">
 		<text>Grass detail density</text>
 	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Grass detail radius</text>
+	</string>
 	<string id="ui_mm_difficulty">
 		<text>Difficulty</text>
 	</string>
@@ -498,6 +504,12 @@
 	<string id="ui_mm_gameplay">
 		<text>Game</text>
 	</string>
+	<string id="ui_mm_ui_style">
+		<text>Interface style</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Call of Pripyat</text>
+	</string>
 	<string id="ui_mm_gamma">
 		<text>Gamma</text>
 	</string>
@@ -524,6 +536,9 @@
 	</string>
 	<string id="ui_mm_load_game">
 		<text>Load game</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Show loading stages</text>
 	</string>
 	<string id="ui_mm_logout">
 		<text>Quit profile</text>
@@ -594,6 +609,9 @@
 	<string id="ui_mm_r2_detail_bump">
 		<text>Detail bump</text>
 	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
 	<string id="ui_mm_r2_steep_parallax">
 		<text>Steep parallax</text>
 	</string>
@@ -606,6 +624,9 @@
 	<string id="ui_mm_r2_sun_quality">
 		<text>Sun quality</text>
 	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Shadow map quality</text>
+	</string>
 	<string id="ui_mm_r3_DX10_1">
 		<text>Use DX10.1</text>
 	</string>
@@ -614,6 +635,18 @@
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces">
 		<text>Wet surfaces</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Wet surfaces optimization</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Wet surfaces near dist.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Wet surfaces far dist.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Wet surfaces quality</text>
 	</string>
 	<string id="ui_mm_r3_gbuffer_opt">
 		<text>Optimize geometric buffer</text>

@@ -9,8 +9,8 @@
 #include "../xrRender/tss.h"
 #include "../xrRender/blenders/blender.h"
 #include "../xrRender/blenders/blender_recorder.h"
-
 #include "../xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 void fix_texture_name(LPSTR fn);
 
@@ -215,8 +215,8 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     FS.r_close(file);
 
     // Select target
-    _vs->vs = glCreateShader(GL_VERTEX_SHADER);
-    void* _result = &_vs->vs;
+    _vs->sh = glCreateShader(GL_VERTEX_SHADER);
+    void* _result = &_vs->sh;
     HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, nullptr, nullptr, NULL, _result);
 
     VERIFY(SUCCEEDED(_hr));
@@ -242,32 +242,20 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     return _vs;
 }
 
-void CResourceManager::_DeleteVS(const SVS* vs)
-{
-    if (0 == (vs->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
-    LPSTR N = LPSTR(*vs->cName);
-    map_VS::iterator I = m_vs.find(N);
-    if (I != m_vs.end())
-    {
-        m_vs.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled vertex-shader '%s'", *vs->cName);
-}
-
+void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 //--------------------------------------------------------------------------------------------------------------
 SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     strcpy_s(name, _name);
-    if (0 == GEnv.Render->m_MSAASample) strcat(name, "_0");
-    if (1 == GEnv.Render->m_MSAASample) strcat(name, "_1");
-    if (2 == GEnv.Render->m_MSAASample) strcat(name, "_2");
-    if (3 == GEnv.Render->m_MSAASample) strcat(name, "_3");
-    if (4 == GEnv.Render->m_MSAASample) strcat(name, "_4");
-    if (5 == GEnv.Render->m_MSAASample) strcat(name, "_5");
-    if (6 == GEnv.Render->m_MSAASample) strcat(name, "_6");
-    if (7 == GEnv.Render->m_MSAASample) strcat(name, "_7");
+    if (0 == GEnv.Render->m_MSAASample) xr_strcat(name, "_0");
+    if (1 == GEnv.Render->m_MSAASample) xr_strcat(name, "_1");
+    if (2 == GEnv.Render->m_MSAASample) xr_strcat(name, "_2");
+    if (3 == GEnv.Render->m_MSAASample) xr_strcat(name, "_3");
+    if (4 == GEnv.Render->m_MSAASample) xr_strcat(name, "_4");
+    if (5 == GEnv.Render->m_MSAASample) xr_strcat(name, "_5");
+    if (6 == GEnv.Render->m_MSAASample) xr_strcat(name, "_6");
+    if (7 == GEnv.Render->m_MSAASample) xr_strcat(name, "_7");
     LPSTR N = LPSTR(name);
     map_PS::iterator I = m_ps.find(N);
     if (I != m_ps.end()) return I->second;
@@ -310,8 +298,8 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     FS.r_close(file);
 
     // Select target
-    _ps->ps = glCreateShader(GL_FRAGMENT_SHADER);
-    void* _result = &_ps->ps;
+    _ps->sh = glCreateShader(GL_FRAGMENT_SHADER);
+    void* _result = &_ps->sh;
     HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, nullptr, nullptr, NULL, _result);
 
     VERIFY(SUCCEEDED(_hr));
@@ -337,18 +325,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     return _ps;
 }
 
-void CResourceManager::_DeletePS(const SPS* ps)
-{
-    if (0 == (ps->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
-    LPSTR N = LPSTR(*ps->cName);
-    map_PS::iterator I = m_ps.find(N);
-    if (I != m_ps.end())
-    {
-        m_ps.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled pixel-shader '%s'", *ps->cName);
-}
+void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 //--------------------------------------------------------------------------------------------------------------
 SGS* CResourceManager::_CreateGS(LPCSTR name)
@@ -361,7 +338,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
     if (0 == xr_stricmp(name, "null"))
     {
-        _gs->gs = NULL;
+        _gs->sh = NULL;
         return _gs;
     }
 
@@ -388,8 +365,8 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     R_ASSERT2 ( file, cname );
 
     // Select target
-    _gs->gs = glCreateShader(GL_GEOMETRY_SHADER);
-    void* _result = &_gs->gs;
+    _gs->sh = glCreateShader(GL_GEOMETRY_SHADER);
+    void* _result = &_gs->sh;
     HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(), nullptr,
                                                     nullptr, NULL, _result);
 
@@ -418,18 +395,16 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     return _gs;
 }
 
-void CResourceManager::_DeleteGS(const SGS* gs)
-{
-    if (0 == (gs->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
-    LPSTR N = LPSTR(*gs->cName);
-    map_GS::iterator I = m_gs.find(N);
-    if (I != m_gs.end())
-    {
-        m_gs.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find compiled geometry shader '%s'", *gs->cName);
-}
+void CResourceManager::_DeleteGS(const SGS* gs) { DestroyShader(gs); }
+
+SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
+void CResourceManager::_DeleteHS(const SHS* HS) { DestroyShader(HS); }
+
+SDS* CResourceManager::_CreateDS(LPCSTR Name) { return CreateShader<SDS>(Name); }
+void CResourceManager::_DeleteDS(const SDS* DS) { DestroyShader(DS); }
+
+SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); }
+void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)
 {

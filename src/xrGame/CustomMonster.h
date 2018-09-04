@@ -36,7 +36,7 @@ class CCustomMonster : public CEntityAlive,
                        public Feel::Sound,
                        public Feel::Touch
 {
-private:
+protected:
     typedef CEntityAlive inherited;
 
 private:

@@ -1,0 +1,16 @@
+#include "common.h"
+
+half4 main_ps_1_1(vf_spot I):COLOR
+{
+	half4 t_base 		= tex2D(s_base,I.tc0);
+	half4 t_lmap 		= tex2D(s_lmap,I.tc1);	// spot-projector
+	half4 t_att 		= tex2D(s_att, I.tc2);	// spot-att
+
+	half4 final 		= t_base*t_lmap*t_att*I.color*2;
+#ifdef DL_DETAILS
+	half3 t_dt 			= tex2D(s_detail,I.tcd).rgb;//*I.c1.x+I.c1.y;
+		  final.rgb    *= t_dt*2;
+#endif
+
+	return final;
+}

@@ -38,7 +38,7 @@ struct SStateDataMoveToPoint
 
     SStateDataAction action;
 
-    SStateDataMoveToPoint()
+    SStateDataMoveToPoint(): braking(false), accel_type(0)
     {
         point.set(0.f, 0.f, 0.f);
         target_direction.set(0.f, 0.f, 0.f);
@@ -77,7 +77,7 @@ struct SStateHideFromPoint
 
     SStateDataAction action;
 
-    SStateHideFromPoint()
+    SStateHideFromPoint(): braking(false), accel_type(0)
     {
         point.set(0.f, 0.f, 0.f);
 
@@ -123,7 +123,7 @@ struct SStateDataMoveAroundPoint
 
     SStateDataAction action;
 
-    SStateDataMoveAroundPoint()
+    SStateDataMoveAroundPoint(): braking(false), accel_type(0)
     {
         point.set(0.f, 0.f, 0.f);
         vertex = u32(-1);

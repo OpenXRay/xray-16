@@ -15,11 +15,11 @@
 #include "gametaskmanager.h"
 #include "gametask.h"
 
-CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml)
+CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml), m_mark_focused(false)
 {
     m_bScale = false;
     m_location_level = 0;
-    m_border_static = NULL;
+    m_border_static = nullptr;
     m_scale_bounds.set(-1.0f, -1.0f);
 }
 

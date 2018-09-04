@@ -45,7 +45,7 @@
 #include "debug_renderer.h"
 #include "xrEngine/GameFont.h"
 
-LevelGraphDebugRender::LevelGraphDebugRender()
+LevelGraphDebugRender::LevelGraphDebugRender() : gameGraph(nullptr), levelGraph(nullptr)
 {
     debugShader->create("debug\\ai_nodes", "$null");
     currentLevelId = -1;
@@ -737,7 +737,7 @@ void LevelGraphDebugRender::DrawCovers()
     auto& nearest = coverPointCache;
     nearest.reserve(1000);
     ai().cover_manager().covers().nearest(Device.vCameraPosition, 5.0f, nearest);
-    for (auto coverPoint : nearest)
+    for (const auto& coverPoint : nearest)
     {
         // high cover
         Fvector pos = coverPoint->position();

@@ -55,7 +55,7 @@ private:
         {
             m_engine->on_idle();
             impl->on_idle();
-        } while (m_engine&&!PeekMessage(&message, HWND(0), 0, 0, 0));
+        } while (m_engine && !m_engine->quit_requested() && !PeekMessage(&message, HWND(0), 0, 0, 0));
 
         impl->on_idle_end();
     }

@@ -328,10 +328,10 @@ static void printBox (PrintingContext &c, dxGeom *g)
 
 
 
-static void printCCylinder (PrintingContext &c, dxGeom *g)
+static void printCapsule (PrintingContext &c, dxGeom *g)
 {
 	dReal radius,length;
-	dGeomCCylinderGetParams (g,&radius,&length);
+	dGeomCapsuleGetParams (g,&radius,&length);
 	c.print ("type","capsule");
 	c.print ("radius",radius);
 	c.print ("length",length);
@@ -404,7 +404,7 @@ static void printGeom (PrintingContext &c, dxGeom *g)
 	switch (g->type) {
 		case dSphereClass: printSphere (c,g); break;
 		case dBoxClass: printBox (c,g); break;
-		case dCCylinderClass: printCCylinder (c,g); break;
+		case dCapsuleClass: printCapsule (c,g); break;
 		case dPlaneClass: printPlane (c,g); break;
 		case dRayClass: printRay (c,g); break;
 		case dGeomTransformClass: printGeomTransform (c,g); break;
@@ -414,6 +414,7 @@ static void printGeom (PrintingContext &c, dxGeom *g)
 
 //***************************************************************************
 // world
+
 void dWorldExportDIF (dWorldID w, FILE *file, const char *prefix)
 {
 	PrintingContext c;
@@ -447,7 +448,7 @@ void dWorldExportDIF (dWorldID w, FILE *file, const char *prefix)
 		b->tag = num;
 		fprintf (file,"%sbody[%d] = dynamics.body {\n\tworld = %sworld,\n",prefix,num,prefix);
 		c.indent++;
-		c.print ("pos",b->pos);
+		c.print ("pos",b->posr.pos);
 		c.print ("q",b->q,4);
 		c.print ("lvel",b->lvel);
 		c.print ("avel",b->avel);

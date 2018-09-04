@@ -157,19 +157,13 @@ public:
     bool _empty()
     {
         return items.empty() &&
-            0 == (intptr_t(children[0]) | intptr_t(children[1]) | intptr_t(children[2]) | intptr_t(children[3]) | intptr_t(children[4]) |
-                intptr_t(children[5]) | intptr_t(children[6]) | intptr_t(children[7]));
+            0 == (uintptr_t(children[0]) | uintptr_t(children[1]) |
+                  uintptr_t(children[2]) | uintptr_t(children[3]) |
+                  uintptr_t(children[4]) | uintptr_t(children[5]) |
+                  uintptr_t(children[6]) | uintptr_t(children[7]));
     }
 };
-////////////
 
-// template <class T, int granularity>
-// class poolSS;
-#ifndef DLL_API
-#define DLL_API XR_IMPORT
-#endif // #ifndef DLL_API
-
-//////////////////////////////////////////////////////////////////////////
 class XRCDB_API ISpatial_DB : private Noncopyable
 {
 public:

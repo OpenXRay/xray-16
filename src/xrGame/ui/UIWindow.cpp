@@ -4,9 +4,6 @@
 #include "MainMenu.h"
 #include "Include/xrRender/DebugRender.h"
 #include "Include/xrRender/UIRender.h"
-#include "xrCore/xrPool.h"
-
-poolSS<_12b, 128> ui_allocator;
 
 // #define LOG_ALL_WNDS
 #ifdef LOG_ALL_WNDS
@@ -308,6 +305,8 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
     case WINDOW_MOUSE_MOVE: OnMouseMove(); break;
     case WINDOW_MOUSE_WHEEL_DOWN: OnMouseScroll(WINDOW_MOUSE_WHEEL_DOWN); break;
     case WINDOW_MOUSE_WHEEL_UP: OnMouseScroll(WINDOW_MOUSE_WHEEL_UP); break;
+    case WINDOW_MOUSE_WHEEL_LEFT: OnMouseScroll(WINDOW_MOUSE_WHEEL_LEFT); break;
+    case WINDOW_MOUSE_WHEEL_RIGHT: OnMouseScroll(WINDOW_MOUSE_WHEEL_RIGHT); break;
     case WINDOW_LBUTTON_DOWN:
         if (OnMouseDown(MOUSE_1))
             return true;

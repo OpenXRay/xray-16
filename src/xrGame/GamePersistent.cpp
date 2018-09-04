@@ -32,6 +32,8 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrEngine/xr_input.h"
+#include "xrEngine/x_ray.h"
+#include "ui/UILoadingScreen.h"
 
 #ifndef MASTER_GOLD
 #include "custommonster.h"
@@ -41,12 +43,62 @@
 #include "ai_debug.h"
 #endif // _EDITOR
 
-//static	void *	ode_alloc	(size_t size)								{ return xr_malloc(size);			}
-//static	void *	ode_realloc	(void *ptr, size_t oldsize, size_t newsize)	{ return xr_realloc(ptr,newsize);	}
-//static	void	ode_free	(void *ptr, size_t size)					{ return xr_free(ptr);				}
+u32 UIStyleID = 0;
+xr_vector<xr_token> UIStyleToken;
 
-// temporary hack to get rid of the Microsoft-specific "__super"
-using super = IGame_Persistent;
+void FillUIStyleToken()
+{
+    UIStyleToken.emplace_back("ui_style_default", 0);
+
+    string_path path;
+    strconcat(sizeof(path), path, UI_PATH, "\\styles\\");
+    FS.update_path(path, _game_config_, path);
+    auto styles = FS.file_list_open(path, FS_ListFolders | FS_RootOnly);
+    if (styles != nullptr)
+    {
+        int i = 1; // It's 1, because 0 is default style
+        for (const auto& style : *styles)
+        {
+            const auto pos = strchr(style, '\\');
+            *pos = '\0'; // we don't need that backslash in the end
+            UIStyleToken.emplace_back(xr_strdup(style), i++); // It's important to have postfix increment!
+        }
+        FS.file_list_close(styles);
+    }
+
+    UIStyleToken.emplace_back(nullptr, -1);
+}
+
+bool defaultUIStyle = true;
+
+void SetupUIStyle()
+{
+    if (UIStyleID == 0)
+        return;
+
+    pcstr selectedStyle = nullptr;
+    for (const auto& token : UIStyleToken)
+        if (token.id == UIStyleID)
+            selectedStyle = token.name;
+
+    string128 selectedStylePath;
+    strconcat(sizeof(selectedStylePath), selectedStylePath, UI_PATH, "\\styles\\", selectedStyle);
+
+    UI_PATH = xr_strdup(selectedStylePath);
+    defaultUIStyle = false;
+}
+
+void CleanupUIStyleToken()
+{
+    for (auto& token : UIStyleToken)
+    {
+        if (token.name && token.id != 0)
+            xr_free(token.name);
+    }
+    UIStyleToken.clear();
+    if (!defaultUIStyle)
+        xr_free(UI_PATH);
+}
 
 CGamePersistent::CGamePersistent(void)
 {
@@ -72,12 +124,7 @@ CGamePersistent::CGamePersistent(void)
     m_frame_counter = 0;
     m_last_stats_frame = u32(-2);
 #endif
-    //
-    // dSetAllocHandler			(ode_alloc		);
-    // dSetReallocHandler			(ode_realloc	);
-    // dSetFreeHandler				(ode_free		);
 
-    //
     BOOL bDemoMode = (0 != strstr(Core.Params, "-demomode "));
     if (bDemoMode)
     {
@@ -108,6 +155,13 @@ CGamePersistent::~CGamePersistent(void)
     Device.seqFrame.Remove(this);
     Engine.Event.Handler_Detach(eDemoStart, this);
     Engine.Event.Handler_Detach(eQuickLoad, this);
+}
+
+void CGamePersistent::PreStart(LPCSTR op)
+{
+    if (!GEnv.isDedicatedServer)
+        pApp->SetLoadingScreen(new UILoadingScreen());
+    inherited::PreStart(op);
 }
 
 void CGamePersistent::RegisterModel(IRenderVisual* V)
@@ -147,10 +201,12 @@ extern void init_game_globals();
 
 void CGamePersistent::OnAppStart()
 {
+    SetupUIStyle();
+
     // load game materials
     GMLib.Load();
     init_game_globals();
-    super::OnAppStart();
+    inherited::OnAppStart();
     m_pUI_core = new ui_core();
     m_pMainMenu = new CMainMenu();
 }
@@ -163,20 +219,20 @@ void CGamePersistent::OnAppEnd()
     xr_delete(m_pMainMenu);
     xr_delete(m_pUI_core);
 
-    super::OnAppEnd();
+    inherited::OnAppEnd();
 
     clean_game_globals();
 
     GMLib.Unload();
 }
 
-void CGamePersistent::Start(LPCSTR op) { super::Start(op); }
+void CGamePersistent::Start(LPCSTR op) { inherited::Start(op); }
 void CGamePersistent::Disconnect()
 {
     // destroy ambient particles
     CParticlesObject::Destroy(ambient_particles);
 
-    super::Disconnect();
+    inherited::Disconnect();
     // stop all played emitters
     GEnv.Sound->stop_emitters();
     m_game_params.m_e_game_type = eGameIDNoGame;
@@ -186,7 +242,7 @@ void CGamePersistent::Disconnect()
 
 void CGamePersistent::OnGameStart()
 {
-    super::OnGameStart();
+    inherited::OnGameStart();
     UpdateGameType();
 }
 
@@ -207,7 +263,7 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort)
 
 void CGamePersistent::UpdateGameType()
 {
-    super::UpdateGameType();
+    inherited::UpdateGameType();
 
     m_game_params.m_e_game_type = ParseStringToGameType(m_game_params.m_game_type);
 
@@ -219,7 +275,7 @@ void CGamePersistent::UpdateGameType()
 
 void CGamePersistent::OnGameEnd()
 {
-    super::OnGameEnd();
+    inherited::OnGameEnd();
 
     xr_delete(g_stalker_animation_data_storage);
     xr_delete(g_stalker_velocity_holder);
@@ -634,10 +690,13 @@ void CGamePersistent::OnFrame()
         }
 #endif // MASTER_GOLD
     }
-    super::OnFrame();
+    inherited::OnFrame();
 
     if (!Device.Paused())
+    {
         Engine.Sheduler.Update();
+        Engine.Scheduler.ProcessStep();
+    }
 
     // update weathers ambient
     if (!Device.Paused())
@@ -745,17 +804,11 @@ void CGamePersistent::OnAppActivate()
     bIsMP &= !Device.Paused();
 
     if (!bIsMP)
-    {
         Device.Pause(FALSE, !bRestorePause, TRUE, "CGP::OnAppActivate");
-    }
     else
-    {
         Device.Pause(FALSE, TRUE, TRUE, "CGP::OnAppActivate MP");
-    }
 
     bEntryFlag = TRUE;
-    if (!GEnv.isDedicatedServer)
-        pInput->ClipCursor(GetUICursor().IsVisible());
 }
 
 void CGamePersistent::OnAppDeactivate()
@@ -777,7 +830,6 @@ void CGamePersistent::OnAppDeactivate()
         Device.Pause(TRUE, FALSE, TRUE, "CGP::OnAppDeactivate MP");
     }
     bEntryFlag = FALSE;
-    pInput->ClipCursor(false);
 }
 
 bool CGamePersistent::OnRenderPPUI_query()

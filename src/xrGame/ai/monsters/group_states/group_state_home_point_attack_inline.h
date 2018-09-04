@@ -27,7 +27,8 @@ const float scare_distance2enemy = 20.f; // distance on which dog can be scared 
 //////////////////////////////////////////////////////////////////////////
 
 TEMPLATE_SPECIALIZATION
-CStateGroupAttackMoveToHomePointAbstract::CStateGroupAttackMoveToHomePoint(_Object* obj) : inherited(obj)
+CStateGroupAttackMoveToHomePointAbstract::CStateGroupAttackMoveToHomePoint(_Object* obj)
+    : inherited(obj), m_target_node(0), m_skip_camp(false), m_state_started(0)
 {
     add_state(eStateAttack_HomePoint_Hide, new CStateMonsterMoveToPointEx<_Object>(obj));
     add_state(eStateAttack_HomePoint_LookOpenPlace, new CStateMonsterLookToPoint<_Object>(obj));

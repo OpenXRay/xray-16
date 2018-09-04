@@ -9,7 +9,8 @@
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/xr_token.h"
 
-extern xr_vector<xr_token> vid_quality_token;
+extern void FillMonitorsToken();
+extern xr_vector<xr_token> VidQualityToken;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -35,14 +36,18 @@ CEngineAPI::CEngineAPI()
 
 CEngineAPI::~CEngineAPI()
 {
-    vid_quality_token.clear();
+    VidQualityToken.clear();
 }
 
 bool is_enough_address_space_available()
 {
+#if defined(WINDOWS)
     SYSTEM_INFO system_info;
     GetSystemInfo(&system_info);
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
+#else
+    return TRUE; // In linux allocated memory limited only by pointer size
+#endif
 }
 
 void CEngineAPI::SetupCurrentRenderer()
@@ -51,7 +56,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsRGL))
     {
-        if (hRenderRGL->exist())
+        if (hRenderRGL->IsLoaded())
         {
             GEnv.CurrentRenderer = 5;
             GEnv.SetupCurrentRenderer = GEnv.SetupRGL;
@@ -65,7 +70,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR4))
     {
-        if (hRenderR4->exist())
+        if (hRenderR4->IsLoaded())
         {
             GEnv.CurrentRenderer = 4;
             GEnv.SetupCurrentRenderer = GEnv.SetupR4;
@@ -79,7 +84,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR3))
     {
-        if (hRenderR3->exist())
+        if (hRenderR3->IsLoaded())
         {
             GEnv.CurrentRenderer = 3;
             GEnv.SetupCurrentRenderer = GEnv.SetupR3;
@@ -93,7 +98,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR2))
     {
-        if (hRenderR2->exist())
+        if (hRenderR2->IsLoaded())
         {
             GEnv.CurrentRenderer = 2;
             GEnv.SetupCurrentRenderer = GEnv.SetupR2;
@@ -107,7 +112,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR1))
     {
-        if (hRenderR1->exist())
+        if (hRenderR1->IsLoaded())
         {
             GEnv.CurrentRenderer = 1;
             GEnv.SetupCurrentRenderer = GEnv.SetupR1;
@@ -122,13 +127,13 @@ void CEngineAPI::InitializeRenderers()
     SetupCurrentRenderer();
 
     if (GEnv.SetupCurrentRenderer == nullptr
-        && vid_quality_token[0].id != -1)
+        && VidQualityToken[0].id != -1)
     {
         // if engine failed to load renderer
         // but there is at least one available
         // then try again
         string32 buf;
-        xr_sprintf(buf, "renderer %s", vid_quality_token[0].name);
+        xr_sprintf(buf, "renderer %s", VidQualityToken[0].name);
         Console->Execute(buf);
 
         // Second attempt
@@ -155,6 +160,8 @@ void CEngineAPI::InitializeRenderers()
 
     if (GEnv.CurrentRenderer != 1)
         hRenderR1->close();*/
+
+    FillMonitorsToken();
 }
 
 void CEngineAPI::Initialize(void)
@@ -164,10 +171,10 @@ void CEngineAPI::Initialize(void)
     hGame = XRay::LoadModule("xrGame");
     R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
 
-    pCreate = (Factory_Create*)hGame->getProcAddress("xrFactory_Create");
+    pCreate = (Factory_Create*)hGame->GetProcAddress("xrFactory_Create");
     R_ASSERT(pCreate);
 
-    pDestroy = (Factory_Destroy*)hGame->getProcAddress("xrFactory_Destroy");
+    pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
     R_ASSERT(pDestroy);
 
     //////////////////////////////////////////////////////////////////////////
@@ -176,10 +183,10 @@ void CEngineAPI::Initialize(void)
     if (strstr(Core.Params, "-tune"))
     {
         hTuner = XRay::LoadModule("vTuneAPI");
-        tune_pause = (VTPause*)hTuner->getProcAddress("VTPause");
-        tune_resume = (VTResume*)hTuner->getProcAddress("VTResume");
+        tune_pause = (VTPause*)hTuner->GetProcAddress("VTPause");
+        tune_resume = (VTResume*)hTuner->GetProcAddress("VTResume");
 
-        if (!tune_pause || !tune_pause)
+        if (!tune_pause || !tune_resume)
         {
             Log("Can't initialize Intel vTune");
             tune_pause = dummy;
@@ -208,20 +215,18 @@ void CEngineAPI::Destroy(void)
 
 void CEngineAPI::CreateRendererList()
 {
+    if (!VidQualityToken.empty())
+        return;
+
     hRenderR1 = XRay::LoadModule("xrRender_R1");
 
-    xr_vector<xr_token> modes;
     if (GEnv.isDedicatedServer)
     {
-        R_ASSERT2(hRenderR1->exist(), "Dedicated server needs xrRender_R1 to work");
-        modes.emplace_back(xr_token("renderer_r1", 0));
-        modes.emplace_back(xr_token(nullptr, -1));
-        vid_quality_token = std::move(modes);
+        R_ASSERT2(hRenderR1->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
+        VidQualityToken.emplace_back("renderer_r1", 0);
+        VidQualityToken.emplace_back(nullptr, -1);
         return;
     }
-
-    if (!vid_quality_token.empty())
-        return;
 
     // Hide "d3d10.dll not found" message box for XP
     SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -234,48 +239,48 @@ void CEngineAPI::CreateRendererList()
     // Restore error handling
     SetErrorMode(0);
 
-    if (hRenderR1->exist())
+    auto& modes = VidQualityToken;
+
+    if (hRenderR1->IsLoaded())
     {
-        modes.emplace_back(xr_token("renderer_r1", 0));
+        modes.emplace_back("renderer_r1", 0);
     }
 
-    if (hRenderR2->exist())
+    if (hRenderR2->IsLoaded())
     {
-        modes.emplace_back(xr_token("renderer_r2a", 1));
-        modes.emplace_back(xr_token("renderer_r2", 2));
+        modes.emplace_back("renderer_r2a", 1);
+        modes.emplace_back("renderer_r2", 2);
         if (GEnv.CheckR2 && GEnv.CheckR2())
-            modes.emplace_back(xr_token("renderer_r2.5", 3));
+            modes.emplace_back("renderer_r2.5", 3);
     }
 
-    if (hRenderR3->exist())
+    if (hRenderR3->IsLoaded())
     {
         if (GEnv.CheckR3 && GEnv.CheckR3())
-            modes.emplace_back(xr_token("renderer_r3", 4));
+            modes.emplace_back("renderer_r3", 4);
         else
-            hRenderR3->close();
+            hRenderR3->Close();
     }
 
-    if (hRenderR4->exist())
+    if (hRenderR4->IsLoaded())
     {
         if (GEnv.CheckR4 && GEnv.CheckR4())
-            modes.emplace_back(xr_token("renderer_r4", 5));
+            modes.emplace_back("renderer_r4", 5);
         else
-            hRenderR4->close();
+            hRenderR4->Close();
     }
 
-    if (hRenderRGL->exist())
+    if (hRenderRGL->IsLoaded())
     {
         if (GEnv.CheckRGL && GEnv.CheckRGL())
-            modes.emplace_back(xr_token("renderer_gl", 6));
+            modes.emplace_back("renderer_gl", 6);
         else
-            hRenderRGL->close();
+            hRenderRGL->Close();
     }
-    modes.emplace_back(xr_token(nullptr, -1));
+    modes.emplace_back(nullptr, -1);
 
     Msg("Available render modes[%d]:", modes.size());
-    for (auto& mode : modes)
+    for (const auto& mode : modes)
         if (mode.name)
             Log(mode.name);
-
-    vid_quality_token = std::move(modes);
 }

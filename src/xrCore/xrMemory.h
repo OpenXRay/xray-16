@@ -11,10 +11,20 @@
 Поэтому всё-же стоит переопределять для большинства случаев операторы new и delete.
 А для остального мы будем полагать (и надеяться), что прокси справится без проблем.
 */
+#if defined(WINDOWS) // I have not idea how it works on Windows, but Linux build fails with error 'multiple declaration of __TBB_malloc_proxy_helper_object'
 #include "tbb/tbbmalloc_proxy.h"
+#endif
 
 class XRCORE_API xrMemory
 {
+    // Additional 16 bytes of memory almost like in original xr_aligned_offset_malloc
+    // But for DEBUG we don't need this if we want to find memory problems
+#ifdef DEBUG
+    size_t reserved = 0;
+#else
+    size_t reserved = 16;
+#endif
+
 public:
     xrMemory();
     void _initialize();
@@ -25,9 +35,9 @@ public:
 public:
     size_t mem_usage();
     void   mem_compact();
-    inline void* mem_alloc             (size_t size) { stat_calls++; return scalable_malloc (     size); };
-    inline void* mem_realloc(void* ptr, size_t size) { stat_calls++; return scalable_realloc(ptr, size); };
-    inline void  mem_free   (void* ptr)              { stat_calls++;        scalable_free   (ptr);       };
+    inline void* mem_alloc             (size_t size) { stat_calls++; return scalable_malloc (     size + reserved); };
+    inline void* mem_realloc(void* ptr, size_t size) { stat_calls++; return scalable_realloc(ptr, size + reserved); };
+    inline void  mem_free   (void* ptr)              { stat_calls++;        scalable_free   (ptr);                  };
 };
 
 extern XRCORE_API xrMemory Memory;

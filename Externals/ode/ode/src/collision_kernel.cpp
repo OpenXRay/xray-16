@@ -142,20 +142,20 @@ static void initColliders()
   setCollider (dSphereClass,dPlaneClass,&dCollideSpherePlane);
   setCollider (dBoxClass,dBoxClass,&dCollideBoxBox);
   setCollider (dBoxClass,dPlaneClass,&dCollideBoxPlane);
-  setCollider (dCCylinderClass,dSphereClass,&dCollideCCylinderSphere);
-  setCollider (dCCylinderClass,dBoxClass,&dCollideCCylinderBox);
-  setCollider (dCCylinderClass,dCCylinderClass,&dCollideCCylinderCCylinder);
-  setCollider (dCCylinderClass,dPlaneClass,&dCollideCCylinderPlane);
+  setCollider (dCapsuleClass,dSphereClass,&dCollideCapsuleSphere);
+  setCollider (dCapsuleClass,dBoxClass,&dCollideCapsuleBox);
+  setCollider (dCapsuleClass,dCapsuleClass,&dCollideCapsuleCapsule);
+  setCollider (dCapsuleClass,dPlaneClass,&dCollideCapsulePlane);
   setCollider (dRayClass,dSphereClass,&dCollideRaySphere);
   setCollider (dRayClass,dBoxClass,&dCollideRayBox);
-  setCollider (dRayClass,dCCylinderClass,&dCollideRayCCylinder);
+  setCollider (dRayClass,dCapsuleClass,&dCollideRayCapsule);
   setCollider (dRayClass,dPlaneClass,&dCollideRayPlane);
 #ifdef dTRIMESH_ENABLED
   setCollider (dTriMeshClass,dSphereClass,&dCollideSTL);
   setCollider (dTriMeshClass,dBoxClass,&dCollideBTL);
   setCollider (dTriMeshClass,dRayClass,&dCollideRTL);
   setCollider (dTriMeshClass,dTriMeshClass,&dCollideTTL);
-  setCollider (dTriMeshClass,dCCylinderClass,&dCollideCCTL);
+  setCollider (dTriMeshClass,dCapsuleClass,&dCollideCCTL);
 #endif
   setAllColliders (dGeomTransformClass,&dCollideTransform);
 }
@@ -313,8 +313,8 @@ void dGeomSetBody (dxGeom *g, dxBody *b)
 
   if (b) {
     if (!g->body) dFree (g->pos,sizeof(dxPosR));
-    g->pos = b->pos;
-    g->R = b->R;
+    g->pos = b->posr.pos;
+    g->R = b->posr.R;
     dGeomMoved (g);
     if (g->body != b) {
       g->bodyRemove();
@@ -326,8 +326,8 @@ void dGeomSetBody (dxGeom *g, dxBody *b)
       dxPosR *pr = (dxPosR*) dAlloc (sizeof(dxPosR));
       g->pos = pr->pos;
       g->R = pr->R;
-      memcpy (g->pos,g->body->pos,sizeof(dVector3));
-      memcpy (g->R,g->body->R,sizeof(dMatrix3));
+      memcpy (g->pos,g->body->posr.pos,sizeof(dVector3));
+      memcpy (g->R,g->body->posr.R,sizeof(dMatrix3));
       g->bodyRemove();
     }
     // dGeomMoved() should not be called if the body is being set to 0, as the

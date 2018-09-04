@@ -262,10 +262,10 @@ dxBody *dBodyCreate (dxWorld *w)
   b->invI[5] = 1;
   b->invI[10] = 1;
   b->invMass = 1;
-  dSetZero (b->pos,4);
+  dSetZero (b->posr.pos,4);
   dSetZero (b->q,4);
   b->q[0] = 1;
-  dRSetIdentity (b->R);
+  dRSetIdentity (b->posr.R);
   dSetZero (b->lvel,4);
   dSetZero (b->avel,4);
   dSetZero (b->facc,4);
@@ -328,9 +328,9 @@ void *dBodyGetData (dBodyID b)
 void dBodySetPosition (dBodyID b, dReal x, dReal y, dReal z)
 {
   dAASSERT (b);
-  b->pos[0] = x;
-  b->pos[1] = y;
-  b->pos[2] = z;
+  b->posr.pos[0] = x;
+  b->posr.pos[1] = y;
+  b->posr.pos[2] = z;
 
   // notify all attached geoms that this body has moved
   for (dxGeom *geom = b->geom; geom; geom = dGeomGetBodyNext (geom))
@@ -348,7 +348,7 @@ void dBodySetRotation (dBodyID b, const dMatrix3 R)
   b->q[1] = q[1];
   b->q[2] = q[2];
   b->q[3] = q[3];
-  dQtoR (b->q,b->R);
+  dQtoR (b->q,b->posr.R);
 
   // notify all attached geoms that this body has moved
   for (dxGeom *geom = b->geom; geom; geom = dGeomGetBodyNext (geom))
@@ -364,7 +364,7 @@ void dBodySetQuaternion (dBodyID b, const dQuaternion q)
   b->q[2] = q[2];
   b->q[3] = q[3];
   dNormalize4 (b->q);
-  dQtoR (b->q,b->R);
+  dQtoR (b->q,b->posr.R);
 
   // notify all attached geoms that this body has moved
   for (dxGeom *geom = b->geom; geom; geom = dGeomGetBodyNext (geom))
@@ -393,14 +393,14 @@ void dBodySetAngularVel (dBodyID b, dReal x, dReal y, dReal z)
 const dReal * dBodyGetPosition (dBodyID b)
 {
   dAASSERT (b);
-  return b->pos;
+  return b->posr.pos;
 }
 
 
 const dReal * dBodyGetRotation (dBodyID b)
 {
   dAASSERT (b);
-  return b->R;
+  return b->posr.R;
 }
 
 
@@ -470,7 +470,7 @@ void dBodyAddRelForce (dBodyID b, dReal fx, dReal fy, dReal fz)
   t1[1] = fy;
   t1[2] = fz;
   t1[3] = 0;
-  dMULTIPLY0_331 (t2,b->R,t1);
+  dMULTIPLY0_331 (t2,b->posr.R,t1);
   b->facc[0] += t2[0];
   b->facc[1] += t2[1];
   b->facc[2] += t2[2];
@@ -485,7 +485,7 @@ void dBodyAddRelTorque (dBodyID b, dReal fx, dReal fy, dReal fz)
   t1[1] = fy;
   t1[2] = fz;
   t1[3] = 0;
-  dMULTIPLY0_331 (t2,b->R,t1);
+  dMULTIPLY0_331 (t2,b->posr.R,t1);
   b->tacc[0] += t2[0];
   b->tacc[1] += t2[1];
   b->tacc[2] += t2[2];
@@ -503,9 +503,9 @@ void dBodyAddForceAtPos (dBodyID b, dReal fx, dReal fy, dReal fz,
   f[0] = fx;
   f[1] = fy;
   f[2] = fz;
-  q[0] = px - b->pos[0];
-  q[1] = py - b->pos[1];
-  q[2] = pz - b->pos[2];
+  q[0] = px - b->posr.pos[0];
+  q[1] = py - b->posr.pos[1];
+  q[2] = pz - b->posr.pos[2];
   dCROSS (b->tacc,+=,q,f);
 }
 
@@ -523,7 +523,7 @@ void dBodyAddForceAtRelPos (dBodyID b, dReal fx, dReal fy, dReal fz,
   prel[1] = py;
   prel[2] = pz;
   prel[3] = 0;
-  dMULTIPLY0_331 (p,b->R,prel);
+  dMULTIPLY0_331 (p,b->posr.R,prel);
   b->facc[0] += f[0];
   b->facc[1] += f[1];
   b->facc[2] += f[2];
@@ -540,14 +540,14 @@ void dBodyAddRelForceAtPos (dBodyID b, dReal fx, dReal fy, dReal fz,
   frel[1] = fy;
   frel[2] = fz;
   frel[3] = 0;
-  dMULTIPLY0_331 (f,b->R,frel);
+  dMULTIPLY0_331 (f,b->posr.R,frel);
   b->facc[0] += f[0];
   b->facc[1] += f[1];
   b->facc[2] += f[2];
   dVector3 q;
-  q[0] = px - b->pos[0];
-  q[1] = py - b->pos[1];
-  q[2] = pz - b->pos[2];
+  q[0] = px - b->posr.pos[0];
+  q[1] = py - b->posr.pos[1];
+  q[2] = pz - b->posr.pos[2];
   dCROSS (b->tacc,+=,q,f);
 }
 
@@ -565,8 +565,8 @@ void dBodyAddRelForceAtRelPos (dBodyID b, dReal fx, dReal fy, dReal fz,
   prel[1] = py;
   prel[2] = pz;
   prel[3] = 0;
-  dMULTIPLY0_331 (f,b->R,frel);
-  dMULTIPLY0_331 (p,b->R,prel);
+  dMULTIPLY0_331 (f,b->posr.R,frel);
+  dMULTIPLY0_331 (p,b->posr.R,prel);
   b->facc[0] += f[0];
   b->facc[1] += f[1];
   b->facc[2] += f[2];
@@ -615,10 +615,10 @@ void dBodyGetRelPointPos (dBodyID b, dReal px, dReal py, dReal pz,
   prel[1] = py;
   prel[2] = pz;
   prel[3] = 0;
-  dMULTIPLY0_331 (p,b->R,prel);
-  result[0] = p[0] + b->pos[0];
-  result[1] = p[1] + b->pos[1];
-  result[2] = p[2] + b->pos[2];
+  dMULTIPLY0_331 (p,b->posr.R,prel);
+  result[0] = p[0] + b->posr.pos[0];
+  result[1] = p[1] + b->posr.pos[1];
+  result[2] = p[2] + b->posr.pos[2];
 }
 
 
@@ -631,7 +631,7 @@ void dBodyGetRelPointVel (dBodyID b, dReal px, dReal py, dReal pz,
   prel[1] = py;
   prel[2] = pz;
   prel[3] = 0;
-  dMULTIPLY0_331 (p,b->R,prel);
+  dMULTIPLY0_331 (p,b->posr.R,prel);
   result[0] = b->lvel[0];
   result[1] = b->lvel[1];
   result[2] = b->lvel[2];
@@ -644,9 +644,9 @@ void dBodyGetPointVel (dBodyID b, dReal px, dReal py, dReal pz,
 {
   dAASSERT (b);
   dVector3 p;
-  p[0] = px - b->pos[0];
-  p[1] = py - b->pos[1];
-  p[2] = pz - b->pos[2];
+  p[0] = px - b->posr.pos[0];
+  p[1] = py - b->posr.pos[1];
+  p[2] = pz - b->posr.pos[2];
   p[3] = 0;
   result[0] = b->lvel[0];
   result[1] = b->lvel[1];
@@ -660,11 +660,11 @@ void dBodyGetPosRelPoint (dBodyID b, dReal px, dReal py, dReal pz,
 {
   dAASSERT (b);
   dVector3 prel;
-  prel[0] = px - b->pos[0];
-  prel[1] = py - b->pos[1];
-  prel[2] = pz - b->pos[2];
+  prel[0] = px - b->posr.pos[0];
+  prel[1] = py - b->posr.pos[1];
+  prel[2] = pz - b->posr.pos[2];
   prel[3] = 0;
-  dMULTIPLY1_331 (result,b->R,prel);
+  dMULTIPLY1_331 (result,b->posr.R,prel);
 }
 
 
@@ -677,7 +677,7 @@ void dBodyVectorToWorld (dBodyID b, dReal px, dReal py, dReal pz,
   p[1] = py;
   p[2] = pz;
   p[3] = 0;
-  dMULTIPLY0_331 (result,b->R,p);
+  dMULTIPLY0_331 (result,b->posr.R,p);
 }
 
 
@@ -690,7 +690,7 @@ void dBodyVectorFromWorld (dBodyID b, dReal px, dReal py, dReal pz,
   p[1] = py;
   p[2] = pz;
   p[3] = 0;
-  dMULTIPLY1_331 (result,b->R,p);
+  dMULTIPLY1_331 (result,b->posr.R,p);
 }
 
 

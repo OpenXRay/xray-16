@@ -39,6 +39,7 @@ dev_debug = false
 sim_debug = false
 mus_vol = 0
 amb_vol = 0
+b_discard_settings_shown = false
 ----------------------------------------------------------------------
 local scripts_to_print =	{
 							["stalker_generic"] = true,

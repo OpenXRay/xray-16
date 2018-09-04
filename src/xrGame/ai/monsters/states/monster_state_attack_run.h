@@ -10,7 +10,7 @@ class CStateMonsterAttackRun : public CState<_Object>
     TTime m_time_path_rebuild;
 
 public:
-    IC CStateMonsterAttackRun(_Object* obj) : inherited(obj) {}
+    IC CStateMonsterAttackRun(_Object* obj) : inherited(obj), m_time_path_rebuild(0) {}
     virtual void initialize();
     virtual void execute();
     virtual void finalize();

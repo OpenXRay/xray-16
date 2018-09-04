@@ -96,6 +96,7 @@ bool CPHScriptObjectCondition::is_true() { return luabind::call_member<bool>(*m_
 bool CPHScriptObjectCondition::obsolete() const { return false; }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CPHScriptObjectActionN::CPHScriptObjectActionN(const luabind::object& object, const luabind::functor<void>& functor)
+    : b_obsolete(false)
 {
     m_callback.set(functor, object);
 }

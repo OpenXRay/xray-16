@@ -21,7 +21,6 @@ public:
     IRender* Render;
     IDebugRender* DRender;
     CDUInterface* DU;
-    xr_token* vid_mode_token;
     IUIRender* UIRender;
     CGameMtlLibrary* PGMLib;
     IRenderFactory* RenderFactory;

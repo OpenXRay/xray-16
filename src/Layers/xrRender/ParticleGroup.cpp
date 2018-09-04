@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrParticles/psystem.h"
 
@@ -90,7 +89,7 @@ BOOL CPGDef::Load(IReader& F)
 
 BOOL CPGDef::Load2(CInifile& ini)
 {
-    //.	u16 version						= ini.r_u16("_group", "version");
+    //u16 version = ini.r_u16("_group", "version");
     m_Flags.assign(ini.r_u32("_group", "flags"));
 
     m_Effects.resize(ini.r_u32("_group", "effects_count"));
@@ -296,6 +295,7 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
             GEnv.Render->model_Delete(pVisual);
             *it = nullptr;
         }
+
         _children_related.clear();
         _children_free.clear();
     }
@@ -319,14 +319,19 @@ void OnGroupParticleBirth(void* owner, u32 param, PAPI::Particle& m, u32 idx)
 {
     CParticleGroup* PG = static_cast<CParticleGroup*>(owner);
     VERIFY(PG);
+
     CParticleEffect* PE = static_cast<CParticleEffect*>(PG->items[param]._effect);
     PS::OnEffectParticleBirth(PE, param, m, idx);
+
     // if have child
     const CPGDef* PGD = PG->GetDefinition();
     VERIFY(PGD);
+
     const CPGDef::SEffect* eff = PGD->m_Effects[param];
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnBirthChild))
         PG->items[param].StartFreeChild(PE, *eff->m_OnBirthChildName, m);
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnPlayChild))
         PG->items[param].StartRelatedChild(PE, *eff->m_OnPlayChildName, m);
 }
@@ -334,14 +339,19 @@ void OnGroupParticleDead(void* owner, u32 param, PAPI::Particle& m, u32 idx)
 {
     CParticleGroup* PG = static_cast<CParticleGroup*>(owner);
     VERIFY(PG);
+
     CParticleEffect* PE = static_cast<CParticleEffect*>(PG->items[param]._effect);
     PS::OnEffectParticleDead(PE, param, m, idx);
+
     // if have child
     const CPGDef* PGD = PG->GetDefinition();
     VERIFY(PGD);
+
     const CPGDef::SEffect* eff = PGD->m_Effects[param];
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnPlayChild))
         PG->items[param].StopRelatedChild(idx);
+
     if (eff->m_Flags.is(CPGDef::SEffect::flOnDeadChild))
         PG->items[param].StartFreeChild(PE, *eff->m_OnDeadChildName, m);
 }
@@ -548,10 +558,12 @@ void CParticleGroup::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOO
 BOOL CParticleGroup::Compile(CPGDef* def)
 {
     m_Def = def;
+
     // destroy existing
     for (auto i_it = items.begin(); i_it != items.end(); i_it++)
         i_it->Clear();
     items.clear();
+
     // create new
     if (m_Def)
     {

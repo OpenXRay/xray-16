@@ -1,6 +1,8 @@
-# exclude all dot files except .git files
+# exclude all dot files except .git, appveyor and travis files
 .*
 !.git*
+!.appveyor*
+!.travis.yml
 
 # exclude binaries and temporary files
 bin/

@@ -70,6 +70,7 @@ using string4096 = char[4096];
 using string_path = char[2 * max_path];
 
 // XXX: Replace __interface with either struct or class. MS defines it as struct for COM, but this project is C++.
+#if defined(WINDOWS)
 #define xr_pure_interface __interface
-
+#endif
 #endif

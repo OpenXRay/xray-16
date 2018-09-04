@@ -11,6 +11,7 @@
 #include "control_critical_wound.h"
 
 CControlManagerCustom::CControlManagerCustom()
+    : m_critical_wound(nullptr), m_threaten_anim(nullptr), m_threaten_time(0)
 {
     m_sequencer = 0;
     m_triple_anim = 0;

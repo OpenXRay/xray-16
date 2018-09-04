@@ -1141,7 +1141,7 @@ void VisualCallback(IKinematics* tpKinematics)
     CGameObject* game_object =
         smart_cast<CGameObject*>(static_cast<IGameObject*>(tpKinematics->GetUpdateCallbackParam()));
     VERIFY(game_object);
-    for (auto cb : game_object->visual_callbacks())
+    for (const auto& cb : game_object->visual_callbacks())
         cb(tpKinematics);
 }
 

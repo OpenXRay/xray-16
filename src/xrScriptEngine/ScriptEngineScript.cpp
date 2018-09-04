@@ -76,20 +76,26 @@ void prefetch_module(pcstr file_name) { GEnv.ScriptEngine->process_file(file_nam
 
 struct profile_timer_script
 {
-    using Clock = std::chrono::high_resolution_clock;
-    using Time = Clock::time_point;
-    using Duration = Clock::duration;
-
-    Time start_time;
-    Duration accumulator;
+    u64 start_cpu_tick_count;
+    u64 accumulator;
     u64 count = 0;
     int recurse_mark = 0;
 
     profile_timer_script()
-        : start_time(),
-        accumulator(),
-        count(0),
-        recurse_mark(0) {}
+        : start_cpu_tick_count(0),
+          accumulator(0),
+          count(0),
+          recurse_mark(0) {}
+
+    profile_timer_script(const profile_timer_script& profile_timer) { *this = profile_timer; }
+    profile_timer_script& operator=(const profile_timer_script& profile_timer)
+    {
+        start_cpu_tick_count = profile_timer.start_cpu_tick_count;
+        accumulator = profile_timer.accumulator;
+        count = profile_timer.count;
+        recurse_mark = profile_timer.recurse_mark;
+        return *this;
+    }
 
     bool operator<(const profile_timer_script& profile_timer) const
     {
@@ -103,29 +109,32 @@ struct profile_timer_script
             ++recurse_mark;
             return;
         }
-
         ++recurse_mark;
         ++count;
-        start_time = Clock::now();
+        start_cpu_tick_count = CPU::GetCLK();
     }
 
     void stop()
     {
-        if (!recurse_mark) return;
+        if (!recurse_mark)
+            return;
 
         --recurse_mark;
 
-        if (recurse_mark) return;
+        if (recurse_mark)
+            return;
 
-        const auto finish = Clock::now();
-        if (finish > start_time)
-            accumulator += finish - start_time;
+        u64 finish = CPU::GetCLK();
+        if (finish > start_cpu_tick_count)
+            accumulator += finish - start_cpu_tick_count;
     }
 
     float time() const
     {
-        using namespace std::chrono;
-        return float(duration_cast<milliseconds>(accumulator).count()) * 1000000.f;
+        FPU::m64r();
+        float result = float(double(accumulator) / double(CPU::clk_per_second)) * 1000000.f;
+        FPU::m24r();
+        return result;
     }
 };
 

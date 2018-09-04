@@ -1,4 +1,7 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+
+#include <limits>
+
 #include "PHDynamicData.h"
 #include "Physics.h"
 #include "tri-colliderknoopc/dTriList.h"
@@ -22,7 +25,6 @@ extern CPHWorld* ph_world;
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"
-// union dInfBytes dInfinityValue = {{0,0,0x80,0x7f}};
 // PhysicsStepTimeCallback		*physics_step_time_callback				= 0;
 
 const float default_w_limit = 9.8174770f; //(M_PI/16.f/(fixed_step=0.02f));
@@ -248,7 +250,8 @@ IC static int CollideIntoGroup(
         }
 
         if (pushing_neg)
-            surface.mu = flt_max; // dInfinity
+            surface.mu = std::numeric_limits<dReal>::max();
+
         if (do_collide && collided_contacts < MAX_CONTACTS)
         {
             ++collided_contacts;
@@ -418,12 +421,12 @@ void BodyCutForce(dBodyID body, float l_limit, float w_limit)
     dMatrix3 tmp, invI, I;
 
     // compute inertia tensor in global frame
-    dMULTIPLY2_333(tmp, m.I, body->R);
-    dMULTIPLY0_333(I, body->R, tmp);
+    dMULTIPLY2_333(tmp, m.I, body->posr.R);
+    dMULTIPLY0_333(I, body->posr.R, tmp);
 
     // compute inverse inertia tensor in global frame
-    dMULTIPLY2_333(tmp, body->invI, body->R);
-    dMULTIPLY0_333(invI, body->R, tmp);
+    dMULTIPLY2_333(tmp, body->invI, body->posr.R);
+    dMULTIPLY0_333(invI, body->posr.R, tmp);
 
     // angular accel
     dVector3 wa;

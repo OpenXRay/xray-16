@@ -1,5 +1,4 @@
-#ifndef ParticlesObjectH
-#define ParticlesObjectH
+#pragma once
 
 #include "xrEngine/PS_instance.h"
 
@@ -7,7 +6,7 @@ extern const Fvector zero_vel;
 
 class CParticlesObject : public CPS_Instance
 {
-    typedef CPS_Instance inherited;
+    using inherited = CPS_Instance;
 
     u32 dwLastTime;
     void Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove);
@@ -63,5 +62,3 @@ public:
         }
     }
 };
-
-#endif /*ParticlesObjectH*/

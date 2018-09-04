@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Text_Console.h"
 
+#if defined(WINDOWS)
 LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
@@ -51,3 +52,4 @@ LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
+#endif

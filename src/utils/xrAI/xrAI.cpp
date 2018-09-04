@@ -104,7 +104,7 @@ void execute(LPSTR cmd)
 
             const auto hFactory = XRay::LoadModule("xrSE_Factory");
 
-            R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
+            R_ASSERT2(hFactory->IsLoaded(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 
 #ifdef XR_X64
             pcstr create_entity_name = "create_entity";
@@ -113,15 +113,13 @@ void execute(LPSTR cmd)
             pcstr create_entity_name = "_create_entity@4";
             pcstr destroy_entity_name = "_destroy_entity@4";
 #endif
-            create_entity = (Factory_Create*)hFactory->getProcAddress(create_entity_name);
-            destroy_entity = (Factory_Destroy*)hFactory->getProcAddress(destroy_entity_name);
+            create_entity = (Factory_Create*)hFactory->GetProcAddress(create_entity_name);
+            destroy_entity = (Factory_Destroy*)hFactory->GetProcAddress(destroy_entity_name);
 
             R_ASSERT(create_entity);
             R_ASSERT(destroy_entity);
 
             CGameSpawnConstructor(name, output, start, !!no_separator_check);
-
-            hFactory->close();
 
             create_entity = nullptr;
             destroy_entity = nullptr;

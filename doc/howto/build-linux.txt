@@ -1,0 +1,61 @@
+TITLE: X-Ray 1.6 build and setup on Linux
+
+Required packages:
+------
+OpenSSL
+Theora
+OGG
+SDL2
+LZO
+JPEG
+
+Ubuntu 18.04 build dependencies:
+sudo apt install git cmake libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+
+Build commands:
+------
+cd xray-16
+git submodule update --init --recursive
+mkdir bin && cd bin
+cmake ..
+(or export CC=clang && export CXX=clang++ && cmake ..)
+make
+
+Libraries:
+------
+To build X-Ray Engine you'll need following libraries:
+* Windows SDK
+* BugTrap: https://github.com/Xottab-DUTY/BugTrap
+* CryptoPP: https://github.com/weidai11/cryptopp
+* FreeImage: http://freeimage.sourceforge.net
+* FreeMagic: https://github.com/OpenXRay/FreeMagic
+* GameSpy: https://github.com/nitrocaster/GameSpy
+* libjpeg: https://github.com/OpenXRay/libjpeg
+  - Use "jpeg" as project root directory name for compatibility with CxImage
+* libogg-1.1.4: http://xiph.org/downloads
+* libtheora-1.1.1: http://xiph.org/downloads
+* libvorbis-1.2.3: http://xiph.org/downloads
+* Lightwave: https://github.com/OpenXRay/LightWave
+* Luabind: https://github.com/Xottab-DUTY/luabind-deboostified
+* LuaJIT: https://github.com/Xottab-DUTY/LuaJIT
+* lzo: https://github.com/alexgdi/lzo
+* Autodesk Maya 2008/2009 SDK: https://github.com/OpenXRay/maya
+* Autodesk 3DS Max 6.0 SDK: https://github.com/OpenXRay/3dsmax
+* NVAPI: https://developer.nvidia.com/nvapi
+* OpenAutomate: https://developer.nvidia.com/openautomate
+* pugixml: https://github.com/zeux/pugixml/
+* zlib: http://zlib.net
+All mentioned libraries are already in repository as submodules!
+
+Setup:
+------
+- Install S.T.A.L.K.E.R Call of Pripyat
+- Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
+  http://cop.stalker-game.ru/?page=patches#2
+- Clone the repository (you should not download it as an archive)
+  You can just push `Open in Desktop` if you are using Github Desktop.
+  If you are using Git console, here's the command:
+  `git clone https://github.com/OpenXRay/xray-16.git --recurse-submodules`
+- If you are using git client, make sure all submodules are initialized.
+  Type this command in the Git console `git submodule update --init --recursive`
+- Now you can build the engine!

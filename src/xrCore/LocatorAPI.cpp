@@ -7,15 +7,21 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#if defined(WINDOWS)
 #include <direct.h>
-#include <fcntl.h>
 #include <sys/stat.h>
+#endif
+#include <fcntl.h>
 #pragma warning(pop)
 
 #include "FS_internal.h"
 #include "stream_reader.h"
 #include "file_stream_reader.h"
 #include "xrCore/Threading/Lock.hpp"
+#if defined(LINUX)
+#include "xrstring.h"
+#include <glob.h>
+#endif
 
 const u32 BIG_FILE_READER_WINDOW_SIZE = 1024 * 1024;
 
@@ -129,7 +135,7 @@ XRCORE_API void _dump_open_files(int mode)
 {
     if (mode == 1)
     {
-        for (auto file : g_open_files)
+        for (const auto& file : g_open_files)
         {
             Log("----opened files");
             if (file._reader != nullptr)
@@ -139,9 +145,8 @@ XRCORE_API void _dump_open_files(int mode)
     else
     {
         Log("----un-used");
-        for (auto itr : g_open_files)
+        for (const auto& file : g_open_files)
         {
-            auto file = itr;
             if (file._reader == nullptr)
                 Msg("[%d] fname:%s", file._used, file._fn.c_str());
         }
@@ -157,10 +162,14 @@ CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
 #endif // CONFIG_PROFILE_LOCKS
 {
     m_Flags.zero();
+#if defined(WINDOWS)
     // get page size
     SYSTEM_INFO sys_inf;
     GetSystemInfo(&sys_inf);
     dwAllocGranularity = sys_inf.dwAllocationGranularity;
+#elif defined(LINUX)
+    dwAllocGranularity = sysconf(_SC_PAGE_SIZE);
+#endif
     m_iLockRescan = 0;
     dwOpenCounter = 0;
 }
@@ -251,16 +260,30 @@ IReader* open_chunk(void* ptr, u32 ID)
 {
     u32 dwType, dwSize;
     DWORD read_byte;
+#ifdef WINDOWS
     u32 pt = SetFilePointer(ptr, 0, nullptr, FILE_BEGIN);
     VERIFY(pt != INVALID_SET_FILE_POINTER);
+#else
+    ::rewind(ptr);
+#endif
     while (true)
     {
+#ifdef WINDOWS
         bool res = ReadFile(ptr, &dwType, 4, &read_byte, nullptr);
+#elif defined(LINUX)
+        read_byte = ::read(ptr, &dwType, 4);
+        bool res = (read_byte != -1);
+#endif
         if (read_byte == 0)
             return nullptr;
         //. VERIFY(res&&(read_byte==4));
 
+#ifdef WINDOWS
         res = ReadFile(ptr, &dwSize, 4, &read_byte, nullptr);
+#else
+        read_byte = ::read(ptr, &dwSize, 4);
+        res = (read_byte != -1);
+#endif
         if (read_byte == 0)
             return nullptr;
         //. VERIFY(res&&(read_byte==4));
@@ -268,7 +291,12 @@ IReader* open_chunk(void* ptr, u32 ID)
         if ((dwType & ~CFS_CompressMark) == ID)
         {
             u8* src_data = xr_alloc<u8>(dwSize);
+#ifdef WINDOWS
             res = ReadFile(ptr, src_data, dwSize, &read_byte, nullptr);
+#else
+            read_byte = ::read(ptr, src_data, dwSize);
+            res = (read_byte != -1);
+#endif
             VERIFY(res && (read_byte == dwSize));
             if (dwType & CFS_CompressMark)
             {
@@ -280,9 +308,14 @@ IReader* open_chunk(void* ptr, u32 ID)
             }
             return new CTempReader(src_data, dwSize, 0);
         }
+#ifdef WINDOWS
         pt = SetFilePointer(ptr, dwSize, nullptr, FILE_CURRENT);
         if (pt == INVALID_SET_FILE_POINTER)
             return nullptr;
+#else
+        if(-1 == ::fseek(ptr, dwSize, SEEK_CUR))
+            return nullptr;
+#endif
     }
     return nullptr;
 };
@@ -381,20 +414,33 @@ void CLocatorAPI::archive::open()
     if (hSrcFile && hSrcMap)
         return;
 
+#if defined(WINDOWS)
     hSrcFile = CreateFile(*path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
     R_ASSERT(hSrcFile != INVALID_HANDLE_VALUE);
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
     size = GetFileSize(hSrcFile, nullptr);
+#elif defined(LINUX)
+    hSrcFile = ::open(*path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    R_ASSERT(hSrcFile != -1);
+    struct stat file_info;
+    ::fstat(hSrcFile, &file_info);
+    size = file_info.st_size;
+#endif
     R_ASSERT(size > 0);
 }
 
 void CLocatorAPI::archive::close()
 {
+#if defined(WINDOWS)
     CloseHandle(hSrcMap);
     hSrcMap = nullptr;
     CloseHandle(hSrcFile);
     hSrcFile = nullptr;
+#elif defined(LINUX)
+    ::close(hSrcFile);
+    hSrcFile = -1;
+#endif
 }
 
 void CLocatorAPI::ProcessArchive(pcstr _path)
@@ -511,6 +557,12 @@ bool ignore_name(const char* _name)
         return true;
     if (ENDS_WITH(".sln"))
         return true;
+    if (ENDS_WITH(".pdb"))
+        return true;
+    if (ENDS_WITH(".ipdb"))
+        return true;
+    if (ENDS_WITH(".iobj"))
+        return true;
 #undef ENDS_WITH
     return false;
 }
@@ -521,6 +573,7 @@ bool ignore_name(const char* _name)
 
 bool ignore_path(const char* _path)
 {
+#if defined(WINDOWS)
     HANDLE h = CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 
     if (h != INVALID_HANDLE_VALUE)
@@ -530,6 +583,16 @@ bool ignore_path(const char* _path)
     }
     else
         return true;
+#elif defined(LINUX)
+    HANDLE h  = ::open(_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    if (h != -1)
+    {
+        ::close(h);
+        return false;
+    }
+    else
+        return true;
+#endif
 }
 
 bool CLocatorAPI::Recurse(pcstr path)
@@ -543,14 +606,33 @@ bool CLocatorAPI::Recurse(pcstr path)
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, "*.*");
     _finddata_t findData;
+#ifdef WINDOWS
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
         return false;
+#elif defined(LINUX)
+    glob_t globbuf;
+
+    globbuf.gl_offs = 256;
+    int result = glob(scanPath, GLOB_NOSORT, NULL, &globbuf);
+
+    if(0 != result)
+        return false;
+
+    intptr_t handle = globbuf.gl_pathc - 1;
+#endif
+
     rec_files.reserve(256);
     size_t oldSize = rec_files.size();
     intptr_t done = handle;
     while (done != -1)
     {
+#if defined(LINUX)
+    	xr_strcpy(findData.name, sizeof globbuf.gl_pathv[handle - done], globbuf.gl_pathv[handle - done]);
+        struct stat fi;
+        stat(findData.name, &fi);
+        findData.size = fi.st_size;
+#endif
         string1024 fullPath;
         bool ignore = false;
         if (m_Flags.test(flNeedCheck))
@@ -565,9 +647,17 @@ bool CLocatorAPI::Recurse(pcstr path)
         }
         if (!ignore)
             rec_files.push_back(findData);
+#ifdef WINDOWS
         done = _findnext(handle, &findData);
+#elif defined(LINUX)
+        done--;
+#endif
     }
+#ifdef WINDOWS
     _findclose(handle);
+#elif defined(LINUX)
+    globfree(&globbuf);
+#endif
     size_t newSize = rec_files.size();
     if (newSize > oldSize)
     {
@@ -579,6 +669,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     // insert self
     if (path && path[0] != 0)
         Register(path, 0xffffffff, 0, 0, 0, 0, 0);
+
     return true;
 }
 
@@ -606,7 +697,11 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     setup_fs_path(fs_name, fs_path);
 
     string_path full_current_directory;
+#if defined(WINDOWS)
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
+#elif defined(LINUX)
+    realpath(fs_path, full_current_directory);
+#endif
 
     FS_Path* path = new FS_Path(full_current_directory, "", "", "", 0);
 #ifdef DEBUG
@@ -798,7 +893,7 @@ void CLocatorAPI::_destroy()
 {
     CloseLog();
 
-    for (auto it : m_files)
+    for (auto& it : m_files)
     {
         auto str = pstr(it.name);
         xr_free(str);
@@ -1133,7 +1228,12 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     if (end > A.size)
         end = A.size;
     u32 sz = end - start;
+#if defined(WINDOWS)
     u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
+#elif defined(LINUX)
+    u8* ptr = (u8*)::mmap(NULL, sz, PROT_READ, MAP_SHARED, A.hSrcFile, start);
+#endif
+
     VERIFY3(ptr, "cannot create file mapping on file", fname);
 
     string512 temp;
@@ -1154,7 +1254,11 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     u8* dest = xr_alloc<u8>(desc.size_real);
     rtc_decompress(dest, desc.size_real, ptr + ptr_offs, desc.size_compressed);
     R = new CTempReader(dest, desc.size_real, 0);
+#if defined(WINDOWS)
     UnmapViewOfFile(ptr);
+#elif defined(LINUX)
+    ::munmap(ptr, sz);
+#endif
 
 #ifdef FS_DEBUG
     unregister_file_mapping(ptr, sz);
@@ -1377,9 +1481,15 @@ void CLocatorAPI::w_close(IWriter*& S)
 
         if (bReg)
         {
+#if defined(WINDOWS)
             struct _stat st;
             _stat(fname, &st);
             Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
+#elif defined(LINUX)
+            struct stat st;
+            ::fstat(fname, &st);
+            Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
+#endif
         }
     }
 }

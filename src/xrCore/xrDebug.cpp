@@ -3,18 +3,24 @@
 
 #include "xrDebug.h"
 #include "os_clipboard.h"
+#include "log.h"
+#if defined(WINDOWS)
 #include "Debug/dxerr.h"
+#endif
 #include "Threading/ScopeLock.hpp"
 
 #pragma warning(push)
 #pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
+#if defined(WINDOWS)
 #include "Debug/MiniDump.h"
 #pragma warning(pop)
 #include <malloc.h>
 #include <direct.h>
+#endif
 
 extern bool shared_str_initialized;
 
+#if defined(WINDOWS)
 #ifdef __BORLANDC__
 #include "d3d9.h"
 #include "d3dx9.h"
@@ -25,6 +31,7 @@ extern bool shared_str_initialized;
 #define USE_BUG_TRAP
 static BOOL bException = FALSE;
 #endif
+#endif
 
 #ifndef USE_BUG_TRAP
 #include <exception>
@@ -34,29 +41,40 @@ static BOOL bException = FALSE;
 #include <BugTrap/source/Client/BugTrap.h>
 #endif
 
+#if defined(WINDOWS)
 #include <new.h> // for _set_new_mode
 #include <signal.h> // for signals
 #include <errorrep.h> // ReportFault
+#elif defined(LINUX)
+#include <sys/user.h>
+#include <sys/ptrace.h>
+#endif
 #pragma comment(lib, "FaultRep.lib")
 
 #ifdef DEBUG
 #define USE_OWN_ERROR_MESSAGE_WINDOW
-#else
-#define USE_OWN_MINI_DUMP
 #endif
 
 #if defined XR_X64
-#	define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
+#define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
 #elif defined XR_X86
-#	define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
+#define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
 #else
-#	error CPU architecture is not supported.
+#error CPU architecture is not supported.
 #endif
 
 namespace
 {
 ICN void* GetInstructionPtr()
 {
+#if defined(LINUX)
+    pid_t traced_process;
+    struct user_regs_struct regs;
+    ptrace(PTRACE_ATTACH, traced_process, NULL, NULL);
+    ptrace(PTRACE_GETREGS, traced_process, NULL, &regs);
+
+    return regs.rip;
+#else
 #ifdef _MSC_VER
     return _ReturnAddress();
 #else
@@ -68,9 +86,105 @@ ICN void* GetInstructionPtr()
     _asm retn
 #endif
 #endif
+#endif
 }
 }
 
+// XXX: Probably rename this to AssertionResult?
+enum MessageBoxResult
+{
+    resultUndefined = -1,
+    resultContinue = 0,
+    resultTryAgain = 1,
+    resultCancel = 2
+};
+
+constexpr SDL_MessageBoxButtonData buttons[] =
+{
+    /* .flags, .buttonid, .text */
+    { 0, resultContinue, "Continue"  },
+    { 0, resultTryAgain, "Try again" },
+    { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT |
+      SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,
+         resultCancel, "Cancel"      }
+};
+
+SDL_MessageBoxData messageboxdata =
+{
+    SDL_MESSAGEBOX_ERROR,
+    nullptr,
+    "Fatal error",
+    "Vse clomalocb, tashite novyy dvizhok",
+    SDL_arraysize(buttons),
+    buttons,
+    nullptr
+};
+
+int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
+{
+#ifdef WINDOWS // because Windows default Message box is fancy
+    HWND hwnd = nullptr;
+
+    if (applicationWindow)
+    {
+        SDL_SysWMinfo info;
+        SDL_VERSION(&info.version);
+        if (SDL_GetWindowWMInfo(applicationWindow, &info))
+        {
+            switch (info.subsystem)
+            {
+            case SDL_SYSWM_WINDOWS:
+                hwnd = info.info.win.window;
+                break;
+            default: break;
+            }
+        }
+    }
+
+    if (simple)
+        return MessageBox(hwnd, message, title, MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+
+    const int result = MessageBox(hwnd, message, title,
+        MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
+
+    switch (result)
+    {
+    case IDCANCEL: return resultCancel;
+    case IDTRYAGAIN: return resultTryAgain;
+    case IDCONTINUE: return resultContinue;
+    default: return resultUndefined;
+    }
+#else
+    if (simple)
+        return SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, applicationWindow);
+
+    messageboxdata.window = applicationWindow;
+    messageboxdata.title = title;
+    messageboxdata.message = message;
+    int button = resultUndefined;
+    SDL_ShowMessageBox(&messageboxdata, &button);
+    return button;
+#endif
+}
+
+SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
+    void* /*userdata*/)
+{
+    if (data->always_ignore)
+        return SDL_ASSERTION_ALWAYS_IGNORE;
+
+    constexpr pcstr desc = "SDL2 assert triggered";
+    bool alwaysIgnore = false;
+    xrDebug::Fail(alwaysIgnore, {data->filename, data->linenum, data->function}, data->condition, desc);
+
+    if (alwaysIgnore)
+        return SDL_ASSERTION_ALWAYS_IGNORE;
+
+    // XXX: change Fail return type from void to 'enum MessageBoxResult'
+    return SDL_ASSERTION_IGNORE;
+}
+
+SDL_Window* xrDebug::applicationWindow = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
 xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
@@ -81,8 +195,13 @@ bool xrDebug::ErrorAfterDialog = false;
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
 
-void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
+#if defined(WINDOWS)
+void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
+#elif defined(LINUX)
+void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
+#endif
 
+#if defined(WINDOWS)
 bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
 {
     BOOL result = StackWalk(MACHINE_TYPE, GetCurrentProcess(), GetCurrentThread(), stackFrame, threadCtx, nullptr,
@@ -219,7 +338,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
     stackFrame.AddrFrame.Mode = AddrModeFlat;
     stackFrame.AddrFrame.Offset = threadCtx->Ebp;
 #else
-#	error CPU architecture is not supported.
+#error CPU architecture is not supported.
 #endif
 
     while (GetNextStackFrameString(&stackFrame, threadCtx, frameStr) && traceResult.size() <= maxFramesCount)
@@ -251,57 +370,61 @@ void xrDebug::LogStackTrace(const char* header)
         Msg("%s", frame.c_str());
     }
 }
+#endif // defined(WINDOWS)
 
-void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
-                         const char* arg1, const char* arg2)
+
+void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
+                         const char* desc, const char* arg1, const char* arg2)
 {
     char* buffer = assertionInfo;
     if (!expr)
         expr = "<no expression>";
     bool extendedDesc = desc && strchr(desc, '\n');
     pcstr prefix = "[error] ";
-    buffer += sprintf(buffer, "\nFATAL ERROR\n\n");
-    buffer += sprintf(buffer, "%sExpression    : %s\n", prefix, expr);
-    buffer += sprintf(buffer, "%sFunction      : %s\n", prefix, loc.Function);
-    buffer += sprintf(buffer, "%sFile          : %s\n", prefix, loc.File);
-    buffer += sprintf(buffer, "%sLine          : %d\n", prefix, loc.Line);
+    buffer += xr_sprintf(buffer, bufferSize, "\nFATAL ERROR\n\n");
+    buffer += xr_sprintf(buffer, bufferSize, "%sExpression    : %s\n", prefix, expr);
+    buffer += xr_sprintf(buffer, bufferSize, "%sFunction      : %s\n", prefix, loc.Function);
+    buffer += xr_sprintf(buffer, bufferSize, "%sFile          : %s\n", prefix, loc.File);
+    buffer += xr_sprintf(buffer, bufferSize, "%sLine          : %d\n", prefix, loc.Line);
     if (extendedDesc)
     {
-        buffer += sprintf(buffer, "\n%s\n", desc);
+        buffer += xr_sprintf(buffer, bufferSize, "\n%s\n", desc);
         if (arg1)
         {
-            buffer += sprintf(buffer, "%s\n", arg1);
+            buffer += xr_sprintf(buffer, bufferSize, "%s\n", arg1);
             if (arg2)
-                buffer += sprintf(buffer, "%s\n", arg2);
+                buffer += xr_sprintf(buffer, bufferSize, "%s\n", arg2);
         }
     }
     else
     {
-        buffer += sprintf(buffer, "%sDescription   : %s\n", prefix, desc);
+        buffer += xr_sprintf(buffer, bufferSize, "%sDescription   : %s\n", prefix, desc);
         if (arg1)
         {
             if (arg2)
             {
-                buffer += sprintf(buffer, "%sArgument 0    : %s\n", prefix, arg1);
-                buffer += sprintf(buffer, "%sArgument 1    : %s\n", prefix, arg2);
+                buffer += xr_sprintf(buffer, bufferSize, "%sArgument 0    : %s\n", prefix, arg1);
+                buffer += xr_sprintf(buffer, bufferSize, "%sArgument 1    : %s\n", prefix, arg2);
             }
             else
-                buffer += sprintf(buffer, "%sArguments     : %s\n", prefix, arg1);
+                buffer += xr_sprintf(buffer, bufferSize, "%sArguments     : %s\n", prefix, arg1);
         }
     }
-    buffer += sprintf(buffer, "\n");
+    buffer += xr_sprintf(buffer, bufferSize, "\n");
     if (shared_str_initialized)
     {
         Log(assertionInfo);
         FlushLog();
     }
     buffer = assertionInfo;
+#if defined(WINDOWS)
     if (IsDebuggerPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert"))
         return;
+#endif
     if (shared_str_initialized)
         Log("stack trace:\n");
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    buffer += sprintf(buffer, "stack trace:\n\n");
+    buffer += xr_sprintf(buffer, bufferSize, "stack trace:\n\n");
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     xr_vector<xr_string> stackTrace = BuildStackTrace();
     for (size_t i = 2; i < stackTrace.size(); i++)
@@ -309,7 +432,7 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
         if (shared_str_initialized)
             Log(stackTrace[i].c_str());
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        buffer += sprintf(buffer, "%s\n", stackTrace[i].c_str());
+        buffer += xr_sprintf(buffer, bufferSize, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
     if (shared_str_initialized)
@@ -345,9 +468,10 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     lock.Enter();
     ErrorAfterDialog = true;
     string4096 assertionInfo;
-    GatherInfo(assertionInfo, loc, expr, desc, arg1, arg2);
+    auto size = sizeof(assertionInfo);
+    GatherInfo(assertionInfo, sizeof(assertionInfo), loc, expr, desc, arg1, arg2);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    strcat(assertionInfo,
+    xr_strcat(assertionInfo,
            "\r\n"
            "Press CANCEL to abort execution\r\n"
            "Press TRY AGAIN to continue execution\r\n"
@@ -360,23 +484,28 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         OnDialog(true);
     FlushLog();
     if (Core.PluginMode)
-        MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        ShowMessage("X-Ray error", assertionInfo);
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        int result = MessageBox(NULL, assertionInfo, "Fatal error",
-                                MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
-        switch (result)
+        switch (ShowMessage("Fatal error", assertionInfo, false))
         {
-        case IDCANCEL:
+        case resultUndefined:
+            xr_strcat(assertionInfo, SDL_GetError());
+            [[fallthrough]];
+
+        case resultCancel:
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
             DEBUG_BREAK;
             break;
-        case IDTRYAGAIN: ErrorAfterDialog = false;
+
+        case resultTryAgain:
+            ErrorAfterDialog = false;
             break;
-        case IDCONTINUE:
+
+        case resultContinue:
             ErrorAfterDialog = false;
             ignoreAlways = true;
             break;
@@ -391,6 +520,7 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     }
     if (OnDialog)
         OnDialog(false);
+
     lock.Leave();
 }
 
@@ -403,20 +533,24 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 void xrDebug::DoExit(const std::string& message)
 {
     FlushLog();
-    MessageBox(NULL, message.c_str(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+    ShowMessage("Error", message.c_str());
+#if defined(WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
+#endif
 }
 
 LPCSTR xrDebug::ErrorToString(long code)
 {
     const char* result = nullptr;
     static string1024 descStorage;
+#if defined(WINDOWS)
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
     {
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, code, 0, descStorage, sizeof(descStorage) - 1, 0);
         result = descStorage;
     }
+#endif
     return result;
 }
 
@@ -454,16 +588,17 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
             string256 currentDir;
             _getcwd(currentDir, sizeof(currentDir));
             string256 relDir;
-            strcpy_s(relDir, logDir);
+            xr_strcpy(relDir, logDir);
             strconcat(sizeof(logDir), logDir, currentDir, "\\", relDir);
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        strcpy_s(logDir, "logs");
+        xr_strcpy(logDir, "logs");
     }
     string_path temp;
     strconcat(sizeof(temp), temp, logDir, log_name());
+#if defined(WINDOWS)
     BT_AddLogFile(temp);
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
@@ -475,15 +610,20 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 
     BT_SetReportFilePath(dumpPath);
     BT_SaveSnapshot(nullptr);
+#endif
 }
 
 void xrDebug::SetupExceptionHandler(const bool& dedicated)
 {
+#if defined(WINDOWS)
+    const auto commandLine = GetCommandLine();
+
     // disable 'appname has stopped working' popup dialog
-    UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+    const auto prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
     SetErrorMode(prevMode | SEM_NOGPFAULTERRORBOX);
     BT_InstallSehFilter();
-    if (!dedicated && !strstr(GetCommandLine(), "-silent_error_mode"))
+
+    if (!dedicated && !strstr(commandLine, "-silent_error_mode"))
         BT_SetActivityType(BTA_SHOWUI);
     else
         BT_SetActivityType(BTA_SAVEREPORT);
@@ -497,49 +637,26 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
     BT_SetAppName("X-Ray Engine");
     BT_SetReportFormat(BTRF_TEXT);
     BT_SetFlags(BTF_DETAILEDMODE | BTF_ATTACHREPORT);
+
 #ifdef MASTER_GOLD
-#ifdef _EDITOR // MASTER_GOLD && EDITOR
-    auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs;
-#else // MASTER_GOLD && !EDITOR
-    auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
-#endif
+    auto minidumpFlags = MiniDumpFilterMemory | MiniDumpScanMemory;
+
+    if (strstr(commandLine, "-detailed_minidump"))
+        minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #else
-#ifdef EDITOR // !MASTER_GOLD && EDITOR
-    auto minidumpFlags = MiniDumpWithDataSegs;
-#else // !MASTER_GOLD && !EDITOR
-    auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
+    const auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #endif
-#endif
+    
     BT_SetDumpType(minidumpFlags);
     //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
     BT_SetSupportEMail("openxray@yahoo.com");
+#endif
 }
 #endif // USE_BUG_TRAP
 
-#ifdef USE_OWN_MINI_DUMP
-void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
-{
-    string64 dateStr;
-    timestamp(dateStr);
-    string_path dumpPath;
-    sprintf(dumpPath, "%s_%s_%s.mdmp", Core.ApplicationName, Core.UserName, dateStr);
-    __try
-    {
-        if (FS.path_exist("$logs$"))
-            FS.update_path(dumpPath, "$logs$", dumpPath);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        string_path temp;
-        strcpy_s(temp, dumpPath);
-        sprintf(dumpPath, "logs/%s", temp);
-    }
-    WriteMiniDump(MINIDUMP_TYPE(MiniDumpFilterMemory | MiniDumpScanMemory), dumpPath, GetCurrentThreadId(), exPtrs);
-}
-#endif
-
 void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 {
+#if defined(WINDOWS)
     int lastErr = GetLastError();
     if (lastErr == ERROR_SUCCESS)
     {
@@ -550,12 +667,14 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, lastErr,
                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
     // XXX nitrocaster: check buffer overflow
-    sprintf(buffer, "[error][%8d]: %s", lastErr, (char*)msg);
+    xr_sprintf(buffer, bufferSize, "[error][%8d]: %s", lastErr, (char*)msg);
     LocalFree(msg);
+#endif
 }
 
 LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 {
+#if defined(WINDOWS)
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
     if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
@@ -572,7 +691,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         {
             if (shared_str_initialized)
                 Log(stackTrace[i].c_str());
-            sprintf(buffer, "%s\r\n", stackTrace[i].c_str());
+            xr_sprintf(buffer, sizeof(buffer), "%s\r\n", stackTrace[i].c_str());
 #ifdef DEBUG
             if (!IsDebuggerPresent())
                 os_clipboard::update_clipboard(buffer);
@@ -582,7 +701,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         {
             if (shared_str_initialized)
                 Msg("\n%s", errMsg);
-            strcat(errMsg, "\r\n");
+            xr_strcat(errMsg, "\r\n");
 #ifdef DEBUG
             if (!IsDebuggerPresent())
                 os_clipboard::update_clipboard(buffer);
@@ -600,10 +719,9 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     {
         if (OnDialog)
             OnDialog(true);
-        MessageBox(NULL,
-                   "Fatal error occurred\n\n"
-                   "Press OK to abort program execution",
-                   "Fatal error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        constexpr pcstr msg = "Fatal error occurred\n\n"
+            "Press OK to abort program execution";
+        ShowMessage("Fatal error", msg);
     }
 #endif
     ReportFault(exPtrs, 0);
@@ -614,17 +732,22 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         OnDialog(false);
 #endif
     return EXCEPTION_CONTINUE_SEARCH;
+#else
+    return 0;
+#endif
 }
 
 #ifndef USE_BUG_TRAP
 void _terminate()
 {
+#if defined(WINDOWS)
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
+#endif
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, nullptr, "Unexpected application termination");
-    strcat(assertionInfo, "Press OK to abort execution\r\n");
-    MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+    xr_strcat(assertionInfo, "Press OK to abort execution\r\n");
+    xrDebug::ShowMessage("Fatal Error", assertionInfo);
     exit(-1);
 }
 #endif // USE_BUG_TRAP
@@ -638,6 +761,7 @@ static void handler_base(const char* reason)
 static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* function, const wchar_t* file,
                                       unsigned int line, uintptr_t reserved)
 {
+#if defined(WINDOWS)
     bool ignoreAlways = false;
     string4096 mbExpression;
     string4096 mbFunction;
@@ -659,6 +783,7 @@ static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* 
         xr_strcpy(mbFile, __FILE__);
     }
     xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
+#endif
 }
 
 static void pure_call_handler() { handler_base("pure virtual function call"); }
@@ -673,6 +798,7 @@ static void termination_handler(int signal) { handler_base("termination with exi
 
 void xrDebug::OnThreadSpawn()
 {
+#if defined(WINDOWS)
 #ifdef USE_BUG_TRAP
     BT_SetTerminate();
 #else
@@ -692,6 +818,7 @@ void xrDebug::OnThreadSpawn()
 #if 0 // should be if we use exceptions
     std::set_unexpected(_terminate);
 #endif
+#endif
 }
 
 void xrDebug::Initialize(const bool& dedicated)
@@ -699,6 +826,9 @@ void xrDebug::Initialize(const bool& dedicated)
     *BugReportFile = 0;
     OnThreadSpawn();
     SetupExceptionHandler(dedicated);
+    SDL_SetAssertionHandler(SDLAssertionHandler, nullptr);
     // exception handler to all "unhandled" exceptions
+#if defined(WINDOWS)
     PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);
+#endif
 }

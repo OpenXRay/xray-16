@@ -13,11 +13,11 @@ ScheduledBase::ScheduledBase()
 #endif
 }
 
-extern BOOL g_bSheduleInProgress;
 ScheduledBase::~ScheduledBase()
 {
     VERIFY2(!Engine.Sheduler.Registered(this), make_string("0x%08x : %s", this, *shedule_Name()));
 
+// XXX: WTF???
 // sad, but true
 // we need this to become MASTER_GOLD
 #ifndef DEBUG
@@ -33,11 +33,14 @@ void ScheduledBase::shedule_Update(u32 dt)
     if (shedule.dbg_startframe == shedule.dbg_update_shedule)
     {
         LPCSTR name = "unknown";
-        IGameObject* O = dynamic_cast<IGameObject*>(this);
-        if (O)
-            name = *O->cName();
+        const auto object = dynamic_cast<IGameObject*>(this);
+        if (object)
+            name = object->cName().c_str();
         xrDebug::Fatal(DEBUG_INFO, "'shedule_Update' called twice per frame for %s", name);
     }
     shedule.dbg_update_shedule = shedule.dbg_startframe;
 #endif
 }
+
+void ScheduledBaseMT::shedule_register() { Engine.Scheduler.Register(this); }
+void ScheduledBaseMT::shedule_unregister() { Engine.Scheduler.Unregister(this); }

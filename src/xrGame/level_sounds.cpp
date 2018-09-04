@@ -137,7 +137,8 @@ void SMusicTrack::Stop() { m_SourceStereo.stop_deferred(); }
 //-----------------------------------------------------------------------------
 // level sound manager
 //-----------------------------------------------------------------------------
-CLevelSoundManager::CLevelSoundManager() { m_NextTrackTime = 0; }
+CLevelSoundManager::CLevelSoundManager() : m_CurrentTrack(0) { m_NextTrackTime = 0; }
+
 void CLevelSoundManager::Load()
 {
     // static level sounds

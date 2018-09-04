@@ -67,94 +67,110 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     }
     else
     {
-        u32 tree_aref = 200;
-        if (oNotAnTree.value)
-            tree_aref = 0;
+        u32	tree_aref = oNotAnTree.value ? 0 : 200;
+        D3DBLEND blend_src, blend_dst;
+        if (oBlend.value)
+        {
+            blend_src = D3DBLEND_SRCALPHA;
+            blend_dst = D3DBLEND_INVSRCALPHA;
+        }
+        else
+        {
+            blend_src = D3DBLEND_ONE;
+            blend_dst = D3DBLEND_ZERO;
+        }
+
+        LPCSTR tsv_hq, tsp_hq;
+        LPCSTR tsv_point, tsv_spot, tsp_point, tsp_spot;
+        if (C.bDetail_Diffuse)
+        {
+            if (oNotAnTree.value)
+            {
+                tsv_hq = "tree_s_dt";
+                tsv_point = "tree_s_point_dt";
+                tsv_spot = "tree_s_spot_dt";
+            }
+            else
+            {
+                tsv_hq = "tree_w_dt";
+                tsv_point = "tree_w_point_dt";
+                tsv_spot = "tree_w_spot_dt";
+            }
+            tsp_hq = "vert_dt";
+            tsp_point = "add_point_dt";
+            tsp_spot = "add_spot_dt";
+        }
+        else
+        {
+            if (oNotAnTree.value)
+            {
+                tsv_hq = "tree_s";
+                tsv_point = "tree_s_point";
+                tsv_spot = "tree_s_spot";
+            }
+            else
+            {
+                tsv_hq = "tree_w";
+                tsv_point = "tree_w_point";
+                tsv_spot = "tree_w_spot";
+            }
+            tsp_hq = "vert";
+            tsp_point = "add_point";
+            tsp_spot = "add_spot";
+        }
 
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
-            if (oNotAnTree.value)
-            {
-                // Level view
-                LPCSTR tsv = "tree_s", tsp = "vert";
-                if (C.bDetail_Diffuse)
-                {
-                    tsv = "tree_s_dt";
-                    tsp = "vert_dt";
-                }
-                if (oBlend.value)
-                    C.r_Pass(
-                        tsv, tsp, TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, tree_aref);
-                else
-                    C.r_Pass(tsv, tsp, TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, tree_aref);
-                C.r_Sampler("s_base", C.L_textures[0]);
-                C.r_Sampler("s_detail", C.detail_texture);
-                C.r_End();
-            }
-            else
-            {
-                // Level view
-                if (C.bDetail_Diffuse)
-                {
-                    if (oBlend.value)
-                        C.r_Pass("tree_w_dt", "vert_dt", TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA,
-                            D3DBLEND_INVSRCALPHA, TRUE, tree_aref);
-                    else
-                        C.r_Pass("tree_w_dt", "vert_dt", TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE,
-                            tree_aref);
-                    C.r_Sampler("s_base", C.L_textures[0]);
-                    C.r_Sampler("s_detail", C.detail_texture);
-                    C.r_End();
-                }
-                else
-                {
-                    if (oBlend.value)
-                        C.r_Pass("tree_w", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA,
-                            TRUE, tree_aref);
-                    else
-                        C.r_Pass(
-                            "tree_w", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, tree_aref);
-                    C.r_Sampler("s_base", C.L_textures[0]);
-                    C.r_Sampler("s_detail", C.detail_texture);
-                    C.r_End();
-                }
-            }
-            break;
-        case SE_R1_NORMAL_LQ:
+        {
             // Level view
-            if (oBlend.value)
-                C.r_Pass(
-                    "tree_s", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, tree_aref);
-            else
-                C.r_Pass("tree_s", "vert", TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, tree_aref);
+            C.r_Pass(tsv_hq, tsp_hq, TRUE, TRUE, TRUE, TRUE, blend_src, blend_dst, TRUE, tree_aref);
+            C.r_Sampler("s_base", C.L_textures[0]);
+            if (C.bDetail_Diffuse)
+                C.r_Sampler("s_detail", C.detail_texture);
+            C.r_End();
+        }
+        break;
+        case SE_R1_NORMAL_LQ:
+        {
+            // Level view
+            C.r_Pass("tree_s", "vert", TRUE, TRUE, TRUE, TRUE, blend_src, blend_dst, TRUE, tree_aref);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_End();
-            break;
+        }
+        break;
         case SE_R1_LPOINT:
-            C.r_Pass((oNotAnTree.value) ? "tree_s_point" : "tree_w_point", "add_point", FALSE, TRUE, FALSE, TRUE,
-                D3DBLEND_ONE, D3DBLEND_ONE, TRUE, 0);
+        {
+            C.r_Pass(tsv_point, tsp_point, FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE, 0);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler_clf("s_lmap", TEX_POINT_ATT);
             C.r_Sampler_clf("s_att", TEX_POINT_ATT);
+            if (C.bDetail_Diffuse)
+                C.r_Sampler("s_detail", C.detail_texture);
             C.r_End();
-            break;
+        }
+        break;
         case SE_R1_LSPOT:
-            C.r_Pass((oNotAnTree.value) ? "tree_s_spot" : "tree_w_spot", "add_spot", FALSE, TRUE, FALSE, TRUE,
-                D3DBLEND_ONE, D3DBLEND_ONE, TRUE, 0);
+        {
+            C.r_Pass(tsv_spot, tsp_spot, FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE, 0);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler_clf("s_lmap", "internal\\internal_light_att", true);
             C.r_Sampler_clf("s_att", TEX_SPOT_ATT);
+            if (C.bDetail_Diffuse)
+                C.r_Sampler("s_detail", C.detail_texture);
             C.r_End();
-            break;
+        }
+        break;
         case SE_R1_LMODELS:
+        {
             /*	Don't use lighting from flora - strange visual results
             //	Lighting only
-            C.r_Pass		("tree_wave","vert_l",FALSE);
-            C.r_Sampler		("s_base",C.L_textures[0]);
-            C.r_End			();
+            C.r_Pass			("tree_wave","vert_l",FALSE);
+            C.r_Sampler			("s_base",C.L_textures[0]);
+            C.r_End				();
             */
-            break;
+        }
+        break;
         }
     }
 }

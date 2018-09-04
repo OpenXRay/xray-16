@@ -1,9 +1,9 @@
 [submodule "Externals/LuaJIT"]
 	path = Externals/LuaJIT
-	url = https://github.com/Xottab-DUTY/LuaJIT.git
+	url = https://github.com/OpenXRay/LuaJIT.git
 [submodule "Externals/luabind"]
 	path = Externals/luabind
-	url = https://github.com/Xottab-DUTY/luabind-deboostified.git
+    url = https://github.com/OpenXRay/luabind-deboostified.git
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
 	url = https://github.com/nitrocaster/GameSpy.git
@@ -58,12 +58,6 @@
 [submodule "Externals/pugixml"]
 	path = Externals/pugixml
 	url = https://github.com/zeux/pugixml.git
-[submodule "Externals/glew"]
-	path = Externals/glew
-	url = https://github.com/Armada651/glew
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
-[submodule "Externals/glslang"]
-	path = Externals/glslang
-	url = https://github.com/KhronosGroup/glslang.git

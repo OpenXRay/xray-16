@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include <glslang/SPIRV/GlslangToSpv.h>
-
 #include "rgl.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/xr_object.h"
@@ -14,6 +12,7 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 CRender RImplementation;
 
@@ -122,15 +121,13 @@ extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
 // Just two static storage
 void CRender::create()
 {
-    glslang::InitializeProcess();
-
     Device.seqFrame.Add(this,REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
     m_MSAASample = -1;
 
     // hardware
-    o.smapsize = 2048;
+    o.smapsize = ps_r2_smapsize;
     o.mrt = HW.Caps.raster.dwMRT_count >= 3;
     o.mrtmixdepth = HW.Caps.raster.b_MRT_mixdepth;
 
@@ -372,7 +369,6 @@ void CRender::create()
     //R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[0]));
     //R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[1]));
 
-    xrRender_apply_tf();
     PortalTraverser.initialize();
     //	TODO: OGL: Implement FluidManager.
     //	FluidManager.Initialize( 70, 70, 70 );
@@ -396,7 +392,6 @@ void CRender::destroy()
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
     r_dsgraph_destroy();
-    glslang::FinalizeProcess();
 }
 
 void CRender::reset_begin()
@@ -436,7 +431,6 @@ void CRender::reset_end()
 
     Target = new CRenderTarget();
 
-    xrRender_apply_tf();
     //FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 
     // Set this flag true to skip the first render frame,
@@ -1362,12 +1356,15 @@ HRESULT CRender::shader_compile(
             Log(shaderSrc);
             Log("Shader source end.");
         }
+        xr_free(shaderSrc);
 #endif
 
+        xr_free(_pErrorMsgs);
         CHK_GL(glDeleteShader(shader));
         return E_FAIL;
     }
 
+    xr_free(_pErrorMsgs);
     CHK_GL(glDeleteShader(shader));
     return S_OK;
 }

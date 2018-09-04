@@ -266,12 +266,12 @@ CCameraEffectorControlled::~CCameraEffectorControlled() { m_controller->SetCam(N
 BOOL CCameraEffectorControlled::Valid() { return m_controller->Valid(); }
 #define SND_MIN_VOLUME_FACTOR (0.1f)
 
-SndShockEffector::SndShockEffector()
+SndShockEffector::SndShockEffector() : m_end_time(0), m_life_time(0)
 {
     m_snd_length = 0.0f;
     m_cur_length = 0.0f;
     m_stored_volume = -1.0f;
-    m_actor = NULL;
+    m_actor = nullptr;
 }
 
 SndShockEffector::~SndShockEffector()

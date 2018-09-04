@@ -97,31 +97,47 @@ void CSoundRender_TargetA::update()
 {
     inherited::update();
 
-    ALint processed;
-    // Get status
-    A_CHK(alGetSourcei(pSource, AL_BUFFERS_PROCESSED, &processed));
+    ALint processed, state;
+    ALenum error;
 
-    if (processed > 0)
+    /* Get relevant source info */
+    alGetSourcei(pSource, AL_SOURCE_STATE, &state);
+    alGetSourcei(pSource, AL_BUFFERS_PROCESSED, &processed);
+    if ((error = alGetError()) != AL_NO_ERROR)
     {
-        while (processed)
+        Msg("! %s:: source state check failed (0x%d)", __FUNCTION__, error);
+        return;
+    }
+
+    while (processed > 0)
+    {
+        ALuint BufferID;
+        A_CHK(alSourceUnqueueBuffers(pSource, 1, &BufferID));
+        fill_block(BufferID);
+        A_CHK(alSourceQueueBuffers(pSource, 1, &BufferID));
+        processed--;
+        if ((error = alGetError()) != AL_NO_ERROR)
         {
-            ALuint BufferID;
-            A_CHK(alSourceUnqueueBuffers(pSource, 1, &BufferID));
-            fill_block(BufferID);
-            A_CHK(alSourceQueueBuffers(pSource, 1, &BufferID));
-            --processed;
+            Msg("! %s:: buffering data failed (0x%d)", __FUNCTION__, error);
+            return;
         }
     }
-    else
+
+    /* Make sure the source hasn't underrun */
+    if (state != AL_PLAYING && state != AL_PAUSED)
     {
-        // processed == 0
-        // check play status -- if stopped then queue is not being filled fast enough
-        ALint state;
-        A_CHK(alGetSourcei(pSource, AL_SOURCE_STATE, &state));
-        if (state != AL_PLAYING)
+        ALint queued;
+
+        /* If no buffers are queued, playback is finished */
+        alGetSourcei(pSource, AL_BUFFERS_QUEUED, &queued);
+        if (queued == 0)
+            return;
+
+        alSourcePlay(pSource);
+        if ((error = alGetError()) != AL_NO_ERROR)
         {
-            //Log("Queuing underrun detected.");
-            A_CHK(alSourcePlay(pSource));
+            Msg("! %s:: restarting playback failed (0x%d)", __FUNCTION__, error);
+            return;
         }
     }
 }

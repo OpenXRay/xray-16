@@ -1,6 +1,5 @@
 #pragma once
-#ifndef XRENGINE_ISHEDULED_H_INCLUDED
-#define XRENGINE_ISHEDULED_H_INCLUDED
+
 #include "Engine.h"
 #include "Common/Noncopyable.hpp"
 
@@ -42,9 +41,15 @@ public:
     virtual SchedulerData& GetSchedulerData() override { return shedule; }
     virtual void shedule_Update(u32 dt) override;
     virtual shared_str shedule_Name() const override { return shared_str("unknown"); }
+
 protected:
-    void shedule_register();
-    void shedule_unregister();
+    virtual void shedule_register();
+    virtual void shedule_unregister();
 };
 
-#endif // #ifndef XRENGINE_ISHEDULED_H_INCLUDED
+class ENGINE_API ScheduledBaseMT : public ScheduledBase
+{
+protected:
+    void shedule_register() override;
+    void shedule_unregister() override;
+};

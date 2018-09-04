@@ -51,7 +51,6 @@ public:
 #ifdef DEBUG
     RENDER_FACTORY_INTERFACE(ObjectSpaceRender)
 #endif // DEBUG
-    RENDER_FACTORY_INTERFACE(ApplicationRender)
     RENDER_FACTORY_INTERFACE(WallMarkArray)
 #endif // _EDITOR
 

@@ -1,0 +1,76 @@
+version: '{build}'
+
+pull_requests:
+  do_not_increment_build_number: true
+
+skip_tags: true
+
+image:
+- Visual Studio 2017
+
+configuration:
+- Debug
+- Mixed
+- Release
+
+platform:
+- x64
+- x86
+
+cache:
+- src/packages -> **/packages.config
+
+before_build:
+- cmd: >-
+    nuget restore src\engine.sln
+
+    git submodule update --init --recursive
+
+build:
+  project: src/engine.sln
+  parallel: true
+  verbosity: minimal
+
+after_build:
+- cmd: xr_pack_build.cmd
+
+test: off
+
+artifacts:
+- path: res/OpenXRay.Dx86.7z
+  name: OpenXRay.Dx86.7z
+- path: res/OpenXRay.Dx64.7z
+  name: OpenXRay.Dx64.7z
+- path: res/OpenXRay.Mx86.7z
+  name: OpenXRay.Mx86.7z
+- path: res/OpenXRay.Mx64.7z
+  name: OpenXRay.Mx64.7z
+- path: res/OpenXRay.Rx86.7z
+  name: OpenXRay.Rx86.7z
+- path: res/OpenXRay.Rx64.7z
+  name: OpenXRay.Rx64.7z
+- path: res/Symbols.Dx86.7z
+  name: Symbols.Dx86.7z
+- path: res/Symbols.Dx64.7z
+  name: Symbols.Dx64.7z
+- path: res/Symbols.Mx86.7z
+  name: Symbols.Mx86.7z
+- path: res/Symbols.Mx64.7z
+  name: Symbols.Mx64.7z
+- path: res/Symbols.Rx86.7z
+  name: Symbols.Rx86.7z
+- path: res/Symbols.Rx64.7z
+  name: Symbols.Rx64.7z
+
+deploy:
+- provider: GitHub
+  tag: $(appveyor_build_version)
+  release: OpenXRay (build $(appveyor_build_version))
+  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
+  auth_token:
+    secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
+  artifact:
+    OpenXRay.Dx86.7z, OpenXRay.Dx64.7z, OpenXRay.Mx86.7z, OpenXRay.Mx64.7z, OpenXRay.Rx86.7z, OpenXRay.Rx64.7z,
+    Symbols.Dx86.7z, Symbols.Dx64.7z, Symbols.Mx86.7z, Symbols.Mx64.7z, Symbols.Rx86.7z, Symbols.Rx64.7z
+  draft: true
+  force_update: true

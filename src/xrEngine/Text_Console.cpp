@@ -104,9 +104,9 @@ void CTextConsole::CreateLogWnd()
     lf.lfUnderline = 0;
     lf.lfStrikeOut = 0;
     lf.lfCharSet = DEFAULT_CHARSET;
-    lf.lfOutPrecision = OUT_STRING_PRECIS;
+    lf.lfOutPrecision = OUT_TT_PRECIS;
     lf.lfClipPrecision = CLIP_STROKE_PRECIS;
-    lf.lfQuality = DRAFT_QUALITY;
+    lf.lfQuality = CLEARTYPE_NATURAL_QUALITY;
     lf.lfPitchAndFamily = VARIABLE_PITCH | FF_SWISS;
     xr_sprintf(lf.lfFaceName, sizeof(lf.lfFaceName), "");
 
@@ -140,7 +140,20 @@ void CTextConsole::Initialize()
 {
     inherited::Initialize();
 
-    m_pMainWnd = &Device.m_hWnd;
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(Device.m_sdlWnd, &info))
+    {
+        switch (info.subsystem)
+        {
+        case SDL_SYSWM_WINDOWS:
+            m_pMainWnd = &info.info.win.window;
+            break;
+        default: break;
+        }
+    }
+    else
+        Log("Couldn't get window information: %s", SDL_GetError());
     m_dwLastUpdateTime = Device.dwTimeGlobal;
     m_last_time = Device.dwTimeGlobal;
 

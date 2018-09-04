@@ -2,8 +2,8 @@
 
 #include "GeometryBits.h"
 
-#include "phworld.h"
-#include "geometry.h"
+#include "PHWorld.h"
+#include "Geometry.h"
 
 enum geom_category { gct_static = 1 << 0, gct_dynamic = 1 << 1 };
 

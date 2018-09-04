@@ -90,7 +90,9 @@ extern BOOL g_show_wnd_rect2;
 //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
-// extern  BOOL	g_old_style_ui_hud;
+
+extern u32 UIStyleID;
+extern xr_vector<xr_token> UIStyleToken;
 
 extern float g_smart_cover_factor;
 extern int g_upgrades_log;
@@ -374,17 +376,20 @@ public:
 class CCC_DemoRecord : public IConsole_Command
 {
 public:
-    CCC_DemoRecord(LPCSTR N) : IConsole_Command(N){};
+    CCC_DemoRecord(LPCSTR N) : IConsole_Command(N) {}
     virtual void Execute(LPCSTR args)
     {
-#ifndef DEBUG
-// if (GameID() != eGameIDSingle)
-//{
-//	Msg("For this game type Demo Record is disabled.");
-//	return;
-//};
-#endif
+        if (!g_pGameLevel) // level not loaded
+        {
+            Log("Demo Record is disabled when level is not loaded.");
+            return;
+        }
+
         Console->Hide();
+
+        // close main menu if it is open
+        if (MainMenu()->IsActive())
+            MainMenu()->Activate(false);
 
         LPSTR fn_;
         STRCONCAT(fn_, args, ".xrdemo");
@@ -1313,6 +1318,16 @@ public:
     }
 };
 
+class CCC_UIRestart : public IConsole_Command
+{
+public:
+    CCC_UIRestart(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr /*args*/) override
+    {
+    }
+};
+
 struct CCC_StartTimeSingle : public IConsole_Command
 {
     CCC_StartTimeSingle(LPCSTR N) : IConsole_Command(N){};
@@ -1757,17 +1772,13 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
 
-#if !defined(MASTER_GOLD) || defined(DEBUG)
     CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
-#endif // DEBUG
 
-// Demo
-#if 1 // ndef MASTER_GOLD
+    // Demo
     CMD1(CCC_DemoPlay, "demo_play");
     CMD1(CCC_DemoRecord, "demo_record");
     CMD1(CCC_DemoRecordSetPos, "demo_set_cam_position");
-#endif // #ifndef MASTER_GOLD
 
 #ifndef MASTER_GOLD
     // ai
@@ -1901,7 +1912,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
-    CMD3(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
+    CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");
@@ -2099,7 +2110,9 @@ void CCC_RegisterCommands()
 #endif
     CMD4(CCC_Float, "con_sensitive", &g_console_sensitive, 0.01f, 1.0f);
     CMD4(CCC_Integer, "wpn_aim_toggle", &b_toggle_weapon_aim, 0, 1);
-//	CMD4(CCC_Integer,	"hud_old_style",			&g_old_style_ui_hud, 0, 1);
+
+    CMD1(CCC_UIRestart, "ui_restart");
+    CMD3(CCC_Token, "ui_style", &UIStyleID, UIStyleToken.data());
 
 #ifdef DEBUG
     CMD4(CCC_Float, "ai_smart_cover_animation_speed_factor", &g_smart_cover_animation_speed_factor, .1f, 10.f);

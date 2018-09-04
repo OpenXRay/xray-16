@@ -6,7 +6,7 @@
 #include "xrEngine/xr_object.h"
 #include "xrEngine/PS_Instance.h"
 #endif
-#include "xrEngine/Device.h"
+#include "xrEngine/device.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrCore/Threading/Lock.hpp"
@@ -153,12 +153,13 @@ void ISpatial_NODE::_remove(ISpatial* S)
 
 ISpatial_DB::ISpatial_DB(const char* name) :
 #ifdef CONFIG_PROFILE_LOCKS
-    pcs(new Lock(MUTEX_PROFILE_ID(ISpatial_DB)))
+    pcs(new Lock(MUTEX_PROFILE_ID(ISpatial_DB))),
 #else
-    pcs(new Lock)
+    pcs(new Lock),
 #endif // CONFIG_PROFILE_LOCKS
+    rt_insert_object(nullptr), m_root(nullptr),
+    m_bounds(0), q_result(nullptr)
 {
-    m_root = NULL;
     xr_strcpy(Name, name);
 }
 

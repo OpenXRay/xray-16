@@ -2,46 +2,63 @@ TITLE: X-Ray 1.6 build and setup instructions
 
 Build:
 ------
-Currently, the only compiler supported is Visual C++ 2015. If you don't have Visual Studio yet, you can
-download and install Visual Studio 2015 Community Edition - it's absolutely free for open source projects.
+Currently, the only compiler supported is Visual C++ 2017. If you don't have Visual Studio yet, you can
+download and install Visual Studio 2017 Community Edition - it's absolutely free for open source projects.
 
-By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in
+By default, all libraries mentioned below (except Windows SDK) are assumed to be in
 the src\Externals directory.
 
+Windows SDK is available from Visual Studio 2017 installer. You will definitely need to install the following items:
+* Windows 8.1 SDK (or newer)
+* Visual C++ MFC for x86 and x64
+* NuGet package manager
+
+You will need following extension to save files in Visual Studio with encoding UTF-8 without BOM:
+https://marketplace.visualstudio.com/items?itemName=hbuexinxin.ForceUTF8NoBOM
+
+Libraries:
+------
 To build X-Ray Engine you'll need following libraries:
-* OpenSSL: https://www.openssl.org/source
-  - Prebuilt binaries can be downloaded here: https://slproweb.com/products/Win32OpenSSL.html
-* OpenAutomate: https://developer.nvidia.com/openautomate
-* NVAPI: https://developer.nvidia.com/nvapi
-* libjpeg: http://sourceforge.net/projects/libjpeg
-  - Use "jpeg" as project root directory name for compatibility with CxImage
-* zlib: http://zlib.net
-* BugTrap: https://github.com/nitrocaster/BugTrap
+* Windows SDK
+* BugTrap: https://github.com/Xottab-DUTY/BugTrap
+* CryptoPP: https://github.com/weidai11/cryptopp
 * FreeImage: http://freeimage.sourceforge.net
-* FreeMagic
+* FreeMagic: https://github.com/OpenXRay/FreeMagic
+* GameSpy: https://github.com/nitrocaster/GameSpy
+* libjpeg: https://github.com/OpenXRay/libjpeg
+  - Use "jpeg" as project root directory name for compatibility with CxImage
 * libogg-1.1.4: http://xiph.org/downloads
 * libtheora-1.1.1: http://xiph.org/downloads
 * libvorbis-1.2.3: http://xiph.org/downloads
-* Autodesk Maya 2008/2009 SDK
-* Autodesk 3DS Max 6.0 SDK
-* Windows SDK: http://www.microsoft.com/en-us/download/details.aspx?id=8279
-* DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
-  - replace dxguid.lib with the one from Windows SDK
-    (for DirectPlay GUIDs)
-XXX nitrocaster: add LuaJIT & LuaBind instructions
-
-You can download all these libraries (except Windows/DirectX SDK) with compiled binaries here:
-https://drive.google.com/file/d/0B2mH6ffKfXjCMjRfRTZsVlBtUVE
+* Lightwave: https://github.com/OpenXRay/LightWave
+* Luabind: https://github.com/Xottab-DUTY/luabind-deboostified
+* LuaJIT: https://github.com/Xottab-DUTY/LuaJIT
+* lzo: https://github.com/alexgdi/lzo
+* Autodesk Maya 2008/2009 SDK: https://github.com/OpenXRay/maya
+* Autodesk 3DS Max 6.0 SDK: https://github.com/OpenXRay/3dsmax
+* NVAPI: https://developer.nvidia.com/nvapi
+* OpenAutomate: https://developer.nvidia.com/openautomate
+* pugixml: https://github.com/zeux/pugixml/
+* zlib: http://zlib.net
+All mentioned libraries are already in repository as submodules!
 
 Setup:
 ------
 - Install S.T.A.L.K.E.R Call of Pripyat
 - Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
   http://cop.stalker-game.ru/?page=patches#2
-- Download and unpack archive with libraries
-- Run xrbinprep.cmd to initialize new game binary directories and link default gamedata to OpenXRay's:
-  $ xrbinprep.cmd "C:\Program Files (x86)\GSC World Publishing\S.T.A.L.K.E.R. - Call of Pripyat"
-  Note that this script requires admin rights (in order to execute 'mklink'). Also make sure you pass a
-  game installation directory to this script. Once done, you can find .xrbinup_xxx scripts in the reporitory root:
-  use them later to install newly built binaries to the corresponding game binary directory.
+- Clone the repository (you should not download it as an archive)
+  You can just push `Open in Desktop` if you are using Github Desktop.
+  If you are using Git console, here's the command:
+  `git clone https://github.com/OpenXRay/xray-16.git --recurse-submodules`
+- If you are using git client, make sure all submodules are initialized.
+  Type this command in the Git console `git submodule update --init --recursive`
 - Now you can build the engine!
+
+Debug/Run from Visual Studio:
+------
+In solution "engine" properties in Visual Studio set:
+- Startup Project: Single startup project = xr_3da
+
+In Project "xr_3da" properties set:
+- Debugging: Working Directory = C:\PATH\TO\StalkerCallOfPripyat\ (which contains fsgame.ltx)

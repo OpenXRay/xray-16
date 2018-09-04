@@ -6,7 +6,10 @@ class CDestroyablePhysicsObject : public CPhysicObject,
                                   public CHitImmunity,
                                   public CDamageManager
 {
-    typedef CPhysicObject inherited;
+protected:
+    using inherited = CPhysicObject;
+
+private:
     float m_fHealth;
     ref_sound m_destroy_sound;
     shared_str m_destroy_particles;

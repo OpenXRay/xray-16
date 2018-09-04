@@ -715,7 +715,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 }
 
 CRelationMapLocation::CRelationMapLocation(const shared_str& type, u16 object_id, u16 pInvOwnerActorID)
-    : CMapLocation(*type, object_id)
+    : CMapLocation(*type, object_id), m_last_relation()
 {
     m_curr_spot_name = type;
     m_pInvOwnerActorID = pInvOwnerActorID;

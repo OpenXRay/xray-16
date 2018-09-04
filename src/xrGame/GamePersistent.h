@@ -11,6 +11,10 @@ class ui_core;
 
 class CGamePersistent : public IGame_Persistent, public IEventReceiver
 {
+protected:
+    using inherited = IGame_Persistent;
+
+private:
     // ambient particles
     CParticlesObject* ambient_particles;
     u32 ambient_sound_next_time[20]; // max snd channels
@@ -57,6 +61,7 @@ public:
     CGamePersistent();
     virtual ~CGamePersistent();
 
+    void PreStart(LPCSTR op) override;
     virtual void Start(LPCSTR op);
     virtual void Disconnect();
 
