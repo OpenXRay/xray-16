@@ -5,6 +5,7 @@ X-Ray Engine 1.6 expansion
 
 |Platform|Build Status|
 |--------|------|
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e4f1f1bed24949e88c9c5274c8842402)](https://app.codacy.com/app/OpenXRay/xray-16?utm_source=github.com&utm_medium=referral&utm_content=OpenXRay/xray-16&utm_campaign=Badge_Grade_Dashboard)
 | Linux x64 |[![Build Status](https://api.travis-ci.org/OpenXRay/xray-16.svg?branch=xd_dev)](https://travis-ci.org/OpenXRay/xray-16)|
 | Windows |[![Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
 
