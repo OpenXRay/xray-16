@@ -143,16 +143,27 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #endif
     HRESULT R;
 #ifdef USE_DX11
-    D3D_FEATURE_LEVEL pFeatureLevels[] = {
+    D3D_FEATURE_LEVEL featureLevels[] =
+    {
+        D3D_FEATURE_LEVEL_11_1,
         D3D_FEATURE_LEVEL_11_0,
-        // D3D_FEATURE_LEVEL_10_1,
-        // D3D_FEATURE_LEVEL_10_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0,
+        D3D_FEATURE_LEVEL_9_3,
+        D3D_FEATURE_LEVEL_9_2,
+        D3D_FEATURE_LEVEL_9_1,
     };
 
     R = D3D11CreateDevice(m_pAdapter,
         D3D_DRIVER_TYPE_UNKNOWN, // Если мы выбираем конкретный адаптер, то мы обязаны использовать D3D_DRIVER_TYPE_UNKNOWN.
-        NULL, createDeviceFlags, pFeatureLevels, sizeof(pFeatureLevels) / sizeof(pFeatureLevels[0]),
+        nullptr, createDeviceFlags, featureLevels, sizeof(featureLevels) / sizeof(featureLevels[0]),
         D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
+
+    if (FAILED(R))
+        R = D3D11CreateDevice(m_pAdapter,
+            D3D_DRIVER_TYPE_UNKNOWN, // Если мы выбираем конкретный адаптер, то мы обязаны использовать D3D_DRIVER_TYPE_UNKNOWN.
+            nullptr, createDeviceFlags, &featureLevels[1], sizeof(featureLevels) / sizeof(featureLevels[0]) - 1,
+            D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
 
