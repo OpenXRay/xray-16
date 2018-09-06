@@ -930,7 +930,7 @@ void D3DXRenderBase::overdrawBegin()
 {
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //  TODO: DX10: Implement overdrawBegin
-    VERIFY("! D3DXRenderBase::overdrawBegin not implemented.");
+    VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
 #else
     // Turn stenciling
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE));
@@ -952,7 +952,7 @@ void D3DXRenderBase::overdrawEnd()
 {
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     // TODO: DX10: Implement overdrawEnd
-    VERIFY("!D3DXRenderBase::overdrawEnd not implemented.");
+    VERIFY(!"D3DXRenderBase::overdrawEnd not implemented.");
 #else
     // Set up the stencil states
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP));
