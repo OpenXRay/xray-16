@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include <timeapi.h>
 #pragma hdrstop
 
 #if defined(WINDOWS)
+#include <timeapi.h>
 #include <intrin.h> // __rdtsc
 #include <process.h>
 #include <powerbase.h>
@@ -215,6 +215,7 @@ XRCORE_API u64 GetCLK()
 
 void Detect()
 {
+#if defined(WINDOWS)
     // Timers & frequency
     u64 start, end;
     u32 dwStart, dwTest;
@@ -273,6 +274,9 @@ void Detect()
     a = 1000000;
     b = double(clk_per_second);
     clk_to_microsec = float(double(a / b));
+#else
+#pragma message("FIXME!")
+#endif
 }
 } // namespace CPU
 
