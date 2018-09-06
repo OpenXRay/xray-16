@@ -7,6 +7,7 @@
 #include "SoundRender_Emitter.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#define OPENAL
 #include <eax/eax.h>
 #pragma warning(pop)
 

@@ -26,10 +26,12 @@
 #include "OpenALDeviceList.h"
 #include "xrCore/xr_token.h"
 
+#ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <objbase.h>
 #pragma warning(pop)
+#endif // _WIN32
 
 #ifdef _EDITOR
 log_fn_ptr_type* pLog = nullptr;
@@ -38,7 +40,9 @@ log_fn_ptr_type* pLog = nullptr;
 void __cdecl al_log(char* msg) { Log(msg); }
 ALDeviceList::ALDeviceList()
 {
+#ifdef _EDITOR
     pLog = al_log;
+#endif // _EDITOR
     snd_device_id = (u32)-1;
     Enumerate();
 }
@@ -66,7 +70,9 @@ void ALDeviceList::Enumerate()
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
 
+#ifdef _WIN32
     CoUninitialize();
+#endif
     // grab function pointers for 1.0-API functions, and if successful proceed to enumerate all devices
     if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
     {
@@ -169,8 +175,10 @@ void ALDeviceList::Enumerate()
             GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no",
             GetDeviceDesc(j).props.xram ? "yes" : "no");
     }
+#ifdef _WIN32
     if (!strstr(GetCommandLine(), "-weather"))
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+#endif
 }
 
 pcstr ALDeviceList::GetDeviceName(u32 index) const { return snd_devices_token[index].name; }
