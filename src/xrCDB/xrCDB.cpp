@@ -14,6 +14,7 @@ namespace Opcode
 using namespace CDB;
 using namespace Opcode;
 
+#ifdef _WIN32
 BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
@@ -25,6 +26,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
     }
     return TRUE;
 }
+#endif // _WIN32
 
 // Model building
 MODEL::MODEL() :
