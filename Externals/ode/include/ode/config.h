@@ -58,6 +58,8 @@ extern "C" {
 
 #include <math.h>
 
+#include <stdint.h>		// uintptr_t
+
 /* Define the dInfinity macro */
 #ifdef INFINITY
 #ifdef dSINGLE
