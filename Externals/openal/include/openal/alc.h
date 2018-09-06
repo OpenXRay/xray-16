@@ -273,7 +273,7 @@ typedef void           (ALC_APIENTRY *LPALCCAPTURESAMPLES)( ALCdevice *device, A
 #endif
 
 typedef void __cdecl log_fn_ptr_type(char*);
-extern ALC_API log_fn_ptr_type*	pLog ;
+extern log_fn_ptr_type*	pLog;
 
 void AlLog(char* format, ...);
 
