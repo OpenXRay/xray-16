@@ -4,7 +4,6 @@
 #include "xrEngine/xr_collide_form.h"
 #include "xrEngine/xr_object.h"
 #include "Intersect.hpp"
-#include "d3d9types.h"
 
 #ifdef DEBUG
 static BOOL _cdb_bDebug = false;
