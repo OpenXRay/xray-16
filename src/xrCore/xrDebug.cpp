@@ -745,7 +745,7 @@ void _terminate()
         exit(-1);
 #endif
     string4096 assertionInfo;
-    xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, nullptr, "Unexpected application termination");
+    xrDebug::GatherInfo(assertionInfo, sizeof(assertionInfo), DEBUG_INFO, nullptr, "Unexpected application termination");
     xr_strcat(assertionInfo, "Press OK to abort execution\r\n");
     xrDebug::ShowMessage("Fatal Error", assertionInfo);
     exit(-1);
