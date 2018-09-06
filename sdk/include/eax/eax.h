@@ -60,7 +60,7 @@ extern "C" {
 	#ifndef DEFINE_GUID
 		#ifndef INITGUID
 			#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
-					extern const GUID FAR name
+					extern const GUID name
 		#else
 			#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
 					extern const GUID name = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
@@ -70,8 +70,14 @@ extern "C" {
 	/*
 	* EAX OpenAL Extension {4FF53B81-1CE0-11d3-AAB8-00A0C95949D5}
 	*/
+#ifdef _WIN32
 	typedef ALenum (__cdecl *EAXSet)(const GUID*, ALuint, ALuint, ALvoid*, ALuint);
 	typedef ALenum (__cdecl *EAXGet)(const GUID*, ALuint, ALuint, ALvoid*, ALuint);
+#else
+	typedef ALenum (*EAXSet)(const GUID*, ALuint, ALuint, ALvoid*, ALuint);
+	typedef ALenum (*EAXGet)(const GUID*, ALuint, ALuint, ALvoid*, ALuint);
+#endif
+	
 #endif
 
 #pragma pack(push, 4)

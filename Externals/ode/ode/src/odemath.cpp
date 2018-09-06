@@ -23,6 +23,10 @@
 #include <ode/common.h>
 #include <ode/odemath.h>
 #include <float.h>
+#ifdef __linux__
+#include <math.h>
+#define _copysign copysign
+#endif // __linux__
 
 // this may be called for vectors `a' with extremely small magnitude, for
 // example the result of a cross product on two nearly perpendicular vectors.
