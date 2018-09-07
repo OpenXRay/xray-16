@@ -54,7 +54,7 @@ public:
     virtual void enable(bool value);
 
 protected:
-    virtual bool use_parent_ai_locations() const = 0 { return !enabled(); }
+    virtual bool use_parent_ai_locations() const = 0;
 public:
 #ifdef DEBUG
     static CAttachableItem* m_dbgItem;
