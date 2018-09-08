@@ -18,11 +18,10 @@ class CPathManager<CGameGraph, _DataStorage, SGameVertex<_dist_type, _index_type
           _dist_type, _index_type, _iteration_type>
 {
 protected:
-    typedef CGameGraph _Graph;
-    typedef SGameVertex<_dist_type, _index_type, _iteration_type> _Parameters;
-    typedef typename CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type, _iteration_type>,
-        _dist_type, _index_type, _iteration_type>
-        inherited;
+    using _Graph = CGameGraph;
+    using _Parameters = SGameVertex<_dist_type, _index_type, _iteration_type>;
+    using inherited = CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type, _iteration_type>,
+        _dist_type, _index_type, _iteration_type>;
 
 protected:
     _Parameters* m_evaluator;
