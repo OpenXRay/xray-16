@@ -179,7 +179,7 @@
     <ClInclude Include="luabind\luabind\yield_policy.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="LuaJIT\src\LuaJIT.vcxproj">
+    <ProjectReference Include="LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
   </ItemGroup>
