@@ -59,6 +59,9 @@
     <PostBuildEvent>
       <Command>$(OutDir)$(TargetName) ..\LuaJIT\dynasm\dynasm.lua -LN -D WIN -D JIT -D FFI -o ..\LuaJIT\src\host\buildvm_arch_$(PlatformShortName).h ..\LuaJIT\src\vm_x86.dasc</Command>
     </PostBuildEvent>
+    <ClCompile>
+      <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
     <PostBuildEvent>
