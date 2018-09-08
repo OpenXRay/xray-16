@@ -22,11 +22,10 @@ Build commands:
 ------
 cd xray-16
 git submodule update --init --recursive
-//temporary fix is removing cryptopp
 rm -rf Externals/cryptopp/*
 mkdir bin && cd bin
 cmake ..
-(or export CC=clang && export CXX=clang++ && cmake ..)
+(or CC=clang CXX=clang++ cmake ..)
 make
 
 Libraries (OLD LIST !!! ):
