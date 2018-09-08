@@ -20,7 +20,7 @@
 #include "ai_monster_space.h"
 #include "ai/monsters/control_animation_base.h"
 #include "UIGameCustom.h"
-#include "UI/UIStatic.h"
+#include "ui/UIStatic.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrEngine/profiler.h"
 #include "ActorEffector.h"

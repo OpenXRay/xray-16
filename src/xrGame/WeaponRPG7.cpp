@@ -82,7 +82,7 @@ void CWeaponRPG7::ReloadMagazine()
 void CWeaponRPG7::SwitchState(u32 S) { inherited::SwitchState(S); }
 void CWeaponRPG7::FireStart() { inherited::FireStart(); }
 #include "Inventory.h"
-#include "inventoryOwner.h"
+#include "InventoryOwner.h"
 void CWeaponRPG7::switch2_Fire()
 {
     m_iShotNum = 0;

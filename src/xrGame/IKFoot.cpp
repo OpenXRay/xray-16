@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#include "ikfoot.h"
+#include "IKFoot.h"
 
 #include "ik_collide_data.h"
 #include "GameObject.h"

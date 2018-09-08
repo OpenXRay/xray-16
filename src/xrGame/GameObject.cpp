@@ -1100,7 +1100,7 @@ void CGameObject::u_EventGen(NET_Packet& P, u32 type, u32 dest)
 }
 
 void CGameObject::u_EventSend(NET_Packet& P, u32 dwFlags) { Level().Send(P, dwFlags); }
-#include "bolt.h"
+#include "Bolt.h"
 
 BOOL CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
 BOOL CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }

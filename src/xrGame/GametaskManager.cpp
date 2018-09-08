@@ -8,7 +8,7 @@
 #include "map_location.h"
 #include "Actor.h"
 #include "UIGameSP.h"
-#include "ui/UIPDAWnd.h"
+#include "ui/UIPdaWnd.h"
 #include "encyclopedia_article.h"
 #include "ui/UIMapWnd.h"
 #include "xrCore/buffer_vector.h"

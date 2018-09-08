@@ -4,12 +4,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "customrocket.h"
+#include "CustomRocket.h"
 #include "ParticlesObject.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/ExtendedGeom.h"
-#include "xrPhysics/calculatetriangle.h"
-#include "xrPhysics/tri-colliderknoopc/dctriangle.h"
+#include "xrPhysics/CalculateTriangle.h"
+#include "xrPhysics/tri-colliderknoopc/dcTriangle.h"
 
 #include "Level.h"
 #include "xrMessages.h"

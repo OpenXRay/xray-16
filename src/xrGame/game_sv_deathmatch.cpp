@@ -9,7 +9,7 @@
 #include "Actor.h"
 #include "game_cl_base.h"
 #include "xr_level_controller.h"
-#include "hudItem.h"
+#include "HudItem.h"
 #include "Weapon.h"
 #include "eatable_item_object.h"
 #include "Missile.h"

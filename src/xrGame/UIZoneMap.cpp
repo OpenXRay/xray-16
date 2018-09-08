@@ -1,8 +1,8 @@
 #include "StdAfx.h"
-#include "uizonemap.h"
+#include "UIZoneMap.h"
 
 #include "InfoPortion.h"
-#include "Pda.h"
+#include "PDA.h"
 
 #include "Grenade.h"
 #include "Level.h"

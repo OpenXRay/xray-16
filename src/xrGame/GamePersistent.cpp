@@ -18,7 +18,7 @@
 #include "Actor.h"
 #include "Spectator.h"
 
-#include "UI/UItextureMaster.h"
+#include "ui/UITextureMaster.h"
 
 #include "xrEngine/xrSASH.h"
 #include "ai_space.h"
@@ -943,7 +943,6 @@ void CGamePersistent::UpdateDof()
     (m_dof[0].z < m_dof[2].z) ? clamp(m_dof[1].z, m_dof[0].z, m_dof[2].z) : clamp(m_dof[1].z, m_dof[2].z, m_dof[0].z);
 }
 
-#include "ui/uimainingamewnd.h"
 void CGamePersistent::OnSectorChanged(int sector)
 {
     if (CurrentGameUI())

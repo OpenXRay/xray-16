@@ -20,7 +20,7 @@
 #include "ai_space.h"
 #include "xrEngine/profiler.h"
 #include "Actor.h"
-#include "xrEngine/camerabase.h"
+#include "xrEngine/CameraBase.h"
 #include "GamePersistent.h"
 #include "actor_memory.h"
 #include "client_spawn_manager.h"

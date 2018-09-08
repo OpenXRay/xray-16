@@ -8,7 +8,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "animation_utils.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 hit_animation_global_params ghit_anims_params;

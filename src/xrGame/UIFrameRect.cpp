@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "uiFrameRect.h"
+#include "UIFrameRect.h"
 #include "HUDManager.h"
 #include "ui/uitexturemaster.h"
 

@@ -3,7 +3,7 @@
 #include "game_cl_base.h"
 #include "game_state_accumulator.h"
 #include "Actor.h"
-#include "actorcondition.h"
+#include "ActorCondition.h"
 
 namespace award_system
 {

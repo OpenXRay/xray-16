@@ -7,7 +7,7 @@
 #include "Actor.h"
 
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 CWeaponRG6::~CWeaponRG6() {}
@@ -43,7 +43,7 @@ void CWeaponRG6::Load(LPCSTR section)
     inheritedSG::Load(section);
 }
 #include "Inventory.h"
-#include "inventoryOwner.h"
+#include "InventoryOwner.h"
 void CWeaponRG6::FireStart()
 {
     if (GetState() == eIdle && getRocketCount())

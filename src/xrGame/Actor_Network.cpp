@@ -12,7 +12,7 @@
 #include "ActorEffector.h"
 
 #include "xrPhysics/IPHWorld.h"
-#include "xrPhysics/actorcameracollision.h"
+#include "xrPhysics/ActorCameraCollision.h"
 #include "Level.h"
 #include "xr_level_controller.h"
 #include "game_cl_base.h"

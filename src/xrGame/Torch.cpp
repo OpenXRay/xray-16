@@ -9,7 +9,7 @@
 
 #include "Level.h"
 #include "Include/xrRender/Kinematics.h"
-#include "xrEngine/camerabase.h"
+#include "xrEngine/CameraBase.h"
 #include "xrEngine/xr_collide_form.h"
 #include "Inventory.h"
 #include "game_base_space.h"

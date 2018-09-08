@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "actor_mp_client.h"
-#include "actorcondition.h"
+#include "ActorCondition.h"
 #include "xrEngine/CameraBase.h"
 #include "xrEngine/CameraManager.h"
 

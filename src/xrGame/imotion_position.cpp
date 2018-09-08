@@ -10,7 +10,7 @@
 #include "animation_utils.h"
 #include "xrCore/buffer_vector.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 #ifdef DEBUG

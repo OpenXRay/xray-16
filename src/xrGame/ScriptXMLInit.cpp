@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "ScriptXmlInit.h"
+#include "ScriptXMLInit.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UITextureMaster.h"
 #include "ui/UICheckButton.h"

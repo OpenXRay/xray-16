@@ -3,7 +3,7 @@
 #include "cover_point.h"
 #include "cover_manager.h"
 #include "cover_evaluators.h"
-#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "detail_path_manager.h"
 #include "level_location_selector.h"
 #include "level_path_manager.h"

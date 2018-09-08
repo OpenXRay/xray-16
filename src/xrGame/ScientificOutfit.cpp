@@ -6,7 +6,7 @@
 #pragma once
 
 #include "StdAfx.h"
-#include "scientificoutfit.h"
+#include "ScientificOutfit.h"
 
 CScientificOutfit::CScientificOutfit() {}
 CScientificOutfit::~CScientificOutfit() {}
