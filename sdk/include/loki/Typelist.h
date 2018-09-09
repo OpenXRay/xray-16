@@ -20,8 +20,7 @@
 #define TYPELIST_INC_
 
 #include <type_traits>
-
-struct None {};
+#include "EmptyType.h"
 
 namespace Loki
 {
