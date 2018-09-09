@@ -1,7 +1,7 @@
 #pragma once
 #include "alife_abstract_registry.h"
 
-enum ETaskState
+enum ETaskState : u32
 {
     eTaskStateFail = 0,
     eTaskStateInProgress,

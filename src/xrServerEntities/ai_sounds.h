@@ -11,7 +11,7 @@
 #define ai_soundsH
 #include "xrCore/xr_token.h"
 
-enum ESoundTypes
+enum ESoundTypes : u32
 {
 #if defined(WINDOWS)
     SOUND_TYPE_NO_SOUND = 0x00000000ui32,

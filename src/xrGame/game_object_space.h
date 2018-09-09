@@ -2,7 +2,7 @@
 
 namespace GameObject
 {
-enum ECallbackType
+enum ECallbackType : u32
 {
     eTradeStart = u32(0),
     eTradeStop,

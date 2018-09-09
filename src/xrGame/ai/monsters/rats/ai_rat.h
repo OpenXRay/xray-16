@@ -17,7 +17,7 @@
 
 class CBlend;
 class CPatrolPath;
-enum ESoundTypes;
+enum ESoundTypes : u32;
 class rat_state_manager;
 
 namespace steering_behaviour

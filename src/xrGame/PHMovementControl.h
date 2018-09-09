@@ -7,7 +7,7 @@
 
 namespace ALife
 {
-enum EHitType;
+enum EHitType : u32;
 }
 
 namespace DetailPathManager

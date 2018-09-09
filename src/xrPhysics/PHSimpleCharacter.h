@@ -9,7 +9,7 @@
 
 namespace ALife
 {
-enum EHitType;
+enum EHitType : u32;
 };
 #ifdef DEBUG
 #include "debug_output.h"

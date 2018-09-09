@@ -10,7 +10,7 @@
 
 namespace StalkerDecisionSpace
 {
-enum EWorldProperties
+enum EWorldProperties : u32
 {
     eWorldPropertyAlive = u32(0),
     eWorldPropertyDead,

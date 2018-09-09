@@ -9,7 +9,7 @@
 #ifndef ai_soundsH
 #define ai_soundsH
 
-enum ESoundTypes
+enum ESoundTypes : u32
 {
     SOUND_TYPE_NO_SOUND = 0x00000000ui32,
 

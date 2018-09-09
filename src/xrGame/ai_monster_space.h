@@ -12,28 +12,28 @@
 
 namespace MonsterSpace
 {
-enum EMentalState
+enum EMentalState : u32
 {
     eMentalStateDanger = u32(0),
     eMentalStateFree,
     eMentalStatePanic,
 };
 
-enum EBodyState
+enum EBodyState : u32
 {
     eBodyStateCrouch = u32(0),
     eBodyStateStand,
     eBodyStateDummy = u32(-1)
 };
 
-enum EMovementType
+enum EMovementType : u32
 {
     eMovementTypeWalk = 0,
     eMovementTypeRun,
     eMovementTypeStand,
 };
 
-enum EMovementDirection
+enum EMovementDirection : u32
 {
     eMovementDirectionForward = 0,
     eMovementDirectionBackward,
@@ -41,7 +41,7 @@ enum EMovementDirection
     eMovementDirectionRight,
 };
 
-enum EObjectAction
+enum EObjectAction : u32
 {
     eObjectActionSwitch1,
     eObjectActionSwitch2,
@@ -83,7 +83,7 @@ struct SBoneRotation
     float speed;
 };
 
-enum EScriptMonsterMoveAction
+enum EScriptMonsterMoveAction : u32
 {
     eMA_WalkFwd,
     eMA_WalkBkwd,
@@ -95,14 +95,14 @@ enum EScriptMonsterMoveAction
     eMA_RunWithLeader
 };
 
-enum EScriptMonsterSpeedParam
+enum EScriptMonsterSpeedParam : u32
 {
     eSP_Default = u32(0),
     eSP_ForceSpeed,
     eSP_None = u32(-1),
 };
 
-enum EScriptMonsterAnimAction
+enum EScriptMonsterAnimAction : u32
 {
     eAA_StandIdle,
     eAA_CapturePrepare,
@@ -117,7 +117,7 @@ enum EScriptMonsterAnimAction
     eAA_NoAction = u32(-1)
 };
 
-enum EScriptMonsterGlobalAction
+enum EScriptMonsterGlobalAction : u32
 {
     eGA_Rest = u32(0),
     eGA_Eat,
@@ -126,13 +126,13 @@ enum EScriptMonsterGlobalAction
     eGA_None = u32(-1)
 };
 
-enum EScriptSoundAnim
+enum EScriptSoundAnim : u32
 {
     eAnimSoundCustom = u32(0),
     eAnimSoundDefault,
 };
 
-enum EMonsterHeadAnimType
+enum EMonsterHeadAnimType : u32
 {
     eHeadAnimNormal = u32(0),
     eHeadAnimAngry,
