@@ -3,22 +3,15 @@
 
 XRCORE_API bool g_bEnableStatGather = false;
 
-CStatTimer::CStatTimer()
-{
-    accum = 0;
-    result = 0.f;
-    count = 0;
-}
-
 void CStatTimer::FrameStart()
 {
-    accum = 0;
+    accum = Duration();
     count = 0;
 }
 
 void CStatTimer::FrameEnd()
 {
-    const float time = 1000.f * float(double(accum) / double(CPU::qpc_freq));
+    const float time = GetElapsed_sec();
     if (time > result)
         result = time;
     else
