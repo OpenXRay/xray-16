@@ -53,7 +53,7 @@ private:
     }
 
     template <>
-    static void Load<Loki::NullType>(TContainer* self, IReader& reader)
+    static void Load<Loki::EmptyType>(TContainer* self, IReader& reader)
     {
     }
 
@@ -64,7 +64,7 @@ private:
     }
 
     template <>
-    static void Save<Loki::NullType>(TContainer* self, IWriter& writer)
+    static void Save<Loki::EmptyType>(TContainer* self, IWriter& writer)
     {
     }
 

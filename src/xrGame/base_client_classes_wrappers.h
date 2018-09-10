@@ -34,7 +34,7 @@ struct heritage
     {
     };
 
-    typedef Loki::Typelist<_1, Loki::Typelist<_2, Loki::NullType>> tl;
+    typedef Loki::Typelist<_1, Loki::Typelist<_2, Loki::EmptyType>> tl;
     typedef typename Loki::TL::Erase<tl, Loki::EmptyType>::Result pure_tl;
     typedef typename Loki::GenLinearHierarchy<pure_tl, linear_registrator> result;
 };

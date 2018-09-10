@@ -96,7 +96,7 @@ private:
     template <typename TypeListElement>
     void init_acpv_list();
     template <>
-    void init_acpv_list<Loki::NullType>(){};
+    void init_acpv_list<Loki::EmptyType>(){};
 
     void update_average_values();
     void update_accumulative_values();
