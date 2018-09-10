@@ -9,6 +9,6 @@ private:
 
 protected:
 public:
-    CWeaponFORT();
-    virtual ~CWeaponFORT();
+    CWeaponFORT() {}
+    virtual ~CWeaponFORT() {}
 };
