@@ -9,7 +9,7 @@
 #include "pch_script.h"
 #include "Common/object_broker.h"
 #include "UIInventoryUpgradeWnd.h"
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
 #include "string_table.h"
 

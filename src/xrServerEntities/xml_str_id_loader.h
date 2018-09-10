@@ -1,9 +1,9 @@
 #pragma once
 
 #ifdef XRGAME_EXPORTS
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #else // XRGAME_EXPORTS
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "Common/object_broker.h"
 #endif // XRGAME_EXPORTS
 

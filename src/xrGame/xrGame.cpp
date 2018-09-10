@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "object_factory.h"
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "xr_level_controller.h"
 #include "xrEngine/profiler.h"
 
@@ -49,12 +49,15 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
 // g_profiler			= new CProfiler();
 #endif
+        gStringTable = new CStringTable();
+        StringTable().Init();
         break;
     }
 
     case DLL_PROCESS_DETACH:
     {
         CleanupUIStyleToken();
+        xr_delete(gStringTable);
         break;
     }
     }

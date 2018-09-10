@@ -12,7 +12,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 
 template <typename _return_type>
 class CScriptCallbackEx;

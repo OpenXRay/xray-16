@@ -28,6 +28,9 @@
     <Filter Include="LuaStudio\Backend">
       <UniqueIdentifier>{48cb416c-d090-4ae9-b4e3-56abea843d93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ScriptCallbackEx">
+      <UniqueIdentifier>{b1b81af3-4b79-4435-92cc-5226c808c8ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.hpp">
@@ -114,6 +117,9 @@
     <ClInclude Include="BindingsDumper.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="script_callback_ex.h">
+      <Filter>ScriptCallbackEx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -158,5 +164,8 @@
     <ClCompile Include="BindingsDumper.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

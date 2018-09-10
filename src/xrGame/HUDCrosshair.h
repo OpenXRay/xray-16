@@ -6,7 +6,7 @@
 
 #define HUD_CURSOR_SECTION "hud_cursor"
 
-#include "ui_defs.h"
+#include "xrUICore/ui_defs.h"
 
 class CHUDCrosshair
 {

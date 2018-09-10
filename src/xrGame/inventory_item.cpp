@@ -93,8 +93,8 @@ void CInventoryItem::Load(LPCSTR section)
         self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
 
     m_section_id._set(section);
-    m_name = CStringTable().translate(pSettings->r_string(section, "inv_name"));
-    m_nameShort = CStringTable().translate(pSettings->r_string(section, "inv_name_short"));
+    m_name = StringTable().translate(pSettings->r_string(section, "inv_name"));
+    m_nameShort = StringTable().translate(pSettings->r_string(section, "inv_name_short"));
 
     m_weight = pSettings->r_float(section, "inv_weight");
     R_ASSERT(m_weight >= 0.f);
@@ -103,7 +103,7 @@ void CInventoryItem::Load(LPCSTR section)
     u32 sl = pSettings->r_u32(section, "slot");
     m_ItemCurrPlace.base_slot_id = (sl == -1) ? 0 : (sl + 1);
 
-    m_Description = CStringTable().translate(pSettings->r_string(section, "description"));
+    m_Description = StringTable().translate(pSettings->r_string(section, "description"));
 
     m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
     m_can_trade = READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE);

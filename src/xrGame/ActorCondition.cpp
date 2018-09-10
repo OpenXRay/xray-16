@@ -9,10 +9,10 @@
 #include "autosave_manager.h"
 #include "xrserver.h"
 #include "ai_space.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"
 #include "game_object_space.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "Common/object_broker.h"
 #include "weapon.h"
 
@@ -20,7 +20,7 @@
 #include "ai/monsters/basemonster/base_monster.h"
 #include "UIGameCustom.h"
 #include "ui/UIMainIngameWnd.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 
 #define MAX_SATIETY 1.0f
 #define START_SATIETY 0.5f

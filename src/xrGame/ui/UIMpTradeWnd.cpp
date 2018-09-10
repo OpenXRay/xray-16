@@ -2,7 +2,7 @@
 #include "UIMpTradeWnd.h"
 #include "UIMpItemsStoreWnd.h"
 #include "UITabButtonMP.h"
-#include "UITabControl.h"
+#include "xrUICore/TabControl/UITabControl.h"
 #include "UIDragDropListEx.h"
 #include "UICellItem.h"
 #include "UIDialogHolder.h"

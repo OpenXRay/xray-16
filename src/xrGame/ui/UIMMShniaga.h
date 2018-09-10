@@ -1,12 +1,24 @@
 #pragma once
-
-#include "UIWindow.h"
+#include "xrUICore/Windows/UIWindow.h"
 
 class CUIStatic;
 class CUITextWnd;
 class CUIXml;
 class CUIScrollView;
 class CMMSound;
+
+class CUIMMMagnifer : public CUIStatic
+{
+public:
+    CUIMMMagnifer();
+    virtual ~CUIMMMagnifer();
+    void SetPPMode();
+    void ResetPPMode();
+    bool GetPPMode() { return m_bPP; };
+
+protected:
+    bool m_bPP;
+};
 
 class CUIMMShniaga : public CUIWindow, public CDeviceResetNotifier
 {
@@ -51,7 +63,7 @@ protected:
     float pos(float x1, float x2, u32 t);
 
     CUIStatic* m_shniaga;
-    CUIStatic* m_magnifier;
+    CUIMMMagnifer* m_magnifier;
     CUIScrollView* m_view;
 
     u32 m_start_time;

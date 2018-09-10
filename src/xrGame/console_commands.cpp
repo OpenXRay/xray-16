@@ -32,7 +32,7 @@
 #include "ui/UIOptConCom.h"
 #include "UIGameSP.h"
 #include "ui/UIActorMenu.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "zone_effector.h"
 #include "GameTask.h"
 #include "MainMenu.h"
@@ -86,7 +86,7 @@ extern BOOL g_ShowAnimationInfo;
 extern BOOL g_bShowHitSectors;
 // extern	BOOL	g_bDebugDumpPhysicsStep	;
 extern ESingleGameDifficulty g_SingleGameDifficulty;
-extern BOOL g_show_wnd_rect2;
+XRUICORE_API extern BOOL g_show_wnd_rect2;
 //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
@@ -570,7 +570,7 @@ public:
 #endif
         StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true);
         LPSTR save_name;
-        STRCONCAT(save_name, CStringTable().translate("st_game_saved").c_str(), ": ", S);
+        STRCONCAT(save_name, StringTable().translate("st_game_saved").c_str(), ": ", S);
         _s->wnd()->TextItemControl()->SetText(save_name);
 
         xr_strcat(S, ".dds");

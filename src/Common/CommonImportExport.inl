@@ -72,6 +72,12 @@
 #define XRSOUND_API XR_IMPORT
 #endif
 
+#ifdef XRUICORE_EXPORTS
+#define XRUICORE_API XR_EXPORT
+#else
+#define XRUICORE_API XR_IMPORT
+#endif
+
 #ifndef ENGINE_API
 #ifndef NO_ENGINE_API
 #ifdef ENGINE_BUILD

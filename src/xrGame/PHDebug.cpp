@@ -22,7 +22,7 @@
 #include "xrCore/xr_token.h"
 #include "xrEngine/GameFont.h"
 
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 
 Flags32 ph_dbg_draw_mask;
 Flags32 ph_dbg_draw_mask1;

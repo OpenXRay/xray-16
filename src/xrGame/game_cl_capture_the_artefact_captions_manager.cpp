@@ -49,7 +49,6 @@ void CTAGameClCaptionsManager::ShowInProgressCaptions()
     if (!control_entity)
         return;
 
-    CStringTable st;
     if (ps->team == static_cast<u8>(etSpectatorsTeam))
     {
         VERIFY(smart_cast<CSpectator*>(control_entity));
@@ -98,11 +97,10 @@ void CTAGameClCaptionsManager::ShowPendingCaptions() {}
 void CTAGameClCaptionsManager::ShowScoreCaptions()
 {
     VERIFY(m_winner_team != etSpectatorsTeam);
-    CStringTable st;
     LPCSTR team_name = CTeamInfo::GetTeam_name(m_winner_team + 1);
-    u32 win_str_size = st.translate("mp_team_wins").size() + xr_strlen(team_name) + 1;
+    u32 win_str_size = StringTable().translate("mp_team_wins").size() + xr_strlen(team_name) + 1;
     char* win_str = static_cast<char*>(_alloca(win_str_size));
-    xr_sprintf(win_str, win_str_size, st.translate("mp_team_wins").c_str(), team_name);
+    xr_sprintf(win_str, win_str_size, StringTable().translate("mp_team_wins").c_str(), team_name);
     parent_game_ui->SetRoundResultCaption(win_str);
 }
 
@@ -176,7 +174,7 @@ u32 CTAGameClCaptionsManager::SetWarmupTime(u32 current_warmup_time, u32 current
     u32 time_remains = current_warmup_time - current_time;
 
     string64 time_str;
-    CStringTable st;
+    CStringTable& st = StringTable();
     ConvertTime2String(time_str, time_remains);
 
     warmup_message[0] = 0; // bad style

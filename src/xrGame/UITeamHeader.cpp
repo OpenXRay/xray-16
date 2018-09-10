@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UITeamHeader.h"
 #include "UITeamState.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "xrCore/buffer_vector.h"
 
 UITeamHeader::UITeamHeader(UITeamState const* const parent) : m_parent(parent), m_team_header_root() {}
@@ -50,7 +50,6 @@ void UITeamHeader::InitFieldsStatics(CUIXml& uiXml)
 {
     VERIFY(m_team_header_root);
     int tempNumber = uiXml.GetNodesNum(m_team_header_root, FILED_NODE_NAME);
-    CStringTable st;
     for (int i = 0; i < tempNumber; ++i)
     {
         XML_NODE tempFieldNode = uiXml.NavigateToNode(FILED_NODE_NAME, i);
@@ -62,7 +61,7 @@ void UITeamHeader::InitFieldsStatics(CUIXml& uiXml)
         this->AttachChild(static_cast<CUIWindow*>(tempField));
         tempField->SetAutoDelete(true);
         CUIXmlInit::InitStatic(uiXml, FILED_NODE_NAME, i, tempField);
-        m_translated_strings.insert(std::make_pair(shared_str(tempFieldName), st.translate(tempFieldName)));
+        m_translated_strings.insert(std::make_pair(shared_str(tempFieldName), StringTable().translate(tempFieldName)));
         m_field_fillers.insert(std::make_pair(shared_str(tempFieldName), tempField));
     }
 }

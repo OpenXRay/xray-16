@@ -4,7 +4,7 @@
 
 #include "xrCore/fastdelegate.h"
 //#include "pch_script.h" // Don't include PCH headers from a header. It frequently creates circular dependencies!
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "mixed_delegate_unique_tags.h"
 
 template <typename Signature, int UniqueTag = mdut_no_unique_tag>
