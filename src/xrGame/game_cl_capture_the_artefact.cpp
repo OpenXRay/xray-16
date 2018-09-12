@@ -1261,7 +1261,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     command[psize - 1] = 0;
     player[psize - 1] = 0;
 
-    sscanf_s(command, "%s", cmd_name, psize);
+    sscanf(command, "%s", cmd_name);
     u32 cmd_len = xr_strlen(cmd_name);
     u32 tcmd_len = cmd_len;
 
@@ -1276,8 +1276,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     Msg("---Vote command: %s", cmd_name);
 #endif
 
-    int args_count = sscanf_s(command + cmd_len, scans_format, args[0], psize + 1, args[1], psize + 1, args[2],
-        psize + 1, args[3], psize + 1, args[4], psize + 1);
+    int args_count = sscanf(command + cmd_len, scans_format, args[0], args[1], args[2], args[3], args[4]);
     if (args_count < 0)
         args_count = 0;
 
