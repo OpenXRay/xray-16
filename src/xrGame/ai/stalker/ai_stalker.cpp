@@ -19,7 +19,7 @@
 #include "Inventory.h"
 #include "Artefact.h"
 #include "PHMovementControl.h"
-#include "xrServerEntities/xrserver_objects_alife_monsters.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "cover_evaluators.h"
 #include "xrServer.h"
 #include "xr_level_controller.h"

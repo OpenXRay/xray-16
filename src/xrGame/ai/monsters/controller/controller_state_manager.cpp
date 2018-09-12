@@ -11,7 +11,6 @@
 #include "ai/monsters/controlled_entity.h"
 
 #include "ai/monsters/states/monster_state_rest.h"
-#include "controller_state_attack.h"
 #include "ai/monsters/states/monster_state_attack_melee.h"
 #include "ai/monsters/states/monster_state_attack_run.h"
 #include "ai/monsters/states/monster_state_eat.h"
@@ -20,6 +19,7 @@
 #include "ai/monsters/states/monster_state_hear_danger_sound.h"
 #include "ai/monsters/states/monster_state_hitted.h"
 #include "ai/monsters/states/monster_state_attack.h"
+#include "controller_state_attack.h"
 
 #include "EntityCondition.h"
 

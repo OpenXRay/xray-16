@@ -34,7 +34,7 @@
 #include "UIMessageBoxEx.h"
 #include "UIPropertiesBox.h"
 #include "UIMainIngameWnd.h"
-#include "Trade.h"
+#include "trade.h"
 
 void CUIActorMenu::SetActor(CInventoryOwner* io)
 {

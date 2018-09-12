@@ -6,7 +6,7 @@
 #include "game_cl_base.h"
 #include "game_cl_mp.h"
 #include "Actor.h"
-#include "xrServer_Object_base.h"
+#include "xrServer_Object_Base.h"
 #include "RegistryFuncs.h"
 #include "GamePersistent.h"
 #include "MainMenu.h"

@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include ".\uiradiobutton.h"
+#include "UIRadioButton.h"
 #include "UILines.h"
 
 void CUIRadioButton::InitButton(Fvector2 pos, Fvector2 size)

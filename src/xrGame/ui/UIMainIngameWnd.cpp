@@ -14,7 +14,7 @@
 #include "WeaponMagazined.h"
 #include "Missile.h"
 #include "Grenade.h"
-#include "xrServerEntities/xrServer_objects_ALife.h"
+#include "xrServerEntities/xrServer_Objects_ALife.h"
 #include "alife_simulator.h"
 #include "alife_object_registry.h"
 #include "game_cl_base.h"

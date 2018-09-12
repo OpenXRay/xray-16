@@ -20,7 +20,7 @@
 #include "alife_group_registry.h"
 #include "alife_object_registry.h"
 #include "xrCore/_vector3d_ext.h"
-#include "xrServerEntities/xrServer_Objects_Alife_Monsters.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 
 using namespace MonsterSpace;
 using namespace MonsterSound;

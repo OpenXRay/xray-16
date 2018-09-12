@@ -4,7 +4,7 @@
 #include "ai/monsters/states/monster_state_attack_run_attack.h"
 #include "ai/monsters/states/state_hide_from_point.h"
 #include "ai/monsters/states/monster_state_find_enemy.h"
-#include "group_state_squad_move_to_radius.h "
+#include "group_state_squad_move_to_radius.h"
 #include "group_state_home_point_attack.h"
 #include "group_state_custom.h"
 #include "ai/monsters/ai_monster_squad.h"

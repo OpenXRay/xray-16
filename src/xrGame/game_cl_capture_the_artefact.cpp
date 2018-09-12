@@ -7,7 +7,7 @@
 #include "Artefact.h"
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
-#include "ui/UIPDAWnd.h"
+#include "ui/UIPdaWnd.h"
 #include "ui/UIMapDesc.h"
 #include "ui/UIVote.h"
 #include "ui/TeamInfo.h"

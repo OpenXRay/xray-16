@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "UIFrameRect.h"
 #include "HUDManager.h"
-#include "ui/uitexturemaster.h"
+#include "ui/UITextureMaster.h"
 
 CUIFrameRect::CUIFrameRect()
 {

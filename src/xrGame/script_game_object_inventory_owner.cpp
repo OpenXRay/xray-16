@@ -25,7 +25,7 @@
 #include "ActorCondition.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "HudItem.h"
-#include "ui/UItalkWnd.h"
+#include "ui/UITalkWnd.h"
 #include "Inventory.h"
 #include "InfoPortion.h"
 #include "ai/monsters/basemonster/base_monster.h"

@@ -10,7 +10,7 @@
 #include "UICellItemFactory.h"
 #include "InventoryOwner.h"
 #include "Inventory.h"
-#include "Trade.h"
+#include "trade.h"
 #include "Entity.h"
 #include "Actor.h"
 #include "Weapon.h"

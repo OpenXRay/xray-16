@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "ai/monsters/PseudoGigant/pseudo_gigant.h"
-#include "ai/monsters/PseudoGigant/pseudo_gigant_step_effector.h"
+#include "ai/monsters/pseudogigant/pseudo_gigant.h"
+#include "ai/monsters/pseudogigant/pseudo_gigant_step_effector.h"
 #include "Actor.h"
 #include "ActorEffector.h"
 #include "Level.h"

@@ -32,7 +32,7 @@
 #include "alife_simulator.h"
 #include "alife_object_registry.h"
 #include "date_time.h"
-#include "custommonster.h"
+#include "CustomMonster.h"
 #include "movement_manager.h"
 #include "location_manager.h"
 #endif

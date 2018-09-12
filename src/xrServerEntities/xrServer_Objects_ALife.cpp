@@ -26,7 +26,7 @@
 #ifndef XRGAME_EXPORTS
 LPCSTR GAME_CONFIG = "game.ltx";
 #else // XRGAME_EXPORTS
-#include "xrEngine/render.h"
+#include "xrEngine/Render.h"
 #endif // XRGAME_EXPORTS
 
 #ifdef XRSE_FACTORY_EXPORTS

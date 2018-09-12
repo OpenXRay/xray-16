@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "ai/monsters/Flesh/flesh.h"
-#include "ai/monsters/Flesh/flesh_state_manager.h"
+#include "ai/monsters/flesh/flesh.h"
+#include "ai/monsters/flesh/flesh_state_manager.h"
 #include "ai/monsters/control_animation_base.h"
 #include "ai/monsters/control_direction_base.h"
 #include "ai/monsters/control_movement_base.h"

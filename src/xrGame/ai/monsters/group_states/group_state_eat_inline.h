@@ -9,7 +9,7 @@
 #include "CharacterPhysicsSupport.h"
 #include "group_state_eat_drag.h"
 #include "group_state_custom.h"
-#include "group_state_eat_eat.h "
+#include "group_state_eat_eat.h"
 
 #define TEMPLATE_SPECIALIZATION \
     template <typename _Object\

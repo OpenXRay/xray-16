@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "uiscrollbar.h"
+#include "UIScrollBar.h"
 #include "UI3tButton.h"
 #include "UIScrollBox.h"
 #include "UIXmlInit.h"

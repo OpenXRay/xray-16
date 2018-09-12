@@ -19,8 +19,8 @@
 #include "ai_space.h"
 #include "cover_point.h"
 #include "cover_manager.h"
-#include "ai/monsters/Controller/controller_animation.h"
-#include "ai/monsters/Controller/controller_direction.h"
+#include "ai/monsters/controller/controller_animation.h"
+#include "ai/monsters/controller/controller_direction.h"
 #include "ai/monsters/control_direction_base.h"
 #include "ai/monsters/control_movement_base.h"
 #include "ai/monsters/control_path_builder_base.h"
@@ -31,7 +31,7 @@
 #include "character_community.h"
 #include "InventoryOwner.h"
 #include "xrServerEntities/character_info.h"
-#include "ai/monsters/Controller/controller_psy_hit.h"
+#include "ai/monsters/controller/controller_psy_hit.h"
 #include "ai/monsters/monster_cover_manager.h"
 
 const u32 _pmt_psy_attack_delay = 2000;
