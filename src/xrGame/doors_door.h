@@ -14,7 +14,7 @@ class CPhysicObject;
 namespace doors
 {
 class actor;
-enum door_state;
+enum door_state : int;
 
 class door : private Noncopyable
 {

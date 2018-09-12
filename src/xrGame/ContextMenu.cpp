@@ -17,7 +17,7 @@ CContextMenu::~CContextMenu()
 void CContextMenu::Load(CInifile* INI, LPCSTR SECT)
 {
     CInifile::Sect& S = INI->r_section(SECT);
-    for (CInifile::SectCIt I = S.Data.begin(); S.Data.end() != I; ++I)
+    for (auto I = S.Data.begin(); S.Data.end() != I; ++I)
     {
         char Event[128], Param[128];
         Event[0] = 0;

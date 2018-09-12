@@ -370,7 +370,7 @@ TEMPLATE_SPECIALIZATION
 IC typename CProblemSolverAbstract::edge_value_type CProblemSolverAbstract::estimate_edge_weight(
     const _index_type& condition) const
 {
-    return (helper::estimate_edge_weight_impl<reverse_search>(*this, condition));
+    return (helper::template estimate_edge_weight_impl<reverse_search>(*this, condition));
 }
 
 TEMPLATE_SPECIALIZATION
