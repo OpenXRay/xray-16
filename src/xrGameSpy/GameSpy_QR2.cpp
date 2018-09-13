@@ -85,21 +85,27 @@ void CGameSpy_QR2::RegisterAdditionalKeys()
     qr2_register_keyA(SERVER_UP_TIME_KEY, ("server_up_time"));
 };
 
-bool CGameSpy_QR2::Init(int PortID, int Public, Context& ctx)
-{
-    //--------- QR2 Init -------------------------/
-    // call qr_init with the query port number and gamename, default IP address, and no user data
-
-    //	if (qr2_initA(NULL,NULL,PortID, GAMESPY_GAMENAME, m_SecretKey, Public, 0,
-    qr2_error_t err = xrGS_qr2_initA(NULL, NULL, PortID, Public, 0, ctx.OnServerKey, ctx.OnPlayerKey, ctx.OnTeamKey,
-        ctx.OnKeyList, ctx.OnCount, ctx.OnError, &ctx);
+bool CGameSpy_QR2::Init(int PortID, int Public, SInitConfig& ctx)
+{        
+    qr2_error_t err = xrGS_qr2_initA(nullptr, 
+                                     nullptr, 
+                                     PortID, 
+                                     Public, 
+                                     0, 
+                                     ctx.OnServerKey, 
+                                     ctx.OnPlayerKey, 
+                                     ctx.OnTeamKey,
+                                     ctx.OnKeyList, 
+                                     ctx.OnCount, 
+                                     ctx.OnError, 
+                                     ctx.GSServer);
+        
 #ifndef MASTER_GOLD
     Msg("xrGS::xrGS_qr2_initA returned code is [%d]", err);
 #endif // #ifndef MASTER_GOLD
 
     if (err != e_qrnoerror)
     {
-        //		_tprintf(_T("Error starting query sockets\n"));
         Msg("xrGS::QR2 : Failes to Initialize!");
         return false;
     }
@@ -112,8 +118,7 @@ bool CGameSpy_QR2::Init(int PortID, int Public, Context& ctx)
     // Set a function to be called when we receive a nat negotiation request
     qr2_register_natneg_callback(NULL, ctx.OnNatNeg);
 
-    // Set a function to be called when gamespy responds my IP and port number
-    // qr2_register_publicaddress_callback(NULL, callback_public);
+    // Set a function to be called when gamespy responds my IP and port number    
     qr2_register_denyresponsetoip_callback(NULL, ctx.OnDenyIP);
 
 #ifndef MASTER_GOLD

@@ -7,7 +7,7 @@
 // void			xrGameSpyServer::QR2_Init			(u32 PortID)
 void xrGameSpyServer::QR2_Init(int PortID)
 {
-    CGameSpy_QR2::Context ctx;
+    CGameSpy_QR2::SInitConfig ctx;
     ctx.OnServerKey = callback_serverkey;
     ctx.OnPlayerKey = callback_playerkey;
     ctx.OnTeamKey = callback_teamkey;
