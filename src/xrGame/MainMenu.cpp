@@ -761,7 +761,7 @@ bool CMainMenu::IsCDKeyIsValid()
     for (int i = 0; i < 4; i++)
     {
         GetGameID(&GameID, i);
-        if (VerifyClientCheck(CDKey, unsigned short(GameID)) == 1)
+        if (VerifyClientCheck(CDKey, (unsigned short)(GameID)) == 1)
             return true;
     };
     return false;

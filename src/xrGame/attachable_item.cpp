@@ -125,7 +125,7 @@ void CAttachableItem::afterDetach()
     object().processing_deactivate();
 }
 
-virtual bool CAttachableItem::use_parent_ai_locations() const
+bool CAttachableItem::use_parent_ai_locations() const
 {
     return !enabled();
 }

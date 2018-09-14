@@ -150,7 +150,7 @@ typedef unsigned char* LPBYTE;
 typedef unsigned int UINT;
 typedef int INT;
 typedef unsigned long ULONG;
-typedef unsigned long& ULONG_PTR;
+typedef unsigned long* ULONG_PTR;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
 
@@ -208,7 +208,7 @@ typedef unsigned int UINT_PTR;
 typedef long LONG_PTR;
 #endif // XR_X64
 
-typedef int HANDLE;
+typedef void* HANDLE;
 typedef void* HMODULE;
 typedef void* PVOID;
 typedef void* LPVOID;

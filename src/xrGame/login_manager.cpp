@@ -350,7 +350,7 @@ void login_manager::save_password_to_registry(char const* password)
         return;
     }
 
-    key_t pass_key;
+    secure_messaging::key_t pass_key;
     generate_key(pass_key_seed, pass_key);
     u32 buffer_size = xr_strlen(password) + 1;
     u8* buffer = static_cast<u8*>(_alloca(buffer_size));
@@ -370,7 +370,7 @@ char const* login_manager::get_password_from_registry()
 
     if (pass_size)
     {
-        key_t pass_key;
+        secure_messaging::key_t pass_key;
         generate_key(pass_key_seed, pass_key);
         decrypt(tmp_password_dest, pass_size, pass_key);
         xr_strcpy(m_reg_password, (char*)tmp_password_dest);

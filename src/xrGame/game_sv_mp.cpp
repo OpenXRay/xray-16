@@ -229,6 +229,7 @@ struct real_sender
         P = Packet;
         flags_to_send = flags;
     }
+
     void operator()(IClient* client)
     {
         xrClientData* tmp_client = static_cast<xrClientData*>(client);

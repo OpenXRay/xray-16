@@ -690,7 +690,7 @@ ICollisionHitCallback* CEntityAlive::get_collision_hit_callback()
     if (cs)
         return cs->get_collision_hit_callback();
     else
-        return false;
+        return nullptr;
 }
 
 void CEntityAlive::set_collision_hit_callback(ICollisionHitCallback* cc)

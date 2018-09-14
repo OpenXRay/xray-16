@@ -8,6 +8,8 @@
 #include "debug_text_tree.h"
 #endif
 
+inline TTime current_time() { return Device.dwTimeGlobal; }
+
 template <typename _Object>
 class CState
 {
