@@ -69,6 +69,7 @@ void ForceSetGoodwill(CSE_ALifeMonsterAbstract* self, int goodwill, ALife::_OBJE
 
 static void CSE_ALifeMonsterAbstract_Export(lua_State* luaState)
 {
+#ifndef LINUX // FIXME!!!
     module(luaState)[luabind_class_monster2(
         CSE_ALifeMonsterAbstract, "cse_alife_monster_abstract", CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable)
                          .def("smart_terrain_id", &smart_terrain_id)
@@ -89,8 +90,9 @@ static void CSE_ALifeMonsterAbstract_Export(lua_State* luaState)
                          .def("force_set_goodwill", &ForceSetGoodwill)
 #endif
     ];
+#endif
 }
-
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT_FUNC(
     CSE_ALifeMonsterAbstract, (CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable), CSE_ALifeMonsterAbstract_Export);
 
@@ -112,3 +114,4 @@ SCRIPT_EXPORT_FUNC(
 SCRIPT_EXPORT(CSE_ALifePsyDogPhantom, (CSE_ALifeMonsterBase), {
     module(luaState)[luabind_class_monster1(CSE_ALifePsyDogPhantom, "cse_alife_psydog_phantom", CSE_ALifeMonsterBase)];
 });
+#endif

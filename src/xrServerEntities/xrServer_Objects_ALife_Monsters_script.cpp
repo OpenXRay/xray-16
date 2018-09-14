@@ -13,6 +13,7 @@
 
 using namespace luabind;
 
+#ifndef LINUX // FIXME!!!
 #ifdef XRGAME_EXPORTS
 LPCSTR profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
 SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
@@ -53,3 +54,4 @@ SCRIPT_EXPORT(CSE_ALifeMonsterRat, (CSE_ALifeMonsterAbstract, CSE_ALifeInventory
     module(luaState)[luabind_class_monster2(
         CSE_ALifeMonsterRat, "cse_alife_monster_rat", CSE_ALifeMonsterAbstract, CSE_ALifeInventoryItem)];
 });
+#endif

@@ -39,12 +39,14 @@
 #include "doors.h"
 #include "xrNetServer/NET_Messages.h"
 
+#ifndef LINUX // FIXME!!!
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <intrin.h>
 #pragma warning(pop)
 
 #pragma intrinsic(_InterlockedCompareExchange)
+#endif
 
 extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 
@@ -109,8 +111,10 @@ void CGameObject::MakeMeCrow()
         return;
     u32 const device_frame_id = Device.dwFrame;
     u32 const object_frame_id = dwFrame_AsCrow;
+#ifndef LINUX // FIXME!!!
     if ((u32)_InterlockedCompareExchange((long*)&dwFrame_AsCrow, device_frame_id, object_frame_id) == device_frame_id)
         return;
+#endif
     VERIFY(dwFrame_AsCrow == device_frame_id);
     Props.crow = 1;
     g_pGameLevel->Objects.o_crow(this);

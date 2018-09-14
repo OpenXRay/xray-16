@@ -15,6 +15,7 @@ using namespace luabind;
 
 static void CSE_SmartCover_Export(lua_State* luaState)
 {
+#ifndef LINUX // FIXME!!!
     module(luaState)[luabind_class_dynamic_alife1(CSE_SmartCover, "cse_smart_cover", CSE_ALifeDynamicObject)
                          .def("description", &CSE_SmartCover::description)
 #ifndef AI_COMPILER
@@ -24,6 +25,9 @@ static void CSE_SmartCover_Export(lua_State* luaState)
                          .def("set_loopholes_table_checker", &CSE_SmartCover::set_loopholes_table_checker)
 #endif
     ];
+#endif
 }
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT_FUNC(CSE_SmartCover, (CSE_ALifeDynamicObject), CSE_SmartCover_Export);
+#endif

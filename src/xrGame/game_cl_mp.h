@@ -328,7 +328,9 @@ public:
 
     void __stdcall sending_screenshot_callback(file_transfer::sending_status_t status, u32 bytes_sent, u32 data_size);
     //-------------------------------------------------------------------------------------------------
+#ifndef LINUX
     static void generate_file_name(string_path& file_name, LPCSTR file_suffix, SYSTEMTIME const& date_time);
+#endif
     static LPCSTR make_file_name(LPCSTR session_id, string_path& dest);
 //-------------------------------------------------------------------------------------------------
 #include "game_cl_mp_messages_menu.h"

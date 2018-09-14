@@ -67,6 +67,7 @@ CUIMapList::~CUIMapList() {}
 void CUIMapList::StartDedicatedServer()
 {
     string_path ModuleFileName;
+#ifndef LINUX // FIXME!!!
     GetModuleFileName(NULL, ModuleFileName, sizeof(ModuleFileName));
 
     char* ModuleName = NULL;
@@ -83,6 +84,7 @@ void CUIMapList::StartDedicatedServer()
     Msg("Going to quit before starting dedicated server");
     Msg("Working folder is:%s", g_sLaunchWorkingFolder);
     Msg("%s %s", g_sLaunchOnExit_app, g_sLaunchOnExit_params);
+#endif
     Console->Execute("quit");
 }
 

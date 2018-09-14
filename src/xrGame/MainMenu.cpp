@@ -608,8 +608,9 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 
     string4096 FilePath = "";
     char* FileName = NULL;
+#ifndef LINUX // FIXME!!!
     GetFullPathName(fileName, 4096, FilePath, &FileName);
-
+#endif
     string_path fname;
     if (FS.path_exist("$downloads$"))
     {

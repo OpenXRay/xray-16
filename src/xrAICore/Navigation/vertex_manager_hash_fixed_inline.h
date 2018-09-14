@@ -67,7 +67,11 @@ inline bool CHashFixedVertexManager::is_opened(const Vertex& vertex) const { ret
 TEMPLATE_SPECIALIZATION
 inline u32 CHashFixedVertexManager::hash_index(const Index& vertex_id) const
 {
+#ifdef LINUX // FIXME!!
+    return 0;
+#else
     return hash_fixed_vertex_manager::to_u32(vertex_id) % HashSize;
+#endif
 }
 
 TEMPLATE_SPECIALIZATION

@@ -37,6 +37,8 @@ SCRIPT_EXPORT(login_operation_cb, (), {
                          .def(constructor<>())
                          .def(constructor<gamespy_gp::login_operation_cb::lua_object_type,
                              gamespy_gp::login_operation_cb::lua_function_type>())
+#ifndef LINUX // FIXME!!!
                          .def("bind", &gamespy_gp::login_operation_cb::bind)
+#endif
                          .def("clear", &gamespy_gp::login_operation_cb::clear)];
 });

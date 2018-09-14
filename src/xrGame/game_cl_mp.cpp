@@ -1535,11 +1535,13 @@ void game_cl_mp::SendCollectedData(u8 const* buffer, u32 buffer_size, u32 uncomp
         upload_memory_writer.pointer(), upload_memory_writer.size(), sending_cb, uncompressed_size);
 };
 
+#ifndef LINUX // FIXME!!!
 void game_cl_mp::generate_file_name(string_path& file_name, LPCSTR file_suffix, SYSTEMTIME const& date_time)
 {
     xr_sprintf(file_name, "%02d%02d%02d-%02d%02d%02d_%s", date_time.wYear % 100, date_time.wMonth, date_time.wDay,
         date_time.wHour, date_time.wMinute, date_time.wSecond, file_suffix);
 }
+#endif
 
 LPCSTR game_cl_mp::make_file_name(LPCSTR session_id, string_path& dest)
 {
@@ -1582,9 +1584,11 @@ void game_cl_mp::PrepareToReceiveFile(
     string_path screen_shot_fn;
     LPCSTR dest_file_name = NULL;
     STRCONCAT(dest_file_name, make_file_name(client_session_id.c_str(), screen_shot_fn));
+#ifndef LINUX // FIXME!!!
     SYSTEMTIME date_time;
     GetLocalTime(&date_time);
     generate_file_name(screen_shot_fn, dest_file_name, date_time);
+#endif
 
     fr_callback_binder* tmp_binder = get_receiver_cb_binder();
     if (!tmp_binder)

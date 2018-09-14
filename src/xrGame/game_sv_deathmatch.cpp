@@ -104,7 +104,11 @@ void game_sv_Deathmatch::Create(shared_str& options)
 
     switch_Phase(GAME_PHASE_PENDING);
 
+#ifdef LINUX // FIXME!!!
+    ::Random.seed(0);
+#else
     ::Random.seed(GetTickCount());
+#endif
     m_CorpseList.clear();
 
     m_AnomaliesPermanent.clear();
