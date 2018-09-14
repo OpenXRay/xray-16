@@ -183,7 +183,7 @@ bool CBloodsuckerStateAttackAbstract::check_hiding()
 TEMPLATE_SPECIALIZATION
 void CBloodsuckerStateAttackAbstract::setup_substates()
 {
-    state_ptr state = get_state_current();
+    typename inherited::state_ptr state = get_state_current();
 
     if (current_substate == eStateAttack_Hide)
     {
