@@ -187,7 +187,7 @@ void CBloodsuckerStateAttackAbstract::setup_substates()
 
     if (current_substate == eStateAttack_Hide)
     {
-        CStateMonsterBackstubEnemy<_Object>::StateParams data;
+        typename CStateMonsterBackstubEnemy<_Object>::StateParams data;
 
         data.action.action = ACT_RUN;
         data.action.time_out = 0;

@@ -21,22 +21,21 @@
 #include <loki/HierarchyGenerators.h>
 #include "xrServer_Object_Base.h"
 
+template <typename _type, typename _base>
+struct linear_registrator : public _base, public _type
+{
+};
+
+template <typename _type>
+struct linear_registrator<_type, Loki::EmptyType> : public _type
+{
+};
+
 template <typename _1, typename _2>
 struct heritage
 {
-    template <typename _type, typename _base>
-    struct linear_registrator : public _base, public _type
-    {
-    };
-
-    template <typename _type>
-    struct linear_registrator<_type, Loki::EmptyType> : public _type
-    {
-    };
-
-    typedef Loki::Typelist<_1, Loki::Typelist<_2, Loki::EmptyType>> tl;
-    typedef typename Loki::TL::Erase<tl, Loki::EmptyType>::Result pure_tl;
-    typedef typename Loki::GenLinearHierarchy<pure_tl, linear_registrator> result;
+    using tl = Loki::Typelist<_1, _2>;
+    using result = Loki::GenLinearHierarchy<tl, linear_registrator>;
 };
 
 template <typename base>
@@ -46,7 +45,7 @@ public:
     IC FactoryObjectWrapperTpl(){};
     virtual ~FactoryObjectWrapperTpl(){};
 
-    virtual IFactoryObject* _construct() { return (call_member<IFactoryObject*>(this, "_construct")); }
+    virtual IFactoryObject* _construct() { return (luabind::call_member<IFactoryObject*>(this, "_construct")); }
     static IFactoryObject* _construct_static(base* self) { return (self->base::_construct()); }
 private:
     // not exported

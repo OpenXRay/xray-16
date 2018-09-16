@@ -2,6 +2,7 @@
 #include "pseudodog.h"
 
 class CPsyDogPhantom;
+class CPsyDogAura;
 
 class CPsyDog : public CAI_PseudoDog
 {

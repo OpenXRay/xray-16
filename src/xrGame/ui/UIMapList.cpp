@@ -145,7 +145,7 @@ void CUIMapList::OnListItemClicked()
     m_pMapInfo->InitMap(M.map_name.c_str(), M.map_ver.c_str());
 }
 
-xr_token g_GameModes[];
+extern xr_token g_GameModes[];
 
 void CUIMapList::OnModeChange() { UpdateMapList(GetCurGameType()); }
 EGameIDs CUIMapList::GetCurGameType()

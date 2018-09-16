@@ -1592,7 +1592,7 @@ void game_cl_CaptureTheArtefact::OnRender()
                 VERIFY(ps->getName());
                 string64 upper_name;
                 xr_strcpy(upper_name, ps->getName());
-                _strupr_s(upper_name);
+                _strupr(upper_name);
                 pActor->RenderText(upper_name, IPos, &dup, PLAYER_NAME_COLOR);
             }
             if (m_bFriendlyIndicators)
