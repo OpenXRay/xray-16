@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "UIBuyWeaponTab.h"
-#include "xrUICore/TabControl/UITabButton.h"
+#include "UITabButton.h"
 
 void CUIBuyWeaponTab::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "KillMessageStruct.h"
-#include "xrUICore/Static/UIStatic.h"
+#include "UIStatic.h"
 
 class CUIPdaKillMessage : public CUIColorAnimConrollerContainer
 {

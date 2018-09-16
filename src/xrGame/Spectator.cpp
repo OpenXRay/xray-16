@@ -641,20 +641,21 @@ void CSpectator::GetSpectatorString(string1024& pStr)
         return;
 
     xr_string SpectatorMsg;
+    CStringTable st;
     switch (cam_active)
     {
     case eacFreeFly:
     {
-        SpectatorMsg = *StringTable().translate("mp_spectator");
+        SpectatorMsg = *st.translate("mp_spectator");
         SpectatorMsg += " ";
-        SpectatorMsg += *StringTable().translate("mp_free_fly");
+        SpectatorMsg += *st.translate("mp_free_fly");
     }
     break;
     case eacFirstEye:
     {
-        SpectatorMsg = *StringTable().translate("mp_spectator");
+        SpectatorMsg = *st.translate("mp_spectator");
         SpectatorMsg += " ";
-        SpectatorMsg += *StringTable().translate("mp_first_eye");
+        SpectatorMsg += *st.translate("mp_first_eye");
         SpectatorMsg += " ";
         //			SpectatorMsg = "SPECTATOR (First-Eye): ";
         SpectatorMsg += m_pActorToLookAt ? m_pActorToLookAt->Name() : "";
@@ -662,9 +663,9 @@ void CSpectator::GetSpectatorString(string1024& pStr)
     break;
     case eacFreeLook:
     {
-        SpectatorMsg = *StringTable().translate("mp_spectator");
+        SpectatorMsg = *st.translate("mp_spectator");
         SpectatorMsg += " ";
-        SpectatorMsg += *StringTable().translate("mp_free_look");
+        SpectatorMsg += *st.translate("mp_free_look");
         SpectatorMsg += " ";
         //			SpectatorMsg = "SPECTATOR (Free-Look):";
         SpectatorMsg += m_pActorToLookAt ? m_pActorToLookAt->Name() : "";
@@ -672,9 +673,9 @@ void CSpectator::GetSpectatorString(string1024& pStr)
     break;
     case eacLookAt:
     {
-        SpectatorMsg = *StringTable().translate("mp_spectator");
+        SpectatorMsg = *st.translate("mp_spectator");
         SpectatorMsg += " ";
-        SpectatorMsg += *StringTable().translate("mp_look_at");
+        SpectatorMsg += *st.translate("mp_look_at");
         SpectatorMsg += " ";
         //			SpectatorMsg = "SPECTATOR (Look-At):";
         SpectatorMsg += m_pActorToLookAt ? m_pActorToLookAt->Name() : "";

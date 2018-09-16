@@ -3,8 +3,8 @@
 #include "UIStats.h"
 #include "UIXmlInit.h"
 #include "UIStatsPlayerList.h"
-#include "xrUICore/Static/UIStatic.h"
-#include "xrUICore/Windows/UIFrameWindow.h"
+#include "UIStatic.h"
+#include "UIFrameWindow.h"
 #include "Level.h"
 #include "game_base_space.h"
 

@@ -9,7 +9,7 @@
 #define UI_ACTOR_STATE_INFO_H_INCLUDED
 
 #include "alife_space.h"
-#include "xrUICore/Hint/UIHint.h"
+#include "UIHint.h"
 
 class CUIProgressBar;
 class CUIProgressShape;

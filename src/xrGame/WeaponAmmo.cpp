@@ -67,7 +67,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     VERIFY(u16(-1) != bullet_material_idx);
     VERIFY(param_s.fWallmarkSize > 0);
 
-    m_InvShortName = StringTable().translate(pSettings->r_string(section, "inv_name_short"));
+    m_InvShortName = CStringTable().translate(pSettings->r_string(section, "inv_name_short"));
 }
 
 float CCartridge::Weight() const

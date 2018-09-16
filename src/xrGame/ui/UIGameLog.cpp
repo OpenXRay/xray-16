@@ -10,7 +10,7 @@
 #include "UIXmlInit.h"
 #include "UIPdaMsgListItem.h"
 #include "UIPdaKillMessage.h"
-#include "xrUICore/Lines/UILines.h"
+#include "UILines.h"
 
 CUIGameLog::CUIGameLog()
 {

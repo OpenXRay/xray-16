@@ -6,7 +6,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/profiler.h"
 #include "MainMenu.h"
-#include "xrUICore/Cursor/UICursor.h"
+#include "UICursor.h"
 #include "game_base_space.h"
 #include "Level.h"
 #include "ParticlesObject.h"
@@ -18,7 +18,7 @@
 #include "actor.h"
 #include "spectator.h"
 
-#include "xrUICore/XML/UITextureMaster.h"
+#include "UI/UItextureMaster.h"
 
 #include "xrEngine/xrSASH.h"
 #include "ai_space.h"
@@ -116,8 +116,9 @@ CGamePersistent::CGamePersistent(void)
 
     ZeroMemory(ambient_sound_next_time, sizeof(ambient_sound_next_time));
 
-    m_pMainMenu = nullptr;
-    m_intro = nullptr;
+    m_pUI_core = NULL;
+    m_pMainMenu = NULL;
+    m_intro = NULL;
     m_intro_event.bind(this, &CGamePersistent::start_logo_intro);
 #ifdef DEBUG
     m_frame_counter = 0;
@@ -206,7 +207,7 @@ void CGamePersistent::OnAppStart()
     GMLib.Load();
     init_game_globals();
     inherited::OnAppStart();
-    GEnv.UI = new ui_core();
+    m_pUI_core = new ui_core();
     m_pMainMenu = new CMainMenu();
 }
 
@@ -216,7 +217,7 @@ void CGamePersistent::OnAppEnd()
         m_pMainMenu->Activate(false);
 
     xr_delete(m_pMainMenu);
-    xr_delete(GEnv.UI);
+    xr_delete(m_pUI_core);
 
     inherited::OnAppEnd();
 
@@ -868,7 +869,7 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
             tip_num = m_functor(map_name.c_str());
         }
         //		tip_num = 83;
-        xr_sprintf(buff, "%s%d:", StringTable().translate("ls_tip_number").c_str(), tip_num);
+        xr_sprintf(buff, "%s%d:", CStringTable().translate("ls_tip_number").c_str(), tip_num);
         shared_str tmp = buff;
 
         if (is_single)
@@ -877,7 +878,7 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
             xr_sprintf(buff, "ls_mp_tip_%d", tip_num);
 
         pApp->LoadTitleInt(
-            StringTable().translate("ls_header").c_str(), tmp.c_str(), StringTable().translate(buff).c_str());
+            CStringTable().translate("ls_header").c_str(), tmp.c_str(), CStringTable().translate(buff).c_str());
     }
 }
 
@@ -886,7 +887,7 @@ void CGamePersistent::SetLoadStageTitle(pcstr ls_title)
     string256 buff;
     if (ls_title)
     {
-        xr_sprintf(buff, "%s%s", StringTable().translate(ls_title).c_str(), "...");
+        xr_sprintf(buff, "%s%s", CStringTable().translate(ls_title).c_str(), "...");
         pApp->SetLoadStageTitle(buff);
     }
     else
@@ -952,5 +953,5 @@ void CGamePersistent::OnSectorChanged(int sector)
 void CGamePersistent::OnAssetsChanged()
 {
     IGame_Persistent::OnAssetsChanged();
-    StringTable().rescan();
+    CStringTable().rescan();
 }

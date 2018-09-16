@@ -1,9 +1,9 @@
 #pragma once
 
 #include "UIDialogWnd.h"
-#include "xrUICore/Callbacks/UIWndCallback.h"
+#include "UIWndCallback.h"
 #include "xrServerEntities/inventory_space.h"
-#include "xrUICore/Hint/UIHint.h"
+#include "UIHint.h"
 
 class CUICharacterInfo;
 class CUIDragDropListEx;

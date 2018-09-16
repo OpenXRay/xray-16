@@ -1,7 +1,7 @@
 #pragma once
 
-#include "xrUICore/Static/UIStatic.h"
-#include "xrUICore/ListBox/UIListBoxItem.h"
+#include "UIStatic.h"
+#include "UIListBoxItem.h"
 
 struct LIST_SRV_SIZES
 {

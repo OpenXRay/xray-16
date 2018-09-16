@@ -1,8 +1,8 @@
 #ifndef UITEAMSTATE
 #define UITEAMSTATE
 
-#include "xrUICore/Windows/UIWindow.h"
-#include "xrUICore/XML/xrUIXmlParser.h"
+#include "ui/UIWindow.h"
+#include "ui/xrUIXmlParser.h"
 #include "ui/UIXmlInit.h"
 
 #include "game_cl_base.h"

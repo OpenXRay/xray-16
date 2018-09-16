@@ -10,9 +10,9 @@
 #include "UIDragDropReferenceList.h"
 #include "UICellCustomItems.h"
 #include "UIItemInfo.h"
-#include "xrUICore/Windows/UIFrameLineWnd.h"
-#include "xrUICore/PropertiesBox/UIPropertiesBox.h"
-#include "xrUICore/ListBox/UIListBoxItem.h"
+#include "UIFrameLineWnd.h"
+#include "UIPropertiesBox.h"
+#include "UIListBoxItem.h"
 #include "UIMainIngameWnd.h"
 #include "UIGameCustom.h"
 #include "eatable_item_object.h"
@@ -27,7 +27,7 @@
 #include "Antirad.h"
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
-#include "xrUICore/Cursor/UICursor.h"
+#include "UICursor.h"
 #include "MPPlayersBag.h"
 #include "player_hud.h"
 #include "CustomDetector.h"
@@ -1038,7 +1038,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
     {
         if (item_in_slot_2 && item_in_slot_2->CanAttach(pScope))
         {
-            shared_str str = StringTable().translate("st_attach_scope_to_pistol");
+            shared_str str = CStringTable().translate("st_attach_scope_to_pistol");
             str.printf("%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_2, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_scope_to_pistol",  (void*)item_in_slot_2,
@@ -1047,7 +1047,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         }
         if (item_in_slot_3 && item_in_slot_3->CanAttach(pScope))
         {
-            shared_str str = StringTable().translate("st_attach_scope_to_pistol");
+            shared_str str = CStringTable().translate("st_attach_scope_to_pistol");
             str.printf("%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_3, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_scope_to_rifle",  (void*)item_in_slot_3,
@@ -1061,7 +1061,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
     {
         if (item_in_slot_2 && item_in_slot_2->CanAttach(pSilencer))
         {
-            shared_str str = StringTable().translate("st_attach_silencer_to_pistol");
+            shared_str str = CStringTable().translate("st_attach_silencer_to_pistol");
             str.printf("%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_2, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_silencer_to_pistol",  (void*)item_in_slot_2,
@@ -1070,7 +1070,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         }
         if (item_in_slot_3 && item_in_slot_3->CanAttach(pSilencer))
         {
-            shared_str str = StringTable().translate("st_attach_silencer_to_pistol");
+            shared_str str = CStringTable().translate("st_attach_silencer_to_pistol");
             str.printf("%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_3, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_silencer_to_rifle",  (void*)item_in_slot_3,
@@ -1084,7 +1084,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
     {
         if (item_in_slot_2 && item_in_slot_2->CanAttach(pGrenadeLauncher))
         {
-            shared_str str = StringTable().translate("st_attach_gl_to_rifle");
+            shared_str str = CStringTable().translate("st_attach_gl_to_rifle");
             str.printf("%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_2, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_gl_to_pistol",  (void*)item_in_slot_2,
@@ -1094,7 +1094,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         }
         if (item_in_slot_3 && item_in_slot_3->CanAttach(pGrenadeLauncher))
         {
-            shared_str str = StringTable().translate("st_attach_gl_to_rifle");
+            shared_str str = CStringTable().translate("st_attach_gl_to_rifle");
             str.printf("%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_3, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_gl_to_rifle",  (void*)item_in_slot_3,

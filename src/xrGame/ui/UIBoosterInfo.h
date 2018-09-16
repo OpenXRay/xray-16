@@ -1,5 +1,5 @@
 #pragma once
-#include "xrUICore/Windows/UIWindow.h"
+#include "UIWindow.h"
 #include "EntityCondition.h"
 
 class CUIXml;

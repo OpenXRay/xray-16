@@ -22,7 +22,7 @@
 
 #define PLAYING_ANIM_TIME 10000
 
-#include "xrUICore/ProgressBar/UIProgressShape.h"
+#include "ui/UIProgressShape.h"
 #include "ui/UIXmlInit.h"
 #include "physicsshellholder.h"
 

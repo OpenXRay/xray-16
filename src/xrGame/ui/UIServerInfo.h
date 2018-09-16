@@ -2,7 +2,7 @@
 #define UISERVER_INFO_INCLUDED
 
 #include "UIDialogWnd.h"
-#include "xrUICore/Callbacks/UIWndCallback.h"
+#include "UIWndCallback.h"
 
 class CUIStatic;
 class CUIScrollView;

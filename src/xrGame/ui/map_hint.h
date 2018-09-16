@@ -1,5 +1,5 @@
 #pragma once
-#include "xrUICore/Windows/UIFrameWindow.h"
+#include "UIFrameWindow.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 
 class CUIStatic;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIRankIndicator.h"
 #include "UIXmlInit.h"
-#include "xrUICore/Static/UIStatic.h"
+#include "UIStatic.h"
 
 CUIRankIndicator::CUIRankIndicator() { m_current = u8(-1); }
 CUIRankIndicator::~CUIRankIndicator()

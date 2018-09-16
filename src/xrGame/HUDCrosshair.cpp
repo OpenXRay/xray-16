@@ -5,7 +5,8 @@
 #include "stdafx.h"
 
 #include "HUDCrosshair.h"
-#include "xrUICore/ui_base.h"
+//.#include "UIStaticItem.h"
+#include "ui_base.h"
 
 CHUDCrosshair::CHUDCrosshair()
 {

@@ -6,12 +6,11 @@
 #include "ai_sounds.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
-#include "xrScriptEngine/script_callback_ex.h"
+#include "script_callback_ex.h"
 #include "game_object_space.h"
 #include "script_game_object.h"
 #include "xrEngine/LightAnimLibrary.h"
-#include "xrUICore/ui_base.h"
-
+#include "ui_base.h"
 #ifdef DEBUG
 #include "xrEngine/GameFont.h"
 #endif

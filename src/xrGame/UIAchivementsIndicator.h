@@ -1,7 +1,7 @@
 #ifndef UI_ACHIVEMENTS_INDICATOR_INCLUDED
 #define UI_ACHIVEMENTS_INDICATOR_INCLUDED
 
-#include "xrUICore/Static/UIStatic.h"
+#include "ui/UIStatic.h"
 #include "ui/KillMessageStruct.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 

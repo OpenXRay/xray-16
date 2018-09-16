@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "UIDragDropListEx.h"
-#include "xrUICore/ScrollBar/UIScrollBar.h"
+#include "UIScrollBar.h"
 #include "Common/object_broker.h"
 #include "UICellItem.h"
-#include "xrUICore/Cursor/UICursor.h"
+#include "UICursor.h"
 //Alundaio
 #include "Inventory.h"
 //-Alundaio

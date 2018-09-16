@@ -1,5 +1,5 @@
 #pragma once
-#include "xrUICore/Windows/UIWindow.h"
+#include "UIWindow.h"
 #include "xrServerEntities/alife_space.h"
 
 class CUIXml;

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "xrUICore/ScrollView/UIScrollView.h"
+#include "UIScrollView.h"
 
 class CUIXml;
 class CUIPdaKillMessage;

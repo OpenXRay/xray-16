@@ -9,8 +9,8 @@
 #ifndef UI_INVENTORY_UPGRADE_INFO_H_INCLUDED
 #define UI_INVENTORY_UPGRADE_INFO_H_INCLUDED
 
-#include "xrUICore/Windows/UIWindow.h"
-#include "xrUICore/XML/xrUIXmlParser.h"
+#include "UIWindow.h"
+#include "xrUIXmlParser.h"
 
 namespace inventory
 {

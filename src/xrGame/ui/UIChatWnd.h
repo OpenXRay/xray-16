@@ -1,6 +1,6 @@
 #pragma once
 #include "UIDialogWnd.h"
-#include "xrUICore/Callbacks/UIWndCallback.h"
+#include "UIWndCallback.h"
 
 class CUIXml;
 class CUIGameLog;

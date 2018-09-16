@@ -573,7 +573,7 @@ void stop_tutorial()
         g_tutorial->Stop();
 }
 
-LPCSTR translate_string(LPCSTR str) { return *StringTable().translate(str); }
+LPCSTR translate_string(LPCSTR str) { return *CStringTable().translate(str); }
 bool has_active_tutotial() { return (g_tutorial != NULL); }
 
 //Alundaio: namespace level exports extension

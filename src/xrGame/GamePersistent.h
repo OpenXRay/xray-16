@@ -53,6 +53,7 @@ private:
     void UpdateDof();
 
 public:
+    ui_core* m_pUI_core;
     IReader* pDemoFile;
     u32 uTime2Change;
     EVENT eDemoStart;

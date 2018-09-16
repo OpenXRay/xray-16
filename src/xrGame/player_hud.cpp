@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "player_hud.h"
 #include "HudItem.h"
-#include "xrUICore/ui_base.h"
+#include "ui_base.h"
 #include "actor.h"
 #include "physic_item.h"
 #include "static_cast_checked.hpp"
