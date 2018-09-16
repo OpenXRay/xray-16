@@ -26,20 +26,17 @@ class CActionPlanner
           _condition_evaluator, u32, _reverse_search, _world_operator_ptr, _condition_evaluator_ptr>
 {
 public:
-    typedef CProblemSolver<GraphEngineSpace::CWorldProperty, GraphEngineSpace::CWorldState, _world_operator,
-        _condition_evaluator, u32, _reverse_search, _world_operator_ptr, _condition_evaluator_ptr>
-        CProblemSolver;
-    using COperator = typename CProblemSolver::COperator;
-    using CConditionEvaluator = typename CProblemSolver::CConditionEvaluator;
-    using _condition_type = typename CProblemSolver::condition_type;
-    using _edge_type = typename CProblemSolver::edge_type;
-    using _value_type = typename CProblemSolver::value_type;
-    using _operator_ptr = typename CProblemSolver::operator_ptr;
-    typedef CProblemSolver inherited;
-    typedef typename inherited::edge_type _action_id_type;
-    typedef GraphEngineSpace::CWorldProperty CWorldProperty;
-    typedef GraphEngineSpace::CWorldState CWorldState;
-    typedef _world_operator world_operator;
+    using inherited = CProblemSolver<GraphEngineSpace::CWorldProperty, GraphEngineSpace::CWorldState,
+        _world_operator, _condition_evaluator, u32, _reverse_search, _world_operator_ptr, _condition_evaluator_ptr>;
+    using COperator = typename inherited::COperator;
+    using CConditionEvaluator = typename inherited::CConditionEvaluator;
+    using _condition_type = typename inherited::condition_type;
+    using _edge_type = typename inherited::edge_type;
+    using _value_type = typename inherited::value_type;
+    using _operator_ptr = typename inherited::operator_ptr;
+    using _action_id_type = typename inherited::edge_type;
+    using CWorldProperty = GraphEngineSpace::CWorldProperty;
+    using world_operator = _world_operator;
 
 protected:
     bool m_initialized;
