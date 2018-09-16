@@ -407,9 +407,14 @@ bool login_manager::get_remember_me_from_registry()
 
 void login_manager::forgot_password(char const* url)
 {
+#ifdef WINDOWS
     LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
+#else
+    std::string command = "xdg-open " + std::string{url};
+    system(command.c_str());
+#endif
 }
 
 } // namespace gamespy_gp
