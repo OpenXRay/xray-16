@@ -267,7 +267,12 @@ typedef dirent DirEntryType;
 #define lstrcpy strcpy
 #define stricmp strcasecmp
 #define strupr SDL_strupr
-#define strncpy_s(dest, size, source, num) (NULL == strncpy(dest, source, num))
+inline bool strncpy_s(char * dest, size_t, const char * source, size_t num) {
+    return NULL == strncpy(dest, source, num);
+}
+inline bool strncpy_s(char * dest, const char * source, size_t num) {
+    return NULL == strncpy(dest, source, num);
+}
 #define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
 #define strcat_s(dest, num, source) (dest == strcat(dest, source))
 #define _vsnprintf vsnprintf
