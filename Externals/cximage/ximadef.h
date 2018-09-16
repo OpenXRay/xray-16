@@ -94,14 +94,15 @@ typedef struct tagcomplex {
 #include <string.h>
 #include <ctype.h>
 
+#ifndef CXIMAGE_NO_WIN32_DEFINES
 typedef unsigned char  BYTE;
 typedef unsigned short WORD;
 typedef unsigned long  DWORD;
 typedef unsigned int   UINT;
 typedef const char* LPCTSTR;
-
-typedef DWORD          COLORREF;
 typedef unsigned int   HANDLE;
+#endif
+typedef DWORD          COLORREF;
 typedef void*          HRGN;
 typedef void*          HDC;
 
@@ -125,7 +126,7 @@ typedef int boolean;
 #define TCHAR char
 #define _T
 #endif
-
+#ifndef CXIMAGE_NO_WIN32_DEFINES
 typedef struct tagRECT
 {
 	long    left;
@@ -139,7 +140,7 @@ typedef struct tagPOINT
 	long  x;
 	long  y;
 } POINT;
-
+#endif
 typedef struct tagRGBQUAD {
 	BYTE    rgbBlue;
 	BYTE    rgbGreen;
