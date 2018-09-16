@@ -856,7 +856,6 @@
     <ClInclude Include="game_path_manager.h" />
     <ClInclude Include="game_path_manager_inline.h" />
     <ClInclude Include="game_state_accumulator.h" />
-    <ClInclude Include="game_state_accumulator_inline.h" />
     <ClInclude Include="game_sv_artefacthunt.h" />
     <ClInclude Include="game_sv_base.h" />
     <ClInclude Include="game_sv_base_console_vars.h" />
