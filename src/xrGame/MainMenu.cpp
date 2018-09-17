@@ -351,7 +351,9 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
+#if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 0.9f);
+#endif
     }
 
     if (SDL_SCANCODE_F12 == dik)
@@ -372,7 +374,9 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
+#if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 1.f);
+#endif
     }
 
 
