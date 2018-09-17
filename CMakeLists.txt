@@ -4,6 +4,7 @@ project(OpenXRay)
 include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+include(cotire)
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)

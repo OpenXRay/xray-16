@@ -26,5 +26,8 @@ include_directories(
 add_definitions(-DXRAICORE_EXPORTS -DAI_COMPILER -D_SECURE_SCL=0)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp")
+cotire(${PROJECT_NAME})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrAPI xrScriptEngine luabind ${LUA_LIBRARIES})
