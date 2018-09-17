@@ -17,7 +17,7 @@
 #include "alife_story_registry.h"
 #include "game_object_space.h"
 #include "Common/object_broker.h"
-#include "ui/uitexturemaster.h"
+#include "ui/UITextureMaster.h"
 
 CGameTask::CGameTask()
     : m_map_object_id(0), m_TimeToComplete(0), m_priority(0)

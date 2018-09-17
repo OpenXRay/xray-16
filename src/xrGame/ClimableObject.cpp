@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "climableobject.h "
+#include "ClimableObject.h"
 #include "xrPhysics/IPHStaticGeomShell.h"
 #include "xrServer_Objects_ALife.h"
 #include "xrPhysics/PHCharacter.h"

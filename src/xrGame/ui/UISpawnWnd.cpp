@@ -7,7 +7,7 @@
 #include "UIScrollView.h"
 #include "UI3tButton.h"
 #include "xr_level_controller.h"
-#include "uicursor.h"
+#include "UICursor.h"
 #include "UIGameCustom.h"
 
 CUISpawnWnd::CUISpawnWnd() : m_iCurTeam(0)

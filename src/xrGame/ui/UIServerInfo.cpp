@@ -8,6 +8,9 @@
 #include "UIGameCustom.h"
 #include "Level.h"
 #include "game_cl_mp.h"
+#ifdef LINUX // Avoid conflicting macros
+#define CXIMAGE_NO_WIN32_DEFINES
+#endif
 #include "ximage.h"
 #include "xmemfile.h"
 
@@ -118,7 +121,7 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
     if (new_size > (sizeof(tmp_string) - 1))
         new_size = (sizeof(tmp_string) - 1);
 
-    strncpy_s(tmp_string, reinterpret_cast<char const*>(data_ptr), new_size);
+    strncpy_s(tmp_string, sizeof(tmp_string), reinterpret_cast<char const*>(data_ptr), new_size);
     tmp_string[new_size] = 0;
 
     // std::replace(tmp_string, tmp_string + new_size, '\r', '\\');

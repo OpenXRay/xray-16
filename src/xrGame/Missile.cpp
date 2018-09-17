@@ -17,7 +17,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrNetServer/NET_Messages.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 #define PLAYING_ANIM_TIME 10000

@@ -24,9 +24,9 @@ u32 g_sv_base_dwRPointFreezeTime = 0;
 int g_sv_base_iVotingEnabled = 0x00ff;
 //-----------------------------------------------------------------
 
-extern const xr_token round_end_result_str[] = {{"Finish", eRoundEnd_Finish}, {"Game restarted", eRoundEnd_GameRestarted},
-    {"Game restarted fast", eRoundEnd_GameRestartedFast}, {"Time limit", eRoundEnd_TimeLimit},
-    {"Frag limit", eRoundEnd_FragLimit}, {"Artefact limit", eRoundEnd_ArtrefactLimit}, {"Unknown", eRoundEnd_Force},
+extern const xr_token round_end_result_str[] = {{"Finish", int(eRoundEnd_Finish)}, {"Game restarted", int(eRoundEnd_GameRestarted)},
+    {"Game restarted fast", int(eRoundEnd_GameRestartedFast)}, {"Time limit", int(eRoundEnd_TimeLimit)},
+    {"Frag limit", int(eRoundEnd_FragLimit)}, {"Artefact limit", int(eRoundEnd_ArtrefactLimit)}, {"Unknown", int(eRoundEnd_Force)},
     {0, 0}};
 
 // Main

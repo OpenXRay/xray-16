@@ -29,7 +29,7 @@
 #include "stalker_animation_manager.h"
 #include "InventoryOwner.h"
 #include "Inventory.h"
-#include "activatingcharcollisiondelay.h"
+#include "ActivatingCharCollisionDelay.h"
 #include "stalker_movement_manager_smart_cover.h"
 
 // const float default_hinge_friction = 5.f;//gray_wolf comment

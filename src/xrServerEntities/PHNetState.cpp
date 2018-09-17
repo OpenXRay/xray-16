@@ -1,7 +1,8 @@
-#include "stdafx.h"
 #pragma hdrstop
 
 #include "PHNetState.h"
+#include "xrCore/net_utils.h"
+#include "xrCore/FS.h"
 
 //////////////////////////////////////8/////////////////////////////////////////////////////
 

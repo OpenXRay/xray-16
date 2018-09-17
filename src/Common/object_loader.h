@@ -92,7 +92,7 @@ struct CLoader
         template <typename T1, typename T2>
         static void add(T1& data, T2& value)
         {
-            add_helper<T1, T2>::add<is_tree_structure<T1>::value>(data, value);
+            add_helper<T1, T2>::template add<is_tree_structure<T1>::value>(data, value);
         }
 
         template <typename T>

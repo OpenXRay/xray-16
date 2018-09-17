@@ -14,7 +14,7 @@
 #include "moving_bones_snd_player.h"
 #include "xrPhysics/ExtendedGeom.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #include "xrEngine/objectdump.h"
 #endif
 BOOL dbg_draw_doors = false;

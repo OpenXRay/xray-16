@@ -10,7 +10,7 @@
 
 namespace MovementManager
 {
-enum EPathType
+enum EPathType : u32
 {
     ePathTypeGamePath = u32(0),
     ePathTypeLevelPath,

@@ -7,6 +7,7 @@ class game_sv_ArtefactHunt : public game_sv_TeamDeathmatch
 private:
     typedef game_sv_TeamDeathmatch inherited;
 
+#undef NONE // FIXME!!! Ugly
     enum ARTEFACT_STATE
     {
         NONE,

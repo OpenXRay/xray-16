@@ -5682,9 +5682,6 @@
     <ClInclude Include="game_state_accumulator.h">
       <Filter>Core\Server\Games\client\mp\award_system\player_state</Filter>
     </ClInclude>
-    <ClInclude Include="game_state_accumulator_inline.h">
-      <Filter>Core\Server\Games\client\mp\award_system\player_state</Filter>
-    </ClInclude>
     <ClInclude Include="hits_store.h">
       <Filter>Core\Server\Games\client\mp\award_system\player_state</Filter>
     </ClInclude>

@@ -362,6 +362,8 @@ bool CLevel::Connect2Server(const char* options)
     //---------------------------------------------------------------------------
     if (psNET_direct_connect)
         m_bConnectResultReceived = true;
+
+#ifndef LINUX // FIXME!!!
     u32 EndTime = GetTickCount() + ConnectionTimeOut;
     while (!m_bConnectResultReceived)
     {
@@ -391,6 +393,7 @@ bool CLevel::Connect2Server(const char* options)
         }
         //-----------------------------------------
     }
+#endif
     Msg("%c client : connection %s - <%s>", m_bConnectResult ? '*' : '!', m_bConnectResult ? "accepted" : "rejected",
         m_sConnectResult.c_str());
     if (!m_bConnectResult)

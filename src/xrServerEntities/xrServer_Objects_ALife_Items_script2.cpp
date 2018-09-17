@@ -13,6 +13,7 @@
 
 using namespace luabind;
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(CSE_ALifeItemPDA, (CSE_ALifeItem),
     { module(luaState)[luabind_class_item1(CSE_ALifeItemPDA, "cse_alife_item_pda", CSE_ALifeItem)]; });
 
@@ -39,3 +40,4 @@ SCRIPT_EXPORT(CSE_ALifeItemWeaponMagazined, (CSE_ALifeItemWeapon), {
     module(luaState)[luabind_class_item1(
         CSE_ALifeItemWeaponMagazined, "cse_alife_item_weapon_magazined", CSE_ALifeItemWeapon)];
 });
+#endif

@@ -6,8 +6,12 @@
 IC u32 net_flags(
     bool bReliable = false, bool bSequental = true, bool bHighPriority = false, bool bSendImmediatelly = false)
 {
+#ifdef LINUX // FIXME!!!
+    return 0;
+#else
     return (bReliable ? DPNSEND_GUARANTEED : DPNSEND_NOCOMPLETE) | (bSequental ? 0 : DPNSEND_NONSEQUENTIAL) |
         (bHighPriority ? DPNSEND_PRIORITY_HIGH : 0) | (bSendImmediatelly ? DPNSEND_IMMEDIATELLY : 0);
+#endif
 }
 
 struct MSYS_CONFIG

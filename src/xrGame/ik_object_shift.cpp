@@ -3,7 +3,7 @@
 #include "pose_extrapolation.h"
 #include "xrPhysics/MathUtils.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 #ifdef DEBUG
 

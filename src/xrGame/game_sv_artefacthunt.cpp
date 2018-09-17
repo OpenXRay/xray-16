@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "game_sv_ArtefactHunt.h"
+#include "game_sv_artefacthunt.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrServer.h"
 #include "Level.h"

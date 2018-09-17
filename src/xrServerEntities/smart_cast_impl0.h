@@ -41,16 +41,16 @@ struct CTypeHelper
     };
 
     template <>
-    struct add<Loki::NullType>
+    struct add<Loki::EmptyType>
     {
-        typedef Loki::Typelist<Loki::Typelist<T, Loki::Typelist<P, Loki::NullType>>, List> result;
+        typedef Loki::Typelist<Loki::Typelist<T, Loki::Typelist<P, Loki::EmptyType>>, List> result;
     };
 
     typedef typename add<List>::result result;
 };
 };
 
-#define cast_type_list Loki::NullType
+#define cast_type_list Loki::EmptyType
 #define add_to_cast_list(B, A) typedef SmartDynamicCast::CTypeHelper<cast_type_list, A, B>::result TypeList_##A##B
 #define save_cast_list(B, A) TypeList_##A##B
 

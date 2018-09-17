@@ -19,7 +19,7 @@ class CPHActorCharacter;
 class CPHAICharacter;
 namespace ALife
 {
-enum EHitType;
+enum EHitType : u32;
 }
 enum EEnvironment { peOnGround, peAtWall, peInAir };
 

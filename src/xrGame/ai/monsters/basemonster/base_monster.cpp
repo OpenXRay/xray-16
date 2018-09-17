@@ -9,7 +9,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "PHMovementControl.h"
 #include "ai/monsters/ai_monster_squad_manager.h"
-#include "xrServerEntities/xrserver_objects_alife_monsters.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "ai/monsters/corpse_cover.h"
 #include "cover_evaluators.h"
 #include "seniority_hierarchy_holder.h"

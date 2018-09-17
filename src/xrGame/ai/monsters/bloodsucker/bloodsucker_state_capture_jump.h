@@ -8,6 +8,8 @@ class CStateCaptureJumpBloodsucker : public CState<_Object>
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::prev_substate;
+    using inherited::current_substate;
 
 public:
     CStateCaptureJumpBloodsucker(_Object* obj);

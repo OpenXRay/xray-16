@@ -6,6 +6,9 @@ class CStateBloodsuckerVampireHide : public CState<_Object>
 {
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::object;
+    using inherited::prev_substate;
+    using inherited::current_substate;
 
 public:
     CStateBloodsuckerVampireHide(_Object* obj);

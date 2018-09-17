@@ -6,7 +6,7 @@
 #pragma once
 
 #include "StdAfx.h"
-#include "exooutfit.h"
+#include "ExoOutfit.h"
 
 CExoOutfit::CExoOutfit() {}
 CExoOutfit::~CExoOutfit() {}

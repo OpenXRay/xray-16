@@ -5,7 +5,7 @@
 #include "xrPhysics/PhysicsShell.h"
 #include "xrEngine/GameMtlLib.h"
 #include "PHMovementControl.h"
-#include "wound.h"
+#include "Wound.h"
 #include "xrMessages.h"
 #include "Level.h"
 #include "Include/xrRender/Kinematics.h"
@@ -690,7 +690,7 @@ ICollisionHitCallback* CEntityAlive::get_collision_hit_callback()
     if (cs)
         return cs->get_collision_hit_callback();
     else
-        return false;
+        return nullptr;
 }
 
 void CEntityAlive::set_collision_hit_callback(ICollisionHitCallback* cc)

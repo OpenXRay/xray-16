@@ -2,7 +2,7 @@
 #include "UITalkWnd.h"
 #include "UITalkDialogWnd.h"
 #include "Actor.h"
-#include "Trade.h"
+#include "trade.h"
 #include "UIGameSP.h"
 #include "PDA.h"
 #include "xrServerEntities/character_info.h"
@@ -12,7 +12,7 @@
 #include "game_cl_base.h"
 #include "string_table.h"
 #include "xr_level_controller.h"
-#include "xrEngine/cameraBase.h"
+#include "xrEngine/CameraBase.h"
 #include "UIXmlInit.h"
 #include "UI3tButton.h"
 
@@ -384,8 +384,10 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
     }
 
     strncpy_s(fn, sizeof(fn), path, xr_strlen(path));
+#ifndef LINUX // FIXME!!!
     strncat_s(fn, sizeof(fn), text, text_len);
     strncat_s(fn, sizeof(fn), ext, xr_strlen(ext));
+#endif
 
     //	strconcat( sizeof(fn), fn, "characters_voice\\dialogs\\", text2, ".ogg" );
 

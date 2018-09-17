@@ -13,6 +13,7 @@
 
 using namespace luabind;
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(CSE_ALifeSchedulable, (), {
     module(luaState)[class_<IPureSchedulableObject>("ipure_schedulable_object"),
         //			.def(		constructor<>()),
@@ -76,3 +77,4 @@ SCRIPT_EXPORT(CSE_ALifeInventoryBox, (CSE_ALifeDynamicObjectVisual), {
     module(luaState)[luabind_class_dynamic_alife1(
         CSE_ALifeInventoryBox, "cse_alife_inventory_box", CSE_ALifeDynamicObjectVisual)];
 });
+#endif

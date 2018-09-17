@@ -1,7 +1,7 @@
 #pragma once
 
-#include "uiframewindow.h"
-#include "uilistbox.h"
+#include "UIFrameWindow.h"
+#include "UIListBox.h"
 
 class CUIPropertiesBox : public CUIFrameWindow, public CUIWndCallback
 {

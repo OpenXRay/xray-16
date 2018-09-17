@@ -12,6 +12,7 @@
 #include "_vector3d.h"
 #include "_vector4.h"
 #include "_color.h"
+#include "xrstring.h"
 #include "xrCommon/math_funcs.h"
 #include "xrCommon/xr_stack.h"
 

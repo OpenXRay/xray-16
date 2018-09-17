@@ -10,7 +10,7 @@
 #define GROUP_STATE_ADAPTER_H_INCLUDED
 
 #include "ai/monsters/state.h"
-#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 
 class CBaseMonster;
 

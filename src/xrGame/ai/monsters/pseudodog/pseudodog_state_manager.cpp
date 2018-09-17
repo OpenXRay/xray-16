@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "ai/monsters/Pseudodog/pseudodog.h"
-#include "ai/monsters/Pseudodog/pseudodog_state_manager.h"
+#include "ai/monsters/pseudodog/pseudodog.h"
+#include "ai/monsters/pseudodog/pseudodog_state_manager.h"
 #include "ai/monsters/control_animation_base.h"
 #include "ai/monsters/control_direction_base.h"
 #include "ai/monsters/control_movement_base.h"

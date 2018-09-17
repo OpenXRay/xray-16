@@ -350,7 +350,7 @@ void login_manager::save_password_to_registry(char const* password)
         return;
     }
 
-    key_t pass_key;
+    secure_messaging::key_t pass_key;
     generate_key(pass_key_seed, pass_key);
     u32 buffer_size = xr_strlen(password) + 1;
     u8* buffer = static_cast<u8*>(_alloca(buffer_size));
@@ -370,7 +370,7 @@ char const* login_manager::get_password_from_registry()
 
     if (pass_size)
     {
-        key_t pass_key;
+        secure_messaging::key_t pass_key;
         generate_key(pass_key_seed, pass_key);
         decrypt(tmp_password_dest, pass_size, pass_key);
         xr_strcpy(m_reg_password, (char*)tmp_password_dest);
@@ -407,9 +407,14 @@ bool login_manager::get_remember_me_from_registry()
 
 void login_manager::forgot_password(char const* url)
 {
+#ifdef WINDOWS
     LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
+#else
+    std::string command = "xdg-open " + std::string{url};
+    system(command.c_str());
+#endif
 }
 
 } // namespace gamespy_gp

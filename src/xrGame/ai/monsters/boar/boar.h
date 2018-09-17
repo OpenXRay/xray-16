@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "ai/monsters/controlled_entity.h"
 
 class CAI_Boar : public CBaseMonster, public CControlledEntity<CAI_Boar>

@@ -219,12 +219,17 @@ struct real_sender
     NET_Packet* P;
     u32 flags_to_send;
 
+#ifdef LINUX // FIXME!!!
+    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = 0)
+#else
     real_sender(xrServer* server, NET_Packet* Packet, u32 flags = DPNSEND_GUARANTEED)
+#endif
     {
         server_for_send = server;
         P = Packet;
         flags_to_send = flags;
     }
+
     void operator()(IClient* client)
     {
         xrClientData* tmp_client = static_cast<xrClientData*>(client);

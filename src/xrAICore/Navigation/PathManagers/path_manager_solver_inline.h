@@ -29,7 +29,7 @@ IC void CSolverPathManager::setup(const _Graph* _graph, _DataStorage* _data_stor
     this->start_node_index = _start_node_index;
     this->goal_node_index = _goal_node_index;
     this->max_visited_node_count = params.max_visited_node_count;
-    this->max_range = (_solver_dist_type)params.max_range;
+    this->max_range = (GraphEngineSpace::_solver_dist_type)params.max_range;
     this->max_iteration_count = params.max_iteration_count;
 }
 
@@ -90,7 +90,7 @@ IC void CSolverPathManager::create_path(T& vertex)
 {
     VERIFY(this->data_storage);
     if (m_edge_path)
-        this->data_storage->get_edge_path(*m_edge_path, &vertex, typename _Graph::reverse_search);
+        this->data_storage->get_edge_path(*m_edge_path, &vertex, _Graph::reverse_search);
 }
 
 #undef TEMPLATE_SPECIALIZATION

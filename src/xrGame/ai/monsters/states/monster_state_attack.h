@@ -9,6 +9,7 @@ class CStateMonsterAttack : public CState<_Object>
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::object;
 
     u32 m_time_next_run_away;
     u32 m_time_start_check_behinder;

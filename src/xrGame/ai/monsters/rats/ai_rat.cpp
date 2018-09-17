@@ -12,7 +12,7 @@
 #include "xrPhysics/PhysicsShell.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
-#include "xrServerEntities/xrserver_objects_alife_monsters.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "ai/monsters/rats/ai_rat_space.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "detail_path_manager.h"

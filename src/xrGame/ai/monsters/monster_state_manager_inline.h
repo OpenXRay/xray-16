@@ -14,6 +14,12 @@ bool object_exists_in_alife_registry(u32 id);
 } // namespace detail
 
 TEMPLATE_SPECIALIZATION
+void CMonsterStateManagerAbstract::remove_links(IGameObject* object)
+{
+    inherited::remove_links(object);
+}
+
+TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::update()
 {
     // Lain: added

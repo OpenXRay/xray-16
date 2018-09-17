@@ -60,8 +60,10 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, Gam
     {
         string1024 CompName;
         DWORD CompNameSize = 1024;
+#ifndef LINUX // FIXME!!!
         if (GetComputerName(CompName, &CompNameSize))
             HostName = CompName;
+#endif
     }
     else
         HostName = game->get_option_s(*session_name, "hname", NULL);

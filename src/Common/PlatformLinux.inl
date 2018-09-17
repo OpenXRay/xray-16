@@ -150,7 +150,7 @@ typedef unsigned char* LPBYTE;
 typedef unsigned int UINT;
 typedef int INT;
 typedef unsigned long ULONG;
-typedef unsigned long& ULONG_PTR;
+typedef unsigned long* ULONG_PTR;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
 
@@ -208,7 +208,7 @@ typedef unsigned int UINT_PTR;
 typedef long LONG_PTR;
 #endif // XR_X64
 
-typedef int HANDLE;
+typedef void* HANDLE;
 typedef void* HMODULE;
 typedef void* PVOID;
 typedef void* LPVOID;
@@ -267,7 +267,12 @@ typedef dirent DirEntryType;
 #define lstrcpy strcpy
 #define stricmp strcasecmp
 #define strupr SDL_strupr
-#define strncpy_s(dest, size, source, num) (NULL == strncpy(dest, source, num))
+inline bool strncpy_s(char * dest, size_t, const char * source, size_t num) {
+    return NULL == strncpy(dest, source, num);
+}
+inline bool strncpy_s(char * dest, const char * source, size_t num) {
+    return NULL == strncpy(dest, source, num);
+}
 #define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
 #define strcat_s(dest, num, source) (dest == strcat(dest, source))
 #define _vsnprintf vsnprintf

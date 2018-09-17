@@ -25,6 +25,8 @@ SCRIPT_EXPORT(store_operation_cb, (), {
                          .def(constructor<>())
                          .def(constructor<gamespy_profile::store_operation_cb::lua_object_type,
                              gamespy_profile::store_operation_cb::lua_function_type>())
+#ifndef LINUX // FIXME!!!
                          .def("bind", &gamespy_profile::store_operation_cb::bind)
+#endif
                          .def("clear", &gamespy_profile::store_operation_cb::clear)];
 });

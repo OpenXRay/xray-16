@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "artefact.h"
+#include "Artefact.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "PhysicsShellHolder.h"
 #include "game_cl_base.h"
@@ -332,8 +332,8 @@ void CArtefact::MoveTo(Fvector const& position)
     // m_bInInterpolation = false;
 }
 
-#include "inventoryOwner.h"
-#include "Entity_alive.h"
+#include "InventoryOwner.h"
+#include "entity_alive.h"
 void CArtefact::UpdateXForm()
 {
     if (Device.dwFrame != dwXF_Frame)

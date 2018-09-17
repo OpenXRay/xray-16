@@ -23,7 +23,7 @@
 #include "script_callback_ex.h"
 #include "encyclopedia_article.h"
 #include "GametaskManager.h"
-#include "GameTaskdefs.h"
+#include "GameTaskDefs.h"
 #include "InfoPortion.h"
 #include "Inventory.h"
 #include "CustomDetector.h"

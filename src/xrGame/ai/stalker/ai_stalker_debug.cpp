@@ -41,7 +41,7 @@
 #include "agent_corpse_manager.h"
 #include "agent_location_manager.h"
 #include "cover_point.h"
-#include "xrEngine/camerabase.h"
+#include "xrEngine/CameraBase.h"
 #include "mt_config.h"
 #include "weaponmagazined.h"
 #include "object_handler_space.h"

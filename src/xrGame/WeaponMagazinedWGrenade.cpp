@@ -217,7 +217,7 @@ bool CWeaponMagazinedWGrenade::Action(u16 cmd, u32 flags)
 }
 
 #include "Inventory.h"
-#include "inventoryOwner.h"
+#include "InventoryOwner.h"
 void CWeaponMagazinedWGrenade::state_Fire(float dt)
 {
     VERIFY(fOneShotTime > 0.f);

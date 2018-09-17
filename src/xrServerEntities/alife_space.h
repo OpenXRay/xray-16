@@ -79,7 +79,7 @@ enum EMeetActionType
     eMeetActionTypeDummy = u32(-1),
 };
 
-enum ERelationType
+enum ERelationType : u32
 {
     eRelationTypeFriend = u32(0),
     eRelationTypeNeutral,
@@ -89,7 +89,7 @@ enum ERelationType
     eRelationTypeDummy = u32(-1),
 };
 
-enum EHitType
+enum EHitType : u32
 {
     eHitTypeBurn = u32(0),
     eHitTypeShock,

@@ -26,8 +26,10 @@
 
 #include "ui/UICDkey.h"
 
+#ifdef WINDOWS
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
+#endif
 
 #include "Common/object_broker.h"
 
@@ -612,8 +614,9 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 
     string4096 FilePath = "";
     char* FileName = NULL;
+#ifndef LINUX // FIXME!!!
     GetFullPathName(fileName, 4096, FilePath, &FileName);
-
+#endif
     string_path fname;
     if (FS.path_exist("$downloads$"))
     {
@@ -764,7 +767,7 @@ bool CMainMenu::IsCDKeyIsValid()
     for (int i = 0; i < 4; i++)
     {
         GetGameID(&GameID, i);
-        if (VerifyClientCheck(CDKey, unsigned short(GameID)) == 1)
+        if (VerifyClientCheck(CDKey, (unsigned short)(GameID)) == 1)
             return true;
     };
     return false;
@@ -851,9 +854,14 @@ void CMainMenu::OnDownloadMPMap_CopyURL(CUIWindow* w, void* d)
 void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
 {
     LPCSTR url = m_downloaded_mp_map_url.c_str();
+#ifdef WINDOWS
     LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
+#else
+    std::string command = "xdg-open " + std::string{url};
+    system(command.c_str());
+#endif
 }
 
 demo_info const* CMainMenu::GetDemoInfo(LPCSTR file_name)

@@ -19,7 +19,7 @@ public:
     virtual void force_script_state(EMonsterState state);
     virtual void execute_script_state();
     virtual void critical_finalize();
-    virtual void remove_links(IGameObject* object) = 0 { inherited::remove_links(object); }
+    virtual void remove_links(IGameObject* object) = 0;
     virtual EMonsterState get_state_type();
 
     virtual bool check_control_start_conditions(ControlCom::EControlType type)

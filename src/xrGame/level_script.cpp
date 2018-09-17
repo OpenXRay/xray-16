@@ -780,7 +780,10 @@ IC static void CLevel_Export(lua_State* luaState)
         ]
     ];
 
-    module(luaState)[def("command_line", &command_line), def("IsGameTypeSingle", &IsGameTypeSingle),
+    module(luaState)[def("command_line", &command_line),
+#ifndef LINUX // FIXME!!!
+        def("IsGameTypeSingle", &IsGameTypeSingle),
+#endif
         def("IsDynamicMusic", &IsDynamicMusic), def("render_get_dx_level", &render_get_dx_level),
         def("IsImportantSave", &IsImportantSave)];
 
@@ -829,6 +832,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("has_active_tutorial", &has_active_tutotial), def("translate_string", &translate_string)
 
     ];
+
 };
 
 SCRIPT_EXPORT_FUNC(CLevel, (), CLevel_Export);

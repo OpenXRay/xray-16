@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "Helicopter.h"
+#include "helicopter.h"
 #include "Level.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"

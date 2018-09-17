@@ -5,7 +5,7 @@
 #include "xrPhysics/CalculateTriangle.h"
 #include "xrEngine/profiler.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 CWalmarkManager::CWalmarkManager() {}

@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "ElevatorState.h"
 #include "ClimableObject.h"
-#include "PHCharacter.h"
+#include "xrPhysics/PHCharacter.h"
 #include "MathUtils.h"
-#include "PHWorld.h"
+#include "xrPhysics/PHWorld.h"
 #ifdef DEBUG
 #include "../xrEngine/Statgraph.h"
 #include "PHDebug.h"

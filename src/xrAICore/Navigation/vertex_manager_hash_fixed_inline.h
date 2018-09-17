@@ -16,6 +16,10 @@
     CVertexManagerHashFixed<TPathId, TIndex, HashSize, FixSize>::CDataStorage<TPathBuilder, TVertexAllocator, \
         TCompoundVertex>
 
+#define CHashFixedVertexManagerT                                                                              \
+    typename CVertexManagerHashFixed<TPathId, TIndex, HashSize, FixSize>::template CDataStorage<TPathBuilder, \
+        TVertexAllocator, TCompoundVertex>
+
 TEMPLATE_SPECIALIZATION
 inline CHashFixedVertexManager::CDataStorage(const u32 vertex_count)
     : CDataStorageBase(vertex_count), CDataStorageAllocator(), m_current_path_id(PathId(0))
@@ -53,7 +57,7 @@ inline void CHashFixedVertexManager::add_opened(Vertex& vertex) { vertex.opened(
 TEMPLATE_SPECIALIZATION
 inline void CHashFixedVertexManager::add_closed(Vertex& vertex) { vertex.opened() = 0; }
 TEMPLATE_SPECIALIZATION
-inline typename CHashFixedVertexManager::PathId CHashFixedVertexManager::current_path_id() const
+inline CHashFixedVertexManagerT::PathId CHashFixedVertexManager::current_path_id() const
 {
     return m_current_path_id;
 }
@@ -63,7 +67,11 @@ inline bool CHashFixedVertexManager::is_opened(const Vertex& vertex) const { ret
 TEMPLATE_SPECIALIZATION
 inline u32 CHashFixedVertexManager::hash_index(const Index& vertex_id) const
 {
+#ifdef LINUX // FIXME!!
+    return 0;
+#else
     return hash_fixed_vertex_manager::to_u32(vertex_id) % HashSize;
+#endif
 }
 
 TEMPLATE_SPECIALIZATION
@@ -84,7 +92,7 @@ inline bool CHashFixedVertexManager::is_visited(const Index& vertex_id) const
 TEMPLATE_SPECIALIZATION
 inline bool CHashFixedVertexManager::is_closed(const Vertex& vertex) const { return !is_opened(vertex); }
 TEMPLATE_SPECIALIZATION
-inline typename CHashFixedVertexManager::Vertex& CHashFixedVertexManager::get_node(const Index& vertex_id) const
+inline CHashFixedVertexManagerT::Vertex& CHashFixedVertexManager::get_node(const Index& vertex_id) const
 {
     VERIFY(is_visited(vertex_id));
     IndexVertex* vertex = m_hash[hash_index(vertex_id)];
@@ -98,7 +106,7 @@ inline typename CHashFixedVertexManager::Vertex& CHashFixedVertexManager::get_no
 }
 
 TEMPLATE_SPECIALIZATION
-inline typename CHashFixedVertexManager::Vertex& CHashFixedVertexManager::create_vertex(
+inline CHashFixedVertexManagerT::Vertex& CHashFixedVertexManager::create_vertex(
     Vertex& vertex, const Index& vertex_id)
 {
     // allocating new index node

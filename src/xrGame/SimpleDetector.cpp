@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "simpledetector.h"
+#include "SimpleDetector.h"
 #include "ui/ArtefactDetectorUI.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/LightAnimLibrary.h"

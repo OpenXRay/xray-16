@@ -7,6 +7,9 @@ class CStateBloodsuckerVampire : public CState<_Object>
 {
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::object;
+    using inherited::current_substate;
+    using inherited::prev_substate;
 
     const CEntityAlive* enemy;
 

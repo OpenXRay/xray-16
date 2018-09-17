@@ -25,7 +25,7 @@
 #include "ActorCondition.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "HudItem.h"
-#include "ui/UItalkWnd.h"
+#include "ui/UITalkWnd.h"
 #include "Inventory.h"
 #include "InfoPortion.h"
 #include "ai/monsters/basemonster/base_monster.h"
@@ -1509,7 +1509,7 @@ LPCSTR CScriptGameObject::aim_bone_id() const
     if (!stalker)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member aim_bone_id!");
-        return (false);
+        return nullptr;
     }
 
     return (stalker->aim_bone_id().c_str());

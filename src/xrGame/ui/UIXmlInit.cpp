@@ -11,7 +11,6 @@
 #include "UITabControl.h"
 #include "UILabel.h"
 #include "UIAnimatedStatic.h"
-#include "uixmlinit.h"
 #include "UIListBox.h"
 #include "UIComboBox.h"
 #include "UITrackBar.h"
@@ -21,7 +20,7 @@
 #include "UITextureMaster.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
-#include "UItabButtonMP.h"
+#include "UITabButtonMP.h"
 #include "UILines.h"
 
 extern int keyname_to_dik(LPCSTR);

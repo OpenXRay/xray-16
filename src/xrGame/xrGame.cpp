@@ -33,6 +33,7 @@ DLL_API void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
 
 void CCC_RegisterCommands();
 
+#ifdef WINDOWS
 BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
@@ -60,3 +61,4 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
     }
     return (TRUE);
 }
+#endif

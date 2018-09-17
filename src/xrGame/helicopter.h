@@ -4,7 +4,7 @@
 #include "WeaponAmmo.h"
 #include "RocketLauncher.h"
 #include "Entity.h"
-#include "phskeleton.h"
+#include "PHSkeleton.h"
 #include "hit_immunity.h"
 #include "memory_manager.h"
 #include "HudSound.h"

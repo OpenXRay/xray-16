@@ -64,7 +64,7 @@
     {                                                            \
         try                                                      \
         {                                                        \
-            return call_member<ret_type>(this, #v_func_name);    \
+            return luabind::call_member<ret_type>(this, #v_func_name);    \
         }                                                        \
         CAST_FAILED(v_func_name, ret_type)                       \
         catch (...) { return ((ret_type)(0)); }                  \
@@ -76,7 +76,7 @@
     {                                                                 \
         try                                                           \
         {                                                             \
-            return call_member<ret_type>(this, #v_func_name, p1);     \
+            return luabind::call_member<ret_type>(this, #v_func_name, p1);     \
         }                                                             \
         CAST_FAILED(v_func_name, ret_type)                            \
         catch (...) { return ((ret_type)(0)); }                       \
@@ -87,7 +87,7 @@
     }
 #else // DEBUG
 #define DEFINE_LUA_WRAPPER_CONST_METHOD_1(v_func_name, ret_type, t1)                                    \
-    virtual ret_type v_func_name(t1 p1) const { return call_member<ret_type>(this, #v_func_name, p1); } \
+    virtual ret_type v_func_name(t1 p1) const { return luabind::call_member<ret_type>(this, #v_func_name, p1); } \
     static ret_type v_func_name##_static(const inherited* ptr, t1 p1)                                   \
     {                                                                                                   \
         return ptr->self_type::inherited::v_func_name(p1);                                              \
@@ -99,7 +99,7 @@
     {                                              \
         try                                        \
         {                                          \
-            call_member<void>(this, #v_func_name); \
+            luabind::call_member<void>(this, #v_func_name); \
         }                                          \
         catch (...)                                \
         {                                          \
@@ -111,7 +111,7 @@
     {                                                  \
         try                                            \
         {                                              \
-            call_member<void>(this, #v_func_name, p1); \
+            luabind::call_member<void>(this, #v_func_name, p1); \
         }                                              \
         catch (...)                                    \
         {                                              \
@@ -123,7 +123,7 @@
     {                                                      \
         try                                                \
         {                                                  \
-            call_member<void>(this, #v_func_name, p1, p2); \
+            luabind::call_member<void>(this, #v_func_name, p1, p2); \
         }                                                  \
         catch (...)                                        \
         {                                                  \
@@ -135,7 +135,7 @@
     {                                                                     \
         try                                                               \
         {                                                                 \
-            call_member<void>(this, #v_func_name, p1, p2, p3);            \
+            luabind::call_member<void>(this, #v_func_name, p1, p2, p3);            \
         }                                                                 \
         catch (...)                                                       \
         {                                                                 \
@@ -151,7 +151,7 @@
     {                                                                            \
         try                                                                      \
         {                                                                        \
-            call_member<void>(this, #v_func_name, p1, p2, p3, p4);               \
+            luabind::call_member<void>(this, #v_func_name, p1, p2, p3, p4);               \
         }                                                                        \
         catch (...)                                                              \
         {                                                                        \
@@ -167,7 +167,7 @@
     {                                                         \
         try                                                   \
         {                                                     \
-            return call_member<ret_type>(this, #v_func_name); \
+            return luabind::call_member<ret_type>(this, #v_func_name); \
         }                                                     \
         CAST_FAILED(v_func_name, ret_type)                    \
         catch (...) { return ((ret_type)(0)); }               \
@@ -178,7 +178,7 @@
     {                                                             \
         try                                                       \
         {                                                         \
-            return call_member<ret_type>(this, #v_func_name, p1); \
+            return luabind::call_member<ret_type>(this, #v_func_name, p1); \
         }                                                         \
         CAST_FAILED(v_func_name, ret_type)                        \
         catch (...) { return ((ret_type)(0)); }                   \
@@ -189,7 +189,7 @@
     {                                                                  \
         try                                                            \
         {                                                              \
-            return call_member<ret_type>(this, #v_func_name, p1, p2);  \
+            return luabind::call_member<ret_type>(this, #v_func_name, p1, p2);  \
         }                                                              \
         CAST_FAILED(v_func_name, ret_type)                             \
         catch (...) { return ((ret_type)(0)); }                        \
@@ -204,7 +204,7 @@
     {                                                                         \
         try                                                                   \
         {                                                                     \
-            return call_member<ret_type>(this, #v_func_name, p1, p2, p3);     \
+            return luabind::call_member<ret_type>(this, #v_func_name, p1, p2, p3);     \
         }                                                                     \
         CAST_FAILED(v_func_name, ret_type)                                    \
         catch (...) { return ((ret_type)(0)); }                               \
@@ -219,7 +219,7 @@
     {                                                                                \
         try                                                                          \
         {                                                                            \
-            return call_member<ret_type>(this, #v_func_name, p1, p2, p3, p4);        \
+            return luabind::call_member<ret_type>(this, #v_func_name, p1, p2, p3, p4);        \
         }                                                                            \
         CAST_FAILED(v_func_name, ret_type)                                           \
         catch (...) { return ((ret_type)(0)); }                                      \

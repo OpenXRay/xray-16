@@ -2,7 +2,7 @@
 #include "control_animation_base.h"
 #include "control_direction_base.h"
 #include "control_movement_base.h"
-#include "BaseMonster/base_monster.h"
+#include "basemonster/base_monster.h"
 #include "PHMovementControl.h"
 #include "anim_triple.h"
 #include "Include/xrRender/KinematicsAnimated.h"

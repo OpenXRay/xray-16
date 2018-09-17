@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "ai/monsters/Pseudodog/psy_dog.h"
+#include "ai/monsters/pseudodog/psy_dog.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
@@ -13,10 +13,10 @@
 #include "Actor.h"
 #include "ai/monsters/ai_monster_effector.h"
 #include "ActorEffector.h"
-#include "ai/monsters/Pseudodog/psy_dog_aura.h"
-#include "ai/monsters/Pseudodog/psy_dog_state_manager.h"
+#include "ai/monsters/pseudodog/psy_dog_aura.h"
+#include "ai/monsters/pseudodog/psy_dog_state_manager.h"
 #include "alife_object_registry.h"
-#include "xrServerEntities/xrserver_objects_alife_monsters.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "xrNetServer/NET_Messages.h"
 
 CPsyDog::CPsyDog()

@@ -56,10 +56,9 @@ struct accumulative_pair_t
 }; // struct accumulative_pair_t
 } // namespace detail
 
-#define ACCUMULATIVE_STATE_LIST Loki::NullType
-#define ADD_ACCUMULATIVE_STATE(id, type)                                                   \
-    typedef Loki::Typelist<detail::accumulative_pair_t<id, type>, ACCUMULATIVE_STATE_LIST> \
-        Accumulative_State_Type_##type;
+#define ACCUMULATIVE_STATE_LIST Loki::Typelist<>
+#define ADD_ACCUMULATIVE_STATE(id, type) using Accumulative_State_Type_##type =                   \
+        Loki::TL::Prepend<detail::accumulative_pair_t<id, type>, ACCUMULATIVE_STATE_LIST>::result
 #define SAVE_TYPE_LIST(id, type) Accumulative_State_Type_##type
 
 } // namespace award_system

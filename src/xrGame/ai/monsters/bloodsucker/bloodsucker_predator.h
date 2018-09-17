@@ -6,6 +6,10 @@ class CStateBloodsuckerPredator : public CState<_Object>
 {
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::object;
+    using inherited::prev_substate;
+    using inherited::time_state_started;
+    using inherited::current_substate;
 
     u32 m_target_node;
     u32 m_time_start_camp;

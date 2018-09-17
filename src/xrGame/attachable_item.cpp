@@ -112,6 +112,7 @@ bool CAttachableItem::can_be_attached() const
 
     return (true);
 }
+
 void CAttachableItem::afterAttach()
 {
     VERIFY(m_valid);
@@ -122,6 +123,11 @@ void CAttachableItem::afterDetach()
 {
     VERIFY(m_valid);
     object().processing_deactivate();
+}
+
+bool CAttachableItem::use_parent_ai_locations() const
+{
+    return !enabled();
 }
 
 #ifdef DEBUG

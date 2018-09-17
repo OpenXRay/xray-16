@@ -67,6 +67,7 @@ CUIMapList::~CUIMapList() {}
 void CUIMapList::StartDedicatedServer()
 {
     string_path ModuleFileName;
+#ifndef LINUX // FIXME!!!
     GetModuleFileName(NULL, ModuleFileName, sizeof(ModuleFileName));
 
     char* ModuleName = NULL;
@@ -83,6 +84,7 @@ void CUIMapList::StartDedicatedServer()
     Msg("Going to quit before starting dedicated server");
     Msg("Working folder is:%s", g_sLaunchWorkingFolder);
     Msg("%s %s", g_sLaunchOnExit_app, g_sLaunchOnExit_params);
+#endif
     Console->Execute("quit");
 }
 
@@ -143,7 +145,7 @@ void CUIMapList::OnListItemClicked()
     m_pMapInfo->InitMap(M.map_name.c_str(), M.map_ver.c_str());
 }
 
-xr_token g_GameModes[];
+extern xr_token g_GameModes[];
 
 void CUIMapList::OnModeChange() { UpdateMapList(GetCurGameType()); }
 EGameIDs CUIMapList::GetCurGameType()
@@ -281,7 +283,7 @@ void CUIMapList::SetModeSelector(CUIWindow* ms) { m_pModeSelector = ms; }
 void CUIMapList::SetMapPic(CUIStatic* map_pic) { m_pMapPic = map_pic; }
 void CUIMapList::SetMapInfo(CUIMapInfo* map_info) { m_pMapInfo = map_info; }
 void CUIMapList::SetServerParams(LPCSTR params) { m_srv_params = params; }
-#include "uilistboxitem.h"
+#include "UIListBoxItem.h"
 void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id)
 {
     R_ASSERT2(m_pWeatherSelector, "m_pWeatherSelector == NULL");

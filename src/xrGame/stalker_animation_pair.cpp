@@ -16,7 +16,7 @@
 #include "animation_movement_controller.h"
 #include "xrCore/buffer_vector.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 #pragma warning(push)

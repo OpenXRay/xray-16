@@ -4,6 +4,7 @@ template <typename _Object>
 class CStateControlFire : public CState<_Object>
 {
     typedef CState<_Object> inherited;
+    using inherited::object;
 
     u32 m_time_started;
     u32 m_time_state_last_execute;

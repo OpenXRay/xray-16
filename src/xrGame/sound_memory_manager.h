@@ -19,7 +19,7 @@ namespace MemorySpace
 struct CSoundObject;
 };
 
-enum ESoundTypes;
+enum ESoundTypes : u32;
 
 class CCustomMonster;
 class CAI_Stalker;

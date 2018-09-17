@@ -2,7 +2,7 @@
 #include "game_sv_item_respawner.h"
 #include "game_sv_base.h"
 #include "Level.h"
-#include "xrServer_Objects_Alife_Items.h"
+#include "xrServer_Objects_ALife_Items.h"
 #include "xrNetServer/NET_Messages.h"
 #include <functional>
 

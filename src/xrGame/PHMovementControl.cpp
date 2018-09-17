@@ -22,7 +22,7 @@
 #include "PhysicsShellHolder.h"
 #include "xrCore/xr_token.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 #include "Include/xrRender/Kinematics.h"

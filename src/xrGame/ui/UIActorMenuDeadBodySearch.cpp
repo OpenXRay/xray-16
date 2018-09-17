@@ -12,7 +12,7 @@
 #include "GameObject.h"
 #include "InventoryOwner.h"
 #include "Inventory.h"
-#include "Inventory_item.h"
+#include "inventory_item.h"
 #include "InventoryBox.h"
 #include "string_table.h"
 #include "ai/monsters/basemonster/base_monster.h"

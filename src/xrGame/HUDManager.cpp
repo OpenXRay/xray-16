@@ -15,7 +15,7 @@
 #include "game_cl_base.h"
 #include "xrEngine/GameFont.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 extern CUIGameCustom* CurrentGameUI() { return HUD().GetGameUI(); }
@@ -313,7 +313,7 @@ void CHUDManager::SetHitmarkType(LPCSTR tex_name) { HitMarker.InitShader(tex_nam
 void CHUDManager::SetGrenadeMarkType(LPCSTR tex_name) { HitMarker.InitShader_Grenade(tex_name); }
 // ------------------------------------------------------------------------------------
 
-#include "ui/UIMainInGameWnd.h"
+#include "ui/UIMainIngameWnd.h"
 extern CUIXml* pWpnScopeXml;
 
 void CHUDManager::Load()

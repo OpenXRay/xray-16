@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "poltergeist.h"
-#include "xrServerEntities/xrmessages.h"
+#include "xrServerEntities/xrMessages.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "Level.h"

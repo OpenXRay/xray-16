@@ -5,6 +5,11 @@ template <typename _Object>
 class CBloodsuckerStateAttack : public CStateMonsterAttack<_Object>
 {
     typedef CStateMonsterAttack<_Object> inherited_attack;
+    using inherited = typename inherited_attack::inherited;
+    using inherited::prev_substate;
+    using inherited::current_substate;
+    using inherited::m_time_start_check_behinder;
+    using inherited::object;
 
     u32 m_time_stop_invis;
     Fvector m_dir_point;
@@ -32,6 +37,7 @@ template <typename _Object>
 class CStateMonsterBackstubEnemy : public CState<_Object>
 {
     typedef CState<_Object> inherited;
+    using inherited::object;
 
 public:
     struct StateParams : SStateDataMoveToPointEx
