@@ -9,7 +9,7 @@
 #pragma once
 
 #include <loki/HierarchyGenerators.h>
-#define registry_type_list Loki::Typelist<>
-#define add_to_registry_type_list(a) using registry_##a = Loki::TL::Prepend<a, registry_type_list>::result;
+#define registry_type_list Loki::NullType
+#define add_to_registry_type_list(a) typedef Loki::Typelist<a, registry_type_list> registry_##a;
 #define define_constant(a) (a*)0
 #define save_registry_type_list(a) registry_##a
