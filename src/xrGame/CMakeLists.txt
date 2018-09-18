@@ -108,5 +108,8 @@ list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UITex
 add_definitions(-DXRGAME_EXPORTS -D_USRDLL)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "StdAfx.h")
+cotire(${PROJECT_NAME})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrEngine xrMiscMath luabind xrAPI xrAICore xrSound xrScriptEngine cximage ${LUA_LIBRARIES} pugixml xrCDB xrPhysics ${SDL_LIBRARIES})

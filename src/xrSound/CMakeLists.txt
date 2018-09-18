@@ -25,5 +25,8 @@ list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./MusicS
 add_definitions(-DXRSOUND_EXPORTS -DdSINGLE -D_SECURE_SCL=0)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
+cotire(${PROJECT_NAME})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrAPI xrCDB ${OGG_LIBRARIES} openal vorbis vorbisfile)

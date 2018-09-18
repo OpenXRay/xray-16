@@ -4,11 +4,13 @@ project(OpenXRay)
 include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+include(cotire)
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    set(ENV{CCACHE_SLOPPINESS} pch_defines,time_macros)
 endif(CCACHE_FOUND)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
