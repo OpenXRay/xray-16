@@ -20,13 +20,13 @@ SCRIPT_EXPORT(profile_data_script_registrator, (), {
             .def_readonly("second", &all_best_scores_t::value_type::second)];
 });
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(store_operation_cb, (), {
     module(luaState)[class_<gamespy_profile::store_operation_cb>("store_operation_cb")
                          .def(constructor<>())
                          .def(constructor<gamespy_profile::store_operation_cb::lua_object_type,
                              gamespy_profile::store_operation_cb::lua_function_type>())
-#ifndef LINUX // FIXME!!!
                          .def("bind", &gamespy_profile::store_operation_cb::bind)
-#endif
                          .def("clear", &gamespy_profile::store_operation_cb::clear)];
 });
+#endif

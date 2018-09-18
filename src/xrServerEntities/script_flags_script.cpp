@@ -53,17 +53,16 @@ void one(T* self)
     self->assign(typename T::TYPE(-1));
 }
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(Flags8, (),
 {
     module(luaState)
     [
         class_<Flags8>("flags8")
             .def(constructor<>())
-#ifndef LINUX // FIXME!!!
             .def("get", &Flags8::get)
             .def("zero", &Flags8::zero)
             .def("one", &one<Flags8>)
-#endif
             .def("invert", (Flags8 & (Flags8::*)())(&Flags8::invert))
             .def("invert", (Flags8 & (Flags8::*)(const Flags8&))(&Flags8::invert))
             .def("invert", (Flags8 & (Flags8::*)(const Flags8::TYPE))(&Flags8::invert))
@@ -88,11 +87,9 @@ SCRIPT_EXPORT(Flags16, (),
     [
         class_<Flags16>("flags16")
             .def(constructor<>())
-#ifndef LINUX // FIXME!!!
             .def("get", &Flags16::get)
             .def("zero", &Flags16::zero)
             .def("one", &one<Flags16>)
-#endif
             .def("invert", (Flags16 & (Flags16::*)())(&Flags16::invert))
             .def("invert", (Flags16 & (Flags16::*)(const Flags16&))(&Flags16::invert))
             .def("invert", (Flags16 & (Flags16::*)(const Flags16::TYPE))(&Flags16::invert))
@@ -117,11 +114,9 @@ SCRIPT_EXPORT(Flags32, (),
     [
         class_<Flags32>("flags32")
             .def(constructor<>())
-#ifndef LINUX // FIXME!!!
             .def("get", &Flags32::get)
             .def("zero", &Flags32::zero)
             .def("one", &Flags32::one)
-#endif
             .def("invert", (Flags32 & (Flags32::*)())(&Flags32::invert))
             .def("invert", (Flags32 & (Flags32::*)(const Flags32&))(&Flags32::invert))
             .def("invert", (Flags32 & (Flags32::*)(const Flags32::TYPE))(&Flags32::invert))
@@ -139,3 +134,4 @@ SCRIPT_EXPORT(Flags32, (),
             .def("equal", (bool(*)(Flags32*, const Flags32&, const Flags32::TYPE))(&equal<Flags32>))
     ];
 });
+#endif

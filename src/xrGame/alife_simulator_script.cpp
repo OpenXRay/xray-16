@@ -348,10 +348,9 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          .def("actor", &get_actor)
                          .def("has_info", &has_info)
                          .def("dont_has_info", &dont_has_info)
-#ifndef LINUX // FIXME!!!
-                         .def("switch_distance", &CALifeSimulator::switch_distance)
-                         .def("set_switch_distance", &CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
-#endif
+                         .def("switch_distance", (float (CALifeSimulator::*)())(&CALifeSimulator::switch_distance))
+                         .def("set_switch_distance", (void (CALifeSimulator::*)(float))
+                            (&CALifeSimulator::set_switch_distance)) //Alundaio: renamed to set_switch_distance from switch_distance
                          //Alundaio: extend alife simulator exports
                          .def("teleport_object", &teleport_object)
                          //Alundaio: END

@@ -781,9 +781,7 @@ IC static void CLevel_Export(lua_State* luaState)
     ];
 
     module(luaState)[def("command_line", &command_line),
-#ifndef LINUX // FIXME!!!
-        def("IsGameTypeSingle", &IsGameTypeSingle),
-#endif
+        def("IsGameTypeSingle", (bool (*)())&IsGameTypeSingle),
         def("IsDynamicMusic", &IsDynamicMusic), def("render_get_dx_level", &render_get_dx_level),
         def("IsImportantSave", &IsImportantSave)];
 
