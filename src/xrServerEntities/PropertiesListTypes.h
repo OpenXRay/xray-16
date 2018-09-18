@@ -8,6 +8,7 @@
 #include "xrCore/_rect.h"
 #include "xrCore/xr_trims.h"
 #include "xrCore/xr_shortcut.h"
+#include "xrCore/xr_token.h"
 //#include "xrCore/xrCore.h"
 
 #ifdef __BORLANDC__

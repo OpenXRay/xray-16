@@ -10,7 +10,9 @@
 
 #include "visual_memory_params.h"
 #include "memory_space.h"
+#include "memory_space_impl.h"
 #include "xrCommon/xr_vector.h"
+
 
 class CCustomMonster;
 class CAI_Stalker;

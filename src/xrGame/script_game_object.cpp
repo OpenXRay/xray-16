@@ -673,7 +673,7 @@ pcstr CScriptGameObject::get_smart_cover_description() const
             LuaMessageType::Error, "smart_cover::object : cannot access class member get_smart_cover_description!");
         return nullptr;
     }
-    return smart_cover_object->cover().description()->table_id().c_str();
+    return smart_cover_object->get_cover().get_description()->table_id().c_str();
 }
 
 void CScriptGameObject::set_visual_name(LPCSTR visual) { object().cNameVisual_set(visual); }

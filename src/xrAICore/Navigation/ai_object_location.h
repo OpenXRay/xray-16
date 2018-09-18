@@ -13,7 +13,7 @@
 namespace LevelGraph
 {
 class CVertex;
-};
+}
 
 class CAI_ObjectLocation
 {

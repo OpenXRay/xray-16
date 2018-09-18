@@ -1362,10 +1362,10 @@ void CCharacterPhysicsSupport::on_destroy_anim_mov_ctrl()
     anim_mov_state.active = false;
 }
 
-bool CCharacterPhysicsSupport::interactive_motion() { return is_imotion(m_interactive_motion); }
+bool CCharacterPhysicsSupport::is_interactive_motion() { return is_imotion(m_interactive_motion); }
 bool CCharacterPhysicsSupport::can_drop_active_weapon()
 {
-    return !interactive_motion() && m_flags.test(fl_death_anim_on);
+    return !is_interactive_motion() && m_flags.test(fl_death_anim_on);
 };
 
 void CCharacterPhysicsSupport::in_Die()

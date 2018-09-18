@@ -17,14 +17,14 @@
 const CAI_Stalker& static_obstacles_avoider::object() const { return (movement_manager().object()); }
 void static_obstacles_avoider::query(const Fvector& start_position, const Fvector& dest_position)
 {
-    ai().moving_objects().query_action_static(object().get_moving_object(), start_position, dest_position);
+    ai().get_moving_objects().query_action_static(object().get_moving_object(), start_position, dest_position);
 
     m_current_iteration.swap(object().get_moving_object()->static_query());
 }
 
 void static_obstacles_avoider::query()
 {
-    ai().moving_objects().query_action_static(object().get_moving_object());
+    ai().get_moving_objects().query_action_static(object().get_moving_object());
 
     m_current_iteration.swap(object().get_moving_object()->static_query());
 }

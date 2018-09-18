@@ -224,7 +224,7 @@ description::~description()
     delete_data(m_transitions);
 }
 
-loophole const* description::loophole(shared_str const& loophole_id) const
+loophole const* description::get_loophole(shared_str const& loophole_id) const
 {
     class id_predicate
     {

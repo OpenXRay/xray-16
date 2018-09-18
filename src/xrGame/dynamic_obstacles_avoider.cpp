@@ -16,7 +16,7 @@
 
 void dynamic_obstacles_avoider::query()
 {
-    ai().moving_objects().query_action_dynamic(object().get_moving_object());
+    ai().get_moving_objects().query_action_dynamic(object().get_moving_object());
 
     m_current_iteration.swap(object().get_moving_object()->dynamic_query());
 }

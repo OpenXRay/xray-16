@@ -1579,7 +1579,7 @@ bool CScriptGameObject::suitable_smart_cover(CScriptGameObject* object)
         return (false);
     }
 
-    smart_cover::cover const& cover = smart_object->cover();
+    smart_cover::cover const& cover = smart_object->get_cover();
     if (!cover.can_fire())
         return (true);
 

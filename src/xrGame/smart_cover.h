@@ -56,7 +56,7 @@ public:
         luabind::adl::object const& loopholes);
     ~cover();
     IC Loopholes const& loopholes() const;
-    IC object const& object() const;
+    IC object const& get_object() const;
     IC Fvector fov_position(loophole const& loophole) const;
     IC Fvector fov_direction(loophole const& loophole) const;
     IC Fvector danger_fov_direction(loophole const& loophole) const;
@@ -66,7 +66,7 @@ public:
     u32 const& action_level_vertex_id(loophole const& loophole, shared_str const& action_id) const;
     loophole* best_loophole(
         Fvector const& position, float& value, bool const& use_default_behaviour, bool is_smart_cover_entered) const;
-    IC DescriptionPtr const& description() const;
+    IC DescriptionPtr const& get_description() const;
     void evaluate_loophole(
         Fvector const& position, loophole*& source, loophole*& result, float& value, bool is_smart_cover_entered) const;
     IC shared_str const& id() const;
