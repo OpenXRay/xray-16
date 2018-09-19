@@ -37,7 +37,7 @@ CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
         xr_delete(g_object_factory);
         ai().SetupScriptEngine();
 #ifdef DEBUG
-        ai().moving_objects().clear();
+        ai().get_moving_objects().clear();
 #endif // DEBUG
     }
 

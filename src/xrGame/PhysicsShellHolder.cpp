@@ -322,7 +322,7 @@ void CPhysicsShellHolder::OnChangeVisual()
         if (char_support)
             char_support->destroy_imotion();
 
-        VERIFY(!character_physics_support() || !character_physics_support()->interactive_motion());
+        VERIFY(!character_physics_support() || !character_physics_support()->is_interactive_motion());
         if (m_pPhysicsShell)
             m_pPhysicsShell->Deactivate();
         xr_delete(m_pPhysicsShell);
