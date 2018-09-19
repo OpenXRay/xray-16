@@ -36,7 +36,7 @@ using MemorySpace::CMemoryInfo;
 float stalker_movement_manager_smart_cover::enter_path(LoopholePath* result, Fvector const& position,
     u32 const level_vertex_id, smart_cover::cover const& cover, shared_str const& target_loophole_id)
 {
-    VERIFY(cover.get_description()->loophole(target_loophole_id));
+    VERIFY(cover.get_description()->get_loophole(target_loophole_id));
 
     float value = flt_max;
 
@@ -212,7 +212,7 @@ stalker_movement_manager_smart_cover::transition_action const& stalker_movement_
 
     VERIFY2(
         result, make_string("cover[%s][%s], loophole[%s -> %s], body_state[%s] [%f][%f][%f]", cover.id().c_str(),
-                    cover.description()->table_id().c_str(), loophole_id0.c_str(), loophole_id1.c_str(),
+                    cover.get_description()->table_id().c_str(), loophole_id0.c_str(), loophole_id1.c_str(),
                     !target_body_state ? "" : (*target_body_state == eBodyStateStand ?
                                                       "stand" :
                                                       (*target_body_state == eBodyStateCrouch ? "crouch" : "invalid!")),

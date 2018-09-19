@@ -197,12 +197,12 @@ LPCSTR stalker_movement_params::cover_loophole_id() const
     if (m_cover_loophole)
     {
         VERIFY(m_cover_loophole_id == m_cover_loophole->id());
-        VERIFY(m_cover->description()->loophole(m_cover_loophole_id));
+        VERIFY(m_cover->get_description()->get_loophole(m_cover_loophole_id));
         return (m_cover_loophole_id.c_str());
     }
 
     actualize_loophole();
-    VERIFY(!m_cover_selected_loophole || m_cover->description()->loophole(m_cover_selected_loophole->id()));
+    VERIFY(!m_cover_selected_loophole || m_cover->get_description()->get_loophole(m_cover_selected_loophole->id()));
     return (m_cover_selected_loophole ? m_cover_selected_loophole->id().c_str() : "");
 }
 
@@ -213,11 +213,11 @@ smart_cover::loophole const* stalker_movement_params::cover_loophole() const
     if (m_cover_loophole)
     {
         VERIFY(m_cover_loophole_id == m_cover_loophole->id());
-        VERIFY(m_cover->description()->loophole(m_cover_loophole_id));
+        VERIFY(m_cover->get_description()->get_loophole(m_cover_loophole_id));
         return (m_cover_loophole);
     }
 
     actualize_loophole();
-    VERIFY(!m_cover_selected_loophole || m_cover->description()->loophole(m_cover_selected_loophole->id()));
+    VERIFY(!m_cover_selected_loophole || m_cover->get_description()->get_loophole(m_cover_selected_loophole->id()));
     return (m_cover_selected_loophole);
 }
