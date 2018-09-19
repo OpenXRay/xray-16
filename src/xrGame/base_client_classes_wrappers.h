@@ -34,8 +34,9 @@ struct linear_registrator<_type, Loki::EmptyType> : public _type
 template <typename _1, typename _2>
 struct heritage
 {
-    using tl = Loki::Typelist<_1, _2>;
-    using result = Loki::GenLinearHierarchy<tl, linear_registrator>;
+    typedef Loki::Typelist<_1, Loki::Typelist<_2, Loki::NullType>> tl;
+    typedef typename Loki::TL::Erase<tl, Loki::EmptyType>::Result pure_tl;
+    typedef typename Loki::GenLinearHierarchy<pure_tl, linear_registrator>::LinBase result;
 };
 
 template <typename base>

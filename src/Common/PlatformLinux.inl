@@ -49,6 +49,7 @@
 #define CALLBACK
 #define TEXT(x) strdup(x)
 
+/*
 inline char* _strlwr_l(char* str, locale_t loc)
 {
 //TODO
@@ -58,6 +59,7 @@ inline char* _strupr_l(char* str, locale_t loc)
 {
 //TODO
 }
+*/
 
 #define VOID void
 #define HKL void*

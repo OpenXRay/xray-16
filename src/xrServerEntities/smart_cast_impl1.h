@@ -59,7 +59,7 @@ struct exists
     };
 
     template <>
-    struct iterator<Loki::EmptyType>
+    struct iterator<Loki::NullType>
     {
         enum
         {
@@ -83,7 +83,7 @@ struct merge
     };
 
     template <>
-    struct iterator<Loki::EmptyType>
+    struct iterator<Loki::NullType>
     {
         typedef List2 result;
     };
@@ -116,9 +116,9 @@ struct has_conversion
     };
 
     template <>
-    struct search_base<Loki::EmptyType>
+    struct search_base<Loki::NullType>
     {
-        typedef Loki::EmptyType result;
+        typedef Loki::NullType result;
     };
 
     template <typename T>
@@ -149,7 +149,7 @@ struct has_conversion
     };
 
     template <>
-    struct search_conversion<Loki::EmptyType>
+    struct search_conversion<Loki::NullType>
     {
         enum
         {
@@ -197,7 +197,7 @@ struct has_any_conversion
     };
 
     template <>
-    struct iterator<Loki::EmptyType>
+    struct iterator<Loki::NullType>
     {
         enum
         {
@@ -233,14 +233,14 @@ struct CMatcher
                 template <bool>
                 struct _selector
                 {
-                    typedef Loki::Typelist<typename PrevHead::Head, Loki::Typelist<Target, Loki::EmptyType>> result;
+                    typedef Loki::Typelist<typename PrevHead::Head, Loki::Typelist<Target, Loki::NullType>> result;
                 };
 
                 template <>
                 struct _selector<false>
                 {
                     typedef Loki::Typelist<typename PrevHead::Head,
-                        Loki::Typelist<Head, Loki::Typelist<Target, Loki::EmptyType>>>
+                        Loki::Typelist<Head, Loki::Typelist<Target, Loki::NullType>>>
                         result;
                 };
 
@@ -258,7 +258,7 @@ struct CMatcher
         };
 
         template <>
-        struct CMatchHelper3<Loki::EmptyType>
+        struct CMatchHelper3<Loki::NullType>
         {
             typedef typename CMatchHelper<typename T::Tail>::result result;
         };
@@ -290,9 +290,9 @@ struct CMatcher
     };
 
     template <>
-    struct CMatchHelper<Loki::EmptyType>
+    struct CMatchHelper<Loki::NullType>
     {
-        typedef Loki::EmptyType result;
+        typedef Loki::NullType result;
     };
 
     typedef typename CMatchHelper<cast_type_list>::result result;
@@ -326,7 +326,7 @@ struct conversion_sequence
                 typedef search_result result;
             };
 
-            typedef typename selector<is_type<Loki::EmptyType, search_result>::value>::result result;
+            typedef typename selector<is_type<Loki::NullType, search_result>::value>::result result;
         };
 
         template <bool>
@@ -346,7 +346,7 @@ struct conversion_sequence
                 typedef typename list_iterator<Tail>::result result;
             };
 
-            typedef typename _selector<!is_type<Loki::EmptyType, helper_result>::value>::result result;
+            typedef typename _selector<!is_type<Loki::NullType, helper_result>::value>::result result;
         };
 
         template <>
@@ -369,7 +369,7 @@ struct conversion_sequence
                     typedef typename list_iterator<Tail>::result result;
                 };
 
-                typedef typename _selector2<!is_type<Loki::EmptyType, helper_result>::value>::result result;
+                typedef typename _selector2<!is_type<Loki::NullType, helper_result>::value>::result result;
             };
 
             template <>
@@ -386,9 +386,9 @@ struct conversion_sequence
     };
 
     template <>
-    struct list_iterator<Loki::EmptyType>
+    struct list_iterator<Loki::NullType>
     {
-        typedef Loki::EmptyType result;
+        typedef Loki::NullType result;
     };
 
     template <int length>
@@ -410,7 +410,7 @@ struct conversion_sequence
             typedef typename list_iterator<cast_type_list>::result result;
         };
 
-        typedef typename _selector<!is_type<Loki::EmptyType, nearest>::value>::result result;
+        typedef typename _selector<!is_type<Loki::NullType, nearest>::value>::result result;
     };
 
     template <>
@@ -422,7 +422,7 @@ struct conversion_sequence
     template <>
     struct selector<0>
     {
-        typedef Loki::EmptyType result;
+        typedef Loki::NullType result;
     };
 
     typedef typename selector<max_length>::result result;
@@ -451,7 +451,7 @@ struct CSmartCaster
     };
 
     template <>
-    struct CHelper<Loki::EmptyType>
+    struct CHelper<Loki::NullType>
     {
         IC static Target* smart_cast(Head* p) { return (SmartDynamicCast::smart_cast<Target>(p)); }
     };
@@ -474,7 +474,7 @@ struct CSmartMatcher
     }
 
     template <>
-    IC static T1* smart_cast<Loki::EmptyType>(T2* p)
+    IC static T1* smart_cast<Loki::NullType>(T2* p)
     {
 #ifdef SHOW_SMART_CAST_UNOPTIMIZED_CASES
 #pragma todo("Dima to all : this smart_cast is not optimized!")

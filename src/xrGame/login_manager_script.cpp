@@ -32,13 +32,13 @@ SCRIPT_EXPORT(profile, (), {
         luaState)[class_<profile>("profile").def("unique_nick", &profile::unique_nick).def("online", &profile::online)];
 });
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(login_operation_cb, (), {
     module(luaState)[class_<gamespy_gp::login_operation_cb>("login_operation_cb")
                          .def(constructor<>())
                          .def(constructor<gamespy_gp::login_operation_cb::lua_object_type,
                              gamespy_gp::login_operation_cb::lua_function_type>())
-#ifndef LINUX // FIXME!!!
                          .def("bind", &gamespy_gp::login_operation_cb::bind)
-#endif
                          .def("clear", &gamespy_gp::login_operation_cb::clear)];
 });
+#endif

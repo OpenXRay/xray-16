@@ -32,25 +32,26 @@
 
 namespace award_system
 {
+
 template <typename>
 struct AccumulatorHelper;
 
 template <>
-struct AccumulatorHelper<Loki::Typelist<>> {
+struct AccumulatorHelper<Loki::NullType> {
 	static void init_acpv(game_state_accumulator*,
 		game_state_accumulator::accumulative_values_collection_t&)
 	{
 	}
 };
 
-template <typename T, typename... Ts>
-struct AccumulatorHelper<Loki::Typelist<T, Ts...>> {
+template <typename Head, typename Tail>
+struct AccumulatorHelper<Loki::Typelist<Head, Tail>> {
 	static void init_acpv(game_state_accumulator* self,
 		game_state_accumulator::accumulative_values_collection_t& accumulative_values)
 	{
-		AccumulatorHelper<Loki::Typelist<Ts...>>::init_acpv(self, accumulative_values);
-		player_state_param* tmp_obj_inst = new typename T::value_type(self);
-		accumulative_values.insert(std::make_pair(T::value_id, tmp_obj_inst));
+		AccumulatorHelper<Tail>::init_acpv(self, accumulative_values);
+		player_state_param* tmp_obj_inst = new typename Head::value_type(self);
+		accumulative_values.insert(std::make_pair(Head::value_id, tmp_obj_inst));
 	}
 };
 

@@ -12,35 +12,35 @@
 #include "alife_space.h"
 #include "Common/object_type_traits.h"
 
-template <typename, typename>
+template <typename TContainer, typename TList>
 struct RegistryHelper;
 
 template <typename TContainer>
-struct RegistryHelper<TContainer, Loki::Typelist<>>
+struct RegistryHelper<TContainer, Loki::NullType>
 {
     static void Save(TContainer*, IWriter&) {};
     static void Load(TContainer*, IReader&) {};
 };
 
-template <typename TContainer, typename T, typename... Ts>
-struct RegistryHelper<TContainer, Loki::Typelist<T, Ts...>>
+template <typename TContainer, typename Head, typename Tail>
+struct RegistryHelper<TContainer, Loki::Typelist<Head, Tail>>
 {
-    static constexpr bool isSerializable = object_type_traits::is_base_and_derived<ISerializable, T>::value;
+    static constexpr bool isSerializable =
+        object_type_traits::is_base_and_derived<ISerializable, Head>::value;
 
     static void Save(TContainer* self, IWriter& writer)
     {
         if constexpr (isSerializable)
-            self->T::save(writer);
-        RegistryHelper<TContainer, Loki::Typelist<Ts...>>::Save(self, writer);
+            self->Head::save(writer);
+        RegistryHelper<TContainer, Tail>::Save(self, writer);
     };
 
     static void Load(TContainer* self, IReader& reader)
     {
         if constexpr (isSerializable)
-            self->T::load(reader);
-        RegistryHelper<TContainer, Loki::Typelist<Ts...>>::Load(self, reader);
+            self->Head::load(reader);
+        RegistryHelper<TContainer, Tail>::Load(self, reader);
     }
-
 };
 
 void CALifeRegistryContainer::load(IReader& file_stream)

@@ -81,7 +81,6 @@ public:
     bool check_accumulative_value(enum_accumulative_player_values param_id, u32_binary_function* func, u32 right_arg);
 
     using accumulative_values_collection_t = AssociativeVector<enum_accumulative_player_values, player_state_param*>;
-
 private:
     // average_values_collection_t			m_average_values;
     accumulative_values_collection_t m_accumulative_values;
