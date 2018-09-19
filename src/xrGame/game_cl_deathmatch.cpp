@@ -949,7 +949,7 @@ void game_cl_Deathmatch::OnRender()
     };
 }
 
-IC bool DM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2)
+bool DM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2)
 {
     if (p1->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && !p2->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
         return false;

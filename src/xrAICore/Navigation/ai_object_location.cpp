@@ -6,11 +6,10 @@
 //	Description : AI object location implementation
 ////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "xrAICore/Navigation/level_graph.h"
+#include "xrGame/ai_space.h"
 
 IC void CAI_ObjectLocation::init()
 {

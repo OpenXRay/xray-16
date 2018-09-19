@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "ai_monster_utils.h"
 #include "Entity.h"
-#include "xrAICore/Navigation/ai_object_location_impl.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "Include/xrRender/Kinematics.h"

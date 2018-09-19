@@ -153,7 +153,7 @@ IC void stalker_movement_manager_base::setup_head_speed(stalker_movement_params&
         m_head.speed = m_danger_head_speed;
 }
 
-IC void stalker_movement_manager_base::add_velocity(int mask, float linear, float compute_angular, float angular)
+void stalker_movement_manager_base::add_velocity(int mask, float linear, float compute_angular, float angular)
 {
     detail().add_velocity(mask, CDetailPathManager::STravelParams(linear, compute_angular, angular));
 }

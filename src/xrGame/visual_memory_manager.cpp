@@ -157,7 +157,7 @@ void CVisualMemoryManager::reload(LPCSTR section)
     }
 }
 
-IC const CVisionParameters& CVisualMemoryManager::current_state() const
+const CVisionParameters& CVisualMemoryManager::current_state() const
 {
     if (m_stalker)
     {

@@ -136,7 +136,7 @@ public:
     IC const VISIBLES& objects() const;
     IC const RAW_VISIBLES& raw_objects() const;
     IC const NOT_YET_VISIBLES& not_yet_visible_objects() const;
-    IC const CVisionParameters& current_state() const;
+    const CVisionParameters& current_state() const;
     IC squad_mask_type mask() const;
 
 public:
