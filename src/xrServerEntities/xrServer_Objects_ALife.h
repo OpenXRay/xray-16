@@ -99,7 +99,7 @@ public:
 
     CSE_ALifeGraphPoint(LPCSTR caSection);
     virtual ~CSE_ALifeGraphPoint();
-    virtual bool match_configuration() const noexcept { return false; }
+    virtual bool match_configuration() const /* noexcept */ { return false; }
 #ifndef XRGAME_EXPORTS
     virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
@@ -151,17 +151,17 @@ public:
 
     CSE_ALifeObject(LPCSTR caSection);
     virtual ~CSE_ALifeObject();
-    virtual bool used_ai_locations() const noexcept;
-    virtual bool can_save() const noexcept;
-    virtual bool can_switch_online() const noexcept;
-    virtual bool can_switch_offline() const noexcept;
-    virtual bool interactive() const noexcept;
+    virtual bool used_ai_locations() const /* noexcept* */;
+    virtual bool can_save() const /* noexcept */;
+    virtual bool can_switch_online() const /* noexcept */;
+    virtual bool can_switch_offline() const /* noexcept */;
+    virtual bool interactive() const /* noexcept */;
     virtual CSE_ALifeObject* cast_alife_object() { return this; }
     bool move_offline() const;
-    void can_switch_online(bool value) noexcept;
-    void can_switch_offline(bool value) noexcept;
+    void can_switch_online(bool value) /* noexcept */;
+    void can_switch_offline(bool value) /* noexcept */;
     void use_ai_locations(bool value);
-    void interactive(bool value) noexcept;
+    void interactive(bool value) /* noexcept */;
     void move_offline(bool value);
     bool visible_for_map() const;
     void visible_for_map(bool value);
@@ -174,7 +174,7 @@ public:
     virtual void spawn_supplies();
     CALifeSimulator& alife() const;
     virtual Fvector draw_level_position() const;
-    virtual bool keep_saved_data_anyway() const noexcept;
+    virtual bool keep_saved_data_anyway() const /* noexcept */;
 #endif
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -341,8 +341,8 @@ class CSE_ALifePHSkeletonObject : public CSE_ALifeDynamicObjectVisual, public CS
 public:
     CSE_ALifePHSkeletonObject(LPCSTR caSection);
     virtual ~CSE_ALifePHSkeletonObject();
-    virtual bool can_save() const noexcept;
-    virtual bool used_ai_locations() const noexcept;
+    virtual bool can_save() const /* noexcept */;
+    virtual bool used_ai_locations() const /* noexcept */;
     virtual void load(NET_Packet& tNetPacket);
     virtual CSE_Abstract* cast_abstract() { return this; }
 public:
@@ -364,8 +364,8 @@ public:
     CSE_ALifeSpaceRestrictor(LPCSTR caSection);
     virtual ~CSE_ALifeSpaceRestrictor();
     virtual IServerEntityShape* __stdcall shape();
-    virtual bool can_switch_offline() const noexcept;
-    virtual bool used_ai_locations() const noexcept;
+    virtual bool can_switch_offline() const /* noexcept */;
+    virtual bool used_ai_locations() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -411,7 +411,7 @@ public:
     virtual void update();
     virtual float detect_probability();
     virtual void smart_touch(CSE_ALifeMonsterAbstract* monster);
-    virtual bool used_ai_locations() const noexcept { return true; };
+    virtual bool used_ai_locations() const /* noexcept */ { return true; };
     virtual CSE_ALifeSmartZone* cast_smart_zone() { return this; };
 #ifdef XRGAME_EXPORTS
     virtual bool bfActive();
@@ -444,8 +444,8 @@ public:
     shared_str fixed_bones;
     CSE_ALifeObjectPhysic(LPCSTR caSection);
     virtual ~CSE_ALifeObjectPhysic();
-    virtual bool used_ai_locations() const noexcept;
-    virtual bool can_save() const noexcept;
+    virtual bool used_ai_locations() const /* noexcept */;
+    virtual bool can_save() const /* noexcept */;
     virtual void load(NET_Packet& tNetPacket);
     virtual CSE_Abstract* cast_abstract() { return this; }
     //  virtual void                    load                    (IReader& r){inherited::load(r);}
@@ -543,8 +543,8 @@ public:
     CSE_ALifeObjectHangingLamp(LPCSTR caSection);
     virtual ~CSE_ALifeObjectHangingLamp();
     virtual void load(NET_Packet& tNetPacket);
-    virtual bool used_ai_locations() const noexcept;
-    virtual bool match_configuration() const noexcept;
+    virtual bool used_ai_locations() const /* noexcept */;
+    virtual bool match_configuration() const /* noexcept */;
     virtual bool __stdcall validate();
 #ifndef XRGAME_EXPORTS
     virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
@@ -565,7 +565,7 @@ class CSE_ALifeObjectProjector : public CSE_ALifeDynamicObjectVisual
 public:
     CSE_ALifeObjectProjector(LPCSTR caSection);
     virtual ~CSE_ALifeObjectProjector();
-    virtual bool used_ai_locations() const noexcept;
+    virtual bool used_ai_locations() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -584,8 +584,8 @@ public:
     CSE_ALifeHelicopter(LPCSTR caSection);
     virtual ~CSE_ALifeHelicopter();
     virtual void load(NET_Packet& tNetPacket);
-    virtual bool can_save() const noexcept;
-    virtual bool used_ai_locations() const noexcept;
+    virtual bool can_save() const /* noexcept */;
+    virtual bool used_ai_locations() const /* noexcept */;
     virtual CSE_Motion* __stdcall motion();
     virtual CSE_Abstract* cast_abstract() { return this; }
     virtual void UPDATE_Read(NET_Packet& P);
@@ -619,9 +619,9 @@ public:
     float health;
     CSE_ALifeCar(LPCSTR caSection);
     virtual ~CSE_ALifeCar();
-    virtual bool used_ai_locations() const noexcept;
+    virtual bool used_ai_locations() const /* noexcept */;
     virtual void load(NET_Packet& tNetPacket);
-    virtual bool can_save() const noexcept;
+    virtual bool can_save() const /* noexcept */;
     virtual CSE_Abstract* cast_abstract() { return this; }
 protected:
     virtual void data_load(NET_Packet& tNetPacket);
@@ -643,8 +643,8 @@ public:
     float m_health;
     CSE_ALifeObjectBreakable(LPCSTR caSection);
     virtual ~CSE_ALifeObjectBreakable();
-    virtual bool used_ai_locations() const noexcept;
-    virtual bool can_switch_offline() const noexcept;
+    virtual bool used_ai_locations() const /* noexcept */;
+    virtual bool can_switch_offline() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -661,8 +661,8 @@ public:
     CSE_ALifeObjectClimable(LPCSTR caSection);
     shared_str material;
     virtual ~CSE_ALifeObjectClimable();
-    virtual bool used_ai_locations() const noexcept;
-    virtual bool can_switch_offline() const noexcept;
+    virtual bool used_ai_locations() const /* noexcept */;
+    virtual bool can_switch_offline() const /* noexcept */;
     virtual IServerEntityShape* __stdcall shape();
 
 #ifndef XRGAME_EXPORTS

@@ -14,7 +14,6 @@
 using namespace luabind;
 
 void set_yaw(CSE_ALifeObjectPhysic* obj, const float yaw) { obj->o_Angle.y = yaw; }
-#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(CSE_ALifeObjectHangingLamp, (CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton), {
     module(luaState)[luabind_class_dynamic_alife2(
         CSE_ALifeObjectHangingLamp, "cse_alife_object_hanging_lamp", CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton)];
@@ -30,4 +29,3 @@ SCRIPT_EXPORT(CSE_ALifeSmartZone, (CSE_ALifeSpaceRestrictor, CSE_ALifeSchedulabl
     module(luaState)[luabind_class_zone2(
         CSE_ALifeSmartZone, "cse_alife_smart_zone", CSE_ALifeSpaceRestrictor, CSE_ALifeSchedulable)];
 });
-#endif

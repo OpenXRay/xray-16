@@ -13,7 +13,6 @@
 
 using namespace luabind;
 
-#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(CSE_ALifeInventoryItem, (), {
     module(luaState)[class_<CSE_ALifeInventoryItem>("cse_alife_inventory_item")
         //          .def(       constructor<LPCSTR>())
@@ -52,4 +51,3 @@ SCRIPT_EXPORT(CSE_ALifeItemDetector, (CSE_ALifeItem),
 
 SCRIPT_EXPORT(CSE_ALifeItemArtefact, (CSE_ALifeItem),
     { module(luaState)[luabind_class_item1(CSE_ALifeItemArtefact, "cse_alife_item_artefact", CSE_ALifeItem)]; });
-#endif

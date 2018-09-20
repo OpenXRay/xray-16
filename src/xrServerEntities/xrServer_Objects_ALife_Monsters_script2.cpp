@@ -13,7 +13,6 @@
 
 using namespace luabind;
 
-#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(CSE_ALifeCreatureCrow, (CSE_ALifeCreatureAbstract),
 {
     module(luaState)
@@ -45,4 +44,3 @@ SCRIPT_EXPORT(CSE_ALifeHumanStalker, (CSE_ALifeHumanAbstract, CSE_PHSkeleton),
         luabind_class_monster2(CSE_ALifeHumanStalker, "cse_alife_human_stalker", CSE_ALifeHumanAbstract, CSE_PHSkeleton)
     ];
 });
-#endif
