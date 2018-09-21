@@ -6,7 +6,6 @@ using namespace luabind;
 using namespace luabind::policy;
 using namespace gamespy_gp;
 
-#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(account_manager, (), {
     module(luaState)[class_<account_manager>("account_manager")
                          .def("suggest_unique_nicks", &account_manager::suggest_unique_nicks)
@@ -31,6 +30,7 @@ SCRIPT_EXPORT(account_manager, (), {
                          .def("stop_searching_email", &account_manager::stop_searching_email)];
 });
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(suggest_nicks_cb, (), {
     module(luaState)[class_<gamespy_gp::suggest_nicks_cb>("suggest_nicks_cb")
                          .def(constructor<>())

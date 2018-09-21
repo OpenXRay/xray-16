@@ -14,7 +14,6 @@
 using namespace luabind;
 using namespace luabind::policy;
 
-#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(CSE_ALifeCreatureActor, (CSE_ALifeCreatureAbstract, CSE_ALifeTraderAbstract, CSE_PHSkeleton),
 {
     module(luaState)
@@ -88,4 +87,3 @@ static void CSE_ALifeOnlineOfflineGroup_Export(lua_State* luaState)
 }
 
 SCRIPT_EXPORT_FUNC(CSE_ALifeOnlineOfflineGroup, (CSE_ALifeDynamicObject, CSE_ALifeSchedulable), CSE_ALifeOnlineOfflineGroup_Export);
-#endif
