@@ -18,6 +18,7 @@
 #include "object_factory.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location_impl.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "ai_debug.h"
 #include "xrEngine/IGame_Level.h"
