@@ -18,9 +18,9 @@
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
 
-#ifdef XR_X64
+#if defined(XR_X64)
 #define _finddata_t _finddata64i32_t
-#elif XR_X86
+#elif defined(XR_X86)
 #define _finddata_t _finddata32_t
 #endif // XR_X64 or XR_X86
 
