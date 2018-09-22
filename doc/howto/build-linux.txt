@@ -16,7 +16,7 @@ JPEG
 
 
 Ubuntu 18.04 build dependencies:
-sudo apt install git cmake libfreeimage-dev liblockfile-dev libopenal-dev libtbb-dev libcrypto++-dev libpugixml-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+sudo apt install git cmake libfreeimage-dev liblockfile-dev libopenal-dev libtbb-dev libcrypto++-dev libpugixml-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev libreadline-dev
 
 Build commands:
 ------
