@@ -29,7 +29,7 @@ set(LUA_LIBRARIES luajit)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-elseif(${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     set(LUA_LIBRARIES luajit-debug)
 endif()
 
@@ -39,7 +39,6 @@ add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION 
 
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
-set(LUA_FOUND 1)
 if (NOT WIN32)
 if(EXISTS ${CMAKE_SOURCE_DIR}/Externals/cryptopp/dsa.h)
     file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/Externals/cryptopp)
