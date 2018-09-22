@@ -127,7 +127,6 @@ struct XML_DOC
 
 class XRCORE_API XMLDocument
 {
-    void Load(pcstr path_alias, pcstr xml_filename);
 
 public:
     string_path m_xml_file_name;
@@ -135,7 +134,9 @@ public:
     virtual ~XMLDocument();
     void ClearInternal();
 
-    void Load(pcstr path_alias, pcstr path, pcstr xml_filename);
+    bool Load(pcstr path_alias, pcstr xml_filename, bool fatal = true);
+    bool Load(pcstr path_alias, pcstr path, pcstr xml_filename, bool fatal = true);
+    bool Load(pcstr path_alias, pcstr path, pcstr path2, pcstr xml_filename, bool fatal = true);
 
     //чтение элементов
     pcstr Read(pcstr path, const size_t index, pcstr default_str_val) const;

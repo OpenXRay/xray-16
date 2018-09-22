@@ -45,23 +45,42 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
     }
 }
 
-void XMLDocument::Load(pcstr path_alias, pcstr path, pcstr _xml_filename)
+bool XMLDocument::Load(pcstr path_alias, pcstr path, pcstr xml_filename, bool fatal)
 {
-    shared_str fn = correct_file_name(path, _xml_filename);
+    shared_str fn = correct_file_name(path, xml_filename);
 
     string_path str;
     xr_sprintf(str, "%s\\%s", path, *fn);
-    return Load(path_alias, str);
+    return Load(path_alias, str, fatal);
 }
 
-//инициализация и загрузка XML файла
-void XMLDocument::Load(pcstr path, pcstr xml_filename)
+// Try to load from the first path, and if it's failed then try the second one
+bool XMLDocument::Load(pcstr path_alias, pcstr path, pcstr path2, pcstr xml_filename, bool fatal /*= true*/)
 {
-    xr_strcpy(m_xml_file_name, xml_filename);
-    // Load and parse xml file
+    shared_str fn = correct_file_name(path, xml_filename);
 
+    string_path str;
+    xr_sprintf(str, "%s\\%s", path, *fn);
+    if (Load(path_alias, str, false))
+        return true;
+
+    xr_sprintf(str, "%s\\%s", path2, *fn);
+    return Load(path_alias, str, fatal);
+}
+
+// Load and parse xml file
+bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
+{
     IReader* F = FS.r_open(path, xml_filename);
-    R_ASSERT3(F, "XML ERROR! File doesn't exist: ", xml_filename);
+    if (!F)
+    {
+        if (fatal)
+            R_ASSERT3(F, "Can't find specified xml file", xml_filename);
+        else
+            return false;
+    }
+
+    xr_strcpy(m_xml_file_name, xml_filename);
 
     CMemoryWriter W;
     ParseFile(path, W, F, this);
@@ -79,6 +98,8 @@ void XMLDocument::Load(pcstr path, pcstr xml_filename)
     }
 
     m_root = m_Doc.firstChildElement();
+
+    return true;
 }
 
 XML_NODE XMLDocument::NavigateToNode(XML_NODE start_node, pcstr path, const size_t node_index) const
