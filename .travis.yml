@@ -1,34 +1,54 @@
-language: cpp
-cache: ccache
-sudo: required
 dist: xenial
-compiler:
-- g++
-install: export CXX="g++-7"
+sudo: required
+cache: ccache
+language: cpp
+
+#branches:
+#  only:
+#  - linux
+#  - xd_dev
+#  - "/^v\\d+\\./"
+
 os:
 - linux
-before_script:
-  - g++ --version
-  - sudo apt-get install libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev
-  - sudo apt-get install cmake lua5.1-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
-  - mkdir bin
-  - cd bin
-  - cmake ..
-script:
-- if [ $TRAVIS_OS_NAME == linux ]; then make && file src/xrCore/xrCore.so; fi
+compiler:
+- g++
+env:
+  global:
+  - LANG="en_US.UTF-8"
+  matrix:
+  - TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+  - TARGET_CPU=x86 BUILD_CONFIGURATION=Release
+
 addons:
   apt:
     sources:
     - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
     - g++-7
-#branches:
-#  only:
-#  - linux
-#  - xd_dev
-#  - "/^v\\d+\\./"
+
+install: export CXX="g++-7"
+
+before_script:
+  - g++ --version
+  - export core_count=$(nproc || echo 4) && echo core_count = $core_count
+  - mkdir bin
+  - cd bin
+  - if [ $TARGET_CPU == x64 ]; then
+       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev;
+       sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev;
+       cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
+    fi
+
+  - if [ $TARGET_CPU == x86 ]; then
+       sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-7-multilib libpulse-dev:i386 libglib2.0-dev:i386;
+       sudo apt-get install -y libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386;
+       sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 libsdl2-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386;
+       CFLAGS="-m32 -march=native" CXXFLAGS="-m32 -march=native" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_ASM_FLAGS=-m32;
+    fi
+
+script:
+- if [ $TRAVIS_OS_NAME == linux ]; then make -j $core_count && file src/xrCore/xrCore.so; fi
+
 notifications:
   email: false
-env:
-  global:
-  - LANG="en_US.UTF-8"
