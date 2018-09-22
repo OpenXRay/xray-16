@@ -25,8 +25,14 @@ git submodule update --init --recursive
 rm -rf Externals/cryptopp/*
 mkdir bin && cd bin
 cmake ..
-(or CC=clang CXX=clang++ cmake ..)
 make
+
+#To enable all instruction for the local machine:
+CFLAGS="-march=native" CXXFLAGS="-march=native" cmake ..
+#To enable debugging:
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+#To use clang:
+CC=clang CXX=clang++ cmake ..
 
 Libraries (OLD LIST !!! ):
 ------
