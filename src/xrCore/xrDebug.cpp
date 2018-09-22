@@ -67,7 +67,7 @@ static BOOL bException = FALSE;
 #error CPU architecture is not supported.
 #endif
 
-namespace
+/*namespace
 {
 ICN void* GetInstructionPtr()
 {
@@ -92,7 +92,7 @@ ICN void* GetInstructionPtr()
 #endif
 #endif
 }
-}
+}*/
 
 // XXX: Probably rename this to AssertionResult?
 enum MessageBoxResult
