@@ -33,6 +33,8 @@ CFLAGS="-march=native" CXXFLAGS="-march=native" cmake ..
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 #To use clang:
 CC=clang CXX=clang++ cmake ..
+#To output log and error to different files:
+make >out.log 2>error.log
 
 Libraries (OLD LIST !!! ):
 ------
