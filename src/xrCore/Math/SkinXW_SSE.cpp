@@ -12,7 +12,7 @@ namespace XRay
 {
 namespace Math
 {
-#if defined(WINDOWS) and defined(XR_X86)
+#if defined(WINDOWS) && defined(XR_X86)
 #define transform_dir(idx, res, SX, SY, SZ, T1) \
     \
 __asm movzx eax,                                \
