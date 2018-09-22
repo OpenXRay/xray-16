@@ -47,8 +47,6 @@ struct _finddata32_t
     _fsize_t size;
     char name[FILENAME_MAX];
 };
-
-#define _finddata_t     _finddata64i32_t
 #endif
 
 class CStreamReader;
