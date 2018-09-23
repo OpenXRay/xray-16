@@ -34,7 +34,7 @@ UIInvUpgradeInfo::~UIInvUpgradeInfo() {}
 void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;
-    ui_xml.Load(CONFIG_PATH, UI_PATH, xml_name);
+    ui_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
     CUIXmlInit xml_init;
 
     XML_NODE stored_root = ui_xml.GetLocalRoot();

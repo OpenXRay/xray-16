@@ -16,7 +16,7 @@ UITeamPanels::~UITeamPanels() { CUIStatsIcon::FreeTexInfo(); }
 
 void UITeamPanels::Init(LPCSTR xmlName, LPCSTR panelsRootNode)
 {
-    uiXml.Load(CONFIG_PATH, UI_PATH, xmlName);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xmlName);
     CUIXmlInit::InitWindow(uiXml, panelsRootNode, 0, this);
     XML_NODE panelsRoot = uiXml.NavigateToNode(panelsRootNode, 0);
     VERIFY(panelsRoot);

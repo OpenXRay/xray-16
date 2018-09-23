@@ -28,7 +28,7 @@ void CUIGameAHunt::Init(int stage)
         m_pTeamPanels->Init(TEAM_PANELS_AHUNT_XML_NAME, "team_panels_wnd");
 
         CUIXml uiXml;
-        uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_ahunt.xml");
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_ahunt.xml");
 
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
         CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);

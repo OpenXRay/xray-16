@@ -88,7 +88,7 @@ void CUILogsWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUILogsWnd::Init()
 {
-    m_uiXml.Load(CONFIG_PATH, UI_PATH, PDA_LOGS_XML);
+    m_uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_LOGS_XML);
 
     CUIXmlInit::InitWindow(m_uiXml, "main_wnd", 0, this);
 

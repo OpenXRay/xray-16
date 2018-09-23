@@ -14,7 +14,7 @@ CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
     AttachChild(m_pList);
     m_pList->SetAutoDelete(true);
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "maingame.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "maingame.xml");
     CUIXmlInit::InitWindow(xml_doc, "speech_menu", 0, this);
     CUIXmlInit::InitScrollView(xml_doc, "speech_menu", 0, m_pList);
     m_pList->SetWndPos(Fvector2().set(0, 0));

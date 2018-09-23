@@ -50,7 +50,7 @@ void CUIFactionWarWnd::Reset()
 void CUIFactionWarWnd::Init()
 {
 	CUIXml xml;
-	xml.Load( CONFIG_PATH, UI_PATH, PDA_FACTION_WAR_XML );
+	xml.Load( CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_FACTION_WAR_XML );
 
 	CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
 

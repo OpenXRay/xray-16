@@ -28,6 +28,8 @@
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
 
+#include <tbb/parallel_for_each.h>
+
 #include "Common/object_broker.h"
 
 #include "account_manager.h"
@@ -150,16 +152,43 @@ CMainMenu::~CMainMenu()
 void CMainMenu::ReadTextureInfo()
 {
     string_path buf;
-    FS_FileSet fset;
-    FS.file_list(fset, "$game_config$", FS_ListFiles, strconcat(sizeof(buf), buf, UI_PATH, "\\", "textures_descr\\*.xml"));
-    for (const auto& file : fset)
-    {
-        string_path fn1, fn2, fn3;
-        _splitpath(file.name.c_str(), fn1, fn2, fn3, 0);
-        xr_strcat(fn3, ".xml");
+    FS_FileSet files;
 
-        CUITextureMaster::ParseShTexInfo(fn3);
-    }
+    const auto UpdateFileSet = [&](pcstr path)
+    {
+        FS.file_list(files, "$game_config$", FS_ListFiles,
+            strconcat(sizeof(buf), buf, path, "\\", "textures_descr\\*.xml")
+        );
+    };
+
+    const auto ParseFileSet = [&]()
+    {
+        /*
+         * Original CoP textures_descr
+         * loading time:
+         * Single-threaded ~80 ms
+         * Multi-threaded  ~40 ms
+         * Just a bit of speedup
+        */
+        tbb::parallel_for_each(files, [](const FS_File& file)
+        {
+            string_path path, name;
+            _splitpath(file.name.c_str(), nullptr, path, name, nullptr);
+            xr_strcat(name, ".xml");
+            path[xr_strlen(path) - 1] = '\0'; // cut the latest '\\'
+
+            CUITextureMaster::ParseShTexInfo(path, name);
+        });
+    };
+
+    UpdateFileSet(UI_PATH_DEFAULT);
+    ParseFileSet();
+
+    if (0 == xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
+        return;
+
+    UpdateFileSet(UI_PATH);
+    ParseFileSet();
 }
 
 void CMainMenu::Activate(bool bActivate)

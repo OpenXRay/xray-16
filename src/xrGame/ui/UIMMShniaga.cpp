@@ -165,7 +165,7 @@ void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_pat
     delete_data(*lst);
 
     CUIXml tmp_xml;
-    tmp_xml.Load(CONFIG_PATH, UI_PATH, xml_file);
+    tmp_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_file);
     CreateList(*lst, tmp_xml, xml_path);
 }
 

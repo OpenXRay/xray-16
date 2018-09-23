@@ -66,7 +66,7 @@ void CUIGameCTA::Init(int stage)
         teamPanels->Init(TEAM_PANELS_XML_NAME, "team_panels_wnd");
 
         CUIXml uiXml;
-        uiXml.Load(CONFIG_PATH, UI_PATH, CTA_GAME_WND_XML);
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, CTA_GAME_WND_XML);
 
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
 
@@ -761,7 +761,7 @@ void CUIGameCTA::SetVoteMessage(LPCSTR str)
     if (str)
     {
         CUIXml uiXml;
-        uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_dm.xml");
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml");
         m_voteStatusWnd = new UIVoteStatusWnd();
         m_voteStatusWnd->InitFromXML(uiXml);
         m_voteStatusWnd->Show(true);
