@@ -22,17 +22,16 @@ Build commands:
 ------
 cd xray-16
 git submodule update --init --recursive
-rm -rf Externals/cryptopp/*
 mkdir bin && cd bin
 cmake ..
 make
 
-#To enable all instruction for the local machine:
-CFLAGS="-march=native" CXXFLAGS="-march=native" cmake ..
 #To enable debugging:
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 #To use clang:
 CC=clang CXX=clang++ cmake ..
+#To enable all instruction for the local machine:
+CFLAGS="-march=native" CXXFLAGS="-march=native" cmake ..
 #To output log and error to different files:
 make >out.log 2>error.log
 
