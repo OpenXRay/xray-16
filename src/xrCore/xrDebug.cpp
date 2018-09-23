@@ -613,7 +613,7 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 #endif
 }
 
-void xrDebug::SetupExceptionHandler(const bool& dedicated)
+void xrDebug::SetupExceptionHandler()
 {
 #if defined(WINDOWS)
     const auto commandLine = GetCommandLine();
@@ -623,7 +623,7 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
     SetErrorMode(prevMode | SEM_NOGPFAULTERRORBOX);
     BT_InstallSehFilter();
 
-    if (!dedicated && !strstr(commandLine, "-silent_error_mode"))
+    if (!GEnv.isDedicatedServer && !strstr(commandLine, "-silent_error_mode"))
         BT_SetActivityType(BTA_SHOWUI);
     else
         BT_SetActivityType(BTA_SAVEREPORT);
@@ -821,11 +821,11 @@ void xrDebug::OnThreadSpawn()
 #endif
 }
 
-void xrDebug::Initialize(const bool& dedicated)
+void xrDebug::Initialize()
 {
     *BugReportFile = 0;
     OnThreadSpawn();
-    SetupExceptionHandler(dedicated);
+    SetupExceptionHandler();
     SDL_SetAssertionHandler(SDLAssertionHandler, nullptr);
     // exception handler to all "unhandled" exceptions
 #if defined(WINDOWS)

@@ -57,7 +57,7 @@ private:
 
 public:
     xrDebug() = delete;
-    static void Initialize(const bool& dedicated);
+    static void Initialize();
     static void Destroy();
     static void OnThreadSpawn();
 
@@ -90,7 +90,7 @@ private:
     static bool symEngineInitialized;
     static Lock dbgHelpLock;
     static void FormatLastError(char* buffer, const size_t& bufferSize);
-    static void SetupExceptionHandler(const bool& dedicated);
+    static void SetupExceptionHandler();
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
 #if defined(WINDOWS)
