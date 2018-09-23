@@ -7,7 +7,7 @@ extern int ProcessDifference();
 
 int __cdecl main(int argc, char* argv[])
 {
-    xrDebug::Initialize(false);
+    xrDebug::Initialize();
     Core.Initialize("xrCompress", 0, FALSE);
     printf("\n\n");
 
