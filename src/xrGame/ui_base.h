@@ -50,7 +50,7 @@ struct CFontManager : public pureDeviceReset
     virtual void OnDeviceReset();
 };
 
-class ui_core : public CDeviceResetNotifier
+class UICore : public CDeviceResetNotifier
 {
     C2DFrustum m_2DFrustum;
     C2DFrustum m_2DFrustumPP;
@@ -68,8 +68,8 @@ class ui_core : public CDeviceResetNotifier
 public:
     xr_stack<Frect> m_Scissors;
 
-    ui_core();
-    ~ui_core();
+    UICore();
+    ~UICore();
     CFontManager& Font() { return *m_pFontManager; }
     CUICursor& GetUICursor() { return *m_pUICursor; }
     IC float ClientToScreenScaledX(float left) const { return left * m_current_scale->x; };
@@ -98,5 +98,5 @@ public:
 };
 
 extern CUICursor& GetUICursor();
-extern ui_core& UI();
+extern UICore& UI();
 extern CUIGameCustom* CurrentGameUI();

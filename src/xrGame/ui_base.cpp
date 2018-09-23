@@ -6,7 +6,7 @@
 pcstr UI_PATH = "ui";
 
 CUICursor& GetUICursor() { return UI().GetUICursor(); };
-ui_core& UI() { return *GamePersistent().m_pUI_core; };
+UICore& UI() { return *GamePersistent().m_pUI_core; };
 extern ENGINE_API Fvector2 g_current_font_scale;
 
 void S2DVert::rotate_pt(const Fvector2& pivot, const float cosA, const float sinA, const float kx)
@@ -112,14 +112,14 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
     return dest;
 }
 
-void ui_core::OnDeviceReset()
+void UICore::OnDeviceReset()
 {
     m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
 
     m_2DFrustum.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth), float(Device.dwHeight)));
 }
 
-void ui_core::ClientToScreenScaled(Fvector2& dest, float left, float top) const
+void UICore::ClientToScreenScaled(Fvector2& dest, float left, float top) const
 {
     if (m_currentPointType != IUIRender::pttLIT)
         dest.set(ClientToScreenScaledX(left), ClientToScreenScaledY(top));
@@ -127,31 +127,31 @@ void ui_core::ClientToScreenScaled(Fvector2& dest, float left, float top) const
         dest.set(left, top);
 }
 
-void ui_core::ClientToScreenScaled(Fvector2& src_and_dest) const
+void UICore::ClientToScreenScaled(Fvector2& src_and_dest) const
 {
     if (m_currentPointType != IUIRender::pttLIT)
         src_and_dest.set(ClientToScreenScaledX(src_and_dest.x), ClientToScreenScaledY(src_and_dest.y));
 }
 
-void ui_core::ClientToScreenScaledWidth(float& src_and_dest) const
+void UICore::ClientToScreenScaledWidth(float& src_and_dest) const
 {
     if (m_currentPointType != IUIRender::pttLIT)
         src_and_dest /= m_current_scale->x;
 }
 
-void ui_core::ClientToScreenScaledHeight(float& src_and_dest) const
+void UICore::ClientToScreenScaledHeight(float& src_and_dest) const
 {
     if (m_currentPointType != IUIRender::pttLIT)
         src_and_dest /= m_current_scale->y;
 }
 
-void ui_core::AlignPixel(float& src_and_dest) const
+void UICore::AlignPixel(float& src_and_dest) const
 {
     if (m_currentPointType != IUIRender::pttLIT)
         src_and_dest = (float)iFloor(src_and_dest);
 }
 
-void ui_core::PushScissor(const Frect& r_tgt, bool overlapped)
+void UICore::PushScissor(const Frect& r_tgt, bool overlapped)
 {
     if (UI().m_currentPointType == IUIRender::pttLIT)
         return;
@@ -186,7 +186,7 @@ void ui_core::PushScissor(const Frect& r_tgt, bool overlapped)
     GEnv.UIRender->SetScissor(&r);
 }
 
-void ui_core::PopScissor()
+void UICore::PopScissor()
 {
     if (UI().m_currentPointType == IUIRender::pttLIT)
         return;
@@ -209,7 +209,7 @@ void ui_core::PopScissor()
     }
 }
 
-ui_core::ui_core()
+UICore::UICore()
 {
     if (!GEnv.isDedicatedServer)
     {
@@ -230,13 +230,13 @@ ui_core::ui_core()
     m_currentPointType = IUIRender::pttTL;
 }
 
-ui_core::~ui_core()
+UICore::~UICore()
 {
     xr_delete(m_pFontManager);
     xr_delete(m_pUICursor);
 }
 
-void ui_core::pp_start()
+void UICore::pp_start()
 {
     m_bPostprocess = true;
 
@@ -251,20 +251,20 @@ void ui_core::pp_start()
         float(GEnv.Render->getTarget()->get_height()) / float(Device.dwHeight));
 }
 
-void ui_core::pp_stop()
+void UICore::pp_stop()
 {
     m_bPostprocess = false;
     m_current_scale = &m_scale_;
     g_current_font_scale.set(1.0f, 1.0f);
 }
 
-void ui_core::RenderFont() { Font().Render(); }
-bool ui_core::is_widescreen()
+void UICore::RenderFont() { Font().Render(); }
+bool UICore::is_widescreen()
 {
     return (Device.dwWidth) / float(Device.dwHeight) > (UI_BASE_WIDTH / UI_BASE_HEIGHT + 0.01f);
 }
 
-float ui_core::get_current_kx()
+float UICore::get_current_kx()
 {
     float h = float(Device.dwHeight);
     float w = float(Device.dwWidth);
@@ -273,7 +273,7 @@ float ui_core::get_current_kx()
     return res;
 }
 
-shared_str ui_core::get_xml_name(LPCSTR fn)
+shared_str UICore::get_xml_name(LPCSTR fn)
 {
     string_path str;
     if (!is_widescreen())

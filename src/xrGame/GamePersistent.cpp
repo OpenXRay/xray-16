@@ -207,7 +207,7 @@ void CGamePersistent::OnAppStart()
     GMLib.Load();
     init_game_globals();
     inherited::OnAppStart();
-    m_pUI_core = new ui_core();
+    m_pUI_core = new UICore();
     m_pMainMenu = new CMainMenu();
 }
 
