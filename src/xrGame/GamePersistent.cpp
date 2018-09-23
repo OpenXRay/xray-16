@@ -116,7 +116,6 @@ CGamePersistent::CGamePersistent(void)
 
     ZeroMemory(ambient_sound_next_time, sizeof(ambient_sound_next_time));
 
-    m_pUI_core = NULL;
     m_pMainMenu = NULL;
     m_intro = NULL;
     m_intro_event.bind(this, &CGamePersistent::start_logo_intro);
@@ -207,7 +206,7 @@ void CGamePersistent::OnAppStart()
     GMLib.Load();
     init_game_globals();
     inherited::OnAppStart();
-    m_pUI_core = new UICore();
+    GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
 }
 
@@ -217,7 +216,7 @@ void CGamePersistent::OnAppEnd()
         m_pMainMenu->Activate(false);
 
     xr_delete(m_pMainMenu);
-    xr_delete(m_pUI_core);
+    xr_delete(GEnv.UI);
 
     inherited::OnAppEnd();
 

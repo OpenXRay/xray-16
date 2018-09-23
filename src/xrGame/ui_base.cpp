@@ -5,8 +5,8 @@
 
 pcstr UI_PATH = "ui";
 
-CUICursor& GetUICursor() { return UI().GetUICursor(); };
-UICore& UI() { return *GamePersistent().m_pUI_core; };
+CUICursor& GetUICursor() { return GEnv.UI->GetUICursor(); }
+UICore& UI() { return *GEnv.UI; }
 extern ENGINE_API Fvector2 g_current_font_scale;
 
 void S2DVert::rotate_pt(const Fvector2& pivot, const float cosA, const float sinA, const float kx)
