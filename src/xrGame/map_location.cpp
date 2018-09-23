@@ -92,7 +92,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
     if (!g_uiSpotXml)
     {
         g_uiSpotXml = new CUIXml();
-        g_uiSpotXml->Load(CONFIG_PATH, UI_PATH, "map_spots.xml");
+        g_uiSpotXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_spots.xml");
     }
 
     string512 path_base, path;

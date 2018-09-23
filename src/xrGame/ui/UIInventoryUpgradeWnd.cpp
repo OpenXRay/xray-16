@@ -65,7 +65,7 @@ CUIInventoryUpgradeWnd::~CUIInventoryUpgradeWnd()
 void CUIInventoryUpgradeWnd::Init()
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, g_inventory_upgrade_xml);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, g_inventory_upgrade_xml);
 
     CUIXmlInit xml_init;
     xml_init.InitWindow(uiXml, "main", 0, this);

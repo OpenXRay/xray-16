@@ -26,7 +26,7 @@ CUITalkDialogWnd::~CUITalkDialogWnd() { xr_delete(m_uiXml); }
 void CUITalkDialogWnd::InitTalkDialogWnd()
 {
     m_uiXml = new CUIXml();
-    m_uiXml->Load(CONFIG_PATH, UI_PATH, TALK_XML);
+    m_uiXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TALK_XML);
     CUIXmlInit ml_init;
 
     CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this);

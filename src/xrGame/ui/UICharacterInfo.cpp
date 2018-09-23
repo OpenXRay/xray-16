@@ -121,7 +121,7 @@ void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIIte
 void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, xml_name);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
     InitCharacterInfo(pos, size, &uiXml);
 }
 

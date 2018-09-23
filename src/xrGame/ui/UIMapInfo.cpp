@@ -49,7 +49,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
     CStringTable str_tbl;
 
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "ui_mapinfo.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mapinfo.xml");
 
     CUITextWnd* st;
     // try to find file with info

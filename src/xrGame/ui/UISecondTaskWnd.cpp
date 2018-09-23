@@ -192,7 +192,7 @@ bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
     SetMessageTarget(parent);
 
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, PDA_TASK_XML);
+    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_TASK_XML);
 
     CUIXmlInit::InitWindow(xml, "second_task_wnd:task_item", 0, this);
 

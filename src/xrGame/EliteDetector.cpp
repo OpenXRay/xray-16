@@ -79,7 +79,7 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
 {
     m_parent = p;
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "ui_detector_artefact.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_detector_artefact.xml");
 
     CUIXmlInit xml_init;
     string512 buff;

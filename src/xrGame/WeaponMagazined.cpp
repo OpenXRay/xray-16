@@ -29,7 +29,7 @@ void createWpnScopeXML()
     if (!pWpnScopeXml)
     {
         pWpnScopeXml = new CUIXml();
-        pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, "scopes.xml");
+        pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
     }
 }
 

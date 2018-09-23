@@ -48,7 +48,7 @@ CUICellItem::~CUICellItem()
 void CUICellItem::init()
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "actor_menu_item.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml");
 
     m_text = new CUIStatic();
     m_text->SetAutoDelete(true);

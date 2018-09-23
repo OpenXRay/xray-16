@@ -61,7 +61,7 @@ CUIMapWnd::~CUIMapWnd()
 void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, xml_name);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
 
     string512 pth;
     CUIXmlInit xml_init;

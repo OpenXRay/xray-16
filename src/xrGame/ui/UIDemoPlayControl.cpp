@@ -69,7 +69,7 @@ CUIDemoPlayControl::~CUIDemoPlayControl()
 void CUIDemoPlayControl::Init()
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "demo_play_control.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "demo_play_control.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "demo_play_control", 0, this);
 

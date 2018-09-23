@@ -251,7 +251,7 @@ void CUIGameCustom::Load()
         return;
     R_ASSERT(!MsgConfig);
     MsgConfig = new CUIXml();
-    MsgConfig->Load(CONFIG_PATH, UI_PATH, "ui_custom_msgs.xml");
+    MsgConfig->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_custom_msgs.xml");
     R_ASSERT(!ActorMenu);
     ActorMenu = new CUIActorMenu();
     R_ASSERT(!PdaMenu);

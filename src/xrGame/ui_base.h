@@ -5,6 +5,7 @@
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_stack.h"
 
+static constexpr pcstr UI_PATH_DEFAULT = "ui";
 extern pcstr UI_PATH;
 
 class CUICursor;

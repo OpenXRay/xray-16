@@ -25,15 +25,12 @@ void CUITextureMaster::FreeTexInfo()
 }
 
 void CUITextureMaster::FreeCachedShaders() { m_shaders.clear(); }
-void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file)
+void CUITextureMaster::ParseShTexInfo(pcstr path, pcstr xml_file)
 {
     CUIXml xml;
-    {
-        string_path buf;
-        xml.Load(CONFIG_PATH, strconcat(sizeof(buf), buf, UI_PATH, "\\", "textures_descr"), xml_file);
-    }
+    xml.Load(CONFIG_PATH, path, xml_file);
 
-    int files_num = xml.GetNodesNum("", 0, "file");
+    const int files_num = xml.GetNodesNum("", 0, "file");
 
     for (int fi = 0; fi < files_num; ++fi)
     {
@@ -42,7 +39,7 @@ void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file)
 
         XML_NODE node = xml.NavigateToNode("file", fi);
 
-        int num = xml.GetNodesNum(node, "texture");
+        const int num = xml.GetNodesNum(node, "texture");
         for (int i = 0; i < num; i++)
         {
             TEX_INFO info;

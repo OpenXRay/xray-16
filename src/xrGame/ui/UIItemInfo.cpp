@@ -66,7 +66,7 @@ CUIItemInfo::~CUIItemInfo()
 void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, xml_name);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
     CUIXmlInit xml_init;
 
     if (uiXml.NavigateToNode("main_frame", 0))
