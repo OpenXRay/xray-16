@@ -702,7 +702,7 @@ void Scheduler::Unregister(ISheduled* object)
     Msg("SCHEDULERMT: unregister [%s][%x]", object->shedule_Name().c_str(), object);
 #endif
 
-    ItemReg item = { false, object->GetSchedulerData().b_RT, object };
+    ItemReg item = { false, object->GetSchedulerData().b_RT != 0, object };
 
     RegistrationQueue.emplace_back(std::move(item));
 }

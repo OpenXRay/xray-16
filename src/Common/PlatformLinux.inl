@@ -115,7 +115,7 @@ inline void _splitpath (
 }
 
 #include <iostream>
-inline void OutputDebugString(char *str) // for linux debugger
+inline void OutputDebugString(const char *str) // for linux debugger
 {
     std::cerr << str;
 }
@@ -202,7 +202,7 @@ typedef struct _EXCEPTION_POINTERS {
 
 #ifdef XR_X64
 typedef int64_t INT_PTR;
-typedef uint16_t UINT_PTR;
+typedef uint64_t UINT_PTR;
 typedef int64_t LONG_PTR;
 #else
 typedef int INT_PTR;
