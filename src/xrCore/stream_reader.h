@@ -4,7 +4,11 @@
 class XRCORE_API CStreamReader : public IReaderBase<CStreamReader>
 {
 private:
+#if defined(WINDOWS)
     HANDLE m_file_mapping_handle;
+#elif defined(LINUX)
+    int m_file_mapping_handle;
+#endif
     u32 m_start_offset;
     u32 m_file_size;
     u32 m_archive_size;
@@ -31,12 +35,21 @@ public:
     IC CStreamReader();
 
 public:
+#if defined(WINDOWS)
     virtual void construct(const HANDLE& file_mapping_handle, const u32& start_offset, const u32& file_size,
         const u32& archive_size, const u32& window_size);
+#elif defined(LINUX)
+    virtual void construct(int file_mapping_handle, const u32& start_offset, const u32& file_size,
+        const u32& archive_size, const u32& window_size);
+#endif
     virtual void destroy();
 
 public:
+#if defined(WINDOWS)
     IC const HANDLE& file_mapping_handle() const;
+#elif defined(LINUX)
+    IC const int& file_mapping_handle() const;
+#endif
     IC u32 elapsed() const;
     IC const u32& length() const;
     IC void seek(const int& offset);

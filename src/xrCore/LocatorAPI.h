@@ -94,13 +94,18 @@ public:
 
     struct archive
     {
-        u32 size;
-        u32 vfs_idx;
+        u32 size = 0;
+        u32 vfs_idx = u32(-1);
         shared_str path;
-        void *hSrcFile, *hSrcMap;
-        CInifile* header;
+#if defined(WINDOWS)
+        void *hSrcFile = nullptr;
+        void *hSrcMap = nullptr
+#elif defined(LINUX)
+        int hSrcFile = 0;
+#endif
+        CInifile* header = nullptr;
         
-        archive() : size(0), vfs_idx(u32(-1)), hSrcFile(nullptr), hSrcMap(nullptr), header(nullptr) {}
+        archive() = default;
         void open();
         void close();
     };

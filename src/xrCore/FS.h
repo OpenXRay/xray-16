@@ -410,7 +410,11 @@ private:
 class XRCORE_API CVirtualFileRW : public IReader
 {
 private:
+#if defined(WINDOWS)
     void *hSrcFile, *hSrcMap;
+#elif defined(LINUX)
+    int hSrcFile;
+#endif
 
 public:
     CVirtualFileRW(const char* cFileName);
