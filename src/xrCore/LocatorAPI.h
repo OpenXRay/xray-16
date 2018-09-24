@@ -99,7 +99,7 @@ public:
         shared_str path;
 #if defined(WINDOWS)
         void *hSrcFile = nullptr;
-        void *hSrcMap = nullptr
+        void *hSrcMap = nullptr;
 #elif defined(LINUX)
         int hSrcFile = 0;
 #endif
