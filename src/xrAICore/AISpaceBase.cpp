@@ -2,8 +2,8 @@
 #include "AISpaceBase.hpp"
 #include "Navigation/game_graph.h"
 #include "Navigation/level_graph.h"
-#include "Navigation/graph_engine.h"
 #include "Navigation/PatrolPath/patrol_path_storage.h"
+#include "Navigation/graph_engine.h"
 
 AISpaceBase::AISpaceBase() { GEnv.AISpace = this; }
 AISpaceBase::~AISpaceBase()

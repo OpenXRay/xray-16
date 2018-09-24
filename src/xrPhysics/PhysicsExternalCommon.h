@@ -5,6 +5,7 @@
 #include "xrPhysics/xrPhysics.h"
 #include "xrCore/_types.h"
 #include "xrCore/_matrix.h"
+#include "MathUtils.h"
 
 struct dContactGeom;
 struct dContact;

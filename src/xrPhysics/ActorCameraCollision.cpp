@@ -5,13 +5,13 @@
 #include "xrEngine/CameraBase.h"
 #include "xrEngine/GameMtlLib.h"
 
-#include "PHWorld.h"
-#include "PHCollideValidator.h"
 #include "PHShell.h"
 #include "matrix_utils.h"
 #include "IPhysicsShellHolder.h"
 #include "xrEngine/xr_object.h" //--#SM+#--
 #include "GeometryBits.h"
+#include "PHWorld.h"
+#include "PHCollideValidator.h"
 
 #ifdef DEBUG
 #include "debug_output.h"

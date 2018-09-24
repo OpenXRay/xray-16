@@ -11,8 +11,6 @@
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "Common/object_broker.h"
 
-class CGraphEngine;
-
 template <typename _operator_condition, typename _condition_state, typename _operator, typename _condition_evaluator,
     typename _operator_id_type, bool _reverse_search = false, typename _operator_ptr = _operator*,
     typename _condition_evaluator_ptr = _condition_evaluator*>
