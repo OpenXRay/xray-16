@@ -9,12 +9,15 @@
 #include "ik_limb_state_predict.h"
 
 class IKinematics;
-class CDB::TRI;
 struct SCalculateData;
 struct SIKCollideData;
 class CGameObject;
 class motion_marks;
 class ik_goal_matrix;
+namespace CDB
+{
+class TRI;
+}
 namespace extrapolation
 {
 class points;

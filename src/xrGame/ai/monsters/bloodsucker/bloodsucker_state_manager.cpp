@@ -7,8 +7,8 @@
 #include "ai/monsters/control_movement_base.h"
 #include "ai/monsters/control_path_builder_base.h"
 
-#include "ai/monsters/states/monster_state_rest.h"
 #include "ai/monsters/states/monster_state_attack.h"
+#include "ai/monsters/states/monster_state_rest.h"
 #include "ai/monsters/states/monster_state_panic.h"
 #include "ai/monsters/states/monster_state_eat.h"
 #include "ai/monsters/states/monster_state_hear_int_sound.h"

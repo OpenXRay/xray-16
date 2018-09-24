@@ -8,6 +8,21 @@
 
 #pragma once
 
+#include "xrAICore/Navigation/level_graph.h"
+
+IC void CAI_ObjectLocation::init()
+{
+    if (ai().get_level_graph())
+        ai().level_graph().set_invalid_vertex(m_level_vertex_id);
+    else
+        m_level_vertex_id = u32(-1);
+
+    if (ai().get_game_graph())
+        ai().game_graph().set_invalid_vertex(m_game_vertex_id);
+    else
+        m_game_vertex_id = GameGraph::_GRAPH_ID(-1);
+}
+
 IC CAI_ObjectLocation::CAI_ObjectLocation() { init(); }
 IC void CAI_ObjectLocation::reinit() { init(); }
 IC const GameGraph::_GRAPH_ID CAI_ObjectLocation::game_vertex_id() const { return (m_game_vertex_id); }

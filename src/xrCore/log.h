@@ -30,7 +30,7 @@ struct LogCallback
     void* Context;
 
     LogCallback() : Log(nullptr), Context(nullptr) {}
-    LogCallback(nullptr_t) : Log(nullptr), Context(nullptr) {}
+    LogCallback(std::nullptr_t) : Log(nullptr), Context(nullptr) {}
     LogCallback(Func log, void* ctx) : Log(log), Context(ctx) {}
     void operator()(const char* s) { Log(Context, s); }
     operator bool() const { return !!Log; }

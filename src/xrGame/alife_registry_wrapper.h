@@ -40,9 +40,9 @@ const typename _registry_type::_data* CALifeRegistryWrapper<_registry_type>::obj
         if (I == local_registry.end())
         {
             typename _registry_type::_data new_registry;
-            std::pair<_registry_type::iterator, bool> p = local_registry.insert(std::make_pair(id, new_registry));
-            VERIFY(p.second);
-            return &(*local_registry.find(id)).second;
+            auto [iter, inserted] = local_registry.insert(std::make_pair(id, new_registry));
+            VERIFY(inserted);
+            return &(iter->second);
         }
         return (&(*I).second);
     }
@@ -63,9 +63,9 @@ typename _registry_type::_data& CALifeRegistryWrapper<_registry_type>::objects(u
         if (I == local_registry.end())
         {
             typename _registry_type::_data new_registry;
-            std::pair<_registry_type::iterator, bool> p = local_registry.insert(std::make_pair(id, new_registry));
-            VERIFY(p.second);
-            return (*local_registry.find(id)).second;
+            auto [iter, inserted] = local_registry.insert(std::make_pair(id, new_registry));
+            VERIFY(inserted);
+            return (iter->second);
         }
         else
             return ((*I).second);

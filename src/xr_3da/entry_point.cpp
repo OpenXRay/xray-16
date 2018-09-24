@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
             for(i = 1; i < argc; ++i)
                 sum += strlen(argv[i]) + 1;
 
-            commandLine = malloc(sum);
+            commandLine = (char*)malloc(sum);
             memset(commandLine, 0, sum);
 
             for(i = 1; i < argc; ++i)

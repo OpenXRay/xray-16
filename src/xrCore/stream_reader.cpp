@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 #endif
 
+#if defined(WINDOWS)
 void CStreamReader::construct(const HANDLE& file_mapping_handle, const u32& start_offset, const u32& file_size,
     const u32& archive_size, const u32& window_size)
 {
@@ -16,6 +17,19 @@ void CStreamReader::construct(const HANDLE& file_mapping_handle, const u32& star
 
     map(0);
 }
+#elif defined(LINUX)
+void CStreamReader::construct(int file_mapping_handle, const u32& start_offset, const u32& file_size,
+    const u32& archive_size, const u32& window_size)
+{
+    m_file_mapping_handle = file_mapping_handle;
+    m_start_offset = start_offset;
+    m_file_size = file_size;
+    m_archive_size = archive_size;
+    m_window_size = _max(window_size, FS.dwAllocGranularity);
+
+    map(0);
+}
+#endif
 
 void CStreamReader::destroy() { unmap(); }
 void CStreamReader::map(const u32& new_offset)

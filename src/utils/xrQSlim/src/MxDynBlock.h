@@ -18,6 +18,8 @@ class MxDynBlock : public MxBlock<T>
 {
 private:
     int fill;
+    using MxBlock<T>::resize;
+    using MxBlock<T>::begin;
 
 public:
     MxDynBlock(int n = 2) : MxBlock<T>(n) { fill = 0; }

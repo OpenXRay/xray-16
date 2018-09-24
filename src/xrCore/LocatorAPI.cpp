@@ -256,34 +256,24 @@ const CLocatorAPI::file* CLocatorAPI::Register(
     return &*result;
 }
 
+#if defined(WINDOWS)
 IReader* open_chunk(void* ptr, u32 ID)
 {
     u32 dwType, dwSize;
     DWORD read_byte;
-#ifdef WINDOWS
     u32 pt = SetFilePointer(ptr, 0, nullptr, FILE_BEGIN);
     VERIFY(pt != INVALID_SET_FILE_POINTER);
-#else
-    ::lseek(ptr, 0L, SEEK_SET);
-#endif
+
     while (true)
     {
-#ifdef WINDOWS
         bool res = ReadFile(ptr, &dwType, 4, &read_byte, nullptr);
-#elif defined(LINUX)
-        read_byte = ::read(ptr, &dwType, 4);
-        bool res = (read_byte != -1);
-#endif
+
         if (read_byte == 0)
             return nullptr;
         //. VERIFY(res&&(read_byte==4));
 
-#ifdef WINDOWS
         res = ReadFile(ptr, &dwSize, 4, &read_byte, nullptr);
-#else
-        read_byte = ::read(ptr, &dwSize, 4);
-        res = (read_byte != -1);
-#endif
+
         if (read_byte == 0)
             return nullptr;
         //. VERIFY(res&&(read_byte==4));
@@ -291,12 +281,8 @@ IReader* open_chunk(void* ptr, u32 ID)
         if ((dwType & ~CFS_CompressMark) == ID)
         {
             u8* src_data = xr_alloc<u8>(dwSize);
-#ifdef WINDOWS
             res = ReadFile(ptr, src_data, dwSize, &read_byte, nullptr);
-#else
-            read_byte = ::read(ptr, src_data, dwSize);
-            res = (read_byte != -1);
-#endif
+
             VERIFY(res && (read_byte == dwSize));
             if (dwType & CFS_CompressMark)
             {
@@ -308,17 +294,62 @@ IReader* open_chunk(void* ptr, u32 ID)
             }
             return new CTempReader(src_data, dwSize, 0);
         }
-#ifdef WINDOWS
+
         pt = SetFilePointer(ptr, dwSize, nullptr, FILE_CURRENT);
         if (pt == INVALID_SET_FILE_POINTER)
             return nullptr;
-#else
-        if(-1 == ::lseek(ptr, dwSize, SEEK_CUR))
-            return nullptr;
-#endif
     }
     return nullptr;
 };
+#endif
+
+#if defined(LINUX)
+IReader* open_chunk(int fd, u32 ID)
+{
+    u32 dwType, dwSize;
+    DWORD read_byte;
+    ::lseek(fd, 0L, SEEK_SET);
+
+    while (true)
+    {
+        read_byte = ::read(fd, &dwType, 4);
+        bool res = (read_byte != -1);
+
+        if (read_byte == 0)
+            return nullptr;
+        //. VERIFY(res&&(read_byte==4));
+
+        read_byte = ::read(fd, &dwSize, 4);
+        res = (read_byte != -1);
+
+        if (read_byte == 0)
+            return nullptr;
+        //. VERIFY(res&&(read_byte==4));
+
+        if ((dwType & ~CFS_CompressMark) == ID)
+        {
+            u8* src_data = xr_alloc<u8>(dwSize);
+            read_byte = ::read(fd, src_data, dwSize);
+            res = (read_byte != -1);
+
+            VERIFY(res && (read_byte == dwSize));
+            if (dwType & CFS_CompressMark)
+            {
+                BYTE* dest;
+                unsigned dest_sz;
+                _decompressLZ(&dest, &dest_sz, src_data, dwSize);
+                xr_free(src_data);
+                return new CTempReader(dest, dest_sz, 0);
+            }
+            return new CTempReader(src_data, dwSize, 0);
+        }
+
+        if(-1 == ::lseek(fd, dwSize, SEEK_CUR))
+            return nullptr;
+    }
+    return nullptr;
+};
+#endif
 
 void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 {
@@ -416,17 +447,21 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
 void CLocatorAPI::archive::open()
 {
+#if defined(WINDOWS)
     // Open the file
     if (hSrcFile && hSrcMap)
         return;
 
-#if defined(WINDOWS)
     hSrcFile = CreateFile(*path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
     R_ASSERT(hSrcFile != INVALID_HANDLE_VALUE);
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
     size = GetFileSize(hSrcFile, nullptr);
 #elif defined(LINUX)
+    // Open the file
+    if (hSrcFile)
+        return;
+
     hSrcFile = ::open(*path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     R_ASSERT(hSrcFile != -1);
     struct stat file_info;
@@ -505,7 +540,11 @@ bool CLocatorAPI::load_all_unloaded_archives()
     bool res = false;
     for (auto& archive : m_archives)
     {
+#if defined(WINDOWS)
         if (archive.hSrcFile == nullptr)
+#elif defined(LINUX)
+        if (archive.hSrcFile == 0)
+#endif
         {
             LoadArchive(archive);
             res = true;
@@ -593,7 +632,7 @@ bool ignore_path(const char* _path)
     else
         return true;
 #elif defined(LINUX)
-    HANDLE h  = ::open(_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    int h = ::open(_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (h != -1)
     {
         ::close(h);
@@ -1294,7 +1333,11 @@ void CLocatorAPI::file_from_archive(CStreamReader*& R, pcstr fname, const file& 
         make_string("cannot use stream reading for compressed data %s, do not compress data to be streamed", fname));
 
     R = new CStreamReader();
+#if defined(WINDOWS)
     R->construct(A.hSrcMap, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
+#elif defined(LINUX)
+    R->construct(A.hSrcFile, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
+#endif
 }
 
 void CLocatorAPI::copy_file_to_build(IWriter* W, IReader* r) { W->w(r->pointer(), r->length()); }
@@ -1506,7 +1549,7 @@ void CLocatorAPI::w_close(IWriter*& S)
             Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #elif defined(LINUX)
             struct stat st;
-            ::fstat(fname, &st);
+            ::stat(fname, &st);
             Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #endif
         }

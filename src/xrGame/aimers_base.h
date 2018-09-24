@@ -10,6 +10,7 @@
 #define AIMERS_BASE_H_INCLUDED
 
 #include "Include/xrRender/animation_motion.h"
+#include "animation_movement_controller.h"
 #include "Common/Noncopyable.hpp"
 
 class CGameObject;

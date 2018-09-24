@@ -261,7 +261,7 @@ void CUITalkWnd::AskQuestion()
         {
             string128 s;
             xr_sprintf(s, "ID = [%s] of selected question is out of range of available dialogs ",
-                UITalkDialogWnd->m_ClickedQuestionID);
+                UITalkDialogWnd->m_ClickedQuestionID.c_str());
             VERIFY2(FALSE, s);
         }
 

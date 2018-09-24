@@ -8,6 +8,10 @@
 
 #pragma once
 
+#ifndef AI_COMPILER
+#include "xrAICore/Navigation/graph_engine.h"
+#endif
+
 #define TEMPLATE_SPECIALIZATION                                                                                  \
     template <typename _operator_condition, typename _operator, typename _condition_state,                       \
         typename _condition_evaluator, typename _operator_id_type, bool _reverse_search, typename _operator_ptr, \

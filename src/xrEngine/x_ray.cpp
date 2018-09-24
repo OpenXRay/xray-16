@@ -458,7 +458,11 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
+#if defined(WINDOWS)
         if (A.hSrcFile == nullptr)
+#elif defined(LINUX)
+        if (A.hSrcFile == 0)
+#endif
         {
             LPCSTR ln = A.header->r_string("header", "level_name");
             LPCSTR lv = A.header->r_string("header", "level_ver");

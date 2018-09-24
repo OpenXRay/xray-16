@@ -465,7 +465,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
         //R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
         if (Level().Objects.net_Find(E->ID) != nullptr)
         {
-            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name);
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name.c_str());
             return false;
         }
     }
@@ -491,8 +491,8 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     {
 #pragma warning(push)
 #pragma warning(disable : 4238)
-        m_ini_file = new CInifile(
-            &IReader((void*)(*(O->m_ini_string)), O->m_ini_string.size()), FS.get_path("$game_config$")->m_Path);
+        IReader reader((void*)(*(O->m_ini_string)), O->m_ini_string.size());
+        m_ini_file = new CInifile(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
     }
 

@@ -98,6 +98,13 @@ if (UNIX)
     # has itanium/*
     set(_TBB_COMPILER ${TBB_COMPILER})
     set(_TBB_ARCHITECTURE ${TBB_ARCHITECTURE})
+
+    # Fix for clang compiler
+    # https://www.threadingbuildingblocks.org/docs/help/reference/appendices/known_issues/linux_os.html
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+      string(REPLACE "." "0" TBB_USE_GLIBCXX_VERSION ${CMAKE_CXX_COMPILER_VERSION})
+      add_definitions(-DTBB_USE_GLIBCXX_VERSION=${TBB_USE_GLIBCXX_VERSION})
+    endif()
   endif (APPLE)
 endif (UNIX)
 
