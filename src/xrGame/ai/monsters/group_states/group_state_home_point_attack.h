@@ -10,6 +10,8 @@ protected:
     using inherited::object;
     using inherited::prev_substate;
     using inherited::current_substate;
+    using inherited::select_state;
+    using inherited::get_state_current;
 
     u32 m_target_node;
     bool m_skip_camp;

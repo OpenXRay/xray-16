@@ -10,6 +10,9 @@ class CStateBloodsuckerVampire : public CState<_Object>
     using inherited::object;
     using inherited::current_substate;
     using inherited::prev_substate;
+    using inherited::get_state;
+    using inherited::select_state;
+    using inherited::get_state_current;
 
     const CEntityAlive* enemy;
 

@@ -733,7 +733,7 @@ public:
             OnDrawText(this, draw_val);
         else
             for (int i = 0; this->token[i].name; i++)
-                if (this->token[i].id == (int)GetValue())
+                if (this->token[i].id == (int)this->GetValue())
                     return this->token[i].name;
         return draw_val;
     }
@@ -765,7 +765,7 @@ public:
             OnDrawText(this, draw_val);
         else
             for (u32 k = 0; k < token_count; k++)
-                if ((T)token[k].id == GetValue())
+                if ((T)token[k].id == this->GetValue())
                     return *token[k].name;
         return draw_val;
     }

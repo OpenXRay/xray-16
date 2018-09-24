@@ -10,6 +10,14 @@ class CBloodsuckerStateAttack : public CStateMonsterAttack<_Object>
     using inherited::current_substate;
     using inherited::m_time_start_check_behinder;
     using inherited::object;
+    using inherited::check_steal_state;
+    using inherited::select_state;
+    using inherited::check_camp_state;
+    using inherited::check_home_point;
+    using inherited::check_find_enemy_state;
+    using inherited::get_state_current;
+    using inherited::get_state;
+    using inherited::check_run_attack_state;
 
     u32 m_time_stop_invis;
     Fvector m_dir_point;

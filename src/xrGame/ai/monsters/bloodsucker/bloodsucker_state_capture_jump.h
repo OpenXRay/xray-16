@@ -10,6 +10,10 @@ protected:
     typedef CState<_Object>* state_ptr;
     using inherited::prev_substate;
     using inherited::current_substate;
+    using inherited::get_state_current;
+    using inherited::check_home_point;
+    using inherited::check_find_enemy;
+    using inherited::select_state;
 
 public:
     CStateCaptureJumpBloodsucker(_Object* obj);

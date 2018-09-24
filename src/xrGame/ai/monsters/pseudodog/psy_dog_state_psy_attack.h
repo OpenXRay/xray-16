@@ -8,6 +8,7 @@ class CStatePsyDogPsyAttack : public CState<_Object>
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::select_state;
 
 public:
     CStatePsyDogPsyAttack(_Object* obj);
