@@ -24,7 +24,8 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 
 #pragma warning(push)
 #pragma warning(disable : 4238)
-    CInifile ini(&IReader((void*)ini_string, xr_strlen(ini_string)), FS.get_path("$game_config$")->m_Path);
+    IReader reader((void*)ini_string, xr_strlen(ini_string));
+    CInifile ini(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
 
     // Alundaio: This will spawn a single random section listed in [spawn_loadout]
