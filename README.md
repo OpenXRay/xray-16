@@ -6,7 +6,7 @@ X-Ray Engine 1.6 expansion
 |Platform|Build Status|
 |--------|------|
 | Linux (GCC)(Release)(x64/x86) |[![Build Status](https://api.travis-ci.org/q4a/xray-16.svg?branch=linux)](https://travis-ci.org/q4a/xray-16)|
-| Windows (MSVC)(Debug/Mixed/Release)(x64/x86) |[![Build status](https://ci.appveyor.com/api/projects/status/beb4c2xtyru4galx?svg=true)](https://ci.appveyor.com/project/q4a/xray-16)|
+| Windows (MSVC)(Debug/Mixed/Release)(x64/x86) |[![Build status](https://ci.appveyor.com/api/projects/status/beb4c2xtyru4galx/branch/linux?svg=true)](https://ci.appveyor.com/project/q4a/xray-16)|
 
 This repository contains X-Ray Engine sources based on version 1.6.02.
 The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by GSC Game World.
