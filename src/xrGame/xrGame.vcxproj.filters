@@ -10185,6 +10185,9 @@
     <ClCompile Include="WeaponScript.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\WeaponScript</Filter>
     </ClCompile>
+    <ClCompile Include="ui\UILoadingScreenHardcoded.h">
+      <Filter>UI\Common\LoadingScreen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">

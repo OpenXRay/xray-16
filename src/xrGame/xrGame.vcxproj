@@ -3489,6 +3489,7 @@
     </ClCompile>
     <ClCompile Include="ui\UIListItemServer.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp" />
+    <ClInclude Include="ui\UILoadingScreenHardcoded.h" />
     <ClCompile Include="ui\UILogsWnd.cpp" />
     <ClCompile Include="ui\UIMainIngameWnd.cpp" />
     <ClCompile Include="ui\UIMap.cpp" />

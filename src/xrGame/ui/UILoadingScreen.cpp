@@ -28,9 +28,9 @@ UILoadingScreen::UILoadingScreen()
 void UILoadingScreen::Initialize()
 {
     CUIXml uiXml;
-    bool result = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml");
+    bool loaded = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml");
 
-    if (!result) // Robustness? Yes!
+    if (!loaded) // Robustness? Yes!
     {
         if (UI().is_widescreen())
             uiXml.Set(LoadingScreenXML16x9);
