@@ -53,11 +53,6 @@ void CUIProgressBar::UpdateProgressBar()
         m_CurrentLength = GetHeight() * fCurrentLength;
         break;
 
-    case om_tocenter:
-    case om_vtocenter:
-        R_ASSERT2(false, "to_center mode is not implemented.");
-        break;
-
     default:
         m_CurrentLength = 0.0f;
     }
@@ -138,9 +133,6 @@ void CUIProgressBar::Draw()
         progress_rect.set(0, center - m_CurrentLength, GetWidth(), center + m_CurrentLength);
         break;
     }
-    // XXX: Implement to_center mode
-    case om_tocenter:
-    case om_vtocenter: R_ASSERT2(false, "to_center mode is not implemented."); break;
     default: NODEFAULT; break;
     }
 
