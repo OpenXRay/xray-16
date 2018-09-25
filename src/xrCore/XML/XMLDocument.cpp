@@ -87,14 +87,27 @@ bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
     W.w_stringZ("");
     FS.r_close(F);
 
-    m_Doc.parse(reinterpret_cast<pcstr>(W.pointer()));
+    return Set(reinterpret_cast<pcstr>(W.pointer()));
+}
+
+// XXX: support #include directive
+bool XMLDocument::Set(pcstr text, bool fatal)
+{
+    R_ASSERT(text != nullptr);
+    m_Doc.parse(text);
 
     if (m_Doc.isError())
     {
         string1024 str;
-        xr_sprintf(str, "XML Error! File: %s Description: %s:%u", m_xml_file_name, m_Doc.error(), m_Doc.errorOffset());
-        char* offsetted = (char*)W.pointer() + m_Doc.errorOffset();
-        R_ASSERT3(false, str, offsetted ? offsetted : "wrong offset");
+        xr_sprintf(str, "XML Error! File: %s Description: %s:%u \n", m_xml_file_name, m_Doc.error(), m_Doc.errorOffset());
+        pcstr offsetted = text + m_Doc.errorOffset();
+
+        if (fatal)
+            R_ASSERT3(false, str, offsetted);
+        else
+            Log(str, offsetted);
+
+        return false;
     }
 
     m_root = m_Doc.firstChildElement();

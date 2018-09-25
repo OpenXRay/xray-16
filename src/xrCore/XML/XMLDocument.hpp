@@ -138,6 +138,9 @@ public:
     bool Load(pcstr path_alias, pcstr path, pcstr xml_filename, bool fatal = true);
     bool Load(pcstr path_alias, pcstr path, pcstr path2, pcstr xml_filename, bool fatal = true);
 
+    // Set XML directly. Doesn't support #include directive
+    bool Set(pcstr text, bool fatal = true);
+
     //чтение элементов
     pcstr Read(pcstr path, const size_t index, pcstr default_str_val) const;
     pcstr Read(XML_NODE start_node, pcstr path, const size_t index, pcstr default_str_val) const;
