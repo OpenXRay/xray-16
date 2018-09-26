@@ -5,10 +5,17 @@
 
 namespace
 {
-const xr_token simulation_type_token[] = {{"Fog", dx103DFluidData::ST_FOG}, {"Fire", dx103DFluidData::ST_FIRE}, {0, 0}};
+const xr_token simulation_type_token[] = {
+    {"Fog", dx103DFluidData::ST_FOG},
+    {"Fire", dx103DFluidData::ST_FIRE},
+    {0, 0}
+};
 
-const xr_token emitter_type_token[] = {{"SimpleGaussian", dx103DFluidEmitters::ET_SimpleGausian},
-    {"SimpleDraught", dx103DFluidEmitters::ET_SimpleDraught}, {0, 0}};
+const xr_token emitter_type_token[] = {
+    {"SimpleGaussian", dx103DFluidEmitters::ET_SimpleGausian},
+    {"SimpleDraught", dx103DFluidEmitters::ET_SimpleDraught},
+    {0, 0}
+};
 }
 
 DXGI_FORMAT dx103DFluidData::m_VPRenderTargetFormats[VP_NUM_TARGETS] = {
@@ -20,7 +27,7 @@ DXGI_FORMAT dx103DFluidData::m_VPRenderTargetFormats[VP_NUM_TARGETS] = {
 dx103DFluidData::dx103DFluidData()
 {
     D3D_TEXTURE3D_DESC desc;
-    desc.BindFlags = D3D10_BIND_SHADER_RESOURCE | D3D10_BIND_RENDER_TARGET;
+    desc.BindFlags = D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET;
     desc.CPUAccessFlags = 0;
     desc.MipLevels = 1;
     desc.MiscFlags = 0;
