@@ -15,12 +15,13 @@
 IC CGameObject& CScriptGameObject::object() const
 {
 #ifdef DEBUG
-    __try
+    // What does this even throw? Think about rewriting this try-catch block
+    try
     {
         if (m_game_object && m_game_object->lua_game_object() == this)
             return (*m_game_object);
     }
-    __except (EXCEPTION_EXECUTE_HANDLER)
+    catch (...)
     {
     }
 

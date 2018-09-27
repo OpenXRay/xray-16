@@ -156,11 +156,11 @@ static void play_object(dxGeomUserData* data, SGameMtlPair* mtl_pair, const dCon
 
     CPHSoundPlayer* sp = NULL;
 #ifdef DEBUG
-    __try
+    try
     {
         sp = data->ph_ref_object->ObjectPhSoundPlayer();
     }
-    __except (EXCEPTION_EXECUTE_HANDLER)
+    catch (...)
     {
         Msg("data->ph_ref_object: %p ", data->ph_ref_object);
         Msg("data: %p ", data);
