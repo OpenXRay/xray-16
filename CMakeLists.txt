@@ -30,6 +30,7 @@ set(LUA_LIBRARIES luajit)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    add_definitions(-DDEBUG)
     set(LUA_LIBRARIES luajit-debug)
 endif()
 
