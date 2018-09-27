@@ -2,13 +2,14 @@
 #pragma hdrstop
 
 #ifdef DEBUG
-
+#ifndef LINUX // FIXME!!!
 static HANDLE hLocalSlot = INVALID_HANDLE_VALUE;
-
+#endif
 extern void msParse(LPCSTR cmd);
 
 void msCreate(LPCSTR name)
 {
+#ifndef LINUX // FIXME!!!
     string256 fn;
     xr_sprintf(fn, sizeof(fn), "\\\\.\\mailslot\\%s", name);
     hLocalSlot = CreateMailslot(fn,
@@ -18,10 +19,12 @@ void msCreate(LPCSTR name)
     if (hLocalSlot == INVALID_HANDLE_VALUE)
         return;
     // Msg ("* mailSLOT successfully created.");
+#endif
 }
 
 void msRead(void)
 {
+#ifndef LINUX // FIXME!!!
     DWORD cbMessage, cMessage, cbRead;
     BOOL fResult;
     LPSTR lpszBuffer;
@@ -57,10 +60,12 @@ void msRead(void)
         if (!fResult)
             return;
     }
+#endif
 }
 
 void msWrite(char* name, char* dest, char* msg)
 {
+#ifndef LINUX // FIXME!!!
     HANDLE hFile;
     DWORD cbWritten;
     BOOL fResult;
@@ -74,6 +79,7 @@ void msWrite(char* name, char* dest, char* msg)
         return;
     fResult = WriteFile(hFile, msg, (u32)lstrlen(msg) + 1, &cbWritten, (LPOVERLAPPED)NULL);
     fResult = CloseHandle(hFile);
+#endif
 }
 
 #endif

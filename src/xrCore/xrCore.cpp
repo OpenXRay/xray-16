@@ -280,7 +280,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         EFS._initialize();
 #ifdef DEBUG
 #ifndef _EDITOR
+#ifndef LINUX // FIXME!!!
         Msg("Process heap 0x%08x", GetProcessHeap());
+#endif
 #endif
 #endif // DEBUG
     }
