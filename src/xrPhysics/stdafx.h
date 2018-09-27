@@ -16,7 +16,7 @@
 
 #include "xrPhysics.h"
 
-#ifdef DEBUG
+#if defined(DEBUG) && defined(WINDOWS)
 #include <d3d9types.h>
 #endif
 

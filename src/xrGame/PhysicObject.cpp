@@ -15,7 +15,7 @@
 #include "xrPhysics/ExtendedGeom.h"
 #ifdef DEBUG
 #include "PHDebug.h"
-#include "xrEngine/objectdump.h"
+#include "xrEngine/ObjectDump.h"
 #endif
 BOOL dbg_draw_doors = false;
 CPhysicObject::CPhysicObject(void)

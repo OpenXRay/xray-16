@@ -43,13 +43,13 @@
 #include "cover_point.h"
 #include "xrEngine/CameraBase.h"
 #include "mt_config.h"
-#include "weaponmagazined.h"
+#include "WeaponMagazined.h"
 #include "object_handler_space.h"
 #include "debug_renderer.h"
 #include "CharacterPhysicsSupport.h"
 #include "smart_cover_animation_selector.h"
 #include "animation_movement_controller.h"
-#include "phdebug.h"
+#include "PHDebug.h"
 #include "game_object_space.h"
 #include "aimers_weapon.h"
 #include "aimers_bone.h"
@@ -166,7 +166,7 @@ void draw_planner(const planner_type& brain, LPCSTR start_indent, LPCSTR indent,
     for (; I != E; ++I)
     {
         const auto J = std::lower_bound(brain.current_state().conditions().cbegin(), brain.current_state().conditions().cend(),
-                planner_type::CWorldProperty((*I).first, false));
+            typename planner_type::CWorldProperty((*I).first, false));
         char temp = '?';
         if ((J != brain.current_state().conditions().end()) && ((*J).condition() == (*I).first))
         {
@@ -181,7 +181,7 @@ void draw_planner(const planner_type& brain, LPCSTR start_indent, LPCSTR indent,
     for (; I != E; ++I)
     {
         const auto J = std::lower_bound(brain.target_state().conditions().cbegin(), brain.target_state().conditions().cend(),
-                planner_type::CWorldProperty((*I).first, false));
+            typename planner_type::CWorldProperty((*I).first, false));
         char temp = '?';
         if ((J != brain.target_state().conditions().end()) && ((*J).condition() == (*I).first))
         {

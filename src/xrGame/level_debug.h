@@ -62,8 +62,8 @@ public:
             std::sort(m_data.begin(), m_data.end(), sort_id_pred());
         }
         IC void clear() { m_data.clear(); }
-        template <class T>
-        IC void process(T& process_pred)
+        template <class H>
+        IC void process(H& process_pred)
         {
             for (ITEM_STORAGE_VEC_IT it = m_data.begin(); it != m_data.end(); ++it)
             {

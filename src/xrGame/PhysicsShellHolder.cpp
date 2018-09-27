@@ -20,7 +20,7 @@
 #include "PHCollisionDamageReceiver.h"
 #include "xrEngine/IPhysicsShell.h"
 #ifdef DEBUG
-#include "xrEngine/objectdump.h"
+#include "xrEngine/ObjectDump.h"
 #endif
 CPhysicsShellHolder::CPhysicsShellHolder() { init(); }
 CPhysicsShellHolder::~CPhysicsShellHolder()

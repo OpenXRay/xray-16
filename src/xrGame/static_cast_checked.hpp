@@ -36,15 +36,11 @@ struct value
 template <typename source_type, typename destination_type>
 struct helper
 {
-    template <bool is_polymrphic>
+    template <bool is_polymorphic>
     inline static void check(source_type source)
     {
-        value<destination_type>::check(source);
-    }
-
-    template <>
-    inline static void check<false>(source_type source)
-    {
+        if constexpr (is_polymorphic)
+            value<destination_type>::check(source);
     }
 };
 
@@ -55,11 +51,11 @@ struct helper
 template <typename destination_type, typename source_type>
 inline destination_type static_cast_checked(source_type const& source)
 {
-    typedef object_type_traits::remove_pointer<source_type>::type pointerless_type;
-    typedef object_type_traits::remove_reference<pointerless_type>::type pure_source_type;
+    using pointerless_type = typename object_type_traits::remove_pointer<source_type>::type;
+    using pure_source_type = typename object_type_traits::remove_reference<pointerless_type>::type;
 
     debug::detail::static_cast_checked::helper<source_type const&,
-        destination_type>::check<std::is_polymorphic<pure_source_type>::value>(source);
+        destination_type>::template check<std::is_polymorphic<pure_source_type>::value>(source);
 
     return (static_cast<destination_type>(source));
 }
@@ -67,11 +63,11 @@ inline destination_type static_cast_checked(source_type const& source)
 template <typename destination_type, typename source_type>
 inline destination_type static_cast_checked(source_type& source)
 {
-    typedef object_type_traits::remove_pointer<source_type>::type pointerless_type;
-    typedef object_type_traits::remove_reference<pointerless_type>::type pure_source_type;
+    using pointerless_type = typename object_type_traits::remove_pointer<source_type>::type;
+    using pure_source_type = typename object_type_traits::remove_reference<pointerless_type>::type;
 
     debug::detail::static_cast_checked::helper<source_type&,
-        destination_type>::check<std::is_polymorphic<pure_source_type>::value>(source);
+        destination_type>::template check<std::is_polymorphic<pure_source_type>::value>(source);
 
     return (static_cast<destination_type>(source));
 }

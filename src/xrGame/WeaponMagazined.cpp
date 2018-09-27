@@ -695,7 +695,7 @@ void CWeaponMagazined::switch2_Idle()
 }
 
 #ifdef DEBUG
-#include "ai\stalker\ai_stalker.h"
+#include "ai/stalker/ai_stalker.h"
 #include "object_handler_planner.h"
 #endif
 void CWeaponMagazined::switch2_Fire()

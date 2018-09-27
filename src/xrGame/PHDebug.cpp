@@ -18,7 +18,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "xrEngine/iphdebug.h"
+#include "xrEngine/IPHdebug.h"
 #include "xrCore/xr_token.h"
 #include "xrEngine/GameFont.h"
 
@@ -707,8 +707,8 @@ static LPCSTR name_bool(BOOL v)
 
 static LPCSTR name_blend_type(CBlend::ECurvature blend)
 {
-    static xr_token token_blend[] = {{"eFREE_SLOT", CBlend::eFREE_SLOT}, {"eAccrue", CBlend::eAccrue},
-        {"eFalloff", CBlend::eFalloff}, {"eFORCEDWORD", CBlend::eFORCEDWORD}};
+    static xr_token token_blend[] = {{"eFREE_SLOT", int(CBlend::eFREE_SLOT)}, {"eAccrue", int(CBlend::eAccrue)},
+        {"eFalloff", int(CBlend::eFalloff)}, {"eFORCEDWORD", int(CBlend::eFORCEDWORD)}};
     return get_token_name(token_blend, blend);
 }
 /*

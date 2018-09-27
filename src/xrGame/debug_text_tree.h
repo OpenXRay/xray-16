@@ -100,4 +100,5 @@ void log_text_tree(text_tree& tree);
 #include "debug_text_tree_inline.h"
 
 } // namespace debug
+
 #endif // defined(AI_DEBUG_TEXT_TREE_H_INCLUDED)
