@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../xrRenderGL/glState.h"
+
 class SimulatorStates
 {
 private:

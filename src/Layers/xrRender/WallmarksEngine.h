@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 #pragma once
+#include "xrCore/intrusive_ptr.h"
 #include "xrEngine/Render.h"
 
 namespace WallmarksEngine

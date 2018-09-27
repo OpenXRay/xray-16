@@ -2,6 +2,8 @@ project(xrRenderPC_GL)
 
 list(APPEND DIRS
     "."
+    "../xrRender"
+    "../xrRenderGL"
     )
 
 
@@ -14,7 +16,8 @@ include_directories(
     ${SDL_INCLUDE_DIRS}
     )
 
-#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./r2_R_sun.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./r3_R_rain.cpp")
 #list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.hpp")
 
 add_definitions(-DXRLCUTIL_EXPORTS -D_USRDLL -DXRRENDER_GL_EXPORTS -DUSE_OGL -DNO_XR_VDECLARATOR)

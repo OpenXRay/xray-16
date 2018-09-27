@@ -2,13 +2,13 @@
 #pragma hdrstop
 
 #ifndef _EDITOR
-#include "../../xrEngine/render.h"
+#include "../../xrEngine/Render.h"
 #endif
 
 #include "../xrRender/ResourceManager.h"
 #include "../xrRender/tss.h"
-#include "../xrRender/blenders/blender.h"
-#include "../xrRender/blenders/blender_recorder.h"
+#include "../xrRender/blenders/Blender.h"
+#include "../xrRender/blenders/Blender_Recorder.h"
 #include "../xrRenderGL/glBufferUtils.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
