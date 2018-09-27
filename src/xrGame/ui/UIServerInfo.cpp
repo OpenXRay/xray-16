@@ -8,9 +8,6 @@
 #include "UIGameCustom.h"
 #include "Level.h"
 #include "game_cl_mp.h"
-#ifdef LINUX // Avoid conflicting macros
-#define CXIMAGE_NO_WIN32_DEFINES
-#endif
 #include "ximage.h"
 #include "xmemfile.h"
 

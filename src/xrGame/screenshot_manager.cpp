@@ -13,9 +13,6 @@
 #include <ddraw.h>
 #endif
 
-#ifdef LINUX // Avoid conflicting macros
-#define CXIMAGE_NO_WIN32_DEFINES
-#endif
 #include "ximage.h"
 #include "xmemfile.h"
 

@@ -2,6 +2,7 @@
 #define __ximadefs_h
 
 #include "ximacfg.h"
+#include "Common/Platform.hpp"
 
 #if defined(_AFXDLL)||defined(_USRDLL)
  #define DLL_EXP __declspec(dllexport)
@@ -53,11 +54,11 @@
  #define CXIMAGE_SUPPORT_WINDOWS 0
 #endif
 
-#ifndef min
-#define min(a,b) (((a)<(b))?(a):(b))
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
 #endif
-#ifndef max
-#define max(a,b) (((a)>(b))?(a):(b))
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
 #endif
 
 #ifndef PI
@@ -94,14 +95,6 @@ typedef struct tagcomplex {
 #include <string.h>
 #include <ctype.h>
 
-#ifndef CXIMAGE_NO_WIN32_DEFINES
-typedef unsigned char  BYTE;
-typedef unsigned short WORD;
-typedef unsigned long  DWORD;
-typedef unsigned int   UINT;
-typedef const char* LPCTSTR;
-typedef unsigned int   HANDLE;
-#endif
 typedef DWORD          COLORREF;
 typedef void*          HRGN;
 typedef void*          HDC;
@@ -126,21 +119,7 @@ typedef int boolean;
 #define TCHAR char
 #define _T
 #endif
-#ifndef CXIMAGE_NO_WIN32_DEFINES
-typedef struct tagRECT
-{
-	long    left;
-	long    top;
-	long    right;
-	long    bottom;
-} RECT;
 
-typedef struct tagPOINT
-{
-	long  x;
-	long  y;
-} POINT;
-#endif
 typedef struct tagRGBQUAD {
 	BYTE    rgbBlue;
 	BYTE    rgbGreen;
@@ -196,7 +175,6 @@ typedef struct tagRGBTRIPLE {
 #define GetRValue(rgb)      ((BYTE)(rgb))
 #define GetGValue(rgb)      ((BYTE)(((WORD)(rgb)) >> 8))
 #define GetBValue(rgb)      ((BYTE)((rgb)>>16))
-#define RGB(r,g,b)          ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16)))
 
 #ifndef _COMPLEX_DEFINED
 
