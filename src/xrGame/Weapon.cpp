@@ -27,6 +27,7 @@
 #include "xrNetServer/NET_Messages.h"
 #include "xrCore/xr_token.h"
 #include "CameraLook.h"
+#include "ActorNightVision.h"
 
 #define WEAPON_REMOVE_TIME 60000
 #define ROTATION_TIME 0.25f
@@ -836,11 +837,10 @@ void CWeapon::UpdateCL()
         {
             CActor* pA = smart_cast<CActor*>(H_Parent());
             R_ASSERT(pA);
-            CTorch* pTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && pTorch->GetNightVisionStatus())
+            if (pA->GetNightVisionStatus())
             {
-                m_bRememberActorNVisnStatus = pTorch->GetNightVisionStatus();
-                pTorch->SwitchNightVision(false, false);
+                m_bRememberActorNVisnStatus = pA->GetNightVisionStatus();
+                pA->SwitchNightVision(false, false, false);
             }
             m_zoom_params.m_pNight_vision->Start(m_zoom_params.m_sUseZoomPostprocess, pA, false);
         }
@@ -862,12 +862,8 @@ void CWeapon::EnableActorNVisnAfterZoom()
 
     if (pA)
     {
-        CTorch* pTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT));
-        if (pTorch)
-        {
-            pTorch->SwitchNightVision(true, false);
-            pTorch->GetNightVision()->PlaySounds(CNightVisionEffector::eIdleSound);
-        }
+        pA->SwitchNightVision(true, false, false);
+        pA->GetNightVision()->PlaySounds(CNightVisionEffector::eIdleSound);
     }
 }
 

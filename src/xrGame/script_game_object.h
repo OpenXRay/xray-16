@@ -628,6 +628,7 @@ public:
     void enable_attachable_item(bool value);
     bool attachable_item_enabled() const;
     void enable_night_vision(bool value);
+    void night_vision_allowed(bool value);	
     bool night_vision_enabled() const;
     void enable_torch(bool value);
     bool torch_enabled() const;

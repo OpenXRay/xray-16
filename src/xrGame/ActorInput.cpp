@@ -617,50 +617,13 @@ void CActor::set_input_external_handler(CActorInputHandler* handler)
     m_input_external_handler = handler;
 }
 
-void CActor::SwitchNightVision()
-{
-    CWeapon* wpn1 = NULL;
-    CWeapon* wpn2 = NULL;
-    if (inventory().ItemFromSlot(INV_SLOT_2))
-        wpn1 = smart_cast<CWeapon*>(inventory().ItemFromSlot(INV_SLOT_2));
-
-    if (inventory().ItemFromSlot(INV_SLOT_3))
-        wpn2 = smart_cast<CWeapon*>(inventory().ItemFromSlot(INV_SLOT_3));
-
-    xr_vector<CAttachableItem*> const& all = CAttachmentOwner::attached_objects();
-    xr_vector<CAttachableItem*>::const_iterator it = all.begin();
-    xr_vector<CAttachableItem*>::const_iterator it_e = all.end();
-    for (; it != it_e; ++it)
-    {
-        CTorch* torch = smart_cast<CTorch*>(*it);
-        if (torch)
-        {
-            if (wpn1 && wpn1->IsZoomed())
-                return;
-
-            if (wpn2 && wpn2->IsZoomed())
-                return;
-
-            torch->SwitchNightVision();
-            return;
-        }
-    }
-}
+void CActor::SwitchNightVision() { SwitchNightVision(!m_bNightVisionOn); }
 
 void CActor::SwitchTorch()
 {
-    xr_vector<CAttachableItem*> const& all = CAttachmentOwner::attached_objects();
-    xr_vector<CAttachableItem*>::const_iterator it = all.begin();
-    xr_vector<CAttachableItem*>::const_iterator it_e = all.end();
-    for (; it != it_e; ++it)
-    {
-        CTorch* torch = smart_cast<CTorch*>(*it);
-        if (torch)
-        {
-            torch->Switch();
-            return;
-        }
-    }
+    CTorch* pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
+    if (pTorch)
+        pTorch->Switch();
 }
 
 #ifdef COC_KICK

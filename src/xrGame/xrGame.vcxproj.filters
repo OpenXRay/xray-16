@@ -6677,8 +6677,14 @@
     <ClInclude Include="ActorBackpack.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
+    <ClInclude Include="ActorNightVision.h">
+      <Filter>Core\Client\Objects\actor\base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActorNightVision.cpp">
+      <Filter>Core\Client\Objects\actor\base</Filter>
+    </ClCompile>
     <ClCompile Include="damage_manager.cpp">
       <Filter>AI\AComponents\DamageManager</Filter>
     </ClCompile>
