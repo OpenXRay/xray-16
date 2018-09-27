@@ -166,6 +166,15 @@ public:
     const shared_str& GetGrenadeLauncherName() const { return m_sGrenadeLauncherName; }
     const shared_str GetScopeName() const { return pSettings->r_string(m_scopes[m_cur_scope], "scope_name"); }
     const shared_str& GetSilencerName() const { return m_sSilencerName; }
+    const shared_str GetGrenadeLauncherBoneName() const { return READ_IF_EXISTS(pSettings, r_string, m_sGrenadeLauncherName, "addon_bone", "wpn_launcher"); }
+    const shared_str GetScopeBoneName() const
+    {
+        LPCSTR scope_section = pSettings->r_string(m_scopes[m_cur_scope], "scope_name");
+        return READ_IF_EXISTS(pSettings, r_string, scope_section, "addon_bone", "wpn_scope");
+    }
+    const shared_str GetSilencerBoneName() const { return READ_IF_EXISTS(pSettings, r_string, m_sSilencerName, "addon_bone", "wpn_silencer"); }
+    bool SetBoneVisible(IKinematics* m_model, const shared_str& bone_name, BOOL bVisibility, BOOL bSilent);
+
     IC void ForceUpdateAmmo() { m_BriefInfo_CalcFrame = 0; }
     u8 GetAddonsState() const { return m_flagsAddOnState; };
     void SetAddonsState(u8 st) { m_flagsAddOnState = st; } // dont use!!! for buy menu only!!!
