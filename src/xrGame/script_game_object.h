@@ -718,7 +718,7 @@ public:
     bool invulnerable() const;
     void invulnerable(bool invulnerable);
     pcstr get_smart_cover_description() const;
-    void set_visual_name(pcstr visual);
+    void set_visual_name(pcstr visual, bool bForce = false);
     pcstr get_visual_name() const;
 
     bool can_throw_grenades() const;

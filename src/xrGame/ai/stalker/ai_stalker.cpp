@@ -1428,3 +1428,15 @@ void CAI_Stalker::ResetBoneProtections(pcstr imm_sect, pcstr bone_sect)
         }
     }
 }
+
+void CAI_Stalker::ChangeVisual(shared_str NewVisual)
+{
+    if (!NewVisual.size()) return;
+    if (cNameVisual().size())
+    {
+        if (cNameVisual() == NewVisual) return;
+    }
+    cNameVisual_set(NewVisual);
+    Visual()->dcast_PKinematics()->CalculateBones_Invalidate();
+    Visual()->dcast_PKinematics()->CalculateBones(TRUE);
+};

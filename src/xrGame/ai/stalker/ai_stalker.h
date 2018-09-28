@@ -199,6 +199,9 @@ public:
     virtual void PHHit(SHit& H);
     virtual bool feel_vision_isRelevant(IGameObject* who);
     virtual float Radius() const;
+
+    virtual void ChangeVisual(shared_str NewVisual);
+
 #ifdef DEBUG
     virtual void OnHUDDraw(CCustomHUD* hud);
     virtual void OnRender();

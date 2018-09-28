@@ -588,24 +588,47 @@ void CScriptGameObject::ResetBoneProtections(pcstr imm_sect, pcstr bone_sect)
     stalker->ResetBoneProtections(imm_sect, bone_sect);
 }
 
-void CScriptGameObject::set_visual_name(pcstr visual)
+#include "stalker_animation_manager.h"
+void CScriptGameObject::set_visual_name(pcstr visual, bool bForce)
 {
     if (strcmp(visual, object().cNameVisual().c_str()) == 0) return;
 
+	if (!bForce)
+    {
+        object().cNameVisual_set(visual);
+        return;
+    }
+
     CActor* actor = smart_cast<CActor*>(&object());
-    if (actor) { actor->ChangeVisual(visual); return; }
+    if (actor) { actor->ChangeVisual(visual); actor->OnChangeVisual(); return; }
 
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (stalker)
     {
-        stalker->cNameVisual_set(visual);
-        stalker->Visual()->dcast_PKinematics()->CalculateBones_Invalidate();
-        stalker->Visual()->dcast_PKinematics()->CalculateBones(TRUE);
-        stalker->ResetBoneProtections(NULL, NULL);
         NET_Packet P;
         object().u_EventGen(P, GE_CHANGE_VISUAL, object().ID());
         P.w_stringZ(visual);
         object().u_EventSend(P);
+
+        stalker->ChangeVisual(visual);
+
+        CPhysicsShell* tmp_shell = stalker->PPhysicsShell();
+        stalker->PPhysicsShell() = NULL;
+        stalker->OnChangeVisual();
+        stalker->PPhysicsShell() = tmp_shell;
+        tmp_shell = NULL;
+
+        IKinematicsAnimated* V = smart_cast<IKinematicsAnimated*>(stalker->Visual());
+        if (V)
+        {
+            if (!stalker->already_dead())
+            stalker->CStepManager::reload(stalker->cNameSect().c_str());
+            stalker->CDamageManager::reload(*stalker->cNameSect(), "damage", pSettings);
+            stalker->ResetBoneProtections(NULL, NULL);
+            stalker->reattach_items();
+            stalker->m_pPhysics_support->in_ChangeVisual();
+            stalker->animation().reload();
+        }
     }
 }
 
