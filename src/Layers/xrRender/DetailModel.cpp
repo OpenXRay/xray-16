@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
-#include "detailmodel.h"
+#include "DetailModel.h"
 
 CDetail::~CDetail() {}
 void CDetail::Unload()

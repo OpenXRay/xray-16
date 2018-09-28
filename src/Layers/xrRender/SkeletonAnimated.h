@@ -2,8 +2,8 @@
 #ifndef SkeletonAnimatedH
 #define SkeletonAnimatedH
 
-#include "skeletoncustom.h"
-#include "animation.h"
+#include "SkeletonCustom.h"
+#include "Animation.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
 
 #include "Include/xrRender/KinematicsAnimated.h"

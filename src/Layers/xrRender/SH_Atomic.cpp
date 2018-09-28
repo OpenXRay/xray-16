@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "sh_atomic.h"
+#include "SH_Atomic.h"
 #include "ResourceManager.h"
 
 // Atomic

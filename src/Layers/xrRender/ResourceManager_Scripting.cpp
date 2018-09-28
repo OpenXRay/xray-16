@@ -4,8 +4,8 @@
 #include "xrEngine/Render.h"
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/blender.h"
-#include "blenders/blender_recorder.h"
+#include "blenders/Blender.h"
+#include "blenders/Blender_Recorder.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "luabind/return_reference_to_policy.hpp"
 

@@ -6,6 +6,10 @@
 #include "xrCore/Threading/ThreadPool.hpp"
 #endif
 
+#if defined(LINUX)
+#include <math.h>
+#endif
+
 using namespace PAPI;
 using namespace PS;
 

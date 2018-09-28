@@ -38,7 +38,7 @@ dxRainRender::dxRainRender()
 
 dxRainRender::~dxRainRender() { ::RImplementation.model_Delete(DM_Drop); }
 void dxRainRender::Copy(IRainRender& _in) { *this = *(dxRainRender*)&_in; }
-#include "xrEngine/iGame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 
 void dxRainRender::Render(CEffect_Rain& owner)
 {

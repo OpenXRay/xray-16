@@ -6,7 +6,7 @@
 #include "xrEngine/IRenderable.h"
 
 #include "FLOD.h"
-#include "particlegroup.h"
+#include "ParticleGroup.h"
 #include "FTreeVisual.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"

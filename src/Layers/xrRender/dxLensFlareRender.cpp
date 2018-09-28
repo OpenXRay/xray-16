@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxLensFlareRender.h"
 #include "xrEngine/xr_efflensflare.h"
-#include "xrEngine/iGame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #define MAX_Flares 24
 
 #define FAR_DIST g_pGamePersistent->Environment().CurrentEnv->far_plane

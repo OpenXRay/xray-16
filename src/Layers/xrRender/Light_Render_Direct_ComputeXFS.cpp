@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "light_render_direct.h"
+#include "Light_Render_Direct.h"
 
 void CLight_Compute_XFORM_and_VIS::compute_xf_spot(light* L)
 {

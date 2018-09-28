@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
@@ -9,11 +10,12 @@
 #include "xrEngine/Render.h"
 #endif
 #pragma warning(pop)
+#endif
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/blender.h"
-#include "blenders/blender_recorder.h"
+#include "blenders/Blender.h"
+#include "blenders/Blender_Recorder.h"
 #include "ShaderResourceTraits.h"
 
 void fix_texture_name(LPSTR fn);
