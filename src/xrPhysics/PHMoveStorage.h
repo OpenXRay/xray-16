@@ -1,5 +1,5 @@
-#ifndef PHMOVESTORAGE_H
-#define PHMOVESTORAGE_H
+#pragma once
+
 #include "PHGeometryOwner.h"
 // DEFINE_VECTOR(dReal *&,POSITIONS_STORAGE,POSITIONS_I);
 
@@ -42,5 +42,3 @@ public:
     void add(CODEGeom* g) { m_trace_geometries.push_back(g); }
     void clear() { m_trace_geometries.clear(); }
 };
-
-#endif

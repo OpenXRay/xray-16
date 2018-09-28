@@ -1,6 +1,5 @@
 #pragma once
-#ifndef MATH_UTILS_H
-#define MATH_UTILS_H
+
 #include "xrCore/_fbox.h"
 #include "xrCore/_obb.h"
 #include "xrPhysics.h"
@@ -477,5 +476,3 @@ const float DET_CHECK_FATAL_EPS = 0.8f; // scale -35%  !? ;)
 #else
 #define VERIFY_RMATRIX(M)
 #endif
-
-#endif // include guard

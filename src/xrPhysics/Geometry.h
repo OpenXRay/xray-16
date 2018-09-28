@@ -1,6 +1,5 @@
 #pragma once
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+
 #include "PhysicsCommon.h"
 #include "ExtendedGeom.h"
 #include "MathUtilsOde.h"
@@ -193,4 +192,3 @@ private:
     virtual void dbg_draw(float scale, u32 color, Flags32 flags) const;
 #endif
 };
-#endif // GEOMETRY_H

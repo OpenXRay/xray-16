@@ -1,5 +1,4 @@
-#ifndef PH_IMPACT_H
-#define PH_IMPACT_H
+#pragma once
 
 struct SPHImpact
 {
@@ -14,5 +13,3 @@ struct SPHImpact
     }
 };
 using PH_IMPACT_STORAGE = xr_vector<SPHImpact>;
-
-#endif

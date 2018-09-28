@@ -1,6 +1,3 @@
-#ifndef _IPHYSICS_SCRIPTED_
-#define _IPHYSICS_SCRIPTED_
-
 #pragma once
 
 #include "xrServerEntities/smart_cast.h" // get_script_wrapper() needs it
@@ -83,4 +80,3 @@ wrap* get_script_wrapper(typename wrap::type_impl& E)
 
     return e;
 }
-#endif

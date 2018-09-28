@@ -1,7 +1,4 @@
-///////////////////////////////////////////////////////////////////////
-
-#ifndef PH_SHELL
-#define PH_SHELL
+#pragma once
 
 class CPHShell;
 class CPHShellSplitterHolder;
@@ -313,5 +310,3 @@ IC void CPHShell::SetObjVsShellTransform(const Fmatrix& root_transform)
     m_object_in_root.invert();
     SetNotActivating();
 }
-
-#endif

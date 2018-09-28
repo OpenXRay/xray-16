@@ -1,5 +1,4 @@
-#ifndef PH_COLLIDE_VALIDATOR
-#define PH_COLLIDE_VALIDATOR
+#pragma once
 
 #include "ICollideValidator.h"
 typedef u32 CLClassBits;
@@ -86,5 +85,3 @@ private:
     static _flags<CLClassBits> ClassNCFlags;
     static _flags<CLClassBits> NonTypeFlags;
 };
-
-#endif

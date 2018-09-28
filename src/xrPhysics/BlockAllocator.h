@@ -1,5 +1,5 @@
-#ifndef BLOCK_ALLOCATOR_H
-#define BLOCK_ALLOCATOR_H
+#pragma once
+
 template <class T, u32 block_size>
 class CBlockAllocator
 {
@@ -87,5 +87,3 @@ private:
     //IC void construct(u32 position) { xr_allocator_t<T>().construct(pointer(position)); }
     //IC void construct_back() { xr_allocator_t<T>().construct(back_pointer()); }
 };
-
-#endif

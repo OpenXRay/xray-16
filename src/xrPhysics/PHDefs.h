@@ -1,6 +1,5 @@
 #pragma once
-#ifndef PHDEFS_H
-#define PHDEFS_H
+
 #include <utility>
 #include "xrCommon/xr_vector.h"
 
@@ -20,5 +19,3 @@ using PHSHELL_PAIR_VECTOR = xr_vector<shell_root>;
 typedef xr_vector<shell_root>::reverse_iterator SHELL_PAIR_RI;
 
 typedef xr_vector<CPHElement*>::reverse_iterator ELEMENT_RI;
-
-#endif

@@ -1,5 +1,5 @@
-#ifndef PH_WORLD_H
-#define PH_WORLD_H
+#pragma once
+
 #include "Physics.h"
 #include "PHUpdateObject.h"
 #include "IPHWorld.h"
@@ -167,4 +167,3 @@ private:
 };
 extern CPHWorld* ph_world;
 IC CPHWorld& inl_ph_world() { return *ph_world; }
-#endif

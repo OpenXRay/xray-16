@@ -1,5 +1,5 @@
-#ifndef I_COLLISION_DAMAGE_INFO_H
-#define I_COLLISION_DAMAGE_INFO_H
+#pragma once
+
 // struct SCollisionHitCallback;
 class ICollisionHitCallback;
 class ICollisionDamageInfo
@@ -24,4 +24,3 @@ protected:
     virtual ~ICollisionDamageInfo() {}
 #endif
 };
-#endif

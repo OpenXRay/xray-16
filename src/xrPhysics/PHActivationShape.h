@@ -1,6 +1,4 @@
-#ifndef PH_ACTIVATION_SHAPE
-#define PH_ACTIVATION_SHAPE
-#endif
+#pragma once
 
 #include "PHValideValues.h"
 #include "PHObject.h"

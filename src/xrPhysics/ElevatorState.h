@@ -1,5 +1,4 @@
-#ifndef ELEVATOR_STAETE
-#define ELEVATOR_STAETE
+#pragma once
 
 #include "IElevatorState.h"
 class CPHCharacter;
@@ -62,5 +61,3 @@ private:
 public:
     void NetRelcase(IPhysicsShellHolder* O);
 };
-
-#endif
