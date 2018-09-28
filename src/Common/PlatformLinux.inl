@@ -275,9 +275,10 @@ inline bool strncpy_s(char * dest, size_t, const char * source, size_t num) {
 inline bool strncpy_s(char * dest, const char * source, size_t num) {
     return NULL == strncpy(dest, source, num);
 }
-#define strcpy_s(dest, source) (NULL == strcpy(dest, source))
-#define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
-#define strcat_s(dest, num, source) (dest == strcat(dest, source))
+inline int strcpy_s(char *dest, const char *source) { return (int)(NULL == strcpy(dest, source)); }
+inline int strcpy_s(char *dest, size_t num, const char *source) { return (int)(NULL == strcpy(dest, source)); }
+inline int strcat_s(char * dest, size_t size, const char * source) { return (NULL == strcat(dest, source)); }
+
 #define _vsnprintf vsnprintf
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
 #define _alloca alloca
@@ -773,5 +774,139 @@ typedef enum _D3DSAMPLERSTATETYPE {
 #define D3DFVF_TEXCOORDSIZE3(CoordIndex) (D3DFVF_TEXTUREFORMAT3 << (CoordIndex*2 + 16))
 #define D3DFVF_TEXCOORDSIZE4(CoordIndex) (D3DFVF_TEXTUREFORMAT4 << (CoordIndex*2 + 16))
 
+typedef enum _D3DDECLMETHOD {
+  D3DDECLMETHOD_DEFAULT          = 0,
+  D3DDECLMETHOD_PARTIALU         = 1,
+  D3DDECLMETHOD_PARTIALV         = 2,
+  D3DDECLMETHOD_CROSSUV          = 3,
+  D3DDECLMETHOD_UV               = 4,
+  D3DDECLMETHOD_LOOKUP           = 5,
+  D3DDECLMETHOD_LOOKUPPRESAMPLED = 6
+} D3DDECLMETHOD;
+
+
+#define D3DMAXDECLMETHOD        D3DDECLMETHOD_LOOKUPPRESAMPLED
+
+typedef enum _D3DDECLTYPE {
+  D3DDECLTYPE_FLOAT1    =  0,
+  D3DDECLTYPE_FLOAT2    =  1,
+  D3DDECLTYPE_FLOAT3    =  2,
+  D3DDECLTYPE_FLOAT4    =  3,
+  D3DDECLTYPE_D3DCOLOR  =  4,
+  D3DDECLTYPE_UBYTE4    =  5,
+  D3DDECLTYPE_SHORT2    =  6,
+  D3DDECLTYPE_SHORT4    =  7,
+  /* VS 2.0 */
+  D3DDECLTYPE_UBYTE4N   =  8,
+  D3DDECLTYPE_SHORT2N   =  9,
+  D3DDECLTYPE_SHORT4N   = 10,
+  D3DDECLTYPE_USHORT2N  = 11,
+  D3DDECLTYPE_USHORT4N  = 12,
+  D3DDECLTYPE_UDEC3     = 13,
+  D3DDECLTYPE_DEC3N     = 14,
+  D3DDECLTYPE_FLOAT16_2 = 15,
+  D3DDECLTYPE_FLOAT16_4 = 16,
+  D3DDECLTYPE_UNUSED    = 17,
+} D3DDECLTYPE;
+
+#define D3DMAXDECLTYPE          D3DDECLTYPE_UNUSED
+
+typedef enum _D3DDECLUSAGE {
+  D3DDECLUSAGE_POSITION     = 0,
+  D3DDECLUSAGE_BLENDWEIGHT  = 1,
+  D3DDECLUSAGE_BLENDINDICES = 2,
+  D3DDECLUSAGE_NORMAL       = 3,
+  D3DDECLUSAGE_PSIZE        = 4,
+  D3DDECLUSAGE_TEXCOORD     = 5,
+  D3DDECLUSAGE_TANGENT      = 6,
+  D3DDECLUSAGE_BINORMAL     = 7,
+  D3DDECLUSAGE_TESSFACTOR   = 8,
+  D3DDECLUSAGE_POSITIONT    = 9,
+  D3DDECLUSAGE_COLOR        = 10,
+  D3DDECLUSAGE_FOG          = 11,
+  D3DDECLUSAGE_DEPTH        = 12,
+  D3DDECLUSAGE_SAMPLE       = 13
+} D3DDECLUSAGE;
+
+typedef enum _D3DFILLMODE {
+    D3DFILL_POINT               = 1,
+    D3DFILL_WIREFRAME           = 2,
+    D3DFILL_SOLID               = 3,
+
+    D3DFILL_FORCE_DWORD         = 0x7fffffff
+} D3DFILLMODE;
+
+typedef enum _D3DLIGHTTYPE {
+    D3DLIGHT_POINT          = 1,
+    D3DLIGHT_SPOT           = 2,
+    D3DLIGHT_DIRECTIONAL    = 3,
+
+    D3DLIGHT_FORCE_DWORD    = 0x7fffffff
+} D3DLIGHTTYPE;
+
+#ifndef D3DCOLOR_DEFINED
+typedef DWORD D3DCOLOR;
+#define D3DCOLOR_DEFINED
+#endif
+
+typedef enum _D3DSHADEMODE {
+    D3DSHADE_FLAT               = 1,
+    D3DSHADE_GOURAUD            = 2,
+    D3DSHADE_PHONG              = 3,
+
+    D3DSHADE_FORCE_DWORD        = 0x7fffffff
+} D3DSHADEMODE;
+
+typedef enum _D3DSWAPEFFECT {
+    D3DSWAPEFFECT_DISCARD         = 1,
+    D3DSWAPEFFECT_FLIP            = 2,
+    D3DSWAPEFFECT_COPY            = 3,
+    D3DSWAPEFFECT_OVERLAY         = 4,
+    D3DSWAPEFFECT_FLIPEX          = 5,
+    D3DSWAPEFFECT_FORCE_DWORD     = 0xFFFFFFFF
+} D3DSWAPEFFECT;
+
+typedef enum _D3DTRANSFORMSTATETYPE {
+    D3DTS_VIEW            =  2,
+    D3DTS_PROJECTION      =  3,
+    D3DTS_TEXTURE0        = 16,
+    D3DTS_TEXTURE1        = 17,
+    D3DTS_TEXTURE2        = 18,
+    D3DTS_TEXTURE3        = 19,
+    D3DTS_TEXTURE4        = 20,
+    D3DTS_TEXTURE5        = 21,
+    D3DTS_TEXTURE6        = 22,
+    D3DTS_TEXTURE7        = 23,
+
+    D3DTS_FORCE_DWORD     = 0x7fffffff
+} D3DTRANSFORMSTATETYPE;
+
+#define D3DTS_WORLD  D3DTS_WORLDMATRIX(0)
+#define D3DTS_WORLD1 D3DTS_WORLDMATRIX(1)
+#define D3DTS_WORLD2 D3DTS_WORLDMATRIX(2)
+#define D3DTS_WORLD3 D3DTS_WORLDMATRIX(3)
+#define D3DTS_WORLDMATRIX(index) (D3DTRANSFORMSTATETYPE)(index + 256)
+
+#define D3DUSAGE_RENDERTARGET       __MSABI_LONG(0x00000001)
+#define D3DUSAGE_DEPTHSTENCIL       __MSABI_LONG(0x00000002)
+#define D3DUSAGE_WRITEONLY          __MSABI_LONG(0x00000008)
+#define D3DUSAGE_SOFTWAREPROCESSING __MSABI_LONG(0x00000010)
+#define D3DUSAGE_DONOTCLIP          __MSABI_LONG(0x00000020)
+#define D3DUSAGE_POINTS             __MSABI_LONG(0x00000040)
+#define D3DUSAGE_RTPATCHES          __MSABI_LONG(0x00000080)
+#define D3DUSAGE_NPATCHES           __MSABI_LONG(0x00000100)
+#define D3DUSAGE_DYNAMIC            __MSABI_LONG(0x00000200)
+#define D3DUSAGE_AUTOGENMIPMAP      __MSABI_LONG(0x00000400)
+#define D3DUSAGE_DMAP               __MSABI_LONG(0x00004000)
+
+#define D3DCOLOR_ARGB(a,r,g,b)       ((D3DCOLOR)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
+#define D3DCOLOR_COLORVALUE(r,g,b,a) D3DCOLOR_RGBA((DWORD)((r)*255.f),(DWORD)((g)*255.f),(DWORD)((b)*255.f),(DWORD)((a)*255.f))
+#define D3DCOLOR_RGBA(r,g,b,a)       D3DCOLOR_ARGB(a,r,g,b)
+#define D3DCOLOR_XRGB(r,g,b)         D3DCOLOR_ARGB(0xff,r,g,b)
+#define D3DCOLOR_XYUV(y,u,v)         D3DCOLOR_ARGB(0xFF,y,u,v)
+#define D3DCOLOR_AYUV(a,y,u,v)       D3DCOLOR_ARGB(a,y,u,v)
+
+#define D3DDECL_END() {0xFF,0,D3DDECLTYPE_UNUSED,0,0,0}
 
 inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
+
