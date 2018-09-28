@@ -275,6 +275,7 @@ inline bool strncpy_s(char * dest, size_t, const char * source, size_t num) {
 inline bool strncpy_s(char * dest, const char * source, size_t num) {
     return NULL == strncpy(dest, source, num);
 }
+#define strcpy_s(dest, source) (NULL == strcpy(dest, source))
 #define strcpy_s(dest, num, source) (NULL == strcpy(dest, source))
 #define strcat_s(dest, num, source) (dest == strcat(dest, source))
 #define _vsnprintf vsnprintf

@@ -5,6 +5,7 @@
 #include "FHierrarhyVisual.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "Include/xrRender/Kinematics.h"
+#include "SkeletonX.h"
 
 // consts
 extern Lock UCalc_Mutex;
