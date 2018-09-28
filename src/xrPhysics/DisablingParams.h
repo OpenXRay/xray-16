@@ -1,5 +1,6 @@
 #pragma once
-
+#ifndef DISABLING_PARAMS_H
+#define DISABLING_PARAMS_H
 #include "xrPhysics.h"
 
 // fwd. decl.
@@ -28,3 +29,5 @@ struct SAllDDWParams
 };
 
 extern SAllDDWParams worldDisablingParams;
+
+#endif
