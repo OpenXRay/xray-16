@@ -4,6 +4,7 @@ list(APPEND DIRS
     "."
     "../xrRender"
     "../xrRenderGL"
+    "../../Include/xrRender"
     )
 
 
@@ -11,6 +12,8 @@ add_dir("${DIRS}")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../xrRender
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Include/xrRender
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/luabind
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/gli
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../sdk/include
@@ -19,7 +22,14 @@ include_directories(
 
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./r2_R_sun.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./r3_R_rain.cpp")
-#list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.hpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/HW.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/SH_RT.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/stats_manager.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/Texture.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/SH_Texture.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/ResourceManager_Resources.cpp")
+
+list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/stats_manager.h")
 
 add_definitions(-DXRLCUTIL_EXPORTS -D_USRDLL -DXRRENDER_GL_EXPORTS -DUSE_OGL -DNO_XR_VDECLARATOR)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
