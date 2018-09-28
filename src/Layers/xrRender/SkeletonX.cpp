@@ -5,10 +5,12 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
 #pragma warning(pop)
+#endif
 
 #ifndef _EDITOR
 #include "xrEngine/Render.h"

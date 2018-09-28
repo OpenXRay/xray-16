@@ -412,7 +412,7 @@ template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs
 template<class T>
 IC void sort_front_to_back_render_and_clean(T &vec)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_l<T::value_type>); // front-to-back
+    std::sort(vec.begin(), vec.end(), cmp_first_l<typename T::value_type>); // front-to-back
     for (auto &i : vec)
         render_item(i);
     vec.clear();
@@ -421,7 +421,7 @@ IC void sort_front_to_back_render_and_clean(T &vec)
 template<class T>
 IC void sort_back_to_front_render_and_clean(T &vec)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_h<T::value_type>); // back-to-front
+    std::sort(vec.begin(), vec.end(), cmp_first_h<typename T::value_type>); // back-to-front
     for (auto &i : vec)
         render_item(i);
     vec.clear();

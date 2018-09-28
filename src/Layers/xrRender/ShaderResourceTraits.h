@@ -8,7 +8,7 @@ struct ShaderTypeTraits;
 template <>
 struct ShaderTypeTraits<SVS>
 {
-    typedef CResourceManager::map_VS MapType;
+    using MapType = CResourceManager::map_VS;
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
@@ -65,7 +65,7 @@ struct ShaderTypeTraits<SVS>
 template <>
 struct ShaderTypeTraits<SPS>
 {
-    typedef CResourceManager::map_PS MapType;
+    using MapType = CResourceManager::map_PS;
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
@@ -132,7 +132,7 @@ struct ShaderTypeTraits<SPS>
 template <>
 struct ShaderTypeTraits<SGS>
 {
-    typedef CResourceManager::map_GS MapType;
+    using MapType = CResourceManager::map_GS;
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
@@ -191,7 +191,7 @@ struct ShaderTypeTraits<SGS>
 template <>
 struct ShaderTypeTraits<SHS>
 {
-    typedef CResourceManager::map_HS MapType;
+    using MapType = CResourceManager::map_HS;
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
@@ -227,7 +227,7 @@ struct ShaderTypeTraits<SHS>
 template <>
 struct ShaderTypeTraits<SDS>
 {
-    typedef CResourceManager::map_DS MapType;
+    using MapType = CResourceManager::map_DS;
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
@@ -263,7 +263,7 @@ struct ShaderTypeTraits<SDS>
 template <>
 struct ShaderTypeTraits<SCS>
 {
-    typedef CResourceManager::map_CS MapType;
+    using MapType = CResourceManager::map_CS;
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
@@ -340,7 +340,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 template <typename T>
 inline T* CResourceManager::CreateShader(const char* name, const char* filename /*= nullptr*/, const bool searchForEntryAndTarget /*= false*/)
 {
-    ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
+    typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
     auto iterator = sh_map.find(N);
 
@@ -437,7 +437,7 @@ inline void CResourceManager::DestroyShader(const T* sh)
     if (0 == (sh->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
 
-    ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
+   typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
 
     LPSTR N = LPSTR(*sh->cName);
     auto iterator = sh_map.find(N);
