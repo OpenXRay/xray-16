@@ -1,0 +1,108 @@
+[logic]
+active = nil ;sr_idle@spawn
+
+[sr_idle@spawn]
+on_info = {+zat_b5_actor_with_stalkers} sr_idle@clear_stalkers %=clear_smart_terrain(zat_b5_smart_terrain)% 
+on_info2 = {+zat_b5_actor_with_bandits} sr_idle@clear_bandits %=clear_smart_terrain(zat_b5_smart_terrain)% 
+on_info3 = {+zat_b5_actor_with_dealer} sr_idle@clear_dealers %=clear_smart_terrain(zat_b5_smart_terrain)%  
+
+[sr_idle@clear_stalkers]
+on_game_timer = 20 | sr_idle@alter_stalkers %=create_squad(zat_b5_stalkers_squad:zat_b5_smart_terrain)%
+
+[sr_idle@clear_bandits]
+on_game_timer = 20 | sr_idle@alter_bandits %=create_squad(zat_b5_bandit_squad:zat_b5_smart_terrain)%
+
+[sr_idle@clear_dealers]
+on_game_timer = 20 | sr_idle@create_stalkers %=create_squad(zat_b5_dolg_squad:zat_b5_smart_terrain) =create_squad(zat_b5_dolg_assist_squad:zat_b5_smart_terrain)% 
+
+
+[sr_idle@alter_bandits]
+on_info = {+zat_b5_actor_with_bandits +zat_b7_stalker_raider_leader_alive} sr_idle@create_stalkers %=create_squad_member(zat_b5_stalker_raider_leader:zat_b5_bandit_squad)%
+on_info2 = {+zat_b5_actor_with_bandits -zat_b7_stalker_raider_leader_alive} sr_idle@create_stalkers %=create_squad_member(zat_b7_bandit_boss_dead:zat_b5_bandit_squad)%
+on_info3 = {-zat_b5_actor_with_bandits +zat_b7_stalker_raider_leader_alive} sr_idle@dealer_check %=create_squad_member(zat_b5_stalker_raider_leader:zat_b5_bandit_squad)%
+on_info4 = {-zat_b5_actor_with_bandits -zat_b7_stalker_raider_leader_alive} sr_idle@dealer_check %=create_squad_member(zat_b7_bandit_boss_dead:zat_b5_bandit_squad)%
+
+[sr_idle@alter_stalkers]
+on_info = {+zat_b7_stalker_victim_leader_alive} sr_idle@create_stalkers %=create_squad_member(zat_b5_stalker_commander_b7:zat_b5_stalkers_squad)%
+on_info2 = {-zat_b7_stalker_victim_leader_alive} sr_idle@create_stalkers %=create_squad_member(zat_b5_stalker_commander:zat_b5_stalkers_squad)%
+
+[sr_idle@create_stalkers]
+on_info = {+zat_b5_actor_stalker_go_to_trader} sr_idle@pre_stalkers_disable_ui %=create_squad(zat_b5_dolg_squad:zat_b5_smart_terrain)  =create_squad(zat_b5_bandit_squad:zat_b5_smart_terrain) =create_squad(zat_b5_dolg_assist_squad:zat_b5_smart_terrain)% 
+on_info2 = {+zat_b5_come_to_bandits_complete} sr_idle@bandits_check %=create_squad(zat_b5_dolg_squad:zat_b5_smart_terrain) =create_squad(zat_b5_dolg_assist_squad:zat_b5_smart_terrain)% 
+on_info3 = {+zat_b5_spawn_enemy} sr_idle@alter_bandits %=create_squad(zat_b5_bandit_squad:zat_b5_smart_terrain)%
+on_info4 = {+zat_b5_time_is_out =squad_exist(zat_b5_stalkers_squad)} sr_idle@nil %=remove_squad(zat_b5_stalkers_squad)%,  {+zat_b5_time_is_out !squad_exist(zat_b5_stalkers_squad)} sr_idle@nil
+
+;-------------за сталкеров-------------------
+[sr_idle@pre_stalkers_disable_ui]
+on_info = {+zat_b7_stalker_raider_leader_alive} sr_idle@cheack_alive_leader %=create_squad_member(zat_b5_stalker_raider_leader:zat_b5_bandit_squad)%
+on_info2 = {-zat_b7_stalker_raider_leader_alive} sr_idle@cheack_alive_leader %=create_squad_member(zat_b7_bandit_boss_dead:zat_b5_bandit_squad)%
+
+;[sr_idle@stalkers_disable_ui]
+;on_info = {+zat_b5_start_quest_stalkers -zat_b5_meat} sr_idle@stalkers_timer_to_cam_eff %=disable_ui%, {+zat_b5_start_quest_stalkers +zat_b5_meat} sr_idle@cheack_alive_leader
+
+;[sr_idle@stalkers_timer_to_cam_eff]
+;on_game_timer = 10 | {-zat_b5_meat} sr_idle@stalkers_cam_sig %=run_cam_effector_global(scenario_cam\Zaton\zat_b5_from_stalkers)%, {+zat_b5_meat} sr_idle@cheack_alive_leader %=enable_ui%
+
+
+;[sr_idle@stalkers_cam_sig]
+;on_signal = cameff_end | sr_idle@cheack_alive_leader %=enable_ui%
+
+[sr_idle@cheack_alive_leader]
+on_info = {+zat_b5_stalker_leader_dead} sr_idle@nil
+on_info2 = {+zat_b5_actor_help_stalkers_pric -zat_b5_stalker_leader_dead -zat_b7_stalker_victim_leader_alive !dist_to_actor_le(140)} sr_idle@nil
+on_info3 = {+zat_b5_actor_help_stalkers_pric -zat_b5_stalker_leader_dead +zat_b7_stalker_victim_leader_alive !dist_to_actor_le(140)} sr_idle@alive_leader_create %=remove_squad(zat_b5_stalkers_squad)%
+on_info4 = {=is_squad_enemy_to_actor(zat_b5_stalkers_squad) !dist_to_actor_le(140)} sr_idle@nil %=remove_squad(zat_b5_stalkers_squad)%
+
+[sr_idle@alive_leader_create]
+on_game_timer = 20 | sr_idle@nil %=create_squad(zat_b7_stalkers_base_squad:zat_b5_smart_terrain) +zat_b5_stalker_leader_end%
+
+
+
+
+;-------------за торговца-------------------
+[sr_idle@dealer_check]
+on_info = {+zat_b5_dealer_close} sr_idle@dealer_disable_ui
+on_info2 = {+zat_b5_meat} sr_idle@add_stalker_with_dealer_to_nil %=create_squad(zat_b5_stalkers_squad:zat_b5_smart_terrain)%
+
+[sr_idle@dealer_disable_ui]
+on_actor_in_zone = zat_b5_sr_actor_in_zone_spawn_enemy | sr_idle@add_stalker_with_dealer %+zat_b5_dealer_close_by_trader =disable_ui =create_squad(zat_b5_stalkers_squad:zat_b5_smart_terrain)%
+on_info = {+zat_b5_meat} sr_idle@add_stalker_with_dealer_to_nil %=create_squad(zat_b5_stalkers_squad:zat_b5_smart_terrain)%
+on_info2 = {+zat_b5_leave_for_trader_quest} sr_idle@nil
+
+[sr_idle@add_stalker_with_dealer]
+on_info = {+zat_b7_stalker_victim_leader_alive} sr_idle@dealer_cam_sig %=create_squad_member(zat_b5_stalker_commander_b7:zat_b5_stalkers_squad)%
+on_info2 = {-zat_b7_stalker_victim_leader_alive} sr_idle@dealer_cam_sig %=create_squad_member(zat_b5_stalker_commander:zat_b5_stalkers_squad)%
+
+[sr_idle@add_stalker_with_dealer_to_nil]
+on_info = {+zat_b7_stalker_victim_leader_alive} sr_idle@nil %=create_squad_member(zat_b5_stalker_commander_b7:zat_b5_stalkers_squad)%
+on_info2 = {-zat_b7_stalker_victim_leader_alive} sr_idle@nil %=create_squad_member(zat_b5_stalker_commander:zat_b5_stalkers_squad)%
+
+;[sr_idle@dealer_timer_to_cam_eff]
+;on_game_timer = 10 | {-zat_b5_meat} sr_idle@dealer_cam_sig  %=run_cam_effector_global(scenario_cam\Zaton\zat_b5_from_bandits)%, {+zat_b5_meat} sr_idle@dealer_cam_sig
+
+[sr_idle@dealer_cam_sig]
+on_info = {+zat_b5_dealer_cutscene_end} sr_idle@nil %=enable_ui%
+
+;--------------------за бандитов-----------------------
+
+[sr_idle@bandits_check]
+on_info = {+zat_b5_sultan_close} sr_idle@bandits_disable_ui 
+on_info2 = {+zat_b5_meat} sr_idle@nil
+
+[sr_idle@bandits_disable_ui]
+on_actor_in_zone = zat_b5_sr_actor_in_zone_spawn_enemy | sr_idle@add_stalker_with_bandits %+zat_b5_sultan_close_by_trader =disable_ui =create_squad(zat_b5_stalkers_squad:zat_b5_smart_terrain)% ; 
+on_info = {+zat_b5_meat} sr_idle@nil
+on_info2 = {+zat_b5_leave_for_bandit_quest} sr_idle@nil
+
+[sr_idle@add_stalker_with_bandits]
+on_info = {+zat_b7_stalker_victim_leader_alive} sr_idle@bandits_cam_sig %=create_squad_member(zat_b5_stalker_commander_b7:zat_b5_stalkers_squad)%
+on_info2 = {-zat_b7_stalker_victim_leader_alive} sr_idle@bandits_cam_sig %=create_squad_member(zat_b5_stalker_commander:zat_b5_stalkers_squad)%
+
+;[sr_idle@bandits_timer_to_cam_eff]
+;on_info = {-zat_b5_meat} sr_idle@bandits_cam_sig %=run_cam_effector_global(scenario_cam\Zaton\zat_b5_from_bandits)%, {+zat_b5_meat} sr_idle@bandits_cam_sig
+;on_game_timer = 10 | {-zat_b5_meat} sr_idle@bandits_cam_sig %=run_cam_effector_global(scenario_cam\Zaton\zat_b5_from_bandits)%, {+zat_b5_meat} sr_idle@bandits_cam_sig
+
+[sr_idle@bandits_cam_sig]
+on_info = {+zat_b5_bandits_cutscene_end} sr_idle@nil %=enable_ui%
+
+[sr_idle@nil]

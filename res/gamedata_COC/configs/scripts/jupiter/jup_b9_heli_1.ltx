@@ -1,0 +1,15 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {=actor_in_zone(jup_b9_heli_1) -jup_b9_heli_1_searching} sr_idle@2 %=run_tutorial(jup_b9_heli_1)%
+on_info2 = {+jup_b9_heli_1_searching} sr_idle@3
+
+[sr_idle@2]
+on_info = {!actor_in_zone(jup_b9_heli_1)} sr_idle %=stop_tutorial%
+on_info2 = {+jup_b9_heli_1_searching -jup_b9_give_item} sr_idle@3 %+jup_b9_give_item%
+on_info3 = {+jup_b9_give_item} sr_idle@3
+on_info4 = {!has_active_tutorial} sr_idle
+
+[sr_idle@3]
+

@@ -1,0 +1,57 @@
+[logic@night_hunter_chimera]
+suitable = {=target_squad_name(jup_b212_jupiter_chimera)} true
+active = mob_walker@selector
+monster_job = true
+on_death = mob_death
+
+[mob_death]
+on_info = %+jup_b212_jupiter_chimera_dead%
+
+[mob_walker@selector]
+path_walk = way_1_walk
+on_info = {=actor_in_zone(jup_b212_jupiter_chimera_spawn_zone)} mob_walker@going
+on_info2 = {!actor_in_zone(jup_b212_jupiter_chimera_spawn_zone)} mob_home@01
+
+[mob_walker@going]
+path_walk = way_1_walk
+on_info = {=dist_to_actor_le(10)} mob_home@attack
+on_signal = gohome | mob_home@01
+
+[mob_home@attack]
+path_home = chimera_home_1
+home_min_radius = 50
+home_max_radius = 100
+on_game_timer = 600 |  mob_home@01
+aggressive = true
+
+[mob_home@01]
+path_home = chimera_home_1
+home_min_radius = 5
+home_max_radius = 10
+on_info = {=actor_in_zone(jup_b212_actor_cheat)} mob_home@cheat
+on_game_timer = 600 |  mob_home@02
+;on_hit = {=is_enemy_actor} % =make_actor_visible_to_squad(jup_b212_jupiter_chimera_lair)%
+
+[mob_home@02]
+path_home = chimera_home_2
+home_min_radius = 5
+home_max_radius = 10
+aggressive = true
+on_info = {=actor_in_zone(jup_b212_actor_cheat)} mob_home@cheat
+on_game_timer = 600 |  mob_home@03
+
+[mob_home@03]
+path_home = chimera_home_3
+home_min_radius = 5
+home_max_radius = 10
+aggressive = true
+on_game_timer = 600 |  mob_home@01
+
+[mob_home@cheat]
+path_home = chimera_home_3
+home_min_radius = 3
+home_max_radius = 5
+aggressive = true
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true 
+combat_ignore_keep_when_attacked = true 
+on_info = {!actor_in_zone(jup_b212_actor_cheat)} mob_home@01

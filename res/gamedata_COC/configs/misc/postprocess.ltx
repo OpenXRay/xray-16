@@ -1,0 +1,321 @@
+[postprocess_base]
+pp_eff_name	= radiation.ppe
+duality_h		= .015
+duality_v		= .015
+blur			= 1
+gray			= .0
+noise			= .01
+noise_scale		= 1
+noise_color		= 255,255,255,70
+
+[postprocess_anomaly]
+pp_eff_name	= radiation.ppe
+duality_h		= 0
+duality_v		= 0
+blur			= 1
+gray			= .7	;.9
+noise			= .2	;.5
+noise_scale		= 1
+noise_color		= 155,155,155,70
+
+;-------------------------------------------------------------------------------
+; New zone postprocess
+;-------------------------------------------------------------------------------
+[postprocess_steam_mine]
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+pp_eff_name	= steam_mine.ppe
+radius_min		= 0.7
+radius_max		= 1.0
+
+[postprocess_acidic]
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+pp_eff_name	= acidic.ppe
+radius_min		= 0.3
+radius_max		= 1.0
+
+[postprocess_acidic_mine]
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+pp_eff_name	= acidic_mine.ppe
+radius_min		= 0.7
+radius_max		= 1.0
+
+[postprocess_thermal]
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+pp_eff_name	= thermal.ppe
+radius_min		= 0.3
+radius_max		= 1.0
+
+[postprocess_thermal_mine]
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+pp_eff_name	= thermal_mine.ppe
+radius_min		= 0.7
+radius_max		= 1.0
+
+[postprocess_rad]
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+pp_eff_name	= radiation.ppe
+radius_min		= 0.3
+radius_max		= 1.0
+
+[postprocess_psi]
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+pp_eff_name	= psi.ppe
+radius_min		= 0.3
+radius_max		= 1.0
+
+[psy_antenna]
+pp_eff_name		= psi.ppe
+pp_eff_cyclic	= 1
+pp_eff_overlap  = true
+
+radius_min		= 0.3
+radius_max		= 1.0
+
+[postprocess_death]
+pp_eff_name	= death.ppe
+radius_min		= 0.5
+radius_max		= 1.1
+
+[postprocess_flame]
+pp_eff_name	= flame.ppe
+radius_min		= 0.5
+radius_max		= 0.8
+
+[postprocess_fuzz]
+pp_eff_name	= fuzz.ppe
+radius_min		= 0.5
+radius_max		= 0.8
+
+[postprocess_gravi]
+pp_eff_name 	= gravi.ppe
+radius_min		= 0.8
+radius_max		= 1.4
+
+[postprocess_gravi_mine]
+pp_eff_name 	= gravi_mine.ppe
+radius_min		= 0.7
+radius_max		= 1.0
+
+[postprocess_electra]
+pp_eff_name 	= electra.ppe
+radius_min		= 0.5
+radius_max		= 0.9
+
+[postprocess_electra_mine]
+pp_eff_name 	= electra_mine.ppe
+radius_min		= 0.3
+radius_max		= 1.0
+
+[mosquito_bald]
+pp_eff_name 	= mosquito_bald.ppe
+radius_min		= 0.2
+radius_max		= 2.7
+
+[postprocess_gas]
+pp_eff_name 	= alcohol.ppe
+radius_min		= 0.3
+radius_max		= 1.0
+
+[postprocess_new]
+pp_eff_name		= radiation.ppe
+radius_min		= 0.5
+radius_max		= 1.1
+
+;-------------------------------------------------------------------------------
+[effector_alcohol]
+pp_eff_name	 = alcohol.ppe
+pp_eff_cyclic	= 1
+pp_eff_overlap = true
+
+cam_eff_name	= camera_effects\drunk.anm
+cam_eff_cyclic	= 1
+
+[alcohol]
+pp_eff_name	 = alcohol.ppe
+pp_eff_overlap = true
+pp_eff_cyclic	= 0
+cam_eff_name	= camera_effects\drunk.anm
+cam_eff_cyclic	= 0
+
+[effector_explode_hit]
+cam_eff_cyclic		= 0
+cam_eff_name		= camera_effects\shell_shock.anm
+cam_eff_hud_affect	= true
+
+[effector_fire_hit]
+pp_eff_name		= fire_hit.ppe
+pp_eff_cyclic	= 0
+pp_eff_overlap = true
+cam_eff_cyclic	= 0
+
+[effector_fire_hit_0]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_front.anm
+
+[effector_fire_hit_1]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_right.anm
+
+[effector_fire_hit_2]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_back.anm
+
+[effector_fire_hit_3]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_left.anm
+
+[effector_fire_hit_4]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_front_left.anm
+
+[effector_fire_hit_5]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_back_left.anm
+
+[effector_fire_hit_6]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_front_right.anm
+
+[effector_fire_hit_7]:effector_fire_hit
+cam_eff_name	= camera_effects\hit_back_right.anm
+
+[snd_shock_effector]
+;pp_eff_name		= duality_circle.ppe
+pp_eff_name		= snd_shock.ppe
+pp_eff_overlap = true
+pp_eff_cyclic	= 1
+
+[effector_controller_aura]
+pp_eff_name		= controller_hit.ppe
+pp_eff_overlap = true
+pp_eff_cyclic	= 0
+
+[effector_blink_black]
+pp_eff_name		= blink_black.ppe
+pp_eff_cyclic	= 0
+pp_eff_overlap = true
+
+[effector_controller_aura2]:effector_alcohol
+pp_eff_cyclic	= 0
+cam_eff_cyclic	= 0
+
+[effector_monster_hit]
+;pp_eff_name		= fire_hit.ppe ; no postprocess
+;pp_eff_cyclic	= 0
+cam_eff_cyclic	= 0
+
+[effector_monster_hit_0]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_front.anm
+
+[effector_monster_hit_1]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_right.anm
+
+[effector_monster_hit_2]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_back.anm
+
+[effector_monster_hit_3]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_left.anm
+
+[effector_monster_hit_4]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_front_left.anm
+
+[effector_monster_hit_5]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_back_left.anm
+
+[effector_monster_hit_6]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_front_right.anm
+
+[effector_monster_hit_7]:effector_monster_hit
+cam_eff_name	= camera_effects\hit_back_right.anm
+
+;-------------------------------------------------------------------------------
+; Nightvision postprocess
+;-------------------------------------------------------------------------------
+[effector_nightvision_1]
+pp_eff_name		= nightvision_1.ppe
+pp_eff_overlap = false
+pp_eff_cyclic	= 1
+
+
+[effector_nightvision_2]
+pp_eff_name 	= nightvision_2.ppe
+pp_eff_cyclic 	= 1
+pp_eff_overlap = false
+
+[effector_nightvision_3]
+pp_eff_name 	= nightvision_3.ppe
+pp_eff_cyclic 	= 1
+pp_eff_overlap = false
+
+;-------------------------------------------------------------------------------
+; Детект нас полтергейстами
+;-------------------------------------------------------------------------------
+[poltergeist_detection_effector]
+pp_eff_name 	= poltergeist_scan.ppe
+pp_eff_cyclic 	= 1
+pp_eff_overlap = true
+;-------------------------------------------------------------------------------
+
+[_actor_death_effector]
+pp_eff_name		= actor_death.ppe
+pp_eff_cyclic	= 0
+pp_eff_overlap = true
+cam_eff_name	= camera_effects\drunk.anm
+cam_eff_cyclic	= 1
+snd				= characters_voice\human_01\dolg\help\wounded_heavy\help_8
+
+[brighten]
+pp_eff_name 	= brighten.ppe
+pp_eff_cyclic 	= 1
+pp_eff_overlap	= true
+
+;-------------------------------------------------------------------------------
+;	Fade
+;-------------------------------------------------------------------------------
+
+[fade_in]
+pp_eff_name 	= fade_in.ppe
+pp_eff_cyclic 	= 0
+pp_eff_overlap 	= false
+
+[fade_in_out]
+pp_eff_name 	= fade_in_out.ppe
+pp_eff_cyclic 	= 0
+pp_eff_overlap 	= false
+
+[black]
+pp_eff_name 	= black.ppe
+pp_eff_cyclic 	= 1
+pp_eff_overlap 	= false
+
+[blink]
+pp_eff_name 	= blink.ppe
+pp_eff_cyclic 	= 0
+pp_eff_overlap 	= false
+
+[fade_to_black_9_sec]
+pp_eff_name 	= fade_to_black_9_sec.ppe
+pp_eff_cyclic 	= 0
+pp_eff_overlap 	= false
+
+[agr_u_fade]
+pp_eff_name 	= agr_u_fade.ppe
+pp_eff_cyclic 	= 0
+pp_eff_overlap 	= false
+
+;-------------------------------------------------------------------------------
+;	Brain Scorcher
+;-------------------------------------------------------------------------------
+[effector_radar_stop]
+;pp_eff_name		= radar_stop.ppe
+;pp_eff_cyclic	= 0
+
+cam_eff_name	= camera_effects\radar_stop.anm
+cam_eff_cyclic	= 0

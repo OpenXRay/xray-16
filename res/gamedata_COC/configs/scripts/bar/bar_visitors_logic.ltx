@@ -1,0 +1,621 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+[animpoint@bar_visitors_animp_gen]
+reach_movement = walk_noweap
+use_camp = false
+meet = meet@bar_visitors_animpoint_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@bar_visitors_animp_gen_reach]:animpoint@bar_visitors_animp_gen
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+
+[meet@bar_visitors_animpoint_meet]
+close_snd_hello = {=check_npc_name(monolith)} nil, {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} meet_hide_weapon, meet_hello
+close_snd_bye 	= {=check_npc_name(monolith)} nil, {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} nil, meet_hello
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+
+[logic@bar_visitors_animp_01]
+active = animpoint@bar_visitors_animp_01
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_02]
+active = animpoint@bar_visitors_animp_02
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_03]
+active = animpoint@bar_visitors_animp_03
+suitable = {=npc_community(dolg)} true
+prior = 60
+
+[logic@bar_visitors_animp_04]
+active = animpoint@bar_visitors_animp_04
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_05]
+active = animpoint@bar_visitors_animp_05
+suitable = {=npc_community(dolg)} true
+prior = 60
+
+[logic@bar_visitors_animp_06]
+active = animpoint@bar_visitors_animp_06
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_07]
+active = animpoint@bar_visitors_animp_07
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_08]
+active = animpoint@bar_visitors_animp_08
+suitable = {=npc_community(dolg)} true
+prior = 60
+
+[logic@bar_visitors_animp_09]
+active = animpoint@bar_visitors_animp_09
+suitable = {=npc_community(dolg)} true
+prior = 60
+
+[logic@bar_visitors_animp_10]
+active = animpoint@bar_visitors_animp_10
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_11]
+active = animpoint@bar_visitors_animp_11
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_12]
+active = animpoint@bar_visitors_animp_12
+suitable = {=npc_community(dolg)} true
+prior = 60
+
+[logic@bar_visitors_animp_13]
+active = animpoint@bar_visitors_animp_13
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_14]
+active = animpoint@bar_visitors_animp_14
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_15]
+active = animpoint@bar_visitors_animp_15
+suitable = {=npc_community(dolg)} true
+prior = 60
+
+[logic@bar_visitors_animp_16]
+active = animpoint@bar_visitors_animp_16
+suitable = {=npc_community(dolg)} true
+prior = 60
+
+[logic@bar_visitors_animp_17]
+active = animpoint@bar_visitors_animp_17
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_animp_18]
+active = animpoint@bar_visitors_animp_18
+suitable = {=npc_community(stalker)} true
+prior = 60
+
+[logic@bar_visitors_beh_trade_job_1]
+active = beh@bar_visitors_beh_trade_job_1
+suitable = {=npc_has_items_to_sell(bar_visitors) !surge_started} true
+prior = 65
+
+[beh@general]
+meet = meet@bar_visitors_animpoint_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+sound_idle = state
+behavior_state = beh_move
+target = waypoint
+walk_dist = 100
+jog_dist = 220
+wait_anim = guard
+walk_anim = patrol
+jog_anim = patrol
+run_anim = rush
+delay_anim = guard
+
+[beh@bar_visitors_beh_trade_job_1]:beh@general
+pt1 = 20000,choose | pos:135.85096740723,-4.8249821662903,20.686948776245 look:132.11878967285,-4.7589621543884,20.52367401123
+pt2 = 9000,zat_b14_give_artefact_act | pos:135.85096740723,-4.8249821662903,20.686948776245 look:132.11878967285,-4.7589621543884,20.52367401123 sig:trade
+pt3 = 15000,guard | pos:135.85096740723,-4.8249821662903,20.686948776245 look:132.11878967285,-4.7589621543884,20.52367401123
+on_signal = trade | %=trade_job_sell_items%
+path_end = loop
+
+
+
+[animpoint@bar_visitors_animp_01]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_01
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_01_reached
+
+[animpoint@bar_visitors_animp_02]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_02
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_02_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_03]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_03
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_03_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_04]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_04
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_04_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_05]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_05
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_05_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_06]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_06
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_06_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_07]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_07
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_07_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_08]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_08
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_08_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_09]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_09
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_09_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_10]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_10
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_10_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_11]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_11
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_11_reached
+use_camp = true
+
+[animpoint@bar_visitors_animp_12]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_12
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_12_reached
+
+[animpoint@bar_visitors_animp_13]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_13
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_13_reached
+
+[animpoint@bar_visitors_animp_14]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_14
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_14_reached
+
+[animpoint@bar_visitors_animp_15]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_15
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_15_reached
+
+[animpoint@bar_visitors_animp_16]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_16
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_16_reached
+
+[animpoint@bar_visitors_animp_17]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_17
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_17_reached
+
+[animpoint@bar_visitors_animp_18]:animpoint@bar_visitors_animp_gen_reach
+cover_name = bar_visitors_animp_18
+use_camp = true
+on_info = {=npc_in_zone(bar_no_weapon_zone)} animpoint@bar_visitors_animp_18_reached
+
+
+
+[animpoint@bar_visitors_animp_01_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_01
+use_camp = true
+
+[animpoint@bar_visitors_animp_02_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_02
+use_camp = true
+
+[animpoint@bar_visitors_animp_03_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_03
+use_camp = true
+
+[animpoint@bar_visitors_animp_04_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_04
+use_camp = true
+
+[animpoint@bar_visitors_animp_05_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_05
+use_camp = true
+
+[animpoint@bar_visitors_animp_06_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_06
+use_camp = true
+
+[animpoint@bar_visitors_animp_07_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_07
+use_camp = true
+
+[animpoint@bar_visitors_animp_08_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_08
+use_camp = true
+
+[animpoint@bar_visitors_animp_09_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_09
+use_camp = true
+
+[animpoint@bar_visitors_animp_10_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_10
+use_camp = true
+
+[animpoint@bar_visitors_animp_11_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_11
+use_camp = true
+
+[animpoint@bar_visitors_animp_12_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_12
+use_camp = true
+
+[animpoint@bar_visitors_animp_13_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_13
+use_camp = true
+
+[animpoint@bar_visitors_animp_14_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_14
+use_camp = true
+
+[animpoint@bar_visitors_animp_15_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_15
+use_camp = true
+
+[animpoint@bar_visitors_animp_16_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_16
+use_camp = true
+
+[animpoint@bar_visitors_animp_17_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_17
+use_camp = true
+
+[animpoint@bar_visitors_animp_18_reached]:animpoint@bar_visitors_animp_gen
+cover_name = bar_visitors_animp_18
+use_camp = true
+
+[logic@bar_visitors_animpoint_kamp1]
+active = animpoint@bar_visitors_animpoint_kamp1
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true 
+
+[logic@bar_visitors_animpoint_kamp2]
+active = animpoint@bar_visitors_animpoint_kamp2
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true 
+
+[logic@bar_visitors_animpoint_kamp3]
+active = animpoint@bar_visitors_animpoint_kamp3
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true 
+
+[logic@bar_visitors_animpoint_kamp4]
+active = animpoint@bar_visitors_animpoint_kamp4
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true 
+
+[logic@bar_visitors_animpoint_kamp5]
+active = animpoint@bar_visitors_animpoint_kamp5
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true 
+
+[logic@bar_visitors_animpoint_kamp6]
+active = animpoint@bar_visitors_animpoint_kamp6
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true
+
+[logic@bar_visitors_animpoint_kamp7]
+active = animpoint@bar_visitors_animpoint_kamp7
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true 
+
+[logic@bar_visitors_animpoint_kamp8]
+active = animpoint@bar_visitors_animpoint_kamp8
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true 
+
+[logic@bar_visitors_animpoint_kamp9]
+active = animpoint@bar_visitors_animpoint_kamp9
+suitable = {=npc_community(stalker)} true
+prior = 60
+turn_on_campfire = true
+
+[animpoint@bar_visitors_animpoint_kamp1]
+cover_name = bar_visitors_animpoint_kamp1
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@bar_visitors_animpoint_kamp2]
+cover_name = bar_visitors_animpoint_kamp2
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@bar_visitors_animpoint_kamp3]
+cover_name = bar_visitors_animpoint_kamp3
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@bar_visitors_animpoint_kamp4]
+cover_name = bar_visitors_animpoint_kamp4
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@bar_visitors_animpoint_kamp5]
+cover_name = bar_visitors_animpoint_kamp5
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@bar_visitors_animpoint_kamp6]
+cover_name = bar_visitors_animpoint_kamp6
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@bar_visitors_animpoint_kamp7]
+cover_name = bar_visitors_animpoint_kamp7
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@bar_visitors_animpoint_kamp8]
+cover_name = bar_visitors_animpoint_kamp8
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@bar_visitors_animpoint_kamp9]
+cover_name = bar_visitors_animpoint_kamp9
+use_camp = true
+turn_on_campfire = true
+
+;Arnie
+[logic@bar_arena_manager]
+active = walker@bar_arena_manager
+suitable = {=check_npc_name(bar_arena_manager)} true
+level_spot = quest_npc
+prior = 200
+
+[walker@bar_arena_manager]:walker@generic
+path_walk = bar_arena_manager_walk
+path_look = bar_arena_manager_look
+meet = meet@bar_arena_manager
+invulnerable = {!actor_enemy} true, false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[meet@bar_arena_manager]
+use = true
+close_anim = wait
+trade_enable = false
+
+;Liolik
+[logic@bar_arena_guard]
+active = walker@bar_arena_guard
+suitable = {=check_npc_name(bar_arena_guard)} true
+prior = 200
+
+[walker@bar_arena_guard]:walker@generic
+path_walk = bar_arena_guard_walk
+path_look = bar_arena_guard_look
+meet = meet@bar_arena_guard
+trade_enable = false
+
+[meet@bar_arena_guard]
+close_distance = 2
+close_victim = actor
+close_anim = guard
+use			    = false
+use_wpn		    = false
+abuse           = false
+
+;Old Arena crowd
+[logic@bar_visitors_animp_arena_1]
+active = animpoint@bar_visitors_animp_arena_1
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_1]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_1
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_2]
+active = animpoint@bar_visitors_animp_arena_2
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_2]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_2
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_3]
+active = animpoint@bar_visitors_animp_arena_3
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_3]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_3
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_4]
+active = animpoint@bar_visitors_animp_arena_4
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_4]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_4
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_5]
+active = animpoint@bar_visitors_animp_arena_5
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_5]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_5
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_6]
+active = animpoint@bar_visitors_animp_arena_6
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_6]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_6
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_7]
+active = animpoint@bar_visitors_animp_arena_7
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_7]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_7
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_8]
+active = animpoint@bar_visitors_animp_arena_8
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_8]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_8
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_9]
+active = animpoint@bar_visitors_animp_arena_9
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_9]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_9
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%
+
+[logic@bar_visitors_animp_arena_10]
+active = animpoint@bar_visitors_animp_arena_10
+suitable = {+bar_arena_start =npc_community(stalker) =npc_in_zone(bar_dolg_territory)} true, {+bar_arena_start =npc_community(dolg) =npc_in_zone(bar_dolg_territory)} true
+prior = 70
+
+[animpoint@bar_visitors_animp_arena_10]:walker@generic
+reach_movement = sprint
+cover_name = bar_visitors_animp_arena_10
+avail_animations = hello_wpn
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+on_info = %=play_sound(arena_public)%
+on_info2 = {-bar_arena_start} %=stop_sound%

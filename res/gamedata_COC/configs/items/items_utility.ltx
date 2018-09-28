@@ -1,0 +1,88 @@
+[test_container]:booster_script
+class 									 = S_FOOD
+use1_action_functor                      = bind_container.access_inventory
+use1_functor                             = bind_container.can_access_inventory
+script_binding                           = bind_container.bind
+remove_after_use                         = false
+dont_stack                               = true
+
+[artefact_container]:test_container
+visual                                   = dynamics\box\konteyner_03b.ogf
+empty_weight                             = 2.0
+inv_weight                               = 2.0
+inv_name                                 = st_itm_artefact_container_name
+inv_name_short                           = st_itm_artefact_container_name
+inv_grid_width                           = 1
+inv_grid_height                          = 2
+inv_grid_x                               = 4
+inv_grid_y                               = 39
+cost                                     = 5000
+allow_take_list							 = artefact, artefact_s
+allow_take_count						 = 2
+
+[itm_sleepbag]:booster
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\antirad"
+$prefetch                                = 32
+cform                                    = skeleton
+visual                                   = dynamics\equipments\item_sleepbag.ogf
+inv_weight                               = 1
+description                              = st_itm_sleepbag_desc
+inv_name                                 = st_itm_sleepbag_name
+inv_name_short                           = st_itm_sleepbag_name
+inv_grid_width                           = 2
+inv_grid_height                          = 2
+inv_grid_x                               = 18
+inv_grid_y                               = 10
+cost                                     = 1580
+eat_health                               = 0
+eat_satiety                              = 0
+eat_power                                = 0
+eat_radiation                            = 0
+eat_alcohol                              = 0
+wounds_heal_perc                         = 0
+animation_slot                           = 4
+hud                                      = wpn_vodka_hud
+placeable_section                        = ph_sleepbag ;Section of placeable physics object
+
+[itm_deployable_mgun]:booster
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\antirad"
+$prefetch                                = 32
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_mounted\wpn_mounted_pkm_trenoga.ogf
+description                              = st_itm_deployable_mgun_desc
+inv_weight                               = 11.5
+inv_name                                 = st_itm_deployable_mgun_name
+inv_name_short                           = st_itm_deployable_mgun_name
+inv_grid_height                          = 2
+inv_grid_width                           = 6
+inv_grid_x                               = 6
+inv_grid_y                               = 31
+cost                                     = 23700
+eat_health                               = 0
+eat_satiety                              = 0
+eat_power                                = 0
+eat_radiation                            = 0
+eat_alcohol                              = 0
+wounds_heal_perc                         = 0
+animation_slot                           = 4
+hud                                      = wpn_vodka_hud
+slot                                     = -1
+
+[matches]:booster_script
+$spawn 					= "misc\matches"
+visual					= dynamics\drink\drink_match0.ogf
+use_condition       	= true
+max_uses            	= 8
+inv_weight				= 0.045
+inv_name_short			= st_matches
+inv_name				= st_matches
+inv_grid_height			= 1
+inv_grid_width			= 1
+inv_grid_x				= 3
+inv_grid_y				= 40
+description				= st_matches_descr
+cost					= 210

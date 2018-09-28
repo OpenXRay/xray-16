@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_mutants_historic">
+		<text>Mutants (Historic)</text>
+	</string>
+	
+	<string id="encyclopedia_mutants_historic_rat_wolf">
+		<text>Rat wolf</text>
+	</string>
+	<string id="encyclopedia_mutants_historic_rat_wolf_text">
+		<text>
+			%c[guide_blue]Rat wolves%c[default] were a rare subspecies of mutated rats.\n
+			\n%c[guide_green]Information%c[default]
+			\nMuch more dangerous than their existing cousins currently found in the Zone, the rat wolf was an indiscriminate killing machine.\n
+			\nOften leading packs of regular rats, these creatures were easy to spot in comparison as they frequently grew to be about two or three times as large.\n
+			\nAside from this there were only a few slight differences in their appearance, such as having larger and entirely black eyeballs, whilst their upper bodies were swollen and fat.\n
+			\nNatural selection eventually played its part, as due to their unnatural size they often stood out and were easy pickings for the Zone's cats and other similar mutants.\n
+			\n%c[guide_green]Statistics%c[default]
+			\n• Attacks: Melee\n• Health: Average\n• Speed: Average\n• Traits: None\n
+			\n%c[guide_green]Trivia%c[default]
+			\n• All that is known about this mutant is from game design documents.
+			\n• This mutant was cut from S.T.A.L.K.E.R.: Shadow of Chernobyl.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_mutants_historic_tark">
+		<text>Tark</text>
+	</string>
+	<string id="encyclopedia_mutants_historic_tark_text">
+		<text>
+			%c[guide_blue]Tarks%c[default] are extinct horse-like creatures, likely mutated from the Przewalski's horse.\n
+			\n%c[guide_green]Information%c[default]
+			\nThis creature bore little resemblance to its ancestors due to massive exposure to radiation upon the Zone's inception.\n
+			\nIts hind legs were atrophied whereas those at its anterior had become visibly exaggerated, whilst its tail and much of its mouth had all but decayed or disappeared.\n
+			\nSimilar in ways to a flesh, the tark's body was greatly swollen and bloated, and were also frequently seen hunting in large groups - though probably as more of an instinctual relic than any natural form of a herd.\n
+			\nUnlike other mutants in the Zone they were incredibly feral animals, with their madness often overwhelming their perception of fear and likely contributing to their eventual downfall.\n
+			\n%c[guide_green]Statistics%c[default]
+			\n• Attacks: Melee\n• Health: Average\n• Speed: Fast\n• Traits: Frenzied\n
+			\n%c[guide_green]Trivia%c[default]
+			\n• All that is known about this mutant is from what accompanied its submission.
+			\n• This mutant lost to the Snork in the Monster Ball competition by GSC Game World.
+		</text>
+	</string>
+	
+</string_table>

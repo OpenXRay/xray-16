@@ -197,6 +197,13 @@
 		<track_detail_radius x="147" y="0" width="188" height="16" step="4" is_integer="1">
 			<options_item entry="r__detail_radius" group="mm_opt_video_adv"/>
 		</track_detail_radius>
+	
+        <cap_detail_scale x="15" y="0" width="108" height="24">
+			<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_detail_scale</text>
+		</cap_detail_scale>
+		<track_detail_scale x="147" y="0" width="188" height="16" step="0.02">
+			<options_item entry="r__detail_scale" group="mm_opt_video_adv" depend="restart"/>
+		</track_detail_scale>
 		
         <cap_texture_lod x="15" y="3" width="108" height="24" >
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_texture_quality</text>
@@ -362,7 +369,7 @@
 	            <d r="70" g="70" b="70"/>
 		    </text_color>
         </combo_sun_shafts>
-		
+
 		<cap_r2_sun_shafts_mode x="15" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_sun_shafts_mode</text>
         </cap_r2_sun_shafts_mode>
@@ -421,6 +428,14 @@
 	            <d r="70" g="70" b="70"/>
 		    </text_color>
         </combo_ssao>
+
+        <cap_r2_fxaa x="15" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_fxaa</text>
+        </cap_r2_fxaa>
+        <check_r2_fxaa x="136" y="0" width="35" stretch="1" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r2_soft_water" group="mm_opt_video_adv" depend="vid"/>
+        </check_r2_fxaa>
 
         <cap_soft_water x="15" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_soft_water</text>
@@ -618,6 +633,11 @@
 			<texture>ui_inGame2_checkbox</texture>
 			<options_item entry="cl_cod_pickup_mode" group="mm_opt_gameplay"/>
 		</check_cod_pickup_mode>
+
+		<check_invert_zoom x="162" y="3" width="35" height="29" stretch="1">
+			<texture>ui_inGame2_checkbox</texture>
+			<options_item entry="g_invert_zoom" group="mm_opt_gameplay"/>
+		</check_invert_zoom>
 		
 		<cap_localization x="45" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_localization</text>

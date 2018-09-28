@@ -1,0 +1,657 @@
+<header>
+
+        <debug_info x="10" y="160" width="1024" height="768" la_text="1" la_alpha="1" complex_mode="1">
+            <text font="arial_14" r="225" g="225" b="225" a="255" />
+        </debug_info>
+
+        <hud_timer  x="869" y="0" width="155" height="66">
+                <text x="-15" y="23it" font="graffiti32" r="238" g="155" b="23" a="255" align="r"/>
+                <texture>ui_hud_timer_games</texture>
+        </hud_timer>
+
+        <hud_timer_text x="852" y="80" width="157" height="67" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+                <text x="0" y="0" font="graffiti22" r="240" g="217" b="182" a="255" align="c"/>
+        </hud_timer_text>
+
+		<cs_debug  x="350" y="20" width="400" height="100" la_text="1" la_alpha="1" complex_mode="1">
+				<text font="arial_14"  r="240" g="217" b="180" a="255" align="l"/>
+		</cs_debug>
+		<cop_debug  x="20" y="250" width="600" height="100" la_text="1" la_alpha="1" complex_mode="1">
+				<text font="arial_14"  r="240" g="217" b="180" a="255" align="l"/>
+		</cop_debug>
+		<cop2_debug  x="750" y="20" width="255" height="100" la_text="1" la_alpha="1" complex_mode="1">
+				<text font="arial_14" r="240" g="217" b="180" a="255" align="l"/>
+		</cop2_debug>
+        <sleep_001  x="20" y="20" width="984" height="728">
+                <texture x="0" y="0" width="984" height="728">car\trabantnoise</texture>
+        </sleep_001>
+
+        <controller_fx  x="0" y="0" width="1024" height="768" stretch="1">
+                <texture>act\act_controller_hit</texture>
+        </controller_fx>
+
+        <controller_fx2  x="0" y="0" width="1024" height="768" stretch="1">
+                <texture>act\act_controller_hit1</texture>
+        </controller_fx2>
+
+        <monster_claws  x="512" y="384" width="512" height="512" alignment="c" stretch="1" heading="1" light_anim="monster_claws" la_alpha="1" la_cyclic="0" ttl="3">
+                <texture>controller\controller_blood_01</texture>
+        </monster_claws>
+
+	<main_task  x="235" y="120" width="554" height="60" complex_mode="1">
+		<text align="c" font="graffiti32"  r="240" g="217" b="182" a="255"/>
+	</main_task>
+
+	<secondary_task  x="235" y="180" width="554" height="60" complex_mode="1" light_anim="ui_tesk_description" la_alpha="1" la_text="1" la_cyclic="0">
+		<text align="c" font="graffiti22"  r="240" g="217" b="182" a="200"/>
+	</secondary_task>
+
+  <cs_psy_danger  x="262" y="30" width="500" height="20" complex_mode="1">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </cs_psy_danger>
+
+        <cs_radiation_danger  x="262" y="50" width="500" height="20" complex_mode="1">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </cs_radiation_danger>
+
+  <cs_demo_play  x="30" y="710" width="600" height="50" complex_mode="1" stretch="1"
+                                                        light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+    <text font="letterica18"  r="240" g="217" b="182" a="255" align="l"/>
+  </cs_demo_play>
+
+	<closecaption_1  x="512" y="670" width="600" height="50" alignment="c" complex_mode="1">	<!-- normal -->
+		<text font="graffiti22" r="240" g="217" b="182" a="255" align="c"/>
+	</closecaption_1>
+	<closecaption_1_shadow  x="513" y="671" width="600" height="50" alignment="c" complex_mode="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</closecaption_1_shadow>
+
+	<closecaption_2  x="512" y="635" width="600" height="50" alignment="c" complex_mode="1">	<!-- distant voice, "shouting from afar" -->
+		<text font="graffiti22" r="216" g="186" b="140" a="255" align="c"/>
+	</closecaption_2>
+	<closecaption_2_shadow  x="513" y="636" width="600" height="50" alignment="c" complex_mode="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</closecaption_2_shadow>
+
+	<closecaption_3  x="512" y="561" width="740" height="50" alignment="c" complex_mode="1">	<!-- monolith pray -->
+		<text font="graffiti22" r="180" g="172" b="148" a="255" align="c"/>
+	</closecaption_3>
+	<closecaption_3_shadow  x="513" y="562" width="740" height="50" alignment="c" complex_mode="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</closecaption_3_shadow>
+
+	<closecaption_4  x="512" y="705" width="600" height="50" alignment="c" complex_mode="1">	<!-- second talker -->
+		<text font="graffiti22" r="238" g="155" b="23" a="255" align="c"/>
+	</closecaption_4>
+	<closecaption_4_shadow  x="513" y="706" width="600" height="50" alignment="c" complex_mode="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</closecaption_4_shadow>
+
+	<cs_subtitles_npc  x="175" y="597" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="216" g="186" b="140" a="255" align="c"/>
+	</cs_subtitles_npc>
+	<cs_subtitles_npc_shadow  x="176" y="598" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</cs_subtitles_npc_shadow>
+
+	<closecaption_6  x="512" y="561" width="600" height="50" alignment="c" complex_mode="1">	<!-- "danger" -->
+		<text font="graffiti22" r="240" g="0" b="0" a="255" align="c"/>
+	</closecaption_6>
+	<closecaption_6_shadow  x="513" y="562" width="600" height="50" alignment="c" complex_mode="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</closecaption_6_shadow>
+
+	<cs_subtitles_actor  x="175" y="597" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+	</cs_subtitles_actor>
+	<cs_subtitles_actor_shadow  x="176" y="598" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</cs_subtitles_actor_shadow>
+
+	<cs_subtitles_object  x="175" y="516" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="255" g="255" b="255" a="255" align="c"/>
+	</cs_subtitles_object>
+	<cs_subtitles_object_shadow  x="176" y="517" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</cs_subtitles_object_shadow>
+
+	<closecaption_9  x="512" y="597" width="600" height="50" alignment="c" complex_mode="1">	<!-- [closed caption] -->
+		<text font="graffiti22" r="240" g="192" b="0" a="255" align="c"/>
+	</closecaption_9>
+	<closecaption_9_shadow  x="513" y="598" width="600" height="50" alignment="c" complex_mode="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</closecaption_9_shadow>
+
+	<cs_subtitles  x="175" y="597" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="160" g="160" b="160" a="255" align="c"/>
+	</cs_subtitles>
+	<cs_subtitles_shadow  x="176" y="598" width="674" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="0" g="0" b="0" a="200" align="c"/>
+	</cs_subtitles_shadow>
+
+        <cs_yantar_td  x="200" y="200" width="600" height="50" complex_mode="1" stretch="1"
+                                                        light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </cs_yantar_td>
+
+  <cs_arena_kills  x="30" y="300" width="600" height="50" complex_mode="1" stretch="1"
+                                                        light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+    <text font="graffiti32"  r="240" g="217" b="182" a="255" align="l"/>
+  </cs_arena_kills>
+
+		<game_saved x="100" y="730" width="800" height="30" ttl="3">
+			<text font="graffiti22" r="240" g="217" b="182" a="255" align="c"/>
+		</game_saved>
+
+        <autosave  x="100" y="730" width="800" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c">st_autosave</text>
+        </autosave>
+
+        <item_used  x="100" y="700" width="800" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </item_used>
+
+        <gun_jammed x="200" y="70" width="600" height="50" ttl="3">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">gun_jammed</text>
+        </gun_jammed>
+
+        <can_use_weapon_now x="200" y="70" width="600" height="50" ttl="3">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">can_use_weapon_now</text>
+        </can_use_weapon_now>
+
+        <cant_walk x="200" y="650" width="600" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c">cant_walk</text>
+        </cant_walk>
+
+        <cant_walk_weight x="200" y="650" width="600" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c">cant_walk_weight</text>
+        </cant_walk_weight>
+
+        <not_enough_money_mine  x="100" y="100" width="800" height="60">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">st_not_enough_money</text>
+        </not_enough_money_mine>
+
+        <not_enough_money_other  x="100" y="100" width="800" height="60">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">st_not_enough_money_npc</text>
+        </not_enough_money_other>
+
+  <max_ping_warn_1 x="512" y="300" width="360" height="64" alignment="c" ttl="10">
+    <texture x="0" y="0" width="360" height="64" a="30">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_1>
+  <max_ping_warn_2 x="512" y="300" width="360" height="64" alignment="c" ttl="8">
+    <texture x="0" y="0" width="360" height="64" a="64">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_2>
+  <max_ping_warn_3 x="512" y="300" width="360" height="64" alignment="c" ttl="8">
+    <texture x="0" y="0" width="360" height="64" a="160">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_3>
+  <max_ping_warn_4 x="512" y="300" width="360" height="64" alignment="c" ttl="8">
+    <texture x="0" y="0" width="360" height="64" a="255">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_4>
+
+	<cs_enemy_health  x="680" y="15" width="325" height="25" stretch="1">
+		<text font="graffiti19"  r="240" g="217" b="182" a="255" align="c"/>
+		<texture>ui_sega_healph</texture>
+	</cs_enemy_health>
+
+	<crow_timer  x="869" y="0" width="155" height="66">
+		<text x="20" y="23" font="graffiti32" r="238" g="155" b="23" a="255" align="c"/>
+		<texture>ui_hud_timer_games</texture>
+<!--
+		<text x="-15" y="23" font="graffiti32" r="238" g="155" b="23" a="255" align="r"/>
+		<texture>ui_hud_timer_games</texture>
+-->
+	</crow_timer>
+	<crow_timer_text x="852" y="80" width="157" height="67" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<text x="0" y="0" font="graffiti22" r="240" g="217" b="182" a="255" align="c"/>
+	</crow_timer_text>
+
+	<shooting_timer x="869" y="0" width="155" height="66">
+		<text x="20" y="23" font="graffiti32" r="238" g="155" b="23" a="255" align="c"/>
+		<texture>ui_hud_timer_games</texture>
+	</shooting_timer>
+	<shooting_counter  x="433" y="0" width="224" height="46">
+		<text x="2" y="6" font="graffiti32" r="238" g="155" b="23" a="255" align="c"/>
+		<texture>ui_hud_points_count</texture>
+	</shooting_counter>
+	<shooting_get_ready  x="212" y="300" width="600" height="68" complex_mode="1" light_anim="ui_slow_blinking_alpha">
+		<text font="graffiti32"  r="240" g="217" b="182" a="255" align="c"/>
+	</shooting_get_ready>
+
+
+	<text_on_screen_center x="212" y="300" width="600" height="68" complex_mode="1" light_anim="ui_slow_blinking_alpha">
+		<text font="graffiti32"  r="240" g="217" b="182" a="255" align="c"/>
+	</text_on_screen_center>
+
+  <mp_timelimit x="100" y="77" width="824" height="30">
+    <text font="graffiti19" color="ui_red" align="c"/>
+  </mp_timelimit>
+  <mp_spetatormode x="100" y="115" width="824" height="30">
+    <text font="graffiti19" color="ui_red" align="c"/>
+  </mp_spetatormode>
+  <mp_spectator x="100" y="115" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_spectator>
+  <mp_pressjump x="100" y="729" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_pressjump>
+  <mp_pressbuy x="100" y="749" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_pressbuy>
+  <mp_round_result x="100" y="345" width="824" height="30">
+    <text font="graffiti19" r="240" g="255" b="240"    align="c"/>
+  </mp_round_result>
+  <mp_force_respawn_time x="100" y="38" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_force_respawn_time>
+  <mp_demo_play x="0" y="195" width="824" height="30">
+    <text font="graffiti19" color="ui_green"/>
+  </mp_demo_play>
+  <mp_warm_up x="100" y="75" width="824" height="30">
+    <text font="graffiti19" color="ui_green" align="c"/>
+  </mp_warm_up>
+  <mp_ah_buy x="100" y="729" width="824" height="30">
+    <text font="graffiti19" r="255" g="255" b="0"    align="c"/>
+  </mp_ah_buy>
+  <mp_tdm_buy x="100" y="729" width="824" height="30">
+    <text font="graffiti19" r="255" g="255" b="0"    align="c"/>
+  </mp_tdm_buy>
+
+  <blackscreen width="1024" height="768" stretch="1">
+    <texture>intro\intro_back</texture>
+  </blackscreen>
+
+<!-- AtmosFear 4:3 ratio -->
+	<atm_indik_rad_green x="30" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_green</texture>
+	</atm_indik_rad_green>
+	<atm_indik_rad_yellow x="30" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_yellow</texture>
+	</atm_indik_rad_yellow>
+	<atm_indik_rad_orange x="30" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_orange</texture>
+	</atm_indik_rad_orange>
+	<atm_indik_rad_red x="30" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_red</texture>
+	</atm_indik_rad_red>
+
+	<atm_indik_acid_green x="165" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_green</texture>
+	</atm_indik_acid_green>
+	<atm_indik_acid_yellow x="165" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_yellow</texture>
+	</atm_indik_acid_yellow>
+	<atm_indik_acid_orange x="165" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_orange</texture>
+	</atm_indik_acid_orange>
+	<atm_indik_acid_red x="165" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_red</texture>
+	</atm_indik_acid_red>
+
+	<atm_indik_psi_green x="120" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_green</texture>
+	</atm_indik_psi_green>
+	<atm_indik_psi_yellow x="120" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_yellow</texture>
+	</atm_indik_psi_yellow>
+	<atm_indik_psi_orange x="120" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_orange</texture>
+	</atm_indik_psi_orange>
+	<atm_indik_psi_red x="120" y="230" width="37" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_red</texture>
+	</atm_indik_psi_red>
+
+	<!-- AtmosFear 16:10 ratio -->
+	<atm_indik_rad_green_16 x="24" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_green</texture>
+	</atm_indik_rad_green_16>
+	<atm_indik_rad_yellow_16 x="24" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_yellow</texture>
+	</atm_indik_rad_yellow_16>
+	<atm_indik_rad_orange_16 x="24" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_orange</texture>
+	</atm_indik_rad_orange_16>
+	<atm_indik_rad_red_16 x="24" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Radiation_red</texture>
+	</atm_indik_rad_red_16>
+
+	<atm_indik_acid_green_16 x="132" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_green</texture>
+	</atm_indik_acid_green_16>
+	<atm_indik_acid_yellow_16 x="132" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_yellow</texture>
+	</atm_indik_acid_yellow_16>
+	<atm_indik_acid_orange_16 x="132" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_orange</texture>
+	</atm_indik_acid_orange_16>
+	<atm_indik_acid_red_16 x="132" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Biological_red</texture>
+	</atm_indik_acid_red_16>
+
+	<atm_indik_psi_green_16 x="21" y="146" width="19" height="22" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_green</texture>
+	</atm_indik_psi_green_16>
+	<atm_indik_psi_yellow_16 x="96" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_yellow</texture>
+	</atm_indik_psi_yellow_16>
+	<atm_indik_psi_orange_16 x="96" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_orange</texture>
+	</atm_indik_psi_orange_16>
+	<atm_indik_psi_red_16 x="96" y="230" width="29" height="33" stretch="1">
+		<texture>ui_inGame2_triangle_Psy_red</texture>
+	</atm_indik_psi_red_16>
+
+	<helm_respirator1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator1</texture>
+	</helm_respirator1>
+	<helm_respirator2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator2</texture>
+	</helm_respirator2>
+	<helm_respirator3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator3</texture>
+	</helm_respirator3>
+	<helm_respirator4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator4</texture>
+	</helm_respirator4>
+	<helm_respirator5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator5</texture>
+	</helm_respirator5>
+	<helm_respirator6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator6</texture>
+	</helm_respirator6>
+	<helm_respirator7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator7</texture>
+	</helm_respirator7>
+	<helm_respirator8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator8</texture>
+	</helm_respirator8>
+	<helm_respirator9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator9</texture>
+	</helm_respirator9>
+	<helm_respirator10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator10</texture>
+	</helm_respirator10>
+	<helm_respirator11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator11</texture>
+	</helm_respirator11>
+	<helm_respirator12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_respirator12</texture>
+	</helm_respirator12>
+
+	<helm_hardhat1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat1</texture>
+	</helm_hardhat1>
+	<helm_hardhat2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat2</texture>
+	</helm_hardhat2>
+	<helm_hardhat3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat3</texture>
+	</helm_hardhat3>
+	<helm_hardhat4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat4</texture>
+	</helm_hardhat4>
+	<helm_hardhat5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat5</texture>
+	</helm_hardhat5>
+	<helm_hardhat6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat6</texture>
+	</helm_hardhat6>
+	<helm_hardhat7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat7</texture>
+	</helm_hardhat7>
+	<helm_hardhat8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat8</texture>
+	</helm_hardhat8>
+	<helm_hardhat9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat9</texture>
+	</helm_hardhat9>
+	<helm_hardhat10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat10</texture>
+	</helm_hardhat10>
+	<helm_hardhat11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat11</texture>
+	</helm_hardhat11>
+	<helm_hardhat12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_hardhat12</texture>
+	</helm_hardhat12>
+
+	<helm_protective1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective1</texture>
+	</helm_protective1>
+	<helm_protective2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective2</texture>
+	</helm_protective2>
+	<helm_protective3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective3</texture>
+	</helm_protective3>
+	<helm_protective4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective4</texture>
+	</helm_protective4>
+	<helm_protective5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective5</texture>
+	</helm_protective5>
+	<helm_protective6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective6</texture>
+	</helm_protective6>
+	<helm_protective7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective7</texture>
+	</helm_protective7>
+	<helm_protective8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective8</texture>
+	</helm_protective8>
+	<helm_protective9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective9</texture>
+	</helm_protective9>
+	<helm_protective10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective10</texture>
+	</helm_protective10>
+	<helm_protective11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective11</texture>
+	</helm_protective11>
+	<helm_protective12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_protective12</texture>
+	</helm_protective12>
+
+	<helm_battle1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle1</texture>
+	</helm_battle1>
+	<helm_battle2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle2</texture>
+	</helm_battle2>
+	<helm_battle3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle3</texture>
+	</helm_battle3>
+	<helm_battle4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle4</texture>
+	</helm_battle4>
+	<helm_battle5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle5</texture>
+	</helm_battle5>
+	<helm_battle6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle6</texture>
+	</helm_battle6>
+	<helm_battle7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle7</texture>
+	</helm_battle7>
+	<helm_battle8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle8</texture>
+	</helm_battle8>
+	<helm_battle9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle9</texture>
+	</helm_battle9>
+	<helm_battle10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle10</texture>
+	</helm_battle10>
+	<helm_battle11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle11</texture>
+	</helm_battle11>
+	<helm_battle12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_battle12</texture>
+	</helm_battle12>
+
+	<helm_tactic1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic1</texture>
+	</helm_tactic1>
+	<helm_tactic2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic2</texture>
+	</helm_tactic2>
+	<helm_tactic3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic3</texture>
+	</helm_tactic3>
+	<helm_tactic4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic4</texture>
+	</helm_tactic4>
+	<helm_tactic5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic5</texture>
+	</helm_tactic5>
+	<helm_tactic6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic6</texture>
+	</helm_tactic6>
+	<helm_tactic7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic7</texture>
+	</helm_tactic7>
+	<helm_tactic8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic8</texture>
+	</helm_tactic8>
+	<helm_tactic9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic9</texture>
+	</helm_tactic9>
+	<helm_tactic10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic10</texture>
+	</helm_tactic10>
+	<helm_tactic11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic11</texture>
+	</helm_tactic11>
+	<helm_tactic12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_tactic12</texture>
+	</helm_tactic12>
+
+	<helm_scientific1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific1</texture>
+	</helm_scientific1>
+	<helm_scientific2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific2</texture>
+	</helm_scientific2>
+	<helm_scientific3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific3</texture>
+	</helm_scientific3>
+	<helm_scientific4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific4</texture>
+	</helm_scientific4>
+	<helm_scientific5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific5</texture>
+	</helm_scientific5>
+	<helm_scientific6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific6</texture>
+	</helm_scientific6>
+	<helm_scientific7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific7</texture>
+	</helm_scientific7>
+	<helm_scientific8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific8</texture>
+	</helm_scientific8>
+	<helm_scientific9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific9</texture>
+	</helm_scientific9>
+	<helm_scientific10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific10</texture>
+	</helm_scientific10>
+	<helm_scientific11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific11</texture>
+	</helm_scientific11>
+	<helm_scientific12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_scientific12</texture>
+	</helm_scientific12>
+
+	<helm_exo1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo1</texture>
+	</helm_exo1>
+	<helm_exo2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo2</texture>
+	</helm_exo2>
+	<helm_exo3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo3</texture>
+	</helm_exo3>
+	<helm_exo4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo4</texture>
+	</helm_exo4>
+	<helm_exo5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo5</texture>
+	</helm_exo5>
+	<helm_exo6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo6</texture>
+	</helm_exo6>
+	<helm_exo7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo7</texture>
+	</helm_exo7>
+	<helm_exo8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo8</texture>
+	</helm_exo8>
+	<helm_exo9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo9</texture>
+	</helm_exo9>
+	<helm_exo10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo10</texture>
+	</helm_exo10>
+	<helm_exo11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo11</texture>
+	</helm_exo11>
+	<helm_exo12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\helm_exo12</texture>
+	</helm_exo12>
+	<hud_glass1 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass1</texture>
+	</hud_glass1>
+	<hud_glass2 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass2</texture>
+	</hud_glass2>
+	<hud_glass3 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass3</texture>
+	</hud_glass3>
+	<hud_glass4 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass4</texture>
+	</hud_glass4>
+	<hud_glass5 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass5</texture>
+	</hud_glass5>
+	<hud_glass6 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass6</texture>
+	</hud_glass6>
+	<hud_glass7 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass7</texture>
+	</hud_glass7>
+	<hud_glass8 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass8</texture>
+	</hud_glass8>
+	<hud_glass9 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass9</texture>
+	</hud_glass9>
+	<hud_glass10 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass10</texture>
+	</hud_glass10>
+	<hud_glass11 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass11</texture>
+	</hud_glass11>
+	<hud_glass12 x="0" y="0" width="1024" height="768" stretch="1">
+		<texture>ui\hud_glass12</texture>
+	</hud_glass12>
+</header>

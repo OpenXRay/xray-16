@@ -1,0 +1,135 @@
+﻿<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-------------------------- FREEDOM TRADER ------------------------>
+    <specific_character id="mil_smart_terrain_7_10_freedom_trader_stalker" team_default="1">
+    <name>mil_Svoboda_trader_name</name>
+    <icon>ui_inGame2_skinflint</icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>mil_smart_terrain_7_10_freedom_trader_stalker</class>
+    <community>freedom</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>15996</rank>
+    <reputation>1793</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <visual>actors\stalker_freedom\stalker_sv_balon_1</visual>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <supplies></supplies>
+#include "gameplay\character_criticals.xml"
+        <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+        <actor_dialog>actor_break_dialog</actor_dialog>
+        </specific_character>
+        
+        <!-------------------------- FREEDOM MECHANIC ------------------------>
+        <specific_character id="mil_smart_terrain_7_7_freedom_mechanic_stalker" team_default="1">
+        <name>mil_Svoboda_engineer_name</name>
+        <icon>ui_inGame2_freedom_tech</icon>
+        <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+        <class>mil_smart_terrain_7_7_freedom_mechanic_stalker</class>
+        <community>freedom</community>
+        <map_icon x="1" y="0"/>
+        <terrain_sect>stalker_terrain</terrain_sect>
+        <mechanic_mode>1</mechanic_mode>
+        <rank>12966</rank>
+        <reputation>1338</reputation>
+        <visual>actors\stalker_freedom\stalker_freedom_4_face_1</visual>
+        <snd_config>characters_voice\human_01\freedom\</snd_config>
+    <supplies></supplies>
+#include "gameplay\character_criticals.xml"
+        <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+        <actor_dialog>dm_tech_repair</actor_dialog>
+        <actor_dialog>dm_broker_dialog</actor_dialog>
+        <actor_dialog>actor_break_dialog</actor_dialog>
+        </specific_character>
+        
+        <!---------------------------FREEDOM BODYGUARDS---------------------->
+        <specific_character id="mil_smart_terrain_7_7_freedom_bodyguard_stalker" team_default = "1">
+        <name>GENERATE_NAME_stalker</name>
+        <icon>ui_inGame2_Freedom_5</icon>
+        <map_icon x="5" y="0"></map_icon>
+        <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+        <snd_config>characters_voice\human_03\freedom\</snd_config>
+        <crouch_type>0</crouch_type>
+        <class>mil_smart_terrain_7_7_freedom_bodyguard_stalker</class>
+        <community>freedom</community>
+        <terrain_sect>stalker_terrain</terrain_sect>
+        <rank>17716</rank>
+        <reputation>1462</reputation>
+        <visual>actors\stalker_freedom\stalker_freedom_5</visual>
+        <supplies>
+        [spawn] \n
+        wpn_usp  \n
+        ammo_11.43x23_hydro = 1 \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_drugs.xml"
+#include "gameplay\character_food.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="mil_smart_terrain_7_7_freedom_bodyguard2_stalker" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Freedom_5</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <crouch_type>0</crouch_type>
+    <class>mil_smart_terrain_7_7_freedom_bodyguard2_stalker</class>
+    <community>freedom</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>17208</rank>
+    <reputation>97</reputation>
+    <visual>actors\stalker_freedom\stalker_freedom_5</visual>
+    <supplies>
+        [spawn] \n
+        wpn_usp  \n
+        ammo_11.43x23_hydro = 1 \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_drugs.xml"
+#include "gameplay\character_food.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!---------------------------FREEDOM LEADER---------------------->
+    <specific_character id="mil_smart_terrain_7_7_freedom_leader_stalker" team_default = "1">
+    <name>mil_freedom_leader_name</name>
+    <icon>ui_inGame2_lukash</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <crouch_type>0</crouch_type>
+    <class>mil_smart_terrain_7_7_freedom_leader_stalker</class>
+    <community>freedom</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>26740</rank>
+    <reputation>2285</reputation>
+    <visual>actors\stalker_freedom\stalker_sv_leader</visual>
+    <supplies>
+        [spawn] \n
+        wpn_usp  \n
+        ammo_11.43x23_hydro = 1 \n
+        wpn_g36 \n
+        ammo_5.56x45_ap = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_drugs.xml"
+#include "gameplay\character_food.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+</xml>

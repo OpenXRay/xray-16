@@ -1,0 +1,40 @@
+[logic@dog_doctor]
+active = mob_walker@stand
+suitable = {=check_npc_name(mar_smart_terrain_base_dog_doctor)} true
+prior = 75
+monster_job = true
+
+[mob_walker@stand]
+path_walk = dog_1_walk 
+path_look = dog_1_look
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
+combat_ignore_me_cond = true
+aggressive = false
+on_info = {!is_day} mob_walker@waiting_sleep
+
+[mob_walker@waiting_sleep]
+path_walk = dog_1_walk 
+path_look = dog_1_look
+on_timer = 3500 | {~50} mob_walker@sleep, mob_walker@sit
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
+combat_ignore_me_cond = true
+aggressive = false
+
+[mob_walker@sit]
+path_walk = dog_1_walk 
+path_look = dog_sit_look
+on_timer = 30000 | mob_walker@waiting_sleep
+aggressive = false
+on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
+combat_ignore_me_cond = true
+
+[mob_walker@sleep]
+path_walk = dog_1_walk
+path_look = dog_sleep_look
+on_timer = 30000 | mob_walker@waiting_sleep
+aggressive = false
+on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
+combat_ignore_cond = {=check_squad_name(faction_base_defense_flesh_squad)} false, {=check_squad_name(faction_base_defense_boar_squad)} false, {=check_squad_name(faction_base_defense_dog_squad)} false, true
+combat_ignore_me_cond = true
+on_info = {=is_day} mob_walker@stand

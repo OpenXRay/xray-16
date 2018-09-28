@@ -1,0 +1,16 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+;on_info = {+agru_door_1_closed} sr_psy_antenna@active %=give_inited_task(storyline:agru_destroy_monsters_task:dolg)%
+on_actor_in_zone = agru_poltergeist_out_restr | sr_psy_antenna@active
+
+[sr_psy_antenna@active]
+eff_intensity = 200
+hit_intensity = 20
+phantom_prob = 100
+mute_sound_threshold = 0
+on_info = {+agru_controller_death} sr_idle@end
+on_actor_not_in_zone = agru_poltergeist_out_restr | sr_idle
+
+[sr_idle@end]

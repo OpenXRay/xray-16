@@ -1,0 +1,38 @@
+[anomal_zone]
+
+field_name = aes_2c_01_ce_anomaly_spot
+
+layers_count = 2
+respawn_tries = 2
+max_artefacts = 2
+
+start_artefact = ; af_vyvert
+ 
+artefacts = af_vyvert, af_gravi, af_gold_fish, af_ameba_slime, af_ameba_slug, af_ameba_mica
+
+coeff = 2, 2, 1, 2, 2, 1
+
+artefact_ways = aes_2c_01_ce_af_way_01, aes_2c_01_ce_af_way_02
+
+applying_force_xz = 400
+applying_force_y = 200
+
+[mines_core]
+aes_zone_gravi_zone_0009
+aes_zone_gravi_zone_0016
+
+[layer_1]
+mines_section = mines_layer_1 
+
+[mines_layer_1]:mines_core
+aes_zone_gravi_zone_0014
+aes_zone_gravi_zone_0010
+
+[layer_2]
+mines_section = mines_layer_2 
+
+[mines_layer_2]:mines_core
+aes_zone_gravi_zone_0007
+aes_zone_gravi_zone_0005
+aes_zone_gravi_zone_0006
+aes_zone_gravi_zone_0011

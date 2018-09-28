@@ -1,0 +1,16 @@
+[smart_terrain]
+squad_id = 12
+max_population = 2
+respawn_params = respawn@mil_smart_terrain_7_10
+respawn_idle = 86400
+
+
+[respawn@mil_smart_terrain_7_10]
+spawn_freedom@advanced
+
+[spawn_freedom@advanced]
+spawn_squads =  freedom_sim_squad_advanced, freedom_sim_squad_advanced, freedom_sim_squad_novice
+spawn_num = 2
+
+[exclusive]
+mil_smart_terrain_7_10_freedom_trader =  military\mil_smart_terrain_7_10_smart_logic.ltx

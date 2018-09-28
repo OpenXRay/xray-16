@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+<!--			-- Clear Sky --				-->
+
+	<string id="csky_novice_outfit_name">
+		<text>Clear Sky leather jacket</text>
+	</string>
+
+	<string id="csky_light_novice_outfit_name">
+		<text>CS-1a body armour</text>
+	</string>
+	<string id="csky_light_novice_outfit_description">
+		<text>The most basic body armour worn by the Clear Sky faction providing good protection from anomalous exposure, its design is reminiscent of the popular Sunrise suit. Includes a container capable of holding one artefact.</text>
+	</string>
+
+	<string id="csky_light_original_outfit_name">
+		<text>CS-1b body armour</text>
+	</string>
+	<string id="csky_light_original_outfit_description">
+		<text>The CS-1b consists of a military bulletproof vest with an additional load-bearing vest worn over the top and comes with two built-in artefact containers.</text>
+	</string>
+
+	<string id="csky_light_outfit_name">
+		<text>CS-2 body armour</text>
+	</string>
+	<string id="csky_light_outfit_description">
+		<text>This body armour is often used for conducting search operations in areas of low anomalous activity and as such is a notable improvement over the CS-1. Comes with two built-in artefact containers.</text>
+	</string>
+
+	<string id="csky_medium_outfit_name">
+		<text>CS-3a body armour</text>
+	</string>
+	<string id="csky_medium_outfit_description">
+		<text>The CS-3a consists of a military bulletproof vest and comes with two built-in artefact containers.</text>
+	</string>
+
+	<string id="csky_heavy_outfit_name">
+		<text>CS-3b body armour</text>
+	</string>
+	<string id="csky_heavy_outfit_description">
+		<text>The CS-3b body armour is a heavier variant of the CS-3a originally designed by Clear Sky for combat during the faction wars, but has long since been re-purposed. Includes a two built-in artefact containers.</text>
+	</string>
+
+	<string id="cs_stalker_outfit_name">
+		<text>Clear Sky Sunrise suit</text>
+	</string>
+	<string id="cs_stalker_outfit_description">
+		<text>A Clear Sky branded Sunrise bodysuit. Despite the fact that the body armour is incapable of protecting the wearer from even pistol bullets, the suit enjoys great popularity within Clear Sky members due to its low cost and modification potential. Comes with built-in artefact container.</text>
+	</string>
+
+	<string id="cs_nbc_outfit_name">
+		<text>Clear Sky NBC suit</text>
+	</string>
+	<string id="cs_nbc_outfit_description">
+		<text>The Clear Sky NBC suit is an advanced version of the standard CS-1 Body Armour. It is composed of a camouflaged CBRN suit with a Class III Kevlar vest. Comes standard with a GP-5 gas mask using a hose leading to a modern filter. Comes with a built-in artefact container.</text>
+	</string>
+
+	<string id="cs_scientific_outfit_name">
+		<text>Clear Sky scientific suit</text>
+	</string>
+	<string id="cs_scientific_outfit_description">
+		<text>This suit, produced by one of Kiev's Defence Research Institutes, is a great alternative to home-made stalker suits. While its built-in body armour can only stop light rounds, the anomaly and radiation protection system is second to none. Fully upgradeable and boasting a built-in artefact container, this bodysuit is the equipment of choice for many experienced stalkers.</text>
+	</string>
+
+	<string id="cs_exo_outfit_name">
+		<text>Clear Sky exoskeleton</text>
+	</string>
+	<string id="cs_exo_outfit_description">
+		<text>An experimental sample of an exoskeleton painted in Clear Sky colours, their demand is high between veterans of the Clear Sky faction. Comes with a built-in artefact containers.</text>
+	</string>
+
+<!--			-- Ecologist --				-->
+
+	<string id="ecolog_outfit_orn_name">
+		<text>SSP-99 protection suit</text>
+	</string>
+	<string id="ecolog_outfit_orn_description">
+		<text>The SSP-99 chemical protection suit is specially designed by the Ecologists for use in the Zone. The suit has an integrated air-filtering and air-conditioning system, it is also heat and electricity resistant and provides good protection from radiation and biological anomalies. It is resistant to chemically aggressive environments. It is not designed for combat, so it provides little bullet and splinter protection. The suit has two artefact containers.</text>
+	</string>
+	
+	<string id="ecolog_outfit_grn_name">
+		<text>SSP-99M protection suit</text>
+	</string>
+	<string id="ecolog_outfit_grn_description">
+		<text>The SSP-99M chemical protection suit is specially designed for scientific expeditions into the Zone. The SSP-99M is a high quality modified SSP-99 suit. It provides increased body protection from bullets and splinters, as it was designed for guards working with scientific expeditions. The suit has two artefact containers.</text>
+	</string>
+	
+	<string id="ecologist_guard_outfit_name">
+		<text>Ecologist guard suit</text>
+	</string>
+	<string id="ecologist_guard_outfit_description">
+		<text>The Ecologist guard suit is a light bodysuit of twin-layered rubberised cloth with Plexiglas lining with built-in body armour. This suit is modelled after the popular Sunrise suit often seen worn by stalkers throughout the Zone due to its good reputation against mutant threats. Comes with built-in artefact containers.</text>
+	</string>
+
+<!--			-- Duty --				-->
+
+	<string id="dolg_novice_outfit_name">
+		<text>Duty leather jacket</text>
+	</string>
+
+	<string id="dolg_outfit_name">
+		<text>PS5-M Universal Protection</text>
+	</string>
+	<string id="dolg_outfit_description">
+		<text>This modern version of the Duty bodysuit is better suited for stalkers who are used to or prefer lightweight suits. Unlike the PSZ series, this suit also provides good protection against anomalies. The suit cannot be modified with an artefact container, but may be upgraded with a combat support system instead.</text>
+	</string>
+
+	<string id="dolg_heavy_outfit_name">
+		<text>PSZ-9d body armour</text>
+	</string>
+	<string id="dolg_heavy_outfit_description">
+		<text>This early model of the Duty bodysuit is based on the Spetsnaz PSZ-9 body armour and modified for used in the Zone. The suit is capable of stopping a rifle bullet, however this level of protection comes at the cost of its weight, bulkiness and virtually non-existent anomaly protection. The suit cannot be modified with an artefact container, but may be upgraded with a combat support system.</text>
+	</string>
+
+	<string id="dolg_scientific_outfit_name">
+		<text>Duty scientific suit</text>
+	</string>
+	<string id="dolg_scientific_outfit_description">
+		<text>A wonderful protective suit for the Zone, mostly appreciated because it combines both excellent anomaly and bullet-proofing qualities. It includes the PSZ-9d suit, a closed cycle breathing system and an integrated system of anomalous field suppression. Whilst it provides quality bullet and splinter protection it does not come with an artefact container.</text>
+	</string>
+
+	<string id="dolg_radiation_outfit_name">
+		<text>Duty radiation suit</text>
+	</string>
+	<string id="dolg_radiation_outfit_description">
+		<text>The best in personal protection technology. Composed of three elements - a tactical helmet, a heavy armoured vest and reinforced jumpsuit. The vest consists of several thick layers of Kevlar and can be reinforced with composite or titanium plates for increased protection. Does not come with a built-in artefact container.</text>
+	</string>
+
+	<string id="dolg_exo_outfit_name">
+		<text>Duty exoskeleton</text>
+	</string>
+	<string id="dolg_exo_outfit_description">
+		<text>Duty's exoskeleton uses heavier materials to improve bullet resistance over that of others, this version of the exoskeleton though heavy makes one feel like a tank. The only downfall is the weak anomaly protection provided with the armour is very lacking and even the most basic of anomalies can often incapacitate or kill whoever sits inside it. Does not come with an artefact container.</text>
+	</string>
+
+<!--			-- Freedom --				-->
+
+	<string id="svoboda_novice_outfit_name">
+		<text>Freedom leather jacket</text>
+	</string>
+
+	<string id="svoboda_light_outfit_name">
+		<text>Wind of Freedom</text>
+	</string>
+	<string id="svoboda_light_outfit_description">
+		<text>This lightweight Freedom bodysuit's fabric is treated with "Horizon", a special solution developed by the faction by trial and error to increase resistance to anomalies. Like the Sunrise suit, the Wind of Freedom comes with built-in body armour and artefact container.</text>
+	</string>
+
+  	<string id="svoboda_medium_outfit_name">
+    	<text>Guardian of Freedom</text>
+  	</string>
+  	<string id="svoboda_medium_outfit_description">
+    	<text>A modern Freedom model more suitable to new stalker recruits who are used to simpler suits. Unlike the PS3 series, this variation provides decent protection from anomalies and minimal protection from bullets. Comes with built-in artefact container.</text>
+  	</string>
+
+	<string id="svoboda_heavy_outfit_name">
+		<text>Sentinel of Freedom</text>
+	</string>
+	<string id="svoboda_heavy_outfit_description">
+		<text>This stalker bodysuit with reinforced body armour made by Freedom craftsmen represents a good compromise between combat and anomaly protection. The built-in body armour comprises armour plating and ten Kevlar layers, capable of stopping a pistol bullet. The suit uses the relatively expensive Sovereign compound for anomaly protection. Comes with an artefact container.</text>
+	</string>
+
+	<string id="svoboda_scientific_outfit_name">
+		<text>Freedom scientific suit</text>
+	</string>
+	<string id="svoboda_scientific_outfit_description">
+		<text>Produced by Freedom especially for research in the Zone. The closed system of breathing and special treatment materials provide excellent protection against harmful radiation and anomalous effects. However, the built-in body armour isn't the best and can break somewhat easily, so is not suitable for active hostilities. Fully upgradeable and boasting built-in artefact container.</text>
+	</string>
+
+	<string id="svoboda_radiation_outfit_name">
+		<text>Freedom radiation suit</text>
+	</string>
+	<string id="svoboda_radiation_outfit_description">
+		<text>The best in personal protection technology. Composed of three elements - a tactical helmet, a heavy armoured vest and reinforced jumpsuit. The vest consists of several thick layers of Kevlar and can be reinforced with composite or titanium plates for increased protection. Comes with a built-in artefact container.</text>
+	</string>
+
+  	<string id="svoboda_exo_outfit_name">
+    	<text>Freedom exoskeleton</text>
+  	</string>
+  	<string id="svoboda_exo_outfit_description">
+    	<text>An upgraded version of a regular exoskeleton. The use of lighter materials allowed the designers to reduce the suit's weight and with Freedom's usual trademark of high quality anomaly protection, the only thing that suffers is its overall armour and impact. Comes with built-in artefact container.</text>
+  	</string>
+
+<!--			-- Loner --				-->
+
+	<string id="novice_outfit_name">
+		<text>Leather jacket</text>
+	</string>
+	<string id="novice_outfit_description">
+		<text>The leather jacket does not provide sufficient protection from the Zone's harsh conditions since it's simply a leather anorak. Typically, it is also worn with a backpack with extra straps across the chest. Leather offers little protection from gunfire or claws and is absolutely useless against radiation or anomalies.</text>
+	</string>
+
+	<string id="stalker_outfit_name">
+		<text>Sunrise suit</text>
+	</string>
+	<string id="stalker_outfit_description">
+		<text>This DIY stalker bodysuit is a combination of twin-layered rubberised cloth with Plexiglas lining and built-in body armour. Despite the fact that the body armour is often strained by anything beyond even pistol bullets, the suit enjoys great popularity due to its low cost and modification potential. Comes with built-in artefact container.</text>
+	</string>
+
+	<string id="exo_proto_outfit_name">
+		<text>Sunrise exoskeleton</text>
+	</string>
+	<string id="exo_proto_outfit_description">
+		<text>A standard Sunrise bodysuit fitted into a old military grade exoskeleton. Offers the same amount of protection as a standard Sunrise, but with greatly increased carrying capacity. Where the hell did you find this?</text>
+	</string>
+
+	<string id="nbc_outfit_name">
+		<text>NBC suit</text>
+	</string>
+	<string id="nbc_outfit_description">
+		<text>The NBC suit is an advanced version of the standard Sunrise suit. It is composed of a camouflaged CBRN suit with a Class III Kevlar vest. Comes standard with a GP-5 gas mask using a hose leading to a modern filter. Comes with a built-in artefact container.</text>
+	</string>
+
+ 	<string id="barmerc_outfit_name">
+		<text>Bar guard uniform</text>
+  	</string>
+  	<string id="barmerc_outfit_description">
+		<text>The uniform used by guards in and around the 100 Rads bar. Its design is based on the outfit used by mercenaries around the Zone. Due to a special treatment of the fabric, the armour has much strengthened stability to offset the physical movement of its plates. Its protective properties are slightly better then those of the PSZ-7 military bulletproof suits.</text>
+  	</string>
+
+	<string id="scientific_outfit_name">
+		<text>SEVA suit</text>
+	</string>
+	<string id="scientific_outfit_description">
+		<text>This suit, produced by one of Kiev's Defence Research Institutes, is a great alternative to home-made stalker suits. The anomaly and radiation protection system is second to none. Fully upgradeable and boasting built-in artefact container, this bodysuit is the equipment of choice for many experienced stalkers.</text>
+	</string>
+
+	<string id="scientific_heavy_outfit_name">
+		<text>Heavy SEVA suit</text>
+	</string>
+	<string id="scientific_heavy_outfit_description">
+		<text>A modified SEVA suit with heavier emphasis on body armour. The anomaly protection features have slightly suffered due to this change of priorities. Fully upgradeable and boasting two built-in artefact containers.</text>
+	</string>
+
+	<string id="radiation_outfit_name">
+		<text>Radiation suit</text>
+	</string>
+	<string id="radiation_outfit_description">
+		<text>The best in personal protection technology. Composed of three elements - a tactical helmet, a heavy armoured vest and reinforced jumpsuit. The vest consists of several thick layers of Kevlar and can be reinforced with composite or titanium plates for increased protection. Comes with a built-in artefact container.</text>
+	</string>
+
+	<string id="exo_outfit_name">
+		<text>Exoskeleton</text>
+	</string>
+	<string id="exo_outfit_description">
+		<text>An experimental sample of an exoskeleton that was never mass-produced due to extraordinary cost and design flaws. Despite this, it is in demand due to its ability to take on the weight of all carried equipment, and therefore small batches are made in underground facilities outside of Ukraine. Comes with a built-in artefact container.</text>
+	</string>
+
+<!--			-- Mercenary --				-->
+
+ 	<string id="merc_outfit_name">
+    	<text>Mercenary suit</text>
+  	</string>
+  	<string id="merc_outfit_description">
+		<text>Outfit of choice for the Mercenary faction. Its design is based on the suit used by the special forces of Western armies. Due to a special treatment of the fabric, the armour has a strengthened stability during the physical movement of its plates. Comes with built-in artefact containers.</text>
+  	</string>
+
+	<string id="merc_stalker_outfit_name">
+		<text>Mercenary Sunrise suit</text>
+	</string>
+	<string id="merc_stalker_outfit_description">
+		<text>A Sunrise bodysuit worn by mercenaries in the Zone, painted in murky colours. In spite of the body armour's lack of resistance towards anything stronger than a pistol bullet, the suit enjoys great popularity among mercenaries due to its low cost and modification potential. Comes with a built-in artefact container.</text>
+	</string>
+
+	<string id="merc_scientific_outfit_name">
+		<text>Mercenary scientific suit</text>
+	</string>
+	<string id="merc_scientific_outfit_description">
+		<text>Suit for mercenaries who often work in or near anomalous areas. Protection systems with a closed cycle, built-in suppression action anomalous fields. It provides good protection from bullet and shrapnel hit, but not enough for large-scale hostilities. Fully upgradeable and boasting two built-in artefact containers.</text>
+	</string>
+
+	<string id="merc_radiation_outfit_name">
+		<text>Mercenary radiation suit</text>
+	</string>
+	<string id="merc_radiation_outfit_description">
+		<text>The best in personal protection technology. Composed of three elements - a tactical helmet, a heavy armoured vest and reinforced jumpsuit. The vest consists of several thick layers of Kevlar and can be reinforced with composite or titanium plates for increased protection. Comes with two built-in artefact containers.</text>
+	</string>
+
+	<string id="merc_exo_outfit_name">
+		<text>Merc exoskeleton</text>
+	</string>
+	<string id="merc_exo_outfit_description">
+		<text>An experimental sample of the exoskeleton often worn by veterans of the Mercenary faction. Repainted in the faction's typical colours. Comes with a built-in artefact containers.</text>
+	</string>
+
+<!--			-- Monolith--				-->
+
+	<string id="monolith_outfit_name">
+		<text>Monolith suit</text>
+	</string>
+	<string id="monolith_outfit_description">
+		<text>Standard body armour worn by the Monolith faction, whilst many variants exist to improve their scientific or combat abilities this model is the most basic. The suit has two artefact containers.</text>
+	</string>
+
+	<string id="monolith_nbc_outfit_name">
+		<text>Monolith NBC suit</text>
+	</string>
+	<string id="monolith_nbc_outfit_description">
+		<text>The Monolith NBC suit is an advanced version of the standard Monolith suit. It is composed of a camouflaged CBRN suit with a Class III Kevlar vest. Comes standard with a GP-5 gas mask using a hose leading to a modern filter. Comes with a built-in artefact container.</text>
+	</string>
+
+	<string id="monolith_scientific_outfit_name">
+		<text>Monolith scientific suit</text>
+	</string>
+	<string id="monolith_scientific_outfit_description">
+		<text>The Monolith scientific suit includes a flak vest of unknown origin and also features unique modifications for greater resistance to radiation at the cost of being more vulnerable to psi-fields. The anomaly protection system has been upgraded to match the SEVA bodysuit The suit has two artefact containers.</text>
+	</string>
+
+	<string id="monolith_radiation_outfit_name">
+		<text>Monolith radiation suit</text>
+	</string>
+	<string id="monolith_radiation_outfit_description">
+		<text>The best in personal protection technology. Composed of three elements - a tactical helmet, a heavy armoured vest and reinforced jumpsuit. The vest consists of several thick layers of Kevlar and can be reinforced with composite or titanium plates for increased protection. Comes with two built-in artefact containers.</text>
+	</string>
+
+	<string id="monolith_exo_outfit_name">
+		<text>Monolith exoskeleton</text>
+	</string>
+	<string id="monolith_exo_outfit_description">
+		<text>Painted in Monolith colours, this exoskeleton includes a flak vest of unknown origin and also features unique modifications creating a slight resistance to radiation. The system has been upgraded to almost match the Military exoskeleton at the cost of having no psi-protection. Can hold up to two artefact containers.</text>
+	</string>
+
+<!--			-- Bandit --				-->
+
+	<string id="bandit_novice_outfit_name">
+		<text>Black leather jacket</text>
+	</string>
+	<string id="bandit_novice_outfit_description">
+		<text>The jacket consists of a black leather anorak with Kevlar patches sewn into it. Typically it is also worn with a backpack made of hemp with extra straps across the chest, blue tracksuit pants, white running shoes and a beige hoodie worn underneath</text>
+	</string>
+
+	<string id="trenchcoat_outfit_name">
+		<text>Leather trench coat</text>
+	</string>
+	<string id="trenchcoat_outfit_description">
+		<text>A regular black leather trench coat. Has no special purpose other than to keep the wearer warm at night or protect him from a blind dog bite. Although the trench coat is not particularly comfortable, it is often used by bandits in the Zone - either because it allows them to hide in the dark or simply due to its "cool" appearance.</text>
+	</string>
+
+	<string id="banditmerc_outfit_name">
+		<text>Bandit mercenary suit</text>
+	</string>
+	<string id="banditmerc_outfit_description">
+		<text>Outfit of choice for the Mercenary faction, recently "liberated" by bandits. The bandit variation suffers from external damage providing less adequate protection across the board, whilst it is not only less costly, it is much easier to get a hold of.</text>
+	</string>
+
+	<string id="bandit_specops_outfit_name">
+		<text>Bandit Berill-5M armoured suit</text>
+	</string>
+	<string id="bandit_specops_outfit_description">
+		<text>An upgraded version of the common bandit body armour. The vest includes PSZ-9a series military body armour and many other upgrades to protect the wearer against anomalies and radiation.</text>
+	</string>
+
+	<string id="trenchcoat_brown_outfit_name">
+		<text>Bandit leather trench coat</text>
+	</string>
+	<string id="trenchcoat_brown_outfit_description">
+		<text>A regular trench coat that hides a stalker bodysuit underneath it. Said bodysuit comes with reinforced body armour made by bandit craftsmen providing good protection against anomalies. The suit cannot be modified with an artefact container, but may be upgraded with a combat support system instead.</text>
+	</string>
+
+	<string id="bandit_exo_outfit_name">
+		<text>Bandit exoskeleton</text>
+	</string>
+	<string id="bandit_exo_outfit_description">
+		<text>A standard exoskeleton modified by bandits to use lighter materials, which overall has reduced the weight of the suit. Comes with a built-in artefact container.</text>
+	</string>
+
+<!--			-- Military --				-->
+
+	<string id="army_outfit_name">
+		<text>Soldier uniform</text>
+	</string>
+	<string id="army_outfit_description">
+		<text>A poor protective outfit contracted by government bureaucrats outsourcing to the lowest bidder. It slightly increases bullet, shrapnel and bite protection. For the soldiers serving in the Zone, it is as good as walking naked amidst rifle bullets and anomalies.</text>
+	</string>
+
+	<string id="specops_outfit_name">
+		<text>Berill-5M armoured suit</text>
+	</string>
+	<string id="specops_outfit_description">
+		<text>This item comprises military PS5 series body armour with beryllium coating modified for use in the Zone. Designed for assault operations in highly radioactive areas, it is ineffective in areas of high anomalous activity. The suit makes its way to stalkers through the military, who exchange it for loot. Does not come with an artefact container.</text>
+	</string>
+
+	<string id="military_outfit_name">
+		<text>SKAT-9 "Bulat" military armoured suit</text>
+	</string>
+	<string id="military_outfit_description">
+		<text>This modern military armoured suit is designed for assault operations in anomalous areas. Comprises a PSZ-12p heavy military armoured suit, built-in compensation suit, and an anomalous protection bodysuit. The armour provides excellent protection against bullet and fragmentation damage, without greatly reducing the wearer's mobility. Does not come with an artefact container.</text>
+	</string>
+
+	<string id="commander_outfit_name">
+		<text>SKAT-9M military armoured suit</text>
+	</string>
+	<string id="commander_outfit_description">
+		<text>This Skat-9M bulletproof military suit is designed for assault operations in areas of anomalous activity. It includes a PSZ-12p heavy military bulletproof suit and an integrated compensation suit. It provides perfect protection from bullets and splinters and it doesn't decrease the soldier's mobility. It has a balanced system of anomaly protection.</text>
+	</string>
+
+	<string id="military_exo_outfit_name">
+		<text>Military exoskeleton</text>
+	</string>
+	<string id="military_exo_outfit_description">
+		<text>The Military variant of the exoskeleton uses heavier materials to improve bullet resistance, this version of the exoskeleton though heavy makes one feel like a tank. The only downfall is the weak anomaly protection provided with the armour is very lacking and even the most basic of anomalies can often incapacitate or kill whoever sits inside it. Does not come with an artefact container.</text>
+	</string>
+
+<!--			-- ISG --					-->
+
+	<string id="isg_outfit_name">
+		<text>ISG outfit</text>
+	</string>
+	<string id="isg_outfit_description">
+		<text>This bodysuit is a combination of a bodysuit of twin-layered rubberised cloth with Plexiglas lining and built-in body armour. Created specifically for members of the now defunct United Nations International Scientific Group, this suit is modelled after the popular Sunrise suit. Comes with built-in artefact containers.</text>
+	</string>
+
+	<string id="isg_scientific_outfit_name">
+		<text>ISG SEVA suit</text>
+	</string>
+	<string id="isg_scientific_outfit_description">
+		<text>A suit once worn by brave ISG scientists who foraged into Zone's most anomalous areas. It provides good protection from bullet and shrapnel hit, but not enough for large-scale hostilities. Fully upgradeable and boasting two built-in artefact containers.</text>
+	</string>
+
+<!--			-- Helmet --				-->
+
+	<string id="st_helm_facemask">
+		<text>Mask</text>
+	</string>
+	<string id="st_helm_facemask_descr">
+		<text>A piece of cloth for covering one's mouth. Protects wearer from inhaling dust. You should probably invest in a respirator.</text>
+	</string>
+
+	<string id="st_helm_respirator_half">
+		<text>Respirator</text>
+	</string>
+	<string id="st_helm_respirator_half_descr">
+		<text>A regular plastic and rubber respirator, used to protect the wearer from inhaling harmful dusts, fumes, vapours or gases. Widely used by rookies and veterans of all factions due to its universal functionality. Does not provide any physical protection.</text>
+	</string>
+
+	<string id="st_helm_respirator_2_descr">
+		<text>A regular plastic and rubber gas mask, used for filtering air for radioactive particles and poisonous substances. This older model is still widely used by rookies and veterans of all factions due to its universal functionality and cheap price. Does not provide any physical protection.</text>
+	</string>
+
+	<string id="st_helm_respirator">
+		<text>Gas mask</text>
+	</string>
+	<string id="st_helm_respirator_descr">
+		<text>A regular plastic and rubber gas mask, used for filtering air for radioactive particles and poisonous substances. Widely used by rookies and veterans of all factions due to its universal functionality. Does not provide any physical protection.</text>
+	</string>
+
+	<string id="st_helm_respirator_gp5">
+		<text>GP-5 gas mask</text>
+	</string>
+	<string id="st_helm_respirator_gp5_descr">
+		<text>The GP-5 was designed to protect civilians of the Soviet Union from radioactive fallout during the Cold War and was manufactured from 1962 to 1989. This mask is a helmet-type mask which was made in both white and black rubber. The lenses of these masks are held in place by crimped metal rims, crimped onto the rubber of the mask. The bottom of the mask is made of metal, and in it is the 40mm filter input, and the inhale and exhale valves. The GP-5 is widely used by loners and bandits due to its availability and cheap price.</text>
+	</string>
+
+	<string id="st_helm_m40">
+		<text>M40 Field Protective Mask</text>
+	</string>
+	<string id="st_helm_m40_descr">
+		<text>The M40 was the result of a program in the 1980s to develop a successor to the M17-series protective masks. The M40 was to be a return to conventional gas mask design with an external side-mounted filter canister, rather than the internal cheek filters of the M17, which were awkward to change especially in a contaminated environment. The M40 is favoured amongst many factions, particularly the Mercenaries as while it may lack strong protection vs. anomalies it makes up for this by providing moderate bullet protection.</text>
+	</string>
+
+	<string id="st_helm_protective">
+		<text>Screen helmet</text>
+	</string>
+	<string id="st_helm_protective_descr">
+		<text>A light helmet with an airtight visor intended for protection against anomalies. Judging by the design, the helmet is made by the same Defence Research Institutes as the SEVA suit. Its intended use may very well be in combination with military suits for operations in highly anomalous areas. </text>
+	</string>
+
+	<string id="st_helm_hardhat">
+		<text>Steel helmet</text>
+	</string>
+	<string id="st_helm_hardhat_descr">
+		<text>A desperately outdated steel army helmet without any additions. Provides no protection against anomalies or radiation, but can deflect bullets. This helmet was never particularly popular in the Zone, except for use in brief armed conflicts between factions.</text>
+	</string>
+
+	<string id="st_helm_tactic">
+		<text>Tactical helmet</text>
+	</string>
+	<string id="st_helm_tactic_descr">
+		<text>A Western model of a tactical helmet, it is not known how it made its way into the Zone. The helmet is designed to provide a squad leader with strategic superiority over the enemy via its many scanners and satellite communications devices, which have not been installed in this particular helmet. Comes with multi-layered Kevlar protection and armoured elements to protect electronic components. Includes a respirator and a first generation night vision device.</text>
+	</string>
+
+	<string id="st_helm_battle">
+		<text>Sphere M12 helmet</text>
+	</string>
+	<string id="st_helm_battle_descr">
+		<text>An aluminium/titanium helmet with a cloth exterior that comes with pockets for additional steel armour pieces and an armoured face mask. The Sphere M12 is normally used as part of a combination that includes PSZ series Spetsnaz body armour. Quite popular in the Zone thanks to its respirator and built-in first generation night vision device, as well as providing the maximum head protection possible. Comes with electronics slots.</text>
+	</string>
+
+	<string id="st_helm_tactic_2">
+		<text>Tactical M12 helmet</text>
+	</string>
+	<string id="st_helm_tactic_2_descr">
+		<text>An aluminium/titanium helmet with an armour face mask and a cloth exterior that comes with pockets for additional steel armour pieces providing the maximum head protection possible. The Tactical M12 is normally used as part of a combination that includes PSZ series Spetsnaz body armour. It is quite rare in the Zone thanks to its limited production. It comes with a built-in first generation night vision device as well as electronics slots. </text>
+	</string>
+
+</string_table>

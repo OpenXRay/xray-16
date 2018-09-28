@@ -1,0 +1,69 @@
+[anomal_zone]
+
+layers_count = 3
+respawn_tries = 1
+max_artefacts = 2
+
+;applying_force_xz = 200
+;applying_force_y = 400 
+
+start_artefact = ; af_blood
+
+artefacts = af_blood, af_mincer_meat, af_soul, af_fuzz_kolobok, af_baloon, af_glass, af_rusty_thorn
+
+coeff = 3, 2, 2, 2, 1, 1, 3
+
+artefact_ways = zat_b39_af_way, zat_b39_af_way_2, zat_b39_af_way_3
+
+field_name = zat_b39_zone_field_acidic_weak, zat_b39_zone_field_acidic_average, zat_b39_zone_field_acidic_strong, zat_b39_zone_field_psychic_average
+
+[mines_core]
+zat_b39_zone_mine_acidic_weak
+zat_b39_zone_mine_acidic_weak_0000
+zat_b39_zone_mine_acidic_weak_0001
+zat_b39_zone_mine_acidic_weak_0002
+zat_b39_zone_mine_acidic_weak_0003
+zat_b39_zone_mine_acidic_weak_0004
+zat_b39_zone_mine_acidic_weak_0005
+zat_b39_zone_mine_acidic_weak_0006
+zat_b39_zone_mine_acidic_weak_0007
+zat_b39_zone_mine_acidic_weak_0008
+zat_b39_zone_mine_acidic_weak_0009
+zat_b39_zone_mine_acidic_weak_0010
+zat_b39_zone_mine_acidic_weak_0011
+zat_b39_zone_mine_acidic_weak_0012
+zat_b39_zone_mine_acidic_weak_0013
+zat_b39_zone_mine_acidic_weak_0014
+zat_b39_zone_mine_acidic_weak_0015
+zat_b39_zone_mine_acidic_weak_0016
+
+[layer_1]
+mines_section = mines_layer_1 
+
+[mines_layer_1]:mines_core
+zat_b39_zone_mine_acidic_weak_0017
+zat_b39_zone_mine_acidic_weak_0018
+zat_b39_zone_mine_acidic_weak_0023
+zat_b39_zone_mine_acidic_weak_0024
+zat_b39_zone_mine_acidic_weak_0027
+zat_b39_zone_mine_acidic_weak_0029
+
+
+[layer_2]
+mines_section = mines_layer_2 
+
+[mines_layer_2]:mines_core
+zat_b39_zone_mine_acidic_weak_0022
+zat_b39_zone_mine_acidic_weak_0026
+zat_b39_zone_mine_acidic_weak_0028
+zat_b39_zone_mine_acidic_weak_0030
+zat_b39_zone_mine_acidic_weak_0031
+
+[layer_3]
+mines_section = mines_layer_3 
+
+[mines_layer_3]:mines_core
+zat_b39_zone_mine_acidic_weak_0019
+zat_b39_zone_mine_acidic_weak_0020
+zat_b39_zone_mine_acidic_weak_0021
+zat_b39_zone_mine_acidic_weak_0025

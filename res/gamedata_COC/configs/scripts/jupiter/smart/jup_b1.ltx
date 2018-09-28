@@ -1,0 +1,41 @@
+[smart_terrain]
+squad_id = 5
+max_population = 3
+;respawn_only_smart = true
+respawn_params = respawn@jup_b1
+;arrive_dist = 75
+respawn_idle = 86400
+
+
+[respawn@jup_b1]
+spawn_controller
+spawn_sim_controller
+
+[spawn_controller]
+spawn_squads = simulation_controller
+;spawn_num = {+jup_b1_task_done} 1, 0
+spawn_num = 1
+
+[spawn_sim_controller]
+spawn_squads = jup_b1_simulation_controller
+;spawn_num = {+jup_b1_task_done +jup_b1_controller_is_dead} 1, 0
+spawn_num = 1
+
+[exclusive]
+jup_b1_stalker_1= jupiter\jup_b1_stalker_1.ltx
+jup_b1_stalker_2= jupiter\jup_b1_stalker_2.ltx
+jup_b1_stalker_3= jupiter\jup_b1_stalker_3.ltx
+jup_b1_stalker_4= jupiter\jup_b1_stalker_4.ltx
+jup_b1_zomb_stalker_1= jupiter\jup_b1_stalker_1.ltx
+jup_b1_zomb_stalker_2= jupiter\jup_b1_stalker_2.ltx
+jup_b1_zomb_stalker_3= jupiter\jup_b1_stalker_3.ltx
+jup_b1_zomb_stalker_4= jupiter\jup_b1_stalker_4.ltx
+jup_b1_zombie_1 = jupiter\jup_b1_zombie.ltx
+jup_b1_zombie_2 = jupiter\jup_b1_zombie.ltx
+jup_b1_zombie_3 = jupiter\jup_b1_zombie.ltx
+jup_b1_controller = jupiter\jup_b1_controller.ltx
+jup_b1_tushkano_1 = jupiter\jup_b1_tushkano.ltx
+jup_b1_tushkano_2 = jupiter\jup_b1_tushkano.ltx
+jup_b1_tushkano_3 = jupiter\jup_b1_tushkano.ltx
+jup_b1_tushkano_4 = jupiter\jup_b1_tushkano.ltx
+jup_b1_tushkano_5 = jupiter\jup_b1_tushkano.ltx

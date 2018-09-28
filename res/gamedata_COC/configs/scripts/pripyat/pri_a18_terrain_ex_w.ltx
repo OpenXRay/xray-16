@@ -1,0 +1,402 @@
+[hit]
+on_info = %+pri_a18_hit_pray_squad%
+
+[logic@monolith_1]
+active = walker@monolith_1_teleport
+suitable = {=target_squad_name(pri_a18_monolith_idol_squad)} true
+prior = 70
+on_hit = hit
+
+[walker@monolith_1_teleport]
+corpse_detection_enabled = false
+path_walk = pri_a18_monolith_1_walk
+on_info = walker@pri_a18_start_1 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_1_walk)%
+ 
+[walker@pri_a18_start_1]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_1_walk
+path_look = pri_a18_monolith_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_info = {-pri_a18_hit_pray_squad} %=play_sound(pri_a18_monolith_pray)%
+on_info2 = {+pri_a18_hit_pray_squad} walker@pri_a18_start_1_timer
+
+[walker@pri_a18_start_1_timer]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_1_walk
+path_look = pri_a18_monolith_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_game_timer = 25 | walker@pri_a18_start_1_combat
+
+[walker@pri_a18_start_1_combat]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_1_walk
+path_look = pri_a18_monolith_1_look
+
+;-------------
+ 
+[logic@monolith_2]
+active = walker@monolith_2_teleport
+suitable = {=target_squad_name(pri_a18_monolith_idol_squad)} true
+prior = 70
+on_hit = hit
+
+[walker@monolith_2_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2_walk
+on_info = walker@pri_a18_start_2 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_2_walk)%
+
+[walker@pri_a18_start_2]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2_walk
+path_look = pri_a18_monolith_2_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_info = {+pri_a18_hit_pray_squad} walker@pri_a18_start_2_timer
+
+[walker@pri_a18_start_2_timer]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2_walk
+path_look = pri_a18_monolith_2_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_game_timer = 25 | walker@pri_a18_start_2_combat
+
+[walker@pri_a18_start_2_combat]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2_walk
+path_look = pri_a18_monolith_2_look
+
+;-------------
+
+[logic@monolith_3]
+active = walker@monolith_3_teleport
+suitable = {=target_squad_name(pri_a18_monolith_idol_squad)} true
+prior = 70
+on_hit = hit
+
+[walker@monolith_3_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_3_walk
+on_info = walker@pri_a18_start_3 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_3_walk)%
+
+[walker@pri_a18_start_3]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_3_walk
+path_look = pri_a18_monolith_3_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_info = {+pri_a18_hit_pray_squad} walker@pri_a18_start_3_timer
+
+[walker@pri_a18_start_3_timer]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_3_walk
+path_look = pri_a18_monolith_3_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_game_timer = 25 | walker@pri_a18_start_3_combat
+
+[walker@pri_a18_start_3_combat]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_3_walk
+path_look = pri_a18_monolith_3_look
+
+;-------------
+
+[logic@monolith_4]
+active = walker@monolith_4_teleport
+suitable = {=target_squad_name(pri_a18_monolith_idol_squad)} true
+prior = 70
+on_hit = hit
+
+[walker@monolith_4_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_4_walk
+on_info = walker@pri_a18_start_4 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_4_walk)%
+
+[walker@pri_a18_start_4]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_4_walk
+path_look = pri_a18_monolith_4_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_info = {+pri_a18_hit_pray_squad} walker@pri_a18_start_4_timer
+
+[walker@pri_a18_start_4_timer]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_4_walk
+path_look = pri_a18_monolith_4_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_game_timer = 25 | walker@pri_a18_start_4_combat
+
+[walker@pri_a18_start_4_combat]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_4_walk
+path_look = pri_a18_monolith_4_look
+
+;-------------
+
+[logic@monolith_5]
+active = walker@monolith_5_teleport
+suitable = {=target_squad_name(pri_a18_monolith_idol_squad)} true
+prior = 70
+on_hit = hit
+
+[walker@monolith_5_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_5_walk
+on_info = walker@pri_a18_start_5 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_5_walk)%
+
+[walker@pri_a18_start_5]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_5_walk
+path_look = pri_a18_monolith_5_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_info = {+pri_a18_hit_pray_squad} walker@pri_a18_start_5_timer
+
+[walker@pri_a18_start_5_timer]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_5_walk
+path_look = pri_a18_monolith_5_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_game_timer = 25 | walker@pri_a18_start_5_combat
+
+[walker@pri_a18_start_5_combat]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_5_walk
+path_look = pri_a18_monolith_5_look
+
+;-------------
+
+[logic@monolith_post_guard_1]
+active = walker@post_guard_1_teleport
+suitable = {=target_squad_name(pri_a18_monolith_post_guard_squad)} true
+prior = 70
+on_hit = combat
+
+[combat]
+on_info = %+pri_a18_post_guard_combat%
+
+[walker@post_guard_1_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_1_post_guard_walk
+on_info = walker@post_guard_1 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_1_post_guard_walk)%
+
+[walker@post_guard_1]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_1_post_guard_walk
+path_look = pri_a18_monolith_1_post_guard_look
+out_restr = pri_a18_post_quard_out_restrictor
+combat_ignore_cond =  true
+on_info = {+pri_a18_post_guard_combat} walker@post_guard_12 
+on_info2 = {=enemy_in_zone(pri_a18_enter_restrictor)} %+pri_a18_post_guard_combat%
+
+[walker@post_guard_12]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_1_post_guard_walk
+out_restr = pri_a18_post_quard_out_restrictor
+
+;-------------
+
+[logic@monolith_post_guard_2]
+active = walker@post_guard_2_teleport
+suitable = {=target_squad_name(pri_a18_monolith_post_guard_squad)} true
+prior = 70
+on_hit = combat
+
+[walker@post_guard_2_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2_post_guard_walk
+on_info = walker@post_guard_2 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_2_post_guard_walk)%
+
+[walker@post_guard_2]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2_post_guard_walk
+path_look = pri_a18_monolith_2_post_guard_look
+out_restr = pri_a18_post_quard_out_restrictor
+combat_ignore_cond =  true
+on_info = {+pri_a18_post_guard_combat} walker@post_guard_22 
+on_info2 = {=enemy_in_zone(pri_a18_enter_restrictor)} %+pri_a18_post_guard_combat%
+
+[walker@post_guard_22]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2_post_guard_walk
+out_restr = pri_a18_post_quard_out_restrictor
+
+;-------------
+
+[logic@monolith_post_guard_3]
+active = walker@post_guard_3_teleport
+suitable = {=target_squad_name(pri_a18_monolith_post_guard_squad)} true
+prior = 70
+on_hit = combat
+
+[walker@post_guard_3_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_3_post_guard_walk
+on_info = walker@post_guard_3 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_3_post_guard_walk)%
+
+[walker@post_guard_3]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_3_post_guard_walk
+path_look = pri_a18_monolith_3_post_guard_look
+out_restr = pri_a18_post_quard_out_restrictor
+combat_ignore_cond =  true
+on_info = {+pri_a18_post_guard_combat} walker@post_guard33 
+on_info2 = {=enemy_in_zone(pri_a18_enter_restrictor)} %+pri_a18_post_guard_combat%
+
+[walker@post_guard33]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_3_post_guard_walk
+out_restr = pri_a18_post_quard_out_restrictor
+
+;-------------
+
+[logic@monolith_post_guard_4]
+active = walker@post_guard_4_teleport
+suitable = {=target_squad_name(pri_a18_monolith_post_guard_squad)} true
+prior = 70
+on_hit = combat
+
+[walker@post_guard_4_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_4_post_guard_walk
+on_info = patrol@post_guard_1 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_4_post_guard_walk)%
+
+[patrol@post_guard_1]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_4_post_guard_walk
+path_look = pri_a18_monolith_4_post_guard_look
+out_restr = pri_a18_post_quard_out_restrictor
+combat_ignore_cond =  true
+on_info = {+pri_a18_post_guard_combat} patrol@post_guard_11 
+on_info2 = {=enemy_in_zone(pri_a18_enter_restrictor)} %+pri_a18_post_guard_combat%
+
+[patrol@post_guard_11]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_4_post_guard_walk
+out_restr = pri_a18_post_quard_out_restrictor
+
+;-------------
+
+[logic@monolith_post_guard_5]
+active = walker@post_guard_5_teleport
+suitable = {=target_squad_name(pri_a18_monolith_post_guard_squad)} true
+prior = 70
+on_hit = combat
+
+[walker@post_guard_5_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_5_post_guard_walk
+on_info = patrol@post_guard_2 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_5_post_guard_walk)%
+
+[patrol@post_guard_2]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_5_post_guard_walk
+path_look = pri_a18_monolith_5_post_guard_look
+out_restr = pri_a18_post_quard_out_restrictor
+combat_ignore_cond =  true
+on_info = {+pri_a18_post_guard_combat} patrol@post_guard_22 
+on_info2 = {=enemy_in_zone(pri_a18_enter_restrictor)} %+pri_a18_post_guard_combat%
+
+[patrol@post_guard_22]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_5_post_guard_walk
+out_restr = pri_a18_post_quard_out_restrictor
+
+;-------------
+
+[logic@pri_a18_monolith_corridor]
+active = walker@post_guard_6_teleport
+suitable = {=target_squad_name(pri_a18_monolith_corridor_squad)} true
+prior = 70
+
+[walker@post_guard_6_teleport]
+corpse_detection_enabled = false
+path_walk = monolith_corridor_walk
+on_info = camper@corridor %=teleport_npc(pri_a18_smart_terrain_monolith_corridor_walk)%
+
+[camper@corridor]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = monolith_corridor_walk
+path_look = monolith_corridor_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true 
+combat_ignore_keep_when_attacked = true 
+radius = 0
+on_info = {=see_actor} walker@corridor_2  
+
+[walker@corridor_2]
+in_restr = pri_a18_monolith_trance_restrictor
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = monolith_corridor_walk 
+path_look = monolith_corridor_look
+
+;-------------
+
+[logic@pri_a18_monolith_2nd_corridor_1]
+active = walker@monolith_2nd_corridor_1_teleport
+suitable = {=target_squad_name(pri_a18_monolith_2nd_corridor_squad)} true
+prior = 200
+
+[walker@monolith_2nd_corridor_1_teleport]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2nd_corridor_walk_1
+on_info = walker@monolith_2nd_corridor_wait_1 %=teleport_npc(pri_a18_smart_terrain_pri_a18_monolith_2nd_corridor_walk_1)%
+
+[walker@monolith_2nd_corridor_wait_1]
+corpse_detection_enabled = false
+gather_items_enabled = false
+path_walk = pri_a18_monolith_2nd_corridor_walk_1
+path_look = pri_a18_monolith_2nd_corridor_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+in_restr = pri_a18_monolith_trance_restrictor
+on_info = {!squad_exist(pri_a18_monolith_corridor_squad) =enemy_in_zone(pri_a18_corridor_man_fire_zone)} walker@monolith_2nd_corridor_wait_1_2 
+on_info2 = {=enemy_in_zone(pri_surge_hide_a18_2)} walker@monolith_2nd_corridor_wait_1_2  
+
+[walker@monolith_2nd_corridor_wait_1_2]
+corpse_detection_enabled = false
+gather_items_enabled = false
+def_state_moving = assault
+path_walk = pri_a18_monolith_2nd_corridor_attack_walk

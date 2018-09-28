@@ -1,0 +1,40 @@
+<w>
+  	<background width="1024" height="768">
+		<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+			<texture x="0" y="0" width="1920" height="1080">ui\ui_background_new</texture>
+		</auto_static>
+	</background>
+    <file_item>
+	    <main width="392" height="18"/>
+	    <fn width="300" height="18"/>
+	    <fd width="88" height="18"/>
+    </file_item>
+    <form x="282" y="200" width="460" height="411" stretch="1">
+	    <texture>ui_inGame2_screen_4</texture>
+	    <caption x="10" y="6" width="86" height="24" stretch="1">
+		    <text r="170" g="170" b="170" font="graffiti22" align="c" vert_align="c">ui_mm_save_game</text>
+	    </caption>
+	    <edit x="24" y="40" width="419" height="24" file_name_mode="1">
+		    <texture>ui_inGame2_edit_box_1</texture>
+		    <text x="3" font="letterica18" vert_align="c"/>
+	    </edit>
+	    <list_frame x="24" y="82" width="419" height="291">
+		    <texture>ui_inGame2_servers_list_frame</texture>
+	    </list_frame>
+	    <list x="27" y="82" width="417" height="291" item_height="18" can_select="1">
+		    <font font="letterica18"/>
+	    </list>
+	    <btn_save x="100" y="382" width="86" height="24" stretch="1">
+	        <texture>ui_inGame2_button</texture>
+	        <text font="letterica18">ui_mm_save</text>
+	    </btn_save>
+	    <btn_delete x="189" y="382" width="86" height="24" stretch="1">
+	        <texture>ui_inGame2_button</texture>
+	        <text font="letterica18">ui_mm_delete</text>
+	    </btn_delete>
+	    <btn_cancel x="278" y="382" width="86" height="24" stretch="1">
+	        <texture>ui_inGame2_button</texture>
+	        <text font="letterica18">ui_mm_cancel</text>
+	    </btn_cancel>
+	</form>
+</w>

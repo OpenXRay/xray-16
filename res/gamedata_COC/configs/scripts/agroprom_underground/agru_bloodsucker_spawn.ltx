@@ -1,0 +1,8 @@
+[logic]
+active = sr_idle@line_0
+
+[sr_idle@line_0]
+;on_game_timer = 20 | %=spawn_object(agru_bloodsucker:agru_bloodsucker_walk:0)% sr_idle@line_1
+on_game_timer = 20 | sr_idle@line_1 %=create_squad(agr_u_bloodsucker_2_squad:agr_u_bloodsucker_2)%
+
+[sr_idle@line_1]

@@ -1,0 +1,570 @@
+--------------------------------
+----- Written by Darryl123 -----
+--------------------------------
+
+-------------------------
+----- Miscellaneous -----
+-------------------------
+
+-- Check if achievements can be unlocked.
+function can_unlock()
+	return (db.actor and db.actor.afterFirstUpdate)
+end
+
+-- Counts how many achievements exist.
+local achievements_count = nil
+function get_achievements_count()
+	-- Check if a count has already been made.
+	if (achievements_count) then
+		return achievements_count
+	end
+	-- Scan the achievements section for achievements.
+	achievements_count = 0
+	local ini = system_ini()
+	local line_count = ini:line_count("achievements") or 0
+	for i = 0, line_count - 1 do
+		-- Check whether the achievement requires story mode.
+		local junk1, section, junk2 = ini:r_line("achievements", i, "", "")
+		local story = ini:r_bool_ex(section, "story", false)
+		if (not story or (story and not has_alife_info("story_mode_disabled"))) then
+			achievements_count = achievements_count + 1
+		end
+	end
+	return achievements_count
+end
+
+-- Counts how many achievements are locked.
+function get_achievements_locked_count()
+	return get_achievements_count() - get_achievements_unlocked_count()
+end
+
+-- Counts how many achievements are unlocked.
+function get_achievements_unlocked_count()
+	return dxr_statistics.get_actor_achievements_count()
+end
+
+-- Checks whether an achievement is unlocked.
+function has_achievement(achievement)
+	return dxr_statistics.has_actor_achievement(achievement)
+end
+
+--------------------
+----- Functors -----
+--------------------
+
+-- Bookworm Food
+function bookworm_food_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("bookworm_food")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (bookworm_food_requirements()) then
+		bookworm_food_rewards()
+		return true
+	end
+end
+
+-- Completionist.
+function completionist_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("completionist")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (completionist_requirements()) then
+		completionist_rewards()
+		return true
+	end
+end
+
+-- Down to Earth.
+function down_to_earth_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("down_to_earth")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (down_to_earth_requirements()) then
+		down_to_earth_rewards()
+		return true
+	end
+end
+
+-- Duga Free.
+function duga_free_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("duga_free")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (duga_free_requirements()) then
+		duga_free_rewards()
+		return true
+	end
+end
+
+-- Geologist.
+function geologist_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("geologist")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (geologist_requirements()) then
+		geologist_rewards()
+		return true
+	end
+end
+
+-- Heavy Pockets.
+function heavy_pockets_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("heavy_pockets")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (heavy_pockets_requirements()) then
+		heavy_pockets_rewards()
+		return true
+	end
+end
+
+-- Infopreneur.
+function infopreneur_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("infopreneur")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (infopreneur_requirements()) then
+		infopreneur_rewards()
+		return true
+	end
+end
+
+-- Mechanized Warfare.
+function mechanized_warfare_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("mechanized_warfare")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (mechanized_warfare_requirements()) then
+		mechanized_warfare_rewards()
+		return true
+	end
+end
+
+-- Patriarch.
+function patriarch_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("patriarch")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (patriarch_requirements()) then
+		patriarch_rewards()
+		return true
+	end
+end
+
+-- Radiotherapy.
+function radiotherapy_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("radiotherapy")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (radiotherapy_requirements()) then
+		radiotherapy_rewards()
+		return true
+	end
+end
+
+-- Rag and Bone.
+function rag_and_bone_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("rag_and_bone")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (rag_and_bone_requirements()) then
+		rag_and_bone_rewards()
+		return true
+	end
+end
+
+-- Silver or Lead.
+function silver_or_lead_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("silver_or_lead")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (silver_or_lead_requirements()) then
+		silver_or_lead_rewards()
+		return true
+	end
+end
+
+-- Tourist.
+function tourist_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("tourist")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (has_alife_info("tourist_achievement_delay")) then
+		tourist_rewards()
+		return true
+	end
+	-- An infoportion delays the achievement.
+	-- Without this it often unlocks during level transition.
+	if (tourist_requirements()) then
+		db.actor:give_info_portion("tourist_achievement_delay")
+		return false
+	end
+end
+
+-- Well Dressed.
+function well_dressed_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("well_dressed")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (well_dressed_requirements()) then
+		well_dressed_rewards()
+		return true
+	end
+end
+
+-- Wishful Thinking.
+function wishful_thinking_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("wishful_thinking")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (wishful_thinking_requirements()) then
+		wishful_thinking_rewards()
+		return true
+	end
+end
+
+------------------------
+----- Requirements -----
+------------------------
+
+-- Bookworm Food
+-- Requires all encyclopedia articles be unlocked.
+function bookworm_food_requirements()
+	return (
+				(dxr_encyclopedia.get_articles_locked_count() == 0)
+		)
+end
+
+
+-- Completionist.
+-- Requires all available achievements to be unlocked.
+function completionist_requirements()
+	return (
+				(get_achievements_locked_count() <= 1)
+		)
+end
+
+-- Down to Earth.
+-- Requires 3 helicopters killed, or just one with an RPG-7.
+function down_to_earth_requirements()
+	return (
+				(dxr_statistics.get_statistic_count("helicopters_downed") >= 3)
+			 or (dxr_statistics.get_statistic_count("helicopters_downed2") >= 1)
+		)
+end
+
+-- Duga Free.
+-- Requires story mode, and that the Miracle Machine and Brain Scorcher are disabled.
+function duga_free_requirements()
+	return (
+			not (has_alife_info("story_mode_disabled"))
+			and (has_alife_info("yan_labx16_switcher_primary_off"))
+			and (has_alife_info("bar_deactivate_radar_done"))
+		)
+end
+
+-- Geologist.
+-- Requires 50 artefacts be detected by the player.
+function geologist_requirements()
+	return (
+				(dxr_statistics.get_statistic_count("artefacts_detected") >= 50)
+		)
+end
+
+-- Heavy Pockets.
+-- Requires player to possess 1,000,000 RU.
+function heavy_pockets_requirements()
+	return (
+				(db.actor:money() >= 1000000)
+		)	
+end
+
+-- Infopreneur.
+-- Requires player to deliver 50 PDAs.
+function infopreneur_requirements()
+	return (
+				(dxr_statistics.get_statistic_count("pdas_delivered") >= 50)
+		)
+end
+
+-- Mechanized Warfare.
+-- Requires a mechanic to own all tools.
+function mechanized_warfare_requirements()
+	return (
+				(has_alife_info("agr_smart_terrain_1_6_army_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("bar_visitors_stalker_mechanic_upgrade_tier_3"))
+			 or (has_alife_info("cit_killers_merc_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("val_smart_terrain_7_3_bandit_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("jup_b217_stalker_tech_upgrade_tier_3"))
+			 or (has_alife_info("mar_base_stalker_tech_upgrade_tier_3"))
+			 or (has_alife_info("mil_smart_terrain_7_7_freedom_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("pri_monolith_monolith_mechanic_stalker_upgrade_tier_3"))
+			 or (has_alife_info("yan_ecolog_kruglov_upgrade_tier_3"))
+			 or (has_alife_info("zat_a2_stalker_mechanic_upgrade_tier_3"))
+		)
+end
+
+-- Patriarch.
+-- Requires rank of 'Legend' be reached.
+function patriarch_requirements()
+	return (
+				(db.actor:character_rank() >= 28000)
+		)
+end
+
+-- Radiotherapy.
+-- Requires 25 emissions and 25 psi-storms to be survived.
+function radiotherapy_requirements()
+	return (
+				(dxr_statistics.get_statistic_count("emissions") >= 25)
+			and (dxr_statistics.get_statistic_count("psi_storms") >= 25)
+		)
+end
+
+-- Rag and Bone.
+-- Requires 100 stashes be found and looted.
+function rag_and_bone_requirements()
+	return (
+				(dxr_statistics.get_statistic_count("stashes_found") >= 100)
+		)
+end
+
+-- Silver or Lead.
+-- Requires player to kill 500 stalkers or have 50 surrender to you.
+function silver_or_lead_requirements()
+	return (
+				(dxr_statistics.get_statistic_count("killed_stalkers") >= 500)
+			 or (dxr_statistics.get_statistic_count("enemies_surrendered") >= 50)
+		)
+end
+
+-- Tourist.
+-- Requires player to visit all levels.
+function tourist_requirements()
+	return (
+				(dxr_statistics.has_actor_visitied_all_levels())
+		)
+end
+
+-- Well Dressed.
+-- Requires player to kill 500 mutants or field dress 250 mutant parts.
+function well_dressed_requirements()
+	return (
+				(dxr_statistics.get_statistic_count("killed_monsters") >= 500)
+			 or (dxr_statistics.get_statistic_count("field_dressings") >= 250)
+		)
+end
+
+-- Wishful Thinking.
+-- Requires story mode, and for the player to destroy the Wish Granter.
+function wishful_thinking_requirements()
+	return (
+			not (has_alife_info("story_mode_disabled"))
+			and (has_alife_info("sar2_monolith_end"))
+		)
+end
+
+-------------------
+----- Rewards -----
+-------------------
+
+-- Bookworm Food.
+-- Future memory sticks become rare PDAs.
+-- Reputation and rank point increase.
+function bookworm_food_rewards()
+	SendScriptCallback("on_achievement_earned","bookworm_food","st_achievement_15_unlock")
+end
+
+-- Completionist.
+-- Reputation and rank point increase.
+function completionist_rewards()
+	SendScriptCallback("on_achievement_earned","completionist","st_achievement_10_unlock")
+end
+
+-- Down to Earth.
+-- Weaker helicopters are respawned.
+-- Reputation and rank point increase.
+function down_to_earth_rewards()
+	SendScriptCallback("on_achievement_earned","down_to_earth","st_achievement_12_unlock")
+end
+
+-- Duga Free.
+-- Yantar & Radar psi-fields disabled.
+-- Reputation and rank point increase.
+function duga_free_rewards()
+	SendScriptCallback("on_achievement_earned","duga_free","st_achievement_4_unlock")
+end
+
+-- Geologist.
+-- Increased spawn chance of artefacts.
+-- Reputation and rank point increase.
+function geologist_rewards()
+	SendScriptCallback("on_achievement_earned","geologist","st_achievement_13_unlock")
+end
+
+-- Heavy Pockets.
+-- Traders sell cheaper and rarer goods.
+-- Reputation and rank point increase.
+function heavy_pockets_rewards()
+	SendScriptCallback("on_achievement_earned","heavy_pockets","st_achievement_1_unlock")
+end
+
+-- Infopreneur.
+-- Money received for delivering PDAs increased.
+-- Reputation and rank point increase.
+function infopreneur_rewards()
+	SendScriptCallback("on_achievement_earned","infopreneur","st_achievement_3_unlock")
+end
+
+-- Mechanized Warfare.
+-- A mechanic can now fully upgrade equipment.
+-- Reputation and rank point increase.
+function mechanized_warfare_rewards()
+	SendScriptCallback("on_achievement_earned","mechanized_warfare","st_achievement_7_unlock")
+end
+
+-- Patriarch.
+-- Larger sized squads can be recruited.
+-- Reputation and rank point increase.
+function patriarch_rewards()
+	SendScriptCallback("on_achievement_earned","patriarch","st_achievement_14_unlock")
+end
+
+-- Radiotherapy.
+-- 25% chance of surviving emissions and psi-vortices.
+-- Reputation and rank point increase.
+function radiotherapy_rewards()
+	SendScriptCallback("on_achievement_earned","radiotherapy","st_achievement_2_unlock")
+end
+
+-- Rag and Bone.
+-- Random chance of better loot in task reward stashes.
+-- Reputation and rank point increase.
+function rag_and_bone_rewards()
+	SendScriptCallback("on_achievement_earned","rag_and_bone","st_achievement_9_unlock")
+end
+
+-- Silver or Lead.
+-- 33% chance of a second stash from surrendering stalkers.
+-- Reputation and rank point increase.
+function silver_or_lead_rewards()
+	SendScriptCallback("on_achievement_earned","silver_or_lead","st_achievement_6_unlock")
+end
+
+-- Tourist.
+-- 3 "Tourist's stashes" are revealed.
+-- Reputation and rank point increase.
+function tourist_rewards()
+	for i=1,3 do
+		coc_treasure_manager.reveal_random_stash("treasure_unique","st_ui_pda_secret_tourist")
+	end
+	db.actor:disable_info_portion("tourist_achievement_delay")
+	SendScriptCallback("on_achievement_earned","tourist","st_achievement_8_unlock")
+end
+
+-- Well Dressed.
+-- 20% chance of extra parts when field dressing mutants.
+-- Reputation and rank point increase.
+function well_dressed_rewards()
+	SendScriptCallback("on_achievement_earned","well_dressed","st_achievement_5_unlock")
+end
+
+-- Wishful Thinking.
+-- Bonus reputation and rank point increase.
+-- Reputation and rank point increase.
+function wishful_thinking_rewards()
+	dxr_statistics.increment_rank(1000)
+	dxr_statistics.increment_reputation(500)
+	SendScriptCallback("on_achievement_earned","wishful_thinking","st_achievement_11_unlock")
+end

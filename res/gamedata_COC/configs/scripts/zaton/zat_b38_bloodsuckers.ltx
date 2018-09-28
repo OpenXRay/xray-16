@@ -1,0 +1,85 @@
+[logic@bloodsucker_1]
+active = mob_walker@wait1
+on_death = death@1
+on_hit = hit@1
+prior = 200
+suitable = {=check_npc_name(zat_b38_bloodsucker_1)} true
+monster_job = true
+
+[death@1]
+on_info = %+zat_b38_bloodscuker_1_death -zat_b38_fight_started%
+
+[hit@1]
+on_info = %+zat_b38_fight_started%
+on_info2 = {=hit_by_actor} %+zat_b38_attacker_wake_1%
+
+[mob_walker@wait1]
+path_walk = bloodsucker_1_wait_walk
+path_look = bloodsucker_1_wait_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info2 = {=dist_to_actor_le(5)} mob_home@actor1 %+zat_b38_fight_started%
+on_info3  = {+zat_b38_attacker_wake_1} mob_home@actor1
+on_info4 = {+zat_b38_stalker_cop_see_bloodsucker_done} mob_home@angry1
+on_info5 = {=jup_b47_npc_online(zat_b38_bloodsucker_1) -zat_b38_bl1_on_job} %=teleport_npc(zat_b38_bloodsucker_1_wait_walk) +zat_b38_bl1_on_job%
+on_actor_in_zone = zat_b38 | mob_home@angry2 %=teleport_npc(zat_b38_bloodsucker_2_wait_look) =hit_npc_from_actor%
+out_restr = zat_b38_vnz_out_restr
+
+[mob_home@actor1]
+path_home = bloodsucker_1_wait_walk
+home_min_radius = 30
+home_max_radius = 40
+on_info = {-zat_b38_fight_started} %+zat_b38_fight_started%
+aggressive = true
+combat_ignore_cond = {=check_enemy_name(zat_b38_stalker_cop) =actor_in_zone(zat_b38_vnz_out_restr)} true
+out_restr = zat_b38_vnz_out_restr
+
+[mob_home@angry1]
+path_home = bloodsucker_1_home
+aggressive = true
+combat_ignore_cond = {=check_enemy_name(zat_b38_stalker_cop) =actor_in_zone(zat_b38_vnz_out_restr)} true
+out_restr = zat_b38_vnz_out_restr
+on_info = {-zat_b38_fight_started} %+zat_b38_fight_started%
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[logic@bloodsucker_2]
+active = mob_walker@wait2
+on_death = death@2
+on_hit = hit@2
+prior = 200
+suitable = {=check_npc_name(zat_b38_bloodsucker_2)} true
+monster_job = true
+
+[death@2]
+on_info = %+zat_b38_bloodscuker_2_death -zat_b38_fight_started%
+
+[hit@2]
+on_info = %+zat_b38_fight_started%
+on_info2 = {=hit_by_actor} %+zat_b38_attacker_wake_2%
+
+[mob_walker@wait2]
+path_walk = bloodsucker_2_wait_walk
+path_look = bloodsucker_2_wait_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info2 = {=dist_to_actor_le(3)} mob_home@actor2 %+zat_b38_fight_started%
+on_info3 = {+zat_b38_attacker_wake_2} mob_home@actor1
+on_info4 = {+zat_b38_stalker_cop_see_bloodsucker_2} mob_home@angry2
+on_actor_in_zone = zat_b38 | %+zat_b38_stalker_cop_see_bloodsucker_2 =hit_npc_from_actor%
+out_restr = zat_b38_vnz_out_restr
+
+[mob_home@actor2]
+path_home = bloodsucker_2_wait_walk
+aggressive = true
+on_info = {-zat_b38_fight_started} %+zat_b38_fight_started%
+combat_ignore_cond = {=check_enemy_name(zat_b38_stalker_cop) =actor_in_zone(zat_b38_vnz_out_restr)} true
+home_min_radius = 30
+home_max_radius = 40
+out_restr = zat_b38_vnz_out_restr
+
+[mob_home@angry2]
+path_home = bloodsucker_2_home
+aggressive = true
+combat_ignore_cond = {=check_enemy_name(zat_b38_stalker_cop) =actor_in_zone(zat_b38_vnz_out_restr)} true
+out_restr = zat_b38_vnz_out_restr
+on_info = {-zat_b38_fight_started} %+zat_b38_fight_started%

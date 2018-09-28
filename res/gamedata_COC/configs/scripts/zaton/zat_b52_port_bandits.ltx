@@ -1,0 +1,213 @@
+[hit@def]
+on_info = walker@fight %+zat_b52_robbery_no%
+;-------------------------------------Лидер братвы--------------------------------------------
+
+[logic@port_bandit_1_leader]
+active = walker@wait
+suitable = {=npc_community(bandit)} true, false
+prior = 100
+on_death = death
+post_combat_time = 0, 0
+on_hit = hit@def
+
+[walker@wait] ;Ждем игрока
+path_walk = port_bandit_1_walk_1
+path_look = port_bandit_1_look_1
+def_state_moving1 = walk
+def_state_moving2 = rush
+on_info = {=actor_enemy =dist_to_actor_le(20) -zat_b52_robbery_done} remark@tell_actor
+combat_ignore_cond = {=actor_enemy} true
+meet = no_meet
+
+
+[remark@tell_actor] ;Видим игрока
+target = story | actor
+anim = hello_wpn
+meet = no_meet
+on_info = %=play_sound(zat_b52_port_bandits_see_actor)% remark@wait_actor
+combat_ignore_cond = {=actor_enemy} true
+on_info2 = {=dist_to_actor_ge(40)} walker@wait
+
+
+[remark@wait_actor] ;Ждем игрока
+target = story | actor
+anim = wait_na
+meet = no_meet
+on_info = {=actor_enemy =dist_to_actor_le(5)} walker@robbery %+zat_b52_robbery_start%
+on_info2 = {=dist_to_actor_ge(40)} walker@wait 
+combat_ignore_cond = {=actor_enemy} true
+
+
+[walker@robbery] ;Просим игрока отдать оружие
+path_walk = port_bandit_1_walk_1
+path_look = port_bandit_1_look_1
+meet = meet@robbery
+on_info = {+zat_b52_robbery_done} remark@guard_first_sound
+on_info2 = {+zat_b52_robbery_no} walker@fight %=set_squad_enemy_to_actor(zat_b52_port_bandits) =play_sound(zat_b52_port_bandits_kill_actor_snd)%
+combat_ignore_cond = {=actor_enemy} true
+
+
+[meet@robbery] ;Просим игрока отдать оружие
+close_victim 	= actor
+far_victim 	    = actor
+close_distance 	= 6
+far_distance 	= 10
+far_anim 		= nil
+close_anim 		= nil
+use = {=has_enemy} false, {=actor_enemy} self, false
+allow_break = false
+trade_enable = false
+meet_dialog = {=actor_enemy} zat_b52_robbery_port_bandits_1
+
+[walker@fight] ;Игрок сопротивляется
+path_walk = port_bandit_1_walk_1
+path_look = port_bandit_1_look_1
+combat_ignore_cond = false
+meet = no_meet
+
+[remark@guard_first_sound] ;Проганяем игрока раз
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+meet = no_meet
+on_info = %=play_sound(zat_b52_port_bandits_after_pay_snd)%
+on_signal = sound_end | remark@guard_second_sound_wait
+combat_ignore_cond = {=actor_enemy} true
+
+
+[remark@guard_second_sound_wait] ;Проганяем игрока раз ждем
+target = story | actor
+anim = backoff
+snd_anim_sync = true
+meet = no_meet
+on_info = {=actor_in_zone(zat_b52_smart_terrain_def)} remark@guard_second_sound
+combat_ignore_cond = {=actor_enemy} true
+
+
+[remark@guard_second_sound] ;Проганяем игрока два
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+meet = no_meet
+on_info = %=play_sound(zat_b52_port_bandits_after_pay_snd)%
+on_signal = sound_end | remark@guard_last_sound_wait
+combat_ignore_cond = {=actor_enemy} true
+
+
+[remark@guard_last_sound_wait] ;Проганяем игрока два ждем
+target = story | actor
+anim = backoff
+snd_anim_sync = true
+meet = no_meet
+on_info = {=actor_in_zone(zat_b52_smart_terrain_def)} remark@guard_last_sound
+combat_ignore_cond = {=actor_enemy} true
+
+
+[remark@guard_last_sound] ;Проганяем игрока три
+target = story | actor
+anim = backoff2
+snd_anim_sync = true
+meet = no_meet
+on_info = %=play_sound(zat_b52_port_bandits_after_pay_snd)%
+on_signal = sound_end | remark@end
+combat_ignore_cond = {=actor_enemy} true
+
+
+[remark@end] ;Игрок надоел - стреляем по нему
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+meet = no_meet
+on_game_timer = 50 | walker@fight %=set_squad_enemy_to_actor(zat_b52_port_bandits)% 
+
+
+[death]
+on_info = %+zat_b52_bandit_leader_is_dead%
+
+;-------------------------------------Браток раз--------------------------------------------
+
+[logic@port_bandit_2]
+active = walker@wait_bandit_2
+suitable = true
+prior = 90
+post_combat_time = 0, 0
+
+[walker@wait_bandit_2] ;Ждем игрока
+path_walk = port_bandit_2_walk_1
+path_look = port_bandit_2_look_1
+on_info = {-zat_b52_robbery_no +zat_b52_robbery_start -zat_b52_robbery_done} remark@wait_bandit_2_robbery
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true
+meet = no_meet
+
+[remark@wait_bandit_2_robbery] ;Наводим ствол на игрока
+target = story | actor
+anim = threat_na
+meet = no_meet
+on_info2 = {+zat_b52_robbery_no} walker@wait_bandit_2
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true
+
+;-------------------------------------Браток дыва--------------------------------------------
+
+[logic@port_bandit_3]
+active = walker@wait_bandit_3
+suitable = true
+prior = 90
+post_combat_time = 0, 0
+
+[walker@wait_bandit_3] ;Ждем игрока
+path_walk = port_bandit_3_walk_1
+path_look = port_bandit_3_look_1
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true
+on_info = {-zat_b52_robbery_no +zat_b52_robbery_start -zat_b52_robbery_done} remark@wait_bandit_3_robbery
+meet = no_meet
+
+[remark@wait_bandit_3_robbery] ;Наводим ствол на игрока
+target = story | actor
+anim = threat_na
+meet = no_meet
+on_info2 = {+zat_b52_robbery_no} walker@wait_bandit_3
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true
+
+;-------------------------------------Браток тыри--------------------------------------------
+
+[logic@port_bandit_4]
+active = walker@wait_bandit_4
+suitable = true
+prior = 90
+post_combat_time = 0, 0
+
+[walker@wait_bandit_4] ;Ждем игрока
+path_walk = port_bandit_4_walk_1
+path_look = port_bandit_4_look_1
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true
+on_info = {-zat_b52_robbery_no +zat_b52_robbery_start -zat_b52_robbery_done} remark@wait_bandit_4_robbery
+meet = no_meet
+
+[remark@wait_bandit_4_robbery] ;Наводим ствол на игрока
+target = story | actor
+anim = threat_na
+meet = no_meet
+on_info2 = {+zat_b52_robbery_no} walker@wait_bandit_4
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true
+
+;-------------------------------------Браток четыри--------------------------------------------
+
+[logic@port_bandit_5]
+active = walker@wait_bandit_5
+suitable = true
+prior = 90
+post_combat_time = 0, 0
+
+[walker@wait_bandit_5] ;Ждем игрока
+path_walk = port_bandit_5_walk_1
+path_look = port_bandit_5_look_1
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true
+on_info = {-zat_b52_robbery_no +zat_b52_robbery_start -zat_b52_robbery_done} remark@wait_bandit_5_robbery
+meet = no_meet
+
+[remark@wait_bandit_5_robbery] ;Наводим ствол на игрока
+target = story | actor
+anim = threat_na
+meet = no_meet
+on_info2 = {+zat_b52_robbery_no} walker@wait_bandit_5
+combat_ignore_cond = {+zat_b52_robbery_no} false, {=actor_enemy =npc_community(bandit)} true

@@ -1,0 +1,126 @@
+[logic]
+;active = ph_idle@wait
+active = ph_idle@default
+
+;[ph_idle@wait]
+;on_info = {=actor_in_zone(bar_bar_entry_zone)} ph_idle@start_propaganda
+;on_info2 = {=actor_has_weapon} ph_idle@warn
+;on_info3 = {=check_smart_alarm_status(bar_dolg_bunker)} ph_idle@alarm
+;on_info4 = {=check_smart_alarm_status(bar_dolg_general)} ph_idle@alarm
+;on_info5 = {=check_smart_alarm_status(bar_visitors)} ph_idle@alarm
+;on_info6 = {=check_smart_alarm_status(bar_zastava)} ph_idle@alarm
+;on_info7 = {=check_smart_alarm_status(bar_zastava_2)} ph_idle@alarm
+;on_info8 = {+bar_arena_start} ph_idle@idle
+ 
+;[ph_idle@start_propaganda]
+;on_info = %=play_sound(bar_dolg_speech)%
+;on_info2 = {=actor_has_weapon} ph_idle@warn
+;on_info3 = {=check_smart_alarm_status(bar_dolg_bunker)} ph_idle@alarm
+;on_info4 = {=check_smart_alarm_status(bar_dolg_general)} ph_idle@alarm
+;on_info5 = {=check_smart_alarm_status(bar_visitors)} ph_idle@alarm
+;on_info6 = {=check_smart_alarm_status(bar_zastava)} ph_idle@alarm
+;on_info7 = {=check_smart_alarm_status(bar_zastava_2)} ph_idle@alarm
+;on_info8 = {+bar_arena_start} ph_idle@idle
+
+;[ph_idle@warn]
+;on_info = %=play_sound(bar_dolg_warn)%
+;on_timer = 5000 | ph_idle@wait
+;on_info2 = {!actor_has_weapon} ph_idle@wait
+;on_info3 = {+bar_arena_start} ph_idle@idle
+
+;[ph_idle@kill]
+;on_info = %=play_sound(dolg_megafon_kill)%
+;on_timer = 5000 | ph_idle@wait
+
+;[ph_idle@alarm]
+;on_info = %=play_sound(bar_dolg_alarm)%
+;on_timer = 5000 | ph_idle@wait
+;on_info2 = {!check_smart_alarm_status(bar_dolg_bunker)} ph_idle@wait
+;on_info3 = {!check_smart_alarm_status(bar_dolg_general)} ph_idle@wait
+;on_info4 = {!check_smart_alarm_status(bar_visitors)} ph_idle@wait
+;on_info5 = {!check_smart_alarm_status(bar_zastava)} ph_idle@wait
+;on_info6 = {!check_smart_alarm_status(bar_zastava_2)} ph_idle@wait
+;on_info7 = {+bar_arena_start} ph_idle@idle
+
+
+;BAR from build2571 
+[ph_idle@default]
+on_info = %=play_sound(bar_dolg_speech)%
+on_info2 = {+bar_arena_start} ph_idle@idle %=stop_sound%, {+bar_territory_nodolg_1_hit -bar_dolg_territory_1_hit_notify} ph_idle@1_hit %=stop_sound%, {+bar_territory_nodolg_2_hit -bar_dolg_territory_2_hit_notify} ph_idle@2_hit %=stop_sound%, {+bar_territory_nodolg_kill -bar_dolg_territory_kill_notify} ph_idle@kill %=stop_sound%, {=check_smart_alarm_status(bar_dolg_general)} ph_idle@alarm %=stop_sound%, {=check_smart_alarm_status(bar_dolg_bunker)} ph_idle@alarm %=stop_sound%
+
+[ph_idle@1_hit]
+on_info = %=play_sound(dolg_megafon_1_hit)%
+on_timer = 15000 | ph_idle@default %+bar_dolg_territory_1_hit_notify =stop_sound%
+on_info2 = {+bar_territory_nodolg_2_hit -bar_dolg_territory_2_hit_notify} ph_idle@2_hit, {+bar_territory_nodolg_kill -bar_dolg_territory_kill_notify} ph_idle@kill
+
+[ph_idle@2_hit]
+on_info = %=play_sound(dolg_megafon_2_hit)%
+on_timer = 15000 | ph_idle@default %+bar_dolg_territory_2_hit_notify +bar_dolg_territory_1_hit_notify =stop_sound%
+on_info2 = {+bar_territory_nodolg_kill -bar_dolg_territory_kill_notify} ph_idle@kill
+
+[ph_idle@kill]
+on_info = %=play_sound(dolg_megafon_kill)%
+on_timer = 15000 | ph_idle@default %+bar_dolg_territory_kill_notify +bar_dolg_territory_1_hit_notify +bar_dolg_territory_2_hit_notify =stop_sound%
+
+[ph_idle@alarm]
+on_info = %=play_sound(bar_dolg_alarm)%
+on_info2 = {!check_smart_alarm_status(bar_dolg_general)} ph_idle@default %=stop_sound%
+on_info3 = {!check_smart_alarm_status(bar_dolg_bunker)} ph_idle@default %=stop_sound%
+
+
+
+[ph_idle@idle]
+on_info ={+bar_arena_start_introduce +bar_arena_actor_afraid} ph_idle@actor_afraid, {+bar_arena_start_introduce +bar_arena_pseudodog_choosen} ph_idle@introduce_pseudodog, {+bar_arena_start_introduce +bar_arena_snork_choosen} ph_idle@introduce_snork, {+bar_arena_start_introduce +bar_arena_bloodsucker_choosen} ph_idle@introduce_bloodsucker, {+bar_arena_start_introduce +bar_arena_burer_choosen} ph_idle@introduce_burer, {+bar_arena_start_introduce +bar_arena_savage_choosen} ph_idle@introduce_savage
+
+[ph_idle@actor_afraid]
+on_info = %=play_sound(arena_actor_afraid)%
+on_signal = sound_end| ph_idle@idle %-bar_arena_start_introduce +bar_old_arena_reset -bar_arena_start -bar_arena_1000_r -bar_arena_2000_r -bar_arena_3000_r -bar_arena_5000_r -bar_arena_20_p -bar_arena_50_p -bar_arena_100_p -bar_arena_fight_10 -bar_arena_fight_20 -bar_arena_fight_30 -bar_arena_fight_40 -bar_arena_fight_50 -bar_arena_fight_60 -bar_arena_fight_70 -bar_arena_fight_80 -bar_arena_fight_90	-bar_arena_start_introduce -bar_arena_spawn_monstr -bar_arena_monstr_ready -bar_arena_monstr_dead -bar_arena_actor_victory -bar_arena_actor_lose -bar_arena_actor_afraid -bar_arena_actor_dead -bar_arena_pseudodog_choosen -bar_arena_snork_choosen -bar_arena_bloodsucker_choosen -bar_arena_burer_choosen -bar_arena_savage_choosen%
+	
+[ph_idle@introduce_pseudodog]
+on_info = %=play_sound(arena_introduce_pseudodog)%
+on_signal = sound_end| ph_idle@fight %-bar_arena_start_introduce%
+;on_timer = 24000 | ph_idle@fight %-bar_arena_start_introduce%
+
+[ph_idle@introduce_snork]
+on_info = %=play_sound(arena_introduce_snork)%
+on_signal = sound_end| ph_idle@fight %-bar_arena_start_introduce%
+;on_timer = 30000 | ph_idle@fight %-bar_arena_start_introduce%
+
+[ph_idle@introduce_bloodsucker]
+on_info = %=play_sound(arena_introduce_bloodsucker)%
+on_signal = sound_end| ph_idle@fight %-bar_arena_start_introduce%
+;on_timer = 30000 | ph_idle@fight %-bar_arena_start_introduce%
+
+[ph_idle@introduce_burer]
+on_info = %=play_sound(arena_introduce_burer)%
+on_signal = sound_end| ph_idle@fight %-bar_arena_start_introduce%
+;on_timer = 52000 | ph_idle@fight %-bar_arena_start_introduce%
+
+[ph_idle@introduce_savage]
+on_info = %=play_sound(arena_introduce_savage)%
+on_signal = sound_end| ph_idle@fight %-bar_arena_start_introduce%
+;on_timer = 34000 | ph_idle@fight %-bar_arena_start_introduce%
+
+[ph_idle@fight]
+on_info = {-bar_arena_start} ph_idle@default, {+bar_arena_actor_victory +bar_arena_20_p +bar_arena_start_introduce} ph_idle@victory, {+bar_arena_actor_victory +bar_arena_start_introduce} ph_idle@victory, {+bar_arena_actor_lose +bar_arena_start_introduce} ph_idle@lose, {+bar_arena_actor_dead +bar_arena_start_introduce} ph_idle@death,  {+bar_arena_monstr_ready +bar_arena_start_introduce} ph_idle@fight_begin
+
+
+[ph_idle@fight_begin]
+on_info = %=play_sound(arena_fight_begin)%
+on_signal = sound_end| ph_idle@fight %-bar_arena_start_introduce%
+
+[ph_idle@victory]
+on_info = %=play_sound(arena_fight_victory)%
+on_signal = sound_end| ph_idle@default %-bar_arena_start_introduce%
+
+[ph_idle@victory_notime]
+on_info = %=play_sound(arena_fight_victory_notime)%
+on_signal = sound_end| ph_idle@default %-bar_arena_start_introduce%
+
+[ph_idle@lose]
+on_info = %=play_sound(arena_fight_lose)%
+on_signal = sound_end| ph_idle@default %-bar_arena_start_introduce%
+
+[ph_idle@death]
+on_info = %=play_sound(arena_fight_death)%
+on_signal = sound_end| ph_idle@default %-bar_arena_start_introduce%

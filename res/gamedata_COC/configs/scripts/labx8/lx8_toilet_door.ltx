@@ -1,0 +1,87 @@
+[logic]
+;active = ph_door@close
+active = ph_door@close_3
+
+[ph_door@close]
+locked = false
+closed = true
+snd_open_start = metal_small_open ;trader_door_open_start
+snd_close_start = metal_small_close_start ;trader_door_close_start
+snd_close_stop = metal_small_close_stop ;trader_door_close_stop
+on_use = ph_door@open %+lx8_toilet_door_open%    ;{-lx8_toilet_door_open} ph_door@open ,
+on_info = {+lx8_toilet_burer_dead} ph_door@free
+on_info2 = {+pri_a19_lab_x16_info} ph_door@open_2
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = metal_small_open ;trader_door_open_start
+snd_close_start = metal_small_close_start ;trader_door_close_start
+snd_close_stop = metal_small_close_stop ;trader_door_close_stop
+;on_use = ph_door@free 
+on_info = {+lx8_toilet_door_close} ph_door@locked
+on_info2 = {+lx8_toilet_burer_dead} ph_door@free
+on_info3 = {+pri_a19_lab_x16_info} ph_door@open_2
+
+[ph_door@locked]
+locked = true
+closed = true
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+;on_use = ph_door@open
+hit_on_bone = 4 | ph_door@open_2 %+lx8_toilet_door_open_again% | 2 | ph_door@open_2 %+lx8_toilet_door_open_again%
+on_info = {+lx8_toilet_burer_dead} ph_door@free
+on_info2 = {+pri_a19_lab_x16_info} ph_door@open_2
+
+[ph_door@open_2]
+locked = false
+closed = false
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = {+lx8_toilet_burer_dead} ph_door@close_2
+on_info = {-lx8_toilet_door_open_again} %+lx8_toilet_door_open_again%
+
+[ph_door@close_2]
+locked = false
+closed = true
+snd_open_start = metal_small_open ;trader_door_open_start
+snd_close_start = metal_small_close_start ;trader_door_close_start
+snd_close_stop = metal_small_close_stop ;trader_door_close_stop
+;on_use = ph_door@open_2
+on_use = ph_door@free
+
+[ph_door@free]
+locked = false
+closed = false
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+no_force = true
+;on_use = ph_door@open_2
+on_use = ph_door@close_2
+
+[ph_door@close_3]
+locked = false
+closed = true
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@open_3
+hit_on_bone = 1|ph_door@free_3|2|ph_door@free_3
+
+[ph_door@open_3]
+locked = false
+closed = false
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@close_3
+hit_on_bone = 1|ph_door@free_3|2|ph_door@free_3
+
+[ph_door@free_3]
+locked = false
+closed = true
+no_force = true
+on_use = ph_door@open_3

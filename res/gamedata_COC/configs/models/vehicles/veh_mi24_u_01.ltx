@@ -1,0 +1,81 @@
+[helicopter_definition]
+default_hit_factor  = 0.01             ; default hit factor (0..1)
+hit_section         = hit_bones        ; hit section name
+wpn_rotate_x_bone   = front_gun        ; rotate X-axis(pitch) bone name
+wpn_rotate_y_bone   = front_gun_tower  ; rotate Y-axis(head)  bone name
+wpn_fire_bone       = front_gun_fire   ; weapon axis (fire)   bone name
+left_rocket_bone    = left_gun         ;
+left_rocket2_bone   = left_gun2        ;
+right_rocket_bone   = right_gun        ;
+right_rocket2_bone  = right_gun2       ;
+smoke_bone          = front_propeller
+light_bone          = front_propeller
+
+[hit_bones]                            ; per bones hit factor
+pilot1              = 0.00015
+pilot2              = 0.00015
+back_propeller		= 0.00015
+
+
+[on_death_mode]
+scale_bone = front_propeller2,back_propeller2
+
+;-------------------------------------------------------------------------------
+;------ destroyed part ---------------------------------------------------------
+
+[destroyed]
+dynamics\vehicles\mi24\part\veh_mi24_part1
+dynamics\vehicles\mi24\part\veh_mi24_part2
+dynamics\vehicles\mi24\part\veh_mi24_part3
+dynamics\vehicles\mi24\part\veh_mi24_part4
+dynamics\vehicles\mi24\part\veh_mi24_part5
+dynamics\vehicles\mi24\part\veh_mi24_part6
+dynamics\vehicles\mi24\part\veh_mi24_part7
+dynamics\vehicles\mi24\part\veh_mi24_part8
+dynamics\vehicles\mi24\part\veh_mi24_part9
+dynamics\vehicles\mi24\part\veh_mi24_part10
+
+[autoremove_parts]
+time					 = 60
+
+;-------------------------------------------------------------------------------
+;--- part impulse_transition ---------------------------------------------------
+
+[impulse_transition_to_parts]
+random_min               = 20.0    ; величина случайно направленного импульса пропорционально массе нового объекта
+random_hit_imp           = 30.0     ; величина случайно направленного импульса пропорционально разрушающему хиту
+;ref_bone                 =         ; кость из по которой определяется скорость для частей у который связь не задана, по умолчанию рут
+imp_transition_factor    = 1.0     ; фактор с которым прикладывается хит по исходному объекту ко всем частям 
+lv_transition_factor     = 2.0     ; коэффициент передачи линейной скорости
+av_transition_factor     = 2.0     ; коэффициент передачи угловой скорости
+
+;-------------------------------------------------------------------------------
+[explosion]
+blast					= 2
+blast_r					= 15
+blast_impulse			= 350
+frags		        	= 15
+frags_r					= 30
+frag_hit				= 0.8
+frag_hit_impulse		= 320
+hit_type_blast			= explosion
+hit_type_frag			= fire_wound
+up_throw_factor			= 0.25
+wm_size             	= 0.1
+explode_particles		= explosions\expl_mushroom_01
+light_color				= 0.6,0.5,0.3
+light_range				= 15.0
+light_time 				= 0.5
+
+;трассы от осколков
+fragment_speed				= 76
+fragment_tracer_max_length	= 3
+explode_duration    		= 50			;подолжительность взрыва (с)
+
+;звуки
+snd_explode 			= weapons\heli_explosion
+;wallmarks
+wallmark_section		= explosion_marks
+
+[explode_effector]
+effect_sect_name= effector_explode_hit

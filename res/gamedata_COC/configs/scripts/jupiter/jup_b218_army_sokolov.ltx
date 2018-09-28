@@ -1,0 +1,41 @@
+[logic@jup_b218_army_sokolov]
+suitable = {=check_npc_name(pri_a15_sokolov)} true
+active = animpoint@stand
+prior = 200
+
+[walker]
+path_walk = pri_a15_sokolov_walk
+path_look = pri_a15_sokolov_look
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_b41_sr_light
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@stand]
+cover_name = jup_b41_animp_sokolov
+use_camp = false
+meet = meet
+on_info = {!npc_in_zone(jup_b41_sr_light)} %=teleport_npc(jup_b41_pri_a15_sokolov_walk)%
+out_restr = jup_b41_sr_light
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable    = false
+meet_on_talking = false

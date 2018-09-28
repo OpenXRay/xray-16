@@ -1,0 +1,29 @@
+[logic@sniper]
+active = camper@start
+suitable = {=check_npc_name(pri_b36_monolith_sniper) -pri_b36_sniper_dead} true
+prior = 200
+on_death = death
+
+[camper@start]
+path_walk = pri_b36_sniper_1_walk
+path_look = pri_b36_sniper_1_look
+out_restr = pri_b36_sniper_out_restr
+radius = 25
+on_info = {=dist_to_actor_le(100) =is_enemy_actor =see_actor -pri_b36_ahtung} %+pri_b36_ahtung%
+on_info2 = {=health_le(0.9) !actor_enemy} %=restore_health%
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false
+
+[death]
+on_info = %+pri_b36_sniper_dead%

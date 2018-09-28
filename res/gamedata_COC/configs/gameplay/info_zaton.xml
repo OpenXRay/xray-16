@@ -1,0 +1,542 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+   <info_portion id="zat_b14_recon_place"></info_portion>
+   <info_portion id="zat_b14_take_item"></info_portion>
+   <info_portion id="zat_b14_give_item_linker"></info_portion>
+   <info_portion id="zat_b14_give_item_stalker"></info_portion>
+   <info_portion id="zat_b14_not_give_item_stalker"></info_portion>
+   <info_portion id="zat_b14_not_give_item_linker"></info_portion>
+   <info_portion id="zat_b14_dialog_done"></info_portion>
+   <info_portion id="zat_b14_stalker_robbery"></info_portion>
+   <info_portion id="zat_b14_strange_item"></info_portion>
+   <info_portion id="zat_a2_linker_b14_quest_strange_item_lost_artefact"></info_portion>
+   <info_portion id="zat_a2_linker_b14_quest_strange_item_done"></info_portion>
+   <info_portion id="zat_a2_linker_b14_quest_wrong_done"></info_portion>
+   <info_portion id="zat_b14_stalker_at_bar_start_done"></info_portion>
+   <info_portion id="zat_b14_stalker_cut_scene_ready"></info_portion>
+   <info_portion id="zat_b14_cut_scene_1_start"></info_portion>
+   <info_portion id="zat_b14_cut_scene_1_point_01"></info_portion>
+   <info_portion id="zat_b14_cut_scene_1_point_02"></info_portion>
+   <info_portion id="zat_b14_cut_scene_1_point_03"></info_portion>
+   <info_portion id="zat_b14_cut_scene_end"></info_portion>
+   <info_portion id="zat_b14_cut_scene_stalker_transfer_artefact"></info_portion>
+   <info_portion id="zat_b14_cut_scene_linker_have_artefact"></info_portion>
+   <info_portion id="zat_b14_cut_scene_stalker_not_have_artefact"></info_portion>
+   <info_portion id="zat_b14_dialog_last_chance_done"></info_portion>
+   <info_portion id="zat_b14_ui_disable"></info_portion>
+   <info_portion id="zat_b14_ui_enable"></info_portion>
+   <info_portion id="zat_b14_spawn_friends_stalker"></info_portion>
+   <info_portion id="zat_b14_door_1_unlock"></info_portion>
+   <info_portion id="zat_b14_robbery_nowpn_actor"></info_portion>
+   <info_portion id="zat_b14_robbery_give_artefact"></info_portion>
+   <info_portion id="zat_b14_robbery_not_give_artefact"></info_portion>
+   <info_portion id="zat_b14_stalker_robbery_cutscene_start"></info_portion>
+   <info_portion id="zat_b14_stalker_robbery_cutscene_end"></info_portion>
+   <info_portion id="zat_b14_actor_know_about_svyaznoy"></info_portion>
+   <info_portion id="zat_b14_smart_terrain_open"></info_portion>
+   <info_portion id="zat_b14_actor_in_up_point_zone"></info_portion>
+   <info_portion id="zat_a2_stalker_barmen_hit_from_actor"></info_portion>
+   <info_portion id="zat_b14_actor_enemy"></info_portion>
+   <info_portion id="zat_b14_stalker_work_end"></info_portion>
+   <info_portion id="zat_b14_stalker_change_smart"></info_portion>
+   <info_portion id="zat_b14_robbery_punch_play_sound"></info_portion>
+   <info_portion id="zat_b14_learn_about_strange_occurrence_give_task"></info_portion>
+   <info_portion id="zat_b14_learn_about_strange_occurrence_by_stalkers_give_task"></info_portion>
+   <info_portion id="zat_b14_general_stalker_spawn"></info_portion>
+   <info_portion id="zat_b14_bad_stalker_1_2_spawn"></info_portion>
+   <info_portion id="zat_b14_stalkers_bandits_free"></info_portion>
+
+<!-- B38 -->
+
+   <info_portion id="zat_b38_actor_know_about_lair"></info_portion>
+
+
+   <info_portion id="zat_b38_bloodsucker_1_set_state"></info_portion>
+   <info_portion id="zat_b38_bloodsucker_2_set_state"></info_portion>
+
+<!-- Doors infos and sounds -->
+   <info_portion id="zat_b38_lift_open"></info_portion>
+   <info_portion id="zat_b38_underground_door_open"></info_portion>
+   <info_portion id="zat_b38_lock_sound_play"></info_portion>
+   <info_portion id="zat_b38_lock_sound_stop"></info_portion>
+   <info_portion id="zat_b38_bloodsucker_fear_1_play"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_find_lair_pda_play"></info_portion>
+
+<!-- Dialogs infos -->
+   <info_portion id="zat_b38_stalkers_den_of_the_bloodsucker_universal_dialog_done"></info_portion>
+   <info_portion id="zat_b38_stalker_medic_bloodsucker_dialog_done"></info_portion>
+
+<!-- Spawner infos -->
+
+   <info_portion id="zat_b38_spawn_all"></info_portion>
+   <info_portion id="zat_b38_spawn_npc_cop_again"></info_portion>
+   <info_portion id="zat_b38_spawn_npc_cop_again2"></info_portion>
+   <info_portion id="zat_b38_cop_spawn_again"></info_portion>
+   <info_portion id="zat_b38_cop_spawn_again2"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_destroy"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_destroy2"></info_portion>
+   <info_portion id="zat_b38_bloodsucker_1_angry"></info_portion>
+   <info_portion id="zat_b38_bloodsucker_2_angry"></info_portion>
+
+<!-- Tasks infos -->
+   <info_portion id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_meet_ment_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_jump_down_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_check_basement_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_meet_cop_later_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_meet_cop_next_day_give"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_complete"></info_portion>
+   <info_portion id="zat_b38_den_of_the_bloodsucker_complete"></info_portion>
+   <info_portion id="zat_b38_den_of_the_bloodsucker_inform_stalkers_give"></info_portion>
+   <info_portion id="zat_b38_den_of_the_bloodsucker_tell_barman_about_all_give"></info_portion>
+
+<!-- Other infos -->
+   <info_portion id="zat_b38_stalker_cop_fear_1"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_fear_2"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_death"></info_portion>
+   <info_portion id="zat_b38_bloodscuker_1_hit"></info_portion>
+   <info_portion id="zat_b38_bloodscuker_1_death"></info_portion>
+   <info_portion id="zat_b38_bloodscuker_2_hit"></info_portion>
+   <info_portion id="zat_b38_bloodscuker_2_death"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_cave_end"></info_portion>
+   <info_portion id="zat_b38_show_spot_dead_body"></info_portion>
+
+   <info_portion id="zat_b38_bloodscukers_sleepers_stand_up"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give_task"></info_portion>
+   <info_portion id="zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_fail"></info_portion>
+   <info_portion id="zat_b38_disappearance_stalkers_reversed"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_come_here_2_play"></info_portion>
+   <info_portion id="zat_b38_cop_hit_from_actor"></info_portion>
+   <info_portion id="zat_b38_stalker_cop_task_dialog_done"></info_portion>
+   <info_portion id="zat_b38_cop_about_lair_dialog_done"></info_portion>
+
+<!-- B57 -->
+
+<!-- Tasks infos -->
+
+   <info_portion id="zat_b57_den_of_the_bloodsucker_search_gas_give"></info_portion>
+   <info_portion id="zat_b57_den_of_the_bloodsucker_destroy_lair_give"></info_portion>
+   <info_portion id="zat_b57_den_of_the_bloodsucker_talk_shystriy"></info_portion>
+   <info_portion id="zat_b57_den_of_the_bloodsucker_place_gas_give"></info_portion>
+   <info_portion id="zat_b57_den_of_the_bloodsucker_twist_vintil_give"></info_portion>
+   <info_portion id="zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give"></info_portion>
+   <info_portion id="zat_b57_den_of_the_bloodsucker_spawn_gas"></info_portion>
+   <info_portion id="zat_b30_owl_stalker_trader_more_documets_done"></info_portion>
+
+<!-- Dialogs infos -->
+   <info_portion id="zat_b57_barmen_about_bloodsucker_lair_dialog_done"></info_portion>
+   <info_portion id="zat_b57_nimble_reward_dialog_done"></info_portion>
+   <info_portion id="zat_b57_nimble_talk_about_gas"></info_portion>
+   <info_portion id="zat_b57_generic_dialog_done"></info_portion>
+
+<!-- Spawner infos -->
+   <info_portion id="zat_b57_bloodsucker_spawn"></info_portion>
+   <info_portion id="zat_b57_set_bloodsucker_state"></info_portion>
+
+<!-- Sounds infos -->
+   <info_portion id="zat_b57_gas_running_play"></info_portion>
+   <info_portion id="zat_b57_roar_play"></info_portion>
+   <info_portion id="zat_b57_gas_running_stop"></info_portion>
+
+   <info_portion id="zat_b57_balon_use"></info_portion>
+   <info_portion id="zat_b57_set_bloodsucker_attacker_1_state"></info_portion>
+   <info_portion id="zat_b57_set_bloodsucker_attacker_2_state"></info_portion>
+   <info_portion id="zat_b57_set_bloodsucker_attacker_3_state"></info_portion>
+
+	<!--B5-->
+	<info_portion id="zat_b5_bandit_hit"></info_portion>
+	<info_portion id="zat_b5_stalker_hit"></info_portion>
+	<info_portion id="zat_b5_start"></info_portion>
+	<info_portion id="zat_b5_actor_with_stalkers"></info_portion>
+	<info_portion id="zat_b5_actor_with_bandits"></info_portion> 
+	<info_portion id="zat_b5_actor_with_dealer"></info_portion>
+	<info_portion id="zat_b5_actor_help_stalkers"></info_portion>
+	<info_portion id="zat_b5_actor_help_bandits"></info_portion>
+	<info_portion id="zat_b5_actor_help_dealer"></info_portion>
+	<info_portion id="zat_b7_actor_now_duty_illicit_dealer"></info_portion>
+	<info_portion id="zat_b5_sultan_close_by_trader"></info_portion>
+	<info_portion id="zat_b5_actor_bandit_go_to_trader"></info_portion>
+	<info_portion id="zat_b5_dealer_speak_1_done"></info_portion>
+	<info_portion id="zat_b5_dealer_speak_2_done"></info_portion>
+	<info_portion id="zat_b5_bandit_speak_1_done"></info_portion>
+	<info_portion id="zat_b5_come_to_stalkers"></info_portion>
+	<info_portion id="zat_b5_actor_together_dealer"></info_portion>
+	<info_portion id="zat_b5_actor_go_to_trader"></info_portion>
+	<info_portion id="zat_b5_meat"></info_portion>
+	<info_portion id="zat_b5_bandits_death"></info_portion>
+	<info_portion id="zat_b5_stalker_death"></info_portion>
+	<info_portion id="zat_b5_protect_dealer_done"></info_portion>
+	<info_portion id="zat_b5_sultan_dead"></info_portion>
+	<info_portion id="zat_b5_cover_dealer_done"></info_portion>
+	<info_portion id="zat_b5_trader_death"></info_portion>
+	<info_portion id="zat_b5_speak_dealer_done"></info_portion>
+	<info_portion id="zat_b5_come_to_bandits_complete"></info_portion>
+	<info_portion id="zat_b5_trader_death_info"></info_portion>	
+	<info_portion id="zat_b5_dealer_full_revard"></info_portion>	
+	<info_portion id="zat_b5_dealer_easy_revard"></info_portion>
+	<info_portion id="zat_b5_actor_stalker_go_to_trader"></info_portion>
+	<info_portion id="zat_b5_bandit_in_fight"></info_portion>
+	<info_portion id="zat_b5_stalker_attack_dealer"></info_portion>
+	<info_portion id="zat_b5_start_quest_stalkers"></info_portion>
+	<info_portion id="zat_b5_come_to_dealer_done"></info_portion>
+	<info_portion id="zat_b5_spawn_enemy"></info_portion>
+	<info_portion id="zat_b5_come_to_bandits_done"></info_portion>
+	<info_portion id="zat_b5_meat_online"></info_portion>
+	<info_portion id="zat_b5_actor_speak_barmen"></info_portion>
+	<info_portion id="zat_b5_actor_speak_linker"></info_portion>
+	<info_portion id="zat_b5_sultan_speak_for_stalkers"></info_portion>
+	<info_portion id="zat_b5_stalkers_death"></info_portion>
+
+    <!-- B22 -->
+   
+    <info_portion id="zat_b38_disappearance_stalkers_meet_cop_24h_past_give"></info_portion>
+    <info_portion id="zat_b38_disappearance_stalkers_find_out_where_is_cop_give"></info_portion>
+    <info_portion id="zat_b38_disappearance_stalkers_find_cop_near_port_krans_give"></info_portion>
+    <info_portion id="zat_b38_disappearance_stalkers_deal_with_medic_give"></info_portion>
+    <info_portion id="zat_b38_disappearance_stalkers_tell_barmen_about_medic_give"></info_portion>
+    <info_portion id="zat_b22_stalker_medic_wounded_heavy"></info_portion>    
+    <info_portion id="zat_b22_stalker_cop_place"></info_portion>
+    <info_portion id="zat_b22_stalker_vampire"></info_portion>  
+    <info_portion id="zat_b22_stalker_vampire_story"></info_portion>  
+    <info_portion id="zat_b22_deal_with_medic_vampire_completed"></info_portion>
+    <info_portion id="zat_b22_deal_with_medic_vampire_reversed"></info_portion>
+    <info_portion id="zat_b22_barmen_gave_reward"></info_portion>
+    <info_portion id="zat_b22_questline_reversed"></info_portion>
+    <info_portion id="zat_b22_stalker_medic_body_searched"></info_portion>
+    <info_portion id="con"></info_portion>
+    <info_portion id="1"></info_portion>
+    <info_portion id="2"></info_portion>
+    <info_portion id="3"></info_portion>
+    <info_portion id="4"></info_portion>
+    <info_portion id="5"></info_portion>
+    <info_portion id="6"></info_portion>
+    <info_portion id="zat_b22_actor_in"></info_portion>
+    <info_portion id="zat_b22_actor_gone"></info_portion>
+    <info_portion id="zat_b22_medic_dialog_info_1"></info_portion>
+    <info_portion id="zat_b22_medic_dialog_info_2"></info_portion>
+    <info_portion id="zat_b22_medic_dialog_info_3"></info_portion>
+
+	<!-- Zaton B7 -->
+
+	<info_portion id="zat_b7_raider_plan"></info_portion>
+	<info_portion id="zat_b7_stalkers_raiders_attack"></info_portion>
+	<info_portion id="zat_b7_stalkers_raiders_attack_started"></info_portion>
+	<info_portion id="zat_b7_stalker_raider_leader_on_position"></info_portion>
+	<info_portion id="zat_b7_stalkers_victims_know_about_raid"></info_portion>
+	<info_portion id="zat_b7_actor_killed_victims_self"></info_portion>
+	<info_portion id="zat_b7_victims_disappeared"></info_portion>
+	<info_portion id="zat_b7_task_end"></info_portion>
+	<info_portion id="zat_b7_stalkers_raiders_reward_given"></info_portion>
+	<info_portion id="zat_b7_stalkers_victims_reward_given"></info_portion>
+	<info_portion id="zat_b7_attack_started"></info_portion>
+	<info_portion id="zat_b7_actor_really_helped_stalkers"></info_portion>
+	<info_portion id="zat_b7_actor_refused_to_be_robbed"></info_portion>
+	<info_portion id="zat_b7_actor_robbed"></info_portion>
+	<info_portion id="zat_b7_stalkers_raiders_meet"></info_portion>
+	<info_portion id="zat_b7_stalkers_victims_prepare"></info_portion>
+	<info_portion id="zat_b7_actor_with_stalkers"></info_portion>
+	<info_portion id="zat_b7_actor_with_bandits"></info_portion> 
+	<info_portion id="zat_b7_actor_help_stalkers"></info_portion>
+	<info_portion id="zat_b7_actor_help_bandits"></info_portion>
+	<info_portion id="zat_b7_actor_really_helped_bandits"></info_portion>
+	<info_portion id="zat_b7_actor_teleport"></info_portion>
+	<info_portion id="zat_b7_stalkers_victims_task_given"></info_portion>
+	<info_portion id="zat_b7_sound_play"></info_portion>
+	<info_portion id="zat_b7_stalker_raider_leader_alive"></info_portion>
+	<info_portion id="zat_b7_stalker_victim_leader_alive"></info_portion>
+	<info_portion id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_told"></info_portion>
+
+    <!-- B103 -->
+    <info_portion id="zat_b103_actor_took_kardan_task"></info_portion>
+    <info_portion id="stalkers_toolkit_dialog"></info_portion>
+    <info_portion id="zat_b103_toolkit_known"></info_portion>
+    <info_portion id="zat_b103_merc_used_actor"></info_portion>
+    <info_portion id="zat_b103_merc_bring_supplies"></info_portion>
+	<info_portion id="zat_a2_toolkit_search"></info_portion>
+	<info_portion id="zat_b103_actor_warned_by_merc"></info_portion>
+	<info_portion id="zat_b103_merc_ammo_got"></info_portion>
+	<info_portion id="zat_b103_merc_medkit_got"></info_portion>
+	<info_portion id="zat_b103_merc_food_got"></info_portion>
+	<info_portion id="zat_b103_merc_supplies_got"></info_portion>
+	<info_portion id="zat_b103_merc_task_done"></info_portion>
+	<info_portion id="zat_b103_actor_take_toolkit"></info_portion>
+	<info_portion id="zat_b103_merc_fight"></info_portion>
+	<info_portion id="zat_b103_merc_about_supplies_mentioned"></info_portion>
+
+   <!-- Zaton B100 -->
+	<info_portion id="zat_b100_poltergeist_spawned_01"></info_portion>
+	<info_portion id="zat_b100_poltergeist_spawned_02"></info_portion>
+	<info_portion id="zat_b100_heli_2_searched"></info_portion>
+	<info_portion id="zat_b100_sound_played"></info_portion>
+	<info_portion id="zat_b100_cameff_played"></info_portion>
+	<info_portion id="zat_b100_heli_2_searching"></info_portion>
+	<info_portion id="zat_b100_poltergeist_dead_01"></info_portion>
+	<info_portion id="zat_b100_poltergeist_dead_02"></info_portion>
+
+   <!-- Zaton B33 -->
+	<info_portion id="zat_b33_actor_is_down"></info_portion>
+	<info_portion id="zat_b33_find_package"></info_portion>
+	<info_portion id="zat_b33_package_returned"></info_portion>
+	<info_portion id="zat_b33_refuse_task"></info_portion>
+	<info_portion id="zat_b33_task_gived"></info_portion>
+	<info_portion id="zat_b33_share_start"></info_portion>
+	<info_portion id="zat_b33_safe_container"></info_portion>
+	<info_portion id="zat_b33_first_item"></info_portion>
+	<info_portion id="zat_b33_second_item"></info_portion>
+	<info_portion id="zat_b33_third_item"></info_portion>
+	<info_portion id="zat_b33_fourth_item"></info_portion>
+	<info_portion id="zat_b33_fifth_item"></info_portion>
+	<info_portion id="zat_b33_snork_jump_05"></info_portion>
+
+	<!-- Zaton B29 -->
+
+	<info_portion id="zat_b29_task_start"></info_portion>
+	<info_portion id="zat_b29_task_fail"></info_portion>
+	<info_portion id="zat_b29_linker_info"></info_portion>
+	<info_portion id="zat_b29_rivals_search"></info_portion>
+	<info_portion id="zat_b29_stalker_rival_1_found_af"></info_portion>
+	<info_portion id="zat_b29_stalker_rival_2_found_af"></info_portion>
+	<info_portion id="zat_b29_stalkers_rivals_found_af"></info_portion>
+	<info_portion id="zat_b29_quest_af_given"></info_portion>
+	<info_portion id="zat_b29_af_16"></info_portion>
+	<info_portion id="zat_b29_af_17"></info_portion>
+	<info_portion id="zat_b29_af_18"></info_portion>
+	<info_portion id="zat_b29_af_19"></info_portion>
+	<info_portion id="zat_b29_af_20"></info_portion>
+	<info_portion id="zat_b29_af_21"></info_portion>
+	<info_portion id="zat_b29_af_22"></info_portion>
+	<info_portion id="zat_b29_af_23"></info_portion>
+	<info_portion id="zat_b29_bring_af_17"></info_portion>
+	<info_portion id="zat_b29_bring_af_18"></info_portion>
+	<info_portion id="zat_b29_bring_af_19"></info_portion>
+	<info_portion id="zat_b29_bring_af_20"></info_portion>
+	<info_portion id="zat_b29_bring_af_21"></info_portion>
+	<info_portion id="zat_b29_bring_af_22"></info_portion>
+	<info_portion id="zat_b29_bring_af_23"></info_portion>
+	<info_portion id="zat_b29_adv_task_given"></info_portion>
+	<info_portion id="zat_b29_redice"></info_portion>
+	<info_portion id="zat_b29_exclusive_conditions"></info_portion>
+	<info_portion id="zat_b29_rival_1_base"></info_portion>
+	<info_portion id="zat_b29_rival_1_1"></info_portion>
+	<info_portion id="zat_b29_rival_1_2"></info_portion>
+	<info_portion id="zat_b29_rival_1_3"></info_portion>
+	<info_portion id="zat_b29_rival_1_4"></info_portion>
+	<info_portion id="zat_b29_rival_1_5"></info_portion>
+	<info_portion id="zat_b29_rival_2_base"></info_portion>
+	<info_portion id="zat_b29_rival_2_1"></info_portion>
+	<info_portion id="zat_b29_rival_2_2"></info_portion>
+	<info_portion id="zat_b29_rival_2_3"></info_portion>
+	<info_portion id="zat_b29_rival_2_4"></info_portion>
+	<info_portion id="zat_b29_rival_2_5"></info_portion>
+	<info_portion id="zat_b29_rival_sound_played"></info_portion>
+	<info_portion id="zat_b29_linker_take_af_from_rival"></info_portion>
+	<info_portion id="zat_b29_adv_task_timeout"></info_portion>
+	<info_portion id="zat_b29_first_rival_taken_out"></info_portion>
+	<info_portion id="zat_b29_second_rival_taken_out"></info_portion>
+	<info_portion id="zat_b29_linker_fears_actor"></info_portion>
+	<info_portion id="zat_b29_respawn"></info_portion>
+
+  <!-- Zaton B18 -->
+	<info_portion id="zat_b18_noah_shot_door"></info_portion>
+	<info_portion id="zat_b18_noah_remembers"></info_portion>
+	<info_portion id="zat_b18_noah_met"></info_portion>
+	<info_portion id="zat_b18_noah_gave_first_artefact"></info_portion>
+	<info_portion id="zat_b18_noah_gave_second_artefact"></info_portion>
+	<info_portion id="zat_b18_noah_breakdown"></info_portion>
+	<info_portion id="zat_b18_noah_told_about_arc"></info_portion>
+	<info_portion id="zat_b18_reset_memory"></info_portion>
+	<info_portion id="zat_b18_noah_dead"></info_portion>
+	<info_portion id="zat_b18_noah_go_away"></info_portion>
+	<info_portion id="zat_b18_noah_about_dog_told"></info_portion>
+	<info_portion id="zat_b18_noah_about_catastrophe_told"></info_portion>
+
+
+<!-- Zaton B52 -->
+	<info_portion id="zat_b52_item_1_a_taken"></info_portion>
+	<info_portion id="zat_b52_item_1_b_taken"></info_portion>
+	<info_portion id="zat_b52_item_1_c_taken"></info_portion>
+	<info_portion id="zat_b52_item_2_a_taken"></info_portion>
+	<info_portion id="zat_b52_item_2_b_taken"></info_portion>
+	<info_portion id="zat_b52_item_2_c_taken"></info_portion>
+	<info_portion id="zat_b52_item_3_a_taken"></info_portion>
+	<info_portion id="zat_b52_item_3_b_taken"></info_portion>
+	<info_portion id="zat_b52_item_3_c_taken"></info_portion>
+	<info_portion id="zat_b52_item_4_a_taken"></info_portion>
+	<info_portion id="zat_b52_item_4_b_taken"></info_portion>
+	<info_portion id="zat_b52_item_4_c_taken"></info_portion>
+	<info_portion id="zat_b52_item_taken"></info_portion>
+	<info_portion id="zat_b52_item_no_taken"></info_portion>
+	<info_portion id="zat_b52_meet_port_bandits"></info_portion>
+	<info_portion id="zat_b52_snag_know_weapon"></info_portion>
+	<info_portion id="zat_b52_nimble_clear"></info_portion>
+	<info_portion id="zat_b52_port_bandits_spawn"></info_portion>
+	<info_portion id="zat_b52_reputation_task_open"></info_portion>
+
+<!-- Tasks infos -->
+	<info_portion id="zat_b52_snag_no_place"></info_portion>
+	<info_portion id="zat_b52_sultan_know_there_snag"></info_portion>
+	<info_portion id="zat_b52_barman_know_there_snag"></info_portion>
+	<info_portion id="zat_b52_snag_port_cranes"></info_portion>
+	<info_portion id="zat_b52_snag_no_port_cranes"></info_portion>
+	<info_portion id="zat_b52_reputation_give"></info_portion>
+	<info_portion id="zat_b52_snag_port_bandits"></info_portion>
+	<info_portion id="zat_b52_snag_jupiter"></info_portion>
+	<info_portion id="zat_b52_actor_has_port_bandits_pda"></info_portion>
+
+<!-- Robbery infos -->
+	<info_portion id="zat_b52_robbery_start"></info_portion>
+	<info_portion id="zat_b52_robbery_yes"></info_portion>
+	<info_portion id="zat_b52_robbery_no"></info_portion>
+	<info_portion id="zat_b52_robbery_done"></info_portion>
+
+	<info_portion id="zat_b52_actor_go_offline"></info_portion>
+
+<!-- Dialogs infos -->
+	<info_portion id="zat_b51_stalker_snag_b52_about_gun_questions_dialog_done"></info_portion>
+	<info_portion id="zat_b51_stalker_nimble_b52_about_gun_questions_dialog_done"></info_portion>
+	<info_portion id="zat_b33_stalker_snag_b52_my_gun_dialog_done"></info_portion>
+	<info_portion id="zat_b22_stalker_medic_b52_about_nimble_dialog_done"></info_portion>
+	<info_portion id="zat_b3_stalker_mechanic_b52_about_nimble_dialog_done"></info_portion>
+	<info_portion id="zat_a2_linker_b52_about_nimble_dialog_done"></info_portion>
+	<info_portion id="zat_b7_bandit_boss_sultan_b52_about_nimble_dialog_done"></info_portion>
+	<info_portion id="zat_b38_stalker_cop_b52_about_nimble"></info_portion>
+	<info_portion id="zat_a2_stalker_barmen_b52_about_nimble_dialog_done"></info_portion>
+	<info_portion id="zat_b7_bandit_boss_sultan_b52_about_snag"></info_portion>
+	<info_portion id="zat_a2_stalker_barmen_b52_about_snag"></info_portion>
+	<info_portion id="zat_b106_stalker_gonta_b52_about_nimble_dialog_done"></info_portion>
+	<info_portion id="zat_a23_stalker_tech_told_about_battery"></info_portion>
+
+<!-- b51 -->
+
+	<info_portion id="zat_b51_nimble_intro"></info_portion>
+
+	<info_portion id="zat_b51_order_in_process"></info_portion>
+	<info_portion id="zat_b51_order_ready"></info_portion>
+	<info_portion id="zat_b51_order_refused"></info_portion>
+	<info_portion id="zat_b51_order_unavailable"></info_portion>
+
+	<info_portion id="zat_b51_nimble_can_go"></info_portion>
+
+	<info_portion id="zat_b51_processing_category_1"></info_portion>
+	<info_portion id="zat_b51_processing_category_2"></info_portion>
+	<info_portion id="zat_b51_processing_category_3"></info_portion>
+	<info_portion id="zat_b51_processing_category_4"></info_portion>
+	<info_portion id="zat_b51_processing_category_5"></info_portion>
+	<info_portion id="zat_b51_processing_category_6"></info_portion>
+	<info_portion id="zat_b51_processing_category_7"></info_portion>
+
+	<info_portion id="zat_b51_finishing_category_1"></info_portion>
+	<info_portion id="zat_b51_finishing_category_2"></info_portion>
+	<info_portion id="zat_b51_finishing_category_3"></info_portion>
+	<info_portion id="zat_b51_finishing_category_4"></info_portion>
+	<info_portion id="zat_b51_finishing_category_5"></info_portion>
+	<info_portion id="zat_b51_finishing_category_6"></info_portion>
+	<info_portion id="zat_b51_finishing_category_7"></info_portion>
+
+	<info_portion id="zat_b51_finished_category_1"></info_portion>
+	<info_portion id="zat_b51_finished_category_2"></info_portion>
+	<info_portion id="zat_b51_finished_category_3"></info_portion>
+	<info_portion id="zat_b51_finished_category_4"></info_portion>
+	<info_portion id="zat_b51_finished_category_5"></info_portion>
+	<info_portion id="zat_b51_finished_category_6"></info_portion>
+	<info_portion id="zat_b51_finished_category_7"></info_portion>
+
+	<info_portion id="zat_b51_finished_categories_all"></info_portion>
+
+	<info_portion id="zat_b51_ordered_item_1_1"></info_portion>
+	<info_portion id="zat_b51_ordered_item_1_2"></info_portion>
+	<info_portion id="zat_b51_ordered_item_1_3"></info_portion>
+	<info_portion id="zat_b51_ordered_item_2_1"></info_portion>
+	<info_portion id="zat_b51_ordered_item_2_2"></info_portion>
+	<info_portion id="zat_b51_ordered_item_2_3"></info_portion>
+	<info_portion id="zat_b51_ordered_item_3_1"></info_portion>
+	<info_portion id="zat_b51_ordered_item_3_2"></info_portion>
+	<info_portion id="zat_b51_ordered_item_3_3"></info_portion>
+	<info_portion id="zat_b51_ordered_item_4_1"></info_portion>
+	<info_portion id="zat_b51_ordered_item_4_2"></info_portion>
+	<info_portion id="zat_b51_ordered_item_4_3"></info_portion>
+	<info_portion id="zat_b51_ordered_item_5_1"></info_portion>
+	<info_portion id="zat_b51_ordered_item_6_1"></info_portion>
+	<info_portion id="zat_b51_ordered_item_7_1"></info_portion>
+
+	<info_portion id="zat_b51_done_item_1_1"></info_portion>
+	<info_portion id="zat_b51_done_item_1_2"></info_portion>
+	<info_portion id="zat_b51_done_item_1_3"></info_portion>
+	<info_portion id="zat_b51_done_item_2_1"></info_portion>
+	<info_portion id="zat_b51_done_item_2_2"></info_portion>
+	<info_portion id="zat_b51_done_item_2_3"></info_portion>
+	<info_portion id="zat_b51_done_item_3_1"></info_portion>
+	<info_portion id="zat_b51_done_item_3_2"></info_portion>
+	<info_portion id="zat_b51_done_item_3_3"></info_portion>
+	<info_portion id="zat_b51_done_item_4_1"></info_portion>
+	<info_portion id="zat_b51_done_item_4_2"></info_portion>
+	<info_portion id="zat_b51_done_item_4_3"></info_portion>
+	<info_portion id="zat_b51_done_item_5_1"></info_portion>
+	<info_portion id="zat_b51_done_item_6_1"></info_portion>
+	<info_portion id="zat_b51_done_item_7_1"></info_portion>
+
+	<info_portion id="zat_b51_told_about_item_1_1"></info_portion>
+	<info_portion id="zat_b51_told_about_item_1_2"></info_portion>
+	<info_portion id="zat_b51_told_about_item_1_3"></info_portion>
+	<info_portion id="zat_b51_told_about_item_2_1"></info_portion>
+	<info_portion id="zat_b51_told_about_item_2_2"></info_portion>
+	<info_portion id="zat_b51_told_about_item_2_3"></info_portion>
+	<info_portion id="zat_b51_told_about_item_3_1"></info_portion>
+	<info_portion id="zat_b51_told_about_item_3_2"></info_portion>
+	<info_portion id="zat_b51_told_about_item_3_3"></info_portion>
+	<info_portion id="zat_b51_told_about_item_4_1"></info_portion>
+	<info_portion id="zat_b51_told_about_item_4_2"></info_portion>
+	<info_portion id="zat_b51_told_about_item_4_3"></info_portion>
+	<info_portion id="zat_b51_told_about_item_5_1"></info_portion>
+	<info_portion id="zat_b51_told_about_item_6_1"></info_portion>
+	<info_portion id="zat_b51_told_about_item_7_1"></info_portion>
+
+<!-- Zaton B14 -->
+	<info_portion id="zat_b14_den_of_the_bloodsucker_find_keys_give"></info_portion>
+	<info_portion id="zat_b14_den_of_the_bloodsucker_open_conteiner_give"></info_portion>
+	<info_portion id="zat_b12_key_1_use"></info_portion>
+	<info_portion id="zat_b12_key_2_use"></info_portion>
+
+<!-- Zaton B30 -->
+
+	<info_portion id="zat_b30_task_start"></info_portion>
+	<info_portion id="zat_b30_actor_in_tempting_business"></info_portion>
+	<info_portion id="zat_b30_actor_gave_detector"></info_portion>
+	<info_portion id="zat_b30_owl_in_trouble"></info_portion>
+	<info_portion id="zat_b30_owl_in_trouble_dialog_done"></info_portion>
+	<info_portion id="zat_b30_owl_to_sultan"></info_portion>
+	<info_portion id="zat_b30_actor_against_owl"></info_portion>
+	<info_portion id="zat_b30_actor_against_barmen"></info_portion>
+	<info_portion id="zat_b30_owl_quest_done"></info_portion>
+	<info_portion id="zat_b30_compass_task_start"></info_portion>
+	<info_portion id="zat_b30_need_artefact_from_noah"></info_portion>
+	<info_portion id="zat_b30_about_compass_told"></info_portion>
+	<info_portion id="zat_b30_jup_b6_scientist_tech_about_owl"></info_portion>
+	<info_portion id="zat_b30_compass_to_barmen"></info_portion>
+	<info_portion id="zat_b30_compass_to_sultan"></info_portion>
+	<info_portion id="zat_b30_barmen_got_af"></info_portion>
+	<info_portion id="zat_b30_sultan_got_af"></info_portion>
+	<info_portion id="zat_b30_compass_to_barmen_reversed"></info_portion>
+	<info_portion id="zat_b30_compass_to_sultan_reversed"></info_portion>
+	<info_portion id="zat_b30_actor_with_af"></info_portion>
+	<info_portion id="zat_b30_actor_with_sultan"></info_portion>
+	<info_portion id="zat_b30_sultan_know_about_detectors"></info_portion>
+	<info_portion id="zat_b30_barmen_going_under_sultan"></info_portion>
+	<info_portion id="zat_b30_barmen_under_sultan"></info_portion>
+	<info_portion id="zat_b30_first_detector"></info_portion>
+	<info_portion id="zat_b30_second_detector"></info_portion>
+	<info_portion id="zat_b30_barmen_under_sultan_told"></info_portion>
+	<info_portion id="zat_b30_owl_detectors_approached"></info_portion>
+	<info_portion id="zat_b30_sultan_refuses_af"></info_portion>
+	<info_portion id="zat_b30_rival_1_wo_detector"></info_portion>
+	<info_portion id="zat_b30_rival_2_wo_detector"></info_portion>
+	<info_portion id="zat_b30_task_percents_running"></info_portion>
+	<info_portion id="zat_a2_stalker_barmen_setup"></info_portion>
+	<info_portion id="zat_b38_stalker_medic_setup"></info_portion>
+	<info_portion id="zat_b104_task_end"></info_portion>
+
+</game_information_portions>

@@ -1,0 +1,19 @@
+[logic@jup_b10_stalker_drunk]
+suitable = {=check_npc_name(jup_b10_stalker_drunk)} true
+active = animpoint@ravings
+prior = 200
+
+[animpoint@ravings]
+cover_name = jup_a6_animpoint_drunk
+avail_animations = zat_b3_tech_drunk
+reach_distance = 2
+use_camp = false
+meet = no_meet
+on_actor_in_zone = jup_b10_sr_warnzone | %=play_sound(jup_b10_stalker_drunk_no_meet) +jup_b10_actor_seen_senka%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

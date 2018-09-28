@@ -1,0 +1,38 @@
+[logic]
+active = ph_door@closed
+
+[ph_door@closed]
+closed = true
+locked = false
+on_use = ph_door@open
+;on_info = {=actor_in_zone(jup_a6_sr_noweap_zulus) =actor_has_weapon} ph_door@locked
+;on_info2 = {=check_smart_alarm_status(jup_a6:alarm)} ph_door@locked_alarm
+snd_open_start = wood_large_open
+snd_close_start = wood_large_close_start
+snd_close_stop = wood_large_close_stop
+
+[ph_door@open]
+closed = false
+locked = false
+on_use = ph_door@closed
+;on_info = {=actor_in_zone(jup_a6_sr_noweap_zulus) =actor_has_weapon} ph_door@locked
+;on_info2 = {=check_smart_alarm_status(jup_a6:alarm)} ph_door@locked_alarm
+;on_game_timer = 50 | ph_door@closed
+snd_open_start = wood_large_open
+snd_close_start = wood_large_close_start
+snd_close_stop = wood_large_close_stop
+
+[ph_door@locked]
+closed = true
+locked = true
+;on_info = {=actor_in_zone(jup_a6_sr_noweap_zulus) !actor_has_weapon} ph_door@closed
+;on_info2 = {=check_smart_alarm_status(jup_a6:alarm)} ph_door@locked_alarm
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_hide_weapon
+
+[ph_door@locked_alarm]
+closed = true
+locked = true
+;on_info = {=check_smart_alarm_status(jup_a6:normal)} ph_door@locked
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_hide_weapon

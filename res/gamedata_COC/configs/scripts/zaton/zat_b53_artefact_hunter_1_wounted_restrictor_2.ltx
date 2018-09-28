@@ -1,0 +1,13 @@
+[logic]
+active = nil ;sr_idle
+
+;------ искатель попадает в вторую, сильную аномалию ------
+[sr_idle]
+on_info = {+zat_b53_artefact_hunter_1_in_zone_ounted_restrictor_2} sr_particle %=play_sound(steam_blowout)%
+
+[sr_particle]
+name = static\zharka_static_steam
+path = zat_b53_artefact_hunter_1_wounted_particle_steam_point_2
+mode = 2
+looped = false
+on_timer = 600 | %+zat_b53_big_anomaly_partile%

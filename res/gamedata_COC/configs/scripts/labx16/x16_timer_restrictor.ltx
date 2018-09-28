@@ -1,0 +1,15 @@
+[logic]
+active = sr_idle
+ 
+[sr_idle]
+on_actor_inside = {+yan_labx16_switcher_primary_off} sr_idle@nil, sr_timer@1 %=play_sound(rad_hat_1)%
+ 
+[sr_timer@1]
+type = dec
+start_value = 240000
+on_value = 5 | %=play_sound(rad_hat_2)% | 0 | sr_idle@nil %=kill_actor%
+;on_actor_outside = sr_idle
+on_info = {+yan_labx16_switcher_primary_off} sr_idle@nil
+string = st_helmet_countdown
+
+[sr_idle@nil]

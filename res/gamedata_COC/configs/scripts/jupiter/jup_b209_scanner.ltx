@@ -1,0 +1,15 @@
+[collide]
+ignore_static
+
+[logic]
+active = ph_idle
+
+[ph_idle]
+nonscript_usable = true 
+on_info = {+jup_b209_scanner_time_to_remove} ph_idle@remove
+
+[ph_idle@remove]
+tips = jup_b209_scanner_remove_tips
+on_use = %+jup_b209_scanner_remove =destroy_object%
+
+

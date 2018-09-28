@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<string_table>
+
+	<string id="csky_patch">
+		<text>Clear Sky patch</text>
+	</string>
+	<string id="csky_patch_description">
+		<text>An insignia torn from a uniform of the Clear Sky faction.</text>
+	</string>
+
+	<string id="freedom_patch">
+		<text>Freedom patch</text>
+	</string>
+	<string id="freedom_patch_description">
+		<text>An insignia torn from a uniform of the Freedom faction.</text>
+	</string>
+
+	<string id="stalker_patch">
+		<text>Loner patch</text>
+	</string>
+	<string id="stalker_patch_description">
+		<text>An insignia torn from the uniform of a loner.</text>
+	</string>
+
+	<string id="ecolog_patch">
+		<text>Ecologist patch</text>
+	</string>
+	<string id="ecolog_patch_description">
+		<text>An insignia torn from the uniform of an ecologist.</text>
+	</string>
+
+	<string id="bandit_patch">
+		<text>Bandit patch</text>
+	</string>
+	<string id="bandit_patch_description">
+		<text>An insignia torn from the uniform of a bandit.</text>
+	</string>
+
+	<string id="duty_patch">
+		<text>Duty patch</text>
+	</string>
+	<string id="duty_patch_description">
+		<text>An insignia torn from a uniform of the Duty faction.</text>
+	</string>
+
+	<string id="monolith_patch">
+		<text>Monolith patch</text>
+	</string>
+	<string id="monolith_patch_description">
+		<text>An insignia torn from a uniform of the Monolith faction.</text>
+	</string>
+
+	<string id="army_patch">
+		<text>Army patch</text>
+	</string>
+	<string id="army_patch_description">
+		<text>An insignia torn from a uniform of the Ukrainian army.</text>
+	</string>
+
+	<string id="merc_patch">
+		<text>Mercenary patch</text>
+	</string>
+	<string id="merc_patch_description">
+		<text>An insignia torn from the uniform of a mercenary.</text>
+	</string>
+	
+</string_table>

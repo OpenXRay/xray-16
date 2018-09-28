@@ -207,6 +207,12 @@
 	<string id="ui_mm_msaa_alphatest">
 		<text>Smooth A-test objects</text>
 	</string>
+	<string id="st_opt_atest_msaa_dx10_0">
+		<text>DX10.0 style [Standard]</text>
+	</string>
+	<string id="st_opt_atest_msaa_dx10_1">
+		<text>DX10.1 style [Higher quality]</text>
+	</string>
 	<string id="ui_mm_msaa_opt">
 		<text>Optimize smoothing</text>
 	</string>
@@ -274,7 +280,7 @@
 		<text>Grass shadow</text>
 	</string>
     <string id="ui_mm_r__actor_shadow">
-    <text>Actor shadow</text>
+		<text>Actor shadow</text>
     </string>
 	<string id="ui_mm_r2_sun_quality">
 		<text>Sun quality</text>
@@ -439,6 +445,9 @@
 	<string id="st_cap_check_azazel_mode">
 		<text>Azazel mode</text>
 	</string>
+	<string id="st_cap_check_campfire">
+		<text>Campfire save mode</text>
+	</string>
 	<string id="ui_mm_debug_hud">
 		<text>Debug HUD</text>
 	</string>
@@ -523,6 +532,30 @@
 	<string id="ui_mm_cod_pickup_mode">
 		<text>AoE pickup mode</text>
 	</string>
+	<string id="ui_mm_invert_zoom">
+		<text>Invert zoom</text>
+	</string>
+	<string id="ui_mm_detail_scale">
+		<text>Grass scale</text>
+	</string>
+	<string id="ui_mm_enhanced_recoil">
+		<text>Enhanced recoil</text>
+	</string>
+	<string id="ui_mm_weapon_hide">
+		<text>Holster when using items</text>
+	</string>
+	<string id="ui_mm_multi_wpn_conditions">
+		<text>Factor (guns condition)</text>
+	</string>
+	<string id="ui_mm_multi_rewards_money">
+		<text>Factor (money reward)</text>
+	</string>
+	<string id="ui_mm_multi_rewards_goodwill">
+		<text>Factor (goodwill reward)</text>
+	</string>
+	<string id="ui_mm_multi_loot">
+		<text>Factor (loot scale)</text>
+	</string>
 	<string id="eng">
 		<text>English</text>
 	</string>
@@ -537,5 +570,26 @@
 	</string>
 	<string id="screen_space">
 		<text>Screen Space</text>
+	</string>
+	<string id="ui_mm_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_set_economy">
+		<text>Progression</text>
+	</string>
+	<string id="st_econ_1">
+		<text>Fast</text>
+	</string>
+	<string id="st_econ_2">
+		<text>Normal</text>
+	</string>
+	<string id="st_econ_3">
+		<text>Slow</text>
+	</string>
+	<string id="st_econ_4">
+		<text>Sluggish</text>
+	</string>
+	<string id="ui_mm_detector_charge">
+		<text>Detector charge</text>
 	</string>
 </string_table>

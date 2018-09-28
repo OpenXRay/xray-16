@@ -1,0 +1,271 @@
+[logic@work1]
+active = walker@zombied1
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit1
+
+
+[walker@zombied1];:walker@z
+path_walk = zombied1_1_walk
+path_look = zombied1_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit1]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;------------------------- 2 ------------------------------
+
+[logic@work2]
+active = walker@zombied2
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit2
+
+
+[walker@zombied2]
+path_walk = zombied2_1_walk
+path_look = zombied2_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit2]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;------------------------- 3 ------------------------------
+
+[logic@work3]
+active = walker@zombied3
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit3
+
+[walker@zombied3]
+path_walk = zombied3_1_walk
+path_look = zombied3_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit3]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;------------------------- 4 ------------------------------
+
+[logic@work4]
+active = walker@zombied4
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit4
+
+[walker@zombied4]
+path_walk = zombied4_1_walk
+path_look = zombied4_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit4]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;------------------------- 5 ------------------------------
+
+[logic@work5]
+active = walker@zombied5
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit5
+
+[walker@zombied5]
+path_walk = zombied5_1_walk
+path_look = zombied5_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit5]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;------------------------- 6 ------------------------------
+
+[logic@work6]
+active = walker@zombied6
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit6
+
+[walker@zombied6]
+path_walk = zombied6_1_walk
+path_look = zombied6_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit6]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;----------------------- 7 ----------------------
+
+[logic@work7]
+active = walker@zombied7
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit7
+
+[walker@zombied7]
+path_walk = zombied7_1_walk
+path_look = zombied7_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit7]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;----------------------- 8 ----------------------
+
+[logic@work8]
+active = walker@zombied8
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit8
+
+[walker@zombied8]
+path_walk = zombied8_1_walk
+path_look = zombied8_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+
+[hit8]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;----------------------- 9 ----------------------
+
+[logic@work9]
+active = walker@zombied9
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit9
+
+[walker@zombied9]
+path_walk = zombied9_1_walk
+path_look = zombied9_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[hit9]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+;----------------------- 10 ----------------------
+
+[logic@work10]
+active = walker@zombied10
+suitable = {=npc_community(zombied)} true
+prior = 35
+on_hit = hit10
+
+[walker@zombied10]
+path_walk = zombied10_1_walk
+path_look = zombied10_1_look
+on_actor_dist_le_nvis = 5 | {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+out_restr = jup_b19_zombied_restrictor
+on_sound = actor|WPN_shoot|10000|0.3| {=dist_to_actor_le(15) -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound2 = actor|MST_step|10|0.1| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound3 = actor|WPN_empty|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+on_sound4 = actor|WPN_reload|15|0.3| {-jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar) -jup_b19_actor_damaged_zombied} true, {=is_enemy_actor -jup_b19_actor_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_1) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_2) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_3) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_4) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(jup_b19_merc_5) -jup_b19_mercs_damaged_zombied} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+corpse_detection_enabled = false
+wounded = wounded
+
+[danger]
+ignore_distance = 0
+
+[hit10]
+on_info = {=hit_by_actor -jup_b19_actor_damaged_zombied} %+jup_b19_actor_damaged_zombied%, {=hitted_by(jup_b19_merc_1:jup_b19_merc_2:jup_b19_merc_3:jup_b19_merc_4:jup_b19_merc_5)} %+jup_b19_mercs_damaged_zombied%
+
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false

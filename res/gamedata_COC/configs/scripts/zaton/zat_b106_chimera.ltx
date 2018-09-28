@@ -1,0 +1,61 @@
+[logic@zat_b106_chimera]
+suitable = {=check_npc_name(zat_b106_chimera)} true
+active = mob_walker@sleep
+monster_job = true
+on_death = death
+on_hit = hit
+prior = 200
+
+
+[mob_walker@sleep]
+path_walk = zat_b106_sleeper_chimera_walk
+path_look = zat_b106_sleeper_chimera_look
+out_restr = zat_b106_chimera_restr
+on_sound = actor|WPN_shoot|10000|0.00001| {=dist_to_actor_le(40)} mob_home@fight %+zat_b106_ahtung%
+on_sound2 = actor|WPN_hit|30|0.1| mob_home@fight %+zat_b106_ahtung%
+on_sound3 = actor|MST_damage|20|0.1| mob_home@fight %+zat_b106_ahtung%
+on_sound4 = actor|MST_step|30|0.1| mob_home@fight %+zat_b106_ahtung%
+on_sound5 = actor|MST_die|10|0.1| mob_home@fight %+zat_b106_ahtung%
+on_sound6 = actor|WPN_empty|30|0.1| mob_home@fight %+zat_b106_ahtung%
+on_sound7 = actor|WPN_reload|15|0.1| mob_home@fight %+zat_b106_ahtung%
+on_info = {+zat_b106_ahtung} mob_home@fight
+on_info2 = {=dist_to_actor_le(7)} mob_home@fight %+zat_b106_ahtung%
+on_info3 = {+zat_b106_one_shot} %=kill_npc +zat_b106_one_hit%
+on_info4 = {+zat_b108_actor_damaged_chimera -zat_b106_one_shot} mob_home@fight_2
+npc_friendly = true
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true ;{=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+danger = danger
+
+[mob_home@fight]
+path_home = zat_b106_chimera_home
+aggressive = true
+out_restr = zat_b106_chimera_restr
+home_min_radius = 3
+home_max_radius = 80
+npc_friendly = false
+on_info = {+zat_b106_one_shot} %=kill_npc +zat_b106_one_hit%
+on_info2 = {+zat_b108_actor_damaged_chimera -zat_b106_one_shot} mob_home@fight_2
+on_game_timer = 3 | mob_home@fight_2
+combat_ignore_cond = {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[mob_home@fight_2]
+path_home = zat_b106_chimera_home
+aggressive = true
+out_restr = zat_b106_chimera_restr
+home_min_radius = 3
+home_max_radius = 80
+npc_friendly = false
+combat_ignore_cond = {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[danger]
+ignore_distance = 0
+
+[death]
+on_info = %+zat_b106_chimera_dead%
+
+[hit]
+on_info = {=hit_by_actor =hitted_on_bone(head_boss:boss_jaw:brow:ear_r:eye_l:eye_r:) -zat_b106_one_shot} %+zat_b106_one_shot +zat_b108_actor_damaged_chimera +zat_b106_ahtung%, {=hit_by_actor !hitted_on_bone(head_boss:boss_jaw:brow:ear_r:eye_l:eye_r:) -zat_b108_actor_damaged_chimera} %+zat_b108_actor_damaged_chimera%
+
+
+ 

@@ -1,0 +1,440 @@
+[up_sect_firsta_walther]
+cost		      		= 500
+value					= +10
+
+rpm						= 30
+
+[up_sect_firstc_walther]
+cost		      		= 1000
+value					= -20
+
+cam_dispersion          = -0.14
+cam_step_angle_horz		= -0.1
+
+[up_sect_firstd_walther]
+cost		      		= 1000
+value					= +20
+
+bullet_speed		 	= 50
+fire_dispersion_base	= -0.01
+
+[up_sect_firste_walther]
+cost		      		= 3000
+;value					= +20
+
+fire_modes		  = 1, 3
+rpm               = 365
+
+[up_sect_secona_walther]
+cost		      		= 500
+value					= +10
+
+bullet_speed		 	= 30
+fire_dispersion_base    = -0.005
+
+[up_sect_seconc_walther]
+cost		      		= 1000
+value					= 15
+
+fire_dispersion_condition_factor    = -0.6
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
+
+[up_sect_secone_walther]
+cost		      		= 2000
+value					= +25
+
+rpm						= 60
+
+[up_sect_seconf_walther]
+cost		      		= 2000
+value					= +30
+
+bullet_speed		 	= 70
+fire_dispersion_base    = -0.015
+
+[up_sect_thirda_walther]
+cost		      		= 500
+value					= +10
+
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.00005
+condition_shot_dec      	= -0.00005
+misfire_start_prob	     	= -0.0005
+misfire_end_prob	     	= -0.005
+
+[up_sect_thirdc_walther]
+cost		      		= 1000
+value					= +15
+
+crosshair_inertion			= -0.6
+
+PDM_disp_vel_factor 		= -0.3
+PDM_disp_accel_factor 		= -0.3
+
+[up_sect_thirdd_walther]
+cost		      		= 1000
+value					= -20
+
+cam_dispersion          = -0.14
+cam_step_angle_horz		= -0.1
+
+[up_sect_fourta_walther]
+cost		      		= 500
+value					= +10
+
+fire_dispersion_base	= -0.04
+fire_dispersion_condition_factor    = -0.3
+
+[up_sect_fourtc_walther]
+cost		      		= 1000
+value					= +15
+
+fire_dispersion_condition_factor    = -0.6
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
+
+[up_sect_fiftha_walther]
+cost		      		= 1000
+value					= 0
+
+snd_silncer_shot				= weapons\n_pb_shot
+silencer_status        			 = 2
+silencer_name  				= wpn_addon_silencer		; section name for the attachable silencer
+silencer_x 						= 48						; offset in inventory icon
+silencer_y 						= -14
+
+
+[up_firsta_walther]
+scheme_index            = 0, 0
+known                   = 1
+;;invented                = 1                							; 0
+effects                 = up_gr_firstcd_walther
+section                 = up_sect_firsta_walther
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_zatp_a1_name
+description             = st_up_zatp_a1_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_1
+
+;;...
+[up_firstc_walther]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_walther
+section                 = up_sect_firstc_walther
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_zatp_b6_name
+description             = st_up_zatp_b6_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_2
+
+[up_firstd_walther]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_walther
+section                 = up_sect_firstd_walther
+property                = prop_bullet_speed, prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_zatp_b8_name
+description             = st_up_zatp_b8_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_3
+
+[up_firste_walther]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_walther
+property                = prop_3xfire, prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_zatp_c7_name
+description             = st_up_zatp_c7_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_4
+
+
+
+[up_secona_walther]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_walther
+section                 = up_sect_secona_walther
+property                = prop_bullet_speed, prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_barp_a1_name
+description             = st_up_barp_a1_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_5
+
+[up_seconc_walther]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_walther
+section                 = up_sect_seconc_walther
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_barp_b1_name
+description             = st_up_barp_b1_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_6
+
+[up_secone_walther]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_secone_walther
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_barp_c1_name
+description             = st_up_barp_c1_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_7
+
+[up_seconf_walther]
+scheme_index            = 2, 2
+known                   = 1
+effects                 =
+section                 = up_sect_seconf_walther
+property                = prop_bullet_speed, prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_barp_c3_name
+description             = st_up_barp_c3_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_8
+
+
+[up_thirda_walther]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_walther
+section                 = up_sect_thirda_walther
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_stvp_a1_name
+description             = st_up_stvp_a1_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_9
+
+[up_thirdc_walther]
+scheme_index            = 1, 3
+known                   = 1
+effects                 =
+section                 = up_sect_thirdc_walther
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_stvp_b5_name
+description             = st_up_stvp_b5_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_10
+
+[up_thirdd_walther]
+scheme_index            = 1, 4
+known                   = 1
+effects                 =
+section                 = up_sect_thirdd_walther
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_stvp_b3_name
+description             = st_up_stvp_b3_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_11
+
+[up_fourta_walther]
+scheme_index            = 0, 3
+known                   = 1
+effects                 = up_gr_fourtcd_walther
+section                 = up_sect_fourta_walther
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_usmp_a1_name
+description             = st_up_usmp_a1_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_12
+
+
+[up_fourtc_walther]
+scheme_index            = 1, 5
+known                   = 1
+effects                 =
+section                 = up_sect_fourtc_walther
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_usmp_b5_name
+description             = st_up_usmp_b5_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_13
+
+
+[up_fiftha_walther]
+scheme_index            = 0, 4
+known                   = 1
+effects                 =
+section                 = up_sect_fiftha_walther
+property                = prop_silencer
+
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_add_a1_name
+description             = st_up_add_a1_descr
+icon                    = ui_inGame2_upgrade_Volker_P9M_14
+
+
+
+[up_gr_firstab_walther]
+elements                = up_firsta_walther
+
+[up_gr_firstcd_walther]
+elements                = up_firstc_walther, up_firstd_walther
+
+[up_gr_firstef_walther]
+elements                = up_firste_walther
+
+[up_gr_seconab_walther]
+elements                = up_secona_walther
+
+[up_gr_seconcd_walther]
+elements                = up_seconc_walther
+
+[up_gr_seconef_walther]
+elements                = up_secone_walther, up_seconf_walther
+
+[up_gr_thirdab_walther]
+elements                = up_thirda_walther
+
+[up_gr_thirdcd_walther]
+elements                = up_thirdc_walther, up_thirdd_walther
+
+[up_gr_fourtab_walther]
+elements                = up_fourta_walther
+
+[up_gr_fourtcd_walther]
+elements                = up_fourtc_walther
+
+[up_gr_fifthab_walther]
+elements                = up_fiftha_walther

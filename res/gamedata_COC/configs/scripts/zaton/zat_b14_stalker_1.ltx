@@ -1,0 +1,237 @@
+[logic@b14_stalker_1]
+suitable = {=check_npc_name(zat_b14_stalker_1)} true
+prior = 200
+active = walker@go
+on_hit = hit
+on_death = death
+post_combat_time = 0, 0
+
+[death]
+on_info = {!killed_by_actor} %+zat_b14_stalker_death =stop_sound%, {=killed_by_actor =squad_exist(zat_b14_stalkers)} %+zat_b14_stalker_killed_by_actor =set_squad_enemy_to_actor(zat_b14_stalkers) =stop_sound%, %=stop_sound% 
+
+[hit] ;Если игрок имеет артефакт, кричим, чтобы отдал
+on_info = {=hit_by_actor =actor_has_item(af_quest_b14_twisted) =is_alive} %=play_sound(zat_b14_robbery_kill_actor_snd) +zat_b14_actor_enemy%
+
+[walker@go] ;Ждем игрока
+path_walk = zat_b14_stalker_1_walk_1
+path_look = zat_b14_stalker_1_look_1
+on_actor_dist_le_nvis = 5 | {!actor_in_zone(zat_b14_not_give_item_zone)} remark@ready
+def_state_moving = run
+def_state_standing = wait_na
+show_spot = {!actor_enemy} false, true
+combat_igrore_cond = true
+danger = danger_condition@go
+meet = no_meet
+wounded = wounded
+;group = 14
+
+[danger_condition@go]
+ignore_distance = 0
+ignore_distance_grenade = 0
+ignore_distance_corpse = 0
+ignore_distance_hit = 0
+ignore_distance_sound = 0
+
+[remark@ready] ;Поймали игрока
+anim = wait_na
+target = story | actor
+meet = meet@story
+on_info = {+zat_b14_dialog_done +zat_b14_give_item_stalker} walker@item %+zat_b14_stalkers_bandits_free%
+on_info2 = {+zat_b14_not_give_item_stalker} animpoint@offence %=play_sound(zat_b14_scene_1_stalker_offended)%
+in_restr = zat_b14_not_give_item_zone
+combat_ignore_cond = {!actor_enemy} true
+wounded = wounded
+danger = danger_condition@go
+
+[meet@story] ;Диалог - дай артефакт!
+close_anim = nil
+close_snd_hello = nil
+close_snd_bye = nil
+close_victim = actor
+use = {!actor_enemy} self
+trade_enable = false
+allow_break = false
+meet_dialog = zat_b14_stalker_start
+
+;Дали артефакт
+
+[walker@item] ;Отдали артефакт
+path_walk = zat_b14_stalker_1_sprint_1
+def_state_moving1 = run
+on_game_timer = 30 | walker@item_sprint_1
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded
+meet = no_meet
+
+[walker@item_sprint_1]
+path_walk = zat_b14_stalker_1_sprint_1
+def_state_moving1 = sprint
+on_signal = path_end | walker@item_sprint_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded
+meet = no_meet
+
+[walker@item_sprint_2]
+path_walk = zat_b14_stalker_1_sprint_2
+def_state_moving1 = sprint
+on_signal = path_end | walker@item_sprint_3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded
+meet = no_meet
+
+[walker@item_sprint_3]
+path_walk = zat_b14_stalker_1_sprint_3
+def_state_moving1 = sprint
+on_signal = path_end | walker@item_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded
+meet = no_meet
+
+[walker@item_2] ;Отдали артефакт
+path_walk = zat_b14_stalker_1_walk_3
+path_look = zat_b14_stalker_1_look_3
+def_state_moving1 = sprint
+on_info = {=npc_in_zone(zat_a2_sr_noweap)} walker@item_3
+on_info2 = {=npc_in_zone(zat_a2_sr_noweap) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy} walker@fight_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded
+meet = no_meet
+out_restr = zat_a2_sr_noweap
+
+[walker@item_3] ; Заходим в корабль
+path_walk = zat_b14_stalker_1_walk_4
+path_look = zat_b14_stalker_1_look_4
+def_state_moving1 = run
+on_info = {!npc_in_zone(zat_surge_hide_a2)} walker@item_2
+on_info2 ={=npc_in_zone(zat_surge_hide_a2)} walker@item_4 
+on_info3 = {=npc_in_zone(zat_a2_sr_noweap) !npc_in_zone(zat_surge_hide_a2) =actor_in_zone(zat_a2_sr_noweap) =actor_enemy} walker@fight_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded
+meet = no_meet
+out_restr = zat_a2_sr_noweap
+
+[walker@item_4] ; Подходим к стойке
+path_walk = zat_b14_stalker_1_walk_4
+path_look = zat_b14_stalker_1_look_4
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+def_state_moving1 = walk
+on_info ={=npc_in_zone(zat_b14_bar_zone)} %+zat_b14_stalker_change_smart%
+meet = no_meet
+out_restr = zat_a2_sr_noweap
+
+;Не дали артефакт
+
+[walker@no_item] ;Игрок не дал артефакт, обиделись
+path_walk = zat_b14_stalker_1_walk_2
+path_look = zat_b14_stalker_1_look_2
+on_signal = zat_b14_stalker_sit | animpoint@offence
+on_info = {=actor_in_zone(zat_b14_robbery_start)} walker@prerobbery %+zat_b14_stalker_robbery%
+in_restr = zat_b14_not_give_item_zone
+danger = danger_condition@go
+combat_ignore_cond = {!actor_enemy} true
+wounded = wounded
+meet = no_meet
+
+[animpoint@offence]
+cover_name = zat_b14_stalker_1_anim
+avail_animations = zat_b14_stay_wall
+use_camp = false
+on_info = {+zat_b14_give_item_stalker} walker@item %+zat_b14_stalkers_bandits_free%
+on_info2 = {=actor_in_zone(zat_b14_robbery_start)} walker@prerobbery %+zat_b14_stalker_robbery%
+in_restr = zat_b14_not_give_item_zone
+danger = danger_condition@go
+combat_ignore_cond = {!actor_enemy} true
+wounded = wounded
+meet = meet@stand
+
+[meet@stand] ;Последний шанс игрока отдать артефакт
+close_distance  = 1
+far_distance    = 1
+close_anim = nil
+far_anim = nil
+meet_dialog = {-zat_b14_dialog_last_chance_done} zat_b14_stalker_start_last_chance, zat_b14_stalker_start_last_chance_end
+use = true
+trade_enable = false
+
+;Грабим игрока
+
+[walker@prerobbery] ;Ограбление
+path_walk = zat_b14_stalker_1_walk_1
+path_look = zat_b14_stalker_1_look_1_1
+on_signal = end | remark@robbery
+in_restr = zat_b14_not_give_item_zone
+combat_ignore_cond = {!actor_enemy} true
+danger = danger_condition@go
+wounded = wounded
+meet = no_meet
+
+[remark@robbery] ;Ограбление
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+on_info = {+zat_b14_robbery_nowpn_actor +zat_b14_stalker_robbery_cutscene_start} companion@robbery
+in_restr = zat_b14_not_give_item_zone
+combat_ignore_cond = {!actor_enemy} true
+danger = danger_condition@go
+wounded = wounded
+meet = no_meet
+
+[companion@robbery] ;Бежим грабить
+on_actor_dist_le_nvis = 2 | remark@robbery_artefact
+meet = no_meet
+in_restr = zat_b14_not_give_item_zone
+wounded = wounded
+combat_ignore_cond = {!actor_enemy} true
+danger = danger_condition@go
+
+[remark@robbery_artefact] ;Диалог ограбления
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+meet = meet@robbery
+on_info = {+zat_b14_robbery_give_artefact} walker@item
+on_info2 = {+zat_b14_robbery_not_give_artefact} remark@punch
+in_restr = zat_b14_not_give_item_zone
+wounded = wounded
+combat_ignore_cond = {!actor_enemy} true
+danger = danger_condition@go
+
+[remark@punch] ;Удар по морде и еще словесный плевок в морду
+target = story | actor
+anim = punch
+on_timer = 1000 | {-zat_b14_robbery_punch_play_sound} walker@fight %=actor_punch =hit_npc_from_actor(zat_b14_stalker_1) =play_sound(zat_b14_robbery_punch) +zat_b14_robbery_punch_play_sound%
+meet = no_meet
+wounded = wounded
+combat_ignore_cond = {!actor_enemy} true
+danger = danger_condition@go
+
+[meet@robbery]
+close_distance = 2
+close_anim = threat_na
+close_victim = actor
+use = {!actor_enemy} self
+trade_enable = false
+allow_break = false
+meet_dialog = zat_b14_stalker_robbery
+
+[wounded] ;Не должен быть раненым
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false
+
+;Бой
+
+[walker@fight] ;В бой!
+path_walk = zat_b14_stalker_1_walk_2
+path_look = zat_b14_stalker_1_look_2
+in_restr = zat_b14_not_give_item_zone
+wounded = wounded
+meet = no_meet
+
+[walker@fight_2] ;В бой!
+path_walk = zat_b14_stalker_1_walk_3
+path_look = zat_b14_stalker_1_look_3
+wounded = wounded
+meet = no_meet

@@ -1,0 +1,25 @@
+[settings]
+enable = true
+
+actor_cause_surrender 			= true			;Player can cause prisoner animation on wounded victims. Can add condlist such as has_info (Maybe if you want actor only doing it if he joined bandits)
+actor_cause_surrender_chance 	= 0.35			; 0.0 to 1.0 float value for percent
+actor_cause_surrender_max_dist 	= 8
+
+state_run_min_distance = 6		;Distance greater then to use running state
+
+min_timer = 1500				;Amount of time (milliseconds) before pulling the trigger after reaching target position.
+max_timer = 4500
+surrender_min_timer = 8000		;Amount of time (milliseconds) before pulling the trigger if victim is playing prisoner animation.
+surrender_max_timer = 10000
+
+min_distance = 3				;Distance in which to search for an accessible vertex nearest victim
+max_distance = 5
+
+min_vector_rotate_y = 1			; The min rotation to randomly circle around victim
+max_vector_rotate_y = 140		; The max rotation to randomly circle around victim
+
+chance_to_play_sound = 0.33		;Chance in which a stalker will say the "kill_wounded" sound
+chance_to_play_surrender = 0.30 ;Chance for wounded victim to play prisoner animation
+
+;Communities that can cause the prisoner animation
+cause_surrender_communities = bandit, killer, stalker, duty, freedom, army, csky, monolith

@@ -1,0 +1,70 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+use_camp = false
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+reach_distance = 100
+reach_movement = sprint
+avail_animations = zat_b106_wounded_idle
+on_info = {+sar_monolith_destroy} %=kill_npc%
+
+[logic@warlab_pod_1]
+active = animpoint@warlab_pod_1
+suitable = {=check_npc_name(warlab_pod_1_stalker)} true
+prior = 200
+
+[logic@warlab_pod_2]
+active = animpoint@warlab_pod_2
+suitable = {=check_npc_name(warlab_pod_2_stalker)} true
+prior = 200
+
+[logic@warlab_pod_3]
+active = animpoint@warlab_pod_3
+suitable = {=check_npc_name(warlab_pod_3_stalker)} true
+prior = 200
+
+[logic@warlab_pod_4]
+active = animpoint@warlab_pod_4
+suitable = {=check_npc_name(warlab_pod_4_stalker)} true
+prior = 200
+
+[logic@warlab_pod_5]
+active = animpoint@warlab_pod_5
+suitable = {=check_npc_name(warlab_pod_5_stalker)} true
+prior = 200
+
+[logic@warlab_pod_6]
+active = animpoint@warlab_pod_6
+suitable = {=check_npc_name(warlab_pod_6_stalker)} true
+prior = 200
+
+[logic@warlab_pod_7]
+active = animpoint@warlab_pod_7
+suitable = {=check_npc_name(warlab_pod_7_stalker)} true
+prior = 200
+
+[animpoint@warlab_pod_1]:walker@generic
+cover_name = warlab_animp_pod_1
+
+[animpoint@warlab_pod_2]:walker@generic
+cover_name = warlab_animp_pod_2
+
+[animpoint@warlab_pod_3]:walker@generic
+cover_name = warlab_animp_pod_3
+
+[animpoint@warlab_pod_4]:walker@generic
+cover_name = warlab_animp_pod_4
+
+[animpoint@warlab_pod_5]:walker@generic
+cover_name = warlab_animp_pod_5
+
+[animpoint@warlab_pod_6]:walker@generic
+cover_name = warlab_animp_pod_6
+
+[animpoint@warlab_pod_7]:walker@generic
+cover_name = warlab_animp_pod_7

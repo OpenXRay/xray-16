@@ -1,0 +1,28 @@
+<credits_seq>
+  <over_main_menu>1</over_main_menu>
+  <persistent>1</persistent>
+  <global_wnd width="1024" height="768">
+
+      <auto_static x="481" y="88" width="28" height="32" stretch="1">
+        <texture width="32" height="32">ui\video_crow</texture>
+      </auto_static>
+			<auto_static x="85" y="0" width="854" height="768" stretch="1">
+						<texture>ui_credits_background</texture>
+			</auto_static>
+
+
+      <auto_static x="186" y="436" width="668" height="320" stretch="1">
+        <texture x="1" y="1" width="798" height="318">ui\video_tuman</texture>
+      </auto_static>
+
+      <auto_static x="0" y="0" width="85" height="768" stretch="1">
+        <texture>ui_credits_left_widepanel</texture>
+      </auto_static>
+      <auto_static x="939" y="0" width="85" height="768" stretch="1">
+        <texture>ui_credits_right_widepanel</texture>
+      </auto_static>
+
+    <function_on_stop>xr_effects.after_credits</function_on_stop>
+  </global_wnd>
+#include "ui\ui_credits_base.xml"
+</credits_seq>

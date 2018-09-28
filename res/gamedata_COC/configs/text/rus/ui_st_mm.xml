@@ -46,16 +46,16 @@
 		<text>КАРТА</text>
 	</string>
 	<string id="renderer_r1">
-		<text>Статичное освещение</text>
+		<text>Статичное освещение DX8</text>
 	</string>
 	<string id="renderer_r2a">
-		<text>Динам. освещение объектов</text>
+		<text>Динамическое освещение DX9</text>
 	</string>
 	<string id="renderer_r2">
-		<text>Полное динамич. освещение</text>
+		<text>Полное динам.освещение DX9</text>
 	</string>
 	<string id="renderer_r2.5">
-		<text>Улучш. полное освещение</text>
+		<text>Улучш.динамич.освещение DX9</text>
 	</string>
 	<string id="renderer_r3">
 		<text>Ул. полное освещение (DX10)</text>
@@ -206,6 +206,12 @@
 	</string>
 	<string id="ui_mm_msaa_alphatest">
 		<text>Сглаживать А-тестовые объекты</text>
+	</string>
+	<string id="st_opt_atest_msaa_dx10_0">
+		<text>DX10.0 стиль (Стандарт)</text>
+	</string>
+	<string id="st_opt_atest_msaa_dx10_1">
+		<text>DX10.1 стиль (Высокое качество)</text>
 	</string>
 	<string id="ui_mm_msaa_opt">
 		<text>Оптимизировать сглаживание</text>
@@ -425,7 +431,7 @@
 		<text>Тесселяция</text>
 	</string>
 	<string id="ui_mm_confirm_changes">
-		<text>Применить совершенные изменения? Все изменения будут отменены через</text>
+		<text>Применить совершённые изменения? Все изменения будут отменены через</text>
 	</string>
 	<string id="st_cap_check_story">
 		<text>Тайна Зоны</text>
@@ -439,6 +445,9 @@
 	<string id="st_cap_check_azazel_mode">
 		<text>Жизнь после жизни</text>
 	</string>
+	<string id="st_cap_check_campfire">
+		<text>Сохранения только у костров</text>
+	</string>
 	<string id="st_cap_check_hardcore_aim">
 		<text>Меткие НПС</text>
 	</string>
@@ -446,7 +455,7 @@
 		<text>Debug Hud</text>
 	</string>
 	<string id="ui_mm_debug_map_hud">
-		<text>Debug HUD Mapspots</text>
+		<text>Debug режим глоб.карты</text>
 	</string>
 	<string id="ui_mm_radio_mod">
 		<text>Музыка радио</text>
@@ -464,7 +473,7 @@
 		<text>Спаун вертолёта</text>
 	</string>
 	<string id="ui_mm_ai_die_in_anomaly">
-		<text>Смерть НПС в аномалиях</text>
+		<text>НПС гибнут в аномалиях</text>
 	</string>
 	<string id="ui_mm_dynamic_news">
 		<text>Динамические новости</text>
@@ -526,6 +535,30 @@
 	<string id="ui_mm_cod_pickup_mode">
 		<text>Автоподбор лута</text>
 	</string>
+	<string id="ui_mm_invert_zoom">
+		<text>Инвертировать зум</text>
+	</string>
+	<string id="ui_mm_detail_scale">
+		<text>Прорисовка травы</text>
+	</string>
+	<string id="ui_mm_enhanced_recoil">
+		<text>Усиленная отдача</text>
+	</string>
+	<string id="ui_mm_weapon_hide">
+		<text>Убрать оружие при лечении</text>
+	</string>
+	<string id="ui_mm_multi_wpn_conditions">
+		<text>Фактор состояния оружия</text>
+	</string>
+	<string id="ui_mm_multi_rewards_money">
+		<text>Фактор награды за задания</text>
+	</string>
+	<string id="ui_mm_multi_rewards_goodwill">
+		<text>Фактор взаимоотношений</text>
+	</string>
+	<string id="ui_mm_multi_loot">
+		<text>Фактор лута</text>
+	</string>
 	<string id="eng">
 		<text>English</text>
 	</string>
@@ -539,6 +572,27 @@
 		<text>Volumetric</text>
 	</string>
 	<string id="screen_space">
-		<text>Screen Space</text>
+		<text>Размер экрана</text>
+	</string>
+	<string id="ui_mm_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_set_economy">
+		<text>Прогрессия</text>
+	</string>
+	<string id="st_econ_1">
+		<text>Быстро</text>
+	</string>
+	<string id="st_econ_2">
+		<text>Нормально</text>
+	</string>
+	<string id="st_econ_3">
+		<text>Медленно</text>
+	</string>
+	<string id="st_econ_4">
+		<text>Очень медленно</text>
+	</string>
+	<string id="ui_mm_detector_charge">
+		<text>Заряд детекторов</text>
 	</string>
 </string_table>

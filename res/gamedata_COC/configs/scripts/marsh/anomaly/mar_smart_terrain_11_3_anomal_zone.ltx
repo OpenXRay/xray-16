@@ -1,0 +1,46 @@
+[anomal_zone]
+layers_count = 3
+respawn_tries = 2
+max_artefacts = 2
+
+artefacts = af_cristall, af_drops, af_fireball, af_dummy_glassbeads, af_eye, af_fire
+start_artefact = ; af_dummy_glassbeads
+coeff = 2, 2, 2, 2, 1, 1
+
+artefact_ways = mar_smart_terrain_11_3_af_way, mar_smart_terrain_11_3_af_way_2, mar_smart_terrain_11_3_af_way_3
+
+
+field_name = mar_smart_terrain_11_3_zone_field_thermal_weak
+
+[mines_core]
+mar_smart_terrain_11_3_mine_thermal_with_steam_0002
+mar_smart_terrain_11_3_mine_thermal_with_steam_0003
+mar_smart_terrain_11_3_mine_thermal_with_steam_0016
+
+[layer_1]
+mines_section = mines_layer_1
+
+[mines_layer_1]:mines_core
+mar_smart_terrain_11_3_mine_thermal_with_steam_0001
+mar_smart_terrain_11_3_mine_thermal_with_steam_0004
+mar_smart_terrain_11_3_mine_thermal_with_steam_0015
+mar_smart_terrain_11_3_mine_thermal_with_steam_0014
+mar_smart_terrain_11_3_mine_thermal_with_steam_0008
+
+[layer_2]
+mines_section = mines_layer_2
+
+[mines_layer_2]:mines_core
+mar_smart_terrain_11_3_mine_thermal_with_steam_0005
+mar_smart_terrain_11_3_mine_thermal_with_steam_0006
+mar_smart_terrain_11_3_mine_thermal_with_steam_0007
+mar_smart_terrain_11_3_mine_thermal_with_steam_0013
+
+[layer_3]
+mines_section = mines_layer_3
+
+[mines_layer_3]:mines_core
+mar_smart_terrain_11_3_mine_thermal_with_steam_0009
+mar_smart_terrain_11_3_mine_thermal_with_steam_0010
+mar_smart_terrain_11_3_mine_thermal_with_steam_0011
+mar_smart_terrain_11_3_mine_thermal_with_steam_0012

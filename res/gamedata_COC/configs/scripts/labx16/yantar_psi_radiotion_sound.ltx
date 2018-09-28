@@ -1,0 +1,19 @@
+[logic]
+active = sr_idle
+
+;[sr_idle]
+;on_actor_inside = sr_sound_act
+
+;[sr_sound_act]
+;snd = ambient\x16\x16_psy
+;delay = 1000
+;max_delay = 1000
+;stereo = true
+;on_actor_outside = sr_idle
+
+[sr_idle]
+on_actor_inside = sr_idle@sound
+
+[sr_idle@sound]
+on_info = %=play_sound_looped(x16_psy_loop)%
+on_actor_outside = sr_idle %=stop_sound_looped%

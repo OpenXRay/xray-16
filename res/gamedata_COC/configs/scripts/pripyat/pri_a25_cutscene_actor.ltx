@@ -1,0 +1,32 @@
+[logic]
+active = walker@start
+
+[walker@start]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+path_walk = pri_a25_smart_terrain_cutscene_actor_walk
+path_look = pri_a25_smart_terrain_cutscene_actor_look
+def_state_standing = wait_rac
+on_game_timer = 60 | walker@talk_rac_actor
+
+[walker@talk_rac_actor]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+path_walk = pri_a25_smart_terrain_cutscene_actor_walk
+path_look = pri_a25_smart_terrain_cutscene_actor_look
+def_state_standing = wait_rac
+on_signal = sound_end | %+pri_a25_actor_all_doors_locked_snd_end%
+on_info = %=play_sound(pri_a25_actor_all_doors_locked)%
+on_info2 = {+pri_a25_destr_cutsc_actor} %=destroy_object%

@@ -1,0 +1,81 @@
+#include "common.h"
+#include "shadow.h"
+
+struct 	v2p
+{
+	float3 	lightToPos	: TEXCOORD0;	// light center to plane vector
+	float3 	vPos		: TEXCOORD1;	// position in camera space
+	half 	fDensity	: TEXCOORD2;	// plane density alon Z axis
+//	half2	tNoise 		: TEXCOORD3;	// projective noise
+};
+
+uniform float4              m_lmap        [2];
+uniform sampler2D 	s_noise;
+
+#define	USE_LMAP
+#define	USE_LMAPXFORM
+#define	USE_SHADOW
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+half4 	main	( v2p I )	: COLOR
+{
+        // ----- shadow
+	float4	P4	= half4(I.vPos, 1);
+        float4	PS	= mul( m_shadow, P4);
+        half	s	= 1.h;
+        #ifdef	USE_SHADOW
+//                #ifdef	USE_SJITTER
+//                  s         = shadowtest        (PS,tcJ);
+//                #else
+                  	s	= shadow(PS);
+//                #endif
+        #endif
+
+        // ----- lightmap
+        half4	lightmap = 1.h;
+        #ifdef	USE_LMAP
+                #ifdef	USE_LMAPXFORM
+              		PS.x	= dot( P4, m_lmap[0]);
+                        PS.y	= dot( P4, m_lmap[1]);
+                #endif
+                lightmap = tex2Dproj(s_lmap, PS);        //
+        #endif
+
+	// ----- attenuate
+	half rsqr	= dot( I.lightToPos, I.lightToPos); // distance 2 light (squared)
+  	half  att 	= saturate( 1 - rsqr * Ldynamic_pos.w ); // q-linear attenuate
+	//half  att 	= saturate( 1 - (rsqr * Ldynamic_pos.w)*(rsqr * Ldynamic_pos.w) ); // q-linear attenuate
+  	//half  att 	= 10*(1/(1+0.1*rsqr));
+	//half  att 	= 1.0h/rsqr;
+	//half  att 	= 1.0h/rsqr-Ldynamic_pos.w;
+	//half  att 	= 5*(sqrt(1.0h/rsqr)-sqrt(Ldynamic_pos.w));
+
+	// ----- noise
+	PS.xy /= PS.w;
+	half time = timers.z*0.1;	
+	PS.xy /= 3;
+	PS.x += time;
+	half4	t_noise	= tex2D(s_noise,PS);
+	PS.x -= time;
+	PS.y -= time*0.70091;
+	t_noise *= tex2D(s_noise,PS);
+	//t_noise *= 4;
+	t_noise = t_noise*0.5+0.5;
+
+	// out
+	//half maxIntens = 1.0h/100.0h;
+	//half maxIntens = 1.0h/40.0h;	
+	//half maxIntens = 1.0h/10.0h;
+	half maxIntens = I.fDensity;
+	half3	result = maxIntens * s * att;
+	result *= lightmap;
+	result *= Ldynamic_color * t_noise;
+
+//	result = maxIntens;
+//	result *= lightmap;
+
+//	result = 0.1h;
+//	result = 0.0h;
+	return  half4( result, 0);
+}

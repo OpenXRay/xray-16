@@ -1,0 +1,30 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@ready
+
+[sr_idle@ready]
+on_actor_in_zone = dar_close_door_zone | sr_idle@wait_assault %+dar_door3_closed%
+
+[sr_idle@wait_assault]
+;on_info = {-x18_actor_fall +dar_door3_free} sr_idle@wait_dream %=x18_gluk =run_cam_effector(radar_stop:2506:false)%
+on_info = {+dar_door3_free} sr_idle@wait_dream %=x18_gluk =run_cam_effector(radar_stop:2506:false)%
+
+[sr_idle@wait_dream]
+;on_timer  = 9000 | {-x18_actor_fall} sr_idle@wait_dream_2 %=disable_ui +x18_actor_fall =run_postprocess(agr_u_fade)%
+on_timer  = 9000 | sr_idle@wait_dream_2 %=disable_ui =run_postprocess(agr_u_fade)%
+
+[sr_idle@wait_dream_2]
+on_timer = 3000 | sr_idle@dream %=stop_cam_effector(1974) =run_tutorial(x18_dream)%
+
+[sr_idle@dream]
+on_info  = {+dar_x18_dream} sr_idle@wait_stand %=run_cam_effector(prison_1:2506:false)%
+
+[sr_idle@wait_stand]
+on_timer = 3000 | sr_idle@wait_sound %=enable_ui%
+
+[sr_idle@wait_sound]
+on_timer = 4500 | sr_idle@nil %=play_sound(val_patrol_prikaz) =create_squad(dar_military_scout_squad:dar_military_scout)%
+
+[sr_idle@nil]

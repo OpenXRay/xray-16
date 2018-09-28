@@ -1,0 +1,14 @@
+[logic]
+active = ph_idle@idle_no_owner
+
+[ph_idle@idle_no_owner]
+auto_fire 		= false
+on_info1 		= {=obj_on_job(bar_zastava:bar_zastava_minigunner_excl:beh@bar_zastava_minigunner_excl_ready)} ph_minigun@ready_to_fire
+
+[ph_minigun@ready_to_fire]
+auto_fire 		= true
+target			= job
+smart 			= bar_zastava
+job 			= bar_zastava_minigunner_excl
+fire_range 		= 150
+on_info1 		= {!obj_on_job(bar_zastava:bar_zastava_minigunner_excl:beh@bar_zastava_minigunner_excl_ready)} ph_idle@idle_no_owner

@@ -1,0 +1,12 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_info = {+jup_b19_following_yar}  sr_idle@set %=set_counter(zombied_dead)%
+on_info2 = {+jup_b19_yar_enemy_or_dead}  sr_idle@nil
+
+[sr_idle@set]
+on_info = {=counter_greater(zombied_dead:9)} sr_idle@nil %+jup_b19_zombied_dead%
+on_info2 = {+jup_b19_yar_enemy_or_dead}  sr_idle@nil
+
+[sr_idle@nil]

@@ -1,0 +1,20 @@
+[logic]
+active = walker@meet_coloner
+
+; ************************* 2 *****************************
+[walker@meet_coloner]
+path_walk = pri_a28_cutscene_actor_base_walk
+path_look = pri_a16_pri_b305_kovalskiy_walk
+def_state_standing = ward
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_b305_kovalskiy_think_of_attack_done_end -pri_b305_actor_check_signal_done} %=play_sound(pri_b305_actor_check_signal) +pri_b305_actor_check_signal_done%
+on_signal = sound_end | {-pri_b305_actor_check_signal_done_end} %+pri_b305_actor_check_signal_done_end%
+on_info2 = {+pri_b305_second_cam_end} %=destroy_object -pri_b305_2_cam_actor% 
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

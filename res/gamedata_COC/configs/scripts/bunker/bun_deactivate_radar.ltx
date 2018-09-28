@@ -1,0 +1,30 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@wait
+ 
+[sr_idle@wait]
+on_info = {=actor_community(actor_monolith)} sr_idle@nil
+on_info2 = {+bar_deactivate_radar_done} sr_idle@psy_sound %=run_cam_effector(radar_stop:2506:false) =play_sound(brain_scorcher_rumble) =disable_ui%
+
+[sr_idle@psy_sound]
+on_info = %=play_sound(psy_blackout)%
+on_timer  = 10500| {-bun_actor_fall} %=disable_ui +bun_actor_fall =run_postprocess(agr_u_fade)%
+on_signal = sound_end | sr_idle@sleep %=run_tutorial(radar_dream) +sar_monolith_call +bun_antenna_off%
+
+[sr_idle@sleep]
+on_info  = {+bun_patrol_start} sr_idle@monolith_call %=run_cam_effector(prison_1:2506:false)%
+
+[sr_idle@monolith_call]
+on_info = %=play_sound(bun_monolith_call_1)%
+on_signal = sound_end|sr_idle@patrol_sound %=enable_ui%
+
+[sr_idle@patrol_sound]
+on_timer = 5000 | %=play_sound(bun_patrol_prikaz)%
+on_signal = sound_end|sr_idle@give_task
+
+[sr_idle@give_task]
+on_timer = 5000 | sr_idle@nil %=give_task(sar_monolith) +sar_monolith_quest_started%
+
+[sr_idle@nil]

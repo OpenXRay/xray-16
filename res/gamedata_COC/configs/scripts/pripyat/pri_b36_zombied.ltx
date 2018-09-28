@@ -1,0 +1,168 @@
+[logic@zombied_1]
+active = walker@zombied_1
+suitable = {=check_npc_name(zombied)} true
+prior = 50
+
+[walker@zombied_1]
+path_walk = pri_b36_zombied_1_1_walk
+path_look = pri_b36_zombied_1_1_look
+on_info = {+pri_b36_ahtung} walker@fire_actor_1
+on_actor_dist_le = 35 | {=see_actor} walker@fire_actor_1 %+pri_b36_ahtung%
+on_sound = actor|WPN_shoot|10000|0.2| {=dist_to_actor_le(70)} walker@fire_actor_1 %+pri_b36_ahtung%
+on_sound2 = actor|MST_step|15|0.5| walker@fire_actor_1 %+pri_b36_ahtung%
+on_sound3 = actor|WPN_empty|15|0.3| walker@fire_actor_1 %+pri_b36_ahtung%
+on_sound4 = actor|WPN_reload|15|0.3| walker@fire_actor_1 %+pri_b36_ahtung%
+on_sound5 = actor|MST_damage|10|0.3| walker@fire_actor_3 %+pri_b36_ahtung%
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor} true, {=check_enemy_name(sim_default)} true
+out_restr = pri_b36_sr_half_out_restr
+danger = danger_1
+
+
+[walker@fire_actor_1]
+path_walk = pri_b36_zombied_1_1_walk
+path_look = pri_b36_zombied_1_1_look
+out_restr = pri_b36_sr_half_out_restr
+sound_idle = state
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+;danger = danger1
+
+[danger_1]
+ignore_distance = 0
+
+
+;------------------------- 2 ------------------------------
+
+[logic@zombied_2]
+active = walker@zombied_2
+suitable = {=check_npc_name(zombied)} true
+prior = 50
+
+[walker@zombied_2]
+path_walk = pri_b36_zombied_2_1_walk
+path_look = pri_b36_zombied_2_1_look
+on_info = {+pri_b36_ahtung} walker@fire_actor_2
+on_actor_dist_le = 35 | {=see_actor} walker@fire_actor_2 %+pri_b36_ahtung%
+on_sound = actor|WPN_shoot|10000|0.2| {=dist_to_actor_le(70)} walker@fire_actor_2 %+pri_b36_ahtung%
+on_sound2 = actor|MST_step|15|0.5| walker@fire_actor_2 %+pri_b36_ahtung%
+on_sound3 = actor|WPN_empty|15|0.3| walker@fire_actor_2 %+pri_b36_ahtung%
+on_sound4 = actor|WPN_reload|15|0.3| walker@fire_actor_2 %+pri_b36_ahtung%
+on_sound5 = actor|MST_damage|10|0.3| walker@fire_actor_3 %+pri_b36_ahtung%
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor} true, {=check_enemy_name(sim_default)} true
+out_restr = pri_b36_sr_half_out_restr
+danger = danger_2
+
+
+[walker@fire_actor_2]
+path_walk = pri_b36_zombied_2_1_walk
+path_look = pri_b36_zombied_2_1_look
+out_restr = pri_b36_sr_half_out_restr
+sound_idle = state
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+;danger = danger1
+
+[danger_2]
+ignore_distance = 0
+
+
+;------------------------- 3 ------------------------------
+
+[logic@zombied_3]
+active = walker@zombied_3
+suitable = {=check_npc_name(zombied)} true
+prior = 50
+
+[walker@zombied_3]
+path_walk = pri_b36_zombied_3_1_walk
+path_look = pri_b36_zombied_3_1_look
+on_info = {+pri_b36_ahtung} walker@fire_actor_3
+on_actor_dist_le = 35 | {=see_actor} walker@fire_actor_3 %+pri_b36_ahtung%
+on_sound = actor|WPN_shoot|10000|0.2| {=dist_to_actor_le(70)} walker@fire_actor_3 %+pri_b36_ahtung%
+on_sound2 = actor|MST_step|15|0.5| walker@fire_actor_3 %+pri_b36_ahtung%
+on_sound3 = actor|WPN_empty|15|0.3| walker@fire_actor_3 %+pri_b36_ahtung%
+on_sound4 = actor|WPN_reload|15|0.3| walker@fire_actor_3 %+pri_b36_ahtung%
+on_sound5 = actor|MST_damage|10|0.3| walker@fire_actor_3 %+pri_b36_ahtung%
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor} true, {=check_enemy_name(sim_default)} true
+danger = danger_3
+out_restr = pri_b36_sr_half_out_restr
+
+[walker@fire_actor_3]
+path_walk = pri_b36_zombied_3_1_walk
+path_look = pri_b36_zombied_3_1_look
+sound_idle = state
+;danger = danger3
+out_restr = pri_b36_sr_half_out_restr
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+
+[danger_3]
+ignore_distance = 0
+
+
+;------------------------- 4 ------------------------------
+
+[logic@zombied_4]
+active = walker@zombied_4
+suitable = {=check_npc_name(zombied)} true
+prior = 50
+
+[walker@zombied_4]
+path_walk = pri_b36_zombied_4_1_walk
+path_look = pri_b36_zombied_4_1_look
+out_restr = pri_b36_zombied_restrictor
+on_info = {+pri_b36_ahtung !actor_in_zone(pri_b36_sr_half_out_restr)} walker@fire_actor_4
+on_actor_dist_le = 35 | {=see_actor} walker@fire_actor_4 %+pri_b36_ahtung%
+on_sound = actor|WPN_shoot|10000|0.2| {=dist_to_actor_le(70)} walker@fire_actor_4 %+pri_b36_ahtung%
+on_sound2 = actor|MST_step|15|0.5| walker@fire_actor_4 %+pri_b36_ahtung%
+on_sound3 = actor|WPN_empty|15|0.3| walker@fire_actor_4 %+pri_b36_ahtung%
+on_sound4 = actor|WPN_reload|15|0.3| walker@fire_actor_4 %+pri_b36_ahtung%
+on_sound5 = actor|MST_damage|10|0.3| walker@fire_actor_4 %+pri_b36_ahtung%
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor} true, {=check_enemy_name(sim_default)} true
+danger = danger_4
+
+[walker@fire_actor_4]
+path_walk = pri_b36_zombied_4_2_walk
+path_look = pri_b36_zombied_4_2_look
+sound_idle = state
+out_restr = pri_b36_zombied_restrictor
+combat_ignore_cond = {=check_enemy_name(sim_default)} true
+
+
+[danger_4]
+ignore_distance = 0
+
+
+;------------------------- 5 ------------------------------
+
+[logic@zombied_5]
+active = walker@zombied_5
+suitable = {=check_npc_name(zombied)} true
+prior = 50
+
+[walker@zombied_5]
+path_walk = pri_b36_zombied_5_1_walk
+path_look = pri_b36_zombied_5_1_look
+on_info = {+pri_b36_ahtung} walker@fire_actor_5
+on_actor_dist_le = 35 | {=see_actor} walker@fire_actor_5 %+pri_b36_ahtung%
+on_sound = actor|WPN_shoot|10000|0.2| {=dist_to_actor_le(70)} walker@fire_actor_5 %+pri_b36_ahtung%
+on_sound2 = actor|MST_step|15|0.5| walker@fire_actor_5 %+pri_b36_ahtung%
+on_sound3 = actor|WPN_empty|15|0.3| walker@fire_actor_5 %+pri_b36_ahtung%
+on_sound4 = actor|WPN_reload|15|0.3| walker@fire_actor_5 %+pri_b36_ahtung%
+on_sound5 = actor|MST_damage|10|0.3| walker@fire_actor_5 %+pri_b36_ahtung%
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor} true, {=check_enemy_name(sim_default)} true
+danger = danger_5
+out_restr = pri_b36_zombied_restrictor
+
+
+[walker@fire_actor_5]
+path_walk = pri_b36_zombied_5_1_walk
+path_look = pri_b36_zombied_5_1_look
+sound_idle = state
+out_restr = pri_b36_zombied_restrictor
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+
+[danger_5]
+ignore_distance = 0

@@ -1,0 +1,17 @@
+[logic]
+active = walker
+on_death = death
+
+[walker]
+path_walk = warlab_pod_room_spawn_walk
+path_look = warlab_pod_room_spawn_look
+out_restr = warlab_in_restr
+on_info = walker@1 %=hit_npc_from_actor%
+
+[walker@1]
+path_walk = warlab_pod_room_spawn_walk2
+path_look = warlab_pod_room_spawn_look2
+out_restr = warlab_in_restr
+
+[death]
+on_info = %+warlab_stalker_monolith_4_killed%

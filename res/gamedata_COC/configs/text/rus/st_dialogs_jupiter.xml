@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="jup_a6_freedom_trader_ashot_start_dialog_0">
+		<text>Чем я могу помочь?</text>
+	</string>
+	<string id="jup_b19_freedom_yar_start_dialog_0">
+		<text>Привет, сталкер! Чего тебе?</text>
+	</string>	
+	<string id="jup_b220_trapper_start_11">
+		<text>Я - Зверобой. Не представляйся, не надо.</text>
+	</string>
+	<string id="jup_b220_trapper_start_12">
+		<text>С чем пришёл?</text>
+	</string>
+	<string id="jup_a6_stalker_medik_start_dialog_0">
+		<text>Ты за медикаментами или так, поболтать?</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_0">
+		<text>Мне нужна медицинская помощь.</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_1">
+		<text>А ну, давай я гляну...</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_2">
+		<text>Сейчас глянем... Так, печень, естественно, увеличена, но это профессиональное... В остальном - здоров как бюрер!</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_11">
+		<text>[далее...]</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_111">
+		<text>Вот, теперь всё хорошо.</text>
+	</string>
+	
+	<string id="jup_a6_freedom_leader_start_dialog_11">
+		<text>Что расскажешь?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_start_dialog_12">
+		<text>С каким вопросом пришёл?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_0">
+		<text>Расскажи мне о «Свободе».</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1">
+		<text>Рассказывать долго. Спрашивай.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1111">
+		<text>Что вы здесь делаете?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11111">
+		<text>Следим, чтобы разные официальные лица ничего не укрыли от обычных людей. Ты же знаешь, как бывает: только-только нашли какую-то лабораторию новую или документы, проливающие свет на тайну Зоны... так сразу трах-бах, военная операция, убирают всё почище пылесоса. И единственный способ хоть что-то узнать - найти первыми.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1112">
+		<text>Что привело вас к центру Зоны?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11121">
+		<text>Ребятам просто по приколу было сходить посмотреть на новые места... Шучу. Для нас это шанс найти что-то такое, отчего весь мир на уши станет. Ведь раньше здесь не то что военных - сталкеров не было. Куда ни плюнь, везде что-то новое.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_111211">
+		<text>Нашли что-нибудь?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1112111">
+		<text>Пока только пару дверей закрытых да непонятные новые артефакты.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1113">
+		<text>Как ты оказался в «Свободе»?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11131">
+		<text>Да как оказался... ещё до образования Зоны дружил с лидерами «Свободы». Тогда, правда, они были не лидерами, а обычными хипанами. А как в Зону за артефактами полез, смотрю - всё знакомые лица! Ну и решил с друзьями тусоваться.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1114">
+		<text>Что думаешь о «Долге»?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11141">
+		<text>Дураки они, вот что думаю. Ну, спрашивается, на кой чёрт им уничтожать Зону? Есть не просит, за установленные границы не лезет. Сиди себе да изучай её на здоровье. Это же сколько научных открытий можно сделать! Вот человечество сколько существует, а антигравитацию так и не смогло создать. А тут, в Зоне, на каждому углу готовый антигравитационных прибор. Вообще, прогнать бы их отсюда, чтобы не мешали, да лень связываться.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1115">
+		<text>А, ладно. Забудь.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11151">
+		<text>Без проблем.</text>
+	</string>
+	
+	<string id="jup_a6_stalker_barmen_start_dialog_11">
+		<text>Приветствую тебя в моём индивидуальном райском уголке. Что, желаешь приобщиться к изобилию?</text>
+	</string>
+	<string id="jup_a6_stalker_barmen_start_dialog_12">
+		<text>Что, зашёл освежиться? Выпивка у меня обычная, зато гостеприимство и радушие - высший класс!</text>
+	</string>
+	<string id="jup_a6_stalker_barmen_start_dialog_13">
+		<text>У меня как в Греции - всё есть. Тебе чего? Поесть, выпить, пострелять?</text>
+	</string>
+	
+	<string id="jup_b6_scientist_nuclear_physicist_start_11">
+		<text>Что Вы мне скажете?</text>
+	</string>
+	<string id="jup_b16_biochemist_oasis_start_11">
+		<text>Что привело Вас к нам?</text>
+	</string>
+
+	<string id="jup_b6_scientist_medic_start_11">
+		<text>С чем пришёл?</text>
+	</string>
+
+	<!-- Ashot and Yar -->
+	<string id="st_jup_yar_reply_1">
+		<text>Пусть %s оторвёт зад от стула, так ему и скажи.</text>
+	</string>
+	<string id="st_jup_yar_reply_2">
+		<text>Он, что, не знает, что я занят? Пусть идёт сюда.</text>
+	</string>
+	<string id="st_jup_yar_reply_3">
+		<text>Мне за ходьбу не платят. Пусть идёт ко мне.</text>
+	</string>
+	<string id="st_jup_yar_reply_4">
+		<text>Что? Где %s ? Почему ещё не у меня?</text>
+	</string>
+	<string id="st_jup_yar_reply_5">
+		<text>Где %s? Скажи ему: пусть идёт сюда, да поскорее.</text>
+	</string>
+	
+	<string id="st_jup_ashot_reply_1">
+		<text>Если %s захочет, то придёт сам, так и передай.</text>
+	</string>
+	<string id="st_jup_ashot_reply_2">
+		<text>Если хочет, пусть приходит сам, если ему надо. Хорошо?</text>
+	</string>
+	<string id="st_jup_ashot_reply_3">
+		<text>Пусть идёт сюда сам.</text>
+	</string>
+	<string id="st_jup_ashot_reply_4">
+		<text>Я же не могу бросить всё. Он сам должен придти ко мне, не так ли?</text>
+	</string>
+	<string id="st_jup_ashot_reply_5">
+		<text>Я не мальчик на побегушках. Пусть %s приходит сам.</text>
+	</string>
+
+</string_table>

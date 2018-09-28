@@ -1,0 +1,80 @@
+; This is used for determining which levels to deactivate and remove from simulation. "Linked" levels will have level transiting enabled and respawns active.
+; This is done to alleviate the performance issues with having hundreds of active squads and smart terrain updates
+
+[k00_marsh]
+target_maps = l03_agroprom, l01_escape, l08_yantar
+
+[k01_darkscape]
+target_maps = l01_escape, l04_darkvalley
+
+[l01_escape]
+target_maps = k00_marsh, k01_darkscape, l02_garbage
+
+[l02_garbage]
+target_maps = l06_rostok, l03_agroprom, l04_darkvalley, l01_escape, l07_military
+
+[l03_agroprom]
+target_maps = l08_yantar, l02_garbage, k00_marsh, l06_rostok, l03u_agr_underground
+
+[l04_darkvalley]
+target_maps = k01_darkscape, l02_garbage, l07_military, k02_trucks_cemetery, l04u_labx18
+
+[l05_bar]
+target_maps = l06_rostok, l07_military, l02_garbage, k02_trucks_cemetery
+
+[l06_rostok]
+target_maps = l07_military, l08_yantar, l02_garbage, l03_agroprom
+
+[l07_military]
+target_maps = l09_deadcity, l10_red_forest, l10_radar, l02_garbage, l04_darkvalley, k02_trucks_cemetery
+
+[l08_yantar]
+target_maps = l09_deadcity, l06_rostok, l03_agroprom, k00_marsh, l08u_brainlab
+
+[l09_deadcity]
+target_maps = l08_yantar, l10_limansk, l07_military
+
+[l10_limansk]
+target_maps = l10_red_forest, l09_deadcity, l11_hospital
+
+[l10_radar]
+target_maps = l11_pripyat, l10_red_forest, l07_military, l10u_bunker
+
+[l10_red_forest]
+target_maps = l10_limansk, l07_military, l10_radar, jupiter
+
+[l11_hospital]
+target_maps = l10_limansk, l12_stancia_2
+
+[l11_pripyat]
+target_maps = l12_stancia, l10_radar, pripyat, jupiter
+
+[l12_stancia]
+target_maps = l11_pripyat, l12_stancia_2, zaton, l12u_sarcofag
+
+[l12u_sarcofag]
+target_maps = l12u_control_monolith
+
+[l12u_control_monolith]
+target_maps = l12u_sarcofag
+
+[l12_stancia_2]
+target_maps = l12_stancia, l13_generators, l11_hospital, l12u_control_monolith
+
+[l13_generators]
+target_maps = l12_stancia_2
+
+[zaton]
+target_maps = l10_limansk, l11_hospital, l09_deadcity, l12_stancia, l08_yantar
+
+[jupiter] ;Note: Jupiter so active with many smarts that it's not a good idea to re-enable this without performance issues
+target_maps = l10_red_forest, l11_pripyat, pripyat, l07_military, jupiter_underground
+
+[pripyat]
+target_maps = l11_pripyat, l10_radar, l07_military, jupiter_underground, jupiter
+
+[jupiter_underground]
+target_maps = jupiter, pripyat
+
+[k02_trucks_cemetery]
+target_maps = l05_bar, l04_darkvalley, l07_military

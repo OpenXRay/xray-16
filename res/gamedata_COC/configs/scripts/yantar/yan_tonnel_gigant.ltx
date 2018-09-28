@@ -1,0 +1,13 @@
+[logic]
+active = mob_walker
+
+[mob_walker]
+path_walk = yan_gigant_walk
+path_look = yan_gigant_look
+on_info = mob_walker@2 %=hit_npc_from_actor =play_sound(giant_underground_0)%
+out_restr = yantar_tunnel_restrictor_3
+
+[mob_walker@2]
+path_walk = yan_gigant_walk2
+path_look = yan_gigant_look2
+out_restr = yantar_tunnel_restrictor_3

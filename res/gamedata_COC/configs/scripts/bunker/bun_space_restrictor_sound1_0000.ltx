@@ -1,0 +1,12 @@
+[logic]
+active = sr_idle@on
+
+[sr_idle@on]
+on_info = %=play_sound_looped(radar_meh_on)%
+on_info2 = {+bar_deactivate_radar_done} sr_idle@off %=stop_sound_looped%
+
+[sr_idle@off]
+on_info = %=play_sound(radar_meh_off)%
+on_signal = sound_end| sr_idle@nil
+
+[sr_idle@nil]

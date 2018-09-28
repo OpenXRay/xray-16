@@ -1,0 +1,200 @@
+#include "mp_ranks.ltx"
+#include "mp_bonuses.ltx"
+
+[buy_menu_items_place]
+
+lst_pistol			= mp_wpn_pm, mp_wpn_pb, mp_wpn_fort, mp_wpn_walther, mp_wpn_colt1911, mp_wpn_usp, mp_wpn_sig220, mp_wpn_desert_eagle, mp_wpn_hpsa, mp_wpn_beretta
+lst_pistol_ammo		= mp_ammo_9x18_fmj, mp_ammo_9x18_pmm, mp_ammo_9x19_fmj, mp_ammo_9x19_pbp, mp_ammo_11.43x23_fmj, mp_ammo_11.43x23_hydro
+
+lst_rifle			= mp_wpn_bm16, mp_wpn_wincheaster1300, mp_wpn_spas12, mp_wpn_protecta, mp_wpn_ak74u, mp_wpn_ak74,  mp_wpn_mp5, mp_wpn_l85, mp_wpn_lr300, mp_wpn_abakan, mp_wpn_sig550, mp_wpn_groza, mp_wpn_g36, mp_wpn_fn2000, mp_wpn_val, mp_wpn_vintorez, mp_wpn_svd, mp_wpn_svu,mp_wpn_gauss, mp_wpn_rpg7, mp_wpn_rg-6, mp_wpn_pkm, mp_wpn_toz34
+lst_rifle_ammo		= mp_ammo_vog-25, mp_ammo_m209, mp_ammo_og-7b, mp_ammo_gauss, mp_ammo_9x19_fmj_4mp5, mp_ammo_9x19_pbp_4mp5, mp_ammo_5.45x39_fmj, mp_ammo_5.45x39_ap, mp_ammo_5.56x45_ss190, mp_ammo_5.56x45_ap, mp_ammo_7.62x54_7h1, mp_ammo_9x39_pab9, mp_ammo_9x39_ap, mp_ammo_12x70_buck, mp_ammo_12x76_zhekan, mp_ammo_pkm_100
+
+lst_outfit			= mp_exo_outfit, mp_scientific_outfit, mp_military_stalker_outfit
+lst_medkit			= mp_medkit, mp_medkit_scientic, mp_medkit_army
+lst_granade			= mp_grenade_f1, mp_grenade_rgd5, mp_grenade_gd-05
+lst_others			= mp_energy_drink, mp_bandage, mp_antirad, mp_drug_coagulant, mp_drug_radioprotector, mp_detector_advanced, mp_device_torch, mp_wpn_addon_scope, mp_wpn_addon_scope_susat, mp_wpn_addon_silencer, mp_wpn_addon_grenade_launcher, mp_wpn_addon_grenade_launcher_m203, mp_wpn_binoc
+lst_shop			= 
+lst_player_bag		= mp_wpn_knife
+
+
+[deathmatch_gamedata]
+;actor spawn effect
+;actor_spawn_effect = anomaly2\electra2_blast
+not_free_ammo 		= mp_ammo_vog-25, mp_ammo_m209, mp_ammo_og-7b
+
+[deathmatch_base_cost]
+mp_wpn_knife						= 0
+
+mp_wpn_pm							= 0
+mp_wpn_pb							= 0
+mp_wpn_fort							= 350,0,0,0,0
+mp_wpn_hpsa							= 350,0,0,0,0
+mp_wpn_colt1911						= 500,350,0,0,0;
+mp_wpn_walther						= 500,350,0,0,0;
+mp_wpn_beretta						= 600,450,350
+mp_wpn_sig220  						= 650,500,400
+mp_wpn_usp							= 700,550,450
+mp_wpn_desert_eagle					= 800,650,550 
+
+mp_wpn_bm16 						= 250
+mp_wpn_toz34						= 500 ;600
+mp_wpn_wincheaster1300				= 600 ;700;
+mp_wpn_spas12           			= 700 ;1000;
+mp_wpn_protecta						= 1200 ;1500
+ 
+mp_wpn_ak74u						= 480 ;600;
+mp_wpn_pkm							= 1300 ;1500;
+mp_wpn_mp5              			= 480 ;600;
+mp_wpn_ak74							= 550 ;600 ;650 
+mp_wpn_l85							= 650 ;620 ;700;
+mp_wpn_abakan						= 750 ;800 
+mp_wpn_lr300						= 750 ;850
+mp_wpn_groza						= 1000 ;1200
+mp_wpn_sig550						= 950 ;1100
+mp_wpn_val							= 1200 ;1300
+mp_wpn_g36							= 1300 ;1400
+mp_wpn_fn2000						= 1500 ;1600;
+
+mp_wpn_vintorez         			= 950 ;1100
+mp_wpn_svu							= 1300 ;1500
+mp_wpn_svd							= 1300 ;1500
+mp_wpn_gauss						= 1800 ;2000
+
+mp_wpn_rpg7							= 1200
+mp_wpn_rg-6             			= 750
+
+
+mp_grenade_f1						= 250;
+mp_grenade_rgd5						= 100;
+mp_grenade_gd-05					= 50 ;100
+mp_ammo_vog-25						= 450 ;500;
+mp_ammo_m209						= 450 ;500;
+mp_ammo_og-7b						= 1200 ;1500
+
+
+mp_ammo_9x18_fmj					= 0, 0, 0, 0, 0
+mp_ammo_9x18_pmm					= 0, 0, 0, 0, 0
+
+mp_ammo_9x19_fmj					= 25, 0, 0, 0, 0
+mp_ammo_9x19_pbp					= 50, 0, 0, 0, 0
+mp_ammo_9x19_fmj_4mp5               = 35
+mp_ammo_9x19_pbp_4mp5               = 60
+
+mp_ammo_11.43x23_fmj				= 50, 50, 0, 0, 0
+mp_ammo_11.43x23_hydro				= 75, 50, 0, 0, 0
+
+;-----
+
+mp_ammo_5.45x39_fmj					= 35;75
+mp_ammo_5.45x39_ap					= 60;100
+
+mp_ammo_5.56x45_ss190				= 60;100
+mp_ammo_5.56x45_ap					= 85;150
+
+mp_ammo_7.62x54_7h1					= 200;
+;mp_ammo_7.62x54_ap					= 165;
+;mp_ammo_7.62x54_7h14				= 200;
+mp_ammo_pkm_100					= 350;
+
+mp_ammo_9x39_pab9					= 100;125
+mp_ammo_9x39_ap						= 125;175
+
+mp_ammo_12x70_buck					= 50;100
+mp_ammo_12x76_zhekan				= 75
+mp_ammo_gauss						= 250;500
+
+
+mp_exo_outfit						= 1250 ;1500;1250;1500
+mp_scientific_outfit				= 250;300;350
+mp_military_stalker_outfit			= 700 ;750;850
+
+mp_medkit							= 250
+mp_medkit_scientic					= 350
+mp_medkit_army						= 500
+
+mp_energy_drink						= 100
+mp_bandage							= 25
+mp_antirad							= 50
+
+mp_drug_coagulant					= 100
+mp_drug_radioprotector				= 100
+
+
+mp_detector_advanced				= 50
+mp_device_torch						= 50
+mp_wpn_addon_scope					= 200 ;250;150
+mp_wpn_addon_scope_susat			= 250;150
+mp_wpn_addon_silencer				= 250 ;150
+mp_wpn_addon_grenade_launcher		= 350;300
+mp_wpn_addon_grenade_launcher_m203	= 350;300
+mp_wpn_binoc						= 200
+
+
+[deathmatch_team0]
+team_idx		= 1
+
+pistols			= mp_wpn_pm, mp_wpn_pb, mp_wpn_fort, mp_wpn_hpsa, mp_wpn_walther, mp_wpn_colt1911, mp_wpn_beretta, mp_wpn_sig220, mp_wpn_usp, mp_wpn_desert_eagle
+
+shotgun			= mp_wpn_bm16, mp_wpn_toz34, mp_wpn_wincheaster1300, mp_wpn_spas12, mp_wpn_protecta
+assault			= mp_wpn_ak74u, mp_wpn_mp5, mp_wpn_l85, mp_wpn_ak74, mp_wpn_abakan, mp_wpn_lr300, mp_wpn_groza, mp_wpn_sig550, mp_wpn_val, mp_wpn_g36, mp_wpn_pkm, mp_wpn_fn2000;
+sniper_rifles	= mp_wpn_vintorez, mp_wpn_svu, mp_wpn_svd, mp_wpn_gauss
+heavy_weapons	= mp_wpn_rpg7, mp_wpn_rg-6
+
+granades		= mp_grenade_rgd5,mp_grenade_f1, mp_grenade_gd-05, mp_ammo_vog-25, mp_ammo_m209, mp_ammo_og-7b, mp_ammo_9x18_fmj,mp_ammo_9x18_pmm, mp_ammo_9x19_fmj,mp_ammo_9x19_pbp, mp_ammo_9x19_fmj_4mp5, mp_ammo_9x19_pbp_4mp5, mp_ammo_5.45x39_fmj,mp_ammo_5.45x39_ap,mp_ammo_5.56x45_ss190,mp_ammo_5.56x45_ap,mp_ammo_7.62x54_7h1,mp_ammo_9x39_pab9,mp_ammo_9x39_ap,mp_ammo_11.43x23_fmj,mp_ammo_11.43x23_hydro,mp_ammo_12x70_buck,mp_ammo_12x76_zhekan,mp_ammo_gauss, mp_ammo_pkm_100
+outfits			= mp_scientific_outfit, mp_military_stalker_outfit, mp_exo_outfit 
+equipment		= mp_medkit, mp_energy_drink, mp_bandage, mp_antirad, mp_drug_coagulant, mp_drug_radioprotector, mp_wpn_addon_silencer, mp_wpn_addon_scope, mp_wpn_addon_scope_susat, mp_wpn_addon_silencer, mp_wpn_addon_grenade_launcher, mp_wpn_addon_grenade_launcher_m203;
+
+;//группы амуниции (используются в наградах)
+gid_exo_outfit			= mp_exo_outfit
+gid_gauss_rifle 		= mp_wpn_gauss
+gid_double_barred		= mp_wpn_bm16, mp_wpn_toz34
+gid_hand_grenades		= mp_grenade_rgd5, mp_grenade_f1
+gid_cool_weapons		= mp_wpn_fn2000, mp_wpn_g36, mp_wpn_gauss, mp_wpn_groza, mp_wpn_pkm, mp_wpn_rg-6, mp_wpn_rpg7, mp_wpn_sig550, mp_wpn_spas12, mp_wpn_svd, mp_wpn_svu, mp_wpn_val
+
+skins = mp_team_green_1, mp_team_green_2, mp_team_green_3, mp_team_green_4, mp_team_green_addon_fr, mp_team_green_addon_uk
+
+
+
+;//соответствие иконок оборудованию
+mp_exo_outfit			= mp_team_green_armor_exo
+mp_scientific_outfit		= mp_team_green_armor_sci
+mp_military_stalker_outfit	= mp_team_green_armor_military
+
+;//money amounts
+money_start		= 300
+money_min		= 0
+
+kill_rival		= 300;400
+kill_self		= 0
+kill_team		= 0
+
+target_rival		= 0
+target_team		= 0
+target_succeed		= 0
+target_succeed_all	= 0
+
+round_win		= 100
+round_loose		= 50
+round_draw		= 50
+
+round_loose_minor		= 0
+round_win_minor		= 0
+
+clear_run_bonus				= 200
+
+mp_wpn_pm_cost		= 0
+
+default_items	= mp_wpn_knife, mp_wpn_pm
+;//---- indicator data --------
+indicator_r1 = 0.2
+indicator_r2 = 0.2
+
+indicator_x = 0.0
+indicator_y = 0.5
+indicator_z = 0.0
+
+indicator_shader = friendly_indicator
+indicator_texture = ui\ui_blueteam
+
+invincible_shader = friendly_indicator
+invincible_texture = ui\ui_skull

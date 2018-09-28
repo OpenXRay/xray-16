@@ -1,0 +1,11 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@wait
+
+[sr_idle@wait]
+on_info = {=actor_has_item(cit_doctors_key) =actor_has_item(cit_doctors_pda) -cit_jail_doctor_pryp_task} %+mar_doctor_found +cit_jail_doctor_pryp_task +cit_doctor_meet_conclusion_info =give_task(cit_doctor_task) =give_task(main_1_search_agr_ug) =give_task(main_2_search_labx18) =give_task(main_3_search_labx16) =give_task(main_4_search_labx10) =give_task(main_5_search_labx8) =give_task(main_6_search_jup_ug) =give_task(main_7_search_mon_con)%
+on_info2 = {=actor_has_item(cit_doctors_key) =actor_has_item(cit_doctors_pda) +cit_doctor_meet_conclusion_info} sr_idle@nil
+
+[sr_idle@nil]

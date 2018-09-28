@@ -1,0 +1,22 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@wait
+ 
+[sr_idle@wait]
+on_info = {+warlab_deactivate_generators_done} sr_idle@psy_sound %=play_sound(brain_scorcher_rumble)%
+
+[sr_idle@psy_sound]
+on_timer = 2000 | sr_idle@final_peace %=play_sound(psy_blackout)%
+
+[sr_idle@final_peace]
+on_info = {=actor_in_zone(warlab_in_restr)} sr_idle@final_peace_end %=stop_sound =run_tutorial(final_peace) =disable_ui%
+
+[sr_idle@final_peace_end]
+on_info = {+end_final_peace} sr_idle@teleport %=run_postprocess(black:3009:true)%
+
+[sr_idle@teleport]
+on_info = sr_idle@nil %=teleport_actor(warlab_jump_gen_walk:warlab_jump_gen_look) =stop_postprocess(3009) =enable_ui%
+
+[sr_idle@nil]

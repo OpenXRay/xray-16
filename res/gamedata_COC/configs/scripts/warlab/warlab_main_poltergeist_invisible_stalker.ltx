@@ -1,0 +1,29 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+[logic]
+active = animpoint
+
+[animpoint]:walker@generic
+reach_movement = sprint
+cover_name = warlab_invisible_stalker_smart_cover
+avail_animations = wait_na
+meet = meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = false
+invulnerable = true
+
+[meet]
+close_distance 	= 1
+close_victim 	= actor
+;far_distance 	= 10
+;far_victim 		= actor
+use = {=dist_to_actor_le(2.5)} self, false
+meet_dialog = warlab_entity_start
+trade_enable = false
+;precond = "visibility"
+abuse           = false
+allow_break     = false

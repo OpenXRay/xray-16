@@ -1,0 +1,105 @@
+function get_loophole_lead_stand_hit_tv(id, position, fov_direction, enter_direction)
+	return {	id = id,
+				fov_position = position,
+				fov_direction = fov_direction,
+				danger_fov_direction  = vector():set(-1,0,0),
+				enter_direction = enter_direction,
+				usable = true,
+				fov	= 45.0,
+				danger_fov = 120.0,
+				range = 200.0,
+				actions = {
+					idle = {
+						animations = {
+							idle = {
+								"lead_1_idle_7",
+							},
+						},
+					},
+					lookout = {
+						animations = {
+							idle = {
+								"lead_1_idle_3",
+							},
+						},
+					},
+					fire = {
+						animations = {
+							idle = {
+								"lead_1_idle_7",
+							},
+							shoot = {
+								"lead_1_idle_7",
+							},							
+						},
+					},
+					fire_no_lookout = {
+						animations = {
+							idle = {
+								"lead_1_idle_3",
+							},
+							shoot = {
+								"lead_1_idle_3",
+							},							
+						},
+					},					
+					reload = {
+						animations = {
+							idle = {
+								"lead_1_idle_7",
+							},
+						},
+					},
+				},
+				transitions = {
+					{
+						action_from = "idle",
+						action_to = "lookout",
+						weight = 1.2,
+						animations = {
+							"lead_1_idle",
+						},
+					},
+					{
+						action_from = "lookout",
+						action_to = "idle",
+						weight = 1.2,
+						animations = {
+							"lead_1_idle",
+						},
+					},
+					{
+						action_from = "idle",
+						action_to = "fire",
+						weight = 1.2,
+						animations = {
+							"lead_1_idle",
+						},
+					},
+					{
+						action_from = "fire",
+						action_to = "idle",
+						weight = 1.2,
+						animations = {
+							"lead_1_idle",
+						},
+					},
+										{
+						action_from = "idle",
+						action_to = "fire_no_lookout",
+						weight = 1.2,
+						animations = {
+							"lead_1_idle",
+						},
+					},
+					{
+						action_from = "fire_no_lookout",
+						action_to = "idle",
+						weight = 1.2,
+						animations = {
+							"lead_1_idle",
+						},
+					},						
+				},
+			}
+end

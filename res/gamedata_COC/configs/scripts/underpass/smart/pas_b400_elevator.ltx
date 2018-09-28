@@ -1,0 +1,24 @@
+[smart_terrain]
+squad_id = 3
+max_population = 3
+;;arrive_dist = 100000
+respawn_params = respawn@pas_b400_elevator
+respawn_idle = 86400
+
+
+[respawn@pas_b400_elevator]
+spawn_bloodsucker
+
+[spawn_bloodsucker]
+spawn_squads = simulation_bloodsucker
+spawn_num = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} 3, 0
+
+[exclusive]
+pas_b400_zulus_elevator = underpass\pas_b400_elevator.ltx
+pas_b400_vano_elevator = underpass\pas_b400_elevator.ltx
+pas_b400_sokolov_elevator = underpass\pas_b400_elevator.ltx
+pas_b400_wanderer_elevator = underpass\pas_b400_elevator.ltx
+
+pas_b400_snork_elevator_4 = underpass\pas_b400_elevator_monsters.ltx
+pas_b400_tushkano_elevator_1 = underpass\pas_b400_elevator_monsters.ltx
+pas_b400_tushkano_elevator_2 = underpass\pas_b400_elevator_monsters.ltx

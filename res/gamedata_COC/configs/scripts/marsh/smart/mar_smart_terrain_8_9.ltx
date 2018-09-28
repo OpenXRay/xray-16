@@ -1,0 +1,17 @@
+[smart_terrain];mar_smart_terrain_8_9
+squad_id = 24
+max_population = 1
+respawn_params = respawn@mar_smart_terrain_8_9
+respawn_idle = 86400
+
+[respawn@mar_smart_terrain_8_9]
+spawn_heli_strong
+spawn_heli_weak
+
+[spawn_heli_strong]
+spawn_helicopter = simulation_helicopter_strong
+spawn_num = {!down_to_earth_functor !heli_exist_on_level} 1, 0
+
+[spawn_heli_weak]
+spawn_helicopter = simulation_helicopter_weak
+spawn_num = {=down_to_earth_functor !heli_exist_on_level} 1, 0

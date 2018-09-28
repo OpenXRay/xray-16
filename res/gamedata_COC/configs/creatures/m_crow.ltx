@@ -1,0 +1,87 @@
+[m_crow]
+GroupControlSection     = spawn_group
+$spawn                  = "monsters\crow"                   ; option for Level Editor
+$prefetch               = 50
+spawn                   = on
+cform                   = skeleton
+class                   = AI_CROW
+visual                  = monsters\crow\crow.ogf
+corpse_visual           = monsters\crow\crow.ogf
+speed                   = 6.0
+angular_speed           = 0.1
+goal_change_delta       = 5.0
+min_height              = 30                                ;35
+goal_variability        = 50.0, 10.0, 50.0                  ;10.0, 15.0, 200.0
+idle_sound_delta        = 400.f                             ;100.f
+
+Health                  = 1
+MaxHealthValue          = 1
+ef_creature_type        = -1
+
+script_binding          = bind_crow.bind
+
+;------------------------------------------------------------------------
+; Influences
+;------------------------------------------------------------------------
+
+fire_max_distance			=	0
+fire_max_power				=	5
+fire_linear_factor			=	0
+fire_quadratic_factor		=	0.025
+
+psy_max_distance			=	0
+psy_max_power				=	5
+psy_linear_factor			=	0.05
+psy_quadratic_factor		=	0
+
+radiation_max_distance		=	3
+radiation_max_power			=	0.02
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+
+;movement params
+ph_box0_center          = 0.0,  0.025, 0.0
+ph_box0_size            = 0.1,  0.05,  0.1
+ph_box1_center          = 0.0,  0.025, 0.0
+ph_box1_size            = 0.1,  0.05,  0.1
+ph_crash_speed_min      = 16
+ph_crash_speed_max      = 30
+ph_mass                 = 1
+
+;открытые раны
+min_wound_size          = 0.01
+
+;entity condition
+satiety_v               = 0.00      ;0.01                   ;скорость уменьшения сытости со временем
+radiation_v             = 0.00001   ;0.004                  ;скорость уменьшения радиации
+satiety_power_v         = 0.001     ;0.01                   ;увеличение силы при уменьшении сытости
+satiety_health_v        = 0.001     ;0.03                   ;увеличение здоровья при уменьшении сытости
+satiety_critical        = -1.0      ;0.25                   ;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v      = 0.01      ;0.006                  ;уменьшение здоровья при воздействии радиации
+bleeding_v              = 0.05      ;0.02                   ;потеря крови при максимальной ране
+wound_incarnation_v     = 0.01      ;0.001                  ;скорость заживания раны
+morale_v                = 0.01                              ;скорость восстановления морали
+health_hit_part         = 1.0       ;0.8                    ;процент хита, уходящий на отнимание здоровья
+power_hit_part          = 1.0       ;0.9                    ;процент хита, уходящий на отнимание силы
+psy_health_v            = 0.1                               ;скорость восстановления psy-здоровья
+
+;коэффициенты иммунитета
+burn_immunity           = 1.0
+strike_immunity         = 3.0
+shock_immunity          = 1.0
+wound_immunity          = 1.0
+radiation_immunity      = 0.0
+telepatic_immunity      = 1.0
+chemical_burn_immunity  = 1.0
+explosion_immunity      = 3.0
+fire_wound_immunity     = 3.0
+
+;коэффициенты скоростей изменения параметров во время сна
+sleep_health            = 1.0       ;1.5
+sleep_power             = 1.0       ;1.5
+sleep_satiety           = 1.0       ;0.8
+sleep_radiation         = 1.0       ;1.1
+sleep_psy_health        = 1.0
+
+;species of monster
+species                 = bird

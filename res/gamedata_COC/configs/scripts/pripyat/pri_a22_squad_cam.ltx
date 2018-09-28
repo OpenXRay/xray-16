@@ -1,0 +1,41 @@
+[logic]
+active = nil;sr_idle@find_squad_cam
+
+[sr_idle@find_squad_cam]
+on_info = {+pri_a22_start} sr_idle@check_actor_find_squad %+pri_a18_use_idol_done +pri_a18_found_antenna +pri_a21_sentry_task_done +pri_a19_lab_x8_investigated%
+on_info2 = {+pri_a25_task_start} sr_idle@check_actor_find_squad
+
+[sr_idle@check_actor_find_squad]
+on_info = {=actor_in_zone(pri_a22_find_squad)} sr_idle@check_cutscene_start_info %+pri_a22_actor_in_zone_pri_a22_find_squad%
+
+[sr_idle@check_cutscene_start_info]
+on_info = {+pri_a22_ran_squad_cam} sr_idle@cutscene_timer %=disable_ui =run_postprocess(fade_in:4310)%
+
+[sr_idle@cutscene_timer]
+on_game_timer = 20 | sr_cutscene@start %=run_postprocess(black:4311:true) =create_cutscene_actor_with_weapon(pri_a22_cutscene_actor_find_squad:pri_a22_smart_terrain_pri_a22_squad_cutscene_actor_walk:0:26)%
+
+[sr_cutscene@start]
+enable_ui_on_end = false
+global_cameffect = true
+outdoor = true
+point = pri_a25_actor_walk 
+look = pri_a25_actor_look
+cam_effector = scenario_cam\pripyat\pri_a22_radio_camera
+on_game_timer = 10 | {-pri_a22_pp_stop} %+pri_a22_pp_stop =stop_postprocess(4310) =stop_postprocess(4311)%
+on_signal = cameff_end | sr_idle@cutscene_end_postprocess %=run_postprocess(black:4313:true) +pri_a22_cutscene_actor_find_squad_destroy =teleport_actor(pri_a22_smart_terrain_pri_a22_squad_cutscene_actor_walk:pri_a22_smart_terrain_pri_a22_squad_cutscene_actor_look)%
+on_signal2 = cam_effector_stop | sr_idle@cutscene_end_postprocess %=run_postprocess(black:4313:true) +pri_a22_cutscene_actor_find_squad_destroy =teleport_actor(pri_a22_smart_terrain_pri_a22_squad_cutscene_actor_walk:pri_a22_smart_terrain_pri_a22_squad_cutscene_actor_look)%
+on_info = {+pri_a22_cam_2_fade -pri_a22_cam_2_fade_in} %=run_postprocess(fade_in:4312) +pri_a22_cam_2_fade_in%
+on_info2 = {+pri_a22_find_squad_cam_end} %=stop_sr_cutscene%
+on_info3 = {+pri_a22_cut_actor_hit} %=stop_sr_cutscene +pri_a22_find_squad_cam_end +pri_a22_cam_2_fade +pri_a22_cam_2_fade_in +pri_a22_actor_to_base_talked% 
+
+[sr_idle@cutscene_end_postprocess]
+on_game_timer = 20 | sr_idle@pre_cutscene_end_info_part_2 %=stop_postprocess(4312) =stop_postprocess(4313) =enable_ui%
+
+[sr_idle@pre_cutscene_end_info_part_2]
+on_info = sr_idle@autosave %+pri_a22_scene_done +pri_a17_colonel_question_unavailable%
+
+[sr_idle@autosave]
+on_info = {-pri_a22_once_autosave} %+pri_a22_once_autosave =scenario_autosave(st_save_pri_a22_found_dead_squad)%
+on_info2 = {+pri_a22_once_autosave} sr_idle@nil
+
+[sr_idle@nil]

@@ -1,0 +1,150 @@
+[logic@jup_b221_freedom_01]
+active = animpoint@jup_b221_freedom_01_reach
+suitable = {+jup_b25_freedom_flint_gone =npc_community(freedom) =npc_in_zone(jup_a6_sr_noweap)} true
+prior = 150
+
+[animpoint@jup_b221_freedom_01_reach]
+cover_name = jup_b221_freedom_01
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@jup_b221_freedom
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_b221_freedom_01
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_b221_freedom_01]
+cover_name = jup_b221_freedom_01
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@jup_b221_freedom
+on_info = {+jup_b221_freedom_main} animpoint@jup_b221_freedom_01_theme
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_b221_freedom_01_theme]
+cover_name = jup_b221_freedom_01
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = no_meet
+on_info = {-jup_b221_play_main_start} %=jup_b221_play_main(freedom) +jup_b221_play_main_start%
+on_signal = theme_end | animpoint@jup_b221_freedom_01 %-jup_b221_freedom_main -jup_b221_play_main_start%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@jup_b221_freedom]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+
+
+[logic@jup_b221_freedom_02]
+active = animpoint@jup_b221_freedom_02_reach
+suitable = {+jup_b25_freedom_flint_gone =npc_community(freedom) =npc_in_zone(jup_a6_sr_noweap)} true
+prior = 150
+
+[animpoint@jup_b221_freedom_02_reach]
+cover_name = jup_b221_freedom_02
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@jup_b221_freedom
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_b221_freedom_02
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_b221_freedom_02]
+cover_name = jup_b221_freedom_02
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@jup_b221_freedom
+on_info = {+jup_b221_freedom_reaction_01} animpoint@jup_b221_freedom_02_reaction
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_b221_freedom_02_reaction]
+cover_name = jup_b221_freedom_02
+use_camp = false
+meet = no_meet
+on_info = %=play_sound(jup_b221_freedom_reaction)%
+on_signal = sound_end | animpoint@jup_b221_freedom_02 %-jup_b221_freedom_reaction_01%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+
+[logic@jup_b221_freedom_03]
+active = animpoint@jup_b221_freedom_03_reach
+suitable = {+jup_b25_freedom_flint_gone =npc_community(freedom) =npc_in_zone(jup_a6_sr_noweap)} true
+prior = 150
+
+[animpoint@jup_b221_freedom_03_reach]
+cover_name = jup_b221_freedom_03
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@jup_b221_freedom
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_b221_freedom_03
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_b221_freedom_03]
+cover_name = jup_b221_freedom_03
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@jup_b221_freedom
+on_info = {+jup_b221_freedom_reaction_02} animpoint@jup_b221_freedom_03_reaction
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_b221_freedom_03_reaction]
+cover_name = jup_b221_freedom_03
+use_camp = false
+meet = no_meet
+on_info = %=play_sound(jup_b221_freedom_reaction)%
+on_signal = sound_end | animpoint@jup_b221_freedom_03 %-jup_b221_freedom_reaction_02%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

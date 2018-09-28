@@ -1,0 +1,38 @@
+[logic]
+active = ph_door@check_story
+
+[ph_door@check_story]
+on_info = {+story_mode_disabled} ph_door@unlocked_closed, ph_door@locked
+
+[ph_door@locked]
+locked = true
+closed = true
+tip_open = tip_door_coded
+on_info = {=actor_has_item(decoder)} ph_door@coded
+
+[ph_door@coded]
+locked = true
+closed = true
+tip_open = tip_door_decode
+on_info = {!actor_has_item(decoder)} ph_door@locked
+on_use = ph_door@decoding %+warlab_access_decoding =play_sound_looped(warlab_decoder)%
+
+[ph_door@decoding]
+locked = true
+closed = true
+tip_open = tip_door_decoding
+on_info = {+warlab_finish_decoding} ph_door@unlocked %+warlab_door_opened =stop_sound_looped%
+
+[ph_door@unlocked]
+locked = false
+closed = false
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@unlocked_closed
+
+[ph_door@unlocked_closed]
+locked = false
+closed = true
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@unlocked

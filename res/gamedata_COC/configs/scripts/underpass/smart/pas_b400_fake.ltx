@@ -1,0 +1,16 @@
+[smart_terrain]
+squad_id = 4
+max_population = 3
+;;arrive_dist = 100000
+respawn_params = respawn@pas_b400_fake
+respawn_idle = 86400
+
+
+[respawn@pas_b400_fake]
+spawn_burer
+
+[spawn_burer]
+spawn_squads = simulation_burer
+spawn_num = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} 3, 0
+
+[exclusive]

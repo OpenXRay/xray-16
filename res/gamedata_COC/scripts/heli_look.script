@@ -1,0 +1,53 @@
+--[[------------------------------------------------------------------------------------------------
+Helicopter look
+Андрущенко Иван
+
+--------------------------------------------------------------------------------------------------]]
+local heli_looker = {}
+
+function get_heli_looker(obj)
+    if heli_looker[obj:id()] == nil then
+        heli_looker[obj:id()] = heli_look(obj)
+    end
+    return heli_looker[obj:id()]
+end
+
+class "heli_look"
+
+function heli_look:__init(obj)
+	self.obj            = obj
+    self.look_point     = vector():set(0,0,0)
+    self.look_state     = false
+
+end
+
+function heli_look:calc_look_point(dest_point, look_state)
+    self.look_state = look_state
+    if look_state and dest_point then
+        local heli = self.obj:get_helicopter()
+        local dist_to_dest_point = heli:GetDistanceToDestPosition()
+	    local new_direction = vector():set(0,0,0)                             --' ед. вектор заданного направления
+	    local curr_heli_position = self.obj:position()						--' текущая позиция
+	    local curr_heli_direction = self.obj:direction()					--' единичный вектор текущего направления
+        local heli_velocity = heli:GetSpeedInDestPoint(0)
+	    local curr_heli_velocity = heli:GetCurrVelocity()					--' текущая скорость
+
+        new_direction.x = (dest_point.x - curr_heli_position.x)/dist_to_dest_point
+        new_direction.y = (dest_point.y - curr_heli_position.y)/dist_to_dest_point
+        new_direction.z = (dest_point.z - curr_heli_position.z)/dist_to_dest_point
+        
+        local delta
+        if heli_velocity <= 0 then
+            delta = 0
+        else
+            delta = curr_heli_velocity/heli_velocity
+            if delta > 2 then
+                delta = 2
+            end
+        end
+        self.look_point.x = heli_velocity^2 * (curr_heli_direction.x + new_direction.x / 2 * (2 - delta))
+        self.look_point.y = heli_velocity^2 * (curr_heli_direction.y + new_direction.y / 2 * (2 - delta))
+        self.look_point.z = heli_velocity^2 * (curr_heli_direction.z + new_direction.z / 2 * (2 - delta))
+        heli:LookAtPoint( self.look_point, look_state )
+    end
+end

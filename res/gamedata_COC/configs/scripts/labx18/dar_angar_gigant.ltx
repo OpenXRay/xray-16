@@ -1,0 +1,18 @@
+[logic@angar_gigant]
+active = mob_home@angar_gigant
+suitable = {=target_squad_name(dar_angar_gigant_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@angar_gigant]
+path_home = home
+home_min_radius = 35
+home_max_radius = 40
+on_actor_dist_le_nvis = 35 | {=actor_in_zone(dar_angar_gigant_territory)} mob_home@angar_gigant_2 %=hit_npc_from_actor =play_sound(giant_underground_0)%
+out_restr = dar_angar_gigant_territory
+
+[mob_home@angar_gigant_2]
+path_home = home
+home_min_radius = 25
+home_max_radius = 30
+out_restr = dar_angar_gigant_territory

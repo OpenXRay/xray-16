@@ -1,0 +1,24 @@
+[smart_terrain];zat_sim_13
+squad_id = 23
+max_population = 1
+spawn_point = zat_sim_13_spawn_point 
+respawn_params = respawn@zat_sim_13
+respawn_idle = 86400
+
+
+[respawn@zat_sim_13]
+spawn_bandit@novice
+spawn_bandit@master
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 2, 0
+
+[spawn_bandit@novice]
+spawn_squads = simulation_bandit
+spawn_num = {+bar_deactivate_radar_done} 2, 0
+
+[spawn_bandit@master]
+spawn_squads = bandit_sim_squad_veteran, bandit_sim_squad_advanced
+spawn_num = {+bar_deactivate_radar_done} 2, 0

@@ -1,0 +1,72 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+[gl_test_shell]:delayed_action_fuse,grenade_rgd5,wpn_fake_missile
+class                                    = II_EXPLO
+visual                                   = grenadier\ammo_vog-25.ogf
+inv_name                                 = .
+inv_name_short                           = .
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 50
+inv_grid_y                               = 50
+
+immunities_sect                          = gl_test_shell_immunities
+wm_size                                  = 0.1
+ph_mass                                  = 5
+
+[gl_test_shell_ammo_vog-25]:gl_test_shell
+visual                                   = grenadier\ammo_vog-25.ogf
+[gl_test_shell_ammo_vog-25p]:gl_test_shell
+visual                                   = grenadier\ammo_vog-25p.ogf
+[gl_test_shell_ammo_m209]:gl_test_shell
+visual                                   = grenadier\ammo_m209.ogf
+
+[gl_fake_missile]:delayed_action_fuse
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\explosive\gl_fake_missile"
+$prefetch                                = 16
+class                                    = II_EXPLO
+cform                                    = skeleton
+cost                                     = 10
+inv_name                                 = .
+inv_name_short                           = .
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 50
+inv_grid_y                               = 50
+can_take                                 = true
+immunities_sect                          = gl_test_shell_immunities	                                       ;gl_fake_missile_immunities
+time_to_explode                          = 0.0
+wm_size                                  = 0.1
+ph_mass                                  = 5
+explode_duration                         = 3
+
+[gl_fake_missile_ammo_vog-25]:wpn_fake_missile,gl_fake_missile
+[gl_fake_missile_ammo_vog-25p]:wpn_fake_missile1,gl_fake_missile
+[gl_fake_missile_ammo_m209]:wpn_fake_missile2,gl_fake_missile
+
+[gl_fake_missile_immunities]
+burn_immunity                            = 0.6
+strike_immunity                          = 1
+shock_immunity                           = 1
+wound_immunity                           = 0.1
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0.3
+explosion_immunity                       = 1
+fire_wound_immunity                      = 0.7
+
+[gl_test_shell_immunities]
+burn_immunity                            = 0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0

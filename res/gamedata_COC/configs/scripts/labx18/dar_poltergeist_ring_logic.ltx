@@ -1,0 +1,58 @@
+;**************************************
+;Poltergeist ring
+;**************************************
+
+[logic@dar_poltergeist_ring_base]
+active = mob_home@dar_poltergeist_ring_base
+suitable = {=target_squad_name(dar_poltergeist_ring_squad_1)} true
+monster_job = true
+prior = 200
+on_death = mob_death@dar_poltergeist_ring_base
+
+[mob_home@dar_poltergeist_ring_base]
+path_home = way
+out_restr = dar_poltergeist_tele_round_restr
+
+[mob_death@dar_poltergeist_ring_base]
+on_info = %+dar_ring_spawn1%
+
+
+[logic@dar_poltergeist_ring_1_1]
+active = mob_home@dar_poltergeist_ring_1_1
+suitable = {=target_squad_name(dar_poltergeist_ring_squad_1)} true
+monster_job = true
+prior = 200
+on_death = mob_death@dar_poltergeist_ring_1_1
+
+[mob_home@dar_poltergeist_ring_1_1]
+path_home = way
+out_restr = dar_poltergeist_tele_round_restr
+
+[mob_death@dar_poltergeist_ring_1_1]
+on_info = %+dar_ring_spawn2_1%
+
+
+[logic@dar_poltergeist_ring_1_2]
+active = mob_home@dar_poltergeist_ring_1_2
+suitable = {=target_squad_name(dar_poltergeist_ring_squad_1)} true
+monster_job = true
+prior = 200
+on_death = mob_death@dar_poltergeist_ring_1_2
+
+[mob_home@dar_poltergeist_ring_1_2]
+path_home = way
+out_restr = dar_poltergeist_tele_round_restr
+
+[mob_death@dar_poltergeist_ring_1_2]
+on_info = %+dar_ring_spawn2_2%
+
+
+[logic@dar_poltergeist_ring_end]
+active = mob_home@dar_poltergeist_ring_end
+suitable = {=target_squad_name(dar_poltergeist_ring_squad_2)} true
+monster_job = true
+prior = 200
+
+[mob_home@dar_poltergeist_ring_end]
+path_home = way
+out_restr = dar_poltergeist_tele_round_restr

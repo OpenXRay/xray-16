@@ -1,0 +1,208 @@
+;freedom mechanic
+[logic@mil_smart_terrain_7_7_freedom_mechanic]
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_mechanic_stalker)} true
+prior = 200
+active = animpoint@stand
+level_spot = mechanic
+
+[animpoint@stand]
+cover_name = mil_smart_terrain_7_7_freedom_mechanic_smart_cover
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@mechanic
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+;reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@mechanic]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+
+;freedom leader
+[logic@mil_smart_terrain_7_7_freedom_leader]
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_leader_stalker)} true
+prior = 200
+active = animpoint@mil_freedom_leader
+level_spot = quest_npc
+
+[animpoint@mil_freedom_leader]
+cover_name = mil_smart_terrain_7_7_freedom_leader_animp
+avail_animations = fold_arms
+meet = meet@stand_base
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+use_camp = false
+
+[meet@stand_base]
+close_snd_hello = jup_a6_freedom_leader_greeting
+close_snd_bye 	= jup_a6_freedom_leader_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_on_talking = false
+
+;freedom guard1
+[logic@mil_smart_terrain_7_7_freedom_bodyguard1]
+active = walker@guard
+prior = 150
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_bodyguard_stalker)} true
+
+[walker@guard]
+path_walk = freedom_bodyguard_1_walk
+path_look = freedom_bodyguard_1_look
+meet = meet@guard
+on_actor_in_zone = mil_smart_terrain_7_7_freedom_bodyguard_restrictor | {=actor_has_weapon} walker@threat
+
+[meet@guard]
+close_distance = 5
+close_victim = actor
+close_anim = guard
+use = false
+
+[walker@threat]
+path_walk = freedom_bodyguard_1_walk
+path_look = freedom_bodyguard_1_look
+on_game_timer = 10 | %=play_sound(mil_freedom_guards_warning_actor)%
+meet = meet@threat
+on_actor_in_zone = mil_smart_terrain_7_7_freedom_bodyguard_restrictor | {!actor_has_weapon} walker@guard
+on_actor_not_in_zone = mil_smart_terrain_7_7_freedom_bodyguard_restrictor | walker@guard
+
+[meet@threat]
+close_distance = 5
+close_victim = actor
+close_anim = {!actor_has_weapon} guard, threat
+use = false
+
+;freedom guard2
+[logic@mil_smart_terrain_7_7_freedom_bodyguard2]
+active = walker@guard_2
+prior = 150
+suitable = {=check_npc_name(mil_smart_terrain_7_7_freedom_bodyguard2_stalker)} true
+
+[walker@guard_2]
+path_walk = freedom_bodyguard_2_walk
+path_look = freedom_bodyguard_2_look
+meet = meet@guard_2
+on_actor_in_zone = mil_smart_terrain_7_7_freedom_bodyguard_restrictor | {=actor_has_weapon} walker@threat_2
+
+[meet@guard_2]
+close_distance = 5
+close_victim = actor
+close_anim = guard
+use = false
+
+[walker@threat_2]
+path_walk = freedom_bodyguard_2_walk
+path_look = freedom_bodyguard_2_look
+meet = meet@threat_2
+on_actor_in_zone = mil_smart_terrain_7_7_freedom_bodyguard_restrictor | {!actor_has_weapon} walker@guard_2
+on_actor_not_in_zone = mil_smart_terrain_7_7_freedom_bodyguard_restrictor | walker@guard_2
+
+[meet@threat_2]
+close_distance = 5
+close_victim = actor
+close_anim = {!actor_has_weapon} guard, threat
+use = false
+
+;------------------------------
+;------- Mutant swarm ----------
+;------------------------------
+
+[logic@faction_base_defense_enemy1]
+active = mob_home@faction_base_defense_enemy1
+suitable = {=target_squad_name(faction_base_defense_flesh_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy1]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy2]
+active = mob_home@faction_base_defense_enemy2
+suitable = {=target_squad_name(faction_base_defense_boar_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy2]
+path_home = home_attackers
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy3]
+active = mob_home@faction_base_defense_enemy3
+suitable = {=target_squad_name(faction_base_defense_dog_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy3]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy4]
+active = mob_home@faction_base_defense_enemy4
+suitable = {=target_squad_name(faction_base_defense_flesh_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy4]
+path_home = home_attackers ;home_attackers_2
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy5]
+active = mob_home@faction_base_defense_enemy5
+suitable = {=target_squad_name(faction_base_defense_boar_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy5]
+path_home = home_attackers ;home_attackers_2
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy6]
+active = mob_home@faction_base_defense_enemy6
+suitable = {=target_squad_name(faction_base_defense_dog_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy6]
+path_home = home_attackers ;home_attackers_2
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0

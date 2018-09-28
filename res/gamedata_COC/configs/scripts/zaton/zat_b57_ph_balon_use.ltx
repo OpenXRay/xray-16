@@ -1,0 +1,9 @@
+[logic]
+active = nil;ph_idle@wait
+
+[ph_idle@wait]
+on_info = {+zat_b57_den_of_the_bloodsucker_place_gas_give -zat_b57_balon_use} ph_idle@use
+
+[ph_idle@use]
+on_use = {=actor_has_item(zat_b57_gas)} nil %+zat_b57_balon_use%
+tips = zat_b57_balon_use_hint

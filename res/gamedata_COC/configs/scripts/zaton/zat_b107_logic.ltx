@@ -1,0 +1,19 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+zat_b28_heli_3_searched -jup_b9_blackbox_decrypted -zat_b107_evacuation_info_partial} %+zat_b107_evacuation_info_partial =give_task(zat_b107_evacuation_zaton) =give_task(zat_b107_evacuation_jupiter) =give_task(zat_b107_evacuation_pripyat)%
+on_info2 = {+jup_b9_blackbox_decrypted -zat_b28_heli_3_searched -zat_b107_evacuation_info_partial} %+zat_b107_evacuation_info_partial =give_task(zat_b107_evacuation_pripyat)%
+on_info3 = {+jup_b9_blackbox_decrypted +zat_b28_heli_3_searched -zat_b107_evacuation_info_full} %+zat_b107_evacuation_info_full%
+on_info4 = {+zat_b107_evacuation_info_full +jup_a9_way_info +jup_a9_conservation_info +jup_a9_power_info -jup_a9_actor_found_main_documents} %+jup_a9_actor_found_main_documents%
+on_info5 = {+zat_b107_evacuation_info_full -jup_a9_actor_found_main_documents -jup_a9_way_to_pripyat_search_started} sr_idle@nill %=give_task(jup_a9_way_to_pripyat_search)%
+on_info6 = {+zat_b107_evacuation_info_full +jup_a9_actor_found_main_documents} sr_idle@nill %+jup_a9_way_to_pripyat_search_started%
+on_info7 = {+jup_a9_way_to_pripyat_search_started} sr_idle@nill
+
+;-------Затычка для старта на ЗАТОНЕ ---------
+;on_info6 = {+zat_b107_start_zaton} %+jup_b9_blackbox_decrypted +jup_b205_evacuation_visited%
+
+;-------Затычка для старта на ЮПИТЕРЕ ---------
+;on_info7 = {+zat_b107_start_jupiter} %+zat_b28_heli_3_searched +zat_a2_stalker_barmen_army +zat_a2_stalker_barmen_evacuation_asked%
+
+[sr_idle@nill]

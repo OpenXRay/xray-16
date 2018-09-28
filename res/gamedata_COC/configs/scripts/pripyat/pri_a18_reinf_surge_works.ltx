@@ -1,0 +1,87 @@
+[hit]
+on_info = {=hit_by_actor} %+pri_a18_actor_enemy%
+
+
+[logic@pri_a18_vano_surge]
+active = walker@surge_1
+suitable = {=check_npc_name(vano) +pri_a18_surge_started} true
+prior = 100
+post_combat_time = 0, 0
+on_hit = hit
+
+[walker@surge_1]
+path_walk = surge_1_walk
+path_look = surge_1_look
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = assault
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+on_info = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info2 = {=surge_complete} %-pri_a18_surge_started%
+
+
+
+
+
+
+[logic@pri_a18_sokolov_surge]
+active = walker@surge_2
+suitable = {=check_npc_name(pri_a15_sokolov) +pri_a18_surge_started} true
+prior = 100
+post_combat_time = 0, 0
+on_hit = hit
+
+[walker@surge_2]
+path_walk = surge_2_walk
+path_look = surge_2_look
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = assault
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+on_info = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info2 = {=surge_complete} %-pri_a18_surge_started%
+
+
+
+
+
+[logic@pri_a18_merkulov_surge]
+active = walker@surge_3
+suitable = {=check_npc_name(pri_a22_military_merkulov) +pri_a18_surge_started} true
+prior = 100
+post_combat_time = 0, 0
+on_hit = hit
+
+[walker@surge_3]
+path_walk = surge_1_walk
+path_look = surge_1_look
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = assault
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+on_info = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info2 = {=surge_complete} %-pri_a18_surge_started%
+
+
+
+
+[logic@pri_a18_skelja_surge]
+active = walker@surge_4
+suitable = {=check_npc_name(pri_a22_military_skelja) +pri_a18_surge_started} true
+prior = 100
+post_combat_time = 0, 0
+on_hit = hit
+
+[walker@surge_4]
+path_walk = surge_2_walk
+path_look = surge_2_look
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = assault
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+on_info = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info2 = {=surge_complete} %-pri_a18_surge_started%

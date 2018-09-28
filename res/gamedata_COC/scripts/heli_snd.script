@@ -1,0 +1,63 @@
+-- звук реакции пилотов вертолёта на разные события
+-- Чугай
+
+snd_see_enemy = {
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\see_enemy_1]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\see_enemy_2]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\see_enemy_3]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\see_enemy_4]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\see_enemy_5]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\see_enemy_6]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\see_enemy_7]] )
+}
+
+snd_hit = {
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_1]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_2]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_3]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_4]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_5]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_6]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_7]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_8]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\hit_9]] )
+}
+
+snd_damaged = {
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\damage_1]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\damage_2]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\damage_3]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\damage_4]] )
+}
+
+snd_down = {
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\death_1]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\death_2]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\death_3]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\death_4]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\death_5]] ),
+	xr_sound.get_safe_sound_object( [[vehicles\helicopter\death_6]] )
+}
+
+--------------------------------------------------------------------------------
+
+function play_snd( st, snd_set, priority )
+	if not st.mute and
+	   ( not st.snd_obj or
+	   not st.snd_obj:playing() or
+	   st.snd_priority < priority )
+	then
+		stop_snd( st )
+
+		st.snd_obj = snd_set[math.random( 1, #snd_set )]
+		st.snd_obj:play( db.actor, 0, sound_object.s2d )
+
+		st.snd_priority = priority
+	end
+end
+
+function stop_snd( st )
+	if st.snd_obj then
+		st.snd_obj:stop()
+	end
+end

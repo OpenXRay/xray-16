@@ -1,0 +1,29 @@
+[logic@pri_a22_military_skelja]
+active = animpoint@base
+suitable = {-pri_a25_task_start =check_npc_name(pri_a22_military_skelja)} true
+prior = 200
+
+[animpoint@base]
+cover_name = pri_a16_animp_4
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_info = {+pri_a21_task_start} animpoint@base_2
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@base_2]
+cover_name = pri_a16_animp_7
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+use_camp = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

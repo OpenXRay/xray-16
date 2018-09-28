@@ -1,0 +1,70 @@
+[logic]
+active = nil ;sr_idle@wait_consent
+
+[sr_idle@wait_consent]
+on_info = {+zat_b106_gonta_accept_actor} sr_idle@wait_hunt %=give_task(zat_b106_hunt_himera)%
+;on_info2 = {=is_squad_enemy_to_actor(zat_b106_stalker_gonta_squad)} sr_idle@nil
+;on_info3 = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil, {+zat_b106_fail} sr_idle@nil
+
+[sr_idle@wait_hunt]
+on_info = {+zat_b106_start_hunt} sr_idle@disable_ui ;%=disable_ui%
+;on_info2 = {=is_squad_enemy_to_actor(zat_b106_stalker_gonta_squad)} sr_idle@nil
+;on_info3 = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil %=enable_ui%, {+zat_b106_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@disable_ui]
+on_game_timer = 10 | sr_idle@timer %=run_postprocess(fade_in) =clear_smart_terrain(zat_b106_smart_terrain)% ; 
+;on_info = {=is_squad_enemy_to_actor(zat_b106_stalker_gonta_squad)} sr_idle@nil %=enable_ui%
+;on_info2 = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil %=enable_ui%, {+zat_b106_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@surge %=run_postprocess(black:12106:true) +zat_b106_destroy_gonta +zat_b106_destroy_garmata =teleport_squad(zat_b106_stalker_gonta_squad:zat_b106_smart_terrain_gonta_lair_1_walk) =forward_game_time(0:20)%
+;on_info = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil %=enable_ui%, {+zat_b106_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@surge]
+on_info = {=surge_started} sr_idle@enable_set_timer %=stop_surge%, sr_idle@enable_set_timer
+
+[sr_idle@enable_set_timer]
+on_info =  sr_idle@two_black %=create_squad(zat_b106_chimera_squad:zat_b106_smart_terrain) =teleport_actor(zat_b106_teleport_actor_walk:zat_b106_teleport_actor_look) =set_squad_goodwill(zat_b106_stalker_gonta_squad:friend)%
+;on_info2 = {+zat_b106_gonta_dead} sr_idle@nil %=enable_ui =stop_postprocess(12106)%, {+zat_b106_fail} sr_idle@nil %=enable_ui =stop_postprocess(12106)%
+
+[sr_idle@two_black]
+on_game_timer = 30 | {+zat_b106_remark} sr_idle@timer_proc_done %=stop_postprocess(12106)%
+;on_info = {+zat_b106_gonta_dead} sr_idle@nil %=enable_ui =stop_postprocess(12106)%, {+zat_b106_fail} sr_idle@nil %=enable_ui =stop_postprocess(12106)%
+
+[sr_idle@timer_proc_done]
+on_game_timer = 10 | sr_idle@enable_ui %+zat_b106_remark_done%
+;on_info2 = {+zat_b106_gonta_dead} sr_idle@nil %=enable_ui%, {+zat_b106_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@enable_ui]
+on_info = {+zat_b106_forwarding} sr_idle@wait %=enable_ui%
+on_info2 = {=is_squad_enemy_to_actor(zat_b106_stalker_gonta_squad)} sr_idle@nil
+on_info3 = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil, {+zat_b106_fail} sr_idle@nil 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[sr_idle@wait]
+on_info = {+zat_b106_return_to_skadovsk} sr_idle@check_gonta %+zat_b106_hunt_finish =run_postprocess(fade_in_out)%
+on_info2 = {+zat_b106_hunt_finish}  sr_idle@create_stalkers 
+on_info3 = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil, {+zat_b106_fail} sr_idle@nil, {+zat_b106_go_to_home} sr_idle@nil
+
+[sr_idle@check_gonta]
+on_game_timer = 20 | {-zat_b106_gonta_dead} sr_idle@check_garmata %=teleport_squad(zat_b106_stalker_gonta_squad:zat_stalker_base_smart_gonta_1_walk)%, {+zat_b106_gonta_dead} sr_idle@check_garmata
+on_info = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil %=enable_ui%, {+zat_b106_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@check_garmata]
+on_info = {-zat_b106_garmata_dead} sr_idle@enable_ui_timer_two %=teleport_actor(zat_actor_arrive_walk:zat_actor_arrive_look) =forward_game_time(0.20)%, {+zat_b106_garmata_dead} sr_idle@enable_ui_timer_two %=teleport_actor(zat_b106_return_actor_walk:zat_b106_return_actor_look)  =forward_game_time(0.20)%
+on_info2 = {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil %=enable_ui%, {+zat_b106_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@enable_ui_timer_two]
+on_game_timer = 30 | sr_idle@nil %=enable_ui%
+
+
+[sr_idle@create_stalkers]
+on_game_timer = 10 | sr_idle@teleport_gonta_to_jupiter %=teleport_squad(zat_b106_stalker_gonta_squad:zat_stalker_base_smart_gonta_1_walk)%
+
+
+
+[sr_idle@teleport_gonta_to_jupiter]
+on_info = {+jup_b6_gonta_employed =dist_to_story_obj_ge(zat_b106_stalker_gonta:50)} sr_idle@nil %=remove_squad(zat_b106_stalker_gonta_squad) =remove_squad(zat_b106_stalker_crab_squad) +jup_b6_gonta_on_jupiter%
+
+[sr_idle@nil]

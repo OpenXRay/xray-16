@@ -1,0 +1,17 @@
+[logic]
+active = nil;sr_idle@wait_for_spawn
+
+[sr_idle@wait_for_spawn]
+on_info = {=is_jup_a12_mercs_time +jup_a12_actor_choose_power -pri_a12_stalker_prisoner_free -jup_a12_actor_switched_from_ransom_to_power} sr_idle@spawn, {+pri_a12_stalker_prisoner_free} sr_idle@nil
+on_info2 = {-jup_a12_spawn_merc_squad !actor_in_zone(jup_a12_sr_merc_kamp)} %+jup_a12_spawn_merc_squad%
+on_info3 = {+jup_a12_spawn_merc_squad =actor_in_zone(jup_a12_sr_merc_kamp)} %-jup_a12_spawn_merc_squad%
+
+[sr_idle@spawn]
+on_info = {-jup_a12_spawn_merc_squad !actor_in_zone(jup_a12_sr_merc_kamp)} %+jup_a12_spawn_merc_squad%
+on_info2 = {+jup_a12_spawn_merc_squad =actor_in_zone(jup_a12_sr_merc_kamp)} %-jup_a12_spawn_merc_squad =clear_smart_terrain(jup_sim_2) =clear_smart_terrain(jup_sim_11) =clear_smart_terrain(jup_sim_12)%
+on_info3 = sr_idle@transfer %=create_squad(jup_a12_merc_stalker_squad:jup_a12_merc) +jup_a12_mercs_spawned%
+ 
+[sr_idle@transfer]
+on_info = {+jup_a12_actor_choose_power +jup_a12_actor_is_ready +jup_a12_merc_cover_in_merc_camp} sr_idle@nil %=relocate_item(af_soul:jup_a12_stalker_assaulter:jup_a12_merc_cover)%
+
+[sr_idle@nil]

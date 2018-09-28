@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_locations">
+		<text>Локации</text>
+	</string>
+	
+	<string id="encyclopedia_locations_agroprom">
+		<text>Агропром</text>
+	</string>
+	<string id="encyclopedia_locations_agroprom_text">
+		<text>
+			%c[guide_blue]Агропром%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Рельеф местности очень похож на Армейские Склады.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_agroprom_underground">
+		<text>Подземелья «Агропрома»</text>
+	</string>
+	<string id="encyclopedia_locations_agroprom_underground_text">
+		<text>
+			%c[guide_blue]Подземелья «Агропрома»%c[default] - сеть подземных тоннелей.\n
+			\n%c[guide_green]Информация%c[default]
+			\nНеизвестно, с какой целью всё это было построено. Некоторые отсеки явно были предназначены для хозяйственных и складских нужд, другие носят отчетливо научный характер.\n
+			\nВ настоящее время катакомбы заброшены и служат лишь для добывания артефактов из присутствующих в изобилии аномалий, а также в качестве охотничьих угодий бандитов и мутантов, которые охотятся на ничего не подозревающих сталкеров.\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+			\n• Является соединением локаций из этих двух частей игры .
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_army_warehouses">
+		<text>Армейские Склады</text>
+	</string>
+	<string id="encyclopedia_locations_army_warehouses_text">
+		<text>
+			%c[guide_blue]Армейские Склады%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Рельеф местности очень похож на Агропром.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_chernobyl_npp">
+		<text>Чернобыльская АЭС</text>
+	</string>
+	<string id="encyclopedia_locations_chernobyl_npp_text">
+		<text>
+			The %c[guide_blue]Чернобыльская АЭС%c[default] или %c[guide_blue]АЭС имени В.И.Ленина%c[default] построенная в советское время атомная станция, о которой хоть раз слышал каждый - самое сердце Зоны.\n
+			\n%c[guide_green]Информация%c[default]
+			\nИменно здесь в 1986 году произошёл первый взрыв - в ночь на 26 апреля 1986 года реактор четвёртого энергоблока Чернобыльской АЭС разрушился в результате мощного теплового взрыва. Подхваченная ветром радиоактивная пыль частично выпала на территории СССР, оставила очаги излучения в Европе и даже достигла берегов Америки.\n
+			\nЗаражённые территории в радиусе тридцати километров от станции превратились в строго охраняемую Зону полного отчуждения.\n
+			\nНа ЧАЭС были созданы первые секретные лаборатории «О-Сознания», проводившие исследования ноосферы. Если верить легендам, где-то там находится некий объект, способный исполнить любое желание – его называют Монолитом.\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• В действительности ЧАЭС расположена южнее города Припять.
+			\n• Увидеть ЧАЭС можно и с других локаций.
+			\n• Северная и южная половины ранее были единым целым.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_cordon">
+		<text>Кордон</text>
+	</string>
+	<string id="encyclopedia_locations_cordon_text">
+		<text>
+			%c[guide_blue]Кордон%c[default].\n
+			\n%c[guide_green]Информация%c[default]\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• На стадии разработки на Кордоне была расположена фабрика, которую позднее заменили на АТП.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_dark_valley">
+		<text>Тёмная Долина</text>
+	</string>
+	<string id="encyclopedia_locations_dark_valley_text">
+		<text>
+			%c[guide_blue]Тёмная Долина%c[default].\n
+			\n%c[guide_green]Информация%c[default]\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+			\n• Изначально локация была почти в два раза больше. Восточная часть была вырезана при разработке.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_darkscape">
+		<text>Тёмная Лощина</text>
+	</string>
+	<string id="encyclopedia_locations_darkscape_text">
+		<text>
+			%c[guide_blue]Тёмная Лощина%c[default] или %c[guide_blue]Тёмный Кордон%c[default] представляет собой лесистую, густо покрытую аномалиями, область.\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация была вырезана из финальной версии S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_dead_city">
+		<text>Мёртвый Город</text>
+	</string>
+	<string id="encyclopedia_locations_dead_city_text">
+		<text>
+			%c[guide_blue]Мёртвый Город%c[default], когда-то полный жизни, сейчас является не более, чем скоплением полуразрушенных зданий.\n
+			\n%c[guide_green]Информация%c[default]
+			\nРаньше в городе жили те, кто не смог найти жильё в Лиманске или Припяти. Настоящее имя этого городка уже давно забыто.\n
+			\nНынешнее прозвище, данное сталкерами, можно считать очень точным - особенно, если хотя бы раз побывать в этих местах.\n
+			\nНесмотря на постоянные атаки бандитов и мутантов, наёмники создали здесь свою базу, тем самым обеспечив себе мощное присутствие в этом уголке Зоны.\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация была вырезана из финальной версии S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_deserted_hospital">
+		<text>Заброшенный Госпиталь</text>
+	</string>
+	<string id="encyclopedia_locations_deserted_hospital_text">
+		<text>
+			%c[guide_blue]Заброшенный%c[default] или %c[guide_blue]Лиманский Госпиталь%c[default] - большое и заброшенное здание, почти полностью ушедшее в землю.\n
+			\n%c[guide_green]Информация%c[default]
+			\nНичего не известно об истории этой больницы, но можно предположить, что основными пациентами были жители близлежащего Лиманска.\n
+			\nОдной из наиболее интересных особенностей является тот факт, что здание каким-то образом почти полностью ушло под землю и сильно разрушилось, хотя землетрясений в этой части мира, как правило, не бывает.\n
+			\nЭто также единственный крупный район в пределах Зоны, где отсутствуют радиационный фон и аномальная активность. И одновременно -  один из самых опасных из-за присутствия группировки «Монолит».\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• На локации нет выбросов и пси-штормов, поскольку здесь нет укрытий.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Изначально не отображалась на карте Зоны.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_garbage">
+		<text>Свалка</text>
+	</string>
+	<string id="encyclopedia_locations_garbage_text">
+		<text>
+			%c[guide_blue]Свалка%c[default].\n
+			\n%c[guide_green]Информация%c[default]\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация отображает реально существующие в ЧЗО свалки радиоактивных отходов и брошенной техники.
+			\n• На стадии разработки игры эта местность была в несколько раз больше.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_generators">
+		<text>Генераторы</text>
+	</string>
+	<string id="encyclopedia_locations_generators_text">
+		<text>
+			%c[guide_blue]Генераторы%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация была вырезана из финальной версии S.T.A.L.K.E.R.«Тень Чернобыля».
+			\n• Локация была вырезана из финальной версии S.T.A.L.K.E.R.«Чистое Небо».
+		</text>
+	</string>
+	
+	<string id="encyclopedia_locations_great_swamp">
+		<text>Болота</text>
+	</string>
+	<string id="encyclopedia_locations_great_swamp_text">
+		<text>
+			%c[guide_blue]Болота%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация с таким названием была вырезана из финальной версии S.T.A.L.K.E.R.«Тень Чернобыля».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_jupiter">
+		<text>Окрестности «Юпитера»</text>
+	</string>
+	<string id="encyclopedia_locations_jupiter_text">
+		<text>
+			%c[guide_blue]Окрестности «Юпитера»%c[default] - местность, прилегающая к заводу «Юпитер» и %c[guide_blue]станции Янов%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Зов Припяти».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_jupiter_underground">
+		<text>Путепровод «Припять-1»</text>
+	</string>
+	<string id="encyclopedia_locations_jupiter_underground_text">
+		<text>
+			%c[guide_blue]Путепровод «Припять-1»%c[default] - также известный, как %c[guide_blue]Подземелья Припяти%c[default] или %c[guide_blue]Подземелья «Юпитера»%c[default] - представляет собой сеть туннелей, которые проходят глубоко под поверхностью недалеко от самого центра Зоны.\n
+			\n%c[guide_green]Информация%c[default]
+			\nЭти сокрытые от посторонних глаз туннели ранее использовались для скрытного перемещения каких-то грузов, о чём свидетельствуют многочисленные ржавеющие транспортные средства. После второй катастрофы они были заброшены и заполнены ядовитыми газами.\n
+			\nПосле того, как группе сталкеров удалось открыть туннели со стороны завода «Юпитер», время и естественная вентиляция и сделали их безопасными.\n
+			\nКонечно, «безопасный» - весьма относительный термин в Зоне. Тот, кто отважился спуститься в Путепровод, неизбежно должен быть готов к встрече с неисчислимыми рядами снорков и зомбированных сталкеров.\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Зов Припяти».
+			\n• Локация была вырезана из финальной версии S.T.A.L.K.E.R.«Чистое Небо».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_lab_x16">
+		<text>Лаборатория Х-16</text>
+	</string>
+	<string id="encyclopedia_locations_lab_x16_text">
+		<text>
+			%c[guide_blue]Лаборатория Х-16%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_lab_x18">
+		<text>Лаборатория Х-18</text>
+	</string>
+	<string id="encyclopedia_locations_lab_x18_text">
+		<text>
+			%c[guide_blue]Лаборатория Х-18%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_lab_x19">
+		<text>Лаборатория Х-19</text>
+	</string>
+	<string id="encyclopedia_locations_lab_x19_text">
+		<text>
+			%c[guide_blue]Лаборатория Х-19%c[default] - также известная, как %c[guide_blue]Лаборатория Х-10%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_lab_x8">
+		<text>Лаборатория Х-8</text>
+	</string>
+	<string id="encyclopedia_locations_lab_x8_text">
+		<text>
+			%c[guide_blue]Лаборатория Х-8%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Зов Припяти».
+			\n• Планировкой помещений идентична Военной лаборатории.
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_limansk">
+		<text>Лиманск</text>
+	</string>
+	<string id="encyclopedia_locations_limansk_text">
+		<text>
+			%c[guide_blue]Лиманск%c[default] или, официально, %c[guide_blue]Лиманск-13%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• На планировку локации оказал сильное влияние реальный военный городок «Чернобыль-2».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_monolith_control_center">
+		<text>Центр управления Монолитом</text>
+	</string>
+	<string id="encyclopedia_locations_monolith_control_center_text">
+		<text>
+			%c[guide_blue]Центр управления Монолитом%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Недоступная для игрока область, которая использовалась только для финальных сцен.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_monolith_war_lab">
+		<text>Военная лаборатория</text>
+	</string>
+	<string id="encyclopedia_locations_monolith_war_lab_text">
+		<text>
+			The %c[guide_blue]Военная лаборатория%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Планировкой помещений идентична лаборатории Х-8.
+			\n• Локация была вырезана из финальной версии S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_outskirts">
+		<text>Окраины Припяти</text>
+	</string>
+	<string id="encyclopedia_locations_outskirts_text">
+		<text>
+			%c[guide_blue]Окраины Припяти%c[default] или %c[guide_blue]Восточная Припять%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Зов Припяти».
+			\n• Первоначальное название «Припять» было изменено во избежание путаницы.
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_pripyat">
+		<text>Центр Припяти</text>
+	</string>
+	<string id="encyclopedia_locations_pripyat_text">
+		<text>
+			%c[guide_blue]Центр Припяти%c[default] или просто %c[guide_blue]Припять%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Первоначальное название «Припять» было изменено во избежание путаницы.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_red_forest">
+		<text>Рыжий Лес</text>
+	</string>
+	<string id="encyclopedia_locations_red_forest_text">
+		<text>
+			The %c[guide_blue]Рыжий Лес%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_radar">
+		<text>Радар</text>
+	</string>
+	<string id="encyclopedia_locations_radar_text">
+		<text>
+			%c[guide_blue]Радар%c[default] или %c[guide_blue]Тёмный Лес%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_rostok">
+		<text>Бар</text>
+	</string>
+	<string id="encyclopedia_locations_rostok_text">
+		<text>
+			%c[guide_blue]Бар%c[default], он же - %c[guide_blue]Завод «Росток»%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Западная половина была преобразована в Дикую Территорию.
+			\n• На локации есть местность, которая недоступна для игрока.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_sarcophagus">
+		<text>Саркофаг</text>
+	</string>
+	<string id="encyclopedia_locations_sarcophagus_text">
+		<text>
+			%c[guide_blue]Саркофаг%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Значительная часть локации дублируется на территории ЧАЭС, но является недоступной.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_truck_cemetery">
+		<text>Кладбище Техники</text>
+	</string>
+	<string id="encyclopedia_locations_truck_cemetery_text">
+		<text>
+			%c[guide_blue]Кладбище Техники%c[default] - расположенная в районе %c[guide_blue]Рассохи%c[default] гигантская свалка облучённой техники.\n
+			\n%c[guide_green]Информация%c[default]
+			\nВо время ликвидации последствий катастрофы 1986 года, многие машины работали в непосредственной близости от реактора и, в основном, использовались для перевозки высокоактивных материалов.\n
+			\nБольшая часть их была на тот момент в рабочем состоянии, но не было никакого практического способа провести дезактивацию, остальные вышли из строя из-за суровых условий эксплуатации и были просто брошены здесь.\n
+			\nПосле возникновения Зоны, область стала ареной постоянных стычек «Свободы» и «Долга», а также солдат и бандитов, которые время от времени вламываются сюда с востока и юга.\n
+			\nНесмотря на кажущуюся заброшенность, эти места часто посещается вольными сталкерами и членами других группировок.\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• На самом деле все транспортные средства в районе Россохи давно утилизированы.
+			\n• Эта локация имеет самый большой размер и из-за обилия объектов является наиболее ресурсоёмкой.
+			\n• Локация создана исключительно для S.T.A.L.K.E.R.«Зов Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_wild_territory">
+		<text>Дикая Территория</text>
+	</string>
+	<string id="encyclopedia_locations_wild_territory_text">
+		<text>
+			%c[guide_blue]Дикая Территория%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Изначально являлась частью завода Росток.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_yantar">
+		<text>Янтарь</text>
+	</string>
+	<string id="encyclopedia_locations_yantar_text">
+		<text>
+			%c[guide_blue]Янтарь%c[default].\n
+			\n%c[guide_green]Информация%c[default]
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Был сильно переделан во время разработки и изначально был в несколько раз больше.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Чистое Небо».
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Тень Чернобыля».
+		</text>
+	</string>
+		
+	<string id="encyclopedia_locations_zaton">
+		<text>Затон</text>
+	</string>
+	<string id="encyclopedia_locations_zaton_text">
+		<text>
+			%c[guide_blue]Затон%c[default] - высохшее старое русло реки Припять.\n
+			\n%c[guide_green]Информация%c[default]
+			\nО прошлом Затона говорят многочисленные осевшие на дно лодки, катера, баржи и сухогрузы.
+			\nРадиации на Затоне мало, однако присутствуют мутанты, аномалии и зомбированные сталкеры.\n
+			\nНесмотря на то, что Затон расположен в центре Зоны и окружён территориями «Монолита», там есть крупные лагеря сталкеров - такие, как «Скадовск» и «Шевченко».\n
+			\n%c[guide_green]Дополнительные сведения%c[default]
+			\n• Локация является высохшим руслом-старицей реки Припять.
+			\n• Локация присутствовала в S.T.A.L.K.E.R.«Зов Припяти».
+		</text>
+	</string>
+	
+</string_table>

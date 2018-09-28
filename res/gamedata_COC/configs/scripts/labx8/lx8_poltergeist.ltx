@@ -1,0 +1,28 @@
+[logic@polter]
+active = mob_home
+suitable = {=check_npc_name(lx8_poltergeist)} true
+prior = 100
+monster_job = true
+
+[mob_home]
+path_home = polter_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 40
+aggressive = true
+out_restr = lx8_sr_polter_out_restr
+on_timer = 30000 | {!actor_in_zone(lx8_sr_polter_danger_zone)} mob_home@hold %-lx8_polter_ignore%
+on_info = {=actor_in_zone(lx8_sr_burer_out_restr) =is_alive(lx8_burer) =is_alive(lx8_burer_2) =is_alive(lx8_burer_3)} %=polter_actor_ignore(true)%, %=polter_actor_ignore(false)%
+on_info2 = {=actor_in_zone(lx8_sr_toilet_burer_out_restr) =is_alive(lx8_toilet_burer)} %=polter_actor_ignore(true)%, %=polter_actor_ignore(false)%
+		
+[mob_home@hold]
+path_home = polter_home
+actor_friendly = true ;false
+home_min_radius = 30
+home_max_radius = 40
+aggressive = false
+braindead = true
+out_restr = lx8_sr_polter_out_restr
+on_timer = 30000 | mob_home
+on_info = {=actor_in_zone(lx8_sr_polter_danger_zone)} mob_home 
+on_info2 = {-lx8_polter_ignore} %+lx8_polter_ignore =polter_actor_ignore(true)%

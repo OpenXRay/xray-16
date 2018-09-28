@@ -1,0 +1,14 @@
+[logic]
+active = sr_idle@check_switch
+
+[sr_idle@check_switch]
+on_info = {+bar_deactivate_radar_done} sr_idle@nil, sr_particle
+
+[sr_particle]
+name = anomaly2\psi_antenna_00
+path = rad_antenna_particle2
+mode = 2
+looped = true
+on_info = {+bar_deactivate_radar_done} sr_idle@nil
+
+[sr_idle@nil]

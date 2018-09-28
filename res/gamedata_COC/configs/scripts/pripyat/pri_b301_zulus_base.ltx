@@ -1,0 +1,45 @@
+[logic@pri_b301_zulus]
+suitable = {=check_npc_name(pri_b301_zulus)} true
+active = walker@base
+prior = 200
+
+[walker@base]
+path_walk = zulus_2_walk_1
+path_look = zulus_2_look_1
+meet = no_meet
+on_info = {=npc_in_zone(pri_surge_hide_a16)} walker@base_stand
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[walker@base_stand]
+path_walk = zulus_2_walk_1
+path_look = zulus_2_look_1
+on_info = {+jup_b15_zulus_b301_reward_dialog_end} animpoint@pri_a16_zulus %=give_items(wpn_wincheaster1300:ammo_12x70_buck)%
+meet = meet
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[animpoint@pri_a16_zulus]
+cover_name = pri_a16_animp_wanderer
+use_camp = false 
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_info = {=dist_to_actor_ge(100) +jup_b15_zulus_b301_reward_dialog_done -pri_b301_zulus_full_destroy} %=destroy_object +pri_b301_zulus_full_destroy%
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+use = {!actor_enemy =dist_to_actor_le(2)} self, {!actor_enemy} true
+meet_dialog	=  jup_b15_zulus_b301_reward_dialog
+trade_enable 	= false
+allow_break 	= false

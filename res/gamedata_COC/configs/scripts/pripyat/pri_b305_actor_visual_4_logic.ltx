@@ -1,0 +1,85 @@
+[logic]
+active = walker@strelok_operation_start
+
+; ************************* 4 *****************************
+[walker@strelok_operation_start]
+path_walk = pri_a16_pri_b305_actor_strelok_operation_walk
+path_look = pri_a16_pri_b305_strelok_operation_look
+out_restr = pri_a16_sr_noweap
+def_state_standing = threat
+;on_game_timer = 20 | remark@strelok_operation_start 
+on_info = {+pri_b305_strelok_introduse_done_end} walker@meet_strelok
+on_info2 = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@strelok_operation_start]
+target = path | pri_a16_pri_b305_strelok_operation_walk, 0
+anim   = threat
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_b305_strelok_introduse_done_end} walker@meet_strelok
+on_info2 = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@meet_strelok]
+path_walk = pri_a16_pri_b305_actor_meet_strelok_walk
+path_look = pri_a16_pri_b305_strelok_operation_walk
+out_restr = pri_a16_sr_noweap
+def_state_standing = guard
+on_signal = pri_b305_actor_met_strelok | {-pri_b305_actor_ask_about_burning_antenn_done} %=play_sound(pri_b305_actor_ask_about_burning_antenn) +pri_b305_actor_ask_about_burning_antenn_done%
+on_signal2 = sound_end | remark@wait %+pri_b305_actor_ask_about_burning_antenn_done_end%
+on_info = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@wait]
+target = story | pri_b305_strelok
+anim   = guard
+out_restr = pri_a16_sr_noweap
+; +начался выброс
+on_game_timer = 30 | {+pri_b305_strelok_about_zone_destroying_done_end -pri_b305_actor_emission_starts_done} %=play_sound(pri_b305_actor_emission_starts) +pri_b305_actor_emission_starts_done%
+on_signal = sound_end | walker@time %+pri_b305_actor_emission_starts_done_end%
+on_info = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@time]
+path_walk = pri_a16_pri_b305_actor_meet_strelok_walk
+path_look = pri_a16_pri_b305_strelok_operation_walk
+out_restr = pri_a16_sr_noweap
+def_state_standing = guard
+on_game_timer = 40 | %=destroy_object -pri_b305_4_cam_actor%
+on_info = {+pri_b305_forth_cam_end} %=destroy_object -pri_b305_4_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

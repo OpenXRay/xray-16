@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 5
+max_population = 3
+respawn_params = respawn@gen_smart_terrain_lab_entrance_2
+respawn_idle = 86400
+
+
+[respawn@gen_smart_terrain_lab_entrance_2]
+spawn_mutants
+spawn_polter
+
+[spawn_mutants]
+spawn_squads = simulation_controller
+spawn_num = 1
+
+[spawn_polter]
+spawn_squads = simulation_poltergeist_tele
+spawn_num = 2

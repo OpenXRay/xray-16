@@ -1,0 +1,32 @@
+[logic]
+active = nil;sr_idle@check_surge_end
+
+[sr_idle@check_surge_end]
+on_info = {+pri_a28_colonel_to_center_3_sound_end} sr_idle@timer_befor_cutscene
+
+[sr_idle@timer_befor_cutscene]
+on_game_timer = 10 | sr_idle@cutscene_actor_spawn %=disable_ui =run_postprocess(fade_in_out)%
+
+[sr_idle@cutscene_actor_spawn]
+on_game_timer = 25 | sr_cutscene %=create_cutscene_actor_with_weapon(pri_a28_cutscene_actor_base:pri_a16_pri_b305_kovalskiy_walk)%
+
+[sr_cutscene]
+global_cameffect = true
+point = pri_a28_actor_walk
+look = pri_a28_actor_look
+cam_effector = scenario_cam\pripyat\pri_a28_ssu_communication_camera
+on_info = {+pri_a28_ssu_to_actor_5_sound_end} %=stop_sr_cutscene%
+on_signal = cameff_end | sr_idle@after_1
+
+[sr_idle@after_1]
+on_game_timer = 10 | {-pri_a28_destroy_base_cutscene_actor} %+pri_a28_destroy_base_cutscene_actor%
+on_info = {+pri_a28_destroy_base_cutscene_actor_done} sr_idle@after_2 %=teleport_actor(pri_a28_cutscene_actor_base_walk:pri_a28_cutscene_actor_base_look)%
+
+[sr_idle@after_2]
+on_game_timer = 10 | sr_idle@save %=stop_postprocess(2021) =enable_ui +pri_a28_base_movie_done%
+
+[sr_idle@save]
+on_info = {-pri_a28_talked_with_ssu} %+pri_a28_talked_with_ssu =scenario_autosave(st_save_pri_a28_talked_with_ssu)%
+on_info2 = {+pri_a28_talked_with_ssu} sr_idle@nil
+
+[sr_idle@nil]

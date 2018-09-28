@@ -1,0 +1,14 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_particle
+
+[sr_particle]
+name = _samples_particles_\effects\electra
+path = warlab_pods_particle2_way
+mode = 2
+looped = true
+on_info = {+warlab_deactivate_generators_done} sr_idle@nil
+
+[sr_idle@nil]

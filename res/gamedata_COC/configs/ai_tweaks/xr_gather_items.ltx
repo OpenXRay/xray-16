@@ -1,0 +1,22 @@
+[settings]
+enable = true						;Use new scheme
+max_detect_dist = 1225			;max dist*dist < max that NPCs will detect items from visual memory
+artifact_search_time = 90000	; miliseconds to auto-pickup artefact no matter how far away it is
+state_run = run
+state_walk = walk
+run_dist = 3						;Distance in which to use run state
+
+allow_artifact_detection = true		;Allow npcs to pickup artifacts if they detect them
+
+use_xr_corpse_detection_loot_table = true
+
+[artifact_communities]; Squad Communities who are allowed to detect artifacts.
+stalker
+bandit
+killer
+dolg
+freedom
+ecolog
+csky
+
+[lootable]; Only used when use_xr_corpse_detection_loot_table = false

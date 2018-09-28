@@ -1,0 +1,13 @@
+[logic]
+active = nil;ph_idle@jup_b202_wait_stolen
+
+[ph_idle@jup_b202_end]
+nonscript_usable = true
+tips = inventory_box_use
+
+[ph_idle@jup_b202_wait_stolen]
+on_info = {+jup_b52_actor_items_can_be_stolen} ph_idle@jup_b202_actor_can_return_item 
+tips = jup_b202_treasures_closed
+
+[ph_idle@jup_b202_actor_can_return_item]:ph_idle@jup_b202_end
+on_use = ph_idle@jup_b202_end %+jup_b202_actor_items_returned +jup_b202_actor_find_snag%

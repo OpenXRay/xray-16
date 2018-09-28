@@ -1,0 +1,21 @@
+[logic]
+;active = ph_sound@a
+active = sr_idle@on
+
+;[ph_sound@a]
+;snd = radar_drone
+;on_info = {+bar_deactivate_radar_done} ph_sound@b
+;looped = true
+
+;[ph_sound@b]
+;snd = radar_drone
+;looped = false
+;on_signal = sound_end| nil
+
+[sr_idle@on]
+on_info = {-bar_deactivate_radar_done} %=play_sound_looped(radar_drone)%
+on_info2 = {+bar_deactivate_radar_done} sr_idle@off
+
+[sr_idle@off]
+on_game_timer = 5 | %=stop_sound_looped%
+on_game_timer2 = 100 | nil

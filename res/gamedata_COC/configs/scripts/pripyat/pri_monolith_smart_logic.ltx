@@ -1,0 +1,162 @@
+[logic@prayer_1]
+active = walker@prayer_1
+suitable = {=npc_community(monolith) =surge_started} true
+prior = 300
+
+[logic@prayer_2]
+active = walker@prayer_2
+suitable = {=npc_community(monolith) =surge_started} true
+prior = 300
+
+[logic@prayer_3]
+active = walker@prayer_3
+suitable = {=npc_community(monolith) =surge_started} true
+prior = 300
+
+[logic@prayer_4]
+active = walker@prayer_4
+suitable = {=npc_community(monolith) =surge_started} true
+prior = 300
+
+[logic@prayer_5]
+active = walker@prayer_5
+suitable = {=npc_community(monolith) =surge_started} true
+prior = 300
+
+[logic@prayer_6]
+active = walker@prayer_6
+suitable = {=npc_community(monolith) =surge_started} true
+prior = 300
+
+[walker@prayer_1]
+path_walk = prayer_1_walk
+path_look = prayer_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+danger = danger
+meet = no_meet
+
+[walker@prayer_2]
+path_walk = prayer_2_walk
+path_look = prayer_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+danger = danger
+meet = no_meet
+
+[walker@prayer_3]
+path_walk = prayer_3_walk
+path_look = prayer_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+danger = danger
+meet = no_meet
+
+[walker@prayer_4]
+path_walk = prayer_4_walk
+path_look = prayer_2_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+danger = danger
+meet = no_meet
+
+[walker@prayer_5]
+path_walk = prayer_5_walk
+path_look = prayer_2_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+danger = danger
+meet = no_meet
+
+[walker@prayer_6]
+path_walk = prayer_6_walk
+path_look = prayer_2_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+danger = danger
+meet = no_meet
+
+[danger]
+ignore_distance = 0
+
+;monolith trader
+[logic@pri_monolith_monolith_trader]
+suitable = {=check_npc_name(pri_monolith_monolith_trader_stalker)} true
+prior = 200
+active = animpoint@stand
+level_spot = trader
+trade = misc\trade\trade_monolith_rabbit.ltx
+dont_keep_items = true
+
+[animpoint@stand]
+cover_name = pri_monolith_monolith_trader_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@trader
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@trader]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+
+;monolith mechanic
+[logic@pri_monolith_monolith_mechanic]
+suitable = {=check_npc_name(pri_monolith_monolith_mechanic_stalker)} true
+prior = 200
+active = animpoint@stand2
+level_spot = mechanic
+
+[animpoint@stand2]
+cover_name = pri_monolith_monolith_mechanic_smart_cover
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@mechanic
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@mechanic]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+

@@ -1,0 +1,9 @@
+; add a story mode check if this is ever enabled
+[logic]
+;active = sr_idle
+active = sr_idle@nil
+
+[sr_idle]
+on_actor_inside = {+pri_documents_warlab_task} sr_idle@nil %+gen_actor_found_warlab%
+
+[sr_idle@nil]

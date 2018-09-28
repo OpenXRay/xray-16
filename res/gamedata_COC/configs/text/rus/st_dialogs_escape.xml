@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+<!--------------------------- esc_2_12_stalker_trader ----------->
+	<string id="esc_2_12_stalker_trader_start_dialog_1">
+		<text>О, новые лица... Или я уже видел тебя раньше, сталкер? Я здесь покупаю и продаю всё, что необходимо таким, как ты. Если нужен источник дохода, то я всегда нуждаюсь в ком-то, кто готов делать грязную работу.\n Посмотри на этот лагерь. Все сталкеры свободно приходят сюда, чтобы отдохнуть подальше от неприятностей. Поэтому предупреждаю - никаких конфликтов с военными. Я плачу хорошие деньги, чтобы держать их подальше от этого места. Сталкеры должны чувствовать себя в относительной безопасности, пока находятся в лагере.</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_2">
+		<text>Привет, сталкер! Что тебе нужно?</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_esc_m_trader_task_1_complete">
+		<text>Дело сделано? Молодец, вот твоя награда.</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_esc_m_trader_task_2_complete">
+		<text>Хм, да у тебя талант, парень! Вот твоя награда, держи.</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_wolf_start ------>
+	<string id="esc_2_12_stalker_wolf_start_dialog_1">
+		<text>Привет, сталкер! Какими судьбами в деревне?</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_fanat ----------->
+	<string id="esc_2_12_stalker_fanat_start_dialog_1">
+		<text>Здорово, сталкер! Как жизнь?</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_start_dialog_esc_m_trader_task_2">
+		<text>Тебе нужно что-то?</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_about_esc_m_trader_task_2_0">
+		<text>На АТП засели бандиты. Сидорович сказал, что ты можешь помочь разобраться с ними.</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_about_esc_m_trader_task_2_1">
+		<text>Конечно, я помогу. Не хочу, чтобы они угрожали зелени.</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_nimble ----------->
+	<!-- esc_2_12_stalker_trader_mar_base_owl_stalker_trader_task_1 -->
+	<string id="esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1">
+		<text>Для меня? Ах да, я ждал этот КПК. Дрозд помогает мне поддерживать контакты на стороне, оставаясь в безопасности и сохраняя анонимность, благодаря высокому уровню шифрования данных - хех, хакерские штучки. Веришь или нет, раньше я тоже был членом «Чистого Неба». Много дерьма тогда произошло, однако, они каким-то образом умудрились сохранить группировку. Лишь немногие из них, как, например, Холод, или Новиков, являются старыми членами группировки; большинство либо погибли, либо решили идти своей дорогой. Я не видел смысла оставаться с ними на Болотах, однако всё ещё стараюсь поддерживать связь. Ох, прости, чуть не забыл. Вот твоя награда:</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1_about">
+		<text>У меня есть кое-что для тебя.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_no">
+		<text>Эмм, я так не думаю.</text>
+	</string>
+	
+	<string id="esc_2_12_stalker_nimble_about_0">
+		<text>Ответишь на пару вопросов?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1">
+		<text>Конечно.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1111">
+		<text>Как долго ждать заказ?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1114">
+		<text>Расскажи о себе.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_11141">
+		<text>Да ничего интересного. Всякое бывало, как и со всеми тут: и в аномалии попадал, и в плену у бандитов был... Я же в Зону ещё пацаном пришёл. Вначале по мелочи бегал - антирады, патроны бронебойные... Потом с Сидоровичем работал - долг отдавал, он мне разок шкуру спас. Пока для него каштаны из огня таскал, завёл пару своих полезных знакомств, ну и при первой возможности взялся за эксклюзивные заказы. Я же ведь из любой ситуации выкручивался - и, чую, однажды удача сбойнёт. А дурное желание загибаться по пустякам уже давно выветрилось.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1116">
+		<text>Спасибо, я всё понял.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_11161">
+		<text>Был рад помочь.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_11">
+		<text>Приветствую. Я - Шустрый. Обычно ко мне обращаются за уникальным оружием. Редкие модели, прототипы, именные пушки - ну и элитное снаряжение там, последние разработки защитных и боевых костюмов... Каждая вещь проверяется мной лично, так что качество гарантировано!</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_12">
+		<text>Приветствую. Хочешь заказать что-нибудь?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_13">
+		<text>Приветствую.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_14">
+		<text>Заказ будет выполнен в ближайшее время.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_15">
+		<text>Твой заказ выполнен. Можешь забрать.</text>
+	</string>
+</string_table>

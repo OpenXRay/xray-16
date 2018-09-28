@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-------------------------- OSOZNANIE REPRESENTATIVE ------------------------>
+    <specific_character id="osoznanie" team_default = "1">
+    <name>warlab_osoznanie_name</name>
+    <icon>ui_inGame2_sakharov_pepe</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>The representative of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>522</rank>
+    <reputation>127</reputation>
+    <visual>actors\ucheniy\ucheniy_1_strong</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    <start_dialog>oso_osoznanie_start</start_dialog>
+    <actor_dialog>oso_who_are_you</actor_dialog>
+    <actor_dialog>oso_what_is_the_zone</actor_dialog>
+    <actor_dialog>oso_what_about_me</actor_dialog>
+    <actor_dialog>oso_why_chernobyl</actor_dialog>
+    <actor_dialog>oso_chernobyl_crush</actor_dialog>
+    <actor_dialog>oso_stalker</actor_dialog>
+    <actor_dialog>oso_death_truck</actor_dialog>
+    <actor_dialog>oso_what_next</actor_dialog>
+    <actor_dialog>oso_yes</actor_dialog>
+    <actor_dialog>oso_no</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- 7 OSOZNANIE VOLUNTEERS ------------------------>
+    <specific_character id="warlab_pod_1_stalker" team_default = "1">
+    <name>warlab_volunteer_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>A volunteer of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>14488</rank>
+    <reputation>2157</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    </specific_character>
+    
+    <specific_character id="warlab_pod_2_stalker" team_default = "1">
+    <name>warlab_volunteer_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>A volunteer of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2750</rank>
+    <reputation>-740</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    </specific_character>
+    
+    <specific_character id="warlab_pod_3_stalker" team_default = "1">
+    <name>warlab_volunteer_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>A volunteer of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>20666</rank>
+    <reputation>-864</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    </specific_character>
+    
+    <specific_character id="warlab_pod_4_stalker" team_default = "1">
+    <name>warlab_volunteer_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>A volunteer of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25098</rank>
+    <reputation>275</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    </specific_character>
+    
+    <specific_character id="warlab_pod_5_stalker" team_default = "1">
+    <name>warlab_volunteer_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>A volunteer of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>12612</rank>
+    <reputation>-694</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    </specific_character>
+    
+    <specific_character id="warlab_pod_6_stalker" team_default = "1">
+    <name>warlab_volunteer_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>A volunteer of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1268</rank>
+    <reputation>-1820</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    </specific_character>
+    
+    <specific_character id="warlab_pod_7_stalker" team_default = "1">
+    <name>warlab_volunteer_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>A volunteer of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>17984</rank>
+    <reputation>-2388</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    </specific_character>
+    
+    <specific_character id="warlab_invisible_stalker" team_default = "1">
+    <name>warlab_entity_name</name>
+    <icon>ui_inGame2_Hero</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Unexpected side effect of the project "Awareness".</bio>
+    <class>trader</class>
+    <community>trader</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>346</rank>
+    <reputation>234</reputation>
+    <visual>actors\stalker_invisible\stalker_invisible</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+    </supplies>
+    <start_dialog>warlab_entity_start</start_dialog>
+    </specific_character>
+    
+</xml>

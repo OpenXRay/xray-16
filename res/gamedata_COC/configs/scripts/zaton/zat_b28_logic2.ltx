@@ -1,0 +1,13 @@
+[logic]
+active = nil ;sr_idle@logic2
+
+[sr_idle@logic2]
+on_info = {+zat_b28_heli_3_play_sound -zat_b28_heli_3_sound} %=play_sound(zat_b28_heli_3_evacuation_points)%
+on_signal = sound_end | sr_idle@timer %+zat_b28_heli_3_sound%
+on_info2 = {+zat_b28_actor_hit} sr_idle@timer %=stop_sound%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@nil %+zat_b28_camera_stop%
+on_info = {+zat_b28_actor_hit} sr_idle@nil %=stop_sound +zat_b28_camera_stop%
+
+[sr_idle@nil]

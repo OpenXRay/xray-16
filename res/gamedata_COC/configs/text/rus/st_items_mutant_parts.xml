@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="mutant_flesh_meat">
+		<text>Мясо плоти</text>
+	</string>
+	<string id="mutant_flesh_meat_description">
+		<text>Жёсткое и горькое мясо плоти является наиболее распространенной едой в Зоне. Однако, большинство сталкеров всё же предпочитают обычные консервы.</text>
+	</string>
+
+	<string id="mutant_boar_chop">
+		<text>Мясо кабана</text>
+	</string>
+	<string id="mutant_boar_chop_description">
+		<text>Ответ Зоны свиным отбивным с Большой Земли. Жуётся гораздо сложнее, нежели мясо их нормальных сородичей.</text>
+	</string>
+
+	<string id="mutant_dog_meat">
+		<text>Мясо слепой собаки</text>
+	</string>
+	<string id="mutant_dog_meat_description">
+		<text>Обычно добывается и продаётся в Зоне. Ценится выше, чем мясо плоти, из-за менее горького вкуса.</text>
+	</string>
+
+	<string id="mutant_psevdodog_meat">
+		<text>Мясо псевдопса</text>
+	</string>
+	<string id="mutant_psevdodog_meat_description">
+		<text>Несмотря на то, что достать данное мясо сложнее, чем мясо слепой собаки, на вкус они практически одинаковы. Поэтому большинство сталкеров не будут платить за него больше.</text>
+	</string>
+
+	<string id="mutant_krovosos_meat">
+		<text>Мясо кровососа</text>
+	</string>
+	<string id="mutant_krovosos_meat_description">
+		<text>Кусок волокнистого мяса кровососа. Несмотря на то, что достать его не так просто, зачастую продаётся за копейки из-за отвратительного вкуса.</text>
+	</string>
+
+	<string id="mutant_snork_hand">
+		<text>Рука снорка</text>
+	</string>
+	<string id="mutant_snork_hand_description">
+		<text>Рука снорка. От человеческой ничем кардинально не отличается, кроме того, что имеет серый оттенок и покрыта множеством ран и волдырей.</text>
+	</string>
+
+	<string id="mutant_fracture_hand">
+		<text>Рука излома</text>
+	</string>
+	<string id="mutant_fracture_hand_description">
+		<text>Рука излома. Несмотря на свою тонкость и костлявость, она часто имеет необычайно длинные и острые пальцы.</text>
+	</string>
+
+	<string id="mutant_zombi_hand">
+		<text>Рука зомби</text>
+	</string>
+	<string id="mutant_zombi_hand_description">
+		<text>Грязная и мерзкая рука зомби. Потеряв всё, кроме первобытных инстинктов, зомбированные используют их в качестве оружия.</text>
+	</string>
+
+	<string id="mutant_chimera_meat">
+		<text>Мясо химеры</text>
+	</string>
+	<string id="mutant_chimera_meat_description">
+		<text>Массивный кусок мяса химеры. Немногие могут позволить себе таким попировать, поэтому и цена ему дана немалая.</text>
+	</string>
+
+	<string id="mutant_tushkano_meat">
+		<text>Мясо тушкана</text>
+	</string>
+	<string id="mutant_tushkano_meat_description">
+		<text>Несмотря на то, что мяса с этих грызунов много не соберёшь, это наиболее дешёвая и часто встречающаяся пища, что обуславливается огромным количеством тушканов в Зоне.</text>
+	</string>
+
+	<string id="mutant_flesh_eye">
+		<text>Глаз плоти</text>
+	</string>
+	<string id="mutant_flesh_eye_description">
+		<text>Абсолютно отличен от глаз обычных свиней, от которых эти существа произошли. Глаз плоти представляет из себя большой тяжелый шар полностью коричневого цвета.</text>
+	</string>
+
+	<string id="mutant_boar_leg">
+		<text>Копыто кабана</text>
+	</string>
+	<string id="mutant_boar_leg_description">
+		<text>Некоторые сталкеры вешают копыта кабанов себе на шею как талисман. Кое-кто также находит им более экзотическое применение, перетирая их в порошок.</text>
+	</string>
+
+	<string id="mutant_dog_tail">
+		<text>Хвост слепой собаки</text>
+	</string>
+	<string id="mutant_dog_tail_description">
+		<text>Длинный, бесшёрстный хвост слепого пса. Не имеет абсолютно никакой пользы и является самым дешёвым трофеем в Зоне.</text>
+	</string>
+
+	<string id="mutant_psevdodog_tail">
+		<text>Хвост псевдособаки</text>
+	</string>
+	<string id="mutant_psevdodog_tail_description">
+		<text>Мех на хвосте псевдособаки является отличным термоизолятором, поэтому сталкеры часто вшивают их под комбинезоны и бронежилеты в холодные времена года.</text>
+	</string>
+
+	<string id="mutant_krovosos_jaw">
+		<text>Щупальца кровососа</text>
+	</string>
+	<string id="mutant_krovosos_jaw_description">
+		<text>Щупальца кровососа содержат особую железу: она выделяет фермент, растворяющий кожу жертвы, и одновременно препятствующий сворачиванию крови. Если учёным удастся определить структуру фермента, то это поможет осуществить прорыв в медицине.</text>
+	</string>
+
+	<string id="mutant_snork_leg">
+		<text>Стопа снорка</text>
+	</string>
+	<string id="mutant_snork_leg_description">
+		<text>Стопа снорка, в отличие от человеческой, содержит большее количество сухожилий, обладающих потрясающей эластичностью. Этим объясняется способность снорков совершать невероятные прыжки.</text>
+	</string>
+
+	<string id="mutant_chimera_cogot">
+		<text>Зуб химеры</text>
+	</string>
+	<string id="mutant_chimera_cogot_description">
+		<text>Зуб из пасти химеры. Как известно, химеры меняют зубы на протяжении всей своей жизни, из-за чего их часто находят сломанными или изношенными и не особо ценят.</text>
+	</string>
+
+	<string id="mutant_chimera_claw">
+		<text>Коготь химеры</text>
+	</string>
+	<string id="mutant_chimera_claw_description">
+		<text>Несмотря на то, что коготь этого существа может без труда разрезать несколько листов кевлара, они часто изнашиваются из-за экстремальных условий применения, и, так же, как и ее зубы, попросту отпадают, заменяясь новыми, что делает их не очень дорогим товаром.</text>
+	</string>
+
+	<string id="mutant_tushkano_head">
+		<text>Голова тушкана</text>
+	</string>
+	<string id="mutant_tushkano_head_description">
+		<text>Глаза, уши, пасть и нос тушкана в крошечной упаковке. Не очень полезные, не очень ценные.</text>
+	</string>
+
+	<string id="mutant_controller_brain">
+		<text>Мозг контролёра</text>
+	</string>
+	<string id="mutant_controller_brain_description">
+		<text>Мозг контролёра высоко развит и наделён способностью овладевать умами других существ. Именно поэтому он так ценится учёными. Можно продать гораздо дороже, чем любой другой трофей.</text>
+	</string>
+
+	<string id="mutant_controller_hand">
+		<text>Рука контролёра</text>
+	</string>
+	<string id="mutant_controller_hand_description">
+		<text>Считается, что руки контролёра, наряду с его мозгом, наделяют это существо такими способностями, как, например,  направленные ментальные атаки. Ценятся учёными не меньше, чем мозг контролёра.</text>
+	</string>
+
+	<string id="mutant_cat_tail">
+		<text>Хвост кота</text>
+	</string>
+		<string id="mutant_cat_tail_description">
+		<text>Считается, что кошки в Зоне произошли от диких рысей. Сталкеры носят их хвосты на поясе в качестве трофеев, что даёт им хоть какую-то пользу, в отличие от собачьих.</text>
+	</string>
+
+	<string id="mutant_pseudogigant_hand">
+		<text>Рука псевдогиганта</text>
+	</string>
+	<string id="mutant_pseudogigant_hand_description">
+		<text>Огромная, мускулистая рука псевдогиганта, которая, тем не менее, является одной из наименьших частей тела этого существа. Пользы не представляет, однако весьма ценится коллекционерами за свою редкость.</text>
+	</string>
+
+	<string id="mutant_pseudogigant_eye">
+		<text>Глаз псевдогиганта</text>
+	</string>
+	<string id="mutant_pseudogigant_eye_description">
+		<text>Огромный, по сравнению с человеческим, глаз псевдогиганта. Что интересно, у этих существ глаза обычно разных размеров. Не представляет никакой пользы, но, тем не менее, порой продаётся за неплохие деньги.</text>
+	</string>
+
+	<string id="mutant_burer_hand">
+		<text>Рука бюрера</text>
+	</string>
+	<string id="mutant_burer_hand_description">
+		<text>Руки бюреров определенно связаны с их способностями двигать объекты, создавать защитные поля и атаковать противников ментальными волнами. Представляют большую ценность для учёных.</text>
+	</string>
+
+	<string id="mutant_karlik_ear">
+		<text>Ухо карлика</text>
+	</string>
+	<string id="mutant_karlik_ear_description">
+		<text>Заостренное ухо карлика. Часть тела, интересная только с научной точки зрения, так как головной мозг и остальные клетки разрушаются химическими веществами после смерти. Очень ценится из-за того огромного запаса удачи и навыков, которые необходимы для получения этого трофея.</text>
+	</string>
+
+	<string id="mutant_crow_beak">
+		<text>Клюв вороны</text>
+	</string>
+	<string id="mutant_crow_beak_description">
+		<text>Почему-то вороны являются единственными существами в Зоне, не претерпевшими радикальных мутаций. Исследователи полагают, что они имеют сильный иммунитет к воздействию радиации. И именно поэтому заинтересованы в любой части тела этих пернатых.</text>
+	</string>
+	
+	
+</string_table>

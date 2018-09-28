@@ -1,0 +1,36 @@
+[logic@jup_b6_scientist_biochemist]
+suitable = {=check_npc_name(jup_b6_scientist_biochemist)} true
+prior = 200
+active = walker@firstmeet
+
+[walker@firstmeet]
+path_walk = bio_walk
+path_look  = bio_look
+def_state_standing = wait_trade
+def_state_moving = walk_noweap
+combat_ignore_cond = {=check_enemy_smart(jup_b41)} true
+on_info  = {-jup_b1_sci_task_controller_start} %+jup_b1_sci_task_controller_start =set_counter(jup_b1_sci_task_controller_count:0)% 
+on_info2 = {+jup_b46_spatial_bubble_reported -jup_b1_sci_task_controller_4_done} %=inc_counter(jup_b1_sci_task_controller_count:1) +jup_b1_sci_task_controller_4_done% 
+on_info3 = {!npc_in_zone(jup_b41_sr_light)} %=teleport_npc(jup_b41_bio_walk)%
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_b41_sr_light
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_snd_hello = jup_b6_scientist_biochemist_greeting
+close_snd_bye = jup_b6_scientist_biochemist_farewell
+close_anim 		= nil
+close_victim 	= actor
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 3
+far_distance 	= 4
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable 	= false

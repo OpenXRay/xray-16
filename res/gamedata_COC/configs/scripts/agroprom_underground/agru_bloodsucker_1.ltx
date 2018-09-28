@@ -1,0 +1,22 @@
+[logic@agr_u_bloodsucker_1]
+active = mob_home@1
+suitable = {=target_squad_name(agr_u_bloodsucker_1_squad)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_home@1]
+path_home = home
+home_min_radius = 20
+home_max_radius = 75
+on_info = %=play_sound(red_bloodsucker_growl)% mob_home@2
+out_restr = agr_u_bloodsucker_rest
+
+[mob_home@2]
+path_home = home
+home_min_radius = 20
+home_max_radius = 75
+out_restr = agr_u_bloodsucker_rest
+
+[death]
+on_info = %+agru_add_reward%

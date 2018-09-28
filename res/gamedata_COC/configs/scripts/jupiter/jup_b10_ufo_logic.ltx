@@ -1,0 +1,13 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_info = {=actor_in_zone(jup_b10_ufo_restrictor)} sr_idle@tutorial %=run_tutorial(jup_b10_ufo_tutor)%
+on_info2 = {+jup_b10_ufo_memory_started} sr_idle@nil
+
+[sr_idle@tutorial]
+on_info = {!actor_in_zone(jup_b10_ufo_restrictor)} sr_idle@start %=stop_tutorial%
+on_info2 = {+jup_b10_ufo_memory_started} sr_idle@nil
+on_info3 = {!has_active_tutorial} sr_idle@start
+
+[sr_idle@nil]

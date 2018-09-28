@@ -1,0 +1,11 @@
+[logic]
+active = nil;sr_idle@logic2
+
+[sr_idle@logic2]
+on_info = {+jup_b9_heli_1_play_sound -jup_b9_heli_1_sound } %=play_sound(jup_b9_heli_1_blackbox)%
+on_signal = sound_end | sr_idle@2 %+jup_b9_heli_1_sound%
+
+[sr_idle@2]
+on_game_timer = 20 | sr_idle@nil %+jup_b9_camera_stop%
+
+[sr_idle@nil]

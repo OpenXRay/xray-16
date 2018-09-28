@@ -1,0 +1,237 @@
+;-----------------------------------ANOM LIANA_MIKE-------------------
+;---------------------------------------------------------------------
+[anomaly_liana_mike_veg]:zone_base
+GroupControlSection	= spawn_group_zone
+$spawn 			= "zones\unknow_anom\liana_mike_veg"
+;$prefetch 		= 16
+class			= ZS_BFUZZ
+visual			= dynamics\anomaly\unknow_anom\anomaly_liana_mike_veg
+min_speed_to_react = 1.00  ;   1.00 < 2.00
+ef_anomaly_type				= 2
+ef_weapon_type				= 14
+
+hit_impulse_scale	= 1
+effective_radius	= 1 ;ðàçìåð ðàäèóñà â ïðîöåíòàõ îò îðèãèíàëüíîãî, ãäå äåéñòâóåò çîíà
+sound			= zone_mosquito_bald
+postprocess		= postprocess_fuzz
+
+
+;----------- Anomaly settings -----------------------
+;min_start_power		= 0.49
+max_start_power		= 0.5
+attenuation			= 1
+;period				= 1
+
+idle_particles		= anomaly2\pux_idle
+blowout_particles	= _samples_particles_\pux_atack
+idle_small_particles		= anomaly2\pux_idle  
+idle_big_particles			= _samples_particles_\pux_atack
+
+blowout_sound		= ambient\rnd_outdoor\rnd_fly2
+hit_sound = ambient\rnd_outdoor\rnd_fly1
+entrance_sound				= ambient\rnd_outdoor\rnd_flies_1
+
+hit_type		= strike
+
+disable_time		= 10000
+disable_time_small	= -1
+disable_idle_time	= 50000
+
+ignore_nonalive		= false
+ignore_small		= false
+ignore_artefacts	= true
+
+awaking_time		= 100
+blowout_time		= 7000
+accamulate_time		= 250
+
+attack_animation_start		= 0
+attack_animation_end		= 5000
+
+blowout_light		= off
+idle_light			= off
+
+;visible_by_detector = on
+
+blowout_wind		= off
+
+;ðîæäåíèå àðòåôàêòîâ âî âðåìÿ ñðàáàòûâàíèÿ
+;spawn_blowout_artefacts = off
+
+;-------------Wood variation-------------
+
+[anoma_liana_mike_wood]:anomaly_liana_mike_veg
+$spawn 			= "zones\unknow_anom\liana_mike_wood"
+visual			= dynamics\anomaly\unknow_anom\anoma_liana_mike_wood
+
+
+
+;-----------------------------------ANOM TON-------------------
+;--------------------------------------------------------------
+[anoma_ton_veg]:zone_base
+GroupControlSection	= spawn_group_zone
+$spawn 			= "zones\unknow_anom\anoma_ton_veg"
+;$prefetch 		= 16
+class			= ZS_BFUZZ
+visual			= dynamics\anomaly\unknow_anom\anoma_ton_veg
+min_speed_to_react = 1.00  ;   1.00 < 2.00
+ef_anomaly_type				= 2
+ef_weapon_type				= 14
+
+hit_impulse_scale	= 1
+effective_radius	= 1 ;ðàçìåð ðàäèóñà â ïðîöåíòàõ îò îðèãèíàëüíîãî, ãäå äåéñòâóåò çîíà
+sound			= zone_mosquito_bald
+postprocess		= postprocess_fuzz
+
+
+;----------- Anomaly settings -----------------------
+;min_start_power		= 0.49
+max_start_power		= 0.5
+attenuation			= 1
+;period				= 1
+
+idle_particles		= anomaly2\pux_idle
+blowout_particles	= _samples_particles_\pux_atack
+idle_small_particles		= anomaly2\pux_idle  
+idle_big_particles			= _samples_particles_\pux_atack
+
+blowout_sound		= ambient\rnd_outdoor\rnd_fly2
+hit_sound = ambient\rnd_outdoor\rnd_fly1
+entrance_sound				= ambient\rnd_outdoor\rnd_flies_1
+
+hit_type		= strike
+
+disable_time		= 10000
+disable_time_small	= -1
+disable_idle_time	= 50000
+
+ignore_nonalive		= false
+ignore_small		= false
+ignore_artefacts	= true
+
+awaking_time		= 100
+blowout_time		= 7000
+accamulate_time		= 250
+
+attack_animation_start		= 0
+attack_animation_end		= 5000
+
+blowout_light		= off
+idle_light			= off
+
+;visible_by_detector = on
+
+blowout_wind		= off
+
+;ðîæäåíèå àðòåôàêòîâ âî âðåìÿ ñðàáàòûâàíèÿ
+;spawn_blowout_artefacts = off
+
+;-------------Wood variation-------------
+
+[anoma_ton_wood]:anoma_ton_veg
+$spawn 			= "zones\unknow_anom\anoma_ton_wood"
+visual			= dynamics\anomaly\unknow_anom\anoma_ton_wood
+
+;-------------Fire variation-------------
+
+[anoma_ton_red]:anoma_ton_veg
+$spawn 			= "zones\unknow_anom\anoma_ton_red"
+visual			= dynamics\anomaly\unknow_anom\anoma_ton_red
+
+idle_particles				= explosions\effects\campfire_smoke_06
+blowout_particles			= explosions\explosion_01a
+
+hit_small_particles	    	= damage_fx\burn_creatures
+hit_big_particles			= damage_fx\burn_creatures00
+idle_small_particles		= damage_fx\burn_creatures
+idle_big_particles			= damage_fx\burn_creatures00
+
+idle_sound					= anomaly\fireball_idle		;ïîñòîÿííûé çâóê
+blowout_sound				= anomaly\fireball_blow	   	;âî âðåìÿ âûáðîñà(óäàðà) â öåíòðå àíîìàëèè
+hit_sound					= ambient\fire2				;íà ïåðñîíàæå, êîãäà òîò ïîëó÷àåò õèò
+entrance_sound				= ambient\fire2				;ïðè ïîïàäàíèè îáúåêòà â àíîìàëèþ
+
+hit_type					= burn
+
+;-------------Chemical variation-------------
+
+[anoma_ton_blue]:anoma_ton_veg
+$spawn 			= "zones\unknow_anom\anoma_ton_blue"
+visual			= dynamics\anomaly\unknow_anom\anoma_ton_blue
+
+idle_sound					= anomaly\buzz_idle; bfuzz_blowout		;ïîñòîÿííûé çâóê
+blowout_sound				= anomaly\buzz_hit; bfuzz_hit		;âî âðåìÿ âûáðîñà(óäàðà) â öåíòðå àíîìàëèè
+hit_sound					= anomaly\buzz_hit; bfuzz_hit		;íà ïåðñîíàæå, êîãäà òîò ïîëó÷àåò õèò
+entrance_sound				= anomaly\buzz_hit; bfuzz_hit		;ïðè ïîïàäàíèè îáúåêòà â àíîìàëèþ
+
+hit_type					= chemical_burn
+
+idle_particles				= zones_mine\zone_acidic_mine_idle
+blowout_particles			= zones_mine\zone_acidic_mine_hit
+
+
+
+
+
+;-----------------------------------ANOM BASED ON PUDDLE_1 -------------------
+;---------------------------------------------------------------------
+[anomaly_puddle_1_veg]:zone_base
+GroupControlSection	= spawn_group_zone
+$spawn 			= "zones\unknow_anom\anomaly_puddle_1_veg"
+;$prefetch 		= 16
+class			= ZS_BFUZZ
+visual			= dynamics\anomaly\unknow_anom\anomaly_puddle_1_veg
+min_speed_to_react = 1.00  ;   1.00 < 2.00
+ef_anomaly_type				= 2
+ef_weapon_type				= 14
+
+hit_impulse_scale	= 1
+effective_radius	= 1 ;ðàçìåð ðàäèóñà â ïðîöåíòàõ îò îðèãèíàëüíîãî, ãäå äåéñòâóåò çîíà
+sound			= zone_mosquito_bald
+postprocess		= postprocess_fuzz
+
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+
+;----------- Anomaly settings -----------------------
+;min_start_power		= 0.49
+max_start_power		= 0.5
+attenuation			= 1
+;period				= 1
+
+idle_particles		= anomaly2\pux_idle
+blowout_particles	= _samples_particles_\pux_atack
+idle_small_particles		= anomaly2\pux_idle  
+idle_big_particles			= _samples_particles_\pux_atack
+
+blowout_sound		= ambient\rnd_outdoor\rnd_fly2
+hit_sound = ambient\rnd_outdoor\rnd_fly1
+entrance_sound				= ambient\rnd_outdoor\rnd_flies_1
+
+hit_type		= strike
+
+disable_time		= 10000
+disable_time_small	= -1
+disable_idle_time	= 50000
+
+ignore_nonalive		= false
+ignore_small		= false
+ignore_artefacts	= true
+
+awaking_time		= 100
+blowout_time		= 7000
+accamulate_time		= 250
+
+attack_animation_start		= 0
+attack_animation_end		= 5000
+
+blowout_light		= off
+idle_light			= off
+
+;visible_by_detector = on
+
+blowout_wind		= off
+
+;ðîæäåíèå àðòåôàêòîâ âî âðåìÿ ñðàáàòûâàíèÿ
+;spawn_blowout_artefacts = off

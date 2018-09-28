@@ -1,0 +1,38 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@teleport
+
+[sr_idle@teleport]
+;on_timer = 7000 | sr_cutscene@osoznanie_cam %=teleport_actor(oso_actor_walk:oso_actor_look)%
+on_info = {+warlab_door_opened} sr_idle@out %=run_postprocess(fade_in) =teleport_actor(oso_actor_walk:oso_actor_look) +warlab_actor_teleported =disable_ui =play_sound_looped(warlab_oso)%
+
+;[sr_cutscene@osoznanie_cam]
+;cam_effector = oso_cam
+;point = oso_actor_walk
+;look = oso_actor_look
+;on_signal = cameff_end | sr_idle@nil %=oso_init_dialod%
+;on_timer = 7500 | %+oso_init_dialog%
+
+[sr_idle@out]
+on_timer = 500 | {+warlab_actor_teleported} sr_idle@talk %=run_postprocess(black:3009:true)%
+
+[sr_idle@talk]
+on_timer = 6000 | sr_idle@decided %=stop_postprocess(3009) =enable_ui +oso_init_dialog%
+
+[sr_idle@decided]
+on_timer = 2000 | {-oso_init_dialog} sr_idle@wait_2nd_actor %=destroy_object(story:osoznanie) =run_postprocess(black:3009:true)%
+
+[sr_idle@wait_2nd_actor]
+on_info = {+sar2_monolith_end} sr_idle@wait_gen_off %=stop_postprocess(3009) +warlab_actor_second_arrive =spawn_object(artefact_monolit_ghost:oso_walk:0)%
+
+[sr_idle@wait_gen_off]
+on_info = {+warlab_deactivate_generators_done} sr_idle@destroy_holo %=destroy_object(story:artefact_monolit_ghost) =play_sound(mon_explosion) =stop_sound_looped%
+
+[sr_idle@destroy_holo]
+on_info = {=story_object_exist(warlab_light_alarm_glass_0017)} %=destroy_object(story:warlab_light_alarm_glass_0017)%
+on_info2 = {=story_object_exist(warlab_light_alarm_glass_0026)} %=destroy_object(story:warlab_light_alarm_glass_0026)%
+on_info3 = {!story_object_exist(warlab_light_alarm_glass_0017) !story_object_exist(warlab_light_alarm_glass_0026)} sr_idle@nil
+
+[sr_idle@nil]

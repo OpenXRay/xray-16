@@ -1,0 +1,11 @@
+[logic]
+active = sr_idle@start
+
+[sr_idle@start]
+on_actor_in_zone = lx8_sr_toilet_burer_out_restr | sr_idle@stop %=play_sound_looped(labx8_crying)%
+
+[sr_idle@stop]
+on_info = {+lx8_toilet_door_open} sr_idle@nil %=stop_sound_looped%
+on_info2 = {+pri_a19_lab_x16_info} sr_idle@nil %=stop_sound_looped%
+
+[sr_idle@nil]

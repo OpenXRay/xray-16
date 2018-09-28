@@ -1,0 +1,29 @@
+[logic@pri_a16_kirillov]
+active = animpoint@base
+suitable = true ;{-pri_a25_rfi_source_eliminated =check_npc_name(pri_a22_army_signaller)} true
+prior = 90
+level_spot = mechanic
+
+[animpoint@base]
+cover_name = pri_a16_animp_tech
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = meet
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+allow_break 	= false
+meet_on_talking = false
+meet_dialog = dm_add_repair

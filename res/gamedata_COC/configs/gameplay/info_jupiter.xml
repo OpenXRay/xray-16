@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+
+	<info_portion id="jup_pri_zulus_death"></info_portion>
+
+	<!--B208-->
+
+	<!-- Dialog info -->
+	<info_portion id="jup_b208_burers_hunt_about"></info_portion>
+	<info_portion id="jup_b208_burers_hunt_started"></info_portion>
+
+	<!-- Task info -->
+	<info_portion id="jup_b208_burers_hunt_give"></info_portion>
+	<info_portion id="jup_b208_burers_dead"></info_portion>
+	<info_portion id="jup_b208_burers_hunt_done"></info_portion>
+
+	<!-- Other -->
+	<info_portion id="jup_b208_burer_1_dead"></info_portion>
+	<info_portion id="jup_b208_burer_2_dead"></info_portion>
+
+
+	<!--A9-->
+
+	<!-- Task info -->
+	<info_portion id="jup_a9_way_to_pripyat_search_started"></info_portion>
+	<info_portion id="jup_a9_way_to_pripyat_power_info_started"></info_portion>
+	<info_portion id="jup_a9_way_to_pripyat_gas_info_started"></info_portion>
+	<info_portion id="jup_a9_way_to_pripyat_way_info_started"></info_portion>
+
+	<!-- Camera info -->
+	<info_portion id="jup_a9_cam_1_end"></info_portion>
+	<info_portion id="jup_a9_cam_2_end"></info_portion>
+	<info_portion id="jup_a9_cam_3_end"></info_portion>
+
+	<!-- Item has -->
+	<info_portion id="zat_a9_actor_has_jup_a9_evacuation_info"></info_portion>
+	<info_portion id="zat_a9_actor_has_jup_a9_meeting_info"></info_portion>
+	<info_portion id="zat_a9_actor_has_jup_a9_conservation_info"></info_portion>
+	<info_portion id="zat_a9_actor_has_jup_a9_actor_power_info"></info_portion>
+	<info_portion id="zat_a9_actor_has_jup_a9_actor_losses_info"></info_portion>
+	<info_portion id="zat_a9_actor_has_jup_a9_delivery_info"></info_portion>
+	<info_portion id="zat_a9_actor_has_jup_a9_way_info"></info_portion>
+
+	<!-- Other -->
+	<info_portion id="jup_a9_tech_conservation_info"></info_portion>
+	<info_portion id="jup_a9_tech_way_info"></info_portion>
+
+	<!-- Sound info -->
+	<info_portion id="zat_a9_actor_way_info_play_sound"></info_portion>
+	<info_portion id="zat_a9_actor_delivery_info_play_sound"></info_portion>
+	<info_portion id="zat_a9_actor_losses_info_play_sound"></info_portion>
+	<info_portion id="zat_a9_actor_power_info_play_sound"></info_portion>
+	<info_portion id="zat_a9_actor_conservation_info_play_sound"></info_portion>
+	<info_portion id="zat_a9_actor_meeting_info_play_sound"></info_portion>
+	<info_portion id="zat_a9_actor_evacuation_info_play_sound"></info_portion>
+
+	<!-- Dialogs info -->
+	<info_portion id="jup_b217_stalker_tech_jupiter_delivery_done"></info_portion>
+	<info_portion id="jup_b217_stalker_tech_jupiter_evacuation_done"></info_portion>
+	<info_portion id="jup_b217_stalker_tech_jupiter_losses_done"></info_portion>
+	<info_portion id="jup_b217_stalker_tech_jupiter_meeting_done"></info_portion>
+	<info_portion id="jup_b217_stalker_tech_jupiter_power_done"></info_portion>
+	<info_portion id="jup_b217_stalker_tech_jupiter_way_done"></info_portion>
+
+	<!-- Test info -->
+	<info_portion id="jup_a9_set_default_counter"></info_portion>
+
+	<!--A12-->
+
+	<info_portion id="jup_a12_actor_choose_ransom"></info_portion>
+	<info_portion id="jup_a12_actor_choose_power"></info_portion>
+	<info_portion id="jup_a12_actor_choose_self"></info_portion>
+	<info_portion id="pri_a12_stalker_prisoner_free"></info_portion>
+	<info_portion id="jup_a12_prisoner_free_with_stalkers"></info_portion>
+	<info_portion id="jup_a12_actor_is_ready"></info_portion>
+	<info_portion id="jup_a12_actor_has_pass_to_containers"></info_portion>
+	<info_portion id="jup_a12_chief_bandit_meet"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_free"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_stood_up"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_out_of_prison"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_wait_for_dialog"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_thanked_actor"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_out_of_hangar"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_out_of_containers"></info_portion>
+	<info_portion id="jup_a12_stalkers_on_base"></info_portion>
+	<info_portion id="jup_a12_bandit_out"></info_portion>
+	<info_portion id="jup_a12_bandit_payment_started"></info_portion>
+	<info_portion id="jup_a12_actor_did_not_pay_to_cashier"></info_portion>
+	<info_portion id="jup_a12_actor_paid_to_cashier"></info_portion>
+	<info_portion id="jup_a12_bandit_cashier_dead"></info_portion>
+	<info_portion id="jup_a12_actor_enemy_to_bandits"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_dead"></info_portion>
+	<info_portion id="jup_a12_chief_bandit_wait_threat_prisoner"></info_portion>
+	<info_portion id="jup_a12_chief_bandit_threat_prisoner"></info_portion>
+	<info_portion id="jup_a12_chief_bandit_kill_prisoner"></info_portion>
+	<info_portion id="jup_a12_mercs_go_to_positions"></info_portion>
+	<info_portion id="jup_a12_merc_cover_to_position"></info_portion>
+	<info_portion id="jup_a12_merc_left_to_position"></info_portion>
+	<info_portion id="jup_a12_merc_right_to_position"></info_portion>
+	<info_portion id="jup_a12_merc_cover_on_position"></info_portion>
+	<info_portion id="jup_a12_bandit_guard_killed"></info_portion>
+	<info_portion id="jup_a12_merc_cover_attacked_containers"></info_portion>
+	<info_portion id="jup_a12_merc_left_attacked_containers"></info_portion>
+	<info_portion id="jup_a12_merc_right_attacked_containers"></info_portion>
+	<info_portion id="jup_a12_merc_attack_started"></info_portion>
+	<info_portion id="jup_a12_actor_guided_base"></info_portion>
+	<info_portion id="jup_a12_ui"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_free_dialog_done"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_hit_by_actor"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_questioned"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_friends_talked"></info_portion>
+	<info_portion id="jup_a12_task_given"></info_portion>
+	<info_portion id="jup_a12_stalker_assaulter_has_af"></info_portion>
+	<info_portion id="jup_a12_merc_cover_in_merc_camp"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_hide_end"></info_portion>
+	<info_portion id="jup_a12_actor_switched_from_ransom_to_power"></info_portion>
+	<info_portion id="jup_a12_mercs_done"></info_portion>
+	<info_portion id="jup_a12_bandit_guard_can_be_easily_killed"></info_portion>
+	<info_portion id="jup_a12_stalker_diplomat_after_talked"></info_portion>
+	<info_portion id="jup_a12_bandit_taunt"></info_portion>
+	<info_portion id="jup_a12_stalker_assaulter_told_story"></info_portion>
+	<info_portion id="jup_a12_actor_choose"></info_portion>
+	<info_portion id="jup_a12_stalker_assaulter_argued"></info_portion>
+	<info_portion id="jup_a12_stalker_diplomat_argued"></info_portion>
+	<info_portion id="jup_a12_stalker_prisoner_cheats_to_base"></info_portion>
+	<info_portion id="jup_a12_stalker_assaulter_1_argue"></info_portion>
+	<info_portion id="jup_a12_stalker_assaulter_2_argue"></info_portion>
+	<info_portion id="jup_a12_stalker_assaulter_3_argue"></info_portion>
+	<info_portion id="jup_a12_task_start"></info_portion>
+	<info_portion id="jup_a12_spawn_merc_squad"></info_portion>
+	
+	<!--B25-->
+
+	<info_portion id="jup_b207_task_start"></info_portion>
+	<info_portion id="jup_b207_morgan_blackmailed"></info_portion>
+	<info_portion id="jup_b207_morgan_gived_blackmail_reward"></info_portion>
+	<info_portion id="jup_b207_morgan_gived_depot"></info_portion>
+	<info_portion id="jup_b207_morgan_ambush"></info_portion>
+	<info_portion id="jup_b207_about_dealers_pda_kardan"></info_portion>
+	<info_portion id="jup_b207_about_dealers_pda_novikov"></info_portion>
+	<info_portion id="jup_b207_freedom_knows_about_depot"></info_portion>
+	<info_portion id="jup_b207_duty_knows_about_depot"></info_portion>
+	<info_portion id="jup_b207_freedom_in_depot"></info_portion>
+	<info_portion id="jup_b207_attack_started"></info_portion>
+	<info_portion id="jup_b207_freedom_wins"></info_portion>
+	<info_portion id="jup_b207_duty_wins"></info_portion>
+	<info_portion id="jup_b207_attack_end"></info_portion>
+	<info_portion id="jup_b207_duty_asked_to_leave"></info_portion>
+	<info_portion id="jup_b207_freedom_refused_to_leave"></info_portion>
+
+	<!--B25-->
+
+	<info_portion id="jup_b25_story_controller_played"></info_portion>
+	<info_portion id="jup_b25_story_artefact_played"></info_portion>
+	<info_portion id="jup_b25_story_oasis_played"></info_portion>
+	<info_portion id="jup_b25_story_bloodsucker_played"></info_portion>
+	<info_portion id="jup_b25_story_scientist_played"></info_portion>
+	<info_portion id="jup_b25_story_guide_played"></info_portion>
+	<info_portion id="jup_b25_story_zaton_played"></info_portion>
+	<info_portion id="jup_b25_play_reaction"></info_portion>
+	<info_portion id="jup_b25_found_senya"></info_portion>
+	<info_portion id="jup_b25_blame_story_end"></info_portion>
+	<info_portion id="jup_b25_second_story"></info_portion>
+	<info_portion id="jup_b25_third_story"></info_portion>
+	<info_portion id="jup_b25_first_blame"></info_portion>
+	<info_portion id="jup_b25_second_blame"></info_portion>
+	<info_portion id="jup_b25_third_blame"></info_portion>
+	<info_portion id="jup_b25_accuse_flint_gived"></info_portion>
+	<info_portion id="jup_b25_senya_spawned"></info_portion>
+	<info_portion id="jup_b25_story_artefact_talked"></info_portion>
+	<info_portion id="jup_b25_story_bloodsucker_talked"></info_portion>
+	<info_portion id="jup_b25_story_guide_talked"></info_portion>
+	<info_portion id="jup_b16_oasis_talked"></info_portion>
+	<info_portion id="jup_b25_story_scientist_talked"></info_portion>
+    <info_portion id="zat_b106_found_soroka"></info_portion>
+
+	<!--B19-->
+
+	<info_portion id="jup_b19_agreed_to_go"></info_portion>
+	<info_portion id="jup_b19_ready_to_go"></info_portion>
+	<info_portion id="jup_b19_arrived"></info_portion>
+	<info_portion id="jup_b19_destroy_yar"></info_portion>
+	<info_portion id="jup_b19_destroy_yar_done"></info_portion>
+	<info_portion id="jup_b19_merc_spawned"></info_portion>
+	<info_portion id="jup_b19_mercs_dead"></info_portion>
+	<info_portion id="jup_b19_done_why_mercs_complete"></info_portion>
+	<info_portion id="jup_b19_yar_teleport_actor_to_yanov"></info_portion>
+	<info_portion id="jup_b19_done_bye_complete"></info_portion>
+	<info_portion id="jup_b19_done_why_my_complete"></info_portion>
+	<info_portion id="jup_b19_yar_switch_smart_terrain"></info_portion>
+	<info_portion id="jup_b19_yar_dont_teleport_actor_to_yanov"></info_portion>
+	<info_portion id="jup_b19_actor_damaged_zombied"></info_portion>
+	<info_portion id="jup_b19_mercs_damaged_zombied"></info_portion>
+	<info_portion id="jup_b19_enable_ui_done"></info_portion>
+	<info_portion id="jup_b19_yar_hate_zombied"></info_portion>
+	<info_portion id="jup_b19_yar_hate_zombied_done"></info_portion>
+
+	<info_portion id="jup_b19_yar_in_pripyat_met"></info_portion>
+	<info_portion id="jup_b19_yar_in_pripyat_about_told"></info_portion>
+
+
+	<!--B206-->
+
+	<!-- dialogs infos -->
+	<info_portion id="jup_b6_scientist_medic_soldier_outfit_done"></info_portion>
+	<info_portion id="jup_b6_scientist_nuclear_physicist_soldier_outfit_done"></info_portion>
+	<info_portion id="jup_b6_scientist_biochemist_soldier_outfit_done"></info_portion>
+	<info_portion id="jup_b6_scientist_biochemist_anomalous_grove_done""></info_portion>
+	<info_portion id="jup_b206_anomalous_grove_has_plant_done"></info_portion>
+	<info_portion id="jup_b6_scientist_biochemist_anomalous_plant_done"></info_portion>
+	<info_portion id="jup_b206_nuclear_physicist_get_outfit_done"></info_portion>
+
+	<!-- task infos -->
+	<info_portion id="jup_b206_anomalous_grove_started"></info_portion>
+	<info_portion id="jup_b206_anomalous_grove_done"></info_portion>
+
+	<!-- other infos -->
+	<info_portion id="jup_b218_soldier_need_outfit"></info_portion>
+	<info_portion id="jup_b206_soldier_outfit_mentioned"></info_portion>
+	<info_portion id="jup_b206_spawn_plant"></info_portion>
+	<info_portion id="jup_b206_play_particle"></info_portion>
+
+
+	<!--B220-->
+
+	<info_portion id="jup_b220_trapper_about_retire_told"></info_portion>
+	<info_portion id="jup_b208_burers_hunt_done"></info_portion>
+	<info_portion id="jup_b212_jupiter_chimera_hunt_told"></info_portion>
+	<info_portion id="jup_b212_jupiter_chimera_hunt_started"></info_portion>
+	<info_portion id="jup_b212_jupiter_chimera_dead"></info_portion>
+	<info_portion id="jup_b212_jupiter_chimera_hunt_done"></info_portion>
+	<info_portion id="jup_b220_trapper_jupiter_chimera_why_me_done"></info_portion>
+	<info_portion id="jup_b212_jupiter_chimera_hunt_give"></info_portion>
+	<info_portion id="jup_b212_jupiter_chimera_free"></info_portion>
+
+	<!--B32-->
+
+	<info_portion id="jup_b32_task_start"></info_portion>
+	<info_portion id="jup_b32_task_addon_start"></info_portion>
+	<info_portion id="jup_b32_scanners_tranferred"></info_portion>
+	<info_portion id="jup_b32_scanner_1_placed"></info_portion>
+	<info_portion id="jup_b32_scanner_2_placed"></info_portion>
+	<info_portion id="jup_b32_scanner_3_placed"></info_portion>
+	<info_portion id="jup_b32_scanner_4_placed"></info_portion>
+	<info_portion id="jup_b32_scanner_5_placed"></info_portion>
+	<info_portion id="jup_b32_scanner_reward"></info_portion>
+	<info_portion id="jup_b32_task_end"></info_portion>
+	<info_portion id="jup_b32_tutorial_done"></info_portion>
+
+	<!--A10-->
+	<info_portion id="jup_a10_debt_wo_percent"></info_portion>
+	<info_portion id="jup_a10_threatened"></info_portion>
+	<info_portion id="jup_a10_bandit_about_percent_asked"></info_portion>
+
+
+</game_information_portions>

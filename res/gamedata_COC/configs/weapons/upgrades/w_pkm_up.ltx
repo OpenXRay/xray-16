@@ -1,0 +1,496 @@
+[up_sect_firsta_pkm]
+cost		      		= 2000
+value					= +10
+
+fire_dispersion_condition_factor    = -0.25
+misfire_start_prob	     	= -0.0005
+misfire_end_prob	     	= -0.0075
+
+[up_sect_firstc_pkm]
+cost		      		= 4000
+value					= -20
+
+cam_dispersion              = -0.12
+cam_step_angle_horz        	= -0.12
+
+[up_sect_firstd_pkm]
+cost		      		= 4000
+value					= +20
+
+bullet_speed            = +100
+fire_dispersion_base	= -0.01
+
+[up_sect_firste_pkm]
+cost		      		= 8000
+value					= +25
+
+rpm                     = +100
+
+[up_sect_secona_pkm]
+cost		      		= 2000
+value					= -10
+
+cam_dispersion              = -0.06
+cam_step_angle_horz        	= -0.06
+
+[up_sect_seconc_pkm]
+cost		      		= 4000
+value					= -20
+
+cam_dispersion              = -0.12
+cam_step_angle_horz        	= -0.12
+
+[up_sect_secone_pkm]
+cost		      		= 8000
+value					= +25
+
+crosshair_inertion		   = -1.8
+ 
+PDM_disp_vel_factor 		= -0.75
+PDM_disp_accel_factor 		= -0.75
+
+[up_sect_seconf_pkm]
+cost		      		= 8000
+value					= +25
+
+rpm						= +100
+
+[up_sect_thirda_pkm]
+cost		      		= 2000
+value					= +10
+
+fire_dispersion_condition_factor    = -0.25
+misfire_start_prob	     	= -0.0005
+misfire_end_prob	     	= -0.0075
+
+[up_sect_thirdc_pkm]
+cost		      		= 4000
+value					= +15
+
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.0005
+misfire_end_prob	     	= -0.005
+
+[up_sect_thirdd_pkm]
+cost		      		= 4000
+value					= +15
+
+rpm						= +75
+
+[up_sect_thirde_pkm]
+cost		      		= 8000
+value					= +30
+
+fire_dispersion_base	= -0.09
+fire_dispersion_condition_factor    = -0.5
+
+[up_sect_fourta_pkm]
+cost		      		= 2000
+value					= +10
+
+fire_dispersion_base	= -0.05
+fire_dispersion_condition_factor    = -0.25
+
+[up_sect_fourtc_pkm]
+cost		      		= 4000
+value					= +15
+
+crosshair_inertion		   = -1.2
+
+PDM_disp_vel_factor 		= -0.5
+PDM_disp_accel_factor 		= -0.5
+
+[up_sect_fourte_pkm]
+cost		      		= 8000
+value					= -30
+
+cam_dispersion              = -0.18
+cam_step_angle_horz        	= -0.18
+
+[up_sect_fiftha_pkm]
+cost		      		= 7500
+value					= +100
+
+ammo_mag_size           = 100
+
+
+[up_firsta_pkm]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_pkm
+section                 = up_sect_firsta_pkm
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zath_a1_name
+description             = st_up_zath_a1_descr
+icon                    = ui_inGame2_upgrade_RP74_1
+
+;;...
+[up_firstc_pkm]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_pkm
+section                 = up_sect_firstc_pkm
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zath_b2_name
+description             = st_up_zath_b2_descr
+icon                    = ui_inGame2_upgrade_RP74_2
+
+[up_firstd_pkm]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_pkm
+section                 = up_sect_firstd_pkm
+property                = prop_bullet_speed, prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zath_b1_name
+description             = st_up_zath_b1_descr
+icon                    = ui_inGame2_upgrade_RP74_3
+
+[up_firste_pkm]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_pkm
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zath_c1_name
+description             = st_up_zath_c1_descr
+icon                    = ui_inGame2_upgrade_RP74_4
+
+[up_secona_pkm]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_pkm
+section                 = up_sect_secona_pkm
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auth_a1_name
+description             = st_up_auth_a1_descr
+icon                    = ui_inGame2_upgrade_RP74_5
+
+[up_seconc_pkm]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_pkm
+section                 = up_sect_seconc_pkm
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auth_b1_name
+description             = st_up_auth_b1_descr
+icon                    = ui_inGame2_upgrade_RP74_6
+
+[up_secone_pkm]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_secone_pkm
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auth_c2_name
+description             = st_up_auth_c2_descr
+icon                    = ui_inGame2_upgrade_RP74_7
+
+[up_seconf_pkm]
+scheme_index            = 2, 2
+known                   = 1
+effects                 =
+section                 = up_sect_seconf_pkm
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auth_c1_name
+description             = st_up_auth_c1_descr
+icon                    = ui_inGame2_upgrade_RP74_8
+
+[up_thirda_pkm]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_pkm
+section                 = up_sect_thirda_pkm
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvh_b1_name
+description             = st_up_stvh_b1_descr
+icon                    = ui_inGame2_upgrade_RP74_1
+
+[up_thirdc_pkm]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_thirdef_pkm
+section                 = up_sect_thirdc_pkm
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvh_b2_name
+description             = st_up_stvh_b2_descr
+icon                    = ui_inGame2_upgrade_RP74_10
+
+
+
+[up_thirdd_pkm]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_pkm
+section                 = up_sect_thirdd_pkm
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvh_a1_name
+description             = st_up_stvh_a1_descr
+icon                    = ui_inGame2_upgrade_RP74_11
+
+
+[up_thirde_pkm]
+scheme_index            = 2, 3
+known                   = 1
+effects                 =
+section                 = up_sect_thirde_pkm
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvh_c1_name
+description             = st_up_stvh_c1_descr
+icon                    = ui_inGame2_upgrade_RP74_12
+
+
+[up_fourta_pkm]
+scheme_index            = 0, 3
+known                   = 1
+effects                 = up_gr_fourtcd_pkm
+section                 = up_sect_fourta_pkm
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_prih_a1_name
+description             = st_up_prih_a1_descr
+icon                    = ui_inGame2_upgrade_RP74_13
+
+[up_fourtc_pkm]
+scheme_index            = 1, 5
+known                   = 1
+effects                 = up_gr_fourtef_pkm
+section                 = up_sect_fourtc_pkm
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_prih_b1_name
+description             = st_up_prih_b1_descr
+icon                    = ui_inGame2_upgrade_RP74_14
+
+[up_fourte_pkm]
+scheme_index            = 2, 4
+known                   = 1
+effects                 =
+section                 = up_sect_fourte_pkm
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_prih_c1_name
+description             = st_up_prih_c1_descr
+icon                    = ui_inGame2_upgrade_RP74_15
+
+
+[up_fiftha_pkm]
+scheme_index            = 0, 4
+known                   = 1
+effects                 =
+section                 = up_sect_fiftha_pkm
+property                = prop_ammo_size 
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_addh_a1_name
+description             = st_up_addh_a1_descr
+icon                    = ui_inGame2_upgrade_RP74_16
+
+
+[up_gr_firstab_pkm]
+elements                = up_firsta_pkm
+
+[up_gr_firstcd_pkm]
+elements                = up_firstc_pkm, up_firstd_pkm
+
+[up_gr_firstef_pkm]
+elements                = up_firste_pkm
+
+[up_gr_seconab_pkm]
+elements                = up_secona_pkm
+
+[up_gr_seconcd_pkm]
+elements                = up_seconc_pkm
+
+[up_gr_seconef_pkm]
+elements                = up_secone_pkm, up_seconf_pkm
+
+[up_gr_thirdab_pkm]
+elements                = up_thirda_pkm
+
+[up_gr_thirdcd_pkm]
+elements                = up_thirdc_pkm, up_thirdd_pkm
+
+[up_gr_thirdef_pkm]
+elements                = up_thirde_pkm
+
+[up_gr_fourtab_pkm]
+elements                = up_fourta_pkm
+
+[up_gr_fourtcd_pkm]
+elements                = up_fourtc_pkm
+
+[up_gr_fourtef_pkm]
+elements                = up_fourte_pkm
+
+[up_gr_fifthab_pkm]
+elements                = up_fiftha_pkm

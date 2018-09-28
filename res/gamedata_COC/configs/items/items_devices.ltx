@@ -88,7 +88,7 @@ class                                    = TORCH_S
 cform                                    = skeleton
 visual                                   = dynamics\devices\dev_torch_light\dev_torch_light.ogf
 description                              = st_device_torch_descr
-cost                                     = 100
+cost                                     = 0
 inv_name                                 = st_device_torch_name
 inv_name_short                           = st_device_torch_name
 inv_weight                               = 0.0
@@ -97,11 +97,18 @@ inv_grid_height                          = 1
 inv_grid_x                               = 14
 inv_grid_y                               = 7
 
-;aauu? iaeucy oi?aiaaou
 can_trade                                = true
 
 position                                 = 0.35,0.25,0.0
+
+highlight_equipped 						 = true
+light_section						 	 = torch_definition_volumetric	; The light section to use in it's model/objects/light_night.ltx
 light_trace_bone                         = lights_bone
+
+torch_offset							 = -0.2, 0.1, -0.3
+omni_offset								 = -0.2, 0.1, -0.1
+torch_inertion_speed_min				 = 0.5
+torch_inertion_speed_max				 = 7.5
 
 attach_angle_offset                      = 3.062, 0.008, -1.532
 attach_position_offset                   = 0.134, -0.007, 0.09
@@ -109,20 +116,13 @@ attach_position_offset                   = 0.134, -0.007, 0.09
 attach_bone_name                         = bip01_head
 auto_attach                              = false
 
+snd_turn_on								 = weapons\nv_start
+snd_turn_off							 = weapons\nv_off
+
 slot                                     = 9
 default_to_ruck                          = false
 sprint_allowed                           = true
 control_inertion_factor                  = 1
-disabled_maps                            = ai_test,ai_test2, andy_test_
-
-; CoC-Xray
-light_section							 = torch_definition
-torch_offset							 = -0.2, 0.1, -0.3
-omni_offset								 = -0.2, 0.1, -0.1
-torch_inertion_speed_min				 = 0.5
-torch_inertion_speed_max				 = 7.5
-snd_turn_on								 = weapons\nv_start
-snd_turn_off							 = weapons\nv_off
 
 [device_flare]:identity_immunities
 class                                    = D_FLARE

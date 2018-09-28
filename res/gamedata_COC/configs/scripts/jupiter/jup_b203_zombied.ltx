@@ -1,0 +1,107 @@
+[logic@work_1]
+active = walker@zombied_1
+suitable = {=target_squad_name(jup_b203_zombied_squad)} true
+prior = 200
+
+[walker@zombied_1]
+path_walk = zombied_1_1_walk
+path_look = zombied_1_1_look
+out_restr = jup_b203_zombied_restr_1
+def_state_standing = guard_na
+sound_idle = state
+combat_ignore_cond = = {=check_enemy_name(sim_default)} true
+
+;------------------------- 2 ------------------------------
+
+[logic@work_2]
+active = walker@zombied_2
+suitable = {=target_squad_name(jup_b203_zombied_squad)} true
+prior = 200
+
+[walker@zombied_2]
+path_walk = zombied_2_1_walk
+path_look = zombied_2_1_look
+out_restr = jup_b203_zombied_restr_1
+def_state_standing = guard_na
+sound_idle = state
+combat_ignore_cond = = {=check_enemy_name(sim_default)} true
+
+;------------------------- 3 ------------------------------
+
+[logic@work_3]
+active = walker@zombied_3
+suitable = {=target_squad_name(jup_b203_zombied_squad)} true
+prior = 200
+on_hit = hit_3
+
+[walker@zombied_3]
+path_walk = zombied_3_1_walk
+path_look = zombied_3_1_look
+out_restr = jup_b203_zombied_restr_2
+def_state_standing = guard_na
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor -jup_b203_damaged_room_1} true, {=check_enemy_name(sim_default)} true
+on_info = {=actor_in_zone(jup_b203_zombied_restr_1) -jup_b203_damaged_room_1} %+jup_b203_damaged_room_1%
+
+[hit_3]
+on_info = {=hit_by_actor -jup_b203_damaged_room_1} %+jup_b203_damaged_room_1%
+
+;------------------------- 4 ------------------------------
+
+[logic@work_4]
+active = walker@zombied_4
+suitable = {=target_squad_name(jup_b203_zombied_squad)} true
+prior = 200
+on_hit = hit_4
+
+[walker@zombied_4]
+path_walk = zombied_4_1_walk
+path_look = zombied_4_1_look
+out_restr = jup_b203_zombied_restr_2
+def_state_standing = guard_na
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor -jup_b203_damaged_room_1} true, {=check_enemy_name(sim_default)} true
+on_info = {=actor_in_zone(jup_b203_zombied_restr_1) -jup_b203_damaged_room_1} %+jup_b203_damaged_room_1%
+
+[hit_4]
+on_info = {=hit_by_actor -jup_b203_damaged_room_1} %+jup_b203_damaged_room_1%
+
+;------------------------- 5 ------------------------------
+
+[logic@work_5]
+active = walker@zombied_5
+suitable = {=target_squad_name(jup_b203_zombied_squad)} true
+prior = 200
+on_hit = hit_5
+
+[walker@zombied_5]
+path_walk = zombied_5_1_walk
+path_look = zombied_5_1_look
+out_restr = jup_b203_zombied_restr_2
+def_state_standing = guard_na
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor -jup_b203_damaged_room_1} true, {=check_enemy_name(sim_default)} true
+on_info = {=actor_in_zone(jup_b203_zombied_restr_1) -jup_b203_damaged_room_1} %+jup_b203_damaged_room_1%
+
+[hit_5]
+on_info = {=hit_by_actor -jup_b203_damaged_room_1} %+jup_b203_damaged_room_1%
+
+;------------------------- 6 ------------------------------
+
+[logic@work_6]
+active = walker@zombied_6
+suitable = {=target_squad_name(jup_b203_zombied_squad)} true
+prior = 200
+on_hit = hit_6
+
+[walker@zombied_6]
+path_walk = zombied_6_1_walk
+path_look = zombied_6_1_look
+out_restr = jup_b203_zombied_restr_3
+def_state_standing = guard_na
+sound_idle = state
+combat_ignore_cond = {=is_enemy_actor -jup_b203_damaged_room_2} true, {=check_enemy_name(sim_default)} true
+on_info = {=actor_in_zone(jup_b203_zombied_restr_2) -jup_b203_damaged_room_2} %+jup_b203_damaged_room_2%
+
+[hit_6]
+on_info = {=hit_by_actor -jup_b203_damaged_room_2} %+jup_b203_damaged_room_2%

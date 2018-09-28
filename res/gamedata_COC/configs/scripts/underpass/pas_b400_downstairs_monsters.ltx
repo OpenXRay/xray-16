@@ -1,0 +1,20 @@
+[logic@pas_b400_tushkano_downstairs_1]
+active = mob_home@tushkano_downstairs
+suitable = {=target_squad_name(pas_b400_downstairs_tushkano)} true
+prior = 200
+monster_job = true
+
+[logic@pas_b400_tushkano_downstairs_2]
+active = mob_home@tushkano_downstairs
+suitable = {=target_squad_name(pas_b400_downstairs_tushkano)} true
+prior = 200
+monster_job = true
+
+[mob_home@tushkano_downstairs]
+path_home = tushkano_home 
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = pas_b400_sr_downstairs_2
+on_info = {+pas_b400_track_door_opened} mob_home@tushkano_downstairs_okay
+
+[mob_home@tushkano_downstairs_okay]
+path_home = tushkano_home 

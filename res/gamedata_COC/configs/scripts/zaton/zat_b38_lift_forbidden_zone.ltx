@@ -1,0 +1,7 @@
+[logic]
+active = nil ;sr_idle@kill
+
+[sr_idle@kill]
+on_actor_inside = {-zat_b38_break_lift} sr_idle@nil %+zat_b38_forbidden_fail =kill_actor%
+
+[sr_idle@nil]

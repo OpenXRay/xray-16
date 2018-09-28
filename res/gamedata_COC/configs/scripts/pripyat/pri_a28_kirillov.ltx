@@ -1,0 +1,116 @@
+; Reference animpoints
+[animpoint@a28_def]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+avail_animations = animpoint_sit_high_no_rnd
+use_camp = false
+out_restr = pri_a16_sr_noweap
+cover_name = pri_a16_animp_tech
+reach_movement = walk
+reach_distance = 1
+meet = meet@a28
+on_info = {+pri_a28_colonel_after_surge_sound_end} animpoint@rac_sound_1
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@a28_radio]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+avail_animations = animpoint_sit_high_no_rnd
+use_camp = false
+out_restr = pri_a16_sr_noweap
+cover_name = pri_a16_animp_tech
+reach_movement = walk
+reach_distance = 1
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@a28]
+abuse = false
+use = {=actor_enemy} false, {=is_playing_sound} false, true
+close_snd_hello = nil
+close_snd_bye = nil
+allow_break = false
+trade_enable = true
+close_distance = 0
+close_anim = nil
+far_distance = 0
+meet_on_talking = false
+
+;--------------------------------------
+
+[logic@pri_a28_kirillov]
+active = animpoint@a28_second_theme_1
+suitable = {+pri_b305_fifth_cam_end -pri_a28_update_task_cover_strelok =check_npc_name(pri_a22_army_signaller)} true
+prior = 200
+level_spot = mechanic
+
+;--------------------------------------
+; Second theme about surge, reply
+[animpoint@a28_second_theme_1]:animpoint@a28_def
+on_info3 = {+pri_b305_kovalskiy_order_kirilov_done_end -pri_b305_kirilov_order_agree_done} %=play_sound(pri_b305_kirilov_order_agree) +pri_b305_kirilov_order_agree_done%
+on_signal = sound_end | {-pri_b305_kirilov_order_agree_done_end} %+pri_b305_kirilov_order_agree_done_end%
+on_info2 = {!is_alive(pri_a17_military_lieutenant_podorojniy)} animpoint@a28_third_theme_1, {+pri_a28_army_surge_talk_2_first} animpoint@a28_second_theme_2
+
+[animpoint@a28_second_theme_2]:animpoint@a28_def
+on_game_timer = 20 | %=play_sound(pri_a28_army_surge_talk_2_second)%
+on_signal = sound_end | animpoint@a28_third_theme_2 %+pri_a28_army_surge_talk_2_done%
+meet = no_meet
+
+;--------------------------------------
+; Third theme about surge, start
+[animpoint@a28_third_theme_1]:animpoint@a28_def
+on_info2 = {!is_alive(pri_a17_military_captain_tarasov)} animpoint@a28_third_theme_3, {+pri_a28_army_surge_talk_1_done} animpoint@a28_third_theme_2
+
+[animpoint@a28_third_theme_2]:animpoint@a28_def
+on_game_timer = 100 | animpoint@a28_third_theme_3
+
+[animpoint@a28_third_theme_3]:animpoint@a28_def
+on_game_timer = 100 | {=is_alive(pri_a17_military_prapor_valentyr)} animpoint@a28_third_theme_3_play, animpoint@a28_third_theme_4
+
+[animpoint@a28_third_theme_3_play]:animpoint@a28_def
+on_info = %=play_sound(pri_a28_army_surge_talk_3_first)%
+on_signal = sound_end | animpoint@a28_third_theme_4 %+pri_a28_army_surge_talk_3_first%
+meet = no_meet
+
+[animpoint@a28_third_theme_4]:animpoint@a28_def
+
+;--------------------------------------
+; Establishing radio connection with HQ
+[animpoint@rac_sound_1]:animpoint@a28_radio
+on_game_timer = 10 | animpoint@rac_sound_2 %=play_sound(pri_a28_signaller_after_surge_1)%
+
+[animpoint@rac_sound_2]:animpoint@a28_radio
+on_signal = sound_end | {-pri_a28_signaller_after_surge_1_done} %+pri_a28_signaller_after_surge_1_done%
+avail_animations = pri_a28_kirillov_sit_high_radio
+on_info = {+pri_a28_kirillov_hq_online} animpoint@rac_sound_3
+
+[animpoint@rac_sound_3]:animpoint@a28_radio
+on_game_timer = 0 | {!is_playing_sound} %=play_sound(pri_a28_signaller_after_surge_2)%
+avail_animations = pri_a28_kirillov_sit_high_radio
+on_signal = sound_end | animpoint@rac_sound_4 %+pri_a28_signaller_after_surge_sound_end%
+
+[animpoint@rac_sound_4]:animpoint@a28_radio
+on_info = {+pri_a28_colonel_to_center_3_sound_end} animpoint@a28_wait_near_door
+
+;--------------------------------------
+; Gathering group before evacuation
+[animpoint@a28_wait_near_door]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+avail_animations = animpoint_sit_high_no_rnd
+use_camp = false
+out_restr = pri_a16_sr_noweap
+cover_name = pri_a16_animp_tech
+reach_movement = walk
+reach_distance = 1
+meet = meet@a28
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

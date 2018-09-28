@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_factions">
+		<text>Factions</text>
+	</string>
+	
+	<string id="encyclopedia_factions_bandit">
+		<text>Bandit</text>
+	</string>
+	<string id="encyclopedia_factions_bandit_text">
+		<text>
+			%c[guide_blue]Bandits%c[default] are members of the criminal underworld who operate in the Zone.\n
+			\n%c[guide_green]Information%c[default]
+			\nWhether to flee from their past crimes or to make money from selling artefacts and dealing firearms, their actions leave them despised by almost everybody foreign to their ranks.\n
+			\nThe faction consists of the Zone's many numerous gangs, operating separately of one another, and guided first by opportunity before any form of organised leadership.\n
+			\nAmbushing unsuspecting stalkers, blocking routes and "taxing" those who pass, and even entrapping stalkers into debt are just but a few of their many illicit activities in the Zone.\n
+			\nHere, criminals and gangsters can do whatever they want with little fear of consequence.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Olivius (De facto)\n• Headquarters: Dark Valley\n• Colours: Various
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_clear_sky">
+		<text>Clear Sky</text>
+	</string>
+	<string id="encyclopedia_factions_clear_sky_text">
+		<text>
+			%c[guide_blue]Clear Sky%c[default] are a scientific faction dedicated to learning about the Zone's inner workings.\n
+			\n%c[guide_green]Information%c[default]
+			\nDespite recent history they are generally considered to be a peaceful faction, preferring to invest their time and resources into research, rather than in playing politics.\n
+			\nThey view the Zone and its creation as both a gift and a curse - an incredible event with unappreciated potential - and a threat to humanity if not properly kept in balance.\n
+			\nIt was this latter part of their ideology which led them to near destruction, in chasing a stalker who they believed would greatly upset this balance, they fielded one of the largest forces ever seen in the Zone.\n
+			\nAfter the ensuing battles against the Monolith in their path, and the emission that followed them, the faction was left leaderless and in a state of near disrepair.\n
+			\nToday however they are led by Cold, who has helped them to rebuild and recover - carrying on the research of their predecessors and keeping the peace in the south of the Zone.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Cold\n• Headquarters: Great Swamp\n• Colours: Blue and white
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_duty">
+		<text>Duty</text>
+	</string>
+	<string id="encyclopedia_factions_duty_text">
+		<text>
+			%c[guide_blue]Duty%c[default] is a paramilitary organisation formed by former soldiers.\n
+			\n%c[guide_green]Information%c[default]
+			\nCharacterised by their strict discipline and military attributes, their ideology is built upon the protection of humanity from the dangers of the Zone.\n
+			\nIn view of this, Duty deals with the Zone's internal problems - the destruction of mutants and bandits - which greatly facilitates the daily lives of ordinary stalkers.\n
+			\nDespite taking this hardline approach they have been known to cooperate with Ecologists, handing over artefacts in return for knowledge which could assist them in their ideological crusade.\n
+			\nBecause of their actions they find themselves at constant odds with Freedom, a faction similar in size and strength, but whose attitude toward the Zone is of coexistence and preservation.\n
+			\nAfter a short-lived truce at Yanov station bloodily collapsed, their bitter rivalry has yet again embroiled them both in another deadly conflict with no clear end in sight.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: General Voronin\n• Headquarters: Rostok\n• Colours: Red and black
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_ecologist">
+		<text>Ecologist</text>
+	</string>
+	<string id="encyclopedia_factions_ecologist_text">
+		<text>
+			%c[guide_blue]Ecologists%c[default] are an institute of government-backed research organisations.\n
+			\n%c[guide_green]Information%c[default]
+			\nThere is no ecosystem anywhere else quite like the one found in the Zone, so naturally there is also a great interest expressed in it by the government.\n
+			\nIt is for this reason that the faction exists - to study the artefacts, anomalies, mutants and other unnatural objects that can be found only here.\n
+			\nThus far they have established two research labs, one in Yantar and the other in Jupiter, from which they conduct most of their secretive experiments.\n
+			\nWhen working out in the field they are often accompanied by an escort, usually hired mercenaries or stalkers, or are otherwise armed themselves.\n
+			\nMany stalkers who hunt for artefacts and rare mutant parts sell them to the Ecologists, as they are usually willing to pay much more than anybody else for them.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Professor Sakharov / Professor Hermann\n• Headquarters: Yantar / Jupiter\n• Colours: Various
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_freedom">
+		<text>Freedom</text>
+	</string>
+	<string id="encyclopedia_factions_freedom_text">
+		<text>
+			%c[guide_blue]Freedom%c[default] are anarchists and daredevils who fight for free access to the Zone.\n
+			\n%c[guide_green]Information%c[default]
+			\nMembers of this faction believe that the Zone should be a separate and free territory without laws and rulers, seeing it as a scientific marvel, and opposing all who would try to exploit or work against its nature.\n
+			\nThese views put them in direct contrast with Clear Sky and the Military, who seek its containment, and Duty, who want nothing less than to see the destruction of the Zone and everything spawned of it.\n
+			\nDespite finding enemies in almost everybody, they remain one of the most powerful factions in the Zone, which has allowed them to survive through their long-running and brutal fight against Duty's ambitions.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Lukash\n• Headquarters: Army Warehouses\n• Colours: Green, olive, and yellow
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_loner">
+		<text>Loner</text>
+	</string>
+	<string id="encyclopedia_factions_loner_text">
+		<text>
+			%c[guide_blue]Loners%c[default], or "%c[guide_blue]free stalkers%c[default]", are those who aren't aligned to a faction.\n
+			\n%c[guide_green]Information%c[default]
+			\nStalkers who come to the Zone entail a variety of motives: a thirst for adventure, the urge to explore the unknown, or the desire to start a new life from scratch.\n
+			\nThe majority of factions take a neutral or friendly stance towards them, seeing them as potential recruits, or as workers to perform jobs they are unable or unwilling to do themselves.\n
+			\nMost of their income is from the collection of artefacts, mutant parts, and miscellaneous weapons and items discovered when looting abandoned buildings and deceased stalkers.\n
+			\nHowever most of the time loners prefer to crowd around bars or at a bonfire, listening to tales and jokes, and playing the guitar or harmonica to pass the time.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Various\n• Headquarters: Various\n• Colours: Various
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_mercenary">
+		<text>Mercenary</text>
+	</string>
+	<string id="encyclopedia_factions_mercenary_text">
+		<text>
+			%c[guide_blue]Mercenaries%c[default] are a faction of private military contractors.\n
+			\n%c[guide_green]Information%c[default]
+			\nThey are very serious about their tasks and work in general, with well-planned operations and excellent preparation being the keys to their success.\n
+			\nContrary to popular belief they are not just hired killers, but carry out various contracts involving finding rare artefacts and equipment, and escorting valuable cargo through the most dangerous areas of the Zone.\n
+			\nFor a small reward, they have been known to subcontract parts of their work to other stalkers, usually jobs they consider too small or simple to involve professionals.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Dushman\n• Headquarters: Dead City\n• Colours: Blue and black
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_military">
+		<text>Military</text>
+	</string>
+	<string id="encyclopedia_factions_military_text">
+		<text>
+			%c[guide_blue]Military%c[default] forces in the Zone are a detachment of the State Security Service.\n
+			\n%c[guide_green]Information%c[default]
+			\nTasked primarily with ensuring that the border between the Zone and the outside world is not breached, they are hated here by almost everybody barring Duty and the Ecologists.\n
+			\nThey have the right to fire without warning, therefore military checkpoints are safer to bypass, as all unofficial persons in the Zone are considered "local fauna" and are subject to destruction.\n
+			\nIn reality however the military are frequently and easily bribed, with the most obvious example being how they ignore the rookie village despite it being less than a few hundred meters away from a major checkpoint.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Major Kuznetsov (De facto)\n• Headquarters: Agroprom\n• Colours: Green and olive
+		</text>
+	</string>
+	
+	<string id="encyclopedia_factions_monolith">
+		<text>Monolith</text>
+	</string>
+	<string id="encyclopedia_factions_monolith_text">
+		<text>
+			%c[guide_blue]Monolith%c[default] are a fanatical pseudo-religious sect hostile to all but their own.\n
+			\n%c[guide_green]Information%c[default]
+			\nFixated by their fanaticism, they attempt to resist all who would try to penetrate through to the center of the Zone - to such an extent that most stalkers consider them to be genuinely insane.\n
+			\nWhilst physically on par with any other stalkers in the Zone, their fervour sets them aside in enabling them to ignore pain and continue a fight, even after running out of ammunition for their weapons.\n
+			\nTheir members are thought to be inducted through brainwashing, previously via the use of the Brain Scorcher until it was shut down by Strelok.\n
+			\nIrrespective of this, in recent years the Monolith have somehow gotten access to a new and mysterious supply of reinforcements.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Unknown\n• Headquarters: Pripyat\n• Colours: White, black, and brown
+		</text>
+	</string>
+	
+</string_table>

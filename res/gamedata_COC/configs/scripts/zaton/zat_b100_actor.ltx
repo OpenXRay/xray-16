@@ -1,0 +1,45 @@
+; general section
+
+[animpoint@zat_b100_a23_actor_gen]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+; work section
+
+[logic]
+active = walker@zat_b100_temp
+on_hit = hit
+
+[walker@zat_b100_temp]
+path_walk = zat_a23_temp_actor_walk
+path_look = zat_a23_temp_actor_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = no_meet
+out_restr = zat_a23_cat_rest
+on_info = {=actor_in_zone(zat_a23_cat_rest)} animpoint@zat_a23_gauss_rifle_docs_investigation %=teleport_npc(zat_a23_cam_actor_walk)%, {=actor_in_zone(zat_b100_heli_2_cat)} animpoint@zat_b100_actor %=teleport_npc(zat_b100_heli_2_walk)%
+
+[animpoint@zat_b100_actor]:animpoint@zat_b100_a23_actor_gen
+avail_animations = zat_b100_heli_2_serch
+cover_name = zat_b100_heli_2_serch_animpoint
+
+[animpoint@zat_a23_gauss_rifle_docs_investigation]:animpoint@zat_b100_a23_actor_gen
+avail_animations = guard
+cover_name = zat_a23_actor_animpoint
+out_restr = zat_a23_cat_rest
+on_game_timer = 20 |  animpoint@zat_a23_gauss_rifle_docs_investigation_end
+
+[animpoint@zat_a23_gauss_rifle_docs_investigation_end]:animpoint@zat_b100_a23_actor_gen
+avail_animations = jup_a9_cam3_actor
+cover_name = zat_a23_actor_animpoint
+out_restr = zat_a23_cat_rest
+
+[hit]
+on_info = %+zat_b100_actor_hit =destroy_object%

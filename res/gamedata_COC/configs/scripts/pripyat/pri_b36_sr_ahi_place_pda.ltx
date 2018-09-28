@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_info = {+pri_b36_master_dead} sr_idle@check
+
+[sr_idle@check]
+on_info = {=actor_has_item(pri_b36_monolith_hiding_place_pda)} sr_idle@nil %=give_treasure(pri_b36_tower_treasure:pri_b36_ground_treasure)%
+
+[sr_idle@nil]

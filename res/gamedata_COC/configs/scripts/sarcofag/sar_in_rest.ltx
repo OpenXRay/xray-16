@@ -1,0 +1,44 @@
+[logic]
+;active = sr_idle
+active = sr_idle@spawn
+
+;[sr_idle]
+;on_info = {+sar_start_decoding} sr_sound
+
+;[sr_sound]
+;snd = device\decoder
+;play_at_actor = true
+;on_signal = sound_end| sr_idle
+;on_info = {+sar_finish_decoding} sr_idle@nil
+
+[sr_idle@spawn]
+on_actor_inside = sr_idle@spawn1 %+sar_start_teleport%
+
+[sr_idle@spawn1]
+on_timer = 2000| sr_idle@spawn2 %+sar_monolith_spawn1 =spawn_object(sar_stalker_monolith_1:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@spawn2]
+on_timer = 2000| sr_idle@spawn3 %+sar_monolith_spawn2 =spawn_object(sar_stalker_monolith_2:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@spawn3]
+on_timer = 2000| sr_idle@spawn4 %+sar_monolith_spawn3 =spawn_object(sar_stalker_monolith_3:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@spawn4]
+on_timer = 2000| sr_idle@spawn5 %+sar_monolith_spawn4 =spawn_object(sar_stalker_monolith_4:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@spawn5]
+on_timer = 2000| sr_idle@spawn6 %+sar_monolith_spawn5 =spawn_object(sar_stalker_monolith_5:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@spawn6]
+on_timer = 2000| sr_idle@spawn7 %+sar_monolith_spawn6 =spawn_object(sar_stalker_monolith_6:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@spawn7]
+on_timer = 2000| sr_idle@spawn8 %+sar_monolith_spawn7 =spawn_object(sar_stalker_monolith_7:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@spawn8]
+on_timer = 2000| sr_idle@end %+sar_monolith_spawn8 =spawn_object(sar_stalker_monolith_8:sar_secret_room_spawn_walk:0)%
+
+[sr_idle@end]
+on_timer = 2000| sr_idle@nil %+sar_end_teleport%
+
+[sr_idle@nil]

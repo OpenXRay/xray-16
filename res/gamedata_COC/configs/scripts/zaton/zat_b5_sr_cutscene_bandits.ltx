@@ -1,0 +1,19 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b5_sultan_close_by_trader} sr_cutscene@cam1 %=create_cutscene_actor_with_weapon(zat_b5_actor_with_bandits:zat_b5_smart_terrain_actor_with_bandits_walk)%
+on_info2 = {+zat_b5_task_end} sr_idle@nil
+on_info3 = {+zat_b5_meat} sr_idle@nil
+
+[sr_cutscene@cam1]
+point = zat_b5_smart_terrain_actor_after_bandits_cutscene_walk
+look = zat_b5_smart_terrain_actor_after_bandits_cutscene_look
+cam_effector = scenario_cam\Zaton\zat_b5_from_bandits
+on_signal = cameff_end | sr_idle@nil %+zat_b5_bandits_cutscene_end +zat_b5_meat%
+global_cameffect = true
+outdoor = true
+on_info = {+zat_b5_meat} %+zat_b5_bandits_cutscene_end =stop_sr_cutscene%
+enable_ui_on_end = true
+
+[sr_idle@nil]

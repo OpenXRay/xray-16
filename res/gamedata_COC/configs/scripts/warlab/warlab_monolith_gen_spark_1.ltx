@@ -1,0 +1,17 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@wait_2nd_actor
+
+[sr_idle@wait_2nd_actor]
+on_info = {+sar2_monolith_end =actor_in_zone(warlab_in_restr)} sr_idle@on
+
+[sr_idle@on]
+on_info = {-warlab_deactivate_generators_done} %=play_sound_looped(warlab_pod_noise)%
+on_info2 = {+warlab_deactivate_generators_done} sr_idle@off
+
+[sr_idle@off]
+on_info = sr_idle@nil %=stop_sound_looped%
+
+[sr_idle@nil]

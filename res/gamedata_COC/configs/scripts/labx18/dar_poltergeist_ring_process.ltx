@@ -1,0 +1,14 @@
+[logic]
+active = sr_idle@spawn1
+
+[sr_idle@spawn1]
+on_info = {+dar_codelock1_unlock} sr_idle@wait %=create_squad(dar_poltergeist_ring_squad_1:dar_poltergeist_ring)%
+
+[sr_idle@wait]
+on_info = {+dar_ring_spawn1 +dar_ring_spawn2_1 +dar_ring_spawn2_2} sr_idle@spawn2 %+dar_ring_spawn2%
+on_info2 = {+dar_ring_spawn2} sr_idle@spawn2
+
+[sr_idle@spawn2]
+on_info = {+dar_ring_spawn2} sr_idle@nil %=create_squad(dar_poltergeist_ring_squad_2:dar_poltergeist_ring)%
+
+[sr_idle@nil]

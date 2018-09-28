@@ -1,0 +1,126 @@
+;************************
+;*** Monolith_general ***
+;************************
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+[logic@sar_monolith_general_post1_1]
+active = camper@sar_monolith_general_post1_1
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[camper@sar_monolith_general_post1_1]:walker@generic
+path_walk = post1_1_walk
+path_look = post1_1_look
+radius = 5
+out_restr = sar_camp_room
+
+
+[logic@sar_monolith_general_post1_2]
+active = camper@sar_monolith_general_post1_2
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[camper@sar_monolith_general_post1_2]:walker@generic
+path_walk = post1_2_walk
+path_look = post1_2_look
+radius = 10
+out_restr = sar_camp_room
+
+
+[logic@sar_monolith_general_post2_1]
+active = camper@sar_monolith_general_post2_1
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[camper@sar_monolith_general_post2_1]:walker@generic
+path_walk = post2_1_walk
+path_look = post2_1_look
+radius = 10
+out_restr = sar_camp_room
+
+
+[logic@sar_monolith_general_post2_2]
+active = camper@sar_monolith_general_post2_2
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[camper@sar_monolith_general_post2_2]:walker@generic
+path_walk = post2_2_walk
+path_look = post2_2_look
+radius = 5
+out_restr = sar_camp_room
+
+
+[logic@sar_monolith_general_patrol]
+active = patrol@sar_monolith_general_patrol
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[patrol@sar_monolith_general_patrol]:walker@generic
+path_walk = patrol_walk
+commander = true
+out_restr = sar_camp_room
+
+
+[logic@sar_monolith_general_patrol_follower1]
+active = patrol@sar_monolith_general_patrol_follower1
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[patrol@sar_monolith_general_patrol_follower1]:walker@generic
+path_walk = patrol_walk
+out_restr = sar_camp_room
+
+
+[logic@sar_monolith_general_patrol_room]
+active = walker@sar_monolith_general_patrol_room
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[walker@sar_monolith_general_patrol_room]:walker@generic
+path_walk = patrol_walk_room
+out_restr = sar_camp_room
+
+
+[logic@sar_monolith_general_kamp1]
+active = animpoint@sar_monolith_general_kamp1
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[animpoint@sar_monolith_general_kamp1]:walker@generic
+cover_name = sar_monolith_general_kamp1
+use_camp = true
+
+
+[logic@sar_monolith_general_kamp2]
+active = animpoint@sar_monolith_general_kamp2
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[animpoint@sar_monolith_general_kamp2]:walker@generic
+cover_name = sar_monolith_general_kamp2
+use_camp = true
+
+
+[logic@sar_monolith_general_kamp3]
+active = animpoint@sar_monolith_general_kamp3
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[animpoint@sar_monolith_general_kamp3]:walker@generic
+cover_name = sar_monolith_general_kamp3
+use_camp = true
+
+
+[logic@sar_monolith_general_kamp4]
+active = animpoint@sar_monolith_general_kamp4
+suitable = {=target_squad_name(sar_monolith_general_squad)} true
+prior = 200
+
+[animpoint@sar_monolith_general_kamp4]:walker@generic
+cover_name = sar_monolith_general_kamp4
+use_camp = true

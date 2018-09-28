@@ -1,0 +1,286 @@
+local item_by_community = {}
+local item_count = {}
+local always_keep_item = {}
+local item_by_story_id
+local death_ini = ini_file("misc\\death_generic.ltx")
+local diff_multi, cnt_multi_1, cnt_multi_2 = 0.8,1,1
+
+function SetDiffModifications()
+	local diff = axr_main.config:r_value("mm_options","multi_loot",2) or 1
+	diff_multi = (diff - 0.2) or 0.8
+	cnt_multi_1 = diff or 1
+	cnt_multi_2 = diff or 1
+end
+
+function init_drop_settings()
+	-- Create a list by community of the percent chance to spawn an item
+	SetDiffModifications()
+	local community_list = { "stalker", "dolg", "freedom", "bandit", "renegade", "army", "zombied", "ecolog", "killer", "monolith", "csky" }
+	for k,v in pairs(community_list) do
+		item_by_community[v] = {}
+		if death_ini:section_exist(v) then
+			local n = death_ini:line_count(v)
+			local id, value = "", ""
+			for i=0,n-1 do
+				result, id, value	= death_ini:r_line_ex(v,i,"","")
+				local temp = not (death_ini:line_exist("exclude_from_multi",id)) and diff_multi or 1
+				item_by_community[v][id] = value and tonumber(value) * temp or 0
+				--printf("item by community difficulty multi %s : %s",temp,item_by_community[v][id])
+			end
+		end
+	end
+
+	local n = death_ini:line_count("item_count")
+	local id, value = "", ""
+	for i=0,n-1 do
+		local result, id, value	= death_ini:r_line_ex("item_count",i,"","")
+		local p = alun_utils.str_explode(value,",")
+		if (p) then
+			p[1] = tonumber(p[1]) or 0
+			p[2] = tonumber(p[2]) or p[1]
+			item_count[id] = {math.ceil(p[1] * cnt_multi_1),math.ceil(p[2] * cnt_multi_2)}
+			--printf("item count  min%s:max%s  item_count[id] min%s:max%s",cnt_multi_1,cnt_multi_2,item_count[id][1],item_count[id][2])
+		end
+	end
+	
+ 	-- Create a list of item sections that npc must keep
+	local n = death_ini:line_count("keep_items")
+	for i=0,n-1 do
+		local result, id, value	= death_ini:r_line_ex("keep_items",i,"","")
+		if value == "true" then
+			always_keep_item[id] = true
+		end
+	end
+	
+	-- Create a list of item sections that npc must keep
+	local n = death_ini:line_count("spawn_by_story_id")
+	for i=0,n-1 do
+		if not (item_by_story_id) then 
+			item_by_story_id = {}
+		end
+		local result, id, value	= death_ini:r_line_ex("spawn_by_story_id",i,"","")
+		item_by_story_id[id] = value
+	end
+end
+
+-- this will actually occur every time corpse spawn unless already looted
+function decide_items_to_keep(npc)
+	local death_dropped = utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped")
+	if (death_dropped) then
+		return
+	end
+	npc:iterate_inventory(keep_item, npc)
+end
+
+function create_release_item(npc,who)
+	local death_dropped = utils.se_obj_load_var(npc:id(),npc:name(),"death_dropped")
+	if (death_dropped) then
+		return
+	end
+	utils.se_obj_save_var(npc:id(),npc:name(),"death_dropped",true)
+	
+	-- spawn items by story id
+	local sid = item_by_story_id and get_object_story_id(npc:id())
+	if (sid and item_by_story_id[sid]) then
+		local p = xr_logic.pick_section_from_condlist(db.actor,npc,utils.parse_condlist(item_by_story_id[sid]))
+		--local p = alun_utils.str_explode(item_by_story_id[sid],",")
+		--printf("sid=%s p=%s",sid,p)
+		if (p and p ~= "" and p ~= "nil") then
+			create_items(npc, p, 1, 100 * cnt_multi_2)
+		end
+	end
+
+	local ini = npc:spawn_ini()
+	if ini and ini:section_exist("dont_spawn_loot") then
+		return
+	end
+	
+	local st = db.storage[npc:id()]
+	if (st and st.ini and st.section_logic and st.ini:line_exist(st.section_logic,"dont_spawn_loot")) then 
+		return
+	end
+
+	local spawn_items = item_by_community[character_community(npc)]
+	if spawn_items == nil then
+		return
+	end
+	
+	npc:iterate_inventory(try_spawn_ammo_for_weapon,npc)
+	
+	for sec,v in pairs(spawn_items) do
+		if (v > 0 and item_count[sec]) and not utils.is_ammo(sec) then
+			local number = math.random(item_count[sec][1], item_count[sec][2])
+			
+			-- Bookworm Food achievement.
+			-- Changes memory sticks to rare PDAs when no articles left.
+			if (sec == "itm_guide_usb_1" or sec == "itm_guide_usb_2") then
+				-- Check locked articles count instead of for achieved_bookworm_food infoportion.
+				-- If articles are added after achievement is unlocked, they might become unobtainable.
+				if dxr_encyclopedia.get_articles_locked_count() == 0 then
+					sec = "itm_pda_rare"
+				end
+			end
+			
+			create_items(npc, sec, number, v)
+		end
+	end
+end
+
+--' Функция вызывается для каждого предмета, если вернет false то предмет удалится.
+function keep_item(npc, item)
+	if not (item) then 
+		return 
+	end 
+	
+	local section = item:section()
+	if (always_keep_item[section]) then 
+		return 
+	end 
+	
+	local se_item = alife_object(item:id())
+	if not (se_item) then 
+		return
+	end
+	
+	local ini = npc:spawn_ini()
+	if ini and ini:section_exist("dont_keep_items") then
+		alife():release(se_item, true)
+		return
+	end
+	
+	local st = db.storage[npc:id()]
+	if (st and st.ini and st.section_logic and st.ini:line_exist(st.section_logic,"dont_keep_items")) then
+		alife():release(se_item, true)
+		return
+	end 
+	
+	--List of animation objects that we never want to drop as an item.
+	local animationObjects = {
+		["bolt"] = true,
+		["medkit_script"] = true,
+		["guitar_a"] = true,
+		["guitar_a2"] = true,
+		["harmonica_a"] = true,
+		["wpn_binoc"] = true,
+		["anim_binoc"] = true,
+		["anim_knife"] = true,
+		["device_torch"] = true,
+		["device_pda"] = true,
+		["hand_radio"] = true,
+		["hand_radio_r"] = true,
+		["stick_bred"] = true,
+		["stick_kolbasa"] = true,
+		["stick_kolbasa_bred"] = true,
+	}
+	
+	--If our section is one of the above animation objects, release it and return.
+	if animationObjects[section] then
+		alife():release( se_item, true )
+		return
+	end
+	
+	local m = math.ceil(item:get_max_uses() * math.random(diff_multi,1))
+	if (m > 0) then 
+		local r = math.random(0,m)
+		item:set_remaining_uses(r)
+		if (r == 0) then 
+			alife():release(se_item, true)
+		end
+		return
+	end
+	
+	if IsArtefact(item) then
+		return
+	end
+
+	local cls = item:clsid()
+	if IsWeapon(item,cls) and not(cls==clsid.wpn_grenade_rgd5_s or cls==clsid.wpn_grenade_f1_s or cls==clsid.wpn_knife_s) then
+		set_weapon_drop_condition(npc,item)
+		-- Set random ammo in mag
+		item:set_ammo_elapsed( math.random(0,item:get_ammo_in_magazine()) )
+		return
+	end
+	
+	local temp = not (death_ini:line_exist("exclude_from_multi",item:section())) and diff_multi or 1
+	if (item:cast_Ammo() == nil and xr_corpse_detection.lootable_table and xr_corpse_detection.lootable_table[section] and math.random(1,100) < 65 * temp) then
+		return
+	end
+	
+	alife():release(se_item, true)
+end
+
+function set_weapon_drop_condition(npc,itm)
+	local multi = (axr_main.config:r_value("mm_options","multi_wpn_conditions",2) or 1)
+	local condition  = (math.random(40)+30)/100
+	--printf("condition [%s]", tostring(condition))
+	itm:set_condition(condition * multi)
+	try_spawn_ammo_for_weapon(npc,itm)
+end
+
+function try_spawn_ammo_for_weapon(npc,itm)
+	if not (IsWeapon(itm)) then 
+		return 
+	end
+	
+	local ini = system_ini()
+	local ammo_class = ini:r_list(itm:section(),"ammo_class")
+	if not (ammo_class and #ammo_class > 0) then 
+		return
+	end
+	
+	-- randomly spawn only 1 ammo type per found weapon
+	local ammo_type = itm:get_ammo_type()+1
+	local sec = ammo_class[ammo_type]
+	if (sec and item_count[sec]) then 
+		local number = math.random(item_count[sec][1], item_count[sec][2])
+		if (number > 0 and system_ini():section_exist(sec)) then
+			create_ammo(sec,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
+		end
+	end
+
+	ammo_class = ini:r_list(itm:section(),"grenade_class")
+	if not (ammo_class and #ammo_class > 0) then 
+		return
+	end
+	
+	-- spawn grenade ammo if there is launcher attached
+	if (ini:r_float_ex(itm:section(),"grenade_launcher_status",0) > 0) then
+		local se_item = alife_object(itm:id())
+		if (se_item) then
+			local flags = se_item:get_addon_flags()
+			if (flags:is(cse_alife_item_weapon.eWeaponAddonGrenadeLauncher)) then
+				for i=1,#ammo_class do
+					sec = ammo_class[i]
+					if (sec and item_count[sec]) then 
+						local number = math.random(item_count[sec][1], item_count[sec][2])
+						if (number > 0 and ini:section_exist(sec)) then 
+							create_ammo(sec,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+--' Функция спавнит необходимое число предметов
+function create_items(npc, section, number, rnd)
+	if not (system_ini():section_exist(section)) then 
+		--printf("death_manager: ERROR: trying to spawn section that doesn't exist! %s",section)
+		return 
+	end 
+	
+	--printf("death_dropped: create %s=%s",section,number)
+	if (utils.is_ammo(section))then
+		if number > 0 then
+			create_ammo(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id(),number)
+		end
+	else
+		for i=1,number do
+			--' Проверяем вероятность появить каждый объект в отдельности
+			if (math.random(1,1000)/1000 <=  rnd) then
+				alife():create(section,npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
+			end
+		end
+	end
+end

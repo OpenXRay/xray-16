@@ -1,0 +1,27 @@
+[animpoint@def]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = true
+
+[logic@pri_a20_missing_military_recon_leader]
+active = animpoint@base_1
+suitable = {-pri_a17_actor_has_gauss_rifle =check_npc_name(pri_a15_military_recon_leader)} true, {-pri_a17_actor_has_gauss_rifle =check_npc_name(pri_a15_military_recon_1)} true
+prior = 200
+
+[logic@pri_a20_missing_military_recon_1]
+active = animpoint@base_2
+suitable = {-pri_a17_actor_has_gauss_rifle =check_npc_name(pri_a15_military_recon_leader)} true, {-pri_a17_actor_has_gauss_rifle =check_npc_name(pri_a15_military_recon_1)} true
+prior = 200
+
+
+[animpoint@base_1]:animpoint@def
+cover_name = pri_a16_animp_7
+
+[animpoint@base_2]:animpoint@def
+cover_name = pri_a16_animp_8

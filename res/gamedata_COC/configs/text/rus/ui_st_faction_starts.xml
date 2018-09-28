@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<string id="ui_st_abandoned_sawmill">
+		<text>Затон. Лесопилка</text>
+	</string>
+
+	<string id="ui_st_abandoned_school">
+		<text>Мёртвый Город. Старая школа</text>
+	</string>
+
+	<string id="ui_st_abandoned_village">
+		<text>Военные Склады. Брошенный хутор</text>
+	</string>
+
+	<string id="ui_st_apartment">
+		<text>Квартира в Припяти</text>
+	</string>
+
+	<string id="ui_st_brain_scorcher">
+		<text>Радар. Выжигатель Мозгов</text>
+	</string>
+
+	<string id="ui_st_car_park">
+		<text>Кордон. АТП</text>
+	</string>
+
+	<string id="ui_st_construction_site">
+		<text>Дикая Территория</text>
+	</string>
+
+	<string id="ui_st_container_warehouse">
+		<text>Окрестности «Юпитера». Склад контейнеров</text>
+	</string>
+
+	<string id="ui_st_cultural_center">
+		<text>Припять. ДК «Энергетик»</text>
+	</string>
+
+	<string id="ui_st_eastern_factory">
+		<text>Тёмная Долина. Завод над Х-18</text>
+	</string>
+
+	<string id="ui_st_factory_complex">
+		<text>Агропром. Завод «Агропром»</text>
+	</string>
+
+	<string id="ui_st_hermanns_bunker">
+		<text>«Юпитер». Бункер учёных</text>
+	</string>
+
+	<string id="ui_st_hidden_base">
+		<text>Болота. База «Чистого Неба»</text>
+	</string>
+
+	<string id="ui_st_kopachy_village">
+		<text>Окрестности «Юпитера». Копачи</text>
+	</string>
+
+	<string id="ui_st_lodging_house">
+		<text>Росток. Бар «100 Рентген»</text>
+	</string>
+
+	<string id="ui_st_makeshift_barracks">
+		<text>Росток. База «Долга»</text>
+	</string>
+
+	<string id="ui_st_military_base">
+		<text>Военные Склады</text>
+	</string>
+
+	<string id="ui_st_northern_factory">
+		<text>Тёмная Долина. Северная фабрика</text>
+	</string>
+
+	<string id="ui_st_pumping_station">
+		<text>Болота. Насосная станция</text>
+	</string>
+
+	<string id="ui_st_river_port">
+		<text>Окраины Припяти. Речной порт.</text>
+	</string>
+
+	<string id="ui_st_rookie_village">
+		<text>Кордон. Деревня новичков</text>
+	</string>
+
+	<string id="ui_st_research_institute">
+		<text>Агропром. НИИ «Агропром»</text>
+	</string>
+
+	<string id="ui_st_sakharovs_bunker">
+		<text>Янтарь. Лагерь учёных</text>
+	</string>
+
+	<string id="ui_st_skadovsk_shipwreck">
+		<text>Затон. «Скадовск»</text>
+	</string>
+
+	<string id="ui_st_southern_checkpoint">
+		<text>Кордон. Южный блокпост</text>
+	</string>
+
+	<string id="ui_st_sports_center">
+		<text>Мёртвый Город. Магазин «Коопторг»</text>
+	</string>
+
+	<string id="ui_st_substation_workshops">
+		<text>Затон. Цеха подстанции</text>
+	</string>
+
+	<string id="ui_st_train_hangar">
+		<text>Свалка. Депо</text>
+	</string>
+
+	<string id="ui_st_tunnel_entrance">
+		<text>«Юпитер». Подземка венткомплекса</text>
+	</string>
+
+	<string id="ui_st_tunnel_refuge">
+		<text>Подземелья «Агропрома»</text>
+	</string>
+
+	<string id="ui_st_tuzla_outpost">
+		<text>Болота. Лодочная станция</text>
+	</string>
+
+	<string id="ui_st_yanov_station">
+		<text>Окрестности «Юпитера». Станция «Янов»</text>
+	</string>
+
+</string_table>

@@ -1,0 +1,184 @@
+<w>
+	<!-- No images -->
+	<file name="ui\ui_console">
+		<texture id="encyclopedia_achievements_bookworm_food_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_completionist_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_down_to_earth_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_duga_free_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_geologist_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_heavy_pockets_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_infopreneur_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_mechanized_warfare_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_patriarch_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_radiotherapy_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_rag_and_bone_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_silver_or_lead_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_tourist_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_well_dressed_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_achievements_wishful_thinking_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_features_companions_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_features_equipment_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_features_rank_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_features_reputation_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_features_stashes_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_mutants_historic_rat_wolf_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_mutants_historic_tark_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_ai_die_to_anomalies_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_aoe_pickup_mode_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_artefact_degradation_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_delayed_repairs_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_difficulty_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_enhanced_recoil_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_hardcore_ai_aim_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_helicopter_patrols_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_localisation_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_online_exclusion_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_population_factors_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_quicksave_count_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_radio_music_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_gameplay_sleep_deprivation_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_other_azazel_mode_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_other_ironman_mode_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_other_story_mode_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_other_survival_mode_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_ui_hud_dynamic_news_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_ui_hud_extended_hud_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_options_ui_hud_portrait_by_outfit_image" x="0" y="0" width="0" height="0"/>
+	</file>
+	
+	<!-- Anomalies (Other) -->
+	<file name="ui\guide\encyclopedia_anomalies_other">
+		<texture id="encyclopedia_anomalies_other_emission_image" x="0" y="256" width="512" height="256"/>
+		<texture id="encyclopedia_anomalies_other_phantom_image" x="512" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_anomalies_other_psistorm_image" x="0" y="0" width="512" height="256"/>
+	</file>
+	
+	<!-- Characters -->
+	<!-- Split into multiple files to prevent loading massive textures. -->
+	<file name="ui\guide\encyclopedia_characters">
+		<texture id="encyclopedia_characters_barkeep_image" x="256" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_beard_image" x="512" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_cold_image" x="512" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_fanatic_image" x="256" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_characters_ivan_trodnik_image" x="0" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_characters_librarian_image" x="512" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_characters_lieutenant_kirilov_image" x="768" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_nimble_image" x="0" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_novikov_image" x="256" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_characters_sidorovich_image" x="0" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_sultan_image" x="512" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_characters_wolf_image" x="256" y="256" width="256" height="256"/>
+	</file>
+	
+	<file name="ui\guide\encyclopedia_characters2">
+		<texture id="encyclopedia_characters_ashot_image" x="768" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_characters_axel_image" x="768" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_cardan_image" x="512" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_characters_hawaiian_image" x="512" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_limpid_image" x="0" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_loki_image" x="512" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_major_kuznetsov_image" x="0" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_characters_olivius_image" x="256" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_owl_image" x="768" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_professor_kruglov_image" x="0" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_professor_sakharov_image" x="256" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_sergeant_spooner_image" x="256" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_characters_yar_image" x="768" y="512" width="256" height="256"/>
+	</file>
+	
+	<file name="ui\guide\encyclopedia_characters3">
+		<texture id="encyclopedia_characters_doctor_image" x="256" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_gonta_image" x="0" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_characters_spore_image" x="0" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_characters_xenotech_image" x="256" y="0" width="256" height="256"/>
+	</file>
+	
+	<!-- Features -->
+	<file name="ui\guide\encyclopedia_features">
+		<texture id="encyclopedia_features_guide_image" x="0" y="256" width="512" height="256"/>
+		<texture id="encyclopedia_features_map_spots_image" x="0" y="0" width="512" height="256"/>
+	</file>
+	
+	<!-- Factions, Factions (Historic) & Factions (Other) -->
+	<file name="ui\guide\encyclopedia_factions">
+		<texture id="encyclopedia_factions_bandit_image" x="0" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_factions_clear_sky_image" x="256" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_factions_duty_image" x="512" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_factions_ecologist_image" x="0" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_factions_freedom_image" x="256" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_factions_loner_image" x="512" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_factions_mercenary_image" x="0" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_factions_military_image" x="256" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_factions_monolith_image" x="512" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_factions_historic_final_day_image" x="0" y="0" width="0" height="0"/>
+		<texture id="encyclopedia_factions_historic_isg_image" x="0" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_factions_historic_renegade_image" x="256" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_factions_other_zombified_image" x="512" y="768" width="256" height="256"/>
+	</file>
+	
+	<!-- Locations -->
+	<file name="ui\guide\encyclopedia_levels">
+		<texture id="encyclopedia_locations_agroprom_image" x="0" y="0" width="0" height="256"/>
+		<texture id="encyclopedia_locations_agroprom_underground_image" x="0" y="256" width="512" height="256"/>
+		<texture id="encyclopedia_locations_army_warehouses_image" x="0" y="512" width="512" height="256"/>
+		<texture id="encyclopedia_locations_chernobyl_npp_image" x="0" y="768" width="512" height="256"/>
+		<texture id="encyclopedia_locations_cordon_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_dark_valley_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_darkscape_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_dead_city_image" x="512" y="256" width="512" height="256"/>
+		<texture id="encyclopedia_locations_deserted_hospital_image" x="512" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_garbage_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_generators_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_great_swamp_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_jupiter_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_jupiter_underground_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_lab_x16_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_lab_x18_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_lab_x19_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_lab_x8_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_limansk_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_monolith_control_center_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_outskirts_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_pripyat_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_radar_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_red_forest_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_rostok_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_sarcophagus_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_truck_cemetery_image" x="512" y="512" width="512" height="256"/>
+		<texture id="encyclopedia_locations_warlab_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_wild_territory_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_yantar_image" x="0" y="0" width="512" height="256"/>
+		<texture id="encyclopedia_locations_zaton_image" x="512" y="768" width="512" height="256"/>
+	</file>
+	
+	<!-- Mutants -->
+	<!-- Split into multiple files to prevent loading massive textures. -->
+	<file name="ui\guide\encyclopedia_mutants">
+		<texture id="encyclopedia_mutants_blind_dog_image" x="0" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_bloodsucker_image" x="0" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_boar_image" x="0" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_burer_image" x="256" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_cat_image" x="256" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_chimera_image" x="256" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_controller_image" x="512" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_crow_image" x="512" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_flesh_image" x="512" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_poltergeist_image" x="768" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_pseudogeist_image" x="256" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_psydog_image" x="768" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_pyrogeist_image" x="768" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_rat_image" x="768" y="512" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_snork_image" x="0" y="768" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_zombie_image" x="512" y="768" width="256" height="256"/>
+	</file>
+	
+	<file name="ui\guide\encyclopedia_mutants2">
+		<texture id="encyclopedia_mutants_fracture_image" x="512" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_karlik_image" x="0" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_pseudodog_image" x="256" y="256" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_pseudogiant_image" x="256" y="0" width="256" height="256"/>
+		<texture id="encyclopedia_mutants_tushkano_image" x="0" y="256" width="256" height="256"/>
+	</file>
+	
+	
+</w>

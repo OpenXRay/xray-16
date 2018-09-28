@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+<string id="bar_arena_man_job_0">
+		<text>Есть для меня противник?</text>
+	</string>
+	<string id="bar_arena_man_job_11">
+		<text>Ну что ж, первый бой. Твой противник - такой же кусок мяса, как и ты. Попал сюда из-за долгов. Его поставили перед выбором: либо выходишь и дерёшься, либо отправляешься в ближайшую аномалию. Так что драться он будет как пёс, загнанный в угол. Из снаряжения сегодня, дай-ка подумать, ага - будете драться на ПМах. Ну, и по две обоймы, я думаю, вам хватит. Иди и надери ему задницу, или пойдёшь собакам на корм, выбор небольшой. Вперёд.</text>
+	</string>
+	<string id="bar_arena_man_job_111">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_112">
+		<text>Я не готов.</text>
+	</string>
+	<string id="bar_arena_man_job_12">
+		<text>Предыдущий бой ещё ничего не означал. Ты всё ещё кусок мяса, на который приличный человек не поставит и обоймы. Если хочешь неплохо заработать, тебе предстоит ещё не раз выступить. Твой противник - тоже прошёл первый круг и сделал это достаточно быстро, да и противник у него был посерьезней твоего. Ну, если честно, он мне не нравится, он убивает очень быстро, а публика этого не любит. Так что давай - иди и покажи, на что ты способен. После этого боя ставки начнут повышаться, осталось только выжить. Пошёл!</text>
+	</string>
+	<string id="bar_arena_man_job_121">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_122">
+		<text>Я не готов.</text>
+	</string>
+	<string id="bar_arena_man_job_13">
+		<text>Ну что ж. Ты оказался не таким уж слабаком, каким показался с первого взгляда. Пришло время проверить тебя в честной схватке. Против тебе выступают два противника, первый Швед, второго - не помню как зовут. Их специально поставили в пару, они друг другу страшно не нравятся. Так что командной игры с их стороны можешь не бояться. Скорее они друг друга подстрелят. Из оружия сегодня - ружья, так что смотри, в упор не подставляйся, а то по частям тебя собирать будут. Ставки против тебя десять к одному, если победишь, отлично заработаешь. Погнал!</text>
+	</string>
+	<string id="bar_arena_man_job_131">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_132">
+		<text>Я не готов.</text>
+	</string>
+	<string id="bar_arena_man_job_14">
+		<text>Теперь я могу с уверенностью сказать, что ты - боец. Пришло время командного выступления. С тобой будут выступать два новичка, два брата. Они ещё не выступали, но, так как они братья, пришлось их засунуть в командные бои. На особую помощь - можешь не рассчитывать, так что полагайся только на себя. Против вас выступает сыгранная команда, претенденты на финал этого сезона. Опасные парни. Оружие смешанное, у одного из них автоматический дробовик - с ним будь предельно осторожен. У остальных автоматы. Давай, удачи, она тебе пригодится.</text>
+	</string>
+	<string id="bar_arena_man_job_141">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_142">
+		<text>Я не готов.</text>
+	</string>
+	<string id="bar_arena_man_job_15">
+		<text>Сегодня у тебя необычный бой. Про твои подвиги прослышали даже вояки и прислали двоих своих бойцов; да, не удивляйся, вояки тоже в этом участвуют. Среди зрителей есть даже генерал. Эти парни из спецназа, точнее, из ОМОНА. И вооружены они соответствующе. Будь осторожен - у них достаточно крепкая броня. Я тебя тоже голым не оставлю. Получишь броню, свободовский броник, чтоб они подавились. Штука легкая, так что бегать мешать не будет. Покажи им, что наш брат тоже не лыком шит. Удачи!</text>
+	</string>
+	<string id="bar_arena_man_job_151">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_152">
+		<text>Я не готов.</text>
+	</string>
+	<string id="bar_arena_man_job_16">
+		<text>Сегодня у тебя показательный бой. Долг изловил банду, которая долгое время на Ростке покоя сталкерам не давала. Брали их ночью, так что почти все живы остались. Их все равно к стенке будут ставить, так я Долг уломал дать им шанс. Кто выживет, отправится в тюрягу вне Зоны, всё лучше, чем подохнуть. Вооружены они чем попало, в основном, пистолетами и обрезами, но их шестеро, так что смотри - не подставляйся по-глупому. Айда!</text>
+	</string>
+	<string id="bar_arena_man_job_161">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_162">
+		<text>Я не готов.</text>
+	</string>
+	<string id="bar_arena_man_job_17">
+		<text>Вот ты и дошел почти до финала. Тебе предстоит бой со сталкером-мастером. Да, он один, но он в экзоскелете, и с хорошим оружием, если попадешь под очередь, считай, что ты труп. Тебя ждет сюрприз, о котором я не могу тебе рассказать, но мой тебе совет - готовься, схватка будет непростой. Победитель этой схватки пройдет в финал - Смертельный бой. Вперед!</text>
+	</string>
+	<string id="bar_arena_man_job_171">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_172">
+		<text>Я не готов.</text>
+	</string>
+	<string id="bar_arena_man_job_18">
+		<text>Я тебя поздравляю! Ты дошел до финала. Осталась последняя схватка - Смертельный бой. В этом бою - каждый сам за себя. Помимо тебя, в схватке принимают участие ещё четыре сталкера, все мастера, все в экзоскелетах. Теперь всё будет честно - у тебя будет точно такое же снаряжение. Никаких аптечек и бинтов. Готов?! Докажи что ты лучший! ПОШЁЛ!</text>
+	</string>
+	<string id="bar_arena_man_job_181">
+		<text>Я готов.</text>
+	</string>
+	<string id="bar_arena_man_job_182">
+		<text>Я не готов.</text>
+    </string>
+    <string id="bar_arena_man_start_111112">
+        <text>Эй! Ты заплатил мне за бой, а сам просто ушёл!</text>
+	</string>
+	<string id="bar_arena_man_start_11">
+		<text>Здорово! Есть новый бой для тебя.</text>
+	</string>
+	<string id="bar_arena_man_start_21">
+		<text>Погуляй часок-другой, арена ещё не готова!</text>
+	</string>
+	<string id="bar_arena_man_start_31">
+		<text>Ты уже стал Мастером!\n</text>
+	</string>
+	<string id="bar_arena_man_start_41">
+		<text>Ты победил! Вот твоя награда!</text>
+	</string>
+	<string id="bar_arena_man_start_51">
+		<text>Ты недостаточно опытен для этого боя!</text>
+	</string>
+    <string id="bar_arena_manager_game_0">
+        <text>Я хочу сразиться. Но не с человеком, нет. Есть какая-нибудь тварь?</text>
+    </string>
+    <string id="bar_arena_manager_game_1">
+        <text>К сожалению, нет никого. Подожди день или два, пока мы не поймаем новых мутантов.</text>
+    </string>
+    <string id="bar_arena_manager_game_100">
+        <text>Предоплата - 1000 рублей.</text>
+    </string>
+    <string id="bar_arena_manager_game_101">
+        <text>Отлично. Вот,держи деньги.</text>
+    </string>
+    <string id="bar_arena_manager_game_105">
+        <text>У меня нет достаточного количества денег.</text>
+    </string>
+    <string id="bar_arena_manager_game_1051">
+        <text>Тогда убирайся отсюда.</text>
+    </string>
+    <string id="bar_arena_manager_game_110">
+        <text>Надо заплатить 2000 рублей для участия.</text>
+    </string>
+    <string id="bar_arena_manager_game_111">
+        <text>Отлично. Вот,держи деньги.</text>
+    </string>
+    <string id="bar_arena_manager_game_11111112">
+        <text>Я уже заплатил!</text>
+    </string>
+    <string id="bar_arena_manager_game_115">
+        <text>У меня нет достаточного количества денег.</text>
+    </string>
+    <string id="bar_arena_manager_game_1151">
+        <text>И хватит задавать так много вопросов.</text>
+    </string>
+    <string id="bar_arena_manager_game_120">
+        <text>Платишь 3000 рублей за участие, и кровосос твой.</text>
+    </string>
+    <string id="bar_arena_manager_game_121">
+        <text>Отлично. Это - твои деньги.</text>
+    </string>
+    <string id="bar_arena_manager_game_125">
+        <text>У меня нет столько.</text>
+    </string>
+    <string id="bar_arena_manager_game_1251">
+        <text>Тогда не отнимай моё время.</text>
+    </string>
+    <string id="bar_arena_manager_game_130">
+        <text>Не так быстро. Плата за участие - 5000 рублей.</text>
+    </string>
+    <string id="bar_arena_manager_game_131">
+        <text>Отлично. Вот, держи деньги.</text>
+    </string>
+    <string id="bar_arena_manager_game_135">
+        <text>У меня нет такого количества денег.</text>
+    </string>
+    <string id="bar_arena_manager_game_1351">
+        <text>Уходи. Не надо притворяться нищим.</text>
+    </string>
+    <string id="bar_arena_manager_game_140">
+        <text>Плата за участие - 5000 рублей.</text>
+    </string>
+    <string id="bar_arena_manager_game_141">
+        <text>Отлично. Вот, держи деньги.</text>
+    </string>
+    <string id="bar_arena_manager_game_145">
+        <text>У меня нет денег.</text>
+    </string>
+    <string id="bar_arena_manager_game_1451">
+        <text>Ну, что ж... Вольному - воля.</text>
+    </string>
+    <string id="bar_arena_manager_game_2">
+        <text>Псевдопёс. Крупный экземпляр, но сильно израненный. С другой стороны, это очень жестокий зверь.</text>
+    </string>
+    <string id="bar_arena_manager_game_200">
+        <text>По рукам. Ещё один момент: ставка на время, которое тебе потребуется, чтобы убить его. Если удалось - ты выиграл, в противном случае - проиграл. Чем меньше время, тем больше награда</text>
+    </string>
+    <string id="bar_arena_manager_game_201">
+        <text>30 секунд - тройной выигрыш.</text>
+    </string>
+    <string id="bar_arena_manager_game_202">
+        <text>Полторы минуты - двойной приз.</text>
+    </string>
+    <string id="bar_arena_manager_game_203">
+        <text>Без лимита времени - половина ставки.</text>
+    </string>
+    <string id="bar_arena_manager_game_204">
+        <text>Я передумал.</text>
+    </string>
+    <string id="bar_arena_manager_game_2041">
+        <text>Чёрт! Деньги уже уплачены.</text>
+    </string>
+    <string id="bar_arena_manager_game_21">
+        <text>Хорошо, я буду драться.</text>
+    </string>
+    <string id="bar_arena_manager_game_22">
+        <text>Пёс? Это всё, что есть?</text>
+    </string>
+    <string id="bar_arena_manager_game_221">
+        <text>Ты что, испугался этого полудохлого пса?</text>
+    </string>
+    <string id="bar_arena_manager_game_3">
+        <text>Есть урод в противогазе, называется снорк. Тонкий и слабый на вид, но довольно проворный.</text>
+    </string>
+    <string id="bar_arena_manager_game_300">
+        <text>Отлично, всё готово. Вперёд!</text>
+    </string>
+    <string id="bar_arena_manager_game_31">
+        <text>Давай. Снорк, так снорк.</text>
+    </string>
+    <string id="bar_arena_manager_game_32">
+        <text>Меня сейчас вырвет. Конечно, нет.</text>
+    </string>
+    <string id="bar_arena_manager_game_321">
+        <text>Что, испугался полугнилого урода в противогазе?</text>
+    </string>
+    <string id="bar_arena_manager_game_4">
+        <text>На этот раз нам по-настоящему повезло. Мы поймали молодого кровососа. Тем не менее, уже с плохими манерами.</text>
+    </string>
+    <string id="bar_arena_manager_game_41">
+        <text>Смелее! Кровосос ждёт.</text>
+    </string>
+    <string id="bar_arena_manager_game_42">
+        <text>Кровосос? Что за...</text>
+    </string>
+    <string id="bar_arena_manager_game_421">
+        <text>Как? Ты боишься кровососов? А ты, случайно, не из «Свободы»?</text>
+    </string>
+    <string id="bar_arena_manager_game_5">
+        <text>На этот раз - толстый маленький карлик в чёрном плаще. Местные аборигены называют его бюрером.</text>
+    </string>
+    <string id="bar_arena_manager_game_51">
+        <text>Жирный и короткий? Я его легко уделаю.</text>
+    </string>
+    <string id="bar_arena_manager_game_52">
+        <text>Нет. Я - пас.</text>
+    </string>
+    <string id="bar_arena_manager_game_521">
+        <text>Он едва достигает метра в высоту. И он страшен?</text>
+    </string>
+    <string id="bar_arena_manager_game_6">
+        <text>Сегодня особенный день. Я не знаю, где они нашли его, но он настоящий зверь.</text>
+    </string>
+    <string id="bar_arena_manager_game_61">
+        <text>По рукам. Я избавлю его от страданий.</text>
+    </string>
+    <string id="bar_arena_manager_game_62">
+        <text>Я не хочу умереть, найди кого-то другого.</text>
+    </string>
+    <string id="bar_arena_manager_game_621">
+        <text>Ну, честно говоря, даже я нахожу это животное страшным. Но я не дерусь на Арене, так что кого это волнует?</text>
+    </string>
+    <string id="bar_arena_manager_info_0">
+        <text>Есть несколько вопросов.</text>
+    </string>
+    <string id="bar_arena_manager_info_1">
+        <text>Давай.</text>
+    </string>
+    <string id="bar_arena_manager_info_10">
+        <text>Неважно.</text>
+    </string>
+    <string id="bar_arena_manager_info_11">
+        <text>Что это за место?</text>
+    </string>
+    <string id="bar_arena_manager_info_111">
+        <text>Это арена, мой маленький бизнес. Место, где сталкеры могут испытать свою храбрость и заработать славу, сражаясь против ужасов Зоны.</text>
+    </string>
+    <string id="bar_arena_manager_info_12">
+        <text>Где ты берёшь мутантов?</text>
+    </string>
+    <string id="bar_arena_manager_info_121">
+        <text>Я заключил сделку с Долгом. Вместо того, чтобы убивать всех мутантов, они  приносят более слабых из них сюда, в обмен на наличные деньги. Долг получает деньги, мутанты умирают, а мне платят. Выигрывают все.</text>
+    </string>
+    <string id="bar_arena_manager_info_13">
+        <text>Откуда ты родом?</text>
+    </string>
+    <string id="bar_arena_manager_info_131">
+        <text>Какая разница? Я услышал об этом маленьком захолустье и понял, что смог бы заработать здесь неплохую копейку. И вот я здесь.</text>
+    </string>
+    <string id="bar_arena_manager_rules_0">
+        <text>Каковы правила?</text>
+    </string>
+    <string id="bar_arena_manager_rules_1">
+        <text>О, эти правила довольно просты. Я придумал их сам. Есть клетка, и мутант внутри клетки. Ты платишь деньги и говоришь мне, сколько нужно времени, чтобы убить его. Если сделаешь это - выиграешь, если нет - я выиграю.\n Но основное блюдо: бой на арене бандитов и других выродков Зоны, захваченных Долгом за свои преступления. Некоторые из них просто сталкеры, обожающие драку, и на самом деле не преступники. И кто покидает Арену живым - получает значительную награду. Если они продолжают выигрывать бои, то больше сталкеров приходят смотреть на их бой, и бойцы выиграют больше денег.</text>
+    </string>
+    <string id="bar_arena_manager_start_11">
+        <text>Рад тебя видеть, сталкер, добро пожаловать на Арену.</text>
+    </string>
+    <string id="bar_arena_manager_start_21">
+        <text>Итак, чего же ты ждешь? Вперёд.</text>
+    </string>
+    <string id="bar_arena_manager_start_31">
+        <text>К сожалению, нет никого. Подожди день или два, пока мы не поймаем новых мутантов.</text>
+    </string>
+    <string id="bar_arena_manager_start_41">
+        <text>Вот ты где! Отлично сработано! Если хочешь ещё один бой за деньги, то просто шепни, когда.</text>
+    </string>
+    <string id="bar_arena_manager_start_51">
+        <text>Извини, но ты проиграл. Приходи позже, когда подготовишься.</text>
+    </string>
+<!------------------ bar_visitors_barman_stalker_trader ----------->
+	<string id="bar_visitors_barman_stalker_trader_start_dialog_11">
+		<text>Здорово! Ну, как оно?</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_start_dialog_12">
+		<text>Тебе чего, сталкер?</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_start_dialog_13">
+		<text>Ты купить чего-то хочешь, или как?</text>
+	</string>
+<!------------------------- bar_visitors_stalker_mechanic ------------------------>
+	<string id="bar_visitors_stalker_mechanic_start_dialog_1">
+		<text>Здорово, мужик, как Зона? Эмм... Я надеюсь, тебе нужно что-нибудь починить? А то я сейчас совсем на мели...</text>
+	</string>
+</string_table>

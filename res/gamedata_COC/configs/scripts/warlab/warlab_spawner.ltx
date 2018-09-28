@@ -1,0 +1,19 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@spawner
+
+[sr_idle@spawner]
+on_info = {=actor_in_zone(warlab_door_marker) +warlab_password_info} sr_idle@destroyer %=spawn_object(warlab_invisible_stalker:warlab_invisible_stalker_spawn_point:0) =create_squad(warlab_main_polter_squad:warlab_common_consciousness_smart_terrain) =create_squad(warlab_pod_stalker_squad:warlab_common_consciousness_smart_terrain) =give_task(warlab_kill_crazy_entity) +warlab_kill_crazy_entity_task_started%
+
+[sr_idle@destroyer]
+on_info = {+warlab_main_polter_scene_start} sr_idle@spawner2 %=destroy_object(story:warlab_invisible_stalker)%
+
+[sr_idle@spawner2]
+on_info = {+warlab_poltergeist_dead} sr_idle@spawner3 %=create_squad(warlab_main_psysucker_squad:warlab_common_consciousness_smart_terrain)%
+
+[sr_idle@spawner3]
+on_info = {+warlab_psysucker_dead} sr_idle@nil %=create_squad(warlab_main_psycontroller_squad:warlab_common_consciousness_smart_terrain)%
+
+[sr_idle@nil]

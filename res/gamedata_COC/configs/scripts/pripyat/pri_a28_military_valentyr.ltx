@@ -1,0 +1,84 @@
+; Reference animpoint
+[animpoint@a28_def]
+cover_name = pri_a16_animp_4
+reach_movement = walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = pri_a16_sr_noweap
+meet = meet@meet_snd_surge
+on_info = {+pri_a28_militarys_go_to_the_door} animpoint@a28_wait_near_door
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@meet_snd_surge]
+abuse = false
+use = false
+snd_on_use = pri_a28_army_about_surge_2
+close_distance = 0
+far_distance = 0
+close_anim = nil
+meet_on_talking = false
+
+[meet@meet_near_door]
+abuse = false
+use = false
+snd_on_use = pri_a28_army_about_evacuation_2
+close_distance = 0
+far_distance = 0
+close_anim = nil
+meet_on_talking = false
+
+;--------------------------------------
+
+[logic@pri_a28_military_valentyr] 
+suitable = {+pri_b305_fifth_cam_end -pri_a28_update_task_cover_strelok =check_npc_name(pri_a17_military_prapor_valentyr)} true
+prior = 200
+post_combat_time = 0, 0
+active = animpoint@a28_first_theme_1
+
+;--------------------------------------
+; First theme about surge, reply
+[animpoint@a28_first_theme_1]:animpoint@a28_def
+on_info2 = {+pri_a28_army_surge_talk_3_first} animpoint@a28_third_theme_2, {+pri_a28_army_surge_talk_1_first} animpoint@a28_first_theme_2
+
+[animpoint@a28_first_theme_2]:animpoint@a28_def
+on_game_timer = 20 | %=play_sound(pri_a28_army_surge_talk_1_second)%
+on_signal = sound_end | animpoint@a28_third_theme_1 %+pri_a28_army_surge_talk_1_done%
+meet = no_meet
+
+;--------------------------------------
+; Third theme about surge, reply
+[animpoint@a28_third_theme_1]:animpoint@a28_def
+on_info2 = {+pri_a28_army_surge_talk_3_first} animpoint@a28_third_theme_2
+
+[animpoint@a28_third_theme_2]:animpoint@a28_def
+on_game_timer = 20 | %=play_sound(pri_a28_army_surge_talk_3_second)%
+on_signal = sound_end | animpoint@a28_third_theme_3 %+pri_a28_army_surge_talk_3_done%
+meet = no_meet
+
+[animpoint@a28_third_theme_3]:animpoint@a28_def
+on_info2 = {+pri_a28_colonel_to_center_3_sound_end} animpoint@a28_ready_for_news
+
+;--------------------------------------
+; Becoming ready for fast exit from animpoint
+[animpoint@a28_ready_for_news]:animpoint@a28_def
+avail_animations = animpoint_stay_wall_no_rnd
+
+;--------------------------------------
+; Gathering group before evacuation
+[animpoint@a28_wait_near_door]
+cover_name = pri_a16_animp_valentyr
+reach_movement = walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = pri_a16_sr_noweap
+avail_animations = animpoint_stay_wall_no_rnd
+meet = meet@meet_near_door
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

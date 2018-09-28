@@ -1,0 +1,19 @@
+[sar_monolith]
+icon = ui_iconsTotal_sar_monolith
+prior = 104
+storyline = true
+title = sar_monolith
+target = {+sar_monolith_find} sar_monolith, {+actor_in_sarcofag} sar_monolith, aes_space_restrictor_to_sarcofag
+descr = {+sar_monolith_find} sar_monolith_0, {+actor_in_sarcofag} sar_monolith_2, sar_monolith_1
+condlist_0 = {+actor_made_wish} complete
+condlist_1 = {+sar2_monolith_end} complete
+
+
+[sar_monolith_destroy]
+icon = ui_iconsTotal_sar_monolith_destroy
+prior = 104
+storyline = true
+title = sar_monolith_destroy
+target = {-sar2_actor_in_monolith_room} sar_monolith, {+sar2_actor_in_monolith_room -sar2_monolith_end} sar_monolith, {+sar2_monolith_end -sar_monolith_off} gen_space_restrictor_to_warlab, {+sar_monolith_off -warlab_deactivate_generators_done} warlab_primary_switcher_id
+descr = {-sar2_actor_in_monolith_room} sar_monolith_destroy_0, {+sar2_actor_in_monolith_room -sar2_monolith_end} sar_monolith_destroy_1, {+sar2_monolith_end -sar_monolith_off} sar_monolith_destroy_2, {+sar_monolith_off -warlab_deactivate_generators_done} sar_monolith_destroy_3
+condlist_0 = {+warlab_deactivate_generators_done} complete

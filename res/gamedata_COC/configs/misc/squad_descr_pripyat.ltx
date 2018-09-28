@@ -1,0 +1,665 @@
+;«десь содержатс€ дескрипшены сквадов, которые потом можно создавать использу€ спец функции.
+
+[pri_b301_snorks_squad]:online_offline_group
+faction = monster_zombied_day
+npc = pri_b301_snork_1, pri_b301_snork_2, pri_b301_snork_3, pri_b301_snork_4, pri_b301_snork_5
+spawn_point = pri_b301_spawn_point_1a
+target_smart = pri_b301
+story_id = pri_b301_snorks_squad
+
+[pri_b301_zulus_squad]:online_offline_group
+faction = dolg
+relationship = neutral
+npc = pri_b301_zulus
+spawn_point = pri_b301_spawn_point_2
+target_smart = {+pri_b301_zulus_teleport} pri_a16, {+pri_b301_zulus_go_alone} pri_a16, {+pri_b301_zulus_work_end} nil, pri_b301
+story_id = pri_b301_zulus_squad
+
+[pri_a17_military_colonel_kovalski_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a17_military_colonel_kovalski
+spawn_point = pri_a16_military_colonel_kovalski_walk
+target_smart = pri_a16
+story_id = pri_a17_military_colonel_kovalski_squad
+
+[pri_a20_missing_military_recon]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a15_military_recon_leader, pri_a15_military_recon_1, pri_a15_military_recon_2, pri_a15_military_recon_3
+spawn_point = {+pri_a17_actor_has_gauss_rifle} pri_b35_mercs_deadman_military_4_look, pri_a16_pri_b305_squad_look
+target_smart = {+pri_a17_actor_has_gauss_rifle} pri_b35_mercs, pri_a16
+story_id = pri_a20_missing_military_recon
+sympathy = 0
+always_arrived = true
+
+;------------------------------------- A17
+
+[pri_a17_recon_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc =  pri_a17_military_captain_tarasov, pri_a17_military_prapor_valentyr, pri_a17_military_sergeant_morozov, pri_a17_military_lieutenant_podorojniy
+target_smart = {-pri_a17_at_home +pri_a17_teleport_military_recon} pri_a17, pri_a16
+sympathy = 0
+story_id = pri_a17_recon_squad
+
+[pri_a17_mon_patrol]:online_offline_group
+faction = monolith
+npc = pri_a17_monolith_patrol_1, pri_a17_monolith_patrol_2, pri_a17_monolith_patrol_lead
+spawn_point = pri_a17_mon_pat_spawn
+target_smart = pri_a17
+story_id = pri_a17_mon_patrol
+
+[pri_a17_mon_preacher]:online_offline_group
+faction = monolith
+npc = pri_a17_monolith_preacher
+spawn_point = pri_a17_mon_preacher_spawn
+target_smart = pri_a17
+story_id = pri_a17_mon_preacher
+
+[pri_a17_mon_ambush_1]:online_offline_group
+faction = monolith
+npc =  pri_a17_monolith_ambusher_1, pri_a17_monolith_sniper_1, pri_a17_monolith_sniper_2
+spawn_point = pri_a17_sf_spawn
+target_smart = pri_a17
+story_id = pri_a17_mon_ambush_1
+
+[pri_a17_mon_ambush_2]:online_offline_group
+faction = monolith
+npc =  pri_a17_monolith_ambusher_2, pri_a17_monolith_ambusher_3, pri_a17_monolith_ambusher_4, pri_a17_monolith_ambusher_5
+spawn_point = pri_a17_ff_spawn
+target_smart = pri_a17
+story_id = pri_a17_mon_ambush_2
+
+[pri_a17_mon_ambush_3]:online_offline_group
+faction = monolith
+npc = pri_a17_monolith_ambusher_6, pri_a17_monolith_ambusher_8, pri_a17_monolith_ambusher_10
+spawn_point = pri_a17_ff_spawn
+target_smart = pri_a17
+story_id = pri_a17_mon_ambush_3
+
+[pri_a17_mon_ambush_4]:online_offline_group
+faction = monolith
+npc = pri_a17_monolith_ambusher_7, pri_a17_monolith_sniper_4
+spawn_point = pri_a17_sf_spawn
+target_smart = pri_a17
+story_id = pri_a17_mon_ambush_4
+
+[pri_a17_mon_ambush_5]:online_offline_group
+faction = monolith
+npc = pri_a17_monolith_ambusher_9, pri_a17_monolith_sniper_3
+spawn_point = pri_a17_roof_spawn
+target_smart = pri_a17
+story_id = pri_a17_mon_ambush_5
+;-------------------------------------
+
+[pri_a18_monolith_idol_squad]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_1, sim_default_monolith_1, sim_default_monolith_0, sim_default_monolith_0, sim_default_monolith_0
+spawn_point = pri_a18_terrain_spawn
+target_smart = pri_a18_smart_terrain
+story_id = pri_a18_monolith_idol_squad
+
+[pri_a18_monolith_post_guard_squad]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_1, sim_default_monolith_1, sim_default_monolith_0, sim_default_monolith_0, sim_default_monolith_0
+spawn_point = pri_a18_post_guard_smart_terrain_spawn_point
+target_smart = pri_a18_smart_terrain
+story_id = pri_a18_monolith_post_guard_squad
+
+[pri_a18_monolith_corridor_squad]:online_offline_group
+faction = monolith
+npc = pri_a18_monolith_1st_corridor_npc
+spawn_point = pri_a18_smart_terrain_monolith_corridor_walk
+target_smart = pri_a18_smart_terrain
+story_id = pri_a18_monolith_corridor_squad
+
+[pri_a18_monolith_2nd_corridor_squad]:online_offline_group
+faction = monolith
+npc = pri_a18_monolith_2nd_corridor_1
+spawn_point = pri_a18_terrain_spawn
+target_smart = pri_a18_smart_terrain
+story_id = pri_a18_monolith_2nd_corridor_squad
+
+;-------------------------------------
+[pri_a21_chasovoi]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a21_sentry_lieutenant_stecenko
+spawn_point = {+pri_a21_task_start} pri_a21_smart_terrain_chasovoi_mad_walk, pri_a16_pri_b305_kovalskiy_walk
+target_smart = {+pri_a21_task_start} pri_a21_smart_terrain, pri_a16
+sympathy = 0
+story_id = pri_a21_chasovoi
+always_arrived = true
+
+[pri_a21_kontroler_squad]:online_offline_group
+faction = monster_zombied_day
+npc = m_controller_normal
+spawn_point = pri_a21_smart_terrain_kontroler_spawn_point
+target_smart = pri_a21_smart_terrain
+story_id = pri_a21_kontroler_squad
+always_arrived = true
+;-----------------------------------------------------------------
+[pri_a25_base_army_medic]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a25_base_medic
+target_smart = {+pri_b305_medic_home} pri_a16, {+pri_a25_task_start} pri_a25_smart_terrain, pri_a16
+story_id = pri_a25_base_army_medic
+always_arrived = true
+invulnerable = {+pri_a28_update_task_cover_strelok} false, true
+
+;---------------------
+[pri_a22_military_yarmoshuk_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a22_military_yarmoshuk
+spawn_point = {+pri_a25_task_start} pri_a22_smart_terrain_military_dead_walk_1, pri_a16_yarmoshuk_walk
+target_smart = {+pri_a25_task_start} pri_a22_smart_terrain, pri_a16
+story_id = pri_a22_military_yarmoshuk_squad
+sympathy = 0
+
+[pri_a22_military_skelja_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a22_military_skelja
+spawn_point = {+pri_a25_task_start} pri_a22_smart_terrain_military_dead_walk_1, {+pri_a20_talk_with_colonel_complete} pri_b35_mercs_pri_a18_reinforcement_1_go_post_walk_1, pri_a16_pri_b305_kovalskiy_walk
+target_smart = {+pri_a25_task_start -pri_a18_actor_enemy} pri_a22_smart_terrain, {+pri_a18_scene_end_change_smart -pri_a18_actor_enemy} pri_a16, {+pri_a20_talk_with_colonel_complete +pri_a18_skelja_merkulov_can_work -pri_a18_sokolov_exist -pri_a18_scene_end_change_smart} pri_b35_mercs, pri_a16
+story_id = pri_a22_military_skelja_squad
+sympathy = 0
+always_arrived = true
+
+[pri_a22_military_skelja_squad_strong]:pri_a22_military_skelja_squad
+npc = pri_a22_military_skelja_strong
+
+[pri_a22_military_merkulov_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a22_military_merkulov
+spawn_point = {+pri_a25_task_start} pri_a22_smart_terrain_military_dead_walk_1, {+pri_a20_talk_with_colonel_complete} pri_b35_mercs_pri_a18_reinforcement_1_go_post_walk_2, pri_a16_merkulov_spawn_point
+target_smart = {+pri_a25_task_start -pri_a18_actor_enemy} pri_a22_smart_terrain, {+pri_a18_scene_end_change_smart -pri_a18_actor_enemy} pri_a16, {+pri_a20_talk_with_colonel_complete +pri_a18_skelja_merkulov_can_work -pri_a18_vano_exist -pri_a18_scene_end_change_smart} pri_b35_mercs, pri_a16
+story_id = pri_a22_military_merkulov_squad
+sympathy = 0
+always_arrived = true
+
+[pri_a22_military_merkulov_squad_strong]:pri_a22_military_merkulov_squad
+npc = pri_a22_military_merkulov_strong
+
+;---------------------
+[pri_a25_poltergeist_1_squad]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_tele
+spawn_point = pri_a25_smart_terrain_pri_a25_poltergeist_1_spawn_point
+target_smart = pri_a25_smart_terrain
+story_id = pri_a25_poltergeist_1_squad
+
+[pri_a25_poltergeist_2_squad]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_tele
+spawn_point = pri_a25_smart_terrain_pri_a25_poltergeist_2_spawn_point
+target_smart = pri_a25_smart_terrain
+story_id = pri_a25_poltergeist_2_squad
+
+[pri_a25_poltergeist_3_squad]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_tele
+spawn_point = pri_a25_smart_terrain_pri_a25_poltergeist_2_spawn_point
+target_smart = pri_a25_smart_terrain
+story_id = pri_a25_poltergeist_3_squad
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; B 304 ;;;;;;;;;;;;;;;;;;;;;
+
+[pri_b304_dogs]:online_offline_group
+faction = monster_predatory_day
+npc = dog_weak, dog_weak, dog_weak, dog_weak, dog_weak, dog_weak, dog_weak, dog_weak, dog_strong, dog_strong
+spawn_point = pri_b304_monsters_smart_terrain_spawn
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_dogs
+
+[pri_b304_tushkano_1]:online_offline_group
+faction = monster_predatory_day
+npc = pas_b400_tushkano_smart, pas_b400_tushkano_smart 
+spawn_point = pri_b304_monsters_smart_terrain_spawn_1
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_1
+
+[pri_b304_tushkano_2]:online_offline_group
+faction = monster_predatory_night
+npc = pas_b400_tushkano_smart, pas_b400_tushkano_smart 
+spawn_point = pri_b304_monsters_smart_terrain_spawn_2
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_2
+
+[pri_b304_tushkano_3]:online_offline_group
+faction = monster_predatory_night
+npc = pas_b400_tushkano_smart, pas_b400_tushkano_smart 
+spawn_point = pri_b304_monsters_smart_terrain_spawn_3
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_3
+
+[pri_b304_tushkano_4]:online_offline_group
+faction = monster_predatory_night
+npc = pas_b400_tushkano_smart
+spawn_point = pri_b304_monsters_smart_terrain_spawn_4
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_4
+
+[pri_b304_tushkano_5]:online_offline_group
+faction = monster_predatory_night
+npc = pas_b400_tushkano_smart 
+spawn_point = pri_b304_monsters_smart_terrain_spawn_5
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_5
+
+[pri_b304_tushkano_6]:online_offline_group
+faction = monster_predatory_night
+npc = pas_b400_tushkano_smart, pas_b400_tushkano_smart 
+spawn_point = pri_b304_monsters_smart_terrain_spawn_6
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_6
+
+[pri_b304_tushkano_7]:online_offline_group
+faction = monster_predatory_night
+npc = pas_b400_tushkano_smart 
+spawn_point = pri_b304_monsters_smart_terrain_spawn_7
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_7
+
+[pri_b304_tushkano_8]:online_offline_group
+faction = monster_predatory_night
+npc = pas_b400_tushkano_smart, pas_b400_tushkano_smart 
+spawn_point = pri_b304_monsters_smart_terrain_spawn_8
+target_smart = pri_b304_monsters_smart_terrain
+story_id = pri_b304_tushkano_8
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;		Pripyat B306
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[pri_b306_4_floor_monolith]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_3, sim_default_monolith_2
+target_smart = pri_b306
+spawn_point = pri_b306_4_floor_spawn
+story_id = pri_b306_4_floor_monolith
+
+[pri_b306_4_floor_monolith_2]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_2, sim_default_monolith_1
+target_smart = pri_b306
+spawn_point = pri_b306_4_floor_spawn_2
+story_id = pri_b306_4_floor_monolith_2
+
+[pri_b306_3_floor_monolith]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_3, sim_default_monolith_2, sim_default_monolith_1, sim_default_monolith_1
+target_smart = pri_b306
+spawn_point = pri_b306_3_floor_spawn_monolith
+story_id = pri_b306_3_floor_monolith
+
+[pri_b306_3_floor_zombied]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_2
+target_smart = pri_b306
+spawn_point = pri_b306_3_floor_spawn_zombied
+story_id = pri_b306_3_floor_zombied
+
+[pri_b306_2_floor_monolith]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_2, sim_default_monolith_1, sim_default_monolith_1, sim_default_monolith_1
+target_smart = pri_b306
+spawn_point = pri_b306_2_floor_spawn_monolith
+story_id = pri_b306_2_floor_monolith
+
+[pri_b306_2_floor_zombied]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_3, sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_1, sim_default_zombied_1
+target_smart = pri_b306
+spawn_point = pri_b306_2_floor_spawn_zombied
+story_id = pri_b306_2_floor_zombied
+
+[pri_b306_1_floor_zombied]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_1
+target_smart = pri_b306
+spawn_point = pri_b306_1_floor_spawn_zombied
+story_id = pri_b306_1_floor_zombied
+
+[pri_b306_1_floor_zombied_2]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_1, sim_default_zombied_1
+target_smart = pri_b306
+spawn_point = pri_b306_1_floor_spawn_zombied
+story_id = pri_b306_1_floor_zombied_2
+
+[pri_b306_mercs_squad_light]:online_offline_group
+faction = killer
+npc = sim_default_killer_1, sim_default_killer_2, sim_default_killer_2
+target_smart = {-pri_b306_mercs_attacked} pri_b306, nil
+spawn_point = pri_b306_mercs_spawn
+story_id = pri_b306_mercs_squad
+
+[pri_b306_mercs_squad_strong]:pri_b306_mercs_squad_light
+npc = sim_default_killer_1, sim_default_killer_2, sim_default_killer_2, sim_default_killer_3, sim_default_killer_3, sim_default_killer_4
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;		Pripyat A15
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[pri_a15_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = pri_a15_actor
+target_smart = pri_a15
+spawn_point = pri_a15_actor_spawn
+story_id = pri_a15_squad
+always_arrived = true
+
+[pri_a15_military_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a15_military_tarasov
+target_smart = pri_a15
+spawn_point = pri_a15_military_tarasov_spawn
+story_id = pri_a15_military_squad
+always_arrived = true
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;		Pripyat B35
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[pri_b35_jup_b43_stalker_assistant_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc =  jup_b43_stalker_assistant_pri
+target_smart = pri_a16
+spawn_point = pri_a16_pri_b305_squad_look
+story_id = pri_b35_jup_b43_stalker_assistant_squad
+
+[pri_b35_military_squad]:online_offline_group
+faction = army
+relationship = neutral
+npc = pri_a22_army_signaller
+target_smart = {+pri_b35_actor_is_guided -pri_b305_fifth_cam_end -pri_b35_actor_rest} pri_b35_military, pri_a16
+spawn_point = {+pri_b35_actor_is_guided -pri_b35_actor_rest} pri_b35_military_spawn, pri_a16_pri_b305_kovalskiy_walk
+story_id = pri_b35_military_squad
+always_arrived = true
+
+[pri_b35_mercs_squad]:online_offline_group
+faction = killer
+npc = pri_b35_merc_leader, sim_default_killer_2, sim_default_killer_2, sim_default_killer_3, sim_default_killer_3, pri_b35_merc_grenade_launcher_1, pri_b35_merc_grenade_launcher_2
+target_smart = pri_b35_mercs
+spawn_point = pri_b35_mercs_spawn
+story_id = pri_b35_mercs_squad
+always_arrived = true
+
+[pri_b35_envoy_squad]:online_offline_group
+faction = killer
+npc = pri_b35_guard_envoy_1, pri_b35_guard_envoy_2
+target_smart = {+pri_b35_rendevous_done} pri_sim_4, pri_b35_mercs
+spawn_point = pri_b35_envoy_spawn
+story_id = pri_b35_envoy_squad
+always_arrived = true
+
+;-------------------- b36 --------------------
+[pri_b36_monolith_sniper_squad]:online_offline_group
+faction = monolith
+npc = pri_b36_monolith_sniper
+target_smart = pri_b36_smart_terrain
+spawn_point = pri_b36_sniper_spawn
+story_id = pri_b36_monolith_sniper_squad
+
+[pri_b36_zombied_squad]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_3, sim_default_zombied_4, sim_default_zombied_3, sim_default_zombied_3 , sim_default_zombied_4
+target_smart = pri_b36_smart_terrain
+spawn_point = pri_b36_zombied_spawn_point
+story_id = pri_b36_zombied_squad
+
+[pri_b36_monolith_guard_squad]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_2, sim_default_monolith_2
+target_smart = pri_b36_smart_terrain
+spawn_point = pri_b36_guard_spawn
+story_id = pri_b36_monolith_guard_squad
+
+[pri_b36_monolith_marine_squad]:online_offline_group
+faction = monolith
+npc = pri_b36_monolith_marine_sniper, sim_default_monolith_2 , sim_default_monolith_2, sim_default_monolith_2, sim_default_monolith_3,sim_default_monolith_3
+target_smart = pri_b36_smart_terrain
+spawn_point = pri_b36_smart_terrain_spawn_point
+story_id = pri_b36_monolith_marine_squad
+
+
+;-----------------------------------------------------------------
+[pri_b305_dogs_squad]:online_offline_group
+faction = monster_predatory_day
+npc = dog_weak, dog_weak, dog_weak, dog_strong, dog_strong
+spawn_point = pri_b305_dogs_spawn
+target_smart = pri_b305_dogs
+story_id = pri_b305_dogs_squad
+
+;---------------------------- b303 ------------------------------------------------
+[pri_b303_burer_squad]:online_offline_group
+faction = monster_zombied_night
+npc = burer_normal
+target_smart = pri_b303
+spawn_point = pri_b303_save_home
+story_id = pri_b303_burer_squad
+
+;----------- rimaxch_selo_test ---------------
+[rimaxch_selo_test_squad]:online_offline_group
+faction = army
+npc = pri_a22_military_yarmoshuk, pri_a22_military_skelja 
+target_smart = rm_smart_terrain
+spawn_point = rm_smart_terrain_way
+story_id = rimaxch_selo_test_squad
+;--------------redstain------------------
+[test_sokolov]:online_offline_group
+faction = army
+npc = pri_a15_sokolov_sci
+spawn_point = {+3} redstain_selo_smart_terrain_walk_3, {+2} redstain_selo_smart_terrain_walk_2, redstain_selo_smart_terrain_walk_1
+target_smart = redstain_selo_smart_terrain
+story_id = test_sokolov
+
+;---------------------------------------------
+[pri_a16_wanderer_freedom_squad]:online_offline_group
+faction = freedom
+relationship = friend
+npc = sim_default_stalker_2
+target_smart = pri_a16
+story_id = pri_a16_wanderer_squad
+
+[pri_a16_wanderer_dolg_squad]:online_offline_group
+faction = dolg
+relationship = friend
+npc = pri_a16_wanderer_dolg_npc
+target_smart = pri_a16
+story_id = pri_a16_wanderer_squad
+
+;---------------------------------------------
+[pri_a16_sokolov_squad]:online_offline_group
+faction = army
+relationship = friend
+npc = sim_default_stalker_2
+spawn_point = {+pri_a20_talk_with_colonel_complete} pri_b35_mercs_pri_a18_reinforcement_1_go_post_walk_1, pri_a16_pri_a20_sokolov_walk
+target_smart = {+pri_a18_scene_end_change_smart -pri_a18_actor_enemy} pri_a16, {+pri_a20_talk_with_colonel_complete -pri_a18_scene_end_change_smart} pri_b35_mercs, pri_a16
+story_id = pri_a16_sokolov_squad
+sympathy = 0
+always_arrived = true
+
+[pri_a16_sokolov_squad_strong]:pri_a16_sokolov_squad
+npc = pri_a15_sokolov_sci_head_strong
+
+[pri_a16_vano_squad]:online_offline_group
+faction = stalker
+relationship = friend
+npc = sim_default_stalker_2
+spawn_point = {+pri_a20_talk_with_colonel_complete} pri_b35_mercs_pri_a18_reinforcement_1_go_post_walk_2, pri_a16_pri_a20_sokolov_walk
+target_smart = {+pri_a18_scene_end_change_smart -pri_a18_actor_enemy} pri_a16, {+pri_a20_talk_with_colonel_complete -pri_a18_scene_end_change_smart} pri_b35_mercs, pri_a16
+story_id = pri_a16_vano_squad
+sympathy = 0
+always_arrived = true
+
+[pri_a16_vano_squad_strong]:pri_a16_vano_squad
+npc = jup_b218_vano_in_suit_strong
+
+;---------------------
+[pri_a16_stalkers_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = sim_default_stalker_pri_a16, sim_default_stalker_3, sim_default_stalker_2
+target_smart = pri_a16
+
+[pri_a16_freedom_yar_squad]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b19_freedom_yar                                                                                                 
+target_smart = pri_a16 
+
+;--------------------- A28
+[pri_a16_military_squad]:online_offline_group
+faction = army
+npc = pri_a17_military_colonel_kovalski, pri_a25_base_medic, pri_a22_army_signaller
+target_smart = {+pri_a28_evac_done} pri_a28_heli, {+pri_a28_school_done} pri_a28_evac, {+pri_a28_arch_done} pri_a28_school, {+pri_a28_shop_done} pri_a28_arch, {+pri_a28_base_done} pri_a28_shop, {+pri_a28_update_task_cover_strelok} pri_a28_base, pri_a16
+story_id = pri_a16_military_squad
+relationship = friend
+
+[pri_a16_military_squad_strong]:pri_a16_military_squad
+npc = pri_a17_military_colonel_kovalski_strong, pri_a25_base_medic_strong, pri_a22_army_signaller_strong
+
+[pri_a28_base_zombied]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_3, sim_default_zombied_3, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_1
+target_smart = {+pri_a28_base_zombied_done} nil, pri_a28_base
+spawn_point = pri_a28_base_zombied_4_walk
+story_id = pri_a28_base_zombied
+
+[pri_a28_base_zombied_2]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_4, sim_default_zombied_3, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_1
+target_smart = {+pri_a28_base_zombied_done} nil, pri_a28_base
+spawn_point = pri_a28_base_zombied_10_walk
+story_id = pri_a28_base_zombied_2
+
+[pri_a28_shop_zombied]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_3, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_1
+target_smart = {+pri_a28_shop_zombied_done} nil, pri_a28_shop
+spawn_point = pri_a28_shop_zombied_4_walk
+story_id = pri_a28_shop_zombied
+
+[pri_a28_shop_zombied_2]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_1
+target_smart = {+pri_a28_shop_zombied_done} nil, pri_a28_shop
+spawn_point = pri_a28_shop_zombied_8_walk
+story_id = pri_a28_shop_zombied_2
+
+[pri_a28_shop_zombied_3]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_1
+target_smart = {+pri_a28_shop_zombied_done} nil, pri_a28_shop
+spawn_point = pri_a28_shop_zombied_11_walk
+story_id = pri_a28_shop_zombied_3
+
+[pri_a28_arch_zombied]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_3, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_1
+target_smart = {+pri_a28_shop_zombied_done} nil, pri_a28_arch
+spawn_point = pri_a28_arch_zombied_4_walk
+story_id = pri_a28_arch_zombied
+
+[pri_a28_school_snorks_1]:online_offline_group
+faction = monster_zombied_day
+npc = snork_strong, snork_strong 
+target_smart = pri_a28_school
+spawn_point = pri_a28_school_snork_1_home
+story_id = pri_a28_school_snorks_1
+
+[pri_a28_school_snorks_1_strong]:pri_a28_school_snorks_1
+npc = snork_strong, snork_strong, snork_strong, snork_strong
+
+[pri_a28_school_snorks_2]:online_offline_group
+faction = monster_zombied_day
+npc = snork_strong, snork_strong, snork_strong
+target_smart = pri_a28_school
+spawn_point = pri_a28_school_snork_2_home
+story_id = pri_a28_school_snorks_2
+
+[pri_a28_school_snorks_2_strong]:pri_a28_school_snorks_2
+npc = snork_strong, snork_strong, snork_strong, snork_strong, snork_strong
+
+[pri_a28_evac_squad]:online_offline_group
+faction = army
+npc = pri_a28_evac_com, sim_default_military_4, sim_default_military_4, sim_default_military_3_sniper 
+target_smart = pri_a28_heli
+spawn_point = pri_a28_heli_evac_military_1_walk
+story_id = pri_a28_evac_squad
+relationship = friend
+
+[pri_a28_heli_mono_default]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_4, sim_default_monolith_3, sim_default_monolith_3, sim_default_monolith_3, sim_default_monolith_2, sim_default_monolith_2, sim_default_monolith_2, sim_default_monolith_2, sim_default_monolith_1, sim_default_monolith_1, sim_default_monolith_1, sim_default_monolith_1
+target_smart = {+pri_a28_cutscenes_end} nil, pri_a28_heli
+spawn_point = pri_a28_heli_mono_spawn
+;story_id = pri_a28_heli_mono_default
+
+[pri_a28_heli_mono_snipers]:online_offline_group
+faction = monolith
+npc = pas_b400_monolith_sniper, pas_b400_monolith_sniper, pas_b400_monolith_sniper, pas_b400_monolith_sniper
+target_smart = pri_a28_heli
+spawn_point = pri_a28_heli_mono_sniper_4_wait
+;story_id = pri_a28_heli_mono_snipers
+
+[pri_a28_heli_mono_add_1]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_3, sim_default_monolith_2, sim_default_monolith_2, sim_default_monolith_1
+target_smart = {+pri_a28_cutscenes_end} nil, pri_a28_heli
+spawn_point = pri_a28_heli_mono_add_1_spawn
+;story_id = pri_a28_heli_mono_add_1
+
+[pri_a28_heli_mono_add_2]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_4, sim_default_monolith_2, sim_default_monolith_2, sim_default_monolith_1
+target_smart = {+pri_a28_cutscenes_end} nil, pri_a28_heli
+spawn_point = pri_a28_heli_mono_add_2_spawn
+;story_id = pri_a28_heli_mono_add_2
+
+[pri_a28_heli_mono_add_3]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_4, sim_default_monolith_3, sim_default_monolith_2, sim_default_monolith_1
+target_smart = {+pri_a28_cutscenes_end} nil, pri_a28_heli
+spawn_point = pri_a28_heli_mono_add_3_spawn
+;story_id = pri_a28_heli_mono_add_3
+
+[pri_a28_heli_mono_add_2_final]:online_offline_group
+faction = monolith
+npc = sim_default_monolith_3, sim_default_monolith_2, sim_default_monolith_2
+target_smart = {+pri_a28_cutscenes_end} nil, pri_a28_heli
+spawn_point = pri_a28_heli_mono_add_2_spawn
+
+
+;---------------------------------------------------------------------------------------------------
+;;;;;;;;;;;SZA Freeplay mod;;;;;;;;;;
+
+[pri_a16_medic_yar_squad]:online_offline_group
+faction = stalker
+npc = pri_medic_stalker
+target_smart = pri_a16
+story_id = pri_a16_medic_yar_squad
+
+;;;;;;;;;;;;;;;;;;;;;SOC Pripyat;;;;;;;;;;;;;;;;;;;;;;
+[pri_monolith_monolith_trader_stalker_squad]:online_offline_group
+faction = monolith
+npc = pri_monolith_monolith_trader_stalker
+target_smart = pri_monolith
+story_id = pri_monolith_monolith_trader_stalker_squad
+;spawn_point = pri_monolith_monolith_trader_spawn
+
+[pri_monolith_monolith_mechanic_stalker_squad]:online_offline_group
+faction = monolith
+npc = pri_monolith_monolith_mechanic_stalker
+target_smart = pri_monolith
+story_id = pri_monolith_monolith_mechanic_stalker_squad
+spawn_point = pri_monolith_monolith_mechanic_spawn

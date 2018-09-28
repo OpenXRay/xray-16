@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- ELIMINATE MUTANTS FOR BEARD TASK -->
+	<string id="zat_a2_stalker_barmen_task_1_name">
+		<text>Зачистка</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_task_1_text">
+		<text>Борода попросил зачистить местность от мутантов.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_task_1_about">
+		<text>Тсс... Слышал это? Вой мутантов. Прямо мороз по коже. Как насчёт того, чтобы успокоить их? Я не останусь в долгу.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_task_1_finish">
+		<text>Ха-ха! Хорошо сделано, сталкер! Вот, держи от Бороды!</text>
+	</string>
+	<!-- FIND ARTEFACT FOR BEARD TASK -->
+	<string id="zat_a2_stalker_barmen_task_2_name">
+		<text>Отыскать артефакт %s для Бороды</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_task_2_text">
+		<text>Надо найти артефакт %s. Борода обещает неплохо за него заплатить.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_task_2_about">
+		<text>Я обычно не покупаю артефакты у сталкеров... Но тут поступил срочный заказ, клиента не хотелось бы подвести. Сможешь достать кое-что для меня?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_task_2_fetch_about">
+		<text>Я обычно не покупаю артефакты у сталкеров... Но тут поступил срочный заказ, клиента не хотелось бы подвести. Сможешь достать кое-что для меня? Слушай, я ищу артефакт %s. Видел где-нибудь? Если найдёшь - я хорошо заплачу.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_task_2_fetch_finish">
+		<text>Хорошая работа, сталкер! Выпей, я плачу!</text>
+	</string>
+	<!-- ASSASSINATION FOR OWL TASK -->
+	<string id="zat_b30_owl_stalker_trader_task_1_name">
+		<text>Дипломатия</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_task_1_text">
+		<text>Убедить военного коменданта прекратить поиски сталкера.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_task_1_about">
+		<text>Видишь того парня в углу? Спецназ СБУ ищет его. Он скрывается здесь уже в течение нескольких недель. Говорят, что он прошёл через Выжигатель, чтобы оторваться от них. Я не знаю, как он выжил. Хотя  теперь он, похоже, не совсем в ладах с головой. Во всяком случае, ты можешь помочь бедняге. Я случайно узнал, где находится командир, который хочет поймать его. Может быть, ты сможешь убедить его оставить парня в покое?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_task_1_finish">
+		<text>А, ты убил его! Мужик, ты просто прирождённый дипломат!</text>
+	</string>
+	<!-- FIND LEVEL 1 TOOLKIT FOR CARDAN TASK -->
+	<string id="zat_a2_stalker_mechanic_task_1_name">
+		<text>Найти %s для Кардана</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_1_text">
+		<text>Нужно принести Кардану %s, чтобы он мог проводить модернизацию оружия или бронежилетов.</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_1_about">
+		<text>Понимаешь, братан, для того, чтоб снарягу чинить, мне не только водка нужна, но и инструменты. Вот если б ты их принес - я б всё что угодно сделать смог. Ты как, поможешь?</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_1_fetch_about">
+		<text>Понимаешь, братан, для того, чтоб снарягу чинить, мне не только водка нужна, но и инструменты. Вот если б ты их принес - я б всё что угодно сделать смог. Ты как, поможешь? Достань мне набор инструментов, хоть самый простейший. Я тебе даже заплачу, если принесёшь.</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_1_fetch_finish">
+		<text>Отлично, самое то! Спасибо, сталкер, держи чем богат:</text>
+	</string>
+	<!-- FIND LEVEL 2 TOOLKIT FOR CARDAN TASK -->
+	<string id="zat_a2_stalker_mechanic_task_2_name">
+		<text>Найти %s для Кардана</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_2_text">
+		<text>Нужно принести Кардану %s, чтобы он мог проводить серьёзную модернизацию оружия или бронежилетов.</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_2_about">
+		<text>Мне бы не помешало больше инструментов... и водки. Тот набор довольно хороший, но слишком простой. Для чего посерьёзнее - совсем не годится. Сможешь достать набор получше?</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_2_fetch_about">
+		<text>Мне бы не помешало больше инструментов... и водки. Тот набор довольно хороший, но слишком простой. Для чего посерьёзнее - совсем не годится. Сможешь достать набор получше? Если принесёшь набор инструментов для тонкой работы - накрою поляну, можешь не сомневаться.</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_2_fetch_finish">
+		<text>Ну спасибо, теперь у меня есть всё, что надо. Жаль только, обещанной поляны не выйдет... Но я тебе деньгами компенсирую, лады? И это, если будет не с кем выпить, или снаряга сломается - приходи, я завсегда помогу.</text>
+	</string>
+	<!-- FIND LEVEL 3 TOOLKIT FOR CARDAN TASK -->
+	<string id="zat_a2_stalker_mechanic_task_3_name">
+		<text>Найти %s для Кардана</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_3_text">
+		<text>%s нужны Кардану для проведения самых сложных модификаций. Надо найти их.</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_3_about">
+		<text>Надо больше инструментов и водки, но водку и так легко найти. То, что мне сейчас надо - инструменты для калибровки. Сделаешь это для меня?</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_3_fetch_about">
+		<text>Надо больше инструментов и водки, но водку и так легко найти. То, что мне сейчас надо - инструменты для калибровки. Сделаешь это для меня? Принесёшь - с меня причитается.</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_task_3_fetch_finish">
+		<text>Фантастика! Ну, теперь заходи в любое время!</text>
+	</string>
+</string_table>

@@ -1,0 +1,37 @@
+[logic@pri_b303_burer_01]
+suitable = {=is_monster_burer} true
+prior = 200
+monster_job = true
+active = mob_walker@save
+
+[mob_walker@save]
+path_walk = save_home
+path_look = attack_home
+out_restr = pri_surge_hide_b303
+combat_ignore_cond = {!actor_in_zone(pri_b303_burer_out_rest)} true
+on_info = {=actor_in_zone(pri_b303_actor_come)} mob_walker@wait, {=actor_in_zone(pri_b303_burer_out_rest)} mob_walker@wait
+on_info2 = {-pri_b303_door_must_be_opened =npc_in_zone(pri_surge_hide_b303)} %+pri_b303_door_must_be_opened%, {+pri_b303_door_must_be_opened !npc_in_zone(pri_surge_hide_b303)} %-pri_b303_door_must_be_opened%
+
+[mob_walker@wait]
+path_walk = burer_walk
+path_look = burer_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = pri_b303_burer_out_rest
+on_sound = actor|WPN_shoot|25|0.0| mob_home@attack
+on_sound2 = actor|WPN_hit|20|0.0| mob_home@attack
+on_sound3 = actor|MST_step|25|0.1| mob_home@attack
+on_actor_dist_le_nvis = 5 | mob_home@attack
+on_actor_dist_le = 8 | mob_home@attack 
+on_info = {!actor_in_zone(pri_b303_burer_out_rest) !actor_in_zone(pri_b303_actor_come)} mob_walker@save
+on_info2 = {+pri_b303_actor_attack_burer} mob_home@attack
+on_info3 = {-pri_b303_door_must_be_opened =npc_in_zone(pri_surge_hide_b303)} %+pri_b303_door_must_be_opened%, {+pri_b303_door_must_be_opened !npc_in_zone(pri_surge_hide_b303)} %-pri_b303_door_must_be_opened%
+
+[mob_home@attack]
+path_home = attack_home
+home_min_radius = 5
+home_max_radius = 15
+aggressive = true
+out_restr = pri_b303_burer_out_rest
+on_info = {!actor_in_zone(pri_b303_burer_out_rest) !actor_in_zone(pri_b303_actor_come)} mob_walker@save
+on_info2 = {-pri_b303_actor_attack_burer} %+pri_b303_actor_attack_burer%
+on_info3 = {-pri_b303_door_must_be_opened =npc_in_zone(pri_surge_hide_b303)} %+pri_b303_door_must_be_opened%, {+pri_b303_door_must_be_opened !npc_in_zone(pri_surge_hide_b303)} %-pri_b303_door_must_be_opened%

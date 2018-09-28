@@ -1,0 +1,48 @@
+[logic]
+active = remark@start
+on_hit = hit
+
+[remark@start]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+path_walk = pri_a22_smart_terrain_pri_a22_squad_cutscene_actor_walk
+anim = sit
+target = story | pri_a22_military_yarmoshuk
+on_game_timer = 50 | remark@stand_up
+
+[remark@stand_up]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+anim = wait_na
+target = story | pri_a22_military_yarmoshuk
+on_game_timer = 30 | remark@talk_rac_actor
+
+[remark@talk_rac_actor]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+anim = wait_rac
+target = story | pri_a22_military_yarmoshuk
+on_signal = sound_end | %+pri_a22_actor_to_base_talked%
+on_game_timer = 70 | %=play_sound(pri_a22_actor_to_base_find_squad_member)%
+on_info = {+pri_a22_cutscene_actor_find_squad_destroy} %=destroy_object%
+
+[hit]
+on_info = %+pri_a22_cut_actor_hit =destroy_object%

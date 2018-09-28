@@ -1,0 +1,91 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_b19_agreed_to_go} sr_idle@agreed_to_go %=give_task(jup_b19_airing_to_kopatci)%
+on_info2 = {+jup_b19_fail}  sr_idle@nil 
+
+[sr_idle@agreed_to_go]
+on_info = {+jup_b19_ready_to_go} sr_idle@disable_ui 
+on_info2 = {+jup_b19_fail}  sr_idle@nil 
+
+[sr_idle@disable_ui]
+on_game_timer = 10 | sr_idle@timer %+jup_b19_dont_break =run_postprocess(fade_in)%
+on_info = {+jup_b19_fail}  sr_idle@nil %=enable_ui%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@create_squad %+jup_b19_destroy_yar =run_postprocess(black:2119:true) =teleport_squad(jup_b19_freedom_yar_squad:jup_b19_yar_1_walk)% ;
+on_info = {+jup_b19_fail}  sr_idle@nil %=enable_ui%
+
+[sr_idle@create_squad]
+on_game_timer = 10 | sr_idle@black  %=teleport_actor(jup_b19_teleport_actor_walk:jup_b19_teleport_actor_look) =clear_smart_terrain(jup_b19:false) =enable_ui% 
+on_info = {+jup_b19_fail}  sr_idle@nil %=stop_postprocess(2119) =enable_ui%
+
+[sr_idle@black]
+on_info = sr_idle@surge %=forward_game_time(1)% 
+on_info2 = {+jup_b19_fail}  sr_idle@nil %=stop_postprocess(2119) =enable_ui%
+
+[sr_idle@surge]
+on_info = {=surge_started} sr_idle@white %=stop_surge%, sr_idle@white
+
+[sr_idle@white]
+on_info = {+jup_b19_arrived} sr_idle@enable_ui_timer %=stop_postprocess(2119)%
+on_info2 = {+jup_b19_fail} sr_idle@nil %=stop_postprocess(2119) =enable_ui%
+
+[sr_idle@enable_ui_timer]
+on_info = {!black_screen} sr_idle@enable_ui %+jup_b19_arrived_done%
+on_info2 = {+jup_b19_fail} sr_idle@nil %=enable_ui%
+
+
+[sr_idle@enable_ui]
+on_info = {-jup_b19_ui_input_enabled} %=enable_ui +jup_b19_ui_input_enabled%
+on_game_timer = 10 | {!talking} sr_idle@merc_spawned %=enable_ui%
+on_info2 = {+jup_b19_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@merc_spawned]
+on_info = {+jup_b19_merc_spawned} sr_idle@disable_ui2 %-jup_b19_actor_damaged_zombied =create_squad(jup_b19_merc_squad:jup_b19)% 
+on_info2 = {+jup_b19_fail} sr_idle@nil ;%=enable_ui%
+
+[sr_idle@disable_ui2]
+on_game_timer = 10 | sr_idle@wait %=set_counter(merc_death) =set_squads_enemies(jup_b19_merc_squad:jup_b19_freedom_yar_squad)%
+on_info = {+jup_b19_fail} sr_idle@nil ;%=enable_ui%
+
+[sr_idle@wait]
+on_info = {=counter_greater(merc_death:4)} sr_idle@wait_teleport %+jup_b19_mercs_dead%
+on_info2 = {+jup_b19_fail} sr_idle@nil ;%=enable_ui%
+
+[sr_idle@wait_teleport]
+on_info = {+jup_b19_yar_teleport_actor_to_yanov} sr_idle@done_disable_ui %=disable_ui =run_postprocess(fade_in)%
+on_info2 = {+jup_b19_yar_dont_teleport_actor_to_yanov} sr_idle@wait_for_yar_teleport
+on_info3 = {+jup_b19_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@done_disable_ui]
+on_game_timer = 10 | sr_idle@done_timer %=run_postprocess(fade_in)%
+on_info = {+jup_b19_fail} sr_idle@nil %=enable_ui%
+
+[sr_idle@done_timer]
+on_game_timer = 20 | sr_idle@switch %=forward_game_time(1) =run_postprocess(black:3120:true)%
+on_info = {+jup_b19_fail} sr_idle@nil %=enable_ui =stop_postprocess(3120)%
+
+[sr_idle@switch]
+on_game_timer = 10 | sr_idle@done_create_squad %-jup_b19_dont_break +jup_b19_yar_switch_smart_terrain%
+on_info = {+jup_b19_fail} sr_idle@nil %=enable_ui =stop_postprocess(3120)%
+
+[sr_idle@done_create_squad]
+on_game_timer = 10 | sr_idle@two_white  %=teleport_squad(jup_b19_freedom_yar_squad:jup_a6_spawn_point) =teleport_actor(jup_actor_arrive_walk:jup_actor_arrive_look)% ;=create_squad(jup_b19_freedom_yar_squad:jup_a6) 
+on_info = {+jup_b19_fail}  sr_idle@nil %=enable_ui =stop_postprocess(3120)%
+
+[sr_idle@two_white]
+on_game_timer = 40 | sr_idle@done_enable_ui %=stop_postprocess(3120)%
+on_info = {+jup_b19_fail} sr_idle@nil %=enable_ui =stop_postprocess(3120)%
+
+[sr_idle@done_enable_ui]
+on_info = {-jup_b19_ui_input_2_enabled} sr_idle@wait_for_yar_teleport %=enable_ui +jup_b19_ui_input_2_enabled%
+on_game_timer = 20 | sr_idle@wait_for_yar_teleport %=enable_ui%
+
+[sr_idle@wait_for_yar_teleport]
+on_info = {+jup_b19_fail} sr_idle@nil
+;on_info2 = {=distance_to_obj_ge(jup_b19_freedom_yar_squad:150) =squad_exist(jup_b19_freedom_yar_squad)} sr_idle@nil %=remove_squad(jup_b19_freedom_yar_squad)%
+on_info3 = {!squad_exist(jup_b19_freedom_yar_squad)} sr_idle@nil
+
+[sr_idle@nil]

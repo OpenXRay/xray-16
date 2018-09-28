@@ -1,0 +1,42 @@
+[logic]
+active = ph_door@check_story
+
+[ph_door@check_story]
+on_info = {+story_mode_disabled} ph_door@open_again, ph_door@locked
+
+[ph_door@locked]
+locked = true
+closed = true
+on_info = {+warlab_codelock_unlock} ph_door@open %+gen_actor_found_warlab +warlab_open_door =play_sound(trader_door_unlock)%
+tip_open = jup_b205_tip_door_closed
+tip_close = 
+on_use = %+warlab_door_closed%
+
+[ph_door@open]
+locked = false
+closed = false
+tip_open = 
+tip_close = 
+on_info = {+warlab_main_polter_scene_start} ph_door@lock_again
+
+[ph_door@lock_again]
+locked = true
+closed = true
+on_info = {+warlab_main_polter_dead} ph_door@open_again %+warlab_open_main_door =play_sound(trader_door_unlock)%
+on_use = {+warlab_main_polter_dead} ph_door@open_again, %+warlab_open_main_door%
+tip_open = dar_poltergeist_hold_the_door
+tip_close = 
+
+[ph_door@open_again]
+locked = false
+closed = false
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@close
+
+[ph_door@close]
+locked = false
+closed = true
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@open_again

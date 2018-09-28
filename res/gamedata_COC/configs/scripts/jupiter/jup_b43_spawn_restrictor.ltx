@@ -1,0 +1,9 @@
+[logic]
+active = nil;sr_idle@both_artefacts_dialo_disbler
+
+[sr_idle@both_artefacts_dialo_disbler]
+on_info = {+jup_b43_mincer_meat_give_done} %+jup_b43_mincer_meat_and_kolobok_dialog_disable%
+on_info2 = {+jup_b43_kolobok_give_done} %+jup_b43_mincer_meat_and_kolobok_dialog_disable%
+on_info3 = {!squad_exist(jup_b43_stalker_assistant_squad_sq) +pri_a17_actor_has_gauss_rifle -jup_b43_once_jupgarik_create} sr_idle@nil %+jup_b43_once_jupgarik_create =create_squad(jup_b43_stalker_assistant_squad_sq:jup_a6)%
+
+[sr_idle@nil]

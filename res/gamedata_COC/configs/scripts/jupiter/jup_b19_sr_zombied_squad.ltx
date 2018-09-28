@@ -1,0 +1,22 @@
+[logic]
+active = nil;sr_idle@nil
+
+[sr_idle]
+on_info = {+jup_b19_ready_to_go} sr_idle@check %-jup_b19_actor_damaged_zombied =clear_smart_terrain(jup_b19)%
+
+[sr_idle@check]
+on_game_timer = 20 | {=squad_exist(jup_b19_kopatci_zombied_squad)} sr_idle@remove , {!squad_exist(jup_b19_kopatci_zombied_squad)} sr_idle@spawn
+
+[sr_idle@remove]
+on_game_timer = 10 | sr_idle@check %=remove_squad(jup_b19_kopatci_zombied_squad)%
+
+[sr_idle@spawn]
+on_info =  sr_idle@add %=create_squad(jup_b19_kopatci_zombied_squad:jup_b19)%
+
+[sr_idle@add]
+on_game_timer = 10 | {=squad_exist(jup_b19_kopatci_zombied_squad) !squad_npc_count_ge(jup_b19_kopatci_zombied_squad:9)} sr_idle@timer %=create_squad_member(jup_b19_zombied_2:jup_b19_kopatci_zombied_squad:jup_b19)%, {=squad_exist(jup_b19_kopatci_zombied_squad) =squad_npc_count_ge(jup_b19_kopatci_zombied_squad:9)} sr_idle@nil, {!squad_exist(jup_b19_kopatci_zombied_squad) sr_idle@nil
+
+[sr_idle@timer]
+on_info = sr_idle@add
+
+[sr_idle@nil]

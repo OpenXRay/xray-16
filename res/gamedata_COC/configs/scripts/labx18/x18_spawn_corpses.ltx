@@ -1,0 +1,13 @@
+[logic]
+active = sr_idle@1
+
+[sr_idle@1]
+on_info = sr_idle@2 %=spawn_corpse(dar_corpse_1:dar_corpse_1_deadway) =spawn_corpse(dar_corpse_2:dar_corpse_2_deadway) =spawn_corpse(dar_corpse_kalugin:dar_corpse_kalugin_deadway) =spawn_corpse(dar_corpse_ecolog_guard:dar_corpse_ecolog_guard_deadway)%
+
+[sr_idle@2]
+on_info = {+dar_password_info1} sr_idle@3 %=send_tip(st_labx18_pass_to_1st_door:saharov)%
+
+[sr_idle@3]
+on_info = {+dar_password_info2} sr_idle@nil  %=send_tip(st_labx18_pass_to_2nd_door:ecolog)%
+
+[sr_idle@nil]

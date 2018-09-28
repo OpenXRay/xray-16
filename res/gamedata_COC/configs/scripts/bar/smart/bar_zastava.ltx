@@ -1,0 +1,34 @@
+[smart_terrain]
+squad_id = 4
+max_population = 4
+;arrive_dist = 300
+respawn_params = respawn@bar_zastava
+respawn_idle = 86400
+
+
+[respawn@bar_zastava]
+spawn_duty@advanced
+spawn_duty@veteran
+
+[spawn_duty@advanced]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_novice
+spawn_num = {+bar_zastava_minigunner_dead +bar_zastava_duty_guard1_dead +bar_zastava_duty_guard2_dead +bar_zastava_duty_guard3_dead +bar_zastava_duty_guard4_dead +bar_zastava_duty_guard5_dead +bar_zastava_duty_guard6_dead +bar_zastava_duty_guard7_dead +bar_zastava_duty_guard8_dead +bar_zastava_duty_guard9_dead} 1, 0
+
+[spawn_duty@veteran]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_veteran
+spawn_num = {+bar_zastava_minigunner_dead +bar_zastava_duty_guard1_dead +bar_zastava_duty_guard2_dead +bar_zastava_duty_guard3_dead +bar_zastava_duty_guard4_dead +bar_zastava_duty_guard5_dead +bar_zastava_duty_guard6_dead +bar_zastava_duty_guard7_dead +bar_zastava_duty_guard8_dead +bar_zastava_duty_guard9_dead} 1, 0
+
+[exclusive]
+duty_guard1 = bar\bar_zastava_smart.ltx
+duty_guard2 = bar\bar_zastava_smart.ltx
+duty_guard3 = bar\bar_zastava_smart.ltx
+duty_guard4 = bar\bar_zastava_smart.ltx
+duty_guard5 = bar\bar_zastava_smart.ltx
+duty_guard6 = bar\bar_zastava_smart.ltx
+duty_guard7 = bar\bar_zastava_smart.ltx
+duty_guard8 = bar\bar_zastava_smart.ltx
+duty_guard9 = bar\bar_zastava_smart.ltx
+bar_zastava_minigunner_excl = bar\bar_zastava_smart.ltx
+faction_base_defense_enemy1 = bar\bar_zastava_smart.ltx
+faction_base_defense_enemy2 = bar\bar_zastava_smart.ltx
+faction_base_defense_enemy3 = bar\bar_zastava_smart.ltx

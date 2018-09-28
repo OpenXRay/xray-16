@@ -1,0 +1,28 @@
+---------------------------------------------------------------------
+class "se_car" (cse_alife_car)
+--------------------
+function se_car:__init (section) super (section)
+end
+function se_car:on_register()
+	cse_alife_car.on_register(self)
+	SendScriptCallback("server_entity_on_register",self,"se_car")
+end
+function se_car:on_unregister()
+	SendScriptCallback("server_entity_on_unregister",self,"se_car")
+	cse_alife_car.on_unregister(self)
+end 
+function se_car:can_switch_offline ()
+	return cse_alife_car.can_switch_offline(self)
+end
+function se_car:can_switch_online ()
+	return cse_alife_car.can_switch_online(self)
+end
+function se_car:STATE_Write(packet)
+	cse_alife_car.STATE_Write(self,packet)
+end
+function se_car:STATE_Read(packet,size)
+	cse_alife_car.STATE_Read(self, packet, size)
+end
+function se_car:keep_saved_data_anyway()
+	return true
+end

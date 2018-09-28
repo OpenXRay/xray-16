@@ -1,0 +1,17 @@
+[logic@jup_a10_bandit_guard_2]
+suitable = {=target_squad_name(jup_a10_bandit_squad_3) !check_npc_name(jup_a10_bandit_leader)} true
+prior = 100
+active = walker@jup_a10_bandit_guard_2
+
+[walker@jup_a10_bandit_guard_2]
+path_walk = bodyguard_2_walk
+path_look  = bodyguard_2_look
+on_info = {=surge_started} walker@surge
+meet = no_meet
+
+
+[walker@surge]
+path_walk = bodyguard_2_walk
+path_look  = bodyguard_2_look
+on_info = {=surge_complete} walker@jup_a10_bandit_guard_2
+meet = no_meet

@@ -1,0 +1,439 @@
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+
+
+[logic@pas_b400_hall_monolith_1]
+active = camper@monolith_1
+suitable = {=target_squad_name(pas_b400_hall_monolith_squad)} true
+prior = 200
+
+[camper@monolith_1]
+path_walk = monolith_1_1_walk
+path_look = monolith_1_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_1
+wounded = wounded@no_wound
+
+[walker@monolith_1]
+path_walk = monolith_1_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_2]
+active = camper@monolith_2
+suitable = {=target_squad_name(pas_b400_hall_monolith_squad)} true
+prior = 200
+
+[camper@monolith_2]
+path_walk = monolith_2_1_walk
+path_look = monolith_1_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_2
+wounded = wounded@no_wound
+
+[walker@monolith_2]
+path_walk = monolith_2_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_3]
+active = camper@monolith_3
+suitable = {=target_squad_name(pas_b400_hall_monolith_squad)} true
+prior = 200
+
+[camper@monolith_3]
+path_walk = monolith_3_1_walk
+path_look = monolith_1_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_3
+wounded = wounded@no_wound
+
+[walker@monolith_3]
+path_walk = monolith_3_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_4]
+active = camper@monolith_4
+suitable = {=target_squad_name(pas_b400_hall_monolith_squad)} true
+prior = 200
+
+[camper@monolith_4]
+path_walk = monolith_4_1_walk
+path_look = monolith_2_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_4
+wounded = wounded@no_wound
+
+[walker@monolith_4]
+path_walk = monolith_4_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_5]
+active = camper@monolith_5
+suitable = {=target_squad_name(pas_b400_hall_monolith_squad)} true
+prior = 200
+
+[camper@monolith_5]
+path_walk = monolith_5_1_walk
+path_look = monolith_2_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_5
+wounded = wounded@no_wound
+
+[walker@monolith_5]
+path_walk = monolith_5_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_6]
+active = camper@monolith_6
+suitable = {=target_squad_name(pas_b400_hall_monolith_squad)} true
+prior = 200
+
+[camper@monolith_6]
+path_walk = monolith_6_1_walk
+path_look = monolith_2_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_6
+wounded = wounded@no_wound
+
+[walker@monolith_6]
+path_walk = monolith_6_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_7]
+active = camper@monolith_7
+suitable = {=target_squad_name(pas_b400_hall_monolith_2_squad)} true
+prior = 200
+
+[camper@monolith_7]
+path_walk = monolith_7_1_walk
+path_look = monolith_7_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_7
+wounded = wounded@no_wound
+
+[walker@monolith_7]
+path_walk = monolith_7_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_8]
+active = camper@monolith_8
+suitable = {=target_squad_name(pas_b400_hall_monolith_2_squad)} true
+prior = 200
+
+[camper@monolith_8]
+path_walk = monolith_8_1_walk
+path_look = monolith_8_look
+no_retreat = true
+def_state_moving = assault
+on_signal = path_end | walker@monolith_8
+wounded = wounded@no_wound
+
+[walker@monolith_8]
+path_walk = monolith_8_2_walk
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_sniper_1]
+active = camper@sniper_1
+suitable = {=target_squad_name(pas_b400_hall_monolith_sniper_1)} true
+prior = 200
+
+[camper@sniper_1]
+path_walk = mono_sniper_1_walk
+path_look = mono_sniper_1_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_sniper_1_in
+on_signal = path_end | remark@sniper_1_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_1_wait]
+target = path | pas_b400_hall_mono_sniper_1_look,0
+anim = hide_na
+on_info = {=actor_in_zone(pas_b400_sr_hall_control_up)} remark@sniper_1 %+pas_b400_hall_monolith_snipers_attacked%
+on_info2 = {=actor_in_zone(pas_b400_sr_hall_6)} remark@sniper_1 %+pas_b400_hall_monolith_snipers_attacked%
+out_restr = pas_b400_sr_hall_sniper_1_in
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_1]
+target = path | pas_b400_hall_mono_sniper_1_look,0
+anim = hide_fire
+on_signal = anim_end | camper@sniper_1_battle
+on_game_timer = 30 | camper@sniper_1_battle
+out_restr = pas_b400_sr_hall_sniper_1_in
+combat_ignore_cond = {=check_enemy_name(wanderer)} true
+wounded = wounded@no_wound
+
+[camper@sniper_1_battle]
+path_walk = mono_sniper_1_walk
+path_look = mono_sniper_1_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_sniper_1_in
+radius = 10
+combat_ignore_cond = {=check_enemy_name(wanderer)} true
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_sniper_2]
+active = camper@sniper_2
+suitable = {=target_squad_name(pas_b400_hall_monolith_sniper_2)} true
+prior = 200
+
+[camper@sniper_2]
+path_walk = mono_sniper_2_walk
+path_look = mono_sniper_2_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_sniper_2_in
+on_signal = path_end | remark@sniper_2_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_2_wait]
+target = path | pas_b400_hall_mono_sniper_2_look,0
+anim = hide_na
+on_info = {=actor_in_zone(pas_b400_sr_hall_control_up)} remark@sniper_2 %+pas_b400_hall_monolith_snipers_attacked%
+on_info2 = {=actor_in_zone(pas_b400_sr_hall_6)} remark@sniper_2 %+pas_b400_hall_monolith_snipers_attacked%
+out_restr = pas_b400_sr_hall_sniper_2_in
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_2]
+target = path | pas_b400_hall_mono_sniper_2_look,0
+anim = hide_fire
+on_signal = anim_end | camper@sniper_2_battle
+on_game_timer = 30 | camper@sniper_2_battle
+out_restr = pas_b400_sr_hall_sniper_2_in
+combat_ignore_cond = {=check_enemy_name(wanderer)} true
+wounded = wounded@no_wound
+
+[camper@sniper_2_battle]
+path_walk = mono_sniper_2_walk
+path_look = mono_sniper_2_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_sniper_2_in
+radius = 10
+combat_ignore_cond = {=check_enemy_name(wanderer)} true
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_sniper_3]
+active = camper@sniper_3
+suitable = {=target_squad_name(pas_b400_hall_monolith_sniper_3)} true
+prior = 200
+
+[camper@sniper_3]
+path_walk = mono_sniper_3_walk
+path_look = mono_sniper_3_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_2
+on_signal = path_end | remark@sniper_3_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_3_wait]
+target = path | pas_b400_hall_mono_sniper_3_look,0
+anim = hide_na
+on_info5 = {=actor_in_zone(pas_b400_sr_hall_control_up)} remark@sniper_3
+on_info6 = {=actor_in_zone(pas_b400_sr_hall_6)} remark@sniper_3
+out_restr = pas_b400_sr_hall_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_3]
+target = story | actor
+anim = hide_fire
+on_signal = anim_end | camper@sniper_3_battle
+on_game_timer = 30 | camper@sniper_3_battle
+out_restr = pas_b400_sr_hall_2
+wounded = wounded@no_wound
+
+[camper@sniper_3_battle]
+path_walk = mono_sniper_3_walk
+path_look = mono_sniper_3_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_2
+radius = 10
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_sniper_4]
+active = camper@sniper_4
+suitable = {=target_squad_name(pas_b400_hall_monolith_sniper_4)} true
+prior = 200
+
+[camper@sniper_4]
+path_walk = mono_sniper_4_walk
+path_look = mono_sniper_4_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_9
+on_signal = path_end | remark@sniper_4_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_4_wait]
+target = path | pas_b400_hall_mono_sniper_4_look,0
+anim = hide_na
+on_info = {=actor_in_zone(pas_b400_sr_hall_1)} remark@sniper_4
+on_info2 = {=actor_in_zone(pas_b400_sr_hall_3)} remark@sniper_4
+on_info3 = {=actor_in_zone(pas_b400_sr_hall_7)} remark@sniper_4
+on_info4 = {=actor_in_zone(pas_b400_sr_hall_9)} remark@sniper_4
+out_restr = pas_b400_sr_hall_9
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+wounded = wounded@no_wound
+
+[remark@sniper_4]
+target = story | actor
+anim = hide_fire
+on_signal = anim_end | camper@sniper_4_battle
+on_game_timer = 30 | camper@sniper_4_battle
+out_restr = pas_b400_sr_hall_9
+wounded = wounded@no_wound
+
+[camper@sniper_4_battle]
+path_walk = mono_sniper_4_walk
+path_look = mono_sniper_4_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_campering = hide_na
+def_state_campering_fire = hide_fire
+out_restr = pas_b400_sr_hall_9
+radius = 10
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_10]
+active = walker@monolith_10_wait
+suitable = {=target_squad_name(pas_b400_hall_monolith_after_fwd_squad)} true
+prior = 200
+
+[walker@monolith_10_wait]
+path_walk = monolith_after_fwd_squad_spawn
+def_state_standing = hide_na
+def_state_moving = assault
+on_info = {+pas_b400_hall_door_opened} walker@monolith_10
+wounded = wounded@no_wound
+
+[walker@monolith_10]
+path_walk = monolith_10_walk
+path_look = monolith_10_look
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+
+[logic@pas_b400_hall_monolith_11]
+active = walker@monolith_11_wait
+suitable = {=target_squad_name(pas_b400_hall_monolith_after_fwd_squad)} true
+prior = 200
+
+[walker@monolith_11_wait]
+path_walk = monolith_after_fwd_squad_spawn
+def_state_standing = hide_na
+def_state_moving = assault
+on_info = {+pas_b400_hall_door_opened} walker@monolith_11
+wounded = wounded@no_wound
+
+[walker@monolith_11]
+path_walk = monolith_11_walk
+path_look = monolith_11_look
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_12]
+active = walker@monolith_12
+suitable = {=target_squad_name(pas_b400_hall_monolith_after_bwd_squad)} true
+prior = 200
+
+[walker@monolith_12]
+path_walk = monolith_12_walk
+path_look = monolith_12_look
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound
+
+
+
+[logic@pas_b400_hall_monolith_13]
+active = walker@monolith_13
+suitable = {=target_squad_name(pas_b400_hall_monolith_after_bwd_squad)} true
+prior = 200
+
+[walker@monolith_13]
+path_walk = monolith_13_walk
+path_look = monolith_13_look
+def_state_standing = hide_na
+def_state_moving = assault
+wounded = wounded@no_wound

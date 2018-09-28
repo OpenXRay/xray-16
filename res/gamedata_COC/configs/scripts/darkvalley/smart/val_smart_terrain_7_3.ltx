@@ -1,0 +1,26 @@
+[smart_terrain]
+squad_id = 7
+max_population = 4
+respawn_params = respawn@val_smart_terrain_7_3
+respawn_idle = 86400
+
+
+[respawn@val_smart_terrain_7_3]
+spawn_bandit@advanced
+spawn_bandit@master
+
+[spawn_bandit@advanced]
+spawn_squads = bandit_sim_squad_novice, bandit_sim_squad_advanced
+spawn_num = 2
+
+[spawn_bandit@master]
+spawn_squads = bandit_sim_squad_advanced, bandit_sim_squad_advanced, bandit_sim_squad_veteran
+spawn_num = 2
+
+[exclusive]
+val_smart_terrain_7_3_camp_work_1 = darkvalley\val_smart_terrain_7_3_smart_logic.ltx
+val_smart_terrain_7_3_camp_work_2 = darkvalley\val_smart_terrain_7_3_smart_logic.ltx
+val_smart_terrain_7_3_camp_work_3 = darkvalley\val_smart_terrain_7_3_smart_logic.ltx
+val_smart_terrain_7_3_camp_work_4 = darkvalley\val_smart_terrain_7_3_smart_logic.ltx
+val_smart_terrain_7_3_camp_work_5 = darkvalley\val_smart_terrain_7_3_smart_logic.ltx
+val_smart_terrain_7_3_bandit_mechanic =  darkvalley\val_smart_terrain_7_3_smart_logic.ltx

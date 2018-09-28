@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+<!-- esc_2_12_stalker_trader -->
+   <dialog id="esc_2_12_stalker_trader_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+				<next>1112</next>
+            </phrase>
+		    <phrase id="1111">
+				<dont_has_info>esc_m_trader_on_first_meet</dont_has_info>
+                <text>esc_2_12_stalker_trader_start_dialog_1</text>
+				<give_info>esc_m_trader_on_first_meet</give_info>
+            </phrase>
+		    <phrase id="1112">
+				<has_info>esc_m_trader_on_first_meet</has_info>
+                <text>esc_2_12_stalker_trader_start_dialog_2</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+<!-- esc_2_12_stalker_wolf_start -->
+   <dialog id="esc_2_12_stalker_wolf_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+            </phrase>
+		    <phrase id="1111">
+                <text>esc_2_12_stalker_wolf_start_dialog_1</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+<!--------------------------- esc_2_12_stalker_fanat ------------>
+   <dialog id="esc_2_12_stalker_fanat_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+				<next>1112</next>
+            </phrase>
+		    <phrase id="1111">
+				<precondition>dialogs_escape.actor_dont_has_esc_m_trader_task_2</precondition>
+                <text>esc_2_12_stalker_fanat_start_dialog_1</text>
+            </phrase>
+			<phrase id="1112">
+				<precondition>dialogs_escape.actor_has_esc_m_trader_task_2</precondition>
+                <text>esc_2_12_stalker_fanat_start_dialog_esc_m_trader_task_2</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+	<dialog id="esc_2_12_stalker_fanat_about_quest">
+		<precondition>dialogs_escape.esc_2_12_stalker_fanat_about_quest</precondition>
+		<phrase_list>
+			<phrase id="0">							<!-- actor -->
+				<text>esc_2_12_stalker_fanat_about_esc_m_trader_task_2_0</text>
+				<next>1</next>
+			</phrase>
+		    <phrase id="1">							<!-- npc -->
+                <text>esc_2_12_stalker_fanat_about_esc_m_trader_task_2_1</text>
+				<action>dialogs_escape.set_esc_2_12_stalker_fanat_as_companion</action>
+            </phrase>
+		</phrase_list>
+	</dialog>
+<!--------------------------- esc_2_12_stalker_nimble ----------->
+    <dialog id="esc_2_12_stalker_nimble_start">
+        <phrase_list>
+            <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text />
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+                <next>14</next>
+                <next>15</next>
+            </phrase>
+            <phrase id="11">
+                <text>esc_2_12_stalker_nimble_start_11</text>
+                <dont_has_info>esc_2_12_nimble_intro</dont_has_info>
+                <give_info>esc_2_12_nimble_intro</give_info>
+            </phrase>
+            <phrase id="12">
+                <text>esc_2_12_stalker_nimble_start_12</text>
+                <dont_has_info>esc_2_12_finished_categories_all</dont_has_info>
+                <dont_has_info>esc_2_12_order_in_process</dont_has_info>
+                <has_info>esc_2_12_nimble_intro</has_info>
+            </phrase>
+            <phrase id="13">
+                <text>esc_2_12_stalker_nimble_start_13</text>
+                <dont_has_info>esc_2_12_order_in_process</dont_has_info>
+                <has_info>esc_2_12_nimble_intro</has_info>
+                <has_info>esc_2_12_finished_categories_all</has_info>
+            </phrase>
+            <phrase id="14">
+                <text>esc_2_12_stalker_nimble_start_14</text>
+                <dont_has_info>esc_2_12_order_ready</dont_has_info>
+                <has_info>esc_2_12_order_in_process</has_info>
+            </phrase>
+            <phrase id="15">
+                <text>esc_2_12_stalker_nimble_start_15</text>
+                <has_info>esc_2_12_order_in_process</has_info>
+                <has_info>esc_2_12_order_ready</has_info>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="esc_2_12_stalker_nimble_about_quest">
+		<phrase_list>
+			<phrase id="0">	
+				<precondition>dialogs_escape.actor_has_mar_base_owl_stalker_trader_task_1_pda</precondition>
+				<text>esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1_about</text>
+				<next>1</next>
+			</phrase> 
+		    <phrase id="1">
+                <text>esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1</text>
+				<action>dialogs_escape.mar_base_owl_stalker_trader_task_1_give_reward</action>
+            </phrase>
+		</phrase_list>
+	</dialog>
+    <dialog id="esc_2_12_stalker_nimble_about">
+        <has_info>esc_2_12_nimble_intro</has_info>
+        <phrase_list>
+            <phrase id="111">
+                <text />
+                <next>1111</next>
+                <next>1114</next>
+                <next>1116</next>
+            </phrase>
+            <phrase id="0">
+                <text>esc_2_12_stalker_nimble_about_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="11">
+                <text />
+                <next>111</next>
+            </phrase>
+            <phrase id="1">
+                <text>esc_2_12_stalker_nimble_about_1</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="1111">
+                <text>esc_2_12_stalker_nimble_about_1111</text>
+                <next>11111</next>
+            </phrase>
+            <phrase id="11111">
+                <text>esc_2_12_stalker_nimble_about_11111</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="1114">
+                <text>esc_2_12_stalker_nimble_about_1114</text>
+                <next>11141</next>
+            </phrase>
+            <phrase id="11141">
+                <text>esc_2_12_stalker_nimble_about_11141</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="1116">
+                <text>esc_2_12_stalker_nimble_about_1116</text>
+                <next>11161</next>
+            </phrase>
+            <phrase id="11161">
+                <text>esc_2_12_stalker_nimble_about_11161</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

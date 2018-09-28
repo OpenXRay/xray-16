@@ -1,0 +1,443 @@
+#include "pri_a28_general.ltx"
+
+[logic@pri_a28_kovalski_evac]
+active = camper@kovalski_evac_1
+suitable = {-pri_a28_evac_done =check_npc_name(kovalski)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@kovalski_evac_1]:walker@kovalski_fight
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_horror_start =npc_in_zone(pri_a28_sr_horror)} remark@kovalski_horror_1
+on_info2 = {-pri_a28_horror_start =npc_in_zone(pri_a28_sr_evac_1)} remark@kovalski_horror_1 %+pri_a28_horror_start%
+on_info3 = {+pri_a28_strelok_run} camper@kovalski_evac_2
+
+[remark@kovalski_horror_1]:walker@kovalski_ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 3
+on_game_timer = 36 | remark@kovalski_horror_2
+
+[remark@kovalski_horror_2]:walker@kovalski_ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 1
+on_game_timer = 28 | remark@kovalski_horror_3
+
+[remark@kovalski_horror_3]:walker@kovalski_ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 4
+on_info = {+pri_a28_strelok_run} camper@kovalski_evac_2
+
+[camper@kovalski_evac_2]:walker@kovalski_ignore
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_signal = path_end | remark@kovalski_evac_2_wait
+
+[remark@kovalski_evac_2_wait]:walker@kovalski_ignore
+target = story | actor
+anim = hide_na
+out_restr = pri_a28_sr_evac_1
+on_game_timer = 300 | {=dist_to_actor_ge(15) -pri_a28_strelok_dead} %=play_sound(pri_a28_colonel_wait_actor) +pri_a28_colonel_wait_actor%
+on_game_timer2 = 450 | {=dist_to_actor_ge(15)} %=play_sound(pri_a28_colonel_wait_actor_long) +pri_a28_colonel_wait_actor%
+on_game_timer3 = 600 | {=dist_to_actor_ge(15)} remark@kovalski_evac_2_talk %=play_sound(pri_a28_colonel_wait_actor_go)%
+on_info = {-pri_a28_actor_enemy_to_squad =dist_to_actor_le(30) +pri_a28_colonel_wait_actor} remark@kovalski_evac_2_talk %=play_sound(pri_a28_colonel_wait_actor_return)%
+on_info2 = {-pri_a28_actor_enemy_to_squad =dist_to_actor_le(30) -pri_a28_colonel_wait_actor} remark@kovalski_evac_2_talk
+on_info3 = {-pri_a28_actor_enemy_to_squad +pri_a28_evac_leave} camper@kovalski_evac_3 %=play_sound(pri_a28_colonel_wait_actor_go)%
+on_info4 = {+pri_a28_actor_enemy_to_squad} remark@kovalski_evac_2_talk
+
+[remark@kovalski_evac_2_talk]:walker@kovalski_ignore
+target = story | actor
+anim = hide_na
+out_restr = pri_a28_sr_evac_2
+on_signal = sound_end | camper@kovalski_evac_3 %+pri_a28_evac_leave%
+on_game_timer = 10 | %=play_sound(pri_a28_colonel_clear_the_deck)%
+
+[camper@kovalski_evac_3]:walker@kovalski_ignore
+path_walk = kovalski_3_walk
+path_look = kovalski_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2
+on_info = {+pri_a28_evac_come_close_done =npc_in_zone(pri_a28_sr_evac_2)} %=play_sound(pri_a28_colonel_see_helicopter)%
+on_signal = sound_end | %+pri_a28_evac_done%
+
+
+
+[logic@pri_a28_medic_evac]
+active = camper@medic_evac_1 
+suitable = {-pri_a28_evac_done =check_npc_name(base_medic)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@medic_evac_1]:walker@fight
+path_walk = medic_2_walk
+path_look = medic_2_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_horror
+on_info = {=npc_in_zone(pri_a28_sr_horror)} camper@medic_evac_1_wait
+
+[camper@medic_evac_1_wait]:walker@ignore
+path_walk = medic_2_walk
+path_look = medic_2_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_horror
+on_game_timer = 15 | remark@medic_horror_1
+
+[remark@medic_horror_1]:walker@ignore
+anim = threat_heli
+target = path | pri_a28_horror_look, 0
+on_signal = sound_end | remark@medic_horror_2 %+pri_a28_army_what_is_that +pri_a28_horror_start%
+on_info = %=play_sound(pri_a28_army_what_is_that)%
+
+[remark@medic_horror_2]:walker@ignore
+anim = threat_heli
+target = path | pri_a28_horror_look, 1
+on_game_timer = 45 | remark@medic_horror_3
+
+[remark@medic_horror_3]:walker@ignore
+anim = threat_heli
+target = path | pri_a28_horror_look, 2
+on_info2 = {+pri_a28_strelok_dont_stop} remark@medic_horror_4
+
+[remark@medic_horror_4]:walker@ignore
+anim = pri_a25_psy_medic_idle
+target = path | pri_a28_horror_look, 1
+on_signal = sound_end | remark@medic_horror_5 %+pri_a28_army_its_here =give_task(pri_a28_recover_medic)%
+on_game_timer = 10 | %=play_sound(pri_a28_army_its_here)%
+
+[remark@medic_horror_5]:walker@ignore
+anim = pri_a25_psy_medic_idle
+target = path | pri_a28_horror_look, 2
+meet = meet@medic_horror_wait
+on_game_timer = 30 | remark@medic_horror_wait
+
+[remark@medic_horror_wait]:walker@ignore
+anim = pri_a25_psy_medic_idle
+target = path | pri_a28_horror_look, 3
+meet = meet@medic_horror_wait
+on_signal = sound_end | remark@medic_horror_recovered %+pri_a28_medic_recovered%
+on_info = {+pri_a28_medic_recovered} remark@medic_horror_recovered
+
+[meet@medic_horror_wait]
+abuse = false
+use = false
+snd_on_use = pri_a28_army_confusion
+use_text = pri_a28_talk_with_stupid_medic
+close_distance = 0
+far_distance = 0
+
+[remark@medic_horror_recovered]:walker@ignore
+anim = pri_a25_psy_medic_out 
+target = story | actor
+on_signal = anim_end | camper@medic_evac_2
+
+[camper@medic_evac_2]:walker@ignore
+path_walk = medic_1_walk
+path_look = medic_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_evac_leave} camper@medic_evac_3
+
+[camper@medic_evac_3]:walker@ignore
+path_walk = medic_3_walk
+path_look = medic_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2
+
+
+
+
+[logic@pri_a28_strelok_evac]
+active = camper@strelok_evac_1 
+suitable = {-pri_a28_evac_done =check_npc_name(strelok)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@strelok_evac_1]:walker@fight
+path_walk = strelok_1_walk
+path_look = strelok_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_horror_start =npc_in_zone(pri_a28_sr_horror)} remark@strelok_horror_1
+on_info2 = {-pri_a28_horror_start =npc_in_zone(pri_a28_sr_evac_1)} remark@strelok_horror_1 %+pri_a28_horror_start%
+on_info3 = {+pri_a28_army_its_here} remark@strelok_horror_1
+
+[remark@strelok_horror_1]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 2
+on_game_timer = 23 | remark@strelok_horror_2
+
+[remark@strelok_horror_2]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 1
+on_game_timer = 31 | remark@strelok_horror_3
+
+[remark@strelok_horror_3]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 3
+on_game_timer = 15 | %=play_sound(pri_a28_strelok_dont_stop)%
+on_signal = sound_end |  %+pri_a28_strelok_dont_stop%
+on_info = {+pri_a28_army_its_here} remark@strelok_horror_4
+
+[remark@strelok_horror_4]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 1
+on_game_timer = 10 | %=play_sound(pri_a28_strelok_run)%
+on_signal = sound_end | camper@strelok_evac_2 %+pri_a28_strelok_run%
+
+[camper@strelok_evac_2]:walker@ignore
+path_walk = strelok_1_walk
+path_look = strelok_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_evac_leave} camper@strelok_evac_3
+
+[camper@strelok_evac_3]:walker@ignore
+path_walk = strelok_3_walk
+path_look = strelok_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2
+
+
+
+[logic@pri_a28_military_1_evac]
+active = camper@military_1_evac_1
+suitable = {-pri_a28_evac_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(base_medic) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_1_evac_1]:walker@fight
+path_walk = military_1_1_walk
+path_look = military_1_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_horror_start =npc_in_zone(pri_a28_sr_horror)} remark@military_1_horror_1
+on_info2 = {-pri_a28_horror_start =npc_in_zone(pri_a28_sr_evac_1)} remark@military_1_horror_1 %+pri_a28_horror_start%
+on_info3 = {+pri_a28_strelok_run} camper@military_1_evac_2
+
+[remark@military_1_horror_1]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 4
+on_game_timer = 44 | remark@military_1_horror_2
+
+[remark@military_1_horror_2]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 1
+on_game_timer = 12 | remark@military_1_horror_3
+
+[remark@military_1_horror_3]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 2
+on_info = {+pri_a28_strelok_run} camper@military_1_evac_2
+
+[camper@military_1_evac_2]:walker@ignore
+path_walk = military_1_1_walk
+path_look = military_1_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_evac_leave} camper@military_1_evac_3
+
+[camper@military_1_evac_3]:walker@fight
+path_walk = military_1_3_walk
+path_look = military_1_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2
+
+
+
+[logic@pri_a28_military_2_evac]
+active = camper@military_2_evac_1
+suitable = {-pri_a28_evac_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(base_medic) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_2_evac_1]:walker@fight
+path_walk = military_2_1_walk
+path_look = military_2_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_horror_start =npc_in_zone(pri_a28_sr_horror)} remark@military_2_horror_1
+on_info2 = {-pri_a28_horror_start =npc_in_zone(pri_a28_sr_evac_1)} remark@military_2_horror_1 %+pri_a28_horror_start%
+on_info3 = {+pri_a28_strelok_run} camper@military_2_evac_2
+
+[remark@military_2_horror_1]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 3
+on_game_timer = 28 | remark@military_2_horror_2
+
+[remark@military_2_horror_2]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 4
+on_game_timer = 36 | remark@military_2_horror_3
+
+[remark@military_2_horror_3]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 3
+on_info = {+pri_a28_strelok_run} camper@military_2_evac_2
+
+[camper@military_2_evac_2]:walker@ignore
+path_walk = military_2_1_walk
+path_look = military_2_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_evac_leave} camper@military_2_evac_3
+
+[camper@military_2_evac_3]:walker@fight
+path_walk = military_2_3_walk
+path_look = military_2_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2
+
+
+
+[logic@pri_a28_military_3_evac]
+active = camper@military_3_evac_1
+suitable = {-pri_a28_evac_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(base_medic) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_3_evac_1]:walker@fight
+path_walk = military_3_1_walk
+path_look = military_3_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_horror_start =npc_in_zone(pri_a28_sr_horror)} remark@military_3_horror_1
+on_info2 = {-pri_a28_horror_start =npc_in_zone(pri_a28_sr_evac_1)} remark@military_3_horror_1 %+pri_a28_horror_start%
+on_info3 = {+pri_a28_strelok_run} camper@military_3_evac_2
+
+[remark@military_3_horror_1]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 3
+on_game_timer = 33 | remark@military_3_horror_2
+
+[remark@military_3_horror_2]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 4
+on_game_timer = 44 | remark@military_3_horror_3
+
+[remark@military_3_horror_3]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 1
+on_info = {+pri_a28_strelok_run} camper@military_3_evac_2
+
+[camper@military_3_evac_2]:walker@ignore
+path_walk = military_3_1_walk
+path_look = military_3_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_evac_leave} camper@military_3_evac_3
+
+[camper@military_3_evac_3]:walker@fight
+path_walk = military_3_3_walk
+path_look = military_3_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2
+
+
+
+[logic@pri_a28_military_4_evac]
+active = camper@military_4_evac_1
+suitable = {-pri_a28_evac_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(base_medic) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_4_evac_1]:walker@fight
+path_walk = military_4_1_walk
+path_look = military_4_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_horror_start =npc_in_zone(pri_a28_sr_horror)} remark@military_4_horror_1
+on_info2 = {-pri_a28_horror_start =npc_in_zone(pri_a28_sr_evac_1)} remark@military_4_horror_1 %+pri_a28_horror_start%
+on_info3 = {+pri_a28_strelok_run} camper@military_4_evac_2
+
+[remark@military_4_horror_1]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 2
+on_game_timer = 22 | remark@military_4_horror_2
+
+[remark@military_4_horror_2]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 0
+on_game_timer = 56 | remark@military_4_horror_3
+
+[remark@military_4_horror_3]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 1
+on_info = {+pri_a28_strelok_run} camper@military_4_evac_2
+
+[camper@military_4_evac_2]:walker@ignore
+path_walk = military_4_1_walk
+path_look = military_4_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_evac_leave} camper@military_4_evac_3
+
+[camper@military_4_evac_3]:walker@fight
+path_walk = military_4_3_walk
+path_look = military_4_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2
+
+
+
+[logic@pri_a28_military_5_evac]
+active = camper@military_5_evac_1
+suitable = {-pri_a28_evac_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(base_medic) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_5_evac_1]:walker@fight
+path_walk = military_5_1_walk
+path_look = military_5_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_horror_start =npc_in_zone(pri_a28_sr_horror)} remark@military_5_horror_1
+on_info2 = {-pri_a28_horror_start =npc_in_zone(pri_a28_sr_evac_1)} remark@military_5_horror_1 %+pri_a28_horror_start%
+on_info3 = {+pri_a28_strelok_run} camper@military_5_evac_2
+
+[remark@military_5_horror_1]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 0
+on_game_timer = 25 | remark@military_5_horror_2
+
+[remark@military_5_horror_2]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 4
+on_game_timer = 40 | remark@military_5_horror_3
+
+[remark@military_5_horror_3]:walker@ignore
+anim = hide_na
+target = path | pri_a28_horror_look, 1
+on_info = {+pri_a28_strelok_run} camper@military_5_evac_2
+
+[camper@military_5_evac_2]:walker@ignore
+path_walk = military_5_1_walk
+path_look = military_5_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_1
+on_info = {+pri_a28_evac_leave} camper@military_5_evac_3
+
+[camper@military_5_evac_3]:walker@fight
+path_walk = military_5_3_walk
+path_look = military_5_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_evac_2

@@ -1,0 +1,13 @@
+[logic]
+active = nil ;sr_idle@spawn_keys
+
+[sr_idle@spawn_keys]
+on_info = {-zat_b12_item_1_spawned} %+zat_b12_item_1_spawned =spawn_object_in(zat_b12_key_1:zat_b12_key_1_box)  =spawn_object_in(zat_b12_documents_1:zat_b12_key_1_box) =spawn_object_in(zat_b12_documents_2:zat_b12_key_1_box)%
+on_info2 = {-zat_b12_item_2_spawned} %+zat_b12_item_2_spawned =spawn_object_in(zat_b12_key_2:zat_b12_key_2_box) =spawn_object_in(zat_b12_documents_2:zat_b12_key_2_box)%
+on_info3 = {-zat_b12_item_3_spawned} %+zat_b12_item_5_spawned =spawn_object_in(ammo_5.45x39_fmj:zat_b12_millitary_box) =spawn_object_in(ammo_5.45x39_fmj:zat_b12_millitary_box) =spawn_object_in(ammo_5.45x39_ap:zat_b12_millitary_box) =spawn_object_in(ammo_9x18_fmj:zat_b12_millitary_box) =spawn_object_in(ammo_9x18_fmj:zat_b12_millitary_box) =spawn_object_in(ammo_9x18_fmj:zat_b12_millitary_box) =spawn_object_in(grenade_rgd5:zat_b12_millitary_box) =spawn_object_in(grenade_rgd5:zat_b12_millitary_box)%
+on_timer = 10 | sr_idle@spawn_balon
+
+[sr_idle@spawn_balon]
+on_info = sr_idle@end %=spawn_object_in(zat_b57_gas:zat_b57_gas_box)%
+
+[sr_idle@end]

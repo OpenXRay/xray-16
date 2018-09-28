@@ -1,0 +1,41 @@
+[logic@burer]
+active = mob_home
+suitable = {=check_npc_name(lx8_burer)} true
+prior = 100
+monster_job = true
+
+[mob_home]
+path_home = burer_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 30
+aggressive = true
+out_restr = lx8_sr_burer_out_restr
+
+[logic@burer_2]
+active = mob_home@2
+suitable = {=check_npc_name(lx8_burer_2)} true
+prior = 100
+monster_job = true
+
+[mob_home@2]
+path_home = burer_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 30
+aggressive = true
+out_restr = lx8_sr_burer_out_restr
+
+[logic@burer_3]
+active = mob_home@3
+suitable = {=check_npc_name(lx8_burer_3)} true
+prior = 100
+monster_job = true
+
+[mob_home@3]
+path_home = burer_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 30
+aggressive = true
+out_restr = lx8_sr_burer_out_restr

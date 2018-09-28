@@ -1,0 +1,328 @@
+[up_sect_firsta_svoboda_outfit]
+cost 		= 400
+value		= +10
+
+fire_wound_protection  			= 0.05
+bones_koeff_protection_add  	= actor_armor_light_add_1
+
+[up_sect_firstc_svoboda_outfit]
+cost 		= 800
+value		= +15
+
+immunities_sect_add				= sect_svoboda_outfit_immunities_add
+
+[up_sect_firste_svoboda_outfit]
+cost 		= 1200
+value		= +30
+
+fire_wound_protection  			= 0.1
+bones_koeff_protection_add  	= actor_armor_light_add_3
+
+[up_sect_firstf_svoboda_outfit]
+cost 		= 1200
+value		= -30
+
+strike_protection 				= 0.06 ;0.3 
+explosion_protection 			= 0.06 ;0.3 
+wound_protection				= 0.06 ;0.3 
+hit_fraction_actor				= -0.12 ;0.45
+
+[up_sect_secona_svoboda_outfit]
+cost 		= 400
+value		= -10
+
+hit_fraction_actor				= -0.08 ;0.55
+strike_protection 				= 0.04 ;0.3 
+explosion_protection 			= 0.04 ;0.3 
+wound_protection				= 0.04 ;0.3 
+
+[up_sect_seconc_svoboda_outfit]
+cost 		= 800
+value		= -3.5
+
+inv_weight  					= -3.5
+power_loss						= -0.05
+
+[up_sect_second_svoboda_outfit]
+cost 		= 3000
+value		= +2
+
+power_restore_speed				= 0.002
+power_loss						= -0.1
+
+[up_sect_secone_svoboda_outfit]
+cost 		= 1200
+value		= +30
+
+fire_wound_protection  			= 0.15
+bones_koeff_protection_add  	= actor_armor_medium_add_2
+
+[up_sect_thirda_svoboda_outfit]
+cost 		= 400
+value		= +5
+
+additional_inventory_weight		= 5		; +max_walk_weight
+additional_inventory_weight2	= 5
+power_loss						= -0.05
+
+[up_sect_thirdc_svoboda_outfit]
+cost 		= 1000
+value       = +3
+
+health_restore_speed			= 0.00045
+
+[up_sect_thirde_svoboda_outfit]
+cost 		= 2000
+value       = +3
+
+bleeding_restore_speed          = 0.003
+power_restore_speed				= 0.003
+
+
+[up_firsta_svoboda_outfit]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_svoboda_outfit
+section                 = up_sect_firsta_svoboda_outfit
+property                = prop_armor
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_a6_name
+description             = st_up_arm_a6_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_1
+
+[up_firstc_svoboda_outfit]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_svoboda_outfit
+section                 = up_sect_firstc_svoboda_outfit
+property                = prop_durability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_b2_name
+description             = st_up_arm_b2_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_2
+
+[up_firste_svoboda_outfit]
+scheme_index            = 2, 0
+known                   = 1
+effects                 = 
+section                 = up_sect_firste_svoboda_outfit
+property                = prop_armor
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_c2_name
+description             = st_up_arm_c2_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_3
+
+[up_firstf_svoboda_outfit]
+scheme_index            = 2, 1
+known                   = 1
+effects                 = 
+section                 = up_sect_firstf_svoboda_outfit
+property                = prop_damage
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_c6_name
+description             = st_up_arm_c6_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_4
+
+[up_secona_svoboda_outfit]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_svoboda_outfit
+section                 = up_sect_secona_svoboda_outfit
+property                = prop_damage
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_a1_name
+description             = st_up_kom_a1_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_5
+
+[up_seconc_svoboda_outfit]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_seconef_svoboda_outfit
+section                 = up_sect_seconc_svoboda_outfit
+property                = prop_weightoutfit
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_b5_name
+description             = st_up_kom_b5_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_6
+
+[up_second_svoboda_outfit]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_svoboda_outfit
+section                 = up_sect_second_svoboda_outfit
+property                = prop_power
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_b10_name
+description             = st_up_kom_b10_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_8
+
+[up_secone_svoboda_outfit]
+scheme_index            = 2, 2
+known                   = 1
+effects                 = 
+section                 = up_sect_secone_svoboda_outfit
+property                = prop_armor
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_c3_name
+description             = st_up_kom_c3_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_7
+
+[up_thirda_svoboda_outfit]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_svoboda_outfit
+section                 = up_sect_thirda_svoboda_outfit
+property                = prop_tonnage
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_a4_name
+description             = st_up_uti_a4_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_9
+
+[up_thirdc_svoboda_outfit]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_thirdef_svoboda_outfit
+section                 = up_sect_thirdc_svoboda_outfit
+property                = prop_restore_health
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_b4_name
+description             = st_up_uti_b4_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_10
+
+
+[up_thirde_svoboda_outfit]
+scheme_index            = 2, 3
+known                   = 1
+effects                 = 
+section                 = up_sect_thirde_svoboda_outfit
+property                = prop_restore_bleeding, prop_power
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_c2_name
+description             = st_up_uti_c2_descr
+icon                    = ui_inGame2_upgrade_svoboda_outfit_11
+
+[up_gr_firstab_svoboda_outfit]
+elements                = up_firsta_svoboda_outfit
+
+[up_gr_firstcd_svoboda_outfit]
+elements                = up_firstc_svoboda_outfit
+
+[up_gr_firstef_svoboda_outfit]
+elements                = up_firste_svoboda_outfit, up_firstf_svoboda_outfit
+
+[up_gr_seconab_svoboda_outfit]
+elements                = up_secona_svoboda_outfit
+
+[up_gr_seconcd_svoboda_outfit]
+elements                = up_seconc_svoboda_outfit, up_second_svoboda_outfit
+
+[up_gr_seconef_svoboda_outfit]
+elements                = up_secone_svoboda_outfit
+
+[up_gr_thirdab_svoboda_outfit]
+elements                = up_thirda_svoboda_outfit
+
+[up_gr_thirdcd_svoboda_outfit]
+elements                = up_thirdc_svoboda_outfit
+
+[up_gr_thirdef_svoboda_outfit]
+elements                = up_thirde_svoboda_outfit

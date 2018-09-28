@@ -1,0 +1,11 @@
+[logic]
+active = nil ;sr_idle@1
+
+[sr_idle@1]
+on_info = sr_idle@end %=create_squad(zat_b56_polter_squad:zat_b56)%
+
+[sr_idle@end]
+on_info = {!squad_exist(zat_b56_polter_squad) =surge_started} sr_idle@delay
+
+[sr_idle@delay]
+on_info = {=surge_complete} sr_idle@1

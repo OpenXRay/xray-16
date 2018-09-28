@@ -1,0 +1,28 @@
+[logic]
+active = nil;sr_idle@monolith_patrol_at_progress
+
+[sr_idle@monolith_patrol_at_progress]
+on_info = {+pri_a17_mon_pat_1} sr_idle@monolith_patrol_at_position_1 
+on_info2 = {+pri_a17_mon_atk} sr_idle@nil 
+
+[sr_idle@monolith_patrol_at_position_1]
+on_info = {+pri_a17_mon_pat_2} sr_idle@monolith_patrol_at_position_2 
+on_info2 = {+pri_a17_mon_atk} sr_idle@nil 
+
+[sr_idle@monolith_patrol_at_position_2]
+on_info = {+pri_a17_mon_pat_3} sr_idle@monolith_patrol_at_position_3 
+on_info2 = {+pri_a17_mon_atk} sr_idle@nil 
+
+[sr_idle@monolith_patrol_at_position_3]
+on_info = {+pri_a17_mon_pat_4} sr_idle@monolith_patrol_at_position_4
+on_info2 = {+pri_a17_mon_atk} sr_idle@nil 
+
+[sr_idle@monolith_patrol_at_position_4]
+on_info = {+pri_a17_atk_mon_pat} sr_idle@nil 
+on_info2 = {+pri_a17_mon_atk} sr_idle@nil 
+
+;[sr_idle@autosave]
+;on_info = {-pri_a17_get_gauss_save =actor_has_item(pri_a17_gauss_rifle)} %+pri_a17_get_gauss_save =scenario_autosave(st_save_pri_a17_hospital_start)%
+;on_info2 = {+pri_a17_get_gauss_save} sr_idle@nil
+
+[sr_idle@nil]

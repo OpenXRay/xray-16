@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- DEFEND BAR FROM MUTANTS TASK -->
+	<string id="bar_visitors_barman_stalker_trader_task_1_name">
+		<text>Очистить местность от мутантов</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_1_text">
+		<text>Бармен попросил зачистить местность от мутантов в целях обеспечения безопасности бара, а также сталкеров, которые приходят на Росток. Необходимо уничтожить всех тварей в указанной области. По завершении задания - вернуться за наградой.</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_1_about">
+		<text>Мне нужен кто-нибудь достаточно смелый для выполнения одного опасного, но высокооплачиваемого задания. Мутанты обосновались неподалёку от моего бара и нужно срочно их полностью истребить. Место я отмечу на карте в твоём КПК. Если сделаешь это, то заработаешь немного денег. Что скажешь?</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_1_finish">
+		<text>Спасибо, благодаря тебе мы в безопасности. Вот оплата.</text>
+	</string>
+	<!-- KILL BANDITS FOR BARMAN TASK -->
+	<string id="bar_visitors_barman_stalker_trader_task_2_name">
+		<text>Уничтожить бандитов</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_2_text">
+		<text>Уничтожить всех бандитов в указанном районе.</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_2_about">
+		<text>Нужна твоя помощь. Одна группа бандитов вызывает много проблем. Нужно избавиться от них.</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_2_finish">
+		<text>Хорошая работа, сталкер! Вот награда, заслужил.</text>
+	</string>
+	<!-- FIND ARTEFACT FOR BARMAN TASK -->
+	<string id="bar_visitors_barman_stalker_trader_task_3_name">
+		<text>Найти артефакт %s</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_3_text">
+		<text>Бармен просил найти для него артефакт %s.</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_3_about">
+		<text>Сталкер, мне нужна твоя помощь. Надо найти одну вещь, а если точнее - артефакт. Согласен помочь?</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_3_fetch_about">
+		<text>Я ищу артефакт %s. Если найдёшь такой и принесёшь мне, я хорошо заплачу.</text>
+	</string>
+	<string id="bar_visitors_barman_stalker_trader_task_3_fetch_finish">
+		<text>Отличная работа. Вот твоё вознаграждение.</text>
+	</string>
+	<!-- DEFEND TERRITORY FOR DUTY TASK -->
+	<string id="bar_dolg_general_petrenko_stalker_task_1_name">
+		<text>Захватить территорию</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_1_text">
+		<text>Необходимо устранить территориальную угрозу в данной зоне.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_1_about">
+		<text>Мне стало известно, что один из наших лагерей находится под угрозой. Мы должны нанести удар первыми. Мне нужны умелые бойцы для выполнения этой задачи, возьмёшься?</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_1_finish">
+		<text>Задача выполнена? Отлично.</text>
+	</string>
+	<!-- CAPTURE TERRITORY FOR DUTY TASK -->
+	<string id="bar_dolg_general_petrenko_stalker_task_2_name">
+		<text>Отвоевать территорию</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_2_text">
+		<text>Необходимо вернуть под контроль «Долга» захваченную врагами территорию.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_2_about">
+		<text>Есть важное дело. «Свобода» заняла один из наших лагерей, и мне нужен хороший боец, чтобы исправить эту ситуацию.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_2_finish">
+		<text>Миссия выполнена? Отличная работа!</text>
+	</string>
+	<!-- ASSASSINATION FOR DUTY TASK -->
+	<string id="bar_dolg_general_petrenko_stalker_task_3_name">
+		<text>Убийство</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_3_text">
+		<text>Полковник Петренко приказал найти и устранить цель.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_3_about">
+		<text>У меня есть список очень важных лиц, о которых нужно... позаботиться. Некоторые - стукачи, или простая шпана, которая узнала лишнее. Но есть и лидеры отрядов, и высокопоставленные лица «Свободы». Выуди из них всю информацию, какую сможешь, потом прикончи.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_3_finish">
+		<text>Отлично! Вот обещанная награда:</text>
+	</string>
+	<!-- FIND LEVEL 1 TOOLKIT FOR MANGUN TASK -->
+	<string id="bar_visitors_stalker_mechanic_task_1_name">
+		<text>Найти для Громова %s</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_text">
+		<text>Нужно принести инструменты Громову, чтобы он смог проводить модернизацию снаряжения.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_about">
+		<text>Знаешь, браток, а я ведь на самом деле неплохой техник. И оружие и броню чинить умею, даже апгрейды какие-никакие делаю! Вернее, делал бы, если бы инструменты были нормальные. Да только где их здесь возьмешь? Может, поможешь раздобыть какой-нибудь простенький набор, а?</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_fetch_about">
+		<text>Знаешь, браток, а я ведь на самом деле неплохой техник. И оружие и броню чинить умею, даже апгрейды какие-никакие делаю!. Вернее, делал бы, если бы инструменты были нормальные. Да только где их здесь возьмешь? Может ты поможешь раздобыть какой-нибудь простенький набор, а? Мне нужен набор инструментов для грубой работы.  В нём должны быть инструменты и масла для работы с оружием. Если сможешь его достать, я буду благодарен, даже заплачу тебе!.. Наверное.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_fetch_finish">
+		<text>Отлично, чувак! Ох, прости, мне нечем заплатить. Но я могу дать тебе хорошую скидку!</text>
+	</string>
+	<!-- FIND LEVEL 2 TOOLKIT FOR MANGUN TASK -->
+	<string id="bar_visitors_stalker_mechanic_task_2_name">
+		<text>Найти для Громова %s</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_text">
+		<text>Необходимо принести Громову инструменты для тонкой работы. Ему нужен более полный набор, чтобы проводить более сложную модернизацию снаряжения.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_about">
+		<text>Эй, чувак, если ты согласишься достать мне более полный набор, получишь ещё большую скидку. Поможешь, приятель?</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_fetch_about">
+		<text>Эй, чувак, если ты согласишься достать мне более полный набор, получишь ещё большую скидку. Поможешь, приятель? Мне нужны инструменты для тонкой работы. Там должно быть всё, что мне нужно. Ты будешь мне как брат, если достанешь его!</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_fetch_finish">
+		<text>Ух ты блин, спасибо, братан! Теперь-то я точно разбогатею. Чёрт возьми, я таки стану успешным!.. Если, конечно, и этот шанс не упущу. Но пока не могу предложить тебе ничего лучше, чем скидка. Извини, приятель.</text>
+	</string>
+	<!-- FIND LEVEL 3 TOOLKIT FOR MANGUN TASK -->
+	<string id="bar_visitors_stalker_mechanic_task_3_name">
+		<text>Найти для Громова %s</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_text">
+		<text>Необходимо принести Громову %s. Ему нужен уникальный набор, чтобы проводить ещё более сложную модернизацию снаряжения.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_about">
+		<text>Эй, парень, если найдёшь что-то стоящее - с меня скидка!</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_fetch_about">
+		<text>Мне нужны инструменты для калибровки. В них должно быть всё, что мне нужно. Ты будешь мне как брат, если достанешь их!</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_fetch_finish">
+		<text>Ни ху...! Блин, спасибо, братан! Теперь-то я точно разбогатею. Чёрт возьми, я таки стану успешным!.. Если, конечно, ещё и этот шанс не упущу. Но пока не могу предложить тебе ничего лучше, чем скидка. Извини, дружище.</text>
+	</string>
+</string_table>

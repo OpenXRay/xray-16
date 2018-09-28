@@ -1,0 +1,19 @@
+[logic]
+active = nil ;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {=actor_in_zone(zat_b104_sr_attack) =actor_has_item(toolkit_1)} sr_idle@with_toolkit
+on_info2 = {=actor_in_zone(zat_b104_sr_attack) !actor_has_item(toolkit_1)} sr_idle@get_toolkit
+
+[sr_idle@get_toolkit]
+on_info = {!actor_in_zone(zat_b104_sr_attack)} sr_idle@wait
+on_info2 = {=actor_has_item(toolkit_1)} sr_idle@got_toolkit
+
+[sr_idle@got_toolkit]
+on_info = {!actor_in_zone(zat_b104_sr_attack)} sr_idle@nil %+zat_b104_task_end%
+
+[sr_idle@with_toolkit]
+on_info = {!actor_in_zone(zat_b104_sr_attack)} sr_idle@wait
+on_info2 = {=actor_has_item_count(toolkit_1:2)} sr_idle@got_toolkit
+
+[sr_idle@nil]

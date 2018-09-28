@@ -1,0 +1,27 @@
+[logic@snork_2]
+suitable = {=is_monster_snork -zat_b28_heli_3_searched} true
+active = mob_home@1
+monster_job = true
+prior = 100
+
+[mob_home@1]
+path_home = mob_home_2
+home_min_radius = 20
+home_max_radius = 40
+on_info = {+zat_b28_heli_3_searching -zat_b28_heli_3_searched} mob_home@2
+on_info2 = {!npc_in_zone(zat_b28_smart_terrain_att)}  %=kill_npc()%
+
+[mob_home@2]
+path_home = mob_home_2
+home_min_radius = 20
+home_max_radius = 40
+combat_ignore_cond  = {=is_enemy_actor} true, false
+on_info = {+zat_b28_heli_3_searched} mob_home@3
+on_info2 = {!npc_in_zone(zat_b28_smart_terrain_att)}  %=kill_npc()%
+
+[mob_home@3]
+path_home = mob_home_2
+home_min_radius = 30
+home_max_radius = 55
+on_info = {!npc_in_zone(zat_b28_smart_terrain_att)}  %=kill_npc()%
+combat_ignore_cond  = false

@@ -1,0 +1,22 @@
+[logic]
+active = ph_door@open
+
+[ph_door@open]
+locked = false
+closed = false
+tip_open = nil
+tip_close = 
+snd_init 		= 
+snd_open_start 	= 
+snd_close_start = 
+snd_close_stop 	= 
+
+[ph_door@close]
+locked = false
+closed = true
+on_use = ph_door@open 
+tip_close = 
+snd_init 		= 
+snd_open_start 	= 
+snd_close_start = 
+snd_close_stop 	= 

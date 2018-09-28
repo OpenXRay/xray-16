@@ -1,0 +1,45 @@
+[logic]
+active = nil ;sr_idle@spawn_corps
+
+[sr_idle@spawn_corps]
+on_info = {-zat_b100_military_corps_spawned} sr_idle@poltergeist %=spawn_corpse(zat_b100_military_1:zat_b100_heli_2_look) =spawn_corpse(zat_b100_military_2:zat_b100_poltergeist_01_walk) =spawn_corpse(zat_b100_military_3:zat_b100_poltergeist_02_walk) +zat_b100_military_corps_spawned%
+
+[sr_idle@poltergeist]
+on_info = {+zat_b100_heli_2_searching +zat_a1_game_start} sr_idle@thinking_spawn %+zat_b100_polter_ignor_actor =run_postprocess(fade_in:7914) =disable_ui%
+
+[sr_idle@thinking_spawn]
+on_game_timer = 20 | sr_idle@thinking_fade %=run_postprocess(black:7915:true) =create_cutscene_actor_with_weapon(zat_b100_actor:zat_a23_temp_actor_walk:0:0)%
+
+[sr_idle@thinking_fade]
+on_game_timer = 40 | sr_cutscene@thinking_start %=stop_postprocess(7914) =stop_postprocess(7915)%
+
+[sr_cutscene@thinking_start]
+point = zat_b100_heli_2_walk
+look = zat_b100_heli_2_look
+cam_effector = scenario_cam\Zaton\zat_b100_heli_2_camera
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+on_signal = cameff_end | {+zat_b100_heli_2_searched} sr_idle@destroy
+on_signal2 = cam_effector_stop | {+zat_b100_heli_2_searched} sr_idle@destroy
+on_signal3 = sound_end | {-zat_b100_heli_2_searched} %+zat_b100_heli_2_searched =stop_sr_cutscene =run_postprocess(fade_in:7916)%
+on_info = {+zat_b100_actor_hit} %=stop_sr_cutscene +zat_b100_heli_2_searched =run_postprocess(fade_in:7916)%
+on_info2 = {-zat_b100_sound_play} %+zat_b100_sound_play =play_sound(zat_b100_heli_2_maps)%
+
+[sr_idle@destroy]
+on_game_timer = 20 | {=object_exist(zat_b100_actor)} sr_idle@end %=run_postprocess(black:7917:true) =destroy_object(story:zat_b100_actor) =teleport_actor(zat_b100_heli_2_walk:zat_b100_heli_2_look)%, sr_idle@end %=run_postprocess(black:7917:true) =teleport_actor(zat_b100_heli_2_walk:zat_b100_heli_2_look)%
+
+[sr_idle@end]
+on_game_timer = 20 | {-zat_b100_guide_maps_gived} sr_idle@save %=stop_postprocess(7916) =stop_postprocess(7917) =enable_ui -zat_b100_polter_ignor_actor +zat_b100_guide_maps_gived =give_task(zat_b100_guide_maps)%, sr_idle@save %=stop_postprocess(7916) =stop_postprocess(7917) =enable_ui -zat_b100_polter_ignor_actor%
+
+[sr_idle@save]
+on_info = {-zat_b100_scenario_save_heli_2_searched} %+zat_b100_scenario_save_heli_2_searched =scenario_autosave(st_save_zat_b100_searched_heli_2)%
+on_info2 = {+zat_b100_scenario_save_heli_2_searched} sr_idle@polter_respawn
+
+[sr_idle@polter_respawn]
+on_info = {+zat_b100_heli_2_searched !obj_on_job(logic@zat_b100_poltergeist_02:zat_b100) !squad_exist(zat_b100_poltergeist_squad_01) =distance_to_obj_ge(zat_b100_heli_2:100)} sr_idle@timer
+on_info2 = {+zat_b100_spawn_new_wave} %-zat_b100_spawn_new_wave%
+
+[sr_idle@timer]
+on_info = {+zat_b100_spawn_new_wave} sr_idle@polter_respawn %-zat_b100_spawn_new_wave =create_squad(zat_b100_poltergeist_squad_01:zat_b100)% 
+on_game_timer = 7200 | sr_idle@polter_respawn %+zat_b100_spawn_new_wave%

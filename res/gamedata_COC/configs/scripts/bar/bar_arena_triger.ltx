@@ -1,0 +1,113 @@
+[logic]
+active = sr_idle@idle
+
+[sr_idle@idle]
+on_info = {+bar_arena_fight_1 -bar_arena_fight_1_done} sr_idle@wait_1 %=disable_ui =spawn_object(bar_arena_stalker_1:bar_arena_wait_walk_6)%
+on_info2 = {+bar_arena_fight_2 -bar_arena_fight_2_done} sr_idle@wait_2 %=disable_ui =spawn_object(bar_arena_stalker_2:bar_arena_wait_walk_6)%
+on_info3 = {+bar_arena_fight_3 -bar_arena_fight_3_done} sr_idle@wait_3 %=disable_ui =spawn_object(bar_arena_stalker_3_1:bar_arena_wait_walk_1) =spawn_object(bar_arena_stalker_3_2:bar_arena_wait_walk_5)%
+on_info4 = {+bar_arena_fight_4 -bar_arena_fight_4_done} sr_idle@wait_4 %=disable_ui =spawn_object(bar_arena_stalker_4_1:bar_arena_wait_walk_6) =spawn_object(bar_arena_stalker_4_2:bar_arena_wait_walk_1) =spawn_object(bar_arena_stalker_4_3:bar_arena_wait_walk_5) =spawn_object(bar_arena_stalker_4_4:bar_arena_wait_walk_7) =spawn_object(bar_arena_stalker_4_5:bar_arena_wait_walk_8)%
+on_info5 = {+bar_arena_fight_5 -bar_arena_fight_5_done} sr_idle@wait_5 %=disable_ui =spawn_object(bar_arena_stalker_5_1:bar_arena_wait_walk_2) =spawn_object(bar_arena_stalker_5_2:bar_arena_wait_walk_4)%
+on_info6 = {+bar_arena_fight_6 -bar_arena_fight_6_done} sr_idle@wait_6 %=disable_ui =spawn_object(bar_arena_stalker_6_1:bar_arena_wait_walk_4) =spawn_object(bar_arena_stalker_6_2:bar_arena_wait_walk_2) =spawn_object(bar_arena_stalker_6_3:bar_arena_wait_walk_1) =spawn_object(bar_arena_stalker_6_4:bar_arena_wait_walk_5) =spawn_object(bar_arena_stalker_6_5:bar_arena_wait_walk_3) =spawn_object(bar_arena_stalker_6_6:bar_arena_wait_walk_6)%
+on_info7 = {+bar_arena_fight_7 -bar_arena_fight_7_done} sr_idle@wait_7 %=disable_ui =spawn_object(bar_arena_stalker_7:bar_arena_wait_walk_6)%
+on_info8 = {+bar_arena_fight_8 -bar_arena_fight_8_done} sr_idle@wait_8 %=disable_ui =spawn_object(bar_arena_stalker_8_1:bar_arena_wait_walk_5) =spawn_object(bar_arena_stalker_8_2:bar_arena_wait_walk_2) =spawn_object(bar_arena_stalker_8_3:bar_arena_wait_walk_4) =spawn_object(bar_arena_stalker_8_4:bar_arena_wait_walk_1)% 
+
+[sr_idle@wait_1]
+on_timer = 1000 | sr_cutscene@fight_1 %=bar_arena_teleport% 
+
+[sr_idle@wait_2]
+on_timer = 1000 | sr_cutscene@fight_2 %=bar_arena_teleport% 
+
+[sr_idle@wait_3]
+on_timer = 1000 | sr_cutscene@fight_3 %=bar_arena_teleport% 
+
+[sr_idle@wait_4]
+on_timer = 1000 | sr_cutscene@fight_4 %=bar_arena_teleport% 
+
+[sr_idle@wait_5]
+on_timer = 1000 | sr_cutscene@fight_5 %=bar_arena_teleport% 
+
+[sr_idle@wait_6]
+on_timer = 1000 | sr_cutscene@fight_6 %=bar_arena_teleport% 
+
+[sr_idle@wait_7]
+on_timer = 1000 | sr_cutscene@fight_7 %=bar_arena_teleport% 
+
+[sr_idle@wait_8]
+on_timer = 1000 | sr_cutscene@fight_8 %=bar_arena_teleport% 
+
+[sr_cutscene@fight_1]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(2)%
+
+[sr_cutscene@fight_2]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(3)%
+
+[sr_cutscene@fight_3]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(3)%
+
+[sr_cutscene@fight_4]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(3)%
+
+[sr_cutscene@fight_5]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(3)%
+
+[sr_cutscene@fight_6]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(3)%
+
+[sr_cutscene@fight_7]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(3)%
+
+[sr_cutscene@fight_8]
+point = t_way
+look = t_look
+global_cameffect = true
+outdoor = true
+cam_effector = arena
+on_signal = cameff_end | sr_idle@fight %=enable_ui +bar_arena_fight_begin =bar_arena_weapon_slot(3)%
+
+[sr_idle@fight]
+on_info = sr_idle@wait_finish
+
+[sr_idle@wait_finish]
+on_info = {+bar_arena_fight_1 +bar_arena_fight_1_done} sr_idle@pause %+bar_arena_fight_1_reward%,{+bar_arena_fight_2 +bar_arena_fight_2_done} sr_idle@pause %+bar_arena_fight_2_reward%,{+bar_arena_fight_3 =bar_arena_fight_3_end} sr_idle@pause %+bar_arena_fight_3_done +bar_arena_fight_3_reward%,{+bar_arena_fight_4 =bar_arena_fight_4_end} sr_idle@pause %+bar_arena_fight_4_done +bar_arena_fight_4_reward%
+on_info2 = {+bar_arena_fight_5 =bar_arena_fight_5_end} sr_idle@pause %+bar_arena_fight_5_done +bar_arena_fight_5_reward%, {+bar_arena_fight_6 =bar_arena_fight_6_end} sr_idle@pause %+bar_arena_fight_6_done +bar_arena_fight_6_reward%, {+bar_arena_fight_7 +bar_arena_fight_7_done} sr_idle@pause %+bar_arena_fight_7_reward%,{+bar_arena_fight_8 =bar_arena_fight_8_end} nil %+bar_arena_fight_8_done +bar_arena_fight_8_reward%
+
+[sr_idle@pause]
+on_info = sr_idle@wait_pause %+bar_arena_pause%
+
+[sr_idle@wait_pause]
+on_game_timer = 1 | sr_idle@idle %-bar_arena_pause%

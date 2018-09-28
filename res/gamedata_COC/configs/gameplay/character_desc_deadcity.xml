@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-------------------------- MERC TRADER ------------------------>
+    <specific_character id="cit_killers_merc_trader_stalker" team_default="1">
+    <name>cit_killers_merc_trader_stalker_name</name>
+    <icon>ui_inGame2_merc_trade</icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>cit_killers_merc_trader_stalker</class>
+    <community>killer</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>15322</rank>
+    <reputation>-818</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <visual>actors\stalker_merc\stalker_ki_head_2</visual>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        wpn_hpsa \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- MERC MECHANIC ------------------------>
+    <specific_character id="cit_killers_merc_mechanic_stalker" team_default="1">
+    <name>cit_killers_merc_mechanic_stalker_name</name>
+    <icon>ui_inGame2_merc_tech</icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>cit_killers_merc_mechanic_stalker</class>
+    <community>killer</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <mechanic_mode>1</mechanic_mode>
+    <rank>14098</rank>
+    <reputation>149</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2_face_2</visual>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 = 1 \n
+        ammo_9x19_pbp = 1 \n
+        wpn_hpsa \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+</xml>

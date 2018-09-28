@@ -1,0 +1,20 @@
+
+function get_ui_clsid(game_type_option)
+
+	if(game_type_option == "single") then 
+		return "UI_SINGL" end
+
+	if(game_type_option == "deathmatch") then 
+		return "UI_DM" end
+
+	if(game_type_option == "teamdeathmatch") then 
+		return "UI_TDM" end
+
+	if(game_type_option == "artefacthunt") then 
+		return "UI_AHUNT" end
+
+	if(game_type_option == "capturetheartefact") then
+		return "UI_CTA" end
+
+
+end

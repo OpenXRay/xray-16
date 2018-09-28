@@ -1,0 +1,11 @@
+[logic]
+active = nil;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+jup_a12_mercs_go_to_positions} sr_light@off
+
+[sr_light@off]
+light_on = false
+on_info = {+pri_a12_stalker_prisoner_free} sr_idle@nil
+
+[sr_idle@nil]

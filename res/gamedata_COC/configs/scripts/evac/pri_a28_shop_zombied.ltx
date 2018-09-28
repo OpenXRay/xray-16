@@ -1,0 +1,224 @@
+[logic@pri_a28_zombied_1_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_1_shop_walk
+
+[logic@pri_a28_zombied_2_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_2_shop_walk
+
+[logic@pri_a28_zombied_3_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_3_shop_walk
+
+[logic@pri_a28_zombied_4_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_4_shop_walk
+
+[logic@pri_a28_zombied_5_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_5_shop_walk
+
+
+
+[walker@pri_a28_zombied_1_shop_walk]
+path_walk = zombied_1_walk
+on_info = walker@pri_a28_zombied_1_shop_wait %=teleport_npc(pri_a28_shop_zombied_1_walk)%
+
+[walker@pri_a28_zombied_2_shop_walk]
+path_walk = zombied_2_walk
+on_info = walker@pri_a28_zombied_2_shop_wait %=teleport_npc(pri_a28_shop_zombied_2_walk)%
+
+[walker@pri_a28_zombied_3_shop_walk]
+path_walk = zombied_3_walk
+on_info = walker@pri_a28_zombied_3_shop_wait %=teleport_npc(pri_a28_shop_zombied_3_walk)%
+
+[walker@pri_a28_zombied_4_shop_walk]
+path_walk = zombied_4_walk
+on_info = walker@pri_a28_zombied_4_shop_wait %=teleport_npc(pri_a28_shop_zombied_4_walk)%
+
+[walker@pri_a28_zombied_5_shop_walk]
+path_walk = zombied_5_walk
+on_info = walker@pri_a28_zombied_5_shop_wait %=teleport_npc(pri_a28_shop_zombied_5_walk)%
+
+
+
+[walker@pri_a28_zombied_1_shop_wait]
+path_walk = zombied_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_army_zombied_in_building} walker@pri_a28_zombied_1_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_1_shop_attack
+
+[walker@pri_a28_zombied_2_shop_wait]
+path_walk = zombied_2_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_army_zombied_in_building} walker@pri_a28_zombied_1_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_1_shop_attack
+
+[walker@pri_a28_zombied_3_shop_wait]
+path_walk = zombied_3_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_army_zombied_in_building} walker@pri_a28_zombied_2_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_2_shop_attack
+
+[walker@pri_a28_zombied_4_shop_wait]
+path_walk = zombied_4_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_army_zombied_in_building} walker@pri_a28_zombied_2_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_2_shop_attack
+
+[walker@pri_a28_zombied_5_shop_wait]
+path_walk = zombied_5_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_army_zombied_in_building} walker@pri_a28_zombied_3_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_3_shop_attack
+
+
+
+[walker@pri_a28_zombied_1_shop_attack]
+path_walk = zombied_1_attack
+on_signal = path_end | %+pri_a28_shop_zombied_done%
+
+[walker@pri_a28_zombied_2_shop_attack]
+path_walk = zombied_2_attack
+on_signal = path_end | %+pri_a28_shop_zombied_done%
+
+[walker@pri_a28_zombied_3_shop_attack]
+path_walk = zombied_3_attack
+on_signal = path_end | %+pri_a28_shop_zombied_done%
+
+
+
+
+
+[logic@pri_a28_zombied_6_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied_2) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_6_shop_walk
+
+[logic@pri_a28_zombied_7_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied_2) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_7_shop_walk
+
+[logic@pri_a28_zombied_8_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied_2) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_8_shop_walk
+
+[logic@pri_a28_zombied_9_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied_2) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_9_shop_walk
+
+
+
+[walker@pri_a28_zombied_6_shop_walk]
+path_walk = zombied_6_walk
+on_info = walker@pri_a28_zombied_6_shop_wait %=teleport_npc(pri_a28_shop_zombied_6_walk)%
+
+[walker@pri_a28_zombied_7_shop_walk]
+path_walk = zombied_7_walk
+on_info = walker@pri_a28_zombied_7_shop_wait %=teleport_npc(pri_a28_shop_zombied_7_walk)%
+
+[walker@pri_a28_zombied_8_shop_walk]
+path_walk = zombied_8_walk
+on_info = walker@pri_a28_zombied_8_shop_wait %=teleport_npc(pri_a28_shop_zombied_8_walk)%
+
+[walker@pri_a28_zombied_9_shop_walk]
+path_walk = zombied_9_walk
+on_info = walker@pri_a28_zombied_9_shop_wait %=teleport_npc(pri_a28_shop_zombied_9_walk)%
+
+
+
+[walker@pri_a28_zombied_6_shop_wait]
+path_walk = zombied_6_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_shop_1_leave} walker@pri_a28_zombied_4_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_4_shop_attack
+
+[walker@pri_a28_zombied_7_shop_wait]
+path_walk = zombied_7_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_shop_1_leave} walker@pri_a28_zombied_5_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_5_shop_attack
+
+[walker@pri_a28_zombied_8_shop_wait]
+path_walk = zombied_8_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_shop_1_leave} walker@pri_a28_zombied_4_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_4_shop_attack
+
+[walker@pri_a28_zombied_9_shop_wait]
+path_walk = zombied_9_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_shop_1_leave} walker@pri_a28_zombied_5_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_5_shop_attack
+
+
+
+[walker@pri_a28_zombied_4_shop_attack]
+path_walk = zombied_4_attack
+on_signal = path_end | %+pri_a28_shop_zombied_done%
+
+[walker@pri_a28_zombied_5_shop_attack]
+path_walk = zombied_5_attack
+on_signal = path_end | %+pri_a28_shop_zombied_done%
+
+
+
+
+
+
+[logic@pri_a28_zombied_10_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied_3) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_10_shop_walk
+
+[logic@pri_a28_zombied_11_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied_3) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_11_shop_walk
+
+[logic@pri_a28_zombied_12_shop]
+suitable = {=target_squad_name(pri_a28_shop_zombied_3) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_12_shop_walk
+
+
+
+[walker@pri_a28_zombied_10_shop_walk]
+path_walk = zombied_10_walk
+on_info = walker@pri_a28_zombied_10_shop_wait %=teleport_npc(pri_a28_shop_zombied_10_walk)%
+
+[walker@pri_a28_zombied_11_shop_walk]
+path_walk = zombied_11_walk
+on_info = walker@pri_a28_zombied_11_shop_wait %=teleport_npc(pri_a28_shop_zombied_11_walk)%
+
+[walker@pri_a28_zombied_12_shop_walk]
+path_walk = zombied_12_walk
+on_info = walker@pri_a28_zombied_12_shop_wait %=teleport_npc(pri_a28_shop_zombied_12_walk)%
+
+
+
+[walker@pri_a28_zombied_10_shop_wait]
+path_walk = zombied_10_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_shop_1_leave} walker@pri_a28_zombied_1_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_1_shop_attack
+
+[walker@pri_a28_zombied_11_shop_wait]
+path_walk = zombied_11_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_shop_1_leave} walker@pri_a28_zombied_2_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_2_shop_attack
+
+[walker@pri_a28_zombied_12_shop_wait]
+path_walk = zombied_12_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_shop_1_leave} walker@pri_a28_zombied_3_shop_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_3_shop_attack

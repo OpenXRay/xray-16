@@ -1,0 +1,31 @@
+[logic]
+active = sr_idle@random
+
+;[sr_idle@turn_off]
+;on_info = sr_idle@random %=turn_off(jup_b43_heart_lamp)%
+
+[sr_idle@random]
+on_info = {~20} %+jup_b16_sr_1_1%, {~40} %+jup_b16_sr_1_2%, {~60} %+jup_b16_sr_1_3%, {~80} %+jup_b16_sr_1_4%, %+jup_b16_sr_1_5%
+on_info2 = {~20} %+jup_b16_sr_2_1%, {~40} %+jup_b16_sr_2_2%, {~60} %+jup_b16_sr_2_3%, {~80} %+jup_b16_sr_2_4%, %+jup_b16_sr_2_5%
+on_info3 = {~20} %+jup_b16_sr_3_1%, {~40} %+jup_b16_sr_3_2%, {~60} %+jup_b16_sr_3_3%, {~80} %+jup_b16_sr_3_4%, %+jup_b16_sr_3_5%
+on_info4 = {~20} %+jup_b16_sr_4_1%, {~40} %+jup_b16_sr_4_2%, {~60} %+jup_b16_sr_4_3%, {~80} %+jup_b16_sr_4_4%, %+jup_b16_sr_4_5%
+on_info6 = {+jup_b41_heart_spawn} sr_idle@nil %+jup_b16_randomize% 
+on_info5 =  sr_idle@wait_for_reset %+jup_b16_randomize% 
+
+[sr_idle@wait_for_reset]
+on_info = {-jup_b16_oasis_artifact_spawn} %=spawn_object(af_oasis_heart:jup_b16_oasis_artifact_spawn) +jup_b16_oasis_artifact_spawn%
+on_info2 = {+jup_b16_oasis_start -jup_b16_oasis_give_task}  %+jup_b16_oasis_give_task%
+on_info3 = {=surge_started} sr_idle@surge
+on_info4  = {-jup_b16_randomize} sr_idle@random %-jup_b16_sr_1_1 -jup_b16_sr_1_2 -jup_b16_sr_1_3 -jup_b16_sr_1_4 -jup_b16_sr_1_5 -jup_b16_sr_2_1 -jup_b16_sr_2_2 -jup_b16_sr_2_3 -jup_b16_sr_2_4 -jup_b16_sr_2_5 -jup_b16_sr_3_1 -jup_b16_sr_3_2 -jup_b16_sr_3_3 -jup_b16_sr_3_4 -jup_b16_sr_3_5 -jup_b16_sr_4_1 -jup_b16_sr_4_2 -jup_b16_sr_4_3 -jup_b16_sr_4_4 -jup_b16_sr_4_5%
+on_info6 = {+jup_b41_heart_spawn} sr_idle@nil
+
+[sr_idle@surge]
+on_info = {!surge_started} sr_idle@wait_for_reset %-jup_b16_randomize%
+on_info2 = {+jup_b16_oasis_start -jup_b16_oasis_give_task}  %+jup_b16_oasis_give_task%
+
+[sr_idle@surge_after_task]
+on_info = {!surge_started} sr_idle@nil %-jup_b16_randomize%
+
+[sr_idle@nil]
+on_info3 = {=surge_started} sr_idle@surge_after_task
+on_info4  = {-jup_b16_randomize} sr_idle@random %-jup_b16_sr_1_1 -jup_b16_sr_1_2 -jup_b16_sr_1_3 -jup_b16_sr_1_4 -jup_b16_sr_1_5 -jup_b16_sr_2_1 -jup_b16_sr_2_2 -jup_b16_sr_2_3 -jup_b16_sr_2_4 -jup_b16_sr_2_5 -jup_b16_sr_3_1 -jup_b16_sr_3_2 -jup_b16_sr_3_3 -jup_b16_sr_3_4 -jup_b16_sr_3_5 -jup_b16_sr_4_1 -jup_b16_sr_4_2 -jup_b16_sr_4_3 -jup_b16_sr_4_4 -jup_b16_sr_4_5%

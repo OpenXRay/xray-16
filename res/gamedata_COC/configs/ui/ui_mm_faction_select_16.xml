@@ -1,0 +1,246 @@
+<w>
+
+	<background width="1024" height="768">
+		<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+			<texture x="0" y="0" width="1920" height="1080">ui\ui_background_new</texture>
+		</auto_static>
+	</background>
+
+	<main_dialog>
+		<dialog x="282" y="200" width="600" height="462">
+			<auto_static x="0" y="0" width="460" height="411" stretch="1">
+				<texture>ui_inGame2_screen_4</texture>
+			</auto_static>
+		</dialog>
+
+		<cap_character_name x="33" y="40" width="32" height="29">
+			<text r="190" g="190" b="190" font="letterica18" align="l" vert_align="c">st_mm_faction_cap_character_name</text>
+		</cap_character_name>
+		<input_character_name x="67" y="40" width="175" height="29">
+			<text x="5" font="letterica18" vert_align="c" align="l"/>
+		</input_character_name>
+
+		<cap_faction_name x="340" y="40" width="40" height="29">
+			<text r="190" g="190" b="190" font="letterica18" align="l" vert_align="c">st_mm_faction_cap_faction</text>
+		</cap_faction_name>
+		<disp_faction_name x="380" y="40" width="50" height="29">
+			<text x="0" y="0" r="245" g="245" b="245" vert_align="c" align="l" font="letterica18" />
+		</disp_faction_name>	
+		
+		<list_factions x="30" y="117" width="135" height="18">
+            <list_font r="190" g="190" b="190" font="letterica18"/>
+            <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_factions>
+		
+		<cap_economy x="35" y="350" width="40" height="20">
+			<text r="245" g="245" b="245" font="letterica18" align="l" vert_align="c">ui_mm_set_economy</text>
+		</cap_economy>
+		<list_economy x="105" y="350" width="70" height="29">
+            <list_font r="245" g="245" b="245" font="letterica16"/>
+            <text_color>
+	            <e r="245" g="245" b="245"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_economy>
+		
+		<list_starts x="185" y="350" width="250" height="29">
+            <list_font r="170" g="170" b="170" font="letterica16"/>
+            <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_starts>
+		
+		<list_icon x="185" y="328" width="250" height="29">
+            <list_font r="170" g="170" b="170" font="letterica16"/>
+            <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_icon>
+		
+		<!-- patch icons -->
+		<faction_stalker x="30" y="85" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_stalker</texture>
+			</auto_static>
+		</faction_stalker>
+		<faction_bandit x="78" y="85" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_bandit</texture>
+			</auto_static>
+		</faction_bandit>
+		<faction_csky x="126" y="85" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_csky</texture>
+			</auto_static>
+		</faction_csky>
+		
+		<faction_dolg x="30" y="133" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_dolg</texture>
+			</auto_static>
+		</faction_dolg>
+		<faction_freedom x="78" y="133" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_freedom</texture>
+			</auto_static>
+		</faction_freedom>
+		<faction_killer x="126" y="133" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_killer</texture>
+			</auto_static>
+		</faction_killer>
+
+		<faction_army x="30" y="181" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_army</texture>
+			</auto_static>
+		</faction_army>
+		<faction_ecolog x="78" y="181" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_ecolog</texture>
+			</auto_static>
+		</faction_ecolog>
+		<faction_monolith x="126" y="181" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_monolith</texture>
+			</auto_static>
+		</faction_monolith>
+			
+		<!-- patches inactive -->
+		<faction_stalker_inactive x="30" y="85" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_stalker_inactive</texture>
+			</auto_static>
+		</faction_stalker_inactive>
+		<faction_bandit_inactive x="78" y="85" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_bandit_inactive</texture>
+			</auto_static>
+		</faction_bandit_inactive>
+		<faction_csky_inactive x="126" y="85" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_csky_inactive</texture>
+			</auto_static>
+		</faction_csky_inactive>
+		
+		<faction_dolg_inactive x="30" y="133" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_dolg_inactive</texture>
+			</auto_static>
+		</faction_dolg_inactive>
+		<faction_freedom_inactive x="78" y="133" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_freedom_inactive</texture>
+			</auto_static>
+		</faction_freedom_inactive>
+		<faction_killer_inactive x="126" y="133" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_killer_inactive</texture>
+			</auto_static>
+		</faction_killer_inactive>
+
+		<faction_army_inactive x="30" y="181" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_army_inactive</texture>
+			</auto_static>
+		</faction_army_inactive>
+		<faction_ecolog_inactive x="78" y="181" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_ecolog_inactive</texture>
+			</auto_static>
+		</faction_ecolog_inactive>
+		<faction_monolith_inactive x="126" y="181" width="48" height="48">
+			<auto_static x="0" y="0" width="48" height="48" stretch="1">
+				<texture>ui_mm_faction_monolith_inactive</texture>
+			</auto_static>
+		</faction_monolith_inactive>
+		
+		<!-- description window -->
+		<description>
+			<background>
+				<auto_static x="185" y="84" width="250" height="242" stretch="1">
+					<texture a="200">ui_inGame2_pda_favorite_weapon_background</texture>
+				</auto_static>
+			</background>
+			
+			<char_icon x="51" y="8" width="123" height="87">
+			</char_icon>
+			
+			<templ_item width="220" height="108"/>
+			
+			<list_frame x="185" y="84" width="250" height="242" stretch="1">
+				<texture>ui_inGame2_servers_list_frame</texture>
+			</list_frame>
+			
+			<desc_win width="220" height="720">
+				<text complex_mode="1" x="10" y="10" r="200" g="200" b="200" align="l" font="letterica16" />
+			</desc_win>
+		<!--- actual text and scroll bar -->
+			<scroll_v x="185" y="84" width="250" height="237" right_ident="0" left_ident="0" top_indent="0" bottom_indent="0" vert_interval="0" always_show_scroll="0"/>
+		</description>
+	
+		<btn_back x="101" y="382" width="86" height="24" stretch="1">
+			<text font="letterica18" align="c">st_mm_faction_back</text>
+			<texture>ui_inGame2_button</texture>
+		</btn_back>
+		
+		<btn_rand x="189" y="382" width="86" height="24" stretch="1">
+			<text font="letterica18" align="c">st_mm_faction_rand</text>
+			<texture>ui_inGame2_button</texture>
+		</btn_rand>
+
+		<btn_submit x="277" y="382" width="86" height="24" stretch="1">
+			<text align="c" font="letterica18">st_mm_faction_submit</text>
+			<texture>ui_inGame2_button</texture>
+		</btn_submit>
+		
+		<cap_check_story x="55" y="237" width="40" height="20" stretch="1">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_story</text>
+        </cap_check_story>		
+        <check_story x="30" y="233" width="28" height="25" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+        </check_story>
+		
+        <cap_check_hardcore x="55" y="259" width="40" height="20" stretch="1">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_hardcore</text>
+        </cap_check_hardcore>		
+        <check_hardcore x="30" y="255" width="28" height="25" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+        </check_hardcore>
+		
+		<cap_check_survival x="55" y="281" width="40" height="20" stretch="1">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_survival</text>
+        </cap_check_survival>		
+        <check_survival x="30" y="277" width="28" height="25" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+        </check_survival>
+		
+		<cap_check_azazel_mode x="55" y="303" width="40" height="20" stretch="1">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_azazel_mode</text>
+        </cap_check_azazel_mode>		
+        <check_azazel_mode x="30" y="299" width="28" height="25" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+        </check_azazel_mode>
+		
+		<cap_check_campfire x="55" y="325" width="40" height="20" stretch="1">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_campfire</text>
+        </cap_check_campfire>		
+        <check_campfire x="30" y="321" width="28" height="25" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+        </check_campfire>
+	</main_dialog>
+	
+	<hint_wnd x="0" y="0" width="215" height="100">
+	    <background x="0" y="0" width="215" height="100">
+		    <texture>ui_icons_PDA_tooltips</texture>
+	    </background>
+	    <text x="20" y="20" width="190" height="100">
+	    	<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t"/>
+	    </text>
+	</hint_wnd>
+</w>

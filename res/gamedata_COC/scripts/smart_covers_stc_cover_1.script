@@ -1,0 +1,292 @@
+local temp = {}
+if (move ~= nil) then
+  temp = move
+end
+move  = temp
+
+function get_smart_cover_stc_1()
+  return {
+      loopholes = {
+        smart_covers_loophole_1.get_loophole_1("first",	vector():set(-1,0,0),	vector():set(0,0,0), 											vector():set(-1,0,0)			),
+        smart_covers_loophole_2.get_loophole_2("second",	vector():set(1,0,0.02),  vector():set(-25.17,0,2.99),  					vector():set(-1,0,0)	),
+        smart_covers_loophole_1.get_loophole_1("third",  	vector():set(1,0,0.06),vector():set(-64.63,0.01,10.12),  	  		vector():set(-1,0,0)	),
+		smart_covers_loophole_2.get_loophole_2("fourth",  vector():set(-0.99,0,0.13),	vector():set(-62.75,0,9.8),  		  	vector():set(1,0,0)	),
+		smart_covers_loophole_1.get_loophole_1("fifth",  	vector():set(0.5,0,-0.87),	vector():set(-101.78,0,32.25),    	vector():set(-0.5,0,0.87)	)
+      },
+
+  
+      transitions = {
+      --' Анимации входа в бойницы
+      {
+        vertex0 = "",
+        vertex1 = "first",
+        weight = 1.0,
+                actions = {
+              {
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions = {
+                      {
+                        animation = "stn_coverture_1",
+                        position = vector():set(11.09,11.44,-1.13),
+                        body_state = move.crouch, movement_type = move.run,
+                      },
+                      },
+                            }
+              }
+      },
+      {
+        vertex0 = "",
+        vertex1 = "second",
+        weight = 1.0,
+                actions = {
+              {
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions = {
+                      {
+                        animation = "loophole_1_in_front_0",
+                        position = vector():set(-25.48,0.1,2.68),
+                        body_state = move.crouch, movement_type = move.run,
+                      },
+                      },
+                            }
+              }
+      },	  
+	 {
+				   vertex0 = "",
+				   vertex1 = "third",
+				   weight = 1.0,
+						   actions = {
+						 {
+										   precondition_functor = "smart_covers.script_functor_true",
+										   precondition_params = "",
+										   actions = {
+								 {
+								   animation = "loophole_1_in_front_0",
+								   position = VEC_ZERO,
+								   body_state = move.crouch, movement_type = move.run,
+								 },
+								 },
+									   }
+						 }
+				 },	
+				 {
+						vertex0 = "",
+						vertex1 = "fourth",
+						weight = 1.0,
+								actions = {
+							  {
+												precondition_functor = "smart_covers.script_functor_true",
+												precondition_params = "",
+												actions = {
+									  {
+										animation = "loophole_1_in_front_0",
+										position = VEC_ZERO,
+										body_state = move.crouch, movement_type = move.run,
+									  },
+									  },
+											}
+							  }
+					  },
+					  {
+							 vertex0 = "",
+							 vertex1 = "fifth",
+							 weight = 1.0,
+									 actions = {
+								   {
+													 precondition_functor = "smart_covers.script_functor_true",
+													 precondition_params = "",
+													 actions = {
+										   {
+											 animation = "loophole_1_in_front_0",
+											 position = VEC_ZERO,
+											 body_state = move.crouch, movement_type = move.run,
+										   },
+										   },
+												 }
+								   }
+						   },     
+       
+	   
+	   {
+        vertex0 = "first",
+        vertex1 = "second",
+        weight = 1.0,
+                actions = {
+              {
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions = {
+                      {
+                        animation = "stn_coverture_2",
+                        position = vector():set(-25.17,0,2.99),
+                        body_state = move.standing, movement_type = move.run,
+                      },
+                      },
+                            }
+              }
+      },
+       {
+        vertex0 = "second",
+        vertex1 = "first",
+        weight = 1.0,
+                actions = {
+              {
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions = {
+                      {
+                        animation = "",
+                        position = VEC_ZERO,
+                        body_state = move.standing, movement_type = move.run,
+                      },
+                      },
+                            }
+              }
+      },
+	  {
+					vertex0 = "second",
+					vertex1 = "third",
+					weight = 1.0,
+							actions = {
+						  {
+											precondition_functor = "smart_covers.script_functor_true",
+											precondition_params = "",
+											actions = {
+								  {
+									animation = "stn_coverture_3",
+									position = vector():set(-64.63,0.01,10.12),
+									body_state = move.standing, movement_type = move.run,
+								  },
+								  },
+										}
+						  }
+				  },	  	 
+				  {
+					vertex0 = "third",
+					vertex1 = "fourth",
+					weight = 1.0,
+							actions = {
+						  {
+											precondition_functor = "smart_covers.script_functor_true",
+											precondition_params = "",
+											actions = {
+								  {
+									animation = "stn_coverture_3_run",
+									position = vector():set(-62.75,0,9.8),
+									body_state = move.crouch, movement_type = move.run,
+								  },
+								  },
+										}
+						  }
+				  },	  	 				   	  
+				  {
+					vertex0 = "fourth",
+					vertex1 = "fifth",
+					weight = 1.0,
+							actions = {
+						  {
+											precondition_functor = "smart_covers.script_functor_true",
+											precondition_params = "",
+											actions = {
+								  {
+									animation = "stn_run",
+									position = vector():set(-101.78,0,32.25),
+									body_state = move.standing, movement_type = move.run,
+								  },
+								  },
+										}
+						  }
+				  },	  	  	
+
+ 				{
+					vertex0 = "third",
+					vertex1 = "first",
+					weight = 1.0,
+							actions = {
+						  {
+											precondition_functor = "smart_covers.script_functor_true",
+											precondition_params = "",
+											actions = {
+								  {
+									animation = "",
+									position = VEC_ZERO,
+									body_state = move.standing, movement_type = move.run,
+								  },
+								  },
+										}
+						  }
+				  },
+ {
+					vertex0 = "fourth",
+					vertex1 = "first",
+					weight = 1.0,
+							actions = {
+						  {
+											precondition_functor = "smart_covers.script_functor_true",
+											precondition_params = "",
+											actions = {
+								  {
+									animation = "",
+									position = VEC_ZERO,
+									body_state = move.standing, movement_type = move.run,
+								  },
+								  },
+										}
+						  }
+				  },
+ {
+					vertex0 = "fifth",
+					vertex1 = "first",
+					weight = 1.0,
+							actions = {
+						  {
+											precondition_functor = "smart_covers.script_functor_true",
+											precondition_params = "",
+											actions = {
+								  {
+									animation = "",
+									position = VEC_ZERO,
+									body_state = move.standing, movement_type = move.run,
+								  },
+								  },
+										}
+						  }
+				  },
+ 
+      --' Анимации выхода из бойниц.
+	   
+			--' Анимации выхода из бойниц.
+			{
+			  vertex0 = "fifth",
+			  vertex1 = "",
+			  weight = 1.1,
+			  actions = {
+	  --[[              {
+						animation = "loophole_1_jump_0",
+						position = vector():set(0,0,2),
+						precondition_functor = "smart_covers.exit_random",
+						precondition_params = "50"
+					},]]--
+					{
+					  precondition_functor = "smart_covers.script_functor_true",
+									  precondition_params = "",
+									  actions = {
+							{
+							  animation = "stn_coverture_4",
+							  position = VEC_ZERO, --     43.6,0,-106.65),
+							  body_state = move.standing, movement_type = move.run,
+							},
+							},
+					}
+			  }
+			}					     
+    }
+  }
+end
+
+
+function exit_random(p)
+  return math.random(100) <= tonumber(p)
+end

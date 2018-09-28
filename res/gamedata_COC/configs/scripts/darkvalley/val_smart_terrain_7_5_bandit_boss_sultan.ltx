@@ -1,0 +1,34 @@
+[logic@zat_b7_bandit_boss_sultan]
+active = animpoint@base
+suitable = {=check_npc_name(zat_b7_bandit_boss_sultan)} true
+prior = 200
+level_spot = quest_npc
+
+[animpoint@base]
+use_camp = false
+avail_animations = animpoint_sit_normal
+cover_name = val_smart_terrain_7_5_sc_sultan
+;reach_distance = 1.5
+meet = meet@base
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@base]
+close_snd_hello = zat_b7_bandit_boss_sultan_greeting
+close_snd_bye = zat_b7_bandit_boss_sultan_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+trade_enable = false
+allow_break = false
+close_snd_distance = 3
+meet_dialog	= {-zat_b7_bandit_boss_sultan_intro} zat_b7_bandit_boss_sultan_intro, {+zat_b30_barmen_got_af +zat_b30_actor_with_sultan -zat_b30_sultan_refuses_af -zat_b30_compass_to_sultan_reversed} zat_b7_bandit_boss_sultan_b30_refuse_af_dialog, {+zat_b30_barmen_got_af +zat_b30_sultan_got_af -zat_b30_sultan_refuses_af -zat_b30_compass_to_sultan_reversed} zat_b7_bandit_boss_sultan_b30_refuse_af_dialog, {+zat_b7_actor_help_bandits -zat_b5_actor_with_bandits} zat_b7_bandit_boss_sultan_b5_give_task_dialog
+meet_on_talking = false

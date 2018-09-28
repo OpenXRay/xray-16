@@ -1,0 +1,278 @@
+[logic@pas_b400_tushkano_canalisation_1]
+active = mob_home@tushkano_canalisation_home
+suitable = {=is_monster_tushkano =target_squad_name(pas_b400_canalisation_tushkano)} true
+prior = 200
+monster_job = true
+
+[logic@pas_b400_tushkano_canalisation_2]
+active = mob_home@tushkano_canalisation_home
+suitable = {=is_monster_tushkano =target_squad_name(pas_b400_canalisation_tushkano)} true
+prior = 200
+monster_job = true
+
+[logic@pas_b400_tushkano_canalisation_3]
+active = mob_home@tushkano_canalisation_home
+suitable = {=is_monster_tushkano =target_squad_name(pas_b400_canalisation_tushkano)} true
+prior = 200
+monster_job = true
+
+[mob_home@tushkano_canalisation_home]
+path_home = tushkano_spawn
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+home_min_radius = 2
+home_max_radius = 5
+aggressive = false
+npc_friendly = true
+braindead = true
+on_info = {+pas_b400_canalisation_tushkano_start} mob_home@tushkano_canalisation_1
+out_restr = pas_b400_sr_canalisation_tushkano_in
+
+[mob_home@tushkano_canalisation_1]
+path_home = tushkano_1_walk 
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+home_min_radius = 2
+home_max_radius = 5
+aggressive = false
+npc_friendly = true
+on_info = {=npc_in_zone(pas_b400_sr_canalisation_tushkano_revert)} mob_home@tushkano_canalisation_home_2
+on_game_timer = 75 | mob_home@tushkano_canalisation_home_2
+out_restr = pas_b400_sr_canalisation_tushkano_revert
+
+[mob_home@tushkano_canalisation_home_2]
+path_home = tushkano_home
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+home_min_radius = 2
+home_max_radius = 5
+aggressive = false
+npc_friendly = true
+on_game_timer = 15 | mob_home@tushkano_canalisation_home_3 %+pas_b400_canalisation_tushkano_attacked%
+
+[mob_home@tushkano_canalisation_home_3]
+path_home = tushkano_home
+aggressive = true
+
+
+
+[logic@pas_b400_snork_canalisation_2]
+active = mob_walker@snork_canalisation_2_walk
+suitable = {=is_monster_snork =target_squad_name(pas_b400_canalisation_snork_2)} true
+prior = 200
+monster_job = true
+
+[mob_walker@snork_canalisation_2_walk]
+path_walk = snork_2_walk 
+path_look = snork_2_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+npc_friendly = true
+out_restr = pas_b400_sr_canalisation_snork_2_in
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_2) !actor_in_zone(pas_b400_sr_canalisation_1)} mob_walker@snork_canalisation_3_walk %+pas_b400_canalisation_tushkano_attacked%
+on_info2 = {+pas_b400_canalisation_tushkano_attacked} mob_walker@snork_canalisation_3_walk
+
+[mob_walker@snork_canalisation_3_walk]
+path_walk = snork_3_walk 
+path_look = snork_3_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+npc_friendly = true
+out_restr = pas_b400_sr_canalisation_snork_2_in
+on_signal = path_end | mob_jump@snork_canalisation_2_jump
+
+[mob_jump@snork_canalisation_2_jump]
+path_jump = snork_3_look
+ph_jump_factor = 1.2
+offset = 0,0,0
+on_signal = jumped | mob_home@snork_canalisation_2_home
+
+[mob_home@snork_canalisation_2_home]
+path_home = snork_3_look
+home_min_radius = 10
+home_max_radius = 50
+aggressive = true
+
+
+[logic@pas_b400_snork_canalisation_2_r]
+active = mob_home@snork_canalisation_2rl_home
+suitable = {=target_squad_name(pas_b400_canalisation_snork_2_r)} true
+prior = 200
+monster_job = true
+
+[logic@pas_b400_snork_canalisation_2_l]
+active = mob_home@snork_canalisation_2rl_home
+suitable = {=target_squad_name(pas_b400_canalisation_snork_2_l)} true
+prior = 200
+monster_job = true
+
+[mob_home@snork_canalisation_2rl_home]
+path_home = snork_2_home
+home_min_radius = 10
+home_max_radius = 50
+aggressive = true
+
+
+
+[logic@pas_b400_canalisation_1_zombied_1]
+active = walker@canalisation_1_zombied_1
+suitable = {=target_squad_name(pas_b400_canalisation_1_zombied)} true
+prior = 200
+
+[walker@canalisation_1_zombied_1]
+path_walk = 1_zombied_1_walk
+on_info = {+pas_b400_way_door_opened} walker@canalisation_1_zombied_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_1_zombied_2]
+active = walker@canalisation_1_zombied_2
+suitable = {=target_squad_name(pas_b400_canalisation_1_zombied)} true
+prior = 200
+
+[walker@canalisation_1_zombied_2]
+path_walk = 1_zombied_2_walk
+on_info = {+pas_b400_way_door_opened} walker@canalisation_1_zombied_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[walker@canalisation_1_zombied_attack]
+path_walk = 1_zombied_attack
+
+
+
+[logic@pas_b400_canalisation_3_zombied_1]
+active = walker@canalisation_3_zombied_1
+suitable = {=target_squad_name(pas_b400_canalisation_3_zombied)} true
+prior = 200
+
+[walker@canalisation_3_zombied_1]
+path_walk = 3_zombied_1_1_walk
+on_info = {+pas_b400_canalisation_zombied_3_attacked} walker@canalisation_3_zombied_1_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_3_zombied_2]
+active = walker@canalisation_3_zombied_2
+suitable = {=target_squad_name(pas_b400_canalisation_3_zombied)} true
+prior = 200
+
+[walker@canalisation_3_zombied_2]
+path_walk = 3_zombied_2_1_walk
+on_info = {+pas_b400_canalisation_zombied_3_attacked} walker@canalisation_3_zombied_2_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_3_zombied_3]
+active = walker@canalisation_3_zombied_3
+suitable = {=target_squad_name(pas_b400_canalisation_3_zombied)} true
+prior = 200
+
+[walker@canalisation_3_zombied_3]
+path_walk = 3_zombied_3_1_walk
+on_info = {+pas_b400_canalisation_zombied_3_attacked} walker@canalisation_3_zombied_1_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_3_zombied_4]
+active = walker@canalisation_3_zombied_4
+suitable = {=target_squad_name(pas_b400_canalisation_3_zombied)} true
+prior = 200
+
+[walker@canalisation_3_zombied_4]
+path_walk = 3_zombied_4_1_walk
+on_info = {+pas_b400_canalisation_zombied_3_attacked} walker@canalisation_3_zombied_2_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_3_zombied_5]
+active = walker@canalisation_3_zombied_5
+suitable = {=target_squad_name(pas_b400_canalisation_3_zombied)} true
+prior = 200
+
+[walker@canalisation_3_zombied_5]
+path_walk = 3_zombied_5_1_walk
+on_info = {+pas_b400_canalisation_zombied_3_attacked} walker@canalisation_3_zombied_1_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_3_zombied_6]
+active = walker@canalisation_3_zombied_6
+suitable = {=target_squad_name(pas_b400_canalisation_3_zombied)} true
+prior = 200
+
+[walker@canalisation_3_zombied_6]
+path_walk = 3_zombied_6_1_walk
+on_info = {+pas_b400_canalisation_zombied_3_attacked} walker@canalisation_3_zombied_2_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[walker@canalisation_3_zombied_1_attack]
+path_walk = 3_zombied_1_attack
+
+[walker@canalisation_3_zombied_2_attack]
+path_walk = 3_zombied_2_attack
+
+
+
+[logic@pas_b400_canalisation_5_zombied_1]
+active = walker@canalisation_5_zombied_1
+suitable = {=target_squad_name(pas_b400_canalisation_5_zombied)} true
+prior = 200
+on_hit = hit@zombied
+
+[walker@canalisation_5_zombied_1]
+path_walk = 5_zombied_1_1_walk
+on_info = {+pas_b400_canalisation_zombied_5_attacked} walker@canalisation_5_zombied_1_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_5_zombied_2]
+active = walker@canalisation_5_zombied_2
+suitable = {=target_squad_name(pas_b400_canalisation_5_zombied)} true
+prior = 200
+on_hit = hit@zombied
+
+[walker@canalisation_5_zombied_2]
+path_walk = 5_zombied_2_1_walk
+on_info = {+pas_b400_canalisation_zombied_5_attacked} walker@canalisation_5_zombied_2_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_5_zombied_3]
+active = walker@canalisation_5_zombied_3
+suitable = {=target_squad_name(pas_b400_canalisation_5_zombied)} true
+prior = 200
+on_hit = hit@zombied
+
+[walker@canalisation_5_zombied_3]
+path_walk = 5_zombied_3_1_walk
+on_info = {+pas_b400_canalisation_zombied_5_attacked} walker@canalisation_5_zombied_1_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_5_zombied_4]
+active = walker@canalisation_5_zombied_4
+suitable = {=target_squad_name(pas_b400_canalisation_5_zombied)} true
+prior = 200
+on_hit = hit@zombied
+
+[walker@canalisation_5_zombied_4]
+path_walk = 5_zombied_4_1_walk
+on_info = {+pas_b400_canalisation_zombied_5_attacked} walker@canalisation_5_zombied_2_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_5_zombied_5]
+active = walker@canalisation_5_zombied_5
+suitable = {=target_squad_name(pas_b400_canalisation_5_zombied)} true
+prior = 200
+on_hit = hit@zombied
+
+[walker@canalisation_5_zombied_5]
+path_walk = 5_zombied_5_1_walk
+on_info = {+pas_b400_canalisation_zombied_5_attacked} walker@canalisation_5_zombied_1_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[logic@pas_b400_canalisation_5_zombied_6]
+active = walker@canalisation_5_zombied_6
+suitable = {=target_squad_name(pas_b400_canalisation_5_zombied)} true
+prior = 200
+on_hit = hit@zombied
+
+[walker@canalisation_5_zombied_6]
+path_walk = 5_zombied_6_1_walk
+on_info = {+pas_b400_canalisation_zombied_5_attacked} walker@canalisation_5_zombied_2_attack
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[walker@canalisation_5_zombied_1_attack]
+path_walk = 5_zombied_1_attack
+
+[walker@canalisation_5_zombied_2_attack]
+path_walk = 5_zombied_2_attack
+
+[hit@zombied]
+on_info = %+pas_b400_canalisation_zombied_5_attacked%

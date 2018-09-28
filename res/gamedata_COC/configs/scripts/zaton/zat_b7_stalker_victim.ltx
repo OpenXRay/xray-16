@@ -1,0 +1,227 @@
+[logic@zat_b7_stalker_victim_sleeper_1]
+active = sleeper@sleeper_1
+prior = 30
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) -zat_b7_stalkers_victims_prepare} true, {+zat_b7_task_end} true
+
+[sleeper@sleeper_1]
+path_main = stalker_victim_sleeper_1
+meet = no_meet
+
+
+[logic@zat_b7_stalker_victim_sleeper_2]
+active = sleeper@sleeper_2
+prior = 30
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) -zat_b7_stalkers_victims_prepare} true, {+zat_b7_task_end} true
+
+[sleeper@sleeper_2]
+path_main = stalker_victim_sleeper_2
+meet = no_meet
+
+
+[logic@zat_b7_guard_walker]
+active = walker@zat_b7_guard_walker
+prior = 35
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) -zat_b7_stalkers_victims_prepare} true, {+zat_b7_task_end} true
+
+[walker@zat_b7_guard_walker]
+path_walk = guard_walker_walk
+path_look = guard_walker_look
+def_state_moving = walk
+meet = no_meet
+
+
+[logic@zat_b7_stalker_victim_1]
+active = walker@start_1
+prior = 200
+suitable = {=is_alive(zat_b7_stalker_victim_1) =check_npc_name(zat_b7_stalker_victim_1)} true, {!is_alive(zat_b7_stalker_victim_1) =target_squad_name(zat_b7_stalkers_victims_1) =is_squad_commander} true
+
+[walker@start_1]
+path_walk = stalker_victim_leader_walk
+path_look = stalker_victim_leader_look
+def_state_standing = sit
+meet = meet@start_1
+on_info = {+zat_b7_stalkers_raiders_attack +zat_b7_stalkers_victims_know_about_raid} camper@prepared_for_attack_1 %+zat_b7_stalkers_victims_prepare%
+on_info2 = {+zat_b7_actor_teleport +zat_b7_stalkers_victims_know_about_raid} camper@prepared_for_attack_1 %+zat_b7_stalkers_victims_prepare%
+
+[meet@start_1]
+meet_dialog = {+zat_b7_raider_plan} zat_b7_stalkers_victims_dialog
+close_snd_hello = {+zat_b7_actor_help_stalkers +zat_b7_actor_really_helped_stalkers -zat_b7_sound_play} zat_b7_stalker_after_ok %+zat_b7_sound_play%, {+zat_b7_actor_help_stalkers -zat_b7_actor_really_helped_stalkers -zat_b7_sound_play} zat_b7_stalker_after_bad %+zat_b7_sound_play%, {=actor_has_weapon} meet_hide_weapon, meet_hello
+close_snd_bye = nil
+close_distance = 5
+close_anim = nil
+close_victim = nil
+far_distance = 10
+trade_enable = false
+close_victim = actor
+use = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {+zat_b7_actor_robbed} false, true 
+snd_on_use = nil
+
+[camper@prepared_for_attack_1]
+path_walk = stalker_victim_1_prepared_for_attack_walk
+path_look = stalker_victim_1_prepared_for_attack_look
+no_retreat = true
+meet = meet@start_1
+def_state_campering = hide 
+def_state_moving = sprint
+def_state_moving_fire = sneak_fire
+radius = 0
+on_info = {+zat_b7_actor_help_stalkers} walker@end_1
+on_info2 = {=is_squad_enemy_to_actor(zat_b7_stalkers_raiders) -zat_b7_attack_started} camper@attack_1_leader %+zat_b7_attack_started =play_sound(zat_b7_stalkers_attack) =set_squads_enemies(zat_b7_stalkers_raiders:zat_b7_stalkers_victims_1)%
+on_info3 = {-zat_b7_attack_started =squad_in_zone(zat_b7_stalkers_raiders:zat_b7_sr_stalkers_victims_attack)} camper@attack_1_leader %+zat_b7_attack_started =play_sound(zat_b7_stalkers_attack) =set_squads_enemies(zat_b7_stalkers_raiders:zat_b7_stalkers_victims_1)%
+
+[camper@attack_1_leader]
+path_walk = stalker_victim_1_attack_walk
+path_look = stalker_victim_1_attack_look
+no_retreat = true
+on_info = {+zat_b7_actor_help_stalkers} walker@end_1
+on_info2 = {!squad_exist(zat_b7_stalkers_raiders)} walker@end_1
+meet = no_meet
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 0
+
+[walker@end_1]
+path_walk = stalker_victim_leader_walk
+path_look = stalker_victim_leader_look
+def_state_standing = sit
+meet = meet@start_1
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+
+
+[logic@zat_b7_stalker_victim_2]
+active = camper@prepared_for_attack_2
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) +zat_b7_stalkers_victims_prepare -zat_b7_actor_help_stalkers} true
+
+[camper@prepared_for_attack_2]
+path_walk = stalker_victim_2_prepared_for_attack_walk
+path_look = stalker_victim_2_prepared_for_attack_look
+no_retreat = true
+on_info = {+zat_b7_attack_started} camper@attack_2
+def_state_campering = hide 
+def_state_moving = sprint
+def_state_moving_fire = sneak_fire
+radius = 10
+
+
+[logic@zat_b7_stalker_victim_3]
+active = camper@prepared_for_attack_3
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) +zat_b7_stalkers_victims_prepare -zat_b7_actor_help_stalkers} true
+
+[camper@prepared_for_attack_3]
+path_walk = stalker_victim_3_prepared_for_attack_walk
+path_look = stalker_victim_3_prepared_for_attack_look
+no_retreat = true
+on_info = {+zat_b7_attack_started} camper@attack_1
+def_state_campering = hide 
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+
+[camper@attack_1]
+path_walk = stalker_victim_1_attack_walk
+path_look = stalker_victim_1_attack_look
+no_retreat = true
+meet = no_meet
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+on_signal = path_end | walker@attack_1_1
+;danger = danger@no_danger
+
+[walker@attack_1_1]
+path_walk = stalker_victim_2_attack_walk
+path_look = stalker_victim_2_attack_look
+meet = no_meet
+def_state_standing = hide_na
+
+
+[logic@zat_b7_stalker_victim_4]
+active = camper@prepared_for_attack_4
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) +zat_b7_stalkers_victims_prepare -zat_b7_actor_help_stalkers} true
+
+[camper@prepared_for_attack_4]
+path_walk = stalker_victim_4_prepared_for_attack_walk
+path_look = stalker_victim_4_prepared_for_attack_look
+no_retreat = true
+on_info = {+zat_b7_attack_started} camper@attack_1
+def_state_campering = hide 
+def_state_moving = sprint
+def_state_moving_fire = sneak_fire
+radius = 10
+
+
+[logic@zat_b7_stalker_victim_5]
+active = camper@prepared_for_attack_5
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) +zat_b7_stalkers_victims_prepare -zat_b7_actor_help_stalkers} true
+
+[camper@prepared_for_attack_5]
+path_walk = stalker_victim_5_prepared_for_attack_walk
+path_look = stalker_victim_5_prepared_for_attack_look
+no_retreat = true
+on_info = {+zat_b7_attack_started} camper@attack_2
+def_state_campering = hide 
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+
+[camper@attack_2]
+path_walk = stalker_victim_2_attack_walk
+path_look = stalker_victim_2_attack_look
+no_retreat = true
+meet = no_meet
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+on_signal = path_end | walker@attack_2_1
+;danger = danger@no_danger
+
+[walker@attack_2_1]
+path_walk = stalker_victim_1_attack_walk
+path_look = stalker_victim_1_attack_look
+meet = no_meet
+def_state_standing = hide_na
+
+
+[logic@zat_b7_stalker_victim_6]
+active = camper@prepared_for_attack_6
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) +zat_b7_stalkers_victims_prepare -zat_b7_actor_help_stalkers} true
+
+[camper@prepared_for_attack_6]
+path_walk = stalker_victim_6_prepared_for_attack_walk
+path_look = stalker_victim_6_prepared_for_attack_look
+no_retreat = true
+on_info = {+zat_b7_attack_started} camper@attack_1
+def_state_campering = hide 
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+
+
+[logic@zat_b7_stalker_victim_7]
+active = camper@prepared_for_attack_7
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_victims_1) +zat_b7_stalkers_victims_prepare -zat_b7_actor_help_stalkers} true
+
+[camper@prepared_for_attack_7]
+path_walk = stalker_victim_7_prepared_for_attack_walk
+path_look = stalker_victim_7_prepared_for_attack_look
+no_retreat = true
+on_info = {+zat_b7_attack_started} camper@attack_2
+def_state_campering = hide 
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10

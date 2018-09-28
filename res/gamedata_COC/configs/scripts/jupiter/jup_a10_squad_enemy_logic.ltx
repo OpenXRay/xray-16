@@ -1,0 +1,9 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {=is_squad_enemy_to_actor(jup_a10_bandit_squad)} sr_idle@2 %=set_squad_enemy_to_actor(jup_a10_bandit_squad_2) =set_squad_enemy_to_actor(jup_a10_bandit_squad_3)%
+on_info2 = {=is_squad_enemy_to_actor(jup_a10_bandit_squad_2)} sr_idle@2 %=set_squad_enemy_to_actor(jup_a10_bandit_squad) =set_squad_enemy_to_actor(jup_a10_bandit_squad_3)%
+on_info3 = {=is_squad_enemy_to_actor(jup_a10_bandit_squad_3)} sr_idle@2 %=set_squad_enemy_to_actor(jup_a10_bandit_squad) =set_squad_enemy_to_actor(jup_a10_bandit_squad_2)%
+
+[sr_idle@2]

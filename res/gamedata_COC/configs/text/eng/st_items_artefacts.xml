@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_af_baloon_descr">
+		<text>A compound of several hollow organic formations, this artefact emits a gaseous substance that can neutralize radioactive particles inside the body without harming it. Because of its effectiveness, this artefact is in great demand.</text>
+	</string>
+	<string id="st_af_baloon_name">
+		<text>Bubble</text>
+	</string>
+	<string id="st_af_blood_descr">
+		<text>A reddish formation of compressed and fossilized plants, soil and animal debris. Can partially neutralize chemical poisons. Emits radiation.</text>
+	</string>
+	<string id="st_af_blood_name">
+		<text>Stone Blood</text>
+	</string>
+	<string id="st_af_cristall_descr">
+		<text>This artefact is formed in anomalous zones with intense thermal activity. Actively consumes excessive heat, remaining cool to the touch throughout. Emits radiation.</text>
+	</string>
+	<string id="st_af_cristall_flower_descr">
+		<text>This artefact is made up of a granite-like stone deformed by an extreme gravitational force, resulting in a crystallized formation that has not been explained by science to date. Can provide moderate protection against psi-emissions and is radioactive.</text>
+	</string>
+	<string id="st_af_cristall_flower_name">
+		<text>Stone Flower</text>
+	</string>
+	<string id="st_af_cristall_name">
+		<text>Crystal</text>
+	</string>
+	<string id="st_af_dummy_battery_descr">
+		<text>The composition of this artefact includes electrostatic elements, but scientists have yet to identify the exact physical conditions required for its formation. The artefact is popular in the Zone and valued by its residents and visitors for its energizing properties, although it can tire the body out through prolonged use. Emits radiation.</text>
+	</string>
+	<string id="st_af_dummy_battery_name">
+		<text>Battery</text>
+	</string>
+	<string id="st_af_dummy_dummy_descr">
+		<text>This artefact used to be considered trash, devoid of any useful properties. However, scientists recently discovered that if kept in constant contact with the body, it has an excellent stimulating effect on the nervous system. Emits radiation.</text>
+	</string>
+	<string id="st_af_dummy_dummy_name">
+		<text>Shell</text>
+	</string>
+	<string id="st_af_dummy_glassbeads_descr">
+		<text>Much about this artefact remains a complete mystery to scientists. At the same time, it is known for certain that emissions produced by pulses in its thicker sections force blood in open wounds to clot quicker, forming a protective scab. One of the most noticeable effects of this artefact is the increased speed of bleeding control. Emits radiation.</text>
+	</string>
+	<string id="st_af_dummy_glassbeads_name">
+		<text>Mama's Beads</text>
+	</string>
+	<string id="st_af_electra_flash_descr">
+		<text>This electrostatic artefact is a powerful absorbent of electricity, which it later discharges. Flash is capable of protecting its bearer from electric shocks of up to 5,000 volts. Emits radiation.</text>
+	</string>
+	<string id="st_af_electra_flash_name">
+		<text>Flash</text>
+	</string>
+	<string id="st_af_electra_moonlight_descr">
+		<text>This unique electrostatic artefact can resonate under the influence of psi-waves. Stalkers have learned to fine-tune the artefact so that it resonates in opposite phase to the main source of emissions, thus fully or significantly neutralizing their effects. Emits radiation.</text>
+	</string>
+	<string id="st_af_electra_moonlight_name">
+		<text>Moonlight</text>
+	</string>
+	<string id="st_af_electra_sparkler_descr">
+		<text>A bright representative of the electrostatic family of artefacts, this artefact can smooth fluctuations in electric field density. Emits radiation.</text>
+	</string>
+	<string id="st_af_electra_sparkler_name">
+		<text>Sparkler</text>
+	</string>
+	<string id="st_af_eye_descr">
+		<text>This artefact, which resembles the human eye, considerably increases the body's metabolism, helping wounds heal quicker. Experienced stalkers say that the Eye also brings luck. Emits radiation. </text>
+	</string>
+	<string id="st_af_eye_name">
+		<text>Eye</text>
+	</string>
+	<string id="st_af_fire_descr">
+		<text>This artefact forms in areas of high thermal activity. Produces powerful infra-red emissions, which intensify metabolic processes, healing wounds before its bearer's very eyes. As this artefact is very rare, it is extremely valuable. Emits radiation.</text>
+	</string>
+	<string id="st_af_fire_name">
+		<text>Flame</text>
+	</string>
+	<string id="st_af_fireball_descr">
+		<text>Even though Fireball is a thermal artefact, it can be handled without fear of being burned. This artefact is valued for its ability to maintain a temperature of 75 degrees Fahrenheit within a small radius, virtually regardless of its surroundings. Emits radiation.</text>
+	</string>
+	<string id="st_af_fireball_name">
+		<text>Fireball</text>
+	</string>
+	<string id="st_af_fuzz_kolobok_descr">
+		<text>A relatively rare artefact which forms in areas contaminated with chemicals, Kolobok is highly valued for its ability to heal wounds of any kind in mere minutes. For unknown reasons, scientists are spreading rumours among stalkers that the artefact interacts with the bearer's genetic code. Emits radiation.</text>
+	</string>
+	<string id="st_af_fuzz_kolobok_name">
+		<text>Kolobok</text>
+	</string>
+	<string id="st_af_glass_name">
+		<text>Firefly</text>
+	</string>
+	<string id="st_af_glass_descr">
+		<text>Firefly interacts with fields unknown to science, considerably speeding up regeneration of tissue and organs in living beings, as well as normalizing metabolic processes. This artefact can literally get a badly wounded stalker back on his feet in seconds. Unfortunately, Firefly is extremely rare. Emits radiation.</text>
+	</string>
+	<string id="st_af_gold_fish_descr">
+		<text>The result of an interaction between a large number of gravitational fields, Goldfish produces its own powerful internally directed gravitational field, which renders items within its range almost weightless. This artefact is most effective for reducing carried weight, which explains why it is always in great demand. Emits radiation.</text>
+	</string>
+	<string id="st_af_gold_fish_name">
+		<text>Goldfish</text>
+	</string>
+	<string id="st_af_gravi_descr">
+		<text>Gravi is formed from metallic substances exposed to prolonged gravitation. This makes it capable of sustaining an anti-gravitational field, and many stalkers use it to reduce the weight of their backpacks. Emits radiation.</text>
+	</string>
+	<string id="st_af_gravi_name">
+		<text>Gravi</text>
+	</string>
+	<string id="st_af_ice_descr">
+		<text>At first glance, this artefact resembles Kolobok. Some claim that it actually is Kolobok, its properties reinforced by exposure to a powerful electric field. Thanks to its unique properties, the artefact can significantly increase the bearer's muscle tone. Emits radiation.</text>
+	</string>
+	<string id="st_af_ice_name">
+		<text>Snowflake</text>
+	</string>
+	<string id="st_af_medusa_descr">
+		<text>This gravitational artefact attracts and absorbs radioactive particles, reducing the effects of radiation on the body. Very common in the Zone and is unofficially used outside the Zone for treating acute radiation sickness in exceptional circumstances.</text>
+	</string>
+	<string id="st_af_medusa_name">
+		<text>Jellyfish</text>
+	</string>
+	<string id="st_af_mincer_meat_descr">
+		<text>This organic artefact consists of deformed, mutated animal tissue. When placed in a chemically contaminated area, Meat Chunk transforms the airborne chemicals into a mucous fluid. Emits radiation.</text>
+	</string>
+	<string id="st_af_mincer_meat_name">
+		<text>Meat Chunk</text>
+	</string>
+	<string id="st_af_night_star_descr">
+		<text>This glowing artefact can generate a local directed low-gravity field. Widely used by stalkers along with Gravi, a similar artefact, to increase maximum load. Emits radiation.</text>
+	</string>
+	<string id="st_af_night_star_name">
+		<text>Night Star</text>
+	</string>
+	<string id="st_af_soul_descr">
+		<text>A unique organic artefact with properties just as unique. Somehow it increases the body's overall recovery rate from damage of any kind, without accelerating the accumulation of toxins. Thanks to its effects and attractive appearance, this artefact is a valuable collector's item. Emits radiation.</text>
+	</string>
+	<string id="st_af_soul_name">
+		<text>Soul</text>
+	</string>
+	<string id="st_af_vyvert_descr">
+		<text>This bizarrely-shaped artefact appears in places with increased gravitational activity. Acting as a kind of sponge that absorbs radioactive elements, this artefact provides protection from outside radiation as well as from radioactive particles that have already made their way into the body.</text>
+	</string>
+	<string id="st_af_vyvert_name">
+		<text>Wrenched</text>
+	</string>
+	<string id="st_compass">
+		<text>Compass</text>
+	</string>
+	<string id="st_compass_descr">
+		<text>A rare artefact - it's been several years since one was found. The artefact can locate gaps in anomaly fields. It is believed that it can help one traverse the most complex anomaly fields completely unharmed. However, very few know how to handle it properly.</text>
+	</string>
+	<string id="st_oasis_heart">
+		<text>Heart of the Oasis</text>
+	</string>
+	<string id="st_oasis_heart_descr">
+		<text>This artefact was once found at the center of the legendary Oasis. It appears that the Heart is a crystallized plant, which has acquired the healing properties of the Oasis. Unlike the Oasis itself, however, this artefact is extremely radioactive.</text>
+	</string>
+	<string id="af_drops">
+		<text>Droplets</text>
+	</string>
+	<string id="st_af-drops_descr">
+		<text>Formed in the Burner anomaly, at high temperatures. From the exterior, it looks like a tear-like shade compound with a glossy surface, covered in cracks.</text>
+	</string>
+	<string id="af_ameba_slime">
+		<text>Slime</text>
+	</string>
+	<string id="st_af_ameba_slime_descr">
+		<text>It is certain that this artefact is created by the anomaly called "Fruit punch". When carried on the belt the wounds bleed less, although the body of its owner becomes more vulnerable to various burns.</text>
+	</string>
+	<string id="af_ameba_slug">
+		<text>Slug</text>
+	</string>
+	<string id="st_af_ameba_slug_descr">
+		<text>Formed by the "Fruit punch" anomaly. The negative qualities of this artefact are compensated by the fact that it heightens the coagulation quality of blood. It's not often that one runs into such an artefact, and they pay well for it too.</text>
+	</string>
+	<string id="af_ameba_mica">
+		<text>Mica</text>
+	</string>
+	<string id="st_af_ameba_mica_descr">
+		<text>Anomaly "Fruit punch" is able to create such an artefact at the rarest, most extreme collection of physical conditions. The result is a semi-transparent, hard object. A rare and expensive artefact.</text>
+	</string>
+	<string id="af_dummy_spring">
+		<text>Spring</text>
+	</string>
+	<string id="st_af_dummy_spring_descr">
+		<text>According to the opinion of some researchers-theorists, this artefact is a hybrid between Batteries and Shell.</text>
+	</string>
+	<string id="af_dummy_pellicle">
+		<text>Pellicle</text>
+	</string>
+	<string id="st_af_dummy_pellicle_descr">
+		<text>This artefact is so rare that many researchers can't even imagine that such a substance can exist in a natural setting. Emits acidic chemical components.</text>
+	</string>
+	<string id="af_rusty_thorn">
+		<text>Thorn</text>
+	</string>
+	<string id="st_af_rusty_thorn_descr">
+		<text>The result of the interaction between the anomaly Burnt Fuzz and the body of a careless stalker. The Thorn artefact pokes the body of its owner, no matter what. But it also helps clean the body of radionuclide. Quite widespread and cheap.</text>
+	</string>
+	<string id="af_rusty_kristall">
+		<text>Crystal Thorn</text>
+	</string>
+	<string id="st_af_rusty_kristall_descr">
+		<text>Crystallizes in the anomaly Burnt Fuzz. Naturally takes out the radiation from the organism. That is, through the ears along with some amount of blood. Blood loss is possible also through over openings. Widespread and quite effective, which is the cause for the stable price in the artefact market.</text>
+	</string>
+		<string id="af_rusty_sea_urchin">
+		<text>Urchin</text>
+	</string>
+	<string id="st_af_rusty_sea_urchin_descr">
+		<text>The anomaly Burnt Fuzz very rarely gives rise to this artefact. Raise the blood pressure and so, the body gets rid of a large amount of red blood cells. But along with them the stored radiation leaves the body as well. In his fundamental work titled "Ionization and polarization of the components of rare artefacts", Sakharov noted that the content of this formation has a critical stability, and it's not realistic to create such an artefact in lab conditions in the next ten years.</text>
+	</string>
+</string_table>

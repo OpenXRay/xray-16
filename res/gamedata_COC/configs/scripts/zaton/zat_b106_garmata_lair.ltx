@@ -1,0 +1,292 @@
+[logic@zat_b106_garmata_lair]
+active = walker@start
+suitable = {=check_npc_name(zat_b106_stalker_garmata)} true
+prior = 200
+on_death = death
+post_combat_time = 0,0
+
+[walker@start]
+path_walk = garmata_lair_1_walk
+path_look = garmata_lair_1_look
+def_state_moving1 = patrol
+def_state_moving2 = patrol
+def_state_moving3 = patrol
+def_state_standing = guard_na
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_forwarding} walker@move_to_position
+;on_info2 = {-zat_b106_give_items_2} %=give_items(wpn_spas12:ammo_12x70_buck) +zat_b106_give_items_2%
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position]
+path_walk = garmata_lair_2_walk
+path_look = garmata_lair_2_look
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_signal = point2 | walker@move_to_position_2 
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position_2]
+path_walk = garmata_lair_3_walk
+path_look = garmata_lair_3_look
+def_state_moving1 = sneak
+def_state_standing = hide_na
+on_signal = point3 | walker@move_to_position_3
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position_3]
+path_walk = garmata_lair_4_walk
+path_look = garmata_lair_4_look
+def_state_moving1 = sneak
+def_state_standing = hide_na
+on_info = {+zat_b106_gonta_hunt_kill -zat_b106_gonta_dead} walker@move_to_position_4, {+zat_b106_gonta_dead} walker@move_to_position_4 
+on_info2 = {+zat_b106_ahtung} walker@fire
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position_4]
+path_walk = garmata_lair_5_walk
+path_look = garmata_lair_5_look
+def_state_moving1 = sneak
+def_state_standing = hide_na
+on_signal = point5 | walker@move_to_position_timer
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position_timer]
+path_walk = garmata_lair_5_walk
+path_look = garmata_lair_5_look
+def_state_moving1 = sneak
+def_state_standing = threat_na
+on_game_timer = 10 | walker@move_to_position_5
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position_5]
+path_walk = garmata_lair_6_walk
+path_look = garmata_lair_6_look
+def_state_moving1 = sneak
+def_state_standing = hide_na
+on_signal = point6 | walker@move_to_position_6
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position_6]
+path_walk = garmata_lair_7_walk
+path_look = garmata_lair_7_look
+def_state_moving1 = sneak
+def_state_standing = hide_na
+on_signal = point7 | walker@move_to_position_7
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@move_to_position_7]
+path_walk = garmata_lair_8_walk
+path_look = garmata_lair_8_look
+def_state_moving1 = sneak
+def_state_standing = threat_na
+on_signal = point8 | walker@timer_position
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@timer_position]
+path_walk = garmata_lair_8_walk
+path_look = garmata_lair_8_look
+def_state_moving1 = sneak
+def_state_standing = threat_na
+combat_ignore_cond = {=check_enemy_name(zat_b106_chimera) -zat_b106_ahtung} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+on_info = {+zat_b106_fire} remark@fire
+on_info2 = {+zat_b106_ahtung} walker@fire
+danger = danger
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@fire]
+anim = threat_fire
+target = path | zat_b106_smart_terrain_garmata_lair_8_look, 0
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+danger = danger
+on_game_timer = 40 | walker@fire
+on_info = {+zat_b106_ahtung} walker@fire
+out_restr = zat_b106_chimera_restr
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[walker@fire]
+path_walk = garmata_lair_8_walk
+path_look = garmata_lair_8_look
+def_state_standing = guard_na
+meet = no_meet
+wounded = wounded
+out_restr = zat_b106_chimera_restr
+on_info = {+zat_b106_chimera_dead +zat_b106_gonta_dead !actor_enemy} remark@finish
+on_info2 = {+zat_b106_chimera_dead -zat_b106_gonta_dead !actor_enemy} remark@wait_gonta
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[remark@finish]
+anim = guard_na
+target = story | actor
+on_info = {-zat_b108_actor_damaged_chimera} remark@kozel 
+on_info2 = {+zat_b108_actor_damaged_chimera -zat_b106_one_hit} %=play_sound(zat_b106_gonta_hunt_complete) +zat_b106_chimera_dead_reward%
+on_info3 = {+zat_b108_actor_damaged_chimera +zat_b106_one_hit} %=play_sound(zat_b106_gonta_hunt_great)%
+on_signal = sound_end | {-zat_b106_one_hit} remark@wait_actor, {+zat_b106_one_hit} remark@wait_actor
+meet = no_meet
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[remark@wait_actor]
+anim = guard_na
+target = story | actor
+on_info = {!dist_to_actor_le(140) -zat_b106_hunt_finish} %+zat_b106_hunt_finish%
+on_info2 = {+zat_b106_stalker_gonta_after_fight_done} walker@home %+zat_b106_go_to_home%
+meet = meet
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[remark@wait_gonta]
+anim = guard_na 
+target = story | actor
+on_info = {!dist_to_actor_le(140) -zat_b106_hunt_finish} %+zat_b106_hunt_finish%
+on_info2 = {+zat_b106_dont_receipt_reward} walker@home %+zat_b106_go_to_home%
+on_info3 = {+zat_b106_stalker_gonta_after_fight_done} walker@home %+zat_b106_go_to_home%
+meet = meet@shoot
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[remark@kozel]
+anim = guard_na
+target = story | actor
+on_info = %=play_sound(zat_b106_dont_receipt_reward)% 
+on_signal = sound_end | walker@home %+zat_b106_dont_receipt_reward +zat_b106_go_to_home%
+meet = no_meet
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[walker@home]
+path_walk = garmata_3_walk
+path_look = garmata_3_look
+out_restr = zat_a2_sr_noweap
+on_signal = garmata_close_home | %+zat_b106_hunt_finish%
+meet = no_meet
+corpse_detection_enabled = false 
+gather_items_enabled = false
+;help_wounded_enabled = true ;false
+wounded = wounded
+def_state_moving1 = assault
+def_state_standing = guard_na
+combat_ignore_cond =  {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+
+[meet]
+use			= {=actor_enemy} false, true
+abuse		= true
+trade_enable 	= false
+allow_break = false
+meet_dialog = {-zat_b106_stalker_gonta_after_fight_done} zat_b106_stalker_garmata_b106_after_hunt
+close_anim      = guard_na
+close_victim    = actor
+close_distance = 5
+
+
+
+[meet@shoot]
+close_victim = actor
+use = false
+snd_on_use = {=actor_enemy} nil, zat_b106_garmata_refuse_talk
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false
+
+[danger]
+ignore_distance = 0
+
+[death]
+on_info = %+zat_b106_garmata_dead%

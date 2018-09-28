@@ -1,0 +1,14 @@
+[logic]
+active = ph_idle@idle_no_owner
+
+[ph_idle@idle_no_owner]
+auto_fire 		= false
+on_info1 		= {=obj_on_job(esc_smart_terrain_3_16:esc_smart_terrain_3_16_minigunner_excl:beh@esc_smart_terrain_3_16_minigunner_excl_ready)} ph_minigun@ready_to_fire
+
+[ph_minigun@ready_to_fire]
+auto_fire 		= true
+target			= job
+smart 			= esc_smart_terrain_3_16
+job 			= esc_smart_terrain_3_16_minigunner_excl
+fire_range 		= 150
+on_info1 		= {!obj_on_job(esc_smart_terrain_3_16:esc_smart_terrain_3_16_minigunner_excl:beh@esc_smart_terrain_3_16_minigunner_excl_ready)} ph_idle@idle_no_owner

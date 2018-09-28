@@ -1,0 +1,9 @@
+[logic]
+active = nil;ph_idle@wait
+
+[ph_idle@wait]
+tips = inventory_item_use
+on_use = ph_idle@used %=scenario_autosave(st_save_jup_b47_got_admin_docs)%
+
+[ph_idle@used]
+on_info = {-jup_b47_actor_pick_docs} %+jup_b47_actor_pick_docs =destroy_object =spawn_object_in(jup_b47_jupiter_products_info:actor)%

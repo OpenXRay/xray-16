@@ -1,0 +1,32 @@
+[logic]
+active = sr_idle@wait_for_actor
+
+[sr_idle@wait_for_actor]
+on_actor_inside = sr_idle@check_conditions, {+warlab_deactivate_generators_done} sr_idle@nil
+
+[sr_idle@check_conditions]
+on_info = {=is_dark_night -actor_is_sleeping !is_faction_enemy_to_actor(stalker) -warlab_deactivate_generators_done !has_task(faction_base_defense)} sr_idle@decide
+on_actor_outside = sr_idle@wait_for_actor
+
+[sr_idle@decide]
+on_info = {~50} sr_idle@timer, sr_idle@spawn_random %=give_task(faction_base_defense)%
+
+[sr_idle@spawn_random]
+on_info = {~33} sr_idle@spawn1, {~33} sr_idle@spawn2, sr_idle@spawn3
+
+[sr_idle@spawn1]
+on_info = sr_idle@wait_for_end %=flush_smart_terrain(esc_smart_terrain_4_11) =create_squad(faction_base_defense_flesh_squad:esc_smart_terrain_4_11) +faction_base_defense_flesh_squad_spawned =teleport_squad(faction_base_defense_flesh_squad:esc_smart_terrain_4_11_home_attackers)%
+
+[sr_idle@spawn2]
+on_info = sr_idle@wait_for_end %=flush_smart_terrain(esc_smart_terrain_4_11) =create_squad(faction_base_defense_boar_squad:esc_smart_terrain_4_11) +faction_base_defense_boar_squad_spawned =teleport_squad(faction_base_defense_boar_squad:esc_smart_terrain_4_11_home_attackers)%
+
+[sr_idle@spawn3]
+on_info = sr_idle@wait_for_end %=flush_smart_terrain(esc_smart_terrain_4_11) =create_squad(faction_base_defense_dog_squad:esc_smart_terrain_4_11) +faction_base_defense_dog_squad_spawned =teleport_squad(faction_base_defense_dog_squad:esc_smart_terrain_4_11_home_attackers)%
+
+[sr_idle@wait_for_end]
+on_info = {+faction_base_defense_enemy_killed} sr_idle@timer %+faction_base_defense_2nd_enemy_killed%
+
+[sr_idle@timer]
+on_game_timer = 86400 | sr_idle@wait_for_actor %-mar_smart_terrain_5_12_mutants_to_base -faction_base_defense_enemy_killed -faction_base_defense_2nd_enemy_killed -faction_base_defense_flesh_squad_spawned -faction_base_defense_boar_squad_spawned -faction_base_defense_dog_squad_spawned%
+
+[sr_idle@nil]

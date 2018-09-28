@@ -1,0 +1,311 @@
+#include "pri_a28_general.ltx"
+
+[logic@pri_a28_kovalski_base]
+active = walker@kovalski_base_1 
+suitable = {-pri_a28_base_done =check_npc_name(kovalski)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@kovalski_base_1]:walker@kovalski_ignore
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+out_restr = pri_a16_sr_noweap
+on_info = {=npc_in_zone(pri_a28_sr_base_1) !npc_in_zone(pri_surge_hide_a16) +pri_a28_heli_near_base} remark@kovalski_base_1
+
+[remark@kovalski_base_1]:walker@kovalski_ignore
+target = story | pri_a28_heli
+anim = threat_na
+out_restr = pri_a16_sr_noweap
+on_signal = sound_end | walker@kovalski_base_1_stand %+pri_a28_colonel_about_heli%
+on_info = %=play_sound(pri_a28_colonel_about_heli)%
+on_info2 = {+pri_a28_colonel_about_heli} walker@kovalski_base_1_stand
+
+[walker@kovalski_base_1_stand]:walker@kovalski_ignore
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_army_zombied_first} walker@kovalski_base_1_wait
+
+[walker@kovalski_base_1_wait]:walker@kovalski_fight
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+out_restr = pri_a16_sr_noweap
+on_game_timer = 30 |  %=play_sound(pri_a28_colonel_zombied_first)%
+on_signal = sound_end | %+pri_a28_colonel_zombied_first%
+on_info = {+pri_a28_colonel_zombied_first} smartcover@kovalski_base_1_fight
+
+[smartcover@kovalski_base_1_fight]:walker@fight
+cover_name = pri_a28_base_cover_2
+use_in_combat = true
+out_restr = pri_a16_sr_noweap
+on_game_timer = 80 | camper@kovalski_base_2 %+pri_a28_base_leave% 
+on_info = {+pri_a28_base_leave} camper@kovalski_base_2
+on_info2 = {=in_dest_smart_cover !has_enemy_in_current_loopholes_fov} walker@kovalski_base_1_fight
+
+[walker@kovalski_base_1_fight]:walker@kovalski_fight
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+out_restr = pri_a16_sr_noweap
+on_game_timer = 60 | %+pri_a28_base_leave% 
+on_info = {+pri_a28_base_leave} camper@kovalski_base_2 %=disable_memory_object%
+
+[camper@kovalski_base_2]:walker@kovalski_ignore
+path_walk = kovalski_2_walk
+path_look = kovalski_2_look 
+out_restr = pri_a28_sr_shop_1
+
+
+
+[logic@pri_a28_kirillov_base]
+active = walker@kirillov_base_1 
+suitable = {-pri_a28_base_done =check_npc_name(army_signaller)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@kirillov_base_1]:walker@ignore
+path_walk = kirillov_1_walk
+path_look = kirillov_1_look
+def_state_standing = hide_na
+out_restr = pri_a16_sr_noweap
+on_info = {=npc_in_zone(pri_a28_sr_base_1) !npc_in_zone(pri_surge_hide_a16) +pri_a28_colonel_about_heli} walker@kirillov_base_1_wait
+
+[walker@kirillov_base_1_wait]:walker@ignore
+path_walk = kirillov_1_walk
+path_look = kirillov_1_look
+def_state_standing = hide_na
+out_restr = pri_a16_sr_noweap
+on_game_timer = 10 | %=play_sound(pri_a28_army_zombied_first)%
+on_signal = sound_end | walker@kirillov_base_1_fight %+pri_a28_army_zombied_first%
+on_info = {+pri_a28_army_zombied_first} walker@kirillov_base_1_fight
+
+[walker@kirillov_base_1_fight]:walker@fight
+path_walk = kirillov_1_walk
+path_look = kirillov_1_look
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_colonel_zombied_first} camper@kirillov_base_2 %=disable_memory_object%
+
+[camper@kirillov_base_2]:walker@ignore
+path_walk = kirillov_2_walk
+path_look = kirillov_2_look 
+out_restr = pri_a28_sr_base_2
+on_signal = path_end | smartcover@kirillov_base_2_fight
+
+[smartcover@kirillov_base_2_fight]:walker@fight
+cover_name = pri_a28_base_cover_7
+use_in_combat = true
+out_restr = pri_a28_sr_base_2
+on_info = {=in_dest_smart_cover !has_enemy_in_current_loopholes_fov} walker@kirillov_base_2_fight
+
+[walker@kirillov_base_2_fight]:walker@fight
+path_walk = kirillov_2_walk
+path_look = kirillov_2_look 
+out_restr = pri_a28_sr_base_2
+
+
+
+
+[logic@pri_a28_strelok_base]
+active = walker@strelok_base_1 
+suitable = {-pri_a28_base_done =check_npc_name(strelok)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@strelok_base_1]:walker@ignore
+path_walk = strelok_1_walk
+path_look = strelok_1_look
+def_state_standing = hide_na
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_army_zombied_first} walker@strelok_base_1_fight
+
+[walker@strelok_base_1_fight]:walker@fight
+path_walk = strelok_1_walk
+path_look = strelok_1_look
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_colonel_zombied_first} camper@strelok_base_2 %=disable_memory_object%
+
+[camper@strelok_base_2]:walker@ignore
+path_walk = strelok_2_walk
+path_look = strelok_2_look
+out_restr = pri_a28_sr_base_2
+on_signal = path_end | walker@strelok_base_2_fight
+
+[walker@strelok_base_2_fight]:walker@fight
+path_walk = strelok_2_walk
+path_look = strelok_2_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_base_2
+
+
+
+[logic@pri_a28_military_1_base]
+active = walker@military_1_base_1 
+suitable = {-pri_a28_base_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(army_signaller) !check_npc_name(kovalski)} true
+prior = 110
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@military_1_base_1]:walker@ignore
+path_walk = military_1_1_walk
+path_look = military_1_1_look
+def_state_standing = hide_na
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_army_zombied_first} walker@military_1_base_1_fight
+
+[walker@military_1_base_1_fight]:walker@fight
+path_walk = military_1_1_walk
+path_look = military_1_1_look
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_base_leave} camper@military_1_base_2 %=disable_memory_object%
+
+[camper@military_1_base_2]:walker@ignore
+path_walk = military_1_2_walk
+path_look = military_1_2_look 
+out_restr = pri_a28_sr_base_2
+on_signal = path_end | walker@military_1_base_2_fight
+
+[walker@military_1_base_2_fight]:walker@fight
+path_walk = military_1_2_walk
+path_look = military_1_2_look 
+out_restr = pri_a28_sr_base_2
+
+
+
+[logic@pri_a28_military_2_base]
+active = walker@military_2_base_1 
+suitable = {-pri_a28_base_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(army_signaller) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@military_2_base_1]:walker@ignore
+path_walk = military_2_1_walk
+path_look = military_2_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_base_1
+on_info = {+pri_a28_army_zombied_first} walker@military_2_base_1_fight
+
+[walker@military_2_base_1_fight]:walker@fight
+path_walk = military_2_1_walk
+path_look = military_2_1_look
+out_restr = pri_a28_sr_base_1
+on_info = {+pri_a28_colonel_zombied_first} camper@military_2_base_2 %=disable_memory_object%
+
+[camper@military_2_base_2]:walker@ignore
+path_walk = military_2_2_walk
+path_look = military_2_2_look 
+out_restr = pri_a28_sr_base_2
+on_signal = path_end | walker@military_2_base_2_fight
+
+[walker@military_2_base_2_fight]:walker@fight
+path_walk = military_2_2_walk
+path_look = military_2_2_look 
+out_restr = pri_a28_sr_base_2
+
+
+
+[logic@pri_a28_military_3_base]
+active = walker@military_3_base_1 
+suitable = {-pri_a28_base_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(army_signaller) !check_npc_name(kovalski)} true
+prior = 90
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@military_3_base_1]:walker@ignore
+path_walk = military_3_1_walk
+path_look = military_3_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_base_1
+on_info = {+pri_a28_army_zombied_first} walker@military_3_base_1_fight
+
+[walker@military_3_base_1_fight]:walker@fight
+path_walk = military_3_1_walk
+path_look = military_3_1_look
+out_restr = pri_a28_sr_base_1
+on_info = {+pri_a28_colonel_zombied_first} camper@military_3_base_2 %=disable_memory_object%
+
+[camper@military_3_base_2]:walker@ignore
+path_walk = military_3_2_walk
+path_look = military_3_2_look 
+out_restr = pri_a28_sr_base_2
+on_signal = path_end | walker@military_3_base_2_fight
+
+[walker@military_3_base_2_fight]:walker@fight
+path_walk = military_3_2_walk
+path_look = military_3_2_look 
+out_restr = pri_a28_sr_base_2
+
+
+
+[logic@pri_a28_military_4_base]
+active = walker@military_4_base_1 
+suitable = {-pri_a28_base_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(army_signaller) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@military_4_base_1]:walker@ignore
+path_walk = military_4_1_walk
+path_look = military_4_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_base_1
+on_info = {+pri_a28_army_zombied_first} walker@military_4_base_1_fight
+
+[walker@military_4_base_1_fight]:walker@fight
+path_walk = military_4_1_walk
+path_look = military_4_1_look
+out_restr = pri_a28_sr_base_1
+on_info = {+pri_a28_base_leave} camper@military_4_base_2 %=disable_memory_object%
+
+[camper@military_4_base_2]:walker@ignore
+path_walk = military_4_2_walk
+path_look = military_4_2_look 
+out_restr = pri_a28_sr_base_2
+on_signal = path_end | walker@military_4_base_2_fight
+
+[walker@military_4_base_2_fight]:walker@fight
+path_walk = military_4_2_walk
+path_look = military_4_2_look 
+out_restr = pri_a28_sr_base_2
+
+
+
+[logic@pri_a28_military_5_base]
+active = walker@military_5_base_1 
+suitable = {-pri_a28_base_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(army_signaller) !check_npc_name(kovalski)} true
+prior = 90
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[walker@military_5_base_1]:walker@ignore
+path_walk = military_5_1_walk
+path_look = military_5_1_look
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_army_zombied_first} walker@military_5_base_1_fight
+
+[walker@military_5_base_1_fight]:walker@fight
+path_walk = military_5_1_walk
+path_look = military_5_1_look
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_base_leave} camper@military_5_base_2 %=disable_memory_object%
+
+[camper@military_5_base_2]:walker@ignore
+path_walk = military_5_2_walk
+path_look = military_5_2_look 
+out_restr = pri_a28_sr_base_2
+on_signal = path_end | walker@military_5_base_2_fight
+
+[walker@military_5_base_2_fight]:walker@fight
+path_walk = military_5_2_walk
+path_look = military_5_2_look 
+out_restr = pri_a28_sr_base_2

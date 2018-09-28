@@ -8,6 +8,7 @@ function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
 	self.opened_doors = {}
 	self.first_update = false
+	self.object = obj
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)
@@ -230,6 +231,8 @@ function motivator_binder:net_destroy()
 		db.actor:stop_talk()
 		self.object:stop_talk()
 	end
+	
+	ai_stalker.clear_cover(self.object:id())
 
 	if (self.st) then
 		if (self.st.active_scheme) then
@@ -260,8 +263,6 @@ function motivator_binder:net_destroy()
 		m_data.game_object[self.object:id()] = nil
 	end
 	
-	trade_manager.on_npc_death(self.object)
-	
 	object_binder.net_destroy(self)
 end
 
@@ -272,30 +273,9 @@ function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_i
 		return 
 	end
 	
-	if (who:id() == 0) then
-		xr_statistic.set_best_weapon(amount)
-	end
-	
 	-- Only wound the stalker from powerful attacks if not a head hit and not already wounded
 	if (bone_index ~= 15 and amount > 15 and amount >= obj.health*100 and not IsWounded(obj)) then
-		local skip_wound
-		if (who:id() == 0) then 
-			-- Surprise attacks with knife don't force wound
-			if (self.object:target_mental_state() == anim.free) then 
-				local active_item = who:active_item()
-				if (active_item and active_item:clsid() == clsid.wpn_knife_s) then 
-					skip_wound = true
-				end
-			end
-			
-			-- surrendered victims should die instantly, not re-wound
-			if (utils.load_var(self.object,"victim_surrender",false) == true) then
-				skip_wound = true
-			end
-		end
-		if not (skip_wound) then
-			obj.health = 0.15
-		end
+		obj:set_health_ex(0.15)
 	end
 
 	if (self.st.active_section and self.st.active_scheme) then
@@ -342,13 +322,15 @@ function motivator_binder:death_callback(victim, who)
 		return 
 	end
 	
+	ai_stalker.clear_cover(self.object:id())
+	
 	if (victim:has_info("npcx_is_companion")) then 
-		xr_statistic.inc_actor_reputation(-75) -- lose rep for companion death, nobody would want to hang out with a loser!
+		dxr_statistics.increment_statistic("killed_companions") -- lose rep for companion death, nobody would want to hang out with a loser!
 	elseif (who and who:id() == 0) then
 		if (utils.load_var(victim,"victim_surrender",false) == true) then
 			local state = tostring(utils.load_var(victim, "wounded_state"))
 			if (state ~= "nil") then
-				xr_statistic.inc_actor_reputation(-25) -- lose rep for killing still wounded surrendered victim
+				dxr_statistics.increment_statistic("killed_prisoners") -- lose rep for killing still wounded surrendered victim
 			end
 		end
 	end
@@ -360,7 +342,6 @@ function motivator_binder:death_callback(victim, who)
 		self:setup_known_info(self.object,self.st.ini,known_info)
 	end
 	
-	trade_manager.on_npc_death(self.object)
 	self:hit_callback(victim, 1, VEC_ZERO, who, "from_death_callback")
 
 	local id = victim:id()
@@ -380,7 +361,7 @@ function motivator_binder:death_callback(victim, who)
 		-- npc_statistic
 		local se_obj = alife_object(who:id())
 		if (se_obj) then
-			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+			local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
 			if (m_data) then
 				m_data.stalkers_killed = m_data.stalkers_killed and m_data.stalkers_killed + 1 or 1
 			end
@@ -492,6 +473,8 @@ function motivator_binder:update(delta)
 	SendScriptCallback("npc_on_update",object,db.storage[id])
 	-- End [Alundaio]
 	
+	stalker_generic.update_invulnerability(object)
+	
 	local tg = time_global()
 	if (self.__tmr and tg < self.__tmr) then
 		--alun_utils.debug_write(strformat("motivator_bind:update %s END 2",self.object and self.object:name()))
@@ -502,8 +485,6 @@ function motivator_binder:update(delta)
 	-- DOOR
 	ph_door.try_to_open_door(self.object, self.opened_doors)
 	ph_door.try_to_close_door(self.object, self.opened_doors)
-	
-	stalker_generic.update_invulnerability(object)
 
 	if (self.st.active_scheme) then
 		local switched
@@ -610,32 +591,31 @@ function motivator_binder:save_state(m_data)
 	state.xr_logic.activation_game_time = st.activation_game_time
 
 	xr_sound.npc_save_state(id,state)
-	trade_manager.save_state(id,state)
 	db.storage[id].pstor = db.storage[id].pstor or {}
 	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",self.object:name()))
 end
 
 function motivator_binder:load_state()
 	local state = alife_storage_manager.get_game_object_state(self.object)
-	if not (state and state.xr_logic) then
+	if not (state) then 
 		return
 	end
-	
 	local id = self.object:id()
 	db.storage[id] = db.storage[id] or {}
 	local st = db.storage[id]
 	st.object = self.object
 	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",id))
 	--st.job_ini = state.xr_logic.job_ini
-	st.loaded_ini_filename = state.xr_logic.ini_filename
-	st.loaded_section_logic = state.xr_logic.section_logic
-	st.loaded_active_section = state.xr_logic.active_section
-	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
-	st.activation_time = time_global() + (state.xr_logic.activation_time or 0)
-	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
-	state.xr_logic = nil
+	if (state.xr_logic) then
+		st.loaded_ini_filename = state.xr_logic.ini_filename
+		st.loaded_section_logic = state.xr_logic.section_logic
+		st.loaded_active_section = state.xr_logic.active_section
+		st.loaded_gulag_name = state.xr_logic.gulag_name or ""
+		st.activation_time = time_global() + (state.xr_logic.activation_time or 0)
+		st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
+		state.xr_logic = nil
+	end
 	xr_sound.npc_load_state(id,state)
-	trade_manager.load_state(id,state)
 	if (state.pstor_all) then
 		db.storage[id].pstor = state.pstor_all
 		state.pstor_all = nil

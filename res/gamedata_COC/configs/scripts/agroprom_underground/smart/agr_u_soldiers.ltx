@@ -1,0 +1,28 @@
+[smart_terrain]
+squad_id = 5
+max_population = 2
+respawn_params = respawn@agr_u_soldiers
+respawn_idle = 86400
+respawn_radius = 300
+
+[respawn@agr_u_soldiers]
+spawn_controller
+
+[spawn_controller]
+spawn_squads = simulation_controller
+spawn_num = {+agru_add_reward_2} 1, 0
+
+[exclusive]
+agr_u_soldiers_controller = agroprom_underground\agr_u_soldiers_controller.ltx
+agr_u_soldiers_squad_1 = agroprom_underground\agr_u_soldiers_logic.ltx
+agr_u_soldiers_squad_2 = agroprom_underground\agr_u_soldiers_logic.ltx
+agr_u_soldiers_squad_3 = agroprom_underground\agr_u_soldiers_logic.ltx
+agr_u_soldiers_squad_4 = agroprom_underground\agr_u_soldiers_logic.ltx
+agr_u_soldiers_squad_5 = agroprom_underground\agr_u_soldiers_logic.ltx
+agr_u_soldiers_squad_6 = agroprom_underground\agr_u_soldiers_logic.ltx
+agr_u_soldiers_squad_7 = agroprom_underground\agr_u_soldiers_logic.ltx
+agr_u_soldiers_squad_8 = agroprom_underground\agr_u_soldiers_logic.ltx
+agru_end_poltergeist_squad_1 = agroprom_underground\agru_end_poltergeist_1.ltx
+agru_end_poltergeist_squad_2 = agroprom_underground\agru_end_poltergeist_2.ltx
+agru_end_poltergeist_squad_3 = agroprom_underground\agru_end_poltergeist_3.ltx
+agru_end_poltergeist_squad_4 = agroprom_underground\agru_end_poltergeist_4.ltx

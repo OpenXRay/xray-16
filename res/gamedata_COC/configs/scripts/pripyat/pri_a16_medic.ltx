@@ -1,0 +1,29 @@
+[logic@pri_a16_medic]
+suitable = true
+prior = 200
+active = animpoint@base
+level_spot = medic
+
+[animpoint@base]
+cover_name = pri_a16_animp_medic
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = meet
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+trade_enable 	= false
+allow_break 	= false
+meet_on_talking = false

@@ -1,0 +1,52 @@
+[animpoint@jup_a9_actor_gen]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+reach_movement = patrol
+
+[walker@jup_a9_gen]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[logic]
+active = walker@jup_a9_teleport
+
+[walker@jup_a9_teleport]:walker@jup_a9_gen
+path_walk = jup_a9_temp_actor_walk
+path_look = jup_a9_temp_actor_look
+out_restr = jup_a9_in_rest_for_temp_actor
+def_state_standing = wait_na
+on_info = {=actor_in_zone(jup_a9_cam_1)} animpoint@jup_a9_cam_1 %=teleport_npc(jup_a9_cam_1_actor_walk)%, {=actor_in_zone(jup_a9_cam_2)} animpoint@jup_a9_cam_2 %=teleport_npc(jup_a9_cam_2_actor_walk)%, {=actor_in_zone(jup_a9_cam_3)} animpoint@jup_a9_cam_3 %=teleport_npc(jup_a9_cam_3_actor_walk)%
+
+[animpoint@jup_a9_cam_1]:animpoint@jup_a9_actor_gen
+avail_animations = jup_a9_cam1_actor
+cover_name = jup_a9_cam_1_animpoint
+on_info = {+jup_a9_cam1_actor_anim_end} walker@jup_a9_cam_1
+
+[walker@jup_a9_cam_1]:walker@jup_a9_gen
+path_walk = jup_a9_cam_1_actor_walk2
+path_look = jup_a9_cam_1_actor_look2
+def_state_moving = patrol
+def_state_standing = guard
+
+
+[animpoint@jup_a9_cam_2]:animpoint@jup_a9_actor_gen
+avail_animations = jup_a9_cam2_actor
+cover_name = jup_a9_cam_2_animpoint
+out_restr = jup_factory_default_in_restrictor
+
+[animpoint@jup_a9_cam_3]:animpoint@jup_a9_actor_gen
+avail_animations = jup_a9_cam3_actor
+cover_name = jup_a9_cam_3_animpoint
+out_restr = jup_factory_default_in_restrictor

@@ -1,0 +1,19 @@
+[logic]
+active = nil;sr_idle@wait_for_task
+
+[sr_idle@wait_for_task]
+on_info = {+jup_a12_mercs_go_to_positions +jup_a12_actor_choose_power -jup_a12_met_with_liberators} %+jup_a12_met_with_liberators =scenario_autosave(st_save_jup_a12_met_with_liberators)%
+on_info2 = {+jup_a12_mercs_go_to_positions +jup_a12_actor_choose_power +jup_a12_met_with_liberators} sr_idle@wait_for_attack_start
+on_info3 = {+jup_a12_stalkers_on_base} sr_idle@nil, {+jup_a12_stalker_prisoner_dead} sr_idle@nil
+on_info4 = {-jup_a12_mercs_go_to_positions =is_squad_enemy_to_actor(jup_a12_merc_stalker_squad)} %+jup_a12_mercs_go_to_positions% 
+on_info5 = {-jup_a12_mercs_go_to_positions +jup_a12_mercs_spawned !squad_exist(jup_a12_merc_stalker_squad)} %+jup_a12_mercs_go_to_positions% 
+
+[sr_idle@wait_for_attack_start]
+on_info = {+jup_a12_bandit_guard_killed} sr_idle@wait_for_attack_end %+jup_a12_merc_attack_started =set_squad_enemy_to_actor(jup_a12_bandit_guard_squad)%
+on_info2 = {+jup_a12_actor_enemy_to_bandits} sr_idle@wait_for_attack_end %+jup_a12_merc_attack_started%
+
+[sr_idle@wait_for_attack_end]
+on_info = {+jup_a12_mercs_done} sr_idle@nil, {+pri_a12_stalker_prisoner_free} sr_idle@nil
+on_info2 = {+jup_a12_merc_attack_started =dist_to_story_obj_ge(jup_a12_stalker_prisoner:225)} sr_idle@nil %+jup_a12_stalker_prisoner_dead%, {+jup_a12_merc_attack_started =dist_to_story_obj_ge(jup_a12_stalker_prisoner:175)} %=play_sound(jup_a12_stalkers_to_actor_came_back)%
+
+[sr_idle@nil]

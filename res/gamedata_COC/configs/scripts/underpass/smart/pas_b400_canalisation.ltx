@@ -1,0 +1,43 @@
+[smart_terrain]
+squad_id = 1
+max_population = 3
+;;arrive_dist = 100000
+respawn_params = respawn@pas_b400_canalisation
+respawn_idle = 86400
+
+
+[respawn@pas_b400_canalisation]
+spawn_snorks
+
+[spawn_snorks]
+spawn_squads = simulation_snork
+spawn_num = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} 3, 0
+
+
+[exclusive]
+pas_b400_tushkano_canalisation_1 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_tushkano_canalisation_2 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_tushkano_canalisation_3 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_snork_canalisation_2 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_snork_canalisation_2_r = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_snork_canalisation_2_l = underpass\pas_b400_canalisation_monsters.ltx
+
+pas_b400_canalisation_1_zombied_1 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_1_zombied_2 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_3_zombied_1 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_3_zombied_2 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_3_zombied_3 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_3_zombied_4 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_3_zombied_5 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_3_zombied_6 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_5_zombied_1 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_5_zombied_2 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_5_zombied_3 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_5_zombied_4 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_5_zombied_5 = underpass\pas_b400_canalisation_monsters.ltx
+pas_b400_canalisation_5_zombied_6 = underpass\pas_b400_canalisation_monsters.ltx
+
+pas_b400_zulus_canalisation = underpass\pas_b400_canalisation.ltx
+pas_b400_vano_canalisation = underpass\pas_b400_canalisation.ltx
+pas_b400_sokolov_canalisation = underpass\pas_b400_canalisation.ltx
+pas_b400_wanderer_canalisation = underpass\pas_b400_canalisation.ltx

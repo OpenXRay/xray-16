@@ -1,0 +1,38 @@
+[smart_terrain];mar_smart_terrain_5_12
+squad_id = 12
+max_population = 4
+;spawn_point = mar_smart_terrain_5_12_spawn_point
+respawn_params = respawn@mar_smart_terrain_5_12
+respawn_idle = 86400
+;arrive_dist = 100000
+
+[respawn@mar_smart_terrain_5_12]
+spawn_stalker@novice
+spawn_stalker@advanced
+
+[spawn_stalker@novice]
+spawn_squads = csky_sim_squad_novice
+spawn_num = 1
+
+[spawn_stalker@advanced]
+spawn_squads = csky_sim_squad_novice, csky_sim_squad_advanced
+spawn_num = 1
+
+
+[exclusive]
+mar_smart_terrain_5_12_surge_work_1 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_surge_work_2 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_surge_work_3 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_surge_work_4 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_surge_work_5 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_surge_work_6 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_surge_work_7 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_surge_work_8 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_camp_work_1 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_camp_work_2 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_camp_work_3 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_camp_work_4 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+mar_smart_terrain_5_12_camp_work_5 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+faction_base_defense_enemy1 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+faction_base_defense_enemy2 = marsh\mar_smart_terrain_5_12_smart_logic.ltx
+faction_base_defense_enemy3 = marsh\mar_smart_terrain_5_12_smart_logic.ltx

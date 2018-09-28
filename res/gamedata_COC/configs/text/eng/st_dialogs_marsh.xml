@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+    <string id="cit_doctor_hello_dialog_11">
+        <text>Yes? What do you want? Strelok? Is that you?</text>
+    </string>
+    <string id="cit_doctor_hello_dialog_21">
+        <text>I've told you everything that I know.</text>
+    </string>
+    <string id="cit_doctor_main_dialog_0">
+        <text>Strelok? I think you have me confused old man. I've heard you have information about the Zone.</text>
+    </string>
+    <string id="cit_doctor_main_dialog_1">
+        <text>Confused? Oh... I might have the information you seek, but I'll want you to do something in return.</text>
+    </string>
+    <string id="cit_doctor_main_dialog_11">
+        <text>Of course, what would you have me do?</text>
+    </string>
+    <string id="cit_doctor_main_dialog_2">
+        <text>The Zone has taken a heavy toll on me over the years, so I spend my final days here where it's quiet, but I would rather enjoy seeing my old friends once again.\nI fear Strelok and Guide may be dead, but I would very much like to speak with Fang and Ghost while there is still time. If you can find them and bring them here I would most appreciate your efforts.</text>
+    </string>
+    <string id="cit_doctor_main_dialog_21">
+        <text>How long have you lived out here? Fang and Ghost are legendary stalkers, but they're both long dead. Fang was killed by a mercenary named Scar in Army Warehouses, and Ghost was found underneath Yantar in Lab X-16 about a year later. Did you really not know?</text>
+    </string>
+    <string id="cit_doctor_main_dialog_3">
+        <text>They're both dead? Are you sure? I just... Oh alright... What is it that you want to know?</text>
+    </string>
+    <string id="cit_doctor_main_dialog_31">
+        <text>Really, now you'll tell me so easily? I feel you are just wasting my time, old man.</text>
+    </string>
+    <string id="cit_doctor_main_dialog_4">
+        <text>Wait! Don't go... I just didn't expect them to finish badly. When Strelok last came to visit, he gave me a key and coordinates to a stash in Pripyat.\nHe hasn't visited in years so I don't suppose he's fared much better. He was saying something about the Monolith, I didn't understand much of it and I'm not too sure he did either. Here, take it. One more thing... He spent a lot of time searching for clues of a conspiracy in underground labs, some kind of secret cover-up I believe. Perhaps you'll find your answers there.</text>
+    </string>
+    <string id="cit_doctor_main_dialog_41">
+        <text>I see. Thanks, I appreciate your help.</text>
+    </string>
+    <string id="cit_doctor_main_dialog_5">
+        <text>Now go, leave an old man in peace.</text>
+    </string>
+    <string id="mar_base_owl_stalker_trader_start_dialog_1">
+        <text>Need supplies or equipment? Information?... Or maybe you want to sell information?</text>
+    </string>
+    <string id="mar_smart_terrain_base_doctor_need_health_care_0">
+        <text>I need medical assistance.</text>
+    </string>
+    <string id="mar_smart_terrain_base_doctor_need_health_care_1">
+        <text>Alright, I'll see what I can do.</text>
+    </string>
+    <string id="mar_smart_terrain_base_doctor_need_health_care_11">
+        <text>[continue...]</text>
+    </string>
+    <string id="mar_smart_terrain_base_doctor_need_health_care_111">
+        <text>That wasn't so bad, eh? You can go.</text>
+    </string>
+    <string id="mar_smart_terrain_base_doctor_need_health_care_2">
+        <text>Alright, I'll take a look... No wounds? You show no signs of radiation sickness. I think everything is in order; You are good to go.</text>
+    </string>
+    <string id="mar_smart_terrain_base_doctor_start_1">
+        <text>Whatcha' need stalker?</text>
+    </string>
+    <string id="marsh_stalker_barmen_start_dialog_1">
+        <text>A fresh face! People around here call me Librarian. I'm the local bartender. I'll be glad to answer any questions you have. Sometimes I post job offerings or hear some interesting rumours, so check back often.</text>
+    </string>
+    <string id="marsh_stalker_barmen_start_dialog_2">
+        <text>Hey, stalker. What do you need?</text>
+    </string>
+    <string id="marsh_stalker_tech_start_1">
+        <text>Greetings, stalker. Can I be of assistance? Good tools are hard to come by in the Zone, but I can still repair your kit and do minor upgrades.</text>
+    </string>
+    <string id="marsh_stalker_medic_background">
+        <text>Me? I used to be a guide believe it or not. I mostly stuck to the marshes, but often took stalkers to places quite far from here. But that was a different time, before they found that damned mercenary in the reeds with a mouth full of swamp water.
+		      Every single day he'd forget the way in and out of the base and I'd have to take him not more than a five minute walk from here to the fishing hamlet and back. And then within only a few weeks he'd somehow managed to convince our leadership and most of our men to charge into the power station.
+			  Needless to say neither he nor much of our faction came back from his madness.\nBy the end of it I had nobody left to guide but plenty of people to patch up.\nSo here I am. All because of that fuckin' crazy merc.</text>
+    </string>
+    <string id="marsh_stalker_barman_background">
+        <text>I'm the bartender. I serve drinks, food, and keep the radio playing. It's not an exciting job, but still preferable to being out in the field. Been working here for quite a few years now, got caught on the inside of the swamps when the emission hit so I was pretty much stuck here.
+		      Headed south like most people tried to but I was one of the few that didn't get picked off by bandits on the way. I searched out this base and joined up with Clear Sky. It was either that or die in a puddle somewhere. Spent the first few weeks as a grunt repelling the anarchists from our lookout posts
+			  and then got the job as the new bartender when Cold got promoted. Naturally I accepted, I'd rather be shooting drinks than bullets. But enough talk, how about a nice cold one?</text>
+    </string>
+    <string id="marsh_stalker_trader_background">
+        <text>Spore's the name, I took over this gig about a year ago. Came to the Zone looking for wealth like everybody does and ran into a stalker called Nimble.\nFound out we shared a lot of the same talents, both got a lot of outside contacts,
+		      good at trafficking goods in and out of the Zone, and selling info.\nSo when the Monolith resurgence happened and business was driven south, we followed. Managed to land myself a nice job here after Nimble recommended me to Cold. He was a member
+			  of Clear Sky back in the day, y'know? Gives us both a nice little operation here, we have access to an army-free smuggling route through the swamps and Clear Sky gets first pick of everything we get our hands on. Pay Nimble a visit if you're ever
+			  in the Cordon, last I heard he was hanging out around the rookie camp. If you ever need a hard to obtain weapon or outfit smuggled in from the outside he's the guy who peddles the goods.</text>
+    </string>
+    <string id="marsh_stalker_tech_background">
+        <text>The name's Novikov, but some call me Grey. I'm the technician who keeps everything working, and the only person any good stalker goes to if their shooter starts jamming. Used to work here a long time ago until just before Cold took over. When everything went to shit I looked for somewhere greener
+		      and got contracted by the Ecologists up in Jupiter. Was up there for a good few years until one day I heard that somehow these guys pulled through, and as soon as my contract was up I headed back. They took me in without question, my skills with a workbench and my contacts within the Ecologists
+			  were sorely needed. I got us set up working with their guys so we could carry on with our old research. If you fancy the work they're always looking for guides to the local anomalies, talk to Spore about it if you're interested.</text>
+    </string>
+    <string id="marsh_stalker_leader_background">
+        <text>Where do I begin? They call me Cold in these parts, I'm the leader of Clear Sky. Used to be the old drinks dispenser here a long time ago until I handed that honour over to Librarian once we caught wind of what happened to Lebedev, Suslov and the rest of our commanders.
+		      After long and intense negotiations with the latest shipment of smuggled vodka, the local force decided that I was best suited for taking over the reins, and I've been holding on to them ever since.</text> 
+    </string>
+	<string id="marsh_csky_history_ask1">
+		<text>Tell me about Clear Sky.</text>
+	</string>
+	<string id="marsh_csky_history_ask2">
+		<text>What is it you want to know?</text>
+	</string>
+	<string id="marsh_csky_history_destroyed1">
+		<text>Wasn't the faction destroyed?</text>
+	</string>
+	<string id="marsh_csky_history_destroyed2">
+		<text>Almost, but we managed to pull through. While most of our guys were wiped out at the power plant, not all of us were. A good number were still in our other territories, which were later cut off from the rest of the Zone by anomalies following the emission.
+		      When it became obvious to those in the swamps at the time that they were almost trapped here with no easy way out everything went to hell. Honest stalkers became bandits overnight whilst the rest tried to flee to our base or live off the area's mutants.
+			  We took on a lot of men and our food stores ensured their loyalty, after a little while it became obvious we'd need a new leader. I took on the burden and asked our Librarian to man the bar in my place, he'd earned quite a name for himself in the short time since he joined.
+			  After a few months of tit-for-tat raiding with the bandits we managed to smoke most of them out, but that didn't stop the army from feeling like they needed to move in and finish the job. Even now, they still have that bird of theirs watching the areas they took over.
+			  </text>
+	</string>
+</string_table>

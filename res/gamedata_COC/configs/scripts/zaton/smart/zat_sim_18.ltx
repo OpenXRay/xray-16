@@ -1,0 +1,24 @@
+[smart_terrain];zat_sim_18
+squad_id = 18
+max_population = 1
+;respawn_only_smart = true
+respawn_params = respawn@zat_sim_18  
+respawn_idle = 86400
+ 
+
+[respawn@zat_sim_18]
+spawn_mix_dogs
+spawn_mix_boar_flesh
+spawn_rat
+
+[spawn_rat]
+spawn_squads = simulation_rat
+spawn_num = 1
+
+[spawn_mix_boar_flesh]
+spawn_squads = simulation_boar, simulation_flesh, simulation_mix_boar_flesh
+spawn_num = 1
+
+[spawn_mix_dogs]
+spawn_squads = simulation_pseudodog, simulation_dog, simulation_mix_dogs
+spawn_num = 1

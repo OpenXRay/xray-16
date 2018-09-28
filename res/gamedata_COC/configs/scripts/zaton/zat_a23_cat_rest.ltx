@@ -1,0 +1,46 @@
+[logic]
+active = nil ;sr_idle@zat_a23_gauss_rifle_guard_spawn
+
+[sr_idle@zat_a23_gauss_rifle_guard_spawn]
+on_info = {-zat_a23_gauss_rifle_guard_spawned =actor_has_item(zat_a23_access_card)} sr_idle@zat_a23_wait_actor %+zat_a23_gauss_rifle_guard_spawned =create_squad(zat_a23_zombie_squad:zat_a23_smart_terrain) =create_squad(zat_a23_giant_squad:zat_a23_smart_terrain) =set_counter(zat_a23_zombied_attack:0) =set_counter(zat_a23_zombied_death:0)%, {+zat_a23_gauss_rifle_guard_spawned} sr_idle@zat_a23_wait_actor
+on_info2 = {=actor_has_item(zat_a23_gauss_rifle_docs)} sr_idle@zat_a23_pick_documents %+zat_a23_actor_used_access_card%
+
+[sr_idle@zat_a23_wait_actor]
+on_info = {=counter_greater(zat_a23_zombied_attack:5)} sr_idle@zat_a23_pick_documents, {+zat_a23_actor_used_access_card} sr_idle@zat_a23_zombie_attak
+on_info2 = {=actor_has_item(zat_a23_gauss_rifle_docs)} sr_idle@zat_a23_pick_documents %+zat_a23_actor_used_access_card%
+
+[sr_idle@zat_a23_zombie_attak]
+on_game_timer = 50 | sr_idle@zat_a23_wait_actor %=inc_counter(zat_a23_zombied_attack:1)%
+on_info = {=counter_greater(zat_a23_zombied_death:5)} sr_idle@zat_a23_pick_documents
+on_info2 = {=actor_has_item(zat_a23_gauss_rifle_docs)} sr_idle@zat_a23_pick_documents %+zat_a23_actor_used_access_card%
+
+[sr_idle@zat_a23_pick_documents]
+on_info = {=actor_has_item(zat_a23_gauss_rifle_docs)} sr_idle@zat_a23_cam_spawn %=run_postprocess(fade_in:7910) =disable_ui%
+
+[sr_idle@zat_a23_cam_spawn]
+on_game_timer = 20 | sr_idle@zat_a23_cam_time %=run_postprocess(black:7911:true) =create_cutscene_actor_with_weapon(zat_b100_actor:zat_a23_temp_actor_walk:0:0:3)%
+
+[sr_idle@zat_a23_cam_time]
+on_game_timer = 30 | sr_cutscene@zat_a23_cam_start %=stop_postprocess(7910) =stop_postprocess(7911)%
+
+[sr_cutscene@zat_a23_cam_start]
+point = zat_a23_cam_actor_walk
+look = zat_a23_cam_actor_look
+cam_effector = scenario_cam\zaton\zat_a23_documents_cam
+global_cameffect = true
+enable_ui_on_end = false
+on_signal1 = theme_end | {-zat_a23_actor_has_gauss_rifle_documentation} %+zat_a23_actor_has_gauss_rifle_documentation =stop_sr_cutscene =run_postprocess(fade_in:7912) =give_actor(zat_a23_labx8_key) =give_task(pri_a19_lab_x8_investigation)%
+on_signal2 = cameff_end | {+zat_a23_actor_has_gauss_rifle_documentation} sr_idle@zat_a23_cam_destroy
+on_game_timer = 40 | %=play_sound(zat_a23_about_x8)%
+
+[sr_idle@zat_a23_cam_destroy]
+on_game_timer = 20 | {=object_exist(zat_b100_actor)} sr_idle@zat_a23_cam_end %=run_postprocess(black:7913:true) =destroy_object(story:zat_b100_actor) =destroy_object(story:zat_a23_gauss_rifle_docs_fake) =teleport_actor(zat_a23_cam_actor_walk:zat_a23_cam_actor_look)%, sr_idle@zat_a23_cam_end %=run_postprocess(black:7913:true) =destroy_object(story:zat_a23_gauss_rifle_docs_fake) =teleport_actor(zat_a23_cam_actor_walk:zat_a23_cam_actor_look)%
+
+[sr_idle@zat_a23_cam_end]
+on_game_timer = 20 | sr_idle@zat_a23_end %=stop_postprocess(7912) =stop_postprocess(7913) =enable_ui%
+
+[sr_idle@zat_a23_end]
+on_info = {-zat_a23_scenario_save_actor_has_gause_docs} %+zat_a23_scenario_save_actor_has_gause_docs =scenario_autosave(st_save_zat_a23_got_gauss_docs)%
+on_info2 = {+zat_a23_scenario_save_actor_has_gause_docs} sr_idle@zat_a23_nil
+
+[sr_idle@zat_a23_nil] 

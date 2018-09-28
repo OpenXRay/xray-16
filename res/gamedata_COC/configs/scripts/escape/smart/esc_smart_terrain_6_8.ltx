@@ -1,0 +1,24 @@
+[smart_terrain];esc_smart_terrain_6_8
+squad_id = 18
+max_population = 2
+
+;=================================================================
+;            FACTION CONTROLLED SMART_TERRAIN
+;=================================================================
+; this smart is an example on how to use faction_controlled feature.
+; when faction controlled is enabled, the controlling faction is decided
+; by the last npc who entered the smart. If he is the only faction present it will shift
+; control to his faction.
+;
+; default_faction is the starting faction for the smart.
+; 
+; The respawn sections are created dynamically for each faction listed with faction_controlled.
+; When the smart is controlled by this faction, it will only spawn this faction. 
+; In this example, bandits or army can spawn here if one of these factions comes here. Otherwise this smart will not be a respawner.
+; 
+; Make sure you have props set up properly in simulation_object_props.ltx
+; This uses the actual community names found in game_relations.ltx (ex. stalker, bandit, csky, army, dolg, freedom, ecolog, killer, monolith)
+
+faction_controlled = army, bandit
+faction_respawn_num = 1
+default_faction = army 

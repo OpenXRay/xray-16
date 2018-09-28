@@ -1,0 +1,14 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_b218_gather_squad_complete} sr_light
+
+[sr_light]
+light_on = true
+on_info = {+jup_b219_destroy_actor} sr_idle@wait
+
+[sr_idle@wait]
+on_game_timer = 50 | sr_idle@nil
+
+[sr_idle@nil]

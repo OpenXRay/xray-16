@@ -1,0 +1,41 @@
+[logic]
+active = nil ;sr_idle@spawn
+
+[sr_idle@spawn]
+on_info = {-zat_b28_spawn_dead} sr_idle %+zat_b28_spawn_dead =spawn_corpse(snork_weak : zat_b28_snork_1_dead_walk) =spawn_corpse(snork_weak : zat_b28_snork_2_dead_walk) =spawn_corpse(snork_weak : zat_b28_snork_3_dead_walk) =spawn_corpse(zat_b28_draper : zat_b28_draper_walk) =spawn_corpse(zat_b28_umerov : zat_b28_umerov_walk) =spawn_corpse(zat_b28_smoliak : zat_b28_smoliak_walk)%
+
+[sr_idle]
+on_info = {+zat_a1_game_start -zat_b28_start_blok} sr_idle@1 %+zat_b28_start_blok%
+on_info2 = {+zat_b28_start_blok} sr_idle@1
+
+[sr_idle@1]
+on_info =  {+zat_b28_heli_3_searching -zat_b28_heli_3_searched} sr_idle@timer1 %=disable_ui =run_postprocess(fade_in:8109)%
+
+[sr_idle@timer1]
+on_game_timer = 20 | sr_idle@timer12 %=run_postprocess(black:8110:true) =create_cutscene_actor_with_weapon(zat_b28_actor_visual_stalker:zat_b28_actor_visual_stalker_walk:0:153)%
+
+[sr_idle@timer12]
+on_game_timer = 45 | sr_cutscene %=stop_postprocess(8110) =stop_postprocess(8109) +zat_b28_heli_3_play_sound%
+
+[sr_cutscene]
+point = zat_b28_actor_visual_stalker_walk
+look = zat_b28_actor_visual_stalker_look
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+cam_effector = scenario_cam\zaton\zat_b28_heli3_camera
+on_signal = cameff_end | sr_idle@fade_out %=run_postprocess(black:8112:true)%
+on_signal2 = cam_effector_stop | sr_idle@fade_out %=run_postprocess(black:8112:true)%
+on_info = {+zat_b28_heli_3_sound -zat_b28_heli_after_camera_fade} %+zat_b28_heli_after_camera_fade =run_postprocess(fade_in:8111)%
+on_info2 = {+zat_b28_camera_stop} %=stop_sr_cutscene%
+on_info3 = {+zat_b28_actor_hit} %=stop_sr_cutscene% 
+
+[sr_idle@fade_out]
+on_game_timer = 10 | %+zat_b28_heli_3_searched%
+on_info = {+zat_b28_heli_3_searched} sr_idle@nil %=stop_postprocess(8111) =stop_postprocess(8112) =teleport_actor(zat_b28_actor_visual_stalker_walk:zat_b28_actor_visual_stalker_look) =enable_ui%
+
+[sr_idle@nil]
+on_info = {+zat_b28_heli_3_searched -save_zat_b28_searched_heli_3} %+save_zat_b28_searched_heli_3 =scenario_autosave(st_save_zat_b28_searched_heli_3)%
+on_info2 = {+save_zat_b28_searched_heli_3} sr_idle@nil2
+
+[sr_idle@nil2]

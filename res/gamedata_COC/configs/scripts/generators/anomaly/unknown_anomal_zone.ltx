@@ -1,0 +1,58 @@
+[anomal_zone]
+
+field_name = gen_smart_terrain_urod_anomaly_spot
+
+layers_count = 3
+respawn_tries = 2
+max_artefacts = 4
+
+applying_force_xz = 300
+applying_force_y = 400 
+
+artefacts = af_gold_fish, af_eye, af_fire, af_glass, af_baloon, af_ice, af_ameba_mica, af_rusty_sea, af_dummy_pellicle
+
+start_artefact = ; af_dummy_pellicle
+
+coeff = 1, 1, 1, 1, 1, 1, 1, 1, 1
+
+artefact_ways = gen_smart_terrain_urod_af_way, gen_smart_terrain_urod_af_way_2, gen_smart_terrain_urod_af_way_3, gen_smart_terrain_urod_af_way_4
+
+[layer_1]
+mines_section = mines_layer_1 
+
+[mines_layer_1]
+gen_zone_mine_gravitational_strong_0038
+gen_zone_mine_electric_strong_0024
+gen_zone_mine_electric_strong_0015
+gen_zone_mine_thermal_strong_0035
+
+
+[layer_2]
+mines_section = mines_layer_2
+
+[mines_layer_2]
+gen_zone_mine_electric_strong_0029
+gen_zone_mine_electric_strong_0011
+gen_zone_mine_thermal_strong_0045
+gen_zone_mine_gravitational_strong_0029
+gen_zone_mine_acidic_strong_0024
+gen_zone_mine_acidic_strong_0023
+gen_zone_mine_electric_strong_0021
+gen_zone_mine_electric_strong_0044
+gen_zone_mine_electric_strong_0005
+gen_zone_mine_acidic_strong_0031
+
+[layer_3]
+mines_section = mines_layer_3 
+
+[mines_layer_3]
+gen_zone_mine_acidic_strong_0031
+gen_zone_mine_acidic_strong_0016
+gen_zone_mine_thermal_strong_0037
+gen_zone_mine_acidic_strong_0029
+gen_zone_mine_acidic_strong_0029
+gen_zone_mine_acidic_strong_0020
+gen_zone_mine_gravitational_strong_0037
+
+
+

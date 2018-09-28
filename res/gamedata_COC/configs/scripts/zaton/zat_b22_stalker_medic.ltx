@@ -1,0 +1,101 @@
+[walker@presets]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = zat_b22_stalker_medic_identified
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[remark@presets]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = zat_b22_stalker_medic_identified
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+;******************************************************
+[logic@zat_b22_stalker_medic]
+suitable = {=check_npc_name(zat_b22_stalker_medic)} true
+prior = 200
+active = walker@wait
+on_hit = hit
+on_death = death
+known_info = known_info
+
+[known_info]
+zat_b22_stalker_medic_body_searched
+
+[hit]
+on_info = {=hit_by_actor +zat_b22_actor_came_first_time} remark@go_wounded, {=hit_by_actor +zat_b22_actor_can_hurt} remark@go_wounded, %=restore_health%
+
+[death]
+on_info = %+zat_b22_stalker_medic_death =stop_sound%
+on_info2 = {-zat_b22_stalker_vampire_story} %=spawn_object_in(zat_b22_medic_pda:zat_b22_stalker_medic)%
+
+[walker@wait]:walker@presets
+path_walk = zat_b22_stalker_medic_walk
+path_look = zat_b22_stalker_medic_look
+on_info = {-zat_b22_medic_job_tp} %+zat_b22_medic_job_tp =teleport_npc(zat_medic_home_smart_zat_b22_stalker_medic_walk)%  
+on_game_timer = 60 | remark@wait
+on_signal = medic_looks_body | remark@wait
+
+
+[remark@wait]:remark@presets
+anim = zat_b22_medic_turn_idle
+meet = no_meet
+on_actor_in_zone = zat_b22_stalker_medic_identified | remark@meet_actor %+zat_b22_actor_came_first_time%
+
+
+[remark@meet_actor]:remark@presets
+anim = zat_b22_medic_turn_out
+on_signal = anim_end | remark@hello_actor
+meet = no_meet
+on_actor_not_in_zone = zat_b22_stalker_medic_identified | remark@suiside %+zat_b22_actor_gone%
+on_info = {+zat_b22_stalker_vampire_story} remark@suiside 
+
+[remark@hello_actor]:remark@presets
+target = story | actor
+anim = ward_noweap
+on_game_timer = 30 | {-zat_b22_stalker_medic_hello_done} %=play_sound(zat_b22_stalker_medic_hello) +zat_b22_stalker_medic_hello_done%
+meet = meet
+on_actor_not_in_zone = zat_b22_stalker_medic_identified | remark@suiside %+zat_b22_actor_gone%
+on_info = {+zat_b22_stalker_vampire_story} remark@suiside 
+
+[remark@go_wounded]:remark@presets
+meet = meet
+wounded = wounded
+on_actor_not_in_zone = zat_b22_stalker_medic_identified | nil %=kill_npc%
+on_info = {-zat_b22_medic_goodwill} %=set_squad_goodwill(zat_b22_medic:neutral) +zat_b22_medic_goodwill%
+on_info2 = {+zat_b22_stalker_vampire_story} nil %=kill_npc% 
+
+[remark@suiside]:remark@presets
+anim = zat_b22_medic_suicide
+on_signal = anim_end | remark@suiside_shot
+meet = no_meet
+
+[remark@suiside_shot]:remark@presets
+anim = zat_b22_medic_suicide
+on_game_timer = 7 | nil %=kill_npc%
+meet = no_meet
+
+[meet]
+close_distance  = 30
+close_anim      = idle
+close_snd_hello = nil
+close_snd_bye   = nil
+close_victim    = actor
+use             = {+zat_b22_stalker_vampire_story} false, true
+trade_enable    = false
+allow_break     = false
+
+[wounded]
+hp_state = 101|wounded_heavy@help_heavy
+hp_state_see = 101|wounded_heavy@help_heavy
+hp_victim = 101|actor
+hp_cover = 101|false
+hp_fight = 101|false
+autoheal = false
+enable_talk = true

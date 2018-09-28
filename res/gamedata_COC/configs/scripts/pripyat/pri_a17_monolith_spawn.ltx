@@ -1,0 +1,34 @@
+[logic]
+active = nil;sr_idle@recon_on_position
+
+[sr_idle@recon_on_position]
+on_info = {+pri_a17_teleport_military_recon} sr_idle@monolith_patrol %=set_counter(pri_a17_monolith_death:0) =create_squad(pri_a17_mon_patrol:pri_a17) =create_squad(pri_a17_mon_ambush_1:pri_a17) =create_squad(pri_a17_mon_ambush_2:pri_a17) =set_counter(pri_a17_monolith_amb_death:0)%
+
+[sr_idle@monolith_patrol]
+on_info = {=counter_equal(pri_a17_monolith_death:3)} sr_idle@patrol_dead %+pri_a17_patrol_dead%
+on_info2 = {+pri_a17_mon_ambush_start} sr_idle@monolith_ambush_preach
+on_info3 = {+pri_a17_actor_leaver} sr_idle@monolith_ambush_preach %+pri_a17_mon_ambush_start%
+on_info4 = {+pri_a17_actor_find_ambush} sr_idle@monolith_ambush_preach %+pri_a17_mon_ambush_start%
+
+[sr_idle@patrol_dead]
+on_info = {+pri_a17_mon_ambush_start} sr_idle@monolith_ambush_preach
+
+[sr_idle@monolith_ambush_preach]
+on_game_timer = 5 | sr_idle@monolith_ambush_squad_2 %=create_squad(pri_a17_mon_preacher:pri_a17)%
+
+[sr_idle@monolith_ambush_squad_2]
+on_info = {=counter_equal(pri_a17_monolith_amb_death:4)} sr_idle@stage_1
+
+[sr_idle@stage_1]
+on_game_timer = 15 | {!actor_in_zone(pri_a17_first_floor) -pri_a17_stage_1_ended} sr_idle@stage_2 %=create_squad(pri_a17_mon_ambush_3:pri_a17) +pri_a17_stage_1_ended%, {!actor_in_zone(pri_a17_second_floor)} sr_idle@stage_2, {!actor_in_zone(pri_a17_roof)} sr_idle@stage_3
+
+[sr_idle@stage_2]
+on_game_timer = 15 | {!actor_in_zone(pri_a17_second_floor) -pri_a17_stage_2_ended} sr_idle@stage_3 %=create_squad(pri_a17_mon_ambush_4:pri_a17) +pri_a17_stage_2_ended%, {!actor_in_zone(pri_a17_roof)} sr_idle@stage_3, {!actor_in_zone(pri_a17_first_floor)} sr_idle@stage_1
+
+[sr_idle@stage_3]
+on_game_timer = 15 | {+pri_a17_stage_1_ended +pri_a17_stage_2_ended +pri_a17_stage_3_ended} sr_idle@death_end, {!actor_in_zone(pri_a17_roof) -pri_a17_stage_3_ended} sr_idle@stage_1 %=create_squad(pri_a17_mon_ambush_5:pri_a17) +pri_a17_stage_3_ended%, {!actor_in_zone(pri_a17_first_floor)} sr_idle@stage_1, {!actor_in_zone(pri_a17_second_floor)} sr_idle@stage_2
+
+[sr_idle@death_end]
+on_info = {=counter_equal(pri_a17_monolith_amb_death:14) +pri_a17_mon_preacher_dead} sr_idle@end %+pri_a17_mon_ambush_killed%
+
+[sr_idle@end]

@@ -1,0 +1,110 @@
+[walker@def]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = pri_a16_sr_noweap
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@def]
+reach_movement = walk_noweap
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+use_camp = false
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+
+[logic@pri_a16_guarder_1]
+active = walker@guarder_1
+suitable = {-pri_a25_rfi_source_eliminated =npc_in_zone(pri_a16_sr_light)} true
+prior = 140
+
+[walker@guarder_1]:walker@def
+path_walk = guarder_1_walk
+path_look = guarder_1_look
+on_info = {=surge_started} walker@hide_1
+out_restr = pri_a16_sr_noweap
+
+[walker@hide_1]:walker@def
+path_walk = hide_1_walk
+path_look = hide_1_look
+on_info = {=surge_complete} walker@guarder_1
+out_restr = pri_a16_sr_noweap
+
+
+
+[logic@pri_a16_guarder_2]
+active = walker@guarder_2 
+suitable = {-pri_a25_rfi_source_eliminated =npc_in_zone(pri_a16_sr_light)} true
+prior = 140
+
+[walker@guarder_2]:walker@def
+path_walk = guarder_2_walk
+path_look = guarder_2_look
+on_info = {=surge_started} walker@hide_2
+
+[walker@hide_2]:walker@def
+path_walk = hide_2_walk
+path_look = hide_1_look
+on_info = {=surge_complete} walker@guarder_2
+
+
+
+[logic@pri_a16_guarder_3]
+active = animpoint@guarder_3 
+suitable = {-pri_a25_rfi_source_eliminated =npc_in_zone(pri_a16_sr_light)} true
+prior = 150
+
+[animpoint@guarder_3]:animpoint@def
+cover_name = pri_a16_animp_5
+use_camp = true
+
+
+
+[logic@pri_a16_guarder_4]
+active = animpoint@guarder_4
+suitable = {-pri_a25_rfi_source_eliminated =npc_in_zone(pri_a16_sr_light)} true
+prior = 150
+
+[animpoint@guarder_4]:animpoint@def
+cover_name = pri_a16_animp_6
+use_camp = true
+
+
+
+[logic@pri_a16_guarder_main]
+active = walker@base
+suitable = {-pri_a25_rfi_source_eliminated +pri_a21_task_end =check_npc_name(sokolov)} true, {-pri_a25_rfi_source_eliminated +pri_a21_task_end =check_npc_name(podorojniy)} true
+prior = 200
+
+[walker@base]
+path_walk = yarmoshuk_walk
+path_look = yarmoshuk_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = meet@guard_main
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+
+[meet@guard_main]
+close_snd_hello	= nil
+close_snd_bye	= nil
+close_anim 		= nil
+close_victim	= nil
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+trade_enable 	= false
+allow_break 	= false

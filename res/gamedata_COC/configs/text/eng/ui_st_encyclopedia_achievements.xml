@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_achievements">
+		<text>Achievements</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_bookworm_food">
+		<text>Bookworm Food</text>
+	</string>
+	<string id="encyclopedia_achievements_bookworm_food_text">
+		<text>
+			%c[guide_blue]Bookworm Food%c[default] requires you to unlock all articles for the in-game guide.\n
+			\n%c[guide_green]Information%c[default]
+			\nArticles can be unlocked through a multitude of ways, such as talking to important characters or downloading data from memory sticks.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nAll future memory sticks which would be found on the bodies of dead stalkers will be replaced by rare PDAs.\n
+			\nShould extra articles be added after unlocking this achievement, such as via a patch or a mod, then this effect will be temporarily disabled so that memory sticks can be obtained again.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_completionist">
+		<text>Completionist</text>
+	</string>
+	<string id="encyclopedia_achievements_completionist_text">
+		<text>
+			%c[guide_blue]Completionist%c[default] requires you to unlock all other available achievements.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nDouble the amount of rank points compared to when you normally unlock an achievement.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_down_to_earth">
+		<text>Down to Earth</text>
+	</string>
+	<string id="encyclopedia_achievements_down_to_earth_text">
+		<text>
+			%c[guide_blue]Down to Earth%c[default] requires you to destroy either 3 helicopters with small arms, or just the 1 if you use an explosive weapon such as the RPG or RG-6.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nMi-24 "Hind" helicopters will gradually be replaced with the weaker Mi-2 "Hoplite".
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_duga_free">
+		<text>Duga Free</text>
+	</string>
+	<string id="encyclopedia_achievements_duga_free_text">
+		<text>
+			%c[guide_blue]Duga Free%c[default] requires you to disable both the Miracle Machine and the Brain Scorcher.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nYantar and Radar will become much easier to travel through after said psi-field emitters are disabled.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_geologist">
+		<text>Geologist</text>
+	</string>
+	<string id="encyclopedia_achievements_geologist_text">
+		<text>
+			%c[guide_blue]Geologist%c[default] requires you to detect a minimum of 50 artefacts.\n
+			\n%c[guide_green]Information%c[default]
+			\nArtefact detection requires a detector, which are sold by most traders.\nBy using them near an anomaly, there is a chance you may detect an artefact.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nRespawn rates for artefacts found in anomalies will be slightly increased.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_heavy_pockets">
+		<text>Heavy Pockets</text>
+	</string>
+	<string id="encyclopedia_achievements_heavy_pockets_text">
+		<text>
+			%c[guide_blue]Heavy Pockets%c[default] requires you to possess 1,000,000 RU at any one moment.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nMost traders will begin to offer you special supplies which would only otherwise be available if you had great relations with their faction.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_infopreneur">
+		<text>Infopreneur</text>
+	</string>
+	<string id="encyclopedia_achievements_infopreneur_text">
+		<text>
+			%c[guide_blue]Infopreneur%c[default] requires to you deliver a minimum of 50 PDAs to information brokers.\n
+			\n%c[guide_green]Information%c[default]
+			\nPDAs can be found on the bodies of dead stalkers, and can be traded to information brokers by telling them you have information to sell.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nInformation brokers will offer you a slightly increased reward for any future PDAs you bring them.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_mechanized_warfare">
+		<text>Mechanized Warfare</text>
+	</string>
+	<string id="encyclopedia_achievements_mechanized_warfare_text">
+		<text>
+			%c[guide_blue]Mechanized Warfare%c[default] requires you to deliver all 3 sets of tools to a single technician.\n
+			\n%c[guide_green]Information%c[default]
+			\nBasic, advanced, and expert tools can be found mostly in stashes, but can also on occasion be found for sale by certain traders.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nGunsmith and sewing kits will repair weapons and outfits slightly more than before.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_patriarch">
+		<text>Patriarch</text>
+	</string>
+	<string id="encyclopedia_achievements_patriarch_text">
+		<text>
+			%c[guide_blue]Patriarch%c[default] requires you to achieve the highest possible rank.\n
+			\n%c[guide_green]Information%c[default]
+			\nRank can be earned through almost every action that you can take in the Zone.\nAn article explaining ranks and how they work can be found in the features category.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nYou will be able to recruit 2 additional companions above the regular limit.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_radiotherapy">
+		<text>Radiotherapy</text>
+	</string>
+	<string id="encyclopedia_achievements_radiotherapy_text">
+		<text>
+			%c[guide_blue]Radiotherapy%c[default] requires you to survive 25 emissions and 25 psi-storms.\n
+			\n%c[guide_green]Information%c[default]
+			\nEmissions and psi-storms occur at random intervals, which can be altered through the weather options section of the main menu.\n
+			\nBoth of these features can be toggled at any time during a playthrough, but will need to be enabled in order for you to earn this achievement.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nThere is a small chance that you will survive an emission or a psi-vortex without taking cover.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_rag_and_bone">
+		<text>Rag and Bone</text>
+	</string>
+	<string id="encyclopedia_achievements_rag_and_bone_text">
+		<text>
+			%c[guide_blue]Rag and Bone%c[default] requires you to loot (at least partially) a minimum of 100 stashes.\n
+			\n%c[guide_green]Information%c[default]
+			\nStashes can be found almost anywhere in the Zone at any time, but receiving their coordinates after completing tasks will mark them on your map.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nThe maximum total value of items found in newly generated stashes will be slightly increased.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_silver_or_lead">
+		<text>Silver or Lead</text>
+	</string>
+	<string id="encyclopedia_achievements_silver_or_lead_text">
+		<text>
+			%c[guide_blue]Silver or Lead%c[default] requires you to either kill 500 stalkers, or make 50 stalkers surrender to you.\n
+			\n%c[guide_green]Information%c[default]
+			\nThe requirements for this achievement will likely be met through normal gameplay, but if you are deliberately trying to unlock it, be careful not to kill neutral or friendly stalkers if you value your reputation.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nSurrendering stalkers may sometimes give you coordinates to an additional stash location.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_tourist">
+		<text>Tourist</text>
+	</string>
+	<string id="encyclopedia_achievements_tourist_text">
+		<text>
+			%c[guide_blue]Tourist%c[default] requires you to visit all 32 levels in the Zone.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nYou will receive coordinates for 3 unique stashes.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_well_dressed">
+		<text>Well Dressed</text>
+	</string>
+	<string id="encyclopedia_achievements_well_dressed_text">
+		<text>
+			%c[guide_blue]Well Dressed%c[default] requires you to either kill 500 mutants, or field dress 250 mutant parts.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nYou may sometimes receive additional mutant parts when field dressing.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_wishful_thinking">
+		<text>Wishful Thinking</text>
+	</string>
+	<string id="encyclopedia_achievements_wishful_thinking_text">
+		<text>
+			%c[guide_blue]Wishful Thinking%c[default] requires you to defeat all 10 waves of the Wish Granter's illusions.\n
+			\n%c[guide_green]Rewards%c[default]
+			\nYou will receive a major increase to both your rank and reputation.
+		</text>
+	</string>
+	
+</string_table>

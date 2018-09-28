@@ -1,0 +1,22 @@
+[smart_terrain]
+squad_id = 1
+max_population = 2
+respawn_params = respawn@agr_u_bandits
+respawn_idle = 86400
+respawn_radius = 300
+
+[respawn@agr_u_bandits]
+spawn_bandit@advanced
+
+[spawn_bandit@advanced]
+spawn_squads = bandit_sim_squad_novice, bandit_sim_squad_advanced
+spawn_num = 2
+
+[exclusive]
+agr_u_bandits_squad_1 = agroprom_underground\agr_u_bandits_logic.ltx
+agr_u_bandits_squad_2 = agroprom_underground\agr_u_bandits_logic.ltx
+agr_u_bandits_squad_3 = agroprom_underground\agr_u_bandits_logic.ltx
+agr_u_bandits_squad_4 = agroprom_underground\agr_u_bandits_logic.ltx
+agr_u_bandits_squad_5 = agroprom_underground\agr_u_bandits_logic.ltx
+agr_u_bandits_squad_6 = agroprom_underground\agr_u_bandits_logic.ltx
+agr_u_bandits_squad_7 = agroprom_underground\agr_u_bandits_logic.ltx

@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle@3
+
+[sr_idle@3]
+on_info = sr_idle@4 %=spawn_corpse(sim_default_zombied_1:jup_b205_dead_zombie_01_way) =spawn_corpse(sim_default_zombied_1:jup_b205_smart_terrain_tushkano_evil_tushkano_look)% 
+
+[sr_idle@4]
+on_info = {=actor_has_item(jup_b205_sokolov_note)} sr_idle@end %+jup_b205_evacuation_visited +jup_b205_pass_code_valide%
+
+[sr_idle@end]

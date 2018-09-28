@@ -1,0 +1,19 @@
+[logic]
+active = nil ;sr_idle@artifact
+
+[sr_idle@artifact]
+on_info = {=actor_has_item(af_quest_b14_twisted) -zat_b14_take_item} %+zat_b14_take_item =scenario_autosave(st_save_zat_b14_got_altered_wheel)%
+on_info2 = {+zat_b14_take_item} sr_idle@spawn_stalker
+
+[sr_idle@spawn_stalker]
+on_info = {-zat_b14_general_stalker_spawn} sr_idle@teleport %=create_squad(zat_b14_stalkers:zat_b14_smart_terrain) +zat_b14_general_stalker_spawn%
+
+[sr_idle@teleport]
+on_timer = 3000 | sr_idle@artifact_2 %=teleport_npc_by_story_id(zat_stalker_friend_1_id:zat_b14_smart_terrain_zat_b14_stalker_3_walk_1) =teleport_npc_by_story_id(zat_stalker_friend_2_id:zat_b14_smart_terrain_zat_b14_stalker_2_walk_1)% 
+
+[sr_idle@artifact_2]
+on_info  = {=actor_has_item(af_quest_b14_twisted) +zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor} sr_idle@end %+zat_b14_return_item%
+on_info2 = {+zat_b14_give_item_linker} sr_idle@end
+on_info3 = {+zat_b14_cut_scene_1_start} sr_idle@end %=teleport_npc_by_story_id(zat_stalker_friend_1_id:zat_stalker_base_smart_general_characters_spawn_point) =teleport_npc_by_story_id(zat_stalker_friend_2_id:zat_stalker_base_smart_general_characters_spawn_point)% 
+
+[sr_idle@end]

@@ -1,0 +1,19 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside = sr_idle@minus %+esc_actor_come_first%
+
+[sr_idle@minus]
+on_info = {+esc_trader_hello_first_played} sr_idle@last
+
+[sr_idle@last]
+on_actor_in_zone = esc_space_restrictor_wait_trader | {-esc_player_sleeps} sr_idle@timer
+
+[sr_idle@timer]
+on_game_timer = 150 | sr_idle@check
+on_actor_not_in_zone = esc_space_restrictor_wait_trader | sr_idle@last
+on_info = {+esc_skip_angry} sr_idle@last %-esc_skip_angry -esc_player_sleeps%
+
+[sr_idle@check]
+on_actor_in_zone = esc_space_restrictor_wait_trader | sr_idle@last %+esc_player_sleeps%

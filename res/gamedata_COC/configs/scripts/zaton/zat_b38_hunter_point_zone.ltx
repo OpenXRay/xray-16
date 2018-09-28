@@ -1,0 +1,19 @@
+[logic]
+active = nil ;sr_idle@pre
+
+[sr_idle@pre]
+on_info = {+zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give_task} sr_idle@wait
+
+[sr_idle@wait] ;Включаем таймер по наличии задания и игрока в зоне, телепорт глухаря
+on_actor_inside = sr_idle@timer %+zat_b38_lair_started =teleport_squad(zat_b38_stalker_cop_squad:zat_b38_research_first_hall_walk:1)%
+
+[sr_idle@timer] ;По рации мент связывается с нами
+on_game_timer = 60 | {-zat_b38_stalker_cop_find_lair_pda_play} sr_idle@info %=play_sound(zat_b38_stalker_cop_find_lair_pda) +zat_b38_stalker_cop_find_lair_pda_play%
+
+[sr_idle@info] ;Обновляем задание
+on_signal = sound_end | {-zat_b38_disappearance_stalkers_meet_ment_give} sr_idle@fail_check %+zat_b38_disappearance_stalkers_meet_ment_give%
+
+[sr_idle@fail_check]
+on_info = {+zat_b38_failed_getaway -zat_b38_cop_passed_away =squad_exist(zat_b38_stalker_cop_squad)} sr_idle@nil %=teleport_squad(zat_b38_stalker_cop_squad:zat_stalker_base_smart_general_characters_spawn_point)%
+
+[sr_idle@nil]

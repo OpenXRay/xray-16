@@ -1,0 +1,335 @@
+; general
+
+[hit@zat_b40_mercs_hit_gen]
+on_info =  {=fighting_actor} %+zat_b40_merc_in_combat%
+
+[camper@zat_b40_mercs_gen]
+radius = 50 
+def_state_moving = assault
+combat_ignore_cond =  false
+corpse_detection_enabled = false
+
+[walker@zat_b40_mercs_gen]
+def_state_moving = assault
+def_state_standing = hide
+
+[remark@zat_b40_danger_gen]
+anim = hide
+
+[remark@zat_b40_warning_gen]
+anim = guard_na
+combat_ignore_cond =  false
+corpse_detection_enabled = false
+
+[camper@zat_b40_surge_gen]:camper@zat_b40_mercs_gen
+def_state_standing = sit_knee
+out_restr = zat_surge_hide_b40
+
+[logic@zat_b40_mercs_gen]
+suitable = true
+prior = 90
+
+; logic
+[logic@zat_b40_guard_leader_01]:logic@zat_b40_mercs_gen
+suitable = true ;{=check_npc_name(zat_b40_merc_squad_leader_1)} true
+prior = 91
+active = camper@zat_b40_guard_leader_01
+known_info = known_info@zat_b40_guard_leader_01
+
+[logic@zat_b40_guard_leader_02]:logic@zat_b40_mercs_gen
+suitable = true ;{=check_npc_name(zat_b40_merc_squad_leader_2)} true
+prior = 91
+active = camper@zat_b40_guard_leader_02
+known_info = known_info@zat_b40_guard_leader_02
+
+[logic@zat_b40_guard_01]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_01
+
+[logic@zat_b40_guard_02]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_02
+
+[logic@zat_b40_guard_03]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_03
+
+[logic@zat_b40_guard_04]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_04
+
+[logic@zat_b40_guard_05]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_05
+
+[logic@zat_b40_guard_06]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_06
+
+[logic@zat_b40_guard_07]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_07
+
+[logic@zat_b40_guard_08]:logic@zat_b40_mercs_gen
+active = camper@zat_b40_guard_08
+
+; corp
+
+[known_info@zat_b40_guard_leader_01]
+zat_b40_guard_leader_01_serchd
+
+[known_info@zat_b40_guard_leader_02]
+zat_b40_guard_leader_02_serchd
+
+; camper
+
+[camper@zat_b40_guard_leader_01]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_squad_leader_1_walk
+path_look = zat_b40_merc_squad_leader_1_look
+on_info = {=surge_started} camper@zat_b40_surge_09
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_09 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_09 
+
+[camper@zat_b40_guard_leader_02]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_squad_leader_2_walk
+path_look = zat_b40_merc_squad_leader_2_look
+on_info = {=surge_started} camper@zat_b40_surge_10
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_10 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_10 
+
+[camper@zat_b40_guard_01]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_01_walk
+path_look = zat_b40_merc_01_look
+on_info = {=surge_started} camper@zat_b40_surge_01
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_01 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_01 
+
+[camper@zat_b40_guard_02]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_02_walk
+path_look = zat_b40_merc_02_look
+on_info = {=surge_started} camper@zat_b40_surge_02
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_02 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_02 
+
+[camper@zat_b40_guard_03]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_03_walk
+path_look = zat_b40_merc_03_look
+on_info = {=surge_started} camper@zat_b40_surge_03
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_03 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_03 
+
+[camper@zat_b40_guard_04]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_04_walk
+path_look = zat_b40_merc_04_look
+on_info = {=surge_started} camper@zat_b40_surge_04
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_04 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_04 
+
+[camper@zat_b40_guard_05]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_05_walk
+path_look = zat_b40_merc_05_look
+on_info = {=surge_started} camper@zat_b40_surge_05
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_05 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_05 
+
+[camper@zat_b40_guard_06]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_06_walk
+path_look = zat_b40_merc_06_look
+on_info = {=surge_started} camper@zat_b40_surge_06
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_06 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_06 
+
+[camper@zat_b40_guard_07]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_07_walk
+path_look = zat_b40_merc_07_look
+on_info = {=surge_started} camper@zat_b40_surge_07
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_07 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_07 
+
+[camper@zat_b40_guard_08]:camper@zat_b40_mercs_gen
+path_walk = zat_b40_merc_08_walk
+path_look = zat_b40_merc_08_look
+on_info = {=surge_started} camper@zat_b40_surge_08
+;on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_08 %+zat_b40_warning%
+;on_info3 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_08 
+
+;walker
+
+[walker@zat_b40_mercs_01]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_01_walk
+path_look = zat_b40_merc_01_look
+on_info = {=surge_started} camper@zat_b40_surge_01
+
+[walker@zat_b40_mercs_02]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_02_walk
+path_look = zat_b40_merc_02_look
+on_info = {=surge_started} camper@zat_b40_surge_02
+
+[walker@zat_b40_mercs_03]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_03_walk
+path_look = zat_b40_merc_03_look
+on_info = {=surge_started} camper@zat_b40_surge_03
+
+[walker@zat_b40_mercs_04]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_04_walk
+path_look = zat_b40_merc_04_look
+on_info = {=surge_started} camper@zat_b40_surge_04
+
+[walker@zat_b40_mercs_05]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_05_walk
+path_look = zat_b40_merc_05_look
+on_info = {=surge_started} camper@zat_b40_surge_05
+
+[walker@zat_b40_mercs_06]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_06_walk
+path_look = zat_b40_merc_06_look
+on_info = {=surge_started} camper@zat_b40_surge_06
+
+[walker@zat_b40_mercs_07]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_07_walk
+path_look = zat_b40_merc_07_look
+on_info = {=surge_started} camper@zat_b40_surge_07
+
+[walker@zat_b40_mercs_08]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_08_walk
+path_look = zat_b40_merc_08_look
+on_info = {=surge_started} camper@zat_b40_surge_08
+
+[walker@zat_b40_mercs_09]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_squad_leader_1_walk
+path_look = zat_b40_merc_squad_leader_1_look
+on_info = {=surge_started} camper@zat_b40_surge_09
+
+[walker@zat_b40_mercs_10]:walker@zat_b40_mercs_gen
+path_walk = zat_b40_merc_squad_leader_2_walk
+path_look = zat_b40_merc_squad_leader_2_look
+on_info = {=surge_started} camper@zat_b40_surge_10
+
+; danger remark
+
+[remark@zat_b40_danger_01]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_01
+on_info4 = {=surge_started} camper@zat_b40_surge_01
+
+[remark@zat_b40_danger_02]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_02
+on_info4 = {=surge_started} camper@zat_b40_surge_02
+
+[remark@zat_b40_danger_03]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_03
+on_info4 = {=surge_started} camper@zat_b40_surge_03
+
+[remark@zat_b40_danger_04]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_04
+on_info4 = {=surge_started} camper@zat_b40_surge_04
+
+[remark@zat_b40_danger_05]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_05
+on_info4 = {=surge_started} camper@zat_b40_surge_05
+
+[remark@zat_b40_danger_06]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_06
+on_info4 = {=surge_started} camper@zat_b40_surge_06
+
+[remark@zat_b40_danger_07]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_07
+on_info4 = {=surge_started} camper@zat_b40_surge_07
+
+[remark@zat_b40_danger_08]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_08
+on_info4 = {=surge_started} camper@zat_b40_surge_08
+
+[remark@zat_b40_danger_09]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_09
+on_info4 = {=surge_started} camper@zat_b40_surge_09
+
+[remark@zat_b40_danger_10]:remark@zat_b40_danger_gen
+on_info3 = {+zat_b40_merc_combat_find_actor} walker@zat_b40_mercs_10
+on_info4 = {=surge_started} camper@zat_b40_surge_10
+
+;surge
+
+[camper@zat_b40_surge_01]:camper@zat_b40_surge_gen
+path_walk = walker_1_walk
+path_look = walker_1_look
+on_info = {=surge_complete} camper@zat_b40_guard_01
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_01 %+zat_b40_warning%
+
+[camper@zat_b40_surge_02]:camper@zat_b40_surge_gen
+path_walk = walker_2_walk
+path_look = walker_2_look
+on_info = {=surge_complete} camper@zat_b40_guard_02
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_02 %+zat_b40_warning%
+
+[camper@zat_b40_surge_03]:camper@zat_b40_surge_gen
+path_walk = walker_3_walk
+path_look = walker_3_look
+on_info = {=surge_complete} camper@zat_b40_guard_03
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_03 %+zat_b40_warning%
+
+[camper@zat_b40_surge_04]:camper@zat_b40_surge_gen
+path_walk = walker_4_walk
+path_look = walker_4_look
+on_info = {=surge_complete} camper@zat_b40_guard_04
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_04 %+zat_b40_warning%
+
+[camper@zat_b40_surge_05]:camper@zat_b40_surge_gen
+path_walk = walker_5_walk
+path_look = walker_5_look
+on_info = {=surge_complete} camper@zat_b40_guard_05
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_05 %+zat_b40_warning%
+
+[camper@zat_b40_surge_06]:camper@zat_b40_surge_gen
+path_walk = walker_6_walk
+path_look = walker_6_look
+on_info = {=surge_complete} camper@zat_b40_guard_06
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_06 %+zat_b40_warning%
+
+[camper@zat_b40_surge_07]:camper@zat_b40_surge_gen
+path_walk = walker_7_walk
+path_look = walker_7_look
+on_info = {=surge_complete} camper@zat_b40_guard_07
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_07 %+zat_b40_warning%
+
+[camper@zat_b40_surge_08]:camper@zat_b40_surge_gen
+path_walk = surge_4_walk
+path_look = surge_4_look
+on_info = {=surge_complete} camper@zat_b40_guard_08
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_08 %+zat_b40_warning%
+
+[camper@zat_b40_surge_09]:camper@zat_b40_surge_gen
+path_walk = surge_5_walk
+path_look = surge_5_look
+on_info = {=surge_complete} camper@zat_b40_guard_leader_01
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_09 %+zat_b40_warning%
+
+[camper@zat_b40_surge_10]:camper@zat_b40_surge_gen
+path_walk = surge_3_walk
+path_look = surge_3_look
+on_info = {=surge_complete} camper@zat_b40_guard_leader_02
+on_info2 = {+zat_b40_actor_find_mer_camp -zat_b40_merc_in_combat -zat_b40_warning} remark@zat_b40_warning_10 %+zat_b40_warning%
+
+; remark
+
+[remark@zat_b40_warning_01]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_01 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_01
+
+[remark@zat_b40_warning_02]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_02 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_02
+
+[remark@zat_b40_warning_03]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_03 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_03
+
+[remark@zat_b40_warning_04]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_04 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_04
+
+[remark@zat_b40_warning_05]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_05 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_05
+
+[remark@zat_b40_warning_06]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_06 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_06
+
+[remark@zat_b40_warning_07]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_07 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_07
+
+[remark@zat_b40_warning_08]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_08 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_08
+
+[remark@zat_b40_warning_09]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_09 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_leader_01
+
+[remark@zat_b40_warning_10]:remark@zat_b40_warning_gen
+on_info2 = {+zat_b40_merc_in_combat} remark@zat_b40_danger_10 %=stop_sound%, {+zat_b40_start_worning_time} camper@zat_b40_guard_leader_02

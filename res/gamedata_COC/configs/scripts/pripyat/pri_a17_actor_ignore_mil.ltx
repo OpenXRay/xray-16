@@ -1,0 +1,30 @@
+[logic]
+active = nil;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+pri_a17_teleport_military_recon} sr_idle@normal
+
+[sr_idle@normal]
+on_game_timer = 21600 | {=distance_to_obj_ge(pri_a17_recon_squad:100)} sr_idle@end %+pri_a17_actor_leaver +pri_a17_actor_find_ambush% ;актер бросил военных и ушел
+on_info = {+pri_a17_patrol_dead} sr_idle@actor_ignore_task ;актер делает все правильно).
+on_info2 = {+pri_a17_actor_attack_military} sr_idle@badend %+pri_a17_mon_ambush_start% ;актер атаковал военных
+on_info3 = {=actor_in_zone(pri_a17_first_floor)} %+pri_a17_actor_find_ambush%, {=actor_in_zone(pri_a17_second_floor)} %+pri_a17_actor_find_ambush%
+
+;актер делает все правильно).
+[sr_idle@actor_ignore_task]
+on_info = {+pri_a17_mon_ambush_start} sr_idle@end, {=actor_in_zone(pri_a17_hosp_square)} sr_idle@actor_ignore_task_2, {+pri_a17_actor_attack_military} sr_idle@badend %+pri_a17_mon_ambush_start%
+on_game_timer  = 600 | sr_idle@end %+pri_a17_mon_ambush_start%
+on_game_timer2 = 21600 | {=distance_to_obj_ge(pri_a17_recon_squad:100)} sr_idle@end %+pri_a17_actor_leaver +pri_a17_actor_find_ambush% 
+
+[sr_idle@actor_ignore_task_2]
+on_info = {+pri_a17_mon_ambush_start} sr_idle@end, {!actor_in_zone(pri_a17_hosp_square)} sr_idle@chek, {+pri_a17_actor_attack_military} sr_idle@badend  %+pri_a17_mon_ambush_start%
+on_game_timer = 450 | sr_idle@end %+pri_a17_mon_ambush_start%
+
+[sr_idle@chek]
+on_game_timer = 50 | {=actor_in_zone(pri_a17_hosp_square)} sr_idle@actor_ignore_task_2, sr_idle@end %+pri_a17_mon_ambush_start%
+
+;актер атаковал военных
+[sr_idle@badend]
+on_game_timer = 10 | sr_idle@end %+pri_a17_actor_attack_military_antibug%
+
+[sr_idle@end]

@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 1
+max_population = 4
+respawn_params = respawn@val_smart_terrain_1_2
+respawn_idle = 86400
+
+
+[respawn@val_smart_terrain_1_2]
+spawn_army@novice
+spawn_army@advanced
+
+[spawn_army@novice]
+spawn_squads = army_sim_squad_novice
+spawn_num = 2
+
+[spawn_army@advanced]
+spawn_squads = army_sim_squad_novice, army_sim_squad_advanced
+spawn_num = 1

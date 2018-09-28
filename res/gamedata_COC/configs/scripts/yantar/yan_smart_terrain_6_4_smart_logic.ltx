@@ -1,0 +1,278 @@
+;------------------------- 0a yan_surge_cover 00 ---------
+
+[logic@yan_bunk_hide_00]
+active = animpoint@yan_bunk_hide_00
+suitable = {=surge_started} true, false
+prior = 70
+
+[animpoint@yan_bunk_hide_00]
+cover_name = yan_bunk_smart_cover_0000
+reach_movement = run
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = yan_smart_terrain_6_4_surge_hide_a1
+
+;------------------------- 0a yan_surge_cover 04 ---------
+
+[logic@yan_bunk_hide_04]
+active = animpoint@yan_bunk_hide_04
+suitable = {=surge_started} true, false
+prior = 70
+
+[animpoint@yan_bunk_hide_04]
+cover_name = yan_bunk_smart_cover_0004
+reach_movement = run
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = yan_smart_terrain_6_4_surge_hide_a1
+
+;------------------------- 0a yan_surge_cover 05 ---------
+
+[logic@yan_bunk_hide_05]
+active = animpoint@yan_bunk_hide_05
+suitable = {=surge_started} true, false
+prior = 70
+
+[animpoint@yan_bunk_hide_05]
+cover_name = yan_bunk_smart_cover_0005
+reach_movement = run
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = yan_smart_terrain_6_4_surge_hide_a1
+
+;------------------------- 0a yan_surge_cover 06 ---------
+
+[logic@yan_bunk_hide_06]
+active = animpoint@yan_bunk_hide_06
+suitable = {=surge_started} true, false
+prior = 70
+
+[animpoint@yan_bunk_hide_06]
+cover_name = yan_bunk_smart_cover_0006
+reach_movement = run
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = yan_smart_terrain_6_4_surge_hide_a1
+
+;------------------------- 1 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_1]
+active = walker@yan_smart_terrain_6_4_zombie_wave_1
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base3) -yan_faction_base_defense_zombi_wave_3_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base6) -yan_faction_base_defense_zombi_wave_6_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base9) -yan_faction_base_defense_zombi_wave_7_3_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_1]
+path_walk = 1_1_walk
+path_look = 1_1_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 2 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_2]
+active = walker@yan_smart_terrain_6_4_zombie_wave_2
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base3) -yan_faction_base_defense_zombi_wave_3_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base6) -yan_faction_base_defense_zombi_wave_6_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base9) -yan_faction_base_defense_zombi_wave_7_3_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_2]
+path_walk = 2_2_walk
+path_look = 2_2_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+;------------------------- 3 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_3]
+active = walker@yan_smart_terrain_6_4_zombie_wave_3
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base3) -yan_faction_base_defense_zombi_wave_3_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base6) -yan_faction_base_defense_zombi_wave_6_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base9) -yan_faction_base_defense_zombi_wave_7_3_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_3]
+path_walk = 3_3_walk
+path_look = 3_3_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+;------------------------- 4 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_4]
+active = walker@yan_smart_terrain_6_4_zombie_wave_4
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base3) -yan_faction_base_defense_zombi_wave_3_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base6) -yan_faction_base_defense_zombi_wave_6_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base9) -yan_faction_base_defense_zombi_wave_7_3_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_4]
+path_walk = 4_4_walk
+path_look = 4_4_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+;------------------------- 5 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_5]
+active = walker@yan_smart_terrain_6_4_zombie_wave_5
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base3) -yan_faction_base_defense_zombi_wave_3_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base6) -yan_faction_base_defense_zombi_wave_6_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base9) -yan_faction_base_defense_zombi_wave_7_3_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_5]
+path_walk = 5_5_walk
+path_look = 5_5_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+;------------------------- 6 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_6]
+active = walker@yan_smart_terrain_6_4_zombie_wave_6
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base2) -yan_faction_base_defense_zombi_wave_2_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base5) -yan_faction_base_defense_zombi_wave_5_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base8) -yan_faction_base_defense_zombi_wave_7_2_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_6]
+path_walk = 6_6_walk
+path_look = 6_6_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 7 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_7]
+active = walker@yan_smart_terrain_6_4_zombie_wave_7
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base2) -yan_faction_base_defense_zombi_wave_2_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base5) -yan_faction_base_defense_zombi_wave_5_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base8) -yan_faction_base_defense_zombi_wave_7_2_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_7]
+path_walk = 7_7_walk
+path_look = 7_7_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 8 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_8]
+active = walker@yan_smart_terrain_6_4_zombie_wave_8
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base2) -yan_faction_base_defense_zombi_wave_2_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base5) -yan_faction_base_defense_zombi_wave_5_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base8) -yan_faction_base_defense_zombi_wave_7_2_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_8]
+path_walk = 8_8_walk
+path_look = 8_8_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 9 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_9]
+active = walker@yan_smart_terrain_6_4_zombie_wave_9
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base2) -yan_faction_base_defense_zombi_wave_2_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base5) -yan_faction_base_defense_zombi_wave_5_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base8) -yan_faction_base_defense_zombi_wave_7_2_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_9]
+path_walk = 9_9_walk
+path_look = 9_9_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 10 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_10]
+active = walker@yan_smart_terrain_6_4_zombie_wave_10
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base2) -yan_faction_base_defense_zombi_wave_2_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base5) -yan_faction_base_defense_zombi_wave_5_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base8) -yan_faction_base_defense_zombi_wave_7_2_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_10]
+path_walk = 10_10_walk
+path_look = 10_10_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+;------------------------- 11 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_11]
+active = walker@yan_smart_terrain_6_4_zombie_wave_11
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base1) -yan_faction_base_defense_zombi_wave_1_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base4) -yan_faction_base_defense_zombi_wave_4_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base7) -yan_faction_base_defense_zombi_wave_7_1_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_11]
+path_walk = 11_11_walk
+path_look = 11_11_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 12 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_12]
+active = walker@yan_smart_terrain_6_4_zombie_wave_12
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base1) -yan_faction_base_defense_zombi_wave_1_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base4) -yan_faction_base_defense_zombi_wave_4_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base7) -yan_faction_base_defense_zombi_wave_7_1_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_12]
+path_walk = 12_12_walk
+path_look = 12_12_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 13 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_13]
+active = walker@yan_smart_terrain_6_4_zombie_wave_13
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base1) -yan_faction_base_defense_zombi_wave_1_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base4) -yan_faction_base_defense_zombi_wave_4_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base7) -yan_faction_base_defense_zombi_wave_7_1_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_13]
+path_walk = 13_13_walk
+path_look = 13_13_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 14 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_14]
+active = walker@yan_smart_terrain_6_4_zombie_wave_14
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base1) -yan_faction_base_defense_zombi_wave_1_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base4) -yan_faction_base_defense_zombi_wave_4_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base7) -yan_faction_base_defense_zombi_wave_7_1_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_14]
+path_walk = 14_14_walk
+path_look = 14_14_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false
+
+
+;------------------------- 15 ------------------------------
+
+[logic@yan_smart_terrain_6_4_zombie_wave_15]
+active = walker@yan_smart_terrain_6_4_zombie_wave_15
+suitable = {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base1) -yan_faction_base_defense_zombi_wave_1_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base4) -yan_faction_base_defense_zombi_wave_4_killed} true, {=target_squad_name(yan_faction_base_defense_zombi_in_sci_base7) -yan_faction_base_defense_zombi_wave_7_1_killed} true
+prior = 50
+
+[walker@yan_smart_terrain_6_4_zombie_wave_15]
+path_walk = 15_15_walk
+path_look = 15_15_look
+sound_idle = state
+combat_ignore_cond = {=check_enemy_name(actor)} false, true
+combat_ignore_keep_when_attacked = false

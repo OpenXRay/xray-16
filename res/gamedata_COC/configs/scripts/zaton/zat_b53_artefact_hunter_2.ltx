@@ -1,0 +1,142 @@
+[walker@def_no_loot]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+
+[logic@zat_b53_artefact_hunter_2]
+suitable = {=check_npc_name(zat_b53_artefact_hunter_2)} true
+prior = 70
+active = walker@wait_actor_scene_start
+on_hit = hit
+on_death = death
+ 
+[walker@wait_actor_scene_start]:walker@def_no_loot
+meet = no_meet
+path_walk = artefact_hunter_2_walk
+path_look = artefact_hunter_2_look
+def_state_standing = wait_na
+on_info = {+zat_b53_artefact_hunter_2_must_say_go_on} walker@scene_start
+
+[walker@scene_start]:walker@def_no_loot
+meet = no_meet
+path_walk = artefact_hunter_2_walk
+path_look = artefact_hunter_2_look
+def_state_standing = wait_na
+on_game_timer = 15 | walker@say_friend_go_on_snd_timer %=play_sound(zat_b53_artefact_hunter_2_come_on)%
+
+[walker@say_friend_go_on_snd_timer]:walker@def_no_loot
+meet = no_meet
+path_walk = artefact_hunter_2_walk
+path_look = artefact_hunter_2_look
+def_state_standing = wait_na
+on_info = {+artefact_hunter_1_in_zone_wounted_restrictor_1} walker@say_friend_go_on_snd
+on_info2 = {=surge_kill_all} %=kill_npc%
+
+[walker@say_friend_go_on_snd]:walker@def_no_loot
+meet = no_meet
+path_walk = artefact_hunter_2_walk
+path_look = artefact_hunter_2_look
+def_state_standing = wait_na
+on_info = {+zat_b53_come_on_continue_sound} walker@wait_friend_wounded %=play_sound(zat_b53_artefact_hunter_2_come_on_continue)%
+on_info2 = {=surge_kill_all} %=kill_npc%
+
+[walker@wait_friend_wounded]:walker@def_no_loot
+meet = no_meet
+path_walk = artefact_hunter_2_walk
+path_look = artefact_hunter_2_look
+def_state_standing = wait_na
+on_info = {+zat_b53_artefact_hunter_1_in_zone_ounted_restrictor_2} remark@actor_help_snd
+on_info2 = {=surge_kill_all} %=kill_npc%
+
+[remark@actor_help_snd]:walker@def_no_loot
+meet = no_meet
+anim = wait_na
+target = story | actor
+on_game_timer = 15 | remark@hello_or_dont %=play_sound(zat_b53_artefact_hunter_help)%
+on_info = {=surge_kill_all} %=kill_npc%
+on_info2 = {!is_alive(zat_b53_artefact_hunter_1)} remark@wait_for_a_new_job
+
+[remark@hello_or_dont]:walker@def_no_loot
+meet = no_meet
+anim = wait_na
+target = story | actor
+on_info = {=surge_kill_all} %=kill_npc%
+on_info2 = {!is_alive(zat_b53_artefact_hunter_1)} remark@wait_for_a_new_job
+on_info3 = {=dist_to_actor_le(5)} remark@actor_help_wait
+on_info4 = {=dist_to_actor_ge(5)} remark@actor_help_anim_hello
+
+[remark@actor_help_anim_hello]:walker@def_no_loot
+meet = meet
+anim = hello
+target = story | actor
+on_info = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info2 = {=surge_kill_all} %=kill_npc%
+on_info3 = {!is_alive(zat_b53_artefact_hunter_1)} remark@wait_for_a_new_job
+on_info4 = {=dist_to_actor_le(5)} remark@actor_help_wait
+on_info5 = {+zat_b53_thanks_dialog} remark@actor_help_wait %=actor_friend%
+
+[remark@actor_help_wait]:walker@def_no_loot
+meet = meet
+anim = wait_na
+target = story | actor
+on_info = {=npc_talking} remark@acor_help_talk
+on_info2 = {+zat_b53_thanks_dialog +zat_b53_artefact_hunter_1_with_friend} remark@sit_ass_talk
+on_info3 = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info4 = {=surge_kill_all} %=kill_npc%
+on_info5 = {!is_alive(zat_b53_artefact_hunter_1)} remark@wait_for_a_new_job
+on_info6 = {+zat_b53_thanks_dialog} %=actor_friend%
+
+[remark@acor_help_talk]:walker@def_no_loot
+meet = meet
+anim = wait_na
+target = story | actor
+on_info = {+zat_b53_artefact_hunter_dialog_1_end} remark@wait_actor_help_to_friend
+on_info2 = {+zat_b53_thanks_dialog +zat_b53_artefact_hunter_1_with_friend} remark@sit_ass_talk
+on_info3 = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info4 = {=surge_kill_all} %=kill_npc%
+on_info5 = {+zat_b53_thanks_dialog} %=actor_friend%
+
+[remark@wait_actor_help_to_friend]:walker@def_no_loot
+meet = no_meet
+anim = wait_na
+target = story | zat_b53_artefact_hunter_1
+on_info = {+zat_b53_thanks_dialog +zat_b53_artefact_hunter_1_with_friend} remark@sit_ass_talk
+on_info2 = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info3 = {=surge_kill_all} %=kill_npc%
+on_info4 = {!is_alive(zat_b53_artefact_hunter_1)} remark@wait_for_a_new_job
+on_info5 = {+zat_b53_thanks_dialog} %=actor_friend%
+
+[remark@wait_for_a_new_job]:walker@def_no_loot
+meet = meet
+anim = wait
+target = story | zat_b53_artefact_hunter_1
+on_info = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info2 = {=surge_kill_all} %=kill_npc%
+
+[remark@sit_ass_talk]:walker@def_no_loot
+meet = meet
+anim = sit_ass
+target = path | zat_b53_artefact_hunter_2_sit_ass_look, 0
+on_info = {+zat_b53_actor_enemy} walker@actor_enemy
+
+[walker@actor_enemy]:walker@def_no_loot
+meet = no_meet
+path_walk = artefact_hunter_2_walk
+on_info = %=actor_enemy%
+
+[meet]
+use = true
+abuse = false
+allow_break = false
+trade_enable = false
+close_anim = nil
+close_distance = 0
+far_distance = 0
+
+[hit]
+on_info = {=hit_by_actor} %+zat_b53_actor_enemy%
+
+[death]
+on_info = {=killed_by_actor -zat_b53_dec_faction_goodwill_done} %=dec_faction_goodwill_to_actor(stalker:100) +zat_b53_dec_faction_goodwill_done%

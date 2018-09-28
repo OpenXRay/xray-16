@@ -1,0 +1,8 @@
+[logic]
+active = nil ;sr_idle@give_task
+
+[sr_idle@give_task]
+on_info = {+zat_b52_nimble_clear -zat_b52_reputation_give} sr_idle@end %=give_task(zat_b52_reputation) +zat_b52_reputation_give%
+on_info2 = {+zat_b52_reputation_give} sr_idle@end
+
+[sr_idle@end]

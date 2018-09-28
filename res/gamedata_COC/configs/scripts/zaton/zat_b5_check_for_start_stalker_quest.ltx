@@ -1,0 +1,28 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+zat_b5_actor_stalker_go_to_trader} sr_idle@check
+on_info2 = {+zat_b5_meat} sr_idle@nil
+on_info3 ={+zat_b5_time_is_out} sr_idle@nil
+
+[sr_idle@check]
+on_actor_inside = sr_cutscene@cam1 %+zat_b5_start_quest_stalkers =disable_ui%
+on_info ={+zat_b5_time_is_out} sr_idle@nil
+on_info2 = {+zat_b5_meat} sr_idle@nil
+on_info3 = {+zat_b5_break_cutscene} sr_idle@nil
+on_actor_in_zone = zat_sr_check_enemy_dist | sr_idle@nil %+zat_b5_break_cutscene +zat_b5_stalker_attack_dealer%
+
+[sr_cutscene@cam1]
+point = zat_b5_smart_terrain_actor_after_stalker_cutscene_walk
+look = zat_b5_smart_terrain_actor_after_stalker_cutscene_look
+cam_effector = scenario_cam\Zaton\zat_b5_from_stalkers
+on_signal = cameff_end | sr_idle@nil
+global_cameffect = true
+outdoor = true
+on_info = {+zat_b5_meat} %=stop_sr_cutscene%
+on_info2 = {+zat_b5_dealer_speak_2_done} %=stop_sr_cutscene%
+enable_ui_on_end = true
+
+
+[sr_idle@nil]

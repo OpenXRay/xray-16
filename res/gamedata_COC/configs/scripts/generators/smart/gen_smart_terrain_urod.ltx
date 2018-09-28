@@ -1,0 +1,23 @@
+[smart_terrain]
+squad_id = 7
+max_population = 2
+respawn_params = respawn@gen_smart_terrain_urod
+respawn_idle = 86400
+
+
+[respawn@gen_smart_terrain_urod]
+spawn_chimera
+spawn_bloodsucker
+spawn_boss
+
+[spawn_boss]
+spawn_squads = simulation_controller_psy, simulation_psysucker
+spawn_num = {-warlab_deactivate_generators_done} 1, 0
+
+[spawn_chimera]
+spawn_squads = simulation_chimera
+spawn_num = {+warlab_deactivate_generators_done} 1, 0
+
+[spawn_bloodsucker]
+spawn_squads = simulation_bloodsucker 
+spawn_num = {+warlab_deactivate_generators_done} 1, 0

@@ -1,0 +1,13 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_actor_in_zone = pri_b304_store_hall | {=actor_has_item(toolkit_3)} sr_idle@has_one %+zat_b103_toolkit_2_second%, sr_idle@has_none
+
+[sr_idle@has_one]
+on_info3 = {=actor_has_item_count(toolkit_3:2)} sr_idle@free %+pri_b304_actor_take_toolkit%
+
+[sr_idle@has_none]
+on_info2 = {=actor_has_item(toolkit_3)} sr_idle@free %+pri_b304_actor_take_toolkit%
+
+[sr_idle@free]

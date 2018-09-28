@@ -1,0 +1,11 @@
+[logic]
+active = nil;sr_idle@day
+
+[sr_idle@day]
+on_info = {+jup_b212_jupiter_chimera_hunt_started !is_day =dist_to_actor_le(150)} sr_idle@night %=create_squad(jup_b212_jupiter_chimera_lair:jup_b212)%
+
+[sr_idle@night]
+on_info = {=is_day =dist_to_story_obj_ge(jup_b212_chimera_killer_id:75)} sr_idle@day %=remove_squad(jup_b212_jupiter_chimera)%
+on_info2 = {+jup_b212_jupiter_chimera_dead} sr_idle@nil
+
+[sr_idle@nil]

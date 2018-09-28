@@ -1,0 +1,304 @@
+﻿  <!-- renegade novice -->
+
+	<specific_character id="sim_default_renegade_0_default_0" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_1</icon>
+
+		<class>sim_default_renegade_0</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_01\bandit\</snd_config>
+
+		<rank>299</rank>
+		<reputation>-81</reputation>
+
+		<money min="250" max="1750" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_1</visual>
+		<supplies>
+			[spawn] \n
+			wpn_bm16 \n
+			ammo_12x70_buck \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+
+	<specific_character id="sim_default_renegade_0_default_1" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_1</icon>
+
+		<class>sim_default_renegade_0</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_02\bandit\</snd_config>
+
+		<rank>335</rank>
+		<reputation>-1046</reputation>
+
+		<money min="250" max="1750" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_1</visual>
+		<supplies>
+			[spawn] \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+
+<!-- renegade expirienced -->
+
+	<specific_character id="sim_default_renegade_1_default_0" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_1</icon>
+
+		<class>sim_default_renegade_1</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_01\bandit\</snd_config>
+
+		<rank>875</rank>
+		<reputation>33</reputation>
+
+		<money min="775" max="2250" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_1</visual>
+		<supplies>
+			[spawn] \n
+			wpn_toz34 \n
+			ammo_12x70_buck \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+
+	<specific_character id="sim_default_renegade_1_default_1" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_1</icon>
+
+		<class>sim_default_renegade_1</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_02\bandit\</snd_config>
+
+		<rank>793</rank>
+		<reputation>51</reputation>
+
+		<money min="775" max="2250" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_1</visual>
+		<supplies>
+			[spawn] \n
+			wpn_toz34 \n
+			ammo_12x70_buck \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+
+	<specific_character id="sim_default_renegade_1_default_2" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_3</icon>
+
+		<class>sim_default_renegade_1</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_01\bandit\</snd_config>
+
+		<rank>3293</rank>
+		<reputation>1491</reputation>
+
+		<money min="775" max="2500" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_3</visual>
+		<supplies>
+			[spawn] \n
+			wpn_toz34 \n
+			ammo_12x76_zhekan \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+
+	<specific_character id="sim_default_renegade_1_default_3" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_1</icon>
+
+		<class>sim_default_renegade_1</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_02\bandit\</snd_config>
+
+		<rank>179</rank>
+		<reputation>1882</reputation>
+
+		<money min="775" max="2250" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_1</visual>
+		<supplies>
+			[spawn] \n
+			wpn_mp5 \n
+			ammo_9x19_fmj \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+
+<!-- renegade expirienced 2 -->
+
+	<specific_character id="sim_default_renegade_2_default_0" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_3</icon>
+
+		<class>sim_default_renegade_2</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_01\bandit\</snd_config>
+
+		<rank>3844</rank>
+		<reputation>1882</reputation>
+
+		<money min="1500" max="3000" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_3</visual>
+		<supplies>
+			[spawn] \n
+			wpn_toz34 \n
+			ammo_12x76_zhekan \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+			grenade_rgd5 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+	
+	<specific_character id="sim_default_renegade_2_default_1" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_3_mask</icon>
+
+		<class>sim_default_renegade_2</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_02\bandit\</snd_config>
+
+		<rank>5806</rank>
+		<reputation>1584</reputation>
+
+		<money min="1500" max="3000" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_3_mask</visual>
+		<supplies>
+			[spawn] \n
+			wpn_toz34 \n
+			ammo_12x76_zhekan \n
+			wpn_pm_9x19 \n
+			ammo_9x19_fmj \n
+			grenade_rgd5 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+
+	<specific_character id="sim_default_renegade_2_default_2" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_4</icon>
+
+		<class>sim_default_renegade_2</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_01\bandit\</snd_config>
+
+		<rank>2128</rank>
+		<reputation>659</reputation>
+
+		<money min="1500" max="3000" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_4</visual>
+		<supplies>
+			[spawn] \n
+			wpn_bm16 \n
+			ammo_12x76_zhekan \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>
+	
+	 <specific_character id="sim_default_renegade_2_default_3" team_default = "1">
+
+		<name>GENERATE_NAME_stalker</name>
+		<icon>ui_inGame2_bandit_2</icon>
+
+		<class>sim_default_renegade_2</class>
+		<community>renegade</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_02\bandit\</snd_config>
+
+		<rank>3663</rank>
+		<reputation>1291</reputation>
+
+		<money min="1500" max="3000" infinitive="0"/>
+
+		<visual>actors\stalker_bandit\stalker_bandit_2</visual>
+		<supplies>
+			[spawn] \n
+			wpn_mp5 \n
+			ammo_9x19_fmj \n
+			wpn_pm \n
+			ammo_9x18_fmj \n
+			grenade_rgd5 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+		</supplies>
+
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+
+	</specific_character>

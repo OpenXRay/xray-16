@@ -1,0 +1,11 @@
+[logic]
+active = nil;sr_idle@set_default_counter
+
+[sr_idle@set_default_counter]
+on_info = {-pri_b301_set_default_counter} sr_idle@add_counter %=set_counter(pri_b301_monsters_death_counter:0) +pri_b301_set_default_counter%
+
+[sr_idle@add_counter]
+on_info = {+pri_b301_monster_death} sr_idle@add_counter %=inc_counter(pri_b301_monsters_death_counter:1) -pri_b301_monster_death%
+on_info2 = {=counter_equal(pri_b301_monsters_death_counter:5) -pri_b301_end_counter} sr_idle@end %+pri_b301_end_counter +pri_b301_save_zulus_complete%
+
+[sr_idle@end]

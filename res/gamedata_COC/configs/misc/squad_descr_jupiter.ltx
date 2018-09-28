@@ -1,0 +1,782 @@
+; «десь содержатс€ дескрипшены сквадов, которые потом можно создавать использу€ спец функции.
+
+;COC Jup A6
+[jup_a6_freedom_trader_ashot_squad]:online_offline_group
+faction = freedom
+npc = jup_a6_freedom_trader_ashot
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_a6_freedom_trader_ashot_squad
+
+[jup_b19_freedom_yar_squad]:online_offline_group
+faction = freedom
+npc = jup_b19_freedom_yar                                                                                                   
+target_smart = jup_a6 
+spawn_point = jup_a6_spawn_point
+story_id = jup_b19_freedom_yar_squad
+
+;----------------------------- B208 ----------------------------------------
+
+[jup_b208_burers_squad]:online_offline_group
+faction = monster
+npc = burer_normal, burer_normal
+target_smart = jup_b208 
+spawn_point = jup_b208_burer_lair_1_spawn_point
+story_id = jup_b208_burers_squad
+
+[jup_b208_simulation_burer]:online_offline_group
+faction = monster_zombied_night
+npc_random = burer_normal
+npc_in_squad = 1, 2
+target_smart = jup_b208 
+;----------------------------- B212 ----------------------------------------
+
+[jup_b212_jupiter_chimera_lair]:online_offline_group
+faction = monster
+npc = jup_b212_chimera_killer
+story_id = jup_b212_jupiter_chimera
+target_smart = jup_b212
+spawn_point = {=actor_in_zone(jup_b212_chimera_spawn_zone)} jup_b212_chimera_spawn_point_1, jup_b212_chimera_spawn_point_2
+
+;----------------------------- A10 ----------------------------------------
+
+[jup_a10_bandit_squad]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = sim_default_bandit_3, sim_default_bandit_2, sim_default_bandit_2
+story_id = jup_a10_bandit_squad
+target_smart = {+jup_a10_vano_give_task_end} nil, {+jup_a10_fals} nil, jup_a10_smart_terrain
+spawn_point = jup_a10_spawn_point
+sympathy = 0
+
+[jup_a10_bandit_squad_1]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = sim_default_bandit_3, sim_default_bandit_2, sim_default_bandit_2
+story_id = jup_a10_bandit_squad_1
+target_smart = {+jup_a10_vano_give_task_end} nil, {+jup_a10_fals} nil, jup_a10_smart_terrain
+spawn_point = jup_a10_smart_terrain_jup_a10_bandit_guard_1_walk
+sympathy = 0
+
+[jup_a10_bandit_squad_2]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = sim_default_bandit_3, sim_default_bandit_3, sim_default_bandit_2
+story_id = jup_a10_bandit_squad_2
+target_smart = {+jup_a10_vano_give_task_end} nil, {+jup_a10_fals} nil, jup_a10_smart_terrain
+spawn_point = jup_a10_smart_terrain_jup_a10_bandit_guard_1_walk
+sympathy = 0
+
+[jup_a10_bandit_squad_3]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = jup_a10_bandit_leader, sim_default_bandit_3, sim_default_bandit_3, sim_default_bandit_3
+story_id = jup_a10_bandit_squad_3
+target_smart = {+jup_a10_vano_give_task_end} nil, {+jup_a10_fals} nil, jup_a10_smart_terrain
+spawn_point = jup_a10_smart_terrain_walker_4_walk
+sympathy = 0
+
+;----------------------------- B200 ----------------------------------------
+
+[jup_b200_tushkano_squad]:online_offline_group
+faction = monster_predatory_night
+npc = tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal
+target_smart = jup_b200_tushkan_smart_terrain
+spawn_point = jup_b200_tushkan_smart_terrain_home_1
+story_id = jup_b200_tushkano_squad
+
+[jup_b25_alex_squad]:online_offline_group
+faction = stalker
+;relationship = neutral
+;npc = jup_b217_stalker_tech, jup_b220_trapper
+npc = jup_b220_trapper
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_b25_alex_squad
+
+[jup_b200_stalker_squad]:online_offline_group
+faction = stalker
+;relationship = neutral
+npc = sim_default_stalker_2, sim_default_stalker_2, sim_default_stalker_2, sim_default_stalker_2, sim_default_stalker_2
+target_smart = {+jup_b200_tech_materials_brought_some} nil, {+jup_b200_tech_materials_brought_all} nil, jup_b200
+spawn_point = jup_b200_walker_2_walk
+story_id = jup_b200_stalker_squad
+
+;----------------------------- B4 ----------------------------------------
+[jup_b4_squad]:online_offline_group
+faction = monolith
+relationship = neutral
+npc = jup_b4_monolith_squad_leader_monolith_skin, jup_b4_monolith_squad_soldier_1_monolith_skin, jup_b4_monolith_squad_soldier_2_monolith_skin, jup_b4_monolith_squad_soldier_3_monolith_skin,jup_b4_monolith_squad_soldier_4_monolith_skin, jup_b4_monolith_squad_soldier_5_monolith_skin
+target_smart = jup_b4, {+jup_b4_monolith_squad_out} nil
+spawn_point = jup_b4_spawn_point
+story_id = jup_b4_squad
+
+[jup_b4_squad_duty]:online_offline_group
+faction = dolg
+relationship = neutral
+npc =  jup_b4_monolith_squad_soldier_1_duty_skin, jup_b4_monolith_squad_soldier_2_duty_skin, jup_b4_monolith_squad_soldier_3_duty_skin,jup_b4_monolith_squad_soldier_4_duty_skin, jup_b4_monolith_squad_soldier_5_duty_skin
+;target_smart = {+jup_b4_monolith_squad_on_base} nil , {+jup_b4_duty_go_home} jup_a6, jup_b4 
+target_smart = {+jup_b4_duty_go_home} jup_a6:nil, {+jup_b4_duty_go_home_alone} jup_a6:nil, jup_b4 
+spawn_point = jup_b4_spawn_point
+story_id = jup_b4_squad_duty
+
+
+
+[jup_b4_squad_freedom]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b4_monolith_squad_soldier_1_freedom_skin, jup_b4_monolith_squad_soldier_2_freedom_skin, jup_b4_monolith_squad_soldier_3_freedom_skin,jup_b4_monolith_squad_soldier_4_freedom_skin, jup_b4_monolith_squad_soldier_5_freedom_skin
+;target_smart = {+jup_b4_monolith_squad_on_base} nil , {+jup_b4_freedom_go_home} jup_a6, jup_b4
+target_smart = {+jup_b4_freedom_go_home} jup_a6:nil, {+jup_b4_freedom_go_home_alone} jup_a6:nil, jup_b4
+spawn_point = jup_b4_spawn_point
+story_id = jup_b4_squad_freedom
+
+[jup_b4_squad_freedom_leader]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b4_monolith_squad_leader_freedom_skin
+target_smart = {+jup_b4_freedom_go_home} jup_a6, {+jup_b4_freedom_go_home_alone} jup_a6, jup_b4
+spawn_point = jup_b4_spawn_point
+story_id = jup_b4_squad_freedom_leader
+
+[jup_b4_duty_squad]:online_offline_group
+faction = dolg
+relationship = neutral
+npc = jup_b4_duty_leader,jup_b4_duty_help
+;target_smart = {+jup_b4_duty_in_b25} nil ,{+jup_b4_monolith_squad_out} jup_a6, {+jup_b4_duty_go_home} jup_a6, jup_b4
+target_smart = {+jup_b4_duty_go_home} jup_a6:nil, {+jup_b4_duty_go_home_alone} jup_a6:nil, jup_b4 
+spawn_point = jup_b4_duty_fredom_spawn
+story_id = jup_b4_duty_squad
+
+[jup_b4_freedom_squad]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b4_freedom_leader,jup_b4_freedom_help
+;target_smart = {+jup_b4_freedom_in_b25} nil, {+jup_b4_monolith_squad_out}jup_a6, {+jup_b4_freedom_go_home} jup_a6, jup_b4
+target_smart = {+jup_b4_freedom_go_home} jup_a6:nil, {+jup_b4_freedom_go_home_alone} jup_a6:nil, jup_b4
+spawn_point = jup_b4_duty_fredom_spawn
+story_id = jup_b4_freedom_squad
+
+; ---------------------------- B8 --------------------------------------------
+[jup_b8_psy_dog_squad]:online_offline_group
+faction = monster_predatory_day
+npc = psy_dog_normal, psy_dog_normal
+target_smart = jup_b8_smart_terrain
+spawn_point = jup_b8_psy_dog_spawn
+story_id = jup_b8_psy_dog_squad
+
+; ---------------------------- B209 --------------------------------------------
+[jup_b209_squad_snork_up]:online_offline_group
+faction = monster_zombied_day
+npc = snork_normal, snork_normal, snork_normal, snork_normal, snork_normal
+target_smart = jup_b209
+spawn_point = jup_b209_snork_home_up
+story_id = jup_b209_squad_snork
+
+[jup_b209_squad_snork_1]:online_offline_group
+faction = monster_zombied_day
+npc = snork_normal
+target_smart = jup_b209
+spawn_point = jup_b209_snork_home_d_1
+story_id = jup_b209_squad_snork_1
+
+[jup_b209_squad_snork_2]:online_offline_group
+faction = monster_zombied_day
+npc = snork_normal
+target_smart = jup_b209
+spawn_point = jup_b209_snork_home_d_3
+story_id = jup_b209_squad_snork_2
+
+; ---------------------------- A12 --------------------------------------------
+
+[jup_a12_bandit_chief_squad]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = sim_default_bandit_1, sim_default_bandit_1
+target_smart = jup_a12
+spawn_point = jup_a12_bandit_chief_squad_spawn_point
+sympathy = 0
+story_id = jup_a12_bandit_chief_squad
+always_arrived = true
+
+[jup_a12_bandit_cashier_squad]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = jup_a12_bandit_cashier, sim_default_bandit_1, sim_default_bandit_1, sim_default_bandit_0
+target_smart = jup_a12
+spawn_point = jup_a12_bandit_cashier_squad_spawn_point
+sympathy = 0
+story_id = jup_a12_bandit_cashier_squad
+always_arrived = true
+
+[jup_a12_bandit_guard_squad]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = jup_a12_bandit_guard, sim_default_bandit_1, sim_default_bandit_1, sim_default_bandit_0 
+target_smart = jup_a12
+spawn_point = jup_a12_bandit_guard_squad_spawn_point
+sympathy = 0
+story_id = jup_a12_bandit_guard_squad
+always_arrived = true
+
+[jup_a12_bandit_sim_squad]:online_offline_group
+faction = bandit
+;relationship = neutral
+npc = sim_default_bandit_0, sim_default_bandit_0, sim_default_bandit_0, sim_default_bandit_0, sim_default_bandit_0, sim_default_bandit_0
+target_smart = {-jup_a12_task_done} jup_a12, {+jup_a12_task_done} nil
+spawn_point = jup_a12_bandit_cashier_squad_spawn_point
+sympathy = 0
+story_id = jup_a12_bandit_sim_squad
+always_arrived = true
+
+[jup_a12_merc_stalker_squad]:online_offline_group
+faction = stalker
+;relationship = neutral
+npc = jup_a12_merc_cover, sim_default_stalker_3, sim_default_stalker_3
+target_smart = {+jup_a12_task_done} nil, {-jup_a12_merc_attack_started} jup_a12_merc, {+jup_a12_merc_attack_started} jup_a12
+spawn_point = {-jup_a12_spawn_merc_squad} jup_a12_merc_stalker_squad_spawn_point_2, {+jup_a12_spawn_merc_squad} jup_a12_merc_stalker_squad_spawn_point
+story_id = jup_a12_merc_stalker_squad
+always_arrived = true
+
+; B25
+
+[jup_b25_freedom_flint_squad]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b25_freedom_flint;, sim_default_freedom_2, sim_default_freedom_2
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_b25_freedom_flint_squad
+
+[jup_b25_stalker_senya_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_b25_stalker_senya
+target_smart = jup_b25
+spawn_point = jup_b25_way
+story_id = jup_b25_stalker_senya_squad
+
+;----------------------------------- B1
+
+[jup_b1_stalker_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_b1_stalker_1, jup_b1_stalker_2, jup_b1_stalker_3, jup_b1_stalker_4
+target_smart = {+jup_b6_anom_2} jup_b6_anom_2, {+jup_b6_anom_1} jup_b211, {+jup_b1_st_mission} jup_b1, jup_b41
+spawn_point = jup_b41_stalker_spawn
+story_id = jup_b1_stalker_squad
+
+[jup_b1_zombie]:online_offline_group
+faction = zombied
+npc = jup_b1_zombie_1, jup_b1_zombie_2, jup_b1_zombie_3
+target_smart = {+jup_b1_complete_end} nil, jup_b1
+spawn_point = jup_b1_zombie_spawn
+story_id = jup_b1_zombie
+
+[jup_b1_tushkano_squad]:online_offline_group
+faction = monster_predatory_night
+npc = jup_b1_tushkano_target, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal
+target_smart = {+jup_b1_complete_end} nil, jup_b1
+spawn_point = jup_b1_tushkano_spawn
+story_id = jup_b1_tushkano_squad
+
+[jup_b1_controller_squad]:online_offline_group
+faction = monster_zombied_day
+npc = jup_b1_controller
+target_smart = {+jup_b1_complete_end} nil, jup_b1
+spawn_point = jup_b1_controller_spawn
+story_id = jup_b1_controller_squad
+
+[jup_b1_simulation_controller]:online_offline_group
+faction = monster_zombied_day
+npc_random = m_controller_normal
+npc_in_squad = 1, 1
+target_smart = jup_b1
+
+[jup_b1_stalker_pro_squad]:jup_b1_stalker_squad
+npc = jup_b1_pro_stalker_1, jup_b1_pro_stalker_2, jup_b1_pro_stalker_3, jup_b1_pro_stalker_4
+faction = ecolog
+relationship = neutral
+target_smart = jup_b41
+
+[jup_b6_scientist_group]:online_offline_group
+faction = ecolog
+relationship = neutral
+npc = jup_b6_scientist_tech, jup_b6_scientist_nuclear_physicist, jup_b6_scientist_biochemist
+target_smart = jup_b41
+spawn_point = jup_b41_sci_spawn
+story_id = jup_b6_scientist_group
+
+;------------------------------------- B6
+
+[jup_b6_stalker_freedom_squad]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b6_freedom_stalker_1, jup_b6_freedom_stalker_2, jup_b6_freedom_stalker_3, jup_b6_freedom_stalker_4
+target_smart = {+jup_b6_anom_2} jup_b6_anom_2, {+jup_b6_anom_1} jup_b211, jup_b41
+spawn_point = jup_b41_stalker_spawn
+story_id = jup_b6_stalker_freedom_squad
+
+[jup_b6_stalker_duty_squad]:online_offline_group
+faction = dolg
+relationship = neutral
+npc = jup_b6_duty_stalker_1, jup_b6_duty_stalker_2, jup_b6_duty_stalker_3, jup_b6_duty_stalker_4
+target_smart = {+jup_b6_anom_2} jup_b6_anom_2, {+jup_b6_anom_1} jup_b211, jup_b41
+spawn_point = jup_b41_stalker_spawn
+story_id = jup_b6_stalker_duty_squad
+
+[jup_b6_stalker_gonta_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_b6_stalker_gonta, jup_b6_stalker_garmata, jup_b6_stalker_crab
+target_smart = {+jup_b6_anom_2} jup_b6_anom_2, {+jup_b6_anom_1} jup_b211, jup_b41
+spawn_point = jup_b41_stalker_spawn
+story_id = jup_b6_stalker_gonta_squad 
+
+[jup_b6_stalker_exprisoner_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_b6_stalker_prisoner, jup_b6_stalker_assaulter, jup_b6_stalker_diplomat
+target_smart = {+jup_b6_anom_2} jup_b6_anom_2, {+jup_b6_anom_1} jup_b211, jup_b41
+spawn_point = jup_b41_stalker_spawn
+story_id = jup_b6_stalker_exprisoner_squad
+
+;-------------------------------------
+
+[jup_b6_flesh_horde]:online_offline_group
+faction = monster_vegetarian
+npc = flesh_strong, flesh_normal, flesh_normal
+target_smart = {+jup_b6_complete_end} nil, jup_b211
+spawn_point = {-jup_b6_mut_1_false ~33} jup_b211_spawn_1, {-jup_b6_mut_2_false ~66} jup_b211_spawn_2, {-jup_b6_mut_3_false} jup_b211_spawn_3
+story_id = jup_b6_flesh_horde
+
+[jup_b6_flesh_horde_2]:online_offline_group
+faction = monster_vegetarian
+npc = flesh_strong, flesh_strong, flesh_normal,  flesh_normal
+target_smart =  {+jup_b6_complete_end} nil, jup_b211
+spawn_point = {-jup_b6_mut_1_false ~33} jup_b211_spawn_1, {-jup_b6_mut_2_false ~66} jup_b211_spawn_2, {-jup_b6_mut_3_false} jup_b211_spawn_3
+story_id = jup_b6_flesh_horde_2
+
+[jup_b6_boar_horde]:online_offline_group
+faction = monster_vegetarian
+npc = boar_normal, boar_normal
+target_smart = {+jup_b6_complete_end} nil, jup_b211
+spawn_point = {-jup_b6_mut_1_false ~33} jup_b211_spawn_1, {-jup_b6_mut_2_false ~66} jup_b211_spawn_2, {-jup_b6_mut_3_false} jup_b211_spawn_3
+story_id = jup_b6_boar_horde
+
+[jup_b6_boar_horde_2]:online_offline_group
+faction = monster_vegetarian
+npc = boar_strong, boar_normal, boar_normal
+target_smart = {+jup_b6_complete_end} nil, jup_b211
+spawn_point = {-jup_b6_mut_1_false ~33} jup_b211_spawn_1, {-jup_b6_mut_2_false ~66} jup_b211_spawn_2, {-jup_b6_mut_3_false} jup_b211_spawn_3
+story_id = jup_b6_boar_horde_2
+
+[jup_b6_swamp_hunters]:online_offline_group
+faction = monster_predatory_night
+npc = jup_b6_bloodsucker_1, jup_b6_bloodsucker_2, jup_b6_bloodsucker_3
+target_smart = {+jup_b6_complete_end} nil, jup_b211
+spawn_point = jup_b211_mob_home_hunter_prime
+story_id = jup_b6_swamp_hunters
+
+[jup_b6_zombie_squad_1]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_1, sim_default_zombied_1
+target_smart = {+jup_b6_anom_2 -jup_b6_task_fail} jup_b6_anom_2, {+jup_b19_complete} nil, {+jup_b19_yar_enemy_or_dead} nil, jup_b19
+spawn_point =  {-jup_b6_zom_1_false ~33} jup_b6_anom_2_spawn_1, {-jup_b6_zom_2_false ~66} jup_b6_anom_2_spawn_2, {-jup_b6_zom_3_false} jup_b6_anom_2_spawn_3
+story_id = jup_b6_zombie_squad_1
+
+[jup_b6_zombie_squad_2]:online_offline_group
+faction = zombied
+npc =  sim_default_zombied_2, sim_default_zombied_1
+target_smart = {+jup_b6_anom_2 -jup_b6_task_fail} jup_b6_anom_2, {+jup_b19_complete} nil, {+jup_b19_yar_enemy_or_dead} nil, jup_b19
+spawn_point =  {-jup_b6_zom_1_false ~33} jup_b6_anom_2_spawn_1, {-jup_b6_zom_2_false ~66} jup_b6_anom_2_spawn_2, {-jup_b6_zom_3_false} jup_b6_anom_2_spawn_3
+story_id = jup_b6_zombie_squad_2
+
+[jup_b6_zombie_squad_3]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_1, sim_default_zombied_2, sim_default_zombied_2
+target_smart = {+jup_b6_anom_2 -jup_b6_task_fail} jup_b6_anom_2, {+jup_b19_complete} nil, {+jup_b19_yar_enemy_or_dead} nil, jup_b19
+spawn_point =  {-jup_b6_zom_1_false ~33} jup_b6_anom_2_spawn_1, {-jup_b6_zom_2_false ~66} jup_b6_anom_2_spawn_2, {-jup_b6_zom_3_false} jup_b6_anom_2_spawn_3
+story_id = jup_b6_zombie_squad_3
+
+[jup_b6_zombie_squad_4]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_3, sim_default_zombied_3
+target_smart = {+jup_b6_anom_2 -jup_b6_task_fail} jup_b6_anom_2, {+jup_b19_complete} nil, {+jup_b19_yar_enemy_or_dead} nil, jup_b19
+spawn_point =  {-jup_b6_zom_1_false ~33} jup_b6_anom_2_spawn_1, {-jup_b6_zom_2_false ~66} jup_b6_anom_2_spawn_2, {-jup_b6_zom_3_false} jup_b6_anom_2_spawn_3
+story_id = jup_b6_zombie_squad_4
+
+[jup_b6_zombie_squad_5]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_4, sim_default_zombied_2
+target_smart = {+jup_b6_anom_2 -jup_b6_task_fail} jup_b6_anom_2, {+jup_b19_complete} nil, {+jup_b19_yar_enemy_or_dead} nil, jup_b19
+spawn_point = {-jup_b6_zom_1_false ~33} jup_b6_anom_2_spawn_1, {-jup_b6_zom_2_false ~66} jup_b6_anom_2_spawn_2, {-jup_b6_zom_3_false} jup_b6_anom_2_spawn_3
+story_id = jup_b6_zombie_squad_5
+
+;------------------------------------- 
+
+;------------------- jup_b43 ------------------ 
+[jup_b43_stalker_assistant_squad_sq]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_b43_stalker_assistant
+target_smart = {+pri_a17_give_task_get_gauss_rifle} jup_a6, jup_b41
+spawn_point = {+pri_a17_give_task_get_gauss_rifle} jup_a6_actor_look, jup_b41_jup_b43_stalker_assistant_walk
+story_id = jup_b43_stalker_assistant_squad_sq
+;------------------------------------- 
+
+[jup_b202_stalker_snag_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+sympathy = 0
+npc = jup_b202_stalker_snag
+target_smart = {+jup_b202_snag_teleported -jup_b202_stalker_snag_go_base} jup_b202, jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_b202_stalker_snag_squad
+
+[jup_a6_stalker_medik_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_a6_stalker_medik
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_a6_stalker_medik_squad
+
+[jup_b15_zulus_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_b15_zulus
+target_smart = jup_a6
+story_id = jup_b15_zulus_squad
+spawn_point = jup_a6_jup_b218_squad_member_arrive_walk
+always_arrived = true
+
+[jup_a6_stalker_barmen_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = jup_a6_stalker_barmen
+target_smart = jup_a6
+spawn_point = jup_a6_barmen_spawn
+story_id = jup_a6_stalker_barmen_squad
+
+;[jup_b202_snag_wounded]:online_offline_group
+;faction = stalker
+;sympathy = 0
+;npc = jup_b202_stalker_snag
+;target_smart = {-jup_b202_stalker_snag_go_base} jup_b202, jup_a6 
+;spawn_point = jup_b202_snag_wounded_walk
+;story_id = jup_b202_snag_wounded
+
+[jup_b202_bandit_squad]:online_offline_group
+faction = bandit
+relationship = neutral
+sympathy = 0
+npc = jup_b202_bandit
+target_smart = {-jup_b202_bandit_go_away} jup_b202, jup_b204
+spawn_point = jup_b202_snag_wounded_look
+story_id = jup_b202_bandit_squad
+
+;----------------------- B19----------------------------------------
+
+[jup_b19_kopatci_zombied_squad]:online_offline_group
+faction = zombied
+npc = jup_b19_zombied_1, jup_b19_zombied_1, jup_b19_zombied_1, jup_b19_zombied_1, jup_b19_zombied_1, jup_b19_zombied_2, jup_b19_zombied_2, jup_b19_zombied_2, jup_b19_zombied_2, jup_b19_zombied_2 
+target_smart = {+jup_b6_anom_2 -jup_b6_task_fail} jup_b6_anom_2, {+jup_b19_complete} nil, {+jup_b19_yar_enemy_or_dead} nil, jup_b19
+spawn_point = jup_b19_zombied_spawn_point
+story_id = jup_b19_kopatci_zombied_squad
+always_arrived = true
+
+[jup_b19_merc_squad]:online_offline_group
+faction = killer
+relationship = neutral
+npc = jup_b19_merc_1 , jup_b19_merc_2, jup_b19_merc_3, jup_b19_merc_4, jup_b19_merc_5
+target_smart =  {+jup_b19_mercs_free} nil, jup_b19  
+spawn_point = jup_b19_merc_spawn_point
+story_id = jup_b19_merc_squad
+always_arrived = true
+
+;-------------------Zaton B215 on Jupiter-------------------------
+[zat_b215_stalker_guide_jupiter_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+sympathy = 1
+npc = zat_b215_stalker_guide_jupiter
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = zat_b215_stalker_guide_jupiter_squad
+
+;-------------------Freedom Leader -------------------------------
+[jup_a6_freedom_leader_squad]:online_offline_group
+faction = freedom
+relationship = neutral
+sympathy = 1
+npc = jup_a6_freedom_leader
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_a6_freedom_leader_squad
+
+;------------------Duty Leader -----------------------------------
+[jup_a6_duty_leader_squad]:online_offline_group
+faction = dolg
+relationship = neutral
+sympathy = 1
+npc = jup_a6_duty_leader
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_a6_duty_leader_squad
+
+;------ Jupiter B207 ------------------------------------------
+[jup_b207_zat_b7_duty_illicit_dealer]:online_offline_group
+faction = dolg
+relationship = neutral
+npc = zat_b7_duty_illicit_dealer
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_b207_zat_b7_duty_illicit_dealer
+always_arrived = true
+
+[jup_b207_zat_b7_duty_illicit_dealer_depot]:online_offline_group
+faction = killer
+npc = jup_b207_merc_leader, sim_default_killer_1, sim_default_killer_1, sim_default_killer_1
+target_smart = jup_b207
+spawn_point = jup_b207_depot_spawn
+story_id = jup_b207_zat_b7_duty_illicit_dealer_depot
+always_arrived = true
+
+[jup_b207_depot_mercs]:online_offline_group
+faction = killer
+npc = sim_default_killer_2
+target_smart = jup_b207
+spawn_point = jup_b207_depot_mercs_spawn
+story_id = jup_b207_depot_mercs
+always_arrived = true
+
+[jup_b207_merc_1]:online_offline_group
+faction = killer
+npc = jup_b207_merc_illicit_dealer, sim_default_killer_1, sim_default_killer_1, sim_default_killer_1, sim_default_killer_2
+;start with simulation
+target_smart = nil
+story_id = jup_b207_merc_1
+
+[jup_b207_merc_2]:online_offline_group
+faction = killer
+npc = jup_b207_merc_illicit_dealer, sim_default_killer_1, sim_default_killer_1, sim_default_killer_1, sim_default_killer_2
+;start with simulation
+target_smart = nil
+story_id = jup_b207_merc_2
+
+[jup_b207_duty_base]:online_offline_group
+faction = dolg
+relationship = neutral
+npc = jup_b207_duty_security_squad_leader, sim_default_duty_1, sim_default_duty_2, sim_default_duty_2
+target_smart = {+jup_b207_attack_started} jup_b207, {+jup_b207_freedom_in_depot} jup_b207_depot_attack, {+jup_b207_duty_knows_about_depot +jup_b207_ui} jup_b207_depot_attack, jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_b207_duty_base
+always_arrived = true
+
+[jup_b207_freedom_base]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b207_freedom_assault_squad_leader, sim_default_freedom_1
+target_smart = {+jup_b207_freedom_knows_about_depot} jup_b207, {+jup_b207_attack_started} nil, jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_b207_freedom_base
+always_arrived = true
+
+[jup_b207_freedom_depot]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = jup_b207_freedom_recon_squad_leader, sim_default_freedom_2, sim_default_freedom_1, sim_default_freedom_1
+target_smart = jup_b207
+spawn_point = jup_b207_depot_spawn
+story_id = jup_b207_freedom_depot
+always_arrived = true
+
+;--------------------- b203------------------------
+[jup_b203_zombied_squad]:online_offline_group
+faction = zombied
+npc = sim_default_zombied_1, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_3, sim_default_zombied_3, sim_default_zombied_2 
+;не отпускать в симул€цию
+target_smart = jup_b203
+spawn_point = jup_b203_spawn_point
+story_id = jup_b203_zombied_squad
+
+[jup_b203_tushkano]:online_offline_group
+faction = monster_predatory_night
+npc = tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal
+;не отпускать в симул€цию
+target_smart = jup_b203
+spawn_point = jup_b203_tushkano_spawn_point
+story_id = jup_b203_tushkano
+
+;--------------------- b204------------------------
+[jup_b204_squad]:online_offline_group
+faction = bandit
+sympathy = 0
+relationship = enemy
+npc = sim_default_bandit_3, sim_default_bandit_2, sim_default_bandit_2, sim_default_bandit_2, sim_default_bandit_1
+target_smart = jup_b204
+spawn_point = jup_b204_spawn_point
+story_id = jup_b204_squad
+
+[jup_b10_stalker_drunk_squad]:online_offline_group
+faction = stalker
+relationship = neutral
+sympathy = 0
+;npc = jup_b10_stalker_drunk
+npc = jup_b217_stalker_tech, jup_b10_stalker_drunk
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_b10_stalker_drunk_squad
+
+;--------------------- b205------------------------
+[jup_b205_zombie_01_squad]:online_offline_group
+faction = zombied
+sympathy = 0
+npc = sim_default_zombied_3, sim_default_zombied_2, sim_default_zombied_1, sim_default_zombied_2
+target_smart = jup_b205_smart_terrain
+spawn_point = jup_b205_zombie_01_spawn_point
+story_id = jup_b205_zombie_01_squad
+
+[jup_b205_zombie_02_squad]:online_offline_group
+faction = zombied
+sympathy = 0
+npc = sim_default_zombied_3, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_2, sim_default_zombied_1
+target_smart = jup_b205_smart_terrain
+spawn_point = jup_b205_zombie_02_spawn_point
+story_id = jup_b205_zombie_02_squad
+
+[jup_b205_monster_01_squad]:online_offline_group
+faction = monster_predatory_night
+sympathy = 0
+npc = tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal
+target_smart = jup_b205_smart_terrain
+spawn_point = jup_b205_smart_terrain_tushkano_home_1
+story_id = jup_b205_monster_01_squad
+
+[jup_b205_monster_02_squad]:online_offline_group
+faction = monster_predatory_night
+sympathy = 0
+npc = tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal;, tushkano_normal, tushkano_normal, tushkano_normal, tushkano_normal
+target_smart = jup_b205_smart_terrain_tushkano
+spawn_point = jup_b205_smart_terrain_tushkano_evil_tushkano_look
+story_id = jup_b205_monster_02_squad
+
+[jup_b205_monster_04_squad]:online_offline_group
+faction = monster_predatory_night
+sympathy = 0
+npc = burer_normal
+target_smart = jup_b205_smart_terrain
+spawn_point = jup_b205_monster_01_spawn_point
+story_id = jup_b205_monster_04_squad
+
+;------------------------- b47 ----------------------
+
+[jup_b47_merc_guard_squad]:online_offline_group
+relationship = neutral
+faction = stalker
+npc = sim_default_stalker_3, sim_default_stalker_3, sim_default_stalker_4, sim_default_stalker_3
+target_smart = jup_b41
+spawn_point =  jup_b41_merc_guard_spown
+story_id = jup_b47_merc_guard_squad
+
+[jup_b47_bunker_guard_freedom]:online_offline_group
+faction = freedom
+relationship = neutral
+npc = sim_default_freedom_3, sim_default_freedom_2, sim_default_freedom_1, sim_default_freedom_1, sim_default_freedom_1
+target_smart = jup_b41
+spawn_point = jup_b41_merc_guard_spown
+story_id = jup_b47_bunker_guard_freedom
+
+[jup_b47_bunker_guard_duty]:online_offline_group
+faction = dolg
+relationship = neutral
+npc = sim_default_duty_3, sim_default_duty_2, sim_default_duty_1, sim_default_duty_1, sim_default_duty_1
+target_smart = jup_b41
+spawn_point = jup_b41_merc_guard_spown
+story_id = jup_b47_bunker_guard_duty
+
+[jup_b47_bunker_guard_lost_merc]:online_offline_group
+relationship = friend
+faction = killer
+npc = zat_b103_lost_merc_leader, zat_b103_lost_merc_1, zat_b103_lost_merc_2, zat_b103_lost_merc_3, zat_b103_lost_merc_4
+;, zat_b103_lost_merc_5, zat_b103_lost_merc_6
+target_smart = jup_b41
+spawn_point = jup_b41_merc_guard_spown
+story_id = jup_b47_bunker_guard_lost_merc
+
+[jup_b47_bunker_guard_stalker_leader]:online_offline_group
+faction = stalker
+relationship = neutral
+npc = zat_b7_stalker_victim_1, sim_default_stalker_2, sim_default_stalker_2, sim_default_stalker_2, sim_default_stalker_2
+target_smart = jup_b41
+spawn_point = jup_b41_merc_guard_spown
+story_id = jup_b47_bunker_guard_stalker_leader
+
+;--------------------------- b219 ---------------------
+[jup_b219_squad]:online_offline_group
+sympathy = 0
+faction = stalker
+relationship = neutral
+npc = jup_b219_zulus
+target_smart = jup_b219
+spawn_point = jup_b219_spawn_spown
+story_id = jup_b219_squad
+
+[jup_b219_stalker_tech_squad]:online_offline_group
+sympathy = 0
+faction = stalker
+relationship = neutral
+npc = jup_b219_stalker_tech
+target_smart = jup_b219
+spawn_point = jup_b219_tech_spawn_spown
+story_id = jup_b219_stalker_tech_squad
+
+
+;---------------------------- b221 ------------------------
+[jup_b221_duty_squad]:online_offline_group
+sympathy = 0
+faction = dolg
+relationship = neutral
+npc = sim_default_duty_0;, sim_default_duty_0, sim_default_duty_0, sim_default_duty_0
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point 
+story_id = jup_b221_duty_squad
+
+[jup_b221_freedom_squad]:online_offline_group
+sympathy = 0
+faction = freedom
+relationship = neutral
+npc = sim_default_freedom_0;, sim_default_freedom_0, sim_default_freedom_0, sim_default_freedom_0
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point 
+story_id = jup_b221_freedom_squad
+
+;--------------------------- a9 --------------------------
+[jup_a9_dogs_normal]:online_offline_group
+faction = monster_predatory_day
+npc = dog_weak, dog_strong, dog_normal, dog_normal, dog_normal 
+target_smart = jup_b47;jup_a9:jup_sim_19:loop;:jup_b47
+spawn_point = jup_b47_dogs_spawn
+story_id = jup_a9_dogs_normal
+on_death = %+jup_a9_dogs_normal_dead%
+
+
+[test_tushkano]:online_offline_group
+faction = monster_predatory_night
+npc = tushkano_normal
+;не отпускать в симул€цию
+target_smart = bes_test
+spawn_point = jup_b203_tushkano_spawn_point
+story_id = jup_b203_tushkano
+
+
+
+
+;-------------------------NEW-----------------------------
+[jup_a6_kardan_squad]:online_offline_group
+faction = stalker
+npc = zat_a2_stalker_mechanic
+target_smart = jup_a6
+spawn_point = jup_a6_spawn_point
+story_id = jup_a6_kardan_squad

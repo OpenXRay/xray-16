@@ -1,0 +1,183 @@
+[logic@pri_b306_merc_1]
+active = walker@pri_b306_merc_1 
+suitable = {=target_squad_name(pri_b306_mercs_squad)} true
+prior = 200
+
+[walker@pri_b306_merc_1]
+path_walk = merc_1_walk
+on_info = walker@pri_b306_merc_1_wait %=teleport_npc(pri_b306_merc_1_walk)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[walker@pri_b306_merc_1_wait]
+path_walk = merc_1_walk
+path_look = merc_1_look
+on_info = {+pri_b306_mercs_attack_start} camper@pri_b306_merc_1_attack
+
+[camper@pri_b306_merc_1_attack]
+path_walk = merc_1_attack
+path_look = merc_2_attack
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+no_retreat = true
+on_signal = path_end | walker@pri_b306_merc_1_attack
+
+[walker@pri_b306_merc_1_attack]
+path_walk = merc_1_attack
+on_info = {-pri_b306_mercs_attacked} %+pri_b306_mercs_attacked%
+
+
+
+[logic@pri_b306_merc_2]
+active = walker@pri_b306_merc_2 
+suitable = {=target_squad_name(pri_b306_mercs_squad)} true
+prior = 200
+
+[walker@pri_b306_merc_2]
+path_walk = merc_2_walk
+on_info = walker@pri_b306_merc_2_wait %=teleport_npc(pri_b306_merc_2_walk)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[walker@pri_b306_merc_2_wait]
+path_walk = merc_2_walk
+path_look = merc_2_look
+on_info = {+pri_b306_mercs_attack_start} camper@pri_b306_merc_2_attack
+
+[camper@pri_b306_merc_2_attack]
+path_walk = merc_1_attack
+path_look = merc_2_attack
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+no_retreat = true
+on_signal = path_end | walker@pri_b306_merc_2_attack
+
+[walker@pri_b306_merc_2_attack]
+path_walk = merc_1_attack
+on_info = {-pri_b306_mercs_attacked} %+pri_b306_mercs_attacked%
+
+
+
+[logic@pri_b306_merc_3]
+active = walker@pri_b306_merc_3 
+suitable = {=target_squad_name(pri_b306_mercs_squad)} true
+prior = 200
+
+[walker@pri_b306_merc_3]
+path_walk = merc_3_walk
+on_info = walker@pri_b306_merc_3_wait %=teleport_npc(pri_b306_merc_3_walk)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[walker@pri_b306_merc_3_wait]
+path_walk = merc_3_walk
+path_look = merc_3_look
+on_info = {+pri_b306_mercs_attack_start} camper@pri_b306_merc_3_attack
+
+[camper@pri_b306_merc_3_attack]
+path_walk = merc_2_attack
+path_look = merc_1_attack
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+no_retreat = true
+on_signal = path_end | walker@pri_b306_merc_3_attack
+
+[walker@pri_b306_merc_3_attack]
+path_walk = merc_2_attack
+on_info = {-pri_b306_mercs_attacked} %+pri_b306_mercs_attacked%
+
+
+
+[logic@pri_b306_merc_4]
+active = walker@pri_b306_merc_4 
+suitable = {=target_squad_name(pri_b306_mercs_squad)} true
+prior = 190
+
+[walker@pri_b306_merc_4]
+path_walk = merc_4_walk
+on_info = walker@pri_b306_merc_3_wait %=teleport_npc(pri_b306_merc_4_walk)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[walker@pri_b306_merc_4_wait]
+path_walk = merc_4_walk
+path_look = merc_4_look
+on_info = {+pri_b306_mercs_attack_start} camper@pri_b306_merc_4_attack
+
+[camper@pri_b306_merc_4_attack]
+path_walk = merc_2_attack
+path_look = merc_1_attack
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+no_retreat = true
+on_signal = path_end | walker@pri_b306_merc_4_attack
+
+[walker@pri_b306_merc_4_attack]
+path_walk = merc_2_attack
+on_info = {-pri_b306_mercs_attacked} %+pri_b306_mercs_attacked%
+
+
+
+[logic@pri_b306_merc_5]
+active = walker@pri_b306_merc_5 
+suitable = {=target_squad_name(pri_b306_mercs_squad)} true
+prior = 190
+
+[walker@pri_b306_merc_5]
+path_walk = merc_5_walk
+on_info = walker@pri_b306_merc_2_wait %=teleport_npc(pri_b306_merc_5_walk)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[walker@pri_b306_merc_5_wait]
+path_walk = merc_5_walk
+path_look = merc_5_look
+on_info = {+pri_b306_mercs_attack_start} camper@pri_b306_merc_5_attack
+
+[camper@pri_b306_merc_5_attack]
+path_walk = merc_2_attack
+path_look = merc_1_attack
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+no_retreat = true
+on_signal = path_end | walker@pri_b306_merc_5_attack
+
+[walker@pri_b306_merc_5_attack]
+path_walk = merc_2_attack
+on_info = {-pri_b306_mercs_attacked} %+pri_b306_mercs_attacked%
+
+
+
+[logic@pri_b306_merc_6]
+active = walker@pri_b306_merc_6 
+suitable = {=target_squad_name(pri_b306_mercs_squad)} true
+prior = 190
+
+[walker@pri_b306_merc_6]
+path_walk = merc_6_walk
+on_info = walker@pri_b306_merc_6_wait %=teleport_npc(pri_b306_merc_6_walk)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[walker@pri_b306_merc_6_wait]
+path_walk = merc_6_walk
+path_look = merc_6_look
+on_info = {+pri_b306_mercs_attack_start} camper@pri_b306_merc_6_attack
+
+[camper@pri_b306_merc_6_attack]
+path_walk = merc_1_attack
+path_look = merc_2_attack
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 10
+no_retreat = true
+on_signal = path_end | walker@pri_b306_merc_6_attack
+
+[walker@pri_b306_merc_6_attack]
+path_walk = merc_1_attack
+on_info = {-pri_b306_mercs_attacked} %+pri_b306_mercs_attacked%

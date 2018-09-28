@@ -5,7 +5,7 @@ r2		= 2
 r2.5	= 3
 r3		= 4
 r4		= 5
-Команда називається r2_ssao. Для DX10 і DX11 потрібно додати нову опцію - st_opt_ultra, але лише коли r2_ssao_mode==hdao.
+РљРѕРјР°РЅРґР° РЅР°Р·РёРІР°С”С‚СЊСЃСЏ r2_ssao. Р”Р»СЏ DX10 С– DX11 РїРѕС‚СЂС–Р±РЅРѕ РґРѕРґР°С‚Рё РЅРѕРІСѓ РѕРїС†С–СЋ - st_opt_ultra, Р°Р»Рµ Р»РёС€Рµ РєРѕР»Рё r2_ssao_mode==hdao.
 ]]
 class "opt_video_adv" (CUIWindow)
 function opt_video_adv:__init() super()
@@ -92,10 +92,15 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	xml:InitStatic("video_adv:cap_detail_density", _st)
 	xml:InitTrackBar("video_adv:track_detail_density", _st)
 	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
-	
+
 	_st	= xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_detail_radius", _st)
 	xml:InitTrackBar("video_adv:track_detail_radius", _st)
+	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+
+	_st	= xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_detail_scale", _st)
+	xml:InitTrackBar("video_adv:track_detail_scale", _st)
 	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
@@ -108,7 +113,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	xml:InitStatic("video_adv:cap_r__enable_grass_shadow", _st)
 	ctl = xml:InitCheck("video_adv:check_r__enable_grass_shadow", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
-	
+
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r__actor_shadow", _st)
 	ctl = xml:InitCheck("video_adv:check_r__actor_shadow", _st)
@@ -156,7 +161,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	xml:InitStatic("video_adv:cap_sun_shafts", _st)
 	ctl = xml:InitComboBox("video_adv:combo_sun_shafts", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_25, control=_st})
-	
+
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r2_sun_shafts_mode", _st)
 	ctl = xml:InitComboBox("video_adv:list_r2_sun_shafts_mode", _st)
@@ -175,6 +180,11 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	ctl = xml:InitComboBox("video_adv:combo_ssao", _st)
 	handler.combo_ssao = ctl
 	table.insert(handler.m_preconditions, {func=mode_ge_25, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r2_fxaa", _st)
+	ctl = xml:InitCheck("video_adv:check_r2_fxaa", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_2a, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_soft_water", _st)
@@ -212,6 +222,12 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r3_msaa_opt", _st)
 	ctl = xml:InitCheck("video_adv:check_r3_msaa_opt", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
+
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r3_msaa_alphatest", _st)
+	ctl = xml:InitComboBox("video_adv:combo_r3_msaa_alphatest", _st)
+	handler.combo_r3_msaa_alphatest = ctl
 	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
 
 -- r4_enable_tessellation		only r4

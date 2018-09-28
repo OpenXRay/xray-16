@@ -1,0 +1,17 @@
+[logic]
+active = nil;sr_idle@jupiter
+
+[sr_idle@jupiter]
+on_info = {+actor_was_in_many_bad_places} sr_idle@nil
+on_info2 = {=counter_greater(anomalies_visited:18)} sr_idle@nil %+actor_was_in_many_bad_places%
+on_info3 = {-jup_b10_visited =actor_in_zone(jup_b10_zone_field_thermal_average)} %+jup_b10_visited =inc_counter(anomalies_visited)%
+on_info4 = {-jup_b200_visited =actor_in_zone(jup_b200_field)} %+jup_b200_visited =inc_counter(anomalies_visited)%
+on_info5 = {-jup_b201_visited !dist_to_story_obj_ge(jup_b201_spot:15)} %+jup_b201_visited =inc_counter(anomalies_visited)%
+on_info6 = {-jup_b206_visited =actor_in_zone(jup_b206_field_acidic_average)} %+jup_b206_visited =inc_counter(anomalies_visited)%
+on_info7 = {-jup_b209_visited =actor_in_zone(jup_b209_zone_field_thermal_average)} %+jup_b209_visited =inc_counter(anomalies_visited)%
+on_info8 = {-jup_b211_visited =actor_in_zone(jup_b211_zone_field_acidic_average)} %+jup_b211_visited =inc_counter(anomalies_visited)%
+on_info9 = {-jup_b214_visited =actor_in_zone(jup_surge_hide_b214)} %+jup_b214_visited =inc_counter(anomalies_visited)%
+on_info10 = {-jup_b25_visited =actor_in_zone(jup_b25_zone_field_acidic_weak)} %+jup_b25_visited =inc_counter(anomalies_visited)%
+on_info11 = {-jup_b32_visited =actor_in_zone(jup_b32_zone_field_radioactive_weak)} %+jup_b32_visited =inc_counter(anomalies_visited)%
+
+[sr_idle@nil]

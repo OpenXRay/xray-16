@@ -1,0 +1,5 @@
+<w>
+    <file name="ui\ui_loot_interface">
+		<texture id="ui_loot_window" x="0" y="0" width="350" height="512" />
+    </file>
+</w>

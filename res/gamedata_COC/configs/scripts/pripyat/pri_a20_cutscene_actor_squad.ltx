@@ -1,0 +1,61 @@
+[logic]
+active = remark@start
+on_hit = hit
+
+[remark@start]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+anim = sit
+target = path | pri_a20_cutscene_actor_walk_squad, 0
+on_game_timer = 50 | remark@stand_up
+
+[remark@stand_up]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+target = path | pri_a20_cutscene_actor_walk_squad, 0
+anim = wait_na
+on_game_timer = 30 | remark@speak_radio
+
+[remark@speak_radio]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+target = path | pri_a20_cutscene_actor_walk_squad, 0
+anim = wait_rac
+on_game_timer = 70 | {-pri_a20_squad_cutscene_actor_talk} %+pri_a20_squad_cutscene_actor_talk =play_sound(pri_a20_actor_report_about_squad)%
+on_signal = sound_end | remark@speak_radio_2 %+pri_a20_squad_cutscene_actor_talk_complete%
+
+[remark@speak_radio_2]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+target = path | pri_a20_cutscene_actor_walk_squad, 0
+anim = wait_rac
+on_signal = sound_end | %+pri_a20_squad_cutscene_actor_talk_2_complete%
+on_info = {+pri_a20_squad_cutscene_actor_talk_2 -pri_a18_use_idol_done} %=play_sound(pri_a20_actor_about_next_task)%, {+pri_a20_squad_cutscene_actor_talk_2 +pri_a18_use_idol_done} %=play_sound(pri_a20_actor_no_data)%
+on_info2 = {+pri_a20_talk_with_colonel_complete} %=destroy_object%
+
+[hit]
+on_info = %+pri_a20_cut_actor_hit =destroy_object%

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<!-- FIND AND ENTER THE WARLAB -->
+	<string id="sar_perception">
+		<text>На север!</text>
+	</string>
+	<string id="sar_perception_1">
+		<text>Выяснить, кто - или что - стоит за Монолитом.</text>
+	</string>
+	<string id="sar_perception_2">
+		<text>Найти лабораторию, упомянутую в рукописи, и узнать, что там скрывается.</text>
+	</string>
+	<string id="sar_perception_3">
+		<text>Нужно использовать декодер, чтобы открыть дверь.</text>
+	</string>
+	<string id="sar_perception_4">
+		<text>Нейтрализовать охрану, чтобы попасть в комнату.</text>
+	</string>
+    <string id="sar_perception_5">
+		<text>Узнать код доступа из документов.</text>
+	</string>
+	<string id="warlab_kill_crazy_entity_title">
+		<text>Сделка с неведомой Сущностью</text>
+	</string>
+	<string id="warlab_kill_crazy_entity_1">
+		<text>Поговорить с Сущностью.</text>
+	</string>
+	<string id="warlab_kill_crazy_entity_2">
+		<text>Необходимо убить три физические формы Сущности, чтобы открыть дверь.</text>
+	</string>
+</string_table>

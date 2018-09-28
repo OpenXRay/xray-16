@@ -1,0 +1,36 @@
+[smart_terrain]
+def_restr = pri_a16_sr_noweap
+safe_restr = pri_surge_hide_a16; pri_a16_sr_light
+smart_control = smart_control
+squad_id = 26
+max_population = 4
+respawn_params = respawn@pri_a16
+;arrive_dist = 65
+
+[respawn@pri_a16]
+spawn_stalker
+
+[spawn_stalker]
+spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_advanced, stalker_sim_squad_veteran
+spawn_num = 4
+
+[smart_control]
+noweap_zone = pri_a16_sr_noweap
+ignore_zone = pri_surge_hide_a16; pri_a16_sr_light
+alarm_start_sound = {-pri_b305_fifth_cam_end} pri_a16_base_alarm, nil
+alarm_stop_sound = {-pri_b305_fifth_cam_end} pri_a16_base_relax, nil
+
+[exclusive]
+pri_medic_stalker = pripyat\pri_medic_stalker.ltx
+pri_a16_stalker_1 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_2 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_3 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_4 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_5 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_6 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_7 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_8 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_9 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_10 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_11 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_12 = pripyat\pri_a16_logic_stalker.ltx

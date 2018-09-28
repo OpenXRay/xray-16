@@ -1,0 +1,26 @@
+[settings]
+enable = true  									;Enables a memory system that keeps track of how long enemy has been visible or heard. When time is up, combat enemy is forgotten.
+time_safe = 120000								;Amount of time before safe zone flag wears off when an NPC leaves a no combat smart
+
+[combat_inertion]; Time in which a NPC engages combat long after losing sight or sound on an enemy
+stalker = 	{=has_actor_enemy} 150000, 60000
+bandit = 	{=has_actor_enemy} 150000, 60000
+dolg = 		{=has_actor_enemy} 150000, 60000
+freedom =	{=has_actor_enemy} 150000, 60000
+ecolog = 	{=has_actor_enemy} 150000, 60000
+killer = 	{=has_actor_enemy} 150000, 60000
+army =		{=has_actor_enemy} 150000, 60000
+monolith =	{=has_actor_enemy} 150000, 60000
+csky =		{=has_actor_enemy} 150000, 60000
+
+[combat_inertion_mult]
+novice = 1.0
+trainee = 1.1
+experienced = 1.2
+professional = 1.3
+veteran = 1.4
+expert = 1.5
+master = 1.75
+legend = 2.0
+
+[forbidden_npcs] ;NPC or Squad section names who will use 50m distance check

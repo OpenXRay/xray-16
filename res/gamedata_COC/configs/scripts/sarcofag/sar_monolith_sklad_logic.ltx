@@ -1,0 +1,58 @@
+;************************
+;**** Monolith_skald ****
+;************************
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+
+[logic@sar_monolith_sklad_patrol1]
+active = walker@sar_monolith_sklad_patrol1
+suitable = {=target_squad_name(sar_monolith_sklad_squad)} true
+prior = 200
+
+[walker@sar_monolith_sklad_patrol1]:walker@generic
+path_walk = patrol
+
+
+[logic@sar_monolith_sklad_patrol2]
+active = walker@sar_monolith_sklad_patrol2
+suitable = {=target_squad_name(sar_monolith_sklad_squad)} true
+prior = 200
+
+[walker@sar_monolith_sklad_patrol2]:walker@generic
+path_walk = patrol
+
+
+[logic@sar_monolith_sklad_guard1]
+active = camper@sar_monolith_sklad_guard1
+suitable = {=target_squad_name(sar_monolith_sklad_squad)} true
+prior = 200
+
+[camper@sar_monolith_sklad_guard1]:walker@generic
+path_walk = walk1
+path_look = look1
+radius = 10
+
+
+[logic@sar_monolith_sklad_guard2]
+active = camper@sar_monolith_sklad_guard2
+suitable = {=target_squad_name(sar_monolith_sklad_squad)} true
+prior = 200
+
+[camper@sar_monolith_sklad_guard2]:walker@generic
+path_walk = walk2
+path_look = look2
+radius = 10
+
+
+[logic@sar_monolith_sklad_patrol_ambush]
+active = walker@sar_monolith_sklad_patrol_ambush
+suitable = {=target_squad_name(sar_monolith_sklad_squad)} true
+prior = 200
+
+[walker@sar_monolith_sklad_patrol_ambush]:walker@generic
+path_walk = ambush_walk
+path_look = ambush_look

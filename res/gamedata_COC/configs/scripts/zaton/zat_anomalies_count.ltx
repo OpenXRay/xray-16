@@ -1,0 +1,26 @@
+[logic]
+active = nil ;sr_idle@start
+
+[sr_idle@start]
+on_info = sr_idle@zaton %=set_counter(anomalies_visited:0)%
+
+[sr_idle@zaton]
+on_info = {+actor_was_in_many_bad_places} sr_idle@nil
+on_info2 = {=counter_greater(anomalies_visited:18)} sr_idle@nil %+actor_was_in_many_bad_places%
+on_info3 = {-zat_b100_visited =actor_in_zone(zat_b100_zone_field_radioactive_weak)} %+zat_b100_visited =inc_counter(anomalies_visited)%
+on_info4 = {-zat_b101_visited =actor_in_zone(zat_b101_zone_field_acidic_weak_0002)} %+zat_b101_visited =inc_counter(anomalies_visited)%
+on_info16 = {-zat_b101_visited =actor_in_zone(zat_b101_zone_field_acidic_weak_0001)} %+zat_b101_visited =inc_counter(anomalies_visited)%
+on_info5 = {-zat_b14_visited =actor_in_zone(zat_b14_zone_field_radioactive_weak)} %+zat_b14_visited =inc_counter(anomalies_visited)%
+on_info6 = {-zat_b20_visited =actor_in_zone(zat_b20_zone_field_thermal_weak)} %+zat_b20_visited =inc_counter(anomalies_visited)%
+on_info7 = {-zat_b20_visited =actor_in_zone(zat_b20_zone_field_thermal_weak_0000)} %+zat_b20_visited =inc_counter(anomalies_visited)%
+on_info8 = {-zat_b20_visited =actor_in_zone(zat_b20_zone_field_thermal_weak_0001)} %+zat_b20_visited =inc_counter(anomalies_visited)%
+on_info9 = {-zat_b20_visited =actor_in_zone(zat_b20_zone_field_thermal_weak_0002)} %+zat_b20_visited =inc_counter(anomalies_visited)%
+on_info10 = {-zat_b39_visited =actor_in_zone(zat_b29_sr_4)} %+zat_b39_visited =inc_counter(anomalies_visited)%
+on_info11 = {-zat_b44_visited =actor_in_zone(zat_surge_hide_b44)} %+zat_b44_visited =inc_counter(anomalies_visited)%
+on_info12 = {-zat_b53_visited =actor_in_zone(zat_b53_zone_field_thermal_weak)} %+zat_b53_visited =inc_counter(anomalies_visited)%
+on_info13 = {-zat_b54_visited =actor_in_zone(zat_b54_zone_field_psychic_average_0000)} %+zat_b54_visited =inc_counter(anomalies_visited)%
+on_info17 = {-zat_b54_visited =actor_in_zone(zat_b54_zone_field_psychic_average_0001)} %+zat_b54_visited =inc_counter(anomalies_visited)%
+on_info14 = {-zat_b55_visited =actor_in_zone(zat_b55_zone_field_radioactive_average)} %+zat_b55_visited =inc_counter(anomalies_visited)%
+on_info15 = {-zat_b56_visited =actor_in_zone(zaton_b56_zone_field_thermal_average)} %+zat_b56_visited =inc_counter(anomalies_visited)%
+
+[sr_idle@nil]

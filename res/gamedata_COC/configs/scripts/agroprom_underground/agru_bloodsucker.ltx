@@ -1,0 +1,26 @@
+[logic@agr_u_bloodsucker_2]
+active = mob_walker@invis
+suitable = {=target_squad_name(agr_u_bloodsucker_2_squad)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@invis]
+path_walk = walk
+path_look = look
+state = invis
+braindead = true
+actor_friendly = true
+npc_friendly = true
+on_info = {=dist_to_actor_le(5)} %=play_sound(red_bloodsucker_growl)% mob_walker@vis
+out_restr = agru_bloodsucker_out_restr
+
+[mob_walker@vis]
+path_walk = walk
+path_look = look
+state = vis
+on_info = {=dist_to_actor_ge(5)} mob_walker@invis
+out_restr = agru_bloodsucker_out_restr
+
+[death]
+on_info = %+agru_add_reward_1%

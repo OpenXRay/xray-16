@@ -1,0 +1,21 @@
+[logic]
+active = nil;sr_idle@control
+
+[sr_idle@control]
+;on_info1 = {+jup_first_meet_made -jup_travel_made -zat_b215_guide_to_zaton} sr_idle@on_jup_aborigen %=run_postprocess(black:1238:true) =disable_ui =teleport_actor(jup_actor_arrive_walk:jup_actor_arrive_look) +jup_travel_made -zat_b215_guide_to_zaton%, {-jup_first_meet_made -jup_travel_made} sr_idle@on_jup_guest %=disable_ui =teleport_actor(jup_a6_actor_walk:jup_a6_actor_look) +jup_travel_made -zat_b215_guide_to_zaton%; =run_postprocess(black:1239:true)%
+;on_info2 = {+zat_b215_guide_to_zaton +jup_travel_made} sr_idle@to_zat_meet %=run_postprocess(fade_in) =disable_ui%
+;on_info3 = {+uni_leave_zone_info} sr_idle@leave_zone %=disable_ui =run_postprocess(fade_in)% 
+
+[sr_idle@on_jup_guest]
+on_game_timer = 100 | {-jup_b217_task_start} sr_idle@control %+jup_b217_task_start +jup_first_meet_made +jup_b217_welcome_faded%
+
+[sr_idle@on_jup_aborigen]
+on_game_timer = 25 | sr_idle@control %=enable_ui =stop_postprocess(1238)%
+
+[sr_idle@to_zat_meet]
+on_info = {-zat_b215_to_zat_pp_start} %+zat_b215_to_zat_pp_start =run_postprocess(black:1240:true) -jup_travel_made%
+on_game_timer = 25 | sr_idle@control %=teleport_actor(jup_goto_zaton_walk:jup_goto_zaton_look) =forward_game_time(4) -zat_b215_to_zat_pp_start%
+
+[sr_idle@leave_zone]
+on_game_timer = 20 | nil %=run_tutorial(outro_game)%
+

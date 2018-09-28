@@ -1,0 +1,11 @@
+[logic]
+active = nil ;sr_idle@start
+
+[sr_idle@start]
+on_info = {=actor_has_item(zat_b20_noah_pda) -zat_b28_heli_3_searched} sr_idle@distance %=play_sound(zat_b20_noah_pda) +zat_b20_plateau_way_started +zat_b20_plateau_way_mentioned%
+on_info2 = {=actor_has_item(zat_b20_noah_pda) +zat_b28_heli_3_searched} sr_idle@nil %=play_sound(zat_b20_noah_pda)%
+
+[sr_idle@distance]
+on_info = {!dist_to_story_obj_ge(zat_b20_teleport_mapspot:30)} sr_idle@nil %+zat_b20_plateau_way_known%
+
+[sr_idle@nil]

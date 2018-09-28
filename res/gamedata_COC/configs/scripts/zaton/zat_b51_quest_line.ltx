@@ -1,0 +1,30 @@
+[logic]
+active = nil ;sr_idle@waiting_order
+
+[sr_idle@waiting_order]
+on_info = {+zat_b51_order_in_process} sr_idle@safe_distance %=give_task(zat_b51_nimble_items)%
+
+[sr_idle@safe_distance]
+;on_info = {=dist_to_actor_ge(10)} sr_idle@random %=destroy_object(story:zat_a2_stalker_nimble_id)%, {=actor_in_zone(zat_a2_sr_sleep)} sr_idle@random %=destroy_object(story:zat_a2_stalker_nimble_id)%
+on_info = {+zat_b51_nimble_can_go =dist_to_actor_ge(10)} sr_idle@random %=remove_squad(zat_a2_stalker_nimble_squad)%, {+zat_b51_nimble_can_go =actor_in_zone(zat_a2_sr_sleep)} sr_idle@random %=remove_squad(zat_a2_stalker_nimble_squad)%
+
+[sr_idle@random]
+on_info = {~20} sr_idle@12hours, {~50} sr_idle@18hours, sr_idle@24hours
+
+[sr_idle@12hours]
+on_game_timer = 43200 | sr_idle@order_ready
+;on_timer = 2000 | sr_idle@order_ready
+
+[sr_idle@18hours]
+on_game_timer = 64800 | sr_idle@order_ready
+;on_timer = 2000 | sr_idle@order_ready
+
+[sr_idle@24hours]
+on_game_timer = 86400 | sr_idle@order_ready
+;on_timer = 2000 | sr_idle@order_ready
+
+[sr_idle@order_ready]
+on_info = {=dist_to_actor_ge(10)} sr_idle@final %+zat_b51_order_ready_task +zat_b51_order_ready =play_sound(zat_b51_order_ready) =create_squad(zat_a2_stalker_nimble_squad:zat_stalker_base_smart)%, {=actor_in_zone(zat_a2_sr_sleep)} sr_idle@final %+zat_b51_order_ready =play_sound(zat_b51_order_ready) =create_squad(zat_a2_stalker_nimble_squad:zat_stalker_base_smart) +zat_b51_order_ready_task%
+
+[sr_idle@final]
+on_info =| {-zat_b51_order_in_process} sr_idle@waiting_order %-zat_b51_order_ready_task%

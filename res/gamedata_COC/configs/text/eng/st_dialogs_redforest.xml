@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+<string id="red_forester_hello_dialog_0">
+		<text>To what do I owe this pleasure?</text>
+	</string>
+	<string id="red_forester_about_forest_0">
+		<text>Tell me about the Red Forest.</text>
+	</string>
+	<string id="red_forester_about_forest_1">
+		<text>This used to be a wildlife reserve, and I was the local forester. I protected the forest and its animals from poachers. Now the Zone itself protects this place, and it does it so well that people are willing to travel a dozen extra miles just to avoid it. If a stranger sets his foot in the forest, he's as good as dead. I may be Forester, but even I don't know exactly what goes on here. A man walks into the mist and just gets sucked off into nowhere. You could be walking right behind him and still not know how he met his end. So that's that, sonny.</text>
+	</string>
+	<string id="red_forester_about_zone_0">
+		<text>What can you tell me about the Zone?</text>
+	</string>
+	<string id="red_forester_about_zone_1">
+		<text>The Zone, heh... The Zone has a life of its own, and we people just get in its way - some more, some less. The Zone works to neutralize any risk to its existence the same way our bodies fight diseases. We get a fever, and the Zone has its shakes too. Emissions - now those are a way to "barf" us up. The more irritation we cause to it, the stronger the new emissions will be.</text>
+	</string>
+	<string id="red_forester_about_zone_11">
+		<text>How did you survive here all these years - alone and amidst all the dangers?</text>
+	</string>
+	<string id="red_forester_about_zone_111">
+		<text>One foolish action can destroy the Zone... along with everything that belongs to it. Not just mutants and anomalies, but also artefacts and you stalkers... and me. I can feel that the Zone is deeply concerned - something is upsetting it, disturbing its equilibrium. A storm is brewing... and I don't know if the status quo can be preserved. </text>
+	</string>
+	<string id="red_forester_hello_dialog_1">
+		<text>What's a rookie like you looking for in Forester's estate?</text>
+	</string>
+	<string id="red_forester_hello_dialog_2">
+		<text>Was it chance that brought you to me?</text>
+	</string>
+	<string id="red_forester_hello_dialog_3">
+		<text>Good luck, son!</text>
+	</string>
+	<string id="red_forester_hello_dialog_4">
+		<text>Don't forget me!</text>
+	</string>
+	<string id="red_forester_hello_dialog_5">
+		<text>Remember me well!</text>
+	</string>
+	<string id="red_forester_who_are_you_0">
+		<text>Who are you?</text>
+	</string>
+	<string id="red_forester_who_are_you_1">
+		<text>What can I tell you about myself? I'm Forester. I've been here a long time; I've spent my whole life living next to this forest. I'm old. At my age you grow attached to your place of residence, no matter what it is. I refused to be evacuated after the accident at the power plant; I also survived the appearance of the Zone. I remember a flash on the horizon... many folks died that day, but the Zone spared me, you see? Heck, it didn't just spare me, it gave me a gift! I used to be able to find paths in the forest, and now I can feel a safe way of getting through real deadly anomalies. Stalkers envy me, but I can't say I'm all that happy about my gift. You must understand that everything comes at a price. Some day the Zone will take payment for my gift. That's what I am afraid of, buddy. </text>
+	</string>
+	<string id="red_forester_who_are_you_111">
+		<text>No, this was your typical pine forest. Well, it was also a nature reserve, but that was about as special as it got at the time. It became red after the accident at the Chernobyl NPP in 1986. It was green when I went to bed, and when I woke up it was as you see it now. Then the Zone appeared, and animals and birds abandoned this forest. I was the only living being that stayed behind. Just me, a red forest and this thick mist that never clears.</text>
+	</string>
+	<string id="red_forester_who_are_you_11111">
+		<text>Yes, many stalkers have met their end here. I even heard rumours that an evil spirit lives in the Red Forest. The way I see it, this forest is just like everything else in the Zone. If you treat it right it won't touch you. The trouble is you stalkers don't treat anything right. You seek to own parts of the Zone and in return you get... what you're due.</text>
+	</string>
+</string_table>

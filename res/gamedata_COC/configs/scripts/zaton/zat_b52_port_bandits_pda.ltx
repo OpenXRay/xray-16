@@ -1,0 +1,8 @@
+[logic]
+active = nil ;sr_idle@wait_actor
+
+[sr_idle@wait_actor]
+on_info = {=actor_has_item(device_pda_port_bandit_leader) -zat_b52_actor_has_port_bandits_pda} sr_idle@end %+zat_b52_actor_has_port_bandits_pda%
+on_info2 = {+zat_b52_actor_has_port_bandits_pda} sr_idle@end
+
+[sr_idle@end]

@@ -1,0 +1,33 @@
+[logic@mar_smart_terrain_base_stalker_guide_marsh]
+suitable = {=check_npc_name(mar_smart_terrain_base_stalker_leader_marsh)} true
+prior = 200
+active = animpoint
+level_spot = quest_npc
+
+[animpoint]
+cover_name = mar_smart_terrain_base_stalker_guide_marsh
+reach_distance = 3
+use_camp = false
+meet = meet@base
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+;out_restr = mar_smart_terrain_base_sr_no_assault
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@base]
+close_snd_hello = mar_csky_barman_meet
+close_snd_bye = mar_csky_barman_meet_bye
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+trade_enable = false
+allow_break = false
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+meet_on_talking = false

@@ -1,0 +1,139 @@
+[logic@jup_b6_flesh_1_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_flesh_horde)} true, {=target_squad_name(jup_b6_flesh_horde_2)} true
+prior = 70
+monster_job = true
+
+[mob_home]
+path_home  = mob_home
+home_min_radius = 15
+home_max_radius = 35
+aggressive = true
+on_info = {=dist_to_actor_ge(140) +jup_b6_task_fail} %=destroy_object%, {=dist_to_actor_ge(140) +jup_b6_two_anomaly_learned} %=destroy_object%
+ 
+
+;--------------------------------------------------
+
+[logic@jup_b6_flesh_2_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_flesh_horde)} true, {=target_squad_name(jup_b6_flesh_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_flesh_3_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_flesh_horde)} true, {=target_squad_name(jup_b6_flesh_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_flesh_4_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_flesh_horde)} true, {=target_squad_name(jup_b6_flesh_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_flesh_5_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_flesh_horde)} true, {=target_squad_name(jup_b6_flesh_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_boar_1_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_boar_horde)} true, {=target_squad_name(jup_b6_boar_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_boar_2_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_boar_horde)} true, {=target_squad_name(jup_b6_boar_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_boar_3_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_boar_horde)} true, {=target_squad_name(jup_b6_boar_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_boar_4_anom_1]
+active = mob_home
+suitable = {=target_squad_name(jup_b6_boar_horde)} true, {=target_squad_name(jup_b6_boar_horde_2)} true
+prior = 70
+monster_job = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_hunter_1_anom_1]
+active = mob_home@hunter_1
+suitable = {=target_squad_name(jup_b6_swamp_hunters)} true
+prior = 70
+monster_job = true
+
+[mob_home@hunter_1]
+path_home  = mob_home_hunter
+home_min_radius = 10
+home_max_radius = 20
+;on_info = {+jup_b6_mut_wave_2} mob_home@huntin
+ 
+out_restr = jup_b211_bloodsuckers_out_restr_1
+
+[mob_home@huntin]
+path_home  = mob_home_hunter_1
+home_min_radius = 40
+home_max_radius = 60
+ 
+aggressive = true
+
+;--------------------------------------------------
+
+[logic@jup_b6_hunter_2_anom_1]
+active = mob_home@hunter_2
+suitable = {=target_squad_name(jup_b6_swamp_hunters)} true
+prior = 70
+monster_job = true
+
+[mob_home@hunter_2]
+path_home  = mob_home_hunter
+home_min_radius = 10
+home_max_radius = 20
+;on_info = {+jup_b6_mut_wave_3} mob_home@huntin
+ 
+out_restr = jup_b211_bloodsuckers_out_restr_1
+
+;--------------------------------------------------
+
+[logic@jup_b6_hunter_3_anom_1]
+active = mob_home@hunter_prime
+suitable = {=target_squad_name(jup_b6_swamp_hunters)} true
+prior = 70
+monster_job = true
+
+[mob_home@hunter_prime]
+path_home  = mob_home_hunter_prime
+home_min_radius = 10
+home_max_radius = 20
+;on_info = {+jup_b6_mut_wave_4} mob_home@huntin_prime
+ 
+out_restr = jup_b211_bloodsuckers_out_restr_2
+
+[mob_home@huntin_prime]
+path_home  = mob_home_hunter_2
+home_min_radius = 30
+home_max_radius = 60
+ 
+aggressive = true

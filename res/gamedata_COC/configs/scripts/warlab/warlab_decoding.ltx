@@ -1,0 +1,36 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle
+
+[sr_idle]
+on_info = {+warlab_access_decoding} sr_timer %+warlab_start_teleport%
+
+[sr_timer]
+type = dec
+start_value = 30000
+on_value = 0 | sr_idle@check_death
+
+[sr_idle@check_death]
+on_info = {+warlab_stalker_monolith_1_killed +warlab_stalker_monolith_2_killed +warlab_stalker_monolith_3_killed +warlab_stalker_monolith_4_killed +warlab_stalker_monolith_5_killed +warlab_stalker_monolith_6_killed +warlab_stalker_monolith_7_killed +warlab_stalker_monolith_8_killed} sr_idle@scene1
+
+[sr_idle@scene1]
+on_timer = 1000 | sr_idle@scene2 %=run_cam_effector(radar_stop:2506:false)%
+
+[sr_idle@scene2]
+on_timer = 9000 | sr_idle@scene3 %=run_postprocess(agr_u_fade)%
+
+[sr_idle@scene3]
+on_timer = 3000 | sr_idle@scene4 %=run_tutorial(warlab_dream) =disable_ui%
+
+[sr_idle@scene4]
+on_info  = {+end_warlab_dream} sr_idle@scene5 %=run_cam_effector(prison_1:2508:false)%
+
+[sr_idle@scene5]
+on_timer = 4000 | sr_idle@oso_spawner %=enable_ui +warlab_finish_decoding%
+
+[sr_idle@oso_spawner]
+on_info = {+warlab_finish_decoding +warlab_door_opened +warlab_actor_teleported} sr_idle@nil %=spawn_object(osoznanie:oso_walk:0)%
+
+[sr_idle@nil]

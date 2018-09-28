@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<string id="ui_st_abandoned_sawmill">
+		<text>Abandoned Sawmill (Zaton)</text>
+	</string>
+
+	<string id="ui_st_abandoned_school">
+		<text>Abandoned School (Dead City)</text>
+	</string>
+
+	<string id="ui_st_abandoned_village">
+		<text>Abandoned Village (Army Warehouses)</text>
+	</string>
+
+	<string id="ui_st_apartment">
+		<text>Apartment (Outskirts)</text>
+	</string>
+
+	<string id="ui_st_brain_scorcher">
+		<text>Brain Scorcher (Radar)</text>
+	</string>
+
+	<string id="ui_st_car_park">
+		<text>Car Park (Cordon)</text>
+	</string>
+
+	<string id="ui_st_construction_site">
+		<text>Construction Site (Wild Territory)</text>
+	</string>
+
+	<string id="ui_st_container_warehouse">
+		<text>Container Warehouse (Jupiter)</text>
+	</string>
+
+	<string id="ui_st_cultural_center">
+		<text>Cultural Center (Pripyat)</text>
+	</string>
+
+	<string id="ui_st_eastern_factory">
+		<text>Eastern Factory (Dark Valley)</text>
+	</string>
+
+	<string id="ui_st_factory_complex">
+		<text>Factory Complex (Agroprom)</text>
+	</string>
+
+	<string id="ui_st_hermanns_bunker">
+		<text>Hermann's Bunker (Jupiter)</text>
+	</string>
+
+	<string id="ui_st_hidden_base">
+		<text>Hidden Base (Great Swamp)</text>
+	</string>
+
+	<string id="ui_st_kopachy_village">
+		<text>Kopachy Village (Jupiter)</text>
+	</string>
+
+	<string id="ui_st_lodging_house">
+		<text>Lodging House (Rostok)</text>
+	</string>
+
+	<string id="ui_st_makeshift_barracks">
+		<text>Makeshift Barracks (Rostok)</text>
+	</string>
+
+	<string id="ui_st_military_base">
+		<text>Military Base (Army Warehouses)</text>
+	</string>
+
+	<string id="ui_st_northern_factory">
+		<text>Northern Factory (Dark Valley)</text>
+	</string>
+
+	<string id="ui_st_pumping_station">
+		<text>Pumping Station (Great Swamp)</text>
+	</string>
+	
+	<string id="ui_st_river_port">
+		<text>River Port (Outskirts)</text>
+	</string>
+
+	<string id="ui_st_rookie_village">
+		<text>Rookie Village (Cordon)</text>
+	</string>
+
+	<string id="ui_st_research_institute">
+		<text>Research Institute (Agroprom)</text>
+	</string>
+
+	<string id="ui_st_sakharovs_bunker">
+		<text>Sakharov's Bunker (Yantar)</text>
+	</string>
+
+	<string id="ui_st_skadovsk_shipwreck">
+		<text>Skadovsk Shipwreck (Zaton)</text>
+	</string>
+
+	<string id="ui_st_southern_checkpoint">
+		<text>Southern Checkpoint (Cordon)</text>
+	</string>
+
+	<string id="ui_st_sports_center">
+		<text>Sports Center (Dead City)</text>
+	</string>
+
+	<string id="ui_st_substation_workshops">
+		<text>Substation Workshops (Zaton)</text>
+	</string>
+
+	<string id="ui_st_train_hangar">
+		<text>Train Hangar (Garbage)</text>
+	</string>
+
+	<string id="ui_st_tunnel_entrance">
+		<text>Tunnel Entrance (Jupiter)</text>
+	</string>
+
+	<string id="ui_st_tunnel_refuge">
+		<text>Tunnel Refuge (Agr. Underground)</text>
+	</string>
+
+	<string id="ui_st_tuzla_outpost">
+		<text>Tuzla Outpost (Great Swamp)</text>
+	</string>
+
+	<string id="ui_st_yanov_station">
+		<text>Yanov Station (Jupiter)</text>
+	</string>
+	
+</string_table>

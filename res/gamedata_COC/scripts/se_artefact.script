@@ -1,0 +1,37 @@
+class "se_artefact"	(cse_alife_item_artefact)
+
+function se_artefact:__init (section) super (section)
+end
+
+
+function se_artefact:on_register()
+	cse_alife_item_artefact.on_register(self)
+	SendScriptCallback("server_entity_on_register",self,"se_artefact")
+end
+
+function se_artefact:on_unregister()
+	SendScriptCallback("server_entity_on_unregister",self,"se_artefact")
+	cse_alife_item_artefact.on_unregister(self)
+end
+--------------------
+function se_artefact:can_switch_offline ()
+--	printf("id [%s] can_switch_offline called, can it [%s]", tostring(self.id), tostring(cse_alife_item_artefact.can_switch_offline (self)))
+	if alife():actor() and (alife():actor().position:distance_to(self.position) <= 150) then
+--		printf("af_id [%s] can not go offline, distance [%s]", tostring(self.id), tostring(db.actor:position():distance_to(self.position)))
+		return false
+	end
+--	printf("af_id [%s] can go offline, distance [%s]", tostring(self.id), tostring(db.actor:position():distance_to(self.position)))
+	return cse_alife_item_artefact.can_switch_offline (self)
+end
+--------------------
+function se_artefact:can_switch_online ()
+--	printf("id [%s] can_switch_online called, can it [%s]", tostring(self.id), tostring(cse_alife_item_artefact.can_switch_online (self)))
+	return cse_alife_item_artefact.can_switch_online (self)
+end
+--------------------
+function se_artefact:STATE_Read(stpk,size)
+	cse_alife_item_artefact.STATE_Read(self,stpk,size)
+end
+function se_artefact:STATE_Write(stpk)
+	cse_alife_item_artefact.STATE_Write(self,stpk)
+end

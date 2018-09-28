@@ -1,0 +1,560 @@
+;Mercs with (M)organ
+[logic@jup_b207_depot_merc_leader]
+active = walker@merc_leader_stand 
+suitable = {=check_npc_name(zat_b7_duty_illicit_dealer)} true
+prior = 200
+on_combat = combat
+
+[combat]
+on_info = {-jup_b207_morgan_ambush} %+jup_b207_morgan_ambush%
+
+[walker@merc_leader_stand]
+path_walk = merc_leader_walk
+path_look = merc_leader_look
+on_info = {+jup_b207_morgan_ambush} camper@merc_leader_hide
+combat_ignore_cond = {=check_enemy_name(sim_default_killer)} true, false
+
+[camper@merc_leader_hide]
+path_walk = merc_4_walk
+path_look = merc_4_look
+no_retreat = true
+radius = 0
+def_state_standing = hide_na
+combat_ignore_cond = {=check_enemy_name(sim_default_killer)} true, false
+
+
+[logic@jup_b207_merc_1]
+active = walker@merc_1 
+suitable = {!check_npc_name(zat_b7_duty_illicit_dealer) =target_squad_name(jup_b207_zat_b7_duty_illicit_dealer_depot)} true
+prior = 200
+on_combat = combat
+
+[walker@merc_1]
+path_walk = merc_1_walk
+path_look = merc_1_look
+def_state_standing = hide_na
+on_info = {+jup_b207_morgan_ambush} camper@merc_1
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[camper@merc_1]
+path_walk = merc_1_attack_walk
+path_look = merc_5_look
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 0
+no_retreat = true
+on_signal = path_end | walker@merc_1_attack
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[walker@merc_1_attack]
+path_walk = merc_1_attack_walk
+path_look = merc_5_look
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+
+[logic@jup_b207_merc_2]
+active = walker@merc_2 
+suitable = {!check_npc_name(zat_b7_duty_illicit_dealer) =target_squad_name(jup_b207_zat_b7_duty_illicit_dealer_depot)} true
+prior = 200
+on_combat = combat
+
+[walker@merc_2]
+path_walk = merc_2_walk
+path_look = merc_2_look
+def_state_standing = hide_na
+on_info = {+jup_b207_morgan_ambush} camper@merc_2
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[camper@merc_2]
+path_walk = merc_2_attack_walk
+path_look = merc_5_look
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 0
+no_retreat = true
+on_signal = path_end | walker@merc_2_attack
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[walker@merc_2_attack]
+path_walk = merc_2_attack_walk
+path_look = merc_5_look
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+
+[logic@jup_b207_merc_3]
+active = walker@merc_3 
+suitable = {!check_npc_name(zat_b7_duty_illicit_dealer) =target_squad_name(jup_b207_zat_b7_duty_illicit_dealer_depot)} true
+prior = 200
+on_combat = combat
+
+[walker@merc_3]
+path_walk = merc_3_walk
+path_look = merc_3_look
+def_state_standing = hide_na
+on_info = {+jup_b207_morgan_ambush} camper@merc_3
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[camper@merc_3]
+path_walk = merc_3_attack_walk
+path_look = merc_5_look
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 0
+no_retreat = true
+on_signal = path_end | walker@merc_3_attack
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[walker@merc_3_attack]
+path_walk = merc_3_attack_walk
+path_look = merc_5_look
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+
+[logic@jup_b207_merc_4]
+active = walker@merc_4 
+suitable = {!check_npc_name(zat_b7_duty_illicit_dealer) =target_squad_name(jup_b207_zat_b7_duty_illicit_dealer_depot)} true
+prior = 200
+on_combat = combat
+
+[walker@merc_4]
+path_walk = merc_4_walk
+path_look = merc_4_look
+def_state_standing = hide_na
+on_info = {+jup_b207_morgan_ambush} camper@merc_4
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[camper@merc_4]
+path_walk = merc_4_attack_walk
+path_look = merc_5_look
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 0
+no_retreat = true
+on_signal = path_end | walker@merc_4_attack
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[walker@merc_4_attack]
+path_walk = merc_4_attack_walk
+path_look = merc_5_look
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+
+[logic@jup_b207_merc_5]
+active = camper@merc_5 
+suitable = {=target_squad_name(jup_b207_depot_mercs)} true
+prior = 200
+
+[camper@merc_5]
+path_walk = merc_5_walk
+path_look = merc_5_look
+no_retreat = true
+radius = 0
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+on_signal = path_end | walker@merc_5_attack
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[walker@merc_5_attack]
+path_walk = merc_5_walk
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+
+[logic@jup_b207_merc_6]
+active = camper@merc_6 
+suitable = {=target_squad_name(jup_b207_depot_mercs)} true
+prior = 200
+
+[camper@merc_6]
+path_walk = merc_6_walk
+path_look = merc_6_look
+no_retreat = true
+radius = 0
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+on_signal = path_end | walker@merc_6_attack
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+[walker@merc_6_attack]
+path_walk = merc_6_walk
+combat_ignore_cond = {=check_enemy_name(zat_b7_duty_illicit_dealer)} true, false
+
+
+
+
+
+
+
+;Attack depot duty squad in depot attack smart
+[logic@jup_b207_duty_leader]
+active = walker@duty_leader_position 
+suitable = {=check_npc_name(jup_b207_duty_security_squad_leader)} true
+prior = 200
+
+[walker@duty_leader_position]
+path_walk = duty_leader_position_walk
+path_look = duty_leader_position_look
+def_state_standing = threat_na
+def_state_moving = assault
+on_signal = path_end | remark@duty_leader_ask
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+[remark@duty_leader_ask]
+anim = threat_na
+on_info = {=dist_to_actor_le(75)} %=play_sound(jup_b207_duty_security_squad_to_freedom_leave)%
+on_signal = sound_end | remark@duty_leader_play %+jup_b207_duty_asked_to_leave% 
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+[remark@duty_leader_play]
+on_info = {+jup_b207_freedom_refused_to_leave} %=play_sound(jup_b207_duty_security_squad_to_freedom_start_attack)%; +jup_b207_attack_started%
+on_signal = sound_end | %+jup_b207_attack_started% 
+anim = threat_na
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+
+
+
+
+[logic@jup_b207_duty_1]
+active = walker@duty_1_position 
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader)} true
+prior = 200
+
+[walker@duty_1_position]
+path_walk = duty_1_walk
+path_look = duty_leader_position_look
+def_state_standing = threat_na
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+
+[logic@jup_b207_duty_2]
+active = walker@duty_2_position 
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader)} true
+prior = 200
+
+[walker@duty_2_position]
+path_walk = duty_2_walk
+path_look = duty_leader_position_look
+def_state_standing = threat_na
+def_state_moving = assault
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+
+[logic@jup_b207_duty_3]
+active = walker@duty_3_position 
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader)} true
+prior = 200
+
+[walker@duty_3_position]
+path_walk = duty_3_walk
+path_look = duty_leader_position_look
+def_state_standing = threat_na
+def_state_moving = assault
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+
+[logic@jup_b207_duty_4]
+active = walker@duty_4_position 
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader)} true
+prior = 200
+
+[walker@duty_4_position]
+path_walk = duty_4_walk
+path_look = duty_leader_position_look
+def_state_standing = threat_na
+def_state_moving = assault
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+
+[logic@jup_b207_duty_5]
+active = walker@duty_5_position 
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader)} true
+prior = 200
+
+[walker@duty_5_position]
+path_walk = duty_5_walk
+path_look = duty_leader_position_look
+def_state_standing = threat_na
+def_state_moving = assault
+combat_ignore_cond = {=check_enemy_smart(jup_b207)} true, false
+meet = no_meet
+
+
+
+
+
+
+;Attack depot duty squad in depot smart while attack
+[logic@jup_b207_duty_leader_attack]
+active = camper@merc_6
+suitable = {=check_npc_name(jup_b207_duty_security_squad_leader) -jup_b207_attack_end} true
+prior = 200
+
+
+[logic@jup_b207_duty_1_attack]
+active = camper@merc_1
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader) =target_squad_name(jup_b207_duty_base) -jup_b207_attack_end} true
+prior = 200
+
+
+[logic@jup_b207_duty_2_attack]
+active = camper@merc_2
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader) =target_squad_name(jup_b207_duty_base) -jup_b207_attack_end} true
+prior = 200
+
+
+[logic@jup_b207_duty_3_attack]
+active = camper@merc_3
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader) =target_squad_name(jup_b207_duty_base) -jup_b207_attack_end} true
+prior = 200
+
+
+[logic@jup_b207_duty_4_attack]
+active = camper@merc_4
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader) =target_squad_name(jup_b207_duty_base) -jup_b207_attack_end} true
+prior = 200
+
+
+[logic@jup_b207_duty_5_attack]
+active = camper@merc_5
+suitable = {!check_npc_name(jup_b207_duty_security_squad_leader) =target_squad_name(jup_b207_duty_base) -jup_b207_attack_end} true
+prior = 200
+
+
+
+
+
+
+
+
+;Defence freedom squad
+[logic@jup_b207_freedom_leader_defence]
+active = camper@freedom_leader
+suitable = {=check_npc_name(jup_b207_freedom_recon_squad_leader) -jup_b207_attack_end} true
+prior = 200
+
+[camper@freedom_leader]
+path_walk = freedom_leader_walk
+path_look = freedom_leader_look
+no_retreat = true
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+def_state_standing = hide_na
+on_info = {+jup_b207_duty_knows_about_depot} walker@guard_4_bad
+on_info2 = {-jup_b207_freedom_refused_to_leave +jup_b207_duty_asked_to_leave} remark@freedom_refuse
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+[remark@freedom_refuse]
+anim = hide_na
+on_info = %=play_sound(jup_b207_freedom_recon_squad_refuse)%
+on_signal = sound_end | camper@freedom_leader %+jup_b207_freedom_refused_to_leave% 
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+meet = no_meet
+
+
+
+
+
+[logic@jup_b207_freedom_1_defence]
+active = walker@freedom_1
+suitable = {!check_npc_name(jup_b207_freedom_recon_squad_leader) =target_squad_name(jup_b207_freedom_depot) -jup_b207_attack_end} true
+prior = 200
+
+[walker@freedom_1]
+path_walk = freedom_1_walk
+path_look = freedom_leader_look
+def_state_standing = hide_na
+on_info = {+jup_b207_duty_knows_about_depot} walker@guard_1_bad
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+
+[logic@jup_b207_freedom_2_defence]
+active = walker@freedom_2
+suitable = {!check_npc_name(jup_b207_freedom_recon_squad_leader) =target_squad_name(jup_b207_freedom_depot) -jup_b207_attack_end} true
+prior = 200
+
+[walker@freedom_2]
+path_walk = freedom_2_walk
+path_look = freedom_leader_look
+def_state_standing = hide_na
+on_info = {+jup_b207_duty_knows_about_depot} walker@guard_2_bad
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+
+[logic@jup_b207_freedom_3_defence]
+active = walker@freedom_3
+suitable = {!check_npc_name(jup_b207_freedom_recon_squad_leader) =target_squad_name(jup_b207_freedom_depot) -jup_b207_attack_end} true
+prior = 200
+
+[walker@freedom_3]
+path_walk = freedom_3_walk
+path_look = freedom_leader_look
+def_state_standing = hide_na
+on_info = {+jup_b207_duty_knows_about_depot} walker@guard_3_bad
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+
+[logic@jup_b207_freedom_4_defence]
+active = walker@freedom_4
+suitable = {!check_npc_name(jup_b207_freedom_recon_squad_leader) =target_squad_name(jup_b207_freedom_base) -jup_b207_attack_end} true
+prior = 200
+
+[walker@freedom_4]
+path_walk = freedom_4_walk
+path_look = freedom_4_look
+def_state_standing = hide_na
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+
+[logic@jup_b207_freedom_5_defence]
+active = walker@freedom_5
+suitable = {!check_npc_name(jup_b207_freedom_recon_squad_leader) =target_squad_name(jup_b207_freedom_base) -jup_b207_attack_end} true
+prior = 200
+
+[walker@freedom_5]
+path_walk = freedom_5_walk
+path_look = freedom_5_look
+def_state_standing = hide_na
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+
+
+
+
+
+
+;Guards - that ones who won
+[logic@jup_b207_depot_guard_1]
+active = remark@choose_1
+suitable = {+jup_b207_attack_end} true
+prior = 200
+
+[remark@choose_1]
+path_walk = perimeter_1_walk
+path_look = perimeter_1_look
+on_info = {+jup_b207_freedom_knows_about_depot +jup_b207_freedom_wins} walker@guard_1_ok
+on_info2 = {+jup_b207_duty_knows_about_depot +jup_b207_duty_wins} walker@guard_1_ok
+on_info3 = {+jup_b207_freedom_knows_about_depot +jup_b207_duty_wins} walker@guard_1_bad
+on_info4 = {+jup_b207_duty_knows_about_depot +jup_b207_freedom_wins} walker@guard_1_bad
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+[walker@guard_1_ok]
+path_walk = perimeter_1_walk
+path_look = perimeter_1_look
+meet = meet@guard_ok
+
+[walker@guard_1_bad]
+path_walk = perimeter_1_walk
+path_look = perimeter_1_look
+meet = meet@guard_bad
+on_info = {!actor_enemy =actor_in_zone(jup_b207_sr_control)} %=actor_enemy%
+on_info2 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(freedom)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_freedom_guards_warning_actor)%
+on_info3 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(dolg)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_duty_guards_warning_actor)%
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+[meet@guard_ok]
+close_distance = 5
+close_victim = actor
+close_anim = guard
+use	= {=actor_enemy} false, true
+
+[meet@guard_bad]
+close_distance = 15
+close_victim = actor
+close_anim = threat
+far_victim = actor
+far_anim = threat
+use	= false
+
+[logic@jup_b207_depot_guard_2]
+active = remark@choose_2
+suitable = {+jup_b207_attack_end} true
+prior = 200
+
+[remark@choose_2]
+path_walk = perimeter_2_walk
+path_look = perimeter_2_look
+on_info = {+jup_b207_freedom_knows_about_depot +jup_b207_freedom_wins} walker@guard_2_ok
+on_info2 = {+jup_b207_duty_knows_about_depot +jup_b207_duty_wins} walker@guard_2_ok
+on_info3 = {+jup_b207_freedom_knows_about_depot +jup_b207_duty_wins} walker@guard_2_bad
+on_info4 = {+jup_b207_duty_knows_about_depot +jup_b207_freedom_wins} walker@guard_2_bad
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+[walker@guard_2_ok]
+path_walk = perimeter_2_walk
+path_look = perimeter_2_look
+meet = meet@guard_ok
+
+[walker@guard_2_bad]
+path_walk = perimeter_2_walk
+path_look = perimeter_2_look
+meet = meet@guard_bad
+on_info = {!actor_enemy =actor_in_zone(jup_b207_sr_control)} %=actor_enemy%
+on_info2 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(freedom)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_freedom_guards_warning_actor)%
+on_info3 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(dolg)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_duty_guards_warning_actor)%
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+
+[logic@jup_b207_depot_guard_3]
+active = remark@choose_3
+suitable = {+jup_b207_attack_end} true
+prior = 200
+
+[remark@choose_3]
+path_walk = perimeter_3_walk
+path_look = perimeter_3_look
+on_info = {+jup_b207_freedom_knows_about_depot +jup_b207_freedom_wins} walker@guard_3_ok
+on_info2 = {+jup_b207_duty_knows_about_depot +jup_b207_duty_wins} walker@guard_3_ok
+on_info3 = {+jup_b207_freedom_knows_about_depot +jup_b207_duty_wins} walker@guard_3_bad
+on_info4 = {+jup_b207_duty_knows_about_depot +jup_b207_freedom_wins} walker@guard_3_bad
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+[walker@guard_3_ok]
+path_walk = perimeter_3_walk
+path_look = perimeter_3_look
+meet = meet@guard_ok
+
+[walker@guard_3_bad]
+path_walk = perimeter_3_walk
+path_look = perimeter_3_look
+meet = meet@guard_bad
+on_info = {!actor_enemy =actor_in_zone(jup_b207_sr_control)} %=actor_enemy%
+on_info2 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(freedom)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_freedom_guards_warning_actor)%
+on_info3 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(dolg)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_duty_guards_warning_actor)%
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+
+[logic@jup_b207_depot_guard_4]
+active = remark@choose_4
+suitable = {+jup_b207_attack_end} true
+prior = 200
+
+[remark@choose_4]
+path_walk = perimeter_4_walk
+path_look = perimeter_4_look
+on_info = {+jup_b207_freedom_knows_about_depot +jup_b207_freedom_wins} walker@guard_4_ok
+on_info2 = {+jup_b207_duty_knows_about_depot +jup_b207_duty_wins} walker@guard_4_ok
+on_info3 = {+jup_b207_freedom_knows_about_depot +jup_b207_duty_wins} walker@guard_4_bad
+on_info4 = {+jup_b207_duty_knows_about_depot +jup_b207_freedom_wins} walker@guard_4_bad
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false
+
+[walker@guard_4_ok]
+path_walk = perimeter_4_walk
+path_look = perimeter_4_look
+meet = meet@guard_ok
+
+[walker@guard_4_bad]
+path_walk = perimeter_4_walk
+path_look = perimeter_4_look
+meet = meet@guard_bad
+on_info = {-jup_b207_freedom_refused_to_leave +jup_b207_duty_asked_to_leave} remark@freedom_refuse
+on_info2 = {!actor_enemy =actor_in_zone(jup_b207_sr_control)} %=actor_enemy%
+on_info3 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(freedom)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_freedom_guards_warning_actor)%
+on_info4 = {-jup_b207_guards_warning_actor =dist_to_actor_le(20) !actor_enemy =actor_in_zone(jup_b207_sr_depot_defence) =npc_community(dolg)} %+jup_b207_guards_warning_actor =play_sound(jup_b207_duty_guards_warning_actor)%
+combat_ignore_cond = {-jup_b207_attack_started =check_enemy_smart(jup_b207_depot_attack)} true, false

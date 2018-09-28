@@ -1,0 +1,27 @@
+[logic]
+active = nil ;sr_idle@task
+
+[sr_idle@task]
+on_info = {+zat_b7_actor_with_stalkers -zat_b7_stalkers_victims_task_given} %+zat_b7_stalkers_victims_task_given =give_task(zat_b7_stalkers_victims)%
+on_info2 = {+zat_b7_actor_teleport} sr_idle@teleport %=run_postprocess(fade_in_out)%
+on_info3 = {+zat_b7_stalkers_raiders_attack} sr_idle@check_actor
+
+[sr_idle@teleport]
+on_game_timer = 30 | {!zat_b7_is_night} sr_idle@out %=teleport_squad(zat_b7_stalkers_raiders:zat_b7_stalkers_raiders_spawn_2) =teleport_actor(zat_b7_actor_teleport_walk:zat_b7_actor_teleport_look) =set_game_time(23:0) +zat_b7_stalkers_raiders_attack%, {=zat_b7_is_night} sr_idle@out %=teleport_squad(zat_b7_stalkers_raiders:zat_b7_stalkers_raiders_spawn_2) =teleport_actor(zat_b7_actor_teleport_walk:zat_b7_actor_teleport_look) +zat_b7_stalkers_raiders_attack%
+
+[sr_idle@out]
+on_game_timer = 30 | sr_idle@after %=enable_ui()%
+
+[sr_idle@check_actor]
+on_info = {+actor_is_sleeping} sr_idle@teleport_squad
+on_info2 = {=actor_in_zone(zat_a2_sr_sleep)} sr_idle@teleport_squad
+on_info3 = {-actor_is_sleeping !actor_in_zone(zat_a2_sr_sleep)} sr_idle@after
+
+[sr_idle@teleport_squad]
+on_info = sr_idle@after %=teleport_squad(zat_b7_stalkers_raiders:zat_b7_stalkers_raiders_spawn_2) +zat_b7_stalker_teleported%
+
+[sr_idle@after]
+on_info = {+zat_b7_actor_with_stalkers -zat_b7_stalkers_victims_task_given} %+zat_b7_stalkers_victims_task_given =give_task(zat_b7_stalkers_victims)%
+on_info2 = {+zat_b7_task_end} sr_idle@nil
+
+[sr_idle@nil]

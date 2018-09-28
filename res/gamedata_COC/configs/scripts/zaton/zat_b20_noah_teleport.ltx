@@ -1,0 +1,103 @@
+[logic@zat_b20_noah_teleport]
+active = walker@start
+suitable = {=check_npc_name(zat_b20_noah_teleport)} true
+prior = 500
+on_death = death
+
+[walker@start]
+path_walk = zat_b20_noah_1_walk
+path_look = zat_b20_noah_1_look
+def_state_moving1 = assault
+def_state_standing = guard_na
+out_restr = zat_b20_in_restrictor
+on_signal = ready | {=see_actor} walker@wait %+zat_b20_stop_postprocess%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+in_restr = zat_b20_zone_mine_thermal_average_0034, zat_b20_zone_mine_thermal_average_0035, zat_b20_zone_mine_thermal_average_0037, zat_b20_zone_mine_thermal_average_0038, zat_b20_zone_mine_thermal_average_0040, zat_b20_zone_mine_thermal_average_0041, zat_b20_zone_mine_thermal_average_0042, zat_b20_zone_mine_thermal_average_0043 , zat_b20_zone_mine_thermal_average_0047, zat_b20_zone_mine_thermal_average_0050, zat_b20_zone_mine_thermal_average_0051,  zat_b20_zone_mine_thermal_average_0054, zat_b20_zone_mine_thermal_average_0057, zat_b20_zone_mine_thermal_average_0058, zat_b20_zone_mine_thermal_average_0062, zat_b20_zone_mine_thermal_average_0066
+
+
+[walker@wait]
+path_walk = zat_b20_noah_1_walk
+path_look = zat_b20_noah_1_look
+def_state_moving1 = assault
+def_state_standing = guard_na
+out_restr = zat_b20_in_restrictor
+on_info = {+zat_b20_noah_ready_to_jump} remark@instructions 
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+in_restr = zat_b20_zone_mine_thermal_average_0034, zat_b20_zone_mine_thermal_average_0035, zat_b20_zone_mine_thermal_average_0037, zat_b20_zone_mine_thermal_average_0038, zat_b20_zone_mine_thermal_average_0040, zat_b20_zone_mine_thermal_average_0041, zat_b20_zone_mine_thermal_average_0042, zat_b20_zone_mine_thermal_average_0043 , zat_b20_zone_mine_thermal_average_0047, zat_b20_zone_mine_thermal_average_0050, zat_b20_zone_mine_thermal_average_0051,  zat_b20_zone_mine_thermal_average_0054, zat_b20_zone_mine_thermal_average_0057, zat_b20_zone_mine_thermal_average_0058, zat_b20_zone_mine_thermal_average_0062, zat_b20_zone_mine_thermal_average_0066
+
+[remark@instructions]
+anim = guard
+target = story | actor
+on_info = %=play_sound(zat_b20_noah_instructions)%
+on_signal = sound_end | walker@walk_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = zat_b20_in_restrictor
+danger = danger
+meet = no_meet
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+in_restr = zat_b20_zone_mine_thermal_average_0034, zat_b20_zone_mine_thermal_average_0035, zat_b20_zone_mine_thermal_average_0037, zat_b20_zone_mine_thermal_average_0038, zat_b20_zone_mine_thermal_average_0040, zat_b20_zone_mine_thermal_average_0041, zat_b20_zone_mine_thermal_average_0042, zat_b20_zone_mine_thermal_average_0043 , zat_b20_zone_mine_thermal_average_0047, zat_b20_zone_mine_thermal_average_0050, zat_b20_zone_mine_thermal_average_0051,  zat_b20_zone_mine_thermal_average_0054, zat_b20_zone_mine_thermal_average_0057, zat_b20_zone_mine_thermal_average_0058, zat_b20_zone_mine_thermal_average_0062, zat_b20_zone_mine_thermal_average_0066
+
+[walker@walk_2]
+path_walk = zat_b20_noah_2_walk
+on_signal = jump | remark@jump
+def_state_moving1 = assault
+def_state_standing = wait_na
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = zat_b20_in_restrictor
+meet = no_meet
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+in_restr = zat_b20_zone_mine_thermal_average_0034, zat_b20_zone_mine_thermal_average_0035, zat_b20_zone_mine_thermal_average_0037, zat_b20_zone_mine_thermal_average_0038, zat_b20_zone_mine_thermal_average_0040, zat_b20_zone_mine_thermal_average_0041, zat_b20_zone_mine_thermal_average_0042, zat_b20_zone_mine_thermal_average_0043 , zat_b20_zone_mine_thermal_average_0047, zat_b20_zone_mine_thermal_average_0050, zat_b20_zone_mine_thermal_average_0051,  zat_b20_zone_mine_thermal_average_0054, zat_b20_zone_mine_thermal_average_0057, zat_b20_zone_mine_thermal_average_0058, zat_b20_zone_mine_thermal_average_0062, zat_b20_zone_mine_thermal_average_0066
+
+[remark@jump]
+target = story | zat_b20_teleport_mapspot
+anim = zat_b20_noah_jump
+meet = no_meet
+on_info = {=npc_in_zone(zat_b20_teleport)} %+zat_b20_destroy_actor =destroy_object% 
+on_info2 = {+zat_b20_plateau_way_known)} %+zat_b20_destroy_actor =destroy_object%
+out_restr = zat_b20_in_restrictor
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+in_restr = zat_b20_zone_mine_thermal_average_0034, zat_b20_zone_mine_thermal_average_0035, zat_b20_zone_mine_thermal_average_0037, zat_b20_zone_mine_thermal_average_0038, zat_b20_zone_mine_thermal_average_0040, zat_b20_zone_mine_thermal_average_0041, zat_b20_zone_mine_thermal_average_0042, zat_b20_zone_mine_thermal_average_0043 , zat_b20_zone_mine_thermal_average_0047, zat_b20_zone_mine_thermal_average_0050, zat_b20_zone_mine_thermal_average_0051,  zat_b20_zone_mine_thermal_average_0054, zat_b20_zone_mine_thermal_average_0057, zat_b20_zone_mine_thermal_average_0058, zat_b20_zone_mine_thermal_average_0062, zat_b20_zone_mine_thermal_average_0066
+
+[meet]
+close_anim		= guard_na
+close_victim    = actor
+close_distance  = 1
+close_snd_hello = nil
+close_snd_bye   = nil
+use			=  true
+;abuse		= true
+;trade_enable 	= false
+;allow_break = false
+
+[danger]
+ignore_distance = 0
+
+[death]
+on_info = %+zat_b18_noah_dead%
+
+;in_restr = zat_b20_zone_mine_thermal_average_0034, zat_b20_zone_mine_thermal_average_0035, zat_b20_zone_mine_thermal_average_0037, zat_b20_zone_mine_thermal_average_0038, zat_b20_zone_mine_thermal_average_0040, zat_b20_zone_mine_thermal_average_0041, zat_b20_zone_mine_thermal_average_0042, zat_b20_zone_mine_thermal_average_0043 , zat_b20_zone_mine_thermal_average_0047, zat_b20_zone_mine_thermal_average_0050, zat_b20_zone_mine_thermal_average_0051,  zat_b20_zone_mine_thermal_average_0054, zat_b20_zone_mine_thermal_average_0057, zat_b20_zone_mine_thermal_average_0058, zat_b20_zone_mine_thermal_average_0062, zat_b20_zone_mine_thermal_average_0066

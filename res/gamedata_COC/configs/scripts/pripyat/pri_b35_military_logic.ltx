@@ -1,0 +1,18 @@
+[logic@pri_a22_army_signaller]
+active = walker@stand
+suitable = {=check_npc_name(pri_a22_army_signaller) +pri_b35_actor_is_guided -pri_b35_actor_rest -pri_a25_rfi_source_eliminated} true
+prior = 200
+
+[walker@stand]
+path_walk = spawn
+path_look = look
+meet = meet@self
+
+[meet@self]
+close_distance = 10
+close_victim = actor
+close_anim = guard_na
+use = {!actor_enemy +pri_b35_ui -pri_b35_actor_rest =dist_to_actor_le(10) =see_actor} self
+meet_dialog = pri_a22_army_signaller_b35_about_merc
+allow_break	= false
+trade_enable = false

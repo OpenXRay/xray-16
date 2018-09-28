@@ -1,0 +1,17 @@
+[red_forest_bridge]
+GroupControlSection	= spawn_group
+$spawn 				= "physics\red_forest_bridge"
+$prefetch 			= 8
+class				= O_PHYSIC ;Change to O_PHYS_S if you want to use se_item.se_physic
+remove_time			= 60; after this time  unbreaked removable bone will be removed
+script_binding      = bind_red_forest_bridge.bind
+visual              = dynamics\scene_objects\red_forest\red_forest_bridge_01_dynamic
+
+[agru_door]
+GroupControlSection	= spawn_group
+$spawn 				= "physics\agru_door"
+$prefetch 			= 8
+class				= O_PHYSIC ;Change to O_PHYS_S if you want to use se_item.se_physic
+remove_time			= 60; after this time  unbreaked removable bone will be removed
+;script_binding      = bind_agru_door.bind
+visual              = dynamics\door\agru_door 

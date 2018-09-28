@@ -1,0 +1,20 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@1
+
+[sr_idle@1]
+on_actor_inside = sr_idle %+warlab_pod_room_door_find%
+
+[sr_idle]
+on_info = {+warlab_start_teleport} sr_particle
+
+[sr_particle]
+name = anomaly2\teleport_out_00
+mode = 2
+path = warlab_part_points
+looped = true
+on_info = {+warlab_end_teleport} sr_idle@nil
+
+[sr_idle@nil]

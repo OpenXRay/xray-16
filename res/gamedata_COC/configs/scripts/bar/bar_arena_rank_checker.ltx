@@ -1,0 +1,5 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {!bar_actor_rank_stalker -bar_arena_fight_3_reward +bar_arena_fight_3_done -bar_arena_fight_6_done} %+bar_arena_rank_false% , {!bar_actor_rank_veteran -bar_arena_fight_6_reward +bar_arena_fight_6_done} %+bar_arena_rank_false% , %-bar_arena_rank_false%

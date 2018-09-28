@@ -1,0 +1,30 @@
+[logic@snork]
+active = mob_walker@wait
+suitable = {=check_npc_name(lx8_snork)} true
+prior = 50
+monster_job = true
+
+
+[mob_walker@wait]
+path_walk = snork_jump_01_walk 
+path_look = snork_jump_01_look
+combat_ignore_cond =  true
+on_info = {=actor_in_zone(lx8_sr_up_ladder)} mob_walker@run
+on_info2 = {=actor_in_zone(lx8_sr_close_combat)}  mob_home@combat
+;out_restr = lx8_sr_close_combat
+
+[mob_walker@run]
+path_walk = snork_jump_02_walk 
+path_look = snork_jump_02_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_signal = kill | %=kill_npc%
+;out_restr = lx8_sr_close_combat
+
+[mob_home@combat]
+path_home = snork_combat_home
+home_min_radius = 30
+home_max_radius = 40
+braindead = false
+aggressive = true
+out_restr = lx8_sr_close_combat
+combat_ignore_cond = {=check_enemy_name(lx8_controller)} true

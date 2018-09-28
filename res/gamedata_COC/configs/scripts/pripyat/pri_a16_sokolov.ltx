@@ -1,0 +1,69 @@
+[logic@pri_a16_sokolov]
+active = animpoint@pri_a16_sokolov 
+suitable = {-pri_a20_squad_cutscene_actor_talk_2_complete -pri_b305_fifth_cam_end =check_npc_name(sokolov) =npc_in_zone(pri_surge_hide_a16)} true
+prior = 200
+
+[animpoint@pri_a16_sokolov]
+cover_name = pri_a16_animp_sokolov
+use_camp = false 
+meet = meet@pri_a16_sokolov
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_info = {-pri_a20_sokolov_with_garick_new_way_to_pripyat_3 -pri_a25_rfi_source_eliminated +pri_a17_actor_has_gauss_rifle} walker@a20_stand_base
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+reach_movement = walk
+
+[meet@pri_a16_sokolov]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+trade_enable 	= false
+allow_break 	= false
+meet_on_talking = false
+
+[walker@a20_stand_base]
+meet = no_meet
+path_walk = pri_a20_sokolov_walk
+path_look = pri_a20_sokolov_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+def_state_standing = wait_na
+def_state_moving = walk
+on_signal = sound_end | %+pri_a20_way_to_pripyat_1_sound_end%
+on_info = {=actor_in_zone(pri_a20_sokolov_with_garick_new_way_to_pripyat_talk)} %=play_sound(pri_a20_sokolov_with_garick_new_way_to_pripyat_1)%
+on_info2 = {+pri_a20_way_to_pripyat_2_sound_end} walker@a20_stand_base_2
+on_info3 = {+pri_a25_rfi_source_eliminated} animpoint@pri_a16_sokolov
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[walker@a20_stand_base_2]
+meet = no_meet
+path_walk = pri_a20_sokolov_walk
+path_look = pri_a20_sokolov_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+def_state_standing = wait_na
+def_state_moving = walk
+on_info = {+pri_a25_rfi_source_eliminated} animpoint@pri_a16_sokolov
+on_game_timer = 10 | {-pri_a20_sokolov_with_garick_new_way_to_pripyat_3} %+pri_a20_sokolov_with_garick_new_way_to_pripyat_3 =play_sound(pri_a20_sokolov_with_garick_new_way_to_pripyat_3)%
+on_signal = sound_end | animpoint@pri_a16_sokolov %+pri_a20_way_to_pripyat_3_sound_end%
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false

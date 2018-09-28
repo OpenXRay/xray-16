@@ -1,0 +1,815 @@
+;----------
+; AMUNITION
+;----------
+
+[ammo_base]:identity_immunities,default_weapon_params
+class                                    = AMMO 	;Change to AMMO_S if you want to use se_item.se_ammo script binding
+;belt				= true
+slot                                     = -1
+explosive                                = false
+cform = skeleton
+4to1_tracer                              = true
+tracer_color_ID                          = 0
+k_cam_dispersion                         = 1.0 ; shoot effect script only, will be added to engine later
+
+[ammo_knife]:ammo_base
+$prefetch                                = 64
+box_size                                 = 1
+buck_shot                                = 1
+cost                                     = 1
+impair                                   = 1
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 0
+inv_grid_y                               = 0
+inv_name                                 = "ammo_knife"
+inv_name_short                           = "ammo_knife"
+inv_weight                               = 0
+k_air_resistance                         = 1
+k_ap                                     = 0.5
+k_disp                                   = 1
+k_dist                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 1
+tracer                                   = off
+visual                                   = dynamics\weapons\wpn_ammo\ammo_9x18_fmj.ogf
+wm_size                                  = 0.04
+
+[ammo_9x18_fmj]:ammo_base ; 7H15
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_9x18_fmj"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_9x18_fmj.ogf
+description                              = ammo-9x18-fmj_descr
+$prefetch                                = 64
+
+cost                                     = 300
+
+box_size                                 = 50
+
+inv_name                                 = ammo-9x18-fmj
+inv_name_short                           = ammo-9x18-fmj_s
+inv_weight                               = .5
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 9
+inv_grid_y                               = 5
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.1
+k_ap                                     = 0.1
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.06
+k_air_resistance                         = 1.0
+
+[ammo_9x18_pmm]:ammo_base ; 7H16
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_9x18_pmm"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_9x18_pmm.ogf
+description                              = ammo-9x18-pmm_descr
+$prefetch                                = 64
+
+cost                                     = 500
+
+box_size                                 = 50
+
+inv_name                                 = ammo-9x18-pmm
+inv_name_short                           = ammo-9x18-pmm_s
+inv_weight                               = .5
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 10
+inv_grid_y                               = 5
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1.15
+k_impulse                                = 1
+k_pierce                                 = 0.2
+k_ap                                     = 0.2
+impair                                   = 1.1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.06
+k_air_resistance                         = 1.0
+k_bullet_speed                           = 1.25
+
+[ammo_9x19_fmj]:ammo_base ; 124gr
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_9x19_fmj"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_9x19_fmj.ogf
+description                              = ammo-9x19-fmj_descr
+slot                                     = -1
+$prefetch                                = 64
+
+cost                                     = 350
+
+box_size                                 = 50
+
+inv_name                                 = ammo-9x19-fmj
+inv_name_short                           = ammo-9x19-fmj_s
+inv_weight                               = .5
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 11
+inv_grid_y                               = 5
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.1
+k_ap                                     = 0.1
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 2
+wm_size                                  = 0.06
+k_air_resistance                         = 1.0
+
+[ammo_9x19_pbp]:ammo_base ; 7H21
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_9x19_pbp"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_9x19_pbp.ogf
+description                              = ammo-9x19-pbp_descr
+$prefetch                                = 64
+
+cost                                     = 600
+
+box_size                                 = 50
+
+inv_name                                 = ammo-9x19-pbp
+inv_name_short                           = ammo-9x19-pbp_s
+inv_weight                               = .45
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 12
+inv_grid_y                               = 5
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1.2
+k_impulse                                = 1
+k_pierce                                 = 0.15
+k_ap                                     = 0.15
+impair                                   = 1.1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 2
+wm_size                                  = 0.06
+k_air_resistance                         = 1.0
+k_bullet_speed                           = 1.25
+
+[ammo_11.43x23_fmj]:ammo_base ; 230gr
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_11.43x23_fmj"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_1143x23_fmj.ogf
+description                              = ammo-11.43x23-fmj_descr
+$prefetch                                = 64
+
+cost                                     = 750
+
+box_size                                 = 50
+
+inv_name                                 = ammo-11.43x23-fmj
+inv_name_short                           = ammo-11.43x23-fmj_s
+inv_weight                               = .9
+
+inv_grid_width                           = 2	                                       ;1
+inv_grid_height                          = 1
+inv_grid_x                               = 18
+inv_grid_y                               = 7
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.1
+k_ap                                     = 0.1
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 2
+wm_size                                  = 0.08
+k_air_resistance                         = 0.75
+
+[ammo_11.43x23_hydro]:ammo_base
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_11.43x23_hydro"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_1143x23_hydro.ogf
+description                              = ammo-11.43x23-hydro_descr
+$prefetch                                = 64
+
+cost                                     = 1250
+
+box_size                                 = 50
+
+inv_name                                 = ammo-11.43x23-hydro
+inv_name_short                           = ammo-11.43x23-hydro_s
+inv_weight                               = .9
+
+inv_grid_width                           = 2	                                       ;1
+inv_grid_height                          = 1
+inv_grid_x                               = 0
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1.2
+k_impulse                                = 1
+k_pierce                                 = 0.15
+k_ap                                     = 0.15
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 2
+wm_size                                  = 0.09
+k_air_resistance                         = 0.8
+
+[ammo_5.45x39_fmj]:ammo_base ; 7H10
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_5.45x39_fmj"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_545x39_fmj.ogf
+description                              = ammo-5.45x39-fmj_descr
+$prefetch                                = 64
+
+cost                                     = 900
+
+box_size                                 = 60
+
+inv_name                                 = ammo-5.45x39-fmj
+inv_name_short                           = ammo-5.45x39-fmj_s
+inv_weight                               = .65
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 8
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.33
+k_ap                                     = 0.33
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.05
+k_air_resistance                         = 1.1
+
+[ammo_5.45x39_ap]:ammo_base ; 7H22
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_5.45x39_ap"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_545x39_ap.ogf
+description                              = ammo-5.45x39-ap_descr
+$prefetch                                = 64
+
+cost                                     = 1500
+
+box_size                                 = 60
+
+inv_name                                 = ammo-5.45x39-ap
+inv_name_short                           = ammo-5.45x39-ap_s
+inv_weight                               = .65
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 6
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.6
+k_ap                                     = 0.6
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.05
+k_air_resistance                         = 1.1
+
+[ammo_5.56x45_ss190]:ammo_base ; SS109 (M855) green tip
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_5.56x45_ss190"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_556x45_ss190.ogf
+description                              = ammo-5.56x45-ss190_descr
+slot                                     = -1
+$prefetch                                = 64
+
+cost                                     = 950
+
+box_size                                 = 60
+
+inv_name                                 = ammo-5.56x45-ss190
+inv_name_short                           = ammo-5.56x45-ss190_s
+inv_weight                               = .7
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 12
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1.1 ; due to bigger (62gr) bullet
+k_impulse                                = 1
+k_pierce                                 = 0.3
+k_ap                                     = 0.3
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 2
+wm_size                                  = 0.05
+k_air_resistance                         = 1.1
+
+[ammo_5.56x45_ap]:ammo_base ; M995 black tip
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_5.56x45_ap"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_556x45_ap.ogf
+description                              = ammo-5.56x45-ap_descr
+$prefetch                                = 64
+
+cost                                     = 1600
+
+box_size                                 = 60
+
+inv_name                                 = ammo-5.56x45-ap
+inv_name_short                           = ammo-5.56x45-ap_s
+inv_weight                               = .7
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 10
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.6
+k_ap                                     = 0.6
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 2
+wm_size                                  = 0.05
+k_air_resistance                         = 1.1
+
+[ammo_pkm_100]:ammo_base
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_pkm_100"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_pkm.ogf
+description                              = ammo-7.62x54-pkm_descr
+$prefetch                                = 64
+
+cost                                     = 2500
+
+box_size                                 = 100
+
+inv_name                                 = ammo-7.62x54-pkm
+inv_name_short                           = ammo-7.62x54-pkm_s
+inv_weight                               = 2.2
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 0
+inv_grid_y                               = 9
+
+hud_icon                                 = ui_hud2_res_back
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.3
+k_ap                                     = 0.3
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.07
+k_air_resistance                         = 0.5
+
+[ammo_7.62x54_7h1]:ammo_base ; 7H14
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_7.62x54_7h1"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_762x54_7h1.ogf
+description                              = ammo-7.62x54-7h14_descr
+$prefetch                                = 64
+
+cost                                     = 500
+
+box_size                                 = 10
+
+inv_name                                 = ammo-7.62x54-7h14
+inv_name_short                           = ammo-7.62x54-7h14_s
+inv_weight                               = .22
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 14	                                       ;15
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 0.9
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.75
+k_ap                                     = 1
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.07
+k_air_resistance                         = 0.4
+
+[ammo_gauss]:ammo_base
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_gauss"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_gauss.ogf
+description                              = ammo-gauss_descr
+$prefetch                                = 64
+
+cost                                     = 2500
+
+box_size                                 = 10
+
+inv_name                                 = ammo-gauss
+inv_name_short                           = ammo-gauss
+inv_weight                               = 1
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 13
+inv_grid_y                               = 5
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 5
+k_ap                                     = 5
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = off
+wm_size                                  = 0.02
+
+explosive                                = on
+
+[ammo_gauss_cardan]:ammo_gauss
+$spawn                                   = "weapons\ammo\ammo_gauss_cardan"	                                       ; option for Level Editor
+visual                                   = dynamics\weapons\wpn_ammo\ammo_gauss_custom.ogf
+description                              = ammo-gauss_cardan_descr
+
+box_size                                 = 6
+
+inv_name                                 = ammo-gauss_cardan
+inv_name_short                           = ammo-gauss_cardan
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 14
+inv_grid_y                               = 5
+
+[ammo_9x39_pab9]:ammo_base ; SP5
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_9x39_pab9"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_9x39_sp5.ogf
+description                              = ammo-9x39-pab9_descr
+$prefetch                                = 64
+
+cost                                     = 900
+
+box_size                                 = 30
+
+inv_name                                 = ammo-9x39-pab9
+inv_name_short                           = ammo-9x39-pab9_s
+inv_weight                               = .7
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 18
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.3
+k_ap                                     = 0.3
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.07
+k_air_resistance                         = 0.25
+
+[ammo_9x39_ap]:ammo_base ; SP6
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_9x39_ap"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_9x39_ap.ogf
+description                              = ammo-9x39-ap_descr
+$prefetch                                = 64
+
+cost                                     = 1500
+
+box_size                                 = 30
+
+inv_name                                 = ammo-9x39-ap
+inv_name_short                           = ammo-9x39-ap_s
+inv_weight                               = .7
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 16
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.62
+k_ap                                     = 0.62
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = on
+tracer_color_ID                          = 1
+wm_size                                  = 0.07
+k_air_resistance                         = 0.25
+
+[ammo_12x70_buck]:ammo_base ; #00 buck
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_12x70_buck"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_12x70_buck.ogf
+description                              = ammo-12x70-buck_descr
+$prefetch                                = 64
+
+cost                                     = 200
+
+box_size                                 = 10
+
+inv_name                                 = ammo-12x70-buck
+inv_name_short                           = ammo-12x70-buck_s
+inv_weight                               = .45
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 2
+inv_grid_y                               = 8
+
+k_dist                                   = 0.75
+k_disp                                   = 8
+k_hit                                    = 0.4
+k_impulse                                = 0.5
+k_pierce                                 = 0.03
+k_ap                                     = 0.03
+impair                                   = 1
+buck_shot                                = 9
+tracer                                   = off
+wm_size                                  = 0.035
+k_air_resistance                         = 1.3
+
+[ammo_12x76_zhekan]:ammo_base
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_12x76_zhekan"	                                       ; option for Level Editor
+
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_12x76_zhekan.ogf
+description                              = ammo-12x76-zhekan_descr
+$prefetch                                = 64
+
+cost                                     = 350
+
+box_size                                 = 10
+
+inv_name                                 = ammo-12x76-zhekan
+inv_name_short                           = ammo-12x76-zhekan_s
+inv_weight                               = .45
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 4
+inv_grid_y                               = 8
+
+k_dist                                   = 1
+k_disp                                   = 0.9
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.3
+k_ap                                     = 0.3
+impair                                   = 1
+buck_shot                                = 1
+tracer                                   = off
+wm_size                                  = 0.1
+explosive                                = off
+k_air_resistance                         = 1.1
+k_bullet_speed                           = 1.2
+
+[ammo_12x76_zhekan_heli]:ammo_12x76_zhekan ; Do not use! Fake zhekan for helicopter
+$spawn                                   = ;"weapons\ammo\ammo_12x76_zhekan_heli"
+k_disp                                   = 1
+k_ap                                     = 0.5
+k_air_resistance                         = 1
+k_bullet_speed                           = 1
+explosive                                = off
+4to1_tracer                              = false
+tracer                                   = on
+tracer_color_ID                          = 3
+
+[ammo_og-7b]:ammo_base
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_og-7b"	                                       ; option for Level Editor
+class                                    = S_OG7B
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_og_7b.ogf
+description                              = ammo-og-7b_descr
+$prefetch                                = 64
+
+cost                                     = 2000
+
+box_size                                 = 1
+
+inv_name                                 = ammo-og-7b
+inv_name_short                           = ammo-og-7b_s
+inv_weight                               = 2.0
+
+inv_grid_width                           = 3
+inv_grid_height                          = 1
+inv_grid_x                               = 10
+inv_grid_y                               = 13
+
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.25
+k_ap                                     = 0.25
+impair                                   = 1
+buck_shot                                = 0
+tracer                                   = off
+wm_size                                  = 0.5
+
+wallmark_section                         = explosion_marks
+
+;могут ли боеприпасы быть неограниченными : 1 - могут, 0 - не могут
+can_be_unlimited                         = true
+
+;-----------------------------------------
+; Grenades for Attachable grenade launcher
+;-----------------------------------------
+
+[ammo_vog-25]:ammo_base
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_vog-25"	                                       ; option for Level Editor
+class                                    = S_VOG25
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_vog_25.ogf
+description                              = ammo-vog-25_descr
+
+$prefetch                                = 64
+
+cost                                     = 500
+
+box_size                                 = 1
+
+inv_name                                 = ammo-vog-25
+inv_name_short                           = ammo-vog-25_s
+inv_weight                               = .25
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 15
+inv_grid_y                               = 5
+
+kill_msg_x                               = 38
+kill_msg_y                               = 233
+kill_msg_width                           = 21
+kill_msg_height                          = 22
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.25
+k_ap                                     = 0.25
+impair                                   = 1
+buck_shot                                = 0
+tracer                                   = off
+wm_size                                  = 0.3
+
+fake_grenade_name                        = wpn_fake_missile
+
+;могут ли боеприпасы быть неограниченными : 1 - могут, 0 - не могут
+can_be_unlimited                         = true
+
+[ammo_m209]:ammo_base
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "weapons\ammo\ammo_m209"	                                       ; option for Level Editor
+class                                    = S_M209
+cform                                    = skeleton
+visual                                   = dynamics\weapons\wpn_ammo\ammo_m209.ogf
+description                              = ammo-m209_descr
+slot                                     = -1
+$prefetch                                = 64
+
+cost                                     = 500
+
+box_size                                 = 1
+
+inv_name                                 = ammo-m209
+inv_name_short                           = ammo-m209_s
+inv_weight                               = .23
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 16
+inv_grid_y                               = 5
+
+kill_msg_x                               = 61
+kill_msg_y                               = 232
+kill_msg_width                           = 19
+kill_msg_height                          = 22
+
+k_dist                                   = 1
+k_disp                                   = 1
+k_hit                                    = 1
+k_impulse                                = 1
+k_pierce                                 = 0.25
+k_ap                                     = 0.25
+impair                                   = 1
+buck_shot                                = 0
+tracer                                   = off
+wm_size                                  = 0.3
+
+fake_grenade_name                        = wpn_fake_missile2
+
+;могут ли боеприпасы быть неограниченными : 1 - могут, 0 - не могут
+can_be_unlimited                         = true

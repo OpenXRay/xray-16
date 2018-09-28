@@ -1,0 +1,71 @@
+;*****************************************************************
+;Military assault
+;*****************************************************************
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+[logic@dar_military_scout_hide]
+active = camper@dar_military_scout_hide
+suitable = {=target_squad_name(dar_military_scout_squad)} true
+prior = 200
+
+[camper@dar_military_scout_hide]:walker@generic
+path_walk = walk_hide
+path_look = look_hide
+def_state_moving = assault
+def_state_campering = hide_na
+radius = 10
+danger = danger_condition@scout
+
+
+[logic@dar_military_scout_camper1]
+active = camper@dar_military_scout_camper1
+suitable = {=target_squad_name(dar_military_scout_squad)} true
+prior = 200
+
+[camper@dar_military_scout_camper1]:walker@generic
+path_walk = camper1_walk
+path_look = camper1_look
+def_state_moving = assault
+def_state_campering = hide_na
+radius = 10
+danger = danger_condition@scout
+
+
+[logic@dar_military_scout_camper2]
+active = camper@dar_military_scout_camper2
+suitable = {=target_squad_name(dar_military_scout_squad)} true
+prior = 200
+
+[camper@dar_military_scout_camper2]:walker@generic
+path_walk = camper2_walk
+path_look = camper2_look
+def_state_moving = assault
+def_state_campering = hide_na
+radius = 10
+danger = danger_condition@scout
+
+
+[logic@dar_military_scout_camper3]
+active = camper@dar_military_scout_camper3
+suitable = {=target_squad_name(dar_military_scout_squad)} true
+prior = 200
+
+[camper@dar_military_scout_camper3]:walker@generic
+path_walk = camper3_walk
+path_look = camper3_look
+def_state_moving = assault
+def_state_campering = hide_na
+radius = 10
+danger = danger_condition@scout
+
+[danger_condition@scout]
+ignore_distance       = 10
+ignore_distance_grenade = 10
+ignore_distance_corpse  = 0
+;ignore_distance_danger_hit     = 20
+ignore_distance_sound   = 0 
+danger_inertion_time_hit = 1

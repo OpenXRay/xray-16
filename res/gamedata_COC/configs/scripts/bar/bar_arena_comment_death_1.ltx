@@ -1,0 +1,13 @@
+[logic]
+active = sr_idle@idle
+
+[sr_idle@idle]
+on_info = {+bar_arena_public_death} sr_idle@sound
+on_info2 = {+bar_arena_fight_8_stalker_1_die +bar_arena_fight_8_stalker_2_die +bar_arena_fight_8_stalker_3_die +bar_arena_fight_8_stalker_4_die} sr_idle@nil
+
+[sr_idle@sound]
+on_info %=play_sound(bar_arena_public_death)%
+;on_signal = sound_end| sr_idle@idle %-bar_arena_public_death%
+on_timer = 8000 | sr_idle@idle %=stop_sound -bar_arena_public_death%
+
+[sr_idle@nil]

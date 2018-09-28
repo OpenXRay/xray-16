@@ -1,0 +1,168 @@
+[logic@lost_merc_leader]
+suitable   = {!surge_started} true
+active     = walker@leader
+prior      = 100
+on_death = death
+
+[death]
+on_info = %=stop_sound +zat_b103_merc_fight =set_squad_goodwill(zat_b103_lost_merc_squad1:enemy)%
+
+[walker@def]
+on_info66 = {+zat_b103_merc_fight} walker@nil_fight %=stop_sound%
+on_info77 = {+zat_b103_actor_warned_by_merc -zat_b103_warned_by_mercs_saved} %+zat_b103_warned_by_mercs_saved =scenario_autosave(st_save_zat_b103_warned_by_mercs)%
+
+[remark@def]
+on_info66 = {+zat_b103_merc_fight} walker@nil_fight %=stop_sound%
+on_info77 = {+zat_b103_actor_warned_by_merc -zat_b103_warned_by_mercs_saved} %+zat_b103_warned_by_mercs_saved =scenario_autosave(st_save_zat_b103_warned_by_mercs)%
+
+[walker@force_maj]:walker@def
+path_walk = lost_merc_leader_walk
+path_look = lost_merc_leader_look
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound -zat_b103_force_maj +zat_b103_force_maj_after%
+
+[walker@nil_fight]
+path_walk = lost_merc_leader_walk
+path_look = lost_merc_leader_look
+on_info = {-zat_b103_actor_enemy} %=set_squad_goodwill(zat_b103_lost_merc_squad1:enemy) +zat_b103_actor_enemy%
+
+[walker@leader]:walker@def
+path_walk = lost_merc_leader_walk
+path_look = lost_merc_leader_look
+def_state_moving1 = sprint
+def_state_moving2 = sprint
+def_state_moving3 = sprint
+on_info = {+zat_b103_merc_used_actor} %-zat_b103_merc_used_actor%
+on_info2 = {+zat_b103_actor_came_armed} %-zat_b103_actor_came_armed%
+on_info3 = {+zat_b103_actor_warned_by_merc} %-zat_b103_actor_warned_by_merc%
+on_actor_in_zone = zat_b103_sr_def_restr | {=actor_has_weapon -zat_b103_actor_warned_by_merc} remark@warn1 %+zat_b103_actor_came_armed +zat_b103_warning%, remark@meet_use
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+on_info5 = {+zat_b103_force_maj_after} %-zat_b103_force_maj_after%
+
+[remark@warn1]:remark@def
+target = story | actor
+anim   = threat_na
+meet   = no_meet
+on_info   = {-zat_b103_merc_fight} %=play_sound(zat_b103_merc_hide_weapon_1)%
+on_signal = sound_end | {!actor_has_weapon} remark@pause_meet %-zat_b103_warning%, remark@warn2
+on_actor_in_zone     = zat_b103_merc_territory | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone2 	 = zat_b103_merc_robbery | {!actor_has_weapon} remark@pause_meet %=stop_sound -zat_b103_warning%
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound -zat_b103_warning%
+meet = no_meet
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@warn2]:remark@def
+target = story | actor
+anim = threat_na
+meet = no_meet
+on_info = {-zat_b103_merc_fight} %=play_sound(zat_b103_merc_hide_weapon_2)%
+on_signal = sound_end | {!actor_has_weapon} remark@pause_meet, remark@count
+on_actor_in_zone     = zat_b103_merc_territory | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone2    = zat_b103_merc_robbery | {!actor_has_weapon} remark@pause_meet %=stop_sound%
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound%
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@count]:remark@def
+target = story | actor
+anim = threat_na
+meet = no_meet
+on_info = {-zat_b103_merc_fight} %=play_sound(zat_b103_merc_count)%  
+on_signal = theme_end | {!actor_has_weapon} remark@pause_meet %-zat_b103_warning%, %+zat_b103_merc_fight%
+on_actor_in_zone     = zat_b103_merc_territory | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone2    = zat_b103_merc_robbery | {!actor_has_weapon} remark@pause_meet %=stop_sound -zat_b103_warning%
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound -zat_b103_warning%
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@pause_meet]:remark@def
+target = story | actor
+anim = guard
+on_game_timer = 20 | {+zat_b103_actor_came_armed} %=play_sound(zat_b103_merc_come_here_now) -zat_b103_actor_came_armed -zat_b103_warning%
+on_actor_in_zone  = zat_b103_merc_territory | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone2 = zat_b103_merc_inside_yard | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone3 = zat_b103_merc_robbery | {=actor_has_weapon} remark@warn1
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound -zat_b103_warning%
+on_actor_dist_le = 20 | remark@meet_use
+meet = no_meet
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@meet_use]:remark@def
+target = story | actor
+anim = guard
+meet = meet
+on_info = {+zat_b103_merc_task_done} remark@watch
+on_info2 = {+zat_b103_actor_warned_by_merc} remark@watch_forbidden
+on_actor_in_zone  = zat_b103_merc_territory | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone2 = zat_b103_merc_inside_yard | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone3 = zat_b103_merc_robbery | {=actor_has_weapon} remark@warn1 
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound%
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+
+[remark@watch_forbidden]:remark@def
+target = story | actor
+anim = guard
+on_info  = {+zat_b103_merc_task_done} remark@watch
+on_info2 = {+zat_b103_actor_left_yard} %-zat_b103_actor_left_yard%
+on_actor_in_zone  = zat_b103_merc_territory | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone2 = zat_b103_merc_robbery | {=actor_has_weapon} remark@warn1 
+on_actor_in_zone3 = zat_b103_merc_inside_yard | remark@watch_forbidden_fail %+zat_b103_actor_in_yard%
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound%
+on_actor_dist_le_nvis = 20 | remark@watch_forbidden_meet_use
+meet = meet
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@watch_forbidden_fail]:remark@def
+target = story | actor
+anim = threat_na
+on_info = {-zat_b103_actor_warned_inside} %=play_sound(zat_b103_merc_warning)%, remark@watch_forbidden_fail_warned
+on_signal = sound_end | %+zat_b103_actor_warned_inside =stop_sound%
+on_timer = 8000 | {-zat_b103_actor_left_yard !has_enemy} %+zat_b103_merc_fight%
+on_actor_not_in_zone = zat_b103_merc_inside_yard | {!actor_has_weapon} remark@watch_forbidden %+zat_b103_actor_left_yard =reset_sound_npc%
+on_actor_not_in_zone2 = zat_b103_merc_inside_yard | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+meet = no_meet
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@watch_forbidden_fail_warned]:remark@def
+anim = guard
+on_timer = 5000 | {-zat_b103_actor_left_yard !has_enemy} %+zat_b103_merc_fight%
+on_actor_not_in_zone = zat_b103_merc_inside_yard | {!actor_has_weapon} remark@watch_forbidden %+zat_b103_actor_left_yard =reset_sound_npc%
+meet = no_meet
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@watch_forbidden_meet_use]:remark@def
+target = story | actor
+anim = guard
+on_info = {+zat_b103_merc_task_done} remark@watch
+on_info2 = {+zat_b103_actor_left_yard} %-zat_b103_actor_left_yard%
+meet = meet
+on_actor_in_zone  = zat_b103_merc_territory | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%
+on_actor_in_zone2 = zat_b103_merc_robbery | {=actor_has_weapon} remark@warn1 
+on_actor_in_zone3 = zat_b103_merc_inside_yard | remark@watch_forbidden_fail %+zat_b103_actor_in_yard%
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound%
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[remark@watch]:remark@def
+target = story | actor
+anim = guard
+meet = meet
+on_info = {=actor_has_weapon -zat_b103_force_maj_after} remark@watch_fail
+on_info2 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@leader %=stop_sound%
+
+[remark@watch_fail]:remark@def
+target = story | actor
+anim = threat_na
+on_info = {=actor_has_weapon -zat_b103_merc_hide_weapon_1_done} %=play_sound(zat_b103_merc_hide_weapon_1) +zat_b103_merc_hide_weapon_1_done%
+on_game_timer = 50 | {=actor_has_weapon !has_enemy} %+zat_b103_merc_fight%, remark@watch %=stop_sound -zat_b103_merc_hide_weapon_1_done%
+meet = no_meet
+on_info4 = {=has_enemy !is_enemy_actor =actor_in_zone(zat_b103_sr_def_restr)} walker@force_maj %=stop_sound +zat_b103_force_maj%
+
+[meet]
+close_anim = guard_na
+close_distance = 20
+close_victim = actor
+far_distance = 40
+far_victim = nil
+far_anim = guard
+use = {+zat_b103_merc_task_done -zat_b103_merc_fight !actor_enemy} true, {-zat_b103_merc_used_actor =dist_to_actor_le(20) -zat_b103_merc_task_done -zat_b103_merc_fight !actor_enemy} self, {-zat_b103_merc_fight !actor_enemy} true
+trade_enable = false
+allow_break = false

@@ -1,0 +1,556 @@
+[logic@zat_b7_bandit_boss_sultan_b5]
+active = walker@start
+suitable = {=check_npc_name(zat_b7_duty_illicit_dealer) -zat_b5_trader_death} true
+prior = 100
+post_combat_time = 0,0 ;5,5
+on_death = death
+on_hit = hit
+
+[walker@start]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = assault
+def_state_standing = guard_na
+on_info = {+zat_b5_actor_with_bandits} walker@start_work_bandit
+on_info2 = {+zat_b5_actor_with_dealer} walker@start_work_dealer
+on_info3 = {+zat_b5_actor_with_stalkers} walker@start_work_bandit %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@start_work_bandit]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_info = {+zat_b5_actor_bandit_go_to_trader} walker@start_work_bandit_2, {+zat_b5_actor_stalker_go_to_trader} walker@start_work_bandit_2
+on_info2 = {+zat_b5_meat} walker@fight_bandit %=actor_enemy%
+on_info3 = {+zat_b5_actor_with_stalkers =actor_see_npc =see_actor} remark@see_actor
+meet = meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true , {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+on_hit = hit
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--ждет бандитов
+[walker@start_work_bandit_2]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_info = {+zat_b5_sultan_close_by_trader +zat_b5_actor_with_bandits} walker@timer_to_remark, {+zat_b5_actor_with_stalkers +zat_b5_start_quest_stalkers} walker@timer_to_remark
+on_info2 = {+zat_b5_meat} walker@fight_bandit %=actor_enemy%
+on_info3 = {+zat_b5_actor_with_stalkers =actor_see_npc =see_actor} remark@see_actor
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+on_hit = hit
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--ждет ремарка
+[walker@timer_to_remark]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_game_timer = 10 | remark@speak_sultan
+on_info = {+zat_b5_meat} walker@fight_bandit %=actor_enemy%
+on_info2 = {+zat_b5_actor_with_stalkers =actor_see_npc =see_actor} remark@see_actor
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_bandits)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true 
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--первая фраза "что там у вас"
+[remark@speak_sultan]
+anim = guard
+target = path | zat_b5_smart_terrain_zat_b5_bandit_sultan_2_walk,0
+on_info = %=play_sound(zat_b5_dealer_bandit_speak_1)%
+on_signal = sound_end  | walker@wait %+zat_b5_dealer_speak_1_done%
+on_info2= {+zat_b5_meat} walker@fight_bandit %=actor_enemy%
+on_info3 = {+zat_b5_actor_with_stalkers =actor_see_npc =see_actor} remark@see_actor
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_bandits)} true, {=check_enemy_name(zat_b5_stalker:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--ждет ответа
+[walker@wait]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence 
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_info =  {+zat_b5_bandit_speak_1_done} remark@speak_sultan_2
+on_info2 = {+zat_b5_meat} walker@fight_bandit %=actor_enemy%
+on_info3 = {+zat_b5_actor_with_stalkers =actor_see_npc =see_actor} remark@see_actor
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_bandits)} true, {=check_enemy_name(zat_b5_stalker:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true 
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--вторая фраза "оружие не проблема"
+[remark@speak_sultan_2]
+anim = guard
+target = path | zat_b5_smart_terrain_zat_b5_bandit_sultan_2_walk,0
+on_info = %=play_sound(zat_b5_dealer_bandit_speak_2)%
+on_signal = sound_end  | walker@wait_2 %+zat_b5_dealer_speak_2_done%
+on_info2 = {+zat_b5_meat} walker@fight_bandit %=actor_enemy%
+on_info3 = {+zat_b5_actor_with_stalkers =actor_see_npc =see_actor} remark@see_actor
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_bandits)} true, {=check_enemy_name(zat_b5_stalker:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--ждем атаки сталкеров
+[walker@wait_2]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence 
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_info =  {+zat_b5_stalker_attack_dealer} remark@fire %=actor_enemy%
+;on_info2 = {+zat_b5_meat} walker@fight_bandit %=actor_enemy%
+on_info2 = {+zat_b5_actor_with_stalkers =actor_see_npc =see_actor} remark@see_actor
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_bandits)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true , {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[remark@fire]
+anim = guard_na
+target = path | zat_b5_smart_terrain_zat_b5_stalker_commander_camper_1_walk,0
+on_info = %=play_sound(zat_b5_dealer_angry)%
+on_signal = sound_end | walker@fight %+zat_b5_meat =actor_enemy%
+meet = no_meet 
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_bandits)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss:actor)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@fight_bandit]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+out_restr = zat_b5_smart_terrain_attack
+def_state_moving1 = patrol
+def_state_standing = guard_na
+meet = no_meet
+on_info = {+zat_b5_bandits_death +zat_b5_stalker_death} walker@after_fight
+on_info2 =  {-zat_b5_actor_with_dealer -zat_b5_actor_enemy} walker@fight %+zat_b5_actor_enemy =actor_enemy%
+combat_ignore_cond = {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss) -zat_b5_stalker_death +zat_b5_actor_with_stalkers} true, {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2) true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+;gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--------------------за торговца-------------------------------
+[walker@start_work_dealer]
+path_walk = zat_b5_dolg_trader_11_walk
+path_look = zat_b5_dolg_trader_11_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = run
+def_state_standing = guard_na
+on_actor_dist_le_nvis = 55 | walker@wait_actor %=play_sound(zat_b5_dealer_want_speak_with_actor)%
+on_info = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@wait_actor]
+path_walk = zat_b5_dolg_trader_11_walk
+path_look = zat_b5_dolg_trader_11_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = run
+def_state_standing = guard_na
+on_info = {+zat_b5_actor_together_dealer} walker@timer_to_position
+on_info2 = {+zat_b5_meat} walker@fight_dealer
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@timer_to_position]
+path_walk = zat_b5_dolg_trader_11_walk
+path_look = zat_b5_dolg_trader_11_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = assault
+def_state_standing = guard_na
+on_game_timer = 20 | walker@move_to_position
+on_info = {+zat_b5_meat} walker@fight
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@move_to_position]
+path_walk = zat_b5_dolg_trader_2_walk
+path_look = zat_b5_dolg_trader_2_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_signal = dealer_2 | walker@move_to_position_2
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@move_to_position_2]
+path_walk = zat_b5_dolg_trader_3_walk
+path_look = zat_b5_dolg_trader_3_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_signal = dealer_3 | walker@move_to_position_3 
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@move_to_position_3]
+path_walk = zat_b5_dolg_trader_4_walk
+path_look = zat_b5_dolg_trader_4_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_signal = dealer_4 | walker@on_position %=play_sound(zat_b5_dealer_wait_clients)%
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@on_position]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_actor_in_zone = zat_b5_sr_actor_in_zone_spawn_enemy | walker@start_bandits %+zat_b5_spawn_enemy%
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@start_bandits]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_game_timer = 30| walker@wait_bandits %+zat_b5_actor_bandit_go_to_trader%
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@wait_bandits]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+on_game_timer = 140| walker@see_bandits %=play_sound(zat_b5_dealer_see_clients)%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@see_bandits]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dealer_close_by_trader} walker@dealer_timer_to_remark
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@dealer_timer_to_remark]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = walk
+def_state_standing = guard_na
+on_game_timer = 20 | remark@dealer_speak_sultan
+on_info = {+zat_b5_meat} walker@fight_dealer
+on_info2 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(zat_b5_stalker:zat_b5_stalker_commander)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--первая фраза "что там у вас"
+[remark@dealer_speak_sultan]
+anim = guard
+target = path | zat_b5_smart_terrain_zat_b5_bandit_sultan_2_walk,0
+on_info = %=play_sound(zat_b5_dealer_bandit_speak_1)%
+on_signal = sound_end  | walker@dealer_wait %+zat_b5_dealer_speak_1_done%
+on_info2 = {+zat_b5_meat} walker@fight_dealer
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(zat_b5_stalker:zat_b5_stalker_commander)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--ждет ответа
+[walker@dealer_wait]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence 
+def_state_moving1 = walk
+def_state_standing = guard_na
+on_info =  {+zat_b5_bandit_speak_1_done} remark@dealer_speak_sultan_2
+on_info2 = {+zat_b5_meat} walker@fight_dealer
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(zat_b5_stalker:zat_b5_stalker_commander)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--вторая фраза "оружие не проблема"
+[remark@dealer_speak_sultan_2]
+anim = guard
+target = path | zat_b5_smart_terrain_zat_b5_bandit_sultan_2_walk,0
+on_info = %=play_sound(zat_b5_dealer_bandit_speak_2)%
+on_signal = sound_end  | walker@dealer_wait_2 %+zat_b5_dealer_speak_2_done%
+on_info2 = {+zat_b5_meat} walker@fight_dealer
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(zat_b5_stalker:zat_b5_stalker_commander)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;--ждем атаки сталкеров
+[walker@dealer_wait_2]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = walk
+def_state_standing = guard_na
+on_info =  {+zat_b5_sultan_speak_for_stalkers} remark@dealer_fire
+on_info2 = {+zat_b5_meat} walker@fight_dealer
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(zat_b5_stalker:zat_b5_stalker_commander)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[remark@dealer_fire]
+anim = caution
+target = path | zat_b5_smart_terrain_zat_b5_stalker_commander_camper_1_walk,0
+on_info = %=play_sound(zat_b5_dealer_angry)%
+on_signal = sound_end | remark@dealer_fire_2
+on_info2 = {+zat_b5_meat} walker@fight_dealer
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(zat_b5_stalker:zat_b5_stalker_commander)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[remark@dealer_fire_2]
+anim = guard
+target = path | zat_b5_smart_terrain_zat_b5_stalker_commander_camper_1_walk,0
+on_info = %=play_sound(zat_b5_dealer_kill_bandits)%
+on_signal = sound_end | walker@fight_dealer %+zat_b5_meat%
+on_info2 = {+zat_b5_meat} walker@fight_dealer
+on_info3 = {+zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy%
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2:zat_b5_actor_with_dealer)} true, {=check_enemy_name(zat_b5_stalker_raider:zat_b7_bandit_boss)} true, {=check_enemy_name(zat_b5_stalker:zat_b5_stalker_commander)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@fight_dealer]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+out_restr = zat_b5_smart_terrain_attack
+def_state_standing = guard_na
+meet = no_meet
+on_info = {+zat_b5_bandits_death +zat_b5_stalker_death} walker@after_fight
+on_info2 = {-zat_b5_actor_enemy_done +zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy +zat_b5_actor_enemy_done%
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2) true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@after_fight]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+on_info = {+zat_b5_speak_dealer_done} walker@go_on 
+on_info2 = {-zat_b5_actor_enemy_done +zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy +zat_b5_actor_enemy_done%
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2) true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+meet = meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+
+
+
+[walker@go_on]
+path_walk = walker_7_walk
+path_look = walker_7_look
+;out_restr = zat_b5_dolg_trader_1_defence
+def_state_moving1 = patrol
+def_state_standing = guard_na
+meet = no_meet
+on_info = {=dist_to_actor_ge(170)}  %=destroy_object%
+on_info2 = {-zat_b5_actor_enemy_done +zat_b5_dolg_enemy} walker@fight_dealer %=actor_enemy +zat_b5_actor_enemy_done%
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2) true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[walker@fight]
+path_walk = zat_b5_dolg_trader_1_walk
+path_look = zat_b5_dolg_trader_1_look
+out_restr = zat_b5_smart_terrain_attack
+def_state_standing = guard_na
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2) true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+meet = no_meet
+;gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[remark@see_actor]
+anim = guard
+target = story | actor
+on_info = %=play_sound(zat_b5_dealer_angry)%
+on_signal = sound_end | walker@fight %+zat_b5_meat%
+on_info2 = {=hit_by_actor} walker@fight 
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(zat_b5_dealer_assistant_1:zat_b5_dealer_assistant_2)} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false
+
+[meet]
+close_anim      = guard_na
+close_victim    = actor
+use			= true
+abuse		= true
+trade_enable 	= false
+allow_break = false
+meet_dialog		= zat_b5_illicit_dealer_dialog
+close_distance  = 3
+
+[danger]
+ignore_distance = 0
+
+[hit]
+on_info = {=hit_by_actor -zat_b5_dolg_enemy} %+zat_b5_dolg_enemy +zat_b5_meat%, {-zat_b5_meat +zat_b5_actor_together_dealer +zat_b5_bandit_speak_1_done} %+zat_b5_meat%
+
+[death]
+on_info = %+zat_b5_trader_death +zat_b5_meat =inc_counter(killer_death)%

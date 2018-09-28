@@ -1,0 +1,42 @@
+[walker@zat_a2_jobs]
+meet = meet@zat_a2_jobs_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+
+[meet@zat_a2_jobs_meet]
+close_anim 		= nil
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+use 			= false
+allow_break 	= false
+
+
+
+[logic@zat_a2_barmen_trade]
+active = walker@zat_a2_barmen_trade 
+suitable = {=check_npc_name(sim_default) =npc_in_zone(zat_a2_sr_light) +test_ifoportion_here} true
+prior = 200
+
+[walker@zat_a2_barmen_trade]:walker@zat_a2_jobs
+;zat_stalker_base_smart_barmen_trade_walk
+;zat_stalker_base_smart_barmen_trade_look
+path_walk = barmen_trade_walk
+path_look = barmen_trade_look
+
+
+
+[logic@zat_a2_mechanic_trade]
+active = walker@zat_a2_mechanic_trade 
+suitable = {=check_npc_name(sim_default) =npc_in_zone(zat_a2_sr_light) +test_ifoportion_here} true
+prior = 200
+
+[walker@zat_a2_mechanic_trade]:walker@zat_a2_jobs
+;zat_stalker_base_smart_mechanic_trade_walk
+;zat_stalker_base_smart_mechanic_trade_look
+path_walk = mechanic_trade_walk
+path_look = mechanic_trade_look

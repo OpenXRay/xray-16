@@ -1,0 +1,80 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_info = {+pri_b35_task_start} sr_idle@start2 %+pri_a17_military_base_commander_task_dialog_end +zat_a23_actor_has_gauss_rifle_documentation +pri_a17_actor_has_gauss_rifle +pri_b306_attack_end%
+on_info2 = {+zat_a23_actor_has_gauss_rifle_documentation} sr_idle@start2 %+pri_b35_task_start +pri_b306_attack_end%
+
+[sr_idle@start2]
+on_info = {+pri_b35_task_continue} sr_idle@wait_for_start %+zat_b40_actor_has_notebook +jup_b19_information_about_merc +pri_b35_about_mercs_dialog%
+on_info2 = {+jup_b19_information_about_merc} sr_idle@wait_for_start %+pri_b35_about_mercs_dialog%
+on_info3 = {+zat_b40_actor_has_notebook} sr_idle@wait_for_start %+pri_b35_about_mercs_dialog%
+
+[sr_idle@wait_for_start]
+on_info = {+pri_b35_task_running} sr_idle@task_running %-pri_b306_attack_end =clear_smart_terrain(pri_b35_mercs:false) =clear_smart_terrain(pri_b35_military:false)%
+on_info2 = {+pri_a25_rfi_source_eliminated} sr_idle@nil %+pri_b35_task_refuse% 
+on_info3 = {+pri_b35_task_refuse} sr_idle@nil
+
+[sr_idle@task_running]
+on_info = {+pri_b35_actor_is_guided} sr_idle@wait_for_colonel %-pri_b35_ui%
+
+[sr_idle@wait_for_colonel]
+on_info = {+pri_b35_ui} sr_idle@teleport_actor %-pri_b35_ui =run_postprocess(fade_in_out)%
+
+[sr_idle@teleport_actor]
+on_game_timer = 20 | sr_idle@spawn_squad %=remove_squad(pri_b35_military_squad) =teleport_actor(pri_b35_actor_teleport_walk:pri_b35_actor_teleport_look) =forward_game_time(0:15)%
+
+[sr_idle@spawn_squad]
+on_game_timer = 10 | sr_idle@post_teleport %=create_squad(pri_b35_military_squad:pri_b35_military) =create_squad(pri_b35_mercs_squad:pri_b35_mercs)%
+
+[sr_idle@post_teleport]
+on_game_timer = 20 | %+pri_b35_ui%
+on_info = {+pri_b35_ui} sr_idle@after_teleport %=enable_ui%
+
+[sr_idle@after_teleport]
+on_info = {+pri_b35_actor_rest} sr_idle@actor_rest %-pri_b35_ui =run_postprocess(fade_in_out) =give_task(pri_b35_task)%
+
+[sr_idle@actor_rest]
+on_game_timer = 20 | sr_idle@post_rest %=forward_game_time(2:30) =play_sound(pri_b35_rendevous_started) =remove_squad(pri_b35_military_squad)%
+
+[sr_idle@post_rest]
+on_game_timer = 30 | %+pri_b35_ui%
+on_info = {+pri_b35_ui} sr_idle@save %=enable_ui =activate_weapon(wpn_svd) =create_squad(pri_b35_military_squad:pri_a16)%
+
+[sr_idle@save]
+on_info = {-pri_b35_ready_to_snipe} %+pri_b35_ready_to_snipe =scenario_autosave(st_save_pri_b35_ready_to_snipe)%
+on_info2 = {+pri_b35_ready_to_snipe} sr_idle@create_envoy
+
+[sr_idle@create_envoy]
+on_game_timer = 50 | sr_idle@hunt_started %=create_squad(pri_b35_envoy_squad:pri_sim_4)%
+on_info = {+pri_b35_attack_started} sr_idle@hunt_started %=create_squad(pri_b35_envoy_squad:pri_sim_4)%
+on_info2 = {!actor_in_zone(pri_b35_sr_actor_position)} sr_idle@hunt_started %+pri_b35_envoy_escape +pri_b35_attack_started%
+
+[sr_idle@hunt_started]
+on_info = {+pri_b35_rendevous_done =squad_exist(pri_b35_envoy_squad) =squad_in_zone_all(pri_b35_envoy_squad:pri_b35_sr_envoy_escape)} sr_idle@remove_envoy
+on_info2 = {+pri_b35_rendevous_done =squad_exist(pri_b35_mercs_squad) =squad_in_zone_all(pri_b35_mercs_squad:pri_b35_sr_mercs_escape)} sr_idle@remove_mercs
+on_info3 = {+pri_b35_rendevous_done =dist_to_story_obj_ge(pri_b35_envoy_squad:150)} sr_idle@remove_envoy
+on_info4 = {+pri_b35_rendevous_done =dist_to_story_obj_ge(pri_b35_mercs_squad:150)} sr_idle@remove_mercs
+
+on_info5 = {+pri_b35_target_merc +pri_b35_merc_leader_out -pri_b35_primary} %+pri_b35_primary%
+on_info6 = {-pri_b35_target_merc +pri_b35_merc_leader_out -pri_b35_secondary} %+pri_b35_secondary%
+on_info7 = {+pri_b35_target_envoy +pri_b35_envoy_out -pri_b35_primary} %+pri_b35_primary%
+on_info8 = {-pri_b35_target_envoy +pri_b35_envoy_out -pri_b35_secondary} %+pri_b35_secondary%
+
+on_info9 = {-pri_b35_attack_started !actor_in_zone(pri_b35_sr_actor_position)} %+pri_b35_attack_started +pri_b35_rendevous_done%
+on_info10 = {+pri_b35_reward_given} sr_idle@nil, {+pri_b305_second_cam_end} sr_idle@nil
+on_info11 = {+pri_b35_merc_leader_escape +pri_b35_envoy_escape} sr_idle@nil
+on_info12 = {+pri_b35_attack_started -pri_b35_envoy_escape -pri_b35_envoy_out =squad_exist(pri_b35_envoy_squad) !actor_in_zone(pri_b35_sr_actor_position)} sr_idle@remove_envoy
+on_info13 = {+pri_b35_attack_started -pri_b35_merc_leader_escape -pri_b35_merc_leader_out =squad_exist(pri_b35_mercs_squad) !actor_in_zone(pri_b35_sr_actor_position)} sr_idle@remove_mercs
+
+[sr_idle@remove_envoy]
+on_info = {-pri_b35_envoy_escape -pri_b35_envoy_out} sr_idle@hunt_started %+pri_b35_envoy_escape =remove_squad(pri_b35_envoy_squad)%
+on_info2 = {+pri_b35_envoy_out} sr_idle@hunt_started %=remove_squad(pri_b35_envoy_squad)%
+on_info3 = {+pri_b35_envoy_escape} sr_idle@hunt_started %=remove_squad(pri_b35_envoy_squad)%
+
+[sr_idle@remove_mercs]
+on_info = {-pri_b35_merc_leader_escape -pri_b35_merc_leader_out} sr_idle@hunt_started %+pri_b35_merc_leader_escape =remove_squad(pri_b35_mercs_squad) =create_squad(merc_sim_squad_advanced:pri_b307) =create_squad(merc_sim_squad_advanced:pri_b302)%
+on_info2 = {+pri_b35_merc_leader_out} sr_idle@hunt_started %=remove_squad(pri_b35_mercs_squad)%
+on_info3= {+pri_b35_merc_leader_escape} sr_idle@hunt_started %=remove_squad(pri_b35_mercs_squad)%
+
+[sr_idle@nil]

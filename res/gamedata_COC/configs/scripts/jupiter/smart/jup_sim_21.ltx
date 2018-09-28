@@ -1,0 +1,24 @@
+[smart_terrain]
+squad_id = 41
+max_population = 1
+;respawn_only_smart = true
+respawn_params = respawn@jup_sim_21
+respawn_idle = 86400
+
+
+[respawn@jup_sim_21]
+spawn_duty@advanced
+spawn_duty@veteran
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 1, 0
+
+[spawn_duty@advanced]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_novice
+spawn_num = {+bar_deactivate_radar_done} 1, 0
+
+[spawn_duty@veteran]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_veteran
+spawn_num = {+bar_deactivate_radar_done} 1, 0

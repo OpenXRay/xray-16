@@ -1,0 +1,39 @@
+[logic@master]
+active = walker@start
+suitable = {=check_npc_name(pri_b36_monolith_master_hiding_place) -pri_b36_master_dead} true
+prior = 300
+on_death = death
+on_hit = hit
+
+[walker@start]
+path_walk = place_master_1_walk
+path_look = place_master_1_look
+out_restr = pri_b36_master_out_restr
+def_state_standing = trans_0
+combat_ignore_cond = {=is_enemy_actor -pri_b36_actor_hitted_master} true, {=check_enemy_name(sim_default)} true
+on_info = {+pri_b36_actor_hitted_master} walker@fire
+danger = danger
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@fire]
+path_walk = place_master_1_walk
+path_look = place_master_1_look
+out_restr = pri_b36_master_out_restr
+danger = danger
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+
+[danger]
+ignore_distance = 0
+
+[hit]
+on_info = {=hit_by_actor -pri_b36_actor_hitted_master} %+pri_b36_actor_hitted_master +pri_b36_ahtung%
+
+[death]
+on_info = %+pri_b36_master_dead%

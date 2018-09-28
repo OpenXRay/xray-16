@@ -1,0 +1,45 @@
+;----------------- каомната 2 1 ------------------
+[logic@tushkano_6]
+suitable = {=is_monster_tushkano} true
+active = mob_home@tushkano_1
+monster_job = true
+prior = 100
+
+[mob_home@tushkano_1]
+path_home = home_3
+home_min_radius = 1
+home_max_radius = 5
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_info = {=actor_in_zone(jup_b203_tushkano_restr)} mob_home@tushkano_1_1
+
+[mob_home@tushkano_1_1]
+path_home = home_3_1
+home_min_radius = 1
+home_max_radius = 20
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_info = {!actor_in_zone(jup_b203_tushkano_restr)} mob_home@tushkano_1
+
+;----------------- коридор 2 ------------------
+[logic@tushkano_7]
+suitable = {=is_monster_tushkano} true
+active = mob_home@tushkano_2
+monster_job = true
+prior = 100
+
+[mob_home@tushkano_2]
+path_home = home_3
+home_min_radius = 1
+home_max_radius = 5
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_info = {=actor_in_zone(jup_b203_tushkano_restr)} mob_home@tushkano_2_1
+
+[mob_home@tushkano_2_1]
+path_home = home_3_1
+home_min_radius = 1
+home_max_radius = 20
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_info = {!actor_in_zone(jup_b203_tushkano_restr)} mob_home@tushkano_2

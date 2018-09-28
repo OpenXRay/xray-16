@@ -1,0 +1,10 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {=actor_has_item(zat_b12_documents_2)} %+zat_b12_find_keys_and_open%
+on_info2 = {=actor_has_item(zat_b12_key_1) =actor_has_item(zat_b12_key_2)} %+zat_b12_actor_have_keys%, {=actor_has_item(zat_b12_key_1) +zat_b12_one_lock_open} %+zat_b12_actor_have_keys%, {=actor_has_item(zat_b12_key_2) +zat_b12_one_lock_open} %+zat_b12_actor_have_keys%
+on_info3 = {=actor_has_item(zat_b57_gas)} sr_idle@end %+zat_b57_actor_has_gas%
+on_info4 = {-zat_b12_actor_found_documents =actor_has_item(zat_b12_documents_1)} %+zat_b12_actor_found_documents%, {-zat_b12_actor_found_documents =actor_has_item(zat_b12_documents_2)} %+zat_b12_actor_found_documents%
+
+[sr_idle@end]

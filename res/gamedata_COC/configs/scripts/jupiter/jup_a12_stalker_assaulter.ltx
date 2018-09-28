@@ -1,0 +1,80 @@
+[logic@jup_a12_stalker_assaulter]
+active = animpoint@stand_start
+suitable = {=check_npc_name(jup_a12_stalker_assaulter)} true
+prior = 200
+
+[animpoint@argue]
+cover_name = jup_a6_animp_assaulter
+avail_animations = animpoint_stay_table
+use_camp = false
+on_signal = sound_end | {-jup_a12_stalker_diplomat_argued -jup_a12_stalker_assaulter_argued} %+jup_a12_stalker_assaulter_argued% 
+on_info = {+jup_a12_stalker_assaulter_1_argue -jup_a12_stalker_assaulter_argued} %=play_sound(jup_a12_stalker_assaulter_1_argue)%
+on_info2 = {+jup_a12_stalker_assaulter_2_argue -jup_a12_stalker_assaulter_argued} %=play_sound(jup_a12_stalker_assaulter_2_argue)%
+on_info3 = {+jup_a12_stalker_assaulter_3_argue -jup_a12_stalker_assaulter_argued} %=play_sound(jup_a12_stalker_assaulter_3_argue)%
+on_info4 = {!actor_in_zone(jup_a12_sr_stalkers_argue)} animpoint@stand_start %-jup_a12_stalker_assaulter_argued -jup_a12_stalker_assaulter_1_argue -jup_a12_stalker_assaulter_2_argue -jup_a12_stalker_assaulter_3_argue%
+on_info5 = {+jup_a12_stalker_assaulter_told_story} animpoint@stand_start
+on_info6 = {+jup_a12_stalker_diplomat_argued} animpoint@stand_start %-jup_a12_stalker_assaulter_argued -jup_a12_stalker_assaulter_1_argue -jup_a12_stalker_assaulter_2_argue -jup_a12_stalker_assaulter_3_argue%
+meet = meet@stand_start_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@stand_start]
+cover_name = jup_a6_animp_assaulter
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet@stand_start_meet
+on_info = {-jup_a12_stalker_assaulter_1_argue -jup_a12_stalker_assaulter_2_argue -jup_a12_stalker_assaulter_3_argue ~33} %+jup_a12_stalker_assaulter_1_argue%
+on_info2 = {-jup_a12_stalker_assaulter_1_argue -jup_a12_stalker_assaulter_2_argue -jup_a12_stalker_assaulter_3_argue ~66} %+jup_a12_stalker_assaulter_2_argue%
+on_info3 = {-jup_a12_stalker_assaulter_1_argue -jup_a12_stalker_assaulter_2_argue -jup_a12_stalker_assaulter_3_argue} %+jup_a12_stalker_assaulter_3_argue%
+on_info4 = {-jup_a12_stalker_assaulter_has_af} %+jup_a12_stalker_assaulter_has_af =give_items(af_gold_fish)%
+on_info5 = {+jup_a12_stalker_prisoner_free} animpoint@stand_after
+on_game_timer = 130 | {-jup_a12_stalker_assaulter_told_story +jup_b217_welcome_tech_talked =actor_in_zone(jup_a12_sr_stalkers_argue)} animpoint@argue %-jup_a12_stalker_diplomat_argued%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@stand_start_meet]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_dialog = {-jup_a12_actor_is_ready} jup_a12_stalkers_choose_dialog, {+jup_a12_actor_is_ready} jup_a12_stalker_assaulter_after_scene_dialog
+meet_on_talking = false
+
+[animpoint@stand_after]
+cover_name = jup_a6_animp_assaulter
+use_camp = false
+meet = meet@after_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@after_meet]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_dialog = jup_a12_stalker_assaulter_after_scene_dialog
+meet_on_talking = false

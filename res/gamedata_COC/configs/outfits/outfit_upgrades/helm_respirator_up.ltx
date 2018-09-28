@@ -1,0 +1,86 @@
+[up_sect_firsta_helm_respirator]
+cost 		= 300
+value 		= +10
+
+telepatic_protection  			= 0.01
+
+[up_sect_firstc_helm_respirator]
+cost 		= 600
+value		= +20
+
+chemical_burn_protection        = 0.01
+immunities_sect_add 			= sect_helm_chem_immunity_add
+
+[up_sect_firstd_helm_respirator]
+cost 		= 600
+value		= +20
+
+radiation_protection 			= 0.003
+
+
+[up_firsta_helm_respirator]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_helm_respirator
+section                 = up_sect_firsta_helm_respirator
+property                = prop_psy
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_res_a2_name
+description             = st_up_res_a2_descr
+icon                    = ui_inGame2_upgrade_helm_respirator_1
+
+
+[up_firstc_helm_respirator]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = 
+section                 = up_sect_firstc_helm_respirator
+property                = prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_res_b2_name
+description             = st_up_res_b2_descr
+icon                    = ui_inGame2_upgrade_helm_respirator_2
+
+[up_firstd_helm_respirator]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = 
+section                 = up_sect_firstd_helm_respirator
+property                = prop_radio
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_res_b3_name
+description             = st_up_res_b3_descr
+icon                    = ui_inGame2_upgrade_helm_respirator_3
+
+[up_gr_firstab_helm_respirator]
+elements                = up_firsta_helm_respirator
+
+[up_gr_firstcd_helm_respirator]
+elements                = up_firstc_helm_respirator, up_firstd_helm_respirator

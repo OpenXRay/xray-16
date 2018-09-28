@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- ESCORT ECOGS TASK -->
+	<string id="yan_ecolog_semenov_task_1_name">
+		<text>Escort Semenov</text>
+	</string>
+	<string id="yan_ecolog_semenov_task_1_text">
+		<text>Assistant Semenov has contracted you to escort him around the local area to kill mutants so that he can retrieve fresh tissue samples and analyse the corpses with his scanning equipment.</text>
+	</string>
+	<string id="yan_ecolog_semenov_task_1_about">
+		<text>Would you mind helping me kill some mutants so that I can take readings and tissue samples? Let's say... About five different mutants. I'll be putting my life in your hands and you would need to ensure my safety. I will compensate you for your efforts.</text>
+	</string>
+	<string id="yan_ecolog_semenov_task_1_finish">
+		<text>Thank you for your assistance, friend. I have all the tissue samples I need. Here is your payment... Come back and see me again some time.</text>
+	</string>
+	<!-- FIND MUTANT PARTS FOR ECOGS TASK -->
+	<string id="yan_stalker_sakharov_task_1_name">
+		<text>Procure "%s"</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_text">
+		<text>Sakharov needs a tissue sample from a %s.</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_about">
+		<text>I need an experienced stalker or a mutant hunter. Is that somebody you?</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_fetch_about">
+		<text>I need to collect tissue samples from a %s. I don't care how you get it, just make sure it's fresh. Get here A.S.A.P. as soon as you recover what I need from the mutant.</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_fetch_finish">
+		<text>Thank you, sir. This will help immensely in my research.</text>
+	</string>
+	<!-- FIND ARTEFACT FOR SAKHAROV TASK -->
+	<string id="yan_stalker_sakharov_task_2_text">
+		<text>You have been asked to retrieve the %s artefact. Bring it back to Sakharov if you happen to get your hands on one.</text>
+	</string>
+	<!-- WAIT FOR PSI HELMET CALIBRATION TASK -->
+	<string id="yan_stalker_sakharov_psi_helmet_upgrade_name">
+		<text>Collect the psi-helmet</text>
+	</string>
+	<string id="yan_stalker_sakharov_psi_helmet_upgrade_text">
+		<text>Professor Sakharov has agreed to recalibrate the psi-protection helmet. He asked you to come back to pick it up in a couple days.</text>
+	</string>
+	<!-- TURN OFF MIRACLE MACHINE TASK -->
+	<string id="brain_machine_deactivate_name">
+		<text>Disable the Miracle Machine</text>
+	</string>
+	<string id="brain_machine_deactivate_text">
+		<text>The Miracle Machine prevents stalkers from travelling between Yantar and the Dead City. Disabling it will require advanced psi-protective equipment.</text>
+	</string>
+	<!-- FIND LEVEL 1 TOOLKIT FOR KRUGLOV -->
+	<string id="yan_ecolog_kruglov_task_1_name">
+		<text>Find "%s"</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_text">
+		<text>%s are required by Kruglov to install basic equipment upgrades, you should bring them back to him if you find any.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_about">
+		<text>I'm in desperate need of new tools, man.  I can't do anything with the rusty shit I have and I'm running out of gun oil. If you are interested in helping me out, I will tell you what I need.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_fetch_about">
+		<text>I need a set of basic tools. It should contain what I need. If you can bring some back for me I will be grateful, I will even offer you a discount from here on out.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_fetch_finish">
+		<text>Perfect! This is just what I need, man. I can properly upgrade gear now!</text>
+	</string>
+	<!-- FIND LEVEL 2 TOOLKIT FOR KRUGLOV -->
+	<string id="yan_ecolog_kruglov_task_2_name">
+		<text>Find "%s"</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_text">
+		<text>%s are required by Kruglov to install advanced equipment upgrades, you should bring them back to him if you find any.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_about">
+		<text>The toolkit you brought me is great, but it doesn't have everything I need. Do you think you can find me a better set?</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_fetch_about">
+		<text>I need an %s. I'm not sure where you can get one of these, but if you can find one, I need it.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_fetch_finish">
+		<text>You followed through again! Good deal, man, here is some money.</text>
+	</string>
+	<!-- FIND LEVEL 3 TOOLKIT FOR KRUGLOV -->
+	<string id="yan_ecolog_kruglov_task_3_name">
+		<text>Find "%s"</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_text">
+		<text>%s are required by Kruglov to install expert equipment upgrades, you should bring them back to him if you find any.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_about">
+		<text>The toolkit you brought me is great, but it doesn't have everything I need. Do you think you can find me a better set?</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_fetch_about">
+		<text>I need an %s. I'm not sure where you can get one of these, but if you can find one, I need it.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_fetch_finish">
+		<text>You followed through again! Good deal, man, here is some money.</text>
+	</string>
+</string_table>

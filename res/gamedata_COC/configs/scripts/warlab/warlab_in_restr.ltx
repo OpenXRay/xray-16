@@ -1,0 +1,37 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@spawn
+
+[sr_idle@spawn]
+on_info = {+warlab_start_teleport} sr_idle@spawn1
+
+[sr_idle@spawn1]
+on_timer = 2000| sr_idle@spawn2 %+warlab_monolith_spawn1 =spawn_object(warlab_stalker_monolith_1:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@spawn2]
+on_timer = 2000| sr_idle@spawn3 %+warlab_monolith_spawn2 =spawn_object(warlab_stalker_monolith_2:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@spawn3]
+on_timer = 2000| sr_idle@spawn4 %+warlab_monolith_spawn3 =spawn_object(warlab_stalker_monolith_3:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@spawn4]
+on_timer = 2000| sr_idle@spawn5 %+warlab_monolith_spawn4 =spawn_object(warlab_stalker_monolith_4:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@spawn5]
+on_timer = 2000| sr_idle@spawn6 %+warlab_monolith_spawn5 =spawn_object(warlab_stalker_monolith_5:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@spawn6]
+on_timer = 2000| sr_idle@spawn7 %+warlab_monolith_spawn6 =spawn_object(warlab_stalker_monolith_6:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@spawn7]
+on_timer = 2000| sr_idle@spawn8 %+warlab_monolith_spawn7 =spawn_object(warlab_stalker_monolith_7:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@spawn8]
+on_timer = 2000| sr_idle@end %+warlab_monolith_spawn8 =spawn_object(warlab_stalker_monolith_8:warlab_pod_room_spawn_walk:0)%
+
+[sr_idle@end]
+on_timer = 2000| sr_idle@nil %+warlab_end_teleport%
+
+[sr_idle@nil]

@@ -1,0 +1,91 @@
+[logic@tushkano_1_1]
+suitable = {=check_npc_name(lx8_1_tushkano_1)} true
+active = mob_home@tushkano_1_1
+monster_job = true
+prior = 75
+
+[mob_home@tushkano_1_1]
+path_home = tushkano_1_home
+home_min_radius = 2
+home_max_radius = 4
+aggressive = false ;true
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {=actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_11_1
+
+[mob_home@tushkano_11_1]
+path_home = tushkano_1_home
+home_min_radius = 30
+home_max_radius = 40
+aggressive = true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {!actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_1_1
+
+[logic@tushkano_1_2]
+suitable = {=check_npc_name(lx8_1_tushkano_2)} true
+active = mob_home@tushkano_1_2
+monster_job = true
+prior = 75
+
+[mob_home@tushkano_1_2]
+path_home = tushkano_1_home
+home_min_radius = 2
+home_max_radius = 4
+aggressive = false ;true
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {=actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_11_2
+
+[mob_home@tushkano_11_2]
+path_home = tushkano_1_home
+home_min_radius = 30
+home_max_radius = 40
+aggressive = true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {!actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_1_2
+
+[logic@tushkano_1_3]
+suitable = {=check_npc_name(lx8_1_tushkano_3)} true
+active = mob_home@tushkano_1_3
+monster_job = true
+prior = 75
+
+[mob_home@tushkano_1_3]
+path_home = tushkano_1_home
+home_min_radius = 2
+home_max_radius = 4
+aggressive = false ;true
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {=actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_11_3
+
+[mob_home@tushkano_11_3]
+path_home = tushkano_1_home
+home_min_radius = 30
+home_max_radius = 40
+aggressive = true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {!actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_1_3
+
+[logic@tushkano_1_4]
+suitable = {=check_npc_name(lx8_1_tushkano_4)} true
+active = mob_home@tushkano_1_4
+monster_job = true
+prior = 75
+
+[mob_home@tushkano_1_4]
+path_home = tushkano_1_home
+home_min_radius = 2
+home_max_radius = 4
+aggressive = false ;true
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {=actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_11_4
+
+[mob_home@tushkano_11_4]
+path_home = tushkano_1_home
+home_min_radius = 30
+home_max_radius = 40
+aggressive = true
+out_restr = lx8_sr_tushkano_1_out_restr
+on_info = {!actor_in_zone(lx8_sr_tushkano_1_out_restr)} mob_home@tushkano_1_4

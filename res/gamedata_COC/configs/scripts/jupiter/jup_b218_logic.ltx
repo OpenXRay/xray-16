@@ -1,0 +1,52 @@
+[logic]
+active = nil;sr_idle@task  
+
+[sr_idle@task]
+; ---------------Вано---------------------
+on_info  = {+jup_a9_tech_way_info +jup_b218_stalker_agreed -jup_b218_stalker_task} %=give_task(jup_b218_stalker) +jup_b218_stalker_task%
+on_info2 = {+jup_a10_vano_agree_go_und -jup_b218_vano_tp} sr_idle@vano_tp %+jup_b218_vano_tp =run_postprocess(fade_in) =disable_ui% 
+; ---------------Соколов------------------
+on_info3 = {+jup_a9_tech_way_info +jup_b218_soldier_agreed -jup_b218_soldier_task} %=give_task(jup_b218_soldier) +jup_b218_soldier_task%
+on_info4 = {+jup_b218_soldier_hired -jup_b218_sokolov_tp} sr_idle@sokolov_tp %+jup_b218_sokolov_tp =run_postprocess(fade_in) =disable_ui% 
+; ---------------Бродяга-Свободовец-------
+on_info5 = {+jup_a9_tech_way_info +jup_b218_monolith_agreed +jup_b4_monolith_squad_in_freedom -jup_b218_monolith_task} %=give_task(jup_b218_monolith) +jup_b218_monolith_task%
+on_info6 = {+jup_b218_monolith_hired +jup_b4_monolith_squad_in_freedom -jup_b218_monolith_fr_tp} sr_idle@monolith_fr_tp %+jup_b218_monolith_fr_tp +jup_b218_monolith_tp =run_postprocess(fade_in) =disable_ui% 
+; ---------------Бродяга-Долговец---------
+on_info7 = {+jup_a9_tech_way_info +jup_b218_monolith_agreed +jup_b4_monolith_squad_in_duty -jup_b218_monolith_task} %=give_task(jup_b218_monolith) +jup_b218_monolith_task%
+on_info8 = {+jup_b218_monolith_hired +jup_b4_monolith_squad_in_duty -jup_b218_monolith_du_tp} sr_idle@monolith_du_tp %+jup_b218_monolith_du_tp +jup_b218_monolith_tp =run_postprocess(fade_in) =disable_ui% 
+; ---------------освобождаем логику--------------------------------------
+on_info9 = {+jup_b218_gather_squad_complete} sr_idle@free
+; ---------------Игрок---------------------------------------
+on_info10 = {+jup_a9_tech_way_info -jup_b218_actor_outfit_task !actor_has_item(scientific_outfit)} %=give_task(jup_b218_actor_outfit) +jup_b218_actor_outfit_task%
+on_info11 = {+jup_a9_tech_way_info -jup_b218_actor_can_go_pass -jup_b218_actor_outfit_task =actor_has_item(scientific_outfit)} %+jup_b218_actor_can_go_pass%
+
+[sr_idle@vano_tp]
+on_game_timer = 20 | sr_idle@remove_pp %=run_postprocess(black:5617:true) =destroy_object(story:jup_a10_stalker_vano) =create_squad_member(jup_b218_vano_in_suit:jup_b15_zulus_squad:jup_a6_jup_b218_squad_member_arrive_walk) =teleport_actor(jup_b15_cut_actor_walk:jup_b15_cut_actor_look) +jup_b218_pause_meet =forward_game_time(1) =disable_ui%
+
+[sr_idle@sokolov_tp]
+on_game_timer = 20 | sr_idle@remove_pp_offline %=run_postprocess(black:5617:true) =destroy_object(story:pri_a15_sokolov) =create_squad_member(pri_a15_sokolov_sci:jup_b15_zulus_squad:jup_a6_jup_b218_squad_member_arrive_walk) =teleport_actor(jup_b15_cut_actor_walk:jup_b15_cut_actor_look) +jup_b218_pause_meet =forward_game_time(1) =disable_ui%
+
+[sr_idle@monolith_fr_tp]
+on_game_timer = 20 | sr_idle@remove_pp %=run_postprocess(black:5617:true) =destroy_object(story:jup_b4_monolith_squad_leader_freedom_skin) =create_squad_member(jup_b4_monolith_squad_leader_freedom_mon_skin:jup_b15_zulus_squad:jup_a6_jup_b218_squad_member_arrive_walk) =teleport_actor(jup_b15_cut_actor_walk:jup_b15_cut_actor_look) +jup_b218_pause_meet =forward_game_time(1) =disable_ui%
+
+[sr_idle@monolith_du_tp]
+on_game_timer = 20 | sr_idle@remove_pp %=run_postprocess(black:5617:true) =destroy_object(story:jup_b4_monolith_squad_leader_duty_skin) =create_squad_member(jup_b4_monolith_squad_leader_duty_mon_skin:jup_b15_zulus_squad:jup_a6_jup_b218_squad_member_arrive_walk) =teleport_actor(jup_b15_cut_actor_walk:jup_b15_cut_actor_look) +jup_b218_pause_meet =forward_game_time(1) =disable_ui%
+
+[sr_idle@remove_pp]
+on_game_timer = 50 | sr_idle@task %=stop_postprocess(5617)%
+
+[sr_idle@remove_pp_offline]
+on_game_timer = 100 | sr_idle@task %=stop_postprocess(5617)%
+
+[sr_idle@free]
+on_info = {+pri_a16_sokolov_on_pripyat =story_object_exist(pri_a15_sokolov)} sr_idle@nil %=destroy_object(story:pri_a15_sokolov)%
+
+[sr_idle@nil]
+
+
+
+
+
+
+
+

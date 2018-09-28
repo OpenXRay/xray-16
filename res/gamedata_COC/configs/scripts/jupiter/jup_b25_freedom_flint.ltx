@@ -1,0 +1,165 @@
+; general section
+
+[animpoint@jup_b25_flint_gen]
+cover_name = jup_b221_freedom_03
+avail_animations = animpoint_stay_table
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_b25_reach_ap]:animpoint@jup_b25_flint_gen
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+
+[logic@jup_b25_listener_gen]
+suitable = {=target_squad_name(b207)} false, {=check_npc_name(monolith)} false, {-jup_b25_freedom_flint_gone =npc_community(freedom) !check_npc_name(jup_b25_freedom_flint)} true
+prior = 150
+
+
+; flint work sections
+
+[logic@jup_b25_flint]:logic@jup_b25_listener_gen
+active = animpoint@jup_b25_flint_start
+suitable = {=check_npc_name(jup_b25_freedom_flint) -jup_b25_freedom_flint_gone} true
+
+[animpoint@jup_b25_flint_start]:animpoint@jup_b25_flint_gen
+on_info = {+jup_b25_story_controller_played} animpoint@jup_b25_case_story, {+jup_b217_welcome_tech_talked} animpoint@jup_b25_wait_a_little
+
+[animpoint@jup_b25_wait_a_little]:animpoint@jup_b25_flint_gen
+on_game_timer = 400 | {=actor_in_zone(jup_b25_tell_story_control)} animpoint@jup_b25_story_controller %=set_counter(jup_b25_stories:0)%
+
+[animpoint@jup_b25_story_controller]:animpoint@jup_b25_flint_gen
+on_info = {-jup_b25_story_controller_played} %=play_sound(jup_b25_story_controller)%
+on_signal = theme_end | animpoint@jup_b25_reaction_story %+jup_b25_story_controller_played +jup_b25_play_reaction%
+on_info2 = {+zat_b215_guide_to_zaton} animpoint@jup_b25_reaction_story %+jup_b25_story_controller_played +jup_b25_play_reaction%
+
+[animpoint@jup_b25_reaction_story]:animpoint@jup_b25_flint_gen
+meet = meet@jup_b25_flint
+on_info1 = {+jup_b25_play_reaction} %-jup_b25_play_reaction%
+on_info2 = {-jup_b25_story_zaton_played =distance_to_obj_ge(jup_b25_freedom_flint:150)} animpoint@jup_b25_case_story
+on_info3 = {+jup_b25_blame_story_end +jup_b25_story_zaton_played +zat_b106_found_soroka} animpoint@jup_b25_flint_end_blame
+on_info4 = {+jup_b25_blame_story_end -jup_b25_story_zaton_played} animpoint@jup_b25_story_soroka
+on_info5 = {-jup_b25_second_story =counter_equal(jup_b25_stories:2)} %+jup_b25_second_story%
+on_info6 = {-jup_b25_third_story =counter_equal(jup_b25_stories:3)} %+jup_b25_third_story%
+;on_offline = {-jup_b25_story_zaton_played} animpoint@jup_b25_case_story
+
+[animpoint@jup_b25_case_story]:animpoint@jup_b25_flint_gen
+meet = meet@jup_b25_flint
+on_info = {+jup_b25_play_reaction} %-jup_b25_play_reaction%
+on_actor_in_zone1 = jup_b25_tell_story_control | {+jup_b25_found_senya -jup_b25_story_artefact_played -zat_b106_found_soroka} animpoint@jup_b25_stoy_artefact  
+on_actor_in_zone2 = jup_b25_tell_story_control | {+jup_b16_oasis_found -jup_b25_story_oasis_played -zat_b106_found_soroka} animpoint@jup_b25_stoy_oasis 
+on_actor_in_zone3 = jup_b25_tell_story_control | {+zat_b57_bloodsucker_lair_clear -jup_b25_story_bloodsucker_played -zat_b106_found_soroka} animpoint@jup_b25_stoy_bloodsucker
+on_actor_in_zone4 = jup_b25_tell_story_control | {+jup_b6_complete_end -jup_b25_story_scientist_played -zat_b106_found_soroka} animpoint@jup_b25_stoy_scientist
+on_actor_in_zone5 = jup_b25_tell_story_control | {+zat_b215_gave_maps -jup_b25_story_guide_played -zat_b106_found_soroka} animpoint@jup_b25_stoy_guide
+on_actor_in_zone6 = jup_b25_tell_story_control | {+jup_b25_blame_story_end -jup_b25_story_zaton_played -zat_b106_found_soroka} animpoint@jup_b25_story_soroka
+
+[animpoint@jup_b25_stoy_oasis]:animpoint@jup_b25_flint_gen
+on_actor_in_zone = jup_b25_tell_story_control | {-jup_b25_story_oasis_played} %=play_sound(jup_b25_story_oasis)%
+on_signal = theme_end | animpoint@jup_b25_reaction_story %+jup_b25_story_oasis_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction%
+on_info = {+zat_b215_guide_to_zaton} animpoint@jup_b25_reaction_story %+jup_b25_story_oasis_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction% 
+
+[animpoint@jup_b25_stoy_bloodsucker]:animpoint@jup_b25_flint_gen
+on_actor_in_zone = jup_b25_tell_story_control | {-jup_b25_story_bloodsucker_played} %=play_sound(jup_b25_story_bloodsucker)%
+on_signal = theme_end | animpoint@jup_b25_reaction_story %+jup_b25_story_bloodsucker_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction%
+on_info = {+zat_b215_guide_to_zaton} animpoint@jup_b25_reaction_story %+jup_b25_story_bloodsucker_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction%
+
+[animpoint@jup_b25_stoy_guide]:animpoint@jup_b25_flint_gen
+on_actor_in_zone = jup_b25_tell_story_control | {-jup_b25_story_guide_played} %=play_sound(jup_b25_story_guide)%
+on_signal = theme_end | animpoint@jup_b25_reaction_story %+jup_b25_story_guide_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction%
+on_info = {+zat_b215_guide_to_zaton} animpoint@jup_b25_reaction_story %+jup_b25_story_guide_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction%
+
+[animpoint@jup_b25_stoy_scientist]:animpoint@jup_b25_flint_gen
+on_actor_in_zone = jup_b25_tell_story_control | {-jup_b25_story_scientist_played} %=play_sound(jup_b25_story_scientist)%
+on_signal = theme_end | animpoint@jup_b25_reaction_story %+jup_b25_story_scientist_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction%
+on_info = {+zat_b215_guide_to_zaton} animpoint@jup_b25_reaction_story %+jup_b25_story_scientist_played =inc_counter(jup_b25_stories) +jup_b25_play_reaction%
+
+[animpoint@jup_b25_stoy_artefact]:animpoint@jup_b25_flint_gen
+on_actor_in_zone = jup_b25_tell_story_control | {-jup_b25_story_artefact_played} %=play_sound(jup_b25_story_artefact)%
+on_signal = theme_end | animpoint@jup_b25_reaction_story %+jup_b25_story_artefact_played +jup_b25_play_reaction%
+on_info = {+zat_b215_guide_to_zaton} animpoint@jup_b25_reaction_story %+jup_b25_story_artefact_played +jup_b25_play_reaction%
+
+[animpoint@jup_b25_story_soroka]:animpoint@jup_b25_flint_gen
+on_actor_in_zone = jup_b25_tell_story_control | %=play_sound(jup_b25_story_zaton)%
+on_signal = theme_end | animpoint@jup_b25_reaction_story %+jup_b25_story_zaton_played +zat_b106_found_soroka +jup_b25_play_reaction%
+on_info = {+zat_b215_guide_to_zaton} animpoint@jup_b25_reaction_story %+jup_b25_story_zaton_played +zat_b106_found_soroka +jup_b25_play_reaction%
+
+[animpoint@jup_b25_flint_end_blame]:animpoint@jup_b25_flint_gen
+
+[meet@jup_b25_flint]
+close_snd_hello = nil
+close_snd_bye   = nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+allow_break = false
+trade_enable = false
+use             = {-jup_b25_blame_story_end !actor_enemy} true, false
+meet_on_talking = false
+
+
+
+; listener works sections
+[logic@jup_b25_listener_01]:logic@jup_b25_listener_gen
+active = animpoint@jup_b25_listener_01_reach
+
+[animpoint@jup_b25_listener_01_reach]:animpoint@jup_b25_reach_ap
+cover_name = jup_b221_freedom_01
+meet = meet@jup_b25_listener_gen
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_b25_listener_01
+
+[animpoint@jup_b25_listener_01]:animpoint@jup_b25_flint_gen
+cover_name = jup_b221_freedom_01
+meet = meet@jup_b25_listener_gen
+on_info = {+jup_b25_play_reaction} animpoint@jup_b25_listener_01_reaction
+
+[animpoint@jup_b25_listener_01_reaction]:animpoint@jup_b25_flint_gen
+cover_name = jup_b221_freedom_01
+on_info = {-zat_b215_guide_to_zaton} %=play_sound(jup_b25_story_first_reac)%
+on_signal = sound_end | animpoint@jup_b25_listener_01 %-jup_b25_play_reaction%
+on_info2 = {+zat_b215_guide_to_zaton} animpoint@jup_b25_listener_01 %-jup_b25_play_reaction%
+
+
+
+
+[logic@jup_b25_listener_02]:logic@jup_b25_listener_gen
+active = animpoint@jup_b25_listener_02_reach
+prior = 100
+
+[animpoint@jup_b25_listener_02_reach]:animpoint@jup_b25_reach_ap
+cover_name = jup_b221_freedom_02
+meet = meet@jup_b25_listener_gen
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_b25_listener_02
+
+[animpoint@jup_b25_listener_02]:animpoint@jup_b25_flint_gen
+cover_name = jup_b221_freedom_02
+meet = meet@jup_b25_listener_gen
+on_info = {+jup_b25_play_reaction} animpoint@jup_b25_listener_02_reaction
+
+[animpoint@jup_b25_listener_02_reaction]:animpoint@jup_b25_flint_gen
+cover_name = jup_b221_freedom_02
+on_info = {-zat_b215_guide_to_zaton} %=play_sound(jup_b25_story_second_reac)%
+on_signal = sound_end | animpoint@jup_b25_listener_02 %-jup_b25_play_reaction%
+on_info2 = {+zat_b215_guide_to_zaton} animpoint@jup_b25_listener_02 %-jup_b25_play_reaction%
+
+
+
+
+[meet@jup_b25_listener_gen]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false

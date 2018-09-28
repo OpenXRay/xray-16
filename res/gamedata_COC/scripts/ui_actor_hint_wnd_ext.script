@@ -1,0 +1,28 @@
+local SINGLETON = nil
+function get_ui()
+	SINGLETON = SINGLETON or hint_wnd_ext()
+	--SINGLETON:Reset()
+	return SINGLETON
+end
+
+class "hint_wnd_ext" (CUIWindow)
+function hint_wnd_ext:__init(itm1,itm2) super()
+	local xml = CScriptXmlInit()
+	xml:ParseFile("actor_menu_item.xml")
+	
+	self:SetWndPos(vector2():set(0,0))
+	self:SetWndSize(vector2():set(212,30))
+	self:SetAutoDelete(false)
+	
+	self.expiration = xml:InitTextWnd("static_expiration",self)
+end
+
+function hint_wnd_ext:__finalize() 
+	SINGLETON = nil
+end
+
+function hint_wnd_ext:Reinit(itm1,itm2)
+	-- THIS IS JUST A TEST
+	self.expiration:SetText("Expiration: 2 days, 8 hours")
+	self.expiration:AdjustHeightToText()
+end

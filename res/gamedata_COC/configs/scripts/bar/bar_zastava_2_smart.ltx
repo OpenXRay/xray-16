@@ -1,0 +1,251 @@
+;minigunner
+[logic@bar_zastava_2_minigunner_excl]
+active = beh@bar_zastava_2_minigunner_excl
+suitable = {!surge_started} true
+prior = 60
+on_death = death@bar_zastava_2_minigunner
+
+[meet@general]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+[beh@general]
+behavior_state = beh_move
+target = waypoint
+walk_dist = 100
+jog_dist = 220
+wait_anim = rush
+walk_anim = rush
+jog_anim = rush
+run_anim = rush
+delay_anim = guard
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = meet@general
+
+[beh@idle]:beh@general
+on_info = {!has_enemy} beh@bar_zastava_2_minigunner_excl
+
+[beh@bar_zastava_2_minigunner_excl]:beh@general
+pt1 = 1,guard | pos:82.33,0.00,137.39 look:55.48,0.00,145.83
+path_end = beh@bar_zastava_2_minigunner_excl_ready
+
+[beh@bar_zastava_2_minigunner_excl_ready]:beh@general
+no_combat_job = true
+pt1 = 20000,ward | pos:82.33,0.00,137.39 look:55.48,0.00,145.83
+path_end = loop
+on_info = {=pure_enemy_dist_le(20)} beh@idle
+
+
+[meet@bar_zastava_2]
+close_snd_hello = {=check_npc_name(monolith)} nil, {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} meet_hide_weapon, meet_hello
+close_snd_bye 	= {=check_npc_name(monolith)} nil, {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} nil, meet_hello
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+[logic@duty2_guard1]
+active = walker@duty2_guard1_reach
+suitable = {=npc_community(dolg) !surge_started} true
+prior = 100
+on_death = death@bar_zastava_2_duty2_guard1
+
+[walker@duty2_guard1_reach]
+path_walk = walker_1_walk
+path_look = walker_1_look
+def_state_standing = wait_na
+meet = meet@bar_zastava_2
+;out_restr = bar_zastava2_online_restrictor
+gather_items_enabled = true
+help_wounded_enabled = true
+corpse_detection_enabled = true
+use_camp = false
+on_info = {=npc_in_zone(bar_zastava_restrictor_2)} walker@duty2_guard1
+
+[walker@duty2_guard1]
+path_walk = walker_1_walk
+path_look = walker_1_look
+def_state_standing = wait_na
+meet = meet@bar_zastava_2
+;out_restr = bar_zastava2_online_restrictor
+gather_items_enabled = true
+help_wounded_enabled = true
+corpse_detection_enabled = true
+use_camp = false
+
+
+[logic@duty2_guard2]
+active = walker@duty2_guard2
+suitable = {=npc_community(dolg) !surge_started} true
+prior = 100
+on_death = death@bar_zastava_2_duty2_guard2
+
+[walker@duty2_guard2]
+path_walk = walker_2_walk
+path_look = walker_2_look
+on_info = {!actor_enemy =see_actor =actor_has_weapon =actor_in_zone(bar_zastava_2_warn_zone) =dist_to_actor_le(35)} remark@duty2_guard2
+;out_restr = bar_zastava2_online_restrictor
+meet = no_meet
+
+[remark@duty2_guard2]
+anim = threat
+target = story | actor
+;on_info = %=play_sound(jup_a6_base_guard)%
+on_game_timer = 75 | walker@duty2_guard2
+;out_restr = bar_zastava2_online_restrictor
+meet = no_meet
+
+[logic@duty2_guard3]
+active = walker@duty2_guard3
+suitable = {=npc_community(dolg)  !surge_started} true
+prior = 100
+on_death = death@bar_zastava_2_duty2_guard3
+
+[walker@duty2_guard3]
+path_walk = walker_3_walk
+path_look = walker_3_look
+def_state_standing = wait_na
+meet = meet@bar_zastava_2
+;out_restr = bar_zastava2_online_restrictor
+gather_items_enabled = true
+help_wounded_enabled = true
+corpse_detection_enabled = true
+use_camp = false
+on_info = {=npc_in_zone(bar_zastava_restrictor_2)} walker@duty2_guarder3
+
+[walker@duty2_guarder3]
+path_walk = walker_3_walk
+path_look = walker_3_look
+def_state_standing = wait_na
+meet = meet@bar_zastava_2
+;out_restr = bar_zastava2_online_restrictor
+gather_items_enabled = true
+help_wounded_enabled = true
+corpse_detection_enabled = true
+use_camp = false
+
+
+[logic@duty2_guard4]
+active = walker@duty2_guard4
+suitable = {=check_npc_name(bar_zastava_2_commander) =npc_in_zone(bar_zastava_restrictor_2) !surge_started} true
+prior = 100
+on_death = death@bar_zastava_2_duty2_guard4
+
+[walker@duty2_guard4]
+path_walk = walker_4_walk
+path_look = walker_4_look
+on_info = {!actor_enemy =see_actor =actor_has_weapon =actor_in_zone(bar_zastava_2_warn_zone) =dist_to_actor_le(35)} remark@duty2_guard4
+;out_restr = bar_zastava2_online_restrictor
+meet = no_meet
+
+[remark@duty2_guard4]
+anim = threat
+target = story | actor
+;on_info = %=play_sound(jup_b207_duty_guards_warning_actor)%
+on_game_timer = 75 | walker@duty2_guard4
+;out_restr = bar_zastava2_online_restrictor
+meet = no_meet
+
+[logic@duty2_guard5]
+active = walker@duty2_guard5_reach
+suitable = {=npc_community(dolg)  !surge_started} true
+prior = 100
+on_death = death@bar_zastava_2_duty2_guard5
+
+[walker@duty2_guard5_reach]
+path_walk = walker_5_walk
+path_look = walker_5_look
+def_state_standing = wait_na
+meet = meet@bar_zastava_2
+;out_restr = bar_zastava2_online_restrictor
+gather_items_enabled = true
+help_wounded_enabled = true
+corpse_detection_enabled = true
+use_camp = false
+on_info = {=npc_in_zone(bar_zastava_restrictor_2)} walker@duty2_guard5
+
+[walker@duty2_guard5]
+path_walk = walker_5_walk
+path_look = walker_5_look
+def_state_standing = wait_na
+meet = meet@bar_zastava_2
+;out_restr = bar_zastava2_online_restrictor
+gather_items_enabled = true
+help_wounded_enabled = true
+corpse_detection_enabled = true
+use_camp = false
+
+[death@bar_zastava_2_minigunner]
+on_info  = %+bar_zastava_2_minigunner_dead%
+
+[death@bar_zastava_2_duty2_guard1]
+on_info  = %+bar_zastava_2_duty2_guard1_dead%
+
+[death@bar_zastava_2_duty2_guard2]
+on_info  = %+bar_zastava_2_duty2_guard2_dead%
+
+[death@bar_zastava_2_duty2_guard3]
+on_info  = %+bar_zastava_2_duty2_guard3_dead%
+
+[death@bar_zastava_2_duty2_guard4]
+on_info  = %+bar_zastava_2_duty2_guard4_dead%
+
+[death@bar_zastava_2_duty2_guard5]
+on_info  = %+bar_zastava_2_duty2_guard5_dead%
+
+;------------------------------
+;------- Mutant swarm ----------
+;------------------------------
+
+[logic@faction_base_defense_enemy1]
+active = mob_home@faction_base_defense_enemy1
+suitable = {=target_squad_name(faction_base_defense_flesh_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy1]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy2]
+active = mob_home@faction_base_defense_enemy2
+suitable = {=target_squad_name(faction_base_defense_boar_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy2]
+path_home = home_attackers
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy3]
+active = mob_home@faction_base_defense_enemy3
+suitable = {=target_squad_name(faction_base_defense_dog_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy3]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0

@@ -1,0 +1,11 @@
+[logic]
+active = sr_particle
+
+[sr_particle]
+name = anomaly2\generatory
+mode = 2
+path = gen_part_points
+looped = true
+on_info = {+warlab_deactivate_generators_done} sr_idle@nil %=clear_weather%
+
+[sr_idle@nil]

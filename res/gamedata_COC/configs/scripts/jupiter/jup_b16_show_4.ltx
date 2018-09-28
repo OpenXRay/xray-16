@@ -1,0 +1,66 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+jup_b16_go_particle} sr_idle@2
+
+[sr_idle@2]
+on_actor_in_zone = jup_b16_show_particles_sr | {+jup_b16_show_particles} sr_idle@wait_for_show_particle
+
+[sr_idle@wait_for_show_particle]
+on_timer = 100 | {+jup_b16_sr_4_1 +jup_b16_row_complete_4} sr_particle@4_1 %-jup_b16_row_complete_4%
+on_timer2 = 100 | {+jup_b16_sr_4_2 +jup_b16_row_complete_4} sr_particle@4_2 %-jup_b16_row_complete_4%
+on_timer3 = 100 | {+jup_b16_sr_4_3 +jup_b16_row_complete_4} sr_particle@4_3 %-jup_b16_row_complete_4%
+on_timer4 = 100 | {+jup_b16_sr_4_4 +jup_b16_row_complete_4} sr_particle@4_4 %-jup_b16_row_complete_4%
+on_timer5 = 100 | {+jup_b16_sr_4_5 +jup_b16_row_complete_4} sr_particle@4_5 %-jup_b16_row_complete_4%
+on_info = {-jup_b16_row_complete_4} sr_idle
+
+[sr_particle@4_1]
+name = anomaly2\oasis_way
+path = jup_b16_sr_4_1_particle
+mode = 2
+looped = true
+on_info = {-jup_b16_sound_4_1} %+jup_b16_sound_4_1%
+on_info2 = {-jup_b16_sr_4_1} sr_idle %-jup_b16_sound_4_1 -jup_b16_show_particles -jup_b16_go_particle%, {+jup_b16_actor_leave_oazis} sr_idle %-jup_b16_sound_4_1 -jup_b16_show_particles -jup_b16_go_particle%
+;on_info = {-jup_b16_show_particles} sr_idle
+
+
+[sr_particle@4_2]
+name = anomaly2\oasis_way
+path = jup_b16_sr_4_2_particle
+mode = 2
+looped = true
+on_info = {-jup_b16_sound_4_2} %+jup_b16_sound_4_2%
+on_info2 = {-jup_b16_sr_4_2} sr_idle %-jup_b16_sound_4_2 -jup_b16_show_particles -jup_b16_go_particle%, {+jup_b16_actor_leave_oazis} sr_idle %-jup_b16_sound_4_2 -jup_b16_show_particles -jup_b16_go_particle%
+;on_info = {-jup_b16_show_particles} sr_idle
+
+
+[sr_particle@4_3]
+name = anomaly2\oasis_way
+path = jup_b16_sr_4_3_particle
+mode = 2
+looped = true
+on_info = {-jup_b16_sound_4_3} %+jup_b16_sound_4_3%
+on_info2 = {-jup_b16_sr_4_3} sr_idle %-jup_b16_sound_4_3 -jup_b16_show_particles -jup_b16_go_particle%, {+jup_b16_actor_leave_oazis} sr_idle %-jup_b16_sound_4_3 -jup_b16_show_particles -jup_b16_go_particle%
+;on_info = {-jup_b16_show_particles} sr_idle
+
+
+[sr_particle@4_4]
+name = anomaly2\oasis_way
+path = jup_b16_sr_4_4_particle
+mode = 2
+looped = true
+on_info = {-jup_b16_sound_4_4} %+jup_b16_sound_4_4%
+on_info2 = {-jup_b16_sr_4_4} sr_idle %-jup_b16_sound_4_4 -jup_b16_show_particles -jup_b16_go_particle%, {+jup_b16_actor_leave_oazis} sr_idle %-jup_b16_sound_4_4 -jup_b16_show_particles -jup_b16_go_particle%
+;on_info = {-jup_b16_show_particles} sr_idle
+
+
+[sr_particle@4_5]
+name = anomaly2\oasis_way
+path = jup_b16_sr_4_5_particle
+mode = 2
+looped = true
+on_info = {-jup_b16_sound_4_5} %+jup_b16_sound_4_5%
+on_info2 = {-jup_b16_sr_4_5} sr_idle %-jup_b16_sound_4_5 -jup_b16_show_particles -jup_b16_go_particle%, {+jup_b16_actor_leave_oazis} sr_idle %-jup_b16_sound_4_5 -jup_b16_show_particles -jup_b16_go_particle%
+;on_info = {-jup_b16_show_particles} sr_idle
+

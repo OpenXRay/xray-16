@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+<!--------------------------- esc_2_12_stalker_trader ----------->
+	<string id="esc_2_12_stalker_trader_start_dialog_1">
+		<text>A fresh face... Or have I seen you around before, stalker? I'm the guy around here to see if you need to buy or sell equipment. If you are seeking a source of income, I'm always in need of someone willing to do dirty work.\nI look over this camp; all stalkers are welcome here to rest as long as they stay out of trouble. I warn you, do not mess with the military, I pay good money to keep them away from this place. Stalkers should be relatively safe as long as they don't leave camp.</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_2">
+		<text>Hey, stalker! What do you need?</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_esc_m_trader_task_1_complete">
+		<text>Business is taken care of? Good work, here is your payment.</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_esc_m_trader_task_2_complete">
+		<text>You have a real talent, you know that? Here is your payment. This will be good for business.</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_wolf_start ------>
+	<string id="esc_2_12_stalker_wolf_start_dialog_1">
+		<text>Hello, stalker. What brings you to the village, today?</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_fanat ----------->
+	<string id="esc_2_12_stalker_fanat_start_dialog_1">
+		<text>Hello, stalker. How are you today?</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_start_dialog_esc_m_trader_task_2">
+		<text>Do you need something, stalker?</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_about_esc_m_trader_task_2_0">
+		<text>There are bandits that need taken care of at the car park. Sidorovich said you may want to assist me.</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_about_esc_m_trader_task_2_1">
+		<text>Yes, I'll help you. I don't want any more harm to come to any of the rookies.</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_nimble ----------->
+	<!-- esc_2_12_stalker_trader_mar_base_owl_stalker_trader_task_1 -->
+	<string id="esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1">
+		<text>Something for me? I've been waiting for this. Spore helps me keep my contacts on the outside safe and anonymous through high-level encryption - heh, hacker shit. Believe it or not I used to be a Clear Sky member way back, a lot of bad shit happened but it seems that somehow they managed to pull together. Most either died or went their separate ways. I saw no point in sticking around but I still retain contact with Spore. Oh, sorry, I forgot. Here's your payment:</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1_about">
+		<text>I have something for you.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_no">
+		<text>I'm not sure you have the right person.</text>
+	</string>
+	
+	<string id="esc_2_12_stalker_nimble_about_0">
+		<text>Can you answer a couple of questions?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1">
+		<text>Sure.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1114">
+		<text>Tell me about yourself.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_11141">
+		<text>Nothing much to tell. I've had it good and I've had it bad, like most people. Stepped into a few anomalies, been a hostage to bandits... I came to the Zone a young lad, a long time ago. I was a gopher at first - anti-rads, armour-piercing ammo, that sort of thing. Then I worked for Sidorovich... Paying him back for saving my ass. As I pulled chestnuts out of the fire for him, I made some useful connections and branched out on my own as soon as I could to start delivering exclusive orders. So far I've been able to dodge everything life has thrown at me, but I've a feeling my luck is running out. At the same time, I've no desire to bust my ass for pennies any-more.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1116">
+		<text>Thanks, I see.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_11161">
+		<text>Glad to help.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_11">
+		<text>Hello. I'm Nimble. People come to me for unique weapons. Rare models, prototypes, unique shooters - stuff like that. Plus elite equipment, the latest modifications of protective and combat suits. I check every item personally, so quality is guaranteed.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_12">
+		<text>Hello. Would you like to place an order?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_13">
+		<text>Hello.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_14">
+		<text>Your order will be delivered very soon.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_15">
+		<text>The order is finished. Please come to collect it.</text>
+	</string>
+</string_table>

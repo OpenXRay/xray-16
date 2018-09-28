@@ -1,0 +1,16 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_a10_vano_give_task} sr_idle@2
+on_info2 = {+jup_a10_run_quest} %+jup_b218_gather_squad +jup_a9_tech_conservation_info%
+on_info3 = {!squad_exist(jup_a10_bandit_squad_3)} %+jup_a10_bandit_out%
+
+[sr_idle@2]
+;on_info = {+jup_a10_vano_give_task -jup_a10_bandit_take_money -jup_a10_bandit_take_all_money +jup_a10_death_0 +jup_a10_death_1 +jup_a10_death_2 +jup_a10_death_3} %+jup_a10_bandit_out +jup_a10_back_vano%
+on_info = {+jup_a10_vano_give_task -jup_a10_bandit_take_money -jup_a10_bandit_take_all_money !squad_exist(jup_a10_bandit_squad_3)} %+jup_a10_bandit_out +jup_a10_back_vano%
+on_info2 = {+jup_a10_back_vano} sr_idle@3
+;on_info@3 = {=squad_exist(jup_a10_bandit_squad_3)} %+jup_a10_bandit_squad_death%
+;on_game_timer = 259200 | sr_idle@3 %+jup_a10_fals -jup_a10_vano_give_task% 
+
+[sr_idle@3]

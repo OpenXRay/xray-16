@@ -1,0 +1,157 @@
+[mob_home]
+path_home = fight_1
+home_min_radius = 10
+home_max_radius = 20
+in_restr = pri_b304_dogs_inrestr
+aggressive = true
+
+[mob_home@1]
+path_home = dog_patrol_1
+home_min_radius = 10
+home_max_radius = 20
+npc_friendly = true
+aggressive = true
+on_game_timer = 50 | {!has_enemy} mob_home@2
+in_restr = pri_b304_dogs_inrestr
+
+[mob_home@2]
+path_home = dog_patrol_2
+home_min_radius = 10
+home_max_radius = 20
+npc_friendly = true
+aggressive = true
+on_game_timer = 50 | {!has_enemy} mob_home@3
+in_restr = pri_b304_dogs_inrestr
+
+[mob_home@3]
+path_home = dog_patrol_3
+home_min_radius = 10
+home_max_radius = 20
+npc_friendly = true
+aggressive = true
+on_game_timer = 50 | {!has_enemy} mob_home@1
+in_restr = pri_b304_dogs_inrestr
+
+;*********************< travelling works >********************************
+
+[logic@pri_b304_dog_patrol_1]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_2]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_3]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_4]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_5]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_6]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_7]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_8]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_9]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_patrol_0]
+ suitable = {-pri_b304_actor_in_store_hall} true
+active = mob_home@2
+prior = 200
+monster_job = true
+
+;********************< fight works >*********************
+
+[logic@pri_b304_dog_fight_1]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_2]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_3]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_4]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_5]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_6]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_7]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_8]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_9]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true
+
+[logic@pri_b304_dog_fight_0]
+suitable = {+pri_b304_actor_in_store_hall} true
+active = mob_home
+prior = 200
+monster_job = true

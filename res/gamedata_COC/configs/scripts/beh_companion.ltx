@@ -1,0 +1,147 @@
+[logic]
+active = beh@base
+post_combat_time = 0,0
+;trade = misc\trade\trade_companion.ltx
+level_spot = companion
+
+;======================
+; default logic
+;======================
+[beh@general_no_companion]
+sound_idle = state
+behavior_state = beh_move
+target = waypoint
+walk_dist = 100
+jog_dist = 220
+wait_anim = guard
+walk_anim = patrol
+jog_anim = rush
+run_anim = panic
+delay_anim = guard
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+invulnerable = true
+
+[beh@general]
+combat_ignore_keep_when_attacked = true
+combat_ignore_cond = {=check_enemy_name(actor)} true, {-npcx_beh_ignore_combat -npcx_beh_ignore_actor_enemies}  false, {+npcx_beh_ignore_combat +npcx_beh_ignore_actor_enemies} true, {+npcx_beh_ignore_combat -npcx_beh_ignore_actor_enemies =is_enemy_fighting_actor} false, true
+meet = meet
+gather_items_enabled = {+npcx_beh_gather_items}true, false
+corpse_detection_enabled = {+npcx_beh_loot_corpses} true, false
+actor_dialogs = actor_dialogs
+behavior_state = {+npcx_beh_wait} beh_wait, beh_move
+target = {!is_squad_commander} commander, {=is_squad_commander +npcx_beh_patrol_mode} waypoint, actor_squad
+walk_dist = {+npcx_beh_patrol_mode} 90, 5
+jog_dist = {+npcx_beh_patrol_mode} 150, 15
+keep_distance = {+npcx_beh_distance_far} far, near
+near_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 3, 3
+far_desired_dist = {+npcx_beh_patrol_mode =is_squad_commander} 1, {!is_squad_commander} 8, 10
+wait_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} hide, guard
+walk_anim = {=is_wounded} nil, {+npcx_beh_patrol_mode -npcx_beh_substate_stealth} patrol,{+npcx_beh_substate_stealth} sneak, rush
+jog_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} sneak_run, assault
+run_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} panic, panic
+delay_anim = {=is_wounded} nil, {+npcx_beh_substate_stealth} hide, random_animation
+out_restr = zat_a2_sr_noweap, jup_a6_sr_noweap, jup_b41_sr_noweap
+
+[meet]
+;reset_distance = 2
+abuse = false
+snd_on_use 				= {=is_wounded} nil, {!is_squad_commander} meet_use_no_talk_leader
+close_distance          = {=is_wounded} 1, {!is_squad_commander} 0, 2
+close_anim              = {=is_wounded} nil, {!is_squad_commander} nil, {+npcx_beh_substate_stealth -npcx_beh_substate_relax} hide_no_wpn, guard_na
+close_snd_hello         = nil
+close_snd_bye           = nil
+close_victim			= {=is_wounded} nil, {!is_squad_commander} nil, actor
+far_distance			= 0
+far_anim				= nil
+far_snd					= nil
+far_victim				= nil
+use 					= {=is_wounded} true, {=dist_to_actor_le(4)} true, false ;{=is_wounded} true, {!is_squad_commander} false, {=dist_to_actor_le(5)} true, false
+allow_break				= true
+use_text				= nil
+trade_enable 			= {=is_wounded} false, true
+meet_dialog				= {=is_wounded} axr_companion_medkit, nil
+
+[actor_dialogs]
+disable = dm_ordered_task_dialog, dm_traveler_dialog, dm_actor_become_guide_to_companion_dialog, dm_universal_dialog, about_quests_dialog_dolg, about_quests_dialog_freedom, about_quests_dialog_bandit, about_quests_dialog_stalkers
+
+;===============================================
+;            		 active sections
+;===============================================
+[beh@base]:beh@general
+on_info1 = {=check_squad_name(ecolog_companion_task_1)} beh@ecolog_companion_task_1, {=check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2, {=check_squad_name(yan_ecolog_semenov_squad)} beh@yan_ecolog_semenov_task_1
+on_info2 = {=check_squad_name(bandit_companion_task_1)} beh@bandit_companion_task_1
+on_info3 = {=check_squad_name(hostage_companion_task_1)} beh@hostage_1
+;on_info4 = beh@general       ;IMPORTANT: not a special task squad so use general section; Make sure it's always the last LINE in this section
+
+[meet@ecolog_companion_task_1]:meet
+meet_dialog	= {=is_wounded} axr_companion_medkit, {=check_smart_dist_le(40:mar_smart_terrain_base)} ecolog_companion_task_1_dialog, nil
+
+[meet@ecolog_companion_task_2]:meet
+meet_dialog	= {=is_wounded} axr_companion_medkit, {=check_smart_dist_le(40:jup_b41)} ecolog_companion_task_2_dialog, nil
+
+[beh@ecolog_companion_task_1]:beh@general
+meet = meet@ecolog_companion_task_1
+on_info1 = {=dist_to_task_target_anomaly_le(15)} beh@task_target_anomaly_1, {=squad_commander_active_section(beh@task_target_anomaly_1)} beh@task_target_anomaly_1
+on_info2 = {-ecolog_companion_task_1_force_started =dist_to_actor_le(3)} %+ecolog_companion_task_1_force_started =force_talk(true)%
+on_info3 = {=check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2
+
+[beh@ecolog_companion_task_2]:beh@general
+meet = meet@ecolog_companion_task_2
+on_info1 = {=dist_to_task_target_anomaly_le(15)} beh@task_target_anomaly_1, {=squad_commander_active_section(beh@task_target_anomaly_1)} beh@task_target_anomaly_1
+on_info2 = {-ecolog_companion_task_2_force_started =dist_to_actor_le(3)} %+ecolog_companion_task_2_force_started =force_talk(true)%
+on_info3 = {=check_squad_name(ecolog_companion_task_1)} beh@ecolog_companion_task_1
+
+[beh@yan_ecolog_semenov_task_1]:beh@general
+invulnerable = true
+mutant_corpse_analysis = {=is_squad_commander =check_task_stage(yan_ecolog_semenov_task_1:0)} true
+
+[meet@bandit_companion_task_1]:meet
+meet_dialog	= {=is_wounded} axr_companion_medkit, bandit_companion_task_1_dialog
+
+[beh@bandit_companion_task_1]:beh@general
+meet = meet@bandit_companion_task_1
+;on_info1 = 
+on_info2 = {-bandit_companion_task_1_force_started =dist_to_actor_le(3)} %+bandit_companion_task_1_force_started =force_talk(true)%
+corpse_detection_enabled = true
+
+;====================================================================
+; 				special scenario active sections
+;====================================================================
+[meet@hostage_companion_task_1]:meet
+meet_dialog	= {=is_wounded} axr_companion_medkit, hostage_companion_task_1_dialog
+meet_on_talking = false 
+
+[beh@hostage_1]:beh@general_no_companion
+target = task_target_hostage
+wait_anim = prisoner
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_me_cond = true
+on_info1 = {+hostage_companion_task_1_hostage_rescued} beh@hostage_companion_task_1
+meet = meet@hostage_companion_task_1
+
+[beh@hostage_companion_task_1]:beh@general
+
+
+[beh@task_target_anomaly_1]:beh@general_no_companion
+target = task_target_anomaly
+wait_anim = scaner_crouch
+on_info1 = {=is_squad_commander} beh@task_target_anomaly_2 %=play_sound(jup_b6_stalker_1_first_measurement_begin)%
+on_info2 = {!has_task_target_anomaly =check_squad_name(ecolog_companion_task_1)} beh@ecolog_companion_task_1, {!has_task_target_anomaly =check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2
+
+[beh@task_target_anomaly_2]:beh@general_no_companion
+target = task_target_anomaly
+wait_anim = scaner_crouch
+on_game_timer = 900 | beh@task_target_anomaly_3 %=reset_task_target_anomaly =play_sound(jup_b6_stalker_1_measurements_done)%
+
+[beh@task_target_anomaly_3]
+on_info = {=check_squad_name(ecolog_companion_task_2)} beh@ecolog_companion_task_2, beh@ecolog_companion_task_1

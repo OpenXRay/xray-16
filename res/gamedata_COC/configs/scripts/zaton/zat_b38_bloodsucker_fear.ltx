@@ -1,0 +1,14 @@
+[logic]
+active = nil ;sr_idle@fear
+
+; Страшный звук в сцене
+[sr_idle@fear]
+on_info = {+zat_b38_scary_sound} sr_idle@signal %=play_sound(zat_b38_bloodsucker_roar)%
+
+[sr_idle@signal]
+on_signal = sound_end | sr_idle@timer
+
+[sr_idle@timer]
+on_game_timer = 30 | {+zat_b38_illusion} sr_idle@end %+zat_b38_time_to_say_illusion%
+
+[sr_idle@end]

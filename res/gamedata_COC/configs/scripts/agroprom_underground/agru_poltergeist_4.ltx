@@ -1,0 +1,18 @@
+[logic@agru_poltergeist_squad_4]
+active = mob_walker
+suitable = {=target_squad_name(agru_poltergeist_squad)} true
+monster_job = true
+prior = 200
+
+[mob_walker]
+path_walk = walk4
+braindead = true
+actor_friendly = true
+npc_friendly = true
+on_actor_dist_le = 3 | mob_walker@attack 
+out_restr = agru_poltergeist_out_restr
+
+[mob_walker@attack]
+path_walk = walk4
+on_actor_dist_ge = 3 | mob_walker
+out_restr = agru_poltergeist_out_restr

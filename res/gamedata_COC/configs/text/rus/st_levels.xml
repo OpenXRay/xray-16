@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<string_table>
+	<!-- Level Names -->
+  <string id="l03_agroprom">
+    <text>Агропром</text>
+  </string>
+  <string id="l03u_agr_underground">
+    <text>Подземелья Агропрома</text>
+  </string>
+  <string id="l07_military">
+    <text>Армейские Склады</text>
+  </string>
+  <string id="l12_stancia_2">
+    <text>Север ЧАЭС</text>
+  </string>
+  <string id="l12_stancia">
+    <text>Юг ЧАЭС</text>
+  </string>
+  <string id="l01_escape">
+    <text>Кордон</text>
+  </string>
+   <string id="k01_darkscape">
+    <text>Тёмная Лощина</text>
+  </string>
+  <string id="l04_darkvalley">
+    <text>Тёмная Долина</text>
+  </string>
+  <string id="l09_deadcity">
+    <text>Мёртвый Город</text>
+  </string>
+  <string id="l11_hospital">
+    <text>Заброшенный Госпиталь</text>
+  </string>
+   <string id="fake_start">
+    <text>Фальстарт</text>
+	</string>
+  <string id="l02_garbage">
+    <text>Свалка</text>
+  </string>
+  <string id="l13_generators">
+    <text>Генераторы</text>
+  </string>
+  <string id="k00_marsh">
+    <text>Болота</text>
+  </string>
+   <string id="jupiter">
+    <text>Окрестности «Юпитера»</text>
+  </string>
+    <string id="jupiter_underground">
+    <text>Путепровод «Припять-1»</text>
+  </string>
+  <string id="l08u_brainlab">
+    <text>Лаборатория Х-16</text>
+  </string>
+  <string id="l04u_labx18">
+    <text>Лаборатория Х-18</text>
+  </string>
+  <string id="l10u_bunker">
+    <text>Лаборатория Х-19 «Х-10»</text>
+	</string>
+  <string id="labx8">
+    <text>Лаборатория Х-8</text>
+  </string>
+  <string id="l10_limansk">
+    <text>Лиманск</text>
+  </string>
+  <string id="l12u_control_monolith">
+    <text>Центр управления Монолитом</text>
+  </string>
+   <string id="l13u_warlab">
+    <text>Военная лаборатория</text>
+  </string>
+  <string id="pripyat">
+    <text>Окраины Припяти</text>
+  </string>
+  <string id="l11_pripyat">
+    <text>Центр Припяти</text>
+  </string>
+  <string id="l10_radar">
+    <text>Радар</text>
+  </string>
+  <string id="l10_red_forest">
+    <text>Рыжий Лес</text>
+  </string>
+ <string id="l05_bar">
+    <text>Бар</text>
+  </string>
+  <string id="l12u_sarcofag">
+    <text>Саркофаг</text>
+  </string>
+   <string id="k02_trucks_cemetery">
+    <text>Кладбище Техники</text>
+  </string>
+  <string id="l06_rostok">
+    <text>Дикая Территория</text>
+  </string>
+  <string id="l08_yantar">
+    <text>Янтарь</text>
+  </string>
+  <string id="zaton">
+    <text>Затон</text>
+  </string>
+
+	<!-- Level Changers -->
+  <string id="mar_space_restrictor_to_agroprom_descr">
+    <text>На Агропром</text>
+  </string>
+  <string id="space_restrictor_to_agr_ug_desc">
+    <text>В подземелья Агропрома</text>
+  </string>
+  <string id="space_restrictor_to_military_desc">
+    <text>На Армейские Склады</text>
+  </string>
+  <string id="gen_space_restrictor_to_aes2_descr">
+    <text>На ЧАЭС</text>
+  </string>
+  <string id="ds_space_restrictor_to_escape_descr">
+    <text>На Кордон</text>
+  </string>
+  <string id="esc_space_restrictor_to_darkscape_descr">
+    <text>В Тёмную Лощину</text>
+  </string>
+  <string id="ds_space_restrictor_to_darkvalley_desc">
+    <text>В Тёмную Долину</text>
+  </string>
+   <string id="space_restrictor_to_deadcity_desc">
+    <text>В Мёртвый Город</text>
+  </string>
+  <string id="space_restrictor_to_hospital">
+		<text>В заброшенный госпиталь</text>
+  </string>
+  <string id="esc_space_restrictor_to_garbage_descr">
+    <text>На Свалку</text>
+  </string>
+  <string id="aes2_space_restrictor_to_gen_descr">
+    <text>К Генераторам</text>
+  </string>
+   <string id="mar_teleport_from_base_to_north_descr">
+    <text>На Болота</text>
+	</string>
+  <string id="space_restrictor_to_jupiter_desc">
+		<text>В окрестности Юпитера</text>
+  </string>
+  <string id="space_restrictor_to_jupiter_ug_desc">
+		<text>В Путепровод «Припять-1»</text>
+  </string>
+  <string id="space_restrictor_to_labx16_desc">
+    <text>В лабораторию Х-16</text>
+  </string>
+  <string id="space_restrictor_to_labx18_desc">
+    <text>В лабораторию Х-18</text>
+  </string>
+  <string id="space_restrictor_to_labx10_desc">
+    <text>В лабораторию Х-19 «Х-10»</text>
+  </string>
+  <string id="space_restrictor_to_labx8_desc">
+    <text>В лабораторию Х-8</text>
+  </string>
+  <string id="space_restrictor_to_limansk_desc">
+    <text>В Лиманск</text>
+  </string>
+  <string id="space_restrictor_to_secret_lab_desc">
+    <text>В центр управления Монолитом</text>
+  </string>
+  <string id="space_restrictor_to_warlab_desc">
+    <text>В Военную лабораторию</text>
+  </string>
+  <string id="space_restrictor_to_cop_pripyat_desc">
+		<text>На Окраины Припяти</text>
+  </string>
+  <string id="space_restrictor_to_pripyat_desc">
+		<text>В Центр Припяти</text>
+  </string>
+  <string id="space_restrictor_to_radar_desc">
+    <text>На Радар</text>
+  </string>
+  <string id="mil_space_restrictor_to_red_1_descr">
+    <text>В Рыжий Лес</text>
+  </string>
+  <string id="space_restrictor_to_bar_desc">
+    <text>На Росток</text>
+  </string>
+  <string id="space_restrictor_to_sarcophagus_desc">
+    <text>В Саркофаг</text>
+  </string>
+  <string id="space_restrictor_to_tc_desc">
+		<text>На Кладбище Техники</text>
+  </string>
+   <string id="space_restrictor_to_rostok_desc">
+    <text>На Дикую Территорию</text>
+  </string>
+  <string id="space_restrictor_to_yantar_desc">
+    <text>На Янтарь</text>
+  </string>
+  <string id="space_restrictor_to_zaton_desc">
+		<text>На Затон</text>
+  </string>  
+</string_table>

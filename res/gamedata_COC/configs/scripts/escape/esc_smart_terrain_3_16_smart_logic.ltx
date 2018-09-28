@@ -1,0 +1,95 @@
+;minigunner
+[logic@esc_smart_terrain_3_16_minigunner_excl]
+active = beh@esc_smart_terrain_3_16_minigunner_excl
+suitable = {!surge_started} true
+prior = 60
+
+[meet@general]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+[beh@general]
+behavior_state = beh_move
+target = waypoint
+walk_dist = 100
+jog_dist = 220
+wait_anim = rush
+walk_anim = rush
+jog_anim = rush
+run_anim = rush
+delay_anim = guard
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = meet@general
+
+[beh@idle]:beh@general
+on_info = {!has_enemy} beh@esc_smart_terrain_3_16_minigunner_excl
+
+[beh@esc_smart_terrain_3_16_minigunner_excl]:beh@general
+pt1 = 1000,guard | pos:-130.23077392578,-25.849973678589,-354.50341796875 look:-130,-25,-340
+path_end = beh@esc_smart_terrain_3_16_minigunner_excl_ready
+
+[beh@esc_smart_terrain_3_16_minigunner_excl_ready]:beh@general
+no_combat_job = true
+pt1 = 20000,ward | pos:-130.23077392578,-25.849973678589,-354.50341796875 look:-130,-25,-340
+path_end = loop
+on_info = {=pure_enemy_dist_le(17)} beh@idle
+
+;camping
+[logic@esc_smart_terrain_3_16_camp_work_1]
+active = animpoint@esc_smart_terrain_3_16_camp_work_1
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_3_16_camp_work_2]
+active = animpoint@esc_smart_terrain_3_16_camp_work_2
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_3_16_camp_work_3]
+active = animpoint@esc_smart_terrain_3_16_camp_work_3
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_3_16_camp_work_4]
+active = animpoint@esc_smart_terrain_3_16_camp_work_4
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_3_16_camp_work_5]
+active = animpoint@esc_smart_terrain_3_16_camp_work_5
+suitable = {!surge_started} true
+prior = 45
+
+[animpoint@esc_smart_terrain_3_16_camp_work_1]
+cover_name = esc_smart_terrain_3_16_animpoint_kamp1
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_3_16_camp_work_2]
+cover_name = esc_smart_terrain_3_16_animpoint_kamp2
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_3_16_camp_work_3]
+cover_name = esc_smart_terrain_3_16_animpoint_kamp3
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_3_16_camp_work_4]
+cover_name = esc_smart_terrain_3_16_animpoint_kamp4
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_3_16_camp_work_5]
+cover_name = esc_smart_terrain_3_16_animpoint_kamp5
+use_camp = true
+turn_on_campfire = true

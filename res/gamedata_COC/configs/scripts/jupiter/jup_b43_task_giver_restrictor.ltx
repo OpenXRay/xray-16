@@ -1,0 +1,12 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_info = {+jup_b43_contract_started} sr_idle@wait_end_task %=give_task(jup_b43_stalker_assistant_contract)%
+
+[sr_idle@wait_end_task]
+on_info = {+jup_b43_contract_brought_first_artefact -jup_b43_once_treasure_give_1} %=give_treasure(jup_hiding_place_5) +jup_b43_once_treasure_give_1%
+on_info2 = {+jup_b43_contract_brought_second_artefact -jup_b43_once_treasure_give_2} %=give_treasure(jup_hiding_place_23) +jup_b43_once_treasure_give_2%
+on_info3 = {+jup_b43_contract_brought_first_artefact +jup_b43_contract_brought_second_artefact} sr_idle@nil %+jup_b43_contract_complete%
+
+[sr_idle@nil]

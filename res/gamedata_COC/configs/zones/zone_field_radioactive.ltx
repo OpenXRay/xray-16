@@ -1,0 +1,45 @@
+[zone_field_radioactive]:zone_base
+GroupControlSection			=	spawn_group_zone
+$def_sphere					=	15
+;$prefetch					=	16
+class						=	ZS_RADIO
+hit_impulse_scale			=	0.01
+effective_radius			=	1.00	;размер	радиуса	в	процентах	от	оригинального,	где	действует	зона
+postprocess					=	postprocess_rad
+ef_anomaly_type				=	3
+ef_weapon_type				=	15
+;-----------	Zone	Base	-----------------------
+idle_light_volumetric		=	false
+idle_light_shadow			=	true
+pick_dof_effector			=	false
+idle_light_r1				=	true
+;-----------	Anomaly	settings	-----------------------
+max_start_power				=	0
+attenuation					=	0.5
+hit_type					=	radiation
+disable_time				=	-1		;время	игнорирования	неживого	объекта	в	зоне	(-1	если	не	нужно)
+disable_time_small			=	-1		;время	игнорирования	маленького	неживого	объекта	в	зоне	(-1	если	не	нужно)
+disable_idle_time			=	-1		;время	отключения	idle	партиклов
+ignore_nonalive				=	true;
+ignore_small				=	false;
+ignore_artefacts			=	true
+blowout_light				=	off
+idle_light					=	off
+awaking_time				=	100
+blowout_time				=	100
+accamulate_time				=	100
+blowout_wind				=	off
+shape_transp_color			=	200,	200,	0,	60
+shape_edge_color			=	32,	32,	32,	255
+[zone_field_radioactive_weak]:zone_field_radioactive
+$spawn						=	"zones\field_radioactive_weak"
+;-----------	Anomaly	settings	-----------------------
+max_start_power				=	0.015
+[zone_field_radioactive_average]:zone_field_radioactive
+$spawn						=	"zones\field_radioactive_average"
+;-----------	Anomaly	settings	-----------------------
+max_start_power				=	0.02
+[zone_field_radioactive_strong]:zone_field_radioactive
+$spawn						=	"zones\field_radioactive_strong"
+;-----------	Anomaly	settings	-----------------------
+max_start_power				=	0.03

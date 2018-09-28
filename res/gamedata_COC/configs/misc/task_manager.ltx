@@ -1,0 +1,42 @@
+; Выдача заданий: =give_task(тип_задания:ид_задания:группировка)
+
+#include "tm_zaton.ltx"
+#include "tm_jupiter.ltx"
+#include "tm_pripyat.ltx"
+
+;Call of Chernobyl
+#include "tm_escape.ltx"
+#include "tm_marsh.ltx"
+#include "tm_yantar.ltx"
+#include "tm_darkvalley.ltx"
+#include "tm_military.ltx"
+#include "tm_bar.ltx"
+#include "tm_pripyat2.ltx"
+#include "tm_deadcity.ltx"
+#include "tm_agroprom.ltx"
+#include "tm_radar.ltx"
+#include "tm_dynamic.ltx"
+#include "tm_sarcofag.ltx"
+#include "tm_warlab.ltx"
+
+[hide_from_surge]
+icon = ui_inGame2_Vibros
+prior = 20
+title_functor = surge_task_title
+descr_functor = surge_task_descr
+target_functor = surge_task_target
+;dont_send_update_news = true
+condlist_0 = {=surge_complete()} complete
+condlist_1 = {!actor_alive()} fail
+
+;AtmosFear Psi Storm
+[hide_from_psi_storm]
+icon = ui_inGame2_psi_storm
+prior = 20
+title_functor = psi_storm_task_title
+descr_functor = psi_storm_task_descr
+target_functor = psi_storm_task_target
+;dont_send_update_news = true
+condlist_0 = {=psi_storm_complete()} complete
+condlist_1 = {!actor_alive()} fail
+

@@ -1,0 +1,27 @@
+[logic@zat_b106_stalker_gonta]
+suitable = {=check_npc_name(zat_b106_stalker_gonta)} true
+active = animpoint@leader
+prior = 200
+
+[animpoint@leader]
+cover_name = zat_a2_sc_zat_b106_stalker_gonta
+avail_animations = animpoint_stay_table
+out_restr = zat_a2_sr_noweap
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true 
+combat_ignore_keep_when_attacked = true
+meet = meet
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+allow_break 	= false
+meet_on_talking = false

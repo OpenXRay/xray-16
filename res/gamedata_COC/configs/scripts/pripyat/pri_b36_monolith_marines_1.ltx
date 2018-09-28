@@ -1,0 +1,52 @@
+[logic@marine_1]
+active = walker@start
+suitable = {=check_npc_name(monolith)} true
+prior = 100
+
+[walker@start]
+path_walk = guard_1_walk
+path_look = guard_1_look
+def_state_standing = wait
+on_info = {+pri_b36_ahtung} walker@walk ;camper@walk
+on_info2 = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_sound = actor|WPN_shoot|10000|0.2| {=dist_to_actor_le(70)} walker@walk %+pri_b36_ahtung%
+on_sound2 = actor|MST_step|35|0.2| walker@walk %+zat_b5_meat%
+on_sound3 = actor|WPN_empty|30|0.1| walker@walk %+pri_b36_ahtung%
+on_sound4 = actor|WPN_reload|20|0.2| walker@walk %+pri_b36_ahtung%
+on_sound5 = actor|MST_damage|30|0.1| walker@walk %+pri_b36_ahtung%
+on_sound6 = actor|WPN_hit|30|0.1| walker@walk %+pri_b36_ahtung%
+out_restr = pri_b36_zombied_restrictor
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk]
+path_walk = marine_1_2_walk
+path_look = marine_1_2_look
+out_restr = pri_b36_sr_half_out_restr
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+
+[camper@walk]
+path_walk = marine_1_2_walk
+path_look = marine_1_2_look
+out_restr = pri_b36_sr_half_out_restr
+;radius = 30
+def_state_moving = raid
+def_state_moving_fire = raid_fire
+def_state_campering = threat_na
+def_state_campering_fire = hide_fire
+attack_sound = false
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond =  {=check_enemy_name(sim_default)} true
+
+[danger]
+ignore_distance = 0
+

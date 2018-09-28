@@ -1,0 +1,12 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {=actor_in_zone(zat_b28_heli_3) -zat_b28_heli_3_searching} sr_idle@2 %=run_tutorial(zat_b28_heli_3)%
+on_info2 = {+zat_b28_heli_3_searching} sr_idle@3
+
+[sr_idle@2]
+on_info = {!actor_in_zone(zat_b28_heli_3)} sr_idle %=stop_tutorial%
+on_info2 = {!has_active_tutorial} sr_idle
+
+[sr_idle@3]

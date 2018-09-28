@@ -1,0 +1,79 @@
+----------------------------------------
+-- Auto-release old dropped items 
+-- Author: Alundaio
+----------------------------------------
+local items_marked_for_removal = {}
+
+local function npc_on_item_drop(npc,item)
+	if (item:parent() == nil or item:parent():id() == npc:id()) then 
+		items_marked_for_removal[item:id()] = {item:name(),game.get_game_time()}
+	end
+end
+
+local function npc_on_item_take(npc,item)
+	items_marked_for_removal[item:id()] = nil
+end
+
+local function actor_on_item_drop(item)
+	npc_on_item_drop(db.actor,item)
+end
+
+local function actor_on_item_take(item)
+	items_marked_for_removal[item:id()] = nil
+end 
+
+local function save_state(m_data)
+	m_data.items_marked_for_removal = items_marked_for_removal
+end
+
+local function load_state(m_data)
+	if (m_data.items_marked_for_removal) then
+		for k,v in pairs(m_data.items_marked_for_removal) do 
+			items_marked_for_removal[k] = v
+		end
+		m_data.items_marked_for_removal = nil
+	end
+end
+
+local function on_game_load()
+	CreateTimeEvent(0,"release_item",5,clear)
+end
+--------------------------------------------------------
+-- ON GAME START 
+--------------------------------------------------------
+function on_game_start()
+	RegisterScriptCallback("npc_on_item_drop",npc_on_item_drop)
+	RegisterScriptCallback("npc_on_item_take",npc_on_item_take)
+	RegisterScriptCallback("actor_on_item_drop",actor_on_item_drop)
+	RegisterScriptCallback("actor_on_item_take",actor_on_item_take)
+	RegisterScriptCallback("save_state",save_state)
+	RegisterScriptCallback("load_state",load_state)
+	RegisterScriptCallback("on_game_load",on_game_load)
+end
+
+-----------------------------------------------------------
+--
+-----------------------------------------------------------
+function clear()
+
+	if (axr_main.config:r_value("mm_options","enable_release_dropped_items",1,false)) then
+		local sim = alife()
+		for id,t in pairs(items_marked_for_removal) do 
+			local se_obj = sim:object(id)
+			if (se_obj and se_obj.parent_id == 65535 and se_obj:name() == t[1] and game.get_game_time():diffSec(t[2]) >= 86400) then
+				if not (se_obj.online) then
+					--printf("release %s",t[1])
+					safe_release_manager.release(se_obj)
+					items_marked_for_removal[id] = nil
+				end
+			else 
+				--printf("fail %s",t[1])
+				items_marked_for_removal[id] = nil
+			end
+		end
+	end
+	
+	ResetTimeEvent(0,"release",5)
+	
+	return false
+end

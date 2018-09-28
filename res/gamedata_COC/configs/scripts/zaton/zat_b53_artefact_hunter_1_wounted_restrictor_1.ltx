@@ -1,0 +1,17 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+artefact_hunter_1_in_zone_wounted_restrictor_1} sr_idle@timer
+
+[sr_idle@timer]
+on_game_timer = 118 | sr_particle %=play_sound(steam_blowout)%
+
+[sr_particle]
+name = static\zharka_static_steam
+path = zat_b53_artefact_hunter_1_wounted_particle_steam_point_1
+mode = 2
+looped = false
+on_game_timer = 10800 | sr_idle@nil %+zat_b53_go_nil%
+
+[sr_idle@nil]

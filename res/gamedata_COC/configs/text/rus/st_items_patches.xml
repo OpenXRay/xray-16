@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<string_table>
+
+	<string id="csky_patch">
+		<text>Нашивка «Чистого Неба»</text>
+	</string>
+	<string id="csky_patch_description">
+		<text>Нашивка, содранная с костюма «Чистого Неба».</text>
+	</string>
+
+	<string id="freedom_patch">
+		<text>Нашивка «Свободы»</text>
+	</string>
+	<string id="freedom_patch_description">
+		<text>Нашивка, содранная с костюма «свободовца».</text>
+	</string>
+
+	<string id="stalker_patch">
+		<text>Нашивка вольного сталкера</text>
+	</string>
+	<string id="stalker_patch_description">
+		<text>Нашивка, содранная с костюма вольного сталкера.</text>
+	</string>
+
+	<string id="ecolog_patch">
+		<text>Нашивка учёного</text>
+	</string>
+	<string id="ecolog_patch_description">
+		<text>Нашивка, содранная с костюма учёного.</text>
+	</string>
+
+	<string id="bandit_patch">
+		<text>Нашивка бандита</text>
+	</string>
+	<string id="bandit_patch_description">
+		<text>Нашивка, содранная с костюма бандита.</text>
+	</string>
+
+	<string id="duty_patch">
+		<text>Нашивка «Долга»</text>
+	</string>
+	<string id="duty_patch_description">
+		<text>Нашивка, содранная с костюма «долговца».</text>
+	</string>
+
+	<string id="monolith_patch">
+		<text>Нашивка «Монолита»</text>
+	</string>
+	<string id="monolith_patch_description">
+		<text>Нашивка, содранная с костюма «монолитовца».</text>
+	</string>
+
+	<string id="army_patch">
+		<text>Нашивка военного</text>
+	</string>
+	<string id="army_patch_description">
+		<text>Нашивка, содранная с униформы военного.</text>
+	</string>
+
+	<string id="merc_patch">
+		<text>Нашивка наёмника</text>
+	</string>
+	<string id="merc_patch_description">
+		<text>Нашивка, содранная с костюма наёмника.</text>
+	</string>
+	
+</string_table>

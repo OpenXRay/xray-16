@@ -1,0 +1,22 @@
+[mob_home@gas_bloodsucker_attack]
+path_home = zat_b57_bloodsuckers_attackers_home
+aggressive = true
+home_min_radius = 100
+home_max_radius = 150
+on_info = {=is_alive +zat_b57_gas_running_stop} %=kill_npc%
+on_info2 = {=is_alive +zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give =dist_to_actor_ge(150)} nil %=kill_npc%
+
+;************************************************
+[logic@gas_bloodsucker_1]
+active = mob_home@gas_bloodsucker_attack
+prior = 200
+suitable = {=target_squad_name(zat_b57_bloodsuckers)} true
+monster_job = true
+
+;*************************************************
+[logic@gas_bloodsucker_2]
+active = mob_home@gas_bloodsucker_attack
+prior = 200
+suitable = {=target_squad_name(zat_b57_bloodsuckers)} true
+monster_job = true
+

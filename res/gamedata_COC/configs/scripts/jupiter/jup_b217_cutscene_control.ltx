@@ -1,0 +1,29 @@
+[logic] 
+;active = sr_idle@jup_b217_welcome_cameff_begin
+active = nil
+
+[sr_idle@jup_b217_welcome_cameff_begin]
+on_info = {+jup_b217_welcome_faded} sr_cutscene@217
+
+[sr_cutscene@217]
+point = jup_a6_actor_walk
+look  = jup_a6_actor_look
+on_game_timer = 25 | {-jup_b217_pp_end_in_scene} %+jup_b217_pp_end_in_scene%
+cam_effector = scenario_cam\jupiter\jup_b217_welcome_cameff
+enable_ui_on_end = true
+global_cameffect = true
+on_info = {+jup_b217_welcome_tech_talked} %=stop_sr_cutscene =run_postprocess(fade_in_out)%
+on_signal = cameff_end | sr_idle@jup_b217_give_task 
+
+[sr_idle@jup_b217_give_task]
+;on_game_timer = 10 | {-jup_b217_pp_out} %+jup_b217_pp_out =run_postprocess(black:1245:true)%
+;on_game_timer2 = 40 | {-jup_b217_info} %=stop_postprocess(1245) +jup_b217_info%
+on_info2 = {-jup_b217_arrived_to_jup_saved} %+jup_b217_arrived_to_jup_saved =scenario_autosave(st_save_jup_b217_arrived_to_jup)%
+on_info3 = {+jup_b217_tech_instruments_start} sr_idle@wait %=give_task(jup_b217_tech_instruments)%
+
+[sr_idle@wait]
+on_info = {+jup_b4_task_end +jup_b46_task_done +jup_b207_task_end} sr_idle@nil %+jup_a6_tasks_done%
+
+[sr_idle@nil]
+
+

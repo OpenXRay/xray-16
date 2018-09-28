@@ -1,0 +1,12 @@
+[logic]
+active = nil ;sr_idle@spawn_barge
+
+[sr_idle@spawn_barge]
+on_info  = {-zat_b44_stalker_barge_spawned} sr_idle@barge_pda_story %+zat_b44_stalker_barge_spawned =spawn_corpse(zat_b44_stalker_barge:zat_b44_stalker_barge_dead_walk)%
+
+[sr_idle@barge_pda_story]
+on_info = {=actor_has_item(zat_b44_barge_pda) -zat_b44_stalker_barge_body_searched} %=play_sound(zat_b44_stalker_barge_pda) +zat_b44_stalker_barge_body_searched%
+on_info2 = {+zat_b44_tech_buddies_started -zat_b44_tech_buddies_given} %=give_task(zat_b44_tech_buddies) +zat_b44_tech_buddies_given%
+on_info3 = {+zat_b44_tech_buddies_joker_told +zat_b44_tech_buddies_barge_told -zat_b44_tech_buddies_both_told} sr_idle@nil %+zat_b44_tech_buddies_both_told +zat_b44_tech_buddies_told%
+
+[sr_idle@nil]

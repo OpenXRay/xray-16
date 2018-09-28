@@ -1,0 +1,12 @@
+[logic]
+active = nil;ph_idle@wait
+
+[ph_idle@wait]
+on_info = {+jup_b207_morgan_gived_depot} ph_idle@hit %=spawn_object(jup_b207_depot_cover:jup_b207_depot_cover)%
+on_info2 = {+jup_b207_freedom_knows_about_depot} ph_idle@hit %=spawn_object(jup_b207_depot_cover:jup_b207_depot_cover)%
+on_info3 = {+jup_b207_duty_knows_about_depot} ph_idle@hit %=spawn_object(jup_b207_depot_cover:jup_b207_depot_cover)%
+
+[ph_idle@hit]
+on_info = {=story_object_exist(jup_b207_depot_cover_id)} ph_idle@nil %=force_obj(jup_b207_depot_cover_id) =destroy_object%
+
+[ph_idle@nil]

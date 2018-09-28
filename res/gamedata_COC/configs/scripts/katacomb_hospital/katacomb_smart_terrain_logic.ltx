@@ -1,0 +1,90 @@
+;minigunner z1
+[logic@kat_hosp_z1_minigunner_excl]
+active = beh@kat_hosp_z1_minigunner_excl
+;suitable = {!surge_started} true
+prior = 60
+
+[meet@general]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+[beh@general]
+behavior_state = beh_move
+target = waypoint
+walk_dist = 100
+jog_dist = 220
+wait_anim = rush
+walk_anim = rush
+jog_anim = rush
+run_anim = rush
+delay_anim = guard
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = meet@general
+
+[beh@idle]:beh@general
+on_info = {!has_enemy} beh@kat_hosp_z1_minigunner_excl
+
+[beh@kat_hosp_z1_minigunner_excl]:beh@general
+pt1 = 1,guard | pos:-85.12,25.42,681.26 look:-84.76,24.75,707.27
+path_end = beh@kat_hosp_z1_minigunner_excl_ready
+
+[beh@kat_hosp_z1_minigunner_excl_ready]:beh@general
+no_combat_job = true
+pt1 = 20000,ward | pos:-85.12,25.42,681.26 look:-84.76,24.75,707.27
+path_end = loop
+on_info = {=pure_enemy_dist_le(20)} beh@idle
+
+;minigunner z3
+[logic@kat_hosp_z3_minigunner_excl]
+active = beh@kat_hosp_z3_minigunner_excl
+;suitable = {!surge_started} true
+prior = 60
+
+[meet@general2]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+[beh@general2]
+behavior_state = beh_move
+target = waypoint
+walk_dist = 100
+jog_dist = 220
+wait_anim = rush
+walk_anim = rush
+jog_anim = rush
+run_anim = rush
+delay_anim = guard
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = meet@general2
+
+[beh@idle2]:beh@general2
+on_info = {!has_enemy} beh@kat_hosp_z3_minigunner_excl
+
+[beh@kat_hosp_z3_minigunner_excl]:beh@general2
+pt1 = 1,guard | pos:-85.30,21.82,568.71 look:-86.52,25.29,592.11
+path_end = beh@kat_hosp_z3_minigunner_excl_ready
+
+[beh@kat_hosp_z3_minigunner_excl_ready]:beh@general2
+no_combat_job = true
+pt1 = 20000,ward | pos:-85.30,21.82,568.71 look:-86.52,25.29,592.11
+path_end = loop
+on_info = {=pure_enemy_dist_le(20)} beh@idle2
+

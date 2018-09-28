@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- ASSASSINATION FOR MERCS TASK -->
+	<string id="cit_killers_merc_trader_stalker_task_1_name">
+		<text>Убить сталкера</text>
+	</string>
+	<string id="cit_killers_merc_trader_stalker_task_1_text">
+		<text>Необходимо найти и ликвидировать цель.</text>
+	</string>
+	<string id="cit_killers_merc_trader_stalker_task_1_about">
+		<text>Наш наниматель на днях предоставил новый список заказов, и кому-то нужно всё это разгребать. Сейчас времена тяжёлые - бойцов мало, заданий много, а работу-то делать надо. Мы ведь не хотим потерять  доверие заказчиков, правильно? В общем, твоя задача - найти и замочить одного типа, неважно, кто он. Если интересует, скину детали на твой КПК.</text>
+	</string>
+	<string id="cit_killers_merc_trader_stalker_task_1_finish">
+		<text>Сделано? Отлично. Вот твоя доля:</text>
+	</string>
+	<!-- ASSAULT TERRITORY FOR MERCS TASK -->
+	<string id="cit_killers_merc_trader_stalker_task_2_name">
+		<text>Зачистка</text>
+	</string>
+	<string id="cit_killers_merc_trader_stalker_task_2_text">
+		<text>Очистите область от любых враждебных элементов.</text>
+	</string>
+	<string id="cit_killers_merc_trader_stalker_task_2_about">
+		<text>Мне нужно, чтобы ты сыграл ключевую роль в нападении. Очисти указанную область от любых враждебных сил.</text>
+	</string>
+	<string id="cit_killers_merc_trader_stalker_task_2_finish">
+		<text>Отличная работа, боец.</text>
+	</string>
+	<!-- FIND LEVEL 1 TOOLS FOR HOG TASK -->
+	<string id="cit_killers_merc_mechanic_stalker_task_1_name">
+		<text>Найти Хогу %s</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_1_text">
+		<text>Необходимо достать %s и отнести их Хогу, чтобы он смог проводить модернизацию снаряжения.</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_1_about">
+		<text>Есть предложение. Мне нужны кое-какие инструменты, сможешь принести - получишь награду. Идёт?</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_1_fetch_about">
+		<text>Есть предложение. Мне нужны кое-какие инструменты, сможешь принести - получишь награду. Идёт? Отлично. Я ищу %s. Там должны быть разные масла и инструменты для работы с оружием. Если достанешь - я в долгу не останусь.</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_1_fetch_finish">
+		<text>Неплохо, именно то, что я искал.</text>
+	</string>
+	<!-- FIND LEVEL 2 TOOLS FOR HOG TASK -->
+	<string id="cit_killers_merc_mechanic_stalker_task_2_name">
+		<text>Найти Хогу %s</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_2_text">
+		<text>Необходимо достать %s и отнести их Хогу. Технику нужны инструменты получше.</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_2_about">
+		<text>Есть ещё одно предложение. Тот ремнабор, что ты мне принес, конечно, хорош, но в нём есть не всё, что мне нужно. Сможешь найти мне набор получше?</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_2_fetch_about">
+		<text>Есть ещё одно предложение. Тот ремнабор, что ты мне принес, конечно, хорош, но в нём есть не всё, что мне нужно. Сможешь найти мне набор получше? Мне нужны %s. Не знаю, где ты их достанешь, но если найдёшь - тащи.</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_2_fetch_finish">
+		<text>Спасибо. Порадовал.</text>
+	</string>
+	<!-- FIND LEVEL 3 TOOLS FOR HOG TASK -->
+	<string id="cit_killers_merc_mechanic_stalker_task_3_name">
+		<text>Найти Хогу %s</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_3_text">
+		<text>Необходимо достать %s и отнести их Хогу. Технику нужны наилучшие инструменты.</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_3_about">
+		<text>Есть ещё одно предложение. Тот второй ремнабор, что ты мне принес, конечно, хорош, но и в нём кое-чего недостаёт. Сможешь найти мне набор получше?</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_3_fetch_about">
+		<text>Есть ещё одно предложение. Тот второй ремнабор, что ты мне принес, конечно, хорош, но и в нём кое-чего недостаёт. Сможешь найти мне набор получше? Мне нужны %s. Не знаю даже, где такие водятся, но если найдёшь - тащи.</text>
+	</string>
+	<string id="cit_killers_merc_mechanic_stalker_task_3_fetch_finish">
+		<text>Спасибо. Теперь у меня есть всё, что мне нужно.</text>
+	</string>
+</string_table>

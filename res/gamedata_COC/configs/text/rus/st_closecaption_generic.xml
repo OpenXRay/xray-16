@@ -1,0 +1,827 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<string_table>
+
+	<!-- Bandits -->
+	
+	<string id="cc_generic-bandit-meet_hello_1">
+		<text>Чё нового, э?</text>
+	</string>
+	<string id="cc_generic-bandit-meet_hello_2">
+		<text>Ну, типа, привет.</text>
+	</string>
+	<string id="cc_generic-bandit-meet_hello_3">
+		<text>Чё, ну чё ты тут мельтешишь!</text>
+	</string>
+	
+	<string id="cc_generic-bandit-meet_hide_weapon_1">
+		<text>Сышь, ты, тушкан, ты запарил уже стволом размахивать!</text>
+	</string>
+	<string id="cc_generic-bandit-meet_hide_weapon_2">
+		<text>Заныкал волыну, быренька!</text>
+	</string>
+	<string id="cc_generic-bandit-meet_hide_weapon_3">
+		<text>Ты чё на? Пушку нафиг!</text>
+	</string>
+	<string id="cc_generic-bandit-meet_hide_weapon_4">
+		<text>Или пушку нах, или сам вали!</text>
+	</string>
+	<string id="cc_generic-bandit-meet_hide_weapon_5">
+		<text>Чё, крутой, да? Убери волыну!</text>
+	</string>
+	<string id="cc_generic-bandit-meet_hide_weapon_6">
+		<text>Ты волыной не свети, нехрен!</text>
+	</string>
+	
+	<string id="cc_generic-bandit-meet_use_no_default_1">
+		<text>Сышишь, иди с другими трепись, я пас.</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_default_2">
+		<text>Кореш, мне щас не до тёрок.</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_default_3">
+		<text>Отвали на, внатуре!</text>
+	</string>
+	
+	<string id="cc_generic-bandit-meet_use_no_fight_1">
+		<text>Ты чё, охренел?</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_fight_2">
+		<text>Стреляй, давай, потом побазарим!</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_fight_3">
+		<text>Чё, ну чё ты варежку раззяпил, потом перетрём!</text>
+	</string>
+	
+	<string id="cc_generic-bandit-meet_use_no_talk_leader_1">
+		<text>Со всеми вопросами - вали к бригадному.</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_talk_leader_2">
+		<text>Иди, бугру по ушам катайся, а мои не казённые.</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_talk_leader_3">
+		<text>Если те перетереть чё надо - вон пахан.</text>
+	</string>
+	
+	<string id="cc_generic-bandit-meet_use_no_weapon_1">
+		<text>Со стволом в лапах - какой базар? Убери на!</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_weapon_2">
+		<text>Волыну заныкай, тогда и побазарим.</text>
+	</string>
+	<string id="cc_generic-bandit-meet_use_no_weapon_3">
+		<text>Или пушку нах, или сам вали!</text>
+	</string>
+	
+	<!-- Clear Sky -->
+	
+	<string id="cc_generic-csky-meet_hello_1">
+		<text>Чего тебе, сталкер?</text>
+	</string>
+	<string id="cc_generic-csky-meet_hello_2">
+		<text>Тебе нужно что, сталкер?</text>
+	</string>
+	<string id="cc_generic-csky-meet_hello_3">
+		<text>Чего тебе?</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_hide_weapon_1">
+		<text>Оружие убрал.</text>
+	</string>
+	<string id="cc_generic-csky-meet_hide_weapon_2">
+		<text>Оружие опусти, мужик!</text>
+	</string>
+	<string id="cc_generic-csky-meet_hide_weapon_3">
+		<text>Не балуй, оружие спрячь!</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_use_no_talk_leader_1">
+		<text>Если нужно что, спрашивай у главного...</text>
+	</string>
+	<string id="cc_generic-csky-meet_use_no_talk_leader_2">
+		<text>Слушай, все вопросы - к главному.</text>
+	</string>
+	<string id="cc_generic-csky-meet_use_no_talk_leader_3">
+		<text>Вон старший стоит. Так ты к нему обращайся.</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_use_no_weapon_1">
+		<text>Опусти пушку, потом поговорим.</text>
+	</string>
+	<string id="cc_generic-csky-meet_use_no_weapon_2">
+		<text>Убери ствол, если говорить охота.</text>
+	</string>
+	<string id="cc_generic-csky-meet_use_no_weapon_3">
+		<text>Оружие убери сперва.</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_weapon_start_1">
+		<text>Опусти пушку, потом поговорим.</text>
+	</string>
+	<string id="cc_generic-csky-meet_weapon_start_2">
+		<text>Убери ствол, если говорить охота.</text>
+	</string>
+	<string id="cc_generic-csky-meet_weapon_start_3">
+		<text>Оружие убери сперва.</text>
+	</string>
+
+	<string id="cc_generic-csky-meet_weapon_wait_1">
+		<text>Волыну спрячь!</text>
+	</string>
+	<string id="cc_generic-csky-meet_weapon_wait_2">
+		<text>Убери оружие.</text>
+	</string>
+	<string id="cc_generic-csky-meet_weapon_wait_3">
+		<text>Ствол убери!</text>
+	</string>
+	<string id="cc_generic-csky-meet_weapon_wait_4">
+		<text>Ствол на плечо!</text>
+	</string>
+	<string id="cc_generic-csky-meet_weapon_wait_5">
+		<text>Так, давай-ка без шуток. Прячь оружие.</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_stop_1">
+		<text>М-м да, кого только в Зону не заносит.</text>
+	</string>
+	<string id="cc_generic-csky-meet_stop_2">
+		<text>Не хочешь - как хочешь.</text>
+	</string>
+	<string id="cc_generic-csky-meet_stop_3">
+		<text>Ох ты, беда. Говорить, наверное, не умеем.</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_general_wait_1">
+		<text>Сколько мне ещё ждать?</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_wait_2">
+		<text>Эй, ты, заснул, что ли?</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_wait_3">
+		<text>Эй, проснись!</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_wait_4">
+		<text>Мужик, не тормози.</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_wait_5">
+		<text>Ты что хотел-то?</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_general_stop_1">
+		<text>Ты не в себе, что ли?</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_stop_2">
+		<text>Ох и зануда, ни слова не сказал.</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_stop_3">
+		<text>Вот, блин! Ещё одно немое полено.</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_general_start_1">
+		<text>Чего тебе?</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_start_2">
+		<text>Ты что-то хотел?</text>
+	</string>
+	<string id="cc_generic-csky-meet_general_start_3">
+		<text>Тебе чего надо-то?</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_comander_wait_1">
+		<text>Ты говори уже, чего хотел.</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_wait_2">
+		<text>Давай, выкладывай скорее!</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_wait_3">
+		<text>У тебя ко мне дело есть или как?</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_wait_4">
+		<text>Чего молчишь-то?</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_wait_5">
+		<text>Чего ждёшь?</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_comander_stop_1">
+		<text>М-м да, кого только в Зону не заносит.</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_stop_2">
+		<text>Не хочешь - как хочешь.</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_stop_3">
+		<text>Ох ты, беда. Говорить, наверное, не умеем.</text>
+	</string>
+	
+	<string id="cc_generic-csky-meet_comander_start_1">
+		<text>Чего тебе, сталкер?</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_start_2">
+		<text>Тебе нужно что, сталкер?</text>
+	</string>
+	<string id="cc_generic-csky-meet_comander_start_3">
+		<text>Я тебя слушаю.</text>
+	</string>
+	
+	<!-- Duty -->
+	
+	<string id="cc_generic-dolg-meet_hello_1">
+		<text>Какие новости, сталкер?</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hello_2">
+		<text>Как жизнь?</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hello_3">
+		<text>Ну, здорова!</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_hide_weapon_1">
+		<text>Опусти оружие.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_2">
+		<text>Оружие прибери, дружище.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_3">
+		<text>Парень, оружие спрячь.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_7">
+		<text>Сталкер, оружие за спину.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_8">
+		<text>Оружие убери, я сказал!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_9">
+		<text>Спрячь оружие, сталкер!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_10">
+		<text>Что, не можешь со стволом расстаться?</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_11">
+		<text>Так, парень, оружие спрячь.</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_default_1">
+		<text>Нет, сейчас не поговорим.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_default_2">
+		<text>Не выйдет сейчас разговора.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_default_3">
+		<text>Поговорить не получится, извини.</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_fight_1">
+		<text>Ты что, сдурел?!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_fight_2">
+		<text>Нашёл время!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_fight_3">
+		<text>В другой раз поговорим!</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_talk_leader_1">
+		<text>По всем вопросам - к командиру отряда.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_talk_leader_2">
+		<text>Со всеми вопросами - к командиру.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_talk_leader_3">
+		<text>Иди с командиром говори.</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_weapon_1">
+		<text>Оружие убери - поговорим.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_2">
+		<text>Спрячь оружие - тогда и разговор.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_3">
+		<text>Оружием только не размахивай.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_6">
+		<text>Так, или пушку убери, или дуй отсюда.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_7">
+		<text>Нет, так разговора не выйдет. Спрячь пукалку сначала.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_8">
+		<text>Убери свою пушку, тогда и разговор будет!</text>
+	</string>
+	
+	<!-- Ecologists -->
+	
+	<string id="cc_generic-ecolog-meet_hello_1">
+		<text>Что скажешь?</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hello_2">
+		<text>Слушаю тебя.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hello_3">
+		<text>День добрый.</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_hide_weapon_1">
+		<text>Я нервный. Не держи меня на мушке.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hide_weapon_2">
+		<text>Ты сперва пушку спрячь.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hide_weapon_3">
+		<text>Мужик, сначала оружие спрячь.</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_default_1">
+		<text>Не о чем мне сейчас трепаться, понимаешь?</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_default_2">
+		<text>Прости, разговора не будет.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_default_3">
+		<text>Не приставай с разговорами, добром прошу.</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_fight_1">
+		<text>Какие разговоры? Прячься, идиот!</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_fight_2">
+		<text>Потом! Всё потом!</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_fight_3">
+		<text>У тебя голова на плечах есть? Нашёл время!</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_talk_leader_1">
+		<text>Мужик, ну не могу я с тобой разговаривать, понимаешь?</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_talk_leader_2">
+		<text>Прости, разговора не будет.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_talk_leader_3">
+		<text>Да отстань ты со своими разговорами!</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_weapon_1">
+		<text>Хочешь поговорить, убери оружие.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_weapon_2">
+		<text>Убирай ствол, мужик, а то разговора не будет.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_weapon_3">
+		<text>Э, нет, так не пойдёт. Давай без оружия.</text>
+	</string>
+	
+	<!-- Freedom -->
+	
+	<string id="cc_generic-freedom-meet_hello_1">
+		<text>Что скажешь, брат?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hello_2">
+		<text>Эй, сталкер, с чем пожаловал?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hello_3">
+		<text>Здоров!</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_hide_weapon_1">
+		<text>Оружие-то опусти, а?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_2">
+		<text>Сталкер, ствол у тебя красивый, да только убрал бы ты его!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_3">
+		<text>Эй, ты, кончай ружьём махать.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_9">
+		<text>Ты это, не безобразничай. Ствол спрячь, а?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_10">
+		<text>Мужик, ты уже достал своим стволом махать.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_11">
+		<text>Прячь игрушку!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_12">
+		<text>Убирай волыну к чёрту!</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_default_1">
+		<text>Э, отстань, любопытный!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_default_2">
+		<text>Да не буду я с тобой говорить.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_default_3">
+		<text>Мэн, поговорить нам с тобой нынче не светит.</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_fight_1">
+		<text>Эй, ты чё, тупой?!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_fight_2">
+		<text>Чувак, ты офонарел?!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_fight_3">
+		<text>Тут типа немного стреляют, понял?!</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_talk_leader_1">
+		<text>Чувак, иди вон лучше с главным пообщайся!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_talk_leader_2">
+		<text>Я тебе вряд ли что интересное расскажу. Иди-ка ты лучше с главным беседуй.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_talk_leader_3">
+		<text>Слушай, не грузи, а? Вон главный стоит, его и спрашивай.</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_weapon_1">
+		<text>Но ты оружие своё сначала спрячь!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_2">
+		<text>Давай по-дружески, чувак. Без ствола.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_3">
+		<text>Спрячь ствол - поговорим.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_6">
+		<text>Ты стрелять собрался или разговаривать? Убери ствол.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_7">
+		<text>Мэн! Давай-ка ты свои аргументы за спину спрячешь, а?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_8">
+		<text>Ну не люблю я говорить под прицелом, чувак.</text>
+	</string>
+	
+	<!-- Loner -->
+	
+	<string id="cc_generic-stalker-meet_hello_1">
+		<text>Ну, привет.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hello_2">
+		<text>Привет, брат!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hello_3">
+		<text>Ну, что расскажешь?</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_hide_weapon_1">
+		<text>Оружие убрал.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_2">
+		<text>Оружие опусти, мужик!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_3">
+		<text>Не балуй, оружие спрячь!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_7">
+		<text>Оружие спрячь!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_6">
+		<text>Ты пукалкой-то не размахивай!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_8">
+		<text>Нафиг ствол!</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_default_1">
+		<text>Не буду я говорить.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_default_2">
+		<text>Не охота мне с тобой болтать.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_default_3">
+		<text>Не в настроении я нынче трепаться.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_fight_1">
+		<text>Какие сейчас разговоры?!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_fight_2">
+		<text>Мужик, ты сдурел? Потом поговорим!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_fight_3">
+		<text>Не время трепаться!</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_talk_leader_1">
+		<text>Если нужно что, спрашивай у главного...</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_talk_leader_2">
+		<text>Слушай, все вопросы - к главному.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_talk_leader_3">
+		<text>Вон старший стоит. Так ты к нему обращайся.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_weapon_1">
+		<text>Не люблю я говорить под прицелом, мужик.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_weapon_2">
+		<text>Эй, ты пушкой-то не маши! Для разговора она не нужна.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_weapon_3">
+		<text>Как спрячешь ствол, будет разговор.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_weapon_9">
+		<text>Не, так разговора не будет. Оружие убери.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_weapon_start_1">
+		<text>Не люблю я говорить под прицелом, мужик.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_start_2">
+		<text>Эй, ты пушкой-то не маши! Для разговора она не нужна.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_start_3">
+		<text>Как спрячешь ствол, будет разговор.</text>
+	</string>
+
+	<string id="cc_generic-stalker-meet_weapon_wait_1">
+		<text>Ты что, ствол вообще из рук не выпускаешь?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_2">
+		<text>Нафиг ствол!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_3">
+		<text>С пушкой - какой разговор? Спрячь от греха!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_4">
+		<text>Ты пукалкой-то не размахивай!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_5">
+		<text>Оружие спрячь!</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_wait_1">
+		<text>Слушаю тебя.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_2">
+		<text>Ну, рассказывай давай.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_3">
+		<text>Слушай, у меня дел по горло, говори давай.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_4">
+		<text>Застеснялся, что ли?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_5">
+		<text>Да ты не стесняйся, говори.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_6">
+		<text>Ты по делу если, так говори, не тупи.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_7">
+		<text>Так, короче, ты долго ещё молчать будешь?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_8">
+		<text>Не спи, замёрзнешь.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_9">
+		<text>Да говори уже!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_10">
+		<text>Ну давай уже, не телься.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_11">
+		<text>Я не понял, ты хотел что, нет?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_12">
+		<text>Я что, за тебя говорить должен?</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_stop_1">
+		<text>Хм, тяжело с немым договориться, однако.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_2">
+		<text>Научишься говорить - подваливай.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_3">
+		<text>Иди-ка ты помолчи с кем-нибудь другим.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_4">
+		<text>Да, вот и поговорили.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_5">
+		<text>Что, в молчанку будем играть?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_6">
+		<text>Тебе чего надо? Нет, стоит, молчит...</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_general_wait_1">
+		<text>Не спи, замёрзнешь.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_2">
+		<text>Да говори уже!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_3">
+		<text>Ну давай уже, не телься.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_4">
+		<text>Я не понял, ты хотел что, нет?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_5">
+		<text>Я что, за тебя говорить должен?</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_general_stop_1">
+		<text>Да, вот и поговорили.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_stop_2">
+		<text>Что, в молчанку будем играть?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_stop_3">
+		<text>Тебе чего надо? Нет, стоит, молчит...</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_general_start_1">
+		<text>Ну, привет.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_start_2">
+		<text>Привет, брат!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_start_3">
+		<text>Слушаю тебя.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_comander_wait_1">
+		<text>Слушай, у меня дел по горло, говори давай.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_2">
+		<text>Застеснялся, что ли?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_3">
+		<text>Да ты не стесняйся, говори.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_4">
+		<text>Ты по делу если, так говори, не тупи.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_5">
+		<text>Так, короче, ты долго ещё молчать будешь?</text>
+	</string>
+	
+	<!-- Mercenaries -->
+	
+	<string id="cc_generic-killer-meet_hello_1">
+		<text>Подходи. Не кусаюсь.</text>
+	</string>
+	<string id="cc_generic-killer-meet_hello_2">
+		<text>Здорово, брат!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hello_3">
+		<text>Ты кто такой?</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_1">
+		<text>Ты пушку-то спрячь!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_2">
+		<text>Если хочешь поговорить, так пушку опусти и подходи. Медленно!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_3">
+		<text>Если хочешь поговорить, так пушку опусти и подходи. Медленно!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_4">
+		<text>Ты пушку-то спрячь!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_5">
+		<text>Если хочешь поговорить, так пушку опусти и подходи. Медленно!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_6">
+		<text>Ты пушку-то спрячь!</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_default_1">
+		<text>Не, у меня нет настроения болтать.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_default_2">
+		<text>Извини, сейчас - неохота болтать.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_default_3">
+		<text>Дружище, ты плохо понял? Я не хочу с тобой разговаривать.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_fight_1">
+		<text>Не сейчас!</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_fight_2">
+		<text>Ты чего, сдурел? Не сейчас!</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_fight_3">
+		<text>Война идёт, не видишь, что ли?</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_talk_leader_1">
+		<text>Да не охота мне болтать, иди с командиром говори.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_talk_leader_2">
+		<text>Если что - к командиру. С ним беседуй.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_talk_leader_3">
+		<text>Да не охота мне болтать, иди с командиром говори.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_weapon_1">
+		<text>Э! Сперва пушку спрячь. Потом поговорим.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_weapon_2">
+		<text>Если хочешь говорить - убери волыну.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_weapon_3">
+		<text>Спрячь волыну, потом потолкуем.</text>
+	</string>
+
+	<!-- Military -->
+	
+	<string id="cc_generic-military-meet_hello_1">
+		<text>Здоров.</text>
+	</string>
+	<string id="cc_generic-military-meet_hello_2">
+		<text>Чего тебе?</text>
+	</string>
+	<string id="cc_generic-military-meet_hello_3">
+		<text>Ну? Я слушаю...</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_hide_weapon_1">
+		<text>Оружие опусти.</text>
+	</string>
+	<string id="cc_generic-military-meet_hide_weapon_2">
+		<text>Оружие за спину!</text>
+	</string>
+	<string id="cc_generic-military-meet_hide_weapon_3">
+		<text>Спрячь оружие.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_default_1">
+		<text>У меня нет времени болтать.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_default_2">
+		<text>Ничем помочь не могу.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_default_3">
+		<text>Оставь меня в покое.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_fight_1">
+		<text>После поговорим!</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_fight_2">
+		<text>Разговорчики!</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_fight_3">
+		<text>Нашёл время болтать.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_talk_leader_1">
+		<text>Сходил бы ты лучше к командиру.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_talk_leader_2">
+		<text>С вопросами - к командиру.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_talk_leader_3">
+		<text>Моё дело стрелять. А насчёт поговорить - это к командиру.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_weapon_1">
+		<text>Хочешь говорить - спрячь оружие.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_weapon_2">
+		<text>Разговор будет, как ствол уберёшь.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_weapon_3">
+		<text>Оружие опусти, тогда поговорим.</text>
+	</string>
+
+	<!-- Monolith -->
+	
+	<string id="cc_generic-monolith-meet_hello_1">
+		<text>Никому не верь, кроме Монолита и братьев своих. Никому.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_hello_2">
+		<text>Здесь слишком пусто.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_hello_3">
+		<text>Наверное, я когда-то был здесь. Не помню.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_hello_4">
+		<text>Странно... Всё здесь странно.</text>
+	</string>
+	
+	<string id="cc_generic-monolith-meet_use_no_fight_1">
+		<text>Монолит... Великий Монолит.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_fight_2">
+		<text>Враги близко... Такова воля Монолита.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_fight_3">
+		<text>Монолит... Я твой верный слуга.</text>
+	</string>
+	
+	<string id="cc_generic-monolith-meet_use_no_talk_leader_1">
+		<text>Давай лучше помолчим.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_talk_leader_2">
+		<text>Не стоит болтать попусту.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_talk_leader_3">
+		<text>Не хочу сейчас разговаривать.</text>
+	</string>
+	
+</string_table>

@@ -1,0 +1,21 @@
+[smart_terrain];mar_smart_terrain_4_5
+squad_id = 10
+max_population = 5
+;spawn_point = mar_smart_terrain_10_5_spawn_point
+respawn_params = respawn@mar_smart_terrain_4_5
+respawn_idle = 86400
+
+
+[respawn@mar_smart_terrain_4_5]
+spawn_military@novice
+
+[spawn_military@novice]
+spawn_squads = army_sim_squad_novice
+spawn_num = 2
+
+[exclusive]
+mar_smart_terrain_4_5_camp_work_1 = marsh\mar_smart_terrain_4_5_smart_logic.ltx
+mar_smart_terrain_4_5_camp_work_2 = marsh\mar_smart_terrain_4_5_smart_logic.ltx
+mar_smart_terrain_4_5_camp_work_3 = marsh\mar_smart_terrain_4_5_smart_logic.ltx
+mar_smart_terrain_4_5_camp_work_4 = marsh\mar_smart_terrain_4_5_smart_logic.ltx
+mar_smart_terrain_4_5_camp_work_5 = marsh\mar_smart_terrain_4_5_smart_logic.ltx

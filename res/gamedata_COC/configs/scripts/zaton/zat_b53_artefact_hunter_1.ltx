@@ -1,0 +1,151 @@
+[logic@zat_b53_artefact_hunter_1]
+suitable = {=check_npc_name(zat_b53_artefact_hunter_1)} true
+prior = 70
+active = walker@wait_actor_scene_start
+on_hit = hit
+on_death = death
+dont_spawn_loot
+
+[walker@wait_actor_scene_start]
+corpse_detection_enabled = false
+meet = no_meet
+def_state_moving = walk
+path_walk = artefact_hunter_1_spawn_point
+path_look = artefact_hunter_1_wounted_particle_steam_point_1
+on_signal = zat_b53_artefact_hunter_1_scene_start | remark@scene_start
+on_info = {+zat_b53_thanks_dialog} walker@go_friend
+
+[remark@scene_start]
+corpse_detection_enabled = false
+meet = no_meet
+anim = probe_stand
+target = path | zat_b53_artefact_hunter_1_wounted_particle_steam_point_1, 0
+on_info = {=actor_in_zone(zat_b53_actor_find_artefact_hunters_restrictor) =actor_see_npc} walker@start_go %+zat_b53_artefact_hunter_2_must_say_go_on%
+on_info2 = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info3 = {+zat_b53_thanks_dialog} walker@go_friend
+
+[walker@start_go]
+corpse_detection_enabled = false
+meet = no_meet
+def_state_moving = walk
+path_walk = artefact_hunter_1_wounted_particle_steam_point_1
+path_look = artefact_hunter_1_wounted_particle_steam_point_2
+on_info = {=npc_in_zone(zat_b53_artefact_hunter_1_wounted_restrictor_1)} remark@probe %+artefact_hunter_1_in_zone_wounted_restrictor_1%
+on_info2 = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info3 = {+zat_b53_go_nil} %=kill_npc%, {=surge_kill_all} %=kill_npc%
+
+[remark@probe]
+corpse_detection_enabled = false
+meet = no_meet
+anim = probe_way
+target = path | zat_b53_artefact_hunter_1_big_anomaly_go, 0
+on_game_timer = 130 | remark@wait_go_big_anomalie %+zat_b53_come_on_continue_sound%
+on_info = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info2 = {+zat_b53_go_nil} %=kill_npc%, {=surge_kill_all} %=kill_npc%
+
+[remark@wait_go_big_anomalie]
+corpse_detection_enabled = false
+meet = no_meet
+anim = guard_na
+target = path | zat_b53_artefact_hunter_1_big_anomaly_go, 0
+on_game_timer = 110 | walker@go_on_in_big_anomaly %+zat_b53_come_on_continue_sound%
+on_info = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info2 = {+zat_b53_go_nil} %=kill_npc%, {=surge_kill_all} %=kill_npc%
+
+[walker@go_on_in_big_anomaly]
+corpse_detection_enabled = false
+meet = no_meet
+path_walk = artefact_hunter_1_big_anomaly_go
+on_info2 = {=npc_in_zone(zat_b53_artefact_hunter_1_wounted_restrictor_2)} walker@wounded %+zat_b53_artefact_hunter_1_in_zone_ounted_restrictor_2%
+on_info3 = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info4 = {+zat_b53_go_nil} %=kill_npc%, {=surge_kill_all} %=kill_npc%
+
+[walker@wounded]
+wounded = wounded
+corpse_detection_enabled = false
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+path_walk = artefact_hunter_1_big_anomaly_go
+on_info = {+zat_b53_go_nil} %=kill_npc%, {=surge_kill_all} %=kill_npc%
+on_info2 = {+zat_b53_thanks_dialog} walker@go_friend %=actor_friend%
+on_info3 = {=actor_enemy} walker@wounded_actor_enemy
+on_info4 = {=dist_to_actor_ge(100)} %=kill_npc%
+
+[walker@wounded_actor_enemy]
+wounded = wounded
+corpse_detection_enabled = false
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+path_walk = artefact_hunter_1_big_anomaly_go
+on_info = {+zat_b53_go_nil} %=kill_npc%, {=surge_kill_all} %=kill_npc%
+on_info2 = {=dist_to_actor_ge(100)} %=kill_npc%
+
+[walker@go_friend]
+corpse_detection_enabled = false
+meet = no_meet
+def_state_moving = run
+path_walk = artefact_hunter_1_with_friend_walk
+path_look = artefact_hunter_1_sit_ass_look
+on_signal = zat_b53_artefact_hunter_1_with_friend_walk_sig | remark@sit_ass_talk %+zat_b53_artefact_hunter_1_with_friend%
+on_info = {+zat_b53_actor_enemy} walker@actor_enemy
+on_info2 = {=dist_to_actor_le(5) !npc_in_zone(zat_b53_zone_field_thermal_weak_self_use) -zat_b53_once_use_self_dialog} remark@thanks_self %+zat_b53_once_use_self_dialog%
+
+[remark@thanks_self]
+meet = meet@self
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+corpse_detection_enabled = false
+combat_ignore_keep_when_attacked = true 
+target = story | actor
+on_info = {+zat_b53_thanks_dialog_end !talking} walker@go_friend
+
+[remark@sit_ass_talk]
+corpse_detection_enabled = false
+meet = meet
+anim = sit_ass
+target = path | zat_b53_artefact_hunter_1_sit_ass_look, 0
+on_info = {+zat_b53_actor_enemy} walker@actor_enemy
+
+[walker@actor_enemy]
+corpse_detection_enabled = false
+meet = no_meet
+path_walk = artefact_hunter_1_spawn_point
+on_info = %=actor_enemy%
+
+[meet]
+use = true
+abuse = false
+allow_break = false
+trade_enable = false
+close_anim = nil
+close_victim = nil
+close_distance = 0
+far_distance = 0
+
+[meet@self]
+use = self
+meet_dialog = zat_b53_artefact_hunter_1_gathering_artefacts
+abuse = false
+allow_break = false
+trade_enable = false
+close_anim = nil
+close_victim = nil
+close_distance = 0
+far_distance = 0
+
+[hit]
+on_info = {=hit_by_actor} %+zat_b53_actor_enemy%
+
+[death]
+on_info = {=killed_by_actor -zat_b53_dec_faction_goodwill_done} %=dec_faction_goodwill_to_actor(stalker:100) +zat_b53_dec_faction_goodwill_done%
+
+[wounded]
+autoheal = false
+enable_talk = true
+not_for_help = true
+hp_state = 101|wounded_heavy@help_heavy
+hp_state_see = 101|wounded_heavy@help_heavy
+hp_victim = 101|nil
+hp_fight = 101|false
+hp_cover = 101|false

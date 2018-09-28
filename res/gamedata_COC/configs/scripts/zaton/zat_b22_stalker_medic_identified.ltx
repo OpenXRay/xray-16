@@ -1,0 +1,17 @@
+[logic]
+active = nil ;sr_idle@1 
+
+[sr_idle@general]
+on_info = {+zat_b22_stalker_medic_body_searched -zat_b22_stalker_vampire_story =actor_has_item(zat_b22_medic_pda)} sr_idle@4 %=play_sound(zat_b22_stalker_medic_diary) +zat_b22_stalker_vampire +zat_b22_stalker_vampire_story%
+on_info2 = {=actor_has_item(zat_b22_medic_pda) -zat_b22_actor_has_proof} %+zat_b22_actor_has_proof%
+
+[sr_idle@1]:sr_idle@general
+on_actor_inside = sr_idle@2 %+zat_b22_actor_in%
+
+[sr_idle@2]:sr_idle@general
+on_actor_outside = sr_idle@general %+zat_b22_actor_gone% 
+
+[sr_idle@4]
+on_info = {=actor_has_item(zat_b22_medic_pda)} sr_idle@5 %+zat_b22_actor_has_proof%
+
+[sr_idle@5]

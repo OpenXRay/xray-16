@@ -1,0 +1,283 @@
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+
+
+[logic@jup_a12_merc_cover]
+active = walker@merc_cover_start
+post_combat_time = 0, 0
+suitable = {=check_npc_name(jup_a12_merc_cover) -jup_a12_merc_attack_started} true
+prior = 200
+
+[walker@merc_cover_start]
+path_walk = kamp_walker_walk
+path_look = kamp_walker_look
+def_state_moving = assault
+on_info = {+jup_a12_mercs_go_to_positions} walker@cover_walk_to_position %=play_sound(jup_a12_merc_lets_go)%, {!is_jup_a12_mercs_time} %+jup_a12_mercs_go_to_positions%
+on_info2 = {-jup_a12_merc_cover_in_merc_camp} %+jup_a12_merc_cover_in_merc_camp%
+meet = meet@cover_merc_kamp_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, {!actor_enemy =dist_to_actor_ge(50)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[meet@cover_merc_kamp_meet]
+meet_dialog = jup_a12_stalker_give_art_dialog
+trade_enable = false
+snd_on_use = {=is_wounded} nil, {=actor_enemy} nil, {=has_enemy} meet_use_no_fight, {=actor_has_weapon} meet_use_no_weapon
+use		   = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {=actor_has_weapon} false, true
+
+[walker@cover_walk_to_position]
+path_walk = cover_to_position_walk
+path_look = cover_to_position_look
+def_state_moving = assault
+on_signal = path_end | walker@cover_walk_on_position %+jup_a12_merc_cover_to_position =play_sound(jup_a12_merc_cover_us) +jup_a12_bandit_guard_can_be_easily_killed%
+on_info = {+jup_a12_merc_cover_to_position} walker@cover_walk_on_position
+team = jup_a12_mercs
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@cover_walk_on_position]
+path_walk = cover_on_position_walk
+path_look = cover_on_position_look
+def_state_moving = sneak_run
+on_signal = path_end | %+jup_a12_merc_cover_on_position =play_sound(jup_a12_merc_ready)%
+on_info = {+jup_a12_merc_cover_on_position} remark@cover_attack_guard
+team = jup_a12_mercs2
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[remark@cover_attack_guard]
+anim = threat_fire
+on_game_timer = 100 | %+jup_a12_bandit_guard_killed%
+target =  story | jup_a12_bandit_guard
+on_info = {+jup_a12_merc_attack_started} %=play_sound(jup_a12_merc_attack_started)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+meet = no_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+
+
+[logic@jup_a12_merc_cover_attack]
+active = camper@cover_attack_containers
+post_combat_time = 0, 0
+suitable = {=check_npc_name(jup_a12_merc_cover) +jup_a12_merc_attack_started} true
+prior = 200
+
+[camper@cover_attack_containers]
+path_walk = merc_cover_attack_containers_walk
+path_look = merc_cover_attack_containers_look
+def_state_moving = assault_fire
+def_state_moving_fire = assault_fire
+no_retreat = true
+on_signal = path_end | walker@cover_walk_to_hangar %+jup_a12_merc_cover_attacked_containers%
+on_info = {+jup_a12_merc_cover_attacked_containers} walker@cover_walk_to_hangar
+on_info2 = {+jup_a12_merc_attack_started -jup_a12_merc_attack_started_sound} %+jup_a12_merc_attack_started_sound =play_sound(jup_a12_merc_attack_started)%
+meet = no_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@cover_walk_to_hangar]
+path_walk = merc_cover_walk_to_hangar_walk
+path_look = merc_cover_walk_to_hangar_look
+on_actor_dist_ge_nvis = 150 | %+jup_a12_mercs_done%
+on_info = {+jup_a12_mercs_done} walker@cover_merc_kamp_after
+meet = meet@merc_hangar_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+def_state_moving = assault
+
+[meet@merc_hangar_meet]
+meet_dialog = jup_a12_merc_done_dialog
+trade_enable = false
+snd_on_use = {=is_wounded} nil, {=actor_enemy} nil, {=has_enemy} meet_use_no_fight, {=actor_has_weapon} meet_use_no_weapon
+use		   = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {=actor_has_weapon} false, true
+
+[walker@cover_merc_kamp_after]
+path_walk = merc_kamp_walker_walk
+path_look = merc_kamp_walker_look
+def_state_moving = assault
+meet = no_meet
+wounded = wounded@no_wound
+
+
+
+[logic@jup_a12_merc_left]
+active = walker@merc_left_start
+post_combat_time = 0, 0
+suitable = {=target_squad_name(jup_a12_merc_stalker_squad) !check_npc_name(jup_a12_merc_cover) -jup_a12_merc_attack_started} true
+prior = 200
+
+[walker@merc_left_start]
+path_walk = kamp_walker_1_walk
+path_look = kamp_walker_look
+def_state_moving = assault
+on_info = {+jup_a12_mercs_go_to_positions} walker@left_walk_to_position
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, {!actor_enemy =dist_to_actor_ge(50)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@left_walk_to_position]
+path_walk = left_to_position_walk
+path_look = left_to_position_look
+def_state_moving = assault
+on_signal = path_end | walker@left_walk_on_position %+jup_a12_merc_left_to_position +jup_a12_bandit_guard_can_be_easily_killed%
+on_info = {+jup_a12_merc_left_to_position} walker@left_walk_on_position
+team = jup_a12_mercs
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@left_walk_on_position]
+path_walk = left_on_position_walk
+path_look = left_on_position_look
+def_state_moving = sneak_run
+on_signal = on_pos | %=play_sound(jup_a12_merc_ready)%
+on_info = {+jup_a12_merc_attack_started} %=play_sound(jup_a12_merc_attack_started)%
+team = jup_a12_mercs2
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+
+
+[logic@jup_a12_merc_left_attack]
+active = camper@left_attack_containers
+post_combat_time = 0, 0
+suitable = {=target_squad_name(jup_a12_merc_stalker_squad) !check_npc_name(jup_a12_merc_cover) +jup_a12_merc_attack_started} true
+prior = 200
+
+[camper@left_attack_containers]
+path_walk = merc_left_attack_containers_walk
+path_look = merc_left_attack_containers_look
+def_state_moving = assault_fire
+def_state_moving_fire = assault_fire
+no_retreat = true
+on_signal = path_end | walker@left_walk_to_hangar %+jup_a12_merc_left_attacked_containers%
+on_info = {+jup_a12_merc_left_attacked_containers} walker@left_walk_to_hangar
+meet = no_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@left_walk_to_hangar]
+path_walk = merc_left_walk_to_hangar_walk
+path_look = merc_left_walk_to_hangar_look
+on_actor_dist_ge_nvis = 150 | %+jup_a12_mercs_done%
+on_info = {+jup_a12_mercs_done} walker@left_merc_kamp_after
+meet = meet@merc_hangar_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+def_state_moving = assault
+
+[walker@left_merc_kamp_after]
+path_walk = merc_kamp_walker_1_walk
+path_look = merc_kamp_walker_look
+def_state_moving = assault
+meet = no_meet
+wounded = wounded@no_wound
+
+
+
+[logic@jup_a12_merc_right]
+active = walker@merc_right_start
+post_combat_time = 0, 0
+suitable = {=target_squad_name(jup_a12_merc_stalker_squad) !check_npc_name(jup_a12_merc_cover) -jup_a12_merc_attack_started} true
+prior = 200
+
+[walker@merc_right_start]
+path_walk = kamp_walker_2_walk
+path_look = kamp_walker_look
+def_state_moving = assault
+on_info = {+jup_a12_mercs_go_to_positions} walker@right_walk_to_position
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, {!actor_enemy =dist_to_actor_ge(50)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@right_walk_to_position]
+path_walk = right_to_position_walk
+path_look = right_to_position_look
+def_state_moving = assault
+on_signal = path_end | walker@right_walk_on_position %+jup_a12_merc_right_to_position +jup_a12_bandit_guard_can_be_easily_killed%
+on_info = {+jup_a12_merc_right_to_position} walker@right_walk_on_position
+team = jup_a12_mercs
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@right_walk_on_position]
+path_walk = right_on_position_walk
+path_look = right_on_position_look
+def_state_moving = sneak_run
+on_signal = on_pos | %=play_sound(jup_a12_merc_ready)%
+on_info = {+jup_a12_merc_attack_started} %=play_sound(jup_a12_merc_attack_started)%
+team = jup_a12_mercs2
+meet = no_meet
+combat_ignore_condition = {=check_enemy_smart(jup_a12)} true, false
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+
+
+[logic@jup_a12_merc_right_attack]
+active = camper@right_attack_containers
+post_combat_time = 0, 0
+suitable = {=target_squad_name(jup_a12_merc_stalker_squad) !check_npc_name(jup_a12_merc_cover) +jup_a12_merc_attack_started} true
+prior = 200
+
+[camper@right_attack_containers]
+path_walk = merc_right_attack_containers_walk
+path_look = merc_right_attack_containers_look
+def_state_moving = assault_fire
+def_state_moving_fire = assault_fire
+no_retreat = true
+on_signal = path_end | %+jup_a12_merc_right_attacked_containers%
+on_info = {+jup_a12_merc_right_attacked_containers} walker@right_walk_to_hangar
+meet = no_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@right_walk_to_hangar]
+path_walk = merc_right_walk_to_hangar_walk
+path_look = merc_right_walk_to_hangar_look
+on_actor_dist_ge_nvis = 150 | %+jup_a12_mercs_done%
+on_info = {+jup_a12_mercs_done} walker@right_merc_kamp_after
+meet = meet@merc_hangar_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+def_state_moving = assault
+
+[walker@right_merc_kamp_after]
+path_walk = merc_kamp_walker_2_walk
+path_look = merc_kamp_walker_look
+def_state_moving = assault
+meet = no_meet
+wounded = wounded@no_wound

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<string id="zat_a2_stalker_barmen_actor_info_0">
+		<text>Расскажи про здешнюю жизнь.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1">
+		<text>Ну-у, это обширная тема!.. Я лучше на твои вопросы отвечу. Спрашивай.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1111">
+		<text>Чем здесь занимаются сталкеры?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11111">
+		<text>Дружище, а ты-то кто - не сталкер разве?! Охо-хо... ладно, всякое в этой жизни бывает, и провалы в памяти тоже. В общем, за бортом «Скадовска» ребята исследуют местность, ищут артефакты. Отстреливаются от тех людей и тварей, что пытаются напасть. А на самом «Скадовске» - в основном пьют, болтают... отдыхают, в общем, перед следующей вылазкой. Правда, иногда начинается веселье. Это когда выброс шибает. В этом случае мы все сидим тут тише воды, ниже травы и поминаем тех, кто в разные времена до укрытия не успел добежать.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1112">
+		<text>Что привело сталкеров к центру Зоны?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11121">
+		<text>Вот это совсем забавный вопрос! Ну как же. Одни желают найти Клондайк артефактов. Другие ловят каждый новый слух про Оазис. Третьи ищут Исполнитель Желаний. Ну и не забывай ещё про банальные жадность и любопытство... У каждого есть своя причина. У тебя же ведь нашлась какая-то?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1113">
+		<text>Как ты здесь оказался?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11131">
+		<text>Пришёл с Глухарём, когда Выжигатель отключился... но тебя ведь не это интересует, так?.. Ладно... Основной мой бизнес - артефакты. Всякой мелочи за пределами Зоны уже выше крыши: серьёзных заказчиков интересует штучный товар. Вот я и решил организовать лагерь для сталкеров там, где ещё можно найти что-нибудь ценное. А что хочет сталкер, когда вернётся с хабаром? Расслабиться и пообщаться! Все это он тут, на «Скадовске», и найдёт.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1114">
+		<text>Что ты думаешь про бандитов?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11141">
+		<text>Да как тебе сказать... Я, в принципе, ничего не имею против любого, кто забредает на «Скадовск», - пока гость ведёт себя по-человечески. В конце концов, полных ублюдков не так уж много... А некоторые бандюки - так они же сами бывшие сталкеры! Кто знает, вдруг такой в один прекрасный день решит бросить тёмные дела? Все мы люди, а в жизни всякое бывает.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1115">
+		<text>А, ладно. Забудь.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11151">
+		<text>Как скажешь.</text>
+	</string>
+
+	<string id="zat_b7_stalkers_victims_dialog_11">
+		<text>Здоров, сталкер. Я занят пока, извини. Давай потом поболтаем, лады?</text>
+	</string>
+
+	<string id="zat_b22_stalker_medic_start_1">
+		<text>Здорово! Чем могу помочь?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_0">
+		<text>Мне нужна медицинская помощь.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_1">
+		<text>Сейчас посмотрю...</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_2">
+		<text>Дай гляну... Хмм... Кажись, здоров. Ни ранений, ни облучения. Можешь идти.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_11">
+		<text>[Далее...]</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_111">
+		<text>Ну как, лучше теперь?</text>
+	</string>
+	<string id="zat_b18_noah_start_11">
+		<text>Ты кто такой?</text>
+	</string>
+	<string id="zat_b18_noah_start_111">
+		<text>Сталкер. Уже виделись.</text>
+	</string>
+	<string id="zat_b18_noah_start_1111">
+		<text>Что-то не припоминаю... Ладно, чего тебе?</text>
+	</string>
+	<string id="zat_b18_noah_start_112">
+		<text>Сталкер. Просто сталкер.</text>
+	</string>
+	<string id="zat_b18_noah_start_1121">
+		<text>Ты всё-таки понял и пришёл в Ковчег!..</text>
+	</string>
+	<string id="zat_b18_noah_start_113">
+		<text>Не твоё дело.</text>
+	</string>
+	<string id="zat_b18_noah_start_21">
+		<text>А, это ты... Что надо?</text>
+	</string>
+
+
+	<string id="zat_b3_stalker_tech_start_15">
+		<text>Эт-т ты правильно зашёл... Подлатать пушку - дело нужное. А если захватил с собой бутылочку-другую, то я тебе любую модификацию устрою. Хоть парашют на дробовик пришью...</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_1_0">
+		<text>Есть водка. Будешь?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_1_2">
+		<text>Завязал, больше не пью. Когда «изделие №62» увидел, думал - всё, белка хватила... Так-то... Слишком много проблем из-за бухла. Да и здоровье...</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_2_0">
+		<text>Держи ещё бутылку.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_3_0">
+		<text>Есть третья бутылка... Если надо ещё.</text>
+	</string>
+
+	<string id="zat_b52_robbery_port_bandits_1_0">
+		<text>Привет! Деньжат не подкинешь?</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1">
+		<text>Гм... Нет.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_11">
+		<text>Эй, чего такой жадный? Делиться надо...</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_111">
+		<text>Я ничего тебе не должен.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_111111">
+		<text>Да, ладно. Мы же не суки, все свои.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111111">
+		<text>Пока!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_11112">
+		<text>Нет!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_111121">
+		<text>Подумай хорошенько. Если есть мозги, поймёшь, что лучше не ерепениться перед превосходящими силами.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111211">
+		<text>Я сказал, нет!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_2">
+		<text>Хорошо.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111">
+		<text>Давай сюда!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111212">
+		<text>Ладно.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_21">
+		<text>Давай деньги, придурок!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_11111">
+		<text>Легче, легче... Вот так.</text>
+	</string>
+</string_table>

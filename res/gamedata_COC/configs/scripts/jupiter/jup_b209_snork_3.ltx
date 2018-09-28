@@ -1,0 +1,35 @@
+[logic@jup_b209_snork_3]
+suitable = {=target_squad_name(jup_b209_squad_snork_up) -jup_b209_snork_3_death} true
+active = mob_home@_3
+monster_job = true
+prior = 100
+on_death = death
+
+[mob_home@_3]
+path_home = snork_home_up
+home_min_radius = 5
+home_max_radius = 10
+on_timer = 15000 | mob_walker@3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_walker@3]
+path_walk = snork_3_walk
+path_look = snork_3_jump
+on_signal = snork_3 | mob_jump@3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_jump@3]
+path_jump = snork_3_jump
+ph_jump_factor = 1
+offset = 0,0,0
+on_signal = jumped | mob_home@3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_home@3]
+path_home = snork_home
+home_min_radius = 10
+home_max_radius = 20
+aggressive = true
+
+[death]
+on_info = %+jup_b209_snork_3_death%

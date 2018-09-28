@@ -1,0 +1,180 @@
+;generic section
+[logic@zat_b33_snork_jump_gen]
+suitable = {=is_monster_snork} true
+prior = 90
+monster_job = true
+
+[mob_walker@zat_b33_snork_jump_gen]
+out_restr = zat_b33_space_restrictor
+combat_ignore_cond =  true
+
+[mob_jump@zat_b33_snork_jump_gen]
+offset = 0,0,0
+out_restr = zat_b33_space_restrictor
+combat_ignore_cond =  true
+
+[mob_home@zat_b33_snork_jump_gen]
+home_min_radius = 2
+home_max_radius = 15
+out_restr = zat_b33_space_restrictor
+aggressive = true
+
+;snork jobs
+
+[logic@zat_b33_snork_jump_01]:logic@zat_b33_snork_jump_gen
+active = mob_walker@zat_b33_snork_jump_01
+on_hit = hit@zat_b33_snork_jump_01
+
+[hit@zat_b33_snork_jump_01]
+on_info = mob_home@zat_b33_snork_jump_01_02
+
+[mob_walker@zat_b33_snork_jump_01]:mob_walker@zat_b33_snork_jump_gen
+path_walk = snork_jump_01_walk 
+path_look = snork_jump_01_02
+on_actor_dist_le_nvis = 4 |  mob_home@zat_b33_snork_jump_01_02
+on_actor_in_zone1 = zat_b33_space_restrictor_snork_jump_01_02 | mob_jump@zat_b33_snork_jump_01_02
+on_actor_in_zone2 = zat_b33_space_restrictor_snork_jump_01_01 | mob_jump@zat_b33_snork_jump_01_01
+on_info = {+zat_b33_snork_jump_05} mob_home@zat_b33_snork_jump_01_02
+
+[mob_jump@zat_b33_snork_jump_01_02]:mob_jump@zat_b33_snork_jump_gen
+path_jump = snork_jump_01_02
+ph_jump_factor = 1.2
+on_signal = jumped | mob_home@zat_b33_snork_jump_01_02
+
+[mob_jump@zat_b33_snork_jump_01_01]:mob_jump@zat_b33_snork_jump_gen
+path_jump = snork_jump_01_01
+ph_jump_factor = 1.1
+on_signal = jumped | mob_home@zat_b33_snork_jump_01_01
+
+[mob_home@zat_b33_snork_jump_01_01]:mob_home@zat_b33_snork_jump_gen
+path_home = snork_jump_01_01
+
+[mob_home@zat_b33_snork_jump_01_02]:mob_home@zat_b33_snork_jump_gen
+path_home = snork_jump_01_02
+
+
+
+
+
+[logic@zat_b33_snork_jump_02]:logic@zat_b33_snork_jump_gen
+active = mob_walker@zat_b33_snork_jump_02
+on_hit = hit@zat_b33_snork_jump_02
+
+[hit@zat_b33_snork_jump_02]
+on_info = mob_home@zat_b33_snork_jump_02
+
+[mob_walker@zat_b33_snork_jump_02]:mob_walker@zat_b33_snork_jump_gen
+path_walk = snork_jump_02_walk 
+path_look = snork_jump_02_01
+on_actor_dist_le_nvis = 15 |  mob_jump@zat_b33_snork_jump_02_01
+on_info = {+zat_b33_snork_jump_05} mob_home@zat_b33_snork_jump_02
+
+[mob_jump@zat_b33_snork_jump_02_01]:mob_jump@zat_b33_snork_jump_gen
+path_jump = snork_jump_02_01
+ph_jump_factor = 1.5
+on_signal = jumped | mob_home@zat_b33_snork_jump_02
+
+[mob_home@zat_b33_snork_jump_02]:mob_home@zat_b33_snork_jump_gen
+path_home = snork_jump_02_01
+
+
+
+
+[logic@zat_b33_snork_jump_03]:logic@zat_b33_snork_jump_gen
+active = mob_walker@zat_b33_snork_jump_03
+on_hit = hit@zat_b33_snork_jump_03
+
+[hit@zat_b33_snork_jump_03]
+on_info = mob_home@zat_b33_snork_jump_03_01
+
+[mob_walker@zat_b33_snork_jump_03]:mob_walker@zat_b33_snork_jump_gen
+path_walk = snork_jump_03_walk 
+path_look = snork_jump_03_01
+on_actor_dist_le_nvis = 2 |  mob_home@zat_b33_snork_jump_03_01
+on_actor_in_zone = zat_b33_space_restrictor_snork_jump_03_01 | mob_jump@zat_b33_snork_jump_03_01
+on_actor_in_zone2 = zat_b33_space_restrictor_snork_jump_03_02 | mob_jump@zat_b33_snork_jump_03_02
+on_info = {+zat_b33_snork_jump_05} mob_home@zat_b33_snork_jump_03_01
+
+[mob_jump@zat_b33_snork_jump_03_01]:mob_jump@zat_b33_snork_jump_gen
+path_jump = snork_jump_03_01
+ph_jump_factor = 1.2
+on_signal = jumped | mob_home@zat_b33_snork_jump_03_01
+
+[mob_jump@zat_b33_snork_jump_03_02]:mob_jump@zat_b33_snork_jump_gen
+path_jump = snork_jump_03_02
+ph_jump_factor = 1.2
+on_signal = jumped | mob_home@zat_b33_snork_jump_03_02
+
+[mob_home@zat_b33_snork_jump_03_01]:mob_home@zat_b33_snork_jump_gen
+path_home = snork_jump_03_01
+
+[mob_home@zat_b33_snork_jump_03_02]:mob_home@zat_b33_snork_jump_gen
+path_home = snork_jump_03_02
+
+
+
+
+
+
+[logic@zat_b33_snork_jump_04]:logic@zat_b33_snork_jump_gen
+active = mob_walker@zat_b33_snork_jump_04
+on_hit = hit@zat_b33_snork_jump_04
+
+[hit@zat_b33_snork_jump_04]
+on_info = mob_home@zat_b33_snork_jump_04
+
+[mob_walker@zat_b33_snork_jump_04]:mob_walker@zat_b33_snork_jump_gen
+path_walk = snork_jump_04_walk 
+path_look = snork_jump_04_01
+on_actor_dist_le_nvis = 16 |  mob_jump@zat_b33_snork_jump_04_01
+on_info = {+zat_b33_snork_jump_05} mob_home@zat_b33_snork_jump_04
+
+[mob_jump@zat_b33_snork_jump_04_01]:mob_jump@zat_b33_snork_jump_gen
+path_jump = snork_jump_04_01
+ph_jump_factor = 1.4
+on_signal = jumped | mob_home@zat_b33_snork_jump_04
+
+[mob_home@zat_b33_snork_jump_04]:mob_home@zat_b33_snork_jump_gen
+path_home = snork_jump_04_01
+
+
+
+
+
+
+
+[logic@zat_b33_snork_jump_05]:logic@zat_b33_snork_jump_gen
+active = mob_walker@zat_b33_snork_jump_05
+suitable = {=is_monster_snork +zat_b33_snork_spawn_05 -zat_b33_snork_jump_05_dead} true
+prior = 200
+on_hit = hit@zat_b33_snork_jump_05
+on_death = mob_death@zat_b33_snork_jump_05
+
+[hit@zat_b33_snork_jump_05]
+on_info = mob_home@zat_b33_snork_jump_05
+
+[mob_death@zat_b33_snork_jump_05]
+on_info = %+zat_b33_snork_jump_05_dead%
+
+[mob_walker@zat_b33_snork_jump_05]:mob_walker@zat_b33_snork_jump_gen
+path_walk = snork_jump_05_walk 
+path_look = snork_jump_05_01
+out_restr = zat_b33_space_restrictor_05
+on_info = mob_jump@zat_b33_snork_jump_05_01
+
+[mob_jump@zat_b33_snork_jump_05_01]
+path_jump = snork_jump_05_01
+offset = 0,0,0
+ph_jump_factor = 1.2
+combat_ignore_cond =  true
+out_restr = zat_b33_space_restrictor_05
+on_signal = jumped | mob_home@zat_b33_snork_jump_05
+
+[mob_home@zat_b33_snork_jump_05]
+path_home = snork_jump_05_01
+home_min_radius = 2
+home_max_radius = 15
+on_info = {-zat_b33_snork_jump_05} %+zat_b33_snork_jump_05%
+
+
+

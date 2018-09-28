@@ -1,0 +1,26 @@
+[logic]
+active = nil ;sr_idle@b38_connect
+
+[sr_idle@b38_connect]
+on_info  = {+zat_b38_cop_passed_away =story_object_exist(zat_b22_stalker_medic) -zat_b22_medic_respawn} sr_idle@2 %=teleport_npc_by_story_id(zat_b22_stalker_medic:zat_medic_home_smart_zat_b22_stalker_medic_walk) +zat_b22_medic_respawn =spawn_corpse(zat_b22_stalker_hunter_dead:zat_b22_stalker_hunter_dead) =spawn_object_in(drug_antidot:zat_b22_medic_inv_box) =spawn_object_in(medkit_army:zat_b22_medic_inv_box) =spawn_object_in(medkit_army:zat_b22_medic_inv_box) =spawn_object(zat_b38_stalker_cop_dead:zat_medic_home_smart_zat_b22_stalker_medic_look)%
+
+[sr_idle@2]
+on_info = {-zat_b22_stalker_hunter_hit =story_object_exist(zat_b22_stalker_hunter_dead)} %=hit_obj(zat_b22_stalker_hunter_dead:bip01_head:5:500:zat_b22_stalker_hunter_dead) +zat_b22_stalker_hunter_hit%
+on_actor_in_zone = zat_b22_stalker_medic_identified | sr_idle@6 %+zat_b38_disappearance_stalkers_deal_with_medic_give +zat_b22_stalker_vampire%
+on_game_timer = 86400 | sr_idle@3 %+zat_b38_disappearance_stalkers_meet_cop_24h_past_give%
+ 
+[sr_idle@3]
+on_info = {+zat_b22_stalker_cop_place} sr_idle@4 %+zat_b38_disappearance_stalkers_find_out_where_is_cop_give%
+on_actor_in_zone = zat_b22_stalker_medic_identified | sr_idle@6 %+zat_b38_disappearance_stalkers_deal_with_medic_give +zat_b22_stalker_vampire%
+
+[sr_idle@4]
+on_info = {+zat_b38_disappearance_stalkers_find_cop_near_port_krans_give} sr_idle@5
+on_actor_in_zone = zat_b22_stalker_medic_identified | sr_idle@6 %+zat_b38_disappearance_stalkers_deal_with_medic_give +zat_b22_stalker_vampire%
+
+[sr_idle@5]
+on_actor_in_zone = zat_b22_stalker_medic_identified | sr_idle@6 %+zat_b22_stalker_vampire +zat_b38_disappearance_stalkers_deal_with_medic_give%
+
+[sr_idle@6]
+on_info = {+zat_b22_stalker_vampire_story} nil %+zat_b38_disappearance_stalkers_tell_barmen_about_medic_give%
+on_info2 = {+zat_b22_stalker_medic_body_searched} %+zat_b38_disappearance_stalkers_tell_barmen_about_medic_give%
+on_info3 = {+zat_b22_actor_gone +zat_b22_stalker_medic_death -zat_b22_stalker_vampire_story} %+zat_b38_disappearance_stalkers_tell_barmen_about_medic_give%

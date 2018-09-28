@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- ASSAULT AREA FOR MILITARY TASK -->
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_1_name">
+		<text>Зачистка</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_1_text">
+		<text>Вам поручено возглавить операцию по зачистке местности.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_1_about">
+		<text>Командир обеспокоен ростом числа незаконных проникновений через охраняемый периметр. Он хочет, чтобы ты зачистил территорию от посторонних лиц.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_1_finish">
+		<text>Отличная работа.</text>
+	</string>
+	<!-- CAPTURE TERRITORY FOR MILITARY TASK -->
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_2_name">
+		<text>Захват территории</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_2_text">
+		<text>Поступил приказ захватить территорию для нового лагеря.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_2_about">
+		<text>СБУ занимается поиском документов, свидетельств и причин возникновения Зоны и нашему подразделению было поручено проникнуть дальше в Зону для проведения исследовательской операции. Командир ищет добровольцев, чтобы захватить территорию для нас. Готов к бою?</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_2_finish">
+		<text>Задача выполнена? Отличная работа. Я сообщу командиру о твоих успехах.</text>
+	</string>
+	<!-- ASSASSINATION FOR MILITARY TASK -->
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_3_name">
+		<text>Смерть врагу!</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_3_text">
+		<text>Поставлена задача захватить или убить врага.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_3_about">
+		<text>От офицера СБУ нашему командиру поступил список разыскиваемых лиц, которые решили скрыться от правосудия здесь, в Зоне. Если доберёшься до любого из них, получишь награду. Готов?</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_trader_stalker_task_3_finish">
+		<text>Выдающаяся работа! Командир будет доволен.</text>
+	</string>
+	<!-- FIND LEVEL 1 TOOLKIT FOR KIRILOV TASK -->
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_1_name">
+		<text>Найти для Кириллова %s</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_1_text">
+		<text>Необходимо принести %s лейтенанту Кириллову - технику на базе. Он заплатит за инструменты и, кроме того, сможет проводить модернизацию оружия или бронежилетов.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_1_about">
+		<text>Слушай, боец, окажешь услугу? Почти каждый день ко мне приходят солдаты с разломанной в хлам снарягой, а инструментов у меня кот наплакал. Не изолентой же мне броники заматывать, правильно? Может, сможешь достать мне ремнабор какой-нибудь самый простенький, а я тебе деньжат отвалю, мм?</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_1_fetch_about">
+		<text>Слушай, боец, окажешь услугу? Почти каждый день ко мне приходят солдаты с разломанной в хлам снарягой, а инструментов у меня кот наплакал. Не изолентой же мне броники заматывать, правильно? Может, сможешь достать мне ремнабор какой-нибудь самый простенький, а я тебе деньжат отвалю, мм? В общем, найдёшь набор инструментов - приноси, с меня причитается.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_1_fetch_finish">
+		<text>Спасибо, солдат! Вот, держи, как обещал:</text>
+	</string>
+	<!-- FIND LEVEL 2 TOOLKIT FOR KIRILOV TASK -->
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_2_name">
+		<text>Найти для Кириллова %s</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_2_text">
+		<text>Необходимо принести %s лейтенанту Кириллову - технику на базе. Он заплатит за инструменты и, кроме того, сможет проводить сложную модернизацию оружия или бронежилетов.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_2_about">
+		<text>Ладно, в общем, мне нужны ещё инструменты. Правда, хрен его знает, есть ли они вообще в этих краях. Что думаешь, сможешь найти?</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_2_fetch_about">
+		<text>Ладно, в общем, мне нужны ещё инструменты. Правда, хрен его знает, есть ли они вообще в этих краях. Что думаешь, сможешь найти? Принеси мне инструменты для тонкой работы. Там должно быть всё, что мне нужно. Если сможешь достать - твою снарягу отныне буду чинить задаром... почти.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_2_fetch_finish">
+		<text>Отлично! Если тебе нужно что будет - обращайся, помогу чем смогу.</text>
+	</string>
+	<!-- FIND LEVEL 3 TOOLKIT FOR KIRILOV TASK -->
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_3_name">
+		<text>Найти для Кириллова %s</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_3_text">
+		<text>Лейтенант Кириллов просил найти набор инструментов для калибровки. Техник заплатит за инструменты и, кроме того, сможет проводить ещё более сложную модернизацию оружия или бронежилетов.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_3_about">
+		<text>Ладно, в общем, мне нужны ещё инструменты. Правда, хрен его знает, есть ли они вообще в этих краях. Что думаешь, сможешь найти?</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_3_fetch_about">
+		<text>Ладно, в общем, мне нужны ещё инструменты. Правда, хрен его знает, есть ли они вообще в этих краях. Что думаешь, сможешь найти? Мне нужны инструменты для калибровки. Если принесёшь - скидка на ремонт тебе обеспечена.</text>
+	</string>
+	<string id="agr_smart_terrain_1_6_army_mechanic_stalker_task_3_fetch_finish">
+		<text>Отлично! Ну теперь-то больше не придётся голову ломать, чем броню латать, да и бойцов терять меньше будем. Спасибо, в общем. Если тебе нужно что будет - обращайся, помогу чем смогу.</text>
+	</string>		
+</string_table>

@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_actor_in_zone = jup_b203_zombied_restr_1 | sr_idle@one {-jup_b203_damaged_room_1} %+jup_b203_damaged_room_1%
+
+[sr_idle@one]
+on_actor_in_zone = jup_b203_zombied_restr_2 | sr_idle@nil {-jup_b203_damaged_room_2} %+jup_b203_damaged_room_2%
+
+[sr_idle@nil]

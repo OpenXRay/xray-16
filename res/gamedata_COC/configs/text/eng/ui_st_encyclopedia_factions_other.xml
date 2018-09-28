@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_factions_other">
+		<text>Factions (Other)</text>
+	</string>
+	
+	<string id="encyclopedia_factions_other_zombified">
+		<text>Zombified</text>
+	</string>
+	<string id="encyclopedia_factions_other_zombified_text">
+		<text>
+			%c[guide_blue]Zombified%c[default] stalkers are those who have fallen under the effects of a strong psi-field.\n
+			\n%c[guide_green]Information%c[default]
+			\nThese creatures lack the higher functions of the brain and act solely on residual reflexes and skills, incapable of conscious activity, and having a high threshold for pain.\n
+			\nThe mental and physical health of a zombified stalker will gradually deteriorate over time, eventually losing the last of their humanity, and becoming the mutant known as a zombie.\n
+			\nUnlike the mutant however, zombified stalkers are capable of using weapons and tools, and are frequently seen working together in groups, or with soldiers of the Monolith.\n
+			\n%c[guide_green]Statistics%c[default]\n
+			\n• Leaders: Unknown\n• Headquarters: Unknown\n• Colours: Various\n
+		</text>
+	</string>
+	
+</string_table>

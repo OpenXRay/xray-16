@@ -1,0 +1,53 @@
+[logic]
+active = sr_idle@spawn_minigun; sr_idle@wait_for_actor
+
+[sr_idle@spawn_minigun]
+on_info = sr_idle@wait_for_actor %=spawn_object(yantar_deployable_mgun:yantar_deployable_mgun_spawn_point)%
+
+[sr_idle@wait_for_actor]
+on_actor_inside = {-yan_labx16_switcher_primary_off} sr_idle@check_conditions, {+yan_labx16_switcher_primary_off} sr_idle@nil
+
+[sr_idle@check_conditions]
+on_info = {=get_start_time_elapsed_ge(172800) =is_day -actor_is_sleeping !is_faction_enemy_to_actor(ecolog) -yan_labx16_switcher_primary_off !has_task(faction_base_defense)} sr_idle@decide
+on_actor_outside = sr_idle@wait_for_actor
+
+[sr_idle@decide]
+on_info = {~50} sr_idle@timer, sr_idle@wait_for_sakharov %=give_task(faction_base_defense) =start_surge +yantar_faction_base_defense_quest_started%
+
+[sr_idle@wait_for_sakharov]
+on_timer = 5000 | sr_idle@spawn1 %=yan_saharov_message(about_storm)%
+
+[sr_idle@spawn1]
+on_info = {!is_actor_surge_immuned} %=actor_surge_immuned(true)%
+;on_info2 = {!object_exist(yantar_deployable_mgun)} %=spawn_object(yantar_deployable_mgun:yantar_deployable_mgun_spawn_point)%
+on_info3 = sr_idle@spawn2 %=flush_smart_terrain(yan_smart_terrain_6_2) =create_squad(yan_faction_base_defense_zombi_in_sci_base1:yan_smart_terrain_6_2)  =teleport_squad(yan_faction_base_defense_zombi_in_sci_base1:yan_smart_terrain_6_2_zombied_wave_spawn_point)%
+
+[sr_idle@spawn2]
+on_info = {+yan_faction_base_defense_zombi_wave_1_killed} sr_idle@spawn3 %=flush_smart_terrain(yan_smart_terrain_5_5)  =create_squad(yan_faction_base_defense_zombi_in_sci_base2:yan_smart_terrain_5_5) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base2:yan_smart_terrain_5_5_zombied_wave_spawn_point)%
+
+[sr_idle@spawn3]
+on_info = {+yan_faction_base_defense_zombi_wave_2_killed} sr_idle@spawn4 %=flush_smart_terrain(yan_smart_terrain_4_4)  =create_squad(yan_faction_base_defense_zombi_in_sci_base3:yan_smart_terrain_4_4) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base3:yan_smart_terrain_4_4_zombied_wave_spawn_point)%
+
+[sr_idle@spawn4]
+on_info = {+yan_faction_base_defense_zombi_wave_3_killed} sr_idle@spawn5 %=flush_smart_terrain(yan_smart_terrain_6_2)  =create_squad(yan_faction_base_defense_zombi_in_sci_base4:yan_smart_terrain_6_2) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base4:yan_smart_terrain_6_2_zombied_wave_spawn_point)%
+
+[sr_idle@spawn5]
+on_info = {+yan_faction_base_defense_zombi_wave_4_killed} sr_idle@spawn6 %=flush_smart_terrain(yan_smart_terrain_5_5)  =create_squad(yan_faction_base_defense_zombi_in_sci_base5:yan_smart_terrain_5_5) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base5:yan_smart_terrain_5_5_zombied_wave_spawn_point)%
+
+[sr_idle@spawn6]
+on_info = {+yan_faction_base_defense_zombi_wave_5_killed} sr_idle@spawn7 %=flush_smart_terrain(yan_smart_terrain_4_4)  =create_squad(yan_faction_base_defense_zombi_in_sci_base6:yan_smart_terrain_4_4) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base6:yan_smart_terrain_4_4_zombied_wave_spawn_point)%
+
+[sr_idle@spawn7]
+on_info = {+yan_faction_base_defense_zombi_wave_6_killed} sr_idle@wait_for_end %=flush_smart_terrain(yan_smart_terrain_6_2) =flush_smart_terrain(yan_smart_terrain_5_5) =flush_smart_terrain(yan_smart_terrain_4_4)  =create_squad(yan_faction_base_defense_zombi_in_sci_base7:yan_smart_terrain_6_2) =create_squad(yan_faction_base_defense_zombi_in_sci_base8:yan_smart_terrain_5_5) =create_squad(yan_faction_base_defense_zombi_in_sci_base9:yan_smart_terrain_4_4) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base7:yan_smart_terrain_6_2_zombied_wave_spawn_point) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base8:yan_smart_terrain_5_5_zombied_wave_spawn_point) =teleport_squad(yan_faction_base_defense_zombi_in_sci_base9:yan_smart_terrain_4_4_zombied_wave_spawn_point)%
+
+[sr_idle@wait_for_end]
+on_info = {+yan_faction_base_defense_zombi_wave_7_1_killed +yan_faction_base_defense_zombi_wave_7_2_killed +yan_faction_base_defense_zombi_wave_7_3_killed} sr_idle@pda_message %=stop_surge =actor_surge_immuned(false) +faction_base_defense_enemy_killed +faction_base_defense_2nd_enemy_killed%
+
+[sr_idle@pda_message]
+on_info = {+yan_stalker_sakharov_offer_free_upgrade} sr_idle@timer
+on_timer = 4000 | {-yan_stalker_sakharov_offer_free_upgrade} sr_idle@timer %=yan_saharov_message(free_upgrade) +yan_stalker_sakharov_offer_free_upgrade%
+
+[sr_idle@timer]
+on_game_timer = 86400 | sr_idle@wait_for_actor %-yan_faction_base_defense_zombi_wave_1_killed -yan_faction_base_defense_zombi_wave_2_killed -yan_faction_base_defense_zombi_wave_3_killed -yan_faction_base_defense_zombi_wave_4_killed -yan_faction_base_defense_zombi_wave_5_killed -yan_faction_base_defense_zombi_wave_6_killed -yan_faction_base_defense_zombi_wave_7_1_killed -yan_faction_base_defense_zombi_wave_7_2_killed -yan_faction_base_defense_zombi_wave_7_3_killed -mar_smart_terrain_5_12_mutants_to_base -faction_base_defense_enemy_killed -faction_base_defense_2nd_enemy_killed -yantar_faction_base_defense_quest_started%
+
+[sr_idle@nil]

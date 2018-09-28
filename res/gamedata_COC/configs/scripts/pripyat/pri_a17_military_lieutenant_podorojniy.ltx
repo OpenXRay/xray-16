@@ -1,0 +1,174 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+;----------------------------------------------------------------------------------------------------------
+
+[logic@pri_a17_military_lieutenant_podorojniy]
+suitable = {-pri_a17_actor_leaver =check_npc_name(pri_a17_military_lieutenant_podorojniy)}
+prior = 70
+active = walker@start
+on_death = death
+on_combat = combat
+post_combat_time = 0, 0
+known_info = known_info
+
+[walker@start]:walker@generic
+path_walk = pod_start
+def_state_standing = threat_na
+combat_ignore_cond = {=fighting_dist_ge (15)} true
+on_info = {+pri_a17_teleport_step_1 -pri_a17_pod_teleported} %+pri_a17_pod_teleported =teleport_npc(pri_a17_patrol_home)%
+on_game_timer = 35 |smartcover@start
+meet = no_meet
+
+[smartcover@start]:walker@generic
+def_state_moving1 = assault
+cover_name = pri_a17_pod_cover_start
+cover_state = idle_target 
+combat_ignore_cond = {=fighting_dist_ge (15)} true
+on_info = {+pri_a17_mon_ambush_killed} walker@safe, {+pri_a17_patrol_dead} walker@squad_go_check, {+pri_a17_squad_go_1} walker@tocover1
+meet = no_meet
+
+[walker@tocover1]:walker@generic
+path_walk = pod_go_1
+def_state_moving1 = assault 
+combat_ignore_cond = {=fighting_dist_ge (15)} true
+on_signal = at_position | smartcover@pod_first_cover
+meet = no_meet
+
+[smartcover@pod_first_cover]:walker@generic
+cover_name = pri_a17_pod_cover_1
+cover_state = lookout_target
+combat_ignore_cond = {=fighting_dist_ge (15)} true
+on_info = {=in_dest_smart_cover} %+pri_a17_pod_in_cover_1%
+on_info2 = {+pri_a17_recon_go} smartcover@pod_second_cover
+meet = no_meet
+
+[smartcover@pod_second_cover]:walker@generic
+cover_name = pri_a17_pod_cover_2
+cover_state = default_behavior
+on_info = {=npc_in_zone(pri_a17_pod_cover_2_zone)} %+pri_a17_pod_at_position%
+on_info2 = {+pri_a17_pod_at_position} smartcover@ready_to_attack
+combat_ignore_cond = {=fighting_dist_ge (25)} true
+meet = no_meet
+
+[smartcover@ready_to_attack]:walker@generic
+cover_name = pri_a17_pod_cover_2
+cover_state = idle_target 
+combat_ignore_cond = {=fighting_dist_ge (15)} true
+on_info = {+pri_a17_mon_atk} camper@attack %=make_enemy(pri_a17_monolith_patrol_1)%
+meet = no_meet
+
+[camper@attack]:walker@generic
+path_walk = pod_fight
+path_look = pod_pat_look
+def_state_moving1 = assault
+def_state_campering = threat_na
+def_state_campering_fire = threat_fire
+no_retreat = true 
+def_state_moving1 = assault
+out_restr = pri_a17_pod_chek_fight_zone
+on_info = {+pri_a17_patrol_dead +pri_a17_squad_move} walker@squad_go_check 
+on_info2 = {+pri_a17_ice_dead} walker@defend
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(pri_a17_monolith_preacher)} true
+
+[walker@squad_go_check]:walker@generic
+path_walk = pod_chek_sit
+path_look = pod_chek_look  
+def_state_moving1 = assault
+on_info = {+pri_a17_ice_dead} walker@defend
+combat_ignore_cond = {=fighting_dist_ge (25)} true, {=check_enemy_name(pri_a17_monolith_preacher)} true
+meet = no_meet
+
+[walker@defend]:walker@generic
+path_walk = pod_chek_fight
+path_look = pod_pat_look
+out_restr = pri_a17_pod_chek_fight_zone
+on_info = {=counter_greater(pri_a17_monolith_amb_death:11) !squad_has_enemy(pri_a17_recon_squad) +pri_a17_actor_has_gauss_rifle} walker@safe, {+pri_a17_mon_ambush_killed} walker@safe
+on_info2 = {=health_le(0.4) !actor_enemy} %=restore_health% 
+combat_ignore_cond = {=check_enemy_name(pri_a17_monolith_preacher)} true
+def_state_moving1 = assault 
+meet = no_meet
+combat_ignore_cond = {=check_enemy_name(pri_a17_monolith_preacher)} true
+
+[walker@safe]:walker@generic
+path_walk = pod_chek_fight
+path_look = pod_chek_look
+on_info = {+pri_a17_actor_has_gauss_rifle} walker@fintalk
+meet = meet@get_f_gauss
+
+[meet@get_f_gauss]
+meet_state 	= 15| guard
+meet_state_wpn 	= 15| guard
+victim 		= 15| actor
+victim_wpn 	= 15| actor
+use			= true
+use_wpn		= true
+meet_dialog	= pri_a17_military_recon_squad_after_scene_dialog 
+trade_enable	= false
+
+[walker@fintalk]:walker@generic
+path_walk = pod_final_sit
+path_look = pod_final_look
+on_info = {+pri_a17_go_home} patrol@home, {+pri_a17_val_dead} patrol@home, {+pri_a17_taras_dead} patrol@home
+meet = no_meet
+
+[patrol@home]:walker@generic
+path_walk = patrol_home
+formation = back
+on_signal = path_end | walker@base_1
+on_info = {=npc_in_zone(pri_a16_sr_noweap)} walker@base
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+def_state_moving = assault
+
+[walker@base]
+path_walk = pod_base_stay
+path_look = pod_base_look
+def_state_standing = ward
+on_info = {=squad_in_zone_all(pri_a17_recon_squad:pri_surge_hide_a16)} %+pri_a17_at_home =set_squad_neutral_to_actor(pri_a17_recon_squad)%
+out_restr = pri_a16_sr_noweap
+
+;-------------------------------------------------------------
+
+[wounded]
+hp_state 		= 0|wounded_heavy@help_heavy
+hp_state_see 	= 0|wounded_heavy@help_heavy
+hp_victim 		= 0|nil
+hp_fight 		= 0|false
+hp_cover		= 0|false
+
+[combat]
+on_info = {=actor_enemy} %+pri_a17_actor_attack_military%
+
+[death]
+on_info = {=killed_by_actor =squad_exist(pri_a17_recon_squad)} %+pri_a17_actor_attack_military +pri_a17_pod_dead =set_squad_enemy_to_actor(pri_a17_recon_squad) =stop_sound%, %+pri_a17_pod_dead =stop_sound%
+
+[known_info]
+pri_a17_pod_is_dead
+
+;-------------------------------------------Актер бросил отряд--------------------------------------------
+[logic@pri_a17_military_lieutenant_podorojniy_dead]:walker@generic
+suitable = {+pri_a17_actor_leaver  =check_npc_name(pri_a17_military_lieutenant_podorojniy)} true
+prior = 70
+active = walker@pod_dead
+on_death = death
+on_combat = combat
+post_combat_time = 0, 0
+known_info = known_info
+
+[walker@pod_dead]:walker@generic
+path_walk = pod_dead
+on_info = walker@pod_dead_2 %=teleport_npc(pri_a17_pod_dead)%
+meet = no_meet
+
+[walker@pod_dead_2]:walker@generic
+path_walk = pod_dead
+on_game_timer = 20 | walker@pod_dead_3 %=hit_npc(self:pri_a17_val_pat_look:bip01_head:1:33)%
+
+[walker@pod_dead_3]:walker@generic
+path_walk = pod_dead
+on_game_timer = 5 | nil %=kill_npc%

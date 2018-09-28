@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_features">
+		<text>Features</text>
+	</string>
+	
+	<string id="encyclopedia_features_companions">
+		<text>Companions</text>
+	</string>
+	<string id="encyclopedia_features_companions_text">
+		<text>
+			%c[guide_blue]Companions%c[default] are stalkers who can be recruited to your side, similar to followers and familiars in other games.\n
+			\n%c[guide_green]Information%c[default]
+			\nWith the Zone being as dangerous as it is, most other stalkers can be found exploring in small groups, usually in size of around 3 to 4 individuals.\n
+			\nThis feature allows you to do the same, as by talking to the leader of one of these groups you may be able to convince them to explore the Zone together with you.\n
+			\nThe only requirements are that the squad's leader must have friendly relations with you, that his rank be no more than a single tier above yours, and that you haven't too many stalkers already following you.\n
+			\nIn very special cases, characters such as Fanatic may be used as companions to help complete certain tasks, having their own unique set of requirements, and not counting towards your squad limit.\n
+			\nInformation about your companions can be viewed in the Relations tab of the PDA, where you can also issue them orders as a group or individually, as well as change their behaviours.\n
+			\nThis can also be done through key bindings, which can be set via the Controls options menu.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_guide">
+		<text>Guide</text>
+	</string>
+	<string id="encyclopedia_features_guide_text">
+		<text>
+			The %c[guide_blue]Guide%c[default] is a resource to help teach you about the game and its contents.\n
+			\n%c[guide_green]Information%c[default]
+			\nThis feature was added at much request by players to help explain features and gameplay mechanics, as well as to add a more visual representation of your progression.\n
+			\nArticles are sorted by category, with all tutorial-esque and important content being unlocked right from creating your own character.\n
+			\nWhen you unlock an article its name and category are displayed in the message, allowing you to find the content with relative ease.\n
+			\n%c[guide_green]Disclaimer%c[default]
+			\nFor the first time since S.T.A.L.K.E.R.: Shadow of Chernobyl a serious attempt is being made at reintroducing a complete in-game user guide to all available content.\n
+			\nAlthough this feature is mostly complete in function it is still in an early work-in-progress stage, and as such only a small percentage of articles have been written.\n
+			\nBecause of the magnitude of such a task there is much more yet to be added, with many missing and incomplete categories, and the interactive unlock system not yet being fully integrated.\n
+			\nBy introducing new articles with further updates and patches the guide will eventually be completed but it will take quite some time.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_map_spots">
+		<text>Map spots</text>
+	</string>
+	<string id="encyclopedia_features_map_spots_text">
+		<text>
+			%c[guide_blue]Map spots%c[default] are icons which appear on the map to highlight points of particular interest.\n
+			\n%c[guide_green]Information%c[default]
+			\nMany locations and entities have map spots associated with them, making it easier to read the map at a glance without having to worry about remembering tons of information.\n
+			\nYou are able to create your own custom map spots by double-clicking on the map and entering a name to be displayed when hovered over - these can be renamed or removed later by right-clicking them and selecting the appropriate context option.\n
+			\n%c[guide_green]Toggles%c[default]
+			\nAnomalous areas, important objects (traders, technicians, beds, etc.), stashes, and task waypoints can be toggled within the PDA by pressing the aptly named buttons at the top of the map tab.\n
+			\nRegardless of these settings, those which are attributed to stalkers and other moving objects are always visible on your minimap - as there is no guarantee they will remain stationary and in a single location.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_rank">
+		<text>Rank</text>
+	</string>
+	<string id="encyclopedia_features_rank_text">
+		<text>
+			%c[guide_blue]Rank%c[default] is a score system based on what a stalker has accomplished in the Zone.\n
+			\n%c[guide_green]Information%c[default]
+			\nActions which you perform throughout your playthrough are recorded and each grant a varying number of points depending on the action in question.\n
+			\nAs you accumulate more and more points your rank will gradually change as you pass through every milestone, with each requiring an additional 1,000 points on top of the requirements of its predecessor.\n
+			\nMost of these actions are logged in the statistics tab of the PDA, which also contains an in-game leaderboard that keeps track of the current top-100 highest ranking stalkers.\n
+			\n%c[guide_green]Ranks%c[default]
+			\n• Rookie: 0\n• Trainee: 1,000\n• Experienced: 3,000\n• Professional: 6,000\n• Veteran: 10,000\n• Expert: 15,000\n• Master: 21,000\n• Legend: 28,000
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_reputation">
+		<text>Reputation</text>
+	</string>
+	<string id="encyclopedia_features_reputation_text">
+		<text>
+			%c[guide_blue]Reputation%c[default] is a representation of how a stalker interacts with others.\n
+			\n%c[guide_green]Information%c[default]
+			\nReputation is similar to rank but differs in that it isn't quite so linear - being able to both increase and decrease - and that it is based on your interactions with other stalkers rather than the environment.\n
+			\nThe easiest ways to increase reputation are by completing tasks, providing first-aid, and killing your faction's enemies, whilst inversely the easiest ways to lose it are by cancelling or failing tasks, and killing neutral or friendly stalkers.\n
+			\nIt should be noted that whilst it is used by some features, reputation is largely immersion-focused and should not be confused with goodwill.\n
+			\n%c[guide_green]Reputations%c[default]
+			\n• Terrible: -2,000\n• Dreary: -1,500\n• Awful: -1,000\n• Bad: -500\n• Neutral: 0\n• Good: 500\n• Great: 1,000\n• Brilliant: 1,500\n• Excellent: 2,000
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_stashes">
+		<text>Stashes</text>
+	</string>
+	<string id="encyclopedia_features_stashes_text">
+		<text>
+			%c[guide_blue]Stashes%c[default] are items stored by stalkers in often well-hidden locations.\n
+			\n%c[guide_green]Information%c[default]
+			\nMost stalkers in the Zone store spare ammunition, food, and medicines in containers, backpacks, and other hidden objects with the intent to retrieve them later.\n
+			\nFrequently the information as to their whereabouts dies with the stalker who hid them, resulting in numerous stashes full of unused items strewing the landscape waiting to be discovered at any time.\n
+			\nInformation brokers and traders often give coordinates to stashes as a bonus payment for those who have done good work for them, whereas those in a tight pinch might try to use their own personal stashes to barter for their survival.\n
+			\nYou can create your own stashes by right-clicking and selecting the appropriate option on any backpack in your inventory.\n
+			\nStashes which you create are never looted by other stalkers, so your items will always be safe.\n
+			\n%c[guide_green]Identification%c[default]
+			\nThe type and/or status of a stash can be easily determined by looking at its icon on the map or by hovering your mouse cursor over it.\n
+			\n• Green: Untouched\n• Purple: Partially looted\n• Yellow: Player-owned\n• Red: Unique
+		</text>
+	</string>
+	
+</string_table>

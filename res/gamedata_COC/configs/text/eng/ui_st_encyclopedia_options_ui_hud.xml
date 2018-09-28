@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_options_ui_hud">
+		<text>Options (UI/HUD)</text>
+	</string>
+	
+	<string id="encyclopedia_options_ui_hud_dynamic_news">
+		<text>Dynamic news</text>
+	</string>
+	<string id="encyclopedia_options_ui_hud_dynamic_news_text">
+		<text>
+			%c[guide_blue]Dynamic news%c[default] allows stalkers to report on their experiences in the Zone.\n
+			\n%c[guide_green]Information%c[default]
+			\nStalkers will comment on events that they have seen or heard near their location, or on their current activities, using the PDA communications network.\n
+			\nThese events and activities can range from something as mundane as complaining about the price of goods sold by a trader, to requesting help from faction allies when under attack.\n
+			\nMany other features also tie into the system; stalkers may comment on suspicious activity when you are hunting a bounty, giving you an idea where your target is, or may mention if somebody has a job available.\n
+			\nThis feature can be toggled from the UI/HUD options menu and is enabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_options_ui_hud_extended_hud">
+		<text>Extended HUD</text>
+	</string>
+	<string id="encyclopedia_options_ui_hud_extended_hud_text">
+		<text>
+			%c[guide_blue]Extended HUD%c[default] allows the display of additional on-screen information.\n
+			\n%c[guide_green]Information%c[default]
+			\nWith this feature enabled brief companion information and a miniaturised version of the artefact belt are made visible on the heads-up display.\n
+			\nThis feature can be toggled from the UI/HUD options menu and is disabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_options_ui_hud_portrait_by_outfit">
+		<text>Portrait by outfit</text>
+	</string>
+	<string id="encyclopedia_options_ui_hud_portrait_by_outfit_text">
+		<text>
+			%c[guide_blue]Portrait by outfit%c[default] changes your portrait based on your current outfit.\n
+			\n%c[guide_green]Information%c[default]
+			\nWith this feature enabled, every time you equip or unequip an outfit (not including headgear) your character's portrait will be updated to reflect this, mimicking how portraits for the AI match with how they look.\n
+			\nThis feature can be toggled from the UI/HUD options menu and is disabled by default.
+		</text>
+	</string>
+	
+</string_table>

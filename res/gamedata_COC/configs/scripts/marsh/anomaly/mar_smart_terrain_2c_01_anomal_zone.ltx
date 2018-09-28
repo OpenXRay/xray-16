@@ -1,0 +1,33 @@
+[anomal_zone]
+
+layers_count = 2
+respawn_tries = 1
+max_artefacts = 1
+
+artefacts = af_blood, af_mincer_meat, af_soul, af_fuzz_kolobok, af_rusty_thorn
+start_artefact = ; af_rusty_thorn
+coeff = 2, 2, 2, 1, 1, 2
+
+artefact_ways = mar_2c_01_af_way
+
+field_name = mar_2c_01_anomaly_spot
+
+[mines_core]
+
+[layer_1]
+mines_section = mines_layer_1 
+
+[mines_layer_1]:mines_core
+mar_zone_mine_acidic_weak_0024
+mar_zone_mine_acidic_weak_0026
+mar_zone_mine_acidic_weak_0023
+mar_zone_mine_acidic_weak_0022
+
+[layer_2]
+mines_section = mines_layer_2 
+
+[mines_layer_2]:mines_core
+mar_zone_mine_acidic_weak_0024
+mar_zone_mine_acidic_weak_0026
+mar_zone_mine_acidic_weak_0023
+mar_zone_mine_acidic_weak_0022

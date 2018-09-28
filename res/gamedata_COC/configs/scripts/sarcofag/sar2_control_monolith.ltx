@@ -1,0 +1,22 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+sar2_monolith_rock} sr_particle %=aes_earthshake%
+
+[sr_particle]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar_monolith_particle_way
+looped = true
+on_timer = 2000| sr_idle %-sar2_monolith_rock%
+on_info = {+sar2_monolith_end} sr_particle@2
+
+[sr_particle@2]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar_monolith_particle_way
+looped = true
+on_timer = 2000| sr_idle@nil
+
+[sr_idle@nil]

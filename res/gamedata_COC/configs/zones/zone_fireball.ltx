@@ -1,0 +1,111 @@
+[fireball_zone]:zone_base
+GroupControlSection			= spawn_group_zone
+$spawn						= "zones\fireball"
+;$prefetch 					= 8
+class						= ZS_TORRD
+hit_impulse_scale			=   0
+effective_radius			= 2.75 ;размер радиуса в процентах от оригинального, где действует зона
+postprocess					= postprocess_thermal_mine
+
+ef_anomaly_type				= 1
+ef_weapon_type				= 13
+
+
+;----------- Anomaly settings -----------------------
+max_start_power		= 0.9
+attenuation			= 1
+
+idle_particles				= anomaly2\heat_02
+blowout_particles			= anomaly2\heat_03
+
+hit_small_particles	    	= damage_fx\burn_creatures
+hit_big_particles			= damage_fx\burn_creatures00
+idle_small_particles		= damage_fx\burn_creatures
+idle_big_particles			= damage_fx\burn_creatures00
+
+idle_particles_dont_stop	= true;
+
+idle_sound					= anomaly\fireball_idle		;постоянный звук
+blowout_sound				= anomaly\fireball_blow	   	;во время выброса(удара) в центре аномалии
+hit_sound					= ambient\fire2				;на персонаже, когда тот получает хит
+entrance_sound				= ambient\fire2				;при попадании объекта в аномалию
+
+hit_type					= burn
+
+disable_time		= 0	;время игнорирования неживого объекта в зоне (-1 если не нужно)
+disable_time_small	= 0	;время игнорирования маленького неживого объекта в зоне (-1 если не нужно)
+disable_idle_time	= 50000	;время отключения idle партиклов
+
+ignore_nonalive		= true
+ignore_small		= true
+ignore_artefacts	= true
+
+blowout_light		= on
+light_color		    = 1.8,1.7,1.4
+light_range		    = 15.0
+light_time 		    = 2
+light_height		= 0.75			;подъем источника света на высоту
+
+
+idle_light			= on
+idle_light_range	= 15.0
+idle_light_anim		= koster_01
+idle_light_height	= 0.75			;подъем источника света на высоту
+
+awaking_time		= 100
+blowout_time		= 100
+accamulate_time		= 100
+
+blowout_wind		= off
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+
+
+[fireball_electric_zone]:fireball_zone
+$spawn						= "zones\fireball_electric"
+postprocess					= postprocess_electra_mine
+
+idle_particles				= anomaly2\heat_02_electra
+blowout_particles			= anomaly2\heat_03_electra
+
+hit_small_particles			= anomaly2\electra_entrance_small
+hit_big_particles			= anomaly2\electra_damage_02_smoke
+idle_small_particles		= anomaly2\electra_damage_01_smoke
+idle_big_particles			= anomaly2\electra_damage_02_smoke
+entrance_small_particles	= anomaly2\electra_entrance_small
+entrance_big_particles		= anomaly2\emi_entrance_big_00
+
+idle_sound					= anomaly\electra_idle1
+blowout_sound				= anomaly\electra_blast1
+hit_sound					= anomaly\electra_hit
+entrance_sound				= anomaly\electra_hit
+
+hit_type					= shock
+
+light_color		    		= 0.8,0.9,1
+
+idle_light_anim				= koster_01_electra
+
+[fireball_acidic_zone]:fireball_zone
+$spawn						= "zones\fireball_acidic"
+postprocess					= postprocess_acidic_mine
+
+idle_particles				= anomaly2\heat_02_green
+blowout_particles			= anomaly2\heat_03_green
+
+hit_small_particles	    	= 
+hit_big_particles			= 
+idle_small_particles		= 
+idle_big_particles			= 
+
+idle_sound					= anomaly\buzz_idle; bfuzz_blowout		;постоянный звук
+blowout_sound				= anomaly\buzz_hit; bfuzz_hit		;во время выброса(удара) в центре аномалии
+hit_sound					= anomaly\buzz_hit; bfuzz_hit		;на персонаже, когда тот получает хит
+entrance_sound				= anomaly\buzz_hit; bfuzz_hit		;при попадании объекта в аномалию
+
+hit_type					= chemical_burn
+
+light_color		    		= 1.1,1.7,1.4
+
+idle_light_anim				= light_green_00

@@ -1,0 +1,47 @@
+;Reference animpoint
+
+[animpoint@a28_radio]
+cover_name = pri_a16_animp_radio_talk
+reach_movement = walk
+avail_animations = wait ;ward
+out_restr = pri_a16_sr_noweap
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+;--------------------------------------
+
+[logic]
+active = animpoint@a28_radio_talking_1
+
+;--------------------------------------
+
+[animpoint@a28_radio_talking_1]:animpoint@a28_radio
+on_info = {=animpoint_reached -pri_a28_ssu_to_actor_1_sound_begin} %+pri_a28_ssu_to_actor_1_sound_begin%
+on_info2 = {+pri_a28_ssu_to_actor_1_sound_end} animpoint@a28_radio_talking_2
+
+[animpoint@a28_radio_talking_2]:animpoint@a28_radio
+on_game_timer = 10 | %=play_sound(pri_a28_actor_to_ssu_1)%
+on_signal = sound_end | animpoint@a28_radio_talking_3 %+pri_a28_actor_to_ssu_1_sound_end%
+
+[animpoint@a28_radio_talking_3]:animpoint@a28_radio
+on_info = {+pri_a28_ssu_to_actor_2_sound_end} animpoint@a28_radio_talking_4
+
+[animpoint@a28_radio_talking_4]:animpoint@a28_radio
+on_game_timer = 10 | %=play_sound(pri_a28_actor_to_ssu_2)%
+on_signal = sound_end | animpoint@a28_radio_talking_5 %+pri_a28_actor_to_ssu_2_sound_end%
+
+[animpoint@a28_radio_talking_5]:animpoint@a28_radio
+on_info = {+pri_a28_ssu_to_actor_3_sound_end} animpoint@a28_radio_talking_6
+
+[animpoint@a28_radio_talking_6]:animpoint@a28_radio
+on_game_timer = 10 | {+zat_b101_both_heli_info} %=play_sound(pri_a28_actor_to_ssu_with_heli_info)%, %=play_sound(pri_a28_actor_to_ssu_without_heli_info)%
+on_signal = sound_end | animpoint@a28_radio_talking_7 %+pri_a28_actor_to_ssu_with_or_without_heli_info_sound_end%
+
+[animpoint@a28_radio_talking_7]:animpoint@a28_radio
+on_info = {+pri_a28_destroy_base_cutscene_actor} %=destroy_object +pri_a28_destroy_base_cutscene_actor_done%

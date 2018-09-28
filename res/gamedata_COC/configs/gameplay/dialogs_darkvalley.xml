@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+<!------------- bandit_companion_task_1 ----------->
+	<dialog id="bandit_companion_task_1_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+			<phrase id="1">
+				<text />
+				<next>111</next>
+				<next>112</next>
+				<next>113</next>
+			</phrase>
+		    <phrase id="111">
+				<dont_has_info>bandit_companion_task_1_started</dont_has_info>
+				<precondition>dialogs_darkvalley.bandit_companion_task_1_not_complete</precondition>
+                <text>bandit_companion_task_1_start_dialog_1</text>
+				<give_info>bandit_companion_task_1_started</give_info>
+				<next>1111</next>
+            </phrase>
+		    <phrase id="112">
+				<has_info>bandit_companion_task_1_started</has_info>
+				<precondition>dialogs_darkvalley.bandit_companion_task_1_not_complete</precondition>
+                <text>bandit_companion_task_1_start_dialog_2</text>
+				<give_info>bandit_companion_task_1_started</give_info>
+				<next>1111</next>
+            </phrase>
+		    <phrase id="113">
+				<precondition>dialogs_darkvalley.bandit_companion_task_1_complete</precondition>
+                <text>bandit_companion_task_1_complete</text>
+				<action>dialogs_darkvalley.bandit_companion_task_1_give_reward</action>
+				<next>1113</next>
+            </phrase>
+			<phrase id="1111">
+				<text>bandit_companion_task_1_actor_reply</text>
+			</phrase>
+			<phrase id="1113">
+				<text>bandit_companion_task_1_actor_reply</text>
+				<action>dialogs_darkvalley.bandit_companion_task_1_complete_task</action>
+			</phrase>
+        </phrase_list>
+    </dialog>
+<!------------- val_smart_terrain_7_3_bandit_mechanic_stalker ---------->
+    <dialog id="val_smart_terrain_7_3_bandit_mechanic_stalker_start_dialog">
+        <phrase_list>
+			<phrase id="0">
+                <text>val_smart_terrain_7_3_bandit_mechanic_stalker_start_dialog_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+<!------------- val_smart_terrain_7_4_bandit_trader_stalker ---------------->
+   <dialog id="val_smart_terrain_7_4_bandit_trader_stalker_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+			<phrase id="1">
+				<text />
+				<next>111</next>
+				<next>112</next>
+			</phrase>
+		    <phrase id="111">
+				<dont_has_info>val_smart_terrain_7_4_bandit_trader_stalker_setup</dont_has_info>
+                <text>val_smart_terrain_7_4_bandit_trader_stalker_start_dialog_1</text>
+				<give_info>val_smart_terrain_7_4_bandit_trader_stalker_setup</give_info>
+            </phrase>
+		    <phrase id="112">
+				<has_info>val_smart_terrain_7_4_bandit_trader_stalker_setup</has_info>
+                <text>val_smart_terrain_7_4_bandit_trader_stalker_start_dialog_2</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

@@ -1,0 +1,16 @@
+[logic]
+active = nil ;sr_idle@zat_b33_run_tutor
+
+[sr_idle@zat_b33_run_tutor]
+on_info = {=actor_in_zone(zat_b33_tutor) -zat_b33_find_package !has_active_tutorial} sr_idle@zat_b33_stop_tutor %=run_tutorial(zat_b33_snag_container)%
+on_info2 = {+zat_b33_find_package} sr_idle@save
+
+[sr_idle@zat_b33_stop_tutor]
+on_info = {!actor_in_zone(zat_b33_tutor)} sr_idle@zat_b33_run_tutor %=stop_tutorial%
+on_info2 = {!has_active_tutorial} sr_idle@zat_b33_run_tutor
+
+[sr_idle@save]
+on_info = {-zat_b33_scenario_save_after_finde_package} %+zat_b33_scenario_save_after_finde_package =scenario_autosave(st_save_zat_b33_got_container)%
+on_info2 = {+zat_b33_scenario_save_after_finde_package} sr_idle@nil
+
+[sr_idle@nil]

@@ -1,0 +1,66 @@
+[mob_home@squad_01_wait]
+path_home = tushkano_home_1
+home_min_radius = 2
+home_max_radius = 5
+;out_restr = jup_b205_tushkano_zone_03
+;on_info = {!npc_in_zone(jup_b205_tushkano_zone_03)} %=teleport_npc(jup_b205_smart_terrain_tushkano_home_1)%
+
+[mob_home@squad_01_attack]
+path_home = tushkano_home_2
+home_min_radius = 5
+home_max_radius = 20
+
+
+
+[logic@tushkano_works]
+suitable = {=is_monster_tushkano} true
+monster_job = true
+on_death = mob_death
+
+[logic@tushkano_work_01]:logic@tushkano_works
+active = mob_home@tushkano_01_wait
+
+[logic@tushkano_work_02]:logic@tushkano_works
+active = mob_home@tushkano_02_wait
+
+[logic@tushkano_work_03]:logic@tushkano_works
+active = mob_home@tushkano_03_wait
+
+[logic@tushkano_work_04]:logic@tushkano_works
+active = mob_home@tushkano_04_wait
+
+[logic@tushkano_work_05]:logic@tushkano_works
+active = mob_home@tushkano_05_wait
+
+[logic@tushkano_work_06]:logic@tushkano_works
+active = mob_home@tushkano_06_wait
+
+[logic@tushkano_work_07]:logic@tushkano_works
+active = mob_home@tushkano_07_wait
+
+
+;---------------------------------------
+
+[mob_home@tushkano_01_wait]:mob_home@squad_01_wait
+;on_info2 = {=counter_equal(jup_b205_death_count:1)} mob_home@squad_01_attack
+
+[mob_home@tushkano_02_wait]:mob_home@squad_01_wait
+;on_info2 = {=counter_equal(jup_b205_death_count:2)} mob_home@squad_01_attack
+
+[mob_home@tushkano_03_wait]:mob_home@squad_01_wait
+;on_info2 = {=counter_equal(jup_b205_death_count:3)} mob_home@squad_01_attack
+
+[mob_home@tushkano_04_wait]:mob_home@squad_01_wait
+;on_info2 = {=counter_equal(jup_b205_death_count:4)} mob_home@squad_01_attack
+
+[mob_home@tushkano_05_wait]:mob_home@squad_01_wait
+;on_info2 = {=counter_equal(jup_b205_death_count:5)} mob_home@squad_01_attack
+
+[mob_home@tushkano_06_wait]:mob_home@squad_01_wait
+;on_info2 = {=counter_equal(jup_b205_death_count:6)} mob_home@squad_01_attack
+
+[mob_home@tushkano_07_wait]:mob_home@squad_01_wait
+;on_info2 = {=counter_equal(jup_b205_death_count:7)} mob_home@squad_01_attack
+
+[mob_death]
+;on_info = %=inc_counter(jup_b205_death_count)%

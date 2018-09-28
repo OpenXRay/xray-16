@@ -1,0 +1,36 @@
+[logic]
+active = walker@pri_a21_start
+on_hit = hit
+
+[walker@pri_a21_start]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+path_walk = pri_a21_smart_terrain_cutscene_actor_spawn_point
+path_look = pri_a21_smart_terrain_chasovoi_mad_walk
+def_state_standing = wait_rac
+on_game_timer = 60 | remark@talk_rac_actor
+
+[remark@talk_rac_actor]
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+anim = wait_rac
+target = path | pri_a21_smart_terrain_chasovoi_mad_walk, 0
+on_signal = sound_end | %+pri_a21_actor_talk_after_done%
+on_info = {-pri_a21_from_kontroler_100_m} %=play_sound(pri_a21_actor_to_base_find_and_terminate_controller)%
+on_info2 = {+pri_a21_from_kontroler_100_m} %=play_sound(pri_a21_actor_to_base_terminate_controller)%
+on_info3 = {+pri_a21_sentry_task_done} %=destroy_object%
+
+[hit]
+on_info = %+pri_a21_cut_actor_hit =destroy_object%

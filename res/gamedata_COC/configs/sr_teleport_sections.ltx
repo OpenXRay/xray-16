@@ -1,0 +1,917 @@
+;MARSH
+[mar_space_restrictor_to_escape_1]
+enable = true                                              	;Enable/disable level changer, can take condition list
+spot = level_changer_right                                  ;String from map_spots.xml for marking level changer on global map with icon
+text = st_level_changer_descr								;Text shown with Yes/No display box
+hint = ds_space_restrictor_to_escape_descr					;Map spot hint in st_items_quest.xml
+;hint = mar_space_restrictor_to_escape_descr				;Map spot hint in st_items_quest.xml
+path = mar_space_restrictor_to_escape_1_drop                ;Waypoint to teleport actor if Yes chosen
+reject_path = mar_level_changer_to_escape_1_reject_way      ;Waypoint to teleport actor if No chosen
+autosave = true
+
+[mar_space_restrictor_to_escape_2]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_escape_descr
+;hint = mar_space_restrictor2_to_escape_descr
+path = mar_space_restrictor_to_escape_2_drop
+reject_path = mar_level_changer_to_escape_2_reject_way
+autosave = true
+
+[mar_space_restrictor_to_agroprom_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = mar_space_restrictor_to_agroprom_descr
+path = mar_space_restrictor_to_agroprom_drop
+reject_path = mar_level_changer_to_agroprom_1_reject_way
+autosave = true
+
+[mar_teleport_from_base_to_north]
+enable = true
+spot = level_changer_up_right
+text = mar_teleport_from_base_to_north_descr
+hint = mar_teleport_from_base_to_north_descr
+path = mar_smart_terrain_5_12_teleport_walk
+reject_path = mar_smart_terrain_base_teleport_walk
+
+[mar_teleport_from_base_to_west]
+enable = true
+spot = level_changer_left_up
+text = mar_teleport_from_base_to_north_descr
+hint = mar_teleport_from_base_to_north_descr
+path = mar_actor_teleport_tutorial_walk
+reject_path = mar_smart_terrain_base_intro_walk
+
+[mar_teleport_to_base]
+enable = true
+spot = level_changer_down_left
+text = st_teleport2_descr
+hint = mar_teleport_to_base_desc
+path = mar_smart_terrain_base_teleport_walk
+reject_path = mar_smart_terrain_5_12_teleport_walk
+
+
+;ESCAPE
+[esc_space_restrictor_to_marsh_1]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = mar_teleport_from_base_to_north_descr
+;hint = esc_space_restrictor_to_marsh_descr
+path = esc_space_restrictor_to_marsh_drop
+reject_path = esc_level_changer_to_marsh_1_reject_way
+autosave = true
+
+[esc_space_restrictor_to_marsh_2]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = mar_teleport_from_base_to_north_descr
+;hint = esc_space_restrictor2_to_marsh_descr
+path = esc_space_restrictor_to_marsh_2_drop
+reject_path = esc_level_changer_to_marsh_2_reject_way
+autosave = true
+
+[esc_space_restrictor_to_garbage_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = esc_space_restrictor_to_garbage_drop
+reject_path = esc_level_changer_1_reject_way
+autosave = true
+
+
+[esc_space_restrictor_to_garbage_2]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = esc_space_restrictor_to_garbage_2_drop
+reject_path = esc_level_changer_2_reject_way
+autosave = true
+
+[esc_space_restrictor_to_darkscape_1]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_darkscape_descr
+path = esc_space_restrictor_to_darkscape_drop
+reject_path = esc_level_changer_to_darkvalley_1_reject_way
+autosave = true
+
+;DARKSCAPE
+[ds_space_restrictor_to_escape]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_escape_descr
+path = ds_space_restrictor_to_escape_drop
+reject_path = ds_level_changer_to_escape_1_reject_way
+autosave = true
+
+[ds_space_restrictor_to_darkvalley]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_darkvalley_desc
+path = ds_space_restrictor_to_darkvalley_drop
+reject_path = ds_level_changer_to_darkvalley_1_reject_way
+autosave = true
+
+;AGROPROM
+[agr_space_restrictor_to_garbage_1]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = agr_space_restrictor_to_garbage1_drop
+reject_path = agr_level_changer_to_garbage_1_reject_way
+autosave = true
+
+[agr_space_restrictor_to_garbage_2]
+enable = true
+spot = level_changer_up_right
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = agr_space_restrictor_to_garbage2_drop
+reject_path = agr_level_changer_to_garbage_2_reject_way
+autosave = true
+
+[agr_space_restrictor_to_marsh_1]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = mar_teleport_from_base_to_north_descr
+path = agr_space_restrictor_to_marsh_1_drop
+reject_path = agr_level_changer_to_marsh_1_reject_way
+autosave = true
+
+[agr_space_restrictor_to_yantar_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_yantar_desc
+path = agr_space_restrictor_to_yantar_1_drop
+reject_path = agr_level_changer_to_yantar_1_reject_way
+autosave = true
+
+[agr_space_restrictor_to_agr_ug_1]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_agr_ug_desc
+path = agr_space_restrictor_to_agr_ug_1_drop
+reject_path = agr_level_changer_to_underground_1_reject_way
+autosave = true
+
+[agr_space_restrictor_to_agr_ug_2]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_agr_ug_desc
+path = agr_space_restrictor_to_agr_ug_2_drop
+reject_path = agr_level_changer_to_underground_2_reject_way
+autosave = true
+
+[agr_space_restrictor_to_agr_ug_3]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_agr_ug_desc
+path = agr_space_restrictor_to_agr_ug_3_drop
+reject_path = agr_level_changer_to_underground_3_reject_way
+autosave = true
+
+[agr_space_restrictor_to_agr_ug_4]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_agr_ug_desc
+path = agr_space_restrictor_to_agr_ug_4_drop
+reject_path = agr_level_changer_to_underground_4_reject_way
+autosave = true
+
+[agr_space_restrictor_to_agr_ug_5]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_agr_ug_desc
+path = agr_space_restrictor_to_agr_ug_5_drop
+reject_path = agr_level_changer_to_underground_5_reject_way
+autosave = true
+
+[agr_space_restrictor_to_agr_ug_6]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_agr_ug_desc
+path = agr_space_restrictor_to_agr_ug_6_drop
+reject_path = agr_level_changer_to_underground_6_reject_way
+autosave = true
+
+
+;GARBAGE
+[gar_space_restrictor_to_agroprom_1]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = mar_space_restrictor_to_agroprom_descr
+path = gar_space_restrictor_to_agroprom_1_drop
+reject_path = gar_level_changer_to_agroprom_1_reject_way
+autosave = true
+
+[gar_space_restrictor_to_agroprom_2]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = mar_space_restrictor_to_agroprom_descr
+path = gar_space_restrictor_to_agroprom_2_drop
+reject_path = gar_level_changer_to_agroprom_2_reject_way
+autosave = true
+
+[gar_space_restrictor_to_bar_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_bar_desc
+path = gar_space_restrictor_to_bar_1_drop
+reject_path = gar_level_changer_to_bar_1_reject_way
+autosave = true
+
+[gar_space_restrictor_to_darkvalley_1]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_darkvalley_desc
+path = gar_space_restrictor_to_darkvalley_1_drop
+reject_path = gar_level_changer_to_darkvalley_1_reject_way
+autosave = true
+
+[gar_space_restrictor_to_darkvalley_2]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_darkvalley_desc
+path = gar_space_restrictor_to_darkvalley_2_drop
+reject_path = gar_level_changer_to_darkvalley_2_reject_way
+autosave = true
+
+[gar_space_restrictor_to_escape_1]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_escape_descr
+path = gar_space_restrictor_to_escape_1_drop
+reject_path = gar_level_changer_to_escape_1_reject_way
+autosave = true
+
+[gar_space_restrictor_to_escape_2]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_escape_descr
+path = gar_space_restrictor_to_escape_2_drop
+reject_path = gar_level_changer_to_escape_2_reject_way
+autosave = true
+
+[gar_space_restrictor_to_rostok_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_rostok_desc
+path = gar_space_restrictor_to_rostok_1_drop
+reject_path = gar_level_changer_to_rostok_1_reject_way
+autosave = true
+
+
+;DARK VALLEY
+[val_space_restrictor_to_darkscape]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_darkscape_descr
+path = val_space_restrictor_to_darkscape_drop
+reject_path = val_level_changer_to_darkscape_1_reject_way
+autosave = true
+
+[val_space_restrictor_to_garbage_1]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = val_space_restrictor_to_garbage_1_drop
+reject_path = val_level_changer_to_garbage_1_reject_way
+autosave = true
+
+[val_space_restrictor_to_garbage_2]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = val_space_restrictor_to_garbage_2_drop
+reject_path = val_level_changer_to_garbage_2_reject_way
+autosave = true
+
+[val_space_restrictor_to_labx18]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_labx18_desc
+path = val_space_restrictor_to_labx18_drop
+reject_path = val_level_changer_to_labx18_reject_way
+autosave = true
+
+[val_space_restrictor_to_tc]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_tc_desc
+path = val_space_restrictor_to_tc_drop
+reject_path = val_level_changer_to_tc_reject_way
+autosave = true
+
+;BAR
+[bar_space_restrictor_to_garbage_01]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = bar_space_restrictor_to_garbage_01_drop
+reject_path = bar_way_if_reject_to_gar
+autosave = true
+
+[bar_space_restrictor_to_military_01]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_military_desc
+path = bar_space_restrictor_to_military_01_drop
+reject_path = bar_way_if_reject_to_mil
+autosave = true
+
+[bar_space_restrictor_to_rostok_01]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = space_restrictor_to_rostok_desc
+path = bar_space_restrictor_to_rostok_01_drop
+reject_path = bar_way_if_reject_to_ros
+autosave = true
+
+[bar_space_restrictor_to_tc]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = space_restrictor_to_tc_desc
+path = bar_space_restrictor_to_tc_drop
+reject_path = bar_way_if_reject_to_tc
+autosave = false
+
+;ROSTOK
+[ros_space_restrictor_to_bar_1]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = space_restrictor_to_bar_desc
+path = ros_space_restrictor_to_bar_1_drop
+reject_path = ros_way_if_reject_to_bar
+autosave = true
+
+[ros_space_restrictor_to_garbage_1]
+enable = true
+spot = level_changer_right_down
+text = st_level_changer_descr
+hint = esc_space_restrictor_to_garbage_descr
+path = ros_space_restrictor_to_garbage_1_drop
+reject_path = ros_way_if_reject_to_garbage_1
+autosave = true
+
+[ros_space_restrictor_to_yantar_1]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = space_restrictor_to_yantar_desc
+path = ros_space_restrictor_to_yantar_1_drop
+reject_path = ros_way_if_reject_to_yan
+autosave = true
+
+
+;YANTAR
+[yan_space_restrictor_to_rostok_1]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = space_restrictor_to_rostok_desc
+path = yan_space_restrictor_to_rostok_1_drop
+reject_path = yan_level_changer_to_rostok_1_reject_way
+autosave = true
+
+[yan_space_restrictor_to_agroprom_1]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = mar_space_restrictor_to_agroprom_descr
+path = yan_space_restrictor_to_agroprom_1_drop
+reject_path = yan_level_changer_to_agroprom_1_reject_way
+autosave = true
+
+[yan_space_restrictor_to_dead_city_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_deadcity_desc
+path = yan_space_restrictor_to_dead_city_1_drop
+reject_path = yan_level_changer_to_dead_city_1_reject_way
+autosave = true
+
+[yan_space_restrictor_to_dead_city_2]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_deadcity_desc
+path = yan_space_restrictor_to_dead_city_1_drop_2
+reject_path = yan_level_changer_to_dead_city_1_reject_way_2
+autosave = true
+
+[yan_space_restrictor_to_x16]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_labx16_desc
+path = yan_space_restrictor_to_x16_drop
+reject_path = yan_way_if_reject_to_x16
+autosave = true
+
+
+;MILITARY
+[mil_space_restrictor_to_red_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = mil_space_restrictor_to_red_1_descr
+path = mil_space_restrictor_to_red_1_drop
+reject_path = mil_way_if_reject_to_red
+autosave = true
+
+[mil_space_restrictor_to_bar_1]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_bar_desc
+path = mil_space_restrictor_to_bar_1_drop
+reject_path = mil_level_changer_to_bar_1_reject_way
+autosave = true
+
+[mil_space_restrictor_to_radar_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_radar_desc
+path = mil_space_restrictor_to_radar_1_drop
+reject_path = mil_way_if_reject_to_rad
+autosave = true
+
+[mil_space_restrictor_to_dead_city_1]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = space_restrictor_to_deadcity_desc
+path = mil_space_restrictor_to_dead_city_1_drop
+reject_path = mil_level_changer_to_dead_city_1_reject_way
+autosave = true
+
+[mil_space_restrictor_to_tc]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_tc_desc
+path = mil_space_restrictor_to_tc_drop
+reject_path = mil_level_changer_to_tc_reject_way
+autosave = true
+
+;DEAD CITY
+[cit_space_restrictor_to_limansk]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_limansk_desc
+path = cit_space_restrictor_to_limansk_drop
+reject_path = cit_to_limansk_if_reject_way
+autosave = true
+
+[cit_space_restrictor_to_yantar]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_yantar_desc
+path = cit_space_restrictor_to_yantar_drop
+reject_path = cit_to_yantar_if_reject_way
+autosave = true
+
+[cit_space_restrictor_to_military]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = space_restrictor_to_military_desc
+path = cit_space_restrictor_to_military_drop
+reject_path = cit_to_military_if_reject_way
+autosave = true
+
+
+;RED FOREST
+[red_space_restricor_to_jupiter]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_jupiter_desc
+path = red_space_restricor_to_jupiter_drop
+reject_path = red_level_changer_to_jupiter_reject_way
+autosave = true
+
+[red_space_restrictor_to_military_1]
+enable = true
+spot = level_changer_right_down
+text = st_level_changer_descr
+hint = space_restrictor_to_military_desc
+path = red_space_restrictor_to_military_1_drop
+reject_path = red_level_changer_to_military_1_reject_way
+autosave = true
+
+[red_space_restrictor_to_limansk]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = space_restrictor_to_limansk_desc
+path = red_space_restrictor_to_limansk_drop
+reject_path = red_level_changer_to_limansk_reject_way
+autosave = true
+
+[red_space_restrictor_to_radar_1]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = space_restrictor_to_radar_desc
+path = red_space_restrictor_to_radar_1_drop
+reject_path = red_level_changer_to_radar_1_reject_way
+autosave = true
+
+;RADAR
+[rad_space_restrictor_to_military_01]
+enable = true
+spot = level_changer_down_left
+text = st_level_changer_descr
+hint = space_restrictor_to_military_desc
+path = rad_space_restrictor_to_military_01_drop
+reject_path = rad_way_if_reject_to_mil
+autosave = true
+
+[rad_space_restrictor_to_red_forest]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = mil_space_restrictor_to_red_1_descr
+path = rad_space_restrictor_to_red_forest_drop
+reject_path = rad_to_red_forest_if_reject_way
+autosave = true
+
+[rad_space_restrictor_to_pripyat_01]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_pripyat_desc
+path = rad_space_restrictor_to_pripyat_01_drop
+reject_path = rad_way_if_reject_to_pri
+autosave = true
+
+[rad_space_restrictor_to_bunker]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_labx10_desc
+path = rad_space_restrictor_to_bunker_drop
+reject_path = rad_way_if_reject_to_und
+autosave = true
+
+;LIMANSK
+[lim_space_restrictor_to_dead_city]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_deadcity_desc
+path = lim_space_restrictor_to_dead_city_drop
+reject_path = lim_to_dead_city_if_reject_way
+autosave = true
+
+[lim_space_restrictor_to_red_forest]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = mil_space_restrictor_to_red_1_descr
+path = lim_space_restrictor_to_red_forest_drop
+reject_path = lim_level_changer_to_red_forest_reject_way
+autosave = true
+
+[lim_space_restrictor_to_hospital]
+enable = true
+spot = level_changer_up_right
+text = st_level_changer_descr
+hint = space_restrictor_to_hospital
+path = lim_space_restrictor_to_hospital_drop
+reject_path = lim_level_changer_to_hospital_reject_way
+autosave = true
+
+
+;HOSPITAL
+[katacomb_space_restrictor_to_limansk]
+enable = true
+spot = level_changer_down_left
+text = st_level_changer_descr
+hint = space_restrictor_to_limansk_desc
+path = katacomb_space_restrictor_to_limansk_drop
+reject_path = katacomb_level_changer_to_limansk_reject_way
+autosave = true
+
+[katacomb_space_restrictor_to_aes_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = gen_space_restrictor_to_aes2_descr
+path = katacomb_space_restrictor_to_aes_1_drop
+reject_path = katacomb_level_changer_to_aes_1_reject_way
+autosave = true
+
+
+;PRIPYAT
+[pri_space_restrictor_to_radar]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_radar_desc
+path = pri_space_restrictor_to_radar_drop
+reject_path = pri_way_if_reject_to_rad
+autosave = true
+
+[pri_space_restrictor_to_stancia]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = gen_space_restrictor_to_aes2_descr
+path = pri_space_restrictor_to_stancia_drop
+reject_path = pri_path_if_reject
+autosave = true
+
+[pri_space_restrictor_to_cop_pripyat]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = space_restrictor_to_cop_pripyat_desc
+path = pri_space_restrictor_to_cop_pripyat_drop
+reject_path = pri_path_if_reject_to_cop_pripyat
+autosave = true
+
+[pri_space_restrictor_to_jupiter]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = space_restrictor_to_jupiter_desc
+path = pri_space_restrictor_to_jupiter_drop
+reject_path = pri_path_if_reject_to_jupiter
+autosave = true
+
+[pri_space_restrictor_to_jup_ug]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_jupiter_ug_desc
+path = pri_a15_actor_spawn
+reject_path = pri_a15_traveller_actor
+autosave = true
+
+[pri_space_restrictor_to_labx8]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_labx8_desc
+path = pri_b306_actor_lc_walk
+reject_path = pri_path_if_reject_to_labx8
+autosave = true
+
+;STANCIA1
+[aes_space_restrictor_to_pripyat]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_pripyat_desc
+path = aes_space_restrictor_to_pripyat_drop
+reject_path = from_aes_to_pripjat_way_if_reject
+autosave = true
+
+[aes_space_restrictor_to_zaton]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_zaton_desc
+path = aes_space_restrictor_to_red_forest_drop
+reject_path = aes_level_changer_to_red_forest_reject_way
+autosave = true
+
+[aes_space_restrictor_to_aes2]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = gen_space_restrictor_to_aes2_descr
+path = aes_space_restrictor_to_aes2_drop
+reject_path = aes_to_aes2_if_reject_way
+autosave = true
+
+[aes_space_restrictor_to_sarcofag]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_sarcophagus_desc
+path = aes_space_restrictor_to_sarcofag_drop
+reject_path = st1_way_if_reject_to_sar
+autosave = true
+
+;STANCIA 2
+[aes2_space_restrictor_to_gen]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = aes2_space_restrictor_to_gen_descr
+path = aes2_space_restrictor_to_gen_drop
+reject_path = aes2_way_if_reject_to_gen
+autosave = true
+
+[aes2_space_restrictor_to_aes1]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = gen_space_restrictor_to_aes2_descr
+path = aes2_space_restrictor_to_aes1_drop
+reject_path = from_aes2_to_aes_way_if_reject
+autosave = true
+
+[aes2_space_restrictor_to_hospital]
+enable = true
+spot = level_changer_down_left
+text = st_level_changer_descr
+hint = space_restrictor_to_hospital
+path = aes2_space_restrictor_to_hospital_drop
+reject_path = aes2_to_hospital_way_if_reject
+autosave = true
+
+[aes2_space_restrictor_to_secret_lab]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_secret_lab_desc
+path = aes2_space_restrictor_to_secret_lab_drop
+reject_path = st2_way_if_reject_to_con
+autosave = true
+
+;GENERATORS
+[gen_space_restrictor_to_aes2]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = gen_space_restrictor_to_aes2_descr
+path = gen_space_restrictor_to_aes2_drop
+reject_path = gen_way_if_reject_to_aes2
+autosave = true
+
+[gen_space_restrictor_to_warlab]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_warlab_desc
+path = gen_space_restrictor_to_warlab_drop
+reject_path = gen_way_if_reject_to_warlab
+autosave = true
+
+;ZATON
+[zaton_space_restrictor_to_jupiter]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_jupiter_desc
+path = zaton_space_restrictor_to_jupiter_drop
+reject_path = zaton_way_if_reject_to_jupiter
+autosave = true
+
+[zaton_space_restrictor_to_stancia_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = gen_space_restrictor_to_aes2_descr
+path = zaton_space_restrictor_to_stancia_1_drop
+reject_path = zaton_way_if_reject_to_stancia
+autosave = true
+
+;JUPITER
+[jup_space_restrictor_to_zaton]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_zaton_desc
+path = jup_space_restrictor_to_zaton_drop
+reject_path = jup_way_if_reject_to_zaton
+autosave = true
+
+[jupiter_space_restrictor_to_red_forest]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = mil_space_restrictor_to_red_1_descr
+path = jupiter_space_restrictor_to_red_forest_drop
+reject_path = jup_way_if_reject_to_red_forest
+autosave = true
+
+[jupiter_space_restrictor_to_soc_pripyat]
+enable = true
+spot = level_changer_right
+text = st_level_changer_descr
+hint = space_restrictor_to_pripyat_desc
+path = jupiter_space_restrictor_to_soc_pripyat_drop
+reject_path = jup_way_if_reject_to_soc_pripyat
+autosave = true
+
+[jupiter_space_restrictor_to_jupiter_ug]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = space_restrictor_to_jupiter_ug_desc
+path = jupiter_space_restrictor_to_jupiter_ug_drop
+reject_path = jup_way_if_reject_to_jupiter_ug
+autosave = true
+
+
+;JUPITER UNDERGROUND
+[jupiter_ug_space_restrictor_to_jupiter]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_jupiter_desc
+path = jupiter_ug_space_restrictor_to_jupiter_drop
+reject_path = jup_ug_way_if_reject_to_jupiter
+autosave = true
+
+
+;COP PRIPYAT
+[cop_pripyat_space_restrictor_to_soc_pripyat]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = space_restrictor_to_pripyat_desc
+path = cop_pripyat_space_restrictor_to_soc_pripyat_drop
+reject_path = cop_pripyat_way_if_reject_to_soc_pripyat
+autosave = true
+
+;TRUCKS CEMETERY
+[tc_space_restrictor_to_darkvalley]
+enable = true
+spot = level_changer_down
+text = st_level_changer_descr
+hint = ds_space_restrictor_to_darkvalley_desc
+path = tc_space_restrictor_to_darkvalley_drop
+reject_path = tc_way_if_reject_to_darkvalley
+autosave = true
+
+[tc_space_restrictor_to_bar]
+enable = true
+spot = level_changer_left
+text = st_level_changer_descr
+hint = space_restrictor_to_bar_desc
+path = tc_space_restrictor_to_bar_drop
+reject_path = tc_level_changer_to_bar_reject_way
+autosave = true
+
+[tc_space_restrictor_to_military_1]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_military_desc
+path = tc_space_restrictor_to_military_drop
+reject_path = tc_way_if_reject_to_military_1
+autosave = true
+
+[tc_space_restrictor_to_military_2]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_military_desc
+path = tc_space_restrictor_to_military_drop
+reject_path = tc_way_if_reject_to_military_2
+autosave = true
+
+[tc_space_restrictor_to_military_3]
+enable = true
+spot = level_changer_up
+text = st_level_changer_descr
+hint = space_restrictor_to_military_desc
+path = tc_space_restrictor_to_military_drop
+reject_path = tc_way_if_reject_to_military_3
+autosave = true

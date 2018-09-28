@@ -1,0 +1,51 @@
+<w>
+    <file name="ui\ui_statistics">
+
+<!--team frame-->
+    <texture id="ui_statTwo_t" x="0" y="0" width="845" height="98" />
+<!--//tile-->
+    <texture id="ui_statTwo_back" x="0" y="98" width="845" height="162" />
+    <texture id="ui_statTwo_tabdiv" x="0" y="711" width="845" height="25" />
+<!--//tile-->
+    <texture id="ui_statTwo2_back" x="0" y="540" width="845" height="162" />
+    <texture id="ui_statTwo2_tabdiv" x="0" y="267" width="845" height="58" />
+
+<!--//lines-->
+    <texture id="ui_v_line_normal" x="6" y="327" width="1" height="16" />
+    <texture id="ui_v_line_bold" x="423" y="107" width="2" height="16" />
+
+
+<!--//deathmatch-->
+    <texture id="ui_statTwo_tabdiv_l" x="9" y="325" width="402" height="25" />
+    <texture id="ui_statTwo_tabdiv_r" x="411" y="325" width="402" height="25" />
+    <texture id="ui_string_statTwo_b" x="813" y="325" width="32" height="15" />
+    <texture id="ui_string_statTwo_back" x="813" y="325" width="32" height="15" />
+    <texture id="ui_string_statTwo_e" x="813" y="325" width="32" height="15" />
+    <texture id="ui_statOne_t" x="0" y="350" width="446" height="95" />
+    <texture id="ui_statOne_b" x="0" y="445" width="447" height="58" />
+    <texture id="ui_statOne_tabdiv" x="0" y="503" width="411" height="25" />
+    <texture id="ui_statOne_back" x="447" y="350" width="440" height="163" />
+
+    <texture id="ui_statTwo_b" x="0" y="0" width="845" height="98" />
+    <texture id="ui_statTwo_e" x="0" y="711" width="845" height="25" />
+    <texture id="ui_statTwo2_b" x="0" y="0" width="839" height="0" />
+    <texture id="ui_statTwo2_e" x="0" y="267" width="839" height="58" />
+
+ 	<texture id="ui_statSingle_b" x="0" y="350" width="447" height="95" />
+	<texture id="ui_statSingle_e" x="0" y="445" width="447" height="58" />
+	<texture id="ui_statSingle_back" x="447" y="350" width="447" height="163" />
+
+	<texture id="ui_statGreen_b" x="0" y="0" width="424" height="98" />
+	<texture id="ui_statGreen_e" x="0" y="282" width="424" height="31" />
+	<texture id="ui_statGreen_back" x="0" y="99" width="424" height="174" />
+
+	<texture id="ui_statBlue_b" x="424" y="0" width="424" height="98" />
+	<texture id="ui_statBlue_e" x="424" y="282" width="424" height="31" />
+	<texture id="ui_statBlue_back" x="424" y="99" width="424" height="174" />
+
+    <texture id="ui_statSpectators_b" x="0" y="350" width="446" height="95" />
+    <texture id="ui_statSpectators_e" x="0" y="460" width="446" height="31" />
+    <texture id="ui_statSpectators_back" x="0" y="445" width="446" height="15" />
+
+   </file>
+</w>

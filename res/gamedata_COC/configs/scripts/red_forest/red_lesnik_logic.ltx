@@ -1,0 +1,88 @@
+[logic]
+active =  mob_trader@sit
+relation = neutral
+level_spot = quest_npc
+
+[mob_trader@sit]
+anim_global = forester_sit
+on_game_timer = 100 | {~50} mob_trader@idle_see, mob_trader@beard
+on_info = {=npc_talking ~35} mob_trader@talk1, {=npc_talking ~35} mob_trader@talk2, {=npc_talking} mob_trader@talk3
+on_info2 = {=dist_to_actor_le(4) !npc_talking} mob_trader@hello
+;on_info2 = {=actor_out_zone(red_forester_restr)} mob_trader@idle_wait
+
+[mob_trader@idle_see]
+anim_global = forester_see
+anim_head = normal
+on_signal = animation_end | {~75} mob_trader@sit, {~25} mob_trader@beard
+on_info = {=npc_talking ~35} mob_trader@talk1, {=npc_talking ~35} mob_trader@talk2, {=npc_talking} mob_trader@talk3
+on_info2 = {=dist_to_actor_le(4) !npc_talking} mob_trader@hello
+
+[mob_trader@beard]
+anim_global = forester_beard
+anim_head = normal
+on_signal = animation_end | {~75} mob_trader@sit, {~25} mob_trader@idle_see, mob_trader@sit
+on_info = {=npc_talking ~35} mob_trader@talk1, {=npc_talking ~35} mob_trader@talk2, {=npc_talking} mob_trader@talk3
+on_info2 = {=dist_to_actor_le(4) !npc_talking} mob_trader@hello
+
+[mob_trader@hello]
+anim_global = forester_reaction
+anim_head = forester_reaction
+sound_phrase = red_forester_meet
+on_info = mob_trader@sit2
+on_signal = animation_end | mob_trader@sit2
+
+[mob_trader@sit2]
+anim_global = forester_sit
+on_game_timer = 100 | {~50} mob_trader@idle_see2, mob_trader@beard2
+on_info = {=npc_talking ~35} mob_trader@talk1, {=npc_talking ~35} mob_trader@talk2, {=npc_talking} mob_trader@talk3
+on_info2 = {=dist_to_actor_ge(4) !npc_talking} mob_trader@sit
+
+[mob_trader@idle_see2]
+anim_global = forester_see
+anim_head = normal
+on_signal = animation_end | {~75} mob_trader@beard2, mob_trader@sit2
+on_info = {=npc_talking ~35} mob_trader@talk1, {=npc_talking ~35} mob_trader@talk2, {=npc_talking} mob_trader@talk3
+on_info2 = {=dist_to_actor_ge(4) !npc_talking} mob_trader@sit
+
+[mob_trader@beard2]
+anim_global = forester_beard
+anim_head = normal
+on_signal = animation_end | {~75} mob_trader@idle_see2, mob_trader@sit2
+on_info = {=npc_talking ~35} mob_trader@talk1, {=npc_talking ~35} mob_trader@talk2, {=npc_talking} mob_trader@talk3
+on_info2 = {=dist_to_actor_ge(4) !npc_talking} mob_trader@sit
+
+
+
+[mob_trader@talk1]
+anim_global = forester_talk_1
+anim_head = forester_talk_1
+on_info = {=is_upgrading} mob_trade@trade
+on_info2 = {!npc_talking} mob_trader@bye
+
+[mob_trader@talk2]
+anim_global = forester_talk_2
+anim_head = forester_talk_2
+on_info = {=is_upgrading} mob_trade@trade
+on_info2 = {!npc_talking} mob_trader@bye
+
+[mob_trader@talk3]
+anim_global = forester_talk_3
+anim_head = forester_talk_3
+on_info = {=is_upgrading} mob_trade@trade
+on_info2 = {!npc_talking} mob_trader@bye
+
+[mob_trade@trade]
+anim_global = forester_talk_3
+anim_head = forester_talk_3
+on_info = {!is_upgrading} mob_trader@bye
+
+[mob_trader@bye]
+anim_global = forester_talk_1
+anim_head = forester_talk_1
+sound_phrase = red_forester_meet_bye
+on_info={!npc_talking !is_upgrading} mob_trader@sit2
+
+
+[meet@no_trade]
+trade_enable = false
+quest_npc = true

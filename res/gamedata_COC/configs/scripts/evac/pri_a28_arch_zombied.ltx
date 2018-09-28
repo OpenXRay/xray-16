@@ -1,0 +1,107 @@
+[logic@pri_a28_zombied_1_arch]
+suitable = {=target_squad_name(pri_a28_arch_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_1_arch_walk
+
+[logic@pri_a28_zombied_2_arch]
+suitable = {=target_squad_name(pri_a28_arch_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_2_arch_walk
+
+[logic@pri_a28_zombied_3_arch]
+suitable = {=target_squad_name(pri_a28_arch_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_3_arch_walk
+
+[logic@pri_a28_zombied_4_arch]
+suitable = {=target_squad_name(pri_a28_arch_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_4_arch_walk
+
+[logic@pri_a28_zombied_5_arch]
+suitable = {=target_squad_name(pri_a28_arch_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_5_arch_walk
+
+[logic@pri_a28_zombied_6_arch]
+suitable = {=target_squad_name(pri_a28_arch_zombied) +pri_b305_fifth_cam_end} true
+prior = 200
+active = walker@pri_a28_zombied_6_arch_walk
+
+
+
+[walker@pri_a28_zombied_1_arch_walk]
+path_walk = zombied_1_walk
+on_info = walker@pri_a28_zombied_1_arch_wait %=teleport_npc(pri_a28_arch_zombied_1_walk)%
+
+[walker@pri_a28_zombied_2_arch_walk]
+path_walk = zombied_2_walk
+on_info = walker@pri_a28_zombied_2_arch_wait %=teleport_npc(pri_a28_arch_zombied_2_walk)%
+
+[walker@pri_a28_zombied_3_arch_walk]
+path_walk = zombied_3_walk
+on_info = walker@pri_a28_zombied_3_arch_wait %=teleport_npc(pri_a28_arch_zombied_3_walk)%
+
+[walker@pri_a28_zombied_4_arch_walk]
+path_walk = zombied_4_walk
+on_info = walker@pri_a28_zombied_4_arch_wait %=teleport_npc(pri_a28_arch_zombied_4_walk)%
+
+[walker@pri_a28_zombied_5_arch_walk]
+path_walk = zombied_5_walk
+on_info = walker@pri_a28_zombied_5_arch_wait %=teleport_npc(pri_a28_arch_zombied_5_walk)%
+
+[walker@pri_a28_zombied_6_arch_walk]
+path_walk = zombied_6_walk
+on_info = walker@pri_a28_zombied_6_arch_wait %=teleport_npc(pri_a28_arch_zombied_6_walk)%
+
+
+
+[walker@pri_a28_zombied_1_arch_wait]
+path_walk = zombied_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_strelok_go_over_anomaly} walker@pri_a28_zombied_1_arch_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_1_arch_attack
+
+[walker@pri_a28_zombied_2_arch_wait]
+path_walk = zombied_2_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_strelok_go_over_anomaly} walker@pri_a28_zombied_1_arch_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_1_arch_attack
+
+[walker@pri_a28_zombied_3_arch_wait]
+path_walk = zombied_3_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_strelok_go_over_anomaly} walker@pri_a28_zombied_2_arch_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_2_arch_attack
+
+[walker@pri_a28_zombied_4_arch_wait]
+path_walk = zombied_4_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_strelok_go_over_anomaly} walker@pri_a28_zombied_2_arch_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_2_arch_attack
+
+[walker@pri_a28_zombied_5_arch_wait]
+path_walk = zombied_5_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_strelok_go_over_anomaly} walker@pri_a28_zombied_3_arch_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_3_arch_attack
+
+[walker@pri_a28_zombied_6_arch_wait]
+path_walk = zombied_6_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_strelok_go_over_anomaly} walker@pri_a28_zombied_3_arch_attack
+on_info2 = {=dist_to_actor_le(13)} walker@pri_a28_zombied_3_arch_attack
+
+
+
+[walker@pri_a28_zombied_1_arch_attack]
+path_walk = zombied_1_attack
+on_signal = path_end | %+pri_a28_arch_zombied_done%
+
+[walker@pri_a28_zombied_2_arch_attack]
+path_walk = zombied_2_attack
+on_signal = path_end | %+pri_a28_arch_zombied_done%
+
+[walker@pri_a28_zombied_3_arch_attack]
+path_walk = zombied_3_attack
+on_signal = path_end | %+pri_a28_arch_zombied_done%

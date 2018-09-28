@@ -1,0 +1,13 @@
+[logic@agr_u_monsters_controller]
+active = mob_walker
+suitable = {=target_squad_name(agru_controller_1_squad)} true
+monster_job = true
+prior = 200
+on_death = mob_death
+
+[mob_walker]
+path_walk = walk
+out_restr = agru_poltergeist_out_restr
+
+[mob_death]
+on_info = %+agru_controller_death%

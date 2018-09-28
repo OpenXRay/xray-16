@@ -1,0 +1,30 @@
+[volume]
+	EmittersNum		= 2
+	Hemi			= 0.0
+
+	GravityBuoyancy		= 0.0015;
+
+[emitter01]
+	Type 			= SimpleGaussian
+	Position 		= 49.0, 10.0, 54.0
+	Radius			= 0.25
+	Sigma			= 1
+	FlowSpeed		= 0.4
+	FlowDirection	= -0.7, 1.5, -0.8
+	Density			= 2.0
+
+	ApplyDensity	= 1
+	ApplyImpulse	= 1
+
+[emitter00]
+	Type 			= SimpleGaussian
+	Position 		= 35.0, 10.0, 40.0
+;	Radius			= 0.15
+	Radius			= 0.22
+	Sigma			= 1
+	FlowSpeed		= 0.1
+	FlowDirection	= -1.2, 1.5, -0.8
+	Density			= 1.0
+
+	ApplyDensity	= 1
+	ApplyImpulse	= 1

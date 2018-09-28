@@ -1,0 +1,149 @@
+;Meets default
+[meet@def]
+close_snd_hello = nil
+close_snd_bye = nil
+close_distance = 0
+far_distance = 0
+close_victim = nil
+use = false
+abuse = false
+
+[meet@zulus_def]:meet@def
+snd_on_use = pas_b400_zulus_no_meet
+
+[meet@vano_def]:meet@def
+snd_on_use = pas_b400_vano_no_meet
+
+[meet@sokolov_def]:meet@def
+snd_on_use = pas_b400_sokolov_no_meet
+
+[meet@wanderer_def]:meet@def
+snd_on_use = pas_b400_wanderer_no_meet
+
+
+;Hits
+[hit@zulus]
+on_info = {-pas_b400_zulus_dead !is_playing_sound =is_alive !hit_by_actor} %=play_sound(pas_b400_zulus_on_enemy_hit)%
+on_info2 = {-pas_b400_zulus_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_zulus_hit:2) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_zulus_on_actor_hit_3) =inc_counter(pas_b400_actor_zulus_hit) =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+on_info3 = {-pas_b400_zulus_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_zulus_hit:1) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_zulus_on_actor_hit_2) =inc_counter(pas_b400_actor_zulus_hit)%
+on_info4 = {-pas_b400_zulus_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_zulus_hit:0) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_zulus_on_actor_hit_1) =inc_counter(pas_b400_actor_zulus_hit)%
+on_info5 = {=deadly_hit} %+pas_b400_zulus_dead%
+
+[hit@vano]
+on_info = {-pas_b400_vano_dead !is_playing_sound =is_alive !hit_by_actor} %=play_sound(pas_b400_vano_on_enemy_hit)%
+on_info2 = {-pas_b400_vano_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_vano_hit:2) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_vano_on_actor_hit_3) =inc_counter(pas_b400_actor_vano_hit) =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+on_info3 = {-pas_b400_vano_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_vano_hit:1) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_vano_on_actor_hit_2) =inc_counter(pas_b400_actor_vano_hit)%
+on_info4 = {-pas_b400_vano_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_vano_hit:0) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_vano_on_actor_hit_1) =inc_counter(pas_b400_actor_vano_hit)%
+on_info5 = {=deadly_hit} %+pas_b400_vano_dead%
+
+[hit@sokolov]
+on_info = {-pas_b400_sokolov_dead !is_playing_sound =is_alive !hit_by_actor} %=play_sound(pas_b400_sokolov_on_enemy_hit)%
+on_info2 = {-pas_b400_sokolov_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_sokolov_hit:2) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_sokolov_on_actor_hit_3) =inc_counter(pas_b400_actor_sokolov_hit) =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+on_info3 = {-pas_b400_sokolov_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_sokolov_hit:1) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_sokolov_on_actor_hit_2) =inc_counter(pas_b400_actor_sokolov_hit)%
+on_info4 = {-pas_b400_sokolov_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_sokolov_hit:0) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_sokolov_on_actor_hit_1) =inc_counter(pas_b400_actor_sokolov_hit)%
+on_info5 = {=deadly_hit} %+pas_b400_sokolov_dead%
+
+[hit@wanderer]
+on_info = {-pas_b400_wanderer_dead !is_playing_sound =is_alive !hit_by_actor} %=play_sound(pas_b400_wanderer_on_enemy_hit)%
+on_info2 = {-pas_b400_wanderer_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_wanderer_hit:2) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_wanderer_on_actor_hit_3) =inc_counter(pas_b400_actor_wanderer_hit) =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+on_info3 = {-pas_b400_wanderer_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_wanderer_hit:1) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_wanderer_on_actor_hit_2) =inc_counter(pas_b400_actor_wanderer_hit)%
+on_info4 = {-pas_b400_wanderer_dead !is_playing_sound =is_alive !has_enemy =hit_by_actor =counter_equal(pas_b400_actor_wanderer_hit:0) =squad_exist(pas_b400_stalkers_squad)} %=play_sound(pas_b400_wanderer_on_actor_hit_1) =inc_counter(pas_b400_actor_wanderer_hit)%
+on_info5 = {=deadly_hit} %+pas_b400_wanderer_dead%
+
+
+;Death
+[death@zulus]
+on_info = %=stop_sound +pas_b400_zulus_dead +pri_a15_zulus_out%
+on_info2 = {!killed_by_actor} %+pas_b400_zulus_dead_sound%, {=killed_by_actor =squad_exist(pas_b400_stalkers_squad)} %+pas_b400_zulus_dead_sound +pas_b400_zulus_dead_sound_actor =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+
+[death@vano]
+on_info = %=stop_sound +pas_b400_vano_dead +pri_a15_vano_out%
+on_info2 = {!killed_by_actor} %+pas_b400_vano_dead_sound%, {=killed_by_actor =squad_exist(pas_b400_stalkers_squad)} %+pas_b400_vano_dead_sound +pas_b400_vano_dead_sound_actor =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+
+[death@sokolov]
+on_info = %=stop_sound +pas_b400_sokolov_dead +pri_a15_sokolov_out%
+on_info2 = {!killed_by_actor} %+pas_b400_sokolov_dead_sound%, {=killed_by_actor =squad_exist(pas_b400_stalkers_squad)} %+pas_b400_sokolov_dead_sound +pas_b400_sokolov_dead_sound_actor =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+
+[death@wanderer]
+on_info = %=stop_sound +pas_b400_wanderer_dead +pri_a15_wanderer_out%
+on_info2 = {!killed_by_actor} %+pas_b400_wanderer_dead_sound%, {=killed_by_actor =squad_exist(pas_b400_stalkers_squad)} %+pas_b400_wanderer_dead_sound +pas_b400_wanderer_dead_sound_actor =set_squad_enemy_to_actor(pas_b400_stalkers_squad) +pas_b400_actor_enemy%
+
+
+;Sounds
+[walker@zulus_def]
+meet = meet@zulus_def
+wounded = wounded@no_wound
+def_state_standing = threat_na
+def_state_moving = assault
+on_info92 = {+pas_b400_about_gates} %-pas_b400_about_gates =play_sound(pas_b400_zulus_about_gates)%
+on_info93 = {+pas_b400_zulus_idle_talk} %-pas_b400_zulus_idle_talk =play_sound(pas_b400_zulus_idle)%
+on_info94 = {+pas_b400_vano_dead_sound +pas_b400_vano_dead_sound_actor} %-pas_b400_vano_dead_sound =play_sound(pas_b400_zulus_on_actor_assault)%, {+pas_b400_vano_dead_sound} %-pas_b400_vano_dead_sound =play_sound(pas_b400_zulus_on_enemy_assault_vano)%
+on_info95 = {+pas_b400_sokolov_dead_sound +pas_b400_sokolov_dead_sound_actor} %-pas_b400_sokolov_dead_sound =play_sound(pas_b400_zulus_on_actor_assault)%, {+pas_b400_sokolov_dead_sound} %-pas_b400_sokolov_dead_sound =play_sound(pas_b400_zulus_on_enemy_assault_sokolov)%
+on_info96 = {+pas_b400_wanderer_dead_sound +pas_b400_wanderer_dead_sound_actor} %-pas_b400_wanderer_dead_sound =play_sound(pas_b400_zulus_on_actor_assault)%, {+pas_b400_wanderer_dead_sound} %-pas_b400_wanderer_dead_sound =play_sound(pas_b400_zulus_on_enemy_assault_wanderer)%
+on_info97 = {+pas_b400_actor_far =dist_to_actor_le(30)} %-pas_b400_actor_far%
+on_info98 = {-pas_b400_actor_far =pas_b400_actor_far_backward} %=play_sound(pas_b400_zulus_come_back) +pas_b400_actor_far%
+on_info99 = {-pas_b400_actor_far =pas_b400_actor_far_forward} %=play_sound(pas_b400_zulus_wait_for_me) +pas_b400_actor_far%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@vano_def]
+meet = meet@vano_def
+wounded = wounded@no_wound
+def_state_standing = threat_na
+def_state_moving = assault
+on_info92 = {+pas_b400_about_gates} %-pas_b400_about_gates =play_sound(pas_b400_vano_about_gates)%
+on_info93 = {+pas_b400_vano_idle_talk} %-pas_b400_vano_idle_talk =play_sound(pas_b400_vano_idle)%
+on_info94 = {+pas_b400_zulus_dead_sound +pas_b400_zulus_dead_sound_actor} %-pas_b400_zulus_dead_sound =play_sound(pas_b400_vano_on_actor_assault)%, {+pas_b400_zulus_dead_sound} %-pas_b400_zulus_dead_sound =play_sound(pas_b400_vano_on_enemy_assault_zulus)%
+on_info95 = {+pas_b400_sokolov_dead_sound +pas_b400_sokolov_dead_sound_actor} %-pas_b400_sokolov_dead_sound =play_sound(pas_b400_vano_on_actor_assault)%, {+pas_b400_sokolov_dead_sound} %-pas_b400_sokolov_dead_sound =play_sound(pas_b400_vano_on_enemy_assault_sokolov)%
+on_info96 = {+pas_b400_wanderer_dead_sound +pas_b400_wanderer_dead_sound_actor} %-pas_b400_wanderer_dead_sound =play_sound(pas_b400_vano_on_actor_assault)%, {+pas_b400_wanderer_dead_sound} %-pas_b400_wanderer_dead_sound =play_sound(pas_b400_vano_on_enemy_assault_wanderer)%
+on_info97 = {+pas_b400_actor_far =dist_to_actor_le(30)} %-pas_b400_actor_far%
+on_info98 = {-pas_b400_actor_far =pas_b400_actor_far_backward} %=play_sound(pas_b400_vano_come_back) +pas_b400_actor_far%
+on_info99 = {-pas_b400_actor_far =pas_b400_actor_far_forward} %=play_sound(pas_b400_vano_wait_for_me) +pas_b400_actor_far%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@sokolov_def]
+meet = meet@sokolov_def
+wounded = wounded@no_wound
+def_state_standing = threat_na
+def_state_moving = assault
+on_info92 = {+pas_b400_about_gates} %-pas_b400_about_gates =play_sound(pas_b400_sokolov_about_gates)%
+on_info93 = {+pas_b400_sokolov_idle_talk} %-pas_b400_sokolov_idle_talk =play_sound(pas_b400_sokolov_idle)%
+on_info94 = {+pas_b400_zulus_dead_sound +pas_b400_zulus_dead_sound_actor} %-pas_b400_zulus_dead_sound =play_sound(pas_b400_sokolov_on_actor_assault)%, {+pas_b400_zulus_dead_sound} %-pas_b400_zulus_dead_sound =play_sound(pas_b400_sokolov_on_enemy_assault_zulus)%
+on_info95 = {+pas_b400_vano_dead_sound +pas_b400_vano_dead_sound_actor} %-pas_b400_vano_dead_sound =play_sound(pas_b400_sokolov_on_actor_assault)%, {+pas_b400_vano_dead_sound} %-pas_b400_vano_dead_sound =play_sound(pas_b400_sokolov_on_enemy_assault_vano)%
+on_info96 = {+pas_b400_wanderer_dead_sound +pas_b400_wanderer_dead_sound_actor} %-pas_b400_wanderer_dead_sound =play_sound(pas_b400_sokolov_on_actor_assault)%, {+pas_b400_wanderer_dead_sound} %-pas_b400_wanderer_dead_sound =play_sound(pas_b400_sokolov_on_enemy_assault_wanderer)%
+on_info97 = {+pas_b400_actor_far =dist_to_actor_le(30)} %-pas_b400_actor_far%
+on_info98 = {-pas_b400_actor_far =pas_b400_actor_far_backward} %=play_sound(pas_b400_sokolov_come_back) +pas_b400_actor_far%
+on_info99 = {-pas_b400_actor_far =pas_b400_actor_far_forward} %=play_sound(pas_b400_sokolov_wait_for_me) +pas_b400_actor_far%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@wanderer_def]
+meet = meet@wanderer_def
+wounded = wounded@no_wound
+def_state_standing = hide_na
+def_state_moving = assault
+on_info92 = {+pas_b400_about_gates} %-pas_b400_about_gates =play_sound(pas_b400_wanderer_about_gates)%
+on_info93 = {+pas_b400_wanderer_idle_talk} %-pas_b400_wanderer_idle_talk =play_sound(pas_b400_wanderer_idle)%
+on_info94 = {+pas_b400_zulus_dead_sound +pas_b400_zulus_dead_sound_actor} %-pas_b400_zulus_dead_sound =play_sound(pas_b400_wanderer_on_actor_assault)%, {+pas_b400_zulus_dead_sound} %-pas_b400_zulus_dead_sound =play_sound(pas_b400_wanderer_on_enemy_assault_zulus)%
+on_info95 = {+pas_b400_vano_dead_sound +pas_b400_vano_dead_sound_actor} %-pas_b400_vano_dead_sound =play_sound(pas_b400_wanderer_on_actor_assault)%, {+pas_b400_vano_dead_sound} %-pas_b400_vano_dead_sound =play_sound(pas_b400_wanderer_on_enemy_assault_vano)%
+on_info96 = {+pas_b400_sokolov_dead_sound +pas_b400_sokolov_dead_sound_actor} %-pas_b400_sokolov_dead_sound =play_sound(pas_b400_wanderer_on_actor_assault)%, {+pas_b400_sokolov_dead_sound} %-pas_b400_sokolov_dead_sound =play_sound(pas_b400_wanderer_on_enemy_assault_sokolov)%
+on_info97 = {+pas_b400_actor_far =dist_to_actor_le(30)} %-pas_b400_actor_far%
+on_info98 = {-pas_b400_actor_far =pas_b400_actor_far_backward} %=play_sound(pas_b400_wanderer_come_back) +pas_b400_actor_far%
+on_info99 = {-pas_b400_actor_far =pas_b400_actor_far_forward} %=play_sound(pas_b400_wanderer_wait_for_me) +pas_b400_actor_far%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+
+;Wounded - no wounds
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false

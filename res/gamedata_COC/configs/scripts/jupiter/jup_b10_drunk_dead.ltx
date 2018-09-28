@@ -1,0 +1,8 @@
+[dont_spawn_loot]
+[logic]
+;suitable = {=check_npc_name(jup_b10_stalker_drunk_dead)} true
+active = walker@ihopeyoudie
+
+[walker@ihopeyoudie]
+path_walk = jup_b10_drunk_deadway_01
+on_info = %=jup_b10_spawn_drunk_dead_items =kill_npc%

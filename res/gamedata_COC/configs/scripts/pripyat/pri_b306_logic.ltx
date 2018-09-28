@@ -1,0 +1,430 @@
+;4 floor group 1
+[logic@pri_b306_monolith_5_1]
+active = walker@pri_b306_monolith_5_1
+suitable = {=target_squad_name(pri_b306_4_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_5_1]
+path_walk = monolith_5_1_walk
+path_look = monolith_5_1_look
+no_retreat = true
+def_state_standing = hide_na
+;out_restr = pri_b306_sr_4_floor
+;in_restr = pri_b306_sr_in
+on_info = {=see_actor} walker@pri_b306_monolith_5_1_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_4_floor)} true
+
+[walker@pri_b306_monolith_5_1_norestr]
+path_walk = monolith_5_1_walk
+
+
+[logic@pri_b306_monolith_5_2]
+active = walker@pri_b306_monolith_5_2
+suitable = {=target_squad_name(pri_b306_4_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_5_2]
+path_walk = monolith_5_2_walk
+path_look = monolith_5_2_look
+no_retreat = true
+def_state_standing = hide_na
+;out_restr = pri_b306_sr_4_floor
+;in_restr = pri_b306_sr_in
+on_info = {=see_actor} walker@pri_b306_monolith_5_2_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_4_floor)} true
+
+[walker@pri_b306_monolith_5_2_norestr]
+path_walk = monolith_5_2_walk
+
+
+;4 floor group 2
+[logic@pri_b306_monolith_5_3]
+active = walker@pri_b306_monolith_5_3
+suitable = {=target_squad_name(pri_b306_4_floor_monolith_2)} true
+prior = 200
+
+[walker@pri_b306_monolith_5_3]
+path_walk = monolith_5_3_walk
+path_look = monolith_5_3_look
+no_retreat = true
+def_state_standing = hide_na
+out_restr = pri_b306_sr_4_floor_2
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_4_floor)} walker@pri_b306_monolith_5_3_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_5_3_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_4_floor_2)} true
+
+[walker@pri_b306_monolith_5_3_norestr]
+path_walk = monolith_5_3_walk
+
+
+[logic@pri_b306_monolith_5_4]
+active = walker@pri_b306_monolith_5_4
+suitable = {=target_squad_name(pri_b306_4_floor_monolith_2)} true
+prior = 200
+
+[walker@pri_b306_monolith_5_4]
+path_walk = monolith_5_4_walk
+path_look = monolith_5_4_look
+no_retreat = true
+def_state_standing = hide_na
+out_restr = pri_b306_sr_4_floor_2
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_4_floor)} walker@pri_b306_monolith_5_4_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_5_4_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_4_floor_2)} true
+
+[walker@pri_b306_monolith_5_4_norestr]
+path_walk = monolith_5_4_walk
+
+
+;3rd floor monolith squad
+[logic@pri_b306_monolith_4_1]
+active = walker@pri_b306_monolith_4_1
+suitable = {=target_squad_name(pri_b306_3_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_4_1]
+path_walk = monolith_4_1_walk
+path_look = monolith_4_1_look
+no_retreat = true
+def_state_standing = hide_na
+out_restr = pri_b306_sr_3_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_4_floor_2)} walker@pri_b306_monolith_4_1_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_4_1_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_3_floor)} true
+
+[walker@pri_b306_monolith_4_1_norestr]
+path_walk = monolith_4_1_walk
+
+
+[logic@pri_b306_monolith_4_2]
+active = walker@pri_b306_monolith_4_2
+suitable = {=target_squad_name(pri_b306_3_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_4_2]
+path_walk = monolith_4_2_walk
+path_look = monolith_4_2_look
+no_retreat = true
+def_state_standing = hide_na
+out_restr = pri_b306_sr_3_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_4_floor_2)} walker@pri_b306_monolith_4_2_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_4_2_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_3_floor)} true
+
+[walker@pri_b306_monolith_4_2_norestr]
+path_walk = monolith_4_2_walk
+
+
+[logic@pri_b306_monolith_4_3]
+active = walker@pri_b306_monolith_4_3
+suitable = {=target_squad_name(pri_b306_3_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_4_3]
+path_walk = monolith_4_3_walk
+path_look = monolith_4_1_look
+no_retreat = true
+def_state_standing = hide_na
+out_restr = pri_b306_sr_3_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_4_floor_2)} walker@pri_b306_monolith_4_3_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_4_3_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_3_floor)} true
+
+[walker@pri_b306_monolith_4_3_norestr]
+path_walk = monolith_4_3_walk
+
+
+[logic@pri_b306_monolith_4_4]
+active = walker@pri_b306_monolith_4_4
+suitable = {=target_squad_name(pri_b306_3_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_4_4]
+path_walk = monolith_4_4_walk
+path_look = monolith_4_1_look
+no_retreat = true
+def_state_standing = hide_na
+out_restr = pri_b306_sr_3_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_4_floor_2)} walker@pri_b306_monolith_4_4_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_4_4_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_3_floor)} true
+
+[walker@pri_b306_monolith_4_4_norestr]
+path_walk = monolith_4_4_walk
+
+
+;3 floor wc zombied
+[logic@pri_b306_zombied_4_1]
+active = walker@pri_b306_zombied_4_1
+suitable = {=target_squad_name(pri_b306_3_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_4_1]
+path_walk = zombied_4_1_walk
+;danger = danger@short_danger
+out_restr = pri_b306_sr_wc_zombie
+
+
+;2nd floor monolith squad
+[logic@pri_b306_monolith_3_1]
+active = walker@pri_b306_monolith_3_1
+suitable = {=target_squad_name(pri_b306_2_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_3_1]
+path_walk = monolith_3_1_walk
+path_look = monolith_3_1_look
+no_retreat = true
+def_state_standing = hide_na
+;out_restr = pri_b306_sr_2_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_3_floor)} walker@pri_b306_monolith_3_1_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_3_1_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_2_floor)} true
+
+[walker@pri_b306_monolith_3_1_norestr]
+path_walk = monolith_3_1_walk
+
+
+[logic@pri_b306_monolith_3_2]
+active = walker@pri_b306_monolith_3_2
+suitable = {=target_squad_name(pri_b306_2_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_3_2]
+path_walk = monolith_3_2_walk
+path_look = monolith_3_1_look
+no_retreat = true
+def_state_standing = hide_na
+;out_restr = pri_b306_sr_2_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_3_floor)} walker@pri_b306_monolith_3_2_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_3_2_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_2_floor)} true
+
+[walker@pri_b306_monolith_3_2_norestr]
+path_walk = monolith_3_2_walk
+
+
+[logic@pri_b306_monolith_3_3]
+active = walker@pri_b306_monolith_3_3
+suitable = {=target_squad_name(pri_b306_2_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_3_3]
+path_walk = monolith_3_3_walk
+path_look = monolith_3_3_look
+no_retreat = true
+def_state_standing = hide_na
+;out_restr = pri_b306_sr_2_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_3_floor)} walker@pri_b306_monolith_3_3_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_3_3_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_2_floor)} true
+
+[walker@pri_b306_monolith_3_3_norestr]
+path_walk = monolith_3_3_walk
+
+
+[logic@pri_b306_monolith_3_4]
+active = walker@pri_b306_monolith_3_4
+suitable = {=target_squad_name(pri_b306_2_floor_monolith)} true
+prior = 200
+
+[walker@pri_b306_monolith_3_4]
+path_walk = monolith_3_4_walk
+path_look = monolith_3_4_look
+no_retreat = true
+def_state_standing = hide_na
+;out_restr = pri_b306_sr_2_floor
+;in_restr = pri_b306_sr_in
+on_info = {=actor_in_zone(pri_b306_sr_3_floor)} walker@pri_b306_monolith_3_4_norestr
+on_info2 = {=see_actor} walker@pri_b306_monolith_3_4_norestr
+combat_ignore_cond = {!actor_in_zone(pri_b306_sr_2_floor)} true
+
+[walker@pri_b306_monolith_3_4_norestr]
+path_walk = monolith_3_4_walk
+
+
+;2nd floor zombies
+[logic@pri_b306_zombied_3_1]
+active = walker@pri_b306_zombied_3_1
+suitable = {=target_squad_name(pri_b306_2_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_3_1]
+path_walk = zombied_3_1_walk
+path_look = zombied_3_1_look
+;danger = danger@short_danger
+;out_restr = pri_b306_sr_2_floor_2
+on_info = {=actor_in_zone(pri_b306_sr_2_floor)} walker@pri_b306_zombied_3_1_norestr
+
+[walker@pri_b306_zombied_3_1_norestr]
+path_walk = zombied_3_1_walk
+
+
+[logic@pri_b306_zombied_3_2]
+active = walker@pri_b306_zombied_3_2
+suitable = {=target_squad_name(pri_b306_2_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_3_2]
+path_walk = zombied_3_2_walk
+path_look = zombied_3_2_look
+;danger = danger@short_danger
+;out_restr = pri_b306_sr_2_floor_2
+on_info = {=actor_in_zone(pri_b306_sr_2_floor)} walker@pri_b306_zombied_3_2_norestr
+
+[walker@pri_b306_zombied_3_2_norestr]
+path_walk = zombied_3_2_walk
+
+
+[logic@pri_b306_zombied_3_3]
+active = walker@pri_b306_zombied_3_3
+suitable = {=target_squad_name(pri_b306_2_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_3_3]
+path_walk = zombied_3_3_walk
+path_look = zombied_3_3_look
+;danger = danger@short_danger
+;out_restr = pri_b306_sr_2_floor_2
+on_info = {=actor_in_zone(pri_b306_sr_2_floor)} walker@pri_b306_zombied_3_3_norestr
+
+[walker@pri_b306_zombied_3_3_norestr]
+path_walk = zombied_3_3_walk
+
+
+[logic@pri_b306_zombied_3_4]
+active = walker@pri_b306_zombied_3_4
+suitable = {=target_squad_name(pri_b306_2_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_3_4]
+path_walk = zombied_3_4_walk
+path_look = zombied_3_4_look
+;danger = danger@short_danger
+;out_restr = pri_b306_sr_2_floor_2
+on_info = {=actor_in_zone(pri_b306_sr_2_floor)} walker@pri_b306_zombied_3_4_norestr
+
+[walker@pri_b306_zombied_3_4_norestr]
+path_walk = zombied_3_4_walk
+
+
+[logic@pri_b306_zombied_3_5]
+active = walker@pri_b306_zombied_3_5
+suitable = {=target_squad_name(pri_b306_2_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_3_5]
+path_walk = zombied_3_5_walk
+path_look = zombied_3_5_look
+;danger = danger@short_danger
+;out_restr = pri_b306_sr_2_floor_2
+on_info = {=actor_in_zone(pri_b306_sr_2_floor)} walker@pri_b306_zombied_3_5_norestr
+
+[walker@pri_b306_zombied_3_5_norestr]
+path_walk = zombied_3_5_walk
+
+
+;;zombied 1st floor
+[logic@pri_b306_zombied_2_1]
+active = walker@pri_b306_zombied_2_1
+suitable = {=target_squad_name(pri_b306_1_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_1]
+path_walk = zombied_2_1_walk
+path_look = zombied_2_1_look
+;danger = danger@short_danger
+
+
+[logic@pri_b306_zombied_2_2]
+active = walker@pri_b306_zombied_2_2
+suitable = {=target_squad_name(pri_b306_1_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_2]
+path_walk = zombied_2_2_walk
+path_look = zombied_2_1_look
+;danger = danger@short_danger
+
+
+[logic@pri_b306_zombied_2_3]
+active = walker@pri_b306_zombied_2_3
+suitable = {=target_squad_name(pri_b306_1_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_3]
+path_walk = zombied_2_3_walk
+path_look = zombied_2_3_look
+;danger = danger@short_danger
+
+
+[logic@pri_b306_zombied_2_4]
+active = walker@pri_b306_zombied_2_4
+suitable = {=target_squad_name(pri_b306_1_floor_zombied)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_4]
+path_walk = zombied_2_4_walk
+path_look = zombied_2_3_look
+;danger = danger@short_danger
+
+
+[logic@pri_b306_zombied_2_5]
+active = walker@pri_b306_zombied_2_5
+suitable = {=target_squad_name(pri_b306_1_floor_zombied_2)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_5]
+path_walk = zombied_2_5_walk
+path_look = zombied_2_5_look
+;danger = danger@short_danger
+
+
+[logic@pri_b306_zombied_2_6]
+active = walker@pri_b306_zombied_2_6
+suitable = {=target_squad_name(pri_b306_1_floor_zombied_2)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_6]
+path_walk = zombied_2_6_walk
+path_look = zombied_2_6_look
+;danger = danger@short_danger
+
+
+[logic@pri_b306_zombied_2_7]
+active = walker@pri_b306_zombied_2_7
+suitable = {=target_squad_name(pri_b306_1_floor_zombied_2)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_7]
+path_walk = zombied_2_7_walk
+path_look = zombied_2_7_look
+;danger = danger@short_danger
+
+
+[logic@pri_b306_zombied_2_8]
+active = walker@pri_b306_zombied_2_8
+suitable = {=target_squad_name(pri_b306_1_floor_zombied_2)} true
+prior = 200
+
+[walker@pri_b306_zombied_2_8]
+path_walk = zombied_2_8_walk
+path_look = zombied_2_8_look
+;danger = danger@short_danger
+
+
+;[danger@short_danger]
+;ignore_distance = 15
+;danger_inertion_time_grenade = 10000
+;danger_inertion_time_hit = 5000
+;danger_inertion_time_sound = 3000
+;danger_inertion_time_ricochet = 0

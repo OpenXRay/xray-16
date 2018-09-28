@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- ESCORT ECOGS TASK -->
+	<string id="yan_ecolog_semenov_task_1_name">
+		<text>Помочь доценту Семёнову</text>
+	</string>
+	<string id="yan_ecolog_semenov_task_1_text">
+		<text>Нужно сопроводить доцента Семёнова по окрестностям, отыскать и убить несколько мутантов, чтобы учёный мог взять свежие образцы ткани и просканировать тела.</text>
+	</string>
+	<string id="yan_ecolog_semenov_task_1_about">
+		<text>Вы не могли бы помочь мне отыскать пару мутантов для исследований? Скажем... пять разных особей. Ну и, естественно, обеспечить мне безопасность во время проведения замеров. Я заплачу Вам за Вашу работу.</text>
+	</string>
+	<string id="yan_ecolog_semenov_task_1_finish">
+		<text>Спасибо за помощь, сталкер. Я собрал все данные, которые мне нужны. Вот Ваша награда... Заходите ещё в нашу лабораторию.</text>
+	</string>
+	<!-- FIND MUTANT PARTS FOR ECOGS TASK -->
+	<string id="yan_stalker_sakharov_task_1_name">
+		<text>%s - достать образец</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_text">
+		<text>%s - достать образец ткани мутанта.</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_about">
+		<text>Мне нужен опытный охотник на мутантов для одного дела. Могу ли я на Вас рассчитывать?</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_fetch_about">
+		<text>Мне требуются некоторые образцы для исследований, а именно... %s. Не важно, где Вы их достанете, главное, чтобы они были как можно свежее. После того, как соберёте всё, что мне нужно - возвращайтесь сюда как можно скорее.</text>
+	</string>
+	<string id="yan_stalker_sakharov_task_1_fetch_finish">
+		<text>Благодарю Вас, молодой человек. Я немедленно приступаю к исследованиям.</text>
+	</string>
+	<!-- FIND ARTEFACT FOR SAKHAROV TASK -->
+	<string id="yan_stalker_sakharov_task_2_text">
+		<text>Сахаров просил найти и принести ему артефакт %s.</text>
+	</string>
+	<!-- WAIT FOR PSI HELMET CALIBRATION TASK -->
+	<string id="yan_stalker_sakharov_psi_helmet_upgrade_name">
+		<text>Калибровка пси-шлема</text>
+	</string>
+	<string id="yan_stalker_sakharov_psi_helmet_upgrade_text">
+		<text>Профессор Сахаров согласился настроить пси-шлем. Он попросил прийти через несколько дней.</text>
+	</string>
+	<!-- TURN OFF MIRACLE MACHINE TASK -->
+	<string id="brain_machine_deactivate_name">
+		<text>Отключить пси-установку</text>
+	</string>
+	<string id="brain_machine_deactivate_text">
+		<text>Пси-установка своим излучением закрывает проход между Янтарём и Мёртвым Городом. Для её отключения требуются передовые устройства пси-защиты.</text>
+	</string>
+	<!-- FIND LEVEL 1 TOOLKIT FOR KRUGLOV -->
+	<string id="yan_ecolog_kruglov_task_1_name">
+		<text>Найти Круглову %s</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_text">
+		<text>Необходимо принести Круглову %s, чтобы он мог обеспечить базовую модернизацию оружия или бронежилетов.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_about">
+		<text>Мне нужна помощь. Множество коллег просят меня починить их снаряжение, но я не могу. У меня нет для этого подходящих инструментов. Я бы мог починить практически любое снаряжение, будь у меня нужные инструменты. Можете мне с этим помочь?</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_fetch_about">
+		<text>Мне нужен набор инструментов для грубой работы. В нём должно быть всё, что мне нужно. Если сможете принести - наградой не обижу.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_1_fetch_finish">
+		<text>Отлично! Это как раз то, что мне нужно. Я могу приступить к работе прямо сейчас.</text>
+	</string>
+	<!-- FIND LEVEL 2 TOOLKIT FOR KRUGLOV -->
+	<string id="yan_ecolog_kruglov_task_2_name">
+		<text>Найти %s для Круглова</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_text">
+		<text>Необходимо достать %s и отнести их Круглову. Ему нужны более качественные инструменты.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_about">
+		<text>Есть ещё одно предложение. Тот ремнабор, что Вы мне принесли, конечно, хорош, но он... как бы поточнее выразиться... не совсем полон, да. Сможете найти мне набор получше?</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_fetch_about">
+		<text>Мне нужны %s. Не знаю, где Вы достанете их, но если найдёте - несите прямо ко мне, наградой не обижу.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_2_fetch_finish">
+		<text>Вы опять помогли мне! Хорошая работа. Вот деньги.</text>
+	</string>
+	<!-- FIND LEVEL 3 TOOLKIT FOR KRUGLOV -->
+	<string id="yan_ecolog_kruglov_task_3_name">
+		<text>Найти и принести Круглову %s</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_text">
+		<text>Круглов просил найти набор инструментов для калибровки. Он заплатит за инструменты и, кроме того, сможет проводить более сложную модернизацию снаряжения.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_about">
+		<text>Вы принесли мне отличный ремнабор, но в нём, как выяснилось, всё же недостаёт немногих, но крайне важных приспособлений. Как думаете, сможете найти мне инструменты для калибровки?</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_fetch_about">
+		<text>Мне нужны инструменты для калибровки. Если принесёте - считайте, что скидка на ремонт Вам обеспечена.</text>
+	</string>
+	<string id="yan_ecolog_kruglov_task_3_fetch_finish">
+		<text>Вы вновь выручили меня! Отличная работа, вот, держите деньги.</text>
+	</string>
+</string_table>

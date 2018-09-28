@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="st_achievement_1_name">
+		<text>Состоятельный клиент</text>
+	</string>
+	<string id="st_achievement_1_hint">
+		<text>Торговцы чаще предлагают Вам самые редкие и дорогие товары.</text>
+	</string>
+	<string id="st_achievement_1_descr">
+		<text>Хотя Вы не понаслышке знакомы с нехваткой денег, Вас далеко не всегда можно назвать стесненным в средствах. Напротив, порой, Вашим денежным сбережениям можно позавидовать. Такие клиенты - большая радость для торговца.</text>
+	</string>
+	<string id="st_achievement_1_unlock">
+		<text>Получено достижение «Состоятельный клиент».</text>
+	</string>
+	
+	<string id="st_achievement_2_name">
+		<text>Отмеченный Зоной</text>
+	</string>
+	<string id="st_achievement_2_hint">
+		<text>У Вас есть шанс пережить выброс вне укрытия даже без приёма специальных препаратов, если Ваше здоровье ничем не подорвано.</text>
+	</string>
+	<string id="st_achievement_2_descr">
+		<text>Вы смогли пережить выброс, не спрятавшись в укрытие, - Вас спасли таблетки анабиотика. Это оказало неоднозначное воздействие на Вашу психику - у Вас в голове наступила странная тишина. Кажется, Вы больше не слышите постоянного потока мыслей.</text>
+	</string>
+	<string id="st_achievement_2_unlock">
+		<text>Получено достижение «Отмеченный Зоной».</text>
+	</string>
+	
+	<string id="st_achievement_3_name">
+		<text>Торговец информацией</text>
+	</string>
+	<string id="st_achievement_3_hint">
+		<text>Торговцы увеличили Вам размер вознаграждения за принесённые КПК - как лучшему информатору и соратнику по профессии.</text>
+	</string>
+	<string id="st_achievement_3_descr">
+		<text>Какая бы информация ни попала к Вам в руки - Вы всегда находили на неё покупателя. Не упуская возможности предоставить информацию интересующимся, Вы, естественно, не забывали и о своей выгоде.</text>
+	</string>
+	<string id="st_achievement_3_unlock">
+		<text>Получено достижение «Торговец информацией».</text>
+	</string>
+	
+	<string id="st_achievement_4_name">
+		<text>Первопроходец</text>
+	</string>
+	<string id="st_achievement_4_hint">
+		<text>Пути через Янтарь и Радар теперь снова открыты.</text>
+	</string>
+	<string id="st_achievement_4_descr">
+		<text>Вам удалось отключить пси-установки на Янтаре и Радаре. В связи с этим многие сталкеры снова ринулись к центру Зоны.</text>
+	</string>
+	<string id="st_achievement_4_unlock">
+		<text>Получено достижение «Первопроходец».</text>
+	</string>
+	
+	<string id="st_achievement_5_name">
+		<text>Охотник на мутантов</text>
+	</string>
+	<string id="st_achievement_5_hint">
+		<text>Шанс выпадения трофеев с туш убитых мутантов увеличился.</text>
+	</string>
+	<string id="st_achievement_5_descr">
+		<text>Вы не пытаетесь избегать опасных мутантов - Вы ведёте на них охоту, и преуспели в этом. Хорошие охотники - уважаемые люди среди сталкеров.</text>
+	</string>
+	<string id="st_achievement_5_unlock">
+		<text>Получено достижение «Охотник на мутантов».</text>
+	</string>
+	
+	<string id="st_achievement_6_name">
+		<text>Авторитет</text>
+	</string>
+	<string id="st_achievement_6_hint">
+		<text>Захваченные противники могут дать наводку на тайники.</text>
+	</string>
+	<string id="st_achievement_6_descr">
+		<text>Ваш путь усеян трупами. Поэтому многие противники предпочитают расстаться со своим имуществом, в надежде сохранить жизнь.</text>
+	</string>
+	<string id="st_achievement_6_unlock">
+		<text>Получено достижение «Авторитет».</text>
+	</string>
+	
+	<string id="st_achievement_7_name">
+		<text>Мастер высоких технологий</text>
+	</string>
+	<string id="st_achievement_7_hint">
+		<text>Швейные и ремонтные наборы стали намного эффективнее.</text>
+	</string>
+	<string id="st_achievement_7_descr">
+		<text>Техник получил все наборы инструментов, о которых только можно мечтать в Зоне. Услуги Лесника никогда не были дешёвыми, но теперь у него есть конкуренция.</text>
+	</string>
+	<string id="st_achievement_7_unlock">
+		<text>Получено достижение «Мастер высоких технологий».</text>
+	</string>
+	
+	<string id="st_achievement_8_name">
+		<text>Искатель</text>
+	</string>
+	<string id="st_achievement_8_hint">
+		<text>Есть шанс найти что-то новое в ранее исследованных местах.</text>
+	</string>
+	<string id="st_achievement_8_descr">
+		<text>У Зоны почти не осталось доступных мест, обойденных Вашим вниманием. Вы побывали практически во всех местных аномалиях.</text>
+	</string>
+	<string id="st_achievement_8_unlock">
+		<text>Получено достижение «Искатель».</text>
+	</string>
+	
+	<string id="st_achievement_9_name">
+		<text>Сыщик</text>
+	</string>
+	<string id="st_achievement_9_hint">
+		<text>Ваши шансы наткнуться на тайники других сталкеров значительно выросли.</text>
+	</string>
+	<string id="st_achievement_9_descr">
+		<text>У вас явный талант находить тайники других сталкеров. Несмотря на кое-какие неприятности, Вы чувствуете, что по большей части удача Вам улыбается.</text>
+	</string>
+	<string id="st_achievement_9_unlock">
+		<text>Получено достижение «Сыщик».</text>
+	</string>
+	
+	<string id="st_achievement_10_name">
+		<text>Опытный сталкер</text>
+	</string>
+	<string id="st_achievement_10_hint">
+		<text>Получены все существующие достижения.</text>
+	</string>
+	<string id="st_achievement_10_descr">
+		<text>Вы знаете Зону лучше, чем Зона знает себя. И остались живы, несмотря на все трудности и угрозы, с которыми Вам довелось столкнуться.</text>
+	</string>
+	<string id="st_achievement_10_unlock">
+		<text>Получено достижение «Опытный сталкер».</text>
+	</string>
+	
+	<string id="st_achievement_11_name">
+		<text>Исполнитель Желаний</text>
+	</string>
+	<string id="st_achievement_11_hint">
+		<text>Давняя тайна раскрыта. Ваши ранг и репутация сильно выросли.</text>
+	</string>
+	<string id="st_achievement_11_descr">
+		<text>До Вас доходили слухи, а теперь Вы и сами убедились - Исполнитель Желаний реален. Его голос до сих пор эхом звучит в Вашей голове. Но теперь Исполнителя больше нет. И как бы кто ни сомневался, но факт остаётся фактом - Вы его уничтожили.</text>
+	</string>
+	<string id="st_achievement_11_unlock">
+		<text>Получено достижение «Исполнитель Желаний».</text>
+	</string>
+	
+	<string id="st_achievement_12_name">
+		<text>Чистое небо</text>
+	</string>
+	<string id="st_achievement_12_hint">
+		<text>Вертолёты Ми-2 заменят Ми-24.</text>
+	</string>
+	<string id="st_achievement_12_descr">
+		<text>Наверное, весёлое занятие - сбивать вертолёты. Как говорится, большой шкаф громко падает.</text>
+	</string>
+	<string id="st_achievement_12_unlock">
+		<text>Получено достижение «Чистое небо».</text>
+	</string>
+	
+	<string id="st_achievement_13_name">
+		<text>Первооткрыватель</text>
+	</string>
+	<string id="st_achievement_13_hint">
+		<text>Накопленный опыт позволяет Вам чаще находить редкие артефакты.</text>
+	</string>
+	<string id="st_achievement_13_descr">
+		<text>Что бы новое ни появилось в Зоне - Вы готовы исследовать это первым. Находя новые, ещё неизученные аномальные образования, Вы продвинули науку в понимании Зоны.</text>
+	</string>
+	<string id="st_achievement_13_unlock">
+		<text>Получено достижение «Первооткрыватель».</text>
+	</string>
+	
+	<string id="st_achievement_14_name">
+		<text>Лидер</text>
+	</string>
+	<string id="st_achievement_14_hint">
+		<text>Число напарников в вашем отряде увеличено.</text>
+	</string>
+	<string id="st_achievement_14_descr">
+		<text>Вам нет равных в вопросах уничтожения военных «вертушек» или добывания КПК, содержащих ценную информацию. Истории ваших свершений увековечены в сталкерских рассказах у многих костров Зоны.</text>
+	</string>
+	<string id="st_achievement_14_unlock">
+		<text>Получено достижение «Лидер».</text>
+	</string>
+
+	<string id="st_achievement_15_name">
+		<text>Книжник</text>
+	</string>
+	<string id="st_achievement_15_hint">
+		<text>Найденные флеш-карты заменяются на редкие КПК.</text>
+	</string>
+	<string id="st_achievement_15_descr">
+		<text>Вы узнали много нового о Зоне и её многочисленных обитателях - как собственными усилиями, так и читая написанные другими документы. Возможно, пришло время поделиться этими заниями с другими?</text>
+	</string>
+	<string id="st_achievement_15_unlock">
+		<text>Получено достижение «Книжник».</text>
+	</string>
+
+</string_table>

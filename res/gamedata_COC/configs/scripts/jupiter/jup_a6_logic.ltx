@@ -1,0 +1,430 @@
+[animpoint@jup_a6_animp_gen]
+reach_movement = walk_noweap
+use_camp = false
+meet = meet@jup_a6_animpoint_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@jup_a6_animp_gen_reach]:animpoint@jup_a6_animp_gen
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+
+[meet@jup_a6_animpoint_meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+
+
+[logic@jup_a6_animp_01]
+active = animpoint@jup_a6_animp_01
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_02]
+active = animpoint@jup_a6_animp_02
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_03]
+active = animpoint@jup_a6_animp_03
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_04]
+active = animpoint@jup_a6_animp_04
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_09]
+active = animpoint@jup_a6_animp_09
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_10]
+active = animpoint@jup_a6_animp_10
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_11]
+active = animpoint@jup_a6_animp_11
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_15]
+active = animpoint@jup_a6_animp_15
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_16]
+active = animpoint@jup_a6_animp_16
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_17]
+active = animpoint@jup_a6_animp_17
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_18]
+active = animpoint@jup_a6_animp_18
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_91]
+active = animpoint@jup_a6_animp_91
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_92]
+active = animpoint@jup_a6_animp_92
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_93]
+active = animpoint@jup_a6_animp_93
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_05]
+active = animpoint@jup_a6_animp_05
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_06]
+active = animpoint@jup_a6_animp_06
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_07]
+active = animpoint@jup_a6_animp_07
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_08]
+active = animpoint@jup_a6_animp_08
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_12]
+active = animpoint@jup_a6_animp_12
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_13]
+active = animpoint@jup_a6_animp_13
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_14]
+active = animpoint@jup_a6_animp_14
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_19]
+active = animpoint@jup_a6_animp_19
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_20]
+active = animpoint@jup_a6_animp_20
+suitable = true
+prior = 60
+
+[logic@jup_a6_animp_21]
+active = animpoint@jup_a6_animp_21
+suitable = true
+prior = 60
+
+[animpoint@jup_a6_animp_01]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_01
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_01_reached
+
+[animpoint@jup_a6_animp_02]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_02
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_02_reached
+
+[animpoint@jup_a6_animp_03]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_03
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_03_reached
+
+[animpoint@jup_a6_animp_04]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_04
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_04_reached
+
+[animpoint@jup_a6_animp_05]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_05
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_05_reached
+
+[animpoint@jup_a6_animp_06]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_06
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_06_reached
+
+[animpoint@jup_a6_animp_07]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_07
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_07_reached
+
+[animpoint@jup_a6_animp_08]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_08
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_08_reached
+
+[animpoint@jup_a6_animp_09]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_09
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_09_reached
+
+[animpoint@jup_a6_animp_10]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_10
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_10_reached
+
+[animpoint@jup_a6_animp_11]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_11
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_11_reached
+
+[animpoint@jup_a6_animp_12]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_12
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_12_reached
+
+[animpoint@jup_a6_animp_13]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_13
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_13_reached
+
+[animpoint@jup_a6_animp_14]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_14
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_14_reached
+
+[animpoint@jup_a6_animp_15]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_15
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_15_reached
+
+[animpoint@jup_a6_animp_16]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_16
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_16_reached
+
+[animpoint@jup_a6_animp_17]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_17
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_17_reached
+
+[animpoint@jup_a6_animp_18]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_18
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_18_reached
+
+[animpoint@jup_a6_animp_19]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_19
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_19_reached
+
+[animpoint@jup_a6_animp_20]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_20
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_20_reached
+
+[animpoint@jup_a6_animp_21]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_21
+use_camp = true
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_21_reached
+
+[animpoint@jup_a6_animp_91]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_b221_duty_01
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_91_reached
+
+[animpoint@jup_a6_animp_92]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_b221_duty_02
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_92_reached
+
+[animpoint@jup_a6_animp_93]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_b221_duty_03
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_93_reached
+
+
+
+[animpoint@jup_a6_animp_01_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_01
+use_camp = true
+
+[animpoint@jup_a6_animp_02_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_02
+
+[animpoint@jup_a6_animp_03_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_03
+
+[animpoint@jup_a6_animp_04_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_04
+
+[animpoint@jup_a6_animp_05_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_05
+
+[animpoint@jup_a6_animp_06_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_06
+
+[animpoint@jup_a6_animp_07_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_07
+
+[animpoint@jup_a6_animp_08_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_08
+
+[animpoint@jup_a6_animp_09_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_09
+
+[animpoint@jup_a6_animp_10_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_10
+
+[animpoint@jup_a6_animp_11_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_11
+
+[animpoint@jup_a6_animp_12_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_12
+use_camp = true
+
+[animpoint@jup_a6_animp_13_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_13
+use_camp = true
+
+[animpoint@jup_a6_animp_14_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_14
+use_camp = true
+
+[animpoint@jup_a6_animp_15_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_15
+use_camp = true
+
+[animpoint@jup_a6_animp_16_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_16
+use_camp = true
+
+[animpoint@jup_a6_animp_17_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_17
+use_camp = true
+
+[animpoint@jup_a6_animp_18_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_18
+use_camp = true
+
+[animpoint@jup_a6_animp_19_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_19
+use_camp = true
+
+[animpoint@jup_a6_animp_20_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_20
+
+[animpoint@jup_a6_animp_21_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_21
+use_camp = true
+
+[animpoint@jup_a6_animp_91_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_b221_duty_01
+
+[animpoint@jup_a6_animp_92_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_b221_duty_02
+
+[animpoint@jup_a6_animp_93_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_b221_duty_03
+			
+
+
+[logic@jup_a6_duty_guard]
+active = walker@jup_a6_duty_guard_reach
+suitable = true
+prior = 61
+
+[walker@jup_a6_duty_guard_reach]
+path_walk = duty_guard_walk
+path_look = duty_guard_look
+def_state_standing = wait_na
+meet = meet@jup_a6_animpoint_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+on_info = {=npc_in_zone(jup_a6_sr_light)} walker@jup_a6_duty_guard
+
+[walker@jup_a6_duty_guard]
+path_walk = duty_guard_walk
+path_look = duty_guard_look
+def_state_standing = wait_na
+meet = meet@jup_a6_animpoint_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+
+[logic@jup_a6_duty_guarder]
+active = walker@jup_a6_duty_guarder
+suitable = true
+prior = 61
+
+[walker@jup_a6_duty_guarder]
+path_walk = duty_guarder_walk
+path_look = duty_guarder_look
+on_info = {!actor_enemy =see_actor !npc_in_zone(jup_a6_sr_light) =actor_has_weapon =actor_in_zone(jup_a6_sr_noweap) =dist_to_actor_le(35)} remark@jup_a6_duty_guarder
+out_restr = jup_a6_sr_noweap
+meet = meet@jup_a6_animpoint_meet
+invulnerable = {!actor_enemy} true, false
+
+[remark@jup_a6_duty_guarder]
+anim = threat
+target = story | actor
+;on_info = %=play_sound(jup_a6_base_guard)%
+on_game_timer = 75 | walker@jup_a6_duty_guarder
+out_restr = jup_a6_sr_noweap
+meet = meet@jup_a6_animpoint_meet
+invulnerable = {!actor_enemy} true, false
+
+
+[logic@jup_a6_freedom_guarder]
+active = walker@jup_a6_freedom_guarder
+suitable = true
+prior = 61
+
+[walker@jup_a6_freedom_guarder]
+path_walk = freedom_guarder_walk
+path_look = freedom_guarder_look
+on_info = {!actor_enemy =see_actor !npc_in_zone(jup_a6_sr_light) =actor_has_weapon =actor_in_zone(jup_a6_sr_noweap) =dist_to_actor_le(35)} remark@jup_a6_freedom_guarder
+out_restr = jup_a6_sr_noweap
+meet = meet@jup_a6_animpoint_meet
+invulnerable = {!actor_enemy} true, false
+
+[remark@jup_a6_freedom_guarder]
+anim = threat
+target = story | actor
+;on_info = %=play_sound(jup_a6_base_guard)%
+on_game_timer = 75 | walker@jup_a6_freedom_guarder
+out_restr = jup_a6_sr_noweap
+meet = meet@jup_a6_animpoint_meet
+invulnerable = {!actor_enemy} true, false
+
+[logic@jup_a6_animp_freedom_guard]
+active = animpoint@jup_a6_animp_freedom_guard
+suitable = true
+prior = 61
+
+[animpoint@jup_a6_animp_freedom_guard]:animpoint@jup_a6_animp_gen_reach
+cover_name = jup_a6_animp_freedom_guard
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@jup_a6_animp_freedom_guard_reached
+
+[animpoint@jup_a6_animp_freedom_guard_reached]:animpoint@jup_a6_animp_gen
+cover_name = jup_a6_animp_freedom_guard

@@ -1,0 +1,8 @@
+[logic]
+active = nil;sr_idle@out
+
+[sr_idle@out]
+on_actor_inside = sr_idle@in %+pri_b304_actor_in_store_hall%
+
+[sr_idle@in]
+on_actor_not_in_zone = pri_b304_actor_run_away | sr_idle@out %-pri_b304_actor_in_store_hall%

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<string_table>
+	<!-- Level Names -->
+	<string id="l03_agroprom">
+		<text>Agroprom</text>
+	</string>
+	<string id="l03u_agr_underground">
+		<text>Agroprom Underground</text>
+	</string>
+	<string id="l07_military">
+		<text>Army Warehouses</text>
+	</string>
+	<string id="l12_stancia_2">
+		<text>Chernobyl NPP (North)</text>
+	</string>
+	<string id="l12_stancia">
+		<text>Chernobyl NPP (South)</text>
+	</string>
+	<string id="l01_escape">
+		<text>Cordon</text>
+	</string>
+	<string id="k01_darkscape">
+		<text>Darkscape</text>
+	</string>
+	<string id="l04_darkvalley">
+		<text>Dark Valley</text>
+	</string>
+	<string id="l09_deadcity">
+		<text>Dead City</text>
+	</string>
+	<string id="l11_hospital">
+		<text>Deserted Hospital</text>
+	</string>
+	<string id="fake_start">
+		<text>Fake Start</text>
+	</string>
+	<string id="l02_garbage">
+		<text>Garbage</text>
+	</string>
+	<string id="l13_generators">
+		<text>Generators</text>
+	</string>
+	<string id="k00_marsh">
+		<text>Great Swamp</text>
+	</string>
+	 <string id="jupiter">
+		<text>Jupiter</text>
+	</string>
+		<string id="jupiter_underground">
+		<text>Jupiter Underground</text>
+	</string>
+	<string id="l08u_brainlab">
+		<text>Lab X-16 (Yantar)</text>
+	</string>
+	<string id="l04u_labx18">
+		<text>Lab X-18 (Dark Valley)</text>
+	</string>
+	<string id="l10u_bunker">
+		<text>Lab X-19 (Radar)</text>
+	</string>
+	<string id="labx8">
+		<text>Lab X-8 (Outskirts)</text>
+	</string>
+	<string id="l10_limansk">
+		<text>Limansk</text>
+	</string>
+	<string id="l12u_control_monolith">
+		<text>Monolith Control Center</text>
+	</string>
+	 <string id="l13u_warlab">
+		<text>Monolith War Lab</text>
+	</string>
+	<string id="pripyat">
+		<text>Outskirts</text>
+	</string>
+	<string id="l11_pripyat">
+		<text>Pripyat</text>
+	</string>
+	<string id="l10_radar">
+		<text>Radar</text>
+	</string>
+	<string id="l10_red_forest">
+		<text>Red Forest</text>
+	</string>
+	<string id="l05_bar">
+		<text>Rostok</text>
+	</string>
+	<string id="l12u_sarcofag">
+		<text>Sarcophagus</text>
+	</string>
+	 <string id="k02_trucks_cemetery">
+		<text>Truck Cemetery</text>
+	</string>
+	<string id="l06_rostok">
+		<text>Wild Territory</text>
+	</string>
+	<string id="l08_yantar">
+		<text>Yantar</text>
+	</string>
+	<string id="zaton">
+		<text>Zaton</text>
+	</string>
+
+	<!-- Level Changers -->
+	<string id="mar_space_restrictor_to_agroprom_descr">
+		<text>To Agroprom</text>
+	</string>
+	<string id="space_restrictor_to_agr_ug_desc">
+		<text>To Agroprom Underground</text>
+	</string>
+	<string id="space_restrictor_to_military_desc">
+		<text>To Army Warehouses</text>
+	</string>
+	<string id="gen_space_restrictor_to_aes2_descr">
+		<text>To Chernobyl NPP</text>
+	</string>
+	<string id="ds_space_restrictor_to_escape_descr">
+		<text>To Cordon</text>
+	</string>
+	<string id="esc_space_restrictor_to_darkscape_descr">
+		<text>To Darkscape</text>
+	</string>
+	<string id="ds_space_restrictor_to_darkvalley_desc">
+		<text>To Dark Valley</text>
+	</string>
+	<string id="space_restrictor_to_deadcity_desc">
+		<text>To Dead City</text>
+	</string>
+	<string id="space_restrictor_to_hospital">
+		<text>To Deserted Hospital</text>
+	</string>
+	<string id="esc_space_restrictor_to_garbage_descr">
+		<text>To Garbage</text>
+	</string>
+	<string id="aes2_space_restrictor_to_gen_descr">
+		<text>To Generators</text>
+	</string>
+	<string id="mar_teleport_from_base_to_north_descr">
+		<text>To Great Swamp</text>
+	</string>
+	<string id="space_restrictor_to_jupiter_desc">
+		<text>To Jupiter</text>
+	</string>
+	<string id="space_restrictor_to_jupiter_ug_desc">
+		<text>To Jupiter Underground</text>
+	</string>
+	<string id="space_restrictor_to_labx16_desc">
+		<text>To Lab X-16</text>
+	</string>
+	<string id="space_restrictor_to_labx18_desc">
+		<text>To Lab X-18</text>
+	</string>
+	<string id="space_restrictor_to_labx10_desc">
+		<text>To Lab X-19</text>
+	</string>
+	<string id="space_restrictor_to_labx8_desc">
+		<text>To Lab X-8</text>
+	</string>
+	<string id="space_restrictor_to_limansk_desc">
+		<text>To Limansk</text>
+	</string>
+	<string id="space_restrictor_to_secret_lab_desc">
+		<text>To Monolith Control Center</text>
+	</string>
+	<string id="space_restrictor_to_warlab_desc">
+		<text>To Monolith War Lab</text>
+	</string>
+	<string id="space_restrictor_to_cop_pripyat_desc">
+		<text>To Outskirts</text>
+	</string>
+	<string id="space_restrictor_to_pripyat_desc">
+		<text>To Pripyat</text>
+	</string>
+	<string id="space_restrictor_to_radar_desc">
+		<text>To Radar</text>
+	</string>
+	<string id="mil_space_restrictor_to_red_1_descr">
+		<text>To Red Forest</text>
+	</string>
+	<string id="space_restrictor_to_bar_desc">
+		<text>To Rostok</text>
+	</string>
+	<string id="space_restrictor_to_sarcophagus_desc">
+		<text>To Sarcophagus</text>
+	</string>
+	<string id="space_restrictor_to_tc_desc">
+		<text>To Truck Cemetery</text>
+	</string>	
+	<string id="space_restrictor_to_rostok_desc">
+		<text>To Wild Territory</text>
+	</string>
+	<string id="space_restrictor_to_yantar_desc">
+		<text>To Yantar</text>
+	</string>
+	<string id="space_restrictor_to_zaton_desc">
+		<text>To Zaton</text>
+	</string>	
+</string_table>

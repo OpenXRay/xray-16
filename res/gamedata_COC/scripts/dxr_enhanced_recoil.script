@@ -1,0 +1,185 @@
+--------------------------------
+----- Written by Darryl123 -----
+--------------------------------
+
+--------------------------
+----- Initialisation -----
+--------------------------
+
+-- If enabled, activate the feature automatically.
+function on_game_start()
+	local enable = axr_main.config:r_value("mm_options", "enable_enhanced_recoil", 1, false)
+	if (enable) then
+		activate_feature()
+	end
+end
+
+-- Activates the feature.
+local recoil_values = nil
+local feature_active = nil
+function activate_feature()
+	-- Return if already activated.
+	if (feature_active) then
+		return
+	end
+	feature_active = true
+	
+	-- Return if the enhanced recoil plugin doesn't exist.
+	local ini = ini_file("plugins\\enhanced_recoil.ltx")
+	local plugin_section = "enhanced_recoil"
+	if not (ini:section_exist(plugin_section)) then
+		printf("Enhanced recoil section \"" .. plugin_section .. "\" does not exist.")
+		return
+	end
+	
+	-- Read all of the effect values from the plugin.
+	-- Only do this if they haven't been read already.
+	if (not recoil_values) then
+		recoil_values = {}
+		local line_count = ini:line_count(plugin_section) or 0
+		for i = 0, line_count - 1 do
+			-- Read all of the required data from the config plugin.
+			local junk1, section, value = ini:r_line(plugin_section, i, "", "")
+			local zoom_in_effects = ini:r_string_ex(section, "zoom_in_effects")
+			local zoom_out_effects = ini:r_string_ex(section, "zoom_out_effects")
+			
+			-- Store the data if it is valid to use.
+			if (zoom_in_effects and zoom_out_effects) then
+				-- Split the strings into individual values.
+				zoom_in_effects = alun_utils.str_explode(zoom_in_effects, ",")
+				zoom_out_effects = alun_utils.str_explode(zoom_out_effects, ",")
+				
+				-- Store and convert values as numbers to avoid casting when used later.
+				recoil_values[section] = {}
+				local function store_and_convert(name, values)
+					recoil_values[section][name] = {}
+					for k, v in pairs(values) do
+						table.insert(recoil_values[section][name], tonumber(v) or 0)
+					end
+				end
+				store_and_convert("zoom_in_effects", zoom_in_effects)
+				store_and_convert("zoom_out_effects", zoom_out_effects)
+				
+				-- Store the zoom multiplier values.
+				recoil_values[section].speed = ini:r_float_ex(section, "speed") or nil
+				recoil_values[section].zoom_in_multi = ini:r_float_ex(section, "zoom_in_multi") or 1
+				recoil_values[section].zoom_out_multi = ini:r_float_ex(section, "zoom_out_multi") or 1
+				recoil_values[section].upgrade_multi = ini:r_float_ex(section, "upgrade_multi") or 1
+			end
+		end
+	end
+	
+	-- Checks for when a shot has been fired.
+	-- Could be better implemented via an engine callback.
+	shot_timer = time_global()
+	RegisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
+end
+
+-- Deactivates the feature.
+function deactivate_feature()
+	-- Return if feature already deactivated.
+	if (not feature_active) then
+		return
+	end
+	feature_active = nil
+	UnregisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
+end
+
+---------------------
+----- Callbacks -----
+---------------------
+
+-- Called when actor fires a weapon.
+function actor_on_weapon_fired(actor,weapon,ammo_elapsed)
+	-- Magazine is empty, no recoil necessary.
+	if (ammo_elapsed == 0) then
+		return
+	end
+	-- Return if there are no recoil values for this weapon.
+	if not (recoil_values and recoil_values[weapon:section()]) then
+		return
+	end
+	-- Create recoil effects.
+	create_effect(weapon)
+end
+
+local recoils = {}
+-- Calculates, caches, and then returns the recoil value.
+function calculate_recoil(weapon,recoil_values)
+	-- Return a cached value if this weapon and ammo combination has been used before.
+	-- This saves having to keep digging out weapon and ammo values and recalculating for every shot.
+	local ammo_type = (weapon:get_ammo_type() + 1)
+	if (recoils[weapon:id()]) then
+		if (recoils[weapon:id()][ammo_type]) then
+			return recoils[weapon:id()][ammo_type]
+		end
+	else recoils[weapon:id()] = {} end
+	
+	-- Fetch the multipliers values for the weapon.
+	local zoom_in_multi = recoil_values[weapon:section()].zoom_in_multi
+	local zoom_out_multi = recoil_values[weapon:section()].zoom_out_multi
+	local upgrade_multi = recoil_values[weapon:section()].upgrade_multi
+
+	-- Each upgrade has a section associated with it which contains offsets to weapon values.
+	-- Retrieve the name of this section, and then have it checked for alterations to "cam_dispersion".
+	local sys_ini = system_ini()
+	local dispersion = sys_ini:r_float_ex(weapon:section(), "cam_dispersion") or 1
+	local dispersion_offset = 0
+	local function iterator(upgrade)
+		local upgrade_section = sys_ini:r_string_ex(upgrade, "section")
+		local upgrade_offset = upgrade_section and sys_ini:r_float_ex(upgrade_section, "cam_dispersion", 0) or 0
+		dispersion_offset = dispersion_offset + (upgrade_offset * upgrade_multi)
+	end
+	weapon:iterate_installed_upgrades(iterator)
+	
+	-- Factor in the ammunition which is being fired, "k_cam_dispersion" is used by this feature.
+	local ammo_section = weapon:weapon_get_ammo_section(weapon:get_ammo_type())
+	local recoil = (math.sqrt((sys_ini:r_float_ex(ammo_section, "k_cam_dispersion") or 1) ^3) * ((dispersion + dispersion_offset) / dispersion))
+	recoils[weapon:id()][ammo_type] = recoil
+	return (recoil * (axr_main.weapon_is_zoomed and zoom_in_multi or zoom_out_multi))
+end
+	
+-- Shakes the screen about a bit and pretends to be recoil.
+function create_effect(weapon)
+	-- Retrieve the speed and effects values.
+	local speed = recoil_values[weapon:section()].speed
+	local zoom_in_effects = recoil_values[weapon:section()].zoom_in_effects
+	local zoom_out_effects = recoil_values[weapon:section()].zoom_out_effects
+	
+	-- We can't proceed if either are missing, so return here.
+	if not (speed and zoom_in_effects and zoom_out_effects) then
+		printf("Speed or zoom in/out effects values are missing for weapon " .. weapon:section())
+		return
+	end
+	
+	-- Calculate the recoil value.
+	local recoil = calculate_recoil(weapon,recoil_values)
+	
+	-- Cycle through each effect and create a camera effector.
+	-- Only four effects are used (one for each direction type), and any above this will be ignored.
+	local effects_table = axr_main.weapon_is_zoomed and zoom_in_effects or zoom_out_effects
+	for key, value in pairs(effects_table) do
+		-- Correct the animation speed if it is out of bounds.
+		if (speed < 1) then speed = 1 elseif (speed > 3) then speed = 3 end
+		
+		-- Calculate how many times to run the camera effects.
+		-- The less times it moves the camera - the less recoil there is.
+		local count, remainder = math.modf(value * recoil)
+		if (remainder ~= 0 and count > 4) then
+			count = (count - ((count * math.random(0, remainder * 100)) / 100))
+			count, remainder = math.modf(count)
+		end
+		if (remainder ~= 0 and math.random() < remainder) then
+			count = count + 1
+		end
+		
+		-- Turn data into camera movement.
+		local variant = math.random(0, 1)
+		if (count >= 1 and key <= 4) then
+			for index = 1, count do
+				local animation = string.format([[shoot\s%s_e%s_%s.anm]], speed, key, variant)
+				level.add_cam_effector(animation, math.random(5000, 8000), false, "")
+			end
+		end
+	end
+end

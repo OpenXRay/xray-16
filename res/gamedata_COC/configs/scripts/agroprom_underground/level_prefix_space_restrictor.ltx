@@ -1,0 +1,14 @@
+[logic]
+;active = sr_idle
+active = sr_idle@nil
+
+[sr_idle]
+on_info = {=rostok_dist_to_actor_le(8) -agr_knockdown +esc_find_doctor_start} sr_particle %+agr_knockdown%
+
+[sr_particle]
+name = explosions\explosion_04b      
+path = particle_way
+mode = 2				
+looped = false
+
+[sr_idle@nil]

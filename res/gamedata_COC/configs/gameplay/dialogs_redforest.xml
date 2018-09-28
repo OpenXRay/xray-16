@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+    
+    <dialog id="red_forester_who_are_you">
+        <dont_has_info>red_forester_who_are_you</dont_has_info>
+        <phrase_list>
+            <phrase id="1">
+                <text>red_forester_who_are_you_1</text>
+                <give_info>red_forester_who_are_you</give_info>
+            </phrase>
+            <phrase id="0">
+                <text>red_forester_who_are_you_0</text>
+                <action>dialog_manager.action_disable_phrase</action>
+                <next>1</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="red_forester_about_zone">
+        <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+        <has_info>red_forester_who_are_you</has_info>
+        <phrase_list>
+            <phrase id="11">
+                <text>red_forester_about_zone_11</text>
+                <next>111</next>
+            </phrase>
+            <phrase id="1">
+                <text>red_forester_about_zone_1</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="111">
+                <text>red_forester_about_zone_111</text>
+            </phrase>
+            <phrase id="0">
+                <text>red_forester_about_zone_0</text>
+                <action>dialog_manager.action_disable_phrase</action>
+                <next>1</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    
+    <dialog id="red_forester_about_forest">
+	    <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+        <has_info>red_forester_who_are_you</has_info>
+        <phrase_list>
+            <phrase id="1">
+                <text>red_forester_about_forest_1</text>
+            </phrase>
+            <phrase id="0">
+                <text>red_forester_about_forest_0</text>
+			    <action>dialog_manager.action_disable_phrase</action>
+                <next>1</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="red_forester_hello_dialog">
+        <phrase_list>
+            <phrase id="0">
+                <text>red_forester_hello_dialog_0</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_phrase</action>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

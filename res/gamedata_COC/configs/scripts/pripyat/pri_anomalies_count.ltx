@@ -1,0 +1,14 @@
+[logic]
+active = nil;sr_idle@pripyat
+
+[sr_idle@pripyat]
+on_info = {+actor_was_in_many_bad_places} sr_idle@nil
+on_info2 = {=counter_greater(anomalies_visited:18)} sr_idle@nil %+actor_was_in_many_bad_places%
+on_info3 = {-pri_b301_visited =actor_in_zone(pri_b301_field)} %+pri_b301_visited =inc_counter(anomalies_visited)%
+;on_info4 = {-pri_b302_visited =actor_in_zone(pri_a28_sr_mono_add_2)} %+pri_b302_visited =inc_counter(anomalies_visited)%
+on_info5 = {-pri_b303_visited =actor_in_zone(pri_b303_kill_dog_rest)} %+pri_b303_visited =inc_counter(anomalies_visited)%
+on_info6 = {-pri_b304_visited =actor_in_zone(pri_surge_hide_b304_2)} %+pri_b304_visited =inc_counter(anomalies_visited)%
+on_info7 = {-pri_b306_visited =actor_in_zone(pri_b306_field)} %+pri_b306_visited =inc_counter(anomalies_visited)%
+;on_info8 = {-pri_b307_visited =actor_in_zone(pri_b307_zone_field_thermal_average)} %+pri_b307_visited =inc_counter(anomalies_visited)%
+
+[sr_idle@nil]

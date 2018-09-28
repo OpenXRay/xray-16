@@ -1,0 +1,203 @@
+; This plugin determines the categories and their articles for the encyclopedia.
+; Categories are listed in "encyclopedia" and their articles in sections of the same names.
+
+; Flags can be used to alter the behaviour of specific articles.
+
+; Tier flags ensure that random unlocks via memory sticks will primarily work through articles based on their relevance.
+; By using this you can ensure that the player has access to early-game content long before that of the very late-game.
+; However, tiers will do nothing to hinder progress at the occasional possibility of discovering late-game content early on.
+; Whilst regular articles are always randomly unlockable, there is a 50% chance of selecting exclusively from tiered articles.
+
+; Mode flags make available/unavailable an article based on whether a certain mode is in use.
+; A value of "0" requires the mode not be used for the article to be available, and vice versa for a value of "1".
+; For an article to be available regardless of the current mode, the absence of this flag altogether will suffice.
+; The available mode flags are as follows: "azazal", "debug", "dev_debug", "ironman", "story" and "survival".
+
+; Unlock flags remove the requirement of having to discover an article or randomly unlock it.
+; This is extremely useful for tutorial-esque articles, such as those about achievements or features.
+; Valuing the unlock flag at "0" has the same effect as if the flag didn't exist whatsoever.
+
+; For any article which you add it is HIGHLY recommended to add texture description for it for reasons too long to list, even if it lacks an image.
+; You can create this by looking in the /configs/ui/textures_descr/ui_pda_encyclopedia.xml file and following the existing examples.
+
+[encyclopedia]
+encyclopedia_achievements
+encyclopedia_anomalies_other
+encyclopedia_characters
+encyclopedia_factions
+encyclopedia_factions_historic
+encyclopedia_factions_other
+encyclopedia_features
+encyclopedia_locations
+encyclopedia_mutants
+encyclopedia_mutants_historic
+encyclopedia_options_gameplay
+encyclopedia_options_other
+encyclopedia_options_ui_hud
+
+[encyclopedia_achievements]
+encyclopedia_achievements_bookworm_food = unlocked=1
+encyclopedia_achievements_completionist = unlocked=1
+encyclopedia_achievements_down_to_earth = unlocked=1
+encyclopedia_achievements_duga_free = unlocked=1, story=1
+encyclopedia_achievements_geologist = unlocked=1
+encyclopedia_achievements_heavy_pockets = unlocked=1
+encyclopedia_achievements_infopreneur = unlocked=1
+encyclopedia_achievements_mechanized_warfare = unlocked=1
+encyclopedia_achievements_patriarch = unlocked=1
+encyclopedia_achievements_radiotherapy = unlocked=1
+encyclopedia_achievements_rag_and_bone = unlocked=1
+encyclopedia_achievements_silver_or_lead = unlocked=1
+encyclopedia_achievements_tourist = unlocked=1
+encyclopedia_achievements_well_dressed = unlocked=1
+encyclopedia_achievements_wishful_thinking = unlocked=1, story=1
+
+[encyclopedia_anomalies_other]
+encyclopedia_anomalies_other_emission
+encyclopedia_anomalies_other_phantom
+encyclopedia_anomalies_other_psistorm
+
+[encyclopedia_characters]
+encyclopedia_characters_ashot
+encyclopedia_characters_axel
+encyclopedia_characters_barkeep
+encyclopedia_characters_beard
+encyclopedia_characters_cardan
+encyclopedia_characters_cold
+encyclopedia_characters_doctor
+encyclopedia_characters_fanatic
+encyclopedia_characters_gonta
+encyclopedia_characters_hawaiian
+encyclopedia_characters_ivan_trodnik
+encyclopedia_characters_librarian
+encyclopedia_characters_lieutenant_kirilov
+encyclopedia_characters_limpid
+encyclopedia_characters_loki
+encyclopedia_characters_major_kuznetsov
+encyclopedia_characters_nimble = tier=1
+encyclopedia_characters_novikov
+encyclopedia_characters_olivius
+encyclopedia_characters_owl
+encyclopedia_characters_professor_kruglov
+encyclopedia_characters_professor_sakharov
+encyclopedia_characters_sergeant_spooner
+encyclopedia_characters_sidorovich = tier=1
+encyclopedia_characters_spore
+encyclopedia_characters_sultan
+encyclopedia_characters_wolf
+encyclopedia_characters_xenotech
+encyclopedia_characters_yar
+
+[encyclopedia_factions]
+encyclopedia_factions_bandit = tier=1
+encyclopedia_factions_clear_sky = tier=2
+encyclopedia_factions_duty = tier=2
+encyclopedia_factions_ecologist = tier=3
+encyclopedia_factions_freedom = tier=2
+encyclopedia_factions_loner = tier=1
+encyclopedia_factions_mercenary = tier=3
+encyclopedia_factions_military = tier=3
+encyclopedia_factions_monolith = tier=4
+
+[encyclopedia_factions_historic]
+encyclopedia_factions_historic_final_day
+encyclopedia_factions_historic_isg
+encyclopedia_factions_historic_renegade
+
+[encyclopedia_factions_other]
+encyclopedia_factions_other_zombified = tier=2
+
+[encyclopedia_features]
+encyclopedia_features_companions = unlocked=1
+encyclopedia_features_guide = unlocked=1
+encyclopedia_features_map_spots = unlocked=1
+encyclopedia_features_rank = unlocked=1
+encyclopedia_features_reputation = unlocked=1
+encyclopedia_features_stashes = unlocked=1
+
+[encyclopedia_locations]
+;encyclopedia_locations_agroprom
+encyclopedia_locations_agroprom_underground
+;encyclopedia_locations_army_warehouses
+encyclopedia_locations_chernobyl_npp = tier=3
+;encyclopedia_locations_cordon
+;encyclopedia_locations_dark_valley
+;encyclopedia_locations_darkscape
+encyclopedia_locations_dead_city
+encyclopedia_locations_deserted_hospital
+;encyclopedia_locations_garbage
+;encyclopedia_locations_generators = tier=5
+;encyclopedia_locations_great_swamp
+;encyclopedia_locations_jupiter
+encyclopedia_locations_jupiter_underground
+;encyclopedia_locations_lab_x16 = tier=4
+;encyclopedia_locations_lab_x18 = tier=4
+;encyclopedia_locations_lab_x19 = tier=4
+;encyclopedia_locations_lab_x8 = tier=4
+;encyclopedia_locations_limansk
+;encyclopedia_locations_monolith_control_center = tier=5
+;encyclopedia_locations_monolith_war_lab = tier=5
+;encyclopedia_locations_outskirts
+;encyclopedia_locations_pripyat
+;encyclopedia_locations_radar
+;encyclopedia_locations_red_forest
+;encyclopedia_locations_rostok
+;encyclopedia_locations_sarcophagus = tier=5
+encyclopedia_locations_truck_cemetery
+;encyclopedia_locations_wild_territory
+;encyclopedia_locations_yantar
+encyclopedia_locations_zaton
+
+[encyclopedia_mutants]
+encyclopedia_mutants_blind_dog = tier=1
+encyclopedia_mutants_bloodsucker = tier=3
+encyclopedia_mutants_boar = tier=1
+encyclopedia_mutants_burer = tier=4
+encyclopedia_mutants_cat = tier=1
+encyclopedia_mutants_chimera = tier=3
+encyclopedia_mutants_controller = tier=3
+encyclopedia_mutants_crow = tier=1
+encyclopedia_mutants_flesh = tier=1
+encyclopedia_mutants_fracture = tier=2
+encyclopedia_mutants_karlik = tier=5
+encyclopedia_mutants_poltergeist = tier=3
+encyclopedia_mutants_pseudodog = tier=2
+encyclopedia_mutants_pseudogeist = tier=3
+encyclopedia_mutants_pseudogiant = tier=4
+encyclopedia_mutants_psydog = tier=3
+encyclopedia_mutants_pyrogeist = tier=3
+encyclopedia_mutants_rat = tier=2
+encyclopedia_mutants_snork = tier=2
+encyclopedia_mutants_tushkano = tier=2
+encyclopedia_mutants_zombie = tier=2
+
+[encyclopedia_mutants_historic]
+encyclopedia_mutants_historic_rat_wolf
+encyclopedia_mutants_historic_tark
+
+[encyclopedia_options_gameplay]
+encyclopedia_options_gameplay_ai_die_to_anomalies = unlocked=1
+encyclopedia_options_gameplay_aoe_pickup_mode = unlocked=1
+encyclopedia_options_gameplay_artefact_degradation = unlocked=1
+encyclopedia_options_gameplay_delayed_repairs = unlocked=1
+encyclopedia_options_gameplay_difficulty = unlocked=1
+encyclopedia_options_gameplay_enhanced_recoil = unlocked=1
+encyclopedia_options_gameplay_hardcore_ai_aim = unlocked=1
+encyclopedia_options_gameplay_helicopter_patrols = unlocked=1
+encyclopedia_options_gameplay_localisation = unlocked=1
+encyclopedia_options_gameplay_online_exclusion = unlocked=1
+encyclopedia_options_gameplay_population_factors = unlocked=1
+encyclopedia_options_gameplay_quicksave_count = unlocked=1
+encyclopedia_options_gameplay_radio_music = unlocked=1
+encyclopedia_options_gameplay_sleep_deprivation = unlocked=1
+
+[encyclopedia_options_other]
+encyclopedia_options_other_azazel_mode = unlocked=1
+encyclopedia_options_other_ironman_mode = unlocked=1
+encyclopedia_options_other_story_mode = unlocked=1
+encyclopedia_options_other_survival_mode = unlocked=1
+
+[encyclopedia_options_ui_hud]
+encyclopedia_options_ui_hud_dynamic_news = unlocked=1
+encyclopedia_options_ui_hud_extended_hud = unlocked=1
+encyclopedia_options_ui_hud_portrait_by_outfit = unlocked=1

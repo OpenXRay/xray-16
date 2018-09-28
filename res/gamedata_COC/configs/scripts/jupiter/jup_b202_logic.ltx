@@ -1,0 +1,28 @@
+[logic]
+active = nil;sr_idle@jup_b202_spawn_snag
+
+[sr_idle@jup_b202_spawn_snag]
+on_info = {+zat_b52_nimble_clear} sr_idle@jup_b202_spawn_item_to_snag %=create_squad(jup_b202_stalker_snag_squad:jup_a6)%
+
+[sr_idle@jup_b202_spawn_item_to_snag]
+on_info = {+zat_b33_package_returned} sr_idle@jup_b202_wait_for_stol %=zat_b202_spawn_b33_loot%, sr_idle@jup_b202_wait_for_stol
+
+[sr_idle@jup_b202_wait_for_stol]
+on_info = {+jup_b52_actor_items_can_be_stolen =squad_exist(jup_b202_stalker_snag_squad)} sr_idle@jup_b202_items_stolen %=clear_smart_terrain(jup_b202:false) =set_counter(jup_b202_sound_count:0) =teleport_squad(jup_b202_stalker_snag_squad:jup_b202_snag_wait_walk) +jup_b202_snag_teleported%
+
+[sr_idle@jup_b202_items_stolen]
+on_info = {+jup_b202_actor_items_stolen =squad_exist(jup_b202_stalker_snag_squad)} sr_idle@jup_b202_wait_for_actor %=create_squad(jup_b202_bandit_squad:jup_b202)%
+
+[sr_idle@jup_b202_wait_for_actor]
+on_actor_inside = {-jup_b202_actor_find_snag +jup_b202_actor_items_stolen} %+jup_b202_actor_find_snag%
+on_info1 = {=actor_has_item(jup_b202_bandit_pda) -jup_b202_bandit_pda} %+jup_b202_bandit_pda =play_sound(jup_b202_bandit_pda)%
+on_info2 = {=actor_has_item(device_flash_snag) -jup_b202_snag_pda} %+jup_b202_snag_pda =play_sound(jup_b202_snag_pda) +jup_b202_polustanok +jup_b202_talked_about_treasure +jup_b202_actor_find_snag%
+on_info3 = {=surge_kill_all -jup_b202_stalker_snag_go_base -jup_b202_all_killed_by_surge} %=kill_npc(jup_b202_stalker_snag) =kill_npc(jup_b202_bandit) +jup_b202_all_killed_by_surge%
+on_info4 = {+jup_b202_polustanok} sr_idle@jup_b202_wait_death, {+jup_b202_actor_find_snag} sr_idle@jup_b202_wait_death
+
+[sr_idle@jup_b202_wait_death]:sr_idle@jup_b202_wait_for_actor
+on_game_timer = 7200 | {-jup_b202_actor_spare_snag -zat_b52_snag_is_dead} %=kill_npc(jup_b202_stalker_snag)%
+on_info4 = {-jup_b202_actor_spare_snag -zat_b52_snag_is_dead +zat_b215_guide_to_zaton} %=kill_npc(jup_b202_stalker_snag)%
+on_info5 = {+jup_b202_actor_spare_snag +jup_b202_bandit_pda +jup_b202_snag_pda +jup_b202_actor_items_stolen} sr_idle@jup_b202_end
+
+[sr_idle@jup_b202_end]

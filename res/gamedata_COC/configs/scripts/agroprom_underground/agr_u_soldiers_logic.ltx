@@ -1,0 +1,146 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+[logic@agr_u_soldiers_squad_1]
+active = walker@agr_u_soldiers_squad_1
+suitable = {=target_squad_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_1
+
+[walker@agr_u_soldiers_squad_1]:walker@generic
+path_walk = walk1
+path_look = look1
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_1]
+on_info = %+agr_u_soldiers_squad_soldier_1_is_dead%
+
+
+[logic@agr_u_soldiers_squad_2]
+active = walker@agr_u_soldiers_squad_2
+suitable = {=target_squad_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_2
+
+[walker@agr_u_soldiers_squad_2]:walker@generic
+path_walk = walk2
+path_look = look2
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_2]
+on_info = %+agr_u_soldiers_squad_soldier_2_is_dead%
+
+
+
+[logic@agr_u_soldiers_squad_3]
+active = walker@agr_u_soldiers_squad_3
+suitable = {=target_squad_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_3
+
+[walker@agr_u_soldiers_squad_3]:walker@generic
+path_walk = walk3
+path_look = look3
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_3]
+on_info = %+agr_u_soldiers_squad_soldier_3_is_dead%
+
+
+[logic@agr_u_soldiers_squad_4]
+active = walker@agr_u_soldiers_squad_4
+suitable = {=target_squad_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_4
+
+[walker@agr_u_soldiers_squad_4]:walker@generic
+path_walk = walk4
+path_look = look4
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_4]
+on_info = %+agr_u_soldiers_squad_soldier_4_is_dead%
+
+
+
+[logic@agr_u_soldiers_squad_5]
+active = walker@agr_u_soldiers_squad_5
+suitable = {=target_squad_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_5
+
+[walker@agr_u_soldiers_squad_5]:walker@generic
+path_walk = walk5
+path_look = look5
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_5]
+on_info = %+agr_u_soldiers_squad_soldier_5_is_dead%
+
+
+
+[logic@agr_u_soldiers_squad_6]
+active = walker@agr_u_soldiers_squad_6
+suitable = {=check_npc_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_6
+
+[walker@agr_u_soldiers_squad_6]:walker@generic
+path_walk = walk6
+path_look = look6
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_6]
+on_info = %+agr_u_soldiers_squad_soldier_6_is_dead%
+
+
+
+[logic@agr_u_soldiers_squad_7]
+active = walker@agr_u_soldiers_squad_7
+suitable = {=target_squad_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_7
+
+[walker@agr_u_soldiers_squad_7]:walker@generic
+path_walk = walk7
+path_look = look7
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_7]
+on_info = %+agr_u_soldiers_squad_soldier_7_is_dead%
+
+
+
+[logic@agr_u_soldiers_squad_8]
+active = walker@agr_u_soldiers_squad_8
+suitable = {=target_squad_name(agr_u_soldiers_squad)} true
+prior = 200
+on_death = death@soldier_8
+
+[walker@agr_u_soldiers_squad_8]:walker@generic
+path_walk = walk8
+path_look = look8
+;combat_ignore_cond = {=check_enemy_name(actor)} false, true
+danger = danger
+
+[death@soldier_8]
+on_info = %+agr_u_soldiers_squad_soldier_8_is_dead%
+on_info2 = {+agr_u_soldiers_squad_soldier_1_is_dead +agr_u_soldiers_squad_soldier_2_is_dead +agr_u_soldiers_squad_soldier_3_is_dead +agr_u_soldiers_squad_soldier_4_is_dead +agr_u_soldiers_squad_soldier_5_is_dead +agr_u_soldiers_squad_soldier_6_is_dead +agr_u_soldiers_squad_soldier_7_is_dead} %+agr_u_soldiers_dead%
+
+
+[danger]
+;danger_expiration_time = 60000
+danger_inertion_time_grenade = 90000
+danger_inertion_time_hit = 90000
+danger_inertion_time_sound = 90000
+danger_inertion_time_ricochet = 90000

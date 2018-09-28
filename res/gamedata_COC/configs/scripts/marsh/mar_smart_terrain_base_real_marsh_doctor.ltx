@@ -1,0 +1,33 @@
+[logic@real_marsh_doctor]
+suitable = {=check_npc_name(mar_smart_terrain_doc_doctor)} true
+prior = 200
+active = animpoint@base
+can_select_weapon = false
+known_info = known_info
+;level_spot = quest_npc
+
+[animpoint@base]
+cover_name = mar_smart_terrain_base_real_marsh_doctor_animp
+use_camp = true
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = true
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = true
+allow_break 	= false
+meet_on_talking = false
+trade_enable = false
+
+[known_info]
+mar_doctor_found

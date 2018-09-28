@@ -1,0 +1,10 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b5_trader_death} sr_idle@check
+
+[sr_idle@check]
+on_info = {=actor_has_item(device_pda_zat_b5_dealer)} sr_idle@nil %+zat_b7_actor_now_duty_illicit_dealer%
+
+[sr_idle@nil]

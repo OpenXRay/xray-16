@@ -1,0 +1,32 @@
+[logic]
+;active = sr_idle@start
+active = sr_idle@nil
+
+[sr_idle@start]
+on_info = sr_idle %=turn_off(399)%
+
+[sr_idle]
+on_info = {+agr_knockdown} sr_idle@1
+
+[sr_idle@1]
+on_timer = 300 | sr_idle@2 %=agr_knockdown =run_cam_effector(dis_consciousness:1984:true) =disable_ui%
+
+[sr_idle@2]
+on_timer = 2000 | sr_idle@3_1 %=agr_contuz =turn_on(399) =run_postprocess(agr_u_fade) +agr_doc_wakeup%
+
+[sr_idle@3_1]
+on_timer = 1500 | sr_idle@3 %=stop_cam_effector(1984) =run_postprocess(deadcity_wake)%
+
+[sr_idle@3]
+on_timer  = 1500 | sr_idle@4  %=agr_cam_effect =teleport_actor(kat_teleport_to_dark_city_position:kat_teleport_to_dark_city_orientation) +esc_find_doctor_done +cit_jail_actor_wake%
+
+[sr_idle@4]
+on_timer = 85500 | sr_idle@5 %=run_postprocess(agr_u_fade) +cit_jail_doctor_pryp_task%
+
+[sr_idle@5]
+on_timer = 3000 | sr_idle@last %+cit_jail_doctor_pryp_task =stop_cam_effector(123) =run_cam_effector(prison_1:2508:false)%
+
+[sr_idle@last]
+on_timer = 4000 | sr_idle@nil %=enable_ui =turn_off(399)%
+
+[sr_idle@nil]

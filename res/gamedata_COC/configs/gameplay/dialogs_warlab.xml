@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+    <dialog id="oso_what_about_me">
+        <has_info>oso_what_is_the_zone</has_info>
+        <dont_has_info>oso_what_about_me</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_what_about_me_0</text>
+                <give_info>oso_what_about_me</give_info>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>oso_what_about_me_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_no">
+        <has_info>oso_question</has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_no_0</text>
+                <action>dialogs_warlab.osoznanie_decline</action>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_death_truck">
+        <has_info>oso_what_about_me</has_info>
+        <dont_has_info>oso_death_truck</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_death_truck_0</text>
+                <give_info>oso_death_truck</give_info>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>oso_death_truck_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_osoznanie_start">
+        <phrase_list>
+            <phrase id="2">
+                <text />
+                <has_info>oso_question</has_info>
+                <next>21</next>
+            </phrase>
+            <phrase id="11">
+                <text>oso_osoznanie_start_11</text>
+            </phrase>
+            <phrase id="21">
+                <text>oso_osoznanie_start_21</text>
+            </phrase>
+            <phrase id="0">
+                <text />
+                <next>1</next>
+                <next>2</next>
+            </phrase>
+            <phrase id="1">
+                <text />
+                <dont_has_info>oso_question</dont_has_info>
+                <next>11</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_stalker">
+        <has_info>oso_what_about_me</has_info>
+        <dont_has_info>oso_stalker</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_stalker_0</text>
+                <give_info>oso_stalker</give_info>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>oso_stalker_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_why_chernobyl">
+        <has_info>oso_what_is_the_zone</has_info>
+        <dont_has_info>oso_why_chernobyl</dont_has_info>
+        <phrase_list>
+            <phrase id="1">
+                <text>oso_why_chernobyl_1</text>
+            </phrase>
+            <phrase id="0">
+                <text>oso_why_chernobyl_0</text>
+                <give_info>oso_why_chernobyl</give_info>
+                <next>1</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_what_is_the_zone">
+        <has_info>oso_who_are_you</has_info>
+        <dont_has_info>oso_what_is_the_zone</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_what_is_the_zone_0</text>
+                <give_info>oso_what_is_the_zone</give_info>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>oso_what_is_the_zone_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+ 
+    <dialog id="oso_who_are_you">
+        <dont_has_info>oso_who_are_you</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_who_are_you_0</text>
+                <give_info>oso_who_are_you</give_info>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>oso_who_are_you_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	
+    <dialog id="oso_what_next">
+        <has_info>oso_death_truck</has_info>
+        <has_info>oso_stalker</has_info>
+        <has_info>oso_chernobyl_crush</has_info>
+        <dont_has_info>oso_question</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_what_next_0</text>
+                <give_info>oso_question</give_info>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>oso_what_next_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_yes">
+        <has_info>oso_question</has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>oso_yes_0</text>
+                <action>dialogs_warlab.osoznanie_agree</action>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="oso_chernobyl_crush">
+        <has_info>oso_why_chernobyl</has_info>
+        <dont_has_info>oso_chernobyl_crush</dont_has_info>
+        <phrase_list>
+            <phrase id="1">
+                <text>oso_chernobyl_crush_1</text>
+            </phrase>
+            <phrase id="0">
+                <text>oso_chernobyl_crush_0</text>
+                <give_info>oso_chernobyl_crush</give_info>
+                <next>1</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="warlab_entity_start">
+        <phrase_list>
+            <phrase id="1">
+                <text></text>
+                <dont_has_info>warlab_ent_question</dont_has_info>
+                <next>11</next>
+            </phrase>
+            <phrase id="0">
+                <text></text>
+                <next>1</next>
+            </phrase>
+            <phrase id="11">
+                <text>warlab_entity_start_11</text>
+                <next>12</next>
+            </phrase>
+            <phrase id="12">
+                <text>warlab_entity_start_12</text>
+                <next>13</next>
+            </phrase>
+            <phrase id="13">
+                <text>warlab_entity_start_13</text>
+                <next>14</next>
+            </phrase>
+            <phrase id="14">
+                <text>warlab_entity_start_14</text>
+                <next>15</next>
+            </phrase>
+            <phrase id="15">
+                <text>warlab_entity_start_15</text>
+                <next>16</next>
+            </phrase>
+            <phrase id="16">
+                <text>warlab_entity_start_16</text>
+                <next>17</next>
+            </phrase>
+            <phrase id="17">
+                <text>warlab_entity_start_17</text>
+                <next>18</next>
+            </phrase>
+            <phrase id="18">
+                <text>warlab_entity_start_18</text>
+                <action>dialogs.break_dialog</action>
+                <give_info>warlab_main_polter_scene_start</give_info>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

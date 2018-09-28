@@ -1,0 +1,36 @@
+[logic@pri_a21_chasovoi]
+active = animpoint@pri_a21_start
+suitable = {+pri_a21_task_start =check_npc_name(pri_a21_sentry_lieutenant_stecenko)} true
+prior = 200
+on_death = death
+on_hit = hit
+
+[animpoint@pri_a21_start]
+meet = no_meet
+cover_name = pri_a21_sc_mad_chasovoi
+avail_animations = pri_a21_sentry_madness
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_info = %=play_sound(pri_a21_sentr_crazy_1)%
+on_info2 = {=dist_to_actor_le(10)} remark@self_murder
+on_info3 = {-pri_a21_once_autosave =dist_to_actor_le(30)} %+pri_a21_once_autosave =scenario_autosave(st_save_pri_a21_approached_mad_sentry)%
+
+[remark@self_murder]
+meet = no_meet
+anim = pri_a21_sentry_madness_suicide
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+on_signal = anim_end | %=stop_sound =kill_npc%
+on_info = %=play_sound(pri_a21_sentr_crazy_2)%
+
+[hit]
+on_info = {!deadly_hit} %=kill_npc%
+
+[death]
+on_info = %+pri_a21_chasovoi_dead%

@@ -1,0 +1,34 @@
+[logic]
+active = walker
+on_death = death
+
+[walker]
+path_walk = bar_arena_wait_walk_2
+path_look = bar_arena_wait_look
+combat_ignore_cond = true
+on_info = {+bar_arena_fight_begin} walker@1
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = bar_arena_restrictor
+
+[walker@1]
+path_walk = bar_arena_walk_3_1
+path_look = bar_arena_walk_attack
+def_state_moving = raid
+def_state_standing = threat_na
+wounded = wounded@ignore
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = bar_arena_restrictor
+
+[wounded@ignore]
+hp_state        = 0|wounded_heavy@help_heavy
+hp_state_see    = 0|wounded_heavy@help_heavy
+hp_victim       = 0|nil
+hp_fight        = 0|false
+hp_cover        = 0|false
+
+[death]
+on_info = %+bar_arena_fight_6_stalker_2_die +bar_arena_public_death%

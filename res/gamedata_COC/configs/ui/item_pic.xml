@@ -1,0 +1,13 @@
+<w>
+	<window x="0" y="0" width="810" height="640">
+		<texture>ui_inGame2_hint_wnd_main_window</texture>
+	</window>
+	
+	<img_static x="5" y="5" width="800" height="600">
+	</img_static>
+	
+	<button_quit x="347" y="610" width="127" height="28">
+		<text align="c" font="letterica18" r="227" g="199" b="178">ui_exit</text>	
+		<texture>ui_inGame2_Mp_bigbuttone</texture>			
+	</button_quit>
+</w>

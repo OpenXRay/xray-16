@@ -1,0 +1,9 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b5_actor_stalker_go_to_trader} sr_idle@nil %=set_squad_goodwill(zat_b5_stalkers_squad:friend)%
+on_info2 = {+zat_b5_come_to_bandits_complete} sr_idle@nil %=set_squad_goodwill(zat_b5_bandit_squad:friend)%
+on_info3 = {+zat_b5_come_to_dealer_done} sr_idle@nil %=set_squad_goodwill(zat_b5_dolg_squad:friend) =set_squad_goodwill(zat_b5_dolg_assist_squad:friend)%
+
+[sr_idle@nil]

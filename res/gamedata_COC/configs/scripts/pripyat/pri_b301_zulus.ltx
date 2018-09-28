@@ -1,0 +1,78 @@
+[logic@zulus]
+suitable = {=check_npc_name(pri_b301_zulus) -pri_b301_zulus_work_end} true
+active = camper@wait_for_actor
+on_death = death
+post_combat_time = 0, 0
+prior = 200
+
+[death]
+on_info = %+pri_b301_zulus_dead%
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false
+
+[camper@wait_for_actor]
+path_walk = zulus_walk_1
+path_look = zulus_look_1
+out_restr = pri_b301_zulus_def_restr
+meet = no_meet
+on_info = {=dist_to_actor_le(50)} camper@defend %+pri_a301_zulus_start_scene%, {=actor_see_npc} camper@defend %+pri_a301_zulus_start_scene%
+wounded = wounded
+radius = 5
+def_state_campering_fire = threat_fire
+def_state_campering = threat
+
+[camper@defend]
+path_walk = zulus_walk_1
+path_look = zulus_look_1
+out_restr = pri_b301_zulus_def_restr
+meet = no_meet
+on_info = {+pri_b301_save_zulus_complete =dist_to_actor_le(8) +pri_b301_monster_death_1 +pri_b301_monster_death_2 +pri_b301_monster_death_3} remark@no_danger
+on_info2 = {-pri_b301_zulus_hello_in_combat_sound =see_actor() =dist_to_actor_le(20)} %+pri_b301_zulus_hello_in_combat_sound =play_sound(pri_b301_zulus_hello_in_combat)%, {-pri_b301_zulus_hello_in_combat_sound =dist_to_actor_le(5)} %+pri_b301_zulus_hello_in_combat_sound =play_sound(pri_b301_zulus_hello_in_combat)%
+on_info3 = {-pri_b301_save_zulus_complete} %=play_sound(pri_b301_zulus_surrounded)%
+on_info4 = {=dist_to_actor_ge(140)} %=destroy_object +pri_b301_zulus_destroy_alone_without_fight%
+wounded = wounded
+radius = 5
+def_state_campering_fire = threat_fire
+def_state_campering = threat
+
+[remark@no_danger]
+target = story | actor
+anim = guard_na
+on_signal = sound_end | remark@dialog
+meet = no_meet
+on_info = %=play_sound(pri_b301_zulus_after_fight)%
+wounded = wounded
+
+[remark@dialog]
+target = story | actor
+anim = guard
+on_info = {+pri_b301_zulus_remain_alone} walker@wait, {+pri_b301_zulus_go_alone} %+pri_b301_zulus_work_end%, {+pri_b301_go_on_base} %+pri_b301_zulus_work_end%
+on_info2 = {-pri_b301_go_on_base =dist_to_actor_ge(140) -pri_b301_zulus_destroy_alone} %=destroy_object +pri_b301_zulus_destroy_alone%
+meet = meet@self
+wounded = wounded
+
+[walker@wait]
+path_walk = zulus_walk_1
+path_look = zulus_look_1
+def_state_standing = sit_ass
+on_info = {-pri_b301_go_on_base =dist_to_actor_ge(140) -pri_b301_zulus_destroy_alone} %=destroy_object +pri_b301_zulus_destroy_alone%
+meet = meet
+
+[meet]
+use = {=actor_enemy} false, true
+use_wpn = {=actor_enemy} false, true
+meet_dialog	= jup_b15_zulus_b301_after_fight
+trade_enable 	= false
+allow_break 	= false
+
+[meet@self]
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} self, true
+use_wpn = {=actor_enemy} false, true
+meet_dialog	= jup_b15_zulus_b301_after_fight
+trade_enable 	= false
+allow_break 	= false

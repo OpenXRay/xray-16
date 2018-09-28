@@ -1,0 +1,41 @@
+;generic section
+
+[logic@jup_a9_dog_gen]
+suitable = {=target_squad_name(jup_a9_dogs_normal)} true
+prior = 200
+monster_job = true
+
+[mob_walker@jup_a9_dog_gen]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+;dogs section
+
+[logic@jup_a9_dog_01]:logic@jup_a9_dog_gen
+active = mob_walker@01
+
+[logic@jup_a9_dog_02]:logic@jup_a9_dog_gen
+active = mob_walker@02
+
+[logic@jup_a9_dog_03]:logic@jup_a9_dog_gen
+active = mob_walker@03
+
+[logic@jup_a9_dog_04]:logic@jup_a9_dog_gen
+active = mob_walker@04
+
+[logic@jup_a9_dog_05]:logic@jup_a9_dog_gen
+active = mob_walker@05
+
+
+[mob_walker@01]:mob_walker@jup_a9_dog_gen
+path_walk = dogs_1_walk
+
+[mob_walker@02]:mob_walker@jup_a9_dog_gen
+path_walk = dogs_2_walk
+
+[mob_walker@03]:mob_walker@jup_a9_dog_gen
+path_walk = dogs_3_walk
+
+[mob_walker@04]:mob_walker@jup_a9_dog_gen
+path_walk = dogs_4_walk
+
+[mob_walker@05]:mob_walker@jup_a9_dog_gen
+path_walk = dogs_5_walk

@@ -1,0 +1,11 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b5_meat -zat_b5_meat_online} sr_idle@check %+zat_b5_meat_online =set_squads_enemies(zat_b5_stalkers_squad:zat_b5_bandit_squad) =set_squads_enemies(zat_b5_stalkers_squad:zat_b5_dolg_squad) =set_squads_enemies(zat_b5_bandit_squad:zat_b5_dolg_squad) =set_squads_enemies(zat_b5_bandit_squad:zat_b5_dolg_assist_squad) =set_squads_enemies(zat_b5_stalkers_squad:zat_b5_dolg_assist_squad)%
+
+[sr_idle@check]
+on_info = {+zat_b5_dolg_enemy -zat_b5_dealer_speak_1_done} sr_idle@nil %=set_squad_enemy_to_actor(zat_b5_bandit_squad)%
+;on_info2 = {+zat_b5_meat -zat_b5_actor_with_dealer } sr_idle@nil %=set_squad_enemy_to_actor(zat_b5_dolg_squad)%
+
+[sr_idle@nil]

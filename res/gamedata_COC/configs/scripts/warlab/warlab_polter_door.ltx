@@ -1,0 +1,45 @@
+[logic]
+active = ph_door@check_story
+
+[ph_door@check_story]
+on_info = {+story_mode_disabled} ph_door@close, ph_door@horror_knock
+
+[ph_door@horror_knock]
+locked = true
+closed = true
+on_info = {~60 =actor_in_zone(warlab_door_marker)} ph_door@horror_wait %=hit_npc(warlab_point_knock:door:0:1500) =play_particle_on_path(hit_fx\hit_stucco_statik:warlab_knock_points:70) =play_sound(trader_door_close_stop)%, ph_door@horror_silence
+on_info2 = {+warlab_main_polter_dead} ph_door@open %+warlab_open_door2 =play_sound(trader_door_unlock)%
+tip_open = dar_poltergeist_hold_the_door
+tip_close = 
+
+[ph_door@horror_wait]
+locked = true
+closed = true
+on_timer = 2500| ph_door@horror_knock
+on_info = {+warlab_main_polter_dead} ph_door@open %+warlab_open_door2 =play_sound(trader_door_unlock)%
+on_use = {+warlab_main_polter_dead} ph_door@open, %+warlab_door2_closed%
+tip_open = dar_poltergeist_hold_the_door
+tip_close = 
+
+[ph_door@horror_silence]
+locked = true
+closed = true
+on_timer = 2000| ph_door@horror_knock
+on_info = {+warlab_main_polter_dead} ph_door@open %+warlab_open_door2 =play_sound(trader_door_unlock)%
+on_use = {+warlab_main_polter_dead} ph_door@open, %+warlab_door2_closed%
+tip_open = dar_poltergeist_hold_the_door
+tip_close = 
+
+[ph_door@open]
+locked = false
+closed = false
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@close
+
+[ph_door@close]
+locked = false
+closed = true
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@open

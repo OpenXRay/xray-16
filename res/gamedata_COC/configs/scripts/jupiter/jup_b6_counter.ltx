@@ -1,0 +1,42 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_b6_give_task} sr_idle@count %=set_counter(jup_b6_anom_1_count_1:0) =set_counter(jup_b6_anom_1_count_2:0) =set_counter(jup_b6_anom_1_count_3:0) =set_counter(jup_b6_anom_1_count_4:0) =set_counter(jup_b6_anom_2_count_1:0) =set_counter(jup_b6_anom_2_count_2:0) =set_counter(jup_b6_anom_2_count_3:0) =set_counter(jup_b6_anom_2_count_4:0)%
+
+[sr_idle@count]
+on_info =  {=counter_greater(jup_b6_anom_1_count_1:80)} %+jup_b6_anom_1_count_1_end%, {=counter_greater(jup_b6_anom_1_count_1:20) -jup_b6_mut_wave_1} %+jup_b6_mut_wave_1%
+on_info2 = {=counter_greater(jup_b6_anom_1_count_2:100)} %+jup_b6_anom_1_count_2_end%, {=counter_greater(jup_b6_anom_1_count_2:30) -jup_b6_mut_wave_2} %+jup_b6_mut_wave_2%
+on_info3 = {=counter_greater(jup_b6_anom_1_count_3:120)} %+jup_b6_anom_1_count_3_end%, {=counter_greater(jup_b6_anom_1_count_3:70) -jup_b6_mut_wave_3} %+jup_b6_mut_wave_3%
+on_info4 = {=counter_greater(jup_b6_anom_1_count_4:140)} %+jup_b6_anom_1_count_4_end%, {=counter_greater(jup_b6_anom_1_count_4:110) -jup_b6_mut_wave_4} %+jup_b6_mut_wave_4%
+on_info5 = {+jup_b6_anom_1_count_1_end +jup_b6_anom_1_count_2_end +jup_b6_anom_1_count_3_end +jup_b6_anom_1_count_4_end -jup_b6_anom_1_reward_given} %+jup_b6_anom_1_count_end +jup_b6_reward +jup_b6_travel +jup_b6_anom_1_reward_given%
+
+on_info6 = {=counter_greater(jup_b6_anom_2_count_1:80)} %+jup_b6_anom_2_count_1_end%, {=counter_greater(jup_b6_anom_2_count_1:20) -jup_b6_zom_wave_1} %+jup_b6_zom_wave_1%
+on_info7 = {=counter_greater(jup_b6_anom_2_count_2:100)} %+jup_b6_anom_2_count_2_end%, {=counter_greater(jup_b6_anom_2_count_1:40) -jup_b6_zom_wave_2} %+jup_b6_zom_wave_2%
+on_info8 = {=counter_greater(jup_b6_anom_2_count_3:120)} %+jup_b6_anom_2_count_3_end%, {=counter_greater(jup_b6_anom_2_count_1:60) -jup_b6_zom_wave_3} %+jup_b6_zom_wave_3%
+on_info9 = {=counter_greater(jup_b6_anom_2_count_4:140)} %+jup_b6_anom_2_count_4_end%, {=counter_greater(jup_b6_anom_2_count_1:80) -jup_b6_zom_wave_4} %+jup_b6_zom_wave_4%
+on_info10 = {+jup_b6_anom_2_count_1_end +jup_b6_anom_2_count_2_end +jup_b6_anom_2_count_3_end +jup_b6_anom_2_count_4_end -jup_b6_anom_2_reward_given} %+jup_b6_anom_2_count_end +jup_b6_reward +jup_b6_travel +jup_b6_anom_2_reward_given%
+
+on_info11 = {+jup_b6_anom_1_count_end +jup_b6_anom_2_count_end}  %+jup_b6_two_anomaly_learned% sr_idle@end, {+jup_b6_task_fail} sr_idle@end
+
+on_info12 = {=is_dead(jup_b1_stalker_1) =story_object_exist(jup_b1_stalker_1)} %+jup_b1_stalker_1_is_dead%
+on_info13 = {=is_dead(jup_b1_stalker_2) =story_object_exist(jup_b1_stalker_2)} %+jup_b1_stalker_2_is_dead%
+on_info14 = {=is_dead(jup_b1_stalker_3) =story_object_exist(jup_b1_stalker_3)} %+jup_b1_stalker_3_is_dead%
+on_info15 = {=is_dead(jup_b1_stalker_4) =story_object_exist(jup_b1_stalker_4)} %+jup_b1_stalker_4_is_dead%
+on_info16 = {+jup_b1_stalker_1_is_dead +jup_b1_stalker_2_is_dead +jup_b1_stalker_3_is_dead +jup_b1_stalker_4_is_dead} %+jup_b1_squad_is_dead%
+
+on_game_timer = 15 | sr_idle@count_idle
+
+[sr_idle@count_idle]
+on_game_timer = 15 | sr_idle@count
+on_info = {+jup_b6_anom_1_count_end +jup_b6_anom_2_count_end}  %+jup_b6_two_anomaly_learned% sr_idle@end, {+jup_b6_task_fail} sr_idle@end
+
+[sr_idle@end]
+on_info =  {=is_dead(jup_b1_stalker_1) =story_object_exist(jup_b1_stalker_1)} %+jup_b1_stalker_1_is_dead%
+on_info2 = {=is_dead(jup_b1_stalker_2) =story_object_exist(jup_b1_stalker_2)} %+jup_b1_stalker_2_is_dead%
+on_info3 = {=is_dead(jup_b1_stalker_3) =story_object_exist(jup_b1_stalker_3)} %+jup_b1_stalker_3_is_dead%
+on_info4 = {=is_dead(jup_b1_stalker_4) =story_object_exist(jup_b1_stalker_4)} %+jup_b1_stalker_4_is_dead%
+on_info5 = {+jup_b1_stalker_1_is_dead +jup_b1_stalker_2_is_dead +jup_b1_stalker_3_is_dead +jup_b1_stalker_4_is_dead} %+jup_b1_squad_is_dead%
+on_info6 = {+jup_b6_complete_end} sr_idle@total_end, {+jup_b6_task_fail} sr_idle@total_end
+
+[sr_idle@total_end]

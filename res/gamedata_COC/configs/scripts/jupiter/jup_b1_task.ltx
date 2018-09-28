@@ -1,0 +1,33 @@
+[logic]
+active = nil;sr_idle@turn_anomaly_off
+
+[sr_idle@turn_anomaly_off]
+on_game_timer = 15 | %=anomaly_turn_off(jup_b1_anomal_zone) +jup_b1_debug% 
+on_info = {+jup_b1_give_task} sr_idle@no_task
+
+[sr_idle@no_task]
+on_game_timer = 5 | sr_idle@end1  %=create_squad(jup_b1_zombie:jup_b1) =anomaly_turn_on(jup_b1_anomal_zone)%
+
+[sr_idle@end1]
+on_game_timer = 8 | sr_idle@choose %=give_task(jup_b1_task)%
+
+[sr_idle@choose]
+on_info = {+jup_b1_teleport_to_tunnel}  sr_idle@wait_control, {+jup_b1_go_on_task} sr_idle@wait_control
+
+[sr_idle@wait_control]
+on_timer = 2160000 | sr_idle@no_task_2 %-jup_b1_go_on_task -jup_b1_give_task =play_sound(jup_b1_actor_dont_come) +jup_b1_st_go_home%
+on_info = {+jup_b1_start} sr_idle@reward
+
+
+[sr_idle@no_task_2]
+on_game_timer = 5 | sr_idle@end2  %=anomaly_turn_on(jup_b1_anomal_zone)%
+
+[sr_idle@end2]
+on_game_timer = 8 | sr_idle@reward %=give_task(jup_b1_task) +jup_b1_start%
+
+
+[sr_idle@reward]
+on_info = {+jup_b1_rewarded_by_st} sr_idle@end %=give_treasure(jup_hiding_place_33)%
+on_info2 = {+jup_b1_task_done} sr_idle@end
+
+[sr_idle@end]

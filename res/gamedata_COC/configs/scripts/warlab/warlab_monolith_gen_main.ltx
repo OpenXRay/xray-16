@@ -1,0 +1,29 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+warlab_actor_second_arrive =counter_greater(mon_destroy_generator:1)} sr_idle@sound1 %+warlab_mon_poltergeist_1_spawn =spawn_object(warlab_poltergeist_1:warlab_poltergeist_home:0)%
+
+[sr_idle@sound1]
+on_info = %=play_sound(mon_monolith_damaged)%
+on_info2 = {=counter_greater(mon_destroy_generator:3)} sr_idle@sound2 %+sar_mon_poltergeist_2_spawn =spawn_object(warlab_poltergeist_2:warlab_poltergeist_home:0)%
+
+[sr_idle@sound2]
+on_info = %=play_sound(mon_monolith_heavy_damaged)%
+on_info2 = {=counter_greater(mon_destroy_generator:4)} sr_idle %+sar_mon_poltergeist_3_spawn =spawn_object(warlab_poltergeist_3:warlab_poltergeist_home:0)% 
+
+[sr_idle]
+on_info = {=counter_greater(mon_destroy_generator:5)} sr_idle@sound3  %+sar_mon_poltergeist_4_spawn =spawn_object(warlab_poltergeist_4:warlab_poltergeist_home:0)%
+
+[sr_idle@sound3]
+on_info = %=play_sound(mon_monolith_heavy_damaged)%
+on_info2 = {=counter_greater(mon_destroy_generator:6)} sr_idle@sound4 %=run_postprocess(monolith_off:2507:false)% 
+
+[sr_idle@sound4]
+on_info = %=play_sound(mon_monolith_alarm)%
+on_signal = sound_end| sr_idle@nil %+sar_monolith_destroy +sar_monolith_off%
+
+[sr_idle@nil]

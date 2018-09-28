@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<!-- FIND THE WISH GRANTER (FALSE ENDING) -->
+	<string id="sar_monolith">
+		<text>Зов Севера</text>
+	</string>
+	<string id="sar_monolith_0">
+		<text>Поговорить с Исполнителем Желаний.</text>
+	</string>
+	<string id="sar_monolith_1">
+		<text>Голос на севере зовёт меня. Я должен пойти туда и найти источник.</text>
+	</string>
+	<string id="sar_monolith_2">
+		<text>Голос, зовущий меня, исходит от Исполнителя Желаний. Я должен найти его где-то в Саркофаге.</text>
+	</string>
+	
+	<!-- FIND THE WISH GRANTER (TRUE ENDING) -->
+	<string id="sar_monolith_destroy">
+		<text>Гробница</text>
+	</string>
+	<string id="sar_monolith_destroy_0">
+		<text>Найти скрытую базу, упомянутую в рукописи и узнать, что там происходит.</text>
+	</string>
+	<string id="sar_monolith_destroy_1">
+		<text>Уничтожить Исполнитель Желаний: поразить все 10 волн психофизических голопроекций Монолита.</text>
+	</string>
+    <string id="sar_monolith_destroy_2">
+        <text>Отключить генераторы, питающие «О-Сознание».</text>
+    </string>
+	    <string id="sar_monolith_destroy_3">
+        <text>Отключить Генераторы.</text>
+    </string>
+</string_table>

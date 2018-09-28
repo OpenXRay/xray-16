@@ -1,0 +1,46 @@
+[logic]
+active = nil ;sr_idle@wait_for_start
+
+[sr_idle@wait_for_start]
+on_info = {-zat_b30_task_start +zat_b5_task_end !talking} %+zat_b30_task_start%
+on_info2 = {-zat_b30_task_start +zat_b5_task_end_another !talking} %+zat_b30_task_start%
+on_info3 = {+zat_b30_task_start} sr_idle@wait_for_give_task %+zat_b30_dialog_info%
+
+[sr_idle@wait_for_give_task]
+on_info = {+zat_b30_actor_in_tempting_business} sr_idle@novikov_transfer %=give_task(zat_b30_task)%
+
+[sr_idle@novikov_transfer]
+on_info = {+zat_b30_actor_gave_detector} sr_idle@wait_for_owl_trouble
+;затычка
+;on_info2 = {-zat_b30_actor_gave_detector} %+zat_b30_actor_gave_detector%
+
+[sr_idle@wait_for_owl_trouble]
+on_game_timer = 39600 | sr_idle@owl_in_trouble
+
+[sr_idle@owl_in_trouble]
+on_info = {!actor_in_zone(zat_a2_sr_noweap)} sr_idle@owl_must_pay %+zat_b30_owl_in_trouble =play_sound(zat_b30_owl_about_trouble) +zat_b30_owl_trouble_dialog_info%
+
+[sr_idle@owl_must_pay]
+on_info = {+zat_b30_actor_against_owl} sr_idle@wait_for_sultan_quest
+on_info2 = {+zat_b30_actor_against_barmen} sr_idle@sultan_quest %=give_task(zat_b30_sultan_task)%
+
+[sr_idle@wait_for_sultan_quest]
+on_info = {+zat_b30_actor_with_sultan} sr_idle@sultan_quest %=give_task(zat_b30_sultan_task)%
+
+[sr_idle@sultan_quest]
+on_info = {=actor_has_item_count(detector_scientific:2) -zat_b30_first_detector} %+zat_b30_first_detector%
+on_info2 = {=actor_has_item_count(detector_scientific:3) -zat_b30_second_detector} %+zat_b30_second_detector%
+on_info3 = {+zat_b30_barmen_under_sultan} sr_idle@percents %=set_counter(zat_b30_days_cnt:0)%
+on_info4 = {-zat_b30_second_detector +zat_b29_exclusive_conditions +zat_b29_first_rival_taken_out +zat_b29_second_rival_taken_out} %+zat_b30_second_detector%
+on_info5 = {-zat_b30_second_detector +zat_b29_exclusive_conditions +zat_b30_rival_1_wo_detector +zat_b30_rival_2_wo_detector} %+zat_b30_second_detector%
+on_info6 = {-zat_b30_second_detector +zat_b29_exclusive_conditions +zat_b29_first_rival_taken_out +zat_b30_rival_2_wo_detector} %+zat_b30_second_detector%
+on_info7 = {-zat_b30_second_detector +zat_b29_exclusive_conditions +zat_b30_rival_1_wo_detector +zat_b29_second_rival_taken_out} %+zat_b30_second_detector%
+ 
+[sr_idle@percents]
+on_game_timer = 86400 | sr_idle@increment
+
+[sr_idle@increment]
+on_info = {-zat_b30_task_percents_running} %+zat_b30_task_percents_running =give_task(zat_b30_percent_task)% 
+on_info2 = sr_idle@percents %=inc_counter(zat_b30_days_cnt)%
+
+[sr_idle@nil]

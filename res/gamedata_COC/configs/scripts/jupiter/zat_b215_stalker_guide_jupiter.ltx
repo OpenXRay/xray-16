@@ -1,0 +1,67 @@
+[logic@zat_b215_stalker_guide_jupiter]
+suitable = {=check_npc_name(zat_b215_stalker_guide_jupiter)} true
+prior = 200
+active = animpoint
+level_spot = guider
+
+[animpoint]
+cover_name = jup_a6_animpoint_guider_start
+avail_animations = wait_na
+use_camp = false
+reach_distance = 1
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = no_meet
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info = {+jup_b217_welcome_faded} animpoint@first_visit
+
+[animpoint@first_visit]
+cover_name = jup_a6_animpoint_guider_start
+avail_animations = jup_b217_guide_stand
+use_camp = false
+reach_distance = 0.3
+on_info2 = {+jup_b217_pp_end_in_scene -jup_b217_guide_welcome_end !black_screen} %=play_sound(jup_b217_stalker_guide_welcome) +jup_b217_guide_welcome_end%
+on_signal = sound_end | {-jup_b217_welcome_guide_talked} %+jup_b217_welcome_guide_talked%
+on_info3 = {+jup_b217_welcome_guide_talked} animpoint@rest
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = no_meet
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@rest]
+cover_name = jup_a6_animpoint_guider
+use_camp = false
+reach_movement = walk_noweap
+reach_distance = 1
+on_game_timer = 27 | {-jup_b217_tech_begin_to_talk} %+jup_b217_tech_begin_to_talk%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = meet
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_snd_hello = zat_b215_stalker_guide_greeting
+close_snd_bye = zat_b215_stalker_guide_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_on_talking = false
