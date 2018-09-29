@@ -208,4 +208,4 @@ void CBackend::DestroyConstantBuffers()
     _RELEASE(m_pPixelConstants);
 }
 */
-#endif USE_DX10
+#endif //	USE_DX10
