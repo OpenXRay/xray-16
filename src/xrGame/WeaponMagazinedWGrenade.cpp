@@ -69,7 +69,7 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
 	if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable)
     {
         m_ammoTypes2.clear();
-        LPCSTR S = pSettings->r_string(m_launchers[m_cur_addon.launcher].c_str(), "grenade_class");
+        LPCSTR S = pSettings->r_string(GetGrenadeLauncherName(), "grenade_class");
         if (S && S[0])
         {
             string128 _ammoItem;
@@ -491,7 +491,7 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
                 m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
                 CRocketLauncher::m_fLaunchSpeed = pGrenadeLauncher->GetGrenadeVel();
                 m_ammoTypes2.clear();
-                LPCSTR S = pSettings->r_string((*it), "grenade_class");
+                LPCSTR S = pSettings->r_string(pIItem->object().cNameSect(), "grenade_class");
                 if (S && S[0])
                 {
                     string128 _ammoItem;
@@ -560,7 +560,7 @@ void CWeaponMagazinedWGrenade::InitAddons()
     {
         CRocketLauncher::m_fLaunchSpeed = pSettings->r_float(GetGrenadeLauncherName(), "grenade_vel");
         m_ammoTypes2.clear();
-        LPCSTR S = pSettings->r_string(m_launchers[m_cur_addon.launcher].c_str(), "grenade_class");
+        LPCSTR S = pSettings->r_string(GetGrenadeLauncherName(), "grenade_class");
         if (S && S[0])
         {
             string128 _ammoItem;
