@@ -908,5 +908,16 @@ typedef enum _D3DTRANSFORMSTATETYPE {
 
 #define D3DDECL_END() {0xFF,0,D3DDECLTYPE_UNUSED,0,0,0}
 
+typedef enum _D3DTEXTURETRANSFORMFLAGS {
+    D3DTTFF_DISABLE         =   0,
+    D3DTTFF_COUNT1          =   1,
+    D3DTTFF_COUNT2          =   2,
+    D3DTTFF_COUNT3          =   3,
+    D3DTTFF_COUNT4          =   4,
+    D3DTTFF_PROJECTED       = 256,
+
+    D3DTTFF_FORCE_DWORD     = 0x7fffffff
+} D3DTEXTURETRANSFORMFLAGS;
+
 inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
 

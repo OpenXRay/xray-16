@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "animation.h"
+#include "Animation.h"
 
 using namespace animation;
 
