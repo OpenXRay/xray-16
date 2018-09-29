@@ -1,3 +1,4 @@
+# Based on https://github.com/ldionne/hana/blob/master/.travis.yml
 dist: xenial
 sudo: required
 cache: ccache
@@ -11,26 +12,55 @@ language: cpp
 
 os:
 - linux
-compiler:
-- g++
-env:
-  global:
-  - LANG="en_US.UTF-8"
-  matrix:
-  - TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-  - TARGET_CPU=x86 BUILD_CONFIGURATION=Release
 
-addons:
-  apt:
-    sources:
-    - sourceline: 'ppa:ubuntu-toolchain-r/test'
-    packages:
-    - g++-7
+matrix:
+  include:
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+      addons: &gcc7
+        apt:
+          sources:
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - g++-7
 
-install: export CXX="g++-7"
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x86 BUILD_CONFIGURATION=Release
+      addons: *gcc7
+
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
+      addons: *gcc7
+
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
+      addons: *gcc7
+
+#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+#      addons: &clang50
+#        apt:
+#          sources:
+#            - llvm-toolchain-trusty-5.0
+#          packages:
+#            - clang-5.0
+
+#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
+#      addons: *clang50
+
+#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+#      addons: &clang60
+#        apt:
+#          sources:
+#            - llvm-toolchain-trusty-6.0
+#          packages:
+#            - clang-6.0
+
+#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
+#      addons: *clang60
+
+
+install:
+  - export CC=${C_COMPILER}
+  - export CXX=${CXX_COMPILER}
+  - ${CXX} --version
 
 before_script:
-  - g++ --version
   - export core_count=$(nproc || echo 4) && echo core_count = $core_count
   - mkdir bin
   - cd bin
