@@ -1277,6 +1277,9 @@
     <ClCompile Include="r3_rendertarget_phase_FXAA.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
+    <ClCompile Include="r3_shaders.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\TypeHelper.natvis" />

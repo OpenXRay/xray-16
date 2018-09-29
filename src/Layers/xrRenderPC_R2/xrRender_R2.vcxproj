@@ -478,6 +478,7 @@
     <ClCompile Include="r2_R_render.cpp" />
     <ClCompile Include="r2_R_sun.cpp" />
     <ClCompile Include="r2_sector_detect.cpp" />
+    <ClCompile Include="r2_shaders.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

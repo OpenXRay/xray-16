@@ -310,6 +310,7 @@
     <ClCompile Include="r3_R_rain.cpp" />
     <ClCompile Include="r3_R_sun_support.cpp" />
     <ClCompile Include="rgl.cpp" />
+    <ClCompile Include="rgl_shaders.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
