@@ -25,9 +25,9 @@ public:
     virtual void load(IReader& input_packet);
 
     virtual bool Attach(PIItem pIItem, bool b_send_event);
-    virtual bool Detach(const char* item_section_name, bool b_spawn_item);
+    virtual bool Detach(pcstr item_section_name, bool b_spawn_item);
     virtual bool CanAttach(PIItem pIItem);
-    virtual bool CanDetach(const char* item_section_name);
+    virtual bool CanDetach(pcstr item_section_name);
     virtual void InitAddons();
     virtual bool UseScopeTexture();
     virtual float CurrentZoomFactor();
@@ -78,15 +78,8 @@ public:
     //для подствольника
     //-	CWeaponAmmo*			m_pAmmo2;
     xr_vector<shared_str> m_ammoTypes2;
-    u8 m_ammoType2;
-
-    int iMagazineSize2;
     xr_vector<CCartridge> m_magazine2;
-
-    bool m_bGrenadeMode;
-
     CCartridge m_DefaultCartridge2;
-    u8 iAmmoElapsed2;
 
     virtual void UpdateGrenadeVisibility(bool visibility);
 };

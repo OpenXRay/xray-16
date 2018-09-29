@@ -51,7 +51,7 @@ bool CWeapon::install_upgrade_ammo_class(LPCSTR section, bool test)
             _GetItem(str, i, ammoItem);
             m_ammoTypes.push_back(ammoItem);
         }
-        m_ammoType = 0;
+        m_ammoType.data = 0;
     }
     result |= result2;
 
@@ -282,12 +282,9 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
             }
         }
     }
-    result |=
-        process_if_exists_set(section, "scope_dynamic_zoom", &CInifile::r_bool, m_zoom_params.m_bUseDynamicZoom, test);
-    result |= process_if_exists_set(
-        section, "scope_nightvision", &CInifile::r_string_wb, m_zoom_params.m_sUseZoomPostprocess, test);
-    result |= process_if_exists_set(
-        section, "scope_alive_detector", &CInifile::r_string_wb, m_zoom_params.m_sUseBinocularVision, test);
+    result |= process_if_exists_set(section, "scope_dynamic_zoom", &CInifile::r_bool, m_zoom_params.m_bUseDynamicZoom, test);
+    result |= process_if_exists_set(section, "scope_nightvision", &CInifile::r_string_wb, m_zoom_params.m_sUseZoomPostprocess, test);
+    result |= process_if_exists_set(section, "scope_alive_detector", &CInifile::r_string_wb, m_zoom_params.m_sUseBinocularVision, test);
 
     result |= result2;
 
@@ -298,11 +295,29 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
         m_eSilencerStatus = (ALife::EWeaponAddonStatus)temp_int;
         if (m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent)
         {
-            m_sSilencerName = pSettings->r_string(section, "silencer_name");
-            m_iSilencerX = pSettings->r_s32(section, "silencer_x");
-            m_iSilencerY = pSettings->r_s32(section, "silencer_y");
-            if (m_eSilencerStatus == ALife::eAddonPermanent)
-                InitAddons();
+            if (m_eSilencerStatus == ALife::eAddonAttachable)
+            {
+                if (pSettings->line_exist(section, "silencer_sect"))
+                {
+                    LPCSTR str = pSettings->r_string(section, "silencer_sect");
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 scope_section;
+                        _GetItem(str, i, scope_section);
+                        m_silencers.push_back(scope_section);
+                    }
+                }
+                else
+                {
+                    m_silencers.push_back(section);
+                }
+            }
+            else
+            {
+                m_silencers.push_back(section);
+                if (m_eSilencerStatus == ALife::eAddonPermanent)
+                    InitAddons();
+            }
         }
     }
     result |= result2;
@@ -314,11 +329,29 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
         m_eGrenadeLauncherStatus = (ALife::EWeaponAddonStatus)temp_int;
         if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable || m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
         {
-            m_sGrenadeLauncherName = pSettings->r_string(section, "grenade_launcher_name");
-            m_iGrenadeLauncherX = pSettings->r_s32(section, "grenade_launcher_x");
-            m_iGrenadeLauncherY = pSettings->r_s32(section, "grenade_launcher_y");
-            if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
-                InitAddons();
+            if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable)
+            {
+                if (pSettings->line_exist(section, "grenade_launcher_sect"))
+                {
+                    LPCSTR str = pSettings->r_string(section, "grenade_launcher_sect");
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 scope_section;
+                        _GetItem(str, i, scope_section);
+                        m_launchers.push_back(scope_section);
+                    }
+                }
+                else
+                {
+                    m_launchers.push_back(section);
+                }
+            }
+            else
+            {
+                m_launchers.push_back(section);
+                if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
+                    InitAddons();
+            }
         }
     }
     result |= result2;

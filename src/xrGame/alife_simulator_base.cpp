@@ -124,7 +124,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
     //оружие спавним с полным магазинои
     CSE_ALifeItemWeapon* weapon = smart_cast<CSE_ALifeItemWeapon*>(dynamic_object);
     if (weapon)
-        weapon->a_elapsed = weapon->get_ammo_magsize();
+        weapon->a_elapsed.type1 = weapon->get_ammo_magsize();
 
     dynamic_object->m_tNodeID = level_vertex_id;
     dynamic_object->m_tGraphID = game_vertex_id;

@@ -269,6 +269,22 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     case GE_ADDON_DETACH: { SendBroadcast(BroadcastCID, P, net_flags(TRUE, TRUE));
     }
     break;
+    case GE_WEAPON_SYNCRONIZE:
+    {
+        CSE_ALifeItemWeapon* pW = smart_cast<CSE_ALifeItemWeapon*>(receiver);
+        if (pW)
+        {
+            pW->a_current_addon.data = P.r_u16();
+            pW->ammo_type.data = P.r_u8();
+            pW->a_elapsed.data = P.r_u16();
+            CSE_ALifeItemWeaponMagazinedWGL* pWGL = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(pW);
+            if (pWGL)
+                pWGL->m_bGrenadeMode = !!P.r_u8();
+            else
+                P.r_u8();
+        }
+    }
+    break;
     case GE_CHANGE_POS: { SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
     }
     break;
@@ -362,6 +378,13 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         CSE_Abstract* e_dest = receiver;
         CSE_ALifeTraderAbstract* pTa = smart_cast<CSE_ALifeTraderAbstract*>(e_dest);
         pTa->m_dwMoney = P.r_u32();
+    }
+    break;
+    case GE_SYNC_ALIFEITEM:
+    {
+        CSE_ALifeItem* item = smart_cast<CSE_ALifeItem*>(receiver);
+        if (item)
+            item->m_fCondition = P.r_float();
     }
     break;
     case GE_TRADER_FLAGS:

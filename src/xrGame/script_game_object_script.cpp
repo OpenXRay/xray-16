@@ -106,6 +106,7 @@ SCRIPT_EXPORT(CScriptGameObject, (), {
                 value("on_use_vehicle", int(GameObject::eUseVehicle)),
 
                 // weapon 
+                value("weapon_fired", int(GameObject::eOnWeaponFired)),
                 value("weapon_jammed", int(GameObject::eOnWeaponJammed)),
                 value("weapon_zoom_in", int(GameObject::eOnWeaponZoomIn)),
                 value("weapon_zoom_out", int(GameObject::eOnWeaponZoomOut)),

@@ -154,8 +154,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
         Msg("[%d] net_Spawn successful", E->ID);
 }
 
-CSE_Abstract* CLevel::spawn_item(
-    LPCSTR section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item)
+CSE_Abstract* CLevel::spawn_item(LPCSTR section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item)
 {
     CSE_Abstract* abstract = F_entity_Create(section);
     R_ASSERT3(abstract, "Cannot find item with section", section);
@@ -170,7 +169,7 @@ CSE_Abstract* CLevel::spawn_item(
     //оружие спавним с полным магазинои
     CSE_ALifeItemWeapon* weapon = smart_cast<CSE_ALifeItemWeapon*>(abstract);
     if (weapon)
-        weapon->a_elapsed = weapon->get_ammo_magsize();
+        weapon->a_elapsed.type1 = weapon->get_ammo_magsize();
 
     // Fill
     abstract->s_name = section;

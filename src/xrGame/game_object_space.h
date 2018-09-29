@@ -80,6 +80,7 @@ enum ECallbackType
     eOnWeaponZoomIn,
     eOnWeaponZoomOut,
     eOnWeaponJammed,
+    eOnWeaponFired,
     eOnWeaponMagazineEmpty,
 
     eDummy = u32(-1),

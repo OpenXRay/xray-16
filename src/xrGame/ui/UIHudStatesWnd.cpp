@@ -333,20 +333,15 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
         m_ui_weapon_third_ammo->SetTextColor(m_ui_weapon_ammo_color_inactive);
 
         CWeaponMagazinedWGrenade* wpn = smart_cast<CWeaponMagazinedWGrenade*>(item);
-        if (wpn && wpn->m_bGrenadeMode)
-            m_ui_grenade->SetTextColor(m_ui_weapon_ammo_color_active);
-        else
-            m_ui_grenade->SetTextColor(m_ui_weapon_ammo_color_inactive);
+        if (wpn && wpn->m_bGrenadeMode) m_ui_grenade->SetTextColor(m_ui_weapon_ammo_color_active);
+        else m_ui_grenade->SetTextColor(m_ui_weapon_ammo_color_inactive);
 
         CWeaponMagazined* wpnm = smart_cast<CWeaponMagazined*>(item);
         if (wpnm)
         {
-            if (wpnm->m_ammoType == 0)
-                m_ui_weapon_fmj_ammo->SetTextColor(m_ui_weapon_ammo_color_active);
-            else if (wpnm->m_ammoType == 1)
-                m_ui_weapon_ap_ammo->SetTextColor(m_ui_weapon_ammo_color_active);
-            else if (wpnm->m_ammoType == 2)
-                m_ui_weapon_third_ammo->SetTextColor(m_ui_weapon_ammo_color_active);
+            if (wpnm->m_ammoType.type1 == 0) m_ui_weapon_fmj_ammo->SetTextColor(m_ui_weapon_ammo_color_active);
+            else if (wpnm->m_ammoType.type1 == 1) m_ui_weapon_ap_ammo->SetTextColor(m_ui_weapon_ammo_color_active);
+            else if (wpnm->m_ammoType.type1 == 2) m_ui_weapon_third_ammo->SetTextColor(m_ui_weapon_ammo_color_active);
         }
         //-Alundaio
     }
