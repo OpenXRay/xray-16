@@ -10,8 +10,8 @@
 #include "UIFactionWarWnd.h"
 
 #include "UIXmlInit.h"
-#include "UIProgressBar.h"
-#include "UIFrameLineWnd.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "UIHelper.h"
 
 #include "FactionState.h"

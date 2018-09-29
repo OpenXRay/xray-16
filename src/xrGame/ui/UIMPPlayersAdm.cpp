@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "UIMPPlayersAdm.h"
 #include "UIXmlInit.h"
-#include "UIListBox.h"
-#include "UIListBoxItem.h"
-#include "UIStatic.h"
-#include "UI3tButton.h"
-#include "UITrackBar.h"
-#include "UIComboBox.h"
+#include "xrUICore/ListBox/UIListBox.h"
+#include "xrUICore/ListBox/UIListBoxItem.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Buttons/UI3tButton.h"
+#include "xrUICore/TrackBar/UITrackBar.h"
+#include "xrUICore/ComboBox/UIComboBox.h"
 #include "Level.h"
 #include "xrServer.h"
 #include "game_cl_base.h"
@@ -177,7 +177,7 @@ void CUIMpPlayersAdm::SetMaxPingLimitText()
 {
     int ping_limit = m_pPingLimitTrack->GetIValue();
     string512 tmp_string;
-    xr_sprintf(tmp_string, "%s %d", CStringTable().translate("ui_mp_am_ping_limit").c_str(), ping_limit * 10);
+    xr_sprintf(tmp_string, "%s %d", StringTable().translate("ui_mp_am_ping_limit").c_str(), ping_limit * 10);
     m_pPingLimitText->SetText(tmp_string);
 }
 void CUIMpPlayersAdm::GetSelPlayerScreenshot()

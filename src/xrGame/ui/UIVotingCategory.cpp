@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIVotingCategory.h"
 #include "UIXmlInit.h"
-#include "UI3tButton.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UIKickPlayer.h"
 #include "UIChangeMap.h"
 #include "ChangeWeatherDialog.hpp"

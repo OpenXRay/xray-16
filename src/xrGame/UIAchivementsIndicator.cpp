@@ -2,7 +2,7 @@
 #include "UIAchivementsIndicator.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIGameLog.h"
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "ui/UIPdaMsgListItem.h"
 #include "profile_data_types.h"
 

@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "UIHint.h"
+#include "xrUICore/Hint/UIHint.h"
 
 class CUIXml;
 class CUIStatic;

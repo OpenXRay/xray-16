@@ -12,7 +12,7 @@
 #include "inventoryowner.h"
 #include "inventory.h"
 #include "xrEngine/xr_input.h"
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 #include "xrEngine/GameFont.h"
 
 #ifdef DEBUG

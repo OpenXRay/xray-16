@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "UIGameTutorial.h"
-#include "UIWindow.h"
-#include "UIStatic.h"
+#include "xrUICore/Windows/UIWindow.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UIXmlInit.h"
 #include "Common/object_broker.h"
 #include "xrEngine/xr_input.h"
@@ -10,7 +10,7 @@
 #include "Include/xrRender/UISequenceVideoItem.h"
 #include "Include/xrRender/UIShader.h"
 #include "Include/xrRender/UIRender.h"
-#include "uicursor.h"
+#include "xrUICore/Cursor/UICursor.h"
 
 extern ENGINE_API BOOL bShowPauseString;
 

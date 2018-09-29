@@ -15,7 +15,7 @@
 #include "Level.h"
 #include "infoportion.h"
 #include "alife_registry_wrappers.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 
 void CInventoryOwner::OnEvent(NET_Packet& P, u16 type)

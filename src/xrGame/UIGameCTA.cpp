@@ -31,7 +31,7 @@
 #include "ui/UIBuyWndShared.h"
 #include "ui/UIMoneyIndicator.h"
 #include "ui/UIRankIndicator.h"
-#include "ui/UIProgressShape.h"
+#include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIVoteStatusWnd.h"
 #include "ui/UIActorMenu.h"
@@ -732,8 +732,7 @@ void CUIGameCTA::ShowBuySpawn(s32 spawn_cost)
     if (m_pBuySpawnMsgBox->IsShown())
         return;
 
-    CStringTable st;
-    LPCSTR format_str = st.translate("mp_press_yes2pay").c_str();
+    LPCSTR format_str = StringTable().translate("mp_press_yes2pay").c_str();
     VERIFY(format_str);
     size_t pay_frm_size = xr_strlen(format_str) * sizeof(char) + 64;
     PSTR pay_frm_str = static_cast<char*>(_alloca(pay_frm_size));

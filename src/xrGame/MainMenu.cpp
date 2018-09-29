@@ -6,10 +6,10 @@
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/CameraManager.h"
 #include "xr_Level_controller.h"
-#include "ui\UITextureMaster.h"
+#include "xrUICore/XML/UItextureMaster.h"
 #include "ui\UIXmlInit.h"
-#include "ui\UIBtnHint.h"
-#include "UICursor.h"
+#include "xrUICore/Buttons/UIBtnHint.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
 #include "xrGameSpy/GameSpy_HTTP.h"
 #include "xrGameSpy/GameSpy_Available.h"
@@ -672,8 +672,7 @@ void CMainMenu::OnSessionTerminate(LPCSTR reason)
         return;
 
     m_start_time = Device.dwTimeGlobal;
-    CStringTable st;
-    LPCSTR str = st.translate("ui_st_kicked_by_server").c_str();
+    LPCSTR str = StringTable().translate("ui_st_kicked_by_server").c_str();
     LPSTR text;
 
     if (reason && xr_strlen(reason) && reason[0] == '@')
@@ -685,13 +684,13 @@ void CMainMenu::OnSessionTerminate(LPCSTR reason)
         STRCONCAT(text, str, " ", reason);
     }
 
-    m_pMB_ErrDlgs[SessionTerminate]->SetText(st.translate(text).c_str());
+    m_pMB_ErrDlgs[SessionTerminate]->SetText(StringTable().translate(text).c_str());
     SetErrorDialog(CMainMenu::SessionTerminate);
 }
 
 void CMainMenu::OnLoadError(LPCSTR module)
 {
-    LPCSTR str = CStringTable().translate("ui_st_error_loading").c_str();
+    LPCSTR str = StringTable().translate("ui_st_error_loading").c_str();
     string1024 Text;
     strconcat(sizeof(Text), Text, str, " ");
     xr_strcat(Text, sizeof(Text), module);

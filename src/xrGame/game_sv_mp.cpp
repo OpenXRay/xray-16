@@ -1928,10 +1928,10 @@ void game_sv_mp::DumpOnlineStatistic()
 
     ini.w_u32(current_section.c_str(), "players_total_cnt", m_server->GetClientsCount());
 
-    xr_sprintf(str_buff, "\"%s\"", CStringTable().translate(Level().name().c_str()).c_str());
+    xr_sprintf(str_buff, "\"%s\"", StringTable().translate(Level().name().c_str()).c_str());
     ini.w_string(current_section.c_str(), "current_map_name", str_buff);
 
-    xr_sprintf(str_buff, "%s", CStringTable().translate(type_name()).c_str());
+    xr_sprintf(str_buff, "%s", StringTable().translate(type_name()).c_str());
     ini.w_string(current_section.c_str(), "game_mode", str_buff);
 
     auto it = m_pMapRotation_List.begin();
@@ -1940,7 +1940,7 @@ void game_sv_mp::DumpOnlineStatistic()
     {
         string16 num_buf;
         xr_sprintf(num_buf, "%d", idx);
-        xr_sprintf(str_buff, "\"%s\"", CStringTable().translate((*it).map_name.c_str()).c_str());
+        xr_sprintf(str_buff, "\"%s\"", StringTable().translate((*it).map_name.c_str()).c_str());
         ini.w_string("map_rotation", num_buf, str_buff);
     }
 
@@ -2130,10 +2130,10 @@ void game_sv_mp::DumpRoundStatistics()
     timestamp(str_current_time);
     ini.w_string(current_section.c_str(), "end_time", str_current_time);
 
-    xr_sprintf(str_buff, "%s", CStringTable().translate(type_name()).c_str());
+    xr_sprintf(str_buff, "%s", StringTable().translate(type_name()).c_str());
     ini.w_string(current_section.c_str(), "game_mode", str_buff);
 
-    xr_sprintf(str_buff, "\"%s\"", CStringTable().translate(Level().name().c_str()).c_str());
+    xr_sprintf(str_buff, "\"%s\"", StringTable().translate(Level().name().c_str()).c_str());
     ini.w_string(current_section.c_str(), "current_map_name", str_buff);
 
     xr_sprintf(str_buff, "\"%s\"", Level().name().c_str());

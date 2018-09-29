@@ -21,7 +21,7 @@
 #include "static_cast_checked.hpp"
 #include "clsid_game.h"
 #include "weaponBinocularsVision.h"
-#include "ui/UIWindow.h"
+#include "xrUICore/Windows/UIWindow.h"
 #include "ui/UIXmlInit.h"
 #include "Torch.h"
 #include "xrNetServer/NET_Messages.h"

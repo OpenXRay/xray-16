@@ -11,7 +11,7 @@
 #include "script_game_object_impl.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "smart_cover.h"
 
 bool CScriptGameObject::use_smart_covers_only() const

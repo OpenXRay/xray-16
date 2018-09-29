@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "GameTaskManager.h"
 #include "alife_registry_wrappers.h"
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "GameTask.h"
 #include "Level.h"
 #include "map_manager.h"

@@ -11,7 +11,7 @@
 #include "object_manager.h"
 #include "entity_alive.h"
 #include "custommonster.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 
 class CAI_Stalker;
 

@@ -15,7 +15,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "script_entity_space.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 #include "xrAICore/Navigation/level_graph.h"
 

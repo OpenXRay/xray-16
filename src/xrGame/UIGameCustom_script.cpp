@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "UIGameCustom.h"
 #include "Level.h"
-#include "ui/uistatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

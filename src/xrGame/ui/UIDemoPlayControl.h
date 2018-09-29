@@ -3,7 +3,7 @@
 #define UIDEMOPLAY_CONTROL
 
 #include "UIDialogWnd.h"
-#include "UIWndCallback.h"
+#include "xrUICore/Callbacks/UIWndCallback.h"
 #include "xrCore/buffer_vector.h"
 
 class CUI3tButton;

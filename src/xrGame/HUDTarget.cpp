@@ -10,7 +10,7 @@
 #include "game_cl_base.h"
 #include "xrEngine/IGame_Persistent.h"
 
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 #include "InventoryOwner.h"
 #include "relation_registry.h"
 #include "character_info.h"
@@ -180,10 +180,9 @@ void CHUDTarget::Render()
 
                         if (fuzzyShowInfo > 0.5f)
                         {
-                            CStringTable strtbl;
                             F->SetColor(subst_alpha(C, u8(iFloor(255.f * (fuzzyShowInfo - 0.5f) * 2.f))));
-                            F->OutNext("%s", *strtbl.translate(others_inv_owner->Name()));
-                            F->OutNext("%s", *strtbl.translate(others_inv_owner->CharacterInfo().Community().id()));
+                            F->OutNext("%s", *StringTable().translate(others_inv_owner->Name()));
+                            F->OutNext("%s", *StringTable().translate(others_inv_owner->CharacterInfo().Community().id()));
                         }
                     }
 
