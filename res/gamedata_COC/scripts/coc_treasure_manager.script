@@ -602,7 +602,7 @@ function try_spawn_treasure(box)
 						ct = ammos and #ammos
 						ammo_type = ammos and ct and math.random(0,ct-1) or 0
 							
-						se_obj.ammo_type = ammo_type
+						se_obj:set_ammo_type(ammo_type)
 					end
 				end
 			end

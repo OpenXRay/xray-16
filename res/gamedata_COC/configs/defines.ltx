@@ -124,10 +124,9 @@ empty_weight                             = 0.1
 allow_repair                             = false
 dont_stack								 = false
 
-;USE THIS IF YOU WANT ITEM TO HAVE STORY ID and save condition
+;USE THIS IF YOU WANT ITEM TO HAVE STORY ID
 [booster_script]:booster
 class									 = S_FOOD
-script_binding 							 = bind_item.bind
 
 [zero_immunities]:identity_immunities
 immunities_sect				= sect_zero_immunities
@@ -155,7 +154,6 @@ default_to_ruck             = false
 sprint_allowed              = true
 control_inertion_factor     = 1.0
 zoom_rotate_time            = 0.25
-script_binding				= bind_item.bind_weapon ;To keep track of special scope
 ironsight_zoom_factor		= 1.25		;Really only used for Grenade Launcher Attachments
 
 [common_ph_friction_params_on_npc_death] ; Parameters for setting change of friction at the time of the death of a character

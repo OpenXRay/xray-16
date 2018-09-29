@@ -211,7 +211,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 							local cls = se_item:clsid()
 							if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
 								se_item.condition = cond
-								se_item.ammo_type = ammo_type
+								se_item:set_ammo_type(ammo_type)
 								--printf("spawn wpn=%s ammo_type=%s",spawn_sec,ammo_type)
 								
 								local flags = se_item:get_addon_flags()
@@ -386,7 +386,7 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 						end
 						
 						-- Create the ammo 
-						se_item.ammo_type = ammo_type
+						se_item:set_ammo_type(ammo_type)
 						--printf("spawn_loadout%s wpn=%s ammo_type=%s scope=%s launcher=%s silencer=%s",itr_count,create_section,ammo_type,bScope,bLauncher,bSilencer)
 
 						local ammos = alun_utils.parse_list(sys_ini,create_section,"ammo_class")

@@ -44,14 +44,17 @@ local function npc_on_item_take(npc,item)
 	end
 	
 	-- CHANGE VISUAL FOR OUTFIT
-	-- TODO: FIX IN ENGINE
-	--[[
 	if not (IsOutfit(item)) then 
 		return
-	end 
+	end
 	
 	local story_name = get_object_story_id(npc:id())
 	if (story_name ~= nil) then
+		return
+	end
+	
+	-- currently only allowed for companions
+	if not (npc:has_info("npcx_is_companion")) then
 		return
 	end
 	
@@ -60,8 +63,7 @@ local function npc_on_item_take(npc,item)
 		return
 	end
 	
-	npc:set_visual_name(npc_visual)
-	--]]
+	npc:set_visual_name(npc_visual,true)
 end
 
 local function actor_on_item_take(item)

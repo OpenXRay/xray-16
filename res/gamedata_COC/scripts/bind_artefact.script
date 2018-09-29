@@ -35,15 +35,6 @@ function artefact_binder:update(delta)
     if self.first_call == true then
 		self.first_call = false
 		
-		local se_obj = alife_object(self.object:id())
-		if (se_obj) then
-			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
-			if (m_data and m_data.offline_condition) then
-				self.object:set_condition(tonumber(m_data.offline_condition) or 0.9999999)
-				m_data.offline_condition = nil
-			end
-		end
-		
 		local ini = self.object:spawn_ini()
 		if (ini and ini:section_exist("fixed_bone")) then
 			local bone_name = ini:r_string_ex("fixed_bone", "name")
@@ -68,11 +59,4 @@ end
 
 function artefact_binder:save(stpk)
 	object_binder.save(self,stpk)
-	local se_obj = alife_object(self.object:id())
-	if (se_obj) then
-		local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
-		if (m_data) then 
-			m_data.offline_condition = self.object:condition()
-		end
-	end
 end
