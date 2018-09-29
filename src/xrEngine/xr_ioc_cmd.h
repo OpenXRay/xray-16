@@ -127,7 +127,7 @@ protected:
     u32 mask;
 
 public:
-    CCC_ToggleMask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = TRUE; };
+    CCC_ToggleMask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = TRUE; }
     const BOOL GetValue() const { return value->test(mask); }
     virtual void Execute(LPCSTR /*args*/)
     {
@@ -153,7 +153,7 @@ protected:
     const xr_token* tokens;
 
 public:
-    CCC_Token(LPCSTR N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){};
+    CCC_Token(LPCSTR N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){}
 
     virtual void Execute(LPCSTR args)
     {
@@ -239,8 +239,8 @@ protected:
 
 public:
     CCC_Float(LPCSTR N, float* V, float _min = 0, float _max = 1)
-        : IConsole_Command(N), value(V), min(_min), max(_max){};
-    const float GetValue() const { return *value; };
+        : IConsole_Command(N), value(V), min(_min), max(_max){}
+    const float GetValue() const { return *value; }
     void GetBounds(float& fmin, float& fmax) const
     {
         fmin = min;
@@ -283,8 +283,8 @@ public:
         min.set(_min);
         max.set(_max);
     };
-    const Fvector GetValue() const { return *value; };
-    Fvector* GetValuePtr() const { return value; };
+    const Fvector GetValue() const { return *value; }
+    Fvector* GetValuePtr() const { return value; }
     virtual void Execute(LPCSTR args)
     {
         Fvector v;
@@ -327,14 +327,14 @@ protected:
     int min, max;
 
 public:
-    const int GetValue() const { return *value; };
+    const int GetValue() const { return *value; }
     void GetBounds(int& imin, int& imax) const
     {
         imin = min;
         imax = max;
     }
 
-    CCC_Integer(LPCSTR N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max){};
+    CCC_Integer(LPCSTR N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max){}
 
     virtual void Execute(LPCSTR args)
     {
@@ -382,7 +382,7 @@ public:
 class ENGINE_API CCC_LoadCFG : public IConsole_Command
 {
 public:
-    virtual bool allow(LPCSTR /*cmd*/) { return true; };
+    virtual bool allow(LPCSTR /*cmd*/) { return true; }
     CCC_LoadCFG(LPCSTR N);
     virtual void Execute(LPCSTR args);
 };

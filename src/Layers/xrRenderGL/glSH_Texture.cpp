@@ -4,7 +4,7 @@
 #include "../xrRender/ResourceManager.h"
 
 #ifndef _EDITOR
-#include "../../xrEngine/render.h"
+#include "../../xrEngine/Render.h"
 #endif
 
 #include "../../xrEngine/tntQAVI.h"
@@ -301,8 +301,8 @@ void CTexture::Load()
 void CTexture::Unload()
 {
 #ifdef DEBUG
-	string_path				msg_buff;
-	sprintf_s(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface ID=%d", cName.c_str(), pSurface);
+    string_path				msg_buff;
+    sprintf_s(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface ID=%d", cName.c_str(), pSurface);
 #endif // DEBUG
 
     //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
