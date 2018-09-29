@@ -5,6 +5,10 @@
 // CONFIG_SCRIPT_ENGINE_LOG_EXPORTS
 // CONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
 
+#ifdef DEBUG
+#define XRAY_SCRIPTS_NO_BACKWARDS_COMPATIBILITY
+#endif
+
 /* Callbacks */
 #define EXTENDED_ITEM_CALLBACKS // (eItemToBelt, eItemToSlot, eItemToRuck)
 #define EXTENDED_WEAPON_CALLBACKS // (eOnWeaponZoomIn, eOnWeaponZoomOut, eOnWeaponJammed)
