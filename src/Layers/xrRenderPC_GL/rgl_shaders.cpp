@@ -59,7 +59,7 @@ struct SHADER_MACRO
     char *Define = "#define ", *Name = "\n", *Sep = "\t", *Definition = "\n", *EOL = "\n";
 };
 
-HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
+HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
 {
     xr_vector<char*> source, includes;
@@ -77,7 +77,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     VERIFY(!Flags);
 
     // open included files
-    load_includes((LPCSTR)pSrcData, SrcDataLen, source, includes);
+    load_includes((LPCSTR)fs->pointer(), fs->length(), source, includes);
 
     char sh_name[MAX_PATH] = "";
     u32 len = 0;

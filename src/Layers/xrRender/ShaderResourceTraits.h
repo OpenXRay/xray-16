@@ -392,14 +392,13 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
-        R_ASSERT2(file, cname);
+        R_ASSERT3(file, "Shader file doesnt exist:", cname);
 
         // Duplicate and zero-terminate
         const auto size = file->length();
         char* const data = (LPSTR)_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
-        FS.r_close(file);
 
         // Select target
         LPCSTR c_target = ShaderTypeTraits<T>::GetCompilationTarget();
@@ -417,8 +416,9 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
 #endif
 
         // Compile
-        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size,
-            c_entry, c_target, flags, (void*&)sh);
+        HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry, c_target, flags, (void*&)sh);
+
+        FS.r_close(file);
 
         VERIFY(SUCCEEDED(_hr));
 
