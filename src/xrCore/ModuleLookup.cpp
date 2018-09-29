@@ -23,7 +23,7 @@ void* ModuleHandle::Open(pcstr moduleName)
 {
     if (IsLoaded())
         Close();
-    
+
     Log("Loading DLL:", moduleName);
 
 #ifdef WINDOWS
@@ -36,7 +36,7 @@ void* ModuleHandle::Open(pcstr moduleName)
 #ifdef WINDOWS
         Msg("! Failed to load DLL: 0x%d", GetLastError());
 #elif defined(LINUX)
-        Msg("! Failed to load DLL: 0x%d", dlerror());
+        Msg("! Failed to load DLL: %s", dlerror());
 #endif
     }
 

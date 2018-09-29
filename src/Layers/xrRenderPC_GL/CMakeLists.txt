@@ -1,4 +1,4 @@
-project(xrRenderPC_GL)
+project(xrRender_GL)
 
 list(APPEND DIRS
     "."
