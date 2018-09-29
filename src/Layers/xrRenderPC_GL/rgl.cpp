@@ -761,7 +761,7 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
 
 struct SHADER_MACRO
 {
-    char *Define = "#define ", *Name = "\n", *Sep = "\t", *Definition = "\n", *EOL = "\n";
+    char const *Define = "#define ", *Name = "\n", *Sep = "\t", *Definition = "\n", *EOL = "\n";
 };
 
 HRESULT CRender::shader_compile(
