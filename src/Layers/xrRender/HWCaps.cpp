@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "hwcaps.h"
-#include "hw.h"
+#include "HWCaps.h"
+#include "HW.h"
 
 #if !defined(_EDITOR) && !defined(USE_OGL)
 #include <nvapi.h>

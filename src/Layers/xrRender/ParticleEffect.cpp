@@ -464,8 +464,8 @@ void ParticleRenderStream(PRS_PARAMS* pParams)
         if (angle != m.rot.x)
         {
             angle = m.rot.x;
-            sina = std::sinf(angle);
-            cosa = std::cosf(angle);
+            sina = sinf(angle);
+            cosa = cosf(angle);
         }
 
         _mm_prefetch(64 + (char*)&particles[i + 1], _MM_HINT_NTA);

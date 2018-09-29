@@ -5,17 +5,19 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
 #pragma warning(pop)
+#endif
 
 #include <tbb/parallel_for_each.h>
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/blender.h"
-#include "blenders/blender_recorder.h"
+#include "blenders/Blender.h"
+#include "blenders/Blender_Recorder.h"
 #include "xrCore/Threading/ThreadPool.hpp"
 
 //	Already defined in Texture.cpp

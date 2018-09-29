@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
 #pragma warning(pop)
+#endif
 
-#include "xrCDB/frustum.h"
+#include "xrCDB/Frustum.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "Layers/xrRenderDX10/StateManager/dx10StateManager.h"
