@@ -940,5 +940,22 @@ typedef struct _AVIINDEXENTRY {
 
 typedef void *HIC;
 
+#define D3DTA_SELECTMASK        0x0000000f
+#define D3DTA_DIFFUSE           0x00000000
+#define D3DTA_CURRENT           0x00000001
+#define D3DTA_TEXTURE           0x00000002
+#define D3DTA_TFACTOR           0x00000003
+#define D3DTA_SPECULAR          0x00000004
+#define D3DTA_TEMP              0x00000005
+#define D3DTA_CONSTANT          0x00000006
+#define D3DTA_COMPLEMENT        0x00000010
+#define D3DTA_ALPHAREPLICATE    0x00000020
+
+#define D3DTSS_TCI_PASSTHRU                       0x00000
+#define D3DTSS_TCI_CAMERASPACENORMAL              0x10000
+#define D3DTSS_TCI_CAMERASPACEPOSITION            0x20000
+#define D3DTSS_TCI_CAMERASPACEREFLECTIONVECTOR    0x30000
+#define D3DTSS_TCI_SPHEREMAP                      0x40000
+
 inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
 
