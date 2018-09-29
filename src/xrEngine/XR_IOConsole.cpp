@@ -564,7 +564,7 @@ void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
                 else
                 {
                     IConsole_Command::TStatus stat;
-                    cc->getStatus(stat);
+                    cc->GetStatus(stat);
                     Msg("- %s %s", cc->Name(), stat);
                 }
             }

@@ -252,9 +252,9 @@ public:
         apply();
     }
 
-    void getStatus(TStatus& S) override
+    void GetStatus(TStatus& S) override
     {
-        CCC_Integer::getStatus(S);
+        CCC_Integer::GetStatus(S);
     }
 };
 
@@ -285,9 +285,9 @@ public:
         CCC_Integer::Execute(args);
         apply();
     }
-    virtual void getStatus(TStatus& S)
+    virtual void GetStatus(TStatus& S)
     {
-        CCC_Integer::getStatus(S);
+        CCC_Integer::GetStatus(S);
         apply();
     }
 };
@@ -315,9 +315,9 @@ public:
         CCC_Float::Execute(args);
         apply();
     }
-    virtual void getStatus(TStatus& S)
+    virtual void GetStatus(TStatus& S)
     {
-        CCC_Float::getStatus(S);
+        CCC_Float::GetStatus(S);
         apply();
     }
 };
@@ -639,7 +639,7 @@ public:
                 g_pGamePersistent->SetBaseDof(ps_r2_dof);
         }
     }
-    virtual void getStatus(TStatus& S) { xr_sprintf(S, "%f,%f,%f", value->x, value->y, value->z); }
+    virtual void GetStatus(TStatus& S) { xr_sprintf(S, "%f,%f,%f", value->x, value->y, value->z); }
     virtual void Info(TInfo& I)
     {
         xr_sprintf(I, "vector3 in range [%f,%f,%f]-[%f,%f,%f]", min.x, min.y, min.z, max.x, max.y, max.z);
