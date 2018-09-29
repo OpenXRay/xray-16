@@ -13,6 +13,7 @@
 #include "Level.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location_impl.h"
 #include "xrAICore/Navigation/level_graph.h"
 
 template <typename T>

@@ -233,7 +233,7 @@
 #include "xrGame/ai/monsters/monster_corpse_manager.h" // ~130
 #include "xrGame/ai/stalker/ai_stalker.h"
 #include "Include/xrRender/WallMarkArray.h" // ~80
-#include "xrAICore/Navigation/ai_object_location.h" // ~95, very heavy to compile
+//#include "xrAICore/Navigation/ai_object_location.h" // ~95, very heavy to compile
 #include "xrAICore/Navigation/graph_engine.h" // ~80, VERY heavy to compile
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h" // ~80, VERY heavy to compile
 #ifdef DEBUG
