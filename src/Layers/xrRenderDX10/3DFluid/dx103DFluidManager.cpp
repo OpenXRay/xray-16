@@ -104,7 +104,7 @@ void dx103DFluidManager::Initialize(int width, int height, int depth)
     InitShaders();
 
     D3D_TEXTURE3D_DESC desc;
-    desc.BindFlags = D3D10_BIND_SHADER_RESOURCE | D3D10_BIND_RENDER_TARGET;
+    desc.BindFlags = D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET;
     desc.CPUAccessFlags = 0;
     desc.MipLevels = 1;
     desc.MiscFlags = 0;
