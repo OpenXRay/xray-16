@@ -6,6 +6,8 @@
 #if defined(WINDOWS)
 #include "vfw.h"
 #include "mmsystem.h"
+#elif defined(LINUX)
+#include <FreeImage.h>
 #endif
 
 // replaced with standard AVIIF_KEYFRAME

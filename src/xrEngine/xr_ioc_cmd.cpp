@@ -156,7 +156,7 @@ public:
         {
             IConsole_Command& C = *(it->second);
             TStatus _S;
-            C.Status(_S);
+            C.getStatus(_S);
             TInfo _I;
             C.Info(_I);
 
@@ -601,7 +601,7 @@ public:
         GetToken();
         if (!tokens)
             return;
-        inherited::Status(S);
+        inherited::getStatus(S);
     }
 
     const xr_token* GetToken() noexcept override

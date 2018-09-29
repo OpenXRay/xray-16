@@ -69,12 +69,12 @@ public:
     LPCSTR Name() { return cName; }
     void InvalidSyntax();
     virtual void Execute(LPCSTR args) = 0;
-    virtual void Status(TStatus& S) { S[0] = 0; }
+    virtual void getStatus(TStatus& S) { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_strcpy(I, "(no arguments)"); }
     virtual void Save(IWriter* F)
     {
         TStatus S;
-        Status(S);
+        getStatus(S);
         if (S[0])
             F->w_printf("%s %s\r\n", cName, S);
     }
@@ -110,7 +110,7 @@ public:
         else
             InvalidSyntax();
     }
-    virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
+    virtual void getStatus(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
     virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
@@ -136,7 +136,7 @@ public:
         strconcat(sizeof(S), S, cName, " is ", value->test(mask) ? "on" : "off");
         Log(S);
     }
-    virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
+    virtual void getStatus(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
     virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
@@ -175,7 +175,7 @@ public:
         if (!tok->name)
             InvalidSyntax();
     }
-    virtual void Status(TStatus& S)
+    virtual void getStatus(TStatus& S)
     {
         const xr_token* tok = GetToken();
         while (tok->name)
@@ -255,7 +255,7 @@ public:
         else
             *value = v;
     }
-    virtual void Status(TStatus& S)
+    virtual void getStatus(TStatus& S)
     {
         xr_sprintf(S, sizeof(S), "%3.5f", *value);
         while (xr_strlen(S) && ('0' == S[xr_strlen(S) - 1]))
@@ -305,7 +305,7 @@ public:
         }
         value->set(v);
     }
-    virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "(%f, %f, %f)", value->x, value->y, value->z); }
+    virtual void getStatus(TStatus& S) { xr_sprintf(S, sizeof(S), "(%f, %f, %f)", value->x, value->y, value->z); }
     virtual void Info(TInfo& I)
     {
         xr_sprintf(I, sizeof(I), "vector3 in range [%e,%e,%e]-[%e,%e,%e]", min.x, min.y, min.z, max.x, max.y, max.z);
@@ -344,7 +344,7 @@ public:
         else
             *value = v;
     }
-    virtual void Status(TStatus& S) { xr_itoa(*value, S, 10); }
+    virtual void getStatus(TStatus& S) { xr_itoa(*value, S, 10); }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "integer value in range [%d,%d]", min, max); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -370,7 +370,7 @@ public:
     };
 
     virtual void Execute(LPCSTR args) { strncpy_s(value, size, args, size - 1); }
-    virtual void Status(TStatus& S) { xr_strcpy(S, value); }
+    virtual void getStatus(TStatus& S) { xr_strcpy(S, value); }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "string with up to %d characters", size); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {

@@ -931,5 +931,14 @@ typedef struct _D3DRECT {
 
 typedef DWORD           FOURCC;
 
+typedef struct _AVIINDEXENTRY {
+    DWORD	ckid;
+    DWORD	dwFlags;
+    DWORD	dwChunkOffset;
+    DWORD	dwChunkLength;
+} AVIINDEXENTRY;
+
+typedef void *HIC;
+
 inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
 

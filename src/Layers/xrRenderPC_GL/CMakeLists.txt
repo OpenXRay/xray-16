@@ -39,4 +39,4 @@ add_definitions(-DXRLCUTIL_EXPORTS -D_USRDLL -DXRRENDER_GL_EXPORTS -DUSE_OGL -DN
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore luabind LuaJIT xrCDB xrEngine xrParticles xrScriptEngine xrAPI)
+target_link_libraries(${PROJECT_NAME} xrCore luabind luajit xrCDB xrEngine xrParticles xrScriptEngine xrAPI)
