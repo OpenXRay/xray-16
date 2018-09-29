@@ -147,7 +147,7 @@ void CRender::create()
 
         //.	    _tzset			();
         //.		??? _strdate	( date, 128 );	???
-        //.		??? if (date < 22-march-07)		
+        //.		??? if (date < 22-march-07)
         if (false)
         {
             u32 device_id = HW.Caps.id_device;
@@ -441,11 +441,11 @@ void CRender::reset_end()
 /*
 void CRender::OnFrame()
 {
-	Models->DeleteQueue			();
-	if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))	{
-		Device.seqParallel.insert	(Device.seqParallel.begin(),
-			fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
-	}
+    Models->DeleteQueue			();
+    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))	{
+        Device.seqParallel.insert	(Device.seqParallel.begin(),
+            fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
+    }
 }*/
 void CRender::OnFrame()
 {
@@ -679,7 +679,9 @@ void CRender::rmNormal()
 CRender::CRender()
     : m_bFirstFrameAfterReset(false)
 {
+#if defined(WINDOWS) // remove this after port r2_R_sun.cpp
     init_cacades();
+#endif
 }
 
 CRender::~CRender() {}
@@ -1276,7 +1278,7 @@ HRESULT CRender::shader_compile(
     sprintf_s(name_comment, "// %s\n", name);
     const char** sources = xr_alloc<const char*>(sources_len);
 #ifdef DEBUG
-	sources[0] = "#version 450\n#pragma optimize (off)\n";
+    sources[0] = "#version 450\n#pragma optimize (off)\n";
 #else
     sources[0] = "#version 450\n";
 #endif

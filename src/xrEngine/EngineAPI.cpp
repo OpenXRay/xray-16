@@ -150,7 +150,7 @@ void CEngineAPI::InitializeRenderers()
     // XXX: Unloading disabled due to typeids invalidation
     /*if (GEnv.CurrentRenderer != 5)
         hRenderRGL->close();
-    
+
     if (GEnv.CurrentRenderer != 4)
         hRenderR4->close();
 
@@ -220,15 +220,25 @@ void CEngineAPI::CreateRendererList()
     if (!VidQualityToken.empty())
         return;
 
+    hRenderRGL = XRay::LoadModule("xrRender_GL");
+#if defined(WINDOWS)
     hRenderR1 = XRay::LoadModule("xrRender_R1");
+#endif
 
     if (GEnv.isDedicatedServer)
     {
+#if defined(WINDOWS)
         R_ASSERT2(hRenderR1->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
         VidQualityToken.emplace_back("renderer_r1", 0);
+#elif defined(LINUX)
+        R_ASSERT2(hRenderRGL->IsLoaded(), "Dedicated server needs xrRender_GL to work");
+        VidQualityToken.emplace_back("renderer_gl", 0);
+#endif
         VidQualityToken.emplace_back(nullptr, -1);
         return;
     }
+
+    auto& modes = VidQualityToken;
 
 #if defined(WINDOWS)
     // Hide "d3d10.dll not found" message box for XP
@@ -237,20 +247,16 @@ void CEngineAPI::CreateRendererList()
     hRenderR2 = XRay::LoadModule("xrRender_R2");
     hRenderR3 = XRay::LoadModule("xrRender_R3");
     hRenderR4 = XRay::LoadModule("xrRender_R4");
-#endif
-    hRenderRGL = XRay::LoadModule("xrRender_GL");
 
     // Restore error handling
     SetErrorMode(0);
-
-    auto& modes = VidQualityToken;
 
     if (hRenderR1->IsLoaded())
     {
         modes.emplace_back("renderer_r1", 0);
     }
 
-#if defined(WINDOWS)
+
     if (hRenderR2->IsLoaded())
     {
         modes.emplace_back("renderer_r2a", 1);

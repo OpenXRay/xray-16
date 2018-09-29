@@ -14,6 +14,10 @@
 #include "Layers/xrRenderDX10/MSAA/dx10MSAABlender.h"
 #include "Layers/xrRenderDX10/DX10 Rain/dx10RainBlender.h"
 
+#if defined(LINUX)
+float OLES_SUN_LIMIT_27_01_07 = 100.f;
+#endif
+
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb)
 {
     if (_1)
@@ -188,7 +192,7 @@ Ivector vpack(Fvector src)
     float e_best = flt_max;
     int r = bx, g = by, b = bz;
 #ifdef DEBUG
-	int		d=0;
+    int		d=0;
 #else
     int d = 3;
 #endif
@@ -248,11 +252,11 @@ CRenderTarget::CRenderTarget()
         SampleCount = RImplementation.o.dx10_msaa_samples;
 
 #ifdef DEBUG
-	Msg			("MSAA samples = %d", SampleCount );
+    Msg			("MSAA samples = %d", SampleCount );
    if( RImplementation.o.dx10_msaa_opt )
-	   Msg		("dx10_MSAA_opt = on" );
+       Msg		("dx10_MSAA_opt = on" );
    if( RImplementation.o.dx10_gbuffer_opt )
-	   Msg		("dx10_gbuffer_opt = on" );
+       Msg		("dx10_gbuffer_opt = on" );
 #endif // DEBUG
     param_blur = 0.f;
     param_gray = 0.f;
@@ -897,7 +901,7 @@ CRenderTarget::CRenderTarget()
     s_flip.create("effects\\screen_set", r2_base);
     g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 
-    // 
+    //
     dwWidth = Device.dwWidth;
     dwHeight = Device.dwHeight;
 }
@@ -914,13 +918,13 @@ CRenderTarget::~CRenderTarget()
     t_LUM_dest->surface_set(GL_TEXTURE_2D, NULL);
 
 #ifdef DEBUG
-	GLuint	pSurf = 0;
+    GLuint	pSurf = 0;
 
-	pSurf = t_envmap_0->surface_get();
-	glDeleteTextures(1, &pSurf);
+    pSurf = t_envmap_0->surface_get();
+    glDeleteTextures(1, &pSurf);
 
-	pSurf = t_envmap_1->surface_get();
-	glDeleteTextures(1, &pSurf);
+    pSurf = t_envmap_1->surface_get();
+    glDeleteTextures(1, &pSurf);
 #endif // DEBUG
     t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, NULL);
     t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, NULL);
@@ -940,7 +944,7 @@ CRenderTarget::~CRenderTarget()
     t_noise_mipped->surface_set(GL_TEXTURE_2D, NULL);
     glDeleteTextures(1, &t_noise_surf_mipped);
 
-    // 
+    //
     accum_spot_geom_destroy();
     accum_omnip_geom_destroy();
     accum_point_geom_destroy();

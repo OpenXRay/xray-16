@@ -5,6 +5,8 @@ list(APPEND DIRS
     "../xrRender"
     "../xrRender/blenders"
     "../xrRenderGL"
+    "../xrRenderGL/MSAA"
+    "../xrRenderGL/GL Rain"
     "../../Include/xrRender"
     )
 
