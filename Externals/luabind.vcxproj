@@ -172,7 +172,6 @@
     <ClInclude Include="luabind\luabind\scope.hpp" />
     <ClInclude Include="luabind\luabind\set_package_preload.hpp" />
     <ClInclude Include="luabind\luabind\shared_ptr_converter.hpp" />
-    <ClInclude Include="luabind\luabind\tag_function.hpp" />
     <ClInclude Include="luabind\luabind\typeid.hpp" />
     <ClInclude Include="luabind\luabind\types.hpp" />
     <ClInclude Include="luabind\luabind\version.hpp" />
