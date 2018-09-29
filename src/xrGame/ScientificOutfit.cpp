@@ -3,8 +3,6 @@
 // ScientificOutfit - защитный костюм ученого
 ///////////////////////////////////////////////////////////////
 
-#pragma once
-
 #include "StdAfx.h"
 #include "ScientificOutfit.h"
 

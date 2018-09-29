@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma once
 
 #ifndef _EDITOR
 #include "Render.h"
