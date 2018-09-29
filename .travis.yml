@@ -65,14 +65,14 @@ before_script:
   - mkdir bin
   - cd bin
   - if [ $TARGET_CPU == x64 ]; then
-       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev;
+       sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev;
        sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev;
        cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
     fi
 
   - if [ $TARGET_CPU == x86 ]; then
        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-7-multilib libpulse-dev:i386 libglib2.0-dev:i386;
-       sudo apt-get install -y libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386;
+       sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386;
        sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 libsdl2-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386;
        CFLAGS="-m32 -march=native" CXXFLAGS="-m32 -march=native" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_ASM_FLAGS=-m32;
     fi
