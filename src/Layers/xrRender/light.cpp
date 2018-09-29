@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "light.h"
 
 static const float SQRT2 = 1.4142135623730950488016887242097f;

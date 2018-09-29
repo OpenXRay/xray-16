@@ -919,5 +919,15 @@ typedef enum _D3DTEXTURETRANSFORMFLAGS {
     D3DTTFF_FORCE_DWORD     = 0x7fffffff
 } D3DTEXTURETRANSFORMFLAGS;
 
+#ifndef D3DRECT_DEFINED
+typedef struct _D3DRECT {
+    LONG x1;
+    LONG y1;
+    LONG x2;
+    LONG y2;
+} D3DRECT;
+#define D3DRECT_DEFINED
+#endif
+
 inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
 
