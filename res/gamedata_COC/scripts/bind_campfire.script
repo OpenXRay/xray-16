@@ -37,86 +37,49 @@ function use_campfire(actor,zone,p)
 	end 
 end
 
--- hold (use) to save
-axr_keybind.bind("kUSE",function(p)
-	if s_allow then
-		if (p==0) or (p==1) then
-			s_pass = false
-		elseif (p==2) then
-			-- holding timer
-			if (not s_pass) then
-				s_timer = time_global() + 3000 -- hold for 3 sec
-				s_pass = true
-			end
-			if (time_global() < s_timer) then
-				return
-			end
-			s_pass = false
-
-			-- create save
-			local flist = getFS():file_list_open_ex("$game_saves$",	bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*".. ui_load_dialog.saved_game_extension)
-			local f_cnt = flist and flist:Size() or 0
-			local inc = 0
-			if (f_cnt > 0) then
-				flist:Sort(FS.FS_sort_by_modif_down)
-			
-				for it=0, f_cnt-1 do
-					local file_name = flist:GetAt(it):NameFull():sub(0,-6):lower()
-			
-					-- grab last modified quicksave increment count
-					local d = tonumber( string.match(file_name,"campfire_autosave(%d+)") )
-					if (d) then
-						inc = d
-						break 
-					end
-				end
-			end
-			inc = inc >= axr_main.config:r_value("mm_options","quicksave_cnt",2,5) and 1 or inc + 1
-			get_console():execute("save campfire_autosave" .. inc)
-		end
-	end
-end)
-
 function on_game_start()
-	local tutorial_ran = 0 -- because we don't want to conflict with other tutorials, we need to identify if we are running (ie. > 0)
-	s_allow = false
 	local function main_loop()
 		
 		if not (db.actor) then 
 			return false
 		end
 		
-		if (db.actor:active_item()) then
-			if (tutorial_ran > 0) then
-				tutorial_ran = 0
-				if (game.has_active_tutorial()) then
-					game.stop_tutorial()
-				end
-			end
-			return false 
-		end
-		
+		local active_name = game.active_tutorial_name()
+		local allow_save = false
+		local found = false
 		local pos = db.actor:position()
 		for id,binder in pairs(campfires_all) do
 			if (binder and binder.campfire) then
-				if (pos:distance_to_sqr(binder.object:position()) <= 2) then
-					if not (game.has_active_tutorial()) then
-						tutorial_ran = id
-						if (binder.campfire:is_on()) then
+				local dist = pos:distance_to_sqr(binder.object:position())
+				if (dist <= 5) then
+					allow_save = true
+				end
+				if (dist <= 2 and not db.actor:active_item()) then
+					if (binder.campfire:is_on()) then
+						if not (active_name == "tutorial_campfire_extinguish") then
 							game.start_tutorial("tutorial_campfire_extinguish")
-						else
+						end
+					else
+						if not (active_name == "tutorial_campfire_ignite") then
 							game.start_tutorial("tutorial_campfire_ignite")
 						end
-						s_allow = true
 					end
-				elseif (tutorial_ran == id) then
-					tutorial_ran = 0
-					if (game.has_active_tutorial()) then
-						game.stop_tutorial()
-					end
-					s_allow = false
+					found = true
 				end
 			end 
+		end
+		
+		if not (found) then
+			if (active_name == "tutorial_campfire_extinguish" or active_name == "tutorial_campfire_ignite") then
+				game.stop_tutorial()
+			end
+		end
+		
+		if (alife_storage_manager.get_state().enable_campfire_mode) then
+			_G.ALLOW_SAVING = allow_save
+			if (allow_save) then
+				SetHudMsg("st_allow_save",1)
+			end
 		end
 		
 		return false

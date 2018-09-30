@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
 	<string id="st_ignite_fire">
-		<text>Ignite ($$ACTION_USE$$)\nHold ($$ACTION_USE$$) to save</text>
+		<text>Ignite ($$ACTION_USE$$)</text>
 	</string>
 	<string id="st_extinguish_fire">
-		<text>Extinguish ($$ACTION_USE$$)\nHold ($$ACTION_USE$$) to save</text>
+		<text>Extinguish ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_allow_save">
+		<text>Saving now permitted</text>
 	</string>
 	<string id="actor_inventory_box_use">
 		<text>Open personal box ($$ACTION_USE$$)</text>

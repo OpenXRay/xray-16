@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
 	<string id="st_ignite_fire">
-		<text>Зажечь ($$ACTION_USE$$)\nЧтобы сохранить игру, удерживайте ($$ACTION_USE$$)</text>
+		<text>Зажечь ($$ACTION_USE$$)</text>
 	</string>
 	<string id="st_extinguish_fire">
-		<text>Потушить ($$ACTION_USE$$)\nЧтобы сохранить игру, удерживайте ($$ACTION_USE$$)</text>
+		<text>Потушить ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_allow_save">
+		<text>Сохранение теперь разрешено</text>
 	</string>
 	<string id="actor_inventory_box_use">
 		<text>Открыть личный ящик ($$ACTION_USE$$)</text>

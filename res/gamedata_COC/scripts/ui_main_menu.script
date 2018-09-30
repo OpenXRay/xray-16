@@ -268,9 +268,11 @@ end
 
 function main_menu:OnButton_save_clicked()
 	if (alife_storage_manager.get_state().enable_campfire_mode) then
-		SetHudMsg("st_you_cant_save",4)
-		get_console():execute("main_menu off")
-		return
+		if not (_G.ALLOW_SAVING) then
+			SetHudMsg("st_you_cant_save",4)
+			get_console():execute("main_menu off")
+			return
+		end
 	end
 
 	if self.save_dlg == nil then
