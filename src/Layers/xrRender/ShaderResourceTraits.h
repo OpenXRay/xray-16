@@ -394,18 +394,12 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
         }
         R_ASSERT3(file, "Shader file doesnt exist:", cname);
 
-        // Duplicate and zero-terminate
-        const auto size = file->length();
-        char* const data = (LPSTR)_alloca(size + 1);
-        CopyMemory(data, file->pointer(), size);
-        data[size] = 0;
-
         // Select target
         LPCSTR c_target = ShaderTypeTraits<T>::GetCompilationTarget();
         LPCSTR c_entry = "main";
         
         if (searchForEntryAndTarget)
-            ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
+            ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, static_cast<pcstr>(file->pointer()));
 
 #ifdef USE_OGL
         DWORD flags = NULL;
