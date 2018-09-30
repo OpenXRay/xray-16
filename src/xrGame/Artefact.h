@@ -90,7 +90,7 @@ public:
     float m_fSatietyRestoreSpeed;
     float m_fPowerRestoreSpeed;
     float m_fBleedingRestoreSpeed;
-    CHitImmunity m_ArtefactHitImmunities;
+    HitImmunity::HitTypeSVec m_ArtefactHitImmunities;
 
 public:
     enum EAFHudStates

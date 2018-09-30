@@ -1804,8 +1804,8 @@ float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
     for (auto& it : inventory().m_belt)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
-        if (artefact)
-            hit_power -= artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type);
+        if (artefact && artefact->m_ArtefactHitImmunities[hit_type])
+            hit_power -= (artefact->m_ArtefactHitImmunities[hit_type] * artefact->GetCondition());
     }
     clamp(hit_power, 0.0f, flt_max);
 
@@ -1818,8 +1818,8 @@ float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type)
     for (auto& it : inventory().m_belt)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
-        if (artefact)
-            sum += artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type) * artefact->GetCondition();
+        if (artefact && artefact->m_ArtefactHitImmunities[hit_type])
+            sum += (artefact->m_ArtefactHitImmunities[hit_type] * artefact->GetCondition());
     }
     return sum;
 }

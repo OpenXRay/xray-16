@@ -51,6 +51,10 @@ CArtefact::CArtefact()
     m_activationObj = NULL;
     m_detectorObj = NULL;
     m_additional_weight = 0.0f;
+
+    m_ArtefactHitImmunities.resize(ALife::eHitTypeMax);
+    for (int i = 0; i < ALife::eHitTypeMax; i++)
+        m_ArtefactHitImmunities[i] = 0.0f;
 }
 
 CArtefact::~CArtefact() {}
@@ -75,9 +79,19 @@ void CArtefact::Load(LPCSTR section)
     m_fPowerRestoreSpeed = pSettings->r_float(section, "power_restore_speed");
     m_fBleedingRestoreSpeed = pSettings->r_float(section, "bleeding_restore_speed");
 
-    if (pSettings->section_exist(pSettings->r_string(section, "hit_absorbation_sect")))
+	LPCSTR hit_sect = pSettings->r_string(section, "hit_absorbation_sect");
+    if (pSettings->section_exist(hit_sect))
     {
-        m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings);
+        m_ArtefactHitImmunities[ALife::eHitTypeBurn] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "burn_immunity",0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeStrike] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "strike_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeShock] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "shock_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeWound] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "wound_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeRadiation] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "radiation_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeTelepatic] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "telepathic_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeChemicalBurn] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "chemical_burn_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeExplosion] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "explosion_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeFireWound] = READ_IF_EXISTS(pSettings, r_float, hit_sect, "fire_wound_immunity", 0.f);
+		m_ArtefactHitImmunities[ALife::eHitTypeLightBurn] = m_ArtefactHitImmunities[ALife::eHitTypeBurn];
     }
     m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
     m_af_rank = pSettings->r_u8(section, "af_rank");

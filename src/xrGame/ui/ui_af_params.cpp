@@ -41,7 +41,7 @@ constexpr pcstr af_immunity_section_names[] = // ALife::EInfluenceType
     "telepatic_immunity", // infl_psi=3
     "shock_immunity", // infl_electra=4
     "wound_immunity",
-    //"fire_wound_immunity",
+    "fire_wound_immunity",
     "explosion_immunity",
     "strike_immunity",
 };
@@ -63,7 +63,7 @@ constexpr pcstr af_immunity_caption[] = // ALife::EInfluenceType
     "ui_inv_outfit_telepatic_protection", // "(telepatic_imm)",
     "ui_inv_outfit_shock_protection", // "(shock_imm)",
     "ui_inv_outfit_wound_protection", // "(wound_imm)",
-    //"ui_inv_outfit_fire_wound_protection", // "(fire_wound_imm)",
+    "ui_inv_outfit_fire_wound_protection", // "(fire_wound_imm)",
     "ui_inv_outfit_explosion_protection", // "(explosion_imm)",
     "ui_inv_outfit_strike_protection",	 // "(strike_imm)",
 };
@@ -90,10 +90,7 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
 
     XML_NODE stored_root = xml.GetLocalRoot();
     XML_NODE base_node = xml.NavigateToNode(base, 0);
-    if (!base_node)
-    {
-        return;
-    }
+    if (!base_node) { return; }
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
 
@@ -181,7 +178,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
     for (u32 i = 0; i < af_immunity_count; ++i)
     {
         shared_str const& sect = pSettings->r_string(af_section, "hit_absorbation_sect");
-        val = pSettings->r_float(sect, af_immunity_section_names[i]);
+        val = READ_IF_EXISTS(pSettings, r_float, sect, af_immunity_section_names[i], 0.f);
         if (fis_zero(val))
             continue;
 
