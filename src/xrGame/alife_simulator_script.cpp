@@ -457,6 +457,12 @@ const CALifeObjectRegistry::OBJECT_REGISTRY& alife_objects(const CALifeSimulator
     VERIFY(self);
     return self->objects().objects();
 }
+
+xr_vector<u16>& get_children(const CALifeSimulator* self, CSE_Abstract* object)
+{
+    VERIFY(self);
+    return object->children;
+}
 //-Alundaio
 
 // clang-format off
@@ -509,6 +515,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
             .def("register", &reprocess_spawn)
             .def("set_objects_per_update", &set_objects_per_update)
             .def("set_process_time", &set_process_time)
+			.def("get_children", &get_children, return_stl_iterator)
             //Alundaio: END
 
         ,
