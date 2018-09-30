@@ -24,7 +24,9 @@ void LightThread::Execute()
             gl_data.slots_data.set_slot_calculated(_x, _z);
 
             thProgress = float(_z - Nstart) / float(Nend - Nstart);
-            thPerformance = float(double(t_count) / double(t_time * CPU::clk_to_seconds)) / 1000.f;
+
+            const auto secs = std::chrono::duration_cast<std::chrono::seconds>(t_time).count();
+            thPerformance = float(double(t_count) / double(secs)) / 1000.f;
         }
     }
 }

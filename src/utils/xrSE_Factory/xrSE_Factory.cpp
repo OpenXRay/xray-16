@@ -38,7 +38,7 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
     {
     case DLL_PROCESS_ATTACH:
     {
-        //xrDebug::Initialize(false);
+        //xrDebug::Initialize();
         //Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
         string_path SYSTEM_LTX;
         FS.update_path(SYSTEM_LTX, "$game_config$", "system.ltx");

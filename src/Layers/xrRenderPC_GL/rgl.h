@@ -293,8 +293,7 @@ public:
     GLuint texture_load(LPCSTR fname, u32& msize, GLenum& ret_desc);
     HRESULT shader_compile(
         LPCSTR name,
-        DWORD const* pSrcData,
-        UINT SrcDataLen,
+        IReader* fs,
         LPCSTR pFunctionName,
         LPCSTR pTarget,
         DWORD Flags,

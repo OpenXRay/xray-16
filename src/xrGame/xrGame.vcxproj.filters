@@ -2242,6 +2242,9 @@
     <Filter Include="UI\Common\LoadingScreen">
       <UniqueIdentifier>{d9b405a9-3bb7-4739-bfc6-60b1a7c278cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\WeaponScript">
+      <UniqueIdentifier>{db77f57b-2177-4c67-98d3-eb3e09476a41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -8311,44 +8314,23 @@
     <ClCompile Include="WeaponMagazinedWGrenade.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Automatic</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponWalther.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Walther 99</Filter>
-    </ClCompile>
     <ClCompile Include="WeaponVintorez.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Vintorez</Filter>
     </ClCompile>
     <ClCompile Include="WeaponKnife.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Knife</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponKnife_script.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Knife</Filter>
-    </ClCompile>
     <ClCompile Include="WeaponGroza.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Groza</Filter>
-    </ClCompile>
-    <ClCompile Include="RGD5.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\RGD5</Filter>
     </ClCompile>
     <ClCompile Include="WeaponVal.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Val</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponUSP45.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon USP45</Filter>
-    </ClCompile>
     <ClCompile Include="Bolt.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Bolt</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponSVU.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\SVU</Filter>
-    </ClCompile>
     <ClCompile Include="WeaponRPG7.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\RPG7</Filter>
-    </ClCompile>
-    <ClCompile Include="WeaponRPG7_script.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\RPG7</Filter>
-    </ClCompile>
-    <ClCompile Include="F1.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Grenade F1</Filter>
     </ClCompile>
     <ClCompile Include="WeaponSVD.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\SVD</Filter>
@@ -8365,16 +8347,10 @@
     <ClCompile Include="WeaponHPSA.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\HPSA</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponHPSA_script.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\HPSA</Filter>
-    </ClCompile>
     <ClCompile Include="WeaponPM.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\PM</Filter>
     </ClCompile>
     <ClCompile Include="WeaponBinoculars.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Binocular</Filter>
-    </ClCompile>
-    <ClCompile Include="WeaponBinoculars_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Binocular</Filter>
     </ClCompile>
     <ClCompile Include="WeaponBinocularsVision.cpp">
@@ -8383,22 +8359,10 @@
     <ClCompile Include="WeaponShotgun.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Shotgun</Filter>
     </ClCompile>
-    <ClCompile Include="weaponshotgun_script.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon Shotgun</Filter>
-    </ClCompile>
-    <ClCompile Include="WeaponFORT.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\FORT</Filter>
-    </ClCompile>
     <ClCompile Include="WeaponRG6.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon RG6</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponRG6_script.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\Weapon RG6</Filter>
-    </ClCompile>
     <ClCompile Include="weaponBM16.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\BM-16</Filter>
-    </ClCompile>
-    <ClCompile Include="weaponBM16_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Various weapons\BM-16</Filter>
     </ClCompile>
     <ClCompile Include="WeaponAutomaticShotgun.cpp">
@@ -9823,6 +9787,12 @@
       <Filter>AI\AMonsters\common\components\State</Filter>
     </ClCompile>
     <ClCompile Include="ui\UILoadingScreen.cpp">
+      <Filter>UI\Common\LoadingScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponScript.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\WeaponScript</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UILoadingScreenHardcoded.h">
       <Filter>UI\Common\LoadingScreen</Filter>
     </ClCompile>
     <ClCompile Include="ui\UISleepStatic.cpp">

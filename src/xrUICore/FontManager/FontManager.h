@@ -1,6 +1,5 @@
 #pragma once
 
-
 struct XRUICORE_API CFontManager : public pureDeviceReset
 {
     CFontManager();

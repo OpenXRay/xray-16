@@ -12,7 +12,7 @@ CUIButtonHint::CUIButtonHint()
 {
     CUIXmlInitBase xml_init;
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "hint_item.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "hint_item.xml");
     xml_init.InitFrameWindow(uiXml, "button_hint", 0, this);
 
     m_text = new CUITextWnd();

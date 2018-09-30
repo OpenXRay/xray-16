@@ -11,8 +11,8 @@
 
 typedef FactoryPtr<IUIShader> ui_shader;
 
-#define UI_BASE_WIDTH 1024.0f
-#define UI_BASE_HEIGHT 768.0f
+constexpr float UI_BASE_WIDTH = 1024.0f;
+constexpr float UI_BASE_HEIGHT = 768.0f;
 
 enum EUIItemAlign
 {
@@ -47,8 +47,8 @@ struct S2DVert
     void rotate_pt(const Fvector2& pivot, const float cosA, const float sinA, const float kx);
 };
 
-#define UI_FRUSTUM_MAXPLANES 12
-#define UI_FRUSTUM_SAFE (UI_FRUSTUM_MAXPLANES * 4)
+constexpr u32 UI_FRUSTUM_MAXPLANES = 12;
+constexpr u32 UI_FRUSTUM_SAFE = (UI_FRUSTUM_MAXPLANES * 4);
 typedef svector<S2DVert, UI_FRUSTUM_SAFE> sPoly2D;
 
 class XRUICORE_API C2DFrustum

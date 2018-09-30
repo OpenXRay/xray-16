@@ -88,7 +88,7 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
 void CUIMainIngameWnd::Init()
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, MAININGAME_XML);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MAININGAME_XML);
 
     CUIXmlInit xml_init;
     xml_init.InitWindow(uiXml, "main", 0, this);

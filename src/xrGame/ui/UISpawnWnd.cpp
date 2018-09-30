@@ -58,7 +58,7 @@ CUISpawnWnd::~CUISpawnWnd()
 void CUISpawnWnd::Init()
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "spawn.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "spawn.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "team_selector", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "team_selector:caption", 0, m_pCaption);

@@ -73,7 +73,7 @@ void CUIRankingWnd::Init()
 {
     Fvector2 pos;
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, PDA_RANKING_XML);
+    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_RANKING_XML);
 
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);
     m_delay = (u32)xml.ReadAttribInt("main_wnd", 0, "delay", 3000);

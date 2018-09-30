@@ -6,6 +6,7 @@
 #include "xrCommon/xr_stack.h"
 #include "xrUICore/FontManager/FontManager.h"
 
+static constexpr pcstr UI_PATH_DEFAULT = "ui";
 XRUICORE_API extern pcstr UI_PATH;
 
 class CUICursor;
@@ -19,7 +20,7 @@ public:
     virtual void OnDeviceReset(){};
 };
 
-class XRUICORE_API ui_core : public CDeviceResetNotifier
+class XRUICORE_API UICore : public CDeviceResetNotifier
 {
     C2DFrustum m_2DFrustum;
     C2DFrustum m_2DFrustumPP;
@@ -37,8 +38,8 @@ class XRUICORE_API ui_core : public CDeviceResetNotifier
 public:
     xr_stack<Frect> m_Scissors;
 
-    ui_core();
-    ~ui_core();
+    UICore();
+    ~UICore();
     CFontManager& Font() { return *m_pFontManager; }
     CUICursor& GetUICursor() { return *m_pUICursor; }
     IC float ClientToScreenScaledX(float left) const { return left * m_current_scale->x; };
@@ -67,4 +68,4 @@ public:
 };
 
 XRUICORE_API extern CUICursor& GetUICursor();
-XRUICORE_API extern ui_core& UI();
+XRUICORE_API extern UICore& UI();

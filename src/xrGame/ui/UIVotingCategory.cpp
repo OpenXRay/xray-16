@@ -55,7 +55,7 @@ void CUIVotingCategory::InitVotingCategory()
     if (!xml_doc)
         xml_doc = new CUIXml();
 
-    xml_doc->Load(CONFIG_PATH, UI_PATH, "voting_category.xml");
+    xml_doc->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "voting_category.xml");
 
     CUIXmlInit::InitWindow(*xml_doc, "category", 0, this);
 

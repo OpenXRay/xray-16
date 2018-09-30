@@ -51,7 +51,7 @@ void CUIServerInfo::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndC
 void CUIServerInfo::Init()
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "server_info.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "server_info.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "server_info", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "server_info:caption", 0, m_caption);

@@ -43,7 +43,7 @@ int entry_point(pcstr commandLine)
     splash->Show();
 
     splash->SetStatus("Loading xrDebug...");
-    xrDebug::Initialize(false);
+    xrDebug::Initialize();
 
     splash->SetStatus("Loading Core...");
     thread_spawn(UIThreadProc, "OpenXRay Editor UI Thread", 0, nullptr);

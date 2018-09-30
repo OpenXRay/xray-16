@@ -160,7 +160,7 @@ public:
     static int lua_panic(lua_State* L);
     static void lua_error(lua_State* L);
     static int lua_pcall_failed(lua_State* L);
-#if !XRAY_EXCEPTIONS
+#if 1 //!XRAY_EXCEPTIONS
     static void lua_cast_failed(lua_State* L, const luabind::type_id& info);
 #endif
 #ifdef DEBUG

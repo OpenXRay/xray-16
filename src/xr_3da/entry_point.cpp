@@ -26,7 +26,7 @@ int entry_point(pcstr commandLine)
     if (strstr(commandLine, "-dedicated"))
         GEnv.isDedicatedServer = true;
 
-    xrDebug::Initialize(GEnv.isDedicatedServer);
+    xrDebug::Initialize();
 #ifdef WINDOWS
     StickyKeyFilter filter;
     if (!GEnv.isDedicatedServer)

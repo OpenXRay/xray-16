@@ -61,7 +61,7 @@ CUIMapDesc::~CUIMapDesc()
 void CUIMapDesc::Init()
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "map_desc.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_desc.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "map_desc", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "map_desc:caption", 0, m_pCaption);

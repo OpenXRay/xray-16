@@ -270,6 +270,7 @@
     <ClInclude Include="..\xrRender\r__dsgraph_types.h" />
     <ClInclude Include="..\xrRender\r__sector.h" />
     <ClInclude Include="..\xrRender\Shader.h" />
+    <ClInclude Include="..\xrRender\ShaderResourceTraits.h" />
     <ClInclude Include="..\xrRender\SH_Atomic.h" />
     <ClInclude Include="..\xrRender\SH_Constant.h" />
     <ClInclude Include="..\xrRender\SH_Matrix.h" />
@@ -428,6 +429,7 @@
     <ClCompile Include="FStaticRender_DetectSector.cpp" />
     <ClCompile Include="FStaticRender_Loader.cpp" />
     <ClCompile Include="FStaticRender_RenderTarget.cpp" />
+    <ClCompile Include="FStaticRender_Shaders.cpp" />
     <ClCompile Include="GlowManager.cpp" />
     <ClCompile Include="LightPPA.cpp" />
     <ClCompile Include="LightProjector.cpp" />

@@ -1,5 +1,4 @@
-#include "pch_script.h"
-
+#include "stdafx.h"
 #include "WeaponHPSA.h"
 
 CWeaponHPSA::CWeaponHPSA() : CWeaponPistol() {}

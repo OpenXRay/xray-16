@@ -52,7 +52,7 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
 {
     Clear();
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "message_box.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "message_box.xml");
     CUIXmlInitBase xml_init;
 
     string512 str;

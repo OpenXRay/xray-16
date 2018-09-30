@@ -26,7 +26,7 @@ CUITaskWnd::~CUITaskWnd() { delete_data(m_pMapWnd); }
 void CUITaskWnd::Init()
 {
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, PDA_TASK_XML);
+    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_TASK_XML);
     VERIFY(hint_wnd);
 
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);

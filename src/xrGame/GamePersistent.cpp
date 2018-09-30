@@ -206,7 +206,7 @@ void CGamePersistent::OnAppStart()
     GMLib.Load();
     init_game_globals();
     inherited::OnAppStart();
-    GEnv.UI = new ui_core();
+    GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
 }
 

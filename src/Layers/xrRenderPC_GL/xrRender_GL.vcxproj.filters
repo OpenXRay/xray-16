@@ -675,6 +675,9 @@
     <ClCompile Include="gl_rendertarget_phase_flip.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
+    <ClCompile Include="rgl_shaders.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

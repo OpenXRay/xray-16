@@ -36,7 +36,7 @@ struct sh_pair
 class XRUICORE_API CUITextureMaster
 {
 public:
-    static void ParseShTexInfo(LPCSTR xml_file);
+    static void ParseShTexInfo(pcstr path, pcstr xml_file);
     static void FreeTexInfo();
     static void FreeCachedShaders();
 

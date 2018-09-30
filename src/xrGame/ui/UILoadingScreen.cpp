@@ -9,6 +9,7 @@
 
 #include "StdAfx.h"
 #include "UILoadingScreen.h"
+#include "UILoadingScreenHardcoded.h"
 
 #include "xrEngine/x_ray.h"
 #include "xrEngine/GameFont.h"
@@ -27,7 +28,15 @@ UILoadingScreen::UILoadingScreen()
 void UILoadingScreen::Initialize()
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "ui_mm_loading_screen.xml");
+    bool loaded = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml");
+
+    if (!loaded) // Robustness? Yes!
+    {
+        if (UI().is_widescreen())
+            uiXml.Set(LoadingScreenXML16x9);
+        else
+            uiXml.Set(LoadingScreenXML);
+    }
 
     loadingProgressBackground = UIHelper::CreateStatic(uiXml, "loading_progress_background", this);
     loadingProgress = UIHelper::CreateProgressBar(uiXml, "loading_progress", this);

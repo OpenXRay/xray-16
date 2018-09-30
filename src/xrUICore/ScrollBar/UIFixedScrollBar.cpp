@@ -18,7 +18,7 @@ void CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, LPCSTR prof
 {
     string256 _path;
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "scroll_bar.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scroll_bar.xml");
 
     float width = xml_doc.ReadAttribFlt(profile, 0, "width", 17.0f);
     float height = xml_doc.ReadAttribFlt(profile, 0, "height", 17.0f);

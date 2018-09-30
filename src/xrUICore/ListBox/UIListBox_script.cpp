@@ -60,18 +60,4 @@ SCRIPT_EXPORT(CUIListBoxItemMsgChain, (CUIListBoxItem), {
             .def(constructor<float>())
     ];
 });
-
-SCRIPT_EXPORT(EnumGameIDs, (), {
-    class EnumGameIDs
-    {
-    };
-    module(luaState)
-    [
-        class_<EnumGameIDs>("GAME_TYPE")
-            .enum_("gametype")
-            [
-                value("GAME_UNKNOWN", int(-1))
-            ]
-    ];
-});
 // clang-format on

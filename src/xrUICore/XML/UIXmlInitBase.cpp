@@ -471,14 +471,6 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CU
     {
         mode = CUIProgressBar::om_vfromcenter;
     }
-    else if (xr_stricmp(mode_str, "to_center") == 0)
-    {
-        mode = CUIProgressBar::om_tocenter;
-    }
-    else if (xr_stricmp(mode_str, "vert_to_center") == 0)
-    {
-        mode = CUIProgressBar::om_vtocenter;
-    }
 
     pWnd->InitProgressBar(pos, size, mode);
 
@@ -1053,7 +1045,7 @@ void CUIXmlInitBase::InitColorDefs()
     m_pColorDefs = new ColorDefs();
 
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, COLOR_DEFINITIONS);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, COLOR_DEFINITIONS);
 
     int num = uiXml.GetNodesNum("colors", 0, "color");
 

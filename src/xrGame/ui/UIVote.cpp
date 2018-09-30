@@ -47,7 +47,7 @@ CUIVote::CUIVote()
 void CUIVote::Init()
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "voting_category.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "voting_category.xml");
     CUIXmlInit::InitWindow(xml_doc, "vote", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "vote:background", 0, bkgrnd);
     CUIXmlInit::InitTextWnd(xml_doc, "vote:msg", 0, msg);

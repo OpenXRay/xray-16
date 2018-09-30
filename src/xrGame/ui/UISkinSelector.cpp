@@ -119,7 +119,7 @@ void CUISkinSelectorWnd::Init(const char* strSectionName)
     m_strSection = strSectionName;
 
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "skin_selector.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "skin_selector.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "skin_selector", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "skin_selector:caption", 0, m_pCaption);
