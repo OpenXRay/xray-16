@@ -139,24 +139,9 @@ void CStalkerCombatPlanner::initialize()
     m_last_enemy_id = u16(-1);
     m_last_level_time = 0;
     m_last_wounded = false;
-
-    if (!m_loaded && object().memory().enemy().selected())
-    {
-        CVisualMemoryManager* visual_memory_manager = object().memory().enemy().selected()->visual_memory();
-        VERIFY(visual_memory_manager);
-        CScriptActionPlanner::m_storage.set_property(
-            eWorldPropertyUseSuddenness, !visual_memory_manager->visible_now(&object()));
-    }
-
     m_loaded = false;
 
-    if (!object().agent_manager().member().combat_members().empty())
-        CScriptActionPlanner::m_storage.set_property(eWorldPropertyUseSuddenness, false);
-
-    //  this is possible when i enter combat when it is wait after combat stage
-    //	VERIFY					(object().memory().enemy().selected());
-
-    if (m_object->memory().visual().visible_now(m_object->memory().enemy().selected()))
+	if (m_object->memory().enemy().selected() && m_object->memory().visual().visible_now(m_object->memory().enemy().selected()))
     {
         if (m_object->memory().enemy().selected()->human_being())
             if (object().agent_manager().member().can_cry_noninfo_phrase())
@@ -201,45 +186,29 @@ void CStalkerCombatPlanner::add_evaluators()
     add_evaluator(eWorldPropertyEnemySeeMe, new CStalkerPropertyEvaluatorEnemySeeMe(m_object, "enemy see me"));
     add_evaluator(eWorldPropertyItemToKill, new CStalkerPropertyEvaluatorItemToKill(m_object, "item to kill"));
     add_evaluator(eWorldPropertyItemCanKill, new CStalkerPropertyEvaluatorItemCanKill(m_object, "item can kill"));
-    add_evaluator(
-        eWorldPropertyFoundItemToKill, new CStalkerPropertyEvaluatorFoundItemToKill(m_object, "found item to kill"));
+    add_evaluator(eWorldPropertyFoundItemToKill, new CStalkerPropertyEvaluatorFoundItemToKill(m_object, "found item to kill"));
     add_evaluator(eWorldPropertyFoundAmmo, new CStalkerPropertyEvaluatorFoundAmmo(m_object, "found ammo"));
     add_evaluator(eWorldPropertyReadyToKill, new CStalkerPropertyEvaluatorReadyToKill(m_object, "ready to kill"));
     add_evaluator(eWorldPropertyReadyToDetour, new CStalkerPropertyEvaluatorReadyToDetour(m_object, "ready to detour"));
     add_evaluator(eWorldPropertyPanic, new CStalkerPropertyEvaluatorPanic(m_object, "panic"));
-    add_evaluator(eWorldPropertyDangerGrenade,
-        new CStalkerPropertyEvaluatorGrenadeToExplode(m_object, "is there grenade to explode"));
+    add_evaluator(eWorldPropertyDangerGrenade, new CStalkerPropertyEvaluatorGrenadeToExplode(m_object, "is there grenade to explode"));
     add_evaluator(eWorldPropertyEnemyWounded, new CStalkerPropertyEvaluatorEnemyWounded(m_object, "is enemy wounded"));
-    add_evaluator(
-        eWorldPropertyPlayerOnThePath, new CStalkerPropertyEvaluatorPlayerOnThePath(m_object, "player on the path"));
-    add_evaluator(eWorldPropertyEnemyCriticallyWounded,
-        new CStalkerPropertyEvaluatorEnemyCriticallyWounded(m_object, "enemy_critically_wounded"));
-    add_evaluator(
-        eWorldPropertyTooFarToKillEnemy, new CStalkerPropertyEvaluatorTooFarToKillEnemy(m_object, "too far to kill"));
+    add_evaluator(eWorldPropertyPlayerOnThePath, new CStalkerPropertyEvaluatorPlayerOnThePath(m_object, "player on the path"));
+    add_evaluator(eWorldPropertyEnemyCriticallyWounded, new CStalkerPropertyEvaluatorEnemyCriticallyWounded(m_object, "enemy_critically_wounded"));
+    add_evaluator(eWorldPropertyTooFarToKillEnemy, new CStalkerPropertyEvaluatorTooFarToKillEnemy(m_object, "too far to kill"));
 
-    add_evaluator(eWorldPropertyInCover,
-        new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, eWorldPropertyInCover, true, true, "in cover"));
-    add_evaluator(eWorldPropertyLookedOut,
-        new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, eWorldPropertyLookedOut, true, true, "looked out"));
-    add_evaluator(eWorldPropertyPositionHolded, new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0,
-                                                    eWorldPropertyPositionHolded, true, true, "position holded"));
-    add_evaluator(eWorldPropertyEnemyDetoured, new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0,
-                                                   eWorldPropertyEnemyDetoured, true, true, "enemy detoured"));
-    add_evaluator(eWorldPropertyUseSuddenness, new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0,
-                                                   eWorldPropertyUseSuddenness, true, true, "use suddenness"));
-    add_evaluator(eWorldPropertyCriticallyWounded,
-        new CStalkerPropertyEvaluatorMember(&object().brain().CStalkerPlanner::m_storage,
-            eWorldPropertyCriticallyWounded, true, true, "critically wounded"));
-    add_evaluator(
-        eWorldPropertyKilledWounded, new CStalkerPropertyEvaluatorMember(&object().brain().CStalkerPlanner::m_storage,
-                                         eWorldPropertyKilledWounded, true, true, "killed critically wounded"));
+    add_evaluator(eWorldPropertyInCover, new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, eWorldPropertyInCover, true, true, "in cover"));
+    add_evaluator(eWorldPropertyLookedOut, new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, eWorldPropertyLookedOut, true, true, "looked out"));
+    add_evaluator(eWorldPropertyPositionHolded, new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, eWorldPropertyPositionHolded, true, true, "position holded"));
+    add_evaluator(eWorldPropertyEnemyDetoured, new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, eWorldPropertyEnemyDetoured, true, true, "enemy detoured"));
+    add_evaluator(eWorldPropertyUseSuddenness, new CStalkerPropertyEvaluatorUseSuddenness(m_object, "use suddenness"));
+    add_evaluator(eWorldPropertyCriticallyWounded, new CStalkerPropertyEvaluatorMember(&object().brain().CStalkerPlanner::m_storage, eWorldPropertyCriticallyWounded, true, true, "critically wounded"));
+    add_evaluator(eWorldPropertyKilledWounded, new CStalkerPropertyEvaluatorMember(&object().brain().CStalkerPlanner::m_storage, eWorldPropertyKilledWounded, true, true, "killed critically wounded"));
 
-    add_evaluator(eWorldPropertyShouldThrowGrenade,
-        new CStalkerPropertyEvaluatorShouldThrowGrenade(m_object, "should throw grenade"));
+    add_evaluator(eWorldPropertyShouldThrowGrenade, new CStalkerPropertyEvaluatorShouldThrowGrenade(m_object, "should throw grenade"));
     add_evaluator(eWorldPropertyLowCover, new CStalkerPropertyEvaluatorLowCover(m_object, "using low cover"));
 
-    add_evaluator(
-        eWorldPropertyInSmartCover, new smart_cover::evaluators::in_cover_evaluator(m_object, "in smart cover"));
+    add_evaluator(eWorldPropertyInSmartCover, new smart_cover::evaluators::in_cover_evaluator(m_object, "in smart cover"));
 }
 
 void CStalkerCombatPlanner::add_actions()

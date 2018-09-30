@@ -83,13 +83,13 @@ void CAI_Stalker::compute_enemy_distances(float& minimum_enemy_distance, float& 
     // pistols
     case 5:
     {
-        maximum_enemy_distance = 10.f;
+        maximum_enemy_distance = 15.f;
         break;
     }
     // shotguns
     case 9:
     {
-        maximum_enemy_distance = 5.f;
+        maximum_enemy_distance = 8.f;
         break;
     }
     // sniper rifles
@@ -101,9 +101,29 @@ void CAI_Stalker::compute_enemy_distances(float& minimum_enemy_distance, float& 
     }
     default:
     {
-        maximum_enemy_distance = 20.f;
+        maximum_enemy_distance = 30.f;
         break;
     }
+    }
+    const CEntityAlive* enemy = memory().enemy().selected();
+    if (enemy)
+    {
+        u32 creature_type = enemy->ef_creature_type();
+        switch (creature_type)
+        {
+        case 11:
+        case 21:
+        case 19:
+        case 6:
+        case 20:
+        case 13:
+        {
+            minimum_enemy_distance += 10.f;
+            break;
+        }
+        default: { break;
+        }
+        }
     }
 
     minimum_enemy_distance = std::min(minimum_enemy_distance, maximum_enemy_distance);
