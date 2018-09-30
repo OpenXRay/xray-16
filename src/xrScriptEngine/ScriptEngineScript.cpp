@@ -123,7 +123,7 @@ struct profile_timer_script
     float time() const
     {
         using namespace std::chrono;
-        return float(duration_cast<milliseconds>(accumulator).count()) * 1000000.f;
+        return float(duration_cast<microseconds>(accumulator).count());
     }
 };
 
