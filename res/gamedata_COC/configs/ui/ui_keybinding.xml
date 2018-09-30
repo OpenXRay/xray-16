@@ -69,8 +69,8 @@
 		<command id="kb_custom5"                        exe="custom5"/>
 		<command id="kb_custom6"                        exe="custom6"/> <!-- Cycle HUD -->
 		<command id="kb_custom7"                        exe="custom7"/> <!-- Backpack Quick Release -->
-<!--		<command id="kb_custom8"                        exe="custom8"/>
-		<command id="kb_custom9"                        exe="custom9"/>
+		<command id="kb_custom8"                        exe="custom8"/> <!-- Hide Minimap -->
+<!--		<command id="kb_custom9"                        exe="custom9"/>
 		<command id="kb_custom10"                       exe="custom10"/>
 		<command id="kb_custom12"                       exe="custom10"/>
 		<command id="kb_custom13"                       exe="custom10"/>

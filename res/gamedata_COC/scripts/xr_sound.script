@@ -528,8 +528,9 @@ local ltx = ini_file("plugins\\radio_music.ltx")
 function get_sound_object(theme, t_type)
 	if not (ph_snd_themes) then
 		ph_snd_themes = {}
+	end
+	if not (ph_snd_themes[theme]) then 
 		ph_snd_themes[theme] = alun_utils.collect_section(ltx,theme)
-		--printf("collect theme=%s",theme)
 	end
 
 	if (not ph_snd_themes or not ph_snd_themes[theme]) then

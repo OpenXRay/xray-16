@@ -264,7 +264,9 @@
 	<string id="kb_custom7">
 		<text>Quick release backpack</text>
 	</string>
-	
+	<string id="kb_custom8">
+		<text>Toggle minimap</text>
+	</string>	
 	<string id="kb_pda_tab1">
 		<text>PDA Map</text>
 	</string>

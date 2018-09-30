@@ -94,3 +94,13 @@ bind("kCUSTOM6",function(p)
 		end
 	end
 end)
+
+bind("kCUSTOM8",function(p)
+	if (p==1) then
+		local maingameui = ActorMenu.get_maingame()
+		if (maingameui and maingameui.UIZoneMap) then
+			maingameui.UIZoneMap.disabled = not maingameui.UIZoneMap.disabled
+			maingameui.UIMotionIcon:Show(maingameui.UIZoneMap.disabled == false)
+		end
+	end
+end)
