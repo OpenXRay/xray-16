@@ -542,7 +542,7 @@ void CUIMainIngameWnd::AnimateContacts(bool b_snd)
 {
     UIZoneMap->Counter_ResetClrAnimation();
 
-    if (b_snd)
+    if (b_snd && !UIZoneMap->disabled)
         HUD_SOUND_ITEM::PlaySound(m_contactSnd, Fvector().set(0, 0, 0), 0, true);
 }
 

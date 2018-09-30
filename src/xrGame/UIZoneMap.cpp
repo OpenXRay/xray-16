@@ -18,7 +18,7 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
-CUIZoneMap::CUIZoneMap() : m_current_map_idx(u8(-1)), visible(true) {}
+CUIZoneMap::CUIZoneMap() : m_current_map_idx(u8(-1)), visible(true) { disabled = false; }
 CUIZoneMap::~CUIZoneMap() {}
 void CUIZoneMap::Init()
 {
@@ -95,7 +95,7 @@ void CUIZoneMap::Init()
 
 void CUIZoneMap::Render()
 {
-    if (!visible)
+    if (!visible || disabled)
         return;
 
     m_clipFrame.Draw();
@@ -104,6 +104,7 @@ void CUIZoneMap::Render()
 
 void CUIZoneMap::Update()
 {
+    if (disabled) return;
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!pActor)
         return;

@@ -9,6 +9,7 @@ class CUIZoneMap
 {
 public:
     bool visible;
+    bool disabled;
 
 private:
     CUIMiniMap* m_activeMap;
