@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UISleepStatic.h"
 #include "Actor_Flags.h"
 #include "Level.h"
