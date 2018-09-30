@@ -426,10 +426,10 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
 }
 
 template <typename T>
-inline void CResourceManager::DestroyShader(const T* sh)
+bool CResourceManager::DestroyShader(const T* sh)
 {
     if (0 == (sh->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
+        return false;
 
     ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
 
@@ -439,7 +439,9 @@ inline void CResourceManager::DestroyShader(const T* sh)
     if (iterator != sh_map.end())
     {
         sh_map.erase(iterator);
-        return;
+        return true;
     }
+
     Msg("! ERROR: Failed to find compiled shader '%s'", sh->cName.c_str());
+    return false;
 }

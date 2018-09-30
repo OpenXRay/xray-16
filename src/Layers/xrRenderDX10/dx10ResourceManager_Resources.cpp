@@ -140,31 +140,19 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 
 void CResourceManager::_DeleteVS(const SVS* vs)
 {
-    // XXX: try to use code below
-    // DestroyShader(vs);
-
-    if (0 == (vs->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    LPSTR N = LPSTR(*vs->cName);
-    map_VS::iterator I = m_vs.find(N);
-    if (I != m_vs.end())
+    if (DestroyShader(vs))
     {
-        m_vs.erase(I);
-        xr_vector<SDeclaration*>::iterator iDecl;
-        for (iDecl = v_declarations.begin(); iDecl != v_declarations.end(); ++iDecl)
+        for (const auto& iDecl : v_declarations)
         {
-            xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
-            iLayout = (*iDecl)->vs_to_layout.find(vs->signature->signature);
-            if (iLayout != (*iDecl)->vs_to_layout.end())
+            const auto iLayout = iDecl->vs_to_layout.find(vs->signature->signature);
+            if (iLayout != iDecl->vs_to_layout.end())
             {
                 //	Release vertex layout
                 _RELEASE(iLayout->second);
-                (*iDecl)->vs_to_layout.erase(iLayout);
+                iDecl->vs_to_layout.erase(iLayout);
             }
         }
-        return;
     }
-    Msg("! ERROR: Failed to find compiled vertex-shader '%s'", *vs->cName);
 }
 
 //--------------------------------------------------------------------------------------------------------------

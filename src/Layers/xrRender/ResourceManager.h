@@ -258,7 +258,7 @@ private:
     T* CreateShader(const char* name, const char* filename = nullptr, const bool searchForEntryAndTarget = false);
 
     template <typename T>
-    void DestroyShader(const T* sh);
+    bool DestroyShader(const T* sh);
 };
 
 #endif // ResourceManagerH
