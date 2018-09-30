@@ -1707,8 +1707,6 @@ void CActor::OnItemDrop(CInventoryItem* inventory_item, bool just_before_destroy
     if (weapon && inventory_item->m_ItemCurrPlace.type == eItemPlaceSlot)
     {
         weapon->OnZoomOut();
-        if (weapon->GetRememberActorNVisnStatus())
-            weapon->EnableActorNVisnAfterZoom();
     }
 
     if (!just_before_destroy && inventory_item->BaseSlot() == GRENADE_SLOT &&
@@ -2087,6 +2085,17 @@ bool CActor::unlimited_ammo() { return !!psActorFlags.test(AF_UNLIMITEDAMMO); }
 
 void CActor::SwitchNightVision(bool vision_on, bool use_sounds, bool send_event)
 {
+    if (eacFirstEye == cam_active)
+    {
+        CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
+        if (pWeapon && pWeapon->IsZoomed())
+        {
+            if (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())
+                pWeapon->AllowNightVision(!pWeapon->AllowNightVision());
+            return;
+        }
+    }
+
     m_bNightVisionOn = vision_on;
     if (!m_night_vision)
         m_night_vision = new CNightVisionEffector(cNameSect());

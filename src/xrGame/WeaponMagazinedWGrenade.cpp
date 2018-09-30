@@ -784,7 +784,8 @@ void CWeaponMagazinedWGrenade::load(IReader& input_packet)
 {
     inherited::load(input_packet);
     load_data(m_bGrenadeMode, input_packet);
-    load_data(0, input_packet);
+    int dummy;
+    load_data(dummy, input_packet);
 }
 
 void CWeaponMagazinedWGrenade::net_Export(NET_Packet& P)

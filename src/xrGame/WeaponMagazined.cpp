@@ -1168,10 +1168,13 @@ void CWeaponMagazined::InitAddons()
 
             scope_tex_name = pSettings->r_string(GetScopeName(), "scope_texture");
             m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(GetScopeName(), "scope_zoom_factor");
+            m_zoom_params.m_fScopeZoomFactorMin = READ_IF_EXISTS(pSettings, r_float, GetScopeName(), "scope_zoom_factor_min", 0.3f);
             m_zoom_params.m_sUseZoomPostprocess = READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_nightvision", 0);
             m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", false);
             m_zoom_params.m_sUseBinocularVision = READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_alive_detector", 0);
-            m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
+            float delta, min_zoom_factor;
+            GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
+            m_fRTZoomFactor = min_zoom_factor;
             if (m_UIScope)
             {
                 xr_delete(m_UIScope);

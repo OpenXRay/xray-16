@@ -18,7 +18,7 @@ struct SBinocVisibleObj
     CUIStatic m_rt;
     CUIStatic m_rb;
     Frect cur_rect;
-
+    Fcolor m_colors[3];
     float m_upd_speed;
     Flags8 m_flags;
     void create_default(u32 color);
@@ -45,6 +45,7 @@ public:
 
 protected:
     Fcolor m_frame_color;
+    Fcolor m_colors[3];
     float m_rotating_speed;
     void Load(const shared_str& section);
     HUD_SOUND_COLLECTION m_sounds;
