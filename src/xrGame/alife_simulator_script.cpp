@@ -515,7 +515,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
             .def("register", &reprocess_spawn)
             .def("set_objects_per_update", &set_objects_per_update)
             .def("set_process_time", &set_process_time)
-			.def("get_children", &get_children, return_stl_iterator)
+			.def("get_children", &get_children, return_stl_iterator())
             //Alundaio: END
 
         ,

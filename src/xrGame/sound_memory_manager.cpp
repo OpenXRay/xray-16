@@ -411,10 +411,10 @@ void CSoundMemoryManager::save(NET_Packet& packet) const
         packet.w_float((*I).m_self_params.m_orientation.roll);
 #endif // USE_ORIENTATION
 #ifdef USE_LEVEL_TIME
-        packet.w_u32((Device.dwTimeGlobal >= (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_level_time) : 0);
+        packet.w_u32((Device.dwTimeGlobal > (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_level_time) : 0);
 #endif // USE_LAST_LEVEL_TIME
 #ifdef USE_LEVEL_TIME
-        packet.w_u32((Device.dwTimeGlobal >= (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_last_level_time) : 0);
+        packet.w_u32((Device.dwTimeGlobal > (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_last_level_time) : 0);
 #endif // USE_LAST_LEVEL_TIME
 #ifdef USE_FIRST_LEVEL_TIME
         packet.w_u32((Device.dwTimeGlobal >= (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_first_level_time) : 0);
@@ -462,14 +462,16 @@ void CSoundMemoryManager::load(IReader& packet)
         packet.r_float(object.m_self_params.m_orientation.roll);
 #endif
 #ifdef USE_LEVEL_TIME
-        VERIFY(Device.dwTimeGlobal >= object.m_level_time);
-        object.m_level_time = packet.r_u32();
-        object.m_level_time = Device.dwTimeGlobal - object.m_level_time;
+        object.m_level_time = Device.dwTimeGlobal - packet.r_u32();
+        if (object.m_level_time > Device.dwTimeGlobal)
+            object.m_level_time = Device.dwTimeGlobal;
+            // VERIFY(Device.dwTimeGlobal > object.m_level_time);
 #endif // USE_LEVEL_TIME
 #ifdef USE_LAST_LEVEL_TIME
-        VERIFY(Device.dwTimeGlobal >= object.m_last_level_time);
-        object.m_last_level_time = packet.r_u32();
-        object.m_last_level_time = Device.dwTimeGlobal - object.m_last_level_time;
+        object.m_last_level_time = Device.dwTimeGlobal - packet.r_u32();
+        if (object.m_last_level_time > Device.dwTimeGlobal)
+            object.m_last_level_time = Device.dwTimeGlobal;
+            // VERIFY(Device.dwTimeGlobal > object.m_last_level_time);
 #endif // USE_LAST_LEVEL_TIME
 #ifdef USE_FIRST_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= (*I).m_first_level_time);
