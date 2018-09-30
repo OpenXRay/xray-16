@@ -11,7 +11,7 @@
 #include "Common/Noncopyable.hpp"
 #include "smart_cover_detail.h"
 #include "action_planner_action.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 
 namespace smart_cover
 {

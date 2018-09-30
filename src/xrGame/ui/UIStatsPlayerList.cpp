@@ -6,7 +6,7 @@
 #include "UIStatsIcon.h"
 #include "string_table.h"
 #include "Level.h"
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UIXmlInit.h"
 
 IC bool DM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2);
@@ -231,21 +231,20 @@ void CUIStatsPlayerList::Update()
     };
     pl_count = items.size();
 
-    CStringTable st;
     if (GameID() == eGameIDArtefactHunt && !m_bSpectator)
     {
         game_cl_ArtefactHunt* game = static_cast<game_cl_ArtefactHunt*>(&Game());
         pl_artefacts = game->teams[m_CurTeam - 1].score;
-        xr_sprintf(teaminfo, "%s: %u, %s: %u, %s: %d", *st.translate("mp_artefacts_upcase"), pl_artefacts,
-            *st.translate("mp_players"), pl_count, *st.translate("mp_frags_upcase"), pl_frags);
+        xr_sprintf(teaminfo, "%s: %u, %s: %u, %s: %d", *StringTable().translate("mp_artefacts_upcase"), pl_artefacts,
+            *StringTable().translate("mp_players"), pl_count, *StringTable().translate("mp_frags_upcase"), pl_frags);
         m_header_text->SetText(teaminfo);
     }
     else if (GameID() == eGameIDTeamDeathmatch && !m_bSpectator)
     {
         game_cl_TeamDeathmatch* game = static_cast<game_cl_TeamDeathmatch*>(&Game());
         pl_frags = game->teams[m_CurTeam - 1].score;
-        xr_sprintf(teaminfo, "%s: %d, %s: %u", *st.translate("mp_frags_upcase"), pl_frags, *st.translate("mp_players"),
-            pl_count);
+        xr_sprintf(teaminfo, "%s: %d, %s: %u", *StringTable().translate("mp_frags_upcase"), pl_frags,
+            *StringTable().translate("mp_players"), pl_count);
         m_header_text->SetText(teaminfo);
     }
 

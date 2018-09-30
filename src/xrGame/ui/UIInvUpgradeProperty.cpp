@@ -10,8 +10,8 @@
 #include "UIInvUpgradeProperty.h"
 #include "UIInvUpgradeInfo.h"
 
-#include "UIStatic.h"
-#include "xrUIXmlParser.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
 
 #include "ai_space.h"

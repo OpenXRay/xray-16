@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "UIMapInfo.h"
-#include "UIScrollView.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "UIXmlInit.h"
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "string_table.h"
 
 CUIMapInfo::CUIMapInfo()
@@ -23,13 +23,13 @@ void CUIMapInfo::InitMapInfo(Fvector2 pos, Fvector2 size)
 }
 
 #define ADD_TEXT(x, y, z)                                           \
-    text = *str_tbl.translate(x);                                   \
+    text = *StringTable().translate(x);                                   \
     text += ": ";                                                   \
     text += txt_color_tag;                                          \
     if (ltx.line_exist("map_info", y))                              \
-        text += *str_tbl.translate(ltx.r_string_wb("map_info", y)); \
+        text += *StringTable().translate(ltx.r_string_wb("map_info", y)); \
     else                                                            \
-        text += *str_tbl.translate(z);                              \
+        text += *StringTable().translate(z);                              \
     text += "%c[default]\\n";                                       \
     st = new CUITextWnd();                                          \
     st->SetTextComplexMode(true);                                   \
@@ -45,8 +45,6 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
     m_view->Clear();
     if (NULL == map_name)
         return;
-
-    CStringTable str_tbl;
 
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, "ui_mapinfo.xml");
@@ -68,7 +66,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
         st = new CUITextWnd();
         CUIXmlInit::InitTextWnd(xml_doc, "map_name", 0, st);
 
-        xr_string S = str_tbl.translate(map_name).c_str();
+        xr_string S = StringTable().translate(map_name).c_str();
         if (map_ver)
         {
             S += "[";
@@ -93,27 +91,27 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
 
         shared_str _modes = ltx.r_string_wb("map_info", "modes");
 
-        text = *str_tbl.translate("modes");
+        text = *StringTable().translate("modes");
         text += ": ";
         text += txt_color_tag;
         bool b_ = false;
         if (strstr(_modes.c_str(), "st_deathmatch"))
         {
-            text += *str_tbl.translate("st_deathmatch");
+            text += *StringTable().translate("st_deathmatch");
             b_ = true;
         }
         if (strstr(_modes.c_str(), "st_team_deathmatch"))
         {
             if (b_)
                 text += ", ";
-            text += *str_tbl.translate("st_team_deathmatch");
+            text += *StringTable().translate("st_team_deathmatch");
             b_ = true;
         }
         if (strstr(_modes.c_str(), "st_artefacthunt"))
         {
             if (b_)
                 text += ", ";
-            text += *str_tbl.translate("st_artefacthunt");
+            text += *StringTable().translate("st_artefacthunt");
         }
 
         text += "%c[default]\\n";
@@ -130,7 +128,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
         ADD_TEXT("mp_description", "short_desc", "");
 
         if (ltx.line_exist("map_info", "large_desc"))
-            m_large_desc = str_tbl.translate(ltx.r_string_wb("map_info", "large_desc"));
+            m_large_desc = StringTable().translate(ltx.r_string_wb("map_info", "large_desc"));
     }
     else
     {

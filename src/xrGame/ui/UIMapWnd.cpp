@@ -7,16 +7,16 @@
 #include "UIInventoryUtilities.h"
 #include "map_spot.h"
 #include "map_location.h"
-#include "UIFixedScrollBar.h"
-#include "UIFrameWindow.h"
-#include "UIFrameLineWnd.h"
-#include "UITabControl.h"
-#include "UI3tButton.h"
+#include "xrUICore/ScrollBar/UIFixedScrollBar.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/TabControl/UITabControl.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UIMapWndActions.h"
 #include "UIMapWndActionsSpace.h"
-#include "UIHint.h"
+#include "xrUICore/Hint/UIHint.h"
 #include "map_hint.h"
-#include "UICursor.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "xrEngine/xr_input.h" //remove me !!!
 
 CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(

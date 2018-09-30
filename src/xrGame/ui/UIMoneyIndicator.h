@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "KillMessageStruct.h"
 
 class CUIXml;

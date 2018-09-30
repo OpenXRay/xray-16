@@ -12,7 +12,7 @@
 
 #include "UIInvUpgrade.h"
 
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
 
 #include "ai_space.h"
@@ -248,7 +248,7 @@ void UIUpgrade::OnClick()
     if (m_state == STATE_ENABLED || m_state == STATE_FOCUSED || m_state == STATE_TOUCHED)
     {
         m_parent_wnd->AskUsing(
-            make_string("%s %s", CStringTable().translate("st_upgrade_install").c_str(), get_upgrade()->name()).c_str(),
+            make_string("%s %s", StringTable().translate("st_upgrade_install").c_str(), get_upgrade()->name()).c_str(),
             get_upgrade()->id_str());
     }
     m_parent_wnd->set_info_cur_upgrade(NULL);

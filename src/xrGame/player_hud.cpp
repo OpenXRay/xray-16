@@ -1,13 +1,12 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "player_hud.h"
 #include "HudItem.h"
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 #include "Actor.h"
 #include "physic_item.h"
 #include "static_cast_checked.hpp"
 #include "ActorEffector.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "xrCore/xrDebug_macros.h" // only for pragma todo
 
 
 player_hud* g_player_hud = nullptr;
@@ -15,14 +14,16 @@ Fvector _ancor_pos;
 Fvector _wpn_root_pos;
 
 // clang-format off
-static const float PITCH_OFFSET_R       = 0.017f;   // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры	--#SM+#--
-static const float PITCH_OFFSET_N       = 0.012f;   // Насколько сильно ствол поднимается\опускается при вертикальных поворотах камеры	--#SM+#--
-static const float PITCH_OFFSET_D       = 0.02f;    // Насколько сильно ствол приближается\отдаляется при вертикальных поворотах камеры --#SM+#--
-static const float PITCH_LOW_LIMIT      = -PI;      // Минимальное значение pitch при использовании совместно с PITCH_OFFSET_N			--#SM+#--
-static const float ORIGIN_OFFSET        = -0.05f;   // Фактор влияния инерции на положение ствола (чем меньше, тем маштабней инерция)	--#SM+#--
-static const float ORIGIN_OFFSET_AIM    = -0.03f;   // (Для прицеливания) --#SM+#--
-static const float TENDTO_SPEED         = 5.f;      // Скорость нормализации положения ствола --#SM+#--
-static const float TENDTO_SPEED_AIM     = 8.f;      // (Для прицеливания) --#SM+#--
+// --#SM+# Begin--
+constexpr float PITCH_OFFSET_R    = 0.0f;   // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
+constexpr float PITCH_OFFSET_N    = 0.0f;   // Насколько сильно ствол поднимается\опускается при вертикальных поворотах камеры
+constexpr float PITCH_OFFSET_D    = 0.02f;  // Насколько сильно ствол приближается\отдаляется при вертикальных поворотах камеры
+constexpr float PITCH_LOW_LIMIT   = -PI;    // Минимальное значение pitch при использовании совместно с PITCH_OFFSET_N
+constexpr float ORIGIN_OFFSET     = -0.05f; // Фактор влияния инерции на положение ствола (чем меньше, тем масштабней инерция)
+constexpr float ORIGIN_OFFSET_AIM = -0.03f; // (Для прицеливания)
+constexpr float TENDTO_SPEED      = 5.f;    // Скорость нормализации положения ствола
+constexpr float TENDTO_SPEED_AIM  = 8.f;    // (Для прицеливания)
+// --#SM+# End--
 // clang-format on
 
 float CalcMotionSpeed(const shared_str& anim_name)
@@ -292,7 +293,7 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
         sect_name.c_str());
 
     m_prop_flags.set(e_16x9_mode_now, is_16x9);
-	
+
     //Загрузка параметров инерции --#SM+# Begin--
     m_inertion_params.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, sect_name, "pitch_offset_right", PITCH_OFFSET_R);
     m_inertion_params.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, sect_name, "pitch_offset_up", PITCH_OFFSET_N);
@@ -303,8 +304,7 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     m_inertion_params.m_origin_offset_aim = READ_IF_EXISTS(pSettings, r_float, sect_name, "inertion_origin_aim_offset", ORIGIN_OFFSET_AIM);
     m_inertion_params.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, sect_name, "inertion_tendto_speed", TENDTO_SPEED);
     m_inertion_params.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, sect_name, "inertion_tendto_aim_speed", TENDTO_SPEED_AIM);
-    //--#SM+# End--	
-	
+    //--#SM+# End--
 }
 
 attachable_hud_item::~attachable_hud_item()
@@ -397,7 +397,6 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 
         string_path ce_path;
         string_path anm_name;
-#pragma todo("Xottab_DUTY: replace backslashes with slashes")
         strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
         if (FS.exist(ce_path, "$game_anims$", anm_name))
         {

@@ -4,10 +4,10 @@
 #include "Level.h"
 #include "game_cl_teamdeathmatch.h"
 #include "UIStatix.h"
-#include "UIScrollView.h"
-#include "UI3tButton.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "xr_level_controller.h"
-#include "UICursor.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "UIGameCustom.h"
 
 CUISpawnWnd::CUISpawnWnd() : m_iCurTeam(0)

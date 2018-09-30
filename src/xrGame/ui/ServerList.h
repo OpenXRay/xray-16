@@ -1,13 +1,13 @@
 #pragma once
 
-#include "UIWindow.h"
+#include "xrUICore/Windows/UIWindow.h"
 
-#include "UIListBox.h"
+#include "xrUICore/ListBox/UIListBox.h"
 #include "UIListItemServer.h"
-#include "UIFrameWindow.h"
-#include "UIFrameLineWnd.h"
-#include "UIEditBox.h"
-#include "UI3tButton.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/EditBox/UIEditBox.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "mixed_delegate.h"
 
 class CUIXml;

@@ -2,7 +2,7 @@
 
 class CBulletManager;
 
-#include "ui_defs.h"
+#include "xrUICore/ui_defs.h"
 
 class CTracer
 {

@@ -110,6 +110,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)3dsmax/ver-6.0/include;$(xrExternals)3dsmax/ver-6.0/cssdk/include;$(SolutionDir)plugins\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;UTILITY_EXPORTS;_MAX_EXPORT;_MAX_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -150,6 +151,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)3dsmax/ver-6.0/include;$(xrExternals)3dsmax/ver-6.0/cssdk/include;$(SolutionDir)plugins\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;UTILITY_EXPORTS;_MAX_EXPORT;_MAX_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

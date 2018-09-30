@@ -97,6 +97,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,6 +122,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

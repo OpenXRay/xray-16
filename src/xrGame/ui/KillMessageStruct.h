@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "ui_defs.h"
+#include "xrUICore/ui_defs.h"
 
 struct ColoredName
 {

@@ -103,6 +103,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)libvorbis\include;$(xrExternals)libogg\include;$(xrExternals)OpenAL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -139,6 +140,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)libvorbis\include;$(xrExternals)libogg\include;$(xrExternals)OpenAL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>

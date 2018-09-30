@@ -1046,7 +1046,7 @@ void xrServer::PerformCheckClientsForMaxPing()
                 if (Client->m_ping_warn.m_maxPingWarnings >= g_sv_maxPingWarningsCount)
                 { // kick
                     LPSTR reason;
-                    STRCONCAT(reason, CStringTable().translate("st_kicked_by_server").c_str());
+                    STRCONCAT(reason, StringTable().translate("st_kicked_by_server").c_str());
                     Level().Server->DisconnectClient(Client, reason);
                 }
                 else

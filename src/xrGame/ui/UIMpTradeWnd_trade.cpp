@@ -214,10 +214,10 @@ bool CUIMpTradeWnd::CheckBuyPossibility(const shared_str& sect_name, u32 buy_fla
         {
             if (!b_silent)
                 xr_sprintf(info_buffer, "%s. %s. %s[%d] %s[%d]",
-                    CStringTable().translate("ui_inv_cant_buy_item").c_str(),
-                    CStringTable().translate("ui_inv_not_enought_money").c_str(),
-                    CStringTable().translate("ui_inv_has").c_str(), GetMoneyAmount(),
-                    CStringTable().translate("ui_inv_need").c_str(), _item_cost);
+                    StringTable().translate("ui_inv_cant_buy_item").c_str(),
+                    StringTable().translate("ui_inv_not_enought_money").c_str(),
+                    StringTable().translate("ui_inv_has").c_str(), GetMoneyAmount(),
+                    StringTable().translate("ui_inv_need").c_str(), _item_cost);
             b_can_buy = false;
         };
     }
@@ -225,9 +225,9 @@ bool CUIMpTradeWnd::CheckBuyPossibility(const shared_str& sect_name, u32 buy_fla
     if (b_can_buy && (buy_flags & bf_check_rank_restr) && !g_mp_restrictions.IsAvailable(sect_name))
     {
         if (!b_silent)
-            xr_sprintf(info_buffer, "%s. %s. %s[%s] %s[%s] ", CStringTable().translate("ui_inv_cant_buy_item").c_str(),
-                CStringTable().translate("ui_inv_rank_restr").c_str(), CStringTable().translate("ui_inv_has").c_str(),
-                g_mp_restrictions.GetRankName(GetRank()).c_str(), CStringTable().translate("ui_inv_need").c_str(),
+            xr_sprintf(info_buffer, "%s. %s. %s[%s] %s[%s] ", StringTable().translate("ui_inv_cant_buy_item").c_str(),
+                StringTable().translate("ui_inv_rank_restr").c_str(), StringTable().translate("ui_inv_has").c_str(),
+                g_mp_restrictions.GetRankName(GetRank()).c_str(), StringTable().translate("ui_inv_need").c_str(),
                 g_mp_restrictions.GetRankName(get_rank(sect_name)).c_str());
         b_can_buy = false;
     }
@@ -243,9 +243,9 @@ bool CUIMpTradeWnd::CheckBuyPossibility(const shared_str& sect_name, u32 buy_fla
         if (cnt_have >= cnt_restr)
         {
             if (!b_silent)
-                xr_sprintf(info_buffer, "%s. %s. %s [%d]", CStringTable().translate("ui_inv_cant_buy_item").c_str(),
-                    CStringTable().translate("ui_inv_count_restr").c_str(),
-                    CStringTable().translate("ui_inv_you_already_have").c_str(), cnt_have);
+                xr_sprintf(info_buffer, "%s. %s. %s [%d]", StringTable().translate("ui_inv_cant_buy_item").c_str(),
+                    StringTable().translate("ui_inv_count_restr").c_str(),
+                    StringTable().translate("ui_inv_you_already_have").c_str(), cnt_have);
             b_can_buy = false;
         }
     }

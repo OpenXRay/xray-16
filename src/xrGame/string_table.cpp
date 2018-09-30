@@ -1,13 +1,19 @@
 #include "StdAfx.h"
 #include "string_table.h"
-
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "xr_level_controller.h"
+
+CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 
 STRING_TABLE_DATA* CStringTable::pData = NULL;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 
-CStringTable::CStringTable() { Init(); }
+CStringTable::CStringTable()
+{
+    pData = nullptr;
+}
+
+CStringTable::~CStringTable() { Destroy(); }
 void CStringTable::Destroy() { xr_delete(pData); }
 void CStringTable::rescan()
 {
@@ -96,13 +102,11 @@ void CStringTable::ReparseKeyBindings()
 
 STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
 {
-    //	LPCSTR str = "1 $$action_left$$ 2 $$action_right$$ 3 $$action_left$$ 4";
     xr_string res;
     int k = 0;
     const char* b;
 #define ACTION_STR "$$ACTION_"
 
-//.	int LEN				= (int)xr_strlen(ACTION_STR);
 #define LEN 9
 
     string256 buff;

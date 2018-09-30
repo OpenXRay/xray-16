@@ -7,7 +7,7 @@
 
 #include "StdAfx.h"
 #include "UIWarState.h"
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
 

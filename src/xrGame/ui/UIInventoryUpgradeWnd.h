@@ -9,7 +9,7 @@
 #ifndef UI_INVENTORY_UPGRADE_WND_H_INCLUDED
 #define UI_INVENTORY_UPGRADE_WND_H_INCLUDED
 
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UIInvUpgrade.h"
 
 extern const LPCSTR g_inventory_upgrade_xml;

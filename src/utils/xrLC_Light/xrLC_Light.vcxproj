@@ -104,6 +104,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;LEVEL_COMPILER;_USE_MATH_DEFINES;XRLC_LIGHT_EXPORTS;FORCE_NO_EXCEPTIONS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -122,6 +123,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;LEVEL_COMPILER;XRLC_LIGHT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

@@ -3,13 +3,13 @@
 #include "UIMapWnd.h"
 #include "Common/object_broker.h"
 #include "UIXmlInit.h"
-#include "UIStatic.h"
-#include "UI3tButton.h"
-#include "UIFrameLineWnd.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Buttons/UI3tButton.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "UISecondTaskWnd.h"
 #include "UIMapLegend.h"
 #include "UIHelper.h"
-#include "UIHint.h"
+#include "xrUICore/Hint/UIHint.h"
 #include "GameTask.h"
 #include "map_location.h"
 #include "map_location_defs.h"
@@ -19,7 +19,7 @@
 #include "Level.h"
 #include "GametaskManager.h"
 #include "Actor.h"
-#include "UICheckButton.h"
+#include "xrUICore/Buttons/UICheckButton.h"
 
 CUITaskWnd::CUITaskWnd() { hint_wnd = NULL; }
 CUITaskWnd::~CUITaskWnd() { delete_data(m_pMapWnd); }

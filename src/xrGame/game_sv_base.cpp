@@ -968,15 +968,14 @@ void game_sv_GameState::MapRotation_ListMaps()
         Msg("- Currently there are no any maps in list.");
         return;
     }
-    CStringTable st;
     Msg("- ----------- Maps ---------------");
     for (u32 i = 0; i < m_pMapRotation_List.size(); i++)
     {
         SMapRot& R = m_pMapRotation_List[i];
         if (i == 0)
-            Msg("~   %d. %s (%s) (current)", i + 1, st.translate(R.map_name).c_str(), R.map_name.c_str());
+            Msg("~   %d. %s (%s) (current)", i + 1, StringTable().translate(R.map_name).c_str(), R.map_name.c_str());
         else
-            Msg("  %d. %s (%s)", i + 1, st.translate(R.map_name).c_str(), R.map_name.c_str());
+            Msg("  %d. %s (%s)", i + 1, StringTable().translate(R.map_name).c_str(), R.map_name.c_str());
     }
     Msg("- --------------------------------");
 };
