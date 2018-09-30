@@ -42,8 +42,12 @@ public:
     void clear()
     {
         R_ASSERT(!m_bLocked);
-        for (auto& it : actions)
-            xr_delete(it);
+        while (!actions.empty())
+        {
+            ParticleAction* pa = actions.back();
+            actions.pop_back();
+            xr_delete(pa);
+        }
         actions.clear();
     }
 

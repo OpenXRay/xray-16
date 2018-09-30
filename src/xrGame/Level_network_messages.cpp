@@ -258,9 +258,9 @@ void CLevel::ClientReceive()
         case M_SV_CONFIG_NEW_CLIENT: InitializeClientGame(*P); break;
         case M_SV_CONFIG_GAME: game->net_import_state(*P); break;
         case M_SV_CONFIG_FINISHED: { game_configured = TRUE;
-#ifdef DEBUG
+//#ifdef DEBUG
             Msg("- Game configuring : Finished ");
-#endif // #ifdef DEBUG
+//#endif // #ifdef DEBUG
             if (IsDemoPlayStarted() && !m_current_spectator)
             {
                 SpawnDemoSpectator();
