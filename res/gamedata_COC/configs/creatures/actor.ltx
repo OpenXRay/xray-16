@@ -117,13 +117,13 @@ DynamicObjectsCount     = 32
 min_view_distance       = 1.0  ; коэффициент, который множится на eye_range, в зависимости от угла
 max_view_distance       = 1.0  ; коэффициент, который множится на eye_range, в зависимости от угла
 visibility_threshold    = 1.0  ; значение, при достижении суммой которого объект считается видимым
-always_visible_distance = 1.0
+always_visible_distance = 0.0
 time_quant              = 0.005
 decrease_value          = 0.1  ; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
 velocity_factor         = 0.5
 luminocity_factor       = 0.5 ;0 ; фактор освещения (только для Актёра)
 transparency_threshold  = 0.4 ; 0.25
-still_visible_time      = 5000 ; время, которое объект всё ещё считается видимым, даже если он уже не во фрустуме
+still_visible_time      = 1000 			; время, которое объект всё ещё считается видимым, даже если он уже не во фрустуме
 
 quick_item_1 = medkit
 quick_item_2 = bandage
