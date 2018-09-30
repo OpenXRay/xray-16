@@ -777,14 +777,14 @@ void CWeaponMagazinedWGrenade::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
     save_data(m_bGrenadeMode, output_packet);
-    save_data(0, output_packet);
+    save_data((u32)0, output_packet);
 }
 
 void CWeaponMagazinedWGrenade::load(IReader& input_packet)
 {
     inherited::load(input_packet);
     load_data(m_bGrenadeMode, input_packet);
-    int dummy;
+    u32 dummy;
     load_data(dummy, input_packet);
 }
 

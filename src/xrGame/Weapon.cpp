@@ -692,19 +692,19 @@ void CWeapon::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
     save_data(m_ammoElapsed.data, output_packet);
-    save_data(0, output_packet);
+    save_data((u8)0, output_packet);
     save_data(m_flagsAddOnState, output_packet);
     save_data(m_ammoType.data, output_packet);
     save_data(m_zoom_params.m_bIsZoomModeNow, output_packet);
-    save_data(0, output_packet);
+    save_data((bool)0, output_packet);
 }
 
 void CWeapon::load(IReader& input_packet)
 {
     inherited::load(input_packet);
     load_data(m_ammoElapsed.data, input_packet);
-    int dummy;
-    load_data(dummy, input_packet);
+    u8 dummyu8;
+    load_data(dummyu8, input_packet);
     load_data(m_flagsAddOnState, input_packet);
     UpdateAddonsVisibility();
     load_data(m_ammoType.data, input_packet);
@@ -714,7 +714,7 @@ void CWeapon::load(IReader& input_packet)
         OnZoomIn();
     else
         OnZoomOut();
-
+    bool dummy;
     load_data(dummy, input_packet);
 }
 
