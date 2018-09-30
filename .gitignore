@@ -12,3 +12,6 @@ lib/
 *.aps
 *.user
 *.PVS-Studio.*
+
+# exclude doxygen output
+doc/doxygen/html/*
