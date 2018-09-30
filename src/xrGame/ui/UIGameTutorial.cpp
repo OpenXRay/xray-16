@@ -94,7 +94,11 @@ bool CUISequenceItem::Stop(bool bForce)
     return true;
 }
 
-CUISequencer::CUISequencer() { m_flags.zero(); }
+CUISequencer::CUISequencer()
+{
+    m_flags.zero();
+    m_name = "invalid";
+}
 void CUISequencer::Start(LPCSTR tutor_name)
 {
     // Skip any tutorial except "game_loaded", since we need to show "st_press_any_key" hint
@@ -104,6 +108,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
     VERIFY(m_sequencer_items.size() == 0);
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
+    m_name = tutor_name;
     m_UIWindow = new CUIWindow();
 
     CUIXml uiXml;
