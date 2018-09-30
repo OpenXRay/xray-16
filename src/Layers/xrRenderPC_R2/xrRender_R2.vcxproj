@@ -274,6 +274,7 @@
     <ClInclude Include="..\xrRender\r__pixel_calculator.h" />
     <ClInclude Include="..\xrRender\r__sector.h" />
     <ClInclude Include="..\xrRender\Shader.h" />
+    <ClInclude Include="..\xrRender\ShaderResourceTraits.h" />
     <ClInclude Include="..\xrRender\SH_Atomic.h" />
     <ClInclude Include="..\xrRender\SH_Constant.h" />
     <ClInclude Include="..\xrRender\SH_Matrix.h" />
