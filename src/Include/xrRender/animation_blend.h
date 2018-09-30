@@ -16,7 +16,7 @@ public:
         //		eFixed,
         eAccrue,
         eFalloff,
-        eFORCEDWORD = u32(-1)
+        eFORCEDWORD = int(-1)
     };
 
 public:
