@@ -14,4 +14,4 @@ lib/
 *.PVS-Studio.*
 
 # exclude doxygen output
-doc/html/*
+doc/doxygen/html/*
