@@ -185,7 +185,7 @@ public:
 
 private:
     // Loading / Unloading
-    void LoadBuffers(CStreamReader* fs, BOOL _alternative);
+    void LoadBuffers(CStreamReader* fs, bool alternative);
     void LoadVisuals(IReader* fs);
     void LoadLights(IReader* fs);
     void LoadPortals(IReader* fs);
@@ -217,9 +217,9 @@ public:
 
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
-    D3DVERTEXELEMENT9* getVB_Format(int id, BOOL _alt = FALSE);
-    ID3DVertexBuffer* getVB(int id, BOOL _alt = FALSE);
-    ID3DIndexBuffer* getIB(int id, BOOL _alt = FALSE);
+    D3DVERTEXELEMENT9* getVB_Format(int id, bool alternative = false);
+    ID3DVertexBuffer* getVB(int id, bool alternative = false);
+    ID3DIndexBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();

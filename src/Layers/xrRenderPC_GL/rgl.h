@@ -188,7 +188,7 @@ public:
 
 private:
     // Loading / Unloading
-    void LoadBuffers(CStreamReader* fs, BOOL _alternative);
+    void LoadBuffers(CStreamReader* fs, bool alternative);
     void LoadVisuals(IReader* fs);
     void LoadLights(IReader* fs);
     void LoadPortals(IReader* fs);

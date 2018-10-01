@@ -255,12 +255,12 @@ D3DVERTEXELEMENT9* CRender::getVB_Format(int id)
     VERIFY(id < int(DCL.size()));
     return DCL[id].begin();
 }
-IDirect3DVertexBuffer9* CRender::getVB(int id)
+ID3DVertexBuffer* CRender::getVB(int id)
 {
     VERIFY(id < int(VB.size()));
     return VB[id];
 }
-IDirect3DIndexBuffer9* CRender::getIB(int id)
+ID3DIndexBuffer* CRender::getIB(int id)
 {
     VERIFY(id < int(IB.size()));
     return IB[id];

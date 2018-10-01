@@ -59,7 +59,7 @@ void CRender::level_Load(IReader* fs)
         {
             CStreamReader* geom = FS.rs_open("$level$", "level.geom");
             R_ASSERT2(geom, "level.geom");
-            LoadBuffers(geom, FALSE);
+            LoadBuffers(geom, false);
             LoadSWIs(geom);
             FS.r_close(geom);
         }
@@ -68,7 +68,7 @@ void CRender::level_Load(IReader* fs)
         {
             CStreamReader* geom = FS.rs_open("$level$", "level.geomx");
             R_ASSERT2(geom, "level.geomX");
-            LoadBuffers(geom, TRUE);
+            LoadBuffers(geom, true);
             FS.r_close(geom);
         }
 
@@ -203,15 +203,15 @@ void CRender::level_Unload()
     */
 }
 
-void CRender::LoadBuffers(CStreamReader* base_fs, BOOL _alternative)
+void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 {
     R_ASSERT2(base_fs, "Could not load geometry. File not found.");
     Resources->Evict();
     u32 dwUsage = D3DUSAGE_WRITEONLY;
 
-    xr_vector<VertexDeclarator>& _DC = _alternative ? xDC : nDC;
-    xr_vector<IDirect3DVertexBuffer9*>& _VB = _alternative ? xVB : nVB;
-    xr_vector<IDirect3DIndexBuffer9*>& _IB = _alternative ? xIB : nIB;
+    xr_vector<VertexDeclarator>& _DC  = alternative ? xDC : nDC;
+    xr_vector<ID3DVertexBuffer*>& _VB = alternative ? xVB : nVB;
+    xr_vector<ID3DIndexBuffer*>& _IB  = alternative ? xIB : nIB;
 
     // Vertex buffers
     {
