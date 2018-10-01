@@ -78,7 +78,6 @@ CDetailManager::CDetailManager() : xrc("detail manager")
 {
     dtFS = nullptr;
     dtSlots = nullptr;
-    soft_Geom = nullptr;
     hw_Geom = nullptr;
     hw_BatchSize = 0;
     hw_VB = 0;
@@ -194,11 +193,7 @@ void CDetailManager::Load()
     // Make dither matrix
     bwdithermap(2, dither);
 
-    // Hardware specific optimizations
-    if (UseVS())
-        hw_Load();
-    else
-        soft_Load();
+    hw_Load();
 
     // swing desc
     // normal
@@ -217,10 +212,7 @@ void CDetailManager::Load()
 #endif
 void CDetailManager::Unload()
 {
-    if (UseVS())
-        hw_Unload();
-    else
-        soft_Unload();
+    hw_Unload();
 
     for (DetailIt it = objects.begin(); it != objects.end(); it++)
     {
@@ -399,10 +391,9 @@ void CDetailManager::Render()
 
     RCache.set_CullMode(CULL_NONE);
     RCache.set_xform_world(Fidentity);
-    if (UseVS())
-        hw_Render();
-    else
-        soft_Render();
+
+    hw_Render();
+
     RCache.set_CullMode(CULL_CCW);
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]

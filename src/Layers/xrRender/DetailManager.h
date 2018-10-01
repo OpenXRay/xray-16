@@ -184,13 +184,6 @@ public:
     virtual ObjectList* GetSnapList() = 0;
 #endif
 
-    bool UseVS() { return HW.Caps.geometry_major >= 1; }
-    // Software processor
-    ref_geom soft_Geom;
-    void soft_Load();
-    void soft_Unload();
-    void soft_Render();
-
     // Hardware processor
     ref_geom hw_Geom;
     u32 hw_BatchSize;
