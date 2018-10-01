@@ -87,7 +87,9 @@ SCRIPT_EXPORT(connect_error_cb, (), {
         class_<connect_error_cb>("connect_error_cb")
             .def(constructor<>())
             .def(constructor<connect_error_cb::lua_object_type, connect_error_cb::lua_function_type>())
+#ifndef LINUX // FIXME!!!
             .def("bind", &connect_error_cb::bind)
+#endif
             .def("clear", &connect_error_cb::clear)
     ];
 });

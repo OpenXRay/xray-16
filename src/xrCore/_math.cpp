@@ -211,11 +211,7 @@ void initialize()
 
 namespace CPU
 {
-XRCORE_API u64 qpc_freq = [] {
-    u64 result;
-    QueryPerformanceCounter((PLARGE_INTEGER)&result);
-    return result;
-}();
+XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
 XRCORE_API u32 qpc_counter = 0;
 
