@@ -116,6 +116,7 @@ float ps_r1_lmodel_lerp = 0.1f;
 float ps_r1_dlights_clip = 40.f;
 float ps_r1_pps_u = 0.f;
 float ps_r1_pps_v = 0.f;
+int ps_r1_force_geomx = 0;
 
 // R1-specific
 int ps_r1_GlowsPerFrame = 16; // r1-only
@@ -743,6 +744,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r1_dlights_clip", &ps_r1_dlights_clip, 10.f, 150.f);
     CMD4(CCC_Float, "r1_pps_u", &ps_r1_pps_u, -1.f, +1.f);
     CMD4(CCC_Float, "r1_pps_v", &ps_r1_pps_v, -1.f, +1.f);
+    CMD4(CCC_Integer, "r1_force_geomx", &ps_r1_force_geomx, 0, 1);
 
     // R1-specific
     CMD4(CCC_Integer, "r1_glows_per_frame", &ps_r1_GlowsPerFrame, 2, 32);

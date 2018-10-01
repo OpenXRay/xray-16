@@ -250,20 +250,44 @@ IRenderVisual* CRender::getVisual(int id)
     VERIFY(id < int(Visuals.size()));
     return Visuals[id];
 }
-D3DVERTEXELEMENT9* CRender::getVB_Format(int id)
+D3DVERTEXELEMENT9* CRender::getVB_Format(int id, bool alternative)
 {
-    VERIFY(id < int(DCL.size()));
-    return DCL[id].begin();
+    if (alternative)
+    {
+        VERIFY(id < int(xDC.size()));
+        return xDC[id].begin();
+    }
+    else
+    {
+        VERIFY(id < int(nDC.size()));
+        return nDC[id].begin();
+    }
 }
-ID3DVertexBuffer* CRender::getVB(int id)
+ID3DVertexBuffer* CRender::getVB(int id, bool alternative)
 {
-    VERIFY(id < int(VB.size()));
-    return VB[id];
+    if (alternative)
+    {
+        VERIFY(id < int(xVB.size()));
+        return xVB[id];
+    }
+    else
+    {
+        VERIFY(id < int(nVB.size()));
+        return nVB[id];
+    }
 }
-ID3DIndexBuffer* CRender::getIB(int id)
+ID3DIndexBuffer* CRender::getIB(int id, bool alternative)
 {
-    VERIFY(id < int(IB.size()));
-    return IB[id];
+    if (alternative)
+    {
+        VERIFY(id < int(xIB.size()));
+        return xIB[id];
+    }
+    else
+    {
+        VERIFY(id < int(nIB.size()));
+        return nIB[id];
+    }
 }
 FSlideWindowItem* CRender::getSWI(int id)
 {
