@@ -14,7 +14,7 @@ void dxConsoleRender::OnRender(bool bGame)
 {
     VERIFY(HW.pDevice);
 
-    D3DRECT R = {0, 0, Device.dwWidth, Device.dwHeight};
+    D3DRECT R = {0, 0, static_cast<LONG>(Device.dwWidth), static_cast<LONG>(Device.dwHeight)};
     if (bGame)
         R.y2 /= 2;
 

@@ -226,8 +226,8 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
         break;
     case D3DSAMP_BORDERCOLOR: /* D3DCOLOR */
     {
-        GLint color[] = {color_get_R(value), color_get_G(value), color_get_B(value), color_get_A(value)};
-        CHK_GL(glSamplerParameteriv(m_samplerArray[stage], GL_TEXTURE_BORDER_COLOR, color));
+        GLuint color[] = {color_get_R(value), color_get_G(value), color_get_B(value), color_get_A(value)};
+        CHK_GL(glSamplerParameterIuiv(m_samplerArray[stage], GL_TEXTURE_BORDER_COLOR, color));
     }
         break;
     case D3DSAMP_MAGFILTER: /* D3DTEXTUREFILTER filter to use for magnification */
