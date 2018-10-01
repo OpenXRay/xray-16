@@ -3,6 +3,7 @@ xrCore/.GitInfo.hpp
 # exclude binaries and temporary files
 ipch/
 packages/
+_ReSharper.Caches/
 
 # User-specific files
 *.suo
