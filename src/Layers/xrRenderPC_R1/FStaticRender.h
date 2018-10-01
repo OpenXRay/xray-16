@@ -55,7 +55,7 @@ public:
     xr_vector<IDirect3DIndexBuffer9*> IB;
     xr_vector<dxRender_Visual*> Visuals;
     CPSLibrary PSLibrary;
-    CLight_DB* L_DB;
+    CLight_DB Lights;
     CLightR_Manager* L_Dynamic;
     CLightShadows* L_Shadows;
     CLightProjector* L_Projector;

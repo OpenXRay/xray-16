@@ -46,10 +46,8 @@ void CRender::level_Load(IReader* fs)
     }
 
     // Components
-
     L_Shadows = new CLightShadows();
     L_Projector = new CLightProjector();
-    L_DB = new CLight_DB();
     L_Glows = new CGlowManager();
     Wallmarks = new CWallmarksEngine();
     Details = new CDetailManager();
@@ -133,7 +131,7 @@ void CRender::level_Unload()
 
     //*** Lights
     L_Glows->Unload();
-    L_DB->Unload();
+    Lights.Unload();
 
     //*** Visuals
     for (I = 0; I < Visuals.size(); I++)
@@ -161,7 +159,6 @@ void CRender::level_Unload()
     xr_delete(Details);
     xr_delete(Wallmarks);
     xr_delete(L_Glows);
-    xr_delete(L_DB);
     xr_delete(L_Projector);
     xr_delete(L_Shadows);
 
@@ -278,7 +275,7 @@ void CRender::LoadVisuals(IReader* fs)
 void CRender::LoadLights(IReader* fs)
 {
     // lights
-    L_DB->Load(fs);
+    Lights.Load(fs);
 
     // glows
     IReader* chunk = fs->open_chunk(fsL_GLOWS);

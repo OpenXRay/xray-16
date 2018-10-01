@@ -52,7 +52,6 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
 //////////////////////////////////////////////////////////////////////////
 void CRender::create()
 {
-    L_DB = nullptr;
     L_Shadows = nullptr;
     L_Projector = nullptr;
 
@@ -272,7 +271,7 @@ FSlideWindowItem* CRender::getSWI(int id)
     return &SWIs[id];
 }
 IRender_Target* CRender::getTarget() { return Target; }
-IRender_Light* CRender::light_create() { return L_DB->Create(); }
+IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return new CGlow(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
 BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
@@ -476,9 +475,9 @@ void CRender::Calculate()
             pPortal->bDualRender = TRUE;
         }
     }
+    
     //
-    if (L_DB)
-        L_DB->Update();
+    Lights.Update();
 
     // Main process
     marker++;
@@ -609,7 +608,7 @@ void CRender::Calculate()
                         {
                             vis_data& vis = L->get_homdata();
                             if (HOM.visible(vis))
-                                L_DB->add_light(L);
+                                Lights.add_light(L);
                         }
                     }
                 }
