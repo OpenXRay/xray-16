@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "UIFixedScrollBar.h"
 #include "Buttons/UI3tButton.h"
 #include "Windows/UIFrameLineWnd.h"
 #include "UIScrollBox.h"

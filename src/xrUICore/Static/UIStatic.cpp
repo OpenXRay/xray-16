@@ -4,7 +4,7 @@
 
 #include "XML/UITextureMaster.h"
 #include "xrEngine/LightAnimLibrary.h"
-#include "Lines/uiLines.h"
+#include "Lines/UILines.h"
 #include "Include/xrRender/UIRender.h"
 #include "Buttons/UIBtnHint.h"
 #include "Cursor/UICursor.h"

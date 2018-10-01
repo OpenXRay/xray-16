@@ -9,7 +9,7 @@
 
 #include "pch.hpp"
 #include "UIComboBox.h"
-#include "ListBox\UIListBoxItem.h"
+#include "ListBox/UIListBoxItem.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

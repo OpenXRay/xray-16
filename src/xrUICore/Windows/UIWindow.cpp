@@ -3,7 +3,7 @@
 #include "Cursor/UICursor.h"
 #include "Include/xrRender/DebugRender.h"
 #include "Include/xrRender/UIRender.h"
-#include "xrEngine\xr_input_xinput.h"
+#include "xrEngine/xr_input_xinput.h"
 
 xr_vector<Frect> g_wnds_rects;
 BOOL g_show_wnd_rect2 = FALSE;
