@@ -794,9 +794,6 @@
     <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp">
       <Filter>Details</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\DetailManager_soft.cpp">
-      <Filter>Details</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp">
       <Filter>Details</Filter>
     </ClCompile>
