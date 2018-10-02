@@ -37,6 +37,24 @@
 using namespace luabind;
 using namespace luabind::policy;
 
+/*
+    New luabind makes incorrect casts in this case. He makes casts only to 'true derived class'.
+    For example:
+    db.actor:cast_GameObject() returns NOT object of class CGameObject*
+    it returns CActor* !
+    Also, we can't to use just 'return smart_cast<TClass*>(&script_obj->object())' here, because
+    db.actor:cast_Weapon() returns not 'nil', it returns CActor*.
+*/
+template <typename TClass>
+TClass* ObjectCast(CScriptGameObject* scriptObj)
+{
+    TClass* obj = smart_cast<TClass*>(&scriptObj->object());
+    if (obj)
+        return obj;
+
+    return nullptr;
+}
+
 class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject>& instance)
 {
     instance
@@ -397,46 +415,47 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 #endif
         //-Alundaio
 
-        //AVO: additional functions
-        #ifdef GAME_OBJECT_TESTING_EXPORTS
-        //.def("is_actor_indoors", &CScriptGameObject::IsActorIndoors)
-        //.def("is_game_object", &CScriptGameObject::isGameObject)
-        //.def("is_car", &CScriptGameObject::isCar)
-        //.def("is_helicopter", &CScriptGameObject::isHeli)
-        //.def("is_holder", &CScriptGameObject::isHolderCustom)
-        .def("is_entity_alive", &CScriptGameObject::isEntityAlive)
-        .def("is_inventory_item", &CScriptGameObject::isInventoryItem)
-        .def("is_inventory_owner", &CScriptGameObject::isInventoryOwner)
-        .def("is_actor", &CScriptGameObject::isActor)
-        .def("is_custom_monster", &CScriptGameObject::isCustomMonster)
-        .def("is_weapon", &CScriptGameObject::isWeapon)
-        //.def("is_medkit", &CScriptGameObject::isMedkit)
-        //.def("is_eatable_item", &CScriptGameObject::isEatableItem)
-        //.def("is_antirad", &CScriptGameObject::isAntirad)
-        .def("is_outfit", &CScriptGameObject::isCustomOutfit)
-        .def("is_scope", &CScriptGameObject::isScope)
-        .def("is_silencer", &CScriptGameObject::isSilencer)
-        .def("is_grenade_launcher", &CScriptGameObject::isGrenadeLauncher)
-        .def("is_weapon_magazined", &CScriptGameObject::isWeaponMagazined)
-        .def("is_space_restrictor", &CScriptGameObject::isSpaceRestrictor)
-        .def("is_stalker", &CScriptGameObject::isStalker)
-        .def("is_anomaly", &CScriptGameObject::isAnomaly)
-        .def("is_monster", &CScriptGameObject::isMonster)
-        //.def("is_explosive", &CScriptGameObject::isExplosive)
-        //.def("is_script_zone", &CScriptGameObject::isScriptZone)
-        //.def("is_projector", &CScriptGameObject::isProjector)
-        .def("is_trader", &CScriptGameObject::isTrader)
-        .def("is_hud_item", &CScriptGameObject::isHudItem)
-        //.def("is_food_item", &CScriptGameObject::isFoodItem)
-        .def("is_artefact", &CScriptGameObject::isArtefact)
-        .def("is_ammo", &CScriptGameObject::isAmmo)
-        //.def("is_missile", &CScriptGameObject::isMissile)
-        //.def("is_physics_shell_holder", &CScriptGameObject::isPhysicsShellHolder)
-        //.def("is_grenade", &CScriptGameObject::isGrenade)
-        //.def("is_bottle_item", &CScriptGameObject::isBottleItem)
-        //.def("is_torch", &CScriptGameObject::isTorch)
-        .def("is_weapon_gl", &CScriptGameObject::isWeaponGL)
-        .def("is_inventory_box", &CScriptGameObject::isInventoryBox)
+#ifdef GAME_OBJECT_CASTING_EXPORTS
+        // Casting objects
+        .def("cast_GameObject", &ObjectCast<CGameObject>)
+        .def("cast_Car", &ObjectCast<CCar>)
+        .def("cast_Heli", &ObjectCast<CHelicopter>)
+        .def("cast_HolderCustom", &ObjectCast<CHolderCustom>)
+        .def("cast_EntityAlive", &ObjectCast<CEntityAlive>)
+        .def("cast_InventoryItem", &ObjectCast<CInventoryItem>)
+        .def("cast_InventoryOwner", &ObjectCast<CInventoryOwner>)
+        .def("cast_Actor", &ObjectCast<CActor>)
+        .def("cast_Weapon", &ObjectCast<CWeapon>)
+        //.def("cast_Medkit", &ObjectCast<CMedkit>)
+        //.def("cast_EatableItem", &ObjectCast<CEatableItem>)
+        //.def("cast_Antirad", &ObjectCast<CAntirad>)
+        //.def("cast_CustomOutfit", &ObjectCast<CCustomOutfit>)
+        //.def("cast_Scope", &ObjectCast<CScope>)
+        //.def("cast_Silencer", &ObjectCast<CSilencer>)
+        //.def("cast_GrenadeLauncher", &ObjectCast<CGrenadeLauncher>)
+        .def("cast_WeaponMagazined", &ObjectCast<CWeaponMagazined>)
+        .def("cast_SpaceRestrictor", &ObjectCast<CSpaceRestrictor>)
+        .def("cast_Stalker", &ObjectCast<CAI_Stalker>)
+        .def("cast_CustomZone", &ObjectCast<CCustomZone>)
+        .def("cast_Monster", &ObjectCast<CCustomMonster>)
+        .def("cast_Explosive", &ObjectCast<CExplosive>)
+        .def("cast_ScriptZone", &ObjectCast<CScriptZone>)
+        //.def("cast_Projector", &ObjectCast<CProjector>)
+        //.def("cast_Trader", &ObjectCast<CAI_Trader>)
+        //.def("cast_HudItem", &ObjectCast<CHudItem>)
+        //.def("cast_FoodItem", &ObjectCast<CFoodItem>)
+        .def("cast_Artefact", &ObjectCast<CArtefact>)
+        .def("cast_Ammo", &ObjectCast<CWeaponAmmo>)
+        //.def("cast_Missile", &ObjectCast<CMissile>)
+        .def("cast_PhysicsShellHolder", &ObjectCast<CPhysicsShellHolder>)
+        //.def("cast_Grenade", &ObjectCast<CGrenade>)
+        //.def("cast_BottleItem", &ObjectCast<CBottleItem>)
+        //.def("cast_Torch", &ObjectCast<CTorch>)
+        //.def("cast_WeaponMagazinedWGrenade", &ObjectCast<CWeaponMagazinedWGrenade>)
+        //.def("cast_InventoryBox", &ObjectCast<CInventoryBox>)
+#endif // GAME_OBJECT_CASTING_EXPORTS
+
+
         .def("is_on_belt", &CScriptGameObject::IsOnBelt)
         .def("item_on_belt", &CScriptGameObject::ItemOnBelt)
         .def("belt_count", &CScriptGameObject::BeltSize)
@@ -460,7 +479,6 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("set_actor_run_coef", &CScriptGameObject::SetActorRunCoef)
         .def("get_actor_runback_coef", &CScriptGameObject::GetActorRunBackCoef)
         .def("set_actor_runback_coef", &CScriptGameObject::SetActorRunBackCoef)
-#endif // GAME_OBJECT_TESTING_EXPORTS
         //-AVO
 
         ;
