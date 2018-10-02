@@ -787,49 +787,6 @@ public:
     void unlock_door_for_npc();
     bool is_door_blocked_by_npc() const;
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
-
-    //AVO: functions for object testing
-#ifdef GAME_OBJECT_TESTING_EXPORTS
-    //bool isGameObject() const;
-    //bool isCar() const;
-    //bool isHeli() const;
-    //bool isHolderCustom() const;
-    bool isEntityAlive() const;
-    bool isInventoryItem() const;
-    bool isInventoryOwner() const;
-    bool isActor() const;
-    bool isCustomMonster() const;
-    bool isWeapon() const;
-    //bool isMedkit() const;
-    //bool isEatableItem() const;
-    //bool isAntirad() const;
-    bool isCustomOutfit() const;
-    bool isScope() const;
-    bool isSilencer() const;
-    bool isGrenadeLauncher() const;
-    bool isWeaponMagazined() const;
-    bool isSpaceRestrictor() const;
-    bool isStalker() const;
-    bool isAnomaly() const;
-    bool isMonster() const;
-    //bool isExplosive() const;
-    //bool isScriptZone() const;
-    //bool isProjector() const;
-    bool isTrader() const;
-    bool isHudItem() const;
-    //bool isFoodItem() const;
-    bool isArtefact() const;
-    bool isAmmo() const;
-    //bool isMissile() const;
-    //bool isPhysicsShellHolder() const;
-    //bool isGrenade() const;
-    //bool isBottleItem() const;
-    //bool isTorch() const;
-    bool isWeaponGL() const;
-    bool isInventoryBox() const;
-    
-#endif // GAME_OBJECT_TESTING_EXPORTS
-    //-AVO
     
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
     void SetHealthEx(float hp); //AVO
