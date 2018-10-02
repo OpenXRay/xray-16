@@ -112,16 +112,6 @@ function opt_menu_on_init(menu)
 			end
 		end
 	end}
-	-- detector_charge
-	menu.gameplay_options["detector_charge"]		= {default=true, 	debug_only=true, 	typ="check", on_accept=function(handler,optMgr,ctrl)
-		if (level.present() and detector_charge) then
-			if (ctrl:GetCheck()) then
-				detector_charge.activate_feature()
-			else
-				detector_charge.deactivate_feature()
-			end
-		end
-	end}
 	-- enhanced_recoil
 	menu.gameplay_options["enhanced_recoil"]		= {default=false,	debug_only=false,	typ="check", on_accept=function(handler, optMgr, ctrl)
 		if (ctrl:GetCheck()) then
