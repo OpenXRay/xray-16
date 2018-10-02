@@ -24,11 +24,13 @@ function set_sound_play(npc_id, sound, faction, point)
 		printf("set_sound_play. Trying to play wrong type. %s is %s",sound,snd_theme.class_id)
 	end
 	
+	update(npc_id)
+	
 	if sound_table[npc_id] == nil or snd_theme.play_always == true then
 		if (sound_table[npc_id] and sound_table[npc_id].reset) then 
 			sound_table[npc_id]:reset(npc_id)
 		end
-		if snd_theme:play(npc_id, faction, point,sound) then
+		if snd_theme:play(npc_id, faction, point) then
 			sound_table[npc_id] = snd_theme
 		end
 	end
@@ -36,11 +38,9 @@ function set_sound_play(npc_id, sound, faction, point)
 end
 
 function update(npc_id)
-	if not sound_table[npc_id] then
-		return 
-	end
-	if not(sound_table[npc_id]:is_playing(npc_id)) then
-		sound_table[npc_id]:callback(npc_id)
+	local snd_theme = sound_table[npc_id]
+	if (snd_theme and not snd_theme:is_playing(npc_id)) then
+		snd_theme:callback(npc_id)
 		sound_table[npc_id] = nil
 	end
 end

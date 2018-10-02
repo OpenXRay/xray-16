@@ -126,23 +126,20 @@ function npc_sound:init_npc(npc)
 	if self.prefix == false then
 		npc:sound_prefix(character_prefix)
 	end
-	if self.group_snd then
+
+	if (self.group_snd) then
 		self.can_play_group_sound = true
-	else
-		if self.can_play_sound[npc_id] ~= false then
-			self.can_play_sound[npc_id] = true
-		end
 	end
+	self.can_play_sound[npc_id] = true
 end
 function npc_sound:callback(npc_id)
 	self.played_time = time_global()
 	self.idle_time = math.random(self.min_idle, self.max_idle) * 1000
 
-	if self.group_snd then
+	if (self.group_snd) then
 		self.can_play_group_sound = true
-	else
-		self.can_play_sound[npc_id] = true
 	end
+	self.can_play_sound[npc_id] = true
 
 --	printf("npc_sound:callback!!!!!!!!")
 
@@ -171,7 +168,7 @@ function npc_sound:callback(npc_id)
 		st[st.active_scheme].signals["sound_end"] = true
 	end
 end
-function npc_sound:play(npc_id, faction, point, sound)
+function npc_sound:play(npc_id, faction, point)
 
 	--alun_utils.debug_write(strformat("npc_sound:play npc_id=%s faction=%s msg=%s",npc_id,faction,msg))
 	local npc = db.storage[npc_id] and db.storage[npc_id].object
@@ -205,12 +202,13 @@ function npc_sound:play(npc_id, faction, point, sound)
 		return false
 	end
 
+	
 	npc:play_sound(npc_data.id, self.delay_sound+0.06, self.delay_sound+0.05, 1, 0, self.played_id)
-
+	
 	local table_id = self.played_id + 1
 	local snd = self.sound_path[npc_id][table_id]
 	if not (snd) then 
-		printf("sound_theme.npc_sound:play() snd is nil! %s",sound)
+		printf("sound_theme.npc_sound:play() snd is nil! %s",self.section)
 		return
 	end
 
@@ -226,11 +224,10 @@ function npc_sound:play(npc_id, faction, point, sound)
 	--printf("snd_path is "..tostring(self.sound_path[npc_id][table_id]))
 	local snd_st, num_copy = string.gsub(snd, "\\", "_")
 
-	if self.group_snd then
+	if (self.group_snd) then
 		self.can_play_group_sound = false
-	else
-		self.can_play_sound[npc_id] = false
 	end
+	self.can_play_sound[npc_id] = false
 
 	if not closecaption.sound(snd, sound_object(snd):length(), npc, faction, point, self.delay_sound) then
 		if game.translate_string(snd_st) ~= snd_st then

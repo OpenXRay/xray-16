@@ -227,10 +227,10 @@ function Cmeet_manager:update_state()
 		state_mgr.set_state(self.npc, state, nil, nil, {look_object = victim})
 	end
 
-	local snd = self.a.far_snd and xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_snd)
-	if (snd and snd ~= "nil" and snd ~= "") then
-		xr_sound.set_sound_play(self.npc:id(), snd)
-	end
+	-- local snd = self.a.far_snd and xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_snd)
+	-- if (snd and snd ~= "nil" and snd ~= "") then
+		-- xr_sound.set_sound_play(self.npc:id(), snd)
+	-- end
 end
 function Cmeet_manager:set_start_distance()
 	if db.actor == nil then

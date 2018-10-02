@@ -183,6 +183,9 @@ function add_to_binder(npc, ini, scheme, section, storage)
 	xr_logic.subscribe_action_for_events(npc, storage, new_action)
 	new_action = manager:action(xr_actions_id.alife)
 	new_action:add_precondition(world_property(properties["need_remark"], false))
+	
+	new_action = manager:action(xr_actions_id.stohe_meet_base+1)
+	new_action:add_precondition(world_property(properties["need_remark"], false))
 end
 
 
