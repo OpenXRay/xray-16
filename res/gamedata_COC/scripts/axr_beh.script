@@ -315,9 +315,9 @@ function action_beh:beh_cover()
 		return 
 	end 
 	self.keep_state_until = t + keep_state_min_time
-	local new_state = self.st.wait_animation or "hide"
+	local new_state = self.st.wait_animation or "idle"
 	if (new_state == "rnd") then 
-		new_state = random_choice("binocular","idle","hide","caution")
+		new_state = random_choice("binocular","idle","caution")
 	end
 	state_mgr.set_state(self.object,new_state,nil,nil,{look_object = self.st.desired_target and self.st.desired_target.object or nil})
 end 

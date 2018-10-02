@@ -90,7 +90,7 @@ function action_look_around:reset()
 		self.st.last_seen_pos = self.object:best_enemy():position()
 	end
 
-	state_mgr.set_state( self.object, "hide", nil, nil, { look_position = self.st.last_seen_pos } )
+	state_mgr.set_state( self.object, "hide_na", nil, nil, { look_position = self.st.last_seen_pos } )
 end
 
 function action_look_around:execute()
@@ -115,7 +115,7 @@ function action_look_around:execute()
 		local dir = vector():set( self.st.last_seen_pos ):sub( self.object:position() )
 		dir = vector_rotate_y( dir, ang )
 
-		state_mgr.set_state( self.object, "hide", nil, nil, { look_position = self.object:position():add( dir ) } )
+		state_mgr.set_state( self.object, "hide_na", nil, nil, { look_position = self.object:position():add( dir ) } )
 	end
 end
 

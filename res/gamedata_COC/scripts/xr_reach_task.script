@@ -245,7 +245,7 @@ function action_reach_task_location:fake_target(squad,is_monolith)
 	if (is_monolith) then 
 		state = "trans_0"
 	else 
-		local anims = {"idle","hide","idle_chasovoy","caution"}
+		local anims = {"idle","idle_chasovoy","caution"}
 		state = anims[math.random(#anims)]
 	end
 

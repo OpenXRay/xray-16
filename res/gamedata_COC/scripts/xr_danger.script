@@ -444,6 +444,16 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 		local dist = bdo and bdo:position():distance_to_sqr(npc:position()) or 0
 		if (st.lvid == npc:level_vertex_id() or dist <= st.rnd) then
 			local rnd = math_random(100)
+			
+			local bw = npc:best_weapon()
+			if (bw and IsWeapon(bw)) then
+				local hand_dependence = system_ini():r_float_ex(bw:section(),"hand_dependence",1)
+				if (hand_dependence < 2) then
+					rnd = 100
+					st.searched = true
+				end
+			end
+				
 			if (rnd <= 33) then
 				xr_sound.set_sound_play(npc:id(),"search")
 				state_mgr.set_state(npc,"check_corpse",nil,nil,{look_position = dst and dst.killer_last_known_position})

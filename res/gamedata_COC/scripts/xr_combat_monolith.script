@@ -167,7 +167,7 @@ function action_look_around:execute()
 		local ang = math.rad( math.random( 0, 359 ) )
 		local pos = self.object:position():add( vector():set( math.cos( ang ), 0, math.sin( ang ) ) )
 
-		state_mgr.set_state( self.object, "hide", nil, nil, { look_position = pos } )
+		state_mgr.set_state( self.object, "hide_na", nil, nil, { look_position = pos } )
 	end
 end
 

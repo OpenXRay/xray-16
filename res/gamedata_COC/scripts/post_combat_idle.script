@@ -137,9 +137,17 @@ function action_post_combat_wait:execute()
 
 	local comm = character_community(self.object)
 
-	local state = "hide"
-	local anims = {"idle","hide","idle_chasovoy","caution"}
+	local state = "idle"
+	local anims = {"idle","idle_chasovoy","caution"}
 
+	local bw = npc:best_weapon()
+	if (bw and IsWeapon(bw)) then
+		local hand_dependence = system_ini():r_float_ex(bw:section(),"hand_dependence",1)
+		if (hand_dependence > 1) then
+			table.insert(anims,"hide")
+		end
+	end
+	
 	-- story npcs should only use base anims or it might seem strange
 	local squad = not get_object_story_id(self.object:id()) and get_object_squad(self.object)
 	if (squad) then
