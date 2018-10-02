@@ -1224,7 +1224,7 @@ close_snd_bye                  = nil
 close_victim                   = {=is_wounded} nil, {!is_squad_commander} nil, actor
 far_distance                   = {=is_wounded} 0, {!is_squad_commander} 0, {!after_first_meet !actor_friend =actor_has_weapon} 5, 5
 far_anim                       = {=is_wounded} nil, {!is_squad_commander} nil, {!after_first_meet !actor_friend =actor_has_weapon} threat_na, nil
-far_snd                        = {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {!after_first_meet !actor_friend =actor_has_weapon} meet_hide_weapon, meet_wait
+far_snd                        = {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=is_story} nil, {!after_first_meet !actor_friend =actor_has_weapon} meet_hide_weapon, meet_wait
 far_victim                     = {=is_wounded} nil, {!is_squad_commander} nil, actor
 use                            = {=is_wounded} false, {!is_squad_commander} false, {=actor_enemy} false, {=has_enemy} false,  {=dist_to_actor_le(3)} true, false
 snd_on_use                     = {=is_wounded} nil, {=actor_enemy} nil, {!is_squad_commander} meet_use_no_talk_leader,  {=has_enemy} meet_use_no_fight, {=dist_to_actor_le(3)} meet_use_no_default, nil

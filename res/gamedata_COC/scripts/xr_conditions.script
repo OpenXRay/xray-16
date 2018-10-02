@@ -3008,3 +3008,7 @@ function base_defense_is_actor_on_level(actor,npc,p)
 	end 
 	return true
 end
+
+function is_story(actor,npc,p)
+	return npc and get_object_story_id(type(npc.id) == "function" and npc:id() or npc.id) ~= nil
+end
