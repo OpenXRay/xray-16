@@ -100,6 +100,7 @@ void CWeaponBinoculars::render_item_ui()
 
 void CWeaponBinoculars::ZoomInc()
 {
+	if (!m_zoom_params.m_bUseDynamicZoom)	return;
     float delta, min_zoom_factor;
     GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
 
