@@ -1,5 +1,6 @@
 include(luajit.cmake)
 add_subdirectory(luabind)
+xr_install_file(luabind)
 add_subdirectory(cximage)
 #add_subdirectory(lzo)
 #add_subdirectory(NVTT)
