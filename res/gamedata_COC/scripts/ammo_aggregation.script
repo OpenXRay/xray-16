@@ -63,5 +63,5 @@ function actor_on_item_take(item)
 end
 
 function on_game_start()
-	RegisterScriptCallback("actor_on_item_take", actor_on_item_take)
+	--RegisterScriptCallback("actor_on_item_take", actor_on_item_take)
 end

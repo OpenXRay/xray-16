@@ -26,11 +26,11 @@ using namespace InventoryUtilities;
 
 // what to block
 #ifdef COC_EDITION
-u16	INV_STATE_BLOCK_ALL = 0xffff;
-u16	INV_STATE_LADDER = INV_STATE_BLOCK_ALL;
-u16	INV_STATE_CAR = INV_STATE_LADDER;
-u16	INV_STATE_INV_WND = INV_STATE_BLOCK_ALL;
-u16	INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
+u16 INV_STATE_BLOCK_ALL = 0xffff;
+u16 INV_STATE_LADDER = INV_STATE_BLOCK_ALL;
+u16 INV_STATE_CAR = INV_STATE_LADDER;
+u16 INV_STATE_INV_WND = INV_STATE_BLOCK_ALL;
+u16 INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
 #else
 u16 INV_STATE_LADDER = (1 << INV_SLOT_3 | 1 << BINOCULAR_SLOT);
 u16 INV_STATE_CAR = INV_STATE_LADDER;
@@ -55,34 +55,35 @@ CInventory::CInventory()
     m_iNextActiveSlot = NO_ACTIVE_SLOT;
     m_iPrevActiveSlot = NO_ACTIVE_SLOT;
 
-    //Alundaio: Dynamically create as many slots as we may define in system.ltx
-	string256	slot_persistent;
-	string256	slot_active;
-	xr_strcpy(slot_persistent,"slot_persistent_1");
-	xr_strcpy(slot_active,"slot_active_1");
-	
-	u16 k=1;
-	while( pSettings->line_exist("inventory", slot_persistent) && pSettings->line_exist("inventory", slot_active)){
-		m_last_slot = k;
-		
-		m_slots.resize(k+1); //slot+1 because [0] is the inactive slot
-		
-		m_slots[k].m_bPersistent = !!pSettings->r_bool("inventory",slot_persistent);
-		m_slots[k].m_bAct = !!pSettings->r_bool("inventory",slot_active);
-		
-		++k;
+    // Alundaio: Dynamically create as many slots as we may define in system.ltx
+    string256 slot_persistent;
+    string256 slot_active;
+    xr_strcpy(slot_persistent, "slot_persistent_1");
+    xr_strcpy(slot_active, "slot_active_1");
 
-		xr_sprintf		(slot_persistent,"%s%d","slot_persistent_",k);
-		xr_sprintf		(slot_active,"%s%d","slot_active_",k);
-	}
-	
-	m_blocked_slots.resize(k+1);
-	
-	for (u16 i = 0; i <= k; ++i)
-	{
-		m_blocked_slots[i] = 0;
-	}
-	//-Alundaio
+    u16 k = 1;
+    while (pSettings->line_exist("inventory", slot_persistent) && pSettings->line_exist("inventory", slot_active))
+    {
+        m_last_slot = k;
+
+        m_slots.resize(k + 1); // slot+1 because [0] is the inactive slot
+
+        m_slots[k].m_bPersistent = !!pSettings->r_bool("inventory", slot_persistent);
+        m_slots[k].m_bAct = !!pSettings->r_bool("inventory", slot_active);
+
+        ++k;
+
+        xr_sprintf(slot_persistent, "%s%d", "slot_persistent_", k);
+        xr_sprintf(slot_active, "%s%d", "slot_active_", k);
+    }
+
+    m_blocked_slots.resize(k + 1);
+
+    for (u16 i = 0; i <= k; ++i)
+    {
+        m_blocked_slots[i] = 0;
+    }
+    //-Alundaio
 
     m_bSlotsUseful = true;
     m_bBeltUseful = false;
@@ -192,6 +193,9 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
             VERIFY(result);
         }
     }
+
+    if (Actor()->ID() == m_pOwner->object_id())
+        RepackAmmo(pIItem);
 
     m_pOwner->OnItemTake(pIItem);
 
@@ -347,11 +351,11 @@ bool CInventory::Slot(u16 slot_id, PIItem pIItem, bool bNotActivate, bool strict
 
     if (!strict_placement && !CanPutInSlot(pIItem, slot_id))
     {
-//#ifdef _DEBUG
-        //Msg("there is item %s[%d,%x] in slot %d[%d,%x]", ItemFromSlot(pIItem->GetSlot())->object().cName().c_str(),
+        //#ifdef _DEBUG
+        // Msg("there is item %s[%d,%x] in slot %d[%d,%x]", ItemFromSlot(pIItem->GetSlot())->object().cName().c_str(),
         //    ItemFromSlot(pIItem->GetSlot())->object().ID(), ItemFromSlot(pIItem->GetSlot()), pIItem->GetSlot(),
         //    pIItem->object().ID(), pIItem);
-//#endif
+        //#endif
         //.		if(m_slots[pIItem->GetSlot()].m_pIItem == pIItem && !bNotActivate )
         //.			Activate(pIItem->GetSlot());
 
@@ -556,7 +560,7 @@ void CInventory::Activate(u16 slot, bool bForce)
         //			if ( !xr_strcmp("jup_b43_stalker_assistant_pri6695", name) )
         //				LogStackTrace	("");
         //			Msg				( "[%6d][%s] CInventory::Activate changing next active slot to %d",
-        //Device.dwTimeGlobal,
+        // Device.dwTimeGlobal,
         // name, slot );
         //		}
         m_iNextActiveSlot = slot;
@@ -623,7 +627,7 @@ void CInventory::Activate(u16 slot, bool bForce)
             //				if ( !xr_strcmp("jup_b43_stalker_assistant_pri6695", name) )
             //					LogStackTrace	("");
             //!				Msg				("[%6d][%s] CInventory::Activate changing active slot from %d to %d",
-            //!Device.dwTimeGlobal,
+            //! Device.dwTimeGlobal,
             //! name, m_iActiveSlot, slot );
             //!			}
 
@@ -634,7 +638,7 @@ void CInventory::Activate(u16 slot, bool bForce)
         //			if ( !xr_strcmp("jup_b43_stalker_assistant_pri6695", name) && !slot )
         //				LogStackTrace	("");
         //			Msg				( "[%6d][%s] CInventory::Activate changing next active slot3 to %d",
-        //Device.dwTimeGlobal,
+        // Device.dwTimeGlobal,
         // name, slot );
         //		}
         m_iNextActiveSlot = slot;
@@ -774,27 +778,57 @@ void CInventory::ActiveWeapon(u16 slot)
         return;
     }
     Activate(slot);
-    /*
-        if ( IsGameTypeSingle() )
-        {
-            Activate(slot);
-            return;
-        }
-        if ( GetActiveSlot() == slot )
-        {
-            return;
-        }
+}
 
-        Activate(slot);
-        if ( slot != NO_ACTIVE_SLOT && ItemFromSlot(slot) == NULL )
+void CInventory::RepackAmmo(PIItem pIItem)
+{
+    CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(pIItem);
+    if (!pAmmo)
+        return;
+
+    xr_vector<CWeaponAmmo*> ammos = {};
+    u16 size = pAmmo->m_boxCurr;
+    u16 boxSize = pAmmo->m_boxSize;
+    u16 cartCount = 0;
+
+    for (const PIItem& it : m_ruck)
+    {
+        if (it->object().object_removed())
+            continue;
+
+        CWeaponAmmo* invAmmo = smart_cast<CWeaponAmmo*>(it);
+        if (it->object().cNameSect() == pIItem->object().cNameSect() &&
+            it->object().ID() != pIItem->object().ID() && invAmmo->m_boxCurr < boxSize)
         {
-            u16 prev_activ = GetActiveSlot();
-            m_iActiveSlot  = slot;
-            if ( !ActivateNextItemInActiveSlot() )
-            {
-                m_iActiveSlot = prev_activ;
-            }
-        }*/
+            cartCount += 1;
+            ammos.push_back(invAmmo);
+            size += invAmmo->m_boxCurr;
+        }
+    }
+
+    if (size == pAmmo->m_boxCurr)
+        return;
+
+    u16 fill = iFloor(size / boxSize);
+    u16 remainder = size - (boxSize * fill);
+    if (remainder > 0)
+        pAmmo->m_boxCurr = remainder;
+    else
+    {
+        cartCount += 1;
+        ammos.push_back(pAmmo);
+    }
+
+    for (CWeaponAmmo* ammo : ammos)
+    {
+        if (fill > 0)
+        {
+            ammo->m_boxCurr = boxSize;
+            fill -= 1;
+        }
+        else
+            ammo->DestroyObject();
+    }
 }
 
 void CInventory::Update()
@@ -1096,10 +1130,11 @@ bool CInventory::Eat(PIItem pIItem)
         pItemToEat->object().cNameSect().c_str());
 #endif // MP_LOGGING
 
-    luabind::functor<bool>	funct;
+    luabind::functor<bool> funct;
     if (GEnv.ScriptEngine->functor("_G.CInventory__eat", funct))
     {
-        if (!funct(smart_cast<CGameObject*>(pItemToEat->object().H_Parent())->lua_game_object(), (smart_cast<CGameObject*>(pIItem))->lua_game_object()))
+        if (!funct(smart_cast<CGameObject*>(pItemToEat->object().H_Parent())->lua_game_object(),
+                (smart_cast<CGameObject*>(pIItem))->lua_game_object()))
             return false;
     }
 
@@ -1108,14 +1143,14 @@ bool CInventory::Eat(PIItem pIItem)
         if (IsGameTypeSingle())
             Actor()->callback(GameObject::eUseObject)(smart_cast<CGameObject*>(pIItem)->lua_game_object());
 
-        //if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
+        // if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
         //    CurrentGameUI()->GetActorMenu().RefreshCurrentItemCell();
 
         CurrentGameUI()->GetActorMenu().SetCurrentItem(nullptr);
     }
-        
 
-    if (pItemToEat->GetMaxUses() < 255 && pItemToEat->CanConsumeCharge()) // If uses 255, then skip the decrement for infinite usages
+    if (pItemToEat->GetMaxUses() < 255 &&
+        pItemToEat->CanConsumeCharge()) // If uses 255, then skip the decrement for infinite usages
     {
         u8 remaining = pItemToEat->GetRemainingUses();
         if (remaining > 0)
@@ -1310,7 +1345,8 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
                 luabind::functor<bool> funct;
                 if (GEnv.ScriptEngine->functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
                 {
-                    if (!funct(m_pOwner->cast_game_object()->lua_game_object(), pIItem->cast_game_object()->lua_game_object()))
+                    if (!funct(m_pOwner->cast_game_object()->lua_game_object(),
+                            pIItem->cast_game_object()->lua_game_object()))
                         continue;
                 }
             }
@@ -1330,7 +1366,8 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
                     luabind::functor<bool> funct;
                     if (GEnv.ScriptEngine->functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
                     {
-                        if (!funct(m_pOwner->cast_game_object()->lua_game_object(), pIItem->cast_game_object()->lua_game_object()))
+                        if (!funct(m_pOwner->cast_game_object()->lua_game_object(),
+                                pIItem->cast_game_object()->lua_game_object()))
                             continue;
                     }
                 }
@@ -1355,7 +1392,8 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
                         luabind::functor<bool> funct;
                         if (GEnv.ScriptEngine->functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
                         {
-                            if (!funct(m_pOwner->cast_game_object()->lua_game_object(), item->cast_game_object()->lua_game_object()))
+                            if (!funct(m_pOwner->cast_game_object()->lua_game_object(),
+                                    item->cast_game_object()->lua_game_object()))
                                 continue;
                         }
                     }
@@ -1382,10 +1420,7 @@ bool CInventory::isBeautifulForActiveSlot(CInventoryItem* pIItem)
     return (false);
 }
 
-void CInventory::InvalidateState() throw()
-{
-    m_dwModifyFrame = Device.dwFrame;
-}
+void CInventory::InvalidateState() throw() { m_dwModifyFrame = Device.dwFrame; }
 
 //.#include "WeaponHUD.h"
 void CInventory::Items_SetCurrentEntityHud(bool current_entity)
@@ -1477,7 +1512,7 @@ void CInventory::TryDeactivateActiveSlot()
 
 void CInventory::BlockSlot(u16 slot_id)
 {
-    //VERIFY(slot_id <= LAST_SLOT);
+    // VERIFY(slot_id <= LAST_SLOT);
 
     ++m_blocked_slots[slot_id];
 
@@ -1486,7 +1521,7 @@ void CInventory::BlockSlot(u16 slot_id)
 
 void CInventory::UnblockSlot(u16 slot_id)
 {
-    //VERIFY(slot_id <= LAST_SLOT);
+    // VERIFY(slot_id <= LAST_SLOT);
     VERIFY2(m_blocked_slots[slot_id] > 0, make_string("blocked slot [%d] underflow").c_str());
 
     --m_blocked_slots[slot_id];
@@ -1494,7 +1529,7 @@ void CInventory::UnblockSlot(u16 slot_id)
 
 bool CInventory::IsSlotBlocked(u16 slot_id) const
 {
-    //VERIFY(slot_id <= LAST_SLOT);
+    // VERIFY(slot_id <= LAST_SLOT);
     return m_blocked_slots[slot_id] > 0;
 }
 

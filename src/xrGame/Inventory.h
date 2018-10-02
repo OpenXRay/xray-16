@@ -146,6 +146,8 @@ public:
     void Items_SetCurrentEntityHud(bool current_entity);
     bool isBeautifulForActiveSlot(CInventoryItem* pIItem);
 
+    void RepackAmmo(PIItem item);
+
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);
