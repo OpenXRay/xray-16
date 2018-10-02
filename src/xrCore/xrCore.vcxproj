@@ -116,7 +116,13 @@
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>call .GitInfo.cmd</Command>
+      <Command>where /q git
+if errorlevel 1 (
+  echo git is not founded
+  goto :EOF
+)
+echo git is founded
+call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -132,7 +138,13 @@
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>call .GitInfo.cmd</Command>
+      <Command>where /q git
+if errorlevel 1 (
+  echo git is not founded
+  goto :EOF
+)
+echo git is founded
+call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,7 +163,13 @@
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>call .GitInfo.cmd</Command>
+      <Command>where /q git
+if errorlevel 1 (
+  echo git is not founded
+  goto :EOF
+)
+echo git is founded
+call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -167,7 +185,13 @@
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>call .GitInfo.cmd</Command>
+      <Command>where /q git
+if errorlevel 1 (
+  echo git is not founded
+  goto :EOF
+)
+echo git is founded
+call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
@@ -185,7 +209,13 @@
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>call .GitInfo.cmd</Command>
+      <Command>where /q git
+if errorlevel 1 (
+  echo git is not founded
+  goto :EOF
+)
+echo git is founded
+call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
@@ -201,7 +231,13 @@
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>call .GitInfo.cmd</Command>
+      <Command>where /q git
+if errorlevel 1 (
+  echo git is not founded
+  goto :EOF
+)
+echo git is founded
+call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
