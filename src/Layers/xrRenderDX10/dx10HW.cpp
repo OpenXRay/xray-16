@@ -260,11 +260,16 @@ void CHW::Reset()
     UpdateViews();
 }
 
-bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const D3D_FORMAT_SUPPORT feature) const
+bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const UINT feature) const
 {
-    UINT feature_bit = feature;
-    if (SUCCEEDED(pDevice->CheckFormatSupport(format, &feature_bit)))
-        return true;
+    UINT supports;
+
+    if (SUCCEEDED(pDevice->CheckFormatSupport(format, &supports)))
+    {
+        if (supports & feature)
+            return true;
+    }
+
     return false;
 }
 
