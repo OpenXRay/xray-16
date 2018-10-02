@@ -663,6 +663,15 @@ public:
     }
 };
 
+#ifdef DEBUG
+class CCC_SunshaftsIntensity : public CCC_Float
+{
+public:
+    CCC_SunshaftsIntensity(LPCSTR N, float* V, float _min, float _max) : CCC_Float(N, V, _min, _max) {}
+    virtual void Save(IWriter*) { ; }
+};
+#endif
+
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
 #ifdef DEBUG
@@ -871,6 +880,10 @@ void xrRender_initconsole()
 
     //float ps_r2_dof_near = 0.f; // 0.f
     //float ps_r2_dof_focus = 1.4f; // 1.4f
+
+#ifdef DEBUG
+    CMD4(CCC_SunshaftsIntensity, "r__sunshafts_intensity", &SunshaftsIntensity, 0.f, 1.f);
+#endif
 
     CMD3(CCC_Mask, "r2_volumetric_lights", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS);
     //CMD3(CCC_Mask, "r2_sun_shafts", &ps_r2_ls_flags, R2FLAG_SUN_SHAFTS);

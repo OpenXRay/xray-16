@@ -10,6 +10,8 @@
 #include "Common/object_broker.h"
 #include "Common/LevelGameDef.h"
 
+ENGINE_API float SunshaftsIntensity = 0.f;
+
 void CEnvModifier::load(IReader* fs, u32 version)
 {
     use_flags.one();
@@ -438,42 +440,50 @@ void CEnvDescriptorMixer::lerp(
     wind_velocity = fi * A.wind_velocity + f * B.wind_velocity;
     wind_direction = fi * A.wind_direction + f * B.wind_direction;
 
-    m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
-    m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
-
-    m_fTreeAmplitudeIntensity = fi * A.m_fTreeAmplitudeIntensity + f * B.m_fTreeAmplitudeIntensity;
-
-    // colors
-    //. sky_color.lerp (A.sky_color,B.sky_color,f).add(Mdf.sky_color).mul(modif_power);
-    sky_color.lerp(A.sky_color, B.sky_color, f);
-    if (Mdf.use_flags.test(eSkyColor))
-        sky_color.add(Mdf.sky_color).mul(modif_power);
-
-    //. ambient.lerp (A.ambient,B.ambient,f).add(Mdf.ambient).mul(modif_power);
-    ambient.lerp(A.ambient, B.ambient, f);
-    if (Mdf.use_flags.test(eAmbientColor))
-        ambient.add(Mdf.ambient).mul(modif_power);
-
-    hemi_color.lerp(A.hemi_color, B.hemi_color, f);
-
-    if (Mdf.use_flags.test(eHemiColor))
+#ifdef DEBUG
+    if (SunshaftsIntensity > 0.f)
+        m_fSunShaftsIntensity = SunshaftsIntensity;
+    else
+#endif
     {
-        hemi_color.x += Mdf.hemi_color.x;
-        hemi_color.y += Mdf.hemi_color.y;
-        hemi_color.z += Mdf.hemi_color.z;
-        hemi_color.x *= modif_power;
-        hemi_color.y *= modif_power;
-        hemi_color.z *= modif_power;
+        m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
     }
 
-    sun_color.lerp(A.sun_color, B.sun_color, f);
+m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
 
-    R_ASSERT(_valid(A.sun_dir));
-    R_ASSERT(_valid(B.sun_dir));
-    sun_dir.lerp(A.sun_dir, B.sun_dir, f).normalize();
-    R_ASSERT(_valid(sun_dir));
+m_fTreeAmplitudeIntensity = fi * A.m_fTreeAmplitudeIntensity + f * B.m_fTreeAmplitudeIntensity;
 
-    VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
+// colors
+//. sky_color.lerp (A.sky_color,B.sky_color,f).add(Mdf.sky_color).mul(modif_power);
+sky_color.lerp(A.sky_color, B.sky_color, f);
+if (Mdf.use_flags.test(eSkyColor))
+    sky_color.add(Mdf.sky_color).mul(modif_power);
+
+//. ambient.lerp (A.ambient,B.ambient,f).add(Mdf.ambient).mul(modif_power);
+ambient.lerp(A.ambient, B.ambient, f);
+if (Mdf.use_flags.test(eAmbientColor))
+    ambient.add(Mdf.ambient).mul(modif_power);
+
+hemi_color.lerp(A.hemi_color, B.hemi_color, f);
+
+if (Mdf.use_flags.test(eHemiColor))
+{
+    hemi_color.x += Mdf.hemi_color.x;
+    hemi_color.y += Mdf.hemi_color.y;
+    hemi_color.z += Mdf.hemi_color.z;
+    hemi_color.x *= modif_power;
+    hemi_color.y *= modif_power;
+    hemi_color.z *= modif_power;
+}
+
+sun_color.lerp(A.sun_color, B.sun_color, f);
+
+R_ASSERT(_valid(A.sun_dir));
+R_ASSERT(_valid(B.sun_dir));
+sun_dir.lerp(A.sun_dir, B.sun_dir, f).normalize();
+R_ASSERT(_valid(sun_dir));
+
+VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
 }
 
 //-----------------------------------------------------------------------------
