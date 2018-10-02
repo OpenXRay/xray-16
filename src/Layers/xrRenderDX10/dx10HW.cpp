@@ -319,13 +319,12 @@ void CHW::UpdateViews()
     descDepth.ArraySize = 1;
 
     // Select depth-stencil format
-    // TODO: DX10: test and support other formats
     constexpr DXGI_FORMAT formats[] =
     {
-        //DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
+        DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
         DXGI_FORMAT_D24_UNORM_S8_UINT,
-        //DXGI_FORMAT_D32_FLOAT,
-        //DXGI_FORMAT_D16_UNORM
+        DXGI_FORMAT_D32_FLOAT,
+        DXGI_FORMAT_D16_UNORM
     };
     descDepth.Format = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats, std::size(formats));
     Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(descDepth.Format);

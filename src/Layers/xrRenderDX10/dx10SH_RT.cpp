@@ -61,15 +61,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     u32 usage = 0;
     if (D3DFMT_D24X8 == fmt)
         usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D24S8 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
     else if (D3DFMT_D15S1 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D16 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D16_LOCKABLE == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D32F_LOCKABLE == fmt)
         usage = D3DUSAGE_DEPTHSTENCIL;
     else if ((D3DFORMAT)MAKEFOURCC('D', 'F', '2', '4') == fmt)
         usage = D3DUSAGE_DEPTHSTENCIL;
@@ -78,12 +70,39 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 
     DXGI_FORMAT dx10FMT;
 
-    if (fmt != D3DFMT_D24S8)
-        dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
-    else
+    switch (fmt)
     {
+    case D3DFMT_D32S8X24:
+        dx10FMT = DXGI_FORMAT_R32G8X24_TYPELESS;
+        usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    case D3DFMT_D24S8:
         dx10FMT = DXGI_FORMAT_R24G8_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    case D3DFMT_D32:
+        VERIFY(false, "What? How this happen?");
+        [[fallthrough]];
+
+    case D3DFMT_D32F_LOCKABLE:
+        dx10FMT = DXGI_FORMAT_R32_TYPELESS;
+        usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    case D3DFMT_D16:
+        VERIFY(false, "What? How this happen?");
+        [[fallthrough]];
+
+    case D3DFMT_D16_LOCKABLE:
+        dx10FMT = DXGI_FORMAT_R16_TYPELESS;
+        usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    default:
+        dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
+        break;
     }
 
     const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
@@ -154,10 +173,24 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
         }
 
         ViewDesc.Texture2D.MipSlice = 0;
+
         switch (desc.Format)
         {
-        case DXGI_FORMAT_R24G8_TYPELESS: ViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
-        case DXGI_FORMAT_R32_TYPELESS: ViewDesc.Format = DXGI_FORMAT_D32_FLOAT; break;
+        case DXGI_FORMAT_R16_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D16_UNORM;
+            break;
+
+        case DXGI_FORMAT_R24G8_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+            break;
+
+        case DXGI_FORMAT_R32_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            break;
+
+        case DXGI_FORMAT_R32G8X24_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+            break;
         }
 
         CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &pZRT));
