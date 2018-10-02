@@ -29,7 +29,10 @@ void* ModuleHandle::Open(pcstr moduleName)
 #ifdef WINDOWS
     handle = LoadLibraryA(moduleName);
 #elif defined(LINUX)
-    handle = dlopen(moduleName, RTLD_LAZY);
+    char buf[1024];
+    snprintf(buf, sizeof(buf), "%s.so", moduleName);
+
+    handle = dlopen(buf, RTLD_LAZY);
 #endif
     if (handle == nullptr)
     {
