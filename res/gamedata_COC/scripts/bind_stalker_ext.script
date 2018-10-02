@@ -117,8 +117,8 @@ end
 -------------------
 -- actor_on_weapon_no_ammo(actor,wpn,elapsed)
 -------------------
-function actor_on_weapon_fired(binder,obj,wpn,ammo_elapsed,ammo_type,grenade_elapsed,grenade_type)
-	SendScriptCallback("actor_on_weapon_fired",obj,wpn,ammo_elapsed,ammo_type,grenade_elapsed,grenade_type)
+function actor_on_weapon_fired(binder,obj,wpn,ammo_elapsed,grenade_elapsed,ammo_type,grenade_type)
+	SendScriptCallback("actor_on_weapon_fired",obj,wpn,ammo_elapsed,grenade_elapsed,ammo_type,grenade_type)
 end
 
 -------------------
