@@ -209,7 +209,7 @@ function simulation_board:setup_squad_and_group(se_obj)
 	end
 	
 	local smart = squad.smart_id and sim:object(squad.smart_id)
-	change_team_squad_group(se_obj, se_obj.team, smart and smart.squad_id or se_obj.squad, 1)
+	change_team_squad_group(se_obj, se_obj.team, smart and smart.squad_id or se_obj.squad, se_obj.group)
 end
 
 --' «аполнение стартового расположени€
