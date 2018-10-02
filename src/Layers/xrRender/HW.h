@@ -36,21 +36,20 @@ public:
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 #endif // !USE_OGL
 
-#ifdef DEBUG
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-    void Validate(void){};
-#else //	USE_DX10
-    void Validate(void)
+#if defined(DEBUG) && defined(USE_DX9)
+    void Validate()
     {
         VERIFY(pDevice);
         VERIFY(pD3D);
     };
-#endif //	USE_DX10
 #else
-    void Validate(void){};
+    void Validate() {}
 #endif
 
-//	Variables section
+    // Variables section
+public:
+    CHWCaps Caps;
+
 #if defined(USE_OGL)
     CHW* pDevice;
     CHW* pContext;
@@ -61,62 +60,40 @@ public:
     GLuint pFB;
     GLuint pCFB;
 
-    CHWCaps Caps;
-
     SDL_Window* m_hWnd;
     HDC m_hDC;
     SDL_GLContext m_hRC;
-#elif defined(USE_DX11)
-public:
-    IDXGIFactory1* m_pFactory = nullptr;
-    IDXGIAdapter1* m_pAdapter = nullptr; //	pD3D equivalent
-    ID3D11Device* pDevice = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D11DeviceContext* pContext = nullptr; //	combine with DX9 pDevice via typedef
-    IDXGISwapChain* m_pSwapChain = nullptr;
-    ID3D11RenderTargetView* pBaseRT = nullptr; //	combine with DX9 pBaseRT via typedef
-    ID3D11DepthStencilView* pBaseZB = nullptr;
-
-    CHWCaps Caps;
+#else // General DirectX
+    ID3DDevice* pDevice = nullptr; // render device
+    ID3DRenderTargetView* pBaseRT = nullptr; // base render target
+    ID3DDepthStencilView* pBaseZB = nullptr; // base depth-stencil buffer
 
     D3D_DRIVER_TYPE m_DriverType;
-    DXGI_SWAP_CHAIN_DESC m_ChainDesc; //	DevPP equivalent
-    D3D_FEATURE_LEVEL FeatureLevel;
-#elif defined(USE_DX10)
-public:
+#ifndef USE_DX9
     IDXGIFactory1* m_pFactory = nullptr;
-    IDXGIAdapter1* m_pAdapter = nullptr; //	pD3D equivalent
-    ID3D10Device1* pDevice1 = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D10Device* pDevice = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D10Device1* pContext1 = nullptr; //	combine with DX9 pDevice via typedef
-    ID3D10Device* pContext = nullptr; //	combine with DX9 pDevice via typedef
+    IDXGIAdapter1* m_pAdapter = nullptr; // pD3D equivalent
+    ID3DDeviceContext* pContext = nullptr;
     IDXGISwapChain* m_pSwapChain = nullptr;
-    ID3D10RenderTargetView* pBaseRT = nullptr; //	combine with DX9 pBaseRT via typedef
-    ID3D10DepthStencilView* pBaseZB = nullptr;
-
-    CHWCaps Caps;
-
-    D3D10_DRIVER_TYPE m_DriverType;
-    DXGI_SWAP_CHAIN_DESC m_ChainDesc; //	DevPP equivalent
+    DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
     D3D_FEATURE_LEVEL FeatureLevel;
-#else
-private:
+#if defined(USE_DX10)
+    ID3D10Device1* pDevice1 = nullptr;
+    ID3D10Device1* pContext1 = nullptr;
+#endif
+#else // USE_DX9
 #ifdef DEBUG
     IDirect3DStateBlock9* dwDebugSB = nullptr;
 #endif
+private:
     XRay::Module hD3D = nullptr;
 
 public:
     IDirect3D9* pD3D = nullptr; // D3D
-    IDirect3DDevice9* pDevice = nullptr; // render device
-    IDirect3DSurface9* pBaseRT = nullptr;
-    IDirect3DSurface9* pBaseZB = nullptr;
-
-    CHWCaps Caps;
 
     UINT DevAdapter;
-    D3DDEVTYPE m_DriverType;
     D3DPRESENT_PARAMETERS DevPP;
-#endif //	USE_DX10
+#endif // USE_DX9
+#endif // USE_OGL
 
 #if !defined(_MAYA_EXPORT) && !defined(USE_OGL)
     stats_manager stats_manager;
