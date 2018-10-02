@@ -145,9 +145,9 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     //  TODO: DX10: implement dynamic format selection
     constexpr DXGI_FORMAT formats[] =
     {
-        //DXGI_FORMAT_R16G16B16A16_FLOAT,
-        //DXGI_FORMAT_R10G10B10A2_UNORM,
-        //DXGI_FORMAT_B8G8R8X8_UNORM,
+        //DXGI_FORMAT_R16G16B16A16_FLOAT, // Do we even need this?
+        //DXGI_FORMAT_R10G10B10A2_UNORM, // D3DX11SaveTextureToMemory fails on this format
+        DXGI_FORMAT_B8G8R8X8_UNORM,
         DXGI_FORMAT_R8G8B8A8_UNORM,
     };
 
