@@ -533,6 +533,7 @@ public:
     bool unlimited_ammo();
     IC bool can_be_strapped() const { return m_can_be_strapped; };
 
+    const decltype(m_magazine)& GetMagazine() { return m_magazine; };
     float GetMagazineWeight(const decltype(m_magazine)& mag) const;
 
 protected:

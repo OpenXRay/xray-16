@@ -4,7 +4,7 @@
 
 struct SCartridgeParam
 {
-    float kDist, kDisp, kHit /*, kCritical*/, kImpulse, kAP, kAirRes, kBulletSpeed;
+    float kDist, kDisp, kHit /*, kCritical*/, kImpulse, kAP, kAirRes, kBulletSpeed, k_cam_dispersion;
     int buckShot;
     float impair;
     float fWallmarkSize;
@@ -20,6 +20,7 @@ struct SCartridgeParam
         impair = 1.0f;
         fWallmarkSize = 0.0f;
         u8ColorID = 0;
+        k_cam_dispersion = 1.0f;
     }
 };
 
@@ -48,6 +49,8 @@ public:
     Flags8 m_flags;
 
     shared_str m_InvShortName;
+
+    LPCSTR GetInventoryName() { return m_InvShortName.c_str(); };
     virtual void DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const;
     virtual shared_str const GetAnticheatSectionName() const { return m_ammoSect; };
 };

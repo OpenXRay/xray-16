@@ -34,6 +34,7 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
+using namespace luabind::policy;
 
 SCRIPT_EXPORT(CWeapon, (CGameObject),
 {
@@ -41,7 +42,16 @@ SCRIPT_EXPORT(CWeapon, (CGameObject),
     [
         class_<CWeapon, CGameObject>("CWeapon")
             .def(constructor<>())
-            .def("can_kill", (bool (CWeapon::*)() const)&CWeapon::can_kill)
+            .def("can_kill", (bool (CWeapon::*)() const) & CWeapon::can_kill)
+            .def("ready_to_kill", (bool (CWeapon::*)() const) & CWeapon::ready_to_kill)
+            .def("GetAddonsState", (u8(CWeapon::*)() const) & CWeapon::GetAddonsState)
+            .def("SetAddonsState", &CWeapon::SetAddonsState)
+            .def("IsZoomed", (bool (CWeapon::*)() const) & CWeapon::IsZoomed)
+            .def("GetZoomFactor", (float (CWeapon::*)() const) & CWeapon::GetZoomFactor)
+            .def("SetZoomFactor", &CWeapon::SetZoomFactor)
+            .def("Weight", (float (CWeapon::*)() const) & CWeapon::Weight)
+            .def("Cost", (u32(CWeapon::*)() const) & CWeapon::Cost)
+            .def("GetMagazine", &CWeapon::GetMagazine, return_stl_iterator())
     ];
 });
 
@@ -66,7 +76,15 @@ SCRIPT_EXPORT(CWeaponFORT, (CWeaponMagazined),
 SCRIPT_EXPORT(CF1, (CGameObject, CExplosive), {
     module(luaState)[class_<CF1, bases<CGameObject, CExplosive>>("CF1").def(constructor<>()),
     // new 14.10.08 peacemaker
-    class_<CWeaponAmmo, CGameObject>("CWeaponAmmo").def(constructor<>()),
+    class_<CWeaponAmmo, CGameObject>("CWeaponAmmo")
+            .def(constructor<>())
+            .def_readwrite("m_boxSize", &CWeaponAmmo::m_boxSize)
+            .def_readwrite("m_boxCurr", &CWeaponAmmo::m_boxCurr)
+            .def_readwrite("m_tracer", &CWeaponAmmo::m_tracer)
+            .def_readwrite("m_4to1_tracer", &CWeaponAmmo::m_4to1_tracer)
+            .def("Weight", &CWeaponAmmo::Weight)
+            .def("Cost", &CWeaponAmmo::Cost)
+			.def("Get", &CWeaponAmmo::Get),
     class_<CMedkit, CGameObject>("CMedkit").def(constructor<>()),
     class_<CAntirad, CGameObject>("CAntirad").def(constructor<>()),
     class_<CFoodItem, CGameObject>("CFoodItem").def(constructor<>()),
@@ -125,3 +143,34 @@ SCRIPT_EXPORT(CWeaponVintorez, (CWeaponMagazined),
 
 SCRIPT_EXPORT(CWeaponWalther, (CWeaponMagazined),
     { module(luaState)[class_<CWeaponWalther, CWeaponMagazined>("CWeaponWalther").def(constructor<>())]; });
+
+SCRIPT_EXPORT(CCartridge, (), {
+    module(luaState)[class_<SCartridgeParam>("SCartridgeParam")
+            .def(constructor<>())
+            .def("Init", &SCartridgeParam::Init)
+            .def_readwrite("kDist ", &SCartridgeParam::kDist)
+            .def_readwrite("kDisp ", &SCartridgeParam::kDisp)
+            .def_readwrite("kHit ", &SCartridgeParam::kHit)
+            .def_readwrite("kImpulse ", &SCartridgeParam::kImpulse)
+            .def_readwrite("kAP ", &SCartridgeParam::kAP)
+            .def_readwrite("kAirRes ", &SCartridgeParam::kAirRes)
+            .def_readwrite("kBulletSpeed ", &SCartridgeParam::kBulletSpeed)
+            .def_readwrite("k_cam_dispersion", &SCartridgeParam::k_cam_dispersion)
+            .def_readwrite("buckShot", &SCartridgeParam::buckShot)
+            .def_readwrite("impair", &SCartridgeParam::impair)
+            .def_readwrite("u8ColorID", &SCartridgeParam::u8ColorID),
+        class_<CCartridge>("CCartridge")
+            .def(constructor<>())
+            .def("Weight", &CCartridge::Weight)
+            .def_readwrite("m_LocalAmmoType", &CCartridge::m_LocalAmmoType)
+            .def_readwrite("m_4to1_tracer", &CCartridge::m_4to1_tracer)
+            .def_readwrite("bullet_material_idx", &CCartridge::bullet_material_idx)
+            .def_readwrite("m_flags", &CCartridge::m_flags)
+            .def_readwrite("param_s", &CCartridge::param_s)
+            .enum_("cartridge_flags")[value("cfTracer", int(CCartridge::cfTracer)),
+                value("cfRicochet", int(CCartridge::cfRicochet)),
+                value("cfCanBeUnlimited", int(CCartridge::cfCanBeUnlimited)),
+                value("cfExplosive", int(CCartridge::cfExplosive)),
+                value("cfMagneticBeam", int(CCartridge::cfMagneticBeam))]
+            .def("GetInventoryName", &CCartridge::GetInventoryName)];
+});
