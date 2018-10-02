@@ -330,6 +330,12 @@
 	<string id="ui_inv_af_condition">
 		<text>Efficiency</text>
 	</string>
+	<string id="ui_inv_af_jump_speed">
+		<text>Jump power</text>
+	</string>
+	<string id="ui_inv_af_walk_accel">
+		<text>Movement speed</text>
+	</string>
 	<string id="ui_st_usable_parts">
 		<text>Parts</text>
 	</string>

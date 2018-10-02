@@ -263,6 +263,8 @@
 	<!-- new strike -->
 	<texture id="ui_am_prop_strike" 	x="116" y="505" width="19" height="19" />
 	
+	<!-- new movement modifier -->
+	<texture id="ui_am_prop_movement" 	x="135" y="505" width="19" height="19" />
    </file>
 </w>
 

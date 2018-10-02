@@ -2028,9 +2028,24 @@ axr_keybind.bind("DIK_NUMPADENTER",function(p)
 		return 
 	end 
 	if (p==1) then
-		for story_id,id in pairs(story_objects.object_id_by_story_id) do 
-			printf("%s = %s",story_id,id)
-		end 
+	
+		-- if (db.actor) then 
+			-- local wpn = db.actor:active_item()
+			-- if (wpn and IsWeapon(wpn)) then 
+				-- local weapon = wpn:cast_Weapon()
+				-- if (weapon) then
+					-- for cartridge in weapon:GetMagazine() do
+						-- printf("%s",cartridge:GetInventoryName())
+						-- cartridge.m_flags:set(cartridge.cfExplosive,true)
+					-- end
+				
+				-- end
+			-- end
+		-- end
+		
+		-- for story_id,id in pairs(story_objects.object_id_by_story_id) do 
+			-- printf("%s = %s",story_id,id)
+		-- end 
 		
 		-- local heli
 		-- for id,o in pairs(db.heli) do
