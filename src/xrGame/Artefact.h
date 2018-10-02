@@ -49,6 +49,8 @@ public:
     void SetPowerPower(const float value) { m_fPowerRestoreSpeed = value; }
     void SetBleedingPower(const float value) { m_fBleedingRestoreSpeed = value; }
 
+    float m_fJumpSpeed;
+    float m_fWalkAccel;
 protected:
     virtual void UpdateCLChild(){};
     virtual void CreateArtefactActivation();

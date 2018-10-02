@@ -79,6 +79,9 @@ void CArtefact::Load(LPCSTR section)
     m_fPowerRestoreSpeed = pSettings->r_float(section, "power_restore_speed");
     m_fBleedingRestoreSpeed = pSettings->r_float(section, "bleeding_restore_speed");
 
+    m_fJumpSpeed = READ_IF_EXISTS(pSettings, r_float, section, "jump_speed", 1.f);
+    m_fWalkAccel = READ_IF_EXISTS(pSettings, r_float, section, "walk_accel", 1.f);
+
 	LPCSTR hit_sect = pSettings->r_string(section, "hit_absorbation_sect");
     if (pSettings->section_exist(hit_sect))
     {

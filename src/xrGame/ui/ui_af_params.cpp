@@ -8,6 +8,7 @@
 #include "UIHelper.h"
 #include "string_table.h"
 #include "Inventory_Item.h"
+#include "Artefact.h"
 
 u32 const red_clr = color_argb(255, 210, 50, 50);
 u32 const green_clr = color_argb(255, 170, 170, 170);
@@ -132,6 +133,25 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
         xml.SetLocalRoot(base_node);
     }
 
+    // Alundaio: AF movement modifiers
+    {
+        m_fJumpSpeed = new UIArtefactParamItem();
+        m_fJumpSpeed->Init(xml, "jump_speed");
+        m_fJumpSpeed->SetAutoDelete(false);
+        LPCSTR name = CStringTable().translate("ui_inv_af_jump_speed").c_str();
+        m_fJumpSpeed->SetCaption(name);
+        xml.SetLocalRoot(base_node);
+    }
+    {
+        m_fWalkAccel = new UIArtefactParamItem();
+        m_fWalkAccel->Init(xml, "walk_accel");
+        m_fWalkAccel->SetAutoDelete(false);
+        LPCSTR name = CStringTable().translate("ui_inv_af_walk_accel").c_str();
+        m_fWalkAccel->SetCaption(name);
+        xml.SetLocalRoot(base_node);
+    }
+    //-Alundaio
+
     {
         m_additional_weight = new UIArtefactParamItem();
         m_additional_weight->Init(xml, "additional_weight");
@@ -193,6 +213,30 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
 
         h += m_immunity_item[i]->GetWndSize().y;
         AttachChild(m_immunity_item[i]);
+    }
+    CArtefact* arte = pInvItem.object().cast_artefact();
+    if (arte)
+    {
+        float val = arte->m_fJumpSpeed;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fJumpSpeed->SetValue(val * pInvItem.GetCondition());
+            pos.set(m_fJumpSpeed->GetWndPos());
+            pos.y = h;
+            m_fJumpSpeed->SetWndPos(pos);
+            h += m_fJumpSpeed->GetWndSize().y;
+            AttachChild(m_fJumpSpeed);
+        }
+        val = arte->m_fWalkAccel;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fWalkAccel->SetValue(val * pInvItem.GetCondition());
+            pos.set(m_fWalkAccel->GetWndPos());
+            pos.y = h;
+            m_fWalkAccel->SetWndPos(pos);
+            h += m_fWalkAccel->GetWndSize().y;
+            AttachChild(m_fWalkAccel);
+        }
     }
 
     {

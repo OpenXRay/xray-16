@@ -48,6 +48,8 @@ CTorch::CTorch(void)
     m_omni_offset = OMNI_OFFSET;
     m_torch_inertion_speed_max = TORCH_INERTION_SPEED_MAX;
     m_torch_inertion_speed_min = TORCH_INERTION_SPEED_MIN;
+
+    m_light_section = "torch_definition";
 }
 
 CTorch::~CTorch()
@@ -208,7 +210,6 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
     light_render->set_volumetric_quality(READ_IF_EXISTS(pUserData, r_float, m_light_section, "volumetric_quality", 1.f));
     light_render->set_volumetric_intensity(READ_IF_EXISTS(pUserData, r_float, m_light_section, "volumetric_intensity", 1.f));
     light_render->set_volumetric_distance(READ_IF_EXISTS(pUserData, r_float, m_light_section, "volumetric_distance", 1.f));
-
     light_render->set_type((IRender_Light::LT)(READ_IF_EXISTS(pUserData, r_u8, m_light_section, "type", 2)));
     light_omni->set_type((IRender_Light::LT)(READ_IF_EXISTS(pUserData, r_u8, m_light_section, "omni_type", 1)));
 

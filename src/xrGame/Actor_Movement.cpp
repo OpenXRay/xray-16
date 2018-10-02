@@ -222,7 +222,18 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
         {
             mstate_real |= mcJump;
             m_bJumpKeyPressed = TRUE;
-            Jump = m_fJumpSpeed;
+            float jumpSpd = m_fJumpSpeed;
+            TIItemContainer::iterator it = inventory().m_belt.begin();
+            TIItemContainer::iterator ite = inventory().m_belt.end();
+            for (; it != ite; ++it)
+            {
+                CArtefact* artefact = smart_cast<CArtefact*>(*it);
+                if (artefact)
+                {
+                    jumpSpd *= (artefact->m_fJumpSpeed * artefact->GetCondition());
+                }
+            }
+            Jump = jumpSpd;
             m_fJumpTime = s_fJumpTime;
 
             //уменьшить силу игрока из-за выполненого прыжка
@@ -284,7 +295,18 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
             float scale = vControlAccel.magnitude();
             if (scale > EPS)
             {
-                scale = m_fWalkAccel / scale;
+                float accel_k = m_fWalkAccel;
+                TIItemContainer::iterator it = inventory().m_belt.begin();
+                TIItemContainer::iterator ite = inventory().m_belt.end();
+                for (; it != ite; ++it)
+                {
+                    CArtefact* artefact = smart_cast<CArtefact*>(*it);
+                    if (artefact)
+                    {
+                        accel_k *= (artefact->m_fWalkAccel * artefact->GetCondition());
+                    }
+                }
+                scale = accel_k / scale;
                 if (bAccelerated)
                     if (mstate_real & mcBack)
                         scale *= m_fRunBackFactor;

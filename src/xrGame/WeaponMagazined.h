@@ -151,7 +151,7 @@ public:
     int GetCurrentFireMode() override
     {
         //AVO: fixed crash due to original GSC assumption that CWeaponMagazined will always have firemodes specified in configs.
-        if (HasFireModes() && m_iCurFireMode < m_aFireModes.size())
+        if (HasFireModes())
             return m_aFireModes[m_iCurFireMode];
         return 1;
     }

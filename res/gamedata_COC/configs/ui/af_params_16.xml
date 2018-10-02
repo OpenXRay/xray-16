@@ -164,5 +164,24 @@
 			<text font="letterica16" vert_align="c"/>
 		</value>
 	</additional_weight>
-
+ 
+		<jump_speed x="0" y="0" width="214" height="20" >
+		<caption x="0" y="0" width="15" height="20" complex_mode="0">
+			<texture>ui_am_propery_08</texture>
+			<text color="ui_3" font="letterica16" vert_align="c" x="22" y="0"/>
+		</caption>
+		<value x="140" y="0" width="30" height="20" magnitude="100">
+			<text font="letterica16" vert_align="c"/>
+		</value>
+	</jump_speed>
+	
+	<walk_accel x="0" y="0" width="214" height="20" >
+		<caption x="0" y="0" width="15" height="20" complex_mode="0">
+			<texture>ui_am_propery_08</texture>
+			<text color="ui_3" font="letterica16" vert_align="c" x="22" y="0"/>
+		</caption>
+		<value x="140" y="0" width="30" height="20" magnitude="100">
+			<text font="letterica16" vert_align="c"/>
+		</value>
+	</walk_accel>
 </af_params>
