@@ -652,7 +652,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     if (!stat(scanPath, &buffer))
         return true;
     xr_strcpy(scanPath, sizeof scanPath, path);
-    xr_strcat(scanPath, "*.*");
+    xr_strcat(scanPath, "*");
     _finddata_t findData;
 #ifdef WINDOWS
     intptr_t handle = _findfirst(scanPath, &findData);
@@ -680,6 +680,12 @@ bool CLocatorAPI::Recurse(pcstr path)
         struct stat fi;
         stat(findData.name, &fi);
         findData.size = fi.st_size;
+        switch (fi.st_mode & S_IFMT)
+        {
+        case S_IFDIR: findData.attrib = _A_SUBDIR; break;
+        case S_IFREG: findData.attrib = 0;         break; // File
+        default:      findData.attrib = _A_HIDDEN; break; // Skip
+        }
 #endif
         string1024 fullPath;
         bool ignore = false;
