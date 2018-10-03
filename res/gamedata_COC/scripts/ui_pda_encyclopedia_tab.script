@@ -93,7 +93,12 @@ function pda_encyclopedia_tab:SelectArticle(index_a)
 	if (not locked) then
 		-- Set the article's text.
 		self.information:SetText(game.translate_string(section .. "_text"))
-	
+		
+		local trans = game.translate_string(section .. "_text2")
+		if (trans ~= section .. "_text2") then
+			self.information2:SetText(game.translate_string(section .. "_text2"))
+		end
+
 		-- Set the article's image.
 		-- A bit hacky, but to allow for dynamic width/height we have to initialise the texture twice.
 		-- We load the texture, grab its dimensions, set the window size then reinitialise it a second time.
@@ -117,6 +122,7 @@ function pda_encyclopedia_tab:SelectArticle(index_a)
 		self.image:InitTexture(section .. "_image")
 	else
 		self.information:SetText(game.translate_string("pda_encyclopedia_locked_text"))
+		self.information2:SetText("")
 	end
 	
 	-- Same reasoning as the offset for the image height.
@@ -126,6 +132,11 @@ function pda_encyclopedia_tab:SelectArticle(index_a)
 	-- Adjust the text component size.
 	self.information:AdjustHeightToText()
 	self.information:SetWndSize(vector2():set(self.information:GetWidth(), self.information:GetHeight() + information_offset))
+	self.information2:AdjustHeightToText()
+	self.information2:SetWndSize(vector2():set(self.information2:GetWidth(), self.information2:GetHeight() + information_offset))
+	local pos = self.information2:GetWndPos()
+	local pos2 = self.information:GetWndPos()
+	self.information2:SetWndPos(vector2():set(pos.x,pos2.y+self.information:GetHeight() + information_offset + 10))
 	
 	-- Clear the scrollbar.
 	self.scrollbar:Clear()
@@ -140,6 +151,9 @@ function pda_encyclopedia_tab:SelectArticle(index_a)
 	-- Add the text to the article window.
 	self.scrollbar:AddWindow(self.information, true)
 	self.information:SetAutoDelete(false)
+	self.scrollbar:AddWindow(self.information2, true)
+	self.information2:SetAutoDelete(false)
+	
 	
 	-- Add the image below text depending on checkbox.
 	if not (locked or images_above_text) then
@@ -246,16 +260,19 @@ function pda_encyclopedia_tab:InitControls()
 	
 	-- Text information, footer image (and container), and the scrollbar.
 	self.information = xml:InitTextWnd("description:information", nil)
+	self.information2 = xml:InitTextWnd("description:information2", nil)
 	self.image_container = xml:InitStatic("description:image_container", nil)
 	self.image = xml:InitStatic("description:image_container:image", self.image_container)
 	self.scrollbar = xml:InitScrollView("description:scrollbar", self)
 	
 	-- Add components to the scrollbar.
 	self.scrollbar:AddWindow(self.information, true)
+	self.scrollbar:AddWindow(self.information2, true)
 	self.scrollbar:AddWindow(self.image_container, true)
 	
 	-- Prevent components being deleted while used.
 	self.information:SetAutoDelete(false)
+	self.information2:SetAutoDelete(false)
 	self.image_container:SetAutoDelete(false)
 	self.image:SetAutoDelete(false)
 end

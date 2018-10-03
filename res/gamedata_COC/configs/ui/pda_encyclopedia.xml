@@ -61,6 +61,9 @@
 		<information width="628" height="1">
 			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t" x="5" y="6"/>
 		</information>
+		<information2 width="628" height="1">
+			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t" x="5" y="6"/>
+		</information2>
 		<image_container>
 			<image x="5" y="8" width="0" height="0"></image>
 		</image_container>
