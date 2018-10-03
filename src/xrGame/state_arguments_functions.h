@@ -55,11 +55,6 @@ private:
     static ge_function<T> ge_function;
     static le_function<T> le_function;
 };
-// definitions of static members of functions_cf
-template<typename T>
-ge_function<T> functions_cf<T>::ge_function;
-template<typename T>
-le_function<T> functions_cf<T>::le_function;
 
 typedef binary_function<float> float_binary_function;
 typedef functions_cf<float> float_bfunc_cf;
