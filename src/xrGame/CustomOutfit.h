@@ -31,6 +31,10 @@ public:
     virtual void OnMoveToRuck(const SInvItemPlace& previous_place);
     virtual void OnH_A_Chield();
 
+    float m_fJumpSpeed;
+    float m_fWalkAccel;
+    float m_fOverweightWalkK;
+
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;
 

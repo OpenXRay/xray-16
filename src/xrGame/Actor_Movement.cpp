@@ -18,6 +18,8 @@
 #include "player_hud.h"
 #include "ActorBackpack.h"
 
+#include "CustomOutfit.h"
+
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -233,6 +235,10 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                     jumpSpd *= (artefact->m_fJumpSpeed * artefact->GetCondition());
                 }
             }
+            CCustomOutfit* outfit = GetOutfit();
+            if (outfit)
+                jumpSpd *= outfit->m_fJumpSpeed;
+
             Jump = jumpSpd;
             m_fJumpTime = s_fJumpTime;
 
@@ -306,6 +312,10 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                         accel_k *= (artefact->m_fWalkAccel * artefact->GetCondition());
                     }
                 }
+                CCustomOutfit* outfit = GetOutfit();
+                if (outfit)
+                    accel_k *= outfit->m_fWalkAccel;
+
                 scale = accel_k / scale;
                 if (bAccelerated)
                     if (mstate_real & mcBack)
@@ -660,7 +670,7 @@ void CActor::StopAnyMove()
 
 bool CActor::is_jump() { return ((mstate_real & (mcJump | mcFall | mcLanding | mcLanding2)) != 0); }
 //максимальный переносимы вес
-#include "CustomOutfit.h"
+
 float CActor::MaxCarryWeight() const
 {
     float res = inventory().GetMaxWeight();
