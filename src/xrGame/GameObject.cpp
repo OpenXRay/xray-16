@@ -85,6 +85,9 @@ CGameObject::CGameObject() : SpatialBase(g_SpatialSpace), scriptBinder(this)
 
     m_callbacks = new CALLBACK_MAP();
     m_anim_mov_ctrl = 0;
+
+    m_bNonscriptUsable = true;
+    set_tip_text_default();
 }
 
 CGameObject::~CGameObject()

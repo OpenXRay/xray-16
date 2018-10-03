@@ -420,9 +420,9 @@ void CActor::ActorUse()
     if (character_physics_support()->movement()->PHCapture())
         character_physics_support()->movement()->PHReleaseObject();
 
-    if (m_pUsableObject && NULL == m_pObjectWeLookingAt->cast_inventory_item())
+    if (m_pObjectWeLookingAt && NULL == m_pObjectWeLookingAt->cast_inventory_item())
     {
-        m_pUsableObject->use(this);
+        m_pObjectWeLookingAt->use(this);
     }
 
     if (m_pInvBoxWeLookingAt && m_pInvBoxWeLookingAt->nonscript_usable())
@@ -438,7 +438,7 @@ void CActor::ActorUse()
         return;
     }
 
-    if (!m_pUsableObject || m_pUsableObject->nonscript_usable())
+    if (!m_pObjectWeLookingAt || m_pObjectWeLookingAt->nonscript_usable())
     {
         bool bCaptured = false;
 

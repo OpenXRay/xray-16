@@ -218,7 +218,7 @@ void CActor::PickupModeUpdate_COD()
     if (pNearestItem && m_bPickupMode && !m_pPersonWeLookingAt)
     {
         CGameObject* pUsableObject = smart_cast<CGameObject*>(pNearestItem);
-        if (pUsableObject && (!m_pUsableObject))
+        if (pUsableObject && (!m_pObjectWeLookingAt))
             pUsableObject->use(this);
 
         //подбирание объекта

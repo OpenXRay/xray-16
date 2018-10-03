@@ -174,8 +174,6 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 
     // hFriendlyIndicator.create(FVF::F_LIT,RCache.Vertex.Buffer(),RCache.QuadIB);
 
-    m_pUsableObject = NULL;
-
     m_anims = new SActorMotions();
     //Alundaio: Needed for car
     m_vehicle_anims = new SActorVehicleAnims();
@@ -244,7 +242,6 @@ void CActor::reinit()
     character_physics_support()->in_Init();
     material().reinit();
 
-    m_pUsableObject = NULL;
     if (!GEnv.isDedicatedServer)
         memory().reinit();
 
@@ -1359,7 +1356,6 @@ void CActor::shedule_Update(u32 DT)
     {
         CGameObject* game_object = smart_cast<CGameObject*>(RQ.O);
         m_pObjectWeLookingAt = game_object;
-        m_pUsableObject = game_object;
         m_pInvBoxWeLookingAt = smart_cast<CInventoryBox*>(game_object);
         m_pPersonWeLookingAt = smart_cast<CInventoryOwner*>(game_object);
         m_pVehicleWeLookingAt = smart_cast<CHolderCustom*>(game_object);
@@ -1367,9 +1363,9 @@ void CActor::shedule_Update(u32 DT)
 
         if (GameID() == eGameIDSingle)
         {
-            if (m_pUsableObject && m_pUsableObject->tip_text())
+            if (game_object->tip_text())
             {
-                m_sDefaultObjAction = CStringTable().translate(m_pUsableObject->tip_text());
+                m_sDefaultObjAction = CStringTable().translate(game_object->tip_text());
             }
             else
             {
@@ -1418,7 +1414,6 @@ void CActor::shedule_Update(u32 DT)
     {
         m_pPersonWeLookingAt = NULL;
         m_sDefaultObjAction = NULL;
-        m_pUsableObject = NULL;
         m_pObjectWeLookingAt = NULL;
         m_pVehicleWeLookingAt = NULL;
         m_pInvBoxWeLookingAt = NULL;

@@ -6,6 +6,7 @@
 #if !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
 #define AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_
 
+#include "stdafx.h"
 #include "xrEngine/xr_object.h"
 #include "xrServer_Space.h"
 #include "alife_space.h"
@@ -15,10 +16,10 @@
 #include "Hit.h"
 #include "game_object_space.h"
 
+class CScriptGameObject;
 class CPhysicsShell;
 class CSE_Abstract;
 class CPHSynchronize;
-class CScriptGameObject;
 class CInventoryItem;
 class CEntity;
 class CEntityAlive;
@@ -43,7 +44,6 @@ class CAttachableItem;
 class animation_movement_controller;
 class CBlend;
 class ai_obstacle;
-
 class IKinematics;
 
 template <typename _return_type>

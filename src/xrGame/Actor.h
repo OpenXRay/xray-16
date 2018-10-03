@@ -347,10 +347,11 @@ public:
     virtual bool feel_touch_on_contact(IGameObject* O);
 
     CGameObject* ObjectWeLookingAt() { return m_pObjectWeLookingAt; }
+	CScriptGameObject* ObjectWeLookingAt_script() { return m_pObjectWeLookingAt ? m_pObjectWeLookingAt->lua_game_object() : (0); }
     CInventoryOwner* PersonWeLookingAt() { return m_pPersonWeLookingAt; }
     LPCSTR GetDefaultActionForObject() { return *m_sDefaultObjAction; }
 protected:
-    CGameObject* m_pUsableObject;
+
     // Person we're looking at
     CInventoryOwner* m_pPersonWeLookingAt;
     CHolderCustom* m_pVehicleWeLookingAt;
@@ -757,33 +758,17 @@ private:
     bool m_disabled_hitmarks;
     bool m_inventory_disabled;
     // static CPhysicsShell		*actor_camera_shell;
-
-    IC u32 get_state() const
-    {
-        return this->mstate_real;
-    }
-
-    IC void set_state(u32 state)
-    {
-        mstate_real = state;
-    }
-
-    IC u32 get_state_wishful() const
-    {
-        return this->mstate_wishful;
-    }
-
-    IC void set_state_wishful(u32 state)
-    {
-        mstate_wishful = state;
-    }
-
 public:
+
+    IC u32 get_state() const { return this->mstate_real; }
+    IC void set_state(u32 state) { mstate_real = state; }
+    IC u32 get_state_wishful() const { return this->mstate_wishful; }
+    IC void set_state_wishful(u32 state) { mstate_wishful = state; }
+
     void SwitchNightVision(bool light_on, bool use_sounds = true, bool send_event = true);
     bool GetNightVisionStatus() { return m_bNightVisionOn; }
     void SetNightVisionAllowed(bool bAllow) { m_bNightVisionAllow = bAllow; }
     CNightVisionEffector* GetNightVision() { return m_night_vision; }
-
 protected:
     bool m_bNightVisionOn;
     bool m_bNightVisionAllow;
