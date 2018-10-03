@@ -1,9 +1,7 @@
 local sim_objects_registry = nil
 local props_ini = ini_file("misc\\simulation_objects_props.ltx")
-config = ini_file_ex("ai_tweaks\\simulation_objects.ltx")
 
 local ALLOW_NPC_LEVEL_TRANSITION = true
-
 
 -- setup default squad behaviors
 local default_squad_behaviour = {	
