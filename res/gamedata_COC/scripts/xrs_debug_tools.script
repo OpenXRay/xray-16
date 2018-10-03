@@ -1134,13 +1134,15 @@ function actor_props_hud_show(hud)
 	for i=1,#functors do
 		local val = cactor[ functors[i] ] and cactor[ functors[i] ](cactor)
 		if (functors[i] == "ObjectWeLookingAt") then
-			if (val ~= nil) then
-				hud:add_msg(functors[i],val:name())
-			end
+			hud:add_msg(functors[i],val and val:name() or "nil")
 		else
 			hud:add_msg(functors[i],val)
 		end
 	end
+	
+	local invowner = db.actor:cast_InventoryOwner()
+	local inv = invowner:inventory()
+	hud:add_msg("TotalWeight",inv:TotalWeight())
 	
 	hud:add_msg("----- BELT -----","")
 	
