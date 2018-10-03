@@ -77,21 +77,6 @@ void ALDeviceList::Enumerate()
         xr_strcpy(m_defaultDeviceName, (pstr)alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
         Msg("SOUND: OpenAL: system  default SndDevice name is %s", m_defaultDeviceName);
 
-        // ManowaR
-        // "Generic Hardware" device on software AC'97 codecs introduce
-        // high CPU usage ( up to 30% ) as a consequence - freezes, FPS drop
-        // So if default device is "Generic Hardware" which maps to DirectSound3D interface
-        // We re-assign it to "Generic Software" to get use of old good DirectSound interface
-        // This makes 3D-sound processing unusable on cheap AC'97 codecs
-        // Also we assume that if "Generic Hardware" exists, than "Generic Software" is also exists
-        // Maybe wrong
-
-        if (0 == xr_stricmp(m_defaultDeviceName, AL_GENERIC_HARDWARE))
-        {
-            xr_strcpy(m_defaultDeviceName, AL_GENERIC_SOFTWARE);
-            Msg("SOUND: OpenAL: default SndDevice name set to %s", m_defaultDeviceName);
-        }
-
         index = 0;
         // go through device list (each device terminated with a single NULL, list terminated with double NULL)
         while (*devices != NULL)
