@@ -831,7 +831,7 @@ bool CWeaponMagazinedWGrenade::install_upgrade_ammo_class(LPCSTR section, bool t
 {
     LPCSTR str;
 
-	bool result = process_if_exists(section, "ammo_mag_size", &CInifile::r_s32, m_bGrenadeMode ? iMagazineSize : iMagazineSize2, test);
+	bool result = process_if_exists(section, "ammo_mag_size", &CInifile::r_s32, m_bGrenadeMode ? iMagazineSize2 : iMagazineSize, test);
 
     //	ammo_class = ammo_5.45x39_fmj, ammo_5.45x39_ap  // name of the ltx-section of used ammo
     bool result2 = process_if_exists_set(section, "ammo_class", &CInifile::r_string, str, test);
