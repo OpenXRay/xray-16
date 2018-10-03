@@ -7,7 +7,11 @@
 #include "game_sv_base_console_vars.h"
 #include "game_sv_event_queue.h"
 #include "game_sv_item_respawner.h"
+#if defined(WINDOWS)
 #include "xrNetServer/NET_Server.h"
+#elif defined(LINUX)
+#include "xrNetServer/empty/NET_Server.h"
+#endif
 
 #define MAX_PLAYERS_COUNT 32
 

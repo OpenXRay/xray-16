@@ -36,11 +36,13 @@ enum
 IC u32 TimeGlobal(CTimer* timer) { return timer->GetElapsed_ms(); }
 IC u32 TimerAsync(CTimer* timer) { return TimeGlobal(timer); }
 
+#if defined(WINDOWS)
 // DPlay
 extern "C"
 {
     typedef struct _DPN_CONNECTION_INFO DPN_CONNECTION_INFO;
 }
+#endif
 
 class XRNETSERVER_API IClientStatistic
 {
@@ -52,7 +54,9 @@ public:
     IClientStatistic(const IClientStatistic& rhs); // Required due to probable bug in CLevel::ProcessCompressedUpdate
     ~IClientStatistic();
 
+#if defined(WINDOWS)
     void Update(DPN_CONNECTION_INFO& CI);
+#endif
 
     u32 getPing() const;
     u32 getBPS() const;

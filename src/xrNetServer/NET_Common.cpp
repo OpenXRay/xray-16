@@ -74,7 +74,7 @@ MultipacketSender::~MultipacketSender()
 void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 flags, u32 timeout)
 {
     _buf_cs->Enter();
-
+#if defined(WINDOWS)
     //PrintParsedPacket("-- LL Sending:", 1, packet_data, packet_sz);
 
     Buffer* buf = &_buf;
@@ -111,6 +111,7 @@ void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 f
         _FlushSendBuffer(timeout, buf);
 
     buf->last_flags = flags;
+#endif
     _buf_cs->Leave();
 }
 

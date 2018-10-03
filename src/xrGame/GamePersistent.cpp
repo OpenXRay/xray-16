@@ -466,6 +466,7 @@ void CGamePersistent::WeathersUpdate()
 
 bool allow_intro()
 {
+#if defined(WINDOWS)
 #ifdef MASTER_GOLD
     if (g_SASH.IsRunning())
 #else // #ifdef MASTER_GOLD
@@ -475,6 +476,7 @@ bool allow_intro()
         return false;
     }
     else
+#endif
         return true;
 }
 
