@@ -67,7 +67,7 @@ LPCSTR game_cl_mp_script::GetRoundTime()
 
     split_time(dt, year, month, day, hours, mins, secs, milisecs);
 
-    sprintf_s(bufTime, "%02i:%02i", mins, secs);
+    xr_sprintf(bufTime, "%02i:%02i", mins, secs);
 
     return bufTime;
 }

@@ -1275,7 +1275,7 @@ HRESULT CRender::shader_compile(
     size_t def_len = def_it * 5;
     size_t sources_len = source.size() + def_len + 2;
     string256 name_comment;
-    sprintf_s(name_comment, "// %s\n", name);
+    xr_sprintf(name_comment, "// %s\n", name);
     const char** sources = xr_alloc<const char*>(sources_len);
 #ifdef DEBUG
     sources[0] = "#version 450\n#pragma optimize (off)\n";
