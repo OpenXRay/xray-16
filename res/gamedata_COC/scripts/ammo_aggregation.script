@@ -59,7 +59,8 @@ function aggregate(npc,obj)
 end
 
 function actor_on_item_take(item)
-	aggregate(db.actor,item)
+	-- commented out because it's done in engine when inventory window is closed now
+	--aggregate(db.actor,item)
 end
 
 function on_game_start()
