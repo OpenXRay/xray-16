@@ -45,7 +45,7 @@ function init_drop_settings()
 	
  	-- Create a list of item sections that npc must keep
 	local n = death_ini:line_count("keep_items")
-	for i=0,n-1 do
+	for i=0,n-1 do 
 		local result, id, value	= death_ini:r_line_ex("keep_items",i,"","")
 		if value == "true" then
 			always_keep_item[id] = true
@@ -86,7 +86,7 @@ function create_release_item(npc,who)
 		--local p = alun_utils.str_explode(item_by_story_id[sid],",")
 		--printf("sid=%s p=%s",sid,p)
 		if (p and p ~= "" and p ~= "nil") then
-			create_items(npc, p, 1, 100 * cnt_multi_2)
+			create_items(npc, p, 1, 100)
 		end
 	end
 
@@ -105,7 +105,7 @@ function create_release_item(npc,who)
 		return
 	end
 	
-	npc:iterate_inventory(try_spawn_ammo_for_weapon,npc)
+	--npc:iterate_inventory(try_spawn_ammo_for_weapon,npc)
 	
 	for sec,v in pairs(spawn_items) do
 		if (v > 0 and item_count[sec]) and not utils.is_ammo(sec) then
