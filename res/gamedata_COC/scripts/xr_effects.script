@@ -5194,3 +5194,12 @@ end
 function setup_base_defense_fail_conditions(actor,npc,p)
 	utils.save_var(db.actor,"base_defense_level",level.name())
 end
+
+function set_actor_community(actor,npc,p)
+	local faction = p[1]
+	if (faction == nil or faction == "") then
+		return
+	end
+	db.actor:set_character_community(faction, 0, 0)
+	game_relations.set_community_goodwill_for_faction(faction)
+end
