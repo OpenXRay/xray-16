@@ -910,13 +910,13 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
     string32 int_str;
 
 
-    if (!IsGrenadeLauncherAttached())
+    if (m_bGrenadeMode || !IsGrenadeLauncherAttached())
     {
         info.grenade = "";
         return false;
     }
 
-    int total2 = GetAmmoCount(0);
+    int total2 = GetAmmoCount2(0);
     if (unlimited_ammo())
         xr_sprintf(int_str, "--");
     else
