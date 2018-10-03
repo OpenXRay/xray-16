@@ -19,7 +19,7 @@ by Alundaio
 ---------------------------------------------------------------------------------------------------------
 
 local toggle_hud_list = 	{
-							["right"]  = { "actor_condition_hud", "current_test_hud","actor_inside_zone_hud","feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
+							["right"]  = { "actor_props_hud", "actor_condition_hud", "current_test_hud","actor_inside_zone_hud","feel_touch_hud", "task_hud","squad_info_hud","stalker_info_hud","stalker_data_hud","position_other_hud"},
 							["left"] = { "team_squad_group_hud","surge_hud","arena_hud","actor_feel_touch_hud", "enemy_hud", "trader_hud", "monster_hud", "weapon_hud", "anim_hud", "behavior_hud"},
 							["top"] = { "actor_slot_hud","stalker_condition_hud","space_restrictor_hud","npc_memory_hud","npc_info_hud", "actor_info_hud", "planner_hud", "gulag_info_hud", "heli_hud", "wounded_hud","corpse_hud", "position_hud"}
 							}
@@ -1092,6 +1092,80 @@ function actor_slot_hud_show(hud)
 	end
 	hud:display()
 end 
+
+function actor_props_hud_show(hud)
+	hud:set_header("-[Actor Properties]-")
+	-- actor_script.cpp
+	local cactor = db.actor:cast_Actor()
+	local properties = {
+		"m_fWalkAccel",
+		"m_fJumpSpeed",
+		"m_fRunFactor",
+		"m_fRunBackFactor",
+		"m_fWalkBackFactor",
+		"m_fCrouchFactor",
+		"m_fClimbFactor",
+		"m_fSprintFactor",
+		"m_fWalk_StrafeFactor",
+		"m_fRun_StrafeFactor",
+		"CurrentHeight"
+	}
+	local functors = {
+		"CanSprint",
+		"CanRun",
+		"is_jump",
+		"CameraHeight",
+		"GetWeaponAccuracy",
+		"GetFireDispersion",
+		"IsZoomAimingMode",
+		"get_additional_weight",
+		"MaxWalkWeight",
+		"MaxCarryWeight",
+		"GetNightVisionStatus",
+		"get_state_wishful",
+		"get_state",
+		"ObjectWeLookingAt",
+		"GetDefaultActionForObject"
+	}
+	for i=1,#properties do 
+		hud:add_msg(properties[i],cactor[ properties[i] ])
+	end
+	
+	for i=1,#functors do
+		local val = cactor[ functors[i] ] and cactor[ functors[i] ](cactor)
+		if (functors[i] == "ObjectWeLookingAt") then
+			if (val ~= nil) then
+				hud:add_msg(functors[i],val:name())
+			end
+		else
+			hud:add_msg(functors[i],val)
+		end
+	end
+	
+	hud:add_msg("----- BELT -----","")
+	
+	local hit_to_section = {
+		[hit.light_burn] = "light_burn_immunity",
+		[hit.burn] = "burn_immunity",
+		[hit.strike] = "strike_immunity",
+		[hit.shock] = "shock_immunity",
+		[hit.wound] = "wound_immunity",
+		[hit.radiation] = "radiation_immunity",
+		[hit.telepatic] = "telepatic_immunity",
+		[hit.chemical_burn] = "chemical_burn_immunity",
+		[hit.explosion] = "explosion_immunity",
+		[hit.fire_wound] = "fire_wound_immunity",
+	}
+	
+	for i,v in pairs(hit_to_section) do
+		local val = cactor:GetProtection_ArtefactsOnBelt(i)
+		if (val ~= 0) then
+			hud:add_msg(v,val)
+		end
+	end
+	
+	hud:display()
+end
 
 function actor_condition_hud_show(hud)
 	hud:set_header("-[Actor Condition]-")
