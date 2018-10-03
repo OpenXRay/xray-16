@@ -71,8 +71,8 @@ void CUILogsWnd::Update()
 
     if (!m_items_ready.empty())
     {
-        WINDOW_LIST::reverse_iterator it = m_items_ready.rbegin();
-        WINDOW_LIST::reverse_iterator it_e = m_items_ready.rend();
+        WINDOW_LIST::iterator it = m_items_ready.begin();
+        WINDOW_LIST::iterator it_e = m_items_ready.end();
         for (; it != it_e; ++it)
             m_list->AddWindow(*it, true);
 
@@ -218,7 +218,7 @@ void CUILogsWnd::PerformWork()
 {
     if (!m_news_in_queue.empty())
     {
-        u32 count = _min(30, m_news_in_queue.size());
+        u32 count = _min(15, m_news_in_queue.size());
         for (u32 i = 0; i < count; ++i)
         {
             GAME_NEWS_VECTOR& news_vector = Actor()->game_news_registry->registry().objects();

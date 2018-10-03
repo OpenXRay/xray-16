@@ -34,6 +34,7 @@ class CScriptXmlInit
 {
 public:
     void ParseFile(LPCSTR xml_file);
+    bool NodeExists(LPCSTR path, int index = 0);
     void InitWindow(LPCSTR path, int index, CUIWindow* pWnd);
     UIHint* InitHint(LPCSTR path, CUIWindow* parent);
     CUIFrameWindow* InitFrame(LPCSTR path, CUIWindow* parent);

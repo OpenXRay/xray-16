@@ -167,14 +167,10 @@ bool CUIXmlInit::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* 
     int flag_alpha = xml_doc.ReadAttribInt(path, index, "la_alpha", 0);
 
     u8 flags = 0;
-    if (flag_cyclic)
-        flags |= LA_CYCLIC;
-    if (flag_alpha)
-        flags |= LA_ONLYALPHA;
-    if (flag_text)
-        flags |= LA_TEXTCOLOR;
-    if (flag_texture)
-        flags |= LA_TEXTURECOLOR;
+    if (flag_cyclic)  flags |= LA_CYCLIC;
+    if (flag_alpha)   flags |= LA_ONLYALPHA;
+    if (flag_text)    flags |= LA_TEXTCOLOR;
+    if (flag_texture) flags |= LA_TEXTURECOLOR;
 
     pWnd->SetColorAnimation(str_flag, flags);
 
@@ -206,10 +202,8 @@ bool CUIXmlInit::InitTextWnd(CUIXml& xml_doc, LPCSTR path, int index, CUITextWnd
     int flag_alpha = xml_doc.ReadAttribInt(path, index, "la_alpha", 0);
 
     u8 flags = LA_TEXTCOLOR;
-    if (flag_cyclic)
-        flags |= LA_CYCLIC;
-    if (flag_alpha)
-        flags |= LA_ONLYALPHA;
+    if (flag_cyclic) flags |= LA_CYCLIC;
+    if (flag_alpha)  flags |= LA_ONLYALPHA;
     pWnd->SetColorAnimation(str_flag, flags);
 
     bool bComplexMode = xml_doc.ReadAttribInt(path, index, "complex_mode", 0) ? true : false;
@@ -949,39 +943,41 @@ bool CUIXmlInit::InitSleepStatic(CUIXml& xml_doc, const char* path, int index, C
 
 bool CUIXmlInit::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOwner* pWnd)
 {
-    string256 buf;
-    LPCSTR texture = NULL;
-    LPCSTR shader = NULL;
-    strconcat(sizeof(buf), buf, path, ":texture");
-    if (xml_doc.NavigateToNode(buf))
-    {
-        texture = xml_doc.Read(buf, index, NULL);
-        shader = xml_doc.ReadAttrib(buf, index, "shader", NULL);
-    }
-    if (texture)
-    {
-        if (shader)
-            pWnd->InitTextureEx(texture, shader);
-        else
-            pWnd->InitTexture(texture);
-    }
-    //--------------------
-    Frect rect;
-    rect.x1 = xml_doc.ReadAttribFlt(buf, index, "x", 0);
-    rect.y1 = xml_doc.ReadAttribFlt(buf, index, "y", 0);
-    rect.x2 = rect.x1 + xml_doc.ReadAttribFlt(buf, index, "width", 0);
-    rect.y2 = rect.y1 + xml_doc.ReadAttribFlt(buf, index, "height", 0);
+	//<Рандомные текстуры> Romann (спасибо Charsi за помощь в реализации)
+	int nodes_num = xml_doc.GetNodesNum(path, index, "texture");
+	if (nodes_num > 0)
+	{
+		auto root = xml_doc.GetLocalRoot();
+		xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
 
-    bool stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch") ? true : false;
-    pWnd->SetStretchTexture(stretch_flag);
+		int ind = Random.randI(nodes_num);
 
-    u32 color = GetColor(xml_doc, buf, index, 0xff);
-    pWnd->SetTextureColor(color);
+		LPCSTR texture = xml_doc.Read("texture", ind, NULL);
+		LPCSTR shader = xml_doc.ReadAttrib("texture", ind, "shader", NULL);
+		if (texture) {
+			if (shader)
+				pWnd->InitTextureEx(texture, shader);
+			else
+				pWnd->InitTexture(texture);
+		}
 
-    if (rect.width() != 0 && rect.height() != 0)
-        pWnd->SetTextureRect(rect);
+		Frect rect;
+		rect.x1 = xml_doc.ReadAttribFlt("texture", ind, "x", 0);
+		rect.y1 = xml_doc.ReadAttribFlt("texture", ind, "y", 0);
+		rect.x2 = rect.x1 + xml_doc.ReadAttribFlt("texture", ind, "width", 0);
+		rect.y2 = rect.y1 + xml_doc.ReadAttribFlt("texture", ind, "height", 0);
+		if (rect.width() != 0 && rect.height() != 0) pWnd->SetTextureRect(rect);
 
-    return true;
+		u32 color = GetColor(xml_doc, "texture", ind, 0xff);
+		pWnd->SetTextureColor(color);
+
+		xml_doc.SetLocalRoot(root);
+	}
+	bool stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch") ? true : false;
+	pWnd->SetStretchTexture(stretch_flag);
+
+	return true;
+	//Romann
 }
 
 bool CUIXmlInit::InitTextureOffset(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd)

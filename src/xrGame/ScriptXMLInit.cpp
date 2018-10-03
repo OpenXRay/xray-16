@@ -40,6 +40,15 @@ void _attach_child(CUIWindow* _child, CUIWindow* _parent)
 }
 
 void CScriptXmlInit::ParseFile(LPCSTR xml_file) { m_xml.Load(CONFIG_PATH, UI_PATH, xml_file); }
+
+bool CScriptXmlInit::NodeExists(LPCSTR path, int index)
+{
+    XML_NODE node = m_xml.NavigateToNode(path, index);
+    if (!node)
+        return false;
+    return true;
+}
+
 void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd)
 {
     CUIXmlInit::InitWindow(m_xml, path, index, pWnd);
@@ -258,6 +267,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (), {
     module(luaState)[class_<CScriptXmlInit>("CScriptXmlInit")
                          .def(constructor<>())
                          .def("ParseFile", &CScriptXmlInit::ParseFile)
+                         .def("NodeExists", &CScriptXmlInit::NodeExists)
                          .def("InitWindow", &CScriptXmlInit::InitWindow)
                          .def("InitHint", &CScriptXmlInit::InitHint)
                          .def("InitFrame", &CScriptXmlInit::InitFrame)
