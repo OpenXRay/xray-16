@@ -464,11 +464,8 @@ void CActorCondition::ConditionJump(float weight)
 
 void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
 {
-    float overweight_k = m_fOverweightWalkK;
-    CCustomOutfit* outfit = object().GetOutfit();
-    if (outfit) overweight_k += outfit->m_fOverweightWalkK;
     float power = m_fWalkPower;
-    power += m_fWalkWeightPower * weight * (weight > 1.f ? overweight_k : 1.f);
+    power += m_fWalkWeightPower * weight * (weight > 1.f ? m_fOverweightWalkK : 1.f);
     power *= m_fDeltaTime * (accel ? (sprint ? m_fSprintK : m_fAccelK) : 1.f);
     m_fPower -= HitPowerEffect(power);
 }

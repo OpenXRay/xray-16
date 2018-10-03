@@ -292,10 +292,8 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
             BOOL bAccelerated = isActorAccelerated(mstate_real, IsZoomAimingMode()) && CanAccelerate();
 
             // correct "mstate_real" if opposite keys pressed
-            if (_abs(vControlAccel.z) < EPS)
-                mstate_real &= ~(mcFwd + mcBack);
-            if (_abs(vControlAccel.x) < EPS)
-                mstate_real &= ~(mcLStrafe + mcRStrafe);
+            if (_abs(vControlAccel.z) < EPS) mstate_real &= ~(mcFwd + mcBack);
+            if (_abs(vControlAccel.x) < EPS) mstate_real &= ~(mcLStrafe + mcRStrafe);
 
             // normalize and analyze crouch and run
             float scale = vControlAccel.magnitude();
@@ -314,7 +312,12 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 }
                 CCustomOutfit* outfit = GetOutfit();
                 if (outfit)
+                {
                     accel_k *= outfit->m_fWalkAccel;
+
+                    if (inventory().TotalWeight() > MaxWalkWeight())
+                        accel_k *= outfit->m_fOverweightWalkK;
+                }
 
                 scale = accel_k / scale;
                 if (bAccelerated)
