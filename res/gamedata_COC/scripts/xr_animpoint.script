@@ -46,6 +46,7 @@ function action_reach_animpoint:__init (npc, action_name, storage) super(nil, ac
 end
 function action_reach_animpoint:initialize()
 	action_base.initialize(self)
+	self.st.am_i_reached = false
 	self.st.animpoint:calculate_position()
 end
 function action_reach_animpoint:execute()
