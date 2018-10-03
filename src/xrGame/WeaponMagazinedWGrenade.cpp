@@ -59,10 +59,7 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
 {
     CSE_ALifeItemWeapon* const weapon = smart_cast<CSE_ALifeItemWeapon*>(DC);
     R_ASSERT(weapon);
-    if (IsGameTypeSingle())
-    {
-        inherited::net_Spawn_install_upgrades(weapon->m_upgrades);
-    }
+    if (IsGameTypeSingle()){}
 
     BOOL l_res = inherited::net_Spawn(DC);
 
@@ -901,12 +898,6 @@ bool CWeaponMagazinedWGrenade::install_upgrade_impl(LPCSTR section, bool test)
     result |= result2;
 
     return result;
-}
-
-void CWeaponMagazinedWGrenade::net_Spawn_install_upgrades(Upgrades_type saved_upgrades)
-{
-    // do not delete this
-    // this is intended behaviour
 }
 
 #include "string_table.h"

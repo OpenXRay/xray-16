@@ -2129,7 +2129,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "dbg_dump_physics_step", &ph_console::g_bDebugDumpPhysicsStep, 0, 1);
     CMD1(CCC_InvUpgradesHierarchy, "inv_upgrades_hierarchy");
     CMD1(CCC_InvUpgradesCurItem, "inv_upgrades_cur_item");
-    CMD4(CCC_Integer, "inv_upgrades_log", &g_upgrades_log, 0, 1);
+
     CMD1(CCC_InvDropAllItems, "inv_drop_all_items");
 
     extern BOOL dbg_moving_bones_snd_player;
@@ -2138,7 +2138,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "con_sensitive", &g_console_sensitive, 0.01f, 1.0f);
     CMD4(CCC_Integer, "wpn_aim_toggle", &b_toggle_weapon_aim, 0, 1);
 //	CMD4(CCC_Integer,	"hud_old_style",			&g_old_style_ui_hud, 0, 1);
-
+    CMD4(CCC_Integer, "inv_upgrades_log", &g_upgrades_log, 0, 1);
 #ifdef DEBUG
     CMD4(CCC_Float, "ai_smart_cover_animation_speed_factor", &g_smart_cover_animation_speed_factor, .1f, 10.f);
     CMD4(CCC_Float, "air_resistance_epsilon", &air_resistance_epsilon, .0f, 1.f);
