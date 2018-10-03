@@ -913,6 +913,157 @@ function npc_csky(first_speaker, second_speaker)
 	local npc = who_is_npc(first_speaker, second_speaker)
 	return character_community(npc) == "csky"
 end
+
+function npc_monolith(first_speaker, second_speaker)
+	local npc = who_is_npc(first_speaker, second_speaker)
+	return character_community(npc) == "monolith"
+end
+
+-- Actor community
+function actor_in_stalker(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_stalker"
+end
+
+function not_actor_in_stalker(a, b)
+	return not actor_in_stalker(a,b)
+end
+
+function actor_set_stalker(a, b)
+	db.actor:set_character_community("actor_stalker", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_stalker")
+end
+
+function actor_in_bandit(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_bandit"
+end
+
+function not_actor_in_bandit(a, b)
+	return not actor_in_bandit(a, b)
+end
+
+function actor_set_bandit(a, b)
+	db.actor:set_character_community("actor_bandit", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_bandit")
+end
+
+function actor_in_renegade(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_renegade"
+end
+
+function not_actor_in_renegade(a, b)
+	return not actor_in_renegade(a, b)
+end
+
+function actor_set_renegade(a, b)
+	db.actor:set_character_community("actor_renegade", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_renegade")
+end
+
+function actor_in_freedom(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_freedom"
+end
+
+function not_actor_in_freedom(a, b)
+	return not actor_in_freedom(a, b)
+end
+
+function actor_set_freedom(a, b)
+	db.actor:set_character_community("actor_freedom", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_freedom")
+end
+
+function actor_in_dolg(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_dolg"
+end
+
+function not_actor_in_dolg(a, b)
+	return not actor_in_dolg(a, b)
+end
+
+function actor_set_dolg(a, b)
+	db.actor:set_character_community("actor_dolg", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_dolg")
+end
+
+function actor_in_killer(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_killer"
+end
+
+function not_actor_in_killer(a, b)
+	return not actor_in_killer(a, b)
+end
+
+function actor_set_killer(a, b)
+	db.actor:set_character_community("actor_killer", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_killer")
+end
+
+function actor_in_army(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_army"
+end
+
+function not_actor_in_army(a, b)
+	return not actor_in_army(a, b)
+end
+
+function actor_set_army(a, b)
+	db.actor:set_character_community("actor_army", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_army")
+end
+
+function actor_in_ecolog(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_ecolog"
+end
+
+function not_actor_in_ecolog(a, b)
+	return not actor_in_ecolog(a, b)
+end
+
+function actor_set_ecolog(a, b)
+	db.actor:set_character_community("actor_ecolog", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_ecolog")
+end
+
+function actor_in_csky(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_csky"
+end
+
+function not_actor_in_csky(a, b)
+	return not actor_in_csky(a, b)
+end
+
+function actor_set_csky(a, b)
+	db.actor:set_character_community("actor_csky", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_csky")
+end
+
+function actor_in_monolith(a, b)
+	local npc = who_is_actor(a, b)
+	return character_community(npc) == "actor_monolith"
+end
+
+function not_actor_in_monolith(a, b)
+	return not actor_in_monolith(a, b)
+end
+
+function actor_set_monolith(a, b)
+	db.actor:set_character_community("actor_monolith", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor_monolith")
+end
+
+function actor_clear_community(a, b)
+	db.actor:set_character_community("actor", 0, 0)
+	game_relations.set_community_goodwill_for_faction("actor")
+end
 -----------------------------------------------------------------------------------
 -- Money functions
 -----------------------------------------------------------------------------------
