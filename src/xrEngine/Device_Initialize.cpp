@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "xr_3da/resource.h"
 #include "SDL.h"
-
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
 #include "xr_input.h"
@@ -50,8 +49,16 @@ void CRenderDevice::Initialize()
         const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 
-        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 640, 480, flags);
+#ifdef USE_OGL
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+#endif
 
+        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
