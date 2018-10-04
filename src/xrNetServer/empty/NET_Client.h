@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "NET_Common.h"
-#include "NET_Shared.h"
+#include "../NET_Common.h"
+#include "../NET_Shared.h"
 #include "xrCommon/xr_deque.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCore/xrstring.h"
