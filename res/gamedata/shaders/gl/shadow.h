@@ -554,13 +554,13 @@ bool cheap_reject( float3 tc, inout bool full_light )
    float4 plane1  = sm_minmax_gather( tc.xy, int2(  1,-1 ) );
    float4 plane2  = sm_minmax_gather( tc.xy, int2( -1, 1 ) );
    float4 plane3  = sm_minmax_gather( tc.xy, int2(  1, 1 ) );
-   bool plane     = all( greaterThanEqual( plane0, float4(0) ) && greaterThanEqual( plane1, float4(0) ) && greaterThanEqual( plane2, float4(0) ) && greaterThanEqual( plane3, float4(0) ) );
+   bool plane     = all( greaterThanEqual( plane0, float4(0) )) && all(greaterThanEqual( plane1, float4(0) )) && all(greaterThanEqual( plane2, float4(0) )) && all(greaterThanEqual( plane3, float4(0) ) );
 
    if( !plane ) // if there are no proper plane equations in the support region
    {
-      bool no_plane  = all( lessThan( plane0, float4(0) ) && lessThan( plane1, float4(0) ) && lessThan( plane2, float4(0) ) && lessThan( plane3, float4(0) ) );
+      bool no_plane  = all(lessThan( plane0, float4(0) )) && all(lessThan( plane1, float4(0) )) && all(lessThan( plane2, float4(0) )) && all(lessThan( plane3, float4(0) ) );
       float4 z       = float4( tc.z - 0.0005 );
-      bool reject    = all( greaterThan( z, -plane0 ) && greaterThan( z, -plane1 ) && greaterThan( z, -plane2 ) && greaterThan( z, -plane3 ) ); 
+      bool reject    = all( greaterThan( z, -plane0 )) && all(greaterThan( z, -plane1 )) && all(greaterThan( z, -plane2 )) && all(greaterThan( z, -plane3 ) );
       if( no_plane && reject )
       {
          full_light = false;
