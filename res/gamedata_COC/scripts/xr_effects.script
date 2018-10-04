@@ -2921,6 +2921,7 @@ function disable_level_changer(actor, npc, p)
 		end
 	end
 end
+--]]
 
 function change_actor_community(actor, npc, p)
 	if(p[1]~=nil) then
@@ -2929,7 +2930,6 @@ function change_actor_community(actor, npc, p)
 end
 
 function set_faction_community_to_actor(actor, npc, p)
--- run_string xr_effects.change_actor_community(nil,nil,{"actor_dolg"})
 	if(p[1]~=nil) and (p[2]~=nil) then
 		local rel = 0
 		if(p[2]=="enemy") then
@@ -2940,6 +2940,8 @@ function set_faction_community_to_actor(actor, npc, p)
 		db.actor:set_community_goodwill(p[1], rel)
 	end
 end
+
+--[[
 
 function disable_collision(actor, npc)
 	npc:wounded(true)
@@ -3179,17 +3181,11 @@ function launch_signal_rocket(actor, obj, p)
 	end
 end
 
---[[
 function reset_faction_goodwill(actor, obj, p)
 	if db.actor and p[1] then
-		local board = SIMBOARD
-		local faction = board.players[ p[1] ]
-		if faction then
-			db.actor:set_community_goodwill(p[1], 0)
-		end
+		db.actor:set_community_goodwill(p[1], 0)
 	end
 end
-]]--
 
 function add_cs_text(actor, npc, p)
 	if p[1] then
