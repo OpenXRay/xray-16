@@ -5,8 +5,6 @@
 -- Перевод на xr_logic: Andrey Fidrya (Zmey) af@svitonline.com
 -- Доработка для БТР: Oleg Kreptul (Haron) haronk@ukr.net
 ----------------------------------------------------------------------------------------------------
---function --printf() end
-
 local pi_2 = math.pi / 3 -- 60 degree
 
 local def_min_delta_per_sec = 0.2
@@ -31,6 +29,7 @@ local state_moving_rot_left = 2
 local state_moving_rot_right = 3
 local state_moving_stop = 4
 local state_moving_end = 5
+local state_moving_stuck = 6
 
 local state_cannon_rotate = 1
 local state_cannon_follow = 2
@@ -50,6 +49,7 @@ function action_car:__init(obj, storage)
 	self.object = obj
 	self.car = self.object:get_car()
 	self.st = storage
+	self.accel = move.none
 end
 
 function action_car:reset_scheme(loading)
@@ -357,11 +357,65 @@ function action_car:get_next_walkpoint()
 end
 
 function action_car:at_target_walkpoint()
+    --printf("car <move>: action_car:at_target_walkpoint(%s)", utils.to_str(self.target_walk_pt))
 	if self.target_walk_pt == -2 then return true end
-	local arrived = false --2000 * dist < def_arriving_koef * self.fc_upd_avg * (curVel + self.speed)
+
+    local curVel = self.car:CurrentVel():magnitude()
 	local dist = self.object:position():distance_to(self.path_walk:point(self.target_walk_pt))
-	arrived = dist < 3.0
-	self.target_dist = arrived and -1 or self.target_dist
+
+	--local arrived = 2 * dist < def_update_time * (curVel.x + self.speed) --def_update_time > 2 * dist / (curVel.x + self.speed)
+	--local arrived = dist < curVel.x * def_arriving_factor --8
+
+    -- def_arriving_koef * self.fc_upd_avg / 1000 > 2 * dist / (curVel.x + self.speed)
+	local arrived = false --2000 * dist < def_arriving_koef * self.fc_upd_avg * (curVel + self.speed)
+	
+	if self.fc_upd_avg < 100 then
+		arrived = 2000 * dist < def_arriving_koef * self.fc_upd_avg * (curVel + self.speed)
+	    --printf("car <move>: check formula (%s < %s)", 2000 * dist, def_arriving_koef * self.fc_upd_avg * (curVel + self.speed))
+	    if arrived then
+	        --printf("car <move>: at target pt by formula.")
+	    end
+	end
+	
+	if not arrived then
+	    local diff_angle = angle_xz(self.object, self.path_walk:point(self.target_walk_pt))
+	    --printf("car <move>: dist(%s), angle(%s).", dist, diff_angle)
+	    arrived = dist < 2 or diff_angle >= math.pi
+	    if arrived then
+	        ----printf("car <move>: at target pt by dist(%f) and angle(%f).", dist, diff_angle)
+	        --printf("car <move>: at target pt by dist and angle.")
+	    end
+	end
+	
+	local diff = dist - self.target_dist
+	--printf("car <move>: dist = %s, target = %s, diff = %s, curVel = %s, speed = %s", dist, self.target_dist, diff, curVel, self.speed)
+	if self.target_dist ~= -1 and not arrived then
+	    if diff > 0 then
+	        if diff > def_arriving_dist then
+	            arrived = true
+	            --printf("car <move>: at target pt by diff(%s).", diff)
+	        end
+	    else
+	        self.target_dist = dist
+	    end
+	else
+        self.target_dist = dist
+	end
+--[[
+	----printf("car <move>: action_car:at_target_walkpoint(self.target_walk_pt=%d) = %d (arrived = %s)",		self.target_walk_pt, dist, utils.to_str(arrived))
+    --if arrived then
+        --printf("car <move>: arrived = %f > %f, dist(%f), diff(%f), curSpd(%f), spd(%f)",
+               --def_arriving_koef * self.fc_upd_avg / 1000,
+               --2 * dist / (curVel.x + self.speed),
+               def_arriving_koef * self.fc_upd_avg * (curVel + self.speed),
+               2000 * dist,
+               dist, diff, curVel, self.speed)
+        ----printf("car <move>: arrived = %f < (%f,%f,%f) * %f, spd(%f)", dist, curVel.x, curVel.y, curVel.z, def_arriving_factor, self.speed)
+    --end
+--]]
+    if arrived then
+	    self.target_dist = -1
+    end
 	return arrived
 end
 
@@ -393,34 +447,57 @@ function action_car:go_to_walkpoint(pt)
     local accel = move.none
     local curVel = self.car:CurrentVel():magnitude()
     --printf("car <move>: curVel = %s, speed = %s", curVel, self.speed)
-    if curVel < self.speed then
+
+	if (curVel <= self.speed) then
         accel = move.fwd
-        --printf("car <move>: forward")
-    elseif curVel > self.speed * 1.15 or diff_angle >= math.pi then
-        accel = move.back
-        --printf("car <move>: backward")
+	elseif (curVel > self.speed * 1.15 or diff_angle >= math.pi) then
+		accel = move.back
     end
+	
+	if (self.accel == move.fwd) then 
+		--printf("car <move>: forward")
+	elseif (self.accel == move.back) then
+		--printf("car <move>: backward")
+	end
+	
+	if (self.state_moving == state_moving_stuck) then 
+		if (self.accel == move.fwd) then
+			accel = move.back
+		else
+			accel = move.fwd
+		end
+		xr_logic.mob_capture(self.object, true)
+		action(self.object,
+			move(accel, self.speed), --move.on + 
+			--object("right_light", self.headlights),
+			--object("left_light", self.headlights),
+			cond(cond.time_end, time_infinite)) --self.fc_upd_avg))
+		return
+	end
+	
     ----printf("car <move>: diff_angle = %s, katet = %s", diff_angle, get_katet(self.object, self.path_walk:point(pt)))
 	--if utils.no_need_to_rotate_xz(self.object, self.path_walk:point(pt)) then
 	if diff_angle < def_not_rotating_angle then
-		if self.state_moving ~= state_moving_fwd and accel ~= move.none then
-		    --printf("car <move>: no_need_to_rotate. speed = %s, time = %s", self.speed, self.fc_upd_avg)
-	   		xr_logic.mob_capture(self.object, true)
-			action(self.object,
-				move(accel, self.speed), --move.on + 
-				--object("right_light", self.headlights),
-				--object("left_light", self.headlights),
-				cond(cond.time_end, time_infinite)) --self.fc_upd_avg))
-			self.state_moving = state_moving_fwd
+		if (accel ~= move.none) then
+			if (self.state_moving ~= state_moving_fwd) then
+				self.accel = accel
+				--printf("car <move>: no_need_to_rotate. speed = %s, time = %s", self.speed, self.fc_upd_avg)
+				xr_logic.mob_capture(self.object, true)
+				action(self.object,
+					move(accel, self.speed), --move.on + 
+					--object("right_light", self.headlights),
+					--object("left_light", self.headlights),
+					cond(cond.time_end, time_infinite)) --self.fc_upd_avg))
+				self.state_moving = state_moving_fwd
+			end
 		end
 	else
 		-- Поворачиваться нужно, но в какую сторону?
-		local rotate_left = utils.angle_left_xz(self.object:direction(), 
-		                                       vector():set(self.path_walk:point(pt)
-		                                                                ):sub(self.object:position()))
+		local rotate_left = utils.angle_left_xz(self.object:direction(),vector():set(self.path_walk:point(pt)):sub(self.object:position()))
 		--printf("car <move>: must rotate: left? %s. speed = %s, time = %s", utils.to_str(rotate_left), self.speed, self.fc_upd_avg)
 		if rotate_left then
-			if self.state_moving ~= state_moving_rot_left then 
+			if self.state_moving ~= state_moving_rot_left then
+				self.accel = accel
 				xr_logic.mob_capture(self.object, true)
 				action(self.object,
 					move(accel + move.left, self.speed), --move.on + 
@@ -431,6 +508,7 @@ function action_car:go_to_walkpoint(pt)
 			end
 		else
 			if self.state_moving ~= state_moving_rot_right then
+				self.accel = accel
 				xr_logic.mob_capture(self.object, true)
 				action(self.object,
 					move(accel + move.right, self.speed), --move.on + 
@@ -485,7 +563,7 @@ function action_car:walk_arrival_callback(index)
 	if suggested_loop == "true" then
 		self.loop = true
 	else
-		self.loop = false
+		self.loop = true --false
 	end
 
 	local suggested_dps = self.path_walk_info[index]["dps"]
@@ -958,7 +1036,7 @@ function action_car:fast_update()
 
 	if self.state_moving ~= state_moving_end and
 	   self.state_moving ~= state_moving_stop and 
-	   cur_time >= self.last_pos_time + self.min_car_explode_time
+	   cur_time >= self.last_pos_time + 5000
 	then
 	    --printf("car <state>: moving(%s)", utils.to_str(self.state_moving))
 		if not self.last_pos then
@@ -966,16 +1044,16 @@ function action_car:fast_update()
 			self.last_pos_time = cur_time
 		else
 			local cur_pos = self.object:position()
-			-- local diff = self.last_pos:distance_to(cur_pos)
-			-- if diff < self.min_delta_per_sec then
-                -- --printf("car <move>: got stuck (%s < %s) - stop.", diff, self.min_delta_per_sec)
-                -- self:stop_car()
-				-- --self:car_explode()
-				-- self.state_moving = state_moving_end
-				-- --return false
-			-- else
+			local diff = self.last_pos:distance_to(cur_pos)
+			if diff < self.min_delta_per_sec then
+                --printf("car <move>: got stuck (%s < %s) - stop.", diff, self.min_delta_per_sec)
+				self.state_moving = state_moving_stuck
+			else
 			    self.last_pos = cur_pos
-			--end
+				if (self.state_moving == state_moving_stuck) then
+					self.state_moving = state_moving_fwd
+				end
+			end
 			self.last_pos_time = cur_time
 		end
 	end
