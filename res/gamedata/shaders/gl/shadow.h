@@ -510,41 +510,29 @@ float dx10_0_hw_hq_7x7( float4 tc )
    float2 pwGH = ( float2( 1.0 ) + fc );
    float2 tcGH = (1.0/SMAP_size) * ( fc / pwGH );
 
-   for( int row = -GS2; row <= GS2; row += 2 )
-   {
-      for( int col = -GS2; col <= GS2; col += 2 )
-	  {
-		if( row == -GS2 ) // top row
-		{
-			if( col == -GS2 ) // left
-				s += ( pwAB.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + tcAB, tc.z), int2( col, row ) );
-			else if( col == GS2 ) // right
-				s += ( pwGH.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcAB.y), tc.z), int2( col, row ) );
-			else // center
-				s += (    2.0 * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcAB.y), tc.z), int2( col, row ) );
-		}
-		else if( row == GS2 )  // bottom row
-		{
-			if( col == -GS2 ) // left
-				s += ( pwAB.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcGH.y ), tc.z), int2( col, row ) );
-			else if( col == GS2 ) // right
-				s += ( pwGH.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + tcGH, tc.z), int2( col, row ) );
-			else // center
-				s += (    2.0 * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcGH.y ), tc.z), int2( col, row ) );
-		}
-		else // center rows
-		{
-			if( col == -GS2 ) // left
-				s += ( pwAB.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcM.y ), tc.z), int2( col, row ) );
-			else if( col == GS2 ) // right
-				s += ( pwGH.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcM.y),  tc.z), int2( col, row ) );
-			else // center
-				s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( col, row ) );
-		}
-      }
-	}
+   // top row
+   s += ( pwAB.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + tcAB, tc.z), int2( -3, -3 ) ); // left
+   s += (    2.0 * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcAB.y), tc.z), int2( -3, -1 ) );
+   s += (    2.0 * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcAB.y), tc.z), int2( -3, 1 ) );
+   s += ( pwGH.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcAB.y), tc.z), int2( -3, 3 ) ); // right
 
-    return s/49.0;
+   // center rows
+   s += ( pwAB.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcM.y ), tc.z), int2( -1, -3 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( -1, -1 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( -1, 1 ) );
+   s += ( pwGH.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcM.y),  tc.z), int2( -1, 3 ) );
+   s += ( pwAB.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcM.y ), tc.z), int2( 1, -3 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( 1, -1 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( 1, 1 ) );
+   s += ( pwGH.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcM.y),  tc.z), int2( 1, 3 ) );
+
+   // bottom row
+   s += ( pwAB.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcGH.y ), tc.z), int2( 3, -3 ) );
+   s += (    2.0 * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcGH.y ), tc.z), int2( 3, -1 ) );
+   s += (    2.0 * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcGH.y ), tc.z), int2( 3, 1 ) );
+   s += ( pwGH.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + tcGH, tc.z), int2( 3, 3 ) );
+
+   return s/49.0;
 }
 
 #ifdef SM_MINMAX
