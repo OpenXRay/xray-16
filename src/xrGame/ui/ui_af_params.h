@@ -7,6 +7,10 @@ class CUIXml;
 class CUIStatic;
 class CUITextWnd;
 class UIArtefactParamItem;
+class CCustomOutfit;
+class CHelmet;
+class CBackpack;
+class CArtefact;
 
 class CUIArtefactParams : public CUIWindow
 {
@@ -15,7 +19,10 @@ public:
     virtual ~CUIArtefactParams();
     void InitFromXml(CUIXml& xml);
     bool Check(const shared_str& af_section);
-    void SetInfo(const CInventoryItem& pInvItem);
+    void SetInfo(const CCustomOutfit* pInvItem);
+    void SetInfo(const CHelmet* pInvItem);
+    void SetInfo(const CBackpack* pInvItem);
+    void SetInfo(const CArtefact* pInvItem);
 
 protected:
     static constexpr u32 af_immunity_count = 9;
@@ -26,6 +33,7 @@ protected:
 
     UIArtefactParamItem* m_fJumpSpeed;
     UIArtefactParamItem* m_fWalkAccel;
+    UIArtefactParamItem* m_fOverweightWalkAccel;
 
     CUIStatic* m_Prop_line;
 

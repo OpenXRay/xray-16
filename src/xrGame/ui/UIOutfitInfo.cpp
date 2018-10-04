@@ -298,6 +298,10 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
         float cur = cur_helmet->GetBoneArmor(spine_bone) * cur_helmet->GetCondition();
         float slot = (slot_helmet) ? slot_helmet->GetBoneArmor(spine_bone) * slot_helmet->GetCondition() : cur;
 
+        float max_power = actor->conditions().GetMaxFireWoundProtection();
+        cur /= max_power;
+        slot /= max_power;
+
         m_items[ALife::eHitTypeFireWound]->SetProgressValue(cur, slot);
     }
 }

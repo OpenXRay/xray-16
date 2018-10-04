@@ -10,6 +10,11 @@
 #include "Inventory_Item.h"
 #include "Artefact.h"
 
+#include "CustomOutfit.h"
+#include "ActorHelmet.h"
+#include "ActorBackpack.h"
+
+
 u32 const red_clr = color_argb(255, 210, 50, 50);
 u32 const green_clr = color_argb(255, 170, 170, 170);
 
@@ -150,7 +155,15 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
         m_fWalkAccel->SetCaption(name);
         xml.SetLocalRoot(base_node);
     }
-    //-Alundaio
+
+    {
+        m_fOverweightWalkAccel = new UIArtefactParamItem();
+        m_fOverweightWalkAccel->Init(xml, "overweight_walk_accel");
+        m_fOverweightWalkAccel->SetAutoDelete(false);
+        LPCSTR name = CStringTable().translate("ui_inv_af_overweight_walk_accel").c_str();
+        m_fOverweightWalkAccel->SetCaption(name);
+        xml.SetLocalRoot(base_node);
+    }
 
     {
         m_additional_weight = new UIArtefactParamItem();
@@ -171,7 +184,7 @@ bool CUIArtefactParams::Check(const shared_str& af_section)
     return !!pSettings->line_exist(af_section, "af_actor_properties");
 }
 
-void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
+void CUIArtefactParams::SetInfo(const CArtefact* pInvItem)
 {
     DetachAll();
     AttachChild(m_Prop_line);
@@ -180,20 +193,18 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
     if (!actor)
         return;
 
-    const shared_str& af_section = pInvItem.object().cNameSect();
+    const shared_str& af_section = pInvItem->cNameSect();
 
     float val = 0.0f, max_val = 1.0f;
     Fvector2 pos;
     float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
 
-    //Alundaio: Show AF Condition
-    m_disp_condition->SetValue(pInvItem.GetCondition());
+	m_disp_condition->SetValue(pInvItem->GetCondition());
     pos.set(m_disp_condition->GetWndPos());
     pos.y = h;
     m_disp_condition->SetWndPos(pos);
     h += m_disp_condition->GetWndSize().y;
     AttachChild(m_disp_condition);
-    //-Alundaio
 
     for (u32 i = 0; i < af_immunity_count; ++i)
     {
@@ -202,7 +213,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         if (fis_zero(val))
             continue;
 
-        val *= pInvItem.GetCondition();
+        val *= pInvItem->GetCondition();
         max_val = actor->conditions().GetZoneMaxPower((ALife::EInfluenceType)i);
         val /= max_val;
         m_immunity_item[i]->SetValue(val);
@@ -214,23 +225,22 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         h += m_immunity_item[i]->GetWndSize().y;
         AttachChild(m_immunity_item[i]);
     }
-    CArtefact* arte = pInvItem.object().cast_artefact();
-    if (arte)
+
     {
-        float val = arte->m_fJumpSpeed;
+        float val = pInvItem->m_fJumpSpeed;
         if (_abs(val) < 1.f - EPS)
         {
-            m_fJumpSpeed->SetValue(val * pInvItem.GetCondition());
+            m_fJumpSpeed->SetValue(val * pInvItem->GetCondition());
             pos.set(m_fJumpSpeed->GetWndPos());
             pos.y = h;
             m_fJumpSpeed->SetWndPos(pos);
             h += m_fJumpSpeed->GetWndSize().y;
             AttachChild(m_fJumpSpeed);
         }
-        val = arte->m_fWalkAccel;
+        val = pInvItem->m_fWalkAccel;
         if (_abs(val) < 1.f - EPS)
         {
-            m_fWalkAccel->SetValue(val * pInvItem.GetCondition());
+            m_fWalkAccel->SetValue(val * pInvItem->GetCondition());
             pos.set(m_fWalkAccel->GetWndPos());
             pos.y = h;
             m_fWalkAccel->SetWndPos(pos);
@@ -243,7 +253,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         val = pSettings->r_float(af_section, "additional_inventory_weight");
         if (!fis_zero(val))
         {
-            val *= pInvItem.GetCondition();
+            // val *= pInvItem->GetCondition();
             m_additional_weight->SetValue(val);
 
             pos.set(m_additional_weight->GetWndPos());
@@ -261,7 +271,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         if (fis_zero(val))
             continue;
 
-        val *= pInvItem.GetCondition();
+        val *= pInvItem->GetCondition();
         m_restore_item[i]->SetValue(val);
 
         pos.set(m_restore_item[i]->GetWndPos());
@@ -275,6 +285,127 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
     SetHeight(h);
 }
 
+void CUIArtefactParams::SetInfo(const CCustomOutfit* pInvItem)
+{
+    DetachAll();
+    AttachChild(m_Prop_line);
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (!actor)
+    {
+        return;
+    }
+    const shared_str& af_section = pInvItem->cNameSect();
+    float val = 0.0f, max_val = 1.0f;
+    Fvector2 pos;
+    float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+    {
+        float val = pInvItem->m_fJumpSpeed;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fJumpSpeed->SetValue(val * pInvItem->GetCondition());
+            pos.set(m_fJumpSpeed->GetWndPos());
+            pos.y = h;
+            m_fJumpSpeed->SetWndPos(pos);
+            h += m_fJumpSpeed->GetWndSize().y;
+            AttachChild(m_fJumpSpeed);
+        }
+        val = pInvItem->m_fWalkAccel;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fWalkAccel->SetValue(val * pInvItem->GetCondition());
+            pos.set(m_fWalkAccel->GetWndPos());
+            pos.y = h;
+            m_fWalkAccel->SetWndPos(pos);
+            h += m_fWalkAccel->GetWndSize().y;
+            AttachChild(m_fWalkAccel);
+        }
+        val = pInvItem->m_fOverweightWalkK;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fOverweightWalkAccel->SetValue(val * pInvItem->GetCondition());
+            pos.set(m_fOverweightWalkAccel->GetWndPos());
+            pos.y = h;
+            m_fOverweightWalkAccel->SetWndPos(pos);
+            h += m_fOverweightWalkAccel->GetWndSize().y;
+            AttachChild(m_fOverweightWalkAccel);
+        }
+    }
+    {
+        val = pSettings->r_float(af_section, "additional_inventory_weight");
+        if (!fis_zero(val))
+        {
+            val *= pInvItem->GetCondition();
+            m_additional_weight->SetValue(val);
+            pos.set(m_additional_weight->GetWndPos());
+            pos.y = h;
+            m_additional_weight->SetWndPos(pos);
+            h += m_additional_weight->GetWndSize().y;
+            AttachChild(m_additional_weight);
+        }
+    }
+    SetHeight(h);
+}
+void CUIArtefactParams::SetInfo(const CHelmet* pInvItem) {}
+void CUIArtefactParams::SetInfo(const CBackpack* pInvItem)
+{
+    DetachAll();
+    AttachChild(m_Prop_line);
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (!actor)
+    {
+        return;
+    }
+    const shared_str& af_section = pInvItem->cNameSect();
+    float val = 0.0f, max_val = 1.0f;
+    Fvector2 pos;
+    float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+    {
+        float val = pInvItem->m_fJumpSpeed;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fJumpSpeed->SetValue(val * pInvItem->GetCondition());
+            pos.set(m_fJumpSpeed->GetWndPos());
+            pos.y = h;
+            m_fJumpSpeed->SetWndPos(pos);
+            h += m_fJumpSpeed->GetWndSize().y;
+            AttachChild(m_fJumpSpeed);
+        }
+        val = pInvItem->m_fWalkAccel;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fWalkAccel->SetValue(val * pInvItem->GetCondition());
+            pos.set(m_fWalkAccel->GetWndPos());
+            pos.y = h;
+            m_fWalkAccel->SetWndPos(pos);
+            h += m_fWalkAccel->GetWndSize().y;
+            AttachChild(m_fWalkAccel);
+        }
+        val = pInvItem->m_fOverweightWalkK;
+        if (_abs(val) < 1.f - EPS)
+        {
+            m_fOverweightWalkAccel->SetValue(val * pInvItem->GetCondition());
+            pos.set(m_fOverweightWalkAccel->GetWndPos());
+            pos.y = h;
+            m_fOverweightWalkAccel->SetWndPos(pos);
+            h += m_fOverweightWalkAccel->GetWndSize().y;
+            AttachChild(m_fOverweightWalkAccel);
+        }
+    }
+    {
+        val = pSettings->r_float(af_section, "additional_inventory_weight");
+        if (!fis_zero(val))
+        {
+            // val *= pInvItem->GetCondition();
+            m_additional_weight->SetValue(val);
+            pos.set(m_additional_weight->GetWndPos());
+            pos.y = h;
+            m_additional_weight->SetWndPos(pos);
+            h += m_additional_weight->GetWndSize().y;
+            AttachChild(m_additional_weight);
+        }
+    }
+    SetHeight(h);
+}
 /// ----------------------------------------------------------------
 
 UIArtefactParamItem::UIArtefactParamItem()
