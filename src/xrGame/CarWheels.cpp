@@ -218,7 +218,7 @@ void CCar::SWheelDrive::Init()
 {
     pwheel->Init();
     gear_factor = pwheel->radius / pwheel->car->m_ref_radius;
-    CBoneData& bone_data = smart_cast<IKinematics*>(pwheel->car->Visual())->LL_GetData(u16(pwheel->bone_id));
+    /*CBoneData& bone_data = smart_cast<IKinematics*>(pwheel->car->Visual())->LL_GetData(u16(pwheel->bone_id));
     switch (bone_data.IK_data.type)
     {
     case jtWheel: pos_fvd = bone_map.find(pwheel->bone_id)->second.element->mXFORM.k.x; break;
@@ -227,6 +227,8 @@ void CCar::SWheelDrive::Init()
     }
 
     pos_fvd = pos_fvd > 0.f ? -1.f : 1.f;
+    */
+    pos_fvd = -1.f;
 }
 void CCar::SWheelDrive::Drive()
 {
@@ -249,7 +251,7 @@ void CCar::SWheelSteer::Init()
     IKinematics* pKinematics = smart_cast<IKinematics*>(pwheel->car->Visual());
     pwheel->Init();
     (bone_map.find(pwheel->bone_id))->second.joint->GetLimits(lo_limit, hi_limit, 0);
-    CBoneData& bone_data = pKinematics->LL_GetData(u16(pwheel->bone_id));
+    /*CBoneData& bone_data = pKinematics->LL_GetData(u16(pwheel->bone_id));
     switch (bone_data.IK_data.type)
     {
     case jtWheel:
@@ -261,6 +263,8 @@ void CCar::SWheelSteer::Init()
     }
 
     pos_right = pos_right > 0.f ? -1.f : 1.f;
+	*/
+    pos_right = -1.f;
     float steering_torque = pKinematics->LL_UserData()->r_float("car_definition", "steering_torque");
     VERIFY(pwheel);
     pwheel->ApplySteerAxisTorque(steering_torque);

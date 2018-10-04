@@ -73,21 +73,16 @@ void CActor::detach_Vehicle()
     if (!car)
         return;
 
-    // CPHShellSplitterHolder*sh= car->PPhysicsShell()->SplitterHolder();
-    // if(sh)
-    //	sh->Deactivate();
     car->PPhysicsShell()->SplitterHolderDeactivate();
 
     if (!character_physics_support()->movement()->ActivateBoxDynamic(0))
     {
-        // if(sh)sh->Activate();
         car->PPhysicsShell()->SplitterHolderActivate();
         return;
     }
-    // if(sh)
-    //	sh->Activate();
+
     car->PPhysicsShell()->SplitterHolderActivate();
-    m_holder->detach_Actor(); //
+    m_holder->detach_Actor();
 
     // Real Wolf: колбек на высадку из машины. 01.08.2014.
     this->callback(GameObject::eDetachVehicle)(car->lua_game_object());
@@ -154,5 +149,20 @@ bool CActor::use_Vehicle(CHolderCustom* object)
 void CActor::on_requested_spawn(IGameObject* object)
 {
     CCar* car = smart_cast<CCar*>(object);
+    if (!car)
+        return;
+    car->PPhysicsShell()->SplitterHolderDeactivate();
+    if (!character_physics_support()->movement()->ActivateBoxDynamic(0))
+    {
+        car->PPhysicsShell()->SplitterHolderActivate();
+        return;
+    }
+    car->PPhysicsShell()->SplitterHolderActivate();
+    character_physics_support()->movement()->SetPosition(car->ExitPosition());
+    character_physics_support()->movement()->SetVelocity(car->ExitVelocity());
+
     attach_Vehicle(car);
+    Fvector xyz;
+    car->XFORM().getXYZi(xyz);
+    r_torso.yaw = xyz.y;
 }
