@@ -237,7 +237,8 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
     IKinematicsAnimated* A = smart_cast<IKinematicsAnimated*>(Visual());
     if (A)
     {
-        A->PlayCycle(*heli->startup_animation);
+        if (heli->startup_animation.size())
+            A->PlayCycle(*heli->startup_animation);
         K->CalculateBones(TRUE);
     }
 
@@ -284,13 +285,13 @@ void CHelicopter::net_Destroy()
     m_light_render.destroy();
     m_movement.net_Destroy();
     m_camera_position.clear();
+    CHolderCustom::detach_Actor();
     if (m_pPhysicsShell)
     {
         m_pPhysicsShell->Deactivate();
         m_pPhysicsShell->ZeroCallbacks();
         xr_delete(m_pPhysicsShell);
     }
-    CHolderCustom::detach_Actor();
 #ifdef DEBUG
     Device.seqRender.Remove(this);
 #endif
@@ -413,22 +414,25 @@ void CHelicopter::UpdateCL()
 {
     inherited::UpdateCL();
     CExplosive::UpdateCL();
-    if (PPhysicsShell() && (state() == CHelicopter::eDead))
+    if (PPhysicsShell())
     {
-        PPhysicsShell()->InterpolateGlobalTransform(&XFORM());
+        if (state() == CHelicopter::eDead)
+        {
+            PPhysicsShell()->InterpolateGlobalTransform(&XFORM());
 
-        IKinematics* K = smart_cast<IKinematics*>(Visual());
-        K->CalculateBones();
-        // smoke
-        UpdateHeliParticles();
+            IKinematics* K = smart_cast<IKinematics*>(Visual());
+            K->CalculateBones();
+            // smoke
+            UpdateHeliParticles();
 
-        if (m_brokenSound._feedback())
-            m_brokenSound.set_position(XFORM().c);
+            if (m_brokenSound._feedback())
+                m_brokenSound.set_position(XFORM().c);
 
-        return;
+            return;
+        }
+        else
+            PPhysicsShell()->SetTransform(XFORM(), mh_unspecified);
     }
-    else
-        PPhysicsShell()->SetTransform(XFORM(), mh_unspecified);
 
     m_movement.Update();
 

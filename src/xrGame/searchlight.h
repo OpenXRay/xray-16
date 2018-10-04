@@ -47,7 +47,8 @@ public:
     virtual bool bfAssignObject(CScriptEntityAction* tpEntityAction);
 
     Fvector GetCurrentDirection();
-
+    IC void Switch(bool on) { on ? TurnOn() : TurnOff(); };
+    IC bool IsEnabled() const { return light_render->get_active(); }
 private:
     void TurnOn();
     void TurnOff();

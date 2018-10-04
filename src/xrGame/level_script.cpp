@@ -697,6 +697,10 @@ void reload_language()
     CStringTable().ReloadLanguage();
 }
 
+void LevelPressAction(EGameActions cmd) { Level().IR_OnKeyboardPress(cmd); }
+void LevelReleaseAction(EGameActions cmd) { Level().IR_OnKeyboardRelease(cmd); }
+void LevelHoldAction(EGameActions cmd) { Level().IR_OnKeyboardHold(cmd); }
+
 CScriptGameObject* get_view_entity_script()
 {
     CGameObject* pGameObject = smart_cast<CGameObject*>(Level().CurrentViewEntity());
@@ -754,6 +758,9 @@ IC static void CLevel_Export(lua_State* luaState)
         def("u_event_send", &u_event_send),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
         def("get_target_dist", &g_get_target_dist),
+        def("press_action", &LevelPressAction),
+		def("release_action", &LevelReleaseAction),
+		def("hold_action", &LevelHoldAction),
         def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
         def("get_view_entity", &get_view_entity_script),
         def("set_view_entity", &set_view_entity_script),

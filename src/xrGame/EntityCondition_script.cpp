@@ -66,12 +66,23 @@ void BoosterForEach(CActorCondition* conditions, const luabind::functor<bool> &f
     }
 }
 
+bool ApplyBooster_script(CActorCondition* cond, const SBooster& B, LPCSTR sect)
+{
+	return cond->ApplyBooster(B, sect);
+}
+
 IC static void CActorCondition_Export(lua_State* luaState)
 {
     module(luaState)
     [
+			class_<SBooster>("SBooster")
+			.def(constructor<>())
+			.def_readwrite("fBoostTime", &SBooster::fBoostTime)
+			.def_readwrite("fBoostValue", &SBooster::fBoostValue)
+			.def_readwrite("m_type", &SBooster::m_type),
         class_<CActorCondition, CEntityCondition>("CActorCondition")
             //.def(constructor<>())
+			.def("ApplyBooster", &ApplyBooster_script)
             .def("BoosterForEach", &BoosterForEach)
 			.def("GetSatiety", &CActorCondition::GetSatiety)
             .def("BoostMaxWeight", &CActorCondition::BoostMaxWeight)

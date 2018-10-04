@@ -2,10 +2,13 @@
 #include <dinput.h>
 #include "xr_level_controller.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrEngine/xr_input.h"
 
 using namespace luabind;
 
 static int dik_to_bind(int dik) { return get_binded_action(dik); }
+BOOL key_state(int key) { return pInput->iGetAsyncKeyState(key); }
+
 SCRIPT_EXPORT(KeyBindings, (),
 {
     class EnumGameActions {};
@@ -13,6 +16,8 @@ SCRIPT_EXPORT(KeyBindings, (),
     module(luaState)
     [
         def("dik_to_bind", &dik_to_bind),
+		def("bind_to_dik", &get_action_dik),
+		def("key_state", &key_state),
         class_<EnumGameActions>("key_bindings")
             .enum_("commands")
             [
@@ -95,8 +100,16 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("DIK_SYSRQ", int(DIK_SYSRQ)), value("DIK_HOME", int(DIK_HOME)),
                 value("DIK_PRIOR", int(DIK_PRIOR)), value("DIK_RIGHT", int(DIK_RIGHT)),
                 value("DIK_DOWN", int(DIK_DOWN)), value("DIK_INSERT", int(DIK_INSERT)),
-                value("DIK_LWIN", int(DIK_LWIN)), value("DIK_APPS", int(DIK_APPS)), value("MOUSE_1", int(MOUSE_1)),
-                value("MOUSE_3", int(MOUSE_3)), value("DIK_RETURN", int(DIK_RETURN)),
+                value("DIK_LWIN", int(DIK_LWIN)),
+                value("DIK_APPS", int(DIK_APPS)),
+                value("MOUSE_1",    int(MOUSE_1)),
+                value("MOUSE_3",    int(MOUSE_3)),
+                value("MOUSE_4",	int(MOUSE_4)),
+				value("MOUSE_5",	int(MOUSE_5)),
+				value("MOUSE_6",	int(MOUSE_6)),
+				value("MOUSE_7",	int(MOUSE_7)),
+				value("MOUSE_8",	int(MOUSE_8)),
+                value("DIK_RETURN", int(DIK_RETURN)),
                 value("DIK_NUMPADENTER", int(DIK_NUMPADENTER))
             ]
     ];

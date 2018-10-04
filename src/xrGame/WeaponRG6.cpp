@@ -46,7 +46,7 @@ void CWeaponRG6::Load(LPCSTR section)
 #include "inventoryOwner.h"
 void CWeaponRG6::FireStart()
 {
-    if (GetState() == eIdle && getRocketCount())
+    if (GetState() == eIdle && getRocketCount() && m_ammoElapsed.type1)
     {
         inheritedSG::FireStart();
 
@@ -142,7 +142,7 @@ u8 CWeaponRG6::AddCartridge(u8 cnt)
         --k;
         inheritedRL::SpawnRocket(*fake_grenade_name, this);
     }
-    return k;
+    return t;
 }
 
 void CWeaponRG6::OnEvent(NET_Packet& P, u16 type)
