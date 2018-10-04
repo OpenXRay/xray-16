@@ -363,7 +363,7 @@ void CUIItemInfo::TryAddWpnInfo(CInventoryItem& pInvItem, CInventoryItem* pCompa
     }
 }
 
-void CUIItemInfo::TryAddArtefactInfo(const CInventoryItem& pInvItem)
+void CUIItemInfo::TryAddArtefactInfo(CInventoryItem& pInvItem)
 {
     if (!UIArtefactParams) return;
  	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&pInvItem);
