@@ -388,9 +388,15 @@ function property_functor_a(param1, name)
 			val = ((1*tmp)/max_protections["telepatic_protection"] * 100)
 			prop_damage["telepatic_protection"] = prop_damage["telepatic_protection"] and prop_damage["telepatic_protection"] + val or val	
 		elseif (name == "prop_armor") then
-			tmp = sysini:r_float_ex(section_table[i],"fire_wound_protection") or 0
-			val = ((1*tmp)/max_protections["fire_wound_protection"] * 100)
-			prop_damage["fire_wound_protection"] = prop_damage["fire_wound_protection"] and prop_damage["fire_wound_protection"] + val or val
+			local bones_koeff_protection = sysini:r_string_ex(section_table[i],"bones_koeff_protection_add")
+			if (bones_koeff_protection) then
+				local protect = sysini:r_list(bones_koeff_protection,"bip01_spine1")
+				if (protect and protect[2]) then
+					tmp = tonumber(protect[2]) or 0
+					val = ((1*tmp)/max_protections["fire_wound_protection"] * 100)
+					prop_damage["fire_wound_protection"] = prop_damage["fire_wound_protection"] and prop_damage["fire_wound_protection"] + val or val
+				end
+			end
         elseif (name == "prop_ammo_size") then
             sum = sum + sysini:r_float_ex(section_table[i],"ammo_mag_size",0)
         elseif (name == "prop_rpm") then

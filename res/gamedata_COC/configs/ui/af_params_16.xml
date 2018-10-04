@@ -165,7 +165,7 @@
 		</value>
 	</additional_weight>
 
-		<jump_speed x="0" y="0" width="214" height="20" >
+	<jump_speed x="0" y="0" width="214" height="20" >
 		<caption x="0" y="0" width="15" height="20" complex_mode="0">
 			<texture>ui_am_prop_movement</texture>
 			<text color="ui_3" font="letterica16" vert_align="c" x="22" y="0"/>
@@ -184,5 +184,14 @@
 			<text font="letterica16" vert_align="c"/>
 		</value>
 	</walk_accel>
-	
+
+	<overweight_walk_accel x="0" y="0" width="214" height="20" >
+		<caption x="0" y="0" width="15" height="20" complex_mode="0">
+			<texture>ui_am_prop_overweight_movement</texture>
+			<text color="ui_3" font="letterica16" vert_align="c" x="22" y="0"/>
+		</caption>
+		<value x="140" y="0" width="30" height="20" magnitude="100">
+			<text font="letterica16" vert_align="c"/>
+		</value>
+	</overweight_walk_accel>	
 </af_params>

@@ -265,6 +265,8 @@
 	
 	<!-- new movement modifier -->
 	<texture id="ui_am_prop_movement" 	x="135" y="505" width="19" height="19" />
+	<texture id="ui_am_prop_overweight_movement" 	x="135" y="505" width="19" height="19" />
+	
    </file>
 </w>
 
