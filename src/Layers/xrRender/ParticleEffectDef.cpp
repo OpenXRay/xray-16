@@ -45,7 +45,14 @@ CPEDef::~CPEDef()
 void CPEDef::CreateShader()
 {
     if (*m_ShaderName && *m_TextureName)
+    {
+#ifdef LINUX
+        while (char* sep = strchr(*m_ShaderName, '\\')) *sep = '/';
+        while (char* sep = strchr(*m_TextureName, '\\')) *sep = '/';
+#endif
+
         m_CachedShader.create(*m_ShaderName, *m_TextureName);
+    }
 }
 void CPEDef::DestroyShader() { m_CachedShader.destroy(); }
 void CPEDef::SetName(LPCSTR name) { m_Name = name; }
