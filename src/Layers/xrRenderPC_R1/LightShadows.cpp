@@ -44,14 +44,14 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
     //
     RT.create(RTname, S_rt_size, S_rt_size, S_rtf);
     RT_temp.create(RTtemp, S_rt_size, S_rt_size, S_rtf);
-    sh_World.create("effects\\shadow_world", RTname);
+    sh_World.create("effects" DELIMITER "shadow_world", RTname);
     geom_World.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
     sh_BlurTR.create("blur4", RTtemp2);
     sh_BlurRT.create("blur4", RTname2);
     geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // Debug
-    sh_Screen.create("effects\\screen_set", RTname);
+    sh_Screen.create("effects" DELIMITER "screen_set", RTname);
     geom_Screen.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 }
 

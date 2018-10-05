@@ -48,10 +48,10 @@ FS_Path::FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt, LPCSTR _FilterCaptio
     if (_Add)
         xr_strcat(temp, _Add);
 #if defined(LINUX)
-    char *ptr = strchr(temp, _DELIMITER);
+    char *ptr = strchr(temp, '\\');
     while (ptr) {
-        *ptr = '/';
-        ptr = strchr(ptr, _DELIMITER);
+        *ptr = _DELIMITER;
+        ptr = strchr(ptr, '\\');
     }
 #endif
     if (temp[0] && temp[xr_strlen(temp) - 1] != _DELIMITER)

@@ -434,10 +434,10 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
         strconcat(sizeof full, full, fs_entry_point, name);
 #if defined(LINUX)
-        char *tmp_ptr = strchr(full, _DELIMITER);
+        char *tmp_ptr = strchr(full, '\\');
         while (tmp_ptr) {
             *tmp_ptr = '/';
-            tmp_ptr = strchr(tmp_ptr, _DELIMITER);
+            tmp_ptr = strchr(tmp_ptr, '\\');
         }
 #endif
         Register(full, A.vfs_idx, crc, ptr, size_real, size_compr, 0);

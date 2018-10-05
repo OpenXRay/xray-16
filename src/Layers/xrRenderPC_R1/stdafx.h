@@ -39,5 +39,5 @@
 #include "FStaticRender.h"
 #endif
 
-#define TEX_POINT_ATT "internal\\internal_light_attpoint"
-#define TEX_SPOT_ATT "internal\\internal_light_attclip"
+#define TEX_POINT_ATT "internal" DELIMITER "internal_light_attpoint"
+#define TEX_SPOT_ATT "internal" DELIMITER "internal_light_attclip"

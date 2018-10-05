@@ -110,7 +110,7 @@ void CBlender_postprocess_msaa::Compile(CBlender_Compile& C)
             D3DBLEND_INVSRCALPHA);
         C.r_dx10Texture("s_base0", r2_RT_generic);
         C.r_dx10Texture("s_base1", r2_RT_generic);
-        C.r_dx10Texture("s_noise", "fx\\fx_noise2");
+        C.r_dx10Texture("s_noise", "fx" DELIMITER "fx_noise2");
 
         C.r_dx10Sampler("smp_rtlinear");
         C.r_dx10Sampler("smp_linear");
@@ -122,7 +122,7 @@ void CBlender_postprocess_msaa::Compile(CBlender_Compile& C)
             D3DBLEND_INVSRCALPHA);
         C.r_dx10Texture("s_base0", r2_RT_generic);
         C.r_dx10Texture("s_base1", r2_RT_generic);
-        C.r_dx10Texture("s_noise", "fx\\fx_noise2");
+        C.r_dx10Texture("s_noise", "fx" DELIMITER "fx_noise2");
         C.r_dx10Texture("s_grad0", "$user$cmap0");
         C.r_dx10Texture("s_grad1", "$user$cmap1");
 

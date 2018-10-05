@@ -783,7 +783,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         ID3DXBuffer* disasm = nullptr;
         D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
         string_path dname;
-        strconcat(sizeof(dname), dname, "disasm\\", file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
+        strconcat(sizeof(dname), dname, "disasm" DELIMITER "", file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
         IWriter* W = FS.w_open("$logs$", dname);
         W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
         FS.w_close(W);
@@ -797,10 +797,10 @@ inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 {
     if (pTarget[0] == 'p')
         return create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
-    
+
     if (pTarget[0] == 'v')
         return create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
-    
+
     NODEFAULT;
     return E_FAIL;
 }
@@ -932,7 +932,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     HRESULT _result = E_FAIL;
 
     string_path folder_name, folder;
-    xr_strcpy(folder, "r1\\objects\\r1\\");
+    xr_strcpy(folder, "r1" DELIMITER "objects" DELIMITER "r1" DELIMITER "");
     xr_strcat(folder, name);
     xr_strcat(folder, ".");
 
@@ -941,7 +941,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     xr_strcat(folder, extension);
 
     FS.update_path(folder_name, "$game_shaders$", folder);
-    xr_strcat(folder_name, "\\");
+    xr_strcat(folder_name, "" DELIMITER "");
 
     m_file_set.clear();
     FS.file_list(m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
@@ -950,11 +950,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
-        xr_strcpy(file, "shaders_cache\\r1\\");
+        xr_strcpy(file, "shaders_cache" DELIMITER "r1" DELIMITER "");
         xr_strcat(file, name);
         xr_strcat(file, ".");
         xr_strcat(file, extension);
-        xr_strcat(file, "\\");
+        xr_strcat(file, "" DELIMITER "");
         xr_strcat(file, sh_name);
         FS.update_path(file_name, "$app_data_root$", file);
     }
@@ -1038,8 +1038,8 @@ static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
 #if 1
-	strcpy_s					( result, "" );
-	return						false;
+    strcpy_s					( result, "" );
+    return						false;
 #else // #if 1
 #ifdef DEBUG
     LPCSTR temp = "";

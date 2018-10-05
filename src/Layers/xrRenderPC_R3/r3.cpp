@@ -868,7 +868,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         D3DDisassemble(buffer, buffer_size, FALSE, 0, &disasm);
         // D3DXDisassembleShader		(LPDWORD(code->GetBufferPointer()), FALSE, 0, &disasm );
         string_path dname;
-        strconcat(sizeof(dname), dname, "disasm\\", file_name,
+        strconcat(sizeof(dname), dname, "disasm" DELIMITER "", file_name,
             ('v' == pTarget[0]) ? ".vs" : ('p' == pTarget[0]) ? ".ps" : ".gs");
         IWriter* W = FS.w_open("$logs$", dname);
         W->w(disasm->GetBufferPointer(), (u32)disasm->GetBufferSize());
@@ -1445,7 +1445,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     HRESULT _result = E_FAIL;
 
     string_path folder_name, folder;
-    xr_strcpy(folder, "r3\\objects\\r3\\");
+    xr_strcpy(folder, "r3" DELIMITER "objects" DELIMITER "r3" DELIMITER "");
     xr_strcat(folder, name);
     xr_strcat(folder, ".");
 
@@ -1454,7 +1454,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     xr_strcat(folder, extension);
 
     FS.update_path(folder_name, "$game_shaders$", folder);
-    xr_strcat(folder_name, "\\");
+    xr_strcat(folder_name, "" DELIMITER "");
 
     m_file_set.clear();
     FS.file_list(m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
@@ -1463,11 +1463,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
-        xr_strcpy(file, "shaders_cache\\r3\\");
+        xr_strcpy(file, "shaders_cache" DELIMITER "r3" DELIMITER "");
         xr_strcat(file, name);
         xr_strcat(file, ".");
         xr_strcat(file, extension);
-        xr_strcat(file, "\\");
+        xr_strcat(file, "" DELIMITER "");
         xr_strcat(file, sh_name);
         FS.update_path(file_name, "$app_data_root$", file);
     }
@@ -1548,8 +1548,8 @@ static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
 #if 1
-	strcpy_s					( result, "" );
-	return						false;
+    strcpy_s					( result, "" );
+    return						false;
 #else // #if 1
 #ifdef DEBUG
     LPCSTR temp = "";
