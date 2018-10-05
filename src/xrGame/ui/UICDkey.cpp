@@ -9,6 +9,10 @@
 #include "player_name_modifyer.h"
 #include "xrGameSpy/GameSpy_GP.h"
 #include "xrCore/os_clipboard.h"
+#ifdef LINUX
+#include <sys/types.h>
+#include <pwd.h>
+#endif
 
 string64 gsCDKey = "";
 LPCSTR AddHyphens(LPCSTR c);
@@ -225,12 +229,28 @@ void WriteCDKey_ToRegistry(LPSTR cdkey)
 void GetPlayerName_FromRegistry(char* name, u32 const name_size)
 {
     string256 new_name;
+#if defined(LINUX)
+    uid_t uid = geteuid();
+    struct passwd *pw = getpwuid(uid);
+    if(pw)
+    {
+        strcpy(name, pw->pw_gecos);
+        char* pos = strchr(name, ','); // pw_gecos return string
+        if(NULL != pos)
+            *pos = 0;
+        if(0 == name[0])
+            strcpy(name, pw->pw_name);
+    }
+    if (0 == name[0])
+#else
     if (!ReadRegistry_StrValue(REGISTRY_VALUE_USERNAME, name))
+#endif
     {
         name[0] = 0;
         Msg("! Player name registry key (%s) not found !", REGISTRY_VALUE_USERNAME);
         return;
     }
+
     u32 const max_name_length = GP_UNIQUENICK_LEN - 1;
     if (xr_strlen(name) > max_name_length)
     {
