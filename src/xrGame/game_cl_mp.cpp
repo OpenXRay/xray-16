@@ -43,10 +43,10 @@
 
 #include "xrServer_info.h" //for enum_server_info_type
 
-#define KILLEVENT_ICONS "ui\\ui_hud_mp_icon_death"
-#define RADIATION_ICONS "ui\\ui_mn_radiations_hard"
-#define BLOODLOSS_ICONS "ui\\ui_mn_wounds_hard"
-#define RANK_ICONS "ui\\ui_mp_icon_rank"
+#define KILLEVENT_ICONS "ui" DELIMITER "ui_hud_mp_icon_death"
+#define RADIATION_ICONS "ui" DELIMITER "ui_mn_radiations_hard"
+#define BLOODLOSS_ICONS "ui" DELIMITER "ui_mn_wounds_hard"
+#define RANK_ICONS "ui" DELIMITER "ui_mp_icon_rank"
 
 #define KILLEVENT_GRID_WIDTH 64
 #define KILLEVENT_GRID_HEIGHT 64
@@ -776,7 +776,7 @@ const ui_shader& game_cl_mp::GetEquipmentIconsShader()
     if (m_EquipmentIconsShader->inited())
         return m_EquipmentIconsShader;
 
-    m_EquipmentIconsShader->create("hud\\default", "ui\\ui_mp_icon_kill");
+    m_EquipmentIconsShader->create("hud" DELIMITER "default", "ui" DELIMITER "ui_mp_icon_kill");
     return m_EquipmentIconsShader;
 }
 
@@ -786,7 +786,7 @@ const ui_shader& game_cl_mp::GetKillEventIconsShader()
     /*
     if (m_KillEventIconsShader) return m_KillEventIconsShader;
 
-    m_KillEventIconsShader.create("hud\\default", KILLEVENT_ICONS);
+    m_KillEventIconsShader.create("hud" DELIMITER "default", KILLEVENT_ICONS);
     return m_KillEventIconsShader;
     */
 }
@@ -797,7 +797,7 @@ const ui_shader& game_cl_mp::GetRadiationIconsShader()
     /*
     if (m_RadiationIconsShader) return m_RadiationIconsShader;
 
-    m_RadiationIconsShader.create("hud\\default", RADIATION_ICONS);
+    m_RadiationIconsShader.create("hud" DELIMITER "default", RADIATION_ICONS);
     return m_RadiationIconsShader;
     */
 }
@@ -808,7 +808,7 @@ const ui_shader& game_cl_mp::GetBloodLossIconsShader()
     /*
     if (m_BloodLossIconsShader) return m_BloodLossIconsShader;
 
-    m_BloodLossIconsShader.create("hud\\default", BLOODLOSS_ICONS);
+    m_BloodLossIconsShader.create("hud" DELIMITER "default", BLOODLOSS_ICONS);
     return m_BloodLossIconsShader;
     */
 }
@@ -817,7 +817,7 @@ const ui_shader& game_cl_mp::GetRankIconsShader()
     if (m_RankIconsShader->inited())
         return m_RankIconsShader;
 
-    m_RankIconsShader->create("hud\\default", RANK_ICONS);
+    m_RankIconsShader->create("hud" DELIMITER "default", RANK_ICONS);
     return m_RankIconsShader;
 }
 
@@ -1396,7 +1396,7 @@ void game_cl_mp::LoadBonuses()
             xr_sprintf(IconH, "%s_h", IconStr);
             if (pSettings->line_exist("mp_bonus_icons", IconShader))
             {
-                NewBonus.IconShader->create("hud\\default", pSettings->r_string("mp_bonus_icons", IconShader));
+                NewBonus.IconShader->create("hud" DELIMITER "default", pSettings->r_string("mp_bonus_icons", IconShader));
             }
             Frect IconRect;
             IconRect.x1 = READ_IF_EXISTS(pSettings, r_float, "mp_bonus_icons", IconX, 0);
@@ -1546,7 +1546,7 @@ void game_cl_mp::generate_file_name(string_path& file_name, LPCSTR file_suffix, 
 LPCSTR game_cl_mp::make_file_name(LPCSTR session_id, string_path& dest)
 {
     xr_strcpy(dest, sizeof(dest), session_id);
-    static const char* denied_symbols = "/\\?%%*:|\"<>.";
+    static const char* denied_symbols = "/" DELIMITER "?%%*:|\"<>.";
     size_t tmp_length = xr_strlen(dest);
     size_t start_pos = 0;
     size_t char_pos;

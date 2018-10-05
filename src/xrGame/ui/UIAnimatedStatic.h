@@ -91,6 +91,6 @@ public:
     CUISleepStatic();
     virtual void Draw();
     virtual void Update();
-    virtual void InitTextureEx(LPCSTR tex_name, LPCSTR sh_name = "hud\\default");
+    virtual void InitTextureEx(LPCSTR tex_name, LPCSTR sh_name = "hud" DELIMITER "default");
 };
 #endif // UI_ANIMATED_STATIC_H_

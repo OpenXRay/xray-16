@@ -398,7 +398,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
         string_path ce_path;
         string_path anm_name;
 #pragma todo("Xottab_DUTY: replace backslashes with slashes")
-        strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
+        strconcat(sizeof(anm_name), anm_name, "camera_effects" DELIMITER "weapon" DELIMITER, M.name.c_str(), ".anm");
         if (FS.exist(ce_path, "$game_anims$", anm_name))
         {
             CAnimatorCamEffector* e = new CAnimatorCamEffector();

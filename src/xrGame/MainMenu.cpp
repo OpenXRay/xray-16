@@ -154,7 +154,7 @@ void CMainMenu::ReadTextureInfo()
 {
     string_path buf;
     FS_FileSet fset;
-    FS.file_list(fset, "$game_config$", FS_ListFiles, strconcat(sizeof(buf), buf, UI_PATH, "\\", "textures_descr\\*.xml"));
+    FS.file_list(fset, "$game_config$", FS_ListFiles, strconcat(sizeof(buf), buf, UI_PATH, DELIMITER, "textures_descr" DELIMITER "*.xml"));
     for (const auto& file : fset)
     {
         string_path fn1, fn2, fn3;
@@ -624,7 +624,7 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
         m_sPatchFileName = fname;
     }
     else
-        m_sPatchFileName.printf("downloads\\%s", FileName);
+        m_sPatchFileName.printf("downloads" DELIMITER "%s", FileName);
 
     m_sPDProgress.IsInProgress = true;
     m_sPDProgress.Progress = 0;

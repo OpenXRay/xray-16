@@ -45,7 +45,7 @@ void CUICursor::Hide()
 void CUICursor::InitInternal()
 {
     m_static = new CUIStatic();
-    m_static->InitTextureEx("ui\\ui_ani_cursor", "hud\\cursor");
+    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
     Frect rect;
     rect.set(0.0f, 0.0f, 40.0f, 40.0f);
     m_static->SetTextureRect(rect);

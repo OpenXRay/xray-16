@@ -30,7 +30,7 @@ void CUIMapInfo::InitMapInfo(Fvector2 pos, Fvector2 size)
         text += *str_tbl.translate(ltx.r_string_wb("map_info", y)); \
     else                                                            \
         text += *str_tbl.translate(z);                              \
-    text += "%c[default]\\n";                                       \
+    text += "%c[default]" DELIMITER "n";                                       \
     st = new CUITextWnd();                                          \
     st->SetTextComplexMode(true);                                   \
     st->SetFont(txt_font);                                          \
@@ -53,7 +53,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
 
     CUITextWnd* st;
     // try to find file with info
-    xr_string info_path = "text\\map_desc\\";
+    xr_string info_path = "text" DELIMITER "map_desc" DELIMITER;
     info_path += map_name;
     info_path += ".ltx";
 
@@ -116,7 +116,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
             text += *str_tbl.translate("st_artefacthunt");
         }
 
-        text += "%c[default]\\n";
+        text += "%c[default]" DELIMITER "n";
 
         st = new CUITextWnd();
         st->SetTextComplexMode(true);

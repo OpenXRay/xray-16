@@ -467,7 +467,7 @@ bool valid_saved_game_name(LPCSTR file_name)
     LPCSTR E = file_name + xr_strlen(file_name);
     for (; I != E; ++I)
     {
-        if (!strchr("/\\:*?\"<>|^()[]%", *I))
+        if (!strchr("/" DELIMITER ":*?\"<>|^()[]%", *I))
             continue;
 
         return (false);

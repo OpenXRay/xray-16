@@ -47,7 +47,7 @@
 
 LevelGraphDebugRender::LevelGraphDebugRender() : gameGraph(nullptr), levelGraph(nullptr)
 {
-    debugShader->create("debug\\ai_nodes", "$null");
+    debugShader->create("debug" DELIMITER "ai_nodes", "$null");
     currentLevelId = -1;
     currentActual = false;
     currentCenter = {flt_max, flt_max, flt_max};

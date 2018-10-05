@@ -112,7 +112,7 @@ void CUIChangeMap::OnItemSelect()
     const shared_str& name = M.m_map_names[idx].map_name;
     LPSTR map_ver = NULL;
     STRCONCAT(map_ver, "[", M.m_map_names[idx].map_ver.c_str() ? M.m_map_names[idx].map_ver.c_str() : "unknown", "]");
-    xr_string map_name = "intro\\intro_map_pic_";
+    xr_string map_name = "intro" DELIMITER "intro_map_pic_";
     map_name += name.c_str();
     xr_string full_name = map_name + ".dds";
 
@@ -120,7 +120,7 @@ void CUIChangeMap::OnItemSelect()
     if (FS.exist("$game_textures$", full_name.c_str()))
         map_pic->InitTexture(map_name.c_str());
     else
-        map_pic->InitTexture("ui\\ui_noise");
+        map_pic->InitTexture("ui" DELIMITER "ui_noise");
 
     map_pic->SetTextureRect(orig_rect);
     map_version->SetText(map_ver);

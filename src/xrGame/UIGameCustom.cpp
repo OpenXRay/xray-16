@@ -326,7 +326,7 @@ CMapListHelper gMapListHelper;
 void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName, const char* levelVer /*= "1.0"*/)
 {
     CInifile levelCfg(cfgName);
-    shared_str shLevelName = levelName.substr(0, levelName.find('\\')).c_str();
+    shared_str shLevelName = levelName.substr(0, levelName.find(_DELIMITER)).c_str();
     shared_str shLevelVer = levelVer;
     if (levelCfg.section_exist("map_usage"))
     {
@@ -369,7 +369,7 @@ void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName
 void CMapListHelper::Load()
 {
     string_path cfgFileName;
-    FS.update_path(cfgFileName, "$game_config$", "mp\\map_list.ltx");
+    FS.update_path(cfgFileName, "$game_config$", "mp" DELIMITER "map_list.ltx");
     CInifile maplistCfg(cfgFileName);
     // read weathers set
     CInifile::Sect weatherCfg = maplistCfg.r_section("weather");
@@ -390,7 +390,7 @@ void CMapListHelper::Load()
         LoadMapInfo(cfgFileName, cfg.name);
     }
     // scan all not loaded archieves
-    LPCSTR tempRoot = "temporary_gamedata\\";
+    LPCSTR tempRoot = "temporary_gamedata" DELIMITER;
     FS_Path* levelsPath = FS.get_path("$game_levels$");
     xr_string prevRoot = levelsPath->m_Root;
     levelsPath->_set_root(tempRoot);
@@ -402,7 +402,7 @@ void CMapListHelper::Load()
         const char* levelVersion = arch.header->r_string("header", "level_ver");
         FS.LoadArchive(arch, tempRoot);
         FS.update_path(cfgFileName, "$game_levels$", levelName);
-        xr_strcat(cfgFileName, "\\level.ltx");
+        xr_strcat(cfgFileName, "" DELIMITER "level.ltx");
         LoadMapInfo(cfgFileName, levelName, levelVersion);
         FS.unload_archive(arch);
     }

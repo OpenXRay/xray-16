@@ -18,10 +18,10 @@ CHitMarker::CHitMarker()
     InitShader_Grenade(pSettings->r_string("hud_hitmark", "grenade_mark_texture"));
 }
 
-void CHitMarker::InitShader(LPCSTR tex_name) { hShader2->create("hud\\default", tex_name); }
+void CHitMarker::InitShader(LPCSTR tex_name) { hShader2->create("hud" DELIMITER "default", tex_name); }
 void CHitMarker::InitShader_Grenade(LPCSTR tex_name)
 {
-    hShader_Grenade->create("hud\\default", tex_name); // "hud\\default2"
+    hShader_Grenade->create("hud" DELIMITER "default", tex_name); // "hud" DELIMITER "default2"
 }
 
 //--------------------------------------------------------------------

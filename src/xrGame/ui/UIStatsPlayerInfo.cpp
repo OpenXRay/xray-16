@@ -36,7 +36,7 @@ void CUIStatsPlayerInfo::InitPlayerInfo(Fvector2 pos, Fvector2 size)
     m_pBackground->SetStretchTexture(true);
     m_pBackground->SetWndPos(Fvector2().set(0, 0));
     m_pBackground->SetWndSize(size);
-    m_pBackground->InitTexture("ui\\ui_mp_frags_selection");
+    m_pBackground->InitTexture("ui" DELIMITER "ui_mp_frags_selection");
 
     xr_vector<PI_FIELD_INFO>& field_info = *m_field_info;
     for (u32 i = 0; i < field_info.size(); i++)

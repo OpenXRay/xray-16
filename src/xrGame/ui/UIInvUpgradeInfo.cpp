@@ -119,28 +119,28 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
         }
         else if (upg_res == inventory::upgrade::result_e_unknown)
         {
-            xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s", CStringTable().translate("st_upgr_disable").c_str(),
+            xr_sprintf(str_res, sizeof(str_res), "%s:" DELIMITER "n - %s", CStringTable().translate("st_upgr_disable").c_str(),
                 CStringTable().translate("st_upgr_unknown").c_str());
             m_cost->Show(false);
         }
         else if (upg_res == inventory::upgrade::result_e_group)
-            xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s", CStringTable().translate("st_upgr_disable").c_str(),
+            xr_sprintf(str_res, sizeof(str_res), "%s:" DELIMITER "n - %s", CStringTable().translate("st_upgr_disable").c_str(),
                 CStringTable().translate("st_upgr_group").c_str());
         else if (upg_res_script == inventory::upgrade::result_e_precondition_money)
-            xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s", CStringTable().translate("st_upgr_disable").c_str(),
+            xr_sprintf(str_res, sizeof(str_res), "%s:" DELIMITER "n - %s", CStringTable().translate("st_upgr_disable").c_str(),
                 CStringTable().translate("st_upgr_cant_do").c_str());
         else
         {
             if (upg_res != inventory::upgrade::result_ok)
             {
-                xr_sprintf(str_res, sizeof(str_res), "%s:\\n%s", CStringTable().translate("st_upgr_disable").c_str(),
+                xr_sprintf(str_res, sizeof(str_res), "%s:" DELIMITER "n%s", CStringTable().translate("st_upgr_disable").c_str(),
                     m_upgrade->get_prerequisites());
                 if (upg_res == inventory::upgrade::result_e_parents)
-                    xr_sprintf(str_res, sizeof(str_res), "%s\\n - %s", str_res,
+                    xr_sprintf(str_res, sizeof(str_res), "%s" DELIMITER "n - %s", str_res,
                         CStringTable().translate("st_upgr_parents").c_str());
 
                 if (upg_res == inventory::upgrade::result_e_precondition_money)
-                    xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s",
+                    xr_sprintf(str_res, sizeof(str_res), "%s:" DELIMITER "n - %s",
                         CStringTable().translate("st_upgr_disable").c_str(),
                         CStringTable().translate("st_upgr_cant_do").c_str());
             }

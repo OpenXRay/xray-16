@@ -125,7 +125,7 @@ void CEntityAlive::LoadBloodyWallmarks(LPCSTR section)
     /*
     for (int k=0; k<cnt; ++k)
     {
-        s.create ("effects\\wallmark",_GetItem(wallmarks_name,k,tmp));
+        s.create ("effects" DELIMITER "wallmark",_GetItem(wallmarks_name,k,tmp));
         m_pBloodDropsVector->push_back	(s);
     }
     */

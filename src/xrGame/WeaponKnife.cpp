@@ -18,7 +18,7 @@
 #include <iterator>
 #endif
 
-#define KNIFE_MATERIAL_NAME "objects\\knife"
+#define KNIFE_MATERIAL_NAME "objects" DELIMITER "knife"
 
 #ifdef DEBUG
 #include "debug_renderer.h"

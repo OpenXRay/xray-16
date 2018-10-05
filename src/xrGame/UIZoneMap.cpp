@@ -151,7 +151,7 @@ bool CUIZoneMap::ZoomIn() { return true; }
 bool CUIZoneMap::ZoomOut() { return true; }
 void CUIZoneMap::SetupCurrentMap()
 {
-    m_activeMap->Initialize(Level().name(), "hud\\default");
+    m_activeMap->Initialize(Level().name(), "hud" DELIMITER "default");
 
     Frect r;
     m_clipFrame.GetAbsoluteRect(r);

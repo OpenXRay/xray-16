@@ -219,7 +219,7 @@ void CConsole::OnRender()
     if (!m_hShader_back)
     {
         m_hShader_back = new FactoryPtr<IUIShader>();
-        (*m_hShader_back)->create("hud\\default", "ui\\ui_console"); // "ui\\ui_empty"
+        (*m_hShader_back)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_console"); // "ui/ui_empty"
     }
 
     if (!pFont)

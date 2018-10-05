@@ -30,7 +30,7 @@ void CStringTable::Init()
     //---
     FS_FileSet fset;
     string_path files_mask;
-    xr_sprintf(files_mask, "text\\%s\\*.xml", pData->m_sLanguage.c_str());
+    xr_sprintf(files_mask, "text" DELIMITER "%s" DELIMITER "*.xml", pData->m_sLanguage.c_str());
     FS.file_list(fset, "$game_config$", FS_ListFiles, files_mask);
     auto fit = fset.begin();
     auto fit_e = fset.end();
@@ -54,7 +54,7 @@ void CStringTable::Load(LPCSTR xml_file_full)
 {
     CUIXml uiXml;
     string_path _s;
-    strconcat(sizeof(_s), _s, "text\\", pData->m_sLanguage.c_str());
+    strconcat(sizeof(_s), _s, "text" DELIMITER, pData->m_sLanguage.c_str());
 
     uiXml.Load(CONFIG_PATH, _s, xml_file_full);
 

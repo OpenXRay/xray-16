@@ -16,7 +16,7 @@ class IRender_Sector;
 
 extern const Fvector zero_vel;
 
-#define WEAPON_MATERIAL_NAME "objects\\bullet"
+#define WEAPON_MATERIAL_NAME "objects" DELIMITER "bullet"
 
 class CShootingObject : public IAnticheatDumpable
 {

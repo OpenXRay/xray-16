@@ -65,7 +65,7 @@ void CUIServerInfo::Init()
     m_text_desc->AddWindow(m_text_body, true);
 
     Frect orig_rect = m_image->GetTextureRect();
-    m_image->InitTexture("ui\\ui_noise");
+    m_image->InitTexture("ui" DELIMITER "ui_noise");
     m_image->SetTextureRect(orig_rect);
     m_image->SetStretchTexture(true);
 
@@ -121,12 +121,12 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
     strncpy_s(tmp_string, sizeof(tmp_string), reinterpret_cast<char const*>(data_ptr), new_size);
     tmp_string[new_size] = 0;
 
-    // std::replace(tmp_string, tmp_string + new_size, '\r', '\\');
+    // std::replace(tmp_string, tmp_string + new_size, '\r', _DELIMITER);
     // std::replace(tmp_string, tmp_string + new_size, '\n', 'n');
     char* tmp_iter = strstr(tmp_string, "\r\n");
     while (tmp_iter != NULL)
     {
-        *tmp_iter = '\\';
+        *tmp_iter = _DELIMITER;
         *(tmp_iter + 1) = 'n';
         tmp_iter += 2;
         tmp_iter = strstr(tmp_iter, "\r\n");
