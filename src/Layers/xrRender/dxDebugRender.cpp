@@ -105,7 +105,7 @@ void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)
     R_ASSERT(shdHandle < dbgShaderCount);
 
     static const LPCSTR dbgShaderParams[][2] = {
-        {"hud\\default", "ui\\ui_pop_up_active_back"}, // dbgShaderWindow
+        {"hud" DELIMITER "default", "ui" DELIMITER "ui_pop_up_active_back"}, // dbgShaderWindow
     };
 
     if (!m_dbgShaders[shdHandle])

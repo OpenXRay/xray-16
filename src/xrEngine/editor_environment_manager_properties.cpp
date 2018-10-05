@@ -150,7 +150,7 @@ manager::manager()
         getter.bind(&s_test_property2, &test_property2::getter);
         setter.bind(&s_test_property2, &test_property2::setter);
         holder->add_property("string", "category", "description", s_test_property2.m_property, getter, setter, ".dds",
-            "Texture files (*.dds)|*.dds", "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
+            "Texture files (*.dds)|*.dds", "R:" DELIMITER "development" DELIMITER "priquel" DELIMITER "resources" DELIMITER "gamedata" DELIMITER "textures" DELIMITER "sky",
             "Select texture...");
     }
 

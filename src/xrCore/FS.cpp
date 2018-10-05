@@ -82,7 +82,7 @@ void VerifyPath(LPCSTR path)
     string1024 tmp;
     for (int i = 0; path[i]; i++)
     {
-        if (path[i] != '\\' || i == 0)
+        if (path[i] != _DELIMITER || i == 0)
             continue;
         CopyMemory(tmp, path, i);
         tmp[i] = 0;

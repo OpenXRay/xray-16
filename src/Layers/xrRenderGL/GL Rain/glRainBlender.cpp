@@ -22,10 +22,10 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         jitter(C);
 
-        //C.r_Sampler		("s_water",	"water\\water_water");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_water");
 
-        //C.r_Sampler		("s_water",	"water\\water_studen");
-        C.r_Sampler("s_water", "water\\water_normal");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_studen");
+        C.r_Sampler("s_water", "water" DELIMITER "water_normal");
 
         C.r_End();
 
@@ -48,14 +48,14 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         jitter(C);
 
-        //		C.r_Sampler		("s_water",	"water\\water_water");
+        //		C.r_Sampler		("s_water",	"water" DELIMITER "water_water");
 
-        //C.r_Sampler		("s_water",	"water\\water_studen");
-        //C.r_Sampler		("s_water",	"water\\water_normal");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_studen");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_normal");
 
-        C.r_Sampler("s_water", "water\\water_SBumpVolume");
-        //C.r_Sampler		("s_waterFall",	"water\\water_normal");
-        C.r_Sampler("s_waterFall", "water\\water_flowing_nmap");
+        C.r_Sampler("s_water", "water" DELIMITER "water_SBumpVolume");
+        //C.r_Sampler		("s_waterFall",	"water" DELIMITER "water_normal");
+        C.r_Sampler("s_waterFall", "water" DELIMITER "water_flowing_nmap");
 
         C.r_End();
 
@@ -76,9 +76,9 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         jitter(C);
 
-        //		C.r_Sampler		("s_water",	"water\\water_water");
+        //		C.r_Sampler		("s_water",	"water" DELIMITER "water_water");
 
-        //C.r_Sampler		("s_water",	"water\\water_studen");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_studen");
         C.r_Sampler("s_patched_normal", r2_RT_accum);
 
         //	Normal can be packed into R and G
@@ -107,9 +107,9 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         jitter(C);
 
-        //		C.r_Sampler		("s_water",	"water\\water_water");
+        //		C.r_Sampler		("s_water",	"water" DELIMITER "water_water");
 
-        //C.r_Sampler		("s_water",	"water\\water_studen");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_studen");
         C.r_Sampler("s_patched_normal", r2_RT_accum);
 
         //C.r_ColorWriteEnable( false, false, false, true );
@@ -157,14 +157,14 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         jitter(C);
 
-        //		C.r_Sampler		("s_water",	"water\\water_water");
+        //		C.r_Sampler		("s_water",	"water" DELIMITER "water_water");
 
-        //C.r_Sampler		("s_water",	"water\\water_studen");
-        //C.r_Sampler		("s_water",	"water\\water_normal");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_studen");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_normal");
 
-        C.r_Sampler("s_water", "water\\water_SBumpVolume");
-        //C.r_dx10Texture		("s_waterFall",	"water\\water_normal");
-        C.r_Sampler("s_waterFall", "water\\water_flowing_nmap");
+        C.r_Sampler("s_water", "water" DELIMITER "water_SBumpVolume");
+        //C.r_dx10Texture		("s_waterFall",	"water" DELIMITER "water_normal");
+        C.r_Sampler("s_waterFall", "water" DELIMITER "water_flowing_nmap");
 
         C.r_End();
 
@@ -185,9 +185,9 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         jitter(C);
 
-        //		C.r_Sampler		("s_water",	"water\\water_water");
+        //		C.r_Sampler		("s_water",	"water" DELIMITER "water_water");
 
-        //C.r_Sampler		("s_water",	"water\\water_studen");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_studen");
         C.r_Sampler("s_patched_normal", r2_RT_accum);
 
         //	Normal can be packed into R and G
@@ -215,9 +215,9 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         jitter(C);
 
-        //		C.r_Sampler		("s_water",	"water\\water_water");
+        //		C.r_Sampler		("s_water",	"water" DELIMITER "water_water");
 
-        //C.r_Sampler		("s_water",	"water\\water_studen");
+        //C.r_Sampler		("s_water",	"water" DELIMITER "water_studen");
         C.r_Sampler("s_patched_normal", r2_RT_accum);
 
         //C.r_ColorWriteEnable( false, false, false, true );

@@ -608,13 +608,13 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     __try
     {
         FS.update_path(logDir, "$logs$", "");
-        if (logDir[0] != '\\' && logDir[1] != ':')
+        if (logDir[0] != _DELIMITER && logDir[1] != ':')
         {
             string256 currentDir;
             _getcwd(currentDir, sizeof(currentDir));
             string256 relDir;
             xr_strcpy(relDir, logDir);
-            strconcat(sizeof(logDir), logDir, currentDir, "\\", relDir);
+            strconcat(sizeof(logDir), logDir, currentDir, DELIMITER, relDir);
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)

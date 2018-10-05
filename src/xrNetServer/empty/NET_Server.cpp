@@ -183,7 +183,7 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
     //---------------------------------------
     if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) {
         if (!pSvNetLog)
-            pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+            pSvNetLog = new INetLog("logs" DELIMITER "net_sv_log.log", TimeGlobal(device_timer));
 
         if (pSvNetLog)
             pSvNetLog->LogPacket(TimeGlobal(device_timer), &packet, true);
@@ -374,7 +374,7 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
     //	if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
     if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) {
         if (!pSvNetLog)
-            pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+            pSvNetLog = new INetLog("logs" DELIMITER "net_sv_log.log", TimeGlobal(device_timer));
         if (pSvNetLog)
             pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
     }

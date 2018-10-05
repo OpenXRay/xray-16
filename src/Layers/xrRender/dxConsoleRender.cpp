@@ -4,7 +4,7 @@
 dxConsoleRender::dxConsoleRender()
 {
 #if defined(USE_DX10) || defined(USE_DX11)
-    m_Shader.create("hud\\crosshair");
+    m_Shader.create("hud" DELIMITER "crosshair");
     m_Geom.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 #endif
 }

@@ -660,11 +660,11 @@ void CSE_ALifeCustomZone::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
     PHelper().CreateU32(
-        items, PrepareKey(pref, *s_name, "on/off mode\\Shift time (sec)"), &m_start_time_shift, 0, 100000);
+        items, PrepareKey(pref, *s_name, "on/off mode" DELIMITER "Shift time (sec)"), &m_start_time_shift, 0, 100000);
     PHelper().CreateU32(
-        items, PrepareKey(pref, *s_name, "on/off mode\\Enabled time (sec)"), &m_enabled_time, 0, 100000);
+        items, PrepareKey(pref, *s_name, "on/off mode" DELIMITER "Enabled time (sec)"), &m_enabled_time, 0, 100000);
     PHelper().CreateU32(
-        items, PrepareKey(pref, *s_name, "on/off mode\\Disabled time (sec)"), &m_disabled_time, 0, 100000);
+        items, PrepareKey(pref, *s_name, "on/off mode" DELIMITER "Disabled time (sec)"), &m_disabled_time, 0, 100000);
 }
 #endif // #ifndef XRGAME_EXPORTS
 
@@ -758,8 +758,8 @@ void CSE_ALifeAnomalousZone::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateFloat(
         items, PrepareKey(pref, *s_name, "offline interactive radius"), &m_offline_interactive_radius, 0.f, 100.f);
     PHelper().CreateU16(
-        items, PrepareKey(pref, *s_name, "ALife\\Artefact spawn places count"), &m_artefact_spawn_count, 32, 256);
-    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\Visible for AI"), &m_flags, flVisibleForAI);
+        items, PrepareKey(pref, *s_name, "ALife" DELIMITER "Artefact spawn places count"), &m_artefact_spawn_count, 32, 256);
+    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife" DELIMITER "Visible for AI"), &m_flags, flVisibleForAI);
 }
 #endif // #ifndef XRGAME_EXPORTS
 
@@ -1147,7 +1147,7 @@ void CSE_ALifeMonsterAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
 
-    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\No move in offline"), &m_flags, flOfflineNoMove);
+    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife" DELIMITER "No move in offline"), &m_flags, flOfflineNoMove);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "Use smart terrain tasks"), &m_flags, flUseSmartTerrains);
 
     if (pSettings->line_exist(s_name, "SpaceRestrictionSection"))

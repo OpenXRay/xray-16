@@ -86,12 +86,12 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 
 
 #ifdef _EDITOR
-	ELog.Msg(mtError, "Can't find texture '%s'", fname);
-	return 0;
+    ELog.Msg(mtError, "Can't find texture '%s'", fname);
+    return 0;
 #else
 
     Msg("! Can't find texture '%s'", fname);
-    R_ASSERT(FS.exist(fn, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"));
+    R_ASSERT(FS.exist(fn, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
 
     //	xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
 
@@ -102,7 +102,7 @@ _DDS:
         // Load and get header
         S = FS.r_open(fn);
 #ifdef DEBUG
-		Msg("* Loaded: %s[%d]b", fn, S->length());
+        Msg("* Loaded: %s[%d]b", fn, S->length());
 #endif // DEBUG
         img_size = S->length();
         R_ASSERT(S);
@@ -238,7 +238,7 @@ _BUMP_from_base:
         //////////////////
         if (strstr(fname, "_bump#"))
         {
-            R_ASSERT2 (FS.exist(fn,"$game_textures$", "ed\\ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
+            R_ASSERT2 (FS.exist(fn,"$game_textures$", "ed" DELIMITER "ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
             S = FS.r_open(fn);
             R_ASSERT2 (S, fn);
             img_size = S->length();
@@ -246,7 +246,7 @@ _BUMP_from_base:
         }
         if (strstr(fname, "_bump"))
         {
-            R_ASSERT2 (FS.exist(fn,"$game_textures$", "ed\\ed_dummy_bump", ".dds"),"ed_dummy_bump");
+            R_ASSERT2 (FS.exist(fn,"$game_textures$", "ed" DELIMITER "ed_dummy_bump", ".dds"),"ed_dummy_bump");
             S = FS.r_open(fn);
 
             R_ASSERT2 (S, fn);

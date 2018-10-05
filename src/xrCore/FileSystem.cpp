@@ -136,7 +136,7 @@ bool EFS_Utils::GetOpenNameInternal(
     if (xr_strlen(buffer))
     {
         string_path dr;
-        if (!(buffer[0] == '\\' && buffer[1] == '\\')) // if !network
+        if (!(buffer[0] == _DELIMITER && buffer[1] == _DELIMITER)) // if !network
         {
             _splitpath(buffer, dr, 0, 0, 0);
 
@@ -196,14 +196,14 @@ bool EFS_Utils::GetOpenNameInternal(
 
             xr_strcpy(dir, buffer);
             xr_strcpy(fns, dir);
-            xr_strcat(fns, "\\");
+            xr_strcat(fns, DELIMITER);
             xr_strcat(fns, _GetItem(buffer, 1, buf, 0x0));
 
             for (int i = 2; i < cnt; i++)
             {
                 xr_strcat(fns, ",");
                 xr_strcat(fns, dir);
-                xr_strcat(fns, "\\");
+                xr_strcat(fns, DELIMITER);
                 xr_strcat(fns, _GetItem(buffer, i, buf, 0x0));
             }
             xr_strcpy(buffer, sz_buf, fns);
@@ -237,7 +237,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
     if (xr_strlen(buffer))
     {
         string_path dr;
-        if (!(buffer[0] == '\\' && buffer[1] == '\\')) // if !network
+        if (!(buffer[0] == _DELIMITER && buffer[1] == _DELIMITER)) // if !network
         {
             _splitpath(buffer, dr, 0, 0, 0);
             if (0 == dr[0])
@@ -301,7 +301,7 @@ LPCSTR EFS_Utils::AppendFolderToName(
         if (*s == '_')
         {
             depth--;
-            *d = '\\';
+            *d = _DELIMITER;
         }
         else
         {

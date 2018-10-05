@@ -101,7 +101,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 #ifdef USE_DX11
     if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
     {
-        char hs[256], ds[256]; // = "DX11\\tess", ds[256] = "DX11\\tess";
+        char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";
 
         if (C.TessMethod == CBlender_Compile::TESS_PN || C.TessMethod == CBlender_Compile::TESS_PN_HM)
@@ -138,8 +138,8 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 
         strconcat(sizeof(vs), vs, "deffer_", _vspec, "_bump", params);
         strconcat(sizeof(ps), ps, "deffer_", _pspec, _aref ? "_aref" : "", "_bump", params);
-        strconcat(sizeof(hs), hs, "DX11\\tess", params);
-        strconcat(sizeof(ds), ds, "DX11\\tess", params);
+        strconcat(sizeof(hs), hs, "DX11" DELIMITER "tess", params);
+        strconcat(sizeof(ds), ds, "DX11" DELIMITER "tess", params);
 
         VERIFY(strstr(vs, "bump") != 0);
         VERIFY(strstr(ps, "bump") != 0);
@@ -289,7 +289,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 
     if (bump && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
     {
-        char hs[256], ds[256]; // = "DX11\\tess", ds[256] = "DX11\\tess";
+        char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";
 
         if (C.TessMethod == CBlender_Compile::TESS_PN || C.TessMethod == CBlender_Compile::TESS_PN_HM)
@@ -325,8 +325,8 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         xr_strcat(params, ")");
 
         strconcat(sizeof(vs), vs, "deffer_", _vspec, "_bump", params);
-        strconcat(sizeof(hs), hs, "DX11\\tess", params);
-        strconcat(sizeof(ds), ds, "DX11\\tess_shadow", params);
+        strconcat(sizeof(hs), hs, "DX11" DELIMITER "tess", params);
+        strconcat(sizeof(ds), ds, "DX11" DELIMITER "tess_shadow", params);
 
         C.r_TessPass(vs, hs, ds, "null", "dumb", FALSE, TRUE, TRUE, FALSE);
         RImplementation.clearAllShaderOptions();

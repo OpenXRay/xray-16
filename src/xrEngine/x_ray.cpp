@@ -401,10 +401,10 @@ void CApplication::Level_Scan()
 
 void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 {
-    strconcat(sizeof(dest), dest, "intro\\intro_", level_name);
+    strconcat(sizeof(dest), dest, "intro" DELIMITER "intro_", level_name);
 
     u32 len = xr_strlen(dest);
-    if (dest[len - 1] == '\\')
+    if (dest[len - 1] == _DELIMITER)
         dest[len - 1] = 0;
 
     string16 buff;
@@ -478,7 +478,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
         Level_Scan();
 
     string256 buffer;
-    strconcat(sizeof(buffer), buffer, name, "\\");
+    strconcat(sizeof(buffer), buffer, name, DELIMITER);
     for (u32 I = 0; I < Levels.size(); ++I)
     {
         if (0 == xr_stricmp(buffer, Levels[I].folder))

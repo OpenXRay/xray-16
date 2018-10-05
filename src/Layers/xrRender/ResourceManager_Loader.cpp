@@ -155,9 +155,9 @@ void CResourceManager::StoreNecessaryTextures()
     for (; it != it_e; ++it)
     {
         LPCSTR texture_name = it->first;
-        if (strstr(texture_name, "\\levels\\"))
+        if (strstr(texture_name, DELIMITER "levels" DELIMITER))
             continue;
-        if (!strchr(texture_name, '\\'))
+        if (!strchr(texture_name, _DELIMITER))
             continue;
 
         ref_texture T;

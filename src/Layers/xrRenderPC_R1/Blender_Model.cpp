@@ -152,7 +152,7 @@ void CBlender_Model::Compile(CBlender_Compile& C)
             else
                 C.r_Pass(tsv_spot, tsp_spot, FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
             C.r_Sampler("s_base", C.L_textures[0]);
-            C.r_Sampler_clf("s_lmap", "internal\\internal_light_att", true);
+            C.r_Sampler_clf("s_lmap", "internal" DELIMITER "internal_light_att", true);
             C.r_Sampler_clf("s_att", TEX_SPOT_ATT);
             if (C.bDetail_Diffuse)
                 C.r_Sampler("s_detail", C.detail_texture);

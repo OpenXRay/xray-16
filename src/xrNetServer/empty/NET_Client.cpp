@@ -486,7 +486,7 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 
     if (psNET_Flags.test(NETFLAG_LOG_CL_PACKETS)) {
         if (!pClNetLog)
-            pClNetLog = new INetLog("logs\\net_cl_log.log", timeServer());
+            pClNetLog = new INetLog("logs" DELIMITER "net_cl_log.log", timeServer());
         if (pClNetLog)
             pClNetLog->LogData(timeServer(), data, size);
     }

@@ -451,10 +451,10 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             if (_GetItem(str, 1, inc_name, '"'))
             {
 #if defined(LINUX)
-                char *tmp_ptr = strchr(inc_name, '\\');
+                char *tmp_ptr = strchr(inc_name, _DELIMITER);
                 while (tmp_ptr) {
                     *tmp_ptr = '/';
-                    tmp_ptr = strchr(tmp_ptr, '\\');
+                    tmp_ptr = strchr(tmp_ptr, _DELIMITER);
                 }
 #endif
                 xr_strlwr(inc_name); // compensate removed xr_strlwr on path

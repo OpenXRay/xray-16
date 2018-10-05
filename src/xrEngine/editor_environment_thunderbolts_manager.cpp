@@ -84,7 +84,7 @@ void manager::load_thunderbolts()
     VERIFY(m_thunderbolts.empty());
 
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), true, true, false);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
@@ -104,7 +104,7 @@ void manager::load_thunderbolts()
 void manager::save_thunderbolts()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), false, false, true);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), false, false, true);
 
     for (const auto &i : m_thunderbolts)
         i->save(*config);
@@ -117,7 +117,7 @@ void manager::load_collections()
     VERIFY(m_collections.empty());
 
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), true, true, false);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
@@ -137,7 +137,7 @@ void manager::load_collections()
 void manager::save_collections()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), false, false, true);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), false, false, true);
 
     for (const auto &i : m_collections)
         i->save(*config);
@@ -157,7 +157,7 @@ void manager::save()
     save_collections();
 
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\environment.ltx"), false, false, true);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "environment.ltx"), false, false, true);
 
     CEnvironment& environment = g_pGamePersistent->Environment();
 

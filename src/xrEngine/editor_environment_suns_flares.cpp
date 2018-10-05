@@ -45,7 +45,7 @@ flares::~flares()
 void flares::load(CInifile& config, shared_str const& section)
 {
     m_use = !!READ_IF_EXISTS(&config, r_bool, section, "flares", true);
-    m_shader = READ_IF_EXISTS(&config, r_string, section, "flare_shader", "effects\\flare");
+    m_shader = READ_IF_EXISTS(&config, r_string, section, "flare_shader", "effects" DELIMITER "flare");
 
     if (!m_use)
         return;
@@ -57,8 +57,8 @@ void flares::load(CInifile& config, shared_str const& section)
     shared_str flare_radius =
         READ_IF_EXISTS(&config, r_string, section, "flare_radius", "0.080, 0.120, 0.040, 0.080, 0.120, 0.300");
     shared_str flare_textures = READ_IF_EXISTS(&config, r_string, section, "flare_textures",
-        "fx\\fx_flare1.tga, fx\\fx_flare2.tga, fx\\fx_flare2.tga, fx\\fx_flare2.tga, fx\\fx_flare3.tga, "
-        "fx\\fx_flare1.tga");
+        "fx" DELIMITER "fx_flare1.tga, fx" DELIMITER "fx_flare2.tga, fx" DELIMITER "fx_flare2.tga, fx" DELIMITER "fx_flare2.tga, fx" DELIMITER "fx_flare3.tga, "
+        "fx" DELIMITER "fx_flare1.tga");
 
     u32 opacity_count = _GetItemCount(flare_opacity.c_str());
     u32 position_count = _GetItemCount(flare_position.c_str());

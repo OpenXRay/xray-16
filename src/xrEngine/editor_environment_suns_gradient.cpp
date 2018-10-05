@@ -23,8 +23,8 @@ void gradient::load(CInifile& config, shared_str const& section)
     m_use = !!READ_IF_EXISTS(&config, r_bool, section, "gradient", true);
     m_opacity = READ_IF_EXISTS(&config, r_float, section, "gradient_opacity", .7f);
     m_radius = READ_IF_EXISTS(&config, r_float, section, "gradient_radius", .9f);
-    m_shader = READ_IF_EXISTS(&config, r_string, section, "gradient_shader", "effects\\flare");
-    m_texture = READ_IF_EXISTS(&config, r_string, section, "gradient_texture", "fx\\fx_gradient.tga");
+    m_shader = READ_IF_EXISTS(&config, r_string, section, "gradient_shader", "effects" DELIMITER "flare");
+    m_texture = READ_IF_EXISTS(&config, r_string, section, "gradient_texture", "fx" DELIMITER "fx_gradient.tga");
 }
 
 bool gradient::use_getter() { return (m_use); }

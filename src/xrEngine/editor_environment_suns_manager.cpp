@@ -53,7 +53,7 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), true, true, false);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
@@ -68,7 +68,7 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), false, false, true);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), false, false, true);
 
     for (const auto &i : m_suns)
         i->save(*config);

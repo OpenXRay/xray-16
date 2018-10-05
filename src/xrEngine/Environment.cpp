@@ -89,20 +89,20 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
 
     string_path file_name;
     m_ambients_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\ambients.ltx"), TRUE, TRUE, FALSE);
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), TRUE, TRUE, FALSE);
     m_sound_channels_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), TRUE, TRUE, FALSE);
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), TRUE, TRUE, FALSE);
     m_effects_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), TRUE, TRUE, FALSE);
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "effects.ltx"), TRUE, TRUE, FALSE);
     m_suns_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), TRUE, TRUE, FALSE);
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), TRUE, TRUE, FALSE);
     m_thunderbolt_collections_config = new CInifile(
-        FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
+        FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
     m_thunderbolts_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), TRUE, TRUE, FALSE);
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), TRUE, TRUE, FALSE);
 
     CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\environment.ltx"), TRUE, TRUE, FALSE);
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "environment.ltx"), TRUE, TRUE, FALSE);
     // params
     p_var_alt = deg2rad(config->r_float("environment", "altitude"));
     p_var_long = deg2rad(config->r_float("environment", "delta_longitude"));
