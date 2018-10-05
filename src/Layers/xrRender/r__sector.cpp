@@ -33,8 +33,7 @@ void CPortal::OnRender()
     {
         VERIFY(poly.size());
         // draw rect
-        DEFINE_VECTOR(FVF::L, LVec, LVecIt);
-        static LVec V;
+        static xr_vector<FVF::L> V;
         V.resize(poly.size() + 2);
         Fvector C = {0, 0, 0};
         for (u32 k = 0; k < poly.size(); k++)
