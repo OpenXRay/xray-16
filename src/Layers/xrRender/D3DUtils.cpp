@@ -1409,15 +1409,15 @@ void CDrawUtilities::DrawSelectionRect(const Ivector2& m_SelStart, const Ivector
     pv++;
     pv->set(m_SelStart.x * SCREEN_QUALITY, m_SelEnd.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
     pv++;
-    pv->set(m_SelEnd.x * SCREEN_QUALITY, m_SelEnd.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
-    pv++;
     pv->set(m_SelEnd.x * SCREEN_QUALITY, m_SelStart.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
+    pv++;
+    pv->set(m_SelEnd.x * SCREEN_QUALITY, m_SelEnd.y * SCREEN_QUALITY, m_SelectionRect, 0.f, 0.f);
     pv++;
     Stream->Unlock(4, vs_TL->vb_stride);
     // Render it as triangle list
     DU_DRAW_RS(D3DRS_CULLMODE, D3DCULL_NONE);
     DU_DRAW_SH(RImplementation.m_SelectionShader);
-    DU_DRAW_DP(D3DPT_TRIANGLEFAN, vs_TL, vBase, 2);
+    DU_DRAW_DP(D3DPT_TRIANGLESTRIP, vs_TL, vBase, 2);
     DU_DRAW_RS(D3DRS_CULLMODE, D3DCULL_CCW);
 }
 
