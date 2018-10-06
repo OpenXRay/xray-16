@@ -131,7 +131,7 @@ u16 mbhMulti2Wide(wchar_t* WideStr, wchar_t* WidePos, u16 WideStrSize, const cha
     return dpos;
 }
 
-xr_string StringFromUTF8(const char* in, const std::locale& locale /*= std::locale("")*/)
+xr_string StringFromUTF8(const char* in, const std::locale& locale)
 {
     using wcvt = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>;
     auto wstr = wcvt{}.from_bytes(in);
@@ -140,7 +140,7 @@ xr_string StringFromUTF8(const char* in, const std::locale& locale /*= std::loca
     return result;
 }
 
-xr_string StringToUTF8(const char* in, const std::locale& locale /*= std::locale("")*/)
+xr_string StringToUTF8(const char* in, const std::locale& locale)
 {
     using wcvt = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>;
     std::wstring wstr(xr_strlen(in), L'\0');

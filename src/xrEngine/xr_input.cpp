@@ -195,9 +195,10 @@ pcstr KeyToMouseButtonName(const int dik)
 bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
 {
     xr_string keyname;
+    static std::locale locale("");
 
     if (dik < SDL_NUM_SCANCODES)
-        keyname = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)));
+        keyname = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)), locale);
     else
         keyname = KeyToMouseButtonName(dik);
 

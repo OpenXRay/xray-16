@@ -70,7 +70,7 @@ void type_pair::on_key_press(line_edit_control* const control)
             {
             case SDL_TEXTINPUT:
             {
-                const std::locale locale("");
+                static std::locale locale("");
                 auto str = StringFromUTF8(event.text.text, locale);
 
                 if (std::isalpha(str[0], locale) || str[0] == char(-1)) // "я" = -1
