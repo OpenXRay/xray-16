@@ -494,8 +494,6 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
     net_Statistic.dwBytesSended += size;
 
     // verify
-    VERIFY(desc.dwBufferSize);
-    VERIFY(desc.pBufferData);
 
     //	Msg("- Client::SendTo_LL [%d]", size);
 }

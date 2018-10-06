@@ -382,8 +382,6 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
     // send it
 
     // verify
-    VERIFY(desc.dwBufferSize);
-    VERIFY(desc.pBufferData);
 }
 
 void IPureServer::SendTo(ClientID ID /*DPNID ID*/, NET_Packet& P, u32 dwFlags, u32 dwTimeout)
