@@ -90,3 +90,4 @@ target_include_directories(xrUICore PRIVATE
 	../../Externals/luabind
 	${SDL_INCLUDE_DIRS})
 target_link_libraries(xrUICore xrAPI pugixml xrScriptEngine ${LUAJIT_LIBRARIES} xrEngine xrMiscMath xrCore luabind ${SDL_LIBRARIES})
+xr_install(${PROJECT_NAME})
