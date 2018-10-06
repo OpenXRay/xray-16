@@ -160,7 +160,7 @@ LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
     u32 v_need = CAP_VERSION(2, 0);
     // strstr(Core.Params,"-ps_movie") &&
     if ((v_dev >= v_need) && FS.exist(buff, "$game_textures$", tex_name, ".ogm"))
-        return "hud\\movie";
+        return "hud" DELIMITER "movie";
     else
         return sh_name;
 }

@@ -339,7 +339,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 xr_sprintf(eff_name, sizeof(eff_name), "%s.anm", state_anm);
                 string_path ce_path;
                 string_path anm_name;
-                strconcat(sizeof(anm_name), anm_name, "camera_effects\\actor_move\\", eff_name);
+                strconcat(sizeof(anm_name), anm_name, "camera_effects" DELIMITER "actor_move" DELIMITER, eff_name);
                 if (FS.exist(ce_path, "$game_anims$", anm_name))
                 {
                     CAnimatorCamLerpEffectorConst* e = new CAnimatorCamLerpEffectorConst();

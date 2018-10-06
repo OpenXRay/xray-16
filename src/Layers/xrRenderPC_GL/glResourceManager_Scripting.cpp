@@ -412,7 +412,7 @@ void CResourceManager::LS_Load()
     // load shaders
     const char* shaderPath = RImplementation.getShaderPath();
     xr_vector<char*>* folder = FS.file_list_open("$game_shaders$", shaderPath, FS_ListFiles | FS_RootOnly);
-    VERIFY (folder);
+    R_ASSERT3(folder, "Shader folder not found: ", shaderPath);
     for (u32 it = 0; it < folder->size(); it++)
     {
         string_path namesp, fn;

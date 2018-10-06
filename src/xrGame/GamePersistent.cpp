@@ -51,7 +51,7 @@ void FillUIStyleToken()
     UIStyleToken.emplace_back("ui_style_default", 0);
 
     string_path path;
-    strconcat(sizeof(path), path, UI_PATH, "\\styles\\");
+    strconcat(sizeof(path), path, UI_PATH, DELIMITER "styles" DELIMITER);
     FS.update_path(path, _game_config_, path);
     auto styles = FS.file_list_open(path, FS_ListFolders | FS_RootOnly);
     if (styles != nullptr)
@@ -59,7 +59,7 @@ void FillUIStyleToken()
         int i = 1; // It's 1, because 0 is default style
         for (const auto& style : *styles)
         {
-            const auto pos = strchr(style, '\\');
+            const auto pos = strchr(style, _DELIMITER);
             *pos = '\0'; // we don't need that backslash in the end
             UIStyleToken.emplace_back(xr_strdup(style), i++); // It's important to have postfix increment!
         }
@@ -82,7 +82,7 @@ void SetupUIStyle()
             selectedStyle = token.name;
 
     string128 selectedStylePath;
-    strconcat(sizeof(selectedStylePath), selectedStylePath, UI_PATH, "\\styles\\", selectedStyle);
+    strconcat(sizeof(selectedStylePath), selectedStylePath, UI_PATH, DELIMITER "styles" DELIMITER, selectedStyle);
 
     UI_PATH = xr_strdup(selectedStylePath);
     defaultUIStyle = false;
@@ -465,6 +465,7 @@ void CGamePersistent::WeathersUpdate()
 
 bool allow_intro()
 {
+#if defined(WINDOWS)
 #ifdef MASTER_GOLD
     if (g_SASH.IsRunning())
 #else // #ifdef MASTER_GOLD
@@ -474,6 +475,7 @@ bool allow_intro()
         return false;
     }
     else
+#endif
         return true;
 }
 

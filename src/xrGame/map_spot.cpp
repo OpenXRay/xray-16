@@ -135,7 +135,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     {
         LPCSTR texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
-        if (strchr(texture, '\\'))
+        if (strchr(texture, _DELIMITER))
         {
             float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
             float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
@@ -155,7 +155,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     {
         LPCSTR texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
-        if (strchr(texture, '\\'))
+        if (strchr(texture, _DELIMITER))
         {
             float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
             float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
@@ -174,7 +174,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     {
         LPCSTR texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
-        if (strchr(texture, '\\'))
+        if (strchr(texture, _DELIMITER))
         {
             float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
             float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);

@@ -374,7 +374,7 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
 
     string_path fn;
 
-    LPCSTR path = "characters_voice\\dialogs\\";
+    LPCSTR path = "characters_voice" DELIMITER "dialogs" DELIMITER;
     LPCSTR ext = ".ogg";
     u32 tsize = sizeof(fn) - xr_strlen(path) - xr_strlen(ext) - 1;
     if (text_len > tsize)
@@ -388,7 +388,7 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
     strncat_s(fn, sizeof(fn), ext, xr_strlen(ext));
 #endif
 
-    //	strconcat( sizeof(fn), fn, "characters_voice\\dialogs\\", text2, ".ogg" );
+    //	strconcat( sizeof(fn), fn, "characters_voice" DELIMITER "dialogs" DELIMITER, text2, ".ogg" );
 
     StopSnd();
     if (FS.exist("$game_sounds$", fn))

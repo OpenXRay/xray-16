@@ -185,7 +185,7 @@ void CTexture::Load()
             else
             {
                 flags.MemoryUsage = pTheora->Width(true) * pTheora->Height(true) * 4;
-                BOOL bstop_at_end = (nullptr != strstr(cName.c_str(), "intro\\")) || (nullptr != strstr(cName.c_str(), "outro\\"));
+                BOOL bstop_at_end = (nullptr != strstr(cName.c_str(), "intro" DELIMITER)) || (nullptr != strstr(cName.c_str(), "outro" DELIMITER));
                 pTheora->Play(!bstop_at_end, RDEVICE.dwTimeContinual);
 
                 // Now create texture

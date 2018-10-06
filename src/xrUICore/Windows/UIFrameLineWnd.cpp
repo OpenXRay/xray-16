@@ -10,7 +10,7 @@ CUIFrameLineWnd::CUIFrameLineWnd() : bHorizontal(true), m_bTextureVisible(false)
 void CUIFrameLineWnd::InitFrameLineWnd(LPCSTR base_name, Fvector2 pos, Fvector2 size, bool horizontal)
 {
     InitFrameLineWnd(pos, size, horizontal);
-    InitTexture(base_name, "hud\\default");
+    InitTexture(base_name, "hud" DELIMITER "default");
 }
 
 void CUIFrameLineWnd::InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizontal)

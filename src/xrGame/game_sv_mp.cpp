@@ -1918,9 +1918,9 @@ void game_sv_mp::DumpOnlineStatistic()
     xrGameSpyServer* srv = smart_cast<xrGameSpyServer*>(m_server);
 
     string_path fn;
-    FS.update_path(fn, "$logs$", "mp_stats\\");
+    FS.update_path(fn, "$logs$", "mp_stats" DELIMITER);
     xr_strcat(fn, srv->HostName.c_str());
-    xr_strcat(fn, "\\online_dump.ltx");
+    xr_strcat(fn, "" DELIMITER "online_dump.ltx");
 
     string64 t_stamp;
     timestamp(t_stamp);
@@ -2099,11 +2099,11 @@ void game_sv_mp::StartToDumpStatistics()
     }
 
     xrGameSpyServer* srv = smart_cast<xrGameSpyServer*>(m_server);
-    FS.update_path(round_statistics_dump_fn, "$logs$", "mp_stats\\");
+    FS.update_path(round_statistics_dump_fn, "$logs$", "mp_stats" DELIMITER);
     string64 t_stamp;
     timestamp(t_stamp);
     xr_strcat(round_statistics_dump_fn, srv->HostName.c_str());
-    xr_strcat(round_statistics_dump_fn, "\\games\\dmp");
+    xr_strcat(round_statistics_dump_fn, DELIMITER "games" DELIMITER "dmp");
     xr_strcat(round_statistics_dump_fn, t_stamp);
     xr_strcat(round_statistics_dump_fn, ".ltx");
 }

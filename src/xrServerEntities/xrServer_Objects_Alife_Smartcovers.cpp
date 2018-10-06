@@ -296,7 +296,7 @@ void CSE_SmartCover::fill_visuals()
             return;
 
         CSE_Visual* visual = new CSE_SmartVisual();
-        visual->set_visual("actors\\stalker_neutral\\stalker_neutral_1");
+        visual->set_visual("actors" DELIMITER "stalker_neutral" DELIMITER "stalker_neutral_1");
 
         if (I->animation_id.size() == 0)
         {

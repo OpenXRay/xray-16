@@ -16,10 +16,10 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "Include/xrRender/UIShader.h"
 
-#define BUY_MENU_TEXTURE "ui\\ui_mp_buy_menu"
-#define CHAR_ICONS "ui\\ui_icons_npc"
-#define MAP_ICONS "ui\\ui_icons_map"
-#define MP_CHAR_ICONS "ui\\ui_models_multiplayer"
+#define BUY_MENU_TEXTURE "ui" DELIMITER "ui_mp_buy_menu"
+#define CHAR_ICONS "ui" DELIMITER "ui_icons_npc"
+#define MAP_ICONS "ui" DELIMITER "ui_icons_map"
+#define MP_CHAR_ICONS "ui" DELIMITER "ui_models_multiplayer"
 
 const LPCSTR relationsLtxSection = "game_relations";
 const LPCSTR ratingField = "rating_names";
@@ -48,8 +48,8 @@ CharInfoStrings* charInfoGoodwillStrings = NULL;
 void InventoryUtilities::CreateShaders()
 {
     g_tmpWMShader = new ui_shader();
-    (*g_tmpWMShader)->create("effects\\wallmark", "wm\\wm_grenade");
-    // g_tmpWMShader.create("effects\\wallmark",  "wm\\wm_grenade");
+    (*g_tmpWMShader)->create("effects" DELIMITER "wallmark", "wm" DELIMITER "wm_grenade");
+    // g_tmpWMShader.create("effects" DELIMITER "wallmark",  "wm" DELIMITER "wm_grenade");
 }
 
 void InventoryUtilities::DestroyShaders()
@@ -178,7 +178,7 @@ const ui_shader& InventoryUtilities::GetBuyMenuShader()
     if (!g_BuyMenuShader)
     {
         g_BuyMenuShader = new ui_shader();
-        (*g_BuyMenuShader)->create("hud\\default", BUY_MENU_TEXTURE);
+        (*g_BuyMenuShader)->create("hud" DELIMITER "default", BUY_MENU_TEXTURE);
     }
 
     return *g_BuyMenuShader;
@@ -189,7 +189,7 @@ const ui_shader& InventoryUtilities::GetEquipmentIconsShader()
     if (!g_EquipmentIconsShader)
     {
         g_EquipmentIconsShader = new ui_shader();
-        (*g_EquipmentIconsShader)->create("hud\\default", "ui\\ui_icon_equipment");
+        (*g_EquipmentIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_icon_equipment");
     }
 
     return *g_EquipmentIconsShader;
@@ -200,7 +200,7 @@ const ui_shader& InventoryUtilities::GetMPCharIconsShader()
     if (!g_MPCharIconsShader)
     {
         g_MPCharIconsShader = new ui_shader();
-        (*g_MPCharIconsShader)->create("hud\\default", MP_CHAR_ICONS);
+        (*g_MPCharIconsShader)->create("hud" DELIMITER "default", MP_CHAR_ICONS);
     }
 
     return *g_MPCharIconsShader;
@@ -211,7 +211,7 @@ const ui_shader& InventoryUtilities::GetOutfitUpgradeIconsShader()
     if (!g_OutfitUpgradeIconsShader)
     {
         g_OutfitUpgradeIconsShader = new ui_shader();
-        (*g_OutfitUpgradeIconsShader)->create("hud\\default", "ui\\ui_actor_armor");
+        (*g_OutfitUpgradeIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_armor");
     }
 
     return *g_OutfitUpgradeIconsShader;
@@ -222,7 +222,7 @@ const ui_shader& InventoryUtilities::GetWeaponUpgradeIconsShader()
     if (!g_WeaponUpgradeIconsShader)
     {
         g_WeaponUpgradeIconsShader = new ui_shader();
-        (*g_WeaponUpgradeIconsShader)->create("hud\\default", "ui\\ui_actor_weapons");
+        (*g_WeaponUpgradeIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_weapons");
     }
 
     return *g_WeaponUpgradeIconsShader;

@@ -26,19 +26,19 @@ void simplify_texture(string_path& fn)
     {
         if (strstr(fn, "$user"))
             return;
-        if (strstr(fn, "ui\\"))
+        if (strstr(fn, "ui" DELIMITER))
             return;
         if (strstr(fn, "lmap#"))
             return;
-        if (strstr(fn, "act\\"))
+        if (strstr(fn, "act" DELIMITER))
             return;
-        if (strstr(fn, "fx\\"))
+        if (strstr(fn, "fx" DELIMITER))
             return;
-        if (strstr(fn, "glow\\"))
+        if (strstr(fn, "glow" DELIMITER))
             return;
-        if (strstr(fn, "map\\"))
+        if (strstr(fn, "map" DELIMITER))
             return;
-        xr_strcpy(fn, "ed\\ed_not_existing_texture");
+        xr_strcpy(fn, "ed" DELIMITER "ed_not_existing_texture");
     }
 }
 

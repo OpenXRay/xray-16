@@ -117,7 +117,7 @@ void CAI_Crow::Load(LPCSTR section)
     //////////////////////////////////////////////////////////////////////////
 
     // sounds
-    m_Sounds.m_idle.Load("monsters\\crow\\idle");
+    m_Sounds.m_idle.Load("monsters" DELIMITER "crow" DELIMITER "idle");
     // play defaut
 
     fSpeed = pSettings->r_float(section, "speed");

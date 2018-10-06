@@ -19,13 +19,13 @@ void simplify_texture(string_path& fn)
     if (strstr(Core.Params, "-game_designer"))
     {
         if (strstr(fn, "$user")) return;
-        if (strstr(fn, "ui\\")) return;
+        if (strstr(fn, "ui" DELIMITER )) return;
         if (strstr(fn, "lmap#")) return;
-        if (strstr(fn, "act\\")) return;
-        if (strstr(fn, "fx\\")) return;
-        if (strstr(fn, "glow\\")) return;
-        if (strstr(fn, "map\\")) return;
-        strcpy_s(fn, "ed\\ed_not_existing_texture");
+        if (strstr(fn, "act" DELIMITER )) return;
+        if (strstr(fn, "fx" DELIMITER )) return;
+        if (strstr(fn, "glow" DELIMITER )) return;
+        if (strstr(fn, "map" DELIMITER )) return;
+        strcpy_s(fn, "ed" DELIMITER "ed_not_existing_texture");
     }
 }
 

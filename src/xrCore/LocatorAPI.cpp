@@ -652,7 +652,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     if (!stat(scanPath, &buffer))
         return true;
     xr_strcpy(scanPath, sizeof scanPath, path);
-    xr_strcat(scanPath, "*.*");
+    xr_strcat(scanPath, "*");
     _finddata_t findData;
 #ifdef WINDOWS
     intptr_t handle = _findfirst(scanPath, &findData);
@@ -680,6 +680,12 @@ bool CLocatorAPI::Recurse(pcstr path)
         struct stat fi;
         stat(findData.name, &fi);
         findData.size = fi.st_size;
+        switch (fi.st_mode & S_IFMT)
+        {
+        case S_IFDIR: findData.attrib = _A_SUBDIR; break;
+        case S_IFREG: findData.attrib = 0;         break; // File
+        default:      findData.attrib = _A_HIDDEN; break; // Skip
+        }
 #endif
         string1024 fullPath;
         bool ignore = false;
@@ -732,7 +738,7 @@ void* FileDownload(pcstr file_name, const int& file_handle, u32& file_size);
 void CLocatorAPI::setup_fs_path(pcstr fs_name, string_path& fs_path)
 {
     xr_strcpy(fs_path, fs_name ? fs_name : "");
-    pstr slash = strrchr(fs_path, '\\');
+    pstr slash = strrchr(fs_path, _DELIMITER);
     if (!slash)
         slash = strrchr(fs_path, '/');
     if (!slash)
@@ -851,8 +857,8 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
          if (xr_strlen(tmpAppPath))
          {
          tmpAppPath[xr_strlen(tmpAppPath)-1] = 0;
-         if (strrchr(tmpAppPath, '\\'))
-         *(strrchr(tmpAppPath, '\\')+1) = 0;
+         if (strrchr(tmpAppPath, _DELIMITER))
+         *(strrchr(tmpAppPath, _DELIMITER)+1) = 0;
 
          FS_Path* pFSRoot = FS.get_path("$fs_root$");
          pFSRoot->_set_root (tmpAppPath);
@@ -1058,14 +1064,14 @@ xr_vector<pstr>* CLocatorAPI::file_list_open(pcstr _path, u32 flags)
         if (0 != strncmp(entry.name, N, base_len))
             break; // end of list
         const char* end_symbol = entry.name + xr_strlen(entry.name) - 1;
-        if (*end_symbol != '\\')
+        if (*end_symbol != _DELIMITER)
         {
             // file
             if ((flags & FS_ListFiles) == 0)
                 continue;
 
             const char* entry_begin = entry.name + base_len;
-            if (flags & FS_RootOnly && strstr(entry_begin, "\\"))
+            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER))
                 continue; // folder in folder
             dest->push_back(xr_strdup(entry_begin));
             pstr fname = dest->back();
@@ -1080,7 +1086,7 @@ xr_vector<pstr>* CLocatorAPI::file_list_open(pcstr _path, u32 flags)
                 continue;
             const char* entry_begin = entry.name + base_len;
 
-            if (flags & FS_RootOnly && strstr(entry_begin, "\\") != end_symbol)
+            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER) != end_symbol)
                 continue; // folder in folder
 
             dest->push_back(xr_strdup(entry_begin));
@@ -1128,13 +1134,13 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
         if (0 != strncmp(entry.name, N, base_len))
             break; // end of list
         pcstr end_symbol = entry.name + xr_strlen(entry.name) - 1;
-        if (*end_symbol != '\\')
+        if (*end_symbol != _DELIMITER)
         {
             // file
             if ((flags & FS_ListFiles) == 0)
                 continue;
             LPCSTR entry_begin = entry.name + base_len;
-            if (flags & FS_RootOnly && strstr(entry_begin, "\\"))
+            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER))
                 continue; // folder in folder
             // check extension
             if (b_mask)
@@ -1169,7 +1175,7 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
                 continue;
             LPCSTR entry_begin = entry.name + base_len;
 
-            if (flags & FS_RootOnly && strstr(entry_begin, "\\") != end_symbol)
+            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER) != end_symbol)
                 continue; // folder in folder
             u32 fl = FS_File::flSubDir | (entry.vfs ? FS_File::flVFS : 0);
             dest.insert(FS_File(entry_begin, entry.size_real, entry.modif, fl));
@@ -1194,7 +1200,7 @@ void CLocatorAPI::check_cached_files(pstr fname, const u32& fname_size, const fi
     if (len_file <= len_base)
         return;
 
-    if (len_base == 1 && *path_base == '\\')
+    if (len_base == 1 && *path_base == _DELIMITER)
         len_base = 0;
 
     if (0 != memcmp(path_base, fname, len_base))
@@ -1595,7 +1601,7 @@ bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)
             if (0 != strncmp(entry.name, fpath, base_len))
                 break; // end of list
             const char* end_symbol = entry.name + xr_strlen(entry.name) - 1;
-            if (*end_symbol != '\\')
+            if (*end_symbol != _DELIMITER)
             {
                 // const char* entry_begin = entry.name+base_len;
                 if (!remove_files)
@@ -1614,7 +1620,7 @@ bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)
     for (; r_it != folders.rend(); r_it++)
     {
         const char* end_symbol = r_it->name + xr_strlen(r_it->name) - 1;
-        if (*end_symbol == '\\')
+        if (*end_symbol == _DELIMITER)
         {
             _rmdir(r_it->name);
             m_files.erase(*r_it);
@@ -1789,7 +1795,7 @@ void CLocatorAPI::rescan_path(pcstr full_path, bool bRecurse)
         if (entry.vfs != 0xFFFFFFFF)
             continue;
         pcstr entry_begin = entry.name + base_len;
-        if (!bRecurse && strstr(entry_begin, "\\"))
+        if (!bRecurse && strstr(entry_begin, DELIMITER))
             continue;
         // erase item
         auto str = pstr(cur_item->name);
@@ -1839,7 +1845,7 @@ bool CLocatorAPI::can_write_to_folder(pcstr path)
     {
         string_path temp;
         pcstr fn = "$!#%TEMP%#!$.$$$";
-        strconcat(sizeof temp, temp, path, path[xr_strlen(path) - 1] != '\\' ? "\\" : "", fn);
+        strconcat(sizeof temp, temp, path, path[xr_strlen(path) - 1] != _DELIMITER ? DELIMITER : "", fn);
         FILE* hf = fopen(temp, "wb");
         if (hf == nullptr)
             return false;

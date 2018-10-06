@@ -97,7 +97,7 @@ public:
         u32 dx10_msaa : 1; //	DX10.0 path
         u32 dx10_msaa_hybrid : 1; //	DX10.0 main path with DX10.1 A-test msaa allowed
         u32 dx10_msaa_opt : 1; //	DX10.1 path
-        u32 dx10_gbuffer_opt : 1; //	
+        u32 dx10_gbuffer_opt : 1; //
         u32 dx10_sm4_1 : 1; //	DX10.1 path
         u32 dx10_msaa_alphatest : 2; //	A-test mode
         u32 dx10_msaa_samples : 4;
@@ -294,7 +294,7 @@ public:
 
     // Information
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    virtual LPCSTR getShaderPath() { return "r3\\"; }
+    virtual LPCSTR getShaderPath() { return "r3" DELIMITER ""; }
     virtual ref_shader getShader(int id);
     virtual IRender_Sector* getSector(int id);
     virtual IRenderVisual* getVisual(int id);

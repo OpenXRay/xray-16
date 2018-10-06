@@ -160,7 +160,7 @@ void CMainMenu::ReadTextureInfo()
     const auto UpdateFileSet = [&](pcstr path)
     {
         FS.file_list(files, "$game_config$", FS_ListFiles,
-            strconcat(sizeof(buf), buf, path, "\\", "textures_descr\\*.xml")
+            strconcat(sizeof(buf), buf, path, DELIMITER, "textures_descr" DELIMITER "*.xml")
         );
     };
 
@@ -653,7 +653,7 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
         m_sPatchFileName = fname;
     }
     else
-        m_sPatchFileName.printf("downloads\\%s", FileName);
+        m_sPatchFileName.printf("downloads" DELIMITER "%s", FileName);
 
     m_sPDProgress.IsInProgress = true;
     m_sPDProgress.Progress = 0;

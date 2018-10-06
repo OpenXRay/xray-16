@@ -70,7 +70,7 @@ CCar::CCar()
     ///////////////////////////////
     //////////////////////////////
     /////////////////////////////
-    m_exhaust_particles = "vehiclefx\\exhaust_1";
+    m_exhaust_particles = "vehiclefx" DELIMITER "exhaust_1";
     m_car_sound = new SCarSound(this);
 
     //у машины слотов в инвентаре нет

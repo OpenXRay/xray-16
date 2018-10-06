@@ -23,11 +23,11 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
             if (_GetItem(str, 1, inc_name, '"'))
             {
                 IReader* I = nullptr;
-                if (inc_name == strstr(inc_name, "ui\\"))
+                if (inc_name == strstr(inc_name, "ui" DELIMITER ))
                 {
-                    shared_str fn = xml->correct_file_name("ui", strchr(inc_name, '\\') + 1);
+                    shared_str fn = xml->correct_file_name("ui", strchr(inc_name, _DELIMITER) + 1);
                     string_path buff;
-                    strconcat(sizeof buff, buff, "ui\\", fn.c_str());
+                    strconcat(sizeof buff, buff, "ui" DELIMITER , fn.c_str());
                     I = FS.r_open(path, buff);
                 }
 
@@ -50,7 +50,7 @@ bool XMLDocument::Load(pcstr path_alias, pcstr path, pcstr xml_filename, bool fa
     shared_str fn = correct_file_name(path, xml_filename);
 
     string_path str;
-    xr_sprintf(str, "%s\\%s", path, *fn);
+    xr_sprintf(str, "%s" DELIMITER "%s", path, *fn);
     return Load(path_alias, str, fatal);
 }
 
@@ -60,11 +60,11 @@ bool XMLDocument::Load(pcstr path_alias, pcstr path, pcstr path2, pcstr xml_file
     shared_str fn = correct_file_name(path, xml_filename);
 
     string_path str;
-    xr_sprintf(str, "%s\\%s", path, *fn);
+    xr_sprintf(str, "%s" DELIMITER "%s", path, *fn);
     if (Load(path_alias, str, false))
         return true;
 
-    xr_sprintf(str, "%s\\%s", path2, *fn);
+    xr_sprintf(str, "%s" DELIMITER "%s", path2, *fn);
     return Load(path_alias, str, fatal);
 }
 

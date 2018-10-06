@@ -36,3 +36,5 @@ cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath luabind xrAPI xrSound xrScriptEngine ${LUA_LIBRARIES} ${THEORA_LIBRARY} ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARY} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES})
+xr_install(${PROJECT_NAME})
+

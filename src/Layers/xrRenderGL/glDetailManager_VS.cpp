@@ -26,7 +26,7 @@ void CDetailManager::hw_Load_Shaders()
 {
     // Create shader to access constant storage
     ref_shader S;
-    S.create("details\\set");
+    S.create("details" DELIMITER "set");
     R_constant_table& T0 = *S->E[0]->passes[0]->constants;
     R_constant_table& T1 = *S->E[1]->passes[0]->constants;
     hwc_consts = T0.get("consts");
@@ -147,7 +147,7 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
                 //	Map constants to memory directly
                 {
                     void*	pVData;
-                    RCache.get_ConstantDirect( strArray, 
+                    RCache.get_ConstantDirect( strArray,
                         hw_BatchSize*sizeof(Fvector4)*4,
                         &pVData, 0, 0);
                     c_storage = (Fvector4*) pVData;
@@ -198,7 +198,7 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
                             //	Remap constants to memory directly (just in case anything goes wrong)
                             /*{
                                 void*	pVData;
-                                RCache.get_ConstantDirect( strArray, 
+                                RCache.get_ConstantDirect( strArray,
                                     hw_BatchSize*sizeof(Fvector4)*4,
                                     &pVData, 0, 0);
                                 c_storage = (Fvector4*) pVData;

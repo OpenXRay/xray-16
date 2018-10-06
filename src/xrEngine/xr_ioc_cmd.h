@@ -53,7 +53,7 @@ protected:
 
     IC bool EQ(LPCSTR S1, LPCSTR S2) { return xr_strcmp(S1, S2) == 0; }
 public:
-    IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(TRUE), bEmptyArgsHandled(FALSE)
+    IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(FALSE), bEmptyArgsHandled(FALSE)
     {
         m_LRU.reserve(LRU_MAX_COUNT + 1);
         m_LRU.clear();

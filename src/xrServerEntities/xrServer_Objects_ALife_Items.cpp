@@ -274,9 +274,9 @@ void CSE_ALifeInventoryItem::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateFloat(values, PrepareKey(pref, *base()->s_name, "Item condition"), &m_fCondition, 0.f, 1.f);
     CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(base());
     R_ASSERT(alife_object);
-    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife\\Useful for AI"), &alife_object->m_flags,
+    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife" DELIMITER "Useful for AI"), &alife_object->m_flags,
         CSE_ALifeObject::flUsefulForAI);
-    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife\\Visible for AI"), &alife_object->m_flags,
+    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife" DELIMITER "Visible for AI"), &alife_object->m_flags,
         CSE_ALifeObject::flVisibleForAI);
 }
 #endif // #ifndef XRGAME_EXPORTS
@@ -588,15 +588,15 @@ void CSE_ALifeItemWeapon::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateU16(items, PrepareKey(pref, *s_name, "Ammo: in magazine"), &a_elapsed, 0, 30, 1);
 
     if (m_scope_status == ALife::eAddonAttachable)
-        PHelper().CreateFlag8(items, PrepareKey(pref, *s_name, "Addons\\Scope"), &m_addon_flags, eWeaponAddonScope);
+        PHelper().CreateFlag8(items, PrepareKey(pref, *s_name, "Addons" DELIMITER "Scope"), &m_addon_flags, eWeaponAddonScope);
 
     if (m_silencer_status == ALife::eAddonAttachable)
         PHelper().CreateFlag8(
-            items, PrepareKey(pref, *s_name, "Addons\\Silencer"), &m_addon_flags, eWeaponAddonSilencer);
+            items, PrepareKey(pref, *s_name, "Addons" DELIMITER "Silencer"), &m_addon_flags, eWeaponAddonSilencer);
 
     if (m_grenade_launcher_status == ALife::eAddonAttachable)
         PHelper().CreateFlag8(
-            items, PrepareKey(pref, *s_name, "Addons\\Podstvolnik"), &m_addon_flags, eWeaponAddonGrenadeLauncher);
+            items, PrepareKey(pref, *s_name, "Addons" DELIMITER "Podstvolnik"), &m_addon_flags, eWeaponAddonGrenadeLauncher);
 }
 #endif // #ifndef XRGAME_EXPORTS
 

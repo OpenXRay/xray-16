@@ -23,13 +23,13 @@ const float particles_time = .3f;
 
 dxRainRender::dxRainRender()
 {
-    IReader* F = FS.r_open("$game_meshes$", "dm\\rain.dm");
-    VERIFY3(F, "Can't open file.", "dm\\rain.dm");
+    IReader* F = FS.r_open("$game_meshes$", "dm" DELIMITER "rain.dm");
+    VERIFY3(F, "Can't open file.", "dm" DELIMITER "rain.dm");
 
     DM_Drop = ::RImplementation.model_CreateDM(F);
 
     //
-    SH_Rain.create("effects\\rain", "fx\\fx_rain");
+    SH_Rain.create("effects" DELIMITER "rain", "fx" DELIMITER "fx_rain");
     hGeom_Rain.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
     hGeom_Drops.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 

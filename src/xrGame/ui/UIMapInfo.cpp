@@ -51,7 +51,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
 
     CUITextWnd* st;
     // try to find file with info
-    xr_string info_path = "text\\map_desc\\";
+    xr_string info_path = "text" DELIMITER "map_desc" DELIMITER;
     info_path += map_name;
     info_path += ".ltx";
 

@@ -27,7 +27,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         ID3DXBuffer* disasm = nullptr;
         D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
         string_path dname;
-        strconcat(sizeof(dname), dname, "disasm\\", file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
+        strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
         IWriter* W = FS.w_open("$logs$", dname);
         W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
         FS.w_close(W);
@@ -181,10 +181,10 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
     string_path folder_name, folder;
 
     strncpy_s(extension, pTarget, 2);
-    strconcat(sizeof(folder), folder, "r1\\objects\\r1\\", name, ".", extension);
+    strconcat(sizeof(folder), folder, "r1" DELIMITER "objects" DELIMITER "r1" DELIMITER, name, ".", extension);
 
     FS.update_path(folder_name, "$game_shaders$", folder);
-    xr_strcat(folder_name, "\\");
+    xr_strcat(folder_name, DELIMITER);
 
     m_file_set.clear();
     FS.file_list(m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
@@ -193,7 +193,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
     if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
-        strconcat(sizeof(file), file, "shaders_cache\\r1\\", name, ".", extension, "\\", sh_name);
+        strconcat(sizeof(file), file, "shaders_cache" DELIMITER "r1" DELIMITER, name, ".", extension, DELIMITER, sh_name);
         FS.update_path(file_name, "$app_data_root$", file);
     }
     else

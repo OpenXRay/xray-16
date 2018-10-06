@@ -527,7 +527,7 @@ void CEnvironment::load_level_specific_ambients()
     const shared_str level_name = g_pGameLevel->name();
 
     string_path path;
-    strconcat(sizeof(path), path, "environment\\ambients\\", level_name.c_str(), ".ltx");
+    strconcat(sizeof(path), path, "environment" DELIMITER "ambients" DELIMITER, level_name.c_str(), ".ltx");
 
     string_path full_path;
     CInifile* level_ambients = new CInifile(FS.update_path(full_path, "$game_config$", path), TRUE, TRUE, FALSE);

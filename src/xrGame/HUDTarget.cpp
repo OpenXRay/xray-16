@@ -42,7 +42,7 @@ CHUDTarget::CHUDTarget()
 {
     fuzzyShowInfo = 0.f;
     PP.RQ.range = 0.f;
-    hShader->create("hud\\cursor", "ui\\cursor");
+    hShader->create("hud" DELIMITER "cursor", "ui" DELIMITER "cursor");
 
     PP.RQ.set(NULL, 0.f, -1);
 

@@ -12,7 +12,7 @@
 
 CUIListItemEx::CUIListItemEx(void)
 {
-    //.	this->InitTexture("ui\\hud_map_point");
+    //.	this->InitTexture("ui" DELIMITER "hud_map_point");
     //.	this->SetStretchTexture(true);
     this->m_dwSelectionColor = color_argb(200, 95, 82, 74);
     this->SetColor(color_argb(0, 0, 0, 0));

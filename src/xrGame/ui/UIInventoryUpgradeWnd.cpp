@@ -43,9 +43,9 @@ CUIInventoryUpgradeWnd::Scheme::~Scheme() { delete_data(cells); }
 CUIInventoryUpgradeWnd::CUIInventoryUpgradeWnd()
 {
     // m_WeaponIconsShader = new ui_shader();
-    //(*m_WeaponIconsShader)->create("hud\\default", "ui\\ui_actor_weapons");
+    //(*m_WeaponIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_weapons");
     // m_OutfitIconsShader = new ui_shader();
-    //(*m_OutfitIconsShader)->create("hud\\default", "ui\\ui_actor_armor");
+    //(*m_OutfitIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_armor");
     m_inv_item = NULL;
     m_cur_upgrade_id = NULL;
     m_current_scheme = NULL;

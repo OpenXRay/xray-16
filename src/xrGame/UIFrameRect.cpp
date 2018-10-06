@@ -25,7 +25,7 @@ void CUIFrameRect::InitTextureEx(LPCSTR texture, LPCSTR shader)
     CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_lb"), shader, &frame[CUIFrameRect::fmLB]);
 }
 
-void CUIFrameRect::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud\\default"); }
+void CUIFrameRect::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud" DELIMITER "default"); }
 void CUIFrameRect::UpdateSize(bool recall)
 {
     //	VERIFY(g_bRendering);

@@ -110,22 +110,26 @@ BOOL ShaderElement::equal(ShaderElement& S)
     return TRUE;
 }
 
-BOOL ShaderElement::equal(ShaderElement* S)
+BOOL Shader::equal(Shader* S, int index)
 {
-    if (nullptr == S && nullptr == this)
+    if(nullptr == E[index] && nullptr == S->E[index])
         return TRUE;
-    if (nullptr == S || nullptr == this)
+    if(nullptr == E[index] || nullptr == S->E[index])
         return FALSE;
-    return equal(*S);
+
+    return (E[index] == S->E[index]);
 }
 
-//
-BOOL Shader::equal(Shader& S)
+BOOL Shader::equal(Shader* S)
 {
-    return E[0]->equal(&*S.E[0]) && E[1]->equal(&*S.E[1]) && E[2]->equal(&*S.E[2]) && E[3]->equal(&*S.E[3]) &&
-        E[4]->equal(&*S.E[4]);
+    for (int i = 0; i < 4; i++)
+    {
+        if (!equal(S, i))
+            return FALSE;
+    }
+    return TRUE;
 }
-BOOL Shader::equal(Shader* S) { return equal(*S); }
+
 void STextureList::clear()
 {
     iterator it = begin();

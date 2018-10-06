@@ -2,7 +2,11 @@
 
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
+#if defined(WINDOWS)
 #include "xrNetServer/NET_Client.h"
+#elif defined(LINUX)
+#include "xrNetServer/empty/NET_Client.h"
+#endif
 #include "xrEngine/StatGraph.h"
 #include "xrMessages.h"
 #include "alife_space.h"

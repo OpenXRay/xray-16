@@ -64,4 +64,25 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
     }
     return (TRUE);
 }
+#else
+__attribute__((constructor))
+static void load(int argc, char** argv, char** envp)
+{
+    // Fill ui style token
+    FillUIStyleToken();
+    // register console commands
+    CCC_RegisterCommands();
+    // keyboard binding
+    CCC_RegisterInput();
+#ifdef DEBUG
+// XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
+// g_profiler			= new CProfiler();
+#endif
+}
+
+__attribute__((destructor))
+static void unload()
+{
+    CleanupUIStyleToken();
+}
 #endif
