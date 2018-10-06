@@ -21,21 +21,18 @@ Lock logCS;
 xr_vector<xr_string> LogFile;
 LogCallback LogCB = 0;
 
+bool ForceFlushLog = false;
+IWriter* LogWriter = nullptr;
+size_t CachedLog = 0;
+
 void FlushLog()
 {
     if (!no_log)
     {
         logCS.Enter();
-        IWriter* f = FS.w_open(logFName);
-        if (f)
-        {
-            for (const auto &i : LogFile)
-            {
-                LPCSTR s = i.c_str();
-                f->w_string(s ? s : "");
-            }
-            FS.w_close(f);
-        }
+        if (LogWriter)
+            LogWriter->flush();
+        CachedLog = 0;
         logCS.Leave();
     }
 }
@@ -54,6 +51,33 @@ void AddOne(const char* split)
     // exec CallBack
     if (LogExecCB && LogCB)
         LogCB(split);
+
+    if (LogWriter)
+    {
+#ifdef USE_LOG_TIMING
+        char buf[64];
+        char curTime[64];
+
+        auto now = std::chrono::system_clock::now();
+        auto time = std::chrono::system_clock::to_time_t(now);
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) -
+            std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
+
+        std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime(&time));
+        int len = xr_sprintf(curTime, 64, "[%s.%03lld] ", buf, ms.count());
+
+        LogWriter->w_printf("%s%s\r\n", curTime, split);
+        CachedLog += len;
+#else
+        LogWriter->w_printf("%s\r\n", split);
+#endif
+        CachedLog += xr_strlen(split) + 2;
+
+        if (ForceFlushLog || CachedLog >= 32768)
+            FlushLog();
+
+        //-RvP
+    }
 
     logCS.Leave();
 }
@@ -194,20 +218,44 @@ void CreateLog(BOOL nl)
         FS.update_path(logFName, "$logs$", log_file_name);
     if (!no_log)
     {
-        IWriter* f = FS.w_open(logFName);
-        if (f == NULL)
+        // Alun: Backup existing log
+        xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
+        FS.file_rename(logFName, backup_logFName.c_str(), true);
+        //-Alun
+
+        LogWriter = FS.w_open(logFName);
+        if (LogWriter == nullptr)
         {
 #if defined(WINDOWS)
             MessageBox(NULL, "Can't create log file.", "Error", MB_ICONERROR);
 #endif
             abort();
         }
-        FS.w_close(f);
+        
+        time_t t = time(NULL);
+        tm* ti = localtime(&t);
+        char buf[64];
+        strftime(buf, 64, "[%x %X]\t", ti);
+
+        for (u32 it = 0; it < LogFile.size(); it++)
+        {
+            LPCSTR s = LogFile[it].c_str();
+            LogWriter->w_printf("%s%s\n", buf, s ? s : "");
+        }
+        LogWriter->flush();
     }
+
+    LogFile.reserve(128);
+
+    if (strstr(Core.Params, "-force_flushlog"))
+        ForceFlushLog = true;
 }
 
 void CloseLog(void)
 {
     FlushLog();
+    if (LogWriter)
+        FS.w_close(LogWriter);
+    
     LogFile.clear();
 }
