@@ -2,15 +2,22 @@ TITLE: X-Ray 1.6 build and setup on Linux
 
 Required packages:
 ------
-OpenSSL
+GLEW
+FreeImage
+LockFile
+OpenAL
+TBB
+Crypto++
+pugixml
 Theora
 OGG
 SDL2
 LZO
 JPEG
 
+
 Ubuntu 18.04 build dependencies:
-sudo apt install git cmake libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+sudo apt install git cmake libglew-dev libfreeimage-dev liblockfile-dev libopenal-dev libtbb-dev libcrypto++-dev libpugixml-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev libreadline-dev
 
 Build commands:
 ------
@@ -18,13 +25,20 @@ cd xray-16
 git submodule update --init --recursive
 mkdir bin && cd bin
 cmake ..
-(or export CC=clang && export CXX=clang++ && cmake ..)
 make
 
-Libraries:
+#To enable debugging:
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+#To use clang:
+CC=clang CXX=clang++ cmake ..
+#To enable all instruction for the local machine:
+CFLAGS="-march=native" CXXFLAGS="-march=native" cmake ..
+#To output log and error to different files:
+make >out.log 2>error.log
+
+Libraries (OLD LIST !!! ):
 ------
 To build X-Ray Engine you'll need following libraries:
-* Windows SDK
 * BugTrap: https://github.com/Xottab-DUTY/BugTrap
 * CryptoPP: https://github.com/weidai11/cryptopp
 * FreeImage: http://freeimage.sourceforge.net
