@@ -5,11 +5,13 @@
 !.travis.yml
 
 # exclude binaries and temporary files
-bin/
-bin_plugs/
+bin*/
 intermediate/
 intermediate_plugs/
 lib/
 *.aps
 *.user
 *.PVS-Studio.*
+
+# exclude doxygen output
+doc/doxygen/html/*
