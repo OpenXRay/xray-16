@@ -7,6 +7,10 @@
 #ifndef DETAIL_SLOT_CALCULATE_H_INCLUDED
 #define DETAIL_SLOT_CALCULATE_H_INCLUDED
 
+using Clock = std::chrono::high_resolution_clock;
+using Time = Clock::time_point;
+using Duration = Clock::duration;
+
 using DWORDVec = xr_vector<u32>;
 
 namespace CDB
@@ -16,7 +20,7 @@ class COLLIDER;
 class base_lighting;
 struct DetailSlot;
 
-extern thread_local u64 t_time;
+extern thread_local Duration t_time;
 extern thread_local u64 t_count;
 
 bool detail_slot_calculate(

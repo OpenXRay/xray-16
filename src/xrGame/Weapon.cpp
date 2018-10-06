@@ -21,7 +21,7 @@
 #include "static_cast_checked.hpp"
 #include "clsid_game.h"
 #include "WeaponBinocularsVision.h"
-#include "ui/UIWindow.h"
+#include "xrUICore/Windows/UIWindow.h"
 #include "ui/UIXmlInit.h"
 #include "Torch.h"
 #include "xrNetServer/NET_Messages.h"
@@ -417,7 +417,7 @@ void CWeapon::Load(LPCSTR section)
             if (!pWpnScopeXml)
             {
                 pWpnScopeXml = new CUIXml();
-                pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, "scopes.xml");
+                pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
             }
             CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
         }

@@ -3,17 +3,17 @@
 // UI-controls
 
 #include "UIScriptWnd.h"
-#include "UIButton.h"
-#include "UIMessageBox.h"
-#include "UIPropertiesBox.h"
-#include "UICheckButton.h"
-#include "UIRadioButton.h"
-#include "UIStatic.h"
-#include "UIEditBox.h"
-#include "UIFrameWindow.h"
-#include "UIFrameLineWnd.h"
-#include "UIProgressBar.h"
-#include "UITabControl.h"
+#include "xrUICore/Buttons/UIButton.h"
+#include "xrUICore/MessageBox/UIMessageBox.h"
+#include "xrUICore/PropertiesBox/UIPropertiesBox.h"
+#include "xrUICore/Buttons/UICheckButton.h"
+#include "xrUICore/Buttons/UIRadioButton.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/EditBox/UIEditBox.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/TabControl/UITabControl.h"
 
 #include "uiscriptwnd_script.h"
 

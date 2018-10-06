@@ -1,13 +1,13 @@
 #include "StdAfx.h"
 #include "UITalkDialogWnd.h"
 
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
-#include "UIScrollView.h"
-#include "UI3tButton.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UITalkWnd.h"
 #include "UIInventoryUtilities.h"
-#include "UIBtnHint.h"
+#include "xrUICore/Buttons/UIBtnHint.h"
 
 #include "game_news.h"
 #include "Level.h"
@@ -25,7 +25,7 @@ CUITalkDialogWnd::~CUITalkDialogWnd() { xr_delete(m_uiXml); }
 void CUITalkDialogWnd::InitTalkDialogWnd()
 {
     m_uiXml = new CUIXml();
-    m_uiXml->Load(CONFIG_PATH, UI_PATH, TALK_XML);
+    m_uiXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TALK_XML);
     CUIXmlInit ml_init;
 
     CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this);

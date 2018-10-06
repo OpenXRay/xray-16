@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "UIGameTutorial.h"
-#include "UIWindow.h"
-#include "UIStatic.h"
+#include "xrUICore/Windows/UIWindow.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "UIXmlInit.h"
 #include "Common/object_broker.h"
 #include "xrEngine/xr_input.h"
@@ -107,7 +107,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
     m_UIWindow = new CUIWindow();
 
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "game_tutorials.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "game_tutorials.xml");
 
     int items_count = uiXml.GetNodesNum(tutor_name, 0, "item");
     VERIFY(items_count > 0);

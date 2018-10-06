@@ -11,7 +11,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "game_object_space.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "ai_space.h"
 
 void CStalkerAnimationManager::script_play_callback(CBlend* blend)

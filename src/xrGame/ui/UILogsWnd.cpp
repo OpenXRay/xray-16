@@ -8,13 +8,13 @@
 #include "StdAfx.h"
 #include "UILogsWnd.h"
 #include "UIXmlInit.h"
-#include "UIProgressBar.h"
-#include "UIFrameLineWnd.h"
-#include "UIFrameWindow.h"
-#include "UIScrollBar.h"
-#include "UIFixedScrollBar.h"
-#include "UIScrollView.h"
-#include "UICheckButton.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/ScrollBar/UIScrollBar.h"
+#include "xrUICore/ScrollBar/UIFixedScrollBar.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/Buttons/UICheckButton.h"
 #include "UIHelper.h"
 #include "UICharacterInfo.h"
 #include "UIInventoryUtilities.h"
@@ -88,7 +88,7 @@ void CUILogsWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUILogsWnd::Init()
 {
-    m_uiXml.Load(CONFIG_PATH, UI_PATH, PDA_LOGS_XML);
+    m_uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_LOGS_XML);
 
     CUIXmlInit::InitWindow(m_uiXml, "main_wnd", 0, this);
 
@@ -106,7 +106,7 @@ void CUILogsWnd::Init()
 
     string256 buf;
     xr_strcpy(buf, sizeof(buf), m_center_caption->GetText());
-    xr_strcat(buf, sizeof(buf), CStringTable().translate("ui_logs_center_caption").c_str());
+    xr_strcat(buf, sizeof(buf), StringTable().translate("ui_logs_center_caption").c_str());
     m_center_caption->SetText(buf);
 
     CUIFixedScrollBar* tmp_scroll = new CUIFixedScrollBar();

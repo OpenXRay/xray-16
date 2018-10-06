@@ -440,7 +440,7 @@ void game_cl_Deathmatch::OnConnected()
 
 void game_cl_Deathmatch::shedule_Update(u32 dt)
 {
-    CStringTable st;
+    CStringTable& st = StringTable();
 
     inherited::shedule_Update(dt);
 
@@ -800,7 +800,7 @@ bool game_cl_Deathmatch::OnKeyboardRelease(int key)
 #define MAX_VOTE_PARAMS 5
 void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
 {
-    CStringTable st;
+    CStringTable& st = StringTable();
     inherited::OnVoteStart(P);
 
     string1024 Command = "";

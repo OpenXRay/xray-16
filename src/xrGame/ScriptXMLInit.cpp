@@ -1,25 +1,26 @@
 #include "pch_script.h"
 #include "ScriptXMLInit.h"
 #include "ui/UIXmlInit.h"
-#include "ui/UITextureMaster.h"
-#include "ui/UICheckButton.h"
-#include "ui/UISpinNum.h"
-#include "ui/UISpinText.h"
-#include "ui/UIComboBox.h"
-#include "ui/UITabControl.h"
-#include "ui/UIFrameWindow.h"
+#include "xrUICore/XML/UITextureMaster.h"
+#include "xrUICore/Buttons/UICheckButton.h"
+#include "xrUICore/SpinBox/UISpinNum.h"
+#include "xrUICore/SpinBox/UISpinText.h"
+#include "xrUICore/ComboBox/UIComboBox.h"
+#include "xrUICore/TabControl/UITabControl.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
 #include "ui/UILabel.h"
 #include "ui/ServerList.h"
 #include "ui/UIMapList.h"
 #include "ui/UIKeyBinding.h"
-#include "ui/UIEditBox.h"
-#include "ui/UIAnimatedStatic.h"
-#include "ui/UITrackBar.h"
+#include "xrUICore/EditBox/UIEditBox.h"
+#include "xrUICore/Static/UIAnimatedStatic.h"
+#include "ui/UISleepStatic.h"
+#include "xrUICore/TrackBar/UITrackBar.h"
 #include "ui/UICDkey.h"
 #include "ui/UIMapInfo.h"
 #include "ui/UIMMShniaga.h"
-#include "ui/UIScrollView.h"
-#include "ui/UIProgressBar.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
@@ -37,7 +38,7 @@ void _attach_child(CUIWindow* _child, CUIWindow* _parent)
         _parent->AttachChild(_child);
 }
 
-void CScriptXmlInit::ParseFile(LPCSTR xml_file) { m_xml.Load(CONFIG_PATH, UI_PATH, xml_file); }
+void CScriptXmlInit::ParseFile(LPCSTR xml_file) { m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_file); }
 void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd)
 {
     CUIXmlInit::InitWindow(m_xml, path, index, pWnd);

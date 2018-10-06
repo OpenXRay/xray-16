@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "UIPdaMsgListItem.h"
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
 
 void CUIPdaMsgListItem::SetFont(CGameFont* pFont)
@@ -15,7 +15,7 @@ void CUIPdaMsgListItem::InitPdaMsgListItem(const Fvector2& size)
     inherited::SetWndSize(size);
 
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "maingame_pda_msg.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "maingame_pda_msg.xml");
 
     CUIXmlInit xml_init;
     AttachChild(&UIIcon);

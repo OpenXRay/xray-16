@@ -1,8 +1,8 @@
 #include "pch_script.h"
 #include "UIInventoryUtilities.h"
 #include "WeaponAmmo.h"
-#include "UIStaticItem.h"
-#include "UIStatic.h"
+#include "xrUICore/Static/UIStaticItem.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "eatable_item.h"
 #include "Level.h"
 #include "date_time.h"
@@ -321,7 +321,7 @@ const shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID date, EDate
 
     split_time(date, year, month, day, hours, mins, secs, milisecs);
     VERIFY(1 <= month && month <= 12);
-    LPCSTR month_str = CStringTable().translate(st_months[month - 1]).c_str();
+    LPCSTR month_str = StringTable().translate(st_months[month - 1]).c_str();
 
     // Date
     switch (datePrec)
@@ -348,20 +348,20 @@ LPCSTR InventoryUtilities::GetTimePeriodAsString(LPSTR _buff, u32 buff_sz, ALife
 
     if (month1 != month2)
         cnt = xr_sprintf(
-            _buff + cnt, buff_sz - cnt, "%d %s ", month2 - month1, *CStringTable().translate("ui_st_months"));
+            _buff + cnt, buff_sz - cnt, "%d %s ", month2 - month1, *StringTable().translate("ui_st_months"));
 
     if (!cnt && day1 != day2)
-        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", day2 - day1, *CStringTable().translate("ui_st_days"));
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", day2 - day1, *StringTable().translate("ui_st_days"));
 
     if (!cnt && hours1 != hours2)
         cnt =
-            xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", hours2 - hours1, *CStringTable().translate("ui_st_hours"));
+            xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", hours2 - hours1, *StringTable().translate("ui_st_hours"));
 
     if (!cnt && mins1 != mins2)
-        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", mins2 - mins1, *CStringTable().translate("ui_st_mins"));
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", mins2 - mins1, *StringTable().translate("ui_st_mins"));
 
     if (!cnt && secs1 != secs2)
-        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", secs2 - secs1, *CStringTable().translate("ui_st_secs"));
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", secs2 - secs1, *StringTable().translate("ui_st_secs"));
 
     return _buff;
 }
@@ -376,7 +376,7 @@ void InventoryUtilities::UpdateWeightStr(CUITextWnd& wnd, CUITextWnd& wnd_max, C
     float total = pInvOwner->inventory().CalcTotalWeight();
     float max = pInvOwner->MaxCarryWeight();
 
-    LPCSTR kg_str = CStringTable().translate("st_kg").c_str();
+    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
     xr_sprintf(buf, "%.1f %s", total, kg_str);
     wnd.SetText(buf);
 

@@ -8,7 +8,7 @@
 #include "ui/UIInventoryUtilities.h"
 #include "xrEngine/xr_object.h"
 #include "Common/object_broker.h"
-#include "ui/UITextureMaster.h"
+#include "xrUICore/XML/UITextureMaster.h"
 #include "ui/UIHelper.h"
 
 #include "Include/xrRender/UIShader.h"

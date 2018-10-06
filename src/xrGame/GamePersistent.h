@@ -7,7 +7,7 @@ class CMainMenu;
 class CUICursor;
 class CParticlesObject;
 class CUISequencer;
-class ui_core;
+class UICore;
 
 class CGamePersistent : public IGame_Persistent, public IEventReceiver
 {
@@ -53,7 +53,6 @@ private:
     void UpdateDof();
 
 public:
-    ui_core* m_pUI_core;
     IReader* pDemoFile;
     u32 uTime2Change;
     EVENT eDemoStart;

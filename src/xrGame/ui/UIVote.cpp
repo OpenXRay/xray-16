@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "UIVote.h"
-#include "UIStatic.h"
-#include "UI3tButton.h"
-#include "UIListBox.h"
-#include "UIFrameWindow.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Buttons/UI3tButton.h"
+#include "xrUICore/ListBox/UIListBox.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
 #include "UIXmlInit.h"
 #include "Level.h"
 #include "game_cl_base.h"
@@ -47,7 +47,7 @@ CUIVote::CUIVote()
 void CUIVote::Init()
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "voting_category.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "voting_category.xml");
     CUIXmlInit::InitWindow(xml_doc, "vote", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "vote:background", 0, bkgrnd);
     CUIXmlInit::InitTextWnd(xml_doc, "vote:msg", 0, msg);

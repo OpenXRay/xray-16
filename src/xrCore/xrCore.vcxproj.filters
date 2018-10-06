@@ -309,6 +309,9 @@
     <ClCompile Include="Text\StringConversion.cpp">
       <Filter>Text</Filter>
     </ClCompile>
+    <ClCompile Include="FileCRC32.cpp">
+      <Filter>FS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -676,6 +679,9 @@
     </ClInclude>
     <ClInclude Include="Text\StringConversion.hpp">
       <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="FileCRC32.h">
+      <Filter>FS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

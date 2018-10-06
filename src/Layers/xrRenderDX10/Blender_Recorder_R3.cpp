@@ -197,6 +197,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
 #ifdef USE_DX11
     dest.hs = RImplementation.Resources->_CreateHS("null");
     dest.ds = RImplementation.Resources->_CreateDS("null");
+    dest.cs = RImplementation.Resources->_CreateCS("null");
 #endif
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);

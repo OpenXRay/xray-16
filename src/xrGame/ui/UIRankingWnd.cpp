@@ -7,11 +7,11 @@
 
 #include "pch_script.h"
 #include "UIRankingWnd.h"
-#include "UIFixedScrollBar.h"
+#include "xrUICore/ScrollBar/UIFixedScrollBar.h"
 #include "UIXmlInit.h"
-#include "UIProgressBar.h"
-#include "UIFrameLineWnd.h"
-#include "UIScrollView.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "UIHelper.h"
 #include "UIInventoryUtilities.h"
 #include "Actor.h"
@@ -23,7 +23,7 @@
 #include "relation_registry.h"
 #include "string_table.h"
 #include "UICharacterInfo.h"
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 
 #define PDA_RANKING_XML "pda_ranking.xml"
 
@@ -73,7 +73,7 @@ void CUIRankingWnd::Init()
 {
     Fvector2 pos;
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, PDA_RANKING_XML);
+    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_RANKING_XML);
 
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);
     m_delay = (u32)xml.ReadAttribInt("main_wnd", 0, "delay", 3000);
@@ -127,7 +127,7 @@ void CUIRankingWnd::Init()
 
     string256 buf;
     xr_strcpy(buf, sizeof(buf), m_center_caption->GetText());
-    xr_strcat(buf, sizeof(buf), CStringTable().translate("ui_ranking_center_caption").c_str());
+    xr_strcat(buf, sizeof(buf), StringTable().translate("ui_ranking_center_caption").c_str());
     m_center_caption->SetText(buf);
 
     m_monster_icon_back = UIHelper::CreateStatic(xml, "monster_icon_back", this);

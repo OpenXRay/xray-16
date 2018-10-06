@@ -355,9 +355,6 @@
     <ClInclude Include="luabind\luabind\shared_ptr_converter.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="luabind\luabind\tag_function.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="luabind\luabind\typeid.hpp">
       <Filter>include</Filter>
     </ClInclude>

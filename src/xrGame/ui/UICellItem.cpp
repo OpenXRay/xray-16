@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "UICellItem.h"
-#include "UICursor.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "inventory_item.h"
 #include "UIDragDropListEx.h"
 #include "eatable_item.h"
@@ -9,7 +9,7 @@
 #include "Level.h"
 #include "Common/object_broker.h"
 #include "UIXmlInit.h"
-#include "UIProgressBar.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "Weapon.h"
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
@@ -47,7 +47,7 @@ CUICellItem::~CUICellItem()
 void CUICellItem::init()
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "actor_menu_item.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml");
 
     m_text = new CUIStatic();
     m_text->SetAutoDelete(true);

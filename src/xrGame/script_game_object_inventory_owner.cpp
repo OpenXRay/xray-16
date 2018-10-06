@@ -36,7 +36,7 @@
 #include "stalker_animation_manager.h"
 #include "CameraFirstEye.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "memory_manager.h"
 #include "enemy_manager.h"
 #include "ai/stalker/ai_stalker_impl.h"

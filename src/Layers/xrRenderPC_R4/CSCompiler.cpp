@@ -196,7 +196,7 @@ void CSCompiler::compile(const char* name)
     LPCSTR c_target = "cs_5_0";
     LPCSTR c_entry = "main";
 
-    HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(), c_entry,
+    HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry,
         c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)m_cs);
 
     FS.r_close(file);

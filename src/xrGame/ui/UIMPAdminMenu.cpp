@@ -5,10 +5,10 @@
 #include "UIMPChangeMapAdm.h"
 #include "UIXmlInit.h"
 #include "Common/object_broker.h"
-#include "UITabControl.h"
-#include "UIStatic.h"
-#include "UI3tButton.h"
-#include "UIMessageBox.h"
+#include "xrUICore/TabControl/UITabControl.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Buttons/UI3tButton.h"
+#include "xrUICore/MessageBox/UIMessageBox.h"
 #include "UIMessageBoxEx.h"
 #include "xrEngine/XR_IOConsole.h"
 
@@ -59,7 +59,7 @@ void CUIMpAdminMenu::Init()
     if (!xml_doc)
         xml_doc = new CUIXml();
 
-    xml_doc->Load(CONFIG_PATH, UI_PATH, "ui_mp_admin_menu.xml");
+    xml_doc->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mp_admin_menu.xml");
 
     CUIXmlInit::InitWindow(*xml_doc, "admin_menu", 0, this);
     CUIXmlInit::InitStatic(*xml_doc, "admin_menu:background", 0, m_pBack);

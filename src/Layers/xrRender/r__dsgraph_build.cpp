@@ -952,7 +952,7 @@ void D3DXRenderBase::overdrawEnd()
 {
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     // TODO: DX10: Implement overdrawEnd
-    VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
+    VERIFY(!"D3DXRenderBase::overdrawEnd not implemented.");
 #else
     // Set up the stencil states
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP));
@@ -995,22 +995,31 @@ void D3DXRenderBase::ResourcesDumpMemoryUsage() { Resources->_DumpMemoryUsage();
 DeviceState D3DXRenderBase::GetDeviceState()
 {
     HW.Validate();
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
-//  TODO: DX10: Implement GetDeviceState
-//  TODO: DX10: Implement DXGI_PRESENT_TEST testing
-// VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
-#else // USE_DX10
-    HRESULT _hr = HW.pDevice->TestCooperativeLevel();
-    if (FAILED(_hr))
+#ifdef USE_OGL
+    //  TODO: OGL: Implement GetDeviceState
+#elif !defined(USE_DX9)
+    const auto result = HW.m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
+
+    switch (result)
     {
-        // If the device was lost, do not render until we get it back
-        if (D3DERR_DEVICELOST == _hr)
-            return DeviceState::Lost;
-        // Check if the device is ready to be reset
-        if (D3DERR_DEVICENOTRESET == _hr)
-            return DeviceState::NeedReset;
+    // Check if the device is ready to be reset
+    case DXGI_ERROR_DEVICE_RESET:
+        return DeviceState::NeedReset;
     }
-#endif // USE_DX10
+#else
+    const auto result = HW.pDevice->TestCooperativeLevel();
+
+    switch (result)
+    {
+    // If the device was lost, do not render until we get it back
+    case D3DERR_DEVICELOST:
+        return DeviceState::Lost;
+
+    // Check if the device is ready to be reset
+    case D3DERR_DEVICENOTRESET:
+        return DeviceState::NeedReset;
+    }
+#endif
     return DeviceState::Normal;
 }
 
@@ -1018,7 +1027,7 @@ bool D3DXRenderBase::GetForceGPU_REF() { return HW.Caps.bForceGPU_REF; }
 u32 D3DXRenderBase::GetCacheStatPolys() { return RCache.stat.polys; }
 void D3DXRenderBase::Begin()
 {
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
+#ifdef USE_DX9
     CHK_DX(HW.pDevice->BeginScene());
 #endif
     RCache.OnFrameBegin();
@@ -1052,7 +1061,7 @@ void D3DXRenderBase::End()
         overdrawEnd();
     RCache.OnFrameEnd();
     DoAsyncScreenshot();
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     bool bUseVSync = psDeviceFlags.is(rsFullscreen) && psDeviceFlags.test(rsVSync); //xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
     HW.m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
 #else
@@ -1064,7 +1073,7 @@ void D3DXRenderBase::End()
 void D3DXRenderBase::ResourcesDestroyNecessaryTextures() { Resources->DestroyNecessaryTextures(); }
 void D3DXRenderBase::ClearTarget()
 {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
 #else

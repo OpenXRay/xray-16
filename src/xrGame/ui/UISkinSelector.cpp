@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "UISkinSelector.h"
 #include "UIXmlInit.h"
-#include "UIAnimatedStatic.h"
-#include "UI3tButton.h"
+#include "xrUICore/Static/UIAnimatedStatic.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UIStatix.h"
-#include "UICursor.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "UIGameCustom.h"
 #include "game_cl_deathmatch.h"
 #include "xr_level_controller.h"
@@ -119,7 +119,7 @@ void CUISkinSelectorWnd::Init(const char* strSectionName)
     m_strSection = strSectionName;
 
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "skin_selector.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "skin_selector.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "skin_selector", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "skin_selector:caption", 0, m_pCaption);

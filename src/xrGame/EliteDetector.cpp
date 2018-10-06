@@ -3,8 +3,8 @@
 #include "player_hud.h"
 #include "Include/xrRender/UIRender.h"
 #include "ui/UIXmlInit.h"
-#include "ui/xrUIXmlParser.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "ui/ArtefactDetectorUI.h"
 
 CEliteDetector::CEliteDetector() { m_artefacts.m_af_rank = 3; }
@@ -79,7 +79,7 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
 {
     m_parent = p;
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, "ui_detector_artefact.xml");
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_detector_artefact.xml");
 
     CUIXmlInit xml_init;
     string512 buff;

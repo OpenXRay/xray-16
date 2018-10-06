@@ -3,7 +3,7 @@
 
 #include "UIXmlInit.h"
 #include "UIMpItemsStoreWnd.h"
-#include "UITabControl.h"
+#include "xrUICore/TabControl/UITabControl.h"
 #include "UITabButtonMP.h"
 #include "UIDragDropListEx.h"
 #include "UIItemInfo.h"
@@ -38,7 +38,7 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
     m_sectionPrice = sectionPrice;
 
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "mp_buy_menu.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "mp_buy_menu.xml");
 
     m_store_hierarchy = new CStoreHierarchy();
     m_store_hierarchy->Init(xml_doc, "items_hierarchy");

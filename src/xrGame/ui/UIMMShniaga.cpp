@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "UIMMShniaga.h"
-#include "UICursor.h"
-#include "UIStatic.h"
-#include "UIScrollView.h"
+#include "xrUICore/Cursor/UICursor.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "UIXmlInit.h"
 #include "MMSound.h"
 #include "game_base_space.h"
@@ -17,6 +17,31 @@
 
 extern string_path g_last_saved_game;
 
+CUIMMMagnifer::CUIMMMagnifer() : m_bPP(false) {}
+CUIMMMagnifer::~CUIMMMagnifer()
+{
+    if (GetPPMode())
+        MainMenu()->UnregisterPPDraw(this);
+}
+
+void CUIMMMagnifer::SetPPMode()
+{
+    m_bPP = true;
+    MainMenu()->RegisterPPDraw(this);
+    Show(false);
+};
+
+void CUIMMMagnifer::ResetPPMode()
+{
+    if (GetPPMode())
+    {
+        MainMenu()->UnregisterPPDraw(this);
+        m_bPP = false;
+    }
+}
+
+////////////////////////////////////////////
+
 CUIMMShniaga::CUIMMShniaga()
 {
     m_sound = new CMMSound();
@@ -25,7 +50,7 @@ CUIMMShniaga::CUIMMShniaga()
     AttachChild(m_view);
     m_shniaga = new CUIStatic();
     AttachChild(m_shniaga);
-    m_magnifier = new CUIStatic();
+    m_magnifier = new CUIMMMagnifer();
     m_shniaga->AttachChild(m_magnifier);
     m_magnifier->SetPPMode();
     m_mag_pos = 0;
@@ -165,7 +190,7 @@ void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_pat
     delete_data(*lst);
 
     CUIXml tmp_xml;
-    tmp_xml.Load(CONFIG_PATH, UI_PATH, xml_file);
+    tmp_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_file);
     CreateList(*lst, tmp_xml, xml_path);
 }
 

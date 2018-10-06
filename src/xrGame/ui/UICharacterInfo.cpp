@@ -9,11 +9,11 @@
 #include "string_table.h"
 #include "relation_registry.h"
 
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
 
-#include "UIStatic.h"
-#include "UIScrollView.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 
 #include "alife_simulator.h"
 #include "ai_space.h"
@@ -121,7 +121,7 @@ void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIIte
 void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, xml_name);
+    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
     InitCharacterInfo(pos, size, &uiXml);
 }
 

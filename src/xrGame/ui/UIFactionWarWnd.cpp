@@ -10,8 +10,8 @@
 #include "UIFactionWarWnd.h"
 
 #include "UIXmlInit.h"
-#include "UIProgressBar.h"
-#include "UIFrameLineWnd.h"
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "UIHelper.h"
 
 #include "FactionState.h"
@@ -49,107 +49,107 @@ void CUIFactionWarWnd::Reset()
 
 void CUIFactionWarWnd::Init()
 {
-    CUIXml xml;
-    xml.Load( CONFIG_PATH, UI_PATH, PDA_FACTION_WAR_XML );
+	CUIXml xml;
+	xml.Load( CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_FACTION_WAR_XML );
 
-    CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
+	CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
 
-    m_background			= UIHelper::CreateFrameWindow( xml, "background", this );
+	m_background			= UIHelper::CreateFrameWindow( xml, "background", this );
 
-    m_center_background		= UIHelper::CreateFrameWindow( xml, "center_background", this );
+	m_center_background		= UIHelper::CreateFrameWindow( xml, "center_background", this );
 
-    m_target_static			= UIHelper::CreateTextWnd( xml, "target_static", this );
-    m_target_caption		= UIHelper::CreateTextWnd( xml, "target_caption", this );
-    //m_target_caption->SetElipsis( 1, 0 );
-    m_tc_pos				= m_target_caption->GetWndPos();
+	m_target_static			= UIHelper::CreateTextWnd( xml, "target_static", this );
+	m_target_caption		= UIHelper::CreateTextWnd( xml, "target_caption", this );
+	//m_target_caption->SetElipsis( 1, 0 );
+	m_tc_pos				= m_target_caption->GetWndPos();
 
-    m_target_desc			= UIHelper::CreateTextWnd( xml, "target_decs", this );
-    m_td_pos				= m_target_desc->GetWndPos();
+	m_target_desc			= UIHelper::CreateTextWnd( xml, "target_decs", this );
+	m_td_pos				= m_target_desc->GetWndPos();
 
-    m_state_static			= UIHelper::CreateStatic( xml, "state_static", this );
+	m_state_static			= UIHelper::CreateStatic( xml, "state_static", this );
+	
+	m_our_icon				= UIHelper::CreateStatic( xml, "static_our_icon", this );
+	m_our_icon_over			= UIHelper::CreateStatic( xml, "static_our_icon_over", this );
+	m_our_name				= UIHelper::CreateTextWnd( xml, "static_our_name", this );
+	m_st_our_frac_info		= UIHelper::CreateStatic( xml, "static_our_frac_info", this );
+	m_st_our_mem_count		= UIHelper::CreateStatic( xml, "static_our_mem_count", this );
+	m_st_our_resource		= UIHelper::CreateStatic( xml, "static_our_resource", this );
+	
+	m_pb_our_state			= UIHelper::CreateProgressBar( xml, "progress_our_state", this );
+	m_pb_our_mem_count		= UIHelper::CreateProgressBar( xml, "progress_our_mem_count", this );
+	m_pb_our_resource		= UIHelper::CreateProgressBar( xml, "progress_our_resource", this );
 
-    m_our_icon				= UIHelper::CreateStatic( xml, "static_our_icon", this );
-    m_our_icon_over			= UIHelper::CreateStatic( xml, "static_our_icon_over", this );
-    m_our_name				= UIHelper::CreateTextWnd( xml, "static_our_name", this );
-    m_st_our_frac_info		= UIHelper::CreateStatic( xml, "static_our_frac_info", this );
-    m_st_our_mem_count		= UIHelper::CreateStatic( xml, "static_our_mem_count", this );
-    m_st_our_resource		= UIHelper::CreateStatic( xml, "static_our_resource", this );
+	m_enemy_icon			= UIHelper::CreateStatic( xml, "static_enemy_icon", this );
+	m_enemy_icon_over		= UIHelper::CreateStatic( xml, "static_enemy_icon_over", this );
+	m_enemy_name			= UIHelper::CreateTextWnd( xml, "static_enemy_name", this );
+	m_st_enemy_frac_info	= UIHelper::CreateStatic( xml, "static_enemy_frac_info", this );
+	m_st_enemy_mem_count	= UIHelper::CreateStatic( xml, "static_enemy_mem_count", this );
+	m_st_enemy_resource		= UIHelper::CreateStatic( xml, "static_enemy_resource", this );
 
-    m_pb_our_state			= UIHelper::CreateProgressBar( xml, "progress_our_state", this );
-    m_pb_our_mem_count		= UIHelper::CreateProgressBar( xml, "progress_our_mem_count", this );
-    m_pb_our_resource		= UIHelper::CreateProgressBar( xml, "progress_our_resource", this );
+	m_pb_enemy_state		= UIHelper::CreateProgressBar( xml, "progress_enemy_state", this );
+	m_pb_enemy_mem_count	= UIHelper::CreateProgressBar( xml, "progress_enemy_mem_count", this );	
+	m_pb_enemy_resource		= UIHelper::CreateProgressBar( xml, "progress_enemy_resource", this );	
 
-    m_enemy_icon			= UIHelper::CreateStatic( xml, "static_enemy_icon", this );
-    m_enemy_icon_over		= UIHelper::CreateStatic( xml, "static_enemy_icon_over", this );
-    m_enemy_name			= UIHelper::CreateTextWnd( xml, "static_enemy_name", this );
-    m_st_enemy_frac_info	= UIHelper::CreateStatic( xml, "static_enemy_frac_info", this );
-    m_st_enemy_mem_count	= UIHelper::CreateStatic( xml, "static_enemy_mem_count", this );
-    m_st_enemy_resource		= UIHelper::CreateStatic( xml, "static_enemy_resource", this );
+	m_static_line1			= UIHelper::CreateFrameLine( xml, "static_line1", this );
+	m_static_line2			= UIHelper::CreateFrameLine( xml, "static_line2", this );
+	m_static_line3			= UIHelper::CreateFrameLine( xml, "static_line3", this );
+	m_static_line4			= UIHelper::CreateFrameLine( xml, "static_line4", this );
+	m_static_line_left		= UIHelper::CreateFrameLine( xml, "static_line_left", this );
+	m_static_line_right		= UIHelper::CreateFrameLine( xml, "static_line_right", this );
 
-    m_pb_enemy_state		= UIHelper::CreateProgressBar( xml, "progress_enemy_state", this );
-    m_pb_enemy_mem_count	= UIHelper::CreateProgressBar( xml, "progress_enemy_mem_count", this );
-    m_pb_enemy_resource		= UIHelper::CreateProgressBar( xml, "progress_enemy_resource", this );
+	VERIFY( hint_wnd );
+	m_war_states_parent = new CUIWindow();
+	m_war_states_parent->SetAutoDelete( true );
+	AttachChild( m_war_states_parent );
+	Fvector2 pos;
+	pos.x = xml.ReadAttribFlt( "static_vs_state", 0, "x" );
+	pos.y = xml.ReadAttribFlt( "static_vs_state", 0, "y" );
+	m_war_states_parent->SetWndPos( pos );
 
-    m_static_line1			= UIHelper::CreateFrameLine( xml, "static_line1", this );
-    m_static_line2			= UIHelper::CreateFrameLine( xml, "static_line2", this );
-    m_static_line3			= UIHelper::CreateFrameLine( xml, "static_line3", this );
-    m_static_line4			= UIHelper::CreateFrameLine( xml, "static_line4", this );
-    m_static_line_left		= UIHelper::CreateFrameLine( xml, "static_line_left", this );
-    m_static_line_right		= UIHelper::CreateFrameLine( xml, "static_line_right", this );
+	for ( u8 i = 0; i < max_war_state; ++i )
+	{
+		m_war_state[i] = new UIWarState();
+		m_war_state[i]->InitXML( xml, "static_vs_state", m_war_states_parent );
+		m_war_state[i]->set_hint_wnd( hint_wnd );
+	}
+	
+	float dx = xml.ReadAttribFlt( "static_vs_state", 0, "dx" );
+	m_war_states_dx = dx;
+	m_war_states_xcenter = xml.ReadAttribFlt( "static_vs_state", 0, "xcenter", 511.0f );
 
-    VERIFY( hint_wnd );
-    m_war_states_parent = new CUIWindow();
-    m_war_states_parent->SetAutoDelete( true );
-    AttachChild( m_war_states_parent );
-    Fvector2 pos;
-    pos.x = xml.ReadAttribFlt( "static_vs_state", 0, "x" );
-    pos.y = xml.ReadAttribFlt( "static_vs_state", 0, "y" );
-    m_war_states_parent->SetWndPos( pos );
+	pos.set( 0.0f, 0.0f );
+	m_war_state[0]->SetWndPos( pos );
+	for ( u8 i = 1; i < max_war_state; ++i )
+	{
+		pos.x += m_war_state[i-1]->GetWndSize().x + dx;
+		m_war_state[i]->SetWndPos( pos );
+	}
 
-    for ( u8 i = 0; i < max_war_state; ++i )
-    {
-        m_war_state[i] = new UIWarState();
-        m_war_state[i]->InitXML( xml, "static_vs_state", m_war_states_parent );
-        m_war_state[i]->set_hint_wnd( hint_wnd );
-    }
+	for ( u8 i = 0; i < max_bonuce; ++i )
+	{
+		m_our_bonuces[i] = UIHelper::CreateStatic( xml, "static_our_bonuce", this );
+	}
+	dx = xml.ReadAttribFlt( "static_our_bonuce", 0, "dx" );
+	pos = m_our_bonuces[0]->GetWndPos();
+	for ( u8 i = 1; i < max_bonuce; ++i )
+	{
+		pos.x += m_our_bonuces[i-1]->GetWndSize().x + dx;
+		m_our_bonuces[i]->SetWndPos( pos );
+	}
 
-    float dx = xml.ReadAttribFlt( "static_vs_state", 0, "dx" );
-    m_war_states_dx = dx;
-    m_war_states_xcenter = xml.ReadAttribFlt( "static_vs_state", 0, "xcenter", 511.0f );
-
-    pos.set( 0.0f, 0.0f );
-    m_war_state[0]->SetWndPos( pos );
-    for ( u8 i = 1; i < max_war_state; ++i )
-    {
-        pos.x += m_war_state[i-1]->GetWndSize().x + dx;
-        m_war_state[i]->SetWndPos( pos );
-    }
-
-    for ( u8 i = 0; i < max_bonuce; ++i )
-    {
-        m_our_bonuces[i] = UIHelper::CreateStatic( xml, "static_our_bonuce", this );
-    }
-    dx = xml.ReadAttribFlt( "static_our_bonuce", 0, "dx" );
-    pos = m_our_bonuces[0]->GetWndPos();
-    for ( u8 i = 1; i < max_bonuce; ++i )
-    {
-        pos.x += m_our_bonuces[i-1]->GetWndSize().x + dx;
-        m_our_bonuces[i]->SetWndPos( pos );
-    }
-
-    for ( u8 i = 0; i < max_bonuce; ++i )
-    {
-        m_enemy_bonuces[i] = UIHelper::CreateStatic( xml, "static_enemy_bonuce", this );
-    }
-    dx = xml.ReadAttribFlt( "static_enemy_bonuce", 0, "dx" );
-    pos = m_enemy_bonuces[0]->GetWndPos();
-    for ( u8 i = 1; i < max_bonuce; ++i )
-    {
-        pos.x += m_enemy_bonuces[i-1]->GetWndSize().x + dx;
-        m_enemy_bonuces[i]->SetWndPos( pos );
-    }
-    int delay = xml.ReadAttribInt( "main_wnd", 0, "update_delay", 3000 );
-    m_update_delay = (0 < delay)? (u32)delay : 0;
+	for ( u8 i = 0; i < max_bonuce; ++i )
+	{
+		m_enemy_bonuces[i] = UIHelper::CreateStatic( xml, "static_enemy_bonuce", this );
+	}
+	dx = xml.ReadAttribFlt( "static_enemy_bonuce", 0, "dx" );
+	pos = m_enemy_bonuces[0]->GetWndPos();
+	for ( u8 i = 1; i < max_bonuce; ++i )
+	{
+		pos.x += m_enemy_bonuces[i-1]->GetWndSize().x + dx;
+		m_enemy_bonuces[i]->SetWndPos( pos );
+	}
+	int delay = xml.ReadAttribInt( "main_wnd", 0, "update_delay", 3000 );
+	m_update_delay = (0 < delay)? (u32)delay : 0;
 }
 
 void CUIFactionWarWnd::ShowInfo( bool status )

@@ -6,11 +6,11 @@
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/CameraManager.h"
 #include "xr_level_controller.h"
-#include "ui/UITextureMaster.h"
+#include "xrUICore/XML/UITextureMaster.h"
 #include "ui/UIXmlInit.h"
 #include "SDL.h"
-#include "ui/UIBtnHint.h"
-#include "UICursor.h"
+#include "xrUICore/Buttons/UIBtnHint.h"
+#include "xrUICore/Cursor/UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
 #include "xrGameSpy/GameSpy_HTTP.h"
 #include "xrGameSpy/GameSpy_Available.h"
@@ -30,6 +30,8 @@
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
 #endif
+
+#include <tbb/parallel_for_each.h>
 
 #include "Common/object_broker.h"
 
@@ -153,16 +155,43 @@ CMainMenu::~CMainMenu()
 void CMainMenu::ReadTextureInfo()
 {
     string_path buf;
-    FS_FileSet fset;
-    FS.file_list(fset, "$game_config$", FS_ListFiles, strconcat(sizeof(buf), buf, UI_PATH, DELIMITER, "textures_descr" DELIMITER "*.xml"));
-    for (const auto& file : fset)
-    {
-        string_path fn1, fn2, fn3;
-        _splitpath(file.name.c_str(), fn1, fn2, fn3, 0);
-        xr_strcat(fn3, ".xml");
+    FS_FileSet files;
 
-        CUITextureMaster::ParseShTexInfo(fn3);
-    }
+    const auto UpdateFileSet = [&](pcstr path)
+    {
+        FS.file_list(files, "$game_config$", FS_ListFiles,
+            strconcat(sizeof(buf), buf, path, DELIMITER, "textures_descr" DELIMITER "*.xml")
+        );
+    };
+
+    const auto ParseFileSet = [&]()
+    {
+        /*
+         * Original CoP textures_descr
+         * loading time:
+         * Single-threaded ~80 ms
+         * Multi-threaded  ~40 ms
+         * Just a bit of speedup
+        */
+        tbb::parallel_for_each(files, [](const FS_File& file)
+        {
+            string_path path, name;
+            _splitpath(file.name.c_str(), nullptr, path, name, nullptr);
+            xr_strcat(name, ".xml");
+            path[xr_strlen(path) - 1] = '\0'; // cut the latest '\\'
+
+            CUITextureMaster::ParseShTexInfo(path, name);
+        });
+    };
+
+    UpdateFileSet(UI_PATH_DEFAULT);
+    ParseFileSet();
+
+    if (0 == xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
+        return;
+
+    UpdateFileSet(UI_PATH);
+    ParseFileSet();
 }
 
 void CMainMenu::Activate(bool bActivate)
@@ -651,8 +680,7 @@ void CMainMenu::OnSessionTerminate(LPCSTR reason)
         return;
 
     m_start_time = Device.dwTimeGlobal;
-    CStringTable st;
-    LPCSTR str = st.translate("ui_st_kicked_by_server").c_str();
+    LPCSTR str = StringTable().translate("ui_st_kicked_by_server").c_str();
     LPSTR text;
 
     if (reason && xr_strlen(reason) && reason[0] == '@')
@@ -664,13 +692,13 @@ void CMainMenu::OnSessionTerminate(LPCSTR reason)
         STRCONCAT(text, str, " ", reason);
     }
 
-    m_pMB_ErrDlgs[SessionTerminate]->SetText(st.translate(text).c_str());
+    m_pMB_ErrDlgs[SessionTerminate]->SetText(StringTable().translate(text).c_str());
     SetErrorDialog(CMainMenu::SessionTerminate);
 }
 
 void CMainMenu::OnLoadError(LPCSTR module)
 {
-    LPCSTR str = CStringTable().translate("ui_st_error_loading").c_str();
+    LPCSTR str = StringTable().translate("ui_st_error_loading").c_str();
     string1024 Text;
     strconcat(sizeof(Text), Text, str, " ");
     xr_strcat(Text, sizeof(Text), module);

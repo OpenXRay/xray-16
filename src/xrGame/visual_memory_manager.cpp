@@ -705,13 +705,18 @@ void CVisualMemoryManager::update(float time_delta)
 	}
 #endif
 
-    if (m_object && g_actor && m_object->is_relation_enemy(Actor()))
+    if (m_object && g_actor)
     {
-        xr_vector<CNotYetVisibleObject>::iterator I = std::find_if(
-            m_not_yet_visible_objects.begin(), m_not_yet_visible_objects.end(), CNotYetVisibleObjectPredicate(Actor()));
-        if (I != m_not_yet_visible_objects.end())
+        if (m_object->is_relation_enemy(Actor()))
         {
-            SetActorVisibility(m_object->ID(), clampr((*I).m_value / visibility_threshold(), 0.f, 1.f));
+            xr_vector<CNotYetVisibleObject>::iterator I = std::find_if(m_not_yet_visible_objects.begin(),
+                m_not_yet_visible_objects.end(), CNotYetVisibleObjectPredicate(Actor()));
+            if (I != m_not_yet_visible_objects.end())
+            {
+                SetActorVisibility(m_object->ID(), clampr((*I).m_value / visibility_threshold(), 0.f, 1.f));
+            }
+            else
+                SetActorVisibility(m_object->ID(), 0.f);
         }
         else
             SetActorVisibility(m_object->ID(), 0.f);
@@ -771,7 +776,7 @@ void CVisualMemoryManager::save(NET_Packet& packet) const
         packet.w_float((*I).m_object_params.m_orientation.pitch);
         packet.w_float((*I).m_object_params.m_orientation.roll);
 #endif // USE_ORIENTATION
-        // self params
+       // self params
         packet.w_u32((*I).m_self_params.m_level_vertex_id);
         packet.w_vec3((*I).m_self_params.m_position);
 #ifdef USE_ORIENTATION

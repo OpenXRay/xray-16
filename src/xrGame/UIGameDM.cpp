@@ -13,7 +13,7 @@
 #include "InventoryOwner.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "xr_level_controller.h"
-#include "ui/xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "game_cl_deathmatch.h"
 #include "ui/UIMoneyIndicator.h"
 #include "ui/UIRankIndicator.h"
@@ -85,7 +85,7 @@ void CUIGameDM::Init(int stage)
     { // unique
         m_pTeamPanels->Init(TEAM_PANELS_DM_XML_NAME, "team_panels_wnd");
         CUIXml uiXml;
-        uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_dm.xml");
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml");
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
         m_pMoneyIndicator->InitFromXML(uiXml);
         m_pRankIndicator->InitFromXml(uiXml);
@@ -144,7 +144,7 @@ void CUIGameDM::SetVoteMessage(LPCSTR str)
         if (!m_voteStatusWnd)
         {
             CUIXml uiXml;
-            uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_dm.xml");
+            uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml");
             m_voteStatusWnd = new UIVoteStatusWnd();
             m_voteStatusWnd->InitFromXML(uiXml);
         }

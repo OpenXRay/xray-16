@@ -31,7 +31,7 @@
 #include "ui/UIBuyWndShared.h"
 #include "ui/UIMoneyIndicator.h"
 #include "ui/UIRankIndicator.h"
-#include "ui/UIProgressShape.h"
+#include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIVoteStatusWnd.h"
 #include "ui/UIActorMenu.h"
@@ -66,7 +66,7 @@ void CUIGameCTA::Init(int stage)
         teamPanels->Init(TEAM_PANELS_XML_NAME, "team_panels_wnd");
 
         CUIXml uiXml;
-        uiXml.Load(CONFIG_PATH, UI_PATH, CTA_GAME_WND_XML);
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, CTA_GAME_WND_XML);
 
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
 
@@ -732,8 +732,7 @@ void CUIGameCTA::ShowBuySpawn(s32 spawn_cost)
     if (m_pBuySpawnMsgBox->IsShown())
         return;
 
-    CStringTable st;
-    LPCSTR format_str = st.translate("mp_press_yes2pay").c_str();
+    LPCSTR format_str = StringTable().translate("mp_press_yes2pay").c_str();
     VERIFY(format_str);
     size_t pay_frm_size = xr_strlen(format_str) * sizeof(char) + 64;
     PSTR pay_frm_str = static_cast<char*>(_alloca(pay_frm_size));
@@ -761,7 +760,7 @@ void CUIGameCTA::SetVoteMessage(LPCSTR str)
     if (str)
     {
         CUIXml uiXml;
-        uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_dm.xml");
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml");
         m_voteStatusWnd = new UIVoteStatusWnd();
         m_voteStatusWnd->InitFromXML(uiXml);
         m_voteStatusWnd->Show(true);

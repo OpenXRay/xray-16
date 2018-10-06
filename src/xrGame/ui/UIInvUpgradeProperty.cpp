@@ -10,8 +10,8 @@
 #include "UIInvUpgradeProperty.h"
 #include "UIInvUpgradeInfo.h"
 
-#include "UIStatic.h"
-#include "xrUIXmlParser.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
 
 #include "ai_space.h"
@@ -144,7 +144,7 @@ UIInvUpgPropertiesWnd::~UIInvUpgPropertiesWnd() { delete_data(m_properties_ui); 
 void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;
-    ui_xml.Load(CONFIG_PATH, UI_PATH, xml_name);
+    ui_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
 
     XML_NODE stored_root = ui_xml.GetLocalRoot();
     XML_NODE node = ui_xml.NavigateToNode("upgrade_info", 0);

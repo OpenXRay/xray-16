@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "UIWindow.h"
+#include "xrUICore/Windows/UIWindow.h"
 
 class FactionState
 {

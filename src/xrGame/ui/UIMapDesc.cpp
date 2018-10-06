@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "UIMapDesc.h"
-#include "UIStatic.h"
-#include "UICursor.h"
-#include "UIScrollView.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Cursor/UICursor.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
 #include "UIXmlInit.h"
-#include "UI3tButton.h"
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "UIGameCustom.h"
 #include "Level.h"
 #include "game_cl_teamdeathmatch.h"
@@ -61,7 +61,7 @@ CUIMapDesc::~CUIMapDesc()
 void CUIMapDesc::Init()
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, "map_desc.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_desc.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "map_desc", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "map_desc:caption", 0, m_pCaption);

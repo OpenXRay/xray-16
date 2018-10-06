@@ -232,7 +232,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r3_dynamic_wet_surfaces_sm_res", _st)
 	ctl = xml:InitTrackBar("video_adv:track_r3_dynamic_wet_surfaces_sm_res", _st)
-	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
+	table.insert(handler.m_preconditions, {func=mode_ge_3, control=_st})
 
 -- r3_volumetric_smoke		>r25
 	_st = xml:InitStatic("video_adv:templ_item", nil)

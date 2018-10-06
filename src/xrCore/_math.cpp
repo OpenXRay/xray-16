@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #if defined(WINDOWS)
-#include <timeapi.h>
 #pragma hdrstop
 
 #include <intrin.h> // __rdtsc
@@ -212,17 +211,8 @@ void initialize()
 
 namespace CPU
 {
-XRCORE_API u64 clk_per_second;
-XRCORE_API u64 clk_per_milisec;
-XRCORE_API u64 clk_per_microsec;
-XRCORE_API u64 clk_overhead;
+XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
-XRCORE_API float clk_to_seconds;
-XRCORE_API float clk_to_milisec;
-XRCORE_API float clk_to_microsec;
-
-XRCORE_API u64 qpc_freq = 0;
-XRCORE_API u64 qpc_overhead = 0;
 XRCORE_API u32 qpc_counter = 0;
 
 XRCORE_API processor_info ID;
@@ -239,79 +229,6 @@ XRCORE_API u64 GetCLK()
 {
     return __rdtsc();
 }
-
-void Detect()
-{
-    // Timers & frequency
-    u64 start, end;
-    u32 dwStart, dwTest;
-
-#if defined(WINDOWS)
-    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
-#elif defined(LINUX)
-    setpriority(PRIO_PROCESS, 0, -20);
-#endif
-
-    // Detect Freq
-    dwTest = timeGetTime();
-    do
-    {
-        dwStart = timeGetTime();
-    } while (dwTest == dwStart);
-    start = GetCLK();
-    while (timeGetTime() - dwStart < 1000)
-        ;
-    end = GetCLK();
-    clk_per_second = end - start;
-
-    // Detect RDTSC Overhead
-    clk_overhead = 0;
-    u64 dummy = 0;
-    for (int i = 0; i < 256; i++)
-    {
-        start = GetCLK();
-        clk_overhead += GetCLK() - start - dummy;
-    }
-    clk_overhead /= 256;
-
-    // Detect QPC Overhead
-    qpc_freq = SDL_GetPerformanceFrequency();
-    qpc_overhead = 0;
-    for (int i = 0; i < 256; i++)
-    {
-        start = QPC();
-        qpc_overhead += QPC() - start - dummy;
-    }
-    qpc_overhead /= 256;
-
-#if defined(WINDOWS)
-    SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
-#elif defined(LINUX)
-    setpriority(PRIO_PROCESS, 0, 0);
-#endif
-
-    clk_per_second -= clk_overhead;
-    clk_per_milisec = clk_per_second / 1000;
-    clk_per_microsec = clk_per_milisec / 1000;
-
-#if defined(WINDOWS)
-#ifndef XR_X64
-    _control87(_PC_64, MCW_PC);
-#endif
-#elif defined(LINUX)
-    FPU::m64(); // TODO check after launch!!!
-#endif
-    double a, b;
-    a = 1;
-    b = double(clk_per_second);
-    clk_to_seconds = float(double(a / b));
-    a = 1000;
-    b = double(clk_per_second);
-    clk_to_milisec = float(double(a / b));
-    a = 1000000;
-    b = double(clk_per_second);
-    clk_to_microsec = float(double(a / b));
-}
 } // namespace CPU
 
 bool g_initialize_cpu_called = false;
@@ -319,8 +236,6 @@ bool g_initialize_cpu_called = false;
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
 {
-
-    CPU::Detect();
 
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
@@ -457,7 +372,7 @@ void __cdecl thread_entry(void* _params)
 
 void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* arglist)
 {
-    xrDebug::Initialize(false);
+    xrDebug::Initialize();
 
     THREAD_STARTUP* startup = new THREAD_STARTUP();
     startup->entry = entry;

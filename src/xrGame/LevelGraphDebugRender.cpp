@@ -25,7 +25,7 @@
 #include "alife_monster_movement_manager.h"
 #include "alife_monster_detail_path_manager.h"
 #include "ai_space.h"
-#include "ui_base.h"
+#include "xrUICore/ui_base.h"
 #include "CustomMonster.h"
 #include "ai/stalker/ai_stalker.h"
 #include "team_base_zone.h"

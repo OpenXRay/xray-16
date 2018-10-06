@@ -7,17 +7,17 @@
 
 #include "StdAfx.h"
 #include "UISecondTaskWnd.h"
-#include "xrUIXmlParser.h"
+#include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
-#include "UIFrameWindow.h"
-#include "UIScrollView.h"
-#include "UIStatic.h"
-#include "UI3tButton.h"
-#include "UICheckButton.h"
-#include "UIFrameLineWnd.h"
-#include "UIFixedScrollBar.h"
-#include "UIHint.h"
+#include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/Buttons/UI3tButton.h"
+#include "xrUICore/Buttons/UICheckButton.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/ScrollBar/UIFixedScrollBar.h"
+#include "xrUICore/Hint/UIHint.h"
 #include "UITaskWnd.h"
 #include "GameTaskDefs.h"
 #include "GameTask.h"
@@ -192,7 +192,7 @@ bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
     SetMessageTarget(parent);
 
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, PDA_TASK_XML);
+    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_TASK_XML);
 
     CUIXmlInit::InitWindow(xml, "second_task_wnd:task_item", 0, this);
 

@@ -232,6 +232,9 @@
     <Filter Include="Rendering Device">
       <UniqueIdentifier>{e4d34774-3a5b-468f-9400-12c702636fa1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game API\StringTable">
+      <UniqueIdentifier>{948b4643-0f42-4027-ac44-dbe3702887f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -564,6 +567,15 @@
     <ClInclude Include="Stats.h">
       <Filter>Rendering Device</Filter>
     </ClInclude>
+    <ClInclude Include="xr_input_xinput.h">
+      <Filter>Interfaces\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="StringTable\IStringTable.h">
+      <Filter>Game API\StringTable</Filter>
+    </ClInclude>
+    <ClInclude Include="StringTable\IStringTableDefs.h">
+      <Filter>Game API\StringTable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -880,6 +892,12 @@
     </ClCompile>
     <ClCompile Include="Stats.cpp">
       <Filter>Rendering Device</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_input_xinput.cpp">
+      <Filter>Interfaces\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="StringTable\IStringTable.cpp">
+      <Filter>Game API\StringTable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -74,6 +74,7 @@ list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIDebu
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIFrags.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIFrags2.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIFrameLine.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIListBox_script.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIListItem.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIListItemAdv.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/ui/UIListItemEx.cpp")
@@ -113,5 +114,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "
 cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrEngine xrMiscMath luabind xrAPI xrAICore xrSound xrScriptEngine cximage ${LUA_LIBRARIES} pugixml xrCDB xrPhysics xrNetServer ${SDL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} xrCore xrEngine xrMiscMath luabind xrAPI xrAICore xrUICore xrSound xrScriptEngine cximage ${LUA_LIBRARIES} pugixml xrCDB xrPhysics xrNetServer ${SDL_LIBRARIES})
 xr_install(${PROJECT_NAME})

@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "UIMessageBox.h"
+#include "xrUICore/MessageBox/UIMessageBox.h"
 #include "UIMessageBoxEx.h"
 #include "UIDialogHolder.h"
 

@@ -19,7 +19,7 @@
 #include "Common/object_broker.h"
 #include "sound_player.h"
 #include "Level.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 #include "trader_animation.h"
 #include "xrServerEntities/clsid_game.h"

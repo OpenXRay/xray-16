@@ -1,4 +1,4 @@
-X-Ray Engine 1.6 expansion
+X-Ray Engine 1.6 expansion [![Codacy Badge](https://api.codacy.com/project/badge/Grade/40d84a83b38147c49b4e66705c47a16a)](https://www.codacy.com/app/OpenXRay/xray-16?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenXRay/xray-16&amp;utm_campaign=Badge_Grade)
 ==========================
 
 ### Build Status:

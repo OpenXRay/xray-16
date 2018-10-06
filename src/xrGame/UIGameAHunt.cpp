@@ -4,7 +4,7 @@
 #include "team_base_zone.h"
 #include "Level.h"
 #include "game_cl_artefacthunt.h"
-#include "ui/UIStatic.h"
+#include "xrUICore/Static/UIStatic.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIMoneyIndicator.h"
@@ -28,7 +28,7 @@ void CUIGameAHunt::Init(int stage)
         m_pTeamPanels->Init(TEAM_PANELS_AHUNT_XML_NAME, "team_panels_wnd");
 
         CUIXml uiXml;
-        uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_ahunt.xml");
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_ahunt.xml");
 
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
         CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);

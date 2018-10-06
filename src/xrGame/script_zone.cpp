@@ -11,7 +11,7 @@
 #include "script_game_object.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrEngine/xr_collide_form.h"
-#include "script_callback_ex.h"
+#include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 
 #ifdef DEBUG

@@ -2,6 +2,7 @@ project(xrEngine)
 
 list(APPEND DIRS
     "."
+    "StringTable"
     )
 
 add_dir("${DIRS}")

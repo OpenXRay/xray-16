@@ -10,7 +10,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
-        //xrDebug::Initialize(false);
+        //xrDebug::Initialize();
         //Core.Initialize("XRayEditorTools", 0, FALSE);
         // FPU::m64r	();
         break;

@@ -76,26 +76,16 @@ void prefetch_module(pcstr file_name) { GEnv.ScriptEngine->process_file(file_nam
 
 struct profile_timer_script
 {
-    u64 start_cpu_tick_count;
-    u64 accumulator;
+    using Clock = std::chrono::high_resolution_clock;
+    using Time = Clock::time_point;
+    using Duration = Clock::duration;
+
+    Time start_time;
+    Duration accumulator;
     u64 count = 0;
     int recurse_mark = 0;
 
-    profile_timer_script()
-        : start_cpu_tick_count(0),
-          accumulator(0),
-          count(0),
-          recurse_mark(0) {}
-
-    profile_timer_script(const profile_timer_script& profile_timer) { *this = profile_timer; }
-    profile_timer_script& operator=(const profile_timer_script& profile_timer)
-    {
-        start_cpu_tick_count = profile_timer.start_cpu_tick_count;
-        accumulator = profile_timer.accumulator;
-        count = profile_timer.count;
-        recurse_mark = profile_timer.recurse_mark;
-        return *this;
-    }
+    profile_timer_script() : start_time(), accumulator(), count(0), recurse_mark(0) {}
 
     bool operator<(const profile_timer_script& profile_timer) const
     {
@@ -109,9 +99,10 @@ struct profile_timer_script
             ++recurse_mark;
             return;
         }
+
         ++recurse_mark;
         ++count;
-        start_cpu_tick_count = CPU::GetCLK();
+        start_time = Clock::now();
     }
 
     void stop()
@@ -124,17 +115,15 @@ struct profile_timer_script
         if (recurse_mark)
             return;
 
-        u64 finish = CPU::GetCLK();
-        if (finish > start_cpu_tick_count)
-            accumulator += finish - start_cpu_tick_count;
+        const auto finish = Clock::now();
+        if (finish > start_time)
+            accumulator += finish - start_time;
     }
 
     float time() const
     {
-        FPU::m64r();
-        float result = float(double(accumulator) / double(CPU::clk_per_second)) * 1000000.f;
-        FPU::m24r();
-        return result;
+        using namespace std::chrono;
+        return float(duration_cast<microseconds>(accumulator).count());
     }
 };
 
