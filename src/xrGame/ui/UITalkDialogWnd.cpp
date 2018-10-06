@@ -334,7 +334,7 @@ void CUIAnswerItemIconed::Init(LPCSTR text, LPCSTR name, LPCSTR texture_name)
 {
     xr_string res;
     res += name;
-    res += DELIMITER "n %c[250,255,232,208]";
+    res += "\\n %c[250,255,232,208]";
     res += text;
 
     inherited::Init(res.c_str(), "");
