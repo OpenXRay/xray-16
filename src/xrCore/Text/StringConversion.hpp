@@ -30,5 +30,5 @@ IC bool IsAlphaCharacter(wchar_t wc)
         ((wc >= 0xFF21) && (wc <= 0xFF3A)) || ((wc >= 0xFF41) && (wc <= 0xFF5A)));
 }
 
-XRCORE_API xr_string StringFromUTF8(const char* string, const std::locale& locale = std::locale(""));
-XRCORE_API xr_string StringToUTF8(const char* string, const std::locale& locale = std::locale(""));
+XRCORE_API xr_string StringFromUTF8(const char* string, const std::locale& locale);
+XRCORE_API xr_string StringToUTF8(const char* string, const std::locale& locale);
