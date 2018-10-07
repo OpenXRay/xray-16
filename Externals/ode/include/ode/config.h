@@ -23,7 +23,9 @@
 
 /* per-machine configuration */
 
-
+#ifdef LINUX
+#include <stdint.h>
+#endif
 
 #ifndef _ODE_CONFIG_H_
 
