@@ -1123,7 +1123,7 @@ BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fv
     default: NODEFAULT;
     }
     CHK_DX(V->p_rm_Indices->Unlock());
-#endif	USE_DX10
+#endif // USE_DX10
 
     return result;
 }
