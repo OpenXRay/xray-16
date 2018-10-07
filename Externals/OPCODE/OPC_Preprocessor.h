@@ -17,8 +17,6 @@
 #if defined(_WIN32) || defined(WIN32)
 #pragma message("Compiling on Windows...")
 #define PLATFORM_WINDOWS
-#elif defined(LINUX)
-#pragma message("Compiling on GNU/Linux...")
 #else
 #pragma message("Compiling on unknown platform...")
 #endif
@@ -27,10 +25,6 @@
 #if defined(_MSC_VER)
 #pragma message("Compiling with VC++...")
 #define COMPILER_VISUAL_CPP
-#elif defined(__MINGW32__)
-#pragma message("Compiling with MinGW...")
-#elif defined(__GNUC__)
-#pragma message("Compiling with G++...")
 #else
 #pragma message("Compiling with unknown compiler...")
 #endif
