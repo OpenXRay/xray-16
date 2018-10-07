@@ -12,22 +12,6 @@
 #ifndef __ICEPREPROCESSOR_H__
 #define __ICEPREPROCESSOR_H__
 
-// Check platform
-#if defined(_WIN32) || defined(WIN32)
-#pragma message("Compiling on Windows...")
-#define PLATFORM_WINDOWS
-#else
-#pragma message("Compiling on unknown platform...")
-#endif
-
-// Check compiler
-#if defined(_MSC_VER)
-#pragma message("Compiling with VC++...")
-#define COMPILER_VISUAL_CPP
-#else
-#pragma message("Compiling with unknown compiler...")
-#endif
-
 // Check compiler options
 #ifdef COMPILER_VISUAL_CPP
 #if defined(_CHAR_UNSIGNED)
