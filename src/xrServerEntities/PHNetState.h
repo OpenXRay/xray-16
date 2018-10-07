@@ -6,8 +6,6 @@
 #include "xrCommon/xr_vector.h"
 
 class NET_Packet;
-class IReader;
-class IWriter;
 
 struct SPHNetState
 {
