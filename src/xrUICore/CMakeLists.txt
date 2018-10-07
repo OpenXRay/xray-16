@@ -62,8 +62,16 @@ message("path "  ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_definitions(-DXRUICORE_EXPORTS -D_SECURE_SCL=0)
 
-add_compile_options(/fp:fast "/Yupch.hpp")
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp PROPERTIES COMPILE_FLAGS /Yc)
+if (WIN32)
+	add_compile_options(/fp:fast "/Yupch.hpp")
+	set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp PROPERTIES COMPILE_FLAGS /Yc)
+endif()
+
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+	set(LUAJIT_LIBRARIES luajit-debug)
+else()
+	set(LUAJIT_LIBRARIES luajit)
+endif()
 
 add_library(xrUICore SHARED ${ARROW} ${BUTTONS} ${CALLBACKS}
 					${COMBO_BOX} ${CURSOR}
@@ -75,5 +83,11 @@ add_library(xrUICore SHARED ${ARROW} ${BUTTONS} ${CALLBACKS}
 					${GENERAL})
 
 set_target_properties(xrUICore PROPERTIES PREFIX "")
-target_include_directories(xrUICore PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ../../Externals/lzo/include)
-target_link_libraries(xrUICore xrAPI pugixml xrScriptEngine LuaJIT xrEngine xrMiscMath xrCore luabind)
+target_include_directories(xrUICore PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/../
+	../../Externals/lzo/include
+	../../Externals/luabind
+	${SDL_INCLUDE_DIRS})
+target_link_libraries(xrUICore xrAPI pugixml xrScriptEngine ${LUAJIT_LIBRARIES} xrEngine xrMiscMath xrCore luabind ${SDL_LIBRARIES})
+xr_install(${PROJECT_NAME})

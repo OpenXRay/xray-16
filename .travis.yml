@@ -1,29 +1,84 @@
-language: cpp
-cache: ccache
+# Based on https://github.com/ldionne/hana/blob/master/.travis.yml
+dist: xenial
 sudo: required
-dist: trusty
-compiler:
-- g++
-install: export CXX="g++-7"
+cache: ccache
+language: cpp
+
+#branches:
+#  only:
+#  - linux
+#  - xd_dev
+#  - "/^v\\d+\\./"
+
 os:
 - linux
+
+matrix:
+  include:
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+      addons: &gcc7
+        apt:
+          sources:
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - g++-7
+
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x86 BUILD_CONFIGURATION=Release
+      addons: *gcc7
+
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
+      addons: *gcc7
+
+    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
+      addons: *gcc7
+
+#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+#      addons: &clang50
+#        apt:
+#          sources:
+#            - llvm-toolchain-trusty-5.0
+#          packages:
+#            - clang-5.0
+
+#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
+#      addons: *clang50
+
+#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+#      addons: &clang60
+#        apt:
+#          sources:
+#            - llvm-toolchain-trusty-6.0
+#          packages:
+#            - clang-6.0
+
+#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
+#      addons: *clang60
+
+
+install:
+  - export CC=${C_COMPILER}
+  - export CXX=${CXX_COMPILER}
+  - ${CXX} --version
+
 before_script:
-  - g++ --version
-  - sudo apt-get install libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev
-  - sudo apt-get install cmake lua5.1-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev
+  - export core_count=$(nproc || echo 4) && echo core_count = $core_count
   - mkdir bin
   - cd bin
-  - cmake ..
+  - if [ $TARGET_CPU == x64 ]; then
+       sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev;
+       sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev;
+       cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
+    fi
+
+  - if [ $TARGET_CPU == x86 ]; then
+       sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-7-multilib libpulse-dev:i386 libglib2.0-dev:i386;
+       sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386;
+       sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 libsdl2-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386;
+       CFLAGS="-m32 -march=native" CXXFLAGS="-m32 -march=native" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_ASM_FLAGS=-m32;
+    fi
+
 script:
-- if [ $TRAVIS_OS_NAME == linux ]; then make && file src/xrCore/xrCore.so; fi
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-7
+- if [ $TRAVIS_OS_NAME == linux ]; then make -j $core_count && file src/xrCore/xrCore.so; fi
+
 notifications:
   email: false
-env:
-  global:
-  - LANG="en_US.UTF-8"

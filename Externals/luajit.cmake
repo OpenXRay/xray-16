@@ -319,6 +319,7 @@ endif()
 	add_library( ${LIB_NAME} SHARED ${LJCORE_C} ${DEPS} )
 	set_target_properties ( ${LIB_NAME} PROPERTIES PREFIX "" )
 	target_link_libraries ( ${LIB_NAME} ${LIBS} )
+	xr_install(${LIB_NAME})
 #endif()
 
 if(NOT ${BUILD_LIB_ONLY})

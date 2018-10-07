@@ -119,7 +119,7 @@ find_package_handle_standard_args(SDL REQUIRED_VARS SDL_LIBRARY SDL_INCLUDE_DIR
                                       VERSION_VAR SDL_VERSION)
 
 if(SDL_FOUND)
-    set(SDL_INCLUDE_DIRS ${SDL_INCLUDE_DIRS})
+    set(SDL_INCLUDE_DIRS ${SDL_INCLUDE_DIR})
 
     if(NOT SDL_LIBRARIES)
         set(SDL_LIBRARIES ${SDL_LIBRARY})
