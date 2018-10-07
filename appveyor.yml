@@ -68,7 +68,7 @@ deploy:
   release: OpenXRay (build $(appveyor_build_version))
   description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
-    secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
+    secure: EwMP7ob9Q7cE1EvW72ybDSYjbD44IQRDFhbCQcdOuBSSz9PbO/Pq2ZUNuMqPuvsV
   artifact:
     OpenXRay.Dx86.7z, OpenXRay.Dx64.7z, OpenXRay.Mx86.7z, OpenXRay.Mx64.7z, OpenXRay.Rx86.7z, OpenXRay.Rx64.7z,
     Symbols.Dx86.7z, Symbols.Dx64.7z, Symbols.Mx86.7z, Symbols.Mx64.7z, Symbols.Rx86.7z, Symbols.Rx64.7z
