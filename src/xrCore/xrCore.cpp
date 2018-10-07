@@ -203,14 +203,16 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
             CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
 
+#if defined(WINDOWS)
         string_path fn, dr, di;
 
         // application path
-#if defined(WINDOWS)
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
-#endif
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
+#else
+        SDL_strlcpy(ApplicationPath, SDL_GetBasePath(), sizeof(ApplicationPath));
+#endif
 
 #ifdef _EDITOR
         // working path
@@ -222,7 +224,11 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         }
 #endif
 
-        SDL_strlcpy(WorkingPath, SDL_GetBasePath(), sizeof(WorkingPath));
+#if defined(WINDOWS)
+        GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
+#else
+        getcwd(WorkingPath, sizeof(WorkingPath));
+#endif
 
 #if defined(WINDOWS)
         // User/Comp Name
