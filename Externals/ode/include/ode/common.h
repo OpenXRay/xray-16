@@ -26,6 +26,10 @@
 #include <ode/error.h>
 #include <math.h>
 
+#ifdef LINUX
+#include <alloca.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
