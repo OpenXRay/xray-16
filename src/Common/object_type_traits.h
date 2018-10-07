@@ -113,6 +113,35 @@ struct remove_const<T const>
 };
 
 template <typename T>
+struct remove_noexcept;
+
+template <typename R, typename... Args>
+struct remove_noexcept<R(Args...) noexcept>
+{
+    using type = R(Args...);
+};
+
+template< typename R, typename... Args>
+struct remove_noexcept <R(*)(Args...) noexcept>
+{
+    using type = R(*)(Args...);
+};
+
+template <typename C, typename R, typename... Args>
+struct remove_noexcept<R(C::*)(Args...) noexcept>
+{
+    using type = R(C::*)(Args...);
+};
+
+template <typename C, typename R, typename... Args>
+struct remove_noexcept<R(C::*)(Args...) const noexcept>
+{
+    using type = R(C::*)(Args...) const;
+};
+
+#define REMOVE_NOEXCEPT(fn) (object_type_traits::remove_noexcept<decltype(fn)>::type)(fn)
+
+template <typename T>
 struct is_void
 {
     enum
