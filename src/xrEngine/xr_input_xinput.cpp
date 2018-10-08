@@ -400,7 +400,7 @@ _keyboard keyboards[] =
     { "kBRIGHTNESSUP",          SDL_SCANCODE_BRIGHTNESSUP,       "Brightness Up" },
     { "kDISPLAYSWITCH",         SDL_SCANCODE_DISPLAYSWITCH,      "Display Switch" },
 
-    { "kKBDILLUMTOGGLE)",       SDL_SCANCODE_KBDILLUMTOGGLE,     "Illum Toogle" },
+    { "kKBDILLUMTOGGLE",        SDL_SCANCODE_KBDILLUMTOGGLE,     "Illum Toogle" },
     { "kKBDILLUMDOWN",          SDL_SCANCODE_KBDILLUMDOWN,       "Illum Down" },
     { "kKBDILLUMUP",            SDL_SCANCODE_KBDILLUMUP,         "Illum Up" },
 
