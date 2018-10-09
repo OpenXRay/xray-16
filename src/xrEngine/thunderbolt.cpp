@@ -62,7 +62,12 @@ void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
 
     // models
     LPCSTR m_name = pIni.r_string(sect, "lightning_model");
-    m_pRender->CreateModel(m_name);
+    string_path tmp;
+    xr_strcpy(tmp, m_name);
+#if defined(LINUX)
+    while (char* sep = strchr(tmp, '\\')) *sep = '/';
+#endif
+    m_pRender->CreateModel(tmp);
 
     /*
     IReader* F = 0;
@@ -73,8 +78,11 @@ void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
 
     // sound
     m_name = pIni.r_string(sect, "sound");
+#if defined(LINUX)
+    while (char* sep = strchr(tmp, '\\')) *sep = '/';
+#endif
     if (m_name && m_name[0])
-        snd.create(m_name, st_Effect, sg_Undefined);
+        snd.create(tmp, st_Effect, sg_Undefined);
 }
 
 //----------------------------------------------------------------------------------------------
