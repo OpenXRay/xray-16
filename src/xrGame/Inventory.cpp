@@ -190,7 +190,7 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
         }
     }
 
-    if (Actor()->ID() == m_pOwner->object_id())
+    if (Actor() && Actor()->ID() == m_pOwner->object_id())
         RepackAmmo(pIItem);
 
     m_pOwner->OnItemTake(pIItem);
