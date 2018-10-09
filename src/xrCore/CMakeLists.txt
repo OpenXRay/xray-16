@@ -39,7 +39,7 @@ execute_process(COMMAND git rev-parse --abbrev-ref HEAD
 
 message( "branch: " ${GIT_BRANCH} )
 
-add_definitions(-DXRCORE_EXPORTS -DGIT_INFO_CURRENT_COMMIT="${GIT_SHA1}" -DGIT_INFO_CURRENT_BRANCH="${GIT_BRANCH}")
+add_definitions(-DXRCORE_EXPORTS -DGIT_INFO_CURRENT_COMMIT=${GIT_SHA1} -DGIT_INFO_CURRENT_BRANCH=${GIT_BRANCH})
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
@@ -47,5 +47,5 @@ cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${PROJECT_NAME} xrMiscMath ${SDL_LIBRARIES} ${LZO_LIBRARIES} ${CRYPTO++_LIBRARIES} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} xrMiscMath dl pthread ${SDL_LIBRARIES} ${LZO_LIBRARIES} ${CRYPTO++_LIBRARIES} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
 xr_install(${PROJECT_NAME})
