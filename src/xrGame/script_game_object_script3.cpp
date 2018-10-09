@@ -33,8 +33,6 @@
 #include "ZoneCampfire.h"
 #include "physicobject.h"
 #include "artefact.h"
-#include "Inventory.h"
-#include "inventory_item.h"
 
 using namespace luabind;
 using namespace luabind::policy;
@@ -164,61 +162,6 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .enum_("EPdaMsg")[value("dialog_pda_msg", int(ePdaMsgDialog)), value("info_pda_msg", int(ePdaMsgInfo)),
             value("no_pda_msg", int(ePdaMsgMax))]
 
-        //////////////////////////////////////////////////////////////////////////
-        // class_<CInventoryItem>("CInventoryItem")
-        //////////////////////////////////////////////////////////////////////////
-
-        .def("NameItem", &CInventoryItem::NameItem)
-        .def("NameShort", &CInventoryItem::NameShort)
-        .def("ItemDescription", &CInventoryItem::ItemDescription)
-        .def("Useful", &CInventoryItem::Useful)
-        .def("IsUsingCondition", &CInventoryItem::IsUsingCondition)
-        .def("CanStack", &CInventoryItem::CanStack)
-        .def("HandDependence", &CInventoryItem::HandDependence)
-        .def("ActivateItem", &CInventoryItem::ActivateItem)
-        .def("DeactivateItem", &CInventoryItem::DeactivateItem)
-        .def("GetDropManual", &CInventoryItem::GetDropManual)
-        .def("SetDropManual", &CInventoryItem::SetDropManual)
-        .def("IsQuestItem", &CInventoryItem::IsQuestItem)
-        .def("Cost", &CInventoryItem::Cost)
-        .def("Weight", &CInventoryItem::Weight)
-        .def("SetWeight", &CInventoryItem::SetWeight)
-        .def("GetIconName", &CInventoryItem::GetIconName)
-        .def("GetCondition", &CInventoryItem::GetCondition)
-        .def("SetCondition", &CInventoryItem::SetCondition)
-        .def("CanTake", &CInventoryItem::CanTake)
-        .def("has_any_upgrades", &CInventoryItem::has_any_upgrades)
-        .def("verify_upgrade", &CInventoryItem::verify_upgrade)
-        .def("install_upgrade", &CInventoryItem::install_upgrade)
-        .def("pre_install_upgrade", &CInventoryItem::pre_install_upgrade)
-        .def("CanTake", &CInventoryItem::CanTake)
-
-        //////////////////////////////////////////////////////////////////////////
-        // class_<CInventory>("CInventory")
-        //////////////////////////////////////////////////////////////////////////
-
-        .def("TotalWeight", &CInventory::TotalWeight)
-        .def("CalcTotalWeight", &CInventory::CalcTotalWeight)
-        .def("GetActiveSlot", &CInventory::GetActiveSlot)
-        .def("SetActiveSlot", &CInventory::SetActiveSlot)
-        .def("GetMaxWeight", &CInventory::GetMaxWeight)
-        .def("SetMaxWeight", &CInventory::SetMaxWeight)
-        .def("BeltWidth", &CInventory::BeltWidth)
-        .def("Activate", &CInventory::Activate)
-        .def("InSlot", &CInventory::InSlot)
-        .def("InBelt", &CInventory::InBelt)
-        .def("InRuck", &CInventory::InRuck)
-        .def("ItemFromSlot", &CInventory::ItemFromSlot)
-        //////////////////////////////////////////////////////////////////////////
-
-        //////////////////////////////////////////////////////////////////////////
-        // class_<CInventoryOwner>("CInventoryOwner")
-        //////////////////////////////////////////////////////////////////////////
-        .def("trade_section", &CInventoryOwner::trade_section)
-        .def("sell_useless_items", &CInventoryOwner::sell_useless_items)
-        .def("buy_supplies", &CInventoryOwner::buy_supplies)
-        .def("inventory", (CInventory & (CInventoryOwner::*)()) & CInventoryOwner::inventory)           
-        //////////////////////////////////////////////////////////////////////////
         .def("give_info_portion", &CScriptGameObject::GiveInfoPortion)
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
         .def("give_game_news",
@@ -241,9 +184,6 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("is_active_task", &CScriptGameObject::IsActiveTask)
         .def("get_task", &CScriptGameObject::GetTask)
 
- 		.def("GetTalkPartner", &CInventoryOwner::GetTalkPartner)
- 		.def("OfferTalk", &CInventoryOwner::OfferTalk)
- 		.def("StartTalk", &CInventoryOwner::StartTalk)
         .def("is_talking", &CScriptGameObject::IsTalking)
         .def("stop_talk", &CScriptGameObject::StopTalk)
         .def("enable_talk", &CScriptGameObject::EnableTalk)

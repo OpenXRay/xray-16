@@ -9696,6 +9696,9 @@
     <ClCompile Include="map_script.cpp">
       <Filter>ScriptClasses\ScriptMap</Filter>
     </ClCompile>
+    <ClCompile Include="InventoryOwner_script.cpp">
+      <Filter>Core\Client\Objects\inventory\InventoryOwner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">

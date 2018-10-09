@@ -33,7 +33,7 @@ CInventoryOwner::CInventoryOwner()
 {
     m_pTrade = NULL;
     m_trade_parameters = NULL;
-    m_purchase_list = NULL;
+	m_purchase_list = NULL;
 
     m_inventory = new CInventory();
     m_pCharacterInfo = new CCharacterInfo();
@@ -50,14 +50,14 @@ CInventoryOwner::CInventoryOwner()
     m_deadbody_can_take = true;
     m_deadbody_closed = false;
     m_play_show_hide_reload_sounds = true;
-    m_money = 0;
+	m_money = 0;
 
-    m_bTalking = false;
-    m_bTrading = false;
-    m_pTalkPartner = NULL;
-    m_game_name = "";
+	m_bTalking = false;
+	m_bTrading = false;
+	m_pTalkPartner = NULL;
+	m_game_name = "";
 
-    m_trader_flags.zero();
+	m_trader_flags.zero();
 }
 
 IFactoryObject* CInventoryOwner::_construct()
@@ -132,47 +132,37 @@ BOOL CInventoryOwner::net_Spawn(CSE_Abstract* DC)
         return FALSE;
     CSE_Abstract* E = (CSE_Abstract*)(DC);
 
-    if (IsGameTypeSingle())
+    CSE_ALifeTraderAbstract* pTrader = NULL;
+    if (E)
+        pTrader = smart_cast<CSE_ALifeTraderAbstract*>(E);
+    if (!pTrader)
+        return FALSE;
+
+    R_ASSERT(pTrader->character_profile().size());
+
+    //синхронизируем параметры персонажа с серверным объектом
+    CharacterInfo().Init(pTrader);
+
+    //-------------------------------------
+    m_known_info_registry->registry().init(E->ID);
+    //-------------------------------------
+
+    CAI_PhraseDialogManager* dialog_manager = smart_cast<CAI_PhraseDialogManager*>(this);
+    if (dialog_manager && !dialog_manager->GetStartDialog().size())
     {
-        CSE_ALifeTraderAbstract* pTrader = NULL;
-        if (E)
-            pTrader = smart_cast<CSE_ALifeTraderAbstract*>(E);
-        if (!pTrader)
-            return FALSE;
-
-        R_ASSERT(pTrader->character_profile().size());
-
-        //синхронизируем параметры персонажа с серверным объектом
-        CharacterInfo().Init(pTrader);
-
-        //-------------------------------------
-        m_known_info_registry->registry().init(E->ID);
-        //-------------------------------------
-
-        CAI_PhraseDialogManager* dialog_manager = smart_cast<CAI_PhraseDialogManager*>(this);
-        if (dialog_manager && !dialog_manager->GetStartDialog().size())
-        {
-            dialog_manager->SetStartDialog(CharacterInfo().StartDialog());
-            dialog_manager->SetDefaultStartDialog(CharacterInfo().StartDialog());
-        }
-        m_game_name = pTrader->m_character_name;
-
-        m_deadbody_can_take = pTrader->m_deadbody_can_take;
-        m_deadbody_closed = pTrader->m_deadbody_closed;
-
-        m_trader_flags.assign(pTrader->m_trader_flags.get());
-
+        dialog_manager->SetStartDialog(CharacterInfo().StartDialog());
+        dialog_manager->SetDefaultStartDialog(CharacterInfo().StartDialog());
     }
-    else
-    {
-        CharacterInfo().m_SpecificCharacter.Load("mp_actor");
-        CharacterInfo().InitSpecificCharacter("mp_actor");
-        CharacterInfo().m_SpecificCharacter.data()->m_sGameName =
-            (E->name_replace()[0]) ? E->name_replace() : *pThis->cName();
-        m_game_name = (E->name_replace()[0]) ? E->name_replace() : *pThis->cName();
-    }
+    m_game_name = pTrader->m_character_name;
 
-    inventory().CalcTotalWeight();
+    m_deadbody_can_take = pTrader->m_deadbody_can_take;
+    m_deadbody_closed = pTrader->m_deadbody_closed;
+
+    m_trader_flags.assign(pTrader->m_trader_flags.get());
+
+	inventory().CalcTotalWeight();
+
+    if (!pThis->Local())  return TRUE;
 
     if (!pThis->Local()) return TRUE;
 
@@ -181,7 +171,7 @@ BOOL CInventoryOwner::net_Spawn(CSE_Abstract* DC)
 
 void CInventoryOwner::net_Destroy()
 {
-    CAttachmentOwner::net_Destroy();
+
 
     inventory().Clear();
     inventory().SetActiveSlot(NO_ACTIVE_SLOT);
