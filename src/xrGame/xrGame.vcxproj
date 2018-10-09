@@ -195,6 +195,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)OpenAutomate\inc;$(xrExternals)CxImage;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -2293,7 +2294,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-
     <ClCompile Include="attachable_item.cpp" />
     <ClCompile Include="attachment_owner.cpp" />
     <ClCompile Include="autosave_manager.cpp" />
@@ -2302,7 +2302,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="BastArtifact.cpp" />
-
     <ClCompile Include="BlackDrops.cpp" />
     <ClCompile Include="BlackGraviArtifact.cpp" />
     <ClCompile Include="Bolt.cpp" />
@@ -2367,7 +2366,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ClimableObject.cpp" />
-
     <ClCompile Include="console_commands.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2382,7 +2380,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-
     <ClCompile Include="CustomDetector.cpp" />
     <ClCompile Include="CustomMonster.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -2515,19 +2512,14 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-
     <ClCompile Include="game_cl_single.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="game_news.cpp" />
-
     <ClCompile Include="game_sv_base.cpp" />
-
     <ClCompile Include="game_sv_event_queue.cpp" />
-
     <ClCompile Include="game_sv_single.cpp" />
-
     <ClCompile Include="game_type.cpp" />
     <ClCompile Include="GlobalFeelTouch.cpp" />
     <ClCompile Include="GraviArtifact.cpp" />
@@ -2707,7 +2699,6 @@
     <ClCompile Include="level_sounds.cpp" />
     <ClCompile Include="Level_start.cpp" />
     <ClCompile Include="location_manager.cpp" />
-
     <ClCompile Include="magic_box3.cpp" />
     <ClCompile Include="magic_minimize_1d.cpp" />
     <ClCompile Include="MainMenu.cpp" />
@@ -2763,7 +2754,6 @@
     <ClCompile Include="moving_objects_dynamic.cpp" />
     <ClCompile Include="moving_objects_dynamic_collision.cpp" />
     <ClCompile Include="moving_objects_static.cpp" />
-
     <ClCompile Include="Needles.cpp" />
     <ClCompile Include="NoGravityZone.cpp" />
     <ClCompile Include="object_actions.cpp" />
@@ -2859,13 +2849,11 @@
     <ClCompile Include="physic_item.cpp" />
     <ClCompile Include="player_hud.cpp" />
     <ClCompile Include="player_hud_tune.cpp" />
-
     <ClCompile Include="poses_blending.cpp" />
     <ClCompile Include="pose_extrapolation.cpp" />
     <ClCompile Include="PostprocessAnimator.cpp" />
     <ClCompile Include="pp_effector_custom.cpp" />
     <ClCompile Include="pp_effector_distance.cpp" />
-
     <ClCompile Include="property_evaluator_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2889,7 +2877,6 @@
     <ClCompile Include="relation_registry_fights.cpp" />
     <ClCompile Include="restricted_object.cpp" />
     <ClCompile Include="restricted_object_obstacle.cpp" />
-
     <ClCompile Include="RocketLauncher.cpp" />
     <ClCompile Include="RustyHairArtifact.cpp" />
     <ClCompile Include="saved_game_wrapper.cpp" />
@@ -2903,7 +2890,6 @@
     </ClCompile>
     <ClCompile Include="screenshots_common.cpp" />
     <ClCompile Include="screenshots_writer.cpp" />
-
     <ClCompile Include="ScriptXMLInit.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3318,7 +3304,6 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="static_obstacles_avoider.cpp" />
-
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -3349,7 +3334,6 @@
     <ClCompile Include="trajectories.cpp" />
     <ClCompile Include="UICursor.cpp" />
     <ClCompile Include="UIDialogHolder.cpp" />
-
     <ClCompile Include="UIGameCustom.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3358,20 +3342,15 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-
     <ClCompile Include="UIGameSP.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-
     <ClCompile Include="UIStaticItem.cpp" />
-
     <ClCompile Include="UIZoneMap.cpp" />
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
-
     <ClCompile Include="ui\map_hint.cpp" />
     <ClCompile Include="ui\MMSound.cpp" />
-
     <ClCompile Include="ui\UI3tButton.cpp" />
     <ClCompile Include="ui\UIAchievements.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3408,12 +3387,10 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-
     <ClCompile Include="ui\UICarPanel.cpp" />
     <ClCompile Include="ui\UICellCustomItems.cpp" />
     <ClCompile Include="ui\UICellItem.cpp" />
     <ClCompile Include="ui\UICellItemFactory.cpp" />
-
     <ClCompile Include="ui\UICharacterInfo.cpp" />
     <ClCompile Include="ui\UICheckButton.cpp" />
     <ClCompile Include="ui\UIComboBox.cpp" />
@@ -3423,12 +3400,6 @@
     </ClCompile>
     <ClCompile Include="ui\UICustomEdit.cpp" />
     <ClCompile Include="ui\UICustomSpin.cpp" />
-    <ClCompile Include="ui\UIDebugFonts.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_COC|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="ui\UIDemoPlayControl.cpp" />
     <ClCompile Include="ui\UIDialogWnd.cpp" />
     <ClCompile Include="ui\UIDoubleProgressBar.cpp" />
@@ -3520,7 +3491,6 @@
     <ClCompile Include="ui\UIMessagesWindow.cpp" />
     <ClCompile Include="ui\UIMMShniaga.cpp" />
     <ClCompile Include="ui\UIMotionIcon.cpp" />
-
     <ClCompile Include="ui\UINewsItemWnd.cpp" />
     <ClCompile Include="ui\UIOptionsItem.cpp" />
     <ClCompile Include="ui\UIOptionsManager.cpp" />
@@ -3572,7 +3542,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ui\UIStatix.cpp" />
-
     <ClCompile Include="ui\UISubLine.cpp" />
     <ClCompile Include="ui\UITabButton.cpp" />
     <ClCompile Include="ui\UITabButtonMP.cpp" />
@@ -3586,7 +3555,6 @@
     <ClCompile Include="ui\UITaskWnd.cpp" />
     <ClCompile Include="ui\UITextureMaster.cpp" />
     <ClCompile Include="ui\UITrackBar.cpp" />
-
     <ClCompile Include="ui\UIWindow.cpp" />
     <ClCompile Include="ui\UIWindow_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
