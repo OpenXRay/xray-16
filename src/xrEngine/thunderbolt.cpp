@@ -78,6 +78,7 @@ void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
 
     // sound
     m_name = pIni.r_string(sect, "sound");
+    xr_strcpy(tmp, m_name);
 #if defined(LINUX)
     while (char* sep = strchr(tmp, '\\')) *sep = '/';
 #endif
