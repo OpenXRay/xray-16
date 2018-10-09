@@ -356,7 +356,11 @@ struct THREAD_STARTUP
     char* name;
     void* args;
 };
+#if defined(WINDOWS)
 void __cdecl thread_entry(void* _params)
+#elif defined(LINUX)
+void *__cdecl thread_entry(void* _params)
+#endif
 {
     // initialize
     THREAD_STARTUP* startup = (THREAD_STARTUP*)_params;
@@ -384,7 +388,8 @@ void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* argli
     pthread_t handle;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-    pthread_create(&handle, &attr, NULL, arglist); //TODO convert entry
+    pthread_attr_setstacksize(&attr, stack);
+    pthread_create(&handle, &attr, &thread_entry, startup);
     pthread_attr_destroy(&attr);
 #endif
 }
