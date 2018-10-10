@@ -471,7 +471,7 @@ function action_car:go_to_walkpoint(pt)
 		end
 		xr_logic.mob_capture(self.object, true)
 		action(self.object,
-			move(accel, self.speed), --move.on + 
+			move(accel, 60), --move.on + 
 			--object("right_light", self.headlights),
 			--object("left_light", self.headlights),
 			cond(cond.time_end, time_infinite)) --self.fc_upd_avg))
@@ -1037,34 +1037,30 @@ function action_car:fast_update()
 		return false
 	end
 
-	if self.state_moving ~= state_moving_end and
-	   self.state_moving ~= state_moving_stop and 
-	   cur_time >= self.last_pos_time + 5000
-	then
-	    printf("car <state>: moving(%s)", utils.to_str(self.state_moving))
-		if not self.last_pos then
-			self.last_pos = self.object:position()
-			self.last_pos_time = cur_time
+	if self.state_moving ~= state_moving_end and self.state_moving ~= state_moving_stop and cur_time >= self.last_pos_time + 5000 then
+		if (self.state_moving == state_moving_stuck) then
+			self.state_moving = state_moving_stop
 		else
-			local cur_pos = self.object:position()
-			local diff = self.last_pos:distance_to(cur_pos)
-			if diff < self.min_delta_per_sec then
-                printf("car <move>: got stuck (%s < %s) - stop.", diff, self.min_delta_per_sec)
-				self.state_moving = state_moving_stuck
+			printf("car <state>: moving(%s)", utils.to_str(self.state_moving))
+			if not self.last_pos then
+				self.last_pos = self.object:position()
+				self.last_pos_time = cur_time
 			else
-			    self.last_pos = cur_pos
-				if (self.state_moving == state_moving_stuck) then
-					self.state_moving = state_moving_fwd
+				local cur_pos = self.object:position()
+				local diff = self.last_pos:distance_to(cur_pos)
+				if diff < self.min_delta_per_sec then
+					printf("car <move>: got stuck (%s < %s) - stop.", diff, self.min_delta_per_sec)
+					self.state_moving = state_moving_stuck
+				else
+					self.last_pos = cur_pos
 				end
+				self.last_pos_time = cur_time
 			end
-			self.last_pos_time = cur_time
 		end
 	end
 	
 	printf("car <state>: check moving2 - [%s][%s]", self.state_moving, self.target_walk_pt)
-	if self.state_moving ~= state_moving_end and
-	   self.state_moving ~= state_none
-	then
+	if self.state_moving ~= state_moving_end and self.state_moving ~= state_none then
 	    printf("car <move>: try")
 	    if self.target_walk_pt >= 0 then
 	        if self:at_target_walkpoint() then
