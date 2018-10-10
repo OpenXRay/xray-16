@@ -146,6 +146,15 @@ local function on_game_load()
 	end
 end 
 
+local function npc_on_before_hit(npc,shit,bone_id,flags)
+	if (npc:has_info("npcx_is_companion") and IsWounded(npc)) then
+		if (db.actor:position():distance_to_sqr(npc:position()) < 225) then
+			flags.ret_value = false
+			return
+		end
+	end
+end
+
 ---------------------------------
 -- Register Callbacks
 ---------------------------------
@@ -163,6 +172,7 @@ function on_game_start()
 	RegisterScriptCallback("save_state",save_state)
 	RegisterScriptCallback("load_state",load_state)
 	RegisterScriptCallback("on_game_load",on_game_load)
+	RegisterScriptCallback("npc_on_before_hit",npc_on_before_hit)
 
 	allow_only_friends_as_companions = ini:r_bool_ex("main","allow_only_friends_as_companions",false)
 	allow_simulation_squads_as_companions = ini:r_bool_ex("main","allow_simulation_squads_as_companions",false)

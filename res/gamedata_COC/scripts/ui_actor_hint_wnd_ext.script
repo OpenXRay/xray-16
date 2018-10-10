@@ -23,6 +23,6 @@ end
 
 function hint_wnd_ext:Reinit(itm1,itm2)
 	-- THIS IS JUST A TEST
-	self.expiration:SetText("Expiration: 2 days, 8 hours")
-	self.expiration:AdjustHeightToText()
+	-- self.expiration:SetText("Expiration: 2 days, 8 hours")
+	-- self.expiration:AdjustHeightToText()
 end

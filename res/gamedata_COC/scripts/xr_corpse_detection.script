@@ -157,6 +157,7 @@ function get_loot_table(ini)
 				end
 			end
 		end
+		return false
 	end
 	)
 	return t

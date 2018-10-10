@@ -264,6 +264,7 @@ function simulation_board:fill_start_position()
 				printf("sim_board:fill_start_position incorrect smart by name %s",section)
 			end
 		end
+		return false
 	end
 	)
 end

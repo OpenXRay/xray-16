@@ -383,6 +383,7 @@ function fill_phrase_table()
 
 			phrase_table[category][temp_table.id] = temp_table
 		end
+		return false
 	end 
 	
 	cfg.ini:section_for_each(itr)

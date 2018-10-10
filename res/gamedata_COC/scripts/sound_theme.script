@@ -847,6 +847,7 @@ function load_sound()
 				theme[section] = theme[section] or looped_sound(snd_ini, section)
 			end
 		end
+		return false
 	end
 
 	snd_ini:section_for_each(itr)

@@ -1519,7 +1519,7 @@ function CAI_Stalker__BeforeHitCallback(npc,shit,bone_id)
 		end
 	end
 	flags.ret_value = true
-	SendScriptCallback("npc_on_before_hit",shit,bone_id,flags)
+	SendScriptCallback("npc_on_before_hit",npc,shit,bone_id,flags)
 	return flags.ret_value
 end 
 
@@ -1832,6 +1832,7 @@ function ini_file_ex:get_sections(keytable)
 		else
 			t[#t+1] = section
 		end
+		return false
 	end
 	self.ini:section_for_each(itr)
 	return t

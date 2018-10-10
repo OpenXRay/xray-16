@@ -185,6 +185,7 @@ function calculate_max_hit_power_value()
 				end
 			end
 		end
+		return false
 	end)
 	
 	-- List of all weapons and their calculated hit_power values
