@@ -13,7 +13,7 @@ function end_animation(npc)
 	end
 end
 -----------------------------------------------------------------------------------------
---								EVALUATOR NPC vs BOX
+--								EVALUATOR
 -----------------------------------------------------------------------------------------
 class "evaluator_eat_medkit" (property_evaluator)
 function evaluator_eat_medkit:__init(npc,name,storage) super (nil, name)
@@ -105,7 +105,7 @@ function evaluator_eat_medkit:evaluate()
 	return false
 end
 -----------------------------------------------------------------------------------------
---								ACTION Eat Medkit
+--								ACTION
 -----------------------------------------------------------------------------------------
 class "action_eat_medkit" (action_base)
 function action_eat_medkit:__init (npc,name,storage) super (nil,name)

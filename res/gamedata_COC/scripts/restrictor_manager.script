@@ -1,3 +1,10 @@
+function get_restrictor_manager(npc)
+	if db.storage[npc:id()].restrictor_manager == nil then
+		db.storage[npc:id()].restrictor_manager = Crestrictor_manager(npc)
+	end
+	return db.storage[npc:id()].restrictor_manager
+end
+
 class "Crestrictor_manager"
 function Crestrictor_manager:__init(obj)
   	self.object = obj
@@ -13,12 +20,6 @@ function Crestrictor_manager:__init(obj)
 	end
 end
 
-
-----------------------------------------------------------------------------------------------------------------------
--- STALKER restrictions
-----------------------------------------------------------------------------------------------------------------------
---' Данная функция вычитывает из логики набор рестрикторов, которые нужно проставить персонажу.
-
 local restr_tbl -- scoped because it's used by all online npc frequently and would be Garbage Collector waste
 function Crestrictor_manager:reset_restrictions(st, section)
 	-- OUT RESTRICTIONS
@@ -32,9 +33,9 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	local size_t = 0
 	local exist_rest
 	
-	for k,v in pairs(old_out_restr) do
+	for k,v in ipairs(old_out_restr) do
 		exist_rest = false
-		for kk,vv in pairs(new_out_restr) do
+		for kk,vv in ipairs(new_out_restr) do
 			if v == vv then
 				exist_rest = true
 				break
@@ -54,9 +55,9 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	restr_tbl = iempty_table(restr_tbl)
 	size_t = 0
 	
-	for k,v in pairs(new_out_restr) do
+	for k,v in ipairs(new_out_restr) do
 		exist_rest = false
-		for kk,vv in pairs(old_out_restr) do
+		for kk,vv in ipairs(old_out_restr) do
 			if v == vv then
 				exist_rest = true
 				break
@@ -81,9 +82,9 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	restr_tbl = iempty_table(restr_tbl)
 	size_t = 0
 	
-	for k,v in pairs(old_in_restr) do
+	for k,v in ipairs(old_in_restr) do
 		exist_rest = false
-		for kk,vv in pairs(new_in_restr) do
+		for kk,vv in ipairs(new_in_restr) do
 			if v == vv then
 				exist_rest = true
 				break
@@ -103,9 +104,9 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	restr_tbl = iempty_table(restr_tbl)
 	size_t = 0
 	
-	for k,v in pairs(new_in_restr) do
+	for k,v in ipairs(new_in_restr) do
 		exist_rest = false
-		for kk,vv in pairs(old_in_restr) do
+		for kk,vv in ipairs(old_in_restr) do
 			if v == vv then
 				exist_rest = true
 				break
@@ -120,12 +121,4 @@ function Crestrictor_manager:reset_restrictions(st, section)
 	for i=1,size_t do
 		self.object:add_restrictions("",restr_tbl[i])
 	end
-end
-
-
-function get_restrictor_manager(npc)
-	if db.storage[npc:id()].restrictor_manager == nil then
-		db.storage[npc:id()].restrictor_manager = Crestrictor_manager(npc)
-	end
-	return db.storage[npc:id()].restrictor_manager
 end

@@ -203,9 +203,9 @@ end
 function take_items_enabled(npc, scheme, st, section)
 	local take_items = nil
 	if(st.ini:line_exist(section, "take_items")) then
-			take_items = st.ini:r_bool_ex(section,"take_items",true)
+		take_items = st.ini:r_bool_ex(section,"take_items",true)
 	else
-			take_items = st.ini:r_bool_ex(st.section_logic,"take_items",true)
+		take_items = st.ini:r_bool_ex(st.section_logic,"take_items",true)
 	end
 	npc:take_items_enabled(take_items)
 end

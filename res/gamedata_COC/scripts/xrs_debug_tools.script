@@ -184,6 +184,7 @@ function activate_feature()
 	actions_by_stalker_ids[188118] = "axr_fight_from_cover"
 	actions_by_stalker_ids[188119] = "axr_anomaly_planner-action_evade_anom"
 	actions_by_stalker_ids[188120] = "axr_npc_vs_box"
+	actions_by_stalker_ids[188121] = "xr_eat_medkit"
 	actions_by_stalker_ids[90005] = "gather_items"
 	actions_by_stalker_ids[90006] = "act_climb"
 	
