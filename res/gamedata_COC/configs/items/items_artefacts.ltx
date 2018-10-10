@@ -17,9 +17,6 @@ af_soul                                  = zone_mincer_weak, 5, 100.0
 af_electra_sparkler                      = zone_witches_galantine, 2, 30.0
 af_electra_flash                         = zone_witches_galantine, 3, 50.0
 af_electra_moonlight                     = zone_witches_galantine, 5, 100.0
-mp_af_electra_flash                      = mp_zone_witches_galantine, 3, 50.0
-mp_af_cta_green                          = mp_zone_witches_galantine, 3, 50.0
-mp_af_cta_blue                           = mp_zone_witches_galantine, 3, 50.0
 
 [af_activation_gravi]
 ;----------------------------------------------------------------------------------------------------------------------------------------
@@ -1410,6 +1407,11 @@ bleeding_restore_speed                   = 0
 hit_absorbation_sect                     = af_compass_absorbation
 degrade_rate 							 = 0	;Artefact Degradation
 
+slot									 = 10
+hud										 = af_compass_hud
+highlight_equipped						 = true
+default_to_ruck							 = false
+
 [af_compass_absorbation]
 burn_immunity                            = 0.02	                                       ;???????????? ??????????
 strike_immunity                          = 0
@@ -1420,6 +1422,9 @@ telepatic_immunity                       = 0.01
 chemical_burn_immunity                   = 0.02
 explosion_immunity                       = 0
 fire_wound_immunity                      = 0
+
+[af_compass_hud]:artefact_hud
+item_visual                              = dynamics\artefacts\af_compass_hud
 
 ;--------------------------------------------------------------------------------
 ; «Oasis»
