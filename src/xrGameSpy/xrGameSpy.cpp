@@ -35,7 +35,8 @@ const char* GetGameVersion() { return GAME_VERSION; }
 
 int GetGameDistribution()
 {
-    int KeyValue;
+    int KeyValue = 0;
+
 #ifdef WINDOWS
     HKEY KeyCDKey = 0;
 
