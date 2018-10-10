@@ -136,7 +136,7 @@ function calculate_recoil(weapon,recoil_values)
 	local ammo_section = weapon:weapon_get_ammo_section(weapon:get_ammo_type())
 	local recoil = (math.sqrt((sys_ini:r_float_ex(ammo_section, "k_cam_dispersion") or 1) ^3) * ((dispersion + dispersion_offset) / dispersion))
 	recoils[weapon:id()][ammo_type] = recoil
-	return (recoil * (axr_main.weapon_is_zoomed and zoom_in_multi or zoom_out_multi))
+	return (recoil * (db.actor:cast_Actor():IsZoomAimingMode() and zoom_in_multi or zoom_out_multi))
 end
 	
 -- Shakes the screen about a bit and pretends to be recoil.
@@ -157,7 +157,7 @@ function create_effect(weapon)
 	
 	-- Cycle through each effect and create a camera effector.
 	-- Only four effects are used (one for each direction type), and any above this will be ignored.
-	local effects_table = axr_main.weapon_is_zoomed and zoom_in_effects or zoom_out_effects
+	local effects_table = db.actor:cast_Actor():IsZoomAimingMode() and zoom_in_effects or zoom_out_effects
 	for key, value in pairs(effects_table) do
 		-- Correct the animation speed if it is out of bounds.
 		if (speed < 1) then speed = 1 elseif (speed > 3) then speed = 3 end

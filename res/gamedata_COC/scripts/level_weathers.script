@@ -373,9 +373,9 @@ function WeatherManager:update()
 		self:select_weather(false)
 	end
 
-	if not (axr_main.weapon_is_zoomed) then
-		self:apply_dof()
-	end
+	-- if not (axr_main.weapon_is_zoomed) then
+		-- self:apply_dof()
+	-- end
 	
 	diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
 	if (prev_sec~=diff_sec) then
