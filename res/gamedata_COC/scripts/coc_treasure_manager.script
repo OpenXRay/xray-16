@@ -36,19 +36,8 @@ local valid_map_spots = {
 }
 
 -- Table to put things that you wish only the specific count can ever only spawn
-local always_in_existence = {
-	["af_compass"] = 1,
-	["detector_advanced"] = 10,
-	["detector_elite"] = 4,
-	["detector_scientific"] = 1,
-	["detector_simple"] = 20,
-	["equ_military_pack"] = 5,
-	["equ_tourist_pack"] = 3,
-	["itm_repairkit_tier_1"] = 7,
-	["itm_repairkit_tier_2"] = 5,
-	["itm_repairkit_tier_3"] = 3,
-	["wpn_gauss"] = 1
-}
+-- This is loaded from a plugin now, add sections to coc_treasure_manager's plugin to fill this.
+local always_in_existence = {}
 ------------------------------------------------------------------------------------------------------------------
 --							PRIVATE
 ------------------------------------------------------------------------------------------------------------------
@@ -57,11 +46,20 @@ local function on_game_load()
 		return
 	end
 	
-	local ignore_list = {
-		["bar_inv_box"] = true,
-		["bar_inventory_box_2"] = true,
-		["val_recover_item_2_spawn"] = true
-	}
+	local ini = ini_file("plugins\\coc_treasure_manager.ltx")
+	
+	local line_count = ini:line_count("always_in_existence") or 0
+	for i = 0, line_count - 1 do
+		local junk, section, quantity = ini:r_line("always_in_existence", i, "", "")
+		always_in_existence[section] = quantity
+	end
+	
+	local ignore_list = {}
+	local line_count = ini:line_count("ignore_stashes") or 0
+	for i = 0, line_count - 1 do
+		local junk, section, junk = ini:r_line("ignore_stashes", i, "", "")
+		ignore_list[section] = true
+	end
 
 	local sim = alife()
 	for id, se_obj in alife():objects() do

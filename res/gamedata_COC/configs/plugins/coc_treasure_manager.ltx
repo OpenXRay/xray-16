@@ -1,6 +1,27 @@
-; This plugin prevents specified item sections from spawning in random stashes.
-; Examples of what would go here are unique items, quest items, script items etc.
+; This plugin configures the coc_treasure_manager script file.
 
+; Ensures that a minimal amount of certain items will be spawned.
+[always_in_existence]
+af_compass = 1
+detector_advanced = 10
+detector_elite = 4
+detector_scientific = 1
+detector_simple = 20
+equ_military_pack = 5
+equ_tourist_pack = 3
+itm_repairkit_tier_1 = 7
+itm_repairkit_tier_2 = 5
+itm_repairkit_tier_3 = 3
+wpn_gauss = 1
+
+; These are 'bad' stashes, i.e. boxes which are unreachable.
+[ignore_stashes]
+bar_inv_box
+bar_inventory_box_2
+val_recover_item_2_spawn
+
+; Prevents specified item sections from spawning in random stashes.
+; Examples of what would go here are unique items, quest items, script items etc.
 [ignore_sections]
 af_oasis_heart
 af_quest_b14_twisted
