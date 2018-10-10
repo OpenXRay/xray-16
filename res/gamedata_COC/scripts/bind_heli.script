@@ -245,15 +245,6 @@ function heli_binder:update( delta )
 		end
 
 		if not (self.is_story_heli) then -- has custom logic from spawn
-			-- Down to Earth achievement
-			-- Kills off any remaining strong helicopters.
-			if (dxr_achievements.has_achievement("down_to_earth")) then
-				local self_destruct = system_ini():r_bool_ex(self.object:section(), "kill_with_achievement", false)
-				if (not self.st.heliObject.m_dead and self_destruct == true) then
-					self.self_destruct = true
-				end
-			end
-			
 			-- heli alife simulation
 			local se_obj = alife_object(self.object:id())
 			if (se_obj and se_obj.player_id) then
@@ -284,9 +275,6 @@ function heli_binder:net_spawn( se_abstract )
 		local se_obj = alife_object(se_abstract.id)
 		if (se_obj.m_smart_terrain_id) then
 			smart_terrain.setup_gulag_and_logic_on_spawn(self.object, self.st, se_obj, modules.stype_heli, self.loaded)
-		end
-			if (axr_main.config:r_value("mm_options","enable_heli_spawn",1,true) == false) then 
-			self.self_destruct = true
 		end
 	end
 
@@ -348,16 +336,14 @@ function heli_binder:check_health()
 	if not heli.m_dead then
 		local health = get_heli_health(heli,self.st)
 
-		if health < self.flame_start_health and not heli.m_flame_started and not self.self_destruct then
+		if health < self.flame_start_health and not heli.m_flame_started then
 			heli_start_flame( self.object )
 			xr_sound.set_sound_play(self.object:id(), self.snd_damage)
 		end
 
-		if (self.self_destruct or health <= 0.005) and not self.st.immortal then
+		if (health <= 0.005) and not self.st.immortal then
 			heli_die( self.object )
-			if not self.self_destruct then
-				xr_sound.set_sound_play(self.object:id(), self.snd_down)
-			end
+			xr_sound.set_sound_play(self.object:id(), self.snd_down)
 			
 			local se_obj = alife_object(self.object:id())
 			if (se_obj) then 
@@ -443,6 +429,10 @@ function get_heli_health( heli, st )
 		health = 1
 		heli:SetfHealth( health )
 	else
+		if (axr_main.config:r_value("mm_options","enable_heli_spawn",1,true) == false) then 
+			heli:SetfHealth(0.004)
+			return 0.004
+		end
 		health = heli:GetfHealth()
 		if health < 0 then
 			heli:SetfHealth( 0 )

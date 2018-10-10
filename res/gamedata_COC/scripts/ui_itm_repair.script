@@ -370,6 +370,8 @@ function repair_ui:OnButton_repair()
 		actor_effects.use_item(self.section.."_dummy")
 		level_weathers.get_weather_manager():forced_weather_change()
 	end
+	
+	ActorMenu.get_actor_menu():UpdateConditionProgressBars()
 end
 
 function repair_ui:AddItemToList(item,listbox,condition)

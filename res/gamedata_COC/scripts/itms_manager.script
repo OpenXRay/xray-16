@@ -84,6 +84,11 @@ function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
 		return 
 	end
 	
+	-- Try attach vanilla addons
+	if (itm2:cast_Weapon()) then
+		itm2:weapon_addon_attach(itm1)
+	end
+		
 	local section = itm1:section()
 	if not (RepairTools[section]) then 
 		return 
@@ -159,7 +164,7 @@ function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
 			end
 		end
 		
-		ActorMenu.get_actor_menu():refresh_current_cell_item()
+		ActorMenu.get_actor_menu():UpdateConditionProgressBars()
 	end
 	
 	local function on_no(owner,p)
