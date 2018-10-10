@@ -6662,6 +6662,7 @@
     <ClInclude Include="ActorNightVision.h">
       <Filter>Core\Client\Objects\actor\base</Filter>
     </ClInclude>
+    <ClInclude Include="Flashlight.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActorNightVision.cpp">
@@ -9696,6 +9697,7 @@
     <ClCompile Include="InventoryOwner_script.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryOwner</Filter>
     </ClCompile>
+    <ClCompile Include="Flashlight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
