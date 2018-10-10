@@ -81,9 +81,9 @@ status_functor_params = monster
 target_functor = level_all_of_faction
 stage_complete = 1
 on_init = %=on_init_heli_hunt(agr_smart_terrain_1_6_army_trader_stalker_task_4)%
-on_complete = %=exit_heli =reward_random_money(8500:9500) =reward_stash(true) =inc_task_stage(agr_smart_terrain_1_6_army_trader_stalker_task_4) =complete_task_inc_goodwill(50:army)%
+on_complete = %=exit_heli =reward_random_money(8000:8500) =reward_stash(true) =inc_task_stage(agr_smart_terrain_1_6_army_trader_stalker_task_4) =complete_task_inc_goodwill(50:army)%
 condlist_0 = {!heli_exist_on_level} fail
-condlist_1 = {=kill_count_ge(agr_smart_terrain_1_6_army_trader_stalker_task_4:1)} complete
+condlist_1 = {=kill_count_ge(agr_smart_terrain_1_6_army_trader_stalker_task_4:5)} complete
 condlist_2 = %=enter_heli%
 ;--------------------------------------------------------------------------------------------------
 ; FIND LEVEL 1 TOOLKIT FOR KIRILOV TASK-
