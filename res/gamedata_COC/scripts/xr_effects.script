@@ -5247,3 +5247,10 @@ function set_actor_community(actor,npc,p)
 	db.actor:set_character_community(faction, 0, 0)
 	game_relations.set_community_goodwill_for_faction(faction)
 end
+
+function clear_all_boosters(actor,npc,p)
+	if not (db.actor) then
+		return
+	end
+	db.actor:cast_Actor():conditions():ClearAllBoosters()
+end

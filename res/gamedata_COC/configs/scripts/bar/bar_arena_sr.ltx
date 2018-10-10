@@ -22,7 +22,7 @@ on_info4 = {+bar_arena_spawn_monstr +bar_arena_burer_choosen} sr_idle@inside %=s
 on_info5 = {+bar_arena_spawn_monstr +bar_arena_savage_choosen} sr_idle@inside %=spawn_object(bar_arena_savage:bar_arena_monstr_walk_2:0)%
 
 [sr_idle@inside]
-on_info = {+bar_arena_monstr_ready} sr_idle@wait_actor %-bar_arena_door_2_open +bar_arena_door_3_open%
+on_info = {+bar_arena_monstr_ready} sr_idle@wait_actor %-bar_arena_door_2_open +bar_arena_door_3_open =clear_all_boosters%
 
 [sr_idle@wait_actor]
 ;on_info = {=bar_arena_actor_fight} sr_idle@fight %-bar_arena_door_3_open%
