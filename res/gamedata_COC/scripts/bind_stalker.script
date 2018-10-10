@@ -109,7 +109,8 @@ function actor_binder:net_destroy()
 				callback.weapon_no_ammo, 
 				callback.item_to_slot,
 				callback.item_to_belt,
-				callback.item_to_ruck
+				callback.item_to_ruck,
+				callback.on_foot_step
 	}
 	for i=1,#t do 
 		if (t[i]) then 
@@ -173,7 +174,8 @@ function actor_binder:reinit()
 				
 				["item_to_belt"]			= bind_stalker_ext.actor_item_to_belt,
 				["item_to_slot"]			= bind_stalker_ext.actor_item_to_slot,
-				["item_to_ruck"]			= bind_stalker_ext.actor_item_to_ruck
+				["item_to_ruck"]			= bind_stalker_ext.actor_item_to_ruck,
+				["on_foot_step"]			= bind_stalker_ext.actor_on_foot_step
 	}
 	for cb,func in pairs(t) do 
 		if (callback[cb] and func) then 

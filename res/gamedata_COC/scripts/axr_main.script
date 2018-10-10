@@ -144,6 +144,7 @@ local intercepts = {
 	actor_item_to_belt			= {},
 	actor_item_to_ruck			= {},
 	actor_item_to_slot			= {},
+	actor_on_foot_step			= {},
 	
 	-- level_input.script 
 	level_input_on_key_press	= {},

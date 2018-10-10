@@ -433,3 +433,7 @@ function actor_on_hit_callback(binder, obj, amount, local_direction, who, bone_i
 	end
 	SendScriptCallback("actor_on_hit_callback",obj, amount, local_direction, who, bone_index)
 end
+
+function actor_on_foot_step(binder,obj,power,b_play,b_on_ground,b_hud_view)
+	SendScriptCallback("actor_on_foot_step",obj,power,b_play,b_on_ground,b_hud_view)
+end
