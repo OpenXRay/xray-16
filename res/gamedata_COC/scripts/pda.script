@@ -346,3 +346,30 @@ function coc_rankings_set_icon(index)
 	end
 	return ""
 end
+
+-- map spots
+function add_location(sid, location, hint)
+	local obj_id = story_objects.object_id_by_story_id[story_id]
+	if (obj_id) then
+		if (level.map_has_object_spot(obj_id, location) == 0) then
+			level.map_add_object_spot(obj_id, location, hint or "")
+		end
+	end
+end
+
+function remove_location(sid, location)
+	local obj_id = story_objects.object_id_by_story_id[story_id]
+	if (obj_id) then
+		if (level.map_has_object_spot(obj_id, location) ~= 0) then
+			level.map_remove_object_spot(obj_id, location)
+		end
+	end
+end
+
+function is_map_spot_present(sid, location)
+	local obj_id = story_objects.object_id_by_story_id[story_id]
+	if (obj_id) then
+		return level.map_has_object_spot(obj_id, location) ~= 0
+	end
+	return false
+end
