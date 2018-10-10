@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 LPCSTR modify_player_name(LPCSTR src_name, string256& dest)
 {
     xr_strcpy(dest, src_name);
-    static const char* denied_symbols = "\\?%%\"";
+    static const char* denied_symbols = DELIMITER "?%%\"";
     size_t tmp_length = xr_strlen(dest);
     size_t start_pos = 0;
     size_t char_pos;

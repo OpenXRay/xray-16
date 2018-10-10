@@ -1,12 +1,12 @@
 #include "pch_script.h"
-#include "phrasedialog.h"
-#include "phrasedialogmanager.h"
-#include "gameobject.h"
+#include "PhraseDialog.h"
+#include "PhraseDialogManager.h"
+#include "GameObject.h"
 #include "ai_debug.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "script_game_object.h"
-#include "actor.h"
+#include "Actor.h"
 
 SPhraseDialogData::SPhraseDialogData()
 {

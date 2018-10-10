@@ -18,7 +18,7 @@
 #include "alife_smart_terrain_registry.h"
 #include "alife_group_registry.h"
 #include "alife_registry_container.h"
-#include "xrserver.h"
+#include "xrServer.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "inventory_upgrade_manager.h"
 #include "Level.h"

@@ -82,7 +82,7 @@ void VerifyPath(LPCSTR path)
     string1024 tmp;
     for (int i = 0; path[i]; i++)
     {
-        if (path[i] != '\\' || i == 0)
+        if (path[i] != _DELIMITER || i == 0)
             continue;
         CopyMemory(tmp, path, i);
         tmp[i] = 0;
@@ -108,7 +108,13 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& hFile)
 #else // EDITOR
 static int open_internal(LPCSTR fn, int& handle)
 {
+#if defined(WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
+#elif defined(LINUX)
+    handle = open(fn, _O_RDONLY);
+
+    return (handle == -1);
+#endif
 }
 
 bool file_handle_internal(LPCSTR file_name, u32& size, int& file_handle)
@@ -514,7 +520,7 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
-    hSrcFile = ::open(cFileName, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    hSrcFile = ::open(cFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);
@@ -557,7 +563,7 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
 #elif defined(LINUX)
-    hSrcFile = ::open(cFileName, O_RDONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    hSrcFile = ::open(cFileName, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);

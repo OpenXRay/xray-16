@@ -68,7 +68,7 @@ void CUITextureMaster::ParseShTexInfo(pcstr path, pcstr xml_file)
 
 bool CUITextureMaster::IsSh(const shared_str& texture_name)
 {
-    return strstr(texture_name.c_str(), "\\") ? false : true;
+    return strstr(texture_name.c_str(), DELIMITER) ? false : true;
 }
 
 void CUITextureMaster::InitTexture(
@@ -145,5 +145,5 @@ void CUITextureMaster::GetTextureShader(const shared_str& texture_name, ui_shade
 
     R_ASSERT3(it != m_textures.end(), "can't find texture", texture_name.c_str());
 
-    sh->create("hud\\default", *((*it).second.file));
+    sh->create("hud" DELIMITER "default", *((*it).second.file));
 }

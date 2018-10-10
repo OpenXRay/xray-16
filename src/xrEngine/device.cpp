@@ -12,6 +12,7 @@
 #if defined(WINDOWS)
 #include <mmsystem.h>
 #endif
+#include "SDL.h"
 #pragma warning(pop)
 
 #include "x_ray.h"
@@ -24,7 +25,9 @@
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
 
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
@@ -107,8 +110,10 @@ void CRenderDevice::End(void)
     g_bRendering = FALSE;
     // end scene
     // Present goes here, so call OA Frame end.
+#if !defined(LINUX)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(Device.fTimeGlobal);
+#endif
     GEnv.Render->End();
 
     if (load_finished && m_editor)
@@ -243,8 +248,10 @@ void CRenderDevice::on_idle()
 
     const auto frameStartTime = TimerGlobal.GetElapsed_ms();
 
+#if !defined(LINUX)
     if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
+#endif
 
     FrameMove();
 

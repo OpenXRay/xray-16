@@ -15,7 +15,7 @@
 #include "PHCommander.h"
 #include "PHScriptCall.h"
 #include "PHSimpleCalls.h"
-#include "xrPhysics/iphworld.h"
+#include "xrPhysics/IPHWorld.h"
 #include "doors_manager.h"
 
 void CScriptGameObject::SetTipText(LPCSTR tip_text) { object().set_tip_text(tip_text); }

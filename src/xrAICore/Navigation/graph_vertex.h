@@ -15,10 +15,10 @@ template <typename _data_type, typename _vertex_id_type, typename _graph_type>
 class CVertex
 {
 public:
-    typedef _vertex_id_type _vertex_id_type;
-    typedef typename _graph_type::CEdge _edge_type;
-    typedef typename _edge_type::_edge_weight_type _edge_weight_type;
-    typedef xr_vector<_edge_type> EDGES;
+    typedef _vertex_id_type vertex_id_type;
+    typedef typename _graph_type::CEdge edge_type;
+    typedef typename _graph_type::CEdge::edge_weight_type edge_weight_type;
+    typedef xr_vector<edge_type> EDGES;
     typedef xr_vector<CVertex*> VERTICES;
 
 private:
@@ -35,7 +35,7 @@ public:
     IC CVertex(const _data_type& data, const _vertex_id_type& vertex_id, size_t* edge_count);
     IC ~CVertex();
     IC bool operator==(const CVertex& obj) const;
-    IC void add_edge(CVertex* vertex, const _edge_weight_type& edge_weight);
+    IC void add_edge(CVertex* vertex, const typename _graph_type::CEdge::edge_weight_type& edge_weight);
     IC void remove_edge(const _vertex_id_type& vertex_id);
     IC void on_edge_addition(CVertex* vertex);
     IC void on_edge_removal(const CVertex* vertex);
@@ -44,8 +44,8 @@ public:
     IC _data_type& data();
     IC void data(const _data_type& data);
     IC const EDGES& edges() const;
-    IC const _edge_type* edge(const _vertex_id_type& vertex_id) const;
-    IC _edge_type* edge(const _vertex_id_type& vertex_id);
+    IC const edge_type* edge(const _vertex_id_type& vertex_id) const;
+    IC edge_type* edge(const _vertex_id_type& vertex_id);
 };
 
 #include "graph_vertex_inline.h"

@@ -1,9 +1,9 @@
-#include "stdafx.h"
-#include "uilistwnd.h"
+#include "StdAfx.h"
+#include "UIListWnd.h"
 //.#include "uiscrollbar.h"
 #include "UIFrameLineWnd.h"
 
-//. #define				ACTIVE_BACKGROUND			"ui\\ui_pop_up_active_back"
+//. #define				ACTIVE_BACKGROUND			"ui" DELIMITER "ui_pop_up_active_back"
 //. #define				ACTIVE_BACKGROUND_WIDTH		16
 //. #define				ACTIVE_BACKGROUND_HEIGHT	16
 
@@ -78,7 +78,7 @@ void CUIListWnd::InitListWnd(Fvector2 pos, Fvector2 size, float item_height)
     m_ScrollBar->Enable(false);
 
     /*
-        m_StaticActiveBackground.Init(ACTIVE_BACKGROUND,"hud\\default", 0,0,alNone);
+        m_StaticActiveBackground.Init(ACTIVE_BACKGROUND,"hud" DELIMITER "default", 0,0,alNone);
         m_StaticActiveBackground.SetTile(iFloor(m_iItemWidth/ACTIVE_BACKGROUND_WIDTH),
                                          iFloor(m_iItemHeight/ACTIVE_BACKGROUND_HEIGHT),
                                          fmod(m_iItemWidth,float(ACTIVE_BACKGROUND_WIDTH)),

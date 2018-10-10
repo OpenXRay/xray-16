@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "WeaponCustomPistolAuto.h"
 
 CWeaponCustomPistolAuto::CWeaponCustomPistolAuto() : CWeaponMagazined(SOUND_TYPE_WEAPON_PISTOL) {}

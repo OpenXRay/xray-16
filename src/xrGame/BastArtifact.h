@@ -4,8 +4,8 @@
 ///////////////////////////////////////////////////////////////
 
 #pragma once
-#include "artefact.h"
-#include "xrEngine/feel_touch.h"
+#include "Artefact.h"
+#include "xrEngine/Feel_Touch.h"
 
 #include "entity_alive.h"
 

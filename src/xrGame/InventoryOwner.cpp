@@ -1,11 +1,11 @@
 #include "pch_script.h"
 #include "InventoryOwner.h"
 #include "entity_alive.h"
-#include "pda.h"
-#include "actor.h"
+#include "PDA.h"
+#include "Actor.h"
 #include "trade.h"
-#include "inventory.h"
-#include "xrserver_objects_alife_items.h"
+#include "Inventory.h"
+#include "xrServer_Objects_ALife_Items.h"
 #include "character_info.h"
 #include "script_game_object.h"
 #include "xrScriptEngine/script_engine.hpp"
@@ -13,14 +13,14 @@
 #include "Level.h"
 #include "game_base_space.h"
 #include "PhraseDialog.h"
-#include "xrserver.h"
+#include "xrServer.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "alife_registry_wrappers.h"
 #include "relation_registry.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
-#include "AI/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "trade_parameters.h"
 #include "purchase_list.h"
 #include "alife_object_registry.h"
@@ -271,7 +271,7 @@ void CInventoryOwner::StartTalk(CInventoryOwner* talk_partner, bool start_trade)
     m_pTalkPartner = talk_partner;
 }
 #include "UIGameSP.h"
-#include "ui\UITalkWnd.h"
+#include "ui/UITalkWnd.h"
 
 void CInventoryOwner::StopTalk()
 {

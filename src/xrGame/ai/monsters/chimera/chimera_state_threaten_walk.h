@@ -1,10 +1,12 @@
 #pragma once
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 
 template <typename _Object>
 class CStateChimeraThreatenWalk : public CStateMonsterMoveToPointEx<_Object>
 {
     typedef CStateMonsterMoveToPointEx<_Object> inherited;
+    using inherited::object;
+    using inherited::data;
 
 public:
     IC CStateChimeraThreatenWalk(_Object* obj) : inherited(obj) {}

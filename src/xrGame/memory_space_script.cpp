@@ -9,7 +9,7 @@
 #include "pch_script.h"
 #include "memory_space.h"
 #include "script_game_object.h"
-#include "gameobject.h"
+#include "GameObject.h"
 #include "entity_alive.h"
 #include "danger_object.h"
 #include "xrScriptEngine/ScriptExporter.hpp"

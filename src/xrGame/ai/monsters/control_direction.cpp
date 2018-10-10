@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_direction.h"
-#include "BaseMonster/base_monster.h"
+#include "basemonster/base_monster.h"
 #include "control_manager.h"
 #include "detail_path_manager.h"
 #include "xrAICore/Navigation/level_graph.h"

@@ -11,8 +11,8 @@
 #include "xr_Server_BattlEye.h"
 #include "xr_Client_BattlEye.h"
 
-#define BATTLEYE_SERVER_DLL "BattlEye\\BEServer.dll"
-#define BATTLEYE_CLIENT_DLL "BattlEye\\BEClient.dll"
+#define BATTLEYE_SERVER_DLL "BattlEye" DELIMITER "BEServer.dll"
+#define BATTLEYE_CLIENT_DLL "BattlEye" DELIMITER "BEClient.dll"
 
 class xrServer;
 class BattlEyeServer;

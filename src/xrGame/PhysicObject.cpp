@@ -1,8 +1,8 @@
 #include "pch_script.h"
-#include "physicobject.h"
+#include "PhysicObject.h"
 #include "xrPhysics/PhysicsShell.h"
 
-#include "xrserver_objects_alife.h"
+#include "xrServer_Objects_ALife.h"
 #include "Level.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
@@ -12,10 +12,10 @@
 #include "game_object_space.h"
 
 #include "moving_bones_snd_player.h"
-#include "xrPhysics/extendedgeom.h"
+#include "xrPhysics/ExtendedGeom.h"
 #ifdef DEBUG
-#include "phdebug.h"
-#include "xrEngine/objectdump.h"
+#include "PHDebug.h"
+#include "xrEngine/ObjectDump.h"
 #endif
 BOOL dbg_draw_doors = false;
 CPhysicObject::CPhysicObject(void)
@@ -753,18 +753,18 @@ void CPhysicObject::PH_A_CrPr()
         K->CalculateBones_Invalidate();
         K->CalculateBones(TRUE);
 #if 0
-		Fbox bb= BoundingBox	();
-		DBG_OpenCashedDraw		();
-		Fvector c,r,p;
-		bb.get_CD(c,r );
-		XFORM().transform_tiny(p,c);
-		DBG_DrawAABB( p, r,color_xrgb(255, 0, 0));
-		//PPhysicsShell()->XFORM().transform_tiny(c);
-		Fmatrix mm;
-		PPhysicsShell()->GetGlobalTransformDynamic(&mm);
-		mm.transform_tiny(p,c);
-		DBG_DrawAABB( p, r,color_xrgb(0, 255, 0));
-		DBG_ClosedCashedDraw	(50000);
+        Fbox bb= BoundingBox	();
+        DBG_OpenCashedDraw		();
+        Fvector c,r,p;
+        bb.get_CD(c,r );
+        XFORM().transform_tiny(p,c);
+        DBG_DrawAABB( p, r,color_xrgb(255, 0, 0));
+        //PPhysicsShell()->XFORM().transform_tiny(c);
+        Fmatrix mm;
+        PPhysicsShell()->GetGlobalTransformDynamic(&mm);
+        mm.transform_tiny(p,c);
+        DBG_DrawAABB( p, r,color_xrgb(0, 255, 0));
+        DBG_ClosedCashedDraw	(50000);
 #endif
         spatial_move();
         m_just_after_spawn = false;

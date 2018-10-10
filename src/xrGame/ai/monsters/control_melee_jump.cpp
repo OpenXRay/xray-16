@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_melee_jump.h"
-#include "BaseMonster/base_monster.h"
+#include "basemonster/base_monster.h"
 #include "control_manager.h"
 
 #define CHECK_YAW 165 * PI / 180

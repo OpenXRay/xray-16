@@ -22,18 +22,20 @@ void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
     struct stat file_info;
     ::fstat(m_file_handle, &file_info);
     u32 file_size = (u32)file_info.st_size;
-    inherited::construct(&m_file_handle, 0, file_size, file_size, window_size);
+    inherited::construct(m_file_handle, 0, file_size, file_size, window_size);
 #endif
 }
 
 void CFileStreamReader::destroy()
 {
+#if defined(WINDOWS)
     HANDLE file_mapping_handle = this->file_mapping_handle();
     inherited::destroy();
-#if defined(WINDOWS)
     CloseHandle(file_mapping_handle);
     CloseHandle(m_file_handle);
 #elif defined(LINUX)
+    int file_mapping_handle = this->file_mapping_handle();
+    inherited::destroy();
     ::close(m_file_handle);
     m_file_handle = -1;
 #endif

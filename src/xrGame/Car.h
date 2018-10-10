@@ -2,19 +2,19 @@
 
 //#if 0
 
-#include "entity.h"
+#include "Entity.h"
 
 #include "xrPhysics/PhysicsShell.h"
-#include "xrPhysics/phupdateobject.h"
+#include "xrPhysics/PHUpdateObject.h"
 #include "script_entity.h"
 #include "CarLights.h"
 
 #include "holder_custom.h"
 #include "PHSkeleton.h"
 #include "DamagableItem.h"
-#include "phcollisiondamagereceiver.h"
+#include "PHCollisionDamageReceiver.h"
 #include "CarDamageParticles.h"
-#include "xrserver_objects_alife.h"
+#include "xrServer_Objects_ALife.h"
 #include "CarDamageParticles.h"
 #include "hit_immunity.h"
 #include "Explosive.h"

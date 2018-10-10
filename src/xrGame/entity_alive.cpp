@@ -1,19 +1,19 @@
 #include "pch_script.h"
 #include "entity_alive.h"
-#include "inventoryowner.h"
-#include "inventory.h"
-#include "xrPhysics/physicsshell.h"
+#include "InventoryOwner.h"
+#include "Inventory.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "xrEngine/GameMtlLib.h"
-#include "phmovementcontrol.h"
-#include "wound.h"
-#include "xrmessages.h"
+#include "PHMovementControl.h"
+#include "Wound.h"
+#include "xrMessages.h"
 #include "Level.h"
 #include "Include/xrRender/Kinematics.h"
 #include "relation_registry.h"
 #include "monster_community.h"
-#include "entitycondition.h"
+#include "EntityCondition.h"
 #include "script_game_object.h"
-#include "hit.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
 #include "CharacterPhysicsSupport.h"
 #include "xrScriptEngine/script_callback_ex.h"
@@ -125,7 +125,7 @@ void CEntityAlive::LoadBloodyWallmarks(LPCSTR section)
     /*
     for (int k=0; k<cnt; ++k)
     {
-        s.create ("effects\\wallmark",_GetItem(wallmarks_name,k,tmp));
+        s.create ("effects" DELIMITER "wallmark",_GetItem(wallmarks_name,k,tmp));
         m_pBloodDropsVector->push_back	(s);
     }
     */
@@ -690,7 +690,7 @@ ICollisionHitCallback* CEntityAlive::get_collision_hit_callback()
     if (cs)
         return cs->get_collision_hit_callback();
     else
-        return false;
+        return nullptr;
 }
 
 void CEntityAlive::set_collision_hit_callback(ICollisionHitCallback* cc)

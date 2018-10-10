@@ -8,32 +8,32 @@
 
 #pragma once
 
-#include "xrEngine/engineapi.h"
-#include "xrCDB/ispatial.h"
-#include "xrEngine/isheduled.h"
-#include "xrEngine/irenderable.h"
-#include "xrEngine/icollidable.h"
+#include "xrEngine/EngineAPI.h"
+#include "xrCDB/ISpatial.h"
+#include "xrEngine/ISheduled.h"
+#include "xrEngine/IRenderable.h"
+#include "xrEngine/ICollidable.h"
 #include "xrEngine/xr_object.h"
-#include "entity.h"
+#include "Entity.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include <loki/typelist.h>
-#include <loki/hierarchygenerators.h>
+#include <loki/Typelist.h>
+#include <loki/HierarchyGenerators.h>
 #include "xrServer_Object_Base.h"
+
+template <typename _type, typename _base>
+struct linear_registrator : public _base, public _type
+{
+};
+
+template <typename _type>
+struct linear_registrator<_type, Loki::EmptyType> : public _type
+{
+};
 
 template <typename _1, typename _2>
 struct heritage
 {
-    template <typename _type, typename _base>
-    struct linear_registrator : public _base, public _type
-    {
-    };
-
-    template <typename _type>
-    struct linear_registrator<_type, Loki::EmptyType> : public _type
-    {
-    };
-
     typedef Loki::Typelist<_1, Loki::Typelist<_2, Loki::NullType>> tl;
     typedef typename Loki::TL::Erase<tl, Loki::EmptyType>::Result pure_tl;
     typedef typename Loki::GenLinearHierarchy<pure_tl, linear_registrator>::LinBase result;
@@ -46,7 +46,7 @@ public:
     IC FactoryObjectWrapperTpl(){};
     virtual ~FactoryObjectWrapperTpl(){};
 
-    virtual IFactoryObject* _construct() { return (call_member<IFactoryObject*>(this, "_construct")); }
+    virtual IFactoryObject* _construct() { return (luabind::call_member<IFactoryObject*>(this, "_construct")); }
     static IFactoryObject* _construct_static(base* self) { return (self->base::_construct()); }
 private:
     // not exported

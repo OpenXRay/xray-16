@@ -1,7 +1,7 @@
 // battleye_system.cpp
 // BattlEyeSystem class implementation
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "battleye_system.h"
 #include "object_broker.h"
 #include "MainMenu.h"

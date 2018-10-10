@@ -1,10 +1,10 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Common/_d3d_extensions.h"
 #include "Common/LevelStructure.hpp"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "utils/xrLC_Light/R_light.h"
-#include "light_db.h"
+#include "Light_DB.h"
 
 CLight_DB::CLight_DB() {}
 CLight_DB::~CLight_DB() {}

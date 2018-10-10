@@ -5,6 +5,8 @@ class CStateControlMoveOut : public CState<_Object>
 {
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::object;
+    using inherited::time_state_started;
 
     Fvector m_look_point;
 

@@ -6,7 +6,7 @@
 //	Description : Stalker movement parameters class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_movement_params.h"
 #include "ai_monster_space.h"
 #include "movement_manager_space.h"
@@ -161,7 +161,7 @@ void stalker_movement_params::cover_loophole_id(shared_str const& loophole_id)
     VERIFY(m_cover);
 
     typedef smart_cover::cover::Loopholes Loopholes;
-    Loopholes const& loopholes = m_cover->description()->loopholes();
+    Loopholes const& loopholes = m_cover->get_description()->loopholes();
     Loopholes::const_iterator i = std::find_if(loopholes.begin(), loopholes.end(), loophole_id_predicate(loophole_id));
 
     VERIFY2(i != loopholes.end(),
@@ -174,7 +174,7 @@ void stalker_movement_params::actualize_loophole() const
 {
     if (m_selected_loophole_actual)
     {
-        if (!m_cover || !m_cover_selected_loophole || m_cover->description()->loophole(m_cover_selected_loophole->id()))
+        if (!m_cover || !m_cover_selected_loophole || m_cover->get_description()->get_loophole(m_cover_selected_loophole->id()))
         {
             if (m_last_selection_time + time_before_selection > Device.dwTimeGlobal)
                 return;
@@ -197,12 +197,12 @@ LPCSTR stalker_movement_params::cover_loophole_id() const
     if (m_cover_loophole)
     {
         VERIFY(m_cover_loophole_id == m_cover_loophole->id());
-        VERIFY(m_cover->description()->loophole(m_cover_loophole_id));
+        VERIFY(m_cover->get_description()->get_loophole(m_cover_loophole_id));
         return (m_cover_loophole_id.c_str());
     }
 
     actualize_loophole();
-    VERIFY(!m_cover_selected_loophole || m_cover->description()->loophole(m_cover_selected_loophole->id()));
+    VERIFY(!m_cover_selected_loophole || m_cover->get_description()->get_loophole(m_cover_selected_loophole->id()));
     return (m_cover_selected_loophole ? m_cover_selected_loophole->id().c_str() : "");
 }
 
@@ -213,11 +213,11 @@ smart_cover::loophole const* stalker_movement_params::cover_loophole() const
     if (m_cover_loophole)
     {
         VERIFY(m_cover_loophole_id == m_cover_loophole->id());
-        VERIFY(m_cover->description()->loophole(m_cover_loophole_id));
+        VERIFY(m_cover->get_description()->get_loophole(m_cover_loophole_id));
         return (m_cover_loophole);
     }
 
     actualize_loophole();
-    VERIFY(!m_cover_selected_loophole || m_cover->description()->loophole(m_cover_selected_loophole->id()));
+    VERIFY(!m_cover_selected_loophole || m_cover->get_description()->get_loophole(m_cover_selected_loophole->id()));
     return (m_cover_selected_loophole);
 }

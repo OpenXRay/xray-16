@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PH_CAPTURE_H
-#define PH_CAPTURE_H
 
 #include "PHUpdateObject.h"
 
@@ -72,4 +70,3 @@ private:
     virtual void PhTune(dReal step);
     virtual void NetRelcase(CPhysicsShell* s);
 };
-#endif

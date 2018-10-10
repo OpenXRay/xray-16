@@ -9,7 +9,7 @@
 #include "pch_script.h"
 #include "ai_monsters_misc.h"
 #include "ai_space.h"
-#include "custommonster.h"
+#include "CustomMonster.h"
 #include "ef_storage.h"
 #include "seniority_hierarchy_holder.h"
 #include "team_hierarchy_holder.h"

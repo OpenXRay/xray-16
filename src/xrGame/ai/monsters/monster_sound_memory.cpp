@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "monster_sound_memory.h"
-#include "BaseMonster/base_monster.h"
+#include "basemonster/base_monster.h"
 
 #define CHECK_SOUND_TYPE(a, b, c) \
     {                             \

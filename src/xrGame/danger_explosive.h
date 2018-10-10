@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "gameobject.h"
-#include "explosive.h"
+#include "GameObject.h"
+#include "Explosive.h"
 
 class CExplosive;
 class CGameObject;

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "particlesobject.h"
+#include "ParticlesObject.h"
 
 // refs
 class CObjectAnimator;

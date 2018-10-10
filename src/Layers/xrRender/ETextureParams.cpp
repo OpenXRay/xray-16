@@ -157,75 +157,75 @@ void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::T
     OnTypeChangeEvent = on_type_change;
     PropValue* P = PHelper().CreateToken32(items, "Type", (u32*)&type, ttype_token);
     P->OnChangeEvent.bind(this, &STextureParams::OnTypeChange);
-    PHelper().CreateCaption(items, "Source\\Width", shared_str().printf("%d", width));
-    PHelper().CreateCaption(items, "Source\\Height", shared_str().printf("%d", height));
-    PHelper().CreateCaption(items, "Source\\Alpha", HasAlpha() ? "present" : "absent");
+    PHelper().CreateCaption(items, "Source" DELIMITER "Width", shared_str().printf("%d", width));
+    PHelper().CreateCaption(items, "Source" DELIMITER "Height", shared_str().printf("%d", height));
+    PHelper().CreateCaption(items, "Source" DELIMITER "Alpha", HasAlpha() ? "present" : "absent");
     switch (type)
     {
     case ttImage:
     case ttCubeMap:
         PHelper().CreateToken32(items, "Format", (u32*)&fmt, tfmt_token);
 
-        PHelper().CreateFlag32(items, "MipMaps\\Enabled", &flags, flGenerateMipMaps);
-        PHelper().CreateToken32(items, "MipMaps\\Filter", (u32*)&mip_filter, tparam_token);
+        PHelper().CreateFlag32(items, "MipMaps" DELIMITER "Enabled", &flags, flGenerateMipMaps);
+        PHelper().CreateToken32(items, "MipMaps" DELIMITER "Filter", (u32*)&mip_filter, tparam_token);
 
-        P = PHelper().CreateToken32(items, "Bump\\Mode", (u32*)&bump_mode, tbmode_token);
+        P = PHelper().CreateToken32(items, "Bump" DELIMITER "Mode", (u32*)&bump_mode, tbmode_token);
         P->OnChangeEvent.bind(this, &STextureParams::OnTypeChange);
         if (tbmUse == bump_mode || tbmUseParallax == bump_mode)
         {
             AnsiString path;
             path = base_name;
-            PHelper().CreateChoose(items, "Bump\\Texture", &bump_name, smTexture, path.c_str());
+            PHelper().CreateChoose(items, "Bump" DELIMITER "Texture", &bump_name, smTexture, path.c_str());
         }
 
-        PHelper().CreateFlag32(items, "Details\\Use As Diffuse", &flags, flDiffuseDetail);
-        PHelper().CreateFlag32(items, "Details\\Use As Bump (R2)", &flags, flBumpDetail);
-        PHelper().CreateChoose(items, "Details\\Texture", &detail_name, smTexture);
-        PHelper().CreateFloat(items, "Details\\Scale", &detail_scale, 0.1f, 10000.f, 0.1f, 2);
+        PHelper().CreateFlag32(items, "Details" DELIMITER "Use As Diffuse", &flags, flDiffuseDetail);
+        PHelper().CreateFlag32(items, "Details" DELIMITER "Use As Bump (R2)", &flags, flBumpDetail);
+        PHelper().CreateChoose(items, "Details" DELIMITER "Texture", &detail_name, smTexture);
+        PHelper().CreateFloat(items, "Details" DELIMITER "Scale", &detail_scale, 0.1f, 10000.f, 0.1f, 2);
 
-        PHelper().CreateToken32(items, "Material\\Base", (u32*)&material, tmtl_token);
-        PHelper().CreateFloat(items, "Material\\Weight", &material_weight);
+        PHelper().CreateToken32(items, "Material" DELIMITER "Base", (u32*)&material, tmtl_token);
+        PHelper().CreateFloat(items, "Material" DELIMITER "Weight", &material_weight);
 
-        //      PHelper().CreateFlag32      (items, "Flags\\Binary Alpha",      &flags,             flBinaryAlpha);
-        PHelper().CreateFlag32(items, "Flags\\Dither", &flags, flDitherColor);
-        PHelper().CreateFlag32(items, "Flags\\Dither Each MIP", &flags, flDitherEachMIPLevel);
-        PHelper().CreateFlag32(items, "Flags\\Implicit Lighted", &flags, flImplicitLighted);
+        //      PHelper().CreateFlag32      (items, "Flags" DELIMITER "Binary Alpha",      &flags,             flBinaryAlpha);
+        PHelper().CreateFlag32(items, "Flags" DELIMITER "Dither", &flags, flDitherColor);
+        PHelper().CreateFlag32(items, "Flags" DELIMITER "Dither Each MIP", &flags, flDitherEachMIPLevel);
+        PHelper().CreateFlag32(items, "Flags" DELIMITER "Implicit Lighted", &flags, flImplicitLighted);
 
-        PHelper().CreateFlag32(items, "Fade\\Enable Color", &flags, flFadeToColor);
-        PHelper().CreateFlag32(items, "Fade\\Enabled Alpha", &flags, flFadeToAlpha);
-        PHelper().CreateU8(items, "Fade\\Delay 'n' MIP", &fade_delay, 0, 255);
-        PHelper().CreateU32(items, "Fade\\% of color to fade in", &fade_amount, 0, 100, 0);
-        PHelper().CreateColor(items, "Fade\\Color", &fade_color);
-        PHelper().CreateU8(items, "Fade\\Alpha", ((u8*)&fade_color) + 3, 0, 255);
+        PHelper().CreateFlag32(items, "Fade" DELIMITER "Enable Color", &flags, flFadeToColor);
+        PHelper().CreateFlag32(items, "Fade" DELIMITER "Enabled Alpha", &flags, flFadeToAlpha);
+        PHelper().CreateU8(items, "Fade" DELIMITER "Delay 'n' MIP", &fade_delay, 0, 255);
+        PHelper().CreateU32(items, "Fade" DELIMITER "% of color to fade in", &fade_amount, 0, 100, 0);
+        PHelper().CreateColor(items, "Fade" DELIMITER "Color", &fade_color);
+        PHelper().CreateU8(items, "Fade" DELIMITER "Alpha", ((u8*)&fade_color) + 3, 0, 255);
 
-        PHelper().CreateFlag32(items, "Border\\Enabled Color", &flags, flColorBorder);
-        PHelper().CreateFlag32(items, "Border\\Enabled Alpha", &flags, flAlphaBorder);
-        PHelper().CreateColor(items, "Border\\Color", &border_color);
+        PHelper().CreateFlag32(items, "Border" DELIMITER "Enabled Color", &flags, flColorBorder);
+        PHelper().CreateFlag32(items, "Border" DELIMITER "Enabled Alpha", &flags, flAlphaBorder);
+        PHelper().CreateColor(items, "Border" DELIMITER "Color", &border_color);
         break;
     case ttBumpMap:
-        PHelper().CreateChoose(items, "Bump\\Special NormalMap", &ext_normal_map_name, smTexture, base_name);
-        PHelper().CreateFloat(items, "Bump\\Virtual Height (m)", &bump_virtual_height, 0.f, 0.1f, 0.001f, 3);
+        PHelper().CreateChoose(items, "Bump" DELIMITER "Special NormalMap", &ext_normal_map_name, smTexture, base_name);
+        PHelper().CreateFloat(items, "Bump" DELIMITER "Virtual Height (m)", &bump_virtual_height, 0.f, 0.1f, 0.001f, 3);
         break;
     case ttNormalMap:
         P = PHelper().CreateToken32(items, "Format", (u32*)&fmt, tfmt_token);
         P->Owner()->Enable(false);
 
-        PHelper().CreateFlag32(items, "MipMaps\\Enabled", &flags, flGenerateMipMaps);
-        PHelper().CreateToken32(items, "MipMaps\\Filter", (u32*)&mip_filter, tparam_token);
+        PHelper().CreateFlag32(items, "MipMaps" DELIMITER "Enabled", &flags, flGenerateMipMaps);
+        PHelper().CreateToken32(items, "MipMaps" DELIMITER "Filter", (u32*)&mip_filter, tparam_token);
         break;
     case ttTerrain:
         P = PHelper().CreateToken32(items, "Format", (u32*)&fmt, tfmt_token);
         P->Owner()->Enable(false);
 
-        PHelper().CreateFlag32(items, "Details\\Use As Diffuse", &flags, flDiffuseDetail);
-        PHelper().CreateFlag32(items, "Details\\Use As Bump (R2)", &flags, flBumpDetail);
-        PHelper().CreateChoose(items, "Details\\Texture", &detail_name, smTexture);
-        PHelper().CreateFloat(items, "Details\\Scale", &detail_scale, 0.1f, 10000.f, 0.1f, 2);
+        PHelper().CreateFlag32(items, "Details" DELIMITER "Use As Diffuse", &flags, flDiffuseDetail);
+        PHelper().CreateFlag32(items, "Details" DELIMITER "Use As Bump (R2)", &flags, flBumpDetail);
+        PHelper().CreateChoose(items, "Details" DELIMITER "Texture", &detail_name, smTexture);
+        PHelper().CreateFloat(items, "Details" DELIMITER "Scale", &detail_scale, 0.1f, 10000.f, 0.1f, 2);
 
-        PHelper().CreateToken32(items, "Material\\Base", (u32*)&material, tmtl_token);
-        PHelper().CreateFloat(items, "Material\\Weight", &material_weight);
+        PHelper().CreateToken32(items, "Material" DELIMITER "Base", (u32*)&material, tmtl_token);
+        PHelper().CreateFloat(items, "Material" DELIMITER "Weight", &material_weight);
 
-        P = PHelper().CreateFlag32(items, "Flags\\Implicit Lighted", &flags, flImplicitLighted);
+        P = PHelper().CreateFlag32(items, "Flags" DELIMITER "Implicit Lighted", &flags, flImplicitLighted);
         P->Owner()->Enable(false);
         break;
     }
@@ -245,15 +245,15 @@ BOOL STextureParams::similar(STextureParams& tp1, xr_vector<AnsiString>& sel_par
         {
             res = (type == tp1.type);
         }
-        else if (par_name == "Source\\Width")
+        else if (par_name == "Source" DELIMITER "Width")
         {
             res = (width == tp1.width);
         }
-        else if (par_name == "Source\\Height")
+        else if (par_name == "Source" DELIMITER "Height")
         {
             res = (height == tp1.height);
         }
-        else if (par_name == "Source\\Alpha")
+        else if (par_name == "Source" DELIMITER "Alpha")
         {
             res = (HasAlpha() == tp1.HasAlpha());
         }
@@ -261,103 +261,103 @@ BOOL STextureParams::similar(STextureParams& tp1, xr_vector<AnsiString>& sel_par
         {
             res = (fmt == tp1.fmt);
         }
-        else if (par_name == "MipMaps\\Enabled")
+        else if (par_name == "MipMaps" DELIMITER "Enabled")
         {
             res = (flags.test(flGenerateMipMaps) == tp1.flags.test(flGenerateMipMaps));
         }
-        else if (par_name == "MipMaps\\Filter")
+        else if (par_name == "MipMaps" DELIMITER "Filter")
         {
             res = (mip_filter == tp1.mip_filter);
         }
-        else if (par_name == "Bump\\Mode")
+        else if (par_name == "Bump" DELIMITER "Mode")
         {
             res = (bump_mode == tp1.bump_mode);
         }
-        else if (par_name == "Bump\\Texture")
+        else if (par_name == "Bump" DELIMITER "Texture")
         {
             res = (bump_name == tp1.bump_name);
         }
-        else if (par_name == "Details\\Use As Diffuse")
+        else if (par_name == "Details" DELIMITER "Use As Diffuse")
         {
             res = (flags.test(flDiffuseDetail) == tp1.flags.test(flDiffuseDetail));
         }
-        else if (par_name == "Details\\Use As Bump (R2)")
+        else if (par_name == "Details" DELIMITER "Use As Bump (R2)")
         {
             res = (flags.test(flBumpDetail) == tp1.flags.test(flBumpDetail));
         }
-        else if (par_name == "Details\\Texture")
+        else if (par_name == "Details" DELIMITER "Texture")
         {
             res = (detail_name == tp1.detail_name);
         }
-        else if (par_name == "Details\\Scale")
+        else if (par_name == "Details" DELIMITER "Scale")
         {
             res = (fsimilar(detail_scale, tp1.detail_scale));
         }
-        else if (par_name == "Material\\Base")
+        else if (par_name == "Material" DELIMITER "Base")
         {
             res = (material == tp1.material);
         }
-        else if (par_name == "Material\\Weight")
+        else if (par_name == "Material" DELIMITER "Weight")
         {
             res = (fsimilar(material_weight, tp1.material_weight));
         }
-        else if (par_name == "Flags\\Binary Alpha")
+        else if (par_name == "Flags" DELIMITER "Binary Alpha")
         {
             res = (flags.test(flBinaryAlpha) == tp1.flags.test(flBinaryAlpha));
         }
-        else if (par_name == "Flags\\Dither")
+        else if (par_name == "Flags" DELIMITER "Dither")
         {
             res = (flags.test(flDitherColor) == tp1.flags.test(flDitherColor));
         }
-        else if (par_name == "Flags\\Dither Each MIP")
+        else if (par_name == "Flags" DELIMITER "Dither Each MIP")
         {
             res = (flags.test(flDitherEachMIPLevel) == tp1.flags.test(flDitherEachMIPLevel));
         }
-        else if (par_name == "Flags\\Implicit Lighted")
+        else if (par_name == "Flags" DELIMITER "Implicit Lighted")
         {
             res = (flags.test(flImplicitLighted) == tp1.flags.test(flImplicitLighted));
         }
-        else if (par_name == "Fade\\Enable Color")
+        else if (par_name == "Fade" DELIMITER "Enable Color")
         {
             res = (flags.test(flFadeToColor) == tp1.flags.test(flFadeToColor));
         }
-        else if (par_name == "Fade\\Enabled Alpha")
+        else if (par_name == "Fade" DELIMITER "Enabled Alpha")
         {
             res = (flags.test(flFadeToAlpha) == tp1.flags.test(flFadeToAlpha));
         }
-        else if (par_name == "Fade\\Delay 'n' MIP")
+        else if (par_name == "Fade" DELIMITER "Delay 'n' MIP")
         {
             res = (fade_delay == tp1.fade_delay);
         }
-        else if (par_name == "Fade\\% of color to fade in")
+        else if (par_name == "Fade" DELIMITER "% of color to fade in")
         {
             res = (fade_amount == tp1.fade_amount);
         }
-        else if (par_name == "Fade\\Color")
+        else if (par_name == "Fade" DELIMITER "Color")
         {
             res = (fade_color == tp1.fade_color);
         }
-        else if (par_name == "Fade\\Alpha")
+        else if (par_name == "Fade" DELIMITER "Alpha")
         {
             res = (color_get_A(fade_color) == color_get_A(tp1.fade_color));
         }
-        else if (par_name == "Border\\Enabled Color")
+        else if (par_name == "Border" DELIMITER "Enabled Color")
         {
             res = (flags.test(flColorBorder) == tp1.flags.test(flColorBorder));
         }
-        else if (par_name == "Border\\Enabled Alpha")
+        else if (par_name == "Border" DELIMITER "Enabled Alpha")
         {
             res = (flags.test(flAlphaBorder) == tp1.flags.test(flAlphaBorder));
         }
-        else if (par_name == "Border\\Color")
+        else if (par_name == "Border" DELIMITER "Color")
         {
             res = (border_color == tp1.border_color);
         }
-        else if (par_name == "Bump\\Special NormalMap")
+        else if (par_name == "Bump" DELIMITER "Special NormalMap")
         {
             res = (ext_normal_map_name == tp1.ext_normal_map_name);
         }
-        else if (par_name == "Bump\\Virtual Height (m)")
+        else if (par_name == "Bump" DELIMITER "Virtual Height (m)")
         {
             res = (fsimilar(bump_virtual_height, tp1.bump_virtual_height));
         }

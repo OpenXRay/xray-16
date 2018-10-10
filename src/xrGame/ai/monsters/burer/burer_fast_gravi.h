@@ -1,5 +1,5 @@
 #pragma once
-#include "ai/Monsters/control_combase.h"
+#include "ai/monsters/control_combase.h"
 
 class CBurerFastGravi : public CControl_ComCustom<>
 {

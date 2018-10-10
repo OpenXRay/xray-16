@@ -71,7 +71,7 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\ambients.ltx"), false, false, true);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), false, false, true);
 
     for (const auto &i : m_ambients)
         i->save(*config);

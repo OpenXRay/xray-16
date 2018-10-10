@@ -6,7 +6,7 @@
 //	Description : Stalker animation data
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_animation_data.h"
 
 CStalkerAnimationData::CStalkerAnimationData(IKinematicsAnimated* skeleton_animated)

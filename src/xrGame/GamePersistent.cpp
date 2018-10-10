@@ -1,7 +1,7 @@
 #include "pch_script.h"
-#include "gamepersistent.h"
+#include "GamePersistent.h"
 #include "xrCore/FMesh.hpp"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/GameMtlLib.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/profiler.h"
@@ -15,8 +15,8 @@
 #include "stalker_velocity_holder.h"
 
 #include "ActorEffector.h"
-#include "actor.h"
-#include "spectator.h"
+#include "Actor.h"
+#include "Spectator.h"
 
 #include "xrUICore/XML/UITextureMaster.h"
 
@@ -26,9 +26,9 @@
 
 #include "holder_custom.h"
 #include "game_cl_base.h"
-#include "xrserver_objects_alife_monsters.h"
+#include "xrServer_Objects_ALife_Monsters.h"
 #include "xrServerEntities/xrServer_Object_Base.h"
-#include "UI/UIGameTutorial.h"
+#include "ui/UIGameTutorial.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrEngine/xr_input.h"
@@ -36,7 +36,7 @@
 #include "ui/UILoadingScreen.h"
 
 #ifndef MASTER_GOLD
-#include "custommonster.h"
+#include "CustomMonster.h"
 #endif // MASTER_GOLD
 
 #ifndef _EDITOR
@@ -51,7 +51,7 @@ void FillUIStyleToken()
     UIStyleToken.emplace_back("ui_style_default", 0);
 
     string_path path;
-    strconcat(sizeof(path), path, UI_PATH, "\\styles\\");
+    strconcat(sizeof(path), path, UI_PATH, DELIMITER "styles" DELIMITER);
     FS.update_path(path, _game_config_, path);
     auto styles = FS.file_list_open(path, FS_ListFolders | FS_RootOnly);
     if (styles != nullptr)
@@ -59,7 +59,7 @@ void FillUIStyleToken()
         int i = 1; // It's 1, because 0 is default style
         for (const auto& style : *styles)
         {
-            const auto pos = strchr(style, '\\');
+            const auto pos = strchr(style, _DELIMITER);
             *pos = '\0'; // we don't need that backslash in the end
             UIStyleToken.emplace_back(xr_strdup(style), i++); // It's important to have postfix increment!
         }
@@ -82,7 +82,7 @@ void SetupUIStyle()
             selectedStyle = token.name;
 
     string128 selectedStylePath;
-    strconcat(sizeof(selectedStylePath), selectedStylePath, UI_PATH, "\\styles\\", selectedStyle);
+    strconcat(sizeof(selectedStylePath), selectedStylePath, UI_PATH, DELIMITER "styles" DELIMITER, selectedStyle);
 
     UI_PATH = xr_strdup(selectedStylePath);
     defaultUIStyle = false;
@@ -465,6 +465,7 @@ void CGamePersistent::WeathersUpdate()
 
 bool allow_intro()
 {
+#if defined(WINDOWS)
 #ifdef MASTER_GOLD
     if (g_SASH.IsRunning())
 #else // #ifdef MASTER_GOLD
@@ -474,6 +475,7 @@ bool allow_intro()
         return false;
     }
     else
+#endif
         return true;
 }
 
@@ -912,7 +914,7 @@ void CGamePersistent::SetEffectorDOF(const Fvector& needed_dof)
 }
 
 void CGamePersistent::RestoreEffectorDOF() { SetEffectorDOF(m_dof[3]); }
-#include "hudmanager.h"
+#include "HUDManager.h"
 
 //	m_dof		[4];	// 0-dest 1-current 2-from 3-original
 void CGamePersistent::UpdateDof()
@@ -942,7 +944,6 @@ void CGamePersistent::UpdateDof()
     (m_dof[0].z < m_dof[2].z) ? clamp(m_dof[1].z, m_dof[0].z, m_dof[2].z) : clamp(m_dof[1].z, m_dof[2].z, m_dof[0].z);
 }
 
-#include "ui\uimainingamewnd.h"
 void CGamePersistent::OnSectorChanged(int sector)
 {
     if (CurrentGameUI())

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "burer.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "CharacterPhysicsSupport.h"
@@ -18,7 +18,7 @@
 #include "Inventory.h"
 #include "ActorCondition.h"
 #include "xr_level_controller.h"
-#include "weapon.h"
+#include "Weapon.h"
 #include "xrCore/_vector3d_ext.h"
 #include "ai/monsters/control_direction_base.h"
 

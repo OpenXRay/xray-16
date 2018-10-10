@@ -219,7 +219,7 @@ void CConsole::OnRender()
     if (!m_hShader_back)
     {
         m_hShader_back = new FactoryPtr<IUIShader>();
-        (*m_hShader_back)->create("hud\\default", "ui\\ui_console"); // "ui\\ui_empty"
+        (*m_hShader_back)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_console"); // "ui/ui_empty"
     }
 
     if (!pFont)
@@ -446,14 +446,14 @@ void CConsole::DrawBackgrounds(bool bGame)
                 continue;
             }
 
-			r2.set_zero();
+            r2.set_zero();
             tmp.assign(ts.text.c_str(), ts.HL_start);
-			r2.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-			r2.y1 = pr.y1 + i * font_h;
+            r2.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
+            r2.y1 = pr.y1 + i * font_h;
 
             tmp.assign(ts.text.c_str(), ts.HL_finish);
-			r2.x2 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-			r2.y2 = r2.y1 + font_h;
+            r2.x2 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
+            r2.y2 = r2.y1 + font_h;
 
             DrawRect(r2, tips_word_color);
 
@@ -564,7 +564,7 @@ void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
                 else
                 {
                     IConsole_Command::TStatus stat;
-                    cc->Status(stat);
+                    cc->GetStatus(stat);
                     Msg("- %s %s", cc->Name(), stat);
                 }
             }

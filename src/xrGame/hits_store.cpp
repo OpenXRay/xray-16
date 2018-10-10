@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "hits_store.h"
 #include "Common/object_broker.h"
 

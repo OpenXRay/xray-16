@@ -20,9 +20,8 @@ struct CVertexAllocatorFixed
     class CDataStorage
     {
     public:
-        using Vertex = TCompoundVertex;
-        using Index = typename Vertex::Index;
-        using VertexContainer = xr_vector<Vertex>;
+        using Index = typename TCompoundVertex::Index;
+        using VertexContainer = xr_vector<TCompoundVertex>;
 
     protected:
         u32 m_vertex_count;
@@ -33,7 +32,7 @@ struct CVertexAllocatorFixed
         inline virtual ~CDataStorage();
         inline void init();
         inline u32 get_visited_node_count() const;
-        inline Vertex& create_vertex();
+        inline TCompoundVertex& create_vertex();
     };
 };
 

@@ -12,10 +12,12 @@ template <typename _Graph, typename _DataStorage, typename _Parameters, typename
     typename _iteration_type>
 class CPathManagerGeneric
 {
-protected:
+public:
     const _Graph* graph;
-    _DataStorage* data_storage;
     xr_vector<_index_type>* path;
+
+protected:
+    _DataStorage* data_storage;
     _index_type start_node_index;
     _index_type goal_node_index;
     _dist_type max_range;

@@ -6,7 +6,7 @@
 //	Description : Server objects
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_Objects.h"
 #include "game_base_space.h"
 
@@ -156,7 +156,7 @@ void CSE_SpawnGroup::UPDATE_Write			(NET_Packet	&tNetPacket)
 void CSE_SpawnGroup::FillProps				(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps		(pref,values);
-    PHelper().CreateFlag32		(values,PrepareKey(pref,*s_name,"Spawn\\spawn single item only"),	&m_spawn_flags,
+    PHelper().CreateFlag32		(values,PrepareKey(pref,*s_name,"Spawn" DELIMITER "spawn single item only"),	&m_spawn_flags,
 flSpawnSingleItemOnly);
 }
 #endif // #ifndef XRGAME_EXPORTS

@@ -3,10 +3,10 @@
 // BastArtefact - артефакт мочалка
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "BastArtifact.h"
 #include "xrPhysics/PhysicsShell.h"
-#include "xrPhysics/extendedgeom.h"
+#include "xrPhysics/ExtendedGeom.h"
 #include "ParticlesObject.h"
 
 CBastArtefact::CBastArtefact(void) : m_pHitedEntity(nullptr)

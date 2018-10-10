@@ -65,7 +65,7 @@ void CUIFrameWindow::InitTextureEx(LPCSTR texture, LPCSTR sh_name)
     R_ASSERT2(fsimilar(m_tex_rect[fmRT].width(), m_tex_rect[fmRB].width()), texture);
 }
 
-void CUIFrameWindow::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud\\default"); }
+void CUIFrameWindow::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud" DELIMITER "default"); }
 void CUIFrameWindow::Draw()
 {
     if (m_bTextureVisible)

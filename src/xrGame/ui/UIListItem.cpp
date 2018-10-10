@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "UIlistitem.h"
+#include "UIListItem.h"
 
 CUIListItem::CUIListItem(void)
 {

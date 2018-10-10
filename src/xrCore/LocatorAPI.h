@@ -18,9 +18,9 @@
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
 
-#ifdef XR_X64
+#if defined(XR_X64)
 #define _finddata_t _finddata64i32_t
-#elif XR_X86
+#elif defined(XR_X86)
 #define _finddata_t _finddata32_t
 #endif // XR_X64 or XR_X86
 
@@ -47,8 +47,6 @@ struct _finddata32_t
     _fsize_t size;
     char name[FILENAME_MAX];
 };
-
-#define _finddata_t     _finddata64i32_t
 #endif
 
 class CStreamReader;
@@ -96,13 +94,18 @@ public:
 
     struct archive
     {
-        u32 size;
-        u32 vfs_idx;
+        u32 size = 0;
+        u32 vfs_idx = u32(-1);
         shared_str path;
-        void *hSrcFile, *hSrcMap;
-        CInifile* header;
+#if defined(WINDOWS)
+        void *hSrcFile = nullptr;
+        void *hSrcMap = nullptr;
+#elif defined(LINUX)
+        int hSrcFile = 0;
+#endif
+        CInifile* header = nullptr;
         
-        archive() : size(0), vfs_idx(u32(-1)), hSrcFile(nullptr), hSrcMap(nullptr), header(nullptr) {}
+        archive() = default;
         void open();
         void close();
     };
@@ -123,7 +126,7 @@ private:
     using files_set = xr_set<file, file_pred>;
     using files_it = files_set::iterator;
 
-    using FFVec = xr_vector<_finddata64i32_t>;
+    using FFVec = xr_vector<_finddata_t>;
     FFVec rec_files;
 
     int m_iLockRescan;

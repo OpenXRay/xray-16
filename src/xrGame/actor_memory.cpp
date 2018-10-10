@@ -6,11 +6,11 @@
 //	Description : actor memory
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "actor_memory.h"
-#include "actor.h"
-#include "xrEngine/camerabase.h"
-#include "gamepersistent.h"
+#include "Actor.h"
+#include "xrEngine/CameraBase.h"
+#include "GamePersistent.h"
 
 CActorMemory::CActorMemory(CActor* actor) : inherited(actor, 100), m_actor(actor) { VERIFY(m_actor); }
 bool CActorMemory::feel_vision_isRelevant(IGameObject* O)

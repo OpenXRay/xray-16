@@ -4,7 +4,7 @@
 #include "xrEngine/Render.h"
 #ifdef DEBUG
 #include "xrEngine/xr_object.h"
-#include "xrEngine/PS_Instance.h"
+#include "xrEngine/PS_instance.h"
 #endif
 #include "xrEngine/device.h"
 #include "xrEngine/GameFont.h"

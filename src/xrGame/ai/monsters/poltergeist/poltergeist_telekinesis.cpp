@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "poltergeist.h"
 #include "PhysicsShellHolder.h"
 #include "Level.h"
 #include "Actor.h"
-#include "xrPhysics/icolisiondamageinfo.h"
+#include "xrPhysics/IColisiondamageInfo.h"
 CPolterTele::CPolterTele(CPoltergeist* polter) : inherited(polter), m_pmt_object_collision_damage(0.5f) {}
 CPolterTele::~CPolterTele() {}
 void CPolterTele::load(LPCSTR section)

@@ -6,7 +6,7 @@
 //	Description : Space restriction
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "space_restriction.h"
 #include "space_restriction_manager.h"
 #include "ai_space.h"

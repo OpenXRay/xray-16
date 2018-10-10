@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "death_anims.h"
 
 #include "Actor.h"
-#include "Ai/Stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "WeaponShotgun.h"
 #include "Explosive.h"

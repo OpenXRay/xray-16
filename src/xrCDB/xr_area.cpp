@@ -41,7 +41,7 @@ CObjectSpace::~CObjectSpace()
     // sh_debug.destroy			();
     xr_delete(m_pRender);
 #endif
-	delete lock;
+    delete lock;
 }
 //----------------------------------------------------------------------
 
@@ -75,14 +75,14 @@ int CObjectSpace::GetNearest(xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObj
 }
 
 //----------------------------------------------------------------------
-IC int CObjectSpace::GetNearest(
+int CObjectSpace::GetNearest(
     xr_vector<IGameObject*>& q_nearest, const Fvector& point, float range, IGameObject* ignore_object)
 {
     return (GetNearest(r_spatial, q_nearest, point, range, ignore_object));
 }
 
 //----------------------------------------------------------------------
-IC int CObjectSpace::GetNearest(xr_vector<IGameObject*>& q_nearest, ICollisionForm* obj, float range)
+int CObjectSpace::GetNearest(xr_vector<IGameObject*>& q_nearest, ICollisionForm* obj, float range)
 {
     IGameObject* O = obj->Owner();
     return GetNearest(q_nearest, O->GetSpatialData().sphere.P, range + O->GetSpatialData().sphere.R, O);

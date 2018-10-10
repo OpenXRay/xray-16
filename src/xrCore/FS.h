@@ -12,6 +12,7 @@
 #include "_vector3d.h"
 #include "_vector4.h"
 #include "_color.h"
+#include "xrstring.h"
 #include "xrCommon/math_funcs.h"
 #include "xrCommon/xr_stack.h"
 
@@ -409,7 +410,11 @@ private:
 class XRCORE_API CVirtualFileRW : public IReader
 {
 private:
+#if defined(WINDOWS)
     void *hSrcFile, *hSrcMap;
+#elif defined(LINUX)
+    int hSrcFile;
+#endif
 
 public:
     CVirtualFileRW(const char* cFileName);

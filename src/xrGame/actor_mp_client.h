@@ -1,7 +1,7 @@
 #ifndef ACTOR_MP_CLIENT_H
 #define ACTOR_MP_CLIENT_H
 
-#include "actor.h"
+#include "Actor.h"
 #include "actor_mp_state.h"
 #include "anticheat_dumpable_object.h"
 

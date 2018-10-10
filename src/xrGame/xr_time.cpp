@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xr_time.h"
 #include "ui/UIInventoryUtilities.h"
 #include "Level.h"

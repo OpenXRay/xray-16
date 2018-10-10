@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "zombie.h"
 #include "zombie_state_manager.h"
 
@@ -7,15 +7,15 @@
 #include "ai/monsters/control_movement_base.h"
 #include "ai/monsters/control_path_builder_base.h"
 
-#include "ai/Monsters/states/monster_state_rest.h"
-#include "ai/Monsters/states/monster_state_attack.h"
-#include "ai/Monsters/states/monster_state_eat.h"
-#include "ai/Monsters/states/monster_state_hear_int_sound.h"
+#include "ai/monsters/states/monster_state_rest.h"
+#include "ai/monsters/states/monster_state_attack.h"
+#include "ai/monsters/states/monster_state_eat.h"
+#include "ai/monsters/states/monster_state_hear_int_sound.h"
 #include "zombie_state_attack_run.h"
 #include "EntityCondition.h"
 #include "detail_path_manager.h"
-#include "ai/Monsters/states/monster_state_controlled.h"
-#include "ai/Monsters/states/monster_state_help_sound.h"
+#include "ai/monsters/states/monster_state_controlled.h"
+#include "ai/monsters/states/monster_state_help_sound.h"
 
 CStateManagerZombie::CStateManagerZombie(CZombie* obj) : inherited(obj)
 {

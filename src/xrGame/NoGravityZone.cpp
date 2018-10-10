@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "nogravityzone.h"
-#include "xrPhysics/physicsshell.h"
+#include "StdAfx.h"
+#include "NoGravityZone.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "entity_alive.h"
 #include "PHMovementControl.h"
 

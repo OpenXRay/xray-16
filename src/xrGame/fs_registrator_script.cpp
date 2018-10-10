@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "xrCore/LocatorApi.h"
+#include "xrCore/LocatorAPI.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

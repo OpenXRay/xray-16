@@ -6,7 +6,7 @@
 //	Description : Script action condition class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "script_action_condition.h"
 
 CScriptActionCondition::~CScriptActionCondition() {}

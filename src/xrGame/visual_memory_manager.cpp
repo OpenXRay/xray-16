@@ -19,9 +19,9 @@
 #include "agent_member_manager.h"
 #include "ai_space.h"
 #include "xrEngine/profiler.h"
-#include "actor.h"
-#include "xrEngine/camerabase.h"
-#include "gamepersistent.h"
+#include "Actor.h"
+#include "xrEngine/CameraBase.h"
+#include "GamePersistent.h"
 #include "actor_memory.h"
 #include "client_spawn_manager.h"
 #include "client_spawn_manager.h"
@@ -29,7 +29,7 @@
 #include "ai/monsters/basemonster/base_monster.h"
 
 #ifndef MASTER_GOLD
-#include "actor.h"
+#include "Actor.h"
 #include "ai_debug.h"
 #endif // MASTER_GOLD
 
@@ -157,7 +157,7 @@ void CVisualMemoryManager::reload(LPCSTR section)
     }
 }
 
-IC const CVisionParameters& CVisualMemoryManager::current_state() const
+const CVisionParameters& CVisualMemoryManager::current_state() const
 {
     if (m_stalker)
     {

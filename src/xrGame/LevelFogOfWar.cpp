@@ -2,9 +2,9 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "LevelFogOfWar.h"
-#include "level.h"
+#include "Level.h"
 #include "alife_registry_wrappers.h"
 #include "ui/UIMap.h"
 #include "game_base_space.h"
@@ -50,7 +50,7 @@ FOG_STORAGE_T& CFogOfWarMngr::GetFogStorage()
 CLevelFogOfWar::CLevelFogOfWar()
     : m_rowNum(0), m_colNum(0){
                        //	m_levelRect.set	(0.0f,0.0f,0.0f,0.0f);
-                       //	hShader.create	("hud\\default","ui\\ui_fog_of_war");
+                       //	hShader.create	("hud" DELIMITER "default","ui" DELIMITER "ui_fog_of_war");
                        //	hGeom.create	(FVF::F_TL, RCache.Vertex.Buffer(), 0);
                    };
 
@@ -73,7 +73,7 @@ void CLevelFogOfWar::Init(const shared_str& level)
 
     m_cells.resize(m_rowNum * m_colNum, false);
 
-    hShader.create("hud\\fog_of_war", "ui\\ui_fog_of_war");
+    hShader.create("hud" DELIMITER "fog_of_war", "ui" DELIMITER "ui_fog_of_war");
     hGeom.create(FVF::F_TL, RCache.Vertex.Buffer(), 0);
 }
 

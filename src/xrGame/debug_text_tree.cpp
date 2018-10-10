@@ -6,7 +6,7 @@
 //	Description : Text tree for onscreen debugging
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "debug_text_tree.h"
 #include "Level.h"
 #include "xrUICore/ui_base.h"

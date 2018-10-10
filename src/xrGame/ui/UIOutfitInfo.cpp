@@ -6,7 +6,7 @@
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
 #include "string_table.h"
-#include "actor.h"
+#include "Actor.h"
 #include "ActorCondition.h"
 #include "player_hud.h"
 

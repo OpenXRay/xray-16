@@ -1,23 +1,23 @@
 #pragma once
 
 #include "CustomMonster.h"
-#include "ai/Monsters/monster_enemy_memory.h"
-#include "ai/Monsters/monster_corpse_memory.h"
-#include "ai/Monsters/monster_sound_memory.h"
-#include "ai/Monsters/monster_hit_memory.h"
-#include "ai/Monsters/monster_enemy_manager.h"
-#include "ai/Monsters/monster_corpse_manager.h"
+#include "ai/monsters/monster_enemy_memory.h"
+#include "ai/monsters/monster_corpse_memory.h"
+#include "ai/monsters/monster_sound_memory.h"
+#include "ai/monsters/monster_hit_memory.h"
+#include "ai/monsters/monster_enemy_manager.h"
+#include "ai/monsters/monster_corpse_manager.h"
 #include "step_manager.h"
-#include "ai/Monsters/monster_event_manager.h"
-#include "ai/Monsters/melee_checker.h"
-#include "ai/Monsters/monster_morale.h"
-#include "ai/Monsters/control_manager.h"
-#include "ai/Monsters/control_sequencer.h"
-#include "ai/Monsters/ai_monster_utils.h"
-#include "ai/Monsters/control_manager_custom.h"
-#include "ai/Monsters/ai_monster_shared_data.h"
-#include "ai/Monsters/monster_sound_defs.h"
-#include "ai/Monsters/monster_aura.h"
+#include "ai/monsters/monster_event_manager.h"
+#include "ai/monsters/melee_checker.h"
+#include "ai/monsters/monster_morale.h"
+#include "ai/monsters/control_manager.h"
+#include "ai/monsters/control_sequencer.h"
+#include "ai/monsters/ai_monster_utils.h"
+#include "ai/monsters/control_manager_custom.h"
+#include "ai/monsters/ai_monster_shared_data.h"
+#include "ai/monsters/monster_sound_defs.h"
+#include "ai/monsters/monster_aura.h"
 
 class CCharacterPhysicsSupport;
 class CMonsterCorpseCoverEvaluator;
@@ -427,7 +427,7 @@ public:
 #ifdef DEBUG
 
     template <class Type>
-    bool get_debug_var(pcstr var_name, OUT Type& result);
+    bool get_debug_var(pcstr var_name, Type& result);
 
 public:
     struct SDebugInfo
@@ -593,7 +593,7 @@ public:
 
 #ifdef DEBUG
 template <class Type>
-bool CBaseMonster::get_debug_var(pcstr var_name, OUT Type& result)
+bool CBaseMonster::get_debug_var(pcstr var_name, Type& result)
 {
     char* full_var_name;
     STRCONCAT(full_var_name, get_monster_class_name(), "_", var_name);

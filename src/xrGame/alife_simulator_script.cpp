@@ -331,6 +331,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          .def("set_interactive",
                              (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_interactive))
                          .def("kill_entity", &CALifeSimulator::kill_entity)
+
                          .def("kill_entity", &kill_entity0)
                          .def("kill_entity", &kill_entity1)
                          .def("add_in_restriction", &add_in_restriction)
@@ -347,8 +348,9 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          .def("actor", &get_actor)
                          .def("has_info", &has_info)
                          .def("dont_has_info", &dont_has_info)
-                         .def("switch_distance", &CALifeSimulator::switch_distance)
-                         .def("set_switch_distance", &CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
+                         .def("switch_distance", (float (CALifeSimulator::*)())(&CALifeSimulator::switch_distance))
+                         .def("set_switch_distance", (void (CALifeSimulator::*)(float))
+                            (&CALifeSimulator::set_switch_distance)) //Alundaio: renamed to set_switch_distance from switch_distance
                          //Alundaio: extend alife simulator exports
                          .def("teleport_object", &teleport_object)
                          //Alundaio: END

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "burer.h"
 #include "burer_state_manager.h"
 
@@ -7,13 +7,13 @@
 #include "ai/monsters/control_movement_base.h"
 #include "ai/monsters/control_path_builder_base.h"
 
-#include "ai/Monsters/states/monster_state_rest.h"
-#include "ai/Monsters/states/monster_state_panic.h"
-#include "ai/Monsters/states/monster_state_eat.h"
-#include "ai/Monsters/states/monster_state_hear_int_sound.h"
-#include "ai/Monsters/states/monster_state_hear_danger_sound.h"
-#include "ai/Monsters/states/monster_state_hitted.h"
-#include "ai/Monsters/states/state_custom_action.h"
+#include "ai/monsters/states/monster_state_rest.h"
+#include "ai/monsters/states/monster_state_panic.h"
+#include "ai/monsters/states/monster_state_eat.h"
+#include "ai/monsters/states/monster_state_hear_int_sound.h"
+#include "ai/monsters/states/monster_state_hear_danger_sound.h"
+#include "ai/monsters/states/monster_state_hitted.h"
+#include "ai/monsters/states/state_custom_action.h"
 
 #include "burer_state_attack.h"
 

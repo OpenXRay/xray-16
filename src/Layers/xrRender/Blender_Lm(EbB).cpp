@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "blender_Lm(EbB).h"
+#include "Blender_Lm(EbB).h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -128,7 +128,7 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
         case SE_R1_LSPOT:
             C.r_Pass("lmap_spot", "add_spot", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
             C.r_Sampler("s_base", C.L_textures[0]);
-            C.r_Sampler_clf("s_lmap", "internal\\internal_light_att", true);
+            C.r_Sampler_clf("s_lmap", "internal" DELIMITER "internal_light_att", true);
             C.r_Sampler_clf("s_att", TEX_SPOT_ATT);
             C.r_End();
             break;

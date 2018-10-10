@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "account_manager.h"
 #include "xrGameSpy/GameSpy_GP.h"
 

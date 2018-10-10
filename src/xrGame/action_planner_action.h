@@ -19,13 +19,13 @@ class CActionPlannerAction : public CActionPlanner<_object_type>, public CAction
 protected:
     using inherited_planner = CActionPlanner<_object_type>;
     using inherited_action = CActionBase<_object_type>;
-    using _edge_value_type = typename inherited_action::_edge_value_type;
+    using _edge_value_type = typename inherited_action::edge_value_type;
     using _condition_type = typename inherited_action::_condition_type;
     using _value_type = typename inherited_action::_value_type;
 
 public:
     using COperatorCondition = typename inherited_action::COperatorCondition;
-    using _world_operator = typename inherited_planner::_world_operator;
+    using _world_operator = typename inherited_planner::world_operator;
 
 #ifdef LOG_ACTION
 public:

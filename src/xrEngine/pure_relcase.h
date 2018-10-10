@@ -3,6 +3,7 @@
 #define pure_relcaseH
 #include "xrCore/xrDebug_macros.h"
 #include "xrCore/fastdelegate.h" // XXX: Inluding this VERY heavy file for just xr_stdcall seems suboptimal.
+#include "IGame_Level.h"
 
 class IGameObject;
 

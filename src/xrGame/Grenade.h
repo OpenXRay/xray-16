@@ -1,7 +1,7 @@
 #pragma once
-#include "missile.h"
-#include "explosive.h"
-#include "xrEngine/feel_touch.h"
+#include "Missile.h"
+#include "Explosive.h"
+#include "xrEngine/Feel_Touch.h"
 
 class CGrenade : public CMissile, public CExplosive
 {

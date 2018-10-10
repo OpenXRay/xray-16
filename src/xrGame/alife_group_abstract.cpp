@@ -6,7 +6,7 @@
 //	Description : ALife group abstract class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_Objects_ALife.h"
 #include "ai_space.h"
 #include "alife_simulator.h"

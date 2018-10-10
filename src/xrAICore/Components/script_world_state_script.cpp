@@ -21,7 +21,7 @@ SCRIPT_EXPORT(CScriptWorldState, (), {
                       .def("add_property", (void (CScriptWorldState::*)(const CScriptWorldState::COperatorCondition&))(
                                                &CScriptWorldState::add_condition))
                       .def("remove_property",
-                          (void (CScriptWorldState::*)(const CScriptWorldState::COperatorCondition::_condition_type&))(
+                          (void (CScriptWorldState::*)(const CScriptWorldState::COperatorCondition::condition_type&))(
                               &CScriptWorldState::remove_condition))
                       .def("clear", &CScriptWorldState::clear)
                       .def("includes", &CScriptWorldState::includes)

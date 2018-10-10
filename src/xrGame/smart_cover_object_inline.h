@@ -11,7 +11,7 @@
 
 IC float const& smart_cover::object::enter_min_enemy_distance() const { return (m_enter_min_enemy_distance); }
 IC float const& smart_cover::object::exit_min_enemy_distance() const { return (m_exit_min_enemy_distance); }
-IC smart_cover::cover const& smart_cover::object::cover() const
+IC smart_cover::cover const& smart_cover::object::get_cover() const
 {
     VERIFY(m_cover);
     return (*m_cover);

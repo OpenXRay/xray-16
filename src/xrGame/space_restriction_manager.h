@@ -10,6 +10,7 @@
 
 #include "space_restriction_holder.h"
 #include "alife_space.h"
+#include "space_restriction.h"
 
 namespace RestrictionSpace
 {
@@ -18,8 +19,6 @@ struct CTimeIntrusiveBase;
 
 template <typename _1, typename _2>
 class intrusive_ptr;
-
-class CSpaceRestriction;
 
 class CSpaceRestrictionManager : public CSpaceRestrictionHolder
 {

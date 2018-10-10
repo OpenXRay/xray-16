@@ -6,7 +6,7 @@
 #include "xrEngine/IRenderable.h"
 
 #include "FLOD.h"
-#include "particlegroup.h"
+#include "ParticleGroup.h"
 #include "FTreeVisual.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
@@ -895,8 +895,8 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     create();
     if (!GEnv.isDedicatedServer)
     {
-        m_WireShader.create("editor\\wire");
-        m_SelectionShader.create("editor\\selection");
+        m_WireShader.create("editor" DELIMITER "wire");
+        m_SelectionShader.create("editor" DELIMITER "selection");
         DUImpl.OnDeviceCreate();
     }
 }

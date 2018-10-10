@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "blender_BmmD.h"
+#include "Blender_BmmD.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -17,10 +17,10 @@ CBlender_BmmD::CBlender_BmmD()
     xr_strcpy(oT2_Name, "$null");
     xr_strcpy(oT2_xform, "$null");
     description.version = 3;
-    xr_strcpy(oR_Name, "detail\\detail_grnd_grass"); //"$null");
-    xr_strcpy(oG_Name, "detail\\detail_grnd_asphalt"); //"$null");
-    xr_strcpy(oB_Name, "detail\\detail_grnd_earth"); //"$null");
-    xr_strcpy(oA_Name, "detail\\detail_grnd_yantar"); //"$null");
+    xr_strcpy(oR_Name, "detail" DELIMITER "detail_grnd_grass"); //"$null");
+    xr_strcpy(oG_Name, "detail" DELIMITER "detail_grnd_asphalt"); //"$null");
+    xr_strcpy(oB_Name, "detail" DELIMITER "detail_grnd_earth"); //"$null");
+    xr_strcpy(oA_Name, "detail" DELIMITER "detail_grnd_yantar"); //"$null");
 }
 
 CBlender_BmmD::~CBlender_BmmD() {}
@@ -119,7 +119,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         case SE_R1_LSPOT:
             C.r_Pass("impl_spot_dt", "add_spot_dt", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE);
             C.r_Sampler("s_base", C.L_textures[0]);
-            C.r_Sampler_clf("s_lmap", "internal\\internal_light_att", true);
+            C.r_Sampler_clf("s_lmap", "internal" DELIMITER "internal_light_att", true);
             C.r_Sampler_clf("s_att", TEX_SPOT_ATT);
             C.r_Sampler("s_detail", oT2_Name);
             C.r_End();

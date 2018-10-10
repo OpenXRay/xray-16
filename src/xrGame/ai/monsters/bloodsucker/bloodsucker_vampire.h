@@ -1,5 +1,5 @@
 #pragma once
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 #include "xrServerEntities/clsid_game.h"
 
 template <typename _Object>
@@ -7,6 +7,12 @@ class CStateBloodsuckerVampire : public CState<_Object>
 {
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::object;
+    using inherited::current_substate;
+    using inherited::prev_substate;
+    using inherited::get_state;
+    using inherited::select_state;
+    using inherited::get_state_current;
 
     const CEntityAlive* enemy;
 

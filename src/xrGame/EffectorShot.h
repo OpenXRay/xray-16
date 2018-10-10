@@ -5,7 +5,7 @@
 #pragma once
 
 #include "CameraEffector.h"
-#include "xrEngine/cameramanager.h"
+#include "xrEngine/CameraManager.h"
 #include "Actor.h"
 #include "CameraRecoil.h"
 

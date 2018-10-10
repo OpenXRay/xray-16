@@ -1,5 +1,4 @@
-#ifndef PH_VALIDE_VALUES
-#define PH_VALIDE_VALUES
+#pragma once
 
 #include "MathUtilsOde.h"
 #include "ph_valid_ode.h"
@@ -142,4 +141,3 @@ public:
         m_safe_angular_state.new_state(b);
     }
 };
-#endif

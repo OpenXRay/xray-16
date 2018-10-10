@@ -6,7 +6,7 @@
 //	Description : Agent manager actions
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "agent_manager_actions.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
@@ -16,7 +16,7 @@
 #include "agent_enemy_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "sight_action.h"
-#include "inventory.h"
+#include "Inventory.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CAgentManagerActionNoOrders

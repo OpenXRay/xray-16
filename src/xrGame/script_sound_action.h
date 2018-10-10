@@ -12,7 +12,7 @@
 #include "ai_sounds.h"
 #include "ai_monster_space.h"
 #include "script_sound.h"
-#include "AI/monsters/monster_sound_defs.h"
+#include "ai/monsters/monster_sound_defs.h"
 
 class CScriptSoundAction : public CScriptAbstractAction
 {

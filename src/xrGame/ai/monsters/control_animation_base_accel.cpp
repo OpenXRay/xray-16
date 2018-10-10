@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_animation_base.h"
-#include "BaseMonster/base_monster.h"
+#include "basemonster/base_monster.h"
 #include "detail_path_manager.h"
 #include "monster_velocity_space.h"
 

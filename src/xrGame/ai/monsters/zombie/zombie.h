@@ -1,8 +1,8 @@
 #pragma once
-#include "ai/Monsters/BaseMonster/base_monster.h"
-#include "ai/Monsters/controlled_entity.h"
-#include "ai/Monsters/ai_monster_bones.h"
-#include "ai/Monsters/anim_triple.h"
+#include "ai/monsters/basemonster/base_monster.h"
+#include "ai/monsters/controlled_entity.h"
+#include "ai/monsters/ai_monster_bones.h"
+#include "ai/monsters/anim_triple.h"
 
 #define FAKE_DEATH_TYPES_COUNT 4
 

@@ -6,11 +6,11 @@
 //	Description : Attachable item
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "physicsshellholder.h"
+#include "StdAfx.h"
+#include "PhysicsShellHolder.h"
 #include "attachable_item.h"
-#include "inventoryowner.h"
-#include "inventory.h"
+#include "InventoryOwner.h"
+#include "Inventory.h"
 #include "xrEngine/xr_input.h"
 #include "xrUICore/ui_base.h"
 #include "xrEngine/GameFont.h"
@@ -112,6 +112,7 @@ bool CAttachableItem::can_be_attached() const
 
     return (true);
 }
+
 void CAttachableItem::afterAttach()
 {
     VERIFY(m_valid);
@@ -122,6 +123,11 @@ void CAttachableItem::afterDetach()
 {
     VERIFY(m_valid);
     object().processing_deactivate();
+}
+
+bool CAttachableItem::use_parent_ai_locations() const
+{
+    return !enabled();
 }
 
 #ifdef DEBUG

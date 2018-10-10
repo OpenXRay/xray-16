@@ -3,8 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #pragma once
-#ifndef XRPHYSICS_PHDYNAMICDATA_H
-#define XRPHYSICS_PHDYNAMICDATA_H
+
 #include "PHInterpolation.h"
 #include "MathUtilsOde.h"
 #include "xrCore/_matrix33.h"
@@ -149,5 +148,3 @@ public:
     bool SetGeom(dGeomID ageom);
     bool SetTransform(dGeomID ageom);
 };
-
-#endif // include guard

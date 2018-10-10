@@ -63,7 +63,7 @@ void PROPERTY_COLLECTION::erase(u32 const& position)
     make_state_changed();
 
     VERIFY(position < m_container.size());
-    container_type::value_type value = m_container[position];
+    typename container_type::value_type value = m_container[position];
     m_container.erase(m_container.begin() + position);
     delete_data(value);
 }

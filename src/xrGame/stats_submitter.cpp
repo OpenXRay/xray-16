@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stats_submitter.h"
 #include "xrGameSpy/GameSpy_Full.h"
 #include "login_manager.h"
@@ -293,6 +293,9 @@ bool stats_submitter::add_player_name_to_report()
 
 bool stats_submitter::create_award_inc_report()
 {
+#ifdef LINUX // FIXME!!
+    return false;
+#else
     __time32_t tmp_time = 0;
     _time32(&tmp_time);
 
@@ -309,6 +312,7 @@ bool stats_submitter::create_award_inc_report()
         return false;
 
     return add_player_name_to_report();
+#endif
 }
 
 bool stats_submitter::create_best_scores_report()
@@ -368,9 +372,11 @@ void stats_submitter::quick_reward_with_award(enum_awards_t award_id, gamespy_gp
     all_awards_t::iterator award_iter = tmp_awards.find(award_id);
     R_ASSERT(award_iter != tmp_awards.end());
     ++award_iter->second.m_count;
+#ifndef LINUX // FIXME!!!
     __time32_t tmp_time = 0;
     _time32(&tmp_time);
     award_iter->second.m_last_reward_date = static_cast<u32>(tmp_time);
+#endif
     save_file(profile);
 }
 
@@ -422,12 +428,13 @@ void stats_submitter::save_file(gamespy_gp::profile const* profile)
         ltx_to_write.w_u32(tmp_bs_name, best_score_value_line, i->second);
     }
 
+#ifndef LINUX // FIXME!!!
     __time32_t tmp_time = 0;
     _time32(&tmp_time);
 
     ltx_to_write.w_s32(profile_data_section, profile_id_line, profile->m_profile_id);
     ltx_to_write.w_u32(profile_data_section, profile_last_submit_time, static_cast<u32>(tmp_time));
-
+#endif
     IWriter* tmp_writer = FS.w_open("$app_data_root$", profile_store_file_name);
     m_ltx_file.sign_and_save(*tmp_writer);
     FS.w_close(tmp_writer);

@@ -1,10 +1,23 @@
 #pragma once
-#include "ai/Monsters/states/monster_state_attack.h"
+#include "ai/monsters/states/monster_state_attack.h"
 
 template <typename _Object>
 class CBloodsuckerStateAttack : public CStateMonsterAttack<_Object>
 {
     typedef CStateMonsterAttack<_Object> inherited_attack;
+    using inherited = typename inherited_attack::inherited;
+    using inherited::prev_substate;
+    using inherited::current_substate;
+    using inherited::m_time_start_check_behinder;
+    using inherited::object;
+    using inherited::check_steal_state;
+    using inherited::select_state;
+    using inherited::check_camp_state;
+    using inherited::check_home_point;
+    using inherited::check_find_enemy_state;
+    using inherited::get_state_current;
+    using inherited::get_state;
+    using inherited::check_run_attack_state;
 
     u32 m_time_stop_invis;
     Fvector m_dir_point;
@@ -32,6 +45,7 @@ template <typename _Object>
 class CStateMonsterBackstubEnemy : public CState<_Object>
 {
     typedef CState<_Object> inherited;
+    using inherited::object;
 
 public:
     struct StateParams : SStateDataMoveToPointEx

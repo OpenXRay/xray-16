@@ -33,7 +33,11 @@ class property_holder_holder
 {
 public:
     virtual property_holder_base* object() = 0;
+#if defined(WINDOWS)
     virtual ~property_holder_holder() = 0 {}
+#elif defined(LINUX)
+    virtual ~property_holder_holder() {}
+#endif
 };
 
 class property_holder_collection

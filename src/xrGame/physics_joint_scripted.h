@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xrPhysics/iphysics_scripted.h"
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/PhysicsShell.h"
 
 class cphysics_element_scripted;
 class CPhysicsJoint;

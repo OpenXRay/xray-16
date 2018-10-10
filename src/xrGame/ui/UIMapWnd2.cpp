@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIMapWnd.h"
 #include "UIMap.h"
 #include "UIXmlInit.h"

@@ -4,7 +4,7 @@
 dxConsoleRender::dxConsoleRender()
 {
 #if defined(USE_DX10) || defined(USE_DX11)
-    m_Shader.create("hud\\crosshair");
+    m_Shader.create("hud" DELIMITER "crosshair");
     m_Geom.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 #endif
 }
@@ -14,7 +14,7 @@ void dxConsoleRender::OnRender(bool bGame)
 {
     VERIFY(HW.pDevice);
 
-    D3DRECT R = {0, 0, Device.dwWidth, Device.dwHeight};
+    D3DRECT R = {0, 0, static_cast<LONG>(Device.dwWidth), static_cast<LONG>(Device.dwHeight)};
     if (bGame)
         R.y2 /= 2;
 

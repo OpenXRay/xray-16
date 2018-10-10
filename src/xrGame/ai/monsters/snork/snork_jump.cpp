@@ -1,6 +1,6 @@
-#include "stdafx.h"
-#include "ai/Monsters/snork/snork.h"
-#include "ai/Monsters/snork/snork_jump.h"
+#include "StdAfx.h"
+#include "ai/monsters/snork/snork.h"
+#include "ai/monsters/snork/snork_jump.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "Level.h"
 

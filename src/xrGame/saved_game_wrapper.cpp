@@ -6,7 +6,7 @@
 //	Description : saved game wrapper class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "saved_game_wrapper.h"
 #include "alife_time_manager.h"
 #include "alife_object_registry.h"

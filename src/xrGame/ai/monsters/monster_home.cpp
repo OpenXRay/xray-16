@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "monster_home.h"
-#include "BaseMonster/base_monster.h"
+#include "basemonster/base_monster.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"

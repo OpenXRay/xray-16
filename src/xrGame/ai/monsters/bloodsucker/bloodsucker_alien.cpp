@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "bloodsucker_alien.h"
 #include "bloodsucker.h"
 #include "Level.h"

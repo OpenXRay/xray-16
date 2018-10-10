@@ -6,7 +6,7 @@
 //	Description : Space restriction base
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "space_restriction_base.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"

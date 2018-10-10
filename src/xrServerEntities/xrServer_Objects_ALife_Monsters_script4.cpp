@@ -90,7 +90,6 @@ static void CSE_ALifeMonsterAbstract_Export(lua_State* luaState)
 #endif
     ];
 }
-
 SCRIPT_EXPORT_FUNC(
     CSE_ALifeMonsterAbstract, (CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable), CSE_ALifeMonsterAbstract_Export);
 

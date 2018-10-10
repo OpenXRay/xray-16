@@ -9,6 +9,7 @@
 #pragma once
 
 #include "object_handler.h"
+#include "object_handler_space.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CObjectActionBase

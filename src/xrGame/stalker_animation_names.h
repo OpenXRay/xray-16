@@ -19,7 +19,7 @@ extern LPCSTR in_place_names[];
 extern LPCSTR global_names[];
 extern LPCSTR head_names[];
 
-enum ECriticalWoundType
+enum ECriticalWoundType : u32
 {
     critical_wound_type_head = u32(4),
     critical_wound_type_torso,

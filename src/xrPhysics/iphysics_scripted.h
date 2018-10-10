@@ -1,6 +1,3 @@
-#ifndef _IPHYSICS_SCRIPTED_
-#define _IPHYSICS_SCRIPTED_
-
 #pragma once
 
 #include "xrServerEntities/smart_cast.h" // get_script_wrapper() needs it
@@ -32,7 +29,11 @@ protected:
 #ifdef _EDITOR
     virtual ~iphysics_scripted_class() {}
 #else
+#if defined(WINDOWS)
     virtual ~iphysics_scripted_class() = 0 {}
+#elif defined(LINUX)
+    virtual ~iphysics_scripted_class() {}
+#endif
 #endif
 };
 
@@ -79,4 +80,3 @@ wrap* get_script_wrapper(typename wrap::type_impl& E)
 
     return e;
 }
-#endif

@@ -40,7 +40,7 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), true, true, false);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "effects.ltx"), true, true, false);
 
     VERIFY(m_effects.empty());
 
@@ -62,7 +62,7 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), false, false, true);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "effects.ltx"), false, false, true);
 
     for (const auto &i : m_effects)
         i->save(*config);

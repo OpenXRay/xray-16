@@ -14,7 +14,7 @@ template <typename _world_property, typename _edge_value_type>
 class COperatorAbstract
 {
 public:
-    typedef _edge_value_type _edge_value_type;
+    typedef _edge_value_type edge_value_type;
 
 protected:
     typedef CConditionState<_world_property> inherited;
@@ -41,8 +41,8 @@ public:
     IC const CSConditionState& effects() const;
     IC void add_condition(const COperatorCondition& condition);
     IC void add_effect(const COperatorCondition& effect);
-    IC void remove_condition(const typename COperatorCondition::_condition_type& condition);
-    IC void remove_effect(const typename COperatorCondition::_condition_type& effect);
+    IC void remove_condition(const typename COperatorCondition::condition_type& condition);
+    IC void remove_effect(const typename COperatorCondition::condition_type& effect);
     IC _edge_value_type min_weight() const;
 
     template <typename T>

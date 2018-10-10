@@ -4,6 +4,8 @@ template <typename _Object>
 class CStateControlCamp : public CState<_Object>
 {
     typedef CState<_Object> inherited;
+    using inherited::object;
+    using inherited::time_state_started;
 
     float m_angle_from;
     float m_angle_to;

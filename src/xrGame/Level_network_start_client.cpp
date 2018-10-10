@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "Level.h"
 #include "xrEngine/x_ray.h"
@@ -8,12 +8,12 @@
 #include "game_cl_base.h"
 #include "NET_Queue.h"
 #include "file_transfer.h"
-#include "hudmanager.h"
+#include "HUDManager.h"
 #include "xrNetServer/NET_Messages.h"
 
-#include "xrPhysics/iphworld.h"
+#include "xrPhysics/IPHWorld.h"
 
-#include "phcommander.h"
+#include "PHCommander.h"
 #include "physics_game.h"
 extern pureFrame* g_pNetProcessor;
 

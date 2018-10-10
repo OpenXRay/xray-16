@@ -1178,7 +1178,7 @@ CScriptProcess* CScriptEngine::script_process(const ScriptProcessor& process_id)
 
 void CScriptEngine::parse_script_namespace(const char* name, char* ns, u32 nsSize, char* func, u32 funcSize)
 {
-    auto p = strrchr(name, '.');
+    const char* p = strrchr(name, '.');
     if (!p)
     {
         xr_strcpy(ns, nsSize, GlobalNamespace);

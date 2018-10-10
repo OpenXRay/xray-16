@@ -12,6 +12,9 @@
 #include "xrAICore/Navigation/graph_edge.h"
 #include "Common/object_broker.h"
 #include "xrCommon/xr_map.h"
+#ifdef LINUX
+#include "xrCore/FS.h"
+#endif
 
 template <typename _data_type = Loki::EmptyType, typename _edge_weight_type = float, typename _vertex_id_type = u32,
     typename _edge_data_type = Loki::EmptyType>
@@ -31,7 +34,7 @@ public:
     typedef typename VERTICES::iterator vertex_iterator;
     typedef typename EDGES::const_iterator const_iterator;
     typedef typename EDGES::iterator iterator;
-    typedef _vertex_id_type _vertex_id_type;
+    typedef _vertex_id_type vertex_id_type;
 
 private:
     VERTICES m_vertices;

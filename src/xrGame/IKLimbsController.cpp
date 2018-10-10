@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "IKLimbsController.h"
 
-#include "IK/IKLimb.h"
-#include "physicsshellholder.h"
+#include "ik/IKLimb.h"
+#include "PhysicsShellHolder.h"
 
 #include "ik_anim_state.h"
 #include "xrPhysics/MathUtils.h"
@@ -199,7 +199,7 @@ void CIKLimbsController::ObjectShift(float static_shift, const SCalculateData cd
     CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(m_object);
     VERIFY(sh);
     // CCharacterPhysicsSupport *ch = sh->character_physics_support();
-    _object_shift.freeze(!!Device.Paused()); // ch->interactive_motion() ||
+    _object_shift.freeze(!!Device.Paused()); // ch->is_interactive_motion() ||
 
     if (cnt_in_step != sz && PredictObjectShift(cd)) // cnt_in_step > 0 &&
         return;

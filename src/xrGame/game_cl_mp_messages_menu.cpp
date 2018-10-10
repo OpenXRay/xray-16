@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_cl_mp.h"
 #include "ui/UISpeechMenu.h"
 #include "xrMessages.h"
@@ -45,7 +45,7 @@ void game_cl_mp::AddMessageMenu(LPCSTR menu_section, LPCSTR snd_path, LPCSTR tea
         for (u32 s = 1; s <= 16; s++)
         {
             string_path FileName_Voice, FileName_Radio, fn;
-            xr_sprintf(FileName_Voice, "%s%s%d\\voice_%s%d", snd_path, team_prefix, 1, SoundName, s);
+            xr_sprintf(FileName_Voice, "%s%s%d" DELIMITER "voice_%s%d", snd_path, team_prefix, 1, SoundName, s);
             if (!FS.exist(fn, "$game_sounds$", FileName_Voice, ".ogg"))
                 break;
 
@@ -54,8 +54,8 @@ void game_cl_mp::AddMessageMenu(LPCSTR menu_section, LPCSTR snd_path, LPCSTR tea
             pNewTeamSound->clear();
             for (int t = 1; t <= GetTeamCount(); t++)
             {
-                xr_sprintf(FileName_Voice, "%s%s%d\\voice_%s%d", snd_path, team_prefix, t, SoundName, s);
-                xr_sprintf(FileName_Radio, "%s%s%d\\radio_%s%d", snd_path, team_prefix, t, SoundName, s);
+                xr_sprintf(FileName_Voice, "%s%s%d" DELIMITER "voice_%s%d", snd_path, team_prefix, t, SoundName, s);
+                xr_sprintf(FileName_Radio, "%s%s%d" DELIMITER "radio_%s%d", snd_path, team_prefix, t, SoundName, s);
                 if (FS.exist(fn, "$game_sounds$", FileName_Voice, ".ogg") &&
                     FS.exist(fn, "$game_sounds$", FileName_Radio, ".ogg"))
                 {

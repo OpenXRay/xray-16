@@ -7,8 +7,6 @@
 #include "Common/object_broker.h"
 #endif // XRGAME_EXPORTS
 
-// T_ID    - уникальный текстовый идентификатор (аттрибут id в XML файле)
-// T_INDEX - уникальный числовой индекс
 // T_INIT -  класс где определена статическая InitXmlIdToIndex
 //          функция инициализации file_str и tag_name
 
@@ -51,7 +49,7 @@ public:
     static const ITEM_DATA* GetById(const shared_str& str_id, bool no_assert = false);
     static const ITEM_DATA* GetByIndex(int index, bool no_assert = false);
 
-    static const int IdToIndex(const shared_str& str_id, int default_index = T_INDEX(-1), bool no_assert = false)
+    static const int IdToIndex(const shared_str& str_id, int default_index = -1, bool no_assert = false)
     {
         const ITEM_DATA* item = GetById(str_id, no_assert);
         return item ? item->index : default_index;
@@ -68,7 +66,7 @@ public:
 };
 
 TEMPLATE_SPECIALIZATION
-typename T_VECTOR* CSXML_IdToIndex::m_pItemDataVector = NULL;
+T_VECTOR* CSXML_IdToIndex::m_pItemDataVector = NULL;
 
 TEMPLATE_SPECIALIZATION
 LPCSTR CSXML_IdToIndex::file_str = NULL;
@@ -80,7 +78,7 @@ CSXML_IdToIndex::CXML_IdToIndex() {}
 TEMPLATE_SPECIALIZATION
 CSXML_IdToIndex::~CXML_IdToIndex() {}
 TEMPLATE_SPECIALIZATION
-const typename ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_assert)
+const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_assert)
 {
     T_INIT::InitXmlIdToIndex();
     T_VECTOR::iterator it;
@@ -104,7 +102,7 @@ const typename ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, boo
 }
 
 TEMPLATE_SPECIALIZATION
-const typename ITEM_DATA* CSXML_IdToIndex::GetByIndex(int index, bool no_assert)
+const ITEM_DATA* CSXML_IdToIndex::GetByIndex(int index, bool no_assert)
 {
     if ((size_t)index >= m_pItemDataVector->size())
     {
@@ -124,7 +122,7 @@ void CSXML_IdToIndex::DeleteIdToIndexData()
 }
 
 TEMPLATE_SPECIALIZATION
-typename void CSXML_IdToIndex::InitInternal()
+void CSXML_IdToIndex::InitInternal()
 {
     VERIFY(!m_pItemDataVector);
     T_INIT::InitXmlIdToIndex();

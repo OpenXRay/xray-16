@@ -1,8 +1,8 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "fire_disp_controller.h"
 #include "Actor.h"
-#include "inventory.h"
-#include "weapon.h"
+#include "Inventory.h"
+#include "Weapon.h"
 #include "Level.h"
 
 float const CFireDispertionController::default_inertion = 5.91f; // time to pass value of dispertion = 1

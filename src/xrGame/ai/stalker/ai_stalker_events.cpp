@@ -6,11 +6,11 @@
 //	Description : Events handling for monster "Stalker"
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai_stalker.h"
 #include "PDA.h"
 #include "Inventory.h"
-#include "xrServerEntities/xrmessages.h"
+#include "xrServerEntities/xrMessages.h"
 #include "ShootingObject.h"
 #include "Level.h"
 #include "ai_monster_space.h"

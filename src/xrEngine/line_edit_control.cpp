@@ -12,6 +12,7 @@
 #include "xrCore/buffer_vector.h"
 #include "Common/object_broker.h"
 #include "xr_input.h"
+#include "SDL.h"
 
 #include "edit_actions.h"
 

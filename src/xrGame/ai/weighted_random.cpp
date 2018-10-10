@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "weighted_random.h"
 #include <math.h>
 

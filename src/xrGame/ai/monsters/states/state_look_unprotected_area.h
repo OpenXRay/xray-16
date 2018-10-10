@@ -1,5 +1,5 @@
 #pragma once
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 #include "state_data.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"

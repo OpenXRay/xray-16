@@ -9,7 +9,7 @@
 #include "UIMapInfo.h"
 #include "xrUICore/ComboBox/UIComboBox.h"
 #include "xrUICore/ListBox/UIListBoxItem.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "string_table.h"
 #include "Common/object_broker.h"
 #include "game_base.h"
@@ -67,6 +67,7 @@ CUIMapList::~CUIMapList() {}
 void CUIMapList::StartDedicatedServer()
 {
     string_path ModuleFileName;
+#ifndef LINUX // FIXME!!!
     GetModuleFileName(NULL, ModuleFileName, sizeof(ModuleFileName));
 
     char* ModuleName = NULL;
@@ -75,14 +76,15 @@ void CUIMapList::StartDedicatedServer()
     ModuleName[0] = 0;
 
     xr_strcpy(g_sLaunchOnExit_app, g_sLaunchWorkingFolder);
-    xr_strcat(g_sLaunchOnExit_app, "dedicated\\xrEngine.exe");
+    xr_strcat(g_sLaunchOnExit_app, "dedicated" DELIMITER "xrEngine.exe");
 
     xr_strcpy(g_sLaunchOnExit_params, g_sLaunchOnExit_app);
-    xr_strcat(g_sLaunchOnExit_params, " -i -fsltx ..\\fsgame.ltx -nosound -");
+    xr_strcat(g_sLaunchOnExit_params, " -i -fsltx .." DELIMITER "fsgame.ltx -nosound -");
     xr_strcat(g_sLaunchOnExit_params, GetCommandLine(""));
     Msg("Going to quit before starting dedicated server");
     Msg("Working folder is:%s", g_sLaunchWorkingFolder);
     Msg("%s %s", g_sLaunchOnExit_app, g_sLaunchOnExit_params);
+#endif
     Console->Execute("quit");
 }
 
@@ -122,7 +124,7 @@ void CUIMapList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUIMapList::OnListItemClicked()
 {
-    xr_string map_name = "intro\\intro_map_pic_";
+    xr_string map_name = "intro" DELIMITER "intro_map_pic_";
 
     CUIListBoxItem* itm = m_pList1->GetSelectedItem();
     u32 _idx = (u32)(__int64)(itm->GetData());
@@ -136,14 +138,14 @@ void CUIMapList::OnListItemClicked()
     if (FS.exist("$game_textures$", full_name.c_str()))
         m_pMapPic->InitTexture(map_name.c_str());
     else
-        m_pMapPic->InitTexture("ui\\ui_noise");
+        m_pMapPic->InitTexture("ui" DELIMITER "ui_noise");
 
     m_pMapPic->SetTextureRect(orig_rect);
 
     m_pMapInfo->InitMap(M.map_name.c_str(), M.map_ver.c_str());
 }
 
-xr_token g_GameModes[];
+extern xr_token g_GameModes[];
 
 void CUIMapList::OnModeChange() { UpdateMapList(GetCurGameType()); }
 EGameIDs CUIMapList::GetCurGameType()
@@ -281,7 +283,7 @@ void CUIMapList::SetModeSelector(CUIWindow* ms) { m_pModeSelector = ms; }
 void CUIMapList::SetMapPic(CUIStatic* map_pic) { m_pMapPic = map_pic; }
 void CUIMapList::SetMapInfo(CUIMapInfo* map_info) { m_pMapInfo = map_info; }
 void CUIMapList::SetServerParams(LPCSTR params) { m_srv_params = params; }
-#include "xrUICore/ListBox/UIListBoxItem.h"
+
 void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id)
 {
     R_ASSERT2(m_pWeatherSelector, "m_pWeatherSelector == NULL");

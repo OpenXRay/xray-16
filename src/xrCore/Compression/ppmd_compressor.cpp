@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "ppmd_compressor.h"
 #include "PPMd.h"
+#include "SDL.h"
 
 #if defined(LINUX)
+
 
 LONG InterlockedExchange(LONG volatile *dest, LONG val)
 {
@@ -26,7 +28,7 @@ static LONG PPMd_Locked = 0;
 static inline void PPMd_Lock()
 {
     while (::InterlockedExchange(&PPMd_Locked, 1))
-        ::Sleep(0);
+        SDL_Delay(0);
 }
 
 static inline void PPMd_Unlock() { ::InterlockedExchange(&PPMd_Locked, 0); }

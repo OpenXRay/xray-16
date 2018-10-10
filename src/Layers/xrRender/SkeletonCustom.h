@@ -14,6 +14,7 @@ class CKinematics;
 class CInifile;
 class CBoneData;
 struct SEnumVerticesCallback;
+class CSkeletonX;
 
 // MT-locker
 struct UCalc_mtlock
@@ -106,7 +107,7 @@ class CKinematics : public FHierrarhyVisual, public IKinematics
     friend class CSkeletonX;
 
 protected: //--#SM+#--
-    DEFINE_VECTOR(KinematicsABT::additional_bone_transform, BONE_TRANSFORM_VECTOR, BONE_TRANSFORM_VECTOR_IT);
+    DEFINE_VECTOR(KinematicsABT::additional_bone_transform, BONE_TRANSFORM_VECTOR, BONE_TRANSFORM_VECTOR_IT)
     BONE_TRANSFORM_VECTOR m_bones_offsets;
 
 public:
@@ -158,7 +159,7 @@ protected:
     virtual CBoneData* CreateBoneData(u16 ID) { return new CBoneData(ID); }
     virtual void IBoneInstances_Create();
     virtual void IBoneInstances_Destroy();
-    void Visibility_Invalidate() { Update_Visibility = TRUE; };
+    void Visibility_Invalidate() { Update_Visibility = TRUE; }
     void Visibility_Update();
 
     void LL_Validate();

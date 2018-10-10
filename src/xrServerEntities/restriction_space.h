@@ -26,7 +26,7 @@ struct CTimeIntrusiveBase : public intrusive_base
     using intrusive_base::release;
 };
 
-enum ERestrictorTypes
+enum ERestrictorTypes : u32
 {
     eDefaultRestrictorTypeNone = u8(0),
     eDefaultRestrictorTypeOut = u8(1),
@@ -35,4 +35,4 @@ enum ERestrictorTypes
     eRestrictorTypeIn = u8(4),
     eRestrictorTypeOut = u8(5),
 };
-}; // namespace RestrictionSpace
+} // namespace RestrictionSpace

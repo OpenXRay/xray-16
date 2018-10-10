@@ -11,7 +11,7 @@
 
 namespace MonsterSpace
 {
-enum EBodyState;
+enum EBodyState : u32;
 }; // namespace MonsterSpace
 
 namespace smart_cover

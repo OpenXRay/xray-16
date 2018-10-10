@@ -2,6 +2,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Implemetation//for//CPhysicsElement//////////////////
 ////////////////////////////////////////////////////////////////////////////////
+#pragma once
+
 #include "Geometry.h"
 #include "PHDefs.h"
 #include "PhysicsCommon.h"
@@ -11,8 +13,6 @@
 #include "PHInterpolation.h"
 #include "PHFracture.h"
 #include "physics_scripted.h"
-#ifndef PH_ELEMENT
-#define PH_ELEMENT
 class CPHElement;
 class CPHShell;
 
@@ -295,4 +295,3 @@ IC CPhysicsElement* cast_PhysicsElement(CPHElement* e)
 {
     return static_cast<CPhysicsElement*>(static_cast<CPHElement*>(e));
 }
-#endif

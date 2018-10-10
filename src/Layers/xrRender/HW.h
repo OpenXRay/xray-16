@@ -2,6 +2,8 @@
 
 #include "HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
+#include "SDL.h"
+#include "SDL_syswm.h"
 
 #if !defined(_MAYA_EXPORT) && !defined(USE_OGL)
 #include "stats_manager.h"

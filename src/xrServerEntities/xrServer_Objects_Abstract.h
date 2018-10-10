@@ -60,7 +60,7 @@ public:
     void visual_write(NET_Packet& P);
 
     void set_visual(LPCSTR name, bool load = true);
-    LPCSTR get_visual() const { return *visual_name; };
+    LPCSTR get_visual() const { return *visual_name; }
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
 #endif // #ifndef XRGAME_EXPORTS
@@ -84,7 +84,7 @@ public:
     void motion_write(NET_Packet& P);
 
     void set_motion(LPCSTR name);
-    LPCSTR get_motion() const { return *motion_name; };
+    LPCSTR get_motion() const { return *motion_name; }
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
 #endif // #ifndef XRGAME_EXPORTS

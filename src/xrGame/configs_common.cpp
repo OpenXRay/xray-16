@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "configs_common.h"
 
 namespace mp_anticheat

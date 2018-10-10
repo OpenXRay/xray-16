@@ -2,7 +2,7 @@
 #include "ServerList.h"
 #include "UIXmlInit.h"
 #include "string_table.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrUICore/EditBox/UIEditBox.h"
 #include "UIMessageBoxEx.h"
 #include "xrUICore/MessageBox/UIMessageBox.h"
@@ -12,7 +12,7 @@
 #include "xrGameSpy/GameSpy_Keys.h"
 #include "xrGameSpy/GameSpy_Full.h"
 #include "xrGameSpy/GameSpy_Browser.h"
-#include "spectator.h"
+#include "Spectator.h"
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 CGameSpy_Browser* g_gs_browser = NULL;

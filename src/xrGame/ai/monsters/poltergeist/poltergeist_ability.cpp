@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "poltergeist.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "Level.h"

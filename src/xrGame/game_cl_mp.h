@@ -294,7 +294,7 @@ public:
         u32 m_max_size;
         game_cl_mp* m_owner;
         CMemoryWriter m_writer;
-        fr_callback_binder() : m_frnode(NULL), m_active(false){};
+        fr_callback_binder() : m_frnode(NULL), m_active(false){}
         void __stdcall receiving_file_callback(
             file_transfer::receiving_status_t status, u32 bytes_received, u32 data_size);
         void __stdcall receiving_serverinfo_callback(
@@ -316,8 +316,8 @@ private:
     bool m_ready_to_open_buy_menu;
 
 public:
-    bool is_buy_menu_ready() const { return m_ready_to_open_buy_menu; };
-    void set_buy_menu_not_ready() { m_ready_to_open_buy_menu = false; };
+    bool is_buy_menu_ready() const { return m_ready_to_open_buy_menu; }
+    void set_buy_menu_not_ready() { m_ready_to_open_buy_menu = false; }
     void decompress_and_save_screenshot(LPCSTR file_name, u8* data, u32 data_size, u32 file_size);
     void decompress_and_process_config(LPCSTR file_name, u8* data, u32 data_size, u32 file_size);
 
@@ -328,7 +328,9 @@ public:
 
     void __stdcall sending_screenshot_callback(file_transfer::sending_status_t status, u32 bytes_sent, u32 data_size);
     //-------------------------------------------------------------------------------------------------
+#ifndef LINUX
     static void generate_file_name(string_path& file_name, LPCSTR file_suffix, SYSTEMTIME const& date_time);
+#endif
     static LPCSTR make_file_name(LPCSTR session_id, string_path& dest);
 //-------------------------------------------------------------------------------------------------
 #include "game_cl_mp_messages_menu.h"

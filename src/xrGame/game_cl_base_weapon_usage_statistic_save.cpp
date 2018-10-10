@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_cl_base.h"
 #include "Level.h"
 #include "game_cl_base_weapon_usage_statistic.h"
@@ -70,6 +70,7 @@ void WeaponUsageStatistic::SaveData()
         return;
 
     string64 GameType;
+#ifndef LINUX // FIXME!!!
     SYSTEMTIME Time;
     switch (GameID())
     {
@@ -82,7 +83,7 @@ void WeaponUsageStatistic::SaveData()
     GetLocalTime(&Time);
     xr_sprintf(mFileName, "(%s)_(%s)_%02d.%02d.%02d_%02d.%02d.%02d.wus", *(Level().name()), GameType, Time.wMonth,
         Time.wDay, Time.wYear, Time.wHour, Time.wMinute, Time.wSecond);
-
+#endif
     //---------------------------------------------------------
     FS.update_path(mFileName, "$logs$", mFileName);
     FILE* SFile = fopen(mFileName, "wb");

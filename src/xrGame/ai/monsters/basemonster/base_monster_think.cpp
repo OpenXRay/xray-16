@@ -1,14 +1,14 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "base_monster.h"
-#include "ai/Monsters/ai_monster_squad.h"
-#include "ai/Monsters/ai_monster_squad_manager.h"
+#include "ai/monsters/ai_monster_squad.h"
+#include "ai/monsters/ai_monster_squad_manager.h"
 #include "xrEngine/profiler.h"
-#include "ai/Monsters/state_manager.h"
+#include "ai/monsters/state_manager.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "detail_path_manager.h"
-#include "ai/Monsters/monster_velocity_space.h"
+#include "ai/monsters/monster_velocity_space.h"
 #include "Level.h"
-#include "ai/Monsters/control_animation_base.h"
+#include "ai/monsters/control_animation_base.h"
 
 void CBaseMonster::Think()
 {

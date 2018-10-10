@@ -1,12 +1,12 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIDialogHolder.h"
 #include "ui/UIDialogWnd.h"
 #include "UIGameCustom.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "Level.h"
-#include "actor.h"
+#include "Actor.h"
 #include "xr_level_controller.h"
-#include "xrEngine/CustomHud.h"
+#include "xrEngine/CustomHUD.h"
 
 dlgItem::dlgItem(CUIWindow* pWnd)
 {

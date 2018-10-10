@@ -41,7 +41,7 @@ public:
     IC void init();
     IC virtual void reinit(const _Graph* graph = 0);
     IC void set_selection_type(const ESelectionType selection_type);
-    IC void selection_type() const;
+    IC ESelectionType selection_type() const;
     IC bool actual(const _vertex_id_type start_vertex_id, bool path_completed);
     IC void select_location(const _vertex_id_type start_vertex_id, _vertex_id_type& dest_vertex_id);
 };

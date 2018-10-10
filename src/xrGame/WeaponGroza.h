@@ -1,6 +1,6 @@
 #pragma once
 
-#include "weaponmagazinedwgrenade.h"
+#include "WeaponMagazinedWGrenade.h"
 
 class CWeaponGroza : public CWeaponMagazinedWGrenade
 {

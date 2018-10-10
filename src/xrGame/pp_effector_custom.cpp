@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "pp_effector_custom.h"
-#include "actor.h"
+#include "Actor.h"
 #include "ActorEffector.h"
 
 #define TRANSLATE_TYPE(val) EEffectorPPType(val ? u32(u64(typeid(this).name())) : u32(u64(this) & u32(-1)))

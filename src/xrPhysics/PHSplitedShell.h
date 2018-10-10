@@ -1,5 +1,4 @@
-#ifndef PH_SPLITED_SELL
-#define PH_SPLITED_SELL
+#pragma once
 
 #include "PHShell.h"
 
@@ -16,5 +15,3 @@ private:
 public:
     CPHSplitedShell() { m_max_AABBradius = dInfinity; }
 };
-
-#endif

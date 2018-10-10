@@ -6,7 +6,7 @@
 //	Description : Evaluation functions storage class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ef_storage.h"
 #include "ef_primary.h"
 #include "ef_pattern.h"
@@ -49,30 +49,30 @@ CEF_Storage::CEF_Storage()
     m_fpaBaseFunctions[49] = m_pfEnemyAnomalyType = new CEnemyAnomalyType(this);
     m_fpaBaseFunctions[50] = m_pfEnemyDistanceToGraphPoint = new CEnemyDistanceToGraphPoint(this);
 
-    m_pfWeaponEffectiveness = new CPatternFunction("common\\WeaponEffectiveness.efd", this);
-    m_pfCreatureEffectiveness = new CPatternFunction("common\\CreatureEffectiveness.efd", this);
-    m_pfIntellectCreatureEffectiveness = new CPatternFunction("common\\IntCreatureEffectiveness.efd", this);
-    m_pfAccuracyWeaponEffectiveness = new CPatternFunction("common\\AccWeaponEffectiveness.efd", this);
-    m_pfFinalCreatureEffectiveness = new CPatternFunction("common\\FinCreatureEffectiveness.efd", this);
-    m_pfVictoryProbability = new CPatternFunction("common\\VictoryProbability.efd", this);
-    m_pfEntityCost = new CPatternFunction("common\\EntityCost.efd", this);
-    m_pfExpediency = new CPatternFunction("common\\Expediency.efd", this);
-    m_pfSurgeDeathProbability = new CPatternFunction("common\\SurgeDeathProbability.efd", this);
-    m_pfEquipmentValue = new CPatternFunction("common\\EquipmentValue.efd", this);
-    m_pfMainWeaponValue = new CPatternFunction("common\\MainWeaponValue.efd", this);
-    m_pfSmallWeaponValue = new CPatternFunction("common\\SmallWeaponValue.efd", this);
-    m_pfTerrainType = new CPatternFunction("alife\\TerrainType.efd", this);
-    m_pfWeaponAttackTimes = new CPatternFunction("alife\\WeaponAttackTimes.efd", this);
-    m_pfWeaponSuccessProbability = new CPatternFunction("alife\\WeaponSuccessProbability.efd", this);
-    m_pfEnemyDetectability = new CPatternFunction("alife\\EnemyDetectability.efd", this);
-    m_pfEnemyDetectProbability = new CPatternFunction("alife\\EnemyDetectProbability.efd", this);
-    m_pfEnemyRetreatProbability = new CPatternFunction("alife\\EnemyRetreatProbability.efd", this);
-    m_pfAnomalyDetectProbability = new CPatternFunction("alife\\AnomalyDetectProbability.efd", this);
-    m_pfAnomalyInteractProbability = new CPatternFunction("alife\\AnomalyInteractProbability.efd", this);
-    m_pfAnomalyRetreatProbability = new CPatternFunction("alife\\AnomalyRetreatProbability.efd", this);
-    m_pfBirthPercentage = new CPatternFunction("alife\\BirthPercentage.efd", this);
-    m_pfBirthProbability = new CPatternFunction("alife\\BirthProbability.efd", this);
-    m_pfBirthSpeed = new CPatternFunction("alife\\BirthSpeed.efd", this);
+    m_pfWeaponEffectiveness = new CPatternFunction("common" DELIMITER "WeaponEffectiveness.efd", this);
+    m_pfCreatureEffectiveness = new CPatternFunction("common" DELIMITER "CreatureEffectiveness.efd", this);
+    m_pfIntellectCreatureEffectiveness = new CPatternFunction("common" DELIMITER "IntCreatureEffectiveness.efd", this);
+    m_pfAccuracyWeaponEffectiveness = new CPatternFunction("common" DELIMITER "AccWeaponEffectiveness.efd", this);
+    m_pfFinalCreatureEffectiveness = new CPatternFunction("common" DELIMITER "FinCreatureEffectiveness.efd", this);
+    m_pfVictoryProbability = new CPatternFunction("common" DELIMITER "VictoryProbability.efd", this);
+    m_pfEntityCost = new CPatternFunction("common" DELIMITER "EntityCost.efd", this);
+    m_pfExpediency = new CPatternFunction("common" DELIMITER "Expediency.efd", this);
+    m_pfSurgeDeathProbability = new CPatternFunction("common" DELIMITER "SurgeDeathProbability.efd", this);
+    m_pfEquipmentValue = new CPatternFunction("common" DELIMITER "EquipmentValue.efd", this);
+    m_pfMainWeaponValue = new CPatternFunction("common" DELIMITER "MainWeaponValue.efd", this);
+    m_pfSmallWeaponValue = new CPatternFunction("common" DELIMITER "SmallWeaponValue.efd", this);
+    m_pfTerrainType = new CPatternFunction("alife" DELIMITER "TerrainType.efd", this);
+    m_pfWeaponAttackTimes = new CPatternFunction("alife" DELIMITER "WeaponAttackTimes.efd", this);
+    m_pfWeaponSuccessProbability = new CPatternFunction("alife" DELIMITER "WeaponSuccessProbability.efd", this);
+    m_pfEnemyDetectability = new CPatternFunction("alife" DELIMITER "EnemyDetectability.efd", this);
+    m_pfEnemyDetectProbability = new CPatternFunction("alife" DELIMITER "EnemyDetectProbability.efd", this);
+    m_pfEnemyRetreatProbability = new CPatternFunction("alife" DELIMITER "EnemyRetreatProbability.efd", this);
+    m_pfAnomalyDetectProbability = new CPatternFunction("alife" DELIMITER "AnomalyDetectProbability.efd", this);
+    m_pfAnomalyInteractProbability = new CPatternFunction("alife" DELIMITER "AnomalyInteractProbability.efd", this);
+    m_pfAnomalyRetreatProbability = new CPatternFunction("alife" DELIMITER "AnomalyRetreatProbability.efd", this);
+    m_pfBirthPercentage = new CPatternFunction("alife" DELIMITER "BirthPercentage.efd", this);
+    m_pfBirthProbability = new CPatternFunction("alife" DELIMITER "BirthProbability.efd", this);
+    m_pfBirthSpeed = new CPatternFunction("alife" DELIMITER "BirthSpeed.efd", this);
 }
 
 CEF_Storage::~CEF_Storage()

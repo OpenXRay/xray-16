@@ -25,7 +25,7 @@ void rtc9_initialize()
 
     string_path file_name;
 
-    FS.update_path(file_name, "$game_config$", "mp\\lzo-dict.bin");
+    FS.update_path(file_name, "$game_config$", "mp" DELIMITER "lzo-dict.bin");
 
     if (FS.exist(file_name))
     {

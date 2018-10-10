@@ -2,16 +2,16 @@
 // function responsible for firing with CWeapon
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Weapon.h"
 #include "ParticlesObject.h"
-#include "entity.h"
-#include "actor.h"
+#include "Entity.h"
+#include "Actor.h"
 
-#include "actoreffector.h"
-#include "effectorshot.h"
+#include "ActorEffector.h"
+#include "EffectorShot.h"
 
-#include "level_bullet_manager.h"
+#include "Level_Bullet_Manager.h"
 
 #include "game_cl_mp.h"
 #include "reward_event_generator.h"

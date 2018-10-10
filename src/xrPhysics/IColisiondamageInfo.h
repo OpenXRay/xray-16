@@ -1,5 +1,5 @@
-#ifndef I_COLLISION_DAMAGE_INFO_H
-#define I_COLLISION_DAMAGE_INFO_H
+#pragma once
+
 // struct SCollisionHitCallback;
 class ICollisionHitCallback;
 class ICollisionDamageInfo
@@ -18,6 +18,9 @@ public:
     virtual bool GetAndResetInitiated() = 0;
 
 protected:
+#if defined(WINDOWS)
     virtual ~ICollisionDamageInfo() = 0 {}
-};
+#elif defined(LINUX)
+    virtual ~ICollisionDamageInfo() {}
 #endif
+};

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Blender_light_spot.h"
+#include "blender_light_spot.h"
 
 CBlender_accum_spot::CBlender_accum_spot() { description.CLS = 0; }
 CBlender_accum_spot::~CBlender_accum_spot() { }
@@ -155,7 +155,7 @@ void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
 
         C.r_Sampler("s_lmap", C.L_textures[0]);
         C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
-        C.r_Sampler("s_noise", "fx\\fx_noise");
+        C.r_Sampler("s_noise", "fx" DELIMITER "fx_noise");
         C.r_End();
         break;
     }

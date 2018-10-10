@@ -2,7 +2,7 @@
 #include "xrServer_Objects_ALife_All.h"
 #include "Level.h"
 #include "game_cl_base.h"
-#include "net_queue.h"
+#include "NET_Queue.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
 #include "xrAICore/Navigation/level_graph.h"

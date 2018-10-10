@@ -4,7 +4,7 @@
 #pragma hdrstop
 
 #include "xrEngine/GameFont.h"
-#include "d3dutils.h"
+#include "D3DUtils.h"
 #include "du_box.h"
 #include "du_sphere.h"
 #include "du_sphere_part.h"
@@ -12,10 +12,12 @@
 #include "du_cylinder.h"
 #include "xrCore/_obb.h"
 
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include "d3dx9.h"
 #pragma warning(pop)
+#endif
 
 CDrawUtilities DUImpl;
 

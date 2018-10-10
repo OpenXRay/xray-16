@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Blender_light_occq.h"
+#include "blender_light_occq.h"
 
 CBlender_light_occq::CBlender_light_occq() { description.CLS = 0; }
 CBlender_light_occq::~CBlender_light_occq() { }

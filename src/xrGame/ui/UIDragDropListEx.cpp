@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIDragDropListEx.h"
 #include "xrUICore/ScrollBar/UIScrollBar.h"
 #include "Common/object_broker.h"
@@ -470,8 +470,8 @@ CUICell& CUIDragDropListEx::GetCellAt(const Ivector2& pos) { return m_container-
 CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
 {
     m_pParentDragDropList = parent;
-    hShader->create("hud\\fog_of_war", "ui\\ui_grid");
-    //	hShader_selected->create	( "hud\\fog_of_war", "ui_grid_selected" );
+    hShader->create("hud" DELIMITER "fog_of_war", "ui" DELIMITER "ui_grid");
+    //	hShader_selected->create	( "hud" DELIMITER "fog_of_war", "ui_grid_selected" );
     m_cellSpacing.set(0, 0);
 }
 

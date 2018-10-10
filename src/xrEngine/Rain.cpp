@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma once
 
 #include "Rain.h"
 #include "IGame_Persistent.h"
@@ -40,16 +39,16 @@ CEffect_Rain::CEffect_Rain()
 {
     state = stIdle;
 
-    snd_Ambient.create("ambient\\rain", st_Effect, sg_Undefined);
+    snd_Ambient.create("ambient" DELIMITER "rain", st_Effect, sg_Undefined);
 
     // Moced to p_Render constructor
     /*
-    IReader* F = FS.r_open("$game_meshes$","dm\\rain.dm");
-    VERIFY3 (F,"Can't open file.","dm\\rain.dm");
+    IReader* F = FS.r_open("$game_meshes$","dm" DELIMITER "rain.dm");
+    VERIFY3 (F,"Can't open file.","dm" DELIMITER "rain.dm");
     DM_Drop = GlobalEnv.Render->model_CreateDM (F);
 
     //
-    SH_Rain.create ("effects\\rain","fx\\fx_rain");
+    SH_Rain.create ("effects" DELIMITER "rain","fx" DELIMITER "fx_rain");
     hGeom_Rain.create (FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
     hGeom_Drops.create (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RCache.Vertex.Buffer(), RCache.Index.Buffer());
     */

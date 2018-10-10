@@ -6,7 +6,7 @@
 //  Description : Server objects
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #pragma hdrstop
 #pragma pack(push, 4)
 
@@ -78,12 +78,12 @@ void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
     IServerEntity* abstract = smart_cast<IServerEntity*>(this);
     VERIFY(abstract);
     ChooseValue* V =
-        PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Model\\Visual"), &visual_name, smVisual);
+        PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Model" DELIMITER "Visual"), &visual_name, smVisual);
     V->OnChangeEvent.bind(this, &CSE_Visual::OnChangeVisual);
-    V = PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Model\\Animation"), &startup_animation,
+    V = PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Model" DELIMITER "Animation"), &startup_animation,
         smSkeletonAnims, nullptr, (void*)*visual_name);
     V->OnChangeEvent.bind(this, &CSE_Visual::OnChangeAnim);
-    PHelper().CreateFlag8(items, PrepareKey(pref, abstract->name(), "Model\\Obstacle"), &flags, flObstacle);
+    PHelper().CreateFlag8(items, PrepareKey(pref, abstract->name(), "Model" DELIMITER "Obstacle"), &flags, flObstacle);
 }
 #endif // #ifndef XRGAME_EXPORTS
 

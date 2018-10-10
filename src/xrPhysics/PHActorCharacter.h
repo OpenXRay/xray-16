@@ -1,6 +1,7 @@
 #pragma once
 #include "PHSimpleCharacter.h"
 #include "PHActorCharacterInline.h"
+#include "ExtendedGeom.h"
 
 class CPhysicShellHolder;
 struct SPHCharacterRestrictor

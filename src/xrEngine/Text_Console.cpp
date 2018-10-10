@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Text_Console.h"
 #include "line_editor.h"
+#include "SDL_syswm.h"
 
 extern char const* const ioc_prompt;
 extern char const* const ch_cursor;

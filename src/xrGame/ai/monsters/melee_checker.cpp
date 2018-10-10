@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "melee_checker.h"
 #include "basemonster/base_monster.h"
 #include "Include/xrRender/KinematicsAnimated.h"

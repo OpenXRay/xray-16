@@ -3,6 +3,10 @@
 
 #pragma once
 
+#if defined(USE_OGL)
+#include "../xrRenderGL/glState.h"
+#endif
+
 class SimulatorStates
 {
 private:

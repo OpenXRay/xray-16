@@ -6,8 +6,8 @@
 
 #include "entity_alive.h"
 #include "ui/UIInventoryUtilities.h"
-#include "UI/UIXmlInit.h"
-#include "xrUICore/XML/UITextureMaster.h"
+#include "ui/UIXmlInit.h"
+#include "xrUICore/XML//UITextureMaster.h"
 
 #include "InfoPortion.h"
 #include "PhraseDialog.h"

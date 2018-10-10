@@ -8,6 +8,7 @@
 
 #include "pch_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "Common/object_type_traits.h"
 
 using namespace luabind;
 
@@ -59,8 +60,8 @@ SCRIPT_EXPORT(Flags8, (),
     [
         class_<Flags8>("flags8")
             .def(constructor<>())
-            .def("get", &Flags8::get)
-            .def("zero", &Flags8::zero)
+            .def("get", REMOVE_NOEXCEPT(&Flags8::get))
+            .def("zero", REMOVE_NOEXCEPT(&Flags8::zero))
             .def("one", &one<Flags8>)
             .def("invert", (Flags8 & (Flags8::*)())(&Flags8::invert))
             .def("invert", (Flags8 & (Flags8::*)(const Flags8&))(&Flags8::invert))
@@ -86,8 +87,8 @@ SCRIPT_EXPORT(Flags16, (),
     [
         class_<Flags16>("flags16")
             .def(constructor<>())
-            .def("get", &Flags16::get)
-            .def("zero", &Flags16::zero)
+            .def("get", REMOVE_NOEXCEPT(&Flags16::get))
+            .def("zero", REMOVE_NOEXCEPT(&Flags16::zero))
             .def("one", &one<Flags16>)
             .def("invert", (Flags16 & (Flags16::*)())(&Flags16::invert))
             .def("invert", (Flags16 & (Flags16::*)(const Flags16&))(&Flags16::invert))
@@ -113,9 +114,9 @@ SCRIPT_EXPORT(Flags32, (),
     [
         class_<Flags32>("flags32")
             .def(constructor<>())
-            .def("get", &Flags32::get)
-            .def("zero", &Flags32::zero)
-            .def("one", &Flags32::one)
+            .def("get", REMOVE_NOEXCEPT(&Flags32::get))
+            .def("zero", REMOVE_NOEXCEPT(&Flags32::zero))
+            .def("one", REMOVE_NOEXCEPT(&Flags32::one))
             .def("invert", (Flags32 & (Flags32::*)())(&Flags32::invert))
             .def("invert", (Flags32 & (Flags32::*)(const Flags32&))(&Flags32::invert))
             .def("invert", (Flags32 & (Flags32::*)(const Flags32::TYPE))(&Flags32::invert))

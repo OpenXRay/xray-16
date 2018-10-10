@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIVotingCategory.h"
 #include "UIXmlInit.h"
 #include "xrUICore/Buttons/UI3tButton.h"
@@ -109,7 +109,7 @@ bool CUIVotingCategory::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 
 void CUIVotingCategory::OnBtn(int i)
 {

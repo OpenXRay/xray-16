@@ -24,7 +24,9 @@
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 #include "xr_ioc_cmd.h"
 
 #ifdef MASTER_GOLD
@@ -64,7 +66,11 @@ public:
     {
         if (!ignored)
             return true;
-        return allow_to_include_path(*ignored, path);
+#if !defined(LINUX)
+        return allow_to_include_path(*ignored, path);  //TODO port xrNetServer to Linux
+#else
+        return false; // Noidea what happenning
+#endif
     }
 };
 }
@@ -79,12 +85,14 @@ ENGINE_API void InitSettings()
     pSettings = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pSettings->section_count(),
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
+#if !defined(LINUX)
     xr_auth_strings_t ignoredPaths, checkedPaths;
-    fill_auth_check_params(ignoredPaths, checkedPaths);
+    fill_auth_check_params(ignoredPaths, checkedPaths); //TODO port xrNetServer to Linux
     PathIncludePred includePred(&ignoredPaths);
     CInifile::allow_include_func_t includeFilter;
     includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
     pSettingsAuth = new CInifile(fname, TRUE, TRUE, FALSE, 0, includeFilter);
+#endif
     FS.update_path(fname, "$game_config$", "game.ltx");
     pGameIni = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pGameIni->section_count(),
@@ -203,13 +211,19 @@ ENGINE_API void Startup()
     Engine.Event.Dump();
     // Destroying
     destroyInput();
+#if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
+#endif
         destroySettings();
     LALib.OnDestroy();
+#if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
+#endif
         destroyConsole();
+#if !defined(LINUX)
     else
         Console->Destroy();
+#endif
     destroyEngine();
     destroySound();
 }
@@ -315,8 +329,10 @@ bool CheckBenchmark()
         const u32 sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
+#if !defined(LINUX)
         g_SASH.Init(sashArg);
         g_SASH.MainLoop();
+#endif
         return true;
     }
 

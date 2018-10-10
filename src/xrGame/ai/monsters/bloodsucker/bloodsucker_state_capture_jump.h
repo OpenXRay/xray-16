@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 
 template <typename _Object>
 class CStateCaptureJumpBloodsucker : public CState<_Object>
@@ -8,6 +8,12 @@ class CStateCaptureJumpBloodsucker : public CState<_Object>
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::prev_substate;
+    using inherited::current_substate;
+    using inherited::get_state_current;
+    using inherited::check_home_point;
+    using inherited::check_find_enemy;
+    using inherited::select_state;
 
 public:
     CStateCaptureJumpBloodsucker(_Object* obj);

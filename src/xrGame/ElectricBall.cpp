@@ -3,7 +3,7 @@
 // ElectricBall - артефакт электрический шар
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ElectricBall.h"
 #include "xrPhysics/PhysicsShell.h"
 

@@ -10,6 +10,7 @@
 
 #include "xrScriptEngine/LuaStudio/Defines.hpp"
 
+#if !defined(LINUX)
 #if defined(WIN32)
 #define CS_PLATFORM_WINDOWS_32
 #define CS_PLATFORM_ID
@@ -20,6 +21,7 @@
 #else // #elif defined(_XBOX)
 STATIC_CHECK(false, Unknown_Platform);
 #endif // #elif defined(_XBOX)
+#endif
 
 #ifdef DEBUG
 #define CS_DEBUG_LIBRARIES

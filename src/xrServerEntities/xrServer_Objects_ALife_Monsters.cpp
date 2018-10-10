@@ -6,7 +6,7 @@
 //  Description : Server objects monsters for ALife simulator
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "Common/object_broker.h"
@@ -32,7 +32,7 @@
 #include "alife_simulator.h"
 #include "alife_object_registry.h"
 #include "date_time.h"
-#include "custommonster.h"
+#include "CustomMonster.h"
 #include "movement_manager.h"
 #include "location_manager.h"
 #endif
@@ -517,7 +517,7 @@ CSE_ALifeTrader::CSE_ALifeTrader(LPCSTR caSection)
 
 CSE_ALifeTrader::~CSE_ALifeTrader() {}
 #ifdef DEBUG
-bool CSE_ALifeTrader::match_configuration() const noexcept { return (!strstr(Core.Params, "-designer")); }
+bool CSE_ALifeTrader::match_configuration() const /* noexcept */ { return (!strstr(Core.Params, "-designer")); }
 #endif
 
 CSE_Abstract* CSE_ALifeTrader::init()
@@ -585,7 +585,7 @@ void CSE_ALifeTrader::UPDATE_Read(NET_Packet& tNetPacket)
     inherited2::UPDATE_Read(tNetPacket);
 };
 
-bool CSE_ALifeTrader::interactive() const noexcept { return false; }
+bool CSE_ALifeTrader::interactive() const /* noexcept */ { return false; }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeTrader::FillProps(LPCSTR _pref, PropItemVec& items)
 {
@@ -660,11 +660,11 @@ void CSE_ALifeCustomZone::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
     PHelper().CreateU32(
-        items, PrepareKey(pref, *s_name, "on/off mode\\Shift time (sec)"), &m_start_time_shift, 0, 100000);
+        items, PrepareKey(pref, *s_name, "on/off mode" DELIMITER "Shift time (sec)"), &m_start_time_shift, 0, 100000);
     PHelper().CreateU32(
-        items, PrepareKey(pref, *s_name, "on/off mode\\Enabled time (sec)"), &m_enabled_time, 0, 100000);
+        items, PrepareKey(pref, *s_name, "on/off mode" DELIMITER "Enabled time (sec)"), &m_enabled_time, 0, 100000);
     PHelper().CreateU32(
-        items, PrepareKey(pref, *s_name, "on/off mode\\Disabled time (sec)"), &m_disabled_time, 0, 100000);
+        items, PrepareKey(pref, *s_name, "on/off mode" DELIMITER "Disabled time (sec)"), &m_disabled_time, 0, 100000);
 }
 #endif // #ifndef XRGAME_EXPORTS
 
@@ -758,8 +758,8 @@ void CSE_ALifeAnomalousZone::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateFloat(
         items, PrepareKey(pref, *s_name, "offline interactive radius"), &m_offline_interactive_radius, 0.f, 100.f);
     PHelper().CreateU16(
-        items, PrepareKey(pref, *s_name, "ALife\\Artefact spawn places count"), &m_artefact_spawn_count, 32, 256);
-    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\Visible for AI"), &m_flags, flVisibleForAI);
+        items, PrepareKey(pref, *s_name, "ALife" DELIMITER "Artefact spawn places count"), &m_artefact_spawn_count, 32, 256);
+    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife" DELIMITER "Visible for AI"), &m_flags, flVisibleForAI);
 }
 #endif // #ifndef XRGAME_EXPORTS
 
@@ -859,7 +859,7 @@ CSE_ALifeCreatureAbstract::CSE_ALifeCreatureAbstract(LPCSTR caSection) : CSE_ALi
 
 CSE_ALifeCreatureAbstract::~CSE_ALifeCreatureAbstract() {}
 #ifdef DEBUG
-bool CSE_ALifeCreatureAbstract::match_configuration() const noexcept { return !strstr(Core.Params, "-designer"); }
+bool CSE_ALifeCreatureAbstract::match_configuration() const /* noexcept */ { return !strstr(Core.Params, "-designer"); }
 #endif
 
 u32 CSE_ALifeCreatureAbstract::ef_creature_type() const { return (m_ef_creature_type); }
@@ -980,9 +980,9 @@ void CSE_ALifeCreatureAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeCreatureAbstract::used_ai_locations() const noexcept { return true; }
-bool CSE_ALifeCreatureAbstract::can_switch_online() const noexcept { return inherited::can_switch_online(); }
-bool CSE_ALifeCreatureAbstract::can_switch_offline() const noexcept
+bool CSE_ALifeCreatureAbstract::used_ai_locations() const /* noexcept */ { return true; }
+bool CSE_ALifeCreatureAbstract::can_switch_online() const /* noexcept */ { return inherited::can_switch_online(); }
+bool CSE_ALifeCreatureAbstract::can_switch_offline() const /* noexcept */
 {
     return (inherited::can_switch_offline() && (get_health() > 0.f));
 }
@@ -1147,7 +1147,7 @@ void CSE_ALifeMonsterAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
 
-    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\No move in offline"), &m_flags, flOfflineNoMove);
+    PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife" DELIMITER "No move in offline"), &m_flags, flOfflineNoMove);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "Use smart terrain tasks"), &m_flags, flUseSmartTerrains);
 
     if (pSettings->line_exist(s_name, "SpaceRestrictionSection"))
@@ -1207,7 +1207,7 @@ CSE_ALifeCreatureActor::CSE_ALifeCreatureActor(LPCSTR caSection)
 
 CSE_ALifeCreatureActor::~CSE_ALifeCreatureActor() {}
 #ifdef DEBUG
-bool CSE_ALifeCreatureActor::match_configuration() const noexcept { return true; }
+bool CSE_ALifeCreatureActor::match_configuration() const /* noexcept */ { return true; }
 #endif
 
 CSE_Abstract* CSE_ALifeCreatureActor::init()
@@ -1397,7 +1397,7 @@ void CSE_ALifeCreatureCrow::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UP
 void CSE_ALifeCreatureCrow::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeCreatureCrow::used_ai_locations() const noexcept { return false; }
+bool CSE_ALifeCreatureCrow::used_ai_locations() const /* noexcept */ { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCreaturePhantom
 ////////////////////////////////////////////////////////////////////////////
@@ -1418,7 +1418,7 @@ void CSE_ALifeCreaturePhantom::UPDATE_Write(NET_Packet& tNetPacket) { inherited:
 void CSE_ALifeCreaturePhantom::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeCreaturePhantom::used_ai_locations() const noexcept { return false; }
+bool CSE_ALifeCreaturePhantom::used_ai_locations() const /* noexcept */ { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeMonsterRat
 ////////////////////////////////////////////////////////////////////////////

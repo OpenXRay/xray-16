@@ -1,11 +1,12 @@
 #pragma once
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 
 template <typename _Object>
 class CStateMonsterTestState : public CState<_Object>
 {
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
+    using inherited::object;
 
 public:
     CStateMonsterTestState(_Object* obj);

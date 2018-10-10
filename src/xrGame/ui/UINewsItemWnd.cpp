@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UINewsItemWnd.h"
 #include "UIXmlInit.h"
 #include "xrUICore/Static/UIStatic.h"

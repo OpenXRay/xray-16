@@ -6,8 +6,9 @@
 #include "Common/Common.hpp"
 
 #include "xrEngine/stdafx.h" // XXX: This seems bad. PCH's are for internal (building) use.
+#if !defined(LINUX)
 #include "DPlay/dplay8.h"
-
+#endif
 // xrEngine src file count is ~1100.
 // Comments following individual includes refers to number of times they are included in xrEngine as a whole.
 //#include <assert.h> // ~440 - but it has no include guard! Perhaps that's intentional?
@@ -231,7 +232,7 @@
 #include "xrGame/ai/monsters/monster_corpse_manager.h" // ~130
 #include "xrGame/ai/stalker/ai_stalker.h"
 #include "Include/xrRender/WallMarkArray.h" // ~80
-#include "xrAICore/Navigation/ai_object_location.h" // ~95, very heavy to compile
+//#include "xrAICore/Navigation/ai_object_location.h" // ~95, very heavy to compile
 #include "xrAICore/Navigation/graph_engine.h" // ~80, VERY heavy to compile
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h" // ~80, VERY heavy to compile
 #ifdef DEBUG

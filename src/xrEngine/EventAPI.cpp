@@ -150,8 +150,10 @@ void msParse(LPCSTR c)
     }
     if (0 == xr_stricmp(c, "quit"))
     {
+#ifndef LINUX // FIXME!!!
         TerminateProcess(GetCurrentProcess(), 0);
         Console->Execute("quit");
+#endif
     }
 }
 #endif

@@ -1,8 +1,8 @@
 #pragma once
 #include "game_cl_mp.h"
 
-#include "ui\UIBuyWndShared.h"
-#include "ui\UIBuyWndBase.h"
+#include "ui/UIBuyWndShared.h"
+#include "ui/UIBuyWndBase.h"
 #include "xrCore/buffer_vector.h"
 
 class CUISkinSelectorWnd;
@@ -39,7 +39,7 @@ public:
 
     virtual void LoadSndMessages();
 
-    virtual bool Is_Rewarding_Allowed() const { return m_cl_dwWarmUp_Time == 0; };
+    virtual bool Is_Rewarding_Allowed() const { return m_cl_dwWarmUp_Time == 0; }
 
 protected:
     struct PresetItem
@@ -47,8 +47,8 @@ protected:
         u8 SlotID;
         u8 ItemID;
         s16 BigID;
-        PresetItem(u8 Slot, u8 Item) { set(Slot, Item); };
-        PresetItem(s16 Big) { set(Big); };
+        PresetItem(u8 Slot, u8 Item) { set(Slot, Item); }
+        PresetItem(s16 Big) { set(Big); }
         bool operator==(const s16& ID) { return BigID == ID; }
 
         void set(s16 Big)
@@ -136,8 +136,8 @@ public:
 
     virtual void OnGameMenuRespond_ChangeSkin(NET_Packet& P);
 
-    virtual CUIDialogWnd* GetBuyWnd() { return (CUIDialogWnd*)pCurBuyMenu; };
-    virtual CUIDialogWnd* GetSkinWnd() { return (CUIDialogWnd*)pCurSkinMenu; };
+    virtual CUIDialogWnd* GetBuyWnd() { return (CUIDialogWnd*)pCurBuyMenu; }
+    virtual CUIDialogWnd* GetSkinWnd() { return (CUIDialogWnd*)pCurSkinMenu; }
     virtual void OnVoteStart(NET_Packet& P);
     virtual void OnVoteStop(NET_Packet& P);
     virtual void OnVoteEnd(NET_Packet& P);
@@ -159,7 +159,7 @@ public:
 
     virtual void OnSwitchPhase_InProgress();
 
-    virtual u8 GetTeamCount() { return 1; };
+    virtual u8 GetTeamCount() { return 1; }
     virtual void OnPlayerFlagsChanged(game_PlayerState* ps);
     virtual void SendPickUpEvent(u16 ID_who, u16 ID_what);
 
@@ -177,4 +177,4 @@ private:
     void AdditionalAmmoInserter(aditional_ammo_t::value_type const& sect_name);
 };
 
-IC bool DM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2);
+bool DM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2);

@@ -6,7 +6,7 @@
 //	Description : Agent memory manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "agent_memory_manager.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"

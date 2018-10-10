@@ -3,9 +3,9 @@
 // GrenadeLauncher - апгрейд оружия поствольный гранатомет
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "grenadelauncher.h"
+#include "GrenadeLauncher.h"
 
 CGrenadeLauncher::CGrenadeLauncher() { m_fGrenadeVel = 0.f; }
 CGrenadeLauncher::~CGrenadeLauncher() {}

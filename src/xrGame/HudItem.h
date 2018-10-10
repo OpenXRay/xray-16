@@ -8,7 +8,7 @@ class CMotionDef;
 
 #include "actor_defs.h"
 #include "inventory_space.h"
-#include "hudsound.h"
+#include "HudSound.h"
 
 struct attachable_hud_item;
 class motion_marks;
@@ -67,17 +67,15 @@ protected:
         fl_inertion_allow = (1 << 3),
     };
 
-    struct
-    {
-        const CMotionDef* m_current_motion_def;
-        shared_str m_current_motion;
-        u32 m_dwMotionCurrTm;
-        u32 m_dwMotionStartTm;
-        u32 m_dwMotionEndTm;
-        u32 m_startedMotionState;
-        u8 m_started_rnd_anim_idx;
-        bool m_bStopAtEndAnimIsRunning;
-    };
+    // Motion data
+    const CMotionDef* m_current_motion_def;
+    shared_str m_current_motion;
+    u32 m_dwMotionCurrTm;
+    u32 m_dwMotionStartTm;
+    u32 m_dwMotionEndTm;
+    u32 m_startedMotionState;
+    u8 m_started_rnd_anim_idx;
+    bool m_bStopAtEndAnimIsRunning;
 
 public:
     virtual void Load(LPCSTR section);

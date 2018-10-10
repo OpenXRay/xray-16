@@ -1,10 +1,10 @@
 #pragma once
 
-#include "xrEngine/feel_touch.h"
-#include "xrEngine/feel_sound.h"
-#include "xrEngine/iinputreceiver.h"
+#include "xrEngine/Feel_Touch.h"
+#include "xrEngine/Feel_Sound.h"
+#include "xrEngine/IInputReceiver.h"
 #include "Include/xrRender/KinematicsAnimated.h"
-#include "actor_flags.h"
+#include "Actor_Flags.h"
 #include "actor_defs.h"
 #include "fire_disp_controller.h"
 #include "entity_alive.h"

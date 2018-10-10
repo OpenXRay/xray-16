@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "Layers/xrRender/uber_deffer.h"
-#include "Blender_deffer_model.h"
+#include "blender_deffer_model.h"
 
 CBlender_deffer_model::CBlender_deffer_model()
 {

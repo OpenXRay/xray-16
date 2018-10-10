@@ -1,28 +1,28 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "phmovementcontrol.h"
+#include "PHMovementControl.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrServerEntities/alife_space.h"
 
-#include "xrPhysics/phCharacter.h"
+#include "xrPhysics/PHCharacter.h"
 #include "xrPhysics/IPHCapture.h"
-#include "xrPhysics/iphysicsshellholder.h"
+#include "xrPhysics/IPhysicsShellHolder.h"
 #include "xrPhysics/ElevatorState.h"
 #include "xrPhysics/CalculateTriangle.h"
-#include "xrPhysics/Icolisiondamageinfo.h"
+#include "xrPhysics/IColisiondamageInfo.h"
 #include "xrPhysics/phvalide.h"
-#include "xrPhysics/physicsshell.h"
-#include "xrPhysics/iphworld.h"
+#include "xrPhysics/PhysicsShell.h"
+#include "xrPhysics/IPHWorld.h"
 
 #include "detail_path_manager.h"
 #include "xrEngine/GameMtlLib.h"
 #include "xrEngine/xr_object.h"
 #include "CaptureBoneCallback.h"
 #include "Level.h"
-#include "physicsshellholder.h"
+#include "PhysicsShellHolder.h"
 #include "xrCore/xr_token.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 #include "Include/xrRender/Kinematics.h"
@@ -1712,8 +1712,8 @@ void CPHMovementControl::SetPLastMaterialIDX(u16* p)
 void CPHMovementControl::dbg_Draw()
 {
 #if 0
-		if(m_character)
-			m_character->OnRender();
+        if(m_character)
+            m_character->OnRender();
 #endif
 };
 #endif

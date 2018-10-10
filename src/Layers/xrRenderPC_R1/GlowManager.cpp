@@ -68,7 +68,7 @@ void CGlow::set_radius(float R)
     radius = R;
     spatial_move();
 };
-void CGlow::set_texture(LPCSTR name) { shader.create("effects\\glow", name); }
+void CGlow::set_texture(LPCSTR name) { shader.create("effects" DELIMITER "glow", name); }
 void CGlow::set_color(const Fcolor& C) { color = C; }
 void CGlow::set_color(float r, float g, float b) { color.set(r, g, b, 1); }
 void CGlow::spatial_move()

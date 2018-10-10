@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHCommander.h"
-#include "phsimplecalls.h"
+#include "PHSimpleCalls.h"
 
 #ifdef DEBUG
 #include "xrPhysics/IPHWorld.h"

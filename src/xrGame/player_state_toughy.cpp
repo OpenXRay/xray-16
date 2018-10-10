@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "player_state_toughy.h"
 #include "game_cl_base.h"
 #include "game_state_accumulator.h"
-#include "actor.h"
-#include "actorcondition.h"
+#include "Actor.h"
+#include "ActorCondition.h"
 
 namespace award_system
 {

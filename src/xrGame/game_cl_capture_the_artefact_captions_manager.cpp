@@ -4,7 +4,7 @@
 #include "ui/TeamInfo.h"
 #include "game_cl_capture_the_artefact.h"
 #include "game_cl_capture_the_artefact_captions_manager.h"
-#include "actor.h"
+#include "Actor.h"
 
 CTAGameClCaptionsManager::CTAGameClCaptionsManager()
     : m_can_spawn(false), dwLastTimeRemains(0)

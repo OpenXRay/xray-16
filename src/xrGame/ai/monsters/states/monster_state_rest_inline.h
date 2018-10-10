@@ -6,9 +6,9 @@
 #include "monster_state_squad_rest.h"
 #include "monster_state_squad_rest_follow.h"
 #include "state_move_to_restrictor.h"
-#include "ai/Monsters/ai_monster_squad.h"
-#include "ai/Monsters/ai_monster_squad_manager.h"
-#include "ai/Monsters/anomaly_detector.h"
+#include "ai/monsters/ai_monster_squad.h"
+#include "ai/monsters/ai_monster_squad_manager.h"
+#include "ai/monsters/anomaly_detector.h"
 #include "monster_state_home_point_rest.h"
 #include "monster_state_smart_terrain_task.h"
 

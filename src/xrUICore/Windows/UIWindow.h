@@ -79,7 +79,7 @@ public:
     void ShowChildren(bool show);
 
     //абсолютные координаты
-    IC void GetAbsoluteRect(Frect& r);
+    void GetAbsoluteRect(Frect& r);
     IC void GetAbsolutePos(Fvector2& p)
     {
         Frect abs;

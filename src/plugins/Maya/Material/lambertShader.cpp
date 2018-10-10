@@ -935,7 +935,7 @@ MStatus initializePlugin(MObject obj)
     INIT_OBJ = obj;
     const MString UserClassify("shader/surface");
 
-    Core.Initialize("XRayMayaPlugin", LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
+    Core.Initialize("XRayMayaPlugin", nullptr, LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
     FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
 
     MString command("if( `window -exists createRenderNodeWindow` ) {refreshCreateRenderNodeWindow(\"");

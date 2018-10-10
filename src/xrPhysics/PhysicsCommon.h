@@ -1,5 +1,4 @@
-#ifndef PHYSICS_COMMON_H
-#define PHYSICS_COMMON_H
+#pragma once
 
 #include "DisablingParams.h"
 #include "PhysicsExternalCommon.h"
@@ -52,5 +51,3 @@ IC void MulSprDmp(float& cfm, float& erp, float mul_spring, float mul_damping)
     cfm *= factor;
     erp *= (factor * mul_spring);
 }
-
-#endif // PHYSICS_COMMON_H

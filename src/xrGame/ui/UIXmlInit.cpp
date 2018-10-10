@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIXmlInit.h"
 #include "Level.h"
 #include "string_table.h"
@@ -12,7 +12,7 @@
 #include "UILabel.h"
 #include "xrUICore/Static/UIAnimatedStatic.h"
 #include "UISleepStatic.h"
-#include "uixmlinit.h"
+#include "UIXmlInit.h"
 #include "xrUICore/ListBox/UIListBox.h"
 #include "xrUICore/ComboBox/UIComboBox.h"
 #include "xrUICore/TrackBar/UITrackBar.h"
@@ -21,7 +21,7 @@
 #include "xrUICore/XML/UITextureMaster.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
-#include "UItabButtonMP.h"
+#include "UITabButtonMP.h"
 #include "xrUICore/Lines/UILines.h"
 
 CUIXmlInit::CUIXmlInit() : baseClass() {}

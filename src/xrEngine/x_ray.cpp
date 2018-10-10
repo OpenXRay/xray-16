@@ -15,7 +15,9 @@
 #include "std_classes.h"
 #include "GameFont.h"
 #include "xrCDB/ISpatial.h"
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 #include "xrServerEntities/smart_cast.h"
 #include "xr_input.h"
 
@@ -161,9 +163,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     {
         if (pInput != nullptr)
             pInput->GrabInput(false);
-
+#if !defined(LINUX)
         g_SASH.EndBenchmark();
-
+#endif
         SDL_Event event;
         event.type = SDL_QUIT;
         SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
@@ -399,10 +401,10 @@ void CApplication::Level_Scan()
 
 void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 {
-    strconcat(sizeof(dest), dest, "intro\\intro_", level_name);
+    strconcat(sizeof(dest), dest, "intro" DELIMITER "intro_", level_name);
 
     u32 len = xr_strlen(dest);
-    if (dest[len - 1] == '\\')
+    if (dest[len - 1] == _DELIMITER)
         dest[len - 1] = 0;
 
     string16 buff;
@@ -456,7 +458,11 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
+#if defined(WINDOWS)
         if (A.hSrcFile == nullptr)
+#elif defined(LINUX)
+        if (A.hSrcFile == 0)
+#endif
         {
             LPCSTR ln = A.header->r_string("header", "level_name");
             LPCSTR lv = A.header->r_string("header", "level_ver");
@@ -472,7 +478,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
         Level_Scan();
 
     string256 buffer;
-    strconcat(sizeof(buffer), buffer, name, "\\");
+    strconcat(sizeof(buffer), buffer, name, DELIMITER);
     for (u32 I = 0; I < Levels.size(); ++I)
     {
         if (0 == xr_stricmp(buffer, Levels[I].folder))

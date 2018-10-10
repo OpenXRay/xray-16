@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shootingobject.h"
-#include "weaponammo.h"
-#include "rocketlauncher.h"
-#include "entity.h"
-#include "phskeleton.h"
+#include "ShootingObject.h"
+#include "WeaponAmmo.h"
+#include "RocketLauncher.h"
+#include "Entity.h"
+#include "PHSkeleton.h"
 #include "hit_immunity.h"
 #include "memory_manager.h"
 #include "HudSound.h"

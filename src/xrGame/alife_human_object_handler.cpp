@@ -6,7 +6,7 @@
 //	Description : ALife human object handler class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_human_object_handler.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 

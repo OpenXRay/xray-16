@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "xrserver.h"
+#include "StdAfx.h"
+#include "xrServer.h"
 
 class xrClientData;
 class CSE_Abstract;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_cl_mp.h"
 #include "xr_level_controller.h"
 #include "xrMessages.h"
@@ -26,7 +26,7 @@
 
 #include "string_table.h"
 #include "clsid_game.h"
-#include "mainmenu.h"
+#include "MainMenu.h"
 #include "WeaponKnife.h"
 #include "RegistryFuncs.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
@@ -43,10 +43,10 @@
 
 #include "xrServer_info.h" //for enum_server_info_type
 
-#define KILLEVENT_ICONS "ui\\ui_hud_mp_icon_death"
-#define RADIATION_ICONS "ui\\ui_mn_radiations_hard"
-#define BLOODLOSS_ICONS "ui\\ui_mn_wounds_hard"
-#define RANK_ICONS "ui\\ui_mp_icon_rank"
+#define KILLEVENT_ICONS "ui" DELIMITER "ui_hud_mp_icon_death"
+#define RADIATION_ICONS "ui" DELIMITER "ui_mn_radiations_hard"
+#define BLOODLOSS_ICONS "ui" DELIMITER "ui_mn_wounds_hard"
+#define RANK_ICONS "ui" DELIMITER "ui_mp_icon_rank"
 
 #define KILLEVENT_GRID_WIDTH 64
 #define KILLEVENT_GRID_HEIGHT 64
@@ -84,13 +84,13 @@ game_cl_mp::game_cl_mp()
     //-----------------------------------------------------------
     //-----------------------------------------------------------
     /*	pBuySpawnMsgBox		= new CUIMessageBoxEx();
-	//.	pBuySpawnMsgBox->SetWorkPhase(GAME_PHASE_INPROGRESS);
-	pBuySpawnMsgBox->Init("message_box_buy_spawn");
-	pBuySpawnMsgBox->AddCallback("msg_box", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &game_cl_mp::OnBuySpawn));
-	string1024	BuySpawnText;
-	xr_sprintf(BuySpawnText, "You can buy a spawn for %d $. Press Yes to pay.", 
-		abs(m_iSpawn_Cost));
-	pBuySpawnMsgBox->SetText(BuySpawnText);
+    //.	pBuySpawnMsgBox->SetWorkPhase(GAME_PHASE_INPROGRESS);
+    pBuySpawnMsgBox->Init("message_box_buy_spawn");
+    pBuySpawnMsgBox->AddCallback("msg_box", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &game_cl_mp::OnBuySpawn));
+    string1024	BuySpawnText;
+    xr_sprintf(BuySpawnText, "You can buy a spawn for %d $. Press Yes to pay.",
+        abs(m_iSpawn_Cost));
+    pBuySpawnMsgBox->SetText(BuySpawnText);
 */ //-----------------------------------------------------------
     m_reward_generator = NULL;
     m_ready_to_open_buy_menu = true;
@@ -772,7 +772,7 @@ const ui_shader& game_cl_mp::GetEquipmentIconsShader()
     if (m_EquipmentIconsShader->inited())
         return m_EquipmentIconsShader;
 
-    m_EquipmentIconsShader->create("hud\\default", "ui\\ui_mp_icon_kill");
+    m_EquipmentIconsShader->create("hud" DELIMITER "default", "ui" DELIMITER "ui_mp_icon_kill");
     return m_EquipmentIconsShader;
 }
 
@@ -782,7 +782,7 @@ const ui_shader& game_cl_mp::GetKillEventIconsShader()
     /*
     if (m_KillEventIconsShader) return m_KillEventIconsShader;
 
-    m_KillEventIconsShader.create("hud\\default", KILLEVENT_ICONS);
+    m_KillEventIconsShader.create("hud" DELIMITER "default", KILLEVENT_ICONS);
     return m_KillEventIconsShader;
     */
 }
@@ -793,7 +793,7 @@ const ui_shader& game_cl_mp::GetRadiationIconsShader()
     /*
     if (m_RadiationIconsShader) return m_RadiationIconsShader;
 
-    m_RadiationIconsShader.create("hud\\default", RADIATION_ICONS);
+    m_RadiationIconsShader.create("hud" DELIMITER "default", RADIATION_ICONS);
     return m_RadiationIconsShader;
     */
 }
@@ -804,7 +804,7 @@ const ui_shader& game_cl_mp::GetBloodLossIconsShader()
     /*
     if (m_BloodLossIconsShader) return m_BloodLossIconsShader;
 
-    m_BloodLossIconsShader.create("hud\\default", BLOODLOSS_ICONS);
+    m_BloodLossIconsShader.create("hud" DELIMITER "default", BLOODLOSS_ICONS);
     return m_BloodLossIconsShader;
     */
 }
@@ -813,7 +813,7 @@ const ui_shader& game_cl_mp::GetRankIconsShader()
     if (m_RankIconsShader->inited())
         return m_RankIconsShader;
 
-    m_RankIconsShader->create("hud\\default", RANK_ICONS);
+    m_RankIconsShader->create("hud" DELIMITER "default", RANK_ICONS);
     return m_RankIconsShader;
 }
 
@@ -1387,7 +1387,7 @@ void game_cl_mp::LoadBonuses()
             xr_sprintf(IconH, "%s_h", IconStr);
             if (pSettings->line_exist("mp_bonus_icons", IconShader))
             {
-                NewBonus.IconShader->create("hud\\default", pSettings->r_string("mp_bonus_icons", IconShader));
+                NewBonus.IconShader->create("hud" DELIMITER "default", pSettings->r_string("mp_bonus_icons", IconShader));
             }
             Frect IconRect;
             IconRect.x1 = READ_IF_EXISTS(pSettings, r_float, "mp_bonus_icons", IconX, 0);
@@ -1526,16 +1526,18 @@ void game_cl_mp::SendCollectedData(u8 const* buffer, u32 buffer_size, u32 uncomp
         upload_memory_writer.pointer(), upload_memory_writer.size(), sending_cb, uncompressed_size);
 };
 
+#ifndef LINUX // FIXME!!!
 void game_cl_mp::generate_file_name(string_path& file_name, LPCSTR file_suffix, SYSTEMTIME const& date_time)
 {
     xr_sprintf(file_name, "%02d%02d%02d-%02d%02d%02d_%s", date_time.wYear % 100, date_time.wMonth, date_time.wDay,
         date_time.wHour, date_time.wMinute, date_time.wSecond, file_suffix);
 }
+#endif
 
 LPCSTR game_cl_mp::make_file_name(LPCSTR session_id, string_path& dest)
 {
     xr_strcpy(dest, sizeof(dest), session_id);
-    static const char* denied_symbols = "/\\?%%*:|\"<>.";
+    static const char* denied_symbols = "/" DELIMITER "?%%*:|\"<>.";
     size_t tmp_length = xr_strlen(dest);
     size_t start_pos = 0;
     size_t char_pos;
@@ -1573,9 +1575,11 @@ void game_cl_mp::PrepareToReceiveFile(
     string_path screen_shot_fn;
     LPCSTR dest_file_name = NULL;
     STRCONCAT(dest_file_name, make_file_name(client_session_id.c_str(), screen_shot_fn));
+#ifndef LINUX // FIXME!!!
     SYSTEMTIME date_time;
     GetLocalTime(&date_time);
     generate_file_name(screen_shot_fn, dest_file_name, date_time);
+#endif
 
     fr_callback_binder* tmp_binder = get_receiver_cb_binder();
     if (!tmp_binder)

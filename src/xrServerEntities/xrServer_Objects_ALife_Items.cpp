@@ -6,7 +6,7 @@
 //	Description : Server objects items for ALife simulator
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrMessages.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "clsid_game.h"
@@ -274,9 +274,9 @@ void CSE_ALifeInventoryItem::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateFloat(values, PrepareKey(pref, *base()->s_name, "Item condition"), &m_fCondition, 0.f, 1.f);
     CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(base());
     R_ASSERT(alife_object);
-    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife\\Useful for AI"), &alife_object->m_flags,
+    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife" DELIMITER "Useful for AI"), &alife_object->m_flags,
         CSE_ALifeObject::flUsefulForAI);
-    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife\\Visible for AI"), &alife_object->m_flags,
+    PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife" DELIMITER "Visible for AI"), &alife_object->m_flags,
         CSE_ALifeObject::flVisibleForAI);
 }
 #endif // #ifndef XRGAME_EXPORTS
@@ -588,15 +588,15 @@ void CSE_ALifeItemWeapon::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateU16(items, PrepareKey(pref, *s_name, "Ammo: in magazine"), &a_elapsed, 0, 30, 1);
 
     if (m_scope_status == ALife::eAddonAttachable)
-        PHelper().CreateFlag8(items, PrepareKey(pref, *s_name, "Addons\\Scope"), &m_addon_flags, eWeaponAddonScope);
+        PHelper().CreateFlag8(items, PrepareKey(pref, *s_name, "Addons" DELIMITER "Scope"), &m_addon_flags, eWeaponAddonScope);
 
     if (m_silencer_status == ALife::eAddonAttachable)
         PHelper().CreateFlag8(
-            items, PrepareKey(pref, *s_name, "Addons\\Silencer"), &m_addon_flags, eWeaponAddonSilencer);
+            items, PrepareKey(pref, *s_name, "Addons" DELIMITER "Silencer"), &m_addon_flags, eWeaponAddonSilencer);
 
     if (m_grenade_launcher_status == ALife::eAddonAttachable)
         PHelper().CreateFlag8(
-            items, PrepareKey(pref, *s_name, "Addons\\Podstvolnik"), &m_addon_flags, eWeaponAddonGrenadeLauncher);
+            items, PrepareKey(pref, *s_name, "Addons" DELIMITER "Podstvolnik"), &m_addon_flags, eWeaponAddonGrenadeLauncher);
 }
 #endif // #ifndef XRGAME_EXPORTS
 
@@ -748,8 +748,8 @@ void CSE_ALifeItemAmmo::FillProps(LPCSTR pref, PropItemVec& values)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeItemAmmo::can_switch_online() const noexcept { return inherited::can_switch_online(); }
-bool CSE_ALifeItemAmmo::can_switch_offline() const noexcept
+bool CSE_ALifeItemAmmo::can_switch_online() const /* noexcept */ { return inherited::can_switch_online(); }
+bool CSE_ALifeItemAmmo::can_switch_offline() const /* noexcept */
 { return (inherited::can_switch_offline() && a_elapsed != 0); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemDetector
@@ -948,11 +948,11 @@ void CSE_ALifeItemBolt::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_W
 void CSE_ALifeItemBolt::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
 void CSE_ALifeItemBolt::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); };
 void CSE_ALifeItemBolt::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); };
-bool CSE_ALifeItemBolt::can_save() const noexcept
+bool CSE_ALifeItemBolt::can_save() const /* noexcept */
 {
     return false; //! attached());
 }
-bool CSE_ALifeItemBolt::used_ai_locations() const noexcept { return false; }
+bool CSE_ALifeItemBolt::used_ai_locations() const /* noexcept */ { return false; }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeItemBolt::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
 #endif // #ifndef XRGAME_EXPORTS

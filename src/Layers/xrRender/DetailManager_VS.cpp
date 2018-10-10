@@ -171,7 +171,7 @@ void CDetailManager::hw_Load_Shaders()
 {
     // Create shader to access constant storage
     ref_shader S;
-    S.create("details\\set");
+    S.create("details" DELIMITER "set");
     R_constant_table& T0 = *(S->E[0]->passes[0]->constants);
     R_constant_table& T1 = *(S->E[1]->passes[0]->constants);
     hwc_consts = T0.get("consts");

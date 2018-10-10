@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/Monsters/control_path_builder.h"
+#include "ai/monsters/control_path_builder.h"
 
 class CPoltergeist;
 class CCustomMonster;

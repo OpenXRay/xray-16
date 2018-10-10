@@ -20,8 +20,10 @@ void CBlender_DESC::Setup(LPCSTR N)
 
     xr_strcpy(cComputer, Core.CompName); // Computer
 #ifndef _EDITOR
+#if defined(WINDOWS) // TODO Implement for Linux
     _tzset();
     _time32((__time32_t*)&cTime); // Time
+#endif
 #else
     _tzset();
     time((long*)&cTime); // Time

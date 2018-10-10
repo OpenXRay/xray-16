@@ -16,8 +16,8 @@ class CGameObject;
 
 namespace RestrictionSpace
 {
-enum ERestrictorTypes;
-};
+enum ERestrictorTypes : u32;
+}
 
 template <bool add>
 struct CRestrictionPredicate;

@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_path_builder.h"
 #include "control_manager.h"
-#include "BaseMonster/base_monster.h"
+#include "basemonster/base_monster.h"
 #include "game_location_selector.h"
 #include "level_location_selector.h"
 #include "detail_path_manager.h"
@@ -10,7 +10,7 @@
 #include "movement_manager_space.h"
 #include "level_path_manager.h"
 #include "Actor.h"
-#include "Actor_Memory.h"
+#include "actor_memory.h"
 #include "visual_memory_manager.h"
 
 #ifdef DEBUG

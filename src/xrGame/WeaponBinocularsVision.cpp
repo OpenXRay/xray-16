@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "WeaponBinocularsVision.h"
 #include "WeaponBinoculars.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "entity_alive.h"
 #include "visual_memory_manager.h"
-#include "actor.h"
+#include "Actor.h"
 #include "actor_memory.h"
 #include "relation_registry.h"
 #include "Common/object_broker.h"
@@ -12,7 +12,7 @@
 #include "game_base_space.h"
 #include "Level.h"
 #include "game_cl_base.h"
-#include "AI/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "xrEngine/IGame_Persistent.h"
 
 #define RECT_SIZE 11
@@ -31,16 +31,16 @@ struct FindVisObjByObject
 void SBinocVisibleObj::create_default(u32 color)
 {
     Frect r = {0, 0, RECT_SIZE, RECT_SIZE};
-    m_lt.InitTexture("ui\\ui_enemy_frame");
+    m_lt.InitTexture("ui" DELIMITER "ui_enemy_frame");
     m_lt.SetWndRect(r);
     m_lt.SetAlignment(waCenter);
-    m_lb.InitTexture("ui\\ui_enemy_frame");
+    m_lb.InitTexture("ui" DELIMITER "ui_enemy_frame");
     m_lb.SetWndRect(r);
     m_lb.SetAlignment(waCenter);
-    m_rt.InitTexture("ui\\ui_enemy_frame");
+    m_rt.InitTexture("ui" DELIMITER "ui_enemy_frame");
     m_rt.SetWndRect(r);
     m_rt.SetAlignment(waCenter);
-    m_rb.InitTexture("ui\\ui_enemy_frame");
+    m_rb.InitTexture("ui" DELIMITER "ui_enemy_frame");
     m_rb.SetWndRect(r);
     m_rb.SetAlignment(waCenter);
 

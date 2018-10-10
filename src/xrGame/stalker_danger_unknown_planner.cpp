@@ -6,7 +6,7 @@
 //	Description : Stalker danger unknown planner class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_danger_unknown_planner.h"
 #include "ai/stalker/ai_stalker.h"
 #include "ai/stalker/ai_stalker_space.h"

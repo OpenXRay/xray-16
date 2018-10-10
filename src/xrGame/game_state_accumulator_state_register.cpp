@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_state_accumulator.h"
 
 // typelist:
@@ -32,11 +32,34 @@
 
 namespace award_system
 {
+
+template <typename>
+struct AccumulatorHelper;
+
+template <>
+struct AccumulatorHelper<Loki::NullType> {
+	static void init_acpv(game_state_accumulator*,
+		game_state_accumulator::accumulative_values_collection_t&)
+	{
+	}
+};
+
+template <typename Head, typename Tail>
+struct AccumulatorHelper<Loki::Typelist<Head, Tail>> {
+	static void init_acpv(game_state_accumulator* self,
+		game_state_accumulator::accumulative_values_collection_t& accumulative_values)
+	{
+		AccumulatorHelper<Tail>::init_acpv(self, accumulative_values);
+		player_state_param* tmp_obj_inst = new typename Head::value_type(self);
+		accumulative_values.insert(std::make_pair(Head::value_id, tmp_obj_inst));
+	}
+};
+
 void game_state_accumulator::init_accumulative_values()
 {
     static_assert(Loki::TL::Length<ACCUMULATIVE_STATE_LIST>::value == acpv_count,
         "Not all accumulative values has been added to a ACCUMULATIVE_STATE_LIST type list.");
 
-    init_acpv_list<ACCUMULATIVE_STATE_LIST>();
+    AccumulatorHelper<ACCUMULATIVE_STATE_LIST>::init_acpv(this, m_accumulative_values);
 }
 } // namespace award_system

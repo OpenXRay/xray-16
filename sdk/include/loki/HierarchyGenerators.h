@@ -29,7 +29,7 @@
 #define HIERARCHYGENERATORS_INC_
 
 #include "Typelist.h"
-#include "TypeTraits.h"
+#include "TypeManip.h"
 #include "EmptyType.h"
 
 namespace Loki
@@ -158,9 +158,9 @@ namespace Loki
         >
         ::Result TList;
 
-        template <typename T> struct Rebind
+        template <typename U> struct Rebind
         {
-            typedef Unit<T> Result;
+            typedef Unit<U> Result;
         };
     };
 
@@ -228,7 +228,7 @@ namespace Loki
             typedef typename TL::TypeAt<typename H::TList, i>::Result ElementType;
             typedef typename H::template Rebind<ElementType>::Result UnitType;
             
-            enum { isConst = TypeTraits<H>::isConst };
+            static constexpr bool isConst = std::is_const_v<H>;
 
             typedef typename Select
             <
@@ -273,7 +273,7 @@ namespace Loki
             typedef typename H::TList::Head ElementType;
             typedef typename H::template Rebind<ElementType>::Result UnitType;
             
-            enum { isConst = TypeTraits<H>::isConst };
+            static constexpr bool isConst = std::is_const_v<H>;
 
             typedef typename Select
             <

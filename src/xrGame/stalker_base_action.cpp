@@ -6,7 +6,7 @@
 //	Description : Stalker base action
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_base_action.h"
 #include "ai/stalker/ai_stalker.h"
 #include "script_game_object.h"

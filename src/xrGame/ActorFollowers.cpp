@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 /*
 #include "ActorFollowers.h"
 #include "ui/xrxmlparser.h"
@@ -6,7 +6,7 @@
 #include "Level.h"
 #include "HUDManager.h"
 #include "UIGameCustom.h"
-#include "actor.h"
+#include "Actor.h"
 
 CActorFollowerMngr::CActorFollowerMngr()
 {

@@ -1,19 +1,19 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ParticlesObject.h"
 #include "xrEngine/GameMtlLib.h"
 #include "Level.h"
-#include "gamepersistent.h"
-#include "xrPhysics/Extendedgeom.h"
+#include "GamePersistent.h"
+#include "xrPhysics/ExtendedGeom.h"
 #include "PhysicsGamePars.h"
 
 #include "xrPhysics/PhysicsExternalCommon.h"
-#include "PhSoundPlayer.h"
+#include "PHSoundPlayer.h"
 #include "PhysicsShellHolder.h"
 #include "PHCommander.h"
 #include "xrPhysics/MathUtils.h"
-#include "xrPhysics/iPHWorld.h"
+#include "xrPhysics/IPHWorld.h"
 
-#include "phreqcomparer.h"
+#include "PHReqComparer.h"
 
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/WallMarkArray.h"
@@ -156,11 +156,11 @@ static void play_object(dxGeomUserData* data, SGameMtlPair* mtl_pair, const dCon
 
     CPHSoundPlayer* sp = NULL;
 #ifdef DEBUG
-    __try
+    try
     {
         sp = data->ph_ref_object->ObjectPhSoundPlayer();
     }
-    __except (EXCEPTION_EXECUTE_HANDLER)
+    catch (...)
     {
         Msg("data->ph_ref_object: %p ", data->ph_ref_object);
         Msg("data: %p ", data);

@@ -17,6 +17,7 @@ void getFileCrc32(IReader* F, LPCSTR filePath, u32& outCrc, bool parseIncludes)
                 R_ASSERT(filePath && filePath[0]);
                 if (_GetItem(str, 1, inc_name, '"'))
                 {
+                    xr_strlwr(inc_name);
                     string_path fn;
                     strconcat(sizeof fn, fn, filePath, inc_name);
                     const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);

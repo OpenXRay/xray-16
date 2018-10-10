@@ -22,8 +22,7 @@
 STATIC_CHECK(false, CS_STRING_CONCAT_or_CS_STRING_CONCAT_HELPER_or_CS_STRING_CONCAT4_macro_already_defined);
 #endif // #if defined(CS_STRING_CONCAT) || defined(CS_STRING_CONCAT_HELPER)
 
-#define CS_STRING_CONCAT_HELPER(a, b) a##b
-#define CS_STRING_CONCAT(a, b) CS_STRING_CONCAT_HELPER(a, b)
+#define CS_STRING_CONCAT(a, b) (a"" b)
 
 // CS_MAKE_STRING macro
 #if defined(CS_MAKE_STRING) || defined(CS_MAKE_STRING_HELPER)

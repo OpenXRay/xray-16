@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "profile_data_types.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "profile_data_types_script.h"
@@ -20,6 +20,7 @@ SCRIPT_EXPORT(profile_data_script_registrator, (), {
             .def_readonly("second", &all_best_scores_t::value_type::second)];
 });
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(store_operation_cb, (), {
     module(luaState)[class_<gamespy_profile::store_operation_cb>("store_operation_cb")
                          .def(constructor<>())
@@ -28,3 +29,4 @@ SCRIPT_EXPORT(store_operation_cb, (), {
                          .def("bind", &gamespy_profile::store_operation_cb::bind)
                          .def("clear", &gamespy_profile::store_operation_cb::clear)];
 });
+#endif

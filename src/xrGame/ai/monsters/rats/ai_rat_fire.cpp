@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "ai/Monsters/rats/ai_rat.h"
-#include "ai/Monsters/rats/ai_rat_impl.h"
-#include "ai/Monsters/rats/ai_rat_space.h"
+#include "ai/monsters/rats/ai_rat.h"
+#include "ai/monsters/rats/ai_rat_impl.h"
+#include "ai/monsters/rats/ai_rat_space.h"
 #include "memory_manager.h"
 #include "enemy_manager.h"
 #include "item_manager.h"

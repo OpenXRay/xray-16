@@ -1,14 +1,14 @@
-#include "stdafx.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "StdAfx.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 #include "Level.h"
 #include "xrServer.h"
 #include "game_cl_base.h"
 #include "game_cl_mp.h"
-#include "actor.h"
-#include "xrServer_Object_base.h"
+#include "Actor.h"
+#include "xrServer_Object_Base.h"
 #include "RegistryFuncs.h"
-#include "gamepersistent.h"
+#include "GamePersistent.h"
 #include "MainMenu.h"
 #include "UIGameCustom.h"
 #include "game_sv_deathmatch.h"
@@ -416,7 +416,7 @@ public:
         else
         {
             u32 tmp_client_id;
-            if (sscanf_s(args, "%u", &tmp_client_id) != 1)
+            if (sscanf(args, "%u", &tmp_client_id) != 1)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg("Kick player. Format: \"sv_kick_id <player session id | \'%s\'>\". To receive list of players ids "
@@ -508,7 +508,7 @@ public:
         else
         {
             u32 tmp_client_id;
-            if (sscanf_s(args_, "%u", &tmp_client_id) != 1)
+            if (sscanf(args_, "%u", &tmp_client_id) != 1)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg("Make screenshot. Format: \"make_screenshot <player session id | \'%s\'> <ban_time_in_sec>\". To "
@@ -556,7 +556,7 @@ public:
         else
         {
             u32 tmp_client_id;
-            if (sscanf_s(args_, "%u", &tmp_client_id) != 1)
+            if (sscanf(args_, "%u", &tmp_client_id) != 1)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg("Make screenshot. Format: \"make_config_dump <player session id | \'%s\'> <ban_time_in_sec>\". To "
@@ -615,7 +615,7 @@ protected:
         string32 param_name;
         param_name[0] = 0;
 
-        sscanf_s(args_string, "%16s %32s", action_name, sizeof(action_name), param_name, sizeof(param_name));
+        sscanf(args_string, "%16s %32s", action_name, param_name);
         m_action_param = param_name;
 
         if (!xr_strcmp(action_name, "roundstart"))
@@ -908,7 +908,7 @@ public:
         if (!strncmp(args_, LAST_PRINTED_PLAYER_STR, sizeof(LAST_PRINTED_PLAYER_STR) - 1))
         {
             client_id = last_printed_player;
-            if (sscanf_s(args_ + sizeof(LAST_PRINTED_PLAYER_STR), "%d", &ban_time) != 1)
+            if (sscanf(args_ + sizeof(LAST_PRINTED_PLAYER_STR), "%d", &ban_time) != 1)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg("Ban player. Format: \"sv_banplayer <player session id | \'%s\'> <ban_time_in_sec>\". To receive "
@@ -921,7 +921,7 @@ public:
         else
         {
             u32 tmp_client_id;
-            if (sscanf_s(args_, "%u %d", &tmp_client_id, &ban_time) != 2)
+            if (sscanf(args_, "%u %d", &tmp_client_id, &ban_time) != 2)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg("Ban player. Format: \"sv_banplayer <player session id | \'%s\'> <ban_time_in_sec>\". To receive "
@@ -970,7 +970,7 @@ public:
 
         char hex_digest[64];
         s32 ban_time = 0;
-        if (sscanf_s(args_, "%s %i", &hex_digest, sizeof(hex_digest), &ban_time) != 2)
+        if (sscanf(args_, "%s %i", &hex_digest, &ban_time) != 2)
         {
             Msg("! ERROR: bad command parameters.");
             Msg("Ban player. Format: \"sv_banplayer_by_digest <hex digest> <ban_time_in_sec>\". To get player hex "
@@ -1012,7 +1012,7 @@ public:
         {
             // size_t ????? u32 maybe?
             size_t player_index = 0;
-            if (sscanf_s(args_, "%u", &player_index) != 1)
+            if (sscanf(args_, "%u", &player_index) != 1)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg(" Unban player. Format: \"sv_unbanplayer <banned player index | \'%s\'>. To receive list of banned "
@@ -1226,7 +1226,7 @@ public:
             exclude_raid_from_args(args, tmp_dest, sizeof(tmp_dest));
             if (xr_strlen(tmp_dest))
             {
-                sscanf_s(tmp_dest, "%s", filter_string, sizeof(filter_string));
+                sscanf(tmp_dest, "%s", filter_string);
                 tmp_functor.filter_string = filter_string;
             }
         }
@@ -1323,7 +1323,7 @@ public:
         exclude_raid_from_args(args, tmp_dest, sizeof(tmp_dest));
         if (xr_strlen(tmp_dest))
         {
-            sscanf_s(tmp_dest, "%s", filter_dest, sizeof(filter_dest));
+            sscanf(tmp_dest, "%s", filter_dest);
         }
         tmp_sv_game->PrintBanList(filter_dest);
         Level().Server->Print_Banned_Addreses();
@@ -1356,8 +1356,7 @@ public:
         string256 GameType;
         GameType[0] = 0;
 
-        sscanf_s(args, "%255s %255s %255s", LevelName, sizeof(LevelName), LevelVersion, sizeof(LevelVersion), GameType,
-            sizeof(GameType));
+        sscanf(args, "%255s %255s %255s", LevelName, LevelVersion, GameType);
 
         EGameIDs GameTypeID = ParseStringToGameType(GameType);
         if (GameTypeID == eGameIDNoGame)
@@ -1450,7 +1449,7 @@ public:
         string256 LevelVersion;
         LevelName[0] = 0;
         LevelVersion[0] = 0;
-        sscanf_s(args, "%255s %255s", LevelName, sizeof(LevelName), LevelVersion, sizeof(LevelVersion));
+        sscanf(args, "%255s %255s", LevelName, LevelVersion);
 
         string1024 argsNew;
         xr_sprintf(argsNew, "%s %s %s", LevelName, LevelVersion, Level().Server->GetGameState()->type_name());

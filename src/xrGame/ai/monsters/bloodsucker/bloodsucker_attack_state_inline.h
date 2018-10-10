@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/Monsters/states/state_move_to_point.h"
+#include "ai/monsters/states/state_move_to_point.h"
 
 #define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
@@ -183,11 +183,11 @@ bool CBloodsuckerStateAttackAbstract::check_hiding()
 TEMPLATE_SPECIALIZATION
 void CBloodsuckerStateAttackAbstract::setup_substates()
 {
-    state_ptr state = get_state_current();
+    typename inherited::state_ptr state = get_state_current();
 
     if (current_substate == eStateAttack_Hide)
     {
-        CStateMonsterBackstubEnemy<_Object>::StateParams data;
+        typename CStateMonsterBackstubEnemy<_Object>::StateParams data;
 
         data.action.action = ACT_RUN;
         data.action.time_out = 0;

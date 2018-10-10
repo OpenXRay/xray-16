@@ -600,9 +600,9 @@ depth##ox = sidePr - dFabs(dist##ox);                                           
         dContactGeom *prc, *c = CONTACT(contact, ret * skip);
         prc = c;
 #define FOO(j, op, spoint)                                \
-    c->pos[0] = spoint##[0] op 2.f * hside[j] * R[0 + j]; \
-    c->pos[1] = spoint##[1] op 2.f * hside[j] * R[4 + j]; \
-    c->pos[2] = spoint##[2] op 2.f * hside[j] * R[8 + j];
+	c->pos[0] = spoint[0] op 2.f * hside[j] * R[0 + j]; \
+	c->pos[1] = spoint[1] op 2.f * hside[j] * R[4 + j]; \
+	c->pos[2] = spoint[2] op 2.f * hside[j] * R[8 + j];
 #define BAR(side, sideinc, spos, sdepth)      \
     {                                         \
         pdepth = &(c->depth);                 \

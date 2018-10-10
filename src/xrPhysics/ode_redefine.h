@@ -1,5 +1,4 @@
-#ifndef ODE_REDEFINE
-#define ODE_REDEFINE
+#pragma once
 
 #ifdef XRPHYSICS_EXPORTS
 
@@ -29,5 +28,3 @@
 #endif
 
 #endif // XRGAME_EXPORTS
-
-#endif // ODE_REDEFINE

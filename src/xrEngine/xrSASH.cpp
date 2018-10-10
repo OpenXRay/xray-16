@@ -644,7 +644,7 @@ void xrSASH::GetOption(pcstr pszOptionName)
     else if (pToken)
     {
         IConsole_Command::TStatus stat;
-        pToken->Status(stat);
+        pToken->GetStatus(stat);
         Val.Enum = stat;
         oaAddOptionValue(pszOptionName, OA_TYPE_ENUM, &Val);
     }

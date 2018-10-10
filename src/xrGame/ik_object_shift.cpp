@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ik_object_shift.h"
 #include "pose_extrapolation.h"
 #include "xrPhysics/MathUtils.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 #ifdef DEBUG
 

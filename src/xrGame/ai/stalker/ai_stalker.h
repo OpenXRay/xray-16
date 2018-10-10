@@ -30,13 +30,13 @@ typedef CActionPlanner<CScriptGameObject, false, CActionBase<CScriptGameObject>,
 
 namespace MonsterSpace
 {
-enum EMovementDirection;
-};
+enum EMovementDirection : u32;
+}
 
 namespace StalkerSpace
 {
-enum EBodyAction;
-};
+enum EBodyAction : u32;
+}
 
 namespace smart_cover
 {
@@ -46,10 +46,10 @@ class loophole;
 namespace transitions
 {
 class action;
-};
-};
+}
+}
 
-enum ECriticalWoundType;
+enum ECriticalWoundType : u32;
 
 class CALifeSimulator;
 class CCharacterPhysicsSupport;
@@ -321,8 +321,8 @@ private:
     bool m_can_select_weapon;
 
 public:
-    bool can_select_weapon() { return m_can_select_weapon; };
-    void can_select_weapon(bool can) { m_can_select_weapon = can; };
+    bool can_select_weapon() { return m_can_select_weapon; }
+    void can_select_weapon(bool can) { m_can_select_weapon = can; }
     bool can_take(CInventoryItem const* item);
 
 protected:

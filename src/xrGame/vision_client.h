@@ -11,7 +11,7 @@
 #define VISION_CLIENT_H
 
 #include "xrEngine/ISheduled.h"
-#include "xrEngine/feel_vision.h"
+#include "xrEngine/Feel_Vision.h"
 
 class IGameObject;
 class CEntity;

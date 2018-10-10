@@ -18,9 +18,9 @@ class CVertex;
 class CAI_ObjectLocation
 {
 public:
-    typedef GameGraph::_GRAPH_ID _GRAPH_ID;
-    typedef GameGraph::CVertex CVertex;
-    typedef LevelGraph::CVertex CLevelVertex;
+    using _GRAPH_ID = GameGraph::_GRAPH_ID;
+    using CVertex = GameGraph::CVertex;
+    using CLevelVertex = LevelGraph::CVertex;
 
 private:
     u32 m_level_vertex_id;

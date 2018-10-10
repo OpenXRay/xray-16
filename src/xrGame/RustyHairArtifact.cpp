@@ -3,7 +3,7 @@
 // RustyHairArtefact - артефакт ржавые волосы
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "RustyHairArtifact.h"
 
 CRustyHairArtefact::CRustyHairArtefact(void) {}

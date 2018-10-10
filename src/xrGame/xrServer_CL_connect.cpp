@@ -1,8 +1,8 @@
-#include "stdafx.h"
-#include "xrserver.h"
-#include "xrmessages.h"
-#include "xrserver_objects.h"
-#include "xrServer_Objects_Alife_Monsters.h"
+#include "StdAfx.h"
+#include "xrServer.h"
+#include "xrMessages.h"
+#include "xrServer_Objects.h"
+#include "xrServer_Objects_ALife_Monsters.h"
 #include "Level.h"
 #include "xrNetServer/NET_Messages.h"
 

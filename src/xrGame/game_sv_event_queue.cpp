@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_sv_event_queue.h"
 #include "xrCore/Threading/Lock.hpp"
 
@@ -38,7 +38,9 @@ GameEvent* GameEventQueue::Create()
 #ifdef _DEBUG
 //		Msg ("* GameEventQueue::Create - ready %d, unused %d", ready.size(), unused.size());
 #endif
+#ifndef LINUX // FIXME!!!
         LastTimeCreate = GetTickCount();
+#endif
         //---------------------------------------------
     }
     else
@@ -72,6 +74,7 @@ GameEvent* GameEventQueue::Create(NET_Packet& P, u16 type, u32 time, ClientID cl
     pcs->Enter();
     if (unused.empty())
     {
+#ifndef LINUX // FIXME!!!
         ready.push_back(new GameEvent());
         ge = ready.back();
 //---------------------------------------------
@@ -80,6 +83,7 @@ GameEvent* GameEventQueue::Create(NET_Packet& P, u16 type, u32 time, ClientID cl
 #endif
         LastTimeCreate = GetTickCount();
         //---------------------------------------------
+#endif
     }
     else
     {
@@ -104,6 +108,7 @@ GameEvent* GameEventQueue::Retreive()
     //---------------------------------------------
     else
     {
+#ifndef LINUX // FIXME!!
         u32 tmp_time = GetTickCount() - 60000;
         u32 size = unused.size();
         if ((LastTimeCreate < tmp_time) && (size > 32))
@@ -114,6 +119,7 @@ GameEvent* GameEventQueue::Retreive()
 //			Msg ("GameEventQueue::Retreive - ready %d, unused %d", ready.size(), unused.size());
 #endif
         }
+#endif
     }
     //---------------------------------------------
     pcs->Leave();
@@ -125,6 +131,7 @@ void GameEventQueue::Release()
     pcs->Enter();
     R_ASSERT(!ready.empty());
     //---------------------------------------------
+#ifndef LINUX // FIXME!!!
     u32 tmp_time = GetTickCount() - 60000;
     u32 size = unused.size();
     if ((LastTimeCreate < tmp_time) && (size > 32))
@@ -136,6 +143,7 @@ void GameEventQueue::Release()
     }
     else
         unused.push_back(ready.front());
+#endif
     //---------------------------------------------
     ready.pop_front();
     pcs->Leave();
@@ -175,6 +183,7 @@ u32 GameEventQueue::EraseEvents(event_predicate to_del)
     while (need_to_erase != ready.end())
     {
         //-----
+#ifndef LINUX // FIXME!!!
         u32 tmp_time = GetTickCount() - 60000;
         u32 size = unused.size();
         if ((LastTimeCreate < tmp_time) && (size > 32))
@@ -188,6 +197,7 @@ u32 GameEventQueue::EraseEvents(event_predicate to_del)
         {
             unused.push_back(*need_to_erase);
         }
+#endif
 //-----
 #ifdef DEBUG
         Msg("! GameEventQueue::EraseEvents - destroying event type[%d], sender[0x%08x]", (*need_to_erase)->type,

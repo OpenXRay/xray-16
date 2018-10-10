@@ -3,7 +3,7 @@
 // DummyArtefact - артефакт пустышка
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "DummyArtifact.h"
 #include "xrPhysics/PhysicsShell.h"
 

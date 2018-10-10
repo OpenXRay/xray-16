@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "imotion_velocity.h"
 
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/PhysicsShell.h"
 
 void imotion_velocity::state_start()
 {

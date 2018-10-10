@@ -6,7 +6,7 @@
 //	Description : Stalker anomaly planner
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_anomaly_planner.h"
 #include "stalker_anomaly_actions.h"
 #include "stalker_decision_space.h"

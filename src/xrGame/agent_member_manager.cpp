@@ -6,16 +6,16 @@
 //	Description : Agent member manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "agent_member_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "Common/object_broker.h"
 #include "agent_manager.h"
 #include "agent_memory_manager.h"
-#include "explosive.h"
+#include "Explosive.h"
 #include "sound_player.h"
 #include "cover_point.h"
-#include "grenade.h"
+#include "Grenade.h"
 
 class CMemberPredicate2
 {

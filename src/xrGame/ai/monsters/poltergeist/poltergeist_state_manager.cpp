@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "poltergeist.h"
 #include "poltergeist_state_manager.h"
 
@@ -8,13 +8,13 @@
 #include "ai/monsters/control_path_builder_base.h"
 
 #include "poltergeist_state_rest.h"
-#include "ai/Monsters/states/monster_state_eat.h"
-#include "ai/Monsters/states/monster_state_attack.h"
-#include "ai/Monsters/states/monster_state_panic.h"
+#include "ai/monsters/states/monster_state_eat.h"
+#include "ai/monsters/states/monster_state_attack.h"
+#include "ai/monsters/states/monster_state_panic.h"
 #include "poltergeist_state_attack_hidden.h"
-#include "ai/Monsters/states/monster_state_hear_int_sound.h"
-#include "ai/Monsters/states/monster_state_hear_danger_sound.h"
-#include "ai/Monsters/states/monster_state_hitted.h"
+#include "ai/monsters/states/monster_state_hear_int_sound.h"
+#include "ai/monsters/states/monster_state_hear_danger_sound.h"
+#include "ai/monsters/states/monster_state_hitted.h"
 #include "EntityCondition.h"
 
 CStateManagerPoltergeist::CStateManagerPoltergeist(CPoltergeist* obj) : inherited(obj)

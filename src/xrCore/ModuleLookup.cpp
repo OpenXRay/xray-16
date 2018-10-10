@@ -23,20 +23,21 @@ void* ModuleHandle::Open(pcstr moduleName)
 {
     if (IsLoaded())
         Close();
-    
+
     Log("Loading DLL:", moduleName);
 
 #ifdef WINDOWS
     handle = LoadLibraryA(moduleName);
 #elif defined(LINUX)
-    handle = dlopen(moduleName, RTLD_LAZY);
+    std::string soName = std::string(moduleName) + ".so";
+    handle = dlopen(soName.c_str(), RTLD_LAZY);
 #endif
     if (handle == nullptr)
     {
 #ifdef WINDOWS
         Msg("! Failed to load DLL: 0x%d", GetLastError());
 #elif defined(LINUX)
-        Msg("! Failed to load DLL: 0x%d", dlerror());
+        Msg("! Failed to load DLL %s: %s", soName.c_str(), dlerror());
 #endif
     }
 

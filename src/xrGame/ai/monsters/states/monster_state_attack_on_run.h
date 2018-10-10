@@ -1,11 +1,10 @@
 #ifndef MONSTER_STATE_ATTACK_ON_RUN_H
 #define MONSTER_STATE_ATTACK_ON_RUN_H
 
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 
 #include "ai/weighted_random.h"
 
-inline TTime current_time() { return Device.dwTimeGlobal; }
 template <typename _Object>
 class CStateMonsterAttackOnRun : public CState<_Object>
 {

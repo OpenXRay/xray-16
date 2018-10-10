@@ -17,7 +17,7 @@ class CPathManager<CGameGraph, _DataStorage, _Parameters, _dist_type, _index_typ
 {
 protected:
     typedef CGameGraph _Graph;
-    typedef typename CPathManagerGeneric<_Graph, _DataStorage, _Parameters, _dist_type, _index_type, _iteration_type>
+    typedef CPathManagerGeneric<_Graph, _DataStorage, _Parameters, _dist_type, _index_type, _iteration_type>
         inherited;
 
 protected:

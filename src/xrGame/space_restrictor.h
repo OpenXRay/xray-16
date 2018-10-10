@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "gameobject.h"
+#include "GameObject.h"
 #include "restriction_space.h"
 
 class CSpaceRestrictor : public CGameObject

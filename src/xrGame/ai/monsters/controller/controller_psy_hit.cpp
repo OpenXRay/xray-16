@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "controller_psy_hit.h"
-#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "controller.h"
 #include "ai/monsters/control_animation_base.h"
 #include "ai/monsters/control_direction_base.h"

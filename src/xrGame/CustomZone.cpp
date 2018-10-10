@@ -1,21 +1,21 @@
-#include "stdafx.h"
-#include "xrEngine/xr_ioconsole.h"
-#include "customzone.h"
-#include "hit.h"
+#include "StdAfx.h"
+#include "xrEngine/XR_IOConsole.h"
+#include "CustomZone.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
-#include "actor.h"
+#include "Actor.h"
 #include "ParticlesObject.h"
-#include "xrserver_objects_alife_monsters.h"
+#include "xrServer_Objects_ALife_Monsters.h"
 #include "xrEngine/LightAnimLibrary.h"
 #include "Level.h"
 #include "game_cl_base.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/xr_collide_form.h"
-#include "artefact.h"
+#include "Artefact.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "Include/xrRender/Kinematics.h"
 #include "zone_effector.h"
-#include "breakableobject.h"
+#include "BreakableObject.h"
 #include "GamePersistent.h"
 
 #define WIND_RADIUS (4 * Radius()) //расстояние до актера, когда появляется ветер
@@ -758,7 +758,7 @@ void CCustomZone::PlayHitParticles(CGameObject* pObject)
         }
     }
 }
-#include "bolt.h"
+#include "Bolt.h"
 void CCustomZone::PlayEntranceParticles(CGameObject* pObject)
 {
     m_entrance_sound.play_at_pos(0, pObject->Position());

@@ -1,9 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "UIEditKeyBind.h"
 #include "xr_level_controller.h"
 #include "Common/object_broker.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 
 CUIEditKeyBind::CUIEditKeyBind(bool bPrim)
 {

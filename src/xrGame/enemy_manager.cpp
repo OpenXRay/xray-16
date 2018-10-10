@@ -20,7 +20,7 @@
 #include "script_game_object.h"
 #include "ai_space.h"
 #include "xrEngine/profiler.h"
-#include "actor.h"
+#include "Actor.h"
 #include "ai/stalker/ai_stalker.h"
 #include "movement_manager.h"
 #include "agent_manager.h"

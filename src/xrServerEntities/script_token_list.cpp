@@ -6,7 +6,7 @@
 //	Description : Script token list class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "script_token_list.h"
 #include <algorithm>
 

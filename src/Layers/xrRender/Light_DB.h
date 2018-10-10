@@ -1,7 +1,7 @@
 #pragma once
 
 #include "light.h"
-#include "light_package.h"
+#include "Light_Package.h"
 
 class CLight_DB
 {

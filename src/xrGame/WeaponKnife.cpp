@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "WeaponKnife.h"
 #include "Entity.h"
@@ -8,7 +8,7 @@
 #include "game_cl_base.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/GameMtlLib.h"
-#include "level_bullet_manager.h"
+#include "Level_Bullet_Manager.h"
 #include "ai_sounds.h"
 #include "game_cl_single.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
@@ -18,7 +18,7 @@
 #include <iterator>
 #endif
 
-#define KNIFE_MATERIAL_NAME "objects\\knife"
+#define KNIFE_MATERIAL_NAME "objects" DELIMITER "knife"
 
 #ifdef DEBUG
 #include "debug_renderer.h"

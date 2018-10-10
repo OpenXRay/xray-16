@@ -15,7 +15,7 @@
 #include "inventory_space.h"
 
 #include "character_info_defs.h"
-#include "infoportiondefs.h"
+#include "InfoPortionDefs.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4005)
@@ -152,8 +152,8 @@ public:
     CSE_ALifeItemAmmo(LPCSTR caSection);
     virtual ~CSE_ALifeItemAmmo();
     virtual CSE_ALifeItemAmmo* cast_item_ammo() { return this; };
-    virtual bool can_switch_online() const noexcept;
-    virtual bool can_switch_offline() const noexcept;
+    virtual bool can_switch_online() const /* noexcept */;
+    virtual bool can_switch_offline() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -404,8 +404,8 @@ public:
     u32 m_ef_weapon_type;
     CSE_ALifeItemBolt(LPCSTR caSection);
     virtual ~CSE_ALifeItemBolt();
-    virtual bool can_save() const noexcept;
-    virtual bool used_ai_locations() const noexcept;
+    virtual bool can_save() const /* noexcept */;
+    virtual bool used_ai_locations() const /* noexcept */;
     virtual u32 ef_weapon_type() const;
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);

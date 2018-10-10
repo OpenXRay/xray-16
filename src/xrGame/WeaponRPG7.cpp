@@ -1,11 +1,11 @@
-#include "stdafx.h"
-#include "weaponrpg7.h"
-#include "xrserver_objects_alife_items.h"
-#include "explosiverocket.h"
-#include "entity.h"
+#include "StdAfx.h"
+#include "WeaponRPG7.h"
+#include "xrServer_Objects_ALife_Items.h"
+#include "ExplosiveRocket.h"
+#include "Entity.h"
 #include "Level.h"
 #include "player_hud.h"
-#include "hudmanager.h"
+#include "HUDManager.h"
 
 CWeaponRPG7::CWeaponRPG7() {}
 CWeaponRPG7::~CWeaponRPG7() {}
@@ -81,8 +81,8 @@ void CWeaponRPG7::ReloadMagazine()
 
 void CWeaponRPG7::SwitchState(u32 S) { inherited::SwitchState(S); }
 void CWeaponRPG7::FireStart() { inherited::FireStart(); }
-#include "inventory.h"
-#include "inventoryOwner.h"
+#include "Inventory.h"
+#include "InventoryOwner.h"
 void CWeaponRPG7::switch2_Fire()
 {
     m_iShotNum = 0;

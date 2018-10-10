@@ -1,8 +1,8 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "CharacterPhysicsSupport.h"
 #include "alife_space.h"
-#include "hit.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
 #include "PHMovementControl.h"
 #include "CustomMonster.h"
@@ -10,9 +10,9 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 
 #include "xrPhysics/PhysicsShell.h"
-#include "xrPhysics/iActivationShape.h"
+#include "xrPhysics/IActivationShape.h"
 
-#include "xrPhysics/geometry.h"
+#include "xrPhysics/Geometry.h"
 
 #include "xrPhysics/IPHCapture.h"
 
@@ -27,9 +27,9 @@
 #include "xrServer_Object_Base.h"
 #include "interactive_animation.h"
 #include "stalker_animation_manager.h"
-#include "inventoryowner.h"
-#include "inventory.h"
-#include "activatingcharcollisiondelay.h"
+#include "InventoryOwner.h"
+#include "Inventory.h"
+#include "ActivatingCharCollisionDelay.h"
 #include "stalker_movement_manager_smart_cover.h"
 
 // const float default_hinge_friction = 5.f;//gray_wolf comment
@@ -1362,10 +1362,10 @@ void CCharacterPhysicsSupport::on_destroy_anim_mov_ctrl()
     anim_mov_state.active = false;
 }
 
-bool CCharacterPhysicsSupport::interactive_motion() { return is_imotion(m_interactive_motion); }
+bool CCharacterPhysicsSupport::is_interactive_motion() { return is_imotion(m_interactive_motion); }
 bool CCharacterPhysicsSupport::can_drop_active_weapon()
 {
-    return !interactive_motion() && m_flags.test(fl_death_anim_on);
+    return !is_interactive_motion() && m_flags.test(fl_death_anim_on);
 };
 
 void CCharacterPhysicsSupport::in_Die()

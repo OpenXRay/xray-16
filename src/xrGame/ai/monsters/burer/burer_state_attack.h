@@ -1,5 +1,5 @@
 #pragma once
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 
 template <typename Object>
 class CStateBurerAttack : public CState<Object>

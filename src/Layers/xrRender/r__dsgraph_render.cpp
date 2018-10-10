@@ -57,7 +57,7 @@ template <class T> IC bool cmp_textures_lexN(const T &lhs, const T &rhs)
     return std::lexicographical_compare(t1->begin(), t1->end(), t2->begin(), t2->end());
 }
 
-template <class T> void sort_tlist(xr_vector<T::template value_type *>& lst, xr_vector<T::template value_type *>& temp, T& textures)
+template <class T> void sort_tlist(xr_vector<typename T::value_type *>& lst, xr_vector<typename T::value_type *>& temp, T& textures)
 {
     int amount = textures.begin()->first->size();
 
@@ -66,7 +66,7 @@ template <class T> void sort_tlist(xr_vector<T::template value_type *>& lst, xr_
         // Just sort by SSA
         lst.reserve(textures.size());
         for (auto &i : textures) lst.push_back(&i);
-        std::sort(lst.begin(), lst.end(), cmp_second_ssa<T::template value_type *>);
+        std::sort(lst.begin(), lst.end(), cmp_second_ssa<typename T::value_type *>);
     }
     else
     {
@@ -80,13 +80,13 @@ template <class T> void sort_tlist(xr_vector<T::template value_type *>& lst, xr_
         }
 
         // 1st - part - SSA, 2nd - lexicographically
-        std::sort(lst.begin(), lst.end(), cmp_second_ssa<T::template value_type *>);
+        std::sort(lst.begin(), lst.end(), cmp_second_ssa<typename T::value_type *>);
         if (2 == amount)
-            std::sort(temp.begin(), temp.end(), cmp_textures_lex2<T::template value_type *>);
+            std::sort(temp.begin(), temp.end(), cmp_textures_lex2<typename T::value_type *>);
         else if (3 == amount)
-            std::sort(temp.begin(), temp.end(), cmp_textures_lex3<T::template value_type *>);
+            std::sort(temp.begin(), temp.end(), cmp_textures_lex3<typename T::value_type *>);
         else
-            std::sort(temp.begin(), temp.end(), cmp_textures_lexN<T::template value_type *>);
+            std::sort(temp.begin(), temp.end(), cmp_textures_lexN<typename T::value_type *>);
 
         // merge lists
         lst.insert(lst.end(), temp.begin(), temp.end());
@@ -412,7 +412,7 @@ template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs
 template<class T>
 IC void sort_front_to_back_render_and_clean(T &vec)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_l<T::value_type>); // front-to-back
+    std::sort(vec.begin(), vec.end(), cmp_first_l<typename T::value_type>); // front-to-back
     for (auto &i : vec)
         render_item(i);
     vec.clear();
@@ -421,7 +421,7 @@ IC void sort_front_to_back_render_and_clean(T &vec)
 template<class T>
 IC void sort_back_to_front_render_and_clean(T &vec)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_h<T::value_type>); // back-to-front
+    std::sort(vec.begin(), vec.end(), cmp_first_h<typename T::value_type>); // back-to-front
     for (auto &i : vec)
         render_item(i);
     vec.clear();

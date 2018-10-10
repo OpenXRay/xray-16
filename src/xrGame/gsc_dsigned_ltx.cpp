@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "gsc_dsigned_ltx.h"
 #include "xrCore/xr_ini.h"
 

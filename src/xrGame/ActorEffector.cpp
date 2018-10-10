@@ -1,11 +1,11 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "ActorEffector.h"
 #include "PostprocessAnimator.h"
 #include "xrEngine/EffectorPP.h"
 #include "xrEngine/ObjectAnimator.h"
 #include "Common/object_broker.h"
-#include "actor.h"
+#include "Actor.h"
 
 void AddEffector(CActor* A, int type, const shared_str& sect_name)
 {

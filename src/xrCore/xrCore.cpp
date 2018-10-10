@@ -12,6 +12,7 @@
 #include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
+#include "SDL.h"
 
 #if __has_include(".GitInfo.hpp")
 #include ".GitInfo.hpp"
@@ -78,7 +79,7 @@ void PrintBuildInfo()
 
     if (builder)
         strconcat(sizeof(buf), buf, buf, " (built by ", builder, ")"); // " (built by builder)"
-    
+
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
@@ -183,7 +184,7 @@ void SDLLogOutput(void* /*userdata*/,
     Log(buf);
 }
 
-void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
+void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
@@ -192,25 +193,26 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
-#if defined(WINDOWS)
-        Params = xr_strdup(GetCommandLine());
-#elif  defined(LINUX)
-        Params = xr_strdup(""); //TODO handle /proc/self/cmdline
-#endif
+        if (commandLine)
+            Params = xr_strdup (commandLine);
+        else
+            Params = xr_strdup("");
 
 #if defined(WINDOWS)
         if (!strstr(Params, "-weather"))
             CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
 
+#if defined(WINDOWS)
         string_path fn, dr, di;
 
         // application path
-#if defined(WINDOWS)
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
-#endif
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
+#else
+        SDL_strlcpy(ApplicationPath, SDL_GetBasePath(), sizeof(ApplicationPath));
+#endif
 
 #ifdef _EDITOR
         // working path
@@ -224,6 +226,8 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
 
 #if defined(WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
+#else
+        getcwd(WorkingPath, sizeof(WorkingPath));
 #endif
 
 #if defined(WINDOWS)
@@ -242,7 +246,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         PrintBuildInfo();
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
-        R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
+        R_ASSERT(SDL_HasSSE());
         ttapi.initialize();
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
@@ -282,7 +286,9 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         EFS._initialize();
 #ifdef DEBUG
 #ifndef _EDITOR
+#ifndef LINUX // FIXME!!!
         Msg("Process heap 0x%08x", GetProcessHeap());
+#endif
 #endif
 #endif // DEBUG
     }

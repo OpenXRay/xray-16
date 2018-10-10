@@ -6,17 +6,17 @@
 //	Description : Object handler action planner
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "object_handler_planner.h"
 #include "object_property_evaluators.h"
 #include "object_actions.h"
 #include "ai_monster_space.h"
 #include "object_handler_space.h"
 #include "ai/stalker/ai_stalker.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "object_handler_planner_impl.h"
-#include "weaponmagazined.h"
-#include "missile.h"
+#include "WeaponMagazined.h"
+#include "Missile.h"
 #include "ai_monster_space.h"
 
 using namespace ObjectHandlerSpace;

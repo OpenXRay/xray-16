@@ -8,7 +8,7 @@
 // Copyright:   2004 GSC Game World
 
 #pragma once
-#include "uilistitem.h"
+#include "UIListItem.h"
 
 class CUIListItemEx : public CUIListItem
 {

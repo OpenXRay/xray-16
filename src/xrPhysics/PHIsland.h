@@ -1,6 +1,5 @@
 #pragma once
-#ifndef PH_ISLAND_H
-#define PH_ISLAND_H
+
 #include "xrCore/_flags.h"
 
 #pragma warning(push)
@@ -219,4 +218,3 @@ public:
 protected:
 private:
 };
-#endif

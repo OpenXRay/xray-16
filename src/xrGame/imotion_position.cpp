@@ -1,16 +1,16 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "imotion_position.h"
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/MathUtils.h"
-#include "xrPhysics/extendedgeom.h"
+#include "xrPhysics/ExtendedGeom.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Common/Noncopyable.hpp"
-#include "physicsshellholder.h"
+#include "PhysicsShellHolder.h"
 #include "game_object_space.h"
 #include "animation_utils.h"
 #include "xrCore/buffer_vector.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 #ifdef DEBUG
@@ -277,10 +277,10 @@ void imotion_position::state_end()
 
 #if 0
 
-			DBG_OpenCashedDraw();
-			shell->dbg_draw_geometry( 0.02, color_argb( 255, 0, 255, 0 )  );
-			DBG_DrawBones( *shell->get_ElementByStoreOrder( 0 )->PhysicsRefObject() );
-			DBG_ClosedCashedDraw( 50000 );
+            DBG_OpenCashedDraw();
+            shell->dbg_draw_geometry( 0.02, color_argb( 255, 0, 255, 0 )  );
+            DBG_DrawBones( *shell->get_ElementByStoreOrder( 0 )->PhysicsRefObject() );
+            DBG_ClosedCashedDraw( 50000 );
 
 #endif
 
@@ -300,12 +300,12 @@ void imotion_position::state_end()
     K->CalculateBones_Invalidate();
     K->CalculateBones(true);
 
-#if 0 
+#if 0
 
-			DBG_OpenCashedDraw();
-			shell->dbg_draw_geometry( 0.02, color_argb( 255, 0, 0, 255 )  );
-			DBG_DrawBones( *shell->get_ElementByStoreOrder( 0 )->PhysicsRefObject() );
-			DBG_ClosedCashedDraw( 50000 );
+            DBG_OpenCashedDraw();
+            shell->dbg_draw_geometry( 0.02, color_argb( 255, 0, 0, 255 )  );
+            DBG_DrawBones( *shell->get_ElementByStoreOrder( 0 )->PhysicsRefObject() );
+            DBG_ClosedCashedDraw( 50000 );
 
 #endif
 }

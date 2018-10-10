@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "xrserver_space.h"
+#include "xrServer_Space.h"
 #include "alife_combat_manager.h"
 #include "alife_communication_manager.h"
 

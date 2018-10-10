@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "inventory.h"
+#include "Inventory.h"
 
 IC CInventoryOwner& CInventoryItem::inventory_owner() const
 {

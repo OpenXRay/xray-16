@@ -3,11 +3,11 @@
 //						взрывается при столкновении
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Include/xrRender/Kinematics.h"
 #include "ExplosiveRocket.h"
-#include "physicsshellholder.h"
-#include "xrPhysics/physicsshell.h"
+#include "PhysicsShellHolder.h"
+#include "xrPhysics/PhysicsShell.h"
 
 CExplosiveRocket::CExplosiveRocket() {}
 CExplosiveRocket::~CExplosiveRocket() {}

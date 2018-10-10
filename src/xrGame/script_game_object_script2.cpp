@@ -368,16 +368,16 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_smart_cover_target_default", &CScriptGameObject::set_smart_cover_target_default)
 
         .def("idle_min_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::idle_min_time)
-        .def("idle_min_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::idle_min_time)
+        .def("idle_min_time", (float const (CScriptGameObject::*)() const) & CScriptGameObject::idle_min_time)
 
         .def("idle_max_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::idle_max_time)
-        .def("idle_max_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::idle_max_time)
+        .def("idle_max_time", (float const (CScriptGameObject::*)() const) & CScriptGameObject::idle_max_time)
 
         .def("lookout_min_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::lookout_min_time)
-        .def("lookout_min_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::lookout_min_time)
+        .def("lookout_min_time", (float const (CScriptGameObject::*)() const) & CScriptGameObject::lookout_min_time)
 
         .def("lookout_max_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::lookout_max_time)
-        .def("lookout_max_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::lookout_max_time)
+        .def("lookout_max_time", (float  const(CScriptGameObject::*)() const) & CScriptGameObject::lookout_max_time)
 
         .def("in_loophole_fov", &CScriptGameObject::in_loophole_fov)
         .def("in_current_loophole_fov", &CScriptGameObject::in_current_loophole_fov)

@@ -81,6 +81,7 @@ SCRIPT_EXPORT(SServerFilters, (), {
     ];
 });
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(connect_error_cb, (), {
     module(luaState)
     [
@@ -91,6 +92,7 @@ SCRIPT_EXPORT(connect_error_cb, (), {
             .def("clear", &connect_error_cb::clear)
     ];
 });
+#endif
 
 SCRIPT_EXPORT(CServerList, (CUIWindow), {
     module(luaState)

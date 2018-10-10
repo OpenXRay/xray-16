@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "xrserver.h"
+#include "StdAfx.h"
+#include "xrServer.h"
 #include "game_sv_single.h"
 #include "game_sv_deathmatch.h"
 #include "game_sv_teamdeathmatch.h"
@@ -50,7 +50,7 @@ xrServer::EConnect xrServer::Connect(shared_str& session_name, GameDescriptionDa
 
     // Parse game type
     string1024 type;
-    R_ASSERT2(xr_strlen(options) <= sizeof(type), "session_name too BIIIGGG!!!");
+    R_ASSERT2(xr_strlen(options) <= sizeof(type), "options too BIIIGGG!!!");
     xr_strcpy(type, options);
     if (strchr(type, '/'))
         *strchr(type, '/') = 0;

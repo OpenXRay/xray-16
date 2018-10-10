@@ -6,13 +6,13 @@
 //	Description : Path finding, curve building, position prediction
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "base_monster.h"
-#include "ai/Monsters/corpse_cover.h"
+#include "ai/monsters/corpse_cover.h"
 #include "cover_manager.h"
 #include "cover_point.h"
 #include "ai_space.h"
-#include "ai/Monsters/control_direction_base.h"
+#include "ai/monsters/control_direction_base.h"
 
 // каждый монстр может по-разному реализвать эту функ (e.g. кровосос с поворотом головы и т.п.)
 void CBaseMonster::LookPosition(Fvector to_point, float angular_speed)

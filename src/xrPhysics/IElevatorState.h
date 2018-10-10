@@ -19,5 +19,9 @@ public:
     virtual void NetRelcase(IPhysicsShellHolder* O) = 0;
 
 protected:
+#if defined(WINDOWS)
     virtual ~IElevatorState() = 0 {}
+#elif defined(LINUX)
+    virtual ~IElevatorState() {}
+#endif
 };

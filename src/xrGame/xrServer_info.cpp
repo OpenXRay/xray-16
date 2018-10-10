@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_info.h"
 #include "Level.h"
-#include "xrserver.h"
+#include "xrServer.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrCore/buffer_vector.h"
 

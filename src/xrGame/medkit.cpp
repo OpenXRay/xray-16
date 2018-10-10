@@ -3,7 +3,7 @@
 // Medkit - аптечка, повышающая здоровье
 ///////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "medkit.h"
 #include "xrPhysics/PhysicsShell.h"

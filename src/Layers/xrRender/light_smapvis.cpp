@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Layers/xrRender/light.h"
 #include "Layers/xrRender/FBasicVisual.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "inventory_item_object.h"
-#include "hudsound.h"
+#include "HudSound.h"
 
 class CLAItem;
 class CNightVisionEffector;

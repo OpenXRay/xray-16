@@ -1,9 +1,9 @@
-#include "stdafx.h"
-#include "phcollisiondamagereceiver.h"
+#include "StdAfx.h"
+#include "PHCollisionDamageReceiver.h"
 #include "xrPhysics/IPhysicsShellHolder.h"
 #include "xrCore/xr_ini.h"
 #include "Include/xrRender/Kinematics.h"
-#include "xrPhysics/geometry.h"
+#include "xrPhysics/Geometry.h"
 #include "xrPhysics/PhysicsShell.h"
 
 #include "xrMessages.h"

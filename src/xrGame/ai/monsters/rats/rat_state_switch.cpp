@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "ai/Monsters/rats/ai_rat.h"
+#include "ai/monsters/rats/ai_rat.h"
 #include "ai/ai_monsters_misc.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
 #include "xrAICore/Navigation/game_graph.h"
@@ -13,10 +13,10 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "movement_manager.h"
 #include "sound_player.h"
-#include "ai/Monsters/rats/ai_rat_impl.h"
+#include "ai/monsters/rats/ai_rat_impl.h"
 #include "ai_space.h"
-#include "ai/Monsters/ai_monster_squad_manager.h"
-#include "ai/Monsters/ai_monster_squad.h"
+#include "ai/monsters/ai_monster_squad_manager.h"
+#include "ai/monsters/ai_monster_squad.h"
 
 bool CAI_Rat::switch_to_attack_melee()
 {

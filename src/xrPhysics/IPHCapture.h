@@ -8,7 +8,11 @@ public:
     virtual void Release() = 0;
 
 protected:
+#if defined(WINDOWS)
     virtual ~IPHCapture() = 0 {}
+#elif defined(LINUX)
+    virtual ~IPHCapture() {}
+#endif
 };
 class CPHCharacter;
 struct NearestToPointCallback;

@@ -1,8 +1,8 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UITalkWnd.h"
 #include "UITalkDialogWnd.h"
 #include "Actor.h"
-#include "Trade.h"
+#include "trade.h"
 #include "UIGameSP.h"
 #include "PDA.h"
 #include "xrServerEntities/character_info.h"
@@ -12,7 +12,7 @@
 #include "game_cl_base.h"
 #include "string_table.h"
 #include "xr_level_controller.h"
-#include "xrEngine/cameraBase.h"
+#include "xrEngine/CameraBase.h"
 #include "UIXmlInit.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 
@@ -260,7 +260,7 @@ void CUITalkWnd::AskQuestion()
         {
             string128 s;
             xr_sprintf(s, "ID = [%s] of selected question is out of range of available dialogs ",
-                UITalkDialogWnd->m_ClickedQuestionID);
+                UITalkDialogWnd->m_ClickedQuestionID.c_str());
             VERIFY2(FALSE, s);
         }
 
@@ -374,7 +374,7 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
 
     string_path fn;
 
-    LPCSTR path = "characters_voice\\dialogs\\";
+    LPCSTR path = "characters_voice" DELIMITER "dialogs" DELIMITER;
     LPCSTR ext = ".ogg";
     u32 tsize = sizeof(fn) - xr_strlen(path) - xr_strlen(ext) - 1;
     if (text_len > tsize)
@@ -383,10 +383,12 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
     }
 
     strncpy_s(fn, sizeof(fn), path, xr_strlen(path));
+#ifndef LINUX // FIXME!!!
     strncat_s(fn, sizeof(fn), text, text_len);
     strncat_s(fn, sizeof(fn), ext, xr_strlen(ext));
+#endif
 
-    //	strconcat( sizeof(fn), fn, "characters_voice\\dialogs\\", text2, ".ogg" );
+    //	strconcat( sizeof(fn), fn, "characters_voice" DELIMITER "dialogs" DELIMITER, text2, ".ogg" );
 
     StopSnd();
     if (FS.exist("$game_sounds$", fn))

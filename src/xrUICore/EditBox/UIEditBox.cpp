@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "pch.hpp"
-#include "uieditbox.h"
+#include "UIEditBox.h"
 #include "Windows/UIFrameLineWnd.h"
 
 CUIEditBox::CUIEditBox() : m_frameLine(NULL) {}
@@ -30,7 +30,7 @@ void CUIEditBox::InitTextureEx(LPCSTR texture, LPCSTR shader)
     m_frameLine->SetWndSize(GetWndSize());
 }
 
-void CUIEditBox::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud\\default"); }
+void CUIEditBox::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud" DELIMITER "default"); }
 void CUIEditBox::SetCurrentOptValue()
 {
     SetText(GetOptStringValue());

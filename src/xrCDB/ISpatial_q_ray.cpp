@@ -2,6 +2,7 @@
 #include "ISpatial.h"
 #include "xrCore/_fbox.h"
 #include "xrCore/Threading/Lock.hpp"
+#include "SDL.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <xmmintrin.h>
@@ -335,7 +336,7 @@ void ISpatial_DB::q_ray(
     Stats.Query.Begin();
     q_result = &R;
     q_result->clear();
-    if (CPU::ID.hasFeature(CpuFeature::Sse))
+    if (SDL_HasSSE())
     {
         if (_o & O_ONLYFIRST)
         {

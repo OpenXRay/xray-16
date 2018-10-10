@@ -5,7 +5,7 @@
 //	Description : Animation offsets class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_animation_offsets.hpp"
 
 SRotation const animation_offsets::offsets(shared_str const& animation_id) const

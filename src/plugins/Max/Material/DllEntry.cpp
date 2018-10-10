@@ -16,7 +16,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
     if (!controlsInit)
     {
         controlsInit = TRUE;
-        Core.Initialize("S.T.A.L.K.E.R.Plugin", 0, FALSE, nullptr, true);
+        Core.Initialize("S.T.A.L.K.E.R.Plugin", nullptr, 0, FALSE, nullptr, true);
         FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
         FPU::m64r(); // нужно чтобы макс не сбрасывал контрольки в 0
         InitCustomControls(hInstance); // Initialize MAX's custom controls

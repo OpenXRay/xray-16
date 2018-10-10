@@ -31,7 +31,7 @@ public:
         return node;
     }
 
-    bool operator==(nullptr_t) = delete;
+    bool operator==(std::nullptr_t) = delete;
 
     XML_NODE firstChild() const
     {

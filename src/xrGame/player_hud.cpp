@@ -1,11 +1,11 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "player_hud.h"
 #include "HudItem.h"
 #include "xrUICore/ui_base.h"
-#include "actor.h"
+#include "Actor.h"
 #include "physic_item.h"
 #include "static_cast_checked.hpp"
-#include "actoreffector.h"
+#include "ActorEffector.h"
 #include "xrEngine/IGame_Persistent.h"
 
 
@@ -397,7 +397,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 
         string_path ce_path;
         string_path anm_name;
-        strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
+        strconcat(sizeof(anm_name), anm_name, "camera_effects" DELIMITER "weapon" DELIMITER, M.name.c_str(), ".anm");
         if (FS.exist(ce_path, "$game_anims$", anm_name))
         {
             CAnimatorCamEffector* e = new CAnimatorCamEffector();

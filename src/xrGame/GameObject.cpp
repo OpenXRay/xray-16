@@ -5,18 +5,19 @@
 #include "xrPhysics/PhysicsShell.h"
 #include "ai_space.h"
 #include "CustomMonster.h"
-#include "physicobject.h"
+#include "PhysicObject.h"
 #include "HangingLamp.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "game_sv_single.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "ph_shell_interface.h"
 #include "script_game_object.h"
-#include "xrserver_objects_alife.h"
+#include "xrServer_Objects_ALife.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "game_cl_base.h"
 #include "object_factory.h"
 #include "Include/xrRender/Kinematics.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/ai_object_location_impl.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "ai_debug.h"
@@ -39,12 +40,14 @@
 #include "doors.h"
 #include "xrNetServer/NET_Messages.h"
 
+#ifndef LINUX // FIXME!!!
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <intrin.h>
 #pragma warning(pop)
 
 #pragma intrinsic(_InterlockedCompareExchange)
+#endif
 
 extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 
@@ -109,8 +112,10 @@ void CGameObject::MakeMeCrow()
         return;
     u32 const device_frame_id = Device.dwFrame;
     u32 const object_frame_id = dwFrame_AsCrow;
+#ifndef LINUX // FIXME!!!
     if ((u32)_InterlockedCompareExchange((long*)&dwFrame_AsCrow, device_frame_id, object_frame_id) == device_frame_id)
         return;
+#endif
     VERIFY(dwFrame_AsCrow == device_frame_id);
     Props.crow = 1;
     g_pGameLevel->Objects.o_crow(this);
@@ -460,7 +465,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
         //R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
         if (Level().Objects.net_Find(E->ID) != nullptr)
         {
-            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name);
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name.c_str());
             return false;
         }
     }
@@ -486,8 +491,8 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     {
 #pragma warning(push)
 #pragma warning(disable : 4238)
-        m_ini_file = new CInifile(
-            &IReader((void*)(*(O->m_ini_string)), O->m_ini_string.size()), FS.get_path("$game_config$")->m_Path);
+        IReader reader((void*)(*(O->m_ini_string)), O->m_ini_string.size());
+        m_ini_file = new CInifile(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
     }
 
@@ -1100,7 +1105,7 @@ void CGameObject::u_EventGen(NET_Packet& P, u32 type, u32 dest)
 }
 
 void CGameObject::u_EventSend(NET_Packet& P, u32 dwFlags) { Level().Send(P, dwFlags); }
-#include "bolt.h"
+#include "Bolt.h"
 
 BOOL CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
 BOOL CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }

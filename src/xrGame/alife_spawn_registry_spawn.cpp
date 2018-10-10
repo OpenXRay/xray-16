@@ -6,7 +6,7 @@
 //	Description : ALife spawn registry spawn routines
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_spawn_registry.h"
 #include "Random.hpp"
 

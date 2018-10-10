@@ -2,13 +2,13 @@
 #pragma hdrstop
 
 #ifndef _EDITOR
-#include "../../xrEngine/render.h"
+#include "../../xrEngine/Render.h"
 #endif
 
 #include "../xrRender/ResourceManager.h"
 #include "../xrRender/tss.h"
-#include "../xrRender/blenders/blender.h"
-#include "../xrRender/blenders/blender_recorder.h"
+#include "../xrRender/blenders/Blender.h"
+#include "../xrRender/blenders/Blender_Recorder.h"
 #include "../xrRenderGL/glBufferUtils.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
@@ -19,13 +19,13 @@ void simplify_texture(string_path& fn)
     if (strstr(Core.Params, "-game_designer"))
     {
         if (strstr(fn, "$user")) return;
-        if (strstr(fn, "ui\\")) return;
+        if (strstr(fn, "ui" DELIMITER )) return;
         if (strstr(fn, "lmap#")) return;
-        if (strstr(fn, "act\\")) return;
-        if (strstr(fn, "fx\\")) return;
-        if (strstr(fn, "glow\\")) return;
-        if (strstr(fn, "map\\")) return;
-        strcpy_s(fn, "ed\\ed_not_existing_texture");
+        if (strstr(fn, "act" DELIMITER )) return;
+        if (strstr(fn, "fx" DELIMITER )) return;
+        if (strstr(fn, "glow" DELIMITER )) return;
+        if (strstr(fn, "map" DELIMITER )) return;
+        strcpy_s(fn, "ed" DELIMITER "ed_not_existing_texture");
     }
 }
 

@@ -1,13 +1,13 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "WeaponRG6.h"
-#include "entity.h"
-#include "explosiveRocket.h"
+#include "Entity.h"
+#include "ExplosiveRocket.h"
 #include "Level.h"
 #include "xrPhysics/MathUtils.h"
-#include "actor.h"
+#include "Actor.h"
 
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 
 CWeaponRG6::~CWeaponRG6() {}
@@ -42,8 +42,8 @@ void CWeaponRG6::Load(LPCSTR section)
     inheritedRL::Load(section);
     inheritedSG::Load(section);
 }
-#include "inventory.h"
-#include "inventoryOwner.h"
+#include "Inventory.h"
+#include "InventoryOwner.h"
 void CWeaponRG6::FireStart()
 {
     if (GetState() == eIdle && getRocketCount())

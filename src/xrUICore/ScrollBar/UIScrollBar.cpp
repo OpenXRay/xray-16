@@ -1,5 +1,5 @@
 #include "pch.hpp"
-#include "uiscrollbar.h"
+#include "UIScrollBar.h"
 #include "Buttons/UI3tButton.h"
 #include "UIScrollBox.h"
 #include "XML/UIXmlInitBase.h"

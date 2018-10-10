@@ -6,13 +6,13 @@
 //	Description : Sight action
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "sight_action.h"
 #include "ai/stalker/ai_stalker.h"
 #include "sight_manager.h"
-#include "xrAICore/Navigation/ai_object_location_impl.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "inventory.h"
+#include "Inventory.h"
 
 //#define SIGHT_TEST
 

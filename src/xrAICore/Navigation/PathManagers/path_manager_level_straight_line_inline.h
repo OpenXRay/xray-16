@@ -38,21 +38,21 @@ IC void CLevelStraightLinePathManager::create_path(T& vertex)
 
     Fvector tPosition = m_parameters->m_start_point;
 
-    xr_vector<_index_type>::iterator I = path->begin();
-    xr_vector<_index_type>::iterator E = path->end();
+    typename xr_vector<_index_type>::iterator I = CLevelStraightLinePathManager::path->begin();
+    typename xr_vector<_index_type>::iterator E = CLevelStraightLinePathManager::path->end();
     _index_type& dwNode = *I;
     for (++I; I != E; ++I)
     {
-        u32 vertex_id = graph->check_position_in_direction(dwNode, tPosition, graph->vertex_position(*I));
-        if (graph->valid_vertex_id(vertex_id))
-            fDirectDistance = tPosition.distance_to(graph->vertex_position(*I));
+        u32 vertex_id = CLevelStraightLinePathManager::graph->check_position_in_direction(dwNode, tPosition, CLevelStraightLinePathManager::graph->vertex_position(*I));
+        if (CLevelStraightLinePathManager::graph->valid_vertex_id(vertex_id))
+            fDirectDistance = tPosition.distance_to(CLevelStraightLinePathManager::graph->vertex_position(*I));
         else
             fDirectDistance = m_parameters->max_range;
         if (fDirectDistance == m_parameters->max_range)
         {
             if (fLastDirectDistance == 0)
             {
-                fCumulativeDistance += graph->distance(dwNode, *I);
+                fCumulativeDistance += CLevelStraightLinePathManager::graph->distance(dwNode, *I);
                 dwNode = *I;
             }
             else
@@ -61,7 +61,7 @@ IC void CLevelStraightLinePathManager::create_path(T& vertex)
                 fLastDirectDistance = 0;
                 dwNode = *--I;
             }
-            tPosition = graph->vertex_position(dwNode);
+            tPosition = CLevelStraightLinePathManager::graph->vertex_position(dwNode);
         }
         else
             fLastDirectDistance = fDirectDistance;
@@ -72,14 +72,14 @@ IC void CLevelStraightLinePathManager::create_path(T& vertex)
         }
     }
 
-    u32 vertex_id = graph->check_position_in_direction(dwNode, tPosition, m_parameters->m_dest_point);
-    if (graph->valid_vertex_id(vertex_id))
+    u32 vertex_id = CLevelStraightLinePathManager::graph->check_position_in_direction(dwNode, tPosition, m_parameters->m_dest_point);
+    if (CLevelStraightLinePathManager::graph->valid_vertex_id(vertex_id))
         fDirectDistance = tPosition.distance_to(m_parameters->m_dest_point);
     else
         fDirectDistance = m_parameters->max_range;
     if (fDirectDistance == m_parameters->max_range)
         m_parameters->m_distance = fCumulativeDistance + fLastDirectDistance +
-            m_parameters->m_dest_point.distance_to(graph->vertex_position((*path)[path->size() - 1]));
+            m_parameters->m_dest_point.distance_to(CLevelStraightLinePathManager::graph->vertex_position((*CLevelStraightLinePathManager::path)[CLevelStraightLinePathManager::path->size() - 1]));
     else
         m_parameters->m_distance = fCumulativeDistance + fDirectDistance;
 }

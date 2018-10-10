@@ -3,10 +3,8 @@
 // ExoOutfit - защитный костюм с усилением
 ///////////////////////////////////////////////////////////////
 
-#pragma once
-
-#include "stdafx.h"
-#include "exooutfit.h"
+#include "StdAfx.h"
+#include "ExoOutfit.h"
 
 CExoOutfit::CExoOutfit() {}
 CExoOutfit::~CExoOutfit() {}

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rocketlauncher.h"
-#include "weaponShotgun.h"
+#include "RocketLauncher.h"
+#include "WeaponShotgun.h"
 
 class CWeaponRG6 : public CRocketLauncher, public CWeaponShotgun
 {

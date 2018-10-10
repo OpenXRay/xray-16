@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "ikfoot.h"
+#include "IKFoot.h"
 
 #include "ik_collide_data.h"
 #include "GameObject.h"
@@ -8,7 +8,7 @@
 #include "xrPhysics/MathUtils.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "xrEngine/ennumerateVertices.h"
+#include "xrEngine/EnnumerateVertices.h"
 #include "Common/Noncopyable.hpp"
 
 #ifdef DEBUG
@@ -256,12 +256,12 @@ bool CIKFoot::make_shift(
     shift.mul(shift_m);
     xm.c.add(shift);
 #if 0
-	if(shift_m > 0.f)
-	{
-		DBG_OpenCashedDraw();
-		DBG_DrawLine( toe, Fvector().add( toe, shift ), color_xrgb( 255, 255, 255 )  );
-		DBG_ClosedCashedDraw( 1000 );
-	}
+    if(shift_m > 0.f)
+    {
+        DBG_OpenCashedDraw();
+        DBG_DrawLine( toe, Fvector().add( toe, shift ), color_xrgb( 255, 255, 255 )  );
+        DBG_ClosedCashedDraw( 1000 );
+    }
 #endif
     return true;
 }

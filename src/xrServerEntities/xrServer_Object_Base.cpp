@@ -6,7 +6,7 @@
 //	Description : Server base object
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_Objects.h"
 #include "xrMessages.h"
 #include "game_base_space.h"
@@ -157,13 +157,14 @@ IServerEntityShape* CSE_Abstract::shape() { return (nullptr); }
 CSE_Motion* CSE_Abstract::motion() { return (nullptr); }
 CInifile& CSE_Abstract::spawn_ini()
 {
-    if (!m_ini_file)
+    if (!m_ini_file) {
 #pragma warning(push)
 #pragma warning(disable : 4238)
         // XXX: what a casting mess.. Do we need to use shared_str for m_ini_string?
-        m_ini_file =
-            new CInifile(&IReader((void*)(*(m_ini_string)), m_ini_string.size()), FS.get_path(_game_config_)->m_Path);
+        IReader reader((void*)(*(m_ini_string)), m_ini_string.size());
+        m_ini_file = new CInifile(&reader, FS.get_path(_game_config_)->m_Path);
 #pragma warning(pop)
+    }
     return (*m_ini_file);
 }
 

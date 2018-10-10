@@ -19,23 +19,23 @@
 // fwd. decl.
 namespace ALife
 {
-enum ERelationType;
+enum ERelationType : u32;
 }
 namespace ScriptEntity
 {
-enum EActionType;
+enum EActionType : u32;
 }
 namespace MovementManager
 {
-enum EPathType;
+enum EPathType : u32;
 }
 namespace DetailPathManager
 {
-enum EDetailPathType;
+enum EDetailPathType : u32;
 }
 namespace SightManager
 {
-enum ESightType;
+enum ESightType : u32;
 }
 namespace smart_cover
 {
@@ -50,11 +50,11 @@ class NET_Packet;
 class CGameTask;
 class IGameObject;
 
-enum EPatrolStartType;
-enum EPatrolRouteType;
-enum EPdaMsg;
-enum ESoundTypes;
-enum ETaskState;
+enum EPatrolStartType : u32;
+enum EPatrolRouteType : u32;
+enum EPdaMsg : u32;
+enum ESoundTypes : u32;
+enum ETaskState : u32;
 
 namespace MemorySpace
 {
@@ -63,31 +63,31 @@ struct CVisibleObject;
 struct CSoundObject;
 struct CHitObject;
 struct CNotYetVisibleObject;
-};
+}
 
 namespace MonsterSpace
 {
-enum EBodyState;
-enum EMovementType;
-enum EMovementDirection;
-enum EDirectionType;
-enum EPathState;
-enum EObjectAction;
-enum EMentalState;
-enum EScriptMonsterMoveAction;
-enum EScriptMonsterSpeedParam;
-enum EScriptMonsterAnimAction;
-enum EScriptMonsterGlobalAction;
-enum EScriptSoundAnim;
-enum EMonsterSounds;
-enum EMonsterHeadAnimType;
+enum EBodyState : u32;
+enum EMovementType : u32;
+enum EMovementDirection : u32;
+enum EDirectionType : u32;
+enum EPathState : u32;
+enum EObjectAction : u32;
+enum EMentalState : u32;
+enum EScriptMonsterMoveAction : u32;
+enum EScriptMonsterSpeedParam : u32;
+enum EScriptMonsterAnimAction : u32;
+enum EScriptMonsterGlobalAction : u32;
+enum EScriptSoundAnim : u32;
+enum EMonsterSounds : u32;
+enum EMonsterHeadAnimType : u32;
 struct SBoneRotation;
-};
+}
 
 namespace GameObject
 {
-enum ECallbackType;
-};
+enum ECallbackType : u32;
+}
 
 class CGameObject;
 class CScriptHit;
@@ -131,7 +131,7 @@ class CScriptGameObject;
 
 namespace SightManager
 {
-enum ESightType;
+enum ESightType : u32;
 }
 
 struct CSightParams
@@ -324,7 +324,7 @@ public:
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time);
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type);
 
-    void AddIconedTalkMessage_old(LPCSTR text, LPCSTR texture_name, LPCSTR templ_name){};
+    void AddIconedTalkMessage_old(LPCSTR text, LPCSTR texture_name, LPCSTR templ_name){}
     void AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
     //предикаты наличия/отсутствия порции информации у персонажа
     bool HasInfo(LPCSTR info_id);

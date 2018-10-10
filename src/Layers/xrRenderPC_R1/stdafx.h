@@ -7,10 +7,12 @@
 #endif
 
 #include "xrEngine/stdafx.h"
+#if defined(WINDOWS)
 #include <d3d9.h>
 #include <d3dx9.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
+#endif
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 #include "Layers/xrRender/HW.h"
 #include "Layers/xrRender/Shader.h"
@@ -37,5 +39,5 @@
 #include "FStaticRender.h"
 #endif
 
-#define TEX_POINT_ATT "internal\\internal_light_attpoint"
-#define TEX_SPOT_ATT "internal\\internal_light_attclip"
+#define TEX_POINT_ATT "internal" DELIMITER "internal_light_attpoint"
+#define TEX_SPOT_ATT "internal" DELIMITER "internal_light_attclip"

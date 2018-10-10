@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "control_sequencer.h"
 #include "control_manager.h"
 

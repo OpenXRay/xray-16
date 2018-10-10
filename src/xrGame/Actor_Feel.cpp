@@ -1,11 +1,11 @@
-#include "stdafx.h"
-#include "actor.h"
-#include "weapon.h"
-#include "mercuryball.h"
-#include "inventory.h"
+#include "StdAfx.h"
+#include "Actor.h"
+#include "Weapon.h"
+#include "MercuryBall.h"
+#include "Inventory.h"
 #include "character_info.h"
 #include "xr_level_controller.h"
-#include "customzone.h"
+#include "CustomZone.h"
 #include "xrEngine/GameMtlLib.h"
 #include "ui/UIMainIngameWnd.h"
 #include "UIGameCustom.h"
@@ -15,7 +15,7 @@
 #include "game_cl_base.h"
 #include "Level.h"
 #include "clsid_game.h"
-#include "hudmanager.h"
+#include "HUDManager.h"
 
 #define PICKUP_INFO_COLOR 0xFFDDDDDD
 

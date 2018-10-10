@@ -9,7 +9,7 @@
 #pragma once
 
 #include "xrEngine/GameMtlLib.h"
-#include "phmovementcontrol.h"
+#include "PHMovementControl.h"
 class CPHMovementControl;
 
 class CMaterialManager

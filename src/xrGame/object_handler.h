@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include "inventoryowner.h"
+#include "InventoryOwner.h"
 #include "xrAICore/Navigation/graph_engine_space.h"
 
 namespace MonsterSpace
 {
-enum EObjectAction;
+enum EObjectAction : u32;
 }
 
 class CAI_Stalker;

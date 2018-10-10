@@ -5,6 +5,7 @@
 #include "PHObject.h"
 #include "PHInterpolation.h"
 #include "xrServerEntities/PHSynchronize.h"
+#include "xrServerEntities/alife_space.h"
 #include "PHDisabling.h"
 
 #include "xrEngine/IPhysicsShell.h"
@@ -18,7 +19,7 @@ class CPHActorCharacter;
 class CPHAICharacter;
 namespace ALife
 {
-enum EHitType;
+enum EHitType : u32;
 }
 enum EEnvironment { peOnGround, peAtWall, peInAir };
 

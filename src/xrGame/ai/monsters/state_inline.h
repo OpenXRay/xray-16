@@ -161,14 +161,14 @@ void CStateAbstract::add_debug_info(debug::text_tree& root_s)
     }
     else
     {
-        for (SubStates::const_iterator i = substates.begin(), e = substates.end(); i != e; ++i)
+        for (const auto& [id, substate] : substates)
         {
-            TextTree& current_state_s = root_s.add_line(EMonsterState((*i).first));
-            if (current_substate == (*i).first)
+            TextTree& current_state_s = root_s.add_line(EMonsterState(id));
+            if (current_substate == id)
             {
-                if ((*i).second)
+                if (substate)
                 {
-                    (*i).second->add_debug_info(current_state_s);
+                    substate->add_debug_info(current_state_s);
                 }
                 else
                 {
@@ -205,8 +205,8 @@ EMonsterState CStateAbstract::get_state_type()
 TEMPLATE_SPECIALIZATION
 void CStateAbstract::remove_links(IGameObject* object)
 {
-    SubStates::iterator i = substates.begin();
-    SubStates::iterator e = substates.end();
+    auto i = substates.begin();
+    auto e = substates.end();
     for (; i != e; ++i)
         (*i).second->remove_links(object);
 }

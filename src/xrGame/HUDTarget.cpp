@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "hudtarget.h"
+#include "StdAfx.h"
+#include "HUDTarget.h"
 #include "xrEngine/GameMtlLib.h"
 
 #include "xrEngine/Environment.h"
@@ -19,7 +19,7 @@
 #include "entity_alive.h"
 
 #include "inventory_item.h"
-#include "inventory.h"
+#include "Inventory.h"
 
 #include "ai/monsters/poltergeist/poltergeist.h"
 
@@ -42,7 +42,7 @@ CHUDTarget::CHUDTarget()
 {
     fuzzyShowInfo = 0.f;
     PP.RQ.range = 0.f;
-    hShader->create("hud\\cursor", "ui\\cursor");
+    hShader->create("hud" DELIMITER "cursor", "ui" DELIMITER "cursor");
 
     PP.RQ.set(NULL, 0.f, -1);
 

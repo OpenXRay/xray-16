@@ -2,6 +2,7 @@
 
 #include "state_custom_action.h"
 #include "state_move_to_point.h"
+#include "../ai_monster_squad.h"
 
 #define TEMPLATE_SPECIALIZATION \
     template <typename _Object\

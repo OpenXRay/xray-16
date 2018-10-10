@@ -1,2 +1,2 @@
-#include "StdAfx.h"
-#include "light_render_direct.h"
+#include "stdafx.h"
+#include "Light_Render_Direct.h"

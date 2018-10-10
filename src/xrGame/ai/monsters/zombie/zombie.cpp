@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "zombie.h"
 #include "zombie_state_manager.h"
 #include "xrEngine/profiler.h"

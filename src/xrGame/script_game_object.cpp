@@ -13,26 +13,26 @@
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "script_entity.h"
-#include "physicsshellholder.h"
+#include "PhysicsShellHolder.h"
 #include "helicopter.h"
 #include "holder_custom.h"
-#include "inventoryowner.h"
+#include "InventoryOwner.h"
 #include "movement_manager.h"
 #include "entity_alive.h"
-#include "weaponmagazined.h"
-#include "xrmessages.h"
-#include "inventory.h"
+#include "WeaponMagazined.h"
+#include "xrMessages.h"
+#include "Inventory.h"
 #include "script_ini_file.h"
 #include "Include/xrRender/Kinematics.h"
 #include "HangingLamp.h"
 #include "patrol_path_manager.h"
 #include "xrAICore/Navigation/ai_object_location.h"
-#include "custommonster.h"
-#include "entitycondition.h"
+#include "CustomMonster.h"
+#include "EntityCondition.h"
 #include "space_restrictor.h"
 #include "detail_path_manager.h"
 #include "xrAICore/Navigation/level_graph.h"
-#include "actor.h"
+#include "Actor.h"
 #include "actor_memory.h"
 #include "visual_memory_manager.h"
 #include "smart_cover_object.h"
@@ -673,7 +673,7 @@ pcstr CScriptGameObject::get_smart_cover_description() const
             LuaMessageType::Error, "smart_cover::object : cannot access class member get_smart_cover_description!");
         return nullptr;
     }
-    return smart_cover_object->cover().description()->table_id().c_str();
+    return smart_cover_object->get_cover().get_description()->table_id().c_str();
 }
 
 void CScriptGameObject::set_visual_name(LPCSTR visual) { object().cNameVisual_set(visual); }

@@ -157,7 +157,7 @@ IC void CGameLocationSelector::select_random_location(
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CGameLocationSelector::selection_type() const { return (m_selection_type); }
+IC ESelectionType CGameLocationSelector::selection_type() const { return (m_selection_type); }
 TEMPLATE_SPECIALIZATION
 IC bool CGameLocationSelector::actual(const _vertex_id_type start_vertex_id, bool path_completed)
 {

@@ -6,11 +6,11 @@
 #include "GlowManager.h"
 #include "Layers/xrRender/WallmarksEngine.h"
 #include "FStaticRender_RenderTarget.h"
-#include "Layers/xrRender/modelpool.h"
+#include "Layers/xrRender/ModelPool.h"
 #include "LightShadows.h"
 #include "LightProjector.h"
 #include "LightPPA.h"
-#include "Layers/xrRender/light_DB.h"
+#include "Layers/xrRender/Light_DB.h"
 #include "xrCore/FMesh.hpp"
 
 class dxRender_Visual;
@@ -121,7 +121,7 @@ public:
 
     // Information
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    virtual LPCSTR getShaderPath() override { return "r1\\"; }
+    virtual LPCSTR getShaderPath() override { return "r1" DELIMITER ""; }
     virtual ref_shader getShader(int id);
     virtual IRender_Sector* getSector(int id) override;
     virtual IRenderVisual* getVisual(int id) override;

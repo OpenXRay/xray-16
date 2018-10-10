@@ -6,7 +6,7 @@
 //	Description : ALife communication manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_communication_manager.h"
 
 /**

@@ -13,7 +13,7 @@
 #include "Layers/xrRender/light.h"
 #endif
 #include "PLC_SSE.hpp"
-#ifdef XR_X86
+#if defined(WINDOWS) && defined(XR_X86)
 #include "SkinXW_SSE.hpp"
 #else
 #include "SkinXW_CPP.hpp"
@@ -39,7 +39,7 @@ void Initialize()
     static bool initialized = false;
     if (initialized)
         return;
-#ifdef XR_X86
+#if defined(WINDOWS) && defined(XR_X86)
     Skin1W = Skin1W_SSE;
     Skin2W = Skin2W_SSE;
     Skin3W = Skin3W_SSE;

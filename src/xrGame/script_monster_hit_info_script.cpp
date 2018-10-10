@@ -2,7 +2,7 @@
 #include "script_monster_hit_info.h"
 #include "script_game_object.h"
 #include "ai_monster_space.h"
-#include "AI/Monsters/monster_sound_defs.h"
+#include "ai/monsters/monster_sound_defs.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

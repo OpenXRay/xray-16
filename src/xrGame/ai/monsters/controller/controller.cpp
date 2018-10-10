@@ -1,26 +1,26 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "controller.h"
 #include "controller_state_manager.h"
-#include "ai/Monsters/controlled_entity.h"
+#include "ai/monsters/controlled_entity.h"
 #include "Actor.h"
 #include "ActorEffector.h"
 #include "ActorCondition.h"
-#include "ai/Monsters/ai_monster_effector.h"
+#include "ai/monsters/ai_monster_effector.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "Level.h"
 #include "sound_player.h"
 #include "ai_monster_space.h"
 #include "UIGameCustom.h"
 #include "xrUICore/Static/UIStatic.h"
-#include "ai/Monsters/monster_velocity_space.h"
+#include "ai/monsters/monster_velocity_space.h"
 #include "level_debug.h"
 #include "game_object_space.h"
 #include "detail_path_manager.h"
 #include "ai_space.h"
 #include "cover_point.h"
 #include "cover_manager.h"
-#include "ai/Monsters/Controller/controller_animation.h"
-#include "ai/Monsters/Controller/controller_direction.h"
+#include "ai/monsters/controller/controller_animation.h"
+#include "ai/monsters/controller/controller_direction.h"
 #include "ai/monsters/control_direction_base.h"
 #include "ai/monsters/control_movement_base.h"
 #include "ai/monsters/control_path_builder_base.h"
@@ -31,8 +31,8 @@
 #include "character_community.h"
 #include "InventoryOwner.h"
 #include "xrServerEntities/character_info.h"
-#include "ai/Monsters/Controller/controller_psy_hit.h"
-#include "ai/Monsters/monster_cover_manager.h"
+#include "ai/monsters/controller/controller_psy_hit.h"
+#include "ai/monsters/monster_cover_manager.h"
 
 const u32 _pmt_psy_attack_delay = 2000;
 const float _pmt_psy_attack_min_angle = deg(5);
@@ -76,8 +76,8 @@ void CController::Load(LPCSTR section)
     inherited::Load(section);
 
     // Load Control FX texture
-    //	m_UIControlFX.Init(pSettings->r_string(section, "control_fx_texture"), "hud\\default",0,0,0);
-    //	m_UIControlFX2.Init(pSettings->r_string(section, "control_fx_texture2"), "hud\\default",0,0,0);
+    //	m_UIControlFX.Init(pSettings->r_string(section, "control_fx_texture"), "hud" DELIMITER "default",0,0,0);
+    //	m_UIControlFX2.Init(pSettings->r_string(section, "control_fx_texture2"), "hud" DELIMITER "default",0,0,0);
 
     m_max_controlled_number = pSettings->r_u8(section, "Max_Controlled_Count");
     m_controlled_objects.reserve(m_max_controlled_number);
@@ -211,19 +211,19 @@ void CController::Load(LPCSTR section)
     load_friend_community_overrides(section);
 
     // load
-    m_sound_hit_fx.create("affects\\tinnitus3a", st_Effect, sg_SourceType);
+    m_sound_hit_fx.create("affects" DELIMITER "tinnitus3a", st_Effect, sg_SourceType);
 
-    m_sound_aura_left_channel.create("monsters\\controller\\controller_psy_aura_l", st_Effect, sg_SourceType);
-    m_sound_aura_right_channel.create("monsters\\controller\\controller_psy_aura_r", st_Effect, sg_SourceType);
-    m_sound_aura_hit_left_channel.create("monsters\\controller\\controller_psy_hit_l", st_Effect, sg_SourceType);
-    m_sound_aura_hit_right_channel.create("monsters\\controller\\controller_psy_hit_l", st_Effect, sg_SourceType);
+    m_sound_aura_left_channel.create("monsters" DELIMITER "controller" DELIMITER "controller_psy_aura_l", st_Effect, sg_SourceType);
+    m_sound_aura_right_channel.create("monsters" DELIMITER "controller" DELIMITER "controller_psy_aura_r", st_Effect, sg_SourceType);
+    m_sound_aura_hit_left_channel.create("monsters" DELIMITER "controller" DELIMITER "controller_psy_hit_l", st_Effect, sg_SourceType);
+    m_sound_aura_hit_right_channel.create("monsters" DELIMITER "controller" DELIMITER "controller_psy_hit_l", st_Effect, sg_SourceType);
 
-    m_sound_tube_start.create("monsters\\controller\\controller_first_hit", st_Effect, sg_SourceType);
-    m_sound_tube_pull.create("monsters\\controller\\controller_whoosh", st_Effect, sg_SourceType);
-    m_sound_tube_hit_left.create("monsters\\controller\\controller_final_hit_l", st_Effect, sg_SourceType);
-    m_sound_tube_hit_right.create("monsters\\controller\\controller_final_hit_r", st_Effect, sg_SourceType);
+    m_sound_tube_start.create("monsters" DELIMITER "controller" DELIMITER "controller_first_hit", st_Effect, sg_SourceType);
+    m_sound_tube_pull.create("monsters" DELIMITER "controller" DELIMITER "controller_whoosh", st_Effect, sg_SourceType);
+    m_sound_tube_hit_left.create("monsters" DELIMITER "controller" DELIMITER "controller_final_hit_l", st_Effect, sg_SourceType);
+    m_sound_tube_hit_right.create("monsters" DELIMITER "controller" DELIMITER "controller_final_hit_r", st_Effect, sg_SourceType);
 
-    m_sound_tube_prepare.create("monsters\\controller\\controller_tube_prepare", st_Effect, sg_SourceType);
+    m_sound_tube_prepare.create("monsters" DELIMITER "controller" DELIMITER "controller_tube_prepare", st_Effect, sg_SourceType);
 
     particles_fire = pSettings->r_string(section, "Control_Hit");
 

@@ -86,6 +86,7 @@ public:
 
     static void LogStackTrace(const char* header);
     static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = 512);
+
 private:
     static bool symEngineInitialized;
     static Lock dbgHelpLock;

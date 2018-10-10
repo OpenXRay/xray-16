@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "fracture.h"
 #include "fracture_state_manager.h"
 #include "ai/monsters/monster_velocity_space.h"

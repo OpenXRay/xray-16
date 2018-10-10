@@ -1,7 +1,7 @@
 #ifndef GLOBAL_FEEL_TOUCH_HPP
 #define GLOBAL_FEEL_TOUCH_HPP
 
-#include "xrEngine/feel_touch.h"
+#include "xrEngine/Feel_Touch.h"
 
 // this class implements only denie functionality
 class GlobalFeelTouch : public Feel::Touch

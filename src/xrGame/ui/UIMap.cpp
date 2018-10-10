@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Level.h"
 #include "map_location.h"
 #include "map_manager.h"
@@ -29,7 +29,7 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
     {
         string_path map_cfg_fn;
         string_path fname;
-        strconcat(sizeof(fname), fname, name.c_str(), "\\level.ltx");
+        strconcat(sizeof(fname), fname, name.c_str(), DELIMITER "level.ltx");
         FS.update_path(map_cfg_fn, "$game_levels$", fname);
         levelIni = new CInifile(map_cfg_fn);
     }
@@ -276,7 +276,7 @@ CUIGlobalMap::CUIGlobalMap(CUIMapWnd* pMapWnd)
 }
 
 CUIGlobalMap::~CUIGlobalMap() {}
-void CUIGlobalMap::Initialize() { Init_internal("global_map", *pGameIni, "global_map", "hud\\default"); }
+void CUIGlobalMap::Initialize() { Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default"); }
 void CUIGlobalMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);

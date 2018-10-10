@@ -4,7 +4,9 @@
 #include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
+#if !defined(LINUX)
 #include "xrSASH.h"
+#endif
 
 #include "CameraManager.h"
 #include "Environment.h"
@@ -32,8 +34,10 @@ void IConsole_Command::InvalidSyntax()
     Msg("~ Invalid syntax in call to '%s'", cName);
     Msg("~ Valid arguments: %s", I);
 
+#if !defined(LINUX)
     g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
     g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
+#endif
 }
 
 //-----------------------------------------------------------------------
@@ -152,7 +156,7 @@ public:
         {
             IConsole_Command& C = *(it->second);
             TStatus _S;
-            C.Status(_S);
+            C.GetStatus(_S);
             TInfo _I;
             C.Info(_I);
 
@@ -431,7 +435,7 @@ public:
 };
 //-----------------------------------------------------------------------
 class CCC_VidMonitor : public CCC_Token
-{    
+{
 public:
     CCC_VidMonitor(pcstr name) : CCC_Token(name, &Vid_SelectedMonitor, nullptr)
     {
@@ -597,7 +601,7 @@ public:
         GetToken();
         if (!tokens)
             return;
-        inherited::Status(S);
+        inherited::GetStatus(S);
     }
 
     const xr_token* GetToken() noexcept override
@@ -819,10 +823,10 @@ void CCC_Register()
 #endif
 
     CMD1(CCC_ExclusiveMode, "input_exclusive_mode");
-
+#if !defined(LINUX)
     extern int g_svTextConsoleUpdateRate;
     CMD4(CCC_Integer, "sv_console_update_rate", &g_svTextConsoleUpdateRate, 1, 100);
-
+#endif
     extern int g_svDedicateServerUpdateReate;
     CMD4(CCC_Integer, "sv_dedicated_server_update_rate", &g_svDedicateServerUpdateReate, 1, 1000);
 

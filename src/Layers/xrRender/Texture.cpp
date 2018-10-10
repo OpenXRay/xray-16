@@ -119,10 +119,10 @@ void TW_Save(ID3DTexture2D* T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
     string256 fn;
     strconcat(sizeof(fn), fn, name, "_", prefix, "-", postfix);
     for (int it = 0; it < int(xr_strlen(fn)); it++)
-        if ('\\' == fn[it])
+        if (_DELIMITER == fn[it])
             fn[it] = '_';
     string256 fn2;
-    strconcat(sizeof(fn2), fn2, "debug\\", fn, ".dds");
+    strconcat(sizeof(fn2), fn2, "debug" DELIMITER, fn, ".dds");
     Log("* debug texture save: ", fn2);
     R_CHK(D3DXSaveTextureToFile(fn2, D3DXIFF_DDS, T, nullptr));
 }
@@ -307,7 +307,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 #else
 
     Msg("! Can't find texture '%s'", fname);
-    R_ASSERT(FS.exist(fn, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"));
+    R_ASSERT(FS.exist(fn, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
     goto _DDS;
 
 //xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
@@ -330,7 +330,7 @@ _DDS:
         Msg("! Can't get image info for texture '%s'", fn);
         FS.r_close(S);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
         goto _DDS;
@@ -351,7 +351,7 @@ _DDS_CUBE:
     {
         Msg("! Can't load texture '%s'", fn);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
         goto _DDS;
@@ -379,7 +379,7 @@ _DDS_2D:
     {
         Msg("! Can't load texture '%s'", fn);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
         xr_strlwr(temp);
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
@@ -476,7 +476,7 @@ _BUMP_from_base:
 #ifndef _EDITOR
     if (strstr(fname, "_bump#"))
     {
-        R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
+        R_ASSERT2(FS.exist(fn, "$game_textures$", "ed" DELIMITER "ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
         S = FS.r_open(fn);
         R_ASSERT2(S, fn);
         img_size = S->length();
@@ -484,7 +484,7 @@ _BUMP_from_base:
     }
     if (strstr(fname, "_bump"))
     {
-        R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump", ".dds"), "ed_dummy_bump");
+        R_ASSERT2(FS.exist(fn, "$game_textures$", "ed" DELIMITER "ed_dummy_bump", ".dds"), "ed_dummy_bump");
         S = FS.r_open(fn);
 
         R_ASSERT2(S, fn);

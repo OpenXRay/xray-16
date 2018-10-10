@@ -4,7 +4,7 @@
 
 #include "UIGameMP.h"
 #include "game_base.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCore/buffer_vector.h"
 

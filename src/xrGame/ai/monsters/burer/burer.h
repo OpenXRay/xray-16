@@ -1,8 +1,8 @@
 #pragma once
-#include "ai/Monsters/BaseMonster/base_monster.h"
-#include "ai/Monsters/telekinesis.h"
-#include "ai/Monsters/anim_triple.h"
-#include "ai/Monsters/scanning_ability.h"
+#include "ai/monsters/basemonster/base_monster.h"
+#include "ai/monsters/telekinesis.h"
+#include "ai/monsters/anim_triple.h"
+#include "ai/monsters/scanning_ability.h"
 
 class CCharacterPhysicsSupport;
 class CBurerFastGravi;

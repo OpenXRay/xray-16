@@ -6,7 +6,7 @@
 //	Description : Danger object
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "danger_object.h"
 
 CDangerObject::~CDangerObject() {}

@@ -3,7 +3,7 @@
 //						ними
 //////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "character_rank.h"
 
 #define GAME_RELATIONS_SECT "game_relations"

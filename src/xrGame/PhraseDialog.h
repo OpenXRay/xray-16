@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shared_data.h"
-#include "phrase.h"
+#include "Phrase.h"
 #include "xrAICore/Navigation/graph_abstract.h"
 #include "PhraseDialogDefs.h"
 #include "xml_str_id_loader.h"

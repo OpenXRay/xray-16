@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "actor_mp_client.h"
 
 void CActorMP::DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const

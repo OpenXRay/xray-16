@@ -1,9 +1,9 @@
 #include "pch_script.h"
-#include "ai/Monsters/rats/ai_rat.h"
+#include "ai/monsters/rats/ai_rat.h"
 #include "ai/ai_monsters_misc.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
 #include "xrAICore/Navigation/game_graph.h"
-#include "ai/Monsters/rats/ai_rat_space.h"
+#include "ai/monsters/rats/ai_rat_space.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "detail_path_manager.h"
 #include "memory_manager.h"
@@ -13,7 +13,7 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "movement_manager.h"
 #include "sound_player.h"
-#include "ai/Monsters/rats/ai_rat_impl.h"
+#include "ai/monsters/rats/ai_rat_impl.h"
 #include "ai_space.h"
 
 using namespace RatSpace;

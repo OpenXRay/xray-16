@@ -9,7 +9,7 @@
 #pragma once
 
 #include "xrAICore/Navigation/game_graph_space.h"
-#include "xrserver_space.h"
+#include "xrServer_Space.h"
 #include "alife_space.h"
 
 class CSE_ALifeMonsterAbstract;

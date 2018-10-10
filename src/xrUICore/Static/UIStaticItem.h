@@ -31,7 +31,7 @@ public:
     shared_str dbg_tex_name;
 #endif
 
-    void CreateShader(LPCSTR tex, LPCSTR sh = "hud\\default");
+    void CreateShader(LPCSTR tex, LPCSTR sh = "hud" DELIMITER "default");
     void SetShader(const ui_shader& sh) { hShader = sh; };
     void Init(LPCSTR tex, LPCSTR sh, float left, float top);
     void Render();

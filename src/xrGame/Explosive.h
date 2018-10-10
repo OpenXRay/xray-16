@@ -5,7 +5,7 @@
 #pragma once
 
 #include "xrEngine/Render.h"
-#include "xrEngine/feel_touch.h"
+#include "xrEngine/Feel_Touch.h"
 #include "inventory_item.h"
 #include "ai_sounds.h"
 #include "xrPhysics/DamageSource.h"

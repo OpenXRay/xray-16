@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "light.h"
 
 static const float SQRT2 = 1.4142135623730950488016887242097f;
@@ -71,7 +71,7 @@ void light::set_texture(LPCSTR name)
 #pragma todo("Only shadowed spot implements projective texture")
     string256 temp;
 
-    strconcat(sizeof(temp), temp, "r2\\accum_spot_", name);
+    strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name);
     // strconcat(sizeof(temp),temp,"_nomsaa",name);
     s_spot.create(RImplementation.Target->b_accum_spot, temp, name);
 
@@ -89,9 +89,9 @@ void light::set_texture(LPCSTR name)
         for (int i = 0; i < bound; ++i)
         {
             s_spot_msaa[i].create(RImplementation.Target->b_accum_spot_msaa[i],
-                strconcat(sizeof(temp), temp, "r2\\accum_spot_", name), name);
+                strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name), name);
             s_volumetric_msaa[i].create(RImplementation.Target->b_accum_volumetric_msaa[i],
-                strconcat(sizeof(temp), temp, "r2\\accum_volumetric_", name), name);
+                strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_volumetric_", name), name);
         }
     }
 #endif // (RENDER!=R_R3) || (RENDER!=R_R4) || (RENDER!=R_GL)

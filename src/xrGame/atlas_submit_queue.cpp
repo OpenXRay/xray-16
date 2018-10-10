@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "atlas_submit_queue.h"
 #include "stats_submitter.h"
 #include "login_manager.h"

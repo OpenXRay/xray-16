@@ -18,14 +18,14 @@
 
 namespace MonsterSpace
 {
-enum EBodyState;
-enum EMovementType;
-enum EScriptMonsterMoveAction;
-enum EScriptMonsterSpeedParam;
+enum EBodyState : u32;
+enum EMovementType : u32;
+enum EScriptMonsterMoveAction : u32;
+enum EScriptMonsterSpeedParam : u32;
 };
 
-enum EPatrolStartType;
-enum EPatrolRouteType;
+enum EPatrolStartType : u32;
+enum EPatrolRouteType : u32;
 
 class CPatrolPath;
 class CScriptGameObject;

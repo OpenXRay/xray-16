@@ -6,7 +6,7 @@
 //	Description : stalker movement manager base class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_movement_manager_base.h"
 #include "stalker_movement_manager_space.h"
 #include "script_entity_action.h"
@@ -17,7 +17,7 @@
 #include "level_path_manager.h"
 #include "movement_manager_space.h"
 #include "detail_path_manager_space.h"
-#include "entitycondition.h"
+#include "EntityCondition.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_velocity_holder.h"
 #include "stalker_velocity_collection.h"
@@ -153,7 +153,7 @@ IC void stalker_movement_manager_base::setup_head_speed(stalker_movement_params&
         m_head.speed = m_danger_head_speed;
 }
 
-IC void stalker_movement_manager_base::add_velocity(int mask, float linear, float compute_angular, float angular)
+void stalker_movement_manager_base::add_velocity(int mask, float linear, float compute_angular, float angular)
 {
     detail().add_velocity(mask, CDetailPathManager::STravelParams(linear, compute_angular, angular));
 }

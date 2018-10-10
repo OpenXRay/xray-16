@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "poltergeist.h"
-#include "xrServerEntities/xrmessages.h"
+#include "xrServerEntities/xrMessages.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "Level.h"
@@ -8,7 +8,7 @@
 #include "restricted_object.h"
 #include "Actor.h"
 #include "ActorEffector.h"
-#include "ai/Monsters/ai_monster_effector.h"
+#include "ai/monsters/ai_monster_effector.h"
 
 CPolterFlame::CPolterFlame(CPoltergeist* polter) : inherited(polter) {}
 CPolterFlame::~CPolterFlame() {}

@@ -10,7 +10,7 @@
 //	постоянно считать время между апдейтами.
 //=============================================================================
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIColorAnimatorWrapper.h"
 #include "../../xrEngine/LightAnimLibrary.h"
 

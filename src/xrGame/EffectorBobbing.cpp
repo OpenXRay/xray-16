@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "EffectorBobbing.h"
 
-#include "actor.h"
+#include "Actor.h"
 #include "actor_defs.h"
 
 #define BOBBING_SECT "bobbing_effector"

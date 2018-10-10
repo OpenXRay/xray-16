@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "xr_Server_BattlEye.h"
 
@@ -122,7 +122,7 @@ void BattlEyeServer::PrintMessage(char* message)
     // if( g_be_message_out )
     {
         string512 text;
-        sprintf_s(text, sizeof(text), "BattlEye Server: %s", message);
+        xr_sprintf(text, sizeof(text), "BattlEye Server: %s", message);
         Msg("%s", text);
 
         if (g_be_message_out) //==2

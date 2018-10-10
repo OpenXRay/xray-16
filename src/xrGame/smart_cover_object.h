@@ -10,7 +10,7 @@
 #ifndef SMART_COVER_OBJECT_H_INCLUDED
 #define SMART_COVER_OBJECT_H_INCLUDED
 
-#include "gameobject.h"
+#include "GameObject.h"
 #include "Common/Noncopyable.hpp"
 
 namespace smart_cover
@@ -49,7 +49,7 @@ public:
 
     IC float const& enter_min_enemy_distance() const;
     IC float const& exit_min_enemy_distance() const;
-    IC cover const& cover() const;
+    IC cover const& get_cover() const;
 };
 
 } // namespace smart_cover

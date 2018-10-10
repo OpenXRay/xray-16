@@ -9,8 +9,7 @@
 #pragma once
 
 #include "restriction_space.h"
-
-class CSpaceRestrictionBase;
+#include "space_restriction_base.h"
 
 class CSpaceRestrictionBridge : public RestrictionSpace::CTimeIntrusiveBase
 {

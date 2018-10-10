@@ -5,7 +5,7 @@
 //	Author		: Plichko Alexander
 //	Description : movement manager holder
 ////////////////////////////////////////////////////////////////////////////
-#pragma once;
+#pragma once
 
 class CMovementManagerHolder
 {

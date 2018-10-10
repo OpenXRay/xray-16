@@ -6,7 +6,7 @@
 //	Description : ALife anomalous zone class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
@@ -131,4 +131,4 @@ void CSE_ALifeAnomalousZone::on_spawn()
     //	spawn_artefacts			();
 }
 
-bool CSE_ALifeAnomalousZone::keep_saved_data_anyway() const noexcept { return true; }
+bool CSE_ALifeAnomalousZone::keep_saved_data_anyway() const /* noexcept */ { return true; }

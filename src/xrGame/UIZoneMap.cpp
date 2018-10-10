@@ -1,14 +1,14 @@
-#include "stdafx.h"
-#include "uizonemap.h"
+#include "StdAfx.h"
+#include "UIZoneMap.h"
 
 #include "InfoPortion.h"
-#include "Pda.h"
+#include "PDA.h"
 
 #include "Grenade.h"
 #include "Level.h"
 #include "game_cl_base.h"
 
-#include "actor.h"
+#include "Actor.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/game_graph.h"
 
@@ -151,7 +151,7 @@ bool CUIZoneMap::ZoomIn() { return true; }
 bool CUIZoneMap::ZoomOut() { return true; }
 void CUIZoneMap::SetupCurrentMap()
 {
-    m_activeMap->Initialize(Level().name(), "hud\\default");
+    m_activeMap->Initialize(Level().name(), "hud" DELIMITER "default");
 
     Frect r;
     m_clipFrame.GetAbsoluteRect(r);

@@ -1,5 +1,5 @@
 #pragma once
-#include "ai/Monsters/state.h"
+#include "ai/monsters/state.h"
 #include "alife_smart_terrain_task.h"
 
 template <typename _Object>

@@ -11,7 +11,7 @@ EShaderList GameMtls;
 extern "C" {
 void __cdecl LoadShaders()
 {
-    Core.Initialize("XRayPlugin", 0, FALSE, nullptr, true);
+    Core.Initialize("XRayPlugin", nullptr, 0, FALSE, nullptr, true);
     FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
     LPSTRVec lst;
     ENShaders.count = LoadBlenderList(lst);

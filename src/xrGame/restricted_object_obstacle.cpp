@@ -6,7 +6,7 @@
 //	Description : Restricted object with obstacles' avoidance
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "restricted_object_obstacle.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"

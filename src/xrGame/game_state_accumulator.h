@@ -80,9 +80,8 @@ public:
 
     bool check_accumulative_value(enum_accumulative_player_values param_id, u32_binary_function* func, u32 right_arg);
 
+    using accumulative_values_collection_t = AssociativeVector<enum_accumulative_player_values, player_state_param*>;
 private:
-    typedef AssociativeVector<enum_accumulative_player_values, player_state_param*> accumulative_values_collection_t;
-
     // average_values_collection_t			m_average_values;
     accumulative_values_collection_t m_accumulative_values;
     CItemMgr const* m_item_mngr;
@@ -93,11 +92,6 @@ private:
     void init_accumulative_values();
     void init_player_accum_values(game_PlayerState* new_local_player);
 
-    template <typename TypeListElement>
-    void init_acpv_list();
-    template <>
-    void init_acpv_list<Loki::NullType>(){};
-
     void update_average_values();
     void update_accumulative_values();
 
@@ -107,9 +101,6 @@ private:
     ammunition_group m_amm_groups;
     bone_group m_bone_groups;
 }; // class game_state_accumulator
-
-#include "game_state_accumulator_inline.h"
-
 } // namespace award_system
 
 #endif //#ifndef GAME_STATE_ACCUMULATOR_INCLUDED

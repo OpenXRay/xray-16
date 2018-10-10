@@ -1,15 +1,30 @@
 #include "stdafx.h"
+#if defined(WINDOWS)
 #pragma hdrstop
 
-#if defined(WINDOWS)
 #include <intrin.h> // __rdtsc
 #include <process.h>
+
+#if defined(_MSC_VER)
 #include <powerbase.h>
+#elif defined(__GNUC__)
+#include <float.h> // _controlfp
+//#include_next <float.h>
+//how to include mingw32\i686-w64-mingw32\include\float.h
+//instead of mingw32\lib\gcc\i686-w64-mingw32\7.3.0\include\float.h
+//?
+#endif
+
 #elif defined(LINUX)
 #include <x86intrin.h> // __rdtsc
 #include <fpu_control.h>
 #include <pthread.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <chrono>
 #endif
+#include <thread>
+#include "SDL.h"
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
@@ -34,7 +49,7 @@ XRCORE_API CRandom Random;
  */
 void QueryPerformanceCounter(PLARGE_INTEGER result)
 {
-	u64 nsec_count, nsec_per_tick;
+    u64 nsec_count, nsec_per_tick;
     /*
      * clock_gettime() returns the number of secs. We translate that to number of nanosecs.
      * clock_getres() returns number of seconds per tick. We translate that to number of nanosecs per tick.
@@ -56,6 +71,18 @@ void QueryPerformanceCounter(PLARGE_INTEGER result)
 
      *result = (nsec_count / nsec_per_tick);
 }
+
+DWORD timeGetTime()
+{
+ /*   std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+
+    auto nanosec = now.time_since_epoch();
+
+    return nanosec.count()/(1000000000.0 *60.0 *60.0);
+    */
+    return SDL_GetTicks();
+}
+
 #endif
 
 /*
@@ -184,11 +211,7 @@ void initialize()
 
 namespace CPU
 {
-XRCORE_API u64 qpc_freq = [] {
-    u64 result;
-    QueryPerformanceCounter((PLARGE_INTEGER)&result);
-    return result;
-}();
+XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
 XRCORE_API u32 qpc_counter = 0;
 
@@ -213,28 +236,22 @@ bool g_initialize_cpu_called = false;
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
 {
-    // General CPU identification
-    if (!query_processor_info(&CPU::ID))
-        FATAL("Can't detect CPU/FPU.");
-
-    Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, 'rdtsc'", CPU::ID.modelName,
-        +CPU::ID.vendor, CPU::ID.family, CPU::ID.model, CPU::ID.stepping);
 
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
-    if (CPU::ID.hasFeature(CpuFeature::Mmx)) xr_strcat(features, ", MMX");
-    if (CPU::ID.hasFeature(CpuFeature::_3dNow)) xr_strcat(features, ", 3DNow!");
-    if (CPU::ID.hasFeature(CpuFeature::Sse)) xr_strcat(features, ", SSE");
-    if (CPU::ID.hasFeature(CpuFeature::Sse2)) xr_strcat(features, ", SSE2");
-    if (CPU::ID.hasFeature(CpuFeature::Sse3)) xr_strcat(features, ", SSE3");
-    if (CPU::ID.hasFeature(CpuFeature::MWait)) xr_strcat(features, ", MONITOR/MWAIT");
-    if (CPU::ID.hasFeature(CpuFeature::Ssse3)) xr_strcat(features, ", SSSE3");
-    if (CPU::ID.hasFeature(CpuFeature::Sse41)) xr_strcat(features, ", SSE4.1");
-    if (CPU::ID.hasFeature(CpuFeature::Sse42)) xr_strcat(features, ", SSE4.2");
-    if (CPU::ID.hasFeature(CpuFeature::HT)) xr_strcat(features, ", HTT");
+    if (SDL_HasAltiVec()) xr_strcat(features, ", AltiVec");
+    if (SDL_HasMMX()) xr_strcat(features, ", MMX");
+    if (SDL_Has3DNow()) xr_strcat(features, ", 3DNow!");
+    if (SDL_HasSSE()) xr_strcat(features, ", SSE");
+    if (SDL_HasSSE2()) xr_strcat(features, ", SSE2");
+    if (SDL_HasSSE3()) xr_strcat(features, ", SSE3");
+    if (SDL_HasSSE41()) xr_strcat(features, ", SSE4.1");
+    if (SDL_HasSSE42()) xr_strcat(features, ", SSE4.2");
+    if (SDL_HasAVX()) xr_strcat(features, ", AVX");
+    if (SDL_HasAVX2()) xr_strcat(features, ", AVX2");
 
     Msg("* CPU features: %s", features);
-    Msg("* CPU cores/threads: %d/%d", CPU::ID.n_cores, CPU::ID.n_threads);
+    Msg("* CPU cores/threads: %d/%d", std::thread::hardware_concurrency(), SDL_GetCPUCount());
 
 #if defined(WINDOWS)
     SYSTEM_INFO sysInfo;
@@ -284,7 +301,7 @@ void _initialize_cpu_thread()
     else
         FPU::m24r();
 
-    if (CPU::ID.hasFeature(CpuFeature::Sse))
+    if (SDL_HasSSE())
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);

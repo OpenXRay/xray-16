@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "burer_fast_gravi.h"
 #include "burer.h"
 #include "ai/monsters/control_animation_base.h"

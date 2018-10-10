@@ -25,12 +25,12 @@ engine_impl::~engine_impl()
     capture_input(false);
     xr_delete(m_input_receiver);
 }
-
+#if !defined(LINUX)
 bool engine_impl::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
     return (Device.on_message(hWnd, uMsg, wParam, lParam, result));
 }
-
+#endif
 void engine_impl::on_idle()
 {
     SDL_PumpEvents();
@@ -327,7 +327,7 @@ char const* engine_impl::weather_current_time() const
 void engine_impl::weather_current_time(char const* time)
 {
     u32 hours, minutes, seconds;
-    sscanf_s(time, "%d:%d:%d", &hours, &minutes, &seconds);
+    sscanf(time, "%d:%d:%d", &hours, &minutes, &seconds);
     bool paused = g_pGamePersistent->Environment().m_paused;
 
     g_pGamePersistent->Environment().m_paused = false;

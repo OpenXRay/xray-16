@@ -1,13 +1,13 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "actor_mp_client.h"
-#include "actorcondition.h"
+#include "ActorCondition.h"
 #include "xrEngine/CameraBase.h"
 #include "xrEngine/CameraManager.h"
 
 #include "game_cl_base.h"
 #include "ui/UIActorMenu.h"
 #include "ui/UIDragDropReferenceList.h"
-#include "uigamecustom.h"
+#include "UIGameCustom.h"
 #include "eatable_item.h"
 
 // if we are not current control entity we use this value

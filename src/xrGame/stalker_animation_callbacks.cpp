@@ -6,13 +6,13 @@
 //	Description : Stalker animation manager : bone callbacks
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "stalker_animation_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "sight_manager.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "game_object_space.h"
-#include "effectorshot.h"
+#include "EffectorShot.h"
 
 typedef CStalkerAnimationManager::callback_params callback_params;
 
@@ -82,11 +82,11 @@ static void callback_rotation_blend(CBoneInstance* const bone)
     multiplier = parameter->m_forward ? multiplier : (1.f - multiplier);
 
 #if 0
-	Fmatrix rotation				= *parameter->m_rotation;
-	Fvector							angles;
-	rotation.getXYZ					(angles);
-	angles.mul						(multiplier);
-	rotation.setXYZ					(angles);
+    Fmatrix rotation				= *parameter->m_rotation;
+    Fvector							angles;
+    rotation.getXYZ					(angles);
+    angles.mul						(multiplier);
+    rotation.setXYZ					(angles);
 #else // #if 0
     Fquaternion left;
     left.set(Fidentity);

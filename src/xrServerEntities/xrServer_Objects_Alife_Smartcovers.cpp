@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "xrServer_Objects_ALife_Smartcovers.h"
+#include "xrServer_Objects_Alife_Smartcovers.h"
 
 #ifndef AI_COMPILER
 #include "character_info.h"
@@ -87,11 +87,11 @@ CSE_SmartCover::~CSE_SmartCover()
 }
 
 IServerEntityShape* CSE_SmartCover::shape() { return this; }
-bool CSE_SmartCover::used_ai_locations() const noexcept { return true; }
-bool CSE_SmartCover::can_save() const noexcept { return true; }
-bool CSE_SmartCover::can_switch_online() const noexcept { return true; }
-bool CSE_SmartCover::can_switch_offline() const noexcept { return false; }
-bool CSE_SmartCover::interactive() const noexcept { return false; }
+bool CSE_SmartCover::used_ai_locations() const /* noexcept */ { return true; }
+bool CSE_SmartCover::can_save() const /* noexcept */ { return true; }
+bool CSE_SmartCover::can_switch_online() const /* noexcept */ { return true; }
+bool CSE_SmartCover::can_switch_offline() const /* noexcept */ { return false; }
+bool CSE_SmartCover::interactive() const /* noexcept */ { return false; }
 LPCSTR CSE_SmartCover::description() const { return (m_description.c_str()); }
 #ifndef AI_COMPILER
 void CSE_SmartCover::set_available_loopholes(luabind::object table) { m_available_loopholes = table; }
@@ -296,7 +296,7 @@ void CSE_SmartCover::fill_visuals()
             return;
 
         CSE_Visual* visual = new CSE_SmartVisual();
-        visual->set_visual("actors\\stalker_neutral\\stalker_neutral_1");
+        visual->set_visual("actors" DELIMITER "stalker_neutral" DELIMITER "stalker_neutral_1");
 
         if (I->animation_id.size() == 0)
         {

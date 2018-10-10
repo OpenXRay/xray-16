@@ -12,7 +12,7 @@ namespace XRay
 {
 namespace Math
 {
-#ifdef XR_X86
+#if defined(WINDOWS) && defined(XR_X86)
 void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones);
 void Skin2W_SSE(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones);
 void Skin3W_SSE(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones);

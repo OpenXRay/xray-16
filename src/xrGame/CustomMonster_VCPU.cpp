@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "custommonster.h"
+#include "StdAfx.h"
+#include "CustomMonster.h"
 #include "movement_manager.h"
 
 void CCustomMonster::mk_rotation(Fvector& dir, SRotation& R)

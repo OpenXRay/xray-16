@@ -19,7 +19,7 @@
 #include "Inventory.h"
 #include "Artefact.h"
 #include "PHMovementControl.h"
-#include "xrServerEntities/xrserver_objects_alife_monsters.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "cover_evaluators.h"
 #include "xrServer.h"
 #include "xr_level_controller.h"
@@ -1375,7 +1375,7 @@ void CAI_Stalker::aim_target(Fvector& result, const CGameObject* object)
 BOOL CAI_Stalker::AlwaysTheCrow()
 {
     VERIFY(character_physics_support());
-    return (character_physics_support()->interactive_motion());
+    return (character_physics_support()->is_interactive_motion());
 }
 
 smart_cover::cover const* CAI_Stalker::get_current_smart_cover()

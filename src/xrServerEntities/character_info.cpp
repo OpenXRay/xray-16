@@ -3,7 +3,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "character_info.h"
 
 #ifdef XRGAME_EXPORTS

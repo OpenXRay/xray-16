@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "energy_holder.h"
 #include "GameObject.h"
 

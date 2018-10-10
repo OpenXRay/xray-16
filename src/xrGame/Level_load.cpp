@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Common/LevelGameDef.h"
 #include "ai_space.h"
 #include "ParticlesObject.h"

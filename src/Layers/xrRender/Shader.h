@@ -149,6 +149,7 @@ struct ECORE_API Shader : public xr_resource_flagged
     ~Shader();
     BOOL equal(Shader& S);
     BOOL equal(Shader* S);
+    BOOL equal(Shader* S, int index);
 };
 
 struct ECORE_API resptrcode_shader : public resptr_base<Shader>

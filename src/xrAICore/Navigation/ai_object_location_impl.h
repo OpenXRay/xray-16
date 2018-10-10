@@ -12,19 +12,6 @@
 #include "xrAICore/Navigation/game_graph.h"
 #include "xrAICore/Navigation/level_graph.h"
 
-IC void CAI_ObjectLocation::init()
-{
-    if (ai().get_level_graph())
-        ai().level_graph().set_invalid_vertex(m_level_vertex_id);
-    else
-        m_level_vertex_id = u32(-1);
-
-    if (ai().get_game_graph())
-        ai().game_graph().set_invalid_vertex(m_game_vertex_id);
-    else
-        m_game_vertex_id = GameGraph::_GRAPH_ID(-1);
-}
-
 IC void CAI_ObjectLocation::game_vertex(CVertex const* game_vertex)
 {
     VERIFY(ai().game_graph().valid_vertex_id(ai().game_graph().vertex_id(game_vertex)));

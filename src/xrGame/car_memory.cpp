@@ -6,9 +6,9 @@
 //	Description : car memory
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "car_memory.h"
-#include "car.h"
+#include "Car.h"
 
 car_memory::car_memory(CCar* object) : inherited(object, 100), m_object(object)
 {
@@ -26,7 +26,7 @@ void car_memory::reload(LPCSTR section)
     m_aspect = pSettings->r_float(section, "view_aspect");
     m_far_plane = pSettings->r_float(section, "view_far_plane");
 }
-#include "actor.h"
+#include "Actor.h"
 bool car_memory::feel_vision_isRelevant(IGameObject* object)
 {
     return (NULL != smart_cast<CActor*>(object));

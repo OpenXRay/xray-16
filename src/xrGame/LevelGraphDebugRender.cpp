@@ -6,7 +6,7 @@
 //	Description : Level graph debug functions
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "LevelGraphDebugRender.hpp"
 #ifdef DEBUG
 #include "xrAICore/Navigation/game_graph.h"
@@ -17,7 +17,7 @@
 #include "game_base_space.h"
 #include "game_sv_single.h"
 #include "game_cl_base.h"
-#include "xrserver_objects_alife_monsters.h"
+#include "xrServer_Objects_ALife_Monsters.h"
 #include "alife_simulator.h"
 #include "alife_graph_registry.h"
 #include "alife_object_registry.h"
@@ -47,7 +47,7 @@
 
 LevelGraphDebugRender::LevelGraphDebugRender() : gameGraph(nullptr), levelGraph(nullptr)
 {
-    debugShader->create("debug\\ai_nodes", "$null");
+    debugShader->create("debug" DELIMITER "ai_nodes", "$null");
     currentLevelId = -1;
     currentActual = false;
     currentCenter = {flt_max, flt_max, flt_max};
@@ -374,10 +374,10 @@ void LevelGraphDebugRender::DrawGameGraph()
 // draw back plane
 #if 0 // XXX: disabled in original, reenable?
     Fvector vertices[4];
-	xform.transform_tiny(vertices[0], {center.x-bounds.x, center.y+bounds.y, center.z+bounds.z});
-	xform.transform_tiny(vertices[1], {center.x+bounds.x, center.y+bounds.y, center.z+bounds.z});
-	xform.transform_tiny(vertices[2], {center.x-bounds.x, center.y-bounds.y, center.z-bounds.z});
-	xform.transform_tiny(vertices[3], {center.x+bounds.x, center.y-bounds.y, center.z-bounds.z});
+    xform.transform_tiny(vertices[0], {center.x-bounds.x, center.y+bounds.y, center.z+bounds.z});
+    xform.transform_tiny(vertices[1], {center.x+bounds.x, center.y+bounds.y, center.z+bounds.z});
+    xform.transform_tiny(vertices[2], {center.x-bounds.x, center.y-bounds.y, center.z-bounds.z});
+    xform.transform_tiny(vertices[3], {center.x+bounds.x, center.y-bounds.y, center.z-bounds.z});
     u32 backColor = color_xrgb(0, 0, 0);
     GlobalEnv.DRender->dbg_DrawTRI(Fidentity, vertices[0], vertices[2], vertices[1], backColor);
     GlobalEnv.DRender->dbg_DrawTRI(Fidentity, vertices[1], vertices[2], vertices[3], backColor);

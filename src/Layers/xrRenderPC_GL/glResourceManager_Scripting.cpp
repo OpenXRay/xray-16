@@ -4,8 +4,8 @@
 #include	"xrEngine/Render.h"
 #include	"Layers/xrRender/ResourceManager.h"
 #include	"Layers/xrRender/tss.h"
-#include	"Layers/xrRender/blenders/blender.h"
-#include	"Layers/xrRender/blenders/blender_recorder.h"
+#include	"Layers/xrRender/blenders/Blender.h"
+#include	"Layers/xrRender/blenders/Blender_Recorder.h"
 //	adopt_compiler don't have = operator And it can't have = operator
 #include	"xrScriptEngine/script_engine.hpp"
 #include	"luabind/return_reference_to_policy.hpp"
@@ -412,7 +412,7 @@ void CResourceManager::LS_Load()
     // load shaders
     const char* shaderPath = RImplementation.getShaderPath();
     xr_vector<char*>* folder = FS.file_list_open("$game_shaders$", shaderPath, FS_ListFiles | FS_RootOnly);
-    VERIFY (folder);
+    R_ASSERT3(folder, "Shader folder not found: ", shaderPath);
     for (u32 it = 0; it < folder->size(); it++)
     {
         string_path namesp, fn;

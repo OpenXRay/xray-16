@@ -60,17 +60,7 @@ namespace Loki
     template <bool flag, typename T, typename U>
     struct Select
     {
-    private:
-        template<bool>
-        struct In 
-        { typedef T Result; };
-
-        template<>
-        struct In<false>
-        { typedef U Result; };
-
-    public:
-        typedef typename In<flag>::Result Result;
+        using Result = std::conditional_t<flag, T, U>;
     };
     
 
@@ -84,20 +74,8 @@ namespace Loki
 ////////////////////////////////////////////////////////////////////////////////
 
     template <typename T, typename U>
-    struct IsSameType
-    {
-    private:
-        template<typename>
-        struct In 
-        { enum { value = false }; };
-
-        template<>
-        struct In<T>
-        { enum { value = true };  };
-
-    public:
-        enum { value = In<U>::value };
-    };
+    struct IsSameType : std::is_same<T, U>
+    {};
     
 ////////////////////////////////////////////////////////////////////////////////
 // Helper types Small and Big - guarantee that sizeof(Small) < sizeof(Big)

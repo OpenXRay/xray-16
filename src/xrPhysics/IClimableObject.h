@@ -39,5 +39,9 @@ public:
     virtual IPhysicsShellHolder* cast_IPhysicsShellHolder() = 0;
 
 protected:
+#if defined(WINDOWS)
     virtual ~IClimableObject() = 0 {}
+#elif defined(LINUX)
+    virtual ~IClimableObject() = 0;
+#endif
 };

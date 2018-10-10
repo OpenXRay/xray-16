@@ -5,7 +5,9 @@
 #if defined(USE_OGL)
 
 // TODO: Get rid of D3D types.
+#if defined(WINDOWS)
 #include <d3d9types.h>
+#endif
 
 class glState;
 

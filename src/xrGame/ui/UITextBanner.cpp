@@ -2,7 +2,7 @@
 //  Красивый текстовый баннер с множеством стилей
 //=============================================================================
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UITextBanner.h"
 
 CUITextBanner::CUITextBanner()

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "ai/Monsters/states/state_data.h"
-#include "ai/Monsters/states/state_move_to_point.h"
-#include "ai/Monsters/states/state_hide_from_point.h"
-#include "ai/Monsters/states/state_custom_action.h"
+#include "ai/monsters/states/state_data.h"
+#include "ai/monsters/states/state_move_to_point.h"
+#include "ai/monsters/states/state_hide_from_point.h"
+#include "ai/monsters/states/state_custom_action.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "PHMovementControl.h"
 #include "CharacterPhysicsSupport.h"
 #include "group_state_eat_drag.h"
 #include "group_state_custom.h"
-#include "group_state_eat_eat.h "
+#include "group_state_eat_eat.h"
 
 #define TEMPLATE_SPECIALIZATION \
     template <typename _Object\

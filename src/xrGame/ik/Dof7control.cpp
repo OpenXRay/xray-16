@@ -31,7 +31,7 @@
 
  */
 #include "StdAfx.h"
-#include "dof7control.h"
+#include "Dof7control.h"
 #include "mathTrig.h"
 
 // #define SRSDEBUG

@@ -4,6 +4,12 @@
 #include "IGame_Persistent.h"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
+#include "SDL.h"
+#include "SDL_syswm.h"
+
+extern void FreeMonitorsToken();
+extern void FreeVidModesToken();
+extern void FreeRefreshRateToken();
 
 extern void FreeMonitorsToken();
 extern void FreeVidModesToken();

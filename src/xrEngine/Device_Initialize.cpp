@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "xr_3da/resource.h"
+#include "SDL.h"
 
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
@@ -20,9 +22,10 @@ void CRenderDevice::initialize_weather_editor()
 
     m_editor_finalize = (finalize_function_ptr)m_editor_module->GetProcAddress("finalize");
     VERIFY(m_editor_finalize);
-
+#if !defined(LINUX)
     m_engine = new engine_impl();
     m_editor_initialize(m_editor, m_engine);
+#endif
     VERIFY(m_editor);
 
     m_sdlWnd = SDL_CreateWindowFrom(m_editor->view_handle());
@@ -48,7 +51,7 @@ void CRenderDevice::Initialize()
             SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 
         m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 640, 480, flags);
-       
+
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);

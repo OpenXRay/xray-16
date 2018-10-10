@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PH_ITEM_LIST_H
-#define PH_ITEM_LIST_H
 
 /*
 #define DECLARE_PHLIST_ITEM(class_name) public:\
@@ -96,7 +94,7 @@ class CPHItemStack : public CPHItemList<T>
 public:
     void push_back(T* item)
     {
-        item->stack_pos = size;
+        item->stack_pos = this->size;
         CPHItemList<T>::push_back(item);
     }
 };
@@ -106,5 +104,3 @@ public:
 #define DEFINE_PHITEM_STACK(T, N, I)\
     typedef CPHItemStack<T> N;\
     typedef CPHItemStack<T>::iterator I;
-
-#endif // PH_ITEM_LIST_H

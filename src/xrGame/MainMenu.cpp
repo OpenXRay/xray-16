@@ -1,13 +1,14 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "MainMenu.h"
-#include "UI/UIDialogWnd.h"
+#include "ui/UIDialogWnd.h"
 #include "ui/UIMessageBoxEx.h"
-#include "xrEngine/xr_IOConsole.h"
+#include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/CameraManager.h"
-#include "xr_Level_controller.h"
-#include "xrUICore/XML/UItextureMaster.h"
-#include "ui\UIXmlInit.h"
+#include "xr_level_controller.h"
+#include "xrUICore/XML/UITextureMaster.h"
+#include "ui/UIXmlInit.h"
+#include "SDL.h"
 #include "xrUICore/Buttons/UIBtnHint.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
@@ -25,8 +26,10 @@
 
 #include "ui/UICDkey.h"
 
+#ifdef WINDOWS
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
+#endif
 
 #include <tbb/parallel_for_each.h>
 
@@ -157,7 +160,7 @@ void CMainMenu::ReadTextureInfo()
     const auto UpdateFileSet = [&](pcstr path)
     {
         FS.file_list(files, "$game_config$", FS_ListFiles,
-            strconcat(sizeof(buf), buf, path, "\\", "textures_descr\\*.xml")
+            strconcat(sizeof(buf), buf, path, DELIMITER, "textures_descr" DELIMITER "*.xml")
         );
     };
 
@@ -379,7 +382,9 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
+#if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 0.9f);
+#endif
     }
 
     if (SDL_SCANCODE_F12 == dik)
@@ -400,7 +405,9 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
+#if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 1.f);
+#endif
     }
 
 
@@ -636,8 +643,9 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 
     string4096 FilePath = "";
     char* FileName = NULL;
+#ifndef LINUX // FIXME!!!
     GetFullPathName(fileName, 4096, FilePath, &FileName);
-
+#endif
     string_path fname;
     if (FS.path_exist("$downloads$"))
     {
@@ -645,7 +653,7 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
         m_sPatchFileName = fname;
     }
     else
-        m_sPatchFileName.printf("downloads\\%s", FileName);
+        m_sPatchFileName.printf("downloads" DELIMITER "%s", FileName);
 
     m_sPDProgress.IsInProgress = true;
     m_sPDProgress.Progress = 0;
@@ -787,7 +795,7 @@ bool CMainMenu::IsCDKeyIsValid()
     for (int i = 0; i < 4; i++)
     {
         GetGameID(&GameID, i);
-        if (VerifyClientCheck(CDKey, unsigned short(GameID)) == 1)
+        if (VerifyClientCheck(CDKey, (unsigned short)(GameID)) == 1)
             return true;
     };
     return false;
@@ -874,9 +882,14 @@ void CMainMenu::OnDownloadMPMap_CopyURL(CUIWindow* w, void* d)
 void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
 {
     LPCSTR url = m_downloaded_mp_map_url.c_str();
+#ifdef WINDOWS
     LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
+#else
+    std::string command = "xdg-open " + std::string{url};
+    system(command.c_str());
+#endif
 }
 
 demo_info const* CMainMenu::GetDemoInfo(LPCSTR file_name)

@@ -43,24 +43,18 @@ private:
     int table_width;
 
     //перобразование из LPCSTR в T_ITEM
-
-    template <typename T_CONVERT_ITEM>
-    T_ITEM convert(LPCSTR)
+    T_ITEM convert(LPCSTR str)
     {
-        static_assert(!std::is_same_v<T_CONVERT_ITEM, T_CONVERT_ITEM>, "Specialization for convert in CIni_Table not found."); // Xottab_DUTY: Is this correct?
-        NODEFAULT;
-    }
-
-    template <>
-    T_ITEM convert<int>(LPCSTR str)
-    {
-        return atoi(str);
-    }
-
-    template <>
-    T_ITEM convert<float>(LPCSTR str)
-    {
-        return (float)atof(str);
+        if constexpr(std::is_same<T_ITEM, int>::value)
+        {
+            return atoi(str);
+        }
+        else
+        {
+            static_assert(std::is_same_v<T_ITEM, float>,
+                "Specialization for convert in CIni_Table not found.");
+            return (float)atof(str);
+        }
     }
 };
 
@@ -108,15 +102,16 @@ typename CSIni_Table::ITEM_TABLE& CSIni_Table::table()
 
     for (auto i = table_ini.Data.cbegin(); table_ini.Data.cend() != i; ++i)
     {
-        T_INI_LOADER::index_type cur_index = T_INI_LOADER::IdToIndex((*i).first, type_max<T_INI_LOADER::index_type>);
+        typename T_INI_LOADER::index_type cur_index =
+            T_INI_LOADER::IdToIndex((*i).first, type_max<typename T_INI_LOADER::index_type>);
 
-        if (type_max<T_INI_LOADER::index_type> == cur_index)
-            xrDebug::Fatal(DEBUG_INFO, "wrong community %s in section [%s]", (*i).first, table_sect);
+        if (type_max<typename T_INI_LOADER::index_type> == cur_index)
+            xrDebug::Fatal(DEBUG_INFO, "wrong community %s in section [%s]", (*i).first.c_str(), table_sect);
 
         (*m_pTable)[cur_index].resize(cur_table_width);
         for (std::size_t j = 0; j < cur_table_width; j++)
         {
-            (*m_pTable)[cur_index][j] = convert<typename T_ITEM>(_GetItem(*(*i).second, (int)j, buffer));
+            (*m_pTable)[cur_index][j] = convert(_GetItem(*(*i).second, (int)j, buffer));
         }
     }
 

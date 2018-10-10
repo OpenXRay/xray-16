@@ -1,6 +1,6 @@
 #pragma once
 
-#include "customzone.h"
+#include "CustomZone.h"
 
 class CMosquitoBald : public CCustomZone
 {

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "traffic_optimization.h"
 
 namespace compression
@@ -7,8 +7,8 @@ void init_ppmd_trained_stream(ppmd_trained_stream*& dest)
 {
     VERIFY(dest == NULL);
     string_path file_name;
-    FS.update_path(file_name, "$game_config$", "mp\\ppmd_updates.mdl");
-    R_ASSERT2(FS.exist(file_name), "can't find configs\\mp\\ppmd_updates.mdl");
+    FS.update_path(file_name, "$game_config$", "mp" DELIMITER "ppmd_updates.mdl");
+    R_ASSERT2(FS.exist(file_name), "can't find configs" DELIMITER "mp" DELIMITER "ppmd_updates.mdl");
 
     IReader* reader = FS.r_open(file_name);
     R_ASSERT(reader);
@@ -36,8 +36,8 @@ void init_lzo(u8*& dest_wm, u8*& wm_buffer, lzo_dictionary_buffer& dest_dict)
     dest_wm = (u8*)(size_t(wm_buffer + 16) & ~0xf);
 
     string_path file_name;
-    FS.update_path(file_name, "$game_config$", "mp\\lzo_updates.dic");
-    R_ASSERT2(FS.exist(file_name), "can't find configs\\mp\\lzo_updates.dic");
+    FS.update_path(file_name, "$game_config$", "mp" DELIMITER "lzo_updates.dic");
+    R_ASSERT2(FS.exist(file_name), "can't find configs" DELIMITER "mp" DELIMITER "lzo_updates.dic");
     IReader* reader = FS.r_open(file_name);
     u32 buffer_size = reader->length();
     u8* buffer = (u8*)xr_malloc(buffer_size);

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_cl_base.h"
 #include "player_state_blitzkrieg.h"
 #include "game_state_accumulator.h"

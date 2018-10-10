@@ -8,7 +8,7 @@
 
 #include "pch_script.h"
 #include "stalker_combat_actions.h"
-#include "Ai/Stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker.h"
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
 #include "stalker_decision_space.h"
@@ -31,7 +31,7 @@
 #include "agent_member_manager.h"
 #include "agent_location_manager.h"
 #include "danger_cover_location.h"
-#include "Ai/Stalker/ai_stalker_space.h"
+#include "ai/stalker/ai_stalker_space.h"
 #include "Weapon.h"
 #include "danger_manager.h"
 #include "detail_path_manager.h"
@@ -58,7 +58,7 @@ static const u32 s_wait_enemy_in_smart_cover_time = 30 * 1000;
 using namespace StalkerSpace;
 using namespace StalkerDecisionSpace;
 
-typedef CStalkerActionBase::_edge_value_type _edge_value_type;
+typedef CStalkerActionBase::edge_value_type _edge_value_type;
 
 #ifdef _DEBUG
 //#	define SILENT_COMBAT
@@ -1096,7 +1096,7 @@ void CStalkerActionSuddenAttack::execute()
         else
             object().sight().setup(CSightAction(SightManager::eSightTypePosition,
                                                 mem_object.m_object_params.m_position, true));
-        //-Alundaio		
+        //-Alundaio
     }
 
     if (object().movement().accessible(mem_object.m_object_params.m_level_vertex_id))

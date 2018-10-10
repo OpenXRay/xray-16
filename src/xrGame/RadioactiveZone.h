@@ -1,5 +1,5 @@
 #pragma once
-#include "customzone.h"
+#include "CustomZone.h"
 
 class CRadioactiveZone : public CCustomZone
 {

@@ -25,12 +25,12 @@
 #include "ActorCondition.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "HudItem.h"
-#include "ui/UItalkWnd.h"
+#include "ui/UITalkWnd.h"
 #include "Inventory.h"
 #include "InfoPortion.h"
-#include "AI/Monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/basemonster/base_monster.h"
 #include "WeaponMagazined.h"
-#include "Ai/Stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "stalker_animation_manager.h"
@@ -53,7 +53,7 @@
 #include "inventory_item.h"
 #include "CustomOutfit.h"
 #include "inventory_item_impl.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServerEntities/inventory_space.h"
 //-Alundaio
@@ -761,7 +761,7 @@ LPCSTR CScriptGameObject::sound_voice_prefix() const
     return pInventoryOwner->SpecificCharacter().sound_voice_prefix();
 }
 
-#include "GameTaskManager.h"
+#include "GametaskManager.h"
 ETaskState CScriptGameObject::GetGameTaskState(LPCSTR task_id)
 {
     shared_str shared_name = task_id;
@@ -1509,7 +1509,7 @@ LPCSTR CScriptGameObject::aim_bone_id() const
     if (!stalker)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member aim_bone_id!");
-        return (false);
+        return nullptr;
     }
 
     return (stalker->aim_bone_id().c_str());
@@ -1579,7 +1579,7 @@ bool CScriptGameObject::suitable_smart_cover(CScriptGameObject* object)
         return (false);
     }
 
-    smart_cover::cover const& cover = smart_object->cover();
+    smart_cover::cover const& cover = smart_object->get_cover();
     if (!cover.can_fire())
         return (true);
 

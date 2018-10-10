@@ -10,7 +10,7 @@
 
 #include "stdafx.h"
 #pragma hdrstop
-
+#include "SDL.h"
 #include "os_clipboard.h"
 #include "xrCore/_std_extensions.h"
 

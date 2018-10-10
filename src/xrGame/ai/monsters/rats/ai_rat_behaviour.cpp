@@ -6,7 +6,7 @@
 //	Description : AI Behaviour for monster "Rat"
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai_rat.h"
 #include "rat_state_manager.h"
 #include "ai_space.h"

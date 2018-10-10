@@ -272,9 +272,10 @@ typedef void           (ALC_APIENTRY *LPALCCAPTURESAMPLES)( ALCdevice *device, A
 }
 #endif
 
+#if defined(_WIN32) && !defined(_XBOX)
 typedef void __cdecl log_fn_ptr_type(char*);
 extern ALC_API log_fn_ptr_type*	pLog ;
-
+#endif
 void AlLog(char* format, ...);
 
 #endif /* AL_ALC_H */

@@ -6,7 +6,7 @@
 //	Description : moving objects
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "moving_object.h"
 #include "ai_space.h"
 #include "moving_objects.h"
@@ -23,11 +23,11 @@ moving_object::moving_object(const CEntityAlive* object)
 
     update_position();
 
-    ai().moving_objects().register_object(this);
+    ai().get_moving_objects().register_object(this);
 }
 
-moving_object::~moving_object() { ai().moving_objects().unregister_object(this); }
-void moving_object::on_object_move() { ai().moving_objects().on_object_move(this); }
+moving_object::~moving_object() { ai().get_moving_objects().unregister_object(this); }
+void moving_object::on_object_move() { ai().get_moving_objects().on_object_move(this); }
 void moving_object::update_position() { m_position = m_object->Position(); }
 Fvector moving_object::predict_position(const float& time_to_check) const
 {

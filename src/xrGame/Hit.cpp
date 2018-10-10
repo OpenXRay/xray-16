@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_space.h"
-#include "hit.h"
+#include "Hit.h"
 
 #include "xrCore/Animation/Bone.hpp"
 #include "xrMessages.h"

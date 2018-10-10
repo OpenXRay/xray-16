@@ -2,10 +2,10 @@
 #include "game_cl_mp_script.h"
 #include "xrServer_script_macroses.h"
 #include "UIGameCustom.h"
-#include "level.h"
+#include "Level.h"
 #include "GameObject.h"
 #include "script_game_object.h"
-#include "xrmessages.h"
+#include "xrMessages.h"
 #include "date_time.h"
 #include "ui/UIDialogWnd.h"
 
@@ -67,7 +67,7 @@ LPCSTR game_cl_mp_script::GetRoundTime()
 
     split_time(dt, year, month, day, hours, mins, secs, milisecs);
 
-    sprintf_s(bufTime, "%02i:%02i", mins, secs);
+    xr_sprintf(bufTime, "%02i:%02i", mins, secs);
 
     return bufTime;
 }

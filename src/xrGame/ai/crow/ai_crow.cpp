@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/phvalide.h"
 #include "ai_crow.h"
 #include "Level.h"
@@ -18,7 +18,7 @@
 #include "xrScriptEngine/script_callback_ex.h"
 #include "game_object_space.h"
 #include "script_game_object.h"
-#include "hit.h"
+#include "Hit.h"
 #ifdef DEBUG
 
 #endif
@@ -117,7 +117,7 @@ void CAI_Crow::Load(LPCSTR section)
     //////////////////////////////////////////////////////////////////////////
 
     // sounds
-    m_Sounds.m_idle.Load("monsters\\crow\\idle");
+    m_Sounds.m_idle.Load("monsters" DELIMITER "crow" DELIMITER "idle");
     // play defaut
 
     fSpeed = pSettings->r_float(section, "speed");

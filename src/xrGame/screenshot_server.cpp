@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "screenshot_server.h"
 #include "xrMessages.h"
 #include "Level.h"
@@ -136,9 +136,11 @@ void clientdata_proxy::save_proxy_screenshot()
     LPCSTR dest_file_name = NULL;
     STRCONCAT(dest_file_name, clgame->make_file_name(m_cheater_name.c_str(), screenshot_fn), "_",
         (m_cheater_digest.size() ? clgame->make_file_name(m_cheater_digest.c_str(), str_digest) : "nulldigest"));
+#ifndef LINUX // FIXME!!!
     SYSTEMTIME date_time;
     GetLocalTime(&date_time);
     clgame->generate_file_name(screenshot_fn, dest_file_name, date_time);
+#endif
 
     clgame->decompress_and_save_screenshot(
         screenshot_fn, my_proxy_mem_file.pointer(), my_proxy_mem_file.size(), m_receiver->get_user_param());
@@ -155,10 +157,11 @@ void clientdata_proxy::save_proxy_config()
     string_path dest_file_name;
 
     STRCONCAT(fn_suffix, clgame->make_file_name(m_cheater_name.c_str(), config_fn), ".cltx");
-
+#ifndef LINUX // FIXME!!!
     SYSTEMTIME date_time;
     GetLocalTime(&date_time);
     clgame->generate_file_name(dest_file_name, fn_suffix, date_time);
+#endif
     IWriter* tmp_writer = FS.w_open("$screenshots$", dest_file_name);
     if (!tmp_writer)
         return;
@@ -190,12 +193,14 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     break;
     case file_transfer::receiving_aborted_by_peer:
     {
+#ifndef LINUX // FIXME!!!
         Msg("* download screenshot aborted by peer [%u]", m_chearer_id);
         LPCSTR error_msg;
         char bufforint[16];
         STRCONCAT(
             error_msg, "download screenshot terminated by peer [", ultoa(m_chearer_id.value(), bufforint, 10), "]");
         notify_admin(e_screenshot_error_notif, error_msg);
+#endif
     }
     break;
     case file_transfer::receiving_timeout:
@@ -248,11 +253,13 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     break;
     case file_transfer::receiving_aborted_by_peer:
     {
+#ifndef LINUX // FIXME!!!
         Msg("* download config aborted by peer [%u]", m_chearer_id);
         LPCSTR error_msg;
         char bufforint[16];
         STRCONCAT(error_msg, "download config terminated by peer [", ultoa(m_chearer_id.value(), bufforint, 10), "]");
         notify_admin(e_configs_error_notif, error_msg);
+#endif
     }
     break;
     case file_transfer::receiving_timeout:

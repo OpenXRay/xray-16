@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "anti_aim_ability.h"
 #include "basemonster/base_monster.h"
 #include "Actor.h"

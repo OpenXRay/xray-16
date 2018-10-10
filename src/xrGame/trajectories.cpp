@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "trajectories.h"
 #include "Level.h"
 #include "xrPhysics/IPHWorld.h"

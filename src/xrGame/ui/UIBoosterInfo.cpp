@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIBoosterInfo.h"
 #include "xrUICore/Static/UIStatic.h"
 #include "Common/object_broker.h"

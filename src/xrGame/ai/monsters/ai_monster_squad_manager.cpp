@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ai_monster_squad_manager.h"
 #include "ai_monster_squad.h"
 #include "Entity.h"

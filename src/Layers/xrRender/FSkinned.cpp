@@ -1382,7 +1382,7 @@ void CSkeletonX_ext::_FillVertices(const Fmatrix& view, CSkeletonWallmark& wm, c
     u16* indices = nullptr;
 #if    defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	indices = *m_Indices;
-#else    //    USE_DX10
+#else // USE_DX10
     CHK_DX(V->p_rm_Indices->Lock(0, V->dwPrimitives * 3, (void**)&indices, D3DLOCK_READONLY));
     // fill vertices
     switch (RenderMode)
@@ -1549,7 +1549,7 @@ void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     VERIFY(*m_Indices);
     indices = *m_Indices;
-#else USE_DX10
+#else // USE_DX10
     CHK_DX(V->p_rm_Indices->Lock(0, V->dwPrimitives * 3, (void**)&indices, D3DLOCK_READONLY));
     // fill vertices
     void* vertices = nullptr;
@@ -1558,7 +1558,7 @@ void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
-#endif	//	USE_DX10
+#endif // USE_DX10
     {
         if (*Vertices1W)
             TEnumBoneVertices(Vertices1W, indices + iBase, *faces, C);

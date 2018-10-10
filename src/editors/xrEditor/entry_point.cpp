@@ -5,6 +5,7 @@
 #include "xrEngine/device.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
+#include "SDL.h"
 
 using namespace XRay;
 using namespace XRay::Editor;
@@ -21,7 +22,7 @@ void UIThreadProc(void*)
 
     auto windowIDE = gcnew WindowIDE();
 
-    Core.Initialize("OpenXRayEditor", LogCallback(ELogCallback, windowIDE->Log().Handle.ToPointer()), true);
+    Core.Initialize("OpenXRayEditor", nullptr, LogCallback(ELogCallback, windowIDE->Log().Handle.ToPointer()), true);
 
 #ifdef XR_X64
     Device.m_sdlWnd = (SDL_Window*)windowIDE->View().GetViewHandle().ToInt64();

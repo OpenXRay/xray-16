@@ -8,9 +8,9 @@
 #include "Layers/xrRender/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
-#include "smap_allocator.h"
-#include "Layers/xrRender/light_db.h"
-#include "Layers/xrRender/light_render_direct.h"
+#include "SMAP_Allocator.h"
+#include "Layers/xrRender/Light_DB.h"
+#include "Layers/xrRender/Light_Render_Direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
@@ -91,7 +91,7 @@ public:
         u32 dx10_msaa : 1; //	DX10.0 path
         u32 dx10_msaa_hybrid : 1; //	DX10.0 main path with DX10.1 A-test msaa allowed
         u32 dx10_msaa_opt : 1; //	DX10.1 path
-        u32 dx10_gbuffer_opt : 1; //	
+        u32 dx10_gbuffer_opt : 1; //
         u32 dx10_sm4_1 : 1; //	DX10.1 path
         u32 dx10_msaa_alphatest : 2; //	A-test mode
         u32 dx10_msaa_samples : 4;
@@ -215,7 +215,9 @@ public:
     void render_rain();
 
     void render_sun_cascade(u32 cascade_ind);
+#if defined(WINDOWS) // remove this after port r2_R_sun.cpp
     void init_cacades();
+#endif
     void render_sun_cascades();
 
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
@@ -299,14 +301,14 @@ public:
 
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    LPCSTR getShaderPath() override { return "gl\\"; }
+    LPCSTR getShaderPath() override { return "gl" DELIMITER; }
     virtual ref_shader getShader(int id);
     IRender_Sector* getSector(int id) override;
     IRenderVisual* getVisual(int id) override;
     IRender_Sector* detectSector(const Fvector& P) override;
     IRender_Target* getTarget() override;
 
-    // Main 
+    // Main
     void flush() override;
     void set_Object(IRenderable* O) override;
     void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
@@ -362,8 +364,8 @@ public:
     void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
     void OnFrame() override;
 
-    void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
-    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
+    void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects
+    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
     // Render mode
     void rmNear() override;

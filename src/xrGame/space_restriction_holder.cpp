@@ -6,7 +6,7 @@
 //	Description : Space restriction holder
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "space_restriction_holder.h"
 #include "Common/object_broker.h"
 #include "space_restrictor.h"

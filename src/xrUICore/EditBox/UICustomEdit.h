@@ -4,7 +4,7 @@
 namespace text_editor
 {
 class ENGINE_API line_edit_control;
-enum init_mode;
+enum init_mode : u32;
 };
 
 class XRUICORE_API CUICustomEdit : public CUIStatic

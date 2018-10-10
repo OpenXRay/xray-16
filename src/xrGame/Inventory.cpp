@@ -1,22 +1,22 @@
 #include "pch_script.h"
-#include "inventory.h"
-#include "actor.h"
+#include "Inventory.h"
+#include "Actor.h"
 #include "CustomOutfit.h"
 #include "trade.h"
-#include "weapon.h"
+#include "Weapon.h"
 
 #include "ui/UIInventoryUtilities.h"
 #include "ui/UIActorMenu.h"
 
 #include "eatable_item.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "xrmessages.h"
+#include "xrMessages.h"
 #include "xr_level_controller.h"
 #include "Level.h"
 #include "ai_space.h"
-#include "entitycondition.h"
+#include "EntityCondition.h"
 #include "game_base_space.h"
-#include "uigamecustom.h"
+#include "UIGameCustom.h"
 #include "clsid_game.h"
 #include "static_cast_checked.hpp"
 #include "player_hud.h"
@@ -1081,7 +1081,7 @@ bool CInventory::Eat(PIItem pIItem)
 
         CurrentGameUI()->GetActorMenu().SetCurrentItem(nullptr);
     }
-        
+
 
     if (pItemToEat->Empty())
     {

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "poses_blending.h"
 #include "xrCore/_quaternion.h"
 

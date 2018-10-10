@@ -6,7 +6,7 @@
 #include "PHWorld.h"
 #include "xrEngine/device.h"
 #ifdef DEBUG
-#include "xrEngine/Statgraph.h"
+#include "xrEngine/StatGraph.h"
 #include "debug_output.h"
 #endif
 static const float getting_on_dist = 0.3f;

@@ -9,7 +9,7 @@
 #include "pch_script.h"
 #include "hit_memory_manager.h"
 #include "memory_space_impl.h"
-#include "custommonster.h"
+#include "CustomMonster.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrScriptEngine/script_callback_ex.h"
@@ -24,7 +24,7 @@
 #include "xrEngine/IGame_Persistent.h"
 
 #ifndef MASTER_GOLD
-#include "actor.h"
+#include "Actor.h"
 #include "ai_debug.h"
 #endif // MASTER_GOLD
 

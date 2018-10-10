@@ -64,6 +64,7 @@ SCRIPT_EXPORT(SServerFilters, (), {
                          .def_readwrite("listen_servers", &SServerFilters::listen_servers)];
 });
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(connect_error_cb, (), {
     module(luaState)[class_<connect_error_cb>("connect_error_cb")
                          .def(constructor<>())
@@ -71,6 +72,7 @@ SCRIPT_EXPORT(connect_error_cb, (), {
                          .def("bind", &connect_error_cb::bind)
                          .def("clear", &connect_error_cb::clear)];
 });
+#endif
 
 SCRIPT_EXPORT(CServerList, (CUIWindow), {
     module(luaState)[class_<CServerList, CUIWindow>("CServerList")

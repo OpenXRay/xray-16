@@ -18,6 +18,12 @@ class CBaseLocationSelector<CLevelGraph, _VertexEvaluator, _vertex_id_type>
     typedef CLevelGraph _Graph;
     typedef CAbstractLocationSelector<_Graph, _VertexEvaluator, _vertex_id_type> inherited;
 
+    // Needed for template-derived-classes.
+    using inherited::m_evaluator;
+    using inherited::m_graph;
+    using inherited::m_path;
+    using inherited::m_restricted_object;
+
 public:
     IC CBaseLocationSelector(CRestrictedObject* object);
 

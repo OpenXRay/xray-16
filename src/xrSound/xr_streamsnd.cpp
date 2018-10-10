@@ -15,16 +15,17 @@ CSoundStream::CSoundStream()
 
     bNeedUpdate = true;
     bMustPlay = false;
-
+#if defined(WINDOWS)
     pBuffer = NULL;
-
+#endif
     bMustLoop = false;
     iLoopCountRested = 0;
 
     dwStatus = 0;
-
+#if defined(WINDOWS)
     hAcmStream = 0;
     ZeroMemory(&stream, sizeof(stream));
+#endif
     pwfx = 0;
     psrc = 0;
     dwDecPos = 0;
@@ -49,17 +50,23 @@ CSoundStream::~CSoundStream()
     xr_free(WaveDest);
     xr_free(pwfx);
     xr_free(psrc);
+#if defined(WINDOWS)
     _RELEASE(pBuffer);
+#endif
 }
 
 void CSoundStream::Update()
 {
+#if defined(WINDOWS)
     if (dwStatus & DSBSTATUS_BUFFERLOST)
         pBuffer->Restore();
+#endif
     if (bNeedUpdate)
     {
         fRealVolume = .5f * fRealVolume + .5f * fVolume;
+#if defined(WINDOWS)
         pBuffer->SetVolume(LONG((1 - fRealVolume * psSoundVMusic * fBaseVolume) * float(DSBVOLUME_MIN)));
+#endif
         bNeedUpdate = false;
     }
 }
@@ -78,12 +85,14 @@ void CSoundStream::Play(BOOL loop, int cnt)
     dwDecPos = 0;
     isPresentData = true;
     //----------------
+#if defined(WINDOWS)
     if (hAcmStream)
     {
         CHK_DX(acmStreamClose(hAcmStream, 0));
     }
     CHK_DX(acmStreamOpen(&hAcmStream, 0, psrc, pwfx, 0, NULL, 0, 0));
     CHK_DX(acmStreamSize(hAcmStream, dwDestBufSize, LPDWORD(&dwSrcBufSize), ACM_STREAMSIZEF_DESTINATION));
+#endif
     // alloc source data buffer
     VERIFY(dwSrcBufSize);
     xr_free(WaveSource);
@@ -93,7 +102,9 @@ void CSoundStream::Play(BOOL loop, int cnt)
     hf->seek(DataPos);
     writepos = 0;
     Decompress(WaveDest);
+#if defined(WINDOWS)
     writepos = stream.cbDstLengthUsed;
+#endif
     //-------
     iLoopCountRested = cnt;
     bMustLoop = loop;
@@ -104,6 +115,7 @@ void CSoundStream::Stop()
 {
     int code;
     xr_free(WaveSource);
+#if defined(WINDOWS)
     if (hAcmStream)
     {
         code = acmStreamClose(hAcmStream, 0);
@@ -112,6 +124,7 @@ void CSoundStream::Stop()
     hAcmStream = 0;
     pBuffer->Stop();
     pBuffer->SetCurrentPosition(0);
+#endif
     dwStatus = 0;
     isPause = false;
 }
@@ -125,20 +138,28 @@ void CSoundStream::Pause()
     }
     else
     {
+#if defined(WINDOWS)
         if (!(dwStatus & DSBSTATUS_PLAYING))
             return;
         pBuffer->Stop();
+#endif
         isPause = true;
     }
 }
 
+#if defined(WINDOWS)
 void CSoundStream::Restore() { pBuffer->Restore(); }
+#else
+void CSoundStream::Restore() { ; }
+#endif
 void CSoundStream::OnMove()
 {
-    VERIFY(pBuffer);
+
+#if defined(WINDOWS)
+	VERIFY(pBuffer);
 
     pBuffer->GetStatus(LPDWORD(&dwStatus));
-
+#endif
     if (isPause)
         return;
 
@@ -148,15 +169,23 @@ void CSoundStream::OnMove()
     if (dwStatus & DSBSTATUS_PLAYING)
     {
         Update();
+#if defined(WINDOWS)
         pBuffer->GetCurrentPosition(LPDWORD(&currpos), 0);
+#endif
         if (writepos < currpos)
             delta = currpos - writepos;
         else
             delta = dsBufferSize - (writepos - currpos);
-        if (isPresentData && (delta > stream.cbDstLengthUsed))
+        if (isPresentData
+#if defined(WINDOWS)
+        		&& (delta > stream.cbDstLengthUsed)
+#endif
+        )
         {
             isPresentData = Decompress(WaveDest);
+#if defined(WINDOWS)
             writepos += stream.cbDstLengthUsed;
+#endif
         }
         else
         {
@@ -194,7 +223,9 @@ void CSoundStream::OnMove()
         {
             bMustPlay = false;
             Update();
+#if defined(WINDOWS)
             pBuffer->Play(0, 0, DSBPLAY_LOOPING);
+#endif
             dwStatus |= DSBSTATUS_PLAYING;
         }
     }
@@ -227,6 +258,7 @@ BOOL CSoundStream::Decompress(unsigned char* dest)
     }
     hf->r(WaveSource, dwSrcSize);
 
+#if defined(WINDOWS)
     stream.cbStruct = sizeof(stream);
     stream.fdwStatus = 0;
     stream.pbSrc = WaveSource;
@@ -240,6 +272,7 @@ BOOL CSoundStream::Decompress(unsigned char* dest)
     dwDecPos += stream.cbSrcLengthUsed;
 
     AppWriteDataToBuffer(writepos, WaveDest, stream.cbDstLengthUsed);
+#endif
 
     return r;
 }
@@ -256,6 +289,7 @@ void CSoundStream::AppWriteDataToBuffer(u32 dwOffset, // our own write cursor
 
     // Obtain memory address of write block. This will be in two parts
     // if the block wraps around.
+#if defined(WINDOWS)
     if (DS_OK == pBuffer->Lock(dwOffset, dwSoundBytes, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0))
     {
         // Write to pointers.
@@ -265,10 +299,12 @@ void CSoundStream::AppWriteDataToBuffer(u32 dwOffset, // our own write cursor
         // Release the data back to DSound.
         CHK_DX(pBuffer->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2));
     }
+#endif
 }
 
 #define XRead(a) hf->r(&a, sizeof(a))
 
+#if defined(WINDOWS)
 //--------------------------------------------------------------------------------------------------
 BOOL ADPCMCreateSoundBuffer(IDirectSound8* lpDS, IDirectSoundBuffer** pDSB, WAVEFORMATEX* fmt)
 {
@@ -291,6 +327,7 @@ BOOL ADPCMCreateSoundBuffer(IDirectSound8* lpDS, IDirectSoundBuffer** pDSB, WAVE
     }
     return TRUE;
 }
+#endif
 
 //--------------------------------------------------------------------------------------------------
 void CSoundStream::LoadADPCM()
@@ -301,12 +338,16 @@ void CSoundStream::LoadADPCM()
     sxr_hdr hdr;
 
     string256 fn;
+#if defined(WINDOWS)
     strconcat(fn, fName, ".ogg");
+#elif defined(LINUX)
+    strconcat(256, fn, fName, ".ogg");
+#endif
 
     DataPos = NULL;
 
     hf = FS.r_open("$game_sounds$", fn);
-    R_ASSERT(hf >= 0);
+    VERIFY(hf);
     ZeroMemory(&riff, sizeof(riff));
     XRead(riff);
     CopyMemory(buf, riff.id, 4);
@@ -342,11 +383,14 @@ void CSoundStream::LoadADPCM()
 
     VERIFY(DataPos);
     // dest format
+#if defined(WINDOWS)
     CHK_DX(acmFormatSuggest(NULL, psrc, pwfx, dwFMT_Size, ACM_FORMATSUGGESTF_WFORMATTAG));
+#endif
     // dest buffer (const size)
     WaveDest = (unsigned char*)xr_malloc(dwDestBufSize);
     // wave source -- alloc on Play
-
+#if defined(WINDOWS)
     // DSound----------------------------------------------------------------
     ADPCMCreateSoundBuffer(SoundRender.pDevice, &pBuffer, pwfx);
+#endif
 }

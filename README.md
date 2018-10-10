@@ -16,7 +16,9 @@ and work on the source code.
 
 Changelist is available in [wiki](https://github.com/OpenXRay/xray-16/wiki/Changes).
 
-Build instructions: [doc/howto/build.txt](doc/howto/build.txt)
+Build instructions (Windows): [doc/howto/build.txt](doc/howto/build.txt)
+
+Build instructions (Linux): [doc/howto/build-linux.txt](doc/howto/build-linux.txt)
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
 

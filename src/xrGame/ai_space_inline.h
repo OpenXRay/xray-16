@@ -27,7 +27,7 @@ IC const CCoverManager& CAI_Space::cover_manager() const
     return (*m_cover_manager);
 }
 
-IC moving_objects& CAI_Space::moving_objects() const
+IC moving_objects& CAI_Space::get_moving_objects() const
 {
     VERIFY(m_moving_objects);
     return (*m_moving_objects);

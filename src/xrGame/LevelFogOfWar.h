@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "UI/UIWindow.h"
+#include "ui/UIWindow.h"
 #include "alife_abstract_registry.h"
 
 class CUICustomMap;

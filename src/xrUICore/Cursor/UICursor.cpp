@@ -1,10 +1,11 @@
 #include "pch.hpp"
-#include "uicursor.h"
+#include "UICursor.h"
 
 #include "Static/UIStatic.h"
 #include "Buttons/UIBtnHint.h"
 #include "xrEngine/IInputReceiver.h"
 #include "xrEngine/xr_input.h"
+#include "SDL_syswm.h"
 
 #define C_DEFAULT color_xrgb(0xff, 0xff, 0xff)
 
@@ -44,7 +45,7 @@ void CUICursor::Hide()
 void CUICursor::InitInternal()
 {
     m_static = new CUIStatic();
-    m_static->InitTextureEx("ui\\ui_ani_cursor", "hud\\cursor");
+    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
     Frect rect;
     rect.set(0.0f, 0.0f, 40.0f, 40.0f);
     m_static->SetTextureRect(rect);

@@ -1,5 +1,5 @@
-#ifndef PHSHELL_SPLITTER_H
-#define PHSHELL_SPLITTER_H
+#pragma once
+
 #include "PHDefs.h"
 
 #include "PHFracture.h"
@@ -70,5 +70,3 @@ public:
     void SetBreakable();
     bool IsUnbreakable() { return m_unbreakable; }
 };
-
-#endif

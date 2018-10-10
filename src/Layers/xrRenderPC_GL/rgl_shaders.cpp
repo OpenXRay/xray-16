@@ -39,8 +39,13 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
         // Create path to included shader
         strconcat(sizeof path, path, GEnv.Render->getShaderPath(), fn);
         FS.update_path(path, "$game_shaders$", path);
+#if defined(WINDOWS)
         while (char* sep = strchr(path, '/'))
             *sep = '\\';
+#else
+        while (char* sep = strchr(path, '\\'))
+            *sep = '/';
+#endif
 
         // Open and read file, recursively load includes
         IReader* R = FS.r_open(path);
@@ -56,7 +61,7 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
 
 struct SHADER_MACRO
 {
-    char *Define = "#define ", *Name = "\n", *Sep = "\t", *Definition = "\n", *EOL = "\n";
+    char const *Define = "#define ", *Name = "\n", *Sep = "\t", *Definition = "\n", *EOL = "\n";
 };
 
 HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
@@ -563,7 +568,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     size_t def_len = def_it * 5;
     size_t sources_len = source.size() + def_len + 2;
     string256 name_comment;
-    sprintf_s(name_comment, "// %s\n", name);
+    xr_sprintf(name_comment, "// %s\n", name);
     const char** sources = xr_alloc<const char*>(sources_len);
 #ifdef DEBUG
     sources[0] = "#version 450\n#pragma optimize (off)\n";

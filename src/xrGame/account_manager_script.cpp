@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "account_manager.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -30,6 +30,7 @@ SCRIPT_EXPORT(account_manager, (), {
                          .def("stop_searching_email", &account_manager::stop_searching_email)];
 });
 
+#ifndef LINUX // FIXME!!!
 SCRIPT_EXPORT(suggest_nicks_cb, (), {
     module(luaState)[class_<gamespy_gp::suggest_nicks_cb>("suggest_nicks_cb")
                          .def(constructor<>())
@@ -65,3 +66,4 @@ SCRIPT_EXPORT(found_email_cb, (), {
                          .def("bind", &gamespy_gp::found_email_cb::bind)
                          .def("clear", &gamespy_gp::found_email_cb::clear)];
 });
+#endif

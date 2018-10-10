@@ -1,12 +1,12 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_sv_mp.h"
 #include "xrServer.h"
 #include "xrMessages.h"
 #include "xrServer_Object_Base.h"
 #include "xrServer_Objects.h"
 #include "Level.h"
-#include "xrserver_objects_alife_monsters.h"
-#include "actor.h"
+#include "xrServer_Objects_ALife_Monsters.h"
+#include "Actor.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "date_time.h"
@@ -219,12 +219,17 @@ struct real_sender
     NET_Packet* P;
     u32 flags_to_send;
 
+#ifdef LINUX // FIXME!!!
+    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = 0)
+#else
     real_sender(xrServer* server, NET_Packet* Packet, u32 flags = DPNSEND_GUARANTEED)
+#endif
     {
         server_for_send = server;
         P = Packet;
         flags_to_send = flags;
     }
+
     void operator()(IClient* client)
     {
         xrClientData* tmp_client = static_cast<xrClientData*>(client);
@@ -1070,7 +1075,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
         {
             string256 LevelName;
             string256 LevelVersion;
-            sscanf_s(CommandParams, "%255s %255s", LevelName, sizeof(LevelName), LevelVersion, sizeof(LevelVersion));
+            sscanf(CommandParams, "%255s %255s", LevelName, LevelVersion);
 #ifdef DEBUG
             Msg("--- Starting vote for changing level to: %s[%s]", LevelName, LevelVersion);
 #endif // #ifdef DEBUG
@@ -1913,9 +1918,9 @@ void game_sv_mp::DumpOnlineStatistic()
     xrGameSpyServer* srv = smart_cast<xrGameSpyServer*>(m_server);
 
     string_path fn;
-    FS.update_path(fn, "$logs$", "mp_stats\\");
+    FS.update_path(fn, "$logs$", "mp_stats" DELIMITER);
     xr_strcat(fn, srv->HostName.c_str());
-    xr_strcat(fn, "\\online_dump.ltx");
+    xr_strcat(fn, "" DELIMITER "online_dump.ltx");
 
     string64 t_stamp;
     timestamp(t_stamp);
@@ -2094,11 +2099,11 @@ void game_sv_mp::StartToDumpStatistics()
     }
 
     xrGameSpyServer* srv = smart_cast<xrGameSpyServer*>(m_server);
-    FS.update_path(round_statistics_dump_fn, "$logs$", "mp_stats\\");
+    FS.update_path(round_statistics_dump_fn, "$logs$", "mp_stats" DELIMITER);
     string64 t_stamp;
     timestamp(t_stamp);
     xr_strcat(round_statistics_dump_fn, srv->HostName.c_str());
-    xr_strcat(round_statistics_dump_fn, "\\games\\dmp");
+    xr_strcat(round_statistics_dump_fn, DELIMITER "games" DELIMITER "dmp");
     xr_strcat(round_statistics_dump_fn, t_stamp);
     xr_strcat(round_statistics_dump_fn, ".ltx");
 }

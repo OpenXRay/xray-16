@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 
+#if defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
@@ -9,11 +10,12 @@
 #include "xrEngine/Render.h"
 #endif
 #pragma warning(pop)
+#endif
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/blender.h"
-#include "blenders/blender_recorder.h"
+#include "blenders/Blender.h"
+#include "blenders/Blender_Recorder.h"
 #include "ShaderResourceTraits.h"
 
 void fix_texture_name(LPSTR fn);
@@ -24,19 +26,19 @@ void simplify_texture(string_path& fn)
     {
         if (strstr(fn, "$user"))
             return;
-        if (strstr(fn, "ui\\"))
+        if (strstr(fn, "ui" DELIMITER))
             return;
         if (strstr(fn, "lmap#"))
             return;
-        if (strstr(fn, "act\\"))
+        if (strstr(fn, "act" DELIMITER))
             return;
-        if (strstr(fn, "fx\\"))
+        if (strstr(fn, "fx" DELIMITER))
             return;
-        if (strstr(fn, "glow\\"))
+        if (strstr(fn, "glow" DELIMITER))
             return;
-        if (strstr(fn, "map\\"))
+        if (strstr(fn, "map" DELIMITER))
             return;
-        xr_strcpy(fn, "ed\\ed_not_existing_texture");
+        xr_strcpy(fn, "ed" DELIMITER "ed_not_existing_texture");
     }
 }
 

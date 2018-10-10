@@ -72,7 +72,7 @@ bool stalker_movement_manager_smart_cover::in_current_loophole_fov(Fvector const
     smart_cover::cover const* cover = ai().cover_manager().smart_cover(m_enter_cover_id);
     VERIFY(cover);
 
-    smart_cover::loophole const* loophole = cover->description()->loophole(m_enter_loophole_id);
+    smart_cover::loophole const* loophole = cover->get_description()->get_loophole(m_enter_loophole_id);
     return (cover->is_position_in_fov(*loophole, position));
 }
 
@@ -86,7 +86,7 @@ bool stalker_movement_manager_smart_cover::in_current_loophole_range(Fvector con
     smart_cover::cover const* cover = ai().cover_manager().smart_cover(m_enter_cover_id);
     VERIFY(cover);
 
-    smart_cover::loophole const* loophole = cover->description()->loophole(m_enter_loophole_id);
+    smart_cover::loophole const* loophole = cover->get_description()->get_loophole(m_enter_loophole_id);
     return (cover->is_position_in_range(*loophole, position));
 }
 

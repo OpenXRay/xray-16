@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "ai/Monsters/rats/ai_rat.h"
+#include "ai/monsters/rats/ai_rat.h"
 #include "memory_manager.h"
 #include "enemy_manager.h"
 #include "xrServerEntities/ai_sounds.h"

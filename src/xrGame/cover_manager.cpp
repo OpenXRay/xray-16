@@ -6,7 +6,7 @@
 //	Description : Cover manager class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "tbb/parallel_for.h"
 #include "tbb/blocked_range.h"
 #include "xrAICore/Navigation/level_graph.h"
@@ -201,12 +201,12 @@ public:
     {
         VERIFY(lhs);
         VERIFY(rhs);
-        return (lhs->object().cName()._get() < rhs->object().cName()._get());
+        return (lhs->get_object().cName()._get() < rhs->get_object().cName()._get());
     }
     IC bool operator()(Cover* cover, shared_str const& id)
     {
         VERIFY(cover);
-        return (cover->object().cName()._get() < id._get());
+        return (cover->get_object().cName()._get() < id._get());
     }
 };
 

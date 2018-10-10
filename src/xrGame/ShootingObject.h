@@ -7,7 +7,7 @@
 #pragma once
 
 #include "alife_space.h"
-#include "xrEngine/render.h"
+#include "xrEngine/Render.h"
 #include "anticheat_dumpable_object.h"
 
 class CCartridge;
@@ -16,7 +16,7 @@ class IRender_Sector;
 
 extern const Fvector zero_vel;
 
-#define WEAPON_MATERIAL_NAME "objects\\bullet"
+#define WEAPON_MATERIAL_NAME "objects" DELIMITER "bullet"
 
 class CShootingObject : public IAnticheatDumpable
 {

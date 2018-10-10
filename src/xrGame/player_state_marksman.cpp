@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "player_state_marksman.h"
 #include "kills_store.h"
 #include "game_cl_base.h"
 #include "Level.h"
 #include "game_state_accumulator.h"
-#include "actor.h"
+#include "Actor.h"
 
 namespace award_system
 {

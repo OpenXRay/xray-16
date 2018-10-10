@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "actor_mp_client.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "Level.h"
 #include "GamePersistent.h"
 #include "game_cl_base.h"
-#include "xrEngine/camerabase.h"
+#include "xrEngine/CameraBase.h"
 
 #include "xrPhysics/phvalide.h"
 

@@ -4,6 +4,8 @@
 #include "xrCore/xr_token.h"
 #include "xrCDB/xrXRC.h"
 #include "XR_IOConsole.h"
+#include "SDL.h"	
+#include "SDL_syswm.h"
 
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;

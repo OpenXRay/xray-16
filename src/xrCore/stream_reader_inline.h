@@ -18,7 +18,12 @@ IC CStreamReader& CStreamReader::operator=(const CStreamReader&)
     return (*this);
 }
 
+#if defined(WINDOWS)
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
+#elif defined(LINUX)
+IC const int& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
+#endif
+
 #if defined(WINDOWS)
 IC void CStreamReader::unmap() { UnmapViewOfFile(m_current_map_view_of_file); }
 #else

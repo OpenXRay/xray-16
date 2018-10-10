@@ -6,7 +6,7 @@
 //	Description : Agent corpse manager
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "agent_corpse_manager.h"
 #include "member_order.h"
 #include "ai/stalker/ai_stalker.h"

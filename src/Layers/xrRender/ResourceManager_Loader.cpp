@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "ResourceManager.h"
-#include "blenders/blender.h"
+#include "blenders/Blender.h"
 
 void CResourceManager::OnDeviceDestroy(BOOL)
 {
@@ -103,6 +103,9 @@ void CResourceManager::OnDeviceCreate(IReader* F)
             }
             else
             {
+#ifdef LINUX
+                while (char* sep = strchr(desc.cName, '\\')) *sep = '/';
+#endif
                 if (B->getDescription().version != desc.version)
                 {
                     Msg("! Version conflict in shader '%s'", desc.cName);
@@ -155,9 +158,9 @@ void CResourceManager::StoreNecessaryTextures()
     for (; it != it_e; ++it)
     {
         LPCSTR texture_name = it->first;
-        if (strstr(texture_name, "\\levels\\"))
+        if (strstr(texture_name, DELIMITER "levels" DELIMITER))
             continue;
-        if (!strchr(texture_name, '\\'))
+        if (!strchr(texture_name, _DELIMITER))
             continue;
 
         ref_texture T;

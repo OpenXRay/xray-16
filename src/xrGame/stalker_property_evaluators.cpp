@@ -13,7 +13,7 @@
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
 #include "ai/ai_monsters_misc.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "alife_simulator.h"
 #include "alife_object_registry.h"
 #include "memory_manager.h"
@@ -25,7 +25,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "alife_human_brain.h"
-#include "actor.h"
+#include "Actor.h"
 #include "actor_memory.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "agent_manager.h"
@@ -34,7 +34,7 @@
 #include "cover_point.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "stalker_animation_manager.h"
-#include "weapon.h"
+#include "Weapon.h"
 
 using namespace StalkerDecisionSpace;
 

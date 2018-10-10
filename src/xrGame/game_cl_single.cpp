@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "game_cl_single.h"
 #include "UIGameSP.h"
-#include "actor.h"
+#include "Actor.h"
 #include "clsid_game.h"
 #include "ai_space.h"
 #include "alife_simulator.h"

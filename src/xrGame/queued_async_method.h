@@ -128,7 +128,7 @@ struct parameters_tuple3
 {
     parameters_tuple3() {}
     parameters_tuple3(T1 t1, T2 t2, T3 t3) : m_t1(t1), m_t2(t2), m_t3(t3){};
-    parameters_tuple3(parameters_tuple3 const& copy) : m_t1(copy.m_t1), m_t2(copy.m_t2), m_t3(copt.m_t3){};
+    parameters_tuple3(parameters_tuple3 const& copy) : m_t1(copy.m_t1), m_t2(copy.m_t2), m_t3(copy.m_t3){};
 
     parameters_tuple3& operator=(parameters_tuple3 const& copy)
     {
@@ -165,7 +165,7 @@ struct parameters_tuple4
         return *this;
     }
 
-    bool operator==(parameters_tuple3 const& right) const
+    bool operator==(parameters_tuple4 const& right) const
     {
         return (m_t1 == right.m_t1) && (m_t2 == right.m_t2) && (m_t3 == right.m_t3) && (m_t4 == right.m_t4);
     }

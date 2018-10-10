@@ -53,7 +53,7 @@ protected:
 
     IC bool EQ(LPCSTR S1, LPCSTR S2) { return xr_strcmp(S1, S2) == 0; }
 public:
-    IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(TRUE), bEmptyArgsHandled(FALSE)
+    IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(FALSE), bEmptyArgsHandled(FALSE)
     {
         m_LRU.reserve(LRU_MAX_COUNT + 1);
         m_LRU.clear();
@@ -69,12 +69,12 @@ public:
     LPCSTR Name() { return cName; }
     void InvalidSyntax();
     virtual void Execute(LPCSTR args) = 0;
-    virtual void Status(TStatus& S) { S[0] = 0; }
+    virtual void GetStatus(TStatus& S) { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_strcpy(I, "(no arguments)"); }
     virtual void Save(IWriter* F)
     {
         TStatus S;
-        Status(S);
+        GetStatus(S);
         if (S[0])
             F->w_printf("%s %s\r\n", cName, S);
     }
@@ -110,7 +110,7 @@ public:
         else
             InvalidSyntax();
     }
-    virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
+    virtual void GetStatus(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
     virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
@@ -127,7 +127,7 @@ protected:
     u32 mask;
 
 public:
-    CCC_ToggleMask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = TRUE; };
+    CCC_ToggleMask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = TRUE; }
     const BOOL GetValue() const { return value->test(mask); }
     virtual void Execute(LPCSTR /*args*/)
     {
@@ -136,7 +136,7 @@ public:
         strconcat(sizeof(S), S, cName, " is ", value->test(mask) ? "on" : "off");
         Log(S);
     }
-    virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
+    virtual void GetStatus(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
     virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
@@ -153,7 +153,7 @@ protected:
     const xr_token* tokens;
 
 public:
-    CCC_Token(LPCSTR N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){};
+    CCC_Token(LPCSTR N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){}
 
     virtual void Execute(LPCSTR args)
     {
@@ -175,7 +175,7 @@ public:
         if (!tok->name)
             InvalidSyntax();
     }
-    virtual void Status(TStatus& S)
+    virtual void GetStatus(TStatus& S)
     {
         const xr_token* tok = GetToken();
         while (tok->name)
@@ -239,8 +239,8 @@ protected:
 
 public:
     CCC_Float(LPCSTR N, float* V, float _min = 0, float _max = 1)
-        : IConsole_Command(N), value(V), min(_min), max(_max){};
-    const float GetValue() const { return *value; };
+        : IConsole_Command(N), value(V), min(_min), max(_max){}
+    const float GetValue() const { return *value; }
     void GetBounds(float& fmin, float& fmax) const
     {
         fmin = min;
@@ -255,7 +255,7 @@ public:
         else
             *value = v;
     }
-    virtual void Status(TStatus& S)
+    virtual void GetStatus(TStatus& S)
     {
         xr_sprintf(S, sizeof(S), "%3.5f", *value);
         while (xr_strlen(S) && ('0' == S[xr_strlen(S) - 1]))
@@ -283,8 +283,8 @@ public:
         min.set(_min);
         max.set(_max);
     };
-    const Fvector GetValue() const { return *value; };
-    Fvector* GetValuePtr() const { return value; };
+    const Fvector GetValue() const { return *value; }
+    Fvector* GetValuePtr() const { return value; }
     virtual void Execute(LPCSTR args)
     {
         Fvector v;
@@ -305,7 +305,7 @@ public:
         }
         value->set(v);
     }
-    virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "(%f, %f, %f)", value->x, value->y, value->z); }
+    virtual void GetStatus(TStatus& S) { xr_sprintf(S, sizeof(S), "(%f, %f, %f)", value->x, value->y, value->z); }
     virtual void Info(TInfo& I)
     {
         xr_sprintf(I, sizeof(I), "vector3 in range [%e,%e,%e]-[%e,%e,%e]", min.x, min.y, min.z, max.x, max.y, max.z);
@@ -327,14 +327,14 @@ protected:
     int min, max;
 
 public:
-    const int GetValue() const { return *value; };
+    const int GetValue() const { return *value; }
     void GetBounds(int& imin, int& imax) const
     {
         imin = min;
         imax = max;
     }
 
-    CCC_Integer(LPCSTR N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max){};
+    CCC_Integer(LPCSTR N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max){}
 
     virtual void Execute(LPCSTR args)
     {
@@ -344,7 +344,7 @@ public:
         else
             *value = v;
     }
-    virtual void Status(TStatus& S) { xr_itoa(*value, S, 10); }
+    virtual void GetStatus(TStatus& S) { xr_itoa(*value, S, 10); }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "integer value in range [%d,%d]", min, max); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -370,7 +370,7 @@ public:
     };
 
     virtual void Execute(LPCSTR args) { strncpy_s(value, size, args, size - 1); }
-    virtual void Status(TStatus& S) { xr_strcpy(S, value); }
+    virtual void GetStatus(TStatus& S) { xr_strcpy(S, value); }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "string with up to %d characters", size); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -382,7 +382,7 @@ public:
 class ENGINE_API CCC_LoadCFG : public IConsole_Command
 {
 public:
-    virtual bool allow(LPCSTR /*cmd*/) { return true; };
+    virtual bool allow(LPCSTR /*cmd*/) { return true; }
     CCC_LoadCFG(LPCSTR N);
     virtual void Execute(LPCSTR args);
 };

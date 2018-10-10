@@ -97,7 +97,7 @@ u32 path_crc32(const char* path, u32 len)
     while (len--)
     {
         const u8 c = *buffer;
-        if (c != '/' && c != '\\')
+        if (c != '/' && c != _DELIMITER)
         {
             ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer];
         }

@@ -6,79 +6,40 @@
 //	Description : ALife registry container class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "alife_registry_container.h"
 #include "Common/object_interfaces.h"
 #include "alife_space.h"
 #include "Common/object_type_traits.h"
 
 template <typename TContainer, typename TList>
-class RegistryHelper
+struct RegistryHelper;
+
+template <typename TContainer>
+struct RegistryHelper<TContainer, Loki::NullType>
 {
-private:
-    ASSERT_TYPELIST(TList);
-    using Head = typename TList::Head;
-    using Tail = typename TList::Tail;
+    static void Save(TContainer*, IWriter&) {};
+    static void Load(TContainer*, IReader&) {};
+};
 
-    static const bool isSerializable = object_type_traits::is_base_and_derived<ISerializable, Head>::value;
+template <typename TContainer, typename Head, typename Tail>
+struct RegistryHelper<TContainer, Loki::Typelist<Head, Tail>>
+{
+    static constexpr bool isSerializable =
+        object_type_traits::is_base_and_derived<ISerializable, Head>::value;
 
-    template <bool serializable>
-    static void LoadHead(TContainer* self, IReader& reader)
-    {
-    }
-
-    template <>
-    static void LoadHead<true>(TContainer* self, IReader& reader)
-    {
-        self->Head::load(reader);
-    }
-
-    template <bool serializable>
-    static void SaveHead(TContainer* self, IWriter& writer)
-    {
-    }
-
-    template <>
-    static void SaveHead<true>(TContainer* self, IWriter& writer)
-    {
-        self->Head::save(writer);
-    }
-
-    static void LoadHead(TContainer* self, IReader& reader) { LoadHead<isSerializable>(self, reader); }
-    static void SaveHead(TContainer* self, IWriter& writer) { SaveHead<isSerializable>(self, writer); }
-    template <typename TListTail>
-    static void Load(TContainer* self, IReader& reader)
-    {
-        RegistryHelper<TContainer, Tail>::Load(self, reader);
-    }
-
-    template <>
-    static void Load<Loki::NullType>(TContainer* self, IReader& reader)
-    {
-    }
-
-    template <typename TListTail>
     static void Save(TContainer* self, IWriter& writer)
     {
+        if constexpr (isSerializable)
+            self->Head::save(writer);
         RegistryHelper<TContainer, Tail>::Save(self, writer);
-    }
+    };
 
-    template <>
-    static void Save<Loki::NullType>(TContainer* self, IWriter& writer)
-    {
-    }
-
-public:
     static void Load(TContainer* self, IReader& reader)
     {
-        Load<Tail>(self, reader);
-        LoadHead(self, reader);
-    }
-
-    static void Save(TContainer* self, IWriter& writer)
-    {
-        Save<Tail>(self, writer);
-        SaveHead(self, writer);
+        if constexpr (isSerializable)
+            self->Head::load(reader);
+        RegistryHelper<TContainer, Tail>::Load(self, reader);
     }
 };
 

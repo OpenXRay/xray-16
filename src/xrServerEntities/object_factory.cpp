@@ -6,7 +6,7 @@
 //	Description : Object factory
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "object_factory.h"
 #include "Common/object_broker.h"
 

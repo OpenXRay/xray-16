@@ -2,7 +2,7 @@
 #define AFX_LIGHTSHADOWS_H__CFA216D9_CACB_4515_9FBE_7C531649168F__INCLUDED_
 #pragma once
 
-#include "Layers/xrRender/Light.h"
+#include "Layers/xrRender/light.h"
 #include "Layers/xrRender/r__dsgraph_types.h"
 
 class CLightShadows

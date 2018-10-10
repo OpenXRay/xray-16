@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "activatingcharcollisiondelay.h"
+#include "ActivatingCharCollisionDelay.h"
 #include "CharacterPhysicsSupport.h"
-#include "phmovementcontrol.h"
+#include "PHMovementControl.h"
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 activating_character_delay::activating_character_delay(CCharacterPhysicsSupport* char_support_)
     : char_support(*char_support_), activate_time(Device.dwTimeGlobal + delay)

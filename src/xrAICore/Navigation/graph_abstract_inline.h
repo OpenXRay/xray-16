@@ -33,7 +33,7 @@ IC void CAbstractGraph::remove_vertex(const _vertex_id_type& vertex_id)
 {
     vertex_iterator I = m_vertices.find(vertex_id);
     VERIFY(m_vertices.end() != I);
-    VERTICES::value_type v = *I;
+    typename VERTICES::value_type v = *I;
     delete_data(v);
     m_vertices.erase(I);
 }
@@ -147,7 +147,7 @@ IC const _edge_weight_type CAbstractGraph::get_edge_weight(
 TEMPLATE_SPECIALIZATION
 IC bool CAbstractGraph::is_accessible(const _vertex_id_type vertex_index) const { return (true); }
 TEMPLATE_SPECIALIZATION
-IC typename CAbstractGraph::_vertex_id_type const& CAbstractGraph::value(
+IC _vertex_id_type const& CAbstractGraph::value(
     _vertex_id_type const& vertex_index, const_iterator i) const
 {
     return ((*i).vertex_id());

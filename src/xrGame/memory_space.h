@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ai_sounds.h"
-#include "xrserver_space.h"
+#include "xrServer_Space.h"
 #include "alife_space.h"
 #include "xrCore/_flags.h"
 #include "xrCommon/misc_math_types.h"

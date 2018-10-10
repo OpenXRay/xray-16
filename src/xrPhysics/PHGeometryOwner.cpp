@@ -13,7 +13,7 @@ CPHGeometryOwner::CPHGeometryOwner()
     // contact_callback=ContactShotMark;//ph_world->default_contact_shotmark();
     contact_callback = ph_world->default_contact_shotmark();
     object_contact_callback = NULL;
-    ul_material = GMLibrary().GetMaterialIdx("objects\\small_box");
+    ul_material = GMLibrary().GetMaterialIdx("objects" DELIMITER "small_box");
     m_group = NULL;
     m_phys_ref_object = NULL;
 }

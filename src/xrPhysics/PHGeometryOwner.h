@@ -1,5 +1,5 @@
-#ifndef PH_GEOMETRY_OWNER_H
-#define PH_GEOMETRY_OWNER_H
+#pragma once
+
 #include "Geometry.h"
 #include "xrEngine/GameMtlLib.h"
 
@@ -131,5 +131,3 @@ void t_get_extensions(
             hi_ext = temp_hi_ext;
     }
 }
-
-#endif

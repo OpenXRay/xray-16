@@ -2,14 +2,14 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "HUDCrosshair.h"
 #include "xrUICore/ui_base.h"
 
 CHUDCrosshair::CHUDCrosshair()
 {
-    hShader->create("hud\\crosshair");
+    hShader->create("hud" DELIMITER "crosshair");
     radius = 0;
 }
 

@@ -1,10 +1,10 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Level.h"
 #include "UIGameDM.h"
 #include "xrServer.h"
 #include "game_sv_mp.h"
-#include "spectator.h"
-#include "actor.h"
+#include "Spectator.h"
+#include "Actor.h"
 #include "game_cl_base.h"
 #include "game_cl_mp.h"
 #include "xrCore/stream_reader.h"
@@ -18,10 +18,12 @@ void CLevel::PrepareToSaveDemo()
     R_ASSERT(!m_DemoPlay);
     string_path demo_name = "";
     string_path demo_path;
+#ifndef LINUX // FIXME!!!
     SYSTEMTIME Time;
     GetLocalTime(&Time);
     xr_sprintf(demo_name, "xray_%02d-%02d-%02d_%02d-%02d-%02d.demo", Time.wMonth, Time.wDay, Time.wYear, Time.wHour,
         Time.wMinute, Time.wSecond);
+#endif
     Msg("Demo would be stored in - %s", demo_name);
     FS.update_path(demo_path, "$logs$", demo_name);
     m_writer = FS.w_open(demo_path);

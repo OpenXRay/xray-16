@@ -1,5 +1,5 @@
 #include "pch_script.h"
-#include "mincer.h"
+#include "Mincer.h"
 #include "RadioactiveZone.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 

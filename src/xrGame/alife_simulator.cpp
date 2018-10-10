@@ -12,10 +12,10 @@
 #include "ai_space.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "mainmenu.h"
+#include "MainMenu.h"
 #include "object_factory.h"
 #include "alife_object_registry.h"
-#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/XR_IOConsole.h"
 
 #ifdef DEBUG
 #include "moving_objects.h"
@@ -37,7 +37,7 @@ CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
         xr_delete(g_object_factory);
         ai().SetupScriptEngine();
 #ifdef DEBUG
-        ai().moving_objects().clear();
+        ai().get_moving_objects().clear();
 #endif // DEBUG
     }
 

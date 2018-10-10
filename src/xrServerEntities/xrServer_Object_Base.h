@@ -115,7 +115,7 @@ public:
 
     CSE_Abstract(LPCSTR caSection);
     virtual ~CSE_Abstract();
-    virtual void OnEvent(NET_Packet& /*tNetPacket*/, u16 /*type*/, u32 /*time*/, ClientID /*sender*/){};
+    virtual void OnEvent(NET_Packet& /*tNetPacket*/, u16 /*type*/, u32 /*time*/, ClientID /*sender*/){}
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
     virtual void __stdcall FillProp(LPCSTR pref, PropItemVec& items);
@@ -127,13 +127,13 @@ public:
     virtual u32 __stdcall visual_collection_size() const { return 0; }
     virtual void __stdcall set_additional_info(void* /*info*/) {};
 #endif // #ifndef XRGAME_EXPORTS
-    virtual BOOL Net_Relevant() { return FALSE; }; // !!!! WARNING!!!
+    virtual BOOL Net_Relevant() { return FALSE; } // !!!! WARNING!!!
     //
     virtual void __stdcall Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal);
     virtual BOOL __stdcall Spawn_Read(NET_Packet& tNetPacket);
     virtual LPCSTR __stdcall name() const;
     virtual LPCSTR __stdcall name_replace() const;
-    virtual void __stdcall set_name(LPCSTR s) { s_name = s; };
+    virtual void __stdcall set_name(LPCSTR s) { s_name = s; }
     virtual void __stdcall set_name_replace(LPCSTR s)
     {
         xr_free(s_name_replace);
@@ -148,12 +148,12 @@ public:
     virtual bool __stdcall validate();
     //
 
-    IC const Fvector& Position() const { return o_Position; };
+    IC const Fvector& Position() const { return o_Position; }
     // we need this to prevent virtual inheritance :-(
     virtual CSE_Abstract* base();
     virtual const CSE_Abstract* base() const;
     virtual CSE_Abstract* init();
-    virtual bool match_configuration() const throw() { return true; }
+    virtual bool match_configuration() const /* noexcept */ { return true; }
     // end of the virtual inheritance dependant code
     IC int script_clsid() const
     {
@@ -163,23 +163,23 @@ public:
     CInifile& spawn_ini();
 
     // for smart cast
-    virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return nullptr; };
-    virtual CSE_ALifeSchedulable* cast_schedulable() { return nullptr; };
-    virtual CSE_ALifeInventoryItem* cast_inventory_item() { return nullptr; };
-    virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return nullptr; };
+    virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return nullptr; }
+    virtual CSE_ALifeSchedulable* cast_schedulable() { return nullptr; }
+    virtual CSE_ALifeInventoryItem* cast_inventory_item() { return nullptr; }
+    virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return nullptr; }
     virtual CSE_ALifeObject* cast_alife_object() { return nullptr; }
     virtual CSE_ALifeDynamicObject* cast_alife_dynamic_object() { return nullptr; }
     virtual CSE_ALifeItemAmmo* cast_item_ammo() { return nullptr; }
     virtual CSE_ALifeItemWeapon* cast_item_weapon() { return nullptr; }
     virtual CSE_ALifeItemDetector* cast_item_detector() { return nullptr; }
-    virtual CSE_ALifeMonsterAbstract* cast_monster_abstract() { return nullptr; };
-    virtual CSE_ALifeHumanAbstract* cast_human_abstract() { return nullptr; };
-    virtual CSE_ALifeAnomalousZone* cast_anomalous_zone() { return nullptr; };
-    virtual CSE_ALifeTrader* cast_trader() { return nullptr; };
-    virtual CSE_ALifeCreatureAbstract* cast_creature_abstract() { return nullptr; };
-    virtual CSE_ALifeSmartZone* cast_smart_zone() { return nullptr; };
-    virtual CSE_ALifeOnlineOfflineGroup* cast_online_offline_group() { return nullptr; };
-    virtual CSE_ALifeItemPDA* cast_item_pda() { return nullptr; };
+    virtual CSE_ALifeMonsterAbstract* cast_monster_abstract() { return nullptr; }
+    virtual CSE_ALifeHumanAbstract* cast_human_abstract() { return nullptr; }
+    virtual CSE_ALifeAnomalousZone* cast_anomalous_zone() { return nullptr; }
+    virtual CSE_ALifeTrader* cast_trader() { return nullptr; }
+    virtual CSE_ALifeCreatureAbstract* cast_creature_abstract() { return nullptr; }
+    virtual CSE_ALifeSmartZone* cast_smart_zone() { return nullptr; }
+    virtual CSE_ALifeOnlineOfflineGroup* cast_online_offline_group() { return nullptr; }
+    virtual CSE_ALifeItemPDA* cast_item_pda() { return nullptr; }
 };
 
 extern u16 script_server_object_version();

@@ -8,7 +8,7 @@
 
 #include "pch_script.h"
 #include "xrServer_Objects.h"
-#include "phnetstate.h"
+#include "PHNetState.h"
 #include "xrServer_script_macroses.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/ScriptExporter.hpp"

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIPdaMsgListItem.h"
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"

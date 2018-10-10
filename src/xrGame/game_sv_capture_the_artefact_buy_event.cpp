@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "game_sv_capture_the_artefact.h"
 
 void game_sv_CaptureTheArtefact::OnPlayerBuyFinished(ClientID id_who, NET_Packet& P)

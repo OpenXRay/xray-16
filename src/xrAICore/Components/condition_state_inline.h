@@ -22,13 +22,13 @@ IC CConditionStateAbstract::CConditionState()
 TEMPLATE_SPECIALIZATION
 CConditionStateAbstract::~CConditionState() {}
 TEMPLATE_SPECIALIZATION
-IC const xr_vector<typename CConditionStateAbstract::COperatorCondition>& CConditionStateAbstract::conditions() const
+IC const xr_vector<_world_property>& CConditionStateAbstract::conditions() const
 {
     return (m_conditions);
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CConditionStateAbstract::add_condition_back(const COperatorCondition& condition)
+IC void CConditionStateAbstract::add_condition_back(const _world_property& condition)
 {
     THROW(m_conditions.empty() || (m_conditions.back().condition() < condition.condition()));
     m_conditions.push_back(condition);
@@ -36,19 +36,19 @@ IC void CConditionStateAbstract::add_condition_back(const COperatorCondition& co
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CConditionStateAbstract::add_condition(const COperatorCondition& condition)
+IC void CConditionStateAbstract::add_condition(const _world_property& condition)
 {
-    xr_vector<COperatorCondition>::iterator I = std::lower_bound(m_conditions.begin(), m_conditions.end(), condition);
+    typename xr_vector<_world_property>::iterator I = std::lower_bound(m_conditions.begin(), m_conditions.end(), condition);
     THROW((I == m_conditions.end()) || ((*I).condition() != condition.condition()));
     m_conditions.insert(I, condition);
     m_hash ^= condition.hash_value();
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CConditionStateAbstract::remove_condition(const typename COperatorCondition::_condition_type& condition)
+IC void CConditionStateAbstract::remove_condition(const typename _world_property::condition_type& condition)
 {
-    xr_vector<COperatorCondition>::iterator I = std::lower_bound(
-        m_conditions.begin(), m_conditions.end(), COperatorCondition(condition, COperatorCondition::_value_type(0)));
+    typename xr_vector<_world_property>::iterator I = std::lower_bound(
+        m_conditions.begin(), m_conditions.end(), _world_property(condition, typename _world_property::value_type(0)));
     THROW((I != m_conditions.end()) && ((*I).condition() == condition));
     m_hash ^= (*I).hash_value();
     m_conditions.erase(I);
@@ -56,7 +56,7 @@ IC void CConditionStateAbstract::remove_condition(const typename COperatorCondit
 
 TEMPLATE_SPECIALIZATION
 IC void CConditionStateAbstract::add_condition(
-    typename xr_vector<COperatorCondition>::const_iterator& J, const COperatorCondition& condition)
+    typename xr_vector<_world_property>::const_iterator& J, const _world_property& condition)
 {
     m_conditions.insert(m_conditions.begin() + (J - m_conditions.begin()), condition);
     m_hash ^= condition.hash_value();
@@ -70,13 +70,13 @@ IC void CConditionStateAbstract::clear()
 }
 
 TEMPLATE_SPECIALIZATION
-IC u8 CConditionStateAbstract::weight(const CConditionState& condition) const
+IC u8 CConditionStateAbstract::weight(const _world_property& condition) const
 {
     u8 result = 0;
-    xr_vector<COperatorCondition>::const_iterator I = conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator E = conditions().end();
-    xr_vector<COperatorCondition>::const_iterator i = condition.conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
+    typename xr_vector<_world_property>::const_iterator I = conditions().begin();
+    typename xr_vector<_world_property>::const_iterator E = conditions().end();
+    typename xr_vector<_world_property>::const_iterator i = condition.conditions().begin();
+    typename xr_vector<_world_property>::const_iterator e = condition.conditions().end();
     for (; (I != E) && (i != e);)
         if ((*I).condition() < (*i).condition())
             ++I;
@@ -95,10 +95,10 @@ IC u8 CConditionStateAbstract::weight(const CConditionState& condition) const
 TEMPLATE_SPECIALIZATION
 IC bool CConditionStateAbstract::operator<(const CConditionState& condition) const
 {
-    xr_vector<COperatorCondition>::const_iterator I = conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator E = conditions().end();
-    xr_vector<COperatorCondition>::const_iterator i = condition.conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
+    typename xr_vector<_world_property>::const_iterator I = conditions().begin();
+    typename xr_vector<_world_property>::const_iterator E = conditions().end();
+    typename xr_vector<_world_property>::const_iterator i = condition.conditions().begin();
+    typename xr_vector<_world_property>::const_iterator e = condition.conditions().end();
     for (; (I != E) && (i != e); ++I, ++i)
         if (*I < *i)
             return (true);
@@ -118,10 +118,10 @@ IC bool CConditionStateAbstract::operator==(const CConditionState& condition) co
 {
     if (hash_value() != condition.hash_value())
         return (false);
-    xr_vector<COperatorCondition>::const_iterator I = conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator E = conditions().end();
-    xr_vector<COperatorCondition>::const_iterator i = condition.conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
+    typename xr_vector<_world_property>::const_iterator I = conditions().begin();
+    typename xr_vector<_world_property>::const_iterator E = conditions().end();
+    typename xr_vector<_world_property>::const_iterator i = condition.conditions().begin();
+    typename xr_vector<_world_property>::const_iterator e = condition.conditions().end();
     for (; (I != E) && (i != e); ++I, ++i)
         if (!(*I == *i))
             return (false);
@@ -134,11 +134,11 @@ TEMPLATE_SPECIALIZATION
 IC CConditionState<_world_property>& CConditionStateAbstract::operator-=(const CConditionState& condition)
 {
     m_hash = 0;
-    xr_vector<COperatorCondition> temp;
-    xr_vector<COperatorCondition>::const_iterator I = conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator E = conditions().end();
-    xr_vector<COperatorCondition>::const_iterator i = condition.conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
+    xr_vector<_world_property> temp;
+    typename xr_vector<_world_property>::const_iterator I = conditions().begin();
+    typename xr_vector<_world_property>::const_iterator E = conditions().end();
+    typename xr_vector<_world_property>::const_iterator i = condition.conditions().begin();
+    typename xr_vector<_world_property>::const_iterator e = condition.conditions().end();
     for (; (I != E) && (i != e);)
         if ((*I).condition() < (*i).condition())
             ++I;
@@ -161,10 +161,10 @@ IC CConditionState<_world_property>& CConditionStateAbstract::operator-=(const C
 TEMPLATE_SPECIALIZATION
 IC bool CConditionStateAbstract::includes(const CConditionState& condition) const
 {
-    xr_vector<COperatorCondition>::const_iterator I = conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator E = conditions().end();
-    xr_vector<COperatorCondition>::const_iterator i = condition.conditions().begin();
-    xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
+    typename xr_vector<_world_property>::const_iterator I = conditions().begin();
+    typename xr_vector<_world_property>::const_iterator E = conditions().end();
+    typename xr_vector<_world_property>::const_iterator i = condition.conditions().begin();
+    typename xr_vector<_world_property>::const_iterator e = condition.conditions().end();
     for (; (I != E) && (i != e);)
         if ((*I).condition() < (*i).condition())
             ++I;
@@ -183,11 +183,11 @@ IC bool CConditionStateAbstract::includes(const CConditionState& condition) cons
 TEMPLATE_SPECIALIZATION
 IC u32 CConditionStateAbstract::hash_value() const { return (m_hash); }
 TEMPLATE_SPECIALIZATION
-IC const typename CConditionStateAbstract::COperatorCondition* CConditionStateAbstract::property(
-    const typename CConditionStateAbstract::COperatorCondition::_condition_type& condition) const
+IC const _world_property* CConditionStateAbstract::property(
+    const typename _world_property::condition_type& condition) const
 {
-    xr_vector<COperatorCondition>::const_iterator I = std::lower_bound(
-        conditions().begin(), conditions().end(), COperatorCondition(condition, COperatorCondition::_value_type(0)));
+    typename xr_vector<_world_property>::const_iterator I = std::lower_bound(
+        conditions().begin(), conditions().end(), _world_property(condition, typename _world_property::value_type(0)));
     if (I == m_conditions.end())
         return (0);
     else

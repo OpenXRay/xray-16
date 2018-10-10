@@ -1,5 +1,4 @@
-#ifndef EXTENDED_GEOM
-#define EXTENDED_GEOM
+#pragma once
 
 #ifndef dSINGLE
 #define dSINGLE
@@ -275,6 +274,4 @@ IC void dGeomUserDataClearCashedTries(dxGeom* geom)
 }
 #ifdef DEBUG
 XRPHYSICS_API bool IsCyliderContact(const dContact& c);
-#endif
-
 #endif

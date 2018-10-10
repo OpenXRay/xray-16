@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "xrUICore/MessageBox/UIMessageBox.h"
 #include "UIMessageBoxEx.h"
 #include "UIDialogHolder.h"

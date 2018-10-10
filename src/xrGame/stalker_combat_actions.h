@@ -15,8 +15,8 @@ class CCoverPoint;
 
 namespace MonsterSpace
 {
-enum EBodyState;
-enum EMovementType;
+enum EBodyState : u32;
+enum EMovementType : u32;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ public:
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
-    virtual _edge_value_type weight(const CSConditionState& condition0, const CSConditionState& condition1) const;
+    virtual edge_value_type weight(const CSConditionState& condition0, const CSConditionState& condition1) const;
 };
 
 //////////////////////////////////////////////////////////////////////////

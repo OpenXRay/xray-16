@@ -1,24 +1,24 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
-#include "actor.h"
-#include "inventory.h"
-#include "weapon.h"
+#include "Actor.h"
+#include "Inventory.h"
+#include "Weapon.h"
 #include "xrEngine/CameraBase.h"
 #include "xrMessages.h"
 
 #include "Level.h"
 #include "UIGameCustom.h"
 #include "string_table.h"
-#include "actorcondition.h"
+#include "ActorCondition.h"
 #include "game_cl_base.h"
 #include "WeaponMagazined.h"
 #include "CharacterPhysicsSupport.h"
-#include "actoreffector.h"
+#include "ActorEffector.h"
 #include "static_cast_checked.hpp"
 #include "player_hud.h"
 
 #ifdef DEBUG
-#include "phdebug.h"
+#include "PHDebug.h"
 #endif
 static const float s_fLandingTime1 = 0.1f; // через сколько снять флаг Landing1 (т.е. включить следующую анимацию)
 static const float s_fLandingTime2 = 0.3f; // через сколько снять флаг Landing2 (т.е. включить следующую анимацию)
@@ -339,7 +339,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 xr_sprintf(eff_name, sizeof(eff_name), "%s.anm", state_anm);
                 string_path ce_path;
                 string_path anm_name;
-                strconcat(sizeof(anm_name), anm_name, "camera_effects\\actor_move\\", eff_name);
+                strconcat(sizeof(anm_name), anm_name, "camera_effects" DELIMITER "actor_move" DELIMITER, eff_name);
                 if (FS.exist(ce_path, "$game_anims$", anm_name))
                 {
                     CAnimatorCamLerpEffectorConst* e = new CAnimatorCamLerpEffectorConst();
@@ -649,7 +649,7 @@ float CActor::MaxWalkWeight() const
     max_w += get_additional_weight();
     return max_w;
 }
-#include "artefact.h"
+#include "Artefact.h"
 float CActor::get_additional_weight() const
 {
     float res = 0.0f;

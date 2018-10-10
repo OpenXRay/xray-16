@@ -11,16 +11,16 @@
 #include "CustomRocket.h"
 #include "Grenade.h"
 
-#include "xrPhysics/iphworld.h"
-#include "xrPhysics/iActivationShape.h"
+#include "xrPhysics/IPHWorld.h"
+#include "xrPhysics/IActivationShape.h"
 
 #include "CharacterPhysicsSupport.h"
-#include "phmovementcontrol.h"
+#include "PHMovementControl.h"
 #include "physics_shell_animated.h"
-#include "phcollisiondamagereceiver.h"
-#include "xrEngine/iphysicsshell.h"
+#include "PHCollisionDamageReceiver.h"
+#include "xrEngine/IPhysicsShell.h"
 #ifdef DEBUG
-#include "xrEngine/objectdump.h"
+#include "xrEngine/ObjectDump.h"
 #endif
 CPhysicsShellHolder::CPhysicsShellHolder() { init(); }
 CPhysicsShellHolder::~CPhysicsShellHolder()
@@ -322,7 +322,7 @@ void CPhysicsShellHolder::OnChangeVisual()
         if (char_support)
             char_support->destroy_imotion();
 
-        VERIFY(!character_physics_support() || !character_physics_support()->interactive_motion());
+        VERIFY(!character_physics_support() || !character_physics_support()->is_interactive_motion());
         if (m_pPhysicsShell)
             m_pPhysicsShell->Deactivate();
         xr_delete(m_pPhysicsShell);

@@ -1,7 +1,7 @@
 #pragma once
-#include "ai/Monsters/BaseMonster/base_monster.h"
-#include "ai/Monsters/telekinesis.h"
-#include "ai/Monsters/energy_holder.h"
+#include "ai/monsters/basemonster/base_monster.h"
+#include "ai/monsters/telekinesis.h"
+#include "ai/monsters/energy_holder.h"
 
 class CPhysicsShellHolder;
 class CStateManagerPoltergeist;

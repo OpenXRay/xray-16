@@ -23,8 +23,8 @@
 #include "script_game_object.h"
 #include "smart_cover_transition_animation.hpp"
 #include "CharacterPhysicsSupport.h"
-#include "inventory.h"
-#include "weapon.h"
+#include "Inventory.h"
+#include "Weapon.h"
 
 namespace smart_cover
 {
@@ -189,7 +189,7 @@ void stalker_movement_manager_smart_cover::reach_enter_location(u32 const& time_
         target_loophole.enterable() ? target_loophole : nearest_enterable_loophole();
 
     Fvector position;
-    m_target.cover()->object().XFORM().transform_tiny(position, current_transition().animation().position());
+    m_target.cover()->get_object().XFORM().transform_tiny(position, current_transition().animation().position());
 
     u32 level_vertex_id = ai().level_graph().vertex(u32(-1), position);
     if (!accessible(level_vertex_id) || !accessible(position))
@@ -369,9 +369,9 @@ void stalker_movement_manager_smart_cover::loophole_path(smart_cover::cover cons
     typedef GraphEngineSpace::CBaseParameters CBaseParameters;
     CBaseParameters parameters(u32(-1), u32(-1), u32(-1));
     path.clear();
-    R_ASSERT2(ai().graph_engine().search(cover.description()->transitions(), source, target, &path, parameters),
+    R_ASSERT2(ai().graph_engine().search(cover.get_description()->transitions(), source, target, &path, parameters),
         make_string("cannot build path via loopholes [%s] -> [%s] (cover %s)", source_raw.c_str(), target_raw.c_str(),
-            cover.description()->table_id().c_str()));
+            cover.get_description()->table_id().c_str()));
 }
 
 bool stalker_movement_manager_smart_cover::exit_transition()

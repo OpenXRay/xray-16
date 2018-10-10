@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #ifdef DEBUG
 
 #include "xrEngine/StatGraph.h"
@@ -7,18 +7,18 @@
 #include "xrPhysics/MathUtils.h"
 
 #include "xrPhysics/ExtendedGeom.h"
-#include "xrPhysics/iphworld.h"
-#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/IPHWorld.h"
+#include "xrPhysics/PhysicsShell.h"
 
 #include "Level.h"
 
 #include "debug_renderer.h"
-#include "physicsshellholder.h"
+#include "PhysicsShellHolder.h"
 
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "xrEngine/iphdebug.h"
+#include "xrEngine/IPHdebug.h"
 #include "xrCore/xr_token.h"
 #include "xrEngine/GameFont.h"
 
@@ -707,8 +707,8 @@ static LPCSTR name_bool(BOOL v)
 
 static LPCSTR name_blend_type(CBlend::ECurvature blend)
 {
-    static xr_token token_blend[] = {{"eFREE_SLOT", CBlend::eFREE_SLOT}, {"eAccrue", CBlend::eAccrue},
-        {"eFalloff", CBlend::eFalloff}, {"eFORCEDWORD", CBlend::eFORCEDWORD}};
+    static xr_token token_blend[] = {{"eFREE_SLOT", int(CBlend::eFREE_SLOT)}, {"eAccrue", int(CBlend::eAccrue)},
+        {"eFalloff", int(CBlend::eFalloff)}, {"eFORCEDWORD", int(CBlend::eFORCEDWORD)}};
     return get_token_name(token_blend, blend);
 }
 /*

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xrPhysics/PhysicsShell.h"
-#include "weaponammo.h"
+#include "WeaponAmmo.h"
 #include "PHShellCreator.h"
 
 #include "ShootingObject.h"
