@@ -148,7 +148,10 @@
 		<text>Меню выбора команды</text>
 	</string>
 	<string id="kb_torch">
-		<text>Фонарик</text>
+		<text>Налобный Фонарик</text>
+	</string>
+	<string id="kb_flashlight">
+		<text>Ручной Фонарик</text>
 	</string>
 	<string id="kb_turn_engine">
 		<text>Включить</text>

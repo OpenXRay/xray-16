@@ -151,6 +151,9 @@
 		<text>Team selection menu</text>
 	</string>
 	<string id="kb_torch">
+		<text>Headlamp</text>
+	</string>
+	<string id="kb_flashlight">
 		<text>Flashlight</text>
 	</string>
 	<string id="kb_turn_engine">
