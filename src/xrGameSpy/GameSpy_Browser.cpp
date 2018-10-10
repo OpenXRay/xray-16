@@ -328,7 +328,7 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
     {
         PlayerInfo PInfo;
         snprintf(
-            PInfo.Name, "%s", SBServerGetPlayerStringValueA(pServer, i, "player", "Unknown"));
+            PInfo.Name, sizeof(PInfo.Name) - 1, "%s", SBServerGetPlayerStringValueA(pServer, i, "player", "Unknown"));
         PInfo.Name[sizeof(PInfo.Name) - 1] = 0;
         PInfo.Frags = s16(SBServerGetPlayerIntValueA(pServer, i, "score", 0));
         PInfo.Deaths = u16(SBServerGetPlayerIntValueA(pServer, i, "deaths", 0));
