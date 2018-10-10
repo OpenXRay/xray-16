@@ -155,6 +155,48 @@ function add_task_companion(actor,npc,p)
 	end
 end
 
+function on_init_heli_hunt(actor,npc,p)
+	local m_data = alife_storage_manager.get_state()
+	local pos = db.actor:position()
+	m_data.player_last_valid_position = {pos.x,pos.y,pos.z}
+end
+
+function enter_heli(actor,npc,p)
+	-- force into heli
+	if not (db.actor:get_attached_vehicle()) then
+		if not (db.actor:is_talking()) then
+			for id,o in pairs(db.heli) do
+				local pos = vector():set(db.actor:position())
+				pos.y = level.get_bounding_volume().max.y
+				o:force_set_position(pos)
+				db.actor:attach_vehicle(o)
+				local holder = o:cast_HolderCustom()
+				if (holder) then
+					holder:SetExitLocked(true)
+				end
+				break
+			end
+		end
+	end
+end 
+
+function exit_heli(actor,npc,p)
+	local veh = db.actor:get_attached_vehicle()
+	if (veh) then
+		local holder = veh:cast_HolderCustom()
+		if (holder) then
+			holder:SetExitLocked(false)
+		end
+		db.actor:detach_vehicle()
+		
+		local m_data = alife_storage_manager.get_state()
+		local pos = m_data.player_last_valid_position
+		if (pos) then
+			db.actor:set_actor_position(vector():set(unpack(pos)))
+		end
+	end
+end
+
 function inc_task_stage(actor,npc,p)
 	local tsk = p[1] and task_manager.get_task_manager().task_info[p[1]]
 	if (tsk and tsk.stage) then

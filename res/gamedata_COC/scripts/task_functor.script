@@ -73,6 +73,40 @@ end
 ---------------------------------------------------------
 -- TASK FUNCTORS
 ---------------------------------------------------------
+function level_all_of_faction(task_id,field,p,tsk)
+	if (field == "target") then
+		if (tsk and tsk.stage < 1) then
+			local faction_list = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
+			
+			local nearest_id = nil
+			local nearest_dist = nil
+			local se_actor = alife():actor()
+			for id,v in pairs(SIMBOARD.squads) do
+				local squad = alife_object(id)
+				if (squad) and simulation_objects.is_on_the_same_level(squad, se_actor) then
+					if not (squad.first_update) then 
+						return -- not all squads are loaded yet!
+					end
+					if not (squad:get_script_target()) then
+						if (squad.force_online) then
+							for i=1,#faction_list do
+								if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
+									local dist = se_actor.position:distance_to_sqr(squad.position)
+									if (nearest_dist == nil or dist < nearest_dist) then
+										nearest_id = id
+										nearest_dist = dist
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			return nearest_id
+		end
+	end
+end
+
 function general_bounty_task(task_id,field,p,tsk)
 	if (field == "target") then
 		if (tsk) then

@@ -204,7 +204,7 @@ function get_all_from_corpse(npc)
 
 	if not(IsStalker(corpse_npc)) then
 	
-		if (get_story_object("yan_ecolog_semenov")) then
+		if (get_story_object_id("yan_ecolog_semenov") == id) then
 			local need = utils.load_var(db.actor,"yan_ecolog_semenov_task_1_tissue_need") or 0
 			if (need > 0) then
 				local count = utils.load_var(db.actor,"yan_ecolog_semenov_task_1_tissue_count") or 0

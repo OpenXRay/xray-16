@@ -69,6 +69,12 @@ local function squad_on_npc_death(squad,se_npc,killer)
 			return
 		end 
 	end
+	if (squad:npc_count() == 0) then
+		if (xr_conditions.has_task_not_completed(nil,nil,{"agr_smart_terrain_1_6_army_trader_stalker_task_4"}) == true) then 
+			local count = utils.load_var(db.actor,"agr_smart_terrain_1_6_army_trader_stalker_task_4_count") or 0
+			utils.save_var(db.actor,"agr_smart_terrain_1_6_army_trader_stalker_task_4_count",count + 1)
+		end
+	end
 end
 
 local function save_state(m_data)

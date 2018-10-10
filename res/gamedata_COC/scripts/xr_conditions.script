@@ -2993,6 +2993,40 @@ function heli_exist_on_level(actor,npc)
 	return true
 end
 
+function kill_count_ge(actor,npc,p)
+	local count = utils.load_var(db.actor,p[1].."_count") or 0
+	return count >= tonumber(p[2])
+end
+
+function any_on_level(actor,npc,faction_list)
+	local found = false
+	local se_actor = alife():actor()
+	for id,v in pairs(SIMBOARD.squads) do
+		local squad = alife_object(id)
+		if (squad) and simulation_objects.is_on_the_same_level(squad, se_actor) then
+			if not (squad.first_update) then 
+				return -- not all squads are loaded yet!
+			end
+			if not (squad:get_script_target()) then
+				for i=1,#faction_list do
+					if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
+						for k in squad:squad_members() do
+							local member = db.storage[k.id] and db.storage[k.id].object
+							if (member and member:clsid() ~= clsid.bloodsucker_s) then -- only because they stay invis and hard to fight
+								squad.force_online = true
+								found = true
+								break
+							end
+						end
+						
+					end
+				end
+			end
+		end
+	end
+	return found
+end 
+
 function is_actor_surge_immuned(actor,npc,p)
 	return utils.load_var(db.actor,"surge_immuned",false) == true
 end

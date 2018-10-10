@@ -17,7 +17,7 @@ do -- to localize below
 	local function itr(section)
 		local a,key,val = locations_ini:r_line_ex(section,0,"","")
 		location_types[key] = key
-	end 
+	end
 	
 	locations_ini:section_for_each(itr)
 end
@@ -405,7 +405,7 @@ function sim_squad_scripted:on_npc_death(se_npc,se_killer)
 	if self:npc_count() > 0 then
 		self:refresh()
 		return 
-	end 
+	end
 	
 	self.current_action = nil
 	if (self.death_condlist) then
@@ -920,11 +920,11 @@ function sim_squad_scripted:check_online_status()
 	local b = nil
 	if (get_object_story_id(self.id)) then 
 		-- don't enforce any rule
+	elseif (self.force_online) then -- for tasks
+		b = true
 	elseif (self.__lock) then -- couldn't find a target
 		b = false
 	elseif (IsSurvivalMode()) then
-		b = true
-	elseif (self.force_online) then -- for tasks
 		b = true
 	elseif (axr_companions.companion_squads[self.id]) then 
 		b = true
@@ -1084,7 +1084,7 @@ function sim_squad_scripted:show()
 		end
 	elseif not(is_squad_monster[self.player_id]) then
 		local relation = game_relations.get_squad_relation_to_actor_by_id(self)
-		if(relation=="friends") then
+		if (relation=="friends") then
 			spot = "alife_presentation_squad_friend"
 		elseif(relation=="neutral") then
 			spot = "alife_presentation_squad_neutral"
