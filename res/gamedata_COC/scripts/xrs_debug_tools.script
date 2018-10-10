@@ -56,6 +56,10 @@ local function main_loop()
 		return false
 	end
 	
+	if (xrs_debug_tools.debug_god) then
+		db.actor.health = 1
+	end
+	
 	if (STEP) then
 		collectgarbage("step",STEP)
 	end
@@ -1214,34 +1218,37 @@ function actor_condition_hud_show(hud)
 		hud:add_msg(functors[i],actor_condition[ functors[i] ] and actor_condition[ functors[i] ](actor_condition))
 	end
 	
-	if (actor_condition.BoosterForEach) then -- todo: remove me when dlls synced
-		hud:add_msg("","---- Active Boosters ----")
-		
-		local boosterTypeToName = {
-			[CEntityCondition.eBoostHpRestore] = "eBoostHpRestore",
-			[CEntityCondition.eBoostPowerRestore] = "eBoostPowerRestore",
-			[CEntityCondition.eBoostRadiationRestore] = "eBoostRadiationRestore",
-			[CEntityCondition.eBoostBleedingRestore] = "eBoostBleedingRestore",
-			[CEntityCondition.eBoostMaxWeight] = "eBoostMaxWeight",
-			[CEntityCondition.eBoostRadiationProtection] = "eBoostRadiationProtection",
-			[CEntityCondition.eBoostTelepaticProtection] = "eBoostTelepaticProtection",
-			[CEntityCondition.eBoostChemicalBurnProtection] = "eBoostChemicalBurnProtection",
-			[CEntityCondition.eBoostBurnImmunity] = "eBoostBurnImmunity",
-			[CEntityCondition.eBoostShockImmunity] = "eBoostShockImmunity",
-			[CEntityCondition.eBoostRadiationImmunity] = "eBoostRadiationImmunity",
-			[CEntityCondition.eBoostTelepaticImmunity] = "eBoostTelepaticImmunity",
-			[CEntityCondition.eBoostChemicalBurnImmunity] = "eBoostChemicalBurnImmunity",
-			[CEntityCondition.eBoostExplImmunity] = "eBoostExplImmunity",
-			[CEntityCondition.eBoostStrikeImmunity] = "eBoostStrikeImmunity",
-			[CEntityCondition.eBoostFireWoundImmunity] = "eBoostFireWoundImmunity",
-			[CEntityCondition.eBoostWoundImmunity] = "eBoostWoundImmunity"
-		}
-		
-		actor_condition:BoosterForEach(function(booster_type,booster_time,booster_value) 
-			hud:add_msg(boosterTypeToName[booster_type],strformat("%s: %s",booster_time,booster_value))
-		end)
-	end
+	hud:add_msg("","---- Active Boosters ----")
+	
+	local boosterTypeToName = {
+		[CEntityCondition.eBoostHpRestore] = "eBoostHpRestore",
+		[CEntityCondition.eBoostPowerRestore] = "eBoostPowerRestore",
+		[CEntityCondition.eBoostRadiationRestore] = "eBoostRadiationRestore",
+		[CEntityCondition.eBoostBleedingRestore] = "eBoostBleedingRestore",
+		[CEntityCondition.eBoostMaxWeight] = "eBoostMaxWeight",
+		[CEntityCondition.eBoostRadiationProtection] = "eBoostRadiationProtection",
+		[CEntityCondition.eBoostTelepaticProtection] = "eBoostTelepaticProtection",
+		[CEntityCondition.eBoostChemicalBurnProtection] = "eBoostChemicalBurnProtection",
+		[CEntityCondition.eBoostBurnImmunity] = "eBoostBurnImmunity",
+		[CEntityCondition.eBoostShockImmunity] = "eBoostShockImmunity",
+		[CEntityCondition.eBoostRadiationImmunity] = "eBoostRadiationImmunity",
+		[CEntityCondition.eBoostTelepaticImmunity] = "eBoostTelepaticImmunity",
+		[CEntityCondition.eBoostChemicalBurnImmunity] = "eBoostChemicalBurnImmunity",
+		[CEntityCondition.eBoostExplImmunity] = "eBoostExplImmunity",
+		[CEntityCondition.eBoostStrikeImmunity] = "eBoostStrikeImmunity",
+		[CEntityCondition.eBoostFireWoundImmunity] = "eBoostFireWoundImmunity",
+		[CEntityCondition.eBoostWoundImmunity] = "eBoostWoundImmunity"
+	}
+	
+	actor_condition:BoosterForEach(function(booster_type,booster_time,booster_value) 
+		hud:add_msg(boosterTypeToName[booster_type],strformat("%s: %s",booster_time,booster_value))
+	end)
 
+	hud:add_msg("","---- Wounds ----")
+	actor_condition:WoundForEach(function(wound)
+		hud:add_msg( strformat("Bone:%s",wound:GetBoneNum()), strformat("TotalSize:%s",wound:TotalSize()) )
+	end)
+	
 	hud:display()
 end 
 
@@ -2105,7 +2112,17 @@ axr_keybind.bind("DIK_NUMPADENTER",function(p)
 		return 
 	end 
 	if (p==1) then
-	
+	--db.actor:cast_Actor():conditions():ClearAllBoosters()
+		-- local npc = level.get_target_obj()
+		-- if (npc and IsStalker(npc)) then 
+			-- npc:set_desired_position()
+			-- npc:set_desired_direction()
+			-- npc:inactualize_patrol_path()
+			-- npc:set_path_type(game_object.level_path)
+		-- end
+		-- for id,o in pairs(db.heli) do
+			-- o:force_set_position(db.actor:position())
+		-- end	
 		-- if (db.actor) then 
 			-- local wpn = db.actor:active_item()
 			-- if (wpn and IsWeapon(wpn)) then 
