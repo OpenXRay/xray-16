@@ -107,6 +107,7 @@ function get_spawn_table(name)
 		["DET_ADVA"] = "Items (Misc.)",
 		["DET_ELIT"] = "Items (Misc.)",
 		["DET_SCIE"] = "Items (Misc.)",
+		["D_FLALIT"] = "Items (Misc.)",
 
 		["E_STLK"]   = "Outfits",
 		["E_HLMET"]  = "Outfits",

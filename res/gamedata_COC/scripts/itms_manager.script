@@ -30,10 +30,6 @@ local ini = ini_file("plugins\\itms_manager.ltx")
 	local MutantLootEnableUI = ini:r_bool_ex("mutant_loot_mod","enable_ui",false)
 	local MutantLootDecayTime = ini:r_float_ex("mutant_loot_mod","decay_time") or 7200
 
-	-- Flashlight mod
-	local FlashlightModEnable = ini:r_bool_ex("flashlight_mod","enable",false)
-	local FlashlightSections = FlashlightModEnable and alun_utils.collect_section(ini,"flashlight_sections",true)
-
 -- Static Message
 ShowMessage = nil
 ShowMessageInit = nil
@@ -41,7 +37,6 @@ ShowMessageTime = nil
 
 
 function on_game_start()
-	RegisterScriptCallback("actor_on_update",actor_on_update)
 	RegisterScriptCallback("actor_on_item_drop",actor_on_item_drop)
 	RegisterScriptCallback("monster_on_actor_use_callback",monster_on_actor_use_callback)
 	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
@@ -177,35 +172,6 @@ function on_item_drag_dropped(itm1,itm2,from_slot,to_slot)
 	ui_dyn_msg_box.msg_box_ui("message_box_yes_no",true,msg,on_yes,on_no)
 end 
 
-local torch_delay
--- bind_stalker update
-function actor_on_update()
-	if (FlashlightModEnable) then
-		local obj = db.actor:active_detector()
-		local torch = db.actor:object("device_torch")
-		if (obj and FlashlightSections[obj:section()]) then
-			if (has_alife_info("enable_device_torch")) then
-				db.actor:disable_info_portion("enable_device_torch")
-				alife():create("device_torch_dummy",db.actor:position(),0,0,0)
-				SetHudMsg(game.translate_string("st_lamp_disconnected"),5)
-			end
-
-			if (torch and not torch:torch_enabled()) then
-				torch:enable_torch(true)
-				torch:attachable_item_load_attach("dev_torch_fl")
-			end
-		else
-			if (torch and not has_alife_info("enable_device_torch")) then
-				if (torch:torch_enabled()) then
-					torch:enable_torch(false)
-					torch_delay = nil
-					torch:attachable_item_load_attach("device_torch")
-				end
-			end
-		end
-	end
-end
-
 -- bind_stalker on_trade
 function actor_on_trade(obj,sell_bye,money)
 
@@ -310,18 +276,6 @@ function actor_on_item_use(obj)
 		end
 	end
 
-	-- Dummy Torch for Flashlight
-	if (FlashlightModEnable and obj:section() == "device_torch_dummy") then
-		local torch = db.actor:object("device_torch")
-		if not (has_alife_info("enable_device_torch")) then
-			give_info("enable_device_torch")
-			if not (torch) then
-				alife():create("device_torch",db.actor:position(),0,0,0)
-			end
-			SetHudMsg(game.translate_string("st_lamp_equipped"),4)
-		end
-	end
-	
 	-- Deployable mgun
 	if (obj:section() == "itm_deployable_mgun") then
 		local pos = vector():set(device().cam_pos)
