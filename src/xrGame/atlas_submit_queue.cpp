@@ -15,6 +15,7 @@ atlas_submit_queue::atlas_submit_queue(gamespy_profile::stats_submitter* stats_s
 atlas_submit_queue::~atlas_submit_queue() {}
 void atlas_submit_queue::submit_all()
 {
+#ifdef WINDOWS
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
@@ -27,10 +28,12 @@ void atlas_submit_queue::submit_all()
     tmp_task.m_data_type = submit_task::edt_submit_all;
     m_reward_tasks.push_back(tmp_task);
     update();
+#endif
 }
 
 void atlas_submit_queue::submit_reward(gamespy_profile::enum_awards_t const award_id)
 {
+#ifdef WINDOWS
     using namespace gamespy_profile;
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
@@ -55,10 +58,12 @@ void atlas_submit_queue::submit_reward(gamespy_profile::enum_awards_t const awar
     m_reward_tasks.push_back(tmp_task);
 
     update();
+#endif
 }
 
 void atlas_submit_queue::submit_best_results()
 {
+#ifdef WINDOWS
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
@@ -73,10 +78,12 @@ void atlas_submit_queue::submit_best_results()
     m_reward_tasks.push_back(tmp_task);
     m_stats_submitter->quick_set_best_scores(&m_best_results_to_submit, tmp_curr_prof);
     update();
+#endif
 }
 
 void atlas_submit_queue::update()
 {
+#ifdef WINDOWS
     if (m_reward_tasks.empty() || is_active())
         return;
 
@@ -103,6 +110,7 @@ void atlas_submit_queue::update()
         NODEFAULT;
     }
     m_reward_tasks.pop_front();
+#endif
 }
 
 void atlas_submit_queue::do_atlas_reward(
@@ -129,6 +137,7 @@ void atlas_submit_queue::do_atlas_best_results(
 
 void atlas_submit_queue::do_atlas_submit_all(gamespy_gp::profile const* profile)
 {
+#ifdef WINDOWS
     VERIFY(m_stats_submitter);
     VERIFY(!m_atlas_in_process);
 
@@ -137,6 +146,7 @@ void atlas_submit_queue::do_atlas_submit_all(gamespy_gp::profile const* profile)
 
     m_atlas_in_process = true;
     m_stats_submitter->submit_all(&tmp_store->get_awards(), &tmp_store->get_best_scores(), profile, m_atlas_submitted);
+#endif
 }
 
 void __stdcall atlas_submit_queue::atlas_submitted(bool result, char const* err_string)

@@ -7,7 +7,9 @@
 #include "../../xrEngine/Render.h"
 #endif
 
+#ifdef WINDOWS // TODO
 #include "../../xrEngine/tntQAVI.h"
+#endif
 #include "../../xrEngine/xrTheora_Surface.h"
 
 #define		PRIORITY_HIGH	12
@@ -106,6 +108,7 @@ void CTexture::apply_avi(u32 dwStage)
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
 
+#ifdef WINDOWS // TODO
     if (pAVI->NeedUpdate())
     {
         // AVI
@@ -114,6 +117,7 @@ void CTexture::apply_avi(u32 dwStage)
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, m_width, m_height,
             GL_RGBA, GL_UNSIGNED_BYTE, ptr));
     }
+#endif
 };
 
 void CTexture::apply_seq(u32 dwStage)
@@ -212,6 +216,7 @@ void CTexture::Load()
     }
     else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
     {
+#ifdef WINDOWS // TODO
         // AVI
         pAVI = new CAviPlayerCustom();
 
@@ -244,6 +249,7 @@ void CTexture::Load()
                 pSurface = 0;
             }
         }
+#endif
     }
     else if (FS.exist(fn, "$game_textures$", *cName, ".seq"))
     {

@@ -16,7 +16,7 @@
 #undef XMD_H
 
 #include "ximaiter.h"
-         
+#include "ximacfg.h"
 #include <setjmp.h>
 
 struct jpg_error_mgr {

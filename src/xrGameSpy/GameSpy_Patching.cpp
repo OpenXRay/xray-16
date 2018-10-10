@@ -3,6 +3,7 @@
 
 static char const* QueryPatchVersionString(char* dest, u32 dest_size)
 {
+#ifdef WINDOWS
     HKEY KeyCDKey = 0;
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_READ, &KeyCDKey);
@@ -21,6 +22,7 @@ static char const* QueryPatchVersionString(char* dest, u32 dest_size)
     xr_sprintf(dest, dest_size, "-%s", LangID);
 
     RegCloseKey(KeyCDKey);
+#endif
     return dest;
 }
 

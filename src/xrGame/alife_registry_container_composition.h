@@ -75,12 +75,14 @@ add_to_registry_type_list(CSpecificCharacterRegistry)
 
     // game tasks for actor
     add_to_registry_type_list(CGameTaskRegistry)
+#undef map_locations
 #define map_locations define_constant(CGameTaskRegistry)
 #undef registry_type_list
 #define registry_type_list save_registry_type_list(CGameTaskRegistry)
 
     // ActorStatistics
     add_to_registry_type_list(CActorStatisticRegistry)
+#undef map_locations
 #define map_locations define_constant(CActorStatisticRegistry)
 #undef registry_type_list
 #define registry_type_list save_registry_type_list(CActorStatisticRegistry)

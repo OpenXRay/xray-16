@@ -471,7 +471,7 @@ void CRender::Render()
         Target->mark_msaa_edges();
     }
 
-    //	TODO: DX10: Implement DX10 rain.
+#ifdef WINDOWS//	TODO: DX10: Implement DX10 rain.
     if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
     {
         PIX_EVENT(DEFER_RAIN);
@@ -493,6 +493,7 @@ void CRender::Render()
         }
         Target->accum_direct_blend();
     }
+#endif
 
     {
         PIX_EVENT(DEFER_SELF_ILLUM);

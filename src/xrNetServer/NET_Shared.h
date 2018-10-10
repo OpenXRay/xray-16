@@ -67,7 +67,7 @@ public:
     u32 getMPS_Send() const;
     u32 getReceivedPerSec() const;
     u32 getSendedPerSec() const;
-    IC void Clear();
+    void Clear();
     //-----------------------------------------------------------------------
     u32 dwTimesBlocked;
 

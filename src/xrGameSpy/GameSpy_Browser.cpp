@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "GameSpy_Browser.h"
 #include "xrServerEntities/gametype_chooser.h"
 #include "GameSpy_Keys.h"
@@ -327,8 +327,8 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
     for (int i = 0; i < pServerInfo->m_ServerNumPlayers; i++)
     {
         PlayerInfo PInfo;
-        _snprintf_s(
-            PInfo.Name, sizeof(PInfo.Name) - 1, "%s", SBServerGetPlayerStringValueA(pServer, i, "player", "Unknown"));
+        snprintf(
+            PInfo.Name, "%s", SBServerGetPlayerStringValueA(pServer, i, "player", "Unknown"));
         PInfo.Name[sizeof(PInfo.Name) - 1] = 0;
         PInfo.Frags = s16(SBServerGetPlayerIntValueA(pServer, i, "score", 0));
         PInfo.Deaths = u16(SBServerGetPlayerIntValueA(pServer, i, "deaths", 0));

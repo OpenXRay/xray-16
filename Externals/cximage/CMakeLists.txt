@@ -40,6 +40,6 @@ include_directories(
 add_library(cximage STATIC ${SOURCES} ${HEADERS})
 
 set_target_properties(cximage PROPERTIES PREFIX "")
-target_link_libraries(cximage)
+target_link_libraries(cximage jpeg)
 set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 

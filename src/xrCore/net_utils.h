@@ -3,7 +3,6 @@
 #define _INCDEF_NETUTILS_H_
 #include <string.h>
 #include "xrCore/_types.h"
-#include "xrCore/_matrix.h"
 #include "client_id.h"
 #include "xrCommon/xr_string.h"
 
@@ -13,6 +12,7 @@ typedef _vector3<float> Fvector;
 template <class T> struct _vector4;
 typedef _vector4<float> Fvector4;
 class shared_str;
+
 
 #pragma pack(push, 1)
 

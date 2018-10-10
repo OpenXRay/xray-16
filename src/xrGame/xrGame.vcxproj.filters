@@ -6042,9 +6042,6 @@
     <ClInclude Include="ui\UIScriptWnd.h">
       <Filter>UI\UIWindows\ScriptWnd</Filter>
     </ClInclude>
-    <ClInclude Include="ui\uiscriptwnd_script.h">
-      <Filter>UI\UIWindows\ScriptWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UICellCustomItems.h">
       <Filter>UI\UIWindows\DragDrop</Filter>
     </ClInclude>
@@ -6461,6 +6458,7 @@
     <ClInclude Include="ui\UISleepStatic.h">
       <Filter>UI\UIWindows\Static</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UILoadingScreenHardcoded.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9367,9 +9365,6 @@
     <ClCompile Include="ui\UIScriptWnd_script.cpp">
       <Filter>UI\UIWindows\ScriptWnd</Filter>
     </ClCompile>
-    <ClCompile Include="ui\uiscriptwnd_script2.cpp">
-      <Filter>UI\UIWindows\ScriptWnd</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UICellCustomItems.cpp">
       <Filter>UI\UIWindows\DragDrop</Filter>
     </ClCompile>
@@ -9791,9 +9786,6 @@
     </ClCompile>
     <ClCompile Include="WeaponScript.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\WeaponScript</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UILoadingScreenHardcoded.h">
-      <Filter>UI\Common\LoadingScreen</Filter>
     </ClCompile>
     <ClCompile Include="ui\UISleepStatic.cpp">
       <Filter>UI\UIWindows\Static</Filter>

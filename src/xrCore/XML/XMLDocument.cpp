@@ -22,6 +22,9 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
             string256 inc_name;
             if (_GetItem(str, 1, inc_name, '"'))
             {
+#if defined(LINUX)
+                while (char* sep = strchr(inc_name, '\\')) *sep = '/';
+#endif
                 IReader* I = nullptr;
                 if (inc_name == strstr(inc_name, "ui" DELIMITER ))
                 {

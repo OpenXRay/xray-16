@@ -1670,11 +1670,12 @@ public:
             sscanf(arguments, "%d", &bInfo);
             InformOfNoPatch = (bInfo != 0);
         }
-
+#ifdef WINDOWS
         //		GameSpyPatching.CheckForPatch(InformOfNoPatch);
         CGameSpy_Patching::PatchCheckCallback cb;
         cb.bind(MainMenu(), &CMainMenu::OnPatchCheck);
         MainMenu()->GetGS()->GetGameSpyPatching()->CheckForPatch(InformOfNoPatch, cb);
+#endif
     }
 };
 

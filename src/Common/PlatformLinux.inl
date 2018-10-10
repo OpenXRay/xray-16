@@ -105,13 +105,31 @@ inline void _splitpath (
         strcpy(drive, "");
 
     if(dir) {
-        strcpy(dir, dirname(tmp));
+        char tmp_dir[PATH_MAX] = {0};
+        strcpy(tmp_dir, tmp); // W/A for fname broking
+        strcpy(dir, dirname(tmp_dir)); // This eval modify dirname argument!!!
         if (dir[0] && dir[strlen(dir) - 1] != '/')
             strcat(dir, "/");
     }
 
     if(fname)
+    {
         strcpy(fname, basename(tmp));
+        char *pos = strrchr(fname, '.');
+        if(pos != NULL)
+            *pos = 0;
+    }
+
+    if(ext)
+    {
+        char tmp_ext[NAME_MAX] = { 0 };
+        strcpy(tmp_ext, basename(tmp));
+        char *pos = strrchr(fname, '.');
+        if(pos != NULL)
+            strcpy(ext, pos + 1);
+        else
+            strcpy(ext, "");
+    }
 }
 
 #include <iostream>
