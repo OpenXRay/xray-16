@@ -31,7 +31,7 @@
 			
 	    	<texture id="ui_inGame2_PDA_icon_location_legend" x="4" y="587" width="41" height="41" />
 
-
+			<texture id="ui_inGame2_PDA_icon_location_warning" x="981" y="979" width="27" height="27" />
 	</file>
 
     <file name="ui\ui_actor_sleep_screen">
