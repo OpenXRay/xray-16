@@ -1,6 +1,10 @@
 -- ********************************************************
 --			OLD ARENA
 -- ********************************************************
+function arena_has_already_paid(actor,npc)
+	return has_alife_info("bar_arena_1000_r") or has_alife_info("bar_arena_2000_r") or has_alife_info("bar_arena_3000_r") or has_alife_info("bar_arena_4000_r") or has_alife_info("bar_arena_5000_r")
+end
+
 function arena_empty(actor,npc)
 	return arena_has_no_monsters(npc, actor) and arena_hasnt_reward (actor,npc)
 end

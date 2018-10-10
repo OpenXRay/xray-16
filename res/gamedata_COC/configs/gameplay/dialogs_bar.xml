@@ -261,11 +261,7 @@
                 <dont_has_info>bar_arena_start</dont_has_info>
                 <dont_has_info>bar_arena_actor_victory</dont_has_info>
                 <dont_has_info>bar_arena_actor_lose</dont_has_info>
-				<has_info>bar_arena_1000_r</has_info>
-				<has_info>bar_arena_2000_r</has_info>
-				<has_info>bar_arena_3000_r</has_info>
-				<has_info>bar_arena_4000_r</has_info>
-				<has_info>bar_arena_5000_r</has_info>
+				<precondition>dialogs_bar.arena_has_already_paid</precondition>
 				<next>111112</next>
 			</phrase>
 			<phrase id="111112">
