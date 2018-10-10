@@ -1,0 +1,52 @@
+--'******************************************************
+--'*  Биндер объекта артефакт .
+--'******************************************************
+function bind(obj)
+	obj:bind_object(outfit_binder(obj))
+end
+
+class "outfit_binder" (object_binder)
+function outfit_binder:__init(obj) super(obj)
+	--db.storage[self.object:id()] = {}
+end
+function outfit_binder:net_spawn(se_abstract)
+	if not object_binder.net_spawn(self, se_abstract) then
+		return false
+	end
+	--db.add_obj(self.object)
+	
+	-- camo
+	self.visibility_factor = system_ini():r_float_ex(self.object:section(),"visibility_factor",0)
+	
+	return true
+end
+function outfit_binder:update(delta)
+	object_binder.update(self, delta)
+end
+function outfit_binder:net_destroy(se_abstract)
+	--db.del_obj(self.object)
+	object_binder.net_destroy(self)
+end
+
+function outfit_binder:load(stpk)
+	object_binder.load(self,stpk)
+end
+
+function outfit_binder:save(stpk)
+	object_binder.save(self,stpk)
+end
+
+function outfit_binder:install_upgrade_impl(section,test)
+	--printf("%s install_upgrade_impl(%s,%s)",self.object:name(),section,test)
+	local result = object_binder.install_upgrade_impl(section,test)
+	
+	local val = system_ini():r_float_ex(section,"visibility_factor")
+	if (val) then
+		if not (test) then
+			self.visibility_factor = self.visibility_factor + val
+		end
+		result = true
+	end
+	
+	return result
+end

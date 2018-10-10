@@ -10,15 +10,27 @@ function get_visible_value(npc,who,time_delta,time_quant,luminocity,velocity_fac
 	if (level_weathers.bLevelUnderground) then
 		luminocity = luminocity + 0.15
 	end
-	if (who and who:id() == 0) then 
+	
+	local is_actor = who and who:id() == 0
+	if (is_actor) then 
 		local torch = db.actor:object("device_torch")
 		if (torch and torch:torch_enabled()) then 
 			luminocity = luminocity + 0.15
 		end
 	end
 	
-	-- unaltered formula
-	-- time_delta / time_quant * luminocity * (1 + velocity_factor*velocity) * (distance - object_distance) / (distance - always_visible_distance)
+	local visibility = time_delta / time_quant * luminocity * (1 + velocity_factor*velocity) * (distance - object_distance) / distance
 	
-	return  time_delta / time_quant * luminocity * (1 + velocity_factor*velocity) * (distance - object_distance) / distance
+	-- Camoflage
+	if (is_actor) then 
+		local outfit = who:item_in_slot(7)
+		if (outfit) then
+			local binder = outfit:binded_object()
+			if (binder and binder.visibility_factor) then
+				visibility = visibility * visibility_factor
+			end
+		end
+	end
+	
+	return visibility
 end
