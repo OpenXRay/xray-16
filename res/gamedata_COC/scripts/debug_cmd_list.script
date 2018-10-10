@@ -2264,7 +2264,7 @@ function cmd.debug_visuals(me,txt,owner,p)
 					if (se_obj) then
 						alife():create("wpn_pkm",se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,se_obj.id)
 						--printf("%s visual:= %s",se_obj:name(),visual_name)
-						--debug_visuals[se_obj.id] = visual_name
+						debug_visuals[se_obj.id] = visual_name
 					end
 					dist = dist + 1
 				end
