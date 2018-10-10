@@ -50,12 +50,12 @@ public:
     xr_vector<FSlideWindowItem> SWIs;
     xr_vector<ref_shader> Shaders;
     typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
-    xr_vector<VertexDeclarator> DCL;
-    xr_vector<IDirect3DVertexBuffer9*> VB;
-    xr_vector<IDirect3DIndexBuffer9*> IB;
+    xr_vector<VertexDeclarator> nDC, xDC;
+    xr_vector<ID3DVertexBuffer*> nVB, xVB;
+    xr_vector<ID3DIndexBuffer*> nIB, xIB;
     xr_vector<dxRender_Visual*> Visuals;
     CPSLibrary PSLibrary;
-    CLight_DB* L_DB;
+    CLight_DB Lights;
     CLightR_Manager* L_Dynamic;
     CLightShadows* L_Shadows;
     CLightProjector* L_Projector;
@@ -78,7 +78,7 @@ public:
 
 private:
     // Loading / Unloading
-    void LoadBuffers(CStreamReader* fs);
+    void LoadBuffers(CStreamReader* fs, bool alternative = false);
     void LoadVisuals(IReader* fs);
     void LoadLights(IReader* fs);
     void LoadSectors(IReader* fs);
@@ -91,9 +91,9 @@ private:
 public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
-    D3DVERTEXELEMENT9* getVB_Format(int id);
-    IDirect3DVertexBuffer9* getVB(int id);
-    IDirect3DIndexBuffer9* getIB(int id);
+    D3DVERTEXELEMENT9* getVB_Format(int id, bool alternative = false);
+    ID3DVertexBuffer* getVB(int id, bool alternative = false);
+    ID3DIndexBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();

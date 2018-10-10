@@ -89,11 +89,24 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
 
             switch (desc.Format)
             {
-            case DXGI_FORMAT_R24G8_TYPELESS: ViewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS; break;
-            case DXGI_FORMAT_R32_TYPELESS: ViewDesc.Format = DXGI_FORMAT_R32_FLOAT; break;
+            case DXGI_FORMAT_R32G8X24_TYPELESS:
+                ViewDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+                break;
+
+            case DXGI_FORMAT_R24G8_TYPELESS:
+                ViewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+                break;
+
+            case DXGI_FORMAT_R32_TYPELESS:
+                ViewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+                break;
+
+            case DXGI_FORMAT_R16_TYPELESS:
+                ViewDesc.Format = DXGI_FORMAT_R16_FLOAT;
+                break;
             }
 
-            // this would be supported by DX10.1 but is not needed for stalker
+            // this would be supported by DX10.1 but is not needed for stalker // XXX: why?
             // if( ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS )
             if ((desc.SampleDesc.Count <= 1) || (ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS))
                 CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &m_pSRView));
