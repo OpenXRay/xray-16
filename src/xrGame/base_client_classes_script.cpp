@@ -13,7 +13,8 @@
 #include "Include/xrRender/Kinematics.h"
 #include "ai/stalker/ai_stalker.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-
+//#include "ai/patrol_path.h"
+//#include "ai/patrol_point.h"
 using namespace luabind;
 
 // clang-format off
@@ -97,3 +98,47 @@ SCRIPT_EXPORT(CBlend, (), {
     ];
 });
 // clang-format on
+
+#pragma todo("Тут нужно когда-нибудь сделать рефакторинг @Debrovski")
+
+LPCSTR CPatrolPoint::getName(CPatrolPoint *pp) const {
+	return pp->m_name.c_str();
+}
+
+void CPatrolPoint::setName(CPatrolPoint *pp, LPCSTR str) {
+	pp->m_name = shared_str(str);
+}
+
+SCRIPT_EXPORT(CPatrolPoint, (), {
+    module(luaState)[
+		class_<CPatrolPoint>("CPatrolPoint")
+			.def(constructor<>())
+			.def_readwrite("m_position", &CPatrolPoint::m_position)
+			.def_readwrite("m_flags", &CPatrolPoint::m_flags)
+			.def_readwrite("m_level_vertex_id", &CPatrolPoint::m_level_vertex_id)
+			.def_readwrite("m_game_vertex_id", &CPatrolPoint::m_game_vertex_id)
+			.property("m_name", &CPatrolPoint::getName, &CPatrolPoint::setName)
+			.def("position", (CPatrolPoint& (CPatrolPoint::*) (Fvector)) (&CPatrolPoint::position))
+	];
+});
+
+
+SCRIPT_EXPORT(CPatrolPath, (), {
+	module(luaState)[
+		class_<CPatrolPath>("CPatrolPath")
+			.def(constructor<>())
+			.def("add_point", &CPatrolPath::add_point)
+			.def("point", (CPatrolPoint(CPatrolPath::*) (u32)) (&CPatrolPath::point))
+			.def("add_vertex", &CPatrolPath::add_vertex)
+	];
+});
+
+//class CPatrolPointScript
+//{
+//public:
+//    static LPCSTR getName(CPatrolPoint*);
+//    static void setName(CPatrolPoint*, LPCSTR);
+//    DECLARE_SCRIPT_REGISTER_FUNCTION
+//};
+
+

@@ -61,6 +61,8 @@ public:
     IC const CCoverManager& cover_manager() const;
     IC moving_objects& moving_objects() const;
     IC doors::manager& doors() const;
+	IC		CPatrolPathStorage			&patrol_paths_raw();
+
 };
 
 IC CAI_Space& ai();

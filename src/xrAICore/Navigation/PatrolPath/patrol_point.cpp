@@ -146,3 +146,21 @@ const GameGraph::_GRAPH_ID& CPatrolPoint::game_vertex_id() const
         return game_vertex_id(&levelGraph, &gameGraph.cross_table(), &gameGraph);
     return m_game_vertex_id;
 }
+
+CPatrolPoint& CPatrolPoint::position(Fvector position)
+{
+    m_position = position;
+
+    auto level_graph = &GEnv.AISpace->level_graph();
+    if (level_graph && level_graph->valid_vertex_position(m_position))
+    {
+        Fvector pos = m_position;
+        pos.y += .15f;
+        m_level_vertex_id = level_graph->vertex_id(pos);
+    }
+    else
+        m_level_vertex_id = u32(-1);
+    correct_position(level_graph, &GEnv.AISpace->cross_table(), &GEnv.AISpace->game_graph());
+
+    return *this;
+}

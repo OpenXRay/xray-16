@@ -109,3 +109,11 @@ void CPatrolPathStorage::save(IWriter& stream)
 
     stream.close_chunk();
 }
+
+void CPatrolPathStorage::remove_path(shared_str patrol_name) { m_registry.erase(patrol_name); }
+
+void CPatrolPathStorage::add_path(shared_str patrol_name, CPatrolPath* path)
+{
+    remove_path(patrol_name);
+    m_registry.insert(std::make_pair(patrol_name, path));
+}

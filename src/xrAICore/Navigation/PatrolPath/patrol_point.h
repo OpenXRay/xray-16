@@ -18,10 +18,12 @@ class CGameGraph;
 
 class XRAICORE_API CPatrolPoint : public ISerializable
 {
-protected:
+   
+
+public:
     shared_str m_name;
     Fvector m_position;
-    u32 m_flags;
+    u32 m_flags=0x0;
     u32 m_level_vertex_id;
     GameGraph::_GRAPH_ID m_game_vertex_id;
 
@@ -59,7 +61,9 @@ public:
     const u32& level_vertex_id() const;
     // for xrGame
     const GameGraph::_GRAPH_ID& game_vertex_id() const;
-
+    CPatrolPoint& position(Fvector position);
+    LPCSTR getName(CPatrolPoint* pp) const;
+    void setName(CPatrolPoint* pp, LPCSTR str);
 #ifdef DEBUG
 public:
     IC void path(const CPatrolPath* path);

@@ -48,3 +48,9 @@ IC CAI_Space& ai()
     }
     return (*g_ai_space);
 }
+
+IC CPatrolPathStorage &CAI_Space::patrol_paths_raw()
+{
+	VERIFY(m_patrol_path_storage);
+	return *m_patrol_path_storage;
+}

@@ -729,7 +729,14 @@ void qweasddMess1(NET_Packet& val1, bool val2 = false, bool val3 = true)
     LPCSTR str2 = val3 ? "Yes3" : "No3";
     Msg("qweasddMess1 -> packetstr = %s, val2 = %s, val3 = %s", packetstr, str1, str2);
 }
+void patrol_path_add(LPCSTR patrol_path, CPatrolPath* path) {
+	ai().patrol_paths_raw().add_path(shared_str(patrol_path), path);
+}
 
+
+void patrol_path_remove(LPCSTR patrol_path) {
+	ai().patrol_paths_raw().remove_path(shared_str(patrol_path));
+}
 // XXX nitrocaster: one can export enum like class, without defining dummy type
 template<typename T>
 struct EnumCallbackType {};
@@ -744,6 +751,8 @@ IC static void CLevel_Export(lua_State* luaState)
 
     module(luaState, "level")
     [
+		def("patrol_path_add", &patrol_path_add),
+		def("patrol_path_remove", &patrol_path_remove),
         //Alundaio: Extend level namespace exports
 #ifdef NAMESPACE_LEVEL_EXPORTS
         def("send", &g_send),
