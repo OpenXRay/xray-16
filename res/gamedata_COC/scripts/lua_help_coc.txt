@@ -1,6 +1,7 @@
 global
 	function alife()
 	function app_ready()
+	function bind_to_dik(enum EGameActions, number)
 	function bit_and(number, number)
 	function bit_not(number)
 	function bit_or(number, number)
@@ -39,6 +40,7 @@ global
 	function IsDynamicMusic()
 	function IsGameTypeSingle()
 	function IsImportantSave()
+	function key_state(number)
 	function log(string)
 	function prefetch(string)
 	function print_stack()
@@ -62,10 +64,12 @@ namespace actor_stats
 
 namespace ActorMenu
 	function get_actor_menu()
+	function get_maingame()
 	function get_menu_mode()
 	function get_pda_menu()
 
 namespace game
+	function active_tutorial_name()
 	function get_game_time()
 	function has_active_tutorial()
 	function log_stack_trace(string)
@@ -111,6 +115,7 @@ namespace level
 	function hide_indicators()
 	function hide_indicators_safe()
 	function high_cover_in_direction(number, const vector&)
+	function hold_action(enum EGameActions)
 	function is_wfx_playing()
 	function iterate_sounds(string, number, function<void>)
 	function iterate_sounds(string, number, object, function<void>)
@@ -127,8 +132,10 @@ namespace level
 	function physics_world()
 	function prefetch_sound(string)
 	function present()
+	function press_action(enum EGameActions)
 	function rain_factor()
 	function ray_pick(const vector&, const vector&, number, enum collide::rq_target, rq_result&, game_object*)
+	function release_action(enum EGameActions)
 	function remove_call(const function<boolean>&, const function<void>&)
 	function remove_call(object, const function<boolean>&, const function<void>&)
 	function remove_call(object, string, string)
@@ -266,6 +273,7 @@ class alife_simulator
 	function create_ammo(alife_simulator*, string, const vector&, number, number, number, number)
 	function disable_info(const alife_simulator*, const number&, string)
 	function dont_has_info(const alife_simulator*, const number&, string)
+	function get_children(const alife_simulator*, cse_abstract*)
 	function give_info(const alife_simulator*, const number&, string)
 	function has_info(const alife_simulator*, const number&, string)
 	function iterate_info(const alife_simulator*, const number&, const function<boolean>&)
@@ -335,14 +343,50 @@ class best_scores_pair_t
 class CActor (CGameObject)
 	CActor()
 
+	property CurrentHeight
+	property m_fClimbFactor
+	property m_fCrouchFactor
+	property m_fJumpSpeed
+	property m_fRun_StrafeFactor
+	property m_fRunBackFactor
+	property m_fRunFactor
+	property m_fSprintFactor
+	property m_fWalk_StrafeFactor
+	property m_fWalkAccel
+	property m_fWalkBackFactor
+
 	function _construct()
+	function attach_Vehicle(holder*)
+	function CameraHeight()
+	function CanRun()
+	function CanSprint()
 	function conditions() const
+	function detach_Vehicle()
+	function get_additional_weight() const
+	function get_state() const
+	function get_state_wishful() const
+	function GetDefaultActionForObject()
 	function getEnabled() const
+	function GetFireDispersion() const
+	function GetNightVisionStatus()
+	function GetProtection_ArtefactsOnBelt(enum ALife::EHitType)
 	function getVisible() const
+	function GetWeaponAccuracy() const
+	function is_jump()
+	function IsZoomAimingMode() const
+	function MaxCarryWeight() const
+	function MaxWalkWeight() const
+	function MoveActor(vector, vector)
 	function net_Export(net_packet&)
 	function net_Import(net_packet&)
 	function net_Spawn(cse_abstract*)
+	function ObjectWeLookingAt()
+	function RepackAmmo()
+	function set_state(number)
+	function set_state_wishful(number)
+	function SetNightVisionAllowed(boolean)
 	function use(CGameObject*)
+	function use_HolderEx(holder*, boolean)
 	function Visual() const
 
 class CActorCondition (CEntityCondition)
@@ -383,6 +427,7 @@ class CActorCondition (CEntityCondition)
 	property m_fWalkWeightPower
 	property m_MaxWalkWeight
 
+	function ApplyBooster(CActorCondition*, const SBooster&, string)
 	function BleedingSpeed()
 	function BoostBleedingRestore(number)
 	function BoostBurnImmunity(number)
@@ -417,6 +462,7 @@ class CActorCondition (CEntityCondition)
 	function GetPsyHealth() const
 	function GetRadiation() const
 	function GetSatiety() const
+	function GetSatiety()
 	function GetWhoHitLastTimeID()
 	function IsCantSprint() const
 	function IsCantWalk() const
@@ -835,6 +881,24 @@ class CCar (CGameObject, holder)
 	function use(CGameObject*)
 	function Visual() const
 
+class CCartridge
+	const cfCanBeUnlimited = 4
+	const cfExplosive = 8
+	const cfMagneticBeam = 16
+	const cfRicochet = 2
+	const cfTracer = 1
+
+	CCartridge()
+
+	property bullet_material_idx
+	property m_4to1_tracer
+	property m_flags
+	property m_LocalAmmoType
+	property param_s
+
+	function GetInventoryName()
+	function Weight() const
+
 class CCat (CGameObject)
 	CCat()
 
@@ -979,12 +1043,33 @@ class CEatableItem (CInventoryItem)
 	property m_fWeightEmpty
 	property m_fWeightFull
 
+	function ActivateItem()
 	function CanDelete() const
+	function CanStack() const
+	function CanTake() const
 	function Cost() const
+	function DeactivateItem()
 	function Empty() const
+	function GetCondition() const
+	function GetDropManual() const
+	function GetIconName() const
 	function GetMaxUses()
 	function GetRemainingUses() const
+	function HandDependence() const
+	function has_any_upgrades()
+	function install_upgrade(string)
+	function IsQuestItem() const
+	function IsUsingCondition() const
+	function ItemDescription()
+	function NameItem()
+	function NameShort()
+	function pre_install_upgrade()
+	function SetCondition(number)
+	function SetDropManual(number)
 	function SetRemainingUses(number)
+	function SetWeight(number)
+	function Useful() const
+	function verify_upgrade(string)
 	function Weight() const
 
 class cef_storage
@@ -1373,6 +1458,20 @@ class CHudItem
 	function animation_slot()
 	function HudAnimationExist(string)
 
+class CInventory
+	function Activate(number, boolean)
+	function BeltWidth() const
+	function CalcTotalWeight()
+	function GetActiveSlot() const
+	function GetMaxWeight() const
+	function InBelt(const CInventoryItem*) const
+	function InRuck(const CInventoryItem*) const
+	function InSlot(const CInventoryItem*) const
+	function ItemFromSlot(number) const
+	function SetActiveSlot(number)
+	function SetMaxWeight(number)
+	function TotalWeight() const
+
 class CInventoryBox (CGameObject)
 	CInventoryBox()
 
@@ -1389,7 +1488,32 @@ class CInventoryBox (CGameObject)
 	function Visual() const
 
 class CInventoryItem
+	function ActivateItem()
+	function CanStack() const
+	function CanTake() const
+	function Cost() const
+	function DeactivateItem()
+	function GetCondition() const
+	function GetDropManual() const
+	function GetIconName() const
+	function HandDependence() const
+	function has_any_upgrades()
+	function install_upgrade(string)
+	function IsQuestItem() const
+	function IsUsingCondition() const
+	function ItemDescription()
+	function NameItem()
+	function NameShort()
+	function pre_install_upgrade()
+	function SetCondition(number)
+	function SetDropManual(number)
+	function SetWeight(number)
+	function Useful() const
+	function verify_upgrade(string)
+	function Weight() const
+
 class CInventoryOwner
+	function buy_supplies(class CInifile&, string)
 	function deadbody_can_take(boolean)
 	function deadbody_can_take_status() const
 	function deadbody_closed(boolean)
@@ -1403,13 +1527,16 @@ class CInventoryOwner
 	function get_money() const
 	function GetTalkPartner()
 	function IconName() const
+	function inventory()
 	function IsInvUpgradeEnabled()
 	function IsTalkEnabled()
 	function IsTalking()
 	function IsTradeEnabled()
 	function OfferTalk(CInventoryOwner*)
+	function sell_useless_items()
 	function StartTalk(CInventoryOwner*, boolean)
 	function StopTalk()
+	function trade_section() const
 
 class CLevelChanger (CGameObject)
 	CLevelChanger()
@@ -2056,6 +2183,7 @@ class CScriptXmlInit
 	function InitTextWnd(string, CUIWindow*)
 	function InitTrackBar(string, CUIWindow*)
 	function InitWindow(string, number, CUIWindow*)
+	function NodeExists(string, number)
 	function ParseFile(string)
 
 class cse_abstract (cpure_server_object)
@@ -3263,7 +3391,6 @@ class cse_alife_item_weapon (cse_alife_item)
 
 	cse_alife_item_weapon(string)
 
-	property ammo_type
 	property angle
 	property condition
 	property grenade_launcher_status
@@ -3289,7 +3416,10 @@ class cse_alife_item_weapon (cse_alife_item)
 	function clsid() const
 	function get_addon_flags()
 	function get_ammo_elapsed()
+	function get_ammo_elapsed2()
 	function get_ammo_magsize()
+	function get_ammo_type()
+	function get_ammo_type2()
 	function has_upgrade(cse_alife_inventory_item*, string)
 	function init()
 	function interactive() const
@@ -3303,6 +3433,9 @@ class cse_alife_item_weapon (cse_alife_item)
 	function on_unregister()
 	function section_name(const cse_abstract*)
 	function set_ammo_elapsed(number)
+	function set_ammo_elapsed2(number)
+	function set_ammo_type(number)
+	function set_ammo_type2(number)
 	function spawn_ini(cse_abstract*)
 	function STATE_Read(net_packet&, number)
 	function STATE_Write(net_packet&)
@@ -3325,7 +3458,6 @@ class cse_alife_item_weapon_auto_shotgun (cse_alife_item_weapon)
 
 	cse_alife_item_weapon_auto_shotgun(string)
 
-	property ammo_type
 	property angle
 	property condition
 	property grenade_launcher_status
@@ -3351,7 +3483,10 @@ class cse_alife_item_weapon_auto_shotgun (cse_alife_item_weapon)
 	function clsid() const
 	function get_addon_flags()
 	function get_ammo_elapsed()
+	function get_ammo_elapsed2()
 	function get_ammo_magsize()
+	function get_ammo_type()
+	function get_ammo_type2()
 	function has_upgrade(cse_alife_inventory_item*, string)
 	function init()
 	function interactive() const
@@ -3365,6 +3500,9 @@ class cse_alife_item_weapon_auto_shotgun (cse_alife_item_weapon)
 	function on_unregister()
 	function section_name(const cse_abstract*)
 	function set_ammo_elapsed(number)
+	function set_ammo_elapsed2(number)
+	function set_ammo_type(number)
+	function set_ammo_type2(number)
 	function spawn_ini(cse_abstract*)
 	function STATE_Read(net_packet&, number)
 	function STATE_Write(net_packet&)
@@ -3387,7 +3525,6 @@ class cse_alife_item_weapon_magazined (cse_alife_item_weapon)
 
 	cse_alife_item_weapon_magazined(string)
 
-	property ammo_type
 	property angle
 	property condition
 	property grenade_launcher_status
@@ -3413,7 +3550,10 @@ class cse_alife_item_weapon_magazined (cse_alife_item_weapon)
 	function clsid() const
 	function get_addon_flags()
 	function get_ammo_elapsed()
+	function get_ammo_elapsed2()
 	function get_ammo_magsize()
+	function get_ammo_type()
+	function get_ammo_type2()
 	function has_upgrade(cse_alife_inventory_item*, string)
 	function init()
 	function interactive() const
@@ -3427,6 +3567,9 @@ class cse_alife_item_weapon_magazined (cse_alife_item_weapon)
 	function on_unregister()
 	function section_name(const cse_abstract*)
 	function set_ammo_elapsed(number)
+	function set_ammo_elapsed2(number)
+	function set_ammo_type(number)
+	function set_ammo_type2(number)
 	function spawn_ini(cse_abstract*)
 	function STATE_Read(net_packet&, number)
 	function STATE_Write(net_packet&)
@@ -3449,7 +3592,6 @@ class cse_alife_item_weapon_magazined_w_gl (cse_alife_item_weapon_magazined)
 
 	cse_alife_item_weapon_magazined_w_gl(string)
 
-	property ammo_type
 	property angle
 	property condition
 	property grenade_launcher_status
@@ -3475,7 +3617,10 @@ class cse_alife_item_weapon_magazined_w_gl (cse_alife_item_weapon_magazined)
 	function clsid() const
 	function get_addon_flags()
 	function get_ammo_elapsed()
+	function get_ammo_elapsed2()
 	function get_ammo_magsize()
+	function get_ammo_type()
+	function get_ammo_type2()
 	function has_upgrade(cse_alife_inventory_item*, string)
 	function init()
 	function interactive() const
@@ -3489,6 +3634,9 @@ class cse_alife_item_weapon_magazined_w_gl (cse_alife_item_weapon_magazined)
 	function on_unregister()
 	function section_name(const cse_abstract*)
 	function set_ammo_elapsed(number)
+	function set_ammo_elapsed2(number)
+	function set_ammo_type(number)
+	function set_ammo_type2(number)
 	function spawn_ini(cse_abstract*)
 	function STATE_Read(net_packet&, number)
 	function STATE_Write(net_packet&)
@@ -3511,7 +3659,6 @@ class cse_alife_item_weapon_shotgun (cse_alife_item_weapon)
 
 	cse_alife_item_weapon_shotgun(string)
 
-	property ammo_type
 	property angle
 	property condition
 	property grenade_launcher_status
@@ -3537,7 +3684,10 @@ class cse_alife_item_weapon_shotgun (cse_alife_item_weapon)
 	function clsid() const
 	function get_addon_flags()
 	function get_ammo_elapsed()
+	function get_ammo_elapsed2()
 	function get_ammo_magsize()
+	function get_ammo_type()
+	function get_ammo_type2()
 	function has_upgrade(cse_alife_inventory_item*, string)
 	function init()
 	function interactive() const
@@ -3551,6 +3701,9 @@ class cse_alife_item_weapon_shotgun (cse_alife_item_weapon)
 	function on_unregister()
 	function section_name(const cse_abstract*)
 	function set_ammo_elapsed(number)
+	function set_ammo_elapsed2(number)
+	function set_ammo_type(number)
+	function set_ammo_type2(number)
 	function spawn_ini(cse_abstract*)
 	function STATE_Read(net_packet&, number)
 	function STATE_Write(net_packet&)
@@ -5329,6 +5482,45 @@ class CUIGameCustom
 	function update_fake_indicators(number, number)
 	function UpdateActorMenu()
 
+class CUIHudStatesWnd (CUIWindow)
+	CUIHudStatesWnd()
+
+	property m_back
+	property m_fire_mode
+	property m_radia_damage
+	property m_ui_grenade
+	property m_ui_health_bar
+	property m_ui_stamina_bar
+	property m_ui_weapon_ammo_color_active
+	property m_ui_weapon_ammo_color_inactive
+	property m_ui_weapon_ap_ammo
+	property m_ui_weapon_cur_ammo
+	property m_ui_weapon_fmj_ammo
+	property m_ui_weapon_icon
+	property m_ui_weapon_third_ammo
+
+	function AttachChild(CUIWindow*)
+	function DetachChild(CUIWindow*)
+	function Enable(boolean)
+	function FocusReceiveTime() const
+	function GetAbsoluteRect(Frect&)
+	function GetHeight() const
+	function GetWidth() const
+	function GetWndPos(CUIWindow*)
+	function IsAutoDelete()
+	function IsCursorOverWindow() const
+	function IsEnabled()
+	function IsShown()
+	function ResetPPMode()
+	function SetAutoDelete(boolean)
+	function SetPPMode()
+	function SetWindowName(string)
+	function SetWndPos(vector2)
+	function SetWndRect(Frect)
+	function SetWndSize(vector2)
+	function Show(boolean)
+	function WindowName()
+
 class CUILines
 	function GetText()
 	function SetElipsis(boolean)
@@ -5442,6 +5634,52 @@ class CUIListBoxItemMsgChain (CUIListBoxItem)
 	function SetPPMode()
 	function SetTextColor(number)
 	function SetWidth(number)
+	function SetWindowName(string)
+	function SetWndPos(vector2)
+	function SetWndRect(Frect)
+	function SetWndSize(vector2)
+	function Show(boolean)
+	function WindowName()
+
+class CUIMainIngameWnd (CUIWindow)
+	CUIMainIngameWnd()
+
+	property m_ind_bleeding
+	property m_ind_boost_chem
+	property m_ind_boost_health
+	property m_ind_boost_power
+	property m_ind_boost_psy
+	property m_ind_boost_rad
+	property m_ind_boost_radia
+	property m_ind_boost_weight
+	property m_ind_boost_wound
+	property m_ind_helmet_broken
+	property m_ind_outfit_broken
+	property m_ind_overweight
+	property m_ind_radiation
+	property m_ind_starvation
+	property m_ind_weapon_broken
+	property m_ui_hud_states
+	property UIMotionIcon
+	property UIStaticDiskIO
+	property UIStaticQuickHelp
+	property UIZoneMap
+
+	function AttachChild(CUIWindow*)
+	function DetachChild(CUIWindow*)
+	function Enable(boolean)
+	function FocusReceiveTime() const
+	function GetAbsoluteRect(Frect&)
+	function GetHeight() const
+	function GetWidth() const
+	function GetWndPos(CUIWindow*)
+	function IsAutoDelete()
+	function IsCursorOverWindow() const
+	function IsEnabled()
+	function IsShown()
+	function ResetPPMode()
+	function SetAutoDelete(boolean)
+	function SetPPMode()
 	function SetWindowName(string)
 	function SetWndPos(vector2)
 	function SetWndRect(Frect)
@@ -5614,6 +5852,31 @@ class CUIMMShniaga (CUIWindow)
 	function SetWndSize(vector2)
 	function Show(boolean)
 	function ShowPage(enum CUIMMShniaga::enum_page_id)
+	function WindowName()
+
+class CUIMotionIcon (CUIWindow)
+	CUIMotionIcon()
+
+	function AttachChild(CUIWindow*)
+	function DetachChild(CUIWindow*)
+	function Enable(boolean)
+	function FocusReceiveTime() const
+	function GetAbsoluteRect(Frect&)
+	function GetHeight() const
+	function GetWidth() const
+	function GetWndPos(CUIWindow*)
+	function IsAutoDelete()
+	function IsCursorOverWindow() const
+	function IsEnabled()
+	function IsShown()
+	function ResetPPMode()
+	function SetAutoDelete(boolean)
+	function SetPPMode()
+	function SetWindowName(string)
+	function SetWndPos(vector2)
+	function SetWndRect(Frect)
+	function SetWndSize(vector2)
+	function Show(boolean)
 	function WindowName()
 
 class CUIPdaWnd (CUIDialogWnd)
@@ -6098,18 +6361,36 @@ class CUIWindow
 	function Show(boolean)
 	function WindowName()
 
+class CUIZoneMap
+	CUIZoneMap()
+
+	property disabled
+	property visible
+
+	function Background()
+	function MapFrame()
+
 class CWeapon (CGameObject)
 	CWeapon()
 
 	function _construct()
 	function can_kill() const
+	function Cost() const
+	function GetAddonsState() const
 	function getEnabled() const
+	function GetMagazine()
 	function getVisible() const
+	function GetZoomFactor() const
+	function IsZoomed() const
 	function net_Export(net_packet&)
 	function net_Import(net_packet&)
 	function net_Spawn(cse_abstract*)
+	function ready_to_kill() const
+	function SetAddonsState(number)
+	function SetZoomFactor(number)
 	function use(CGameObject*)
 	function Visual() const
+	function Weight() const
 
 class CWeaponAK74 (CGameObject)
 	CWeaponAK74()
@@ -6133,6 +6414,7 @@ class CWeaponAmmo (CGameObject)
 
 	function _construct()
 	function Cost() const
+	function Get(CCartridge&)
 	function getEnabled() const
 	function getVisible() const
 	function net_Export(net_packet&)
@@ -6611,6 +6893,11 @@ class DIK_keys
 	const MOUSE_1 = 337
 	const MOUSE_2 = 338
 	const MOUSE_3 = 339
+	const MOUSE_4 = 340
+	const MOUSE_5 = 341
+	const MOUSE_6 = 342
+	const MOUSE_7 = 343
+	const MOUSE_8 = 344
 
 class DLL_Pure
 	DLL_Pure()
@@ -7225,6 +7512,7 @@ class game_object
 	function movement_target_reached()
 	function movement_type() const
 	function name() const
+	function night_vision_allowed(boolean)
 	function night_vision_enabled() const
 	function not_yet_visible_objects() const
 	function object(number)
@@ -7398,7 +7686,7 @@ class game_object
 	function set_trader_sound(string, string)
 	function set_vis_state(number)
 	function set_visual_memory_enabled(boolean)
-	function set_visual_name(string)
+	function set_visual_name(string, boolean)
 	function set_weapon_type(number)
 	function set_weight(number)
 	function show_condition(ini_file*, string)
@@ -8288,6 +8576,23 @@ class rtoken_list
 	function count()
 	function get(number)
 	function remove(number)
+
+class SBooster
+	SBooster()
+
+	property fBoostTime
+	property fBoostValue
+	property m_type
+
+class SCartridgeParam
+	SCartridgeParam()
+
+	property buckShot
+	property impair
+	property k_cam_dispersion
+	property u8ColorID
+
+	function Init()
 
 class smart_cover_object (CGameObject)
 	smart_cover_object()
