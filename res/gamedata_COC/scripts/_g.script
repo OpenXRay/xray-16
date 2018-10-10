@@ -95,6 +95,38 @@ function SetHudMsg(msg,n)
 	bind_stalker_ext.ShowMessageTime = time_global() + n*1000
 end
 
+-- Should only be used as a single instance
+function SetHudTimer(alias,msg,typ,target)
+	local hud = get_hud()
+	local m_data = alife_storage_manager.get_state()
+	m_data.global_hud_timer = { 
+		[1] = typ == "inc" and 0 or 1, 
+		[2] = typ == "inc" and 0 or target,
+		[3] = typ == "inc" and target or 0, 
+		[4] = time_global(),
+		[5] = alias,
+		[6] = msg
+	}
+
+	hud:AddCustomStatic("hud_timer", true)
+	hud:AddCustomStatic("hud_timer_text", true)	
+	
+	local timer_text = hud:GetCustomStatic("hud_timer_text"):wnd()
+	timer_text:TextControl():SetTextST(msg or "")
+end
+
+function SetHudTimerMsg(msg)
+	local m_data = alife_storage_manager.get_state()
+	m_data.global_hud_timer[6] = msg
+end
+
+function RemoveHudTimer()
+	local hud = get_hud()
+	hud:RemoveCustomStatic("hud_timer")
+	hud:RemoveCustomStatic("hud_timer_text")
+	local m_data = alife_storage_manager.get_state()
+	m_data.global_hud_timer = nil
+end
 --------------------------------------------------------------------------------------------
 -- 								Delayed Event Queue
 --
@@ -154,6 +186,44 @@ function ProcessEventQueue(force)
 	-- if (has_alife_info("sleep_active")) then
 		-- return false
 	-- end
+	
+	local m_data = alife_storage_manager.get_state()
+	local timer_data = m_data.global_hud_timer
+	if (timer_data) then
+		local hud = get_hud()
+		local hud_timer = hud:GetCustomStatic("hud_timer") and hud:GetCustomStatic("hud_timer"):wnd()
+		if (hud_timer) then
+			local nn = time_global() - timer_data[4]
+			local value_time = 0
+			if timer_data[1] == 0 then
+				value_time = timer_data[2] + nn
+			else
+				value_time = timer_data[2] - nn
+			end
+			if value_time <= 0 then
+				value_time = 0
+			end
+
+			local hours = math.floor(value_time/3600000)
+			local minutes = math.floor(value_time/60000 - hours*60)
+			local seconds = math.floor(value_time/1000 - hours*3600 - minutes*60)
+			local str = tostring(hours)..":"..sr_timer.time2str(minutes)..":"..sr_timer.time2str(seconds)
+			hud_timer:TextControl():SetTextST(str)
+			
+			if (timer_data[1] == 0 and value_time >= timer_data[3]) then
+				SendScriptCallback("HudTimerCallback",timer_data[5],timer_data)
+				RemoveHudTimer()
+			elseif (value_time <= timer_data[3]) then
+				SendScriptCallback("HudTimerCallback",timer_data[5],timer_data)
+				RemoveHudTimer()
+			end
+		else
+			hud:AddCustomStatic("hud_timer", true)
+			hud:AddCustomStatic("hud_timer_text", true)
+			local timer_text = hud:GetCustomStatic("hud_timer_text"):wnd()
+			timer_text:TextControl():SetTextST(timer_data[6] or "")
+		end
+	end
 	
 	for event_id,actions in pairs(ev_queue) do
 		for action_id,act in pairs(actions) do

@@ -70,7 +70,7 @@ local function get_smart_terrain_target(se_obj)
 	local is_available = simulation_objects.available_by_id
 	for index=1,simulation_objects.object_registry_size do 
 		local se_target = object_registry[index]
-		if (simulation_objects.available_by_id[se_target.id]) then
+		if (is_available[se_target.id]) then
 			local curr_prior = evaluate_prior(se_target,se_obj)
 			if (curr_prior > 0 and se_target.props and se_target.props[se_obj.player_id] and se_target.props[se_obj.player_id] > 0) then
 				-- Prioritize 5 potential targets

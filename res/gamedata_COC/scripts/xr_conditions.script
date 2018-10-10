@@ -2879,6 +2879,16 @@ function smart_under_faction_war(actor,npc,p)
 	end
 	return smart.faction_war_in_progress == true
 end
+
+function heli_inside_level_boundary(actor,npc,p)
+	for id,o in pairs(db.heli) do
+		local pos = o:position()
+		local bmin = level.get_bounding_volume().min
+		local bmax = level.get_bounding_volume().max
+		return pos.x >= bmin.x and pos.z >= bmin.z and pos.x <= bmin.x+bmax.x and pos.z <= bmin.z+bmax.z
+	end
+	return false
+end
 -------------------------------------------------------------------------------------
 -- Special for Radar
 -------------------------------------------------------------------------------------

@@ -31,6 +31,7 @@ local intercepts = {
 	actor_on_before_hit			= {},
 	inventory_box_can_take		= {},
 	npc_on_before_hit			= {},
+	HudTimerCallback			= {},
 	
 	-- actor_menu_inventory.script 
 	CUIActorMenu_OnItemDropped		= {},

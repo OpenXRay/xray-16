@@ -168,12 +168,17 @@ function enter_heli(actor,npc,p)
 			for id,o in pairs(db.heli) do
 				local pos = vector():set(db.actor:position())
 				pos.y = level.get_bounding_volume().max.y
-				o:force_set_position(pos)
+				--o:force_set_position(pos)
+				local lvid = level.vertex_id(pos)
+				if (lvid < 4294967295) then
+					TeleportObject(id,pos,lvid,db.actor:game_vertex_id())
+				end
 				db.actor:attach_vehicle(o)
 				local holder = o:cast_HolderCustom()
 				if (holder) then
 					holder:SetExitLocked(true)
 				end
+				SetHudTimer("heli_task",nil,"dec",300000)
 				break
 			end
 		end
@@ -194,6 +199,7 @@ function exit_heli(actor,npc,p)
 		if (pos) then
 			db.actor:set_actor_position(vector():set(unpack(pos)))
 		end
+		RemoveHudTimer()
 	end
 end
 

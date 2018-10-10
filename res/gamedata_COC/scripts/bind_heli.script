@@ -77,7 +77,11 @@ function heli_binder:reinit()
 	self.target_alt = 40
 end
 
+local allow_input = true
 function heli_binder:interpret_input(bind,state)
+	if not (allow_input) then
+		return
+	end
 	if (db.actor) then
 		local veh = self.object
 		local ho = veh:get_helicopter()
@@ -216,6 +220,22 @@ function heli_binder:update( delta )
 			end
 			
 			ho:TurnEngineSound(axr_main.config:r_value("mm_options","enable_heli_engine_sound",1,false))
+			
+			-- if not (self:inside_boundary()) then
+				-- allow_input = false
+				-- local object_registry = simulation_objects.object_registry
+				-- local is_available = simulation_objects.available_by_id
+				-- for index=1,simulation_objects.object_registry_size do 
+					-- local se_target = object_registry[index]
+					-- if (is_available[se_target.id]) then
+						-- self.object:get_helicopter():SetSpeedInDestPoint(10)
+						-- self.object:get_helicopter():SetDestPosition(vector():set(se_target.position.x,se_target.position.y+70,se_target.position.z))
+						-- break
+					-- end
+				-- end
+			-- else 
+				-- allow_input = true
+			-- end
 		end
 	end
 
@@ -249,6 +269,12 @@ function heli_binder:update( delta )
 	--alun_utils.debug_write("heli update end")
 end
 
+function heli_binder:inside_boundary()
+	local pos = self.object:position()
+	local bmin = level.get_bounding_volume().min
+	local bmax = level.get_bounding_volume().max
+	return pos.x >= bmin.x and pos.z >= bmin.z and pos.x <= bmin.x+bmax.x and pos.z <= bmin.z+bmax.z
+end
 function heli_binder:net_spawn( se_abstract )
 	if not object_binder.net_spawn( self, se_abstract ) then
 		return false

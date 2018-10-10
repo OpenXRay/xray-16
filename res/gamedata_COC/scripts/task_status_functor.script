@@ -11,7 +11,6 @@ function check_level_under_faction_control(tsk,task_id)
 	
 	local faction_list = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
 	
-	local found = false
 	local se_actor = alife():actor()
 	for id,v in pairs(SIMBOARD.squads) do
 		local squad = alife_object(id)
@@ -22,23 +21,12 @@ function check_level_under_faction_control(tsk,task_id)
 			if not (squad:get_script_target()) then
 				for i=1,#faction_list do
 					if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
-						for k in squad:squad_members() do
-							local member = db.storage[k.id] and db.storage[k.id].object
-							if (member and member:clsid() ~= clsid.bloodsucker_s) then -- only because they stay invis and hard to fight
-								squad.force_online = true
-								found = true
-								break
-							end
-						end
-						
+						squad.force_online = true
+						return
 					end
 				end
 			end
 		end
-	end
-	
-	if (found) then
-		return
 	end
 	
 	return "complete"	

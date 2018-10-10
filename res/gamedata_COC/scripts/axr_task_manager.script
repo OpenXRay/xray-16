@@ -69,10 +69,24 @@ local function squad_on_npc_death(squad,se_npc,killer)
 			return
 		end 
 	end
-	if (squad:npc_count() == 0) then
-		if (xr_conditions.has_task_not_completed(nil,nil,{"agr_smart_terrain_1_6_army_trader_stalker_task_4"}) == true) then 
+
+	if (xr_conditions.has_task_not_completed(nil,nil,{"agr_smart_terrain_1_6_army_trader_stalker_task_4"}) == true) then 
+		local count = utils.load_var(db.actor,"agr_smart_terrain_1_6_army_trader_stalker_task_4_count") or 0
+		count = count + 1
+		utils.save_var(db.actor,"agr_smart_terrain_1_6_army_trader_stalker_task_4_count",count)
+		SetHudTimerMsg(tostring(count))
+	end
+end
+
+local function HudTimerCallback(alias,data)
+	if (alias == "heli_task") then
+		if (xr_conditions.has_task_not_completed(nil,nil,{"agr_smart_terrain_1_6_army_trader_stalker_task_4"}) == true) then
+			xr_effects.set_task_completed(nil,nil,{"agr_smart_terrain_1_6_army_trader_stalker_task_4"})
 			local count = utils.load_var(db.actor,"agr_smart_terrain_1_6_army_trader_stalker_task_4_count") or 0
-			utils.save_var(db.actor,"agr_smart_terrain_1_6_army_trader_stalker_task_4_count",count + 1)
+			if (count > 0) then
+				local multi = (axr_main.config:r_value("mm_options","multi_rewards_money",2) or 1)
+				dialogs.relocate_money(db.actor,150*count*multi,"in")
+			end
 		end
 	end
 end
@@ -102,6 +116,7 @@ function on_game_start()
 	RegisterScriptCallback("squad_on_npc_death",squad_on_npc_death)
 	RegisterScriptCallback("save_state",save_state)
 	RegisterScriptCallback("load_state",load_state)
+	RegisterScriptCallback("HudTimerCallback",HudTimerCallback)
 end
 
 ------------------------------------------------------------------------------
