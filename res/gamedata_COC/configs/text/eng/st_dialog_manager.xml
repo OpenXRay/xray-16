@@ -189,6 +189,9 @@
 	<string id="dm_help_17">
 		<text>Get me a damn doctor! Urgh, have you got a medkit? Please! I need it!</text>
 	</string>
+	<string id="dm_help_18">
+		<text>Argh! I’m bleeding! Help me Stalker!</text>
+	</string>
 <!-- ANOMALIES -->
 	<string id="dm_anomalies_general_1">
 		<text>What do you know about anomalies or artefacts?</text>
@@ -573,6 +576,21 @@
 	<string id="dm_information_62">
 		<text>There's a real demand for tools in the Zone. More intricate gear for adjustments to weapons and suits. I found a set on some guy I shot a couple of months ago, but we had to stash them in a hurry. Not sure where they we hid them, but I'm sure a trader might have the coordinates if you do a few jobs for them.</text>
 	</string>
+	<string id="dm_information_63">
+		<text>Had some new guys flown in from Europe the other day. They brought some nice goods with them and shared it all out. Burgers, beer, rum, wine. Just enough for every squad. \n Now we’re back to square one. Just vodka and canned food again.</text>
+	</string>
+	<string id="dm_information_64">
+		<text>So many squaddies come to the Dead City and need additional training. They’re combat ready, but they’re not ‘Zone ready’. They’re not used to wearing gas masks day and night, or checking for anomalies on patrol. We’ve designated some guys as trainers and had their contracts amended. All they do is teach the new Mercs about the Zone before passing them onto another squad for the serious jobs. Hopefully we won’t lose more guys to stupid mistakes.</text>
+	</string>
+	<string id="dm_information_65">
+		<text>Looks like I'm stuck here. I found a couple of artifacts and decided to head back to the Big Land, but the soldiers at the Cordon have everything secured. I guess I’ll have to find another way home.</text>
+	</string>
+	<string id="dm_information_66">
+		<text>You have trouble sleeping here? I'm exhausted. Most nights I have nightmares that feel so vivid and real. It's terrifying. People tell me stories of Stalkers dying in their sleep or going crazy. I've heard people can get a decent night's sleep by wearing a bucket over their head, but it's probably just some campfire joke.</text>
+	</string>
+	<string id="dm_information_67">
+		<text>My research is slow these days. I spend more time helping people and getting through the day than I do studying the Zone.</text>
+	</string>
 <!-- JOB -->
 	<string id="dm_job_general_1">
 		<text>Anyone posting jobs around here?</text>
@@ -615,7 +633,13 @@
 	</string>
 	<string id="dm_job_10">
 		<text>Sorry man, I've got nothing for you. Just dig in and help us hold on to what we've got.</text>
-	</string>	
+	</string>
+	<string id="dm_job_11">
+		<text>Got nothing for now. Just form up on me and we’ll get the patrols done. Got plenty of war stories for you.</text>
+	</string>
+	<string id="dm_job_12">
+		<text>I’ve got no work for you, but you’ll always find some at Dead City base. Maybe other areas too if they don’t shoot you on sight. Avoid Rostok and the Military Warehouses if you’re no friends of Duty and Freedom.</text>
+	</string>
 <!-- TIPS -->
 	<string id="dm_tips_general_1">
 		<text>Know anything useful?</text>
