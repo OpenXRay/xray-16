@@ -288,7 +288,7 @@ end
 function on_game_start()
 	RegisterScriptCallback("on_game_load",on_game_load)
 	RegisterScriptCallback("actor_on_before_death",actor_on_before_death)
-	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
+	RegisterScriptCallback("actor_on_first_update",actor_on_first_update,true)
 end
 
 --------------------------------------------------------------

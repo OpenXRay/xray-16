@@ -57,8 +57,8 @@ end
 -------------------------------------------------------------------------------------------------------
 -- 											SCRIPTED CALLBACKS
 -------------------------------------------------------------------------------------------------------
-function RegisterScriptCallback(name,func_or_userdata)
-	axr_main.callback_set(name,func_or_userdata)
+function RegisterScriptCallback(name,func_or_userdata,only_once)
+	axr_main.callback_set(name,func_or_userdata,only_once)
 end
 
 function UnregisterScriptCallback(name,func_or_userdata)

@@ -121,7 +121,7 @@ function on_game_start()
 	end
 
 	RegisterScriptCallback("load_state",load_state)
-	RegisterScriptCallback("actor_on_first_update",actor_on_first_update)
+	RegisterScriptCallback("actor_on_first_update",actor_on_first_update,true)
 end
 
 ----// add to bind_stalker or bind_stalker_ext save/load if used. //--

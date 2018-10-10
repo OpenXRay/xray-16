@@ -183,12 +183,12 @@ local intercepts = {
 -- param 1 - name as type<string> (ie. intercepts[name])
 -- param 2 - function to execute as type<function> or userdata with name as function
 -----------------------------------------------------------
-function callback_set(name,func_or_userdata)
+function callback_set(name,func_or_userdata,only_once)
 	if (func_or_userdata == nil) then 
 		callstack()
 	end
 	if (intercepts[name]) then
-		intercepts[name][func_or_userdata] = true
+		intercepts[name][func_or_userdata] = only_once == true
 	end
 end
 
@@ -205,6 +205,9 @@ function make_callback(name,...)
 				func_or_userdata(...)
 			elseif (func_or_userdata[name]) then
 				func_or_userdata[name](func_or_userdata,...)
+			end
+			if (v == true) then
+				intercepts[name][func_or_userdata] = nil
 			end
 		end
 	end

@@ -132,7 +132,7 @@ function multi_choice:FillList(action_list,...)
 		self:AddItemToList(i,str_id,action_list[i])
 	end
 	
-	self:ShowDialog()
+	self:ShowDialog(true)
 end
 
 function multi_choice:OnListItemClicked()
@@ -209,7 +209,7 @@ function context_menu:__init(owner,pos_override,action_list,...) super()
 	
 	local pos = GetCursorPosition() -- because ShowDialog moves mouse cursor to center
 	
-	self:ShowDialog()
+	self:ShowDialog(true)
 	
 	SetCursorPosition(pos)
 	pos = pos_override and vector2():set(pos_override.x,pos_override.y) or GetCursorPosition()
