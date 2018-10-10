@@ -1,0 +1,170 @@
+--------------------------------
+----- Written by Darryl123 -----
+--------------------------------
+
+-- Cache of bone effects in use.
+local bone_effects_cache = {}
+
+-------------------------------
+--- Bone effect subclass ---
+-------------------------------
+
+-- Constructor.
+class "bone_effect"
+function bone_effect:__init(definition)
+	-- Read information from the definition.
+	self.bone = definition.bone
+	self.npc = definition.npc
+	self.particle_object = definition.particle and particles_object(definition.particle)
+	self.sound_object = definition.sound and sound_object(definition.sound)
+	self.stop_on_death = definition.stop_on_death
+	
+	-- Start the bone effect.
+	self:start()
+end
+
+-- Finalizes the bone effect.
+function bone_effect:__finalize()
+	self:stop()
+	self.particle_object = nil
+	self.sound_object = nil
+	self.finalized = true
+end
+
+-- Starts the bone effect.
+function bone_effect:start()
+	-- Return if conditions do not allow starting.
+	if (self.finalized or not self.npc) then return end
+	if (self.stop_on_death and not self.npc:alive()) then return end
+	
+	-- Find the position of the bone.
+	local position = self.npc:bone_position(self.bone)
+	if (position) then
+		-- Play the particle object.
+		if (self.particle_object and not self.particle_object:playing()) then
+			self.particle_object:play_at_pos(position)
+		end
+		-- Play the sound object.
+		if (self.sound_object and not self.sound_object:playing()) then
+			self.sound_object:play_at_pos(db.actor, position, 1, sound_object.looped)
+		end
+		-- Mark as started.
+		self.started = true
+	else
+		printf("Could not determine position of " .. bone .. " on " .. self.npc:section())
+	end
+end
+
+-- Stops the bone effect.
+function bone_effect:stop()
+	if (self.particle_object and self.particle_object:playing()) then
+		self.particle_object:stop_deffered()
+	end
+	if (self.sound_object and self.sound_object:playing()) then
+		self.sound_object:stop()
+	end
+end
+
+-- Updates positions and restarts if required.
+function bone_effect:update()
+	-- Return if conditions do not allow updating.
+	if (self.finalized or not self.started or not self.npc) then return end
+	
+	-- Find the new position of the bone and update accordingly.
+	local position = self.npc:bone_position(self.bone)
+	if (position) then
+		if (self.sound_object and self.sound_object:playing()) then
+			self.sound_object:set_position(position)
+		end
+		self.particle_object:move_to(position, VEC_ZERO)
+	end
+	
+	-- Restart the effect.
+	self:start()
+end
+
+-----------------
+--- Callbacks ---
+-----------------
+
+-- Initiates callbacks required by this script.
+function on_game_start()
+	RegisterScriptCallback("monster_on_net_spawn", monster_on_net_spawn)
+	RegisterScriptCallback("monster_on_update", monster_on_update)
+	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
+end
+
+-- Callback for when a mutant is spawned.
+function monster_on_net_spawn(npc)
+	-- Information about the mutant.
+	local npc_id = npc:id()
+	local npc_section = npc:section()
+	
+	-- Return if a table in the cache already exists with this mutant's id.
+	-- This should be impossible, but the engine often doesn't take the time to care.
+	if (bone_effects_cache[npc_id]) then return end
+	
+	-- Check the mutant's section for the 'bone_effects' attribute.
+	local system_ini = system_ini()
+	local bone_effects = system_ini:r_string_ex(npc_section, "bone_effects")
+	
+	-- Return if the 'bone_effects' attribute or a section with its value cannot be found.
+	if not (bone_effects and system_ini:section_exist(bone_effects)) then return end
+	
+	-- Create a temporary table to match the bones to the sections containing their effects.
+	local bone_effects_table = {}
+	local line_count = system_ini:line_count(bone_effects) or 0
+	for i = 0, line_count - 1 do
+		local junk, bone, section = system_ini:r_line(bone_effects, i, "", "")
+		table.insert(bone_effects_table, {bone = bone, section = section})
+	end
+	
+	-- We'll now scan these sections for their individual effects and then apply them.
+	bone_effects_cache[npc_id] = {}
+	for key, value in pairs(bone_effects_table) do
+		local bone = value.bone
+		local particle = system_ini:r_string_ex(value.section, "particle") or nil
+		local sound = system_ini:r_string_ex(value.section, "sound") or nil
+		local stop_on_death = system_ini:r_bool_ex(value.section, "stop_on_death", true)
+		
+		if (bone and (particle or sound)) then
+			-- Create a bone effect class and store it in the cache.
+			local definition = {
+				["bone"] = bone,
+				["npc"] = npc,
+				["particle"] = particle,
+				["sound"] = sound,
+				["stop_on_death"] = stop_on_death,
+			}
+			table.insert(bone_effects_cache[npc_id], bone_effect(definition))
+			
+		else
+			printf("Either sound or particle effect is missing in a bone effect for " .. npc:section())
+		end
+		
+	end
+end
+
+-- Callback for when a mutant is updated.
+function monster_on_update(npc)
+	local bone_effects = bone_effects_cache[npc:id()]
+	if (bone_effects) then
+		for index, bone_effect in pairs(bone_effects) do
+			if (bone_effect) then
+				bone_effect:update()
+			end
+		end
+	end
+end
+
+-- Callback for when a mutant dies.
+function monster_on_death_callback(npc)
+	local bone_effects = bone_effects_cache[npc:id()]
+	if (bone_effects) then
+		for index, bone_effect in pairs(bone_effects) do
+			if (bone_effect and bone_effect.stop_on_death) then
+				bone_effect:stop()
+			end
+		end
+	end
+end

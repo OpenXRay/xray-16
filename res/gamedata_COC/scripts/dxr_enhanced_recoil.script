@@ -103,8 +103,8 @@ function actor_on_weapon_fired(actor,weapon,ammo_elapsed)
 	create_effect(weapon)
 end
 
-local recoils = {}
 -- Calculates, caches, and then returns the recoil value.
+local recoils = {}
 function calculate_recoil(weapon,recoil_values)
 	-- Return a cached value if this weapon and ammo combination has been used before.
 	-- This saves having to keep digging out weapon and ammo values and recalculating for every shot.
@@ -153,7 +153,7 @@ function create_effect(weapon)
 	end
 	
 	-- Calculate the recoil value.
-	local recoil = calculate_recoil(weapon,recoil_values)
+	local recoil = calculate_recoil(weapon, recoil_values)
 	
 	-- Cycle through each effect and create a camera effector.
 	-- Only four effects are used (one for each direction type), and any above this will be ignored.
