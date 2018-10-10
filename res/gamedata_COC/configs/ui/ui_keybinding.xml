@@ -38,6 +38,7 @@
 	<group name="kb_grp_inventory">
 		<command id="kb_inventory"						exe="inventory"/>
 		<command id="kb_active_jobs"					exe="active_jobs"/>
+		<command id="kb_flashlight"						exe="flashlight"/> <!-- Romann -->
 		<command id="kb_torch"							exe="torch"/>
 		<command id="kb_detector"						exe="show_detector"/>
 		<command id="kb_night_vision"					exe="night_vision"/>
