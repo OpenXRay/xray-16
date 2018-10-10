@@ -47,6 +47,7 @@ Darryl
 Genion23
 Koma
 R_populik
+VodkaChicken
 
 ------------------------------
 Meshes/Modelling
@@ -54,6 +55,7 @@ Meshes/Modelling
 Borovos
 Darkenneko
 R_populik
+VodkaChicken
 
 ------------------------------
 Quality Assurance
@@ -85,6 +87,7 @@ PentagonBlack
 Swartz
 Taffy
 Trebic
+VodkaChicken
 Wolfhound
 Wothan
 Xenotekno
@@ -126,7 +129,6 @@ Smurth
 Surs
 Swartz – Always shares work and inspires
 Tronex
-VodkaChicken – Outfit Addon and icon work
 Zealot_K
 av661194 – Russian localization
 ikdoemaarwat - csky and freedom rookie suit fixes

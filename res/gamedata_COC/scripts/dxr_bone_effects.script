@@ -76,7 +76,9 @@ function bone_effect:update()
 		if (self.sound_object and self.sound_object:playing()) then
 			self.sound_object:set_position(position)
 		end
-		self.particle_object:move_to(position, VEC_ZERO)
+		if (particle_object and particle_object:playing()) then
+			self.particle_object:move_to(position, VEC_ZERO)
+		end
 	end
 	
 	-- Restart the effect.
