@@ -32,9 +32,11 @@ SCRIPT_EXPORT(UIRegistrator, (), {
             .def("GetCDKey", &CMainMenu::GetCDKeyFromRegistry)
             .def("GetPlayerName", &CMainMenu::GetPlayerName)
             .def("GetDemoInfo", &CMainMenu::GetDemoInfo)
+#ifdef WINDOWS
             .def("GetLoginMngr", &CMainMenu::GetLoginMngr)
             .def("GetAccountMngr", &CMainMenu::GetAccountMngr)
-            .def("GetProfileStore", &CMainMenu::GetProfileStore)];
-
+            .def("GetProfileStore", &CMainMenu::GetProfileStore)
+#endif
+                  ];
     module(luaState, "main_menu")[def("get_main_menu", &MainMenu)];
 });

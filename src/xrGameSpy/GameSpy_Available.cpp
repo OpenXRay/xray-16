@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "GameSpy_Available.h"
 
 bool CGameSpy_Available::CheckAvailableServices(shared_str& resultstr)

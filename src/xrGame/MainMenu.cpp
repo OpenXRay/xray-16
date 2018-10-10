@@ -80,12 +80,14 @@ CMainMenu::CMainMenu()
     m_deactivated_frame = 0;
 
     m_sPatchURL = "";
+#ifdef WINDOWS
     m_pGameSpyFull = NULL;
     m_account_mngr = NULL;
     m_login_mngr = NULL;
     m_profile_store = NULL;
     m_stats_submitter = NULL;
     m_atlas_submit_queue = NULL;
+#endif
 
     m_sPDProgress.IsInProgress = false;
     m_downloaded_mp_map_url._set("");
@@ -103,6 +105,7 @@ CMainMenu::CMainMenu()
     {
         g_btnHint = new CUIButtonHint();
         g_statHint = new CUIButtonHint();
+#ifdef WINDOWS
         m_pGameSpyFull = new CGameSpy_Full();
 
         for (u32 i = 0; i < u32(ErrMax); i++)
@@ -127,6 +130,7 @@ CMainMenu::CMainMenu()
         m_profile_store = new gamespy_profile::profile_store(m_pGameSpyFull);
         m_stats_submitter = new gamespy_profile::stats_submitter(m_pGameSpyFull);
         m_atlas_submit_queue = new atlas_submit_queue(m_stats_submitter);
+#endif
     }
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 1000);
@@ -140,6 +144,7 @@ CMainMenu::~CMainMenu()
     xr_delete(m_startDialog);
     g_pGamePersistent->m_pMainMenu = NULL;
 
+#ifdef WINDOWS
     xr_delete(m_account_mngr);
     xr_delete(m_login_mngr);
     xr_delete(m_profile_store);
@@ -147,6 +152,7 @@ CMainMenu::~CMainMenu()
     xr_delete(m_atlas_submit_queue);
 
     xr_delete(m_pGameSpyFull);
+#endif
 
     xr_delete(m_demo_info_loader);
     delete_data(m_pMB_ErrDlgs);
@@ -521,6 +527,7 @@ void CMainMenu::OnFrame()
             Console->Show();
     }
 
+#ifdef WINDOWS
     if (IsActive() || m_sPDProgress.IsInProgress)
     {
         GSUpdateStatus status = m_pGameSpyFull->Update();
@@ -534,6 +541,7 @@ void CMainMenu::OnFrame()
         }
         m_atlas_submit_queue->update();
     }
+#endif
 
     if (IsActive())
     {
@@ -629,6 +637,7 @@ void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
 
 void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 {
+#ifdef WINDOWS
     CGameSpy_Available GSA;
     shared_str result_string;
     if (!GSA.CheckAvailableServices(result_string))
@@ -643,9 +652,7 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 
     string4096 FilePath = "";
     char* FileName = NULL;
-#ifndef LINUX // FIXME!!!
     GetFullPathName(fileName, 4096, FilePath, &FileName);
-#endif
     string_path fname;
     if (FS.path_exist("$downloads$"))
     {
@@ -665,6 +672,7 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
     progressCallback.bind(this, &CMainMenu::OnDownloadPatchProgress);
     m_pGameSpyFull->GetGameSpyHTTP()->DownloadFile(
         *m_sPatchURL, *m_sPatchFileName, completionCallback, progressCallback);
+#endif
 }
 
 void CMainMenu::OnDownloadPatchResult(bool success)
@@ -724,8 +732,10 @@ void CMainMenu::OnRunDownloadedPatch(CUIWindow*, void*)
 
 void CMainMenu::CancelDownload()
 {
+#ifdef WINDOWS
     m_pGameSpyFull->GetGameSpyHTTP()->StopDownload();
     m_sPDProgress.IsInProgress = false;
+#endif
 }
 
 void CMainMenu::SetNeedVidRestart() { m_Flags.set(flNeedVidRestart, TRUE); }
@@ -781,6 +791,7 @@ LPCSTR DelHyphens(LPCSTR c)
 
 bool CMainMenu::IsCDKeyIsValid()
 {
+#ifdef WINDOWS
     if (!m_pGameSpyFull || !m_pGameSpyFull->GetGameSpyHTTP())
         return false;
     string64 CDKey = "";
@@ -799,6 +810,9 @@ bool CMainMenu::IsCDKeyIsValid()
             return true;
     };
     return false;
+#else
+    return true;
+#endif
 }
 
 bool CMainMenu::ValidateCDKey()
@@ -831,12 +845,15 @@ void CMainMenu::OnConnectToMasterServerOkClicked(CUIWindow*, void*) { Hide_CTMS_
 LPCSTR CMainMenu::GetGSVer()
 {
     static string256 buff;
+#ifdef WINDOWS
     xr_strcpy(buff, GetGameVersion());
+#endif
     return buff;
 }
 
 LPCSTR CMainMenu::GetPlayerName()
 {
+#ifdef WINDOWS
     gamespy_gp::login_manager* l_mngr = GetLoginMngr();
     gamespy_gp::profile const* tmp_prof = l_mngr ? l_mngr->get_current_profile() : NULL;
 
@@ -845,6 +862,7 @@ LPCSTR CMainMenu::GetPlayerName()
         m_player_name = tmp_prof->unique_nick();
     }
     else
+#endif
     {
         string512 name;
         GetPlayerName_FromRegistry(name, sizeof(name));

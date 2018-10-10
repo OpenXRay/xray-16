@@ -12,6 +12,7 @@
 
 void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     if (!args || (xr_strlen(args) == 0))
     {
         TInfo tmp_info;
@@ -39,10 +40,12 @@ void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
     prof_data.password = tmp_password;
 
     tmp_acc_mngr->create_profile(tmp_nick, tmp_unick, tmp_email, tmp_password, gamespy_gp::account_operation_cb());
+#endif
 }
 
 void CCC_GapySpyListProfiles::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     if (!args || (xr_strlen(args) == 0))
     {
         TInfo tmp_info;
@@ -60,10 +63,12 @@ void CCC_GapySpyListProfiles::Execute(LPCSTR args)
     VERIFY(tmp_gp);
     gamespy_gp::account_manager* tmp_acc_mngr = MainMenu()->GetAccountMngr();
     tmp_acc_mngr->get_account_profiles(tmp_email, tmp_password, gamespy_gp::account_profiles_cb());
+#endif
 }
 
 void CCC_GameSpyLogin::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     if (!args || (xr_strlen(args) == 0))
     {
         TInfo tmp_info;
@@ -83,14 +88,17 @@ void CCC_GameSpyLogin::Execute(LPCSTR args)
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     tmp_lmngr->login(tmp_email, tmp_nick, tmp_password, gamespy_gp::login_operation_cb());
+#endif
 }
 
 void CCC_GameSpyLogout::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     tmp_lmngr->logout();
+#endif
 }
 
 static char const* print_time(time_t const& src_time, string64& dest_time)
@@ -103,6 +111,7 @@ static char const* print_time(time_t const& src_time, string64& dest_time)
 
 void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     gamespy_gp::profile const* tmp_profile = tmp_lmngr->get_current_profile();
@@ -145,40 +154,48 @@ void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
     {
         Msg("- No profile. You are not loged in.");
     }
+#endif
 }
 
 void CCC_GameSpySuggestUNicks::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     string256 tmp_unick;
     sscanf(args, "%s", tmp_unick);
     gamespy_gp::account_manager* tmp_amngr = MainMenu()->GetAccountMngr();
     VERIFY(tmp_amngr);
     tmp_amngr->suggest_unique_nicks(tmp_unick, gamespy_gp::suggest_nicks_cb());
+#endif
 }
 
 void CCC_GameSpyRegisterUniqueNick::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::login_manager::unique_nick_t tmp_unick;
     sscanf(args, "%s", tmp_unick);
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     tmp_lmngr->set_unique_nick(tmp_unick, gamespy_gp::login_operation_cb());
+#endif
 }
 
 void CCC_GameSpyDeleteProfile::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::account_manager* tmp_amngr = MainMenu()->GetAccountMngr();
     VERIFY(tmp_amngr);
     tmp_amngr->delete_profile(gamespy_gp::account_operation_cb());
+#endif
 }
 
 static gamespy_profile::all_best_scores_t debug_best_scores;
 
 void CCC_GameSpyProfile::Execute(LPCSTR args)
 {
+#ifdef WINDOWS
     VERIFY(MainMenu());
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
@@ -241,4 +258,5 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
             std::make_pair(static_cast<gamespy_profile::enum_best_score_type>(score_id), score_value));
         tmp_ssubmitter->set_best_scores(&debug_best_scores, tmp_curr_prof, gamespy_profile::store_operation_cb());
     }
+#endif
 }

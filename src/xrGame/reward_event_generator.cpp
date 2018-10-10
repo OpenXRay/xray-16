@@ -30,8 +30,10 @@ reward_event_generator::reward_event_generator(u32 const max_rewards_per_game) :
     m_state_event_checker->init();
     m_state_accum->init();
     m_event_handlers->init();
+#ifdef WINDOWS
     m_submit_queue = MainMenu()->GetSubmitQueue();
     VERIFY(m_submit_queue);
+#endif
 }
 
 reward_event_generator::~reward_event_generator()
@@ -162,7 +164,7 @@ void __stdcall reward_event_generator::AddRewardTask(u32 award_id)
 
     if (Level().IsDemoPlayStarted())
         return;
-
+#ifdef WINDOWS
     gamespy_profile::enum_awards_t tmp_award_type = static_cast<gamespy_profile::enum_awards_t>(award_id);
     VERIFY(award_id < gamespy_profile::at_awards_count);
 
@@ -192,13 +194,14 @@ void __stdcall reward_event_generator::AddRewardTask(u32 award_id)
         return;
     }
     m_submit_queue->submit_reward(tmp_award_type);
+#endif
 }
 
 void reward_event_generator::CommitBestResults()
 {
     if (Level().IsDemoPlayStarted())
         return;
-
+#ifdef WINDOWS
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
@@ -215,6 +218,7 @@ void reward_event_generator::CommitBestResults()
     VERIFY(m_best_scores_helper);
     m_best_scores_helper->fill_best_results(m_submit_queue->get_best_results_store());
     m_submit_queue->submit_best_results();
+#endif
 }
 
 } // namespace award_system

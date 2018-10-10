@@ -19,6 +19,7 @@ CGameSpy_Browser* g_gs_browser = NULL;
 
 CServerList::CServerList()
 {
+#ifdef WINDOWS
     m_GSBrowser = MainMenu()->GetGS()->GetGameSpyBrowser();
     CGameSpy_Browser::UpdateCallback updateCb;
     updateCb.bind(this, &CServerList::OnUpdate);
@@ -56,6 +57,7 @@ CServerList::CServerList()
 
     m_last_retreived_index = u32(-1);
     m_need_refresh_fr = u32(-1);
+#endif
 }
 
 CServerList::~CServerList()
@@ -553,6 +555,7 @@ void CServerList::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 
 void CServerList::ConnectToSelected()
 {
+#ifdef WINDOWS
     gamespy_gp::login_manager const* lmngr = MainMenu()->GetLoginMngr();
     R_ASSERT(lmngr);
     gamespy_gp::profile const* tmp_profile = lmngr->get_current_profile();
@@ -605,6 +608,7 @@ void CServerList::ConnectToSelected()
 
         Console->Execute(command.c_str());
     }
+#endif
 }
 
 void CServerList::InitHeader()

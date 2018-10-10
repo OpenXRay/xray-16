@@ -61,6 +61,7 @@ void profile_store::set_current_profile(int profileId, char const* loginTicket)
 
 void profile_store::load_current_profile(store_operation_cb progress_indicator_cb, store_operation_cb complete_cb)
 {
+#ifdef WINDOWS
     if (!complete_cb)
     {
         complete_cb.bind(this, &profile_store::onlylog_completion);
@@ -77,6 +78,7 @@ void profile_store::load_current_profile(store_operation_cb progress_indicator_c
 
     load_prof_params_t tmp_args(progress_indicator_cb);
     m_load_current_profile_qam.execute(this, tmp_args, complete_cb);
+#endif
 }
 
 void profile_store::load_current_profile_raw(load_prof_params_t const& args, store_operation_cb complete_cb)
@@ -133,6 +135,7 @@ void profile_store::load_profile(store_operation_cb progress_indicator_cb)
             FS.r_close(tmp_reader);
         }
     }
+#ifdef WINDOWS
     if (m_valid_ltx)
     {
         s32 tmp_profile_id = m_dsigned_reader.get_ltx().r_s32(profile_data_section, profile_id_line);
@@ -142,7 +145,7 @@ void profile_store::load_profile(store_operation_cb progress_indicator_cb)
         R_ASSERT(tmp_curr_prof);
         m_valid_ltx = (tmp_profile_id == tmp_curr_prof->m_profile_id);
     }
-
+#endif
     m_awards_store->reset_awards();
     m_best_scores_store->reset_scores();
 
