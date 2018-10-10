@@ -292,14 +292,6 @@ function opt_menu_on_set_values(menu,optMgr)
 	axr_main_options.opt_menu_on_set_values(menu,optMgr)
 end
 
-function actor_on_weapon_zoom_in()
-	weapon_is_zoomed = true
-end 
-
-function actor_on_weapon_zoom_out()
-	weapon_is_zoomed = false
-end
-
 ------------------
 -- server_entity_on_register
 ------------------
