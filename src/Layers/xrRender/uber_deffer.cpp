@@ -148,7 +148,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         u32 stage = C.r_dx10Sampler("smp_bump_ds");
         if (stage != -1)
         {
-            C.i_dx10Address(stage, D3DTADDRESS_WRAP);
+            C.i_Address(stage, D3DTADDRESS_WRAP);
             C.i_dx10FilterAnizo(stage, TRUE);
         }
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))
@@ -341,7 +341,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         u32 stage = C.r_dx10Sampler("smp_bump_ds");
         if (stage != -1)
         {
-            C.i_dx10Address(stage, D3DTADDRESS_WRAP);
+            C.i_Address(stage, D3DTADDRESS_WRAP);
             C.i_dx10FilterAnizo(stage, TRUE);
         }
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))

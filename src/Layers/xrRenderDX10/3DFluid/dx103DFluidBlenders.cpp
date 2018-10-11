@@ -152,29 +152,29 @@ void SetupSamplers(CBlender_Compile& C)
     int smp = C.r_dx10Sampler("samPointClamp");
     if (smp != u32(-1))
     {
-        C.i_dx10Address(smp, D3DTADDRESS_CLAMP);
-        C.i_dx10Filter(smp, D3DTEXF_POINT, D3DTEXF_POINT, D3DTEXF_POINT);
+        C.i_Address(smp, D3DTADDRESS_CLAMP);
+        C.i_Filter(smp, D3DTEXF_POINT, D3DTEXF_POINT, D3DTEXF_POINT);
     }
 
     smp = C.r_dx10Sampler("samLinear");
     if (smp != u32(-1))
     {
-        C.i_dx10Address(smp, D3DTADDRESS_CLAMP);
-        C.i_dx10Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        C.i_Address(smp, D3DTADDRESS_CLAMP);
+        C.i_Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
     smp = C.r_dx10Sampler("samLinearClamp");
     if (smp != u32(-1))
     {
-        C.i_dx10Address(smp, D3DTADDRESS_CLAMP);
-        C.i_dx10Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        C.i_Address(smp, D3DTADDRESS_CLAMP);
+        C.i_Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
     smp = C.r_dx10Sampler("samRepeat");
     if (smp != u32(-1))
     {
-        C.i_dx10Address(smp, D3DTADDRESS_WRAP);
-        C.i_dx10Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        C.i_Address(smp, D3DTADDRESS_WRAP);
+        C.i_Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 }
 void SetupTextures(CBlender_Compile& C)
