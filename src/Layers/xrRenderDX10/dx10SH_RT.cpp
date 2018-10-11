@@ -40,10 +40,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     dwHeight = h;
     fmt = f;
 
-    // Get caps
-    // D3DCAPS9	caps;
-    // R_CHK		(HW.pDevice->GetDeviceCaps(&caps));
-
     //	DirectX 10 supports non-power of two textures
     // Pow2
     // if (!btwIsPow2(w) || !btwIsPow2(h))
@@ -82,18 +78,10 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
 
-    case D3DFMT_D32:
-        VERIFY(false, "What? How this happen?");
-        [[fallthrough]];
-
     case D3DFMT_D32F_LOCKABLE:
         dx10FMT = DXGI_FORMAT_R32_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
-
-    case D3DFMT_D16:
-        VERIFY(false, "What? How this happen?");
-        [[fallthrough]];
 
     case D3DFMT_D16_LOCKABLE:
         dx10FMT = DXGI_FORMAT_R16_TYPELESS;
@@ -120,8 +108,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 
     // Try to create texture/surface
     RImplementation.Resources->Evict();
-    //_hr = HW.pDevice->CreateTexture		(w, h, 1, usage, f, D3DPOOL_DEFAULT, &pSurface,NULL);
-    // if (FAILED(_hr) || (0==pSurface))	return;
 
     // Create the render target texture
     D3D_TEXTURE2D_DESC desc;
@@ -151,11 +137,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 
     CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));
     HW.stats_manager.increment_stats_rtarget(pSurface);
-// OK
+    // OK
 #ifdef DEBUG
     Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, dx10FMT, SampleCount);
 #endif // DEBUG
-    // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT));
+    // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT)); // TODO: DX10: check if texture is created?
     if (useAsDepth)
     {
         D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc;
