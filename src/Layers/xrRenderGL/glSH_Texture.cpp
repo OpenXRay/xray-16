@@ -174,6 +174,9 @@ void CTexture::Load()
 
     // Check for OGM
     string_path fn;
+#ifdef LINUX
+    while (char* sep = strchr(*cName, '\\')) *sep = '/';
+#endif
     if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
     {
         // AVI
