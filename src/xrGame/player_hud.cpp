@@ -651,7 +651,7 @@ void player_hud::update_inertion(Fmatrix& trans)
 
 
 		static Fvector						st_last_dir = { 0, 0, 0 };
-#pragma todo("Этот код есть у Алундайо, но почему-то нету у нас. Нужно разобраться @Debrovski")
+#pragma todo("Р­С‚РѕС‚ РєРѕРґ РµСЃС‚СЊ Сѓ РђР»СѓРЅРґР°Р№Рѕ, РЅРѕ РїРѕС‡РµРјСѓ-С‚Рѕ РЅРµС‚Сѓ Сѓ РЅР°СЃ. РќСѓР¶РЅРѕ СЂР°Р·РѕР±СЂР°С‚СЊСЃСЏ @Debrovski")
 		//// load params
 		//float m_pitch_offset_r = PITCH_OFFSET_R;
 		//float m_pitch_offset_n = PITCH_OFFSET_N;

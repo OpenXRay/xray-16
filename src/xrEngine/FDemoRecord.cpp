@@ -423,16 +423,21 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     if (dik == DIK_ESCAPE)
         fLifeTime = -1;
 
-#ifdef DEBUG // ndef MASTER_GOLD // Xottab_DUTY: Teleport to demo cam in Debug configuration
+ //Alundaio: Teleport to demo cam
+//#ifdef DEBUG // ndef MASTER_GOLD // Xottab_DUTY: Teleport to demo cam in Debug configuration
     if (dik == DIK_RETURN)
     {
-        if (g_pGameLevel->CurrentEntity())
+        if (Core.ParamFlags.test(Core.dev))
         {
-            g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
-            fLifeTime = -1;
+            if (g_pGameLevel->CurrentEntity())
+            {
+                g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
+                fLifeTime = -1;
+            }
         }
     }
-#endif
+//#endif // Romann: сделал так, а то телепорт в демо_рекорд совсем не работал.
+ //-Alundaio
 
     if (dik == DIK_PAUSE)
         Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
