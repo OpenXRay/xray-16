@@ -25,7 +25,11 @@ public:
         return *this;
     }
 
-    CPHPositionsPairs& operator=(const CPHPositionsPairs& right) { geom = right.geom; }
+    CPHPositionsPairs& operator=(const CPHPositionsPairs& right)
+    {
+        geom = right.geom;
+        return *this;
+    }
     bool operator==(const CPHPositionsPairs& right) const { return geom == right.geom; }
     bool operator!=(const CPHPositionsPairs& right) const { return geom != right.geom; }
 };

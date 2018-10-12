@@ -52,7 +52,7 @@ public:
     virtual CInifile* LL_UserData() = 0;
     virtual accel* LL_Bones() = 0;
 
-    virtual ICF CBoneInstance& LL_GetBoneInstance(u16 bone_id) = 0;
+    virtual CBoneInstance& LL_GetBoneInstance(u16 bone_id) = 0;
 
     virtual CBoneData& LL_GetData(u16 bone_id) = 0;
 
@@ -61,10 +61,10 @@ public:
     virtual u16 LL_BoneCount() const = 0;
     virtual u16 LL_VisibleBoneCount() = 0;
 
-    virtual ICF Fmatrix& LL_GetTransform(u16 bone_id) = 0;
-    virtual ICF const Fmatrix& LL_GetTransform(u16 bone_id) const = 0;
+    virtual Fmatrix& LL_GetTransform(u16 bone_id) = 0;
+    virtual const Fmatrix& LL_GetTransform(u16 bone_id) const = 0;
 
-    virtual ICF Fmatrix& LL_GetTransform_R(u16 bone_id) = 0;
+    virtual Fmatrix& LL_GetTransform_R(u16 bone_id) = 0;
     virtual Fobb& LL_GetBox(u16 bone_id) = 0;
     virtual const Fbox& GetBox() const = 0;
     virtual void LL_GetBindTransform(xr_vector<Fmatrix>& matrices) = 0;
