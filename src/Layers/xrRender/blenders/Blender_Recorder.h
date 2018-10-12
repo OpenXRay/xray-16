@@ -108,22 +108,18 @@ public:
     void StageSET_Color(u32 a1, u32 op, u32 a2);
     void StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3);
     void StageSET_Alpha(u32 a1, u32 op, u32 a2);
-#if !defined(USE_DX10) && !defined(USE_DX11)
     void StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel);
     void Stage_Texture(LPCSTR name, u32 address = D3DTADDRESS_WRAP, u32 fmin = D3DTEXF_LINEAR,
         u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR);
     void StageTemplate_LMAP0();
-#endif //	USE_DX10
     void Stage_Matrix(LPCSTR name, int UVW_channel);
     void Stage_Constant(LPCSTR name);
     void StageEnd();
 
     // R1/R2-compiler	[programmable]
-#if defined(USE_DX9) || defined(USE_OGL)
     u32 i_Sampler(LPCSTR name);
     void i_Texture(u32 s, LPCSTR name);
     void i_Projective(u32 s, bool b);
-#endif
     void i_Address(u32 s, u32 address);
     void i_Filter_Min(u32 s, u32 f);
     void i_Filter_Mip(u32 s, u32 f);
@@ -161,7 +157,8 @@ public:
         return r_dx10Texture(ResourceName, texture.c_str());
     };
     u32 r_dx10Sampler(LPCSTR ResourceName);
-#else //	USE_DX10
+#endif //	USE_DX10
+
     u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,
         u32 fmin = D3DTEXF_LINEAR, u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR);
     u32 r_Sampler(LPCSTR name, shared_str texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,
@@ -172,7 +169,6 @@ public:
     void r_Sampler_rtf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
     void r_Sampler_clf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
     void r_Sampler_clw(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
-#endif //	USE_DX10
 
 #ifdef USE_OGL
     void i_Comparison(u32 s, u32 func);

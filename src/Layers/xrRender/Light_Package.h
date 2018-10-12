@@ -1,7 +1,6 @@
 #pragma once
 
-#include "light.h"
-
+class light;
 class light_Package
 {
 public:

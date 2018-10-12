@@ -60,24 +60,13 @@ void CBlender_Compile::i_dx10FilterAnizo(u32 s, BOOL value)
 
 u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
 {
-    //	TEST
-    // return ((u32)-1);
-    VERIFY(ResourceName);
-    string256 name;
-    xr_strcpy(name, ResourceName);
-    fix_texture_name(name);
+    // TODO: DX10: Check if we can use dwStage
+    u32 stage = i_Sampler(ResourceName);
 
-    // Find index
-    // ref_constant C			= ctable.get(ResourceName);
-    ref_constant C = ctable.get(name);
-    // VERIFY(C);
-    if (!C)
+    if (stage == u32(-1))
         return u32(-1);
 
-    R_ASSERT(C->type == RC_sampler);
-    u32 stage = C->samp.index;
-
-    //	init defaults here
+    //	init defaults here:
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_POINT,			D3DTEXF_NONE,	D3DTEXF_POINT
     if (0 == xr_strcmp(ResourceName, "smp_nofilter"))
@@ -192,14 +181,3 @@ void CBlender_Compile::r_ComputePass(LPCSTR cs)
     ctable.merge(&dest.cs->constants);
 }
 #endif
-
-void CBlender_Compile::r_End()
-{
-    SetMapping();
-    dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
-    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
-    dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
-    dest.C = 0;
-    ref_matrix_list temp(0);
-    SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
-}
