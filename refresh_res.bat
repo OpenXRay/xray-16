@@ -6,7 +6,7 @@ rem ВАЖНО! Любой чужеродный файл в gamedata будет 
 rem Путь до папки репозитория, например: set PathToRepo=C:\Users\PC\Documents\Visual Studio 2017\Projects\OXR_CoC
 set PathToRepo=C:\OXR_CoC
 rem Путь до папки игры,        например: set PathToRepo=D:\games\CoC_target
-set PathToGame=E:\Games\CoC_1.5_R6_full
+set PathToGame=E:\Games\CoC_1.5_R7_Build
 
 rem ______________________________________________________________________
 rem ______________________________________________________________________
