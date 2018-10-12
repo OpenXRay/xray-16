@@ -20,6 +20,7 @@ struct fury_killer
     {
         m_killer_name = copy.m_killer_name;
         m_after_time = copy.m_after_time;
+        return *this;
     }
 
     bool operator()(shared_str const& killer, shared_str const& victim, kills_store::kill const& kill)

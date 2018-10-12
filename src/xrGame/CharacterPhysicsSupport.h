@@ -153,9 +153,7 @@ public:
     virtual void on_child_shell_activate(CPhysicsShellHolder* obj);
     /////////////////////////////////////////////////////////////////
     CCharacterPhysicsSupport& operator=(CCharacterPhysicsSupport& /**asup/**/)
-    {
-        R_ASSERT2(false, "Can not assign it");
-    }
+        = delete;
     CCharacterPhysicsSupport(EType atype, CEntityAlive* aentity);
     virtual ~CCharacterPhysicsSupport();
 
