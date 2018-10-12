@@ -207,9 +207,9 @@ omni_offset                              = 0,0,0
 torch_inertion_speed_min                 = 0.5
 torch_inertion_speed_max                 = 7.5
 light_section                            = flashlight_definition
-light_trace_bone                         = lights_bone
-snd_turn_on                              = torch\snd_switch_on
-snd_turn_off                             = torch\snd_switch_off
+light_trace_bone                         = light_bone_1
+snd_turn_on                              = torch\snd_switch_on, 1.0, 0.25
+snd_turn_off                             = torch\snd_switch_off, 1.0, 0.25
 
 attach_angle_offset                      = 3.062, 0.008, -1.532
 attach_position_offset                   = 0.134, -0.007, 0.09
@@ -220,9 +220,9 @@ item_orientation 						 = -8, -11.5,50
 item_visual                              = dynamics\devices\dev_tactical_torch\dev_tactical_torch_hud
 fire_point                               = 0,0,0
 fire_direction							 = 0,0,1			;Note: engine default is 0,0,1
-fire_bone                                = cone_bone
+fire_bone                                = light_bone_2
 fire_point2                              = 0,0,0
-fire_bone2                               = wpn_body
+fire_bone2                               = light_bone_2
 anm_show                                 = tactical_torch_draw, tactical_torch_draw
 anm_show_16x9                            = tactical_torch_draw, tactical_torch_draw
 anm_show_fast                            = tactical_torch_draw, tactical_torch_draw
@@ -244,25 +244,113 @@ anm_zoom_16x9							 = tactical_torch_zoom, tactical_torch_zoom
 
 [flashlight_definition]
 type                                     = 2 ; type  0-Direct 1-Point 2-Spot 3-OMNIPART 4-Reflected
-range                                    = 20 ; range                 <in meters>
-range_r2                                 = 20 ; range                 <in meters>
+range                                    = 25 ; range                 <in meters>
+range_r2                                 = 25 ; range                 <in meters>
 color                                    = 0.8,0.7,0.8,0.2 ; four color components <r,g,b,a> 0.f<X<3.f
 color_r2                                 = 1.0,0.9,1.0,0.9 ; four color components <r,g,b,a> 0.f<X<3.f
 color_animator                           = empty ; color animator name   (empty - not using animator) //light_torch_01
 volumetric                               = true
-volumetric_quality                       = 0.5
-volumetric_intensity                     = 0.10
+volumetric_quality                       = 0.60
+volumetric_intensity                     = 0.22
 volumetric_distance                      = 0.25
 
 omni_type                                = 1 ; type  0-Direct 1-Point 2-Spot 3-OMNIPART 4-Reflected
-omni_range                               = 2 ; range                 <in meters>
-omni_range_r2                            = 0.5 ; range                 <in meters>
+omni_range                               = 2.4 ; range                 <in meters>
+omni_range_r2                            = 0.75 ; range                 <in meters>
 omni_color                               = 0.35,0.3,0.35,0.1 ; four color components <r,g,b,a> 0.f<X<3.f
 omni_color_r2                            = 0.45,0.4,0.45,0.1 ; four color components <r,g,b,a> 0.f<X<3.f
 
 spot_texture                             = internal\internal_tactical_torch ; spot texture name     (using only in Second Render)
-spot_angle                               = 65 ; spot angle            <in gradus>
+spot_angle                               = 80 ; spot angle            <in gradus>
 
 glow_texture                             = glow\glow_tactical_torch ; glow texture name     (required)
-glow_radius                              = 0.2 ; glow radius           <in meters>
-guide_bone                               = lights_bone ; guid bone name        (required)
+glow_radius                              = 0.3 ; glow radius           <in meters>
+guide_bone                               = light_bone_2 ; guid bone name        (required)
+
+
+[device_tactical_torch]:identity_immunities
+class 									 = D_FLALIT
+visual									 = dynamics\devices\dev_tactical_torch\dev_tactical_torch.ogf
+hud										 = device_tactical_torch_hud
+slot									 = 8
+animation_slot                           = 7
+default_to_ruck                          = false
+cost									 = 0
+cform                                    = skeleton
+inv_weight                               = 0.05
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 6
+inv_grid_y                               = 39
+inv_name                                 = st_device_flashlight_name
+inv_name_short                           = st_device_flashlight_name
+description                              = st_device_flashlight_desc
+
+attach_angle_offset                      = -1.303,0.107,-1.702
+attach_position_offset                   = 0.14,0.001,0.02
+attach_bone_name                         = bip01_l_hand
+auto_attach                              = false
+
+torch_offset							 = 0,0,0
+omni_offset								 = 0,0,0
+torch_inertion_speed_min				 = 0.5
+torch_inertion_speed_max				 = 7.5
+light_section							 = tactical_torch_definition
+light_trace_bone                         = light_bone_1
+snd_turn_on								 = torch\snd_switch_on, 1.0, 0.25
+snd_turn_off							 = torch\snd_switch_off, 1.0, 0.25
+
+attach_angle_offset                      = 3.062, 0.008, -1.532
+attach_position_offset                   = 0.134, -0.007, 0.09
+
+[device_tactical_torch_hud]:detector_base_hud
+item_position				= -0.053,0.027,0.015
+item_orientation			= -8,-10.5,50
+item_visual             	= dynamics\devices\dev_tactical_torch\dev_tactical_torch_hud
+fire_point					= 0,0,0
+fire_bone      	      		= light_bone_2
+fire_point2					= 0,0,0
+fire_bone2					= light_bone_2
+anm_show					= tactical_torch_draw, tactical_torch_draw
+anm_show_16x9				= tactical_torch_draw, tactical_torch_draw
+anm_show_fast				= tactical_torch_draw, tactical_torch_draw
+anm_show_fast_16x9			= tactical_torch_draw, tactical_torch_draw
+anm_hide					= tactical_torch_holster, tactical_torch_holster
+anm_hide_16x9				= tactical_torch_holster, tactical_torch_holster
+anm_hide_fast				= tactical_torch_holster, tactical_torch_holster
+anm_hide_fast_16x9			= tactical_torch_holster, tactical_torch_holster
+anm_idle					= tactical_torch_idle, tactical_torch_idle
+anm_idle_16x9				= tactical_torch_idle, tactical_torch_idle
+anm_idle_moving				= tactical_torch_moving, tactical_torch_moving
+anm_idle_moving_16x9		= tactical_torch_moving, tactical_torch_moving
+anm_idle_sprint				= tactical_torch_sprint, tactical_torch_sprint
+anm_idle_sprint_16x9		= tactical_torch_sprint, tactical_torch_sprint
+anm_toggle					= tactical_torch_switch, tactical_torch_switch
+anm_toggle_16x9				= tactical_torch_switch, tactical_torch_switch
+anm_zoom					= tactical_torch_zoom, tactical_torch_zoom
+anm_zoom_16x9				= tactical_torch_zoom, tactical_torch_zoom
+
+[tactical_torch_definition]
+type								= 2										; type  0-Direct 1-Point 2-Spot 3-OMNIPART 4-Reflected
+range           					= 80									; range                 <in meters>
+range_r2        					= 80			 						; range                 <in meters>
+color           					= 0.8,0.7,0.7,0.2						; four color components <r,g,b,a> 0.f<X<3.f
+color_r2        					= 1.0,0.9,0.9,0.9						; four color components <r,g,b,a> 0.f<X<3.f
+color_animator  					= empty									; color animator name   (empty - not using animator) //light_torch_01
+volumetric						 	= true
+volumetric_quality                  = 0.63
+volumetric_intensity                = 0.22
+volumetric_distance                 = 0.25
+
+omni_type							= 1										; type  0-Direct 1-Point 2-Spot 3-OMNIPART 4-Reflected
+omni_range     						= 3.0									; range                 <in meters>
+omni_range_r2   					= 0.90									; range                 <in meters>
+omni_color      					= 0.4,0.35,0.35,0.1						; four color components <r,g,b,a> 0.f<X<3.f
+omni_color_r2   					= 0.5,0.45,0.45,0.1						; four color components <r,g,b,a> 0.f<X<3.f
+
+spot_texture    					= internal\internal_tactical_torch		; spot texture name     (using only in Second Render)
+spot_angle      					= 60									; spot angle            <in gradus>
+
+glow_texture    					= glow\glow_tactical_torch					; glow texture name     (required)
+glow_radius     					= 0.25									; glow radius           <in meters>
+guide_bone      					= light_bone_2								; guid bone name        (required)
