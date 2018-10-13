@@ -817,6 +817,7 @@ static void unexpected_handler() { handler_base("unexpected program termination"
 static void abort_handler(int signal) { handler_base("application is aborting"); }
 static void floating_point_handler(int signal) { handler_base("floating point error"); }
 static void illegal_instruction_handler(int signal) { handler_base("illegal instruction"); }
+static void segmentation_fault_handler(int signal) { handler_base("segmentation fault"); }
 static void termination_handler(int signal) { handler_base("termination with exit code 3"); }
 
 void xrDebug::OnThreadSpawn()
@@ -841,6 +842,13 @@ void xrDebug::OnThreadSpawn()
 #if 0 // should be if we use exceptions
     std::set_unexpected(_terminate);
 #endif
+#else //WINDOWS
+    signal(SIGABRT, abort_handler);
+    signal(SIGFPE, floating_point_handler);
+    signal(SIGILL, illegal_instruction_handler);
+    signal(SIGINT, 0);
+    signal(SIGTERM, termination_handler);
+    signal(SIGSEGV, segmentation_fault_handler);
 #endif
 }
 

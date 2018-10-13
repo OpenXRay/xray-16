@@ -21,6 +21,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/prctl.h>
 #include <chrono>
 #endif
 #include <thread>
@@ -333,12 +334,14 @@ struct THREAD_NAME
 
 void thread_name(const char* name)
 {
+    Msg("start new thread [%s]", name);
+#if defined(WINDOWS)
     THREAD_NAME tn;
     tn.dwType = 0x1000;
     tn.szName = name;
     tn.dwThreadID = DWORD(-1);
     tn.dwFlags = 0;
-#if defined(WINDOWS)
+
     __try
     {
         RaiseException(0x406D1388, 0, sizeof(tn) / sizeof(DWORD), (ULONG_PTR*)&tn);
@@ -346,6 +349,8 @@ void thread_name(const char* name)
     __except (EXCEPTION_CONTINUE_EXECUTION)
     {
     }
+#else
+    prctl(PR_SET_NAME, name, 0, 0, 0);
 #endif
 }
 #pragma pack(pop)
@@ -385,7 +390,7 @@ void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* argli
 #if defined(WINDOWS)
     _beginthread(thread_entry, stack, startup);
 #elif defined(LINUX)
-    pthread_t handle;
+    pthread_t handle = 0;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setstacksize(&attr, stack);
