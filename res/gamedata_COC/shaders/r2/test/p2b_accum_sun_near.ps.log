@@ -1,0 +1,361 @@
+--------------------------------------------------------------------------------
+Running performance on file test\p2B_accum_sun_near.ps
+-------------------- NV40 --------------------
+Target: GeForce 6800 Ultra (NV40) :: Unified Compiler: v65.04
+IPU0 ------ Simplified schedule: --------
+
+Pass |  Unit  |  uOp |  PC:  Op
+-----+--------+------+-------------------------
+   1 |   SCT0 |  div |   0:  TEXr r0, f[TEX0], TEX0;
+     |    TEX |  tex |   0:  TEXr r0, f[TEX0], TEX0;
+     |   SCB0 |  mov |   1:  MOVr r1.xyz, r0;
+     |   SCB1 |  mov |   2:  MOVr r1.w, const.---x;
+     |        |      |
+   2 |   SCT1 |  mov |   4:  NRMh h0.xyz, r0;
+     |    SRB |  nrm |   4:  NRMh h0.xyz, r0;
+     |   SCB0 |  dp4 |   5:  DP4r r2.x, const, r1;
+     |   SCB1 |  nop |   5:  DP4r r2.x, const, r1;
+     |        |      |
+   3 |   SCB0 |  dp4 |   7:  DP4r r4.x, const, r1;
+     |   SCB1 |  nop |   7:  DP4r r4.x, const, r1;
+     |        |      |
+   4 |   SCB0 |  dp4 |   9:  DP4r r4.y, const, r1;
+     |   SCB1 |  nop |   9:  DP4r r4.y, const, r1;
+     |        |      |
+   5 |   SCT1 |  div |  11:  RCPr r6.z, r2;
+     |   SCB0 |  dp4 |  12:  DP4r r6.y, const, r1;
+     |   SCB1 |  nop |  12:  DP4r r6.y, const, r1;
+     |        |      |
+   6 |   SCB0 |  mad |  14:  MADr r2.xy, r4, r6.zz--, const.xy--;
+     |   SCB1 |  mad |  16:  MADr r4.zw, r4.--xy, r6.--zz, const.--yx;
+     |        |      |
+   8 |   SCT0 |  mov |  18:  TEXr r6.x, r2, TEX2;
+     |    TEX |  tex |  18:  TEXr r6.x, r2, TEX2;
+     |   SCB0 |  add |  19:  ADDr h6.y,-r6.-x--, r6;
+     |   SCB1 |  mad |  20:  MADr r3.zw, r4.--xy, r6.--zz, const.--xx;
+     |        |      |
+   9 |   SCT0 |  mov |  22:  TEXr r2.x, r4.zwzz, TEX2;
+     |    TEX |  tex |  22:  TEXr r2.x, r4.zwzz, TEX2;
+     |   SCB1 |  mad |  23:  MADr r2.zw, r4.--xy, r6.--zz, const.--xx;
+     |        |      |
+  10 |   SCB1 |  add |  25:  ADDr h6.z,-r2.--x-, r6.--y-;
+     |        |      |
+  11 |   SCT0 |  mov |  26:  TEXr r2.x, r2.zwzz, TEX2;
+     |    TEX |  tex |  26:  TEXr r2.x, r2.zwzz, TEX2;
+     |   SCB1 |  add |  27:  ADDr h6.w,-r2.---x, r6.---y;
+     |        |      |
+  12 |   SCT0 |  mov |  28:  TEXr r2.x, r3.zwzz, TEX2;
+     |    TEX |  tex |  28:  TEXr r2.x, r3.zwzz, TEX2;
+     |   SCB0 |  add |  29:  ADDr h6.x,-r2, r6.y---;
+     |        |      |
+  13 | SCT0/1 |  mul |  30:  MOVrc0 hc,-h6;
+     |   SCB1 |  mad |  31:  MADr r4.zw, r4.--xy, r6.--zz, const.--xy;
+     |        |      |
+  14 |   SCT0 |  mov |  33:  TEXr r3.x, r4.zwzz, TEX2;
+     |    TEX |  tex |  33:  TEXr r3.x, r4.zwzz, TEX2;
+     |   SCB1 |  mad |  34:  MADr r4.zw, r4.--xy, r6.--zz, const.--xy;
+     |        |      |
+  15 | SCT0/1 |  mul |  36:  MOVh h4, const.xxxx;
+     |   SCB0 |  add |  38:  ADDr h5.y,-r3.-x--, r6;
+     |        |      |
+  16 | SCT0/1 |  mul |  39:  MOVh h4(LT0.xyzw), const.xxxx;
+     |   SCB1 |  mad |  41:  MADr r5.zw, r4.--xy, r6.--zz, const.--xy;
+     |        |      |
+  17 |   SCT0 |  mov |  43:  TEXr r3.x, r4.zwzz, TEX2;
+     |    TEX |  tex |  43:  TEXr r3.x, r4.zwzz, TEX2;
+     |   SCB1 |  mad |  44:  MADr r4.zw, r4.--xy, r6.--zz, const.--xy;
+     |        |      |
+  18 |   SCB1 |  add |  46:  ADDr h5.z,-r3.--x-, r6.--y-;
+     |        |      |
+  19 | SCB0/1 |  mad |  47:  MADr r6.xw, r4.x--y, r6.z--z, const.x--y;
+     |        |      |
+  20 |   SCT0 |  mov |  49:  TEXr r3.x, r4.zwzz, TEX2;
+     |    TEX |  tex |  49:  TEXr r3.x, r4.zwzz, TEX2;
+     |   SCB1 |  add |  50:  ADDr h5.w,-r3.---x, r6.---y;
+     |        |      |
+  21 |   SCT0 |  mov |  51:  TEXr r6.x, r6.xwyy, TEX2;
+     |    TEX |  tex |  51:  TEXr r6.x, r6.xwyy, TEX2;
+     |   SCB1 |  mad |  52:  MADr r4.zw, r4.--xy, r6.--zz, const.--xy;
+     |        |      |
+  22 |   SCT0 |  mov |  54:  TEXr r3.x, r4.zwzz, TEX2;
+     |    TEX |  tex |  54:  TEXr r3.x, r4.zwzz, TEX2;
+     |   SCB0 |  add |  55:  ADDr h5.x,-r3, r6.y---;
+     |        |      |
+  23 | SCT0/1 |  mul |  56:  MOVrc0 hc,-h5;
+     |   SCB0 |  mad |  57:  MADr r3.xy, r4, r6.zz--, const.xy--;
+     |        |      |
+  24 | SCT0/1 |  mul |  59:  MOVh h5, const.xxxx;
+     | SCB0/1 |  mul |  61:  MOVh h5(LT0.xyzw), const.xxxx;
+     |        |      |
+  25 |   SCT0 |  mov |  63:  TEXr r3.x, r3, TEX2;
+     |    TEX |  tex |  63:  TEXr r3.x, r3, TEX2;
+     |   SCB0 |  add |  64:  ADDr h6.y,-r3.-x--, r6;
+     |        |      |
+  26 |   SCT0 |  mov |  65:  TEXr r5.x, r5.zwzz, TEX2;
+     |    TEX |  tex |  65:  TEXr r5.x, r5.zwzz, TEX2;
+     |   SCB1 |  mad |  66:  MADr r5.zw, r4.--xy, r6.--zz, const.--xy;
+     |        |      |
+  27 |   SCB1 |  add |  68:  ADDr h6.z,-r5.--x-, r6.--y-;
+     |        |      |
+  28 |   SCT0 |  mov |  69:  TEXr r5.x, r5.zwzz, TEX2;
+     |    TEX |  tex |  69:  TEXr r5.x, r5.zwzz, TEX2;
+     |   SCB1 |  mad |  70:  MADr r5.zw, r4.--xy, r6.--zz, const.--xy;
+     |        |      |
+  29 |   SCB1 |  add |  72:  ADDr h6.w,-r5.---x, r6.---y;
+     |        |      |
+  30 |   SCT0 |  mov |  73:  TEXr r5.x, r5.zwzz, TEX2;
+     |    TEX |  tex |  73:  TEXr r5.x, r5.zwzz, TEX2;
+     |   SCB0 |  add |  74:  ADDr h6.x,-r5, r6.y---;
+     |        |      |
+  31 | SCT0/1 |  mul |  75:  MOVrc0 hc,-h6;
+     |   SCB0 |  mad |  76:  MADr r5.xy, r4, r6.zz--, const.xy--;
+     |        |      |
+  32 | SCT0/1 |  mul |  78:  MOVh h6, const.xxxx;
+     | SCB0/1 |  mul |  80:  MOVh h6(LT0.xyzw), const.xxxx;
+     |        |      |
+  33 |   SCT0 |  mov |  82:  TEXr r5.x, r5, TEX2;
+     |    TEX |  tex |  82:  TEXr r5.x, r5, TEX2;
+     |   SCB0 |  add |  84:  ADDr h10.y,-r5.-x--, r6;
+     |   SCB1 |  add |  83:  ADDr h10.z,-r6.--x-, r6.--y-;
+     |        |      |
+  34 | SCB0/1 |  mad |  85:  MADr r6.xw, r4.x--y, r6.z--z, const.x--x;
+     |        |      |
+  35 |   SCT0 |  mov |  87:  TEXr r6.x, r6.xwyy, TEX2;
+     |    TEX |  tex |  87:  TEXr r6.x, r6.xwyy, TEX2;
+     |   SCB1 |  mad |  88:  MADr r6.zw, r4.--xy, r6.--zz, const.--xx;
+     |        |      |
+  36 |   SCT0 |  mov |  90:  TEXr r4.x, r6.zwzz, TEX2;
+     |    TEX |  tex |  90:  TEXr r4.x, r6.zwzz, TEX2;
+     |   SCB0 |  add |  91:  ADDr h10.x,-r4, r6.y---;
+     |   SCB1 |  add |  92:  ADDr h10.w,-r6.---x, r6.---y;
+     |        |      |
+  37 | SCT0/1 |  mul |  93:  MOVrc0 hc,-h10;
+     |   SCB0 |  mul |  94:  MULr r5.xy, r6.zw--, const.xx--;
+     |        |      |
+  38 | SCT0/1 |  mul |  96:  MOVh h8, const.xxxx;
+     |   SCB0 |  frc |  98:  FRCr h10.xy, r5;
+     |        |      |
+  39 |   SCT1 |  mul |  99:  MULh h10.w, h10.---y, h10.---x;
+     |   SCB0 |  add | 100:  ADDh h12.xy,-h10, const.xx--;
+     |        |      |
+  40 |   SCT0 |  mul | 102:  MULh h10.yz, h10.-yx-, h12.-xy-;
+     | SCB0/1 |  mul | 103:  MOVh h8(LT0.xyzw), const.xxxx;
+     |        |      |
+  41 |   SCT0 |  mul | 105:  MULh h10.x, h12.y---, h12;
+     |   SCB0 |  dp4 | 106:  DP4h h8.x, h8, h10;
+     |   SCB1 |  nop | 106:  DP4h h8.x, h8, h10;
+     |        |      |
+  42 |   SCT0 |  mul | 107:  MULr r5.xy, r5.zw--, const.xx--;
+     |   SCB0 |  frc | 109:  FRCr h10.xy, r5;
+     |        |      |
+  43 |   SCT1 |  mul | 110:  MULh h10.w, h10.---y, h10.---x;
+     |   SCB1 |  add | 111:  ADDh h8.zw,-h10.--xy, const.--xx;
+     |        |      |
+  44 |   SCT0 |  mul | 113:  MULh h10.yz, h10.-yx-, h8.-zw-;
+     |   SCB0 |  mul | 114:  MULh h10.x, h8.w---, h8.z---;
+     |        |      |
+  45 |   SCB0 |  dp4 | 115:  DP4h h8.y, h6, h10;
+     |   SCB1 |  nop | 115:  DP4h h8.y, h6, h10;
+     |        |      |
+  46 |   SCB0 |  mul | 116:  MULr r3.xy, r4.zw--, const.xx--;
+     |        |      |
+  47 |   SCB0 |  frc | 118:  FRCr h6.xy, r3;
+     |        |      |
+  48 |   SCT1 |  mul | 119:  MULh h6.w, h6.---y, h6.---x;
+     |   SCB1 |  add | 120:  ADDh h8.zw,-h6.--xy, const.--xx;
+     |        |      |
+  49 |   SCT0 |  mul | 122:  MULh h6.yz, h6.-yx-, h8.-zw-;
+     |   SCB0 |  mul | 123:  MULh h6.x, h8.w---, h8.z---;
+     |        |      |
+  50 |   SCB0 |  dp4 | 124:  DP4h h8.z, h5, h6;
+     |   SCB1 |  nop | 124:  DP4h h8.z, h5, h6;
+     |        |      |
+  51 |   SCT1 |  mul | 125:  MULr r2.zw, r3, const.--xx;
+     |   SCB0 |  frc | 127:  FRCr h5.xy, r2.zw--;
+     |   SCB1 |  mov | 128:  MOVr r3.z, r0.--w-;
+     |        |      |
+  52 |   SCT1 |  mul | 129:  MULh h5.w, h5.---y, h5.---x;
+     |   SCB0 |  add | 130:  ADDh h6.xy,-h5, const.xx--;
+     |        |      |
+  53 |   SCT0 |  mul | 132:  MULh h5.yz, h5.-yx-, h6.-xy-;
+     |   SCB0 |  mul | 133:  MULh h5.x, h6.y---, h6;
+     |        |      |
+  54 |   SCB0 |  dp4 | 134:  DP4h h8.w, h4, h5;
+     |   SCB1 |  nop | 134:  DP4h h8.w, h4, h5;
+     |        |      |
+  55 |   SCT0 |  div | 135:  TEXh h4.xyz, f[TEX0], TEX1;
+     |    TEX |  tex | 135:  TEXh h4.xyz, f[TEX0], TEX1;
+     |   SCB0 |  dp3 | 136:  DP3h*2 h0.w, h0, h4;
+     |        |      |
+  56 |   SCB0 |  mad | 137:  MADh h0.xyz, h4,-h0.www-, h0;
+     |        |      |
+  57 |   SCB0 |  dp4 | 138:  DP4r r2.z, const, r1;
+     |   SCB1 |  nop | 138:  DP4r r2.z, const, r1;
+     |        |      |
+  58 |   SCB0 |  dp4 | 140:  DP4r r2.w, const, r1;
+     |   SCB1 |  nop | 140:  DP4r r2.w, const, r1;
+     |        |      |
+  59 |   SCT0 |  mov | 142:  TEXh h0.w, r2.zwzz, TEX3;
+     |    TEX |  tex | 142:  TEXh h0.w, r2.zwzz, TEX3;
+     |   SCB0 |  dp4 | 143:  DP4h h4.w, h8, const.xxxx;
+     |   SCB1 |  nop | 143:  DP4h h4.w, h8, const.xxxx;
+     |        |      |
+  60 |   SCB0 |  dp3 | 145:  DP3h r3.x,-const, h4;
+     |   SCB1 |  mul | 147:  MULh h2.w, h0, h4;
+     |        |      |
+  61 |   SCB0 |  dp3 | 148:  DP3h r3.y,-const, h0;
+     |        |      |
+  62 |   SCT0 |  mov | 150:  TEXh h1, r3, TEX4;
+     |    TEX |  tex | 150:  TEXh h1, r3, TEX4;
+     | SCB0/1 |  mul | 151:  MULh h1, h1, const;
+     |        |      |
+  63 |   SCT0 |  div | 153:  TEXh h0, f[TEX0], TEX5;
+     |    TEX |  tex | 153:  TEXh h0, f[TEX0], TEX5;
+     | SCB0/1 |  mad | 154:  MADh h0, h1, h2.wwww, h0;
+
+Pass   SCT  TEX  SCB
+   1:  50% 100% 100%
+   2:   0%   0% 100%
+   3:   0%   0% 100%
+   4:   0%   0% 100%
+   5:  25%   0% 100%
+   6:   0%   0% 100%
+   7:   0%   0%   0%
+   8:   0% 100%  75%
+   9:   0% 100%  50%
+  10:   0%   0%  25%
+  11:   0% 100%  25%
+  12:   0% 100%  25%
+  13: 100%   0%  50%
+  14:   0% 100%  50%
+  15: 100%   0%  25%
+  16: 100%   0%  50%
+  17:   0% 100%  50%
+  18:   0%   0%  25%
+  19:   0%   0%  50%
+  20:   0% 100%  25%
+  21:   0% 100%  50%
+  22:   0% 100%  25%
+  23: 100%   0%  50%
+  24: 100%   0% 100%
+  25:   0% 100%  25%
+  26:   0% 100%  50%
+  27:   0%   0%  25%
+  28:   0% 100%  50%
+  29:   0%   0%  25%
+  30:   0% 100%  25%
+  31: 100%   0%  50%
+  32: 100%   0% 100%
+  33:   0% 100%  50%
+  34:   0%   0%  50%
+  35:   0% 100%  50%
+  36:   0% 100%  50%
+  37: 100%   0%  50%
+  38: 100%   0%  50%
+  39:  25%   0%  50%
+  40:  50%   0% 100%
+  41:  25%   0% 100%
+  42:  50%   0%  50%
+  43:  25%   0%  50%
+  44:  50%   0%  25%
+  45:   0%   0% 100%
+  46:   0%   0%  50%
+  47:   0%   0%  50%
+  48:  25%   0%  50%
+  49:  50%   0%  25%
+  50:   0%   0% 100%
+  51:  50%   0%  75%
+  52:  25%   0%  50%
+  53:  50%   0%  25%
+  54:   0%   0% 100%
+  55:  50% 100%  75%
+  56:   0%   0%  75%
+  57:   0%   0% 100%
+  58:   0%   0% 100%
+  59:   0% 100% 100%
+  60:   0%   0%  75%
+  61:   0%   0%  75%
+  62:   0% 100% 100%
+  63:  50% 100% 100%
+
+MEAN:  23%  33%  60%
+
+Pass   SCT0  SCT1   TEX  SCB0  SCB1
+   1:  100%    0%  100%  100%  100%
+   2:    0%    0%    0%  100%  100%
+   3:    0%    0%    0%  100%  100%
+   4:    0%    0%    0%  100%  100%
+   5:    0%  100%    0%  100%  100%
+   6:    0%    0%    0%  100%  100%
+   7:    0%    0%    0%    0%    0%
+   8:    0%    0%  100%  100%  100%
+   9:    0%    0%  100%    0%  100%
+  10:    0%    0%    0%    0%  100%
+  11:    0%    0%  100%    0%  100%
+  12:    0%    0%  100%  100%    0%
+  13:  100%  100%    0%    0%  100%
+  14:    0%    0%  100%    0%  100%
+  15:  100%  100%    0%  100%    0%
+  16:  100%  100%    0%    0%  100%
+  17:    0%    0%  100%    0%  100%
+  18:    0%    0%    0%    0%  100%
+  19:    0%    0%    0%  100%  100%
+  20:    0%    0%  100%    0%  100%
+  21:    0%    0%  100%    0%  100%
+  22:    0%    0%  100%  100%    0%
+  23:  100%  100%    0%  100%    0%
+  24:  100%  100%    0%  100%  100%
+  25:    0%    0%  100%  100%    0%
+  26:    0%    0%  100%    0%  100%
+  27:    0%    0%    0%    0%  100%
+  28:    0%    0%  100%    0%  100%
+  29:    0%    0%    0%    0%  100%
+  30:    0%    0%  100%  100%    0%
+  31:  100%  100%    0%  100%    0%
+  32:  100%  100%    0%  100%  100%
+  33:    0%    0%  100%  100%  100%
+  34:    0%    0%    0%  100%  100%
+  35:    0%    0%  100%    0%  100%
+  36:    0%    0%  100%  100%  100%
+  37:  100%  100%    0%  100%    0%
+  38:  100%  100%    0%  100%    0%
+  39:    0%  100%    0%  100%    0%
+  40:  100%    0%    0%  100%  100%
+  41:  100%    0%    0%  100%  100%
+  42:  100%    0%    0%  100%    0%
+  43:    0%  100%    0%    0%  100%
+  44:  100%    0%    0%  100%    0%
+  45:    0%    0%    0%  100%  100%
+  46:    0%    0%    0%  100%    0%
+  47:    0%    0%    0%  100%    0%
+  48:    0%  100%    0%    0%  100%
+  49:  100%    0%    0%  100%    0%
+  50:    0%    0%    0%  100%  100%
+  51:    0%  100%    0%  100%  100%
+  52:    0%  100%    0%  100%    0%
+  53:  100%    0%    0%  100%    0%
+  54:    0%    0%    0%  100%  100%
+  55:  100%    0%  100%  100%    0%
+  56:    0%    0%    0%  100%    0%
+  57:    0%    0%    0%  100%  100%
+  58:    0%    0%    0%  100%  100%
+  59:    0%    0%  100%  100%  100%
+  60:    0%    0%    0%  100%    0%
+  61:    0%    0%    0%  100%    0%
+  62:    0%    0%  100%  100%  100%
+  63:  100%    0%  100%  100%  100%
+
+MEAN:   28%   23%   33%   71%   65%
+Cycles: 78.75 :: R Regs Used: 7 :: R Regs Max Index (0 based): 6
+--------------------------------------------------------------------------------
+Running performance on file test\p2b_accum_sun_near.ps
+-------------------- NV40 --------------------
+Target: GeForce 6800 Ultra (NV40) :: Unified Compiler: v81.95
+Cycles: 56.25 :: R Regs Used: 5 :: R Regs Max Index (0 based): 4
+Pixel throughput (assuming 1 cycle texture lookup) 114.29 MP/s
+--------------------------------------------------------------------------------
+Running performance on file test\p2b_accum_sun_near.ps
+-------------------- G70 --------------------
+Target: GeForce 7800 GT (G70) :: Unified Compiler: v81.95
+Cycles: 50.00 :: R Regs Used: 4 :: R Regs Max Index (0 based): 3
+Pixel throughput (assuming 1 cycle texture lookup) 192.00 MP/s

@@ -215,17 +215,4 @@
 													//   0.0833 - upper limit (default, the start of visible unfiltered edges)
 													//   0.0625 - high quality (faster)
 													//   0.0312 - visible limit (slower)
-													
-// Screen space sunshafts
-struct	v_ssss
-{
-	float4 P : POSITIONT;
-	float2 tc0	: TEXCOORD0;
-};
-
-struct	v2p_ssss
-{
-	float2 tc0 : TEXCOORD0;
-	float4 HPos : SV_Position;	// Clip-space position 	(for rasterization)
-};
 #endif

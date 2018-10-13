@@ -1,0 +1,14 @@
+#include "common.h"
+#include "iostructs\p_TL.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 _main ( p_TL I ) // SV_Target
+{
+	return tex2D( s_base, I.Tex0 )*I.Color;
+
+//	float4 res = tex2D( s_base, I.Tex0 )*I.Color;
+//	clip(res-m_AlphaRef);
+//	clip(res-0.5);
+//	return res;
+}

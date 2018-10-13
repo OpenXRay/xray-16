@@ -1,0 +1,21 @@
+#include "common.h"
+#include "iostructs\p_shadow_aref.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 _main ( p_shadow_direct_aref I )
+{
+#ifdef 	USE_HWSMAP
+//	return 	tex2D		(s_base, I.tc0);
+	float4 	C 	= tex2D		(s_base, I.tc0);
+	clip	(C.w - def_aref);
+	return  C;
+#else
+	// 1. Base texture + kill pixels with low alpha
+	float4 	C 	= tex2D		(s_base, I.tc0);
+	clip		(C.w - def_aref);
+
+	// 2.
+	return I.depth;
+#endif
+}

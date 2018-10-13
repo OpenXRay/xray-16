@@ -1,0 +1,30 @@
+#include "common.h"
+
+#ifndef ISAMPLE
+#define ISAMPLE 0
+#endif
+
+in int gl_SampleID;
+out vec4 SV_Target;
+
+layout(location = TEXCOORD0) in float4 tc;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+void main ()
+{
+	//return	tex2Dproj	(s_base,tc);
+
+#ifndef USE_MSAA
+	SV_Target	=	tex2Dproj	( s_generic, tc );
+#else
+	//	Perform texture coordinates projection.
+    float4 w_tc = tc;
+	w_tc.xy /= w_tc.w;
+#ifdef MSAA_OPTIMIZATION
+	SV_Target	=	texelFetch	( s_generic, int2( w_tc.xy * pos_decompression_params2.xy ), gl_SampleID );
+#else
+	SV_Target	=	texelFetch	( s_generic, int2( w_tc.xy * pos_decompression_params2.xy ), ISAMPLE );
+#endif
+#endif
+}

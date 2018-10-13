@@ -1,0 +1,25 @@
+-- normal color mapped pp
+function normal        (shader, t_base, t_second, t_detail)
+	shader:begin	("null","postprocess")
+			: fog	(false)
+			: zb 	(false,false)
+--	shader:sampler	("s_base0")		:texture(t_rt)		: clamp() : f_linear ()
+--	shader:sampler	("s_base1")		:texture(t_rt)		: clamp() : f_linear ()
+	shader:sampler	("s_base0")		:texture("$user$rendertarget_color_map")		: clamp() : f_linear ()
+	shader:sampler	("s_base1")    	:texture("$user$rendertarget_color_map")		: clamp() : f_linear ()
+	shader:sampler	("s_noise")		:texture(t_noise)	: f_linear ()
+end
+
+function l_special        (shader, t_base, t_second, t_detail)
+	shader:begin	("null","postprocess_cm_pre")
+			: fog	(false)
+			: zb 	(false,false)
+	shader:sampler	("s_distort")  	:texture(t_distort)	: clamp() : f_linear ()
+	shader:sampler	("s_base0")		:texture(t_rt)		: clamp() : f_linear ()
+	shader:sampler	("s_base1")    	:texture(t_rt)		: clamp() : f_linear ()
+	shader:sampler	("s_noise")    	:texture(t_noise)	: f_linear ()
+--	shader:sampler	("s_grad0")    	:texture("grad\\grad_red_yellow")	: clamp() : f_linear ()
+--	shader:sampler	("s_grad1")    	:texture("grad\\grad_test1")	: clamp() : f_linear ()
+	shader:sampler	("s_grad0")    	:texture("$user$cmap0")	: clamp() : f_linear ()
+	shader:sampler	("s_grad1")    	:texture("$user$cmap1")	: clamp() : f_linear ()
+end

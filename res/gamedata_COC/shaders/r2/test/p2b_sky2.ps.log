@@ -1,0 +1,58 @@
+--------------------------------------------------------------------------------
+Running performance on file test\p2B_sky2.ps
+-------------------- NV40 --------------------
+Target: GeForce 6800 Ultra (NV40) :: Unified Compiler: v65.04
+IPU0 ------ Simplified schedule: --------
+
+Pass |  Unit  |  uOp |  PC:  Op
+-----+--------+------+-------------------------
+   1 |   SCT0 |  div |   0:  TEXh h0.xyz, f[TEX0], TEX0;
+     |    TEX |  tex |   0:  TEXh h0.xyz, f[TEX0], TEX0;
+     |   SCB1 |  mov |   1:  MOVr r1.w, const.---x;
+     |        |      |
+   2 |   SCT1 |  div |   3:  MOVh h1, f[COL0];
+     |    SRB |  col |   5:  MOVr h0.w, const.---x;
+     |   SCB0 |  mad |   4:  MADh h2.xyz,-h1.www-, h0, h0;
+     |   SCB1 |  mul |   5:  MOVr h0.w, const.---x;
+     |        |      |
+   3 |   SCT0 |  div |   7:  TEXh h0.xyz, f[TEX1], TEX1;
+     |    TEX |  tex |   7:  TEXh h0.xyz, f[TEX1], TEX1;
+     |   SCB0 |  mad |   8:  MADh h0.xyz, h1.www-, h0, h2;
+     |        |      |
+   4 |   SCT0 |  mov |   9:  TEXh h2.x, r1.wwww, TEX2;
+     |    TEX |  tex |   9:  TEXh h2.x, r1.wwww, TEX2;
+     |   SCB0 |  mul |  10:  MULh*2 h0.xyz, h0, h1;
+     |        |      |
+   5 |   SCT0 |  mul |  11:  MULh h0.xyz, h0, h2.xxx-;
+     | SCB0/1 |  mul |  12:  MULr h4, h0, const.xxxy;
+
+Pass   SCT  TEX  SCB
+   1:  50% 100%  25%
+   2:   0%   0% 100%
+   3:  50% 100%  75%
+   4:   0% 100%  75%
+   5:  75%   0% 100%
+
+MEAN:  35%  60%  75%
+
+Pass   SCT0  SCT1   TEX  SCB0  SCB1
+   1:  100%    0%  100%    0%  100%
+   2:    0%    0%    0%  100%  100%
+   3:  100%    0%  100%  100%    0%
+   4:    0%    0%  100%  100%    0%
+   5:  100%    0%    0%  100%  100%
+
+MEAN:   60%    0%   60%   80%   60%
+Cycles: 5.00 :: R Regs Used: 3 :: R Regs Max Index (0 based): 2
+--------------------------------------------------------------------------------
+Running performance on file test\p2b_sky2.ps
+-------------------- NV40 --------------------
+Target: GeForce 6800 Ultra (NV40) :: Unified Compiler: v81.95
+Cycles: 5.00 :: R Regs Used: 3 :: R Regs Max Index (0 based): 2
+Pixel throughput (assuming 1 cycle texture lookup) 1.28 GP/s
+--------------------------------------------------------------------------------
+Running performance on file test\p2b_sky2.ps
+-------------------- G70 --------------------
+Target: GeForce 7800 GT (G70) :: Unified Compiler: v81.95
+Cycles: 5.00 :: R Regs Used: 3 :: R Regs Max Index (0 based): 2
+Pixel throughput (assuming 1 cycle texture lookup) 1.92 GP/s
