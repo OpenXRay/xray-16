@@ -34,5 +34,5 @@ extern XRCORE_API void thread_spawn(thread_t* entry, const char* name, unsigned 
 
 #if defined(LINUX)
 void QueryPerformanceCounter(PLARGE_INTEGER result);
-DWORD timeGetTime();
+XRCORE_API DWORD timeGetTime();
 #endif
