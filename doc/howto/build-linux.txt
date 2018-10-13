@@ -28,9 +28,8 @@ Build commands:
 ------
 ```
 cd xray-16
-git submodule update --init --recursive
-mkdir build
-cd build
+mkdir bin
+cd bin
 cmake ..
 make -jX # where X is the number of cores in your system
 ```
