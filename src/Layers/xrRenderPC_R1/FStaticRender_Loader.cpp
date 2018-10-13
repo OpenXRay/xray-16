@@ -46,10 +46,8 @@ void CRender::level_Load(IReader* fs)
     }
 
     // Components
-
     L_Shadows = new CLightShadows();
     L_Projector = new CLightProjector();
-    L_DB = new CLight_DB();
     L_Glows = new CGlowManager();
     Wallmarks = new CWallmarksEngine();
     Details = new CDetailManager();
@@ -64,10 +62,22 @@ void CRender::level_Load(IReader* fs)
         // VB,IB,SWI
         g_pGamePersistent->SetLoadStageTitle("st_loading_geometry");
         g_pGamePersistent->LoadTitle();
-        CStreamReader* geom = FS.rs_open("$level$", "level.geom");
-        LoadBuffers(geom);
-        LoadSWIs(geom);
-        FS.r_close(geom);
+        {
+            CStreamReader* geom = FS.rs_open("$level$", "level.geom");
+            R_ASSERT2(geom, "level.geom");
+            LoadBuffers(geom, false);
+            LoadSWIs(geom);
+            FS.r_close(geom);
+        }
+
+        //...and alternate/fast geometry
+        if (ps_r1_force_geomx)
+        {
+            CStreamReader* geom = FS.rs_open("$level$", "level.geomx");
+            R_ASSERT2(geom, "level.geomX");
+            LoadBuffers(geom, true);
+            FS.r_close(geom);
+        }
 
         // Visuals
         g_pGamePersistent->SetLoadStageTitle("st_loading_spatial_db");
@@ -133,7 +143,7 @@ void CRender::level_Unload()
 
     //*** Lights
     L_Glows->Unload();
-    L_DB->Unload();
+    Lights.Unload();
 
     //*** Visuals
     for (I = 0; I < Visuals.size(); I++)
@@ -149,19 +159,41 @@ void CRender::level_Unload()
     SWIs.clear();
 
     //*** VB/IB
-    for (I = 0; I < VB.size(); I++)
-        _RELEASE(VB[I]);
-    for (I = 0; I < IB.size(); I++)
-        _RELEASE(IB[I]);
-    DCL.clear();
-    VB.clear();
-    IB.clear();
+    for (I = 0; I < nVB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_vb(nVB[I]);
+        _RELEASE(nVB[I]);
+    }
+
+    for (I = 0; I < xVB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_vb(xVB[I]);
+        _RELEASE(xVB[I]);
+    }
+    nVB.clear();
+    xVB.clear();
+
+    for (I = 0; I < nIB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_ib(nIB[I]);
+        _RELEASE(nIB[I]);
+    }
+
+    for (I = 0; I < xIB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_ib(xIB[I]);
+        _RELEASE(xIB[I]);
+    }
+
+    nIB.clear();
+    xIB.clear();
+    nDC.clear();
+    xDC.clear();
 
     //*** Components
     xr_delete(Details);
     xr_delete(Wallmarks);
     xr_delete(L_Glows);
-    xr_delete(L_DB);
     xr_delete(L_Projector);
     xr_delete(L_Shadows);
 
@@ -175,10 +207,14 @@ void CRender::level_Unload()
     b_loaded = FALSE;
 }
 
-void CRender::LoadBuffers(CStreamReader* base_fs)
+void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 {
     Resources->Evict();
     u32 dwUsage = D3DUSAGE_WRITEONLY | (HW.Caps.geometry.bSoftware ? D3DUSAGE_SOFTWAREPROCESSING : 0);
+
+    xr_vector<VertexDeclarator>& _DC  = alternative ? xDC : nDC;
+    xr_vector<ID3DVertexBuffer*>& _VB = alternative ? xVB : nVB;
+    xr_vector<ID3DIndexBuffer*>& _IB  = alternative ? xIB : nIB;
 
     // Vertex buffers
     if (base_fs->find_chunk(fsL_VB))
@@ -186,8 +222,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs)
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
         u32 count = fs->r_u32();
-        DCL.resize(count);
-        VB.resize(count);
+        _DC.resize(count);
+        _VB.resize(count);
 
         u32 buffer_size = (MAXD3DDECLLENGTH + 1) * sizeof(D3DVERTEXELEMENT9);
         D3DVERTEXELEMENT9* dcl = (D3DVERTEXELEMENT9*)_alloca(buffer_size);
@@ -203,9 +239,9 @@ void CRender::LoadBuffers(CStreamReader* base_fs)
 
             u32 dcl_len = D3DXGetDeclLength(dcl) + 1;
 
-            DCL[i].resize(dcl_len);
-            fs->r(DCL[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
-            //.????????? remove T&B from DCL[]
+            _DC[i].resize(dcl_len);
+            fs->r(_DC[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
+            //.????????? remove T&B from _DC[]
 
             // count, size
             u32 vCount = fs->r_u32();
@@ -214,12 +250,12 @@ void CRender::LoadBuffers(CStreamReader* base_fs)
 
             // Create and fill
             BYTE* pData = nullptr;
-            R_CHK(HW.pDevice->CreateVertexBuffer(vCount * vSize, dwUsage, 0, D3DPOOL_MANAGED, &VB[i], nullptr));
-            HW.stats_manager.increment_stats(vCount * vSize, enum_stats_buffer_type_vertex, D3DPOOL_MANAGED);
-            R_CHK(VB[i]->Lock(0, 0, (void**)&pData, 0));
+            R_CHK(HW.pDevice->CreateVertexBuffer(vCount * vSize, dwUsage, 0, D3DPOOL_MANAGED, &_VB[i], nullptr));
+            HW.stats_manager.increment_stats_vb(_VB[i]);
+            R_CHK(_VB[i]->Lock(0, 0, (void**)&pData, 0));
             fs->r(pData, vCount * vSize);
             //			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
-            VB[i]->Unlock();
+            _VB[i]->Unlock();
 
             //			fs->advance			(vCount*vSize);
         }
@@ -235,7 +271,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs)
     {
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
-        IB.resize(count);
+        _IB.resize(count);
         for (u32 i = 0; i < count; i++)
         {
             u32 iCount = fs->r_u32();
@@ -243,12 +279,12 @@ void CRender::LoadBuffers(CStreamReader* base_fs)
 
             // Create and fill
             BYTE* pData = nullptr;
-            R_CHK(HW.pDevice->CreateIndexBuffer(iCount * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &IB[i], nullptr));
-            HW.stats_manager.increment_stats(iCount * 2, enum_stats_buffer_type_index, D3DPOOL_MANAGED);
-            R_CHK(IB[i]->Lock(0, 0, (void**)&pData, 0));
+            R_CHK(HW.pDevice->CreateIndexBuffer(iCount * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &_IB[i], nullptr));
+            HW.stats_manager.increment_stats_ib(_IB[i]);
+            R_CHK(_IB[i]->Lock(0, 0, (void**)&pData, 0));
             //			CopyMemory			(pData,fs->pointer(),iCount*2);
             fs->r(pData, iCount * 2);
-            IB[i]->Unlock();
+            _IB[i]->Unlock();
 
             //			fs->advance			(iCount*2);
         }
@@ -278,7 +314,7 @@ void CRender::LoadVisuals(IReader* fs)
 void CRender::LoadLights(IReader* fs)
 {
     // lights
-    L_DB->Load(fs);
+    Lights.Load(fs);
 
     // glows
     IReader* chunk = fs->open_chunk(fsL_GLOWS);

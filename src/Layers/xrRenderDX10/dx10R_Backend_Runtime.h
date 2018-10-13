@@ -180,7 +180,7 @@ ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
         vb_stride = _vb_stride;
         // CHK_DX           (HW.pDevice->SetStreamSource(0,vb,0,vb_stride));
         // UINT StreamNumber,
-        // IDirect3DVertexBuffer9 * pStreamData,
+        // ID3DVertexBuffer * pStreamData,
         // UINT OffsetInBytes,
         // UINT Stride
 

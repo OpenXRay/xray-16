@@ -52,7 +52,6 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
 //////////////////////////////////////////////////////////////////////////
 void CRender::create()
 {
-    L_DB = nullptr;
     L_Shadows = nullptr;
     L_Projector = nullptr;
 
@@ -251,20 +250,44 @@ IRenderVisual* CRender::getVisual(int id)
     VERIFY(id < int(Visuals.size()));
     return Visuals[id];
 }
-D3DVERTEXELEMENT9* CRender::getVB_Format(int id)
+D3DVERTEXELEMENT9* CRender::getVB_Format(int id, bool alternative)
 {
-    VERIFY(id < int(DCL.size()));
-    return DCL[id].begin();
+    if (alternative)
+    {
+        VERIFY(id < int(xDC.size()));
+        return xDC[id].begin();
+    }
+    else
+    {
+        VERIFY(id < int(nDC.size()));
+        return nDC[id].begin();
+    }
 }
-IDirect3DVertexBuffer9* CRender::getVB(int id)
+ID3DVertexBuffer* CRender::getVB(int id, bool alternative)
 {
-    VERIFY(id < int(VB.size()));
-    return VB[id];
+    if (alternative)
+    {
+        VERIFY(id < int(xVB.size()));
+        return xVB[id];
+    }
+    else
+    {
+        VERIFY(id < int(nVB.size()));
+        return nVB[id];
+    }
 }
-IDirect3DIndexBuffer9* CRender::getIB(int id)
+ID3DIndexBuffer* CRender::getIB(int id, bool alternative)
 {
-    VERIFY(id < int(IB.size()));
-    return IB[id];
+    if (alternative)
+    {
+        VERIFY(id < int(xIB.size()));
+        return xIB[id];
+    }
+    else
+    {
+        VERIFY(id < int(nIB.size()));
+        return nIB[id];
+    }
 }
 FSlideWindowItem* CRender::getSWI(int id)
 {
@@ -272,7 +295,7 @@ FSlideWindowItem* CRender::getSWI(int id)
     return &SWIs[id];
 }
 IRender_Target* CRender::getTarget() { return Target; }
-IRender_Light* CRender::light_create() { return L_DB->Create(); }
+IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return new CGlow(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
 BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
@@ -476,9 +499,9 @@ void CRender::Calculate()
             pPortal->bDualRender = TRUE;
         }
     }
+    
     //
-    if (L_DB)
-        L_DB->Update();
+    Lights.Update();
 
     // Main process
     marker++;
@@ -609,7 +632,7 @@ void CRender::Calculate()
                         {
                             vis_data& vis = L->get_homdata();
                             if (HOM.visible(vis))
-                                L_DB->add_light(L);
+                                Lights.add_light(L);
                         }
                     }
                 }

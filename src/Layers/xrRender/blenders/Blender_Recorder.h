@@ -118,26 +118,21 @@ public:
     void Stage_Constant(LPCSTR name);
     void StageEnd();
 
-// R1/R2-compiler	[programmable]
-#if defined(USE_DX10) || defined(USE_DX11)
-    void i_dx10Address(u32 s, u32 address);
-    void i_dx10Filter_Min(u32 s, u32 f);
-    void i_dx10Filter_Mip(u32 s, u32 f);
-    void i_dx10Filter_Mag(u32 s, u32 f);
-    void i_dx10FilterAnizo(u32 s, BOOL value);
-    void i_dx10Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
-    void i_dx10BorderColor(u32 s, u32 color);
-#else //	USE_DX10
+    // R1/R2-compiler	[programmable]
+#if defined(USE_DX9) || defined(USE_OGL)
     u32 i_Sampler(LPCSTR name);
     void i_Texture(u32 s, LPCSTR name);
     void i_Projective(u32 s, bool b);
+#endif
     void i_Address(u32 s, u32 address);
     void i_Filter_Min(u32 s, u32 f);
     void i_Filter_Mip(u32 s, u32 f);
     void i_Filter_Mag(u32 s, u32 f);
+#if defined(USE_DX10) || defined(USE_DX11)
+    void i_dx10FilterAnizo(u32 s, BOOL value);
+#endif
     void i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
     void i_BorderColor(u32 s, u32 color);
-#endif //	USE_DX10
 
     // R1/R2-compiler	[programmable]		- templates
     void r_Pass(LPCSTR vs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE, BOOL bABlend = FALSE,

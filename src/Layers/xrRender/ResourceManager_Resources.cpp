@@ -286,7 +286,7 @@ void CResourceManager::DBG_VerifyGeoms()
     */
 }
 
-SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, IDirect3DVertexBuffer9* vb, IDirect3DIndexBuffer9* ib)
+SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
 {
     R_ASSERT(decl && vb);
 
@@ -310,7 +310,7 @@ SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, IDirect3DVertex
     v_geoms.push_back(Geom);
     return Geom;
 }
-SGeometry* CResourceManager::CreateGeom(u32 FVF, IDirect3DVertexBuffer9* vb, IDirect3DIndexBuffer9* ib)
+SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
 {
     D3DVERTEXELEMENT9 dcl[MAX_FVF_DECL_SIZE];
     CHK_DX(D3DXDeclaratorFromFVF(FVF, dcl));

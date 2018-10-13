@@ -145,9 +145,9 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     //  TODO: DX10: implement dynamic format selection
     constexpr DXGI_FORMAT formats[] =
     {
-        //DXGI_FORMAT_R16G16B16A16_FLOAT,
-        //DXGI_FORMAT_R10G10B10A2_UNORM,
-        //DXGI_FORMAT_B8G8R8X8_UNORM,
+        //DXGI_FORMAT_R16G16B16A16_FLOAT, // Do we even need this?
+        //DXGI_FORMAT_R10G10B10A2_UNORM, // D3DX11SaveTextureToMemory fails on this format
+        DXGI_FORMAT_B8G8R8X8_UNORM,
         DXGI_FORMAT_R8G8B8A8_UNORM,
     };
 
@@ -260,11 +260,16 @@ void CHW::Reset()
     UpdateViews();
 }
 
-bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const D3D_FORMAT_SUPPORT feature) const
+bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const UINT feature) const
 {
-    UINT feature_bit = feature;
-    if (SUCCEEDED(pDevice->CheckFormatSupport(format, &feature_bit)))
-        return true;
+    UINT supports;
+
+    if (SUCCEEDED(pDevice->CheckFormatSupport(format, &supports)))
+    {
+        if (supports & feature)
+            return true;
+    }
+
     return false;
 }
 
@@ -314,13 +319,12 @@ void CHW::UpdateViews()
     descDepth.ArraySize = 1;
 
     // Select depth-stencil format
-    // TODO: DX10: test and support other formats
     constexpr DXGI_FORMAT formats[] =
     {
-        //DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
+        DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
         DXGI_FORMAT_D24_UNORM_S8_UINT,
-        //DXGI_FORMAT_D32_FLOAT,
-        //DXGI_FORMAT_D16_UNORM
+        DXGI_FORMAT_D32_FLOAT,
+        DXGI_FORMAT_D16_UNORM
     };
     descDepth.Format = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats, std::size(formats));
     Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(descDepth.Format);

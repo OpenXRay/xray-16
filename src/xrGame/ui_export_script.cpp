@@ -13,10 +13,17 @@ using namespace luabind;
 
 CMainMenu* MainMenu();
 
-SCRIPT_EXPORT(UIRegistrator, (), {
-    module(luaState)[class_<CGameFont>("CGameFont")
-                         .enum_("EAligment")[value("alLeft", int(CGameFont::alLeft)),
-                             value("alRight", int(CGameFont::alRight)), value("alCenter", int(CGameFont::alCenter))],
+ICF static void UIRegistratorScriptExport(lua_State* luaState)
+{
+    module(luaState)
+    [
+        class_<CGameFont>("CGameFont")
+            .enum_("EAligment")
+            [
+                value("alLeft", int(CGameFont::alLeft)),
+                value("alRight", int(CGameFont::alRight)),
+                value("alCenter", int(CGameFont::alCenter))
+            ],
 
         class_<Patch_Dawnload_Progress>("Patch_Dawnload_Progress")
             .def("GetInProgress", &Patch_Dawnload_Progress::GetInProgress)
@@ -37,6 +44,10 @@ SCRIPT_EXPORT(UIRegistrator, (), {
             .def("GetAccountMngr", &CMainMenu::GetAccountMngr)
             .def("GetProfileStore", &CMainMenu::GetProfileStore)
 #endif
-                  ];
-    module(luaState, "main_menu")[def("get_main_menu", &MainMenu)];
-});
+    ];
+    module(luaState, "main_menu")
+    [
+        def("get_main_menu", &MainMenu)
+    ];
+}
+SCRIPT_EXPORT_FUNC(UIRegistrator, (), UIRegistratorScriptExport)

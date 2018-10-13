@@ -52,49 +52,10 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
     passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
 }
 
-void CBlender_Compile::i_dx10Address(u32 s, u32 address)
-{
-    // VERIFY(s!=u32(-1));
-    if (s == u32(-1))
-    {
-        Msg("s != u32(-1)");
-    }
-    RS.SetSAMP(s, D3DSAMP_ADDRESSU, address);
-    RS.SetSAMP(s, D3DSAMP_ADDRESSV, address);
-    RS.SetSAMP(s, D3DSAMP_ADDRESSW, address);
-}
-
-void CBlender_Compile::i_dx10BorderColor(u32 s, u32 color) { RS.SetSAMP(s, D3DSAMP_BORDERCOLOR, color); }
-void CBlender_Compile::i_dx10Filter_Min(u32 s, u32 f)
-{
-    VERIFY(s != u32(-1));
-    RS.SetSAMP(s, D3DSAMP_MINFILTER, f);
-}
-
-void CBlender_Compile::i_dx10Filter_Mip(u32 s, u32 f)
-{
-    VERIFY(s != u32(-1));
-    RS.SetSAMP(s, D3DSAMP_MIPFILTER, f);
-}
-
-void CBlender_Compile::i_dx10Filter_Mag(u32 s, u32 f)
-{
-    VERIFY(s != u32(-1));
-    RS.SetSAMP(s, D3DSAMP_MAGFILTER, f);
-}
-
 void CBlender_Compile::i_dx10FilterAnizo(u32 s, BOOL value)
 {
     VERIFY(s != u32(-1));
     RS.SetSAMP(s, XRDX10SAMP_ANISOTROPICFILTER, value);
-}
-
-void CBlender_Compile::i_dx10Filter(u32 s, u32 _min, u32 _mip, u32 _mag)
-{
-    VERIFY(s != u32(-1));
-    i_dx10Filter_Min(s, _min);
-    i_dx10Filter_Mip(s, _mip);
-    i_dx10Filter_Mag(s, _mag);
 }
 
 u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
@@ -121,52 +82,52 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_POINT,			D3DTEXF_NONE,	D3DTEXF_POINT
     if (0 == xr_strcmp(ResourceName, "smp_nofilter"))
     {
-        i_dx10Address(stage, D3DTADDRESS_CLAMP);
-        i_dx10Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+        i_Address(stage, D3DTADDRESS_CLAMP);
+        i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
     }
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
     if (0 == xr_strcmp(ResourceName, "smp_rtlinear"))
     {
-        i_dx10Address(stage, D3DTADDRESS_CLAMP);
-        i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        i_Address(stage, D3DTADDRESS_CLAMP);
+        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
     }
 
     //	Use	D3DTADDRESS_WRAP,	D3DTEXF_LINEAR,			D3DTEXF_LINEAR,	D3DTEXF_LINEAR
     if (0 == xr_strcmp(ResourceName, "smp_linear"))
     {
-        i_dx10Address(stage, D3DTADDRESS_WRAP);
-        i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        i_Address(stage, D3DTADDRESS_WRAP);
+        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
     //	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
     if (0 == xr_strcmp(ResourceName, "smp_base"))
     {
-        i_dx10Address(stage, D3DTADDRESS_WRAP);
+        i_Address(stage, D3DTADDRESS_WRAP);
         i_dx10FilterAnizo(stage, TRUE);
-        // i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        // i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
     if (0 == xr_strcmp(ResourceName, "smp_material"))
     {
-        i_dx10Address(stage, D3DTADDRESS_CLAMP);
-        i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        i_Address(stage, D3DTADDRESS_CLAMP);
+        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
     }
 
     if (0 == xr_strcmp(ResourceName, "smp_smap"))
     {
-        i_dx10Address(stage, D3DTADDRESS_CLAMP);
-        i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        i_Address(stage, D3DTADDRESS_CLAMP);
+        i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFILTER, TRUE);
         RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 
     if (0 == xr_strcmp(ResourceName, "smp_jitter"))
     {
-        i_dx10Address(stage, D3DTADDRESS_WRAP);
-        i_dx10Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+        i_Address(stage, D3DTADDRESS_WRAP);
+        i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
     }
 
     return stage;

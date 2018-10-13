@@ -627,9 +627,9 @@ IRenderVisual* CRender::getVisual(int id)
     VERIFY(id < int(Visuals.size()));
     return Visuals[id];
 }
-D3DVERTEXELEMENT9* CRender::getVB_Format(int id, BOOL _alt)
+D3DVERTEXELEMENT9* CRender::getVB_Format(int id, bool alternative)
 {
-    if (_alt)
+    if (alternative)
     {
         VERIFY(id < int(xDC.size()));
         return xDC[id].begin();
@@ -640,9 +640,9 @@ D3DVERTEXELEMENT9* CRender::getVB_Format(int id, BOOL _alt)
         return nDC[id].begin();
     }
 }
-ID3DVertexBuffer* CRender::getVB(int id, BOOL _alt)
+ID3DVertexBuffer* CRender::getVB(int id, bool alternative)
 {
-    if (_alt)
+    if (alternative)
     {
         VERIFY(id < int(xVB.size()));
         return xVB[id];
@@ -653,9 +653,9 @@ ID3DVertexBuffer* CRender::getVB(int id, BOOL _alt)
         return nVB[id];
     }
 }
-ID3DIndexBuffer* CRender::getIB(int id, BOOL _alt)
+ID3DIndexBuffer* CRender::getIB(int id, bool alternative)
 {
-    if (_alt)
+    if (alternative)
     {
         VERIFY(id < int(xIB.size()));
         return xIB[id];

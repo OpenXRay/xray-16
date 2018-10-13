@@ -36,15 +36,9 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     R_ASSERT(HW.pDevice && Name && Name[0] && w && h);
     _order = CPU::GetCLK(); // Device.GetTimerGlobal()->GetElapsed_clk();
 
-    // HRESULT		_hr;
-
     dwWidth = w;
     dwHeight = h;
     fmt = f;
-
-    // Get caps
-    // D3DCAPS9	caps;
-    // R_CHK		(HW.pDevice->GetDeviceCaps(&caps));
 
     //	DirectX 10 supports non-power of two textures
     // Pow2
@@ -63,15 +57,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     u32 usage = 0;
     if (D3DFMT_D24X8 == fmt)
         usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D24S8 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
     else if (D3DFMT_D15S1 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D16 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D16_LOCKABLE == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D32F_LOCKABLE == fmt)
         usage = D3DUSAGE_DEPTHSTENCIL;
     else if ((D3DFORMAT)MAKEFOURCC('D', 'F', '2', '4') == fmt)
         usage = D3DUSAGE_DEPTHSTENCIL;
@@ -80,39 +66,49 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 
     DXGI_FORMAT dx10FMT;
 
-    if (fmt != D3DFMT_D24S8)
-        dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
-    else
+    switch (fmt)
     {
+    case D3DFMT_D32S8X24:
+        dx10FMT = DXGI_FORMAT_R32G8X24_TYPELESS;
+        usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    case D3DFMT_D24S8:
         dx10FMT = DXGI_FORMAT_R24G8_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    case D3DFMT_D32F_LOCKABLE:
+        dx10FMT = DXGI_FORMAT_R32_TYPELESS;
+        usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    case D3DFMT_D16_LOCKABLE:
+        dx10FMT = DXGI_FORMAT_R16_TYPELESS;
+        usage = D3DUSAGE_DEPTHSTENCIL;
+        break;
+
+    default:
+        dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
+        break;
     }
 
-    bool bUseAsDepth = (usage == D3DUSAGE_RENDERTARGET) ? false : true;
+    const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
 
     // Validate render-target usage
-    //_hr = HW.pD3D->CheckDeviceFormat(
-    // HW.DevAdapter,
-    // HW.m_DriverType,
-    // HW.Caps.fTarget,
-    // usage,
-    // D3DRTYPE_TEXTURE,
-    // f
-    //);
-    //	TODO: DX10: implement format support check
-    // UINT	FormatSupport;
-    //_hr = HW.pDevice->CheckFormatSupport( dx10FMT, &FormatSupport);
-    // if (FAILED(_hr)) return;
-    // if (!(
-    //(FormatSupport&D3Dxx_FORMAT_SUPPORT_TEXTURE2D)
-    //&&	(FormatSupport&(bUseAsDepth?D3Dxx_FORMAT_SUPPORT_DEPTH_STENCIL:D3Dxx_FORMAT_SUPPORT_RENDER_TARGET))
-    //))
-    // return;
+    UINT required = D3D_FORMAT_SUPPORT_TEXTURE2D;
+
+    if (useAsDepth)
+        required |= D3D_FORMAT_SUPPORT_DEPTH_STENCIL;
+    else
+        required |= D3D_FORMAT_SUPPORT_RENDER_TARGET;
+
+    if (!HW.CheckFormatSupport(dx10FMT, required))
+        return;
 
     // Try to create texture/surface
     RImplementation.Resources->Evict();
-    //_hr = HW.pDevice->CreateTexture		(w, h, 1, usage, f, D3DPOOL_DEFAULT, &pSurface,NULL);
-    // if (FAILED(_hr) || (0==pSurface))	return;
+
     // Create the render target texture
     D3D_TEXTURE2D_DESC desc;
     ZeroMemory(&desc, sizeof(desc));
@@ -124,10 +120,10 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     desc.SampleDesc.Count = SampleCount;
     desc.Usage = D3D_USAGE_DEFAULT;
     if (SampleCount <= 1)
-        desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (bUseAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
+        desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
     else
     {
-        desc.BindFlags = (bUseAsDepth ? D3D_BIND_DEPTH_STENCIL : (D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET));
+        desc.BindFlags = (useAsDepth ? D3D_BIND_DEPTH_STENCIL : (D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET));
         if (RImplementation.o.dx10_msaa_opt)
         {
             desc.SampleDesc.Quality = UINT(D3D_STANDARD_MULTISAMPLE_PATTERN);
@@ -135,18 +131,18 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     }
 
 #ifdef USE_DX11
-    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !bUseAsDepth && SampleCount == 1 && useUAV)
+    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1 && useUAV)
         desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 #endif
 
     CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));
     HW.stats_manager.increment_stats_rtarget(pSurface);
-// OK
+    // OK
 #ifdef DEBUG
     Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, dx10FMT, SampleCount);
 #endif // DEBUG
-    // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT));
-    if (bUseAsDepth)
+    // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT)); // TODO: DX10: check if texture is created?
+    if (useAsDepth)
     {
         D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc;
         ZeroMemory(&ViewDesc, sizeof(ViewDesc));
@@ -163,10 +159,24 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
         }
 
         ViewDesc.Texture2D.MipSlice = 0;
+
         switch (desc.Format)
         {
-        case DXGI_FORMAT_R24G8_TYPELESS: ViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
-        case DXGI_FORMAT_R32_TYPELESS: ViewDesc.Format = DXGI_FORMAT_D32_FLOAT; break;
+        case DXGI_FORMAT_R16_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D16_UNORM;
+            break;
+
+        case DXGI_FORMAT_R24G8_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+            break;
+
+        case DXGI_FORMAT_R32_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            break;
+
+        case DXGI_FORMAT_R32G8X24_TYPELESS:
+            ViewDesc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+            break;
         }
 
         CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &pZRT));
@@ -175,7 +185,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
         CHK_DX(HW.pDevice->CreateRenderTargetView(pSurface, 0, &pRT));
 
 #ifdef USE_DX11
-    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !bUseAsDepth && SampleCount == 1 && useUAV)
+    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1 && useUAV)
     {
         D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
         ZeroMemory(&UAVDesc, sizeof(D3D11_UNORDERED_ACCESS_VIEW_DESC));

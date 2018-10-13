@@ -83,7 +83,7 @@ enum EGameActions
 
     kQUICK_SAVE,
     kQUICK_LOAD,
-    //    kALIFE_CMD,
+    //kALIFE_CMD,
 
     kCUSTOM1,
     kCUSTOM2,
@@ -110,9 +110,7 @@ enum EGameActions
     kPDA_TAB5,
     kPDA_TAB6,
 
-#ifdef COC_KICK
     kKICK, // alpet: kick dynamic objects
-#endif
 
     kLASTACTION,
     kNOTBINDED,
