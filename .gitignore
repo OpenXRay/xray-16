@@ -14,3 +14,4 @@ lib/
 res/gamedata_COC/.gitattributes
 res/gamedata_COC/.gitignore
 res/gamedata_COC/changelog_legend.txt
+*.bak
