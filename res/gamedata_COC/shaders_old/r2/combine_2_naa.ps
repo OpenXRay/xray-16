@@ -1,0 +1,175 @@
+#include "common.h"
+#include "mblur.h"
+#include "dof.h"
+
+struct 	v2p
+{
+  float4 tc0: 		TEXCOORD0;	// Center
+  float4 tc1: 		TEXCOORD1;	// LT 		 
+  float4 tc2: 		TEXCOORD2;	// RB
+  float4 tc3: 		TEXCOORD3;	// RT 
+  float4 tc4: 		TEXCOORD4;	// LB
+  float4 tc5:		TEXCOORD5;	// Left	/ Right	
+  float4 tc6:		TEXCOORD6;	// Top  / Bottom 
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+uniform sampler2D 	s_distort;
+#define	EPSDEPTH	0.001
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 	main		( v2p I )	: COLOR
+{
+#ifdef 	USE_DISTORT
+  	float 	depth 	= tex2D 	(s_position, 	I.tc0).z;
+	float4 	distort	= tex2D		(s_distort, 	I.tc0)	;
+//	float2	offset	= (distort.xy-.5h)*def_distort		;
+	float2	offset	= (distort.xy-(127.0h/255.0h))*def_distort;  // fix newtral offset
+	float2	center	= I.tc0 + offset;
+	float 	depth_x	= tex2D 	(s_position, center).z	;
+	if ((depth_x+EPSDEPTH)<depth)	center	= I.tc0;	// discard new sample
+#else
+	float2	center 	= I.tc0		;
+#endif
+    	//float3 	img 	= tex2D		(s_image, center);
+	float3	img	= dof(center);
+	float4 	bloom	= tex2D		(s_bloom, center);
+	
+			img 	= mblur		(center,tex2D(s_position,I.tc0),img.rgb);
+
+#ifdef 	USE_DISTORT
+ 	float3	blurred	= bloom*def_hdr	;
+			img		= lerp	(img,blurred,distort.z);
+#endif
+
+ 	return 	combine_bloom		(img,bloom);
+}
+/**/
+/*
+#define NEAR 		0.2h
+//#define MINDIST 	0.4h
+#define MINDIST 	1.0h
+//#define MAXDIST 	100.h
+
+//#define MAXDIST 	300.h
+#define MAXDIST 	1.1h
+#define MAXCOF		5.h
+#define MAXCOF_NEAR	100.h
+#define EPSDEPTH	0.0001h
+float4 	main		( v2p I )	: COLOR
+{
+
+	// Scale tap offsets based on render target size
+	float2	center 		= I.tc0;
+	float 	depth		= tex2D(s_position,center).z;
+	if (depth<=EPSDEPTH)	depth = MAXDIST;
+	float 	blur		= saturate( (depth-MINDIST)/(MAXDIST-MINDIST) );	
+	blur*=blur;
+	//float 	blur_near	= pow(saturate( 1-(depth-NEAR)/MINDIST ), 2) * MAXCOF_NEAR;
+	//float 	blur 		= (blur_near+blur_far);	
+
+//	float blur = 1;
+	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h) * MAXCOF * blur;
+
+	// poison
+	float2 	o  [12];
+		o[0]	= float2(-0.326212f , -0.405810f)*scale;
+		o[1] 	= float2(-0.840144f , -0.073580f)*scale;
+		o[2] 	= float2(-0.695914f ,  0.457137f)*scale;
+		o[3] 	= float2(-0.203345f ,  0.620716f)*scale;
+		o[4] 	= float2( 0.962340f , -0.194983f)*scale;
+		o[5] 	= float2( 0.473434f , -0.480026f)*scale;
+		o[6] 	= float2( 0.519456f ,  0.767022f)*scale;
+		o[7] 	= float2( 0.185461f , -0.893124f)*scale;
+		o[8] 	= float2( 0.507431f ,  0.064425f)*scale;
+		o[9] 	= float2( 0.896420f ,  0.412458f)*scale;
+		o[10] 	= float2(-0.321940f , -0.932615f)*scale;
+		o[11] 	= float2(-0.791559f , -0.597710f)*scale;
+
+	// sample 
+	float3	sum 	= tex2D(s_image,center);
+	float 	contrib	= 1.h;
+	for (int i=0; i<12; i++)
+	{
+		float2 	tap 		= center + o[i];
+		float4	tap_color	= tex2D	(s_image,tap);
+		float 	tap_depth 	= tex2D	(s_position,tap).z;
+		float 	tap_contrib	= 1.h;	//(tap_depth>depth)?1.h:0.h;
+			sum 		+= tap_color	* tap_contrib;
+			contrib		+= tap_contrib	;
+	}
+	return 	float4	(sum/contrib,1);
+}
+/**/
+/*
+//	Igor: cheap dof
+#define NEAR 		0.2h
+#define MINDIST 	0.4h
+#define MAXDIST 	100.h
+//#define MAXDIST 	10.h
+#define MAXCOF		5.h
+#define MAXCOF_NEAR	100.h
+#define EPSDEPTH	0.0001h
+float4 	main		( v2p I )	: COLOR
+{
+#ifdef 	USE_DISTORT
+  	float 	depth 	= tex2D 	(s_position, 	I.tc0).z;
+	float4 	distort	= tex2D		(s_distort, 	I.tc0)	;
+	float2	offset	= (distort.xy-.5h)*def_distort		;
+	float2	center	= I.tc0 + offset;
+	float 	depth_x	= tex2D 	(s_position, center).z	;
+	if ((depth_x+EPSDEPTH)<depth)	center	= I.tc0;	// discard new sample
+#else
+	float2	center 	= I.tc0		;
+#endif
+    float3 	img 	= tex2D		(s_image, center);
+	float4 	bloom	= tex2D		(s_bloom, center);
+	
+			img 	= mblur		(center,tex2D(s_position,I.tc0),img.rgb);
+
+#ifdef 	USE_DISTORT
+// 	float3	blurred	= bloom*def_hdr	;
+//			img		= lerp	(img,blurred,distort.z);
+#endif
+
+#ifndef USE_DISTORT
+	float 	depth		= tex2D(s_position,center).z;
+#endif 	//	USE_DISTORT
+	if (depth<=EPSDEPTH)	depth = MAXDIST;
+	float3	blurred		= bloom*def_hdr/4;
+	float 	blur		= saturate( (depth-MINDIST)/(MAXDIST-MINDIST) );
+	blur			*= blur;
+	blur	*= 0.5;
+//	blur	*= 1;
+	img			= lerp( img, blurred, blur);
+
+ 	return 	combine_bloom		(img,bloom);
+}
+/**/
+/*
+//	Igor: original
+float4 	main		( v2p I )	: COLOR
+{
+#ifdef 	USE_DISTORT
+  	float 	depth 	= tex2D 	(s_position, 	I.tc0).z;
+	float4 	distort	= tex2D		(s_distort, 	I.tc0)	;
+	float2	offset	= (distort.xy-.5h)*def_distort		;
+	float2	center	= I.tc0 + offset;
+	float 	depth_x	= tex2D 	(s_position, center).z	;
+	if ((depth_x+EPSDEPTH)<depth)	center	= I.tc0;	// discard new sample
+#else
+	float2	center 	= I.tc0		;
+#endif
+    	float3 	img 	= tex2D		(s_image, center);
+	float4 	bloom	= tex2D		(s_bloom, center);
+	
+	img 	= mblur		(center,tex2D(s_position,I.tc0),img.rgb);
+
+#ifdef 	USE_DISTORT
+ 	float3	blurred	= bloom*def_hdr	;
+		img	= lerp	(img,blurred,distort.z);
+#endif
+
+ 	return 	combine_bloom		(img,bloom);
+}
+/**/

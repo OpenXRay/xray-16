@@ -1,0 +1,111 @@
+#include "common.h"
+#include "mblur.h"
+#include "dof.h"
+/*
+struct 	v2p
+{
+  float4 tc0: 		TEXCOORD0;	// Center
+  float4 tc1: 		TEXCOORD1;	// LT 		 
+  float4 tc2: 		TEXCOORD2;	// RB
+  float4 tc3: 		TEXCOORD3;	// RT 
+  float4 tc4: 		TEXCOORD4;	// LB
+  float4 tc5:		TEXCOORD5;	// Left	/ Right	
+  float4 tc6:		TEXCOORD6;	// Top  / Bottom 
+};
+*/
+
+//////////////////////////////////////////////////////////////////////////////////////////
+#ifndef USE_MSAA
+Texture2D 			s_distort;
+#define	EPSDEPTH	0.001
+#else
+Texture2DMS<float4, MSAA_SAMPLES> s_distort;
+#define	EPSDEPTH	0.001
+#endif
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+
+struct c2_out
+{
+	float4	Color : SV_Target;
+#ifdef USE_MSAA
+	float	Depth : SV_Depth;
+#endif
+};
+
+c2_out main( v2p_aa_AA I )
+{
+	c2_out	res;
+	res.Color = float4(0,0,0,0);
+
+/*	
+#ifdef USE_MSAA
+	[unroll] for( int iSample = 0; iSample < MSAA_SAMPLES; ++iSample )
+	{
+#else // USE_MSAA	
+	int iSample = 0;
+#endif
+*/
+	int iSample = 0;
+
+#ifdef GBUFFER_OPTIMIZATION
+	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, I.HPos, iSample );
+#else
+	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, iSample );
+#endif
+	
+#ifdef 	USE_DISTORT
+//  	float 	depth 	= tex2D 	(s_position, 	I.tc0).z;
+//	float4 	distort	= tex2D		(s_distort, 	I.tc0);
+  	float 	depth 	= gbd.P.z;
+#ifndef USE_MSAA
+	float4 	distort	= s_distort.Sample(smp_nofilter, I.Tex0);
+#else // USE_MSAA
+	float4 	distort	= s_distort.Load( int3( I.Tex0 * pos_decompression_params2.xy, 0 ), iSample );
+#endif // USE_MSAA
+	float2	offset	= (distort.xy-(127.0h/255.0h))*def_distort;  // fix newtral offset
+	float2	center	= I.Tex0 + offset;
+
+#ifdef GBUFFER_OPTIMIZATION
+	gbuffer_data gbdx	= gbuffer_load_data_offset(I.Tex0, center, I.HPos, iSample );
+#else
+	gbuffer_data gbdx	= gbuffer_load_data_offset(I.Tex0, center, iSample);
+#endif
+
+//	float 	depth_x	= tex2D 	(s_position, center).z	;
+	float 	depth_x	= gbdx.P.z;
+	if ((depth_x+EPSDEPTH)<depth)	center	= I.Tex0;	// discard new sample
+#else // USE_DISTORT
+	float2	center 	= I.Tex0;
+#endif
+   	//float3 	img 	= tex2D		(s_image, center);
+
+	float3	img	= dof(center);
+//	float4 	bloom	= tex2D		(s_bloom, center);
+	float4 	bloom	= s_bloom.Sample( smp_rtlinear, center);
+	
+//			img 	= mblur		(center,tex2D(s_position,I.tc0),img.rgb);
+//			img 	= mblur( center, s_position.Sample( smp_nofilter, tc0), img.rgb);
+			img 	= mblur( center, ( gbd ).P, img.rgb);
+
+#ifdef 	USE_DISTORT
+ 	float3	blurred	= bloom*def_hdr	;
+			img		= lerp	(img,blurred,distort.z);
+#endif
+
+/*
+#ifdef USE_MSAA
+ 	res += combine_bloom( img, bloom ) / MSAA_SAMPLES;
+	}
+#else
+ 	res += combine_bloom( img, bloom );
+#endif
+*/
+ 	res.Color += combine_bloom( img, bloom );
+#ifdef USE_MSAA
+	float4 ptp = mul(m_P, float4(gbd.P, 1));
+	res.Depth = ptp.w==0?1:ptp.z/ptp.w;
+#endif
+	
+	return res;
+}
