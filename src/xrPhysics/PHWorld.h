@@ -165,5 +165,5 @@ private:
         m_update_callback = cb;
     }
 };
-extern CPHWorld* ph_world;
+extern XRPHYSICS_API CPHWorld* ph_world;
 IC CPHWorld& inl_ph_world() { return *ph_world; }
