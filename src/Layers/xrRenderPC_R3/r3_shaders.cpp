@@ -7,8 +7,6 @@ template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)
 {
-    // XXX: disasm it
-
     result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
 
     ID3DShaderReflection* pReflection = 0;
@@ -23,7 +21,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     }
     else
     {
-        Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+        Msg("! D3D10ReflectShader %s hr == 0x%08x", file_name, _hr);
     }
 
     return _hr;
@@ -34,37 +32,20 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 {
     // XXX: what's going on with casts here???
     HRESULT _result = E_FAIL;
+    pcstr extension = ".hlsl";
     if (pTarget[0] == 'p')
     {
+        extension = ".ps";
         _result = create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
     }
     else if (pTarget[0] == 'v')
     {
-        // XXX: try to use code below
-        // _result = create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
-
+        extension = ".vs";
         SVS* svs_result = (SVS*)result;
-        _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->sh);
-
-        if (!SUCCEEDED(_result))
+        _result = create_shader(pTarget, buffer, buffer_size, file_name, svs_result, disasm);
+        if (SUCCEEDED(_result))
         {
-            Log("! VS: ", file_name);
-            Msg("! CreatePixelShader hr == 0x%08x", _result);
-            return E_FAIL;
-        }
-
-        ID3DShaderReflection* pReflection = 0;
-        _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
-
-        //	Parse constant, texture, sampler binding
-        //	Store input signature blob
-        if (SUCCEEDED(_result) && pReflection)
-        {
-            //	TODO: DX10: share the same input signatures
-
             //	Store input signature (need only for VS)
-            // CHK_DX( D3DxxGetInputSignatureBlob(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
-            // &_vs->signature) );
             ID3DBlob* pSignatureBlob;
             CHK_DX(D3DGetInputSignatureBlob(buffer, buffer_size, &pSignatureBlob));
             VERIFY(pSignatureBlob);
@@ -72,20 +53,11 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             svs_result->signature = RImplementation.Resources->_CreateInputSignature(pSignatureBlob);
 
             _RELEASE(pSignatureBlob);
-
-            //	Let constant table parse it's data
-            svs_result->constants.parse(pReflection, RC_dest_vertex);
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Log("! VS: ", file_name);
-            Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
         }
     }
     else if (pTarget[0] == 'g')
     {
+        extension = ".gs";
         _result = create_shader(pTarget, buffer, buffer_size, file_name, (SGS*&)result, disasm);
     }
     else
@@ -96,11 +68,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     if (disasm)
     {
         ID3DBlob* disasm = 0;
-        D3DDisassemble(buffer, buffer_size, FALSE, 0, &disasm);
-        // D3DXDisassembleShader		(LPDWORD(code->GetBufferPointer()), FALSE, 0, &disasm );
+        D3DDisassemble(buffer, buffer_size, FALSE, nullptr, &disasm);
         string_path dname;
-        strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name,
-            ('v' == pTarget[0]) ? ".vs" : ('p' == pTarget[0]) ? ".ps" : ".gs");
+        strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, extension);
         IWriter* W = FS.w_open("$logs$", dname);
         W->w(disasm->GetBufferPointer(), (u32)disasm->GetBufferSize());
         FS.w_close(W);
