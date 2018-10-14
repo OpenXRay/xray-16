@@ -35,7 +35,7 @@ DECLARE_MESSAGE(ScreenResolutionChanged);
 struct MessageObject
 {
     IPure* Object;
-    int Prio;
+    unsigned long Prio;
 };
 
 template<class T>
@@ -44,19 +44,12 @@ class MessageRegistry
     bool changed, inProcess;
     xr_vector<MessageObject> messages;
 
-    static int __cdecl compare(const void* e1, const void* e2)
-    {
-        MessageObject* p1 = (MessageObject*)e1;
-        MessageObject* p2 = (MessageObject*)e2;
-        return p2->Prio - p1->Prio;
-    }
-
 public:
     MessageRegistry() : changed(false), inProcess(false) {}
 
     void Clear() { messages.clear(); }
 
-    constexpr void Add(T* object, const int priority = REG_PRIORITY_NORMAL)
+    constexpr void Add(T* object, unsigned long priority = REG_PRIORITY_NORMAL)
     {
         Add({ object, priority });
     }
@@ -117,8 +110,10 @@ public:
 
     void Resort()
     {
-        if (!messages.empty())
-            qsort(&messages.front(), messages.size(), sizeof(MessageObject), compare);
+        if (!messages.empty()) {
+            std::sort(std::begin(messages), std::end(messages),
+                [](const auto& a, const auto& b) { return a.Prio < b.Prio; });
+        }
 
         while (!messages.empty() && messages.back().Prio == REG_PRIORITY_INVALID)
             messages.pop_back();
