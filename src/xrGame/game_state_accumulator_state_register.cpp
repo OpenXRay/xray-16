@@ -30,36 +30,49 @@
 #include "silent_shots.h"
 #include "killer_victim_velocity_angle.h"
 
+#define INIT_ACCUMULATIVE_VALUE(Kind, SomeClass) \
+    m_accumulative_values.insert(std::make_pair(Kind, new SomeClass(this)));
+
 namespace award_system
 {
 
-template <typename>
-struct AccumulatorHelper;
-
-template <>
-struct AccumulatorHelper<Loki::NullType> {
-	static void init_acpv(game_state_accumulator*,
-		game_state_accumulator::accumulative_values_collection_t&)
-	{
-	}
-};
-
-template <typename Head, typename Tail>
-struct AccumulatorHelper<Loki::Typelist<Head, Tail>> {
-	static void init_acpv(game_state_accumulator* self,
-		game_state_accumulator::accumulative_values_collection_t& accumulative_values)
-	{
-		AccumulatorHelper<Tail>::init_acpv(self, accumulative_values);
-		player_state_param* tmp_obj_inst = new typename Head::value_type(self);
-		accumulative_values.insert(std::make_pair(Head::value_id, tmp_obj_inst));
-	}
-};
-
 void game_state_accumulator::init_accumulative_values()
 {
-    static_assert(Loki::TL::Length<ACCUMULATIVE_STATE_LIST>::value == acpv_count,
-        "Not all accumulative values has been added to a ACCUMULATIVE_STATE_LIST type list.");
-
-    AccumulatorHelper<ACCUMULATIVE_STATE_LIST>::init_acpv(this, m_accumulative_values);
+    INIT_ACCUMULATIVE_VALUE(acpv_mad,                          player_state_mad);
+    INIT_ACCUMULATIVE_VALUE(acpv_spots,                        player_spots_counter);
+    INIT_ACCUMULATIVE_VALUE(acpv_toughy,                       player_state_toughy);
+    INIT_ACCUMULATIVE_VALUE(acpv_avenger,                      player_state_avenger);
+    INIT_ACCUMULATIVE_VALUE(acpv_climber,                      player_state_climber);
+    INIT_ACCUMULATIVE_VALUE(acpv_move_state,                   player_state_move);
+    INIT_ACCUMULATIVE_VALUE(acpv_ambassador,                   player_state_ambassador);
+    INIT_ACCUMULATIVE_VALUE(acpv_black_list,                   black_list);
+    INIT_ACCUMULATIVE_VALUE(acpv_kill_in_raw,                  player_rawkill_counter);
+    INIT_ACCUMULATIVE_VALUE(acpv_death_count,                  player_death_counter);
+    INIT_ACCUMULATIVE_VALUE(acpv_remembrance,                  player_state_remembrance);
+    INIT_ACCUMULATIVE_VALUE(acpv_cherub_ready,                 player_state_cherub);
+    INIT_ACCUMULATIVE_VALUE(acpv_ammo_elapsed,                 player_state_ammo_elapsed);
+    INIT_ACCUMULATIVE_VALUE(acpv_opener_ready,                 player_state_opener);
+    INIT_ACCUMULATIVE_VALUE(acpv_skewer_count,                 player_state_skewer);
+    INIT_ACCUMULATIVE_VALUE(acpv_stalker_flair,                stalker_flair);
+    INIT_ACCUMULATIVE_VALUE(acpv_thunder_count,                silent_shots);
+    INIT_ACCUMULATIVE_VALUE(acpv_move_velocity,                player_state_velocity);
+    INIT_ACCUMULATIVE_VALUE(acpv_harvest_count,                harvest_time);
+    INIT_ACCUMULATIVE_VALUE(acpv_marksman_count,               player_state_marksman);
+    INIT_ACCUMULATIVE_VALUE(acpv_multi_champion,               player_multichampion);
+    INIT_ACCUMULATIVE_VALUE(acpv_invincible_fury,              player_state_invincible_fury);
+    INIT_ACCUMULATIVE_VALUE(acpv_blitzkrieg_time,              player_blitzkrieg);
+    INIT_ACCUMULATIVE_VALUE(acpv_enemy_team_score,             player_enemy_team_score);
+    INIT_ACCUMULATIVE_VALUE(acpv_artdeliver_count,             player_artdeliver_counter);
+    INIT_ACCUMULATIVE_VALUE(acpv_my_team_win_score,            player_team_win_score);
+    INIT_ACCUMULATIVE_VALUE(acpv_move_ang_velocity,            player_state_ang_velocity);
+    INIT_ACCUMULATIVE_VALUE(acpv_achilles_heel_ready,          achilles_heel_kill);
+    INIT_ACCUMULATIVE_VALUE(acpv_killer_victim_angle,          killer_victim_angle);
+    INIT_ACCUMULATIVE_VALUE(acpv_enemy_top_player_div,         player_spots_with_top_enemy_divider);
+    INIT_ACCUMULATIVE_VALUE(acpv_command_switch_count,         command_switch_counter);
+    INIT_ACCUMULATIVE_VALUE(acpv_enemy_team_score_now,         player_runtime_enemy_team_score);
+    INIT_ACCUMULATIVE_VALUE(acpv_my_team_win_score_now,        player_runtime_win_score);
+    INIT_ACCUMULATIVE_VALUE(acpv_sprinter_victim_velocity,     spritnter_stopper);
+    INIT_ACCUMULATIVE_VALUE(acpv_faster_than_bullets_time,     faster_than_bullets_time);
+    INIT_ACCUMULATIVE_VALUE(acpv_double_shot_double_kill_time, double_shot_double_kill);
 }
 } // namespace award_system
