@@ -78,11 +78,14 @@ static void load(int argc, char** argv, char** envp)
 // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
 // g_profiler			= new CProfiler();
 #endif
+    gStringTable = new CStringTable();
+    StringTable().Init();
 }
 
 __attribute__((destructor))
 static void unload()
 {
     CleanupUIStyleToken();
+    xr_delete(gStringTable);
 }
 #endif
