@@ -30,10 +30,6 @@ protected:
     u32 m_aveng_count;
 }; // class player_state_avenger
 
-ADD_ACCUMULATIVE_STATE(acpv_avenger, player_state_avenger);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_avenger, player_state_avenger)
-
 } // namespace award_system
 
 #endif //#ifndef PLAYER_STATE_AVENGER

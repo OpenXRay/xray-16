@@ -25,10 +25,6 @@ protected:
     float m_killer_victim_angle_cos;
 }; // class killer_victim_angle
 
-ADD_ACCUMULATIVE_STATE(acpv_killer_victim_angle, killer_victim_angle);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_killer_victim_angle, killer_victim_angle)
-
 } // namespace award_system
 
 #endif //#ifndef KILLER_VICTIM_VELOCITY_ANGLE_INCLUDED

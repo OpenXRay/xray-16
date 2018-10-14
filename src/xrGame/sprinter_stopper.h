@@ -25,10 +25,6 @@ protected:
     float m_sprinter_victim_velocity;
 }; // class spritnter_stopper
 
-ADD_ACCUMULATIVE_STATE(acpv_sprinter_victim_velocity, spritnter_stopper);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_sprinter_victim_velocity, spritnter_stopper)
-
 } // namespace award_system
 
 #endif //#ifndef SPRINTER_STOPPER_INCLUDED

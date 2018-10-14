@@ -26,10 +26,6 @@ protected:
     bool m_opener_ready;
 }; // class player_state_opener
 
-ADD_ACCUMULATIVE_STATE(acpv_opener_ready, player_state_opener);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_opener_ready, player_state_opener)
-
 } // namespace award_system
 
 #endif //#ifndef PLAYER_STATE_OPENER_INCLUDED

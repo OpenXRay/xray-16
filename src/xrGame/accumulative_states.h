@@ -1,8 +1,6 @@
 #ifndef ACCUMULATIVE_STATES_INCLUDED
 #define ACCUMULATIVE_STATES_INCLUDED
 
-#include <loki/Typelist.h>
-
 namespace award_system
 {
 enum enum_accumulative_player_values
@@ -45,22 +43,6 @@ enum enum_accumulative_player_values
     acpv_killer_victim_angle,
     acpv_count,
 }; // enum enum_accumulative_player_values
-
-namespace detail
-{
-template <enum_accumulative_player_values ValueId, typename T>
-struct accumulative_pair_t
-{
-    static enum_accumulative_player_values const value_id = ValueId;
-    typedef T value_type;
-}; // struct accumulative_pair_t
-} // namespace detail
-
-#define ACCUMULATIVE_STATE_LIST Loki::NullType
-#define ADD_ACCUMULATIVE_STATE(id, type)                                                   \
-    typedef Loki::Typelist<detail::accumulative_pair_t<id, type>, ACCUMULATIVE_STATE_LIST> \
-        Accumulative_State_Type_##type;
-#define SAVE_TYPE_LIST(id, type) Accumulative_State_Type_##type
 
 } // namespace award_system
 

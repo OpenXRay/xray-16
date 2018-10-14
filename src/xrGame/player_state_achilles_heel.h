@@ -25,10 +25,6 @@ protected:
     bool m_achilles_kill_was;
 }; // class achilles_heel_kill
 
-ADD_ACCUMULATIVE_STATE(acpv_achilles_heel_ready, achilles_heel_kill);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_achilles_heel_ready, achilles_heel_kill)
-
 } // namespace award_system
 
 #endif //#ifndef PLAYER_STATE_ACHILLES_HEEL_INCLUDED

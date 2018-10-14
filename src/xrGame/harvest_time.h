@@ -28,10 +28,6 @@ protected:
     u32 m_spawn_time;
 }; // class harvest_time
 
-ADD_ACCUMULATIVE_STATE(acpv_harvest_count, harvest_time);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_harvest_count, harvest_time)
-
 } // namespace award_system
 
 #endif //#ifndef HARVEST_TIME_INCLUDED
