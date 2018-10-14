@@ -124,9 +124,9 @@ inline void _splitpath (
     {
         char tmp_ext[NAME_MAX] = { 0 };
         strcpy(tmp_ext, basename(tmp));
-        char *pos = strrchr(fname, '.');
+        char *pos = strrchr(tmp_ext, '.');
         if(pos != NULL)
-            strcpy(ext, pos + 1);
+            strcpy(ext, pos);
         else
             strcpy(ext, "");
     }
