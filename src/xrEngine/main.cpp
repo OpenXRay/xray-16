@@ -11,7 +11,7 @@
 #include "XR_IOConsole.h"
 #include "x_ray.h"
 #include "std_classes.h"
-
+#include "splash.h"
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
 #include "Text_Console.h"
@@ -34,7 +34,7 @@ namespace
 {
 bool CheckBenchmark();
 void RunBenchmark(pcstr name);
-}
+} // namespace
 
 ENGINE_API void InitEngine()
 {
@@ -58,7 +58,7 @@ public:
         return allow_to_include_path(*ignored, path);
     }
 };
-}
+} // namespace
 
 ENGINE_API void InitSettings()
 {
@@ -211,7 +211,12 @@ ENGINE_API int RunApplication()
     {
         CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
+        {
+            splash::hide();
+            MessageBox(nullptr, "The game has already been launched!", nullptr, MB_ICONERROR | MB_OK);
             return 2;
+        }
+        
     }
 #endif
     *g_sLaunchOnExit_app = 0;
@@ -270,7 +275,8 @@ ENGINE_API int RunApplication()
         PROCESS_INFORMATION pi = {};
         // We use CreateProcess to setup working folder
         pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
-        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
+        CreateProcess(
+            g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
     }
     return 0;
 }
@@ -333,4 +339,4 @@ void RunBenchmark(pcstr name)
         Startup();
     }
 }
-}
+} // namespace
