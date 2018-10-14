@@ -537,13 +537,10 @@ public:
     MovementManager::EPathType path_type() const;
     DetailPathManager::EDetailPathType detail_path_type() const;
 
-    u32 add_sound(
-        LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name);
+    u32 add_sound(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name);
     u32 add_sound(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type);
-    u32 add_sound(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type,
-        LPCSTR bone_name, LPCSTR head_anim);
-    u32 add_combat_sound(
-        LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name);
+    u32 add_sound(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name, LPCSTR head_anim);
+    u32 add_combat_sound(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name);
     void remove_sound(u32 internal_type);
     void set_sound_mask(u32 sound_mask);
     void set_sight(SightManager::ESightType sight_type, Fvector* vector3d, u32 dwLookOverDelay);
@@ -843,6 +840,7 @@ public:
     void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject &memory_object);
 
     //Weapon
+    LPCSTR Weapon_GetAmmoSection(u8 ammo_type);
     void Weapon_SetCurrentScope(u8 type);
     u8 Weapon_GetCurrentScope();
     void Weapon_AddonAttach(CScriptGameObject* item);

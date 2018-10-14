@@ -411,6 +411,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("ammo_box_size", &CScriptGameObject::AmmoBoxSize)
 
         //For Weapons
+		.def("weapon_get_ammo_section", &CScriptGameObject::Weapon_GetAmmoSection)
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
         .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
         .def("weapon_set_scope", &CScriptGameObject::Weapon_SetCurrentScope)
