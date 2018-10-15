@@ -19,8 +19,8 @@
 IRender_Mesh::~IRender_Mesh()
 {
 #ifdef USE_OGL
-	GLuint buffers[] = { p_rm_Vertices, p_rm_Indices };
-	glDeleteBuffers(2, buffers);
+    GLuint buffers[] = { p_rm_Vertices, p_rm_Indices };
+    glDeleteBuffers(2, buffers);
 #else
     _RELEASE(p_rm_Vertices);
     _RELEASE(p_rm_Indices);
@@ -68,6 +68,10 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
         string256 fnT, fnS;
         data->r_stringZ(fnT, sizeof(fnT));
         data->r_stringZ(fnS, sizeof(fnS));
+#ifdef LINUX
+        while (char* sep = strchr(fnT, '\\')) *sep = '/';
+        while (char* sep = strchr(fnS, '\\')) *sep = '/';
+#endif
         shader.create(fnS, fnT);
     }
 
