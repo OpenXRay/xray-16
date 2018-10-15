@@ -278,6 +278,9 @@ void CTexture::Load()
             {
                 // Load another texture
                 u32 mem = 0;
+#ifdef LINUX
+                while (char* sep = strchr(buffer, '\\')) *sep = '/';
+#endif
                 pSurface = RImplementation.texture_load(buffer, mem, desc);
                 if (pSurface)
                 {
