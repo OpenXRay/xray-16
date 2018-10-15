@@ -219,6 +219,9 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
     string_path low_name;
     VERIFY(xr_strlen(name) < sizeof(low_name));
     xr_strcpy(low_name, name);
+#ifdef LINUX
+    while (char* sep = strchr(low_name, '\\')) *sep = '/';
+#endif
     xr_strlwr(low_name);
     if (strext(low_name))
         *strext(low_name) = 0;
