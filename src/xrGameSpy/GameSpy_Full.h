@@ -18,13 +18,13 @@ public:
     CGameSpy_Full();
     ~CGameSpy_Full();
 
-    CGameSpy_Available* GetGameSpyAvailable() const { return m_pGSA; };
-    CGameSpy_Patching* GetGameSpyPatching() const { return m_pGS_Patching; };
-    CGameSpy_HTTP* GetGameSpyHTTP() const { return m_pGS_HTTP; };
-    CGameSpy_Browser* GetGameSpyBrowser() const { return m_pGS_SB; };
-    CGameSpy_GP* GetGameSpyGP() const { return m_pGS_GP; };
-    CGameSpy_SAKE* GetGameSpySAKE() const { return m_pGS_SAKE; };
-    CGameSpy_ATLAS* GetGameSpyATLAS() const { return m_pGS_ATLAS; };
+    CGameSpy_Available* GetGameSpyAvailable() const { return m_pGSA; }
+    CGameSpy_Patching* GetGameSpyPatching() const { return m_pGS_Patching; }
+    CGameSpy_HTTP* GetGameSpyHTTP() const { return m_pGS_HTTP; }
+    CGameSpy_Browser* GetGameSpyBrowser() const { return m_pGS_SB; }
+    CGameSpy_GP* GetGameSpyGP() const { return m_pGS_GP; }
+    CGameSpy_SAKE* GetGameSpySAKE() const { return m_pGS_SAKE; }
+    CGameSpy_ATLAS* GetGameSpyATLAS() const { return m_pGS_ATLAS; }
     GSUpdateStatus Update();
     void CoreThink(u32 millisecondsTimeout);
 
