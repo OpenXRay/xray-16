@@ -440,7 +440,10 @@ void CLevel::OnFrame()
     if (!GEnv.isDedicatedServer)
     {
         if (g_mt_config.test(mtMap))
+        {
+            assert(m_map_manager);
             Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(m_map_manager, &CMapManager::Update));
+        }
         else
             MapManager().Update();
         if (IsGameTypeSingle() && Device.dwPrecacheFrame == 0)
@@ -549,6 +552,7 @@ void CLevel::OnFrame()
     {
         if (g_mt_config.test(mtLevelSounds))
         {
+            assert(m_level_sound_manager);
             Device.seqParallel.push_back(
                 fastdelegate::FastDelegate0<>(m_level_sound_manager, &CLevelSoundManager::Update));
         }
