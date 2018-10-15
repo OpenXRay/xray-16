@@ -37,10 +37,10 @@ struct Patch_Dawnload_Progress
     shared_str Status;
     shared_str FileName;
 
-    bool GetInProgress() { return IsInProgress; };
-    float GetProgress() { return Progress; };
-    LPCSTR GetStatus() { return Status.c_str(); };
-    LPCSTR GetFlieName() { return FileName.c_str(); };
+    bool GetInProgress() { return IsInProgress; }
+    float GetProgress() { return Progress; }
+    LPCSTR GetStatus() { return Status.c_str(); }
+    LPCSTR GetFlieName() { return FileName.c_str(); }
 };
 
 class CMainMenu : public IMainMenu,
@@ -69,11 +69,14 @@ class CMainMenu : public IMainMenu,
     void ReadTextureInfo();
 
     xr_vector<CUIWindow*> m_pp_draw_wnds;
-#ifdef WINDOWS
+
     CGameSpy_Full* m_pGameSpyFull;
     gamespy_gp::account_manager* m_account_mngr;
     gamespy_gp::login_manager* m_login_mngr;
     gamespy_profile::profile_store* m_profile_store;
+
+#ifdef WINDOWS
+
     gamespy_profile::stats_submitter* m_stats_submitter;
     atlas_submit_queue* m_atlas_submit_queue;
 #endif
@@ -107,11 +110,12 @@ public:
     Patch_Dawnload_Progress m_sPDProgress;
     Patch_Dawnload_Progress* GetPatchProgress() { return &m_sPDProgress; }
     void CancelDownload();
+    gamespy_gp::account_manager* GetAccountMngr() { return m_account_mngr; }
+    gamespy_gp::login_manager* GetLoginMngr() { return m_login_mngr; }
+    gamespy_profile::profile_store* GetProfileStore() { return m_profile_store; }
+
 #ifdef WINDOWS
     CGameSpy_Full* GetGS() { return m_pGameSpyFull; };
-    gamespy_gp::account_manager* GetAccountMngr() { return m_account_mngr; };
-    gamespy_gp::login_manager* GetLoginMngr() { return m_login_mngr; };
-    gamespy_profile::profile_store* GetProfileStore() { return m_profile_store; };
     gamespy_profile::stats_submitter* GetStatsSubmitter() { return m_stats_submitter; };
     atlas_submit_queue* GetSubmitQueue() { return m_atlas_submit_queue; };
 #endif

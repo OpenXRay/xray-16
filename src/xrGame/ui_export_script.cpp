@@ -39,11 +39,9 @@ ICF static void UIRegistratorScriptExport(lua_State* luaState)
             .def("GetCDKey", &CMainMenu::GetCDKeyFromRegistry)
             .def("GetPlayerName", &CMainMenu::GetPlayerName)
             .def("GetDemoInfo", &CMainMenu::GetDemoInfo)
-#ifdef WINDOWS
             .def("GetLoginMngr", &CMainMenu::GetLoginMngr)
             .def("GetAccountMngr", &CMainMenu::GetAccountMngr)
             .def("GetProfileStore", &CMainMenu::GetProfileStore)
-#endif
     ];
     module(luaState, "main_menu")
     [
