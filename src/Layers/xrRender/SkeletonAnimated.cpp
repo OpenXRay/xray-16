@@ -771,6 +771,9 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         for (u32 k = 0; k < set_cnt; ++k)
         {
             data->r_stringZ(nm, sizeof(nm));
+#ifdef LINUX
+            while (char* sep = strchr(nm, '\\')) *sep = '/';
+#endif
             xr_strcat(nm, ".omf");
             string_path fn;
             if (!FS.exist(fn, "$level$", nm))

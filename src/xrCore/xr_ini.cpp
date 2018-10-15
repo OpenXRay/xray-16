@@ -450,12 +450,8 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             R_ASSERT(path && path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-#if defined(LINUX)
-                char *tmp_ptr = strchr(inc_name, '\\');
-                while (tmp_ptr) {
-                    *tmp_ptr = '/';
-                    tmp_ptr = strchr(tmp_ptr, '\\');
-                }
+#ifdef LINUX
+                while (char* sep = strchr(inc_name, '\\')) *sep = '/';
 #endif
                 xr_strlwr(inc_name); // compensate removed xr_strlwr on path
 

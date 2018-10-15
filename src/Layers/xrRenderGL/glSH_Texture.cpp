@@ -209,9 +209,10 @@ void CTexture::Load()
 
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            if (glGetError() != GL_NO_ERROR)
+            GLenum err = glGetError();
+            if (err != GL_NO_ERROR)
             {
-                FATAL("Invalid video stream");
+                FATAL_F("Invalid video stream: 0x%x", err);
                 xr_delete(pTheora);
                 pSurface = 0;
             }
