@@ -39,7 +39,7 @@ public:
 
     CUIGameCustom* UIGame() { return pUIGame; }
     void ShowGameIndicators(bool b);
-    bool GameIndicatorsShown() { return m_bShowGameIndicators; };
+    bool GameIndicatorsShown() { return m_bShowGameIndicators; }
     void ShowCrosshair(bool b);
     bool CrosshairShown();
 
