@@ -314,52 +314,54 @@ void teleport_object(CALifeSimulator* alife, ALife::_OBJECT_ID id, GameGraph::_G
 
 SCRIPT_EXPORT(CALifeSimulator, (),
 {
-    module(luaState)[class_<CALifeSimulator>("alife_simulator")
-                         .def("valid_object_id", &valid_object_id)
-                         .def("level_id", &get_level_id)
-                         .def("level_name", &get_level_name)
-                         .def("object",
-                             (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
-                         .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
-                                            alife_object))
-	                     .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
-                         .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(
-                                                  alife_story_object))
-                         .def("set_switch_online",
-                             (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_online))
-                         .def("set_switch_offline",
-                             (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_offline))
-                         .def("set_interactive",
-                             (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_interactive))
-                         .def("kill_entity", &CALifeSimulator::kill_entity)
+    module(luaState)
+    [
+        class_<CALifeSimulator>("alife_simulator")
+            .def("valid_object_id", &valid_object_id)
+            .def("level_id", &get_level_id)
+            .def("level_name", &get_level_name)
+            .def("object",
+                (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
+            .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
+                               alife_object))
+	        .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
+            .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(
+                                     alife_story_object))
+            .def("set_switch_online",
+                (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_online))
+            .def("set_switch_offline",
+                (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_offline))
+            .def("set_interactive",
+                (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_interactive))
+            .def("kill_entity", &CALifeSimulator::kill_entity)
 
-                         .def("kill_entity", &kill_entity0)
-                         .def("kill_entity", &kill_entity1)
-                         .def("add_in_restriction", &add_in_restriction)
-                         .def("add_out_restriction", &add_out_restriction)
-                         .def("remove_in_restriction", &remove_in_restriction)
-                         .def("remove_out_restriction", &remove_out_restriction)
-                         .def("remove_all_restrictions", &CALifeSimulator::remove_all_restrictions)
-                         .def("create", &CALifeSimulator__create)
-                         .def("create", &CALifeSimulator__spawn_item2)
-                         .def("create", &CALifeSimulator__spawn_item)
-                         .def("create_ammo", &CALifeSimulator__spawn_ammo)
-                         .def("release", &CALifeSimulator__release)
-                         .def("spawn_id", &CALifeSimulator__spawn_id)
-                         .def("actor", &get_actor)
-                         .def("has_info", &has_info)
-                         .def("dont_has_info", &dont_has_info)
-                         .def("switch_distance", (float (CALifeSimulator::*)())(&CALifeSimulator::switch_distance))
-                         .def("switch_distance", (void (CALifeSimulator::*)(float))
-                            (&CALifeSimulator::set_switch_distance))
-                         .def("set_switch_distance", (void (CALifeSimulator::*)(float))
-                            (&CALifeSimulator::set_switch_distance)) //Alundaio: renamed to set_switch_distance from switch_distance
-                         //Alundaio: extend alife simulator exports
-                         .def("teleport_object", &teleport_object)
-                         //Alundaio: END
+            .def("kill_entity", &kill_entity0)
+            .def("kill_entity", &kill_entity1)
+            .def("add_in_restriction", &add_in_restriction)
+            .def("add_out_restriction", &add_out_restriction)
+            .def("remove_in_restriction", &remove_in_restriction)
+            .def("remove_out_restriction", &remove_out_restriction)
+            .def("remove_all_restrictions", &CALifeSimulator::remove_all_restrictions)
+            .def("create", &CALifeSimulator__create)
+            .def("create", &CALifeSimulator__spawn_item2)
+            .def("create", &CALifeSimulator__spawn_item)
+            .def("create_ammo", &CALifeSimulator__spawn_ammo)
+            .def("release", &CALifeSimulator__release)
+            .def("spawn_id", &CALifeSimulator__spawn_id)
+            .def("actor", &get_actor)
+            .def("has_info", &has_info)
+            .def("dont_has_info", &dont_has_info)
+            .def("switch_distance", (float (CALifeSimulator::*)())(&CALifeSimulator::switch_distance))
+            .def("switch_distance", (void (CALifeSimulator::*)(float))
+               (&CALifeSimulator::set_switch_distance))
+            .def("set_switch_distance", (void (CALifeSimulator::*)(float))
+               (&CALifeSimulator::set_switch_distance)) //Alundaio: renamed to set_switch_distance from switch_distance
+            //Alundaio: extend alife simulator exports
+            .def("teleport_object", &teleport_object),
+            //Alundaio: END
 
-                         ,
-        def("alife", &alife)];
+        def("alife", &alife)
+    ];
     class CALifeSimulatorExporter1
     {
     };
