@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "stalker_low_cover_actions.h"
 #include "ai/stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker_impl.h"
 #include "sight_manager.h"
 #include "memory_manager.h"
 #include "enemy_manager.h"
