@@ -11,7 +11,7 @@
 #include "mp_logging.h"
 #include "xr_collide_form.h"
 
-inline void CObjectList::o_crow(IGameObject* O)
+void CObjectList::o_crow(IGameObject* O)
 {
     Objects& crows = get_crows();
     VERIFY(std::find(crows.begin(), crows.end(), O) == crows.end());
