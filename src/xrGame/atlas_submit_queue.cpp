@@ -120,8 +120,9 @@ void atlas_submit_queue::do_atlas_reward(
     VERIFY(!m_atlas_in_process);
 
     m_atlas_in_process = true;
-
+#ifdef WINDOWS
     m_stats_submitter->reward_with_award(award_id, count, profile, m_atlas_submitted);
+#endif
 }
 
 void atlas_submit_queue::do_atlas_best_results(
@@ -131,8 +132,9 @@ void atlas_submit_queue::do_atlas_best_results(
     VERIFY(!m_atlas_in_process);
 
     m_atlas_in_process = true;
-
+#ifdef WINDOWS
     m_stats_submitter->set_best_scores(br_ptr, profile, m_atlas_submitted);
+#endif
 }
 
 void atlas_submit_queue::do_atlas_submit_all(gamespy_gp::profile const* profile)
