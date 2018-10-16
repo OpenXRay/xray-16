@@ -17,11 +17,13 @@ public:
     typedef R return_type;
     typedef Param1 param1_type;
     typedef Param2 param2_type;
+    typedef mixed_delegate<R(Param1, Param2), UniqueTag> self_type;
 
     typedef fastdelegate::FastDelegate<R(Param1, Param2)> fastdelegate_type;
     typedef CScriptCallbackEx<R> lua_delegate_type;
     typedef luabind::object lua_object_type;
     typedef luabind::functor<R> lua_function_type;
+    using lua_bind_type = void (self_type::*)(lua_object_type, lua_function_type); 
 
     mixed_delegate() {}
     ~mixed_delegate() {}
