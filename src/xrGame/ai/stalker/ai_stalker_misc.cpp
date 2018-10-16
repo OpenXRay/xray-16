@@ -8,6 +8,7 @@
 
 #include "pch_script.h"
 #include "ai_stalker.h"
+#include "ai_stalker_impl.h"
 #include "ai_stalker_space.h"
 #include "Bolt.h"
 #include "Inventory.h"

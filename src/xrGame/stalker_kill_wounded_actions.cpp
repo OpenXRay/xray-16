@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "stalker_kill_wounded_actions.h"
 #include "ai/stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker_impl.h"
 #include "Inventory.h"
 #include "WeaponMagazined.h"
 #include "stalker_movement_manager_smart_cover.h"
