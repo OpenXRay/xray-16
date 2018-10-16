@@ -10,6 +10,7 @@
 #include "Level.h"
 #include "Actor.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 #include "xrServer.h"
 #include "client_spawn_manager.h"

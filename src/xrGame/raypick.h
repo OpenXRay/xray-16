@@ -1,6 +1,7 @@
 #pragma once
 
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "xrCDB/xr_collide_defs.h"
 
 struct script_rq_result
