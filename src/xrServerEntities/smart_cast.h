@@ -12,7 +12,9 @@
 #define SMART_CAST_H
 
 #ifdef DEBUG
+#ifndef PURE_DYNAMIC_CAST
 #define PURE_DYNAMIC_CAST
+#endif // PURE_DYNAMIC_CAST
 #endif // DEBUG
 
 #ifdef PURE_DYNAMIC_CAST
