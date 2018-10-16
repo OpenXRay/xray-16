@@ -77,7 +77,7 @@ ALife::EMeetActionType CALifeMonsterBrain::action_type(
 void CALifeMonsterBrain::on_register() {}
 void CALifeMonsterBrain::on_unregister() {}
 void CALifeMonsterBrain::on_location_change() {}
-IC CSE_ALifeSmartZone& CALifeMonsterBrain::smart_terrain()
+CSE_ALifeSmartZone& CALifeMonsterBrain::smart_terrain()
 {
     VERIFY(object().m_smart_terrain_id != 0xffff);
     if (m_smart_terrain && (object().m_smart_terrain_id == m_smart_terrain->ID))
