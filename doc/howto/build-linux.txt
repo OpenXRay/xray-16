@@ -19,16 +19,23 @@ JPEG
 Ubuntu 18.04 build dependencies:
 sudo apt install git cmake libglew-dev libfreeimage-dev liblockfile-dev libopenal-dev libtbb-dev libcrypto++-dev libpugixml-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev libreadline-dev
 
+Clone command:
+```
+git clone https://github.com/OpenXRay/xray-16.git --recurse-submodules
+```
+
 Build commands:
 ------
+```
 cd xray-16
-git submodule update --init --recursive
-mkdir bin && cd bin
+mkdir bin
+cd bin
 cmake ..
-make
+make -jX # where X is the number of cores in your system
+```
 
 #To enable debugging:
-cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo # Building with Debug flag isn't supported now
 #To use clang:
 CC=clang CXX=clang++ cmake ..
 #To enable all instruction for the local machine:
@@ -63,13 +70,28 @@ All mentioned libraries are already in repository as submodules!
 
 Setup:
 ------
-- Install S.T.A.L.K.E.R Call of Pripyat
+- Install S.T.A.L.K.E.R Call of Pripyat using wine.
+For example if you have a cd-rom you can type `wine setup.exe` to start installation. 
+It's recommended do not use path with spaces, for instance you can use "c:\cop" as 
+an installation path (it will be `~/.wine/drive_c/cop` path on your host linux machine).
 - Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
   http://cop.stalker-game.ru/?page=patches#2
-- Clone the repository (you should not download it as an archive)
-  You can just push `Open in Desktop` if you are using Github Desktop.
-  If you are using Git console, here's the command:
-  `git clone https://github.com/OpenXRay/xray-16.git --recurse-submodules`
-- If you are using git client, make sure all submodules are initialized.
-  Type this command in the Git console `git submodule update --init --recursive`
-- Now you can build the engine!
+
+After building in the engine folder do (assuming you installed CoP in "c:\cop"):
+```
+mkdir ~/.wine/drive_c/cop/bin-linux-dbg # here will be installed binaries with dbg symbols
+make DESTDIR=~/.wine/drive_c/cop/bin-linux-dbg install
+cd ~/.wine/drive_c/cop/bin-linux-dbg
+```
+if you want to debug the game you need to prevent input grabbing:
+```
+setxkbmap -option grab:break_actions 
+```
+now you can run the game using 
+```
+./xr_3da.sh -fsltx ../fsgame.ltx
+```
+or if you want to debug using gdb:
+```
+DEBUGGER="gdb --ex=r --args" ./xr_3da.sh -fsltx ../fsgame.ltx
+```
