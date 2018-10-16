@@ -312,6 +312,7 @@ inline bool strncpy_s(char * dest, const char * source, size_t num) {
 inline int strcpy_s(char *dest, const char *source) { return (int)(NULL == strcpy(dest, source)); }
 inline int strcpy_s(char *dest, size_t num, const char *source) { return (int)(NULL == strcpy(dest, source)); }
 inline int strcat_s(char * dest, size_t size, const char * source) { return (NULL == strcat(dest, source)); }
+inline int strncat_s(char * dest, size_t size, const char * source, size_t count) { return (NULL == strncat(dest, source, count)); }
 
 #define _vsnprintf vsnprintf
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
