@@ -274,10 +274,8 @@ void __stdcall screenshot_manager::jpeg_compress_cb(long progress)
     #endif*/
     if (progress % 5 == 0)
     {
-#ifndef LINUX // FIXME!!!
         if (!SwitchToThread())
             Sleep(10);
-#endif
     }
 }
 
