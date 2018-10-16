@@ -282,10 +282,8 @@ void __stdcall configs_dumper::yield_cb(long progress)
 
 void __stdcall configs_dumper::switch_thread()
 {
-#ifndef LINUX // FIXME!!!
     if (!SwitchToThread())
         Sleep(10);
-#endif
 }
 
 void configs_dumper::realloc_compress_buffer(u32 need_size)
