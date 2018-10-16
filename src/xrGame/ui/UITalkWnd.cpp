@@ -383,10 +383,8 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
     }
 
     strncpy_s(fn, sizeof(fn), path, xr_strlen(path));
-#ifndef LINUX // FIXME!!!
     strncat_s(fn, sizeof(fn), text, text_len);
     strncat_s(fn, sizeof(fn), ext, xr_strlen(ext));
-#endif
 
     //	strconcat( sizeof(fn), fn, "characters_voice" DELIMITER "dialogs" DELIMITER, text2, ".ogg" );
 
