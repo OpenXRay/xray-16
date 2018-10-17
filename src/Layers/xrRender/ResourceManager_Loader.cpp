@@ -96,6 +96,9 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         {
             CBlender_DESC desc;
             chunk->r(&desc, sizeof(desc));
+#ifdef LINUX
+            while (char* sep = strchr(desc.cName, '\\')) *sep = '/';
+#endif
             IBlender* B = IBlender::Create(desc.CLS);
             if (nullptr == B)
             {
@@ -103,9 +106,6 @@ void CResourceManager::OnDeviceCreate(IReader* F)
             }
             else
             {
-#ifdef LINUX
-                while (char* sep = strchr(desc.cName, '\\')) *sep = '/';
-#endif
                 if (B->getDescription().version != desc.version)
                 {
                     Msg("! Version conflict in shader '%s'", desc.cName);
