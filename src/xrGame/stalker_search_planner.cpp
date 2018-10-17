@@ -9,6 +9,7 @@
 #include "StdAfx.h"
 #include "stalker_search_planner.h"
 #include "ai/stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker_impl.h"
 #include "stalker_decision_space.h"
 #include "script_game_object.h"
 #include "script_game_object_impl.h"

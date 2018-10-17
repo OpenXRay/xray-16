@@ -9,6 +9,7 @@
 #include "StdAfx.h"
 #include "stalker_animation_pair.h"
 #include "stalker_animation_manager.h"
+#include "stalker_animation_manager_impl.h"
 #include "xrCore/Animation/Motion.hpp"
 #include "ai_debug.h"
 #include "ai/stalker/ai_stalker.h"
