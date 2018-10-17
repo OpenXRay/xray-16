@@ -60,12 +60,7 @@ void CGameFont::Initialize(pcstr cShader, pcstr cTextureName)
         xr_strcpy(cTexture, sizeof(cTexture), cTextureName);
 
 #if defined(LINUX)
-        char* ptr = strchr(cTexture, '\\');
-        while (ptr)
-        {
-            *ptr = '/';
-            ptr = strchr(ptr, '\\');
-        }
+    while (char* sep = strchr(cTexture, '\\')) *sep = '/';
 #endif
 
     uFlags &= ~fsValid;
