@@ -345,6 +345,10 @@ CInifile::CInifile(pcstr fileName, bool readOnly, bool loadAtStart, bool saveAtE
     if (fileName)
         xr_strcpy(m_file_name, sizeof m_file_name, fileName);
 
+#ifdef LINUX
+    while (char* sep = strchr(m_file_name, '\\')) *sep = '/';
+#endif
+
     m_flags.set(eSaveAtEnd, saveAtEnd);
     m_flags.set(eReadOnly, readOnly);
 
@@ -638,6 +642,9 @@ bool CInifile::save_as(pcstr new_fname)
         xr_strcpy(m_file_name, sizeof m_file_name, new_fname);
 
     R_ASSERT(m_file_name && m_file_name[0]);
+#ifdef LINUX
+    while (char* sep = strchr(m_file_name, '\\')) *sep = '/';
+#endif
     IWriter* F = FS.w_open_ex(m_file_name);
     if (!F)
         return false;
