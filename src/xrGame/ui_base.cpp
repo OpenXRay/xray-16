@@ -2,6 +2,7 @@
 #include "ui_base.h"
 #include "GamePersistent.h"
 #include "UICursor.h"
+#include "xrCore/XML/XMLDocument.hpp"
 
 CUICursor& GetUICursor() { return UI().GetUICursor(); };
 ui_core& UI() { return *GamePersistent().m_pUI_core; };
@@ -292,7 +293,7 @@ shared_str ui_core::get_xml_name(LPCSTR fn)
         else
             xr_sprintf(str, "%s_16", fn);
 
-        if (NULL == FS.exist(str_, "$game_config$", "ui\\", str))
+        if (NULL == FS.exist(str_, "$game_config$", UI_PATH_WITH_DELIMITER, str))
         {
             xr_sprintf(str, "%s", fn);
             if (NULL == strext(fn))
