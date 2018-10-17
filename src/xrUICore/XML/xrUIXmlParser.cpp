@@ -12,11 +12,9 @@ shared_str CUIXml::correct_file_name(pcstr path, pcstr fn)
     {
         return UI().get_xml_name(fn);
     }
-    else
-        return fn;
-#else
-    return fn;
 #endif
+
+    return fn;
 }
 
 CUIXml::CUIXml()

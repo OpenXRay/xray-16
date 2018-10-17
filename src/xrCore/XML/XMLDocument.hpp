@@ -16,7 +16,9 @@
 // XXX: interesting idea is to have variable configs folder. Need we?
 static constexpr pcstr CONFIG_PATH = _game_config_;
 static constexpr pcstr UI_PATH_DEFAULT = "ui";
+static constexpr pcstr UI_PATH_DEFAULT_WITH_DELIMITER = "ui" DELIMITER;
 XRCORE_API extern pcstr UI_PATH;
+XRCORE_API extern pcstr UI_PATH_WITH_DELIMITER;
 
 class XML_NODE
 {

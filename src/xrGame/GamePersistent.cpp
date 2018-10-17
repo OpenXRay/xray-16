@@ -85,6 +85,10 @@ void SetupUIStyle()
     strconcat(sizeof(selectedStylePath), selectedStylePath, UI_PATH, DELIMITER "styles" DELIMITER, selectedStyle);
 
     UI_PATH = xr_strdup(selectedStylePath);
+
+    strconcat(sizeof(selectedStylePath), selectedStylePath, selectedStylePath, DELIMITER);
+    UI_PATH_WITH_DELIMITER = xr_strdup(selectedStylePath);
+
     defaultUIStyle = false;
 }
 
@@ -97,7 +101,10 @@ void CleanupUIStyleToken()
     }
     UIStyleToken.clear();
     if (!defaultUIStyle)
+    {
         xr_free(UI_PATH);
+        xr_free(UI_PATH_WITH_DELIMITER);
+    }
 }
 
 CGamePersistent::CGamePersistent(void)

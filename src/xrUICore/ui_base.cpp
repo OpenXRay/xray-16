@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "ui_base.h"
 #include "Cursor/UICursor.h"
+#include "xrCore/XML/XMLDocument.hpp"
 
 CUICursor& GetUICursor() { return GEnv.UI->GetUICursor(); }
 UICore& UI() { return *GEnv.UI; }
@@ -291,7 +292,7 @@ shared_str UICore::get_xml_name(LPCSTR fn)
         else
             xr_sprintf(str, "%s_16", fn);
 
-        if (NULL == FS.exist(str_, "$game_config$", "ui" DELIMITER , str))
+        if (NULL == FS.exist(str_, "$game_config$", UI_PATH_WITH_DELIMITER, str))
         {
             xr_sprintf(str, "%s", fn);
             if (NULL == strext(fn))
