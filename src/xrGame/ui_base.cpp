@@ -3,8 +3,6 @@
 #include "GamePersistent.h"
 #include "UICursor.h"
 
-pcstr UI_PATH = "ui";
-
 CUICursor& GetUICursor() { return UI().GetUICursor(); };
 ui_core& UI() { return *GamePersistent().m_pUI_core; };
 extern ENGINE_API Fvector2 g_current_font_scale;

@@ -3,6 +3,8 @@
 
 #include "XMLDocument.hpp"
 
+pcstr UI_PATH = "ui";
+
 XMLDocument::XMLDocument() : m_root(), m_pLocalRoot() {}
 
 XMLDocument::~XMLDocument() { ClearInternal(); }
