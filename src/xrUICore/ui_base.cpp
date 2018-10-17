@@ -2,8 +2,6 @@
 #include "ui_base.h"
 #include "Cursor/UICursor.h"
 
-pcstr UI_PATH = "ui";
-
 CUICursor& GetUICursor() { return GEnv.UI->GetUICursor(); }
 UICore& UI() { return *GEnv.UI; }
 extern ENGINE_API Fvector2 g_current_font_scale;

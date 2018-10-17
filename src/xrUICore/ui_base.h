@@ -6,9 +6,6 @@
 #include "xrCommon/xr_stack.h"
 #include "xrUICore/FontManager/FontManager.h"
 
-static constexpr pcstr UI_PATH_DEFAULT = "ui";
-XRUICORE_API extern pcstr UI_PATH;
-
 class CUICursor;
 class CUIGameCustom;
 
