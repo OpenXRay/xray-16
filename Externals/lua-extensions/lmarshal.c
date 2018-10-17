@@ -532,7 +532,7 @@ static int mar_clone(lua_State* L)
     return 1;
 }
 
-static const struct luaL_reg R[] =
+static const struct luaL_Reg R[] =
 {
     {"encode",      mar_encode},
     {"decode",      mar_decode},
