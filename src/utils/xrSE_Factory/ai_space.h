@@ -13,18 +13,20 @@ class CScriptEngine;
 class CAI_Space
 {
 private:
-    CScriptEngine* m_script_engine;
+    bool m_inited = false;
 
+    void init();
     void RegisterScriptClasses();
 
 public:
-    CAI_Space();
+    CAI_Space() = default;
+    CAI_Space(const CAI_Space&) = delete;
+    CAI_Space& operator=(const CAI_Space&) = delete;
     virtual ~CAI_Space();
-    void init();
+    static CAI_Space& GetInstance();
+
     IC CScriptEngine& script_engine() const;
 };
-
-extern CAI_Space* g_ai_space;
 
 IC CAI_Space& ai();
 

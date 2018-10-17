@@ -22,43 +22,42 @@
 #include "moving_objects.h"
 #include "doors_manager.h"
 
-CAI_Space* g_ai_space = 0;
+static CAI_Space g_ai_space;
 
-CAI_Space::CAI_Space()
+CAI_Space& CAI_Space::GetInstance()
 {
-    m_ef_storage = 0;
-    m_cover_manager = 0;
-    m_alife_simulator = 0;
-    m_moving_objects = 0;
-    m_doors_manager = 0;
+    auto& instance = g_ai_space;
+    if (!instance.m_inited)
+    {
+        instance.init();
+    }
+    return instance;
 }
 
 void CAI_Space::init()
 {
-    if (GEnv.isDedicatedServer)
-        return;
-    AISpaceBase::Initialize();
-    VERIFY(!m_ef_storage);
-    m_ef_storage = new CEF_Storage();
+    R_ASSERT(!m_inited);
 
-    VERIFY(!m_cover_manager);
-    m_cover_manager = new CCoverManager();
+    if (!GEnv.isDedicatedServer)
+    {
+        AISpaceBase::Initialize();
 
-    VERIFY(!m_moving_objects);
-    m_moving_objects = new ::moving_objects();
-    VERIFY(!GEnv.ScriptEngine);
-    GEnv.ScriptEngine = new CScriptEngine();
-    SetupScriptEngine();
+        m_ef_storage = std::make_unique<CEF_Storage>();
+        m_cover_manager = std::make_unique<CCoverManager>();
+        m_moving_objects = std::make_unique<::moving_objects>();
+
+        VERIFY(!GEnv.ScriptEngine);
+        GEnv.ScriptEngine = new CScriptEngine();
+        SetupScriptEngine();
+    }
+
+    m_inited = true;
 }
 
 CAI_Space::~CAI_Space()
 {
     unload();
     xr_delete(GEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
-    xr_delete(m_doors_manager);
-    xr_delete(m_moving_objects);
-    xr_delete(m_cover_manager);
-    xr_delete(m_ef_storage);
 }
 
 void CAI_Space::RegisterScriptClasses()
@@ -147,8 +146,7 @@ void CAI_Space::load(LPCSTR level_name)
     m_cover_manager->compute_static_cover();
     m_moving_objects->on_level_load();
 
-    VERIFY(!m_doors_manager);
-    m_doors_manager = new ::doors::manager(level_graph().header().box());
+    m_doors_manager.reset(new ::doors::manager(level_graph().header().box()));
 
 #ifdef DEBUG
     Msg("* Loading ai space is successfully completed (%.3fs, %7.3f Mb)", timer.GetElapsed_sec(),
@@ -161,7 +159,7 @@ void CAI_Space::unload(bool reload)
     if (GEnv.isDedicatedServer)
         return;
     GEnv.ScriptEngine->unload();
-    xr_delete(m_doors_manager);
+    m_doors_manager.reset(nullptr);
     AISpaceBase::Unload(reload);
 }
 

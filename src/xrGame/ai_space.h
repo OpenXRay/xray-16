@@ -10,6 +10,8 @@
 
 #include "xrAICore/AISpaceBase.hpp"
 
+#include <memory>
+
 class CGameGraph;
 class CGameLevelCrossTable;
 class CLevelGraph;
@@ -36,13 +38,17 @@ private:
     friend class CLevel;
 
 private:
-    CEF_Storage* m_ef_storage;
-    CALifeSimulator* m_alife_simulator;
-    CCoverManager* m_cover_manager;
-    moving_objects* m_moving_objects;
-    doors::manager* m_doors_manager;
+    bool m_inited = false;
+
+    std::unique_ptr<CEF_Storage> m_ef_storage;
+    std::unique_ptr<CCoverManager> m_cover_manager;
+    std::unique_ptr<moving_objects> m_moving_objects;
+    std::unique_ptr<doors::manager> m_doors_manager;
+
+    CALifeSimulator* m_alife_simulator = nullptr;
 
 private:
+    void init();
     void load(LPCSTR level_name);
     void unload(bool reload = false);
     void set_alife(CALifeSimulator* alife_simulator);
@@ -50,9 +56,12 @@ private:
     void RegisterScriptClasses();
 
 public:
-    CAI_Space();
+    CAI_Space() = default;
+    CAI_Space(const CAI_Space&) = delete;
+    CAI_Space& operator=(const CAI_Space&) = delete;
     virtual ~CAI_Space();
-    void init();
+    static CAI_Space& GetInstance();
+
     void SetupScriptEngine();
     IC CEF_Storage& ef_storage() const;
 
@@ -64,7 +73,5 @@ public:
 };
 
 IC CAI_Space& ai();
-
-extern CAI_Space* g_ai_space;
 
 #include "ai_space_inline.h"

@@ -10,16 +10,8 @@
 
 IC CScriptEngine& CAI_Space::script_engine() const
 {
-    VERIFY(m_script_engine);
-    return *m_script_engine;
+    VERIFY(GEnv.ScriptEngine);
+    return *GEnv.ScriptEngine;
 }
 
-IC CAI_Space& ai()
-{
-    if (!g_ai_space)
-    {
-        g_ai_space = new CAI_Space();
-        g_ai_space->init();
-    }
-    return *g_ai_space;
-}
+IC CAI_Space& ai() { return CAI_Space::GetInstance(); }

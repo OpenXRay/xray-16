@@ -63,8 +63,6 @@ extern void destroy_lua_wpn_params();
 void clean_game_globals()
 {
     destroy_lua_wpn_params();
-    // destroy ai space
-    xr_delete(g_ai_space);
     // destroy object factory
     xr_delete(g_object_factory);
     // destroy monster squad global var
