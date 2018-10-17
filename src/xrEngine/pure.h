@@ -2,11 +2,11 @@
 #include "xrCommon/xr_vector.h"
 
 // messages
-#define REG_PRIORITY_LOW 0x11111111ul
-#define REG_PRIORITY_NORMAL 0x22222222ul
-#define REG_PRIORITY_HIGH 0x33333333ul
-#define REG_PRIORITY_CAPTURE 0x7ffffffful
-#define REG_PRIORITY_INVALID 0xfffffffful
+#define REG_PRIORITY_LOW 0x11111111
+#define REG_PRIORITY_NORMAL 0x22222222
+#define REG_PRIORITY_HIGH 0x33333333
+#define REG_PRIORITY_CAPTURE 0x7fffffff
+#define REG_PRIORITY_INVALID 0x80000000 // -2147483648, lowest for int
 
 struct IPure
 {
@@ -35,7 +35,7 @@ DECLARE_MESSAGE(ScreenResolutionChanged);
 struct MessageObject
 {
     IPure* Object;
-    unsigned long Prio;
+    int Prio;
 };
 
 template<class T>
@@ -49,7 +49,7 @@ public:
 
     void Clear() { messages.clear(); }
 
-    constexpr void Add(T* object, unsigned long priority = REG_PRIORITY_NORMAL)
+    constexpr void Add(T* object, const int priority = REG_PRIORITY_NORMAL)
     {
         Add({ object, priority });
     }
@@ -112,7 +112,7 @@ public:
     {
         if (!messages.empty()) {
             std::sort(std::begin(messages), std::end(messages),
-                [](const auto& a, const auto& b) { return a.Prio < b.Prio; });
+                [](const auto& a, const auto& b) { return a.Prio > b.Prio; });
         }
 
         while (!messages.empty() && messages.back().Prio == REG_PRIORITY_INVALID)
