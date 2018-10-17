@@ -112,7 +112,7 @@ void CGameObject::MakeMeCrow()
         return;
     u32 const device_frame_id = Device.dwFrame;
     u32 const object_frame_id = dwFrame_AsCrow;
-#ifndef LINUX // FIXME!!!
+#ifndef LINUX
     if ((u32)_InterlockedCompareExchange((long*)&dwFrame_AsCrow, device_frame_id, object_frame_id) == device_frame_id)
 #else
      if (__sync_val_compare_and_swap((long*)&dwFrame_AsCrow, object_frame_id, device_frame_id) == device_frame_id)

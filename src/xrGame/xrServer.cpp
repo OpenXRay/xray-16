@@ -829,7 +829,7 @@ void xrServer::Server_Client_Check(IClient* CL)
     {
         return;
     };
-#ifdef LINUX // FIXME!!!
+#ifdef LINUX
     if (CL->process_id == getpid())
 #else
     if (CL->process_id == GetCurrentProcessId())
