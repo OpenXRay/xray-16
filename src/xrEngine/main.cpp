@@ -66,11 +66,8 @@ public:
     {
         if (!ignored)
             return true;
-#if !defined(LINUX)
-        return allow_to_include_path(*ignored, path);  //TODO port xrNetServer to Linux
-#else
-        return false; // Noidea what happenning
-#endif
+
+        return allow_to_include_path(*ignored, path);
     }
 };
 }
@@ -85,14 +82,12 @@ ENGINE_API void InitSettings()
     pSettings = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pSettings->section_count(),
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
-#if !defined(LINUX)
     xr_auth_strings_t ignoredPaths, checkedPaths;
     fill_auth_check_params(ignoredPaths, checkedPaths); //TODO port xrNetServer to Linux
     PathIncludePred includePred(&ignoredPaths);
     CInifile::allow_include_func_t includeFilter;
     includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
     pSettingsAuth = new CInifile(fname, TRUE, TRUE, FALSE, 0, includeFilter);
-#endif
     FS.update_path(fname, "$game_config$", "game.ltx");
     pGameIni = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pGameIni->section_count(),
