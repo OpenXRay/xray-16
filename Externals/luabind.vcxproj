@@ -79,6 +79,7 @@
     </Link>
     <Link>
       <GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">false</GenerateDebugInformation>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
