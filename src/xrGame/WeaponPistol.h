@@ -1,10 +1,9 @@
 #pragma once
-//#include "WeaponCustomPistol.h"
-#include "WeaponCustomPistolAuto.h"
+#include "WeaponCustomPistol.h"
 
-class CWeaponPistol : public CWeaponCustomPistolAuto
+class CWeaponPistol : public CWeaponCustomPistol
 {
-    using inherited = CWeaponCustomPistolAuto;
+    using inherited = CWeaponCustomPistol;
 
 public:
     CWeaponPistol();
