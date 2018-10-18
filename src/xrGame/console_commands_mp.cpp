@@ -1245,7 +1245,7 @@ public:
         bLowerCaseArgs = false;
         bEmptyArgsHandled = false;
     };
-    virtual void Status(TStatus& S)
+    virtual void GetStatus(TStatus& S)
     {
         S[0] = 0;
         if (IsGameTypeSingle())
