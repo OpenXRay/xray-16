@@ -620,7 +620,7 @@ CVisibleObject* CVisualMemoryManager::visible_object(const CGameObject* game_obj
     return (&*I);
 }
 
-IC squad_mask_type CVisualMemoryManager::mask() const
+squad_mask_type CVisualMemoryManager::mask() const
 {
     if (!m_stalker)
         return (squad_mask_type(-1));
