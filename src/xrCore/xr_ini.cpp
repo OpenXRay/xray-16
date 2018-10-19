@@ -340,14 +340,15 @@ CInifile::CInifile(pcstr fileName, bool readOnly, bool loadAtStart, bool saveAtE
     if (fileName && strstr(fileName, "system"))
         Msg("-----loading %s", fileName);
 
+#ifdef LINUX
+    if (fileName)
+        while (char* sep = strchr((char *)fileName, '\\')) *sep = '/';
+#endif
+
     m_file_name[0] = 0;
     m_flags.zero();
     if (fileName)
         xr_strcpy(m_file_name, sizeof m_file_name, fileName);
-
-#ifdef LINUX
-    while (char* sep = strchr(m_file_name, '\\')) *sep = '/';
-#endif
 
     m_flags.set(eSaveAtEnd, saveAtEnd);
     m_flags.set(eReadOnly, readOnly);
