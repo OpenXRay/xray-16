@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHFracture.h"
 #include "Physics.h"
 #include "PHElement.h"

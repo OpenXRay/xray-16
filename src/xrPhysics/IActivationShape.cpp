@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "IActivationShape.h"
 #include "PHActivationShape.h"
 #include "Physics.h"

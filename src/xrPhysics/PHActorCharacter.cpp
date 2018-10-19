@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHActorCharacter.h"
 #include "ExtendedGeom.h"
 #include "PhysicsCommon.h"
