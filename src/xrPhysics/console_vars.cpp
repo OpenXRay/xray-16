@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "console_vars.h"
 
 #include "PhysicsCommon.h"
