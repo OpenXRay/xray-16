@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PhysicsExternalCommon.h"
 #include "ExtendedGeom.h"
 #include "MathUtilsOde.h"

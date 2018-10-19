@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Geometry.h"
 #include "PHDynamicData.h"
 #include "ExtendedGeom.h"

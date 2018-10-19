@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHMoveStorage.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)

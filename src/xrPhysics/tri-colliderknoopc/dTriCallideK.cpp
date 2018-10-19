@@ -1,2 +1,2 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "dTriCollideK.h"

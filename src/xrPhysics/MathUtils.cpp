@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "MathUtils.h"
 #include "xrCore/_cylinder.h"
 #include <ode/common.h>

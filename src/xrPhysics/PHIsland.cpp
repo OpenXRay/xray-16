@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHIsland.h"
 #include "Physics.h"
 #include "ph_valid_ode.h"
