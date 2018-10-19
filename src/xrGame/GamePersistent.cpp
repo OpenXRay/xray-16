@@ -87,7 +87,7 @@ void SetupUIStyle()
 
     UI_PATH = xr_strdup(selectedStylePath);
 
-    strconcat(sizeof(selectedStylePath), selectedStylePath, selectedStylePath, DELIMITER);
+    strconcat(sizeof(selectedStylePath), selectedStylePath, selectedStylePath, "\\");
     UI_PATH_WITH_DELIMITER = xr_strdup(selectedStylePath);
 
     defaultUIStyle = false;
