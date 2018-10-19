@@ -26,10 +26,6 @@ protected:
     u16 m_last_shoot_weapon;
 }; // class silent_shots
 
-ADD_ACCUMULATIVE_STATE(acpv_thunder_count, silent_shots);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_thunder_count, silent_shots)
-
 } // namespace award_system
 
 #endif //#ifndef SILENT_SHOTS_INCLUDED

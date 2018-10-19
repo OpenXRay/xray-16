@@ -30,10 +30,6 @@ protected:
     u32 m_spawn_time;
 }; // class player_state_marksman
 
-ADD_ACCUMULATIVE_STATE(acpv_marksman_count, player_state_marksman);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_marksman_count, player_state_marksman)
-
 } // namespace award_system
 
 #endif //#ifndef PLAYER_STATE_MARKSMAN

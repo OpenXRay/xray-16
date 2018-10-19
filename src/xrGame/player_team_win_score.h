@@ -31,10 +31,6 @@ protected:
     u8 m_player_team;
 }; // class player_team_win_score
 
-ADD_ACCUMULATIVE_STATE(acpv_my_team_win_score, player_team_win_score);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_my_team_win_score, player_team_win_score)
-
 class player_enemy_team_score : public player_team_win_score
 {
     typedef player_team_win_score inherited;
@@ -55,10 +51,6 @@ protected:
 
 }; // class player_enemy_team_score
 
-ADD_ACCUMULATIVE_STATE(acpv_enemy_team_score, player_enemy_team_score);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_enemy_team_score, player_enemy_team_score)
-
 class player_runtime_win_score : public player_team_win_score
 {
     typedef player_team_win_score inherited;
@@ -71,10 +63,6 @@ public:
     virtual void OnPlayerBringArtefact(game_PlayerState const* ps);
 }; // class player_runtime_win_score
 
-ADD_ACCUMULATIVE_STATE(acpv_my_team_win_score_now, player_runtime_win_score);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_my_team_win_score_now, player_runtime_win_score)
-
 class player_runtime_enemy_team_score : public player_enemy_team_score
 {
     typedef player_enemy_team_score inherited;
@@ -85,10 +73,6 @@ public:
 
     virtual void OnPlayerBringArtefact(game_PlayerState const* ps);
 }; // class player_runtime_enemy_team_score
-
-ADD_ACCUMULATIVE_STATE(acpv_enemy_team_score_now, player_runtime_enemy_team_score);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_enemy_team_score_now, player_runtime_enemy_team_score)
 
 } // namespace award_system
 

@@ -28,10 +28,6 @@ protected:
     u32 m_kills_count;
 }; // class player_state_skewer
 
-ADD_ACCUMULATIVE_STATE(acpv_skewer_count, player_state_skewer);
-#undef ACCUMULATIVE_STATE_LIST
-#define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_skewer_count, player_state_skewer)
-
 } // namespace award_system
 
 #endif //#ifndef PLAYER_STATE_SKEWER_INCLUDED
