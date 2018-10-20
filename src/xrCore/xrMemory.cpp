@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "SDL.h"
+
 #if defined(WINDOWS)
 #include <Psapi.h>
 #elif defined(LINUX)
