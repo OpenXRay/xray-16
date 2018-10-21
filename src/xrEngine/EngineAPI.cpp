@@ -90,7 +90,7 @@ void CEngineAPI::SelectRenderer()
 #if defined(WINDOWS)
     select(r4_library, rsR4, 4, rsR3);
     select(r3_library, rsR3, 3, rsR2);
-    select(r2_library, rsR2, 2, rsR4);
+    select(r2_library, rsR2, 2, rsR1);
 #endif
 
     select(r1_library, rsR1, 1);
