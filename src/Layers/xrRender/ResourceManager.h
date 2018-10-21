@@ -38,7 +38,7 @@ public:
     //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     using map_GS = xr_map<const char*, SGS*, str_pred>;
 #endif
 
@@ -62,7 +62,7 @@ private:
     map_VS m_vs;
     map_PS m_ps;
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     map_GS m_gs;
 #endif
 
@@ -159,7 +159,7 @@ public:
 
 //	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
 //	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     SGS* _CreateGS(LPCSTR Name);
     void _DeleteGS(const SGS* GS);
 #endif //	USE_DX10

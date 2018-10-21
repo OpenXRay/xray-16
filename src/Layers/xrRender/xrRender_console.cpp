@@ -45,14 +45,14 @@ const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     {"st_opt_ultra", 4},
 #endif
     {nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
 #endif // USE_DX10
     {nullptr, 0}};

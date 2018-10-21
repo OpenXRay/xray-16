@@ -174,7 +174,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 #endif // USE_OGL
 
 // ******************** Environment params (setting)
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
 #else //	USE_DX10
 

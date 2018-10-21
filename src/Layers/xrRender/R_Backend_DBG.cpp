@@ -17,7 +17,7 @@ void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV
 
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
 {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
     UNUSED(T);
@@ -33,7 +33,7 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
 }
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
     UNUSED(T);
@@ -162,7 +162,7 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
 
     set_xform_world(T);
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
 // dbg_Draw(D3DPT_TRIANGLELIST,verts,vcnt,gFaces,224);

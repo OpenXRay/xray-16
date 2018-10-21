@@ -149,7 +149,7 @@ void CBackend::Invalidate()
 void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)
 {
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     // TODO: DX10: Implement in the corresponding vertex shaders
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
@@ -196,7 +196,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
         return;
     if (!_enable)
     {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 // TODO: DX10: Implement in the corresponding vertex shaders
 // Use this to set up location, were shader setup code will get data
 // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
