@@ -41,31 +41,38 @@ using Factory_Destroy = DLL_API void __cdecl(IFactoryObject* O);
 
 // Tuning interface
 extern "C" {
-using VTPause = void __cdecl(void);
-using VTResume = void __cdecl(void);
+using VTPause = void __cdecl();
+using VTResume = void __cdecl();
 };
 
 class ENGINE_API CEngineAPI
 {
+    using SupportCheck = bool(*)();
+    using SetupEnv     = void(*)();
+    using GetModeName  = pcstr(*)();
+
     XRay::Module hGame;
     XRay::Module hTuner;
-    XRay::Module hRenderR1;
-    XRay::Module hRenderR2;
-    XRay::Module hRenderR3;
-    XRay::Module hRenderR4;
-    XRay::Module hRenderRGL;
+    xr_map<pcstr, XRay::Module> renderers;
+    xr_map<pcstr, SupportCheck> checkFunctions;
+    xr_map<pcstr, SetupEnv>     setupFunctions;
+
+    SetupEnv setupSelectedRenderer;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
-    Factory_Create* pCreate;
+
+    Factory_Create*  pCreate;
     Factory_Destroy* pDestroy;
-    bool tune_enabled;
-    VTPause* tune_pause;
+
+    bool      tune_enabled;
+    VTPause*  tune_pause;
     VTResume* tune_resume;
+
     void Initialize();
 
     void InitializeRenderers();
-    void SetupCurrentRenderer();
+    void SelectRenderer();
 
     void Destroy();
 
