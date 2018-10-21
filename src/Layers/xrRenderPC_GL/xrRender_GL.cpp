@@ -1,11 +1,11 @@
-// xrRender_GL.cpp : Defines the entry point for the DLL application.
-//
 #include "stdafx.h"
 #include "Layers/xrRender/dxRenderFactory.h"
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-void SetupEnvRGL()
+extern "C"
+{
+XR_EXPORT void SetupEnv()
 {
     GEnv.Render = &RImplementation;
     GEnv.RenderFactory = &RenderFactoryImpl;
@@ -17,25 +17,14 @@ void SetupEnvRGL()
     xrRender_initconsole();
 }
 
-bool SupportsOpenGLRendering()
+XR_EXPORT pcstr GetModeName()
+{
+    return "renderer_gl";
+}
+
+XR_EXPORT bool CheckRendererSupport()
 {
     // XXX: do a real check
     return true;
 }
-
-// This must not be optimized by compiler
-static const volatile class GEnvHelper
-{
-public:
-    GEnvHelper()
-    {
-        GEnv.CheckRGL = SupportsOpenGLRendering;
-        GEnv.SetupRGL = SetupEnvRGL;
-    }
-
-    ~GEnvHelper()
-    {
-        GEnv.SetupRGL = nullptr;
-        GEnv.SetupRGL = nullptr;
-    }
-} helper;
+}

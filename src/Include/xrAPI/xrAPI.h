@@ -15,9 +15,6 @@ class UICore;
 
 class XRAPI_API EngineGlobalEnvironment
 {
-    using SupportCheck = bool(*)();
-    using SetupEnv = void(*)();
-
 public:
     IRender* Render;
     IDebugRender* DRender;
@@ -34,16 +31,6 @@ public:
     bool isDedicatedServer;
 
     int CurrentRenderer;
-    SupportCheck CheckR2;
-    SupportCheck CheckR3;
-    SupportCheck CheckR4;
-    SupportCheck CheckRGL;
-    SetupEnv SetupR1;
-    SetupEnv SetupR2;
-    SetupEnv SetupR3;
-    SetupEnv SetupR4;
-    SetupEnv SetupRGL;
-    SetupEnv SetupCurrentRenderer;
 };
 
 extern XRAPI_API EngineGlobalEnvironment GEnv;
