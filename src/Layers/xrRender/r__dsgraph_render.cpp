@@ -116,7 +116,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
             {
                 RCache.set_VS(vs_it->first);
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
                 //	GS setup
                 mapNormalGS& gs = vs_it->second;
                 gs.ssa = 0;
@@ -205,7 +205,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                     }
                     nrmPS.clear();
                     ps.clear();
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
                 }
                 nrmGS.clear();
                 gs.clear();
@@ -231,7 +231,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         {
             RCache.set_VS(vs_id->first);
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
             mapMatrixGS& gs = vs_id->second;
             gs.ssa = 0;
 
@@ -323,7 +323,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                 }
                 matPS.clear();
                 ps.clear();
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
             }
             matGS.clear();
             gs.clear();

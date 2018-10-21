@@ -169,7 +169,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
                     {
                         Nps.ssa = SSA;
 #endif
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
                         if (SSA > Ngs.ssa)
                         {
                             Ngs.ssa = SSA;
@@ -178,7 +178,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
                             {
                                 Nvs.ssa = SSA;
                             }
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
                         }
 #endif
                     }
@@ -316,7 +316,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                     {
                         Nps.ssa = SSA;
 #endif
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
                         if (SSA > Ngs.ssa)
                         {
                             Ngs.ssa = SSA;
@@ -325,7 +325,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                             {
                                 Nvs.ssa = SSA;
                             }
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
                         }
 #endif
                     }
@@ -928,7 +928,7 @@ void D3DXRenderBase::SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bF
 
 void D3DXRenderBase::overdrawBegin()
 {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     //  TODO: DX10: Implement overdrawBegin
     VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
 #else
@@ -950,7 +950,7 @@ void D3DXRenderBase::overdrawBegin()
 
 void D3DXRenderBase::overdrawEnd()
 {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     // TODO: DX10: Implement overdrawEnd
     VERIFY(!"D3DXRenderBase::overdrawEnd not implemented.");
 #else
@@ -1039,7 +1039,7 @@ void D3DXRenderBase::Begin()
 
 void D3DXRenderBase::Clear()
 {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     HW.pContext->ClearDepthStencilView(RCache.get_ZB(), D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
     if (psDeviceFlags.test(rsClearBB))
     {

@@ -53,7 +53,7 @@ struct ECORE_API SPS : public xr_resource_named
 };
 typedef resptr_core<SPS, resptr_base<SPS>> ref_ps;
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {

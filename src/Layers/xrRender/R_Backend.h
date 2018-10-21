@@ -110,7 +110,7 @@ private:
 #endif // USE_OGL
 
     // Vertices/Indices/etc
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     SDeclaration* decl;
 #else	//	USE_DX10
     IDirect3DVertexDeclaration9* decl;
@@ -151,7 +151,7 @@ private:
 #ifdef DEBUG
     LPCSTR ps_name;
     LPCSTR vs_name;
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     LPCSTR gs_name;
 #ifdef USE_DX11
     LPCSTR hs_name;
@@ -183,7 +183,7 @@ private:
     CTexture* textures_ps[CTexture::mtMaxPixelShaderTextures]; // stages
     //CTexture* textures_vs[5]; // dmap + 4 vs
     CTexture* textures_vs[CTexture::mtMaxVertexShaderTextures]; // 4 vs
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
 #	ifdef USE_DX11
     CTexture* textures_hs[CTexture::mtMaxHullShaderTextures]; // 4 vs
@@ -303,7 +303,7 @@ public:
     ICF void set_States(SState* _state);
     ICF void set_States(ref_state& _state) { set_States(&*_state); }
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     ICF void set_Format(SDeclaration* _decl);
 #else // USE_DX10
     ICF void set_Format(IDirect3DVertexDeclaration9* _decl);
@@ -316,7 +316,7 @@ public:
 #endif // USE_OGL
     ICF void set_PS(ref_ps& _ps) { set_PS(_ps->sh, _ps->cName.c_str()); }
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 #ifdef USE_OGL
     ICF void set_GS(GLuint _gs, LPCSTR _n = 0);
 #else
@@ -431,7 +431,7 @@ public:
             constants.seta(C, e, x, y, z, w);
     }
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     ICF void set_c(R_constant* C, float A)
     {
         if (C)
@@ -483,7 +483,7 @@ public:
             set_ca(&*ctable->get(n), e, x, y, z, w);
     }
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     ICF void set_c(LPCSTR n, float A)
     {
         if (ctable)
@@ -534,7 +534,7 @@ public:
             set_ca(&*ctable->get(n), e, x, y, z, w);
     }
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     ICF void set_c(shared_str& n, float A)
     {
         if (ctable)
@@ -566,7 +566,7 @@ public:
     // Debug render
     void dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
     void dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     //	TODO: DX10: Implement this.
     IC void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { VERIFY(!"Not implemented"); }
     IC void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value) { VERIFY(!"Not implemented"); }

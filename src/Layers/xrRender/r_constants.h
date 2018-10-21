@@ -99,7 +99,7 @@ struct ECORE_API R_constant : public xr_resource
 
     R_constant_load ps;
     R_constant_load vs;
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     R_constant_load gs;
 #ifdef USE_DX11
     R_constant_load hs;
@@ -119,7 +119,7 @@ struct ECORE_API R_constant : public xr_resource
         {
         case RC_dest_vertex: return vs;
         case RC_dest_pixel: return ps;
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
         case RC_dest_geometry: return gs;
 #ifdef USE_DX11
         case RC_dest_hull: return hs;

@@ -99,7 +99,7 @@ struct mapNormalPS : public xr_unordered_map<ps_type, mapNormalCS>
 };
 #endif
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 struct mapNormalGS : public xr_unordered_map<gs_type, mapNormalPS>
 {
     float ssa;
@@ -155,7 +155,7 @@ struct mapMatrixPS : public xr_unordered_map<ps_type, mapMatrixCS>
 };
 #endif
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 struct mapMatrixGS : public xr_unordered_map<gs_type, mapMatrixPS>
 {
     float ssa;
