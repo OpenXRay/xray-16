@@ -33,6 +33,10 @@
 #include "StdAfx.h"
 #include "limb.h"
 
+#ifdef LINUX
+#undef roundup // defined in <sys/param.h>
+#endif
+
 enum
 {
     SolvePosOnly = 1,
