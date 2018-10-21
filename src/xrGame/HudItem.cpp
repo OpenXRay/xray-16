@@ -17,6 +17,15 @@
 #include "script_callback_ex.h"
 #include "script_game_object.h"
 
+extern const float PITCH_OFFSET_R = 0.00f;		// barrel movement sideways (to the left) with vertical camera turns
+extern const float PITCH_OFFSET_N = 0.00f;		// barrel rise / fall with vertical camera turns
+extern const float PITCH_OFFSET_D = 0.00f;		// barrel toward / away when the camera rotates vertically
+extern const float PITCH_LOW_LIMIT = 0.14f;		// minimum pitch value when used in conjunction with PITCH_OFFSET_N
+extern const float ORIGIN_OFFSET = -0.05f;		// inertia factor influence on position of torso (the smaller, the larger the inertia)
+extern const float ORIGIN_OFFSET_AIM = -0.03f;	// (zoomed inertia factor)
+extern const float TENDTO_SPEED = 5.f;			// barrel return speed
+extern const float TENDTO_SPEED_AIM = 8.f;		// (zoomed return speed)
+
 CHudItem::CHudItem()
 {
     RenderHud(TRUE);
@@ -25,6 +34,16 @@ CHudItem::CHudItem()
     m_bStopAtEndAnimIsRunning = false;
     m_current_motion_def = NULL;
     m_started_rnd_anim_idx = u8(-1);
+	
+	//inertion
+	m_inertion_params.m_origin_offset = ORIGIN_OFFSET;
+	m_inertion_params.m_origin_offset_aim = ORIGIN_OFFSET_AIM;
+	m_inertion_params.m_pitch_low_limit = PITCH_LOW_LIMIT;
+	m_inertion_params.m_pitch_offset_d = PITCH_OFFSET_D;
+	m_inertion_params.m_pitch_offset_n = PITCH_OFFSET_N;
+	m_inertion_params.m_pitch_offset_r = PITCH_OFFSET_R;
+	m_inertion_params.m_tendto_speed = TENDTO_SPEED;
+	m_inertion_params.m_tendto_speed_aim = TENDTO_SPEED_AIM;
 }
 
 IFactoryObject* CHudItem::_construct()
@@ -45,6 +64,16 @@ void CHudItem::Load(LPCSTR section)
     m_animation_slot = pSettings->r_u32(section, "animation_slot");
 
     m_sounds.LoadSound(section, "snd_bore", "sndBore", true);
+
+	m_inertion_params.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, section, "pitch_offset_right", PITCH_OFFSET_R);
+	m_inertion_params.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, section, "pitch_offset_up", PITCH_OFFSET_N);
+	m_inertion_params.m_pitch_offset_d = READ_IF_EXISTS(pSettings, r_float, section, "pitch_offset_forward", PITCH_OFFSET_D);
+	m_inertion_params.m_pitch_low_limit = READ_IF_EXISTS(pSettings, r_float, section, "pitch_offset_up_low_limit", PITCH_LOW_LIMIT);
+
+	m_inertion_params.m_origin_offset = READ_IF_EXISTS(pSettings, r_float, section, "inertion_origin_offset", ORIGIN_OFFSET);
+	m_inertion_params.m_origin_offset_aim = READ_IF_EXISTS(pSettings, r_float, section, "inertion_origin_aim_offset", ORIGIN_OFFSET_AIM);
+	m_inertion_params.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, section, "inertion_tendto_speed", TENDTO_SPEED);
+	m_inertion_params.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, section, "inertion_tendto_aim_speed", TENDTO_SPEED_AIM);
 }
 
 void CHudItem::PlaySound(LPCSTR alias, const Fvector& position)

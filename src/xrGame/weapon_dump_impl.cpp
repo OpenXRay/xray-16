@@ -30,4 +30,10 @@ void CWeapon::DumpActiveParams(shared_str const& section_name, CInifile& dst_ini
     dst_ini.w_float(section_name.c_str(), "cam_dispersion_inc", cam_recoil.DispersionInc);
     dst_ini.w_float(section_name.c_str(), "zoom_cam_dispersion", zoom_cam_recoil.Dispersion);
     dst_ini.w_float(section_name.c_str(), "zoom_cam_dispersion_inc", zoom_cam_recoil.DispersionInc);
+	// inertion added
+	dst_ini.w_float(section_name.c_str(), "inertion_origin_offset", m_inertion_params.m_origin_offset);
+	dst_ini.w_float(section_name.c_str(), "inertion_origin_aim_offset", m_inertion_params.m_origin_offset_aim);
+	dst_ini.w_float(section_name.c_str(), "inertion_tendto_speed", m_inertion_params.m_tendto_speed);
+	dst_ini.w_float(section_name.c_str(), "inertion_tendto_aim_speed", m_inertion_params.m_tendto_speed_aim);
+
 }

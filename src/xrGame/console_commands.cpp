@@ -63,13 +63,14 @@ extern u64 g_qwStartGameTime;
 extern u64 g_qwEStartGameTime;
 
 ENGINE_API
-extern float psHUD_FOV;
-extern float psSqueezeVelocity;
-extern int psLUA_GCSTEP;
-
-extern Fvector m_hud_offset_pos;
-extern Fvector m_hand_offset_pos;
+extern	float	psHUD_FOV;
+extern	float	psSqueezeVelocity;
+extern	int		psLUA_GCSTEP;
+extern Fvector	m_hud_offset_pos;
+extern Fvector	m_hand_offset_pos;
 extern BOOL		g_use_aim_inertion;
+
+
 
 extern int x_m_x;
 extern int x_m_z;

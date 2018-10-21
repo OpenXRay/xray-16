@@ -23,14 +23,15 @@ static bool process_if_exists_deg2rad(LPCSTR section, LPCSTR name, float& value,
 
 bool CWeapon::install_upgrade_impl(LPCSTR section, bool test)
 {
-    // inherited::install_upgrade( section );
-    bool result = CInventoryItemObject::install_upgrade_impl(section, test);
+	//inherited::install_upgrade( section );
+	bool result = CInventoryItemObject::install_upgrade_impl(section, test);
 
-    result |= install_upgrade_ammo_class(section, test);
-    result |= install_upgrade_disp(section, test);
-    result |= install_upgrade_hit(section, test);
-    result |= install_upgrade_addon(section, test);
-    return result;
+	result |= install_upgrade_ammo_class(section, test);
+	result |= install_upgrade_disp(section, test);
+	result |= install_upgrade_hit(section, test);
+	result |= install_upgrade_addon(section, test);
+	result |= install_upgrade_hud(section, test);
+	return result;
 }
 
 bool CWeapon::install_upgrade_ammo_class(LPCSTR section, bool test)
@@ -137,6 +138,18 @@ bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
     result |= result2;
 
     return result;
+}
+
+bool CWeapon::install_upgrade_hud(LPCSTR section, bool test)
+{
+	bool result = false;
+	//	Inertion additions
+	result = process_if_exists(section, "inertion_origin_offset", &CInifile::r_float, m_inertion_params.m_origin_offset, test);
+	result |= process_if_exists(section, "inertion_origin_aim_offset", &CInifile::r_float, m_inertion_params.m_origin_offset_aim, test);
+	result |= process_if_exists(section, "inertion_tendto_speed", &CInifile::r_float,m_inertion_params.m_tendto_speed, test);
+	result |= process_if_exists(section, "inertion_tendto_aim_speed", &CInifile::r_float, m_inertion_params.m_tendto_speed_aim, test);
+
+	return result;
 }
 
 bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
