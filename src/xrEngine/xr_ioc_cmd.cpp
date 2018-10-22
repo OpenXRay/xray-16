@@ -401,13 +401,13 @@ public:
             return;
         }
     }
-    virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
+    void GetStatus(TStatus& S) override { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
     const xr_token* GetToken() noexcept override { return VidModesToken.data(); }
     virtual void Info(TInfo& I) { xr_strcpy(I, sizeof(I), "change screen resolution WxH"); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
         TStatus str, cur;
-        Status(cur);
+        GetStatus(cur);
 
         bool res = false;
         const xr_token* tok = GetToken();
@@ -596,7 +596,7 @@ public:
         inherited::Execute(args);
     }
 
-    virtual void Status(TStatus& S)
+    void GetStatus(TStatus& S) override
     {
         GetToken();
         if (!tokens)
@@ -657,7 +657,7 @@ class ENGINE_API CCC_HideConsole : public IConsole_Command
 public:
     CCC_HideConsole(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
     virtual void Execute(LPCSTR args) { Console->Hide(); }
-    virtual void Status(TStatus& S) { S[0] = 0; }
+    void GetStatus(TStatus& S) override { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "hide console"); }
 };
 
