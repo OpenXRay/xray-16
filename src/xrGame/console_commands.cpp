@@ -256,7 +256,7 @@ public:
     }
 
     virtual void Save(IWriter* F){};
-    virtual void Status(TStatus& S)
+    void GetStatus(TStatus& S) override
     {
         if (!g_pGameLevel)
             return;
@@ -1086,7 +1086,7 @@ public:
 #endif
         physics_world()->SetGravity(float(atof(args)));
     }
-    virtual void Status(TStatus& S)
+    void GetStatus(TStatus& S) override
     {
         if (physics_world())
             xr_sprintf(S, "%3.5f", physics_world()->Gravity());
@@ -1114,7 +1114,7 @@ public:
         if (physics_world())
             physics_world()->SetStep(ph_console::ph_step_time);
     }
-    virtual void Status(TStatus& S) { xr_sprintf(S, "%3.5f", 1.f / ph_console::ph_step_time); }
+    void GetStatus(TStatus& S) override { xr_sprintf(S, "%3.5f", 1.f / ph_console::ph_step_time); }
 };
 
 #ifdef DEBUG
@@ -1217,7 +1217,7 @@ public:
         }
     }
 
-    virtual void Status(TStatus& S) { xr_strcpy(S, "<script_name> (Specify script name!)"); }
+    void GetStatus(TStatus& S) override { xr_strcpy(S, "<script_name> (Specify script name!)"); }
     virtual void Save(IWriter* F) {}
     virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_scripts$", ".script"); }
 };
@@ -1257,7 +1257,7 @@ public:
         }
     } // void	Execute
 
-    virtual void Status(TStatus& S) { xr_strcpy(S, "<script_name.function()> (Specify script and function name!)"); }
+    void GetStatus(TStatus& S) override { xr_strcpy(S, "<script_name.function()> (Specify script and function name!)"); }
     virtual void Save(IWriter* F) {}
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -1281,7 +1281,7 @@ public:
         clamp(time_factor, EPS, 1000.f);
         Device.time_factor(time_factor);
     }
-    virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "%f", Device.time_factor()); }
+    void GetStatus(TStatus& S) override { xr_sprintf(S, sizeof(S), "%f", Device.time_factor()); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "[0.001 - 1000.0]"); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -1352,7 +1352,7 @@ struct CCC_StartTimeSingle : public IConsole_Command
         Level().SetGameTimeFactor(g_qwStartGameTime, g_fTimeFactor);
     }
 
-    virtual void Status(TStatus& S)
+    void GetStatus(TStatus& S) override
     {
         u32 year = 1, month = 1, day = 1, hours = 0, mins = 0, secs = 0, milisecs = 0;
         split_time(g_qwStartGameTime, year, month, day, hours, mins, secs, milisecs);
