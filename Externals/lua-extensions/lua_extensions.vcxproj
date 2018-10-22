@@ -573,11 +573,6 @@
     <ClInclude Include="lmarshal.h" />
     <ClInclude Include="script_additional_libs.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LuaJIT\src\LuaJIT.vcxproj">
-      <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

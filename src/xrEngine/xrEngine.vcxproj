@@ -521,9 +521,6 @@
     <ProjectReference Include="..\..\Externals\libtheora_static.vcxproj">
       <Project>{653f3841-3f26-49b9-afcf-091db4b67031}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Externals\LuaJIT\src\LuaJIT.vcxproj">
-      <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\Externals\oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
     </ProjectReference>
