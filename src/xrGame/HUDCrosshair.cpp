@@ -9,7 +9,7 @@
 
 CHUDCrosshair::CHUDCrosshair()
 {
-    hShader->create("hud" DELIMITER "crosshair");
+    hShader->create("hud\\crosshair");
     radius = 0;
 }
 
