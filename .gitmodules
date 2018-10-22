@@ -1,6 +1,7 @@
 [submodule "Externals/LuaJIT"]
 	path = Externals/LuaJIT
-	url = https://github.com/Roman-n/LuaJIT.git
+    url = https://github.com/qweasdd136963/LuaJIT.git
+    branch = v2.1
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/qweasdd136963/luabind-deboostified.git

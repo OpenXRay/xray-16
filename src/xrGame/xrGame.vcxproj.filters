@@ -2308,6 +2308,9 @@
     <Filter Include="UI\Common\LoadingScreen">
       <UniqueIdentifier>{d9b405a9-3bb7-4739-bfc6-60b1a7c278cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Devices\Flashlight">
+      <UniqueIdentifier>{d6a86ff1-7748-4114-a033-8231e9b6a2e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6665,9 +6668,11 @@
     <ClInclude Include="ActorNightVision.h">
       <Filter>Core\Client\Objects\actor\base</Filter>
     </ClInclude>
-    <ClInclude Include="Flashlight.h" />
     <ClInclude Include="ui\UILoadingScreen.h">
       <Filter>UI\Common\LoadingScreen</Filter>
+    </ClInclude>
+    <ClInclude Include="Flashlight.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9703,9 +9708,11 @@
     <ClCompile Include="InventoryOwner_script.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryOwner</Filter>
     </ClCompile>
-    <ClCompile Include="Flashlight.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp">
       <Filter>UI\Common\LoadingScreen</Filter>
+    </ClCompile>
+    <ClCompile Include="Flashlight.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
