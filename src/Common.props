@@ -75,7 +75,18 @@
 
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>.;$(SolutionDir);$(xrExternals);$(ProjectDir);$(xrSdkDir)include;$(xrSdkDir)DXSDK/Include;$(xrExternals)luajit\src;$(xrExternals)luabind;$(xrExternals)GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+        .;
+        $(SolutionDir);
+        $(xrExternals);
+        $(ProjectDir);
+        $(xrSdkDir)include;
+        $(xrSdkDir)DXSDK/Include;
+        $(xrExternals)luajit\src;
+        $(xrExternals)luabind;
+        $(xrExternals)GameSpy\src;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
       <!-- MultiProcessorCompilation don't compatible with LinkIncremental and UseDebugLibraries -->
       <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Debug'  ))">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Mixed'  ))">true</MultiProcessorCompilation>
@@ -93,20 +104,39 @@
         MSVC;dSINGLE;WIN32 : for ODE
         _SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE : temporary workaround for deprecated API
       -->
-      <PreprocessorDefinitions>LUABIND_DYNAMIC_LINK;MSVC;dSINGLE;WIN32;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>
+        LUABIND_DYNAMIC_LINK;
+        MSVC;
+        dSINGLE;
+        WIN32;
+        _SECURE_SCL=0;
+        _CRT_SECURE_NO_WARNINGS;
+        _CRT_SECURE_NO_DEPRECATE;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level1</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrSdkDir)libraries/$(PlatformShortName);$(xrLibDir);$(xrSdkDir)DXSDK/Lib/$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+        $(xrSdkDir)libraries;
+        $(xrSdkDir)libraries/$(PlatformShortName);
+        $(xrLibDir);$(xrSdkDir)DXSDK/Lib/$(PlatformShortName);
+        %(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
       <LargeAddressAware>true</LargeAddressAware>
       <SubSystem>Windows</SubSystem>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrSdkDir)libraries/$(PlatformShortName);$(xrLibDir);$(xrSdkDir)DXSDK/Lib/$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+        $(xrSdkDir)libraries;
+        $(xrSdkDir)libraries/$(PlatformShortName);
+        $(xrLibDir);
+        $(xrSdkDir)DXSDK/Lib/$(PlatformShortName);
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
       <OutputFile>$(xrLibDir)$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
