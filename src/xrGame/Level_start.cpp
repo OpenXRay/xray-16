@@ -21,6 +21,9 @@ shared_str CLevel::OpenDemoFile(const char* demo_file_name)
     return m_demo_server_options;
 }
 void CLevel::net_StartPlayDemo() { net_Start(m_demo_server_options.c_str(), "localhost"); }
+
+extern XRCORE_API bool g_allow_heap_min;
+
 bool CLevel::net_Start(const char* op_server, const char* op_client)
 {
     net_start_result_total = TRUE;
@@ -103,9 +106,9 @@ bool CLevel::net_start1()
         g_pGamePersistent->LoadTitle();
 
 		typedef IGame_Persistent::params params;
-		params							&p = g_pGamePersistent->m_game_params;
+		params &p = g_pGamePersistent->m_game_params;
 		// Connect
-		Server					= new xrServer();
+		Server = new xrServer();
 
         if (xr_strcmp(p.m_alife, "alife"))
         {
@@ -125,6 +128,10 @@ bool CLevel::net_start1()
                 return true;
             }
         }
+    }
+    else
+    {
+        g_allow_heap_min = false;
     }
 
     return true;

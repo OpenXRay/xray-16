@@ -12,6 +12,8 @@ xrMemory Memory;
 // Also used in src\xrCore\xrDebug.cpp to prevent use of g_pStringContainer before it initialized
 bool shared_str_initialized = false;
 
+XRCORE_API bool g_allow_heap_min = true;
+
 xrMemory::xrMemory()
 {
 }
@@ -118,15 +120,9 @@ void xrMemory::mem_compact()
     RegFlushKey(HKEY_CURRENT_USER);
 #endif
 
-    /*
-    Следующие две команды в целом не нужны.
-    Современные аллокаторы достаточно грамотно и когда нужно возвращают память операционной системе.
-    Эта строчки нужны, скорее всего, в определённых ситуациях, вроде использования файлов отображаемых в память,
-    которые требуют большие свободные области памяти.
-    Но всё-же чистку tbb, возможно, стоит оставить. Но и это под большим вопросом.
-    */
-    scalable_allocation_command(TBBMALLOC_CLEAN_ALL_BUFFERS, NULL);
-    //HeapCompact(GetProcessHeap(), 0);
+    if (g_allow_heap_min)
+        _heapmin();
+    HeapCompact(GetProcessHeap(), 0);
     if (g_pStringContainer)
         g_pStringContainer->clean();
     if (g_pSharedMemoryContainer)

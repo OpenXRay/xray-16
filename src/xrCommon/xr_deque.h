@@ -1,8 +1,8 @@
 #pragma once
 #include <deque>
-#include "xrCore/xrMemory.h"
+#include "xrCore/Memory/XRayAllocator.h"
 
-template <typename T, typename allocator = tbb::tbb_allocator<T>>
+template <typename T, typename allocator = XRay::xray_allocator<T>>
 using xr_deque = std::deque<T, allocator>;
 
 #define DEF_DEQUE(N, T)\

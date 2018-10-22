@@ -2,19 +2,6 @@
 
 #include "_types.h"
 
-#include "tbb/tbb_allocator.h"
-#include "tbb/scalable_allocator.h"
-
-/*
-Можно заключить - прокси перехватывает не всегда и/или не всё используемые функции.
-И в очень малом количестве случаев это приводит к странностям при работе с памятью.
-Поэтому всё-же стоит переопределять для большинства случаев операторы new и delete.
-А для остального мы будем полагать (и надеяться), что прокси справится без проблем.
-*/
-#if defined(WINDOWS) // I have not idea how it works on Windows, but Linux build fails with error 'multiple declaration of __TBB_malloc_proxy_helper_object'
-#include "tbb/tbbmalloc_proxy.h"
-#endif
-
 class XRCORE_API xrMemory
 {
     // Additional 16 bytes of memory almost like in original xr_aligned_offset_malloc
@@ -33,7 +20,8 @@ public:
     u32 stat_calls;
 
 public:
-    struct SProcessMemInfo {
+    struct SProcessMemInfo
+    {
         u64 PeakWorkingSetSize;
         u64 WorkingSetSize;
         u64 PagefileUsage;
@@ -47,10 +35,22 @@ public:
 
     void GetProcessMemInfo(SProcessMemInfo& minfo);
     size_t mem_usage();
-    void   mem_compact();
-    inline void* mem_alloc             (size_t size) { stat_calls++; return scalable_malloc (     size + reserved); };
-    inline void* mem_realloc(void* ptr, size_t size) { stat_calls++; return scalable_realloc(ptr, size + reserved); };
-    inline void  mem_free   (void* ptr)              { stat_calls++;        scalable_free   (ptr);                  };
+    void mem_compact();
+    inline void* mem_alloc(size_t size)
+    {
+        stat_calls++;
+        return malloc(size + reserved);
+    };
+    inline void* mem_realloc(void* ptr, size_t size)
+    {
+        stat_calls++;
+        return realloc(ptr, size + reserved);
+    };
+    inline void mem_free(void* ptr)
+    {
+        stat_calls++;
+        free(ptr);
+    };
 };
 
 extern XRCORE_API xrMemory Memory;
@@ -66,15 +66,9 @@ extern XRCORE_API xrMemory Memory;
 Начиная со стандарта C++11 нет необходимости объявлять все формы операторов new и delete.
 */
 
-inline void* operator new(size_t size)
-{
-    return Memory.mem_alloc(size);
-}
+inline void* operator new(size_t size) { return Memory.mem_alloc(size); }
 
-inline void operator delete(void* ptr) noexcept
-{
-    Memory.mem_free(ptr);
-}
+inline void operator delete(void* ptr) noexcept { Memory.mem_free(ptr); }
 
 template <class T>
 inline void xr_delete(T*& ptr) noexcept
@@ -98,7 +92,7 @@ inline void xr_free(T*& ptr) noexcept
         ptr = nullptr;
     }
 }
-inline void* xr_malloc            (size_t size) { return Memory.mem_alloc       (size); }
+inline void* xr_malloc(size_t size) { return Memory.mem_alloc(size); }
 inline void* xr_realloc(void* ptr, size_t size) { return Memory.mem_realloc(ptr, size); }
 
 XRCORE_API pstr xr_strdup(pcstr string);
