@@ -96,9 +96,6 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         {
             CBlender_DESC desc;
             chunk->r(&desc, sizeof(desc));
-#ifdef LINUX
-            while (char* sep = strchr(desc.cName, '\\')) *sep = '/';
-#endif
             IBlender* B = IBlender::Create(desc.CLS);
             if (nullptr == B)
             {

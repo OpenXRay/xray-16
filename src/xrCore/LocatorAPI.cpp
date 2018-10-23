@@ -193,9 +193,13 @@ const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
 const CLocatorAPI::file* CLocatorAPI::Register(
     pcstr name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif)
 {
-    //Msg("Register[%d] [%s]",vfs,name);
     string256 temp_file_name;
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
+
+#ifdef LINUX
+    while (char* sep = strchr(temp_file_name, '/')) *sep = '\\'; // For backward compability of FS, for real filesystem delimiter set to back
+#endif
+    //Msg("Register[%d] [%s]",vfs,temp_file_name);
 
     // Register file
     file desc;
@@ -433,9 +437,6 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         buffer += sizeof ptr;
 
         strconcat(sizeof full, full, fs_entry_point, name);
-#if defined(LINUX)
-        while (char* sep = strchr(full, '\\')) *sep = '/';
-#endif
         Register(full, A.vfs_idx, crc, ptr, size_real, size_compr, 0);
     }
     hdr->close();
@@ -458,6 +459,7 @@ void CLocatorAPI::archive::open()
     if (hSrcFile)
         return;
 
+    while (char* sep = strchr((char *)*path, '\\')) *sep = '/';
     hSrcFile = ::open(*path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     R_ASSERT(hSrcFile != -1);
     struct stat file_info;
@@ -571,7 +573,8 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
             return;
         if (0 == xr_strcmp(entry.name, ".."))
             return;
-        xr_strcat(N, DELIMITER);
+        if(path[xr_strlen(path) - 1] != _DELIMITER || path[xr_strlen(path) - 1] != '/')
+            xr_strcat(N, DELIMITER);
         Register(N, 0xffffffff, 0, 0, entry.size, entry.size, (u32)entry.time_write);
         Recurse(N);
     }
@@ -628,6 +631,7 @@ bool ignore_path(const char* _path)
     else
         return true;
 #elif defined(LINUX)
+    while (char* sep = strchr((char *)_path, '\\')) *sep = '/';
     int h = ::open(_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (h != -1)
     {
@@ -657,6 +661,9 @@ bool CLocatorAPI::Recurse(pcstr path)
 #elif defined(LINUX)
     glob_t globbuf;
 
+    while (char* sep = strchr(scanPath, '\\'))
+        *sep = '/';
+
     globbuf.gl_offs = 256;
     int result = glob(scanPath, GLOB_NOSORT, NULL, &globbuf);
 
@@ -682,6 +689,7 @@ bool CLocatorAPI::Recurse(pcstr path)
         case S_IFREG: findData.attrib = 0;         break; // File
         default:      findData.attrib = _A_HIDDEN; break; // Skip
         }
+        while (char* sep = strchr(findData.name, '/')) *sep = '\\';
 #endif
         string1024 fullPath;
         bool ignore = false;
@@ -712,6 +720,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     _findclose(handle);
 #elif defined(LINUX)
     globfree(&globbuf);
+    while (char* sep = strchr((char *)path, '/')) *sep = '\\';
 #endif
     size_t newSize = rec_files.size();
     if (newSize > oldSize)

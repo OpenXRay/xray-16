@@ -340,11 +340,6 @@ CInifile::CInifile(pcstr fileName, bool readOnly, bool loadAtStart, bool saveAtE
     if (fileName && strstr(fileName, "system"))
         Msg("-----loading %s", fileName);
 
-#ifdef LINUX
-    if (fileName)
-        while (char* sep = strchr((char *)fileName, '\\')) *sep = '/';
-#endif
-
     m_file_name[0] = 0;
     m_flags.zero();
     if (fileName)
@@ -455,9 +450,6 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             R_ASSERT(path && path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-#ifdef LINUX
-                while (char* sep = strchr(inc_name, '\\')) *sep = '/';
-#endif
                 xr_strlwr(inc_name); // compensate removed xr_strlwr on path
 
                 string_path fn;

@@ -512,9 +512,6 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     R_ASSERT (_Name && _Name[0]);
     string_path Name;
     strcpy_s(Name, _Name); //. andy if (strext(Name)) *strext(Name)=0;
-#ifdef LINUX
-    while (char* sep = strchr(Name, '\\')) *sep = '/';
-#endif
 
     fix_texture_name(Name);
 
