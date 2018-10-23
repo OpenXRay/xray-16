@@ -23,7 +23,7 @@ include_directories(
 #	endif()
 #endforeach()
 
-add_definitions(-DXRAICORE_EXPORTS -DAI_COMPILER -D_SECURE_SCL=0)
+add_definitions(-DXRAICORE_EXPORTS)
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp")
