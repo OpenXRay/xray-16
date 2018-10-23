@@ -42,9 +42,6 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
 #if defined(WINDOWS)
         while (char* sep = strchr(path, '/'))
             *sep = '\\';
-#else
-        while (char* sep = strchr(path, '\\'))
-            *sep = '/';
 #endif
 
         // Open and read file, recursively load includes

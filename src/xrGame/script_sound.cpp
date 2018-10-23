@@ -16,9 +16,6 @@
 
 CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
 {
-#ifdef LINUX
-    while (char* sep = strchr((char *)caSoundName, '\\')) *sep = '/';
-#endif
     m_bIsNoSound = strstr(Core.Params, "-nosound");
     m_caSoundToPlay = caSoundName;
     string_path l_caFileName;

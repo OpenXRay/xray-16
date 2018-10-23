@@ -30,9 +30,6 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     strconcat(sizeof(vs), vs, "deffer_", _vspec, lmap ? "_lmh" : "");
     strconcat(sizeof(ps), ps, "deffer_", _pspec, lmap ? "_lmh" : "");
     xr_strcpy(dt, sizeof(dt), _detail_replace ? _detail_replace : (C.detail_texture ? C.detail_texture : ""));
-#ifdef LINUX
-    while (char* sep = strchr(dt, '\\')) *sep = '/';
-#endif
 
     // detect detail bump
     string256 texDetailBump = {'\0'};

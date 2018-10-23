@@ -175,9 +175,6 @@ void CTexture::Load()
 
     // Check for OGM
     string_path fn;
-#ifdef LINUX
-    while (char* sep = strchr(*cName, '\\')) *sep = '/';
-#endif
     if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
     {
         // AVI
@@ -280,9 +277,6 @@ void CTexture::Load()
             {
                 // Load another texture
                 u32 mem = 0;
-#ifdef LINUX
-                while (char* sep = strchr(buffer, '\\')) *sep = '/';
-#endif
                 pSurface = RImplementation.texture_load(buffer, mem, desc);
                 if (pSurface)
                 {

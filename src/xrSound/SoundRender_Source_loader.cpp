@@ -128,8 +128,6 @@ void CSoundRender_Source::load(pcstr name)
     xr_strcpy(N, name);
 #ifdef WINDOWS
     xr_strlwr(N);
-#elif defined(LINUX)
-    while (char* sep = strchr(N, '\\')) *sep = '/';
 #endif
 
     if (strext(N))
