@@ -25,7 +25,7 @@ file(GLOB TRACK_BAR TrackBar/*.h TrackBar/*.cpp)
 file(GLOB WINDOWS Windows/*.h Windows/*.cpp)
 file(GLOB XML XML/*.h XML/*.cpp)
 set(GENERAL ui_base.cpp ui_base.h ui_defs.h uiabstract.h UIMessages.h)
-				 
+
 ######################################################
 
 source_group("arrow" FILES ${ARROW})
@@ -56,36 +56,36 @@ source_group("" FILES ${GENERAL})
 
 ##########################################
 
-message("path "  ${CMAKE_CURRENT_SOURCE_DIR}) 
+message("path "  ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_definitions(-DXRUICORE_EXPORTS -D_SECURE_SCL=0)
+add_definitions(-DXRUICORE_EXPORTS)
 
 if (WIN32)
-	add_compile_options(/fp:fast "/Yupch.hpp")
-	set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp PROPERTIES COMPILE_FLAGS /Yc)
+    add_compile_options(/fp:fast "/Yupch.hpp")
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp PROPERTIES COMPILE_FLAGS /Yc)
 endif()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-	set(LUAJIT_LIBRARIES luajit-debug)
+    set(LUAJIT_LIBRARIES luajit-debug)
 else()
-	set(LUAJIT_LIBRARIES luajit)
+    set(LUAJIT_LIBRARIES luajit)
 endif()
 
 add_library(xrUICore SHARED ${ARROW} ${BUTTONS} ${CALLBACKS}
-					${COMBO_BOX} ${CURSOR}
-					${EDIT_BOX} ${FONT_MANAGER} ${HINT}
-					${INTERACTIVE_BACKGROUND} ${LINES} ${LIST_BOX}
-					${MESSAGE_BOX} ${OPTIONS} ${PCH}
-					${PROGRESS_BAR} ${PROPERTIES_BOX} ${SCROLL_BAR} ${SCROLL_VIEW} ${SPIN_BOX}
-					${STATIC_WINDS} ${TAB_CONTROL} ${TRACK_BAR} ${WINDOWS} ${XML}
-					${GENERAL})
+                    ${COMBO_BOX} ${CURSOR}
+                    ${EDIT_BOX} ${FONT_MANAGER} ${HINT}
+                    ${INTERACTIVE_BACKGROUND} ${LINES} ${LIST_BOX}
+                    ${MESSAGE_BOX} ${OPTIONS} ${PCH}
+                    ${PROGRESS_BAR} ${PROPERTIES_BOX} ${SCROLL_BAR} ${SCROLL_VIEW} ${SPIN_BOX}
+                    ${STATIC_WINDS} ${TAB_CONTROL} ${TRACK_BAR} ${WINDOWS} ${XML}
+                    ${GENERAL})
 
 set_target_properties(xrUICore PROPERTIES PREFIX "")
 target_include_directories(xrUICore PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/../
-	../../Externals/lzo/include
-	../../Externals/luabind
-	${SDL_INCLUDE_DIRS})
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../
+    ../../Externals/lzo/include
+    ../../Externals/luabind
+    ${SDL_INCLUDE_DIRS})
 target_link_libraries(xrUICore xrAPI pugixml xrScriptEngine ${LUAJIT_LIBRARIES} xrEngine xrMiscMath xrCore luabind ${SDL_LIBRARIES})
 xr_install(${PROJECT_NAME})
