@@ -89,47 +89,48 @@ inline void Sleep(int ms)
     usleep(ms * 1000);
 }
 
-#include <libgen.h>
-inline void _splitpath (
-        const char* path,  // Path Input
-        char* drive,       // Drive     : Output
-        char* dir,         // Directory : Output
-        char* fname,       // Filename  : Output
-        char* ext          // Extension : Output
-){
-    char tmp[PATH_MAX] = {0};
-    if(!realpath(path, tmp))
-        strcpy(tmp, path);
+inline void _splitpath(const char* path, // Path Input
+        char* drive, // Drive     : Output
+        char* dir, // Directory : Output
+        char* fname, // Filename  : Output
+        char* ext // Extension : Output
+        )
+{
+    const char *p, *end;
 
     if(drive)
         strcpy(drive, "");
 
-    if(dir) {
-        char tmp_dir[PATH_MAX] = {0};
-        strcpy(tmp_dir, tmp); // W/A for fname broking
-        strcpy(dir, dirname(tmp_dir)); // This eval modify dirname argument!!!
-        if (dir[0] && dir[strlen(dir) - 1] != '/')
-            strcat(dir, "/");
+    end = NULL;
+    for(p = path; *p; p++)
+        if(*p == '/' || *p == '\\')
+            end = p + 1;
+
+    if(end)
+    {
+        if(dir)
+        {
+            memcpy(dir, path, end - path);
+            dir[end - path] = 0;
+        }
+        path = end;
     }
+    else if(dir)
+        dir[0] = 0;
+
+    end = strchr(path, '.');
+
+    if(!end)
+        end = p;
 
     if(fname)
     {
-        strcpy(fname, basename(tmp));
-        char *pos = strrchr(fname, '.');
-        if(pos != NULL)
-            *pos = 0;
+        memcpy(fname, path, end - path);
+        fname[end - path] = 0;
     }
 
     if(ext)
-    {
-        char tmp_ext[NAME_MAX] = { 0 };
-        strcpy(tmp_ext, basename(tmp));
-        char *pos = strrchr(tmp_ext, '.');
-        if(pos != NULL)
-            strcpy(ext, pos);
-        else
-            strcpy(ext, "");
-    }
+        strcpy(ext, end);
 }
 
 #include <iostream>
@@ -350,7 +351,12 @@ inline int _filelength(int fd)
 #define _read read
 #define _set_new_handler std::set_new_handler
 #define _finite isfinite
-#define _mkdir(dir) mkdir(dir, S_IRWXU)
+inline int _mkdir(const char *dir)
+{
+    while (char* sep = strchr((char *)dir, '\\')) *sep = '/';
+    return mkdir(dir, S_IRWXU);
+}
+
 #define _wtoi(arg) wcstol(arg, NULL, 10)
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
 #undef min

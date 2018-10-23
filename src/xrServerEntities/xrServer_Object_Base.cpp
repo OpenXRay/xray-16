@@ -108,9 +108,6 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
     if (pSettings->line_exist(caSection, "custom_data"))
     {
         pcstr const raw_file_name = pSettings->r_string(caSection, "custom_data");
-#ifdef LINUX
-        while (char* sep = strchr((char *)raw_file_name, '\\')) *sep = '/';
-#endif
         IReader const* config = nullptr;
 #ifdef XRGAME_EXPORTS
         if (ai().get_alife())

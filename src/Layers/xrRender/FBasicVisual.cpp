@@ -68,10 +68,6 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
         string256 fnT, fnS;
         data->r_stringZ(fnT, sizeof(fnT));
         data->r_stringZ(fnS, sizeof(fnS));
-#ifdef LINUX
-        while (char* sep = strchr(fnT, '\\')) *sep = '/';
-        while (char* sep = strchr(fnS, '\\')) *sep = '/';
-#endif
         shader.create(fnS, fnT);
     }
 
