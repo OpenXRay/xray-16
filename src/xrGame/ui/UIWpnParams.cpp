@@ -3,7 +3,6 @@
 #include "UIXmlInit.h"
 #include "Level.h"
 #include "game_base_space.h"
-#include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "inventory_item_object.h"
 #include "UIInventoryUtilities.h"
@@ -21,6 +20,22 @@ struct SLuaWpnParams
     ~SLuaWpnParams();
 };
 
+static SLuaWpnParams* g_lua_wpn_params = nullptr;
+
+static CAI_Space::CEventCallback::CID g_wpn_params_cb_cid = CAI_Space::CEventCallback::INVALID_CID;
+
+class CResetEventCb : public CAI_Space::CEventCallback
+{
+public:
+    void ProcessEvent() override
+    {
+        if (g_lua_wpn_params)
+        {
+            xr_delete(g_lua_wpn_params);
+        }
+    }
+};
+
 SLuaWpnParams::SLuaWpnParams()
 {
     bool functor_exists;
@@ -34,16 +49,14 @@ SLuaWpnParams::SLuaWpnParams()
     VERIFY(functor_exists);
     functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetAccuracy", m_functorAccuracy);
     VERIFY(functor_exists);
+
+    if (g_wpn_params_cb_cid == CAI_Space::CEventCallback::INVALID_CID)
+    {
+        g_wpn_params_cb_cid = ai().Subscribe(new CResetEventCb(), CAI_Space::CNotifier::EVENT_SCRIPT_ENGINE_RESET);
+    }
 }
 
 SLuaWpnParams::~SLuaWpnParams() {}
-SLuaWpnParams* g_lua_wpn_params = NULL;
-
-void destroy_lua_wpn_params()
-{
-    if (g_lua_wpn_params)
-        xr_delete(g_lua_wpn_params);
-}
 
 // =====================================================================
 

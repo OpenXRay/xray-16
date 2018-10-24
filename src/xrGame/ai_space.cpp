@@ -22,6 +22,82 @@
 #include "moving_objects.h"
 #include "doors_manager.h"
 
+//----------------------- Event processing-----------------------
+
+CAI_Space::CEventCallback::CID CAI_Space::CEventCallbackStorage::RegisterCallback(CEventCallback* cb)
+{
+    m_lock.lock();
+
+    size_t i, cb_count = m_callbacks.size();
+
+    for (i = 0; i < cb_count; ++i)
+    {
+        if (!m_callbacks[i])
+        {
+            break;
+        }
+    }
+
+    if (i == cb_count)
+    {
+        m_callbacks.resize(cb_count + 1);
+    }
+
+    m_callbacks[i].reset(cb);
+
+    m_lock.unlock();
+    return i;
+}
+bool CAI_Space::CEventCallbackStorage::UnregisterCallback(CEventCallback::CID cid)
+{
+    bool result = false;
+    m_lock.lock();
+
+    if (cid < m_callbacks.size() && m_callbacks[cid])
+    {
+        m_callbacks[cid].reset(nullptr);
+        result = true;
+    }
+
+    m_lock.unlock();
+    return result;
+}
+
+void CAI_Space::CEventCallbackStorage::ExecuteCallbacks()
+{
+    m_lock.lock();
+
+    for (auto& cb : m_callbacks)
+    {
+        if (cb)
+        {
+            cb->ProcessEvent();
+        }
+    }
+
+    m_lock.unlock();
+}
+
+CAI_Space::CEventCallback::CID CAI_Space::CNotifier::RegisterCallback(CEventCallback* cb, EEventID event_id)
+{
+    R_ASSERT(event_id < EVENT_COUNT);
+    return m_callbacks[event_id].RegisterCallback(cb);
+}
+
+bool CAI_Space::CNotifier::UnregisterCallback(CEventCallback::CID cid, EEventID event_id)
+{
+    R_ASSERT(event_id < EVENT_COUNT);
+    return m_callbacks[event_id].UnregisterCallback(cid);
+}
+
+void CAI_Space::CNotifier::FireEvent(EEventID event_id)
+{
+    R_ASSERT(event_id < EVENT_COUNT);
+    m_callbacks[event_id].ExecuteCallbacks();
+}
+
+//----------------------- Main CAI_Space stuff-----------------------
+
 static CAI_Space g_ai_space;
 
 CAI_Space& CAI_Space::GetInstance()
@@ -48,7 +124,7 @@ void CAI_Space::init()
 
         VERIFY(!GEnv.ScriptEngine);
         GEnv.ScriptEngine = new CScriptEngine();
-        SetupScriptEngine();
+        RestartScriptEngine();
     }
 
     m_inited = true;
@@ -56,6 +132,7 @@ void CAI_Space::init()
 
 CAI_Space::~CAI_Space()
 {
+    m_events_notifier.FireEvent(CNotifier::EVENT_SCRIPT_ENGINE_RESET);
     unload();
     xr_delete(GEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
 }
@@ -130,6 +207,21 @@ void CAI_Space::SetupScriptEngine()
     LoadCommonScripts();
 }
 
+void CAI_Space::RestartScriptEngine()
+{
+    if (GEnv.ScriptEngine != nullptr)
+    {
+        m_events_notifier.FireEvent(CNotifier::EVENT_SCRIPT_ENGINE_RESET);
+    }
+
+    SetupScriptEngine();
+#ifdef DEBUG
+    get_moving_objects().clear();
+#endif // DEBUG
+
+    m_events_notifier.FireEvent(CNotifier::EVENT_SCRIPT_ENGINE_STARTED);
+}
+
 void CAI_Space::load(LPCSTR level_name)
 {
     VERIFY(m_game_graph);
@@ -172,4 +264,14 @@ void CAI_Space::set_alife(CALifeSimulator* alife_simulator)
     if (alife_simulator)
         return;
     SetGameGraph(nullptr);
+}
+
+CAI_Space::CEventCallback::CID CAI_Space::Subscribe(CEventCallback* cb, CNotifier::EEventID event_id)
+{
+    return m_events_notifier.RegisterCallback(cb, event_id);
+}
+
+bool CAI_Space::Unsubscribe(CAI_Space::CEventCallback::CID cid, CNotifier::EEventID event_id)
+{
+    return m_events_notifier.UnregisterCallback(cid, event_id);
 }

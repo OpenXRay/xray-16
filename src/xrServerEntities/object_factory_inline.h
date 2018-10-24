@@ -7,8 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#ifndef object_factory_inlineH
-#define object_factory_inlineH
 #include <algorithm>
 
 IC const CObjectFactory& object_factory()
@@ -17,6 +15,27 @@ IC const CObjectFactory& object_factory()
     {
         g_object_factory = new CObjectFactory();
         g_object_factory->init();
+
+        class CResetEventCb : public CAI_Space::CEventCallback
+        {
+            CAI_Space::CEventCallback::CID m_cid;
+
+        public:
+            CResetEventCb() {}
+            void SetCid(CAI_Space::CEventCallback::CID cid) { m_cid = cid; }
+            void ProcessEvent() override
+            {
+                xr_delete(g_object_factory);
+            }
+        };
+
+        static CAI_Space::CEventCallback::CID cid = CAI_Space::CEventCallback::INVALID_CID;
+        if (cid == CAI_Space::CEventCallback::INVALID_CID)
+        {
+            CResetEventCb* e = new CResetEventCb();
+            cid = ai().Subscribe(e, CAI_Space::CNotifier::EVENT_SCRIPT_ENGINE_RESET);
+            e->SetCid(cid);
+        }
     }
     return (*g_object_factory);
 }
@@ -125,5 +144,3 @@ IC void CObjectFactory::actualize() const
     m_actual = true;
     std::sort(m_clsids.begin(), m_clsids.end(), CObjectItemPredicate());
 }
-
-#endif
