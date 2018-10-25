@@ -241,10 +241,6 @@ public:
     bool load_all_unloaded_archives();
     void unload_archive(archive& A);
 
-    void auth_generate(xr_vector<shared_str>& ignore, xr_vector<shared_str>& important);
-    u64 auth_get();
-    void auth_runtime(void*);
-
     void rescan_path(pcstr full_path, bool bRecurse);
     // editor functions
     void rescan_pathes();

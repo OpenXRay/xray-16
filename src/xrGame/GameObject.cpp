@@ -299,21 +299,11 @@ void CGameObject::net_Destroy()
     // ~
     setReady(FALSE);
 
-    if (Level().IsDemoPlayStarted() && ID() == u16(-1))
-    {
-        Msg("Destroying demo_spectator object");
-    }
-    else
-    {
-        g_pGameLevel->Objects.net_Unregister(this);
-    }
+    g_pGameLevel->Objects.net_Unregister(this);
 
     if (this == Level().CurrentEntity())
     {
-        if (!Level().IsDemoPlayStarted())
-        {
-            Level().SetControlEntity(0);
-        }
+        Level().SetControlEntity(0);
         Level().SetEntity(0); // do not switch !!!
     }
 
@@ -387,12 +377,6 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
         }
         SetHitInfo(Hitter, Weapon, HDS.bone(), HDS.p_in_bone_space, HDS.dir);
         Hit(&HDS);
-        //---------------------------------------------------------------------------
-        if (GameID() != eGameIDSingle)
-        {
-            
-        }
-        //---------------------------------------------------------------------------
     }
     break;
     case GE_DESTROY:
@@ -448,21 +432,15 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
         cName_set(E->name_replace());
     bool demo_spectator = false;
 
-    if (Level().IsDemoPlayStarted() && E->ID == u16(-1))
+    // Alundaio:
+    // R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
+    IGameObject* o = Level().Objects.net_Find(E->ID);
+    if (o != nullptr)
     {
-        Msg("* Spawning demo spectator ...");
-        demo_spectator = true;
-    }
-    else
-    {
-        //Alundaio:
-        //R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
-        IGameObject* o = Level().Objects.net_Find(E->ID);
-        if (o != nullptr)
-        {
-            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_spawn():: Object with ID already exists! ID=%d self=%s other=%s", E->ID, cName().c_str(), o->cName().c_str());
-            return false;
-        }
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
+            "CGameObject:net_spawn():: Object with ID already exists! ID=%d self=%s other=%s", E->ID, cName().c_str(),
+            o->cName().c_str());
+        return false;
     }
 
     setID(E->ID);
@@ -497,13 +475,6 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 
     // Net params
     setLocal(E->s_flags.is(M_SPAWN_OBJECT_LOCAL));
-    if (Level().IsDemoPlay()) //&& OnClient())
-    {
-        if (!demo_spectator)
-        {
-            setLocal(FALSE);
-        }
-    };
 
     setReady(TRUE);
     if (!demo_spectator)

@@ -3,7 +3,6 @@
 #define NET_PLAYERS_MONITOR
 
 #include "NET_Shared.h"
-#include "NET_Common.h"
 #include "xrCore/fastdelegate.h"
 #include "xrCore/Threading/Lock.hpp"
 

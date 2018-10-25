@@ -19,7 +19,6 @@
 #include "UITextureMaster.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
-#include "UItabButtonMP.h"
 #include "UILines.h"
 
 extern int keyname_to_dik(LPCSTR);
@@ -402,33 +401,6 @@ bool CUIXmlInit::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButt
     LPCSTR text_hint = xml_doc.ReadAttrib(path, index, "hint", NULL);
     if (text_hint)
         pWnd->m_hint_text = CStringTable().translate(text_hint);
-
-    return true;
-}
-
-bool CUIXmlInit::InitTabButtonMP(CUIXml& xml_doc, LPCSTR path, int index, CUITabButtonMP* pWnd)
-{
-    Init3tButton(xml_doc, path, index, pWnd);
-
-    string256 buff;
-    strconcat(sizeof(buff), buff, path, ":idention");
-
-    if (xml_doc.NavigateToNode(buff, index))
-    {
-        pWnd->m_text_ident_cursor_over.x = xml_doc.ReadAttribFlt(buff, index, "over_x", 0);
-        pWnd->m_text_ident_cursor_over.y = xml_doc.ReadAttribFlt(buff, index, "over_y", 0);
-
-        pWnd->m_text_ident_normal.x = xml_doc.ReadAttribFlt(buff, index, "normal_x", 0);
-        pWnd->m_text_ident_normal.y = xml_doc.ReadAttribFlt(buff, index, "normal_y", 0);
-    }
-
-    strconcat(sizeof(buff), buff, path, ":hint");
-
-    if (xml_doc.NavigateToNode(buff, index))
-    {
-        pWnd->CreateHint();
-        InitStatic(xml_doc, buff, index, pWnd->m_hint);
-    }
 
     return true;
 }

@@ -15,10 +15,8 @@
 #include "seniority_hierarchy_holder.h"
 #include "UIGameCustom.h"
 #include "string_table.h"
-#include "file_transfer.h"
 #include "UI/UIGameTutorial.h"
 #include "ui/UIPdaWnd.h"
-#include "xrNetServer/NET_AuthCheck.h"
 #include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/physicscommon.h"
@@ -139,18 +137,6 @@ void CLevel::net_Stop()
     bReady = false;
     m_bGameConfigStarted = FALSE;
 
-    if (m_file_transfer)
-        xr_delete(m_file_transfer);
-
-    if (IsDemoPlay() && m_current_spectator) // destroying demo spectator ...
-    {
-        m_current_spectator->setDestroy(TRUE);
-        SetControlEntity(NULL); // m_current_spectator == CurrentControlEntity()
-        m_current_spectator = NULL;
-    }
-    else if (IsDemoSave() && !IsDemoInfoSaved())
-        SaveDemoInfo();
-
     remove_objects();
 
     // WARNING ! remove_objects() uses this flag, so position of this line must e here ..
@@ -175,12 +161,6 @@ void CLevel::net_Stop()
 
 void CLevel::ClientSend()
 {
-    if (GameID() != eGameIDSingle || OnClient())
-    {
-        if (!net_HasBandwidth())
-            return;
-    };
-
     NET_Packet P;
     u32 start = 0;
     if (CurrentControlEntity())
@@ -202,17 +182,7 @@ void CLevel::ClientSend()
             }
         }
     }
-    if (m_file_transfer)
-    {
-        m_file_transfer->update_transfer();
-        m_file_transfer->stop_obsolete_receivers();
-    }
-    if (OnClient())
-    {
-        Flush_Send_Buffer();
-        return;
-    }
-    //-------------------------------------------------
+
     while (1)
     {
         P.w_begin(M_UPDATE);
@@ -281,36 +251,11 @@ void CLevel::ClientSave()
     }
 }
 
-// extern	XRPHYSICS_API	float		phTimefactor;
-extern BOOL g_SV_Disable_Auth_Check;
-
 void CLevel::Send(NET_Packet& P, u32 dwFlags, u32 dwTimeout)
 {
-    if (IsDemoPlayStarted() || IsDemoPlayFinished())
-        return;
-    // optimize the case when server located in our memory
-    if (psNET_direct_connect)
-    {
-        ClientID _clid;
-        _clid.set(1);
-        Server->OnMessage(P, _clid);
-    }
-    else if (Server && game_configured && OnServer())
-    {
-#ifdef DEBUG
-        VERIFY2(Server->IsPlayersMonitorLockedByMe() == false, "potential deadlock detected");
-#endif
-        Server->OnMessageSync(P, Game().local_svdpnid);
-    }
-    else
-        IPureClient::Send(P, dwFlags, dwTimeout);
-
-    if (g_pGameLevel && Level().game && GameID() != eGameIDSingle && !g_SV_Disable_Auth_Check)
-    {
-        // anti-cheat
-        phTimefactor = 1.f;
-        psDeviceFlags.set(rsConstantFPS, FALSE);
-    }
+    ClientID _clid;
+    _clid.set(1);
+    Server->OnMessage(P, _clid);
 }
 
 void CLevel::net_Update()
@@ -346,40 +291,17 @@ bool CLevel::Connect2Server(const char* options)
     m_bConnectResultReceived = false;
     m_bConnectResult = true;
 
-    if (!psNET_direct_connect)
-    {
-        xr_auth_strings_t tmp_ignore;
-        xr_auth_strings_t tmp_check;
-        fill_auth_check_params(tmp_ignore, tmp_check);
-        FS.auth_generate(tmp_ignore, tmp_check);
-    }
-
     if (!Connect(options))
         return FALSE;
     //---------------------------------------------------------------------------
-    if (psNET_direct_connect)
-        m_bConnectResultReceived = true;
-    u32 EndTime = GetTickCount() + ConnectionTimeOut;
+    m_bConnectResultReceived = true;
     while (!m_bConnectResultReceived)
     {
         ClientReceive();
         Sleep(5);
         if (Server)
             Server->Update();
-        //-----------------------------------------
-        u32 CurTime = GetTickCount();
-        if (CurTime > EndTime)
-        {
-            NET_Packet P;
-            P.B.count = 0;
-            P.r_pos = 0;
 
-            P.w_u8(0);
-            P.w_u8(0);
-            P.w_stringZ("Data verification failed. Cheater?");
-
-            OnConnectResult(&P);
-        }
         if (net_isFails_Connect())
         {
             OnConnectRejected();
@@ -402,10 +324,7 @@ bool CLevel::Connect2Server(const char* options)
         return FALSE;
     };
 
-    if (psNET_direct_connect)
-        net_Syncronised = TRUE;
-    else
-        net_Syncronize();
+    net_Syncronised = TRUE;
 
     while (!net_IsSyncronised())
     {
@@ -418,10 +337,6 @@ bool CLevel::Connect2Server(const char* options)
         }
     };
 
-    //---------------------------------------------------------------------------
-    // P.w_begin	(M_CLIENT_REQUEST_CONNECTION_DATA);
-    // Send		(P, net_flags(TRUE, TRUE, TRUE, TRUE));
-    //---------------------------------------------------------------------------
     return TRUE;
 };
 
@@ -429,68 +344,17 @@ void CLevel::OnBuildVersionChallenge()
 {
     NET_Packet P;
     P.w_begin(M_CL_AUTH);
-#ifdef USE_DEBUG_AUTH
-    u64 auth = MP_DEBUG_AUTH;
-    Msg("* Sending auth value ...");
-#else
-    u64 auth = FS.auth_get();
-#endif //#ifdef DEBUG
-    P.w_u64(auth);
-    SecureSend(P, net_flags(TRUE, TRUE, TRUE, TRUE));
+    Send(P, net_flags(TRUE, TRUE, TRUE, TRUE));
 };
 
 void CLevel::OnConnectResult(NET_Packet* P)
 {
 	// multiple results can be sent during connection they should be "AND-ed"
 	m_bConnectResultReceived	= true;
-	u8	result					= P->r_u8();
-	u8  res1					= P->r_u8();
-	string512 ResultStr;	
-	P->r_stringZ_s				(ResultStr);
 	ClientID tmp_client_id;
 	P->r_clientID				(tmp_client_id);
 	SetClientID					(tmp_client_id);
-	if (!result)				
-	{
-		m_bConnectResult	= false			;	
-		switch (res1)
-		{
-		case ecr_data_verification_failed:		//Standart error
-			{
-				if (strstr(ResultStr, "Data verification failed. Cheater?"))
-					MainMenu()->SetErrorDialog(CMainMenu::ErrDifferentVersion);
-			}break;
-		case ecr_cdkey_validation_failed:		//GameSpy CDKey
-			{
-				if (!xr_strcmp(ResultStr, "Invalid CD Key"))
-					MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInvalid);//, ResultStr);
-				if (!xr_strcmp(ResultStr, "CD Key in use"))
-					MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInUse);//, ResultStr);
-				if (!xr_strcmp(ResultStr, "Your CD Key is disabled. Contact customer service."))
-					MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyDisabled);//, ResultStr);
-			}break;		
-		case ecr_password_verification_failed:		//login+password
-			{
-				MainMenu()->SetErrorDialog(CMainMenu::ErrInvalidPassword);
-			}break;
-		case ecr_have_been_banned:
-			{
-
-			}break;
-		case ecr_profile_error:
-			{
-				
-			}break;
-		}
-	};	
-	m_sConnectResult			= ResultStr;
-	if (IsDemoSave() && result)
-	{
-		P->r_u8(); //server client or not
-		shared_str server_options;
-		P->r_stringZ(server_options);
-		StartSaveDemo(server_options);
-	}
+    m_sConnectResult = "All Ok";
 };
 
 void CLevel::ClearAllObjects()

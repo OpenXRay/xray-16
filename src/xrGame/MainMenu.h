@@ -5,14 +5,11 @@ class CUIDialogWnd;
 class CUICursor;
 class CUIMessageBoxEx;
 
-class demo_info_loader;
-
 #include "xrEngine/IInputReceiver.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "UIDialogHolder.h"
 #include "ui/UIWndCallback.h"
 #include "ui_base.h"
-#include "DemoInfo.h"
 
 class CMainMenu :
 	public IMainMenu,
@@ -42,8 +39,6 @@ class CMainMenu :
     void ReadTextureInfo();
 
 	xr_vector<CUIWindow*>				m_pp_draw_wnds;
-
-    demo_info_loader* m_demo_info_loader;
     
     bool mLanguageChanged;
 
@@ -126,8 +121,6 @@ public:
 
 	void			SetNeedVidRestart				();
 	virtual void	OnDeviceReset					();
-	
-	demo_info const *	GetDemoInfo					(LPCSTR file_name);
 };
 
 extern CMainMenu* MainMenu();

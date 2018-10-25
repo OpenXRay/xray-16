@@ -12,7 +12,6 @@
 #include "ui\UIEditBox.h"
 #include "ui\UIAnimatedStatic.h"
 #include "ui\UITrackBar.h"
-#include "ui\UIMapInfo.h"
 #include "ui\UIMMShniaga.h"
 #include "ui\UIScrollView.h"
 #include "ui\UIProgressBar.h"

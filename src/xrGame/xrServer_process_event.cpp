@@ -73,10 +73,6 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
             SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
     }
     break;
-    case GE_RESPAWN:
-    
-        
-    break;
     case GE_TRADE_BUY:
     case GE_OWNERSHIP_TAKE:
     {
@@ -388,9 +384,6 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     }
     break;
     case GE_FREEZE_OBJECT: break;
-    case GE_REQUEST_PLAYERS_INFO: { SendPlayersInfo(sender);
-    }
-    break;
     default: R_ASSERT2(0, "Game Event not implemented!!!"); break;
     }
 }

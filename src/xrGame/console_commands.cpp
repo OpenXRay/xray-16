@@ -550,17 +550,6 @@ public:
     CCC_ALifeSave(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR args)
     {
-#if 0
-		if (!Level().autosave_manager().ready_for_autosave()) {
-			Msg		("! Cannot save the game right now!");
-			return;
-		}
-#endif
-        if (!IsGameTypeSingle())
-        {
-            Msg("for single-mode only");
-            return;
-        }
         if (!g_actor || !Actor()->g_Alive())
         {
             Msg("cannot make saved game because actor is dead :(");
@@ -1656,15 +1645,6 @@ public:
     virtual void Execute(LPCSTR) { Level().Objects.dump_all_objects(); }
 };
 
-class CCC_GSCheckForUpdates : public IConsole_Command
-{
-public:
-	CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-	virtual void Execute(LPCSTR arguments)
-	{
-	}
-};
-
 class CCC_Net_SV_GuaranteedPacketMode : public CCC_Integer
 {
 protected:
@@ -1727,6 +1707,29 @@ public:
             g_pGamePersistent->Environment().SetWeather(args, true);
     }
 };
+
+// Give money to actor
+class CCC_GiveMoney : public IConsole_Command
+{
+public:
+    CCC_GiveMoney(LPCSTR N) : IConsole_Command(N){};
+    virtual void Execute(LPCSTR args)
+    {
+        if (!g_pGameLevel)
+            return;
+
+        if (!xr_strlen(args))
+            return;
+
+        int money = atoi(args);
+
+        if (Actor() && money > 0)
+            Actor()->set_money(Actor()->get_money() + money, true);
+        else
+            Msg("Arg must be greater than 0!");
+    }
+};
+
 
 void CCC_RegisterCommands()
 {
@@ -1922,6 +1925,7 @@ void CCC_RegisterCommands()
         CMD1(CCC_ScriptCommand, "run_string");
         CMD3(CCC_Mask, "g_no_clip", &psActorFlags, AF_NO_CLIP);
         CMD1(CCC_SetWeather, "set_weather");
+        CMD1(CCC_GiveMoney, "give_money");
     }
 
     CMD3(CCC_Mask, "g_use_tracers", &psActorFlags, AF_USE_TRACERS);

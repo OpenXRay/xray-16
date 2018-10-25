@@ -15,7 +15,6 @@ game_PlayerState::game_PlayerState(NET_Packet* account_info)
 {
 	GameID				= 0;
 	skin				= 0;
-	m_online_time		= 0;
 	team				= 0;
 	money_for_round		= 0;	
 

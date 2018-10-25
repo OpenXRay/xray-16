@@ -73,7 +73,7 @@ void CActorMP::net_Import(NET_Packet& P)
         N.o_torso.roll -= PI_MUL_2;
 
     {
-        if (Level().IsDemoPlay() || OnServer() || Remote())
+        if (OnServer() || Remote())
         {
             unaffected_r_torso.yaw = N.o_torso.yaw;
             unaffected_r_torso.pitch = N.o_torso.pitch;

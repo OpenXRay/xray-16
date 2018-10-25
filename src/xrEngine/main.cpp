@@ -6,7 +6,6 @@
 #include <locale.h>
 
 #include "IGame_Persistent.h"
-#include "xrNetServer/NET_AuthCheck.h"
 #include "xr_input.h"
 #include "XR_IOConsole.h"
 #include "x_ray.h"
@@ -42,24 +41,6 @@ ENGINE_API void InitEngine()
     Device.Initialize();
 }
 
-namespace
-{
-struct PathIncludePred
-{
-private:
-    const xr_auth_strings_t* ignored;
-
-public:
-    explicit PathIncludePred(const xr_auth_strings_t* ignoredPaths) : ignored(ignoredPaths) {}
-    bool xr_stdcall IsIncluded(pcstr path)
-    {
-        if (!ignored)
-            return true;
-        return allow_to_include_path(*ignored, path);
-    }
-};
-} // namespace
-
 ENGINE_API void InitSettings()
 {
     string_path fname;
@@ -70,12 +51,7 @@ ENGINE_API void InitSettings()
     pSettings = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pSettings->section_count(),
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
-    xr_auth_strings_t ignoredPaths, checkedPaths;
-    fill_auth_check_params(ignoredPaths, checkedPaths);
-    PathIncludePred includePred(&ignoredPaths);
-    CInifile::allow_include_func_t includeFilter;
-    includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
-    pSettingsAuth = new CInifile(fname, TRUE, TRUE, FALSE, 0, includeFilter);
+
     FS.update_path(fname, "$game_config$", "game.ltx");
     pGameIni = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pGameIni->section_count(),
@@ -112,8 +88,6 @@ ENGINE_API void destroySettings()
 {
     auto s = const_cast<CInifile**>(&pSettings);
     xr_delete(*s);
-    auto sa = const_cast<CInifile**>(&pSettingsAuth);
-    xr_delete(*sa);
     xr_delete(pGameIni);
 }
 

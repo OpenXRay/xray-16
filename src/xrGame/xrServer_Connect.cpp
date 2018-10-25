@@ -5,7 +5,6 @@
 #include "game_cl_single.h"
 #include "MainMenu.h"
 #include "xrEngine/x_ray.h"
-#include "xrNetServer/NET_AuthCheck.h"
 #include "xrNetServer/NET_Messages.h"
 
 LPCSTR xrServer::get_map_download_url(LPCSTR level_name, LPCSTR level_version)
@@ -96,37 +95,14 @@ void xrServer::AttachNewClient(IClient* CL)
     msgConfig.sign1 = 0x12071980;
     msgConfig.sign2 = 0x26111975;
 
-    if (psNET_direct_connect) // single_game
-    {
-        SV_Client = CL;
-        CL->flags.bLocal = 1;
-        SendTo_LL(SV_Client->ID, &msgConfig, sizeof(msgConfig), net_flags(TRUE, TRUE, TRUE, TRUE));
-    }
-    else
-    {
-        SendTo_LL(CL->ID, &msgConfig, sizeof(msgConfig), net_flags(TRUE, TRUE, TRUE, TRUE));
-        Server_Client_Check(CL);
-    }
+    SV_Client = CL;
+    CL->flags.bLocal = 1;
+    SendTo_LL(SV_Client->ID, &msgConfig, sizeof(msgConfig), net_flags(TRUE, TRUE, TRUE, TRUE));
 
 	RequestClientDigest(CL);
-	//xrClientData * CL_D=(xrClientData*)(CL); 
-	//ip_address				ClAddress;
-	//GetClientAddress		(CL->ID, ClAddress);
-	CL->m_guid[0]=0;
 }
 
 void xrServer::RequestClientDigest(IClient* CL)
 {
-	Check_BuildVersion_Success(CL);	
-	return;
-}
-
-void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
-{
-	R_ASSERT(xrCL);
-	IClient* tmp_client = static_cast<IClient*>(xrCL);
-	P->r_stringZ(xrCL->m_cdkey_digest);
-	GetPooledState				(xrCL);
-	PerformSecretKeysSync		(xrCL);
-	Check_BuildVersion_Success	(tmp_client);	
+	Check_BuildVersion_Success(CL);
 }

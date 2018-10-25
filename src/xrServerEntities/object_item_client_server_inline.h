@@ -63,8 +63,7 @@ ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServerSingleMp::client_o
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServerSingleMp::server_object(LPCSTR section) const
 {
-    ObjectFactory::ServerObjectBaseClass* result =
-        IsGameTypeSingle() ? new _server_type_single(section) : new _server_type_mp(section);
+    ObjectFactory::ServerObjectBaseClass* result = new _server_type_single(section);
 
     result = result->init();
     R_ASSERT(result);

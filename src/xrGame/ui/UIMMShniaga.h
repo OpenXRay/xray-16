@@ -27,7 +27,6 @@ public:
     {
         epi_main = 0x00,
         epi_new_game,
-        epi_new_network_game,
         epi_none
     }; // enum	enum_page_id
     void SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_path);
@@ -62,7 +61,6 @@ protected:
 
     xr_vector<CUITextWnd*> m_buttons;
     xr_vector<CUITextWnd*> m_buttons_new;
-    xr_vector<CUITextWnd*> m_buttons_new_network;
 
     int m_selected_btn;
     enum_page_id m_page;

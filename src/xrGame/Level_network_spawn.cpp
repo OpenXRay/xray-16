@@ -117,26 +117,14 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 
     if ((E->s_flags.is(M_SPAWN_OBJECT_LOCAL)) && (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER)))
     {
-        if (IsDemoPlayStarted())
+        if (CurrentEntity() != NULL)
         {
-            if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))
-            {
-                SetControlEntity(O);
-                SetEntity(O); // do not switch !!!
-                SetDemoSpectator(O);
-            }
+            CGameObject* pGO = smart_cast<CGameObject*>(CurrentEntity());
+            if (pGO)
+                pGO->On_B_NotCurrentEntity();
         }
-        else
-        {
-            if (CurrentEntity() != NULL)
-            {
-                CGameObject* pGO = smart_cast<CGameObject*>(CurrentEntity());
-                if (pGO)
-                    pGO->On_B_NotCurrentEntity();
-            }
-            SetControlEntity(O);
-            SetEntity(O); // do not switch !!!
-        }
+        SetControlEntity(O);
+        SetEntity(O); // do not switch !!!
     }
 
     if (0xffff != E->ID_Parent)

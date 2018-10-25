@@ -1184,7 +1184,7 @@ void CActor::shedule_Update(u32 DT)
 
     //----------- for E3 -----------------------------
     //	if (Local() && (OnClient() || Level().CurrentEntity()==this))
-    if (Level().CurrentControlEntity() == this && !Level().IsDemoPlay())
+    if (Level().CurrentControlEntity() == this)
     //------------------------------------------------
     {
         g_cl_CheckControls(mstate_wishful, NET_SavedAccel, NET_Jump, dt);
@@ -1228,18 +1228,15 @@ void CActor::shedule_Update(u32 DT)
         {
             f_DropPower = 0.f;
         }
-        if (!Level().IsDemoPlay())
-        {
-            mstate_wishful &= ~mcAccel;
-            mstate_wishful &= ~mcLStrafe;
-            mstate_wishful &= ~mcRStrafe;
-            mstate_wishful &= ~mcLLookout;
-            mstate_wishful &= ~mcRLookout;
-            mstate_wishful &= ~mcFwd;
-            mstate_wishful &= ~mcBack;
-            if (!psActorFlags.test(AF_CROUCH_TOGGLE))
-                mstate_wishful &= ~mcCrouch;
-        }
+        mstate_wishful &= ~mcAccel;
+        mstate_wishful &= ~mcLStrafe;
+        mstate_wishful &= ~mcRStrafe;
+        mstate_wishful &= ~mcLLookout;
+        mstate_wishful &= ~mcRLookout;
+        mstate_wishful &= ~mcFwd;
+        mstate_wishful &= ~mcBack;
+        if (!psActorFlags.test(AF_CROUCH_TOGGLE))
+            mstate_wishful &= ~mcCrouch;
     }
     else
     {
@@ -1261,12 +1258,6 @@ void CActor::shedule_Update(u32 DT)
         }
         mstate_old = mstate_real;
     }
-    /*
-        if (this == Level().CurrentViewEntity())
-        {
-            UpdateMotionIcon		(mstate_real);
-        };
-    */
     NET_Jump = 0;
 
     inherited::shedule_Update(DT);

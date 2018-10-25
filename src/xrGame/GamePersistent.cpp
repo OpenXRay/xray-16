@@ -920,7 +920,7 @@ void CGamePersistent::SetLoadStageTitle(pcstr ls_title)
         pApp->SetLoadStageTitle("");
 }
 
-bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }
+bool CGamePersistent::CanBePaused() { return IsGameTypeSingle(); }
 void CGamePersistent::SetPickableEffectorDOF(bool bSet)
 {
     m_bPickableDOF = bSet;

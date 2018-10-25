@@ -40,9 +40,6 @@
 #include "actor.h"
 #include "player_hud.h"
 #include "UI/UIGameTutorial.h"
-#include "message_filter.h"
-#include "demoplay_control.h"
-#include "demoinfo.h"
 #include "CustomDetector.h"
 #include "xrPhysics/IPHWorld.h"
 #include "xrPhysics/console_vars.h"
@@ -175,23 +172,6 @@ CLevel::~CLevel()
         g_tutorial->m_pStoredInputReceiver = nullptr;
     if (g_tutorial2 && g_tutorial2->m_pStoredInputReceiver == this)
         g_tutorial2->m_pStoredInputReceiver = nullptr;
-    if (IsDemoPlay())
-    {
-        StopPlayDemo();
-        if (m_reader)
-        {
-            FS.r_close(m_reader);
-            m_reader = nullptr;
-        }
-    }
-    xr_delete(m_msg_filter);
-    xr_delete(m_demoplay_control);
-    xr_delete(m_demo_info);
-    if (IsDemoSave())
-    {
-        StopSaveDemo();
-    }
-    deinit_compression();
 }
 
 shared_str CLevel::name() const { return map_data.m_name; }
@@ -217,27 +197,6 @@ void CLevel::PrefetchSound(LPCSTR name)
     // if find failed - preload sound
     if (it == sound_registry.end())
         sound_registry[snd_name].create(snd_name.c_str(), st_Effect, sg_SourceType);
-}
-
-// Game interface ////////////////////////////////////////////////////
-int CLevel::get_RPID(LPCSTR /**name/**/)
-{
-    /*
-    // Gain access to string
-    LPCSTR	params = pLevel->r_string("respawn_point",name);
-    if (0==params)	return -1;
-
-    // Read data
-    Fvector4	pos;
-    int			team;
-    sscanf		(params,"%f,%f,%f,%d,%f",&pos.x,&pos.y,&pos.z,&team,&pos.w); pos.y += 0.1f;
-
-    // Search respawn point
-    svector<Fvector4,maxRP>	&rp = Level().get_team(team).RespawnPoints;
-    for (int i=0; i<(int)(rp.size()); ++i)
-    if (pos.similar(rp[i],EPS_L))	return i;
-    */
-    return -1;
 }
 
 bool g_bDebugEvents = false;
@@ -403,33 +362,16 @@ void CLevel::OnFrame()
 #endif
     Fvector temp_vector;
     m_feel_deny.feel_touch_update(temp_vector, 0.f);
-    if (GameID() != eGameIDSingle)
-        psDeviceFlags.set(rsDisableObjectsAsCrows, true);
-    else
-        psDeviceFlags.set(rsDisableObjectsAsCrows, false);
+    psDeviceFlags.set(rsDisableObjectsAsCrows, false);
     // commit events from bullet manager from prev-frame
     stats.BulletManagerCommit.Begin();
     BulletManager().CommitEvents();
     stats.BulletManagerCommit.End();
     // Client receive
-    if (net_isDisconnected())
-    {
-        if (OnClient() && GameID() != eGameIDSingle)
-        {
-#ifdef DEBUG
-            Msg("--- I'm disconnected, so clear all objects...");
-#endif
-            ClearAllObjects();
-        }
-        Engine.Event.Defer("kernel:disconnect");
-        return;
-    }
-    else
-    {
-        stats.ClientRecv.Begin();
-        ClientReceive();
-        stats.ClientRecv.End();
-    }
+    stats.ClientRecv.Begin();
+    ClientReceive();
+    stats.ClientRecv.End();
+
     ProcessGameEvents();
     if (m_bNeed_CrPr)
         make_NetCorrectionPrediction();
@@ -456,71 +398,6 @@ void CLevel::OnFrame()
     // Draw client/server stats
     if (!GEnv.isDedicatedServer && psDeviceFlags.test(rsStatistic))
     {
-        CGameFont* F = UI().Font().pFontDI;
-        if (!psNET_direct_connect)
-        {
-            if (IsServer())
-            {
-                const IServerStatistic* S = Server->GetStatistic();
-                F->SetHeightI(0.015f);
-                F->OutSetI(0.0f, 0.5f);
-                F->SetColor(color_xrgb(0, 255, 0));
-                F->OutNext("IN:  %4d/%4d (%2.1f%%)", S->bytes_in_real, S->bytes_in,
-                    100.f * float(S->bytes_in_real) / float(S->bytes_in));
-                F->OutNext("OUT: %4d/%4d (%2.1f%%)", S->bytes_out_real, S->bytes_out,
-                    100.f * float(S->bytes_out_real) / float(S->bytes_out));
-                F->OutNext("client_2_sever ping: %d", net_Statistic.getPing());
-                F->OutNext("SPS/Sended : %4d/%4d", S->dwBytesPerSec, S->dwBytesSended);
-                F->OutNext("sv_urate/cl_urate : %4d/%4d", psNET_ServerUpdate, psNET_ClientUpdate);
-                F->SetColor(color_xrgb(255, 255, 255));
-                struct net_stats_functor
-                {
-                    xrServer* m_server;
-                    CGameFont* F;
-                    void operator()(IClient* C)
-                    {
-                        m_server->UpdateClientStatistic(C);
-                        F->OutNext("0x%08x: P(%d), BPS(%2.1fK), MRR(%2d), MSR(%2d), Retried(%2d), Blocked(%2d)",
-                            // Server->game->get_option_s(*C->Name,"name",*C->Name),
-                            C->ID.value(), C->stats.getPing(),
-                            float(C->stats.getBPS()), // /1024,
-                            C->stats.getMPS_Receive(), C->stats.getMPS_Send(), C->stats.getRetriedCount(),
-                            C->stats.dwTimesBlocked);
-                    }
-                };
-                net_stats_functor tmp_functor;
-                tmp_functor.m_server = Server;
-                tmp_functor.F = F;
-                Server->ForEachClientDo(tmp_functor);
-            }
-            if (IsClient())
-            {
-                IPureClient::UpdateStatistic();
-                F->SetHeightI(0.015f);
-                F->OutSetI(0.0f, 0.5f);
-                F->SetColor(color_xrgb(0, 255, 0));
-                F->OutNext("client_2_sever ping: %d", net_Statistic.getPing());
-                F->OutNext("sv_urate/cl_urate : %4d/%4d", psNET_ServerUpdate, psNET_ClientUpdate);
-                F->SetColor(color_xrgb(255, 255, 255));
-                F->OutNext("BReceivedPs(%2d), BSendedPs(%2d), Retried(%2d), Blocked(%2d)",
-                    net_Statistic.getReceivedPerSec(), net_Statistic.getSendedPerSec(), net_Statistic.getRetriedCount(),
-                    net_Statistic.dwTimesBlocked);
-#ifdef DEBUG
-                if (!pStatGraphR)
-                {
-                    pStatGraphR = new CStatGraph();
-                    pStatGraphR->SetRect(50, 700, 300, 68, 0xff000000, 0xff000000);
-                    // m_stat_graph->SetGrid(0, 0.0f, 10, 1.0f, 0xff808080, 0xffffffff);
-                    pStatGraphR->SetMinMax(0.0f, 65536.0f, 1000);
-                    pStatGraphR->SetStyle(CStatGraph::stBarLine);
-                    pStatGraphR->AppendSubGraph(CStatGraph::stBarLine);
-                }
-                pStatGraphR->AppendItem(float(net_Statistic.getBPS()), 0xff00ff00, 0);
-                F->OutSet(20.f, 700.f);
-                F->OutNext("64 KBS");
-#endif
-            }
-        }
     }
     else
     {
@@ -748,8 +625,6 @@ void CLevel::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("- int send:   %2.2fms, %d", stats.ClientSendInternal.result, stats.ClientSendInternal.count);
     font.OutNext("- bmcommit:   %2.2fms, %d", stats.BulletManagerCommit.result, stats.BulletManagerCommit.count);
     stats.FrameStart();
-    if (Server)
-        Server->DumpStatistics(font, alert);
     AIStats.FrameEnd();
     font.OutNext("AI think:     %2.2fms, %d", AIStats.Think.result, AIStats.Think.count);
     font.OutNext("- range:      %2.2fms, %d", AIStats.Range.result, AIStats.Range.count);
@@ -958,15 +833,13 @@ void CLevel::SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTim
 
 bool CLevel::IsServer()
 {
-    if (!Server || IsDemoPlayStarted())
+    if (!Server)
         return false;
     return true;
 }
 
 bool CLevel::IsClient()
 {
-    if (IsDemoPlayStarted())
-        return true;
     if (Server)
         return false;
     return true;

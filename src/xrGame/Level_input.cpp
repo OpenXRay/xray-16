@@ -91,7 +91,7 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
         return;
-    if (Device.Paused() && !IsDemoPlay()
+    if (Device.Paused()
 #if defined(DEBUG) || defined(COC_DEBUG)
         && !psActorFlags.test(AF_NO_CLIP)
 #endif // DEBUG
@@ -139,7 +139,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         if (Device.editor())
             return;
 
-        if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay()))
+        if (!g_block_pause && IsGameTypeSingle())
         {
 #if defined(DEBUG) || defined(COC_DEBUG)
             if (psActorFlags.test(AF_NO_CLIP))
@@ -189,7 +189,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (b_ui_exist && CurrentGameUI()->IR_UIOnKeyboardPress(key))
         return;
 
-    if (Device.Paused() && !IsDemoPlay()
+    if (Device.Paused()
 #if defined(DEBUG) || defined(COC_DEBUG)
         && !psActorFlags.test(AF_NO_CLIP)
 #endif // DEBUG
@@ -580,7 +580,7 @@ void CLevel::IR_OnKeyboardHold(int key)
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardHold(key))
         return;
-    if (Device.Paused() && !Level().IsDemoPlay()
+    if (Device.Paused()
 #if defined(DEBUG) || defined(COC_DEBUG)
         && !psActorFlags.test(AF_NO_CLIP)
 #endif // DEBUG

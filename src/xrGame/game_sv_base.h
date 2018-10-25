@@ -23,7 +23,6 @@ public:
     virtual void OnPlayerConnect(ClientID id) = 0;
     virtual void OnPlayerDisconnect(ClientID id, char* name, u16 gameId) = 0;
     virtual void OnPlayerConnectFinished(ClientID id) = 0;
-//    virtual void SetRoundResult(ERoundEnd_Result result) = 0;
     virtual game_PlayerState* get_eid(u16 id) = 0;
     virtual void* get_client(u16 id) = 0;
     virtual game_PlayerState* get_id(ClientID id) = 0;

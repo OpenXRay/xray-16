@@ -153,11 +153,8 @@ bool CTeleWhirlwindObject::destroy_object(const Fvector dir, float val)
 
         xr_vector<shared_str>::iterator i = D->m_destroyed_obj_visual_names.begin();
         xr_vector<shared_str>::iterator e = D->m_destroyed_obj_visual_names.end();
-        if (IsGameTypeSingle())
-        {
-            for (; e != i; i++)
-                m_telekinesis->add_impact(dir, val * 10.f);
-        };
+        for (; e != i; i++)
+            m_telekinesis->add_impact(dir, val * 10.f);
 
         CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(object);
         if (PP)

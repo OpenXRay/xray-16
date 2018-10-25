@@ -50,7 +50,6 @@ CUIMMShniaga::~CUIMMShniaga()
 
     delete_data(m_buttons);
     delete_data(m_buttons_new);
-    delete_data(m_buttons_new_network);
 }
 
 extern CActor* g_actor;
@@ -92,7 +91,6 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
         else
             CreateList(m_buttons, xml_doc, "menu_main_mm");
     }
-    CreateList(m_buttons_new_network, xml_doc, "menu_network_game");
 
     ShowMain();
 
@@ -156,9 +154,6 @@ void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_pat
     case epi_new_game: { lst = &m_buttons_new;
     }
     break;
-    case epi_new_network_game: { lst = &m_buttons_new_network;
-    }
-    break;
     }; // switch (page_id)
     delete_data(*lst);
 
@@ -175,9 +170,6 @@ void CUIMMShniaga::ShowPage(enum_page_id page_id)
     }
     break;
     case epi_new_game: { ShowNewGame();
-    }
-    break;
-    case epi_new_network_game: { 
     }
     break;
     }; // switch (page_id)
@@ -213,10 +205,6 @@ bool CUIMMShniaga::IsButton(CUIWindow* st)
         if (m_buttons_new[i] == st)
             return true;
 
-    for (u32 i = 0, count = m_buttons_new_network.size(); i < count; ++i)
-        if (m_buttons_new_network[i] == st)
-            return true;
-
     return false;
 }
 
@@ -241,8 +229,6 @@ void CUIMMShniaga::SelectBtn(int btn)
         m_selected = m_buttons[btn];
     else if (epi_new_game == m_page)
         m_selected = m_buttons_new[btn];
-    else if (epi_new_network_game == m_page)
-        m_selected = m_buttons_new_network[btn];
 
     m_selected_btn = btn;
     ProcessEvent(E_Begin);
@@ -264,14 +250,6 @@ void CUIMMShniaga::SelectBtn(CUIWindow* btn)
         else if (1 == m_page)
         {
             if (m_buttons_new[i] == btn)
-            {
-                SelectBtn(i);
-                return;
-            }
-        }
-        else if (2 == m_page)
-        {
-            if (m_buttons_new_network[i] == btn)
             {
                 SelectBtn(i);
                 return;
@@ -357,8 +335,6 @@ int CUIMMShniaga::BtnCount()
         return (int)m_buttons.size();
     else if (m_page == 1)
         return (int)m_buttons_new.size();
-    else if (m_page == 2)
-        return (int)m_buttons_new_network.size();
     else
         return -1;
 }

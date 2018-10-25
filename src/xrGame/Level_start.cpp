@@ -15,13 +15,6 @@
 
 int g_cl_save_demo = 0;
 
-shared_str CLevel::OpenDemoFile(const char* demo_file_name)
-{
-    PrepareToPlayDemo(demo_file_name);
-    return m_demo_server_options;
-}
-void CLevel::net_StartPlayDemo() { net_Start(m_demo_server_options.c_str(), "localhost"); }
-
 extern XRCORE_API bool g_allow_heap_min;
 
 bool CLevel::net_Start(const char* op_server, const char* op_client)
@@ -30,61 +23,17 @@ bool CLevel::net_Start(const char* op_server, const char* op_client)
 
     pApp->LoadBegin();
 
-	string64	player_name = "callofchernobyl";
-	if ( xr_strlen(player_name) == 0 )
-	{
-		xr_strcpy( player_name, xr_strlen(Core.UserName) ? Core.UserName : Core.CompName );
-	}
+	string64 player_name = "";
+    xr_strcpy(player_name, xr_strlen(Core.UserName) ? Core.UserName : Core.CompName);
 	VERIFY( xr_strlen(player_name) );
 
-    // make Client Name if options doesn't have it
-    LPCSTR NameStart = strstr(op_client, "/name=");
-    if (!NameStart)
-    {
-        string512 tmp;
-        xr_strcpy(tmp, op_client);
-        xr_strcat(tmp, "/name=");
-        xr_strcat(tmp, player_name);
-        m_caClientOptions = tmp;
-    }
-    else
-    {
-        string1024 ret = "";
-        LPCSTR begin = NameStart + xr_strlen("/name=");
-        sscanf(begin, "%[^/]", ret);
-        if (!xr_strlen(ret))
-        {
-            string1024 tmpstr;
-            xr_strcpy(tmpstr, op_client);
-            *(strstr(tmpstr, "name=") + 5) = 0;
-            xr_strcat(tmpstr, player_name);
-            const char* ptmp = strstr(strstr(op_client, "name="), "/");
-            if (ptmp)
-                xr_strcat(tmpstr, ptmp);
-            m_caClientOptions = tmpstr;
-        }
-        else
-        {
-            m_caClientOptions = op_client;
-        };
-    };
+    string512 tmp;
+    xr_strcpy(tmp, op_client);
+    xr_strcat(tmp, "/name=");
+    xr_strcat(tmp, player_name);
+    m_caClientOptions = tmp;
     m_caServerOptions = op_server;
     //---------------------------------------------------------------------
-    if (!IsDemoPlay())
-    {
-        LPCSTR pdemosave = strstr(op_client, "/mpdemosave=");
-        bool is_single = m_caServerOptions.size() != 0 ? (strstr(m_caServerOptions.c_str(), "single") != NULL) : false;
-        int save_demo = g_cl_save_demo;
-        if (pdemosave != NULL)
-        {
-            sscanf(pdemosave, "/mpdemosave=%d", &save_demo);
-        }
-        if (!is_single && save_demo)
-        {
-            PrepareToSaveDemo();
-        }
-    }
-    //---------------------------------------------------------------------------
     g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start1));
     g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start2));
     g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start3));
@@ -95,8 +44,6 @@ bool CLevel::net_Start(const char* op_server, const char* op_client)
     return net_start_result_total;
 }
 
-shared_str level_version(const shared_str& server_options);
-shared_str level_name(const shared_str& server_options);
 bool CLevel::net_start1()
 {
     // Start client and server if need it
@@ -253,8 +200,7 @@ bool CLevel::net_start6()
             Console->Execute("main_menu on");
 
         }
-        else if (!map_data.m_map_loaded && map_data.m_name.size() &&
-            m_bConnectResult) // if (map_data.m_name == "") - level not loaded, see CLevel::net_start_client3
+        else if (!map_data.m_map_loaded && map_data.m_name.size() && m_bConnectResult)
         {
             LPCSTR level_id_string = NULL;
             LPCSTR dialog_string = NULL;
@@ -318,11 +264,6 @@ void CLevel::InitializeClientGame(NET_Packet& P)
     game->set_type_name(game_type_name);
     game->Init();
     m_bGameConfigStarted = TRUE;
-
-    if (!IsGameTypeSingle())
-    {
-        init_compression();
-    }
 
     R_ASSERT(Load_GameSpecific_After());
 }

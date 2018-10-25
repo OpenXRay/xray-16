@@ -159,9 +159,6 @@
     <ClCompile Include="LocatorAPI.cpp">
       <Filter>FS</Filter>
     </ClCompile>
-    <ClCompile Include="LocatorAPI_auth.cpp">
-      <Filter>FS</Filter>
-    </ClCompile>
     <ClCompile Include="LocatorAPI_defs.cpp">
       <Filter>FS</Filter>
     </ClCompile>

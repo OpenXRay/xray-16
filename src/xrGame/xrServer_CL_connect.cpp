@@ -93,67 +93,20 @@ void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr)
 {
     NET_Packet P;
     P.w_begin(M_CLIENT_CONNECT_RESULT);
-    P.w_u8(res);
-    P.w_u8(res1);
-    P.w_stringZ(ResultStr);
     P.w_clientID(CL->ID);
 
     if (SV_Client && SV_Client == CL)
         P.w_u8(1);
     else
         P.w_u8(0);
-    P.w_stringZ(Level().m_caServerOptions);
 
     SendTo(CL->ID, P);
-
-    if (!res) // need disconnect
-    {
-#ifdef MP_LOGGING
-        Msg("* Server disconnecting client, resaon: %s", ResultStr);
-#endif
-        Flush_Clients_Buffers();
-        DisconnectClient(CL, ResultStr);
-    }
-
-    if (Level().IsDemoPlay())
-    {
-        Level().StartPlayDemo();
-
-        return;
-    }
-};
-
-void xrServer::SendProfileCreationError(IClient* CL, char const* reason)
-{
-    VERIFY(CL);
-
-    NET_Packet P;
-    P.w_begin(M_CLIENT_CONNECT_RESULT);
-    P.w_u8(0);
-    P.w_u8(ecr_profile_error);
-    P.w_stringZ(reason);
-    P.w_clientID(CL->ID);
-    SendTo(CL->ID, P);
-    if (CL != GetServerClient())
-    {
-        Flush_Clients_Buffers();
-        DisconnectClient(CL, reason);
-    }
-}
-
-BOOL	g_SV_Disable_Auth_Check = FALSE;
-
-bool xrServer::NeedToCheckClient_BuildVersion(IClient* CL)
-{
-	return false;
 };
 
 void xrServer::OnBuildVersionRespond(IClient* CL, NET_Packet& P)
 {
-	u16 Type;
-	P.r_begin( Type );
-	u64 _our		=	FS.auth_get();
-	u64 _him		=	P.r_u64();
+    u16 Type;
+    P.r_begin(Type);
 	RequestClientDigest(CL);
 };
 

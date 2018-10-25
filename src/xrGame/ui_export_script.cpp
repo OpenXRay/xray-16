@@ -11,7 +11,6 @@
 #include "UI/UITabControl.h"
 #include "UI/UIComboBox.h"
 #include "ui/UIOptionsManagerScript.h"
-#include "ui/UIMapInfo.h"
 #include "ScriptXmlInit.h"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -26,7 +25,6 @@ SCRIPT_EXPORT(UIRegistrator, (), {
                              value("alRight", int(CGameFont::alRight)), value("alCenter", int(CGameFont::alCenter))],
 
 		class_<CMainMenu>("CMainMenu")
-			.def("GetDemoInfo",				&CMainMenu::GetDemoInfo)
 	];
 
     module(luaState, "main_menu")[def("get_main_menu", &MainMenu)];

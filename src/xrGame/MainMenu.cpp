@@ -16,9 +16,6 @@
 #include "xrCore/os_clipboard.h"
 #include "xrGame/game_type.h"
 
-#include "DemoInfo.h"
-#include "DemoInfo_Loader.h"
-
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
 
@@ -32,13 +29,6 @@
 extern ENGINE_API BOOL bShowPauseString;
 
 //#define DEMO_BUILD
-
-string128 ErrMsgBoxTemplate[] = {"message_box_invalid_pass", "message_box_invalid_host", "message_box_session_full",
-    "message_box_server_reject", "message_box_cdkey_in_use", "message_box_cdkey_disabled", "message_box_cdkey_invalid",
-    "message_box_different_version", "message_box_gs_service_not_available",
-    "message_box_sb_master_server_connect_failed", "msg_box_no_new_patch", "msg_box_new_patch",
-    "msg_box_patch_download_error", "msg_box_patch_download_success", "msg_box_connect_to_master_server",
-    "msg_box_kicked_by_server", "msg_box_error_loading", "message_box_download_level"};
 
 extern bool b_shniaganeed_pp;
 
@@ -65,22 +55,18 @@ CMainMenu::CMainMenu()
     g_statHint = NULL;
     m_deactivated_frame = 0;
 
- 
-
     //-------------------------------------------
 
     m_NeedErrDialog = ErrNoError;
     m_start_time = 0;
 
-	m_demo_info_loader				= NULL;
-
 	if (!GEnv.isDedicatedServer)
 	{
-		g_btnHint						= new CUIButtonHint();
-		g_statHint						= new CUIButtonHint();
+		g_btnHint = new CUIButtonHint();
+		g_statHint = new CUIButtonHint();
 	}
 	
-	Device.seqFrame.Add		(this,REG_PRIORITY_LOW-1000);
+	Device.seqFrame.Add(this,REG_PRIORITY_LOW-1000);
 	mLanguageChanged = false;
 }
 
@@ -91,7 +77,6 @@ CMainMenu::~CMainMenu()
 	xr_delete						(g_statHint);
 	xr_delete						(m_startDialog);
 	g_pGamePersistent->m_pMainMenu	= NULL;
-	xr_delete						(m_demo_info_loader);
 	delete_data						(m_pMB_ErrDlgs);	
 }
 
@@ -410,12 +395,6 @@ void CMainMenu::OnRenderPPUI_PP()
     }
     UI().pp_stop();
 }
-/*
-void CMainMenu::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
-{
-    pDialog->m_bWorkInPause = true;
-    CDialogHolder::StartStopMenu(pDialog, bDoHideIndicators);
-}*/
 
 // pureFrame
 void CMainMenu::OnFrame()
@@ -572,13 +551,4 @@ LPCSTR DelHyphens(LPCSTR c)
     buf[sz - sz1] = 0;
 
     return buf;
-}
-
-demo_info const * CMainMenu::GetDemoInfo(LPCSTR file_name)
-{
-    if (!m_demo_info_loader)
-    {
-        m_demo_info_loader = new demo_info_loader();
-    }
-    return m_demo_info_loader->get_demofile_info(file_name);
 }

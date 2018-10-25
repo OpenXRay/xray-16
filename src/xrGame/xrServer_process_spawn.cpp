@@ -66,7 +66,7 @@ CSE_Abstract* xrServer::Process_spawn(
     // check if we can assign entity to some client
     if (0 == CL)
     {
-        CL = SelectBestClientToMigrateTo(E);
+        CL = (xrClientData*)SV_Client;
     }
 
     // check for respawn-capability and create phantom as needed
@@ -95,7 +95,7 @@ CSE_Abstract* xrServer::Process_spawn(
         {
             // Clone from Phantom
             E->ID = PerformIDgen(0xffff);
-            E->owner = CL; //		= SelectBestClientToMigrateTo	(E);
+            E->owner = CL;
             E->s_flags.set(M_SPAWN_OBJECT_PHANTOM, FALSE);
             entities.insert(std::make_pair(E->ID, E));
         }

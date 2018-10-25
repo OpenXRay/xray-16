@@ -10,8 +10,6 @@
 #include "xrServer.h"
 #include "GlobalFeelTouch.hpp"
 #include "Level_network_map_sync.h"
-#include "secure_messaging.h"
-#include "traffic_optimization.h"
 
 class CHUDManager;
 class CParticlesObject;
@@ -30,9 +28,6 @@ class LevelGraphDebugRender;
 class CLevelSoundManager;
 class CGameTaskManager;
 class CZoneList;
-class message_filter;
-class demoplay_control;
-class demo_info;
 class CStreamReader;
 
 #ifdef DEBUG
@@ -48,11 +43,6 @@ const int maxTeams = 32;
 class CFogOfWarMngr;
 class CBulletManager;
 class CMapManager;
-
-namespace file_transfer
-{
-class client_site;
-}
 
 class CLevel : public IGame_Level, public IPureClient
 {
@@ -91,7 +81,6 @@ public:
         }
     };
     AIStatistics AIStats;
-#include "Level_network_Demo.h"
     void ClearAllObjects();
 
 private:
@@ -177,10 +166,6 @@ public:
     virtual void OnConnectRejected();
 
 private:
-    void OnSecureMessage(NET_Packet& P);
-    void OnSecureKeySync(NET_Packet& P);
-    void SecureSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
-    secure_messaging::key_t m_secret_key;
     bool m_bNeed_CrPr = false;
     u32 m_dwNumSteps = 0;
     bool m_bIn_CrPr = false;
@@ -202,7 +187,6 @@ private:
     void UpdateDeltaUpd(u32 LastTime);
     void BlockCheatLoad();
     bool Connect2Server(const char* options);
-    void SendClientDigestToServer();
     shared_str m_client_digest; // for screenshots
 
 public:
@@ -282,13 +266,10 @@ public:
     virtual void OnFrame(void);
     virtual void OnRender();
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    virtual shared_str OpenDemoFile(const char* demo_file_name);
-    virtual void net_StartPlayDemo();
     void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
     void cl_Process_Spawn(NET_Packet& P);
     void ProcessGameEvents();
     void ProcessGameSpawns();
-    void ProcessCompressedUpdate(NET_Packet& P, u8 const compression_type);
     // Input
     virtual void IR_OnKeyboardPress(int btn);
     virtual void IR_OnKeyboardRelease(int btn);
@@ -300,7 +281,6 @@ public:
     virtual void IR_OnMouseStop(int, int);
     virtual void IR_OnMouseWheel(int direction);
     virtual void IR_OnActivate(void);
-    int get_RPID(LPCSTR name);
     // Game
     void InitializeClientGame(NET_Packet& P);
     void ClientReceive();
@@ -352,7 +332,6 @@ public:
     float GetEnvironmentGameDayTimeSec();
 
 protected:
-    // CFogOfWarMngr* m_pFogOfWarMngr;
     CMapManager* m_map_manager = nullptr;
     CGameTaskManager* m_game_task_manager = nullptr;
 
@@ -372,24 +351,10 @@ public:
     CSE_Abstract* spawn_item(
         LPCSTR section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item = false);
 
-protected:
-    u32 m_dwCL_PingDeltaSend = 1000;
-    u32 m_dwCL_PingLastSendTime = 0;
-    u32 m_dwRealPing = 0;
-
-public:
-    virtual u32 GetRealPing() { return m_dwRealPing; }
 public:
     void remove_objects();
     virtual void OnSessionTerminate(pcstr reason);
-    file_transfer::client_site* m_file_transfer = nullptr;
-    compression::ppmd_trained_stream* m_trained_stream = nullptr;
-    compression::lzo_dictionary_buffer m_lzo_dictionary;
-    // aligned to 16 bytes m_lzo_working_buffer
-    u8* m_lzo_working_memory = nullptr;
-    u8* m_lzo_working_buffer = nullptr;
-    void init_compression();
-    void deinit_compression();
+
 #ifdef DEBUG
     LevelGraphDebugRender* GetLevelGraphDebugRender() const { return levelGraphDebugRender; }
 #endif

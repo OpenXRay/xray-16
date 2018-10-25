@@ -7,7 +7,6 @@
 #include "ai_space.h"
 #include "game_cl_base.h"
 #include "NET_Queue.h"
-#include "file_transfer.h"
 #include "hudmanager.h"
 #include "xrNetServer/NET_Messages.h"
 
@@ -199,7 +198,7 @@ void CLevel::ClientSendProfileData()
     NP.w_begin(M_CREATE_PLAYER_STATE);
     game_PlayerState tmp_player_state(NULL);
     tmp_player_state.net_Export(NP, TRUE);
-    SecureSend(NP, net_flags(TRUE, TRUE, TRUE, TRUE));
+    Send(NP, net_flags(TRUE, TRUE, TRUE, TRUE));
 }
 
 bool CLevel::net_start_client5()
@@ -247,13 +246,7 @@ bool CLevel::net_start_client6()
 #endif // #ifdef DEBUG
 
         if (game)
-        {
             game->OnConnected();
-            if (game->Type() != eGameIDSingle)
-            {
-                m_file_transfer = new file_transfer::client_site();
-            }
-        }
 
         g_pGamePersistent->SetLoadStageTitle("st_client_synchronising");
         pApp->LoadForceFinish();

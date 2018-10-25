@@ -753,21 +753,11 @@ void CWeaponMagazined::switch2_Fire()
         return;
 #endif // DEBUG
 
-    //
-    //	VERIFY2(
-    //		io && (ii == io->inventory().ActiveItem()),
-    //		make_string(
-    //			"item[%s], parent[%s]",
-    //			*cName(),
-    //			H_Parent() ? *H_Parent()->cName() : "no_parent"
-    //		)
-    //	);
-
     m_bStopedAfterQueueFired = false;
     m_bFireSingleShot = true;
     m_iShotNum = 0;
 
-    if ((OnClient() || Level().IsDemoPlay()) && !IsWorking())
+    if ((OnClient()) && !IsWorking())
         FireStart();
 }
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NET_Shared.h"
-#include "NET_Common.h"
 #include "xrCommon/xr_deque.h"
 #include "xrCommon/xr_vector.h"
 #include "Common/Noncopyable.hpp"
@@ -37,7 +36,7 @@ extern "C"
     struct IDirectPlay8Client;
 }
 
-class XRNETSERVER_API IPureClient : MultipacketReciever, MultipacketSender, Noncopyable
+class XRNETSERVER_API IPureClient : Noncopyable
 {
     enum ConnectionState
     {
@@ -45,8 +44,6 @@ class XRNETSERVER_API IPureClient : MultipacketReciever, MultipacketSender, Nonc
         EnmConnectionWait = -1,
         EnmConnectionCompleted = 1
     };
-
-    friend void sync_thread(void*);
 
 protected:
     struct HOST_NODE : Noncopyable // deprecated...
@@ -65,13 +62,9 @@ protected:
     CTimer* device_timer;
 
     IDirectPlay8Client* NET;
-    IDirectPlay8Address* net_Address_device;
-    IDirectPlay8Address* net_Address_server;
 
     Lock* net_csEnumeration;
     xr_vector<HOST_NODE> net_Hosts;
-
-    NET_Compressor net_Compressor;
 
     ConnectionState net_Connected;
     bool net_Syncronised;
@@ -85,7 +78,6 @@ protected:
     s32 net_TimeDelta_Calculated;
     s32 net_TimeDelta_User;
 
-    void Sync_Thread();
     void Sync_Average();
 
     void SetClientID(ClientID const& local_client) { net_ClientID = local_client; }
@@ -94,12 +86,10 @@ protected:
 public:
     IPureClient(CTimer* tm);
     virtual ~IPureClient();
-    HRESULT net_Handler(u32 dwMessageType, PVOID pMessage);
 
     bool Connect(pcstr server_name);
     void Disconnect();
 
-    void net_Syncronize();
     bool net_isCompleted_Connect() const { return net_Connected == EnmConnectionCompleted; }
     bool net_isFails_Connect() const { return net_Connected == EnmConnectionFails; }
     bool net_isCompleted_Sync() const { return net_Syncronised; }
@@ -112,19 +102,14 @@ public:
     void net_msg_Release() { net_Queue.Release(); } //							|
     void EndProcessQueue() { net_Queue.UnlockQ(); } //							<-
     // send
-    virtual void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
-    virtual void Flush_Send_Buffer();
     virtual void OnMessage(void* data, u32 size);
     virtual void OnInvalidHost() {}
     virtual void OnInvalidPassword() {}
     virtual void OnSessionFull() {}
     virtual void OnConnectRejected() {}
-    bool net_HasBandwidth();
-    void ClearStatistic();
     IClientStatistic& GetStatistic() { return net_Statistic; }
     void UpdateStatistic();
     ClientID const& GetClientID() const { return net_ClientID; }
-    bool GetServerAddress(ip_address& pAddress, DWORD* pPort);
 
     // time management
     u32 timeServer() const { return TimeGlobal(device_timer) + net_TimeDelta + net_TimeDelta_User; }
@@ -142,7 +127,4 @@ public:
 
 private:
     ClientID net_ClientID;
-
-    void _Recieve(const void* data, u32 data_size, u32 param) override;
-    void _SendTo_LL(const void* data, u32 size, u32 flags, u32 timeout) override;
 };

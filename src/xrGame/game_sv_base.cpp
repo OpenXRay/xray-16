@@ -358,18 +358,7 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
         xrClientData* CL = m_server->ID_to_client(sender);
         R_ASSERT2(CL, make_string("M_CREATE_PLAYER_STATE: client 0x%08x not found", sender.value()).c_str());
         CL->ps = createPlayerState(&tNetPacket);
-        CL->ps->m_online_time = Level().timeServer();
         CL->ps->DeathTime = Device.dwTimeGlobal;
-
-        if (psNET_direct_connect) // IsGameTypeSingle())
-            break;
-
-        if (Level().IsDemoPlay())
-            break;
-
-        if (GEnv.isDedicatedServer && (CL == m_server->GetServerClient()))
-            break;
-
     }
     break;
     default:
@@ -388,27 +377,7 @@ void game_sv_GameState::OnSwitchPhase(u32 old_phase, u32 new_phase)
 
 void game_sv_GameState::AddDelayedEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender)
 {
-    //	OnEvent(tNetPacket,type,time,sender);
-    if (IsGameTypeSingle())
-    {
-        m_event_queue->Create(tNetPacket, type, time, sender);
-        return;
-    }
-    switch (type)
-    {
-    case GAME_EVENT_PLAYER_STARTED:
-    case GAME_EVENT_PLAYER_READY:
-    case GAME_EVENT_VOTE_START:
-    case GAME_EVENT_VOTE_YES:
-    case GAME_EVENT_VOTE_NO:
-    case GAME_EVENT_PLAYER_AUTH:
-    case GAME_EVENT_CREATE_PLAYER_STATE: { m_event_queue->Create(tNetPacket, type, time, sender);
-    }
-    break;
-    default: { m_event_queue->CreateSafe(tNetPacket, type, time, sender);
-    }
-    break;
-    }
+    m_event_queue->Create(tNetPacket, type, time, sender);
 }
 
 void game_sv_GameState::ProcessDelayedEvent()
