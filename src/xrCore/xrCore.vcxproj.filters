@@ -112,6 +112,9 @@
     <Filter Include="Compression\lzo">
       <UniqueIdentifier>{c6342a66-65de-47b5-afe5-c51a7383edc0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="xrDelegate">
+      <UniqueIdentifier>{b54073c2-213d-456f-b88d-8eeb0dd440b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -682,6 +685,15 @@
     </ClInclude>
     <ClInclude Include="FileCRC32.h">
       <Filter>FS</Filter>
+    </ClInclude>
+    <ClInclude Include="xrDelegate\xrDelegate.h">
+      <Filter>xrDelegate</Filter>
+    </ClInclude>
+    <ClInclude Include="xrDelegate\xrDelegateArguments.h">
+      <Filter>xrDelegate</Filter>
+    </ClInclude>
+    <ClInclude Include="xrDelegate\xrDelegateBinder.h">
+      <Filter>xrDelegate</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
