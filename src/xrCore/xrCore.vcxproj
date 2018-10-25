@@ -410,6 +410,9 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="xrCore_benchmark_macros.h" />
     <ClInclude Include="xrDebug.h" />
     <ClInclude Include="xrDebug_macros.h" />
+    <ClInclude Include="xrDelegate\xrDelegate.h" />
+    <ClInclude Include="xrDelegate\xrDelegateArguments.h" />
+    <ClInclude Include="xrDelegate\xrDelegateBinder.h" />
     <ClInclude Include="xrMemory.h" />
     <ClInclude Include="xrPool.h" />
     <ClInclude Include="xrsharedmem.h" />
