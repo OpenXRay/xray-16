@@ -8,6 +8,12 @@
 
 #pragma once
 
+namespace hash_fixed_vertex_manager
+{
+extern u32 to_u32(const GraphEngineSpace::CWorldState& other);
+extern u32 to_u32(const shared_str& other);
+}
+
 #define TEMPLATE_SPECIALIZATION                                             \
     template <typename TPathId, typename TIndex, u32 HashSize, u32 FixSize> \
     template <typename TPathBuilder, typename TVertexAllocator, typename TCompoundVertex>
@@ -67,11 +73,7 @@ inline bool CHashFixedVertexManager::is_opened(const Vertex& vertex) const { ret
 TEMPLATE_SPECIALIZATION
 inline u32 CHashFixedVertexManager::hash_index(const Index& vertex_id) const
 {
-#ifdef LINUX // FIXME!!
-    return 0;
-#else
     return hash_fixed_vertex_manager::to_u32(vertex_id) % HashSize;
-#endif
 }
 
 TEMPLATE_SPECIALIZATION

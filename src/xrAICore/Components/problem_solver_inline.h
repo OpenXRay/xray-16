@@ -9,7 +9,7 @@
 #pragma once
 
 #ifndef AI_COMPILER
-#include "xrAICore/Navigation/graph_engine.h"
+#include "xrAICore/Navigation/graph_engine_space.h"
 #endif
 
 #define TEMPLATE_SPECIALIZATION                                                                                  \
