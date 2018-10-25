@@ -20,6 +20,7 @@ struct XRUICORE_API color_animation
     Flags8 m_lanimFlags;
 };
 
+// Unused
 struct xform_animation : public color_animation
 {
     xform_animation();
