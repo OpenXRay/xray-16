@@ -11,7 +11,7 @@ class CLAItem;
 #define LA_TEXTCOLOR (1 << 2)
 #define LA_TEXTURECOLOR (1 << 3)
 
-struct color_animation
+struct XRUICORE_API color_animation
 {
     color_animation();
     CLAItem* m_lanim;
@@ -20,6 +20,7 @@ struct color_animation
     Flags8 m_lanimFlags;
 };
 
+// Unused
 struct xform_animation : public color_animation
 {
     xform_animation();
