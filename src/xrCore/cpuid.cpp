@@ -175,7 +175,7 @@ unsigned int query_processor_info(processor_info* pinfo)
     DWORD byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
 
-    auto buffer = std::make_unique<u8[]>(returnedLength);
+    auto buffer = xr_make_unique<u8[]>(returnedLength);
     auto ptr = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION>(buffer.get());
     GetLogicalProcessorInformation(ptr, &returnedLength);
 

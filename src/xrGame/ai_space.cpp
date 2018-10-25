@@ -118,9 +118,9 @@ void CAI_Space::init()
     {
         AISpaceBase::Initialize();
 
-        m_ef_storage = std::make_unique<CEF_Storage>();
-        m_cover_manager = std::make_unique<CCoverManager>();
-        m_moving_objects = std::make_unique<::moving_objects>();
+        m_ef_storage = xr_make_unique<CEF_Storage>();
+        m_cover_manager = xr_make_unique<CCoverManager>();
+        m_moving_objects = xr_make_unique<::moving_objects>();
 
         VERIFY(!GEnv.ScriptEngine);
         GEnv.ScriptEngine = new CScriptEngine();
