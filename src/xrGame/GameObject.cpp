@@ -115,7 +115,7 @@ void CGameObject::MakeMeCrow()
 #ifndef LINUX
     if ((u32)_InterlockedCompareExchange((long*)&dwFrame_AsCrow, device_frame_id, object_frame_id) == device_frame_id)
 #else
-     if (__sync_val_compare_and_swap((long*)&dwFrame_AsCrow, object_frame_id, device_frame_id) == device_frame_id)
+     if (__sync_val_compare_and_swap(&dwFrame_AsCrow, object_frame_id, device_frame_id) == device_frame_id)
 #endif
         return;
 
