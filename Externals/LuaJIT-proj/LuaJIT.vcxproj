@@ -99,7 +99,8 @@
       <GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">true</GenerateDebugInformation>
     </Link>
     <ClCompile>
-      <PreprocessorDefinitions>LUA_BUILD_AS_DLL;_CRT_STDIO_INLINE=__declspec(dllexport)__inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Platform)'=='x64'">LUA_BUILD_AS_DLL;LUAJIT_ENABLE_GC64;_CRT_STDIO_INLINE=__declspec(dllexport)__inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Platform)'=='Win32'">LUA_BUILD_AS_DLL;_CRT_STDIO_INLINE=__declspec(dllexport)__inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
