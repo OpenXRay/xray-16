@@ -42,6 +42,6 @@ protected:
 #if defined(WINDOWS)
     virtual ~IClimableObject() = 0 {}
 #elif defined(LINUX)
-    virtual ~IClimableObject() = 0;
+    virtual ~IClimableObject() {}
 #endif
 };
