@@ -16,7 +16,7 @@ protected:
 #if defined(WINDOWS)
     virtual ~ICollisionDamageReceiver() = 0 {}
 #elif defined(LINUX)
-    virtual ~ICollisionDamageReceiver() = 0;
+    virtual ~ICollisionDamageReceiver() {}
 #endif
 };
 
