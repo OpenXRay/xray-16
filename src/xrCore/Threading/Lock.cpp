@@ -4,22 +4,11 @@
 
 struct LockImpl
 {
-#ifdef WINDOWS
-    CRITICAL_SECTION cs;
-
-    LockImpl() { InitializeCriticalSection(&cs); }
-    ~LockImpl() { DeleteCriticalSection(&cs); }
-
-    ICF void Lock() { EnterCriticalSection(&cs); }
-    ICF void Unlock() { LeaveCriticalSection(&cs); }
-    ICF bool TryLock() { return !!TryEnterCriticalSection(&cs); }
-#else
     std::recursive_mutex mutex;
 
     ICF void Lock() { mutex.lock(); }
     ICF void Unlock() { mutex.unlock(); }
     ICF bool TryLock() { return mutex.try_lock(); }
-#endif
 };
 
 #ifdef CONFIG_PROFILE_LOCKS
