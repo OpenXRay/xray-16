@@ -870,9 +870,7 @@ void CMainMenu::OnConnectToMasterServerOkClicked(CUIWindow*, void*) { Hide_CTMS_
 LPCSTR CMainMenu::GetGSVer()
 {
     static string256 buff;
-#ifdef WINDOWS
     xr_strcpy(buff, GetGameVersion());
-#endif
     return buff;
 }
 
