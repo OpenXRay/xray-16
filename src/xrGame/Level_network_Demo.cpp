@@ -18,11 +18,15 @@ void CLevel::PrepareToSaveDemo()
     R_ASSERT(!m_DemoPlay);
     string_path demo_name = "";
     string_path demo_path;
-#ifndef LINUX // FIXME!!!
+#ifdef WINDOWS
     SYSTEMTIME Time;
     GetLocalTime(&Time);
     xr_sprintf(demo_name, "xray_%02d-%02d-%02d_%02d-%02d-%02d.demo", Time.wMonth, Time.wDay, Time.wYear, Time.wHour,
         Time.wMinute, Time.wSecond);
+#else
+    time_t Time;
+    time(&Time);
+    xr_sprintf(demo_name, "xray_%s.demo", ctime(&Time));
 #endif
     Msg("Demo would be stored in - %s", demo_name);
     FS.update_path(demo_path, "$logs$", demo_name);
