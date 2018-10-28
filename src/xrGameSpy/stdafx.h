@@ -3,9 +3,7 @@
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 
-#ifdef LINUX
 #include "SDL.h"
-#endif
 
 #include <GameSpy/common/gsCommon.h>
 #include <GameSpy/common/gsAvailable.h>
