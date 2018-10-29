@@ -113,4 +113,4 @@ void CSE_Motion::FillProps(LPCSTR pref, PropItemVec& items)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-#pragma pack(pop, 4)
+#pragma pack(pop)
