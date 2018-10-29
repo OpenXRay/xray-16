@@ -670,7 +670,7 @@ void xrDebug::SetupExceptionHandler()
 #else
     const auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #endif
-    
+
     BT_SetDumpType(minidumpFlags);
     //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
     BT_SetSupportEMail("openxray@yahoo.com");
@@ -817,7 +817,7 @@ static void unexpected_handler() { handler_base("unexpected program termination"
 static void abort_handler(int signal) { handler_base("application is aborting"); }
 static void floating_point_handler(int signal) { handler_base("floating point error"); }
 static void illegal_instruction_handler(int signal) { handler_base("illegal instruction"); }
-static void segmentation_fault_handler(int signal) { handler_base("segmentation fault"); }
+void segmentation_fault_handler(int signal) { throw std::runtime_error("segfault"); }
 static void termination_handler(int signal) { handler_base("termination with exit code 3"); }
 
 void xrDebug::OnThreadSpawn()
@@ -843,12 +843,12 @@ void xrDebug::OnThreadSpawn()
     std::set_unexpected(_terminate);
 #endif
 #else //WINDOWS
+    signal(SIGSEGV, sigsegv_handler);
+    std::set_terminate(_terminate);
     signal(SIGABRT, abort_handler);
     signal(SIGFPE, floating_point_handler);
     signal(SIGILL, illegal_instruction_handler);
     signal(SIGINT, 0);
-    signal(SIGTERM, termination_handler);
-    signal(SIGSEGV, segmentation_fault_handler);
 #endif
 }
 
