@@ -18,7 +18,7 @@ void CRenderTarget::create_minmax_SM()
     pv++;
     RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
     //u_setrt	(rt_smap_depth_minmax_temp,NULL,NULL,NULL);
-    u_setrt(rt_smap_depth_minmax,NULL,NULL,NULL);
+    u_setrt(rt_smap_depth_minmax, 0, 0, 0);
     RCache.set_Element(s_create_minmax_sm->E[0]);
     RCache.set_Geometry(g_combine_2UV);
     RCache.set_Stencil(FALSE, D3DCMP_ALWAYS, 0x80, 0xFF, 0x80, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE,

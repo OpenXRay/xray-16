@@ -76,7 +76,7 @@ CWeapon::CWeapon()
     m_set_next_ammoType_on_reload = undefined_ammo_type;
     m_crosshair_inertion = 0.f;
     m_activation_speed_is_overriden = false;
-    m_cur_scope = NULL;
+    m_cur_scope = 0;
     m_bRememberActorNVisnStatus = false;
 }
 

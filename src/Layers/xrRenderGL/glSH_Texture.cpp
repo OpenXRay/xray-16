@@ -27,8 +27,8 @@ void resptrcode_texture::create(LPCSTR _name)
 //////////////////////////////////////////////////////////////////////
 CTexture::CTexture()
 {
-    pSurface = NULL;
-    pBuffer = NULL;
+    pSurface = 0;
+    pBuffer = 0;
     pAVI = nullptr;
     pTheora = nullptr;
     desc = GL_TEXTURE_2D;

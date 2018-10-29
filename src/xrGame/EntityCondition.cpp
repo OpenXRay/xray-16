@@ -148,7 +148,7 @@ void CEntityCondition::reinit()
 
     m_fHealthLost = 0.f;
     m_pWho = NULL;
-    m_iWhoID = NULL;
+    m_iWhoID = 0;
 
     ClearWounds();
 }
