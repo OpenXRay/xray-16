@@ -3,13 +3,9 @@ out gl_PerVertex { vec4 gl_Position; };
 
 struct vf
 {
-	float2	tc0	; // TEXCOORD0;	// base
-	float4	c0	; // COLOR0;		// color
-//	Igor: for additional depth dest
-#ifdef	USE_SOFT_PARTICLES
-	float4 tctexgen	; // TEXCOORD1;
-#endif	//	USE_SOFT_PARTICLES
-	float4	hpos; // SV_Position;
+	float2 tc0		; // TEXCOORD0;		// base
+	float4 c0		; // COLOR0;		// color
+	float4 hpos		; // SV_Position;	// position
 };
 
 layout(location = POSITION)		in float4	v_model_P		; // POSITION;		// (float,float,float,1)
@@ -26,19 +22,16 @@ layout(location = TANGENT)		in float3	v_model_T		; // TANGENT;		// (nx,ny,nz)
 layout(location = BINORMAL)		in float3	v_model_B		; // BINORMAL;		// (nx,ny,nz)
 #endif
 #if defined(SKIN_2) || defined(SKIN_3)
-layout(location = TEXCOORD0)	in float4	v_model_tc		; // TEXCOORD0;	// (u,v)
+layout(location = TEXCOORD0)		in float4	v_model_tc		; // TEXCOORD0;	// (u,v)
 #else
-layout(location = TEXCOORD0)	in float2	v_model_tc		; // TEXCOORD0;	// (u,v)
+layout(location = TEXCOORD0)		in float2	v_model_tc		; // TEXCOORD0;	// (u,v)
 #endif
 #ifdef	SKIN_4
-layout(location = TEXCOORD1)	in float4	v_model_ind		; // (x=m-index0, y=m-index1, z=m-index2, w=m-index3)
+layout(location = TEXCOORD1)		in float4	v_model_ind		; // (x=m-index0, y=m-index1, z=m-index2, w=m-index3)
 #endif
 
-layout(location = TEXCOORD0) 	out float2	v2p_particle_tc0; // TEXCOORD0;
-layout(location = COLOR0) 		out float4	v2p_particle_c0	; // COLOR0;
-#ifdef	USE_SOFT_PARTICLES
-layout(location = TEXCOORD1) 	out float4	v2p_particle_tctexgen; // TEXCOORD1;
-#endif	//	USE_SOFT_PARTICLES
+layout(location = TEXCOORD0) 		out float2	vf_model_tc0		; // TEXCOORD0;
+layout(location = COLOR0) 		out float4	vf_model_c0		; // COLOR0;
 
 vf   _main (v_model v);
 
@@ -90,8 +83,7 @@ void main()
 	O = _main(skinning_4(I));
 #endif
 
-	v2p_particle_tc0 = O.tc0;
-	v2p_particle_c0 = O.c0;
-	v2p_particle_tctexgen = O.tctexgen;
+	vf_model_tc0 = O.tc0;
+	vf_model_c0 = O.c0;
 	gl_Position = O.hpos;
 }
