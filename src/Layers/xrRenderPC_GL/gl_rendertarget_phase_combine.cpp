@@ -355,14 +355,14 @@ void CRenderTarget::phase_combine()
     if (RImplementation.o.dx10_msaa)
     {
         if (PP_Complex) u_setrt(rt_Generic, 0, 0, HW.pBaseZB); // LDR RT
-        else u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+        else u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
     }
     else
     {
         if (PP_Complex) u_setrt(rt_Color, 0, 0, HW.pBaseZB); // LDR RT
-        else u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+        else u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
     }
-    //. u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB);
+    //. u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT, 0, 0,HW.pBaseZB);
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(FALSE);
 
@@ -483,8 +483,8 @@ void CRenderTarget::phase_combine()
     //*** exposure-pipeline-clear
     {
         std::swap(rt_LUM_pool[gpu_id * 2 + 0], rt_LUM_pool[gpu_id * 2 + 1]);
-        t_LUM_src->surface_set(GL_TEXTURE_2D, NULL);
-        t_LUM_dest->surface_set(GL_TEXTURE_2D, NULL);
+        t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
+        t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
     }
 
 #ifdef DEBUG
@@ -595,8 +595,8 @@ void CRenderTarget::phase_combine()
 void CRenderTarget::phase_wallmarks()
 {
     // Targets
-    RCache.set_RT(NULL, 2);
-    RCache.set_RT(NULL, 1);
+    RCache.set_RT(0, 2);
+    RCache.set_RT(0, 1);
     if (!RImplementation.o.dx10_msaa)
         u_setrt(rt_Color,NULL,NULL, HW.pBaseZB);
     else

@@ -22,7 +22,7 @@
 CPsyDog::CPsyDog()
 {
     m_aura = new CPsyDogAura(this);
-    m_max_phantoms_count = NULL;
+    m_max_phantoms_count = 0;
     m_phantoms_die_time = NULL;
 }
 CPsyDog::~CPsyDog()

@@ -295,7 +295,7 @@ shared_str UICore::get_xml_name(LPCSTR fn)
         if (NULL == FS.exist(str_, "$game_config$", UI_PATH_WITH_DELIMITER, str))
         {
             xr_sprintf(str, "%s", fn);
-            if (NULL == strext(fn))
+            if (nullptr == strext(fn))
                 xr_strcat(str, ".xml");
         }
     }

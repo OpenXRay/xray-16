@@ -354,7 +354,7 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
         sh_map.insert(std::make_pair(sh->set_name(name), sh));
         if (0 == xr_stricmp(name, "null"))
         {
-            sh->sh = NULL;
+            sh->sh = 0;
             return sh;
         }
 
@@ -408,7 +408,7 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
             ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
 #ifdef USE_OGL
-        DWORD flags = NULL;
+        DWORD flags = 0;
 #elif defined(USE_DX10) || defined(USE_DX11)
         DWORD flags = D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
 #else

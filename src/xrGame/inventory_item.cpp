@@ -278,7 +278,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
             if (object().H_Parent())
                 D->ID_Parent = u16(object().H_Parent()->ID());
             else
-                D->ID_Parent = NULL;
+                D->ID_Parent = 0;
         }
         D->ID_Phantom = 0xffff;
         D->o_Position = object().Position();

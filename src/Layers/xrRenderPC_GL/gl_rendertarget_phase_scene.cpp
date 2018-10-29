@@ -26,9 +26,9 @@ void CRenderTarget::phase_scene_prepare()
     {
         //	TODO: DX10: Check if we need to set RT here.
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT,NULL,NULL, HW.pBaseZB);
+            u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, HW.pBaseZB);
         else
-            u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT,NULL,NULL, rt_MSAADepth->pZRT);
+            u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth->pZRT);
 
         //CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
         FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -50,13 +50,13 @@ void CRenderTarget::phase_scene_prepare()
         //	TODO: DX10: Check if we need to set RT here.
         if (!RImplementation.o.dx10_msaa)
         {
-            u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+            u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
             //CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
             HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
         }
         else
         {
-            u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, rt_MSAADepth->pZRT);
+            u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, rt_MSAADepth->pZRT);
             //CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
             HW.pDevice->ClearDepthStencilView(rt_MSAADepth->pZRT, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
         }

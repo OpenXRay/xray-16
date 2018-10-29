@@ -599,7 +599,7 @@ CRenderTarget::CRenderTarget()
             FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
             HW.pDevice->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT,NULL,NULL, HW.pBaseZB);
+        u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
     }
 
     // HBAO
@@ -911,11 +911,11 @@ CRenderTarget::~CRenderTarget()
     glDeleteTextures(1, &t_ss_async);
 
     // Textures
-    t_material->surface_set(GL_TEXTURE_2D, NULL);
+    t_material->surface_set(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &t_material_surf);
 
-    t_LUM_src->surface_set(GL_TEXTURE_2D, NULL);
-    t_LUM_dest->surface_set(GL_TEXTURE_2D, NULL);
+    t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
+    t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
 
 #ifdef DEBUG
     GLuint	pSurf = 0;
@@ -926,8 +926,8 @@ CRenderTarget::~CRenderTarget()
     pSurf = t_envmap_1->surface_get();
     glDeleteTextures(1, &pSurf);
 #endif // DEBUG
-    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, NULL);
-    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, NULL);
+    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
     t_envmap_0.destroy();
     t_envmap_1.destroy();
 
@@ -937,11 +937,11 @@ CRenderTarget::~CRenderTarget()
     // Jitter
     for (int it = 0; it < TEX_jitter_count; it++)
     {
-        t_noise [it]->surface_set(GL_TEXTURE_2D, NULL);
+        t_noise [it]->surface_set(GL_TEXTURE_2D, 0);
     }
     glDeleteTextures(TEX_jitter_count, t_noise_surf);
 
-    t_noise_mipped->surface_set(GL_TEXTURE_2D, NULL);
+    t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &t_noise_surf_mipped);
 
     //
