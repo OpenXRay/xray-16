@@ -198,7 +198,8 @@ void CMainMenu::ReadTextureInfo()
          * Multi-threaded  ~40 ms
          * Just a bit of speedup
         */
-        tbb::parallel_for_each(files, [](const FS_File& file)
+//        tbb::parallel_for_each(files, [](const FS_File& file) // Cause memory corruption (detected by Valgrind)
+        std::for_each(files.begin(), files.end(), [](const FS_File& file)
         {
             string_path path, name;
             _splitpath(file.name.c_str(), nullptr, path, name, nullptr);
@@ -896,7 +897,7 @@ LPCSTR CMainMenu::GetPlayerName()
 
 LPCSTR CMainMenu::GetCDKeyFromRegistry()
 {
-    string512 key;
+    string512 key = { 0 };
     GetCDKey_FromRegistry(key);
     m_cdkey._set(key);
     return m_cdkey.c_str();
