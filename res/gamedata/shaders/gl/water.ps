@@ -7,7 +7,7 @@ TextureCube	s_env1;
 Texture2D	s_leaves;
 
 #if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
-float3	water_intensity;
+uniform float3	water_intensity;
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,6 @@ float4 _main( v2p I )
 	float	alpha	= 0.75f + 0.25f*power;                        // 1=full env, 0=no env
 
 #ifdef	USE_SOFT_WATER
-//	float4 _P = 	tex2Dproj( s_position, I.tctexgen);
 	float2 PosTc = I.tctexgen.xy/I.tctexgen.z;
 #ifdef GBUFFER_OPTIMIZATION
 	gbuffer_data gbd = gbuffer_load_data( PosTc, pos2d );
@@ -74,7 +73,7 @@ float4 _main( v2p I )
 	float	calc_depth	= saturate(waterDepth*calc_cos);
 	float	fLeavesFactor	= smoothstep(0.025, 0.05, calc_depth);
 		fLeavesFactor	*= smoothstep(0.1, 0.075, calc_depth);
-		final		= lerp(final, leaves, leaves.a*fLeavesFactor);
+		final		= lerp(final, leaves.rgb, leaves.a*fLeavesFactor);
 		alpha		= lerp(alpha, leaves.a, leaves.a*fLeavesFactor);
 
 #endif	//	USE_SOFT_WATER
