@@ -7,10 +7,10 @@ uniform float4x4	m_texgen;
 
 v2p _main (v_vert v)
 {
-	v.N		= unpack_D3DCOLOR(v.N);
-	v.T		= unpack_D3DCOLOR(v.T);
-	v.B		= unpack_D3DCOLOR(v.B);
-	v.color		= unpack_D3DCOLOR(v.color);
+	//v.N		= unpack_D3DCOLOR(v.N);
+	//v.T		= unpack_D3DCOLOR(v.T);
+	//v.B		= unpack_D3DCOLOR(v.B);
+	//v.color		= unpack_D3DCOLOR(v.color);
 
 	v2p 		o;
 

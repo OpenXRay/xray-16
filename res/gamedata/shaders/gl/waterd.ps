@@ -18,16 +18,14 @@ float4 _main( v2p I )
 
 #if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 	float	alphaDistort;
-//	float4	_P	= tex2Dproj         (s_position,         I.tctexgen);
-	float2 PosTc = I.tctexgen.xy/I.tctexgen.z;
+	float2	PosTc = I.tctexgen.xy/I.tctexgen.z;
 #ifdef GBUFFER_OPTIMIZATION
 	gbuffer_data gbd = gbuffer_load_data( PosTc, I.hpos );
 #else
 	gbuffer_data gbd = gbuffer_load_data( PosTc );
 #endif
-	//float4 _P = 	s_position.Sample( smp_nofilter, PosTc);
-	float4 _P = 	float4( gbd.P, gbd.mtl );
-	float 	waterDepth = _P.z-I.tctexgen.z;
+	float4 _P = float4( gbd.P, gbd.mtl );
+	float waterDepth = _P.z-I.tctexgen.z;
 	alphaDistort = saturate(5*waterDepth);
 	faded 	= lerp  ( zero, faded, alphaDistort);
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)

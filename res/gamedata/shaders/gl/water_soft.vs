@@ -1,2 +1,2 @@
-//#define	NEED_SOFT_WATER // skyloader: temporarily disabled
+#define	NEED_SOFT_WATER
 #include "water.vs"
