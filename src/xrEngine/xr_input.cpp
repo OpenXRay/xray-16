@@ -333,10 +333,14 @@ void CInput::OnFrame(void)
     stats.FrameTime.Begin();
     dwCurTime = RDEVICE.TimerAsync_MMT();
 
-    if (Device.dwPrecacheFrame == 0)
+    if (Device.dwPrecacheFrame == 0 && !Device.IsAnselActive)
     {
         KeyUpdate();
         MouseUpdate();
+    }
+    else
+    {
+        SDL_FlushEvents(SDL_KEYDOWN, SDL_MOUSEWHEEL);
     }
 
     stats.FrameTime.End();

@@ -423,7 +423,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     if (dik == SDL_SCANCODE_ESCAPE)
         fLifeTime = -1;
 
-#ifdef DEBUG // ndef MASTER_GOLD // Xottab_DUTY: Teleport to demo cam in Debug configuration
+#ifndef MASTER_GOLD
     if (dik == SDL_SCANCODE_RETURN)
     {
         if (g_pGameLevel->CurrentEntity())
@@ -527,12 +527,12 @@ void CDemoRecord::IR_OnMouseHold(int btn)
         return;
     }
     Fvector vT_delta = Fvector().set(0, 0, 0);
-    switch (btn)
+    switch (MouseButtonToKey[btn])
     {
-    case 0:
+    case MOUSE_1:
         vT_delta.z += 1.0f;
         break; // Move Backward
-    case 1:
+    case MOUSE_2:
         vT_delta.z -= 1.0f;
         break; // Move Forward
     }

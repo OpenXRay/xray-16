@@ -71,6 +71,7 @@ public:
     u32 dwPrecacheFrame;
     BOOL b_is_Ready;
     BOOL b_is_Active;
+    bool IsAnselActive;
 
     // Engine flow-control
     u32 dwFrame;
@@ -313,6 +314,7 @@ private:
     using finalize_function_ptr = XRay::Editor::finalize_function_ptr;
 
     XRay::Module m_editor_module;
+
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
     XRay::Editor::ide_base* m_editor;

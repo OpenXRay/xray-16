@@ -206,6 +206,7 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
     clamp(src, 0.f, 1.f);
     float dst = 1 - src;
     m_cam_info.fFov = m_cam_info.fFov * dst + fFOV_Dest * src;
+    m_cam_info.fNear = VIEWPORT_NEAR;
     m_cam_info.fFar = m_cam_info.fFar * dst + fFAR_Dest * src;
     m_cam_info.fAspect = m_cam_info.fAspect * dst + (fASPECT_Dest * aspect) * src;
     m_cam_info.dont_apply = false;
@@ -214,8 +215,8 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
 
     UpdatePPEffectors();
 
-    if (false == m_cam_info.dont_apply && m_bAutoApply)
-        ApplyDevice(VIEWPORT_NEAR);
+    if (!m_cam_info.dont_apply && m_bAutoApply)
+        ApplyDevice();
 
     UpdateDeffered();
 }
@@ -313,7 +314,7 @@ void CCameraManager::UpdatePPEffectors()
     pp_affected.validate("after applying pp");
 }
 
-void CCameraManager::ApplyDevice(float _viewport_near)
+void CCameraManager::ApplyDevice()
 {
     // Device params
     Device.mView.build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
@@ -329,7 +330,7 @@ void CCameraManager::ApplyDevice(float _viewport_near)
 
     //--#SM+# Begin-- +SecondVP+
     // Пересчитываем FOV для второго вьюпорта [Recalculate scene FOV for SecondVP frame]
-    if (Device.m_SecondViewport.IsSVPFrame())
+    if (Device.m_SecondViewport.IsSVPFrame() && !Device.IsAnselActive)
     {
         // Для второго вьюпорта FOV выставляем здесь
         Device.fFOV *= g_pGamePersistent->m_pGShaderConstants->hud_params.y;
@@ -339,9 +340,13 @@ void CCameraManager::ApplyDevice(float _viewport_near)
     }
     else
         Device.m_SecondViewport.isCamReady = false;
-
-    Device.mProject.build_projection(deg2rad(Device.fFOV), m_cam_info.fAspect, _viewport_near, m_cam_info.fFar);
     //--#SM+# End--
+
+    Device.mProject.build_projection(deg2rad(Device.fFOV), m_cam_info.fAspect, m_cam_info.fNear, m_cam_info.fFar);
+    
+    // Apply offset required for Nvidia Ansel
+    Device.mProject._31 = -m_cam_info.offsetX;
+    Device.mProject._32 = -m_cam_info.offsetY;
 
     if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu->IsActive())
         ResetPP();

@@ -77,7 +77,10 @@ public:
     virtual void On_SetEntity();
     virtual void On_LostEntity();
 
-    inline EActorCameras GetActiveCam() const { return cam_active; };
+    EActorCameras GetActiveCam() const { return cam_active; }
+
+    CCameraBase* cam_Active() { return cameras[cam_active]; }
+    CCameraBase* cam_FirstEye() { return cameras[eacFirstEye]; }
 };
 
 #endif // __SPECTATOR_H__

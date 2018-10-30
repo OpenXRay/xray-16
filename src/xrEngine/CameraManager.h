@@ -62,7 +62,7 @@ public:
         float fFAR_Dest, u32 flags);
     void UpdateFromCamera(const CCameraBase* C);
 
-    void ApplyDevice(float _viewport_near);
+    void ApplyDevice();
     static void ResetPP();
 
     CCameraManager(bool bApplyOnUpdate);

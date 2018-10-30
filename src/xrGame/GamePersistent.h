@@ -8,6 +8,7 @@ class CUICursor;
 class CParticlesObject;
 class CUISequencer;
 class UICore;
+class AnselManager;
 
 class CGamePersistent : public IGame_Persistent, public IEventReceiver
 {
@@ -28,6 +29,8 @@ private:
     bool ambient_effect_wind_on;
 
     bool m_bPickableDOF;
+
+    AnselManager* ansel;
 
     CUISequencer* m_intro;
     EVENT eQuickLoad;

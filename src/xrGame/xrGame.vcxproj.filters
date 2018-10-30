@@ -2245,6 +2245,9 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\WeaponScript">
       <UniqueIdentifier>{db77f57b-2177-4c67-98d3-eb3e09476a41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Ansel">
+      <UniqueIdentifier>{5774e461-6abd-4bcb-888c-af7a7d5ab679}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6461,6 +6464,9 @@
     <ClInclude Include="ui\UISleepStatic.h">
       <Filter>UI\UIWindows\Static</Filter>
     </ClInclude>
+    <ClInclude Include="AnselManager.h">
+      <Filter>Core\Client\Ansel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9797,6 +9803,9 @@
     </ClCompile>
     <ClCompile Include="ui\UISleepStatic.cpp">
       <Filter>UI\UIWindows\Static</Filter>
+    </ClCompile>
+    <ClCompile Include="AnselManager.cpp">
+      <Filter>Core\Client\Ansel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

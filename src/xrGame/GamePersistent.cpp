@@ -34,6 +34,7 @@
 #include "xrEngine/xr_input.h"
 #include "xrEngine/x_ray.h"
 #include "ui/UILoadingScreen.h"
+#include "AnselManager.h"
 
 #ifndef MASTER_GOLD
 #include "CustomMonster.h"
@@ -215,6 +216,10 @@ void CGamePersistent::OnAppStart()
     inherited::OnAppStart();
     GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
+
+    ansel = new AnselManager();
+    ansel->Load();
+    ansel->Init();
 }
 
 void CGamePersistent::OnAppEnd()
@@ -230,6 +235,8 @@ void CGamePersistent::OnAppEnd()
     clean_game_globals();
 
     GMLib.Unload();
+
+    xr_delete(ansel);
 }
 
 void CGamePersistent::Start(LPCSTR op) { inherited::Start(op); }
@@ -648,7 +655,7 @@ void CGamePersistent::OnFrame()
                         C = Actor()->Holder()->Camera();
 
                     Actor()->Cameras().UpdateFromCamera(C);
-                    Actor()->Cameras().ApplyDevice(VIEWPORT_NEAR);
+                    Actor()->Cameras().ApplyDevice();
 #ifdef DEBUG
                     if (psActorFlags.test(AF_NO_CLIP))
                     {

@@ -73,6 +73,9 @@ void CHUDManager::Render_First()
 
 bool need_render_hud()
 {
+    if (Device.IsAnselActive)
+        return false;
+
     IGameObject* O = g_pGameLevel ? g_pGameLevel->CurrentViewEntity() : NULL;
     if (0 == O)
         return false;

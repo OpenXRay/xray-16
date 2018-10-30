@@ -266,6 +266,7 @@ void CRenderDevice::on_idle()
         vCameraRight.crossproduct(vCameraTop, vCameraDirection);
         mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
     }
+
     // Matrices
     mFullTransform.mul(mProject, mView);
     GEnv.Render->SetCacheXform(mView, mProject);
@@ -520,9 +521,10 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     {
         if (!Paused())
         {
-            bShowPauseString = editor() ? FALSE : TRUE;
+            if (bShowPauseString && editor())
+                bShowPauseString = FALSE;
 #ifdef DEBUG
-            if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
+            else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
                 bShowPauseString = FALSE;
 #endif
         }

@@ -102,6 +102,7 @@ extern ENGINE_API BOOL g_bRendering;
 void CHUDCrosshair::OnRender()
 {
     VERIFY(g_bRendering);
+
     Fvector2 center;
     Fvector2 scr_size;
     scr_size.set(float(GEnv.Render->getTarget()->get_width()), float(GEnv.Render->getTarget()->get_height()));
