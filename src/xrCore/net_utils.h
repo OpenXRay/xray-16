@@ -87,7 +87,7 @@ public:
         B.count = size;
     }
 
-    NET_Buffer B;
+    NET_Buffer B = {{0}, 0};
     u32 r_pos;
     u32 timeReceive;
     bool w_allow;
