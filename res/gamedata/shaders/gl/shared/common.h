@@ -58,10 +58,14 @@ void	sincos(float x, out float s, out float c) { s = sin(x); c = cos(x); }
 #define COLOR2		2
 #define POSITION	3
 #define POSITIONT	3
+#define POSITION0	3
+#define POSITION1	4
 #define TANGENT		4
 #define NORMAL		5
+#define NORMAL0		5
+#define NORMAL1		6
 #define BINORMAL	6
-#define FOG			7
+#define FOG		7
 #define TEXCOORD0	8
 #define TEXCOORD1	9
 #define TEXCOORD2	10

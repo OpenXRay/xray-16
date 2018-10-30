@@ -1,0 +1,11 @@
+#include "common.h"
+#include "iostructs\p_TL.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 _main ( p_TL I )
+{
+	float4 r = tex2D (s_base,I.Tex0);
+	r.w = 1.f - r.w;
+	return r;
+}

@@ -1,0 +1,16 @@
+#include "common.h"
+#include "iostructs\p_vert.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 _main( v2p I )
+{
+	float4	t_base = tex2D(s_base, I.Tex0);
+	float3	final 	= t_base.rgb*I.c0*2.f;
+
+	//	Fogging
+	final 	= lerp(fog_color.xyz, final, I.fog);
+
+	// out
+	return  float4	(final, t_base.a*I.fog*I.fog);
+}
