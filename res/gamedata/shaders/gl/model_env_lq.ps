@@ -1,0 +1,22 @@
+#include "common.h"
+#include "iostructs\p_model_env_lq.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+TextureCube	s_env;		//	Environment for forward rendering
+
+float4 	_main	( v2p I )
+{
+	float4	t_base 	= tex2D		(s_base,I.tc0);
+	float4	t_env 	= texCUBE	(s_env,	I.tc1);
+
+	float3 	base 	= lerp		(t_env.rgb,t_base.rgb,t_base.a);
+	float3	light	= I.c0;
+	float3	final 	= light*base*2.f;
+
+	//	Fogging
+	final 	= lerp(fog_color.rgb, final, I.fog);
+
+	// out
+	return  float4	(final.rgb,t_base.a*I.fog*I.fog);
+}

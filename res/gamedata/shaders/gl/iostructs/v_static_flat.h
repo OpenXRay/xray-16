@@ -15,7 +15,7 @@ layout(location = TEXCOORD0)	in float2	v_static_tc		; // TEXCOORD0;	// (u,v)
 layout(location = TEXCOORD1)	in float2	v_static_lmh	; // TEXCOORD1;	// (lmu,lmv)
 #endif
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
-layout(location = COLOR0)		in float4	v_static_color	; // COLOR0;	// (r,g,b,dir-occlusion)	//	Swizzle before use!!!
+layout(location = COLOR0)		in float4	v_static_C	; // COLOR0;	// (r,g,b,dir-occlusion)	//	Swizzle before use!!!
 #endif
 layout(location = POSITION)		in float4	v_static_P		; // POSITION;	// (float,float,float,1)
 
@@ -46,7 +46,7 @@ void main()
 	I.lmh		= v_static_lmh;
 #endif
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
-	I.color		= v_static_color;
+	I.color		= v_static_C;
 #endif
 	I.P			= v_static_P;
 
