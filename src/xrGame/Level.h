@@ -43,7 +43,7 @@ class CStreamReader;
 class CDebugRenderer;
 #endif
 
-extern float g_fov;
+extern ENGINE_API float g_fov;
 
 const int maxRP = 64;
 const int maxTeams = 32;
