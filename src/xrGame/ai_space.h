@@ -11,8 +11,7 @@
 #include "xrAICore/AISpaceBase.hpp"
 #include "xrCommon/xr_array.h"
 #include "xrCommon/xr_smart_pointers.h"
-
-#include <mutex>
+#include "xrCore/Events/Notifier.h"
 
 class CGameGraph;
 class CGameLevelCrossTable;
@@ -32,47 +31,6 @@ class manager;
 
 class CAI_Space : public AISpaceBase
 {
-public:
-    class CEventCallback
-    {
-    public:
-        using CID = size_t;
-        static const CID INVALID_CID = std::numeric_limits<CID>::max();
-
-        virtual void ProcessEvent() = 0;
-        virtual ~CEventCallback(){};
-    };
-
-    class CEventCallbackStorage
-    {
-        xr_vector<xr_unique_ptr<CEventCallback>> m_callbacks;
-        std::mutex m_lock;
-
-    public:
-        CEventCallback::CID RegisterCallback(CEventCallback* cb);
-        bool UnregisterCallback(CEventCallback::CID cid);
-        void ExecuteCallbacks();
-    };
-
-    class CNotifier
-    {
-    public:
-        enum EEventID
-        {
-            EVENT_SCRIPT_ENGINE_STARTED,
-            EVENT_SCRIPT_ENGINE_RESET,
-            EVENT_COUNT,
-        };
-
-    private:
-        xr_array<CEventCallbackStorage, EVENT_COUNT> m_callbacks;
-
-    public:
-        CEventCallback::CID RegisterCallback(CEventCallback* cb, EEventID event_id);
-        bool UnregisterCallback(CEventCallback::CID cid, EEventID event_id);
-        void FireEvent(EEventID event_id);
-    };
-
 private:
     friend class CALifeSimulator;
     friend class CALifeGraphRegistry;
@@ -80,9 +38,17 @@ private:
     friend class CALifeSpawnRegistry;
     friend class CLevel;
 
+public:
+    enum EEventID
+    {
+        EVENT_SCRIPT_ENGINE_STARTED,
+        EVENT_SCRIPT_ENGINE_RESET,
+        EVENT_COUNT,
+    };
+
 private:
     bool m_inited = false;
-    CNotifier m_events_notifier;
+    CEventNotifier<EVENT_COUNT> m_events_notifier;
 
     xr_unique_ptr<CEF_Storage> m_ef_storage;
     xr_unique_ptr<CCoverManager> m_cover_manager;
@@ -107,8 +73,8 @@ public:
     virtual ~CAI_Space();
     static CAI_Space& GetInstance();
 
-    CEventCallback::CID Subscribe(CEventCallback* cb, CNotifier::EEventID event_id);
-    bool Unsubscribe(CEventCallback::CID cid, CNotifier::EEventID event_id);
+    CEventNotifierCallback::CID Subscribe(CEventNotifierCallback* cb, EEventID event_id);
+    bool Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id);
     void RestartScriptEngine();
 
     IC CEF_Storage& ef_storage() const;

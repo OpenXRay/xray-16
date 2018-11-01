@@ -364,6 +364,7 @@ call .GitInfo.cmd</Command>
     </ClInclude>
     <ClInclude Include="Debug\MiniDump.h" />
     <ClInclude Include="dump_string.h" />
+    <ClInclude Include="Events\Notifier.h" />
     <ClInclude Include="fastdelegate.h" />
     <CustomBuild Include="FileSystem.h" />
     <ClInclude Include="FileCRC32.h" />

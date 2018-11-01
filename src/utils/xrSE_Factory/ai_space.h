@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrCore/Events/Notifier.h"
 
 class CScriptEngine;
 
@@ -26,6 +27,15 @@ public:
     static CAI_Space& GetInstance();
 
     IC CScriptEngine& script_engine() const;
+
+    enum EEventID
+    {
+        EVENT_SCRIPT_ENGINE_STARTED,
+        EVENT_SCRIPT_ENGINE_RESET,
+        EVENT_COUNT,
+    };
+    CEventNotifierCallback::CID Subscribe(CEventNotifierCallback* cb, EEventID event_id) { return 0; }
+    bool Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id) { return true; }
 };
 
 IC CAI_Space& ai();

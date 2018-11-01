@@ -8,6 +8,8 @@
 
 #pragma once
 #include <algorithm>
+#include "ai_space.h"
+#include "xrCore/Events/Notifier.h"
 
 IC const CObjectFactory& object_factory()
 {
@@ -16,26 +18,20 @@ IC const CObjectFactory& object_factory()
         g_object_factory = new CObjectFactory();
         g_object_factory->init();
 
-        class CResetEventCb : public CAI_Space::CEventCallback
+        class CResetEventCb : public CEventNotifierCallback
         {
-            CAI_Space::CEventCallback::CID m_cid;
-
         public:
-            CResetEventCb() {}
-            void SetCid(CAI_Space::CEventCallback::CID cid) { m_cid = cid; }
+            CID m_cid;
+
             void ProcessEvent() override
             {
                 xr_delete(g_object_factory);
+                ai().Unsubscribe(m_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
             }
         };
 
-        static CAI_Space::CEventCallback::CID cid = CAI_Space::CEventCallback::INVALID_CID;
-        if (cid == CAI_Space::CEventCallback::INVALID_CID)
-        {
-            CResetEventCb* e = new CResetEventCb();
-            cid = ai().Subscribe(e, CAI_Space::CNotifier::EVENT_SCRIPT_ENGINE_RESET);
-            e->SetCid(cid);
-        }
+        CResetEventCb* e = new CResetEventCb();
+        e->m_cid = ai().Subscribe(e, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
     return (*g_object_factory);
 }

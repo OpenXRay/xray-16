@@ -115,6 +115,9 @@
     <Filter Include="xrDelegate">
       <UniqueIdentifier>{b54073c2-213d-456f-b88d-8eeb0dd440b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{f17d865f-a3fd-41ac-b217-d7d34ed591f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -685,6 +688,9 @@
     </ClInclude>
     <ClInclude Include="FileCRC32.h">
       <Filter>FS</Filter>
+    </ClInclude>
+    <ClInclude Include="Events\Notifier.h">
+      <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="xrDelegate\xrDelegate.h">
       <Filter>xrDelegate</Filter>
