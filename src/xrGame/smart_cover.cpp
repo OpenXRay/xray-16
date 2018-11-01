@@ -115,26 +115,15 @@ void cover::vertex(smart_cover::loophole const& loophole, smart_cover::loophole_
         }
 }
 
-class id_predicate
-{
-    shared_str m_id;
-
-public:
-    IC id_predicate(shared_str const& id) : m_id(id) {}
-    IC bool operator()(cover::Vertex const& vertex) const { return (m_id._get() == vertex.first->id()._get()); }
-    IC bool operator()(smart_cover::loophole_data::Action const& action) const
-    {
-        return (m_id._get() == action.first._get());
-    }
-};
-
 u32 const& cover::action_level_vertex_id(smart_cover::loophole const& loophole, shared_str const& action_id) const
 {
-    Vertices::const_iterator found = std::find_if(m_vertices.begin(), m_vertices.end(), id_predicate(loophole.id()));
+    auto found = std::find_if(m_vertices.begin(), m_vertices.end(),
+        [&loophole] (cover::Vertex const& vertex) { return loophole.id()._get() == vertex.first->id()._get(); });
     VERIFY(found != m_vertices.end());
 
-    loophole_data::ActionVertices::const_iterator found2 = std::find_if(
-        found->second.m_action_vertices.begin(), found->second.m_action_vertices.end(), id_predicate(action_id));
+    auto found2 = std::find_if(
+        found->second.m_action_vertices.begin(), found->second.m_action_vertices.end(),
+        [action_id] (smart_cover::loophole_data::Action const& action) { return (action_id._get() == action.first._get()); });
     VERIFY(found2 != found->second.m_action_vertices.end());
     VERIFY(ai().level_graph().valid_vertex_id(found2->second));
 

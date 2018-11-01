@@ -24,18 +24,6 @@ shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
 shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in);
 } // namespace smart_cover
 
-class id_predicate
-{
-    shared_str m_id;
-
-public:
-    IC id_predicate(shared_str const& id) : m_id(id) {}
-    IC bool operator()(std::pair<shared_str, action*> const& other) const
-    {
-        return (m_id._get() == other.first._get());
-    }
-};
-
 loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f)
 {
     VERIFY2(luabind::type(description) == LUA_TTABLE, "invalid loophole description passed");
@@ -108,7 +96,12 @@ void loophole::add_action(LPCSTR type, luabind::object const& table)
 {
     VERIFY(luabind::type(table) == LUA_TTABLE);
     smart_cover::action* action = new smart_cover::action(table);
-    VERIFY(std::find_if(m_actions.begin(), m_actions.end(), id_predicate(type)) == m_actions.end());
+
+    shared_str id = shared_str(type);
+    VERIFY(m_actions.end() == std::find_if(m_actions.begin(), m_actions.end(),
+       [=](std::pair<shared_str, smart_cover::action*> const& other) {
+           return id._get() == other.first._get();
+       }));
     m_actions.insert(std::make_pair(type, action));
 }
 
