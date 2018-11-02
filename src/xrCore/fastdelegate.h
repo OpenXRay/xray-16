@@ -971,8 +971,6 @@ public:
     }
     // Invoke the delegate
     RetType operator()() const {
-        assert (m_Closure.GetClosureThis());
-        assert (m_Closure.GetClosureMemPtr());
         return (m_Closure.GetClosureThis()->*(m_Closure.GetClosureMemPtr()))();
     }
     // Implicit conversion to "bool" using the safe_bool idiom
