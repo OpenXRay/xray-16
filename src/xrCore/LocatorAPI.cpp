@@ -196,9 +196,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
     string256 temp_file_name;
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
 
-#ifdef LINUX
-    while (char* sep = strchr(temp_file_name, '/')) *sep = '\\'; // For backward compability of FS, for real filesystem delimiter set to back
-#endif
+    restore_path_separators(temp_file_name);
     //Msg("Register[%d] [%s]",vfs,temp_file_name);
 
     // Register file
@@ -444,6 +442,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
 void CLocatorAPI::archive::open()
 {
+    convert_path_separators((char *)*path);
 #if defined(WINDOWS)
     // Open the file
     if (hSrcFile && hSrcMap)
@@ -459,7 +458,6 @@ void CLocatorAPI::archive::open()
     if (hSrcFile)
         return;
 
-    while (char* sep = strchr((char *)*path, '\\')) *sep = '/';
     hSrcFile = ::open(*path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     R_ASSERT(hSrcFile != -1);
     struct stat file_info;
@@ -620,6 +618,7 @@ bool ignore_name(const char* _name)
 
 bool ignore_path(const char* _path)
 {
+    convert_path_separators((char *)_path);
 #if defined(WINDOWS)
     HANDLE h = CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 
@@ -631,7 +630,6 @@ bool ignore_path(const char* _path)
     else
         return true;
 #elif defined(LINUX)
-    while (char* sep = strchr((char *)_path, '\\')) *sep = '/';
     int h = ::open(_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (h != -1)
     {
@@ -654,15 +652,13 @@ bool CLocatorAPI::Recurse(pcstr path)
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, "*");
     _finddata_t findData;
+    convert_path_separators(scanPath);
 #ifdef WINDOWS
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
         return false;
 #elif defined(LINUX)
     glob_t globbuf;
-
-    while (char* sep = strchr(scanPath, '\\'))
-        *sep = '/';
 
     globbuf.gl_offs = 256;
     int result = glob(scanPath, GLOB_NOSORT, NULL, &globbuf);
@@ -689,7 +685,7 @@ bool CLocatorAPI::Recurse(pcstr path)
         case S_IFREG: findData.attrib = 0;         break; // File
         default:      findData.attrib = _A_HIDDEN; break; // Skip
         }
-        while (char* sep = strchr(findData.name, '/')) *sep = '\\';
+        restore_path_separators(findData.name);
 #endif
         string1024 fullPath;
         bool ignore = false;
@@ -720,8 +716,9 @@ bool CLocatorAPI::Recurse(pcstr path)
     _findclose(handle);
 #elif defined(LINUX)
     globfree(&globbuf);
-    while (char* sep = strchr((char *)path, '/')) *sep = '\\';
 #endif
+    restore_path_separators((char *)path);
+
     size_t newSize = rec_files.size();
     if (newSize > oldSize)
     {

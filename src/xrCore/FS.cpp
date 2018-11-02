@@ -88,9 +88,8 @@ void VerifyPath(LPCSTR path)
         tmp[i] = 0;
         _mkdir(tmp);
     }
-#ifdef LINUX
-    while (char* sep = strchr((char *)path, '\\')) *sep = '/';
-#endif
+
+    convert_path_separators((char *)path);
 }
 
 #ifdef _EDITOR
@@ -111,10 +110,10 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& hFile)
 #else // EDITOR
 static int open_internal(LPCSTR fn, int& handle)
 {
+    convert_path_separators((char *)fn);
 #if defined(WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
 #elif defined(LINUX)
-    while (char* sep = strchr((char *)fn, '\\')) *sep = '/';
     handle = open(fn, _O_RDONLY);
 
     return (handle == -1);
@@ -511,6 +510,7 @@ CCompressedReader::CCompressedReader(const char* name, const char* sign)
 CCompressedReader::~CCompressedReader() { xr_free(data); };
 CVirtualFileRW::CVirtualFileRW(const char* cFileName)
 {
+    convert_path_separators((char *)cFileName);
 #if defined(WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
@@ -524,7 +524,6 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
-    while (char* sep = strchr((char *)cFileName, '\\')) *sep = '/';
     hSrcFile = ::open(cFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
@@ -556,6 +555,7 @@ CVirtualFileRW::~CVirtualFileRW()
 
 CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 {
+    convert_path_separators((char *)cFileName);
 #if defined(WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
@@ -568,7 +568,6 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
 #elif defined(LINUX)
-    while (char* sep = strchr((char *)cFileName, '\\')) *sep = '/';
     hSrcFile = ::open(cFileName, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;

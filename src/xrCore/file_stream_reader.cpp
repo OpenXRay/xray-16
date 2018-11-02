@@ -19,7 +19,7 @@ void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
 #elif defined(LINUX)
     char path[PATH_MAX] = { 0 };
     strcpy(path, file_name);
-    while (char* sep = strchr(path, '\\')) *sep = '/';
+    convert_path_separators(path);
     m_file_handle = ::open(path, O_RDONLY);
     VERIFY(m_file_handle != -1);
     struct stat file_info;
