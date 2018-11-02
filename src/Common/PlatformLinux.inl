@@ -68,16 +68,7 @@ inline char* _strupr_l(char* str, locale_t loc)
 
 #define __except(X) catch(X)
 
-/*
-static inline long InterlockedExchange(volatile long* val, long new_val)
-{
-  long old_val;
-  do {
-    old_val = *val;
-  } while (__sync_val_compare_and_swap (val, old_val, new_val) != old_val);
-    return old_val;
-}
-*/
+#define GetCurrentProcessId getpid
 
 inline pthread_t GetCurrentThreadId()
 {
