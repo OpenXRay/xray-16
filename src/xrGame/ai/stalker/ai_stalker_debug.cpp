@@ -57,6 +57,7 @@
 #include "xrUICore/ui_base.h"
 #include "doors_actor.h"
 #include "xrEngine/GameFont.h"
+#include "object_handler_planner_impl.h"
 
 CActor* g_debug_actor = 0;
 
