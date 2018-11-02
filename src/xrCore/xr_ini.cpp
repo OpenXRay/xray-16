@@ -634,10 +634,8 @@ bool CInifile::save_as(pcstr new_fname)
     if (new_fname && new_fname[0])
         xr_strcpy(m_file_name, sizeof m_file_name, new_fname);
 
-    R_ASSERT(m_file_name && m_file_name[0]);
-#ifdef LINUX
-    while (char* sep = strchr(m_file_name, '\\')) *sep = '/';
-#endif
+    R_ASSERT(m_file_name[0]);
+    convert_path_separators(m_file_name);
     IWriter* F = FS.w_open_ex(m_file_name);
     if (!F)
         return false;

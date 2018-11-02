@@ -12,6 +12,7 @@ list(APPEND DIRS
     "Text"
     "Threading"
     "XML"
+    "../xrCommon"
     )
 
 add_dir("${DIRS}")

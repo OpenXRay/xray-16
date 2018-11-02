@@ -1000,3 +1000,16 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
 
+inline void convert_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '\\')) *sep = '/';
+}
+
+/** For backward compability of FS, for real filesystem delimiter set to back
+ * @brief restore_path_separators
+ * @param path
+ */
+inline void restore_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '/')) *sep = '\\'; //
+}
