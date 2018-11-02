@@ -39,7 +39,7 @@ private:
     Objects objects_active;
     Objects objects_sleeping;
     Objects m_crows[2];
-    u32 m_owner_thread_id;
+    tid_t m_owner_thread_id;
     ObjectUpdateStatistics stats;
     u32 statsFrame;
 
