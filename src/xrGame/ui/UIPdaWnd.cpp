@@ -165,7 +165,7 @@ void CUIPdaWnd::Update()
     m_clock->TextItemControl().SetText(
         InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
 
-    assert(pUILogsWnd);
+    R_ASSERT(pUILogsWnd);
     Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));
 }
 

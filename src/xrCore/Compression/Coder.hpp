@@ -32,7 +32,7 @@ public:
                                }
 
  void Encode (uint cumFreq, uint freq, uint totFreq) {
-    assert(cumFreq+freq<totFreq && freq && totFreq<=BOT);
+    R_ASSERT(cumFreq+freq<totFreq && freq && totFreq<=BOT);
     low  += cumFreq * (range/= totFreq);
     range*= freq;
     while ((low ^ low+range)<TOP || range<BOT && ((range= -low & BOT-1),1))
@@ -46,7 +46,7 @@ public:
  }
 
  void Decode (uint cumFreq, uint freq, uint totFreq) {
-    assert(cumFreq+freq<totFreq && freq && totFreq<=BOT);
+    R_ASSERT(cumFreq+freq<totFreq && freq && totFreq<=BOT);
     low  += cumFreq*range;
     range*= freq;
     while ((low ^ low+range)<TOP || range<BOT && ((range= -low & BOT-1),1))

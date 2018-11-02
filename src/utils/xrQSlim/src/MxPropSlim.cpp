@@ -342,7 +342,7 @@ unsigned int MxPropSlim::check_local_validity(unsigned int v, const float* vnew)
             mxv_cross3(n, f_n, d_yx); // n = ((y-x)^(v-x))^(y-x)
             mxv_unitize(n, 3);
 
-            // assert( mxv_dot(d_vx, n, 3) > -FEQ_EPS );
+            // R_ASSERT( mxv_dot(d_vx, n, 3) > -FEQ_EPS );
             if (mxv_dot(d_vnew, n, 3) < local_validity_threshold * mxv_dot(d_vx, n, 3))
                 nfailed++;
         }
