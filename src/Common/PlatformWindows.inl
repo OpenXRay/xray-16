@@ -35,3 +35,5 @@
 
 inline void convert_path_separators(char * path) {}
 inline void restore_path_separators(char * path) {}
+
+#define tid_t DWORD
