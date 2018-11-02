@@ -34,7 +34,7 @@ NvEdgeInfo* NvStripifier::FindEdgeInfo(NvEdgeInfoVec& edgeInfos, int v0, int v1)
         }
         else
         {
-            assert(infoIter->m_v1 == v0);
+            R_ASSERT(infoIter->m_v1 == v0);
             if (infoIter->m_v0 == v1)
                 return infoIter;
             else
@@ -53,7 +53,7 @@ NvEdgeInfo* NvStripifier::FindEdgeInfo(NvEdgeInfoVec& edgeInfos, int v0, int v1)
 NvFaceInfo* NvStripifier::FindOtherFace(NvEdgeInfoVec& edgeInfos, int v0, int v1, NvFaceInfo* faceInfo)
 {
     NvEdgeInfo* edgeInfo = FindEdgeInfo(edgeInfos, v0, v1);
-    assert(edgeInfo != NULL);
+    R_ASSERT(edgeInfo != NULL);
     return (edgeInfo->m_face0 == faceInfo ? edgeInfo->m_face1 : edgeInfo->m_face0);
 }
 
@@ -315,7 +315,7 @@ int NvStripifier::GetSharedVertex(NvFaceInfo* faceA, NvFaceInfo* faceB)
 IC int NvStripifier::GetNextIndex(const WordVec& indices, NvFaceInfo* face)
 {
     int numIndices = indices.size();
-    assert(numIndices >= 2);
+    R_ASSERT(numIndices >= 2);
 
     int v0 = indices[numIndices - 2];
     int v1 = indices[numIndices - 1];
@@ -376,7 +376,7 @@ IC bool NvStripInfo::IsMarked(NvFaceInfo* faceInfo)
 //
 IC void NvStripInfo::MarkTriangle(NvFaceInfo* faceInfo)
 {
-    assert(!IsMarked(faceInfo));
+    R_ASSERT(!IsMarked(faceInfo));
     if (IsExperiment())
     {
         faceInfo->m_experimentId = m_experimentId;
@@ -384,7 +384,7 @@ IC void NvStripInfo::MarkTriangle(NvFaceInfo* faceInfo)
     }
     else
     {
-        assert(faceInfo->m_stripId == -1);
+        R_ASSERT(faceInfo->m_stripId == -1);
         faceInfo->m_experimentId = -1;
         faceInfo->m_stripId = m_stripId;
     }
@@ -743,11 +743,11 @@ bool NvStripifier::IsCW(NvFaceInfo* faceInfo, int v0, int v1)
 void NvStripifier::CreateStrips(
     const NvStripInfoVec& allStrips, IntVec& stripIndices, const bool bStitchStrips, unsigned int& numSeparateStrips)
 {
-    assert(numSeparateStrips == 0);
+    R_ASSERT(numSeparateStrips == 0);
 
     NvFaceInfo tLastFace(0, 0, 0);
     int nStripCount = allStrips.size();
-    assert(nStripCount > 0);
+    R_ASSERT(nStripCount > 0);
 
     // we infer the cw/ccw ordering depending on the number of indices
     // this is screwed up by the fact that we insert -1s to denote changing strips
@@ -758,7 +758,7 @@ void NvStripifier::CreateStrips(
     {
         NvStripInfo* strip = allStrips[i];
         int nStripFaceCount = strip->m_faces.size();
-        assert(nStripFaceCount > 0);
+        R_ASSERT(nStripFaceCount > 0);
 
         // Handle the first face in the strip
         {
@@ -1228,7 +1228,7 @@ void NvStripifier::FindAllStrips(
             resetPoints.insert(nextFace);
 
             // otherwise, we shall now try experiments for starting on the 01,12, and 20 edges
-            assert(nextFace->m_stripId < 0);
+            R_ASSERT(nextFace->m_stripId < 0);
 
             // build the strip off of this face's 0-1 edge
             NvEdgeInfo* edge01 = FindEdgeInfo(allEdgeInfos, nextFace->m_v0, nextFace->m_v1);
