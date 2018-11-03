@@ -22,20 +22,6 @@ struct SLuaWpnParams
 
 static SLuaWpnParams* g_lua_wpn_params = nullptr;
 
-static CAI_Space::CEventCallback::CID g_wpn_params_cb_cid = CAI_Space::CEventCallback::INVALID_CID;
-
-class CResetEventCb : public CAI_Space::CEventCallback
-{
-public:
-    void ProcessEvent() override
-    {
-        if (g_lua_wpn_params)
-        {
-            xr_delete(g_lua_wpn_params);
-        }
-    }
-};
-
 SLuaWpnParams::SLuaWpnParams()
 {
     bool functor_exists;
@@ -49,11 +35,6 @@ SLuaWpnParams::SLuaWpnParams()
     VERIFY(functor_exists);
     functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetAccuracy", m_functorAccuracy);
     VERIFY(functor_exists);
-
-    if (g_wpn_params_cb_cid == CAI_Space::CEventCallback::INVALID_CID)
-    {
-        g_wpn_params_cb_cid = ai().Subscribe(new CResetEventCb(), CAI_Space::CNotifier::EVENT_SCRIPT_ENGINE_RESET);
-    }
 }
 
 SLuaWpnParams::~SLuaWpnParams() {}
@@ -127,7 +108,21 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 {
     if (!g_lua_wpn_params)
     {
+        class CResetEventCb : public CEventNotifierCallback
+        {
+        public:
+            CID m_cid = INVALID_CID;
+
+            void ProcessEvent() override
+            {
+                xr_delete(g_lua_wpn_params);
+                ai().Unsubscribe(m_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+            }
+        };
+
         g_lua_wpn_params = new SLuaWpnParams();
+        auto cb = new CResetEventCb();
+        cb->m_cid = ai().Subscribe(cb, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
 
     LPCSTR cur_section = cur_wpn.object().cNameSect().c_str();

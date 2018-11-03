@@ -198,7 +198,7 @@ public:
 
     demo_info const* GetDemoInfo(LPCSTR file_name);
 
-    CAI_Space::CEventCallback::CID m_script_reset_event_cid;
+    CEventNotifierCallback::CID m_script_reset_event_cid;
 };
 
 extern CMainMenu* MainMenu();
