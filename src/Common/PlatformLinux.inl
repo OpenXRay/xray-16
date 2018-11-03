@@ -276,32 +276,127 @@ typedef dirent DirEntryType;
 #define lstrcpy strcpy
 #define stricmp strcasecmp
 #define strupr SDL_strupr
-inline bool strncpy_s(char * dest, size_t dst_size, const char * source, size_t num) {
-    bool result = false;
-    size_t len = 0;
 
-    if((dst_size - 1) >= num)
-        len = num;
+inline int strcpy_s(char *dest, size_t num, const char *source)
+{
+    if(!num)
+        return 22;
+    if(!dest)
+        return 22;
+
+    if(!source)
+    {
+        dest[0] = '\0';
+        return 22;
+    }
+
+    size_t i;
+    for(i = 0; i < num; i++)
+    {
+        if((dest[i] = source[i]) == '\0')
+            return 0;
+    }
+    dest[0] = '\0';
+    return 34;
+}
+
+template <std::size_t num>
+inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(dest, num, source); }
+
+inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
+{
+    if(!num)
+    {
+        if(dest && dst_size)
+            *dest = 0;
+
+        return 0;
+    }
+
+    if (!dest || !source || (0 == dst_size))
+        return 22;
+
+    size_t i, end;
+    if(num < dst_size)
+        end = num;
     else
-        len = dst_size - 1;
+        end = dst_size - 1;
 
-    result = (NULL == strncpy(dest, source, len));
-    dest[len] = 0;
+    for(i = 0; i < end && source[i]; i++)
+        dest[i] = source[i];
 
-    return result;
+    if(!source[i] || end == num)
+    {
+        dest[i] = '\0';
+        return 0;
+    }
+
+    dest[0] = '\0';
+
+    return 22;
 }
-inline bool strncpy_s(char * dest, const char * source, size_t num) {
-    bool result = false;
 
-    result = (NULL == strncpy(dest, source, num));
-    dest[num] = 0;
+template <std::size_t dst_sz>
+inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { return strncpy_s(dest, dst_sz, source, num); }
 
-    return result;
+inline int strcat_s(char * dest, size_t num, const char * source)
+{
+    if(!dest || (0 == num))
+        return 22;
+
+    if(!source)
+    {
+        dest[0] = '\0';
+        return 22;
+    }
+
+    size_t i, j;
+    for(i = 0; i < num; i++)
+    {
+        if(dest[i] == '\0')
+        {
+            for(j = 0; (j + i) < num; j++)
+            {
+                if((dest[j + i] = source[j]) == '\0')
+                    return 0;
+            }
+        }
+    }
+
+    dest[0] = '\0';
+    return 34;
 }
-inline int strcpy_s(char *dest, const char *source) { return (int)(NULL == strcpy(dest, source)); }
-inline int strcpy_s(char *dest, size_t num, const char *source) { return (int)(NULL == strcpy(dest, source)); }
-inline int strcat_s(char * dest, size_t size, const char * source) { return (NULL == strcat(dest, source)); }
-inline int strncat_s(char * dest, size_t size, const char * source, size_t count) { return (NULL == strncat(dest, source, count)); }
+
+inline int strncat_s(char * dest, size_t num, const char * source, size_t count)
+{
+    if (!dest || (0 == num))
+        return 22;
+
+    if (!source)
+    {
+        dest[0] = '\0';
+        return 22;
+    }
+
+    size_t i, j;
+    for(i = 0; i < num; i++)
+    {
+        if(dest[i] == '\0')
+        {
+            for(j = 0; (j + i) < num; j++)
+            {
+                if(j == count || (dest[j + i] = source[j]) == '\0')
+                {
+                    dest[j + i] = '\0';
+                    return 0;
+                }
+            }
+        }
+    }
+
+    dest[0] = '\0';
+    return 34;
+}
 
 #define _vsnprintf vsnprintf
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
