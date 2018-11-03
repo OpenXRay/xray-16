@@ -452,7 +452,6 @@ void CRender::OnFrame()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         // MT-details (@front)
-        assert (Details);
         Device.seqParallel.insert(Device.seqParallel.begin(),
                                   fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
 

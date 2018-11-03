@@ -46,19 +46,6 @@ shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool co
 }
 } // namespace smart_cover
 
-class id_predicate
-{
-    loophole const* m_loophole;
-
-public:
-    IC id_predicate(loophole const& loophole) : m_loophole(&loophole) {}
-    IC bool operator()(loophole* const& loophole) const
-    {
-        VERIFY(loophole);
-        return (m_loophole->id()._get() == loophole->id()._get());
-    }
-};
-
 class enterable_predicate
 {
 public:
@@ -117,7 +104,9 @@ void description::load_loopholes(shared_str const& table_id)
         }
 
         smart_cover::loophole* loophole = new smart_cover::loophole(table);
-        VERIFY(std::find_if(m_loopholes.begin(), m_loopholes.end(), id_predicate(*loophole)) == m_loopholes.end());
+        VERIFY(m_loopholes.end() == std::find_if(m_loopholes.begin(), m_loopholes.end(),
+            [=](smart_cover::loophole* const lh) { return loophole->id()._get() == lh->id()._get(); }));
+
         m_loopholes.push_back(loophole);
     }
 
