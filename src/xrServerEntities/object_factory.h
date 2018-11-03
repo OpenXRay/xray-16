@@ -6,9 +6,6 @@
 //	Description : Object factory
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef object_factoryH
-#define object_factoryH
-
 #pragma once
 
 #include "object_item_abstract.h"
@@ -91,4 +88,3 @@ extern CObjectFactory* g_object_factory;
 IC const CObjectFactory& object_factory();
 
 #include "object_factory_inline.h"
-#endif

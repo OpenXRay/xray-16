@@ -9,6 +9,9 @@
 #pragma once
 
 #include "xrAICore/AISpaceBase.hpp"
+#include "xrCommon/xr_array.h"
+#include "xrCommon/xr_smart_pointers.h"
+#include "xrCore/Events/Notifier.h"
 
 class CGameGraph;
 class CGameLevelCrossTable;
@@ -35,25 +38,45 @@ private:
     friend class CALifeSpawnRegistry;
     friend class CLevel;
 
-private:
-    CEF_Storage* m_ef_storage;
-    CALifeSimulator* m_alife_simulator;
-    CCoverManager* m_cover_manager;
-    moving_objects* m_moving_objects;
-    doors::manager* m_doors_manager;
+public:
+    enum EEventID
+    {
+        EVENT_SCRIPT_ENGINE_STARTED,
+        EVENT_SCRIPT_ENGINE_RESET,
+        EVENT_COUNT,
+    };
 
 private:
+    bool m_inited = false;
+    CEventNotifier<EVENT_COUNT> m_events_notifier;
+
+    xr_unique_ptr<CEF_Storage> m_ef_storage;
+    xr_unique_ptr<CCoverManager> m_cover_manager;
+    xr_unique_ptr<moving_objects> m_moving_objects;
+    xr_unique_ptr<doors::manager> m_doors_manager;
+
+    CALifeSimulator* m_alife_simulator = nullptr;
+
+private:
+    void init();
     void load(LPCSTR level_name);
     void unload(bool reload = false);
     void set_alife(CALifeSimulator* alife_simulator);
     void LoadCommonScripts();
     void RegisterScriptClasses();
+    void SetupScriptEngine();
 
 public:
-    CAI_Space();
+    CAI_Space() = default;
+    CAI_Space(const CAI_Space&) = delete;
+    CAI_Space& operator=(const CAI_Space&) = delete;
     virtual ~CAI_Space();
-    void init();
-    void SetupScriptEngine();
+    static CAI_Space& GetInstance();
+
+    CEventNotifierCallback::CID Subscribe(CEventNotifierCallback* cb, EEventID event_id);
+    bool Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id);
+    void RestartScriptEngine();
+
     IC CEF_Storage& ef_storage() const;
 
     IC const CALifeSimulator& alife() const;
@@ -64,7 +87,5 @@ public:
 };
 
 IC CAI_Space& ai();
-
-extern CAI_Space* g_ai_space;
 
 #include "ai_space_inline.h"

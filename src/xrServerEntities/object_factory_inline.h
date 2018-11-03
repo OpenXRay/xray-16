@@ -7,9 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#ifndef object_factory_inlineH
-#define object_factory_inlineH
 #include <algorithm>
+#include "ai_space.h"
+#include "xrCore/Events/Notifier.h"
 
 IC const CObjectFactory& object_factory()
 {
@@ -17,6 +17,21 @@ IC const CObjectFactory& object_factory()
     {
         g_object_factory = new CObjectFactory();
         g_object_factory->init();
+
+        class CResetEventCb : public CEventNotifierCallback
+        {
+        public:
+            CID m_cid;
+
+            void ProcessEvent() override
+            {
+                xr_delete(g_object_factory);
+                ai().Unsubscribe(m_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+            }
+        };
+
+        CResetEventCb* e = new CResetEventCb();
+        e->m_cid = ai().Subscribe(e, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
     return (*g_object_factory);
 }
@@ -125,5 +140,3 @@ IC void CObjectFactory::actualize() const
     m_actual = true;
     std::sort(m_clsids.begin(), m_clsids.end(), CObjectItemPredicate());
 }
-
-#endif

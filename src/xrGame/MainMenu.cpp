@@ -67,6 +67,17 @@ CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 
 CMainMenu::CMainMenu()
 {
+    class CResetEventCb : public CEventNotifierCallback
+    {
+        CMainMenu* m_mainmenu;
+
+    public:
+        CResetEventCb(CMainMenu* mm) : m_mainmenu(mm) {}
+        void ProcessEvent() override { m_mainmenu->DestroyInternal(true); }
+    };
+
+    m_script_reset_event_cid = ai().Subscribe(new CResetEventCb(this), CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+
     m_Flags.zero();
     m_startDialog = NULL;
     m_screenshotFrame = u32(-1);
@@ -156,6 +167,8 @@ CMainMenu::~CMainMenu()
 
     xr_delete(m_demo_info_loader);
     delete_data(m_pMB_ErrDlgs);
+
+    ai().Unsubscribe(m_script_reset_event_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
 }
 
 void CMainMenu::ReadTextureInfo()

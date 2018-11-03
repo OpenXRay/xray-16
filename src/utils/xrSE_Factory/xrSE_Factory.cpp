@@ -60,7 +60,6 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
         auto s = (CInifile**)&pSettings;
         xr_delete(*s);
         xr_delete(g_property_list_helper);
-        xr_delete(g_ai_space);
         xr_delete(g_object_factory);
         if (prop_helper_module)
             prop_helper_module = nullptr;

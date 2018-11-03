@@ -11,7 +11,7 @@
 #include "vfw.h"
 #endif
 
-std::unique_ptr<EFS_Utils> xr_EFS;
+xr_unique_ptr<EFS_Utils> xr_EFS;
 //----------------------------------------------------
 EFS_Utils::EFS_Utils() {}
 EFS_Utils::~EFS_Utils() {}

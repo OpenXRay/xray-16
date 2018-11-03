@@ -39,12 +39,4 @@ IC doors::manager& CAI_Space::doors() const
     return (*m_doors_manager);
 }
 
-IC CAI_Space& ai()
-{
-    if (!g_ai_space)
-    {
-        g_ai_space = new CAI_Space();
-        g_ai_space->init();
-    }
-    return (*g_ai_space);
-}
+IC CAI_Space& ai() { return CAI_Space::GetInstance(); }

@@ -10,6 +10,7 @@
 #include "LocatorAPI_defs.h"
 //#include "xrCore/Threading/Lock.hpp"
 #include "xrCommon/xr_map.h"
+#include "xrCommon/xr_smart_pointers.h"
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
@@ -255,5 +256,5 @@ public:
     void unlock_rescan();
 };
 
-extern XRCORE_API std::unique_ptr<CLocatorAPI> xr_FS;
+extern XRCORE_API xr_unique_ptr<CLocatorAPI> xr_FS;
 #define FS (*xr_FS)

@@ -15,6 +15,7 @@ class demo_info_loader;
 #include "xrUICore/Callbacks/UIWndCallback.h"
 #include "xrUICore/ui_base.h"
 #include "DemoInfo.h"
+#include "ai_space.h"
 
 namespace gamespy_gp
 {
@@ -196,6 +197,8 @@ public:
     LPCSTR GetCDKeyFromRegistry();
 
     demo_info const* GetDemoInfo(LPCSTR file_name);
+
+    CEventNotifierCallback::CID m_script_reset_event_cid;
 };
 
 extern CMainMenu* MainMenu();

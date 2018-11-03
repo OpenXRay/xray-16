@@ -7,24 +7,36 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrCore/Events/Notifier.h"
 
 class CScriptEngine;
 
 class CAI_Space
 {
 private:
-    CScriptEngine* m_script_engine;
+    bool m_inited = false;
 
+    void init();
     void RegisterScriptClasses();
 
 public:
-    CAI_Space();
+    CAI_Space() = default;
+    CAI_Space(const CAI_Space&) = delete;
+    CAI_Space& operator=(const CAI_Space&) = delete;
     virtual ~CAI_Space();
-    void init();
-    IC CScriptEngine& script_engine() const;
-};
+    static CAI_Space& GetInstance();
 
-extern CAI_Space* g_ai_space;
+    IC CScriptEngine& script_engine() const;
+
+    enum EEventID
+    {
+        EVENT_SCRIPT_ENGINE_STARTED,
+        EVENT_SCRIPT_ENGINE_RESET,
+        EVENT_COUNT,
+    };
+    CEventNotifierCallback::CID Subscribe(CEventNotifierCallback* cb, EEventID event_id) { return 0; }
+    bool Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id) { return true; }
+};
 
 IC CAI_Space& ai();
 

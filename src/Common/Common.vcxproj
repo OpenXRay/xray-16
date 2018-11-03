@@ -180,6 +180,7 @@
     <ClInclude Include="..\xrCommon\xr_list.h" />
     <ClInclude Include="..\xrCommon\xr_map.h" />
     <ClInclude Include="..\xrCommon\xr_set.h" />
+    <ClInclude Include="..\xrCommon\xr_smart_pointers.h" />
     <ClInclude Include="..\xrCommon\xr_stack.h" />
     <ClInclude Include="..\xrCommon\xr_string.h" />
     <ClInclude Include="..\xrCommon\xr_unordered_map.h" />

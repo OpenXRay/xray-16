@@ -3,7 +3,6 @@
 #include "UIXmlInit.h"
 #include "Level.h"
 #include "game_base_space.h"
-#include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "inventory_item_object.h"
 #include "UIInventoryUtilities.h"
@@ -21,6 +20,8 @@ struct SLuaWpnParams
     ~SLuaWpnParams();
 };
 
+static SLuaWpnParams* g_lua_wpn_params = nullptr;
+
 SLuaWpnParams::SLuaWpnParams()
 {
     bool functor_exists;
@@ -37,13 +38,6 @@ SLuaWpnParams::SLuaWpnParams()
 }
 
 SLuaWpnParams::~SLuaWpnParams() {}
-SLuaWpnParams* g_lua_wpn_params = NULL;
-
-void destroy_lua_wpn_params()
-{
-    if (g_lua_wpn_params)
-        xr_delete(g_lua_wpn_params);
-}
 
 // =====================================================================
 
@@ -114,7 +108,21 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 {
     if (!g_lua_wpn_params)
     {
+        class CResetEventCb : public CEventNotifierCallback
+        {
+        public:
+            CID m_cid = INVALID_CID;
+
+            void ProcessEvent() override
+            {
+                xr_delete(g_lua_wpn_params);
+                ai().Unsubscribe(m_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+            }
+        };
+
         g_lua_wpn_params = new SLuaWpnParams();
+        auto cb = new CResetEventCb();
+        cb->m_cid = ai().Subscribe(cb, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
 
     LPCSTR cur_section = cur_wpn.object().cNameSect().c_str();

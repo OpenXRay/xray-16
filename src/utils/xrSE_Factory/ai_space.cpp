@@ -11,9 +11,17 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrServerEntities/object_factory.h"
 
-CAI_Space* g_ai_space = nullptr;
+static CAI_Space g_ai_space;
 
-CAI_Space::CAI_Space() { m_script_engine = nullptr; }
+CAI_Space& CAI_Space::GetInstance()
+{
+    auto& instance = g_ai_space;
+    if (!instance.m_inited)
+    {
+        instance.init();
+    }
+    return instance;
+}
 
 void CAI_Space::RegisterScriptClasses()
 {
@@ -49,13 +57,16 @@ void CAI_Space::RegisterScriptClasses()
 
 void CAI_Space::init()
 {
-    VERIFY(!m_script_engine);
+    R_ASSERT(!m_inited);
+
     VERIFY(!GEnv.ScriptEngine);
-    GEnv.ScriptEngine = m_script_engine = new CScriptEngine(true);
+    GEnv.ScriptEngine = new CScriptEngine(true);
     XRay::ScriptExporter::Reset(); // mark all nodes as undone
-    m_script_engine->init(XRay::ScriptExporter::Export, true);
+    GEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
     RegisterScriptClasses();
     object_factory().register_script();
+
+    m_inited = true;
 }
 
-CAI_Space::~CAI_Space() { xr_delete(m_script_engine); }
+CAI_Space::~CAI_Space() { xr_delete(GEnv.ScriptEngine); }

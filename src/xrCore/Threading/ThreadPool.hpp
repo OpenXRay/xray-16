@@ -15,7 +15,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
-#include <memory>
+#include "xrCommon/xr_smart_pointers.h"
 
 class XRCORE_API Thread
 {
@@ -42,7 +42,7 @@ public:
 class ThreadPool
 {
 public:
-    xr_vector<std::unique_ptr<Thread>> threads;
+    xr_vector<xr_unique_ptr<Thread>> threads;
 
     void initialize()
     {

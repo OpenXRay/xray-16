@@ -85,6 +85,9 @@
     <ClInclude Include="..\xrCommon\xr_array.h">
       <Filter>xrCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_smart_pointers.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">
