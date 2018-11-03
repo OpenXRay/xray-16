@@ -68,13 +68,13 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
     {
     case DLL_PROCESS_ATTACH:
     {
-        load();
+        load(0, nullptr, nullptr);
         break;
     }
 
     case DLL_PROCESS_DETACH:
     {
-        unload()
+        unload();
         break;
     }
     }
