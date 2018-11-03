@@ -110,8 +110,6 @@ CLevel::CLevel()
     Msg("%s", Core.Params);
 }
 
-extern CAI_Space* g_ai_space;
-
 CLevel::~CLevel()
 {
     xr_delete(g_player_hud);
