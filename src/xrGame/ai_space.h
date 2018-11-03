@@ -10,8 +10,8 @@
 
 #include "xrAICore/AISpaceBase.hpp"
 #include "xrCommon/xr_array.h"
+#include "xrCommon/xr_smart_pointers.h"
 
-#include <memory>
 #include <mutex>
 
 class CGameGraph;
@@ -45,7 +45,7 @@ public:
 
     class CEventCallbackStorage
     {
-        xr_vector<std::unique_ptr<CEventCallback>> m_callbacks;
+        xr_vector<xr_unique_ptr<CEventCallback>> m_callbacks;
         std::mutex m_lock;
 
     public:
@@ -84,10 +84,10 @@ private:
     bool m_inited = false;
     CNotifier m_events_notifier;
 
-    std::unique_ptr<CEF_Storage> m_ef_storage;
-    std::unique_ptr<CCoverManager> m_cover_manager;
-    std::unique_ptr<moving_objects> m_moving_objects;
-    std::unique_ptr<doors::manager> m_doors_manager;
+    xr_unique_ptr<CEF_Storage> m_ef_storage;
+    xr_unique_ptr<CCoverManager> m_cover_manager;
+    xr_unique_ptr<moving_objects> m_moving_objects;
+    xr_unique_ptr<doors::manager> m_doors_manager;
 
     CALifeSimulator* m_alife_simulator = nullptr;
 

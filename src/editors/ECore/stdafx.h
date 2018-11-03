@@ -108,6 +108,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 #include "xrCore/xr_token.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_string.h"
+#include "xrCommon/xr_smart_pointers.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/Motion.hpp"
 

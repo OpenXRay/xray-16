@@ -253,9 +253,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         rtc_initialize();
 
-        xr_FS = std::make_unique<CLocatorAPI>();
+        xr_FS = xr_make_unique<CLocatorAPI>();
 
-        xr_EFS = std::make_unique<EFS_Utils>();
+        xr_EFS = xr_make_unique<EFS_Utils>();
         //. R_ASSERT (co_res==S_OK);
     }
     if (init_fs)

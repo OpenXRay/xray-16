@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include "xrCommon/xr_smart_pointers.h"
 
 namespace XRay
 {
@@ -23,15 +23,15 @@ public:
     void* GetProcAddress(pcstr procName) const;
 };
 
-using Module = std::unique_ptr<ModuleHandle>;
+using Module = xr_unique_ptr<ModuleHandle>;
 
 inline auto LoadModule(bool dontUnload = false)
 {
-    return std::make_unique<ModuleHandle>(dontUnload);
+    return xr_make_unique<ModuleHandle>(dontUnload);
 }
 
 inline auto LoadModule(pcstr moduleName, bool dontUnload = false)
 {
-    return std::make_unique<ModuleHandle>(moduleName, dontUnload);
+    return xr_make_unique<ModuleHandle>(moduleName, dontUnload);
 }
 }
