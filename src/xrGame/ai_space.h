@@ -9,8 +9,10 @@
 #pragma once
 
 #include "xrAICore/AISpaceBase.hpp"
+#include "xrCommon/xr_array.h"
 
 #include <memory>
+#include <mutex>
 
 class CGameGraph;
 class CGameLevelCrossTable;
@@ -30,6 +32,47 @@ class manager;
 
 class CAI_Space : public AISpaceBase
 {
+public:
+    class CEventCallback
+    {
+    public:
+        using CID = size_t;
+        static const CID INVALID_CID = std::numeric_limits<CID>::max();
+
+        virtual void ProcessEvent() = 0;
+        virtual ~CEventCallback(){};
+    };
+
+    class CEventCallbackStorage
+    {
+        xr_vector<std::unique_ptr<CEventCallback>> m_callbacks;
+        std::mutex m_lock;
+
+    public:
+        CEventCallback::CID RegisterCallback(CEventCallback* cb);
+        bool UnregisterCallback(CEventCallback::CID cid);
+        void ExecuteCallbacks();
+    };
+
+    class CNotifier
+    {
+    public:
+        enum EEventID
+        {
+            EVENT_SCRIPT_ENGINE_STARTED,
+            EVENT_SCRIPT_ENGINE_RESET,
+            EVENT_COUNT,
+        };
+
+    private:
+        xr_array<CEventCallbackStorage, EVENT_COUNT> m_callbacks;
+
+    public:
+        CEventCallback::CID RegisterCallback(CEventCallback* cb, EEventID event_id);
+        bool UnregisterCallback(CEventCallback::CID cid, EEventID event_id);
+        void FireEvent(EEventID event_id);
+    };
+
 private:
     friend class CALifeSimulator;
     friend class CALifeGraphRegistry;
@@ -39,6 +82,7 @@ private:
 
 private:
     bool m_inited = false;
+    CNotifier m_events_notifier;
 
     std::unique_ptr<CEF_Storage> m_ef_storage;
     std::unique_ptr<CCoverManager> m_cover_manager;
@@ -54,6 +98,7 @@ private:
     void set_alife(CALifeSimulator* alife_simulator);
     void LoadCommonScripts();
     void RegisterScriptClasses();
+    void SetupScriptEngine();
 
 public:
     CAI_Space() = default;
@@ -62,7 +107,10 @@ public:
     virtual ~CAI_Space();
     static CAI_Space& GetInstance();
 
-    void SetupScriptEngine();
+    CEventCallback::CID Subscribe(CEventCallback* cb, CNotifier::EEventID event_id);
+    bool Unsubscribe(CEventCallback::CID cid, CNotifier::EEventID event_id);
+    void RestartScriptEngine();
+
     IC CEF_Storage& ef_storage() const;
 
     IC const CALifeSimulator& alife() const;

@@ -23,7 +23,6 @@
 
 LPCSTR alife_section = "alife";
 
-extern void destroy_lua_wpn_params();
 
 CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
     : CALifeUpdateManager(server, alife_section), CALifeInteractionManager(server, alife_section),
@@ -32,13 +31,7 @@ CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
     // XXX: why do we need to reinitialize script engine?
     if (!strstr(Core.Params, "-keep_lua"))
     {
-        destroy_lua_wpn_params();
-        MainMenu()->DestroyInternal(true);
-        xr_delete(g_object_factory);
-        ai().SetupScriptEngine();
-#ifdef DEBUG
-        ai().get_moving_objects().clear();
-#endif // DEBUG
+        ai().RestartScriptEngine();
     }
 
     ai().set_alife(this);

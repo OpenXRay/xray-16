@@ -58,11 +58,9 @@ void init_game_globals()
 extern CUIXml* g_uiSpotXml;
 extern CUIXml* pWpnScopeXml;
 
-extern void destroy_lua_wpn_params();
 
 void clean_game_globals()
 {
-    destroy_lua_wpn_params();
     // destroy object factory
     xr_delete(g_object_factory);
     // destroy monster squad global var
