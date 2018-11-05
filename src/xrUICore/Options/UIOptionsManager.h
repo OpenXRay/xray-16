@@ -21,8 +21,10 @@ public:
     void DoUIRestart();
     void DoSystemRestart();
 
-    bool NeedSystemRestart() { return 0 != (m_restart_flags & e_system_restart); }
-    bool NeedVidRestart() { return 0 != (m_restart_flags & e_vid_restart); }
+    bool NeedSystemRestart() const { return 0 != (m_restart_flags & e_system_restart); }
+    bool NeedVidRestart() const { return 0 != (m_restart_flags & e_vid_restart); }
+    bool NeedSndRestart() const { return 0 != (m_restart_flags & e_snd_restart); }
+    bool NeedUIRestart() const { return 0 != (m_restart_flags & e_ui_restart); }
     void SendMessage2Group(const shared_str& group, const char* message);
 
     void RegisterItem(CUIOptionsItem* item, const shared_str& group);

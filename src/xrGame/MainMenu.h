@@ -49,7 +49,8 @@ class CMainMenu : public IMainMenu,
                   public pureRender,
                   public CDialogHolder,
                   public CUIWndCallback,
-                  public CDeviceResetNotifier
+                  public CDeviceResetNotifier,
+                  public pureScreenResolutionChanged
 {
     CUIDialogWnd* m_startDialog;
 
@@ -188,6 +189,7 @@ public:
     void Hide_CTMS_Dialog();
     void SetNeedVidRestart();
     virtual void OnDeviceReset();
+    void OnScreenResolutionChanged() override;
     LPCSTR GetGSVer();
 
     bool IsCDKeyIsValid();

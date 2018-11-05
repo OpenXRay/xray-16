@@ -145,15 +145,18 @@ CMainMenu::CMainMenu()
     }
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 1000);
+    Device.seqResolutionChanged.Add(this);
 }
 
 CMainMenu::~CMainMenu()
 {
+    Device.seqResolutionChanged.Remove(this);
     Device.seqFrame.Remove(this);
+
     xr_delete(g_btnHint);
     xr_delete(g_statHint);
     xr_delete(m_startDialog);
-    g_pGamePersistent->m_pMainMenu = NULL;
+    g_pGamePersistent->m_pMainMenu = nullptr;
 
 #ifdef WINDOWS
     xr_delete(m_account_mngr);
@@ -756,6 +759,12 @@ void CMainMenu::OnDeviceReset()
 {
     if (IsActive() && g_pGameLevel)
         SetNeedVidRestart();
+}
+
+void CMainMenu::OnScreenResolutionChanged()
+{
+    ReadTextureInfo();
+    ReloadUI();
 }
 
 // -------------------------------------------------------------------------------------------------
