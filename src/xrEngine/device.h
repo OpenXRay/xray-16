@@ -164,7 +164,6 @@ private:
     void _SetupStates();
 
 public:
-    SDL_Window* m_sdlWnd;
 #if defined(WINDOWS)
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 #endif
