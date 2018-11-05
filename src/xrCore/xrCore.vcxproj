@@ -109,21 +109,24 @@
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying the required libraries ...</Message>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>where /q git
 if errorlevel 1 (
-  echo git is not founded
+  echo git not found
   goto :EOF
 )
-echo git is founded
+echo git found
 call .GitInfo.cmd</Command>
     </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)tbb_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_debug.dll" "$(OutDir)tbb_debug.dll"
+if not exist "$(OutDir)tbb_preview_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview_debug.dll" "$(OutDir)tbb_preview_debug.dll"
+if not exist "$(OutDir)tbbmalloc_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_debug.dll" "$(OutDir)tbbmalloc_debug.dll"
+if not exist "$(OutDir)tbbmalloc_proxy_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy_debug.dll" "$(OutDir)tbbmalloc_proxy_debug.dll"</Command>
+      <Outputs>$(OutDir)tbb_debug.dll;$(OutDir)tbb_preview_debug.dll;$(OutDir)tbbmalloc_debug.dll;$(OutDir)tbbmalloc_proxy_debug.dll;%(Outputs)</Outputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\tbb_debug.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview_debug.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_debug.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy_debug.dll;%(Inputs)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -133,19 +136,24 @@ call .GitInfo.cmd</Command>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
-      <Message>Copying the required libraries ...</Message>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>where /q git
 if errorlevel 1 (
-  echo git is not founded
+  echo git not found
   goto :EOF
 )
-echo git is founded
+echo git found
 call .GitInfo.cmd</Command>
     </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)tbb_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_debug.dll" "$(OutDir)tbb_debug.dll"
+if not exist "$(OutDir)tbb_preview_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview_debug.dll" "$(OutDir)tbb_preview_debug.dll"
+if not exist "$(OutDir)tbbmalloc_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_debug.dll" "$(OutDir)tbbmalloc_debug.dll"
+if not exist "$(OutDir)tbbmalloc_proxy_debug.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy_debug.dll" "$(OutDir)tbbmalloc_proxy_debug.dll"</Command>
+      <Outputs>$(OutDir)tbb_debug.dll;$(OutDir)tbb_preview_debug.dll;$(OutDir)tbbmalloc_debug.dll;$(OutDir)tbbmalloc_proxy_debug.dll;%(Outputs)</Outputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\tbb_debug.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview_debug.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_debug.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy_debug.dll;%(Inputs)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -156,21 +164,24 @@ call .GitInfo.cmd</Command>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying the required libraries ...</Message>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>where /q git
 if errorlevel 1 (
-  echo git is not founded
+  echo git not found
   goto :EOF
 )
-echo git is founded
+echo git found
 call .GitInfo.cmd</Command>
     </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)tbb.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll" "$(OutDir)tbb.dll"
+if not exist "$(OutDir)tbb_preview.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll" "$(OutDir)tbb_preview.dll"
+if not exist "$(OutDir)tbbmalloc.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll" "$(OutDir)tbbmalloc.dll"
+if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll" "$(OutDir)tbbmalloc_proxy.dll"</Command>
+      <Outputs>$(OutDir)tbb.dll;$(OutDir)tbb_preview.dll;$(OutDir)tbbmalloc.dll;$(OutDir)tbbmalloc_proxy.dll;%(Outputs)</Outputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll;%(Inputs)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -180,19 +191,24 @@ call .GitInfo.cmd</Command>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
-      <Message>Copying the required libraries ...</Message>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>where /q git
 if errorlevel 1 (
-  echo git is not founded
+  echo git not found
   goto :EOF
 )
-echo git is founded
+echo git found
 call .GitInfo.cmd</Command>
     </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)tbb.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll" "$(OutDir)tbb.dll"
+if not exist "$(OutDir)tbb_preview.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll" "$(OutDir)tbb_preview.dll"
+if not exist "$(OutDir)tbbmalloc.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll" "$(OutDir)tbbmalloc.dll"
+if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll" "$(OutDir)tbbmalloc_proxy.dll"</Command>
+      <Outputs>$(OutDir)tbb.dll;$(OutDir)tbb_preview.dll;$(OutDir)tbbmalloc.dll;$(OutDir)tbbmalloc_proxy.dll;%(Outputs)</Outputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll;%(Inputs)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <ClCompile>
@@ -202,21 +218,24 @@ call .GitInfo.cmd</Command>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying the required libraries ...</Message>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>where /q git
 if errorlevel 1 (
-  echo git is not founded
+  echo git not found
   goto :EOF
 )
-echo git is founded
+echo git found
 call .GitInfo.cmd</Command>
     </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)tbb.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll" "$(OutDir)tbb.dll"
+if not exist "$(OutDir)tbb_preview.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll" "$(OutDir)tbb_preview.dll"
+if not exist "$(OutDir)tbbmalloc.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll" "$(OutDir)tbbmalloc.dll"
+if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll" "$(OutDir)tbbmalloc_proxy.dll"</Command>
+      <Outputs>$(OutDir)tbb.dll;$(OutDir)tbb_preview.dll;$(OutDir)tbbmalloc.dll;$(OutDir)tbbmalloc_proxy.dll;%(Outputs)</Outputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll;%(Inputs)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <ClCompile>
@@ -226,19 +245,24 @@ call .GitInfo.cmd</Command>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
-      <Message>Copying the required libraries ...</Message>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>where /q git
 if errorlevel 1 (
-  echo git is not founded
+  echo git not found
   goto :EOF
 )
-echo git is founded
+echo git found
 call .GitInfo.cmd</Command>
     </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)tbb.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll" "$(OutDir)tbb.dll"
+if not exist "$(OutDir)tbb_preview.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll" "$(OutDir)tbb_preview.dll"
+if not exist "$(OutDir)tbbmalloc.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll" "$(OutDir)tbbmalloc.dll"
+if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll" "$(OutDir)tbbmalloc_proxy.dll"</Command>
+      <Outputs>$(OutDir)tbb.dll;$(OutDir)tbb_preview.dll;$(OutDir)tbbmalloc.dll;$(OutDir)tbbmalloc_proxy.dll;%(Outputs)</Outputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\tbb.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbb_preview.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc.dll;$(xrSdkDir)binaries\$(PlatformShortName)\tbbmalloc_proxy.dll;%(Inputs)</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation\Bone.cpp" />
