@@ -9,7 +9,7 @@ constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
 
 struct ALDeviceDesc
 {
-    string256 name;
+    string256 name = { 0 };
     int minor_ver;
     int major_ver;
     union ESndProps
@@ -42,7 +42,7 @@ class ALDeviceList
     xr_vector<ALDeviceDesc> m_devices;
     string256 m_defaultDeviceName;
     void Enumerate();
-    
+
 public:
     ALDeviceList();
     ~ALDeviceList();
