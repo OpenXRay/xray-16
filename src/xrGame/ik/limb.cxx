@@ -30,7 +30,7 @@
 
  */
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "limb.h"
 
 enum
