@@ -7,6 +7,8 @@
 
 #include "AnselManager.h"
 #include "holder_custom.h"
+#include "SDL.h"
+#include "SDL_syswm.h"
 
 ENGINE_API extern BOOL bShowPauseString;
 ENGINE_API extern BOOL g_bDisableRedText;
