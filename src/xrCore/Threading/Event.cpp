@@ -1,61 +1,82 @@
 #include "stdafx.h"
 #include "Event.hpp"
+#if defined(WINDOWS)
 
+Event::Event() noexcept { handle = (void*)CreateEvent(NULL, FALSE, FALSE, NULL); }
+Event::~Event() noexcept { CloseHandle(handle); }
+void Event::Reset() noexcept { ResetEvent(handle); }
+void Event::Set() noexcept { SetEvent(handle); }
+void Event::Wait() noexcept { WaitForSingleObject(handle, INFINITE); }
+bool Event::Wait(u32 millisecondsTimeout) noexcept
+{
+    return WaitForSingleObject(handle, millisecondsTimeout) != WAIT_TIMEOUT;
+}
+#elif defined(LINUX)
+#include <pthread.h>
 Event::Event() noexcept
 {
-    signaled = false;
-    mutex = SDL_CreateMutex();
-    cond = SDL_CreateCond();
+    m_id.signaled = false;
+    pthread_mutex_init(&m_id.mutex, nullptr);
+    pthread_cond_init(&m_id.cond, nullptr);
 }
 Event::~Event() noexcept
 {
-    SDL_DestroyMutex(mutex);
-    SDL_DestroyCond(cond);
+    pthread_mutex_destroy(&m_id.mutex);
+    pthread_cond_destroy(&m_id.cond);
 }
 void Event::Reset() noexcept
 {
-    SDL_LockMutex(mutex);
-    SDL_CondSignal(cond);
-    signaled = false;
-    SDL_UnlockMutex(mutex);
+    pthread_mutex_lock(&m_id.mutex);
+    pthread_cond_signal(&m_id.cond);
+    m_id.signaled = false;
+    pthread_mutex_unlock(&m_id.mutex);
 }
 void Event::Set() noexcept
 {
-    SDL_LockMutex(mutex);
-    SDL_CondSignal(cond);
-    signaled = true;
-    SDL_UnlockMutex(mutex);
+    pthread_mutex_lock(&m_id.mutex);
+    pthread_cond_signal(&m_id.cond);
+    m_id.signaled = true;
+    pthread_mutex_unlock(&m_id.mutex);
 }
 void Event::Wait() noexcept
 {
-    SDL_LockMutex(mutex);
+    pthread_mutex_lock(&m_id.mutex);
 
-    while (!signaled)
+    while (!m_id.signaled)
     {
-        SDL_CondWait(cond, mutex);
+        pthread_cond_wait(&m_id.cond, &m_id.mutex);
     }
-    signaled = false; // due in WaitForSingleObject() "Before returning, a wait function modifies the state of some types of synchronization"
+    m_id.signaled = false; // due in WaitForSingleObject() "Before returning, a wait function modifies the state of some types of synchronization"
 
-    SDL_UnlockMutex(mutex);
+    pthread_mutex_unlock(&m_id.mutex);
 }
 bool Event::Wait(u32 millisecondsTimeout) noexcept
 {
     bool result = false;
-    SDL_LockMutex(mutex);
+    pthread_mutex_lock(&m_id.mutex);
 
-    while(!signaled)
+    timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_nsec += (long) millisecondsTimeout * 1000 * 1000;
+    if(ts.tv_nsec > 1000000000)
     {
-        int res = SDL_CondWaitTimeout(cond, mutex, millisecondsTimeout);
+        ts.tv_nsec -= 1000000000;
+        ts.tv_sec += 1;
+    }
 
-        if (res == SDL_MUTEX_TIMEDOUT)
+    while(!m_id.signaled)
+    {
+        int res = pthread_cond_timedwait(&m_id.cond, &m_id.mutex, &ts);
+        if(res == ETIMEDOUT)
         {
             result = true;
             break;
         }
     }
-    signaled = false;
+    m_id.signaled = false;
 
-    SDL_UnlockMutex(mutex);
+    pthread_mutex_unlock(&m_id.mutex);
 
     return result;
 }
+#endif

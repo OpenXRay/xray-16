@@ -6,11 +6,17 @@
 class XRCORE_API Event
 {
     void* handle;
+#if defined(LINUX)
+    struct EventHandle
+    {
+        pthread_mutex_t mutex;
+        pthread_cond_t cond;
+        bool signaled;
+    };
 
 private:
-    SDL_mutex* mutex;
-    SDL_cond* cond;
-    bool signaled;
+    EventHandle m_id;
+#endif
 
 public:
     Event() noexcept;
