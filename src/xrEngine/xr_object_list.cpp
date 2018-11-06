@@ -501,7 +501,7 @@ void CObjectList::Destroy(IGameObject* game_obj)
             Msg("assertion !m_other_crows.empty() failed: %d", m_secondary_crows.size());
 
             u32 j = 0;
-            for (auto iter: m_secondary_crows)
+            for (auto& iter : m_secondary_crows)
                 Msg("%d %s", j++, iter->cName().c_str());
             VERIFY(Device.Paused() || m_secondary_crows.empty());
             m_secondary_crows.clear();
