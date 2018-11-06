@@ -9664,16 +9664,16 @@
     <ClCompile Include="Hit.cpp">
       <Filter>Physics\Hit</Filter>
     </ClCompile>
-    <ClCompile Include="Ik\aint.cpp">
+    <ClCompile Include="Ik\aint.cxx">
       <Filter>Physics\IK</Filter>
     </ClCompile>
     <ClCompile Include="Ik\Dof7control.cpp">
       <Filter>Physics\IK</Filter>
     </ClCompile>
-    <ClCompile Include="Ik\eqn.cpp">
+    <ClCompile Include="Ik\eqn.cxx">
       <Filter>Physics\IK</Filter>
     </ClCompile>
-    <ClCompile Include="Ik\eulersolver.cpp">
+    <ClCompile Include="Ik\eulersolver.cxx">
       <Filter>Physics\IK</Filter>
     </ClCompile>
     <ClCompile Include="ik_anim_state.cpp">
@@ -9703,10 +9703,10 @@
     <ClCompile Include="IKLimbsController.cpp">
       <Filter>Physics\IK</Filter>
     </ClCompile>
-    <ClCompile Include="Ik\jtlimits.cpp">
+    <ClCompile Include="Ik\jtlimits.cxx">
       <Filter>Physics\IK</Filter>
     </ClCompile>
-    <ClCompile Include="Ik\limb.cpp">
+    <ClCompile Include="Ik\limb.cxx">
       <Filter>Physics\IK</Filter>
     </ClCompile>
     <ClCompile Include="Ik\math3d.cpp">

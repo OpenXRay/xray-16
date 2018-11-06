@@ -29,7 +29,7 @@
   MODIFICATIONS.
 
  */
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "aint.h"
 

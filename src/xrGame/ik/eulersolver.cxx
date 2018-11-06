@@ -29,7 +29,7 @@
   MODIFICATIONS.
 
  */
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "eulersolver.h"
 
 typedef void (*euler_solver)(const Matrix G, float& t1, float& t2, float& t3, int family);
