@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #ifdef WINDOWS
 #define ANSEL_SDK_DELAYLOAD

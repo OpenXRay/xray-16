@@ -217,9 +217,11 @@ void CGamePersistent::OnAppStart()
     GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
 
+#ifdef WINDOWS
     ansel = new AnselManager();
     ansel->Load();
     ansel->Init();
+#endif
 }
 
 void CGamePersistent::OnAppEnd()
