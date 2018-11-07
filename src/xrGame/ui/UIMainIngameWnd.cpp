@@ -235,10 +235,11 @@ void CUIMainIngameWnd::Init()
         m_quick_slots_icons.push_back(new CUIStatic());
         m_quick_slots_icons.back()->SetAutoDelete(true);
         AttachChild(m_quick_slots_icons.back());
-        std::string path = "quick_slot" + std::to_string(i);
-        CUIXmlInit::InitStatic(uiXml, path.c_str(), 0, m_quick_slots_icons.back());
-        path += ":counter";
-        UIHelper::CreateStatic(uiXml, path.c_str(), m_quick_slots_icons.back());
+        string32 path;
+        xr_sprintf(path, "quick_slot%d", i);
+        CUIXmlInit::InitStatic(uiXml, path, 0, m_quick_slots_icons.back());
+        xr_strcat(path, ":counter");
+        UIHelper::CreateStatic(uiXml, path, m_quick_slots_icons.back());
     }
     m_QuickSlotText1 = UIHelper::CreateTextWnd(uiXml, "quick_slot0_text", this);
     m_QuickSlotText2 = UIHelper::CreateTextWnd(uiXml, "quick_slot1_text", this);
