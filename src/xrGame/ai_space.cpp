@@ -22,11 +22,35 @@
 #include "moving_objects.h"
 #include "doors_manager.h"
 
-static CAI_Space g_ai_space;
+// Nifty counter required to solve initilization order problem
+// Please, do NOT initialize this static members directly, it breaks the initialization logic
+// And yes, according to the standard ($3.6.2/1): "Objects with static storage duration (3.7.1) shall be
+// zero-initialized (8.5) before any other initialization takes place" So, it must be automatically
+// initialized with zeros before executing the constructor
+static CAI_Space* s_ai_space;
+static u32 s_nifty_counter;
+
+SAI_Space_Initializer::SAI_Space_Initializer()
+{
+    if (s_nifty_counter++ == 0)
+    {
+        s_ai_space = new CAI_Space();
+    }
+}
+
+SAI_Space_Initializer::~SAI_Space_Initializer()
+{
+    if (--s_nifty_counter == 0)
+    {
+        xr_delete(s_ai_space);
+    }
+}
 
 CAI_Space& CAI_Space::GetInstance()
 {
-    auto& instance = g_ai_space;
+    VERIFY(s_ai_space);
+
+    auto& instance = *s_ai_space;
     if (!instance.m_inited)
     {
         instance.init();
