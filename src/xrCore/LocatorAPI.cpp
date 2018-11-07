@@ -442,7 +442,6 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
 void CLocatorAPI::archive::open()
 {
-    convert_path_separators((char *)*path);
 #if defined(WINDOWS)
     // Open the file
     if (hSrcFile && hSrcMap)
@@ -458,7 +457,10 @@ void CLocatorAPI::archive::open()
     if (hSrcFile)
         return;
 
-    hSrcFile = ::open(*path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    pstr conv_path = xr_strdup(path.c_str());
+    convert_path_separators(conv_path);
+    hSrcFile = ::open(conv_path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    xr_free(conv_path);
     R_ASSERT(hSrcFile != -1);
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);
@@ -616,9 +618,8 @@ bool ignore_name(const char* _name)
 // because Unicode file names can
 // be interpolated by FindNextFile()
 
-bool ignore_path(const char* _path)
+bool ignore_path(pcstr _path)
 {
-    convert_path_separators((char *)_path);
 #if defined(WINDOWS)
     HANDLE h = CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 
@@ -630,7 +631,10 @@ bool ignore_path(const char* _path)
     else
         return true;
 #elif defined(LINUX)
-    int h = ::open(_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    pstr conv_path = xr_strdup(_path);
+    convert_path_separators(conv_path);
+    int h = ::open(conv_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    xr_free(conv_path);
     if (h != -1)
     {
         ::close(h);
@@ -1694,8 +1698,11 @@ void CLocatorAPI::file_rename(pcstr src, pcstr dest, bool overwrite)
         m_files.insert(new_desc);
 
         // physically rename file
-        VerifyPath(dest);
-        rename(src, dest);
+        pstr conv_dest = xr_strdup(dest);
+        convert_path_separators(conv_dest);
+        VerifyPath(conv_dest);
+        rename(src, conv_dest);
+        xr_free(conv_dest);
     }
 }
 

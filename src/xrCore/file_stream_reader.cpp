@@ -17,10 +17,10 @@ void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
 
     inherited::construct(file_mapping_handle, 0, file_size, file_size, window_size);
 #elif defined(LINUX)
-    char path[PATH_MAX] = { 0 };
-    strcpy(path, file_name);
-    convert_path_separators(path);
-    m_file_handle = ::open(path, O_RDONLY);
+    pstr conv_fn = xr_strdup(file_name);
+    convert_path_separators(conv_fn);
+    m_file_handle = ::open(conv_fn, O_RDONLY);
+    xr_free(conv_fn);
     VERIFY(m_file_handle != -1);
     struct stat file_info;
     ::fstat(m_file_handle, &file_info);

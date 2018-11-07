@@ -112,7 +112,7 @@ public:
 class XRCORE_API CFileReader : public IReader
 {
 public:
-    CFileReader(const char* name);
+    CFileReader(pcstr name);
     virtual ~CFileReader();
 };
 class CCompressedReader : public IReader
@@ -131,7 +131,7 @@ private:
 #endif
 
 public:
-    CVirtualFileReader(const char* cFileName);
+    CVirtualFileReader(pcstr cFileName);
     virtual ~CVirtualFileReader();
 };
 
