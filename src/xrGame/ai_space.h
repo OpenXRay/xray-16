@@ -73,7 +73,12 @@ public:
     virtual ~CAI_Space();
     static CAI_Space& GetInstance();
 
-    CEventNotifierCallback::CID Subscribe(CEventNotifierCallback* cb, EEventID event_id);
+    template <class CB, class... Args>
+    CEventNotifierCallback::CID Subscribe(EEventID event_id, Args&&... args)
+    {
+        return m_events_notifier.CreateRegisteredCallback<CB>(event_id, args...);
+    }
+
     bool Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id);
     void RestartScriptEngine();
 

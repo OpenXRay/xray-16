@@ -34,7 +34,13 @@ public:
         EVENT_SCRIPT_ENGINE_RESET,
         EVENT_COUNT,
     };
-    CEventNotifierCallback::CID Subscribe(CEventNotifierCallback* cb, EEventID event_id) { return 0; }
+
+    template <class CB, class... Args>
+    CEventNotifierCallback::CID Subscribe(EEventID event_id, Args&&... args)
+    {
+        return 0;
+    }
+
     bool Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id) { return true; }
 };
 

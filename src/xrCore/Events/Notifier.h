@@ -16,6 +16,16 @@ public:
     virtual ~CEventNotifierCallback(){};
 };
 
+class CEventNotifierCallbackWithCid : public CEventNotifierCallback
+{
+private:
+    const CID m_cid;
+
+public:
+    CEventNotifierCallbackWithCid(CID cid) : m_cid(cid), CEventNotifierCallback(){};
+    CID GetCid() const { return m_cid; }
+};
+
 template <unsigned int CNT>
 class CEventNotifier
 {
@@ -41,6 +51,14 @@ private:
         xr_vector<CCallbackWrapper> m_callbacks;
         Lock m_lock;
 
+        CEventNotifierCallback::CID FindFreeCid()
+        {
+            ScopeLock lock(&m_lock);
+            auto it = std::find(m_callbacks.begin(), m_callbacks.end(), nullptr);
+            return (it == m_callbacks.end()) ? CEventNotifierCallback::INVALID_CID :
+                                               std::distance(m_callbacks.begin(), it);
+        }
+
     public:
         CEventNotifierCallback::CID RegisterCallback(CEventNotifierCallback* cb)
         {
@@ -48,6 +66,28 @@ private:
             auto it = std::find(m_callbacks.begin(), m_callbacks.end(), nullptr);
             return (it == m_callbacks.end()) ? (m_callbacks.emplace_back(cb), m_callbacks.size() - 1) :
                                                (it->callback.reset(cb), std::distance(m_callbacks.begin(), it));
+        }
+
+        template <class CB, class... Args>
+        CEventNotifierCallback::CID CreateRegisteredCallback(Args&&... args)
+        {
+            static_assert(std::is_base_of<CEventNotifierCallbackWithCid, CB>::value);
+
+            ScopeLock lock(&m_lock);
+
+            auto cid = FindFreeCid();
+            CB* cb = new CB((cid == CEventNotifierCallback::INVALID_CID) ? m_callbacks.size() : cid, args...);
+
+            if (cid == CEventNotifierCallback::INVALID_CID)
+            {
+                m_callbacks.emplace_back(cb);
+            }
+            else
+            {
+                m_callbacks[cid].callback.reset(cb);
+            }
+
+            return cb->GetCid();
         }
 
         bool UnregisterCallback(CEventNotifierCallback::CID cid)
@@ -98,6 +138,13 @@ public:
     {
         R_ASSERT(event_id < CNT);
         return m_callbacks[event_id].RegisterCallback(cb);
+    }
+
+    template <class CB, class... Args>
+    CEventNotifierCallback::CID CreateRegisteredCallback(unsigned int event_id, Args&&... args)
+    {
+        R_ASSERT(event_id < CNT);
+        return m_callbacks[event_id].CreateRegisteredCallback<CB>(args...);
     }
 
     bool UnregisterCallback(CEventNotifierCallback::CID cid, unsigned int event_id)

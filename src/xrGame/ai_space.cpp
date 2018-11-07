@@ -197,11 +197,6 @@ void CAI_Space::set_alife(CALifeSimulator* alife_simulator)
     SetGameGraph(nullptr);
 }
 
-CEventNotifierCallback::CID CAI_Space::Subscribe(CEventNotifierCallback* cb, EEventID event_id)
-{
-    return m_events_notifier.RegisterCallback(cb, event_id);
-}
-
 bool CAI_Space::Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id)
 {
     return m_events_notifier.UnregisterCallback(cid, event_id);
