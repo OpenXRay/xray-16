@@ -721,8 +721,6 @@ bool CLocatorAPI::Recurse(pcstr path)
 #elif defined(LINUX)
     globfree(&globbuf);
 #endif
-    restore_path_separators((char *)path);
-
     size_t newSize = rec_files.size();
     if (newSize > oldSize)
     {
