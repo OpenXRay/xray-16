@@ -276,18 +276,18 @@ typedef dirent DirEntryType;
 #define lstrcpy strcpy
 #define stricmp strcasecmp
 #define strupr SDL_strupr
-
+// error code numbers from original MS strcpy_s return value
 inline int strcpy_s(char *dest, size_t num, const char *source)
 {
     if(!num)
-        return 22;
+        return EINVAL;
     if(!dest)
-        return 22;
+        return EINVAL;
 
     if(!source)
     {
         dest[0] = '\0';
-        return 22;
+        return EINVAL;
     }
 
     size_t i;
@@ -297,7 +297,7 @@ inline int strcpy_s(char *dest, size_t num, const char *source)
             return 0;
     }
     dest[0] = '\0';
-    return 34;
+    return ERANGE;
 }
 
 template <std::size_t num>
@@ -314,7 +314,7 @@ inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t n
     }
 
     if (!dest || !source || (0 == dst_size))
-        return 22;
+        return EINVAL;
 
     size_t i, end;
     if(num < dst_size)
@@ -333,7 +333,7 @@ inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t n
 
     dest[0] = '\0';
 
-    return 22;
+    return EINVAL;
 }
 
 template <std::size_t dst_sz>
@@ -342,12 +342,12 @@ inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { re
 inline int strcat_s(char * dest, size_t num, const char * source)
 {
     if(!dest || (0 == num))
-        return 22;
+        return EINVAL;
 
     if(!source)
     {
         dest[0] = '\0';
-        return 22;
+        return EINVAL;
     }
 
     size_t i, j;
@@ -364,18 +364,18 @@ inline int strcat_s(char * dest, size_t num, const char * source)
     }
 
     dest[0] = '\0';
-    return 34;
+    return ERANGE;
 }
 
 inline int strncat_s(char * dest, size_t num, const char * source, size_t count)
 {
     if (!dest || (0 == num))
-        return 22;
+        return EINVAL;
 
     if (!source)
     {
         dest[0] = '\0';
-        return 22;
+        return EINVAL;
     }
 
     size_t i, j;
@@ -395,7 +395,7 @@ inline int strncat_s(char * dest, size_t num, const char * source, size_t count)
     }
 
     dest[0] = '\0';
-    return 34;
+    return ERANGE;
 }
 
 #define _vsnprintf vsnprintf
