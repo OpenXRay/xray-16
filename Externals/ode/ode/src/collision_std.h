@@ -58,9 +58,9 @@ int dCollideCapsulePlane (dxGeom *o1, dxGeom *o2, int flags,
 #ifdef __cplusplus
 extern "C" {
 #endif
-int dCollideRaySphere (dxGeom *o1, dxGeom *o2, int flags,
+ODE_API int dCollideRaySphere (dxGeom *o1, dxGeom *o2, int flags,
 		       dContactGeom *contact, int skip);
-int dCollideRayBox (dxGeom *o1, dxGeom *o2, int flags,
+ODE_API int dCollideRayBox (dxGeom *o1, dxGeom *o2, int flags,
 		    dContactGeom *contact, int skip);
 int dCollideRayCapsule (dxGeom *o1, dxGeom *o2,
 			  int flags, dContactGeom *contact, int skip);

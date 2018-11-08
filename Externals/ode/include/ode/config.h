@@ -44,6 +44,10 @@ extern "C" {
   #elif !defined(ODE_LIB)
     #define ODE_DLL_API __declspec(dllimport)
   #endif
+#else
+  #if defined(__GNUC__) && __GNUC__ >=4
+    #define ODE_API __attribute__ ((visibility("default")))
+  #endif
 #endif
     
 #if !defined(ODE_API)

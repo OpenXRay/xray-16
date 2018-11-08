@@ -39,8 +39,8 @@ transform is the identity.
 //****************************************************************************
 // externs
 
-extern "C" void dBodyAddTorque (dBodyID, dReal fx, dReal fy, dReal fz);
-extern "C" void dBodyAddForce (dBodyID, dReal fx, dReal fy, dReal fz);
+extern "C" ODE_API void dBodyAddTorque (dBodyID, dReal fx, dReal fy, dReal fz);
+extern "C" ODE_API void dBodyAddForce (dBodyID, dReal fx, dReal fy, dReal fz);
 const dReal min_stop_err				=					M_PI*0.03f;//0.1f;//
 const dReal min_ball_err				=					0.0f;//0.01f;
 const dReal hinge_min_err_exis_par		=					0.000f;//0.01f;
@@ -690,7 +690,7 @@ static void ballGetInfo2 (dxJointBall *joint, dxJoint::Info2 *info)
 }
 
 
-extern "C" void dJointSetBallAnchor (dxJointBall *joint,
+extern "C" ODE_API void dJointSetBallAnchor (dxJointBall *joint,
 				     dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -699,7 +699,7 @@ extern "C" void dJointSetBallAnchor (dxJointBall *joint,
 }
 
 
-extern "C" void dJointGetBallAnchor (dxJointBall *joint, dVector3 result)
+extern "C" ODE_API void dJointGetBallAnchor (dxJointBall *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -711,7 +711,7 @@ extern "C" void dJointGetBallAnchor (dxJointBall *joint, dVector3 result)
 }
 
 
-extern "C" void dJointGetBallAnchor2 (dxJointBall *joint, dVector3 result)
+extern "C" ODE_API void dJointGetBallAnchor2 (dxJointBall *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -892,7 +892,7 @@ static void hingeComputeInitialRelativeRotation (dxJointHinge *joint)
 }
 
 
-extern "C" void dJointSetHingeAnchor (dxJointHinge *joint,
+extern "C" ODE_API void dJointSetHingeAnchor (dxJointHinge *joint,
 				      dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -902,7 +902,7 @@ extern "C" void dJointSetHingeAnchor (dxJointHinge *joint,
 }
 
 
-extern "C" void dJointSetHingeAxis (dxJointHinge *joint,
+extern "C" ODE_API void dJointSetHingeAxis (dxJointHinge *joint,
 				    dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -912,7 +912,7 @@ extern "C" void dJointSetHingeAxis (dxJointHinge *joint,
 }
 
 
-extern "C" void dJointGetHingeAnchor (dxJointHinge *joint, dVector3 result)
+extern "C" ODE_API void dJointGetHingeAnchor (dxJointHinge *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -924,7 +924,7 @@ extern "C" void dJointGetHingeAnchor (dxJointHinge *joint, dVector3 result)
 }
 
 
-extern "C" void dJointGetHingeAnchor2 (dxJointHinge *joint, dVector3 result)
+extern "C" ODE_API void dJointGetHingeAnchor2 (dxJointHinge *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -936,7 +936,7 @@ extern "C" void dJointGetHingeAnchor2 (dxJointHinge *joint, dVector3 result)
 }
 
 
-extern "C" void dJointGetHingeAxis (dxJointHinge *joint, dVector3 result)
+extern "C" ODE_API void dJointGetHingeAxis (dxJointHinge *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -945,7 +945,7 @@ extern "C" void dJointGetHingeAxis (dxJointHinge *joint, dVector3 result)
 }
 
 
-extern "C" void dJointSetHingeParam (dxJointHinge *joint,
+extern "C" ODE_API void dJointSetHingeParam (dxJointHinge *joint,
 				     int parameter, dReal value)
 {
   dUASSERT(joint,"bad joint argument");
@@ -954,7 +954,7 @@ extern "C" void dJointSetHingeParam (dxJointHinge *joint,
 }
 
 
-extern "C" dReal dJointGetHingeParam (dxJointHinge *joint, int parameter)
+extern "C" ODE_API dReal dJointGetHingeParam (dxJointHinge *joint, int parameter)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dhinge_vtable,"joint is not a hinge");
@@ -962,7 +962,7 @@ extern "C" dReal dJointGetHingeParam (dxJointHinge *joint, int parameter)
 }
 
 
-extern "C" dReal dJointGetHingeAngle (dxJointHinge *joint)
+extern "C" ODE_API dReal dJointGetHingeAngle (dxJointHinge *joint)
 {
   dAASSERT(joint);
   dUASSERT(joint->vtable == &__dhinge_vtable,"joint is not a hinge");
@@ -978,7 +978,7 @@ extern "C" dReal dJointGetHingeAngle (dxJointHinge *joint)
 }
 
 
-extern "C" dReal dJointGetHingeAngleRate (dxJointHinge *joint)
+extern "C" ODE_API dReal dJointGetHingeAngleRate (dxJointHinge *joint)
 {
   dAASSERT(joint);
   dUASSERT(joint->vtable == &__dhinge_vtable,"joint is not a Hinge");
@@ -994,7 +994,7 @@ extern "C" dReal dJointGetHingeAngleRate (dxJointHinge *joint)
 }
 
 
-extern "C" void dJointAddHingeTorque (dxJointHinge *joint, dReal torque)
+extern "C" ODE_API void dJointAddHingeTorque (dxJointHinge *joint, dReal torque)
 {
   dVector3 axis;
   dAASSERT(joint);
@@ -1039,7 +1039,7 @@ static void sliderInit (dxJointSlider *j)
 }
 
 
-extern "C" dReal dJointGetSliderPosition (dxJointSlider *joint)
+extern "C" ODE_API dReal dJointGetSliderPosition (dxJointSlider *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dslider_vtable,"joint is not a slider");
@@ -1063,7 +1063,7 @@ extern "C" dReal dJointGetSliderPosition (dxJointSlider *joint)
 }
 
 
-extern "C" dReal dJointGetSliderPositionRate (dxJointSlider *joint)
+extern "C" ODE_API dReal dJointGetSliderPositionRate (dxJointSlider *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dslider_vtable,"joint is not a slider");
@@ -1181,7 +1181,7 @@ static void sliderGetInfo2 (dxJointSlider *joint, dxJoint::Info2 *info)
 }
 
 
-extern "C" void dJointSetSliderAxis (dxJointSlider *joint,
+extern "C" ODE_API void dJointSetSliderAxis (dxJointSlider *joint,
 				     dReal x, dReal y, dReal z)
 {
   int i;
@@ -1207,7 +1207,7 @@ extern "C" void dJointSetSliderAxis (dxJointSlider *joint,
 }
 
 
-extern "C" void dJointGetSliderAxis (dxJointSlider *joint, dVector3 result)
+extern "C" ODE_API void dJointGetSliderAxis (dxJointSlider *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -1216,7 +1216,7 @@ extern "C" void dJointGetSliderAxis (dxJointSlider *joint, dVector3 result)
 }
 
 
-extern "C" void dJointSetSliderParam (dxJointSlider *joint,
+extern "C" ODE_API void dJointSetSliderParam (dxJointSlider *joint,
 				      int parameter, dReal value)
 {
   dUASSERT(joint,"bad joint argument");
@@ -1225,7 +1225,7 @@ extern "C" void dJointSetSliderParam (dxJointSlider *joint,
 }
 
 
-extern "C" dReal dJointGetSliderParam (dxJointSlider *joint, int parameter)
+extern "C" ODE_API dReal dJointGetSliderParam (dxJointSlider *joint, int parameter)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dslider_vtable,"joint is not a slider");
@@ -1233,7 +1233,7 @@ extern "C" dReal dJointGetSliderParam (dxJointSlider *joint, int parameter)
 }
 
 
-extern "C" void dJointAddSliderForce (dxJointSlider *joint, dReal force)
+extern "C" ODE_API void dJointAddSliderForce (dxJointSlider *joint, dReal force)
 {
   dVector3 axis;
   dUASSERT(joint,"bad joint argument");
@@ -1634,7 +1634,7 @@ static void makeHinge2V1andV2 (dxJointHinge2 *joint)
 }
 
 
-extern "C" void dJointSetHinge2Anchor (dxJointHinge2 *joint,
+extern "C" ODE_API void dJointSetHinge2Anchor (dxJointHinge2 *joint,
 				       dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -1644,7 +1644,7 @@ extern "C" void dJointSetHinge2Anchor (dxJointHinge2 *joint,
 }
 
 
-extern "C" void dJointSetHinge2Axis1 (dxJointHinge2 *joint,
+extern "C" ODE_API void dJointSetHinge2Axis1 (dxJointHinge2 *joint,
 				      dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -1667,7 +1667,7 @@ extern "C" void dJointSetHinge2Axis1 (dxJointHinge2 *joint,
 }
 
 
-extern "C" void dJointSetHinge2Axis2 (dxJointHinge2 *joint,
+extern "C" ODE_API void dJointSetHinge2Axis2 (dxJointHinge2 *joint,
 				      dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -1690,7 +1690,7 @@ extern "C" void dJointSetHinge2Axis2 (dxJointHinge2 *joint,
 }
 
 
-extern "C" void dJointSetHinge2Param (dxJointHinge2 *joint,
+extern "C" ODE_API void dJointSetHinge2Param (dxJointHinge2 *joint,
 				      int parameter, dReal value)
 {
   dUASSERT(joint,"bad joint argument");
@@ -1706,7 +1706,7 @@ extern "C" void dJointSetHinge2Param (dxJointHinge2 *joint,
 }
 
 
-extern "C" void dJointGetHinge2Anchor (dxJointHinge2 *joint, dVector3 result)
+extern "C" ODE_API void dJointGetHinge2Anchor (dxJointHinge2 *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -1718,7 +1718,7 @@ extern "C" void dJointGetHinge2Anchor (dxJointHinge2 *joint, dVector3 result)
 }
 
 
-extern "C" void dJointGetHinge2Anchor2 (dxJointHinge2 *joint, dVector3 result)
+extern "C" ODE_API void dJointGetHinge2Anchor2 (dxJointHinge2 *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -1730,7 +1730,7 @@ extern "C" void dJointGetHinge2Anchor2 (dxJointHinge2 *joint, dVector3 result)
 }
 
 
-extern "C" void dJointGetHinge2Axis1 (dxJointHinge2 *joint, dVector3 result)
+extern "C" ODE_API void dJointGetHinge2Axis1 (dxJointHinge2 *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -1741,7 +1741,7 @@ extern "C" void dJointGetHinge2Axis1 (dxJointHinge2 *joint, dVector3 result)
 }
 
 
-extern "C" void dJointGetHinge2Axis2 (dxJointHinge2 *joint, dVector3 result)
+extern "C" ODE_API void dJointGetHinge2Axis2 (dxJointHinge2 *joint, dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(result,"bad result argument");
@@ -1752,7 +1752,7 @@ extern "C" void dJointGetHinge2Axis2 (dxJointHinge2 *joint, dVector3 result)
 }
 
 
-extern "C" dReal dJointGetHinge2Param (dxJointHinge2 *joint, int parameter)
+extern "C" ODE_API dReal dJointGetHinge2Param (dxJointHinge2 *joint, int parameter)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dhinge2_vtable,"joint is not a hinge2");
@@ -1767,7 +1767,7 @@ extern "C" dReal dJointGetHinge2Param (dxJointHinge2 *joint, int parameter)
 }
 
 
-extern "C" dReal dJointGetHinge2Angle1 (dxJointHinge2 *joint)
+extern "C" ODE_API dReal dJointGetHinge2Angle1 (dxJointHinge2 *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dhinge2_vtable,"joint is not a hinge2");
@@ -1776,7 +1776,7 @@ extern "C" dReal dJointGetHinge2Angle1 (dxJointHinge2 *joint)
 }
 
 
-extern "C" dReal dJointGetHinge2Angle1Rate (dxJointHinge2 *joint)
+extern "C" ODE_API dReal dJointGetHinge2Angle1Rate (dxJointHinge2 *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dhinge2_vtable,"joint is not a hinge2");
@@ -1791,7 +1791,7 @@ extern "C" dReal dJointGetHinge2Angle1Rate (dxJointHinge2 *joint)
 }
 
 
-extern "C" dReal dJointGetHinge2Angle2Rate (dxJointHinge2 *joint)
+extern "C" ODE_API dReal dJointGetHinge2Angle2Rate (dxJointHinge2 *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dhinge2_vtable,"joint is not a hinge2");
@@ -1806,7 +1806,7 @@ extern "C" dReal dJointGetHinge2Angle2Rate (dxJointHinge2 *joint)
 }
 
 
-extern "C" void dJointAddHinge2Torques (dxJointHinge2 *joint, dReal torque1, dReal torque2)
+extern "C" ODE_API void dJointAddHinge2Torques (dxJointHinge2 *joint, dReal torque1, dReal torque2)
 {
   dVector3 axis1, axis2;
   dUASSERT(joint,"bad joint argument");
@@ -2078,7 +2078,7 @@ static void universalComputeInitialRelativeRotations (dxJointUniversal *joint)
 }
 
 
-extern "C" void dJointSetUniversalAnchor (dxJointUniversal *joint,
+extern "C" ODE_API void dJointSetUniversalAnchor (dxJointUniversal *joint,
 					  dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2088,7 +2088,7 @@ extern "C" void dJointSetUniversalAnchor (dxJointUniversal *joint,
 }
 
 
-extern "C" void dJointSetUniversalAxis1 (dxJointUniversal *joint,
+extern "C" ODE_API void dJointSetUniversalAxis1 (dxJointUniversal *joint,
 					 dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2101,7 +2101,7 @@ extern "C" void dJointSetUniversalAxis1 (dxJointUniversal *joint,
 }
 
 
-extern "C" void dJointSetUniversalAxis2 (dxJointUniversal *joint,
+extern "C" ODE_API void dJointSetUniversalAxis2 (dxJointUniversal *joint,
 					 dReal x, dReal y, dReal z)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2114,7 +2114,7 @@ extern "C" void dJointSetUniversalAxis2 (dxJointUniversal *joint,
 }
 
 
-extern "C" void dJointGetUniversalAnchor (dxJointUniversal *joint,
+extern "C" ODE_API void dJointGetUniversalAnchor (dxJointUniversal *joint,
 					  dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2127,7 +2127,7 @@ extern "C" void dJointGetUniversalAnchor (dxJointUniversal *joint,
 }
 
 
-extern "C" void dJointGetUniversalAnchor2 (dxJointUniversal *joint,
+extern "C" ODE_API void dJointGetUniversalAnchor2 (dxJointUniversal *joint,
 					  dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2140,7 +2140,7 @@ extern "C" void dJointGetUniversalAnchor2 (dxJointUniversal *joint,
 }
 
 
-extern "C" void dJointGetUniversalAxis1 (dxJointUniversal *joint,
+extern "C" ODE_API void dJointGetUniversalAxis1 (dxJointUniversal *joint,
 					 dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2153,7 +2153,7 @@ extern "C" void dJointGetUniversalAxis1 (dxJointUniversal *joint,
 }
 
 
-extern "C" void dJointGetUniversalAxis2 (dxJointUniversal *joint,
+extern "C" ODE_API void dJointGetUniversalAxis2 (dxJointUniversal *joint,
 					 dVector3 result)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2166,7 +2166,7 @@ extern "C" void dJointGetUniversalAxis2 (dxJointUniversal *joint,
 }
 
 
-extern "C" void dJointSetUniversalParam (dxJointUniversal *joint,
+extern "C" ODE_API void dJointSetUniversalParam (dxJointUniversal *joint,
 				     int parameter, dReal value)
 {
   dUASSERT(joint,"bad joint argument");
@@ -2180,7 +2180,7 @@ extern "C" void dJointSetUniversalParam (dxJointUniversal *joint,
 }
 
 
-extern "C" dReal dJointGetUniversalParam (dxJointUniversal *joint, int parameter)
+extern "C" ODE_API dReal dJointGetUniversalParam (dxJointUniversal *joint, int parameter)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__duniversal_vtable,"joint is not a universal");
@@ -2193,7 +2193,7 @@ extern "C" dReal dJointGetUniversalParam (dxJointUniversal *joint, int parameter
 }
 
 
-extern "C" dReal dJointGetUniversalAngle1 (dxJointUniversal *joint)
+extern "C" ODE_API dReal dJointGetUniversalAngle1 (dxJointUniversal *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__duniversal_vtable,"joint is not a universal");
@@ -2204,7 +2204,7 @@ extern "C" dReal dJointGetUniversalAngle1 (dxJointUniversal *joint)
 }
 
 
-extern "C" dReal dJointGetUniversalAngle2 (dxJointUniversal *joint)
+extern "C" ODE_API dReal dJointGetUniversalAngle2 (dxJointUniversal *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__duniversal_vtable,"joint is not a universal");
@@ -2215,7 +2215,7 @@ extern "C" dReal dJointGetUniversalAngle2 (dxJointUniversal *joint)
 }
 
 
-extern "C" dReal dJointGetUniversalAngle1Rate (dxJointUniversal *joint)
+extern "C" ODE_API dReal dJointGetUniversalAngle1Rate (dxJointUniversal *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__duniversal_vtable,"joint is not a universal");
@@ -2236,7 +2236,7 @@ extern "C" dReal dJointGetUniversalAngle1Rate (dxJointUniversal *joint)
 }
 
 
-extern "C" dReal dJointGetUniversalAngle2Rate (dxJointUniversal *joint)
+extern "C" ODE_API dReal dJointGetUniversalAngle2Rate (dxJointUniversal *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__duniversal_vtable,"joint is not a universal");
@@ -2257,7 +2257,7 @@ extern "C" dReal dJointGetUniversalAngle2Rate (dxJointUniversal *joint)
 }
 
 
-extern "C" void dJointAddUniversalTorques (dxJointUniversal *joint, dReal torque1, dReal torque2)
+extern "C" ODE_API void dJointAddUniversalTorques (dxJointUniversal *joint, dReal torque1, dReal torque2)
 {
   dVector3 axis1, axis2;
   dAASSERT(joint);
@@ -2483,7 +2483,7 @@ static void amotorGetInfo2 (dxJointAMotor *joint, dxJoint::Info2 *info)
 }
 
 
-extern "C" void dJointSetAMotorNumAxes (dxJointAMotor *joint, int num)
+extern "C" ODE_API void dJointSetAMotorNumAxes (dxJointAMotor *joint, int num)
 {
   dAASSERT(joint && num >= 0 && num <= 3);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
@@ -2498,7 +2498,7 @@ extern "C" void dJointSetAMotorNumAxes (dxJointAMotor *joint, int num)
 }
 
 
-extern "C" void dJointSetAMotorAxis (dxJointAMotor *joint, int anum, int rel,
+extern "C" ODE_API void dJointSetAMotorAxis (dxJointAMotor *joint, int anum, int rel,
 				     dReal x, dReal y, dReal z)
 {
   dAASSERT(joint && anum >= 0 && anum <= 2 && rel >= 0 && rel <= 2);
@@ -2539,7 +2539,7 @@ extern "C" void dJointSetAMotorAxis (dxJointAMotor *joint, int anum, int rel,
 }
 
 
-extern "C" void dJointSetAMotorAngle (dxJointAMotor *joint, int anum,
+extern "C" ODE_API void dJointSetAMotorAngle (dxJointAMotor *joint, int anum,
 				      dReal angle)
 {
   dAASSERT(joint && anum >= 0 && anum < 3);
@@ -2552,7 +2552,7 @@ extern "C" void dJointSetAMotorAngle (dxJointAMotor *joint, int anum,
 }
 
 
-extern "C" void dJointSetAMotorParam (dxJointAMotor *joint, int parameter,
+extern "C" ODE_API void dJointSetAMotorParam (dxJointAMotor *joint, int parameter,
 				      dReal value)
 {
   dAASSERT(joint);
@@ -2565,7 +2565,7 @@ extern "C" void dJointSetAMotorParam (dxJointAMotor *joint, int parameter,
 }
 
 
-extern "C" void dJointSetAMotorMode (dxJointAMotor *joint, int mode)
+extern "C" ODE_API void dJointSetAMotorMode (dxJointAMotor *joint, int mode)
 {
   dAASSERT(joint);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
@@ -2577,7 +2577,7 @@ extern "C" void dJointSetAMotorMode (dxJointAMotor *joint, int mode)
 }
 
 
-extern "C" int dJointGetAMotorNumAxes (dxJointAMotor *joint)
+extern "C" ODE_API int dJointGetAMotorNumAxes (dxJointAMotor *joint)
 {
   dAASSERT(joint);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
@@ -2585,7 +2585,7 @@ extern "C" int dJointGetAMotorNumAxes (dxJointAMotor *joint)
 }
 
 
-extern "C" void dJointGetAMotorAxis (dxJointAMotor *joint, int anum,
+extern "C" ODE_API void dJointGetAMotorAxis (dxJointAMotor *joint, int anum,
 				     dVector3 result)
 {
   dAASSERT(joint && anum >= 0 && anum < 3);
@@ -2608,7 +2608,7 @@ extern "C" void dJointGetAMotorAxis (dxJointAMotor *joint, int anum,
 }
 
 
-extern "C" int dJointGetAMotorAxisRel (dxJointAMotor *joint, int anum)
+extern "C" ODE_API int dJointGetAMotorAxisRel (dxJointAMotor *joint, int anum)
 {
   dAASSERT(joint && anum >= 0 && anum < 3);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
@@ -2618,7 +2618,7 @@ extern "C" int dJointGetAMotorAxisRel (dxJointAMotor *joint, int anum)
 }
 
 
-extern "C" dReal dJointGetAMotorAngle (dxJointAMotor *joint, int anum)
+extern "C" ODE_API dReal dJointGetAMotorAngle (dxJointAMotor *joint, int anum)
 {
   dAASSERT(joint && anum >= 0 && anum < 3);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
@@ -2628,7 +2628,7 @@ extern "C" dReal dJointGetAMotorAngle (dxJointAMotor *joint, int anum)
 }
 
 
-extern "C" dReal dJointGetAMotorAngleRate (dxJointAMotor *joint, int anum)
+extern "C" ODE_API dReal dJointGetAMotorAngleRate (dxJointAMotor *joint, int anum)
 {
   // @@@
   dDebug (0,"not yet implemented");
@@ -2636,7 +2636,7 @@ extern "C" dReal dJointGetAMotorAngleRate (dxJointAMotor *joint, int anum)
 }
 
 
-extern "C" dReal dJointGetAMotorParam (dxJointAMotor *joint, int parameter)
+extern "C" ODE_API dReal dJointGetAMotorParam (dxJointAMotor *joint, int parameter)
 {
   dAASSERT(joint);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
@@ -2648,7 +2648,7 @@ extern "C" dReal dJointGetAMotorParam (dxJointAMotor *joint, int parameter)
 }
 
 
-extern "C" int dJointGetAMotorMode (dxJointAMotor *joint)
+extern "C" ODE_API int dJointGetAMotorMode (dxJointAMotor *joint)
 {
   dAASSERT(joint);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
@@ -2656,7 +2656,7 @@ extern "C" int dJointGetAMotorMode (dxJointAMotor *joint)
 }
 
 
-extern "C" void dJointAddAMotorTorques (dxJointAMotor *joint, dReal torque1, dReal torque2, dReal torque3)
+extern "C" ODE_API void dJointAddAMotorTorques (dxJointAMotor *joint, dReal torque1, dReal torque2, dReal torque3)
 {
   dVector3 axes[3];
   dAASSERT(joint);
@@ -2752,7 +2752,7 @@ static void fixedGetInfo2 (dxJointFixed *joint, dxJoint::Info2 *info)
 }
 
 
-extern "C" void dJointSetFixed (dxJointFixed *joint)
+extern "C" ODE_API void dJointSetFixed (dxJointFixed *joint)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dfixed_vtable,"joint is not fixed");
@@ -2778,7 +2778,7 @@ extern "C" void dJointSetFixed (dxJointFixed *joint)
   }
 }
 
-extern "C" void dJointSetFixedQuaternionPos (dxJointFixed *joint,dQuaternion quaternion,dReal* pos)
+extern "C" ODE_API void dJointSetFixedQuaternionPos (dxJointFixed *joint,dQuaternion quaternion,dReal* pos)
 {
   dUASSERT(joint,"bad joint argument");
   dUASSERT(joint->vtable == &__dfixed_vtable,"joint is not fixed");
