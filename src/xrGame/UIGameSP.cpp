@@ -93,6 +93,11 @@ void CUIGameSP::OnFrame()
     }
 }
 
+void CUIGameSP::OnUIReset()
+{
+    ReinitDialogs();
+}
+
 bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
 {
     if (inherited::IR_UIOnKeyboardPress(dik))

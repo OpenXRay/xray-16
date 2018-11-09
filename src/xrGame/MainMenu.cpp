@@ -148,12 +148,10 @@ CMainMenu::CMainMenu()
     }
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 1000);
-    Device.seqResolutionChanged.Add(this);
 }
 
 CMainMenu::~CMainMenu()
 {
-    Device.seqResolutionChanged.Remove(this);
     Device.seqFrame.Remove(this);
 
     xr_delete(g_btnHint);
@@ -765,8 +763,9 @@ void CMainMenu::OnDeviceReset()
         SetNeedVidRestart();
 }
 
-void CMainMenu::OnScreenResolutionChanged()
+void CMainMenu::OnUIReset()
 {
+    CUIXmlInitBase::InitColorDefs();
     ReadTextureInfo();
     ReloadUI();
 }

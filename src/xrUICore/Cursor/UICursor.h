@@ -2,7 +2,7 @@
 
 class CUIStatic;
 
-class XRUICORE_API CUICursor : public pureRender, public pureScreenResolutionChanged
+class XRUICORE_API CUICursor : public pureRender, public CUIResetAndResolutionNotifier
 {
     bool bVisible;
     Fvector2 vPos;
@@ -21,7 +21,8 @@ public:
     Fvector2 GetCursorPosition();
     void SetUICursorPosition(Fvector2 pos);
     void UpdateCursorPosition(int _dx, int _dy);
-    virtual void OnScreenResolutionChanged();
+
+    void OnUIReset() override;
 
     bool IsVisible() { return bVisible; }
     void Show();

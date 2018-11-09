@@ -96,7 +96,6 @@ CConsole::CConsole() : m_hShader_back(NULL)
     m_cmd_history_max = cmd_history_max;
     m_disable_tips = false;
     Register_callbacks();
-    Device.seqResolutionChanged.Add(this);
 }
 
 void CConsole::Initialize()
@@ -134,7 +133,6 @@ CConsole::~CConsole()
     xr_delete(m_hShader_back);
     xr_delete(m_editor);
     Destroy();
-    Device.seqResolutionChanged.Remove(this);
 }
 
 void CConsole::Destroy()
@@ -203,7 +201,7 @@ void CConsole::OutFont(LPCSTR text, float& pos_y)
     }
 }
 
-void CConsole::OnScreenResolutionChanged()
+void CConsole::OnUIReset()
 {
     xr_delete(pFont);
     xr_delete(pFont2);

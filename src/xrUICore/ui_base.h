@@ -9,14 +9,6 @@
 class CUICursor;
 class CUIGameCustom;
 
-class CDeviceResetNotifier : public pureDeviceReset
-{
-public:
-    CDeviceResetNotifier() { Device.seqDeviceReset.Add(this, REG_PRIORITY_NORMAL); };
-    virtual ~CDeviceResetNotifier() { Device.seqDeviceReset.Remove(this); };
-    virtual void OnDeviceReset(){};
-};
-
 class XRUICORE_API UICore : public CDeviceResetNotifier
 {
     C2DFrustum m_2DFrustum;

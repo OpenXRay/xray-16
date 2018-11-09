@@ -51,7 +51,8 @@ public:
     void SetHitmarkType(LPCSTR tex_name);
     void SetGrenadeMarkType(LPCSTR tex_name);
 
-    virtual void OnScreenResolutionChanged();
+    void OnUIReset() override;
+
     virtual void Load();
     virtual void OnDisconnected();
     virtual void OnConnected();

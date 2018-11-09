@@ -1039,15 +1039,13 @@ bool CUIXmlInitBase::InitAlignment(CUIXml& xml_doc, const char* path, int index,
 
 void CUIXmlInitBase::InitColorDefs()
 {
-    if (NULL != m_pColorDefs)
-        return;
-
-    m_pColorDefs = new ColorDefs();
+    if (!m_pColorDefs)
+        m_pColorDefs = new ColorDefs();
 
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, COLOR_DEFINITIONS);
 
-    int num = uiXml.GetNodesNum("colors", 0, "color");
+    const int num = uiXml.GetNodesNum("colors", 0, "color");
 
     shared_str name;
     int r, b, g, a;

@@ -203,6 +203,7 @@ public:
 
     MessageRegistry<pureFrame> seqFrameMT;
     MessageRegistry<pureDeviceReset> seqDeviceReset;
+    MessageRegistry<pureUIReset> seqUIReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
     CSecondVPParams m_SecondViewport; //--#SM+#-- +SecondVP+
 
@@ -346,5 +347,40 @@ public:
     bool b_need_user_input;
 };
 extern ENGINE_API CLoadScreenRenderer load_screen_renderer;
+
+class CDeviceResetNotifier : public pureDeviceReset
+{
+public:
+    CDeviceResetNotifier() { Device.seqDeviceReset.Add(this, REG_PRIORITY_NORMAL); }
+    virtual ~CDeviceResetNotifier() { Device.seqDeviceReset.Remove(this); }
+    void OnDeviceReset() override {}
+};
+
+class CUIResetNotifier : public pureUIReset
+{
+public:
+    CUIResetNotifier() { Device.seqUIReset.Add(this, REG_PRIORITY_NORMAL); }
+    virtual ~CUIResetNotifier() { Device.seqUIReset.Remove(this); }
+    void OnUIReset() override {}
+};
+
+class CUIResetAndResolutionNotifier : public pureUIReset, pureScreenResolutionChanged
+{
+public:
+    CUIResetAndResolutionNotifier()
+    {
+        Device.seqUIReset.Add(this, REG_PRIORITY_NORMAL);
+        Device.seqResolutionChanged.Add(this, REG_PRIORITY_NORMAL);
+    }
+
+    virtual ~CUIResetAndResolutionNotifier()
+    {
+        Device.seqUIReset.Remove(this);
+        Device.seqResolutionChanged.Remove(this);
+    }
+
+    void OnUIReset() override {}
+    void OnScreenResolutionChanged() override { OnUIReset(); }
+};
 
 #endif

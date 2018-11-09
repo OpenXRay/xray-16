@@ -77,7 +77,7 @@ private:
 
 extern CMapListHelper gMapListHelper;
 
-class CUIGameCustom : public FactoryObjectBase, public CDialogHolder
+class CUIGameCustom : public FactoryObjectBase, public CDialogHolder, public CUIResetNotifier
 {
 protected:
     CUIWindow* Window;

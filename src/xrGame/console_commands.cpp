@@ -1325,9 +1325,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        Device.seqResolutionChanged.Process();
-        if (g_pGamePersistent && g_pGameLevel && Level().game)
-            CurrentGameUI()->ReinitDialogs();
+        Device.seqUIReset.Process();
     }
 };
 

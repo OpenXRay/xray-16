@@ -16,17 +16,15 @@ CUICursor::CUICursor() : m_static(NULL), m_b_use_win_cursor(false)
     vPos.set(0.f, 0.f);
     InitInternal();
     Device.seqRender.Add(this, -3 /*2*/);
-    Device.seqResolutionChanged.Add(this);
 }
 //--------------------------------------------------------------------
 CUICursor::~CUICursor()
 {
     xr_delete(m_static);
     Device.seqRender.Remove(this);
-    Device.seqResolutionChanged.Remove(this);
 }
 
-void CUICursor::OnScreenResolutionChanged()
+void CUICursor::OnUIReset()
 {
     xr_delete(m_static);
     InitInternal();

@@ -227,7 +227,7 @@ void CHUDManager::Load()
     }
 }
 
-void CHUDManager::OnScreenResolutionChanged()
+void CHUDManager::OnUIReset()
 {
     pUIGame->HideShownDialogs();
 
