@@ -46,6 +46,20 @@ void CRenderTarget::phase_combine()
 
     //*** exposure-pipeline
     u32 gpu_id = Device.dwFrame % HW.Caps.iGPUNum;
+	// TODO: Uncomment this and test in the game
+	/*
+    if (Device.m_SecondViewport.IsSVPActive()) //--#SM+#-- +SecondVP+
+    {
+        // clang-format off
+        gpu_id = (Device.dwFrame - 1) % HW.Caps.iGPUNum;	// Фикс "мерцания" tonemapping (HDR) после выключения двойного рендера. 
+                                                            // Побочный эффект - при работе двойного рендера скорость изменения tonemapping (HDR) падает в два раза
+                                                            // Мерцание связано с тем, что HDR для своей работы хранит уменьшенние копии "прошлых кадров"
+                                                            // Эти кадры относительно похожи друг на друга, однако при включенном двойном рендере
+                                                            // в половине кадров оказывается картинка из второго рендера, и поскольку она часто может отличатся по цвету\яркости
+                                                            // то при попытке создания "плавного" перехода между ними получается эффект мерцания
+        // clang-format on
+    }*/
+
     {
         t_LUM_src->surface_set(GL_TEXTURE_2D, rt_LUM_pool[gpu_id * 2 + 0]->pRT);
         t_LUM_dest->surface_set(GL_TEXTURE_2D, rt_LUM_pool[gpu_id * 2 + 1]->pRT);
@@ -67,12 +81,16 @@ void CRenderTarget::phase_combine()
             phase_ssao();
     }
 
+	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     // low/hi RTs
     if (!RImplementation.o.dx10_msaa)
+    {
+        HW.pDevice->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
+        HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
         u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
+    }
     else
     {
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
         HW.pDevice->ClearRenderTargetView(rt_Generic_0_r->pRT, ColorRGBA);
         HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
         u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);

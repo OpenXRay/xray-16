@@ -27,6 +27,9 @@ public:
         C.r_Sampler_clf("s_sky0", "$null");
         C.r_Sampler_clf("s_sky1", "$null");
         C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
+#ifdef USE_OGL
+        C.PassSET_ZB(FALSE, FALSE);
+#endif // USE_OGL
 #endif //	USE_DX10
         C.r_End();
     }
