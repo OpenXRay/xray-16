@@ -26,6 +26,14 @@ void CSoundRender_Emitter::set_frequency(float scale)
         fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * psSoundTimeFactor));
 }
 
+// Перемотка звука на заданную секунду [rewind snd to target time] --#SM+#--
+void CSoundRender_Emitter::set_time(float t)
+{
+    VERIFY2(get_length_sec() >= t, "set_time: time is bigger than length of sound");
+    clamp(t, 0.0f, get_length_sec());
+    fTimeToRewind = t;
+}
+
 CSoundRender_Emitter::CSoundRender_Emitter()
 {
 #ifdef DEBUG
@@ -51,6 +59,7 @@ CSoundRender_Emitter::CSoundRender_Emitter()
     fTimeStarted = 0.0f;
     fTimeToStop = 0.0f;
     fTimeToPropagade = 0.0f;
+    fTimeToRewind = 0.0f; //--#SM+#--
     marker = 0xabababab;
     starting_delay = 0.f;
     priority_scale = 1.f;

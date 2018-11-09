@@ -204,6 +204,41 @@ void CSoundRender_Emitter::update(float dt)
         break;
     }
 
+	//--#SM+# Begin--
+    // hard rewind
+    switch (m_current_state)
+    {
+    case stStarting:
+    case stStartingLooped:
+    case stPlaying:
+    case stSimulating:
+    case stPlayingLooped:
+    case stSimulatingLooped:
+        if (fTimeToRewind > 0.0f)
+        {
+            float fLength = get_length_sec();
+            bool bLooped = (fTimeToStop == 0xffffffff);
+
+            R_ASSERT2(fLength >= fTimeToRewind, "set_time: target time is bigger than length of sound");
+
+            fTimeStarted = SoundRender->fTimer_Value; //--> Когда начали проигрывать звук [when sound started]
+            fTimeToPropagade = fTimeStarted;
+
+            if (!bLooped)
+            {
+                fTimeToStop = fTimeStarted + (fLength - fTimeToRewind); //--> Пересчитываем время, когда звук должен остановиться [recalculate stop time]
+            }
+
+            float fTimeToStart = fTimeStarted + fTimeToRewind;
+
+            u32 ptr = calc_cursor(fTimeStarted, fTimeToStart, fLength, source()->m_wformat);
+            set_cursor(ptr);
+            fTimeToRewind = 0.0f;
+        }
+    default: break;
+    }
+    //--#SM+# End--
+
     // if deffered stop active and volume==0 -> physically stop sound
     if (bStopping && fis_zero(fade_volume))
         i_stop();
