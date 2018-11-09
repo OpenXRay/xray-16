@@ -664,7 +664,6 @@ void player_hud::update_inertion(Fmatrix& trans)
 
         // clamp by PI_DIV_2
         Fvector last;
-        last.set(0,0,0);
         last.normalize_safe(st_last_dir);
         float dot = last.dotproduct(xform.k);
         if (dot < EPS)
