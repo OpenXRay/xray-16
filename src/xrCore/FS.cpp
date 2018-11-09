@@ -86,6 +86,7 @@ void VerifyPath(pcstr path)
             continue;
         CopyMemory(tmp, path, i);
         tmp[i] = 0;
+        convert_path_separators(tmp);
         _mkdir(tmp);
     }
 }

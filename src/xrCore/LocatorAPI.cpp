@@ -1696,9 +1696,9 @@ void CLocatorAPI::file_rename(pcstr src, pcstr dest, bool overwrite)
         m_files.insert(new_desc);
 
         // physically rename file
+        VerifyPath(dest);
         pstr conv_dest = xr_strdup(dest);
         convert_path_separators(conv_dest);
-        VerifyPath(conv_dest);
         rename(src, conv_dest);
         xr_free(conv_dest);
     }

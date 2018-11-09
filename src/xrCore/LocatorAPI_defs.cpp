@@ -52,7 +52,6 @@ FS_Path::FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt, LPCSTR _FilterCaptio
     m_Flags.assign(flags);
 #ifdef _EDITOR
     // Editor(s)/User(s) wants pathes already created in "real" file system :)
-    convert_path_separators(m_Path);
     VerifyPath(m_Path);
 #endif
 }

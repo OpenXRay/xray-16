@@ -438,11 +438,7 @@ inline int _filelength(int fd)
 #define _read read
 #define _set_new_handler std::set_new_handler
 #define _finite isfinite
-inline int _mkdir(const char *dir)
-{
-    while (char* sep = strchr((char *)dir, '\\')) *sep = '/';
-    return mkdir(dir, S_IRWXU);
-}
+inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 
 #define _wtoi(arg) wcstol(arg, NULL, 10)
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
