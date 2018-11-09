@@ -37,21 +37,22 @@ void initialize_bindings()
 
 void remap_keys()
 {
-    int idx = 0;
     string128 buff;
     // Log("Keys remap:");
-    while (keyboards[idx].key_name)
+    for (int idx = 0; keyboards[idx].key_name; ++idx)
     {
         buff[0] = 0;
         _keyboard& kb = keyboards[idx];
-        const bool res = pInput->get_dik_name(kb.dik, buff, sizeof(buff));
-        if (res)
+        if (pInput->get_dik_name(kb.dik, buff, sizeof(buff)))
             kb.key_local_name = buff;
-        else if (kb.key_local_name.empty())
-            kb.key_local_name = kb.key_name;
+        else
+        {
+            Msg("! Can't find a key name for %s", kb.key_name);
+            if (kb.key_local_name.empty())
+                kb.key_local_name = kb.key_name;
+        }
 
         // Msg("[%s]-[%s]", kb.key_name, kb.key_local_name.c_str());
-        ++idx;
     }
 }
 
