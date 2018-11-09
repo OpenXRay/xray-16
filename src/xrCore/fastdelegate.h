@@ -52,7 +52,6 @@
 #endif // _MSC_VER > 1000
 
 #include <memory.h> // to allow <,> comparisons
-#include <cassert>
 
 //////////////////////////////////////////////////
 #define xr_stdcall __stdcall
