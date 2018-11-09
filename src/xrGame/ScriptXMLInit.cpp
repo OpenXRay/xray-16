@@ -39,6 +39,12 @@ void _attach_child(CUIWindow* _child, CUIWindow* _parent)
 }
 
 void CScriptXmlInit::ParseFile(LPCSTR xml_file) { m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_file); }
+
+void CScriptXmlInit::ParseShTexInfo(pcstr xml_file)
+{
+    CUITextureMaster::ParseShTexInfo(xml_file);
+}
+
 void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd)
 {
     CUIXmlInit::InitWindow(m_xml, path, index, pWnd);
@@ -251,6 +257,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (), {
     module(luaState)[class_<CScriptXmlInit>("CScriptXmlInit")
                          .def(constructor<>())
                          .def("ParseFile", &CScriptXmlInit::ParseFile)
+                         .def("ParseShTexInfo", &CScriptXmlInit::ParseShTexInfo)
                          .def("InitWindow", &CScriptXmlInit::InitWindow)
                          .def("InitFrame", &CScriptXmlInit::InitFrame)
                          .def("InitFrameLine", &CScriptXmlInit::InitFrameLine)

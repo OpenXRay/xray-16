@@ -33,6 +33,7 @@ class CScriptXmlInit
 {
 public:
     void ParseFile(LPCSTR xml_file);
+    void ParseShTexInfo(pcstr xml_file);
     void InitWindow(LPCSTR path, int index, CUIWindow* pWnd);
     CUIFrameWindow* InitFrame(LPCSTR path, CUIWindow* parent);
     CUIFrameLineWnd* InitFrameLine(LPCSTR path, CUIWindow* parent);

@@ -70,6 +70,32 @@ void CUITextureMaster::ParseShTexInfo(pcstr path, pcstr xml_file)
     }
 }
 
+void CUITextureMaster::ParseShTexInfo(pcstr xml_file)
+{
+    CUIXml xml;
+    xml.Load(CONFIG_PATH, UI_PATH, xml_file);
+    const shared_str file = xml.Read("file_name", 0, "");
+
+    const int num = xml.GetNodesNum("", 0, "texture");
+    for (int i = 0; i < num; i++)
+    {
+        TEX_INFO info;
+
+        info.file = file;
+
+        info.rect.x1 = xml.ReadAttribFlt("texture", i, "x");
+        info.rect.x2 = xml.ReadAttribFlt("texture", i, "width") + info.rect.x1;
+        info.rect.y1 = xml.ReadAttribFlt("texture", i, "y");
+        info.rect.y2 = xml.ReadAttribFlt("texture", i, "height") + info.rect.y1;
+        shared_str id = xml.ReadAttrib("texture", i, "id");
+
+        if (m_textures.find(id) == m_textures.end())
+            m_textures.emplace(id, info);
+        else
+            m_textures[id] = info;
+    }
+}
+
 bool CUITextureMaster::IsSh(const shared_str& texture_name)
 {
     return strstr(texture_name.c_str(), DELIMITER) ? false : true;
