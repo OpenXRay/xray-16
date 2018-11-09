@@ -161,7 +161,8 @@ void CTexture::Load()
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
-    if (0 == *cName) return;
+    if (nullptr == *cName)
+        return;
     if (0 == xr_stricmp(*cName, "$null")) return;
     if (nullptr != strstr(*cName, "$user$"))
     {
