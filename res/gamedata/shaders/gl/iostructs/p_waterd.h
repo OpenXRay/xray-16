@@ -1,5 +1,6 @@
 
 out vec4 SV_Target;
+in vec4 gl_FragCoord;
 
 struct v2p
 {
@@ -9,6 +10,7 @@ struct v2p
 #if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 	float4  tctexgen; // TEXCOORD3;
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
+	float4  hpos	;	// SV_Position;
 };
 
 layout(location = TEXCOORD0) 		in float2	v2p_waterd_tbase		; // TEXCOORD0;
@@ -29,5 +31,6 @@ void main()
 #if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 	I.tctexgen	= v2p_waterd_tctexgen;
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
+	I.hpos	= gl_FragCoord;
 	SV_Target	= _main (I);
 }
