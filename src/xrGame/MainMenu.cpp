@@ -189,15 +189,7 @@ void CMainMenu::ReadTextureInfo()
 
     const auto ParseFileSet = [&]()
     {
-        /*
-         * Original CoP textures_descr
-         * loading time:
-         * Single-threaded ~80 ms
-         * Multi-threaded  ~40 ms
-         * Just a bit of speedup
-        */
-//        tbb::parallel_for_each(files, [](const FS_File& file) // Cause memory corruption (detected by Valgrind)
-        std::for_each(files.begin(), files.end(), [](const FS_File& file)
+        for (const auto& file : files)
         {
             string_path path, name;
             _splitpath(file.name.c_str(), nullptr, path, name, nullptr);
@@ -205,7 +197,7 @@ void CMainMenu::ReadTextureInfo()
             path[xr_strlen(path) - 1] = '\0'; // cut the latest '\\'
 
             CUITextureMaster::ParseShTexInfo(path, name);
-        });
+        }
     };
 
     UpdateFileSet(UI_PATH_DEFAULT);
