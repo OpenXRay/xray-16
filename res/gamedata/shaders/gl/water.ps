@@ -69,10 +69,10 @@ float4 _main( v2p I )
 	float4	leaves		= tex2D (s_leaves, I.tbase);
 		leaves.rgb	*= water_intensity.r;
 
-	float	calc_cos	= -dot(float3(I.M1.z, I.M2.z, I.M3.z), normalize(v2point));
+	float	calc_cos	= -dot(I.M3, normalize(v2point));
 	float	calc_depth	= saturate(waterDepth*calc_cos);
-	float	fLeavesFactor	= smoothstep(0.025, 0.05, calc_depth);
-		fLeavesFactor	*= smoothstep(0.1, 0.075, calc_depth);
+	float	fLeavesFactor	= smoothstep(0.025f, 0.05f, calc_depth);
+		fLeavesFactor	*= smoothstep(0.1f, 0.075f, calc_depth);
 		final		= lerp(final, leaves.rgb, leaves.a*fLeavesFactor);
 		alpha		= lerp(alpha, leaves.a, leaves.a*fLeavesFactor);
 
