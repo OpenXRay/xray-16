@@ -19,8 +19,8 @@
 IRender_Mesh::~IRender_Mesh()
 {
 #ifdef USE_OGL
-	GLuint buffers[] = { p_rm_Vertices, p_rm_Indices };
-	glDeleteBuffers(2, buffers);
+    GLuint buffers[] = { p_rm_Vertices, p_rm_Indices };
+    glDeleteBuffers(2, buffers);
 #else
     _RELEASE(p_rm_Vertices);
     _RELEASE(p_rm_Indices);

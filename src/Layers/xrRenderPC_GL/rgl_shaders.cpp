@@ -39,13 +39,8 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
         // Create path to included shader
         strconcat(sizeof path, path, GEnv.Render->getShaderPath(), fn);
         FS.update_path(path, "$game_shaders$", path);
-#if defined(WINDOWS)
         while (char* sep = strchr(path, '/'))
             *sep = '\\';
-#else
-        while (char* sep = strchr(path, '\\'))
-            *sep = '/';
-#endif
 
         // Open and read file, recursively load includes
         IReader* R = FS.r_open(path);

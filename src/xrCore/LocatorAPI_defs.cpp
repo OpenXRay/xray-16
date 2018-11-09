@@ -17,17 +17,11 @@
 //////////////////////////////////////////////////////////////////////
 FS_File::FS_File(const xr_string& nm, long sz, time_t modif, unsigned attr) { set(nm, sz, modif, attr); }
 FS_File::FS_File(const xr_string& nm) { set(nm, 0, 0, 0); }
-#if defined(WINDOWS)
 FS_File::FS_File(const _FINDDATA_T& f) { set(f.name, f.size, f.time_write, (f.attrib & _A_SUBDIR) ? flSubDir : 0); }
 FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f)
 {
     set(nm, f.size, f.time_write, (f.attrib & _A_SUBDIR) ? flSubDir : 0);
 }
-#else
-FS_File::FS_File(const _FINDDATA_T& f) {}
-FS_File::FS_File(const xr_string& nm, const _FINDDATA_T& f) {}
-#endif
-
 
 void FS_File::set(const xr_string& nm, long sz, time_t modif, unsigned attr)
 {
@@ -47,15 +41,9 @@ FS_Path::FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt, LPCSTR _FilterCaptio
     xr_strcpy(temp, sizeof(temp), _Root);
     if (_Add)
         xr_strcat(temp, _Add);
-#if defined(LINUX)
-    char *ptr = strchr(temp, '\\');
-    while (ptr) {
-        *ptr = _DELIMITER;
-        ptr = strchr(ptr, '\\');
-    }
-#endif
-    if (temp[0] && temp[xr_strlen(temp) - 1] != _DELIMITER)
+    if (temp[0] && temp[xr_strlen(temp) - 1] != _DELIMITER && temp[xr_strlen(temp) - 1] != '/')
         xr_strcat(temp, DELIMITER);
+    restore_path_separators(temp);
     m_Path = xr_strdup(temp);
     m_DefExt = _DefExt ? xr_strdup(_DefExt) : 0;
     m_FilterCaption = _FilterCaption ? xr_strlwr(xr_strdup(_FilterCaption)) : 0;

@@ -29,5 +29,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "
 cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath ${SDL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath GameSpy ${SDL_LIBRARIES})
 xr_install(${PROJECT_NAME})

@@ -6,7 +6,7 @@
 #define EXCEPTION_EXECUTE_HANDLER	1
 #define EXCEPTION_CONTINUE_SEARCH	0
 
-int _cdecl _resetstkoflw(void);
+int _cdecl XRCORE_API _resetstkoflw(void);
 #endif
 
 #if 1//ndef _EDITOR

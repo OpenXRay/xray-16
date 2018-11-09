@@ -512,10 +512,10 @@ ODE_API dBodyID dBodyCreate (dWorldID);
  */
 ODE_API void dBodyDestroy (dBodyID);
 
-void dWorldAddBody     (dWorldID,dBodyID); // X-Ray custom probably
-void dWorldAddJoint    (dWorldID,dJointID); // X-Ray custom probably
-void dWorldRemoveBody  (dWorldID,dBodyID); // X-Ray custom probably
-void dWorldRemoveJoint (dWorldID,dJointID); // X-Ray custom probably
+ODE_API void dWorldAddBody     (dWorldID,dBodyID); // X-Ray custom probably
+ODE_API void dWorldAddJoint    (dWorldID,dJointID); // X-Ray custom probably
+ODE_API void dWorldRemoveBody  (dWorldID,dBodyID); // X-Ray custom probably
+ODE_API void dWorldRemoveJoint (dWorldID,dJointID); // X-Ray custom probably
 
 /**
  * @brief Set the body's user-data pointer.
@@ -989,7 +989,7 @@ ODE_API dJointID dJointCreateSlider (dWorldID, dJointGroupID);
  * If it is nonzero the joint is allocated in the given joint group.
  */
 ODE_API dJointID dJointCreateContact (dWorldID, dJointGroupID, const dContact *);
-dJointID dJointCreateContactSpecial (dWorldID, dJointGroupID, const dContact *); // XXX: GSC custom?
+ODE_API dJointID dJointCreateContactSpecial (dWorldID, dJointGroupID, const dContact *); // XXX: GSC custom?
 
 /**
  * @brief Create a new joint of the hinge2 type.

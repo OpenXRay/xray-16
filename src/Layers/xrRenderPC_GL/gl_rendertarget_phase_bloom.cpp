@@ -71,7 +71,7 @@ void CRenderTarget::phase_bloom()
     u32 Offset;
 
     // Targets
-    u_setrt(rt_Bloom_1,NULL,NULL,NULL); // No need for ZBuffer at all
+    u_setrt(rt_Bloom_1, 0, 0, 0); // No need for ZBuffer at all
     //RImplementation.rmNormal();
 
     // Clear	- don't clear - it's stupid here :)
@@ -187,12 +187,12 @@ void CRenderTarget::phase_bloom()
         RCache.set_Geometry(g_bloom_build);
 
         // P0
-        u_setrt(rt_Bloom_2,NULL,NULL,NULL); // No need for ZBuffer at all
+        u_setrt(rt_Bloom_2, 0, 0, 0); // No need for ZBuffer at all
         RCache.set_Element(s_bloom->E[3]);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
         // P1
-        u_setrt(rt_Bloom_1,NULL,NULL,NULL); // No need for ZBuffer at all
+        u_setrt(rt_Bloom_1, 0, 0, 0); // No need for ZBuffer at all
         RCache.set_Element(s_bloom->E[4]);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
@@ -271,7 +271,7 @@ void CRenderTarget::phase_bloom()
             Fvector4 w0, w1;
             float kernel = ps_r2_ls_bloom_kernel_g;
             CalcGauss_wave(w0, w1, kernel, kernel / 3.f, ps_r2_ls_bloom_kernel_scale);
-            u_setrt(rt_Bloom_2,NULL,NULL,NULL); // No need for ZBuffer at all
+            u_setrt(rt_Bloom_2, 0, 0, 0); // No need for ZBuffer at all
             RCache.set_Element(s_bloom->E[1]);
             RCache.set_ca("weight", 0, w0);
             RCache.set_ca("weight", 1, w1);
@@ -351,7 +351,7 @@ void CRenderTarget::phase_bloom()
             Fvector4 w0, w1;
             float kernel = ps_r2_ls_bloom_kernel_g * float(Device.dwHeight) / float(Device.dwWidth);
             CalcGauss_wave(w0, w1, kernel, kernel / 3.f, ps_r2_ls_bloom_kernel_scale);
-            u_setrt(rt_Bloom_1,NULL,NULL,NULL); // No need for ZBuffer at all
+            u_setrt(rt_Bloom_1, 0, 0, 0); // No need for ZBuffer at all
             RCache.set_Element(s_bloom->E[2]);
             RCache.set_ca("weight", 0, w0);
             RCache.set_ca("weight", 1, w1);

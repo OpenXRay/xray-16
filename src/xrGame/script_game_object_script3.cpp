@@ -8,6 +8,7 @@
 
 #include "pch_script.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "alife_space.h"
 #include "script_entity_space.h"
 #include "movement_manager_space.h"

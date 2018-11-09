@@ -27,21 +27,24 @@ public:
         R_ASSERT(name && name[0]);
         fName = name;
         VerifyPath(fName.c_str());
+        pstr conv_fn = xr_strdup(name);
+        convert_path_separators(conv_fn);
         if (exclusive)
         {
-            int handle = _sopen(fName.c_str(), _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
+            int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
 #ifdef _EDITOR
             if (handle == -1)
-                Msg("!Can't create file: '%s'. Error: '%s'.", *fName, _sys_errlist[errno]);
+                Msg("!Can't create file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
 #endif
             hf = _fdopen(handle, "wb");
         }
         else
         {
-            hf = fopen(fName.c_str(), "wb");
+            hf = fopen(conv_fn, "wb");
             if (hf == 0)
-                Msg("!Can't write file: '%s'. Error: '%s'.", fName.c_str(), _sys_errlist[errno]);
+                Msg("!Can't write file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
         }
+        xr_free(conv_fn);
     }
 
     virtual ~CFileWriter()
@@ -112,7 +115,7 @@ public:
 class XRCORE_API CFileReader : public IReader
 {
 public:
-    CFileReader(const char* name);
+    CFileReader(pcstr name);
     virtual ~CFileReader();
 };
 class CCompressedReader : public IReader
@@ -131,7 +134,7 @@ private:
 #endif
 
 public:
-    CVirtualFileReader(const char* cFileName);
+    CVirtualFileReader(pcstr cFileName);
     virtual ~CVirtualFileReader();
 };
 

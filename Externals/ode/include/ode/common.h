@@ -314,7 +314,7 @@ typedef struct dJointFeedback {
  * when the ODE step function updates the body state.
  */
 
-void dGeomMoved (dGeomID);
+ODE_API void dGeomMoved (dGeomID);
 dGeomID dGeomGetBodyNext (dGeomID);
 
 

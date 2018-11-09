@@ -258,7 +258,7 @@ void CCC_LoadCFG::Execute(LPCSTR args)
     IReader* F = FS.r_open(cfg_full_name);
 
     string1024 str;
-    if (F != NULL)
+    if (F != nullptr)
     {
         while (!F->eof())
         {

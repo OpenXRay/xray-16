@@ -33,39 +33,9 @@ DLL_API void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
 
 void CCC_RegisterCommands();
 
-#ifdef WINDOWS
-BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-    {
-        // Fill ui style token
-        FillUIStyleToken();
-        // register console commands
-        CCC_RegisterCommands();
-        // keyboard binding
-        CCC_RegisterInput();
-#ifdef DEBUG
-// XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-// g_profiler			= new CProfiler();
-#endif
-        gStringTable = new CStringTable();
-        StringTable().Init();
-        break;
-    }
-
-    case DLL_PROCESS_DETACH:
-    {
-        CleanupUIStyleToken();
-        xr_delete(gStringTable);
-        break;
-    }
-    }
-    return (TRUE);
-}
-#else
+#ifdef LINUX
 __attribute__((constructor))
+#endif
 static void load(int argc, char** argv, char** envp)
 {
     // Fill ui style token
@@ -78,11 +48,36 @@ static void load(int argc, char** argv, char** envp)
 // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
 // g_profiler			= new CProfiler();
 #endif
+    gStringTable = new CStringTable();
+    StringTable().Init();
 }
 
+#ifdef LINUX
 __attribute__((destructor))
+#endif
 static void unload()
 {
     CleanupUIStyleToken();
+    xr_delete(gStringTable);
+}
+
+#ifdef WINDOWS
+BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
+{
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+    {
+        load(0, nullptr, nullptr);
+        break;
+    }
+
+    case DLL_PROCESS_DETACH:
+    {
+        unload();
+        break;
+    }
+    }
+    return (TRUE);
 }
 #endif

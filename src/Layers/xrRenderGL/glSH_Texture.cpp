@@ -27,8 +27,8 @@ void resptrcode_texture::create(LPCSTR _name)
 //////////////////////////////////////////////////////////////////////
 CTexture::CTexture()
 {
-    pSurface = NULL;
-    pBuffer = NULL;
+    pSurface = 0;
+    pBuffer = 0;
     pAVI = nullptr;
     pTheora = nullptr;
     desc = GL_TEXTURE_2D;
@@ -161,6 +161,8 @@ void CTexture::Load()
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
+    if (nullptr == *cName)
+        return;
     if (0 == xr_stricmp(*cName, "$null")) return;
     if (nullptr != strstr(*cName, "$user$"))
     {
@@ -174,9 +176,6 @@ void CTexture::Load()
 
     // Check for OGM
     string_path fn;
-#ifdef LINUX
-    while (char* sep = strchr(*cName, '\\')) *sep = '/';
-#endif
     if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
     {
         // AVI
@@ -209,9 +208,10 @@ void CTexture::Load()
 
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            if (glGetError() != GL_NO_ERROR)
+            GLenum err = glGetError();
+            if (err != GL_NO_ERROR)
             {
-                FATAL("Invalid video stream");
+                FATAL_F("Invalid video stream: 0x%x", err);
                 xr_delete(pTheora);
                 pSurface = 0;
             }

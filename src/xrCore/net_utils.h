@@ -87,7 +87,7 @@ public:
         B.count = size;
     }
 
-    NET_Buffer B;
+    NET_Buffer B = {{0}, 0};
     u32 r_pos;
     u32 timeReceive;
     bool w_allow;
@@ -113,7 +113,7 @@ public:
         ~W_guard() { *guarded = false; }
     };
 	void w(const void* p, u32 count);
-    IC void w_seek(u32 pos, const void* p, u32 count);
+    void w_seek(u32 pos, const void* p, u32 count);
     IC u32 w_tell() { return B.count; }
     // writing - utilities
     IC void w_float(float a)

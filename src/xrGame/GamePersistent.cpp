@@ -217,9 +217,11 @@ void CGamePersistent::OnAppStart()
     GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
 
+#ifdef WINDOWS
     ansel = new AnselManager();
     ansel->Load();
     ansel->Init();
+#endif
 }
 
 void CGamePersistent::OnAppEnd()
@@ -485,16 +487,25 @@ bool allow_intro()
 #else // #ifdef MASTER_GOLD
     if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
 #endif // #ifdef MASTER_GOLD
+#else
+    if (0 != strstr(Core.Params, "-nointro"))
+#endif
     {
         return false;
     }
     else
-#endif
         return true;
 }
 
 void CGamePersistent::start_logo_intro()
 {
+    if(!allow_intro()) // TODO this is dirty hack, rewrite!
+    {
+        m_intro_event = 0;
+        Console->Execute("main_menu on");
+        return;
+    }
+
     if (Device.dwPrecacheFrame == 0)
     {
         m_intro_event.bind(this, &CGamePersistent::update_logo_intro);

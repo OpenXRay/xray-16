@@ -450,13 +450,6 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             R_ASSERT(path && path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-#if defined(LINUX)
-                char *tmp_ptr = strchr(inc_name, '\\');
-                while (tmp_ptr) {
-                    *tmp_ptr = '/';
-                    tmp_ptr = strchr(tmp_ptr, '\\');
-                }
-#endif
                 xr_strlwr(inc_name); // compensate removed xr_strlwr on path
 
                 string_path fn;
@@ -641,7 +634,8 @@ bool CInifile::save_as(pcstr new_fname)
     if (new_fname && new_fname[0])
         xr_strcpy(m_file_name, sizeof m_file_name, new_fname);
 
-    R_ASSERT(m_file_name && m_file_name[0]);
+    R_ASSERT(m_file_name[0]);
+    convert_path_separators(m_file_name);
     IWriter* F = FS.w_open_ex(m_file_name);
     if (!F)
         return false;

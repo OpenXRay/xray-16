@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "SDL.h"
+
 #if defined(WINDOWS)
 #include <Psapi.h>
 #elif defined(LINUX)
@@ -48,8 +50,8 @@ XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
         memory_info.BaseAddress = (char*)memory_info.BaseAddress + memory_info.RegionSize;
     }
 #elif defined(LINUX)
-	struct sysinfo si;
-	sysinfo(&si);
+    struct sysinfo si;
+    sysinfo(&si);
     *_free = si.freeram * si.mem_unit;
     *reserved = si.bufferram * si.mem_unit;
     *committed = (si.totalram - si.freeram + si.totalswap - si.freeswap) * si.mem_unit;
@@ -60,7 +62,7 @@ XRCORE_API void log_vminfo()
 {
     size_t w_free, w_reserved, w_committed;
     vminfo(&w_free, &w_reserved, &w_committed);
-    Msg("* [win32]: free[%d K], reserved[%d K], committed[%d K]", w_free / 1024, w_reserved / 1024, w_committed / 1024);
+    Msg("* [ %s ]: free[%d K], reserved[%d K], committed[%d K]", SDL_GetPlatform(), w_free / 1024, w_reserved / 1024, w_committed / 1024);
 }
 
 size_t xrMemory::mem_usage()

@@ -829,7 +829,7 @@ void xrServer::Server_Client_Check(IClient* CL)
     {
         return;
     };
-#ifndef LINUX // FIXME!!!
+
     if (CL->process_id == GetCurrentProcessId())
     {
         CL->flags.bLocal = 1;
@@ -840,7 +840,6 @@ void xrServer::Server_Client_Check(IClient* CL)
     {
         CL->flags.bLocal = 0;
     }
-#endif
 };
 
 bool xrServer::OnCL_QueryHost()
@@ -986,9 +985,7 @@ void xrServer::create_direct_client()
     SClientConnectData cl_data;
     cl_data.clientID.set(1);
     xr_strcpy(cl_data.name, "single_player");
-#ifndef LINUX // FIXME!!!
     cl_data.process_id = GetCurrentProcessId();
-#endif
     new_client(&cl_data);
 }
 

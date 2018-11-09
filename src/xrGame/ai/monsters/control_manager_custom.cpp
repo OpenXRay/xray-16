@@ -457,7 +457,7 @@ bool CControlManagerCustom::jump_if_possible(Fvector const& target, CEntityAlive
     if (!m_object->check_start_conditions(ControlCom::eControlJump))
         return false;
 
-    bool const aggressive_jump = target_object ? m_object->can_use_agressive_jump(target_object) : NULL;
+    bool const aggressive_jump = target_object ? m_object->can_use_agressive_jump(target_object) : false;
     if (check_possibility && !m_jump->can_jump(target, aggressive_jump))
         return false;
 

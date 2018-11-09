@@ -43,47 +43,10 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #if defined(LINUX)
-#define nsec_per_sec	1000*1000*1000
-/**
- * From https://stackoverflow.com/questions/12468331/queryperformancecounter-linux-equivalent
- * @return
- */
-void QueryPerformanceCounter(PLARGE_INTEGER result)
-{
-    u64 nsec_count, nsec_per_tick;
-    /*
-     * clock_gettime() returns the number of secs. We translate that to number of nanosecs.
-     * clock_getres() returns number of seconds per tick. We translate that to number of nanosecs per tick.
-     * Number of nanosecs divided by number of nanosecs per tick - will give the number of ticks.
-     */
-     struct timespec ts1, ts2;
-
-     if (clock_gettime(CLOCK_MONOTONIC, &ts1) != 0) {
-         return;
-     }
-
-     nsec_count = ts1.tv_nsec + ts1.tv_sec * nsec_per_sec;
-
-     if (clock_getres(CLOCK_MONOTONIC, &ts2) != 0) {
-         return;
-     }
-
-     nsec_per_tick = ts2.tv_nsec + ts2.tv_sec * nsec_per_sec;
-
-     *result = (nsec_count / nsec_per_tick);
-}
-
 DWORD timeGetTime()
 {
- /*   std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-
-    auto nanosec = now.time_since_epoch();
-
-    return nanosec.count()/(1000000000.0 *60.0 *60.0);
-    */
     return SDL_GetTicks();
 }
-
 #endif
 
 /*
@@ -220,8 +183,7 @@ XRCORE_API processor_info ID;
 
 XRCORE_API u64 QPC() noexcept
 {
-    u64 _dest;
-    QueryPerformanceCounter((PLARGE_INTEGER)&_dest);
+    u64 _dest = SDL_GetPerformanceCounter();
     qpc_counter++;
     return _dest;
 }
@@ -269,9 +231,10 @@ void _initialize_cpu()
         Msg("* CPU%zu current freq: %lu MHz, max freq: %lu MHz",
             i, cpuInfo.CurrentMhz, cpuInfo.MaxMhz);
     }
-
-    Log("");
+#else
+    Msg("* CPU current freq: %lu MHz", CPU::qpc_freq);
 #endif
+    Log("");
     Fidentity.identity(); // Identity matrix
     Didentity.identity(); // Identity matrix
     pvInitializeStatics(); // Lookup table for compressed normals
@@ -306,9 +269,9 @@ void _initialize_cpu_thread()
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-#if defined(WINDOWS)
         if (_denormals_are_zero_supported)
         {
+#if defined(WINDOWS)
             __try
             {
                 _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
@@ -317,8 +280,18 @@ void _initialize_cpu_thread()
             {
                 _denormals_are_zero_supported = FALSE;
             }
-        }
+#else
+            try
+            {
+                _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+            }
+            catch (...)
+            {
+                _denormals_are_zero_supported = FALSE;
+            }
 #endif
+        }
+
     }
 }
 

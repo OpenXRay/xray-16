@@ -30,7 +30,7 @@
 
  */
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "limb.h"
 
 enum
@@ -903,7 +903,7 @@ int Limb::InLimits(const float x[7]) const
     return 1;
 }
 
-float roundup(float x)
+float round_up(float x)
 {
     if (x < 0)
         x += 2 * M_PI;
@@ -914,7 +914,7 @@ void dump_file(char* file, int euler_type, float min[], float max[], Matrix c, M
     FILE* fp = fopen(file, "w");
 
     fprintf(fp, "%d\n", euler_type);
-    fprintf(fp, "%f %f %f \n", roundup(min[2]), roundup(min[1]), roundup(min[0]));
+    fprintf(fp, "%f %f %f \n", round_up(min[2]), round_up(min[1]), round_up(min[0]));
     fprintf(fp, "%f %f %f \n", max[2], max[1], max[0]);
     for (int i = 0; i < 4; i++)
         fprintf(fp, "%f %f %f %f\n", c[i][0], c[i][1], c[i][2], c[i][3]);

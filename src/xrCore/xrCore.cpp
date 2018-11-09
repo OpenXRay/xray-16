@@ -7,6 +7,10 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #pragma comment(lib, "winmm.lib")
+#elif defined(LINUX)
+#include <sys/types.h>
+#include <pwd.h>
+#include <unistd.h>
 #endif
 #include "xrCore.h"
 #include "Threading/ThreadPool.hpp"
@@ -237,6 +241,20 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
+#elif defined(LINUX)
+        uid_t uid = geteuid();
+        struct passwd *pw = getpwuid(uid);
+        if(pw)
+        {
+            strcpy(UserName, pw->pw_gecos);
+            char* pos = strchr(UserName, ','); // pw_gecos return string
+            if(NULL != pos)
+                *pos = 0;
+            if(0 == UserName[0])
+                strcpy(UserName, pw->pw_name);
+        }
+
+        gethostname(CompName, sizeof(CompName));
 #endif
 
         Memory._initialize();

@@ -983,7 +983,7 @@ bool CWeaponMagazined::DetachScope(const char* item_section_name, bool b_spawn_i
         LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
         if (!xr_strcmp(iter_scope_name, item_section_name))
         {
-            m_cur_scope = NULL;
+            m_cur_scope = 0;
             detached = true;
         }
     }

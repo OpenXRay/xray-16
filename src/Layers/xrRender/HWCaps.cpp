@@ -238,7 +238,8 @@ void CHWCaps::Update()
     // ***************** PIXEL processing
     raster_major = 4;
     raster_minor = 0;
-    raster.dwStages = 16;
+    // XXX: review this
+    raster.dwStages = 15; // Previuos value is 16, but it's out of bounds
     raster.bNonPow2 = TRUE;
     raster.bCubemap = TRUE;
     raster.dwMRT_count = 4;

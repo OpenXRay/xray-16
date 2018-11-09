@@ -116,8 +116,8 @@ CMainMenu::CMainMenu()
     {
         g_btnHint = new CUIButtonHint();
         g_statHint = new CUIButtonHint();
-#ifdef WINDOWS
         m_pGameSpyFull = new CGameSpy_Full();
+#ifdef WINDOWS
 
         for (u32 i = 0; i < u32(ErrMax); i++)
         {
@@ -136,9 +136,12 @@ CMainMenu::CMainMenu()
         m_pMB_ErrDlgs[DownloadMPMap]->AddCallbackStr(
             "button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap));
 
+#endif
+
         m_account_mngr = new gamespy_gp::account_manager(m_pGameSpyFull->GetGameSpyGP());
         m_login_mngr = new gamespy_gp::login_manager(m_pGameSpyFull);
         m_profile_store = new gamespy_profile::profile_store(m_pGameSpyFull);
+#ifdef WINDOWS
         m_stats_submitter = new gamespy_profile::stats_submitter(m_pGameSpyFull);
         m_atlas_submit_queue = new atlas_submit_queue(m_stats_submitter);
 #endif
@@ -195,7 +198,8 @@ void CMainMenu::ReadTextureInfo()
          * Multi-threaded  ~40 ms
          * Just a bit of speedup
         */
-        tbb::parallel_for_each(files, [](const FS_File& file)
+//        tbb::parallel_for_each(files, [](const FS_File& file) // Cause memory corruption (detected by Valgrind)
+        std::for_each(files.begin(), files.end(), [](const FS_File& file)
         {
             string_path path, name;
             _splitpath(file.name.c_str(), nullptr, path, name, nullptr);
@@ -867,9 +871,7 @@ void CMainMenu::OnConnectToMasterServerOkClicked(CUIWindow*, void*) { Hide_CTMS_
 LPCSTR CMainMenu::GetGSVer()
 {
     static string256 buff;
-#ifdef WINDOWS
     xr_strcpy(buff, GetGameVersion());
-#endif
     return buff;
 }
 
@@ -895,7 +897,7 @@ LPCSTR CMainMenu::GetPlayerName()
 
 LPCSTR CMainMenu::GetCDKeyFromRegistry()
 {
-    string512 key;
+    string512 key = { 0 };
     GetCDKey_FromRegistry(key);
     m_cdkey._set(key);
     return m_cdkey.c_str();

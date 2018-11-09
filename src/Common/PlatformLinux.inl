@@ -68,68 +68,60 @@ inline char* _strupr_l(char* str, locale_t loc)
 
 #define __except(X) catch(X)
 
-/*
-static inline long InterlockedExchange(volatile long* val, long new_val)
-{
-  long old_val;
-  do {
-    old_val = *val;
-  } while (__sync_val_compare_and_swap (val, old_val, new_val) != old_val);
-    return old_val;
-}
-*/
-
-inline pthread_t GetCurrentThreadId()
-{
-    return pthread_self();
-}
+#define tid_t pthread_t
+#define GetCurrentProcessId getpid
+#define GetCurrentThreadId pthread_self
 
 inline void Sleep(int ms)
 {
     usleep(ms * 1000);
 }
 
-#include <libgen.h>
-inline void _splitpath (
-        const char* path,  // Path Input
-        char* drive,       // Drive     : Output
-        char* dir,         // Directory : Output
-        char* fname,       // Filename  : Output
-        char* ext          // Extension : Output
-){
-    char tmp[PATH_MAX] = {0};
-    if(!realpath(path, tmp))
-        strcpy(tmp, path);
+inline void _splitpath(const char* path, // Path Input
+        char* drive, // Drive     : Output
+        char* dir, // Directory : Output
+        char* fname, // Filename  : Output
+        char* ext // Extension : Output
+        )
+{
+    if(!path)
+        return EINVAL;
+    
+    const char *p, *end;
 
     if(drive)
         strcpy(drive, "");
 
-    if(dir) {
-        char tmp_dir[PATH_MAX] = {0};
-        strcpy(tmp_dir, tmp); // W/A for fname broking
-        strcpy(dir, dirname(tmp_dir)); // This eval modify dirname argument!!!
-        if (dir[0] && dir[strlen(dir) - 1] != '/')
-            strcat(dir, "/");
+    end = NULL;
+    for(p = path; *p; p++)
+        if(*p == '/' || *p == '\\')
+            end = p + 1;
+
+    if(end)
+    {
+        if(dir)
+        {
+            memcpy(dir, path, end - path);
+            dir[end - path] = 0;
+        }
+        path = end;
     }
+    else if(dir)
+        dir[0] = 0;
+
+    end = strchr(path, '.');
+
+    if(!end)
+        end = p;
 
     if(fname)
     {
-        strcpy(fname, basename(tmp));
-        char *pos = strrchr(fname, '.');
-        if(pos != NULL)
-            *pos = 0;
+        memcpy(fname, path, end - path);
+        fname[end - path] = 0;
     }
 
     if(ext)
-    {
-        char tmp_ext[NAME_MAX] = { 0 };
-        strcpy(tmp_ext, basename(tmp));
-        char *pos = strrchr(fname, '.');
-        if(pos != NULL)
-            strcpy(ext, pos + 1);
-        else
-            strcpy(ext, "");
-    }
+        strcpy(ext, end);
 }
 
 #include <iostream>
@@ -287,15 +279,128 @@ typedef dirent DirEntryType;
 #define lstrcpy strcpy
 #define stricmp strcasecmp
 #define strupr SDL_strupr
-inline bool strncpy_s(char * dest, size_t, const char * source, size_t num) {
-    return NULL == strncpy(dest, source, num);
+// error code numbers from original MS strcpy_s return value
+inline int strcpy_s(char *dest, size_t num, const char *source)
+{
+    if(!dest)
+        return EINVAL;
+
+    if(0 == num)
+    {
+        dest[0] = '\0';
+        return ERANGE;
+    }
+
+    if(!source)
+    {
+        dest[0] = '\0';
+        return EINVAL;
+    }
+
+    size_t i;
+    for(i = 0; i < num; i++)
+    {
+        if((dest[i] = source[i]) == '\0')
+            return 0;
+    }
+    dest[0] = '\0';
+    return ERANGE;
 }
-inline bool strncpy_s(char * dest, const char * source, size_t num) {
-    return NULL == strncpy(dest, source, num);
+
+template <std::size_t num>
+inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(dest, num, source); }
+
+inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
+{
+    if (!dest || (0 == dst_size))
+        return EINVAL;
+
+    if(0 == num)
+    {
+        dest[0] = '\0';
+        return 0;
+    }
+
+    if (!source)
+    {
+        dest[0] = '\0';
+        return EINVAL;
+    }
+
+    size_t i, end;
+    if(num < dst_size)
+        end = num;
+    else
+        end = dst_size - 1;
+
+    for(i = 0; i < end && source[i]; i++)
+        dest[i] = source[i];
+
+    if(!source[i] || end == num)
+    {
+        dest[i] = '\0';
+        return 0;
+    }
+
+    dest[0] = '\0';
+
+    return EINVAL;
 }
-inline int strcpy_s(char *dest, const char *source) { return (int)(NULL == strcpy(dest, source)); }
-inline int strcpy_s(char *dest, size_t num, const char *source) { return (int)(NULL == strcpy(dest, source)); }
-inline int strcat_s(char * dest, size_t size, const char * source) { return (NULL == strcat(dest, source)); }
+
+template <std::size_t dst_sz>
+inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { return strncpy_s(dest, dst_sz, source, num); }
+
+inline int strcat_s(char * dest, size_t num, const char * source)
+{
+    if(!dest)
+        return EINVAL;
+
+    if(!source)
+    {
+        dest[0] = '\0';
+        return EINVAL;
+    }
+
+    size_t i, j;
+    for(i = 0; i < num; i++)
+    {
+        if(dest[i] == '\0')
+        {
+            for(j = 0; (j + i) < num; j++)
+            {
+                if((dest[j + i] = source[j]) == '\0')
+                    return 0;
+            }
+        }
+    }
+
+    dest[0] = '\0';
+    return ERANGE;
+}
+
+inline int strncat_s(char * dest, size_t num, const char * source, size_t count)
+{
+    if (!dest || !source)
+        return EINVAL;
+
+    size_t i, j;
+    for(i = 0; i < num; i++)
+    {
+        if(dest[i] == '\0')
+        {
+            for(j = 0; (j + i) < num; j++)
+            {
+                if(j == count || (dest[j + i] = source[j]) == '\0')
+                {
+                    dest[j + i] = '\0';
+                    return 0;
+                }
+            }
+        }
+    }
+
+    return ERANGE;
+}
 
 #define _vsnprintf vsnprintf
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
@@ -333,7 +438,8 @@ inline int _filelength(int fd)
 #define _read read
 #define _set_new_handler std::set_new_handler
 #define _finite isfinite
-#define _mkdir(dir) mkdir(dir, S_IRWXU)
+inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
+
 #define _wtoi(arg) wcstol(arg, NULL, 10)
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
 #undef min
@@ -977,3 +1083,16 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
 
+inline void convert_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '\\')) *sep = '/';
+}
+
+/** For backward compability of FS, for real filesystem delimiter set to back
+ * @brief restore_path_separators
+ * @param path
+ */
+inline void restore_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '/')) *sep = '\\'; //
+}

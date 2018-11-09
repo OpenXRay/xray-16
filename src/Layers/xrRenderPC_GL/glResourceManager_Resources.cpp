@@ -212,7 +212,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     // Select target
     _vs->sh = glCreateShader(GL_VERTEX_SHADER);
     void* _result = &_vs->sh;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, NULL, _result);
+    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, 0, _result);
 
     FS.r_close(file);
 
@@ -292,7 +292,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     // Select target
     _ps->sh = glCreateShader(GL_FRAGMENT_SHADER);
     void* _result = &_ps->sh;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, NULL, _result);
+    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, 0, _result);
 
     FS.r_close(file);
 
@@ -362,7 +362,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     _gs->sh = glCreateShader(GL_GEOMETRY_SHADER);
     void* _result = &_gs->sh;
     HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr,
-                                                    nullptr, NULL, _result);
+                                                    nullptr, 0, _result);
 
     VERIFY(SUCCEEDED(_hr));
 
@@ -512,6 +512,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     R_ASSERT (_Name && _Name[0]);
     string_path Name;
     strcpy_s(Name, _Name); //. andy if (strext(Name)) *strext(Name)=0;
+
     fix_texture_name(Name);
 
 #ifdef	DEBUG

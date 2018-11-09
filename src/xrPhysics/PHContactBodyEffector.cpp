@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHContactBodyEffector.h"
 #include "ExtendedGeom.h"
 #include "tri-colliderknoopc/dTriList.h"

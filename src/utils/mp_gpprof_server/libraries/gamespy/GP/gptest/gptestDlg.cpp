@@ -1026,7 +1026,7 @@ void TransferCallback(GPConnection * connection, void * arg_, void * param)
 	switch(arg->type)
 	{
 	case GP_TRANSFER_SEND_REQUEST:
-		transferStart = GetTickCount();
+		transferStart = SDL_GetTicks();
 		CHECK(gpAcceptTransfer(connection, arg->transfer, "I'd like your file"));
 		break;
 

@@ -47,7 +47,7 @@ NET_Packet* INetQueue::Create()
         ready.push_back(new NET_Packet());
         P = ready.back();
         //---------------------------------------------
-        // LastTimeCreate = GetTickCount();
+        // LastTimeCreate = SDL_GetTicks();
         //---------------------------------------------
     } else {
         ready.push_back(unused.back());
@@ -66,7 +66,7 @@ NET_Packet* INetQueue::Create(const NET_Packet& _other)
         ready.push_back(new NET_Packet());
         P = ready.back();
         //---------------------------------------------
-        //        LastTimeCreate = GetTickCount();
+        //        LastTimeCreate = SDL_GetTicks();
         //---------------------------------------------
     } else {
         ready.push_back(unused.back());
@@ -87,7 +87,7 @@ NET_Packet* INetQueue::Retreive()
     //---------------------------------------------
     else {
         /*
-    u32 tmp_time = GetTickCount() - 60000;
+    u32 tmp_time = SDL_GetTicks() - 60000;
     u32 size = unused.size();
     if ((LastTimeCreate < tmp_time) && (size > 32))
     {
@@ -104,7 +104,7 @@ void INetQueue::Release()
 {
     VERIFY(!ready.empty());
     //---------------------------------------------
-    // u32 tmp_time = GetTickCount() - 60000;
+    // u32 tmp_time = SDL_GetTicks() - 60000;
     u32 size = unused.size();
     ready.front()->B.count = 0;
     /*

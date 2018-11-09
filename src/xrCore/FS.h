@@ -18,7 +18,7 @@
 #define CFS_CompressMark (1ul << 31ul)
 #define CFS_HeaderChunkID (666)
 
-XRCORE_API void VerifyPath(LPCSTR path);
+XRCORE_API void VerifyPath(pcstr path);
 
 //#define FS_DEBUG
 
@@ -416,7 +416,7 @@ private:
 #endif
 
 public:
-    CVirtualFileRW(const char* cFileName);
+    CVirtualFileRW(pcstr cFileName);
     virtual ~CVirtualFileRW();
 };
 

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "ExtendedGeom.h"
 #include "dcylinder/dCylinder.h"
 bool IsCyliderContact(const dContact& c)

@@ -38,8 +38,12 @@ private:
     Objects destroy_queue;
     Objects objects_active;
     Objects objects_sleeping;
-    Objects m_crows[2];
-    u32 m_owner_thread_id;
+    /**
+     * @brief m_primary_crows   - list of items of the primary thread
+     * @brief m_secondary_crows - list of items of the secondary thread
+     */
+    Objects m_primary_crows, m_secondary_crows;
+    tid_t m_owner_thread_id;
     ObjectUpdateStatistics stats;
     u32 statsFrame;
 
@@ -123,9 +127,9 @@ private:
     IC Objects& get_crows()
     {
         if (GetCurrentThreadId() == m_owner_thread_id)
-            return (m_crows[0]);
+            return (m_primary_crows);
 
-        return (m_crows[1]);
+        return (m_secondary_crows);
     }
 
     static void clear_crow_vec(Objects& o);

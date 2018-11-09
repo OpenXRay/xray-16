@@ -77,7 +77,7 @@ XRCORE_API void dump_file_mappings()
 // Tools
 //////////////////////////////////////////////////////////////////////
 //---------------------------------------------------
-void VerifyPath(LPCSTR path)
+void VerifyPath(pcstr path)
 {
     string1024 tmp;
     for (int i = 0; path[i]; i++)
@@ -86,12 +86,13 @@ void VerifyPath(LPCSTR path)
             continue;
         CopyMemory(tmp, path, i);
         tmp[i] = 0;
+        convert_path_separators(tmp);
         _mkdir(tmp);
     }
 }
 
 #ifdef _EDITOR
-bool file_handle_internal(LPCSTR file_name, u32& size, int& hFile)
+bool file_handle_internal(pcstr file_name, u32& size, int& hFile)
 {
     hFile = _open(file_name, O_RDONLY | O_BINARY | O_SEQUENTIAL);
     if (hFile <= 0)
@@ -106,18 +107,21 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& hFile)
     return (true);
 }
 #else // EDITOR
-static int open_internal(LPCSTR fn, int& handle)
+static int open_internal(pcstr fn, int& handle)
 {
 #if defined(WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
 #elif defined(LINUX)
-    handle = open(fn, _O_RDONLY);
+    pstr conv_fn = xr_strdup(fn);
+    convert_path_separators(conv_fn);
+    handle = open(conv_fn, _O_RDONLY);
+    xr_free(conv_fn);
 
     return (handle == -1);
 #endif
 }
 
-bool file_handle_internal(LPCSTR file_name, u32& size, int& file_handle)
+bool file_handle_internal(pcstr file_name, u32& size, int& file_handle)
 {
     if (open_internal(file_name, file_handle))
     {
@@ -491,7 +495,7 @@ CPackReader::~CPackReader()
 };
 //---------------------------------------------------
 // file stream
-CFileReader::CFileReader(const char* name)
+CFileReader::CFileReader(pcstr name)
 {
     data = (char*)FileDownload(name, (u32*)&Size);
     Pos = 0;
@@ -505,7 +509,7 @@ CCompressedReader::CCompressedReader(const char* name, const char* sign)
     Pos = 0;
 }
 CCompressedReader::~CCompressedReader() { xr_free(data); };
-CVirtualFileRW::CVirtualFileRW(const char* cFileName)
+CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 {
 #if defined(WINDOWS)
     // Open the file
@@ -520,7 +524,10 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
-    hSrcFile = ::open(cFileName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    pstr conv_path = xr_strdup(cFileName);
+    convert_path_separators(conv_path);
+    hSrcFile = ::open(conv_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    xr_free(conv_path);
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);
@@ -549,7 +556,7 @@ CVirtualFileRW::~CVirtualFileRW()
 #endif
 }
 
-CVirtualFileReader::CVirtualFileReader(const char* cFileName)
+CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
 {
 #if defined(WINDOWS)
     // Open the file
@@ -563,7 +570,10 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
 #elif defined(LINUX)
-    hSrcFile = ::open(cFileName, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    pstr conv_path = xr_strdup(cFileName);
+    convert_path_separators(conv_path);
+    hSrcFile = ::open(conv_path, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
+    xr_free(conv_path);
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);

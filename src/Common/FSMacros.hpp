@@ -1,12 +1,7 @@
 #pragma once
 
-#if defined(LINUX)
-#define _DELIMITER '/' //for looking
-#define DELIMITER "/" // for insert
-#elif defined(WINDOWS)
 #define _DELIMITER '\\' //for looking
 #define DELIMITER "\\" // for insert
-#endif
 
 // game path definition
 #define _game_data_ "$game_data$"

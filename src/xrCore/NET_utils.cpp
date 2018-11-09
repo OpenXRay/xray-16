@@ -302,63 +302,63 @@ float NET_Packet::r_float()
 
 u64 NET_Packet::r_u64()
 {
-    u64 A;
+    u64 A = 0;
     r_u64(A);
     return (A);
 } // qword (8b)
 
 s64 NET_Packet::r_s64()
 {
-    s64 A;
+    s64 A = 0;
     r_s64(A);
     return (A);
 } // qword (8b)
 
 u32 NET_Packet::r_u32()
 {
-    u32 A;
+    u32 A = 0;
     r_u32(A);
     return (A);
 } // dword (4b)
 
 s32 NET_Packet::r_s32()
 {
-    s32 A;
+    s32 A = 0;
     r_s32(A);
     return (A);
 } // dword (4b)
 
 u16 NET_Packet::r_u16()
 {
-    u16 A;
+    u16 A = 0;
     r_u16(A);
     return (A);
 } // word (2b)
 
 s16 NET_Packet::r_s16()
 {
-    s16 A;
+    s16 A = 0;
     r_s16(A);
     return (A);
 } // word (2b)
 
 u8 NET_Packet::r_u8()
 {
-    u8 A;
+    u8 A = 0;
     r_u8(A);
     return (A);
 } // byte (1b)
 
 s8 NET_Packet::r_s8()
 {
-    s8 A;
+    s8 A = 0;
     r_s8(A);
     return (A);
 }
 
 void NET_Packet::r_float_q16(float& A, float min, float max)
 {
-    u16 val;
+    u16 val = 0;
     r_u16(val);
     A = (float(val) * (max - min)) / 65535.f + min; // floating-point-error possible
     VERIFY((A >= min - EPS_S) && (A <= max + EPS_S));
@@ -366,7 +366,7 @@ void NET_Packet::r_float_q16(float& A, float min, float max)
 
 void NET_Packet::r_float_q8(float& A, float min, float max)
 {
-    u8 val;
+    u8 val = 0;
     r_u8(val);
     A = (float(val) / 255.0001f) * (max - min) + min; // floating-point-error possible
     VERIFY((A >= min) && (A <= max));
@@ -376,7 +376,7 @@ void NET_Packet::r_angle16(float& A) { r_float_q16(A, 0, PI_MUL_2); }
 void NET_Packet::r_angle8(float& A) { r_float_q8(A, 0, PI_MUL_2); }
 void NET_Packet::r_dir(Fvector& A)
 {
-    u16 t;
+    u16 t = 0;
     r_u16(t);
     pvDecompress(A, t);
 }
@@ -429,7 +429,7 @@ void NET_Packet::r_stringZ(shared_str& dest)
     }
     else
     {
-        string4096 buff;
+        string4096 buff = { 0 };
         inistream->r_string(buff, sizeof(buff));
         dest = buff;
     }

@@ -117,12 +117,12 @@ BOOL Shader::equal(Shader* S, int index)
     if(nullptr == E[index] || nullptr == S->E[index])
         return FALSE;
 
-    return (E[index] == S->E[index]);
+    return E[index]->equal(*S->E[index]);
 }
 
 BOOL Shader::equal(Shader* S)
 {
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
     {
         if (!equal(S, i))
             return FALSE;

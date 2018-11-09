@@ -13,6 +13,8 @@
 #include "uiabstract.h"
 #include "xrUIXmlParser.h"
 #include "Include/xrRender/UIShader.h"
+#include "xrCore/Threading/Lock.hpp"
+#include "xrCore/Threading/ScopeLock.hpp"
 #include <iostream>
 
 xr_map<shared_str, TEX_INFO> CUITextureMaster::m_textures;
@@ -54,6 +56,8 @@ void CUITextureMaster::ParseShTexInfo(pcstr path, pcstr xml_file)
             /* avo: fix issue when values were not updated (silently skipped) when same key is encountered more than once. This is how std::map is designed. 
             /* Also used more efficient C++11 std::map::emplace method instead of outdated std::pair::make_pair */
             /* XXX: avo: note that xxx.insert(mk_pair(v1,v2)) pattern is used extensively throughout solution so there is a good potential for other bug fixes/improvements */
+            static Lock new_texture_lock;
+            ScopeLock new_texture_guard(&new_texture_lock);
             if (m_textures.find(id) == m_textures.end())
                 m_textures.emplace(id, info);
             else

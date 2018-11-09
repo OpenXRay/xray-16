@@ -59,15 +59,6 @@ void CGameFont::Initialize(pcstr cShader, pcstr cTextureName)
     else
         xr_strcpy(cTexture, sizeof(cTexture), cTextureName);
 
-#if defined(LINUX)
-        char* ptr = strchr(cTexture, '\\');
-        while (ptr)
-        {
-            *ptr = '/';
-            ptr = strchr(ptr, '\\');
-        }
-#endif
-
     uFlags &= ~fsValid;
     vTS.set(1.f, 1.f); // обязательно !!!
 

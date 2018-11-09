@@ -2,11 +2,11 @@
 #include "xrCommon/xr_vector.h"
 
 // messages
-#define REG_PRIORITY_LOW 0x11111111ul
-#define REG_PRIORITY_NORMAL 0x22222222ul
-#define REG_PRIORITY_HIGH 0x33333333ul
-#define REG_PRIORITY_CAPTURE 0x7ffffffful
-#define REG_PRIORITY_INVALID 0xfffffffful
+#define REG_PRIORITY_LOW 0x11111111
+#define REG_PRIORITY_NORMAL 0x22222222
+#define REG_PRIORITY_HIGH 0x33333333
+#define REG_PRIORITY_CAPTURE 0x7fffffff
+#define REG_PRIORITY_INVALID 0x80000000 // -2147483648, lowest for int
 
 struct IPure
 {
@@ -43,13 +43,6 @@ class MessageRegistry
 {
     bool changed, inProcess;
     xr_vector<MessageObject> messages;
-
-    static int __cdecl compare(const void* e1, const void* e2)
-    {
-        MessageObject* p1 = (MessageObject*)e1;
-        MessageObject* p2 = (MessageObject*)e2;
-        return p2->Prio - p1->Prio;
-    }
 
 public:
     MessageRegistry() : changed(false), inProcess(false) {}
@@ -117,8 +110,10 @@ public:
 
     void Resort()
     {
-        if (!messages.empty())
-            qsort(&messages.front(), messages.size(), sizeof(MessageObject), compare);
+        if (!messages.empty()) {
+            std::sort(std::begin(messages), std::end(messages),
+                [](const auto& a, const auto& b) { return a.Prio > b.Prio; });
+        }
 
         while (!messages.empty() && messages.back().Prio == REG_PRIORITY_INVALID)
             messages.pop_back();

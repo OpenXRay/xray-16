@@ -238,7 +238,7 @@ void CUIMainIngameWnd::Init()
         string32 path;
         xr_sprintf(path, "quick_slot%d", i);
         CUIXmlInit::InitStatic(uiXml, path, 0, m_quick_slots_icons.back());
-        xr_sprintf(path, "%s:counter", path);
+        xr_strcat(path, ":counter");
         UIHelper::CreateStatic(uiXml, path, m_quick_slots_icons.back());
     }
     m_QuickSlotText1 = UIHelper::CreateTextWnd(uiXml, "quick_slot0_text", this);

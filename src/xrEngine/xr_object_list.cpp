@@ -224,38 +224,33 @@ void CObjectList::Update(bool bForce)
             // Select Crow-Mode
             stats.Updated = 0;
 
-            Objects& crows = m_crows[0];
-
-            {
-                Objects& crows1 = m_crows[1];
-                crows.insert(crows.end(), crows1.begin(), crows1.end());
-                crows1.clear();
-            }
+            m_primary_crows.insert(m_primary_crows.end(), m_secondary_crows.begin(), m_secondary_crows.end());
+            m_secondary_crows.clear();
 
 #if 0
-            std::sort (crows.begin(), crows.end());
-            crows.erase (
+            std::sort (m_own_crows.begin(), m_own_crows.end());
+            m_own_crows.erase (
                 std::unique(
-                    crows.begin(),
-                    crows.end()
+                    m_own_crows.begin(),
+                    m_own_crows.end()
                 ),
-                crows.end()
+                m_own_crows.end()
             );
 #else
 #ifdef DEBUG
-            std::sort(crows.begin(), crows.end());
-            VERIFY(std::unique(crows.begin(), crows.end()) == crows.end());
+            std::sort(m_primary_crows.begin(), m_primary_crows.end());
+            VERIFY(std::unique(m_primary_crows.begin(), m_primary_crows.end()) == m_primary_crows.end());
 #endif // ifdef DEBUG
 #endif
 
-            stats.Crows = crows.size();
-            Objects* workload = 0;
+            stats.Crows = m_primary_crows.size();
+            Objects* workload;
             if (!psDeviceFlags.test(rsDisableObjectsAsCrows))
-                workload = &crows;
+                workload = &m_primary_crows;
             else
             {
                 workload = &objects_active;
-                clear_crow_vec(crows);
+                clear_crow_vec(m_primary_crows);
             }
 
             stats.Update.Begin();
@@ -266,7 +261,7 @@ void CObjectList::Update(bool bForce)
             IGameObject** objects = (IGameObject**)_alloca(objects_count * sizeof(IGameObject*));
             std::copy(workload->begin(), workload->end(), objects);
 
-            crows.clear();
+            m_primary_crows.clear();
 
             IGameObject** b = objects;
             IGameObject** e = objects + objects_count;
@@ -492,66 +487,62 @@ IGameObject* CObjectList::Create(LPCSTR name)
     return O;
 }
 
-void CObjectList::Destroy(IGameObject* O)
+void CObjectList::Destroy(IGameObject* game_obj)
 {
-    if (0 == O)
+    if (nullptr == game_obj)
         return;
-    net_Unregister(O);
+    net_Unregister(game_obj);
 
     if (!Device.Paused())
     {
-        if (!m_crows[1].empty())
+        // if a game is paused list of other crows should be empty - Why?
+        if (!m_secondary_crows.empty())
         {
-            Msg("assertion !m_crows[1].empty() failed: %d", m_crows[1].size());
+            Msg("assertion !m_other_crows.empty() failed: %d", m_secondary_crows.size());
 
-            Objects::const_iterator i = m_crows[1].begin();
-            Objects::const_iterator const e = m_crows[1].end();
-            for (u32 j = 0; i != e; ++i, ++j)
-                Msg("%d %s", j, (*i)->cName().c_str());
-            VERIFY(Device.Paused() || m_crows[1].empty());
-            m_crows[1].clear();
+            u32 j = 0;
+            for (auto& iter : m_secondary_crows)
+                Msg("%d %s", j++, iter->cName().c_str());
+            VERIFY(Device.Paused() || m_secondary_crows.empty());
+            m_secondary_crows.clear();
         }
     }
     else
     {
-        Objects& crows = m_crows[1];
-        Objects::iterator const i = std::find(crows.begin(), crows.end(), O);
-        if (i != crows.end())
-        {
-            crows.erase(i);
-            VERIFY(std::find(crows.begin(), crows.end(), O) == crows.end());
-        }
+        // if game is paused remove the object from list of other crows
+        auto iter = std::find(m_secondary_crows.begin(), m_secondary_crows.end(), game_obj);
+        if (iter != m_secondary_crows.end())
+            m_secondary_crows.erase(iter);
     }
 
-    Objects& crows = m_crows[0];
-    Objects::iterator _i0 = std::find(crows.begin(), crows.end(), O);
-    if (_i0 != crows.end())
     {
-        crows.erase(_i0);
-        VERIFY(std::find(crows.begin(), crows.end(), O) == crows.end());
+        // Always remove the object from list of own crows. The object may be not a crow.
+        auto iter = std::find(m_primary_crows.begin(), m_primary_crows.end(), game_obj);
+        if (iter != m_primary_crows.end())
+            m_primary_crows.erase(iter);
     }
 
-    // active/inactive
-    Objects::iterator _i = std::find(objects_active.begin(), objects_active.end(), O);
-    if (_i != objects_active.end())
+    // Remove the object from list of active objects if the object is active,
+    // either remove it from list of sleeping objects if it is sleeping
+    // and throw fatal error if the object is neither active nor sleeping
+    auto iter = std::find(objects_active.begin(), objects_active.end(), game_obj);
+    if (iter != objects_active.end())
     {
-        objects_active.erase(_i);
-        VERIFY(std::find(objects_active.begin(), objects_active.end(), O) == objects_active.end());
-        VERIFY(std::find(objects_sleeping.begin(), objects_sleeping.end(), O) == objects_sleeping.end());
+        // this object is active, so remove it from the list
+        objects_active.erase(iter);
+        // check that the object does not belong to list of sleeping object too
+        VERIFY(std::find(objects_sleeping.begin(), objects_sleeping.end(), game_obj) == objects_sleeping.end());
     }
     else
     {
-        Objects::iterator _ii = std::find(objects_sleeping.begin(), objects_sleeping.end(), O);
-        if (_ii != objects_sleeping.end())
-        {
-            objects_sleeping.erase(_ii);
-            VERIFY(std::find(objects_sleeping.begin(), objects_sleeping.end(), O) == objects_sleeping.end());
-        }
-        else
+        iter = std::find(objects_sleeping.begin(), objects_sleeping.end(), game_obj);
+        if (iter == objects_sleeping.end())
             FATAL("! Unregistered object being destroyed");
+        objects_sleeping.erase(iter);
+
     }
 
-    g_pGamePersistent->ObjectPool.destroy(O);
+    g_pGamePersistent->ObjectPool.destroy(game_obj);
 }
 
 void CObjectList::relcase_register(RELCASE_CALLBACK cb, int* ID)
@@ -586,8 +577,8 @@ bool CObjectList::dump_all_objects()
     dump_list(destroy_queue, "destroy_queue");
     dump_list(objects_active, "objects_active");
     dump_list(objects_sleeping, "objects_sleeping");
-    dump_list(m_crows[0], "m_crows[0]");
-    dump_list(m_crows[1], "m_crows[1]");
+    dump_list(m_primary_crows, "m_own_crows");
+    dump_list(m_secondary_crows, "m_other_crows");
     return false;
 }
 

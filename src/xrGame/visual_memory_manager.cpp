@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "visual_memory_manager.h"
 #include "ai/stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker_impl.h"
 #include "memory_space_impl.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrAICore/Navigation/ai_object_location.h"
@@ -619,7 +620,7 @@ CVisibleObject* CVisualMemoryManager::visible_object(const CGameObject* game_obj
     return (&*I);
 }
 
-IC squad_mask_type CVisualMemoryManager::mask() const
+squad_mask_type CVisualMemoryManager::mask() const
 {
     if (!m_stalker)
         return (squad_mask_type(-1));

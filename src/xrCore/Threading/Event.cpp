@@ -15,66 +15,68 @@ bool Event::Wait(u32 millisecondsTimeout) noexcept
 #include <pthread.h>
 Event::Event() noexcept
 {
-	m_id.signaled = false;
-	pthread_mutex_init(&m_id.mutex, nullptr);
-	pthread_cond_init(&m_id.cond, nullptr);
+    m_id.signaled = false;
+    pthread_mutex_init(&m_id.mutex, nullptr);
+    pthread_cond_init(&m_id.cond, nullptr);
 }
 Event::~Event() noexcept
 {
-	pthread_mutex_destroy(&m_id.mutex);
-	pthread_cond_destroy(&m_id.cond);
+    pthread_mutex_destroy(&m_id.mutex);
+    pthread_cond_destroy(&m_id.cond);
 }
 void Event::Reset() noexcept
 {
-	pthread_mutex_lock(&m_id.mutex);
-	pthread_cond_signal(&m_id.cond);
-	m_id.signaled = false;
-	pthread_mutex_unlock(&m_id.mutex);
+    pthread_mutex_lock(&m_id.mutex);
+    pthread_cond_signal(&m_id.cond);
+    m_id.signaled = false;
+    pthread_mutex_unlock(&m_id.mutex);
 }
 void Event::Set() noexcept
 {
-	pthread_mutex_lock(&m_id.mutex);
-	pthread_cond_signal(&m_id.cond);
-	m_id.signaled = true;
-	pthread_mutex_unlock(&m_id.mutex);
+    pthread_mutex_lock(&m_id.mutex);
+    pthread_cond_signal(&m_id.cond);
+    m_id.signaled = true;
+    pthread_mutex_unlock(&m_id.mutex);
 }
 void Event::Wait() noexcept
 {
-	pthread_mutex_lock(&m_id.mutex);
+    pthread_mutex_lock(&m_id.mutex);
 
-	while (!m_id.signaled)
-	{
-		pthread_cond_wait(&m_id.cond, &m_id.mutex);
-	}
+    while (!m_id.signaled)
+    {
+        pthread_cond_wait(&m_id.cond, &m_id.mutex);
+    }
+    m_id.signaled = false; // due in WaitForSingleObject() "Before returning, a wait function modifies the state of some types of synchronization"
 
-	pthread_mutex_unlock(&m_id.mutex);
+    pthread_mutex_unlock(&m_id.mutex);
 }
 bool Event::Wait(u32 millisecondsTimeout) noexcept
 {
-	bool result = false;
-	pthread_mutex_lock(&m_id.mutex);
+    bool result = false;
+    pthread_mutex_lock(&m_id.mutex);
 
-	timespec ts;
-	clock_gettime(CLOCK_REALTIME, &ts);
-	ts.tv_nsec += (long) millisecondsTimeout * 1000 * 1000;
-	if(ts.tv_nsec > 1000000000)
-	{
-		ts.tv_nsec -= 1000000000;
-		ts.tv_sec += 1;
-	}
+    timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_nsec += (long) millisecondsTimeout * 1000 * 1000;
+    if(ts.tv_nsec > 1000000000)
+    {
+        ts.tv_nsec -= 1000000000;
+        ts.tv_sec += 1;
+    }
 
-	while(!m_id.signaled)
-	{
-		int res = pthread_cond_timedwait(&m_id.cond, &m_id.mutex, &ts);
-		if(res == ETIMEDOUT)
-		{
-			result = true;
-			break;
-		}
-	}
+    while(!m_id.signaled)
+    {
+        int res = pthread_cond_timedwait(&m_id.cond, &m_id.mutex, &ts);
+        if(res == ETIMEDOUT)
+        {
+            result = true;
+            break;
+        }
+    }
+    m_id.signaled = false;
 
-	pthread_mutex_unlock(&m_id.mutex);
+    pthread_mutex_unlock(&m_id.mutex);
 
-	return result;
+    return result;
 }
 #endif

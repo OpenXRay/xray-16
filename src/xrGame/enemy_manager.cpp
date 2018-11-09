@@ -22,6 +22,7 @@
 #include "xrEngine/profiler.h"
 #include "Actor.h"
 #include "ai/stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker_impl.h"
 #include "movement_manager.h"
 #include "agent_manager.h"
 #include "agent_enemy_manager.h"

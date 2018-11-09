@@ -264,8 +264,8 @@ void screenshot_manager::process_screenshot(bool singlecore)
     }
     m_make_start_event = CreateEvent(NULL, FALSE, TRUE, NULL);
     m_make_done_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-    thread_spawn(&screenshot_manager::screenshot_maker_thread, "screenshot_maker", 0, this);
 #endif
+    thread_spawn(&screenshot_manager::screenshot_maker_thread, "screenshot_maker", 0, this);
 }
 void __stdcall screenshot_manager::jpeg_compress_cb(long progress)
 {
@@ -274,10 +274,8 @@ void __stdcall screenshot_manager::jpeg_compress_cb(long progress)
     #endif*/
     if (progress % 5 == 0)
     {
-#ifndef LINUX // FIXME!!!
         if (!SwitchToThread())
             Sleep(10);
-#endif
     }
 }
 

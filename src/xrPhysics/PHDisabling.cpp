@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PHDisabling.h"
 #include "PhysicsCommon.h"
 #include "Physics.h"

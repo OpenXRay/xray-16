@@ -6,7 +6,7 @@
 	url = https://github.com/OpenXRay/luabind-deboostified.git
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
-	url = https://github.com/nitrocaster/GameSpy.git
+	url = https://github.com/OpenXRay/GameSpy.git
 [submodule "Externals/AGS_SDK"]
 	path = Externals/AGS_SDK
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git

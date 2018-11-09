@@ -596,8 +596,9 @@ void CRender::add_Geometry(IRenderVisual* V) { add_Static((dxRender_Visual*)V, V
 
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
+    VERIFY2 (T, "Invalid static wallmark triangle");
     if (T->suppress_wm) return;
-    VERIFY2 (_valid(P) && _valid(s) && T && verts && (s>EPS_L), "Invalid static wallmark params");
+    VERIFY2 (_valid(P) && _valid(s) && verts && (s>EPS_L), "Invalid static wallmark params");
     Wallmarks->AddStaticWallmark(T, verts, P, &*S, s);
 }
 

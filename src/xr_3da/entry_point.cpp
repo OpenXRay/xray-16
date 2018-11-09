@@ -101,11 +101,24 @@ int main(int argc, char *argv[])
 
         free(commandLine);
     }
-    catch (...)
+    catch (const std::overflow_error& e)
     {
         _resetstkoflw();
-        FATAL("stack overflow");
+        FATAL_F("stack overflow: %s", e.what());
     }
+    catch (const std::runtime_error& e)
+    {
+        FATAL_F("runtime error: %s", e.what());
+    }
+    catch (const std::exception& e)
+    {
+        FATAL_F("exception: %s", e.what());
+    }
+    catch (...)
+    {
+    // this executes if f() throws std::string or int or any other unrelated type
+    }
+
     return result;
 }
 #endif

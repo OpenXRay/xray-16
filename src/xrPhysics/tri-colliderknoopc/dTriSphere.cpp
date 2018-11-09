@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "dTriColliderCommon.h"
 #include "dTriColliderMath.h"
 #include "dTriSphere.h"

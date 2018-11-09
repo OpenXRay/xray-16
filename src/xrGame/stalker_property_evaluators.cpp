@@ -23,6 +23,7 @@
 #include "danger_manager.h"
 #include "ai_space.h"
 #include "ai/stalker/ai_stalker.h"
+#include "ai/stalker/ai_stalker_impl.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "alife_human_brain.h"
 #include "Actor.h"

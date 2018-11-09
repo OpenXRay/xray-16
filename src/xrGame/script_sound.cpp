@@ -29,7 +29,7 @@ CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
 CScriptSound::~CScriptSound()
 {
     if (m_sound._feedback())
-        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Playing sound is not completed, but is destroying \"%s\"!", 
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Playing sound is not completed, but is destroying \"%s\"!",
             m_sound._handle() ? m_sound._handle()->file_name() : "unknown");
     m_sound.destroy();
 }
