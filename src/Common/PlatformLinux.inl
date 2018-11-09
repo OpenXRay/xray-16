@@ -84,6 +84,9 @@ inline void _splitpath(const char* path, // Path Input
         char* ext // Extension : Output
         )
 {
+    if(!path)
+        return EINVAL;
+    
     const char *p, *end;
 
     if(drive)
@@ -279,10 +282,14 @@ typedef dirent DirEntryType;
 // error code numbers from original MS strcpy_s return value
 inline int strcpy_s(char *dest, size_t num, const char *source)
 {
-    if(!num)
-        return EINVAL;
     if(!dest)
         return EINVAL;
+
+    if(0 == num)
+    {
+        dest[0] = '\0';
+        return ERANGE;
+    }
 
     if(!source)
     {
@@ -305,16 +312,20 @@ inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(des
 
 inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
 {
-    if(!num)
-    {
-        if(dest && dst_size)
-            *dest = 0;
+    if (!dest || (0 == dst_size))
+        return EINVAL;
 
+    if(0 == num)
+    {
+        dest[0] = '\0';
         return 0;
     }
 
-    if (!dest || !source || (0 == dst_size))
+    if (!source)
+    {
+        dest[0] = '\0';
         return EINVAL;
+    }
 
     size_t i, end;
     if(num < dst_size)
@@ -341,7 +352,7 @@ inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { re
 
 inline int strcat_s(char * dest, size_t num, const char * source)
 {
-    if(!dest || (0 == num))
+    if(!dest)
         return EINVAL;
 
     if(!source)
@@ -369,14 +380,8 @@ inline int strcat_s(char * dest, size_t num, const char * source)
 
 inline int strncat_s(char * dest, size_t num, const char * source, size_t count)
 {
-    if (!dest || (0 == num))
+    if (!dest || !source)
         return EINVAL;
-
-    if (!source)
-    {
-        dest[0] = '\0';
-        return EINVAL;
-    }
 
     size_t i, j;
     for(i = 0; i < num; i++)
@@ -394,7 +399,6 @@ inline int strncat_s(char * dest, size_t num, const char * source, size_t count)
         }
     }
 
-    dest[0] = '\0';
     return ERANGE;
 }
 
