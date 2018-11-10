@@ -120,7 +120,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         };
 
         g_lua_wpn_params = new SLuaWpnParams();
-        ai().Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+        ai().template Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
 
     LPCSTR cur_section = cur_wpn.object().cNameSect().c_str();

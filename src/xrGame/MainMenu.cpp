@@ -76,7 +76,7 @@ CMainMenu::CMainMenu()
         void ProcessEvent() override { m_mainmenu->DestroyInternal(true); }
     };
 
-    m_script_reset_event_cid = ai().Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET, this);
+    m_script_reset_event_cid = ai().template Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET, this);
 
     m_Flags.zero();
     m_startDialog = NULL;

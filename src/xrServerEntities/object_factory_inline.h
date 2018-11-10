@@ -30,7 +30,7 @@ IC const CObjectFactory& object_factory()
             }
         };
 
-        ai().Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+        ai().template Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
     return (*g_object_factory);
 }
