@@ -18,20 +18,19 @@ IC const CObjectFactory& object_factory()
         g_object_factory = new CObjectFactory();
         g_object_factory->init();
 
-        class CResetEventCb : public CEventNotifierCallback
+        class CResetEventCb : public CEventNotifierCallbackWithCid
         {
         public:
-            CID m_cid;
+            CResetEventCb(CID cid) : CEventNotifierCallbackWithCid(cid) {}
 
             void ProcessEvent() override
             {
                 xr_delete(g_object_factory);
-                ai().Unsubscribe(m_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+                ai().Unsubscribe(GetCid(), CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
             }
         };
 
-        CResetEventCb* e = new CResetEventCb();
-        e->m_cid = ai().Subscribe(e, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+        ai().Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
     return (*g_object_factory);
 }

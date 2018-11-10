@@ -67,16 +67,16 @@ CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 
 CMainMenu::CMainMenu()
 {
-    class CResetEventCb : public CEventNotifierCallback
+    class CResetEventCb : public CEventNotifierCallbackWithCid
     {
         CMainMenu* m_mainmenu;
 
     public:
-        CResetEventCb(CMainMenu* mm) : m_mainmenu(mm) {}
+        CResetEventCb(CID cid, CMainMenu* mm) : m_mainmenu(mm), CEventNotifierCallbackWithCid(cid) {}
         void ProcessEvent() override { m_mainmenu->DestroyInternal(true); }
     };
 
-    m_script_reset_event_cid = ai().Subscribe(new CResetEventCb(this), CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+    m_script_reset_event_cid = ai().Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET, this);
 
     m_Flags.zero();
     m_startDialog = NULL;

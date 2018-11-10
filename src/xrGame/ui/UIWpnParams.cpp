@@ -108,21 +108,19 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 {
     if (!g_lua_wpn_params)
     {
-        class CResetEventCb : public CEventNotifierCallback
+        class CResetEventCb : public CEventNotifierCallbackWithCid
         {
         public:
-            CID m_cid = INVALID_CID;
-
+            CResetEventCb(CID cid) : CEventNotifierCallbackWithCid(cid) {}
             void ProcessEvent() override
             {
                 xr_delete(g_lua_wpn_params);
-                ai().Unsubscribe(m_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+                ai().Unsubscribe(GetCid(), CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
             }
         };
 
         g_lua_wpn_params = new SLuaWpnParams();
-        auto cb = new CResetEventCb();
-        cb->m_cid = ai().Subscribe(cb, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
+        ai().Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
 
     LPCSTR cur_section = cur_wpn.object().cNameSect().c_str();
