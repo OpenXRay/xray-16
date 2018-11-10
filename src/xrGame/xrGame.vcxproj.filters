@@ -9373,9 +9373,6 @@
     <ClCompile Include="ui\UIScriptWnd_script.cpp">
       <Filter>UI\UIWindows\ScriptWnd</Filter>
     </ClCompile>
-    <ClCompile Include="ui\uiscriptwnd_script2.cpp">
-      <Filter>UI\UIWindows\ScriptWnd</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UICellCustomItems.cpp">
       <Filter>UI\UIWindows\DragDrop</Filter>
     </ClCompile>
