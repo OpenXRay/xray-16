@@ -76,7 +76,7 @@ public:
     template <class CB, class... Args>
     CEventNotifierCallback::CID Subscribe(EEventID event_id, Args&&... args)
     {
-        return m_events_notifier.CreateRegisteredCallback<CB>(event_id, args...);
+        return m_events_notifier.template CreateRegisteredCallback<CB>(event_id, args...);
     }
 
     bool Unsubscribe(CEventNotifierCallback::CID cid, EEventID event_id);
