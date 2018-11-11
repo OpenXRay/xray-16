@@ -42,10 +42,71 @@ IC void MouseRayFromPoint(Fvector& direction, int x, int y, Fmatrix& m_CamMat)
 #define SM_FOR_SEND_HEIGHT 480
 
 #if defined(USE_OGL)
+// XXX: remove
+// Temporary solution based on:
+// http://masandilov.ru/opengl/ScreenShots
+void WriteTGA(IWriter* file)
+{
+    const u32 width = psCurrentVidMode[0];
+    const u32 height = psCurrentVidMode[1];
+
+    constexpr u32 colorMode = 3;
+    const u32 size = width * height * colorMode;
+
+    auto output = new u8[size];
+
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, output);
+
+    const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    constexpr u8 bits = 24;
+    constexpr u8 flipped = 32;
+
+    u8 header[6];
+    header[0] = width % 256;
+    header[1] = width / 256;
+    header[2] = height % 256;
+    header[3] = height / 256;
+    header[4] = bits;
+    header[5] = flipped;
+
+    file->w(tgaHeader, sizeof(tgaHeader));
+    file->w(header, sizeof(header));
+
+    // TGA format used BGR instead of RGB
+    for (u32 i = 0; i < size; i += colorMode)
+        std::swap(output[i], output[i + 2]);
+
+    file->w(output, size);
+    xr_delete(output);
+}
+
+// XXX: Provide full implementation
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
-    // TODO: OGL: Implement screenshot feature.
-    VERIFY(!"CRender::ScreenshotImpl not implemented.");
+    switch (mode)
+    {
+    case SM_NORMAL:
+    {
+        string64 time;
+        string_path buf;
+        xr_sprintf(buf, sizeof(buf), "ss_%s_%s_(%s).tga", Core.UserName, timestamp(time),
+            g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
+        IWriter* fs = FS.w_open("$screenshots$", buf);
+        R_ASSERT(fs);
+        WriteTGA(fs);
+        FS.w_close(fs);
+
+        return;
+    }
+
+    case SM_FOR_CUBEMAP:
+    case SM_FOR_GAMESAVE:
+    case SM_FOR_LEVELMAP:
+    case SM_FOR_MPSENDING:
+        VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
+    }
 }
 #elif defined(USE_DX10) || defined(USE_DX11)
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
