@@ -912,7 +912,7 @@ public:
     }
 
 private:
-    EventDeleteForClientPredicate& operator=(EventDeleteForClientPredicate const& copy) {}
+    EventDeleteForClientPredicate& operator=(EventDeleteForClientPredicate const& copy) = delete;
     ClientID const m_client_id;
 }; // class EventDeleteForClientPredicate
 
