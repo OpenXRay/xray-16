@@ -675,6 +675,9 @@
     <ClCompile Include="rgl_shaders.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="blender_fxaa.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1111,6 +1114,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRenderGL\MSAA\glMSAABlender.h">
       <Filter>Interface implementations\MSAARender</Filter>
+    </ClInclude>
+    <ClInclude Include="blender_fxaa.h">
+      <Filter>Shading templates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

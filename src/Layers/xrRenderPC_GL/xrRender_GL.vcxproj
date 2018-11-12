@@ -196,6 +196,7 @@
     <ClCompile Include="blender_deffer_aref.cpp" />
     <ClCompile Include="blender_deffer_flat.cpp" />
     <ClCompile Include="blender_deffer_model.cpp" />
+    <ClCompile Include="blender_fxaa.cpp" />
     <ClCompile Include="blender_light_direct.cpp" />
     <ClCompile Include="blender_light_mask.cpp" />
     <ClCompile Include="blender_light_occq.cpp" />
@@ -385,6 +386,7 @@
     <ClInclude Include="blender_deffer_aref.h" />
     <ClInclude Include="blender_deffer_flat.h" />
     <ClInclude Include="blender_deffer_model.h" />
+    <ClInclude Include="blender_fxaa.h" />
     <ClInclude Include="blender_light_direct.h" />
     <ClInclude Include="blender_light_mask.h" />
     <ClInclude Include="blender_light_occq.h" />
