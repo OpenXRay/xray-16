@@ -258,6 +258,7 @@ public:
     void phase_scene_end();
     void phase_occq();
     void phase_ssao();
+    void phase_fxaa();
     void phase_downsamp();
     void phase_wallmarks();
     void phase_smap_direct(light* L, u32 sub_phase);

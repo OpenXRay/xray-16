@@ -1,0 +1,35 @@
+#include "common.h"
+#include "iostructs\p_mark_msaa.h"
+
+float4 _main ( p_TL2uv_msaa I )
+{
+#if MSAA_SAMPLES
+
+#ifdef GBUFFER_OPTIMIZATION
+	gbuffer_data gbd0 = gbuffer_load_data( I.Tex0, I.HPos, 0 );
+#else
+	gbuffer_data gbd0 = gbuffer_load_data( I.Tex0, 0 );
+#endif
+	float3 P0 = gbd0.P;
+	float3 N0 = gbd0.N;
+	
+	float3 P = gbd0.P / float(MSAA_SAMPLES);
+	float3 N = gbd0.N / float(MSAA_SAMPLES);
+
+	for( int i = 1; i < MSAA_SAMPLES; i++ )
+	{
+#ifdef GBUFFER_OPTIMIZATION
+		gbuffer_data gbd = gbuffer_load_data( I.Tex0, I.HPos, i );
+#else
+		gbuffer_data gbd = gbuffer_load_data( I.Tex0, i );
+#endif
+		P += gbd.P / float(MSAA_SAMPLES);
+		N += gbd.N / float(MSAA_SAMPLES);
+	}
+	
+	if (all(P==P0 && N==N0))
+	   discard;
+
+#endif // #if MSAA_SAMPLES
+	return float4(0.0f, 0.0f, 0.0f, 0.0f);
+}

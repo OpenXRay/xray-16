@@ -35,9 +35,13 @@ Texture2D s_occ;
 #endif
 #endif
 
+///////
+#undef USE_HDAO
+///////
+
 #ifdef USE_HDAO
 #if SSAO_QUALITY > 3
-#include "ssao_hdao_new.ps"
+//#include "ssao_hdao_new.ps"
 #endif
 #define USE_HDAO_CODE
 #if SSAO_QUALITY <=3
@@ -50,7 +54,7 @@ Texture2D s_occ;
 #define g_txDepth s_position
 #define g_txNormal s_normal
 #endif
-#include "ssao_hdao.ps"
+//#include "ssao_hdao.ps"
 #endif
 #else // USE_HDAO
 #ifdef	USE_HBAO
@@ -79,7 +83,7 @@ _out _main ( _input I, uint iSample )
 #	ifdef GBUFFER_OPTIMIZATION
 	float4	L = texelFetch( s_accumulator, int2(I.pos2d.xy), int(ISAMPLE));	// diffuse.specular
 #	else
-	float4   L = texelFetch( s_accumulator, int2(I.tc0 * pos_decompression_params2.xy), int(ISAMPLE) );
+	float4	L = texelFetch( s_accumulator, int2(I.tc0.xy * pos_decompression_params2.xy), int(ISAMPLE) );
 #	endif
 #endif
 
@@ -115,9 +119,9 @@ _out _main ( _input I, uint iSample )
 
 #ifdef USE_MSAA
 #	ifdef GBUFFER_OPTIMIZATION
-	int2	texCoord = I.pos2d;
+	int2	texCoord = int2( I.pos2d.xy );
 #	else
-	int2	texCoord = int2( I.tc0 * pos_decompression_params2.xy );
+	int2	texCoord = int2( I.tc0.xy * pos_decompression_params2.xy );
 #	endif
 #endif
 	

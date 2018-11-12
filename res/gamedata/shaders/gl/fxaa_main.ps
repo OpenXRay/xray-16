@@ -2,19 +2,18 @@
 #include "iostructs\p_TL.h"
 #include "fxaa.ps"
 
-Texture2D			s_base0;
+Texture2D		s_base0;
 uniform float4		screen_res;	
 
 float4 _main ( p_TL I )
 {
 	float2 rcpFrame = float2(1.0f/screen_res.x, 1.0f/screen_res.y);
-	FxaaTex tex = { smp_rtlinear, s_base0};
 
 	return FxaaPixelShader(I.Tex0,
             FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsolePosPos,
-            tex,							// FxaaTex tex,
-            tex,							// FxaaTex fxaaConsole360TexExpBiasNegOne,
-            tex,							// FxaaTex fxaaConsole360TexExpBiasNegTwo,
+            s_base0,							// FxaaTex tex,
+            s_base0,							// FxaaTex fxaaConsole360TexExpBiasNegOne,
+            s_base0,							// FxaaTex fxaaConsole360TexExpBiasNegTwo,
             rcpFrame,							// FxaaFloat2 fxaaQualityRcpFrame,
             FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt,
             FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt2,
