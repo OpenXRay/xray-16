@@ -309,32 +309,25 @@ IReader* open_chunk(void* ptr, u32 ID)
 IReader* open_chunk(int fd, u32 ID)
 {
     u32 dwType, dwSize;
-    DWORD read_byte;
+    ssize_t read_byte;
     ::lseek(fd, 0L, SEEK_SET);
 
     while (true)
     {
         read_byte = ::read(fd, &dwType, 4);
-        bool res = (read_byte != -1);
-
-        if (read_byte == 0)
+        if (read_byte == -1)
             return nullptr;
-        //. VERIFY(res&&(read_byte==4));
 
         read_byte = ::read(fd, &dwSize, 4);
-        res = (read_byte != -1);
-
-        if (read_byte == 0)
+        if (read_byte == -1)
             return nullptr;
-        //. VERIFY(res&&(read_byte==4));
 
         if ((dwType & ~CFS_CompressMark) == ID)
         {
             u8* src_data = xr_alloc<u8>(dwSize);
             read_byte = ::read(fd, src_data, dwSize);
-            res = (read_byte != -1);
 
-            VERIFY(res && (read_byte == dwSize));
+            VERIFY(read_byte == dwSize);
             if (dwType & CFS_CompressMark)
             {
                 BYTE* dest;
