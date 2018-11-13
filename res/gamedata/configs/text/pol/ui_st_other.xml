@@ -90,6 +90,21 @@
 	<string id="st_loading_textures">
 		<text>Wczytywanie tekstur</text>
 	</string>
+	<string id="st_loading_lights">
+		<text>Wczytywanie oœwietlenia</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>Klient: Czenie z</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>Klient: Odradzanie</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>Klient: Synchronizacja</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>Tworzenie nowej gry</text>
+	</string>
 	<string id="st_mp_direct_ip">
 		<text>Bezpoœr. adres IP</text>
 	</string>

@@ -93,6 +93,9 @@
 	<string id="st_undress_outfit">
 		<text>Zdejmij kombinezon</text>
 	</string>
+	<string id="st_unequip">
+		<text>Zdejmij</text>
+	</string>
 	<string id="st_unload_magazine">
 		<text>Roz³aduj</text>
 	</string>

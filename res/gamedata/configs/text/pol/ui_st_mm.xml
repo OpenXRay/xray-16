@@ -916,13 +916,13 @@
 		<text>Unikalny pseudonim jest za d³ugi. Nie mo¿na wprowadziæ wiêcej ni¿ 30 znaków.</text>
 	</string>
 	<string id="mp_gp_unique_nick_must_contain_only">
-		<text>Unikalne imiê mo¿e zawieraæ tylko cyfry, litery alfabetu ³ac. i symbole spec.: "#$&'()*+-./:;<=>?@[]^_`{|}~ </text>
+		<text>![CDATA[Unikalne imiê mo¿e zawieraæ tylko cyfry, litery alfabetu ³ac. i symbole spec.: "#$&'()*+-./:;<=>?@[]^_`{|}~]]</text>
 	</string>
 	<string id="mp_gp_unique_nick_must_contain_nospaces">
 		<text>Unikalny pseudonim nie mo¿e zawieraæ spacji</text>
 	</string>
 	<string id="mp_gp_unique_nick_bad_first_symbol">
-		<text>Unikalne imiê nie mo¿e zaczynaæ siê od cyfry lub symbolu: "@", "+", ":" lub ‘#’</text>
+		<text>![CDATA[Unikalne imiê nie mo¿e zaczynaæ siê od cyfry lub symbolu: "@", "+", ":" lub ‘#’]]</text>
 	</string>
 	<string id="st_opt_ultra">
 		<text>bardzo wysokie</text>
