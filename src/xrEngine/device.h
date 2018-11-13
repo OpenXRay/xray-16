@@ -351,7 +351,7 @@ extern ENGINE_API CLoadScreenRenderer load_screen_renderer;
 class CDeviceResetNotifier : public pureDeviceReset
 {
 public:
-    CDeviceResetNotifier() { Device.seqDeviceReset.Add(this, REG_PRIORITY_NORMAL); }
+    CDeviceResetNotifier(const int prio = REG_PRIORITY_NORMAL) { Device.seqDeviceReset.Add(this, prio); }
     virtual ~CDeviceResetNotifier() { Device.seqDeviceReset.Remove(this); }
     void OnDeviceReset() override {}
 };
@@ -359,7 +359,7 @@ public:
 class CUIResetNotifier : public pureUIReset
 {
 public:
-    CUIResetNotifier() { Device.seqUIReset.Add(this, REG_PRIORITY_NORMAL); }
+    CUIResetNotifier(const int prio = REG_PRIORITY_NORMAL) { Device.seqUIReset.Add(this, prio); }
     virtual ~CUIResetNotifier() { Device.seqUIReset.Remove(this); }
     void OnUIReset() override {}
 };
@@ -367,10 +367,10 @@ public:
 class CUIResetAndResolutionNotifier : public pureUIReset, pureScreenResolutionChanged
 {
 public:
-    CUIResetAndResolutionNotifier()
+    CUIResetAndResolutionNotifier(const int uiResetPrio = REG_PRIORITY_NORMAL, const int resolutionChangedPrio = REG_PRIORITY_NORMAL)
     {
-        Device.seqUIReset.Add(this, REG_PRIORITY_NORMAL);
-        Device.seqResolutionChanged.Add(this, REG_PRIORITY_NORMAL);
+        Device.seqUIReset.Add(this, uiResetPrio);
+        Device.seqResolutionChanged.Add(this, resolutionChangedPrio);
     }
 
     virtual ~CUIResetAndResolutionNotifier()
