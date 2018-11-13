@@ -41,10 +41,10 @@ public:
     {
         switch (ftype)
         {
-        case tt_greater_equal: { return &ge_function;
+        case tt_greater_equal: { return &s_ge_function;
         }
         break;
-        case tt_less_equal: { return &le_function;
+        case tt_less_equal: { return &s_le_function;
         }
         break;
         }; // switch (ftype)
@@ -52,8 +52,8 @@ public:
     }
 
 private:
-    static ge_function<T> ge_function;
-    static le_function<T> le_function;
+    static ge_function<T> s_ge_function;
+    static le_function<T> s_le_function;
 };
 
 typedef binary_function<float> float_binary_function;

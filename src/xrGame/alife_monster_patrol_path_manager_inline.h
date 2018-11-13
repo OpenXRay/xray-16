@@ -25,12 +25,12 @@ IC bool CALifeMonsterPatrolPathManager::actual() const { return (m_actual); }
 IC bool CALifeMonsterPatrolPathManager::completed() const { return (actual() && m_completed); }
 IC void CALifeMonsterPatrolPathManager::start_type(const EPatrolStartType& start_type) { m_start_type = start_type; }
 IC void CALifeMonsterPatrolPathManager::route_type(const EPatrolRouteType& route_type) { m_route_type = route_type; }
-IC const CALifeMonsterPatrolPathManager::EPatrolStartType& CALifeMonsterPatrolPathManager::start_type() const
+IC const EPatrolStartType& CALifeMonsterPatrolPathManager::start_type() const
 {
     return (m_start_type);
 }
 
-IC const CALifeMonsterPatrolPathManager::EPatrolRouteType& CALifeMonsterPatrolPathManager::route_type() const
+IC const EPatrolRouteType& CALifeMonsterPatrolPathManager::route_type() const
 {
     return (m_route_type);
 }

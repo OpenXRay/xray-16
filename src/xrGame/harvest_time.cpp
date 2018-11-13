@@ -32,6 +32,7 @@ struct victim_raw_kill
         m_killer = copy.m_killer;
         m_victim = copy.m_victim;
         m_after_time = copy.m_after_time;
+        return *this;
     }
 
     bool operator()(shared_str const& killer, shared_str const& victim, kills_store::kill const& kill)

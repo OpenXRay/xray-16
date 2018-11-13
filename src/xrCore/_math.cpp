@@ -350,6 +350,9 @@ void *__cdecl thread_entry(void* _params)
 
     // call
     entry(arglist);
+#ifdef LINUX
+    return nullptr;
+#endif
 }
 
 void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* arglist)
