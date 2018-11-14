@@ -72,6 +72,8 @@ class CMainMenu : public IMainMenu,
 
     xr_vector<CUIWindow*> m_pp_draw_wnds;
 
+    bool languageChanged;
+
     CGameSpy_Full* m_pGameSpyFull;
     gamespy_gp::account_manager* m_account_mngr;
     gamespy_gp::login_manager* m_login_mngr;
@@ -144,6 +146,9 @@ public:
     virtual void Activate(bool bActive);
     bool IsActive() const override;
     virtual bool CanSkipSceneRendering();
+
+    virtual bool IsLanguageChanged();
+    virtual void SetLanguageChanged(bool status);
 
     virtual bool IgnorePause() { return true; }
     virtual void IR_OnMousePress(int btn);

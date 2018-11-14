@@ -22,6 +22,11 @@ function opt_gameplay:InitControls(x, y, xml, handler)
 	xml:InitStatic("tab_gameplay:cap_difficulty", _st)
 	xml:InitComboBox("tab_gameplay:list_difficulty", _st)
 	self.scroll_v:AddWindow(_st, true)
+    
+	_st = xml:InitStatic("tab_gameplay:templ_item", nil)
+	xml:InitStatic("tab_gameplay:cap_localization", _st)
+	xml:InitComboBox("tab_gameplay:list_localization", _st)
+	self.scroll_v:AddWindow(_st, true)
 
 	_st = xml:InitStatic("tab_gameplay:templ_item", nil)
 	xml:InitStatic("tab_gameplay:cap_ui_style", _st)

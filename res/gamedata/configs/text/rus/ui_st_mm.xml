@@ -969,4 +969,13 @@
 	<string id="ui_mm_confirm_changes">
 		<text>Применить сделанные изменения? Все изменения будут отменены через</text>
 	</string>
+	<string id="ui_mm_localization">
+		<text>Язык</text>
+	</string>
+	<string id="eng">
+		<text>English</text>
+	</string>
+	<string id="rus">
+		<text>Русский</text>
+	</string>
 </string_table>
