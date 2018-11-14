@@ -72,6 +72,7 @@ public:
     CAI_Space& operator=(const CAI_Space&) = delete;
     virtual ~CAI_Space();
     static CAI_Space& GetInstance();
+    void DestroyScriptEngine();
 
     template <class CB, class... Args>
     CEventNotifierCallback::CID Subscribe(EEventID event_id, Args&&... args)

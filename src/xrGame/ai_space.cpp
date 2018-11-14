@@ -58,6 +58,17 @@ CAI_Space& CAI_Space::GetInstance()
     return instance;
 }
 
+void CAI_Space::DestroyScriptEngine()
+{
+    if (GEnv.ScriptEngine != nullptr)
+    {
+        m_events_notifier.FireEvent(EVENT_SCRIPT_ENGINE_RESET);
+    }
+
+    unload();
+    xr_delete(GEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
+}
+
 void CAI_Space::init()
 {
     R_ASSERT(!m_inited);
@@ -79,15 +90,7 @@ void CAI_Space::init()
 }
 
 CAI_Space::~CAI_Space()
-{
-    if (GEnv.ScriptEngine != nullptr)
-    {
-        m_events_notifier.FireEvent(EVENT_SCRIPT_ENGINE_RESET);
-    }
-
-    unload();
-    xr_delete(GEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
-}
+{}
 
 void CAI_Space::RegisterScriptClasses()
 {

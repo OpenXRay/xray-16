@@ -61,8 +61,7 @@ extern CUIXml* pWpnScopeXml;
 
 void clean_game_globals()
 {
-    // destroy object factory
-    xr_delete(g_object_factory);
+    ai().DestroyScriptEngine();
     // destroy monster squad global var
     xr_delete(g_monster_squad);
 
