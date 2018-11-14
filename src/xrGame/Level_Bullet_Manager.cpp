@@ -184,8 +184,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet)
 {
 #ifdef DEBUG
-    if (g_mt_config.test(mtBullets))
-        VERIFY(m_thread_id == GetCurrentThreadId());
+    VERIFY(m_thread_id == GetCurrentThreadId());
 #endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
@@ -210,7 +209,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 void CBulletManager::UpdateWorkload()
 {
 #ifdef DEBUG
-    if (g_mt_config.test(mtBullets))
+    if (!g_mt_config.test(mtBullets))
         VERIFY(m_thread_id == GetCurrentThreadId());
 #endif
 
