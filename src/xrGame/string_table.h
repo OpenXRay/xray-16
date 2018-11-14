@@ -29,6 +29,8 @@ public:
     STRING_VALUE translate(const STRING_ID& str_id) const;
     void rescan();
 
+    void ReloadLanguage();
+
     static BOOL m_bWriteErrorsToLog;
     static void ReparseKeyBindings();
 
@@ -37,5 +39,8 @@ private:
     static STRING_VALUE ParseLine(LPCSTR str, LPCSTR key, bool bFirst);
     static STRING_TABLE_DATA* pData;
 };
+
+extern u32 gLanguage;
+extern xr_vector<xr_token> gLanguagesToken;
 
 CStringTable& StringTable();

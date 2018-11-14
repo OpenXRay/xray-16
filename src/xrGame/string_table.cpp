@@ -8,6 +8,9 @@ CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 STRING_TABLE_DATA* CStringTable::pData = NULL;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 
+u32 gLanguage = -1;
+xr_vector<xr_token> gLanguagesToken;
+
 CStringTable::CStringTable()
 {
     pData = nullptr;
@@ -30,8 +33,41 @@ void CStringTable::Init()
 
     pData = new STRING_TABLE_DATA();
 
+    if (gLanguagesToken.size() == 0)
+    {
+        u32 lineCount = pSettings->line_count("Languages");
+        if (lineCount == 0)
+            R_ASSERT2(false, "Section \"Languages\" is empty!");
+
+        LPCSTR lineName, lineVal;
+        for (u16 i = 0; i < lineCount; i++)
+        {
+            pSettings->r_line("Languages", i, &lineName, &lineVal);
+            gLanguagesToken.emplace_back(lineName, i);
+        }
+        gLanguagesToken.emplace_back(nullptr, -1);
+    }
+
     //имя языка, если не задано (NULL), то первый <text> в <string> в XML
-    pData->m_sLanguage = pSettings->r_string("string_table", "language");
+    if (gLanguage != (u32)-1)
+        pData->m_sLanguage = gLanguagesToken.at(gLanguage).name;
+    else
+    {
+        pData->m_sLanguage = pSettings->r_string("string_table", "language");
+        bool found = false;
+        for (const auto& it : gLanguagesToken)
+        {
+            if (it.name && it.name == pData->m_sLanguage)
+            {
+                gLanguage = it.id;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            R_ASSERT2(false, "Check localization.ltx");
+    }
 
     //---
     FS_FileSet fset;
@@ -85,6 +121,15 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
         pData->m_StringTable[string_name] = str_val;
     }
+}
+
+void CStringTable::ReloadLanguage()
+{
+    if (0 == xr_strcmp(gLanguagesToken.at(gLanguage).name, pData->m_sLanguage.c_str()))
+        return;
+
+    Destroy();
+    Init();
 }
 
 void CStringTable::ReparseKeyBindings()
