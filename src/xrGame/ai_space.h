@@ -91,14 +91,8 @@ public:
     IC doors::manager& doors() const;
 };
 
-// Static initializer for every translation unit
-// Need to avoid static initilization order problem
-static struct SAI_Space_Initializer
-{
-    SAI_Space_Initializer();
-    ~SAI_Space_Initializer();
-} s_AISpaceInitializer;
-
 IC CAI_Space& ai();
+
+extern CAI_Space* g_ai_space;
 
 #include "ai_space_inline.h"

@@ -27,7 +27,7 @@ protected:
     void SetGameGraph(CGameGraph* gameGraph);
 
 public:
-    ~AISpaceBase();
+    virtual ~AISpaceBase();
     inline CGameGraph& game_graph() const;
     inline CGameGraph* get_game_graph() const;
     inline CLevelGraph& level_graph() const;
