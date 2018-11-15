@@ -184,6 +184,9 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet)
 {
 #ifdef DEBUG
+    // Always called in Primary thread
+    // Uncomment below if you will change the behaviour
+    // if (!g_mt_config.test(mtBullets))
     VERIFY(m_thread_id == GetCurrentThreadId());
 #endif
 
