@@ -65,7 +65,7 @@ CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
     }
 //----------------------------------------------------------------------------------
 
-CMainMenu::CMainMenu()
+CMainMenu::CMainMenu() : languageChanged(false)
 {
     class CResetEventCb : public CEventNotifierCallbackWithCid
     {
@@ -89,7 +89,6 @@ CMainMenu::CMainMenu()
     g_btnHint = NULL;
     g_statHint = NULL;
     m_deactivated_frame = 0;
-    languageChanged = false;
 
     m_sPatchURL = "";
 #ifdef WINDOWS

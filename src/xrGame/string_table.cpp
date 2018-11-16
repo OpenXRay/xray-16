@@ -5,7 +5,7 @@
 
 CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 
-STRING_TABLE_DATA* CStringTable::pData = nullptr;
+xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 u32 CStringTable::LanguageID = std::numeric_limits<u32>::max();
 xr_vector<xr_token> CStringTable::languagesToken;
@@ -17,21 +17,26 @@ CStringTable::CStringTable()
 }
 
 CStringTable::~CStringTable() { Destroy(); }
-void CStringTable::Destroy() { xr_delete(pData); }
+void CStringTable::Destroy()
+{
+    pData.reset(nullptr);
+}
+
 void CStringTable::rescan()
 {
-    if (pData != nullptr)
-        return;
-    Destroy();
-    Init();
+    if (!pData)
+    {
+        Destroy();
+        Init();
+    }
 }
 
 void CStringTable::Init()
 {
-    if (pData != nullptr)
+    if (pData)
         return;
 
-    pData = new STRING_TABLE_DATA();
+    pData = xr_make_unique<STRING_TABLE_DATA>();
 
     SetLanguage();
 
@@ -76,31 +81,22 @@ void CStringTable::FillLanguageToken()
 
 void CStringTable::SetLanguage()
 {
-    if (LanguageID != (u32)-1)
+    if (LanguageID != std::numeric_limits<u32>::max())
         pData->m_sLanguage = languagesToken.at(LanguageID).name;
     else
     {
         pData->m_sLanguage = pSettings->r_string("string_table", "language");
-        bool found = false;
-        for (const auto& it : languagesToken)
-        {
-            if (it.name && it.name == pData->m_sLanguage)
-            {
-                LanguageID = it.id;
-                found = true;
-                break;
-            }
-        }
+        auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token) {
+            return token.name && token.name == pData->m_sLanguage;
+        });
 
-        if (!found)
-            R_ASSERT2(false, "Check localization.ltx");
+        R_ASSERT3(it != languagesToken.end(), "Check localization.ltx! Current language: ", pData->m_sLanguage.c_str());
+        if (it != languagesToken.end())
+            LanguageID = (*it).id;
     }
 }
 
-xr_token* CStringTable::GetLanguagesToken() const
-{
-    return languagesToken.data();
-}
+xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data(); }
 
 void CStringTable::Load(LPCSTR xml_file_full)
 {

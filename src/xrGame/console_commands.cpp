@@ -205,9 +205,9 @@ public:
 class CCC_GameLanguage : public CCC_Token
 {
 public:
-    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&CStringTable::LanguageID, NULL){};
+    CCC_GameLanguage(pcstr N) : CCC_Token(N, (u32*)&CStringTable::LanguageID, nullptr) {}
 
-    virtual void Execute(LPCSTR args)
+    void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
         StringTable().ReloadLanguage();
