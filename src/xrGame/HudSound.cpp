@@ -177,7 +177,6 @@ void HUD_SOUND_COLLECTION::LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, 
     sndShot is played, it will play all the sound items with the same alias.
 */
 //----------------------------------------------------------
-#ifdef LAYERED_SND_SHOOT
 HUD_SOUND_COLLECTION_LAYERED::~HUD_SOUND_COLLECTION_LAYERED()
 {
     for (auto& sound_item : m_sound_items)
@@ -288,5 +287,4 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(CInifile const *ini, pcstr section,
         snd_item.m_alias = alias;
     }
 }
-#endif
 //-Alundaio

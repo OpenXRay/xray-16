@@ -56,10 +56,8 @@ class HUD_SOUND_COLLECTION
 public:
     ~HUD_SOUND_COLLECTION();
 
-#ifdef LAYERED_SND_SHOOT
     HUD_SOUND_COLLECTION() : m_alias(nullptr) {};
     shared_str m_alias; //Alundaio: For use when it's part of a layered Collection
-#endif
 
     xr_vector<HUD_SOUND_ITEM> m_sound_items; //Alundaio: made public
 
@@ -77,7 +75,6 @@ public:
 };
 
 //Alundaio:
-#ifdef LAYERED_SND_SHOOT
 class HUD_SOUND_COLLECTION_LAYERED
 {
     xr_vector<HUD_SOUND_COLLECTION> m_sound_items;
@@ -99,5 +96,4 @@ public:
 
     void SetPosition(pcstr alias, const Fvector& pos);
 };
-#endif
 //-Alundaio

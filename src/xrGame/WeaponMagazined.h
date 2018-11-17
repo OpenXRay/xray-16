@@ -28,10 +28,8 @@ protected:
     ESoundTypes m_eSoundShot;
     ESoundTypes m_eSoundEmptyClick;
     ESoundTypes m_eSoundReload;
-#ifdef NEW_SOUNDS //AVO: new sounds go here
     ESoundTypes m_eSoundReloadEmpty;
     ESoundTypes m_eSoundReloadMisfire;
-#endif //-NEW_SOUNDS
 
     bool m_sounds_enabled;
     // General
@@ -180,8 +178,6 @@ protected:
     bool WeaponSoundExist(pcstr section, pcstr sound_name) const;
 
     //Alundaio: LAYERED_SND_SHOOT
-#ifdef LAYERED_SND_SHOOT
     HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
-#endif
     //-Alundaio
 };

@@ -344,13 +344,11 @@ bool CHudItem::TryPlayAnimIdle()
                     PlayAnimIdleMoving();
                     return true;
                 }
-#ifdef NEW_ANIMS //AVO: new crouch idle animation
                 if (st.bCrouch && isHUDAnimationExist("anm_idle_moving_crouch"))
                 {
                     PlayAnimIdleMovingCrouch();
                     return true;
                 }
-#endif //-NEW_ANIMS
             }
         }
     }

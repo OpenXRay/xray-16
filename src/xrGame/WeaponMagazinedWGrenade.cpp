@@ -592,7 +592,6 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
     auto state = GetState();
     VERIFY(state == eReload);
 
-#ifdef NEW_ANIMS //AVO: use new animations
     if (IsGrenadeLauncherAttached())
     {
         if (bMisfire)
@@ -617,12 +616,6 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
     }
     else
         inherited::PlayAnimReload();
-#else
-    if (IsGrenadeLauncherAttached())
-        PlayHUDMotion("anm_reload_w_gl", true, this, state);
-    else
-        inherited::PlayAnimReload();
-#endif //-NEW_ANIMS
 }
 
 void CWeaponMagazinedWGrenade::PlayAnimIdle()
@@ -663,11 +656,9 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                     PlayHUDMotion("anm_idle_sprint_g", TRUE, NULL, GetState());
                 else if (act_state == 2)
                     PlayHUDMotion("anm_idle_moving_g", TRUE, NULL, GetState());
-#ifdef NEW_ANIMS //AVO: custom move animation
                 else if (act_state == 3)
                     if (isHUDAnimationExist("anm_idle_moving_crouch_g"))
                         PlayHUDMotion("anm_idle_moving_crouch_g", true, nullptr, GetState());
-#endif //-NEW_ANIMS
             }
             else
             {
@@ -677,11 +668,9 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                     PlayHUDMotion("anm_idle_sprint_w_gl", TRUE, NULL, GetState());
                 else if (act_state == 2)
                     PlayHUDMotion("anm_idle_moving_w_gl", TRUE, NULL, GetState());
-#ifdef NEW_ANIMS //AVO: custom move animation
                 else if (act_state == 3)
                     if (isHUDAnimationExist("anm_idle_moving_crouch_w_gl"))
                         PlayHUDMotion("anm_idle_moving_crouch_w_gl", true, nullptr, GetState());
-#endif //-NEW_ANIMS
             }
         }
     }

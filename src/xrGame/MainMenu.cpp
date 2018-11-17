@@ -315,7 +315,8 @@ void CMainMenu::Activate(bool bActivate)
         if (m_Flags.test(flNeedVidRestart))
         {
             m_Flags.set(flNeedVidRestart, FALSE);
-            Console->Execute("vid_restart");
+            //Console->Execute("vid_restart");
+            Device.PreCache(20, true, false);
         }
     }
 }

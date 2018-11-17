@@ -25,40 +25,8 @@
 /* Tweaks: */
 //#define FP_DEATH // first person death view
 #define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
-#define NEW_ANIMS // use new animations. Please enclose any new animation additions with this define
 
 //#define CONFIG_SUN_MOVEMENT // With this defined sun will move as configured in weather ltx files
 
-/* Sound: */
-#define NEW_SOUNDS // use new sounds. Please enclose any new sound additions with this define
-#define LAYERED_SND_SHOOT// see comment down below
-
 /* Debug: */
 //#define USE_LOG_TIMING
-
-
-/* LAYERED_SND_SHOOT by Alundaio
-When defined, it will allow you to play a group of sounds from a specified section for snd_shoot.
-You can have as many layers as you want, but you must follow naming convention,
-snd_1_layer
-snd_2_layer
-snd_3_layer
-...
-You can also have different variants for each layer defined,
-snd_1_layer
-snd_1_layer1
-snd_1_layer2
-...
-The correct line settings are standard, (ie. snd_1_layer = sound_path, volume, delay)
-ex.
-Here is an example usage:
-snd_shoot = new_snd_section
-[new_snd_section]
-snd_1_layer = weapons\new_sound_shoot1
-snd_1_layer1 = weapons\new_sound_shoot2
-snd_1_layer2 = weapons\new_sound_shoot3
-snd_1_layer3 = weapons\new_sound_shoot4
-snd_2_layer = weapons\mechanical_noise, 1.0, 0.1
-snd_3_layer = weapons\gunshot_echo, 1.0, 0.8
-*/
-//-TWEAKS

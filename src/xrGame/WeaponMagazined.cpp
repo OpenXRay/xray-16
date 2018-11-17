@@ -38,12 +38,13 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
 {
     m_eSoundShow = ESoundTypes(SOUND_TYPE_ITEM_TAKING | eSoundType);
     m_eSoundHide = ESoundTypes(SOUND_TYPE_ITEM_HIDING | eSoundType);
+
     m_eSoundShot = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
     m_eSoundEmptyClick = ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
+
     m_eSoundReload = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
-#ifdef NEW_SOUNDS
     m_eSoundReloadEmpty = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
-#endif
+
     m_sounds_enabled = true;
 
     m_sSndShotCurrent = nullptr;
@@ -87,22 +88,16 @@ void CWeaponMagazined::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_holster", "sndHide", false, m_eSoundHide);
 
     //Alundaio: LAYERED_SND_SHOOT
-#ifdef LAYERED_SND_SHOOT
     m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
-#else
-    m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
-#endif
     //-Alundaio
 
     m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
 
-#ifdef NEW_SOUNDS //AVO: custom sounds go here
     if (WeaponSoundExist(section, "snd_reload_empty"))
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
     if (WeaponSoundExist(section, "snd_reload_misfire"))
         m_sounds.LoadSound(section, "snd_reload_misfire", "sndReloadMisfire", true, m_eSoundReloadMisfire);
-#endif //-NEW_SOUNDS
 
     m_sSndShotCurrent = "sndShot";
 
@@ -115,15 +110,9 @@ void CWeaponMagazined::Load(LPCSTR section)
             m_sSilencerSmokeParticles = pSettings->r_string(section, "silencer_smoke_particles");
 
         //Alundaio: LAYERED_SND_SHOOT Silencer
-#ifdef LAYERED_SND_SHOOT
         m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
         if (WeaponSoundExist(section, "snd_silncer_shot_actor"))
             m_layered_sounds.LoadSound(section, "snd_silncer_shot_actor", "sndSilencerShotActor", false, m_eSoundShot);
-#else
-        m_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
-        if (WeaponSoundExist(section, "snd_silncer_shot_actor"))
-            m_sounds.LoadSound(section, "snd_silncer_shot_actor", "sndSilencerShotActor", false, m_eSoundShot);
-#endif
         //-Alundaio
     }
 
@@ -510,10 +499,8 @@ void CWeaponMagazined::UpdateSounds()
     //. nah	m_sounds.SetPosition("sndShot", P);
     m_sounds.SetPosition("sndReload", P);
 
-#ifdef NEW_SOUNDS //AVO: custom sounds go here
     if (m_sounds.FindSoundItem("sndReloadEmpty", false))
         m_sounds.SetPosition("sndReloadEmpty", P);
-#endif //-NEW_SOUNDS
 
     //. nah	m_sounds.SetPosition("sndEmptyClick", P);
 }
@@ -636,11 +623,7 @@ void CWeaponMagazined::OnShot()
 {
     // Sound
     //Alundaio: LAYERED_SND_SHOOT
-#ifdef LAYERED_SND_SHOOT
     m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
-#else
-    PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), (u8)-1); //Alundaio: Play sound at index (ie. snd_shoot, snd_shoot1, snd_shoot2, snd_shoot3)
-#endif
     //-Alundaio
 
     // Camera
@@ -761,7 +744,6 @@ void CWeaponMagazined::PlayReloadSound()
 {
     if (m_sounds_enabled)
     {
-#ifdef NEW_SOUNDS //AVO: use custom sounds
         if (bMisfire)
         {
             //TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
@@ -780,9 +762,6 @@ void CWeaponMagazined::PlayReloadSound()
             else
                 PlaySound("sndReload", get_LastFP());
         }
-#else
-        PlaySound("sndReload", get_LastFP());
-#endif //-AVO
     }
 }
 
@@ -1155,7 +1134,6 @@ void CWeaponMagazined::PlayAnimReload()
 {
     auto state = GetState();
     VERIFY(state == eReload);
-#ifdef NEW_ANIMS //AVO: use new animations
     if (bMisfire)
         if (isHUDAnimationExist("anm_reload_misfire"))
             PlayHUDMotion("anm_reload_misfire", true, this, state);
@@ -1171,9 +1149,6 @@ void CWeaponMagazined::PlayAnimReload()
         else
             PlayHUDMotion("anm_reload", true, this, state);
     }
-#else
-    PlayHUDMotion("anm_reload", true, this, state);
-#endif //-NEW_ANIM
 }
 
 void CWeaponMagazined::PlayAnimAim() { PlayHUDMotion("anm_idle_aim", true, nullptr, GetState()); }
@@ -1463,11 +1438,7 @@ bool CWeaponMagazined::install_upgrade_impl(LPCSTR section, bool test)
     result2 = process_if_exists_set(section, "snd_shoot", &CInifile::r_string, str, test);
     if (result2 && !test)
     {
-#ifdef LAYERED_SND_SHOOT
         m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
-#else
-        m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
-#endif
     }
     result |= result2;
 
@@ -1485,14 +1456,12 @@ bool CWeaponMagazined::install_upgrade_impl(LPCSTR section, bool test)
     }
     result |= result2;
 
-#ifdef NEW_SOUNDS //AVO: custom sounds go here
     result2 = process_if_exists_set(section, "snd_reload_empty", &CInifile::r_string, str, test);
     if (result2 && !test)
     {
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
     }
     result |= result2;
-#endif //-NEW_SOUNDS
 
     // snd_shoot1     = weapons\ak74u_shot_1 ??
     // snd_shoot2     = weapons\ak74u_shot_2 ??
@@ -1508,11 +1477,7 @@ bool CWeaponMagazined::install_upgrade_impl(LPCSTR section, bool test)
         result2 = process_if_exists_set(section, "snd_silncer_shot", &CInifile::r_string, str, test);
         if (result2 && !test)
         {
-#ifdef LAYERED_SND_SHOOT
             m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
-#else
-            m_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
-#endif
         }
         result |= result2;
     }
