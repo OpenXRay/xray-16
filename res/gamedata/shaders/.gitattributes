@@ -1,0 +1,15 @@
+# DirectX renderer shader extension names
+*.ps text linguist-language=HLSL
+*.vs text linguist-language=HLSL
+*.gs text linguist-language=HLSL
+*.cs text linguist-language=HLSL
+*.hs text linguist-language=HLSL
+*.ds text linguist-language=HLSL
+
+# OpenGL renderer uses the same extensions
+gl/*.ps text linguist-language=GLSL
+gl/*.vs text linguist-language=GLSL
+gl/*.gs text linguist-language=GLSL
+gl/*.cs text linguist-language=GLSL
+gl/*.hs text linguist-language=GLSL
+gl/*.ds text linguist-language=GLSL
