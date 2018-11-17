@@ -1,6 +1,4 @@
 #include "pch_script.h"
-
-// UI-controls
 #include "UIScriptWnd.h"
 #include "uiscriptwnd_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -8,20 +6,20 @@
 
 using namespace luabind;
 
-extern export_class& script_register_ui_window1(export_class&);
-extern export_class& script_register_ui_window2(export_class&);
-
-SCRIPT_EXPORT(CUIDialogWndEx, (CUIDialogWnd, IFactoryObject), {
-    export_class instance("CUIScriptWnd");
-
-    module(luaState)[script_register_ui_window2(script_register_ui_window1(instance)).def("Load", &BaseType::Load)];
-});
-
-export_class& script_register_ui_window1(export_class& instance)
+// clang-format off
+SCRIPT_EXPORT(CUIDialogWndEx, (CUIDialogWnd, IFactoryObject),
 {
-    instance.def(constructor<>())
-        .def("AddCallback", (void (BaseType::*)(LPCSTR, s16, const luabind::functor<void>&, const luabind::object&)) &
+    module(luaState)
+    [
+        luabind::class_<CUIDialogWndEx, luabind::bases<CUIDialogWnd, IFactoryObject>, luabind::default_holder, WrapType>("CUIScriptWnd")
+            .def(constructor<>())
+            .def("AddCallback", (void (BaseType::*)(LPCSTR, s16, const luabind::functor<void>&, const luabind::object&)) &
                 BaseType::AddCallback)
-        .def("Register", (void (BaseType::*)(CUIWindow*, LPCSTR)) & BaseType::Register);
-    return (instance);
-}
+            .def("Register", (void (BaseType::*)(CUIWindow*, LPCSTR)) & BaseType::Register)
+            .def("OnKeyboard", &BaseType::OnKeyboardAction, &WrapType::OnKeyboard_static)
+            .def("Update", &BaseType::Update, &WrapType::Update_static)
+            .def("Dispatch", &BaseType::Dispatch, &WrapType::Dispatch_static)
+            .def("Load", &BaseType::Load)
+    ];
+});
+// clang-format on

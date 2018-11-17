@@ -29,6 +29,10 @@
 
 #define ITEM_REMOVE_TIME 30000
 
+constexpr pcstr INV_NAME_KEY = "inv_name";
+constexpr pcstr INV_NAME_SHORT_KEY = "inv_name_short";
+constexpr pcstr DESCRIPTION_KEY = "description";
+
 net_updateInvData* CInventoryItem::NetSync()
 {
     if (!m_net_updateData)
@@ -93,8 +97,8 @@ void CInventoryItem::Load(LPCSTR section)
         self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
 
     m_section_id._set(section);
-    m_name = StringTable().translate(pSettings->r_string(section, "inv_name"));
-    m_nameShort = StringTable().translate(pSettings->r_string(section, "inv_name_short"));
+    m_name = StringTable().translate(pSettings->r_string(section, INV_NAME_KEY));
+    m_nameShort = StringTable().translate(pSettings->r_string(section, INV_NAME_SHORT_KEY));
 
     m_weight = pSettings->r_float(section, "inv_weight");
     R_ASSERT(m_weight >= 0.f);
@@ -103,7 +107,7 @@ void CInventoryItem::Load(LPCSTR section)
     u32 sl = pSettings->r_u32(section, "slot");
     m_ItemCurrPlace.base_slot_id = (sl == -1) ? 0 : (sl + 1);
 
-    m_Description = StringTable().translate(pSettings->r_string(section, "description"));
+    m_Description = StringTable().translate(pSettings->r_string(section, DESCRIPTION_KEY));
 
     m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
     m_can_trade = READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE);
@@ -121,6 +125,13 @@ void CInventoryItem::Load(LPCSTR section)
         m_fControlInertionFactor = pSettings->r_float(section, "control_inertion_factor");
     }
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
+}
+
+void CInventoryItem::ReloadNames()
+{
+    m_name = StringTable().translate(pSettings->r_string(m_object->cNameSect(), INV_NAME_KEY));
+    m_nameShort = StringTable().translate(pSettings->r_string(m_object->cNameSect(), INV_NAME_SHORT_KEY));
+    m_Description = StringTable().translate(pSettings->r_string(m_object->cNameSect(), DESCRIPTION_KEY));
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)

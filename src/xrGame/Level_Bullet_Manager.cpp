@@ -183,10 +183,10 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type, float maximum_distance,
     const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet)
 {
-#ifdef DEBUG
-    if (g_mt_config.test(mtBullets))
-        VERIFY(m_thread_id == GetCurrentThreadId());
-#endif
+    // Always called in Primary thread
+    // Uncomment below if you will change the behaviour
+    // if (!g_mt_config.test(mtBullets))
+    VERIFY(m_thread_id == GetCurrentThreadId());
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
@@ -209,10 +209,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 
 void CBulletManager::UpdateWorkload()
 {
-#ifdef DEBUG
-    if (g_mt_config.test(mtBullets))
-        VERIFY(m_thread_id == GetCurrentThreadId());
-#endif
+    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == GetCurrentThreadId());
 
     rq_storage.r_clear();
 

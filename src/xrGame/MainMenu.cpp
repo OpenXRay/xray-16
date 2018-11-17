@@ -65,7 +65,7 @@ CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
     }
 //----------------------------------------------------------------------------------
 
-CMainMenu::CMainMenu()
+CMainMenu::CMainMenu() : languageChanged(false)
 {
     class CResetEventCb : public CEventNotifierCallbackWithCid
     {
@@ -347,6 +347,9 @@ bool CMainMenu::ReloadUI()
 bool CMainMenu::IsActive() const { return m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
 
+bool CMainMenu::IsLanguageChanged() { return languageChanged; }
+void CMainMenu::SetLanguageChanged(bool status) { languageChanged = status; }
+
 // IInputReceiver
 void CMainMenu::IR_OnMousePress(int btn)
 {
@@ -557,8 +560,9 @@ void CMainMenu::OnFrame()
     {
         CheckForErrorDlg();
         bool b_is_16_9 = (float)Device.dwWidth / (float)Device.dwHeight > (UI_BASE_WIDTH / UI_BASE_HEIGHT + 0.01f);
-        if (b_is_16_9 != m_activatedScreenRatio)
+        if (b_is_16_9 != m_activatedScreenRatio || languageChanged)
         {
+            languageChanged = false;
             ReloadUI();
             m_startDialog->SendMessage(m_startDialog, MAIN_MENU_RELOADED, NULL);
         }

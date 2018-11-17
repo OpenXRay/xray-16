@@ -665,6 +665,18 @@
             <options_item entry="rs_loadingstages" group="mm_opt_gameplay" is_integer="1"/>
         </check_loadingstages>
 
+		<cap_localization x="20" y="3" width="135" height="24">
+			<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_localization</text>
+		</cap_localization>
+		<list_localization x="180" y="5" width="235" height="20">
+			<options_item entry="g_language" group="mm_opt_gameplay"/>
+			<list_font r="170" g="170" b="170" font="letterica16"/>
+			<text_color>
+				<e r="170" g="170" b="170"/>
+				<d r="70" g="70" b="70"/>
+			</text_color>
+		</list_localization>
+
         <btn_check_updates x="338" y="322" width="108" height="24">
             <text align="c" font="letterica16">ui_mm_check_updates</text>
             <texture>ui_inGame2_button</texture>

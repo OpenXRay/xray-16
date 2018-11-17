@@ -29,13 +29,21 @@ public:
     STRING_VALUE translate(const STRING_ID& str_id) const;
     void rescan();
 
+    void ReloadLanguage();
+
     static BOOL m_bWriteErrorsToLog;
     static void ReparseKeyBindings();
 
+    xr_token* GetLanguagesToken() const;
+    static u32 LanguageID;
+
 private:
     void Load(LPCSTR xml_file);
+    void FillLanguageToken();
+    void SetLanguage();
     static STRING_VALUE ParseLine(LPCSTR str, LPCSTR key, bool bFirst);
-    static STRING_TABLE_DATA* pData;
+    static xr_unique_ptr<STRING_TABLE_DATA> pData;
+    static xr_vector<xr_token> languagesToken;
 };
 
 CStringTable& StringTable();

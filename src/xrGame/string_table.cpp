@@ -5,35 +5,41 @@
 
 CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 
-STRING_TABLE_DATA* CStringTable::pData = NULL;
+xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
+u32 CStringTable::LanguageID = std::numeric_limits<u32>::max();
+xr_vector<xr_token> CStringTable::languagesToken;
 
 CStringTable::CStringTable()
 {
     pData = nullptr;
+    FillLanguageToken();
 }
 
 CStringTable::~CStringTable() { Destroy(); }
-void CStringTable::Destroy() { xr_delete(pData); }
+void CStringTable::Destroy()
+{
+    pData.reset(nullptr);
+}
+
 void CStringTable::rescan()
 {
-    if (NULL != pData)
-        return;
-    Destroy();
-    Init();
+    if (!pData)
+    {
+        Destroy();
+        Init();
+    }
 }
 
 void CStringTable::Init()
 {
-    if (NULL != pData)
+    if (pData)
         return;
 
-    pData = new STRING_TABLE_DATA();
+    pData = xr_make_unique<STRING_TABLE_DATA>();
 
-    //имя языка, если не задано (NULL), то первый <text> в <string> в XML
-    pData->m_sLanguage = pSettings->r_string("string_table", "language");
+    SetLanguage();
 
-    //---
     FS_FileSet fset;
     string_path files_mask;
     xr_sprintf(files_mask, "text" DELIMITER "%s" DELIMITER "*.xml", pData->m_sLanguage.c_str());
@@ -52,9 +58,45 @@ void CStringTable::Init()
 #ifdef DEBUG
     Msg("StringTable: loaded %d files", fset.size());
 #endif // #ifdef DEBUG
-    //---
+
     ReparseKeyBindings();
 }
+
+void CStringTable::FillLanguageToken()
+{
+    if (languagesToken.size() == 0)
+    {
+        u32 lineCount = pSettings->line_count("Languages");
+        R_ASSERT2(lineCount > 0, "Section \"Languages\" is empty!");
+
+        LPCSTR lineName, lineVal;
+        for (u16 i = 0; i < lineCount; i++)
+        {
+            pSettings->r_line("Languages", i, &lineName, &lineVal);
+            languagesToken.emplace_back(lineName, i);
+        }
+        languagesToken.emplace_back(nullptr, -1);
+    }
+}
+
+void CStringTable::SetLanguage()
+{
+    if (LanguageID != std::numeric_limits<u32>::max())
+        pData->m_sLanguage = languagesToken.at(LanguageID).name;
+    else
+    {
+        pData->m_sLanguage = pSettings->r_string("string_table", "language");
+        auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token) {
+            return token.name && token.name == pData->m_sLanguage;
+        });
+
+        R_ASSERT3(it != languagesToken.end(), "Check localization.ltx! Current language: ", pData->m_sLanguage.c_str());
+        if (it != languagesToken.end())
+            LanguageID = (*it).id;
+    }
+}
+
+xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data(); }
 
 void CStringTable::Load(LPCSTR xml_file_full)
 {
@@ -85,6 +127,15 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
         pData->m_StringTable[string_name] = str_val;
     }
+}
+
+void CStringTable::ReloadLanguage()
+{
+    if (0 == xr_strcmp(languagesToken.at(LanguageID).name, pData->m_sLanguage.c_str()))
+        return;
+
+    Destroy();
+    Init();
 }
 
 void CStringTable::ReparseKeyBindings()

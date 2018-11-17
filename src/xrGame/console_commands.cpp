@@ -202,6 +202,40 @@ public:
     virtual void Info(TInfo& I) { xr_strcpy(I, "game difficulty"); }
 };
 
+class CCC_GameLanguage : public CCC_Token
+{
+public:
+    CCC_GameLanguage(pcstr N) : CCC_Token(N, (u32*)&CStringTable::LanguageID, nullptr) {}
+
+    void Execute(pcstr args) override
+    {
+        CCC_Token::Execute(args);
+        StringTable().ReloadLanguage();
+
+        if (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive())
+            MainMenu()->SetLanguageChanged(true);
+
+        if (!g_pGameLevel)
+            return;
+
+        for (u16 id = 0; id < 0xffff; id++)
+        {
+            IGameObject* gameObj = Level().Objects.net_Find(id);
+            if (gameObj)
+            {
+                if (CInventoryItem* invItem = gameObj->cast_inventory_item())
+                    invItem->ReloadNames();
+            }
+        }
+    }
+
+    const xr_token* GetToken() noexcept override
+    {
+        tokens = StringTable().GetLanguagesToken();
+        return CCC_Token::GetToken();
+    }
+};
+
 #ifdef DEBUG
 class CCC_ALifePath : public IConsole_Command
 {
@@ -1753,6 +1787,7 @@ void CCC_RegisterCommands()
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
+    CMD1(CCC_GameLanguage, "g_language");
 
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
