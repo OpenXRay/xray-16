@@ -349,6 +349,8 @@ public:
     bool m_paused;
 #endif // #ifdef _EDITOR
 
+    bool useDynamicSunDir;
+
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
     CInifile* m_effects_config;

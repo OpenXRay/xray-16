@@ -103,6 +103,9 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
 
     CInifile* config =
         new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "environment.ltx"), TRUE, TRUE, FALSE);
+
+    useDynamicSunDir = READ_IF_EXISTS(pSettings, r_bool, OPENXRAY_INI_SECTION, "dynamic_sun_dir", true);
+
     // params
     p_var_alt = deg2rad(config->r_float("environment", "altitude"));
     p_var_long = deg2rad(config->r_float("environment", "delta_longitude"));
@@ -473,13 +476,9 @@ void CEnvironment::OnFrame()
     float current_weight;
     lerp(current_weight);
 
-    //AVO: allow sun to move as defined in configs
-#ifndef CONFIG_SUN_MOVEMENT
     // Igor. Dynamic sun position.
-    if (!GEnv.Render->is_sun_static())
+    if (!GEnv.Render->is_sun_static() && useDynamicSunDir)
         calculate_dynamic_sun_dir();
-#endif
-    //-AVO
 
 #ifndef MASTER_GOLD
     if (CurrentEnv->sun_dir.y > 0)

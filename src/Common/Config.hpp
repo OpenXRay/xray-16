@@ -26,7 +26,5 @@
 //#define FP_DEATH // first person death view
 #define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
 
-//#define CONFIG_SUN_MOVEMENT // With this defined sun will move as configured in weather ltx files
-
 /* Debug: */
 //#define USE_LOG_TIMING

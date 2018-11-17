@@ -12,6 +12,8 @@
 #include "xrCore/clsid.h"
 #include "xrCommon/xr_vector.h"
 
+constexpr pcstr OPENXRAY_INI_SECTION = "openxray";
+
 // refs
 class CInifile;
 struct xr_token;
