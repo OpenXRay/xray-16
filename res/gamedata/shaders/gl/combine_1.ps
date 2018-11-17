@@ -36,7 +36,10 @@ Texture2D s_occ;
 #endif
 
 ///////
+// xxx: disabled error in "ssao_hdao_new.ps" for msaa
+#ifdef MSAA_OPTIMIZATION
 #undef USE_HDAO
+#endif
 ///////
 
 #ifdef USE_HDAO
