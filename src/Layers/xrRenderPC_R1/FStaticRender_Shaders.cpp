@@ -28,7 +28,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
         string_path dname;
         strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
-        IWriter* W = FS.w_open("$logs$", dname);
+        IWriter* W = FS.w_open("$app_data_root$", dname);
         W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
         FS.w_close(W);
         _RELEASE(disasm);
@@ -178,10 +178,13 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
     HRESULT _result = E_FAIL;
 
     char extension[3];
-    string_path folder_name, folder;
-
     strncpy_s(extension, pTarget, 2);
-    strconcat(sizeof(folder), folder, "r1" DELIMITER "objects" DELIMITER "r1" DELIMITER, name, ".", extension);
+
+    string64 filename;
+    strconcat(sizeof(filename), filename, "r1" DELIMITER, name, ".", extension);
+
+    string_path folder_name, folder;
+    strconcat(sizeof(folder), folder, "r1" DELIMITER "objects" DELIMITER, filename);
 
     FS.update_path(folder_name, "$game_shaders$", folder);
     xr_strcat(folder_name, DELIMITER);
@@ -193,7 +196,8 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
     if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
-        strconcat(sizeof(file), file, "shaders_cache" DELIMITER "r1" DELIMITER, name, ".", extension, DELIMITER, sh_name);
+        strconcat(sizeof(file), file, "shaders_cache" DELIMITER, filename, DELIMITER, sh_name);
+        strconcat(sizeof(filename), filename, filename, DELIMITER, sh_name);
         FS.update_path(file_name, "$app_data_root$", file);
     }
     else
@@ -221,7 +225,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
                 u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                 if (bytecodeCrc == savedBytecodeCrc)
                     _result =
-                        create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), file_name, result, o.disasm);
+                        create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), filename, result, o.disasm);
             }
         }
         file->close();
@@ -251,7 +255,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
             FS.w_close(file);
 
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
-                file_name, result, o.disasm);
+                filename, result, o.disasm);
         }
         else
         {
