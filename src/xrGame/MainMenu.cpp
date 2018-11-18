@@ -312,11 +312,31 @@ void CMainMenu::Activate(bool bActivate)
 
         Device.Pause(FALSE, TRUE, TRUE, "mm_deactivate2");
 
+        /* Xottab_DUTY:
+
+           Original code does Device.Reset() twice
+           if we are in main menu and game level exist
+
+           The first time is normal reset
+           The second one happens when 
+           we are closing main menu
+
+           Probable reason is that level needs to be precached
+
+           I changed Mixed and Debug to do precache only
+           instead of resetting entire Device
+
+           XXX: find any problems that may happen
+        */
         if (m_Flags.test(flNeedVidRestart))
         {
             m_Flags.set(flNeedVidRestart, FALSE);
-            //Console->Execute("vid_restart");
+#ifdef NDEBUG
+            Device.Reset();
+#else
+            // Do only a precache for Debug and Mixed
             Device.PreCache(20, true, false);
+#endif
         }
     }
 }
