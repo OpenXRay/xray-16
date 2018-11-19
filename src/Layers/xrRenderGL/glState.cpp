@@ -6,7 +6,7 @@ glState::glState()
     // Clear the sampler array
     memset(m_samplerArray, 0, CTexture::mtMaxCombinedShaderTextures * sizeof(GLuint));
 
-    m_pRasterizerState.CullMode = D3DCULL_CCW;
+    rasterizerCullMode = D3DCULL_CCW;
 
     m_pDepthStencilState.DepthEnable = TRUE;
     m_pDepthStencilState.DepthFunc = D3DCMP_LESSEQUAL;
@@ -45,7 +45,7 @@ void glState::Apply()
             glBindSampler(stage, m_samplerArray[stage]);
     }
 
-    RCache.set_CullMode(m_pRasterizerState.CullMode);
+    RCache.set_CullMode(rasterizerCullMode);
     RCache.set_Z(m_pDepthStencilState.DepthEnable);
     RCache.set_ZFunc(m_pDepthStencilState.DepthFunc);
     RCache.set_Stencil(
@@ -60,11 +60,6 @@ void glState::Apply()
     );
 
     CHK_GL(glDepthMask(m_pDepthStencilState.DepthWriteMask ? GL_TRUE : GL_FALSE));
-
-    if (m_pRasterizerState.ScissorEnable)
-        glEnable(GL_SCISSOR_TEST);
-    else
-        glDisable(GL_SCISSOR_TEST);
 
     if (m_pBlendState.BlendEnable)
         glEnable(GL_BLEND);
@@ -99,11 +94,7 @@ void glState::UpdateRenderState(u32 name, u32 value)
     switch (name)
     {
     case D3DRS_CULLMODE:
-        m_pRasterizerState.CullMode = (D3DCULL)value;
-        break;
-
-    case D3DRS_SCISSORTESTENABLE:
-        m_pRasterizerState.ScissorEnable = value;
+        rasterizerCullMode = (D3DCULL)value;
         break;
 
     case D3DRS_ZENABLE:

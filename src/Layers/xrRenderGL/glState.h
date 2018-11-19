@@ -4,12 +4,6 @@
 
 typedef struct
 {
-    D3DCULL CullMode;
-    BOOL ScissorEnable;
-} D3D_RASTERIZER_STATE;
-
-typedef struct
-{
     BOOL DepthEnable;
     BOOL DepthWriteMask;
     D3DCMPFUNC DepthFunc;
@@ -38,7 +32,7 @@ typedef struct
 class glState
 {
 private:
-    D3D_RASTERIZER_STATE m_pRasterizerState;
+    D3DCULL rasterizerCullMode;
     D3D_DEPTH_STENCIL_STATE m_pDepthStencilState;
     D3D_BLEND_STATE m_pBlendState;
 
