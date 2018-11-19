@@ -229,11 +229,13 @@ void CEngineAPI::CreateRendererList()
             // Load SupportCheck, SetupEnv and GetModeName functions from DLL
             checkFunctions[library] = (SupportCheck)renderers[library]->GetProcAddress(check_function);
             setupFunctions[library] = (SetupEnv)renderers[library]->GetProcAddress(setup_function);
-            const auto getModeName  = (GetModeName)renderers[library]->GetProcAddress(mode_function);
+            // XXX: temporary disabled, need to fix getting render mode
+            //const auto getModeName  = (GetModeName)renderers[library]->GetProcAddress(mode_function);
 
             // Test availability
             if (checkFunctions[library] && checkFunctions[library]())
-                modes.emplace_back(getModeName ? getModeName() : mode, index);
+                //modes.emplace_back(getModeName ? getModeName() : mode, index);
+                modes.emplace_back(mode, index);
             else // Close the handle if test is failed
                 renderers[library]->Close();
         }
