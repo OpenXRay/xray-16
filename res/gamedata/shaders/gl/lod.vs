@@ -6,9 +6,9 @@ v2p _main ( v_lod I )
 {
 	v2p 		o;
 
-	//I.sun_af.xyz	= I.sun_af.zyx; // skyloader: is unpack_D3DCOLOR needed here?
-	//I.rgbh0.xyz	= I.rgbh0.zyx;
-	//I.rgbh1.xyz	= I.rgbh1.zyx;
+	I.sun_af	= unpack_D3DCOLOR(I.sun_af);
+	I.rgbh0		= unpack_D3DCOLOR(I.rgbh0);
+	I.rgbh1		= unpack_D3DCOLOR(I.rgbh1);
 
 	// lerp pos
 	float	factor	= I.sun_af.w;
