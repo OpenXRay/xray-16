@@ -19,7 +19,7 @@ XR_EXPORT void SetupEnv()
 
 XR_EXPORT pcstr GetModeName()
 {
-    return "renderer_r2";
+    return "renderer_r2.5";
 }
 
 XR_EXPORT bool CheckRendererSupport()
