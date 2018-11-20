@@ -640,7 +640,7 @@ bool ignore_path(pcstr _path)
 
 bool CLocatorAPI::Recurse(pcstr path)
 {
-    string_path scanPath;
+    string_path scanPath = { 0 };
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, ".xrignore");
     struct stat buffer;
