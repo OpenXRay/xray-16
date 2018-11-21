@@ -65,12 +65,6 @@ if (WIN32)
     set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp PROPERTIES COMPILE_FLAGS /Yc)
 endif()
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(LUAJIT_LIBRARIES luajit-debug)
-else()
-    set(LUAJIT_LIBRARIES luajit)
-endif()
-
 add_library(xrUICore SHARED ${ARROW} ${BUTTONS} ${CALLBACKS}
                     ${COMBO_BOX} ${CURSOR}
                     ${EDIT_BOX} ${FONT_MANAGER} ${HINT}
