@@ -85,7 +85,7 @@ inline void _splitpath(const char* path, // Path Input
         )
 {
     if(!path)
-        return EINVAL;
+        return;
     
     const char *p, *end;
 
@@ -403,6 +403,11 @@ inline int strncat_s(char * dest, size_t num, const char * source, size_t count)
 }
 
 #define _vsnprintf vsnprintf
+inline int vsnprintf_s(char* buffer, size_t size, size_t, const char* format, va_list list)
+{
+    //TODO add bound check
+    return vsnprintf(buffer, size, format, list);
+}
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
 #define _alloca alloca
 #define _snprintf snprintf
