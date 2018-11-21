@@ -443,7 +443,7 @@ HRESULT CRender::shader_compile(
     char extension[3];
     strncpy_s(extension, pTarget, 2);
     
-    string64 filename;
+    string_path filename;
     strconcat(sizeof(filename), filename, "r2" DELIMITER, name, ".", extension);
 
     string_path folder_name, folder;

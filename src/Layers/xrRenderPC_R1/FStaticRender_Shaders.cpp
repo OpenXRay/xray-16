@@ -180,7 +180,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
     char extension[3];
     strncpy_s(extension, pTarget, 2);
 
-    string64 filename;
+    string_path filename;
     strconcat(sizeof(filename), filename, "r1" DELIMITER, name, ".", extension);
 
     string_path folder_name, folder;
