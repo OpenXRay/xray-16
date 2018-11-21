@@ -215,7 +215,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #else
-        SDL_strlcpy(ApplicationPath, SDL_GetBasePath(), sizeof(ApplicationPath));
+        char *base_path = SDL_GetBasePath();
+        SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
+        SDL_free(base_path);
 #endif
 
 #ifdef _EDITOR
