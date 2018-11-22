@@ -114,6 +114,8 @@ void CRender::render_lights(light_Package& LP)
                 RCache.set_xform_view(L->X.S.view);
                 RCache.set_xform_project(L->X.S.project);
                 r_dsgraph_render_graph(0);
+                if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
+                    Details->Render();
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {
