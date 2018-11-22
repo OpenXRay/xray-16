@@ -255,6 +255,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
         RCache.set_c("RainDensity", fRainFactor, 0, 0, 0);
+        RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0, 0);
         if (!RImplementation.o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
@@ -276,6 +277,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
                 RCache.set_c("m_shadow", m_shadow);
                 RCache.set_c("m_sunmask", m_clouds_shadow);
                 RCache.set_c("RainDensity", fRainFactor, 0, 0, 0);
+                RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0, 0);
                 RCache.set_CullMode(CULL_NONE);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
