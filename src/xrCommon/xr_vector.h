@@ -3,7 +3,7 @@
 #include "xrCore/xrMemory.h"
 
 template <typename T, typename allocator = tbb::tbb_allocator<T>>
-using xr_vector = class std::vector<T, allocator>;
+using xr_vector = std::vector<T, allocator>;
 
 #define DEF_VECTOR(N, T)\
     using N = xr_vector<T>;\
