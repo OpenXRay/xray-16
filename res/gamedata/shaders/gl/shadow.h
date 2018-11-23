@@ -510,41 +510,29 @@ float dx10_0_hw_hq_7x7( float4 tc )
    float2 pwGH = ( float2( 1.0 ) + fc );
    float2 tcGH = (1.0/SMAP_size) * ( fc / pwGH );
 
-   for( int row = -GS2; row <= GS2; row += 2 )
-   {
-      for( int col = -GS2; col <= GS2; col += 2 )
-	  {
-		if( row == -GS2 ) // top row
-		{
-			if( col == -GS2 ) // left
-				s += ( pwAB.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + tcAB, tc.z), int2( col, row ) );
-			else if( col == GS2 ) // right
-				s += ( pwGH.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcAB.y), tc.z), int2( col, row ) );
-			else // center
-				s += (    2.0 * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcAB.y), tc.z), int2( col, row ) );
-		}
-		else if( row == GS2 )  // bottom row
-		{
-			if( col == -GS2 ) // left
-				s += ( pwAB.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcGH.y ), tc.z), int2( col, row ) );
-			else if( col == GS2 ) // right
-				s += ( pwGH.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + tcGH, tc.z), int2( col, row ) );
-			else // center
-				s += (    2.0 * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcGH.y ), tc.z), int2( col, row ) );
-		}
-		else // center rows
-		{
-			if( col == -GS2 ) // left
-				s += ( pwAB.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcM.y ), tc.z), int2( col, row ) );
-			else if( col == GS2 ) // right
-				s += ( pwGH.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcM.y),  tc.z), int2( col, row ) );
-			else // center
-				s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( col, row ) );
-		}
-      }
-	}
+   // top row
+   s += ( pwAB.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + tcAB, tc.z), int2( -3, -3 ) ); // left
+   s += (    2.0 * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcAB.y), tc.z), int2( -3, -1 ) );
+   s += (    2.0 * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcAB.y), tc.z), int2( -3, 1 ) );
+   s += ( pwGH.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcAB.y), tc.z), int2( -3, 3 ) ); // right
 
-    return s/49.0;
+   // center rows
+   s += ( pwAB.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcM.y ), tc.z), int2( -1, -3 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( -1, -1 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( -1, 1 ) );
+   s += ( pwGH.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcM.y),  tc.z), int2( -1, 3 ) );
+   s += ( pwAB.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcM.y ), tc.z), int2( 1, -3 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( 1, -1 ) );
+   s += (    2.0 * 2.0    ) * textureOffset( s_smap, float3(tc.xy + tcM, tc.z), int2( 1, 1 ) );
+   s += ( pwGH.x * 2.0    ) * textureOffset( s_smap, float3(tc.xy + float2( tcGH.x, tcM.y),  tc.z), int2( 1, 3 ) );
+
+   // bottom row
+   s += ( pwAB.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcAB.x, tcGH.y ), tc.z), int2( 3, -3 ) );
+   s += (    2.0 * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcGH.y ), tc.z), int2( 3, -1 ) );
+   s += (    2.0 * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + float2( tcM.x, tcGH.y ), tc.z), int2( 3, 1 ) );
+   s += ( pwGH.x * pwGH.y ) * textureOffset( s_smap, float3(tc.xy + tcGH, tc.z), int2( 3, 3 ) );
+
+   return s/49.0;
 }
 
 #ifdef SM_MINMAX
@@ -554,13 +542,13 @@ bool cheap_reject( float3 tc, inout bool full_light )
    float4 plane1  = sm_minmax_gather( tc.xy, int2(  1,-1 ) );
    float4 plane2  = sm_minmax_gather( tc.xy, int2( -1, 1 ) );
    float4 plane3  = sm_minmax_gather( tc.xy, int2(  1, 1 ) );
-   bool plane     = all( greaterThanEqual( plane0, float4(0) ) && greaterThanEqual( plane1, float4(0) ) && greaterThanEqual( plane2, float4(0) ) && greaterThanEqual( plane3, float4(0) ) );
+   bool plane     = all( greaterThanEqual( plane0, float4(0) )) && all(greaterThanEqual( plane1, float4(0) )) && all(greaterThanEqual( plane2, float4(0) )) && all(greaterThanEqual( plane3, float4(0) ) );
 
    if( !plane ) // if there are no proper plane equations in the support region
    {
-      bool no_plane  = all( lessThan( plane0, float4(0) ) && lessThan( plane1, float4(0) ) && lessThan( plane2, float4(0) ) && lessThan( plane3, float4(0) ) );
+      bool no_plane  = all(lessThan( plane0, float4(0) )) && all(lessThan( plane1, float4(0) )) && all(lessThan( plane2, float4(0) )) && all(lessThan( plane3, float4(0) ) );
       float4 z       = float4( tc.z - 0.0005 );
-      bool reject    = all( greaterThan( z, -plane0 ) && greaterThan( z, -plane1 ) && greaterThan( z, -plane2 ) && greaterThan( z, -plane3 ) ); 
+      bool reject    = all( greaterThan( z, -plane0 )) && all(greaterThan( z, -plane1 )) && all(greaterThan( z, -plane2 )) && all(greaterThan( z, -plane3 ) );
       if( no_plane && reject )
       {
          full_light = false;

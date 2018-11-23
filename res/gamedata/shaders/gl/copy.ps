@@ -4,7 +4,9 @@
 #define ISAMPLE 0
 #endif
 
+#ifdef MSAA_OPTIMIZATION
 in int gl_SampleID;
+#endif
 out vec4 SV_Target;
 
 layout(location = TEXCOORD0) in float2 tc;
