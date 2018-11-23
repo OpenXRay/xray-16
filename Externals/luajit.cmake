@@ -30,7 +30,7 @@ set ( LUA_MAXINPUT 512 CACHE NUMBER "Is the maximum length for an input line in 
 # Version
 set ( MAJVER 2 )
 set ( MINVER 0 )
-set ( RELVER 4 )
+set ( RELVER 5 )
 set ( ABIVER 5.1 )
 set ( NODOTABIVER 51 )
 
