@@ -6,9 +6,9 @@ float Contrast(float Input, float ContrastPower)
 {
      //piecewise contrast function
      bool IsAboveHalf = Input > 0.5 ;
-     float ToRaise = saturate(2*(IsAboveHalf ? 1-Input : Input));
+     float ToRaise = saturate(2*(IsAboveHalf ? (1.0 - Input) : Input));
      float Output = 0.5*pow(ToRaise, ContrastPower); 
-     Output = IsAboveHalf ? 1-Output : Output;
+     Output = IsAboveHalf ? (1.0 - Output) : Output;
      return Output;
 }
 
@@ -21,7 +21,7 @@ void tonemap( out float4 low, out float4 high, float3 rgb, float scale)
 	const float fWhiteIntensitySQR = fWhiteIntensity*fWhiteIntensity;
 
 //	low		=	(rgb/(rgb + 1)).xyzz;
-	low		=	( (rgb*(1+rgb/fWhiteIntensitySQR)) / (rgb+1) ).xyzz;
+	low		=	( (rgb*(1.0+rgb/fWhiteIntensitySQR)) / (rgb+1.0) ).xyzz;
 
 	high	=	rgb.xyzz/def_hdr;	// 8x dynamic range
 
@@ -35,7 +35,7 @@ void tonemap( out float4 low, out float4 high, float3 rgb, float scale)
 
 float4 combine_bloom( float3  low, float4 high)	
 {
-        return float4( low + high.rgb*high.a, 1.f );
+	return float4( low + high.rgb*high.a, 1.0 );
 }
 
 float calc_fogging( float4 w_pos )      
@@ -45,7 +45,7 @@ float calc_fogging( float4 w_pos )
 
 float2 unpack_tc_base( float2 tc, float du, float dv )
 {
-		return (tc.xy + float2	(du,dv))*(32.f/32768.f); //!Increase from 32bit to 64bit floating point
+	return (tc.xy + float2	(du,dv))*(32.0/32768.0); //!Increase from 32bit to 64bit floating point
 }
 
 float3 calc_sun_r1( float3 norm_w )    
@@ -55,7 +55,7 @@ float3 calc_sun_r1( float3 norm_w )
 
 float3 calc_model_hemi_r1( float3 norm_w )    
 {
- return max(0,norm_w.y)*L_hemi_color.rgb;
+	return max(0.0,norm_w.y)*L_hemi_color.rgb;
 }
 
 float3 calc_model_lq_lighting( float3 norm_w )    
@@ -69,7 +69,7 @@ float3 	unpack_bx2( float3 v )	{ return 2*v-1; }
 float3 	unpack_bx2( float4 v )	{ return 2*v.xyz-1; }
 float3 	unpack_bx4( float3 v )	{ return 4*v-2; } //!reduce the amount of stretching from 4*v-2 and increase precision
 float3 	unpack_bx4( float4 v )	{ return 4*v.xyz-2; }
-float2 	unpack_tc_lmap( float2 tc )	{ return tc*(1.f/32768.f);	} // [-1  .. +1 ] 
+float2 	unpack_tc_lmap( float2 tc )	{ return tc*(1.0/32768.0);	} // [-1  .. +1 ] 
 float4	unpack_color( float4 c ) { return c.bgra; }
 float4	unpack_D3DCOLOR( float4 c ) { return c.bgra; }
 float3	unpack_D3DCOLOR( float3 c ) { return c.bgr; }
@@ -78,7 +78,7 @@ float3   p_hemi( float2 tc )
 {
 //	float3	t_lmh = tex2D (s_hemi, tc);
 //	float3	t_lmh = s_hemi.Sample( smp_rtlinear, tc);
-//	return	dot(t_lmh,1.f/4.f);
+//	return	dot(t_lmh,1.0/4.0);
 	float4	t_lmh = tex2D (s_hemi, tc);
 	return	float3(t_lmh.a);
 }

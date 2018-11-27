@@ -17,7 +17,7 @@ f_deffer _main( p_flat I )
 	float 	ms	= xmaterial		;
 #ifdef USE_LM_HEMI
 	float4	lm 	= tex2D( s_hemi, I.lmh );
-//	float 	h  	= dot( lm.rgb, 1.f/3.f );
+//	float 	h  	= dot( lm.rgb, 1.0/3.0 );
 	float 	h  	= get_hemi(lm);
 # ifdef USE_R2_STATIC_SUN
 //		 	ms 	= lm.w			;
@@ -34,7 +34,7 @@ f_deffer _main( p_flat I )
   float4 Ne		= float4( normalize(float3(I.N.xyz)), h );
   O				= pack_gbuffer(
 								Ne,
-								float4( I.position.xyz + Ne.xyz*def_virtualh/2.f, ms ),
+								float4( I.position.xyz + Ne.xyz*def_virtualh/2.0, ms ),
 								float4( D.rgb, def_gloss ) );	// OUT: rgb.gloss
 
   return O;

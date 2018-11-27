@@ -19,10 +19,10 @@ v2p _main ( float3 P )
 	o.lightToPos = vPos.xyz - Ldynamic_pos.xyz;
 	o.vPos = vPos.xyz;
 
-//	o.fDensity = (vMaxBounds.z-vMinBounds.z)/2000.0f;
-//	o.fDensity = (vMaxBounds.z-vMinBounds.z)/2000.0f*2;
-	o.fDensity = 1.0f/40.0f;
-//	o.fDensity = 1.0f/20.0f;
+//	o.fDensity = (vMaxBounds.z-vMinBounds.z)/2000.0;
+//	o.fDensity = (vMaxBounds.z-vMinBounds.z)/2000.0*2.0;
+	o.fDensity = 1.0/40.0;
+//	o.fDensity = 1.0/20.0;
 
 	for (int i=0; i<3; ++i)
 	{

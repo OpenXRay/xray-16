@@ -92,8 +92,8 @@ _out _main ( _input I, uint iSample )
 
 #ifdef USE_SUPER_SPECULAR
 	{
-		float ds = dot( D.rgb, 1.f/3.f );
-		D.w = max( D.w, ds*ds/8.f );
+		float ds = dot( D.rgb, 1.0/3.0 );
+		D.w = max( D.w, ds*ds/8.0 );
 	}
 #endif
 
@@ -160,22 +160,22 @@ _out _main ( _input I, uint iSample )
 	hmodel	(hdiffuse, hspecular, mtl, N.w, D.w, P.xyz, N.xyz);
 //      hmodel		(hdiffuse, hspecular, mtl, 1, D.w, P.xyz, N.xyz);
 //	hdiffuse*=hdiffuse;			//. high contrast hemi
-//	hdiffuse*=(D.rgb*0.8 + 0.2h);	// rise texture contrast for diffuse lighting
+//	hdiffuse*=(D.rgb*0.8 + 0.2);	// rise texture contrast for diffuse lighting
 //	hdiffuse = 0.8;
-//	hdiffuse *= (occ*(D.rgb + .1h));
+//	hdiffuse *= (occ*(D.rgb + 0.1));
 	hdiffuse *= occ;
 	hspecular *= occ;
 
         float4         light       = float4         (L.rgb + hdiffuse, L.w)        ;
         float4         C           = D*light       ;                             // rgb.gloss * light(diffuse.specular)
-//        float3         spec        = (C.rgb*.5h + .5h)*C.w + hspecular + hspecular + hspecular;			// replicated specular
+//        float3         spec        = (C.rgb*0.5 + 0.5)*C.w + hspecular + hspecular + hspecular;			// replicated specular
 	float3         spec        = C.www         + hspecular;      // replicated specular
 
 #ifdef         USE_SUPER_SPECULAR
-                      spec      = (C.rgb*.5h + .5h)*C.w + hspecular        ;
+                      spec      = (C.rgb*0.5 + 0.5)*C.w + hspecular        ;
 #endif
 //		float3       color     = C.rgb + D.rgb*spec     ;
-//		float3       color     = C.rgb + (D.rgb*spec+spec)/0.5h;
+//		float3       color     = C.rgb + (D.rgb*spec+spec)/0.5;
 		float3       color     = C.rgb + spec     ;
 //		float3       color     = C.rgb + D.rgb*spec+hspecular+hspecular     ;	//	More realistic and contrast specular - Ugrumiy edition
 
@@ -241,7 +241,7 @@ _out _main ( _input I, uint iSample )
 
 	//o.low = float4(gbd.P,1);
 
-	//o.low = float4( 1.0f, 0.0f, 0.0f, 1.0f );
+	//o.low = float4( 1.0, 0.0, 0.0, 1.0 );
 
 		return        	o;
 }

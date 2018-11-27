@@ -37,7 +37,7 @@ float4 _main( p_volume I )
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
-	gbd.P += gbd.N*0.015f;
+	gbd.P += gbd.N*0.015;
 #endif	//	GBUFFER_OPTIMIZATION
 
 	float4 _P				= float4( gbd.P, gbd.mtl );
@@ -54,7 +54,7 @@ float4 _main( p_volume I )
         // ----- shadow
 		float4          		P4      = float4( _P.x, _P.y, _P.z, 1);
         float4         		PS      = mul( m_shadow, P4 );
-        float         		s		= 1.f;
+        float         		s		= 1.0;
         #ifdef  USE_SHADOW
                 #ifdef         USE_SJITTER
 							s		= shadowtest( PS, I.tcJ );
@@ -64,7 +64,7 @@ float4 _main( p_volume I )
         #endif
 
         // ----- lightmap
-        float4         lightmap= float4(1.f);
+        float4         lightmap= float4(1.0);
         #ifdef        USE_LMAP
                 #ifdef         USE_LMAPXFORM
 							PS.x	= dot( P4, m_lmap[0] );

@@ -4,8 +4,8 @@
 #undef ULTRA_SHADOWS_ON
 #undef USE_ULTRA_SHADOWS
 
-#define RAY_PATH	2.0h
-#define JITTER_TEXTURE_SIZE	64.0f
+#define RAY_PATH	2.0
+#define JITTER_TEXTURE_SIZE	64.0
 
 #define	JITTER_SUN_SHAFTS
 
@@ -69,8 +69,8 @@ float4 	_main (v2p_volume  I)
 //	float2	tcJ = I.tcJ;
 //	Variable ray length, variable step dencity, use jittering
 	//float4	J0 	= tex2D		(jitter0,tcJ);
-	float4	J0 	= tex2D	( jitter0, tc*screen_res.x*1.f/JITTER_TEXTURE_SIZE );
-	float	coeff = (RAY_SAMPLES - 1*J0.x)/(RAY_SAMPLES*RAY_SAMPLES);		
+	float4	J0 	= tex2D	( jitter0, tc*screen_res.x*1.0/JITTER_TEXTURE_SIZE );
+	float	coeff = (RAY_SAMPLES - 1.0*J0.x)/(RAY_SAMPLES*RAY_SAMPLES);		
 	float3	direction = P*coeff;
 //	float3	direction = P/(RAY_SAMPLES+(J0.x*4-2));
 #endif	//	JITTER_SUN_SHAFTS

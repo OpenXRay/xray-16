@@ -22,29 +22,29 @@ float4 _main( v2p I )
 	float4	base	= tex2D (s_base,I.tbase);
 	float3	n0	= tex2D (s_nmap,I.tnorm0).xyz;
 	float3	n1	= tex2D (s_nmap,I.tnorm1).xyz;
-	float3	Navg	= n0 + n1 - 1.f;
+	float3	Navg	= n0 + n1 - 1.0;
 
 	float3	Nw	= mul (float3x3(I.M1, I.M2, I.M3), Navg);
 		Nw	= normalize (Nw);
 	float3	v2point	= normalize (I.v2point);
 	float3	vreflect = reflect(v2point, Nw);
-		vreflect.y = vreflect.y*2.f - 1.f;     // fake remapping
+		vreflect.y = vreflect.y*2.0 - 1.0;     // fake remapping
 
 	float3	env0	= texCUBE (s_env0, vreflect).rgb;
 	float3	env1	= texCUBE (s_env1, vreflect).rgb;
 	float3	env	= lerp (env0,env1, L_ambient.w);
-		env	*= env*2.f;
+		env	*= env*2.0;
 
 	float	fresnel	= saturate (dot(vreflect,v2point));
 	float	power	= pow(fresnel,9);
-	float	amount	= 0.15f + 0.25f*power;	// 1=full env, 0=no env
+	float	amount	= 0.15 + 0.25*power;	// 1=full env, 0=no env
 
 	float3	c_reflection	= env*amount;
 	float3	final		= lerp(c_reflection,base.rgb,base.a);
-		final		*= I.c0.rgb*2.f;
+		final		*= I.c0.rgb*2.0;
 
 #ifdef	NEED_SOFT_WATER
-	float	alpha	= 0.75f + 0.25f*power;                        // 1=full env, 0=no env
+	float	alpha	= 0.75 + 0.25*power;                        // 1=full env, 0=no env
 
 #ifdef	USE_SOFT_WATER
 	float2 PosTc = I.tctexgen.xy/I.tctexgen.z;
@@ -57,9 +57,9 @@ float4 _main( v2p I )
 	float waterDepth = _P.z-I.tctexgen.z;
 
 	//	water fog
-	float fog_exp_intens	= -4.0f;
-	float fog		= 1.f-exp(fog_exp_intens*waterDepth);
-	float3 Fc  		= float3( 0.1f, 0.1f, 0.1f) * water_intensity.r;
+	float fog_exp_intens	= -4.0;
+	float fog		= 1.0-exp(fog_exp_intens*waterDepth);
+	float3 Fc  		= float3( 0.1, 0.1, 0.1) * water_intensity.r;
 	final 			= lerp (Fc, final, alpha);
 
 		alpha 		= min(alpha, saturate(waterDepth));
@@ -71,8 +71,8 @@ float4 _main( v2p I )
 
 	float	calc_cos	= -dot(I.M3, normalize(v2point));
 	float	calc_depth	= saturate(waterDepth*calc_cos);
-	float	fLeavesFactor	= smoothstep(0.025f, 0.05f, calc_depth);
-		fLeavesFactor	*= smoothstep(0.1f, 0.075f, calc_depth);
+	float	fLeavesFactor	= smoothstep(0.025, 0.05, calc_depth);
+		fLeavesFactor	*= smoothstep(0.1, 0.075, calc_depth);
 		final		= lerp(final, leaves.rgb, leaves.a*fLeavesFactor);
 		alpha		= lerp(alpha, leaves.a, leaves.a*fLeavesFactor);
 

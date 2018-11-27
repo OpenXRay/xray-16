@@ -10,8 +10,8 @@ _out _main( v2p I )
 {
 	float3         	s0  	= texCUBE        (s_sky0,I.tc0).rgb;
 	float3         	s1      = texCUBE        (s_sky1,I.tc1).rgb;
-	float3	sky		= I.factor.xyz*lerp( s0, s1, I.factor.w );
-			sky		*= 0.33f;
+	float3		sky	= I.factor.xyz*lerp( s0, s1, I.factor.w );
+			sky	*= 0.33;
 
 	// final tone-mapping
 	_out			o;

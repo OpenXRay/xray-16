@@ -29,16 +29,16 @@ float4 _main ( float2 tc, float2 tcJ )
 #endif	
 #endif
 
-//	float ColorIntencity = 1 - Gloss*0.5;
+//	float ColorIntencity = 1.0 - Gloss*0.5;
 
-	float ColorIntencity = 1 - sqrt(Gloss);
+	float ColorIntencity = 1.0 - sqrt(Gloss);
 
 //	ColorIntencity = max (ColorIntencity, 0.75);
 	ColorIntencity = max (ColorIntencity, 0.5);
 
 //	float ColorIntencity = (Gloss-0.1)/(Gloss+0.00001);
 
-//	ColorIntencity = min (ColorIntencity, 1);
+//	ColorIntencity = min (ColorIntencity, 1.0);
 
 	//return float4(1,1,1,Gloss);
 	return float4( ColorIntencity, ColorIntencity, ColorIntencity, Gloss*0.8);

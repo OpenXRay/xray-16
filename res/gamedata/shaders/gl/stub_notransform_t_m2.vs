@@ -12,16 +12,16 @@ v2p_TL _main ( v_TL I )
 //	O.HPos = P;
 
 	{
-		I.P.xy += 0.5f;
-//		O.HPos.x = I.P.x/1024 * 2 - 1;
-//		O.HPos.y = (I.P.y/768 * 2 - 1)*-1;
-		O.HPos.x = I.P.x * screen_res.z * 2 - 1;
-		O.HPos.y = (I.P.y * screen_res.w * 2 - 1)*-1;
+		I.P.xy += 0.5;
+//		O.HPos.x = I.P.x/1024.0 * 2.0 - 1.0;
+//		O.HPos.y = (I.P.y/768.0 * 2.0 - 1.0)*-1.0;
+		O.HPos.x = I.P.x * screen_res.z * 2.0 - 1.0;
+		O.HPos.y = (I.P.y * screen_res.w * 2.0 - 1.0)*-1.0;
 		O.HPos.zw = I.P.zw;
 	}
 
 	O.Tex0 = I.Tex0;
-	O.Color = float4(I.Color.bgr*2, 1.0f);	//	swizzle vertex colour
+	O.Color = float4(I.Color.bgr*2.0, 1.0);	//	swizzle vertex colour
 
  	return O;
 }

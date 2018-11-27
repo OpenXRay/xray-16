@@ -52,7 +52,7 @@ float shadow_hw( float4 tc )
   	float	s2		= sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
   	float	s3		= sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
 
-	return	(s0+s1+s2+s3)/4.f;
+	return	(s0+s1+s2+s3)/4.0;
 }
 
 #if SUN_QUALITY>=4
@@ -654,7 +654,7 @@ float4 	test 		(float4 tc, float2 offset)
 	f.z		= test	(tc,-J0.xy+float2( k1, 0)).z;
  	f.w		= test	(tc,-J0.wz+float2( 0, k1)).x;
 
-	half res = ( r.x + r.y + r.z + r.w + f.x + f.y + f.z + f.w )*1.f/(4.f + 4.f );
+	half res = ( r.x + r.y + r.z + r.w + f.x + f.y + f.z + f.w )*1.0/(4.0 + 4.0 );
 	return res;
 }*/
 half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
@@ -675,7 +675,7 @@ half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 	r.z		= test	(tc,-J0.xy+half2(-k, k)).z;
 	r.w		= test	(tc,-J0.wz+half2( k, k)).x;
 
-	return	dot(r,float4(1.f/4.f));
+	return	dot(r,float4(1.0/4.0));
 }
 
 half 	shadow_high 	(float4 tc)			// jittered sampling
@@ -686,7 +686,7 @@ half 	shadow_high 	(float4 tc)			// jittered sampling
 	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0f )*.5f;
 	float4	J0 		= tex2D	(jitter0,tc_J)*scale;
 
-	const float k = 1.f/float(SMAP_size);
+	const float k = 1.0/float(SMAP_size);
 	half4	r;
 	r.x 	= test 	(tc,J0.xy+half2(-k,-k)).x;
 	r.y 	= test 	(tc,J0.wz+half2( k,-k)).y;
@@ -703,7 +703,7 @@ half 	shadow_high 	(float4 tc)			// jittered sampling
 	r1.z	= test	(tc,-2*J0.xy+half2( k1, 0)).z;
 	r1.w	= test	(tc,-2*J0.wz+half2( 0, k1)).x;
 
-	return ( r.x + r.y + r.z + r.w + r1.x + r1.y + r1.z + r1.w )*1.f/8.f;
+	return ( r.x + r.y + r.z + r.w + r1.x + r1.y + r1.z + r1.w )*1.0/8.0;
 }
 
 float shadow( float4 tc ) 
@@ -779,7 +779,7 @@ float 	shadowtest 	(float4 tc, float4 tcJ)				// jittered sampling
 		r.z		= test	(tc,J1.xy).z;
 		r.w		= test	(tc,J1.wz).x;
 
-	return	dot(r,float4(1.f/4.f));
+	return	dot(r,float4(1.0/4.0));
 }
 
 float 	shadow_rain 	(float4 tc, float2 tcJ)			// jittered sampling
@@ -804,7 +804,7 @@ float 	shadow_rain 	(float4 tc, float2 tcJ)			// jittered sampling
 //	r.z		= test	(tc,J0.yz).z;
 //	r.w		= test	(tc,J0.xw).x;
 
-	return	dot(r,float4(1.f/4.f));
+	return	dot(r,float4(1.0/4.0));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -816,7 +816,7 @@ float sunmask( float4 P )
 	return 		tex2D( s_lmap, tc ).w;			// A8 
 }
 #else
-float sunmask( float4 P ) { return 1.f; }		// 
+float sunmask( float4 P ) { return 1.0; }		// 
 #endif
 //////////////////////////////////////////////////////////////////////////////////////////
 uniform float4x4	m_shadow;

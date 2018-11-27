@@ -30,9 +30,8 @@ float DOFFactor(float depth)
 }
 
 
-//#define MAXCOF		5.f
-#define MAXCOF		7.f
-#define EPSDEPTHDOF	0.0001f
+#define MAXCOF		7.0
+#define EPSDEPTHDOF	0.0001
 float3	dof(float2 center)
 {
 	// Scale tap offsets based on render target size
@@ -46,31 +45,31 @@ float3	dof(float2 center)
 
 	//float blur = 1;
 	//	const amount of blur: define controlled
-	//float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * MAXCOF * blur;
+	//float2 	scale 	= float2	(0.5 / 1024.0, 0.5 / 768.0) * MAXCOF * blur;
 	//	const amount of blur: engine controlled
-	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * (dof_kernel.z * blur);
+	float2 	scale 	= float2	(0.5 / 1024.0, 0.5 / 768.0) * (dof_kernel.z * blur);
 	//	amount of blur varies according to resolution
 	//	but kernel size in pixels is fixed.
 	//	float2 	scale 	= dof_kernel.xy * blur;
 
 	// poisson
 	float2 	o  [12];
-		o[0]	= float2(-0.326212f , -0.405810f)*scale;
-		o[1] 	= float2(-0.840144f , -0.073580f)*scale;
-		o[2] 	= float2(-0.695914f ,  0.457137f)*scale;
-		o[3] 	= float2(-0.203345f ,  0.620716f)*scale;
-		o[4] 	= float2( 0.962340f , -0.194983f)*scale;
-		o[5] 	= float2( 0.473434f , -0.480026f)*scale;
-		o[6] 	= float2( 0.519456f ,  0.767022f)*scale;
-		o[7] 	= float2( 0.185461f , -0.893124f)*scale;
-		o[8] 	= float2( 0.507431f ,  0.064425f)*scale;
-		o[9] 	= float2( 0.896420f ,  0.412458f)*scale;
-		o[10] 	= float2(-0.321940f , -0.932615f)*scale;
-		o[11] 	= float2(-0.791559f , -0.597710f)*scale;
+		o[0]	= float2(-0.326212, -0.405810)*scale;
+		o[1] 	= float2(-0.840144, -0.073580)*scale;
+		o[2] 	= float2(-0.695914,  0.457137)*scale;
+		o[3] 	= float2(-0.203345,  0.620716)*scale;
+		o[4] 	= float2( 0.962340, -0.194983)*scale;
+		o[5] 	= float2( 0.473434, -0.480026)*scale;
+		o[6] 	= float2( 0.519456,  0.767022)*scale;
+		o[7] 	= float2( 0.185461, -0.893124)*scale;
+		o[8] 	= float2( 0.507431,  0.064425)*scale;
+		o[9] 	= float2( 0.896420,  0.412458)*scale;
+		o[10] 	= float2(-0.321940, -0.932615)*scale;
+		o[11] 	= float2(-0.791559, -0.597710)*scale;
 
 	// sample
 	float3	sum 	= tex2D(s_image,center).rgb;
-	float 	contrib	= 1.f;
+	float 	contrib	= 1.0;
 
    	for (int i=0; i<12; i++)
 	{

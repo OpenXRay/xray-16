@@ -16,7 +16,7 @@ f_deffer _main ( p_bumped I )
 	float 	ms	= xmaterial		;
 #ifdef USE_LM_HEMI
 	float4	lm 	= tex2D			(s_hemi, I.lmh);
-//	float 	h  	= dot			(lm.rgb,1.f/3.f);
+//	float 	h  	= dot			(lm.rgb,1.0/3.0);
 	float 	h  	= get_hemi(lm);
 # ifdef USE_R2_STATIC_SUN
 //		 	ms 	= lm.w;

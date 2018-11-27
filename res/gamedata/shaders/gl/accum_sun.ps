@@ -49,8 +49,8 @@ float4 	_main	( p_aa_AA_sun I )
 		s_sum.y = tex2D	( s_dmap, I.RT).y;
 		s_sum.z	= tex2D	( s_dmap, I.LB).z;
 		s_sum.w = tex2D	( s_dmap, I.RB).w;
-//	float 	s 	= dot	( s_sum, 1.f/4.f);
-	float 	s 	= ((s_sum.x+s_sum.y)+(s_sum.z+s_sum.w))*(1.f/4.f);
+//	float 	s 	= dot	( s_sum, 1.0/4.0);
+	float 	s 	= ((s_sum.x+s_sum.y)+(s_sum.z+s_sum.w))*(1.0/4.0);
 
 	return 		Ldynamic_color * light * s;
 }

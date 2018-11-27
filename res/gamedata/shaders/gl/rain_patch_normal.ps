@@ -18,13 +18,13 @@ float3	GetNVNMap(float2 tc, float time)
 	//	Unpack NVidia normal map
 //	float4 water = s_water.SampleLevel( smp_linear, float3(tc, time), 0 ) - 0.5;
 //	float4 water = s_water.Sample( smp_linear, float3(tc, time)) - 0.5;
-	float4 water = tex3D( s_water, float3(tc, time), -3. ) - 0.5;
+	float4 water = tex3D( s_water, float3(tc, time), -3.0 ) - 0.5;
 
 	//	Swizzle
 	water.xyz = water.wyz;
 
 	//	Renormalize (*2) and scale (*3)
-	water.xyz *= 6;
+	water.xyz *= 6.0;
 
 //	water.y = sqrt(1-water.x*water.x-water.z*water.z);
 	water.y = 0;
@@ -38,9 +38,9 @@ float3	GetWaterNMap(float2 tc)
 	//	Unpack normal map
 //	float4 water = s_waterFall.SampleLevel( smp_base, float3(tc, time), 0 );
 	float4 water = tex2D( s_waterFall, tc );
-	water.xyz = (water.xzy-0.5)*2;
+	water.xyz = (water.xzy-0.5)*2.0;
 
-//	water.xyz *= 3;
+//	water.xyz *= 3.0;
 
 	water.xyz *= 0.3;
 
@@ -133,7 +133,7 @@ float4 _main ( float2 tc, float2 tcJ )
 
 	float2 IsDir = (float2(fIsZ, fIsX));
 
-//	float2 IsDir = float2(0, 1);
+//	float2 IsDir = float2(0.0, 1.0);
 
 	IsDir = normalize(IsDir);
 

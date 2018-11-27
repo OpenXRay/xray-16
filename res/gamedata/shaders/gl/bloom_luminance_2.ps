@@ -7,7 +7,7 @@
 float	sampleTex	(float2	tc)	
 {
 	float4	data = tex2D(s_image,tc);
-	return 	dot( data, float4(1.f/4.f) );	// sum components
+	return 	dot( data, float4(1.0/4.0) );	// sum components
 }
 
 float4 _main( p_filter I )
@@ -36,10 +36,10 @@ float4 _main( p_filter I )
 
 	// perform accumulation
 	float4	final;
-		final.x	= dot(accum0,float4(1.f/4.f));
-		final.y	= dot(accum1,float4(1.f/4.f));
-		final.z	= dot(accum2,float4(1.f/4.f));
-		final.w	= dot(accum3,float4(1.f/4.f));
+		final.x	= dot(accum0,float4(1.0/4.0));
+		final.y	= dot(accum1,float4(1.0/4.0));
+		final.z	= dot(accum2,float4(1.0/4.0));
+		final.w	= dot(accum3,float4(1.0/4.0));
 
 	// OK
 	return 	final;

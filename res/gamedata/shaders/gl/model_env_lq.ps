@@ -12,7 +12,7 @@ float4 	_main	( v2p I )
 
 	float3 	base 	= lerp		(t_env.rgb,t_base.rgb,t_base.a);
 	float3	light	= I.c0;
-	float3	final 	= light*base*2.f;
+	float3	final 	= light*base*2.0;
 
 	//	Fogging
 	final 	= lerp(fog_color.rgb, final, I.fog);

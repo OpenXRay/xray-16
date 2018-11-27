@@ -2,9 +2,9 @@
 #include "iostructs\p_TL_sun.h"
 
 //	TODO: DX10: move to load instead of sample (will need to provide integer texture coordinates)
-#define EPS	(0.9f/255.f)
-//#define EPS	(40.f/255.f)
-#define CLIP_THRESHOLD	(1.0f/255.f)
+#define EPS	(0.9/255.0)
+//#define EPS	(40.0/255.0)
+#define CLIP_THRESHOLD	(1.0/255.0)
 #ifdef MSAA_OPTIMIZATION
 #ifdef GBUFFER_OPTIMIZATION
 float4 _main ( p_TL I, float4 pos2d, uint iSample )
@@ -26,9 +26,9 @@ float4 _main ( p_TL I )
 
 	float4	NH		= float4( gbd.N, gbd.hemi );
   	float	L 		= NH.w * dot( Ldynamic_dir.xyz, float3(NH) ) + EPS; // Use hemisphere as approximation of max light
-//float	L 		= dot( Ldynamic_dir.xyz, float3(NH) ) + EPS; // Use hemisphere as approximation of max light
+	//float	L 		= dot( Ldynamic_dir.xyz, float3(NH) ) + EPS; // Use hemisphere as approximation of max light
 
-//	L = 1;
+	//	L = 1.0;
 
 	clip(L-CLIP_THRESHOLD);
 

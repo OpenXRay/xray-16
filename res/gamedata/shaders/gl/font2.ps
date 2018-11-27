@@ -6,6 +6,6 @@
 float4 _main ( p_TL I )
 {
 	float4 r = tex2D (s_base,I.Tex0);
-	r.w = 1.f - r.w;
+	r.w = 1.0 - r.w;
 	return r;
 }

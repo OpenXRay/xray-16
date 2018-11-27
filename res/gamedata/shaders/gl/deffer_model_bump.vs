@@ -41,7 +41,7 @@ v2p_bumped _main( v_model I )
 	float3 	N 	= I.N;		// just scale (assume normal in the -.5f, .5f)
 	float3 	T 	= I.T;		// 
 	float3 	B 	= I.B;		// 
-	float3x3 xform	= mul	(float3x3(m_WV), float3x3(2.f*T,2.f*B,2.f*N));
+	float3x3 xform	= mul	(float3x3(m_WV), float3x3(2.0*T,2.0*B,2.0*N));
 	// The pixel shader operates on the bump-map in [0..1] range
 	// Remap this range in the matrix, anyway we are pixel-shader limited :)
 	// ...... [ 2  0  0  0]

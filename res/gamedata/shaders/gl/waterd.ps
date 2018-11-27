@@ -3,7 +3,7 @@
 #include "iostructs\p_waterd.h"
 
 Texture2D	s_distort;
-#define POWER	0.5f
+#define POWER	0.5
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
 float4 _main( v2p I )
@@ -26,17 +26,17 @@ float4 _main( v2p I )
 #endif
 	float4 _P = float4( gbd.P, gbd.mtl );
 	float waterDepth = _P.z-I.tctexgen.z;
-	alphaDistort = saturate(5*waterDepth);
+	alphaDistort = saturate(5.0*waterDepth);
 	faded 	= lerp  ( zero, faded, alphaDistort);
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 
-	float	alpha	= 0.5f;
-		faded	= faded*POWER - 0.5f*POWER + 0.5f;
+	float	alpha	= 0.5;
+		faded	= faded*POWER - 0.5*POWER + 0.5;
 
         // out
 #ifdef	NEED_SOFT_WATER
-	return  float4( faded, 0.f, alpha );
+	return  float4( faded, 0.0, alpha );
 #else	//	NEED_SOFT_WATER
-	return  float4( faded, 0.08f, alpha );
+	return  float4( faded, 0.08, alpha );
 #endif	//	NEED_SOFT_WATER
 }

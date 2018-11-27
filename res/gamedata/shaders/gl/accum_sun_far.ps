@@ -31,10 +31,10 @@ float4 _main ( v2p_volume I  )
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
-	gbd.P += gbd.N*0.015f;
+	gbd.P += gbd.N*0.015;
 #endif	//	GBUFFER_OPTIMIZATION
 
-	float4 _P = float4( gbd.P, 1.f);
+	float4 _P = float4( gbd.P, 1.0);
 
 	float4 PS = mul( m_shadow,  _P );
 
@@ -56,7 +56,7 @@ float4 _main ( v2p_volume I )
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
-	gbd.P += gbd.N*0.015f;
+	gbd.P += gbd.N*0.015;
 #endif	//	GBUFFER_OPTIMIZATION
 
 	float4 _P = float4( gbd.P, gbd.mtl );
@@ -70,7 +70,7 @@ float4 _main ( v2p_volume I )
 	float4	light	= plight_infinity ( m, _P.xyz, _N.xyz, Ldynamic_dir.xyz );
 
 	// ----- shadow
-  	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.f);
+  	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.0);
 	float4 	PS	= mul( m_shadow, P4 );
 	float 	s 	= sunmask( P4 );
 	#if defined	(USE_SJITTER) || SUN_QUALITY==2 // Hight quality
@@ -88,17 +88,17 @@ float4 _main ( v2p_volume I )
 	#endif
 
 	// Far edge fading code
-	float2 	tc_f	= (PS.xy/PS.w)-float2(0.5f,0.5f);
+	float2 	tc_f	= (PS.xy/PS.w)-float2(0.5,0.5);
 			// Fade only fron edges
 			tc_f 	*= step( -dot( tc_f, view_shadow_proj.xy ), 0 );
 			tc_f	= abs( tc_f );
-	float 	border 	= 0.4f;
-	float 	fac_x 	= 1.f-saturate( ( tc_f.x - border )/(0.5f-border));
-	float 	fac_y 	= 1.f-saturate( ( tc_f.y - border )/(0.5f-border));
+	float 	border 	= 0.4;
+	float 	fac_x 	= 1.0-saturate( ( tc_f.x - border )/(0.5-border));
+	float 	fac_y 	= 1.0-saturate( ( tc_f.y - border )/(0.5-border));
 	
-	s += ((1-s)*(1-fac_x*fac_y));
+	s += ((1.0-s)*(1.0-fac_x*fac_y));
 	//\ Far edge fading code
 
-	return 		blend( Ldynamic_color * light * s/*float4( 1.f, 0.2f, 0.2f, 1.f)*/, I.tc.xy );
+	return 		blend( Ldynamic_color * light * s/*float4( 1.0, 0.2, 0.2, 1.0)*/, I.tc.xy );
 }
 #endif

@@ -15,7 +15,7 @@ v2p _main (vi v)
 //	float	scale	= s_tonemap.Load( int3(1,1,0) ).x;
 	float	scale	= texelFetch( s_tonemap, int2(0,0), 0 ).x;
 //	o.c				= float4	( v.c.rgb*(scale*1.7), v.c.a );      		// copy color, pre-scale by tonemap //float4 ( v.c.rgb*scale*2, v.c.a );
-    o.c				= float4	( v.c.rgb*(scale*2.0), v.c.a );      		// copy color, pre-scale by tonemap //float4 ( v.c.rgb*scale*2, v.c.a );
+	o.c				= float4	( v.c.rgb*(scale*2.0), v.c.a );      		// copy color, pre-scale by tonemap //float4 ( v.c.rgb*scale*2, v.c.a );
 
 	return	o;
 }

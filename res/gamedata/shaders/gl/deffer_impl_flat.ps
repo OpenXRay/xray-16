@@ -76,7 +76,7 @@ f_deffer 	_main	( p_flat I 		)
   float4     Ne = float4	(normalize(N), 									D.w			);
   O				= pack_gbuffer( 
 								Ne,	// hemi
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f, 	ms			),	//
+								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.0, 	ms			),	//
 								float4	(D.x,	D.y,	D.z,						G			) );	// OUT: rgb.gloss
 
   return O;

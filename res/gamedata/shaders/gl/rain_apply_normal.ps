@@ -32,6 +32,6 @@ float4 _main ( float2 tc, float2 tcJ )
 #ifndef GBUFFER_OPTIMIZATION	
 	return float4(_N,1);
 #else
-	return float4( gbuf_pack_normal( _N ), 0, 0 );
+	return float4( gbuf_pack_normal( _N ), 0.0, 0.0 );
 #endif
 }

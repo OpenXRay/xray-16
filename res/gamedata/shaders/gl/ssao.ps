@@ -127,23 +127,23 @@ float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
-//	P += N*0.015f;
+//	P += N*0.015;
 #endif	//	GBUFFER_OPTIMIZATION
 
 	float point_depth = P.z;
-	if (point_depth<0.01) point_depth = 100000.0f;	//	filter for the sky
-//	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f)*150/max(point_depth,1.3);
+	if (point_depth<0.01) point_depth = 100000.0;	//	filter for the sky
+//	float2 	scale 	= float2	(0.5 / 1024.0, 0.5 / 768.0)*150/max(point_depth,1.3);
 //	Looks better but triggers some strange hardware(?) bug.
-	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f)*ssao_kernel_size/max(point_depth,1.3);
-//	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f)*min( ssao_kernel_size/point_depth , ssao_kernel_size/1.3 );
+	float2 	scale 	= float2	(0.5 / 1024.0, 0.5 / 768.0)*ssao_kernel_size/max(point_depth,1.3);
+//	float2 	scale 	= float2	(0.5 / 1024.0, 0.5 / 768.0)*min( ssao_kernel_size/point_depth , ssao_kernel_size/1.3 );
 
 	// sample 
-	float 	occ	= 0.0f;	
-	float num_dir	= 0.0f;
-//	float 	occ	= 0.1f;	
-//	float num_dir	= 0.1f;
-//	float 	occ	= 1.0f;
-//	float num_dir	= 1.0f;
+	float 	occ	= 0.0;	
+	float num_dir	= 0.0;
+//	float 	occ	= 0.1;	
+//	float num_dir	= 0.1;
+//	float 	occ	= 1.0;
+//	float num_dir	= 1.0;
 
 ////////////////////////////////
 //	jittering
@@ -164,10 +164,10 @@ for (int rad=0; rad < RINGS; rad++)
 {
 	for (int dir=0; dir < DIRS; dir++)
 	{
-//		SmallTap.x += 0.31337f;
-//		SmallTap.y += 0.73313f;
-		SmallTap.x *= 31337.0f;
-		SmallTap.y *= 73313.0f;
+//		SmallTap.x += 0.31337;
+//		SmallTap.y += 0.73313;
+		SmallTap.x *= 31337.0;
+		SmallTap.y *= 73313.0;
 		SmallTap = frac(SmallTap);
 		float	r		= lerp(rads[rad]*1.3, rads[rad+1]*1.3, SmallTap.x);
 		float   a		= lerp(angles[dir], angles[dir+1], SmallTap.y);

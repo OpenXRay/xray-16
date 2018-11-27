@@ -46,7 +46,7 @@ f_deffer 	_main	( p_particle II )
 			D	*=	II.color;
 
 #ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
-	float alpha = (D.w-def_aref*0.5f)/(1-def_aref*0.5f);
+	float alpha = (D.w-def_aref*0.5)/(1-def_aref*0.5);
 	uint mask = alpha_to_coverage ( alpha, pos2d );
 #else	//	MSAA_ALPHATEST_DX10_1_ATOC
 	clip	(D.w-def_aref);
@@ -59,12 +59,12 @@ f_deffer 	_main	( p_particle II )
 #ifndef EXTEND_F_DEFFER
   O				= pack_gbuffer( 
 								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f	, xmaterial		),
+								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.0	, xmaterial		),
 								float4	(D.xyz,			def_gloss) );		// OUT: rgb.gloss
 #else
   O				= pack_gbuffer( 
 								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f	, xmaterial		),
+								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.0	, xmaterial		),
 								float4	(D.xyz,			def_gloss),
 								mask );		// OUT: rgb.gloss
 #endif								

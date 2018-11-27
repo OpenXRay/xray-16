@@ -49,7 +49,7 @@ struct 	v_model_skinned_4		// 28 bytes
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-float4 	u_position	(float4 v)	{ return float4(v.xyz, 1.f);	}	// -12..+12 //--#SM+#--
+float4 	u_position	(float4 v)	{ return float4(v.xyz, 1.0);	}	// -12..+12 //--#SM+#--
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //uniform float4 	sbones_array	[256-22] : register(vs,c22);

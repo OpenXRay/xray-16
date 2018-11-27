@@ -31,7 +31,7 @@ v2p_shadow_direct _main ( v_shadow_direct I )
 	float 	inten 	= H * dp;			// intensity
 	float2 	result;
 #ifdef	USE_TREEWAVE
-			result	= float2(0);
+			result	= float2(0.0, 0.0);
 #else	//	USE_TREEWAVE
 #ifdef	USE_AREF
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)

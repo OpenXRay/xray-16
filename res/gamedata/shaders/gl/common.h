@@ -13,7 +13,7 @@
 // #define USE_SUPER_SPECULAR
 
 #ifdef        USE_R2_STATIC_SUN
-#  define xmaterial float(1.0f/4.fs)
+#  define xmaterial float(1.0/4.0)
 #else
 #  define xmaterial float(L_material.w)
 #endif

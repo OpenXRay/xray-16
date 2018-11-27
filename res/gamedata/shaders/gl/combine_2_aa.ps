@@ -83,11 +83,11 @@ float4 _main ( v_aa_AA I )
   float  de 		=  saturate	(dot(dd,float4(e_weights.y)));
 
   // weight
-  float 	w 		=  (1-de*ne)*e_kernel.x;	// 0 - no aa, 1=full aa
+  float 	w 		=  (1.0-de*ne)*e_kernel.x;	// 0 - no aa, 1=full aa
 
 #ifdef 	USE_DISTORT
 	float4 	distort	= tex2D		(s_distort, I.Tex0);
-	float2	doffs	= (distort.xy-.5f)*def_distort;
+	float2	doffs	= (distort.xy-0.5)*def_distort;
 	float2	center	= I.Tex0 + doffs;
 #else
 	float2	center 	= I.Tex0;
@@ -102,7 +102,7 @@ float4 _main ( v_aa_AA I )
 	float4 	s2 	=  tex2D	(s_image, offset + I.Tex3*w);
 	float4 	s3 	=  tex2D	(s_image, offset + I.Tex4*w);
 
-	float3 	final	=  mblur( center, dc.xyz, (s0+s1+s2+s3).xyz/4.f );
+	float3 	final	=  mblur( center, dc.xyz, (s0+s1+s2+s3).xyz/4.0 );
 
 	return combine_bloom(final,tex2D	(s_bloom, I.Tex0));
 }

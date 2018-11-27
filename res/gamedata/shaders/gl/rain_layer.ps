@@ -20,11 +20,11 @@ float4 _main ( float2 tc, float2 tcJ )
 	gbuffer_data gbd = gbuffer_load_data( tc );
 #endif
 	float4 _P = float4( gbd.P, 1.0 );
-	//_P.w = 1.f;
+	//_P.w = 1.0;
 
 	float4 PS = mul( m_shadow,  _P );
 
-//	float s	= sample_hw_pcf( PS, float4(0,0,0,0) );
+//	float s	= sample_hw_pcf( PS, float4(0.0,0.0,0.0,0.0) );
 
 	float s	= shadow		(PS);
 
@@ -34,25 +34,25 @@ float4 _main ( float2 tc, float2 tcJ )
 
 	float2 		tc1	= mul( m_sunmask, _P ).xy;		//
 
-//	tc1 /= 10;
+//	tc1 /= 10.0;
 
-	tc1 /= 2;
+	tc1 /= 2.0;
 
 	tc1 = frac(tc1);
 
 	float4 water = textureLod( s_water, tc1, 0 );
 
 //	water.xy = tc1;
-//	water.z = 0;
+//	water.z = 0.0;
 
 //	d*= s;
 
 //	return s;
-//	return float4(s,0,0,0);
-//	return float4(0,0,0,s/2);
-//	return float4(0,0,d,s/2);
+//	return float4(s,0.0,0.0,0.0);
+//	return float4(0.0,0.0,0.0,s/2.0);
+//	return float4(0.0,0.0,d,s/2.0);
 
-	water.xyz = (water.xzy-0.5)*2;
+	water.xyz = (water.xzy-0.5)*2.0;
 
 //	water.y	*= -1;
 
@@ -60,5 +60,5 @@ float4 _main ( float2 tc, float2 tcJ )
 
 	water *= s;
 
-	return float4(water.xyz,s/2);
+	return float4(water.xyz,s/2.0);
 }

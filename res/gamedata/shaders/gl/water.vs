@@ -52,7 +52,7 @@ v2p _main (v_vert v)
 	o.hpos		= mul		(m_VP, P);				// xform, input in world coords
 	o.fog		= saturate	(calc_fogging(v.P));
 	//o.fog		*= o.fog;
-	o.c0		= float4	(L_final, 1.f);
+	o.c0		= float4	(L_final, 1.0);
 
 #if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 	o.tctexgen	= mul		(m_texgen, P);

@@ -11,7 +11,7 @@ uniform float4	MiddleGray;
 float sampleTex( float2 tc )
 {
 	float4	data = tex2D(s_image,tc);
-	return 	dot( data, float4(1.f/4.f) );	// sum components
+	return 	dot( data, float4(1.0/4.0) );	// sum components
 }
 
 float4 _main ( p_filter I )
@@ -40,20 +40,20 @@ float4 _main ( p_filter I )
 
 	// perform accumulation
 	float4	final;
-		final.x	= dot(accum0,float4(1/4.f));
-		final.y	= dot(accum1,float4(1/4.f));
-		final.z	= dot(accum2,float4(1/4.f));
-		final.w	= dot(accum3,float4(1/4.f));
-	float 	result	= dot(final, float4(1/4.f));
+		final.x	= dot(accum0,float4(1.0/4.0));
+		final.y	= dot(accum1,float4(1.0/4.0));
+		final.z	= dot(accum2,float4(1.0/4.0));
+		final.w	= dot(accum3,float4(1.0/4.0));
+	float 	result	= dot(final, float4(1.0/4.0));
 
 	// OK
 	float	scale 		= MiddleGray.x / (result*MiddleGray.y + MiddleGray.z);	// final
 	float  	scale_prev	= tex2D	(s_tonemap,I.Tex0.xy).x;
 	float 	rvalue		= lerp	(scale_prev,scale,MiddleGray.w);
 
-//			clamp		(rvalue, 1.f/8.f, 2.0f);
+//			clamp		(rvalue, 1.0/8.0, 2.0);
 
-			clamp		(rvalue, 1.f/128.f, 20.0f);
+			clamp		(rvalue, 1.0/128.0, 20.0);
 
 	return 	float4(rvalue)		;
 

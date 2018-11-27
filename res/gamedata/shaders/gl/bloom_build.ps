@@ -11,11 +11,11 @@ float4 _main ( p_build I )
 	float3       	s0              =        tex2D           	(s_image,        I.Tex0).rgb;
 	float3         	s1              =        tex2D       		(s_image,        I.Tex1).rgb;
 	float3         	s2              =        tex2D       		(s_image,        I.Tex2).rgb;
-	float3         	s3             	=        tex2D    			(s_image,        I.Tex3).rgb;
+	float3         	s3             	=        tex2D    		(s_image,        I.Tex3).rgb;
 
 
-	float3	avg	= ( (s0+s1) + (s2+s3) )/2;
-	float	hi	= dot( avg, float3(1.f) )-b_params.x	;	// assume def_hdr equal to 3.0
+	float3	avg	= ( (s0+s1) + (s2+s3) )/2.0;
+	float	hi	= dot( avg, float3(1.0) )-b_params.x	;	// assume def_hdr equal to 3.0
 
 	return	float4( avg, hi );
 }

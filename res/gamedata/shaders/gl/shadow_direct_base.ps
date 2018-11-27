@@ -7,7 +7,7 @@
 float4 _main ()
 {
 #ifdef	USE_HWSMAP
-	return float4(0);
+	return float4(0.0, 0.0, 0.0, 0.0);
 #else
 	return I.depth;
 #endif
