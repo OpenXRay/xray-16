@@ -547,25 +547,6 @@ u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float sp
     }
     return 0;
 }
-const Fvector& player_hud::attach_rot() const
-{
-    if (m_attached_items[0])
-        return m_attached_items[0]->hands_attach_rot();
-    else if (m_attached_items[1])
-        return m_attached_items[1]->hands_attach_rot();
-    else
-        return Fvector().set(0, 0, 0);
-}
-
-const Fvector& player_hud::attach_pos() const
-{
-    if (m_attached_items[0])
-        return m_attached_items[0]->hands_attach_pos();
-    else if (m_attached_items[1])
-        return m_attached_items[1]->hands_attach_pos();
-    else
-        return Fvector().set(0, 0, 0);
-}
 
 void player_hud::update(const Fmatrix& cam_trans)
 {
@@ -573,10 +554,26 @@ void player_hud::update(const Fmatrix& cam_trans)
     update_inertion(trans);
     update_additional(trans);
 
-    Fvector ypr = attach_rot();
+    Fvector ypr;
+    if (m_attached_items[0])
+        ypr = m_attached_items[0]->hands_attach_rot();
+    else if (m_attached_items[1])
+        ypr = m_attached_items[1]->hands_attach_rot();
+    else
+        ypr = Fvector().set(0, 0, 0);
+
     ypr.mul(PI / 180.f);
     m_attach_offset.setHPB(ypr.x, ypr.y, ypr.z);
-    m_attach_offset.translate_over(attach_pos());
+    
+    Fvector tmp;
+    if (m_attached_items[0])
+        tmp = m_attached_items[0]->hands_attach_pos();
+    else if (m_attached_items[1])
+        tmp = m_attached_items[1]->hands_attach_pos();
+    else
+        tmp = Fvector().set(0, 0, 0);
+
+    m_attach_offset.translate_over(tmp);
     m_transform.mul(trans, m_attach_offset);
     // insert inertion here
 
