@@ -64,7 +64,7 @@ void ParticleEffect::Remove(int i)
     if (d_cb)
         d_cb(owner, param, m, i);
 
-    m = particles[--p_count]; // не менять правило удаления !!! (dependence ParticleGroup)
+    m = particles[--p_count]; // РЅРµ РјРµРЅСЏС‚СЊ РїСЂР°РІРёР»Рѕ СѓРґР°Р»РµРЅРёСЏ !!! (dependence ParticleGroup)
     //Msg("pDel() : %u", p_count);
 }
 
