@@ -56,7 +56,7 @@ public:
     bool empty() const { return actions.empty(); }
     PAVecIt begin() { return actions.begin(); }
     PAVecIt end() { return actions.end(); }
-    int size() const { return actions.size(); }
+    size_t size() const { return actions.size(); }
 
     void resize(int cnt)
     {
