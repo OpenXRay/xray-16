@@ -324,7 +324,6 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClCompile Include="Text\StringConversion.cpp" />
     <ClCompile Include="Threading\Event.cpp" />
     <ClCompile Include="Threading\ScopeLock.cpp" />
-    <ClCompile Include="Threading\ThreadPool.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="XML\XMLDocument.cpp" />
     <ClCompile Include="xrCore.cpp" />
@@ -424,7 +423,6 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClInclude Include="Text\StringConversion.hpp" />
     <ClInclude Include="Threading\Event.hpp" />
     <ClInclude Include="Threading\ScopeLock.hpp" />
-    <ClInclude Include="Threading\ThreadPool.hpp" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="XML\XMLDocument.hpp" />

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "MathUtil.hpp"
-#include "Threading/ThreadPool.hpp"
 
 #ifdef _EDITOR
 #include "SkeletonX.h"
@@ -19,7 +18,6 @@
 #include "SkinXW_CPP.hpp"
 #include "PLC_CPP.hpp"
 #endif
-#include "Skin4W_MT.hpp"
 
 #include "_math.h"
 

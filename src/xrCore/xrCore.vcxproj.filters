@@ -282,9 +282,6 @@
     <ClCompile Include="Math\PLC_CPP.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\ThreadPool.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="xr_token.cpp">
       <Filter>Math\Extensions</Filter>
     </ClCompile>
@@ -631,9 +628,6 @@
     </ClInclude>
     <ClInclude Include="Math\PLC_CPP.hpp">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Threading\ThreadPool.hpp">
-      <Filter>Threading</Filter>
     </ClInclude>
     <ClInclude Include="xrCore_benchmark_macros.h">
       <Filter>Kernel</Filter>

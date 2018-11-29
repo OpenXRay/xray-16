@@ -13,7 +13,6 @@
 #include <unistd.h>
 #endif
 #include "xrCore.h"
-#include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 #include "SDL.h"
@@ -267,7 +266,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
         R_ASSERT(SDL_HasSSE());
-        ttapi.initialize();
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
@@ -321,7 +319,6 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
-        ttapi.destroy();
         FS._destroy();
         EFS._destroy();
         xr_FS.reset();
