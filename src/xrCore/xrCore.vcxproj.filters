@@ -237,9 +237,6 @@
     <ClCompile Include="Math\PLC_SSE.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Math\Skin4W_MT.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Math\SkinXW_SSE.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -537,9 +534,6 @@
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="Math\PLC_SSE.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Skin4W_MT.hpp">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Math\SkinXW_SSE.hpp">
