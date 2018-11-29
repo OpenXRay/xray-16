@@ -309,12 +309,12 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const 
     pv++;
 }
 
+Lock m_sprite_section;
+
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
-#ifdef _GPA_ENABLED
-    TAL_SCOPED_TASK_NAMED("FillSprite()");
-#endif // _GPA_ENABLED
+    m_sprite_section.Enter();
 
     __m128 Vr, Vt, _T, _R, _pos, _zz, _sa, _ca, a, b, c, d;
 
@@ -368,6 +368,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvec
     pv->color = clr;
     pv->t.set(rb.x, lt.y);
     pv++;
+    m_sprite_section.Leave();
 }
 
 IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const Fvector2& lt, const Fvector2& rb,
