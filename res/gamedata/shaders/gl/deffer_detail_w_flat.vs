@@ -39,7 +39,7 @@ v2p_flat 	_main (v_detail v)
 	// Normal in world coords
 	float3 	norm;	//	= float3(0,1,0);
 		norm.x 	= pos.x - m0.w	;
-		norm.y 	= pos.y - m1.w	+ .75f;	// avoid zero
+		norm.y 	= pos.y - m1.w	+ 0.75;	// avoid zero
 		norm.z	= pos.z - m2.w	;
 
 	// Final out

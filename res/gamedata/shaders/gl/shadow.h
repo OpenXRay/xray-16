@@ -24,9 +24,9 @@ Texture2D	jitter1;
 Texture2D	jitterMipped;
 
 #ifndef USE_ULTRA_SHADOWS
-#define	KERNEL	0.6f
+#define	KERNEL	0.6
 #else
-#define	KERNEL	1.0f
+#define	KERNEL	1.0
 #endif
 
 float modify_light( float light )
@@ -105,9 +105,9 @@ const float W0[11][11] =
 float Fw( int r, int c, float fL )
 {
 	return        (1.0-fL) * (1.0-fL) * (1.0-fL) * W0[r][c] +
-	       3.0f * (1.0-fL) * (1.0-fL) *   fL     * W1[r][c] +
-	       3.0f *    fL    *    fL    * (1.0-fL) * W2[r][c] +
-                     fL    *    fL    *   fL     * 1.0f;
+	       3.0 * (1.0-fL) * (1.0-fL) *   fL     * W1[r][c] +
+	       3.0 *    fL    *    fL    * (1.0-fL) * W2[r][c] +
+                     fL    *    fL    *   fL     * 1.0;
 } 
 
 #define BLOCKER_FILTER_SIZE	11
@@ -119,8 +119,8 @@ float Fw( int r, int c, float fL )
 // uses gather for DX11/10.1 and visibilty encoding for DX10.0
 float shadow_extreme_quality( float3 tc )
 {
-   float  s   = 0.0f;
-   float2 stc = ( SMAP_size * tc.xy ) + float2( 0.5, 0.5 );
+   float  s   = 0.0;
+   float2 stc = ( float( SMAP_size ) * tc.xy ) + float2( 0.5, 0.5 );
    float2 tcs = floor( stc );
    float2 fc;
    int    row;
@@ -134,8 +134,8 @@ float shadow_extreme_quality( float3 tc )
    float2 off;
 
    fc     = stc - tcs;
-   tc.xy  = tc.xy - ( (1.0f/SMAP_size) * fc );
-   tc.z  -= 0.0001f;
+   tc.xy  = tc.xy - ( 1.0 / float( SMAP_size ) * fc );
+   tc.z  -= 0.0001;
 
 #if defined(SM_4_1) || defined( SM_5) 
     // find number of blockers and sum up blocker depth
@@ -144,9 +144,9 @@ float shadow_extreme_quality( float3 tc )
         for( col = -BFS2; col <= BFS2; col += 2 )
         {
             float4 d4 = textureGatherOffset( s_smap, tc.xy, int2( col, row ) );
-            float4 b4 = ( tc.zzzz <= d4 ) ? (0.0f).xxxx : (1.0f).xxxx;   
+            float4 b4 = ( tc.zzzz <= d4 ) ? (0.0).xxxx : (1.0).xxxx;   
 			
-            blockerCount += dot( b4, (1.0f).xxxx );
+            blockerCount += dot( b4, (1.0).xxxx );
             avgBlockerDepth += dot( d4, b4 );
         }
     }
@@ -164,26 +164,26 @@ float shadow_extreme_quality( float3 tc )
             float  b;
 
 			d4.w = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row ) ).x;
-			b = ( tc.z <= d4.w ) ? (0.0f) : (1.0f); 
+			b = ( tc.z <= d4.w ) ? (0.0) : (1.0); 
 			vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.w ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
 			blockerCount     += b;
             avgBlockerDepth  += d4.w * b;
 			
 			d4.z = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row ) ).x;
-			b = ( tc.z <= d4.z ) ? (0.0f) : (1.0f); 
+			b = ( tc.z <= d4.z ) ? (0.0) : (1.0); 
 			vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.z ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
 			blockerCount     += b;
             avgBlockerDepth  += d4.z * b;
 			
 			d4.x = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row+1 ) ).x;
 			vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.x ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
-			b = ( tc.z <= d4.x ) ? (0.0f) : (1.0f); 
+			b = ( tc.z <= d4.x ) ? (0.0) : (1.0); 
 			blockerCount     += b;
             avgBlockerDepth  += d4.x * b;
 
 			d4.y = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row+1 ) ).x;
 			vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.y ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
-			b = ( tc.z <= d4.y ) ? (0.0f) : (1.0f); 
+			b = ( tc.z <= d4.y ) ? (0.0) : (1.0); 
 			blockerCount     += b;
             avgBlockerDepth  += d4.y * b;
         }
@@ -217,10 +217,10 @@ float shadow_extreme_quality( float3 tc )
             v1[(col+FS2)/2] = textureGatherOffset (s_smap, tc.xy, tc.z, 
                                                    int2( col, row ) );
 #else
-            v1[(col+FS2)/2].w = ( ( vmask[ col + FS2 + 0 ] & ( uint(1) << uint( row + FS2 + 0 ) ) ) ? 1.0f : 0.0f );
-            v1[(col+FS2)/2].z = ( ( vmask[ col + FS2 + 1 ] & ( uint(1) << uint( row + FS2 + 0 ) ) ) ? 1.0f : 0.0f );
-            v1[(col+FS2)/2].x = ( ( vmask[ col + FS2 + 0 ] & ( uint(1) << uint( row + FS2 + 1 ) ) ) ? 1.0f : 0.0f );
-            v1[(col+FS2)/2].y = ( ( vmask[ col + FS2 + 1 ] & ( uint(1) << uint( row + FS2 + 1 ) ) ) ? 1.0f : 0.0f );
+            v1[(col+FS2)/2].w = ( ( vmask[ col + FS2 + 0 ] & ( uint(1) << uint( row + FS2 + 0 ) ) ) ? 1.0 : 0.0 );
+            v1[(col+FS2)/2].z = ( ( vmask[ col + FS2 + 1 ] & ( uint(1) << uint( row + FS2 + 0 ) ) ) ? 1.0 : 0.0 );
+            v1[(col+FS2)/2].x = ( ( vmask[ col + FS2 + 0 ] & ( uint(1) << uint( row + FS2 + 1 ) ) ) ? 1.0 : 0.0 );
+            v1[(col+FS2)/2].y = ( ( vmask[ col + FS2 + 1 ] & ( uint(1) << uint( row + FS2 + 1 ) ) ) ? 1.0 : 0.0 );
 #endif
 		  if( col == -FS2 )
 		  {
@@ -266,7 +266,7 @@ float shadow_extreme_quality( float3 tc )
 
 float4 Fw( int r, int c )
 {
-	return float4( W0[r][c], W1[r][c], W2[r][c], 1.0f );
+	return float4( W0[r][c], W1[r][c], W2[r][c], 1.0 );
 }
 
 //======================================================================================
@@ -274,8 +274,8 @@ float4 Fw( int r, int c )
 //======================================================================================
 float shadow_extreme_quality_fused( float3 tc )
 {
-    float4 s   = (0.0f).xxxx;
-    float2 stc = ( SMAP_size * tc.xy ) + float2( 0.5, 0.5 );
+    float4 s   = (0.0).xxxx;
+    float2 stc = ( float(SMAP_size) * tc.xy ) + float2( 0.5, 0.5 );
     float2 tcs = floor( stc );
     float2 fc;
     int    row;
@@ -289,7 +289,7 @@ float shadow_extreme_quality_fused( float3 tc )
     float2 off;
 
     fc     = stc - tcs;
-    tc.xy  = tc.xy - ( fc * (1.0f/SMAP_size) );
+    tc.xy  = tc.xy - ( fc * (1.0/float(SMAP_size)) );
 
     // filter shadow map samples using the dynamic weights
     for( row = -FS2; row <= FS2; row += 2 )
@@ -299,16 +299,16 @@ float shadow_extreme_quality_fused( float3 tc )
             float4 d4;
             
 #ifndef PS_4            
-            d4 = textureGather( s_dmap, tc.xy + (1.0f/SMAP_size) * float2( col, row ) );
+            d4 = textureGather( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col, row ) );
 #else
-			d4.w = textureLod( s_dmap, tc.xy + (1.0f/SMAP_size) * float2( col, row ), 0 ).x;
-			d4.z = textureLod( s_dmap, tc.xy + (1.0f/SMAP_size) * float2( col+1, row ) , 0 ).x;
-			d4.y = textureLod( s_dmap, tc.xy + (1.0f/SMAP_size) * float2( col+1, row+1 ), 0 ).x;
-			d4.x = textureLod( s_dmap, tc.xy + (1.0f/SMAP_size) * float2( col, row+1 ), 0 ).x;
+			d4.w = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col, row ), 0 ).x;
+			d4.z = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col+1, row ) , 0 ).x;
+			d4.y = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col+1, row+1 ), 0 ).x;
+			d4.x = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col, row+1 ), 0 ).x;
 #endif
-            float4 b4  = ( tc.zzzz <= d4 ) ? (0.0f).xxxx : (1.0f).xxxx;   
+            float4 b4  = ( tc.zzzz <= d4 ) ? (0.0).xxxx : (1.0).xxxx;   
 
-            v1[(col+FS2)/2] = ( tc.zzzz <= d4 ) ? (1.0f).xxxx : (0.0f).xxxx;
+            v1[(col+FS2)/2] = ( tc.zzzz <= d4 ) ? (1.0).xxxx : (0.0).xxxx;
             blockerCount += dot( b4, (1.0).xxxx );
             avgBlockerDepth += dot( d4, b4 );
           
@@ -429,9 +429,9 @@ float shadow_extreme_quality_fused( float3 tc )
        }
     }
 
-    return dot(s, float4((1.0f-fRatio)*(1.0f-fRatio)*(1.0f-fRatio),
-						 3.0f * (1.0-fRatio)*(1.0-fRatio)*fRatio,
-						 3.0f * fRatio*fRatio*(1.0-fRatio),
+    return dot(s, float4((1.0-fRatio)*(1.0-fRatio)*(1.0-fRatio),
+						 3.0 * (1.0-fRatio)*(1.0-fRatio)*fRatio,
+						 3.0 * fRatio*fRatio*(1.0-fRatio),
 						 fRatio*fRatio*fRatio ) )/w;
 }
 #endif
@@ -440,15 +440,15 @@ float shadow_extreme_quality_fused( float3 tc )
 
 float dx10_1_hw_hq_7x7( float3 tc )
 {
-   float  s = 0.0f;
-   float2 stc = ( SMAP_size * tc.xy ) + float2( 0.5, 0.5 );
+   float  s = 0.0;
+   float2 stc = ( float(SMAP_size) * tc.xy ) + float2( 0.5, 0.5 );
    float2 tcs = floor( stc );
    float2 fc;
    int    row;
    int    col;
 
    fc.xy = stc - tcs;
-   tc.xy = tcs * ( 1.0 / SMAP_size );
+   tc.xy = tcs * ( 1.0 / float(SMAP_size) );
    
    // loop over the rows
    for( row = -GS2; row <= GS2; row += 2 )
@@ -462,7 +462,7 @@ float dx10_1_hw_hq_7x7( float3 tc )
                 if( col == -GS2 ) // left
                     s += dot( float4( 1.0-fc.x, 1.0, 1.0-fc.y, (1.0-fc.x)*(1.0-fc.y) ), v );
                 else if( col == GS2 ) // right
-                    s += dot( float4( 1.0f, fc.x, fc.x*(1.0-fc.y), 1.0-fc.y ), v );
+                    s += dot( float4( 1.0, fc.x, fc.x*(1.0-fc.y), 1.0-fc.y ), v );
                 else // center
                     s += dot( float4( 1.0, 1.0, 1.0-fc.y, 1.0-fc.y ), v );
             }
@@ -502,13 +502,13 @@ float dx10_0_hw_hq_7x7( float4 tc )
    float2 fc;
 
    fc    = stc - tcs;
-   tc.xy = tc.xy - ( fc * ( 1.0/SMAP_size ) );
+   tc.xy = tc.xy - ( fc * ( 1.0/float(SMAP_size) ) );
 
    float2 pwAB = ( float2( 2.0 ) - fc ); 	
-   float2 tcAB = float2( 1.0/SMAP_size ) / pwAB;
-   float2 tcM  = float2(0.5/SMAP_size );
+   float2 tcAB = float2( 1.0/float(SMAP_size) ) / pwAB;
+   float2 tcM  = float2(0.5/float(SMAP_size) );
    float2 pwGH = ( float2( 1.0 ) + fc );
-   float2 tcGH = (1.0/SMAP_size) * ( fc / pwGH );
+   float2 tcGH = (1.0/float(SMAP_size)) * ( fc / pwGH );
 
    // top row
    s += ( pwAB.x * pwAB.y ) * textureOffset( s_smap, float3(tc.xy + tcAB, tc.z), int2( -3, -3 ) ); // left
@@ -542,11 +542,11 @@ bool cheap_reject( float3 tc, inout bool full_light )
    float4 plane1  = sm_minmax_gather( tc.xy, int2(  1,-1 ) );
    float4 plane2  = sm_minmax_gather( tc.xy, int2( -1, 1 ) );
    float4 plane3  = sm_minmax_gather( tc.xy, int2(  1, 1 ) );
-   bool plane     = all( greaterThanEqual( plane0, float4(0) )) && all(greaterThanEqual( plane1, float4(0) )) && all(greaterThanEqual( plane2, float4(0) )) && all(greaterThanEqual( plane3, float4(0) ) );
+   bool plane     = all( greaterThanEqual( plane0, float4(0.0) )) && all(greaterThanEqual( plane1, float4(0.0) )) && all(greaterThanEqual( plane2, float4(0.0) )) && all(greaterThanEqual( plane3, float4(0.0) ) );
 
    if( !plane ) // if there are no proper plane equations in the support region
    {
-      bool no_plane  = all(lessThan( plane0, float4(0) )) && all(lessThan( plane1, float4(0) )) && all(lessThan( plane2, float4(0) )) && all(lessThan( plane3, float4(0) ) );
+      bool no_plane  = all(lessThan( plane0, float4(0.0) )) && all(lessThan( plane1, float4(0.0) )) && all(lessThan( plane2, float4(0.0) )) && all(lessThan( plane3, float4(0.0) ) );
       float4 z       = float4( tc.z - 0.0005 );
       bool reject    = all( greaterThan( z, -plane0 )) && all(greaterThan( z, -plane1 )) && all(greaterThan( z, -plane2 )) && all(greaterThan( z, -plane3 ) );
       if( no_plane && reject )
@@ -562,7 +562,7 @@ bool cheap_reject( float3 tc, inout bool full_light )
    else // plane equation detected
    {
       // compute corrected z for texel pos
-      const float scale = float( SMAP_size / 4 );
+      const float scale = float( SMAP_size ) / 4.0;
       float2 fc  = frac( tc.xy * scale );
       float  z   = lerp( lerp( plane0.y, plane1.x, fc.x ), lerp( plane2.z, plane3.w, fc.x ), fc.y );
 
@@ -586,7 +586,7 @@ float shadow_hw_hq( float4 tc )
       if( full_light == true )
          return 1.0;
       else
-         return sample_hw_pcf( tc, float4(0) ); 
+         return sample_hw_pcf( tc, float4(0.0) ); 
    }
    else
    {
@@ -628,18 +628,18 @@ float4 	test 		(float4 tc, float2 offset)
 {
 	half4	r;
 
-	const 	float 	scale 	= (0.5f/float(SMAP_size));
+	const 	float 	scale 	= (0.5/float(SMAP_size));
 
-	float  	texsize = 2*SMAP_size;
-	float2 	tc_J	= tc.xy/tc.w*texsize/8.0f;
-	float2 	fr 		= frac(tc_J)*.5f;
+	float  	texsize = 2.0*SMAP_size;
+	float2 	tc_J	= tc.xy/tc.w*texsize/8.0;
+	float2 	fr 		= frac(tc_J)*0.5;
 	
 //	half4	J0 	= tex2D	(jitter0,fr)*scale;
 //	half4	J1 	= tex2D	(jitter1,fr)*scale*2;
 	float4	J0 	= jitter0.Sample( smp_jitter, fr )*scale;
 //	float4	J1 	= jitter1.Sample( smp_jitter, fr )*scale;
 
-	float k = 0.99f/float(SMAP_size);
+	float k = 0.99/float(SMAP_size);
 	r.x 	= test 	(tc,J0.xy+float2(-k,-k)).x;
 	r.y 	= test 	(tc,J0.wz+float2( k,-k)).y;
 	
@@ -647,7 +647,7 @@ float4 	test 		(float4 tc, float2 offset)
  	r.w		= test	(tc,J0.wz+float2( k, k)).x;
 	
 	half4	f;
-	float k1 = 1.5f/float(SMAP_size);
+	float k1 = 1.5/float(SMAP_size);
 	f.x 	= test 	(tc,-J0.xy+float2(-k1,0)).x;
 	f.y 	= test 	(tc,-J0.wz+float2( 0,-k1)).y;
 
@@ -661,15 +661,15 @@ half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 {
 	half4	r;
 
-	//	const 	float 	scale 	= (2.0f/float(SMAP_size));
-	const 	float 	scale 	= (0.7f/float(SMAP_size));
+	//	const 	float 	scale 	= (2.0/float(SMAP_size));
+	const 	float 	scale 	= (0.7/float(SMAP_size));
 
 
-	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0f )*.5f;
+	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0 )*0.5;
 	float4	J0		= tex2D	(jitter0,tc_J)*scale;
 	//half4	J1 		= tex2D	(jitter1,tc_J)*scale;
 
-	const float k = .5f/float(SMAP_size);
+	const float k = 0.5/float(SMAP_size);
 	r.x 	= test 	(tc, J0.xy+half2(-k,-k)).x;
 	r.y 	= test 	(tc, J0.wz+half2( k,-k)).y;
 	r.z		= test	(tc,-J0.xy+half2(-k, k)).z;
@@ -681,9 +681,9 @@ half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 half 	shadow_high 	(float4 tc)			// jittered sampling
 {
 
-	const	float 	scale 	= (0.5f/float(SMAP_size));
+	const	float 	scale 	= (0.5/float(SMAP_size));
 
-	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0f )*.5f;
+	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0 )*0.5;
 	float4	J0 		= tex2D	(jitter0,tc_J)*scale;
 
 	const float k = 1.0/float(SMAP_size);
@@ -695,7 +695,7 @@ half 	shadow_high 	(float4 tc)			// jittered sampling
 	r.w		= test	(tc,J0.wz+half2( k, k)).x;
 
 
-	const float k1 = 1.3f/float(SMAP_size);
+	const float k1 = 1.3/float(SMAP_size);
 	half4	r1;
 	r1.x 	= test 	(tc,-J0.xy+half2(-k1,0)).x;
 	r1.y 	= test 	(tc,-J0.wz+half2( 0,-k1)).y;
@@ -769,7 +769,7 @@ float 	shadowtest 	(float4 tc, float4 tcJ)				// jittered sampling
 {
 	float4	r;
 
-	const 	float 	scale 	= (2.7f/float(SMAP_size));
+	const 	float 	scale 	= (2.7/float(SMAP_size));
 
 	float4	J0 	= tex2Dproj	(jitter0,tcJ)*scale;
 	float4	J1 	= tex2Dproj	(jitter1,tcJ)*scale;
@@ -786,7 +786,7 @@ float 	shadow_rain 	(float4 tc, float2 tcJ)			// jittered sampling
 {
 	float4	r;
 
-	const 	float 	scale 	= (4.0f/float(SMAP_size));
+	const 	float 	scale 	= (4.0/float(SMAP_size));
 //	float4	J0 	= jitter0.Sample( smp_jitter, tcJ )*scale;
 //	float4	J1 	= jitter1.Sample( smp_jitter, tcJ )*scale;
 	float4	J0 	= tex2D( jitter0, tcJ )*scale;

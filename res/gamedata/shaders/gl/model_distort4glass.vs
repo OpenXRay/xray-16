@@ -12,7 +12,7 @@ vf _main (v_model v)
 	// calculate fade
 	float3  dir_v	= normalize	(mul(m_WV,v.P));
 	float3  norm_v	= normalize	(mul(m_WV,v.N));
-	float   fade	= 0.9f*abs	(dot(dir_v,norm_v));
+	float   fade	= 0.9*abs	(dot(dir_v,norm_v));
 	o.c0		= float4	(fade);
 
 	return	o;

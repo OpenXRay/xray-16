@@ -72,7 +72,8 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 #endif // DEBUG
 
     Msg("* GPU vendor: [%s] device: [%s]", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
-    Msg("* GPU OpenGL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    Msg("* GPU OpenGL version: %s", glGetString(GL_VERSION));
+    Msg("* GPU OpenGL shading language version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // Clip control ensures compatibility with D3D device coordinates.
     // TODO: OGL: Fix these differences in the blenders/shaders.

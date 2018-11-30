@@ -2,14 +2,14 @@
 // Gather pattern
 //--------------------------------------------------------------------------------------
 
-float g_fHDAOZDispScale = 0.1f;			    // SSAO param
+float g_fHDAOZDispScale = 0.1;			    // SSAO param
 
 #ifdef USE_HDAO_CODE
 
-float g_fSSAORejectRadius      = 0.43f;	// SSAO param
-float g_fSSAOIntensity         = 0.85f;	// SSAO param
-float g_fSSAOAcceptRadius      = 0.0001f;// SSAO param
-float g_fSSAOAcceptAngle       = 0.98f;	// Used by the ValleyAngle function to determine shallow valleys
+float g_fSSAORejectRadius      = 0.43;	// SSAO param
+float g_fSSAOIntensity         = 0.85;	// SSAO param
+float g_fSSAOAcceptRadius      = 0.0001;// SSAO param
+float g_fSSAOAcceptAngle       = 0.98;	// Used by the ValleyAngle function to determine shallow valleys
 
 // Gather defines
 #define RING_0	(1)
@@ -184,7 +184,7 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 	float3 f3N1;
 	float3 f3N2;
 	float fDot;
-	float fSummedDot = 0.0f;
+	float fSummedDot = 0.0;
 	int2 i2MirrorPattern;
 	int2 i2OffsetScreenCoord;
 	int2 i2MirrorOffsetScreenCoord;
@@ -210,8 +210,8 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 		i2MirrorOffsetScreenCoord = int2( u2ScreenCoord ) + i2MirrorPattern;
 		
 		// Clamp our test to screen coordinates
-		i2OffsetScreenCoord = ivec2(mix( ( i2OffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0f, 1.0f ) ), greaterThan( i2OffsetScreenCoord, ( g_f2RTSize - float2( 1.0f, 1.0f ) ) )));
-		i2MirrorOffsetScreenCoord = ivec2(mix( ( i2MirrorOffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0f, 1.0f ) ), greaterThan( i2MirrorOffsetScreenCoord, ( g_f2RTSize - float2( 1.0f, 1.0f ) ) )));
+		i2OffsetScreenCoord = ivec2(mix( ( i2OffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0, 1.0 ) ), greaterThan( i2OffsetScreenCoord, ( g_f2RTSize - float2( 1.0, 1.0 ) ) )));
+		i2MirrorOffsetScreenCoord = ivec2(mix( ( i2MirrorOffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0, 1.0 ) ), greaterThan( i2MirrorOffsetScreenCoord, ( g_f2RTSize - float2( 1.0, 1.0 ) ) )));
 		i2OffsetScreenCoord = ivec2(mix( ( i2OffsetScreenCoord ), int2( 0 ), lessThan( i2OffsetScreenCoord, int2( 0 ) )));
 		i2MirrorOffsetScreenCoord = ivec2(mix( ( i2MirrorOffsetScreenCoord ), int2( 0 ), lessThan( i2MirrorOffsetScreenCoord, int2( 0 ) )));
 		
@@ -239,16 +239,16 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 		
 		fDot = dot( f3N1, N );
 		
-		fSummedDot += ( fDot > g_fSSAOAcceptAngle ) ? ( 0.0f ) : ( 1.0f - ( abs( fDot ) * 0.25f ) );
+		fSummedDot += ( fDot > g_fSSAOAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
 
 		fDot = dot( f3N2, N );
 		
-		fSummedDot += ( fDot > g_fSSAOAcceptAngle ) ? ( 0.0f ) : ( 1.0f - ( abs( fDot ) * 0.25f ) );
+		fSummedDot += ( fDot > g_fSSAOAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
 	}
 
-	fSummedDot /= 8.0f;
-	fSummedDot += 0.5f;
-	fSummedDot = ( fSummedDot <= 0.5f ) ? ( fSummedDot / 10.0f ) : ( fSummedDot );
+	fSummedDot /= 8.0;
+	fSummedDot += 0.5;
+	fSummedDot = ( fSummedDot <= 0.5 ) ? ( fSummedDot / 10.0 ) : ( fSummedDot );
 		
 	return fSummedDot;
 }
@@ -269,7 +269,7 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 #endif
 #ifndef	SSAO_QUALITY
 {
-	return 1.0f;
+	return 1.0;
 }
 #else
 { 
@@ -282,15 +282,13 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 	float2 f2InvRTSize;
 	float4 f4PosZ;
 	float  ZDisp;
-	float3 f3D0;
-	float3 f3D1;
 	float4 f4Diff;
 	float4 f4Compare[2];
-	float4 f4Occlusion = float4(0.0f);
-	float  fOcclusion = 0.0f;
+	float4 f4Occlusion = float4(0.0);
+	float  fOcclusion = 0.0;
 			
 	// Compute integer screen coord, and store off the inverse of the RT Size
-	f2InvRTSize	  = float2(1.0f) / (g_f2RTSize.xy);
+	f2InvRTSize	  = float2(1.0) / (g_f2RTSize.xy);
 	f2ScreenCoord = tc * (g_f2RTSize.xy);
 	i2ScreenCoord = int2( f2ScreenCoord );
 
@@ -312,11 +310,11 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 	// Loop through each gather location, and compare with its mirrored location
 	for( int iGather=0; iGather<g_iNumRingGathers; ++iGather )
 	{
-		f2MirrorScreenCoord = ( g_f2SSAORingPattern[iGather] + float2( 1.0f, 1.0f ) ) * float2( -1.0f, -1.0f );
+		f2MirrorScreenCoord = ( g_f2SSAORingPattern[iGather] + float2( 1.0, 1.0 ) ) * float2( -1.0, -1.0 );
 		
 		#ifdef SM_4_1
-			f2TexCoord = float2( ( f2ScreenCoord + ( g_f2SSAORingPattern[iGather] + float2( 1.0f, 1.0f ) ) ) * f2InvRTSize );
-			f2MirrorTexCoord = float2( ( f2ScreenCoord + ( f2MirrorScreenCoord + float2( 1.0f, 1.0f ) ) ) * f2InvRTSize );
+			f2TexCoord = float2( ( f2ScreenCoord + ( g_f2SSAORingPattern[iGather] + float2( 1.0, 1.0 ) ) ) * f2InvRTSize );
+			f2MirrorTexCoord = float2( ( f2ScreenCoord + ( f2MirrorScreenCoord + float2( 1.0, 1.0 ) ) ) * f2InvRTSize );
 		#else
 			f2TexCoord = float2( ( f2ScreenCoord + g_f2SSAORingPattern[iGather] ) * f2InvRTSize );
 			f2MirrorTexCoord = float2( ( f2ScreenCoord + ( f2MirrorScreenCoord ) ) * f2InvRTSize );
@@ -324,20 +322,20 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 		
 		f4PosZ		  = GatherZSamples( f2TexCoord );
 		f4Diff		  = float4(ZDisp) - f4PosZ;
-		f4Compare[0]  = mix(float4( 0.0f ), float4( 1.0f ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
-		f4Compare[0] *= mix(float4( 0.0f ), float4( 1.0f ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
+		f4Compare[0]  = mix(float4( 0.0 ), float4( 1.0 ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
+		f4Compare[0] *= mix(float4( 0.0 ), float4( 1.0 ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
 		
 		f4PosZ		  = GatherZSamples( f2MirrorTexCoord );
 		f4Diff		  = float4(ZDisp) - f4PosZ;
-		f4Compare[1]  = mix(float4( 0.0f ), float4( 1.0f ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
-		f4Compare[1] *= mix(float4( 0.0f ), float4( 1.0f ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
+		f4Compare[1]  = mix(float4( 0.0 ), float4( 1.0 ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
+		f4Compare[1] *= mix(float4( 0.0 ), float4( 1.0 ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
 
 		f4Occlusion.xyzw += g_f4SSAORingWeight[iGather].xyzw * ( f4Compare[0].xyzw * f4Compare[1].zwxy );
 	}
 	
-	fOcclusion  = dot( f4Occlusion, float4(g_fSSAOIntensity) ) / ( 2.0f * g_fRingWeightsTotal[g_iNumRings-1] );
-    fOcclusion *= fDot;
-    fOcclusion *= P.z < 0.5f ? 0.0f : lerp( 0.0f, 1.0f, saturate( P.z - 0.5f ) );
+	fOcclusion  = dot( f4Occlusion, float4(g_fSSAOIntensity) ) / ( 2.0 * g_fRingWeightsTotal[g_iNumRings-1] );
+	fOcclusion *= fDot;
+	fOcclusion *= P.z < 0.5 ? 0.0 : lerp( 0.0, 1.0, saturate( P.z - 0.5 ) );
 	fOcclusion  = 1.0f - saturate( fOcclusion );
 	return fOcclusion;
 }

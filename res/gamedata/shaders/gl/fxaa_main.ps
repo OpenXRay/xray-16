@@ -7,23 +7,23 @@ uniform float4		screen_res;
 
 float4 _main ( p_TL I )
 {
-	float2 rcpFrame = float2(1.0f/screen_res.x, 1.0f/screen_res.y);
+	float2 rcpFrame = float2(screen_res.z, screen_res.w);
 
 	return FxaaPixelShader(I.Tex0,
-            FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsolePosPos,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsolePosPos,
             s_base0,							// FxaaTex tex,
             s_base0,							// FxaaTex fxaaConsole360TexExpBiasNegOne,
             s_base0,							// FxaaTex fxaaConsole360TexExpBiasNegTwo,
             rcpFrame,							// FxaaFloat2 fxaaQualityRcpFrame,
-            FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt,
-            FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt2,
-            FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsole360RcpFrameOpt2,
-            0.35f,									// FxaaFloat fxaaQualitySubpix,
-            0.166f,									// FxaaFloat fxaaQualityEdgeThreshold,
-            0.0f,								// FxaaFloat fxaaQualityEdgeThresholdMin,
-            0.0f,									// FxaaFloat fxaaConsoleEdgeSharpness,
-            0.0f,									// FxaaFloat fxaaConsoleEdgeThreshold,
-            0.0f,									// FxaaFloat fxaaConsoleEdgeThresholdMin,
-            FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f)		// FxaaFloat fxaaConsole360ConstDir,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsoleRcpFrameOpt,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsoleRcpFrameOpt2,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsole360RcpFrameOpt2,
+            0.35,									// FxaaFloat fxaaQualitySubpix,
+            0.166,									// FxaaFloat fxaaQualityEdgeThreshold,
+            0.0,								// FxaaFloat fxaaQualityEdgeThresholdMin,
+            0.0,									// FxaaFloat fxaaConsoleEdgeSharpness,
+            0.0,									// FxaaFloat fxaaConsoleEdgeThreshold,
+            0.0,									// FxaaFloat fxaaConsoleEdgeThresholdMin,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0)		// FxaaFloat fxaaConsole360ConstDir,
             );
 }

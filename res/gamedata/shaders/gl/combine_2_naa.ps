@@ -11,7 +11,7 @@ Texture2D 			s_distort;
 Texture2DMS s_distort;
 #define	EPSDEPTH	0.001
 #endif
-uniform float4 		e_barrier;	// x=norm(.8f), y=depth(.1f), z=clr
+uniform float4 		e_barrier;	// x=norm(.8), y=depth(.1), z=clr
 uniform float4 		e_weights;	// x=norm, y=depth, z=clr
 uniform float4 		e_kernel;	// x=norm, y=depth, z=clr
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ c2_out _main( v2p_aa_AA I )
 #else // USE_MSAA
 	float4 	distort	= texelFetch( s_distort, int2( I.Tex0 * pos_decompression_params2.xy), iSample );
 #endif // USE_MSAA
-	float2	offset	= (distort.xy-(127.0f/255.0f))*def_distort;  // fix newtral offset
+	float2	offset	= (distort.xy-(127.0/255.0))*def_distort;  // fix newtral offset
 	float2	center	= I.Tex0 + offset;
 
 #ifdef GBUFFER_OPTIMIZATION
@@ -85,7 +85,7 @@ c2_out _main( v2p_aa_AA I )
 */
  	res.Color += combine_bloom( img, bloom );
 #ifdef USE_MSAA
-	float4 ptp = mul(m_P, float4(gbd.P, 1));
+	float4 ptp = mul(m_P, float4(gbd.P, 1.0));
 	res.Depth = ptp.w==0?1:ptp.z/ptp.w;
 #endif
 	

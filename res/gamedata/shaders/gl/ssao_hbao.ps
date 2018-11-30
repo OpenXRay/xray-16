@@ -15,32 +15,32 @@ uniform	float4		screen_res;
 #define g_Resolution screen_res.xy
 #define g_InvResolution screen_res.zw
 
-const float g_MaxFootprintUV=0.01f;
+const float g_MaxFootprintUV=0.01;
 
 #if SSAO_QUALITY == 3
-const float g_NumDir = 6.0f;
-const float g_NumSteps = 3.0f;
+const float g_NumDir = 6.0;
+const float g_NumSteps = 3.0;
 #elif SSAO_QUALITY == 2
-const float g_NumDir = 5.0f;
-const float g_NumSteps = 3.0f;
+const float g_NumDir = 5.0;
+const float g_NumSteps = 3.0;
 #elif SSAO_QUALITY == 1
-const float g_NumDir = 4.0f;
-const float g_NumSteps = 3.0f;
+const float g_NumDir = 4.0;
+const float g_NumSteps = 3.0;
 #endif
 
-//  const float g_Contrast = 1.5f;
-  const float g_Contrast = 0.8f;
-  const float g_AngleBias = 0.0f;
+//  const float g_Contrast = 1.5;
+  const float g_Contrast = 0.8;
+  const float g_AngleBias = 0.0;
 
 
-  const float g_R = 0.400009334f;
-  const float g_sqr_R = 0.160007462f;
-  const float g_inv_R = 2.49994159f;
+  const float g_R = 0.400009334;
+  const float g_sqr_R = 0.160007462;
+  const float g_inv_R = 2.49994159;
 
 Texture2D 	jitter4;
 
-//#define M_PI 3.1415926f
-const float M_PI = 3.1415926f;
+//#define M_PI 3.1415926
+const float M_PI = 3.1415926;
 
 //----------------------------------------------------------------------------------
 struct PostProc_VSOut
@@ -294,7 +294,7 @@ float horizon_occlusion2_4way(float2 deltaUV0,
                           tangent(T2), tangent(T3) );
     float4 sinH3 = tanH3 / sqrt((1.0f).xxxx + tanH3*tanH3);
 
-    float ao3 = 0.0f;
+    float ao3 = 0.0;
     for(float j = 1; j <= numSteps; ++j) {
         uv0 += deltaUV0; 
         uv1 += deltaUV1; 
@@ -370,8 +370,8 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
 
     
     // Loop for all directions
-    float ao4 = 0.f;
-    float alpha = 2.0f * M_PI / g_NumDir;
+    float ao4 = 0.0;
+    float alpha = 2.0 * M_PI / g_NumDir;
     float delta = g_NumDir / numDirs;
     
     int iNumDir = int(ceil(g_NumDir / delta));
@@ -393,8 +393,8 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
     for (int i = 0; i < (iNumDir / 4); ++i) {  
   
         float d      = float(i)*delta;
-	    float4 angle = alpha * float4( 4.0f*d + 0.0f * delta, 4.0f*d + 1.0f * delta,
-	                                   4.0f*d + 2.0f * delta, 4.0f*d + 3.0f * delta);
+	    float4 angle = alpha * float4( 4.0*d + 0.0 * delta, 4.0*d + 1.0 * delta,
+	                                   4.0*d + 2.0f * delta, 4.0*d + 3.0 * delta);
 	    float4 f4Cos = cos( angle );
 	    float4 f4Sin = sin( angle );
 	    

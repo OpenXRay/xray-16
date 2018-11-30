@@ -51,11 +51,11 @@ RWTexture2D<float> g_ResultTexture : register( u0 );
 // Hard coded HDAO params
 //=================================================================================================================================
 
-float g_fHDAORejectRadius    = 0.43f;	// Camera Z values must fall within the reject and accept radius to be 
-float g_fHDAOAcceptRadius    = 0.0001f;  // considered as a valley
-float g_fHDAOIntensity       = 0.5f;	    // Simple scaling factor to control the intensity of the occlusion
-float g_fHDAONormalScale     = 0.10f;	// Scaling factor to control the effect the normals have 
-float g_fAcceptAngle         = 0.98f;	// Used by the ValleyAngle function to determine shallow valleys
+float g_fHDAORejectRadius    = 0.43;	// Camera Z values must fall within the reject and accept radius to be 
+float g_fHDAOAcceptRadius    = 0.0001;  // considered as a valley
+float g_fHDAOIntensity       = 0.5;	    // Simple scaling factor to control the intensity of the occlusion
+float g_fHDAONormalScale     = 0.10;	// Scaling factor to control the effect the normals have 
+float g_fAcceptAngle         = 0.98;	// Used by the ValleyAngle function to determine shallow valleys
 
 //=================================================================================================================================
 // Thread / Group Defines
@@ -368,10 +368,10 @@ const int2 g_i2NormalLoadPattern[NUM_NORMAL_LOADS] =
 //=================================================================================================================================
 float ValleyAngle( uint2 u2ScreenCoord )
 {
-	float3 f3N1;
-	float3 f3N2;
+	float3 f3N1 = float3(0.0);
+	float3 f3N2 = float3(0.0);
 	float fDot;
-	float fSummedDot = 0.0f;
+	float fSummedDot = 0.0;
 	int2 i2MirrorPattern;
 	int2 i2OffsetScreenCoord;
 	int2 i2MirrorOffsetScreenCoord;
@@ -389,8 +389,8 @@ float ValleyAngle( uint2 u2ScreenCoord )
 		i2MirrorOffsetScreenCoord = u2ScreenCoord + i2MirrorPattern;
 		
 		// Clamp our test to screen coordinates
-		i2OffsetScreenCoord = ( i2OffsetScreenCoord > ( g_f2RTSize - float2( 1.0f, 1.0f ) ) ) ? ( g_f2RTSize - float2( 1.0f, 1.0f ) ) : ( i2OffsetScreenCoord );
-		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord > ( g_f2RTSize - float2( 1.0f, 1.0f ) ) ) ? ( g_f2RTSize - float2( 1.0f, 1.0f ) ) : ( i2MirrorOffsetScreenCoord );
+		i2OffsetScreenCoord = ( i2OffsetScreenCoord > ( g_f2RTSize - float2( 1.0, 1.0 ) ) ) ? ( g_f2RTSize - float2( 1.0, 1.0 ) ) : ( i2OffsetScreenCoord );
+		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord > ( g_f2RTSize - float2( 1.0, 1.0 ) ) ) ? ( g_f2RTSize - float2( 1.0, 1.0 ) ) : ( i2MirrorOffsetScreenCoord );
 		i2OffsetScreenCoord = ( i2OffsetScreenCoord < 0 ) ? ( 0 ) : ( i2OffsetScreenCoord );
 		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord < 0 ) ? ( 0 ) : ( i2MirrorOffsetScreenCoord );
 						
@@ -406,16 +406,16 @@ float ValleyAngle( uint2 u2ScreenCoord )
 		
 		fDot = dot( f3N1, N );
 		
-		fSummedDot += ( fDot > g_fAcceptAngle ) ? ( 0.0f ) : ( 1.0f - ( abs( fDot ) * 0.25f ) );
+		fSummedDot += ( fDot > g_fAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
 
 		fDot = dot( f3N2, N );
 		
-		fSummedDot += ( fDot > g_fAcceptAngle ) ? ( 0.0f ) : ( 1.0f - ( abs( fDot ) * 0.25f ) );
+		fSummedDot += ( fDot > g_fAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
 	}
 
-	fSummedDot /= 8.0f;
-	fSummedDot += 0.5f;
-	fSummedDot = ( fSummedDot <= 0.5f ) ? ( fSummedDot / 10.0f ) : ( fSummedDot );
+	fSummedDot /= 8.0;
+	fSummedDot += 0.5;
+	fSummedDot = ( fSummedDot <= 0.5 ) ? ( fSummedDot / 10.0 ) : ( fSummedDot );
 		
 	return fSummedDot;
 }
@@ -430,7 +430,7 @@ float ValleyAngle( uint2 u2ScreenCoord )
 	    float fCenterZ;
 	    float2 f2SamplePos;
 	    float2 f2MirrorSamplePos;
-	    float fOcclusion = 0.0f;
+	    float fOcclusion = 0.0;
 	    float2 f2SampledZ;
 	    float2 f2Diff;
 	    float2 f2Compare;
@@ -451,8 +451,8 @@ float ValleyAngle( uint2 u2ScreenCoord )
     		
 		    // Valley detect
 		    f2Diff     = fCenterZ.xx - f2SampledZ;
-		    f2Compare  = ( f2Diff < g_fHDAORejectRadius.xx ) ? ( 1.0f ) : ( 0.0f );
-		    f2Compare *= ( f2Diff > g_fHDAOAcceptRadius.xx ) ? ( 1.0f ) : ( 0.0f );
+		    f2Compare  = ( f2Diff < g_fHDAORejectRadius.xx ) ? ( 1.0 ) : ( 0.0 );
+		    f2Compare *= ( f2Diff > g_fHDAOAcceptRadius.xx ) ? ( 1.0 ) : ( 0.0 );
     		
 		    // Weight occlusion
 		    fOcclusion += ( f2Compare.x * f2Compare.y * g_fHDAOSampleWeights[uValley] );	
@@ -461,8 +461,8 @@ float ValleyAngle( uint2 u2ScreenCoord )
 	    // Finally calculate the HDAO occlusion value
 	    fOcclusion /= g_fWeightTotal;
 	    fOcclusion *= g_fHDAOIntensity * fDot;
-	    fOcclusion *= fCenterZ < 0.5f ? 0.0f : lerp( 0.0f, 1.0f, saturate( fCenterZ - 0.5f ) );
-	    fOcclusion = 1.0f - saturate( fOcclusion );
+	    fOcclusion *= fCenterZ < 0.5 ? 0.0 : lerp( 0.0, 1.0, saturate( fCenterZ - 0.5 ) );
+	    fOcclusion = 1.0 - saturate( fOcclusion );
     	
 	    return fOcclusion;
     }
@@ -483,7 +483,7 @@ float ValleyAngle( uint2 u2ScreenCoord )
 	    if( ( u2ScreenPos.x < uint( g_f2RTSize.x ) ) && ( u2ScreenPos.y < uint( g_f2RTSize.y ) ) )
 	    {
             // Write the data directly to an AO texture:
-            g_ResultTexture[u2ScreenPos.xy] = 1.0f;
+            g_ResultTexture[u2ScreenPos.xy] = 1.0;
         }
     }
     #elif SSAO_QUALITY < 3
@@ -495,7 +495,7 @@ float ValleyAngle( uint2 u2ScreenCoord )
 	    if( ( u2ScreenPos.x < uint( g_f2RTSize.x ) ) && ( u2ScreenPos.y < uint( g_f2RTSize.y ) ) )
 	    {
             // Write the data directly to an AO texture:
-            g_ResultTexture[u2ScreenPos.xy] = 1.0f;
+            g_ResultTexture[u2ScreenPos.xy] = 1.0;
         }
     }
     #elif SSAO_QUALITY >= 3
@@ -503,7 +503,7 @@ float ValleyAngle( uint2 u2ScreenCoord )
 	    // Locals
 	    float2 f2ScreenCoord;
 	    float2 f2Coord;
-	    float2 f2InvTextureSize = 1.0f / g_f2RTSize;
+	    float2 f2InvTextureSize = 1.0 / g_f2RTSize;
 	    float4 f4Depth;
 	    float4 f4Normal;
         float4 f4LDSValue;
@@ -512,14 +512,14 @@ float ValleyAngle( uint2 u2ScreenCoord )
 	    if( GI < GATHER_THREADS )
 	    {
 		    // Get the screen position for this threads TEX ops
-		    uColumn = ( GI % GATHER_THREADS_PER_ROW )  * GATHER_PER_THREAD * 2;
-		    uRow = ( GI / GATHER_THREADS_PER_ROW ) * 2;
+		    uColumn = ( GI % GATHER_THREADS_PER_ROW )  * GATHER_PER_THREAD * 2.0;
+		    uRow = ( GI / GATHER_THREADS_PER_ROW ) * 2.0;
 		    f2ScreenCoord = float2( ( float2( Gid.x, Gid.y ) * float2( ALU_DIM, ALU_DIM ) ) - float2( GROUP_TEXEL_OVERLAP, GROUP_TEXEL_OVERLAP ) ) + float2( uColumn, uRow );
 		    
             #ifndef USE_MSAA
                 
                 // Offset for the use of gather4
-                f2ScreenCoord += float2( 1.0f, 1.0f ); 
+                f2ScreenCoord += float2( 1.0, 1.0 ); 
 
             #endif
     		
@@ -603,19 +603,19 @@ float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 #endif
 #ifndef	SSAO_QUALITY
 {
-	return 1.0f;
+	return 1.0;
 }
 #elif SSAO_QUALITY >= 3
 {
 	// Locals
 	uint2 u2CenterScreenCoord;
-    float2 f2ScreenCoord;
+	float2 f2ScreenCoord;
 	float2 f2MirrorScreenCoord;
 	float fCenterZ;
 	float2 f2SampledZ;
 	float2 f2Diff;
 	float2 f2Compare;
-	float fOcclusion = 0.0f;
+	float fOcclusion = 0.0;
 	int iValley;
 	float fDot;
 								
@@ -651,8 +651,8 @@ float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 
 		// Detect valleys 
 		f2Diff     = fCenterZ.xx - f2SampledZ;
-		f2Compare  = ( f2Diff < g_fHDAORejectRadius.xx ) ? ( 1.0f ) : ( 0.0f );
-		f2Compare *= ( f2Diff > g_fHDAOAcceptRadius.xx ) ? ( 1.0f ) : ( 0.0f );
+		f2Compare  = ( f2Diff < g_fHDAORejectRadius.xx ) ? ( 1.0 ) : ( 0.0 );
+		f2Compare *= ( f2Diff > g_fHDAOAcceptRadius.xx ) ? ( 1.0 ) : ( 0.0 );
 						
 		// Accumulate weighted occlusion
 		fOcclusion += f2Compare.x * f2Compare.y * g_fHDAOSampleWeights[iValley];	
@@ -661,8 +661,8 @@ float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 	// Finally calculate the HDAO occlusion value
 	fOcclusion /= g_fWeightTotal;
 	fOcclusion *= g_fHDAOIntensity * fDot;
-	fOcclusion *= fCenterZ < 0.5f ? 0.0f : lerp( 0.0f, 1.0f, saturate( fCenterZ - 0.5f ) );
-	fOcclusion = 1.0f - saturate( fOcclusion );
+	fOcclusion *= fCenterZ < 0.5 ? 0.0 : lerp( 0.0, 1.0, saturate( fCenterZ - 0.5 ) );
+	fOcclusion = 1.0 - saturate( fOcclusion );
 	
 	return fOcclusion;
 }

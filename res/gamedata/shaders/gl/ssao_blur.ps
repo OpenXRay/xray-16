@@ -16,7 +16,7 @@ float ssao_blur_ps(int2 centerTC, int iSample)
 #endif
 {
   // low weight center sample - will be used on edges
-	float  fSumWeight = 0.025f;
+	float  fSumWeight = 0.025;
 #ifndef USE_MSAA
    float2 centerData = tex2D(s_occ, centerTC);
 #else

@@ -6,29 +6,17 @@ layout(location = TEXCOORD0) in float2 uv;
 
 void main()
 {
-	half3	YUV	= tex2D	(s_base, uv).bgr;
+	float3	YUV	= tex2D	(s_base, uv).bgr;
 
-//	half	Y	= YUV.x;
-//	half	U	= YUV.y;
-//	half	V	= YUV.z;
-	half	Y	= YUV.z;
-	half	U	= YUV.y;
-	half	V	= YUV.x;
+	float	Y	= YUV.z;
+	float	U	= YUV.y;
+	float	V	= YUV.x;
 
-	/*
-	half	_T = 1.16406f*Y;
-	half R1 = _T 				+ 1.59765f*V 	- 0.86961f;
-	half G1 = _T - 0.390625f*U 	- 0.8125f*V  	+ 0.53076f;
-	half B1 = _T + 2.01562f*U 					- 1.0786f;
-	*/
+	float	c	= 1.16406;
+	float3	_Y	= float3		(c,			c,		c)*Y;
+	float3	_U	= float3		(0.0, 			-0.390625,	+2.01562) * U;
+	float3	_V	= float3		(+1.59765,		-0.8125,	0.0) * V;
+	float3	_S	= float3		(-0.86961,		+0.53076,	-1.0786);
 
-	half	c	= 1.16406f	;
-	half3	_Y	= half3		(c,				c,			c)			*Y	;
-	half3	_U	= half3		(0, 			-0.390625f, +2.01562f)	*U	;
-	half3	_V	= half3		(+1.59765f,		-0.8125f,	0)			*V	;
-	half3	_S	= half3		(-0.86961f,		+0.53076f,	-1.0786f)		;
-
-	SV_Target = half4(_Y+_U+_V+_S,1);
-
-//	SV_Target = half4(1,0,0,1);
+	SV_Target	= float4(_Y+_U+_V+_S,1.0);
 }

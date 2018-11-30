@@ -3,7 +3,7 @@
 
 
 //	Must be less than view near
-#define	DEPTH_EPSILON	0.1f
+#define	DEPTH_EPSILON	0.1
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
 float4 _main( v2p I )
@@ -21,17 +21,17 @@ float4 _main( v2p I )
 #endif
 	float4 _P		= float4( gbd.P, gbd.mtl );
 	float spaceDepth = _P.z-I.tctexgen.z-DEPTH_EPSILON;
-	if (spaceDepth < -2*DEPTH_EPSILON ) spaceDepth = 100000.0f; //  Skybox doesn't draw into position buffer
-	//result.a *= saturate(spaceDepth*0.3f);
-	result.a *= Contrast( saturate(spaceDepth*1.3f), 2);
-	result.rgb *= Contrast( saturate(spaceDepth*1.3f), 2);
-//	result = Contrast( saturate(spaceDepth*1.3f), 2);
+	if (spaceDepth < -2.0*DEPTH_EPSILON ) spaceDepth = 100000.0; //  Skybox doesn't draw into position buffer
+	//result.a *= saturate(spaceDepth*0.3);
+	result.a *= Contrast( saturate(spaceDepth*1.3), 2.0);
+	result.rgb *= Contrast( saturate(spaceDepth*1.3), 2.0);
+//	result = Contrast( saturate(spaceDepth*1.3), 2.0);
 //	result = saturate (spaceDepth*5.0);
 //	result.rgb = float3(1,0,0);
-//	result.a = 1;
+//	result.a = 1.0;
 #endif	//	USE_SOFT_PARTICLES
 
-	clip(result.a-(0.01f/255.0f));
+	clip(result.a-(0.01/255.0));
 	//clip(result.a-0.5);
 
 	return	result;

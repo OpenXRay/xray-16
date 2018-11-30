@@ -32,7 +32,7 @@ void _main (_input I
 	gbuffer_data gbd2 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(+pos_decompression_params2.z, -pos_decompression_params2.w), I.pos2d * 2, ISAMPLE) );
 	gbuffer_data gbd3 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(-pos_decompression_params2.z, +pos_decompression_params2.w), I.pos2d * 2, ISAMPLE) );
 
-	//float3 avgN = (gbd0.N +  gbd1.N +  gbd2.N + gbd3.N) * 0.25f;
+	//float3 avgN = (gbd0.N +  gbd1.N +  gbd2.N + gbd3.N) * 0.25;
 	
 	// check if they are on the plane
 	//float dx = gbd2.P.z - gbd1.P.z;
@@ -41,8 +41,8 @@ void _main (_input I
 	//float tx = (gbd0.P.z - gbd3.P.z) - dx;
 	//float ty = (gbd0.P.z - gbd2.P.z) - dy;
 
-	//float diff = 0.0f;
-	//if (abs(tx * ty) > 0.005f) diff = 1.0f;
+	//float diff = 0.0;
+	//if (abs(tx * ty) > 0.005) diff = 1.0;
 
 	gbuffer_data gbd = gbd0;
 	if (gbd1.P.z < gbd.P.z) gbd = gbd1;	
@@ -56,7 +56,7 @@ void _main (_input I
 	float occ = calc_ssao( CS_P(P, N, float2(I.tc0), float2(I.tcJ), I.pos2d, ISAMPLE) );
 #else
 	//	Is not supported now
-	float occ = 1.0f;//hbao_calc(P, N, I.tc0, I.pos2d);
+	float occ = 1.0;//hbao_calc(P, N, I.tc0, I.pos2d);
 #endif
 
 	SV_Target = float4(occ, occ, occ, occ);

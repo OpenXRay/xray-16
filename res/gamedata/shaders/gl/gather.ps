@@ -5,7 +5,7 @@ float4 sm_gather( float2 tc, int2 offset )
 #ifdef SM_4_1
 	return textureGatherOffset( s_dmap, tc, offset ); 
 #else
-    const float scale = float( SMAP_size );
+	const float scale = float( SMAP_size );
 	float2 fc = frac( tc * scale );
 	
 	tc -= fc / scale;
@@ -24,7 +24,7 @@ float4 sm_minmax_gather( float2 tc, int2 offset )
 #ifdef SM_4_1
 	return textureGatherOffset( s_smap_minmax, tc, offset ); 
 #else
-    const float scale = float( SMAP_size / 4 );
+	const float scale = float( SMAP_size ) / 4.0;
 	float2 fc = frac( tc * scale );
 	
 	tc -= fc / scale;

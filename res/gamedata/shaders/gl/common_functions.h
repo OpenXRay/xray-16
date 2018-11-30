@@ -95,7 +95,7 @@ float   get_sun( float4 lmh)
 
 float3	v_hemi(float3 n)
 {
-	return L_hemi_color.rgb*(.5f + .5f*n.y);                   
+	return L_hemi_color.rgb*(0.5 + 0.5*n.y);                   
 }
 
 float3	v_sun(float3 n)                        	
@@ -155,8 +155,8 @@ float2 gbuf_pack_normal( float3 norm )
    float2 res;
 
    res.x  = norm.z;
-   res.y  = 0.5f * ( norm.x + 1.0f ) ;
-   res.y *= ( norm.y < 0.0f ? -1.0f : 1.0f );
+   res.y  = 0.5 * ( norm.x + 1.0 ) ;
+   res.y *= ( norm.y < 0.0 ? -1.0 : 1.0 );
 
    return res;
 }
@@ -166,7 +166,7 @@ float3 gbuf_unpack_normal( float2 norm )
    float3 res;
 
    res.z  = norm.x;
-   res.x  = ( 2.0f * abs( norm.y ) ) - 1.0f;
+   res.x  = ( 2.0 * abs( norm.y ) ) - 1.0;
    res.y = ( norm.y < 0 ? -1.0 : 1.0 ) * sqrt( abs( 1 - res.x * res.x - res.z * res.z ) );
 
    return res;

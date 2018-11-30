@@ -1,7 +1,6 @@
 #include "common.h"
 #include "iostructs\p_TL.h"
 
-// uniform sampler2D 	s_base;
 uniform sampler2D 	s_distort;
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -9,9 +8,9 @@ uniform sampler2D 	s_distort;
 float4 _main ( p_TL I )
 {
 	float2 	distort	= tex2D		(s_distort, I.Tex0).rg;
-	float2	offset	= (distort.xy-.5f)*def_distort;
+	float2	offset	= (distort.xy - 0.5)*def_distort;
 	float3	image 	= tex2D		(s_base, I.Tex0 + offset).rgb;
 
 	// out
-	return  float4	(image,1);					// +mov
+	return  float4	(image, 1.0);					// +mov
 }

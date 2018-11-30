@@ -29,7 +29,7 @@ float4 _main ( v2p I )
 	float4	D;
 	float4	H;
 	sample_Textures(D, H, I.tc1, I.tc0, I.af, float2(0.0,0.0) );
-	D.w	= (D.w-(96.0/255.0)*0.5)/(1.0-(96.f/255.0)*0.5);
+	D.w	= (D.w-(96.0/255.0)*0.5)/(1.0-(96.0/255.0)*0.5);
 	return	D.w;
 }
 
@@ -54,7 +54,7 @@ f_deffer 	_main	( v2p I )
 	clip		(D.w-(96.0/255.0))  ;
 #endif	//	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1_ATOC) )
 #ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
-	float alpha = (D.w-(96.0/255.0)*0.5)/(1.f-(96.0/255.0)*0.5);
+	float alpha = (D.w-(96.0/255.0)*0.5)/(1.0-(96.0/255.0)*0.5);
 	uint mask = alpha_to_coverage ( alpha, pos2d );
 #endif	//	MSAA_ALPHATEST_DX10_1_ATOC
 

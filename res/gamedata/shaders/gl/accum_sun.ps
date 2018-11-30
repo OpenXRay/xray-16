@@ -3,18 +3,6 @@
 #include "shadow.h"
 #include "iostructs\p_aa_AA_sun.h"
 
-/*
-struct 	_input
-{
-	float2 	tc 	: TEXCOORD0;
-	float4 	tcJ : TEXCOORD1;
-	float2	LT	: TEXCOORD2;
-	float2	RT	: TEXCOORD3;
-	float2	LB	: TEXCOORD4;
-	float2 	RB	: TEXCOORD5;
-};
-*/
-
 #ifdef MSAA_OPTIMIZATION
 #ifdef GBUFFER_OPTIMIZATION
 float4 	_main	( p_aa_AA_sun I, float4 pos2d, uint iSample )
