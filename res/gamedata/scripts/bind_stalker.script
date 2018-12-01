@@ -178,11 +178,11 @@ function actor_binder:key_hold(key)
 end
 -- mouse move callback (turn on in build_config_defines.h only if absolutely needed)
 function actor_binder:mouse_move(dx, dy)
-	log(string.format("mouse moved to: [%d]:[%d]", dx, dy))
+	-- log(string.format("mouse moved to: [%d]:[%d]", dx, dy))
 end
 -- mouse wheel callback (direction is 120 up and -120 down)
 function actor_binder:mouse_wheel(direction)
-	log(string.format("mouse wheel moved %s", tostring(direction)))
+	-- log(string.format("mouse wheel moved %s", tostring(direction)))
 end
 -- item to ruck callback
 -- note: this is called on new game and level change
