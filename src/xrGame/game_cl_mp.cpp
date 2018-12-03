@@ -1535,7 +1535,8 @@ void game_cl_mp::generate_file_name(string_path& file_name, LPCSTR file_suffix, 
 #else
 void game_cl_mp::generate_file_name(string_path& file_name, LPCSTR file_suffix, time_t& date_time)
 {
-    xr_sprintf(file_name, "%s_%s", ctime(date_time), file_suffix);
+    std::time_t std_date_time = date_time;
+    xr_sprintf(file_name, "%s_%s", ctime(&std_date_time), file_suffix);
 }
 #endif
 
