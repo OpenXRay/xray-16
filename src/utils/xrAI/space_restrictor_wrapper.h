@@ -10,7 +10,7 @@
 
 #include "xrAICore/Navigation/graph_abstract.h"
 #include "xrAICore/Navigation/graph_engine.h"
-#include "xrServerEntities/shapedata.h"
+#include "xrServerEntities/ShapeData.h"
 #include "xrServerEntities/xrServer_Objects_ALife.h"
 
 class CSpaceRestrictorWrapper
