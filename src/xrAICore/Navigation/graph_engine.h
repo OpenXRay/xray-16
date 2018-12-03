@@ -13,7 +13,6 @@
 #include "xrAICore/Navigation/vertex_manager_fixed.h"
 #include "xrAICore/Navigation/vertex_allocator_fixed.h"
 #include "xrAICore/Navigation/data_storage_bucket_list.h"
-#include "xrAICore/Navigation/PathManagers/path_manager.h"
 #include "xrAICore/Navigation/graph_engine_space.h"
 #ifndef AI_COMPILER
 #include "xrAICore/Navigation/vertex_manager_hash_fixed.h"
@@ -109,4 +108,6 @@ public:
 #endif
 };
 
+#include "xrAICore/Navigation/PathManagers/path_manager.h"
+#include "xrAICore/Components/problem_solver_inline.h"
 #include "xrAICore/Navigation/graph_engine_inline.h"
