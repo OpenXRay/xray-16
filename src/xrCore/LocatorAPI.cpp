@@ -405,18 +405,18 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         string_path name, full;
         archive_header header;
         
-        u16 buffer_size = hdr->r_u16(); // Читаем общую длину всей хрени
+        u16 buffer_size = hdr->r_u16(); // Read the total length of all crap
         VERIFY(buffer_size < sizeof(name) + sizeof(archive_header) + sizeof(u32));
 
-        hdr->r(&header, sizeof(archive_header)); // Читаем заголовок
+        hdr->r(&header, sizeof(archive_header)); // Read header
 
         int name_length = buffer_size - sizeof(archive_header) - sizeof(u32);
         VERIFY(name_length > 0);
-        hdr->r(&name, name_length); // читаем имя файла
+        hdr->r(&name, name_length); // Read file name
         name[name_length] = 0;
 
         u32 ptr = 0;
-        hdr->r(&ptr, sizeof(ptr)); // Читаем внутренний указатель на файл в архиве
+        hdr->r(&ptr, sizeof(ptr)); // Obtain internal pointer to the file in archive
 
         strconcat(sizeof full, full, fs_entry_point, name);
         Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, 0);
