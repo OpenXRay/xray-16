@@ -403,32 +403,23 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
     while (!hdr->eof())
     {
         string_path name, full;
-        string1024 buffer_start;
-        u16 buffer_size = hdr->r_u16();
-        VERIFY(buffer_size < sizeof(name) + 4 * sizeof(u32));
-        VERIFY(buffer_size < sizeof(buffer_start));
-        u8* buffer = (u8*)&*buffer_start;
-        hdr->r(buffer, buffer_size);
+        archive_header header;
+        
+        u16 buffer_size = hdr->r_u16(); // Читаем общую длину всей хрени
+        VERIFY(buffer_size < sizeof(name) + sizeof(archive_header) + sizeof(u32));
 
-        u32 size_real = *(u32*)buffer;
-        buffer += sizeof size_real;
+        hdr->r(&header, sizeof(archive_header)); // Читаем заголовок
 
-        u32 size_compr = *(u32*)buffer;
-        buffer += sizeof size_compr;
-
-        u32 crc = *(u32*)buffer;
-        buffer += sizeof crc;
-
-        u32 name_length = buffer_size - 4 * sizeof(u32);
-        memcpy(name, buffer, name_length);
+        int name_length = buffer_size - sizeof(archive_header) - sizeof(u32);
+        VERIFY(name_length > 0);
+        hdr->r(&name, name_length); // читаем имя файла
         name[name_length] = 0;
-        buffer += buffer_size - 4 * sizeof(u32);
 
-        u32 ptr = *(u32*)buffer;
-        buffer += sizeof ptr;
+        u32 ptr = 0;
+        hdr->r(&ptr, sizeof(ptr)); // Читаем внутренний указатель на файл в архиве
 
         strconcat(sizeof full, full, fs_entry_point, name);
-        Register(full, A.vfs_idx, crc, ptr, size_real, size_compr, 0);
+        Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, 0);
     }
     hdr->close();
 }
