@@ -1559,10 +1559,8 @@ CLocatorAPI::files_it CLocatorAPI::file_find_it(pcstr fname)
     VERIFY(xr_strlen(fname) * sizeof(char) < sizeof(file_name));
     xr_strcpy(file_name, sizeof file_name, fname);
     desc_f.name = file_name;
-    // desc_f.name = xr_strlwr(xr_strdup(fname));
-    files_it I = m_files.find(desc_f);
-    // xr_free (desc_f.name);
-    return I;
+
+    return m_files.find(desc_f);
 }
 
 bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)
