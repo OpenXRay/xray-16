@@ -78,7 +78,7 @@ public:
             return						(tpALifeInventoryItem1->m_dwCost > tpALifeInventoryItem2->m_dwCost);
     }
 };
-/**/
+**/
 
 CALifeCommunicationManager::CALifeCommunicationManager(IPureServer* server, LPCSTR section)
     : CALifeSimulatorBase(server, section)
@@ -961,4 +961,4 @@ std::find(tpALifeTrader->children.begin(),tpALifeTrader->children.end(),original
         tpALifeHumanAbstract->attach		(original_pda,true);
     }
 }
-/**/
+**/

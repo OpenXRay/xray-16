@@ -1486,7 +1486,7 @@ void CGameObject::OnRender()
         return;
 
     CDebugRenderer& renderer = Level().debug_renderer();
-    if (/**bDebug && /**/ Visual())
+    if (/**bDebug && **/ Visual())
     {
         float half_cell_size = 1.f * ai().level_graph().header().cell_size() * .5f;
         Fvector additional = Fvector().set(half_cell_size, half_cell_size, half_cell_size);

@@ -762,7 +762,7 @@ class CCC_FlushLog : public IConsole_Command
 {
 public:
     CCC_FlushLog(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR /**args/**/)
+    virtual void Execute(LPCSTR /**args **/)
     {
         FlushLog();
         Msg("* Log file has been saved successfully!");
@@ -1542,7 +1542,7 @@ class CCC_Crash : public IConsole_Command
 {
 public:
     CCC_Crash(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR /**args/**/)
+    virtual void Execute(LPCSTR /**args **/)
     {
         VERIFY3(false, "This is a test crash", "Do not post it as a bug");
         int* pointer = 0;

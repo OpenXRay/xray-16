@@ -85,4 +85,4 @@ smart_cast<CSE_ALifeHumanAbstract*>(ai().alife().objects().object(*I));
         }
     }
 }
-/**/
+**/

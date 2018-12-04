@@ -647,4 +647,4 @@ void CSE_ALifeHumanAbstract::vfAttachItems(ETakeType tTakeType)
     if ((eTakeTypeAll == tTakeType) || (eTakeTypeRest == tTakeType))
         ifChooseValuables		();
 }
-/**/
+**/

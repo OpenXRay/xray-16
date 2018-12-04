@@ -38,7 +38,7 @@ void print_time(LPCSTR S, _TIME_ID tTimeID)
 %d:%d:%d.%d",S,Years,Months,Week,Days,Hours,Minutes,Seconds,Milliseconds);
 }
 
-/**/
+**/
 CALifeCombatManager::CALifeCombatManager(IPureServer* server, LPCSTR section) : CALifeSimulatorBase(server, section)
 {
     /**
@@ -48,7 +48,7 @@ CALifeCombatManager::CALifeCombatManager(IPureServer* server, LPCSTR section) : 
             m_tpaCombatGroups[i].clear();
             m_tpaCombatGroups[i].reserve(255);
         }
-    /**/
+    **/
 }
 
 /**
@@ -491,7 +491,7 @@ CSE_ALifeMonsterAbstract *tpALifeMonsterAbstract2) const
     else
         return(ALife::eRelationTypeNeutral);
 }
-/**/
+**/
 void CALifeCombatManager::kill_entity(CSE_ALifeMonsterAbstract* l_tpALifeMonsterAbstract,
     const GameGraph::_GRAPH_ID& l_tGraphID, CSE_ALifeSchedulable* schedulable)
 {

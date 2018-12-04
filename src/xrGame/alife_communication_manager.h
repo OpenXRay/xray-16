@@ -98,12 +98,12 @@ class CALifeCommunicationManager : public virtual CALifeSimulatorBase
     ALife::ITEM_P_VECTOR			&tpItemVector);
                 void		vfPrintItems					(CSE_ALifeHumanAbstract		*tpALifeHumanAbstract);
     #endif
-    /**/
+    **/
 public:
     CALifeCommunicationManager(IPureServer* server, LPCSTR section);
     /**
         virtual				~CALifeCommunicationManager		();
                 void		communicate_with_customer		(CSE_ALifeHumanAbstract		*tpALifeHumanAbstract,
     CSE_ALifeTrader			*tpALifeTrader);
-    /**/
+    **/
 };

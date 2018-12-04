@@ -30,11 +30,12 @@ CUIMapWnd::CUIMapWnd()
     m_currentZoom = 1.0f;
     m_map_location_hint = NULL;
     m_map_move_step = 10.0f;
-    /*
+    /**
     #ifdef DEBUG
     //	m_dbg_text_hint			= NULL;
     //	m_dbg_info				= NULL;
-    #endif // DEBUG /**/
+    #endif // DEBUG
+    **/
 
     //	UIMainMapHeader			= NULL;
     m_scroll_mode = false;
@@ -48,11 +49,12 @@ CUIMapWnd::~CUIMapWnd()
     delete_data(m_ActionPlanner);
     delete_data(m_GameMaps);
     delete_data(m_map_location_hint);
-    /*
+    /**
     #ifdef DEBUG
         delete_data( m_dbg_text_hint );
         delete_data( m_dbg_info );
-    #endif // DEBUG/**/
+    #endif // DEBUG
+    **/
     g_map_wnd = NULL;
 }
 
@@ -320,11 +322,12 @@ void CUIMapWnd::MoveMap(Fvector2 const& pos_delta)
 void CUIMapWnd::Draw()
 {
     inherited::Draw();
-    /*
+    /**
     #ifdef DEBUG
         m_dbg_text_hint->Draw	();
         m_dbg_info->Draw		();
-    #endif // DEBUG/**/
+    #endif // DEBUG
+    **/
 
     m_btn_nav_parent->Draw();
 }
@@ -689,10 +692,11 @@ void CUIMapWnd::HideHint(CUIWindow* parent)
 void CUIMapWnd::HideCurHint() { m_map_location_hint->SetOwner(NULL); }
 void CUIMapWnd::Hint(const shared_str& text)
 {
-    /*
+/**
 #ifdef DEBUG
     m_dbg_text_hint->SetTextST( *text );
-#endif // DEBUG/**/
+#endif // DEBUG
+**/
 }
 
 void CUIMapWnd::Reset()

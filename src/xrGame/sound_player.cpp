@@ -196,7 +196,7 @@ void CSoundPlayer::play(
         st_Effect,
         sg_SourceType
     );
-    /**/
+    **/
     sound_single.m_sound->clone((*I).second.second->random(id), st_Effect, sg_SourceType);
 
     sound_single.m_sound->_p->g_object = m_object;
