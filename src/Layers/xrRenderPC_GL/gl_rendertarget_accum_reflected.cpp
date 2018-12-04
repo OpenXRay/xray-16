@@ -34,7 +34,7 @@ void CRenderTarget::accum_reflected(light* L)
         Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };

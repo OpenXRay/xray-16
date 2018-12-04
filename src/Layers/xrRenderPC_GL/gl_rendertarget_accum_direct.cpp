@@ -73,13 +73,13 @@ void CRenderTarget::accum_direct(u32 sub_phase)
     {
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
-        pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
         pv++;
-        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+        pv++;
+        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
@@ -149,9 +149,9 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         //Fmatrix			m_TexelAdjust		= 
         //{
         //	0.5f,				0.0f,				0.0f,			0.0f,
-        //	0.0f,				-0.5f,				0.0f,			0.0f,
-        //	0.0f,				0.0f,				fRange,			0.0f,
-        //	0.5f + fTexelOffs,	0.5f + fTexelOffs,	fBias,			1.0f
+        //	0.0f,				0.5f,				0.0f,			0.0f,
+        //	0.0f,				0.0f,				0.5f * fRange,			0.0f,
+        //	0.5f + fTexelOffs,	0.5f + fTexelOffs,	0.5f + fBias,			1.0f
         //};
         float fRange = (SE_SUN_NEAR == sub_phase) ? ps_r2_sun_depth_near_scale : ps_r2_sun_depth_far_scale;
         //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
@@ -160,9 +160,9 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            0.5f, 0.5f, fBias, 1.0f
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            0.5f, 0.5f, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -227,13 +227,13 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         //pv->set						(EPS,			EPS,			d_Z,	d_W, C, p0.x, p0.y, j0.x, j0.y);	pv++;
         //pv->set						(float(_w+EPS),	float(_h+EPS),	d_Z,	d_W, C, p1.x, p1.y, j1.x, j1.y);	pv++;
         //pv->set						(float(_w+EPS),	EPS,			d_Z,	d_W, C, p1.x, p0.y, j1.x, j0.y);	pv++;
-        pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, scale_X);
+        pv->set(-1, -1, d_Z, d_W, C, 0, 0, 0, 0);
         pv++;
-        pv->set(-1, 1, d_Z, d_W, C, 0, 0, 0, 0);
+        pv->set(-1, 1, d_Z, d_W, C, 0, 1, 0, scale_X);
         pv++;
-        pv->set(1, -1, d_Z, d_W, C, 1, 1, scale_X, scale_X);
+        pv->set(1, -1, d_Z, d_W, C, 1, 0, scale_X, 0);
         pv++;
-        pv->set(1, 1, d_Z, d_W, C, 1, 0, scale_X, 0);
+        pv->set(1, 1, d_Z, d_W, C, 1, 1, scale_X, scale_X);
         pv++;
         RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
@@ -370,13 +370,13 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
     {
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p0.y);
         pv++;
-        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p1.y);
         pv++;
-        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p0.y);
         pv++;
-        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p1.y);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
@@ -446,9 +446,9 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         //Fmatrix			m_TexelAdjust		= 
         //{
         //	0.5f,				0.0f,				0.0f,			0.0f,
-        //	0.0f,				-0.5f,				0.0f,			0.0f,
-        //	0.0f,				0.0f,				fRange,			0.0f,
-        //	0.5f + fTexelOffs,	0.5f + fTexelOffs,	fBias,			1.0f
+        //	0.0f,				0.5f,				0.0f,			0.0f,
+        //	0.0f,				0.0f,				0.5f * fRange,			0.0f,
+        //	0.5f + fTexelOffs,	0.5f + fTexelOffs,	0.5f + fBias,			1.0f
         //};
         float fRange = (SE_SUN_NEAR == sub_phase) ? ps_r2_sun_depth_near_scale : ps_r2_sun_depth_far_scale;
         //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
@@ -457,9 +457,9 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            0.5f, 0.5f, fBias, 1.0f
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            0.5f, 0.5f, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -724,13 +724,13 @@ void CRenderTarget::accum_direct_blend()
         //pv->set						(EPS,			EPS,			d_Z,	d_W, C, p0.x, p0.y, p0.x, p0.y);	pv++;
         //pv->set						(float(_w+EPS),	float(_h+EPS),	d_Z,	d_W, C, p1.x, p1.y, p1.x, p1.y);	pv++;
         //pv->set						(float(_w+EPS),	EPS,			d_Z,	d_W, C, p1.x, p0.y, p1.x, p0.y);	pv++;
-        pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, 1);
+        pv->set(-1, -1, d_Z, d_W, C, 0, 0, 0, 0);
         pv++;
-        pv->set(-1, 1, d_Z, d_W, C, 0, 0, 0, 0);
+        pv->set(-1, 1, d_Z, d_W, C, 0, 1, 0, 1);
         pv++;
-        pv->set(1, -1, d_Z, d_W, C, 1, 1, 1, 1);
+        pv->set(1, -1, d_Z, d_W, C, 1, 0, 1, 0);
         pv++;
-        pv->set(1, 1, d_Z, d_W, C, 1, 0, 1, 0);
+        pv->set(1, 1, d_Z, d_W, C, 1, 1, 1, 1);
         pv++;
         RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
@@ -811,13 +811,13 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p0.y);
         pv++;
-        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p1.y);
         pv++;
-        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p0.y);
         pv++;
-        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p1.y);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
@@ -890,9 +890,9 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            0.5f + fTexelOffs, 0.5f + fTexelOffs, fBias, 1.0f
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            0.5f + fTexelOffs, 0.5f + fTexelOffs, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -931,13 +931,13 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         //pv->set						(EPS,			EPS,			d_Z,	d_W, C, p0.x, p0.y, j0.x, j0.y);	pv++;
         //pv->set						(float(_w+EPS),	float(_h+EPS),	d_Z,	d_W, C, p1.x, p1.y, j1.x, j1.y);	pv++;
         //pv->set						(float(_w+EPS),	EPS,			d_Z,	d_W, C, p1.x, p0.y, j1.x, j0.y);	pv++;
-        pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, scale_X);
+        pv->set(-1, -1, d_Z, d_W, C, 0, 0, 0, 0);
         pv++;
-        pv->set(-1, 1, d_Z, d_W, C, 0, 0, 0, 0);
+        pv->set(-1, 1, d_Z, d_W, C, 0, 1, 0, scale_X);
         pv++;
-        pv->set(1, -1, d_Z, d_W, C, 1, 1, scale_X, scale_X);
+        pv->set(1, -1, d_Z, d_W, C, 1, 0, scale_X, 0);
         pv++;
-        pv->set(1, 1, d_Z, d_W, C, 1, 0, scale_X, 0);
+        pv->set(1, 1, d_Z, d_W, C, 1, 1, scale_X, scale_X);
         pv++;
         RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
@@ -1049,15 +1049,6 @@ void CRenderTarget::accum_direct_lum()
     // Fill vertex buffer
     VERIFY (sizeof(v_aa)==g_aa_AA->vb_stride);
     v_aa* pv = (v_aa*)RCache.Vertex.Lock(4, g_aa_AA->vb_stride, Offset);
-    pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
-    pv->uv0.set(p0.x, p1.y);
-    pv->uvJ.set(j0.x, j1.y);
-    pv->uv1.set(p0.x - ddw, p1.y - ddh);
-    pv->uv2.set(p0.x + ddw, p1.y + ddh);
-    pv->uv3.set(p0.x + ddw, p1.y - ddh);
-    pv->uv4.set(p0.x - ddw, p1.y + ddh, 0, 0);
-    pv->uv5.set(0, 0, 0, 0);
-    pv++;
     pv->p.set(EPS, EPS, EPS, 1.f);
     pv->uv0.set(p0.x, p0.y);
     pv->uvJ.set(j0.x, j0.y);
@@ -1067,13 +1058,13 @@ void CRenderTarget::accum_direct_lum()
     pv->uv4.set(p0.x - ddw, p0.y + ddh, 0, 0);
     pv->uv5.set(0, 0, 0, 0);
     pv++;
-    pv->p.set(float(_w + EPS), float(_h + EPS), EPS, 1.f);
-    pv->uv0.set(p1.x, p1.y);
-    pv->uvJ.set(j1.x, j1.y);
-    pv->uv1.set(p1.x - ddw, p1.y - ddh);
-    pv->uv2.set(p1.x + ddw, p1.y + ddh);
-    pv->uv3.set(p1.x + ddw, p1.y - ddh);
-    pv->uv4.set(p1.x - ddw, p1.y + ddh, 0, 0);
+    pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
+    pv->uv0.set(p0.x, p1.y);
+    pv->uvJ.set(j0.x, j1.y);
+    pv->uv1.set(p0.x - ddw, p1.y - ddh);
+    pv->uv2.set(p0.x + ddw, p1.y + ddh);
+    pv->uv3.set(p0.x + ddw, p1.y - ddh);
+    pv->uv4.set(p0.x - ddw, p1.y + ddh, 0, 0);
     pv->uv5.set(0, 0, 0, 0);
     pv++;
     pv->p.set(float(_w + EPS), EPS, EPS, 1.f);
@@ -1083,6 +1074,15 @@ void CRenderTarget::accum_direct_lum()
     pv->uv2.set(p1.x + ddw, p0.y + ddh);
     pv->uv3.set(p1.x + ddw, p0.y - ddh);
     pv->uv4.set(p1.x - ddw, p0.y + ddh, 0, 0);
+    pv->uv5.set(0, 0, 0, 0);
+    pv++;
+    pv->p.set(float(_w + EPS), float(_h + EPS), EPS, 1.f);
+    pv->uv0.set(p1.x, p1.y);
+    pv->uvJ.set(j1.x, j1.y);
+    pv->uv1.set(p1.x - ddw, p1.y - ddh);
+    pv->uv2.set(p1.x + ddw, p1.y + ddh);
+    pv->uv3.set(p1.x + ddw, p1.y - ddh);
+    pv->uv4.set(p1.x - ddw, p1.y + ddh, 0, 0);
     pv->uv5.set(0, 0, 0, 0);
     pv++;
     RCache.Vertex.Unlock(4, g_aa_AA->vb_stride);

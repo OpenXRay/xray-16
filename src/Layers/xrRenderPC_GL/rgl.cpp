@@ -68,8 +68,8 @@ static class cl_pos_decompress_params : public R_constant_setup
 {
     void setup(R_constant* C) override
     {
-        float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
-        float HorzTan = - VertTan / Device.fASPECT;
+        float VertTan = tanf(deg2rad(Device.fFOV / 2.0f));
+        float HorzTan = VertTan / Device.fASPECT;
 
         RCache.set_c(C, HorzTan, VertTan, 2.0f * HorzTan / (float)Device.dwWidth,
                      2.0f * VertTan / (float)Device.dwHeight);

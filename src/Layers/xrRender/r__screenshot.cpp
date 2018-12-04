@@ -60,7 +60,6 @@ void WriteTGA(IWriter* file)
     const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     constexpr u8 bits = 24;
-    constexpr u8 flipped = 32;
 
     u8 header[6];
     header[0] = width % 256;
@@ -68,7 +67,7 @@ void WriteTGA(IWriter* file)
     header[2] = height % 256;
     header[3] = height / 256;
     header[4] = bits;
-    header[5] = flipped;
+    header[5] = 0;
 
     file->w(tgaHeader, sizeof(tgaHeader));
     file->w(header, sizeof(header));

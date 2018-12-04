@@ -192,13 +192,13 @@ void CRender::render_menu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
-    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
-    pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
     pv++;
-    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
     pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+    pv++;
+    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
     pv++;
     RCache.Vertex.Unlock(4, Target->g_menu->vb_stride);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -290,7 +290,7 @@ void CRender::Render()
     // Sync point
     BasicStats.WaitS.Begin();
     /* TODO: OGL: Implement sync point */
-    if (false)
+/*    if (false)
     {
         CTimer T;
         T.Start();
@@ -307,9 +307,19 @@ void CRender::Render()
             }
         }
     }
+*/
+/*
+    if (false)
+    {
+        CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
+        CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500));
+        CHK_GL(glDeleteSync(q_sync_point[q_sync_count]));
+    }
+*/
+
     BasicStats.WaitS.End();
     // TODO: OGL: Implement SLI/Crossfire support.
-    //q_sync_count								= (q_sync_count+1)%HW.Caps.iGPUNum;
+    q_sync_count								= (q_sync_count+1)%HW.Caps.iGPUNum;
     //CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
     //CHK_DX										(EndQuery(q_sync_point[q_sync_count]));
 

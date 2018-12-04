@@ -179,6 +179,7 @@ public:
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
     GLuint q_sync_point[CHWCaps::MAX_GPUS];
+    //GLsync q_sync_point[CHWCaps::MAX_GPUS];
     u32 q_sync_count;
 
     bool m_bMakeAsyncSS;

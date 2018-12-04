@@ -221,13 +221,13 @@ void CRenderTarget::phase_combine()
 
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
+        pv->set(-1, 1, 0, 0, 0, 0, scale_Y);
         pv++;
-        pv->set(-1, -1, 0, 0, 0, 0, 0);
+        pv->set(-1, -1, 0, 1, 0, 0, 0);
         pv++;
-        pv->set(1, 1, 1, 1, 0, scale_X, scale_Y);
+        pv->set(1, 1, 1, 0, 0, scale_X, scale_Y);
         pv++;
-        pv->set(1, -1, 1, 0, 0, scale_X, 0);
+        pv->set(1, -1, 1, 1, 0, scale_X, 0);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
 
@@ -359,6 +359,7 @@ void CRenderTarget::phase_combine()
              HW.pDevice->ResolveSubresource( rt_Generic_1_r->pTexture->surface_get(), 0, rt_Generic_1->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM );
        }
        */
+    RCache.set_Stencil(FALSE);
 
     //FXAA
     if (ps_r2_fxaa)
@@ -417,16 +418,6 @@ void CRenderTarget::phase_combine()
 
         // Fill vertex buffer
         v_aa* pv = (v_aa*)RCache.Vertex.Lock(4, g_aa_AA->vb_stride, Offset);
-        // XXX: tamlin: The following four lines are almost 300 columns wide! FIX!
-        pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
-        pv->uv0.set(p0.x, p1.y);
-        pv->uv1.set(p0.x - ddw, p1.y - ddh);
-        pv->uv2.set(p0.x + ddw, p1.y + ddh);
-        pv->uv3.set(p0.x + ddw, p1.y - ddh);
-        pv->uv4.set(p0.x - ddw, p1.y + ddh);
-        pv->uv5.set(p0.x - ddw, p1.y, p1.y, p0.x + ddw);
-        pv->uv6.set(p0.x, p1.y - ddh, p1.y + ddh, p0.x);
-        pv++;
         pv->p.set(EPS, EPS, EPS, 1.f);
         pv->uv0.set(p0.x, p0.y);
         pv->uv1.set(p0.x - ddw, p0.y - ddh);
@@ -436,14 +427,14 @@ void CRenderTarget::phase_combine()
         pv->uv5.set(p0.x - ddw, p0.y, p0.y, p0.x + ddw);
         pv->uv6.set(p0.x, p0.y - ddh, p0.y + ddh, p0.x);
         pv++;
-        pv->p.set(float(_w + EPS), float(_h + EPS), EPS, 1.f);
-        pv->uv0.set(p1.x, p1.y);
-        pv->uv1.set(p1.x - ddw, p1.y - ddh);
-        pv->uv2.set(p1.x + ddw, p1.y + ddh);
-        pv->uv3.set(p1.x + ddw, p1.y - ddh);
-        pv->uv4.set(p1.x - ddw, p1.y + ddh);
-        pv->uv5.set(p1.x - ddw, p1.y, p1.y, p1.x + ddw);
-        pv->uv6.set(p1.x, p1.y - ddh, p1.y + ddh, p1.x);
+        pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
+        pv->uv0.set(p0.x, p1.y);
+        pv->uv1.set(p0.x - ddw, p1.y - ddh);
+        pv->uv2.set(p0.x + ddw, p1.y + ddh);
+        pv->uv3.set(p0.x + ddw, p1.y - ddh);
+        pv->uv4.set(p0.x - ddw, p1.y + ddh);
+        pv->uv5.set(p0.x - ddw, p1.y, p1.y, p0.x + ddw);
+        pv->uv6.set(p0.x, p1.y - ddh, p1.y + ddh, p0.x);
         pv++;
         pv->p.set(float(_w + EPS), EPS, EPS, 1.f);
         pv->uv0.set(p1.x, p0.y);
@@ -453,6 +444,15 @@ void CRenderTarget::phase_combine()
         pv->uv4.set(p1.x - ddw, p0.y + ddh);
         pv->uv5.set(p1.x - ddw, p0.y, p0.y, p1.x + ddw);
         pv->uv6.set(p1.x, p0.y - ddh, p0.y + ddh, p1.x);
+        pv++;
+        pv->p.set(float(_w + EPS), float(_h + EPS), EPS, 1.f);
+        pv->uv0.set(p1.x, p1.y);
+        pv->uv1.set(p1.x - ddw, p1.y - ddh);
+        pv->uv2.set(p1.x + ddw, p1.y + ddh);
+        pv->uv3.set(p1.x + ddw, p1.y - ddh);
+        pv->uv4.set(p1.x - ddw, p1.y + ddh);
+        pv->uv5.set(p1.x - ddw, p1.y, p1.y, p1.x + ddw);
+        pv->uv6.set(p1.x, p1.y - ddh, p1.y + ddh, p1.x);
         pv++;
         RCache.Vertex.Unlock(4, g_aa_AA->vb_stride);
 
@@ -576,10 +576,10 @@ void CRenderTarget::phase_combine()
 
             // Fill vertex buffer
             FVF::TL* pv					= (FVF::TL*) RCache.Vertex.Lock	(4,g_combine->vb_stride,Offset);
-            pv->set						((IX+0)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p0.x, p1.y);	pv++;
-            pv->set						((IX+0)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p0.x, p0.y);	pv++;
-            pv->set						((IX+1)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p1.x, p1.y);	pv++;
-            pv->set						((IX+1)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p1.x, p0.y);	pv++;
+            pv->set						((IX+0)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p0.x, p0.y);	pv++;
+            pv->set						((IX+0)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p0.x, p1.y);	pv++;
+            pv->set						((IX+1)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p1.x, p0.y);	pv++;
+            pv->set						((IX+1)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p1.x, p1.y);	pv++;
             RCache.Vertex.Unlock		(4,g_combine->vb_stride);
 
             // Draw COLOR
@@ -597,10 +597,10 @@ void CRenderTarget::phase_combine()
 
             // Fill vertex buffer
             FVF::TL* pv					= (FVF::TL*) RCache.Vertex.Lock	(4,g_combine->vb_stride,Offset);
-            pv->set						((IX+0)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p0.x, p1.y);	pv++;
-            pv->set						((IX+0)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p0.x, p0.y);	pv++;
-            pv->set						((IX+1)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p1.x, p1.y);	pv++;
-            pv->set						((IX+1)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p1.x, p0.y);	pv++;
+            pv->set						((IX+0)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p0.x, p0.y);	pv++;
+            pv->set						((IX+0)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p0.x, p1.y);	pv++;
+            pv->set						((IX+1)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p1.x, p0.y);	pv++;
+            pv->set						((IX+1)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p1.x, p1.y);	pv++;
             RCache.Vertex.Unlock		(4,g_combine->vb_stride);
 
             // Draw COLOR
@@ -654,13 +654,13 @@ void CRenderTarget::phase_combine_volumetric()
 
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
+        pv->set(-1, 1, 0, 0, 0, 0, 0);
         pv++;
-        pv->set(-1, -1, 0, 0, 0, 0, 0);
+        pv->set(-1, -1, 0, 1, 0, 0, scale_Y);
         pv++;
-        pv->set(1, 1, 1, 1, 0, scale_X, scale_Y);
+        pv->set(1, 1, 1, 0, 0, scale_X, 0);
         pv++;
-        pv->set(1, -1, 1, 0, 0, scale_X, 0);
+        pv->set(1, -1, 1, 1, 0, scale_X, scale_Y);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
 

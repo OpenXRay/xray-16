@@ -33,13 +33,13 @@ void CRenderTarget::draw_rain(light& RainSetup)
     {
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p0.y);
         pv++;
-        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p1.y);
         pv++;
-        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p0.y);
         pv++;
-        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p1.y);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
@@ -95,9 +95,9 @@ void CRenderTarget::draw_rain(light& RainSetup)
         Fmatrix m_TexelAdjust =
         {
             view_dimX / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dimY / 2.f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            view_dimX / 2.f + view_sx + fTexelOffs, view_dimY / 2.f + view_sy + fTexelOffs, fBias, 1.0f
+            0.0f, view_dimY / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            view_dimX / 2.f + view_sx + fTexelOffs, view_dimY / 2.f + view_sy + fTexelOffs, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -125,9 +125,9 @@ void CRenderTarget::draw_rain(light& RainSetup)
         Fmatrix			m_TexelAdjust		= 
         {
             0.5f,				0.0f,				0.0f,			0.0f,
-            0.0f,				-0.5f,				0.0f,			0.0f,
-            0.0f,				0.0f,				fRange,			0.0f,
-            0.5f,				0.5f,				fBias,			1.0f
+            0.0f,				0.5f,				0.0f,			0.0f,
+            0.0f,				0.0f,				0.5f * fRange,			0.0f,
+            0.5f,				0.5f,				0.5f + fBias,			1.0f
         };
 
         // compute xforms
@@ -177,13 +177,13 @@ void CRenderTarget::draw_rain(light& RainSetup)
 
         // Fill vertex buffer
         FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
-        pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, scale_X);
+        pv->set(-1, -1, d_Z, d_W, C, 0, 0, 0, scale_X);
         pv++;
-        pv->set(-1, 1, d_Z, d_W, C, 0, 0, 0, 0);
+        pv->set(-1, 1, d_Z, d_W, C, 0, 1, 0, 0);
         pv++;
-        pv->set(1, -1, d_Z, d_W, C, 1, 1, scale_X, scale_X);
+        pv->set(1, -1, d_Z, d_W, C, 1, 0, scale_X, scale_X);
         pv++;
-        pv->set(1, 1, d_Z, d_W, C, 1, 0, scale_X, 0);
+        pv->set(1, 1, d_Z, d_W, C, 1, 1, scale_X, 0);
         pv++;
         RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);

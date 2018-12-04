@@ -114,7 +114,7 @@ void CRenderTarget::accum_volumetric_geom_create()
         //R_CHK						(g_accum_volumetric_vb->Lock(0,0,(void**)&pData,0));
         //Slice	*pSlice = (Slice*)pData;
         //float t=0;
-        //float dt = 1.0f/(VOLUMETRIC_SLICES-1);
+        //float dt = 1.0f/((float)VOLUMETRIC_SLICES-1.0f);
         //for ( int i=0; i<VOLUMETRIC_SLICES; ++i)
         //{
         //pSlice[i].m_Vert[0] = Fvector().set(0,0,t);
@@ -127,7 +127,7 @@ void CRenderTarget::accum_volumetric_geom_create()
         Slice pSlice[VOLUMETRIC_SLICES];
 
         float t = 0;
-        float dt = 1.0f / (VOLUMETRIC_SLICES - 1);
+        float dt = 1.0f / ((float)VOLUMETRIC_SLICES - 1.0f);
         for (int i = 0; i < VOLUMETRIC_SLICES; ++i)
         {
             pSlice[i].m_Vert[0] = Fvector().set(0, 0, t);

@@ -97,9 +97,9 @@ void CRenderTarget::accum_spot(light* L)
         float fBias = ps_r2_ls_depth_bias;
         Fmatrix m_TexelAdjust = {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, fBias, 1.0f
+            0.0f, view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -117,9 +117,9 @@ void CRenderTarget::accum_spot(light* L)
         view_sy = 0.f;
         Fmatrix m_TexelAdjust2 = {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, fBias, 1.0f
+            0.0f, view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -311,9 +311,9 @@ void CRenderTarget::accum_volumetric(light* L)
         float fBias = ps_r2_ls_depth_bias;
         Fmatrix m_TexelAdjust = {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, fBias, 1.0f
+            0.0f, view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -331,9 +331,9 @@ void CRenderTarget::accum_volumetric(light* L)
         view_sy = 0.f;
         Fmatrix m_TexelAdjust2 = {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
-            0.0f, 0.0f, fRange, 0.0f,
-            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, fBias, 1.0f
+            0.0f, view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f * fRange, 0.0f,
+            view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, 0.5f + fBias, 1.0f
         };
 
         // compute xforms
@@ -402,11 +402,11 @@ void CRenderTarget::accum_volumetric(light* L)
     */
     // Common constants
     float fQuality = L->m_volumetric_quality;
-    int iNumSlises = (int)(VOLUMETRIC_SLICES * fQuality);
+    int iNumSlises = (int)((float)VOLUMETRIC_SLICES * fQuality);
     //			min 10 surfaces
     iNumSlises = _max(10, iNumSlises);
     //	Adjust slice intensity
-    fQuality = ((float)iNumSlises) / VOLUMETRIC_SLICES;
+    fQuality = ((float)iNumSlises) / (float)VOLUMETRIC_SLICES;
     Fvector L_dir, L_clr, L_pos;
     float L_spec;
     L_clr.set(L->color.r, L->color.g, L->color.b);

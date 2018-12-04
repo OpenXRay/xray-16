@@ -11,13 +11,13 @@ void CRenderTarget::phase_fxaa()
     u_setrt(rt_Generic, nullptr, nullptr, HW.pBaseZB);
 
     FVF::V* pv = (FVF::V*)RCache.Vertex.Lock(4, g_fxaa->vb_stride, Offset);
-    pv->set(du + 0, dv + float(_h), 0, 0, 1);
-    pv++;
     pv->set(du + 0, dv + 0, 0, 0, 0);
     pv++;
-    pv->set(du + float(_w), dv + float(_h), 0, 1, 1);
+    pv->set(du + 0, dv + float(_h), 0, 0, 1);
     pv++;
     pv->set(du + float(_w), dv + 0, 0, 1, 0);
+    pv++;
+    pv->set(du + float(_w), dv + float(_h), 0, 1, 1);
     pv++;
     RCache.Vertex.Unlock(4, g_fxaa->vb_stride);
 

@@ -60,7 +60,6 @@ public:
     GLuint pBaseZB;
     GLuint pPP;
     GLuint pFB;
-    GLuint pCFB;
 
     SDL_Window* m_hWnd;
     HDC m_hDC;

@@ -75,10 +75,6 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL version: %s", glGetString(GL_VERSION));
     Msg("* GPU OpenGL shading language version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    // Clip control ensures compatibility with D3D device coordinates.
-    // TODO: OGL: Fix these differences in the blenders/shaders.
-    CHK_GL(glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE));
-
     //	Create render target and depth-stencil views here
     UpdateViews();
 }
@@ -103,7 +99,6 @@ void CHW::Reset()
 {
     CHK_GL(glDeleteProgramPipelines(1, &pPP));
     CHK_GL(glDeleteFramebuffers(1, &pFB));
-    CHK_GL(glDeleteFramebuffers(1, &pCFB));
 
     CHK_GL(glDeleteTextures(1, &pBaseRT));
     CHK_GL(glDeleteTextures(1, &pBaseZB));

@@ -124,7 +124,7 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         //	Removing half pixel offset
         //0.5f + o_w,			0.5f + o_h,			0.0f,			1.0f
@@ -140,7 +140,7 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
@@ -267,7 +267,7 @@ CRenderTarget::CRenderTarget()
     param_noise_fps = 25.f;
     param_noise_scale = 1.f;
 
-    im_noise_time = 1 / 100;
+    im_noise_time = 1.0f / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 

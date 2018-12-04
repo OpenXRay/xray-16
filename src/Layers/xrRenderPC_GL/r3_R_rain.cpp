@@ -197,7 +197,7 @@ void CRender::render_rain()
         float fTexelOffs = .5f / RImplementation.o.smapsize;
         Fmatrix m_viewport = {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, view_dim / 2.f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             view_dim / 2.f + fTexelOffs, view_dim / 2.f + fTexelOffs, 0.0f, 1.0f
         };

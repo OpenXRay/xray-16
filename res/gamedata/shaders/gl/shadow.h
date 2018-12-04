@@ -497,7 +497,7 @@ float dx10_0_hw_hq_7x7( float4 tc )
    tc.xyz /= tc.w;
 
    float  s   = 0.0;
-   float2 stc = ( SMAP_size * tc.xy ) + float2( 0.5, 0.5 );
+   float2 stc = ( float(SMAP_size) * tc.xy ) + float2( 0.5, 0.5 );
    float2 tcs = floor( stc );
    float2 fc;
 
@@ -630,7 +630,7 @@ float4 	test 		(float4 tc, float2 offset)
 
 	const 	float 	scale 	= (0.5/float(SMAP_size));
 
-	float  	texsize = 2.0*SMAP_size;
+	float  	texsize = 2.0*float(SMAP_size);
 	float2 	tc_J	= tc.xy/tc.w*texsize/8.0;
 	float2 	fr 		= frac(tc_J)*0.5;
 	
@@ -665,7 +665,7 @@ half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 	const 	float 	scale 	= (0.7/float(SMAP_size));
 
 
-	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0 )*0.5;
+	float2 	tc_J	= frac(tc.xy/tc.w*float(SMAP_size)/4.0 )*0.5;
 	float4	J0		= tex2D	(jitter0,tc_J)*scale;
 	//half4	J1 		= tex2D	(jitter1,tc_J)*scale;
 
@@ -683,7 +683,7 @@ half 	shadow_high 	(float4 tc)			// jittered sampling
 
 	const	float 	scale 	= (0.5/float(SMAP_size));
 
-	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0 )*0.5;
+	float2 	tc_J	= frac(tc.xy/tc.w*float(SMAP_size)/4.0 )*0.5;
 	float4	J0 		= tex2D	(jitter0,tc_J)*scale;
 
 	const float k = 1.0/float(SMAP_size);

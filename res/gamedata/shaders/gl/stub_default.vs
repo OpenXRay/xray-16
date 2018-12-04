@@ -9,7 +9,7 @@ v2p_TL _main ( v_TL I)
 
 	O.HPos = mul( m_WVP, I.P);
 	O.Tex0 = I.Tex0;
-	O.Color = I.Color.bgra;	//	swizzle vertex colour
+	O.Color = unpack_D3DCOLOR(I.Color);
 
  	return O;
 }
