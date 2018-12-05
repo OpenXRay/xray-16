@@ -150,7 +150,7 @@ void game_sv_Single::OnDetach(u16 eid_who, u16 eid_what)
                 Msg("Cannot detach object [%s][%s][%d] from object [%s][%s][%d]",
                     l_tpALifeInventoryItem->base()->name_replace(), *l_tpALifeInventoryItem->base()->s_name,
                     l_tpALifeInventoryItem->base()->ID, l_tpDynamicObject->base()->name_replace(),
-                    l_tpDynamicObject->base()->s_name, l_tpDynamicObject->ID);
+                    l_tpDynamicObject->base()->s_name.c_str(), l_tpDynamicObject->ID);
             }
 #endif
         }
