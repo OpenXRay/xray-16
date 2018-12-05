@@ -15,6 +15,49 @@ os:
 
 matrix:
   include:
+#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+#      addons: &clang50
+#        apt:
+#          packages:
+#            - clang-5.0
+#          sources:
+#            - llvm-toolchain-xenial-5.0
+
+#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
+#      addons: *clang50
+
+    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+      addons: &clang60
+        apt:
+          packages:
+            - clang-6.0
+            - libstdc++-8-dev
+          sources:
+            - llvm-toolchain-xenial-6.0
+            - ubuntu-toolchain-r-test
+
+    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
+      addons: *clang60
+
+#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
+#      addons: *clang60
+
+    - env: C_COMPILER=clang-7 CXX_COMPILER=clang++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+      addons: &clang7
+        apt:
+          packages:
+            - clang-7
+            - libstdc++-8-dev
+          sources:
+            - llvm-toolchain-xenial-7
+            - ubuntu-toolchain-r-test
+
+    - env: C_COMPILER=clang-7 CXX_COMPILER=clang++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
+      addons: *clang7
+
+#    - env: C_COMPILER=clang-7 CXX_COMPILER=clang++-7 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
+#      addons: *clang7
+
     - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
       addons: &gcc7
         apt:
@@ -26,33 +69,11 @@ matrix:
     - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x86 BUILD_CONFIGURATION=Release
       addons: *gcc7
 
-    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      addons: *gcc7
+#    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
+#      addons: *gcc7
 
-    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
-      addons: *gcc7
-
-#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-#      addons: &clang50
-#        apt:
-#          sources:
-#            - llvm-toolchain-trusty-5.0
-#          packages:
-#            - clang-5.0
-
-#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
-#      addons: *clang50
-
-#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-#      addons: &clang60
-#        apt:
-#          sources:
-#            - llvm-toolchain-trusty-6.0
-#          packages:
-#            - clang-6.0
-
-#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
-#      addons: *clang60
+#    - env: C_COMPILER=gcc-7 CXX_COMPILER=g++-7 TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
+#      addons: *gcc7
 
 
 install:
@@ -64,16 +85,24 @@ before_script:
   - export core_count=$(nproc || echo 4) && echo core_count = $core_count
   - mkdir bin
   - cd bin
+#       libtbb-dev
   - if [ $TARGET_CPU == x64 ]; then
-       sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev;
+       sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libcrypto++-dev liblockfile-dev libfreeimage-dev;
        sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev;
+       wget http://launchpadlibrarian.net/344209449/libtbb2_2017~U7-8_amd64.deb;
+       wget http://launchpadlibrarian.net/344209445/libtbb-dev_2017~U7-8_amd64.deb;
+       sudo dpkg -i *.deb;
        cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
     fi
 
+#       libtbb-dev:i386
   - if [ $TARGET_CPU == x86 ]; then
        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-7-multilib libpulse-dev:i386 libglib2.0-dev:i386;
-       sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386;
+       sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386;
        sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 libsdl2-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386;
+       wget http://launchpadlibrarian.net/344209917/libtbb2_2017~U7-8_i386.deb;
+       wget http://launchpadlibrarian.net/344209914/libtbb-dev_2017~U7-8_i386.deb;
+       sudo dpkg -i *.deb;
        CFLAGS="-m32 -march=native" CXXFLAGS="-m32 -march=native" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_ASM_FLAGS=-m32;
     fi
 
