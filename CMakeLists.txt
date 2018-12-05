@@ -65,9 +65,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
         message(FATAL_ERROR "Building with a gcc version less than 7.0 is not supported.")
     endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++ -Wno-unused-command-line-argument -Wno-inconsistent-missing-override")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive --std=c++17 -Wno-attributes -pipe -Wl,--no-undefined -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -std=c++17 -Wno-attributes -pipe -Wl,--no-undefined -fvisibility=hidden")
 
 #set (SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=shift -fsanitize=integer-divide-by-zero -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=return -fsanitize=null -fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=bounds-strict -fsanitize=object-size -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZE_FLAGS}")
@@ -85,9 +87,13 @@ if( TBB_PARALLEL )
   add_definitions ( -DUSE_TBB_PARALLEL )
 endif()
 
+if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    # RelWithDebInfo or Debug
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og")
+endif()
+
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     add_definitions(-DDEBUG -DMIXED)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og")
     set(LUA_LIBRARIES luajit-debug)
 endif()
 
