@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "base_monster.h"
 #include "bloodsucker_state_manager.h"
 #include "bloodsucker.h"
 

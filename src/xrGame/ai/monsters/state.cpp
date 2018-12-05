@@ -1,4 +1,17 @@
 #include "StdAfx.h"
+
+#ifdef DEBUG
+namespace debug
+{
+class text_tree;
+}
+
+class CBaseMonster
+{
+public:
+    virtual void add_debug_info(debug::text_tree& root_s);
+};
+#endif
 #include "xrGame/ai/monsters/state.h"
 
 xr_string make_xrstr(EMonsterState state) noexcept
