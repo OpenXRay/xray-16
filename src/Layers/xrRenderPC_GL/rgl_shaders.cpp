@@ -84,13 +84,12 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     u32 len = 0;
     // options
     {
-        xr_sprintf(c_smapsize, "%04d.0", u32(o.smapsize));
+        xr_sprintf(c_smapsize, "%d.0", u32(o.smapsize));
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
-        VERIFY(xr_strlen(c_smapsize) == 4);
-        xr_strcat(sh_name, c_smapsize);
-        len += 4;
+        xr_sprintf(sh_name, "%d", u32(o.smapsize));
+        len += u32(xr_strlen(sh_name));
     }
 
     if (o.fp16_filter)
