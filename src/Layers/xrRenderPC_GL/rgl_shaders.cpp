@@ -15,6 +15,7 @@ static inline bool match_shader_id(
 
 /////////
 
+// TODO: OGL: make ignore commented includes
 static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<char*>& source, xr_vector<char*>& includes)
 {
     // Copy source file data into a null-terminated buffer
@@ -83,7 +84,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     u32 len = 0;
     // options
     {
-        xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));
+        xr_sprintf(c_smapsize, "%04d.0", u32(o.smapsize));
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
@@ -565,11 +566,24 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     string256 name_comment;
     xr_sprintf(name_comment, "// %s\n", name);
     const char** sources = xr_alloc<const char*>(sources_len);
+
+    // xxx: remove this key (from Device_Initialize.cpp too) when crash in menu is fixed
+    if (strstr(Core.Params, "-use_gl_4.1"))
+    {
 #ifdef DEBUG
-    sources[0] = "#version 450\n#pragma optimize (off)\n";
+        sources[0] = "#version 410\n#pragma optimize (off)\n";
 #else
-    sources[0] = "#version 450\n";
+        sources[0] = "#version 410\n";
 #endif
+    }
+    else
+    {
+#ifdef DEBUG
+        sources[0] = "#version 450\n#pragma optimize (off)\n";
+#else
+        sources[0] = "#version 450\n";
+#endif
+    }
     sources[1] = name_comment;
     memcpy(sources + 2, defines, def_len * sizeof(char*));
     memcpy(sources + def_len + 2, source.data(), source.size() * sizeof(char*));

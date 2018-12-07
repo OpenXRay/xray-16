@@ -50,10 +50,13 @@ void CRenderDevice::Initialize()
         const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 
-        // xxx: need to fix getting rsRGL flag, it doesn't work now
-#if defined(WINDOWS)
-        if (strstr(Core.Params, "-gl") || psDeviceFlags.test(rsRGL))
+  
+#if !defined(LINUX)
+        // xxx: fix getting rsRGL flag when crash in menu is fixed, the flag doesn't work now
+        //if (psDeviceFlags.test(rsRGL))
 #endif
+        // xxx: remove this key (from rgl_shaders.cpp too) when crash in menu is fixed
+        if (strstr(Core.Params, "-use_gl_4.1"))
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
