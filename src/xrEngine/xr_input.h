@@ -89,7 +89,6 @@ public:
     bool iGetAsyncKeyState(int dik);
     bool iGetAsyncBtnState(int btn);
     void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
-    void ClipCursor(const bool clip);
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
 

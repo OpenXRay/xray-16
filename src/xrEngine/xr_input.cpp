@@ -46,7 +46,6 @@ CInput::CInput(const bool exclusive)
 
     xrDebug::SetDialogHandler(on_error_dialog);
 
-    SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, "1");
     SDL_StopTextInput(); // sanity
 
     Device.seqAppActivate.Add(this);
@@ -234,29 +233,20 @@ bool CInput::iGetAsyncBtnState(int btn)
     return mouseState[btn];
 }
 
-void CInput::ClipCursor(const bool clip)
-{
-    if (clip)
-    {
-        SDL_ShowCursor(SDL_TRUE);
-        SDL_SetRelativeMouseMode(SDL_TRUE);
-    }
-    else
-    {
-        SDL_ShowCursor(SDL_FALSE);
-        SDL_SetRelativeMouseMode(SDL_FALSE);
-    }
-}
-
 void CInput::GrabInput(const bool grab)
 {
-    ClipCursor(grab);
+    // Self descriptive
+    SDL_ShowCursor(grab ? SDL_FALSE : SDL_TRUE);
 
-    if (IsExclusiveMode())
-        SDL_SetWindowGrab(Device.m_sdlWnd, grab ? SDL_TRUE : SDL_FALSE);
+    // Clip cursor to the current window
+    // If SDL_HINT_GRAB_KEYBOARD is set then the keyboard will be grabbed too
+    SDL_SetWindowGrab(Device.m_sdlWnd, grab ? SDL_TRUE : SDL_FALSE);
 
+    // Grab the mouse
+    SDL_SetRelativeMouseMode(grab ? SDL_TRUE : SDL_FALSE);
+
+    // We're done here.
     inputGrabbed = grab;
-
 }
 
 bool CInput::InputIsGrabbed() const
@@ -354,7 +344,13 @@ IInputReceiver* CInput::CurrentIR()
 void CInput::ExclusiveMode(const bool exclusive)
 {
     GrabInput(false);
+
+    // Original CInput was using DirectInput in exclusive mode
+    // In which keyboard was grabbed with the mouse.
+    // Uncomment it below, if you want.
+    //SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, exclusive ? "1" : "0");
     exclusiveInput = exclusive;
+
     GrabInput(true);
 }
 
