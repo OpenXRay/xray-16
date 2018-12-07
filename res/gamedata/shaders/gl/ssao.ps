@@ -37,57 +37,57 @@ float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ )
 #define DIRS 8
 const float rads[4] = float[]
 ( //I know it will be more focused in the cener, but that's OK
-    0.20000f,
-	0.57735f,
-	0.81650f,
-	1.00000f
+	0.20000,
+	0.57735,
+	0.81650,
+	1.00000
 );
 const float angles[9] = float[]
 (
-	0.0000f,
-	0.7854f,
-	1.5708f,
-	2.3562f,
-	3.1416f,
-	3.9267f,
-	4.7124f,
-	5.4978f,
-	6.2832f
+	0.0000,
+	0.7854,
+	1.5708,
+	2.3562,
+	3.1416,
+	3.9267,
+	4.7124,
+	5.4978,
+	6.2832
 );
 #elif SSAO_QUALITY == 2
 #define RINGS  3
 #define DIRS 4
 const float rads[4] = float[]
 ( //I know it will be more focused in the cener, but that's OK
-    0.20000f,
-	0.57735f,
-	0.81650f,
-	1.00000f
+	0.20000,
+	0.57735,
+	0.81650,
+	1.00000
 );
 const float angles[5] = float[]
 (
-	0.0000f,
-	1.5708f,
-	3.1416f,
-	4.7124f,
-	6.2832f
+	0.0000,
+	1.5708,
+	3.1416,
+	4.7124,
+	6.2832
 );
 #elif SSAO_QUALITY == 1
 #define RINGS 2
 #define DIRS 4
 const float rads[3] = float[]
 ( //I know it will be more focused in the cener, but that's OK
-    0.2000f,
-    0.7071f,
-	1.0000f
+	0.2000,
+	0.7071,
+	1.0000
 );
 const float angles[5] = float[]
 (
-	0.0000f,
-	1.5708f,
-	3.1416f,
-	4.7124f,
-	6.2832f
+	0.0000,
+	1.5708,
+	3.1416,
+	4.7124,
+	6.2832
 );
 #endif
 
@@ -123,7 +123,7 @@ float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 #endif
 #endif
 {
-	//return 1.0h;
+	//return 1.0;
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
@@ -225,7 +225,7 @@ for (int rad=0; rad < RINGS; rad++)
 	occ /= num_dir;
 /**/
 
-//	occ = lerp(1, occ, saturate(point_depth/1.5f));
+//	occ = lerp(1, occ, saturate(point_depth/1.5));
 
 	occ = saturate(occ);
 //	occ = Contrast(occ,2);

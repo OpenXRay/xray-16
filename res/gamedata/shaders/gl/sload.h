@@ -141,7 +141,7 @@ surface_bumped sload_i( p_bumped I)
 	float4 	NuE	= tex2D( s_bumpX, I.tcdh);		// IN:	normal_error.height
 
 	S.base		= tbase(I.tcdh);				//	IN:  rgb.a
-	S.normal	= Nu.wzy + (NuE.xyz - 1.0);	//	(Nu.wzyx - .5f) + (E-.5)
+	S.normal	= Nu.wzy + (NuE.xyz - 1.0);	//	(Nu.wzyx - 0.5) + (E-0.5)
 	S.gloss		= Nu.x*Nu.x;					//	S.gloss = Nu.x*Nu.x;
 	S.height	= NuE.z;
 	//S.height	= 0;
@@ -183,7 +183,7 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	float4 	NuE	= tex2D( s_bumpX, I.tcdh);	// IN:	normal_error.height
 
 	S.base		= tbase(I.tcdh);				//	IN:  rgb.a
-	S.normal	= Nu.wzy + (NuE.xyz - 1.0f);	//	(Nu.wzyx - .5f) + (E-.5)
+	S.normal	= Nu.wzy + (NuE.xyz - 1.0);	//	(Nu.wzyx - 0.5) + (E-0.5)
 	S.gloss		= Nu.x*Nu.x;					//	S.gloss = Nu.x*Nu.x;
 	S.height	= NuE.z;
 	//S.height	= 0;

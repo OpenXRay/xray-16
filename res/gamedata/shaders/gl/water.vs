@@ -26,7 +26,7 @@ v2p _main (v_vert v)
 	// Calculate the 3x3 transform from tangent space to eye-space
 	// TangentToEyeSpace = object2eye * tangent2object
 	//                     = object2eye * transpose(object2tangent) (since the inverse of a rotation is its transpose)
-	float3		N	= unpack_bx2(v.N);			// just scale (assume normal in the -.5f, .5f)
+	float3		N	= unpack_bx2(v.N);			// just scale (assume normal in the -0.5, 0.5)
 	float3		T	= unpack_bx2(v.T);			//
 	float3		B	= unpack_bx2(v.B);			//
 	float3x3	xform	= mul(float3x3(m_W), float3x3(T,B,N));

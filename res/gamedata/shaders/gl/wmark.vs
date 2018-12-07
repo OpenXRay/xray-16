@@ -16,7 +16,7 @@ v2p _main (v_static v)
 	//float3 	L_sun 	= v_sun(N)*v.color.w;			// sun
 	//float3 	L_final	= L_rgb + L_hemi + L_sun + L_ambient;
 
-	o.c0		= float3(0);	//L_final;
+	o.c0		= float3(0.0);	//L_final;
 	o.fog 		= saturate	(calc_fogging(v.P));			// fog, input in world coords
 
 	return o;

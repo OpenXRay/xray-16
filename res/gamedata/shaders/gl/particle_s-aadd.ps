@@ -10,6 +10,6 @@ float4 _main ( v2p I )
 	// color = 1	-> color=c
 	float4	c 	= 	I.c*tex2D	(s_base,I.tc0);
 		c.xyz	*= 	c.w;
-	float3 	r	= 	float3(1,1,1)-c.xyz+c.xyz*c.xyz;	// lerp(1,c.xyz,c.xyz), can't be less than .5f
+	float3 	r	= 	float3(1.0)-c.xyz+c.xyz*c.xyz;	// lerp(1,c.xyz,c.xyz), can't be less than 0.5
 	return	float4(r,1);
 }

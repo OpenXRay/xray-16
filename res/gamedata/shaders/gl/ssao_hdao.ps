@@ -110,7 +110,7 @@ float4 GatherZSamples( float2 f2TexCoord )
 {
 	float4 f4Ret;
 
-	float2 f2InvRTSize = float2(1.0f) / pos_decompression_params2.xy;
+	float2 f2InvRTSize = float2(1.0) / pos_decompression_params2.xy;
 	
 #ifdef USE_MSAA
 	f4Ret.x = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,0 ) ).z;
@@ -336,7 +336,7 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 	fOcclusion  = dot( f4Occlusion, float4(g_fSSAOIntensity) ) / ( 2.0 * g_fRingWeightsTotal[g_iNumRings-1] );
 	fOcclusion *= fDot;
 	fOcclusion *= P.z < 0.5 ? 0.0 : lerp( 0.0, 1.0, saturate( P.z - 0.5 ) );
-	fOcclusion  = 1.0f - saturate( fOcclusion );
+	fOcclusion  = 1.0 - saturate( fOcclusion );
 	return fOcclusion;
 }
 #endif

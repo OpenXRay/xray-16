@@ -24,7 +24,7 @@ void hmodel
 {
         // hscale - something like diffuse reflection
 	float3	nw		= mul( m_v2w, normal );
-	float	hscale	= h;	//. *        (.5h + .5h*nw.y);
+	float	hscale	= h;	//. *        (0.5 + 0.5*nw.y);
 
 #ifdef         USE_GAMMA_22
 			hscale	= (hscale*hscale);        // make it more linear
@@ -34,7 +34,7 @@ void hmodel
 	float3	v2PntL	= normalize( Pnt );
 	float3	v2Pnt	= mul( m_v2w, v2PntL );
 	float3	vreflect= reflect( v2Pnt, nw );
-	float	hspec	= .5f + .5f * dot( vreflect, v2Pnt );
+	float	hspec	= 0.5 + 0.5 * dot( vreflect, v2Pnt );
 
 	// material	// sample material
 	//float4	light	= tex3D( s_material, float3(hscale, hspec, m) );
@@ -75,7 +75,7 @@ void         hmodel_table        (out float3 hdiffuse, out float3 hspecular, flo
         // reflection vector
         float3         v2point        = normalize        (Pnt);
         float3        vreflect= reflect         (v2point,normal);
-        float         hspec         = .5h+.5h*dot        (vreflect,v2point);
+        float         hspec         = 0.5+0.5*dot        (vreflect,v2point);
 
         // material
           float4         light        = tex3D                (s_material, float3(hscale, hspec, m) );                // sample material

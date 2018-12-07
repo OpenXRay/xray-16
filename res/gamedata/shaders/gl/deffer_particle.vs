@@ -15,7 +15,7 @@ v2p_particle _main( vv I )
 #else
 	O.tcdh 		= float2	(I.tc.xyyy			);
 #endif
-	O.position	= float4	(Pe, 		.2f		);
+	O.position	= float4	(Pe, 		0.2		);
 
 #ifdef 	USE_TDETAIL
 	O.tcdbump	= O.tcdh.xy * dt_params.xy;			// dt tc

@@ -30,7 +30,7 @@ v2p_bumped _main( v_in I )
 	I.Nh			= unpack_D3DCOLOR(I.Nh);
 	I.T				= unpack_D3DCOLOR(I.T);
 	I.B				= unpack_D3DCOLOR(I.B);
-	float3 	N 	= unpack_bx4(I.Nh);	// just scale (assume normal in the -.5f, .5f)
+	float3 	N 	= unpack_bx4(I.Nh);	// just scale (assume normal in the -0.5, 0.5)
 	float3 	T 	= unpack_bx4(I.T);	// 
 	float3 	B 	= unpack_bx4(I.B);	// 
 	float3x3 xform	= mul	(float3x3(m_WV), float3x3(T,B,N));

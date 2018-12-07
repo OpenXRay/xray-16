@@ -24,7 +24,7 @@ v2p_bumped 	_main 	(v_tree I)
 	float 	inten 	= H * dp;				// intensity
 	float2 	result	= calc_xz_wave	(wind.xz*inten, frac);
 #ifdef		USE_TREEWAVE
-			result	= float2(0);
+			result	= float2(0.0);
 #endif
 	float4 	w_pos 	= float4(pos.x+result.x, pos.y, pos.z+result.y, 1);
 	float2 	tc 		= (I.tc * consts).xy;
@@ -50,7 +50,7 @@ v2p_bumped 	_main 	(v_tree I)
 	// Calculate the 3x3 transform from tangent space to eye-space
 	// TangentToEyeSpace = object2eye * tangent2object
 	//		     = object2eye * transpose(object2tangent) (since the inverse of a rotation is its transpose)
-	float3 	N 		= unpack_bx4(I.Nh);	// just scale (assume normal in the -.5f, .5f)
+	float3 	N 		= unpack_bx4(I.Nh);	// just scale (assume normal in the -0.5, 0.5)
 	float3 	T 		= unpack_bx4(I.T);	//
 	float3 	B 		= unpack_bx4(I.B);	//
 	float3x3 xform	= mul	(float3x3(m_xform_v), float3x3(T,B,N));

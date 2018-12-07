@@ -114,7 +114,7 @@ float Fw( int r, int c, float fL )
 #define BFS  BLOCKER_FILTER_SIZE
 #define BFS2 ( BLOCKER_FILTER_SIZE / 2 )
 
-#define SUN_WIDTH 300.0f
+#define SUN_WIDTH 300.0
 
 // uses gather for DX11/10.1 and visibilty encoding for DX10.0
 float shadow_extreme_quality( float3 tc )

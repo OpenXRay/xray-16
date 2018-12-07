@@ -103,12 +103,12 @@ float3 fetch_eye_pos(float2 uv)
 //----------------------------------------------------------------------------------
 float falloff(float r)
 {
-    return 1.0f - r*r;
+    return 1.0 - r*r;
 }
 
 float4 falloff4(float4 r)
 {
-    return ( (1.0f).xxxx - r*r );
+    return ( (1.0).xxxx - r*r );
 }
 
 //----------------------------------------------------------------------------------
@@ -119,14 +119,14 @@ float2 snap_uv_offset(float2 uv)
 
 float2 snap_uv_coord(float2 uv)
 {
-    //return (floor(uv * g_Resolution) + 0.5f) * g_InvResolution;
-    return uv - (frac(uv * g_Resolution) - 0.5f) * g_InvResolution;
+    //return (floor(uv * g_Resolution) + 0.5) * g_InvResolution;
+    return uv - (frac(uv * g_Resolution) - 0.5) * g_InvResolution;
 }
 
 //----------------------------------------------------------------------------------
 float tan_to_sin(float x)
 {
-    return x / sqrt(1.0f + x*x);
+    return x / sqrt(1.0 + x*x);
 }
 
 //----------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void integrate_direction(inout float ao, float3 P, float2 uv, float2 deltaUV,
             //[branch]
             if(tanS > tanH) {
                 // Accumulate AO between the horizon and the sample
-                float sinS = tanS / sqrt(1.0f + tanS*tanS);
+                float sinS = tanS / sqrt(1.0 + tanS*tanS);
                 float r = sqrt(d2) * g_inv_R;
                 ao += falloff(r) * (sinS - sinH);
                 
@@ -232,7 +232,7 @@ float horizon_occlusion2(float2 deltaUV,
     float3 T = deltaUV.x * dPdu + deltaUV.y * dPdv;
 
     float tanH2 = tangent(T);
-    float sinH2 = tanH2 / sqrt(1.0f + tanH2*tanH2);
+    float sinH2 = tanH2 / sqrt(1.0 + tanH2*tanH2);
 
     float ao2 = 0;
     for(float j = 1; j <= numSteps; ++j) {
@@ -245,7 +245,7 @@ float horizon_occlusion2(float2 deltaUV,
 	//[branch]
         if ((d2_2 < g_sqr_R) && (tanS2 > tanH2)) {
                 // Accumulate AO between the horizon and the sample
-                float sinS = tanS2 / sqrt(1.0f + tanS2*tanS2);
+                float sinS = tanS2 / sqrt(1.0 + tanS2*tanS2);
                 float r2 = sqrt(d2_2) * g_inv_R;
                 ao2 += falloff(r2) * (sinS - sinH2);
                 
@@ -292,7 +292,7 @@ float horizon_occlusion2_4way(float2 deltaUV0,
 
     float4 tanH3 = float4( tangent(T0), tangent(T1),
                           tangent(T2), tangent(T3) );
-    float4 sinH3 = tanH3 / sqrt((1.0f).xxxx + tanH3*tanH3);
+    float4 sinH3 = tanH3 / sqrt((1.0).xxxx + tanH3*tanH3);
 
     float ao3 = 0.0;
     for(float j = 1; j <= numSteps; ++j) {
@@ -311,18 +311,18 @@ float horizon_occlusion2_4way(float2 deltaUV0,
                               length2(S2 - P), length2(S3 - P) );
         float4 tanS3 = float4( tangent(P, S0), tangent(P, S1),
                               tangent(P, S2), tangent(P, S3) );
-        float4 sinS = tanS3 / sqrt(float4(1.0f).xxxx + tanS3*tanS3);
+        float4 sinS = tanS3 / sqrt(float4(1.0).xxxx + tanS3*tanS3);
         float4 r    = sqrt( d2_3 ) * g_inv_R.xxxx;
         float4 fo   = float4( falloff( r.x ), falloff( r.y ),
                               falloff( r.z ), falloff( r.w ) );
 
-        float4 flag = (d2_3 < g_sqr_R.xxxx) ? float4(1.0f).xxxx : float4(0.0f).xxxx;
+        float4 flag = (d2_3 < g_sqr_R.xxxx) ? float4(1.0).xxxx : float4(0.0).xxxx;
         
-        flag *= (tanS3 > tanH3) ? float4(1.0f).xxxx : float4(0.0f).xxxx;
+        flag *= (tanS3 > tanH3) ? float4(1.0).xxxx : float4(0.0).xxxx;
         
         ao3  += dot( flag, fo * ( sinS - sinH3 ) );
-        tanH3 = ( flag > float4(0.0f).xxxx ? tanS3 : tanH3 );
-        sinH3 = ( flag > float4(0.0f).xxxx ? sinS : sinH3 );
+        tanH3 = ( flag > float4(0.0).xxxx ? tanS3 : tanH3 );
+        sinH3 = ( flag > float4(0.0).xxxx ? sinS : sinH3 );
         }
 
     return ao3;
@@ -332,9 +332,9 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
 {
     float3 P = uv_to_eye(tc0, z);
 
-	float2 	step_size	= float2	(.5f / 1024.0f, .5f / 768.0f)*ssao_kernel_size/max(z,1.3);
+	float2 	step_size	= float2	(0.5 / 1024.0, 0.5 / 768.0)*ssao_kernel_size/max(z,1.3);
   	float numSteps = min ( g_NumSteps, min(step_size.x * g_Resolution.x, step_size.y * g_Resolution.y));
-	float numDirs = min ( g_NumDir, min(step_size.x / 4 * g_Resolution.x, step_size.y / 4 * g_Resolution.y));
+	float numDirs = min ( g_NumDir, min(step_size.x / 4.0 * g_Resolution.x, step_size.y / 4.0 * g_Resolution.y));
     if( numSteps < 1.0 ) return float4(1.0);
     step_size = step_size / ( numSteps + 1 );
 
@@ -394,7 +394,7 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
   
         float d      = float(i)*delta;
 	    float4 angle = alpha * float4( 4.0*d + 0.0 * delta, 4.0*d + 1.0 * delta,
-	                                   4.0*d + 2.0f * delta, 4.0*d + 3.0 * delta);
+	                                   4.0*d + 2.0 * delta, 4.0*d + 3.0 * delta);
 	    float4 f4Cos = cos( angle );
 	    float4 f4Sin = sin( angle );
 	    

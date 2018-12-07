@@ -8,7 +8,7 @@ Texture2D s_distort;
 float4 _main ( v2p I )
 {
 	float4	distort	= tex2D		(s_distort,I.tc0);
-	float    factor	= distort.a * dot(I.c.rgb,float3(0.33f));	
+	float    factor	= distort.a * dot(I.c.rgb,float3(0.33));	
 /*
 #ifdef	USE_SOFT_PARTICLES
 	float2	zero = float2( 0.5, 0.5);
@@ -22,7 +22,7 @@ float4 _main ( v2p I )
 	//float4 _P = tex2Dproj( s_position, I.tctexgen);
 	float4 _P = float4( gbd.P, gbd.mtl );
 	float spaceDepth = _P.z - I.tctexgen.z;
-	if (spaceDepth < -0.1f ) spaceDepth = 100000.0h; //  Skybox doesn't draw into position buffer
+	if (spaceDepth < -0.1 ) spaceDepth = 100000.0; //  Skybox doesn't draw into position buffer
 	alphaDistort = saturate(1.3*spaceDepth);
 //	alphaDistort = 0;
 	distort.xy = lerp  ( zero, distort.xy, alphaDistort);
