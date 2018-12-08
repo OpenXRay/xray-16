@@ -916,18 +916,42 @@
 		<text>Unikalny pseudonim jest za d³ugi. Nie mo¿na wprowadziæ wiêcej ni¿ 30 znaków.</text>
 	</string>
 	<string id="mp_gp_unique_nick_must_contain_only">
-		<text>![CDATA[Unikalne imiê mo¿e zawieraæ tylko cyfry, litery alfabetu ³ac. i symbole spec.: "#$&'()*+-./:;<=>?@[]^_`{|}~]]</text>
+		<text><![CDATA[Unikalne imiê mo¿e zawieraæ tylko cyfry, litery alfabetu ³ac. i symbole spec.: "#$&'()*+-./:;<=>?@[]^_`{|}~]]></text>
 	</string>
 	<string id="mp_gp_unique_nick_must_contain_nospaces">
 		<text>Unikalny pseudonim nie mo¿e zawieraæ spacji</text>
 	</string>
 	<string id="mp_gp_unique_nick_bad_first_symbol">
-		<text>![CDATA[Unikalne imiê nie mo¿e zaczynaæ siê od cyfry lub symbolu: "@", "+", ":" lub ‘#’]]</text>
+		<text><![CDATA[Unikalne imiê nie mo¿e zaczynaæ siê od cyfry lub symbolu: "@", "+", ":" lub ‘#’]]></text>
 	</string>
 	<string id="st_opt_ultra">
 		<text>bardzo wysokie</text>
 	</string>
 	<string id="ui_mm_r4_enable_tessellation">
 		<text>Tesselacja</text>
+	</string>
+	<string id="ui_mm_localization">
+		<text>Jêzyk</text>
+	</string>
+	<string id="eng">
+		<text>Angielski (English)</text>
+	</string>
+	<string id="fra">
+		<text>Francuski (French)</text>
+	</string>
+	<string id="ger">
+		<text>Niemiecki (German)</text>
+	</string>
+	<string id="ita">
+		<text>W³oski (Italian)</text>
+	</string>
+	<string id="pol">
+		<text>Polski (Polish)</text>
+	</string>
+	<string id="rus">
+		<text>Rosyjski (Russian)</text>
+	</string>
+	<string id="spa">
+		<text>Hiszpañski (Spanish)</text>
 	</string>
 </string_table>

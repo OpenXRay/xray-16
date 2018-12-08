@@ -975,7 +975,22 @@
 	<string id="eng">
 		<text>English</text>
 	</string>
+	<string id="fra">
+		<text>French</text>
+	</string>
+	<string id="ger">
+		<text>German</text>
+	</string>
+	<string id="ita">
+		<text>Italian</text>
+	</string>
+	<string id="pol">
+		<text>Polish</text>
+	</string>
 	<string id="rus">
-		<text>Русский</text>
+		<text>Russian</text>
+	</string>
+	<string id="spa">
+		<text>Spanish</text>
 	</string>
 </string_table>

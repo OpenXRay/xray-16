@@ -973,9 +973,24 @@
 		<text>Язык</text>
 	</string>
 	<string id="eng">
-		<text>English</text>
+		<text>Английский (English)</text>
+	</string>
+	<string id="fra">
+		<text>Французский (French)</text>
+	</string>
+	<string id="ger">
+		<text>Немецкий (German)</text>
+	</string>
+	<string id="ita">
+		<text>Итальянский (Italian)</text>
+	</string>
+	<string id="pol">
+		<text>Польский (Polish)</text>
 	</string>
 	<string id="rus">
-		<text>Русский</text>
+		<text>Русский (Russian)</text>
+	</string>
+	<string id="spa">
+		<text>Испанский (Spanish)</text>
 	</string>
 </string_table>
