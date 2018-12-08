@@ -1,12 +1,10 @@
 X-Ray Engine 1.6 expansion [![Codacy Badge](https://api.codacy.com/project/badge/Grade/40d84a83b38147c49b4e66705c47a16a)](https://www.codacy.com/app/OpenXRay/xray-16?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenXRay/xray-16&amp;utm_campaign=Badge_Grade)
 ==========================
 
-### Build Status:
-
-|Platform|Build status|
-|--------|--------|
-| Linux (GCC)(Release)(x64/x86) |[![Build Status](https://api.travis-ci.org/OpenXRay/xray-16.svg?branch=xd_dev)](https://travis-ci.org/OpenXRay/xray-16)|
-| Windows (MSVC)(Debug/Mixed/Release)(x64/x86) |[![Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
+|Platform|Compiler|Configurations|Build status|
+|--------|--------|--------|--------|
+|Windows|MSVC|Debug / Mixed / Release (x64/x86)|[![Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
+|Linux|GCC|Debug / Release (x64/x86)|[![Build Status](https://api.travis-ci.org/OpenXRay/xray-16.svg?branch=xd_dev)](https://travis-ci.org/OpenXRay/xray-16)|
 
 This repository contains X-Ray Engine sources based on version 1.6.02.
 The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by GSC Game World.
@@ -19,6 +17,8 @@ Changelist is available in [wiki](https://github.com/OpenXRay/xray-16/wiki/Chang
 Build instructions (Windows): [doc/howto/build.txt](doc/howto/build.txt)
 
 Build instructions (Linux): [doc/howto/build-linux.txt](doc/howto/build-linux.txt)
+
+Installation instructions: [How to install and play](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-install-and-play)
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
 
