@@ -2,7 +2,7 @@
 #ifndef _STD_EXT_internal
 #define _STD_EXT_internal
 
-#include <math.h>
+#include <cmath>
 #include <float.h>
 #include <stdio.h>
 #include "xrCommon/math_funcs_inline.h"

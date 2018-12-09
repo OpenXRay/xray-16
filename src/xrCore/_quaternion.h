@@ -3,6 +3,7 @@
 #define __Q__
 #include "xrCommon/inlining_macros.h"
 #include "_vector3d.h"
+#include <cmath>
 
 /***************************************************************************
  The quaternion module contains basic support for a quaternion object.
