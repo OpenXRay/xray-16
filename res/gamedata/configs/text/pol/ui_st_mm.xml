@@ -423,6 +423,9 @@
 	<string id="ui_mm_alternative">
 		<text>Alternatywa</text>
 	</string>
+	<string id="ui_mm_always_active">
+		<text>Zawsze aktywny</text>
+	</string>
 	<string id="ui_mm_anisotropic">
 		<text>Filtrowanie anizotropowe</text>
 	</string>
@@ -468,6 +471,9 @@
 	<string id="ui_mm_detail_density">
 		<text>Gêstoœæ trawy</text>
 	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Odleg³oœæ rys. trawy</text>
+	</string>
 	<string id="ui_mm_difficulty">
 		<text>Poziom trudnoœci</text>
 	</string>
@@ -495,6 +501,12 @@
 	<string id="ui_mm_gameplay">
 		<text>Gra</text>
 	</string>
+	<string id="ui_mm_ui_style">
+		<text>Styl interfejsu</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Zew Prypeci</text>
+	</string>
 	<string id="ui_mm_gamma">
 		<text>Korekcja gamma</text>
 	</string>
@@ -521,6 +533,9 @@
 	</string>
 	<string id="ui_mm_load_game">
 		<text>Wczytaj grê</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Postêp wczytywania</text>
 	</string>
 	<string id="ui_mm_logout">
 		<text>Wyloguj siê z profilu</text>
@@ -591,6 +606,9 @@
 	<string id="ui_mm_r2_detail_bump">
 		<text>Mapowanie szczeg. wypuk³.</text>
 	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
 	<string id="ui_mm_r2_steep_parallax">
 		<text>Mapowanie reliefowe</text>
 	</string>
@@ -603,6 +621,9 @@
 	<string id="ui_mm_r2_sun_quality">
 		<text>Jakoœæ s³oñca</text>
 	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Jakoœæ cieni map</text>
+	</string>
 	<string id="ui_mm_r3_DX10_1">
 		<text>U¿ywaj DX10.1</text>
 	</string>
@@ -611,6 +632,18 @@
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces">
 		<text>Mokre powierzchnie</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Optymalizacja mokrych pow.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Mokre pow. na blisk. odleg³oœci</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Mokre pow. na dal. odleg³oœci</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Jakoœæ mokrych powierzchni</text>
 	</string>
 	<string id="ui_mm_r3_gbuffer_opt">
 		<text>Optymalizuj bufor geometryczny</text>
