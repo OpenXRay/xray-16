@@ -788,7 +788,7 @@ void Scheduler::ProcessUpdateQueue()
     const auto dwTime = Device.dwTimeGlobal;
     CTimer eTimer;
 
-    SORT(UpdateQueue.begin(), UpdateQueue.end(), std::less<Item>());
+    ACCELERATED_SORT(UpdateQueue.begin(), UpdateQueue.end(), std::less<Item>());
 
     FOR_START(size_t, 0, UpdateQueue.size(), i)
         {
@@ -869,7 +869,7 @@ void Scheduler::ProcessUpdateQueue()
         }
     FOR_END
 
-    SORT(UpdateQueue.begin(), UpdateQueue.end(), std::less<Item>());
+    ACCELERATED_SORT(UpdateQueue.begin(), UpdateQueue.end(), std::less<Item>());
 
     // always try to decrease target
     psShedulerTarget -= psShedulerReaction;
