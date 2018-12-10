@@ -110,7 +110,9 @@ void CStringTable::SetLanguage()
     {
         pData->m_sLanguage = pSettings->r_string("string_table", "language");
         auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token)
-            {return token.name && token.name == pData->m_sLanguage;});
+        {
+            return token.name && token.name == pData->m_sLanguage;
+        });
 
         R_ASSERT3(it != languagesToken.end(), "Check localization.ltx! Current language: ", pData->m_sLanguage.c_str());
         if (it != languagesToken.end())
