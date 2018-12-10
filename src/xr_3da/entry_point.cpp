@@ -42,7 +42,8 @@ int entry_point(pcstr commandLine)
     }
     Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);
 
-    auto result = RunApplication();
+    int result = 0;
+    result = RunApplication();
 
     Core._destroy();
 
@@ -76,16 +77,17 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;
-
+    static std::locale locale("");
+    char* commandLine = nullptr;
     try
     {
-        char* commandLine = "";
+
         int i;
         if(argc > 1)
         {
             size_t sum = 0;
             for(i = 1; i < argc; ++i)
-                sum += strlen(argv[i]) + 1;
+                sum += strlen(argv[i]) + strlen(" ") + sizeof('\0');
 
             commandLine = (char*)malloc(sum);
             memset(commandLine, 0, sum);
@@ -98,8 +100,7 @@ int main(int argc, char *argv[])
         }
 
         result = entry_point(commandLine);
-
-        free(commandLine);
+        if (commandLine) free(commandLine); {commandLine = NULL;};
     }
     catch (const std::overflow_error& e)
     {

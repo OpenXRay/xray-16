@@ -118,4 +118,4 @@ public:
 #endif // USE_OGL
 };
 
-extern ECORE_API CHW HW;
+//extern volatile ECORE_API CHW HW;

@@ -4,6 +4,8 @@
 
 #include "glStateUtils.h"
 
+extern CHW HW;
+
 IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
     stat.xforms++;

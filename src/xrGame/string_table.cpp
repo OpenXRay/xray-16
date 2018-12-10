@@ -3,7 +3,10 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "xr_level_controller.h"
 
-CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
+CStringTable& StringTable()
+{
+    return *((CStringTable*)gStringTable);
+}
 
 xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
@@ -63,7 +66,6 @@ void CStringTable::Init()
 #ifdef DEBUG
     Msg("StringTable: loaded %d files", fset.size());
 #endif // #ifdef DEBUG
-
     ReparseKeyBindings();
 }
 
@@ -102,13 +104,13 @@ void CStringTable::FillLanguageToken()
 void CStringTable::SetLanguage()
 {
     if (LanguageID != std::numeric_limits<u32>::max())
-        pData->m_sLanguage = languagesToken.at(LanguageID).name;
+        if (languagesToken.size() > LanguageID)
+            pData->m_sLanguage = languagesToken.at(LanguageID).name;
     else
     {
         pData->m_sLanguage = pSettings->r_string("string_table", "language");
-        auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token) {
-            return token.name && token.name == pData->m_sLanguage;
-        });
+        auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token)
+            {return token.name && token.name == pData->m_sLanguage;});
 
         R_ASSERT3(it != languagesToken.end(), "Check localization.ltx! Current language: ", pData->m_sLanguage.c_str());
         if (it != languagesToken.end())
@@ -116,7 +118,10 @@ void CStringTable::SetLanguage()
     }
 }
 
-xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data(); }
+xr_token* CStringTable::GetLanguagesToken() const
+{
+    return languagesToken.data();
+}
 
 void CStringTable::Load(LPCSTR xml_file_full)
 {
@@ -151,8 +156,9 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
 void CStringTable::ReloadLanguage()
 {
-    if (0 == xr_strcmp(languagesToken.at(LanguageID).name, pData->m_sLanguage.c_str()))
-        return;
+    if (languagesToken.size() > LanguageID)
+        if (0 == xr_strcmp(languagesToken.at(LanguageID).name, pData->m_sLanguage.c_str()))
+            return;
 
     Destroy();
     Init();

@@ -178,6 +178,11 @@ public:
     virtual void GetStatus(TStatus& S)
     {
         const xr_token* tok = GetToken();
+        if (!tok)
+        {
+            Msg("! token [%s] is null", cName);
+            return;
+        }
         while (tok->name)
         {
             if (tok->id == (int)(*value))
@@ -194,6 +199,11 @@ public:
     {
         I[0] = 0;
         const xr_token* tok = GetToken();
+        if (!tok)
+        {
+            Msg("! token [%s] is null", cName);
+            return;
+        }
         while (tok->name)
         {
             if (I[0])
@@ -208,6 +218,11 @@ public:
         TStatus str;
         bool res = false;
         const xr_token* tok = GetToken();
+        if (!tok)
+        {
+            Msg("! token [%s] is null", cName);
+            return;
+        }
         while (tok->name && !res)
         {
             if (tok->id == (int)(*value))
@@ -223,6 +238,11 @@ public:
             tips.push_back("--- (current)");
         }
         tok = GetToken();
+        if (!tok)
+        {
+            Msg("! token [%s] is null", cName);
+            return;
+        }
         while (tok->name)
         {
             tips.push_back(tok->name);

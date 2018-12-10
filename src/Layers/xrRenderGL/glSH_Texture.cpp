@@ -208,13 +208,6 @@ void CTexture::Load()
 
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            GLenum err = glGetError();
-            if (err != GL_NO_ERROR)
-            {
-                FATAL_F("Invalid video stream: 0x%x", err);
-                xr_delete(pTheora);
-                pSurface = 0;
-            }
         }
     }
     else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
