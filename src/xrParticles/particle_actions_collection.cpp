@@ -1674,8 +1674,7 @@ void PATurbulenceExecuteStream(TES_PARAMS* pParams)
     int octaves = pParams->octaves;
     float magnitude = pParams->magnitude;
 
-    tbb::parallel_for(tbb::blocked_range<u32>(0, count), [&](const tbb::blocked_range<u32>& range) {
-        for (u32 i = range.begin(); i != range.end(); ++i)
+    FOR_START(u32, 0, count, i)
         {
             Particle& m = effect->particles[i];
 
@@ -1724,7 +1723,7 @@ void PATurbulenceExecuteStream(TES_PARAMS* pParams)
 
             _mm_store_fvector(m.vel, _mvel);
         }
-    });
+    FOR_END
 }
 
 void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max)

@@ -197,8 +197,7 @@ void Skin4W_CPP(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
     vertBoned4W* V = S;
     Fvector P0, N0, P1, N1, P2, N2, P3, N3;
 
-    tbb::parallel_for(tbb::blocked_range<u32>(0, vCount), [&](const tbb::blocked_range<u32>& range) {
-        for (u32 i = range.begin(); i != range.end(); ++i)
+    FOR_START(u32, 0, vCount, i)
         {
             Fmatrix& M0 = Bones[S[i].m[0]].mRenderTransform;
             Fmatrix& M1 = Bones[S[i].m[1]].mRenderTransform;
@@ -240,7 +239,7 @@ void Skin4W_CPP(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
             D[i].u = S[i].u;
             D[i].v = S[i].v;
         }
-    });
+    FOR_END
 }
 } // namespace Math
 } // namespace XRay

@@ -460,9 +460,7 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
     // But it must be 0xFFFFFFFF or otherwise some particles won't play
     float angle = 0xFFFFFFFF;
 
-    
-    tbb::parallel_for(tbb::blocked_range<u32>(0, count), [&](const tbb::blocked_range<u32>& range) {
-        for (u32 i = range.begin(); i != range.end(); ++i)
+    FOR_START(u32, 0, count, i)
         {
             PAPI::Particle& m = particles[i];
             Fvector2 lt, rb;
@@ -574,7 +572,7 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                 }
             }
         }
-    });
+    FOR_END
 }
 
 void CParticleEffect::Render(float)
