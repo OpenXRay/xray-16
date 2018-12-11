@@ -81,7 +81,7 @@ const float respawn_auto = 7.f;
 
 extern float cammera_into_collision_shift;
 
-string32 ACTOR_DEFS::g_quick_use_slots[4] = {NULL, NULL, NULL, NULL};
+string32 ACTOR_DEFS::g_quick_use_slots[4] = {'\0', '\0', '\0', '\0'};
 // skeleton
 
 static Fbox bbStandBox;

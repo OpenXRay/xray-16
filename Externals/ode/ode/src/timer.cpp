@@ -74,9 +74,10 @@ double dTimerResolution()
 
 double dTimerTicksPerSecond()
 {
-  static int query=0;
+  static unsigned int query=0;
   static double hz=0.0;
-  if (!query) {
+  if (!query)
+  {
     LARGE_INTEGER a;
     QueryPerformanceFrequency (&a);
     hz = double(a.QuadPart);
@@ -234,7 +235,7 @@ double dTimerResolution()
 
 double dTimerTicksPerSecond()
 {
-  return 1000000;
+  return 1000000.0;
 }
 
 #endif
@@ -285,7 +286,7 @@ static struct {
   double total_t;		// total clocks used in this slot.
   double total_p;		// total percentage points used in this slot.
   int count;			// number of times this slot has been updated.
-  char *description;		// pointer to static string
+  const char *description;		// pointer to static string
 } event[MAXNUM];
 
 
@@ -339,7 +340,7 @@ void dTimerEnd()
 //****************************************************************************
 // print report
 
-static void fprintDoubleWithPrefix (FILE *f, double a, char *fmt)
+static void fprintDoubleWithPrefix (FILE *f, double a, const char *fmt)
 {
   if (a >= 0.999999) {
     fprintf (f,fmt,a);
@@ -364,7 +365,7 @@ static void fprintDoubleWithPrefix (FILE *f, double a, char *fmt)
 
 void dTimerReport (FILE *fout, int average)
 {
-  int i;
+  unsigned int i;
   size_t maxl;
   double ccunit = 1.0/dTimerTicksPerSecond();
   fprintf (fout,"\nTimer Report (");
@@ -374,45 +375,51 @@ void dTimerReport (FILE *fout, int average)
 
   // get maximum description length
   maxl = 0;
-  for (i=0; i<num; i++) {
+  for (i=0; i<num; ++i)
+  {
     size_t l = strlen (event[i].description);
-    if (l > maxl) maxl = l;
+    if (l > maxl)
+        maxl = l;
   }
 
   // calculate total time
   double t1 = loadClockCount (event[0].cc);
   double t2 = loadClockCount (event[num-1].cc);
   double total = t2 - t1;
-  if (total <= 0) total = 1;
+  if (total <= 0)
+      total = 1;
 
   // compute time difference for all slots except the last one. update totals
   double *times = (double*) ALLOCA (num * sizeof(double));
-  for (i=0; i < (num-1); i++) {
+  for (i=0; i < (num-1); i++)
+  {
     double t1 = loadClockCount (event[i].cc);
     double t2 = loadClockCount (event[i+1].cc);
     times[i] = t2 - t1;
-    event[i].count++;
+    ++ event[i].count;
     event[i].total_t += times[i];
     event[i].total_p += times[i]/total * 100.0;
   }
 
   // print report (with optional averages)
-  for (i=0; i<num; i++) {
+  for (i=0; i<num; ++ i)
+  {
     double t,p;
-    if (i < (num-1)) {
+    if (i < (num-1))
+    {
       t = times[i];
-      p = t/total * 100.0;
+      p = t / total * 100.0;
     }
-    else {
+    else
+    {
       t = total;
       p = 100.0;
     }
-    fprintf (fout,"%-*s %7.2fms %6.2f%%",maxl,event[i].description,
-	     t*ccunit * 1000.0, p);
-    if (average && i < (num-1)) {
-      fprintf (fout,"  (avg %7.2fms %6.2f%%)",
-	       (event[i].total_t / event[i].count)*ccunit * 1000.0,
-	       event[i].total_p / event[i].count);
+    fprintf (fout,"%-*s %7.2fms %6.2f%%", maxl, event[i].description, t * ccunit * 1000.0, p);
+    if (average && i < (num-1))
+    {
+        fprintf (fout,"  (avg %7.2fms %6.2f%%)", (event[i].total_t / event[i].count) * ccunit * 1000.0,
+             event[i].total_p / event[i].count);
     }
     fprintf (fout,"\n");
   }

@@ -970,7 +970,7 @@ public:
 
         char hex_digest[64];
         s32 ban_time = 0;
-        if (sscanf(args_, "%s %i", &hex_digest, &ban_time) != 2)
+        if (sscanf(args_, "%s %i", hex_digest, &ban_time) != 2)
         {
             Msg("! ERROR: bad command parameters.");
             Msg("Ban player. Format: \"sv_banplayer_by_digest <hex digest> <ban_time_in_sec>\". To get player hex "
@@ -1011,7 +1011,7 @@ public:
         else
         {
             // size_t ????? u32 maybe?
-            size_t player_index = 0;
+            u32 player_index = 0;
             if (sscanf(args_, "%u", &player_index) != 1)
             {
                 Msg("! ERROR: bad command parameters.");

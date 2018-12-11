@@ -231,7 +231,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #if defined(WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #else
-        getcwd(WorkingPath, sizeof(WorkingPath));
+        char *prc = getcwd(WorkingPath, sizeof(WorkingPath));
+        R_ASSERT(prc != NULL);
 #endif
 
 #if defined(WINDOWS)

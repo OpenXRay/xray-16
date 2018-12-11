@@ -63,7 +63,7 @@ inline void BLK_NODE::insert(void* pv, int NU)
 {
     MEM_BLK* p = (MEM_BLK*)pv;
     link(p);
-    p->Stamp = ~0UL;
+    p->Stamp = ~0U;
     p->NU = NU;
     Stamp++;
 }
@@ -287,7 +287,7 @@ inline void SpecialFreeUnit(void* ptr)
         BList->insert(ptr, 1);
     else
     {
-        *(DWORD*)ptr = ~0UL;
+        *(DWORD*)ptr = ~0U;
         UnitsStart += UNIT_SIZE;
     }
 }

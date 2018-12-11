@@ -169,7 +169,8 @@ void FileCompress(const char* fn, const char* sign, void* data, u32 size)
 
     int H = _open(fn, O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
     R_ASSERT2(H > 0, fn);
-    _write(H, &M, 8);
+    int sizeWriten = _write(H, &M, 8);
+    R_ASSERT(sizeWriten == 8);
     _writeLZ(H, data, size);
     _close(H);
 }
@@ -181,7 +182,8 @@ void* FileDecompress(const char* fn, const char* sign, u32* size)
 
     int H = _open(fn, O_BINARY | O_RDONLY);
     R_ASSERT2(H > 0, fn);
-    _read(H, &F, 8);
+    int bytesRead = _read(H, &F, 8);
+    R_ASSERT(bytesRead != -1);
     if (strncmp(M, F, 8) != 0)
     {
         F[8] = 0;

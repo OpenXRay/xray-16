@@ -653,7 +653,10 @@ unsigned _writeLZ(int hf, void* d, unsigned size)
     // Flush cache
     int size_out = fs.OutSize();
     if (size_out)
-        _write(hf, fs.OutPointer(), size_out);
+    {
+        int sizeWriten = _write(hf, fs.OutPointer(), size_out);
+        R_ASSERT(sizeWriten == size_out);
+    }
     fs.OutRelease();
     return size_out;
 }
@@ -680,8 +683,8 @@ unsigned _readLZ(int hf, void*& d, unsigned size)
 {
     // Read file in memory
     u8* data = (u8*)xr_malloc(size);
-    _read(hf, data, size);
-
+    int bytesRead = _read(hf, data, size);
+    R_ASSERT(bytesRead != -1);
     fs.Init_Input(data, data + size);
 
     // Actual compression
