@@ -6,7 +6,7 @@
 
 CRT::CRT()
 {
-    pRT = 0;
+    pRT = GL_NONE;
     dwWidth = 0;
     dwHeight = 0;
     fmt = D3DFMT_UNKNOWN;
