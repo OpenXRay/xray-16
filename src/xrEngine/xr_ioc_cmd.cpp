@@ -264,9 +264,7 @@ void CCC_LoadCFG::Execute(LPCSTR args)
         {
             F->r_string(str, sizeof(str));
             if (allow(str))
-            {
                 Console->Execute(str);
-            }
         }
         FS.r_close(F);
         Msg("[%s] successfully loaded.", cfg_full_name);

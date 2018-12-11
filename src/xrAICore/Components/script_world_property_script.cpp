@@ -20,4 +20,4 @@ SCRIPT_EXPORT(CScriptWorldProperty, (), {
                          .def("value", &CScriptWorldProperty::value)
                          .def(const_self < other<CScriptWorldProperty>())
                          .def(const_self == other<CScriptWorldProperty>())];
-});
+})

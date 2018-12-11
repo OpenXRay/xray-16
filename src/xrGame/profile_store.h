@@ -31,14 +31,14 @@ public:
     void stop_loading();
 
     virtual void shedule_Update(u32 dt);
-    virtual shared_str shedule_Name() const { return shared_str("gamespy_sake_updator"); };
-    virtual bool shedule_Needed() { return true; };
-    virtual float shedule_Scale() { return 1.0f; };
+    virtual shared_str shedule_Name() const { return shared_str("gamespy_sake_updator");}
+    virtual bool shedule_Needed() { return true; }
+    virtual float shedule_Scale() { return 1.0f; }
     all_awards_t const& get_awards();
     all_best_scores_t const& get_best_scores();
 
-    awards_store* get_awards_store() { return m_awards_store; };
-    best_scores_store* get_best_scores_store() { return m_best_scores_store; };
+    awards_store* get_awards_store() { return m_awards_store; }
+    best_scores_store* get_best_scores_store() { return m_best_scores_store; }
 private:
     typedef parameters_tuple1<store_operation_cb> load_prof_params_t;
     void load_current_profile_raw(load_prof_params_t const& args, store_operation_cb complete_cb);

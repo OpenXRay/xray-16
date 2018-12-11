@@ -196,7 +196,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
 
     GLint currentFilter = (GLint)GL_NEAREST;
 
-    if (m_samplerArray[stage] == NULL)
+    if (m_samplerArray[stage] == GL_NONE)
         glGenSamplers(1, &m_samplerArray[stage]);
     else if (name == D3DSAMP_MINFILTER || name == D3DSAMP_MIPFILTER)
         glGetSamplerParameteriv(m_samplerArray[stage], GL_TEXTURE_MIN_FILTER, &currentFilter);
@@ -234,7 +234,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
             value, currentFilter, true)));
         break;
     case D3DSAMP_MIPMAPLODBIAS: /* float Mipmap LOD bias */
-        CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, *(float*)value));
+        CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, (GLfloat)value));
         break;
     case D3DSAMP_MAXMIPLEVEL: /* DWORD 0..(n-1) LOD index of largest map to use (0 == largest) */
         CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_LEVEL, value));

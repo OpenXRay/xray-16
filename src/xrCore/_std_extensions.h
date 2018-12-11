@@ -174,6 +174,11 @@ IC size_t xr_strlen(const char* S) { return strlen(S); }
 //#ifndef _EDITOR
 #ifndef MASTER_GOLD
 
+inline LPSTR xr_strcat(LPSTR destination, LPCSTR source)
+{
+    return strcat(destination, source);
+}
+
 inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
 {
     return strcpy_s(destination, destination_size, source);
@@ -257,6 +262,11 @@ inline int xr_strcat(char(&destination)[count], LPCSTR source)
 }
 //#endif // #ifndef _EDITOR
 
+inline void* xr_memset(void* destination, char val, size_t dstSize)
+{
+   return memset(destination, val, dstSize);
+}
+
 inline void MemFill32(void* dst, u32 value, size_t dstSize)
 {
     u32* ptr = static_cast<u32*>(dst);
@@ -264,6 +274,7 @@ inline void MemFill32(void* dst, u32 value, size_t dstSize)
     while (ptr != end)
         *ptr++ = value;
 }
+
 
 XRCORE_API char* timestamp(string64& dest);
 

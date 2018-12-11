@@ -10,7 +10,6 @@
 #include "Include/xrAPI/xrAPI.h"
 #include "xrCore/xr_token.h"
 
-
 CHW HW;
 
 void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLenum severity, GLsizei /*length*/,
@@ -66,8 +65,6 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         Msg("Could not initialize glew.");
         return;
     }
-    char *glew_ver = (char*) glewGetString(GLEW_VERSION);
-
 
 #ifdef DEBUG
     CHK_GL(glEnable(GL_DEBUG_OUTPUT));
@@ -77,7 +74,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU vendor: [%s] device: [%s]", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
     Msg("* GPU OpenGL version: %s", glGetString(GL_VERSION));
     Msg("* GPU OpenGL shading language version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    Msg("* OpenGL Extension Wrangler: %s", glew_ver);
+    Msg("* OpenGL Extension Wrangler version: %s", glewGetString(GLEW_VERSION));
 
     //	Create render target and depth-stencil views here
     UpdateViews();

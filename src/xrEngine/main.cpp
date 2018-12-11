@@ -198,7 +198,7 @@ ENGINE_API void Startup()
 
     // Main cycle
     Device.Run();
-   //  Destroy APP
+    // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
     xr_delete(g_SpatialSpace);
     DEL_INSTANCE(g_pGamePersistent);
@@ -209,12 +209,12 @@ ENGINE_API void Startup()
 #if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
-     destroySettings();
-   LALib.OnDestroy();
+    destroySettings();
+    LALib.OnDestroy();
 #if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
-       destroyConsole();
+    destroyConsole();
 #if !defined(LINUX)
     else
         Console->Destroy();
