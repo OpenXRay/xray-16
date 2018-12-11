@@ -179,8 +179,10 @@ void HUD_SOUND_COLLECTION::LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, 
 //----------------------------------------------------------
 HUD_SOUND_COLLECTION_LAYERED::~HUD_SOUND_COLLECTION_LAYERED()
 {
+#ifndef __GNUC__ // At least GCC call destructor of vector members at call clear()
     for (auto& sound_item : m_sound_layered_items)
         sound_item.~HUD_SOUND_COLLECTION();
+#endif
 
     m_sound_layered_items.clear();
 }
