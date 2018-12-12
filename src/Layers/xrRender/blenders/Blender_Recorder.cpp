@@ -234,7 +234,7 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3DBLEND_ZERO);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //	Since in our engine D3DRS_SEPARATEALPHABLENDENABLE state is
     //	always set to false and in DirectX 10 blend functions for
     //	color and alpha are always independent, assign blend options for
