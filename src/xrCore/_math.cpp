@@ -214,7 +214,7 @@ void _initialize_cpu()
     if (SDL_HasAVX2()) xr_strcat(features, ", AVX2");
 
     Msg("* CPU features: %s", features);
-    Msg("* CPU cores/threads: %d/%d", std::thread::hardware_concurrency(), SDL_GetCPUCount());
+    Msg("* CPU cores/threads: %d/%d", SDL_GetCPUCount(), std::thread::hardware_concurrency());
 
 #if defined(WINDOWS)
     SYSTEM_INFO sysInfo;
