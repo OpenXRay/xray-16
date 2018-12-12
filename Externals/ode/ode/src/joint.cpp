@@ -2799,7 +2799,7 @@ extern "C" ODE_API void dJointSetFixedQuaternionPos (dxJointFixed *joint,dQuater
       // set joint->qrel to the transpose of the first body's q
       joint->qrel[0] = quaternion[0];//joint->node[0].body->q[0];
       for (i=1; i<4; i++) joint->qrel[i] = -quaternion[i];//-joint->node[0].body->q[i];
-      for (i=0; i<4; i++) joint->offset[i] = pos[i];//joint->node[0].body->posr.pos[i];
+      for (i=0; i<3; i++) joint->offset[i] = pos[i];//joint->node[0].body->posr.pos[i];
     }
   }
 }

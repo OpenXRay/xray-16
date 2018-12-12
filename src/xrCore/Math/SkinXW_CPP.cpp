@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "SkinXW_CPP.hpp"
+#include "tbb/parallel_for.h"
+#include "tbb/blocked_range.h"
 #ifdef _EDITOR
 #include "SkeletonX.h"
 #include "SkeletonCustom.h"
@@ -192,57 +194,52 @@ void Skin3W_CPP(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 void Skin4W_CPP(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 {
     // Prepare
-    int U_Count = vCount;
     vertBoned4W* V = S;
-    vertBoned4W* E = V + U_Count;
     Fvector P0, N0, P1, N1, P2, N2, P3, N3;
 
-    // NON-Unrolled loop
-    for (; S != E;)
-    {
-        Fmatrix& M0 = Bones[S->m[0]].mRenderTransform;
-        Fmatrix& M1 = Bones[S->m[1]].mRenderTransform;
-        Fmatrix& M2 = Bones[S->m[2]].mRenderTransform;
-        Fmatrix& M3 = Bones[S->m[3]].mRenderTransform;
+    FOR_START(u32, 0, vCount, i)
+        {
+            Fmatrix& M0 = Bones[S[i].m[0]].mRenderTransform;
+            Fmatrix& M1 = Bones[S[i].m[1]].mRenderTransform;
+            Fmatrix& M2 = Bones[S[i].m[2]].mRenderTransform;
+            Fmatrix& M3 = Bones[S[i].m[3]].mRenderTransform;
 
-        M0.transform_tiny(P0, S->P);
-        P0.mul(S->w[0]);
-        M0.transform_dir(N0, S->N);
-        N0.mul(S->w[0]);
+            M0.transform_tiny(P0, S[i].P);
+            P0.mul(S[i].w[0]);
+            M0.transform_dir(N0, S[i].N);
+            N0.mul(S[i].w[0]);
 
-        M1.transform_tiny(P1, S->P);
-        P1.mul(S->w[1]);
-        M1.transform_dir(N1, S->N);
-        N1.mul(S->w[1]);
+            M1.transform_tiny(P1, S[i].P);
+            P1.mul(S[i].w[1]);
+            M1.transform_dir(N1, S[i].N);
+            N1.mul(S[i].w[1]);
 
-        M2.transform_tiny(P2, S->P);
-        P2.mul(S->w[2]);
-        M2.transform_dir(N2, S->N);
-        N2.mul(S->w[2]);
+            M2.transform_tiny(P2, S[i].P);
+            P2.mul(S[i].w[2]);
+            M2.transform_dir(N2, S[i].N);
+            N2.mul(S[i].w[2]);
 
-        M3.transform_tiny(P3, S->P);
-        P3.mul(1.0f - S->w[0] - S->w[1] - S->w[2]);
-        M3.transform_dir(N3, S->N);
-        N3.mul(1.0f - S->w[0] - S->w[1] - S->w[2]);
+            M3.transform_tiny(P3, S[i].P);
+            P3.mul(1.0f - S[i].w[0] - S[i].w[1] - S[i].w[2]);
+            M3.transform_dir(N3, S[i].N);
+            N3.mul(1.0f - S[i].w[0] - S[i].w[1] - S[i].w[2]);
 
-        P0.add(P1);
-        P0.add(P2);
-        P0.add(P3);
+            P0.add(P1);
+            P0.add(P2);
+            P0.add(P3);
 
-        D->P = P0;
+            D[i].P = P0;
 
-        N0.add(N1);
-        N0.add(N2);
-        N0.add(N3);
+            N0.add(N1);
+            N0.add(N2);
+            N0.add(N3);
 
-        D->N = N0;
+            D[i].N = N0;
 
-        D->u = S->u;
-        D->v = S->v;
-
-        S++;
-        D++;
-    }
+            D[i].u = S[i].u;
+            D[i].v = S[i].v;
+        }
+    FOR_END
 }
 } // namespace Math
 } // namespace XRay

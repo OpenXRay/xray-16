@@ -67,54 +67,37 @@ IC u8 btwCount1(u8 v)
 // same for 32bit
 IC u32 btwCount1(u32 v)
 {
+#ifdef __GNUC__
+    return __builtin_popcount(v);
+#else
     const u32 g31 = 0x49249249ul; // = 0100_1001_0010_0100_1001_0010_0100_1001
     const u32 g32 = 0x381c0e07ul; // = 0011_1000_0001_1100_0000_1110_0000_0111
     v = (v & g31) + (v >> 1 & g31) + (v >> 2 & g31);
     v = (v + (v >> 3) & g32) + (v >> 6 & g32);
     return v + (v >> 9) + (v >> 18) + (v >> 27) & 0x3f;
+#endif
 }
 
-IC u64 btwCount1(u64 v) { return btwCount1(u32(v & u32(-1))) + btwCount1(u32(v >> u64(32))); }
-// XXX: This function is WAY too large to inline, much less FORCE inline.
-// Additionally, doesn't SSE2 have a fast ftol() ?
-ICF int iFloor(float x)
+IC u64 btwCount1(u64 v)
 {
-    int a = *(const int*)&x;
-    int exponent = 127 + 31 - (a >> 23 & 0xFF);
-    int r = ((u32)a << 8 | 1U << 31) >> exponent;
-    exponent += 31 - 127;
-    {
-        int imask = !((1 << exponent) - 1 >> 8 & a);
-        exponent -= 31 - 127 + 32;
-        exponent >>= 31;
-        a >>= 31;
-        r -= imask & a;
-        r &= exponent;
-        r ^= a;
-    }
-    return r;
+#ifdef __GNUC__
+    return __builtin_popcountll(v);
+#else
+    return btwCount1(u32(v & u32(-1))) + btwCount1(u32(v >> u64(32))); 
+#endif
+}
+
+IC int iFloor(float x)
+{
+    return std::floor(x);
 }
 
 /* intCeil() is a non-interesting variant, since effectively
  ceil(x) == -floor(-x)
  */
-ICF int iCeil(float x)
+IC int iCeil(float x)
 {
-    int a = *(const int*)&x;
-    int exponent = 127 + 31 - (a >> 23 & 0xFF);
-    int r = ((u32)a << 8 | 1U << 31) >> exponent;
-    exponent += 31 - 127;
-    {
-        int imask = !((1 << exponent) - 1 >> 8 & a);
-        exponent -= 31 - 127 + 32;
-        exponent >>= 31;
-        a = ~(a - 1 >> 31); /* change sign */
-        r -= imask & a;
-        r &= exponent;
-        r ^= a;
-        r = -r; /* change sign */
-    }
-    return r; /* r = (int)(ceil(f)) */
+    return std::ceil(x);
 }
 
 // Validity checks

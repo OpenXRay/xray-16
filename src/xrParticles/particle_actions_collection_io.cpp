@@ -6,7 +6,7 @@ using namespace PAPI;
 void ParticleAction::Load(IReader& F)
 {
     m_Flags.assign(F.r_u32());
-    type = (PActionEnum)F.r_u32();
+    type = PActionEnum(F.r_u32());
 }
 
 void ParticleAction::Save(IWriter& F)

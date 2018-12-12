@@ -110,6 +110,13 @@ public:
         void open();
         void close();
     };
+    
+    struct archive_header
+    {
+        u32 size_real;
+        u32 size_compr;
+        u32 crc;
+    };
 
     using archives_vec = xr_vector<archive>;
     archives_vec m_archives;

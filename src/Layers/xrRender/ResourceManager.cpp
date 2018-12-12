@@ -18,7 +18,6 @@
 #include "tss.h"
 #include "blenders/Blender.h"
 #include "blenders/Blender_Recorder.h"
-#include "xrCore/Threading/ThreadPool.hpp"
 
 //	Already defined in Texture.cpp
 void fix_texture_name(LPSTR fn);

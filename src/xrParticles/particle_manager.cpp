@@ -302,7 +302,7 @@ ParticleAction* CParticleManager::CreateAction(PActionEnum type)
     return pa;
 }
 
-u32 CParticleManager::LoadActions(int alist_id, IReader& R)
+size_t CParticleManager::LoadActions(int alist_id, IReader& R)
 {
     // Execute the specified action list.
     ParticleActions* pa = GetActionListPtr(alist_id);
@@ -313,7 +313,7 @@ u32 CParticleManager::LoadActions(int alist_id, IReader& R)
         u32 cnt = R.r_u32();
         for (u32 k = 0; k < cnt; k++)
         {
-            ParticleAction* act = CreateAction((PActionEnum)R.r_u32());
+            ParticleAction* act = CreateAction(PActionEnum(R.r_u32()));
             act->Load(R);
             pa->append(act);
         }

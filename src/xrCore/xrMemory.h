@@ -35,9 +35,9 @@ public:
 public:
     size_t mem_usage();
     void   mem_compact();
-    inline void* mem_alloc             (size_t size) { stat_calls++; return scalable_malloc (     size + reserved); };
-    inline void* mem_realloc(void* ptr, size_t size) { stat_calls++; return scalable_realloc(ptr, size + reserved); };
-    inline void  mem_free   (void* ptr)              { stat_calls++;        scalable_free   (ptr);                  };
+    inline void* mem_alloc             (size_t size) { stat_calls++; return scalable_malloc (     size + reserved); }
+    inline void* mem_realloc(void* ptr, size_t size) { stat_calls++; return scalable_realloc(ptr, size + reserved); }
+    inline void  mem_free   (void* ptr)              { stat_calls++;        scalable_free   (ptr);                  }
 };
 
 extern XRCORE_API xrMemory Memory;
@@ -59,6 +59,11 @@ inline void* operator new(size_t size)
 }
 
 inline void operator delete(void* ptr) noexcept
+{
+    Memory.mem_free(ptr);
+}
+
+inline void operator delete(void* ptr, size_t) noexcept
 {
     Memory.mem_free(ptr);
 }

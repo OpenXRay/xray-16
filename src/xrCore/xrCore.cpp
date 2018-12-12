@@ -13,7 +13,6 @@
 #include <unistd.h>
 #endif
 #include "xrCore.h"
-#include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 #include "SDL.h"
@@ -215,7 +214,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #else
-        SDL_strlcpy(ApplicationPath, SDL_GetBasePath(), sizeof(ApplicationPath));
+        char *base_path = SDL_GetBasePath();
+        SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
+        SDL_free(base_path);
 #endif
 
 #ifdef _EDITOR
@@ -265,7 +266,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
         R_ASSERT(SDL_HasSSE());
-        ttapi.initialize();
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
@@ -319,7 +319,6 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
-        ttapi.destroy();
         FS._destroy();
         EFS._destroy();
         xr_FS.reset();

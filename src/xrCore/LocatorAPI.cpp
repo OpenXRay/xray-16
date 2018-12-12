@@ -403,32 +403,23 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
     while (!hdr->eof())
     {
         string_path name, full;
-        string1024 buffer_start;
-        u16 buffer_size = hdr->r_u16();
-        VERIFY(buffer_size < sizeof(name) + 4 * sizeof(u32));
-        VERIFY(buffer_size < sizeof(buffer_start));
-        u8* buffer = (u8*)&*buffer_start;
-        hdr->r(buffer, buffer_size);
+        archive_header header;
+        
+        u16 buffer_size = hdr->r_u16(); // Read the total length of all crap
+        VERIFY(buffer_size < sizeof(name) + sizeof(archive_header) + sizeof(u32));
 
-        u32 size_real = *(u32*)buffer;
-        buffer += sizeof size_real;
+        hdr->r(&header, sizeof(archive_header)); // Read header
 
-        u32 size_compr = *(u32*)buffer;
-        buffer += sizeof size_compr;
-
-        u32 crc = *(u32*)buffer;
-        buffer += sizeof crc;
-
-        u32 name_length = buffer_size - 4 * sizeof(u32);
-        memcpy(name, buffer, name_length);
+        int name_length = buffer_size - sizeof(archive_header) - sizeof(u32);
+        VERIFY(name_length > 0);
+        hdr->r(&name, name_length); // Read file name
         name[name_length] = 0;
-        buffer += buffer_size - 4 * sizeof(u32);
 
-        u32 ptr = *(u32*)buffer;
-        buffer += sizeof ptr;
+        u32 ptr = 0;
+        hdr->r(&ptr, sizeof(ptr)); // Obtain internal pointer to the file in archive
 
         strconcat(sizeof full, full, fs_entry_point, name);
-        Register(full, A.vfs_idx, crc, ptr, size_real, size_compr, 0);
+        Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, 0);
     }
     hdr->close();
 }
@@ -640,7 +631,7 @@ bool ignore_path(pcstr _path)
 
 bool CLocatorAPI::Recurse(pcstr path)
 {
-    string_path scanPath;
+    string_path scanPath = { 0 };
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, ".xrignore");
     struct stat buffer;
@@ -1568,10 +1559,8 @@ CLocatorAPI::files_it CLocatorAPI::file_find_it(pcstr fname)
     VERIFY(xr_strlen(fname) * sizeof(char) < sizeof(file_name));
     xr_strcpy(file_name, sizeof file_name, fname);
     desc_f.name = file_name;
-    // desc_f.name = xr_strlwr(xr_strdup(fname));
-    files_it I = m_files.find(desc_f);
-    // xr_free (desc_f.name);
-    return I;
+
+    return m_files.find(desc_f);
 }
 
 bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)

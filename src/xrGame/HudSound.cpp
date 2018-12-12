@@ -179,35 +179,37 @@ void HUD_SOUND_COLLECTION::LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, 
 //----------------------------------------------------------
 HUD_SOUND_COLLECTION_LAYERED::~HUD_SOUND_COLLECTION_LAYERED()
 {
-    for (auto& sound_item : m_sound_items)
+#ifndef __GNUC__ // At least GCC call destructor of vector members at call clear()
+    for (auto& sound_item : m_sound_layered_items)
         sound_item.~HUD_SOUND_COLLECTION();
+#endif
 
-    m_sound_items.clear();
+    m_sound_layered_items.clear();
 }
 
 void HUD_SOUND_COLLECTION_LAYERED::StopAllSounds()
 {
-    for (auto& sound_item : m_sound_items)
+    for (auto& sound_item : m_sound_layered_items)
         sound_item.StopAllSounds();
 }
 
 void HUD_SOUND_COLLECTION_LAYERED::StopSound(pcstr alias)
 {
-    for (auto& sound_item : m_sound_items)
+    for (auto& sound_item : m_sound_layered_items)
         if (sound_item.m_alias == alias)
             sound_item.StopSound(alias);
 }
 
 void HUD_SOUND_COLLECTION_LAYERED::SetPosition(pcstr alias, const Fvector& pos)
 {
-    for (auto& sound_item : m_sound_items)
+    for (auto& sound_item : m_sound_layered_items)
         if (sound_item.m_alias == alias)
             sound_item.SetPosition(alias, pos);
 }
 
 void HUD_SOUND_COLLECTION_LAYERED::PlaySound(pcstr alias, const Fvector& position, const IGameObject* parent, bool hud_mode, bool looped, u8 index)
 {
-    for (auto& sound_item : m_sound_items)
+    for (auto& sound_item : m_sound_layered_items)
         if (sound_item.m_alias == alias)
             sound_item.PlaySound(alias, position, parent, hud_mode, looped, index);
 }
@@ -215,7 +217,7 @@ void HUD_SOUND_COLLECTION_LAYERED::PlaySound(pcstr alias, const Fvector& positio
 
 HUD_SOUND_ITEM* HUD_SOUND_COLLECTION_LAYERED::FindSoundItem(pcstr alias, bool b_assert)
 {
-    for (auto& sound_item : m_sound_items)
+    for (auto& sound_item : m_sound_layered_items)
         if (sound_item.m_alias == alias)
             return sound_item.FindSoundItem(alias, b_assert);
 
@@ -239,8 +241,8 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(pcstr section, pcstr line, pcstr al
         int k = 1;
         while (pSettings->line_exist(buf_str, sound_line))
         {
-            m_sound_items.resize(m_sound_items.size() + 1);
-            HUD_SOUND_COLLECTION& snd_item = m_sound_items.back();
+            m_sound_layered_items.resize(m_sound_layered_items.size() + 1);
+            HUD_SOUND_COLLECTION& snd_item = m_sound_layered_items.back();
             snd_item.LoadSound(buf_str, sound_line, alias, exclusive, type);
             snd_item.m_alias = alias;
             xr_sprintf(sound_line,"snd_%d_layer", ++k);
@@ -248,8 +250,8 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(pcstr section, pcstr line, pcstr al
     }
     else // For compatibility with normal HUD_SOUND_COLLECTION sounds
     {
-        m_sound_items.resize(m_sound_items.size() + 1);
-        HUD_SOUND_COLLECTION& snd_item = m_sound_items.back();
+        m_sound_layered_items.resize(m_sound_layered_items.size() + 1);
+        HUD_SOUND_COLLECTION& snd_item = m_sound_layered_items.back();
         snd_item.LoadSound(section, line, alias, exclusive, type);
         snd_item.m_alias = alias;
     }
@@ -272,8 +274,8 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(CInifile const *ini, pcstr section,
         int k = 1;
         while (ini->line_exist(buf_str, sound_line))
         {
-            m_sound_items.resize(m_sound_items.size() + 1);
-            HUD_SOUND_COLLECTION& snd_item = m_sound_items.back();
+            m_sound_layered_items.resize(m_sound_layered_items.size() + 1);
+            HUD_SOUND_COLLECTION& snd_item = m_sound_layered_items.back();
             snd_item.LoadSound(buf_str, sound_line, alias, exclusive, type);
             snd_item.m_alias = alias;
             xr_sprintf(sound_line, "snd_%d_layer", ++k);
@@ -281,8 +283,8 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(CInifile const *ini, pcstr section,
     }
     else //For compatibility with normal HUD_SOUND_COLLECTION sounds
     {
-        m_sound_items.resize(m_sound_items.size() + 1);
-        HUD_SOUND_COLLECTION& snd_item = m_sound_items.back();
+        m_sound_layered_items.resize(m_sound_layered_items.size() + 1);
+        HUD_SOUND_COLLECTION& snd_item = m_sound_layered_items.back();
         snd_item.LoadSound(section, line, alias, exclusive, type);
         snd_item.m_alias = alias;
     }

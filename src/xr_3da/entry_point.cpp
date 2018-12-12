@@ -79,16 +79,16 @@ int main(int argc, char *argv[])
 
     try
     {
-        char* commandLine = "";
+        char* commandLine = nullptr;
         int i;
         if(argc > 1)
         {
             size_t sum = 0;
             for(i = 1; i < argc; ++i)
-                sum += strlen(argv[i]) + 1;
+                sum += strlen(argv[i]) + strlen(" \0");
 
-            commandLine = (char*)malloc(sum);
-            memset(commandLine, 0, sum);
+            commandLine = (char*)xr_malloc(sum);
+            ZeroMemory(commandLine, sum);
 
             for(i = 1; i < argc; ++i)
             {
@@ -96,10 +96,12 @@ int main(int argc, char *argv[])
                 strcat(commandLine, " ");
             }
         }
+        else
+            commandLine = strdup("");
 
         result = entry_point(commandLine);
 
-        free(commandLine);
+        xr_free(commandLine);
     }
     catch (const std::overflow_error& e)
     {

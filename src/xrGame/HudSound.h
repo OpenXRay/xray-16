@@ -77,7 +77,7 @@ public:
 //Alundaio:
 class HUD_SOUND_COLLECTION_LAYERED
 {
-    xr_vector<HUD_SOUND_COLLECTION> m_sound_items;
+    xr_vector<HUD_SOUND_COLLECTION> m_sound_layered_items;
 
 public:
     ~HUD_SOUND_COLLECTION_LAYERED();

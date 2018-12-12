@@ -503,7 +503,7 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
     int start = lua_gettop(lua());
     lua_pushstring(lua(), GlobalNamespace);
     lua_rawget(lua(), LUA_GLOBALSINDEX);
-    string256 S2;
+    string256 S2 = { 0 };
     xr_strcpy(S2, name);
     LPSTR S = S2;
     for (;;)
@@ -590,7 +590,7 @@ bool CScriptEngine::object(LPCSTR namespace_name, LPCSTR identifier, int type)
 
 luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
 {
-    string256 S1;
+    string256 S1 = { 0 };
     xr_strcpy(S1, namespace_name);
     LPSTR S = S1;
     luabind::object lua_namespace = luabind::globals(lua());
@@ -1141,7 +1141,7 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
 {
     if (!xr_strlen(function_to_call))
         return false;
-    string256 name_space, function;
+    string256 name_space = { 0 }, function = { 0 };
     parse_script_namespace(function_to_call, name_space, sizeof(name_space), function, sizeof(function));
     if (xr_strcmp(name_space, GlobalNamespace))
     {

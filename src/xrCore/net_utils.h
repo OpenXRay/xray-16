@@ -87,13 +87,13 @@ public:
         B.count = size;
     }
 
-    NET_Buffer B = {{0}, 0};
+    NET_Buffer B;
     u32 r_pos;
     u32 timeReceive;
     bool w_allow;
 
 public:
-    NET_Packet() : inistream(nullptr), r_pos(0), timeReceive(0), w_allow(true) {}
+    NET_Packet() : inistream(nullptr), r_pos(0), timeReceive(0), w_allow(true), B() {}
     // writing - main
     IC void write_start()
     {
