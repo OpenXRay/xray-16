@@ -2,11 +2,10 @@
 
 void CRenderTarget::phase_smap_spot_clear()
 {
-    /*
-    if (RImplementation.b_HW_smap)		u_setrt	(rt_smap_surf, NULL, NULL, rt_smap_d_depth->pRT);
-    else								u_setrt	(rt_smap_surf, NULL, NULL, rt_smap_d_ZB);
-    CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_ZBUFFER,	0xffffffff,	1.0f, 0L));
-    */
+    if (RImplementation.o.HW_smap)
+        u_setrt(rt_smap_surf, NULL, NULL, rt_smap_depth->pZRT);
+    else
+        VERIFY(!"Use HW SMap only for DX10!");
 
     HW.pDevice->ClearDepthStencilView(rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 }
