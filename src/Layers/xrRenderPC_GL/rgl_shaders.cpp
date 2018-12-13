@@ -565,24 +565,11 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     string256 name_comment;
     xr_sprintf(name_comment, "// %s\n", name);
     const char** sources = xr_alloc<const char*>(sources_len);
-
-    // xxx: remove this key (from Device_Initialize.cpp too) when crash in menu is fixed
-    if (strstr(Core.Params, "-use_gl_4.1"))
-    {
 #ifdef DEBUG
-        sources[0] = "#version 410\n#pragma optimize (off)\n";
+    sources[0] = "#version 410\n#pragma optimize (off)\n";
 #else
-        sources[0] = "#version 410\n";
+    sources[0] = "#version 410\n";
 #endif
-    }
-    else
-    {
-#ifdef DEBUG
-        sources[0] = "#version 450\n#pragma optimize (off)\n";
-#else
-        sources[0] = "#version 450\n";
-#endif
-    }
     sources[1] = name_comment;
     memcpy(sources + 2, defines, def_len * sizeof(char*));
     memcpy(sources + def_len + 2, source.data(), source.size() * sizeof(char*));
