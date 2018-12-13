@@ -35,7 +35,7 @@ make -jX # where X is the number of cores in your system
 ```
 
 #To enable debugging:
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo # Building with Debug flag isn't supported now
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo # You can use other standard mode like Debug or Release
 #To use clang:
 CC=clang CXX=clang++ cmake ..
 #To enable all instruction for the local machine:
@@ -68,18 +68,18 @@ To build X-Ray Engine you'll need following libraries:
 * zlib: http://zlib.net
 All mentioned libraries are already in repository as submodules!
 
-Setup:
+Usage:
 ------
 - Install S.T.A.L.K.E.R Call of Pripyat using wine.
 For example if you have a cd-rom you can type `wine setup.exe` to start installation. 
-It's recommended do not use path with spaces, for instance you can use "c:\cop" as 
+Having spaces in path is not recommended, for instance you can use "c:\cop" as 
 an installation path (it will be `~/.wine/drive_c/cop` path on your host linux machine).
 - Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
   http://cop.stalker-game.ru/?page=patches#2
 
 After building in the engine folder do (assuming you installed CoP in "c:\cop"):
 ```
-mkdir ~/.wine/drive_c/cop/bin-linux-dbg # here will be installed binaries with dbg symbols
+mkdir ~/.wine/drive_c/cop/bin-linux-dbg # binaries with dbg symbols will be installed here
 make DESTDIR=~/.wine/drive_c/cop/bin-linux-dbg install
 cd ~/.wine/drive_c/cop/bin-linux-dbg
 ```
