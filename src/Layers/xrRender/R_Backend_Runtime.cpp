@@ -19,21 +19,17 @@ void CBackend::OnFrameEnd()
 {
     if (!GEnv.isDedicatedServer)
     {
-#ifdef USE_OGL
-        Invalidate();
-#elif defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11)
         HW.pContext->ClearState();
-        Invalidate();
-#else // USE_DX10
-
+#elif defined(USE_DX9)
         for (u32 stage = 0; stage < HW.Caps.raster.dwStages; stage++)
             CHK_DX(HW.pDevice->SetTexture(0, nullptr));
         CHK_DX(HW.pDevice->SetStreamSource(0, nullptr, 0, 0));
         CHK_DX(HW.pDevice->SetIndices(nullptr));
         CHK_DX(HW.pDevice->SetVertexShader(nullptr));
         CHK_DX(HW.pDevice->SetPixelShader(nullptr));
+#endif
         Invalidate();
-#endif // USE_DX10
     }
 }
 
@@ -42,14 +38,20 @@ void CBackend::OnFrameBegin()
     if (!GEnv.isDedicatedServer)
     {
         PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));
-#if defined(USE_DX10) || defined(USE_DX11)
+
+        // DX9 sets base rt and base zb by default
+#ifndef USE_DX9
         Invalidate();
-        // DX9 sets base rt nd base zb by default
+
+        // Getting broken HUD hands for OpenGL after calling rmNormal()
+#ifndef USE_OGL
         RImplementation.rmNormal();
+#endif
         set_RT(HW.pBaseRT);
         set_ZB(HW.pBaseZB);
-#endif // USE_DX10
-        memset(&stat, 0, sizeof(stat));
+#endif
+
+        ZeroMemory(&stat, sizeof(stat));
         Vertex.Flush();
         Index.Flush();
         set_Stencil(FALSE);
