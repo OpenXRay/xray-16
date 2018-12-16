@@ -1,0 +1,9 @@
+DEBUGGING
+=========
+First, build with debugging enabled (see INSTALL.linux)
+
+Then run it like this:
+DEBUGGER="gdb --ex=r --args" ./xr_3da.sh -fsltx ../fsgame.ltx
+
+Disable input grabbing:
+setxkbmap -option grab:break_actions 

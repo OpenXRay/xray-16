@@ -1,0 +1,51 @@
+1. RUNTIME REQUIREMENTS
+=======================
+Libraries
+---------
+GLEW      - glew.sourceforge.net (open-source C/C++ extension loading library)
+FreeImage - freeimage.sourceforge.net (Open Source library to support popular graphics image formats)
+lockfile  - github.com/miquels/liblockfile (create, manage and remove generic lockfiles)
+OpenAL    - www.openal.org (cross-platform 3D audio API)
+TBB       - www.threadingbuildingblocks.org (C++ template library for task parallelism)
+Crypto++  - www.cryptopp.com (free C++ class library of cryptographic schemes)
+pugixml   - pugixml.org (C++ XML processing library)
+Theora    - www.theora.org (free and open video compression format)
+OGG       - xiph.org/ogg (multimedia container format, and the native file and stream format)
+SDL2      - www.libsdl.org (low level access to audio, keyboard, mouse, joystick, and graphics hardware)
+LZO       - www.oberhumer.com/opensource/lzo (portable lossless data compression library written in ANSI C)
+libjpeg   - libjpeg-turbo.org (JPEG runtime library)
+
+Utils
+-----
+innoextract - constexpr.org/innoextract (used to extract files from the GOG installer)
+
+Distro packages
+---------------
+* Ubuntu Bionic 18.04
+innoextract libglew2.0 libfreeimage3 liblockfile1 libopenal1 libtbb2 libcrypto++6 libpugixml1v5 libtheora0 libogg0 libsdl2-2.0-0 liblzo2-2 libjpeg8
+
+* Fedora
+???
+
+2. GAME FILES
+=============
+From GOG installer
+------------------
+* Extract game files (note the -g switch)
+innoextract -g 'setup_stalker_cop_2.1.0.17.exe'
+
+* Move the files to the desired directory
+# should already be there if you've followed INSTALL
+mkdir ~/scop
+mv game/* ~/scop
+cd ~/scop
+
+-OR-
+
+From retail release
+-------------------
+* Extract
+* RUSSIAN RELEASE ONLY - Install patch 1.6.02
+http://cop.stalker-game.ru/?page=patches#2
+wget 'http://files.gsc-game.com/st/cop/setup-cop-rp-any-02.exe'
+* ???

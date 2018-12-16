@@ -1,0 +1,43 @@
+WELCOME TO THE XRAY-16 PROJECT!
+===============================
+This README file is for the xray-16 computer game engine.
+
+xray-16 is a development of the engine used in STALKER: Call of Pripyat game
+originally developed by GSC Game World and released in 2009.
+
+It's an effort to get the code into a better shape by fixing bugs and
+refactoring the code.
+It is collectively developed by the OpenXRay community (github.com/OpenXRay).
+It supports GNU/Linux and MS Windows™ on x86/x64 platforms.
+
+LICENSING NOTES
+===============
+Be advised that at the time of writing, this project is NOT endorsed by GSC
+Game World in any way – GSC remains the copyright holder for the original
+source code.
+
+System requirements
+===================
+Supported OSes
+--------------
+* GNU/Linux
+* BSD (?)
+* MS Windows™
+
+Supported platforms
+-------------------
+* x86
+* x64
+
+Hardware requirements
+---------------------
+???
+
+Manifest
+========
+README        - this file
+INSTALL.linux - build instructions
+SETUP.linux   - setting up game files for xray-16
+USAGE.linux   - launching the game and other options
+DEBUG.linux   - debugging instructions
+CONTRIBUTE    - contributing guidelines
