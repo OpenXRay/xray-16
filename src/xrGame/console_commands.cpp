@@ -1682,22 +1682,33 @@ public:
 
 class CCC_GSCheckForUpdates : public IConsole_Command
 {
+private:
+    CGameSpy_Patching::PatchCheckCallback m_resultCallbackBinded;
+    std::atomic<bool> m_checkInProgress = false;
+
+    void xr_stdcall ResultCallback(bool success, pcstr VersionName, pcstr URL)
+    {
+        auto mm = MainMenu();
+        if (mm != nullptr)
+        {
+            mm->OnPatchCheck(success, VersionName, URL);
+        }
+        m_checkInProgress.store(false);
+    }
+
 public:
-    CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N)
+    {
+        m_resultCallbackBinded.bind(this, &CCC_GSCheckForUpdates::ResultCallback);
+        bEmptyArgsHandled = true;
+    };
+
     virtual void Execute(LPCSTR arguments)
     {
-        if (!MainMenu())
+        auto mm = MainMenu();
+        if (mm == nullptr)
             return;
-        /*
-        CGameSpy_Available GSA;
-        shared_str result_string;
-        if (!GSA.CheckAvailableServices(result_string))
-        {
-            Msg(*result_string);
-//			return;
-        };
-        CGameSpy_Patching GameSpyPatching;
-        */
+
         bool InformOfNoPatch = true;
         if (arguments && *arguments)
         {
@@ -1706,10 +1717,10 @@ public:
             InformOfNoPatch = (bInfo != 0);
         }
 #ifdef WINDOWS
-        //		GameSpyPatching.CheckForPatch(InformOfNoPatch);
-        CGameSpy_Patching::PatchCheckCallback cb;
-        cb.bind(MainMenu(), &CMainMenu::OnPatchCheck);
-        MainMenu()->GetGS()->GetGameSpyPatching()->CheckForPatch(InformOfNoPatch, cb);
+        if (!m_checkInProgress.exchange(true))
+        {
+            mm->GetGS()->GetGameSpyPatching()->CheckForPatch(InformOfNoPatch, m_resultCallbackBinded);
+        }
 #endif
     }
 };
