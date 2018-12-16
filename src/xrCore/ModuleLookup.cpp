@@ -1,9 +1,8 @@
 #include "stdafx.h"
 
+#include <SDL_loadso.h>
+
 #include "ModuleLookup.hpp"
-#ifdef LINUX
-#include <dlfcn.h>
-#endif
 
 namespace XRay
 {
@@ -24,21 +23,24 @@ void* ModuleHandle::Open(pcstr moduleName)
     if (IsLoaded())
         Close();
 
-    Log("Loading DLL:", moduleName);
+    Log("Loading module:", moduleName);
+
+    xr_string buf(moduleName);
 
 #ifdef WINDOWS
-    handle = LoadLibraryA(moduleName);
+    buf += ".dll";
 #elif defined(LINUX)
-    std::string soName = std::string(moduleName) + ".so";
-    handle = dlopen(soName.c_str(), RTLD_LAZY);
+    buf += ".so";
+#else
+#error add your platform-specific extension here
 #endif
-    if (handle == nullptr)
+
+    handle = SDL_LoadObject(buf.c_str());
+
+    if (!handle)
     {
-#ifdef WINDOWS
-        Msg("! Failed to load DLL: 0x%d", GetLastError());
-#elif defined(LINUX)
-        Msg("! Failed to load shared library %s: %s", soName.c_str(), dlerror());
-#endif
+        Log("! Failed to load module:", moduleName);
+        Log("!", SDL_GetError());
     }
 
     return handle;
@@ -49,23 +51,7 @@ void ModuleHandle::Close()
     if (dontUnload)
         return;
 
-    bool closed = false;
-
-#ifdef WINDOWS
-    closed = FreeLibrary(static_cast<HMODULE>(handle)) != 0;
-#elif defined(LINUX)
-    closed = dlclose(handle) == 0;
-#endif
-
-    if (closed == false)
-    {
-#ifdef WINDOWS
-        Msg("! Failed to close DLL: 0x%d", GetLastError());
-#elif defined(LINUX)
-        Msg("! Failed to close shared library: %s", dlerror());
-#endif
-    }
-
+    SDL_UnloadObject(handle);
     handle = nullptr;
 }
 
@@ -81,21 +67,12 @@ void* ModuleHandle::operator()() const
 
 void* ModuleHandle::GetProcAddress(pcstr procName) const
 {
-    void* proc = nullptr;
+    const auto proc = SDL_LoadFunction(handle, procName);
 
-#ifdef WINDOWS
-    proc = ::GetProcAddress(static_cast<HMODULE>(handle), procName);
-#elif defined(LINUX)
-    proc = dlsym(handle, procName);
-#endif
-
-    if (proc == nullptr)
+    if (!proc)
     {
-#ifdef WINDOWS
-        Msg("! Failed to load procedure [%s] from DLL: 0x%d", procName, GetLastError());
-#elif defined(LINUX)
-        Msg("! Failed to load procedure [%s] from shared library: %s", procName, dlerror());
-#endif
+        Log("! Failed to load function from module:", procName);
+        Log("!", SDL_GetError());
     }
 
     return proc;

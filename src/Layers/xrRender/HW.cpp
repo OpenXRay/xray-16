@@ -15,7 +15,7 @@ CHW::~CHW() {}
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
-    hD3D = XRay::LoadModule(GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9.dll");
+    hD3D = XRay::LoadModule(GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9");
     R_ASSERT2(hD3D->IsLoaded(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
 
     using _Direct3DCreate9 = IDirect3D9* WINAPI(UINT SDKVersion);
