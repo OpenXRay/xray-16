@@ -2,29 +2,27 @@
 #include "xr_3da/resource.h"
 #include "splash.h"
 
-#if defined(WINDOWS)
-HWND logoWindow = nullptr;
-#else
 SDL_Window* logoWindow = nullptr;
-SDL_Renderer *logoRenderer;
-#endif
 
-#if defined(WINDOWS)
-static INT_PTR CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
+SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
 {
-    switch (msg)
+    const auto pitch = source->pitch;
+    const auto size = pitch * source->h;
+
+    auto original = static_cast<u8*>(alloca(size));
+    CopyMemory(original, source->pixels, size);
+
+    auto flipped = static_cast<u8*>(source->pixels) + size;
+
+    for (auto line = 0; line < source->h; ++line)
     {
-    case WM_DESTROY: break;
-    case WM_CLOSE: DestroyWindow(hw); break;
-    case WM_COMMAND:
-        if (LOWORD(wp) == IDCANCEL)
-            DestroyWindow(hw);
-        break;
-    default: return false;
+        CopyMemory(flipped, original, pitch);
+        original += pitch;
+        flipped -= pitch;
     }
-    return true;
+
+    return source;
 }
-#endif
 
 namespace splash
 {
@@ -32,50 +30,58 @@ void show(const bool topmost)
 {
     if (logoWindow)
         return;
-#if defined(WINDOWS)
-    logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
-    const HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
-    RECT logoRect;
-    GetWindowRect(logoPicture, &logoRect);
-    const HWND prevWindow = topmost ? HWND_TOPMOST : HWND_NOTOPMOST;
-    SetWindowPos(logoWindow, prevWindow, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top,
-        SWP_NOMOVE | SWP_SHOWWINDOW);
-    UpdateWindow(logoWindow);
-#else
-    SDL_CreateWindowAndRenderer(320, 240, SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN, &logoWindow, &logoRenderer);
 
-    SDL_Surface *surface = SDL_LoadBMP("logo.bmp"); // need placed logo.bmp beside of fsgame.ltx
-    if (!surface) {
-        Msg("Couldn't create surface from image: %s", SDL_GetError());
+#ifdef WINDOWS
+    BITMAP splash;
+    HBITMAP bitmapHandle = (HBITMAP)LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDB_BITMAP1), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+    const int bitmapSize = GetObject(bitmapHandle, sizeof(BITMAP), &splash);
+
+    if (0 == bitmapSize)
+    {
+        DeleteObject(bitmapHandle);
         return;
     }
 
-    SDL_Rect rect;
-    SDL_GetClipRect(surface, &rect);
-    SDL_SetWindowSize(logoWindow, rect.w, rect.h);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(logoRenderer, surface);
+    constexpr Uint32 alpha = 0xFF000000;
+    constexpr Uint32 red   = 0x00FF0000;
+    constexpr Uint32 green = 0x0000FF00;
+    constexpr Uint32 blue  = 0x000000FF;
+
+    SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(
+        splash.bmBits, splash.bmWidth, splash.bmHeight,
+        splash.bmBitsPixel, splash.bmWidthBytes,
+        red, green, blue, alpha);
+#else
+    SDL_Surface* surface = SDL_LoadBMP("logo.bmp"); // need placed logo.bmp beside of fsgame.ltx
+#endif // WINDOWS
+
+    if (!surface)
+    {
+        Log("Couldn't create surface from image:", SDL_GetError());
+        return;
+    }
+
+    Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_SKIP_TASKBAR;
+    if (topmost)
+        flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+
+    logoWindow = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, surface->w, surface->h, flags);
+    const auto logoSurface = SDL_GetWindowSurface(logoWindow);
+
+    XRSDL_SurfaceVerticalFlip(surface);
+    SDL_BlitSurface(surface, nullptr, logoSurface, nullptr);
+
     SDL_FreeSurface(surface);
     SDL_ShowWindow(logoWindow);
-
-    SDL_SetRenderDrawColor(logoRenderer, 0x00, 0x00, 0x00, 0x00);
-    SDL_RenderClear(logoRenderer);
-    SDL_RenderCopy(logoRenderer, texture, NULL, NULL);
-    SDL_RenderPresent(logoRenderer);
     SDL_UpdateWindowSurface(logoWindow);
-
-#endif
 }
 
 void hide()
 {
     if (logoWindow != nullptr)
     {
-#if defined(WINDOWS)
-        DestroyWindow(logoWindow);
-#else
         SDL_DestroyWindow(logoWindow);
-#endif
         logoWindow = nullptr;
     }
 }
-}
+} // namespace splash
