@@ -70,12 +70,10 @@ All mentioned libraries are already in repository as submodules!
 
 Setup:
 ------
-- Install S.T.A.L.K.E.R Call of Pripyat using wine.
+- Install S.T.A.L.K.E.R Call of Pripyat using wine (or obtain game resources another way, e.g. via Steam or GOG, all path below for example with wine).
 For example if you have a cd-rom you can type `wine setup.exe` to start installation. 
 It's recommended do not use path with spaces, for instance you can use "c:\cop" as 
 an installation path (it will be `~/.wine/drive_c/cop` path on your host linux machine).
-- Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
-  http://cop.stalker-game.ru/?page=patches#2
 
 After building in the engine folder do (assuming you installed CoP in "c:\cop"):
 ```
