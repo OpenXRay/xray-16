@@ -1685,15 +1685,27 @@ class CCC_GSCheckForUpdates : public IConsole_Command
 private:
     CGameSpy_Patching::PatchCheckCallback m_resultCallbackBinded;
     std::atomic<bool> m_checkInProgress = false;
+    bool m_informNoPatch = true;
 
     void xr_stdcall ResultCallback(bool success, pcstr VersionName, pcstr URL)
     {
         auto mm = MainMenu();
-        if (mm != nullptr)
+        if ((success || m_informNoPatch) && mm != nullptr)
         {
             mm->OnPatchCheck(success, VersionName, URL);
         }
         m_checkInProgress.store(false);
+    }
+
+    void SetupCallParams(pcstr args)
+    {
+        m_informNoPatch = true;
+        if (args && *args)
+        {
+            int bInfo = 1;
+            sscanf(args, "%d", &bInfo);
+            m_informNoPatch = (bInfo != 0);
+        }
     }
 
 public:
@@ -1709,17 +1721,11 @@ public:
         if (mm == nullptr)
             return;
 
-        bool InformOfNoPatch = true;
-        if (arguments && *arguments)
-        {
-            int bInfo = 1;
-            sscanf(arguments, "%d", &bInfo);
-            InformOfNoPatch = (bInfo != 0);
-        }
 #ifdef WINDOWS
         if (!m_checkInProgress.exchange(true))
         {
-            mm->GetGS()->GetGameSpyPatching()->CheckForPatch(InformOfNoPatch, m_resultCallbackBinded);
+            SetupCallParams(arguments);
+            mm->GetGS()->GetGameSpyPatching()->CheckForPatch(true, m_resultCallbackBinded);
         }
 #endif
     }
