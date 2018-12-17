@@ -328,12 +328,8 @@ public:
 
     void __stdcall sending_screenshot_callback(file_transfer::sending_status_t status, u32 bytes_sent, u32 data_size);
     //-------------------------------------------------------------------------------------------------
-#ifdef WINDOWS
-    static void generate_file_name(string_path& file_name, LPCSTR file_suffix, SYSTEMTIME const& date_time);
-#else
-    static void generate_file_name(string_path& file_name, LPCSTR file_suffix, time_t& date_time);
-#endif
-    static LPCSTR make_file_name(LPCSTR session_id, string_path& dest);
+    static xr_string generate_file_name(const xr_string& base_name, const time_t* date_time = nullptr);
+    static xr_string sanitize_filename(const xr_string& base_name);
 //-------------------------------------------------------------------------------------------------
 #include "game_cl_mp_messages_menu.h"
 };
