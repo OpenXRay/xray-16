@@ -130,23 +130,13 @@ void clientdata_proxy::save_proxy_screenshot()
     if (!clgame)
         return;
 
-    string_path screenshot_fn;
-    string_path str_digest;
+    xr_string base_name = xr_string(m_cheater_name.c_str()) + '_';
+    base_name += m_cheater_digest.size() ? m_cheater_digest.c_str() : "nulldigest";
 
-    LPCSTR dest_file_name = NULL;
-    STRCONCAT(dest_file_name, clgame->make_file_name(m_cheater_name.c_str(), screenshot_fn), "_",
-        (m_cheater_digest.size() ? clgame->make_file_name(m_cheater_digest.c_str(), str_digest) : "nulldigest"));
-#ifdef WINDOWS
-    SYSTEMTIME date_time;
-    GetLocalTime(&date_time);
-#else
-    time_t date_time;
-    time(&date_time);
-#endif
-    clgame->generate_file_name(screenshot_fn, dest_file_name, date_time);
+    xr_string fname = clgame->generate_file_name(base_name);
 
     clgame->decompress_and_save_screenshot(
-        screenshot_fn, my_proxy_mem_file.pointer(), my_proxy_mem_file.size(), m_receiver->get_user_param());
+        fname.c_str(), my_proxy_mem_file.pointer(), my_proxy_mem_file.size(), m_receiver->get_user_param());
 }
 
 void clientdata_proxy::save_proxy_config()
@@ -155,20 +145,9 @@ void clientdata_proxy::save_proxy_config()
     if (!clgame)
         return;
 
-    string_path config_fn;
-    LPCSTR fn_suffix = NULL;
-    string_path dest_file_name;
+    xr_string name = clgame->generate_file_name(xr_string(m_cheater_name.c_str()) + ".cltx");
 
-    STRCONCAT(fn_suffix, clgame->make_file_name(m_cheater_name.c_str(), config_fn), ".cltx");
-#ifndef LINUX // FIXME!!!
-    SYSTEMTIME date_time;
-    GetLocalTime(&date_time);
-#else
-    time_t date_time;
-    time(&date_time);
-#endif
-    clgame->generate_file_name(dest_file_name, fn_suffix, date_time);
-    IWriter* tmp_writer = FS.w_open("$screenshots$", dest_file_name);
+    IWriter* tmp_writer = FS.w_open("$screenshots$", name.c_str());
     if (!tmp_writer)
         return;
     tmp_writer->w_u32(m_receiver->get_user_param()); // unpacked size
