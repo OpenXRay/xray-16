@@ -68,7 +68,9 @@ void show(const bool topmost)
     logoWindow = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, surface->w, surface->h, flags);
     const auto logoSurface = SDL_GetWindowSurface(logoWindow);
 
+#ifdef WINDOWS
     XRSDL_SurfaceVerticalFlip(surface);
+#endif
     SDL_BlitSurface(surface, nullptr, logoSurface, nullptr);
 
     SDL_FreeSurface(surface);
