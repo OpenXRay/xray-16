@@ -20,6 +20,7 @@
 #include <sys/mman.h> // for mmap / munmap
 #include <dirent.h>
 #include <utime.h>
+#include <ctime>
 
 #define _LINUX // for GameSpy
 
@@ -1101,3 +1102,5 @@ inline void restore_path_separators(char * path)
 {
     while (char* sep = strchr(path, '/')) *sep = '\\'; //
 }
+
+inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_r(time, result); }

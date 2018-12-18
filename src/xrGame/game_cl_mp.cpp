@@ -1526,33 +1526,36 @@ void game_cl_mp::SendCollectedData(u8 const* buffer, u32 buffer_size, u32 uncomp
         upload_memory_writer.pointer(), upload_memory_writer.size(), sending_cb, uncompressed_size);
 };
 
-#ifdef WINDOWS
-void game_cl_mp::generate_file_name(string_path& file_name, LPCSTR file_suffix, SYSTEMTIME const& date_time)
+xr_string game_cl_mp::generate_file_name(const xr_string& base_name, const time_t* date_time)
 {
-    xr_sprintf(file_name, "%02d%02d%02d-%02d%02d%02d_%s", date_time.wYear % 100, date_time.wMonth, date_time.wDay,
-        date_time.wHour, date_time.wMinute, date_time.wSecond, file_suffix);
-}
-#else
-void game_cl_mp::generate_file_name(string_path& file_name, LPCSTR file_suffix, time_t& date_time)
-{
-    xr_sprintf(file_name, "%s_%s", ctime(date_time), file_suffix);
-}
-#endif
+    xr_string res = sanitize_filename(base_name);
 
-LPCSTR game_cl_mp::make_file_name(LPCSTR session_id, string_path& dest)
-{
-    xr_strcpy(dest, sizeof(dest), session_id);
-    static const char* denied_symbols = "/" DELIMITER "?%%*:|\"<>.";
-    size_t tmp_length = xr_strlen(dest);
-    size_t start_pos = 0;
-    size_t char_pos;
-    while ((char_pos = strcspn(dest + start_pos, denied_symbols)) < (tmp_length - start_pos))
+    time_t file_time = (date_time != nullptr) ? *date_time : time(nullptr);
+
+    tm time_splitted;
+    if (localtime_safe(&file_time, &time_splitted) != nullptr)
     {
-        char_pos += start_pos;
-        dest[char_pos] = '_';
-        ++start_pos;
+        string16 date_str = {};
+        xr_sprintf(date_str, "%02d%02d%02d-%02d%02d%02d_", time_splitted.tm_year % 100, time_splitted.tm_mon,
+            time_splitted.tm_mday, time_splitted.tm_hour, time_splitted.tm_min, time_splitted.tm_sec);
+        res = xr_string(date_str) + res;
     }
-    return dest;
+    return res;
+}
+
+xr_string game_cl_mp::sanitize_filename(const xr_string& base_name)
+{
+    xr_string res = base_name;
+
+    for (size_t i = 0; i < res.length(); ++i)
+    {
+        static const char* DENIED_SYMBOLS = "/\\" DELIMITER "?%%*:|\"<>.";
+        if (strchr(DENIED_SYMBOLS, res[i]) != nullptr)
+        {
+            res[i] = '_';
+        }
+    }
+    return res;
 }
 
 void game_cl_mp::start_receive_server_info(ClientID const& svclient_id)
@@ -1577,18 +1580,6 @@ void game_cl_mp::start_receive_server_info(ClientID const& svclient_id)
 void game_cl_mp::PrepareToReceiveFile(
     ClientID const& from_client, shared_str const& client_session_id, clientdata_event_t response_event)
 {
-    string_path screen_shot_fn;
-    LPCSTR dest_file_name = NULL;
-    STRCONCAT(dest_file_name, make_file_name(client_session_id.c_str(), screen_shot_fn));
-#ifdef WINDOWS // FIXME!!!
-    SYSTEMTIME date_time;
-    GetLocalTime(&date_time);
-#else
-    time_t date_time;
-    time(&date_time);
-#endif
-    generate_file_name(screen_shot_fn, dest_file_name, date_time);
-
     fr_callback_binder* tmp_binder = get_receiver_cb_binder();
     if (!tmp_binder)
     {
@@ -1605,7 +1596,8 @@ void game_cl_mp::PrepareToReceiveFile(
         draw_downloads(false);
     }
 
-    tmp_binder->m_file_name = screen_shot_fn;
+    xr_string base_name = client_session_id.c_str();
+    tmp_binder->m_file_name = generate_file_name(base_name).c_str();
     tmp_binder->m_owner = this;
     tmp_binder->m_active = true;
     tmp_binder->m_downloaded_size = 0; // initial value for rendering
