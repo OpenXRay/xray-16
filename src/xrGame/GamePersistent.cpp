@@ -238,7 +238,9 @@ void CGamePersistent::OnAppEnd()
 
     GMLib.Unload();
 
+#ifdef WINDOWS
     xr_delete(ansel);
+#endif
 }
 
 void CGamePersistent::Start(LPCSTR op) { inherited::Start(op); }
