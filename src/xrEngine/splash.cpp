@@ -61,9 +61,13 @@ void show(const bool topmost)
         return;
     }
 
-    Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_SKIP_TASKBAR;
+    Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
+    
+#if SDL_VERSION_ATLEAST(2,0,5)
+    flags |= SDL_WINDOW_SKIP_TASKBAR;
     if (topmost)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+#endif
 
     logoWindow = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, surface->w, surface->h, flags);
     const auto logoSurface = SDL_GetWindowSurface(logoWindow);
