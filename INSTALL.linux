@@ -28,15 +28,14 @@ Autodesk 3DS Max 6.0 SDK - https://github.com/OpenXRay/3dsmax
 
 Distro packages
 ---------------
-* Ubuntu Bionic 18.04
+# Ubuntu Bionic 18.04
 cmake libglew-dev libfreeimage-dev liblockfile-dev libopenal-dev libtbb-dev libcrypto++-dev libpugixml-dev libogg-dev libtheora-dev libvorbis-dev libsdl2-dev liblzo2-dev libjpeg-dev libncurses5-dev libreadline-dev
 
-* Fedora 2?
+# Fedora 2?
 cmake glew-devel freeimage-devel liblockfile-devel openal-devel tbb-devel cryptopp-devel pugixml-devel libogg-devel libtheora-devel libvorbis-devel SDL2-devel lzo-devel libjpeg-turbo-devel
 
 Getting the source
 ------------------
-cd
 git clone https://github.com/OpenXRay/xray-16.git --recurse-submodules
 
 2. BUILD
@@ -45,23 +44,26 @@ cd xray-16
 mkdir build
 cd build
 cmake ..
-make -jX #where X is the number of build host CPU cores
+# X - max simultaneous jobs make will invoke
+make -jX
 
 Build options
 -------------
-* Enable debugging:
+# Enable debugging
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-* Compile with clang:
+# Compile with clang
 CC=clang CXX=clang++ cmake ..
 
-* Optimize for the host CPU:
+# Optimize for the host CPU
 CFLAGS="-march=native" CXXFLAGS="-march=native" cmake ..
 
 3. INSTALL
 ==========
+# Directory to hold the binaries
 mkdir -p ~/scop/linux
 make DESTDIR=~/scop/linux install
+# Some configs & resources distributed with xray-16
 cp -r ../res/* ~/scop/
 
 4. SETUP AND RUN

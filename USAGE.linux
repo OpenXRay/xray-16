@@ -1,8 +1,8 @@
 LAUNCH
 ======
 
-# cd where you have put the binaries
+# cd to where you have put the binaries
 cd ~/scop/linux
 
-# fsgame.ltx comes from the res/ dir
+# 'fsgame.ltx' can be found in the xray-16 res/ dir
 ./xr_3da.sh -fsltx ../fsgame.ltx
