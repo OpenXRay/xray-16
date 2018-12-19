@@ -79,73 +79,79 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         );
 
         // Determine visibility for static geometry hierrarhy
-        for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+        if (psDeviceFlags.test(rsDrawStatic))
         {
-            CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
-            dxRender_Visual* root = sector->root();
-            for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+            for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
             {
-                set_Frustum(&sector->r_frustums[v_it]);
-                add_Geometry(root);
+                CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+                dxRender_Visual* root = sector->root();
+                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                {
+                    set_Frustum(&sector->r_frustums[v_it]);
+                    add_Geometry(root);
+                }
             }
         }
 
         // Traverse frustums
-        for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
+        if (psDeviceFlags.test(rsDrawDynamic))
         {
-            ISpatial* spatial = lstRenderables[o_it];
-            spatial->spatial_updatesector();
-            CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-            if (nullptr == sector) continue; // disassociated from S/P structure
-
-            if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
+            for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
             {
-                // lightsource
-                light* L = (light*)spatial->dcast_Light();
-                VERIFY (L);
-                float lod = L->get_LOD();
-                if (lod > EPS_L)
+                ISpatial* spatial = lstRenderables[o_it];
+                spatial->spatial_updatesector();
+                CSector* sector = (CSector*)spatial->GetSpatialData().sector;
+                if (nullptr == sector) continue; // disassociated from S/P structure
+
+                if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
                 {
-                    vis_data& vis = L->get_homdata();
-                    if (HOM.visible(vis)) Lights.add_light(L);
-                }
-                continue ;
-            }
-
-            if (PortalTraverser.i_marker != sector->r_marker) continue; // inactive (untouched) sector
-            for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
-            {
-                CFrustum& view = sector->r_frustums[v_it];
-                if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
+                    // lightsource
+                    light* L = (light*)spatial->dcast_Light();
+                    VERIFY(L);
+                    float lod = L->get_LOD();
+                    if (lod > EPS_L)
+                    {
+                        vis_data& vis = L->get_homdata();
+                        if (HOM.visible(vis)) Lights.add_light(L);
+                    }
                     continue;
-
-                if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
-                {
-                    // renderable
-                    IRenderable* renderable = spatial->dcast_Renderable();
-                    VERIFY (renderable);
-
-                    // Occlusion
-                    //	casting is faster then using getVis method
-                    vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
-                    vis_data v_copy = v_orig;
-                    v_copy.box.xform(renderable->GetRenderData().xform);
-                    BOOL bVisible = HOM.visible(v_copy);
-                    v_orig.marker = v_copy.marker;
-                    v_orig.accept_frame = v_copy.accept_frame;
-                    v_orig.hom_frame = v_copy.hom_frame;
-                    v_orig.hom_tested = v_copy.hom_tested;
-                    if (!bVisible) break; // exit loop on frustums
-
-                    // Rendering
-                    set_Object(renderable);
-                    renderable->renderable_Render();
-                    set_Object(nullptr);
                 }
-                break; // exit loop on frustums
+
+                if (PortalTraverser.i_marker != sector->r_marker) continue; // inactive (untouched) sector
+                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                {
+                    CFrustum& view = sector->r_frustums[v_it];
+                    if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
+                        continue;
+
+                    if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
+                    {
+                        // renderable
+                        IRenderable* renderable = spatial->dcast_Renderable();
+                        VERIFY(renderable);
+
+                        // Occlusion
+                        //	casting is faster then using getVis method
+                        vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
+                        vis_data v_copy = v_orig;
+                        v_copy.box.xform(renderable->GetRenderData().xform);
+                        BOOL bVisible = HOM.visible(v_copy);
+                        v_orig.marker = v_copy.marker;
+                        v_orig.accept_frame = v_copy.accept_frame;
+                        v_orig.hom_frame = v_copy.hom_frame;
+                        v_orig.hom_tested = v_copy.hom_tested;
+                        if (!bVisible) break; // exit loop on frustums
+
+                        // Rendering
+                        set_Object(renderable);
+                        renderable->renderable_Render();
+                        set_Object(nullptr);
+                    }
+                    break; // exit loop on frustums
+                }
             }
+            if (g_pGameLevel && phase == PHASE_NORMAL) g_hud->Render_Last(); // HUD
         }
-        if (g_pGameLevel && phase == PHASE_NORMAL) g_hud->Render_Last(); // HUD
     }
     else
     {

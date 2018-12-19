@@ -91,8 +91,8 @@ ICF void CBackend::set_GS(GLuint _gs, LPCSTR _n)
 #ifdef RBackend_PGO
 		string_path name;
 #endif
-        PGO(glGetObjectLabel(GL_PROGRAM, _ps, sizeof(name), nullptr, name));
-        PGO(Msg("PGO:Gshader:%d,%s", _ps, _n ? _n : name));
+        PGO(glGetObjectLabel(GL_PROGRAM, _gs, sizeof(name), nullptr, name));
+        PGO(Msg("PGO:Gshader:%d,%s", _gs, _n ? _n : name));
         //	TODO: OGL: Get statistics for G Shader change
         //stat.gs			++;
         gs = _gs;
@@ -201,8 +201,7 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
     stat.verts += countV;
     stat.polys += PC;
     constants.flush();
-    CHK_GL(glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV)
-    );
+    CHK_GL(glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV));
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
 }
 

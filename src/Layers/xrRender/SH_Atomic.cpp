@@ -134,9 +134,11 @@ SInputSignature::~SInputSignature()
 //	SState
 SState::~SState()
 {
-#ifndef USE_OGL
+#ifdef USE_OGL
+    state.Release();
+#else // USE_OGL
     _RELEASE(state);
-#endif // !USE_OGL
+#endif // USE_OGL
     RImplementation.Resources->_DeleteState(this);
 }
 
@@ -145,7 +147,10 @@ SState::~SState()
 SDeclaration::~SDeclaration()
 {
     RImplementation.Resources->_DeleteDecl(this);
-#if defined(USE_DX10) || defined(USE_DX11)
+    //	Release vertex layout
+#ifdef USE_OGL
+    glDeleteBuffers(1, &dcl);
+#elif defined(USE_DX10) || defined(USE_DX11)
     xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)
@@ -154,11 +159,6 @@ SDeclaration::~SDeclaration()
         _RELEASE(iLayout->second);
     }
 #else // USE_DX10
-    //	Release vertex layout
-#ifdef USE_OGL
-    glDeleteBuffers(1, &dcl);
-#else
     _RELEASE(dcl);
-#endif // USE_OGL
 #endif // USE_DX10
 }

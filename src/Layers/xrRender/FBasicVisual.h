@@ -30,7 +30,7 @@ struct IRender_Mesh
     // indices
 #ifdef USE_OGL
     GLuint p_rm_Indices;
-#else
+#else // USE_OGL
     ID3DIndexBuffer* p_rm_Indices;
 #endif // USE_OGL
     u32 iBase;
@@ -39,8 +39,14 @@ struct IRender_Mesh
 
     IRender_Mesh()
     {
-        p_rm_Vertices = 0;
-        p_rm_Indices = 0;
+        p_rm_Vertices   = 0;
+        vBase           = 0;
+        vCount          = 0;
+        p_rm_Indices    = 0;
+        iBase           = 0;
+        iCount          = 0;
+        dwPrimitives    = 0;
+        rm_geom         = nullptr;
     }
     virtual ~IRender_Mesh();
 

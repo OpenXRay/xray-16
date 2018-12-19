@@ -694,4 +694,4 @@ void CSkeletonX::_DuplicateIndices(const char* /*N*/, IReader* data)
     u32 crc = crc32(data->pointer(), size);
     m_Indices.create(crc, iCount, (u16*)data->pointer());
 }
-#endif //	USE_DX10
+#endif // !USE_DX9

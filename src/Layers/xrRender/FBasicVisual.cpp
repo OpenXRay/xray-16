@@ -19,12 +19,13 @@
 IRender_Mesh::~IRender_Mesh()
 {
 #ifdef USE_OGL
-    GLuint buffers[] = { p_rm_Vertices, p_rm_Indices };
-    glDeleteBuffers(2, buffers);
-#else
+    glDeleteBuffers(1, &p_rm_Vertices);
+    glDeleteBuffers(1, &p_rm_Indices);
+#else // USE_OGL
     _RELEASE(p_rm_Vertices);
     _RELEASE(p_rm_Indices);
 #endif // USE_OGL
+    rm_geom = nullptr;
 }
 
 dxRender_Visual::dxRender_Visual()
