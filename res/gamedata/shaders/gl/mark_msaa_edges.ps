@@ -27,7 +27,7 @@ float4 _main ( p_TL2uv_msaa I )
 		N += gbd.N / float(MSAA_SAMPLES);
 	}
 	
-	if (all(P==P0 && N==N0))
+	if (all(P==P0) && all(N==N0))
 	   discard;
 
 #endif // #if MSAA_SAMPLES
