@@ -1,21 +1,20 @@
 #include "common.h"
-#include "iostructs\p_TL.h"
+
+out vec4 SV_Target;
+
+layout(location = TEXCOORD0) in float2 tc;
 
 uniform sampler2D 	s_distort;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
-float4 _main ( p_TL I )
+void main ()
 {
-	float2 	distort	= tex2D		(s_distort, I.Tex0).xy;
-//	float2	offset	= (distort-0.5)*def_distort;	
-	//
-	float2	offset	= -(distort-float2(0.5, 0.5))*def_distort;		// SkyLoader: added hack to distort in menu because it works incorrect with disabled glClipControl
-		offset.x *= 0.4;
-		offset.y *= 0.7;
-	//
-	float3	image 	= tex2D		(s_base, I.Tex0 + offset).rgb;
+	float2 distort	= tex2D(s_distort, tc).xy;
+	float2 offset	= (distort-0.5)*def_distort;
+	offset.y		*= -1.0;
+	float3 image	= tex2D(s_base, tc + offset).rgb;
 
 	// out
-	return  float4	(image, 1.0);					// +mov
+	SV_Target		= float4 (image, 1.0);					// +mov
 }
