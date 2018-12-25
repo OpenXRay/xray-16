@@ -76,22 +76,21 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;
-    static std::locale locale("");
-    LPSTR commandLine = nullptr;
+    static std::locale locale(""); // set default locale for current machine
+    pstr commandLine = nullptr;
     try
     {
-
         int i;
         if(argc > 1)
         {
             size_t sum = 0;
-            for(i = 1; i < argc; ++i)
+            for(i = 1; i < argc; i++)
                 sum += xr_strlen(argv[i]) + xr_strlen(" ") + sizeof('\0');
 
-            commandLine = (LPSTR)malloc(sum);
-            xr_memset((void*)commandLine, 0, sum);
+            commandLine = static_cast<pstr>(malloc(sum));
+            xr_memset(static_cast<void*>(commandLine), 0, sum);
 
-            for(i = 1; i < argc; ++i)
+            for(i = 1; i < argc; i++)
             {
                 strcat(commandLine, argv[i]);
                 strcat(commandLine, " ");

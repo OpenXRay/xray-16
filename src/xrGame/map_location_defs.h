@@ -1,8 +1,6 @@
 #pragma once
 #include "alife_abstract_registry.h"
 
-//class CMapLocation;
-
 
 struct SLocationKey : public ISerializable, public IPureDestroyableObject
 {

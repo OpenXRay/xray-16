@@ -375,7 +375,7 @@ void dTimerReport (FILE *fout, int average)
 
   // get maximum description length
   maxl = 0;
-  for (i=0; i<num; ++i)
+  for (i=0; i<num; i++)
   {
     size_t l = strlen (event[i].description);
     if (l > maxl)

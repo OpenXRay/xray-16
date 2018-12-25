@@ -3,10 +3,7 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "xr_level_controller.h"
 
-CStringTable& StringTable()
-{
-    return *((CStringTable*)gStringTable);
-}
+CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 
 xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;

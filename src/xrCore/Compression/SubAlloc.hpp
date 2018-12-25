@@ -142,7 +142,7 @@ static void GlueFreeBlocks()
             if (!p->NU)
                 continue;
 
-            while ((p1 = p + p->NU)->Stamp == ~0UL)
+            while ((p1 = p + p->NU)->Stamp == ~0U)
             {
                 p->NU += p1->NU;
                 p1->NU = 0;
@@ -313,7 +313,7 @@ static void ExpandTextArea()
     UINT Count[N_INDEXES];
     memset(Count, 0, sizeof Count);
 
-    while ((p = (BLK_NODE*)UnitsStart)->Stamp == ~0UL)
+    while ((p = (BLK_NODE*)UnitsStart)->Stamp == ~0U)
     {
         MEM_BLK* pm = (MEM_BLK*)p;
         UnitsStart = (BYTE*)(pm + pm->NU);

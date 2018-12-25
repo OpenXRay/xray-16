@@ -234,7 +234,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
             value, currentFilter, true)));
         break;
     case D3DSAMP_MIPMAPLODBIAS: /* float Mipmap LOD bias */
-        CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, (GLfloat)value));
+        CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, static_cast<GLfloat>(value)));
         break;
     case D3DSAMP_MAXMIPLEVEL: /* DWORD 0..(n-1) LOD index of largest map to use (0 == largest) */
         CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_LEVEL, value));

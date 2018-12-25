@@ -236,6 +236,7 @@ bool CInput::iGetAsyncBtnState(int btn)
 void CInput::GrabInput(const bool grab)
 {
     // Self descriptive
+
     SDL_ShowCursor(grab ? SDL_FALSE : SDL_TRUE);
 
     // Clip cursor to the current window
