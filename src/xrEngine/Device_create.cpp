@@ -307,4 +307,3 @@ void FreeRefreshRateToken()
 
     VidRefreshRateToken.clear();
 }
-
