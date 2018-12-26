@@ -1,0 +1,111 @@
+Запуск под Linux
+
+Для сборки и запуска под дистрибутивами Linux основанных
+на пакетной базе Ubuntu16.04, необходимо собрать и установить
+новую версию glew. Актуальная версия на текущее время glew-2.1.0.
+Сборку и установку нужно производить из той версии, что упакована
+в архиве, ссылка на страницу загрузки:
+
+http://glew.sourceforge.net/
+
+Загрузить именно АРХИВ, распаковать и выполнить:
+
+cd ./glew-2.1.0
+make
+sudo make install
+
+Обратите внимание, что очень важно запустить сборку
+openxray ПОСЛЕ установки новой версии glew.
+
+Для справки, glew в LinuxMint18.3 устанавливается в папку:
+/usr/lib64/
+	libGLEW.a
+	libGLEW.so
+	libGLEW.so.2.1
+	libGLEW.so.2.1.0
+
+
+Например файлы у вас организованы вот так:
+
+/mnt/sdc1/openxray/xray-16/	<- Это папка с исходниками openxray
+	.git/
+	bin/
+	cmake/
+	doc/
+	Externals/
+	res/
+	sdk/
+	src/
+	...
+	
+/mnt/sdc1/stalkercop/	<- Это папка с игрой скачанной со Steam
+	bin/
+	bin-linux-dbg/		<- Это папка в которую копируются исполняемые файлы Linux
+		appdataroot/
+		libODE.so
+		luabind.so
+		luajit.so
+		OPCODE
+		xr_3da
+		...
+	gamedata/
+	levels/
+	...
+	Stalker-COP.exe
+
+Для сборки и последующего запуска удобно разместить свои файлы
+build.sh и run.sh вот так:
+/mnt/sdc1/openxray/
+	xray-16/
+	build.sh
+	run.sh
+
+	
+Содержание файла build.sh:
+---------------------------------
+#!/bin/bash
+cd ./xray-16/bin
+#Раскомментируйте строку ниже ТОЛЬКО ДЛЯ ПЕРВОГО запуска build.sh:
+#cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+make DESTDIR=../../../stalkercop/bin-linux-dbg install
+cd ../../
+
+Раскомментируйте строку
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+ТОЛЬКО ДЛЯ ПЕРВОГО запуска build.sh.
+
+
+Содержание файла run.sh:
+---------------------------------
+#!/bin/bash
+cd ../stalkercop/bin-linux-dbg
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/sdc1/stalkercop/bin-linux-dbg:/usr/lib64
+./xr_3da -fsltx ../fsgame.ltx -use_gl_4.1 -draw_borders -nointro
+cd ../../openxray
+
+
+Обратите внимание на пути, заносимые в переменую окружения LD_LIBRARY_PATH:
+/mnt/sdc1/stalkercop/bin-linux-dbg/ - это папка в которую копируются исполняемые файлы Linux.
+/usr/lib64/ - это папка в которую устанавливается glew после сборки.
+-use_gl_4.1 - этот флаг заставляет явно задать используемый профиль OpenGL.
+
+
+Создайте или откройте файл user.ltx:
+/mnt/sdc1/stalkercop/bin-linux-dbg/appdataroot/
+	logs/
+	savegames/
+	tmp.ltx
+	user.ltx
+
+	
+В файле user.ltx должны быть такие строки:
+vid_mode 1024x768
+rs_fullscreen off
+bind pause kP
+
+Теперь, находясь в папке /mnt/sdc1/openxray/, можно
+запускать игру скриптом run.sh, а собирать скриптом
+build.sh. Игра будет открываться в окне,так что будет
+возможность переключаться на окна других программ.
+После запуска игра будет стоять на паузе, нажмите
+клавишу `P` что бы продолжить.

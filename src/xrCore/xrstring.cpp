@@ -221,9 +221,12 @@ void str_container::verify()
 void str_container::dump()
 {
     impl->cs.Enter();
-    FILE* F = fopen("d:\\$str_dump$.txt", "w");
-    impl->dump(F);
-    fclose(F);
+    string_path dump_path;
+    FS.update_path(dump_path, "$app_data_root$", "str_dump.txt");
+    FILE* fp = fopen(dump_path, "w");
+    R_ASSERT(fp);
+    impl->dump(fp);
+    fclose(fp);
     impl->cs.Leave();
 }
 

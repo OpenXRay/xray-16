@@ -52,6 +52,10 @@ static BOOL bException = FALSE;
 #include <sys/user.h>
 #include <sys/ptrace.h>
 #include <execinfo.h>
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
 #endif
 #pragma comment(lib, "FaultRep.lib")
 
@@ -777,6 +781,11 @@ void _terminate()
 
 static void handler_base(const char* reason)
 {
+#if defined(LINUX)
+    void *array[10];
+    size_t bt_size = backtrace(array, sizeof(array)/sizeof(array[0]));  // get void*'s for all entries on the stack
+    backtrace_symbols_fd(array, bt_size, STDERR_FILENO);  // print out all the frames to stderr
+#endif // defined(LINUX)
     bool ignoreAlways = false;
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }

@@ -3,6 +3,7 @@
 #include "particle_manager.h"
 #include "particle_effect.h"
 #include "particle_actions_collection.h"
+#include <pthread.h>
 
 using namespace PAPI;
 
@@ -15,71 +16,45 @@ CParticleManager::~CParticleManager() {}
 
 ParticleEffect* CParticleManager::GetEffectPtr(int effect_id)
 {
-    R_ASSERT(effect_id >= 0 && effect_id < (int)effect_vec.size());
+    R_ASSERT((effect_id >= 0) && (effect_id < (int)effect_vec.size()));
+    R_ASSERT(effect_vec[effect_id] != nullptr);
     return effect_vec[effect_id];
 }
 
 ParticleActions* CParticleManager::GetActionListPtr(int a_list_num)
 {
     R_ASSERT(a_list_num >= 0 && a_list_num < (int)m_alist_vec.size());
+    R_ASSERT(m_alist_vec[a_list_num] != nullptr);
     return m_alist_vec[a_list_num];
 }
 
 // create
 int CParticleManager::CreateEffect(u32 max_particles)
 {
-    int eff_id = -1;
-    for (int i = 0; i < (int)effect_vec.size(); i++)
-        if (!effect_vec[i])
-        {
-            eff_id = i;
-            break;
-        }
-
-    if (eff_id < 0)
-    {
-        // Couldn't find a big enough gap. Reallocate.
-        eff_id = effect_vec.size();
-        effect_vec.push_back(nullptr);
-    }
-
-    effect_vec[eff_id] = new ParticleEffect(max_particles);
-
+    int eff_id = (int)effect_vec.size();
+    effect_vec.push_back(new ParticleEffect(max_particles));
     return eff_id;
 }
 
 void CParticleManager::DestroyEffect(int effect_id)
 {
     R_ASSERT(effect_id >= 0 && effect_id < (int)effect_vec.size());
-    xr_delete(effect_vec[effect_id]);
+    R_ASSERT(effect_vec[effect_id] != nullptr);
+    delete effect_vec[effect_id];
 }
 
 int CParticleManager::CreateActionList()
 {
-    int list_id = -1;
-    for (u32 i = 0; i < m_alist_vec.size(); ++i)
-        if (!m_alist_vec[i])
-        {
-            list_id = i;
-            break;
-        }
-
-    if (list_id < 0)
-    {
-        // Couldn't find a big enough gap. Reallocate.
-        list_id = m_alist_vec.size();
-        m_alist_vec.push_back(nullptr);
-    }
-
-    m_alist_vec[list_id] = new ParticleActions();
-
+    int list_id = (int)m_alist_vec.size();
+    m_alist_vec.push_back(new ParticleActions());
     return list_id;
 }
 
 void CParticleManager::DestroyActionList(int alist_id)
 {
     R_ASSERT(alist_id >= 0 && alist_id < (int)m_alist_vec.size());
-    xr_delete(m_alist_vec[alist_id]);
+    R_ASSERT(m_alist_vec[alist_id] != nullptr);
+    delete m_alist_vec[alist_id];
 }
 
 // control

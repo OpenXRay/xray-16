@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 namespace PAPI
 {
 // refs
@@ -28,54 +30,32 @@ using PAVecIt = PAVec::iterator;
 class ParticleActions
 {
     PAVec actions;
-    bool m_bLocked;
 
 public:
-    ParticleActions()
-    {
-        actions.reserve(4);
-        m_bLocked = false;
-    }
+    ParticleActions() { actions.reserve(4); }
 
     ~ParticleActions() { clear(); }
 
     void clear()
     {
-        R_ASSERT(!m_bLocked);
         for (auto& it : actions)
             xr_delete(it);
         actions.clear();
     }
 
-    void append(ParticleAction* pa)
-    {
-        R_ASSERT(!m_bLocked);
-        actions.push_back(pa);
-    }
+    void append(ParticleAction* pa) { actions.push_back(pa); }
 
     bool empty() const { return actions.empty(); }
     PAVecIt begin() { return actions.begin(); }
     PAVecIt end() { return actions.end(); }
     int size() const { return actions.size(); }
 
-    void resize(int cnt)
-    {
-        R_ASSERT(!m_bLocked);
-        actions.resize(cnt);
-    }
+    void resize(int cnt) { actions.resize(cnt); }
 
     void copy(ParticleActions* src);
 
-    void lock()
-    {
-        R_ASSERT(!m_bLocked);
-        m_bLocked = true;
-    }
+    void lock() { }
 
-    void unlock()
-    {
-        R_ASSERT(m_bLocked);
-        m_bLocked = false;
-    }
+    void unlock() { }
 };
 } // namespace PAPI
