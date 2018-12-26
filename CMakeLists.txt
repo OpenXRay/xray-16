@@ -11,6 +11,12 @@ endif()
 
 option ( TBB_PARALLEL "Use tbb::parallel for prarticle and skinning acceleration on SMP." ON )
 
+if(WIN32)
+option ( TBB_ALLOCATOR "Use tbb memory allocation" ON)
+else()
+option ( TBB_ALLOCATOR "Use tbb memory allocation" OFF)
+endif()
+
 include(cotire)
 
 function(xr_install tgt)
@@ -83,6 +89,10 @@ endif()
 
 if( TBB_PARALLEL )
   add_definitions ( -DUSE_TBB_PARALLEL )
+endif()
+
+if( TBB_ALLOCATOR )
+  add_definitions ( -DUSE_TBB_ALLOCATOR )
 endif()
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")

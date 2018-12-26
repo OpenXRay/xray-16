@@ -3,7 +3,7 @@
 #include "xrCore/xrMemory.h"
 
 // string(char)
-using xr_string = std::basic_string<char, std::char_traits<char>, tbb::tbb_allocator<char>>;
+using xr_string = std::basic_string<char, std::char_traits<char>, xr_allocator<char>>;
 
 inline void xr_strlwr(xr_string& src)
 {
