@@ -15,6 +15,7 @@ struct LockImpl
     ICF bool TryLock() { return !!TryEnterCriticalSection(&cs); }
 #else
     std::recursive_mutex mutex;
+
     ICF void Lock() { mutex.lock(); }
     ICF void Unlock() { mutex.unlock(); }
     ICF bool TryLock() { return mutex.try_lock(); }
