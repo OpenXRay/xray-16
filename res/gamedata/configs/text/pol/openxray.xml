@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_unequip">
+		<text>Zdejmij</text>
+	</string>
+	<string id="st_loading_lights">
+		<text>Wczytywanie oњwietlenia</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>Klient: Czenie z</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>Klient: Odradzanie</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>Klient: Synchronizacja</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>Tworzenie nowej gry</text>
+	</string>
+	<string id="ui_mm_always_active">
+		<text>Zawsze aktywny</text>
+	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Odlegіoњж rys. trawy</text>
+	</string>
+	<string id="ui_mm_ui_style">
+		<text>Styl interfejsu</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Zew Prypeci</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Postкp wczytywania</text>
+	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Jakoњж cieni map</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Optymalizacja mokrych pow.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Mokre pow. na blisk. odlegіoњci</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Mokre pow. na dal. odlegіoњci</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Jakoњж mokrych powierzchni</text>
+	</string>
+	<string id="ui_mm_localization">
+		<text>Jкzyk</text>
+	</string>
+	<string id="eng">
+		<text>Angielski (English)</text>
+	</string>
+	<string id="fra">
+		<text>Francuski (French)</text>
+	</string>
+	<string id="ger">
+		<text>Niemiecki (German)</text>
+	</string>
+	<string id="ita">
+		<text>Wіoski (Italian)</text>
+	</string>
+	<string id="pol">
+		<text>Polski (Polish)</text>
+	</string>
+	<string id="rus">
+		<text>Rosyjski (Russian)</text>
+	</string>
+	<string id="spa">
+		<text>Hiszpaсski (Spanish)</text>
+	</string>
+</string_table>

@@ -3,6 +3,8 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "xr_level_controller.h"
 
+constexpr pcstr OPENXRAY_XML = "openxray.xml";
+
 CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 
 xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData;
@@ -88,9 +90,33 @@ void CStringTable::FillLanguageToken()
             const auto pos = strchr(language, _DELIMITER);
             *pos = '\0'; // we don't need that backslash in the end
 
+            // Skip map_desc folder
             if (0 == xr_strcmp(language, "map_desc"))
                 continue;
 
+            bool shouldSkip = false;
+
+            // Open current language folder
+            string_path folder;
+            strconcat(sizeof(folder), folder, path, language, DELIMITER);
+            auto files = FS.file_list_open(folder, FS_ListFiles | FS_RootOnly);
+
+            // Skip empty folder
+            if (!files || files->empty())
+                shouldSkip = true;
+
+            // Skip folder with only openxray.xml file in it
+            // It's important to have 'else if' instead of simple 'if'
+            else if (files->size() == 1 && xr_strcmp(files->at(0), OPENXRAY_XML) == 0)
+                shouldSkip = true;
+
+            // Don't forget to close opened folder
+            FS.file_list_close(files);
+
+            if (shouldSkip)
+                continue;
+
+            // Finally, we can add language
             languagesToken.emplace_back(xr_strdup(language), i++); // It's important to have postfix increment!
         }
         FS.file_list_close(languages);

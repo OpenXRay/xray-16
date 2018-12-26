@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_unequip">
+		<text>unequip</text>
+	</string>
+	<string id="st_loading_lights">
+		<text>Loading lights</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>CLIENT: Connecting to</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>CLIENT: Spawning</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>CLIENT: Synchronizing</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>Creating new game</text>
+	</string>
+	<string id="ui_mm_always_active">
+		<text>Always active</text>
+	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Grass detail radius</text>
+	</string>
+	<string id="ui_mm_ui_style">
+		<text>Interface style</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Call of Pripyat</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Show loading stages</text>
+	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Shadow map quality</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Wet surfaces optimization</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Wet surfaces near dist.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Wet surfaces far dist.</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Wet surfaces quality</text>
+	</string>
+	<string id="ui_mm_localization">
+		<text>Language</text>
+	</string>
+	<string id="eng">
+		<text>English</text>
+	</string>
+	<string id="fra">
+		<text>French</text>
+	</string>
+	<string id="ger">
+		<text>German</text>
+	</string>
+	<string id="ita">
+		<text>Italian</text>
+	</string>
+	<string id="pol">
+		<text>Polish</text>
+	</string>
+	<string id="rus">
+		<text>Russian</text>
+	</string>
+	<string id="spa">
+		<text>Spanish</text>
+	</string>
+</string_table>
