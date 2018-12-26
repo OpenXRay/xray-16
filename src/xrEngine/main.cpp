@@ -209,7 +209,7 @@ ENGINE_API void Startup()
 #if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
-    destroySettings();
+        destroySettings();
     LALib.OnDestroy();
 #if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
