@@ -12,7 +12,14 @@
 //#include "tbb/tbbmalloc_proxy.h" // Xottab_DUTY: works bad, disabled it..
 #endif
 
-#ifdef USE_TBB_ALLOCATOR
+#if defined(NO_TBB_MALLOC)
+template <typename T>
+using xr_allocator = std::allocator<T>;
+#define xr_internal_malloc malloc
+#define xr_internal_realloc realloc
+#define xr_internal_free free
+
+#else
 #include <tbb/scalable_allocator.h>
 
 template <typename T>
@@ -20,13 +27,6 @@ using xr_allocator = tbb::scalable_allocator<T>;
 #define xr_internal_malloc scalable_malloc
 #define xr_internal_realloc scalable_realloc
 #define xr_internal_free scalable_free
-
-#else
-template <typename T>
-using xr_allocator = std::allocator<T>;
-#define xr_internal_malloc malloc
-#define xr_internal_realloc realloc
-#define xr_internal_free free
 #endif
 
 
@@ -54,15 +54,13 @@ public:
     inline void* mem_alloc(size_t size)
     {
         stat_calls++;
-        return xr_internal_malloc(size);
+        return xr_internal_malloc(size + reserved);
     }
 
     inline void* mem_realloc(void* ptr, size_t new_size)
-    // reallocation is seldom used in the engine
-    // so I don't think this poor algo will significantly decrease performance
     {
         stat_calls++;
-        return xr_internal_realloc(ptr, new_size);
+        return xr_internal_realloc(ptr, new_size + reserved);
     }
 
     inline void mem_free(void* ptr)
