@@ -20,6 +20,7 @@ using xr_allocator = std::allocator<T>;
 #define xr_internal_free free
 
 #else
+#include <tbb/tbb_allocator.h>
 #include <tbb/scalable_allocator.h>
 
 template <typename T>
