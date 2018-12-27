@@ -10,6 +10,7 @@ if(NOT WIN32)
 endif()
 
 option ( TBB_PARALLEL "Use tbb::parallel for prarticle and skinning acceleration on SMP." ON )
+option ( NO_TBB_MALLOC "Use standard memory allocation instead of tbbmalloc" ON )
 
 include(cotire)
 
@@ -83,6 +84,10 @@ endif()
 
 if( TBB_PARALLEL )
   add_definitions ( -DUSE_TBB_PARALLEL )
+endif()
+
+if( NO_TBB_MALLOC )
+  add_definitions ( -DNO_TBB_MALLOC )
 endif()
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")

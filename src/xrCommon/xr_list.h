@@ -2,7 +2,7 @@
 #include <list>
 #include "xrCore/xrMemory.h"
 
-template <typename T, typename allocator = tbb::tbb_allocator<T>>
+template <typename T, typename allocator = xr_allocator<T>>
 using xr_list = std::list<T, allocator>;
 
 #define DEF_LIST(N, T)\

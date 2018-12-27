@@ -2,7 +2,7 @@
 #include <vector>
 #include "xrCore/xrMemory.h"
 
-template <typename T, typename allocator = tbb::tbb_allocator<T>>
+template <typename T, typename allocator = xr_allocator<T>>
 using xr_vector = std::vector<T, allocator>;
 
 #define DEF_VECTOR(N, T)\
