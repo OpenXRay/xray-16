@@ -350,6 +350,7 @@ public:
 #endif // #ifdef _EDITOR
 
     bool useDynamicSunDir;
+    float sunDirAzimuth;
 
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
