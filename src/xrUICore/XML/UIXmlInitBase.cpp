@@ -567,7 +567,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
     if (!curr_root)
         curr_root = xml_doc.GetRoot();
 
-    XML_NODE node = curr_root.firstChild();
+    XML_NODE node = curr_root->FirstChild();
     int cnt_static = 0;
     int cnt_frameline = 0;
     int cnt_text = 0;
@@ -575,7 +575,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
 
     while (node)
     {
-        LPCSTR node_name = node.value();
+        LPCSTR node_name = node->Value();
         if (0 == xr_stricmp(node_name, "auto_static"))
         {
             CUIStatic* pUIStatic = new CUIStatic();
@@ -602,7 +602,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         {
             ++cnt_text;
         }
-        node = node.nextSibling();
+        node = node->NextSibling();
     }
     /*
         CUIStatic* pUIStatic				= NULL;

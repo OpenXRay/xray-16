@@ -5,11 +5,11 @@
 pcstr UI_PATH = UI_PATH_DEFAULT;
 pcstr UI_PATH_WITH_DELIMITER = UI_PATH_DEFAULT_WITH_DELIMITER;
 
-XMLDocument::XMLDocument() : m_root(), m_pLocalRoot() {}
+XMLDocument::XMLDocument() : m_root(nullptr), m_pLocalRoot(nullptr) {}
 
 XMLDocument::~XMLDocument() { ClearInternal(); }
 
-void XMLDocument::ClearInternal() { m_Doc.clear(); }
+void XMLDocument::ClearInternal() { m_Doc.Clear(); }
 
 void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
 {
@@ -96,23 +96,15 @@ bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
 bool XMLDocument::Set(pcstr text, bool fatal)
 {
     R_ASSERT(text != nullptr);
-    m_Doc.parse(text);
+    m_Doc.Parse(&m_Doc, text);
 
-    if (m_Doc.isError())
+    if (m_Doc.Error())
     {
-        string1024 str;
-        xr_sprintf(str, "XML Error! File: %s Description: %s:%u \n", m_xml_file_name, m_Doc.error(), m_Doc.errorOffset());
-        pcstr offsetted = text + m_Doc.errorOffset();
-
-        if (fatal)
-            R_ASSERT3(false, str, offsetted);
-        else
-            Log(str, offsetted);
-
+        R_ASSERT3(!fatal, m_Doc.ErrorDesc(), m_xml_file_name);
         return false;
     }
 
-    m_root = m_Doc.firstChildElement();
+    m_root = m_Doc.FirstChildElement();
 
     return true;
 }
@@ -120,7 +112,7 @@ bool XMLDocument::Set(pcstr text, bool fatal)
 XML_NODE XMLDocument::NavigateToNode(XML_NODE start_node, pcstr path, const size_t node_index) const
 {
     R_ASSERT3(start_node && path, "NavigateToNode failed in XML file ", m_xml_file_name);
-    XML_NODE node;
+    XML_NODE node = nullptr;
     string_path buf_str;
     VERIFY(xr_strlen(path) < 200);
     buf_str[0] = 0;
@@ -134,10 +126,10 @@ XML_NODE XMLDocument::NavigateToNode(XML_NODE start_node, pcstr path, const size
 
     if (token != nullptr)
     {
-        node = start_node.firstChild(token);
+        node = start_node->FirstChild(token);
 
         while (tmp++ < node_index && node)
-            node = node.nextSibling(token);
+            node = node->NextSibling(token);
     }
 
     while (token)
@@ -149,7 +141,7 @@ XML_NODE XMLDocument::NavigateToNode(XML_NODE start_node, pcstr path, const size
             if (node)
             {
                 const XML_NODE node_parent = node;
-                node = node_parent.firstChild(token);
+                node = node_parent->FirstChild(token);
             }
     }
 
@@ -174,7 +166,7 @@ XML_NODE XMLDocument::NavigateToNodeWithAttribute(pcstr tag_name, pcstr attrib_n
             return NavigateToNode(root, tag_name, i);
         }
     }
-    return XML_NODE();
+    return nullptr;
 }
 
 pcstr XMLDocument::Read(pcstr path, const size_t index, pcstr default_str_val) const
@@ -196,11 +188,15 @@ pcstr XMLDocument::Read(XML_NODE node, pcstr default_str_val) const
     if (!node)
         return default_str_val;
 
-    node = node.firstChild();
+    node = node->FirstChild();
     if (!node)
         return default_str_val;
 
-    return node.textValueOr(default_str_val);
+    const auto text = node->ToText();
+    if (text)
+        return text->Value();
+
+    return default_str_val;
 }
 
 int XMLDocument::ReadInt(XML_NODE node, const int default_int_val) const
@@ -273,11 +269,17 @@ pcstr XMLDocument::ReadAttrib(pcstr path, const size_t index, pcstr attrib, pcst
 
 pcstr XMLDocument::ReadAttrib(XML_NODE node, pcstr attrib, pcstr default_str_val) const
 {
-    if (!node)
-        return default_str_val;
+    pcstr result = nullptr;
+    if (node)
+    {
+        // Кастаем ниже по иерархии
+        const auto el = node->ToElement();
 
-    pcstr result_str = node.elementAttribute(attrib);
-    return result_str ? result_str : default_str_val;
+        if (el)
+            result = el->Attribute(attrib);
+    }
+
+    return result ? result : default_str_val;
 }
 
 int XMLDocument::ReadAttribInt(XML_NODE node, pcstr attrib, const int default_int_val) const
@@ -368,9 +370,9 @@ size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name) const
     XML_NODE el;
 
     if (!tag_name)
-        el = node.firstChild();
+        el = node->FirstChild();
     else
-        el = node.firstChild(tag_name);
+        el = node->FirstChild(tag_name);
 
     size_t result = 0;
 
@@ -378,9 +380,9 @@ size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name) const
     {
         ++result;
         if (!tag_name)
-            el = el.nextSibling();
+            el = el->NextSibling();
         else
-            el = el.nextSibling(tag_name);
+            el = el->NextSibling(tag_name);
     }
 
     return result;
@@ -399,24 +401,30 @@ XML_NODE XMLDocument::SearchForAttribute(
 {
     while (start_node)
     {
-        pcstr attribStr = start_node.elementAttribute(attrib);
-        pcstr valueStr = start_node.elementValue();
+        const auto el = start_node->ToElement();
+        if (el)
+        {
+            pcstr attribStr = el->Attribute(attrib);
+            pcstr valueStr = el->Value();
 
-        if (attribStr && 0 == xr_strcmp(attribStr, attrib_value_pattern) && valueStr &&
-            0 == xr_strcmp(valueStr, tag_name))
-            return start_node;
 
-        XML_NODE newEl = start_node.firstChild(tag_name);
+            if (attribStr && 0 == xr_strcmp(attribStr, attrib_value_pattern) && valueStr &&
+                0 == xr_strcmp(valueStr, tag_name))
+            {
+                return el;
+            }
+        }
+
+        XML_NODE newEl = start_node->FirstChild(tag_name);
         newEl = SearchForAttribute(newEl, tag_name, attrib, attrib_value_pattern);
         if (newEl)
             return newEl;
 
-        start_node = start_node.nextSibling(tag_name);
+        start_node = start_node->NextSibling(tag_name);
     }
-    return XML_NODE();
-}
 
-#ifdef DEBUG // debug & mixed
+    return nullptr;
+}
 
 pcstr XMLDocument::CheckUniqueAttrib(XML_NODE start_node, pcstr tag_name, pcstr attrib_name)
 {
@@ -437,4 +445,3 @@ pcstr XMLDocument::CheckUniqueAttrib(XML_NODE start_node, pcstr tag_name, pcstr 
     }
     return nullptr;
 }
-#endif

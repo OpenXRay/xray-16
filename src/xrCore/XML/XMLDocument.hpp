@@ -2,15 +2,9 @@
 #ifndef xrXMLParserH
 #define xrXMLParserH
 
-#if !XRAY_EXCEPTIONS
-#define PUGIXML_NO_EXCEPTIONS
-#endif
-#define PUGIXML_NO_XPATH
-#define PUGIXML_HAS_LONG_LONG
-#include "pugixml.hpp"
-#ifdef DEBUG // debug & mixed
+#include "tinyxml.h"
+
 #include "xrCommon/xr_vector.h"
-#endif
 #include "xrCore/xrstring.h"
 
 // XXX: interesting idea is to have variable configs folder. Need we?
@@ -20,116 +14,10 @@ static constexpr pcstr UI_PATH_DEFAULT_WITH_DELIMITER = "ui" DELIMITER;
 XRCORE_API extern pcstr UI_PATH;
 XRCORE_API extern pcstr UI_PATH_WITH_DELIMITER;
 
-class XML_NODE
-{
-    pugi::xml_node node;
+using XML_NODE = TiXmlNode*;
+using XML_DOC  = TiXmlDocument;
 
-public:
-    XML_NODE() : node() {}
-
-    explicit XML_NODE(const pugi::xml_node node)
-        : node(node) {}
-
-    operator bool() const
-    {
-        return node;
-    }
-
-    bool operator==(std::nullptr_t) = delete;
-
-    XML_NODE firstChild() const
-    {
-        return XML_NODE(node.first_child());
-    }
-
-    XML_NODE firstChild(pcstr name) const
-    {
-        return XML_NODE(node.child(name));
-    }
-
-    XML_NODE nextSibling() const
-    {
-        return XML_NODE(node.next_sibling());
-    }
-
-    XML_NODE nextSibling(pcstr name) const
-    {
-        return XML_NODE(node.next_sibling(name));
-    }
-
-    pcstr textValueOr(pcstr defaultValue) const
-    {
-        const auto text = node.text();
-        return text ? text.get() : defaultValue;
-    }
-
-    pcstr elementAttribute(pcstr name) const
-    {
-        if (node.type() == pugi::node_element)
-        {
-            const auto attr = node.attribute(name);
-            return attr ? attr.value() : nullptr;
-        }
-        return nullptr;
-    }
-
-    pcstr elementValue() const
-    {
-        if (node.type() == pugi::node_element)
-            return node.name();
-
-        return nullptr;
-    }
-
-    pcstr value() const
-    {
-        switch (node.type())
-        {
-        case pugi::node_element:
-            return node.name();
-        default:
-            return node.value();
-        }
-    }
-};
-
-struct XML_DOC
-{
-    pugi::xml_document doc;
-    pugi::xml_parse_result res;
-
-    void clear()
-    {
-        doc.reset();
-    }
-
-    void parse(pcstr data)
-    {
-        res = doc.load_string(data);
-    }
-
-    bool isError() const
-    {
-        return !res;
-    }
-
-    pcstr error() const
-    {
-        return res.description();
-    }
-
-    size_t errorOffset() const
-    {
-        return res.offset;
-    }
-
-    XML_NODE firstChildElement() const
-    {
-        return XML_NODE(doc.document_element());
-    }
-};
-
-class XRCORE_API XMLDocument
+class XRCORE_API XMLDocument : public Noncopyable
 {
 
 public:
@@ -177,12 +65,10 @@ public:
     size_t GetNodesNum(pcstr path, const size_t index, pcstr tag_name) const;
     size_t GetNodesNum(XML_NODE node, pcstr tag_name) const;
 
-#ifdef DEBUG // debug & mixed
     //проверка того, что аттрибуты у тегов уникальны
     //(если не NULL, то уникальность нарушена и возврашается имя
     //повторяющегося атрибута)
     pcstr CheckUniqueAttrib(XML_NODE start_node, pcstr tag_name, pcstr attrib_name);
-#endif
 
     //переместиться по XML дереву
     //путь задается в форме PARENT:CHILD:CHIDLS_CHILD
@@ -199,17 +85,13 @@ protected:
     XML_NODE m_root;
     XML_NODE m_pLocalRoot;
 
-#ifdef DEBUG // debug & mixed
     //буфферный вектор для проверки уникальность аттрибутов
     xr_vector<shared_str> m_AttribValues;
-#endif
+
 public:
     virtual shared_str correct_file_name(pcstr path, pcstr fn) { return fn; }
 
 private:
-    XMLDocument(const XMLDocument& copy);
-    void operator=(const XMLDocument& copy);
-
     XML_DOC m_Doc;
 };
 

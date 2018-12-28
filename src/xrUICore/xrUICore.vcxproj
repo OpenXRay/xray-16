@@ -234,9 +234,6 @@
     <ProjectReference Include="..\..\Externals\LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Externals\pugixml_vs2017_static.vcxproj">
-      <Project>{07cf01c0-b887-499d-ad9c-799cb6a9fe64}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>

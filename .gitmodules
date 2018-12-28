@@ -55,9 +55,6 @@
 [submodule "Externals/nvapi"]
 	path = Externals/nvapi
 	url = https://github.com/OpenXRay/nvapi.git
-[submodule "Externals/pugixml"]
-	path = Externals/pugixml
-	url = https://github.com/zeux/pugixml.git
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git

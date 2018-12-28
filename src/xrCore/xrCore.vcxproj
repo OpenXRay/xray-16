@@ -325,6 +325,10 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClCompile Include="Threading\Event.cpp" />
     <ClCompile Include="Threading\ScopeLock.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
+    <ClCompile Include="XML\tinystr.cpp" />
+    <ClCompile Include="XML\tinyxml.cpp" />
+    <ClCompile Include="XML\tinyxmlerror.cpp" />
+    <ClCompile Include="XML\tinyxmlparser.cpp" />
     <ClCompile Include="XML\XMLDocument.cpp" />
     <ClCompile Include="xrCore.cpp" />
     <ClCompile Include="ModuleLookup.cpp" />
@@ -425,6 +429,8 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClInclude Include="Threading\ScopeLock.hpp" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
+    <ClInclude Include="XML\tinystr.h" />
+    <ClInclude Include="XML\tinyxml.h" />
     <ClInclude Include="XML\XMLDocument.hpp" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="ModuleLookup.hpp" />
@@ -491,9 +497,6 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)lzo.vcxproj">
       <Project>{614aa57f-58d7-45a8-a5ff-93f04b05fac6}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(xrExternals)pugixml_vs2017_static.vcxproj">
-      <Project>{07cf01c0-b887-499d-ad9c-799cb6a9fe64}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>

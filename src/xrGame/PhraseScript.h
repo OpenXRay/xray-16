@@ -9,7 +9,6 @@
 
 class CGameObject;
 class CInventoryOwner;
-class XML_NODE;
 class CUIXml;
 
 class CDialogScriptHelper

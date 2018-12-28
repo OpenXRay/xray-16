@@ -3660,9 +3660,6 @@
     <ProjectReference Include="$(xrExternals)LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(xrExternals)pugixml_vs2017_static.vcxproj">
-      <Project>{07cf01c0-b887-499d-ad9c-799cb6a9fe64}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>

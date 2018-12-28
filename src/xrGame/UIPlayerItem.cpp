@@ -19,6 +19,7 @@ UIPlayerItem::UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* ts
     VERIFY(m_teamPanels);
     myClientId = clientId;
     m_prevTeam = team;
+    m_player_node_root = nullptr;
 }
 
 UIPlayerItem::~UIPlayerItem() {}
