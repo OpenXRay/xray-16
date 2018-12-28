@@ -10,23 +10,22 @@
 #endif
 #include "xrEngine/main.h"
 #include "xrEngine/splash.h"
+#include <SDL.h>
 
 int entry_point(pcstr commandLine)
 {
-    if (strstr(commandLine, "-nosplash") == nullptr)
+    xrDebug::Initialize();
+    R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
+
+    if (!strstr(commandLine, "-nosplash"))
     {
-#ifndef DEBUG
-        const bool topmost = strstr(commandLine, "-splashnotop") == nullptr ? true : false;
-#else
-        constexpr bool topmost = false;
-#endif
+        const bool topmost = !strstr(commandLine, "-splashnotop");
         splash::show(topmost);
     }
 
     if (strstr(commandLine, "-dedicated"))
         GEnv.isDedicatedServer = true;
 
-    xrDebug::Initialize();
 #ifdef WINDOWS
     StickyKeyFilter filter;
     if (!GEnv.isDedicatedServer)
@@ -42,10 +41,11 @@ int entry_point(pcstr commandLine)
     }
     Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);
 
-    auto result = RunApplication();
+    const auto result = RunApplication();
 
     Core._destroy();
 
+    SDL_Quit();
     return result;
 }
 

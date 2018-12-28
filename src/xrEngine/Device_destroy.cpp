@@ -43,7 +43,6 @@ void CRenderDevice::Destroy()
     xr_delete(Statistic);
 
     SDL_DestroyWindow(m_sdlWnd);
-    SDL_Quit();
 }
 
 #include "IGame_Level.h"
