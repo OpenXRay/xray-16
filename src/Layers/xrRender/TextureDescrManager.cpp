@@ -5,6 +5,8 @@
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
 
+//#define SINGLETHREADED_TEXTURES_DESCR
+
 // eye-params
 float r__dtex_range = 50;
 class cl_dt_scaler : public R_constant_setup
@@ -26,6 +28,14 @@ void fix_texture_thm_name(LPSTR fn)
     }
 }
 
+#ifdef SINGLETHREADED_TEXTURES_DESCR
+#define LOCK_DESCR(lock)
+#define UNLOCK_DESCR(lock)
+#else
+#define LOCK_DESCR(lock) lock.Enter()
+#define UNLOCK_DESCR(lock) lock.Leave()
+#endif
+
 void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 {
     FS_FileSet flist;
@@ -34,12 +44,18 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
     Msg("%s, count of .thm files: %d", __FUNCTION__, flist.size());
 #endif
 
-    for (auto& it : flist)
-    {
-#if 0//def DEBUG // XXX: make it as an option
-        //Alundaio: Print list of *.thm to find bad .thms!
-        Msg("%s", it.name.c_str());
+#ifndef SINGLETHREADED_TEXTURES_DESCR
+    Lock lock;
 #endif
+
+    const bool listTHM = strstr(Core.Params, "-list_thm");
+
+    const auto processFile = [&](const FS_File& it)
+    {
+        // Alundaio: Print list of *.thm to find bad .thms!
+        if (listTHM)
+            Log(it.name.c_str());
+
         string_path fn;
         FS.update_path(fn, initial, it.name.c_str());
         IReader* F = FS.r_open(fn);
@@ -54,8 +70,10 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
         if (STextureParams::ttImage == tp.type || STextureParams::ttTerrain == tp.type ||
             STextureParams::ttNormalMap == tp.type)
         {
+            LOCK_DESCR(lock);
             texture_desc& desc = m_texture_details[fn];
             cl_dt_scaler*& dts = m_detail_scalers[fn];
+            UNLOCK_DESCR(lock);
 
             if (tp.detail_name.size() &&
                 tp.flags.is_any(STextureParams::flDiffuseDetail | STextureParams::flBumpDetail))
@@ -95,7 +113,14 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
                 desc.m_spec->m_use_steep_parallax = true;
             }
         }
-    }
+    };
+
+#ifdef SINGLETHREADED_TEXTURES_DESCR
+    for (auto& it : flist)
+        processFile(it);
+#else
+    tbb::parallel_for_each(flist, processFile);
+#endif
 }
 
 void CTextureDescrMngr::Load()
