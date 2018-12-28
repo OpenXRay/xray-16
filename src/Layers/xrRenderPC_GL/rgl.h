@@ -216,9 +216,7 @@ public:
     void render_rain();
 
     void render_sun_cascade(u32 cascade_ind);
-#if defined(WINDOWS) // remove this after port r2_R_sun.cpp
     void init_cacades();
-#endif
     void render_sun_cascades();
 
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
