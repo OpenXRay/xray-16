@@ -82,16 +82,16 @@ static inline float XRVec3Dot(const Fvector3 *pv1, const Fvector3 *pv2)
     return (pv1->x) * (pv2->x) + (pv1->y) * (pv2->y) + (pv1->z) * (pv2->z);
 }
 
-static inline float XRPlaneDotCoord(const Fplane *pp, const Fvector3 *pv)
+static inline float XRPlaneDotCoord(const Fvector4 *pp, const Fvector3 *pv)
 {
     if ( !pp || !pv ) return 0.0f;
-    return ( (pp->n.x) * (pv->x) + (pp->n.y) * (pv->y) + (pp->n.z) * (pv->z) + (pp->d) );
+    return ( (pp->x) * (pv->x) + (pp->y) * (pv->y) + (pp->z) * (pv->z) + (pp->z) );
 }
 
-static inline float XRPlaneDotNormal(const Fplane *pp, const Fvector3 *pv)
+static inline float XRPlaneDotNormal(const Fvector4 *pp, const Fvector3 *pv)
 {
     if ( !pp || !pv ) return 0.0f;
-    return ( (pp->n.x) * (pv->x) + (pp->n.y) * (pv->y) + (pp->n.z) * (pv->z) );
+    return ( (pp->x) * (pv->x) + (pp->y) * (pv->y) + (pp->z) * (pv->z) );
 }
 
 static inline float XRVec3Length(const Fvector3 *pv)
@@ -257,16 +257,13 @@ Fvector3* XRVec3TransformCoord(Fvector3 *pout, const Fvector3 *pv, const Fmatrix
     return pout;
 }
 
-Fvector3* XRVec3TransformCoordArray(Fvector3* out, uint outstride, const Fvector3* in, uint instride, const Fmatrix* matrix, uint elements)
+Fvector3* XRVec3TransformCoordArray(Fvector3* out, const Fvector3* in, const Fmatrix* matrix, uint elements)
 {
     uint i;
 
-    for (i = 0; i < elements; ++i) {
-        XRVec3TransformCoord(
-            (Fvector3*)((char*)out + outstride * i),
-            (const Fvector3*)((const char*)in + instride * i),
-            matrix);
-    }
+    for (i = 0; i < elements; ++i)
+        XRVec3TransformCoord(&out[i], &in[i], matrix);
+
     return out;
 }
 
@@ -276,7 +273,7 @@ struct Frustum
     Frustum();
     Frustum(const Fmatrix* matrix);
 
-    Fplane camPlanes [6];
+    Fvector4 camPlanes [6];
     int nVertexLUT [6];
     Fvector3 pntList [8];
 };
@@ -322,10 +319,9 @@ struct BoundingBox
 
     void Centroid(Fvector3* vec) const
     {
-        Fvector3 tmp = *vec;
-        tmp.set (minPt);
-        tmp.add (maxPt);
-        tmp.mul (0.5f);
+        Fvector3 tmp = minPt;
+        tmp.add(maxPt);
+        tmp.mul(0.5f);
         *vec = tmp; 
     }
 
@@ -345,63 +341,39 @@ struct BoundingBox
     }
 };
 
-
-///////////////////////////////////////////////////////////////////////////
-BOOL LineIntersection2D(Fvector2* result, const Fvector2* lineA, const Fvector2* lineB)
-{
-    //  if the lines are parallel, the lines will not intersect in a point
-    //  NOTE: assumes the rays are already normalized!!!!
-    VERIFY ( _abs(D3DXVec2Dot(&lineA[1], &lineB[1]))<1.f );
-
-    float x[2] = {lineA[0].x, lineB[0].x};
-    float y[2] = {lineA[0].y, lineB[0].y};
-    float dx[2] = {lineA[1].x, lineB[1].x};
-    float dy[2] = {lineA[1].y, lineB[1].y};
-
-    float x_diff = x[0] - x[1];
-    float y_diff = y[0] - y[1];
-
-    float s = (x_diff - dx[1] / dy[1] * y_diff) / (dx[1] * dy[0] / dy[1] - dx[0]);
-    // float t	= (x_diff + s*dx[0]) / dx[1];
-
-    Fvector2 res = lineA[0];
-    Fvector2 tmp = lineA[1];
-    tmp.mul(s);
-    res.add(tmp);
-    *result = res;
-    return TRUE;
-}
-
 ///////////////////////////////////////////////////////////////////////////
 //  PlaneIntersection
 //    computes the point where three planes intersect
 //    returns whether or not the point exists.
-static inline BOOL PlaneIntersection(Fvector3* intersectPt, const Fplane* p0, const Fplane* p1,
-                                     const Fplane* p2)
+static inline BOOL PlaneIntersection(Fvector3* intersectPt, const Fvector4* p0, const Fvector4* p1,
+                                     const Fvector4* p2)
 {
+    Fvector3 n0 = {p0->x, p0->y, p0->z};
+    Fvector3 n1 = {p1->x, p1->y, p1->z};
+    Fvector3 n2 = {p2->x, p2->y, p2->z};
+    
     Fvector3 n1_n2, n2_n0, n0_n1;
 
-    XRVec3Cross(&n1_n2, &p1->n, &p2->n);
-    XRVec3Cross(&n2_n0, &p2->n, &p0->n);
-    XRVec3Cross(&n0_n1, &p0->n, &p1->n);
+    XRVec3Cross(&n1_n2, &n1, &n2);
+    XRVec3Cross(&n2_n0, &n2, &n0);
+    XRVec3Cross(&n0_n1, &n0, &n1);
 
-    float cosTheta = XRVec3Dot(&p0->n, &n1_n2);
+    float cosTheta = XRVec3Dot(&n0, &n1_n2);
 
     if (ALMOST_ZERO(cosTheta) || IS_SPECIAL(cosTheta))
         return FALSE;
 
     float secTheta = 1.f / cosTheta;
 
-    n1_n2 = n1_n2.mul(p0->d);
-    n2_n0 = n2_n0.mul(p1->d);
-    n0_n1 = n0_n1.mul(p2->d);
+    n1_n2.mul(p0->w);
+    n2_n0.mul(p1->w);
+    n0_n1.mul(p2->w);
 
-    Fvector3 result;
-    result = n1_n2;
+    Fvector3 result = n1_n2;
     result.add(n2_n0);
     result.add(n0_n1);
+    result.invert();
     result.mul(secTheta);
-    result.invert ();
     *intersectPt = result;
     return TRUE;
 }
@@ -417,41 +389,42 @@ Frustum::Frustum()
 Frustum::Frustum(const Fmatrix* matrix)
 {
     //  build a view frustum based on the current view & projection matrices...
-    Fvector4 column4 = {matrix->_14, matrix->_24, matrix->_34, matrix->_44};
     Fvector4 column1 = {matrix->_11, matrix->_21, matrix->_31, matrix->_41};
     Fvector4 column2 = {matrix->_12, matrix->_22, matrix->_32, matrix->_42};
     Fvector4 column3 = {matrix->_13, matrix->_23, matrix->_33, matrix->_43};
+    Fvector4 column4 = {matrix->_14, matrix->_24, matrix->_34, matrix->_44};
 
     Fvector4 planes[6];
-    planes[0] = column4.sub(column1); // left
-    planes[1] = column4.add(column1); // right
-    planes[2] = column4.sub(column2); // bottom
-    planes[3] = column4.add(column2); // top
-    planes[4] = column4.sub(column3); // near
-    planes[5] = column4.add(column3); // far
+    Fvector4 tmp;
+    tmp.set(column4);
+    planes[0] = tmp.sub(column1); // left
+    tmp.set(column4);
+    planes[1] = tmp.add(column1); // right
+    tmp.set(column4);
+    planes[2] = tmp.sub(column2); // bottom
+    tmp.set(column4);
+    planes[3] = tmp.add(column2); // top
+    tmp.set(column4);
+    planes[4] = tmp.sub(column3); // near
+    tmp.set(column4);
+    planes[5] = tmp.add(column3); // far
     // ignore near & far plane
 
     int p;
 
-    for (p = 0; p < 6; p++) // normalize the planes
-    {
-        float dot = planes[p].x * planes[p].x + planes[p].y * planes[p].y + planes[p].z * planes[p].z;
-        dot = 1.f / _sqrt(dot);
-        planes[p] = planes[p].mul(dot);
-    }
-
     for (p = 0; p < 6; p++)
-        camPlanes[p] = {planes[p].x, planes[p].y, planes[p].z, planes[p].w};
-
-    //  build a bit-field that will tell us the indices for the nearest and farthest vertices from each plane...
-    for (int i = 0; i < 6; i++)
-        nVertexLUT[i] = (planes[i].x < 0.f ? 1 : 0) | (planes[i].y < 0.f ? 2 : 0) | (planes[i].z < 0.f ? 4 : 0);
+    {
+        planes[p].normalize();
+        camPlanes[p] = planes[p];
+        // build a bit-field that will tell us the indices for the nearest and farthest vertices from each plane...
+        nVertexLUT[p] = (planes[p].x < 0.f ? 1 : 0) | (planes[p].y < 0.f ? 2 : 0) | (planes[p].z < 0.f ? 4 : 0); 
+    }
 
     for (int i = 0; i < 8; i++) // compute extrema
     {
-        const Fplane& p0 = i & 1 ? camPlanes[4] : camPlanes[5];
-        const Fplane& p1 = i & 2 ? camPlanes[3] : camPlanes[2];
-        const Fplane& p2 = i & 4 ? camPlanes[0] : camPlanes[1];
+        const Fvector4 p0 = i & 1 ? camPlanes[4] : camPlanes[5];
+        const Fvector4 p1 = i & 2 ? camPlanes[3] : camPlanes[2];
+        const Fvector4 p2 = i & 4 ? camPlanes[0] : camPlanes[1];
         PlaneIntersection(&pntList[i], &p0, &p1, &p2);
     }
 }
@@ -479,7 +452,7 @@ const float _eps = 0.000001f;
 struct DumbClipper
 {
     CFrustum frustum;
-    xr_vector<Fplane> planes;
+    xr_vector<Fvector4> planes;
 
     BOOL clip(Fvector3& p0, Fvector3& p1) // returns TRUE if result meaningfull
     {
@@ -487,7 +460,7 @@ struct DumbClipper
         Fvector3 D;
         for (int it = 0; it < int(planes.size()); it++)
         {
-            Fplane& P = planes [it];
+            Fvector4 P = planes [it];
             float cls0 = XRPlaneDotCoord(&P, &p0);
             float cls1 = XRPlaneDotCoord(&P, &p1);
             if (cls0 > 0 && cls1 > 0) return false; // fully outside
@@ -497,16 +470,12 @@ struct DumbClipper
                 // clip p0
                 D.set(p1);
                 D.sub(p0);
-//                D = p1 - p0;
                 denum = XRPlaneDotNormal(&P, &D);
                 if (denum != 0)
                 {
-                    Fvector3 tmp;
-                    tmp = D;
-                    tmp.mul(cls0 / denum);
-                    tmp.invert();
-                    p0.add(tmp);
-//                    p0 += - D * cls0 / denum;
+                    D.invert();
+                    D.mul(cls0 / denum);
+                    p0.add(D);
                 }
             }
             if (cls1 > 0)
@@ -514,18 +483,13 @@ struct DumbClipper
                 // clip p1
                 D.set(p0);
                 D.sub(p1);
-//                D = p0 - p1;
                 denum = XRPlaneDotNormal(&P, &D);
                 if (denum != 0)
                 {
-                    Fvector3 tmp;
-                    tmp = D;
-                    tmp.mul(cls1 / denum);
-                    tmp.invert();
-                    p1.add(tmp);
-//                    p1 += - D * cls1 / denum;
+                    D.invert();
+                    D.mul(cls1 / denum);
+                    p1.add(D);
                 }
-                    
             }
         }
         return true;
@@ -552,7 +516,7 @@ struct DumbClipper
                 for (int c = 0; c < 8; c++)
                 {
                     Fvector3 p0 = point(bb, c);
-                    Fvector x0 = wform(xf, *(Fvector*)&p0);
+                    Fvector x0 = wform(xf, p0);
                     result.modify(x0);
                 }
                 break;
@@ -565,8 +529,8 @@ struct DumbClipper
                         Fvector3 p0 = point(bb, c0);
                         Fvector3 p1 = point(bb, c1);
                         if (!clip(p0, p1)) continue;
-                        Fvector x0 = wform(xf, *(Fvector*)&p0);
-                        Fvector x1 = wform(xf, *(Fvector*)&p1);
+                        Fvector x0 = wform(xf, p0);
+                        Fvector x1 = wform(xf, p1);
                         result.modify(x0);
                         result.modify(x1);
                     }
@@ -585,7 +549,7 @@ Fvector2 BuildTSMProjectionMatrix_caster_depth_bounds(Fmatrix& lightSpaceBasis)
     float min_z = 1e32f, max_z = -1e32f;
     Fmatrix minmax_xf;
     XRMatrixMultiply(&minmax_xf, &Device.mView, &lightSpaceBasis);
-    Fmatrix& minmax_xform = *(Fmatrix*)&minmax_xf;
+    Fmatrix& minmax_xform = minmax_xf;
     for (u32 c = 0; c < s_casters.size(); c++)
     {
         Fvector3 pt;
@@ -611,8 +575,7 @@ void CRender::render_sun()
     {
         float _far_ = std::min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv->far_plane);
         //ex_project.build_projection	(deg2rad(Device.fFOV),Device.fASPECT,ps_r2_sun_near,_far_);	
-        ex_project.build_projection(deg2rad(Device.fFOV), Device.fASPECT,VIEWPORT_NEAR, _far_);
-        //VIEWPORT_NEAR
+        ex_project.build_projection(deg2rad(Device.fFOV), Device.fASPECT, VIEWPORT_NEAR, _far_);
         ex_full.mul(ex_project, Device.mView);
         XRMatrixInverse(&ex_full_inverse, nullptr, &ex_full);
     }
@@ -730,8 +693,8 @@ void CRender::render_sun()
     set_Recorder(nullptr);
 
     //	Prepare to interact with D3DX code
-    const Fmatrix& m_View = Device.mView;
-    const Fmatrix& m_Projection = ex_project;
+    const Fmatrix m_View = Device.mView;
+    const Fmatrix m_Projection = ex_project;
     Fvector3 m_lightDir = {fuckingsun->direction.x, fuckingsun->direction.y, fuckingsun->direction.z};
     m_lightDir.invert();
 
@@ -747,7 +710,8 @@ void CRender::render_sun()
     if (_abs(m_fCosGamma) < 0.99f && ps_r2_ls_flags.test(R2FLAG_SUN_TSM))
     {
         //  get the near and the far plane (points) in eye space.
-        Fvector3 frustumPnts[8];
+        #define POINTS_NUM 8
+        Fvector3 frustumPnts[POINTS_NUM];
 
         Frustum eyeFrustum(&m_Projection); // autocomputes all the extrema points
 
@@ -790,11 +754,10 @@ void CRender::render_sun()
         lightSpaceBasis._44 = 1.f;
 
         //  rotate the view frustum into light space
-        XRVec3TransformCoordArray(frustumPnts, sizeof(Fvector3), frustumPnts, sizeof(Fvector3),
-                                    &lightSpaceBasis, sizeof frustumPnts / sizeof(Fvector3));
+        XRVec3TransformCoordArray(frustumPnts, frustumPnts, &lightSpaceBasis, POINTS_NUM);
 
         //  build an off-center ortho projection that translates and scales the eye frustum's 3D AABB to the unit cube
-        BoundingBox frustumBox(frustumPnts, sizeof frustumPnts / sizeof(Fvector3));
+        BoundingBox frustumBox(frustumPnts, POINTS_NUM);
 
         //  also - transform the shadow caster bounding boxes into light projective space.  we want to translate along the Z axis so that
         //  all shadow casters are in front of the near plane.
@@ -810,9 +773,8 @@ void CRender::render_sun()
             max_z = -min_z + max_z + 1.f;
             min_z = 1.f;
             XRMatrixMultiply(&lightSpaceBasis, &lightSpaceBasis, &lightSpaceTranslate);
-            XRVec3TransformCoordArray(frustumPnts, sizeof(Fvector3), frustumPnts, sizeof(Fvector3),
-                                        &lightSpaceTranslate, sizeof frustumPnts / sizeof(Fvector3));
-            frustumBox = BoundingBox(frustumPnts, sizeof frustumPnts / sizeof(Fvector3));
+            XRVec3TransformCoordArray(frustumPnts, frustumPnts, &lightSpaceTranslate, POINTS_NUM);
+            frustumBox = BoundingBox(frustumPnts, POINTS_NUM);
         }
 
         Fmatrix lightSpaceOrtho;
@@ -820,8 +782,7 @@ void CRender::render_sun()
                                    frustumBox.maxPt.y, min_z, max_z);
 
         //  transform the view frustum by the new matrix
-        XRVec3TransformCoordArray(frustumPnts, sizeof(Fvector3), frustumPnts, sizeof(Fvector3),
-                                    &lightSpaceOrtho, sizeof frustumPnts / sizeof(Fvector3));
+        XRVec3TransformCoordArray(frustumPnts, frustumPnts, &lightSpaceOrtho, POINTS_NUM);
 
         Fvector2 centerPts [2];
         //  near plane
@@ -831,8 +792,7 @@ void CRender::render_sun()
         centerPts[1].x = 0.25f * (frustumPnts[0].x + frustumPnts[1].x + frustumPnts[2].x + frustumPnts[3].x);
         centerPts[1].y = 0.25f * (frustumPnts[0].y + frustumPnts[1].y + frustumPnts[2].y + frustumPnts[3].y);
 
-        Fvector2 centerOrig;
-        centerOrig.set(centerPts[0]);
+        Fvector2 centerOrig = centerPts[0];
         centerOrig.add(centerPts[1]);
         centerOrig.mul(0.5f);
 
@@ -843,8 +803,7 @@ void CRender::render_sun()
                                 0.f, 0.f, 1.f, 0.f,
                                 -centerOrig.x, -centerOrig.y, 0.f, 1.f};
 
-        Fvector2 center_dirl;
-        center_dirl.set(centerPts[1]);
+        Fvector2 center_dirl = centerPts[1];
         center_dirl.sub(centerOrig);
         float half_center_len = XRVec2Length(&center_dirl);
         float x_len = centerPts[1].x - centerOrig.x;
@@ -863,10 +822,9 @@ void CRender::render_sun()
         //  just find the view frustum X-axis extrema.  The most negative is Top, the most positive is Base
         //  Point Q (trapezoid projection point) will be a point on the y=0 line.
         XRMatrixMultiply(&trapezoid_space, &xlate_center, &rot_center);
-        XRVec3TransformCoordArray(frustumPnts, sizeof(Fvector3), frustumPnts, sizeof(Fvector3),
-                                    &trapezoid_space, sizeof frustumPnts / sizeof(Fvector3));
+        XRVec3TransformCoordArray(frustumPnts, frustumPnts, &trapezoid_space, POINTS_NUM);
 
-        BoundingBox frustumAABB2D(frustumPnts, sizeof frustumPnts / sizeof(Fvector3));
+        BoundingBox frustumAABB2D(frustumPnts, POINTS_NUM);
 
         float x_scale = std::max(_abs(frustumAABB2D.maxPt.x), _abs(frustumAABB2D.minPt.x));
         float y_scale = std::max(_abs(frustumAABB2D.maxPt.y), _abs(frustumAABB2D.minPt.y));
@@ -901,7 +859,7 @@ void CRender::render_sun()
         float max_slope = -1e32f;
         float min_slope = 1e32f;
 
-        for (int i = 0; i < sizeof frustumPnts / sizeof(Fvector3); i++)
+        for (int i = 0; i < POINTS_NUM; i++)
         {
             Fvector2 tmp = {frustumPnts[i].x * x_scale, frustumPnts[i].y * y_scale};
             float x_dist = tmp.x - projectionPtQ.x;
@@ -968,15 +926,12 @@ void CRender::render_sun()
 
         // create clipper
         DumbClipper view_clipper;
-        Fmatrix& xform = m_LightViewProj;
+        Fmatrix xform = m_LightViewProj;
         view_clipper.frustum.CreateFromMatrix(ex_full, FRUSTUM_P_ALL);
         for (int p = 0; p < view_clipper.frustum.p_count; p++)
         {
             Fplane& P = view_clipper.frustum.planes [p];
-            Fplane tmp;
-            tmp.n.set(P.n);
-            tmp.d = P.d;
-            view_clipper.planes.push_back(tmp);
+            view_clipper.planes.push_back({P.n.x, P.n.y, P.n.z, P.d});
         }
 
         // 
