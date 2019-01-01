@@ -23,7 +23,6 @@
 #define DETAIL_RADIUS // detail draw radius (by K.D.)
 
 /* Tweaks: */
-//#define FP_DEATH // first person death view
 #define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
 
 /* Debug: */

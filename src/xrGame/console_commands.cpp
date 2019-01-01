@@ -109,6 +109,8 @@ extern BOOL g_ai_die_in_anomaly;
 int g_inv_highlight_equipped = 0;
 //-Alundaio
 
+int g_first_person_death = 0;
+
 void register_mp_console_commands();
 //-----------------------------------------------------------
 
@@ -1984,6 +1986,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
+    CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");

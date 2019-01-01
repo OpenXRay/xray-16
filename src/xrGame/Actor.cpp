@@ -80,6 +80,7 @@ const float respawn_delay = 1.f;
 const float respawn_auto = 7.f;
 
 extern float cammera_into_collision_shift;
+extern int g_first_person_death;
 
 string32 ACTOR_DEFS::g_quick_use_slots[4] = {NULL, NULL, NULL, NULL};
 // skeleton
@@ -816,11 +817,15 @@ void CActor::Die(IGameObject* who)
 
     if (IsGameTypeSingle())
     {
-#ifdef FP_DEATH
-        cam_Set(eacFirstEye);
-#else
-        cam_Set(eacFreeLook);
-#endif // FP_DEATH
+        pcstr camera = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "gameplay", "actor_death_camera", "freelook");
+
+        if (xr_strcmp("firsteye", camera) == 0 || g_first_person_death)
+            cam_Set(eacFirstEye);
+        else if (xr_strcmp("freelook", camera) == 0)
+            cam_Set(eacFreeLook);
+        else if (xr_strcmp("fixedlook", camera) == 0)
+            cam_Set(eacFixedLookAt);
+
         CurrentGameUI()->HideShownDialogs();
         start_tutorial("game_over");
     }
