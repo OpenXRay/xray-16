@@ -11,8 +11,8 @@ const float tweak_rain_ortho_xform_initial_offs = 1000.f; //. ?
 
 //	Defined in r2_R_sun.cpp
 Fvector3 wform(Fmatrix& m, Fvector3 const& v);
-Fmatrix* XRMatrixOrthoOffCenterLH(Fmatrix *pout, float l, float r, float b, float t, float zn, float zf);
-Fmatrix* XRMatrixInverse(Fmatrix *pout, float *pdeterminant, const Fmatrix *pm);
+void XRMatrixOrthoOffCenterLH(Fmatrix *pout, float l, float r, float b, float t, float zn, float zf);
+void XRMatrixInverse(Fmatrix *pout, float *pdeterminant, const Fmatrix &pm);
 
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
@@ -57,7 +57,7 @@ void CRender::render_rain()
         const float fRainFar = ps_r3_dyn_wet_surf_far;
         ex_project.build_projection(deg2rad(Device.fFOV/* *Device.fASPECT*/), Device.fASPECT,VIEWPORT_NEAR, fRainFar);
         ex_full.mul(ex_project, Device.mView);
-        XRMatrixInverse(&ex_full_inverse, nullptr, &ex_full);
+        XRMatrixInverse(&ex_full_inverse, nullptr, ex_full);
 
         //	Calculate view frustum were we can see dynamic rain radius
         {
@@ -199,7 +199,7 @@ void CRender::render_rain()
             view_dim / 2.f + fTexelOffs, view_dim / 2.f + fTexelOffs, 0.0f, 1.0f
         };
         Fmatrix m_viewport_inv;
-        XRMatrixInverse(&m_viewport_inv, nullptr, &m_viewport);
+        XRMatrixInverse(&m_viewport_inv, nullptr, m_viewport);
 
         // snap view-position to pixel
         //	snap zero point to pixel

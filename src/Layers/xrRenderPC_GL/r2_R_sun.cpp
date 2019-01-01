@@ -36,235 +36,120 @@ static int facetable[6][4] = {
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L)==0)
 #define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L)==0x7f800000L)
 
-static inline Fmatrix* XRMatrixIdentity(Fmatrix *pout)
+static inline float XRVec2Length(const Fvector2 &pv)
 {
-    if ( !pout ) return nullptr;
-    pout->m[0][1] = 0.0f;
-    pout->m[0][2] = 0.0f;
-    pout->m[0][3] = 0.0f;
-    pout->m[1][0] = 0.0f;
-    pout->m[1][2] = 0.0f;
-    pout->m[1][3] = 0.0f;
-    pout->m[2][0] = 0.0f;
-    pout->m[2][1] = 0.0f;
-    pout->m[2][3] = 0.0f;
-    pout->m[3][0] = 0.0f;
-    pout->m[3][1] = 0.0f;
-    pout->m[3][2] = 0.0f;
-    pout->m[0][0] = 1.0f;
-    pout->m[1][1] = 1.0f;
-    pout->m[2][2] = 1.0f;
-    pout->m[3][3] = 1.0f;
-    return pout;
+    return sqrtf( pv.x * pv.x + pv.y * pv.y );
 }
 
-static inline float XRVec2Length(const Fvector2 *pv)
+static inline float XRPlaneDotCoord(const Fvector4 &pp, const Fvector3 &pv)
 {
-    if (!pv) return 0.0f;
-    return sqrtf( pv->x * pv->x + pv->y * pv->y );
+    return ( (pp.x) * (pv.x) + (pp.y) * (pv.y) + (pp.z) * (pv.z) + (pp.z) );
 }
 
-static inline Fvector3* XRVec3Cross(Fvector3 *pout, const Fvector3 *pv1, const Fvector3 *pv2)
+static inline float XRPlaneDotNormal(const Fvector4 &pp, const Fvector3 &pv)
 {
-    Fvector3 temp;
-
-    if ( !pout || !pv1 || !pv2) return nullptr;
-    temp.x = (pv1->y) * (pv2->z) - (pv1->z) * (pv2->y);
-    temp.y = (pv1->z) * (pv2->x) - (pv1->x) * (pv2->z);
-    temp.z = (pv1->x) * (pv2->y) - (pv1->y) * (pv2->x);
-    *pout = temp;
-    return pout;
+    return ( (pp.x) * (pv.x) + (pp.y) * (pv.y) + (pp.z) * (pv.z) );
 }
 
-static inline float XRVec3Dot(const Fvector3 *pv1, const Fvector3 *pv2)
+void XRVec3TransformNormal(Fvector3 *pout, const Fvector3 &pv, const Fmatrix &pm)
 {
-    if ( !pv1 || !pv2 ) return 0.0f;
-    return (pv1->x) * (pv2->x) + (pv1->y) * (pv2->y) + (pv1->z) * (pv2->z);
+    pout->x = pm.m[0][0] * pv.x + pm.m[1][0] * pv.y + pm.m[2][0] * pv.z;
+    pout->y = pm.m[0][1] * pv.x + pm.m[1][1] * pv.y + pm.m[2][1] * pv.z;
+    pout->z = pm.m[0][2] * pv.x + pm.m[1][2] * pv.y + pm.m[2][2] * pv.z;
 }
 
-static inline float XRPlaneDotCoord(const Fvector4 *pp, const Fvector3 *pv)
+void XRVec3TransformCoordArray(Fvector3* out, const Fvector3* in, const Fmatrix& matrix, uint elements)
 {
-    if ( !pp || !pv ) return 0.0f;
-    return ( (pp->x) * (pv->x) + (pp->y) * (pv->y) + (pp->z) * (pv->z) + (pp->z) );
-}
+    uint i;
 
-static inline float XRPlaneDotNormal(const Fvector4 *pp, const Fvector3 *pv)
-{
-    if ( !pp || !pv ) return 0.0f;
-    return ( (pp->x) * (pv->x) + (pp->y) * (pv->y) + (pp->z) * (pv->z) );
-}
-
-static inline float XRVec3Length(const Fvector3 *pv)
-{
-    if (!pv) return 0.0f;
-    return sqrtf( pv->x * pv->x + pv->y * pv->y + pv->z * pv->z );
-}
-
-Fvector3* XRVec3Normalize(Fvector3 *pout, const Fvector3 *pv)
-{
-    float norm;
-
-    norm = XRVec3Length(pv);
-    if ( !norm )
+    for (i = 0; i < elements; ++i)
     {
-        pout->x = 0.0f;
-        pout->y = 0.0f;
-        pout->z = 0.0f;
+        float norm = matrix.m[0][3] * in[i].x + matrix.m[1][3] * in[i].y + matrix.m[2][3] *in[i].z + matrix.m[3][3];
+    
+        out[i].x = (matrix.m[0][0] * in[i].x + matrix.m[1][0] * in[i].y + matrix.m[2][0] * in[i].z + matrix.m[3][0]) / norm;
+        out[i].y = (matrix.m[0][1] * in[i].x + matrix.m[1][1] * in[i].y + matrix.m[2][1] * in[i].z + matrix.m[3][1]) / norm;
+        out[i].z = (matrix.m[0][2] * in[i].x + matrix.m[1][2] * in[i].y + matrix.m[2][2] * in[i].z + matrix.m[3][2]) / norm;
     }
-    else
-    {
-        pout->x = pv->x / norm;
-        pout->y = pv->y / norm;
-        pout->z = pv->z / norm;
-    }
-
-    return pout;
 }
 
-Fvector3* XRVec3TransformNormal(Fvector3 *pout, const Fvector3 *pv, const Fmatrix *pm)
+void XRMatrixOrthoOffCenterLH(Fmatrix *pout, float l, float r, float b, float t, float zn, float zf)
 {
-    const Fvector3 v = *pv;
-
-    pout->x = pm->m[0][0] * v.x + pm->m[1][0] * v.y + pm->m[2][0] * v.z;
-    pout->y = pm->m[0][1] * v.x + pm->m[1][1] * v.y + pm->m[2][1] * v.z;
-    pout->z = pm->m[0][2] * v.x + pm->m[1][2] * v.y + pm->m[2][2] * v.z;
-    return pout;
-
-}
-
-Fmatrix* XRMatrixTranslation(Fmatrix *pout, float x, float y, float z)
-{
-    XRMatrixIdentity(pout);
-    pout->m[3][0] = x;
-    pout->m[3][1] = y;
-    pout->m[3][2] = z;
-    return pout;
-}
-
-Fmatrix* XRMatrixOrthoOffCenterLH(Fmatrix *pout, float l, float r, float b, float t, float zn, float zf)
-{
-    XRMatrixIdentity(pout);
+    pout->identity();
     pout->m[0][0] = 2.0f / (r - l);
     pout->m[1][1] = 2.0f / (t - b);
     pout->m[2][2] = 1.0f / (zf -zn);
     pout->m[3][0] = -1.0f -2.0f *l / (r - l);
     pout->m[3][1] = 1.0f + 2.0f * t / (b - t);
     pout->m[3][2] = zn / (zn -zf);
-    return pout;
 }
 
-Fmatrix* XRMatrixInverse(Fmatrix *pout, float *pdeterminant, const Fmatrix *pm)
+void XRMatrixInverse(Fmatrix *pout, float *pdeterminant, const Fmatrix &pm)
 {
     float det, t[3], v[16];
     unsigned int i, j;
     
-    t[0] = pm->m[2][2] * pm->m[3][3] - pm->m[2][3] * pm->m[3][2];
-    t[1] = pm->m[1][2] * pm->m[3][3] - pm->m[1][3] * pm->m[3][2];
-    t[2] = pm->m[1][2] * pm->m[2][3] - pm->m[1][3] * pm->m[2][2];
-    v[0] = pm->m[1][1] * t[0] - pm->m[2][1] * t[1] + pm->m[3][1] * t[2];
-    v[4] = -pm->m[1][0] * t[0] + pm->m[2][0] * t[1] - pm->m[3][0] * t[2];
+    t[0] = pm.m[2][2] * pm.m[3][3] - pm.m[2][3] * pm.m[3][2];
+    t[1] = pm.m[1][2] * pm.m[3][3] - pm.m[1][3] * pm.m[3][2];
+    t[2] = pm.m[1][2] * pm.m[2][3] - pm.m[1][3] * pm.m[2][2];
+    v[0] = pm.m[1][1] * t[0] - pm.m[2][1] * t[1] + pm.m[3][1] * t[2];
+    v[4] = -pm.m[1][0] * t[0] + pm.m[2][0] * t[1] - pm.m[3][0] * t[2];
 
-    t[0] = pm->m[1][0] * pm->m[2][1] - pm->m[2][0] * pm->m[1][1];
-    t[1] = pm->m[1][0] * pm->m[3][1] - pm->m[3][0] * pm->m[1][1];
-    t[2] = pm->m[2][0] * pm->m[3][1] - pm->m[3][0] * pm->m[2][1];
-    v[8] = pm->m[3][3] * t[0] - pm->m[2][3] * t[1] + pm->m[1][3] * t[2];
-    v[12] = -pm->m[3][2] * t[0] + pm->m[2][2] * t[1] - pm->m[1][2] * t[2];
+    t[0] = pm.m[1][0] * pm.m[2][1] - pm.m[2][0] * pm.m[1][1];
+    t[1] = pm.m[1][0] * pm.m[3][1] - pm.m[3][0] * pm.m[1][1];
+    t[2] = pm.m[2][0] * pm.m[3][1] - pm.m[3][0] * pm.m[2][1];
+    v[8] = pm.m[3][3] * t[0] - pm.m[2][3] * t[1] + pm.m[1][3] * t[2];
+    v[12] = -pm.m[3][2] * t[0] + pm.m[2][2] * t[1] - pm.m[1][2] * t[2];
 
-    det = pm->m[0][0] * v[0] + pm->m[0][1] * v[4] +
-        pm->m[0][2] * v[8] + pm->m[0][3] * v[12];
+    det = pm.m[0][0] * v[0] + pm.m[0][1] * v[4] +
+        pm.m[0][2] * v[8] + pm.m[0][3] * v[12];
     if (det == 0.0f)
-        return nullptr;
+        return;
     if (pdeterminant)
         *pdeterminant = det;
 
-    t[0] = pm->m[2][2] * pm->m[3][3] - pm->m[2][3] * pm->m[3][2];
-    t[1] = pm->m[0][2] * pm->m[3][3] - pm->m[0][3] * pm->m[3][2];
-    t[2] = pm->m[0][2] * pm->m[2][3] - pm->m[0][3] * pm->m[2][2];
-    v[1] = -pm->m[0][1] * t[0] + pm->m[2][1] * t[1] - pm->m[3][1] * t[2];
-    v[5] = pm->m[0][0] * t[0] - pm->m[2][0] * t[1] + pm->m[3][0] * t[2];
+    t[0] = pm.m[2][2] * pm.m[3][3] - pm.m[2][3] * pm.m[3][2];
+    t[1] = pm.m[0][2] * pm.m[3][3] - pm.m[0][3] * pm.m[3][2];
+    t[2] = pm.m[0][2] * pm.m[2][3] - pm.m[0][3] * pm.m[2][2];
+    v[1] = -pm.m[0][1] * t[0] + pm.m[2][1] * t[1] - pm.m[3][1] * t[2];
+    v[5] = pm.m[0][0] * t[0] - pm.m[2][0] * t[1] + pm.m[3][0] * t[2];
 
-    t[0] = pm->m[0][0] * pm->m[2][1] - pm->m[2][0] * pm->m[0][1];
-    t[1] = pm->m[3][0] * pm->m[0][1] - pm->m[0][0] * pm->m[3][1];
-    t[2] = pm->m[2][0] * pm->m[3][1] - pm->m[3][0] * pm->m[2][1];
-    v[9] = -pm->m[3][3] * t[0] - pm->m[2][3] * t[1]- pm->m[0][3] * t[2];
-    v[13] = pm->m[3][2] * t[0] + pm->m[2][2] * t[1] + pm->m[0][2] * t[2];
+    t[0] = pm.m[0][0] * pm.m[2][1] - pm.m[2][0] * pm.m[0][1];
+    t[1] = pm.m[3][0] * pm.m[0][1] - pm.m[0][0] * pm.m[3][1];
+    t[2] = pm.m[2][0] * pm.m[3][1] - pm.m[3][0] * pm.m[2][1];
+    v[9] = -pm.m[3][3] * t[0] - pm.m[2][3] * t[1]- pm.m[0][3] * t[2];
+    v[13] = pm.m[3][2] * t[0] + pm.m[2][2] * t[1] + pm.m[0][2] * t[2];
 
-    t[0] = pm->m[1][2] * pm->m[3][3] - pm->m[1][3] * pm->m[3][2];
-    t[1] = pm->m[0][2] * pm->m[3][3] - pm->m[0][3] * pm->m[3][2];
-    t[2] = pm->m[0][2] * pm->m[1][3] - pm->m[0][3] * pm->m[1][2];
-    v[2] = pm->m[0][1] * t[0] - pm->m[1][1] * t[1] + pm->m[3][1] * t[2];
-    v[6] = -pm->m[0][0] * t[0] + pm->m[1][0] * t[1] - pm->m[3][0] * t[2];
+    t[0] = pm.m[1][2] * pm.m[3][3] - pm.m[1][3] * pm.m[3][2];
+    t[1] = pm.m[0][2] * pm.m[3][3] - pm.m[0][3] * pm.m[3][2];
+    t[2] = pm.m[0][2] * pm.m[1][3] - pm.m[0][3] * pm.m[1][2];
+    v[2] = pm.m[0][1] * t[0] - pm.m[1][1] * t[1] + pm.m[3][1] * t[2];
+    v[6] = -pm.m[0][0] * t[0] + pm.m[1][0] * t[1] - pm.m[3][0] * t[2];
 
-    t[0] = pm->m[0][0] * pm->m[1][1] - pm->m[1][0] * pm->m[0][1];
-    t[1] = pm->m[3][0] * pm->m[0][1] - pm->m[0][0] * pm->m[3][1];
-    t[2] = pm->m[1][0] * pm->m[3][1] - pm->m[3][0] * pm->m[1][1];
-    v[10] = pm->m[3][3] * t[0] + pm->m[1][3] * t[1] + pm->m[0][3] * t[2];
-    v[14] = -pm->m[3][2] * t[0] - pm->m[1][2] * t[1] - pm->m[0][2] * t[2];
+    t[0] = pm.m[0][0] * pm.m[1][1] - pm.m[1][0] * pm.m[0][1];
+    t[1] = pm.m[3][0] * pm.m[0][1] - pm.m[0][0] * pm.m[3][1];
+    t[2] = pm.m[1][0] * pm.m[3][1] - pm.m[3][0] * pm.m[1][1];
+    v[10] = pm.m[3][3] * t[0] + pm.m[1][3] * t[1] + pm.m[0][3] * t[2];
+    v[14] = -pm.m[3][2] * t[0] - pm.m[1][2] * t[1] - pm.m[0][2] * t[2];
 
-    t[0] = pm->m[1][2] * pm->m[2][3] - pm->m[1][3] * pm->m[2][2];
-    t[1] = pm->m[0][2] * pm->m[2][3] - pm->m[0][3] * pm->m[2][2];
-    t[2] = pm->m[0][2] * pm->m[1][3] - pm->m[0][3] * pm->m[1][2];
-    v[3] = -pm->m[0][1] * t[0] + pm->m[1][1] * t[1] - pm->m[2][1] * t[2];
-    v[7] = pm->m[0][0] * t[0] - pm->m[1][0] * t[1] + pm->m[2][0] * t[2];
+    t[0] = pm.m[1][2] * pm.m[2][3] - pm.m[1][3] * pm.m[2][2];
+    t[1] = pm.m[0][2] * pm.m[2][3] - pm.m[0][3] * pm.m[2][2];
+    t[2] = pm.m[0][2] * pm.m[1][3] - pm.m[0][3] * pm.m[1][2];
+    v[3] = -pm.m[0][1] * t[0] + pm.m[1][1] * t[1] - pm.m[2][1] * t[2];
+    v[7] = pm.m[0][0] * t[0] - pm.m[1][0] * t[1] + pm.m[2][0] * t[2];
 
-    v[11] = -pm->m[0][0] * (pm->m[1][1] * pm->m[2][3] - pm->m[1][3] * pm->m[2][1]) +
-        pm->m[1][0] * (pm->m[0][1] * pm->m[2][3] - pm->m[0][3] * pm->m[2][1]) -
-        pm->m[2][0] * (pm->m[0][1] * pm->m[1][3] - pm->m[0][3] * pm->m[1][1]);
+    v[11] = -pm.m[0][0] * (pm.m[1][1] * pm.m[2][3] - pm.m[1][3] * pm.m[2][1]) +
+        pm.m[1][0] * (pm.m[0][1] * pm.m[2][3] - pm.m[0][3] * pm.m[2][1]) -
+        pm.m[2][0] * (pm.m[0][1] * pm.m[1][3] - pm.m[0][3] * pm.m[1][1]);
 
-    v[15] = pm->m[0][0] * (pm->m[1][1] * pm->m[2][2] - pm->m[1][2] * pm->m[2][1]) -
-        pm->m[1][0] * (pm->m[0][1] * pm->m[2][2] - pm->m[0][2] * pm->m[2][1]) +
-        pm->m[2][0] * (pm->m[0][1] * pm->m[1][2] - pm->m[0][2] * pm->m[1][1]);
+    v[15] = pm.m[0][0] * (pm.m[1][1] * pm.m[2][2] - pm.m[1][2] * pm.m[2][1]) -
+        pm.m[1][0] * (pm.m[0][1] * pm.m[2][2] - pm.m[0][2] * pm.m[2][1]) +
+        pm.m[2][0] * (pm.m[0][1] * pm.m[1][2] - pm.m[0][2] * pm.m[1][1]);
 
     det = 1.0f / det;
 
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
             pout->m[i][j] = v[4 * i + j] * det;
-
-    return pout;
-}
-
-Fmatrix* XRMatrixMultiply(Fmatrix *pout, const Fmatrix *pm1, const Fmatrix *pm2)
-{
-    Fmatrix out;
-    int i,j;
-
-    for (i=0; i<4; i++)
-    {
-        for (j=0; j<4; j++)
-        {
-            out.m[i][j] = pm1->m[i][0] * pm2->m[0][j] + pm1->m[i][1] * pm2->m[1][j] + pm1->m[i][2] * pm2->m[2][j] + pm1->m[i][3] * pm2->m[3][j];
-        }
-    }
-
-    *pout = out;
-    return pout;
-}
-
-Fvector3* XRVec3TransformCoord(Fvector3 *pout, const Fvector3 *pv, const Fmatrix *pm)
-{
-    Fvector3 out;
-    float norm;
-
-    norm = pm->m[0][3] * pv->x + pm->m[1][3] * pv->y + pm->m[2][3] *pv->z + pm->m[3][3];
-
-    out.x = (pm->m[0][0] * pv->x + pm->m[1][0] * pv->y + pm->m[2][0] * pv->z + pm->m[3][0]) / norm;
-    out.y = (pm->m[0][1] * pv->x + pm->m[1][1] * pv->y + pm->m[2][1] * pv->z + pm->m[3][1]) / norm;
-    out.z = (pm->m[0][2] * pv->x + pm->m[1][2] * pv->y + pm->m[2][2] * pv->z + pm->m[3][2]) / norm;
-
-    *pout = out;
-
-    return pout;
-}
-
-Fvector3* XRVec3TransformCoordArray(Fvector3* out, const Fvector3* in, const Fmatrix* matrix, uint elements)
-{
-    uint i;
-
-    for (i = 0; i < elements; ++i)
-        XRVec3TransformCoord(&out[i], &in[i], matrix);
-
-    return out;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -345,29 +230,29 @@ struct BoundingBox
 //  PlaneIntersection
 //    computes the point where three planes intersect
 //    returns whether or not the point exists.
-static inline BOOL PlaneIntersection(Fvector3* intersectPt, const Fvector4* p0, const Fvector4* p1,
-                                     const Fvector4* p2)
+static inline BOOL PlaneIntersection(Fvector3* intersectPt, const Fvector4& p0, const Fvector4& p1,
+                                     const Fvector4& p2)
 {
-    Fvector3 n0 = {p0->x, p0->y, p0->z};
-    Fvector3 n1 = {p1->x, p1->y, p1->z};
-    Fvector3 n2 = {p2->x, p2->y, p2->z};
+    Fvector3 n0 = {p0.x, p0.y, p0.z};
+    Fvector3 n1 = {p1.x, p1.y, p1.z};
+    Fvector3 n2 = {p2.x, p2.y, p2.z};
     
     Fvector3 n1_n2, n2_n0, n0_n1;
 
-    XRVec3Cross(&n1_n2, &n1, &n2);
-    XRVec3Cross(&n2_n0, &n2, &n0);
-    XRVec3Cross(&n0_n1, &n0, &n1);
+    n1_n2.crossproduct(n1, n2);
+    n2_n0.crossproduct(n2, n0);
+    n0_n1.crossproduct(n0, n1);
 
-    float cosTheta = XRVec3Dot(&n0, &n1_n2);
+    float cosTheta = n0.dotproduct(n1_n2);
 
     if (ALMOST_ZERO(cosTheta) || IS_SPECIAL(cosTheta))
         return FALSE;
 
     float secTheta = 1.f / cosTheta;
 
-    n1_n2.mul(p0->w);
-    n2_n0.mul(p1->w);
-    n0_n1.mul(p2->w);
+    n1_n2.mul(p0.w);
+    n2_n0.mul(p1.w);
+    n0_n1.mul(p2.w);
 
     Fvector3 result = n1_n2;
     result.add(n2_n0);
@@ -422,10 +307,10 @@ Frustum::Frustum(const Fmatrix* matrix)
 
     for (int i = 0; i < 8; i++) // compute extrema
     {
-        const Fvector4 p0 = i & 1 ? camPlanes[4] : camPlanes[5];
-        const Fvector4 p1 = i & 2 ? camPlanes[3] : camPlanes[2];
-        const Fvector4 p2 = i & 4 ? camPlanes[0] : camPlanes[1];
-        PlaneIntersection(&pntList[i], &p0, &p1, &p2);
+        const Fvector4& p0 = i & 1 ? camPlanes[4] : camPlanes[5];
+        const Fvector4& p1 = i & 2 ? camPlanes[3] : camPlanes[2];
+        const Fvector4& p2 = i & 4 ? camPlanes[0] : camPlanes[1];
+        PlaneIntersection(&pntList[i], p0, p1, p2);
     }
 }
 
@@ -461,8 +346,8 @@ struct DumbClipper
         for (int it = 0; it < int(planes.size()); it++)
         {
             Fvector4 P = planes [it];
-            float cls0 = XRPlaneDotCoord(&P, &p0);
-            float cls1 = XRPlaneDotCoord(&P, &p1);
+            float cls0 = XRPlaneDotCoord(P, p0);
+            float cls1 = XRPlaneDotCoord(P, p1);
             if (cls0 > 0 && cls1 > 0) return false; // fully outside
 
             if (cls0 > 0)
@@ -470,7 +355,7 @@ struct DumbClipper
                 // clip p0
                 D.set(p1);
                 D.sub(p0);
-                denum = XRPlaneDotNormal(&P, &D);
+                denum = XRPlaneDotNormal(P, D);
                 if (denum != 0)
                 {
                     D.invert();
@@ -483,7 +368,7 @@ struct DumbClipper
                 // clip p1
                 D.set(p0);
                 D.sub(p1);
-                denum = XRPlaneDotNormal(&P, &D);
+                denum = XRPlaneDotNormal(P, D);
                 if (denum != 0)
                 {
                     D.invert();
@@ -548,7 +433,7 @@ Fvector2 BuildTSMProjectionMatrix_caster_depth_bounds(Fmatrix& lightSpaceBasis)
 {
     float min_z = 1e32f, max_z = -1e32f;
     Fmatrix minmax_xf;
-    XRMatrixMultiply(&minmax_xf, &Device.mView, &lightSpaceBasis);
+    minmax_xf.mul(Device.mView, lightSpaceBasis);
     Fmatrix& minmax_xform = minmax_xf;
     for (u32 c = 0; c < s_casters.size(); c++)
     {
@@ -577,7 +462,8 @@ void CRender::render_sun()
         //ex_project.build_projection	(deg2rad(Device.fFOV),Device.fASPECT,ps_r2_sun_near,_far_);	
         ex_project.build_projection(deg2rad(Device.fFOV), Device.fASPECT, VIEWPORT_NEAR, _far_);
         ex_full.mul(ex_project, Device.mView);
-        XRMatrixInverse(&ex_full_inverse, nullptr, &ex_full);
+        ex_full_inverse.invert(ex_full);
+        XRMatrixInverse(&ex_full_inverse, nullptr, ex_full);
     }
 
     // Compute volume(s) - something like a frustum for infinite directional light
@@ -730,10 +616,10 @@ void CRender::render_sun()
         const Fvector3 eyeVector = {0.f, 0.f, -1.f}; //  eye is always -Z in eye space
 
         //  code copied straight from BuildLSPSMProjectionMatrix
-        XRVec3TransformNormal(&upVector, &m_lightDir, &m_View); // lightDir is defined in eye space, so xform it
-        XRVec3Cross(&leftVector, &upVector, &eyeVector);
-        XRVec3Normalize(&leftVector, &leftVector);
-        XRVec3Cross(&viewVector, &upVector, &leftVector);
+        XRVec3TransformNormal(&upVector, m_lightDir, m_View); // lightDir is defined in eye space, so xform it
+        leftVector.crossproduct(upVector, eyeVector);
+        leftVector.normalize();
+        viewVector.crossproduct(upVector, leftVector);
 
         Fmatrix lightSpaceBasis;
         lightSpaceBasis._11 = leftVector.x;
@@ -754,7 +640,7 @@ void CRender::render_sun()
         lightSpaceBasis._44 = 1.f;
 
         //  rotate the view frustum into light space
-        XRVec3TransformCoordArray(frustumPnts, frustumPnts, &lightSpaceBasis, POINTS_NUM);
+        XRVec3TransformCoordArray(frustumPnts, frustumPnts, lightSpaceBasis, POINTS_NUM);
 
         //  build an off-center ortho projection that translates and scales the eye frustum's 3D AABB to the unit cube
         BoundingBox frustumBox(frustumPnts, POINTS_NUM);
@@ -769,11 +655,11 @@ void CRender::render_sun()
         if (min_z <= 1.f) //?
         {
             Fmatrix lightSpaceTranslate;
-            XRMatrixTranslation(&lightSpaceTranslate, 0.f, 0.f, -min_z + 1.f);
+            lightSpaceTranslate.translate(0.f, 0.f, -min_z + 1.f);
             max_z = -min_z + max_z + 1.f;
             min_z = 1.f;
-            XRMatrixMultiply(&lightSpaceBasis, &lightSpaceBasis, &lightSpaceTranslate);
-            XRVec3TransformCoordArray(frustumPnts, frustumPnts, &lightSpaceTranslate, POINTS_NUM);
+            lightSpaceBasis.mul(lightSpaceBasis, lightSpaceTranslate);
+            XRVec3TransformCoordArray(frustumPnts, frustumPnts, lightSpaceTranslate, POINTS_NUM);
             frustumBox = BoundingBox(frustumPnts, POINTS_NUM);
         }
 
@@ -782,7 +668,7 @@ void CRender::render_sun()
                                    frustumBox.maxPt.y, min_z, max_z);
 
         //  transform the view frustum by the new matrix
-        XRVec3TransformCoordArray(frustumPnts, frustumPnts, &lightSpaceOrtho, POINTS_NUM);
+        XRVec3TransformCoordArray(frustumPnts, frustumPnts, lightSpaceOrtho, POINTS_NUM);
 
         Fvector2 centerPts [2];
         //  near plane
@@ -805,7 +691,7 @@ void CRender::render_sun()
 
         Fvector2 center_dirl = centerPts[1];
         center_dirl.sub(centerOrig);
-        float half_center_len = XRVec2Length(&center_dirl);
+        float half_center_len = XRVec2Length(center_dirl);
         float x_len = centerPts[1].x - centerOrig.x;
         float y_len = centerPts[1].y - centerOrig.y;
 
@@ -821,8 +707,8 @@ void CRender::render_sun()
         //  since Top and Base are orthogonal to Center, we can skip computing the convex hull, and instead
         //  just find the view frustum X-axis extrema.  The most negative is Top, the most positive is Base
         //  Point Q (trapezoid projection point) will be a point on the y=0 line.
-        XRMatrixMultiply(&trapezoid_space, &xlate_center, &rot_center);
-        XRVec3TransformCoordArray(frustumPnts, frustumPnts, &trapezoid_space, POINTS_NUM);
+        trapezoid_space.mul(xlate_center, rot_center);
+        XRVec3TransformCoordArray(frustumPnts, frustumPnts, trapezoid_space, POINTS_NUM);
 
         BoundingBox frustumAABB2D(frustumPnts, POINTS_NUM);
 
@@ -837,7 +723,7 @@ void CRender::render_sun()
                                 0.f, 0.f, 1.f, 0.f,
                                 0.f, 0.f, 0.f, 1.f};
 
-        XRMatrixMultiply(&trapezoid_space, &trapezoid_space, &scale_center);
+        trapezoid_space.mul(trapezoid_space, scale_center);
 
         //  scale the frustum AABB up by these amounts (keep all values in the same space)
         frustumAABB2D.minPt.x *= x_scale;
@@ -877,7 +763,7 @@ void CRender::render_sun()
                              0.f, 1.f, 0.f, 0.f,
                              0.f, 0.f, 1.f, 0.f,
                              projectionPtQ.x, 0.f, 0.f, 1.f};
-        XRMatrixMultiply(&trapezoid_space, &trapezoid_space, &ptQ_xlate);
+        trapezoid_space.mul(trapezoid_space, ptQ_xlate);
 
         //  this shear balances the "trapezoid" around the y=0 axis (no change to the projection pt position)
         //  since we are redistributing the trapezoid, this affects the projection field of view (shear_amt)
@@ -889,7 +775,7 @@ void CRender::render_sun()
                                    0.f, 0.f, 1.f, 0.f,
                                    0.f, 0.f, 0.f, 1.f};
 
-        XRMatrixMultiply(&trapezoid_space, &trapezoid_space, &trapezoid_shear);
+        trapezoid_space.mul(trapezoid_space, trapezoid_shear);
 
 
         float z_aspect = (frustumBox.maxPt.z - frustumBox.minPt.z) / (frustumAABB2D.maxPt.y - frustumAABB2D.minPt.y);
@@ -900,18 +786,18 @@ void CRender::render_sun()
                                         0.f, 0.f, 1.f / (z_aspect * max_slope), 0.f,
                                         -xn * xf / (xf - xn), 0.f, 0.f, 0.f};
 
-        XRMatrixMultiply(&trapezoid_space, &trapezoid_space, &trapezoid_projection);
+        trapezoid_space.mul(trapezoid_space, trapezoid_projection);
 
         //  the x axis is compressed to [0..1] as a result of the projection, so expand it to [-1,1]
         Fmatrix biasedScaleX = {2.f, 0.f, 0.f, 0.f,
                                 0.f, 1.f, 0.f, 0.f,
                                 0.f, 0.f, 1.f, 0.f,
                                 -1.f, 0.f, 0.f, 1.f};
-        XRMatrixMultiply(&trapezoid_space, &trapezoid_space, &biasedScaleX);
+        trapezoid_space.mul(trapezoid_space, biasedScaleX);
 
-        XRMatrixMultiply(&m_LightViewProj, &m_View, &lightSpaceBasis);
-        XRMatrixMultiply(&m_LightViewProj, &m_LightViewProj, &lightSpaceOrtho);
-        XRMatrixMultiply(&m_LightViewProj, &m_LightViewProj, &trapezoid_space);
+        m_LightViewProj.mul(m_View, lightSpaceBasis);
+        m_LightViewProj.mul(m_LightViewProj, lightSpaceOrtho);
+        m_LightViewProj.mul(m_LightViewProj, trapezoid_space);
     }
     else
     {
@@ -959,7 +845,7 @@ void CRender::render_sun()
             x_project.build_projection(deg2rad(Device.fFOV), Device.fASPECT,VIEWPORT_NEAR,
                                        ps_r2_sun_near + tweak_guaranteed_range);
             x_full.mul(x_project, Device.mView);
-            XRMatrixInverse(&x_full_inverse, nullptr, &x_full);
+            XRMatrixInverse(&x_full_inverse, nullptr, x_full);
         }
         for (int e = 0; e < 8; e++)
         {
@@ -990,7 +876,7 @@ void CRender::render_sun()
                                      0.f, 2.f / boxHeight, 0.f, 0.f,
                                      0.f, 0.f, 1.f, 0.f,
                                      -2.f * boxX / boxWidth, -2.f * boxY / boxHeight, 0.f, 1.f};
-        XRMatrixMultiply(&m_LightViewProj, &m_LightViewProj, &trapezoidUnitCube);
+        m_LightViewProj.mul(m_LightViewProj, trapezoidUnitCube);
         //XRMatrixMultiply( &trapezoid_space, &trapezoid_space, &trapezoidUnitCube );
         FPU::m24r();
     }
@@ -1057,7 +943,7 @@ void CRender::render_sun_near()
         ex_project.build_projection(deg2rad(Device.fFOV/* *Device.fASPECT*/), Device.fASPECT,VIEWPORT_NEAR,
                                     ps_r2_sun_near);
         ex_full.mul(ex_project, Device.mView);
-        XRMatrixInverse(&ex_full_inverse, nullptr, &ex_full);
+        XRMatrixInverse(&ex_full_inverse, nullptr, ex_full);
     }
 
     // Compute volume(s) - something like a frustum for infinite directional light
@@ -1189,7 +1075,7 @@ void CRender::render_sun_near()
             view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
         };
         Fmatrix m_viewport_inv;
-        XRMatrixInverse(&m_viewport_inv, nullptr, &m_viewport);
+        XRMatrixInverse(&m_viewport_inv, nullptr, m_viewport);
 
         // snap view-position to pixel
         cull_xform.mul(mdir_Project, mdir_View);
@@ -1346,7 +1232,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     {
         ex_project = Device.mProject;
         ex_full.mul(ex_project, Device.mView);
-        XRMatrixInverse(&ex_full_inverse, nullptr, &ex_full);
+        XRMatrixInverse(&ex_full_inverse, nullptr, ex_full);
     }
 
     // Compute volume(s) - something like a frustum for infinite directional light
@@ -1460,7 +1346,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
             view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
         };
         Fmatrix m_viewport_inv;
-        XRMatrixInverse(&m_viewport_inv, nullptr, &m_viewport);
+        XRMatrixInverse(&m_viewport_inv, nullptr, m_viewport);
 
         // snap view-position to pixel
         cull_xform.mul(mdir_Project, mdir_View);
