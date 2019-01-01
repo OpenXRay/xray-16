@@ -11,6 +11,8 @@
 #include <ctype.h>
 #include <limits.h> // for PAGESIZE...
 #include <math.h>
+#include <sched.h>
+
 #include <algorithm> // for min max
 
 #include <string>
@@ -1087,7 +1089,7 @@ typedef void *HIC;
 #define D3DTSS_TCI_CAMERASPACEREFLECTIONVECTOR    0x30000
 #define D3DTSS_TCI_SPHEREMAP                      0x40000
 
-inline BOOL SwitchToThread() { return (0 == pthread_yield()); }
+inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
 inline void convert_path_separators(char * path)
 {

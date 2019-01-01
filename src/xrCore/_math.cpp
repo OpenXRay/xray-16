@@ -21,7 +21,6 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <sys/prctl.h>
 #include <chrono>
 #endif
 #include <thread>
@@ -323,7 +322,7 @@ void thread_name(const char* name)
     {
     }
 #else
-    prctl(PR_SET_NAME, name, 0, 0, 0);
+    pthread_setname_np(pthread_self(), name);
 #endif
 }
 #pragma pack(pop)
