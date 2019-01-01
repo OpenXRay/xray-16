@@ -38,7 +38,7 @@ static int facetable[6][4] = {
 
 static inline Fmatrix* XRMatrixIdentity(Fmatrix *pout)
 {
-    if ( !pout ) return NULL;
+    if ( !pout ) return nullptr;
     pout->m[0][1] = 0.0f;
     pout->m[0][2] = 0.0f;
     pout->m[0][3] = 0.0f;
@@ -68,7 +68,7 @@ static inline Fvector3* XRVec3Cross(Fvector3 *pout, const Fvector3 *pv1, const F
 {
     Fvector3 temp;
 
-    if ( !pout || !pv1 || !pv2) return NULL;
+    if ( !pout || !pv1 || !pv2) return nullptr;
     temp.x = (pv1->y) * (pv2->z) - (pv1->z) * (pv2->y);
     temp.y = (pv1->z) * (pv2->x) - (pv1->x) * (pv2->z);
     temp.z = (pv1->x) * (pv2->y) - (pv1->y) * (pv2->x);
@@ -173,7 +173,7 @@ Fmatrix* XRMatrixInverse(Fmatrix *pout, float *pdeterminant, const Fmatrix *pm)
     det = pm->m[0][0] * v[0] + pm->m[0][1] * v[4] +
         pm->m[0][2] * v[8] + pm->m[0][3] * v[12];
     if (det == 0.0f)
-        return NULL;
+        return nullptr;
     if (pdeterminant)
         *pdeterminant = det;
 
