@@ -227,21 +227,16 @@ void FillVidModesToken(u32 monitorID)
     R_ASSERT3(modeCount > 0, "Failed to find display modes", SDL_GetError());
     modes.reserve(modeCount + 1);
 
-    Msg("Available video modes[%d]:", modes.size());
-
     SDL_DisplayMode displayMode;
     for (int i = modeCount - 1; i >= 0; --i)
     {
         R_ASSERT3(SDL_GetDisplayMode(monitorID, i, &displayMode) == 0, "Failed to find specified display mode", SDL_GetError());
-        
+
         string16 str;
         xr_sprintf(str, sizeof(str), "%dx%d", displayMode.w, displayMode.h);
 
         if (modes.cend() == std::find_if(modes.cbegin(), modes.cend(), uniqueRenderingMode(str)))
-        {
             modes.emplace_back(xr_strdup(str), i);
-            Msg("[%s]", str);
-        }
 
         // For the first time we can fill refresh rate token here
         if (displayMode.w == psCurrentVidMode[0] && displayMode.h == psCurrentVidMode[1])
@@ -251,6 +246,10 @@ void FillVidModesToken(u32 monitorID)
             rates.emplace_back(xr_strdup(str), displayMode.refresh_rate);
         }
     }
+
+    Msg("Available video modes[%d]:", modes.size());
+    for (const auto& mode : modes)
+        Msg("[%s]", mode.name);
 
     modes.emplace_back(nullptr, -1);
     rates.emplace_back(nullptr, -1);
