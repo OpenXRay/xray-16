@@ -58,11 +58,9 @@ void XRVec3TransformNormal(Fvector3 *pout, const Fvector3 &pv, const Fmatrix &pm
     pout->z = pm.m[0][2] * pv.x + pm.m[1][2] * pv.y + pm.m[2][2] * pv.z;
 }
 
-void XRVec3TransformCoordArray(Fvector3* out, const Fvector3* in, const Fmatrix& matrix, uint elements)
+void XRVec3TransformCoordArray(Fvector3* out, const Fvector3* in, const Fmatrix& matrix, unsigned int elements)
 {
-    uint i;
-
-    for (i = 0; i < elements; ++i)
+    for (unsigned int i = 0; i < elements; ++i)
     {
         float norm = matrix.m[0][3] * in[i].x + matrix.m[1][3] * in[i].y + matrix.m[2][3] *in[i].z + matrix.m[3][3];
     
