@@ -345,7 +345,7 @@ struct DumbClipper
         Fvector3 D;
         for (int it = 0; it < int(planes.size()); it++)
         {
-            Fvector4 P = planes [it];
+            const Fvector4 P = planes [it];
             float cls0 = XRPlaneDotCoord(P, p0);
             float cls1 = XRPlaneDotCoord(P, p1);
             if (cls0 > 0 && cls1 > 0) return false; // fully outside
