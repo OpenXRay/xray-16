@@ -33,6 +33,9 @@
 	<string id="ui_mm_loadingstages">
 		<text>Стадии загрузки</text>
 	</string>
+	<string id="renderer_gl">
+		<text>Ул. полное освещение (OpenGL)</text>
+	</string>
 	<string id="ui_mm_r2_fxaa">
 		<text>FXAA</text>
 	</string>
@@ -55,24 +58,24 @@
 		<text>Language</text>
 	</string>
 	<string id="eng">
-		<text>English</text>
+		<text>Английский (English)</text>
 	</string>
 	<string id="fra">
-		<text>French</text>
+		<text>Французский (French)</text>
 	</string>
 	<string id="ger">
-		<text>German</text>
+		<text>Немецкий (German)</text>
 	</string>
 	<string id="ita">
-		<text>Italian</text>
+		<text>Итальянский (Italian)</text>
 	</string>
 	<string id="pol">
-		<text>Polish</text>
+		<text>Польский (Polish)</text>
 	</string>
 	<string id="rus">
-		<text>Russian</text>
+		<text>Русский (Russian)</text>
 	</string>
 	<string id="spa">
-		<text>Spanish</text>
+		<text>Испанский (Spanish)</text>
 	</string>
 </string_table>
