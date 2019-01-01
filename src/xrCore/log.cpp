@@ -5,9 +5,6 @@
 #include "resource.h"
 #include "log.h"
 #include "xrCore/Threading/Lock.hpp"
-#ifdef _EDITOR
-#include "malloc.h"
-#endif
 
 BOOL LogExecCB = TRUE;
 string_path logFName = "engine.log";
@@ -242,8 +239,6 @@ void CreateLog(BOOL nl)
         }
         LogWriter->flush();
     }
-
-    LogFile.reserve(128);
 
     if (strstr(Core.Params, "-force_flushlog"))
         ForceFlushLog = true;
