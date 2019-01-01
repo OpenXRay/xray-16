@@ -102,7 +102,7 @@ static inline float XRVec3Length(const Fvector3 *pv)
 
 Fvector3* XRVec3Normalize(Fvector3 *pout, const Fvector3 *pv)
 {
-    FLOAT norm;
+    float norm;
 
     norm = XRVec3Length(pv);
     if ( !norm )
@@ -244,7 +244,7 @@ Fmatrix* XRMatrixMultiply(Fmatrix *pout, const Fmatrix *pm1, const Fmatrix *pm2)
 Fvector3* XRVec3TransformCoord(Fvector3 *pout, const Fvector3 *pv, const Fmatrix *pm)
 {
     Fvector3 out;
-    FLOAT norm;
+    float norm;
 
     norm = pm->m[0][3] * pv->x + pm->m[1][3] * pv->y + pm->m[2][3] *pv->z + pm->m[3][3];
 
