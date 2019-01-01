@@ -35,7 +35,6 @@ const int dm_obj_in_slot = 4;
 const float dm_slot_size = DETAIL_SLOT_SIZE;
 
 //AVO: detail radius
-#ifdef DETAIL_RADIUS
 //const u32 dm_max_cache_size = 62001; // assuming max dm_size = 124
 constexpr auto dm_max_cache_size = 62001 * 2; // assuming max dm_size = 248
 extern u32 dm_size;
@@ -49,13 +48,6 @@ extern u32 dm_current_cache_line;// = dm_current_size+1+dm_current_size;
 extern u32 dm_current_cache_size;// = dm_current_cache_line*dm_current_cache_line;
 extern float dm_current_fade;// = float(2*dm_current_size)-.5f;
 extern float ps_current_detail_density;
-#else
-const int dm_size = 24;
-const int dm_cache1_line = dm_size * 2 / dm_cache1_count; //! dm_size*2 must be div dm_cache1_count
-const int dm_cache_line = dm_size + 1 + dm_size;
-const int dm_cache_size = dm_cache_line * dm_cache_line;
-const float dm_fade = float(2 * dm_size) - .5f;
-#endif
 
 class ECORE_API CDetailManager
 {
@@ -160,17 +152,10 @@ public:
     xrXRC xrc;
 #endif
     //AVO: detail draw radius
-#ifdef DETAIL_RADIUS
     CacheSlot1** cache_level1;
     Slot*** cache; // grid-cache itself
     svector<Slot*, dm_max_cache_size> cache_task; // non-unpacked slots
     Slot* cache_pool; // just memory for slots
-#else
-    CacheSlot1 cache_level1[dm_cache1_line][dm_cache1_line];
-    Slot* cache[dm_cache_line][dm_cache_line]; // grid-cache itself
-    svector<Slot*, dm_cache_size> cache_task; // non-unpacked slots
-    Slot cache_pool[dm_cache_size]; // just memory for slots
-#endif
 
     int cache_cx;
     int cache_cz;

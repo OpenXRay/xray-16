@@ -19,9 +19,6 @@
 #define GAME_OBJECT_CASTING_EXPORTS // see: script_game_object4.cpp  functions for object casting (ie. cast_Car(), cast_Heli())
 #define NAMESPACE_LEVEL_EXPORTS // see: level_script.cpp
 
-/* Visual */
-#define DETAIL_RADIUS // detail draw radius (by K.D.)
-
 /* Tweaks: */
 #define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
 

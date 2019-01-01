@@ -87,7 +87,6 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     m_time_pos = 0;
     m_global_time_old = 0;
 
-#ifdef DETAIL_RADIUS
     // KD: variable detail radius
     dm_size = dm_current_size;
     dm_cache_line = dm_current_cache_line;
@@ -115,12 +114,10 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     Slot* cache [dm_cache_line][dm_cache_line]; // grid-cache itself
     Slot cache_pool [dm_cache_size]; // just memory for slots 
     */
-#endif
 }
 
 CDetailManager::~CDetailManager()
 {
-#ifdef DETAIL_RADIUS
     for (u32 i = 0; i < dm_cache_size; ++i)
         cache_pool[i].~Slot();
     xr_free(cache_pool);
@@ -136,7 +133,6 @@ CDetailManager::~CDetailManager()
         xr_free(cache_level1[i]);
     }
     xr_free(cache_level1);
-#endif
 }
 
 #ifndef _EDITOR
