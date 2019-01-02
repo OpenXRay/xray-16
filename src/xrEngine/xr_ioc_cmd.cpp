@@ -442,7 +442,11 @@ public:
         bEmptyArgsHandled = false;
     }
 
-    void Execute(pcstr args) override { CCC_Token::Execute(args); }
+    void Execute(pcstr args) override
+    {
+        CCC_Token::Execute(args);
+        FillVidModesToken(Vid_SelectedMonitor);
+    }
 
     const xr_token* GetToken() noexcept override { return VidMonitorsToken.data(); }
 };
