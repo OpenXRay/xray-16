@@ -56,7 +56,7 @@ protected:
     void ProcessEvent(EVENT ev);
 
     bool IsButton(CUIWindow* st);
-    void CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path);
+    void CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path, bool required = true);
     void ShowMain();
     void ShowNewGame();
     void ShowNetworkGame();

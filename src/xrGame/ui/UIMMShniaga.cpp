@@ -80,8 +80,6 @@ CUIMMShniaga::~CUIMMShniaga()
     delete_data(m_buttons_new_network);
 }
 
-extern CActor* g_actor;
-
 void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
 {
     string256 _path;
@@ -111,7 +109,7 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
         if (GameID() == eGameIDSingle)
         {
             VERIFY(Actor());
-            if (g_actor && !Actor()->g_Alive())
+            if (Actor() && !Actor()->g_Alive())
                 CreateList(m_buttons, xml_doc, "menu_main_single_dead");
             else
                 CreateList(m_buttons, xml_doc, "menu_main_single");
@@ -119,7 +117,7 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
         else
             CreateList(m_buttons, xml_doc, "menu_main_mm");
     }
-    CreateList(m_buttons_new_network, xml_doc, "menu_network_game");
+    CreateList(m_buttons_new_network, xml_doc, "menu_network_game", false);
 
     ShowMain();
 
@@ -128,9 +126,8 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
 }
 
 void CUIMMShniaga::OnDeviceReset() {}
-extern CActor* g_actor;
 
-void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path)
+void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path, bool required /*= true*/)
 {
     CGameFont* pF;
     u32 color;
@@ -138,7 +135,11 @@ void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCS
     R_ASSERT(button_height);
 
     CUIXmlInit::InitFont(xml_doc, path, 0, color, pF);
-    R_ASSERT(pF);
+    if (!pF)
+    {
+        R_ASSERT(!required);
+        return;
+    }
 
     int nodes_num = xml_doc.GetNodesNum(path, 0, "btn");
 
