@@ -76,10 +76,8 @@ bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
     IReader* F = FS.r_open(path, xml_filename);
     if (!F)
     {
-        if (fatal)
-            R_ASSERT3(F, "Can't find specified xml file", xml_filename);
-        else
-            return false;
+        R_ASSERT3(!fatal, "Can't find specified xml file", xml_filename);
+        return false;
     }
 
     xr_strcpy(m_xml_file_name, xml_filename);
