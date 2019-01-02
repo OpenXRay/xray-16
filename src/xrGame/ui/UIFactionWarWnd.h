@@ -20,7 +20,9 @@ class CUIFrameLineWnd;
 class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
-	
+
+    bool m_initialized;
+
 	CUIFrameWindow*	m_background;
 	CUIFrameWindow*	m_center_background;
 
