@@ -49,6 +49,9 @@ make -jX
 
 Build options
 -------------
+# Generate compile DB (for code analysis)
+cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+
 # Enable debugging
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
 

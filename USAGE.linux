@@ -6,3 +6,10 @@ cd ~/scop/linux
 
 # 'fsgame.ltx' can be found in the xray-16 res/ dir
 ./xr_3da.sh -fsltx ../fsgame.ltx
+
+# Options
+-fsltx		mandatory if fsgame.ltx not in the same directory as 
+-use_gl_4.1	[removed] use OpenGL profile 4.1
+-nosplash	disable splash screen
+-splashnotop???
+-dedicated	launch dedicated server
