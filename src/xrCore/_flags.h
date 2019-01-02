@@ -13,6 +13,9 @@ struct _flags
 
     T flags;
 
+    _flags () { flags = T(0); }
+    _flags (T v) { flags = T(v); }
+
     TYPE get() const noexcept { return flags; }
 
     SelfRef zero() noexcept

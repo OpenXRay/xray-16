@@ -17,21 +17,22 @@ struct XRCORE_API xr_shortcut
         {
             u8 key;
             Flags8 ext;
-        };
+        } ext_key;
         u16 hotkey;
     };
 
-    xr_shortcut(u8 k, bool a, bool c, bool s) : key(k)
+    xr_shortcut(u8 k, bool a, bool c, bool s)
     {
-        ext.assign(u8((a ? flAlt : 0) | (c ? flCtrl : 0) | (s ? flShift : 0)));
+        ext_key.key = k;
+        ext_key.ext.assign(u8((a ? flAlt : 0) | (c ? flCtrl : 0) | (s ? flShift : 0)));
     }
 
     xr_shortcut()
     {
-        ext.zero();
-        key = 0;
+        ext_key.ext.zero();
+        ext_key.key = 0;
     }
 
-    bool similar(const xr_shortcut& v) const { return ext.equal(v.ext) && (key == v.key); }
+    bool similar(const xr_shortcut& v) const { return ext_key.ext.equal(v.ext_key.ext) && (ext_key.key == v.ext_key.key); }
 };
 #pragma pack(pop)
