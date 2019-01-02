@@ -13,20 +13,20 @@ struct _flags
 
     T flags;
 
-    _flags () { flags = T(0); }
-    _flags (T v) { flags = T(v); }
+    _flags () { flags = static_cast<T>(0); }
+    _flags (T v) { flags = static_cast<T>(v); }
 
     TYPE get() const noexcept { return flags; }
 
     SelfRef zero() noexcept
     {
-        flags = T(0);
+        flags = static_cast<T>(0);
         return *this;
     }
 
     SelfRef one() noexcept
     {
-        flags = T(-1);
+        flags = static_cast<T>(~0);
         return *this;
     }
 
