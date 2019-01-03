@@ -8,6 +8,7 @@ list(APPEND DIRS
     "Crypto"
     "Math"
     "Media"
+    "Memory"
     "PostProcess"
     "Text"
     "Threading"

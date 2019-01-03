@@ -414,6 +414,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClInclude Include="Math\MathUtil.hpp" />
     <ClInclude Include="math_constants.h" />
     <ClInclude Include="Media\Image.hpp" />
+    <ClInclude Include="Memory\xalloc.h" />
     <ClInclude Include="net_utils.h" />
     <ClInclude Include="os_clipboard.h" />
     <ClInclude Include="PostProcess\PostProcess.hpp" />

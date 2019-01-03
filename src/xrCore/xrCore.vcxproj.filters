@@ -710,6 +710,9 @@
     <ClInclude Include="xrDelegate\xrDelegateBinder.h">
       <Filter>xrDelegate</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\xalloc.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

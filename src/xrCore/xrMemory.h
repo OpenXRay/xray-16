@@ -1,5 +1,4 @@
 #pragma once
-
 #include "_types.h"
 
 /*
@@ -10,21 +9,18 @@
 */
 #if defined(WINDOWS) // I have not idea how it works on Windows, but Linux build fails with error 'multiple declaration of __TBB_malloc_proxy_helper_object'
 //#include "tbb/tbbmalloc_proxy.h" // Xottab_DUTY: works bad, disabled it..
+
+#define NO_TBB_MALLOC
 #endif
 
 #if defined(NO_TBB_MALLOC)
-template <typename T>
-using xr_allocator = std::allocator<T>;
 #define xr_internal_malloc malloc
 #define xr_internal_realloc realloc
 #define xr_internal_free free
 
 #else
-#include <tbb/tbb_allocator.h>
 #include <tbb/scalable_allocator.h>
 
-template <typename T>
-using xr_allocator = tbb::scalable_allocator<T>;
 #define xr_internal_malloc scalable_malloc
 #define xr_internal_realloc scalable_realloc
 #define xr_internal_free scalable_free
@@ -127,3 +123,15 @@ inline void* xr_realloc(void* ptr, size_t size) { return Memory.mem_realloc(ptr,
 XRCORE_API pstr xr_strdup(pcstr string);
 
 XRCORE_API void log_vminfo();
+
+#ifdef NO_TBB_MALLOC
+#include "Memory/xalloc.h"
+
+template <typename T>
+using xr_allocator = xalloc<T>;
+#else
+#include <tbb/tbb_allocator.h>
+
+template <typename T>
+using xr_allocator = tbb::scalable_allocator<T>;
+#endif
