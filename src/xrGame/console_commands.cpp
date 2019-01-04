@@ -2062,7 +2062,7 @@ void CCC_RegisterCommands()
 
     extern float ik_cam_shift_tolerance;
     CMD4(CCC_Float, "ik_cam_shift_tolerance", &ik_cam_shift_tolerance, 0.f, 2.f);
-    float ik_cam_shift_speed;
+    extern float ik_cam_shift_speed;
     CMD4(CCC_Float, "ik_cam_shift_speed", &ik_cam_shift_speed, 0.f, 1.f);
     extern BOOL dbg_draw_doors;
     CMD4(CCC_Integer, "dbg_draw_doors", &dbg_draw_doors, FALSE, TRUE);
