@@ -33,7 +33,7 @@ constexpr size_t xr_default_alignment = 16;
 #else
 #define xr_internal_malloc(size) malloc(size)
 #define xr_internal_realloc(ptr, size) realloc(ptr, size)
-#define xr_internal_free free(ptr)
+#define xr_internal_free(ptr) free(ptr)
 #endif
 
 xrMemory Memory;
