@@ -168,8 +168,10 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
     CHK_GL(glClear(mask));
 }
 
-HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
+HRESULT CHW::Present(UINT SyncInterval, UINT /*Flags*/)
 {
+    if(-1 == SDL_GL_SetSwapInterval(SyncInterval ? -1 : 0)) // try adaptive vsync
+        SDL_GL_SetSwapInterval(SyncInterval ? 1 : 0); // if failed, use common vsync
     RImplementation.Target->phase_flip();
     SDL_GL_SwapWindow(m_hWnd);
     return S_OK;
