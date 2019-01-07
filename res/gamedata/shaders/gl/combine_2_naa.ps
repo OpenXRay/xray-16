@@ -3,6 +3,14 @@
 #include "dof.h"
 #include "iostructs\p_naa_AA_combine.h"
 
+// SkyLoader: temporary fix for FXAA
+//#define USE_FXAA
+#ifdef USE_FXAA
+#include "fxaa.ps"
+
+uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
+#endif
+
 //////////////////////////////////////////////////////////////////////////////////////////
 #ifndef USE_MSAA
 Texture2D 			s_distort;
@@ -61,9 +69,34 @@ c2_out _main( v2p_aa_AA I )
 #else // USE_DISTORT
 	float2	center 	= I.Tex0;
 #endif
-   	//float3 	img 	= tex2D		(s_image, center);
 
-	float3	img	= dof(center);
+// SkyLoader: temporary fix for FXAA
+#ifdef USE_FXAA
+	float2 rcpFrame = float2(1.0/screen_res.x, 1.0/screen_res.y);
+
+	float3	img	= FxaaPixelShader(center,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsolePosPos,
+            s_image,							// FxaaTex tex,
+            s_image,							// FxaaTex fxaaConsole360TexExpBiasNegOne,
+            s_image,							// FxaaTex fxaaConsole360TexExpBiasNegTwo,
+            rcpFrame,							// FxaaFloat2 fxaaQualityRcpFrame,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsoleRcpFrameOpt,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsoleRcpFrameOpt2,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsole360RcpFrameOpt2,
+            0.35,									// FxaaFloat fxaaQualitySubpix,
+            0.166,									// FxaaFloat fxaaQualityEdgeThreshold,
+            0.0,								// FxaaFloat fxaaQualityEdgeThresholdMin,
+            0.0,									// FxaaFloat fxaaConsoleEdgeSharpness,
+            0.0,									// FxaaFloat fxaaConsoleEdgeThreshold,
+            0.0,									// FxaaFloat fxaaConsoleEdgeThresholdMin,
+            FxaaFloat4(0.0, 0.0, 0.0, 0.0)		// FxaaFloat fxaaConsole360ConstDir,
+            ).rgb;
+#else
+	float3 	img 	= tex2D(s_image, center).rgb;
+#endif
+
+		img	= dof(img, center);
+
 	float4 	bloom	= tex2D		(s_bloom, center);
 	
 //			img 	= mblur		(center,tex2D(s_position,I.tc0),img.rgb);

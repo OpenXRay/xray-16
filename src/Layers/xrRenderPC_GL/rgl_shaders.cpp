@@ -369,6 +369,22 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         ++len;
     }
 
+    // SkyLoader: temporary added
+    if (ps_r2_fxaa)
+    {
+        defines[def_it].Name = "USE_FXAA";
+        defines[def_it].Definition = "1";
+        def_it++;
+        sh_name[len] = '1';
+        ++len;
+    }
+    else
+    {
+        sh_name[len] = '0';
+        ++len;
+    }
+    // end
+
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
         xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);

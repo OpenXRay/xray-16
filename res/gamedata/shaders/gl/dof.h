@@ -5,17 +5,16 @@
 
 #ifndef	USE_DOF
 
-float3	dof(float2 center)
+float3	dof(float3 img, float2 center)
 {
-	float3 	img 	= tex2D		(s_image, center).rgb;
 	return	img;
 }
 
 #else	//	USE_DOF
 
 // x - near y - focus z - far w - sky distance
-float4	dof_params;
-float3	dof_kernel;	// x,y - resolution pre-scaled z - just kernel size
+uniform float4	dof_params;
+uniform float3	dof_kernel;	// x,y - resolution pre-scaled z - just kernel size
 
 float DOFFactor(float depth)
 {
@@ -32,7 +31,7 @@ float DOFFactor(float depth)
 
 #define MAXCOF		7.0
 #define EPSDEPTHDOF	0.0001
-float3	dof(float2 center)
+float3	dof(float3 img, float2 center)
 {
 	// Scale tap offsets based on render target size
 #ifndef USE_MSAA
@@ -68,7 +67,7 @@ float3	dof(float2 center)
 		o[11] 	= float2(-0.791559, -0.597710)*scale;
 
 	// sample
-	float3	sum 	= tex2D(s_image,center).rgb;
+	float3	sum 	= img;
 	float 	contrib	= 1.0;
 
    	for (int i=0; i<12; i++)

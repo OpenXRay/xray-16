@@ -5,9 +5,16 @@
 Texture2D		s_base0;
 uniform float4		screen_res;	
 
+// SkyLoader: temporary fix for FXAA
+#if 1
 float4 _main ( p_TL I )
 {
-	float2 rcpFrame = float2(screen_res.z, screen_res.w);
+	return float4(0.0, 0.0, 0.0, 0.0);
+}
+#else
+float4 _main ( p_TL I )
+{
+	float2 rcpFrame = float2(1.0/screen_res.x, 1.0/screen_res.y);
 
 	return FxaaPixelShader(I.Tex0,
             FxaaFloat4(0.0, 0.0, 0.0, 0.0),		// FxaaFloat4 fxaaConsolePosPos,
@@ -27,3 +34,4 @@ float4 _main ( p_TL I )
             FxaaFloat4(0.0, 0.0, 0.0, 0.0)		// FxaaFloat fxaaConsole360ConstDir,
             );
 }
+#endif
