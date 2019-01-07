@@ -10,6 +10,32 @@
 #include <sys/resource.h>
 #endif
 
+#ifdef WINDOWS
+#define USE_XR_ALIGNED_MALLOC
+#endif
+
+// Define this if you wan't to use TBB allocator
+//#define USE_TBB_MALLOC
+
+#if defined(USE_XR_ALIGNED_MALLOC)
+#include "Memory/xrMemory_align.h"
+constexpr size_t xr_default_alignment = 16;
+
+#define xr_internal_malloc(size) xr_aligned_malloc(size, xr_default_alignment)
+#define xr_internal_realloc(ptr, size) xr_aligned_realloc(ptr, size, xr_default_alignment)
+#define xr_internal_free(ptr) xr_aligned_free(ptr)
+#elif defined(USE_TBB_MALLOC)
+#include <tbb/scalable_allocator.h>
+
+#define xr_internal_malloc(size) scalable_malloc(size)
+#define xr_internal_realloc(ptr, size) scalable_realloc(ptr, size)
+#define xr_internal_free(ptr) scalable_free(ptr)
+#else
+#define xr_internal_malloc(size) malloc(size)
+#define xr_internal_realloc(ptr, size) realloc(ptr, size)
+#define xr_internal_free free(ptr)
+#endif
+
 xrMemory Memory;
 // Also used in src\xrCore\xrDebug.cpp to prevent use of g_pStringContainer before it initialized
 bool shared_str_initialized = false;
@@ -96,7 +122,7 @@ void xrMemory::mem_compact()
     которые требуют большие свободные области памяти.
     Но всё-же чистку tbb, возможно, стоит оставить. Но и это под большим вопросом.
     */
-#ifndef NO_TBB_MALLOC
+#ifdef USE_TBB_MALLOC
     scalable_allocation_command(TBBMALLOC_CLEAN_ALL_BUFFERS, nullptr);
 #endif
     //HeapCompact(GetProcessHeap(), 0);
@@ -109,6 +135,24 @@ void xrMemory::mem_compact()
     if (strstr(Core.Params, "-swap_on_compact"))
         SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
 #endif
+}
+
+void* xrMemory::mem_alloc(size_t size)
+{
+    stat_calls++;
+    return xr_internal_malloc(size);
+}
+
+void* xrMemory::mem_realloc(void* ptr, size_t size)
+{
+    stat_calls++;
+    return xr_internal_realloc(ptr, size);
+}
+
+void xrMemory::mem_free(void* ptr)
+{
+    stat_calls++;
+    xr_internal_free(ptr);
 }
 
 // xr_strdup

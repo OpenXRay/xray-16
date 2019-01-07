@@ -327,6 +327,9 @@
     <ClCompile Include="FileCRC32.cpp">
       <Filter>FS</Filter>
     </ClCompile>
+    <ClCompile Include="Memory\xrMemory_align.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -711,6 +714,9 @@
       <Filter>xrDelegate</Filter>
     </ClInclude>
     <ClInclude Include="Memory\xalloc.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\xrMemory_align.h">
       <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
