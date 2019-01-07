@@ -309,13 +309,9 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const 
     pv++;
 }
 
-Lock m_sprite_section;
-
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
-    m_sprite_section.Enter();
-
     __m128 Vr, Vt, _T, _R, _pos, _zz, _sa, _ca, a, b, c, d;
 
     _sa = _mm_set1_ps(sina);
@@ -368,7 +364,6 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvec
     pv->color = clr;
     pv->t.set(rb.x, lt.y);
     pv++;
-    m_sprite_section.Leave();
 }
 
 IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const Fvector2& lt, const Fvector2& rb,
@@ -460,7 +455,7 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
     // But it must be 0xFFFFFFFF or otherwise some particles won't play
     float angle = 0xFFFFFFFF;
 
-    FOR_START(u32, 0, count, i)
+    for (u32 i = 0; i < count; i++)
         {
             PAPI::Particle& m = particles[i];
             Fvector2 lt, rb;
@@ -572,7 +567,6 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                 }
             }
         }
-    FOR_END
 }
 
 void CParticleEffect::Render(float)
