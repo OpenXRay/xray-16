@@ -60,7 +60,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
     if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
-        mapDistort.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
     }
 
     // Select shader
@@ -74,13 +74,13 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     if (RI.val_bHUD)
     {
         if (sh->flags.bStrictB2F)
-            mapHUDSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+            mapHUDSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
         else
-            mapHUD      .emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+            mapHUD      .insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
 
 #if RENDER != R_R1
         if (sh->flags.bEmissive)
-            mapHUDEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+            mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
 #endif
         return;
     }
@@ -95,7 +95,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // strict-sorting selection
     if (sh->flags.bStrictB2F)
     {
-        mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+        mapSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
         return;
     }
 
@@ -107,11 +107,11 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
     }
     if (sh->flags.bWmark && pmask_wmark)
     {
-        mapWmark.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+        mapWmark.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
         return;
     }
 #endif
@@ -224,7 +224,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
     if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
-        mapDistort.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }))); // sh_d -> L_special
+        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
     }
 
     // Select shader
@@ -239,7 +239,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     {
         // TODO: Выяснить, почему в единственном месте параметр ssa не используется
         // Визуально различий не замечено
-        mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ /*0*/SSA, nullptr, pVisual, Fidentity, sh })));
+        mapSorted.insert_anyway(distSQ, _MatrixItemS({ /*0*/SSA, nullptr, pVisual, Fidentity, sh }));
         return;
     }
 
@@ -251,11 +251,11 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }))); // sh_d -> L_special
+        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
     }
     if (sh->flags.bWmark && pmask_wmark)
     {
-        mapWmark.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh })));
+        mapWmark.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh }));
         return;
     }
 #endif
@@ -486,7 +486,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         {
             if (ssa < r_ssaDISCARD)
                 return;
-            mapLOD.emplace_back(std::make_pair(D, _LodItem({ ssa, pVisual })));
+            mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
         if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)
@@ -706,7 +706,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         {
             if (ssa < r_ssaDISCARD)
                 return;
-            mapLOD.emplace_back(std::make_pair(D, _LodItem({ ssa, pVisual })));
+            mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
         if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)

@@ -1,4 +1,5 @@
 #pragma once
+#include "xrCore/Containers/FixedMap.h"
 
 class dxRender_Visual;
 
@@ -65,17 +66,17 @@ struct mapNormalItems : public mapNormalDirect
     float ssa;
 };
 
-struct mapNormalTextures : public xr_unordered_map<STextureList*, mapNormalItems>
+struct mapNormalTextures : public xr_fixed_map<STextureList*, mapNormalItems>
 {
     float ssa;
 };
 
-struct mapNormalStates : public xr_unordered_map<state_type, mapNormalTextures>
+struct mapNormalStates : public xr_fixed_map<state_type, mapNormalTextures>
 {
     float ssa;
 };
 
-struct mapNormalCS : public xr_unordered_map<R_constant_table*, mapNormalStates>
+struct mapNormalCS : public xr_fixed_map<R_constant_table*, mapNormalStates>
 {
     float ssa;
 };
@@ -88,26 +89,26 @@ struct mapNormalAdvStages
     mapNormalCS mapCS;
 };
 
-struct mapNormalPS : public xr_unordered_map<ps_type, mapNormalAdvStages>
+struct mapNormalPS : public xr_fixed_map<ps_type, mapNormalAdvStages>
 {
     float ssa;
 };
 #else
-struct mapNormalPS : public xr_unordered_map<ps_type, mapNormalCS>
+struct mapNormalPS : public xr_fixed_map<ps_type, mapNormalCS>
 {
     float ssa;
 };
 #endif
 
 #ifndef USE_DX9
-struct mapNormalGS : public xr_unordered_map<gs_type, mapNormalPS>
+struct mapNormalGS : public xr_fixed_map<gs_type, mapNormalPS>
 {
     float ssa;
 };
 
-struct mapNormalVS : public xr_unordered_map<vs_type, mapNormalGS> {};
+struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalGS> {};
 #else
-struct mapNormalVS : public xr_unordered_map<vs_type, mapNormalPS> {};
+struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalPS> {};
 #endif
 
 using mapNormal_T = mapNormalVS;
@@ -121,17 +122,17 @@ struct mapMatrixItems : public mapMatrixDirect
     float ssa;
 };
 
-struct mapMatrixTextures : public xr_unordered_map<STextureList*, mapMatrixItems>
+struct mapMatrixTextures : public xr_fixed_map<STextureList*, mapMatrixItems>
 {
     float ssa;
 };
 
-struct mapMatrixStates : public xr_unordered_map<state_type, mapMatrixTextures>
+struct mapMatrixStates : public xr_fixed_map<state_type, mapMatrixTextures>
 {
     float ssa;
 };
 
-struct mapMatrixCS : public xr_unordered_map<R_constant_table*, mapMatrixStates>
+struct mapMatrixCS : public xr_fixed_map<R_constant_table*, mapMatrixStates>
 {
     float ssa;
 };
@@ -144,33 +145,33 @@ struct mapMatrixAdvStages
     mapMatrixCS mapCS;
 };
 
-struct mapMatrixPS : public xr_unordered_map<ps_type, mapMatrixAdvStages>
+struct mapMatrixPS : public xr_fixed_map<ps_type, mapMatrixAdvStages>
 {
     float ssa;
 };
 #else
-struct mapMatrixPS : public xr_unordered_map<ps_type, mapMatrixCS>
+struct mapMatrixPS : public xr_fixed_map<ps_type, mapMatrixCS>
 {
     float ssa;
 };
 #endif
 
 #ifndef USE_DX9
-struct mapMatrixGS : public xr_unordered_map<gs_type, mapMatrixPS>
+struct mapMatrixGS : public xr_fixed_map<gs_type, mapMatrixPS>
 {
     float ssa;
 };
 
-struct mapMatrixVS : public xr_unordered_map<vs_type, mapMatrixGS> {};
+struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixGS> {};
 #else
-struct mapMatrixVS : public xr_unordered_map<vs_type, mapMatrixPS> {};
+struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixPS> {};
 #endif
 
 using mapMatrix_T = mapMatrixVS;
 using mapMatrixPasses_T = mapMatrix_T[SHADER_PASSES_MAX];
 
 // Top level
-using mapSorted_T = xr_vector<std::pair<float, _MatrixItemS>>;
-using mapHUD_T    = xr_vector<std::pair<float, _MatrixItemS>>;
-using mapLOD_T    = xr_vector<std::pair<float, _LodItem>>;
+using mapSorted_T = xr_fixed_map<float, _MatrixItemS>;
+using mapHUD_T    = xr_fixed_map<float, _MatrixItemS>;
+using mapLOD_T    = xr_fixed_map<float, _LodItem>;
 }
