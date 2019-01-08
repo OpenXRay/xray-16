@@ -25,6 +25,10 @@ include_directories(
     ${SDL_INCLUDE_DIRS}
     ${TBB_INCLUDE_DIRS}
 )
+
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Memory/xrMemory_align.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/Memory/xrMemory_align.h")
+
 execute_process(COMMAND git rev-parse --verify HEAD
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_SHA1
