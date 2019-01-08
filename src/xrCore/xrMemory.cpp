@@ -140,13 +140,13 @@ void xrMemory::mem_compact()
 void* xrMemory::mem_alloc(size_t size)
 {
     stat_calls++;
-    return xr_internal_malloc(size);
+    return xr_internal_malloc(size + reserved);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)
 {
     stat_calls++;
-    return xr_internal_realloc(ptr, size);
+    return xr_internal_realloc(ptr, size + reserved);
 }
 
 void xrMemory::mem_free(void* ptr)
