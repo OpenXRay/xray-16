@@ -719,6 +719,9 @@
     <ClInclude Include="Memory\xrMemory_align.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\FixedMap.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">
