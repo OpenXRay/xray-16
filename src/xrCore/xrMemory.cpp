@@ -10,11 +10,13 @@
 #include <sys/resource.h>
 #endif
 
+// XXX: fix xrMemory_align on Linux
+// and enable it
 #ifdef WINDOWS
 #define USE_XR_ALIGNED_MALLOC
 #endif
 
-// Define this if you wan't to use TBB allocator
+// Define this if you want to use TBB allocator
 //#define USE_TBB_MALLOC
 
 #if defined(USE_XR_ALIGNED_MALLOC)
@@ -31,8 +33,16 @@ constexpr size_t xr_default_alignment = 16;
 #define xr_internal_realloc(ptr, size) scalable_realloc(ptr, size)
 #define xr_internal_free(ptr) scalable_free(ptr)
 #else
-#define xr_internal_malloc(size) malloc(size)
-#define xr_internal_realloc(ptr, size) realloc(ptr, size)
+// Additional bytes of memory to hide memory problems on Release
+// But for Debug we don't need this if we want to find these problems
+#ifdef NDEBUG
+constexpr size_t xr_reserved_tail = 8;
+#else
+constexpr size_t xr_reserved_tail = 0;
+#endif
+
+#define xr_internal_malloc(size) malloc(size + xr_reserved_tail)
+#define xr_internal_realloc(ptr, size) realloc(ptr, size + xr_reserved_tail)
 #define xr_internal_free(ptr) free(ptr)
 #endif
 
@@ -140,13 +150,13 @@ void xrMemory::mem_compact()
 void* xrMemory::mem_alloc(size_t size)
 {
     stat_calls++;
-    return xr_internal_malloc(size + reserved);
+    return xr_internal_malloc(size);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)
 {
     stat_calls++;
-    return xr_internal_realloc(ptr, size + reserved);
+    return xr_internal_realloc(ptr, size);
 }
 
 void xrMemory::mem_free(void* ptr)

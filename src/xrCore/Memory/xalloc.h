@@ -1,5 +1,7 @@
 #pragma once
 
+#include "xrMemory.h"
+
 template <typename T>
 class xalloc
 {
@@ -35,21 +37,23 @@ public:
         return *this;
     }
 
-    pointer allocate(const size_type n, const void* p = nullptr) const { return xr_alloc<T>(n); }
-    void deallocate(pointer p, const size_type /*n*/) const { xr_free(p); }
-    void deallocate(void* p, const size_type /*n*/) const { xr_free(p); }
+    static pointer allocate(const size_type n, const void* p = nullptr) { return xr_alloc<T>(n); }
+    static void deallocate(pointer p, const size_type /*n*/) { xr_free(p); }
+    static void deallocate(void* p, const size_type /*n*/) { xr_free(p); }
 
     template <class U, class... Args>
-    void construct(U* ptr, Args&&... args)
+    static void construct(U* ptr, Args&&... args)
     {
         new (ptr) U(std::forward<Args>(args)...);
     }
+
     template <class U>
-    void destroy(U* p)
+    static void destroy(U* p)
     {
         p->~U();
     }
-    size_type max_size() const
+
+    static constexpr size_type max_size()
     {
         constexpr auto count = std::numeric_limits<size_type>::max() / sizeof(T);
         return count > 0 ? count : 1;

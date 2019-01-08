@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "xrCore/xrMemory.h"
+#include "xr_allocator.h"
 
 // string(char)
 using xr_string = std::basic_string<char, std::char_traits<char>, xr_allocator<char>>;

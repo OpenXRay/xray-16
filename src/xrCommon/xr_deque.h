@@ -1,6 +1,6 @@
 #pragma once
 #include <deque>
-#include "xrCore/xrMemory.h"
+#include "xr_allocator.h"
 
 template <typename T, typename allocator = xr_allocator<T>>
 using xr_deque = std::deque<T, allocator>;

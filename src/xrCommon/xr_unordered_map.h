@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "xrCore/xrMemory.h"
+#include "xr_allocator.h"
 
 template <typename K, class V, class Hasher = std::hash<K>, class Traits = std::equal_to<K>,
           typename allocator = xr_allocator<std::pair<const K, V>>>

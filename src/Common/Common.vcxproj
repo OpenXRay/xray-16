@@ -175,6 +175,7 @@
     <ClInclude Include="..\xrCommon\math_funcs_inline.h" />
     <ClInclude Include="..\xrCommon\misc_math_types.h" />
     <ClInclude Include="..\xrCommon\predicates.h" />
+    <ClInclude Include="..\xrCommon\xr_allocator.h" />
     <ClInclude Include="..\xrCommon\xr_array.h" />
     <ClInclude Include="..\xrCommon\xr_deque.h" />
     <ClInclude Include="..\xrCommon\xr_list.h" />
