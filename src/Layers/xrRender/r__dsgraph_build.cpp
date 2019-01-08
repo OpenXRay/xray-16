@@ -122,20 +122,20 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
 
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
-        auto &pass = *sh->passes[iPass];
-        auto &map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
+        auto& pass = *sh->passes[iPass];
+        auto& map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
 
 #ifdef USE_OGL
-        auto &Nvs = map[pass.vs->sh];
-        auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->sh];
+        auto& Nvs = map[pass.vs->sh];
+        auto& Ngs = Nvs[pass.gs->sh];
+        auto& Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
-        auto &Nvs = map[&*pass.vs];
-        auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->sh];
+        auto& Nvs = map[&*pass.vs];
+        auto& Ngs = Nvs[pass.gs->sh];
+        auto& Nps = Ngs[pass.ps->sh];
 #else
-        auto &Nvs = map[pass.vs->sh];
-        auto &Nps = Nvs[pass.ps->sh];
+        auto& Nvs = map[pass.vs->sh];
+        auto& Nps = Nvs[pass.ps->sh];
 #endif
 
 #ifdef USE_DX11
