@@ -1232,11 +1232,11 @@ void PARandomVelocity::Transform(const Fmatrix& m) { gen_vel.transform_dir(gen_v
 // satisfying initial x(0)=x0,v(0)=v0 and desired x(t)=xf,v(t)=vf,
 // where x = x(0) + integrate(v(T),0,t)
 static inline void _pconstrain(float x0, float v0, float xf, float vf,
-							   float t, float *a, float *b, float *c)
+                               float t, float *a, float *b, float *c)
 {
-	*c = v0;
-	*b = 2 * (-t*vf - 2*t*v0 + 3*xf - 3*x0) / (t * t);
-	*a = 3 * (t*vf + t*v0 - 2*xf + 2*x0) / (t * t * t);
+    *c = v0;
+    *b = 2 * (-t*vf - 2*t*v0 + 3*xf - 3*x0) / (t * t);
+    *a = 3 * (t*vf + t*v0 - 2*xf + 2*x0) / (t * t * t);
 }
 #endif
 
@@ -1646,86 +1646,6 @@ ICF void _mm_store_fvector(Fvector& v, const __m128 R1)
     _mm_store_ss((float*)&v.z, R2);
 }
 
-struct TES_PARAMS
-{
-    u32 p_count;
-    ParticleEffect* effect;
-    pVector offset;
-    float age;
-    float epsilon;
-    float frequency;
-    int octaves;
-    float magnitude;
-};
-
-void PATurbulenceExecuteStream(TES_PARAMS* pParams)
-{
-    pVector pV;
-    pVector vX;
-    pVector vY;
-    pVector vZ;
-
-    u32 count = pParams->p_count;
-    ParticleEffect* effect = pParams->effect;
-    pVector offset = pParams->offset;
-    float age = pParams->age;
-    float epsilon = pParams->epsilon;
-    float frequency = pParams->frequency;
-    int octaves = pParams->octaves;
-    float magnitude = pParams->magnitude;
-
-    FOR_START(u32, 0, count, i)
-        {
-            Particle& m = effect->particles[i];
-
-            pV.mad(m.pos, offset, age);
-            vX.set(pV.x + epsilon, pV.y, pV.z);
-            vY.set(pV.x, pV.y + epsilon, pV.z);
-            vZ.set(pV.x, pV.y, pV.z + epsilon);
-
-            float d = fractalsum3(pV, frequency, octaves);
-
-            pVector D;
-
-            D.x = fractalsum3(vX, frequency, octaves);
-            D.y = fractalsum3(vY, frequency, octaves);
-            D.z = fractalsum3(vZ, frequency, octaves);
-
-            __m128 _D = _mm_load_fvector(D);
-            __m128 _d = _mm_set1_ps(d);
-            __m128 _magnitude = _mm_set1_ps(magnitude);
-            __m128 _mvel = _mm_load_fvector(m.vel);
-            _D = _mm_sub_ps(_D, _d);
-            _D = _mm_mul_ps(_D, _magnitude);
-
-            __m128 _vmo = _mm_mul_ps(_mvel, _mvel); // _vmo = 00 | zz | yy | xx
-            __m128 _tmp = _mm_movehl_ps(_vmo, _vmo); // _tmp = 00 | zz | 00 | zz
-            _vmo = _mm_add_ss(_vmo, _tmp); // _vmo = 00 | zz | yy | xx + zz
-            _tmp = _mm_unpacklo_ps(_vmo, _vmo); // _tmp = yy | yy | xx + zz | xx + zz
-            _tmp = _mm_movehl_ps(_tmp, _tmp); // _tmp = yy | yy | yy | yy
-            _vmo = _mm_add_ss(_vmo, _tmp); // _vmo = 00 | zz | yy | xx + yy + zz
-            _vmo = _mm_sqrt_ss(_vmo); // _vmo = 00 | zz | yy | vmo
-
-            _mvel = _mm_add_ps(_mvel, _D);
-
-            __m128 _vmn = _mm_mul_ps(_mvel, _mvel); // _vmn = 00 | zz | yy | xx
-            _tmp = _mm_movehl_ps(_vmn, _vmn); // _tmp = 00 | zz | 00 | zz
-            _vmn = _mm_add_ss(_vmn, _tmp); // _vmn = 00 | zz | yy | xx + zz
-            _tmp = _mm_unpacklo_ps(_vmn, _vmn); // _tmp = yy | yy | xx + zz | xx + zz
-            _tmp = _mm_movehl_ps(_tmp, _tmp); // _tmp = yy | yy | yy | yy
-            _vmn = _mm_add_ss(_vmn, _tmp); // _vmn = 00 | zz | yy | xx + yy + zz
-            _vmn = _mm_sqrt_ss(_vmn); // _vmn = 00 | zz | yy | vmn
-
-            _vmo = _mm_div_ss(_vmo, _vmn); // _vmo = 00 | zz | yy | scale
-
-            _vmo = _mm_shuffle_ps(_vmo, _vmo, _MM_SHUFFLE(0, 0, 0, 0)); // _vmo = scale | scale | scale | scale
-            _mvel = _mm_mul_ps(_mvel, _vmo);
-
-            _mm_store_fvector(m.vel, _mvel);
-        }
-    FOR_END
-}
-
 void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max)
 {
 #ifdef _GPA_ENABLED
@@ -1740,21 +1660,75 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
 
     age += dt;
 
-    u32 p_cnt = effect->p_count;
+    u32 count = effect->p_count;
 
-    if (!p_cnt)
+    if (!count)
         return;
 
-    TES_PARAMS tesParams;
-    tesParams.p_count = p_cnt; 
-    tesParams.effect = effect;
-    tesParams.offset = offset;
-    tesParams.age = age;
-    tesParams.epsilon = epsilon;
-    tesParams.frequency = frequency;
-    tesParams.octaves = octaves;
-    tesParams.magnitude = magnitude;
-    PATurbulenceExecuteStream(&tesParams);
+    auto processParticle = [&](Particle& m)
+    {
+        pVector pV;
+        pVector vX;
+        pVector vY;
+        pVector vZ;
+
+        pV.mad(m.pos, offset, age);
+        vX.set(pV.x + epsilon, pV.y, pV.z);
+        vY.set(pV.x, pV.y + epsilon, pV.z);
+        vZ.set(pV.x, pV.y, pV.z + epsilon);
+
+        float d = fractalsum3(pV, frequency, octaves);
+
+        pVector D;
+
+        D.x = fractalsum3(vX, frequency, octaves);
+        D.y = fractalsum3(vY, frequency, octaves);
+        D.z = fractalsum3(vZ, frequency, octaves);
+
+        __m128 _D = _mm_load_fvector(D);
+        __m128 _d = _mm_set1_ps(d);
+        __m128 _magnitude = _mm_set1_ps(magnitude);
+        __m128 _mvel = _mm_load_fvector(m.vel);
+        _D = _mm_sub_ps(_D, _d);
+        _D = _mm_mul_ps(_D, _magnitude);
+
+        __m128 _vmo = _mm_mul_ps(_mvel, _mvel); // _vmo = 00 | zz | yy | xx
+        __m128 _tmp = _mm_movehl_ps(_vmo, _vmo); // _tmp = 00 | zz | 00 | zz
+        _vmo = _mm_add_ss(_vmo, _tmp); // _vmo = 00 | zz | yy | xx + zz
+        _tmp = _mm_unpacklo_ps(_vmo, _vmo); // _tmp = yy | yy | xx + zz | xx + zz
+        _tmp = _mm_movehl_ps(_tmp, _tmp); // _tmp = yy | yy | yy | yy
+        _vmo = _mm_add_ss(_vmo, _tmp); // _vmo = 00 | zz | yy | xx + yy + zz
+        _vmo = _mm_sqrt_ss(_vmo); // _vmo = 00 | zz | yy | vmo
+
+        _mvel = _mm_add_ps(_mvel, _D);
+
+        __m128 _vmn = _mm_mul_ps(_mvel, _mvel); // _vmn = 00 | zz | yy | xx
+        _tmp = _mm_movehl_ps(_vmn, _vmn); // _tmp = 00 | zz | 00 | zz
+        _vmn = _mm_add_ss(_vmn, _tmp); // _vmn = 00 | zz | yy | xx + zz
+        _tmp = _mm_unpacklo_ps(_vmn, _vmn); // _tmp = yy | yy | xx + zz | xx + zz
+        _tmp = _mm_movehl_ps(_tmp, _tmp); // _tmp = yy | yy | yy | yy
+        _vmn = _mm_add_ss(_vmn, _tmp); // _vmn = 00 | zz | yy | xx + yy + zz
+        _vmn = _mm_sqrt_ss(_vmn); // _vmn = 00 | zz | yy | vmn
+
+        _vmo = _mm_div_ss(_vmo, _vmn); // _vmo = 00 | zz | yy | scale
+
+        _vmo = _mm_shuffle_ps(_vmo, _vmo, _MM_SHUFFLE(0, 0, 0, 0)); // _vmo = scale | scale | scale | scale
+        _mvel = _mm_mul_ps(_mvel, _vmo);
+
+        _mm_store_fvector(m.vel, _mvel);
+    };
+
+    constexpr u32 MAX_COUNT = 75;
+
+    if (count < MAX_COUNT)
+    {
+        PARALLEL_FOR(u32, 0, count, i, processParticle(effect->particles[i]))
+    }
+    else
+    {
+        for (u32 i = 0; i < count; i++)
+            processParticle(effect->particles[i]);
+    }
 }
 
 #else

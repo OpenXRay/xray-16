@@ -35,4 +35,7 @@ tbb::parallel_for(tbb::blocked_range<type>(start, finish), [&](const tbb::blocke
 #define ACCELERATED_SORT std::sort
 #endif
 
-
+#define PARALLEL_FOR(type, start, finish, counter, body) \
+    FOR_START(type, start, finish, counter) \
+    { body; } \
+    FOR_END
