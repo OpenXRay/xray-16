@@ -83,7 +83,6 @@ public:
     void add_call(CPHCondition* condition, CPHAction* action);
     void add_call_threadsafety(CPHCondition* condition, CPHAction* action);
 
-    void remove_call(PHCALL_I i);
     bool has_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
     PHCALL_I find_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
     void remove_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
