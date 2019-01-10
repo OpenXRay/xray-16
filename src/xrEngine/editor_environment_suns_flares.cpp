@@ -44,7 +44,7 @@ flares::~flares()
 
 void flares::load(CInifile& config, shared_str const& section)
 {
-    m_use = !!READ_IF_EXISTS(&config, r_bool, section, "flares", true);
+    m_use = config.read_if_exists<bool>(section, "flares", true);
     m_shader = READ_IF_EXISTS(&config, r_string, section, "flare_shader", "effects" DELIMITER "flare");
 
     if (!m_use)

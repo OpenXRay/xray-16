@@ -118,8 +118,8 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     xr_delete(config);
 
     // OpenXRay environment configuration
-    useDynamicSunDir = READ_IF_EXISTS(pSettingsOpenXRay, r_bool, "environment", "dynamic_sun_dir", true);
-    sunDirAzimuth = READ_IF_EXISTS(pSettingsOpenXRay, r_float, "environment", "sun_dir_azimuth", 0.0f);
+    useDynamicSunDir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
+    sunDirAzimuth = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
     clamp(sunDirAzimuth, 0.0f, 360.0f);
     sunDirAzimuth *= (PI / 180.0f);
 }

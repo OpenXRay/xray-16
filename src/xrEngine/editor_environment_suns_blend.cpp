@@ -17,9 +17,9 @@ using editor::environment::suns::manager;
 blend::blend() : m_down_time(0.f), m_rise_time(0.f), m_time(0.f) {}
 void blend::load(CInifile& config, shared_str const& section)
 {
-    m_down_time = READ_IF_EXISTS(&config, r_float, section, "blend_down_time", 60.f);
-    m_rise_time = READ_IF_EXISTS(&config, r_float, section, "blend_rise_time", 60.f);
-    m_time = READ_IF_EXISTS(&config, r_float, section, "blend_time", .1f);
+    m_down_time = config.read_if_exists<float>(section, "blend_down_time", 60.f);
+    m_rise_time = config.read_if_exists<float>(section, "blend_rise_time", 60.f);
+    m_time = config.read_if_exists<float>(section, "blend_time", .1f);
 }
 
 void blend::fill(

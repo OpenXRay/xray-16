@@ -95,6 +95,13 @@ public:
     bool section_exist(const shared_str& S) const;
     Root& sections() { return DATA; }
     Root const& sections() const { return DATA; }
+
+    template<typename T>
+    T read_if_exists(pcstr section, pcstr line, T defaultValue) const;
+
+    template<typename T>
+    T read_if_exists(const shared_str& section, pcstr line, T defaultValue) const;
+
     CLASS_ID r_clsid(pcstr S, pcstr L) const;
     CLASS_ID r_clsid(const shared_str& S, pcstr L) const { return r_clsid(*S, L); }
     pcstr r_string(pcstr S, pcstr L) const; // Left quotes in place
@@ -161,6 +168,9 @@ public:
 
     void remove_line(pcstr S, pcstr L);
 };
+
+#define READ_IF_EXISTS(ltx, method, section, name, default_value) \
+    (((ltx)->line_exist(section, name)) ? ((ltx)->method(section, name)) : (default_value))
 
 // Main configuration file
 extern XRCORE_API CInifile const* pSettings;

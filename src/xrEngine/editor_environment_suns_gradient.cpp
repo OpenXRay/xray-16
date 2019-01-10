@@ -20,9 +20,9 @@ using editor::environment::suns::manager;
 gradient::gradient() : m_use(false), m_opacity(.0f), m_radius(.0f), m_shader(""), m_texture("") {}
 void gradient::load(CInifile& config, shared_str const& section)
 {
-    m_use = !!READ_IF_EXISTS(&config, r_bool, section, "gradient", true);
-    m_opacity = READ_IF_EXISTS(&config, r_float, section, "gradient_opacity", .7f);
-    m_radius = READ_IF_EXISTS(&config, r_float, section, "gradient_radius", .9f);
+    m_use = config.read_if_exists<bool>(section, "gradient", true);
+    m_opacity = config.read_if_exists<float>(section, "gradient_opacity", .7f);
+    m_radius = config.read_if_exists<float>(section, "gradient_radius", .9f);
     m_shader = READ_IF_EXISTS(&config, r_string, section, "gradient_shader", "effects" DELIMITER "flare");
     m_texture = READ_IF_EXISTS(&config, r_string, section, "gradient_texture", "fx" DELIMITER "fx_gradient.tga");
 }

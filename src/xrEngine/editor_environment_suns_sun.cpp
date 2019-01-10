@@ -35,9 +35,9 @@ sun::~sun()
 
 void sun::load(CInifile& config)
 {
-    m_use = !!READ_IF_EXISTS(&config, r_bool, m_id, "sun", true);
-    m_ignore_color = !!READ_IF_EXISTS(&config, r_bool, m_id, "sun_ignore_color", false);
-    m_radius = READ_IF_EXISTS(&config, r_float, m_id, "sun_radius", .15f);
+    m_use = config.read_if_exists<bool>(m_id, "sun", true);
+    m_ignore_color = config.read_if_exists<bool>(m_id, "sun_ignore_color", false);
+    m_radius = config.read_if_exists<float>(m_id, "sun_radius", .15f);
     m_shader = READ_IF_EXISTS(&config, r_string, m_id, "sun_shader", "effects" DELIMITER "sun");
     m_texture = READ_IF_EXISTS(&config, r_string, m_id, "sun_texture", "fx" DELIMITER "fx_sun.tga");
 }

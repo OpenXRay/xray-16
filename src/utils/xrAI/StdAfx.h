@@ -29,5 +29,3 @@ extern CThreadManager::ReportProgressFunc ProxyProgress;
 // Used in:
 // src\xrServerEntities\xrServer_Objects_ALife_Items.cpp
 // src\xrServerEntities\xrServer_Objects_ALife_Monsters.cpp
-#define READ_IF_EXISTS(ltx, method, section, name, default_value)\
-    (ltx->line_exist(section, name)) ? ltx->method(section, name) : default_value

@@ -17,6 +17,3 @@
 #include "xrCore/_quaternion.h"
 #include "xrScriptEngine/DebugMacros.hpp" // XXX: move debug macros to xrCore
 #include "xrServerEntities/smart_cast.h"
-
-#define READ_IF_EXISTS(ltx, method, section, name, default_value)\
-    (ltx->line_exist(section, name)) ? ltx->method(section, name) : default_value
