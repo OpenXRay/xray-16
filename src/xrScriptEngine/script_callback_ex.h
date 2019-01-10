@@ -98,7 +98,7 @@ public:
                 if (m_functor)
                 {
                     VERIFY(m_functor.is_valid());
-                    if (m_object.is_valid())
+                    if (m_object)
                     {
                         VERIFY(m_object.is_valid());
                         return TResult(
@@ -129,7 +129,7 @@ public:
                 if (m_functor)
                 {
                     VERIFY(m_functor.is_valid());
-                    if (m_object.is_valid())
+                    if (m_object)
                     {
                         VERIFY(m_object.is_valid());
                         return TResult(
@@ -162,7 +162,7 @@ void CScriptCallbackEx<void>::operator()(Args&&... args) const
             if (m_functor)
             {
                 VERIFY(m_functor.is_valid());
-                if (m_object.is_valid())
+                if (m_object)
                 {
                     VERIFY(m_object.is_valid());
                     luabind::call_function<void>(m_functor, m_object, std::forward<Args>(args)...);
@@ -190,7 +190,7 @@ void CScriptCallbackEx<void>::operator()(Args&&... args)
             if (m_functor)
             {
                 VERIFY(m_functor.is_valid());
-                if (m_object.is_valid())
+                if (m_object)
                 {
                     VERIFY(m_object.is_valid());
                     luabind::call_function<void>(m_functor, m_object, std::forward<Args>(args)...);
