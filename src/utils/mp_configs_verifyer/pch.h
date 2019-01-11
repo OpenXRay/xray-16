@@ -3,7 +3,7 @@
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 #include "xrCore/LocatorAPI.h"
-#include "xrCore/ppmd_compressor.h"
+#include "xrCore/Compression/ppmd_compressor.h"
 
 #include <stdio.h>
 #include <conio.h>

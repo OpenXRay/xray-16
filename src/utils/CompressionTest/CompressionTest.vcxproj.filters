@@ -26,9 +26,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\xrCore\Model.cpp">
+    <ClCompile Include="CompressionTest.cpp" />
+    <ClCompile Include="..\..\xrCore\Compression\Model.cpp">
       <Filter>PPMd</Filter>
     </ClCompile>
-    <ClCompile Include="CompressionTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>
