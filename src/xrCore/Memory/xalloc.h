@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrMemory.h"
+#include "xrCore/xrMemory.h"
 
 template <typename T>
 class xalloc
