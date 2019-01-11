@@ -30,30 +30,6 @@
     <ClCompile Include="Export\stdafx.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\EditMesh.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\EditMeshIO.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\EditMeshModify.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\EditObject.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\EditObjectImport.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\EditObjectIO.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\EditObjectMotions.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\ELog.cpp">
-      <Filter>Shared Files\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="Server\servmain.c">
       <Filter>Shared Files\Server</Filter>
     </ClCompile>
@@ -84,42 +60,6 @@
     <ClCompile Include="Export\scenscan\vmap.cpp">
       <Filter>Export\SceneScan</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\clip.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\envelope.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\list.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\lwio.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\LWO.cpp">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\lwo2.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\lwob.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\main.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\pntspols.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\surface.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\vecmath.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\LWO\vmap.c">
-      <Filter>Export\LWO</Filter>
-    </ClCompile>
     <ClCompile Include="Export\OMotionLW.cpp">
       <Filter>Export\Wrappers</Filter>
     </ClCompile>
@@ -129,19 +69,70 @@
     <ClCompile Include="Export\Util.cpp">
       <Filter>Export</Filter>
     </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\EditMesh.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\EditMeshIO.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\EditMeshModify.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\EditObject.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\EditObjectImport.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\EditObjectIO.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\EditObjectMotions.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)editors\ECore\Editor\ELog.cpp">
+      <Filter>Shared Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\clip.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\envelope.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\list.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\lwio.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\LWO.cpp">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\lwo2.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\lwob.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\main.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\pntspols.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\surface.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\vecmath.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
+    <ClCompile Include="$(SolutionDir)utils\LWO\vmap.c">
+      <Filter>Export\LWO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Export\stdafx.h">
       <Filter>Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\editors\ECore\Editor\EditMesh.h">
-      <Filter>Shared Files\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\editors\ECore\Editor\EditObject.h">
-      <Filter>Shared Files\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\editors\ECore\Editor\ELog.h">
-      <Filter>Shared Files\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Export\resource.h">
       <Filter>Export</Filter>
@@ -155,15 +146,6 @@
     <ClInclude Include="Export\scenscan\vecmat.h">
       <Filter>Export\SceneScan</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\utils\LWO\envelope.h">
-      <Filter>Export\LWO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\utils\LWO\lwo2.h">
-      <Filter>Export\LWO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\utils\LWO\StdAfx.h">
-      <Filter>Export\LWO</Filter>
-    </ClInclude>
     <ClInclude Include="Export\OMotionLW.hpp">
       <Filter>Export\Wrappers</Filter>
     </ClInclude>
@@ -175,6 +157,24 @@
     </ClInclude>
     <ClInclude Include="Export\Util.hpp">
       <Filter>Export</Filter>
+    </ClInclude>
+    <ClInclude Include="$(SolutionDir)editors\ECore\Editor\EditMesh.h">
+      <Filter>Shared Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="$(SolutionDir)editors\ECore\Editor\EditObject.h">
+      <Filter>Shared Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="$(SolutionDir)editors\ECore\Editor\ELog.h">
+      <Filter>Shared Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="$(SolutionDir)utils\LWO\envelope.h">
+      <Filter>Export\LWO</Filter>
+    </ClInclude>
+    <ClInclude Include="$(SolutionDir)utils\LWO\lwo2.h">
+      <Filter>Export\LWO</Filter>
+    </ClInclude>
+    <ClInclude Include="$(SolutionDir)utils\LWO\StdAfx.h">
+      <Filter>Export\LWO</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -80,6 +80,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>XRayShader</TargetName>
     <TargetExt>.p</TargetExt>
+    <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
@@ -89,6 +90,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <TargetName>XRayShader</TargetName>
     <TargetExt>.p</TargetExt>
+    <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
@@ -98,6 +100,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>XRayShader</TargetName>
     <TargetExt>.p</TargetExt>
+    <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>

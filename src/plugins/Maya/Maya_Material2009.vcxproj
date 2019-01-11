@@ -75,6 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>XRayMaterial</TargetName>
     <TargetExt>.mll</TargetExt>
+    <OutDir>$(xrPlugBinDir)Maya2009\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(xrPlugBinDir)Maya2009\</OutDir>
@@ -84,6 +85,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>XRayMaterial</TargetName>
     <TargetExt>.mll</TargetExt>
+    <OutDir>$(xrPlugBinDir)Maya2009\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <OutDir>$(xrPlugBinDir)Maya2009\</OutDir>
@@ -93,6 +95,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <TargetName>XRayMaterial</TargetName>
     <TargetExt>.mll</TargetExt>
+    <OutDir>$(xrPlugBinDir)Maya2009\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>

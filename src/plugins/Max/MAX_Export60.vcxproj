@@ -83,6 +83,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>XRayExport</TargetName>
     <TargetExt>.dlu</TargetExt>
+    <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
@@ -92,6 +93,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>XRayExport</TargetName>
     <TargetExt>.dlu</TargetExt>
+    <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
@@ -101,6 +103,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <TargetName>XRayExport</TargetName>
     <TargetExt>.dlu</TargetExt>
+    <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
