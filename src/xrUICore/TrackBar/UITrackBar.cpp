@@ -8,7 +8,7 @@
 
 CUITrackBar::CUITrackBar()
     : m_f_min(0), m_f_max(1), m_f_val(0), m_f_opt_backup_value(0), m_f_step(0.01f), m_b_is_float(true),
-      m_b_invert(false)
+      m_b_invert(false), m_b_bound_already_set(false)
 {
     m_pSlider = new CUI3tButton();
     AttachChild(m_pSlider);
@@ -122,9 +122,21 @@ void CUITrackBar::Update()
 void CUITrackBar::SetCurrentOptValue()
 {
     if (m_b_is_float)
-        GetOptFloatValue(m_f_val, m_f_min, m_f_max);
+    {
+        float fake_min, fake_max;
+        if (!m_b_bound_already_set)
+            GetOptFloatValue(m_f_val, m_f_min, m_f_max);
+        else
+            GetOptFloatValue(m_f_val, fake_min, fake_max);
+    }
     else
-        GetOptIntegerValue(m_i_val, m_i_min, m_i_max);
+    {
+        int fake_min, fake_max;
+        if (!m_b_bound_already_set)
+            GetOptIntegerValue(m_i_val, m_i_min, m_i_max);
+        else
+            GetOptIntegerValue(m_i_val, fake_min, fake_max);
+    }
 
     UpdatePos();
 }

@@ -583,6 +583,13 @@
 	            <d r="70" g="70" b="70"/>
             </text_color>
         </list_ui_style>
+		
+		<cap_fov x="20" y="3" width="135" height="24">
+			<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_fov</text>
+		</cap_fov>
+		<track_fov x="180" y="5" width="235" height="20" min="55.0" max="115.0">
+			<options_item entry="fov" group="mm_opt_gameplay" />
+		</track_fov>
 
         <cap_check_crosshair x="20" y="3" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_show_crosshair</text>
