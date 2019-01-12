@@ -22,6 +22,7 @@ private:
     _LEVEL_ID m_level_id;
     shared_str m_level_name;
     float m_actor_health;
+    bool m_valid_save;
 
 public:
     CSavedGameWrapper(LPCSTR saved_game_name);
@@ -33,6 +34,7 @@ public:
     inline const _LEVEL_ID& level_id() const;
     inline LPCSTR level_name() const;
     inline const float& actor_health() const;
+    inline bool valid_save() const;
 };
 
 #include "saved_game_wrapper_inline.h"

@@ -81,9 +81,9 @@ function load_dialog:InitControls()
 	self.list_box:ShowSelectedItem	(true)
 	self:Register			(self.list_box, "list_window")
 
-	ctrl					= xml:Init3tButton("form:btn_load",	self.form)
-	self:Register			(ctrl, "button_load")
-
+	self.load_btn			= xml:Init3tButton("form:btn_load",	self.form)
+	self:Register			(self.load_btn, "button_load")
+	
 	ctrl = xml:Init3tButton	("form:btn_delete",	self.form)
 	self:Register			(ctrl, "button_del")
 
@@ -92,6 +92,8 @@ function load_dialog:InitControls()
 
 	self.message_box		= CUIMessageBoxEx()
 	self:Register			(self.message_box,"message_box")
+	
+	self.selected_save_valid = true
 end
 
 function load_dialog:InitCallBacks()
@@ -103,8 +105,6 @@ function load_dialog:InitCallBacks()
 
 	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, 			  self.OnListItemClicked,		self)
 	self:AddCallback("list_window", ui_events.WINDOW_LBUTTON_DB_CLICK,		  self.OnListItemDbClicked,		self)
-
-
 end
 
 function file_exist(fname)
@@ -145,7 +145,7 @@ function AddTimeDigit(str, dig)
 
 end
 
-function file_data(fname)
+function file_data(fname, self)
 	local f = getFS();
 	local flist = f:file_list_open_ex("$game_saves$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly) , fname .. saved_game_extension)
 	local f_cnt = flist:Size()
@@ -153,6 +153,10 @@ function file_data(fname)
 	if f_cnt > 0 then
 		local file		=	flist:GetAt(0)
 		local sg = CSavedGameWrapper(fname)
+
+		local isSaveValid = sg:valid_save()
+		self.load_btn:Enable(isSaveValid)
+		self.selected_save_valid = isSaveValid
 
 		local y,m,d,h,min,sec,ms = 0,0,0,0,0,0,0
 		y,m,d,h,min,sec,ms = sg:game_time():get(y,m,d,h,min,sec,ms)
@@ -199,7 +203,7 @@ function load_dialog:OnListItemClicked()
 	local item_text				= item.fn:GetText()
 	self.file_caption:SetText	(item_text)
 	self.file_caption:SetEllipsis(true)
-	self.file_data:SetText		(file_data(item_text))
+	self.file_data:SetText		(file_data(item_text, self))
 
 	if file_exist(item_text .. saved_game_extension) ~= true then
 		self.list_box:RemoveItem(item)
@@ -276,7 +280,7 @@ function load_dialog:OnButton_load_clicked()
 
 	local fname		= item.fn:GetText()
 
-	if ( not valid_saved_game(fname) ) then
+	if (not valid_saved_game(fname) or not self.selected_save_valid) then
 		self.msgbox_id						= 0
 		self.message_box:InitMessageBox		("message_box_invalid_saved_game")
 		self.message_box:ShowDialog(true)

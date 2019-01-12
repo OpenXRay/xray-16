@@ -22,7 +22,8 @@ SCRIPT_EXPORT(CSavedGameWrapper, (), {
                          .def("game_time", &CSavedGameWrapper__game_time)
                          .def("level_id", &CSavedGameWrapper::level_id)
                          .def("level_name", &CSavedGameWrapper::level_name)
-                         .def("actor_health", &CSavedGameWrapper::actor_health),
+                         .def("actor_health", &CSavedGameWrapper::actor_health)
+                         .def("valid_save", &CSavedGameWrapper::valid_save),
 
         def("valid_saved_game", (bool (*)(LPCSTR))(&CSavedGameWrapper::valid_saved_game))];
 });
