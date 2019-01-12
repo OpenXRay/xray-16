@@ -54,6 +54,9 @@
 	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
 		<text>Wet surfaces quality</text>
 	</string>
+	<string id="ui_mm_fov">
+		<text>Field of view</text>
+	</string>
 	<string id="ui_mm_localization">
 		<text>Language</text>
 	</string>

@@ -54,6 +54,9 @@
 	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
 		<text>Jakoœæ mokrych powierzchni</text>
 	</string>
+	<string id="ui_mm_fov">
+		<text>Pole widzenia</text>
+	</string>
 	<string id="ui_mm_localization">
 		<text>Jêzyk</text>
 	</string>
