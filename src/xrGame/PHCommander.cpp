@@ -149,10 +149,10 @@ bool CPHCommander::add_call_unique(
     return false;
 }
 
-struct SRemovePred
+struct SRemovePred1
 {
     CPHReqComparerV* cmp_object;
-    SRemovePred(CPHReqComparerV* cmp_o) { cmp_object = cmp_o; }
+    SRemovePred1(CPHReqComparerV* cmp_o) { cmp_object = cmp_o; }
     bool operator()(CPHCall* call)
     {
         if (call->is_any(cmp_object))
@@ -174,7 +174,7 @@ void CPHCommander::remove_calls_threadsafety(CPHReqComparerV* cmp_object)
 
 void CPHCommander::remove_calls(CPHReqComparerV* cmp_object)
 {
-    m_calls.erase(std::remove_if(m_calls.begin(), m_calls.end(), SRemovePred(cmp_object)), m_calls.end());
+    m_calls.erase(std::remove_if(m_calls.begin(), m_calls.end(), SRemovePred1(cmp_object)), m_calls.end());
 }
 
 void CPHCommander::phys_shell_relcase(CPhysicsShell* sh)
