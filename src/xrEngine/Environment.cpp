@@ -608,9 +608,7 @@ SThunderboltCollection* CEnvironment::thunderbolt_collection(
             return it;
 
     NODEFAULT;
-#ifdef DEBUG
     return nullptr;
-#endif // #ifdef DEBUG
 }
 
 CLensFlareDescriptor* CEnvironment::add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id)
