@@ -54,8 +54,6 @@ class ENGINE_API CEngineAPI
     XRay::Module hGame;
     XRay::Module hTuner;
     xr_map<pcstr, XRay::Module> renderers;
-    xr_map<pcstr, SupportCheck> checkFunctions;
-    xr_map<pcstr, SetupEnv>     setupFunctions;
 
     SetupEnv setupSelectedRenderer;
 

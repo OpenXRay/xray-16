@@ -74,7 +74,7 @@ void CEngineAPI::SelectRenderer()
             if (renderers[library]->IsLoaded())
             {
                 GEnv.CurrentRenderer = index;
-                setupSelectedRenderer = setupFunctions[library];
+                setupSelectedRenderer = (SetupEnv)renderers[library]->GetProcAddress(setup_function);
             }
             else // Selected is unavailable
             {
@@ -178,8 +178,6 @@ void CEngineAPI::Destroy(void)
     hTuner = nullptr;
     pCreate = nullptr;
     pDestroy = nullptr;
-    checkFunctions.clear();
-    setupFunctions.clear();
     renderers.clear();
     Engine.Event._destroy();
     XRC.r_clear_compact();
@@ -227,12 +225,11 @@ void CEngineAPI::CreateRendererList()
         if (renderers[library]->IsLoaded())
         {
             // Load SupportCheck, SetupEnv and GetModeName functions from DLL
-            checkFunctions[library] = (SupportCheck)renderers[library]->GetProcAddress(check_function);
-            setupFunctions[library] = (SetupEnv)renderers[library]->GetProcAddress(setup_function);
+            const auto checkSupport = (SupportCheck)renderers[library]->GetProcAddress(check_function);
             const auto getModeName  = (GetModeName)renderers[library]->GetProcAddress(mode_function);
 
             // Test availability
-            if (checkFunctions[library] && checkFunctions[library]())
+            if (checkSupport && checkSupport())
                 modes.emplace_back(getModeName ? getModeName() : mode, index);
             else // Close the handle if test is failed
                 renderers[library]->Close();
