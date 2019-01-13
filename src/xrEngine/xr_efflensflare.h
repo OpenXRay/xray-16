@@ -20,7 +20,6 @@ public:
         shared_str texture;
         shared_str shader;
         FactoryPtr<IFlareRender> m_pRender;
-        // ref_shader hShader;
         SFlare() { fOpacity = fRadius = fPosition = 0; }
     };
 
@@ -99,12 +98,10 @@ protected:
     float fGradientValue;
 
     FactoryPtr<ILensFlareRender> m_pRender;
-    // ref_geom hGeom;
 
     LensFlareDescVec m_Palette;
     CLensFlareDescriptor* m_Current;
 
-    //. #ifdef DEBUG
 public:
     enum LFState
     {
@@ -113,7 +110,6 @@ public:
         lfsHide,
         lfsShow,
     };
-    //. #endif // DEBUG
 
 protected:
     LFState m_State;

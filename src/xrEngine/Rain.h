@@ -46,15 +46,6 @@ private:
 private:
     // Visualization (rain) and (drops)
     FactoryPtr<IRainRender> m_pRender;
-    /*
-    // Visualization (rain)
-    ref_shader SH_Rain;
-    ref_geom hGeom_Rain;
-
-    // Visualization (drops)
-    IRender_DetailModel* DM_Drop;
-    ref_geom hGeom_Drops;
-    */
 
     // Data and logic
     xr_vector<Item> items;

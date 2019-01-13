@@ -312,26 +312,11 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
 void CEnvDescriptor::on_device_create()
 {
     m_pDescriptor->OnDeviceCreate(*this);
-    /*
-    if (sky_texture_name.size())
-    sky_texture.create (sky_texture_name.c_str());
-
-    if (sky_texture_env_name.size())
-    sky_texture_env.create (sky_texture_env_name.c_str());
-
-    if (clouds_texture_name.size())
-    clouds_texture.create (clouds_texture_name.c_str());
-    */
 }
 
 void CEnvDescriptor::on_device_destroy()
 {
     m_pDescriptor->OnDeviceDestroy();
-    /*
-    sky_texture.destroy ();
-    sky_texture_env.destroy ();
-    clouds_texture.destroy ();
-    */
 }
 
 //-----------------------------------------------------------------------------
@@ -341,41 +326,14 @@ CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier) : CEnvDes
 void CEnvDescriptorMixer::destroy()
 {
     m_pDescriptorMixer->Destroy();
-    /*
-    sky_r_textures.clear ();
-    sky_r_textures_env.clear ();
-    clouds_r_textures.clear ();
-    */
 
     // Reuse existing code
     on_device_destroy();
-    /*
-     sky_texture.destroy ();
-     sky_texture_env.destroy ();
-     clouds_texture.destroy ();
-     */
 }
 
 void CEnvDescriptorMixer::clear()
 {
     m_pDescriptorMixer->Clear();
-    /*
-    std::pair<u32,ref_texture> zero = std::make_pair(u32(0),ref_texture(0));
-    sky_r_textures.clear ();
-    sky_r_textures.push_back (zero);
-    sky_r_textures.push_back (zero);
-    sky_r_textures.push_back (zero);
-
-    sky_r_textures_env.clear ();
-    sky_r_textures_env.push_back(zero);
-    sky_r_textures_env.push_back(zero);
-    sky_r_textures_env.push_back(zero);
-
-    clouds_r_textures.clear ();
-    clouds_r_textures.push_back (zero);
-    clouds_r_textures.push_back (zero);
-    clouds_r_textures.push_back (zero);
-    */
 }
 
 void CEnvDescriptorMixer::lerp(
@@ -385,20 +343,6 @@ void CEnvDescriptorMixer::lerp(
     float fi = 1 - f;
 
     m_pDescriptorMixer->lerp(&*A.m_pDescriptor, &*B.m_pDescriptor);
-    /*
-    sky_r_textures.clear ();
-    sky_r_textures.push_back (std::make_pair(0,A.sky_texture));
-    sky_r_textures.push_back (std::make_pair(1,B.sky_texture));
-
-    sky_r_textures_env.clear ();
-
-    sky_r_textures_env.push_back(std::make_pair(0,A.sky_texture_env));
-    sky_r_textures_env.push_back(std::make_pair(1,B.sky_texture_env));
-
-    clouds_r_textures.clear ();
-    clouds_r_textures.push_back (std::make_pair(0,A.clouds_texture));
-    clouds_r_textures.push_back (std::make_pair(1,B.clouds_texture));
-    */
 
     weight = f;
 
