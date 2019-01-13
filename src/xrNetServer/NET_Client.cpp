@@ -809,7 +809,6 @@ bool IPureClient::Connect(pcstr options)
                         {
                             // This host session is not in the list then so insert it.
                             HOST_NODE NODE;
-                            ZeroMemory(&NODE, sizeof(HOST_NODE));
 
                             // Copy the Host Address
                             R_CHK(pEnumHostsResponseMsg->pAddressSender->Duplicate(&NODE.pHostAddress));
