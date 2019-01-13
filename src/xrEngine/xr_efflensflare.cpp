@@ -111,8 +111,8 @@ void CLensFlareDescriptor::OnDeviceCreate()
     // shaders
     m_Gradient.m_pRender->CreateShader(*m_Gradient.shader, *m_Gradient.texture);
     m_Source.m_pRender->CreateShader(*m_Source.shader, *m_Source.texture);
-    for (auto it = m_Flares.begin(); it != m_Flares.end(); it++)
-        it->m_pRender->CreateShader(*it->shader, *it->texture);
+    for (const auto& flare : m_Flares)
+        flare.m_pRender->CreateShader(*flare.shader, *flare.texture);
 }
 
 void CLensFlareDescriptor::OnDeviceDestroy()
@@ -120,8 +120,8 @@ void CLensFlareDescriptor::OnDeviceDestroy()
     // shaders
     m_Gradient.m_pRender->DestroyShader();
     m_Source.m_pRender->DestroyShader();
-    for (auto it = m_Flares.begin(); it != m_Flares.end(); it++)
-        it->m_pRender->DestroyShader();
+    for (const auto& flare : m_Flares)
+        flare.m_pRender->DestroyShader();
 }
 
 //------------------------------------------------------------------------------
@@ -141,11 +141,10 @@ CLensFlare::CLensFlare()
     m_StateBlend = 0.f;
 
 #ifndef _EDITOR
-    for (int i = 0; i < MAX_RAYS; ++i)
+    for (auto& ray : m_ray_cache)
     {
-        m_ray_cache[i].verts[0].set(0, 0, 0);
-        m_ray_cache[i].verts[1].set(0, 0, 0);
-        m_ray_cache[i].verts[2].set(0, 0, 0);
+        for (auto& vert : ray.verts)
+            vert.set(0, 0, 0);
     }
 #endif
 
@@ -516,15 +515,15 @@ void CLensFlare::OnDeviceCreate()
     m_pRender->OnDeviceCreate();
 
     // palette
-    for (auto it = m_Palette.begin(); it != m_Palette.end(); it++)
-        (*it)->OnDeviceCreate();
+    for (const auto& descr : m_Palette)
+        descr->OnDeviceCreate();
 }
 
 void CLensFlare::OnDeviceDestroy()
 {
     // palette
-    for (auto it = m_Palette.begin(); it != m_Palette.end(); it++)
-        (*it)->OnDeviceDestroy();
+    for (const auto& descr : m_Palette)
+        descr->OnDeviceDestroy();
 
     // VS
     m_pRender->OnDeviceDestroy();

@@ -133,9 +133,9 @@ shared_str CEffect_Thunderbolt::AppendDef(
     if (!sect || (0 == sect[0]))
         return "";
 
-    for (auto it = collection.begin(); it != collection.end(); it++)
-        if ((*it)->section == sect)
-            return (*it)->section;
+    for (const auto item : collection)
+        if (item->section == sect)
+            return item->section;
 
     collection.push_back(environment.thunderbolt_collection(pIni, thunderbolts, sect));
     return collection.back()->section;
