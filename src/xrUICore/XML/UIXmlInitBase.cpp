@@ -1167,6 +1167,15 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, LPCSTR path, int index, CUITr
         }
     }
 
+    string512 buf;
+    strconcat(sizeof(buf), buf, path, ":output_wnd");
+    if (xml_doc.NavigateToNode(buf, index))
+    {
+        InitStatic(xml_doc, buf, index, pWnd->m_static);
+        pWnd->m_static_format = xml_doc.ReadAttrib(buf, index, "format", nullptr);
+        pWnd->m_static->Enable(true);
+    }
+
     return true;
 }
 
