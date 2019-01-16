@@ -212,10 +212,10 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 		f3N1.xyz = gbuf_unpack_normal( f3N1.xy );
 		f3N2.xy  = g_txNormal.Load( int3( i2MirrorOffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xy;				
 		f3N2.xyz = gbuf_unpack_normal( f3N2.xy );
-#else
-		f3N1.xy  = g_txNormal.Load( int3( i2OffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;
-		f3N2.xy  = g_txNormal.Load( int3( i2MirrorOffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;				
-#endif
+#else // GBUFFER_OPTIMIZATION
+		f3N1.xyz  = g_txNormal.Load( int3( i2OffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;
+		f3N2.xyz  = g_txNormal.Load( int3( i2MirrorOffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;	
+#endif // GBUFFER_OPTIMIZATION
 		
 		fDot = dot( f3N1, N );
 		
