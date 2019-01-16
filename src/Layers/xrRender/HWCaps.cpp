@@ -233,7 +233,11 @@ void CHWCaps::Update()
     geometry.dwRegisters = cnt;
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(6, 15);
+#ifdef USE_OGL
+    geometry.bVTF = !strstr(Core.Params, "-no_vtf");
+#else // USE_OGL
     geometry.bVTF = TRUE;
+#endif // USE_OGL
 
     // ***************** PIXEL processing
     raster_major = 4;
