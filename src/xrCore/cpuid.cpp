@@ -163,7 +163,7 @@ unsigned int query_processor_info(processor_info* pinfo)
     unsigned int pa_mask_save = 0;
     cpu_set_t my_set;
     CPU_ZERO(&my_set);
-    sched_getaffinity(0, sizeof(cpu_set_t), &my_set);
+    pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &my_set);
     pa_mask_save = CPU_COUNT(&my_set);
 #else
 #warning "No Function to obtain process affinity"
