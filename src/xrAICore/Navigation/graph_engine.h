@@ -15,11 +15,13 @@
 #include "xrAICore/Navigation/data_storage_bucket_list.h"
 #include "xrAICore/Navigation/graph_engine_space.h"
 #ifndef AI_COMPILER
+template <typename _operator_condition, typename _condition_state, typename _operator, typename _condition_evaluator,
+    typename _operator_id_type, bool _reverse_search, typename _operator_ptr, typename _condition_evaluator_ptr>
+class CProblemSolver;
 #include "xrAICore/Navigation/vertex_manager_hash_fixed.h"
 #include "xrAICore/Navigation/data_storage_binary_heap.h"
 #endif
 #include "xrEngine/profiler.h"
-#include "xrAICore/Components/problem_solver.h"
 #include "xrAICore/Components/operator_condition.h"
 #include "xrAICore/Components/condition_state.h"
 #include "xrAICore/Components/operator_abstract.h"
@@ -109,5 +111,4 @@ public:
 };
 
 #include "xrAICore/Navigation/PathManagers/path_manager.h"
-#include "xrAICore/Components/problem_solver_inline.h"
 #include "xrAICore/Navigation/graph_engine_inline.h"

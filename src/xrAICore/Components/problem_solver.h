@@ -151,4 +151,4 @@ public:
     virtual void clear();
 };
 
-//#include "xrAICore/Components/problem_solver_inline.h"
+#include "xrAICore/Components/problem_solver_inline.h"
