@@ -53,10 +53,5 @@ cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-if (NOT WIN32)
-execute_process (COMMAND pkg-config --libs libpcre OUTPUT_VARIABLE LIB_PCRE_LINKER_FLAGS)
-string(STRIP ${LIB_PCRE_LINKER_FLAGS} LIB_PCRE_LINKER_FLAGS)
-endif()
-
-target_link_libraries(${PROJECT_NAME} xrMiscMath dl pthread ${LIB_PCRE_LINKER_FLAGS} ${SDL_LIBRARIES} ${LZO_LIBRARIES} ${CRYPTO++_LIBRARIES} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} xrMiscMath dl pthread ${PCRE_LIBRARIES} ${SDL_LIBRARIES} ${LZO_LIBRARIES} ${CRYPTO++_LIBRARIES} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
 xr_install(${PROJECT_NAME})
