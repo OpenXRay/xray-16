@@ -108,9 +108,6 @@ add_definitions(-DdSINGLE) # for ODE
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
 if (NOT WIN32)
-    set(CRYPTOPP_EXCLUDES ${CMAKE_SOURCE_DIR}/Externals/cryptopp)
-    set(TBB_EXCLUDES ${CMAKE_SOURCE_DIR}/sdk/include/tbb)
-    set(TBB_SERIAL_EXCLUDES ${CMAKE_SOURCE_DIR}/sdk/include/serial/tbb)
     find_package(GLEW REQUIRED)
     find_package(FreeImage REQUIRED)
     find_package(LockFile REQUIRED)
@@ -124,21 +121,16 @@ if (NOT WIN32)
     find_package(TBB REQUIRED)
 endif()
 
+if (USING_OWN_TBB)
+    include_directories(${CMAKE_SOURCE_DIR}/sdk/include)
+endif()
+
 include_directories(${LUA_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/src/Common)
 include_directories(${CMAKE_SOURCE_DIR}/Externals/gli/external/glm)
 include_directories(${CMAKE_SOURCE_DIR}/Externals)
 include_directories(${CMAKE_SOURCE_DIR}/../sdk/include/loki)
 
-
-if (USING_OWN_TBB)
-   include_directories(${CMAKE_SOURCE_DIR}/sdk/include)
-   unset(TBB_EXCLUDES ${CMAKE_SOURCE_DIR}/sdk/include/tbb)
-   unset(TBB_SERIAL_EXCLUDES ${CMAKE_SOURCE_DIR}/sdk/include/serial/tbb)
-endif()
-
 add_subdirectory(Externals)
 add_subdirectory(src)
-add_subdirectory(EXCLUDE_FROM_ALL ${TBB_EXCLUDES})
-add_subdirectory(EXCLUDE_FROM_ALL ${CRYPTOPP_EXCLUDES})
-add_subdirectory(EXCLUDE_FROM_ALL ${TBB_SERIAL_EXCLUDES})
+
