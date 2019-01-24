@@ -126,6 +126,7 @@ find_package(SDL2 REQUIRED)
 find_package(LZO REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(TBB REQUIRED)
+find_package(PCRE REQUIRED)
 endif()
 
 include_directories(${LUA_INCLUDE_DIR})
