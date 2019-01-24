@@ -22,6 +22,12 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <chrono>
+#include <fstream>
+#include <string>
+#include <stdint.h>
+#include <string.h>
+#include <pcre.h>
+#include <iostream>
 #endif
 #include <thread>
 #include "SDL.h"
@@ -195,6 +201,49 @@ XRCORE_API u64 GetCLK()
 
 bool g_initialize_cpu_called = false;
 
+#ifdef LINUX
+u32 cpufreq()
+{
+    u32 cpuFreq = 0;
+
+    // CPU frequency is stored in /proc/cpuinfo in lines beginning with "cpu MHz"
+    pcstr pattern = "^cpu MHz\\s*:\\s*(\\d+)";
+    pcstr pcreErrorStr = nullptr;
+    int pcreErrorOffset = 0;
+
+    pcre* reCompiled = pcre_compile(pattern, PCRE_ANCHORED, &pcreErrorStr, &pcreErrorOffset, nullptr);
+    if(reCompiled == nullptr)
+    {
+        return 0;
+    }
+
+    std::ifstream ifs("/proc/cpuinfo");
+    if(ifs.is_open())
+    {
+        xr_string line;
+        int results[10];
+        while(ifs.good())
+        {
+            std::getline(ifs, line);
+            int rc = pcre_exec(reCompiled, 0, line.c_str(), line.length(), 0, 0, results, sizeof(results)/sizeof(results[0]));
+            if(rc < 0)
+                continue;
+            // Match found - extract frequency
+            pcstr matchStr = nullptr;
+            pcre_get_substring(line.c_str(), results, rc, 1, &matchStr);
+            R_ASSERT(matchStr);
+            cpuFreq = atol(matchStr);
+            pcre_free_substring(matchStr);
+            break;
+        }
+        ifs.close();
+    }
+
+    pcre_free(reCompiled);
+    return cpuFreq;
+}
+#endif // #ifdef LINUX
+
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
 {
@@ -231,7 +280,7 @@ void _initialize_cpu()
             i, cpuInfo.CurrentMhz, cpuInfo.MaxMhz);
     }
 #else
-    Msg("* CPU current freq: %lu MHz", CPU::qpc_freq);
+    Msg("* CPU current freq: %u MHz", cpufreq());
 #endif
     Log("");
     Fidentity.identity(); // Identity matrix
