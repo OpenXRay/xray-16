@@ -34,6 +34,9 @@
 [submodule "Externals/FreeImage"]
 	path = Externals/FreeImage
 	url = https://github.com/OpenXRay/ext-win-freeimage.git
+[submodule "Externals/cryptopp/cryptopp"]
+	path = Externals/cryptopp/cryptopp
+	url = https://github.com/weidai11/cryptopp.git
 [submodule "Externals/OpenAutomate"]
 	path = Externals/OpenAutomate
 	url = https://github.com/OpenXRay/OpenAutomate.git
