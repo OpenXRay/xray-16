@@ -11,7 +11,6 @@ endif()
 
 option ( TBB_PARALLEL "Use tbb::parallel for prarticle and skinning acceleration on SMP." ON )
 option ( NO_TBB_MALLOC "Use standard memory allocation instead of tbbmalloc" ON )
-option ( USING_OWN_TBB "Using specific tbb version from OpenXRay" ON)
 
 include(cotire)
 
