@@ -122,8 +122,9 @@ if (NOT WIN32)
     find_package(PCRE REQUIRED)
 endif()
 
-if (USING_OWN_TBB)
-    include_directories(${CMAKE_SOURCE_DIR}/sdk/include)
+if (WIN32)
+    include_directories(${CMAKE_SOURCE_DIR}/Externals/cryptopp)
+    include_directories(${CMAKE_SOURCE_DIR}/sdk/tbb)
 endif()
 
 include_directories(${LUA_INCLUDE_DIR})

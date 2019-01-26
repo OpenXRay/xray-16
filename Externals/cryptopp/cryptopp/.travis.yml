@@ -1,0 +1,110 @@
+language: cpp
+
+os:
+  - linux
+  - osx
+
+dist: trusty
+sudo: false
+
+# OS X only supports one image. Use the latest.
+osx_image: xcode8.2
+
+git:
+  depth: 3
+
+compiler:
+  - clang
+  - gcc
+
+env:
+  global:
+    - BUILD_JOBS=2
+
+  matrix:
+    - BUILD_MODE="all"
+    - BUILD_MODE="native"
+    - BUILD_MODE="no-asm"
+    - BUILD_MODE="debug"
+    - BUILD_MODE="asan"
+    - BUILD_MODE="ubsan"
+    - BUILD_MODE="ios-arm"
+    - BUILD_MODE="ios-arm64"
+    - BUILD_MODE="ios-watch"
+    - BUILD_MODE="ios-tv"
+
+matrix:
+
+  exclude:
+    # Skip GCC on OS X entirely
+    - os: osx
+      compiler: gcc
+    # Skip UBsan due to GCC 4.8
+    - os: linux
+      compiler: gcc
+      env: BUILD_MODE="ubsan"
+    # Skip UBsan due to Clang 3.4
+    - os: osx
+      compiler: clang
+      env: BUILD_MODE="ubsan"
+    # No iOS builds on Linux
+    - os: linux
+      env: BUILD_MODE="ios-arm"
+    - os: linux
+      env: BUILD_MODE="ios-arm64"
+    - os: linux
+      env: BUILD_MODE="ios-watch"
+    - os: linux
+      env: BUILD_MODE="ios-tv"
+
+  allow_failures:
+    - os: osx
+      env: BUILD_MODE="ios-watch"
+
+script:
+  - |
+    if [[ "$BUILD_MODE" == "ios-arm" ]]; then
+        cp ./TestScripts/setenv-ios.sh .
+        . ./setenv-ios.sh arm
+        make -f GNUmakefile-cross -j "$BUILD_JOBS"
+    elif [[ "$BUILD_MODE" == "ios-arm64" ]]; then
+        cp ./TestScripts/setenv-ios.sh .
+        . ./setenv-ios.sh arm64 -j "$BUILD_JOBS"
+        make -f GNUmakefile-cross
+    elif [[ "$BUILD_MODE" == "ios-watch" ]]; then
+        cp ./TestScripts/setenv-ios.sh .
+        . ./setenv-ios.sh watch
+        make -f GNUmakefile-cross -j "$BUILD_JOBS"
+    elif [[ "$BUILD_MODE" == "ios-tv" ]]; then
+        cp ./TestScripts/setenv-ios.sh .
+        . ./setenv-ios.sh tv
+        make -f GNUmakefile-cross -j  "$BUILD_JOBS"
+    elif [[ "$BUILD_MODE" == "debug" ]]; then
+        CXXFLAGS="-DDEBUG -g2 -O1" make -j "$BUILD_JOBS"
+        ./cryptest.exe v
+        ./cryptest.exe tv all
+    else
+        make "$BUILD_MODE" -j "$BUILD_JOBS"
+        ./cryptest.exe v
+        ./cryptest.exe tv all
+    fi
+
+# whitelist branches to avoid testing feature branches twice
+branches:
+  only:
+    - master
+
+addons:
+  sonarcloud: true
+
+  coverity_scan:
+    project:
+      name: "cryptopp"
+    build_command: "make -j 2"
+
+notifications:
+  email:
+    recipients:
+      - cryptopp-build@googlegroups.com
+    on_success: always # default: change
+    on_failure: always # default: always
