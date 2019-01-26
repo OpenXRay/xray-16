@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "SkinXW_CPP.hpp"
-#include "tbb/parallel_for.h"
-#include "tbb/blocked_range.h"
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
+
 #ifdef _EDITOR
 #include "SkeletonX.h"
 #include "SkeletonCustom.h"
@@ -9,6 +10,8 @@
 #include "Animation/Bone.hpp"
 #include "Layers/xrRender/SkeletonXVertRender.h"
 #endif
+
+
 
 namespace XRay
 {
