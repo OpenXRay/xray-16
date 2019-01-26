@@ -482,11 +482,7 @@ void CGamePersistent::WeathersUpdate()
 bool allow_intro()
 {
 #if defined(WINDOWS)
-#ifdef MASTER_GOLD
-    if (g_SASH.IsRunning())
-#else // #ifdef MASTER_GOLD
     if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
-#endif // #ifdef MASTER_GOLD
 #else
     if (0 != strstr(Core.Params, "-nointro"))
 #endif
