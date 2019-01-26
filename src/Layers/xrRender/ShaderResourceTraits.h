@@ -42,21 +42,21 @@ struct ShaderTypeTraits<SVS>
         }
     }
 
-    static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
+    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
     {
-        HWShaderType sh = 0;
+        HRESULT res = 0;
 
 #ifdef USE_OGL
         sh = glCreateShader(GL_VERTEX_SHADER);
 #elif defined(USE_DX11)
-        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, 0, &sh));
+        res = HW.pDevice->CreateVertexShader(buffer, size, 0, &sh);
 #elif defined(USE_DX10)
-        R_CHK(HW.pDevice->CreateVertexShader(buffer, size, &sh));
+        res = HW.pDevice->CreateVertexShader(buffer, size, &sh);
 #else
-        R_CHK(HW.pDevice->CreateVertexShader(buffer, &sh));
+        res = HW.pDevice->CreateVertexShader(buffer, &sh);
 #endif
 
-        return sh;
+        return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_vertex; }
@@ -108,21 +108,21 @@ struct ShaderTypeTraits<SPS>
         }
     }
 
-    static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
+    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
     {
-        HWShaderType sh = 0;
+        HRESULT res = 0;
 
 #ifdef USE_OGL
         sh = glCreateShader(GL_FRAGMENT_SHADER);
 #elif defined(USE_DX11)
-        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, 0, &sh));
+        res = HW.pDevice->CreatePixelShader(buffer, size, 0, &sh);
 #elif defined(USE_DX10)
-        R_CHK(HW.pDevice->CreatePixelShader(buffer, size, &sh));
+        res = HW.pDevice->CreatePixelShader(buffer, size, &sh);
 #else
-        R_CHK(HW.pDevice->CreatePixelShader(buffer, &sh));
+        res = HW.pDevice->CreatePixelShader(buffer, &sh);
 #endif
 
-        return sh;
+        return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_pixel; }
@@ -168,19 +168,19 @@ struct ShaderTypeTraits<SGS>
         entry = "main";
     }
 
-    static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
+    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
     {
-        HWShaderType sh = 0;
+        HRESULT res = 0;
 
 #ifdef USE_OGL
         sh = glCreateShader(GL_GEOMETRY_SHADER);
 #elif defined(USE_DX11)
-        R_CHK(HW.pDevice->CreateGeometryShader(buffer, size, 0, &sh));
+        res = HW.pDevice->CreateGeometryShader(buffer, size, 0, &sh);
 #else
-        R_CHK(HW.pDevice->CreateGeometryShader(buffer, size, &sh));
+        res = HW.pDevice->CreateGeometryShader(buffer, size, &sh);
 #endif
 
-        return sh;
+        return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_geometry; }
@@ -208,17 +208,17 @@ struct ShaderTypeTraits<SHS>
         entry = "main";
     }
 
-    static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
+    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
     {
-        HWShaderType sh = 0;
+        HRESULT res = 0;
 
 #ifdef USE_OGL
         sh = glCreateShader(GL_TESS_CONTROL_SHADER);
 #else
-        R_CHK(HW.pDevice->CreateHullShader(buffer, size, NULL, &sh));
+        res = HW.pDevice->CreateHullShader(buffer, size, NULL, &sh);
 #endif
 
-        return sh;
+        return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_hull; }
@@ -244,17 +244,17 @@ struct ShaderTypeTraits<SDS>
         entry = "main";
     }
 
-    static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
+    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
     {
-        HWShaderType sh = 0;
+        HRESULT res = 0;
 
 #ifdef USE_OGL
         sh = glCreateShader(GL_TESS_EVALUATION_SHADER);
 #else
-        R_CHK(HW.pDevice->CreateDomainShader(buffer, size, NULL, &sh));
+        res = HW.pDevice->CreateDomainShader(buffer, size, NULL, &sh);
 #endif
 
-        return sh;
+        return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_domain; }
@@ -280,17 +280,17 @@ struct ShaderTypeTraits<SCS>
         entry = "main";
     }
 
-    static inline HWShaderType CreateHWShader(DWORD const* buffer, size_t size)
+    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
     {
-        HWShaderType sh = 0;
+        HRESULT res = 0;
         
 #ifdef USE_OGL
         sh = glCreateShader(GL_COMPUTE_SHADER);
 #else
-        R_CHK(HW.pDevice->CreateComputeShader(buffer, size, NULL, &sh));
+        res = HW.pDevice->CreateComputeShader(buffer, size, NULL, &sh);
 #endif
 
-        return sh;
+        return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_compute; }
