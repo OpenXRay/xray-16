@@ -74,6 +74,7 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
         m_actor_health = 1.f;
         m_level_id = _LEVEL_ID(-1);
         m_level_name = "";
+        m_valid_save = false;
         return;
     }
 
@@ -88,6 +89,7 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
         CALifeTimeManager time_manager(alife_section);
         time_manager.load(reader);
         m_game_time = time_manager.game_time();
+        m_valid_save = true;
     }
 
     {
@@ -161,10 +163,15 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
         {
             CGameGraph graph(*chunk);
             m_level_id = graph.vertex(object->m_tGraphID)->level_id();
+
             if (graph.header().level_exist(m_level_id))
                 m_level_name = graph.header().level(m_level_id).name();
+                
             else
+            {
                 m_level_name = StringTable().translate("ui_st_error");
+                m_valid_save = false;
+            }
         }
 
         chunk->close();
