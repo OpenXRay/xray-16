@@ -60,7 +60,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
     if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
-        mapDistort.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
     }
 
     // Select shader
@@ -74,13 +74,13 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     if (RI.val_bHUD)
     {
         if (sh->flags.bStrictB2F)
-            mapHUDSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+            mapHUDSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
         else
-            mapHUD      .emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+            mapHUD      .insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
 
 #if RENDER != R_R1
         if (sh->flags.bEmissive)
-            mapHUDEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+            mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
 #endif
         return;
     }
@@ -95,7 +95,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // strict-sorting selection
     if (sh->flags.bStrictB2F)
     {
-        mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+        mapSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
         return;
     }
 
@@ -107,11 +107,11 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
     }
     if (sh->flags.bWmark && pmask_wmark)
     {
-        mapWmark.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+        mapWmark.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
         return;
     }
 #endif
@@ -142,12 +142,12 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         Nps.hs = pass.hs->sh;
         Nps.ds = pass.ds->sh;
 
-        auto &Ncs = Nps.mapCS[pass.constants._get()];
+        auto& Ncs = Nps.mapCS[pass.constants._get()];
 #else
-        auto &Ncs = Nps[pass.constants._get()];
+        auto& Ncs = Nps[pass.constants._get()];
 #endif
-        auto &Nstate = Ncs[&*pass.state];
-        auto &Ntex = Nstate[pass.T._get()];
+        auto& Nstate = Ncs[&*pass.state];
+        auto& Ntex = Nstate[pass.T._get()];
         Ntex.push_back(item);
 
         // Need to sort for HZB efficient use
@@ -224,7 +224,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
     if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
-        mapDistort.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }))); // sh_d -> L_special
+        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
     }
 
     // Select shader
@@ -239,7 +239,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     {
         // TODO: Выяснить, почему в единственном месте параметр ssa не используется
         // Визуально различий не замечено
-        mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ /*0*/SSA, nullptr, pVisual, Fidentity, sh })));
+        mapSorted.insert_anyway(distSQ, _MatrixItemS({ /*0*/SSA, nullptr, pVisual, Fidentity, sh }));
         return;
     }
 
@@ -251,11 +251,11 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }))); // sh_d -> L_special
+        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
     }
     if (sh->flags.bWmark && pmask_wmark)
     {
-        mapWmark.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh })));
+        mapWmark.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh }));
         return;
     }
 #endif
@@ -269,32 +269,32 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
-        auto &pass = *sh->passes[iPass];
-        auto &map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
+        auto& pass = *sh->passes[iPass];
+        auto& map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
 
 #ifdef USE_OGL
-        auto &Nvs = map[pass.vs->sh];
-        auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->sh];
+        auto& Nvs = map[pass.vs->sh];
+        auto& Ngs = Nvs[pass.gs->sh];
+        auto& Nps = Ngs[pass.ps->sh];
 #elif defined(USE_DX10) || defined(USE_DX11)
-        auto &Nvs = map[&*pass.vs];
-        auto &Ngs = Nvs[pass.gs->sh];
-        auto &Nps = Ngs[pass.ps->sh];
+        auto& Nvs = map[&*pass.vs];
+        auto& Ngs = Nvs[pass.gs->sh];
+        auto& Nps = Ngs[pass.ps->sh];
 #else
-        auto &Nvs = map[pass.vs->sh];
-        auto &Nps = Nvs[pass.ps->sh];
+        auto& Nvs = map[pass.vs->sh];
+        auto& Nps = Nvs[pass.ps->sh];
 #endif
 
 #ifdef USE_DX11
         Nps.hs = pass.hs->sh;
         Nps.ds = pass.ds->sh;
 
-        auto &Ncs = Nps.mapCS[pass.constants._get()];
+        auto& Ncs = Nps.mapCS[pass.constants._get()];
 #else
-        auto &Ncs = Nps[pass.constants._get()];
+        auto& Ncs = Nps[pass.constants._get()];
 #endif
-        auto &Nstate = Ncs[&*pass.state];
-        auto &Ntex = Nstate[pass.T._get()];
+        auto& Nstate = Ncs[&*pass.state];
+        auto& Ntex = Nstate[pass.T._get()];
         Ntex.push_back(item);
 
         // Need to sort for HZB efficient use
@@ -357,14 +357,14 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto &it : pG->items)
+        for (auto& it : pG->items)
         {
             PS::CParticleGroup::SItem& I = it;
             if (I._effect)
                 add_leafs_Dynamic(I._effect);
-            for (auto &pit : I._children_related)
+            for (auto& pit : I._children_related)
                 add_leafs_Dynamic(pit);
-            for (auto &pit : I._children_free)
+            for (auto& pit : I._children_free)
                 add_leafs_Dynamic(pit);
         }
     }
@@ -373,10 +373,10 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
     {
         // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-        for (auto &i : pV->children)
+        for (auto& i : pV->children)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                                                   // [use shader data from parent model, rather than it childrens]
+                                                         // [use shader data from parent model, rather than it childrens]
 
             add_leafs_Dynamic(i);
         }
@@ -405,10 +405,10 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         {
             pV->CalculateBones(TRUE);
             pV->CalculateWallmarks(); //. bug?
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
             {
                 i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                                                       // [use shader data from parent model, rather than it childrens]
+                                                             // [use shader data from parent model, rather than it childrens]
                 add_leafs_Dynamic(i);
             }
         }
@@ -438,14 +438,14 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto &it : pG->items)
+        for (auto& it : pG->items)
         {
             PS::CParticleGroup::SItem& I = it;
             if (I._effect)
                 add_leafs_Dynamic(I._effect);
-            for (auto &pit : I._children_related)
+            for (auto& pit : I._children_related)
                 add_leafs_Dynamic(pit);
-            for (auto &pit : I._children_free)
+            for (auto& pit : I._children_free)
                 add_leafs_Dynamic(pit);
         }
     }
@@ -454,7 +454,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
     {
         // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-        for (auto &i : pV->children)
+        for (auto& i : pV->children)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
@@ -468,7 +468,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
         pV->CalculateBones(TRUE);
-        for (auto &i : pV->children)
+        for (auto& i : pV->children)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
@@ -486,7 +486,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         {
             if (ssa < r_ssaDISCARD)
                 return;
-            mapLOD.emplace_back(std::make_pair(D, _LodItem({ ssa, pVisual })));
+            mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
         if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)
@@ -495,10 +495,10 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
 #endif
         {
             // Add all children, doesn't perform any tests
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
             {
                 i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                                                       // [use shader data from parent model, rather than it childrens]
+                                                             // [use shader data from parent model, rather than it childrens]
                 add_leafs_Static(i);
             }
         }
@@ -541,25 +541,25 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto &it : pG->items)
+        for (auto& it : pG->items)
         {
             PS::CParticleGroup::SItem& I = it;
             if (fcvPartial == VIS)
             {
                 if (I._effect)
                     add_Dynamic(I._effect, planes);
-                for (auto &pit : I._children_related)
+                for (auto& pit : I._children_related)
                     add_Dynamic(pit, planes);
-                for (auto &pit : I._children_free)
+                for (auto& pit : I._children_free)
                     add_Dynamic(pit, planes);
             }
             else
             {
                 if (I._effect)
                     add_leafs_Dynamic(I._effect);
-                for (auto &pit : I._children_related)
+                for (auto& pit : I._children_related)
                     add_leafs_Dynamic(pit);
-                for (auto &pit : I._children_free)
+                for (auto& pit : I._children_free)
                     add_leafs_Dynamic(pit);
             }
         }
@@ -571,12 +571,12 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         if (fcvPartial == VIS)
         {
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_Dynamic(i, planes);
         }
         else
         {
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_leafs_Dynamic(i);
         }
     }
@@ -604,7 +604,7 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
         {
             pV->CalculateBones(TRUE);
             pV->CalculateWallmarks(); //. bug?
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_leafs_Dynamic(i);
         }
     }
@@ -638,25 +638,25 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto &it : pG->items)
+        for (auto& it : pG->items)
         {
             PS::CParticleGroup::SItem& I = it;
             if (fcvPartial == VIS)
             {
                 if (I._effect)
                     add_Dynamic(I._effect, planes);
-                for (auto &pit : I._children_related)
+                for (auto& pit : I._children_related)
                     add_Dynamic(pit, planes);
-                for (auto &pit : I._children_free)
+                for (auto& pit : I._children_free)
                     add_Dynamic(pit, planes);
             }
             else
             {
                 if (I._effect)
                     add_leafs_Dynamic(I._effect);
-                for (auto &pit : I._children_related)
+                for (auto& pit : I._children_related)
                     add_leafs_Dynamic(pit);
-                for (auto &pit : I._children_free)
+                for (auto& pit : I._children_free)
                     add_leafs_Dynamic(pit);
             }
         }
@@ -668,12 +668,12 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         if (fcvPartial == VIS)
         {
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_Static(i, planes);
         }
         else
         {
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_leafs_Static(i);
         }
     }
@@ -686,12 +686,12 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         pV->CalculateBones(TRUE);
         if (fcvPartial == VIS)
         {
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_Static(i, planes);
         }
         else
         {
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_leafs_Static(i);
         }
     }
@@ -706,7 +706,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         {
             if (ssa < r_ssaDISCARD)
                 return;
-            mapLOD.emplace_back(std::make_pair(D, _LodItem({ ssa, pVisual })));
+            mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
         if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)
@@ -715,7 +715,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
 #endif
         {
             // Add all children, perform tests
-            for (auto &i : pV->children)
+            for (auto& i : pV->children)
                 add_leafs_Static(i);
         }
     }
