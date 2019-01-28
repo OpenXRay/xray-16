@@ -434,12 +434,14 @@ pcstr XMLDocument::CheckUniqueAttrib(XML_NODE start_node, pcstr tag_name, pcstr 
     {
         pcstr attrib = ReadAttrib(start_node, tag_name, i, attrib_name, nullptr);
 
-        xr_vector<shared_str>::iterator it = std::find(m_AttribValues.begin(), m_AttribValues.end(), attrib);
+        auto it = std::find(m_AttribValues.begin(), m_AttribValues.end(), attrib);
 
         if (m_AttribValues.end() != it)
             return attrib;
 
         m_AttribValues.push_back(attrib);
     }
+
+    m_AttribValues.clear();
     return nullptr;
 }
