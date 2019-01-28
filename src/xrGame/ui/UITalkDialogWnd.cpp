@@ -26,7 +26,6 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 {
     m_uiXml = new CUIXml();
     m_uiXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TALK_XML);
-    CUIXmlInit ml_init;
 
     CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this);
 
@@ -245,27 +244,26 @@ CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
 {
     m_text = new CUI3tButton();
     m_text->SetAutoDelete(true);
-    AttachChild(m_text);
+    CUIWindow::AttachChild(m_text);
 
     string512 str;
-    CUIXmlInit xml_init;
-
     xr_strcpy(str, path);
-    xml_init.InitWindow(*xml_doc, str, 0, this);
+
+    CUIXmlInit::InitWindow(*xml_doc, str, 0, this);
 
     m_min_height = xml_doc->ReadAttribFlt(path, 0, "min_height", 15.0f);
 
     strconcat(sizeof(str), str, path, ":content_text");
-    xml_init.Init3tButton(*xml_doc, str, 0, m_text);
+    CUIXmlInit::Init3tButton(*xml_doc, str, 0, m_text);
 
     Register(m_text);
     AddCallback(m_text, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIQuestionItem::OnTextClicked));
 
     m_num_text = new CUITextWnd();
     m_num_text->SetAutoDelete(true);
-    AttachChild(m_num_text);
+    CUIWindow::AttachChild(m_num_text);
     strconcat(sizeof(str), str, path, ":num_text");
-    xml_init.InitTextWnd(*xml_doc, str, 0, m_num_text);
+    CUIXmlInit::InitTextWnd(*xml_doc, str, 0, m_num_text);
 }
 
 void CUIQuestionItem::Init(LPCSTR val, LPCSTR text)
@@ -288,22 +286,21 @@ CUIAnswerItem::CUIAnswerItem(CUIXml* xml_doc, LPCSTR path)
     m_text->SetAutoDelete(true);
     m_name = new CUITextWnd();
     m_name->SetAutoDelete(true);
-    AttachChild(m_text);
-    AttachChild(m_name);
+    CUIWindow::AttachChild(m_text);
+    CUIWindow::AttachChild(m_name);
 
     string512 str;
-    CUIXmlInit xml_init;
-
     xr_strcpy(str, path);
-    xml_init.InitWindow(*xml_doc, str, 0, this);
+
+    CUIXmlInit::InitWindow(*xml_doc, str, 0, this);
 
     m_min_height = xml_doc->ReadAttribFlt(path, 0, "min_height", 15.0f);
     m_bottom_footer = xml_doc->ReadAttribFlt(path, 0, "bottom_footer", 0.0f);
     strconcat(sizeof(str), str, path, ":content_text");
-    xml_init.InitTextWnd(*xml_doc, str, 0, m_text);
+    CUIXmlInit::InitTextWnd(*xml_doc, str, 0, m_text);
 
     strconcat(sizeof(str), str, path, ":name_caption");
-    xml_init.InitTextWnd(*xml_doc, str, 0, m_name);
+    CUIXmlInit::InitTextWnd(*xml_doc, str, 0, m_name);
     SetAutoDelete(true);
 }
 
@@ -321,13 +318,12 @@ CUIAnswerItemIconed::CUIAnswerItemIconed(CUIXml* xml_doc, LPCSTR path) : CUIAnsw
 {
     m_icon = new CUIStatic();
     m_icon->SetAutoDelete(true);
-    AttachChild(m_icon);
+    CUIWindow::AttachChild(m_icon);
 
     string512 str;
-    CUIXmlInit xml_init;
-
     strconcat(sizeof(str), str, path, ":msg_icon");
-    xml_init.InitStatic(*xml_doc, str, 0, m_icon);
+
+    CUIXmlInit::InitStatic(*xml_doc, str, 0, m_icon);
 }
 
 void CUIAnswerItemIconed::Init(LPCSTR text, LPCSTR name, LPCSTR texture_name)

@@ -47,15 +47,13 @@ void CUIActorMenu::Construct()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu.xml");
 
-    CUIXmlInit xml_init;
-
-    xml_init.InitWindow(uiXml, "main", 0, this);
+    CUIXmlInit::InitWindow(uiXml, "main", 0, this);
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
     m_LeftBackground = new CUIStatic();
     m_LeftBackground->SetAutoDelete(true);
     AttachChild(m_LeftBackground);
-    xml_init.InitStatic(uiXml, "left_background", 0, m_LeftBackground);
+    CUIXmlInit::InitStatic(uiXml, "left_background", 0, m_LeftBackground);
 
     m_pUpgradeWnd = new CUIInventoryUpgradeWnd();
     AttachChild(m_pUpgradeWnd);

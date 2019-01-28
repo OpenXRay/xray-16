@@ -118,16 +118,15 @@ void CUISequencer::Start(LPCSTR tutor_name)
     m_flags.set(etsOverMainMenu, !!uiXml.Read("over_main_menu", 0, 0));
     int render_prio = uiXml.ReadInt("render_prio", 0, -2);
 
-    CUIXmlInit xml_init;
     if (UI().is_widescreen() && uiXml.NavigateToNode("global_wnd_16", 0))
     {
-        xml_init.AssignColor("tut_gray", color_rgba(255, 255, 255, 255));
-        xml_init.InitWindow(uiXml, "global_wnd_16", 0, m_UIWindow);
+        CUIXmlInit::AssignColor("tut_gray", color_rgba(255, 255, 255, 255));
+        CUIXmlInit::InitWindow(uiXml, "global_wnd_16", 0, m_UIWindow);
     }
     else
     {
-        xml_init.AssignColor("tut_gray", color_rgba(100, 100, 100, 255));
-        xml_init.InitWindow(uiXml, "global_wnd", 0, m_UIWindow);
+        CUIXmlInit::AssignColor("tut_gray", color_rgba(100, 100, 100, 255));
+        CUIXmlInit::InitWindow(uiXml, "global_wnd", 0, m_UIWindow);
     }
 
     XML_NODE bk = uiXml.GetLocalRoot();

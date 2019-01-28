@@ -66,23 +66,22 @@ void CUIInventoryUpgradeWnd::Init()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, g_inventory_upgrade_xml);
 
-    CUIXmlInit xml_init;
-    xml_init.InitWindow(uiXml, "main", 0, this);
+    CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
     m_item = new CUIStatic();
     m_item->SetAutoDelete(true);
     AttachChild(m_item);
-    xml_init.InitStatic(uiXml, "item_static", 0, m_item);
+    CUIXmlInit::InitStatic(uiXml, "item_static", 0, m_item);
 
     m_back = new CUIWindow();
     m_back->SetAutoDelete(true);
-    xml_init.InitWindow(uiXml, "back", 0, m_back);
+    CUIXmlInit::InitWindow(uiXml, "back", 0, m_back);
     AttachChild(m_back);
 
     m_scheme_wnd = new CUIWindow();
     m_scheme_wnd->SetAutoDelete(true);
     AttachChild(m_scheme_wnd);
-    xml_init.InitWindow(uiXml, "scheme", 0, m_scheme_wnd);
+    CUIXmlInit::InitWindow(uiXml, "scheme", 0, m_scheme_wnd);
 
     m_btn_repair = UIHelper::Create3tButton(uiXml, "repair_button", this);
 

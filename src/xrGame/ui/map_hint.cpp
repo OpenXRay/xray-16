@@ -23,9 +23,7 @@ CUIStatic* init_static_field(CUIXml& uiXml, LPCSTR path, LPCSTR path2)
 
 void CUIMapLocationHint::Init(CUIXml& uiXml, LPCSTR path)
 {
-    CUIXmlInit xml_init;
-
-    xml_init.InitFrameWindow(uiXml, path, 0, this);
+    CUIXmlInit::InitFrameWindow(uiXml, path, 0, this);
 
     CUIStatic* S = NULL;
 

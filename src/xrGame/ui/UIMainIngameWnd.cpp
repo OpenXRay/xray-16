@@ -90,8 +90,7 @@ void CUIMainIngameWnd::Init()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MAININGAME_XML);
 
-    CUIXmlInit xml_init;
-    xml_init.InitWindow(uiXml, "main", 0, this);
+    CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
     Enable(false);
 
@@ -130,7 +129,7 @@ void CUIMainIngameWnd::Init()
 
     m_UIIcons = new CUIScrollView();
     m_UIIcons->SetAutoDelete(true);
-    xml_init.InitScrollView(uiXml, "icons_scroll_view", 0, m_UIIcons);
+    CUIXmlInit::InitScrollView(uiXml, "icons_scroll_view", 0, m_UIIcons);
     AttachChild(m_UIIcons);
 
     m_ind_bleeding = UIHelper::CreateStatic(uiXml, "indicator_bleeding", this);
@@ -491,13 +490,12 @@ void CUIMainIngameWnd::InitFlashingIcons(CUIXml* node)
     const char* const flashingIconNodeName = "flashing_icon";
     int staticsCount = node->GetNodesNum("", 0, flashingIconNodeName);
 
-    CUIXmlInit xml_init;
     CUIStatic* pIcon = NULL;
     // Пробегаемся по всем нодам и инициализируем из них статики
     for (int i = 0; i < staticsCount; ++i)
     {
         pIcon = new CUIStatic();
-        xml_init.InitStatic(*node, flashingIconNodeName, i, pIcon);
+        CUIXmlInit::InitStatic(*node, flashingIconNodeName, i, pIcon);
         shared_str iconType = node->ReadAttrib(flashingIconNodeName, i, "type", "none");
 
         // Теперь запоминаем иконку и ее тип
