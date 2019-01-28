@@ -18,6 +18,22 @@
 #include "UIDragDropReferenceList.h"
 #include "xrUICore/EditBox/UIEditBox.h"
 
+CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
+{
+    // If it's not critical element, then don't crash if it doesn't exist
+    if (!critical && !xml.NavigateToNode(ui_path, 0))
+        return nullptr;
+
+    auto ui = new CUIWindow();
+    if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
+    CUIXmlInit::InitWindow(xml, ui_path, 0, ui);
+    return ui;
+}
+
 CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
@@ -31,6 +47,22 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent
         ui->SetAutoDelete(true);
     }
     CUIXmlInit::InitStatic(xml, ui_path, 0, ui);
+    return ui;
+}
+
+CUIScrollView* UIHelper::CreateScrollView(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
+{
+    // If it's not critical element, then don't crash if it doesn't exist
+    if (!critical && !xml.NavigateToNode(ui_path, 0))
+        return nullptr;
+
+    auto ui = new CUIScrollView();
+    if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
+    CUIXmlInit::InitScrollView(xml, ui_path, 0, ui);
     return ui;
 }
 
