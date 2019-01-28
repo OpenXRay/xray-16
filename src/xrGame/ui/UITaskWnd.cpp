@@ -300,35 +300,27 @@ void CUITaskWnd::OnShowQuestNpcs(CUIWindow* ui, void* d)
 // --------------------------------------------------------------------------------------------------
 CUITaskItem::CUITaskItem() : m_owner(nullptr), m_hint_wt(500), show_hint(false), show_hint_can(false) {}
 CUITaskItem::~CUITaskItem() {}
-CUIStatic* init_static_field(CUIXml& uiXml, LPCSTR path, LPCSTR path2);
 
 void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
 {
     CUIXmlInit::InitWindow(uiXml, path, 0, this);
     m_hint_wt = uiXml.ReadAttribInt(path, 0, "hint_wt", 500);
 
-    string256 buff;
-    CUIStatic* S = nullptr;
-
-    strconcat(sizeof(buff), buff, path, ":t_icon");
-    if (uiXml.NavigateToNode(buff))
+    const auto init = [&](pcstr name, bool critical = true)
     {
-        S = init_static_field(uiXml, path, "t_icon");
-        AttachChild(S);
-    }
-    m_info["t_icon"] = S;
+        string256 buff;
+        strconcat(sizeof(buff), buff, path, ":", name);
+        m_info[name] = UIHelper::CreateStatic(uiXml, buff, this, critical);
+    };
 
-    strconcat(sizeof(buff), buff, path, ":t_icon_over");
-    if (uiXml.NavigateToNode(buff))
-    {
-        S = init_static_field(uiXml, path, "t_icon_over");
-        AttachChild(S);
-    }
-    m_info["t_icon_over"] = S;
+    init("t_icon", false);
+    init("t_icon_over", false);
+    init("t_caption");
 
-    S = init_static_field(uiXml, path, "t_caption");
-    AttachChild(S);
-    m_info["t_caption"] = S;
+    // If icon exist but icon_over doesn't
+    // then just use icon for both cases
+    if (!m_info["t_icon_over"])
+        m_info["t_icon_over"] = m_info["t_icon"];
 
     show_hint_can = false;
     show_hint = false;
