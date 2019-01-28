@@ -53,16 +53,14 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
     Clear();
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "message_box.xml");
-    CUIXmlInitBase xml_init;
 
     string512 str;
-
     strconcat(sizeof(str), str, box_template, ":picture");
     if (uiXml.NavigateToNode(str, 0))
     {
         m_UIStaticPicture = new CUIStatic();
         AttachChild(m_UIStaticPicture);
-        xml_init.InitStatic(uiXml, str, 0, m_UIStaticPicture);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticPicture);
     }
 
     strconcat(sizeof(str), str, box_template, ":message_text");
@@ -70,11 +68,11 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
     {
         m_UIStaticText = new CUITextWnd();
         AttachChild(m_UIStaticText);
-        xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticText);
+        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticText);
     }
 
     xr_strcpy(str, box_template);
-    xml_init.InitStatic(uiXml, str, 0, this);
+    CUIXmlInitBase::InitStatic(uiXml, str, 0, this);
 
     LPCSTR _type = uiXml.ReadAttrib(str, 0, "type", NULL);
     R_ASSERT(_type);
@@ -128,7 +126,7 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":button_ok");
         m_UIButtonYesOk = new CUI3tButton();
         AttachChild(m_UIButtonYesOk);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
     }
     break;
     case MESSAGEBOX_INFO: {
@@ -139,32 +137,32 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":cap_host");
         m_UIStaticHost = new CUITextWnd();
         AttachChild(m_UIStaticHost);
-        xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticHost);
+        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticHost);
 
         strconcat(sizeof(str), str, box_template, ":edit_host");
         m_UIEditHost = new CUIEditBox();
         AttachChild(m_UIEditHost);
-        xml_init.InitEditBox(uiXml, str, 0, m_UIEditHost);
+        CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditHost);
 
         strconcat(sizeof(str), str, box_template, ":cap_password");
         m_UIStaticPass = new CUITextWnd();
         AttachChild(m_UIStaticPass);
-        xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticPass);
+        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_password");
         m_UIEditPass = new CUIEditBox();
         AttachChild(m_UIEditPass);
-        xml_init.InitEditBox(uiXml, str, 0, m_UIEditPass);
+        CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditPass);
 
         strconcat(sizeof(str), str, box_template, ":button_yes");
         m_UIButtonYesOk = new CUI3tButton();
         AttachChild(m_UIButtonYesOk);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
 
         strconcat(sizeof(str), str, box_template, ":button_no");
         m_UIButtonNo = new CUI3tButton();
         AttachChild(m_UIButtonNo);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
         // m_message_box_yes_no->func_on_ok = CUIWndCallback::void_function( this, &CUIActorMenu::OnMesBoxYes );
 
         break;
@@ -173,32 +171,32 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":cap_user_password");
         m_UIStaticUserPass = new CUITextWnd();
         AttachChild(m_UIStaticUserPass);
-        xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticUserPass);
+        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticUserPass);
 
         strconcat(sizeof(str), str, box_template, ":cap_password");
         m_UIStaticPass = new CUITextWnd();
         AttachChild(m_UIStaticPass);
-        xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticPass);
+        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_user_password");
         m_UIEditUserPass = new CUIEditBox();
         AttachChild(m_UIEditUserPass);
-        xml_init.InitEditBox(uiXml, str, 0, m_UIEditUserPass);
+        CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditUserPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_password");
         m_UIEditPass = new CUIEditBox();
         AttachChild(m_UIEditPass);
-        xml_init.InitEditBox(uiXml, str, 0, m_UIEditPass);
+        CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditPass);
 
         strconcat(sizeof(str), str, box_template, ":button_yes");
         m_UIButtonYesOk = new CUI3tButton();
         AttachChild(m_UIButtonYesOk);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
 
         strconcat(sizeof(str), str, box_template, ":button_no");
         m_UIButtonNo = new CUI3tButton();
         AttachChild(m_UIButtonNo);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
     }
     break;
 
@@ -206,22 +204,22 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":cap_login");
         m_UIStaticUserPass = new CUITextWnd();
         AttachChild(m_UIStaticUserPass);
-        xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticUserPass);
+        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticUserPass);
 
         strconcat(sizeof(str), str, box_template, ":cap_password");
         m_UIStaticPass = new CUITextWnd();
         AttachChild(m_UIStaticPass);
-        xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticPass);
+        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_login");
         m_UIEditUserPass = new CUIEditBox();
         AttachChild(m_UIEditUserPass);
-        xml_init.InitEditBox(uiXml, str, 0, m_UIEditUserPass);
+        CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditUserPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_password");
         m_UIEditPass = new CUIEditBox();
         AttachChild(m_UIEditPass);
-        xml_init.InitEditBox(uiXml, str, 0, m_UIEditPass);
+        CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditPass);
 
         m_UIEditUserPass->SetNextFocusCapturer(m_UIEditPass);
         m_UIEditPass->SetNextFocusCapturer(m_UIEditUserPass);
@@ -234,12 +232,12 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":button_yes");
         m_UIButtonYesOk = new CUI3tButton();
         AttachChild(m_UIButtonYesOk);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
 
         strconcat(sizeof(str), str, box_template, ":button_no");
         m_UIButtonNo = new CUI3tButton();
         AttachChild(m_UIButtonNo);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
     }
     break;
 
@@ -248,17 +246,17 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":button_yes");
         m_UIButtonYesOk = new CUI3tButton();
         AttachChild(m_UIButtonYesOk);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
 
         strconcat(sizeof(str), str, box_template, ":button_no");
         m_UIButtonNo = new CUI3tButton();
         AttachChild(m_UIButtonNo);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
 
         strconcat(sizeof(str), str, box_template, ":button_cancel");
         m_UIButtonCancel = new CUI3tButton();
         AttachChild(m_UIButtonCancel);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonCancel);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonCancel);
     }
     break;
 
@@ -267,24 +265,24 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":button_yes");
         m_UIButtonYesOk = new CUI3tButton();
         AttachChild(m_UIButtonYesOk);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
 
         strconcat(sizeof(str), str, box_template, ":button_no");
         m_UIButtonNo = new CUI3tButton();
         AttachChild(m_UIButtonNo);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
 
         strconcat(sizeof(str), str, box_template, ":button_copy");
         m_UIButtonCopy = new CUI3tButton();
         AttachChild(m_UIButtonCopy);
-        xml_init.Init3tButton(uiXml, str, 0, m_UIButtonCopy);
+        CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonCopy);
 
         strconcat(sizeof(str), str, box_template, ":edit_url");
         if (uiXml.NavigateToNode(str))
         {
             m_UIEditURL = new CUIEditBox();
             AttachChild(m_UIEditURL);
-            xml_init.InitEditBox(uiXml, str, 0, m_UIEditURL);
+            CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditURL);
             //				m_UIEditURL->read_only
         }
     }

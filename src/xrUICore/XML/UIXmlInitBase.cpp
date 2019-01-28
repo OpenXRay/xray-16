@@ -35,8 +35,8 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-const char* const COLOR_DEFINITIONS = "color_defs.xml";
-CUIXmlInitBase::ColorDefs* CUIXmlInitBase::m_pColorDefs = NULL;
+constexpr pcstr COLOR_DEFINITIONS = "color_defs.xml";
+CUIXmlInitBase::ColorDefs* CUIXmlInitBase::m_pColorDefs = nullptr;
 
 //////////////////////////////////////////////////////////////////////////
 
