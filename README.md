@@ -14,9 +14,9 @@ and work on the source code.
 
 Changelist is available in [wiki](https://github.com/OpenXRay/xray-16/wiki/Changes).
 
-Build instructions (Windows): [doc/howto/build.txt](doc/howto/build.txt)
+[Build instructions (Windows)](doc/howto/HowToBuild-Windows.md)
 
-Build instructions (Linux): [doc/howto/build-linux.txt](doc/howto/build-linux.txt)
+[Build instructions (Linux)](doc/howto/HowToBuild-Linux.md)
 
 Installation instructions: [How to install and play](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-install-and-play)
 
