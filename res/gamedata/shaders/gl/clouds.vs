@@ -21,11 +21,10 @@ vf _main (vi v)
 	o.color		=	v.color	;			// copy color, low precision, cannot prescale even by 2
 	o.color.w	*= 	pow		(v.p.y,25);
 
-//	float  	scale 	= 	tex2Dlod (s_tonemap,float4(.5,.5,.5,.5)).x ;
-//	float	scale	= s_tonemap.Load( int3(0,0,0) ).x;
-//	float	scale	= s_tonemap.Load( int3(1,1,0) ).x;
-	float	scale	= texelFetch( s_tonemap, int2(0,0), 0 ).x;
-	o.color.rgb 	*= 	scale	;		// high precision
+#ifdef USE_VTF
+	float scale	=	texelFetch(s_tonemap, int2(0,0), 0).x;
+	o.color.rgb	*=	scale;		// high precision
+#endif // USE_VTF
 
 	return o;
 }

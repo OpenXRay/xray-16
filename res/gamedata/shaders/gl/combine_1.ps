@@ -218,7 +218,14 @@ _out _main ( _input I, uint iSample )
 #ifdef         DBG_TMAPPING
         color                        	= D.xyz;
 #endif
+
+	// final tone-mapping
+#ifdef USE_VTF
         float          	tm_scale        = I.tc0.w;                // interpolated from VS
+#else // USE_VTF
+        float          	tm_scale        = tex2D        (s_tonemap,I.tc0).x;
+#endif // USE_VTF
+
 
 #ifdef        USE_SUPER_SPECULAR
         color        	= spec          - hspecular	;

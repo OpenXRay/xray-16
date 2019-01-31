@@ -16,7 +16,11 @@ out float4 SV_Target;
 
 struct	_input
 {
+#ifdef USE_VTF
     float4 tc0;   // : TEXCOORD0; // tc.xy, tc.w = tonemap scale
+#else // USE_VTF
+    float2 tc0;   // : TEXCOORD0; // tc.xy
+#endif // USE_VTF
     float2 tcJ;   // : TEXCOORD1; // jitter coords
     float4 pos2d; // : SV_Position;
 };
