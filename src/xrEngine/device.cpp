@@ -39,6 +39,8 @@ ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 ENGINE_API BOOL g_bRendering = FALSE;
 
+extern int ps_always_active;
+
 BOOL g_bLoaded = FALSE;
 ref_light precache_light = 0;
 
@@ -99,7 +101,7 @@ void CRenderDevice::End(void)
             g_find_chunk_counter.flush();
 #endif
             CheckPrivilegySlowdown();
-            if (g_pGamePersistent->GameType() == 1) // haCk
+            if (g_pGamePersistent->GameType() == 1 && !ps_always_active) // haCk
             {
                 Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
                 if ((flags & SDL_WINDOW_INPUT_FOCUS) == 0)
@@ -573,7 +575,6 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     else
         pInput->GrabInput(false);
 
-    extern int ps_always_active;
     const BOOL isGameActive = ps_always_active || isWndActive;
 
     if (isGameActive != Device.b_is_Active)
