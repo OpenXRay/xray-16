@@ -13,8 +13,7 @@ class CUITalkWnd;
 
 class CUITalkDialogWnd : public CUIWindow, public CUIWndCallback
 {
-private:
-    typedef CUIWindow inherited;
+    using inherited = CUIWindow;
     CUIXml* m_uiXml;
 
 public:
@@ -33,15 +32,20 @@ public:
     u32 GetOurReplicsColor() { return m_uOurReplicsColor; }
     bool mechanic_mode; // for inventory upgrades
 
-    //номер выбранного вопроса
+    // Selected question number
     shared_str m_ClickedQuestionID;
 
-    //список вопросов, которые мы можем задавать персонажу
+    // Dialog interface elements
+    CUIStatic* UIDialogFrameTop;
+    CUIStatic* UIDialogFrameBottom;
 
-    //	Fvector2			m_btn_pos[3];
+    Fvector2 m_btn_pos[3];
     CUI3tButton UIToTradeButton;
-    //	CUI3tButton			UIToExitButton;
+    CUI3tButton* UIToExitButton;
 
+    // Characters info
+    CUIStatic* UIOurIcon;
+    CUIStatic* UIOthersIcon;
     CUICharacterInfo UICharacterInfoLeft;
     CUICharacterInfo UICharacterInfoRight;
 
@@ -56,13 +60,15 @@ public:
     void UpdateButtonsLayout(bool b_disable_break, bool trade_enabled);
 
 private:
+    // List of questions we can ask the character
     CUIScrollView* UIQuestionsList;
     CUIScrollView* UIAnswersList;
 
-    // Шрифт и цвет текста с именем персонажа
+    // Font and colour of text with character name
     CGameFont* m_pNameTextFont;
     u32 m_iNameTextColor;
-    // Цвет тeкста и шрифт наших реплик
+
+    // Text colour of our replics
     u32 m_uOurReplicsColor;
 
     void __stdcall OnTradeClicked(CUIWindow* w, void*);
