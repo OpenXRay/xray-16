@@ -2,18 +2,21 @@
 
 #include "SDL.h"
 
-// SDL_NUM_SCANCODES - max vavue in SDL_SCANCODE_* enum
-#define MOUSE_1 (SDL_NUM_SCANCODES + SDL_BUTTON_LEFT)
-#define MOUSE_2 (SDL_NUM_SCANCODES + SDL_BUTTON_RIGHT)
-#define MOUSE_3 (SDL_NUM_SCANCODES + SDL_BUTTON_MIDDLE)
 
-#define MOUSE_4 (SDL_NUM_SCANCODES + SDL_BUTTON_X1)
-#define MOUSE_5 (SDL_NUM_SCANCODES + SDL_BUTTON_X2)
-#define MOUSE_6 (SDL_NUM_SCANCODES + 6)
-#define MOUSE_7 (SDL_NUM_SCANCODES + 7)
-#define MOUSE_8 (SDL_NUM_SCANCODES + 8)
+// Mouse2 is a middle button in SDL,
+// but in X-Ray this is a right button
+enum xrMouse
+{
+    MOUSE_1 = SDL_NUM_SCANCODES + SDL_BUTTON_LEFT,
+    MOUSE_2 = SDL_NUM_SCANCODES + SDL_BUTTON_RIGHT,
+    MOUSE_3 = SDL_NUM_SCANCODES + SDL_BUTTON_MIDDLE,
+    MOUSE_4 = SDL_NUM_SCANCODES + SDL_BUTTON_X1,
+    MOUSE_5 = SDL_NUM_SCANCODES + SDL_BUTTON_X2,
+    MOUSE_MAX,
+    MOUSE_COUNT = MOUSE_5 - SDL_NUM_SCANCODES
+};
 
-constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5, MOUSE_6, MOUSE_7, MOUSE_8 };
+constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5 };
 
 inline int KeyToMouseButton(const int dik, const bool fromZero = true)
 {
@@ -28,9 +31,6 @@ inline int KeyToMouseButton(const int dik, const bool fromZero = true)
     case MOUSE_3: return 2 + i;
     case MOUSE_4: return 3 + i;
     case MOUSE_5: return 4 + i;
-    case MOUSE_6: return 5 + i;
-    case MOUSE_7: return 6 + i;
-    case MOUSE_8: return 7 + i;
     default: return dik - SDL_NUM_SCANCODES + i;
     }
 }
@@ -45,7 +45,7 @@ class ENGINE_API CInput
 public:
     enum
     {
-        COUNT_MOUSE_BUTTONS = 8,
+        COUNT_MOUSE_BUTTONS = MOUSE_COUNT,
         COUNT_MOUSE_AXIS = 4,
         COUNT_KB_BUTTONS = SDL_NUM_SCANCODES
     };

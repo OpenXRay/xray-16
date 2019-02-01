@@ -122,9 +122,6 @@ _keyboard keyboards[] =
     { "mouse3",                 MOUSE_3,                         "Mouse 3" },
     { "mouse4",                 MOUSE_4,                         "Mouse 4" },
     { "mouse5",                 MOUSE_5,                         "Mouse 5" },
-    { "mouse6",                 MOUSE_6,                         "Mouse 6" },
-    { "mouse7",                 MOUSE_7,                         "Mouse 7" },
-    { "mouse8",                 MOUSE_8,                         "Mouse 8" },
 
     { "kUNKNOWN",               SDL_SCANCODE_UNKNOWN,            "Unknown" },
 

@@ -74,14 +74,8 @@ void CInput::MouseUpdate()
 
     bool mouse_prev[COUNT_MOUSE_BUTTONS];
 
-    mouse_prev[0] = mouseState[0];
-    mouse_prev[1] = mouseState[1];
-    mouse_prev[2] = mouseState[2];
-    mouse_prev[3] = mouseState[3];
-    mouse_prev[4] = mouseState[4];
-    mouse_prev[5] = mouseState[5];
-    mouse_prev[6] = mouseState[6];
-    mouse_prev[7] = mouseState[7];
+    for (int i = 0; i < MOUSE_COUNT; ++i)
+        mouse_prev[i] = mouseState[i];
 
     bool mouseMoved = false;
     offs[0] = offs[1] = offs[2] = 0;
@@ -116,20 +110,9 @@ void CInput::MouseUpdate()
         }
     }
 
-    auto isButtonOnHold = [&](int i)
-    {
+    for (int i = 0; i < MOUSE_COUNT; ++i)
         if (mouseState[i] && mouse_prev[i])
             cbStack.back()->IR_OnMouseHold(i);
-    };
-
-    isButtonOnHold(0);
-    isButtonOnHold(1);
-    isButtonOnHold(2);
-    isButtonOnHold(3);
-    isButtonOnHold(4);
-    isButtonOnHold(5);
-    isButtonOnHold(6);
-    isButtonOnHold(7);
 
     if (mouseMoved)
     {
@@ -184,9 +167,6 @@ pcstr KeyToMouseButtonName(const int dik)
     case MOUSE_3: return "Center mouse";
     case MOUSE_4: return "Fourth mouse";
     case MOUSE_5: return "Fifth mouse";
-    case MOUSE_6: return "Sixth mouse";
-    case MOUSE_7: return "Seventh mouse";
-    case MOUSE_8: return "Eighth mouse";
     default: return "Unknown mouse";
     }
 }
@@ -218,7 +198,7 @@ bool CInput::iGetAsyncKeyState(int dik)
     if (dik < COUNT_KB_BUTTONS)
         return keyboardState[dik];
 
-    if (dik >= MOUSE_1 && dik <= MOUSE_8)
+    if (dik >= MOUSE_1 && dik < MOUSE_MAX)
     {
         const int mk = dik - MOUSE_1;
         return iGetAsyncBtnState(mk);
