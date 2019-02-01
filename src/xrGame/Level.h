@@ -116,12 +116,14 @@ protected:
     CPHCommander* m_ph_commander = nullptr;
     CPHCommander* m_ph_commander_scripts = nullptr;
     CPHCommander* m_ph_commander_physics_worldstep = nullptr;
+
     // Local events
     EVENT eChangeRP;
     EVENT eDemoPlay;
     EVENT eChangeTrack;
     EVENT eEnvironment;
     EVENT eEntitySpawn;
+
     // Statistics
     CStatGraph* pStatGraphS = nullptr;
     u32 m_dwSPC; // SendedPacketsCount
@@ -129,6 +131,7 @@ protected:
     CStatGraph* pStatGraphR = nullptr;
     u32 m_dwRPC; // ReceivedPacketsCount
     u32 m_dwRPS; // ReceivedPacketsSize
+
 private:
     struct ClientStatistics
     {
@@ -173,11 +176,12 @@ public:
     void SetNumCrSteps(u32 NumSteps);
     static void PhisStepsCallback(u32 Time0, u32 Time1);
     bool In_NetCorrectionPrediction() { return m_bIn_CrPr; }
-    virtual void OnMessage(void* data, u32 size);
-    virtual void OnInvalidHost();
-    virtual void OnInvalidPassword();
-    virtual void OnSessionFull();
-    virtual void OnConnectRejected();
+
+    void OnMessage(void* data, u32 size) override;
+    void OnInvalidHost() override;
+    void OnInvalidPassword() override;
+    void OnSessionFull() override;
+    void OnConnectRejected() override;
 
 private:
     void OnSecureMessage(NET_Packet& P);
@@ -198,6 +202,7 @@ public:
     void RemoveObject_From_4CrPr(CGameObject* pObj);
     IGameObject* CurrentControlEntity() const { return pCurrentControlEntity; }
     void SetControlEntity(IGameObject* O) { pCurrentControlEntity = O; }
+
 private:
     void make_NetCorrectionPrediction();
     u32 m_dwDeltaUpdate = 0;
@@ -210,6 +215,7 @@ private:
 
 public:
     shared_str const get_cdkey_digest() const { return m_client_digest; }
+
 private:
     bool m_bConnectResultReceived;
     bool m_bConnectResult;
@@ -266,45 +272,53 @@ protected:
 
 public:
     bool IsChecksumsEqual(u32 check_sum) const;
+
     // sounds
     xr_vector<ref_sound*> static_Sounds;
+
     // startup options
     shared_str m_caServerOptions;
     shared_str m_caClientOptions;
+
     // Starting/Loading
-    virtual bool net_Start(const char* op_server, const char* op_client);
-    virtual void net_Load(const char* name);
-    virtual void net_Save(const char* name);
-    virtual void net_Stop();
+    bool net_Start(const char* op_server, const char* op_client) override;
+    void net_Load(const char* name) override;
+    void net_Save(const char* name) override;
+    void net_Stop() override;
     virtual bool net_Start_client(const char* name);
-    virtual void net_Update();
-    virtual bool Load_GameSpecific_Before();
-    virtual bool Load_GameSpecific_After();
-    virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count);
+    void net_Update() override;
+    bool Load_GameSpecific_Before() override;
+    bool Load_GameSpecific_After() override;
+    void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) override;
+
     // Events
-    virtual void OnEvent(EVENT E, u64 P1, u64 P2);
-    virtual void OnFrame(void);
-    virtual void OnRender();
-    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    virtual shared_str OpenDemoFile(const char* demo_file_name);
-    virtual void net_StartPlayDemo();
+    void OnEvent(EVENT E, u64 P1, u64 P2) override;
+    void OnFrame(void) override;
+    void OnRender() override;
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+    shared_str OpenDemoFile(const char* demo_file_name) override;
+    void net_StartPlayDemo() override;
     void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
     void cl_Process_Spawn(NET_Packet& P);
     void ProcessGameEvents();
     void ProcessGameSpawns();
     void ProcessCompressedUpdate(NET_Packet& P, u8 const compression_type);
+
     // Input
-    virtual void IR_OnKeyboardPress(int btn);
-    virtual void IR_OnKeyboardRelease(int btn);
-    virtual void IR_OnKeyboardHold(int btn);
-    virtual void IR_OnMousePress(int btn);
-    virtual void IR_OnMouseRelease(int btn);
-    virtual void IR_OnMouseHold(int btn);
-    virtual void IR_OnMouseMove(int, int);
-    virtual void IR_OnMouseStop(int, int);
-    virtual void IR_OnMouseWheel(int x, int y);
-    virtual void IR_OnActivate(void);
-    int get_RPID(LPCSTR name);
+    void IR_OnKeyboardPress(int btn) override;
+    void IR_OnKeyboardRelease(int btn) override;
+    void IR_OnKeyboardHold(int btn) override;
+    void IR_OnMousePress(int btn) override;
+    void IR_OnMouseRelease(int btn) override;
+    void IR_OnMouseHold(int btn) override;
+    void IR_OnMouseMove(int, int) override;
+    void IR_OnMouseStop(int, int) override;
+    void IR_OnMouseWheel(int x, int y) override;
+    void IR_OnActivate(void) override;
+
+    // Returns respawn point ID
+    int get_RPID(LPCSTR name); // Xottab_DUTY: Seems to be deprecated
+
     // Game
     void InitializeClientGame(NET_Packet& P);
     void ClientReceive();
@@ -312,9 +326,10 @@ public:
     void ClientSendProfileData();
     void ClientSave();
     u32 Objects_net_Save(NET_Packet* _Packet, u32 start, u32 count);
-    virtual void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
+    void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0) override;
     void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos); // only ask server
     void g_sv_Spawn(CSE_Abstract* E); // server reply/command spawning
+
     // Save/Load/State
     void SLS_Load(LPCSTR name); // Game Load
     void SLS_Default(); // Default/Editor Load
@@ -332,23 +347,27 @@ public:
 
     CLevel();
     virtual ~CLevel();
-    // названияе текущего уровня
-    virtual shared_str name() const;
+    // название текущего уровня
+    shared_str name() const override;
     // this method can be used ONLY from CCC_ChangeGameType
     // XXX nitrocaster: why c_str?
     shared_str version() const { return map_data.m_map_version.c_str(); }
-    virtual void GetLevelInfo(CServerInfo* si);
+    void GetLevelInfo(CServerInfo* si) override;
+
     // gets the time from the game simulation
     ALife::_TIME_ID GetStartGameTime();
     ALife::_TIME_ID GetGameTime();
+
     // возвращает время для энвайронмента в милисекундах относительно начала игры
     ALife::_TIME_ID GetEnvironmentGameTime();
+
     // игровое время в отформатированном виде
     void GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& mins, u32& secs, u32& milisecs);
     float GetGameTimeFactor();
     void SetGameTimeFactor(const float fTimeFactor);
     void SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor);
-    virtual void SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor);
+    void SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor) override;
+
     // gets current daytime [0..23]
     u8 GetDayTime();
     u32 GetGameDayTimeMS();
@@ -385,7 +404,7 @@ public:
     virtual u32 GetRealPing() { return m_dwRealPing; }
 public:
     void remove_objects();
-    virtual void OnSessionTerminate(pcstr reason);
+    void OnSessionTerminate(pcstr reason) override;
     file_transfer::client_site* m_file_transfer = nullptr;
     compression::ppmd_trained_stream* m_trained_stream = nullptr;
     compression::lzo_dictionary_buffer m_lzo_dictionary;
