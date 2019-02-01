@@ -139,38 +139,39 @@ protected:
 public:
     u32 m_deactivated_frame;
     bool m_activatedScreenRatio;
-    virtual void DestroyInternal(bool bForce);
+    void DestroyInternal(bool bForce) override;
+
     CMainMenu();
     virtual ~CMainMenu();
 
-    virtual void Activate(bool bActive);
+    void Activate(bool bActive) override;
     bool IsActive() const override;
-    virtual bool CanSkipSceneRendering();
+    bool CanSkipSceneRendering() override;
 
     virtual bool IsLanguageChanged();
     virtual void SetLanguageChanged(bool status);
 
-    virtual bool IgnorePause() { return true; }
-    virtual void IR_OnMousePress(int btn);
-    virtual void IR_OnMouseRelease(int btn);
-    virtual void IR_OnMouseHold(int btn);
-    virtual void IR_OnMouseMove(int x, int y);
-    virtual void IR_OnMouseStop(int x, int y);
+    bool IgnorePause() override { return true; }
 
-    virtual void IR_OnKeyboardPress(int dik);
-    virtual void IR_OnKeyboardRelease(int dik);
-    virtual void IR_OnKeyboardHold(int dik);
+    void IR_OnMousePress(int btn) override;
+    void IR_OnMouseRelease(int btn) override;
+    void IR_OnMouseHold(int btn) override;
+    void IR_OnMouseWheel(int x, int y) override;
+    void IR_OnMouseMove(int x, int y) override;
+    void IR_OnMouseStop(int x, int y) override;
 
-    virtual void IR_OnMouseWheel(int x, int y);
+    void IR_OnKeyboardPress(int dik) override;
+    void IR_OnKeyboardRelease(int dik) override;
+    void IR_OnKeyboardHold(int dik) override;
 
     bool OnRenderPPUI_query();
     void OnRenderPPUI_main();
     void OnRenderPPUI_PP();
 
-    virtual void OnRender();
-    virtual void OnFrame(void);
+    void OnRender() override;
+    void OnFrame(void) override;
 
-    virtual bool UseIndicators() { return false; }
+    bool UseIndicators() override { return false; }
     void OnDeviceCreate();
 
     void Screenshot(IRender::ScreenshotMode mode = IRender::SM_NORMAL, LPCSTR name = 0);
@@ -180,7 +181,9 @@ public:
     void SetErrorDialog(EErrorDlg ErrDlg);
     EErrorDlg GetErrorDialogType() const { return m_NeedErrDialog; }
     void CheckForErrorDlg();
+
     void SwitchToMultiplayerMenu();
+
     void xr_stdcall OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL);
     void xr_stdcall OnDownloadPatch(CUIWindow*, void*);
     void xr_stdcall OnConnectToMasterServerOkClicked(CUIWindow*, void*);
@@ -191,14 +194,18 @@ public:
 
     void OnSessionTerminate(LPCSTR reason);
     void OnLoadError(LPCSTR module);
+
     void xr_stdcall OnDownloadPatchResult(bool success);
     void xr_stdcall OnDownloadPatchProgress(u64 received, u64 total);
     void xr_stdcall OnRunDownloadedPatch(CUIWindow*, void*);
+
     void Show_CTMS_Dialog();
     void Hide_CTMS_Dialog();
+
     void SetNeedVidRestart();
-    virtual void OnDeviceReset();
+    void OnDeviceReset() override;
     void OnUIReset() override;
+
     LPCSTR GetGSVer();
 
     bool IsCDKeyIsValid();
