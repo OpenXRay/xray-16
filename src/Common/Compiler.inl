@@ -53,6 +53,5 @@
 #define xr_strlwr strlwr
 #define xr_stricmp stricmp
 #define xr_strcmpi strcmpi
-#define xr_unlink unlink
 #define xr_itoa itoa
 #endif

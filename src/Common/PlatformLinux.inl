@@ -143,7 +143,19 @@ inline int GetExceptionCode()
     return 0;
 }
 
-#define xr_unlink unlink
+inline void convert_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '\\')) *sep = '/';
+}
+
+inline int xr_unlink(const char *path)
+{
+    char* conv_fn = strdup(path);
+    convert_path_separators(conv_fn);
+    int result = unlink(conv_fn);
+    free(conv_fn);
+    return result;
+}
 
 #include <inttypes.h>
 typedef int32_t BOOL;
@@ -425,7 +437,6 @@ inline int vsnprintf_s(char* buffer, size_t size, size_t, const char* format, va
 #define wcsicmp _wcsicmp
 #define _wcsicmp wcscmp
 #define _tempnam tempnam
-#define _unlink unlink
 #define _access access
 #define _open open
 #define _close close
@@ -440,7 +451,14 @@ inline int _filelength(int fd)
     return file_info.st_size;
 }
 #define _fdopen fdopen
-#define _rmdir rmdir
+inline int _rmdir(const char *path)
+{
+    char* conv_fn = strdup(path);
+    convert_path_separators(conv_fn);
+    int result = rmdir(conv_fn);
+    free(conv_fn);
+    return result;
+}
 #define _write write
 #define _strupr strupr
 #define _read read
@@ -1090,11 +1108,6 @@ typedef void *HIC;
 #define D3DTSS_TCI_SPHEREMAP                      0x40000
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
-
-inline void convert_path_separators(char * path)
-{
-    while (char* sep = strchr(path, '\\')) *sep = '/';
-}
 
 /** For backward compability of FS, for real filesystem delimiter set to back
  * @brief restore_path_separators
