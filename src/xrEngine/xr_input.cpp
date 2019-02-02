@@ -7,9 +7,13 @@
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
 #include "xrCore/Text/StringConversion.hpp"
+#include "xrCore/xr_token.h"
 
 CInput* pInput = NULL;
 IInputReceiver dummyController;
+
+xr_vector<xr_token> JoysticksToken;
+xr_vector<xr_token> ControllersToken;
 
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
@@ -32,11 +36,121 @@ static void on_error_dialog(bool before)
         pInput->GrabInput(true);
 }
 
+bool CInput::InitJoystick()
+{
+    if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0)
+    {
+        SDL_Joystick* joystick;
+        int count = SDL_NumJoysticks();
+        for (int i = 0; i < count; ++i)
+        {
+            joystick = SDL_JoystickOpen(i);
+            if (joystick)
+            {
+                JoysticksToken.emplace_back(xr_strdup(SDL_JoystickName(joystick)), i);
+                joysticks.emplace_back(joystick);
+                continue;
+            }
+
+            Log("SDL_JoystickOpen failed: ", SDL_GetError());
+            return false;
+        }
+
+        if (joysticks.empty())
+        {
+            Log("No joysticks available");
+            JoysticksToken.emplace_back(nullptr, -1);
+            return false;
+        }
+    }
+    else
+    {
+        Log("Joystick SDL_InitSubSystem failed: ", SDL_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+void CInput::InitGameController()
+{
+    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
+    {
+        SDL_GameController* controller;
+        int count = SDL_NumJoysticks();
+        for (int i = 0; i < count; ++i)
+        {
+            if (SDL_IsGameController(i))
+            {
+                controller = SDL_GameControllerOpen(i);
+                if (controller)
+                {
+                    ControllersToken.emplace_back(xr_strdup(SDL_GameControllerName(controller)), i);
+                    controllers.emplace_back(controller);
+                    continue;
+                }
+
+                Log("SDL_GameControllerOpen failed: ", SDL_GetError());
+                return;
+            }
+        }
+    }
+    else
+    {
+        Log("Game Controller SDL_InitSubSystem failed: ", SDL_GetError());
+        return;
+    }
+}
+
+void CInput::DisplayDevicesList()
+{
+    if (!controllers.empty())
+    {
+        Msg("Available game controllers[%d]:", controllers.size());
+
+        for (auto& token : ControllersToken)
+            if (token.name)
+                Log(token.name);
+    }
+    else
+        Log("No game controllers available");
+
+    if (joysticks.size() > controllers.size())
+    {
+        Msg("Available joysticks[%d]:", joysticks.size() - controllers.size());
+
+        size_t it = 0;
+        for (auto& token : JoysticksToken)
+        {
+            if (it <= ControllersToken.size())
+            {
+                if (token.id == ControllersToken[it].id)
+                {
+                    ++it;
+                    continue;
+                }
+            }
+
+            if (token.name)
+                Log(token.name);
+        }
+    }
+
+    ControllersToken.emplace_back(nullptr, -1);
+    JoysticksToken.emplace_back(nullptr, -1);
+}
+
 CInput::CInput(const bool exclusive)
 {
     exclusiveInput = exclusive;
 
     Log("Starting INPUT device...");
+
+    if (CInput::InitJoystick())
+    {
+        CInput::InitGameController();
+        CInput::DisplayDevicesList();
+    }
 
     MouseDelta = 25;
 
@@ -60,6 +174,21 @@ CInput::CInput(const bool exclusive)
 CInput::~CInput()
 {
     GrabInput(false);
+
+    for (auto& joystick : joysticks)
+        SDL_JoystickClose(joystick);
+
+    for (auto& controller : controllers)
+        SDL_GameControllerClose(controller);
+
+    for (auto& token : JoysticksToken)
+        xr_free(token.name);
+    JoysticksToken.clear();
+
+    for (auto& token : ControllersToken)
+        xr_free(token.name);
+    ControllersToken.clear();
+
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
     Device.seqAppActivate.Remove(this);

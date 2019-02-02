@@ -114,9 +114,15 @@ private:
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
 
     xr_vector<IInputReceiver*> cbStack;
+    xr_vector<SDL_Joystick*> joysticks;
+    xr_vector<SDL_GameController*> controllers;
 
     void MouseUpdate();
     void KeyUpdate();
+
+    bool InitJoystick();
+    void InitGameController();
+    void DisplayDevicesList();
 
     InputStatistics stats;
     bool exclusiveInput;
