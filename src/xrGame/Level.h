@@ -308,12 +308,14 @@ public:
     void IR_OnKeyboardPress(int btn) override;
     void IR_OnKeyboardRelease(int btn) override;
     void IR_OnKeyboardHold(int btn) override;
+
     void IR_OnMousePress(int btn) override;
     void IR_OnMouseRelease(int btn) override;
     void IR_OnMouseHold(int btn) override;
     void IR_OnMouseMove(int, int) override;
     void IR_OnMouseStop(int, int) override;
     void IR_OnMouseWheel(int x, int y) override;
+
     void IR_OnActivate(void) override;
 
     // Returns respawn point ID

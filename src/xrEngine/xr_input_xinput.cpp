@@ -142,7 +142,6 @@ _keyboard keyboards[] =
     { "ckDPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
     { "ckDPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
 
-
     { "kUNKNOWN",               SDL_SCANCODE_UNKNOWN,            "Unknown" },
 
     { "kA",                     SDL_SCANCODE_A,                  "A" },
@@ -333,12 +332,14 @@ _keyboard keyboards[] =
     { "kDECIMALSEPARATOR",      SDL_SCANCODE_DECIMALSEPARATOR,   "Decimal Separator" },
     { "kCURRENCYUNIT",          SDL_SCANCODE_CURRENCYUNIT,       "Currency Unit" },
     { "kCURRENCYSUBUNIT",       SDL_SCANCODE_CURRENCYSUBUNIT,    "Currency Subunit" },
+
     { "kNUMPAD_LEFTPAREN",      SDL_SCANCODE_KP_LEFTPAREN,       "Numpad Left Paren" },
     { "kNUMPAD_RIGHTPAREN",     SDL_SCANCODE_KP_RIGHTPAREN,      "Numpad Right Paren" },
     { "kNUMPAD_LEFTBRACE",      SDL_SCANCODE_KP_LEFTBRACE,       "Numpad Left Brace" },
     { "kNUMPAD_RIGHTBRACE",     SDL_SCANCODE_KP_RIGHTBRACE,      "Numpad Right Brace" },
     { "kNUMPAD_TAB",            SDL_SCANCODE_KP_TAB,             "Numpad Tab" },
     { "kNUMPAD_BACKSPACE",      SDL_SCANCODE_KP_BACKSPACE,       "Numpad Backspace" },
+
     { "kNUMPAD_A",              SDL_SCANCODE_KP_A,               "Numpad A" },
     { "kNUMPAD_B",              SDL_SCANCODE_KP_B,               "Numpad B" },
     { "kNUMPAD_C",              SDL_SCANCODE_KP_C,               "Numpad C" },
@@ -426,6 +427,7 @@ _keyboard keyboards[] =
 
     { "kAPP1",                  SDL_SCANCODE_APP1,               "App 1" },
     { "kAPP2",                  SDL_SCANCODE_APP2,               "App 2" },
+
     { nullptr,                  -1,                              "(null)" }
 };
 // clang-format on

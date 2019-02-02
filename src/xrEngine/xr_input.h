@@ -2,7 +2,6 @@
 
 #include "SDL.h"
 
-
 // Mouse2 is a middle button in SDL,
 // but in X-Ray this is a right button
 enum xrMouse
