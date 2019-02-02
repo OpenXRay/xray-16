@@ -103,13 +103,16 @@ _action actions[] = {
     { "custom13",          kCUSTOM13,          _sp },
     { "custom14",          kCUSTOM14,          _sp },
     { "custom15",          kCUSTOM15,          _sp },
+
     { "cam_autoaim",       kCAM_AUTOAIM,       _sp },
+
     { "pda_tab1",          kPDA_TAB1,          _sp },
     { "pda_tab2",          kPDA_TAB2,          _sp },
     { "pda_tab3",          kPDA_TAB3,          _sp },
     { "pda_tab4",          kPDA_TAB4,          _sp },
     { "pda_tab5",          kPDA_TAB5,          _sp },
     { "pda_tab6",          kPDA_TAB6,          _sp },
+
     { "kick",              kKICK,              _sp },
 
     { nullptr,             kLASTACTION,        _both }
@@ -122,6 +125,23 @@ _keyboard keyboards[] =
     { "mouse3",                 MOUSE_3,                         "Mouse 3" },
     { "mouse4",                 MOUSE_4,                         "Mouse 4" },
     { "mouse5",                 MOUSE_5,                         "Mouse 5" },
+
+    { "ckA",                    XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
+    { "ckB",                    XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
+    { "ckX",                    XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
+    { "ckY",                    XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
+    { "ckBACK",                 XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
+    { "ckGUIDE",                XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
+    { "ckSTART",                XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
+    { "ckLEFTSTICK",            XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
+    { "ckRIGHTSTICK",           XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
+    { "ckLEFTSHOULDER",         XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
+    { "ckRIGHTSHOULDER",        XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
+    { "ckDPAD_UP",              XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
+    { "ckDPAD_DOWN",            XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
+    { "ckDPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
+    { "ckDPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
+
 
     { "kUNKNOWN",               SDL_SCANCODE_UNKNOWN,            "Unknown" },
 

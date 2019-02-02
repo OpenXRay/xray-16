@@ -42,6 +42,14 @@ public:
     virtual void IR_OnKeyboardPress(int /*dik*/) {}
     virtual void IR_OnKeyboardRelease(int /*dik*/) {}
     virtual void IR_OnKeyboardHold(int /*dik*/) {}
+
+    virtual void IR_OnJoystickMove(int /*axis*/, int /*value*/) {}
+    virtual void IR_OnJoystickPress(int /*dik*/) {}
+    virtual void IR_OnJoystickRelease(int /*dik*/) {}
+
+    virtual void IR_OnControllerMove(int /*axis*/, int /*value*/) {}
+    virtual void IR_OnControllerPress(int /*dik*/) {}
+    virtual void IR_OnControllerRelease(int /*dik*/) {}
 };
 
 ENGINE_API extern float psMouseSens;
