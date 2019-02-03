@@ -7,11 +7,17 @@ template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)
 {
-    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
+    HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
+    if (!SUCCEEDED(_hr))
+    {
+        Log("! Shader: ", file_name);
+        Msg("! CreateHWShader hr == 0x%08x", _hr);
+        return E_FAIL;
+    }
 
     LPCVOID data = nullptr;
 
-    HRESULT const _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+    _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
 
     if (SUCCEEDED(_hr) && data)
     {

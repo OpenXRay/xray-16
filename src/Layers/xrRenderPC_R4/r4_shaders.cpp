@@ -13,10 +13,16 @@ template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)
 {
-    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
+    HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
+    if (!SUCCEEDED(_hr))
+    {
+        Log("! Shader: ", file_name);
+        Msg("! CreateHWShader hr == 0x%08x", _hr);
+        return E_FAIL;
+    }
 
     ID3DShaderReflection* pReflection = 0;
-    HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+    _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 
     if (SUCCEEDED(_hr) && pReflection)
     {

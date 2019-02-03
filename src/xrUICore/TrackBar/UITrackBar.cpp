@@ -353,7 +353,7 @@ void CUITrackBar::SetOptFBounds(float fmin, float fmax)
 {
     m_f_min = fmin;
     m_f_max = fmax;
-    if (m_i_val < m_i_min || m_i_val > m_i_max)
+    if (m_f_val < m_f_min || m_f_val > m_f_max)
     {
         clamp(m_f_val, m_f_min, m_f_max);
         OnChangedOptValue();

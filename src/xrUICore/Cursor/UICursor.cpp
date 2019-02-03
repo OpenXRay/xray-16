@@ -107,19 +107,11 @@ Fvector2 CUICursor::GetCursorPositionDelta()
 void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 {
     vPrevPos = vPos;
-    if (m_b_use_win_cursor)
-    {
-        Ivector2 pti;
-        IInputReceiver::IR_GetMousePosReal(pti);
-        vPos.x = (float)pti.x * (UI_BASE_WIDTH / (float)Device.m_rcWindowClient.w);
-        vPos.y = (float)pti.y * (UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h);
-    }
-    else
-    {
-        float sens = 1.0f;
-        vPos.x += _dx * sens;
-        vPos.y += _dy * sens;
-    }
+
+    float sens = 1.0f;
+    vPos.x += _dx * sens;
+    vPos.y += _dy * sens;
+
     clamp(vPos.x, 0.f, UI_BASE_WIDTH);
     clamp(vPos.y, 0.f, UI_BASE_HEIGHT);
 }

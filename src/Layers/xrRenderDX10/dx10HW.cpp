@@ -88,27 +88,13 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #ifdef USE_DX11
     D3D_FEATURE_LEVEL featureLevels[] =
     {
-        D3D_FEATURE_LEVEL_11_1,
         D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0,
-        D3D_FEATURE_LEVEL_9_3,
-        D3D_FEATURE_LEVEL_9_2,
-        D3D_FEATURE_LEVEL_9_1,
     };
 
-    constexpr auto count = sizeof(featureLevels) / sizeof(featureLevels[0]);
-
-    const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
-    {
-        return D3D11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
-            nullptr, createDeviceFlags, level, levels,
-            D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
-    };
-
-    R = createDevice(featureLevels, count);
-    if (FAILED(R))
-        R = createDevice(&featureLevels[1], count - 1);
+    R = D3D11CreateDevice(m_pAdapter,
+        D3D_DRIVER_TYPE_UNKNOWN, // Если мы выбираем конкретный адаптер, то мы обязаны использовать D3D_DRIVER_TYPE_UNKNOWN.
+        nullptr, createDeviceFlags, featureLevels, sizeof(featureLevels) / sizeof(featureLevels[0]),
+        D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
 

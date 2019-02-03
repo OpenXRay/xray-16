@@ -177,8 +177,8 @@ void CScriptGameObject::set_fastcall(const luabind::functor<bool>& functor, cons
     CPHScriptGameObjectCondition* c = new CPHScriptGameObjectCondition(object, functor, m_game_object);
     CPHDummiAction* a = new CPHDummiAction();
     CPHSriptReqGObjComparer cmpr(m_game_object);
-    Level().ph_commander_scripts().remove_calls(&cmpr);
-    Level().ph_commander_scripts().add_call(c, a);
+    Level().ph_commander_scripts().RemoveCallsDeferred(&cmpr);
+    Level().ph_commander_scripts().AddCallDeferred(c, a);
 }
 void CScriptGameObject::set_const_force(const Fvector& dir, float value, u32 time_interval)
 {

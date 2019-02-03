@@ -543,6 +543,7 @@ void CLevel::OnFrame()
     if (!GEnv.isDedicatedServer)
         GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
     m_ph_commander->update();
+    m_ph_commander_scripts->UpdateDeferred();
     m_ph_commander_scripts->update();
     stats.BulletManagerCommit.Begin();
     BulletManager().CommitRenderSet();
