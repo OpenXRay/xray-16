@@ -360,9 +360,6 @@
     <ClInclude Include="Components\condition_state_inline.h">
       <Filter>AI\Components\ProblemSolver\ConditionState</Filter>
     </ClInclude>
-    <ClInclude Include="Components\problem_solver_inline.h">
-      <Filter>AI\Components\ProblemSolver</Filter>
-    </ClInclude>
     <ClInclude Include="AISpaceBase.hpp">
       <Filter>AI</Filter>
     </ClInclude>
@@ -407,5 +404,8 @@
     <ClCompile Include="pch.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

@@ -166,7 +166,6 @@
     <ClInclude Include="Components\operator_condition.h" />
     <ClInclude Include="Components\operator_condition_inline.h" />
     <ClInclude Include="Components\problem_solver.h" />
-    <ClInclude Include="Components\problem_solver_inline.h" />
     <ClInclude Include="Components\script_world_property.h" />
     <ClInclude Include="Components\script_world_property_inline.h" />
     <ClInclude Include="Components\script_world_state.h" />
