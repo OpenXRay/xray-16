@@ -151,8 +151,6 @@ public:
     virtual void clear();
 };
 
-// #include "xrAICore/Components/problem_solver_inline.h"
-
 // #DARK: removed _inline.h, as @xottab_duty asked
 #pragma region inline
 
