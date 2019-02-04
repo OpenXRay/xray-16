@@ -100,6 +100,19 @@ public:
     virtual void Reset();
     void ResetAll();
 
+    virtual void SetFont(CGameFont* pFont)
+    {
+        UNUSED(pFont);
+    }
+
+    virtual CGameFont* GetFont()
+    {
+        if (m_pParentWnd)
+            return m_pParentWnd->GetFont();
+
+        return nullptr;
+    }
+
     using WINDOW_LIST = ui_list<CUIWindow*>;
 
     WINDOW_LIST& GetChildWndList() { return m_ChildWndList; }
@@ -150,6 +163,7 @@ protected:
     //флаг автоматического удаления во время вызова деструктора
     bool m_bAutoDelete;
 
+    // Is user input allowed
     bool m_bIsEnabled;
 
     // Если курсор над окном

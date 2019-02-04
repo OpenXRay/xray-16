@@ -59,16 +59,25 @@ SCRIPT_EXPORT(CUIWindow, (), {
             .def("GetAbsoluteRect", &CUIWindow::GetAbsoluteRect)
 
             .def("SetWndRect", (void (CUIWindow::*)(Frect)) & CUIWindow::SetWndRect_script)
-            .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
             .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
+
             .def("GetWndPos", &get_wnd_pos)
+            .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
+
             .def("GetWidth", &CUIWindow::GetWidth)
+            .def("SetWidth", &CUIWindow::SetWidth)
+
             .def("GetHeight", &CUIWindow::GetHeight)
+            .def("SetHeight", &CUIWindow::SetHeight)
 
             .def("Enable", &CUIWindow::Enable)
             .def("IsEnabled", &CUIWindow::IsEnabled)
+
             .def("Show", &CUIWindow::Show)
             .def("IsShown", &CUIWindow::IsShown)
+
+            .def("SetFont", &CUIWindow::SetFont)
+            .def("GetFont", &CUIWindow::GetFont)
 
             .def("WindowName", &CUIWindow::WindowName_script)
             .def("SetWindowName", &CUIWindow::SetWindowName)

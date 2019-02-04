@@ -58,6 +58,7 @@ public:
     virtual bool UseIndicators() { return true; }
     virtual void StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators);
     virtual void StopDialog(CUIDialogWnd* pDialog);
+    virtual void StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators);
     virtual bool IgnorePause() { return false; }
     virtual bool IR_UIOnKeyboardPress(int dik);
     virtual bool IR_UIOnKeyboardRelease(int dik);

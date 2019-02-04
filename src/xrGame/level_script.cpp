@@ -240,18 +240,23 @@ bool patrol_path_exists(LPCSTR patrol_path) { return (!!ai().patrol_paths().path
 LPCSTR get_name() { return (*Level().name()); }
 void prefetch_sound(LPCSTR name) { Level().PrefetchSound(name); }
 CClientSpawnManager& get_client_spawn_manager() { return (Level().client_spawn_manager()); }
-/*
+
 void start_stop_menu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 {
-    if(pDialog->IsShown())
+    if (pDialog->IsShown())
         pDialog->HideDialog();
     else
         pDialog->ShowDialog(bDoHideIndicators);
 }
-*/
 
 void add_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->AddDialogToRender(pDialog); }
 void remove_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->RemoveDialogToRender(pDialog); }
+
+CUIDialogWnd* main_input_receiver()
+{
+    return HUD().GetGameUI()->TopInputReceiver();
+}
+
 void hide_indicators()
 {
     if (CurrentGameUI())
@@ -704,8 +709,12 @@ IC static void CLevel_Export(lua_State* luaState)
         def("map_remove_object_spot", map_remove_object_spot), def("map_has_object_spot", map_has_object_spot),
         def("map_change_spot_hint", map_change_spot_hint),
 
-        def("add_dialog_to_render", add_dialog_to_render), def("remove_dialog_to_render", remove_dialog_to_render),
-        def("hide_indicators", hide_indicators), def("hide_indicators_safe", hide_indicators_safe),
+        def("start_stop_menu", start_stop_menu),
+        def("add_dialog_to_render", add_dialog_to_render),
+        def("remove_dialog_to_render", remove_dialog_to_render),
+        def("main_input_receiver", main_input_receiver),
+        def("hide_indicators", hide_indicators),
+        def("hide_indicators_safe", hide_indicators_safe),
 
         def("show_indicators", show_indicators), def("show_weapon", show_weapon),
         def("add_call", ((void (*)(const luabind::functor<bool>&, const luabind::functor<void>&)) & add_call)),
