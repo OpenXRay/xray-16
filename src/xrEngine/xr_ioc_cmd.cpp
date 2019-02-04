@@ -536,18 +536,33 @@ virtual void Save (IWriter *F) {};
 
 ENGINE_API BOOL r2_sun_static = TRUE;
 ENGINE_API BOOL r2_advanced_pp = FALSE; // advanced post process and effects
+ENGINE_API BOOL renderer_allow_override = FALSE;
 
-u32 renderer_value = 3;
-
-class CCC_r2 : public CCC_Token
+class CCC_renderer : public CCC_Token
 {
     typedef CCC_Token inherited;
 
+    u32 renderer_value = 3;
+    static BOOL cmd_lock;
+
 public:
-    CCC_r2(LPCSTR N) : inherited(N, &renderer_value, NULL) { renderer_value = 3; };
-    virtual ~CCC_r2() {}
+    CCC_renderer(LPCSTR N) : inherited(N, &renderer_value, NULL) {};
+    virtual ~CCC_renderer() {}
     virtual void Execute(LPCSTR args)
     {
+        if ((renderer_allow_override == FALSE) && (cmd_lock == TRUE))
+        {
+            /*
+             * It is a case when the renderer type was specified as
+             * an application command line argument. This setting should
+             * have the highest priority over other command invocations
+             * (e.g. user config loading).
+             * Since the Engine doesn't support switches between renderers
+             * in runtime, it's safe to disable this command until restart.
+             */
+            return;
+        }
+
         tokens = VidQualityToken.data();
 
         inherited::Execute(args);
@@ -565,11 +580,17 @@ public:
         r2_sun_static = (renderer_value < 2);
 
         r2_advanced_pp = (renderer_value >= 3);
+    
+        cmd_lock = TRUE;
     }
 
     virtual void Save(IWriter* F)
     {
-        // fill_render_mode_list ();
+        if (renderer_allow_override == FALSE)
+        {   // Do not save forced value
+            return;
+        }
+
         tokens = VidQualityToken.data();
         inherited::Save(F);
     }
@@ -580,6 +601,7 @@ public:
         return inherited::GetToken();
     }
 };
+BOOL CCC_renderer::cmd_lock = FALSE;
 
 class CCC_soundDevice : public CCC_Token
 {
@@ -805,7 +827,7 @@ void CCC_Register()
     CMD1(CCC_CenterScreen, "center_screen");
     CMD4(CCC_Integer, "always_active", &ps_always_active, 0, 1);
 
-    CMD1(CCC_r2, "renderer");
+    CMD1(CCC_renderer, "renderer");
 
     if (!GEnv.isDedicatedServer)
         CMD1(CCC_soundDevice, "snd_device");

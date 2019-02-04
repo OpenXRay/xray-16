@@ -50,8 +50,7 @@ void CRenderDevice::Initialize()
 
   
 #if !defined(LINUX)
-        // xxx: need to fix getting rsRGL flag, it doesn't work now
-        if (strstr(Core.Params, "-gl") || psDeviceFlags.test(rsRGL))
+        if (psDeviceFlags.test(rsRGL))
 #endif
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
