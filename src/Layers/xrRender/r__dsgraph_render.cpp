@@ -64,9 +64,8 @@ template <class T> void sort_tlist(xr_vector<typename T::value_type*>& lst, xr_v
     if (amount <= 1)
     {
         // Just sort by SSA
-        lst.reserve(textures.size());
-        for (auto &i : textures) lst.push_back(&i);
-        std::sort(lst.begin(), lst.end(), cmp_second_ssa<typename T::value_type *>);
+        textures.get_any_p(lst);
+        std::sort(lst.begin(), lst.end(), cmp_second_ssa<typename T::value_type*>);
     }
     else
     {
@@ -109,9 +108,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         {
             mapNormalVS& vs = mapNormalPasses[_priority][iPass];
 
-            nrmVS.reserve(vs.size());
-            for (auto &i : vs) nrmVS.push_back(&i);
-            std::sort(nrmVS.begin(), nrmVS.end(), cmp_second_ssa<mapNormalVS::value_type *>);
+            vs.get_any_p(nrmVS);
+            std::sort(nrmVS.begin(), nrmVS.end(), cmp_second_ssa<mapNormalVS::value_type*>);
             for (auto & vs_it : nrmVS)
             {
                 RCache.set_VS(vs_it->first);
@@ -121,9 +119,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                 mapNormalGS& gs = vs_it->second;
                 gs.ssa = 0;
 
-                nrmGS.reserve(gs.size());
-                for (auto &i : gs) nrmGS.push_back(&i);
-                std::sort(nrmGS.begin(), nrmGS.end(), cmp_second_ssa<mapNormalGS::value_type *>);
+                gs.get_any_p(nrmGS);
+                std::sort(nrmGS.begin(), nrmGS.end(), cmp_second_ssa<mapNormalGS::value_type*>);
                 for (auto & gs_it : nrmGS)
                 {
                     RCache.set_GS(gs_it->first);
@@ -134,9 +131,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                     ps.ssa = 0;
 
-                    nrmPS.reserve(ps.size());
-                    for (auto &i : ps) nrmPS.push_back(&i);
-                    std::sort(nrmPS.begin(), nrmPS.end(), cmp_ps_second_ssa<mapNormalPS::value_type *>);
+                    ps.get_any_p(nrmPS);
+                    std::sort(nrmPS.begin(), nrmPS.end(), cmp_ps_second_ssa<mapNormalPS::value_type*>);
                     for (auto &ps_it : nrmPS)
                     {
                         RCache.set_PS(ps_it->first);
@@ -150,9 +146,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                         cs.ssa = 0;
 
-                        nrmCS.reserve(cs.size());
-                        for (auto &i : cs) nrmCS.push_back(&i);
-                        std::sort(nrmCS.begin(), nrmCS.end(), cmp_second_ssa<mapNormalCS::value_type *>);
+                        cs.get_any_p(nrmCS);
+                        std::sort(nrmCS.begin(), nrmCS.end(), cmp_second_ssa<mapNormalCS::value_type*>);
                         for (auto &cs_it : nrmCS)
                         {
                             RCache.set_Constants(cs_it->first);
@@ -160,9 +155,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                             mapNormalStates& states = cs_it->second;
                             states.ssa = 0;
 
-                            nrmStates.reserve(states.size());
-                            for (auto &i : states) nrmStates.push_back(&i);
-                            std::sort(nrmStates.begin(), nrmStates.end(), cmp_second_ssa<mapNormalStates::value_type *>);
+                            states.get_any_p(nrmStates);
+                            std::sort(nrmStates.begin(), nrmStates.end(), cmp_second_ssa<mapNormalStates::value_type*>);
                             for (auto &state_it : nrmStates)
                             {
                                 RCache.set_States(state_it->first);
@@ -224,9 +218,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
     {
         mapMatrixVS& vs = mapMatrixPasses[_priority][iPass];
 
-        matVS.reserve(vs.size());
-        for (auto &i : vs) matVS.push_back(&i);
-        std::sort(matVS.begin(), matVS.end(), cmp_second_ssa<mapMatrixVS::value_type *>);
+        vs.get_any_p(matVS);
+        std::sort(matVS.begin(), matVS.end(), cmp_second_ssa<mapMatrixVS::value_type*>);
         for (auto &vs_id : matVS)
         {
             RCache.set_VS(vs_id->first);
@@ -235,9 +228,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
             mapMatrixGS& gs = vs_id->second;
             gs.ssa = 0;
 
-            matGS.reserve(gs.size());
-            for (auto &i : gs) matGS.push_back(&i);
-            std::sort(matGS.begin(), matGS.end(), cmp_second_ssa<mapMatrixGS::value_type *>);
+            gs.get_any_p(matGS);
+            std::sort(matGS.begin(), matGS.end(), cmp_second_ssa<mapMatrixGS::value_type*>);
             for (auto &gs_it : matGS)
             {
                 RCache.set_GS(gs_it->first);
@@ -248,8 +240,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                 ps.ssa = 0;
 
-                matPS.reserve(ps.size());
-                for (auto &i : ps) matPS.push_back(&i);
+                ps.get_any_p(matPS);
                 std::sort(matPS.begin(), matPS.end(), cmp_ps_second_ssa<mapMatrixPS::value_type *>);
                 for (auto &ps_it : matPS)
                 {
@@ -264,9 +255,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                     cs.ssa = 0;
 
-                    matCS.reserve(cs.size());
-                    for (auto &i : cs) matCS.push_back(&i);
-                    std::sort(matCS.begin(), matCS.end(), cmp_second_ssa<mapMatrixCS::value_type *>);
+                    cs.get_any_p(matCS);
+                    std::sort(matCS.begin(), matCS.end(), cmp_second_ssa<mapMatrixCS::value_type*>);
                     for (auto &cs_it : matCS)
                     {
                         RCache.set_Constants(cs_it->first);
@@ -274,9 +264,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                         mapMatrixStates& states = cs_it->second;
                         states.ssa = 0;
 
-                        matStates.reserve(states.size());
-                        for (auto &i : states) matStates.push_back(&i);
-                        std::sort(matStates.begin(), matStates.end(), cmp_second_ssa<mapMatrixStates::value_type *>);
+                        states.get_any_p(matStates);
+                        std::sort(matStates.begin(), matStates.end(), cmp_second_ssa<mapMatrixStates::value_type*>);
                         for (auto &state_it : matStates)
                         {
                             RCache.set_States(state_it->first);

@@ -68,6 +68,7 @@ public:
     xr_vector<R_dsgraph::mapMatrixStates::value_type *> matStates;
     xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTextures;
     xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTexturesTemp;
+    xr_vector<R_dsgraph::_LodItem> lstLODs;
     xr_vector<int> lstLODgroups;
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
@@ -128,6 +129,7 @@ public:
         matTextures.clear();
         matTexturesTemp.clear();
 
+        lstLODs.clear();
         lstLODgroups.clear();
         lstRenderables.clear();
         lstSpatial.clear();
@@ -135,16 +137,16 @@ public:
 
         for (int i = 0; i < SHADER_PASSES_MAX; ++i)
         {
-            mapNormalPasses[0][i].clear();
-            mapNormalPasses[1][i].clear();
-            mapMatrixPasses[0][i].clear();
-            mapMatrixPasses[1][i].clear();
+            mapNormalPasses[0][i].destroy();
+            mapNormalPasses[1][i].destroy();
+            mapMatrixPasses[0][i].destroy();
+            mapMatrixPasses[1][i].destroy();
         }
-        mapSorted.clear();
-        mapHUD.clear();
-        mapLOD.clear();
-        mapDistort.clear();
-        mapHUDSorted.clear();
+        mapSorted.destroy();
+        mapHUD.destroy();
+        mapLOD.destroy();
+        mapDistort.destroy();
+        mapHUDSorted.destroy();
 
 #if RENDER != R_R1
         mapWmark.clear();
