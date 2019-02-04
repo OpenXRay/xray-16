@@ -536,21 +536,21 @@ virtual void Save (IWriter *F) {};
 
 ENGINE_API BOOL r2_sun_static = TRUE;
 ENGINE_API BOOL r2_advanced_pp = FALSE; // advanced post process and effects
-ENGINE_API BOOL renderer_allow_override = FALSE;
+ENGINE_API bool renderer_allow_override = false;
 
 class CCC_renderer : public CCC_Token
 {
     typedef CCC_Token inherited;
 
     u32 renderer_value = 3;
-    static BOOL cmd_lock;
+    static bool cmd_lock;
 
 public:
     CCC_renderer(LPCSTR N) : inherited(N, &renderer_value, NULL) {};
-    virtual ~CCC_renderer() {}
-    virtual void Execute(LPCSTR args)
+    ~CCC_renderer() override {}
+    void Execute(LPCSTR args) override
     {
-        if ((renderer_allow_override == FALSE) && (cmd_lock == TRUE))
+        if ((renderer_allow_override == false) && (cmd_lock == true))
         {
             /*
              * It is a case when the renderer type was specified as
@@ -581,16 +581,11 @@ public:
 
         r2_advanced_pp = (renderer_value >= 3);
     
-        cmd_lock = TRUE;
+        cmd_lock = true;
     }
 
-    virtual void Save(IWriter* F)
+    void Save(IWriter* F) override
     {
-        if (renderer_allow_override == FALSE)
-        {   // Do not save forced value
-            return;
-        }
-
         tokens = VidQualityToken.data();
         inherited::Save(F);
     }
@@ -601,7 +596,7 @@ public:
         return inherited::GetToken();
     }
 };
-BOOL CCC_renderer::cmd_lock = FALSE;
+bool CCC_renderer::cmd_lock = false;
 
 class CCC_soundDevice : public CCC_Token
 {

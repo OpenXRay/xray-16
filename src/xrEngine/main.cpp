@@ -292,7 +292,7 @@ ENGINE_API int RunApplication()
         {
             CCC_LoadCFG_custom cmd("renderer ");
             cmd.Execute(Console->ConfigFile);
-            renderer_allow_override = TRUE;
+            renderer_allow_override = true;
         }
     }
     else
