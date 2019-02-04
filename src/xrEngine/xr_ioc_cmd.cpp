@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include <algorithm>
+
 #include "IGame_Level.h"
 
 #include "x_ray.h"
@@ -560,6 +563,12 @@ public:
              * Since the Engine doesn't support switches between renderers
              * in runtime, it's safe to disable this command until restart.
              */
+
+            // keep only actual value
+            const auto& it = std::remove_if(VidQualityToken.begin(), VidQualityToken.end(),
+                [&](const auto& renderer) { return renderer.id != renderer_value; });
+
+            VidQualityToken[1].name = '\0';
             return;
         }
 
