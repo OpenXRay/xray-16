@@ -382,38 +382,31 @@ public:
 };
 
 template<class T>
-IC void render_item(T &item)
+IC void render_item(T* item)
 {
-    dxRender_Visual* V = item.second.pVisual;
+    dxRender_Visual* V = item->second.pVisual;
     VERIFY(V && V->shader._get());
-    RCache.set_Element(item.second.se);
-    RCache.set_xform_world(item.second.Matrix);
-    RImplementation.apply_object(item.second.pObject);
+    RCache.set_Element(item->second.se);
+    RCache.set_xform_world(item->second.Matrix);
+    RImplementation.apply_object(item->second.pObject);
     RImplementation.apply_lmaterial();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     RCache.hemi.c_update(V);
-    V->Render(calcLOD(item.first, V->vis.sphere.R));
+    V->Render(calcLOD(item->first, V->vis.sphere.R));
 }
 
-template <class T> IC bool cmp_first_l(const T &lhs, const T &rhs) { return (lhs.first < rhs.first); }
-template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs.first > rhs.first); }
-
-template<class T>
-IC void sort_front_to_back_render_and_clean(T &vec)
+template<typename K, typename V>
+IC void sort_front_to_back_render_and_clean(xr_fixed_map<K, V>& map)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_l<typename T::value_type>); // front-to-back
-    for (auto &i : vec)
-        render_item(i);
-    vec.clear();
+    map.traverse_left_right(render_item);
+    map.clear();
 }
 
-template<class T>
-IC void sort_back_to_front_render_and_clean(T &vec)
+template<typename K, typename V>
+IC void sort_back_to_front_render_and_clean(xr_fixed_map<K, V>& map)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_h<typename T::value_type>); // back-to-front
-    for (auto &i : vec)
-        render_item(i);
-    vec.clear();
+    map.traverse_right_left(render_item);
+    map.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////
