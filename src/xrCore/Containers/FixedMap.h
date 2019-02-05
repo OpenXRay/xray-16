@@ -31,6 +31,17 @@ struct xr_fixed_map_node
         other.right = nullptr;
     }
 
+    xr_fixed_map_node& operator=(xr_fixed_map_node&& other) noexcept
+    {
+        first = std::move(other.first);
+        second = std::move(other.second);
+        left = other.left;
+        right = other.right;
+        other.left = nullptr;
+        other.right = nullptr;
+        return *this;
+    }
+
     xr_fixed_map_node(const xr_fixed_map_node& other) noexcept
     {
         first = other.first;
