@@ -381,8 +381,8 @@ public:
     }
 };
 
-template<class T>
-IC void render_item(T* item)
+template<typename K, typename V>
+IC void __fastcall render_item(xr_fixed_map_node<K, V>* item)
 {
     dxRender_Visual* V = item->second.pVisual;
     VERIFY(V && V->shader._get());
