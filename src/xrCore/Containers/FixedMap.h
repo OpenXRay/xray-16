@@ -105,12 +105,12 @@ private:
         if constexpr (std::is_pod<T>::value)
         {
             ZeroMemory(newNodes, sizeof(value_type) * newLimit);
-            if (limit)
-                std::copy(nodes, nodes + limit, newNodes);
+            if (pool)
+                CopyMemory(newNodes, nodes, allocated_memory());
         }
         else
         {
-            std::move(nodes, nodes + limit, newNodes);
+            std::move(first(), last(), newNodes);
             for (value_type* cur = newNodes + limit; cur != newNodes + newLimit; ++cur)
                 allocator::construct(cur);
         }
@@ -349,6 +349,7 @@ public:
     }
 
     size_t allocated() const { return limit; }
+    size_t allocated_memory() const { return limit * sizeof(value_type); }
 
     bool empty() const { return pool == 0 ; }
     void clear() { pool = 0; }
