@@ -563,12 +563,7 @@ public:
              * Since the Engine doesn't support switches between renderers
              * in runtime, it's safe to disable this command until restart.
              */
-
-            // keep only actual value
-            const auto& it = std::remove_if(VidQualityToken.begin(), VidQualityToken.end(),
-                [&](const auto& renderer) { return renderer.id != renderer_value; });
-
-            VidQualityToken[1].name = '\0';
+            Msg("Renderer is overrided by command line argument");
             return;
         }
 
