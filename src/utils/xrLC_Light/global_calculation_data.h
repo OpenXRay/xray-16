@@ -1,5 +1,5 @@
 #pragma once
-#include "editors/LevelEditor/Engine/communicate.h"
+#include "utils/communicate.h"
 #include "base_lighting.h"
 #include "global_slots_data.h"
 #include "b_build_texture.h"
