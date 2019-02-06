@@ -262,11 +262,12 @@ ENGINE_API int RunApplication()
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
 
+    Engine.External.CreateRendererList();
+
     FPU::m24r();
     InitEngine();
     InitInput();
     InitConsole();
-    Engine.External.CreateRendererList();
 
     if (CheckBenchmark())
         return 0;
@@ -291,6 +292,7 @@ ENGINE_API int RunApplication()
         {
             CCC_LoadCFG_custom cmd("renderer ");
             cmd.Execute(Console->ConfigFile);
+            renderer_allow_override = true;
         }
     }
     else

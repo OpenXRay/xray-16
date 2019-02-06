@@ -29,6 +29,8 @@
 #include "xrCore/xrCore_benchmark_macros.h"
 #include "xrCore/xr_token.h"
 
+extern ENGINE_API bool renderer_allow_override; // allows to change renderer setting
+
 class ENGINE_API IConsole_Command
 {
 public:

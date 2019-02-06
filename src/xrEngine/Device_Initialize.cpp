@@ -48,11 +48,7 @@ void CRenderDevice::Initialize()
         const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 
-  
-#if !defined(LINUX)
-        // xxx: need to fix getting rsRGL flag, it doesn't work now
-        if (strstr(Core.Params, "-gl") || psDeviceFlags.test(rsRGL))
-#endif
+        if (psDeviceFlags.test(rsRGL))
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
