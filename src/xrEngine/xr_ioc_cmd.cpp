@@ -1,7 +1,4 @@
 #include "stdafx.h"
-
-#include <algorithm>
-
 #include "IGame_Level.h"
 
 #include "x_ray.h"
