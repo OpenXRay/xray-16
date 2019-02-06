@@ -93,7 +93,7 @@ public:
     bool w_allow;
 
 public:
-    NET_Packet() : inistream(nullptr), r_pos(0), timeReceive(0), w_allow(true), B() {}
+    NET_Packet() : inistream(nullptr), B(), r_pos(0), timeReceive(0), w_allow(true) {}
     // writing - main
     IC void write_start()
     {
