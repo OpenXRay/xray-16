@@ -137,7 +137,7 @@ bool file_handle_internal(pcstr file_name, u32& size, int& file_handle)
 
 void* FileDownload(LPCSTR file_name, const int& file_handle, u32& file_size)
 {
-    void* buffer = xr_malloc(file_size);
+    void* buffer = xr_malloc(file_size + 1); // IDK why need +1 for file size, but without this caused invalid write size 1 for this buffer
 
     int r_bytes = _read(file_handle, buffer, file_size);
     R_ASSERT3(
