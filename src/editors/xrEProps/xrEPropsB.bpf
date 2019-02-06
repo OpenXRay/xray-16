@@ -1,12 +1,0 @@
-USEFORM("ItemList.cpp", ItemList);
-USEFORM("PropertiesList.cpp", Properties);
-USEFORM("NumericVector.cpp", frmNumericVector);
-USEFORM("ShaderFunction.cpp", frmShaderFunction);
-USEFORM("TextForm.cpp", frmText);
-USEFORM("ChoseForm.cpp", frmChoseItem);
-USEFORM("ItemDialog.cpp", frmItemDialog);
-USEFORM("GameTypeForm.cpp", fmGameType);
-//---------------------------------------------------------------------------
-This file is used by the project manager only and should be treated like the project file
-
-DllMain 

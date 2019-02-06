@@ -1,3 +1,0 @@
-#pragma hdrstop
-
-#define INITGUID
