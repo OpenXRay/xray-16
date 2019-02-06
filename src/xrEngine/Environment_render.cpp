@@ -66,20 +66,17 @@ void CEnvironment::OnDeviceCreate()
     m_pRender->OnDeviceCreate();
 
     // weathers
+    for (auto& cycle : WeatherCycles)
     {
-        auto _I = WeatherCycles.begin();
-        auto _E = WeatherCycles.end();
-        for (; _I != _E; _I++)
-            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
-                (*it)->on_device_create();
+        for (auto& envDescriptor : cycle.second)
+            envDescriptor->on_device_create();
     }
+
     // effects
+    for (auto& cycle : WeatherFXs)
     {
-        auto _I = WeatherFXs.begin();
-        auto _E = WeatherFXs.end();
-        for (; _I != _E; _I++)
-            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
-                (*it)->on_device_create();
+        for (auto& envDescriptor : cycle.second)
+            envDescriptor->on_device_create();
     }
 
     Invalidate();
@@ -91,21 +88,19 @@ void CEnvironment::OnDeviceDestroy()
     m_pRender->OnDeviceDestroy();
 
     // weathers
+    for (auto& cycle : WeatherCycles)
     {
-        auto _I = WeatherCycles.begin();
-        auto _E = WeatherCycles.end();
-        for (; _I != _E; _I++)
-            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
-                (*it)->on_device_destroy();
+        for (auto& envDescriptor : cycle.second)
+            envDescriptor->on_device_destroy();
     }
+
     // effects
+    for (auto& cycle : WeatherFXs)
     {
-        auto _I = WeatherFXs.begin();
-        auto _E = WeatherFXs.end();
-        for (; _I != _E; _I++)
-            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
-                (*it)->on_device_destroy();
+        for (auto& envDescriptor : cycle.second)
+            envDescriptor->on_device_destroy();
     }
+
     CurrentEnv->destroy();
 }
 
