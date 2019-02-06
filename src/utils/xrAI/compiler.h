@@ -3,8 +3,8 @@
 #include "xrCDB/xrCDB.h"
 #include "utils/Shader_xrLC.h"
 #include "xrAICore/Navigation/level_graph.h"
-#include "editors/LevelEditor/Engine/communicate.h"
-#include "editors/LevelEditor/Edit/ESceneAIMapTools_Export.h"
+#include "utils/communicate.h"
+#include "ESceneAIMapTools_Export.h"
 #include "Layers/xrRender/ETextureParams.h"
 
 // base patch used all the time up to merging
