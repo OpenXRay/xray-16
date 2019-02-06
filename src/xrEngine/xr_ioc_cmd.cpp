@@ -590,6 +590,11 @@ public:
 
     void Save(IWriter* F) override
     {
+        if (renderer_allow_override == false)
+        {   // Do not save forced value
+            return;
+        }
+
         tokens = VidQualityToken.data();
         inherited::Save(F);
     }
