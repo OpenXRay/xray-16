@@ -396,7 +396,7 @@ IC bool is_empty_line_now(IReader* F)
     char* a3 = (char*)F->pointer() - 1;
 
     return *a0 == 13 && *a1 == 10 && *a2 == 13 && *a3 == 10;
-};
+}
 
 void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_func)
 {

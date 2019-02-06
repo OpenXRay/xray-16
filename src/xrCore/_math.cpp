@@ -176,7 +176,7 @@ void initialize()
     ::Random.seed(u32(CPU::GetCLK() % ((u64)0x1 << 32)));
 #endif
 }
-};
+}
 
 namespace CPU
 {

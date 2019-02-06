@@ -343,7 +343,7 @@ IReader* open_chunk(int fd, u32 ID)
             return nullptr;
     }
     return nullptr;
-};
+}
 #endif
 
 void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)

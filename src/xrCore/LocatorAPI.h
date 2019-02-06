@@ -60,7 +60,7 @@ enum class FSType
     Any = Virtual | External,
 };
 
-IMPLEMENT_ENUM_FLAG_OPERATORS(FSType, int);
+IMPLEMENT_ENUM_FLAG_OPERATORS(FSType, int)
 
 class FileStatus
 {

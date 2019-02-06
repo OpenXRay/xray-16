@@ -133,7 +133,7 @@ void BasicPostProcessAnimator::SetDesiredFactor(float f, float sp)
     m_factor_speed = sp;
     VERIFY(_valid(m_factor));
     VERIFY(_valid(m_dest_factor));
-};
+}
 
 void BasicPostProcessAnimator::SetCurrentFactor(float f)
 {
@@ -141,7 +141,7 @@ void BasicPostProcessAnimator::SetCurrentFactor(float f)
     m_dest_factor = f;
     VERIFY(_valid(m_factor));
     VERIFY(_valid(m_dest_factor));
-};
+}
 
 BOOL BasicPostProcessAnimator::Process(float dt, SPPInfo& PPInfo)
 {

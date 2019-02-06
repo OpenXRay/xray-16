@@ -178,6 +178,7 @@ inline int xr_strcat(pstr destination, size_t const buffer_size, pcstr source)
 
 inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, pcstr format_string, ...)
 {
+    UNUSED(buffer_size);
     va_list args;
     va_start(args, format_string);
     const int result = vsprintf_s(destination, buffer_size, format_string, args);

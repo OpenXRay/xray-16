@@ -338,7 +338,7 @@ IReader* IReader::open_chunk(u32 ID)
     }
     else
         return 0;
-};
+}
 void IReader::close()
 {
     IReader* self = this;
@@ -406,9 +406,9 @@ void IReader::r(void* p, int cnt)
         FS.dwOpenCounter++;
     }
 #endif
-};
+}
 
-IC BOOL is_term(char a) { return (a == 13) || (a == 10); };
+IC BOOL is_term(char a) { return (a == 13) || (a == 10); }
 IC u32 IReader::advance_term_string()
 {
     u32 sz = 0;
@@ -467,7 +467,7 @@ void IReader::r_stringZ(xr_string& dest)
 {
     dest = (char*)(data + Pos);
     Pos += int(dest.size() + 1);
-};
+}
 
 void IReader::skip_stringZ()
 {
@@ -475,11 +475,11 @@ void IReader::skip_stringZ()
     while ((src[Pos] != 0) && (!eof()))
         Pos++;
     Pos++;
-};
+}
 
 //---------------------------------------------------
 // temp stream
-CTempReader::~CTempReader() { xr_free(data); };
+CTempReader::~CTempReader() { xr_free(data); }
 //---------------------------------------------------
 // pack stream
 CPackReader::~CPackReader()
@@ -492,15 +492,15 @@ CPackReader::~CPackReader()
 #elif defined(LINUX)
     ::munmap(base_address, Size);
 #endif
-};
+}
 //---------------------------------------------------
 // file stream
 CFileReader::CFileReader(pcstr name)
 {
     data = (char*)FileDownload(name, (u32*)&Size);
     Pos = 0;
-};
-CFileReader::~CFileReader() { xr_free(data); };
+}
+CFileReader::~CFileReader() { xr_free(data); }
 //---------------------------------------------------
 // compressed stream
 CCompressedReader::CCompressedReader(const char* name, const char* sign)
@@ -508,7 +508,7 @@ CCompressedReader::CCompressedReader(const char* name, const char* sign)
     data = (char*)FileDecompress(name, sign, (u32*)&Size);
     Pos = 0;
 }
-CCompressedReader::~CCompressedReader() { xr_free(data); };
+CCompressedReader::~CCompressedReader() { xr_free(data); }
 CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 {
 #if defined(WINDOWS)
