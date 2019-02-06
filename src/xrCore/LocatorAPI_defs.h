@@ -23,11 +23,11 @@ public:
     };
 
 public:
-    LPSTR m_Path;
-    LPSTR m_Root;
-    LPSTR m_Add;
-    LPSTR m_DefExt;
-    LPSTR m_FilterCaption;
+    pstr m_Path;
+    pstr m_Root;
+    pstr m_Add;
+    pstr m_DefExt;
+    pstr m_FilterCaption;
     Flags32 m_Flags;
 
 public:

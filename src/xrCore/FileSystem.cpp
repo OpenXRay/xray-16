@@ -48,7 +48,7 @@ xr_string EFS_Utils::ExcludeBasePath(pcstr full_path, pcstr excl_path)
 xr_string EFS_Utils::ChangeFileExt(pcstr src, pcstr ext)
 {
     xr_string tmp;
-    LPSTR src_ext = strext(src);
+    pstr src_ext = strext(src);
     if (src_ext)
     {
         size_t ext_pos = src_ext - src;
@@ -122,7 +122,7 @@ UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
 #endif
 
 bool EFS_Utils::GetOpenNameInternal(
-    pcstr initial, LPSTR buffer, int sz_buf, bool bMulti, pcstr offset, int start_flt_ext)
+    pcstr initial, pstr buffer, int sz_buf, bool bMulti, pcstr offset, int start_flt_ext)
 {
     VERIFY(buffer && (sz_buf > 0));
 #if defined(WINDOWS)
@@ -282,7 +282,7 @@ bool EFS_Utils::GetSaveName(pcstr initial, string_path& buffer, pcstr offset, in
 #endif
 }
 //----------------------------------------------------
-pcstr EFS_Utils::AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int depth, BOOL full_name)
+pcstr EFS_Utils::AppendFolderToName(pstr tex_name, u32 const tex_name_size, int depth, BOOL full_name)
 {
     string256 _fn;
     xr_strcpy(tex_name, tex_name_size, AppendFolderToName(tex_name, _fn, sizeof(_fn), depth, full_name));
@@ -290,11 +290,11 @@ pcstr EFS_Utils::AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int
 }
 
 pcstr EFS_Utils::AppendFolderToName(
-    pcstr src_name, LPSTR dest_name, u32 const dest_name_size, int depth, BOOL full_name)
+    pcstr src_name, pstr dest_name, u32 const dest_name_size, int depth, BOOL full_name)
 {
     shared_str tmp = src_name;
     pcstr s = src_name;
-    LPSTR d = dest_name;
+    pstr d = dest_name;
     int sv_depth = depth;
     for (; *s && depth; s++, d++)
     {
@@ -324,7 +324,7 @@ pcstr EFS_Utils::AppendFolderToName(
 }
 
 pcstr EFS_Utils::GenerateName(
-    pcstr base_path, pcstr base_name, pcstr def_ext, LPSTR out_name, u32 const out_name_size)
+    pcstr base_path, pcstr base_name, pcstr def_ext, pstr out_name, u32 const out_name_size)
 {
     int cnt = 0;
     string_path fn;

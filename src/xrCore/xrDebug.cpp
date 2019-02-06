@@ -688,7 +688,7 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
     }
     void* msg = nullptr;
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, lastErr,
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (pstr)&msg, 0, nullptr);
     // XXX nitrocaster: check buffer overflow
     xr_sprintf(buffer, bufferSize, "[error][%8d]: %s", lastErr, (char*)msg);
     LocalFree(msg);
