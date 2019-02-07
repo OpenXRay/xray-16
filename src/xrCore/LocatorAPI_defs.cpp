@@ -34,7 +34,7 @@ void FS_File::set(const xr_string& nm, long sz, time_t modif, unsigned attr)
 //////////////////////////////////////////////////////////////////////
 // FS_Path
 //////////////////////////////////////////////////////////////////////
-FS_Path::FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt, LPCSTR _FilterCaption, u32 flags)
+FS_Path::FS_Path(pcstr _Root, pcstr _Add, pcstr _DefExt, pcstr _FilterCaption, u32 flags)
 {
     // VERIFY (_Root&&_Root[0]);
     string_path temp;
@@ -65,7 +65,7 @@ FS_Path::~FS_Path()
     xr_free(m_FilterCaption);
 }
 
-void FS_Path::_set(LPCSTR add)
+void FS_Path::_set(pcstr add)
 {
     // m_Add
     R_ASSERT(add);
@@ -81,7 +81,7 @@ void FS_Path::_set(LPCSTR add)
     m_Path = xr_strdup(temp);
 }
 
-void FS_Path::_set_root(LPCSTR root)
+void FS_Path::_set_root(pcstr root)
 {
     string_path temp;
     xr_strcpy(temp, root);
@@ -98,7 +98,7 @@ void FS_Path::_set_root(LPCSTR root)
     m_Path = xr_strdup(temp);
 }
 
-LPCSTR FS_Path::_update(string_path& dest, LPCSTR src) const
+pcstr FS_Path::_update(string_path& dest, pcstr src) const
 {
     R_ASSERT(dest);
     R_ASSERT(src);
@@ -109,7 +109,7 @@ LPCSTR FS_Path::_update(string_path& dest, LPCSTR src) const
     return dest;
 }
 /*
-void FS_Path::_update(xr_string& dest, LPCSTR src)const
+void FS_Path::_update(xr_string& dest, pcstr src)const
 {
 R_ASSERT(src);
 dest = xr_string(m_Path)+src;
@@ -121,10 +121,10 @@ void FS_Path::rescan_path_cb()
     FS.m_Flags.set(CLocatorAPI::flNeedRescan, TRUE);
 }
 
-bool XRCORE_API PatternMatch(LPCSTR s, LPCSTR mask)
+bool XRCORE_API PatternMatch(pcstr s, pcstr mask)
 {
-    LPCSTR cp = 0;
-    LPCSTR mp = 0;
+    pcstr cp = 0;
+    pcstr mp = 0;
     for (; *s && *mask != '*'; mask++, s++)
         if (*mask != *s && *mask != '?')
             return false;

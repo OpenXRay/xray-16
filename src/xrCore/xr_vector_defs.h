@@ -20,7 +20,7 @@ DEFINE_VECTOR(Fvector*, LPFvectorVec, LPFvectorIt);
 DEFINE_VECTOR(Fcolor, FcolorVec, FcolorIt);
 DEFINE_VECTOR(Fcolor*, LPFcolorVec, LPFcolorIt);
 DEFINE_VECTOR(LPSTR, LPSTRVec, LPSTRIt);
-DEFINE_VECTOR(LPCSTR, LPCSTRVec, LPCSTRIt);
+DEFINE_VECTOR(pcstr, pcstrVec, pcstrIt);
 DEFINE_VECTOR(string64, string64Vec, string64It);
 DEFINE_VECTOR(xr_string, SStringVec, SStringVecIt);
 

@@ -15,37 +15,37 @@ xr_unique_ptr<EFS_Utils> xr_EFS;
 //----------------------------------------------------
 EFS_Utils::EFS_Utils() {}
 EFS_Utils::~EFS_Utils() {}
-xr_string EFS_Utils::ExtractFileName(LPCSTR src)
+xr_string EFS_Utils::ExtractFileName(pcstr src)
 {
     string_path name;
     _splitpath(src, 0, 0, name, 0);
     return xr_string(name);
 }
 
-xr_string EFS_Utils::ExtractFileExt(LPCSTR src)
+xr_string EFS_Utils::ExtractFileExt(pcstr src)
 {
     string_path ext;
     _splitpath(src, 0, 0, 0, ext);
     return xr_string(ext);
 }
 
-xr_string EFS_Utils::ExtractFilePath(LPCSTR src)
+xr_string EFS_Utils::ExtractFilePath(pcstr src)
 {
     string_path drive, dir;
     _splitpath(src, drive, dir, 0, 0);
     return xr_string(drive) + dir;
 }
 
-xr_string EFS_Utils::ExcludeBasePath(LPCSTR full_path, LPCSTR excl_path)
+xr_string EFS_Utils::ExcludeBasePath(pcstr full_path, pcstr excl_path)
 {
-    LPCSTR sub = strstr(full_path, excl_path);
+    pcstr sub = strstr(full_path, excl_path);
     if (0 != sub)
         return xr_string(sub + xr_strlen(excl_path));
     else
         return xr_string(full_path);
 }
 
-xr_string EFS_Utils::ChangeFileExt(LPCSTR src, LPCSTR ext)
+xr_string EFS_Utils::ChangeFileExt(pcstr src, pcstr ext)
 {
     xr_string tmp;
     LPSTR src_ext = strext(src);
@@ -62,9 +62,9 @@ xr_string EFS_Utils::ChangeFileExt(LPCSTR src, LPCSTR ext)
     return tmp;
 }
 
-xr_string EFS_Utils::ChangeFileExt(const xr_string& src, LPCSTR ext) { return ChangeFileExt(src.c_str(), ext); }
+xr_string EFS_Utils::ChangeFileExt(const xr_string& src, pcstr ext) { return ChangeFileExt(src.c_str(), ext); }
 //----------------------------------------------------
-void MakeFilter(string1024& dest, LPCSTR info, LPCSTR ext)
+void MakeFilter(string1024& dest, pcstr info, pcstr ext)
 {
     std::string res;
 
@@ -122,7 +122,7 @@ UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
 #endif
 
 bool EFS_Utils::GetOpenNameInternal(
-    LPCSTR initial, LPSTR buffer, int sz_buf, bool bMulti, LPCSTR offset, int start_flt_ext)
+    pcstr initial, LPSTR buffer, int sz_buf, bool bMulti, pcstr offset, int start_flt_ext)
 {
     VERIFY(buffer && (sz_buf > 0));
 #if defined(WINDOWS)
@@ -216,7 +216,7 @@ bool EFS_Utils::GetOpenNameInternal(
 #endif
 }
 
-bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, int start_flt_ext)
+bool EFS_Utils::GetSaveName(pcstr initial, string_path& buffer, pcstr offset, int start_flt_ext)
 {
     // unsigned int dwVersion = GetVersion();
     // unsigned int dwWindowsMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
@@ -224,7 +224,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
     FS_Path& P = *FS.get_path(initial);
     string1024 flt;
 
-    LPCSTR def_ext = P.m_DefExt;
+    pcstr def_ext = P.m_DefExt;
     if (false) //&& dwWindowsMajorVersion == 6 )
     {
         if (strstr(P.m_DefExt, "*."))
@@ -282,18 +282,18 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
 #endif
 }
 //----------------------------------------------------
-LPCSTR EFS_Utils::AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int depth, BOOL full_name)
+pcstr EFS_Utils::AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int depth, BOOL full_name)
 {
     string256 _fn;
     xr_strcpy(tex_name, tex_name_size, AppendFolderToName(tex_name, _fn, sizeof(_fn), depth, full_name));
     return tex_name;
 }
 
-LPCSTR EFS_Utils::AppendFolderToName(
-    LPCSTR src_name, LPSTR dest_name, u32 const dest_name_size, int depth, BOOL full_name)
+pcstr EFS_Utils::AppendFolderToName(
+    pcstr src_name, LPSTR dest_name, u32 const dest_name_size, int depth, BOOL full_name)
 {
     shared_str tmp = src_name;
-    LPCSTR s = src_name;
+    pcstr s = src_name;
     LPSTR d = dest_name;
     int sv_depth = depth;
     for (; *s && depth; s++, d++)
@@ -323,8 +323,8 @@ LPCSTR EFS_Utils::AppendFolderToName(
     return dest_name;
 }
 
-LPCSTR EFS_Utils::GenerateName(
-    LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, LPSTR out_name, u32 const out_name_size)
+pcstr EFS_Utils::GenerateName(
+    pcstr base_path, pcstr base_name, pcstr def_ext, LPSTR out_name, u32 const out_name_size)
 {
     int cnt = 0;
     string_path fn;

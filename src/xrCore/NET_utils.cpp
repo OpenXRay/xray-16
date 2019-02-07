@@ -395,7 +395,7 @@ void NET_Packet::r_stringZ(pstr S)
 {
     if (!inistream)
     {
-        LPCSTR data = LPCSTR(&B.data[r_pos]);
+        pcstr data = pcstr(&B.data[r_pos]);
         size_t len = xr_strlen(data);
         r(S, (u32)len + 1);
     }
@@ -409,7 +409,7 @@ void NET_Packet::r_stringZ(xr_string& dest)
 {
     if (!inistream)
     {
-        dest = LPCSTR(&B.data[r_pos]);
+        dest = pcstr(&B.data[r_pos]);
         r_advance(u32(dest.size() + 1));
     }
     else
@@ -424,7 +424,7 @@ void NET_Packet::r_stringZ(shared_str& dest)
 {
     if (!inistream)
     {
-        dest = LPCSTR(&B.data[r_pos]);
+        dest = pcstr(&B.data[r_pos]);
         r_advance(dest.size() + 1);
     }
     else
@@ -439,7 +439,7 @@ void NET_Packet::skip_stringZ()
 {
     if (!inistream)
     {
-        LPCSTR data = LPCSTR(&B.data[r_pos]);
+        pcstr data = pcstr(&B.data[r_pos]);
         u32 len = xr_strlen(data);
         r_advance(len + 1);
     }
@@ -476,7 +476,7 @@ void NET_Packet::r_stringZ_s(pstr string, u32 const size)
         return;
     }
 
-    LPCSTR data = LPCSTR(B.data + r_pos);
+    pcstr data = pcstr(B.data + r_pos);
     u32 length = xr_strlen(data);
     R_ASSERT2((length + 1) <= size, "buffer overrun");
     r(string, length + 1);

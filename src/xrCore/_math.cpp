@@ -348,7 +348,7 @@ void _initialize_cpu_thread()
 struct THREAD_NAME
 {
     DWORD dwType;
-    LPCSTR szName;
+    pcstr szName;
     DWORD dwThreadID;
     DWORD dwFlags;
 };

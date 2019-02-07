@@ -11,36 +11,36 @@ class XRCORE_API EFS_Utils
 {
 protected:
     bool GetOpenNameInternal(
-        LPCSTR initial, LPSTR buffer, int sz_buf, bool bMulti = false, LPCSTR offset = 0, int start_flt_ext = -1);
+        pcstr initial, LPSTR buffer, int sz_buf, bool bMulti = false, pcstr offset = 0, int start_flt_ext = -1);
 
 public:
     EFS_Utils();
     virtual ~EFS_Utils();
     void _initialize() {}
     void _destroy() {}
-    LPCSTR GenerateName(LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, LPSTR out_name, u32 const out_name_size);
+    pcstr GenerateName(pcstr base_path, pcstr base_name, pcstr def_ext, LPSTR out_name, u32 const out_name_size);
 
-    bool GetOpenName(LPCSTR initial, string_path& buffer, int sz_buf, bool bMulti = false, LPCSTR offset = 0,
+    bool GetOpenName(pcstr initial, string_path& buffer, int sz_buf, bool bMulti = false, pcstr offset = 0,
         int start_flt_ext = -1);
-    bool GetOpenName(LPCSTR initial, xr_string& buf, bool bMulti = false, LPCSTR offset = 0, int start_flt_ext = -1);
+    bool GetOpenName(pcstr initial, xr_string& buf, bool bMulti = false, pcstr offset = 0, int start_flt_ext = -1);
 
-    bool GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset = 0, int start_flt_ext = -1);
-    bool GetSaveName(LPCSTR initial, xr_string& buf, LPCSTR offset = 0, int start_flt_ext = -1);
+    bool GetSaveName(pcstr initial, string_path& buffer, pcstr offset = 0, int start_flt_ext = -1);
+    bool GetSaveName(pcstr initial, xr_string& buf, pcstr offset = 0, int start_flt_ext = -1);
 
-    void MarkFile(LPCSTR fn, bool bDeleteSource);
+    void MarkFile(pcstr fn, bool bDeleteSource);
 
     xr_string AppendFolderToName(xr_string& tex_name, int depth, BOOL full_name);
 
-    LPCSTR AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int depth, BOOL full_name);
-    LPCSTR AppendFolderToName(LPCSTR src_name, LPSTR dest_name, u32 const dest_name_size, int depth, BOOL full_name);
+    pcstr AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int depth, BOOL full_name);
+    pcstr AppendFolderToName(pcstr src_name, LPSTR dest_name, u32 const dest_name_size, int depth, BOOL full_name);
 
-    xr_string ChangeFileExt(LPCSTR src, LPCSTR ext);
-    xr_string ChangeFileExt(const xr_string& src, LPCSTR ext);
+    xr_string ChangeFileExt(pcstr src, pcstr ext);
+    xr_string ChangeFileExt(const xr_string& src, pcstr ext);
 
-    static xr_string ExtractFileName(LPCSTR src);
-    static xr_string ExtractFilePath(LPCSTR src);
-    static xr_string ExtractFileExt(LPCSTR src);
-    static xr_string ExcludeBasePath(LPCSTR full_path, LPCSTR excl_path);
+    static xr_string ExtractFileName(pcstr src);
+    static xr_string ExtractFilePath(pcstr src);
+    static xr_string ExtractFileExt(pcstr src);
+    static xr_string ExcludeBasePath(pcstr full_path, pcstr excl_path);
 };
 extern XRCORE_API xr_unique_ptr<EFS_Utils> xr_EFS;
 #define EFS (*xr_EFS)

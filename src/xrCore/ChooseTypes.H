@@ -44,7 +44,7 @@ struct SChooseItem
 {
     shared_str name;
     shared_str hint;
-    SChooseItem(LPCSTR nm, LPCSTR ht) : name(nm), hint(ht) {}
+    SChooseItem(pcstr nm, pcstr ht) : name(nm), hint(ht) {}
 };
 
 using ChooseItemVec = xr_vector<SChooseItem>;
@@ -52,7 +52,7 @@ using ChooseItemVec = xr_vector<SChooseItem>;
 // typedef
 typedef fastdelegate::FastDelegate2<ChooseItemVec&, void*> TOnChooseFillItems;
 typedef fastdelegate::FastDelegate2<SChooseItem*, PropItemVec&> TOnChooseSelectItem;
-typedef fastdelegate::FastDelegate3<LPCSTR, HDC, const Irect&> TOnDrawThumbnail;
+typedef fastdelegate::FastDelegate3<pcstr, HDC, const Irect&> TOnDrawThumbnail;
 typedef fastdelegate::FastDelegate0<> TOnChooseClose;
 
 typedef void (*TOnChooseFillEvents)();
@@ -75,11 +75,11 @@ struct SChooseEvents
         flags.zero();
     }
     SChooseEvents(
-    LPCSTR capt, TOnChooseFillItems f, TOnChooseSelectItem s, TOnDrawThumbnail t, TOnChooseClose c, u32 fl)
+    pcstr capt, TOnChooseFillItems f, TOnChooseSelectItem s, TOnDrawThumbnail t, TOnChooseClose c, u32 fl)
     {
         Set(capt, f, s, t, c, fl);
     }
-    void Set(LPCSTR capt, TOnChooseFillItems f, TOnChooseSelectItem s, TOnDrawThumbnail t, TOnChooseClose c, u32 fl)
+    void Set(pcstr capt, TOnChooseFillItems f, TOnChooseSelectItem s, TOnDrawThumbnail t, TOnChooseClose c, u32 fl)
     {
         caption = capt;
         on_fill = f;

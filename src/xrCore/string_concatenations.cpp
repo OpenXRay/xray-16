@@ -93,7 +93,7 @@ void check_stack_overflow(u32 stack_increment)
 
 void string_tupples::error_process() const
 {
-    LPCSTR strings[6];
+    pcstr strings[6];
 
     u32 part_size = 0;
     u32 overrun_string_index = (u32)-1;

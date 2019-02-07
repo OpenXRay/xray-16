@@ -1127,7 +1127,7 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
             // file
             if ((flags & FS_ListFiles) == 0)
                 continue;
-            LPCSTR entry_begin = entry.name + base_len;
+            pcstr entry_begin = entry.name + base_len;
             if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER))
                 continue; // folder in folder
             // check extension
@@ -1161,7 +1161,7 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
             // folder
             if ((flags & FS_ListFolders) == 0)
                 continue;
-            LPCSTR entry_begin = entry.name + base_len;
+            pcstr entry_begin = entry.name + base_len;
 
             if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER) != end_symbol)
                 continue; // folder in folder
@@ -1181,9 +1181,9 @@ void CLocatorAPI::check_cached_files(pstr fname, const u32& fname_size, const fi
     if (!path_exist("$server_root$"))
         return;
 
-    LPCSTR path_base = get_path("$server_root$")->m_Path;
+    pcstr path_base = get_path("$server_root$")->m_Path;
     u32 len_base = xr_strlen(path_base);
-    LPCSTR path_file = fname;
+    pcstr path_file = fname;
     u32 len_file = xr_strlen(path_file);
     if (len_file <= len_base)
         return;

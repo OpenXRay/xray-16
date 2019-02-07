@@ -564,7 +564,7 @@ void xrDebug::DoExit(const std::string& message)
 #endif
 }
 
-LPCSTR xrDebug::ErrorToString(long code)
+pcstr xrDebug::ErrorToString(long code)
 {
     const char* result = nullptr;
     static string1024 descStorage;
@@ -597,7 +597,7 @@ int out_of_memory_handler(size_t size)
     return 1;
 }
 
-extern LPCSTR log_name();
+extern pcstr log_name();
 
 void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 {

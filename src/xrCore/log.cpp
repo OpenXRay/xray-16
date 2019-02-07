@@ -201,7 +201,7 @@ LogCallback SetLogCB(const LogCallback& cb)
     return (result);
 }
 
-LPCSTR log_name() { return (log_file_name); }
+pcstr log_name() { return (log_file_name); }
 
 void CreateLog(BOOL nl)
 {
@@ -234,7 +234,7 @@ void CreateLog(BOOL nl)
 
         for (u32 it = 0; it < LogFile.size(); it++)
         {
-            LPCSTR s = LogFile[it].c_str();
+            pcstr s = LogFile[it].c_str();
             LogWriter->w_printf("%s%s\n", buf, s ? s : "");
         }
         LogWriter->flush();

@@ -26,7 +26,7 @@ XRCORE_API void VerifyPath(pcstr path);
 XRCORE_API extern u32 g_file_mapped_memory;
 XRCORE_API extern u32 g_file_mapped_count;
 XRCORE_API void dump_file_mappings();
-extern void register_file_mapping(void* address, const u32& size, LPCSTR file_name);
+extern void register_file_mapping(void* address, const u32& size, pcstr file_name);
 extern void unregister_file_mapping(void* address, const u32& size);
 #endif // DEBUG
 
@@ -160,7 +160,7 @@ public:
         xr_free(data);
     }
 #pragma warning(pop)
-    bool save_to(LPCSTR fn);
+    bool save_to(pcstr fn);
     virtual void flush(){};
 };
 

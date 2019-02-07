@@ -26,7 +26,7 @@ u32 g_file_mapped_count = 0;
 typedef xr_map<u32, std::pair<u32, shared_str>> FILE_MAPPINGS;
 FILE_MAPPINGS g_file_mappings;
 
-void register_file_mapping(void* address, const u32& size, LPCSTR file_name)
+void register_file_mapping(void* address, const u32& size, pcstr file_name)
 {
     FILE_MAPPINGS::const_iterator I = g_file_mappings.find(*(u32*)&address);
     VERIFY(I == g_file_mappings.end());
@@ -135,7 +135,7 @@ bool file_handle_internal(pcstr file_name, u32& size, int& file_handle)
 }
 #endif // EDITOR
 
-void* FileDownload(LPCSTR file_name, const int& file_handle, u32& file_size)
+void* FileDownload(pcstr file_name, const int& file_handle, u32& file_size)
 {
     void* buffer = xr_malloc(file_size + 1); // IDK why need +1 for file size, but without this caused invalid write size 1 for this buffer
 
@@ -152,7 +152,7 @@ void* FileDownload(LPCSTR file_name, const int& file_handle, u32& file_size)
     return (buffer);
 }
 
-void* FileDownload(LPCSTR file_name, u32* buffer_size)
+void* FileDownload(pcstr file_name, u32* buffer_size)
 {
     int file_handle;
     R_ASSERT3(file_handle_internal(file_name, *buffer_size, file_handle), "can't open file : ", file_name);
@@ -225,7 +225,7 @@ void CMemoryWriter::w(const void* ptr, u32 count)
 }
 
 // static const u32 mb_sz = 0x1000000;
-bool CMemoryWriter::save_to(LPCSTR fn)
+bool CMemoryWriter::save_to(pcstr fn)
 {
     IWriter* F = FS.w_open(fn);
     if (F)
