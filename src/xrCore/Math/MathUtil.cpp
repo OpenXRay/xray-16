@@ -16,8 +16,8 @@
 #include "SkinXW_SSE.hpp"
 #else
 #include "SkinXW_CPP.hpp"
-#include "PLC_CPP.hpp"
 #endif
+#include "PLC_CPP.hpp"
 
 #include "_math.h"
 
