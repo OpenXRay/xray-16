@@ -1,34 +1,17 @@
 #pragma once
-#ifndef _BITWISE_
-#define _BITWISE_
+#ifndef _BITWISE_H
+#define _BITWISE_H
 #include "math_constants.h"
 #include "_types.h"
 
 // float values defines
 #define fdSGN 0x080000000 // mask for sign bit
-#define fdMABS 0x07FFFFFFF // mask for absolute value (~sgn)
-#define fdMANT 0x0007FFFFF // mask for mantissa
-#define fdEXPO 0x07F800000 // mask for exponent
-#define fdONE 0x03F800000 // 1.0f
-#define fdHALF 0x03F000000 // 0.5f
-#define fdTWO 0x040000000 // 2.0
-#define fdOOB 0x000000000 // "out of bounds" value
-#define fdNAN 0x07fffffff // "Not a number" value
-#define fdMAX 0x07F7FFFFF // FLT_MAX
-#define fdRLE10 0x03ede5bdb // 1/ln10
 
 // integer math on floats
-#ifdef _M_AMD64
 IC bool negative(const float f) { return f < 0; }
 IC bool positive(const float f) { return f >= 0; }
 IC void set_negative(float& f) { f = -fabsf(f); }
 IC void set_positive(float& f) { f = fabsf(f); }
-#else
-IC bool negative(const float& f) { return *(unsigned*)&f & fdSGN; }
-IC bool positive(const float& f) { return (*(unsigned*)&f & fdSGN) == 0; }
-IC void set_negative(float& f) { *(unsigned*)&f |= fdSGN; }
-IC void set_positive(float& f) { *(unsigned*)&f &= ~fdSGN; }
-#endif
 
 /*
  * Here are a few nice tricks for 2's complement based machines
@@ -100,20 +83,6 @@ IC int iCeil(float x)
     return std::ceil(x);
 }
 
-// Validity checks
-IC bool fis_gremlin(const float& f)
-{
-    u8 value = u8(((*(int*)&f & 0x7f800000) >> 23) - 0x20);
-    return value > 0xc0;
-}
-IC bool fis_denormal(const float& f) { return !(*(int*)&f & 0x7f800000); }
-// Approximated calculations
-IC float apx_InvSqrt(const float& n)
-{
-    long tmp = long(0xBE800000) - *(long*)&n >> 1;
-    float y = *(float*)&tmp;
-    return y * (1.47f - 0.47f * n * y * y);
-}
 // Only for [0..1] (positive) range
 IC float apx_asin(const float x)
 {
