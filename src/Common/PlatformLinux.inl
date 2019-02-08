@@ -16,7 +16,13 @@
 #include <algorithm> // for min max
 
 #include <string>
+#if defined(LINUX)
 #include <alloca.h>
+#elif defined(FREEBSD)
+#include <pthread_np.h>
+#define pthread_setname_np pthread_set_name_np
+#define cpu_set_t cpuset_t
+#endif
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/mman.h> // for mmap / munmap
@@ -43,7 +49,9 @@
 
 #define __cdecl
 #define __stdcall
+#if defined(LINUX)
 #define __fastcall
+#endif
 
 //#define __declspec
 #define __forceinline FORCE_INLINE

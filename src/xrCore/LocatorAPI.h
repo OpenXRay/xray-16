@@ -14,7 +14,7 @@
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
-#if defined(LINUX)
+#if defined(LINUX) || defined(FREEBSD)
 #include <stdint.h>
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
@@ -101,7 +101,7 @@ public:
 #if defined(WINDOWS)
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
         int hSrcFile = 0;
 #endif
         CInifile* header = nullptr;

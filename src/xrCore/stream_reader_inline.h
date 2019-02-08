@@ -1,6 +1,6 @@
 #ifndef STREAM_READER_INLINE_H
 #define STREAM_READER_INLINE_H
-#ifdef LINUX
+#if defined(LINUX) || defined(FREEBSD)
 #include <sys/mman.h>
 #endif
 
@@ -20,7 +20,7 @@ IC CStreamReader& CStreamReader::operator=(const CStreamReader&)
 
 #if defined(WINDOWS)
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
 IC const int& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
 #endif
 
