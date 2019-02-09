@@ -16,7 +16,9 @@
 #include <algorithm> // for min max
 
 #include <string>
-#include <alloca.h>
+#include <pthread_np.h>
+#define pthread_setname_np pthread_set_name_np
+#define cpu_set_t cpuset_t
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/mman.h> // for mmap / munmap
@@ -43,7 +45,6 @@
 
 #define __cdecl
 #define __stdcall
-#define __fastcall
 
 //#define __declspec
 #define __forceinline FORCE_INLINE

@@ -20,8 +20,10 @@
 
 #include <ctime>
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(LINUX)
 #include "Common/PlatformLinux.inl"
+#elif defined(FREEBSD)
+#include "Common/PlatformBSD.inl"
 #elif defined(WINDOWS)
 #include "Common/PlatformWindows.inl"
 #endif
