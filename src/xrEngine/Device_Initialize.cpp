@@ -77,7 +77,7 @@ void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* area, void* /*data*/)
 {
-    if (pInput->InputIsGrabbed())
+    if (!Device.AllowWindowDrag)
         return SDL_HITTEST_NORMAL;
 
     const auto& rect = Device.m_rcWindowClient;

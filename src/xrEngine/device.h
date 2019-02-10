@@ -72,6 +72,7 @@ public:
     BOOL b_is_Ready;
     BOOL b_is_Active;
     bool IsAnselActive;
+    bool AllowWindowDrag; // For windowed mode
 
     // Engine flow-control
     u32 dwFrame;
