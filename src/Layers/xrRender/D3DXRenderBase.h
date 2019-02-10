@@ -83,14 +83,14 @@ public:
     RenderStatistics BasicStats;
 
 public:
-    virtual void set_Transform(Fmatrix* M) override
+    void set_Transform(Fmatrix* M) override
     {
         VERIFY(M);
         val_pTransform = M;
     }
-    virtual void set_HUD(BOOL V) override { val_bHUD = V; }
-    virtual BOOL get_HUD() override { return val_bHUD; }
-    virtual void set_Invisible(BOOL V) override { val_bInvisible = V; }
+    void set_HUD(BOOL V) override { val_bHUD = V; }
+    BOOL get_HUD() override { return val_bHUD; }
+    void set_Invisible(BOOL V) override { val_bInvisible = V; }
     void set_Feedback(R_feedback* V, u32 id)
     {
         val_feedback_breakp = id;
@@ -178,43 +178,43 @@ public:
     void r_dsgraph_render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
     virtual void Copy(IRender& _in) override;
     //	Gamma correction functions
-    virtual void setGamma(float fGamma) override;
-    virtual void setBrightness(float fGamma) override;
-    virtual void setContrast(float fGamma) override;
-    virtual void updateGamma() override;
+    void setGamma(float fGamma) override;
+    void setBrightness(float fGamma) override;
+    void setContrast(float fGamma) override;
+    void updateGamma() override;
     //	Destroy
-    virtual void OnDeviceDestroy(bool bKeepTextures) override;
-    virtual void ValidateHW() override;
-    virtual void DestroyHW() override;
-    virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
+    void OnDeviceDestroy(bool bKeepTextures) override;
+    void ValidateHW() override;
+    void Destroy() override;
+    void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
     //	Init
-    virtual void SetupStates() override;
-    virtual void OnDeviceCreate(const char* shName) override;
-    virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
-    virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) override;
+    void SetupStates() override;
+    void OnDeviceCreate(const char* shName) override;
+    void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
+    void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) override;
     //	Overdraw
-    virtual void overdrawBegin() override;
-    virtual void overdrawEnd() override;
+    void overdrawBegin() override;
+    void overdrawEnd() override;
     //	Resources control
-    virtual void DeferredLoad(bool E) override;
-    virtual void ResourcesDeferredUpload() override;
-    virtual void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) override;
-    virtual void ResourcesDestroyNecessaryTextures() override;
-    virtual void ResourcesStoreNecessaryTextures() override;
-    virtual void ResourcesDumpMemoryUsage() override;
+    void DeferredLoad(bool E) override;
+    void ResourcesDeferredUpload() override;
+    void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) override;
+    void ResourcesDestroyNecessaryTextures() override;
+    void ResourcesStoreNecessaryTextures() override;
+    void ResourcesDumpMemoryUsage() override;
     //	HWSupport
-    virtual bool HWSupportsShaderYUV2RGB() override;
+    bool HWSupportsShaderYUV2RGB() override;
     //	Device state
-    virtual DeviceState GetDeviceState() override;
-    virtual bool GetForceGPU_REF() override;
-    virtual u32 GetCacheStatPolys() override;
-    virtual void Begin() override;
-    virtual void Clear() override;
-    virtual void End() override;
-    virtual void ClearTarget() override;
-    virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) override;
-    virtual void OnAssetsChanged() override;
-    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+    DeviceState GetDeviceState() override;
+    bool GetForceGPU_REF() override;
+    u32 GetCacheStatPolys() override;
+    void Begin() override;
+    void Clear() override;
+    void End() override;
+    void ClearTarget() override;
+    void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) override;
+    void OnAssetsChanged() override;
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
 public:
     CResourceManager* Resources;

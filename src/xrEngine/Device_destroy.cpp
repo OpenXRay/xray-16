@@ -27,7 +27,7 @@ void CRenderDevice::Destroy()
     GEnv.Render->destroy();
     GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
-    GEnv.Render->DestroyHW();
+    GEnv.Render->Destroy();
     FreeRefreshRateToken();
     FreeVidModesToken();
     FreeMonitorsToken();
