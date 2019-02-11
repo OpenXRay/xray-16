@@ -3,17 +3,10 @@
 #include "Render.h"
 #include "IGame_Persistent.h"
 #include "XR_IOConsole.h"
+#include "MonitorManager.hpp"
 #include "xr_input.h"
 #include "SDL.h"
 #include "SDL_syswm.h"
-
-extern void FreeMonitorsToken();
-extern void FreeVidModesToken();
-extern void FreeRefreshRateToken();
-
-extern void FreeMonitorsToken();
-extern void FreeVidModesToken();
-extern void FreeRefreshRateToken();
 
 void CRenderDevice::Destroy()
 {
@@ -28,9 +21,7 @@ void CRenderDevice::Destroy()
     GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
     GEnv.Render->DestroyHW();
-    FreeRefreshRateToken();
-    FreeVidModesToken();
-    FreeMonitorsToken();
+    g_monitors.Destroy();
     seqRender.Clear();
     seqAppActivate.Clear();
     seqAppDeactivate.Clear();

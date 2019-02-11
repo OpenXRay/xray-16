@@ -4,25 +4,14 @@
 #include "xrCore/xr_token.h"
 #include "xrCDB/xrXRC.h"
 #include "XR_IOConsole.h"
+#include "MonitorManager.hpp"
 #include "SDL.h"	
 #include "SDL_syswm.h"
 
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;
-extern xr_vector<xr_token> VidMonitorsToken;
-extern xr_vector<xr_token> VidModesToken;
-extern xr_vector<xr_token> VidRefreshRateToken;
 
 extern XRCDB_API BOOL* cdb_bDebug;
-
-void FillMonitorsToken();
-void FreeMonitorsToken();
-
-void FillVidModesToken(u32 monitorID);
-void FreeVidModesToken();
-
-void FillRefreshRateToken();
-void FreeRefreshRateToken();
 
 void CRenderDevice::_SetupStates()
 {
@@ -58,7 +47,7 @@ void CRenderDevice::Create()
     if (GEnv.isDedicatedServer || editor())
         psDeviceFlags.set(rsFullscreen, false);
 
-    FillVidModesToken(Vid_SelectedMonitor);
+    g_monitors.Initialize();
     UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
@@ -81,13 +70,12 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
     if (windowed)
     {
         // Get the maximal available resolution (penultimate token in VidModesToken)
-        u32 width, height;
-        sscanf(VidModesToken[VidModesToken.size() - 2].name, "%dx%d", &width, &height);
+        const MonitorsManager::ResolutionPair r = g_monitors.GetMaximalResolution();
 
         const bool drawBorders = strstr(Core.Params, "-draw_borders");
 
         bool maximalResolution = false;
-        if (b_is_Ready && !drawBorders && psCurrentVidMode[0] == width && psCurrentVidMode[1] == height)
+        if (b_is_Ready && !drawBorders && psCurrentVidMode[0] == r.first && psCurrentVidMode[1] == r.second)
             maximalResolution = true;
 
         // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
@@ -160,7 +148,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
         string32 buff;
         xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-        if (_ParseItem(buff, VidModesToken.data()) == u32(-1)) // not found
+        if (g_monitors.SelectedResolutionIsSafe()) // not found
         { // select safe
             SDL_DisplayMode current;
             SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
@@ -171,7 +159,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
             if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
                 xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", closest.w, closest.h);
             else
-                xr_sprintf(buff, sizeof(buff), "vid_mode %s", VidModesToken.back());
+                xr_sprintf(buff, sizeof(buff), "vid_mode %s", g_monitors.GetMaximalResolution());
 
             Console->Execute(buff);
         }
@@ -179,130 +167,4 @@ void CRenderDevice::SelectResolution(const bool windowed)
         dwWidth = psCurrentVidMode[0];
         dwHeight = psCurrentVidMode[1];
     }
-}
-
-struct uniqueRenderingMode
-{
-    uniqueRenderingMode(pcstr v) : value(v) {}
-    pcstr value;
-    bool operator()(const xr_token& other) const
-    {
-        return !xr_stricmp(value, other.name);
-    }
-};
-
-void FillMonitorsToken()
-{
-    auto& monitors = VidMonitorsToken;
-
-    if (!monitors.empty())
-        FreeMonitorsToken();
-
-    int displayCount = SDL_GetNumVideoDisplays();
-    R_ASSERT3(displayCount > 0, "Failed to find display", SDL_GetError());
-    monitors.reserve(displayCount + 1);
-
-    for (int i = 0; i < displayCount; ++i)
-    {
-        string512 buf;
-        xr_sprintf(buf, sizeof(buf), "%d. %s", i + 1, SDL_GetDisplayName(i));
-        monitors.emplace_back(xr_strdup(buf), i);
-    }
-
-    monitors.emplace_back(nullptr, -1);
-}
-
-void FillVidModesToken(u32 monitorID)
-{
-    auto& modes = VidModesToken;
-    auto& rates = VidRefreshRateToken;
-
-    if (!modes.empty())
-        FreeVidModesToken();
-
-    if (!rates.empty())
-        FreeRefreshRateToken();
-
-    int modeCount = SDL_GetNumDisplayModes(monitorID);
-    R_ASSERT3(modeCount > 0, "Failed to find display modes", SDL_GetError());
-    modes.reserve(modeCount + 1);
-
-    SDL_DisplayMode displayMode;
-    for (int i = modeCount - 1; i >= 0; --i)
-    {
-        R_ASSERT3(SDL_GetDisplayMode(monitorID, i, &displayMode) == 0, "Failed to find specified display mode", SDL_GetError());
-
-        string16 str;
-        xr_sprintf(str, sizeof(str), "%dx%d", displayMode.w, displayMode.h);
-
-        if (modes.cend() == std::find_if(modes.cbegin(), modes.cend(), uniqueRenderingMode(str)))
-            modes.emplace_back(xr_strdup(str), i);
-
-        // For the first time we can fill refresh rate token here
-        if (displayMode.w == psCurrentVidMode[0] && displayMode.h == psCurrentVidMode[1])
-        {
-            xr_itoa(displayMode.refresh_rate, str, 10);
-
-            rates.emplace_back(xr_strdup(str), displayMode.refresh_rate);
-        }
-    }
-
-    Msg("Available video modes[%d]:", modes.size());
-    for (const auto& mode : modes)
-        Msg("[%s]", mode.name);
-
-    modes.emplace_back(nullptr, -1);
-    rates.emplace_back(nullptr, -1);
-}
-
-void FillRefreshRateToken()
-{
-    auto& rates = VidRefreshRateToken;
-
-    if (!rates.empty())
-        FreeRefreshRateToken();
-
-    int modeCount = SDL_GetNumDisplayModes(Vid_SelectedMonitor);
-    R_ASSERT3(modeCount > 0, "Failed to find display modes", SDL_GetError());
-
-    SDL_DisplayMode displayMode;
-    for (int i = modeCount - 1; i >= 0; --i)
-    {
-        R_ASSERT3(SDL_GetDisplayMode(Vid_SelectedMonitor, i, &displayMode) == 0, "Failed to find specified display mode",
-            SDL_GetError());
-
-        if (displayMode.w != psCurrentVidMode[0] || displayMode.h != psCurrentVidMode[1])
-            continue;
-
-        string16 buff;
-        xr_itoa(displayMode.refresh_rate, buff, 10);
-
-        rates.emplace_back(xr_strdup(buff), displayMode.refresh_rate);
-    }
-
-    rates.emplace_back(nullptr, -1);
-}
-
-void FreeMonitorsToken()
-{
-    for (auto& monitor : VidMonitorsToken)
-        xr_free(monitor.name);
-
-    VidMonitorsToken.clear();
-}
-
-void FreeVidModesToken()
-{
-    for (auto& mode : VidModesToken)
-        xr_free(mode.name);
-
-    VidModesToken.clear();
-}
-
-void FreeRefreshRateToken()
-{
-    for (auto& rate : VidRefreshRateToken)
-        xr_free(rate.name);
-
-    VidRefreshRateToken.clear();
 }

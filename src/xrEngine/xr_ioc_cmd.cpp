@@ -8,6 +8,8 @@
 #include "xrSASH.h"
 #endif
 
+#include "MonitorManager.hpp"
+
 #include "CameraManager.h"
 #include "Environment.h"
 #include "xr_input.h"
@@ -16,13 +18,8 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
-extern void FillVidModesToken(u32 monitorID);
-extern void FillRefreshRateToken();
-ENGINE_API u32 Vid_SelectedMonitor = 0;
-ENGINE_API u32 Vid_SelectedRefreshRate = 60;
-ENGINE_API xr_vector<xr_token> VidMonitorsToken;
-ENGINE_API xr_vector<xr_token> VidModesToken;
-ENGINE_API xr_vector<xr_token> VidRefreshRateToken;
+extern u32 Vid_SelectedMonitor;
+extern u32 Vid_SelectedRefreshRate;
 xr_vector<xr_token> VidQualityToken;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
@@ -379,83 +376,112 @@ public:
         }
     }
 };
+//-----------------------------------------------------------------------
 class CCC_VidMode : public CCC_Token
 {
     u32 _dummy = 0;
 
 public:
-    CCC_VidMode(LPCSTR N) : CCC_Token(N, &_dummy, NULL) { bEmptyArgsHandled = FALSE; };
-    virtual void Execute(LPCSTR args)
-    {
-        u32 _w, _h;
-        int cnt = sscanf(args, "%dx%d", &_w, &_h);
-        if (cnt == 2)
-        {
-            psCurrentVidMode[0] = _w;
-            psCurrentVidMode[1] = _h;
-            FillRefreshRateToken();
-        }
-        else
-        {
-            Msg("! Wrong video mode [%s]", args);
-            return;
-        }
-    }
-    void GetStatus(TStatus& S) override { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
-    const xr_token* GetToken() noexcept override { return VidModesToken.data(); }
-    virtual void Info(TInfo& I) { xr_strcpy(I, sizeof(I), "change screen resolution WxH"); }
-    virtual void fill_tips(vecTips& tips, u32 mode)
-    {
-        TStatus str, cur;
-        GetStatus(cur);
-
-        bool res = false;
-        const xr_token* tok = GetToken();
-        while (tok->name && !res)
-        {
-            if (!xr_strcmp(tok->name, cur))
-            {
-                xr_sprintf(str, sizeof(str), "%s (current)", tok->name);
-                tips.push_back(str);
-                res = true;
-            }
-            tok++;
-        }
-        if (!res)
-        {
-            tips.push_back("--- (current)");
-        }
-        tok = GetToken();
-        while (tok->name)
-        {
-            tips.push_back(tok->name);
-            tok++;
-        }
-    }
-};
-//-----------------------------------------------------------------------
-class CCC_VidMonitor : public CCC_Token
-{
-public:
-    CCC_VidMonitor(pcstr name) : CCC_Token(name, &Vid_SelectedMonitor, nullptr)
+    CCC_VidMode(pcstr name) : CCC_Token(name, &_dummy, nullptr)
     {
         bEmptyArgsHandled = false;
     }
 
     void Execute(pcstr args) override
     {
-        CCC_Token::Execute(args);
-        FillVidModesToken(Vid_SelectedMonitor);
+        u32 w, h;
+        const int cnt = sscanf(args, "%dx%d", &w, &h);
+        if (cnt == 2)
+        {
+            psCurrentVidMode[0] = w;
+            psCurrentVidMode[1] = h;
+        }
+        else
+        {
+            Msg("! Wrong video mode [%s]", args);
+        }
     }
 
-    const xr_token* GetToken() noexcept override { return VidMonitorsToken.data(); }
+    const xr_token* GetToken() noexcept override
+    {
+        return g_monitors.GetTokensForCurrentMonitor().data();
+    }
+
+    void GetStatus(TStatus& S) override
+    {
+        xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
+    }
+
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, sizeof(I), "change screen resolution WxH");
+    }
+
+    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    {
+        g_monitors.FillResolutionsTips(tips);
+    }
 };
 //-----------------------------------------------------------------------
-class CCC_VidRefresh : public CCC_Token
+class CCC_VidMonitor : public IConsole_Command
 {
 public:
-    CCC_VidRefresh(pcstr name) : CCC_Token(name, &Vid_SelectedRefreshRate, nullptr) { bEmptyArgsHandled = false; }
-    const xr_token* GetToken() noexcept override { return VidRefreshRateToken.data(); }
+    CCC_VidMonitor(pcstr name) : IConsole_Command(name)
+    {
+        bEmptyArgsHandled = false;
+    }
+
+    void Execute(pcstr args) override
+    {
+        int id;
+        sscanf(args, "%d. *", &id);
+        Vid_SelectedMonitor = id;
+    }
+
+    void GetStatus(TStatus& S) override
+    {
+        const u32 id = Vid_SelectedMonitor; // readability
+        xr_sprintf(S, sizeof(S), "%d. %s", id, SDL_GetDisplayName(id));
+    }
+
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, sizeof(I), "change monitor");
+    }
+
+    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    {
+        g_monitors.FillMonitorsTips(tips);
+    }
+};
+//-----------------------------------------------------------------------
+class CCC_VidRefresh : public IConsole_Command
+{
+public:
+    CCC_VidRefresh(pcstr name) : IConsole_Command(name)
+    {
+        bEmptyArgsHandled = false;
+    }
+
+    void Execute(pcstr args) override
+    {
+        Vid_SelectedRefreshRate = std::atoi(args);
+    }
+
+    void GetStatus(TStatus& S) override
+    {
+        xr_sprintf(S, sizeof(S), "%d", Vid_SelectedRefreshRate);
+    }
+
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, sizeof(I), "change screen refresh rate");
+    }
+
+    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    {
+        g_monitors.FillRatesTips(tips);
+    }
 };
 //-----------------------------------------------------------------------
 class CCC_SND_Restart : public IConsole_Command

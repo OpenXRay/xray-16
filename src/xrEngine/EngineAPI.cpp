@@ -9,7 +9,6 @@
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/xr_token.h"
 
-extern void FillMonitorsToken();
 extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr check_function = "CheckRendererSupport";
@@ -134,8 +133,6 @@ void CEngineAPI::InitializeRenderers()
 
     if (GEnv.CurrentRenderer != 1)
         renderers[r1_library]->close();*/
-
-    FillMonitorsToken();
 }
 
 void CEngineAPI::Initialize(void)

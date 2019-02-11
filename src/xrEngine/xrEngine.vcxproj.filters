@@ -576,6 +576,9 @@
     <ClInclude Include="StringTable\IStringTableDefs.h">
       <Filter>Game API\StringTable</Filter>
     </ClInclude>
+    <ClInclude Include="MonitorManager.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -898,6 +901,9 @@
     </ClCompile>
     <ClCompile Include="StringTable\IStringTable.cpp">
       <Filter>Game API\StringTable</Filter>
+    </ClCompile>
+    <ClCompile Include="MonitorManager.cpp">
+      <Filter>Interfaces</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
