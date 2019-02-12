@@ -585,6 +585,17 @@ void CLevel::IR_OnKeyboardHold(int key)
 }
 
 void CLevel::IR_OnMouseStop(int /**axis/**/, int /**value/**/) {}
+
+void CLevel::IR_OnControllerPress(int btn) 
+{ 
+    IR_OnKeyboardPress(ControllerButtonToKey[btn]); 
+}
+
+void CLevel::IR_OnControllerRelease(int btn)
+{
+    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
+}
+
 void CLevel::IR_OnActivate()
 {
     if (!pInput)

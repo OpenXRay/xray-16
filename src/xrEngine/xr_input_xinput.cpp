@@ -138,11 +138,11 @@ _action actions[] = {
 
 _keyboard keyboards[] =
 {
-    { "mouse1",                 MOUSE_1,                         "Mouse 1" },
-    { "mouse2",                 MOUSE_2,                         "Mouse 2" },
-    { "mouse3",                 MOUSE_3,                         "Mouse 3" },
-    { "mouse4",                 MOUSE_4,                         "Mouse 4" },
-    { "mouse5",                 MOUSE_5,                         "Mouse 5" },
+    { "mouse1",                 MOUSE_1,                         "LMB" },
+    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake cause init algorithm was changed.
+    { "mouse2",                 MOUSE_2,                         "RMB" },
+    { "mouse4",                 MOUSE_4,                         "Mouse X1" },
+    { "mouse5",                 MOUSE_5,                         "Mouse X2" },
 
     { "ckA",                    XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
     { "ckB",                    XR_CONTROLLER_BUTTON_B,             "Gamepad B" },

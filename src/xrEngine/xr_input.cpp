@@ -3,9 +3,7 @@
 
 #include "xr_input.h"
 #include "IInputReceiver.h"
-#include "Include/editor/ide.hpp"
 #include "GameFont.h"
-#include "PerformanceAlert.hpp"
 #include "xrCore/Text/StringConversion.hpp"
 #include "xrCore/xr_token.h"
 
@@ -22,6 +20,7 @@ ENGINE_API Flags32 psMouseInvert = {FALSE};
 // Max events per frame
 constexpr size_t MAX_KEYBOARD_EVENTS = 64;
 constexpr size_t MAX_MOUSE_EVENTS = 256;
+constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
 float stop_vibration_time = flt_max;
 
@@ -62,6 +61,8 @@ bool CInput::InitJoystick()
             JoysticksToken.emplace_back(nullptr, -1);
             return false;
         }
+
+        availableJoystick = true;
     }
     else
     {
@@ -94,6 +95,8 @@ void CInput::InitGameController()
                 return;
             }
         }
+
+        availableController = true;
     }
     else
     {
@@ -104,7 +107,7 @@ void CInput::InitGameController()
 
 void CInput::DisplayDevicesList()
 {
-    if (!controllers.empty())
+    if (availableController && !controllers.empty())
     {
         Msg("Available game controllers[%d]:", controllers.size());
 
@@ -140,7 +143,7 @@ void CInput::DisplayDevicesList()
     JoysticksToken.emplace_back(nullptr, -1);
 }
 
-CInput::CInput(const bool exclusive)
+CInput::CInput(const bool exclusive): availableJoystick(false), availableController(false)
 {
     exclusiveInput = exclusive;
 
@@ -156,6 +159,7 @@ CInput::CInput(const bool exclusive)
 
     mouseState.reset();
     keyboardState.reset();
+    controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 
@@ -227,13 +231,13 @@ void CInput::MouseUpdate()
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
             break;
-        case SDL_MOUSEBUTTONUP:
-            mouseState[event.button.button - 1] = false;
-            cbStack.back()->IR_OnMouseRelease(event.button.button - 1);
-            break;
         case SDL_MOUSEBUTTONDOWN:
             mouseState[event.button.button - 1] = true;
             cbStack.back()->IR_OnMousePress(event.button.button - 1);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            mouseState[event.button.button - 1] = false;
+            cbStack.back()->IR_OnMouseRelease(event.button.button - 1);
             break;
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
@@ -298,42 +302,90 @@ void CInput::KeyUpdate()
             cbStack.back()->IR_OnKeyboardHold(i);
 }
 
-pcstr KeyToMouseButtonName(const int dik)
+void CInput::GameControllerUpdate()
 {
-    switch (dik)
+    SDL_PumpEvents();
+
+    const auto controllerPrev = controllerState;
+
+    SDL_Event events[MAX_CONTROLLER_EVENTS];
+    const auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
+        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERDEVICEREMAPPED);
+
+    for (int i = 0; i < count; ++i)
     {
-    case MOUSE_1: return "Left mouse";
-    case MOUSE_2: return "Right mouse";
-    case MOUSE_3: return "Center mouse";
-    case MOUSE_4: return "Fourth mouse";
-    case MOUSE_5: return "Fifth mouse";
-    default: return "Unknown mouse";
+        const SDL_Event event = events[i];
+
+        switch (event.type)
+        {
+        case SDL_CONTROLLERAXISMOTION:
+            Log("Controller do axis motion");
+            
+            break;
+        case SDL_CONTROLLERBUTTONDOWN:
+            controllerState[event.cbutton.button] = true;
+            cbStack.back()->IR_OnControllerPress(event.cbutton.button);
+            break;
+        case SDL_CONTROLLERBUTTONUP:
+            controllerState[event.cbutton.button] = false;
+            cbStack.back()->IR_OnControllerRelease(event.cbutton.button);
+            break;
+        case SDL_CONTROLLERDEVICEADDED:
+        case SDL_CONTROLLERDEVICEREMOVED:
+        case SDL_CONTROLLERDEVICEREMAPPED:
+            break;
+        }
     }
+
+    for (int i = 0; i < COUNT_CONTROLLER_BUTTONS; ++i)
+        if (controllerState[i] && controllerPrev[i])
+            cbStack.back()->IR_OnKeyboardHold(ControllerButtonToKey[i]);
 }
 
-bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
+bool KbdKeyToButtonName(const int dik, xr_string& name)
 {
-    xr_string keyname;
     static std::locale locale("");
 
-    if (dik < SDL_NUM_SCANCODES)
-        keyname = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)), locale);
-    else
-        keyname = KeyToMouseButtonName(dik);
-
-    if (keyname.empty())
+    if (dik >= 0)
     {
-        if (dik == SDL_SCANCODE_UNKNOWN)
-            keyname = "Unknown";
-        else
-            return false;
+        name = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)), locale);
+        return true;
     }
 
-    xr_strcpy(dest_str, dest_sz, keyname.c_str());
-    return true;
+    return false;
 }
 
-bool CInput::iGetAsyncKeyState(int dik)
+bool OtherDevicesKeyToButtonName(const int btn, xr_string& name)
+{
+    int idx = btn - MOUSE_1;
+
+    if (idx >= 0)
+    {
+        name = keyboards[idx].key_local_name;
+        return true;
+    }
+
+    return false;
+}
+
+bool CInput::get_dik_name(const int dik, LPSTR dest_str, int dest_sz)
+{
+    xr_string keyname;
+    bool result;
+
+    if (dik < SDL_NUM_SCANCODES)
+        result = KbdKeyToButtonName(dik, keyname);
+    else
+        result = OtherDevicesKeyToButtonName(dik, keyname);
+
+    if (keyname.empty())
+        return false;
+
+    xr_strcpy(dest_str, dest_sz, keyname.c_str());
+    return result;
+}
+
+bool CInput::iGetAsyncKeyState(const int dik)
 {
     if (dik < COUNT_KB_BUTTONS)
         return keyboardState[dik];
@@ -344,13 +396,24 @@ bool CInput::iGetAsyncKeyState(int dik)
         return iGetAsyncBtnState(mk);
     }
 
+    if (dik >= XR_CONTROLLER_BUTTON_A && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        const int mk = dik - XR_CONTROLLER_BUTTON_A;
+        return iGetAsyncGcBtnState(mk);
+    }
+
     // unknown key ???
     return false;
 }
 
-bool CInput::iGetAsyncBtnState(int btn)
+bool CInput::iGetAsyncBtnState(const int btn)
 {
     return mouseState[btn];
+}
+
+bool CInput::iGetAsyncGcBtnState(const int btn)
+{
+    return controllerState[btn];
 }
 
 void CInput::GrabInput(const bool grab)
@@ -420,6 +483,7 @@ void CInput::OnAppActivate(void)
 
     mouseState.reset();
     keyboardState.reset();
+    controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
@@ -431,6 +495,7 @@ void CInput::OnAppDeactivate(void)
 
     mouseState.reset();
     keyboardState.reset();
+    controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
@@ -445,10 +510,13 @@ void CInput::OnFrame(void)
     {
         KeyUpdate();
         MouseUpdate();
+
+        if (availableController)
+            GameControllerUpdate();
     }
     else
     {
-        SDL_FlushEvents(SDL_KEYDOWN, SDL_MOUSEWHEEL);
+        SDL_FlushEvents(SDL_KEYDOWN, SDL_CONTROLLERDEVICEREMAPPED);
     }
 
     stats.FrameTime.End();
@@ -459,6 +527,7 @@ IInputReceiver* CInput::CurrentIR()
 {
     if (cbStack.size())
         return cbStack.back();
+
     return nullptr;
 }
 
@@ -475,12 +544,12 @@ void CInput::ExclusiveMode(const bool exclusive)
     GrabInput(true);
 }
 
-bool CInput::IsExclusiveMode() const { return exclusiveInput; }
+bool CInput::IsExclusiveMode() const 
+{
+    return exclusiveInput;
+}
 
 void CInput::feedback(u16 s1, u16 s2, float time)
 {
     stop_vibration_time = RDEVICE.fTimeGlobal + time;
-#ifndef _EDITOR
-//. set_vibration (s1, s2);
-#endif
 }
