@@ -435,7 +435,7 @@ public:
     {
         u32 id = 0;
 
-        if(1 == sscanf(args, "%u. *", &id))
+        if (1 == sscanf(args, "%u. *", &id))
             Vid_SelectedMonitor = id;
     }
 
