@@ -49,6 +49,7 @@ void RunBenchmark(pcstr name);
 
 ENGINE_API void InitEngine()
 {
+    Log("Initializing Engine...");
     Engine.Initialize();
 }
 

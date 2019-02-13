@@ -36,7 +36,6 @@ void CRenderDevice::initialize_weather_editor()
 
 void CRenderDevice::Initialize()
 {
-    Log("Initializing Engine...");
     TimerGlobal.Start();
     TimerMM.Start();
 
