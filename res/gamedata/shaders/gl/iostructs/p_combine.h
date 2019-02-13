@@ -1,7 +1,9 @@
 
 out vec4 SV_Target0;
 out vec4 SV_Target1;
+#ifdef GBUFFER_OPTIMIZATION
 in vec4 gl_FragCoord;
+#endif // GBUFFER_OPTIMIZATION
 #ifdef MSAA_OPTIMIZATION
 in int gl_SampleID;
 #endif
@@ -14,7 +16,9 @@ struct	_input
 	float2	tc0	; // TEXCOORD0;	// tc.xy
 #endif // USE_VTF
 	float2	tcJ	; // TEXCOORD1;	// jitter coords
+#ifdef GBUFFER_OPTIMIZATION
 	float4	pos2d	; // SV_Position;
+#endif // GBUFFER_OPTIMIZATION
 };
 
 struct	_out
@@ -41,7 +45,9 @@ void main()
 	_input		I;
 	I.tc0 		= p_combine_tc0;
 	I.tcJ 		= p_combine_tcJ;
+#ifdef GBUFFER_OPTIMIZATION
 	I.pos2d		= gl_FragCoord;
+#endif // GBUFFER_OPTIMIZATION
 
 #ifndef MSAA_OPTIMIZATION
 	_out O		= _main ( I );
