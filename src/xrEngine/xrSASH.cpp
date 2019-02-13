@@ -452,6 +452,7 @@ void xrSASH::TryInitEngine(bool bNoRun)
     if (m_bReinitEngine)
     {
         InitEngine();
+        Device.Initialize();
         // It was destroyed on previous exit
         Console->Initialize();
     }
@@ -514,6 +515,7 @@ void xrSASH::ReleaseEngine()
     destroyInput();
     Console->Destroy();
     destroySound();
+    Device.Destroy();
     destroyEngine();
 }
 

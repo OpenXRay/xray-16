@@ -50,7 +50,6 @@ void RunBenchmark(pcstr name);
 ENGINE_API void InitEngine()
 {
     Engine.Initialize();
-    Device.Initialize();
 }
 
 namespace
@@ -148,7 +147,6 @@ ENGINE_API void destroyConsole()
 
 ENGINE_API void destroyEngine()
 {
-    Device.Destroy();
     Engine.Destroy();
 #if defined(LINUX)
     lockfile_remove("/var/lock/stalker-cop.lock");
@@ -229,6 +227,7 @@ ENGINE_API void Startup()
     else
         Console->Destroy();
 #endif
+    Device.Destroy();
     destroyEngine();
     destroySound();
 }
@@ -298,6 +297,7 @@ ENGINE_API int RunApplication()
     else
         Console->Execute("renderer renderer_r1");
 
+    Device.Initialize();
     Engine.External.Initialize();
     Startup();
     // check for need to execute something external
