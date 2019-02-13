@@ -122,10 +122,10 @@ ENGINE_API void InitInput()
     pInput = new CInput(captureInput);
 }
 
-ENGINE_API void destroyInput() { xr_delete(pInput); }
+ENGINE_API void DestroyInput() { xr_delete(pInput); }
 ENGINE_API void InitSound() { ISoundManager::_create(); }
-ENGINE_API void destroySound() { ISoundManager::_destroy(); }
-ENGINE_API void destroySettings()
+ENGINE_API void DestroySound() { ISoundManager::_destroy(); }
+ENGINE_API void DestroySettings()
 {
     auto s = const_cast<CInifile**>(&pSettings);
     xr_delete(*s);
@@ -139,14 +139,14 @@ ENGINE_API void destroySettings()
     xr_delete(pGameIni);
 }
 
-ENGINE_API void destroyConsole()
+ENGINE_API void DestroyConsole()
 {
     Console->Execute("cfg_save");
     Console->Destroy();
     xr_delete(Console);
 }
 
-ENGINE_API void destroyEngine()
+ENGINE_API void DestroyEngine()
 {
     Engine.Destroy();
 #if defined(LINUX)
@@ -214,23 +214,23 @@ ENGINE_API void Startup()
     xr_delete(pApp);
     Engine.Event.Dump();
     // Destroying
-    destroyInput();
+    DestroyInput();
 #if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
-        destroySettings();
+        DestroySettings();
     LALib.OnDestroy();
 #if !defined(LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
-        destroyConsole();
+        DestroyConsole();
 #if !defined(LINUX)
     else
         Console->Destroy();
 #endif
     Device.Destroy();
-    destroyEngine();
-    destroySound();
+    DestroyEngine();
+    DestroySound();
 }
 
 ENGINE_API int RunApplication()

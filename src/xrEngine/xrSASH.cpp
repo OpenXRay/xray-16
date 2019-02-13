@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "main.h"
 #include "xrSASH.h"
 
 #include "XR_IOConsole.h"
@@ -256,13 +257,6 @@ void xrSASH::EndBenchmark()
     oaEndBenchmark();
 }
 
-void InitInput();
-void destroyInput();
-void InitEngine();
-void InitSound();
-void destroySound();
-void destroyEngine();
-
 void xrSASH::GetAllOptions()
 {
     Msg("SASH:: GetAllOptions.");
@@ -512,11 +506,11 @@ void xrSASH::ReleaseEngine()
 {
     m_bReinitEngine = true;
 
-    destroyInput();
+    DestroyInput();
     Console->Destroy();
-    destroySound();
+    DestroySound();
     Device.Destroy();
-    destroyEngine();
+    DestroyEngine();
 }
 
 oaOptionDataType xrSASH::GetOptionType(pcstr pszOptionName)
