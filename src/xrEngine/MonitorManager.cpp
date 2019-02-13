@@ -27,8 +27,15 @@ MonitorsManager::ResolutionPair MonitorsManager::GetMinimalResolution()
 MonitorsManager::ResolutionPair MonitorsManager::GetMaximalResolution()
 {
     const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
-    const auto it = resolutions.crbegin();
-    return it->first;
+    if(!resolutions.empty())
+    {
+        const auto it = resolutions.crbegin();
+        return it->first;
+    }
+    else
+    {
+        return ResolutionPair(640,480);
+    }
 }
 
 

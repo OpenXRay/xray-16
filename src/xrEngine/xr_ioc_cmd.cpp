@@ -433,9 +433,10 @@ public:
 
     void Execute(pcstr args) override
     {
-        int id;
-        sscanf(args, "%d. *", &id);
-        Vid_SelectedMonitor = id;
+        u32 id = 0;
+
+        if(1 == sscanf(args, "%u. *", &id))
+            Vid_SelectedMonitor = id;
     }
 
     void GetStatus(TStatus& S) override
