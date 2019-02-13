@@ -246,6 +246,18 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.set_Textures(&mixRen.sky_r_textures);
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
+#ifdef USE_OGL
+	// Sun must be rendered to generic0 only as it is done in DX
+	if (!RImplementation.o.dx10_msaa)
+	{
+		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, HW.pBaseZB);
+	}
+	else
+	{
+		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+	}
+#endif // USE_OGL
+
     // Sun
     GEnv.Render->rmNormal();
 #if RENDER != R_R1
@@ -258,9 +270,21 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.set_Z(TRUE);
     env.eff_LensFlare->Render(TRUE, FALSE, FALSE);
     RCache.set_Z(FALSE);
-#else
+#else // RENDER != R_R1
     env.eff_LensFlare->Render(TRUE, FALSE, FALSE);
-#endif
+#endif // RENDER != R_R1
+
+#ifdef USE_OGL
+    // set low/hi RTs for clouds
+    if (!RImplementation.o.dx10_msaa)
+    {
+		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, HW.pBaseZB);
+    }
+    else
+    {
+		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+    }
+#endif // USE_OGL
 }
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
