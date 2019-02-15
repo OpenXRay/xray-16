@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "string_concatenations.h"
 
-#if defined(LINUX)
+#if defined(LINUX) || defined(FREEBSD)
 int _cdecl _resetstkoflw(void)
 {
     int stack_addr;

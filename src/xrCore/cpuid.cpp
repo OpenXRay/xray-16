@@ -23,9 +23,9 @@ void nativeCpuId(int regs[4], int i)
 {
 #ifdef WINDOWS
     __cpuid((int *)regs, (int)i);
-#elif defined(LINUX) && defined(GCC)
+#elif (defined(LINUX) || defined(FREEBSD)) && defined(GCC)
     __cpuid((int)i, (int *)regs);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     asm volatile("cpuid" :
     "=eax" (regs[0]),
     "=ebx" (regs[1]),
@@ -159,7 +159,7 @@ unsigned int query_processor_info(processor_info* pinfo)
 #ifdef WINDOWS
     ULONG_PTR pa_mask_save, sa_mask_stub = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     unsigned int pa_mask_save = 0;
     cpu_set_t my_set;
     CPU_ZERO(&my_set);
@@ -200,7 +200,7 @@ unsigned int query_processor_info(processor_info* pinfo)
         byteOffset += sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
         ptr++;
     }
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     int logicalProcessorCount = std::thread::hardware_concurrency();
 
     //not sure about processorCoreCount - is it really cores or threads

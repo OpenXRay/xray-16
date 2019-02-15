@@ -111,7 +111,7 @@ static int open_internal(pcstr fn, int& handle)
 {
 #if defined(WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     pstr conv_fn = xr_strdup(fn);
     convert_path_separators(conv_fn);
     handle = open(conv_fn, _O_RDONLY);
