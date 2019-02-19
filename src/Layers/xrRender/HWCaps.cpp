@@ -234,7 +234,10 @@ void CHWCaps::Update()
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(6, 15);
 #ifdef USE_OGL
-    geometry.bVTF = !strstr(Core.Params, "-no_vtf");
+    // XXX: Disabled by default. Need to:
+    // FIX: Sky texture filtering (point filter now) when VTF is on
+    // TODO: Implement support VTF and: HW.support(D3DFMT_R32F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_VERTEXTEXTURE)
+    geometry.bVTF = (strstr(Core.Params, "-vtf")) ? TRUE : FALSE;
 #else // USE_OGL
     geometry.bVTF = TRUE;
 #endif // USE_OGL
