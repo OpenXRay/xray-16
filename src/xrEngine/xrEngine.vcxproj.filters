@@ -235,6 +235,9 @@
     <Filter Include="Game API\StringTable">
       <UniqueIdentifier>{948b4643-0f42-4027-ac44-dbe3702887f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces\MonitorManager">
+      <UniqueIdentifier>{fa21495d-605e-438d-8058-79e6ff670abe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -577,7 +580,7 @@
       <Filter>Game API\StringTable</Filter>
     </ClInclude>
     <ClInclude Include="MonitorManager.hpp">
-      <Filter>Interfaces</Filter>
+      <Filter>Interfaces\MonitorManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -903,7 +906,7 @@
       <Filter>Game API\StringTable</Filter>
     </ClCompile>
     <ClCompile Include="MonitorManager.cpp">
-      <Filter>Interfaces</Filter>
+      <Filter>Interfaces\MonitorManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
