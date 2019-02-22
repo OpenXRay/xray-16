@@ -161,6 +161,36 @@ void execUserScript()
     Console->ExecuteScript(Console->ConfigFile);
 }
 
+void CheckAndSetupRenderer()
+{
+    if (GEnv.isDedicatedServer)
+    {
+        Console->Execute("renderer renderer_r1");
+        return;
+    }
+
+    if (strstr(Core.Params, "-gl"))
+        Console->Execute("renderer renderer_gl");
+    else if (strstr(Core.Params, "-r4"))
+        Console->Execute("renderer renderer_r4");
+    else if (strstr(Core.Params, "-r3"))
+        Console->Execute("renderer renderer_r3");
+    else if (strstr(Core.Params, "-r2.5"))
+        Console->Execute("renderer renderer_r2.5");
+    else if (strstr(Core.Params, "-r2a"))
+        Console->Execute("renderer renderer_r2a");
+    else if (strstr(Core.Params, "-r2"))
+        Console->Execute("renderer renderer_r2");
+    else if (strstr(Core.Params, "-r1"))
+        Console->Execute("renderer renderer_r1");
+    else
+    {
+        CCC_LoadCFG_custom cmd("renderer ");
+        cmd.Execute(Console->ConfigFile);
+        renderer_allow_override = true;
+    }
+}
+
 void slowdownthread(void*)
 {
     for (;;)
@@ -262,41 +292,18 @@ ENGINE_API int RunApplication()
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
 
-    Engine.External.CreateRendererList();
-
     FPU::m24r();
-    InitEngine();
+
     InitInput();
     InitConsole();
 
+    Engine.External.CreateRendererList();
+    CheckAndSetupRenderer();
+
+    InitEngine();
+
     if (CheckBenchmark())
         return 0;
-
-    if (!GEnv.isDedicatedServer)
-    {
-        if (strstr(Core.Params, "-gl"))
-            Console->Execute("renderer renderer_gl");
-        else if (strstr(Core.Params, "-r4"))
-            Console->Execute("renderer renderer_r4");
-        else if (strstr(Core.Params, "-r3"))
-            Console->Execute("renderer renderer_r3");
-        else if (strstr(Core.Params, "-r2.5"))
-            Console->Execute("renderer renderer_r2.5");
-        else if (strstr(Core.Params, "-r2a"))
-            Console->Execute("renderer renderer_r2a");
-        else if (strstr(Core.Params, "-r2"))
-            Console->Execute("renderer renderer_r2");
-        else if (strstr(Core.Params, "-r1"))
-            Console->Execute("renderer renderer_r1");
-        else
-        {
-            CCC_LoadCFG_custom cmd("renderer ");
-            cmd.Execute(Console->ConfigFile);
-            renderer_allow_override = true;
-        }
-    }
-    else
-        Console->Execute("renderer renderer_r1");
 
     Engine.External.Initialize();
     Startup();
