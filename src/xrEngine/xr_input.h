@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDL.h"
+#include <bitset>
 
 // Mouse2 is a middle button in SDL,
 // but in X-Ray this is a right button
@@ -109,8 +110,8 @@ private:
 
     int offs[COUNT_MOUSE_AXIS];
 
-    bool mouseState[COUNT_MOUSE_BUTTONS];
-    bool keyboardState[COUNT_KB_BUTTONS];
+    std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
+    std::bitset<COUNT_KB_BUTTONS> keyboardState;
 
     xr_vector<IInputReceiver*> cbStack;
 

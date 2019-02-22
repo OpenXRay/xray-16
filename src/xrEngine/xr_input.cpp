@@ -15,6 +15,10 @@ ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
 ENGINE_API Flags32 psMouseInvert = {FALSE};
 
+// Max events per frame
+constexpr size_t MAX_KEYBOARD_EVENTS = 64;
+constexpr size_t MAX_MOUSE_EVENTS = 256;
+
 float stop_vibration_time = flt_max;
 
 static void on_error_dialog(bool before)
@@ -36,8 +40,8 @@ CInput::CInput(const bool exclusive)
 
     MouseDelta = 25;
 
-    ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(keyboardState, sizeof(keyboardState));
+    mouseState.reset();
+    keyboardState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 
@@ -70,19 +74,18 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 void CInput::MouseUpdate()
 {
-    SDL_PumpEvents();
-
-    bool mouse_prev[COUNT_MOUSE_BUTTONS];
-
-    for (int i = 0; i < MOUSE_COUNT; ++i)
-        mouse_prev[i] = mouseState[i];
+    const auto mousePrev = mouseState;
 
     bool mouseMoved = false;
     offs[0] = offs[1] = offs[2] = 0;
 
-    SDL_Event event;
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL))
+    SDL_Event events[MAX_MOUSE_EVENTS];
+    const auto count = SDL_PeepEvents(events, MAX_MOUSE_EVENTS, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+
+    for (int i = 0; i < count; ++i)
     {
+        const SDL_Event event = events[i];
+
         switch (event.type)
         {
         case SDL_MOUSEMOTION:
@@ -111,7 +114,7 @@ void CInput::MouseUpdate()
     }
 
     for (int i = 0; i < MOUSE_COUNT; ++i)
-        if (mouseState[i] && mouse_prev[i])
+        if (mouseState[i] && mousePrev[i])
             cbStack.back()->IR_OnMouseHold(i);
 
     if (mouseMoved)
@@ -132,11 +135,13 @@ void CInput::MouseUpdate()
 
 void CInput::KeyUpdate()
 {
-    SDL_PumpEvents();
+    SDL_Event events[MAX_KEYBOARD_EVENTS];
+    const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYUP);
 
-    SDL_Event event;
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYUP))
+    for (int i = 0; i < count; ++i)
     {
+        const SDL_Event event = events[i];
+
         switch (event.type)
         {
         case SDL_KEYDOWN:
@@ -277,8 +282,8 @@ void CInput::OnAppActivate(void)
     if (CurrentIR())
         CurrentIR()->IR_OnActivate();
 
-    ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(keyboardState, sizeof(keyboardState));
+    mouseState.reset();
+    keyboardState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
@@ -288,8 +293,8 @@ void CInput::OnAppDeactivate(void)
     if (CurrentIR())
         CurrentIR()->IR_OnDeactivate();
 
-    ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(keyboardState, sizeof(keyboardState));
+    mouseState.reset();
+    keyboardState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
