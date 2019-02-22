@@ -72,7 +72,7 @@ void MonitorsManager::FillMonitorsTips(IConsole_Command::vecTips& tips)
     const auto pushString = [&](pcstr fmt, u32 id)
     {
         string64 buf;
-        xr_sprintf(buf, sizeof(buf), fmt, id, SDL_GetDisplayName(id));
+        xr_sprintf(buf, sizeof(buf), fmt, id + 1, SDL_GetDisplayName(id));
         tips.push_back(buf);
     };
 
@@ -148,8 +148,6 @@ void MonitorsManager::FillResolutionsModes(const int monitorID, ResolutionsMap& 
         const int result = SDL_GetDisplayMode(monitorID, i, &mode);
         R_ASSERT3(result == 0, "Failed to find specified display mode", SDL_GetError());
 
-        string64 buf;
-        xr_sprintf(buf, sizeof(buf), "%dx%d", mode.w, mode.h);
         map[{mode.w, mode.h}].push_back(mode.refresh_rate);
     }
 }

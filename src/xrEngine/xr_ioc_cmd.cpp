@@ -433,15 +433,18 @@ public:
 
     void Execute(pcstr args) override
     {
-        int id;
-        sscanf(args, "%d. *", &id);
-        Vid_SelectedMonitor = id;
+        u32 id = 0;
+
+        if (1 == sscanf(args, "%u. *", &id))
+            Vid_SelectedMonitor = id - 1;
+        else
+            InvalidSyntax();
     }
 
     void GetStatus(TStatus& S) override
     {
         const u32 id = Vid_SelectedMonitor; // readability
-        xr_sprintf(S, sizeof(S), "%d. %s", id, SDL_GetDisplayName(id));
+        xr_sprintf(S, sizeof(S), "%d. %s", id + 1, SDL_GetDisplayName(id));
     }
 
     void Info(TInfo& I) override
