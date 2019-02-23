@@ -39,6 +39,8 @@ ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 ENGINE_API BOOL g_bRendering = FALSE;
 
+constexpr size_t MAX_WINDOW_EVENTS = 32;
+
 extern int ps_always_active;
 
 BOOL g_bLoaded = FALSE;
@@ -341,15 +343,16 @@ void CRenderDevice::message_loop()
         return;
     }
 
-    SDL_Event event;
-
-    SDL_PumpEvents();
-    SDL_PeepEvents(&event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT);
-
-    while (SDL_QUIT != event.type)
+    while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
-        if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_SYSWMEVENT))
+        SDL_Event events[MAX_WINDOW_EVENTS];
+        const auto count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+
+        for (int i = 0; i < count; ++i)
         {
+            const SDL_Event event = events[i];
+
             switch (event.type)
             {
             case SDL_WINDOWEVENT:
@@ -401,14 +404,14 @@ void CRenderDevice::message_loop()
                     break;
 
                 case SDL_WINDOWEVENT_CLOSE:
-                    event.type = SDL_QUIT;
+                    SDL_Event quit = { SDL_QUIT };
+                    SDL_PushEvent(&quit);
                 }
             }
             }
         }
 
         on_idle();
-        SDL_PumpEvents();
     }
 }
 
