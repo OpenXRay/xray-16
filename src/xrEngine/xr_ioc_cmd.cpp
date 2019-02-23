@@ -435,10 +435,13 @@ public:
     {
         u32 id = 0;
 
-        if (1 == sscanf(args, "%u. *", &id))
-            Vid_SelectedMonitor = id - 1;
-        else
+        const auto result = sscanf(args, "%u*", &id);
+        const auto count = g_monitors.GetMonitorsCount();
+
+        if (result != 1 || id < 1 || id > count)
             InvalidSyntax();
+        else
+            Vid_SelectedMonitor = id - 1;
     }
 
     void GetStatus(TStatus& S) override
@@ -468,7 +471,28 @@ public:
 
     void Execute(pcstr args) override
     {
-        Vid_SelectedRefreshRate = std::atoi(args);
+        if (!g_monitors.SelectedResolutionIsSafe())
+        {
+            Log("~ It's unsafe to set refresh rate for your resolution");
+            return;
+        }
+
+        auto rates = g_monitors.GetRefreshRates();
+
+        if (!rates)
+        {
+            Log("! No refresh rates for current resolution?!");
+            return;
+        }
+
+        u32 value = static_cast<u32>(std::atoi(args));
+
+        const auto it = std::find(rates->begin(), rates->end(), value);
+
+        if (it == rates->end())
+            InvalidSyntax();
+        else
+            Vid_SelectedRefreshRate = value;
     }
 
     void GetStatus(TStatus& S) override

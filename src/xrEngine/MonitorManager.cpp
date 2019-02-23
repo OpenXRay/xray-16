@@ -17,6 +17,24 @@ void MonitorsManager::Destroy()
     Monitors.clear();
 }
 
+u32 MonitorsManager::GetMonitorsCount()
+{
+    return Monitors.size();
+}
+
+MonitorsManager::RefreshRatesVec* MonitorsManager::GetRefreshRates()
+{
+    const ResolutionPair selected = { psCurrentVidMode[0], psCurrentVidMode[1] };
+
+    ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
+    const auto it = resolutions.find(selected);
+
+    if (it != resolutions.end())
+        return &it->second;
+
+    return nullptr;
+}
+
 MonitorsManager::ResolutionPair MonitorsManager::GetMinimalResolution()
 {
     const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];

@@ -27,6 +27,11 @@ public:
     void Initialize();
     void Destroy();
 
+    u32 GetMonitorsCount();
+
+    // For current resolution
+    RefreshRatesVec* GetRefreshRates(); 
+
     ResolutionPair GetMinimalResolution();
     ResolutionPair GetMaximalResolution();
 
