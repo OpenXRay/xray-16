@@ -16,18 +16,18 @@ static inline bool match_shader_id(
 /////////
 
 // TODO: OGL: make ignore commented includes
-static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<char*>& source, xr_vector<char*>& includes)
+static inline void load_includes(pcstr pSrcData, UINT SrcDataLen, xr_vector<pstr>& source, xr_vector<pstr>& includes)
 {
     // Copy source file data into a null-terminated buffer
-    char* srcData = xr_alloc<char>(SrcDataLen + 2);
-    memcpy(srcData, pSrcData, SrcDataLen);
+    pstr srcData = xr_alloc<char>(SrcDataLen + 2);
+    CopyMemory(srcData, pSrcData, SrcDataLen);
     srcData[SrcDataLen] = '\n';
     srcData[SrcDataLen + 1] = '\0';
     includes.push_back(srcData);
     source.push_back(srcData);
 
     string_path path;
-    char* str = srcData;
+    pstr str = srcData;
     while (strstr(str, "#include") != nullptr)
     {
         // Get filename of include directive
@@ -38,32 +38,34 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
         *str = '\0'; // Terminate filename path
 
         // Create path to included shader
-        strconcat(sizeof path, path, GEnv.Render->getShaderPath(), fn);
-        FS.update_path(path, "$game_shaders$", path);
-        while (char* sep = strchr(path, '/'))
+        strconcat(sizeof(path), path, GEnv.Render->getShaderPath(), fn);
+        FS.update_path(path, _game_shaders_, path);
+        while (pstr sep = strchr(path, '/'))
             *sep = '\\';
 
         // Open and read file, recursively load includes
         IReader* R = FS.r_open(path);
         R_ASSERT2(R, path);
-        load_includes((char*)R->pointer(), R->length(), source, includes);
+        load_includes((pstr)R->pointer(), R->length(), source, includes);
         FS.r_close(R);
 
         // Add next source, skip quotation
-        str++;
+        ++str;
         source.push_back(str);
     }
 }
 
 struct SHADER_MACRO
 {
-    char const *Define = "#define ", *Name = "\n", *Sep = "\t", *Definition = "\n", *EOL = "\n";
+    pcstr Name          = nullptr;
+    pcstr Definition    = nullptr;
+    pstr  FullDefine    = nullptr;
 };
 
 HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
 {
-    xr_vector<char*> source, includes;
+    xr_vector<pstr> source, includes;
     SHADER_MACRO defines[128];
     int def_it = 0;
     char c_smapsize[32];
@@ -78,7 +80,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     VERIFY(!Flags);
 
     // open included files
-    load_includes((LPCSTR)fs->pointer(), fs->length(), source, includes);
+    load_includes((pcstr)fs->pointer(), fs->length(), source, includes);
 
     char sh_name[MAX_PATH] = "";
     u32 len = 0;
@@ -576,24 +578,37 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     }
 
     // Compile sources list
-    size_t def_len = def_it * 5;
-    size_t sources_len = source.size() + def_len + 2;
+    const size_t head_lines = 2; // "#version" line + name_comment line
+    size_t sources_lines = source.size() + def_it + head_lines;
     string256 name_comment;
     xr_sprintf(name_comment, "// %s\n", name);
-    const char** sources = xr_alloc<const char*>(sources_len);
+    pcstr* sources = xr_alloc<pcstr>(sources_lines);
 #ifdef DEBUG
     sources[0] = "#version 410\n#pragma optimize (off)\n";
 #else
     sources[0] = "#version 410\n";
 #endif
     sources[1] = name_comment;
-    memcpy(sources + 2, defines, def_len * sizeof(char*));
-    memcpy(sources + def_len + 2, source.data(), source.size() * sizeof(char*));
+
+    // Make define lines
+    for (u32 i = 0; i < def_it; ++i)
+    {
+        R_ASSERT2(defines[i].Name && defines[i].Definition, name);
+
+        string256 define_line;
+        xr_sprintf(define_line, "#define %s\t%s\n", defines[i].Name, defines[i].Definition);
+        const size_t define_len = xr_strlen(define_line);
+        defines[i].FullDefine = xr_alloc<char>(define_len + 1);
+        CopyMemory(defines[i].FullDefine, define_line, define_len * sizeof(char));
+        defines[i].FullDefine[define_len] = '\0';
+        sources[head_lines + i] = defines[i].FullDefine;
+    }
+    CopyMemory(sources + head_lines + def_it, source.data(), source.size() * sizeof(pstr));
 
     // Compile the shader
     GLuint shader = *(GLuint*)result;
     R_ASSERT(shader);
-    CHK_GL(glShaderSource(shader, sources_len, sources, nullptr));
+    CHK_GL(glShaderSource(shader, sources_lines, sources, nullptr));
     CHK_GL(glCompileShader(shader));
 
     // Create the shader program
@@ -604,8 +619,10 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     *(GLuint*)result = program;
 
     // Free string resources
+    for (u32 i = 0; i < def_it; ++i)
+        xr_free(defines[i].FullDefine);
     xr_free(sources);
-    for (xr_vector<char*>::iterator it = includes.begin(); it != includes.end(); ++it)
+    for (auto it = includes.begin(); it != includes.end(); ++it)
         xr_free(*it);
 
     // Get the compilation result
