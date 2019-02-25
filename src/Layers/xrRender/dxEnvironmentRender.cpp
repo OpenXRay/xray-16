@@ -163,7 +163,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-#else
+#else // USE_OGL
     ID3DBaseTexture* e0 = mixRen.sky_r_textures[0].second->surface_get();
     ID3DBaseTexture* e1 = mixRen.sky_r_textures[1].second->surface_get();
 
@@ -242,8 +242,12 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.set_xform_world(mSky);
     RCache.set_Geometry(sh_2geom);
     RCache.set_Shader(sh_2sky);
-    //	RCache.set_Textures			(&env.CurrentEnv->sky_r_textures);
+#ifdef USE_OGL
+    if (HW.Caps.geometry.bVTF)
+        RCache.set_Textures(&mixRen.sky_r_textures);
+#else // USE_OGL
     RCache.set_Textures(&mixRen.sky_r_textures);
+#endif // USE_OGL
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
 #ifdef USE_OGL
