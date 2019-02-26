@@ -75,6 +75,8 @@ For example if you have a cd-rom you can type `wine setup.exe` to start installa
 It's recommended do not use path with spaces, for instance you can use "c:\cop" as 
 an installation path (it will be `~/.wine/drive_c/cop` path on your host linux machine).
 
+IF YOU HAVE GOG VERSION, RENAME ALL FOLDER IN GAME TO LOWER CASE!!!
+
 After building in the engine folder do (assuming you installed CoP in "c:\cop"):
 ```
 mkdir ~/.wine/drive_c/cop/bin-linux-dbg # here will be installed binaries with dbg symbols
