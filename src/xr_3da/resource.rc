@@ -35,7 +35,7 @@ IDI_ICON1               ICON                    "stalker_cs.ico"
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
+IDB_BITMAP1             BITMAP                  "splash_xrcs_ru.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -125,6 +125,9 @@ END
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
+
+IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

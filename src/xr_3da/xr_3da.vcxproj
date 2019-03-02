@@ -125,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="splash_xrcs_en.bmp" />
+    <Image Include="splash_xrcs_ru.bmp" />
     <Image Include="stalker_cs.ico" />
   </ItemGroup>
   <ItemGroup>
