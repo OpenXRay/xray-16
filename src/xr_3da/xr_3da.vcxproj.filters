@@ -31,6 +31,9 @@
     <Image Include="splash_xrcs_ru.bmp">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="splash_xrcs_pl.bmp">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\TypeHelper.natvis" />
