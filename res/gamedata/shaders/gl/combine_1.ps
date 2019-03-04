@@ -9,7 +9,7 @@
 
 Texture2D s_half_depth;
 
-//include "ssao_blur.ps"
+#include "ssao_blur.ps"
 
 #ifdef HDAO
 #define USE_HDAO 1
@@ -60,7 +60,7 @@ Texture2D s_occ;
 //#_include "ssao_hdao.ps"
 #endif
 #else // USE_HDAO
-#ifdef	USE_HBAO
+#ifdef USE_HBAO
 #include "ssao_hbao.ps"
 #endif	//	USE_HBAO
 #endif // USE_HDAO
