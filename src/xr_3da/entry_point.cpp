@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #if defined(WINDOWS)
-#include "StickyKeyFilter.hpp"
+#include "AccessibilityShortcuts.hpp"
 #elif defined(LINUX)
 #include <unistd.h>
 #include <stdlib.h>
@@ -27,9 +27,9 @@ int entry_point(pcstr commandLine)
         GEnv.isDedicatedServer = true;
 
 #ifdef WINDOWS
-    StickyKeyFilter filter;
+    AccessibilityShortcuts shortcuts;
     if (!GEnv.isDedicatedServer)
-        filter.initialize();
+        shortcuts.Disable();
 #endif
 
     pcstr fsltx = "-fsltx ";

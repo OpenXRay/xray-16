@@ -9,7 +9,7 @@
     <ClInclude Include="resource.h">
       <Filter>resources</Filter>
     </ClInclude>
-    <ClInclude Include="StickyKeyFilter.hpp" />
+    <ClInclude Include="AccessibilityShortcuts.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">

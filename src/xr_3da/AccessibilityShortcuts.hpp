@@ -1,6 +1,6 @@
 #pragma once
 
-class StickyKeyFilter
+class AccessibilityShortcuts
 {
     bool screensaverState;
     STICKYKEYS stickyKeys;
@@ -11,7 +11,7 @@ class StickyKeyFilter
     DWORD toggleKeysFlags;
 
 public:
-    StickyKeyFilter()
+    AccessibilityShortcuts()
     {
         screensaverState = false;
         stickyKeysFlags = 0;
@@ -25,16 +25,16 @@ public:
         toggleKeys.cbSize = sizeof(toggleKeys);
     }
 
-    void initialize()
+    void Disable()
     {
         SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, &screensaverState, 0);
-
-        if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, nullptr, 0);
 
         SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         SystemParametersInfo(SPI_GETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         SystemParametersInfo(SPI_GETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
+
+        if (screensaverState)
+            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, nullptr, 0);
 
         if (stickyKeys.dwFlags & SKF_AVAILABLE)
         {
@@ -58,20 +58,23 @@ public:
         }
     }
 
-    ~StickyKeyFilter()
+    ~AccessibilityShortcuts()
     {
         if (screensaverState)
             SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, TRUE, nullptr, 0);
+
         if (stickyKeysFlags)
         {
             stickyKeys.dwFlags = stickyKeysFlags;
             SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         }
+
         if (filterKeysFlags)
         {
             filterKeys.dwFlags = filterKeysFlags;
             SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         }
+
         if (toggleKeysFlags)
         {
             toggleKeys.dwFlags = toggleKeysFlags;

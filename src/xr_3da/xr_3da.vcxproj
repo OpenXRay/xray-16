@@ -118,7 +118,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="StickyKeyFilter.hpp" />
+    <ClInclude Include="AccessibilityShortcuts.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
