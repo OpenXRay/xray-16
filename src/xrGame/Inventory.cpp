@@ -49,7 +49,10 @@ CInventory::CInventory()
     if (tempSlotsCount > 0 && tempSlotsCount <= LAST_SLOT)
         sz = tempSlotsCount + 1;
     else
+    {
+        Log("! [inventory] slots_count is less than 1 or more than LAST_SLOT");
         sz = 1;
+    }
     m_slots.resize(sz + 1); // first is [1]
     m_iLastSlot = sz - 1;
 
