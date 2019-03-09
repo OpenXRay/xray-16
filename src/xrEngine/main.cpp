@@ -51,6 +51,8 @@ ENGINE_API void InitEngine()
 {
     Engine.Initialize();
     Device.Initialize();
+
+    Console->OnDeviceInitialize();
 }
 
 namespace

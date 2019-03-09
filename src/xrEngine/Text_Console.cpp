@@ -141,6 +141,14 @@ void CTextConsole::Initialize()
 {
     inherited::Initialize();
 
+    m_dwLastUpdateTime = Device.dwTimeGlobal;
+    m_last_time = Device.dwTimeGlobal;
+
+    m_server_info.ResetData();
+}
+
+void CTextConsole::OnDeviceInitialize()
+{
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
     if (SDL_GetWindowWMInfo(Device.m_sdlWnd, &info))
@@ -154,17 +162,13 @@ void CTextConsole::Initialize()
         }
     }
     else
-        Log("Couldn't get window information: %s", SDL_GetError());
-    m_dwLastUpdateTime = Device.dwTimeGlobal;
-    m_last_time = Device.dwTimeGlobal;
+        Log("Couldn't get window information: ", SDL_GetError());
 
     CreateConsoleWnd();
     CreateLogWnd();
 
     ShowWindow(m_hConsoleWnd, SW_SHOW);
     UpdateWindow(m_hConsoleWnd);
-
-    m_server_info.ResetData();
 }
 
 void CTextConsole::Destroy()
