@@ -40,3 +40,5 @@
     #define ANSEL_SDK_INTERNAL_API 
     #define ANSEL_SDK_CLASS_API
 #endif
+
+#define HIGH_QUALITY_CONTROL_ID 189237
