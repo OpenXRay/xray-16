@@ -15,6 +15,16 @@
 #endif
 
 struct SDL_Window;
+
+enum class AssertionResult : int
+{
+    undefined = -1,
+    ignore,
+    tryAgain,
+    abort,
+    ok
+};
+
 class ErrorLocation
 {
 public:
@@ -74,15 +84,15 @@ public:
     static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
                            const char* desc, const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void Fatal(const ErrorLocation& loc, const char* format, ...);
-    static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult,
+    static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
-    static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr,
+    static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr,
                      const char* desc = "assertion failed", const char* arg1 = nullptr, const char* arg2 = nullptr);
-    static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
+    static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void DoExit(const std::string& message);
 
-    static int ShowMessage(pcstr title, pcstr message, bool simple = true);
+    static AssertionResult ShowMessage(pcstr title, pcstr message, bool simpleMode = true);
 
     static void LogStackTrace(const char* header);
     static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = 512);

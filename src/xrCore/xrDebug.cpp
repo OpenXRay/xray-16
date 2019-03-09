@@ -94,23 +94,15 @@ ICN void* GetInstructionPtr()
 }
 }*/
 
-// XXX: Probably rename this to AssertionResult?
-enum MessageBoxResult
-{
-    resultUndefined = -1,
-    resultContinue = 0,
-    resultTryAgain = 1,
-    resultCancel = 2
-};
-
 constexpr SDL_MessageBoxButtonData buttons[] =
 {
     /* .flags, .buttonid, .text */
-    { 0, resultContinue, "Continue"  },
-    { 0, resultTryAgain, "Try again" },
+    { 0, (int)AssertionResult::ignore, "Continue"  },
+    { 0, (int)AssertionResult::tryAgain, "Try again" },
+
     { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT |
       SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,
-         resultCancel, "Cancel"      }
+         (int)AssertionResult::abort, "Cancel" }
 };
 
 SDL_MessageBoxData messageboxdata =
@@ -124,7 +116,7 @@ SDL_MessageBoxData messageboxdata =
     nullptr
 };
 
-int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
+AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode)
 {
 #ifdef WINDOWS // because Windows default Message box is fancy
     HWND hwnd = nullptr;
@@ -145,29 +137,35 @@ int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
         }
     }
 
-    if (simple)
-        return MessageBox(hwnd, message, title, MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+    if (simpleMode)
+    {
+        MessageBox(hwnd, message, title, MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        return AssertionResult::ok;
+    }
 
     const int result = MessageBox(hwnd, message, title,
         MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
 
     switch (result)
     {
-    case IDCANCEL: return resultCancel;
-    case IDTRYAGAIN: return resultTryAgain;
-    case IDCONTINUE: return resultContinue;
-    default: return resultUndefined;
+    case IDCANCEL: return AssertionResult::abort;
+    case IDTRYAGAIN: return AssertionResult::tryAgain;
+    case IDCONTINUE: return AssertionResult::ignore;
+    default: return AssertionResult::undefined;
     }
 #else
-    if (simple)
-        return SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, applicationWindow);
+    if (simpleMode)
+    {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, applicationWindow);
+        return AssertionResult::ok;
+    }
 
     messageboxdata.window = applicationWindow;
     messageboxdata.title = title;
     messageboxdata.message = message;
-    int button = resultUndefined;
+    int button = -1;
     SDL_ShowMessageBox(&messageboxdata, &button);
-    return button;
+    return (AssertionResult)button;
 #endif
 }
 
@@ -177,15 +175,29 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
     if (data->always_ignore)
         return SDL_ASSERTION_ALWAYS_IGNORE;
 
-    constexpr pcstr desc = "SDL2 assert triggered";
+    constexpr pcstr desc = "SDL2 assertion triggered";
     bool alwaysIgnore = false;
-    xrDebug::Fail(alwaysIgnore, {data->filename, data->linenum, data->function}, data->condition, desc);
 
-    if (alwaysIgnore)
+    const auto result = xrDebug::Fail(alwaysIgnore,
+        { data->filename, data->linenum, data->function },
+        data->condition, desc);
+
+    switch (result)
+    {
+    case AssertionResult::ignore:
         return SDL_ASSERTION_ALWAYS_IGNORE;
 
-    // XXX: change Fail return type from void to 'enum MessageBoxResult'
-    return SDL_ASSERTION_IGNORE;
+    case AssertionResult::tryAgain:
+        return SDL_ASSERTION_RETRY;
+
+    case AssertionResult::abort:
+        return SDL_ASSERTION_ABORT;
+
+    case AssertionResult::undefined:
+    case AssertionResult::ok:
+    default:
+        return SDL_ASSERTION_IGNORE;
+    }
 }
 
 SDL_Window* xrDebug::applicationWindow = nullptr;
@@ -476,13 +488,13 @@ void xrDebug::Fatal(const ErrorLocation& loc, const char* format, ...)
     Fail(ignoreAlways, loc, nullptr, "fatal error", desc);
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult, const char* arg1,
+AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult, const char* arg1,
                    const char* arg2)
 {
-    Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
+    return Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
+AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
                    const char* arg2)
 {
 #ifdef PROFILE_CRITICAL_SECTIONS
@@ -508,29 +520,32 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     if (OnDialog)
         OnDialog(true);
     FlushLog();
+
+    AssertionResult result = AssertionResult::abort;
     if (Core.PluginMode)
-        ShowMessage("X-Ray error", assertionInfo);
+        /*result =*/ ShowMessage("X-Ray error", assertionInfo); // Do not assign 'result'
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        switch (ShowMessage("Fatal error", assertionInfo, false))
+        result = ShowMessage("Fatal error", assertionInfo, false);
+        switch (result)
         {
-        case resultUndefined:
+        case AssertionResult::undefined:
             xr_strcat(assertionInfo, SDL_GetError());
             [[fallthrough]];
 
-        case resultCancel:
+        case AssertionResult::abort:
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
             DEBUG_BREAK;
             break;
 
-        case resultTryAgain:
+        case AssertionResult::tryAgain:
             ErrorAfterDialog = false;
             break;
 
-        case resultContinue:
+        case AssertionResult::ignore:
             ErrorAfterDialog = false;
             ignoreAlways = true;
             break;
@@ -547,12 +562,13 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         OnDialog(false);
 
     lock.Leave();
+    return result;
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
+AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
                    const char* arg1, const char* arg2)
 {
-    Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
+    return Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
 }
 
 void xrDebug::DoExit(const std::string& message)
