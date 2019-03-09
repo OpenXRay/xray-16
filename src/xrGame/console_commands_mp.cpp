@@ -90,6 +90,9 @@ extern int g_sv_Pending_Wait_Time;
 extern u32 g_sv_Client_Reconnect_Time;
 int g_dwEventDelay = 0;
 
+extern u32 g_sv_max_suspicious_actions;
+extern u32 g_sv_suspicious_actions_ban_time;
+
 extern u32 g_sv_adm_menu_ban_time;
 extern const xr_token g_ban_times[];
 
@@ -2200,6 +2203,9 @@ void register_mp_console_commands()
     CMD1(CCC_SvChat, "chat");
 
     //-----------------
+    CMD4(CCC_Integer, "sv_adm_menu_ping_limit", (int*)&g_sv_max_suspicious_actions, 1, 30);
+    CMD3(CCC_Token, "sv_suspicious_actions_ban_time", &g_sv_suspicious_actions_ban_time, g_ban_times); // min
+
     CMD3(CCC_Token, "sv_adm_menu_ban_time", &g_sv_adm_menu_ban_time, g_ban_times); // min
     //	CMD4(CCC_Integer,		"sv_adm_menu_ban_time",			(int*)&g_sv_adm_menu_ban_time, 1, 60); //min
     CMD4(CCC_Integer, "sv_adm_menu_ping_limit", (int*)&g_sv_adm_menu_ping_limit, 1, 200); // min
