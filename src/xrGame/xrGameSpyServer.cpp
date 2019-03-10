@@ -37,7 +37,7 @@ xrGameSpyClientData::xrGameSpyClientData() : xrClientData()
 {
     m_bCDKeyAuth = false;
     m_iCDKeyReauthHint = 0;
-    suspiciousActionsCount = 0;
+    suspiciousActionCount = 0;
 }
 void xrGameSpyClientData::Clear()
 {
@@ -46,7 +46,7 @@ void xrGameSpyClientData::Clear()
     m_pChallengeString[0] = 0;
     m_bCDKeyAuth = false;
     m_iCDKeyReauthHint = 0;
-    suspiciousActionsCount = 0;
+    suspiciousActionCount = 0;
 };
 
 xrGameSpyClientData::~xrGameSpyClientData()
@@ -54,7 +54,7 @@ xrGameSpyClientData::~xrGameSpyClientData()
     m_pChallengeString[0] = 0;
     m_bCDKeyAuth = false;
     m_iCDKeyReauthHint = 0;
-    suspiciousActionsCount = 0;
+    suspiciousActionCount = 0;
 }
 //-------------------------------------------------------
 xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, GameDescriptionData& game_descr)
@@ -182,10 +182,10 @@ u32 xrGameSpyServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means
             Msg("! WARNING: Validation challenge respond from client [%s] is %s. DoS attack?", clientIp.c_str(),
                 bytesRemain == 0 ? "empty" : "too long");
 
-            ++CL->suspiciousActionsCount;
+            CL->suspiciousActionCount++;
 
-            if (CL->suspiciousActionsCount > g_sv_max_suspicious_actions)
-                this->BanClient(CL, g_sv_suspicious_actions_ban_time);
+            if (CL->suspiciousActionCount > g_sv_max_suspicious_actions)
+                BanClient(CL, g_sv_suspicious_actions_ban_time);
 
             DisconnectClient(CL, STRING_KICKED_BY_SERVER);
 
