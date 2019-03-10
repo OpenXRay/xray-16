@@ -210,6 +210,17 @@ XRCORE_API u64 GetCLK()
 {
     return __rdtsc();
 }
+
+XRCORE_API u32 GetCUR()
+{
+#if defined(WINDOWS)
+    return GetCurrentProcessNumber();
+#elif defined(LINUX)
+    return static_cast<u32>(sched_getcpu());
+#else
+    return 0;
+#endif
+}
 } // namespace CPU
 
 bool g_initialize_cpu_called = false;
