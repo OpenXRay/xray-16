@@ -81,11 +81,6 @@ void CUICustomEdit::InitCustomEdit(Fvector2 pos, Fvector2 size)
 {
     inherited::SetWndPos(pos);
     inherited::SetWndSize(size);
-    if (!GetMessageTarget())
-    {
-        xr_delete(m_editor_control);
-        FATAL("No valid window available");
-    }
 }
 
 void CUICustomEdit::SetPasswordMode(bool mode) { TextItemControl()->SetPasswordMode(mode); }
