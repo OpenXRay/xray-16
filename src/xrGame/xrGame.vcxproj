@@ -109,12 +109,14 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"
+if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -126,12 +128,14 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"
+if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -143,12 +147,14 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"
+if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -160,12 +166,14 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"
+if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -178,12 +186,14 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"
+if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -195,12 +205,14 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
-      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"</Command>
-      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll</Inputs>
-      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll</Outputs>
+      <Command>if not exist "$(OutDir)AnselSDK$(PlatformArchitecture).dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll" "$(OutDir)AnselSDK$(PlatformArchitecture).dll"
+if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+      <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <Outputs>$(OutDir)AnselSDK$(PlatformArchitecture).dll;$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
