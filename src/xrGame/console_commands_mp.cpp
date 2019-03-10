@@ -2203,7 +2203,7 @@ void register_mp_console_commands()
     CMD1(CCC_SvChat, "chat");
 
     //-----------------
-    CMD4(CCC_Integer, "sv_adm_menu_ping_limit", (int*)&g_sv_max_suspicious_actions, 1, 30);
+    CMD4(CCC_Integer, "sv_max_suspicious_actions", (int*)&g_sv_max_suspicious_actions, 1, 30);
     CMD3(CCC_Token, "sv_suspicious_actions_ban_time", &g_sv_suspicious_actions_ban_time, g_ban_times); // min
 
     CMD3(CCC_Token, "sv_adm_menu_ban_time", &g_sv_adm_menu_ban_time, g_ban_times); // min
