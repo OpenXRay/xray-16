@@ -23,6 +23,7 @@ SCRIPT_EXPORT(CUIComboBox, (CUIWindow),
             .def("SetVertScroll", &CUIComboBox::SetVertScroll)
             .def("SetListLength", &CUIComboBox::SetListLength)
             .def("CurrentID", &CUIComboBox::CurrentID)
+            .def("SetCurrentID", &CUIComboBox::SetItemIDX)
             .def("disable_id", &CUIComboBox::disable_id)
             .def("enable_id", &CUIComboBox::enable_id)
             .def("AddItem", &CUIComboBox::AddItem_)
@@ -30,6 +31,7 @@ SCRIPT_EXPORT(CUIComboBox, (CUIWindow),
             .def("GetTextOf", &CUIComboBox::GetTextOf)
             .def("SetText", &CUIComboBox::SetText)
             .def("ClearList", &CUIComboBox::ClearList)
+            .def("SetCurrentValue", &CUIComboBox::SetCurrentOptValue)
             .def("SetCurrentOptValue", &CUIComboBox::SetCurrentOptValue)
     ];
 });
