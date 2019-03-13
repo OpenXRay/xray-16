@@ -111,7 +111,7 @@
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
-if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
     </CustomBuildStep>
@@ -126,7 +126,7 @@ if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformSho
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
-if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
     </CustomBuildStep>
@@ -142,7 +142,7 @@ if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformSho
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
-if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
     </CustomBuildStep>
@@ -157,7 +157,7 @@ if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformSho
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
-if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
     </CustomBuildStep>
@@ -172,7 +172,7 @@ if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformSho
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
-if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
     </CustomBuildStep>
@@ -187,7 +187,7 @@ if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformSho
     </Link>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImage.dll"
-if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll" "$(OutDir)FreeImagePlus.dll"</Command>
+if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
     </CustomBuildStep>
