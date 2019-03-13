@@ -114,6 +114,7 @@
 if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -129,6 +130,7 @@ if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(Platfor
 if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,6 +147,7 @@ if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(Platfor
 if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -160,6 +163,7 @@ if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(Platfor
 if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
@@ -175,6 +179,7 @@ if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(Platfor
 if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
@@ -190,6 +195,7 @@ if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(Platfor
 if not exist "$(OutDir)FreeImagePlus.dll" copy /y "$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll" "$(OutDir)FreeImagePlus.dll"</Command>
       <Outputs>$(OutDir)FreeImage.dll;$(OutDir)FreeImagePlus.dll</Outputs>
       <Inputs>$(xrSdkDir)binaries\$(PlatformShortName)\FreeImage.dll;$(xrSdkDir)binaries\$(PlatformShortName)\FreeImagePlus.dll</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
