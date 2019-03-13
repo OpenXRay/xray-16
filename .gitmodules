@@ -1,6 +1,6 @@
 [submodule "Externals/LuaJIT"]
 	path = Externals/LuaJIT
-	url = https://github.com/LuaJIT/LuaJIT.git
+	url = https://github.com/OpenXRay/LuaJIT.git
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/OpenXRay/luabind-deboostified.git
