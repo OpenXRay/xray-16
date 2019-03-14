@@ -17,7 +17,7 @@ using namespace luabind;
 using namespace luabind::policy;
 
 // clang-format off
-SCRIPT_EXPORT(CDialogHolder, (), {
+SCRIPT_EXPORT(CDialogHolder, (CUIWindow), {
     module(luaState)
     [
         class_<CDialogHolder>("CDialogHolder")
@@ -29,7 +29,7 @@ SCRIPT_EXPORT(CDialogHolder, (), {
     ];
 });
 
-SCRIPT_EXPORT(CUIDialogWnd, (CUIWindow), {
+SCRIPT_EXPORT(CUIDialogWnd, (CDialogHolder), {
     module(luaState)
     [
         class_<CUIDialogWnd, CUIWindow>("CUIDialogWnd")

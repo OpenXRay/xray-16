@@ -31,7 +31,7 @@ ICF static void UIRegistratorScriptExport(lua_State* luaState)
             .def("GetFlieName", &Patch_Dawnload_Progress::GetFlieName)
             .def("GetProgress", &Patch_Dawnload_Progress::GetProgress),
 
-        class_<CMainMenu>("CMainMenu")
+        class_<CMainMenu, CDialogHolder>("CMainMenu")
             .def("GetPatchProgress", &CMainMenu::GetPatchProgress)
             .def("CancelDownload", &CMainMenu::CancelDownload)
             .def("ValidateCDKey", &CMainMenu::ValidateCDKey)
@@ -48,4 +48,4 @@ ICF static void UIRegistratorScriptExport(lua_State* luaState)
         def("get_main_menu", &MainMenu)
     ];
 }
-SCRIPT_EXPORT_FUNC(UIRegistrator, (), UIRegistratorScriptExport)
+SCRIPT_EXPORT_FUNC(UIRegistrator, (CDialogHolder), UIRegistratorScriptExport)
