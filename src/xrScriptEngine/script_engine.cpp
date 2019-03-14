@@ -866,12 +866,15 @@ void CScriptEngine::unload()
     *m_last_no_file = 0;
 }
 
-void CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err)
+bool CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err)
 {
     print_output(L, scriptName, errorCode, err);
     on_error(L);
 
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
+    bool ignoreAlways;
+    const auto result = xrDebug::Fail(ignoreAlways, DEBUG_INFO, "LUA error", err);
+
+    return result == AssertionResult::ignore;
 }
 
 int CScriptEngine::lua_panic(lua_State* L)
@@ -891,10 +894,14 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
     const bool isString = lua_isstring(L, -1);
     const pcstr err = isString ? lua_tostring(L, -1) : "";
 
-    onErrorCallback(L, "", LUA_ERRRUN, err);
+    const bool result = onErrorCallback(L, "", LUA_ERRRUN, err);
 
     if (isString)
         lua_pop(L, 1);
+
+    if (result)
+        return LUA_OK;
+
     return LUA_ERRRUN;
 }
 #if 1 //!XRAY_EXCEPTIONS
