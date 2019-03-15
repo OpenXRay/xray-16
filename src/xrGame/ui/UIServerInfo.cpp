@@ -12,7 +12,8 @@
 #include "ximage.h"
 #include "xmemfile.h"
 
-#include <FreeImage/FreeImagePlus.h>
+// XXX: uncomment, test and remove CxImage that is currectly used
+//#include <FreeImage/FreeImagePlus.h>
 
 CUIServerInfo::CUIServerInfo()
 {
