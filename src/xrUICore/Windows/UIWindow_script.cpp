@@ -30,7 +30,10 @@ void SetCursorPosition_script(Fvector2& pos) { GetUICursor().SetUICursorPosition
 
 using namespace luabind;
 using namespace luabind::policy;
-
+Frect	get_texture_rect(LPCSTR icon_name)
+{
+    return CUITextureMaster::GetTextureRect(icon_name);
+}
 // clang-format off
 SCRIPT_EXPORT(CUIWindow, (), {
     module(luaState)
@@ -46,6 +49,30 @@ SCRIPT_EXPORT(CUIWindow, (), {
         def("GetCursorPosition", &GetCursorPosition_script),
         def("SetCursorPosition", &SetCursorPosition_script),
         def("FitInRect", &fit_in_rect),
+
+        class_<TEX_INFO>("TEX_INFO")
+            .def("get_file_name", &TEX_INFO::get_file_name)
+            .def("get_rect", &TEX_INFO::get_rect),
+
+        def("GetTextureName", +[](pcstr iconName)
+        {
+            return CUITextureMaster::GetTextureFileName(iconName);
+        }),
+
+        def("GetTextureRect", +[](pcstr iconName)
+        {
+            return CUITextureMaster::GetTextureRect(iconName);
+        }),
+
+        def("GetTextureInfo", +[](pcstr name)
+        {
+            return CUITextureMaster::FindItem(name);
+        }),
+
+        def("GetTextureInfo", +[](pcstr name, pcstr defaultName)
+        {
+            return CUITextureMaster::FindItem(name, defaultName);
+        }),
 
         class_<CUIWindow>("CUIWindow")
             .def(constructor<>())
