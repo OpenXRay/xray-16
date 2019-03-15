@@ -285,19 +285,17 @@ void CApplication::LoadEnd()
 
 void CApplication::SetLoadingScreen(ILoadingScreen* newScreen)
 {
-    if (loadingScreen)
-    {
-        Log("! Trying to create new loading screen, but there is already one..");
-        DEBUG_BREAK;
-        DestroyLoadingScreen();
-    }
-
     loadingScreen = newScreen;
 }
 
 void CApplication::DestroyLoadingScreen()
 {
     xr_delete(loadingScreen);
+}
+
+void CApplication::ShowLoadingScreen(bool show)
+{
+    loadingScreen->Show(show);
 }
 
 void CApplication::LoadDraw()
@@ -318,22 +316,25 @@ void CApplication::LoadDraw()
     Device.End();
 }
 
+void CApplication::LoadForceDrop()
+{
+    loadingScreen->ForceDrop();
+}
+
 void CApplication::LoadForceFinish()
 {
-    if (loadingScreen)
-        loadingScreen->ForceFinish();
+    loadingScreen->ForceFinish();
 }
 
 void CApplication::SetLoadStageTitle(pcstr _ls_title)
 {
-    if (ps_rs_loading_stages && loadingScreen)
+    if (ps_rs_loading_stages)
         loadingScreen->SetStageTitle(_ls_title);
 }
 
 void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
 {
-    if (loadingScreen)
-        loadingScreen->SetStageTip(str1, str2, str3);
+    loadingScreen->SetStageTip(str1, str2, str3);
 }
 
 void CApplication::LoadStage()
@@ -524,10 +525,17 @@ void CApplication::LoadAllArchives()
 }
 
 #pragma optimize("g", off)
-void CApplication::load_draw_internal()
+void CApplication::load_draw_internal(bool precaching /*= false*/)
 {
-    if (loadingScreen)
+    if (precaching)
+    {
+        const u32 total = Device.dwPrecacheTotal;
+        loadingScreen->Update(total - Device.dwPrecacheFrame, total);
+    }
+
+    else if (loadingScreen->IsShown())
         loadingScreen->Update(load_stage, max_load_stage);
+
     else
         GEnv.Render->ClearTarget();
 }

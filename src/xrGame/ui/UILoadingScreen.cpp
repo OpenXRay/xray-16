@@ -54,6 +54,7 @@ void UILoadingScreen::Update(const int stagesCompleted, const int stagesTotal)
     ScopeLock scope(&loadingLock);
 
     const float progress = float(stagesCompleted) / stagesTotal * loadingProgress->GetRange_max();
+
     if (loadingProgress->GetProgressPos() < progress)
         loadingProgress->SetProgressPos(progress);
 
@@ -68,11 +69,40 @@ void UILoadingScreen::Update(const int stagesCompleted, const int stagesTotal)
     Draw();
 }
 
+void UILoadingScreen::ForceDrop()
+{
+    ScopeLock scope(&loadingLock);
+
+    const float prev = loadingProgress->m_inertion;
+    const float maximal = loadingProgress->GetRange_max();
+
+    loadingProgress->m_inertion = 0.0f;
+    loadingProgress->SetProgressPos(loadingProgress->GetRange_min());
+
+    for (int i = 0; i < int(maximal); ++i)
+    {
+        loadingProgress->Update();
+    }
+
+    loadingProgress->m_inertion = prev;
+}
+
 void UILoadingScreen::ForceFinish()
 {
     ScopeLock scope(&loadingLock);
 
-    loadingProgress->SetProgressPos(loadingProgress->GetRange_max());
+    const float prev = loadingProgress->m_inertion;
+    const float maximal = loadingProgress->GetRange_max();
+
+    loadingProgress->m_inertion = 0.0f;
+    loadingProgress->SetProgressPos(maximal);
+    
+    for (int i = 0; i < int(maximal); ++i)
+    {
+        loadingProgress->Update();
+    }
+
+    loadingProgress->m_inertion = prev;
 }
 
 void UILoadingScreen::SetLevelLogo(const char* name)
@@ -96,4 +126,14 @@ void UILoadingScreen::SetStageTip(const char* header, const char* tipNumber, con
     loadingHeader->TextItemControl()->SetText(header);
     loadingTipNumber->TextItemControl()->SetText(tipNumber);
     loadingTip->TextItemControl()->SetText(tip);
+}
+
+void UILoadingScreen::Show(bool status)
+{
+    CUIWindow::Show(status);
+}
+
+bool UILoadingScreen::IsShown()
+{
+    return CUIWindow::IsShown();
 }

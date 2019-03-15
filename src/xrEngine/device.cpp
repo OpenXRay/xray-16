@@ -198,6 +198,7 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
     }
     if (amount && b_draw_loadscreen && !load_screen_renderer.b_registered)
     {
+        pApp->LoadForceDrop();
         load_screen_renderer.start(b_wait_user_input);
     }
 }
@@ -632,6 +633,9 @@ void CLoadScreenRenderer::start(bool b_user_input)
     Device.seqRender.Add(this, 0);
     b_registered = true;
     b_need_user_input = b_user_input;
+
+    pApp->LoadForceDrop();
+    pApp->ShowLoadingScreen(true);
 }
 
 void CLoadScreenRenderer::stop()
@@ -639,12 +643,15 @@ void CLoadScreenRenderer::stop()
     if (!b_registered)
         return;
     Device.seqRender.Remove(this);
-    pApp->DestroyLoadingScreen();
+
     b_registered = false;
     b_need_user_input = false;
+
+    pApp->LoadForceFinish();
+    pApp->ShowLoadingScreen(false);
 }
 
-void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(); }
+void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(true); }
 
 bool CRenderDevice::CSecondVPParams::IsSVPFrame() //--#SM+#-- +SecondVP+
 {

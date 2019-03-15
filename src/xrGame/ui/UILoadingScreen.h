@@ -33,7 +33,11 @@ public:
 
     void Initialize() override;
 
+    void Show(bool status) override;
+    bool IsShown() override;
+
     void Update(const int stagesCompleted, const int stagesTotal) override;
+    void ForceDrop() override;
     void ForceFinish() override;
 
     void SetLevelLogo(const char* name) override;

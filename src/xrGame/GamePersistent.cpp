@@ -166,8 +166,6 @@ CGamePersistent::~CGamePersistent(void)
 
 void CGamePersistent::PreStart(LPCSTR op)
 {
-    if (!GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new UILoadingScreen());
     inherited::PreStart(op);
 }
 
@@ -217,6 +215,8 @@ void CGamePersistent::OnAppStart()
     GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
 
+    pApp->SetLoadingScreen(new UILoadingScreen());
+
 #ifdef WINDOWS
     ansel = new AnselManager();
     ansel->Load();
@@ -229,6 +229,7 @@ void CGamePersistent::OnAppEnd()
     if (m_pMainMenu->IsActive())
         m_pMainMenu->Activate(false);
 
+    pApp->DestroyLoadingScreen();
     xr_delete(m_pMainMenu);
     xr_delete(GEnv.UI);
 
@@ -620,6 +621,9 @@ void CGamePersistent::OnFrame()
 #endif
     if (!GEnv.isDedicatedServer && !m_intro_event.empty())
         m_intro_event();
+
+    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 1 && !m_intro && m_intro_event.empty())
+        pApp->LoadForceFinish(); // hack
 
     if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 0 && !m_intro && m_intro_event.empty())
         load_screen_renderer.stop();

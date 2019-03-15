@@ -75,7 +75,7 @@ public:
         SetVisible(status);
         Enable(status);
     }
-    IC bool IsShown() { return GetVisible(); }
+    virtual bool IsShown() { return GetVisible(); }
     void ShowChildren(bool show);
 
     //абсолютные координаты
