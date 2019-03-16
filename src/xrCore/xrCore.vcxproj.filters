@@ -722,6 +722,9 @@
     <ClInclude Include="Containers\FixedMap.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Crypto\trivial_encryptor.h">
+      <Filter>Crypto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">
