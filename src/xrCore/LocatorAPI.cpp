@@ -261,7 +261,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
 }
 
 #if defined(WINDOWS)
-IReader* open_chunk(void* ptr, u32 ID, bool shouldDecrypt = false)
+IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, u32 archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType, dwSize;
     DWORD read_byte;
@@ -290,13 +290,23 @@ IReader* open_chunk(void* ptr, u32 ID, bool shouldDecrypt = false)
             VERIFY(res && (read_byte == dwSize));
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest;
-                unsigned dest_sz;
+                BYTE* dest = nullptr;
+                unsigned dest_sz = 0;
 
-                if (shouldDecrypt)
+                if (shouldDecrypt) // Try WW key first
                     g_trivial_encryptor.decode(src_data, dwSize, src_data);
 
-                _decompressLZ(&dest, &dest_sz, src_data, dwSize);
+                bool result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+
+                if (!result && shouldDecrypt)
+                {
+                    // Let's try to decode with RU key
+                    g_trivial_encryptor.encode(src_data, dwSize, src_data); // rollback
+                    g_trivial_encryptor.decode(src_data, dwSize, src_data, trivial_encryptor::key_flag::russian);
+                    result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+                }
+                R_ASSERT(result, "Can't decompress archive", archiveName);
+
                 xr_free(src_data);
                 return new CTempReader(dest, dest_sz, 0);
             }
@@ -312,7 +322,7 @@ IReader* open_chunk(void* ptr, u32 ID, bool shouldDecrypt = false)
 #endif
 
 #if defined(LINUX) || defined(FREEBSD)
-IReader* open_chunk(int fd, u32 ID, bool shouldDecrypt = false)
+IReader* open_chunk(int fd, u32 ID, pcstr archiveName, u32 archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType, dwSize;
     ssize_t read_byte;
@@ -336,13 +346,22 @@ IReader* open_chunk(int fd, u32 ID, bool shouldDecrypt = false)
             VERIFY(read_byte == dwSize);
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest;
-                unsigned dest_sz;
+                BYTE* dest = nullptr;
+                unsigned dest_sz = 0;
 
                 if (shouldDecrypt)
                     g_trivial_encryptor.decode(src_data, dwSize, src_data);
 
-                _decompressLZ(&dest, &dest_sz, src_data, dwSize);
+                bool result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+
+                if (!result && shouldDecrypt)
+                {
+                    // Let's try to decode with RU key
+                    g_trivial_encryptor.decode(src_data, dwSize, src_data, trivial_encryptor::key_flag::russian);
+                    result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+                }
+                R_ASSERT(result, "Can't decompress archive", archiveName);
+
                 xr_free(src_data);
                 return new CTempReader(dest, dest_sz, 0);
             }
@@ -421,7 +440,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
     // Read FileSystem
     A.open();
-    IReader* hdr = open_chunk(A.hSrcFile, 1, shouldDecrypt);
+    IReader* hdr = open_chunk(A.hSrcFile, 1, A.path.c_str(), A.size, shouldDecrypt);
 
     R_ASSERT(hdr);
     RStringVec fv;
@@ -510,7 +529,7 @@ void CLocatorAPI::ProcessArchive(pcstr _path)
 
     // Read header
     bool bProcessArchiveLoading = true;
-    IReader* hdr = open_chunk(A.hSrcFile, CFS_HeaderChunkID);
+    IReader* hdr = open_chunk(A.hSrcFile, CFS_HeaderChunkID, A.path.c_str(), A.size);
 
     if (hdr)
     {
