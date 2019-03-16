@@ -14,6 +14,7 @@ _action actions[] = {
     { "down",              kDOWN,              _both },
     { "jump",              kJUMP,              _both },
     { "crouch",            kCROUCH,            _both },
+    { "crouch_toggle",     kCROUCH_TOGGLE,     _both},
     { "accel",             kACCEL,             _both },
     { "sprint_toggle",     kSPRINT_TOGGLE,     _both },
 
@@ -25,11 +26,15 @@ _action actions[] = {
     { "llookout",          kL_LOOKOUT,         _both },
     { "rlookout",          kR_LOOKOUT,         _both },
 
+    { "turn_engine",       kENGINE,            _sp},
+
     { "cam_1",             kCAM_1,             _both },
     { "cam_2",             kCAM_2,             _both },
     { "cam_3",             kCAM_3,             _both },
+    { "cam_4",             kCAM_4,             _both},
     { "cam_zoom_in",       kCAM_ZOOM_IN,       _both },
     { "cam_zoom_out",      kCAM_ZOOM_OUT,      _both },
+    { "cam_autoaim",       kCAM_AUTOAIM,       _sp },
 
     { "torch",             kTORCH,             _both },
     { "night_vision",      kNIGHT_VISION,      _both },
@@ -66,6 +71,9 @@ _action actions[] = {
     { "skin_menu",         kSKIN,              _both },
     { "team_menu",         kTEAM,              _both },
     { "active_jobs",       kACTIVE_JOBS,       _sp },
+    { "map",                kMAP,               _both },
+    { "contacts",           kCONTACTS,          _sp },
+    { "ext_1",              kEXT_1,             _both },
 
     { "vote_begin",        kVOTE_BEGIN,        _both },
     { "show_admin_menu",   kSHOW_ADMIN_MENU,   _both },
@@ -78,6 +86,18 @@ _action actions[] = {
 
     { "speech_menu_0",     kSPEECH_MENU_0,     _both },
     { "speech_menu_1",     kSPEECH_MENU_1,     _both },
+
+    { "speech_menu_2",     kSPEECH_MENU_2,     _mp },
+    { "speech_menu_3",     kSPEECH_MENU_3,     _mp },
+    { "speech_menu_4",     kSPEECH_MENU_4,     _mp },
+    { "speech_menu_5",     kSPEECH_MENU_5,     _mp },
+    { "speech_menu_6",     kSPEECH_MENU_6,     _mp },
+    { "speech_menu_7",     kSPEECH_MENU_7,     _mp },
+    { "speech_menu_8",     kSPEECH_MENU_8,     _mp },
+    { "speech_menu_9",     kSPEECH_MENU_9,     _mp },
+
+    { "use_bandage",       kUSE_BANDAGE,       _sp },
+    { "use_medkit",        kUSE_MEDKIT,        _sp },
 
     { "quick_use_1",       kQUICK_USE_1,       _both },
     { "quick_use_2",       kQUICK_USE_2,       _both },
@@ -103,8 +123,6 @@ _action actions[] = {
     { "custom13",          kCUSTOM13,          _sp },
     { "custom14",          kCUSTOM14,          _sp },
     { "custom15",          kCUSTOM15,          _sp },
-
-    { "cam_autoaim",       kCAM_AUTOAIM,       _sp },
 
     { "pda_tab1",          kPDA_TAB1,          _sp },
     { "pda_tab2",          kPDA_TAB2,          _sp },
