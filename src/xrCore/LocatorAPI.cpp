@@ -357,8 +357,8 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         if (0 == xr_stricmp(read_path.c_str(), "gamedata"))
         {
             read_path = "$fs_root$";
-            auto P = pathes.find(read_path.c_str());
-            if (P != pathes.end())
+            auto P = m_paths.find(read_path.c_str());
+            if (P != m_paths.end())
             {
                 FS_Path* root = P->second;
                 // R_ASSERT3 (root, "path not found ", read_path.c_str());
@@ -375,9 +375,9 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
             int count = sscanf(read_path.c_str(), "%[^\\]s", alias_name);
             R_ASSERT2(count == 1, read_path.c_str());
 
-            auto P = pathes.find(alias_name);
+            auto P = m_paths.find(alias_name);
 
-            if (P != pathes.end())
+            if (P != m_paths.end())
             {
                 FS_Path* root = P->second;
                 // R_ASSERT3 (root, "path not found ", alias_name);
@@ -764,7 +764,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     Msg("$fs_root$ = %s", full_current_directory);
 #endif // #ifdef DEBUG
 
-    pathes.insert(std::make_pair(xr_strdup("$fs_root$"), path));
+    m_paths.insert(std::make_pair(xr_strdup("$fs_root$"), path));
 }
 
 IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
@@ -897,12 +897,12 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
             lp_def = cnt >= 5 ? def : 0;
             lp_capt = cnt >= 6 ? capt : 0;
 
-            auto p_it = pathes.find(root);
+            auto p_it = m_paths.find(root);
 
-            FS_Path* P = new FS_Path(p_it != pathes.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
+            FS_Path* P = new FS_Path(p_it != m_paths.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
             bNoRecurse = !(fl & FS_Path::flRecurse);
             Recurse(P->m_Path);
-            auto I = pathes.insert(std::make_pair(xr_strdup(id), P));
+            auto I = m_paths.insert(std::make_pair(xr_strdup(id), P));
 #ifndef DEBUG
             m_Flags.set(flCacheFiles, false);
 #endif // DEBUG
@@ -955,13 +955,13 @@ void CLocatorAPI::_destroy()
     }
     m_files.clear();
 
-    for (auto& it : pathes)
+    for (auto& it : m_paths)
     {
         auto str = pstr(it.first);
         xr_free(str);
         xr_delete(it.second);
     }
-    pathes.clear();
+    m_paths.clear();
 
     for (auto& it : m_archives)
     {
@@ -1175,7 +1175,7 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
 void CLocatorAPI::check_cached_files(pstr fname, const u32& fname_size, const file& desc, pcstr& source_name)
 {
     string_path fname_copy;
-    if (pathes.size() <= 1)
+    if (m_paths.size() <= 1)
         return;
 
     if (!path_exist("$server_root$"))
@@ -1699,7 +1699,7 @@ int CLocatorAPI::file_length(pcstr src)
 
 bool CLocatorAPI::path_exist(pcstr path)
 {
-    return pathes.find(path) != pathes.end();
+    return m_paths.find(path) != m_paths.end();
 }
 
 FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool recursive)
@@ -1709,14 +1709,14 @@ FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool 
     FS_Path* P = new FS_Path(root, add, nullptr, nullptr, 0);
     bNoRecurse = !recursive;
     Recurse(P->m_Path);
-    pathes.insert(std::make_pair(xr_strdup(path_alias), P));
+    m_paths.insert(std::make_pair(xr_strdup(path_alias), P));
     return P;
 }
 
 FS_Path* CLocatorAPI::get_path(pcstr path)
 {
-    auto P = pathes.find(path);
-    R_ASSERT2(P != pathes.end(), path);
+    auto P = m_paths.find(path);
+    R_ASSERT2(P != m_paths.end(), path);
     return P->second;
 }
 
@@ -1798,7 +1798,7 @@ void CLocatorAPI::rescan_path(pcstr full_path, bool bRecurse)
 void CLocatorAPI::rescan_pathes()
 {
     m_Flags.set(flNeedRescan, false);
-    for (const auto& it : pathes)
+    for (const auto& it : m_paths)
     {
         FS_Path* P = it.second;
         if (P->m_Flags.is(FS_Path::flNeedRescan))

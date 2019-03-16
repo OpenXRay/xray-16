@@ -129,7 +129,7 @@ private:
     };
 
     using PathMap = xr_map<pcstr, FS_Path*, pred_str>;
-    PathMap pathes;
+    PathMap m_paths;
 
     using files_set = xr_set<file, file_pred>;
     using files_it = files_set::iterator;
