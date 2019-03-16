@@ -526,16 +526,36 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                     bInsideSTR = _parse(str2, value_raw);
                     if (bInsideSTR) // multiline str value
                     {
+                        bool incorrectFormat = false;
                         while (bInsideSTR)
                         {
                             xr_strcat(value_raw, sizeof value_raw, "\r\n");
                             string4096 str_add_raw;
                             F->r_string(str_add_raw, sizeof str_add_raw);
-                            R_ASSERT2(xr_strlen(value_raw) + xr_strlen(str_add_raw) < sizeof value_raw,
-                                make_string("Incorrect inifile format: section[%s], variable[%s]. Odd number of quotes "
-                                            "(\") found, but "
-                                            "should be even.",
-                                    Current->Name.c_str(), name));
+
+                            pstr sectionNameTester = strchr(str_add_raw, '[');
+                            if (sectionNameTester)
+                            {
+                                if (strchr(sectionNameTester, ']'))
+                                {
+                                    // That's a new section name! This is 100% error!
+                                    incorrectFormat = true;
+                                }
+                            }
+
+                            if (!(xr_strlen(value_raw) + xr_strlen(str_add_raw) < sizeof value_raw)
+                                || incorrectFormat)
+                            {
+                                Msg("! Incorrect inifile format: section[%s], variable[%s]. Odd number of quotes "
+                                    "(\") found, but "
+                                    "should be even. Trimming it to the first new line.",
+                                    Current->Name.c_str(), name);
+                                pstr trimmie = strstr(str2, "\r\n");
+                                *trimmie = 0;
+                                _Trim(str2, '\"');
+                                break;
+                            }
+
                             xr_strcat(value_raw, sizeof value_raw, str_add_raw);
                             bInsideSTR = _parse(str2, value_raw);
                             if (bInsideSTR)
