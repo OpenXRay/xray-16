@@ -330,6 +330,9 @@
     <ClCompile Include="Memory\xrMemory_align.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Crypto\trivial_encryptor.cpp">
+      <Filter>Crypto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
