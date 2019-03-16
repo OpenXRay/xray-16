@@ -3,10 +3,10 @@
 #include "xrCore/xr_token.h"
 #include "xrCore/_std_extensions.h"
 
-LPSTR _TrimLeft(LPSTR str)
+LPSTR _TrimLeft(LPSTR str, char whatToTrim /*= ' '*/)
 {
     LPSTR p = str;
-    while (*p && (u8(*p) <= u8(' ')))
+    while (*p && (u8(*p) <= u8(whatToTrim)))
         p++;
     if (p != str)
     {
@@ -18,19 +18,19 @@ LPSTR _TrimLeft(LPSTR str)
     return str;
 }
 
-LPSTR _TrimRight(LPSTR str)
+LPSTR _TrimRight(LPSTR str, char whatToTrim /*= ' '*/)
 {
     LPSTR p = str + xr_strlen(str);
-    while ((p != str) && (u8(*p) <= u8(' ')))
+    while ((p != str) && (u8(*p) <= u8(whatToTrim)))
         p--;
     *(++p) = 0;
     return str;
 }
 
-LPSTR _Trim(LPSTR str)
+LPSTR _Trim(LPSTR str, char whatToTrim /*= ' '*/)
 {
-    _TrimLeft(str);
-    _TrimRight(str);
+    _TrimLeft(str, whatToTrim);
+    _TrimRight(str, whatToTrim);
     return str;
 }
 
