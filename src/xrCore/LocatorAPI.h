@@ -244,8 +244,9 @@ public:
 
     bool path_exist(pcstr path);
     FS_Path* get_path(pcstr path);
+    bool get_path(pcstr path, FS_Path** outPath);
     FS_Path* append_path(pcstr path_alias, pcstr root, pcstr add, bool recursive);
-    pcstr update_path(string_path& dest, pcstr initial, pcstr src);
+    pcstr update_path(string_path& dest, pcstr initial, pcstr src, bool crashOnNotFound = true);
 
     int file_list(FS_FileSet& dest, pcstr path, u32 flags = FS_ListFiles, pcstr mask = nullptr);
 

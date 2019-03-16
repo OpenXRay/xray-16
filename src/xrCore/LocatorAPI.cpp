@@ -1715,14 +1715,35 @@ FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool 
 
 FS_Path* CLocatorAPI::get_path(pcstr path)
 {
-    auto P = m_paths.find(path);
+    const auto P = m_paths.find(path);
     R_ASSERT2(P != m_paths.end(), path);
     return P->second;
 }
 
-pcstr CLocatorAPI::update_path(string_path& dest, pcstr initial, pcstr src)
+bool CLocatorAPI::get_path(pcstr path, FS_Path** outPath)
 {
-    return get_path(initial)->_update(dest, src);
+    const auto P = m_paths.find(path);
+
+    if (P != m_paths.end())
+    {
+        if (outPath)
+            *outPath = P->second;
+        return true;
+    }
+
+    return false;
+}
+
+pcstr CLocatorAPI::update_path(string_path& dest, pcstr initial, pcstr src, bool crashOnNotFound /*= true*/)
+{
+    FS_Path* path;
+    if (!get_path(initial, &path))
+    {
+        R_ASSERT(!crashOnNotFound, "Failed to find FS path", initial);
+        return nullptr;
+    }
+
+    return path->_update(dest, src);
 }
 /*
 void CLocatorAPI::update_path(xr_string& dest, pcstr initial, pcstr src)
