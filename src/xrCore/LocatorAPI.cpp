@@ -305,7 +305,7 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, u32 archiveSize, bool 
                     g_trivial_encryptor.decode(src_data, dwSize, src_data, trivial_encryptor::key_flag::russian);
                     result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
                 }
-                R_ASSERT(result, "Can't decompress archive", archiveName);
+                R_ASSERT3(result, "Can't decompress archive", archiveName);
 
                 xr_free(src_data);
                 return new CTempReader(dest, dest_sz, 0);
@@ -360,7 +360,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, u32 archiveSize, bool sho
                     g_trivial_encryptor.decode(src_data, dwSize, src_data, trivial_encryptor::key_flag::russian);
                     result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
                 }
-                R_ASSERT(result, "Can't decompress archive", archiveName);
+                R_ASSERT3(result, "Can't decompress archive", archiveName);
 
                 xr_free(src_data);
                 return new CTempReader(dest, dest_sz, 0);
