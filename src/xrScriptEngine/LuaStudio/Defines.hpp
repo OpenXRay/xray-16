@@ -33,7 +33,5 @@ STATIC_CHECK(false, CS_MAKE_STRING_or_CS_MAKE_STRING_HELPER_macro_already_define
 #define CS_MAKE_STRING_HELPER(a) #a
 #define CS_MAKE_STRING(a) CS_MAKE_STRING_HELPER(a)
 
-#define CS_LIBRARY_NAME(library, extension)                                                                       \
-    CS_MAKE_STRING(CS_STRING_CONCAT(CS_LIBRARY_PREFIX,                                                            \
-        CS_STRING_CONCAT(library, CS_STRING_CONCAT(CS_PLATFORM_ID, CS_STRING_CONCAT(CS_SOLUTION_CONFIGURATION_ID, \
-                                                                       CS_STRING_CONCAT(., extension))))))
+#define CS_LIBRARY_NAME(library, extension) \
+   CS_MAKE_STRING(CS_LIBRARY_PREFIX) CS_MAKE_STRING(library) CS_MAKE_STRING(CS_PLATFORM_ID) CS_MAKE_STRING(CS_SOLUTION_CONFIGURATION_ID) "." CS_MAKE_STRING(extension)

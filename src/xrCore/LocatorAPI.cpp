@@ -1785,7 +1785,7 @@ pcstr CLocatorAPI::update_path(string_path& dest, pcstr initial, pcstr src, bool
     FS_Path* path;
     if (!get_path(initial, &path))
     {
-        R_ASSERT(!crashOnNotFound, "Failed to find FS path", initial);
+        R_ASSERT3(!crashOnNotFound, "Failed to find FS path", initial);
         return nullptr;
     }
 
