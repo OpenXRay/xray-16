@@ -211,10 +211,10 @@ XRCORE_API u64 GetCLK()
     return __rdtsc();
 }
 
-XRCORE_API u32 GetCUR()
+XRCORE_API u32 GetCurrentCPU()
 {
 #if defined(WINDOWS)
-    return GetCurrentProcessNumber();
+    return GetCurrentProcessorNumber();
 #elif defined(LINUX)
     return static_cast<u32>(sched_getcpu());
 #else

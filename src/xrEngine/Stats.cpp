@@ -147,7 +147,7 @@ void CStats::Show()
         font.OutSkip();
         pInput->DumpStatistics(font, alertPtr);
         font.OutSkip();
-        font.OutNext("CPU: %u", CPU::GetCUR());
+        font.OutNext("CPU: %u", CPU::GetCurrentCPU());
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
     }
