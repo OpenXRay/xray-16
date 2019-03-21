@@ -967,9 +967,9 @@
     <Text Include="Pipeline.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\..\TypeHelper.natvis" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Natvis Include="..\xrRender\xrRender.natvis" />
   </ItemGroup>
 </Project>

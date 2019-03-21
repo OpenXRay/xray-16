@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="CSheduler::Item">
+    <DisplayString>{scheduled_name}</DisplayString>
+    <StringView>scheduled_name</StringView>
+  </Type>
+
+  <Type Name="XRay::Sheduler::Item">
+    <DisplayString>{ScheduledName}</DisplayString>
+    <StringView>ScheduledName</StringView>
+  </Type>
+
+  <Type Name="MessageObject">
+    <DisplayString>{Object}</DisplayString>
+  </Type>
+</AutoVisualizer>

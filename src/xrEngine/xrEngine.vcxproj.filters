@@ -916,7 +916,7 @@
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
+    <Natvis Include="xrEngine.natvis" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

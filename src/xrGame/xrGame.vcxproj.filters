@@ -9817,7 +9817,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
+    <Natvis Include="xrGame.natvis" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -31,7 +31,4 @@
       <Filter>PPMd</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="..\..\TypeHelper.natvis" />
-  </ItemGroup>
 </Project>
