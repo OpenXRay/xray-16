@@ -80,8 +80,7 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
                 else
                 {
                     ViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2DMS;
-                    ViewDesc.Texture2D.MostDetailedMip = 0;
-                    ViewDesc.Texture2D.MipLevels = desc.MipLevels;
+                    ViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
                 }
             }
 
