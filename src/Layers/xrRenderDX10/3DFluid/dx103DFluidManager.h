@@ -84,9 +84,9 @@ private:
     void InitShaders();
     void DestroyShaders();
 
-    void PrepareTexture(int rtIndex);
-    void CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC TexDesc);
-    void DestroyRTTextureAndViews(int rtIndex);
+    void PrepareTexture(size_t rtIndex);
+    void CreateRTTextureAndViews(size_t rtIndex, D3D_TEXTURE3D_DESC TexDesc);
+    void DestroyRTTextureAndViews(size_t rtIndex);
 
     void Reset();
 

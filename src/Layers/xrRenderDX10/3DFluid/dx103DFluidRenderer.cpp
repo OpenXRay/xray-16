@@ -108,7 +108,7 @@ void dx103DFluidRenderer::InitShaders()
         CBlender_fluid_raydata Blender;
         ref_shader shader;
         shader.create(&Blender, "null");
-        for (int i = 0; i < 3; ++i)
+        for (size_t i = 0; i < 3; ++i)
             m_RendererTechnique[RS_CompRayData_Back + i] = shader->E[i];
     }
 
@@ -116,14 +116,14 @@ void dx103DFluidRenderer::InitShaders()
         CBlender_fluid_raycast Blender;
         ref_shader shader;
         shader.create(&Blender, "null");
-        for (int i = 0; i < 5; ++i)
+        for (size_t i = 0; i < 5; ++i)
             m_RendererTechnique[RS_QuadEdgeDetect + i] = shader->E[i];
     }
 }
 
 void dx103DFluidRenderer::DestroyShaders()
 {
-    for (int i = 0; i < RS_NumShaders; ++i)
+    for (size_t i = 0; i < RS_NumShaders; ++i)
     {
         //	Release shader's element.
         m_RendererTechnique[i] = 0;
@@ -471,7 +471,7 @@ void dx103DFluidRenderer::CreateRayDataResources(int width, int height)
     RT[0] = 0;
     RT[0].create(m_pRTNames[0], width, height, RTFormats[0]);
 
-    for (int i = 1; i < RRT_NumRT; ++i)
+    for (size_t i = 1; i < RRT_NumRT; ++i)
     {
         RT[i] = 0;
         RT[i].create(m_pRTNames[i], m_iRenderTextureWidth, m_iRenderTextureHeight, RTFormats[i]);
@@ -815,12 +815,9 @@ void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, Fo
         0, // ISpatial_DB::O_ORDERED,
         STYPE_LIGHTSOURCE, center, size);
 
-    u32 iNumRenderables = m_lstRenderables.size();
     // Determine visibility for dynamic part of scene
-    for (u32 i = 0; i < iNumRenderables; ++i)
+    for (ISpatial* spatial : m_lstRenderables)
     {
-        ISpatial* spatial = m_lstRenderables[i];
-
         // Light
         light* pLight = (light*)spatial->dcast_Light();
         VERIFY(pLight);

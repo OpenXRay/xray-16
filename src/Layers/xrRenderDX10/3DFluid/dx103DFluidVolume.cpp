@@ -177,11 +177,9 @@ void dx103DFluidVolume::Render(float /*LOD*/) // LOD - Level Of Detail  [0.0f - 
     // RCache.Render(D3DPT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);
 
     //	Render obstacles
-    const xr_vector<Fmatrix>& Obstacles = m_FluidData.GetObstaclesList();
-    int iObstNum = Obstacles.size();
-    for (int i = 0; i < iObstNum; ++i)
+    for (const Fmatrix& obstacle : m_FluidData.GetObstaclesList())
     {
-        RCache.set_xform_world(Obstacles[i]);
+        RCache.set_xform_world(obstacle);
         // RCache.Render(D3DPT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);
     }
 
