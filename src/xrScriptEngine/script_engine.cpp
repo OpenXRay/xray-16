@@ -990,8 +990,16 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #endif
     reinit();
     luabind::open(lua());
-    // XXX: temporary workaround to preserve backwards compatibility with game scripts
-    luabind::disable_super_deprecation();
+
+    // Workarounds to preserve backwards compatibility with game scripts
+    {
+        const bool nilConversion =
+            pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", false);
+     
+        luabind::allow_nil_conversion(nilConversion);
+        luabind::disable_super_deprecation();
+    }
+
     luabind::bind_class_info(lua());
     setup_callbacks();
     if (exporterFunc)
