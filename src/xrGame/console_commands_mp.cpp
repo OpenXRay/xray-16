@@ -41,6 +41,7 @@ extern int g_iCorpseRemove;
 extern BOOL g_bCollectStatisticData;
 // extern	BOOL	g_bStatisticSaveAuto	;
 extern BOOL g_SV_Disable_Auth_Check;
+extern BOOL g_sv_ignore_version_mismatch;
 
 extern int g_sv_mp_iDumpStatsPeriod;
 extern BOOL g_SV_Force_Artefact_Spawn;
@@ -2126,8 +2127,11 @@ void register_mp_console_commands()
     CMD4(CCC_Integer, "sv_statistic_collect", &g_bCollectStatisticData, 0, 1);
     CMD1(CCC_SaveStatistic, "sv_statistic_save");
 //	CMD4(CCC_Integer,		"sv_statistic_save_auto", &g_bStatisticSaveAuto, 0, 1);
+
 #ifndef MASTER_GOLD
+    // Using CCC_AuthCheck twice, yes. It's not a mistake. 
     CMD4(CCC_AuthCheck, "sv_no_auth_check", &g_SV_Disable_Auth_Check, 0, 1);
+    CMD4(CCC_AuthCheck, "sv_ignore_version_mismatch", &g_sv_ignore_version_mismatch, 0, 1);
 #endif // MASTER_GOLD
 
     CMD4(CCC_Integer, "sv_artefact_spawn_force", &g_SV_Force_Artefact_Spawn, 0, 1);
