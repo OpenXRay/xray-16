@@ -27,6 +27,8 @@
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
 
+#include "xrEngine/TaskScheduler.hpp"
+
 #if !defined(LINUX)
 #include "xrSASH.h"
 #endif
@@ -307,6 +309,7 @@ void CRenderDevice::on_idle()
 
     // renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
+    mtProcessingAllowed = true;
 
     const auto frameEndTime = TimerGlobal.GetElapsed_ms();
     const auto frameTime = frameEndTime - frameStartTime;
@@ -343,6 +346,9 @@ void CRenderDevice::on_idle()
 
     syncFrameDone.Wait(); // wait until secondary thread finish its job
     // renderFrameDone.Wait(); // wait until render thread finish its job
+    while (!TaskScheduler->TaskQueueIsEmpty())
+        std::this_thread::yield();
+    mtProcessingAllowed = false;
 
     if (!b_is_Active)
         Sleep(1);
@@ -468,6 +474,9 @@ void CRenderDevice::Run()
     thread_spawn(PrimaryThreadProc, "X-RAY Primary thread", 0, this);
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
+
+    TaskScheduler.reset(new TaskManager());
+    TaskScheduler->Initialize();
 
     // Message cycle
     seqAppStart.Process();

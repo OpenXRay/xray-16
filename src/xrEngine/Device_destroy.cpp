@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "xrEngine/TaskScheduler.hpp"
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
 #include "IGame_Persistent.h"
@@ -22,6 +23,7 @@ void CRenderDevice::Destroy()
     Memory.mem_compact();
     GEnv.Render->DestroyHW();
     g_monitors.Destroy();
+    TaskScheduler->Destroy();
     seqRender.Clear();
     seqAppActivate.Clear();
     seqAppDeactivate.Clear();
@@ -42,6 +44,8 @@ extern BOOL bNeed_re_create_env;
 
 void CRenderDevice::Reset(bool precache)
 {
+    TaskScheduler->RemoveTasksWithType(Task::Type::Renderer);
+
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
     pInput->GrabInput(false);

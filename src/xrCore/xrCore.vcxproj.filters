@@ -333,6 +333,12 @@
     <ClCompile Include="Crypto\trivial_encryptor.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>
+    <ClCompile Include="Threading\Task.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\TaskManager.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -727,6 +733,12 @@
     </ClInclude>
     <ClInclude Include="Crypto\trivial_encryptor.h">
       <Filter>Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Task.hpp">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\TaskManager.hpp">
+      <Filter>Threading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

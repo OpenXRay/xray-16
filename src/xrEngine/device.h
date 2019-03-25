@@ -211,7 +211,8 @@ public:
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
-        : fWidth_2(0), fHeight_2(0), m_editor_module(nullptr), m_editor_initialize(nullptr),
+        : fWidth_2(0), fHeight_2(0), mtProcessingAllowed(false),
+          m_editor_module(nullptr), m_editor_initialize(nullptr),
           m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
     {
         m_sdlWnd = NULL;
@@ -277,12 +278,18 @@ public:
     }
 
 private:
+    bool mtProcessingAllowed;
     Event primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 
 public:
     volatile BOOL mt_bMustExit;
+
+    bool IsMTProcessingAllowed()
+    {
+        return mtProcessingAllowed;
+    }
 
     ICF void remove_from_seq_parallel(const fastdelegate::FastDelegate0<>& delegate)
     {
