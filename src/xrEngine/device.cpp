@@ -15,6 +15,8 @@
 #include "SDL.h"
 #pragma warning(pop)
 
+#include <thread>
+
 #include "x_ray.h"
 #include "Render.h"
 
@@ -158,6 +160,24 @@ void CRenderDevice::RenderThreadProc(void* context)
     }
 }
 
+void CRenderDevice::PrimaryThreadProc(void* context)
+{
+    auto& device = *static_cast<CRenderDevice*>(context);
+    while (true)
+    {
+        device.primaryProcessFrame.Wait();
+        if (device.mt_bMustExit)
+        {
+            device.primaryThreadExit.Set();
+            return;
+        }
+
+        device.on_idle();
+
+        device.primaryFrameDone.Set();
+    }
+}
+
 void CRenderDevice::SecondaryThreadProc(void* context)
 {
     auto& device = *static_cast<CRenderDevice*>(context);
@@ -166,7 +186,6 @@ void CRenderDevice::SecondaryThreadProc(void* context)
         device.syncProcessFrame.Wait();
         if (device.mt_bMustExit)
         {
-            device.mt_bMustExit = FALSE;
             device.syncThreadExit.Set();
             return;
         }
@@ -344,11 +363,17 @@ void CRenderDevice::message_loop()
         return;
     }
 
+    bool timedOut = false;
+
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
         SDL_Event events[MAX_WINDOW_EVENTS];
-        const auto count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+        int count = 0;
+        if (!timedOut)
+        {
+            count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+                SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+        }
 
         for (int i = 0; i < count; ++i)
         {
@@ -412,7 +437,10 @@ void CRenderDevice::message_loop()
             }
         }
 
-        on_idle();
+        if (!timedOut)
+            primaryProcessFrame.Set();
+
+        timedOut = !primaryFrameDone.Wait(33);
     }
 }
 
@@ -420,7 +448,8 @@ void CRenderDevice::Run()
 {
     g_bLoaded = FALSE;
     Log("Starting engine...");
-    thread_name("X-RAY Primary thread");
+    thread_name("X-RAY Window thread");
+
     // Startup timers and calculate timer delta
     dwTimeGlobal = 0;
     Timer_MM_Delta = 0;
@@ -432,10 +461,14 @@ void CRenderDevice::Run()
         u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
     }
+
     // Start all threads
     mt_bMustExit = FALSE;
+
+    thread_spawn(PrimaryThreadProc, "X-RAY Primary thread", 0, this);
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
+
     // Message cycle
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
@@ -451,13 +484,15 @@ void CRenderDevice::Run()
     seqAppEnd.Process();
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
+    
     // renderProcessFrame.Set();
     // renderThreadExit.Wait();
+    
+    primaryProcessFrame.Set();
     syncProcessFrame.Set();
-    syncThreadExit.Wait();
 
-    while (mt_bMustExit)
-        Sleep(0);
+    primaryThreadExit.Wait();
+    syncThreadExit.Wait();
 }
 
 u32 app_inactive_time = 0;
