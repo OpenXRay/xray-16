@@ -13,12 +13,12 @@ void r_pixel_calculator::begin()
     RCache.set_RT(rt->pRT);
     RCache.set_ZB(zb);
 
-    R_ASSERT(Device.Begin());
+    R_ASSERT(Device.RenderBegin());
 }
 
 void r_pixel_calculator::end()
 {
-    Device.End();
+    Device.RenderEnd();
 
     RCache.set_RT(HW.pBaseRT);
     RCache.set_ZB(HW.pBaseZB);

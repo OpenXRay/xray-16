@@ -34,7 +34,7 @@ bool engine_impl::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 void engine_impl::on_idle()
 {
     SDL_PumpEvents();
-    Device.on_idle();
+    Device.ProcessFrame();
 }
 void engine_impl::on_resize()
 {

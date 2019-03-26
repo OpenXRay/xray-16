@@ -236,11 +236,18 @@ private:
 
 public:
     // Scene control
+    void xr_stdcall ProcessFrame();
+
     void PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input);
-    BOOL Begin();
-    void Clear();
-    void End();
+
+    bool BeforeFrame();
     void FrameMove();
+
+    void BeforeRender();
+    void DoRender();
+    BOOL RenderBegin();
+    void Clear();
+    void RenderEnd();
 
     void overdrawBegin();
     void overdrawEnd();
@@ -303,7 +310,6 @@ private:
     void CalcFrameStats();
 
 public:
-    void xr_stdcall on_idle();
 #if !defined(LINUX)
     bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif

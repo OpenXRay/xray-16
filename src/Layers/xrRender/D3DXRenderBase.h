@@ -209,6 +209,7 @@ public:
     virtual bool GetForceGPU_REF() override;
     virtual u32 GetCacheStatPolys() override;
     virtual void Begin() override;
+    void BeforeFrame() override {}
     virtual void Clear() override;
     virtual void End() override;
     virtual void ClearTarget() override;

@@ -305,7 +305,7 @@ void CApplication::LoadDraw()
 
     Device.dwFrame += 1;
 
-    if (!Device.Begin())
+    if (!Device.RenderBegin())
         return;
 
     if (GEnv.isDedicatedServer)
@@ -313,7 +313,7 @@ void CApplication::LoadDraw()
     else
         load_draw_internal();
 
-    Device.End();
+    Device.RenderEnd();
 }
 
 void CApplication::LoadForceDrop()

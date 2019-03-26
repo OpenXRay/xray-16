@@ -50,7 +50,7 @@ extern int ps_always_active;
 BOOL g_bLoaded = FALSE;
 ref_light precache_light = 0;
 
-BOOL CRenderDevice::Begin()
+BOOL CRenderDevice::RenderBegin()
 {
     if (GEnv.isDedicatedServer)
         return TRUE;
@@ -79,7 +79,7 @@ BOOL CRenderDevice::Begin()
 void CRenderDevice::Clear() { GEnv.Render->Clear(); }
 extern void CheckPrivilegySlowdown();
 
-void CRenderDevice::End(void)
+void CRenderDevice::RenderEnd(void)
 {
     if (GEnv.isDedicatedServer)
         return;
@@ -147,12 +147,12 @@ void CRenderDevice::RenderThreadProc(void* context)
             CStatTimer renderTotalReal;
             renderTotalReal.FrameStart();
             renderTotalReal.Begin();
-            if (device.b_is_Active && device.Begin())
+            if (device.b_is_Active && device.RenderBegin())
             {
                 device.seqRender.Process();
                 device.CalcFrameStats();
                 device.Statistic->Show();
-                device.End(); // Present goes here
+                device.RenderEnd(); // Present goes here
             }
             renderTotalReal.End();
             renderTotalReal.FrameEnd();
@@ -174,7 +174,7 @@ void CRenderDevice::PrimaryThreadProc(void* context)
             return;
         }
 
-        device.on_idle();
+        device.ProcessFrame();
 
         device.primaryFrameDone.Set();
     }
@@ -251,12 +251,12 @@ int g_svDedicateServerUpdateReate = 100;
 
 ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
-void CRenderDevice::on_idle()
+bool CRenderDevice::BeforeFrame()
 {
     if (!b_is_Ready)
     {
         Sleep(100);
-        return;
+        return false;
     }
 
     if (psDeviceFlags.test(rsStatistic))
@@ -264,23 +264,24 @@ void CRenderDevice::on_idle()
     else
         g_bEnableStatGather = false;
 
-    if (g_loading_events.size())
+    if (!g_loading_events.empty())
     {
         if (g_loading_events.front()())
             g_loading_events.pop_front();
         pApp->LoadDraw();
-        return;
+        return false;
     }
-
-    const auto frameStartTime = TimerGlobal.GetElapsed_ms();
 
 #if !defined(LINUX)
     if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
 #endif
 
-    FrameMove();
+    return true;
+}
 
+void CRenderDevice::BeforeRender()
+{
     // Precache
     if (dwPrecacheFrame)
     {
@@ -306,6 +307,41 @@ void CRenderDevice::on_idle()
     mFullTransformSaved = mFullTransform;
     mViewSaved = mView;
     mProjectSaved = mProject;
+}
+
+void CRenderDevice::DoRender()
+{
+    if (GEnv.isDedicatedServer)
+        return;
+
+    CStatTimer renderTotalReal;
+    renderTotalReal.FrameStart();
+    renderTotalReal.Begin();
+    if (b_is_Active && RenderBegin())
+    {
+        // all rendering is done here
+        seqRender.Process();
+
+        CalcFrameStats();
+        Statistic->Show();
+        RenderEnd(); // Present goes here
+    }
+    renderTotalReal.End();
+    renderTotalReal.FrameEnd();
+    stats.RenderTotal.accum = renderTotalReal.accum;
+}
+
+void CRenderDevice::ProcessFrame()
+{
+    if (!BeforeFrame())
+        return;
+
+    const auto frameStartTime = TimerGlobal.GetElapsed_ms();
+
+    GEnv.Render->BeforeFrame();
+    FrameMove();
+
+    BeforeRender();
 
     // renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
@@ -314,23 +350,7 @@ void CRenderDevice::on_idle()
     const auto frameEndTime = TimerGlobal.GetElapsed_ms();
     const auto frameTime = frameEndTime - frameStartTime;
 
-    if (!GEnv.isDedicatedServer)
-    {
-        // all rendering is done here
-        CStatTimer renderTotalReal;
-        renderTotalReal.FrameStart();
-        renderTotalReal.Begin();
-        if (b_is_Active && Begin())
-        {
-            seqRender.Process();
-            CalcFrameStats();
-            Statistic->Show();
-            End(); // Present goes here
-        }
-        renderTotalReal.End();
-        renderTotalReal.FrameEnd();
-        stats.RenderTotal.accum = renderTotalReal.accum;
-    }
+    DoRender();
 
     // Eco render (by alpet)
     u32 updateDelta = 0;
