@@ -468,6 +468,9 @@ void CRenderDevice::message_loop()
 
         timedOut = !primaryFrameDone.Wait(33);
     }
+
+    if (timedOut)
+        primaryFrameDone.Wait();
 }
 
 void CRenderDevice::Run()
@@ -509,8 +512,11 @@ void CRenderDevice::Run()
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
     pInput->GrabInput(true);
+    
     message_loop();
+
     seqAppEnd.Process();
+
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
     
