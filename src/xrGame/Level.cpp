@@ -569,9 +569,10 @@ void CLevel::OnFrame()
     {
         if (g_mt_config.test(mtLUA_GC))
         {
-            TaskScheduler->AddTask("CLevel::script_gc", Task::Type::Scripting,
+            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
+            /*TaskScheduler->AddTask("CLevel::script_gc", Task::Type::Scripting,
                 { this, &CLevel::script_gc },
-                { &Device, &CRenderDevice::IsMTProcessingAllowed });
+                { &Device, &CRenderDevice::IsMTProcessingAllowed });*/
         }
         else
             script_gc();
