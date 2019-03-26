@@ -920,7 +920,7 @@ CRenderTarget::~CRenderTarget()
     glDeleteTextures(1, &t_ss_async);
 
     // Textures
-    t_material->surface_set(GL_TEXTURE_2D, 0);
+    t_material->surface_set(GL_TEXTURE_3D, 0);
     glDeleteTextures(1, &t_material_surf);
 
     t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
