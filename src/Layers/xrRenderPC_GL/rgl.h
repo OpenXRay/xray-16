@@ -357,6 +357,8 @@ public:
     BOOL occ_visible(sPoly& P) override;
 
     // Main
+    void BeforeFrame() override;
+
     void Calculate() override;
     void Render() override;
     void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;

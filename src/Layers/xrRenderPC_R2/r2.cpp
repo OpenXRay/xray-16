@@ -409,6 +409,14 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
+void CRender::BeforeFrame()
+{
+    // MT-HOM (@front)
+    TaskScheduler->AddTask("CHOM::MT_RENDER", Task::Type::Renderer,
+        { &HOM, &CHOM::MT_RENDER },
+        { &Device, &CRenderDevice::IsMTProcessingAllowed });
+}
+
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
@@ -417,11 +425,6 @@ void CRender::OnFrame()
         // MT-details (@front)
         TaskScheduler->AddTask("CDetailManager::MT_CALC", Task::Type::Renderer,
             { Details, &CDetailManager::MT_CALC },
-            { &Device, &CRenderDevice::IsMTProcessingAllowed });
-
-        // MT-HOM (@front)
-        TaskScheduler->AddTask("CHOM::MT_RENDER", Task::Type::Renderer,
-            { &HOM, &CHOM::MT_RENDER },
             { &Device, &CRenderDevice::IsMTProcessingAllowed });
     }
 }
