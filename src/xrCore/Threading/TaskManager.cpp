@@ -42,9 +42,10 @@ void TaskManagerBase::taskManagerThread(void* thisPtr)
 
     while (!self.shouldStop)
     {
-        while (self.tasks.empty())
+        if (self.tasks.empty())
         {
             Sleep(self.taskerSleepTime);
+            continue;
         }
 
         self.lock.Enter();
@@ -68,8 +69,11 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
 
     while (!self.shouldStop)
     {
-        while (self.tasksInExecution.empty())
+        if (self.tasksInExecution.empty())
+        {
             Sleep(WATCHER_CALM_DOWN_PERIOD);
+            continue;
+        }
 
         self.executionLock.Enter();
         for (Task* task : self.tasksInExecution)
