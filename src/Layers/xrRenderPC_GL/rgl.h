@@ -370,6 +370,8 @@ public:
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
+    void MakeContextCurrent(bool acquire) override;
+
     // Render mode
     void rmNear() override;
     void rmFar() override;

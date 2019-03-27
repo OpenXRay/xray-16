@@ -165,6 +165,8 @@ void CRenderDevice::RenderThreadProc(void* context)
 void CRenderDevice::PrimaryThreadProc(void* context)
 {
     auto& device = *static_cast<CRenderDevice*>(context);
+    bool switchContext = psDeviceFlags.test(rsRGL);
+
     while (true)
     {
         device.primaryProcessFrame.Wait();
@@ -174,7 +176,13 @@ void CRenderDevice::PrimaryThreadProc(void* context)
             return;
         }
 
+        if (switchContext)
+            GEnv.Render->MakeContextCurrent(true);
+
         device.ProcessFrame();
+
+        if (switchContext)
+            GEnv.Render->MakeContextCurrent(false);
 
         device.primaryFrameDone.Set();
     }
@@ -390,6 +398,7 @@ void CRenderDevice::message_loop()
     }
 
     bool timedOut = false;
+    bool switchContext = psDeviceFlags.test(rsRGL);
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
@@ -399,6 +408,8 @@ void CRenderDevice::message_loop()
         {
             count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
                 SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+            if (switchContext)
+                GEnv.Render->MakeContextCurrent(true);
         }
 
         for (int i = 0; i < count; ++i)
@@ -464,7 +475,11 @@ void CRenderDevice::message_loop()
         }
 
         if (!timedOut)
+        {
+            if (switchContext)
+                GEnv.Render->MakeContextCurrent(false);
             primaryProcessFrame.Set();
+        }
 
         timedOut = !primaryFrameDone.Wait(33);
     }

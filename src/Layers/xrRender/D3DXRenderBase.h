@@ -217,6 +217,8 @@ public:
     virtual void OnAssetsChanged() override;
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
+    void MakeContextCurrent(bool /*acquire*/) override {}
+
 public:
     CResourceManager* Resources;
     ref_shader m_WireShader;

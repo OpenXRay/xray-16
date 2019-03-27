@@ -404,6 +404,7 @@ public:
     virtual void OnDeviceCreate(LPCSTR shName) = 0;
     virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
     virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) = 0;
+
     //	Overdraw
     virtual void overdrawBegin() = 0;
     virtual void overdrawEnd() = 0;
@@ -430,4 +431,6 @@ public:
     virtual void ClearTarget() = 0;
     virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) = 0;
     virtual void OnAssetsChanged() = 0;
+
+    virtual void MakeContextCurrent(bool acquire) = 0;
 };

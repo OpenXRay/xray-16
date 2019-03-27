@@ -473,6 +473,16 @@ void CRender::OnFrame()
 void CRender::BeforeWorldRender() {}
 void CRender::AfterWorldRender() {}
 
+void CRender::MakeContextCurrent(bool acquire)
+{
+    int result;
+    if (acquire)
+        result = SDL_GL_MakeCurrent(HW.m_hWnd, HW.m_hRC);
+    else
+        result = SDL_GL_MakeCurrent(nullptr, nullptr);
+    R_ASSERT2(result == 0, "Failed to switch OpenGL context");
+}
+
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
 void CRender::ros_destroy(IRender_ObjectSpecific* & p) { xr_delete(p); }
