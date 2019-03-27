@@ -557,9 +557,17 @@ void CLevel::OnFrame()
         if (g_mt_config.test(mtLevelSounds))
         {
             R_ASSERT(m_level_sound_manager);
-            TaskScheduler->AddTask("CLevelSoundManager::Update", Task::Type::Game,
-                { m_level_sound_manager, &CLevelSoundManager::Update },
-                { &Device, &CRenderDevice::IsMTProcessingAllowed });
+            if (true)
+            {
+                Device.seqParallel.push_back(
+                    fastdelegate::FastDelegate0<>(m_level_sound_manager, &CLevelSoundManager::Update));
+            }
+            else
+            {
+                TaskScheduler->AddTask("CLevelSoundManager::Update", Task::Type::Game,
+                    { m_level_sound_manager, &CLevelSoundManager::Update },
+                    { &Device, &CRenderDevice::IsMTProcessingAllowed });
+            }
         }
         else
             m_level_sound_manager->Update();
@@ -569,10 +577,16 @@ void CLevel::OnFrame()
     {
         if (g_mt_config.test(mtLUA_GC))
         {
-            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
-            /*TaskScheduler->AddTask("CLevel::script_gc", Task::Type::Scripting,
-                { this, &CLevel::script_gc },
-                { &Device, &CRenderDevice::IsMTProcessingAllowed });*/
+            if (true)
+            {
+                Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
+            }
+            else
+            {
+                TaskScheduler->AddTask("CLevel::script_gc", Task::Type::Scripting,
+                    { this, &CLevel::script_gc },
+                    { &Device, &CRenderDevice::IsMTProcessingAllowed });
+            }
         }
         else
             script_gc();
