@@ -234,7 +234,8 @@ void CInput::GrabInput(const bool grab)
     SDL_SetWindowGrab(Device.m_sdlWnd, grab ? SDL_TRUE : SDL_FALSE);
 
     // Grab the mouse
-    SDL_SetRelativeMouseMode(grab ? SDL_TRUE : SDL_FALSE);
+    if (exclusiveInput)
+        SDL_SetRelativeMouseMode(grab ? SDL_TRUE : SDL_FALSE);
 
     // We're done here.
     inputGrabbed = grab;
