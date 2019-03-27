@@ -252,14 +252,10 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 #ifdef USE_OGL
 	// Sun must be rendered to generic0 only as it is done in DX
-	if (!RImplementation.o.dx10_msaa)
-	{
-		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, HW.pBaseZB);
-	}
-	else
-	{
-		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
-	}
+    if (!RImplementation.o.dx10_msaa)
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, HW.pBaseZB);
+    else
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
 #endif // USE_OGL
 
     // Sun
@@ -281,14 +277,10 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 #ifdef USE_OGL
     // set low/hi RTs for clouds
     if (!RImplementation.o.dx10_msaa)
-    {
-		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, HW.pBaseZB);
-    }
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, HW.pBaseZB);
     else
-    {
-		RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
-    }
-#endif // USE_OGL
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+ #endif // USE_OGL
 }
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
