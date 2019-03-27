@@ -42,13 +42,14 @@ void TaskManagerBase::taskManagerThread(void* thisPtr)
 
     while (!self.shouldStop)
     {
+        self.lock.Enter();
         if (self.tasks.empty())
         {
+            self.lock.Leave();
             Sleep(self.taskerSleepTime);
             continue;
         }
 
-        self.lock.Enter();
         for (Task* task : self.tasks)
         {
             if (task->CheckIfExecutionAllowed())
@@ -69,13 +70,14 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
 
     while (!self.shouldStop)
     {
+        self.executionLock.Enter();
         if (self.tasksInExecution.empty())
         {
+            self.executionLock.Leave();
             Sleep(WATCHER_CALM_DOWN_PERIOD);
             continue;
         }
 
-        self.executionLock.Enter();
         for (Task* task : self.tasksInExecution)
         {
             if (!task->IsStarted())
