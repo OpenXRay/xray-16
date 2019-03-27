@@ -399,27 +399,14 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_01W);
+        VERIFY(vStride == sizeof(vertHW_1W));
+        VERIFY(0 == V.p_rm_Vertices);
 #else
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_01W, 0);
-#endif // USE_OGL
         VERIFY(vStride == sizeof(vertHW_1W));
-        //BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
+        VERIFY(nullptr == V.p_rm_Vertices);
+#endif // USE_OGL
 
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_1W* dst = (vertHW_1W*)bytes;
-        //vertBoned1W* src = (vertBoned1W*)_verts_;
-        //for (u32 it = 0; it<V.vCount; it++)
-        //{
-        //    Fvector2 uv;
-        //    uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv, src->matrix*3);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
         // TODO: DX10: Check for memory fragmentation
         vertHW_1W* dstOriginal = xr_alloc<vertHW_1W>(V.vCount);
         vertHW_1W* dst = dstOriginal;
@@ -453,27 +440,14 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_2W);
+        VERIFY(vStride == sizeof(vertHW_2W));
+        VERIFY(0 == V.p_rm_Vertices);
 #else
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_2W, 0);
-#endif
         VERIFY(vStride == sizeof(vertHW_2W));
-        // BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
+        VERIFY(nullptr == V.p_rm_Vertices);
+#endif
 
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_2W* dst = (vertHW_2W*)bytes;
-        //vertBoned2W* src = (vertBoned2W*)_verts_;
-        //for (u32 it = 0; it<V.vCount; ++it)
-        //{
-        //    Fvector2uv;
-        //    uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv, int(src->matrix0)*3, int(src->matrix1)*3, src->w);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
         // TODO: DX10: Check for memory fragmentation
         vertHW_2W* dstOriginal = xr_alloc<vertHW_2W>(V.vCount);
         vertHW_2W* dst = dstOriginal;
@@ -506,29 +480,14 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
         }
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_3W);
+        VERIFY(vStride == sizeof(vertHW_3W));
+        VERIFY(0 == V.p_rm_Vertices);
 #else
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_3W, 0);
-#endif // USE_OGL
         VERIFY(vStride == sizeof(vertHW_3W));
-        //BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
+        VERIFY(nullptr == V.p_rm_Vertices);
+#endif // USE_OGL
 
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_3W* dst = (vertHW_3W*)bytes;
-        //vertBoned3W* src = (vertBoned3W*)_verts_;
-
-        //for (u32 it = 0; it<V.vCount; ++it)
-        //{
-        //    Fvector2 uv;
-        //    uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv,
-        //        int(src->m[0])*3, int(src->m[1])*3, int(src->m[2])*3, src->w[0], src->w[1]);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
         // TODO: DX10: Check for memory fragmentation
         vertHW_3W* dstOriginal = xr_alloc<vertHW_3W>(V.vCount);
         vertHW_3W* dst = dstOriginal;
@@ -563,27 +522,13 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_4W);
+        VERIFY(vStride == sizeof(vertHW_4W));
+        VERIFY(0 == V.p_rm_Vertices);
 #else
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_4W, 0);
-#endif
         VERIFY(vStride == sizeof(vertHW_4W));
-        //BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
-
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_4W* dst = (vertHW_4W*)bytes;
-        //vertBoned4W* src = (vertBoned4W*)_verts_;
-        //for (u32 it = 0; it<V.vCount; ++it)
-        //{
-        //    Fvector2 uv; uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv, int(src->m[0])*3,
-        //        int(src->m[1])*3, int(src->m[2])*3, int(src->m[3])*3, src->w[0], src->w[1], src->w[2]);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
+        VERIFY(nullptr == V.p_rm_Vertices);
+#endif
 
         // TODO: DX10: Check for memory fragmentation
         vertHW_4W* dstOriginal = xr_alloc<vertHW_4W>(V.vCount);
