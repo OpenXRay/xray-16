@@ -124,10 +124,10 @@ LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
 
 void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vector<D3D_INPUT_ELEMENT_DESC>& declOut)
 {
-    size_t iDeclSize = declIn.size() - 1;
+    s32 iDeclSize = declIn.size() - 1;
     declOut.resize(iDeclSize + 1);
 
-    for (size_t i = 0; i < iDeclSize; ++i)
+    for (s32 i = 0; i < iDeclSize; ++i)
     {
         const D3DVERTEXELEMENT9& descIn = declIn[i];
         D3D_INPUT_ELEMENT_DESC& descOut = declOut[i];
@@ -141,6 +141,7 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
         descOut.InstanceDataStepRate = 0;
     }
 
-    ZeroMemory(&declOut[iDeclSize], sizeof(declOut[iDeclSize]));
+    if (iDeclSize >= 0)
+        ZeroMemory(&declOut[iDeclSize], sizeof(declOut[iDeclSize]));
 }
 };
