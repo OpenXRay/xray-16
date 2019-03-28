@@ -193,7 +193,7 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
     string512 temp;
     strconcat(sizeof(temp), temp, StringTable().translate("st_loading_saved_game").c_str(),
-        "\"", save_name,SAVE_EXTENSION, "\"");
+        " \"", save_name,SAVE_EXTENSION, "\"");
 
     g_pGamePersistent->SetLoadStageTitle(temp);
     g_pGamePersistent->LoadTitle();
@@ -201,7 +201,7 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
     unload();
     reload(m_section);
 
-    u32 source_count = stream->r_u32();
+    const u32 source_count = stream->r_u32();
     void* source_data = xr_malloc(source_count);
     rtc_decompress(source_data, source_count, stream->pointer(), stream->length() - 3 * sizeof(u32));
     FS.r_close(stream);
