@@ -399,7 +399,7 @@ void CApplication::Level_Scan()
     FS.file_list_close(folder);
 }
 
-void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
+void gen_logo_name(string_path& dest, LPCSTR level_name, int num = -1)
 {
     strconcat(sizeof(dest), dest, "intro" DELIMITER "intro_", level_name);
 
@@ -407,9 +407,21 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
     if (dest[len - 1] == _DELIMITER)
         dest[len - 1] = 0;
 
+    if (num < 0)
+        return;
+
     string16 buff;
     xr_strcat(dest, sizeof(dest), "_");
     xr_strcat(dest, sizeof(dest), xr_itoa(num + 1, buff, 10));
+}
+
+// Return true if logo exists
+// Always sets the path even if logo doesn't exist
+bool set_logo_path(string_path& path, pcstr levelName, int count = -1)
+{
+    gen_logo_name(path, levelName, count);
+    string_path temp2;
+    return FS.exist(temp2, "$game_textures$", path, ".dds") || FS.exist(temp2, "$level$", path, ".dds");
 }
 
 void CApplication::Level_Set(u32 L)
@@ -417,34 +429,32 @@ void CApplication::Level_Set(u32 L)
     if (L >= Levels.size())
         return;
     FS.get_path("$level$")->_set(Levels[L].folder);
+    Level_Current = L;
 
     static string_path path;
+    path[0] = 0;
 
-    if (Level_Current != L)
+    int count = 0;
+    while (true)
     {
-        path[0] = 0;
-
-        Level_Current = L;
-
-        int count = 0;
-        while (true)
-        {
-            string_path temp2;
-            gen_logo_name(path, Levels[L].folder, count);
-            if (FS.exist(temp2, "$game_textures$", path, ".dds") || FS.exist(temp2, "$level$", path, ".dds"))
-                count++;
-            else
-                break;
-        }
-
-        if (count)
-        {
-            int num = ::Random.randI(count);
-            gen_logo_name(path, Levels[L].folder, num);
-        }
+        if (set_logo_path(path, Levels[L].folder, count))
+            count++;
+        else
+            break;
     }
 
-    if (path[0] && loadingScreen)
+    if (count)
+    {
+        const int num = ::Random.randI(count);
+        gen_logo_name(path, Levels[L].folder, num);
+    }
+    else if (!set_logo_path(path, Levels[L].folder))
+    {
+        if (!set_logo_path(path, "no_start_picture"))
+            path[0] = 0;
+    }
+
+    if (path[0])
         loadingScreen->SetLevelLogo(path);
 }
 
