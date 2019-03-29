@@ -43,8 +43,8 @@ bool CCoverEvaluatorBase::inertia(Fvector const& position, float radius)
 {
     //	m_actuality				= m_actuality && fsimilar(m_last_radius,radius);
     //	m_actuality				= m_actuality && ((m_last_radius + EPS_L) >= radius);
-    bool radius_criteria = ((m_last_radius + EPS_L) >= radius);
-    bool time_criteria = (Device.dwTimeGlobal < m_last_update + m_inertia_time);
+    const bool radius_criteria = ((m_last_radius + EPS_L) >= radius);
+    const bool time_criteria = (Device.dwTimeGlobal < m_last_update + m_inertia_time);
 
     m_last_radius = radius;
 
@@ -58,8 +58,9 @@ bool CCoverEvaluatorBase::inertia(Fvector const& position, float radius)
     if (!cover)
         return false;
 
-    if (!m_stalker->get_current_loophole() ||
-        !cover->is_position_in_danger_fov(*m_stalker->get_current_loophole(), position))
+    smart_cover::loophole const* loophole = m_stalker->get_current_loophole();
+    
+    if (!loophole || !cover->is_position_in_danger_fov(*loophole, position))
         return false;
 
     if (!m_stalker->can_fire_right_now())
