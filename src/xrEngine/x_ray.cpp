@@ -349,6 +349,7 @@ void CApplication::LoadStage()
     else
         max_load_stage = 14;
 
+    loadingScreen->Show(true);
     LoadDraw();
     ++load_stage;
 }
