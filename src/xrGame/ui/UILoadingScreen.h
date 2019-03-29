@@ -20,8 +20,8 @@ class UILoadingScreen : public ILoadingScreen, public CUIWindow
 
     CUIStatic* loadingProgressBackground;
     CUIProgressBar* loadingProgress;
-    CUIStatic* loadingLogo;
     CUIStatic* loadingProgressPercent;
+    CUIStatic* loadingLogo;
 
     CUIStatic* loadingStage;
     CUIStatic* loadingHeader;
