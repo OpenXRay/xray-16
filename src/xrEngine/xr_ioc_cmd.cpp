@@ -246,10 +246,10 @@ void CCC_LoadCFG::Execute(LPCSTR args)
 
     FS.update_path(cfg_full_name, "$app_data_root$", cfg_name);
 
-    if (NULL == FS.exist(cfg_full_name))
+    if (!FS.exist(cfg_full_name))
         FS.update_path(cfg_full_name, "$fs_root$", cfg_name);
 
-    if (NULL == FS.exist(cfg_full_name))
+    if (!FS.exist(cfg_full_name))
         xr_strcpy(cfg_full_name, cfg_name);
 
     IReader* F = FS.r_open(cfg_full_name);
