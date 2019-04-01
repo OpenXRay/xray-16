@@ -19,7 +19,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Include/xrRender
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/luabind
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/gli
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../sdk/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/gli/external/glm
     ${SDL_INCLUDE_DIRS}
     )
 

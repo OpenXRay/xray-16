@@ -2,7 +2,11 @@
 #include "xr_effgamma.h"
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
+#if defined(WINDOWS)
 #include <FreeImage/FreeImagePlus.h>
+#else
+#include <FreeImagePlus.h>
+#endif
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "d3dx10tex.h"
 #endif // USE_DX10

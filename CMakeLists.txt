@@ -70,7 +70,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive --std=c++17 -Wno-attributes -pipe -Wl,--no-undefined -fvisibility=hidden")
 
-#set (SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=shift -fsanitize=integer-divide-by-zero -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=return -fsanitize=null -fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=bounds-strict -fsanitize=object-size -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool")
+#set (SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=undefined -fno-sanitize=vptr")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZE_FLAGS}")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SANITIZE_FLAGS}")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SANITIZE_FLAGS}")
@@ -81,6 +81,8 @@ set(LUA_LIBRARIES luajit)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
+
+add_definitions ( -msse2 -mfpmath=sse )
 
 if( TBB_PARALLEL )
   add_definitions ( -DUSE_TBB_PARALLEL )
@@ -107,14 +109,6 @@ add_definitions(-DdSINGLE) # for ODE
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
 if (NOT WIN32)
-if(EXISTS ${CMAKE_SOURCE_DIR}/Externals/cryptopp/dsa.h)
-    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/Externals/cryptopp)
-    file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Externals/cryptopp)
-endif()
-if(EXISTS ${CMAKE_SOURCE_DIR}/sdk/include/tbb/tbb.h)
-    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/sdk/include/tbb)
-    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/sdk/include/serial/tbb)
-endif()
 find_package(GLEW REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(LockFile REQUIRED)
@@ -130,7 +124,7 @@ find_package(PCRE REQUIRED)
 endif()
 
 include_directories(${LUA_INCLUDE_DIR})
-include_directories(${CMAKE_SOURCE_DIR} {CMAKE_SOURCE_DIR}/Common ${CMAKE_SOURCE_DIR}/Externals ${CMAKE_SOURCE_DIR}/Externals/gli/external/glm ${CMAKE_SOURCE_DIR}/../sdk/include/loki)
+include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/Common )
 
 add_subdirectory(Externals)
 add_subdirectory(src)

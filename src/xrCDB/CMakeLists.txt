@@ -8,7 +8,7 @@ add_dir("${DIRS}")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
+    ${CMAKE_SOURCE_DIR}/Externals
     ${SDL_INCLUDE_DIRS}
     )
 
