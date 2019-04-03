@@ -239,7 +239,7 @@ void CRender::Render()
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
 
     // Configure
-    RImplementation.o.distortion = FALSE; // disable distorion
+    o.distortion = FALSE; // disable distorion
     Fcolor sun_color = ((light*)Lights.sun._get())->color;
     BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
     if (o.sunstatic)
@@ -259,7 +259,7 @@ void CRender::Render()
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
     {
         PIX_EVENT(DEFER_Z_FILL);
-        RImplementation.BasicStats.Culling.Begin();
+        BasicStats.Culling.Begin();
         float z_distance = ps_r2_zfill;
         Fmatrix m_zfill, m_project;
         m_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
@@ -270,7 +270,7 @@ void CRender::Render()
         phase = PHASE_SMAP;
         render_main(m_zfill, false);
         r_pmask(true, false); // disable priority "1"
-        RImplementation.BasicStats.Culling.End();
+        BasicStats.Culling.End();
 
         // flush
         Target->phase_scene_prepare();
@@ -285,7 +285,7 @@ void CRender::Render()
 
     //*******
     // Sync point
-    RImplementation.BasicStats.WaitS.Begin();
+    BasicStats.WaitS.Begin();
     if (1)
     {
         CTimer T;
@@ -304,14 +304,14 @@ void CRender::Render()
             }
         }
     }
-    RImplementation.BasicStats.WaitS.End();
+    BasicStats.WaitS.End();
     q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;
     // CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
     CHK_DX(EndQuery(q_sync_point[q_sync_count]));
 
     //******* Main calc - DEFERRER RENDERER
     // Main calc
-    RImplementation.BasicStats.Culling.Begin();
+    BasicStats.Culling.Begin();
     r_pmask(true, false, true); // enable priority "0",+ capture wmarks
     if (bSUN)
         set_Recorder(&main_coarse_structure);
@@ -321,7 +321,7 @@ void CRender::Render()
     render_main(Device.mFullTransform, true);
     set_Recorder(NULL);
     r_pmask(true, false); // disable priority "1"
-    RImplementation.BasicStats.Culling.End();
+    BasicStats.Culling.End();
 
     BOOL split_the_scene_to_minimize_wait = FALSE;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))
@@ -353,8 +353,8 @@ void CRender::Render()
     Target->phase_occq();
     LP_normal.clear();
     LP_pending.clear();
-    if (RImplementation.o.dx10_msaa)
-        RCache.set_ZB(RImplementation.Target->rt_MSAADepth->pZRT);
+    if (o.dx10_msaa)
+        RCache.set_ZB(Target->rt_MSAADepth->pZRT);
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
         // perform tests
@@ -411,11 +411,11 @@ void CRender::Render()
         // skybox can be drawn here
         if (0)
         {
-            if (!RImplementation.o.dx10_msaa)
+            if (!o.dx10_msaa)
                 Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, HW.pBaseZB);
             else
                 Target->u_setrt(
-                    Target->rt_Generic_0_r, Target->rt_Generic_1, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+                    Target->rt_Generic_0_r, Target->rt_Generic_1, 0, Target->rt_MSAADepth->pZRT);
             RCache.set_CullMode(CULL_NONE);
             RCache.set_Stencil(FALSE);
 
@@ -473,7 +473,7 @@ void CRender::Render()
     }
 
     // full screen pass to mark msaa-edge pixels in highest stencil bit
-    if (RImplementation.o.dx10_msaa)
+    if (o.dx10_msaa)
     {
         PIX_EVENT(MARK_MSAA_EDGES);
         Target->mark_msaa_edges();
@@ -490,7 +490,7 @@ void CRender::Render()
     if (bSUN)
     {
         PIX_EVENT(DEFER_SUN);
-        RImplementation.Stats.l_visible++;
+        Stats.l_visible++;
         if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
             render_sun_cascades();
         else
@@ -509,7 +509,7 @@ void CRender::Render()
         RCache.set_xform_project(Device.mProject);
         RCache.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
-        if (!RImplementation.o.dx10_msaa)
+        if (!o.dx10_msaa)
             RCache.set_Stencil(
                 TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         else
@@ -519,7 +519,7 @@ void CRender::Render()
         // (TRUE,D3DCMP_ALWAYS,0x00,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
         RCache.set_CullMode(CULL_CCW);
         RCache.set_ColorWriteEnable();
-        RImplementation.r_dsgraph_render_emissive();
+        r_dsgraph_render_emissive();
     }
 
     // Lighting, non dependant on OCCQ
@@ -548,7 +548,7 @@ void CRender::Render()
 void CRender::render_forward()
 {
     VERIFY(0 == mapDistort.size());
-    RImplementation.o.distortion = RImplementation.o.distortion_enabled; // enable distorion
+    o.distortion = o.distortion_enabled; // enable distorion
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
@@ -565,7 +565,7 @@ void CRender::render_forward()
         g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }
 
-    RImplementation.o.distortion = FALSE; // disable distorion
+    o.distortion = FALSE; // disable distorion
 }
 
 // Перед началом рендера мира --#SM+#-- +SecondVP+
