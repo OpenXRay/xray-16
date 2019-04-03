@@ -2,7 +2,7 @@
 
 static void set_viewport(ID3D10Device* dev, u32 w, u32 h)
 {
-    static D3D10_VIEWPORT viewport[1] = {0, 0, (UINT)w, (UINT)h, 0.f, 1.f};
+    static D3D_VIEWPORT viewport[1] = {0, 0, (UINT)w, (UINT)h, 0.f, 1.f};
     dev->RSSetViewports(1, viewport);
 }
 

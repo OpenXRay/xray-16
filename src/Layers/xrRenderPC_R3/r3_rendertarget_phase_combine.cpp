@@ -23,7 +23,7 @@ void CRenderTarget::DoAsyncScreenshot()
         //	pTex = rt_Color->pSurface;
 
         // HW.pDevice->CopyResource( t_ss_async, pTex );
-        ID3D10Texture2D* pBuffer;
+        ID3DTexture2D* pBuffer;
         hr = HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID*)&pBuffer);
         HW.pDevice->CopyResource(t_ss_async, pBuffer);
 
@@ -77,12 +77,12 @@ void CRenderTarget::phase_combine()
             phase_ssao();
     }
 
+    FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     // low/hi RTs
     if (!RImplementation.o.dx10_msaa)
         u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
     else
     {
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
         HW.pDevice->ClearRenderTargetView(rt_Generic_0_r->pRT, ColorRGBA);
         HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
         u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);

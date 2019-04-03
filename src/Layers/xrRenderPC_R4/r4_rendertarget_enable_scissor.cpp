@@ -44,11 +44,11 @@ void CRenderTarget::enable_dbt_bounds(light* L)
 bool CRenderTarget::u_DBT_enable(float /*zMin*/, float /*zMax*/)
 {
     if (!RImplementation.o.nvdbt)
-        return FALSE;
+        return false;
     if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
-        return FALSE;
+        return false;
 
-    return FALSE;
+    return false;
 
     //	TODO: DX10: Check if DX10 supports this feature
     // enable cheat
@@ -56,7 +56,7 @@ bool CRenderTarget::u_DBT_enable(float /*zMin*/, float /*zMax*/)
     // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z,*(DWORD*)&zMin);
     // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W,*(DWORD*)&zMax);
 
-    // return TRUE;
+    // return true;
 }
 
 void CRenderTarget::u_DBT_disable()
@@ -71,7 +71,7 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
     // Msg	("%d: %x type(%d), pos(%f,%f,%f)",Device.dwFrame,u32(L),u32(L->flags.type),VPUSH(L->position));
 
     // Near plane intersection
-    BOOL near_intersect = FALSE;
+    bool near_intersect;
     {
         Fmatrix& M = Device.mFullTransform;
         Fvector4 plane;
