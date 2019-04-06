@@ -1331,11 +1331,12 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     u32 sz = end - start;
 #if defined(WINDOWS)
     u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
+    VERIFY3(ptr, "cannot create file mapping on file", fname);
 #elif defined(LINUX) || defined(FREEBSD)
     u8* ptr = (u8*)::mmap(NULL, sz, PROT_READ, MAP_SHARED, A.hSrcFile, start);
+    VERIFY3(ptr && ptr != MAP_FAILED, "cannot create file mapping on file", fname);
 #endif
 
-    VERIFY3(ptr, "cannot create file mapping on file", fname);
 
     string1024 temp;
     xr_sprintf(temp, sizeof temp, "%s:%s", *A.path, fname);
