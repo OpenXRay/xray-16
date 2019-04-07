@@ -9817,9 +9817,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="xrGame.natvis" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

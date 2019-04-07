@@ -588,7 +588,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\xrRender\xrRender.natvis" />
+    <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

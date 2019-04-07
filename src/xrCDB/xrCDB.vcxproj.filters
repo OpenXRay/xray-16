@@ -87,4 +87,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

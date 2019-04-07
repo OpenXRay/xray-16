@@ -31,4 +31,7 @@
       <Filter>PPMd</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

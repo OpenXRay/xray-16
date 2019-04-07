@@ -34,4 +34,7 @@
   <ItemGroup>
     <ClInclude Include="pch.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

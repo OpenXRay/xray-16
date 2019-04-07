@@ -922,9 +922,9 @@
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="xrEngine.natvis" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

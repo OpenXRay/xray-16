@@ -111,4 +111,7 @@
   <ItemGroup>
     <None Include="CommonImportExport.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

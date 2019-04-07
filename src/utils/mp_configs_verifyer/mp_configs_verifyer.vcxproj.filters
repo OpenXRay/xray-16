@@ -22,4 +22,7 @@
     <ClInclude Include="configs_dump_verifyer.h" />
     <ClInclude Include="mp_config_sections.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

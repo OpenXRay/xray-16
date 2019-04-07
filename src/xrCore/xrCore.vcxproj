@@ -534,7 +534,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="xrCore.natvis" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

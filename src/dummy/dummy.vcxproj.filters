@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="00dummy_tester.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>
