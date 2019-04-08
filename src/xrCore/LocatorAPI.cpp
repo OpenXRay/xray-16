@@ -720,6 +720,9 @@ bool CLocatorAPI::Recurse(pcstr path)
         struct stat fi;
         stat(findData.name, &fi);
         findData.size = fi.st_size;
+        findData.time_access = fi.st_atim.tv_sec;
+        findData.time_create = fi.st_ctim.tv_sec;
+        findData.time_write = fi.st_mtim.tv_sec;
         switch (fi.st_mode & S_IFMT)
         {
         case S_IFDIR: findData.attrib = _A_SUBDIR; break;
