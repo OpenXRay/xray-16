@@ -742,8 +742,8 @@ void dInternalStepIsland_x2 (dxWorld *world, dxBody * const *body, int nb,
       for (dxJointNode *n1=body[i]->firstjoint; n1; n1=n1->next) {
 	for (dxJointNode *n2=n1->next; n2; n2=n2->next) {
 	  // get joint numbers and ensure ofs[j1] >= ofs[j2]
-	  int j1 = n1->joint->tag;
-	  int j2 = n2->joint->tag;
+	  int j1 = n1->joint->tag >= 0 ? n1->joint->tag : 0;
+	  int j2 = n2->joint->tag >= 0 ? n2->joint->tag : 0;
 	  if (ofs[j1] < ofs[j2]) {
 	    int tmp = j1;
 	    j1 = j2;
