@@ -166,24 +166,37 @@ void CRenderDevice::RenderThreadProc(void* context)
 void CRenderDevice::PrimaryThreadProc(void* context)
 {
     auto& device = *static_cast<CRenderDevice*>(context);
-    bool switchContext = psDeviceFlags.test(rsRGL);
+
+    SDL_Event resetCheck;
+    bool shouldSwitch = true; // always switch for the first time
 
     while (true)
     {
         device.primaryProcessFrame.Wait();
         if (device.mt_bMustExit)
         {
+            GEnv.Render->MakeContextCurrent(false);
             device.primaryThreadExit.Set();
             return;
         }
 
-        if (switchContext)
+        if (shouldSwitch)
+        {
             GEnv.Render->MakeContextCurrent(true);
+            shouldSwitch = false;
+        }
 
         device.ProcessFrame();
 
-        if (switchContext)
-            GEnv.Render->MakeContextCurrent(false);
+        if (SDL_PeepEvents(&resetCheck, 1,
+            SDL_PEEKEVENT, SDL_USEREVENT, SDL_USEREVENT))
+        {
+            if (resetCheck.user.type == device.resetEventId)
+            {
+                shouldSwitch = true;
+                GEnv.Render->MakeContextCurrent(false);
+            }
+        }
 
         device.primaryFrameDone.Set();
     }
@@ -398,8 +411,9 @@ void CRenderDevice::message_loop()
         return;
     }
 
+    GEnv.Render->MakeContextCurrent(false);
+
     bool timedOut = false;
-    bool switchContext = psDeviceFlags.test(rsRGL);
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
@@ -418,9 +432,6 @@ void CRenderDevice::message_loop()
                 count += SDL_PeepEvents(events + count, MAX_WINDOW_EVENTS - count,
                     SDL_GETEVENT, SDL_USEREVENT, SDL_USEREVENT);
             }
-
-            if (switchContext)
-                GEnv.Render->MakeContextCurrent(true);
         }
 
         for (int i = 0; i < count; ++i)
@@ -432,7 +443,11 @@ void CRenderDevice::message_loop()
             case SDL_USEREVENT:
             {
                 if (event.user.type == resetEventId)
+                {
+                    GEnv.Render->MakeContextCurrent(true);
                     Reset(event.user.code);
+                    GEnv.Render->MakeContextCurrent(false);
+                }
                 break;
             }
             case SDL_WINDOWEVENT:
@@ -454,7 +469,10 @@ void CRenderDevice::message_loop()
                         string32 buff;
                         xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
                         Console->Execute(buff);
+
+                        GEnv.Render->MakeContextCurrent(true);
                         Reset();
+                        GEnv.Render->MakeContextCurrent(false);
                     }
                     else
                         UpdateWindowRects();
@@ -493,8 +511,6 @@ void CRenderDevice::message_loop()
 
         if (!timedOut)
         {
-            if (switchContext)
-                GEnv.Render->MakeContextCurrent(false);
             primaryProcessFrame.Set();
         }
 
