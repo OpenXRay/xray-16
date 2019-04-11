@@ -540,7 +540,7 @@ void CRenderDevice::Run()
     }
 
     resetEventId = SDL_RegisterEvents(1);
-    R_ASSERT(resetEventId != u32(-1), "Failed to allocate Device reset SDL event.");
+    R_ASSERT2(resetEventId != u32(-1), "Failed to allocate Device reset SDL event.");
 
     // Start all threads
     mt_bMustExit = FALSE;
