@@ -566,18 +566,19 @@ void CRenderDevice::Run()
     
     message_loop();
 
-    seqAppEnd.Process();
-
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
+
+    primaryProcessFrame.Set();
+    primaryThreadExit.Wait();
+    GEnv.Render->MakeContextCurrent(true);
+
+    seqAppEnd.Process();
     
     // renderProcessFrame.Set();
     // renderThreadExit.Wait();
     
-    primaryProcessFrame.Set();
     syncProcessFrame.Set();
-
-    primaryThreadExit.Wait();
     syncThreadExit.Wait();
 }
 
