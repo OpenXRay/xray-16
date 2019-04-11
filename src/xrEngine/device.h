@@ -262,6 +262,13 @@ public:
     void Run(void);
     void Destroy(void);
     void Reset(bool precache = true);
+    void RequireReset(bool doPrecache = true) const
+    {
+        SDL_Event reset = { SDL_USEREVENT };
+        reset.user.type = resetEventId;
+        reset.user.code = doPrecache;
+        SDL_PushEvent(&reset);
+    }
 
     void UpdateWindowProps(const bool windowed);
     void UpdateWindowRects();
@@ -285,6 +292,7 @@ public:
     }
 
 private:
+    u32 resetEventId;
     std::atomic<bool> mtProcessingAllowed;
     Event primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events

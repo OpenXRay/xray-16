@@ -65,7 +65,8 @@ BOOL CRenderDevice::RenderBegin()
         break;
     case DeviceState::NeedReset:
         // Check if the device is ready to be reset
-        Reset();
+        RequireReset();
+        return FALSE;
         break;
     default: R_ASSERT(0);
     }
@@ -408,6 +409,16 @@ void CRenderDevice::message_loop()
         {
             count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
                 SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+
+            // We need to collect only SDL_USEREVENT,
+            // Other types of events should not be collected
+            // Let's do this like that:
+            if (count < MAX_WINDOW_EVENTS)
+            {
+                count += SDL_PeepEvents(events + count, MAX_WINDOW_EVENTS - count,
+                    SDL_GETEVENT, SDL_USEREVENT, SDL_USEREVENT);
+            }
+
             if (switchContext)
                 GEnv.Render->MakeContextCurrent(true);
         }
@@ -418,6 +429,12 @@ void CRenderDevice::message_loop()
 
             switch (event.type)
             {
+            case SDL_USEREVENT:
+            {
+                if (event.user.type == resetEventId)
+                    Reset(event.user.code);
+                break;
+            }
             case SDL_WINDOWEVENT:
             {
                 switch (event.window.event)
@@ -505,6 +522,9 @@ void CRenderDevice::Run()
         u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
     }
+
+    resetEventId = SDL_RegisterEvents(1);
+    R_ASSERT(resetEventId != u32(-1), "Failed to allocate Device reset SDL event.");
 
     // Start all threads
     mt_bMustExit = FALSE;
