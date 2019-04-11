@@ -285,7 +285,7 @@ public:
     }
 
 private:
-    bool mtProcessingAllowed;
+    std::atomic<bool> mtProcessingAllowed;
     Event primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
