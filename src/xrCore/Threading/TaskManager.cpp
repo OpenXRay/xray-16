@@ -78,6 +78,7 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
             continue;
         }
 
+#ifndef MASTER_GOLD
         for (Task* task : self.tasksInExecution)
         {
             if (!task->IsStarted())
@@ -90,7 +91,7 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
                 calmDown = true;
                 Msg("! Abnormal task execution time [%dms] in [ %s ]", time, task->GetName());
             }
-            
+
 #ifdef PROFILE_TASKS
             bool tooLong;
             bool veryLong;
@@ -116,8 +117,9 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
                 calmDown = true;
                 Msg("~ Task [%s] runs very long %dms", task->GetName(), time);
             }
-#endif
+#endif // PROFILE_TASKS
         }
+#endif // MASTER_GOLD
         self.executionLock.Leave();
         if (calmDown)
         {
@@ -125,6 +127,18 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
             calmDown = false;
         }
     }
+
+    // Wait until last task is done
+    while (true)
+    {
+        ScopeLock scope(&self.executionLock);
+        
+        if (self.tasksInExecution.empty())
+            break;
+
+        Sleep(WATCHER_CALM_DOWN_PERIOD);
+    }
+
     self.watcherThreadExit.Set();
 }
 
@@ -211,10 +225,21 @@ void TaskManagerBase::SpawnTask(Task* task)
 
 void TaskManagerBase::TaskDone(Task* task, u64 executionTime)
 {
-    ScopeLock scope(&executionLock);
+    executionLock.Enter();
 
     const auto it = std::find(tasksInExecution.begin(), tasksInExecution.end(), task);
     R_ASSERT3(it != tasksInExecution.end(), "Task is deleted from the task watcher", task->GetName());
 
     tasksInExecution.erase(it);
+
+    executionLock.Leave();
+
+    if (executionTime > ABNORMAL_EXECUTION_TIME)
+    {
+        Msg("! Task done after abnormal execution time [%dms] in [%s]", time, task->GetName());
+    }
+    else if (executionTime > BIG_EXECUTION_TIME)
+    {
+        Msg("~ Task done after big execution time [%dms] in [%s]", time, task->GetName());
+    }
 }

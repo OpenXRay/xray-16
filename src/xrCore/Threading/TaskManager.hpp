@@ -22,9 +22,6 @@ constexpr u64 WATCHER_CALM_DOWN_PERIOD = 5; // ms
 
 class XRCORE_API TaskManagerBase
 {
-protected:
-    friend class Task;
-
     xr_vector<Task*> tasks;
     xr_vector<Task*> tasksInExecution;
 
@@ -39,6 +36,9 @@ protected:
     static void taskWatcherThread(void* thisPtr);
 
     void SpawnTask(Task* task);
+
+protected:
+    friend class Task;
     virtual void TaskDone(Task* task, u64 executionTime);
 
 public:
