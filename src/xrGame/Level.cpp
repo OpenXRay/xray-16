@@ -443,9 +443,17 @@ void CLevel::OnFrame()
         if (g_mt_config.test(mtMap))
         {
             R_ASSERT(m_map_manager);
-            TaskScheduler->AddTask("CMapManager::Update", Task::Type::Game,
-                { m_map_manager, &CMapManager::Update },
-                { &Device, &CRenderDevice::IsMTProcessingAllowed });
+            if (true)
+            {
+                Device.seqParallel.push_back(
+                    fastdelegate::FastDelegate0<>(m_map_manager, &CMapManager::Update));
+            }
+            else
+            {
+                TaskScheduler->AddTask("CMapManager::Update", Task::Type::Game,
+                    { m_map_manager, &CMapManager::Update },
+                    { &Device, &CRenderDevice::IsMTProcessingAllowed });
+            }
         }
         else
             MapManager().Update();
