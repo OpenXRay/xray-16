@@ -16,9 +16,10 @@ tbb::task* Task::execute()
 
     task();
 
-    TaskScheduler->TaskDone(this, timer.GetElapsed_ms());
     if (onTaskDone)
         onTaskDone();
+
+    TaskScheduler->TaskDone(this, timer.GetElapsed_ms());
 
     return nullptr;
 }
