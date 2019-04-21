@@ -74,6 +74,7 @@ ENGINE_API
 extern float psHUD_FOV;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
+int auto_ammo_unload = 0;
 
 extern int x_m_x;
 extern int x_m_z;
@@ -1925,6 +1926,8 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "hit_anims_reduce_blend", &ghit_anims_params.reduce_blend, 0.f, 1.f);
     CMD4(CCC_Float, "hit_anims_reduce_blend_factor", &ghit_anims_params.reduce_power_factor, 0.0f, 1.0f);
     CMD4(CCC_Integer, "hit_anims_tune", &tune_hit_anims, 0, 1);
+
+
 /////////////////////////////////////////////HIT ANIMATION END////////////////////////////////////////////////////
 
     CMD1(CCC_DumpModelBones, "debug_dump_model_bones");
@@ -1987,6 +1990,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
+    CMD4(CCC_Integer, "unload_ammo_after_pick_up", &auto_ammo_unload, 0, 1);
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");
