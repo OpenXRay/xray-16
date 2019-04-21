@@ -26,8 +26,8 @@ public:
     static void IR_GetMousePosIndependentCrop(Fvector2& f);
     BOOL IR_GetKeyState(int dik);
     BOOL IR_GetBtnState(int btn);
-    void IR_Capture(void);
-    void IR_Release(void);
+    virtual void IR_Capture(void);
+    virtual void IR_Release(void);
 
     virtual void IR_OnDeactivate(void);
     virtual void IR_OnActivate(void);
