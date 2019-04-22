@@ -865,7 +865,7 @@ void CWeapon::EnableActorNVisnAfterZoom()
     }
 }
 
-bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
+bool CWeapon::need_renderable() { return !Device.m_SecondViewport.IsSVPFrame() && !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
 void CWeapon::renderable_Render()
 {
     UpdateXForm();
