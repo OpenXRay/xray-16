@@ -10,6 +10,7 @@
 
 #include "xrCore/os_clipboard.h"
 #include "xrCore/buffer_vector.h"
+#include "xrCore/Text/StringConversion.hpp"
 #include "Common/object_broker.h"
 #include "xr_input.h"
 #include "SDL.h"
@@ -364,7 +365,7 @@ void line_edit_control::assign_callback(int const dik, key_state state, Callback
     m_actions[dik]->on_assign(prev_action);
 }
 
-void line_edit_control::insert_character(char c) { m_inserted[0] = c; }
+void line_edit_control::insert_character(char c) { m_inserted[0] = c; } // FIXME: increment index or use vector-like container instead
 void line_edit_control::clear_inserted() { m_inserted[0] = m_inserted[1] = 0; }
 bool line_edit_control::empty_inserted() { return (m_inserted[0] == 0); }
 void line_edit_control::set_edit(pcstr str)
@@ -423,6 +424,33 @@ void line_edit_control::on_key_press(int dik)
     m_rep_time = 0.0f;
 
     update_key_states();
+    update_bufs();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void line_edit_control::on_text_input(const char *text)
+{
+    clamp_cur_pos();
+    clear_inserted();
+    compute_positions();
+
+    static std::locale locale("");
+    const auto str = StringFromUTF8(text, locale);
+
+    for (const auto c : str)
+    {
+        if (c == '`' || c == '~') // FIXME: console control key. Dunno how to handle properly
+        {
+            continue;
+        }
+        insert_character(c);
+    }
+    add_inserted_text();
+
+    m_edit_str[m_buffer_size - 1] = 0;
+    m_select_start = m_cur_pos;
+
     update_bufs();
 }
 

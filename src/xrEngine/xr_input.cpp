@@ -142,7 +142,7 @@ void CInput::KeyUpdate()
 
     SDL_Event events[MAX_KEYBOARD_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
-        SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYUP);
+        SDL_GETEVENT, SDL_KEYDOWN, SDL_TEXTINPUT);
 
     for (int i = 0; i < count; ++i)
     {
@@ -160,6 +160,14 @@ void CInput::KeyUpdate()
         case SDL_KEYUP:
             keyboardState[event.key.keysym.scancode] = false;
             cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
+            break;
+
+        case SDL_TEXTINPUT:
+            cbStack.back()->IR_OnTextInput(event.text.text);
+            break;
+
+        default:
+            // Nothing here
             break;
         }
     }

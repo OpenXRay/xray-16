@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////
 // Module : line_editor.cpp
 // Created : 22.02.2008
 // Author : Evgeniy Sokolov
@@ -18,6 +18,7 @@ void line_editor::on_frame() { m_control.on_frame(); }
 void line_editor::IR_OnKeyboardPress(int dik) { m_control.on_key_press(dik); }
 void line_editor::IR_OnKeyboardHold(int dik) { m_control.on_key_hold(dik); }
 void line_editor::IR_OnKeyboardRelease(int dik) { m_control.on_key_release(dik); }
+void line_editor::IR_OnTextInput(const char *text) { m_control.on_text_input(text); }
 
 void line_editor::IR_Capture()
 {

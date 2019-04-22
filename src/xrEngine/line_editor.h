@@ -26,9 +26,10 @@ public:
     void IR_Release() final;
 
 protected:
-    virtual void IR_OnKeyboardPress(int dik);
-    virtual void IR_OnKeyboardHold(int dik);
-    virtual void IR_OnKeyboardRelease(int dik);
+    void IR_OnKeyboardPress(int dik) final;
+    void IR_OnKeyboardHold(int dik) final;
+    void IR_OnKeyboardRelease(int dik) final;
+    void IR_OnTextInput(const char *text) final;
 
 private:
     line_edit_control m_control;
