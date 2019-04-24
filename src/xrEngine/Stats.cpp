@@ -173,6 +173,13 @@ void CStats::Show()
     }
 #endif
     font.OnRender();
+
+    if (psDeviceFlags.test(rsShowFPS))
+    {
+        const auto fps = u32(Device.GetStats().fFPS);
+        fpsFont->Out(Device.dwWidth - 40, 5, "%3d", fps);
+        fpsFont->OnRender();
+    }
 }
 
 void CStats::OnDeviceCreate()
@@ -180,7 +187,12 @@ void CStats::OnDeviceCreate()
     g_bDisableRedText = !!strstr(Core.Params, "-xclsx");
 
     if (!GEnv.isDedicatedServer)
+    {
         statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
+        fpsFont = new CGameFont("hud_font_di", CGameFont::fsDeviceIndependent);
+        fpsFont->SetHeightI(0.025f);
+        fpsFont->SetColor(color_rgba(250, 250, 15, 180));
+    }
 
 #ifdef DEBUG
     if (!g_bDisableRedText)
@@ -198,6 +210,7 @@ void CStats::OnDeviceDestroy()
 {
     SetLogCB(nullptr);
     xr_delete(statsFont);
+    xr_delete(fpsFont);
 }
 
 void CStats::FilteredLog(const char* s)
