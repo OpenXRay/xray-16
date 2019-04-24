@@ -1926,8 +1926,6 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "hit_anims_reduce_blend", &ghit_anims_params.reduce_blend, 0.f, 1.f);
     CMD4(CCC_Float, "hit_anims_reduce_blend_factor", &ghit_anims_params.reduce_power_factor, 0.0f, 1.0f);
     CMD4(CCC_Integer, "hit_anims_tune", &tune_hit_anims, 0, 1);
-
-
 /////////////////////////////////////////////HIT ANIMATION END////////////////////////////////////////////////////
 
     CMD1(CCC_DumpModelBones, "debug_dump_model_bones");
