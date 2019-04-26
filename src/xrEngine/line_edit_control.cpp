@@ -124,6 +124,7 @@ void line_edit_control::clear_states()
     m_buf3[0] = 0;
 
     m_cur_pos = 0;
+    m_inserted_pos = 0;
     m_select_start = 0;
     m_p1 = 0;
     m_p2 = 0;
@@ -365,9 +366,16 @@ void line_edit_control::assign_callback(int const dik, key_state state, Callback
     m_actions[dik]->on_assign(prev_action);
 }
 
-void line_edit_control::insert_character(char c) { m_inserted[0] = c; } // FIXME: increment index or use vector-like container instead
-void line_edit_control::clear_inserted() { m_inserted[0] = m_inserted[1] = 0; }
-bool line_edit_control::empty_inserted() { return (m_inserted[0] == 0); }
+void line_edit_control::insert_character(char c)
+{
+    VERIFY(m_inserted_pos < (m_buffer_size - 1 /*trailing zero*/));
+    m_inserted[m_inserted_pos    ] = c;
+    m_inserted[m_inserted_pos + 1] = 0;
+    m_inserted_pos++;
+}
+
+void line_edit_control::clear_inserted() { m_inserted[0] = m_inserted[1] = 0; m_inserted_pos = 0; }
+bool line_edit_control::empty_inserted() const { return m_inserted_pos == 0; }
 void line_edit_control::set_edit(pcstr str)
 {
     u32 str_size = xr_strlen(str);
