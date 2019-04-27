@@ -41,6 +41,7 @@ public:
     // Not thread-safe, for backwards compatibility only
     const TokenVector& GetTokensForCurrentMonitor();
 
+    bool SelectedResolutionIsMaximal();
     bool SelectedResolutionIsSafe();
     bool SelectedRefreshRateIsSafe();
 

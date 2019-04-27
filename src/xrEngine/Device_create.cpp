@@ -79,14 +79,11 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 
     if (windowed)
     {
-        // Get the maximal available resolution (penultimate token in VidModesToken)
-        const MonitorsManager::ResolutionPair r = g_monitors.GetMaximalResolution();
-
         const bool drawBorders = strstr(Core.Params, "-draw_borders");
 
-        bool maximalResolution = false;
-        if (b_is_Ready && !drawBorders && psCurrentVidMode[0] == r.first && psCurrentVidMode[1] == r.second)
-            maximalResolution = true;
+        bool useDesktopFullscreen = false;
+        if (b_is_Ready && !drawBorders && g_monitors.SelectedResolutionIsMaximal())
+            useDesktopFullscreen = true;
 
         SDL_Rect rect;
         SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
@@ -98,7 +95,7 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
         SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
 
         // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
-        SDL_SetWindowFullscreen(m_sdlWnd, maximalResolution ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_FALSE);
+        SDL_SetWindowFullscreen(m_sdlWnd, useDesktopFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_FALSE);
     }
     else
     {
@@ -111,14 +108,17 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
         SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
 
-        SDL_DisplayMode mode;
-        SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
-        mode.w = psCurrentVidMode[0];
-        mode.h = psCurrentVidMode[1];
-        mode.refresh_rate = Vid_SelectedRefreshRate;
-        SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
+        if (b_is_Ready)
+        {
+            SDL_DisplayMode mode;
+            SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
+            mode.w = psCurrentVidMode[0];
+            mode.h = psCurrentVidMode[1];
+            mode.refresh_rate = Vid_SelectedRefreshRate;
+            SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
 
-        SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+            SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+        }
     }
 
     UpdateWindowRects();

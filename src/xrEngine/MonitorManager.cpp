@@ -104,6 +104,13 @@ const MonitorsManager::TokenVector& MonitorsManager::GetTokensForCurrentMonitor(
     return tokens;
 }
 
+bool MonitorsManager::SelectedResolutionIsMaximal()
+{
+    const ResolutionPair r = g_monitors.GetMaximalResolution();
+
+    return psCurrentVidMode[0] == r.first && psCurrentVidMode[1] == r.second;
+}
+
 bool MonitorsManager::SelectedResolutionIsSafe()
 {
     const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];

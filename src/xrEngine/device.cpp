@@ -552,18 +552,18 @@ void CRenderDevice::Run()
     TaskScheduler.reset(new TaskManager());
     TaskScheduler->Initialize();
 
-    // Message cycle
+    // Pre start
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
-    if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
-        SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_HideWindow(m_sdlWnd);
-    SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
-    pInput->GrabInput(true);
-    
+    UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
+    if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
+        SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    OnWM_Activate(1, 0);
+
+    // Message cycle
     message_loop();
 
     // Stop Balance-Thread
