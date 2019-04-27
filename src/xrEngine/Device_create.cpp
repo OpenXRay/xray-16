@@ -63,6 +63,16 @@ void CRenderDevice::Create()
     PreCache(0, false, false);
 }
 
+bool windowIntersectsWithMonitor(const SDL_Rect& window, const SDL_Rect& monitor)
+{
+    const int x = std::max(window.x, monitor.x);
+    const int num1 = std::min(window.w, monitor.w);
+    const int y = std::max(window.y, monitor.y);
+    const int num2 = std::min(window.y, monitor.h);
+
+    return num1 >= x && num2 >= y;
+}
+
 void CRenderDevice::UpdateWindowProps(const bool windowed)
 {
     SelectResolution(windowed);
@@ -78,26 +88,37 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
         if (b_is_Ready && !drawBorders && psCurrentVidMode[0] == r.first && psCurrentVidMode[1] == r.second)
             maximalResolution = true;
 
-        // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
-        SDL_SetWindowFullscreen(m_sdlWnd, maximalResolution ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
+        SDL_Rect rect;
+        SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
+        
+        if (!windowIntersectsWithMonitor(m_rcWindowBounds, rect))
+            SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
+
         SDL_SetWindowBordered(m_sdlWnd, drawBorders ? SDL_TRUE : SDL_FALSE);
+        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
+
+        // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
+        SDL_SetWindowFullscreen(m_sdlWnd, maximalResolution ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_FALSE);
     }
     else
     {
-        SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+        // Changing monitor, unset fullscreen for the previous monitor
+        if (SDL_GetWindowDisplayIndex(m_sdlWnd) != Vid_SelectedMonitor)
+            SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
 
-        // XXX: fix monitor selection
-        // it appears to be buggy
         SDL_Rect rect;
         SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
+        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
+
         SDL_DisplayMode mode;
         SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
         mode.w = psCurrentVidMode[0];
         mode.h = psCurrentVidMode[1];
         mode.refresh_rate = Vid_SelectedRefreshRate;
         SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
+
+        SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
     }
 
     UpdateWindowRects();
@@ -148,18 +169,39 @@ void CRenderDevice::SelectResolution(const bool windowed)
         string32 buff;
         xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-        if (g_monitors.SelectedResolutionIsSafe()) // not found
+        if (!g_monitors.SelectedResolutionIsSafe()) // not found
         { // select safe
             SDL_DisplayMode current;
             SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
             current.w = psCurrentVidMode[0];
             current.h = psCurrentVidMode[1];
 
-            SDL_DisplayMode closest;
+            SDL_DisplayMode closest; // try closest mode
             if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
                 xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", closest.w, closest.h);
-            else
-                xr_sprintf(buff, sizeof(buff), "vid_mode %s", g_monitors.GetMaximalResolution());
+            else // or just use maximal
+            {
+                const auto& r = g_monitors.GetMaximalResolution();
+                xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", r.first, r.second);
+            }
+
+            Console->Execute(buff);
+        }
+
+        if (!g_monitors.SelectedRefreshRateIsSafe())
+        {
+            SDL_DisplayMode current;
+            SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+            current.refresh_rate = Vid_SelectedRefreshRate;
+
+            SDL_DisplayMode closest; // try closest mode
+            if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
+                xr_sprintf(buff, sizeof(buff), "vid_refresh %d", closest.refresh_rate);
+            else // or just use maximal
+            {
+                const u32 rate = g_monitors.GetMaximalRefreshRate();
+                xr_sprintf(buff, sizeof(buff), "vid_refresh %d", rate);
+            }
 
             Console->Execute(buff);
         }

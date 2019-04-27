@@ -35,10 +35,14 @@ public:
     ResolutionPair GetMinimalResolution();
     ResolutionPair GetMaximalResolution();
 
+    u32 GetMinimalRefreshRate();
+    u32 GetMaximalRefreshRate();
+
     // Not thread-safe, for backwards compatibility only
     const TokenVector& GetTokensForCurrentMonitor();
 
     bool SelectedResolutionIsSafe();
+    bool SelectedRefreshRateIsSafe();
 
     void FillMonitorsTips(IConsole_Command::vecTips& tips);
     void FillResolutionsTips(IConsole_Command::vecTips& tips);

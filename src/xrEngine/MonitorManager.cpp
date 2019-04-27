@@ -50,6 +50,34 @@ MonitorsManager::ResolutionPair MonitorsManager::GetMaximalResolution()
 }
 
 
+u32 MonitorsManager::GetMinimalRefreshRate()
+{
+    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
+    const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
+    const auto resolutionIt = resolutions.find(selectedResolution);
+
+    if (resolutionIt == resolutions.end())
+        return 0; // windowed with custom resolution?
+
+    const RefreshRatesVec& rates = resolutionIt->second;
+
+    return rates.front();
+}
+
+u32 MonitorsManager::GetMaximalRefreshRate()
+{
+    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
+    const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
+    const auto resolutionIt = resolutions.find(selectedResolution);
+
+    if (resolutionIt == resolutions.end())
+        return 0; // windowed with custom resolution?
+
+    const RefreshRatesVec& rates = resolutionIt->second;
+
+    return rates.back();
+}
+
 const MonitorsManager::TokenVector& MonitorsManager::GetTokensForCurrentMonitor()
 {
     for (auto& token : tokens)
@@ -79,10 +107,26 @@ const MonitorsManager::TokenVector& MonitorsManager::GetTokensForCurrentMonitor(
 bool MonitorsManager::SelectedResolutionIsSafe()
 {
     const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
-    const ResolutionPair selected = { psCurrentVidMode[0], psCurrentVidMode[1] };
-    const auto it = resolutions.find(selected);
+    const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
+    const auto it = resolutions.find(selectedResolution);
 
     return it != resolutions.end();
+}
+
+bool MonitorsManager::SelectedRefreshRateIsSafe()
+{
+    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
+    const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
+    const auto resolutionIt = resolutions.find(selectedResolution);
+    
+    if (resolutionIt == resolutions.end())
+        return false; // Can't find resolution
+
+    const RefreshRatesVec& rates = resolutionIt->second;
+
+    const auto it = std::find(rates.begin(), rates.end(), Vid_SelectedRefreshRate);
+
+    return it != rates.end();
 }
 
 void MonitorsManager::FillMonitorsTips(IConsole_Command::vecTips& tips)

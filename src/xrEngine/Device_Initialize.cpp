@@ -84,13 +84,19 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* area, v
 
     const auto& rect = Device.m_rcWindowClient;
 
+    bool disableHorzTest = false;
+
     // size of additional interactive area (in pixels)
     constexpr int hit = 15;
 
-    const bool leftSide = area->x <= rect.x + hit;
+    // Workaround for SDL bug 
+    if (area->x > rect.w + hit)
+        disableHorzTest = true; // regression
+
+    const bool leftSide = area->x <= rect.x + hit && !disableHorzTest;
     const bool topSide = area->y <= rect.y + hit;
     const bool bottomSide = area->y >= rect.h - hit;
-    const bool rightSide = area->x >= rect.w - hit;
+    const bool rightSide = area->x >= rect.w - hit && !disableHorzTest;
 
     if (leftSide && topSide)
         return SDL_HITTEST_RESIZE_TOPLEFT;
