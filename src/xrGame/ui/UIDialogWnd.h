@@ -28,8 +28,8 @@ public:
     virtual bool NeedCenterCursor() const { return true; }
     virtual bool WorkInPause() const { return m_bWorkInPause; }
     virtual bool Dispatch(int cmd, int param) { return true; }
-    void ShowDialog(bool bDoHideIndicators);
-    void HideDialog();
+    virtual void ShowDialog(bool bDoHideIndicators);
+    virtual void HideDialog();
 
     virtual bool IR_process();
 };
