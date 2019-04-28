@@ -48,6 +48,7 @@ extern u32 dm_current_cache_line;// = dm_current_size+1+dm_current_size;
 extern u32 dm_current_cache_size;// = dm_current_cache_line*dm_current_cache_line;
 extern float dm_current_fade;// = float(2*dm_current_size)-.5f;
 extern float ps_current_detail_density;
+extern float ps_current_detail_height;
 
 class ECORE_API CDetailManager
 {
