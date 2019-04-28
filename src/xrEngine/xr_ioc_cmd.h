@@ -292,8 +292,11 @@ public:
         Fvector v;
         if (3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z))
         {
-            InvalidSyntax();
-            return;
+            if (3 != sscanf(args, "(%f,%f,%f)", &v.x, &v.y, &v.z))
+            {
+                InvalidSyntax();
+                return;
+            }
         }
         if (v.x < min.x || v.y < min.y || v.z < min.z)
         {
