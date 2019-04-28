@@ -245,7 +245,7 @@ public:
 
     void BeforeRender();
     void DoRender();
-    BOOL RenderBegin();
+    bool RenderBegin();
     void Clear();
     void RenderEnd();
 
@@ -292,6 +292,7 @@ public:
     }
 
 private:
+    DeviceState LastDeviceState;
     u32 resetEventId;
     std::atomic<bool> mtProcessingAllowed;
     Event primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events

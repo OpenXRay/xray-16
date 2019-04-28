@@ -50,31 +50,31 @@ extern int ps_always_active;
 BOOL g_bLoaded = FALSE;
 ref_light precache_light = 0;
 
-BOOL CRenderDevice::RenderBegin()
+bool CRenderDevice::RenderBegin()
 {
     if (GEnv.isDedicatedServer)
-        return TRUE;
+        return true;
 
-    switch (GEnv.Render->GetDeviceState())
+    switch (LastDeviceState)
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
         // If the device was lost, do not render until we get it back
         Sleep(33);
-        return FALSE;
-        break;
+        return false;
+
     case DeviceState::NeedReset:
         // Check if the device is ready to be reset
         RequireReset();
-        return FALSE;
-        break;
+        return false;
+
     default: R_ASSERT(0);
     }
     GEnv.Render->Begin();
     FPU::m24r();
     g_bRendering = TRUE;
 
-    return TRUE;
+    return true;
 }
 
 void CRenderDevice::Clear() { GEnv.Render->Clear(); }
@@ -511,6 +511,7 @@ void CRenderDevice::message_loop()
 
         if (!timedOut)
         {
+            LastDeviceState = GEnv.Render->GetDeviceState();
             primaryProcessFrame.Set();
         }
 
@@ -689,6 +690,7 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 }
 
 BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
+
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
     u16 fActive = LOWORD(wParam);
