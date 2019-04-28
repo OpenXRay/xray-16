@@ -189,6 +189,7 @@ public:
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
 
     virtual float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) = 0;
+    virtual float get_occlusion(Fvector& P, float R, Fvector* occ) = 0;
 
     virtual void object_relcase(IGameObject* obj) = 0;
     virtual const Fvector& listener_position() = 0;
