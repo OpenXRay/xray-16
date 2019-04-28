@@ -4,7 +4,6 @@
 #include "Render.h"
 #include "IGame_Persistent.h"
 #include "XR_IOConsole.h"
-#include "MonitorManager.hpp"
 #include "xr_input.h"
 #include "SDL.h"
 #include "SDL_syswm.h"
@@ -22,7 +21,6 @@ void CRenderDevice::Destroy()
     GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
     GEnv.Render->DestroyHW();
-    g_monitors.Destroy();
     TaskScheduler->Destroy();
     seqRender.Clear();
     seqAppActivate.Clear();

@@ -28,6 +28,7 @@
 #include "xrSASH.h"
 #endif
 #include "xr_ioc_cmd.h"
+#include "MonitorManager.hpp"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -261,6 +262,7 @@ ENGINE_API void Startup()
     else
         Console->Destroy();
 #endif
+    g_monitors.Destroy();
     destroyEngine();
     destroySound();
 }
@@ -296,6 +298,7 @@ ENGINE_API int RunApplication()
 
     FPU::m24r();
 
+    g_monitors.Initialize();
     InitInput();
     InitConsole();
 

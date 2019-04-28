@@ -47,7 +47,6 @@ void CRenderDevice::Create()
     if (GEnv.isDedicatedServer || editor())
         psDeviceFlags.set(rsFullscreen, false);
 
-    g_monitors.Initialize();
     UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
@@ -110,14 +109,14 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 
         if (b_is_Ready)
         {
+            SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+            
             SDL_DisplayMode mode;
             SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
             mode.w = psCurrentVidMode[0];
             mode.h = psCurrentVidMode[1];
             mode.refresh_rate = Vid_SelectedRefreshRate;
             SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
-
-            SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
         }
     }
 
