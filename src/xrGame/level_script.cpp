@@ -594,7 +594,7 @@ CScriptGameObject* g_get_target_obj()
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
     if (RQ.O)
     {
-        CGameObject* game_object = static_cast<CGameObject*>(RQ.O);
+        CGameObject* game_object = smart_cast<CGameObject*>(RQ.O);
         if (game_object)
             return game_object->lua_game_object();
     }
@@ -604,9 +604,7 @@ CScriptGameObject* g_get_target_obj()
 float g_get_target_dist()
 {
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-    if (RQ.range)
-        return RQ.range;
-    return 0.f;
+    return RQ.range;
 }
 
 u32 g_get_target_element()
@@ -635,6 +633,16 @@ void set_active_cam(u8 mode)
 }
 #endif
 //-Alundaio
+
+void iterate_online_objects(luabind::functor<bool> functor)
+{
+    for (u16 i = 0; i < 0xffff; ++i)
+    {
+        CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(i));
+        if (pGameObject && functor(pGameObject->lua_game_object()))
+            return;
+    }
+}
 
 // KD: raypick	
 bool ray_pick(const Fvector& start, const Fvector& dir, float range,
@@ -678,6 +686,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("set_active_cam", &set_active_cam),
 #endif
         //Alundaio: END
+        def("iterate_online_objects", &iterate_online_objects),
         // obsolete\deprecated
         def("object_by_id", get_object_by_id),
 #ifdef DEBUG
