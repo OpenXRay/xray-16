@@ -557,6 +557,7 @@ void CRenderDevice::Run()
     seqAppStart.Process();
     GEnv.Render->ClearTarget();
     splash::hide();
+    SDL_HideWindow(m_sdlWnd);
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
     UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
