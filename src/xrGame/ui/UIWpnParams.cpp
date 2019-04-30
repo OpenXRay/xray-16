@@ -7,6 +7,7 @@
 #include "inventory_item_object.h"
 #include "UIInventoryUtilities.h"
 #include "Weapon.h"
+#include "UIHelper.h"
 
 struct SLuaWpnParams
 {
@@ -63,10 +64,6 @@ CUIWpnParams::CUIWpnParams()
     AttachChild(&m_stAmmo);
     AttachChild(&m_textAmmoCount);
     AttachChild(&m_textAmmoCount2);
-    AttachChild(&m_textAmmoTypes);
-    AttachChild(&m_textAmmoUsedType);
-    AttachChild(&m_stAmmoType1);
-    AttachChild(&m_stAmmoType2);
 }
 
 CUIWpnParams::~CUIWpnParams() {}
@@ -97,10 +94,10 @@ void CUIWpnParams::InitFromXml(CUIXml& xml_doc)
         CUIXmlInit::InitStatic(xml_doc, "wpn_params:static_ammo", 0, &m_stAmmo);
         CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_ammo_count", 0, &m_textAmmoCount);
         CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_ammo_count2", 0, &m_textAmmoCount2);
-        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_ammo_types", 0, &m_textAmmoTypes);
-        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_ammo_used_type", 0, &m_textAmmoUsedType);
-        CUIXmlInit::InitStatic(xml_doc, "wpn_params:static_ammo_type1", 0, &m_stAmmoType1);
-        CUIXmlInit::InitStatic(xml_doc, "wpn_params:static_ammo_type2", 0, &m_stAmmoType2);
+        m_textAmmoTypes = UIHelper::CreateTextWnd(xml_doc, "wpn_params:cap_ammo_types", this, false);
+        m_textAmmoUsedType = UIHelper::CreateTextWnd(xml_doc, "wpn_params:cap_ammo_used_type", this, false);
+        m_stAmmoType1 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type1", this, false);
+        m_stAmmoType2 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type2", this, false);
     }
 }
 
@@ -161,8 +158,6 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 
     if (IsGameTypeSingle())
     {
-        xr_vector<shared_str> ammo_types;
-
         CWeapon* weapon = cur_wpn.cast_weapon();
         if (!weapon)
             return;
@@ -188,44 +183,53 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         xr_sprintf(str, sizeof(str), "%d", ammo_count);
         m_textAmmoCount2.SetText(str);
 
-        ammo_types = weapon->m_ammoTypes;
+        const auto& ammo_types = weapon->m_ammoTypes;
         if (ammo_types.empty())
             return;
 
-        xr_sprintf(str, sizeof(str), "%s", pSettings->r_string(ammo_types[0].c_str(), "inv_name_short"));
-        m_textAmmoUsedType.SetTextST(str);
+        if (m_textAmmoUsedType)
+        {
+            xr_sprintf(str, sizeof(str), "%s", pSettings->r_string(ammo_types[0].c_str(), "inv_name_short"));
+            m_textAmmoUsedType->SetTextST(str);
+        }
 
-        m_stAmmoType1.SetShader(InventoryUtilities::GetEquipmentIconsShader());
         Frect tex_rect;
-        tex_rect.x1 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_x") * INV_GRID_WIDTH);
-        tex_rect.y1 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_y") * INV_GRID_HEIGHT);
-        tex_rect.x2 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_width") * INV_GRID_WIDTH);
-        tex_rect.y2 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_height") * INV_GRID_HEIGHT);
-        tex_rect.rb.add(tex_rect.lt);
-        m_stAmmoType1.SetTextureRect(tex_rect);
-        m_stAmmoType1.TextureOn();
-        m_stAmmoType1.SetStretchTexture(true);
-        m_stAmmoType1.SetWndSize(
-            Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
-
-        m_stAmmoType2.SetShader(InventoryUtilities::GetEquipmentIconsShader());
-        if (ammo_types.size() == 1)
+        if (m_stAmmoType1)
         {
-            tex_rect.set(0, 0, 1, 1);
-        }
-        else
-        {
-            tex_rect.x1 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_x") * INV_GRID_WIDTH);
-            tex_rect.y1 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_y") * INV_GRID_HEIGHT);
-            tex_rect.x2 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_width") * INV_GRID_WIDTH);
-            tex_rect.y2 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_height") * INV_GRID_HEIGHT);
+            m_stAmmoType1->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+            tex_rect.x1 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_x") * INV_GRID_WIDTH);
+            tex_rect.y1 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_y") * INV_GRID_HEIGHT);
+            tex_rect.x2 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_width") * INV_GRID_WIDTH);
+            tex_rect.y2 = float(pSettings->r_u32(ammo_types[0].c_str(), "inv_grid_height") * INV_GRID_HEIGHT);
             tex_rect.rb.add(tex_rect.lt);
+            m_stAmmoType1->SetTextureRect(tex_rect);
+            m_stAmmoType1->TextureOn();
+            m_stAmmoType1->SetStretchTexture(true);
+            m_stAmmoType1->SetWndSize(
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
         }
-        m_stAmmoType2.SetTextureRect(tex_rect);
-        m_stAmmoType2.TextureOn();
-        m_stAmmoType2.SetStretchTexture(true);
-        m_stAmmoType2.SetWndSize(
-            Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
+
+        if (m_stAmmoType2)
+        {
+            m_stAmmoType2->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+            if (ammo_types.size() == 1 && m_stAmmoType1)
+            {
+                tex_rect.set(0, 0, 1, 1);
+            }
+            else
+            {
+                tex_rect.x1 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_x") * INV_GRID_WIDTH);
+                tex_rect.y1 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_y") * INV_GRID_HEIGHT);
+                tex_rect.x2 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_width") * INV_GRID_WIDTH);
+                tex_rect.y2 = float(pSettings->r_u32(ammo_types[1].c_str(), "inv_grid_height") * INV_GRID_HEIGHT);
+                tex_rect.rb.add(tex_rect.lt);
+            }
+            m_stAmmoType2->SetTextureRect(tex_rect);
+            m_stAmmoType2->TextureOn();
+            m_stAmmoType2->SetStretchTexture(true);
+            m_stAmmoType2->SetWndSize(
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
+        }
     }
 }
 
