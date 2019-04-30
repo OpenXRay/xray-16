@@ -592,38 +592,101 @@ void CRenderDevice::FrameMove()
     dwFrame++;
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
-    if (psDeviceFlags.test(rsConstantFPS))
+
+    fTimeDelta = 0.0f;
+    dwTimeDelta = 0;
+
+    if (!Paused())
     {
-        // 20ms = 50fps
-        // fTimeDelta = 0.020f;
-        // fTimeGlobal += 0.020f;
-        // dwTimeDelta = 20;
-        // dwTimeGlobal += 20;
-        // 33ms = 30fps
-        fTimeDelta = 0.033f;
-        fTimeGlobal += 0.033f;
-        dwTimeDelta = 33;
-        dwTimeGlobal += 33;
-    }
-    else
-    {
-        // Timer
-        float fPreviousFrameTime = Timer.GetElapsed_sec();
-        Timer.Start(); // previous frame
-        fTimeDelta =
-            0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
-        // fTimeDelta = 0.7f * fTimeDelta + 0.3f*fPreviousFrameTime; // smooth random system activity
-        if (fTimeDelta > .1f)
-            fTimeDelta = .1f; // limit to 15fps minimum
-        if (fTimeDelta <= 0.f)
-            fTimeDelta = EPS_S + EPS_S; // limit to 15fps minimum
-        if (Paused())
-            fTimeDelta = 0.0f;
-        // u64 qTime = TimerGlobal.GetElapsed_clk();
-        fTimeGlobal = TimerGlobal.GetElapsed_sec(); // float(qTime)*CPU::cycles2seconds;
-        u32 _old_global = dwTimeGlobal;
-        dwTimeGlobal = TimerGlobal.GetElapsed_ms();
-        dwTimeDelta = dwTimeGlobal - _old_global;
+        switch (psConstantFPS)
+        {
+        case ConstantFPS_30:
+        {
+            // 33.3ms = 30fps
+            fTimeDelta = 0.0333f;
+            fTimeGlobal += 0.0333f;
+            dwTimeDelta = 33;
+            dwTimeGlobal += 33;
+            break;
+        }
+        case ConstantFPS_50:
+        {
+            // 20ms = 50fps
+            fTimeDelta = 0.020f;
+            fTimeGlobal += 0.020f;
+            dwTimeDelta = 20;
+            dwTimeGlobal += 20;
+            break;
+        }
+        case ConstantFPS_60:
+        {
+            // 16.7ms = 60fps
+            fTimeDelta = 0.0167f;
+            fTimeGlobal += 0.0167f;
+            dwTimeDelta = 16;
+            dwTimeGlobal += 16;
+            break;
+        }
+        case ConstantFPS_72:
+        {
+            // 13.9ms = 72fps
+            fTimeDelta = 0.0139f;
+            fTimeGlobal += 0.0139f;
+            dwTimeDelta = 14;
+            dwTimeGlobal += 14;
+            break;
+        }
+        case ConstantFPS_82:
+        {
+            // 12.2ms = 82fps
+            fTimeDelta = 0.0122f;
+            fTimeGlobal += 0.0122f;
+            dwTimeDelta = 12;
+            dwTimeGlobal += 12;
+            break;
+        }
+        case ConstantFPS_90:
+        {
+            // 11.1ms = 90fps
+            fTimeDelta = 0.0111f;
+            fTimeGlobal += 0.0111f;
+            dwTimeDelta = 11;
+            dwTimeGlobal += 11;
+            break;
+        }
+        case ConstantFPS_120:
+        {
+            // 8.3ms = 120fps
+            fTimeDelta = 0.0083f;
+            fTimeGlobal += 0.0083f;
+            dwTimeDelta = 8;
+            dwTimeGlobal += 8;
+            break;
+        }
+        default:
+            VERIFY2(false, "Unknown constant FPS token value");
+            [[fallthrough]];
+        case ConstantFPS_off:
+        {
+            // Timer
+            const auto fPreviousFrameTime = Timer.GetElapsed_sec();
+            Timer.Start(); // previous frame
+            
+            fTimeDelta =
+                0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
+            // fTimeDelta = 0.7f * fTimeDelta + 0.3f*fPreviousFrameTime; // smooth random system activity
+            if (fTimeDelta > .1f)
+                fTimeDelta = .1f; // limit to 15fps minimum
+            else if (fTimeDelta <= 0.f)
+                fTimeDelta = EPS_S + EPS_S;
+
+            // u64 qTime = TimerGlobal.GetElapsed_clk();
+            fTimeGlobal = TimerGlobal.GetElapsed_sec(); // float(qTime)*CPU::cycles2seconds;
+            const auto _old_global = dwTimeGlobal;
+            dwTimeGlobal = TimerGlobal.GetElapsed_ms();
+            dwTimeDelta = dwTimeGlobal - _old_global;
+        }
+        }
     }
     // Frame move
     stats.EngineTotal.FrameStart();
