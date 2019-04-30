@@ -164,6 +164,9 @@ public:
     void IR_OnKeyboardRelease(int dik) override;
     void IR_OnKeyboardHold(int dik) override;
 
+    void IR_OnControllerPress(int btn) override;
+    void IR_OnControllerRelease(int btn) override;
+
     bool OnRenderPPUI_query();
     void OnRenderPPUI_main();
     void OnRenderPPUI_PP();

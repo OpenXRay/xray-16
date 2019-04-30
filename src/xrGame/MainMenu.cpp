@@ -472,6 +472,22 @@ void CMainMenu::IR_OnMouseWheel(int x, int y)
     CDialogHolder::IR_UIOnMouseWheel(x, y);
 }
 
+void CMainMenu::IR_OnControllerPress(int btn)
+{
+    if (!IsActive())
+        return;
+
+    IR_OnKeyboardPress(ControllerButtonToKey[btn]);
+}
+
+void CMainMenu::IR_OnControllerRelease(int btn)
+{
+    if (!IsActive())
+        return;
+
+    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
+}
+
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }
 extern void draw_wnds_rects();
 void CMainMenu::OnRender()

@@ -34,7 +34,8 @@ enum xrController
     XR_CONTROLLER_BUTTON_DPAD_DOWN,
     XR_CONTROLLER_BUTTON_DPAD_LEFT,
     XR_CONTROLLER_BUTTON_DPAD_RIGHT,
-    XR_CONTROLLER_BUTTON_MAX
+    XR_CONTROLLER_BUTTON_MAX,
+    XR_CONTROLLER_BUTTON_COUNT = XR_CONTROLLER_BUTTON_MAX - XR_CONTROLLER_BUTTON_A
 };
 
 constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5 };
@@ -58,23 +59,6 @@ constexpr int ControllerButtonToKey[] =
     XR_CONTROLLER_BUTTON_DPAD_RIGHT
 };
 
-inline int KeyToMouseButton(const int dik, const bool fromZero = true)
-{
-    int i = 0;
-    if (!fromZero)
-        ++i;
-
-    switch (dik)
-    {
-    case MOUSE_1: return 0 + i;
-    case MOUSE_2: return 1 + i;
-    case MOUSE_3: return 2 + i;
-    case MOUSE_4: return 3 + i;
-    case MOUSE_5: return 4 + i;
-    default: return dik - SDL_NUM_SCANCODES + i;
-    }
-}
-
 class ENGINE_API IInputReceiver;
 
 class ENGINE_API CInput
@@ -92,7 +76,8 @@ public:
     enum
     {
         COUNT_MOUSE_BUTTONS = MOUSE_COUNT,
-        COUNT_KB_BUTTONS = SDL_NUM_SCANCODES
+        COUNT_KB_BUTTONS = SDL_NUM_SCANCODES,
+        COUNT_CONTROLLER_BUTTONS = XR_CONTROLLER_BUTTON_COUNT
     };
 
     struct InputStatistics
@@ -112,15 +97,26 @@ private:
 
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
+    std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
 
     xr_vector<IInputReceiver*> cbStack;
 
+    xr_vector<SDL_Joystick*> joysticks;
+    xr_vector<SDL_GameController*> controllers;
+
     void MouseUpdate();
     void KeyUpdate();
+    void GameControllerUpdate();
+
+    bool InitJoystick();
+    void InitGameController();
+    void DisplayDevicesList();
 
     InputStatistics stats;
     bool exclusiveInput;
     bool inputGrabbed;
+    bool availableJoystick;
+    bool availableController;
 
 public:
     u32 dwCurTime;
@@ -131,8 +127,9 @@ public:
 
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
-    bool iGetAsyncKeyState(int dik);
-    bool iGetAsyncBtnState(int btn);
+    bool iGetAsyncKeyState(const int dik);
+    bool iGetAsyncBtnState(const int btn);
+    bool iGetAsyncGcBtnState(const int btn);
     void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
@@ -149,7 +146,7 @@ public:
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;
-    bool get_dik_name(int dik, LPSTR dest, int dest_sz);
+    bool get_dik_name(const int dik, LPSTR dest, int dest_sz);
 
     void feedback(u16 s1, u16 s2, float time);
 };
