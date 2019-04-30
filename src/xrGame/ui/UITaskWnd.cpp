@@ -167,7 +167,7 @@ void CUITaskWnd::ReloadTaskInfo()
     for (; b != e; b++)
     {
         shared_str spot = b->spot_type;
-        if (spot == "treasure")
+        if (strstr(spot.c_str(), "treasure"))
             m_bTreasuresEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
         else if (spot == "primary_object")
             m_bPrimaryObjectsEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
