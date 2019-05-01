@@ -818,8 +818,13 @@ static inline bool match_shader(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, LPCSTR const mask, size_t const mask_length)
 {
     u32 const full_shader_id_length = xr_strlen(full_shader_id);
-    R_ASSERT2(full_shader_id_length == mask_length,
-        make_string("bad cache for shader %s, [%s], [%s]", debug_shader_id, mask, full_shader_id));
+    if (full_shader_id_length == mask_length)
+    {
+#ifndef MASTER_GOLD
+        Msg("bad cache for shader %s, [%s], [%s]", debug_shader_id, mask, full_shader_id);
+#endif
+        return false;
+    }
     char const* i = full_shader_id;
     char const* const e = full_shader_id + full_shader_id_length;
     char const* j = mask;
@@ -840,7 +845,12 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 1
+    // XXX: -no_shaders_cache command line key
+    // Don't put here this code:
+    // if (strstr(Core.Params, "-no_shaders_cache"))
+    // It would decrease performance.
+    // It's better to use a console command for this
+#if 0
     strcpy_s(result, "");
     return false;
 #else // #if 1
