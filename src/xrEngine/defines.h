@@ -6,6 +6,10 @@ ENGINE_API extern BOOL bDebug;
 #define bDebug 0
 #endif
 
+extern ENGINE_API bool CallOfPripyatMode;
+extern ENGINE_API bool ClearSkyMode;
+extern ENGINE_API bool ShadowOfChernobylMode;
+
 // textures
 ENGINE_API extern int psTextureLOD;
 

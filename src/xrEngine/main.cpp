@@ -42,6 +42,10 @@ ENGINE_API string512 g_sLaunchOnExit_params;
 ENGINE_API string512 g_sLaunchOnExit_app;
 ENGINE_API string_path g_sLaunchWorkingFolder;
 
+ENGINE_API bool CallOfPripyatMode = false;
+ENGINE_API bool ClearSkyMode = false;
+ENGINE_API bool ShadowOfChernobylMode = false;
+
 namespace
 {
 bool CheckBenchmark();
@@ -100,6 +104,33 @@ ENGINE_API void InitSettings()
     InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
     InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
     InitConfig(pGameIni, "game.ltx");
+
+    pcstr gameMode = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
+
+    if (xr_strcmpi("cop", gameMode) == 0)
+    {
+        CallOfPripyatMode = true;
+        ShadowOfChernobylMode = false;
+        ClearSkyMode = false;
+    }
+    else if (xr_strcmpi("cs", gameMode) == 0)
+    {
+        CallOfPripyatMode = false;
+        ShadowOfChernobylMode = false;
+        ClearSkyMode = true;
+    }
+    else if (xr_strcmpi("shoc", gameMode) == 0 || xr_strcmpi("soc", gameMode) == 0)
+    {
+        CallOfPripyatMode = false;
+        ShadowOfChernobylMode = true;
+        ClearSkyMode = false;
+    }
+    else if (xr_strcmpi("unlock", gameMode) == 0)
+    {
+        CallOfPripyatMode = false;
+        ShadowOfChernobylMode = false;
+        ClearSkyMode = false;
+    }
 }
 
 ENGINE_API void InitConsole()
