@@ -67,13 +67,16 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
     m_caption = UIHelper::CreateTextWnd(uiXml, "caption_static", this);
     m_caption_const = (m_caption->GetText());
-    m_clock = UIHelper::CreateTextWnd(uiXml, "clock_wnd", this);
-    /*
-        m_anim_static			= new CUIAnimatedStatic();
-        AttachChild				(m_anim_static);
+    m_clock = UIHelper::CreateTextWnd(uiXml, "clock_wnd", this, false);
+
+    if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
+    {
+        m_anim_static = new CUIAnimatedStatic();
+        AttachChild(m_anim_static);
         m_anim_static->SetAutoDelete(true);
         CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, m_anim_static);
-    */
+    }
+
     m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
@@ -104,7 +107,7 @@ void CUIPdaWnd::Init()
     UINoice->SetAutoDelete(true);
     CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice);
 
-    //	RearrangeTabButtons		(UITabControl);
+    // RearrangeTabButtons(UITabControl);
 }
 
 void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -162,8 +165,12 @@ void CUIPdaWnd::Update()
 {
     inherited::Update();
     m_pActiveDialog->Update();
-    m_clock->TextItemControl().SetText(
-        InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+
+    if (m_clock)
+    {
+        m_clock->TextItemControl().SetText(
+            GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+    }
 
     R_ASSERT(pUILogsWnd);
     Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));

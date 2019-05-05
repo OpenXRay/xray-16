@@ -32,7 +32,7 @@ protected:
 
     CUITextWnd* m_caption;
     shared_str m_caption_const;
-    //	CUIAnimatedStatic*		m_anim_static;
+    CUIAnimatedStatic* m_anim_static;
     CUITextWnd* m_clock;
 
     // Текущий активный диалог
