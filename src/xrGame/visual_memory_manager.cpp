@@ -149,8 +149,8 @@ void CVisualMemoryManager::reload(LPCSTR section)
     }
     else if (m_object)
     {
-        m_free.Load(pSettings->r_string(section, "vision_free_section"), !!m_client);
-        m_danger.Load(pSettings->r_string(section, "vision_danger_section"), !!m_client);
+        m_free.Load(READ_IF_EXISTS(pSettings, r_string, section, "vision_free_section", section), !!m_client);
+        m_danger.Load(READ_IF_EXISTS(pSettings, r_string, section, "vision_free_section", section), !!m_client);
     }
     else
     {
