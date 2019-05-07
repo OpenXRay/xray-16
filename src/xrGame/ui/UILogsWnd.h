@@ -34,19 +34,21 @@ private:
     typedef CUIWindow inherited;
 
     CUIFrameWindow* m_background;
+    CUIFrameLineWnd* m_background2;
     CUIFrameWindow* m_center_background;
+    CUIStatic* m_center_background2;
 
     CUITextWnd* m_center_caption;
-    //	CUICharacterInfo*	m_actor_ch_info;
+    CUICharacterInfo* m_actor_ch_info;
 
     CUICheckButton* m_filter_news;
     CUICheckButton* m_filter_talk;
 
-    //	CUITextWnd*			m_date_caption;
-    //	CUITextWnd*			m_date;
+    CUITextWnd* m_date_caption;
+    CUITextWnd* m_date;
 
     CUITextWnd* m_period_caption;
-    CUITextWnd* m_period;
+    CUIStatic* m_period;
 
     ALife::_TIME_ID m_start_game_time;
     ALife::_TIME_ID m_selected_period;
