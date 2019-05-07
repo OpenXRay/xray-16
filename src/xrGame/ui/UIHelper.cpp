@@ -105,9 +105,16 @@ CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWind
         return nullptr;
 
     auto ui = new CUIProgressBar();
-    parent->AttachChild(ui);
-    ui->SetAutoDelete(true);
-    CUIXmlInit::InitProgressBar(xml, ui_path, 0, ui);
+    if (!CUIXmlInit::InitProgressBar(xml, ui_path, 0, ui))
+    {
+        R_ASSERT(!critical, "Failed to create progress bar");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
     return ui;
 }
 
