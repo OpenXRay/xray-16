@@ -10,6 +10,7 @@
 #include "UIXmlInit.h"
 
 #include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "xrUICore/Buttons/UI3tButton.h"
@@ -108,6 +109,26 @@ CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWind
     if (!CUIXmlInit::InitProgressBar(xml, ui_path, 0, ui))
     {
         R_ASSERT(!critical, "Failed to create progress bar");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
+    return ui;
+}
+
+CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
+{
+    // If it's not critical element, then don't crash if it doesn't exist
+    if (!critical && !xml.NavigateToNode(ui_path, 0))
+        return nullptr;
+
+    auto ui = new CUIProgressShape();
+    if (!CUIXmlInit::InitProgressShape(xml, ui_path, 0, ui))
+    {
+        R_ASSERT(!critical, "Failed to create progress shape");
         xr_delete(ui);
     }
     else if (parent)
