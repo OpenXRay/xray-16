@@ -750,8 +750,14 @@ IC static void CLevel_Export(lua_State* luaState)
         def("physics_world", &physics_world_scripted),
         def("get_snd_volume", &get_snd_volume),
         def("set_snd_volume", &set_snd_volume),
+
         def("add_cam_effector", &add_cam_effector),
         def("add_cam_effector2", &add_cam_effector2),
+        def("add_cam_effector2", +[](pcstr fn, int id, bool cyclic, pcstr cb_func)
+        {
+            add_cam_effector2(fn, id, cyclic, cb_func, 0.0f);
+        }),
+
         def("remove_cam_effector", &remove_cam_effector),
         def("add_pp_effector", &add_pp_effector),
         def("set_pp_effector_factor", &set_pp_effector_factor),
