@@ -4,6 +4,15 @@
 
 class CUIStatic;
 
+// XXX: make it like CUIProgressBar
+// and add following functions:
+/*
+    SetRange
+    GetProgressPos
+    SetProgressPos
+    GetRange_min
+    GetRange_max
+*/
 class XRUICORE_API CUIProgressShape : public CUIStatic
 {
     friend class CUIXmlInitBase;
