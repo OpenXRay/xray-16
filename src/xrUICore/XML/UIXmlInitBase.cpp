@@ -787,9 +787,12 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUIF
 
     string256 buf;
 
-    bool stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch") ? true : false;
-    R_ASSERT(stretch_flag == false);
-    //.	pWnd->SetStretchTexture( stretch_flag );
+    bool stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch");
+    if (stretch_flag)
+    {
+        Msg("~ [%s] stretch attribute is unsupported for [%s]", xml_doc.m_xml_file_name, path);
+        //.	pWnd->SetStretchTexture( stretch_flag );
+    }
 
     Fvector2 pos, size;
     pos.x = xml_doc.ReadAttribFlt(path, index, "x");
