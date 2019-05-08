@@ -51,6 +51,7 @@ public:
     static pcstr GetTextureFileName(pcstr texture_name);
     static void GetTextureShader(const shared_str& texture_name, ui_shader& sh);
     static TEX_INFO FindItem(const shared_str& texture_name, pcstr default_texture = nullptr);
+    static bool ItemExist(const shared_str& texture_name);
 
 protected:
     IC static bool IsSh(const shared_str& texture_name);
