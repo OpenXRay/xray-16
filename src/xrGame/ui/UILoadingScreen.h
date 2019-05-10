@@ -17,6 +17,7 @@ class CApplication;
 class UILoadingScreen : public ILoadingScreen, public CUIWindow
 {
     Lock loadingLock;
+    bool alwaysShowStage;
 
     CUIStatic* loadingProgressBackground;
     CUIProgressBar* loadingProgress;

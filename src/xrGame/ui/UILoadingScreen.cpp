@@ -23,20 +23,31 @@ UILoadingScreen::UILoadingScreen()
       loadingStage(nullptr), loadingHeader(nullptr),
       loadingTipNumber(nullptr), loadingTip(nullptr)
 {
+    alwaysShowStage = false;
     UILoadingScreen::Initialize();
 }
 
 void UILoadingScreen::Initialize()
 {
     CUIXml uiXml;
-    bool loaded = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml");
+    const bool loaded = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml");
 
     if (!loaded) // Robustness? Yes!
     {
-        if (UI().is_widescreen())
-            uiXml.Set(LoadingScreenXML16x9);
+        if (ClearSkyMode)
+        {
+            if (UICore::is_widescreen())
+                uiXml.Set(LoadingScreenXML16x9ClearSky);
+            else
+                uiXml.Set(LoadingScreenXMLClearSky);
+        }
         else
-            uiXml.Set(LoadingScreenXML);
+        {
+            if (UICore::is_widescreen())
+                uiXml.Set(LoadingScreenXML16x9);
+            else
+                uiXml.Set(LoadingScreenXML);
+        }
     }
 
     const auto loadProgressBar = [&]()
@@ -50,17 +61,18 @@ void UILoadingScreen::Initialize()
         CUIXmlInit::InitWindow(uiXml, "background", 0, this);
     };
 
-    const auto node = uiXml.NavigateToNodeWithAttribute("loading_progress", "under_background", "0");
-    if (node)
+    if (uiXml.ReadAttribInt("loading_progress", 0, "under_background", 1))
     {
-        loadBackground();
         loadProgressBar();
+        loadBackground();
     }
     else
     {
-        loadProgressBar();
         loadBackground();
+        loadProgressBar();
     }
+
+    alwaysShowStage = uiXml.ReadAttribInt("loading_stage", 0, "always_show");
 
     loadingLogo = UIHelper::CreateStatic(uiXml, "loading_logo", this);
     loadingProgressPercent = UIHelper::CreateStatic(uiXml, "loading_progress_percent", this, false);
@@ -135,18 +147,26 @@ void UILoadingScreen::SetLevelLogo(const char* name)
 
 void UILoadingScreen::SetStageTitle(const char* title)
 {
-    ScopeLock scope(&loadingLock);
+    // Only if enabled by user or forced to be displayed by XML
+    // And if exist at all
+    if ((ps_rs_loading_stages || alwaysShowStage) && loadingStage)
+    {
+        ScopeLock scope(&loadingLock);
 
-    loadingStage->TextItemControl()->SetText(title);
+        loadingStage->TextItemControl()->SetText(title);
+    }
 }
 
 void UILoadingScreen::SetStageTip(const char* header, const char* tipNumber, const char* tip)
 {
     ScopeLock scope(&loadingLock);
 
-    loadingHeader->TextItemControl()->SetText(header);
-    loadingTipNumber->TextItemControl()->SetText(tipNumber);
-    loadingTip->TextItemControl()->SetText(tip);
+    if (loadingHeader)
+        loadingHeader->TextItemControl()->SetText(header);
+    if (loadingTipNumber)
+        loadingTipNumber->TextItemControl()->SetText(tipNumber);
+    if (loadingTip)
+        loadingTip->TextItemControl()->SetText(tip);
 }
 
 void UILoadingScreen::Show(bool status)

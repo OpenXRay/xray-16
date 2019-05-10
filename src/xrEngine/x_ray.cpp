@@ -328,8 +328,7 @@ void CApplication::LoadForceFinish()
 
 void CApplication::SetLoadStageTitle(pcstr _ls_title)
 {
-    if (ps_rs_loading_stages)
-        loadingScreen->SetStageTitle(_ls_title);
+    loadingScreen->SetStageTitle(_ls_title);
 }
 
 void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
