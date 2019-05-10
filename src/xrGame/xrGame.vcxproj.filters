@@ -6470,6 +6470,9 @@
     <ClInclude Include="ui\UILoadingScreenHardcoded.h">
       <Filter>UI\Common\LoadingScreen</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIRankFaction.h">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9803,6 +9806,9 @@
     </ClCompile>
     <ClCompile Include="AnselManager.cpp">
       <Filter>Core\Client\Ansel</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIRankFaction.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
