@@ -1042,6 +1042,19 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
+
+    // Game scripts doesn't call randomize but use random
+    // So, we should randomize in the engine.
+    {
+        pcstr randomSeed = "math.randomseed(os.time())";
+        pcstr mathRandom = "math.random()";
+
+        luaL_dostring(lua(), randomSeed);
+        // It's a good practice to call random few times before using it
+        for (int i = 0; i < 3; ++i)
+            luaL_dostring(lua(), mathRandom);
+    }
+
     // XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
     // is that lua hooks somehow make 'super' global unavailable (is's used all over the vanilla scripts).
     // You can disable script profiler by commenting out the following lines in the beginning of _g.script:

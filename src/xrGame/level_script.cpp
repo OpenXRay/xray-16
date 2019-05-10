@@ -41,9 +41,8 @@
 #include "HUDManager.h"
 #include "raypick.h"
 #include "xrCDB/xr_collide_defs.h"
-#ifdef NAMESPACE_LEVEL_EXPORTS
 #include "xrNetServer/NET_Messages.h"
-#endif
+
 using namespace luabind;
 using namespace luabind::policy;
 
@@ -574,9 +573,8 @@ void stop_tutorial()
 LPCSTR translate_string(LPCSTR str) { return *StringTable().translate(str); }
 bool has_active_tutotial() { return (g_tutorial != NULL); }
 
-//Alundaio: namespace level exports extension
-#ifdef NAMESPACE_LEVEL_EXPORTS
-//ability to update level netpacket
+// Alundaio: namespace level exports extension
+// ability to update level netpacket
 void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool bHighPriority = false, bool bSendImmediately = false)
 {
     Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, bSendImmediately));
@@ -631,7 +629,6 @@ void set_active_cam(u8 mode)
     if (actor && mode <= eacMaxCam)
         actor->cam_Set((EActorCameras)mode);
 }
-#endif
 //-Alundaio
 
 void iterate_online_objects(luabind::functor<bool> functor)
@@ -677,7 +674,6 @@ IC static void CLevel_Export(lua_State* luaState)
     module(luaState, "level")
     [
         //Alundaio: Extend level namespace exports
-#ifdef NAMESPACE_LEVEL_EXPORTS
         def("send", &g_send) , //allow the ability to send netpacket to level
         //def("ray_pick",g_ray_pick),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
@@ -686,8 +682,8 @@ IC static void CLevel_Export(lua_State* luaState)
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
-#endif
         //Alundaio: END
+
         def("iterate_online_objects", &iterate_online_objects),
         // obsolete\deprecated
         def("object_by_id", get_object_by_id),

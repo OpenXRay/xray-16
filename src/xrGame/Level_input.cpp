@@ -48,12 +48,14 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
-        g_actor->callback(GameObject::eMouseWheel)(x);
-    /* avo: end */
-#endif
+    {
+        auto& cb = g_actor->callback(GameObject::eMouseWheel);
+        if (cb)
+            cb(x);
+    }
+
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
         return;
     if (Device.Paused()
@@ -79,12 +81,13 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
-        g_actor->callback(GameObject::eMouseMove)(dx, dy);
-    /* avo: end */
-#endif
+    {
+        auto& cb = g_actor->callback(GameObject::eMouseMove);
+        if (cb)
+            cb(dx, dy);
+    }
 
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
         return;
@@ -124,12 +127,13 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     EGameActions _curr = get_binded_action(key);
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (!g_bDisableAllInput && g_actor)
-        g_actor->callback(GameObject::eKeyPress)(key);
-    /* avo: end */
-#endif
+    {
+        auto& cb = g_actor->callback(GameObject::eKeyPress);
+        if (cb)
+            cb(key);
+    }
 
     if (_curr == kPAUSE)
     {
@@ -501,12 +505,13 @@ void CLevel::IR_OnKeyboardRelease(int key)
     if (!bReady || g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
-        g_actor->callback(GameObject::eKeyRelease)(key);
-    /* avo: end */
-#endif
+    {
+        auto& cb = g_actor->callback(GameObject::eKeyRelease);
+        if (cb)
+            cb(key);
+    }
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
         return;
@@ -532,12 +537,13 @@ void CLevel::IR_OnKeyboardHold(int key)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
-        g_actor->callback(GameObject::eKeyHold)(key);
-    /* avo: end */
-#endif
+    {
+        auto& cb = g_actor->callback(GameObject::eKeyHold);
+        if (cb)
+            cb(key);
+    }
 
 #ifdef DEBUG
     // Lain: added
