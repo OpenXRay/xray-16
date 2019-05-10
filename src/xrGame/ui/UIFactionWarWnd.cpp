@@ -44,6 +44,12 @@ void CUIFactionWarWnd::Reset()
     hint_wnd           = NULL;
     m_tc_pos.set       ( 0.0f, 0.0f );
     m_td_pos.set       ( 0.0f, 0.0f );
+
+    m_background = nullptr;
+    m_center_background = nullptr;
+
+    m_background2 = nullptr;
+    m_center_background2 = nullptr;
 }
 
 void CUIFactionWarWnd::Init()
@@ -57,23 +63,28 @@ void CUIFactionWarWnd::Init()
 
 	CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
 
-	m_background			= UIHelper::CreateFrameWindow( xml, "background", this );
+    m_background = UIHelper::CreateFrameWindow(xml, "background", this, false);
+    m_center_background = UIHelper::CreateFrameWindow(xml, "center_background", this, false);
 
-	m_center_background		= UIHelper::CreateFrameWindow( xml, "center_background", this );
+    if (!m_background)
+        m_background2 = UIHelper::CreateFrameLine(xml, "background", this, false);
 
-	m_target_static			= UIHelper::CreateTextWnd( xml, "target_static", this );
-	m_target_caption		= UIHelper::CreateTextWnd( xml, "target_caption", this );
+    if (!m_center_background)
+        m_center_background2 = UIHelper::CreateStatic(xml, "center_background", this, false);
+
+	m_target_static			= UIHelper::CreateStatic( xml, "target_static", this );
+	m_target_caption		= UIHelper::CreateStatic( xml, "target_caption", this );
 	//m_target_caption->SetElipsis( 1, 0 );
 	m_tc_pos				= m_target_caption->GetWndPos();
 
-	m_target_desc			= UIHelper::CreateTextWnd( xml, "target_decs", this );
+	m_target_desc			= UIHelper::CreateStatic( xml, "target_decs", this );
 	m_td_pos				= m_target_desc->GetWndPos();
 
 	m_state_static			= UIHelper::CreateStatic( xml, "state_static", this );
 	
 	m_our_icon				= UIHelper::CreateStatic( xml, "static_our_icon", this );
 	m_our_icon_over			= UIHelper::CreateStatic( xml, "static_our_icon_over", this );
-	m_our_name				= UIHelper::CreateTextWnd( xml, "static_our_name", this );
+	m_our_name				= UIHelper::CreateStatic( xml, "static_our_name", this );
 	m_st_our_frac_info		= UIHelper::CreateStatic( xml, "static_our_frac_info", this );
 	m_st_our_mem_count		= UIHelper::CreateStatic( xml, "static_our_mem_count", this );
 	m_st_our_resource		= UIHelper::CreateStatic( xml, "static_our_resource", this );
@@ -84,7 +95,7 @@ void CUIFactionWarWnd::Init()
 
 	m_enemy_icon			= UIHelper::CreateStatic( xml, "static_enemy_icon", this );
 	m_enemy_icon_over		= UIHelper::CreateStatic( xml, "static_enemy_icon_over", this );
-	m_enemy_name			= UIHelper::CreateTextWnd( xml, "static_enemy_name", this );
+	m_enemy_name			= UIHelper::CreateStatic( xml, "static_enemy_name", this );
 	m_st_enemy_frac_info	= UIHelper::CreateStatic( xml, "static_enemy_frac_info", this );
 	m_st_enemy_mem_count	= UIHelper::CreateStatic( xml, "static_enemy_mem_count", this );
 	m_st_enemy_resource		= UIHelper::CreateStatic( xml, "static_enemy_resource", this );
