@@ -30,7 +30,7 @@ UILoadingScreen::UILoadingScreen()
 void UILoadingScreen::Initialize()
 {
     CUIXml uiXml;
-    const bool loaded = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml");
+    const bool loaded = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml", false);
 
     if (!loaded) // Robustness? Yes!
     {
