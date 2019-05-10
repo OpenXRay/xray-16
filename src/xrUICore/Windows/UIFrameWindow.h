@@ -14,8 +14,8 @@ public:
 
     virtual void SetTextureColor(u32 color) { m_texture_color = color; }
     virtual u32 GetTextureColor() const { return m_texture_color; }
-    virtual void InitTexture(LPCSTR texture);
-    virtual void InitTextureEx(LPCSTR texture, LPCSTR shader);
+    virtual bool InitTexture(pcstr texture, bool fatal = true);
+    virtual bool InitTextureEx(pcstr texture, pcstr shader, bool fatal = true);
 
     virtual void SetStretchTexture(bool stretch) {}
     virtual bool GetStretchTexture() { return false; };

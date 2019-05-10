@@ -14,8 +14,8 @@ class ITextureOwner
 {
 public:
     virtual ~ITextureOwner() {}
-    virtual void InitTexture(LPCSTR texture) = 0;
-    virtual void InitTextureEx(LPCSTR texture, LPCSTR shader) = 0;
+    virtual bool InitTexture(pcstr texture, bool fatal = true) = 0;
+    virtual bool InitTextureEx(pcstr texture, pcstr shader, bool fatal = true) = 0;
     virtual void SetTextureRect(const Frect& r) = 0;
     virtual const Frect& GetTextureRect() const = 0;
     virtual void SetTextureColor(u32 color) = 0;

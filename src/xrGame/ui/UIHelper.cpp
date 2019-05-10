@@ -146,12 +146,16 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindo
         return nullptr;
 
     auto ui = new CUIFrameLineWnd();
-    if (parent)
+    if (!CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT(!critical, "Failed to create frame line");
+        xr_delete(ui);
+    }
+    else if (parent)
     {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui);
     return ui;
 }
 
@@ -162,12 +166,16 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWind
         return nullptr;
 
     auto ui = new CUIFrameWindow();
-    if (parent)
+    if (!CUIXmlInit::InitFrameWindow(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT(!critical, "Failed to create frame window");
+        xr_delete(ui);
+    }
+    else if (parent)
     {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitFrameWindow(xml, ui_path, 0, ui);
     return ui;
 }
 

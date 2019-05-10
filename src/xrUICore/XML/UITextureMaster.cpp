@@ -101,7 +101,7 @@ bool CUITextureMaster::IsSh(const shared_str& texture_name)
     return strstr(texture_name.c_str(), DELIMITER) ? false : true;
 }
 
-void CUITextureMaster::InitTexture(
+bool CUITextureMaster::InitTexture(
     const shared_str& texture_name, const shared_str& shader_name, ui_shader& out_shader, Frect& out_rect)
 {
     xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(texture_name);
@@ -114,12 +114,14 @@ void CUITextureMaster::InitTexture(
 
         out_shader = m_shaders[p];
         out_rect = (*it).second.rect;
+        return true;
     }
-    else
-        out_shader->create(shader_name.c_str(), texture_name.c_str());
+
+    out_shader->create(shader_name.c_str(), texture_name.c_str());
+    return false;
 }
 
-void CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem* tc, const shared_str& shader_name)
+bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem* tc, const shared_str& shader_name)
 {
     xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(texture_name);
     if (it != m_textures.end())
@@ -132,9 +134,11 @@ void CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem
         tc->SetShader(m_shaders[p]);
         tc->SetTextureRect((*it).second.rect);
         tc->SetSize(Fvector2().set(it->second.rect.width(), it->second.rect.height()));
+        return true;
     }
-    else
-        tc->CreateShader(texture_name.c_str(), shader_name.c_str());
+
+    tc->CreateShader(texture_name.c_str(), shader_name.c_str());
+    return false;
 }
 
 Frect CUITextureMaster::GetTextureRect(const shared_str& texture_name)

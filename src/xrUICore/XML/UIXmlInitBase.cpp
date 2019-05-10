@@ -93,16 +93,10 @@ bool CUIXmlInitBase::InitWindow(CUIXml& xml_doc, LPCSTR path, int index, CUIWind
 
 bool CUIXmlInitBase::InitFrameWindow(CUIXml& xml_doc, LPCSTR path, int index, CUIFrameWindow* pWnd, bool fatal /*= true*/)
 {
-    const bool nodeExist = xml_doc.NavigateToNode(path, index);
-    if (!nodeExist)
-    {
-        R_ASSERT4(!fatal, "XML node not found", path, xml_doc.m_xml_file_name);
-        return false;
-    }
+    bool result = InitWindow(xml_doc, path, index, pWnd, fatal);
+    result &= InitTexture(xml_doc, path, index, pWnd, fatal);
 
-    InitTexture(xml_doc, path, index, pWnd);
-    InitWindow(xml_doc, path, index, pWnd);
-    return true;
+    return result;
 }
 
 bool CUIXmlInitBase::InitOptionsItem(CUIXml& xml_doc, LPCSTR path, int index, CUIOptionsItem* pWnd)
@@ -813,8 +807,8 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUIF
     pWnd->SetTextureColor(color);
 
     InitWindow(xml_doc, path, index, pWnd);
-    pWnd->InitFrameLineWnd(*base_name, pos, size, !vertical);
-    return true;
+    
+    return pWnd->InitFrameLineWnd(*base_name, pos, size, !vertical, fatal);
 }
 
 bool CUIXmlInitBase::InitCustomEdit(CUIXml& xml_doc, LPCSTR path, int index, CUICustomEdit* pWnd, bool fatal /*= true*/)
@@ -895,8 +889,10 @@ bool CUIXmlInitBase::InitAnimatedStatic(CUIXml& xml_doc, LPCSTR path, int index,
     return true;
 }
 
-bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOwner* pWnd)
+bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOwner* pWnd, bool fatal /*= true*/)
 {
+    bool result = true;
+
     string256 buf;
     LPCSTR texture = NULL;
     LPCSTR shader = NULL;
@@ -909,9 +905,9 @@ bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextu
     if (texture)
     {
         if (shader)
-            pWnd->InitTextureEx(texture, shader);
+            result = pWnd->InitTextureEx(texture, shader, fatal);
         else
-            pWnd->InitTexture(texture);
+            result = pWnd->InitTexture(texture, fatal);
     }
     //--------------------
     Frect rect;
@@ -929,7 +925,7 @@ bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextu
     if (rect.width() != 0 && rect.height() != 0)
         pWnd->SetTextureRect(rect);
 
-    return true;
+    return result;
 }
 
 bool CUIXmlInitBase::InitTextureOffset(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd)

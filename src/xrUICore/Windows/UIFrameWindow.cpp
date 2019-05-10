@@ -5,7 +5,10 @@
 
 void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts);
 
-CUIFrameWindow::CUIFrameWindow() : m_bTextureVisible(false) { m_texture_color = color_argb(255, 255, 255, 255); }
+CUIFrameWindow::CUIFrameWindow() : m_bTextureVisible(false)
+{
+    m_texture_color = color_argb(255, 255, 255, 255);
+}
 void CUIFrameWindow::SetWndSize(const Fvector2& sz)
 {
     Fvector2 size = sz;
@@ -33,39 +36,127 @@ void CUIFrameWindow::SetWndSize(const Fvector2& sz)
     inherited::SetWndSize(size);
 }
 
-void CUIFrameWindow::InitTextureEx(LPCSTR texture, LPCSTR sh_name)
+bool CUIFrameWindow::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*/)
 {
     dbg_tex_name = texture;
-    m_bTextureVisible = true;
     string256 buf;
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_back"), sh_name, m_shader, m_tex_rect[fmBK]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_l"), sh_name, m_shader, m_tex_rect[fmL]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_r"), sh_name, m_shader, m_tex_rect[fmR]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_t"), sh_name, m_shader, m_tex_rect[fmT]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_b"), sh_name, m_shader, m_tex_rect[fmB]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_lt"), sh_name, m_shader, m_tex_rect[fmLT]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_rb"), sh_name, m_shader, m_tex_rect[fmRB]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_rt"), sh_name, m_shader, m_tex_rect[fmRT]);
-    CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_lb"), sh_name, m_shader, m_tex_rect[fmLB]);
 
-    R_ASSERT2(fsimilar(m_tex_rect[fmLT].height(), m_tex_rect[fmT].height()), texture);
-    R_ASSERT2(fsimilar(m_tex_rect[fmLT].height(), m_tex_rect[fmRT].height()), texture);
-    //	R_ASSERT2(fsimilar(m_tex_rect[fmL].height(), m_tex_rect[fmBK].height()),texture );
-    R_ASSERT2(fsimilar(m_tex_rect[fmL].height(), m_tex_rect[fmR].height()), texture);
-    R_ASSERT2(fsimilar(m_tex_rect[fmLB].height(), m_tex_rect[fmB].height()), texture);
-    R_ASSERT2(fsimilar(m_tex_rect[fmLB].height(), m_tex_rect[fmRB].height()), texture);
+    const bool back_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_back"), shader, m_shader, m_tex_rect[fmBK]);
+    const bool left_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_l"), shader, m_shader, m_tex_rect[fmL]);
+    const bool right_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_r"), shader, m_shader, m_tex_rect[fmR]);
+    const bool top_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_t"), shader, m_shader, m_tex_rect[fmT]);
+    const bool bottom_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_b"), shader, m_shader, m_tex_rect[fmB]);
 
-    R_ASSERT2(fsimilar(m_tex_rect[fmLT].width(), m_tex_rect[fmL].width()), texture);
-    R_ASSERT2(fsimilar(m_tex_rect[fmLT].width(), m_tex_rect[fmLB].width()), texture);
+    const bool leftTop_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_lt"), shader, m_shader, m_tex_rect[fmLT]);
+    const bool rightBottom_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_rb"), shader, m_shader, m_tex_rect[fmRB]);
+    const bool rightTop_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_rt"), shader, m_shader, m_tex_rect[fmRT]);
+    const bool leftBottom_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_lb"), shader, m_shader, m_tex_rect[fmLB]);
 
-    //	R_ASSERT2(fsimilar(m_tex_rect[fmT].width(), m_tex_rect[fmBK].width()),texture );
-    R_ASSERT2(fsimilar(m_tex_rect[fmT].width(), m_tex_rect[fmB].width()), texture);
+    bool failed = false;
 
-    R_ASSERT2(fsimilar(m_tex_rect[fmRT].width(), m_tex_rect[fmR].width()), texture);
-    R_ASSERT2(fsimilar(m_tex_rect[fmRT].width(), m_tex_rect[fmRB].width()), texture);
+    if (fatal)
+    {
+        R_ASSERT2(back_exist, texture);
+        R_ASSERT2(left_exist, texture);
+        R_ASSERT2(right_exist, texture);
+        R_ASSERT2(top_exist, texture);
+        R_ASSERT2(bottom_exist, texture);
+
+        R_ASSERT2(leftTop_exist, texture);
+        R_ASSERT2(rightBottom_exist, texture);
+        R_ASSERT2(rightTop_exist, texture);
+        R_ASSERT2(leftBottom_exist, texture);
+    }
+    /*else*/ // Always set failed flag to be able to play in debug
+    {
+        failed |= !back_exist;
+        failed |= !left_exist;
+        failed |= !right_exist;
+        failed |= !top_exist;
+        failed |= !bottom_exist;
+
+        failed |= !leftTop_exist;
+        failed |= !rightBottom_exist;
+        failed |= !rightTop_exist;
+        failed |= !leftBottom_exist;
+    }
+
+    const bool LT_and_T_are_similar_by_height = fsimilar(m_tex_rect[fmLT].height(), m_tex_rect[fmT].height());
+    const bool LT_and_RT_are_similar_by_height = fsimilar(m_tex_rect[fmLT].height(), m_tex_rect[fmRT].height());
+
+    //const bool L_and_BK_are_similar_by_height = fsimilar(m_tex_rect[fmL].height(), m_tex_rect[fmBK].height());
+    const bool L_and_R_are_similar_by_height = fsimilar(m_tex_rect[fmL].height(), m_tex_rect[fmR].height());
+    
+    const bool LB_and_B_are_similar_by_height = fsimilar(m_tex_rect[fmLB].height(), m_tex_rect[fmB].height());
+    const bool LB_and_RB_are_similar_by_height = fsimilar(m_tex_rect[fmLB].height(), m_tex_rect[fmRB].height());
+
+    const bool LT_and_L_are_similar_by_width = fsimilar(m_tex_rect[fmLT].width(), m_tex_rect[fmL].width());
+    const bool LT_and_LB_are_similar_by_width = fsimilar(m_tex_rect[fmLT].width(), m_tex_rect[fmLB].width());
+
+    //const bool T_and_BK_are_similar_by_width = fsimilar(m_tex_rect[fmT].width(), m_tex_rect[fmBK].width());
+    const bool T_and_B_are_similar_by_width = fsimilar(m_tex_rect[fmT].width(), m_tex_rect[fmB].width());
+
+    const bool RT_and_R_are_similar_by_width = fsimilar(m_tex_rect[fmRT].width(), m_tex_rect[fmR].width());
+    const bool RT_and_RB_are_similar_by_width = fsimilar(m_tex_rect[fmRT].width(), m_tex_rect[fmRB].width());
+
+    if (fatal)
+    {
+        R_ASSERT2(LT_and_T_are_similar_by_height, texture);
+        R_ASSERT2(LT_and_RT_are_similar_by_height, texture);
+
+        //R_ASSERT2(L_and_BK_are_similar_by_height, texture);
+        R_ASSERT2(L_and_R_are_similar_by_height, texture);
+
+        R_ASSERT2(LB_and_B_are_similar_by_height, texture);
+        R_ASSERT2(LB_and_RB_are_similar_by_height, texture);
+
+        R_ASSERT2(LT_and_L_are_similar_by_width, texture);
+        R_ASSERT2(LT_and_LB_are_similar_by_width, texture);
+
+        //R_ASSERT2(T_and_BK_are_similar_by_width, texture);
+        R_ASSERT2(T_and_B_are_similar_by_width, texture);
+
+        R_ASSERT2(RT_and_R_are_similar_by_width, texture);
+        R_ASSERT2(RT_and_RB_are_similar_by_width, texture);
+    }
+    else
+    {
+        if (!LT_and_T_are_similar_by_height && leftTop_exist && top_exist)
+            Msg("! textures %s_lt and %s_t are not similar by height", texture, texture);
+        if (!LT_and_RT_are_similar_by_height && leftTop_exist && rightTop_exist)
+            Msg("! textures %s_lt and %s_rt are not similar by height", texture, texture);
+
+        if (!L_and_R_are_similar_by_height && left_exist && right_exist)
+            Msg("! textures %s_l and %s_r are not similar by height", texture, texture);
+
+        if (!LB_and_B_are_similar_by_height && leftBottom_exist && bottom_exist)
+            Msg("! textures %s_lb and %s_b are not similar by height", texture, texture);
+        if (!LB_and_RB_are_similar_by_height && leftBottom_exist && rightBottom_exist)
+            Msg("! textures %s_lb and %s_rb are not similar by height", texture, texture);
+
+        if (!LT_and_L_are_similar_by_width && leftTop_exist && left_exist)
+            Msg("! textures %s_lt and %s_l are not similar by width", texture, texture);
+        if (!LT_and_LB_are_similar_by_width && leftTop_exist && leftBottom_exist)
+            Msg("! textures %s_lt and %s_lb are not similar by width", texture, texture);
+
+        if (!T_and_B_are_similar_by_width && top_exist && bottom_exist)
+            Msg("! textures %s_t and %s_b are not similar by width", texture, texture);
+
+        if (!RT_and_R_are_similar_by_width && rightTop_exist && right_exist)
+            Msg("! textures %s_rt and %s_r are not similar by width", texture, texture);
+        if (!RT_and_RB_are_similar_by_width && rightTop_exist && rightBottom_exist)
+            Msg("! textures %s_rt and %s_rb are not similar by width", texture, texture);
+    }
+
+    m_bTextureVisible = !failed;
+    return !failed;
 }
 
-void CUIFrameWindow::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud" DELIMITER "default"); }
+bool CUIFrameWindow::InitTexture(pcstr texture, bool fatal)
+{
+    return InitTextureEx(texture, "hud" DELIMITER "default", fatal);
+}
+
 void CUIFrameWindow::Draw()
 {
     if (m_bTextureVisible)

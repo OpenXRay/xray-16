@@ -7,9 +7,9 @@ class XRUICORE_API CUIFrameLineWnd : public CUIWindow
 
 public:
     CUIFrameLineWnd();
-    void InitFrameLineWnd(LPCSTR base_name, Fvector2 pos, Fvector2 size, bool horizontal = true);
+    bool InitFrameLineWnd(LPCSTR base_name, Fvector2 pos, Fvector2 size, bool horizontal = true, bool fatal = true);
     void InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizontal = true);
-    void InitTexture(LPCSTR tex_name, LPCSTR sh_name = "hud" DELIMITER "default");
+    bool InitTexture(pcstr texture, pcstr shader = "hud" DELIMITER "default", bool fatal = true);
     virtual void Draw();
 
     float GetTextureHeight() const { return m_tex_rect[0].height(); }
