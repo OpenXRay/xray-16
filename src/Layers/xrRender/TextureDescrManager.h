@@ -1,8 +1,9 @@
-#ifndef _TextureDescrManager_included_
-#define _TextureDescrManager_included_
-
 #pragma once
+
+#include <bitset>
+
 #include "ETextureParams.h"
+#include "xrCommon/xr_unordered_map.h"
 
 class cl_dt_scaler;
 
@@ -11,10 +12,13 @@ class CTextureDescrMngr
     struct texture_assoc
     {
         shared_str detail_name;
-        // R_constant_setup*	cs;
-        u8 usage;
-        texture_assoc() : /*cs(NULL),*/ usage(0) {}
-        ~texture_assoc() { /*xr_delete(cs);*/}
+        std::bitset<2> usage;
+        enum
+        {
+            flDiffuseDetail,
+            flBumpDetail
+        };
+        texture_assoc() { usage.reset(); }
     };
     struct texture_spec
     {
@@ -29,8 +33,8 @@ class CTextureDescrMngr
         texture_desc() : m_assoc(nullptr), m_spec(nullptr) {}
     };
 
-    using map_TD = xr_map<shared_str, texture_desc>;
-    using map_CS = xr_map<shared_str, cl_dt_scaler*>;
+    using map_TD = xr_unordered_map<shared_str, texture_desc>;
+    using map_CS = xr_unordered_map<shared_str, cl_dt_scaler*>;
 
     map_TD m_texture_details;
     map_CS m_detail_scalers;
@@ -50,4 +54,3 @@ public:
     BOOL GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const;
     BOOL UseSteepParallax(const shared_str& tex_name) const;
 };
-#endif

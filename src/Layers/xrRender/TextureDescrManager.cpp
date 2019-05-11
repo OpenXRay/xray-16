@@ -14,13 +14,13 @@ class cl_dt_scaler : public R_constant_setup
 public:
     float scale;
 
-    cl_dt_scaler(float s) : scale(s){};
-    virtual void setup(R_constant* C) { RCache.set_c(C, scale, scale, scale, 1 / r__dtex_range); }
+    cl_dt_scaler(float s) : scale(s) {}
+    void setup(R_constant* C) override { RCache.set_c(C, scale, scale, scale, 1 / r__dtex_range); }
 };
 
-void fix_texture_thm_name(LPSTR fn)
+void fix_texture_thm_name(pstr fn)
 {
-    LPSTR _ext = strext(fn);
+    pstr _ext = strext(fn);
     if (_ext && (!xr_stricmp(_ext, ".tga") || !xr_stricmp(_ext, ".thm") || !xr_stricmp(_ext, ".dds") ||
        !xr_stricmp(_ext, ".bmp") || !xr_stricmp(_ext, ".ogm")))
     {
@@ -32,15 +32,15 @@ void fix_texture_thm_name(LPSTR fn)
 #define DECLARE_DESCR_LOCK
 #define LOCK_DESCR()
 #define UNLOCK_DESCR()
-#define PROCESS_DESCR(processable, function) \
-    for (const auto& item : processable) \
+#define PROCESS_DESCR(processeable, function) \
+    for (const auto& item : processeable) \
         function(item)
 #else
 #define DECLARE_DESCR_LOCK Lock descrLock
 #define LOCK_DESCR() descrLock.Enter()
 #define UNLOCK_DESCR() descrLock.Leave()
-#define PROCESS_DESCR(processable, function) \
-    tbb::parallel_for_each(processable, function)
+#define PROCESS_DESCR(processeable, function) \
+    tbb::parallel_for_each(processeable, function)
 #endif
 
 void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
@@ -64,6 +64,9 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 #ifndef MASTER_GOLD
         Msg("\tsection [%s] has %d lines", data.Name.c_str(), data.Data.size());
 #endif
+        m_texture_details.reserve(m_texture_details.size() + data.Data.size());
+        m_detail_scalers.reserve(m_detail_scalers.size() + data.Data.size());
+
         const auto processAssociation = [&](const CInifile::Item& item)
         {
             if (listTHM)
@@ -72,23 +75,30 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             LOCK_DESCR();
             texture_desc& desc = m_texture_details[item.first];
             cl_dt_scaler*& dts = m_detail_scalers[item.first];
-            desc.m_assoc = new texture_assoc();
             UNLOCK_DESCR();
+
+            if (desc.m_assoc)
+                xr_delete(desc.m_assoc);
+
+            desc.m_assoc = new texture_assoc();
 
             string_path T;
             float s;
 
-            int res = sscanf(*item.second, "%[^,],%f", T, &s);
-            R_ASSERT(res == 2);
+            const int res = sscanf(*item.second, "%[^,],%f", T, &s);
+            R_ASSERT4(res == 2, "Bad texture association", item.first.c_str(), fname);
             desc.m_assoc->detail_name = T;
-            dts = new cl_dt_scaler(s);
-            desc.m_assoc->usage = 0;
+            if (dts)
+                dts->scale = s;
+            else
+                dts = new cl_dt_scaler(s);
+
             if (strstr(item.second.c_str(), "usage[diffuse_or_bump]"))
-                desc.m_assoc->usage = (1 << 0) | (1 << 1);
+                desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail | texture_assoc::flBumpDetail);
             else if (strstr(item.second.c_str(), "usage[bump]"))
-                desc.m_assoc->usage = (1 << 1);
+                desc.m_assoc->usage.set(texture_assoc::flBumpDetail);
             else if (strstr(item.second.c_str(), "usage[diffuse]"))
-                desc.m_assoc->usage = (1 << 0);
+                desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
         };
         PROCESS_DESCR(data.Data, processAssociation);
     } // "association"
@@ -99,6 +109,8 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 #ifndef MASTER_GOLD
         Msg("\tsection [%s] has %d lines", data.Name.c_str(), data.Data.size());
 #endif
+        m_texture_details.reserve(m_texture_details.size() + data.Data.size());
+
         const auto processSpecification = [&](const CInifile::Item& item)
         {
             if (listTHM)
@@ -108,12 +120,15 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             texture_desc& desc = m_texture_details[item.first];
             UNLOCK_DESCR();
 
+            if (desc.m_spec)
+                xr_delete(desc.m_spec);
+
             desc.m_spec = new texture_spec();
 
             string_path bmode;
             const int res =
                     sscanf(item.second.c_str(), "bump_mode[%[^]]], material[%f]", bmode, &desc.m_spec->m_material);
-            R_ASSERT(res == 2);
+            R_ASSERT4(res == 2, "Bad texture specification", item.first.c_str(), fname);
             if ((bmode[0] == 'u') && (bmode[1] == 's') && (bmode[2] == 'e') && (bmode[3] == ':'))
             {
                 // bump-map specified
@@ -138,6 +153,9 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
 
     DECLARE_DESCR_LOCK;
 
+    m_texture_details.reserve(m_texture_details.size() + flist.size());
+    m_detail_scalers.reserve(m_detail_scalers.size() + flist.size());
+
     const auto processFile = [&](const FS_File& it)
     {
         // Alundaio: Print list of *.thm to find bad .thms!
@@ -150,7 +168,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         xr_strcpy(fn, it.name.c_str());
         fix_texture_thm_name(fn);
 
-        R_ASSERT(F->find_chunk(THM_CHUNK_TYPE));
+        R_ASSERT3(F->find_chunk(THM_CHUNK_TYPE), "Cannot find THM chunk in file", fn);
         F->r_u32();
         STextureParams tp;
         tp.Load(*F);
@@ -174,15 +192,13 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
                 if (dts)
                     dts->scale = tp.detail_scale;
                 else
-                    /*desc.m_assoc->cs*/ dts = new cl_dt_scaler(tp.detail_scale);
-
-                desc.m_assoc->usage = 0;
+                    dts = new cl_dt_scaler(tp.detail_scale);
 
                 if (tp.flags.is(STextureParams::flDiffuseDetail))
-                    desc.m_assoc->usage |= (1 << 0);
+                    desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
 
                 if (tp.flags.is(STextureParams::flBumpDetail))
-                    desc.m_assoc->usage |= (1 << 1);
+                    desc.m_assoc->usage.set(texture_assoc::flBumpDetail);
             }
             if (desc.m_spec)
                 xr_delete(desc.m_spec);
@@ -290,9 +306,9 @@ void CTextureDescrMngr::GetTextureUsage(const shared_str& tex_name, bool& bDiffu
     {
         if (I->second.m_assoc)
         {
-            u8 usage = I->second.m_assoc->usage;
-            bDiffuse = !!(usage & (1 << 0));
-            bBump = !!(usage & (1 << 1));
+            auto& usage = I->second.m_assoc->usage;
+            bDiffuse = usage.test(texture_assoc::flDiffuseDetail);
+            bBump = usage.test(texture_assoc::flBumpDetail);
         }
     }
 }
@@ -307,7 +323,7 @@ BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res
             texture_assoc* TA = I->second.m_assoc;
             res = TA->detail_name.c_str();
             map_CS::const_iterator It2 = m_detail_scalers.find(tex_name);
-            CS = It2 == m_detail_scalers.end() ? 0 : It2->second; // TA->cs;
+            CS = It2 == m_detail_scalers.end() ? 0 : It2->second;
             return TRUE;
         }
     }
