@@ -170,6 +170,19 @@ inline int xr_strcmp(const char* S1, const char* S2)
 }
 #endif
 
+namespace std
+{
+template<>
+struct hash<shared_str>
+{
+    // XXX: enable C++17 for all projects to be able to use nodiscard attribute
+    /*[[nodiscard]]*/ size_t operator()(const shared_str& str) const noexcept
+    {
+        return std::hash<pcstr>{}(str._get()->value);
+    }
+};
+}
+
 // res_ptr == res_ptr
 // res_ptr != res_ptr
 // const res_ptr == ptr
