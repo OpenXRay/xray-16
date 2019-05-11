@@ -24,7 +24,7 @@ constexpr u32 color_rgba(u32 r, u32 g, u32 b, u32 a) noexcept
     return color_argb(a, r, g, b);
 }
 
-constexpr u32 color_argb_f(f32 a, f32 r, f32 g, f32 b) noexcept
+ICF u32 color_argb_f(f32 a, f32 r, f32 g, f32 b) noexcept
 {
 #if 0
     s32 _r = clampr(iFloor(r*255.f), 0, 255);
@@ -40,7 +40,7 @@ constexpr u32 color_argb_f(f32 a, f32 r, f32 g, f32 b) noexcept
     return color_argb(_a, _r, _g, _b);
 }
 
-constexpr u32 color_rgba_f(f32 r, f32 g, f32 b, f32 a) noexcept
+ICF u32 color_rgba_f(f32 r, f32 g, f32 b, f32 a) noexcept
 {
     return color_argb_f(a, r, g, b);
 }
