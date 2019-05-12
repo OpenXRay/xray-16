@@ -132,7 +132,7 @@ protected:
 
 #pragma pack(pop)
 // refs
-class ENGINE_API CRenderDevice : public CRenderDeviceBase
+class ENGINE_API CRenderDevice : public CRenderDeviceBase, public IWindowHandler
 {
 public:
     class ENGINE_API CSecondVPParams //--#SM+#-- +SecondVP+
@@ -278,6 +278,10 @@ public:
     void ShutDown(void);
     virtual const RenderDeviceStatictics& GetStats() const override { return stats; }
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
+    SDL_Window* GetApplicationWindow() override;
+    void DisableFullscreen() override;
+    void ResetFullscreen() override;
 
     void time_factor(const float& time_factor)
     {

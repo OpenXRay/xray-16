@@ -209,3 +209,18 @@ void CRenderDevice::SelectResolution(const bool windowed)
         dwHeight = psCurrentVidMode[1];
     }
 }
+
+SDL_Window* CRenderDevice::GetApplicationWindow()
+{
+    return m_sdlWnd;
+}
+
+void CRenderDevice::DisableFullscreen()
+{
+    SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
+}
+
+void CRenderDevice::ResetFullscreen()
+{
+    UpdateWindowProps(!psDeviceFlags.test(rsFullscreen));
+}

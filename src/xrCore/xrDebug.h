@@ -48,6 +48,14 @@ public:
     }
 };
 
+class IWindowHandler
+{
+public:
+    virtual SDL_Window* GetApplicationWindow() = 0;
+    virtual void DisableFullscreen() = 0;
+    virtual void ResetFullscreen() = 0;
+};
+
 class XRCORE_API xrDebug
 {
 public:
@@ -57,7 +65,7 @@ public:
     using UnhandledExceptionFilter = LONG(WINAPI*)(EXCEPTION_POINTERS* exPtrs);
 
 private:
-    static SDL_Window* applicationWindow;
+    static IWindowHandler* windowHandler;
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
     static CrashHandler OnCrash;
@@ -70,9 +78,10 @@ public:
     static void Initialize();
     static void Destroy();
     static void OnThreadSpawn();
+    static void OnFilesystemInitialized();
 
-    static SDL_Window* GetApplicationWindow() { return applicationWindow; }
-    static void SetApplicationWindow(SDL_Window* window) { applicationWindow = window; }
+    static IWindowHandler* GetWindowHandler() { return windowHandler; }
+    static void SetWindowHandler(IWindowHandler* handler) { windowHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
     static CrashHandler GetCrashHandler() { return OnCrash; }

@@ -121,11 +121,11 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
 #ifdef WINDOWS // because Windows default Message box is fancy
     HWND hwnd = nullptr;
 
-    if (applicationWindow)
+    if (windowHandler)
     {
         SDL_SysWMinfo info;
         SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(applicationWindow, &info))
+        if (SDL_GetWindowWMInfo(windowHandler->GetApplicationWindow(), &info))
         {
             switch (info.subsystem)
             {
@@ -156,11 +156,13 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
 #else
     if (simpleMode)
     {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, applicationWindow);
+        SDL_Window* parent = windowHandler ? windowHandler->GetApplicationWindow() : nullptr;
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, parent);
         return AssertionResult::ok;
     }
 
-    messageboxdata.window = applicationWindow;
+    if (windowHandler)
+        messageboxdata.window =  windowHandler->GetApplicationWindow();
     messageboxdata.title = title;
     messageboxdata.message = message;
     int button = -1;
@@ -200,7 +202,7 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
     }
 }
 
-SDL_Window* xrDebug::applicationWindow = nullptr;
+IWindowHandler* xrDebug::windowHandler = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
 xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
@@ -521,6 +523,9 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
         OnDialog(true);
     FlushLog();
 
+    if (windowHandler)
+        windowHandler->DisableFullscreen();
+
     AssertionResult result = AssertionResult::abort;
     if (Core.PluginMode)
         /*result =*/ ShowMessage("X-Ray error", assertionInfo); // Do not assign 'result'
@@ -561,6 +566,11 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     if (OnDialog)
         OnDialog(false);
 
+#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+    if (windowHandler)
+        windowHandler->ResetFullscreen();
+#endif
+
     lock.Leave();
     return result;
 }
@@ -573,11 +583,27 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 
 void xrDebug::DoExit(const std::string& message)
 {
+    if (windowHandler)
+        windowHandler->DisableFullscreen();
+
     FlushLog();
-    ShowMessage("Error", message.c_str());
+
+    if (IsDebuggerPresent())
+    {
+        const auto result = ShowMessage("Error", message.c_str(), false);
+        if (result != AssertionResult::abort)
+            DEBUG_BREAK;
+    }
+    else
+        ShowMessage("Error", message.c_str());
+
 #if defined(WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
 #endif
+
+    volatile bool neverTrue = false; // if you're under debugger,
+    if (neverTrue && windowHandler) // you can jump here manually
+        windowHandler->ResetFullscreen(); // to reset fullscreen
 }
 
 LPCSTR xrDebug::ErrorToString(long code)
@@ -643,12 +669,6 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
 
-    string_path dumpPath;
-    if (FS.path_exist("$app_data_root$"))
-        FS.update_path(dumpPath, "$app_data_root$", "");
-    xr_strcat(dumpPath, "reports");
-
-    BT_SetReportFilePath(dumpPath);
     BT_SaveSnapshot(nullptr);
 #endif
 }
@@ -668,23 +688,27 @@ void xrDebug::SetupExceptionHandler()
     else
         BT_SetActivityType(BTA_SAVEREPORT);
     BT_SetDialogMessage(BTDM_INTRO2,
-                        "This is X-Ray Engine v1.6 crash reporting client. "
+                        "This is OpenXRay crash reporting client. "
                         "To help the development process, "
                         "please Submit Bug or save report and email it manually (button More...)."
                         "\r\n"
                         "Many thanks in advance and sorry for the inconvenience.");
     BT_SetPreErrHandler(PreErrorHandler, 0);
-    BT_SetAppName("X-Ray Engine");
+    BT_SetAppName("OpenXRay");
     BT_SetReportFormat(BTRF_TEXT);
     BT_SetFlags(BTF_DETAILEDMODE | BTF_ATTACHREPORT);
 
-#ifdef MASTER_GOLD
-    auto minidumpFlags = MiniDumpFilterMemory | MiniDumpScanMemory;
+    auto minidumpFlags = MiniDumpWithDataSegs|
+        MiniDumpWithIndirectlyReferencedMemory |
+        MiniDumpScanMemory |
+        MiniDumpWithProcessThreadData |
+        MiniDumpWithThreadInfo;
 
-    if (strstr(commandLine, "-detailed_minidump"))
-        minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
-#else
-    const auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
+    if (strstr(commandLine, "-full_memory_dump"))
+        minidumpFlags |= MiniDumpWithFullMemory | MiniDumpIgnoreInaccessibleMemory;
+#ifdef MASTER_GOLD
+    else if (!strstr(commandLine, "-detailed_minidump"))
+        minidumpFlags |= MiniDumpFilterMemory;
 #endif
     
     BT_SetDumpType(minidumpFlags);
@@ -693,10 +717,19 @@ void xrDebug::SetupExceptionHandler()
 #endif
 }
 
+void xrDebug::OnFilesystemInitialized()
+{
+    string_path dumpPath;
+    if (FS.update_path(dumpPath, "$app_data_root$", "reports", false))
+    {
+        BT_SetReportFilePath(dumpPath);
+    }
+}
+
 void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 {
 #if defined(WINDOWS)
-    int lastErr = GetLastError();
+    const int lastErr = GetLastError();
     if (lastErr == ERROR_SUCCESS)
     {
         *buffer = 0;
@@ -749,27 +782,50 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     }
     if (shared_str_initialized)
         FlushLog();
-#ifndef USE_OWN_ERROR_MESSAGE_WINDOW
-#ifdef USE_OWN_MINI_DUMP
-    SaveMiniDump(exPtrs);
-#endif
-#else
+
+    if (windowHandler)
+        windowHandler->DisableFullscreen();
+
+#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+    constexpr pcstr fatalError = "Fatal error";
+
+    AssertionResult msgRes = AssertionResult::abort;
     if (!ErrorAfterDialog)
     {
         if (OnDialog)
             OnDialog(true);
+
         constexpr pcstr msg = "Fatal error occurred\n\n"
             "Press OK to abort program execution";
-        ShowMessage("Fatal error", msg);
+        msgRes = ShowMessage(fatalError, msg);
     }
 #endif
-    ReportFault(exPtrs, 0);
+    BT_SetUserMessage(fatalError);
+    BT_SaveSnapshotEx(exPtrs, nullptr);
+
+    const auto reportRes = ReportFault(exPtrs, 0);
+    if (msgRes != AssertionResult::abort ||
+        reportRes == frrvLaunchDebugger)
+    {
+        while (true)
+        {
+            if (IsDebuggerPresent())
+                DEBUG_BREAK;
+        }
+    }
+
     if (PrevFilter)
         PrevFilter(exPtrs);
+
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     if (OnDialog)
         OnDialog(false);
 #endif
+
+    volatile bool neverTrue = false; // if you're under debugger,
+    if (neverTrue && windowHandler) // you can manually
+        windowHandler->ResetFullscreen(); // reset fullscreen
+
     return EXCEPTION_CONTINUE_SEARCH;
 #else
     return 0;
