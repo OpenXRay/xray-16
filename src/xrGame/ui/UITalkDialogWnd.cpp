@@ -66,8 +66,8 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 
     // Main dialog frame
     UIDialogFrameTop = UIHelper::CreateStatic(*m_uiXml, "frame_top", this, false);
-    if (UIDialogFrameBottom)
-        answersParent = UIDialogFrameBottom;
+    if (UIDialogFrameTop)
+        answersParent = UIDialogFrameTop;
 
     // Answers
     UIAnswersList = UIHelper::CreateScrollView(*m_uiXml, "answers_list", answersParent);
