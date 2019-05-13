@@ -367,8 +367,9 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
             CGameTask* ml_task = Level().GameTaskManager().HasGameTask(this, true);
             if (ml_task)
             {
-                CGameTask* active_task = Level().GameTaskManager().ActiveTask();
-                bool border_show = (ml_task == active_task);
+                CGameTask* storyTask = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
+                CGameTask* additionalTask = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
+                const bool border_show = ml_task == storyTask || ml_task == additionalTask;
                 if (m_minimap_spot)
                 {
                     m_minimap_spot->show_static_border(border_show);

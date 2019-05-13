@@ -74,7 +74,7 @@ private:
 
 public:
     UITaskListWndItem();
-    virtual ~UITaskListWndItem();
+    virtual ~UITaskListWndItem() = default;
 
     bool init_task(CGameTask* task, UITaskListWnd* parent);
     IC u32 get_priority_task() const;
@@ -97,7 +97,7 @@ public:
 private: // m_
     CGameTask* m_task;
     CUI3tButton* m_name;
-    //	CUICheckButton*	m_bt_view;
+    CUICheckButton* m_bt_view;
     CUIStatic* m_st_story;
     CUI3tButton* m_bt_focus;
 

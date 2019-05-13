@@ -103,6 +103,7 @@ public:
     LPCSTR GetTitle_script() { return m_Title.c_str(); }
     void SetPriority_script(int _prio) { m_priority = _prio; }
     int GetPriority_script() { return m_priority; }
+    int GetType_script() { return m_task_type; }
     void SetType_script(int t) { m_task_type = (ETaskType)t; }
     LPCSTR GetID_script() { return m_ID.c_str(); }
     void SetID_script(LPCSTR _id) { m_ID = _id; }

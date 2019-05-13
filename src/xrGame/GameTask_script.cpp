@@ -21,7 +21,8 @@ SCRIPT_EXPORT(CGameTask, (),
             .enum_("task_type")
             [
                 value("storyline", int(eTaskTypeStoryline)),
-                value("additional", int(eTaskTypeAdditional))
+                value("additional", int(eTaskTypeAdditional)),
+                value("insignificant", int(eTaskTypeInsignificant))
             ],
 
         class_<CGameTask>("CGameTask")
@@ -33,7 +34,7 @@ SCRIPT_EXPORT(CGameTask, (),
             .def("get_id", &CGameTask::GetID_script)
             .def("set_id", &CGameTask::SetID_script)
             .def("set_type", &CGameTask::SetType_script)
-            //.def("get_type", &CGameTask::GetType_script)
+            .def("get_type", &CGameTask::GetType_script)
             .def("set_icon_name", &CGameTask::SetIconName_script)
             .def("get_icon_name", &CGameTask::GetIconName_script)
             .def("set_description", &CGameTask::SetDescription_script)

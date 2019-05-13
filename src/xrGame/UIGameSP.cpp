@@ -145,13 +145,28 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
         if (!pActor->inventory_disabled())
         {
             m_game_objective = AddCustomStatic("main_task", true);
-            CGameTask* t1 = Level().GameTaskManager().ActiveTask();
-            m_game_objective->m_static->TextItemControl()->SetTextST((t1) ? t1->m_Title.c_str() : "st_no_active_task");
+            CGameTask* t1 = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
+            CGameTask* t2 = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
 
-            if (t1 && t1->m_Description.c_str())
+            if (t1 && t2)
             {
+                m_game_objective->m_static->SetTextST(t1->m_Title.c_str());
                 StaticDrawableWrapper* sm2 = AddCustomStatic("secondary_task", true);
-                sm2->m_static->TextItemControl()->SetTextST(t1->m_Description.c_str());
+                sm2->m_static->SetTextST(t2->m_Title.c_str());
+            }
+            else
+            {
+                if (t1 || t2)
+                {
+                    CGameTask* t = (t1) ? t1 : t2;
+                    m_game_objective->m_static->SetTextST(t->m_Title.c_str());
+                    StaticDrawableWrapper* sm2 = AddCustomStatic("secondary_task", true);
+                    sm2->m_static->TextItemControl()->SetTextST(t->m_Description.c_str());
+                }
+                else
+                {
+                    m_game_objective->m_static->TextItemControl()->SetTextST("st_no_active_task");
+                }
             }
         }
         break;
