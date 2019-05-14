@@ -590,7 +590,7 @@ void xrDebug::DoExit(const std::string& message)
 
     FlushLog();
 
-    if (IsDebuggerPresent())
+    if (ShowErrorMessage)
     {
         const auto result = ShowMessage("Error", message.c_str(), false);
         if (result != AssertionResult::abort)
@@ -721,11 +721,13 @@ void xrDebug::SetupExceptionHandler()
 
 void xrDebug::OnFilesystemInitialized()
 {
+#ifdef USE_BUG_TRAP
     string_path dumpPath;
     if (FS.update_path(dumpPath, "$app_data_root$", "reports", false))
     {
         BT_SetReportFilePath(dumpPath);
     }
+#endif
 }
 
 void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
