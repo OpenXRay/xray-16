@@ -786,10 +786,11 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (windowHandler)
         windowHandler->DisableFullscreen();
 
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     constexpr pcstr fatalError = "Fatal error";
 
     AssertionResult msgRes = AssertionResult::abort;
+
+#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     if (!ErrorAfterDialog)
     {
         if (OnDialog)
