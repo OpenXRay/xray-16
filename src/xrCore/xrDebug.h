@@ -72,6 +72,7 @@ private:
     static DialogHandler OnDialog;
     static string_path BugReportFile;
     static bool ErrorAfterDialog;
+    static bool ShowErrorMessage;
 
 public:
     xrDebug() = delete;

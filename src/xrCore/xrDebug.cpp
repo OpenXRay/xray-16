@@ -209,6 +209,7 @@ xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
 xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
+bool xrDebug::ShowErrorMessage = false;
 
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
@@ -509,67 +510,68 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     string4096 assertionInfo;
     auto size = sizeof(assertionInfo);
     GatherInfo(assertionInfo, sizeof(assertionInfo), loc, expr, desc, arg1, arg2);
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    xr_strcat(assertionInfo,
-           "\r\n"
-           "Press CANCEL to abort execution\r\n"
-           "Press TRY AGAIN to continue execution\r\n"
-           "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
-           "\r\n");
-#endif
+
+    if (ShowErrorMessage)
+    {
+        xr_strcat(assertionInfo,
+            "\r\n"
+            "Press CANCEL to abort execution\r\n"
+            "Press TRY AGAIN to continue execution\r\n"
+            "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
+            "\r\n");
+    }
+
     if (OnCrash)
         OnCrash();
+
     if (OnDialog)
         OnDialog(true);
+
     FlushLog();
 
     if (windowHandler)
         windowHandler->DisableFullscreen();
 
+    bool resetFullscreen = false;
     AssertionResult result = AssertionResult::abort;
     if (Core.PluginMode)
         /*result =*/ ShowMessage("X-Ray error", assertionInfo); // Do not assign 'result'
     else
     {
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        result = ShowMessage("Fatal error", assertionInfo, false);
+        if (ShowErrorMessage)
+            result = ShowMessage("Fatal error", assertionInfo, false);
+
         switch (result)
         {
-        case AssertionResult::undefined:
-            xr_strcat(assertionInfo, SDL_GetError());
-            [[fallthrough]];
-
-        case AssertionResult::abort:
-#ifdef USE_BUG_TRAP
-            BT_SetUserMessage(assertionInfo);
-#endif
-            DEBUG_BREAK;
-            break;
-
         case AssertionResult::tryAgain:
             ErrorAfterDialog = false;
+            resetFullscreen = windowHandler != nullptr;
             break;
 
         case AssertionResult::ignore:
             ErrorAfterDialog = false;
             ignoreAlways = true;
+            resetFullscreen = windowHandler != nullptr;
             break;
-        default: DEBUG_BREAK;
-        }
-#else // !USE_OWN_ERROR_MESSAGE_WINDOW
+
+        case AssertionResult::undefined:
+            xr_strcat(assertionInfo, SDL_GetError());
+            [[fallthrough]];
+        case AssertionResult::abort:
+            [[fallthrough]];
+        default:
 #ifdef USE_BUG_TRAP
-        BT_SetUserMessage(assertionInfo);
+            BT_SetUserMessage(assertionInfo);
 #endif
-        DEBUG_BREAK;
-#endif
+            DEBUG_BREAK;
+        } // switch (result)
     }
+
     if (OnDialog)
         OnDialog(false);
 
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    if (windowHandler)
+    if (resetFullscreen)
         windowHandler->ResetFullscreen();
-#endif
 
     lock.Leave();
     return result;
@@ -790,8 +792,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 
     AssertionResult msgRes = AssertionResult::abort;
 
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    if (!ErrorAfterDialog)
+    if (!ErrorAfterDialog && ShowErrorMessage)
     {
         if (OnDialog)
             OnDialog(true);
@@ -800,7 +801,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
             "Press OK to abort program execution";
         msgRes = ShowMessage(fatalError, msg);
     }
-#endif
+
     BT_SetUserMessage(fatalError);
     BT_SaveSnapshotEx(exPtrs, nullptr);
 
@@ -818,10 +819,8 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (PrevFilter)
         PrevFilter(exPtrs);
 
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    if (OnDialog)
+    if (OnDialog && ShowErrorMessage)
         OnDialog(false);
-#endif
 
     volatile bool neverTrue = false; // if you're under debugger,
     if (neverTrue && windowHandler) // you can manually
@@ -934,5 +933,10 @@ void xrDebug::Initialize()
     // exception handler to all "unhandled" exceptions
 #if defined(WINDOWS)
     PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);
+#endif
+#ifdef DEBUG
+    ShowErrorMessage = true;
+#else
+    ShowErrorMessage = strstr(Core.Params, "-show_error_window");
 #endif
 }
