@@ -108,7 +108,7 @@ CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWind
     auto ui = new CUIProgressBar();
     if (!CUIXmlInit::InitProgressBar(xml, ui_path, 0, ui))
     {
-        R_ASSERT(!critical, "Failed to create progress bar");
+        R_ASSERT2(!critical, "Failed to create progress bar");
         xr_delete(ui);
     }
     else if (parent)
@@ -128,7 +128,7 @@ CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUI
     auto ui = new CUIProgressShape();
     if (!CUIXmlInit::InitProgressShape(xml, ui_path, 0, ui))
     {
-        R_ASSERT(!critical, "Failed to create progress shape");
+        R_ASSERT2(!critical, "Failed to create progress shape");
         xr_delete(ui);
     }
     else if (parent)
@@ -148,7 +148,7 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindo
     auto ui = new CUIFrameLineWnd();
     if (!CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui, critical))
     {
-        R_ASSERT(!critical, "Failed to create frame line");
+        R_ASSERT2(!critical, "Failed to create frame line");
         xr_delete(ui);
     }
     else if (parent)
@@ -168,7 +168,7 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWind
     auto ui = new CUIFrameWindow();
     if (!CUIXmlInit::InitFrameWindow(xml, ui_path, 0, ui, critical))
     {
-        R_ASSERT(!critical, "Failed to create frame window");
+        R_ASSERT2(!critical, "Failed to create frame window");
         xr_delete(ui);
     }
     else if (parent)
