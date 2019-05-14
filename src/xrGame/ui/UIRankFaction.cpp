@@ -5,7 +5,7 @@
 //	Description : UI Rank Faction info window class implementation
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UIRankFaction.h"
 
 #include "UIXmlInit.h"
