@@ -76,7 +76,7 @@ private:
 
 public:
     xrDebug() = delete;
-    static void Initialize();
+    static void Initialize(pcstr commandLine);
     static void Destroy();
     static void OnThreadSpawn();
     static void OnFilesystemInitialized();

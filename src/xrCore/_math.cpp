@@ -438,7 +438,7 @@ void *__cdecl thread_entry(void* _params)
 
 void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* arglist)
 {
-    xrDebug::Initialize();
+    xrDebug::Initialize(Core.Params);
 
     THREAD_STARTUP* startup = new THREAD_STARTUP();
     startup->entry = entry;
