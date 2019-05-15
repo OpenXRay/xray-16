@@ -69,15 +69,19 @@ struct CGameTaskRegistry : public CALifeAbstractRegistry<u16, vGameTasks>
 
             // if it doesn't fit terms above, then it's not valid
             // probably save file is old. We can try to
-            // preserve compatibility with just stream rollback
-            if (!taskId.size())
+            // preserve compatibility with just stream rollback.
+            // additionally, if we loaded eTaskTypeAdditional
+            // eTaskTypeInsignificant can be empty and it's normal
+            if (taskId.size() || taskId == g_active_task_id[eTaskTypeInsignificant])
+            {
+                prevPos = stream.tell(); // it's valid, remember new pos
+            }
+            else
             {
                 taskId = g_active_task_no_task___internal;
                 stream.seek(prevPos); // rollback
                 break; // there's no point to continue
             }
-            else // it's valid, remember new pos
-                prevPos = stream.tell();
         }
     }
 };
