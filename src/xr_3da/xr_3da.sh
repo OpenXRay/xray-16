@@ -10,10 +10,10 @@ fi
 UNAME=$(uname)
 if [ "$UNAME" = "Darwin" ]; then
 	# prepend our lib path to DYLD_LIBRARY_PATH
-	export DYLD_LIBRARY_PATH=${GAMEROOT}:$DYLD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH="${GAMEROOT}:$DYLD_LIBRARY_PATH"
 else
 	# prepend our lib path to LD_LIBRARY_PATH
-	export LD_LIBRARY_PATH=${GAMEROOT}:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH="${GAMEROOT}:$LD_LIBRARY_PATH"
 fi
 
 # and launch the game
