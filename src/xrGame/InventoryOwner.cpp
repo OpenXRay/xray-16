@@ -451,9 +451,7 @@ void CInventoryOwner::OnItemBelt(CInventoryItem* inventory_item, const SInvItemP
     /* avo: script callback */
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    auto& cb = object->callback(GameObject::eItemToBelt);
-    if (cb)
-        cb(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eItemToBelt)(inventory_item->object().lua_game_object());
 }
 
 void CInventoryOwner::OnItemRuck(CInventoryItem* inventory_item, const SInvItemPlace& previous_place)
@@ -461,9 +459,7 @@ void CInventoryOwner::OnItemRuck(CInventoryItem* inventory_item, const SInvItemP
     /* avo: script callback */
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    auto& cb = object->callback(GameObject::eItemToRuck);
-    if (cb)
-        cb(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eItemToRuck)(inventory_item->object().lua_game_object());
 
     detach(inventory_item);
 }
@@ -471,11 +467,9 @@ void CInventoryOwner::OnItemRuck(CInventoryItem* inventory_item, const SInvItemP
 void CInventoryOwner::OnItemSlot(CInventoryItem* inventory_item, const SInvItemPlace& previous_place)
 {
     /* avo: script callback */
-    CGameObject	*object = smart_cast<CGameObject*>(this);
+    CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    auto& cb = object->callback(GameObject::eItemToSlot);
-    if (cb)
-        cb(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eItemToSlot)(inventory_item->object().lua_game_object());
 
     attach(inventory_item);
 }

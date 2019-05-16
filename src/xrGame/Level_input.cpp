@@ -51,9 +51,7 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     /* avo: script callback */
     if (g_actor)
     {
-        auto& cb = g_actor->callback(GameObject::eMouseWheel);
-        if (cb)
-            cb(x);
+        g_actor->callback(GameObject::eMouseWheel)(x);
     }
 
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
@@ -84,9 +82,7 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
     /* avo: script callback */
     if (g_actor)
     {
-        auto& cb = g_actor->callback(GameObject::eMouseMove);
-        if (cb)
-            cb(dx, dy);
+        g_actor->callback(GameObject::eMouseMove)(dx, dy);
     }
 
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
@@ -130,9 +126,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     /* avo: script callback */
     if (!g_bDisableAllInput && g_actor)
     {
-        auto& cb = g_actor->callback(GameObject::eKeyPress);
-        if (cb)
-            cb(key);
+        g_actor->callback(GameObject::eKeyPress)(key);
     }
 
     if (_curr == kPAUSE)
@@ -508,9 +502,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
     /* avo: script callback */
     if (g_actor)
     {
-        auto& cb = g_actor->callback(GameObject::eKeyRelease);
-        if (cb)
-            cb(key);
+        g_actor->callback(GameObject::eKeyRelease)(key);
     }
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
@@ -540,9 +532,7 @@ void CLevel::IR_OnKeyboardHold(int key)
     /* avo: script callback */
     if (g_actor)
     {
-        auto& cb = g_actor->callback(GameObject::eKeyHold);
-        if (cb)
-            cb(key);
+        g_actor->callback(GameObject::eKeyHold)(key);
     }
 
 #ifdef DEBUG
