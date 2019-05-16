@@ -28,6 +28,12 @@ public:
 
     void AllowMultipleTask(bool allow) { m_flags.set(eMultipleTasks, allow); }
 
+    void CleanupTasks() const
+    {
+        for (auto& taskId : g_active_task_id)
+            taskId = g_active_task_no_task___internal;
+    }
+
     vGameTasks& GetGameTasks();
     CGameTask* HasGameTask(const CMapLocation* ml, bool only_inprocess);
     CGameTask* HasGameTask(const shared_str& id, bool only_inprocess);

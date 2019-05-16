@@ -49,6 +49,8 @@
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
+#include "GametaskManager.h"
+
 #ifdef DEBUG
 #include "PHDebug.h"
 #include "ui/UIDebugFonts.h"
@@ -1797,6 +1799,16 @@ public:
     }
 };
 
+class CCC_CleanupTasks : public IConsole_Command
+{
+public:
+    CCC_CleanupTasks(pcstr name) : IConsole_Command(name) {}
+    void Execute(pcstr /*args*/) override
+    {
+        Level().GameTaskManager().CleanupTasks();
+    }
+};
+
 void CCC_RegisterCommands()
 {
     // options
@@ -1987,6 +1999,8 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
+
+    CMD1(CCC_CleanupTasks, "dbg_cleanup_tasks");
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");
