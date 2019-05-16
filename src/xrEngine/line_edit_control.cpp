@@ -13,6 +13,7 @@
 #include "xrCore/Text/StringConversion.hpp"
 #include "Common/object_broker.h"
 #include "xr_input.h"
+#include "xr_input_xinput.h"
 #include "SDL.h"
 
 #include "edit_actions.h"
@@ -448,7 +449,7 @@ void line_edit_control::on_text_input(const char *text)
 
     for (const auto c : str)
     {
-        if (c == '`' || c == '~') // FIXME: console control key. Dunno how to handle properly
+        if (is_binded(kCONSOLE, c))
         {
             continue;
         }
