@@ -133,7 +133,7 @@ void Startup(LPSTR lpCmdLine)
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     // Initialize debugging
-    xrDebug::Initialize();
+    xrDebug::Initialize(lpCmdLine);
     Core.Initialize("xrLC");
 
     if (strstr(Core.Params, "-nosmg"))
