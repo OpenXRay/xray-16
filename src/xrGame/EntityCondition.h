@@ -148,7 +148,7 @@ public:
     void UpdateConditionTime();
     IC void SetConditionDeltaTime(float DeltaTime) { m_fDeltaTime = DeltaTime; };
     //скорость потери крови из всех открытых ран
-    float BleedingSpeed();
+    float BleedingSpeed() const;
 
     IGameObject* GetWhoHitLastTime() { return m_pWho; }
     u16 GetWhoHitLastTimeID() { return m_iWhoID; }
