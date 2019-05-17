@@ -132,7 +132,7 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
     float shoc_value = 0.0f;
     float fwou_value = 0.0f;
 
-    CEntityCondition::BOOSTER_MAP cur_booster_influences = actor->conditions().GetCurBoosterInfluences();
+    const auto& cur_booster_influences = conditions.GetCurBoosterInfluences();
     CEntityCondition::BOOSTER_MAP::const_iterator it;
     it = cur_booster_influences.find(eBoostRadiationProtection);
     if (it != cur_booster_influences.end())

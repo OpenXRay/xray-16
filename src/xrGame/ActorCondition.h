@@ -69,7 +69,7 @@ public:
     IC void BoostRadiationProtection(const float value);
     IC void BoostTelepaticProtection(const float value);
     IC void BoostChemicalBurnProtection(const float value);
-    BOOSTER_MAP GetCurBoosterInfluences() { return m_booster_influences; };
+    const auto& GetCurBoosterInfluences() const { return m_booster_influences; }
     // хромание при потере сил и здоровья
     virtual bool IsLimping() const;
     virtual bool IsCantWalk() const;
