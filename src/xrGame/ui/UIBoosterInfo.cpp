@@ -18,6 +18,7 @@ CUIBoosterInfo::CUIBoosterInfo()
     m_booster_satiety = NULL;
     m_booster_anabiotic = NULL;
     m_booster_time = NULL;
+    m_Prop_line = nullptr;
 }
 
 CUIBoosterInfo::~CUIBoosterInfo()
