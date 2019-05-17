@@ -30,14 +30,13 @@ protected:
     {
         eIcon = 0,
         eIconOver,
-        /*
-                eRankIcon,
-                eRankIconOver,
-                eCommunityIcon,
-                eCommunityIconOver,
-                eCommunityBigIcon,
-                eCommunityBigIconOver,
-        */
+        eRankIcon,
+        eRankIconOver,
+        eCommunityIcon,
+        eCommunityIconOver,
+        eCommunityBigIcon,
+        eCommunityBigIconOver,
+
         eName,
         eNameCaption,
         eRank,
