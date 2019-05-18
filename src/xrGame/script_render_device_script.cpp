@@ -21,6 +21,21 @@ u32 time_global(const CRenderDevice* self)
     return (self->dwTimeGlobal);
 }
 
+void set_season_clr(CRenderDevice* self, float c1, float w1, float c2, float w2)
+{
+    self->SeasonValColor[0] = c1; 
+    self->SeasonValColor[1] = w1; 
+    self->SeasonValColor[2] = c2;
+    self->SeasonValColor[3] = w2;
+
+    Msg("%f;%f;%f;%f", 
+        self->SeasonValColor[0],
+        self->SeasonValColor[1],
+        self->SeasonValColor[2],
+        self->SeasonValColor[3]
+        );
+}
+
 SCRIPT_EXPORT(CRenderDevice, (), {
     module(luaState)[class_<CRenderDevice>("render_device")
                          .def_readonly("width", &CRenderDevice::dwWidth)
@@ -40,6 +55,8 @@ SCRIPT_EXPORT(CRenderDevice, (), {
                          .def_readonly("precache_frame", &CRenderDevice::dwPrecacheFrame)
                          .def_readonly("frame", &CRenderDevice::dwFrame)
                          .def("is_paused", &is_device_paused)
-                         .def("pause", &set_device_paused),
+                         .def("pause", &set_device_paused)
+                            //Graff46 seasons
+                         .def("set_season_colors", &set_season_clr),
         def("app_ready", &is_app_ready)];
 });

@@ -389,6 +389,19 @@ class cl_entity_data : public R_constant_setup //--#SM+#--
     virtual void setup(R_constant* C) { RCache.hemi.c_entity_data = C; }
 };
 static cl_entity_data binder_entity_data;
+// Graff46 seasons
+static class cl_season_cb : public R_constant_setup //--#SM+#--
+{
+    virtual void setup(R_constant* C) { RCache.set_c(C, 
+        Device.SeasonValColor[0],
+        Device.SeasonValColor[1],
+        Device.SeasonValColor[2],
+        Device.SeasonValColor[3]
+        );
+    }
+} binder_season_cb;
+
+
 
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
@@ -429,6 +442,8 @@ void CBlender_Compile::SetMapping()
     // Igor temp solution for the texgen functionality in the shader
     r_Constant("m_texgen", &binder_texgen);
     r_Constant("mVPTexgen", &binder_VPtexgen);
+    // Graff46 seasons
+    r_Constant("season_cb", &binder_season_cb);
 
 #ifndef _EDITOR
     // fog-params

@@ -89,10 +89,10 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case SE_R2_NORMAL_HQ: // deffer wave
-        uber_deffer(C, false, "detail_w", "base", true);
+        uber_deffer(C, false, "detail_w", "base", true, nullptr, false, "clr");
         break;
     case SE_R2_NORMAL_LQ: // deffer still
-        uber_deffer(C, false, "detail_s", "base", true);
+        uber_deffer(C, false, "detail_s", "base", true, nullptr, false, "clr");
         break;
     }
 }

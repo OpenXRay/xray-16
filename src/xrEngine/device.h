@@ -105,6 +105,8 @@ public:
     float fFOV;
     float fASPECT;
 
+    float SeasonValColor[4];
+
 protected:
     u32 Timer_MM_Delta;
     CTimer_paused Timer;

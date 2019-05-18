@@ -11,6 +11,11 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+class cl_recolor_tex : public R_constant_setup //--#SM+#--
+{
+    virtual void setup(R_constant* C) { RCache.set_c(C, 1.f, 0.f, 0.f, 0.f); }
+} binder_recolor_tex;
+
 CBlender_Tree::CBlender_Tree()
 {
     description.CLS = B_TREE;
@@ -128,6 +133,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_Sampler("s_base", C.L_textures[0]);
             if (C.bDetail_Diffuse)
                 C.r_Sampler("s_detail", C.detail_texture);
+            C.r_Constant("recolor_s", &binder_recolor_tex);
             C.r_End();
         }
         break;
@@ -136,6 +142,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             // Level view
             C.r_Pass("tree_s", "vert", TRUE, TRUE, TRUE, TRUE, blend_src, blend_dst, TRUE, tree_aref);
             C.r_Sampler("s_base", C.L_textures[0]);
+            C.r_Constant("recolor_s", &binder_recolor_tex);
             C.r_End();
         }
         break;
@@ -179,6 +186,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 // R2
 //////////////////////////////////////////////////////////////////////////
 #include "uber_deffer.h"
+
 void CBlender_Tree::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -194,10 +202,10 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case SE_R2_NORMAL_HQ: // deffer
-        uber_deffer(C, true, tvs, "base", oBlend.value);
+        uber_deffer(C, true, tvs, "base", oBlend.value, nullptr, false, "clr");
         break;
     case SE_R2_NORMAL_LQ: // deffer
-        uber_deffer(C, false, tvs, "base", oBlend.value);
+        uber_deffer(C, false, tvs, "base", oBlend.value, nullptr, false, "clr");
         break;
     case SE_R2_SHADOW: // smap-spot
         //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
@@ -205,6 +213,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
             C.r_Pass(tvs_s, "shadow_direct_base", FALSE);
+        //C.r_Constant("recolor_s", &binder_recolor_tex);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_End();
         break;

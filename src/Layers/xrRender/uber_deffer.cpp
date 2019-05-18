@@ -3,7 +3,7 @@
 void fix_texture_name(LPSTR fn);
 
 void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref, LPCSTR _detail_replace,
-    bool DO_NOT_FINISH)
+    bool DO_NOT_FINISH, string16 subpath)
 {
     // Uber-parse
     string256 fname, fnameA, fnameB;
@@ -28,7 +28,8 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 
     string256 ps, vs, dt;
     strconcat(sizeof(vs), vs, "deffer_", _vspec, lmap ? "_lmh" : "");
-    strconcat(sizeof(ps), ps, "deffer_", _pspec, lmap ? "_lmh" : "");
+    strconcat(sizeof(ps), ps, subpath , "\\deffer_", _pspec, lmap ? "_lmh" : ""); // season
+    
     xr_strcpy(dt, sizeof(dt), _detail_replace ? _detail_replace : (C.detail_texture ? C.detail_texture : ""));
 
     // detect detail bump
