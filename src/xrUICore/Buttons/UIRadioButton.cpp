@@ -24,3 +24,13 @@ bool CUIRadioButton::InitTexture(pcstr /*texture*/, bool /*fatal = true*/)
     // do nothing
     return true;
 }
+
+bool CUIRadioButton::OnMouseDown(int mouse_btn)
+{
+    const bool result = inherited::OnMouseDown(mouse_btn);
+
+    if (result)
+        GetMessageTarget()->SendMessage(this, RADIOBUTTON_SET, nullptr);
+
+    return result;
+}

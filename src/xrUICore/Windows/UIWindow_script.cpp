@@ -178,7 +178,8 @@ SCRIPT_EXPORT(EnumUIMessages, (), {
                              value("WINDOW_KEYBOARD_CAPTURE_LOST", int(WINDOW_KEYBOARD_CAPTURE_LOST)),
 
                              // CUIButton
-                             value("BUTTON_CLICKED", int(BUTTON_CLICKED)), value("BUTTON_DOWN", int(BUTTON_DOWN)),
+                             value("BUTTON_CLICKED", int(BUTTON_CLICKED)),
+                             value("BUTTON_DOWN", int(BUTTON_DOWN)),
 
                              // CUITabControl
                              value("TAB_CHANGED", int(TAB_CHANGED)),
