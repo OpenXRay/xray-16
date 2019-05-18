@@ -58,6 +58,7 @@ public:
     void on_key_press(int dik);
     void on_key_hold(int dik);
     void on_key_release(int dik);
+    void on_text_input(const char *text);
     void on_frame();
 
     void assign_callback(int const dik, key_state state, Callback const& callback);
@@ -110,7 +111,7 @@ private:
     void create_char_pair(int const dik, char c, char c_shift, bool translate = false);
 
     void clear_inserted();
-    bool empty_inserted();
+    bool empty_inserted() const;
 
     void add_inserted_text();
 
@@ -137,6 +138,7 @@ private:
     int m_buffer_size;
 
     int m_cur_pos;
+    int m_inserted_pos;
     int m_select_start;
     int m_p1;
     int m_p2;

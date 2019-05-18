@@ -166,8 +166,6 @@ CGamePersistent::~CGamePersistent(void)
 
 void CGamePersistent::PreStart(LPCSTR op)
 {
-    if (!GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new UILoadingScreen());
     inherited::PreStart(op);
 }
 
@@ -217,6 +215,8 @@ void CGamePersistent::OnAppStart()
     GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
 
+    pApp->SetLoadingScreen(new UILoadingScreen());
+
 #ifdef WINDOWS
     ansel = new AnselManager();
     ansel->Load();
@@ -229,6 +229,7 @@ void CGamePersistent::OnAppEnd()
     if (m_pMainMenu->IsActive())
         m_pMainMenu->Activate(false);
 
+    pApp->DestroyLoadingScreen();
     xr_delete(m_pMainMenu);
     xr_delete(GEnv.UI);
 
@@ -540,10 +541,10 @@ void CGamePersistent::game_loaded()
             load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
         {
             VERIFY(NULL == m_intro);
-            m_intro = new CUISequencer();
-            m_intro->Start("game_loaded");
             Msg("intro_start game_loaded");
+            m_intro = new CUISequencer();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
+            m_intro->Start("game_loaded");
         }
         m_intro_event = 0;
     }
@@ -558,6 +559,8 @@ void CGamePersistent::update_game_loaded()
 
 void CGamePersistent::start_game_intro()
 {
+    load_screen_renderer.stop();
+
     if (!allow_intro())
     {
         m_intro_event = 0;
@@ -570,9 +573,9 @@ void CGamePersistent::start_game_intro()
         if (0 == xr_stricmp(m_game_params.m_new_or_load, "new"))
         {
             VERIFY(NULL == m_intro);
+            Log("intro_start intro_game");
             m_intro = new CUISequencer();
             m_intro->Start("intro_game");
-            Msg("intro_start intro_game");
         }
     }
 }
@@ -620,6 +623,9 @@ void CGamePersistent::OnFrame()
 #endif
     if (!GEnv.isDedicatedServer && !m_intro_event.empty())
         m_intro_event();
+
+    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 1 && !m_intro && m_intro_event.empty())
+        pApp->LoadForceFinish(); // hack
 
     if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 0 && !m_intro && m_intro_event.empty())
         load_screen_renderer.stop();
@@ -876,21 +882,28 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
     pApp->LoadStage();
     if (change_tip)
     {
+        bool noTips = false;
         string512 buff;
         u8 tip_num;
         luabind::functor<u8> m_functor;
-        bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
+        const bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
         if (is_single)
         {
-            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_tip_number", m_functor));
-            tip_num = m_functor(map_name.c_str());
+            if (GEnv.ScriptEngine->functor("loadscreen.get_tip_number", m_functor))
+                tip_num = m_functor(map_name.c_str());
+            else
+                noTips = true;
         }
         else
         {
-            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_mp_tip_number", m_functor));
-            tip_num = m_functor(map_name.c_str());
+            if (GEnv.ScriptEngine->functor("loadscreen.get_mp_tip_number", m_functor))
+                tip_num = m_functor(map_name.c_str());
+            else
+                noTips = true;
         }
-        //		tip_num = 83;
+        if (noTips)
+            return;
+
         xr_sprintf(buff, "%s%d:", StringTable().translate("ls_tip_number").c_str(), tip_num);
         shared_str tmp = buff;
 

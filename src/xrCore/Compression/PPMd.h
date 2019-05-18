@@ -17,7 +17,7 @@ extern "C" {
 
 bool _STDCALL StartSubAllocator(UINT SubAllocatorSize);
 void _STDCALL StopSubAllocator(); /* it can be called once        */
-size_t _STDCALL GetUsedMemory(); /* for information only         */
+DWORD _STDCALL GetUsedMemory(); /* for information only         */
 
 /****************************************************************************
  * Method of model restoration at memory insufficiency:                     *

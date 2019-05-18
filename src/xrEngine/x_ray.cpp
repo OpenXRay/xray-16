@@ -166,9 +166,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 #if !defined(LINUX)
         g_SASH.EndBenchmark();
 #endif
-        SDL_Event event;
-        event.type = SDL_QUIT;
-        SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+        SDL_Event quit = { SDL_QUIT };
+        SDL_PushEvent(&quit);
 
         for (u32 i = 0; i < Levels.size(); i++)
         {
@@ -236,7 +235,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 
         Console->Execute("main_menu off");
         Console->Hide();
-        Device.Reset(false);
+        Device.RequireReset(false);
 
         g_pGameLevel = smart_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
         VERIFY(g_pGameLevel);
@@ -286,19 +285,17 @@ void CApplication::LoadEnd()
 
 void CApplication::SetLoadingScreen(ILoadingScreen* newScreen)
 {
-    if (loadingScreen)
-    {
-        Log("! Trying to create new loading screen, but there is already one..");
-        DEBUG_BREAK;
-        DestroyLoadingScreen();
-    }
-
     loadingScreen = newScreen;
 }
 
 void CApplication::DestroyLoadingScreen()
 {
     xr_delete(loadingScreen);
+}
+
+void CApplication::ShowLoadingScreen(bool show)
+{
+    loadingScreen->Show(show);
 }
 
 void CApplication::LoadDraw()
@@ -308,7 +305,7 @@ void CApplication::LoadDraw()
 
     Device.dwFrame += 1;
 
-    if (!Device.Begin())
+    if (!Device.RenderBegin())
         return;
 
     if (GEnv.isDedicatedServer)
@@ -316,25 +313,27 @@ void CApplication::LoadDraw()
     else
         load_draw_internal();
 
-    Device.End();
+    Device.RenderEnd();
+}
+
+void CApplication::LoadForceDrop()
+{
+    loadingScreen->ForceDrop();
 }
 
 void CApplication::LoadForceFinish()
 {
-    if (loadingScreen)
-        loadingScreen->ForceFinish();
+    loadingScreen->ForceFinish();
 }
 
 void CApplication::SetLoadStageTitle(pcstr _ls_title)
 {
-    if (ps_rs_loading_stages && loadingScreen)
-        loadingScreen->SetStageTitle(_ls_title);
+    loadingScreen->SetStageTitle(_ls_title);
 }
 
 void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
 {
-    if (loadingScreen)
-        loadingScreen->SetStageTip(str1, str2, str3);
+    loadingScreen->SetStageTip(str1, str2, str3);
 }
 
 void CApplication::LoadStage()
@@ -349,6 +348,7 @@ void CApplication::LoadStage()
     else
         max_load_stage = 14;
 
+    loadingScreen->Show(true);
     LoadDraw();
     ++load_stage;
 }
@@ -399,7 +399,7 @@ void CApplication::Level_Scan()
     FS.file_list_close(folder);
 }
 
-void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
+void gen_logo_name(string_path& dest, LPCSTR level_name, int num = -1)
 {
     strconcat(sizeof(dest), dest, "intro" DELIMITER "intro_", level_name);
 
@@ -407,9 +407,21 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
     if (dest[len - 1] == _DELIMITER)
         dest[len - 1] = 0;
 
+    if (num < 0)
+        return;
+
     string16 buff;
     xr_strcat(dest, sizeof(dest), "_");
     xr_strcat(dest, sizeof(dest), xr_itoa(num + 1, buff, 10));
+}
+
+// Return true if logo exists
+// Always sets the path even if logo doesn't exist
+bool set_logo_path(string_path& path, pcstr levelName, int count = -1)
+{
+    gen_logo_name(path, levelName, count);
+    string_path temp2;
+    return FS.exist(temp2, "$game_textures$", path, ".dds") || FS.exist(temp2, "$level$", path, ".dds");
 }
 
 void CApplication::Level_Set(u32 L)
@@ -417,34 +429,32 @@ void CApplication::Level_Set(u32 L)
     if (L >= Levels.size())
         return;
     FS.get_path("$level$")->_set(Levels[L].folder);
+    Level_Current = L;
 
     static string_path path;
+    path[0] = 0;
 
-    if (Level_Current != L)
+    int count = 0;
+    while (true)
     {
-        path[0] = 0;
-
-        Level_Current = L;
-
-        int count = 0;
-        while (true)
-        {
-            string_path temp2;
-            gen_logo_name(path, Levels[L].folder, count);
-            if (FS.exist(temp2, "$game_textures$", path, ".dds") || FS.exist(temp2, "$level$", path, ".dds"))
-                count++;
-            else
-                break;
-        }
-
-        if (count)
-        {
-            int num = ::Random.randI(count);
-            gen_logo_name(path, Levels[L].folder, num);
-        }
+        if (set_logo_path(path, Levels[L].folder, count))
+            count++;
+        else
+            break;
     }
 
-    if (path[0] && loadingScreen)
+    if (count)
+    {
+        const int num = ::Random.randI(count);
+        gen_logo_name(path, Levels[L].folder, num);
+    }
+    else if (!set_logo_path(path, Levels[L].folder))
+    {
+        if (!set_logo_path(path, "no_start_picture"))
+            path[0] = 0;
+    }
+
+    if (path[0])
         loadingScreen->SetLevelLogo(path);
 }
 
@@ -525,10 +535,17 @@ void CApplication::LoadAllArchives()
 }
 
 #pragma optimize("g", off)
-void CApplication::load_draw_internal()
+void CApplication::load_draw_internal(bool precaching /*= false*/)
 {
-    if (loadingScreen)
+    if (precaching)
+    {
+        const u32 total = Device.dwPrecacheTotal;
+        loadingScreen->Update(total - Device.dwPrecacheFrame, total);
+    }
+
+    else if (loadingScreen->IsShown())
         loadingScreen->Update(load_stage, max_load_stage);
+
     else
         GEnv.Render->ClearTarget();
 }

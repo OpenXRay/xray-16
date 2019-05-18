@@ -26,19 +26,19 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     }
     else
     {
-        D3D10_DEPTH_STENCIL_VIEW_DESC desc;
+        D3D_DEPTH_STENCIL_VIEW_DESC desc;
         zb->GetDesc(&desc);
 
         if (!RImplementation.o.dx10_msaa)
-            VERIFY(desc.ViewDimension == D3D10_DSV_DIMENSION_TEXTURE2D);
+            VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
 
-        ID3D10Resource* pRes;
+        ID3DResource* pRes;
 
         zb->GetResource(&pRes);
 
-        ID3D10Texture2D* pTex = (ID3D10Texture2D*)pRes;
+        ID3DTexture2D* pTex = (ID3DTexture2D*)pRes;
 
-        D3D10_TEXTURE2D_DESC TexDesc;
+        D3D_TEXTURE2D_DESC TexDesc;
 
         pTex->GetDesc(&TexDesc);
 
@@ -73,18 +73,18 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
     }
     else
     {
-        D3D10_DEPTH_STENCIL_VIEW_DESC desc;
+        D3D_DEPTH_STENCIL_VIEW_DESC desc;
         zb->GetDesc(&desc);
         if (!RImplementation.o.dx10_msaa)
-            VERIFY(desc.ViewDimension == D3D10_DSV_DIMENSION_TEXTURE2D);
+            VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
 
-        ID3D10Resource* pRes;
+        ID3DResource* pRes;
 
         zb->GetResource(&pRes);
 
-        ID3D10Texture2D* pTex = (ID3D10Texture2D*)pRes;
+        ID3DTexture2D* pTex = (ID3DTexture2D*)pRes;
 
-        D3D10_TEXTURE2D_DESC TexDesc;
+        D3D_TEXTURE2D_DESC TexDesc;
 
         pTex->GetDesc(&TexDesc);
 
@@ -701,7 +701,7 @@ CRenderTarget::CRenderTarget()
     {
         // Testure for async sreenshots
         {
-            D3D10_TEXTURE2D_DESC desc;
+            D3D_TEXTURE2D_DESC desc;
             desc.Width = Device.dwWidth;
             desc.Height = Device.dwHeight;
             desc.MipLevels = 1;
@@ -709,9 +709,9 @@ CRenderTarget::CRenderTarget()
             desc.SampleDesc.Count = 1;
             desc.SampleDesc.Quality = 0;
             desc.Format = DXGI_FORMAT_R8G8B8A8_SNORM;
-            desc.Usage = D3D10_USAGE_STAGING;
+            desc.Usage = D3D_USAGE_STAGING;
             desc.BindFlags = 0;
-            desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
+            desc.CPUAccessFlags = D3D_CPU_ACCESS_READ;
             desc.MiscFlags = 0;
 
             R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_ss_async));
@@ -729,18 +729,18 @@ CRenderTarget::CRenderTarget()
 
             u16 tempData[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count];
 
-            D3D10_TEXTURE3D_DESC desc;
+            D3D_TEXTURE3D_DESC desc;
             desc.Width = TEX_material_LdotN;
             desc.Height = TEX_material_LdotH;
             desc.Depth = TEX_material_Count;
             desc.MipLevels = 1;
             desc.Format = DXGI_FORMAT_R8G8_UNORM;
-            desc.Usage = D3D10_USAGE_IMMUTABLE;
-            desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+            desc.Usage = D3D_USAGE_IMMUTABLE;
+            desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
             desc.CPUAccessFlags = 0;
             desc.MiscFlags = 0;
 
-            D3D10_SUBRESOURCE_DATA subData;
+            D3D_SUBRESOURCE_DATA subData;
 
             subData.pSysMem = tempData;
             subData.SysMemPitch = desc.Width * 2;
@@ -841,7 +841,7 @@ CRenderTarget::CRenderTarget()
             static const int sampleSize = 4;
             u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter];
 
-            D3D10_TEXTURE2D_DESC desc;
+            D3D_TEXTURE2D_DESC desc;
             desc.Width = TEX_jitter;
             desc.Height = TEX_jitter;
             desc.MipLevels = 1;
@@ -849,13 +849,13 @@ CRenderTarget::CRenderTarget()
             desc.SampleDesc.Count = 1;
             desc.SampleDesc.Quality = 0;
             desc.Format = DXGI_FORMAT_R8G8B8A8_SNORM;
-            // desc.Usage = D3D10_USAGE_IMMUTABLE;
-            desc.Usage = D3D10_USAGE_DEFAULT;
-            desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+            // desc.Usage = D3D_USAGE_IMMUTABLE;
+            desc.Usage = D3D_USAGE_DEFAULT;
+            desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
             desc.CPUAccessFlags = 0;
             desc.MiscFlags = 0;
 
-            D3D10_SUBRESOURCE_DATA subData[TEX_jitter_count];
+            D3D_SUBRESOURCE_DATA subData[TEX_jitter_count];
 
             for (int it = 0; it < TEX_jitter_count - 1; it++)
             {
@@ -898,7 +898,7 @@ CRenderTarget::CRenderTarget()
             float tempDataHBAO[TEX_jitter * TEX_jitter * 4];
 
             // generate HBAO jitter texture (last)
-            D3D10_TEXTURE2D_DESC descHBAO;
+            D3D_TEXTURE2D_DESC descHBAO;
             descHBAO.Width = TEX_jitter;
             descHBAO.Height = TEX_jitter;
             descHBAO.MipLevels = 1;
@@ -906,9 +906,9 @@ CRenderTarget::CRenderTarget()
             descHBAO.SampleDesc.Count = 1;
             descHBAO.SampleDesc.Quality = 0;
             descHBAO.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-            // desc.Usage = D3D10_USAGE_IMMUTABLE;
-            descHBAO.Usage = D3D10_USAGE_DEFAULT;
-            descHBAO.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+            // desc.Usage = D3D_USAGE_IMMUTABLE;
+            descHBAO.Usage = D3D_USAGE_DEFAULT;
+            descHBAO.BindFlags = D3D_BIND_SHADER_RESOURCE;
             descHBAO.CPUAccessFlags = 0;
             descHBAO.MiscFlags = 0;
 

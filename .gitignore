@@ -8,7 +8,7 @@
 CMakeCache.txt
 cmake_install.cmake
 install_manifest.txt
-bin*/
+bin/
 intermediate/
 intermediate_plugs/
 lib/
@@ -23,4 +23,3 @@ CMakeFiles/
 
 # exclude doxygen output
 doc/doxygen/html/*
-Externals/LuaJIT-proj/*.obj

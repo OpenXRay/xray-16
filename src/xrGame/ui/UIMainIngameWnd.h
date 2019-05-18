@@ -125,7 +125,7 @@ public:
 
     void ReceiveNews(GAME_NEWS_DATA* news);
     void UpdateMainIndicators();
-    void UpdateBoosterIndicators(const xr_map<EBoostParams, SBooster> influences);
+    void UpdateBoosterIndicators(const xr_map<EBoostParams, SBooster>& influences);
 
 protected:
     void UpdateQuickSlots();

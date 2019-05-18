@@ -14,6 +14,7 @@ _action actions[] = {
     { "down",              kDOWN,              _both },
     { "jump",              kJUMP,              _both },
     { "crouch",            kCROUCH,            _both },
+    { "crouch_toggle",     kCROUCH_TOGGLE,     _both},
     { "accel",             kACCEL,             _both },
     { "sprint_toggle",     kSPRINT_TOGGLE,     _both },
 
@@ -25,11 +26,15 @@ _action actions[] = {
     { "llookout",          kL_LOOKOUT,         _both },
     { "rlookout",          kR_LOOKOUT,         _both },
 
+    { "turn_engine",       kENGINE,            _sp},
+
     { "cam_1",             kCAM_1,             _both },
     { "cam_2",             kCAM_2,             _both },
     { "cam_3",             kCAM_3,             _both },
+    { "cam_4",             kCAM_4,             _both},
     { "cam_zoom_in",       kCAM_ZOOM_IN,       _both },
     { "cam_zoom_out",      kCAM_ZOOM_OUT,      _both },
+    { "cam_autoaim",       kCAM_AUTOAIM,       _sp },
 
     { "torch",             kTORCH,             _both },
     { "night_vision",      kNIGHT_VISION,      _both },
@@ -66,6 +71,9 @@ _action actions[] = {
     { "skin_menu",         kSKIN,              _both },
     { "team_menu",         kTEAM,              _both },
     { "active_jobs",       kACTIVE_JOBS,       _sp },
+    { "map",                kMAP,               _both },
+    { "contacts",           kCONTACTS,          _sp },
+    { "ext_1",              kEXT_1,             _both },
 
     { "vote_begin",        kVOTE_BEGIN,        _both },
     { "show_admin_menu",   kSHOW_ADMIN_MENU,   _both },
@@ -78,6 +86,18 @@ _action actions[] = {
 
     { "speech_menu_0",     kSPEECH_MENU_0,     _both },
     { "speech_menu_1",     kSPEECH_MENU_1,     _both },
+
+    { "speech_menu_2",     kSPEECH_MENU_2,     _mp },
+    { "speech_menu_3",     kSPEECH_MENU_3,     _mp },
+    { "speech_menu_4",     kSPEECH_MENU_4,     _mp },
+    { "speech_menu_5",     kSPEECH_MENU_5,     _mp },
+    { "speech_menu_6",     kSPEECH_MENU_6,     _mp },
+    { "speech_menu_7",     kSPEECH_MENU_7,     _mp },
+    { "speech_menu_8",     kSPEECH_MENU_8,     _mp },
+    { "speech_menu_9",     kSPEECH_MENU_9,     _mp },
+
+    { "use_bandage",       kUSE_BANDAGE,       _sp },
+    { "use_medkit",        kUSE_MEDKIT,        _sp },
 
     { "quick_use_1",       kQUICK_USE_1,       _both },
     { "quick_use_2",       kQUICK_USE_2,       _both },
@@ -103,13 +123,14 @@ _action actions[] = {
     { "custom13",          kCUSTOM13,          _sp },
     { "custom14",          kCUSTOM14,          _sp },
     { "custom15",          kCUSTOM15,          _sp },
-    { "cam_autoaim",       kCAM_AUTOAIM,       _sp },
+
     { "pda_tab1",          kPDA_TAB1,          _sp },
     { "pda_tab2",          kPDA_TAB2,          _sp },
     { "pda_tab3",          kPDA_TAB3,          _sp },
     { "pda_tab4",          kPDA_TAB4,          _sp },
     { "pda_tab5",          kPDA_TAB5,          _sp },
     { "pda_tab6",          kPDA_TAB6,          _sp },
+
     { "kick",              kKICK,              _sp },
 
     { nullptr,             kLASTACTION,        _both }
@@ -117,14 +138,27 @@ _action actions[] = {
 
 _keyboard keyboards[] =
 {
-    { "mouse1",                 MOUSE_1,                         "Mouse 1" },
-    { "mouse2",                 MOUSE_2,                         "Mouse 2" },
-    { "mouse3",                 MOUSE_3,                         "Mouse 3" },
-    { "mouse4",                 MOUSE_4,                         "Mouse 4" },
-    { "mouse5",                 MOUSE_5,                         "Mouse 5" },
-    { "mouse6",                 MOUSE_6,                         "Mouse 6" },
-    { "mouse7",                 MOUSE_7,                         "Mouse 7" },
-    { "mouse8",                 MOUSE_8,                         "Mouse 8" },
+    { "mouse1",                 MOUSE_1,                         "LMB" },
+    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake cause init algorithm was changed.
+    { "mouse2",                 MOUSE_2,                         "RMB" },
+    { "mouse4",                 MOUSE_4,                         "Mouse X1" },
+    { "mouse5",                 MOUSE_5,                         "Mouse X2" },
+
+    { "ckA",                    XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
+    { "ckB",                    XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
+    { "ckX",                    XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
+    { "ckY",                    XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
+    { "ckBACK",                 XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
+    { "ckGUIDE",                XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
+    { "ckSTART",                XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
+    { "ckLEFTSTICK",            XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
+    { "ckRIGHTSTICK",           XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
+    { "ckLEFTSHOULDER",         XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
+    { "ckRIGHTSHOULDER",        XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
+    { "ckDPAD_UP",              XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
+    { "ckDPAD_DOWN",            XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
+    { "ckDPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
+    { "ckDPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
 
     { "kUNKNOWN",               SDL_SCANCODE_UNKNOWN,            "Unknown" },
 
@@ -316,12 +350,14 @@ _keyboard keyboards[] =
     { "kDECIMALSEPARATOR",      SDL_SCANCODE_DECIMALSEPARATOR,   "Decimal Separator" },
     { "kCURRENCYUNIT",          SDL_SCANCODE_CURRENCYUNIT,       "Currency Unit" },
     { "kCURRENCYSUBUNIT",       SDL_SCANCODE_CURRENCYSUBUNIT,    "Currency Subunit" },
+
     { "kNUMPAD_LEFTPAREN",      SDL_SCANCODE_KP_LEFTPAREN,       "Numpad Left Paren" },
     { "kNUMPAD_RIGHTPAREN",     SDL_SCANCODE_KP_RIGHTPAREN,      "Numpad Right Paren" },
     { "kNUMPAD_LEFTBRACE",      SDL_SCANCODE_KP_LEFTBRACE,       "Numpad Left Brace" },
     { "kNUMPAD_RIGHTBRACE",     SDL_SCANCODE_KP_RIGHTBRACE,      "Numpad Right Brace" },
     { "kNUMPAD_TAB",            SDL_SCANCODE_KP_TAB,             "Numpad Tab" },
     { "kNUMPAD_BACKSPACE",      SDL_SCANCODE_KP_BACKSPACE,       "Numpad Backspace" },
+
     { "kNUMPAD_A",              SDL_SCANCODE_KP_A,               "Numpad A" },
     { "kNUMPAD_B",              SDL_SCANCODE_KP_B,               "Numpad B" },
     { "kNUMPAD_C",              SDL_SCANCODE_KP_C,               "Numpad C" },
@@ -409,6 +445,7 @@ _keyboard keyboards[] =
 
     { "kAPP1",                  SDL_SCANCODE_APP1,               "App 1" },
     { "kAPP2",                  SDL_SCANCODE_APP2,               "App 2" },
+
     { nullptr,                  -1,                              "(null)" }
 };
 // clang-format on

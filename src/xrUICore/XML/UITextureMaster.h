@@ -41,15 +41,17 @@ public:
     static void FreeTexInfo();
     static void FreeCachedShaders();
 
-    static void InitTexture(
+    static bool InitTexture(
         const shared_str& texture_name, CUIStaticItem* tc, const shared_str& shader_name = "hud" DELIMITER "default");
-    static void InitTexture(
+    static bool InitTexture(
         const shared_str& texture_name, const shared_str& shader_name, ui_shader& out_shader, Frect& out_rect);
     static float GetTextureHeight(const shared_str& texture_name);
     static float GetTextureWidth(const shared_str& texture_name);
     static Frect GetTextureRect(const shared_str& texture_name);
+    static pcstr GetTextureFileName(pcstr texture_name);
     static void GetTextureShader(const shared_str& texture_name, ui_shader& sh);
-    static TEX_INFO FindItem(const shared_str& texture_name);
+    static TEX_INFO FindItem(const shared_str& texture_name, pcstr default_texture = nullptr);
+    static bool ItemExist(const shared_str& texture_name);
 
 protected:
     IC static bool IsSh(const shared_str& texture_name);

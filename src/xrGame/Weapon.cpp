@@ -359,25 +359,20 @@ void CWeapon::Load(LPCSTR section)
     //	misfireProbability			  = pSettings->r_float(section,"misfire_probability");
     //	misfireConditionK			  = READ_IF_EXISTS(pSettings, r_float, section, "misfire_condition_k",	1.0f);
     misfireStartCondition = pSettings->r_float(section, "misfire_start_condition");
-    misfireEndCondition = READ_IF_EXISTS(pSettings, r_float, section, "misfire_end_condition", 0.f);
-    misfireStartProbability = READ_IF_EXISTS(pSettings, r_float, section, "misfire_start_prob", 0.f);
+    misfireEndCondition = pSettings->read_if_exists<float>(section, "misfire_end_condition", 0.f);
+    misfireStartProbability = pSettings->read_if_exists<float>(section, "misfire_start_prob", 0.f);
     misfireEndProbability = pSettings->r_float(section, "misfire_end_prob");
     conditionDecreasePerShot = pSettings->r_float(section, "condition_shot_dec");
-    conditionDecreasePerQueueShot =
-        READ_IF_EXISTS(pSettings, r_float, section, "condition_queue_shot_dec", conditionDecreasePerShot);
+    conditionDecreasePerQueueShot = pSettings->read_if_exists<float>(section, "condition_queue_shot_dec", conditionDecreasePerShot);
 
     vLoadedFirePoint = pSettings->r_fvector3(section, "fire_point");
-
-    if (pSettings->line_exist(section, "fire_point2"))
-        vLoadedFirePoint2 = pSettings->r_fvector3(section, "fire_point2");
-    else
-        vLoadedFirePoint2 = vLoadedFirePoint;
+    vLoadedFirePoint2 = pSettings->read_if_exists<Fvector3>(section, "fire_point2", vLoadedFirePoint);
 
     // hands
     eHandDependence = EHandDependence(pSettings->r_s32(section, "hand_dependence"));
-    m_bIsSingleHanded = true;
-    if (pSettings->line_exist(section, "single_handed"))
-        m_bIsSingleHanded = !!pSettings->r_bool(section, "single_handed");
+
+    m_bIsSingleHanded = pSettings->read_if_exists<bool>(section, "single_handed", true);
+
     //
     m_fMinRadius = pSettings->r_float(section, "min_radius");
     m_fMaxRadius = pSettings->r_float(section, "max_radius");

@@ -150,6 +150,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     D3D_SHADER_MACRO defines[128];
     int def_it = 0;
     char c_smapsize[32];
+    char c_gloss[32];
     char c_sun_shafts[32];
     char c_ssao[32];
     char c_sun_quality[32];
@@ -279,6 +280,16 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         def_it++;
     }
     sh_name[len] = '0' + char(o.sunstatic);
+    ++len;
+
+    if (o.forcegloss)
+    {
+        xr_sprintf(c_gloss, "%f", o.forcegloss_v);
+        defines[def_it].Name = "FORCE_GLOSS";
+        defines[def_it].Definition = c_gloss;
+        def_it++;
+    }
+    sh_name[len] = '0' + char(o.forcegloss);
     ++len;
 
     if (o.forceskinw)
@@ -552,7 +563,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     sh_name[len] = '0' + char(o.dx10_sm4_1);
     ++len;
 
-    R_ASSERT(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0);
     if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
     {
         defines[def_it].Name = "SM_5";
@@ -808,8 +818,13 @@ static inline bool match_shader(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, LPCSTR const mask, size_t const mask_length)
 {
     u32 const full_shader_id_length = xr_strlen(full_shader_id);
-    R_ASSERT2(full_shader_id_length == mask_length,
-        make_string("bad cache for shader %s, [%s], [%s]", debug_shader_id, mask, full_shader_id));
+    if (full_shader_id_length == mask_length)
+    {
+#ifndef MASTER_GOLD
+        Msg("bad cache for shader %s, [%s], [%s]", debug_shader_id, mask, full_shader_id);
+#endif
+        return false;
+    }
     char const* i = full_shader_id;
     char const* const e = full_shader_id + full_shader_id_length;
     char const* j = mask;
@@ -830,7 +845,12 @@ static inline bool match_shader(
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
-#if 1
+    // XXX: -no_shaders_cache command line key
+    // Don't put here this code:
+    // if (strstr(Core.Params, "-no_shaders_cache"))
+    // It would decrease performance.
+    // It's better to use a console command for this
+#if 0
     strcpy_s(result, "");
     return false;
 #else // #if 1

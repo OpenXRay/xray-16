@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="arrow">
       <UniqueIdentifier>{2c4605d6-d85a-4a2b-b9e8-caaa34c51732}</UniqueIdentifier>
     </Filter>
@@ -427,5 +424,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

@@ -1600,6 +1600,9 @@ void CActor::ForceTransform(const Fmatrix& m)
     // character_physics_support()->set_movement_position( m.c );
     // character_physics_support()->movement()->SetVelocity( 0, 0, 0 );
 
+    Fvector xyz;
+    m.getHPB(xyz);
+    cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
     character_physics_support()->ForceTransform(m);
     const float block_damage_time_seconds = 2.f;
     if (!IsGameTypeSingle())

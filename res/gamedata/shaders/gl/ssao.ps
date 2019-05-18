@@ -194,7 +194,7 @@ for (int rad=0; rad < RINGS; rad++)
 		//float3	tap_pos	= s_position.Sample(smp_nofilter,tap);
 		float3	tap_pos	= gbd.P;
 #else // SSAO_OPT_DATA
-		float	z	= textureLod(s_half_depth,tap,0).z;
+		float	z	= textureLod(s_half_depth,tap,0).r;
 		float3	tap_pos	= uv_to_eye(tap, z);
 #endif // SSAO_OPT_DATA
 		float3 	direct 	= tap_pos-P.xyz;

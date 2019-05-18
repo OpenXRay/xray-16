@@ -71,9 +71,14 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
 #endif // DEBUG
 
+    int iMaxVTFUnits, iMaxCTIUnits;
+    glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &iMaxVTFUnits);
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &iMaxCTIUnits);
+
     Msg("* GPU vendor: [%s] device: [%s]", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
     Msg("* GPU OpenGL version: %s", glGetString(GL_VERSION));
     Msg("* GPU OpenGL shading language version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
     //	Create render target and depth-stencil views here
     UpdateViews();

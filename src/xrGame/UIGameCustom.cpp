@@ -111,12 +111,12 @@ StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singl
         if (it != CustomStatics.end())
             return *it;
     }
-    CUIXmlInit xmlInit;
+
     CustomStatics.push_back(new StaticDrawableWrapper());
     StaticDrawableWrapper* sss = CustomStatics.back();
     sss->m_static = new CUIStatic();
     sss->m_name = id;
-    xmlInit.InitStatic(*MsgConfig, id, 0, sss->m_static);
+    CUIXmlInit::InitStatic(*MsgConfig, id, 0, sss->m_static);
     float ttl = MsgConfig->ReadAttribFlt(id, 0, "ttl", -1.0f);
     if (ttl > 0.0f)
         sss->m_endTime = Device.fTimeGlobal + ttl;

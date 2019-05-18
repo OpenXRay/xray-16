@@ -6,6 +6,10 @@ ENGINE_API extern BOOL bDebug;
 #define bDebug 0
 #endif
 
+extern ENGINE_API bool CallOfPripyatMode;
+extern ENGINE_API bool ClearSkyMode;
+extern ENGINE_API bool ShadowOfChernobylMode;
+
 // textures
 ENGINE_API extern int psTextureLOD;
 
@@ -20,7 +24,7 @@ enum
     rsStatistic = (1ul << 5ul),
     rsDetails = (1ul << 6ul),
     rsRefresh60hz = (1ul << 7ul),
-    rsConstantFPS = (1ul << 8ul),
+    rsShowFPS = (1ul << 8ul),
     rsDrawStatic = (1ul << 9ul),
     rsDrawDynamic = (1ul << 10ul),
     rsDisableObjectsAsCrows = (1ul << 11ul),
@@ -43,6 +47,19 @@ enum
     // 24-32 bit - reserved to Editor
 };
 
+enum
+{
+    ConstantFPS_off = 0,
+    ConstantFPS_30, // 60hz
+    ConstantFPS_50, // 100hz
+    ConstantFPS_60, // 120hz
+    ConstantFPS_72, // 144hz
+    ConstantFPS_82, // 165hz
+    ConstantFPS_90, // 180hz
+    ConstantFPS_120 // 240hz
+};
+
+ENGINE_API extern u32 psConstantFPS;
 //. ENGINE_API extern u32 psCurrentMode ;
 ENGINE_API extern u32 psCurrentVidMode[];
 ENGINE_API extern u32 psCurrentBPP;

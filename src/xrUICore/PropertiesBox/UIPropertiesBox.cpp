@@ -35,8 +35,15 @@ void CUIPropertiesBox::InitPropertiesBox(Fvector2 pos, Fvector2 size)
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu.xml");
 
-    LPCSTR t = xml_doc.Read("properties_box:texture", 0, "");
-    R_ASSERT(t);
+    if (!xml_doc.NavigateToNode("properties_box"))
+    {
+        xml_doc.ClearInternal();
+        xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "inventory_new.xml");
+        R_ASSERT2(xml_doc.NavigateToNode("properties_box"), "Can't find properties_box in [actor_menu.xml]");
+    }
+
+    LPCSTR t = xml_doc.Read("properties_box:texture", 0, nullptr);
+    R_ASSERT2(t, "Please, specify texture for properties_box");
     InitTexture(t);
 
     CUIXmlInitBase::InitListBox(xml_doc, "properties_box:list", 0, &m_UIListWnd);

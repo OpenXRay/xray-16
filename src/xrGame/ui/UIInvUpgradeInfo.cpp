@@ -35,38 +35,37 @@ void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;
     ui_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
-    CUIXmlInit xml_init;
 
     XML_NODE stored_root = ui_xml.GetLocalRoot();
     XML_NODE node = ui_xml.NavigateToNode("upgrade_info", 0);
     ui_xml.SetLocalRoot(node);
 
-    xml_init.InitWindow(ui_xml, "main_frame", 0, this);
+    CUIXmlInit::InitWindow(ui_xml, "main_frame", 0, this);
 
     m_background = new CUIFrameWindow();
     AttachChild(m_background);
     m_background->SetAutoDelete(true);
-    xml_init.InitFrameWindow(ui_xml, "background_frame", 0, m_background);
+    CUIXmlInit::InitFrameWindow(ui_xml, "background_frame", 0, m_background);
 
     m_name = new CUITextWnd();
     AttachChild(m_name);
     m_name->SetAutoDelete(true);
-    xml_init.InitTextWnd(ui_xml, "info_name", 0, m_name);
+    CUIXmlInit::InitTextWnd(ui_xml, "info_name", 0, m_name);
 
     m_cost = new CUITextWnd();
     AttachChild(m_cost);
     m_cost->SetAutoDelete(true);
-    xml_init.InitTextWnd(ui_xml, "info_cost", 0, m_cost);
+    CUIXmlInit::InitTextWnd(ui_xml, "info_cost", 0, m_cost);
 
     m_desc = new CUITextWnd();
     AttachChild(m_desc);
     m_desc->SetAutoDelete(true);
-    xml_init.InitTextWnd(ui_xml, "info_desc", 0, m_desc);
+    CUIXmlInit::InitTextWnd(ui_xml, "info_desc", 0, m_desc);
 
     m_prereq = new CUITextWnd();
     AttachChild(m_prereq);
     m_prereq->SetAutoDelete(true);
-    xml_init.InitTextWnd(ui_xml, "info_prerequisites", 0, m_prereq);
+    CUIXmlInit::InitTextWnd(ui_xml, "info_prerequisites", 0, m_prereq);
 
     m_properties_wnd = new UIInvUpgPropertiesWnd();
     AttachChild(m_properties_wnd);

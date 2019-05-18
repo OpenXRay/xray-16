@@ -21,7 +21,6 @@ add_dir("${DIRS}")
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/pugixml/src
-    #${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
     ${SDL_INCLUDE_DIRS}
     ${TBB_INCLUDE_DIRS}
 )

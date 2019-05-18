@@ -3,17 +3,24 @@
 
 #include "xr_input.h"
 #include "IInputReceiver.h"
-#include "Include/editor/ide.hpp"
 #include "GameFont.h"
-#include "PerformanceAlert.hpp"
 #include "xrCore/Text/StringConversion.hpp"
+#include "xrCore/xr_token.h"
 
 CInput* pInput = NULL;
 IInputReceiver dummyController;
 
+xr_vector<xr_token> JoysticksToken;
+xr_vector<xr_token> ControllersToken;
+
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
 ENGINE_API Flags32 psMouseInvert = {FALSE};
+
+// Max events per frame
+constexpr size_t MAX_KEYBOARD_EVENTS = 64;
+constexpr size_t MAX_MOUSE_EVENTS = 256;
+constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
 float stop_vibration_time = flt_max;
 
@@ -28,16 +35,131 @@ static void on_error_dialog(bool before)
         pInput->GrabInput(true);
 }
 
-CInput::CInput(const bool exclusive)
+bool CInput::InitJoystick()
+{
+    if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0)
+    {
+        SDL_Joystick* joystick;
+        int count = SDL_NumJoysticks();
+        for (int i = 0; i < count; ++i)
+        {
+            joystick = SDL_JoystickOpen(i);
+            if (joystick)
+            {
+                JoysticksToken.emplace_back(xr_strdup(SDL_JoystickName(joystick)), i);
+                joysticks.emplace_back(joystick);
+                continue;
+            }
+
+            Log("SDL_JoystickOpen failed: ", SDL_GetError());
+            return false;
+        }
+
+        if (joysticks.empty())
+        {
+            Log("No joysticks available");
+            JoysticksToken.emplace_back(nullptr, -1);
+            return false;
+        }
+
+        availableJoystick = true;
+    }
+    else
+    {
+        Log("Joystick SDL_InitSubSystem failed: ", SDL_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+void CInput::InitGameController()
+{
+    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
+    {
+        SDL_GameController* controller;
+        int count = SDL_NumJoysticks();
+        for (int i = 0; i < count; ++i)
+        {
+            if (SDL_IsGameController(i))
+            {
+                controller = SDL_GameControllerOpen(i);
+                if (controller)
+                {
+                    ControllersToken.emplace_back(xr_strdup(SDL_GameControllerName(controller)), i);
+                    controllers.emplace_back(controller);
+                    continue;
+                }
+
+                Log("SDL_GameControllerOpen failed: ", SDL_GetError());
+                return;
+            }
+        }
+
+        availableController = true;
+    }
+    else
+    {
+        Log("Game Controller SDL_InitSubSystem failed: ", SDL_GetError());
+        return;
+    }
+}
+
+void CInput::DisplayDevicesList()
+{
+    if (availableController && !controllers.empty())
+    {
+        Msg("Available game controllers[%d]:", controllers.size());
+
+        for (auto& token : ControllersToken)
+            if (token.name)
+                Log(token.name);
+    }
+    else
+        Log("No game controllers available");
+
+    if (joysticks.size() > controllers.size())
+    {
+        Msg("Available joysticks[%d]:", joysticks.size() - controllers.size());
+
+        size_t it = 0;
+        for (auto& token : JoysticksToken)
+        {
+            if (it <= ControllersToken.size())
+            {
+                if (token.id == ControllersToken[it].id)
+                {
+                    ++it;
+                    continue;
+                }
+            }
+
+            if (token.name)
+                Log(token.name);
+        }
+    }
+
+    ControllersToken.emplace_back(nullptr, -1);
+    JoysticksToken.emplace_back(nullptr, -1);
+}
+
+CInput::CInput(const bool exclusive): availableJoystick(false), availableController(false)
 {
     exclusiveInput = exclusive;
 
     Log("Starting INPUT device...");
 
+    if (CInput::InitJoystick())
+    {
+        CInput::InitGameController();
+        CInput::DisplayDevicesList();
+    }
+
     MouseDelta = 25;
 
-    ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(keyboardState, sizeof(keyboardState));
+    mouseState.reset();
+    keyboardState.reset();
+    controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 
@@ -56,6 +178,21 @@ CInput::CInput(const bool exclusive)
 CInput::~CInput()
 {
     GrabInput(false);
+
+    for (auto& joystick : joysticks)
+        SDL_JoystickClose(joystick);
+
+    for (auto& controller : controllers)
+        SDL_GameControllerClose(controller);
+
+    for (auto& token : JoysticksToken)
+        xr_free(token.name);
+    JoysticksToken.clear();
+
+    for (auto& token : ControllersToken)
+        xr_free(token.name);
+    ControllersToken.clear();
+
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
     Device.seqAppActivate.Remove(this);
@@ -72,23 +209,19 @@ void CInput::MouseUpdate()
 {
     SDL_PumpEvents();
 
-    bool mouse_prev[COUNT_MOUSE_BUTTONS];
-
-    mouse_prev[0] = mouseState[0];
-    mouse_prev[1] = mouseState[1];
-    mouse_prev[2] = mouseState[2];
-    mouse_prev[3] = mouseState[3];
-    mouse_prev[4] = mouseState[4];
-    mouse_prev[5] = mouseState[5];
-    mouse_prev[6] = mouseState[6];
-    mouse_prev[7] = mouseState[7];
+    const auto mousePrev = mouseState;
 
     bool mouseMoved = false;
     offs[0] = offs[1] = offs[2] = 0;
 
-    SDL_Event event;
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL))
+    SDL_Event events[MAX_MOUSE_EVENTS];
+    const auto count = SDL_PeepEvents(events, MAX_MOUSE_EVENTS,
+        SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+
+    for (int i = 0; i < count; ++i)
     {
+        const SDL_Event event = events[i];
+
         switch (event.type)
         {
         case SDL_MOUSEMOTION:
@@ -98,13 +231,13 @@ void CInput::MouseUpdate()
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
             break;
-        case SDL_MOUSEBUTTONUP:
-            mouseState[event.button.button - 1] = false;
-            cbStack.back()->IR_OnMouseRelease(event.button.button - 1);
-            break;
         case SDL_MOUSEBUTTONDOWN:
             mouseState[event.button.button - 1] = true;
             cbStack.back()->IR_OnMousePress(event.button.button - 1);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            mouseState[event.button.button - 1] = false;
+            cbStack.back()->IR_OnMouseRelease(event.button.button - 1);
             break;
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
@@ -116,20 +249,9 @@ void CInput::MouseUpdate()
         }
     }
 
-    auto isButtonOnHold = [&](int i)
-    {
-        if (mouseState[i] && mouse_prev[i])
+    for (int i = 0; i < MOUSE_COUNT; ++i)
+        if (mouseState[i] && mousePrev[i])
             cbStack.back()->IR_OnMouseHold(i);
-    };
-
-    isButtonOnHold(0);
-    isButtonOnHold(1);
-    isButtonOnHold(2);
-    isButtonOnHold(3);
-    isButtonOnHold(4);
-    isButtonOnHold(5);
-    isButtonOnHold(6);
-    isButtonOnHold(7);
 
     if (mouseMoved)
     {
@@ -151,9 +273,14 @@ void CInput::KeyUpdate()
 {
     SDL_PumpEvents();
 
-    SDL_Event event;
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYUP))
+    SDL_Event events[MAX_KEYBOARD_EVENTS];
+    const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
+        SDL_GETEVENT, SDL_KEYDOWN, SDL_TEXTINPUT);
+
+    for (int i = 0; i < count; ++i)
     {
+        const SDL_Event event = events[i];
+
         switch (event.type)
         {
         case SDL_KEYDOWN:
@@ -167,6 +294,14 @@ void CInput::KeyUpdate()
             keyboardState[event.key.keysym.scancode] = false;
             cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
             break;
+
+        case SDL_TEXTINPUT:
+            cbStack.back()->IR_OnTextInput(event.text.text);
+            break;
+
+        default:
+            // Nothing here
+            break;
         }
     }
 
@@ -175,62 +310,118 @@ void CInput::KeyUpdate()
             cbStack.back()->IR_OnKeyboardHold(i);
 }
 
-pcstr KeyToMouseButtonName(const int dik)
+void CInput::GameControllerUpdate()
 {
-    switch (dik)
+    SDL_PumpEvents();
+
+    const auto controllerPrev = controllerState;
+
+    SDL_Event events[MAX_CONTROLLER_EVENTS];
+    const auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
+        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERDEVICEREMAPPED);
+
+    for (int i = 0; i < count; ++i)
     {
-    case MOUSE_1: return "Left mouse";
-    case MOUSE_2: return "Right mouse";
-    case MOUSE_3: return "Center mouse";
-    case MOUSE_4: return "Fourth mouse";
-    case MOUSE_5: return "Fifth mouse";
-    case MOUSE_6: return "Sixth mouse";
-    case MOUSE_7: return "Seventh mouse";
-    case MOUSE_8: return "Eighth mouse";
-    default: return "Unknown mouse";
+        const SDL_Event event = events[i];
+
+        switch (event.type)
+        {
+        case SDL_CONTROLLERAXISMOTION:
+            Log("Controller do axis motion");
+            
+            break;
+        case SDL_CONTROLLERBUTTONDOWN:
+            controllerState[event.cbutton.button] = true;
+            cbStack.back()->IR_OnControllerPress(event.cbutton.button);
+            break;
+        case SDL_CONTROLLERBUTTONUP:
+            controllerState[event.cbutton.button] = false;
+            cbStack.back()->IR_OnControllerRelease(event.cbutton.button);
+            break;
+        case SDL_CONTROLLERDEVICEADDED:
+        case SDL_CONTROLLERDEVICEREMOVED:
+        case SDL_CONTROLLERDEVICEREMAPPED:
+            break;
+        }
     }
+
+    for (int i = 0; i < COUNT_CONTROLLER_BUTTONS; ++i)
+        if (controllerState[i] && controllerPrev[i])
+            cbStack.back()->IR_OnKeyboardHold(ControllerButtonToKey[i]);
 }
 
-bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
+bool KbdKeyToButtonName(const int dik, xr_string& name)
 {
-    xr_string keyname;
     static std::locale locale("");
 
-    if (dik < SDL_NUM_SCANCODES)
-        keyname = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)), locale);
-    else
-        keyname = KeyToMouseButtonName(dik);
-
-    if (keyname.empty())
+    if (dik >= 0)
     {
-        if (dik == SDL_SCANCODE_UNKNOWN)
-            keyname = "Unknown";
-        else
-            return false;
+        name = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)), locale);
+        return true;
     }
 
-    xr_strcpy(dest_str, dest_sz, keyname.c_str());
-    return true;
+    return false;
 }
 
-bool CInput::iGetAsyncKeyState(int dik)
+bool OtherDevicesKeyToButtonName(const int btn, xr_string& name)
+{
+    int idx = btn - MOUSE_1;
+
+    if (idx >= 0)
+    {
+        name = keyboards[idx].key_local_name;
+        return true;
+    }
+
+    return false;
+}
+
+bool CInput::get_dik_name(const int dik, LPSTR dest_str, int dest_sz)
+{
+    xr_string keyname;
+    bool result;
+
+    if (dik < SDL_NUM_SCANCODES)
+        result = KbdKeyToButtonName(dik, keyname);
+    else
+        result = OtherDevicesKeyToButtonName(dik, keyname);
+
+    if (keyname.empty())
+        return false;
+
+    xr_strcpy(dest_str, dest_sz, keyname.c_str());
+    return result;
+}
+
+bool CInput::iGetAsyncKeyState(const int dik)
 {
     if (dik < COUNT_KB_BUTTONS)
         return keyboardState[dik];
 
-    if (dik >= MOUSE_1 && dik <= MOUSE_8)
+    if (dik >= MOUSE_1 && dik < MOUSE_MAX)
     {
         const int mk = dik - MOUSE_1;
         return iGetAsyncBtnState(mk);
+    }
+
+    if (dik >= XR_CONTROLLER_BUTTON_A && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        const int mk = dik - XR_CONTROLLER_BUTTON_A;
+        return iGetAsyncGcBtnState(mk);
     }
 
     // unknown key ???
     return false;
 }
 
-bool CInput::iGetAsyncBtnState(int btn)
+bool CInput::iGetAsyncBtnState(const int btn)
 {
     return mouseState[btn];
+}
+
+bool CInput::iGetAsyncGcBtnState(const int btn)
+{
+    return controllerState[btn];
 }
 
 void CInput::GrabInput(const bool grab)
@@ -243,7 +434,8 @@ void CInput::GrabInput(const bool grab)
     SDL_SetWindowGrab(Device.m_sdlWnd, grab ? SDL_TRUE : SDL_FALSE);
 
     // Grab the mouse
-    SDL_SetRelativeMouseMode(grab ? SDL_TRUE : SDL_FALSE);
+    if (exclusiveInput)
+        SDL_SetRelativeMouseMode(grab ? SDL_TRUE : SDL_FALSE);
 
     // We're done here.
     inputGrabbed = grab;
@@ -297,8 +489,9 @@ void CInput::OnAppActivate(void)
     if (CurrentIR())
         CurrentIR()->IR_OnActivate();
 
-    ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(keyboardState, sizeof(keyboardState));
+    mouseState.reset();
+    keyboardState.reset();
+    controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
@@ -308,8 +501,9 @@ void CInput::OnAppDeactivate(void)
     if (CurrentIR())
         CurrentIR()->IR_OnDeactivate();
 
-    ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(keyboardState, sizeof(keyboardState));
+    mouseState.reset();
+    keyboardState.reset();
+    controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(offs, sizeof(offs));
 }
@@ -324,10 +518,13 @@ void CInput::OnFrame(void)
     {
         KeyUpdate();
         MouseUpdate();
+
+        if (availableController)
+            GameControllerUpdate();
     }
     else
     {
-        SDL_FlushEvents(SDL_KEYDOWN, SDL_MOUSEWHEEL);
+        SDL_FlushEvents(SDL_KEYDOWN, SDL_CONTROLLERDEVICEREMAPPED);
     }
 
     stats.FrameTime.End();
@@ -338,6 +535,7 @@ IInputReceiver* CInput::CurrentIR()
 {
     if (cbStack.size())
         return cbStack.back();
+
     return nullptr;
 }
 
@@ -354,12 +552,12 @@ void CInput::ExclusiveMode(const bool exclusive)
     GrabInput(true);
 }
 
-bool CInput::IsExclusiveMode() const { return exclusiveInput; }
+bool CInput::IsExclusiveMode() const 
+{
+    return exclusiveInput;
+}
 
 void CInput::feedback(u16 s1, u16 s2, float time)
 {
     stop_vibration_time = RDEVICE.fTimeGlobal + time;
-#ifndef _EDITOR
-//. set_vibration (s1, s2);
-#endif
 }

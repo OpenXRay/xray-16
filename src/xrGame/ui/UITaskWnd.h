@@ -24,17 +24,23 @@ private:
     typedef CUIWindow inherited;
 
     CUIFrameWindow* m_background;
+    CUIFrameLineWnd* m_background2;
+
     CUIStatic* m_center_background;
     CUIStatic* m_right_bottom_background;
+    CUIFrameLineWnd* m_task_split;
 
     CUIMapWnd* m_pMapWnd;
     CUITaskItem* m_pStoryLineTaskItem;
+    CUITaskItem* m_pSecondaryTaskItem;
 
     CUI3tButton* m_BtnTaskListWnd;
+    CUIStatic* m_second_task_index;
     CUIStatic* m_devider;
     u32 m_actual_frame;
 
     CUI3tButton* m_btn_focus;
+    CUI3tButton* m_btn_focus2;
 
     CUICheckButton* m_cbTreasures;
     CUICheckButton* m_cbQuestNpcs;
@@ -67,29 +73,33 @@ public:
     void ShowMapLegend(bool status) const;
     void Switch_ShowMapLegend() const;
 
-    bool IsTreasuresEnabled() { return m_bTreasuresEnabled; };
-    bool IsQuestNpcsEnabled() { return m_bQuestNpcsEnabled; };
-    bool IsSecondaryTasksEnabled() { return m_bSecondaryTasksEnabled; };
-    bool IsPrimaryObjectsEnabled() { return m_bPrimaryObjectsEnabled; };
+    bool IsTreasuresEnabled() const { return m_bTreasuresEnabled; };
+    bool IsQuestNpcsEnabled() const { return m_bQuestNpcsEnabled; };
+    bool IsSecondaryTasksEnabled() const { return m_bSecondaryTasksEnabled; };
+    bool IsPrimaryObjectsEnabled() const { return m_bPrimaryObjectsEnabled; };
     void TreasuresEnabled(bool enable)
     {
         m_bTreasuresEnabled = enable;
-        m_cbTreasures->SetCheck(enable);
+        if (m_cbTreasures)
+            m_cbTreasures->SetCheck(enable);
     };
     void QuestNpcsEnabled(bool enable)
     {
         m_bQuestNpcsEnabled = enable;
-        m_cbQuestNpcs->SetCheck(enable);
+        if (m_cbQuestNpcs)
+            m_cbQuestNpcs->SetCheck(enable);
     };
     void SecondaryTasksEnabled(bool enable)
     {
         m_bSecondaryTasksEnabled = enable;
-        m_cbSecondaryTasks->SetCheck(enable);
+        if (m_cbSecondaryTasks)
+            m_cbSecondaryTasks->SetCheck(enable);
     };
     void PrimaryObjectsEnabled(bool enable)
     {
         m_bPrimaryObjectsEnabled = enable;
-        m_cbPrimaryObjects->SetCheck(enable);
+        if (m_cbPrimaryObjects)
+            m_cbPrimaryObjects->SetCheck(enable);
     };
 
     void Show_TaskListWnd(bool status);
@@ -102,6 +112,7 @@ private:
     void OnPrevTaskClicked();
     void xr_stdcall OnShowTaskListWnd(CUIWindow* w, void* d);
     void xr_stdcall OnTask1DbClicked(CUIWindow*, void*);
+    void xr_stdcall OnTask2DbClicked(CUIWindow*, void*);
 
     void xr_stdcall OnShowTreasures(CUIWindow*, void*);
     void xr_stdcall OnShowPrimaryObjects(CUIWindow*, void*);
@@ -119,7 +130,7 @@ private:
 
 public:
     CUITaskItem();
-    virtual ~CUITaskItem();
+    virtual ~CUITaskItem() = default;
 
     virtual void OnFocusReceive();
     virtual void OnFocusLost();

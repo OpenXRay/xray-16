@@ -4,6 +4,12 @@
 // XXX: Get rid of NO_ENGINE_API
 // XXX: Get rid of DLL_API (maybe)
 
+#ifdef XRRENDER_GL_EXPORTS
+#define XRRENDER_GL_API XR_EXPORT
+#else
+#define XRRENDER_GL_API XR_IMPORT
+#endif
+
 #ifdef XRAPI_EXPORTS
 #define XRAPI_API XR_EXPORT
 #else

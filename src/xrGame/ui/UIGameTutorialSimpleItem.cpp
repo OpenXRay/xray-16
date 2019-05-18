@@ -103,8 +103,8 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_UIWindow = new CUIWindow();
     m_UIWindow->SetAutoDelete(false);
     XML_NODE _lsr = xml->GetLocalRoot();
-    CUIXmlInit xml_init;
-    xml_init.InitWindow(*xml, "main_wnd", 0, m_UIWindow);
+
+    CUIXmlInit::InitWindow(*xml, "main_wnd", 0, m_UIWindow);
     xml->SetLocalRoot(_lsr);
 
     // initialize auto_static

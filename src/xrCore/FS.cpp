@@ -111,7 +111,7 @@ static int open_internal(pcstr fn, int& handle)
 {
 #if defined(WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     pstr conv_fn = xr_strdup(fn);
     convert_path_separators(conv_fn);
     handle = open(conv_fn, _O_RDONLY);
@@ -534,6 +534,7 @@ CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
     Size = (int)file_info.st_size;
     R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
     data = (char*)::mmap(NULL, Size, PROT_READ | PROT_WRITE, MAP_SHARED, hSrcFile, 0);
+    R_ASSERT3(data && data != MAP_FAILED, cFileName, xrDebug::ErrorToString(GetLastError()));
 #endif
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);
@@ -569,6 +570,7 @@ CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
     R_ASSERT3(hSrcMap != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
+    R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
     pstr conv_path = xr_strdup(cFileName);
     convert_path_separators(conv_path);
@@ -580,8 +582,8 @@ CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
     Size = (int)file_info.st_size;
     R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
     data = (char*)::mmap(NULL, Size, PROT_READ, MAP_SHARED, hSrcFile, 0);
+    R_ASSERT3(data && data != MAP_FAILED, cFileName, xrDebug::ErrorToString(GetLastError()));
 #endif
-    R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);

@@ -108,6 +108,8 @@ public:
     virtual void Initialize();
     virtual void Destroy();
 
+    virtual void OnDeviceInitialize() {}
+
     virtual void OnRender();
     virtual void OnFrame();
     

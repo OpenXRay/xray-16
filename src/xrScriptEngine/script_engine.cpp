@@ -866,12 +866,15 @@ void CScriptEngine::unload()
     *m_last_no_file = 0;
 }
 
-void CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err)
+bool CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err)
 {
     print_output(L, scriptName, errorCode, err);
     on_error(L);
 
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
+    bool ignoreAlways;
+    const auto result = xrDebug::Fail(ignoreAlways, DEBUG_INFO, "LUA error", err);
+
+    return result == AssertionResult::ignore;
 }
 
 int CScriptEngine::lua_panic(lua_State* L)
@@ -891,10 +894,14 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
     const bool isString = lua_isstring(L, -1);
     const pcstr err = isString ? lua_tostring(L, -1) : "";
 
-    onErrorCallback(L, "", LUA_ERRRUN, err);
+    const bool result = onErrorCallback(L, "", LUA_ERRRUN, err);
 
     if (isString)
         lua_pop(L, 1);
+
+    if (result)
+        return LUA_OK;
+
     return LUA_ERRRUN;
 }
 #if 1 //!XRAY_EXCEPTIONS
@@ -983,8 +990,16 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #endif
     reinit();
     luabind::open(lua());
-    // XXX: temporary workaround to preserve backwards compatibility with game scripts
-    luabind::disable_super_deprecation();
+
+    // Workarounds to preserve backwards compatibility with game scripts
+    {
+        const bool nilConversion =
+            pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", false);
+     
+        luabind::allow_nil_conversion(nilConversion);
+        luabind::disable_super_deprecation();
+    }
+
     luabind::bind_class_info(lua());
     setup_callbacks();
     if (exporterFunc)
@@ -1027,6 +1042,19 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
+
+    // Game scripts doesn't call randomize but use random
+    // So, we should randomize in the engine.
+    {
+        pcstr randomSeed = "math.randomseed(os.time())";
+        pcstr mathRandom = "math.random()";
+
+        luaL_dostring(lua(), randomSeed);
+        // It's a good practice to call random few times before using it
+        for (int i = 0; i < 3; ++i)
+            luaL_dostring(lua(), mathRandom);
+    }
+
     // XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
     // is that lua hooks somehow make 'super' global unavailable (is's used all over the vanilla scripts).
     // You can disable script profiler by commenting out the following lines in the beginning of _g.script:

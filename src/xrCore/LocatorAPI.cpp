@@ -18,7 +18,9 @@
 #include "stream_reader.h"
 #include "file_stream_reader.h"
 #include "xrCore/Threading/Lock.hpp"
-#if defined(LINUX)
+#include "Crypto/trivial_encryptor.h"
+
+#if defined(LINUX) || defined(FREEBSD)
 #include "SDL.h"
 #include "xrstring.h"
 #include <glob.h>
@@ -259,7 +261,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
 }
 
 #if defined(WINDOWS)
-IReader* open_chunk(void* ptr, u32 ID)
+IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, u32 archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType, dwSize;
     DWORD read_byte;
@@ -288,9 +290,23 @@ IReader* open_chunk(void* ptr, u32 ID)
             VERIFY(res && (read_byte == dwSize));
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest;
-                unsigned dest_sz;
-                _decompressLZ(&dest, &dest_sz, src_data, dwSize);
+                BYTE* dest = nullptr;
+                unsigned dest_sz = 0;
+
+                if (shouldDecrypt) // Try WW key first
+                    g_trivial_encryptor.decode(src_data, dwSize, src_data);
+
+                bool result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+
+                if (!result && shouldDecrypt)
+                {
+                    // Let's try to decode with RU key
+                    g_trivial_encryptor.encode(src_data, dwSize, src_data); // rollback
+                    g_trivial_encryptor.decode(src_data, dwSize, src_data, trivial_encryptor::key_flag::russian);
+                    result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+                }
+                R_ASSERT3(result, "Can't decompress archive", archiveName);
+
                 xr_free(src_data);
                 return new CTempReader(dest, dest_sz, 0);
             }
@@ -305,8 +321,8 @@ IReader* open_chunk(void* ptr, u32 ID)
 };
 #endif
 
-#if defined(LINUX)
-IReader* open_chunk(int fd, u32 ID)
+#if defined(LINUX) || defined(FREEBSD)
+IReader* open_chunk(int fd, u32 ID, pcstr archiveName, u32 archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType, dwSize;
     ssize_t read_byte;
@@ -330,9 +346,22 @@ IReader* open_chunk(int fd, u32 ID)
             VERIFY(read_byte == dwSize);
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest;
-                unsigned dest_sz;
-                _decompressLZ(&dest, &dest_sz, src_data, dwSize);
+                BYTE* dest = nullptr;
+                unsigned dest_sz = 0;
+
+                if (shouldDecrypt)
+                    g_trivial_encryptor.decode(src_data, dwSize, src_data);
+
+                bool result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+
+                if (!result && shouldDecrypt)
+                {
+                    // Let's try to decode with RU key
+                    g_trivial_encryptor.decode(src_data, dwSize, src_data, trivial_encryptor::key_flag::russian);
+                    result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
+                }
+                R_ASSERT3(result, "Can't decompress archive", archiveName);
+
                 xr_free(src_data);
                 return new CTempReader(dest, dest_sz, 0);
             }
@@ -350,6 +379,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 {
     // Create base path
     string_path fs_entry_point;
+    bool shouldDecrypt = false;
     fs_entry_point[0] = 0;
     if (A.header)
     {
@@ -357,8 +387,8 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         if (0 == xr_stricmp(read_path.c_str(), "gamedata"))
         {
             read_path = "$fs_root$";
-            auto P = pathes.find(read_path.c_str());
-            if (P != pathes.end())
+            auto P = m_paths.find(read_path.c_str());
+            if (P != m_paths.end())
             {
                 FS_Path* root = P->second;
                 // R_ASSERT3 (root, "path not found ", read_path.c_str());
@@ -375,9 +405,9 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
             int count = sscanf(read_path.c_str(), "%[^\\]s", alias_name);
             R_ASSERT2(count == 1, read_path.c_str());
 
-            auto P = pathes.find(alias_name);
+            auto P = m_paths.find(alias_name);
 
-            if (P != pathes.end())
+            if (P != m_paths.end())
             {
                 FS_Path* root = P->second;
                 // R_ASSERT3 (root, "path not found ", alias_name);
@@ -388,23 +418,38 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
     }
     else
     {
-        R_ASSERT2(0, "unsupported");
-        xr_strcpy(fs_entry_point, sizeof fs_entry_point, A.path.c_str());
-        if (strext(fs_entry_point))
-            *strext(fs_entry_point) = 0;
+        Msg("~ Found archive without ini header: %s", A.path.c_str());
+
+        if (!strstr(A.path.c_str(), ".xdb"))
+        {
+            Msg("Assuming that [%s] is encrypted ShoC archive", A.path.c_str());
+            shouldDecrypt = true;
+        }
+
+        auto P = m_paths.find("$fs_root$");
+        if (P != m_paths.end())
+        {
+            FS_Path* root = P->second;
+            // R_ASSERT3 (root, "path not found ", read_path.c_str());
+            xr_strcpy(fs_entry_point, sizeof fs_entry_point, root->m_Path);
+        }
+        xr_strcat(fs_entry_point, "gamedata" DELIMITER);
     }
     if (entrypoint)
         xr_strcpy(fs_entry_point, sizeof fs_entry_point, entrypoint);
+
     // Read FileSystem
     A.open();
-    IReader* hdr = open_chunk(A.hSrcFile, 1);
+    IReader* hdr = open_chunk(A.hSrcFile, 1, A.path.c_str(), A.size, shouldDecrypt);
+
     R_ASSERT(hdr);
     RStringVec fv;
+
     while (!hdr->eof())
     {
         string_path name, full;
         archive_header header;
-        
+
         u16 buffer_size = hdr->r_u16(); // Read the total length of all crap
         VERIFY(buffer_size < sizeof(name) + sizeof(archive_header) + sizeof(u32));
 
@@ -436,7 +481,7 @@ void CLocatorAPI::archive::open()
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
     size = GetFileSize(hSrcFile, nullptr);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     // Open the file
     if (hSrcFile)
         return;
@@ -460,7 +505,7 @@ void CLocatorAPI::archive::close()
     hSrcMap = nullptr;
     CloseHandle(hSrcFile);
     hSrcFile = nullptr;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     ::close(hSrcFile);
     hSrcFile = -1;
 #endif
@@ -484,7 +529,8 @@ void CLocatorAPI::ProcessArchive(pcstr _path)
 
     // Read header
     bool bProcessArchiveLoading = true;
-    IReader* hdr = open_chunk(A.hSrcFile, CFS_HeaderChunkID);
+    IReader* hdr = open_chunk(A.hSrcFile, CFS_HeaderChunkID, A.path.c_str(), A.size);
+
     if (hdr)
     {
         A.header = new CInifile(hdr, "archive_header");
@@ -524,7 +570,7 @@ bool CLocatorAPI::load_all_unloaded_archives()
     {
 #if defined(WINDOWS)
         if (archive.hSrcFile == nullptr)
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
         if (archive.hSrcFile == 0)
 #endif
         {
@@ -542,7 +588,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 #if defined(WINDOWS)
     xr_strcpy(N, sizeof N, path);
     xr_strcat(N, entry.name);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     xr_strcpy(N, sizeof N, entry.name);
 #endif
 
@@ -614,7 +660,7 @@ bool ignore_path(pcstr _path)
     }
     else
         return true;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     pstr conv_path = xr_strdup(_path);
     convert_path_separators(conv_path);
     int h = ::open(conv_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -645,7 +691,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
         return false;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     glob_t globbuf;
 
     globbuf.gl_offs = 256;
@@ -662,7 +708,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     intptr_t done = handle;
     while (done != -1)
     {
-#if defined(LINUX)
+#if defined(LINUX) || defined(FREEBSD)
         xr_strcpy(findData.name, globbuf.gl_pathv[handle - done]);
         struct stat fi;
         stat(findData.name, &fi);
@@ -683,7 +729,7 @@ bool CLocatorAPI::Recurse(pcstr path)
             xr_strcpy(fullPath, sizeof fullPath, path);
             xr_strcat(fullPath, findData.name);
             ignore = ignore_name(findData.name) || ignore_path(fullPath);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
             xr_strcpy(fullPath, sizeof fullPath, findData.name); // glob return full path to file
             ignore = ignore_name(findData.name);
 #endif
@@ -696,13 +742,13 @@ bool CLocatorAPI::Recurse(pcstr path)
             rec_files.push_back(findData);
 #ifdef WINDOWS
         done = _findnext(handle, &findData);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
         done--;
 #endif
     }
 #ifdef WINDOWS
     _findclose(handle);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     globfree(&globbuf);
 #endif
     size_t newSize = rec_files.size();
@@ -746,7 +792,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     string_path full_current_directory;
 #if defined(WINDOWS)
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     if (SDL_strlen(fs_path) != 0)
     {
         char *tmp_path = realpath(fs_path, NULL);
@@ -764,7 +810,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     Msg("$fs_root$ = %s", full_current_directory);
 #endif // #ifdef DEBUG
 
-    pathes.insert(std::make_pair(xr_strdup("$fs_root$"), path));
+    m_paths.insert(std::make_pair(xr_strdup("$fs_root$"), path));
 }
 
 IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
@@ -897,12 +943,12 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
             lp_def = cnt >= 5 ? def : 0;
             lp_capt = cnt >= 6 ? capt : 0;
 
-            auto p_it = pathes.find(root);
+            auto p_it = m_paths.find(root);
 
-            FS_Path* P = new FS_Path(p_it != pathes.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
+            FS_Path* P = new FS_Path(p_it != m_paths.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
             bNoRecurse = !(fl & FS_Path::flRecurse);
             Recurse(P->m_Path);
-            auto I = pathes.insert(std::make_pair(xr_strdup(id), P));
+            auto I = m_paths.insert(std::make_pair(xr_strdup(id), P));
 #ifndef DEBUG
             m_Flags.set(flCacheFiles, false);
 #endif // DEBUG
@@ -942,6 +988,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     //-----------------------------------------------------------
 
     CreateLog(nullptr != strstr(Core.Params, "-nolog"));
+    xrDebug::OnFilesystemInitialized();
 }
 
 void CLocatorAPI::_destroy()
@@ -955,13 +1002,13 @@ void CLocatorAPI::_destroy()
     }
     m_files.clear();
 
-    for (auto& it : pathes)
+    for (auto& it : m_paths)
     {
         auto str = pstr(it.first);
         xr_free(str);
         xr_delete(it.second);
     }
-    pathes.clear();
+    m_paths.clear();
 
     for (auto& it : m_archives)
     {
@@ -1175,7 +1222,7 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
 void CLocatorAPI::check_cached_files(pstr fname, const u32& fname_size, const file& desc, pcstr& source_name)
 {
     string_path fname_copy;
-    if (pathes.size() <= 1)
+    if (m_paths.size() <= 1)
         return;
 
     if (!path_exist("$server_root$"))
@@ -1285,11 +1332,12 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     u32 sz = end - start;
 #if defined(WINDOWS)
     u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
-#elif defined(LINUX)
+    VERIFY3(ptr, "cannot create file mapping on file", fname);
+#elif defined(LINUX) || defined(FREEBSD)
     u8* ptr = (u8*)::mmap(NULL, sz, PROT_READ, MAP_SHARED, A.hSrcFile, start);
+    VERIFY3(ptr && ptr != MAP_FAILED, "cannot create file mapping on file", fname);
 #endif
 
-    VERIFY3(ptr, "cannot create file mapping on file", fname);
 
     string1024 temp;
     xr_sprintf(temp, sizeof temp, "%s:%s", *A.path, fname);
@@ -1311,7 +1359,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     R = new CTempReader(dest, desc.size_real, 0);
 #if defined(WINDOWS)
     UnmapViewOfFile(ptr);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     ::munmap(ptr, sz);
 #endif
 
@@ -1329,7 +1377,7 @@ void CLocatorAPI::file_from_archive(CStreamReader*& R, pcstr fname, const file& 
     R = new CStreamReader();
 #if defined(WINDOWS)
     R->construct(A.hSrcMap, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     R->construct(A.hSrcFile, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
 #endif
 }
@@ -1541,7 +1589,7 @@ void CLocatorAPI::w_close(IWriter*& S)
             struct _stat st;
             _stat(fname, &st);
             Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
             struct stat st;
             ::stat(fname, &st);
             Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
@@ -1699,7 +1747,7 @@ int CLocatorAPI::file_length(pcstr src)
 
 bool CLocatorAPI::path_exist(pcstr path)
 {
-    return pathes.find(path) != pathes.end();
+    return m_paths.find(path) != m_paths.end();
 }
 
 FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool recursive)
@@ -1709,20 +1757,41 @@ FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool 
     FS_Path* P = new FS_Path(root, add, nullptr, nullptr, 0);
     bNoRecurse = !recursive;
     Recurse(P->m_Path);
-    pathes.insert(std::make_pair(xr_strdup(path_alias), P));
+    m_paths.insert(std::make_pair(xr_strdup(path_alias), P));
     return P;
 }
 
 FS_Path* CLocatorAPI::get_path(pcstr path)
 {
-    auto P = pathes.find(path);
-    R_ASSERT2(P != pathes.end(), path);
+    const auto P = m_paths.find(path);
+    R_ASSERT2(P != m_paths.end(), path);
     return P->second;
 }
 
-pcstr CLocatorAPI::update_path(string_path& dest, pcstr initial, pcstr src)
+bool CLocatorAPI::get_path(pcstr path, FS_Path** outPath)
 {
-    return get_path(initial)->_update(dest, src);
+    const auto P = m_paths.find(path);
+
+    if (P != m_paths.end())
+    {
+        if (outPath)
+            *outPath = P->second;
+        return true;
+    }
+
+    return false;
+}
+
+pcstr CLocatorAPI::update_path(string_path& dest, pcstr initial, pcstr src, bool crashOnNotFound /*= true*/)
+{
+    FS_Path* path;
+    if (!get_path(initial, &path))
+    {
+        R_ASSERT3(!crashOnNotFound, "Failed to find FS path", initial);
+        return nullptr;
+    }
+
+    return path->_update(dest, src);
 }
 /*
 void CLocatorAPI::update_path(xr_string& dest, pcstr initial, pcstr src)
@@ -1798,7 +1867,7 @@ void CLocatorAPI::rescan_path(pcstr full_path, bool bRecurse)
 void CLocatorAPI::rescan_pathes()
 {
     m_Flags.set(flNeedRescan, false);
-    for (const auto& it : pathes)
+    for (const auto& it : m_paths)
     {
         FS_Path* P = it.second;
         if (P->m_Flags.is(FS_Path::flNeedRescan))

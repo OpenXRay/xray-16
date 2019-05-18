@@ -9,7 +9,6 @@
 #include "edit_actions.h"
 #include "line_edit_control.h"
 #include "xr_input.h"
-#include "xrCore/Text/StringConversion.hpp"
 
 namespace text_editor
 {
@@ -57,46 +56,15 @@ void type_pair::init(int dik, char c, char c_shift, bool b_translate)
 
 void type_pair::on_key_press(line_edit_control* const control)
 {
-    char c = 0;
-    if (m_translate)
+    if (!m_translate)
     {
-        c = m_char;
-        char c_shift = m_char_shift;
-
-        SDL_Event event;
-        while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_TEXTINPUT, SDL_TEXTINPUT))
-        {
-            switch (event.type)
-            {
-            case SDL_TEXTINPUT:
-            {
-                static std::locale locale("");
-                auto str = StringFromUTF8(event.text.text, locale);
-
-                if (std::isalpha(str[0], locale) || str[0] == char(-1)) // "я" = -1
-                {
-                    c = std::tolower(str[0], locale);
-                    c_shift = std::toupper(str[0], locale);
-                }
-                break;
-            }
-            }
-        }
-
-        if (control->get_key_state(ks_Shift) != control->get_key_state(ks_CapsLock))
-        {
-            c = c_shift;
-        }
-    }
-    else
-    {
-        c = m_char;
+        char c = m_char;
         if (control->get_key_state(ks_Shift) != control->get_key_state(ks_CapsLock))
         {
             c = m_char_shift;
         }
+        control->insert_character(c);
     }
-    control->insert_character(c);
 }
 
 // -------------------------------------------------------------------------------------------------

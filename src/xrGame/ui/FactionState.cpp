@@ -23,21 +23,20 @@ FactionState::FactionState():
 	power(0.0f),
 	m_actor_goodwill(0)
 {
-	m_id._set         ( NULL );
-	m_name._set       ( NULL );
-	m_icon._set       ( NULL );
-	m_icon_big._set   ( NULL );
-	m_target._set     ( NULL );
-	m_target_desc._set( NULL );
-	m_location._set   ( NULL );
+	m_id._set         (nullptr);
+	m_name._set       (nullptr);
+	m_icon._set       (nullptr);
+	m_icon_big._set   (nullptr);
+	m_target._set     (nullptr);
+	m_target_desc._set(nullptr);
+	m_location._set   (nullptr);
 	
 	ResetStates();
 }
 
-FactionState::FactionState( shared_str const& id )
+FactionState::FactionState(shared_str const& id) : FactionState()
 {
-	FactionState();
-	set_faction_id2( id );
+    set_faction_id2(id);
 }
 
 FactionState::~FactionState()

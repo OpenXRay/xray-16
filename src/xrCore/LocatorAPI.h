@@ -14,7 +14,7 @@
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
-#if defined(LINUX)
+#if defined(LINUX) || defined(FREEBSD)
 #include <stdint.h>
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
@@ -101,7 +101,7 @@ public:
 #if defined(WINDOWS)
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
         int hSrcFile = 0;
 #endif
         CInifile* header = nullptr;
@@ -129,7 +129,7 @@ private:
     };
 
     using PathMap = xr_map<pcstr, FS_Path*, pred_str>;
-    PathMap pathes;
+    PathMap m_paths;
 
     using files_set = xr_set<file, file_pred>;
     using files_it = files_set::iterator;
@@ -244,8 +244,9 @@ public:
 
     bool path_exist(pcstr path);
     FS_Path* get_path(pcstr path);
+    bool get_path(pcstr path, FS_Path** outPath);
     FS_Path* append_path(pcstr path_alias, pcstr root, pcstr add, bool recursive);
-    pcstr update_path(string_path& dest, pcstr initial, pcstr src);
+    pcstr update_path(string_path& dest, pcstr initial, pcstr src, bool crashOnNotFound = true);
 
     int file_list(FS_FileSet& dest, pcstr path, u32 flags = FS_ListFiles, pcstr mask = nullptr);
 

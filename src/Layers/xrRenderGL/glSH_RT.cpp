@@ -6,7 +6,7 @@
 
 CRT::CRT()
 {
-    pRT = NULL;
+    pRT = 0;
     dwWidth = 0;
     dwHeight = 0;
     fmt = D3DFMT_UNKNOWN;
@@ -66,7 +66,7 @@ void CRT::destroy()
     if (pTexture._get())
     {
         pTexture->surface_set(target, 0);
-        pTexture = NULL;
+        pTexture = nullptr;
     }
     CHK_GL(glDeleteTextures(1, &pRT));
 }

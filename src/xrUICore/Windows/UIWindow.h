@@ -75,7 +75,7 @@ public:
         SetVisible(status);
         Enable(status);
     }
-    IC bool IsShown() { return GetVisible(); }
+    virtual bool IsShown() { return GetVisible(); }
     void ShowChildren(bool show);
 
     //абсолютные координаты
@@ -99,6 +99,19 @@ public:
     //для перевода окна и потомков в исходное состояние
     virtual void Reset();
     void ResetAll();
+
+    virtual void SetFont(CGameFont* pFont)
+    {
+        UNUSED(pFont);
+    }
+
+    virtual CGameFont* GetFont()
+    {
+        if (m_pParentWnd)
+            return m_pParentWnd->GetFont();
+
+        return nullptr;
+    }
 
     using WINDOW_LIST = ui_list<CUIWindow*>;
 
@@ -150,6 +163,7 @@ protected:
     //флаг автоматического удаления во время вызова деструктора
     bool m_bAutoDelete;
 
+    // Is user input allowed
     bool m_bIsEnabled;
 
     // Если курсор над окном

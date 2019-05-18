@@ -23,13 +23,16 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 
     bool m_initialized;
 
-	CUIFrameWindow*	m_background;
-	CUIFrameWindow*	m_center_background;
+    CUIFrameWindow* m_background;
+    CUIFrameWindow* m_center_background;
 
-	CUITextWnd*			m_target_static;
-	CUITextWnd*			m_target_caption;       // our
+	CUIFrameLineWnd* m_background2;
+	CUIStatic* m_center_background2;
+
+    CUIStatic* m_target_static;
+    CUIStatic* m_target_caption; // our
 	Fvector2			m_tc_pos;
-	CUITextWnd*			m_target_desc;
+    CUIStatic*			m_target_desc;
 	Fvector2			m_td_pos;
 	CUIStatic*			m_state_static;
 
@@ -42,7 +45,7 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 
 	CUIStatic*			m_our_icon;
 	CUIStatic*			m_our_icon_over;
-	CUITextWnd*			m_our_name;
+    CUIStatic*			m_our_name;
 	CUIStatic*			m_st_our_frac_info;
 	CUIStatic*			m_st_our_mem_count;
 	CUIStatic*			m_st_our_resource;
@@ -53,7 +56,7 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 
 	CUIStatic*			m_enemy_icon;
 	CUIStatic*			m_enemy_icon_over;
-	CUITextWnd*			m_enemy_name;
+    CUIStatic*			m_enemy_name;
 	CUIStatic*			m_st_enemy_frac_info;
 	CUIStatic*			m_st_enemy_mem_count;
 	CUIStatic*			m_st_enemy_resource;

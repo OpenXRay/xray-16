@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- xrCore -->
+  <Type Name="shared_str">
+    <DisplayString Condition="p_ == 0">""</DisplayString>
+    <DisplayString>{p_->value, s}</DisplayString>
+    <StringView>p_->value, s</StringView>
+  </Type>
+
+  <Type Name="resptr_base&lt;*&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>{p_->cName}</DisplayString>
+  </Type>
+  
+  <Type Name="CInifile">
+    <DisplayString>Ini: flags: SaveAtEnd: {!!(m_flags.flags &amp; eSaveAtEnd)} ReadOnly: {!!(m_flags.flags &amp; eReadOnly)} OverrideNames: {!!(m_flags.flags &amp; eOverrideNames)}</DisplayString>
+    <Expand>
+      <ExpandedItem>DATA</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="CInifile::Item">
+    <DisplayString>Key: {first, s} Value: {second, sb}</DisplayString>
+  </Type>
+
+  <Type Name="CInifile::Sect">
+    <DisplayString>{Name}</DisplayString>
+    <Expand>
+      <ExpandedItem>Data</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="FS_Path">
+    <DisplayString>{m_Path, s}</DisplayString>
+  </Type>
+
+  <Type Name="CLocatorAPI::file">
+    <DisplayString>{name, s}</DisplayString>
+  </Type>
+
+  <Type Name="CLocatorAPI::archive">
+    <DisplayString>{path, s}</DisplayString>
+  </Type>
+  <!-- /xrCore -->
+
+  <!-- xrEngine -->
+  <Type Name="CSheduler::Item">
+    <DisplayString>{scheduled_name}</DisplayString>
+    <StringView>scheduled_name</StringView>
+  </Type>
+
+  <Type Name="XRay::Sheduler::Item">
+    <DisplayString>{ScheduledName}</DisplayString>
+    <StringView>ScheduledName</StringView>
+  </Type>
+
+  <Type Name="MessageObject">
+    <DisplayString>{Object}</DisplayString>
+  </Type>
+  <!-- /xrEngine -->
+
+  <!-- xrGame -->
+  <Type Name="CAI_Stalker">
+    <DisplayString>{NameObject.p_->value, s}, $(Type)</DisplayString>
+  </Type>
+  <!-- /xrGame -->
+
+  <!-- xrRender -->
+  <Type Name="CRenderTarget">
+    <DisplayString>CRenderTarget: Size: {dwWidth}x{dwHeight}</DisplayString>
+  </Type>
+  
+  <Type Name="CRT">
+    <DisplayString>{cName}, Size: {dwWidth}x{dwHeight}, Format: {fmt}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;CRT&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>{p_->cName}, Size: {p_->dwWidth}x{p_->dwHeight}, FMT: {p_->fmt}</DisplayString>
+  </Type>
+  
+  <Type Name="CTexture">
+    <DisplayString>{cName}, Size: {m_width}x{m_height}, Format: {desc.Format}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;CTexture&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>{p_->cName}, Size: {p_->m_width}x{p_->m_height}, Format: {p_->desc.Format}</DisplayString>
+  </Type>
+
+  <Type Name="SPass">
+    <DisplayString>PS: {ps}, VS: {vs}, GS: {gs}, HS: {hs}, DS: {ds}, CS: {cs}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;SPass&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>PS: {p_->ps}, VS: {p_->vs}, GS: {p_->gs}, HS: {p_->hs}, DS: {p_->ds}, CS: {p_->cs}</DisplayString>
+  </Type>
+
+  <Type Name="ShaderElement::Sflags">
+    <DisplayString>Priority: {iPriority}, StrictB2F: {bStrictB2F}, Emissive: {bEmissive}, Distort: {bDistort}, Wallmark: {bWmark}</DisplayString>
+  </Type>
+  
+  <Type Name="ShaderElement">
+    <DisplayString>Passes: {passes.count}, Flags: {flags}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;ShaderElement&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>Passes: {p_->passes.count}, Flags: {p_->flags}</DisplayString>
+  </Type>
+
+  <Type Name="SDeclaration">
+    <DisplayString>DX10 Dcl: {dx10_dcl_code}, Dcl: {dcl_code}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;SDeclaration&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>DX10 Dcl: {p_->dx10_dcl_code}, Dcl: {p_->dcl_code}</DisplayString>
+  </Type>
+  
+  <Type Name="SGeometry">
+    <DisplayString>Stride: {vb_stride}, Dcl: {dcl}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;SGeometry&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>Stride: {p_->vb_stride}, Dcl: {p_->dcl}</DisplayString>
+  </Type>
+
+  <Type Name="Shader">
+    <DisplayString>{E}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;Shader&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>{p_->E}</DisplayString>
+  </Type>
+
+  <Type Name="R_constant">
+    <DisplayString>{name}, Type: {type}, Dest: {destination}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;R_constant&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>{p_->name}, Type: {p_->type}, Dest: {p_->destination}</DisplayString>
+  </Type>
+
+  <Type Name="R_constant_table">
+    <DisplayString>Table: {table}, CBTable: {m_CBTable}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;R_constant_table&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>Table: {p_->table}, CBTable: {p_->m_CBTable}</DisplayString>
+  </Type>
+
+  <Type Name="dx10ConstantBuffer">
+    <DisplayString>{cName}, {m_strBufferName}</DisplayString>
+  </Type>
+  <Type Name="resptr_base&lt;dx10ConstantBuffer&gt;">
+    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
+    <DisplayString>{p_->cName}, {p_->m_strBufferName}</DisplayString>
+  </Type>
+
+  <Type Name="CBlender_DESC">
+    <DisplayString>{cName}, CLS: {CLS}, Time: {cTime}, Version: {version}</DisplayString>
+  </Type>
+  
+  <Type Name="IBlender">
+    <DisplayString>Texture: {oT_Name}, XForm: {oT_xform}, Priority: {oPriority}</DisplayString>
+  </Type>
+  <Type Name="FactoryPtr&lt;*&gt;">
+    <DisplayString>{m_pObject}</DisplayString>
+  </Type>
+  <Type Name="dxUIShader">
+    <DisplayString>{hShader}</DisplayString>
+  </Type>
+  <!-- /xrRender -->
+</AutoVisualizer>

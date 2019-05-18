@@ -18,6 +18,7 @@ CUIBoosterInfo::CUIBoosterInfo()
     m_booster_satiety = NULL;
     m_booster_anabiotic = NULL;
     m_booster_time = NULL;
+    m_Prop_line = nullptr;
 }
 
 CUIBoosterInfo::~CUIBoosterInfo()
@@ -96,7 +97,7 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
         return;
     }
 
-    CEntityCondition::BOOSTER_MAP boosters = actor->conditions().GetCurBoosterInfluences();
+    //const auto& boosters = actor->conditions().GetCurBoosterInfluences();
 
     float val = 0.0f, max_val = 1.0f;
     Fvector2 pos;

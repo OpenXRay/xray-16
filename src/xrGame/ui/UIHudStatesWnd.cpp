@@ -578,7 +578,7 @@ void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType t
     protect += (helmet) ? helmet->GetDefHitTypeProtection(hit_type) : 0.0f;
     protect += actor->GetProtection_ArtefactsOnBelt(hit_type);
 
-    CEntityCondition::BOOSTER_MAP cur_booster_influences = actor->conditions().GetCurBoosterInfluences();
+    const auto& cur_booster_influences = actor->conditions().GetCurBoosterInfluences();
     CEntityCondition::BOOSTER_MAP::const_iterator it;
     if (hit_type == ALife::eHitTypeChemicalBurn)
     {
@@ -723,7 +723,7 @@ void CUIHudStatesWnd::FakeUpdateIndicatorType(u8 t, float power)
     protect += (helmet) ? helmet->GetDefHitTypeProtection(hit_type) : 0.0f;
     protect += actor->GetProtection_ArtefactsOnBelt(hit_type);
 
-    CEntityCondition::BOOSTER_MAP cur_booster_influences = actor->conditions().GetCurBoosterInfluences();
+    const auto& cur_booster_influences = actor->conditions().GetCurBoosterInfluences();
     CEntityCondition::BOOSTER_MAP::const_iterator it;
     if (hit_type == ALife::eHitTypeChemicalBurn)
     {

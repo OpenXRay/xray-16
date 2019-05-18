@@ -126,7 +126,6 @@ public:
     virtual void PHFreeze() { return inherited::PHFreeze(); }
     virtual BOOL UsedAI_Locations() { return inherited::UsedAI_Locations(); }
     virtual const SRotation Orientation() const { return inherited::Orientation(); }
-    virtual void renderable_Render() { return inherited::renderable_Render(); }
     virtual void on_restrictions_change();
 
     virtual void SetAttackEffector();

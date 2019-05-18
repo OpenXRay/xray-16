@@ -12,3 +12,18 @@ sun_dir_azimuth = 0.0
 ; Note, that the player can turn on firsteye himself
 ; if you set freelook or fixedlook
 actor_death_camera = freelook
+
+[lua_scripting]
+; This will allow you to skip errors
+; related to wrong arguments passed
+; to functions.
+; WARNING. This may lead to
+; undefined behavior, random crashes
+; and saves corruption
+allow_nil_conversion = false
+
+[compatibility]
+; Compatibility with previous games
+; cop, cs, shoc or soc and unlock
+; unlock is cop with disabled restrictions
+game_mode = cop

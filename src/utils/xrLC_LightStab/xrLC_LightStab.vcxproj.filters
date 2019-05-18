@@ -6,4 +6,7 @@
   <ItemGroup>
     <ClInclude Include="xrLC_LightStab.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

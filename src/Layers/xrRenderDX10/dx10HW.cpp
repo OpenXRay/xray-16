@@ -77,11 +77,10 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     Caps.id_vendor = Desc.VendorId;
     Caps.id_device = Desc.DeviceId;
 
-#if 0 // def DEBUG
-    UINT createDeviceFlags = D3D_CREATE_DEVICE_DEBUG;
-#else
     UINT createDeviceFlags = 0;
-#endif
+
+    if (IsDebuggerPresent())
+        createDeviceFlags |= D3D_CREATE_DEVICE_DEBUG;
 
     HRESULT R;
 

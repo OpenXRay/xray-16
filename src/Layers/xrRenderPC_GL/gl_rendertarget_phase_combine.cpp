@@ -14,7 +14,7 @@ void CRenderTarget::DoAsyncScreenshot()
         HRESULT hr;
 
         //	HACK: unbind RT. CopyResourcess needs src and targetr to be unbound.
-        //u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB);
+        //u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,nullptr,nullptr,HW.pBaseZB);
 
         //ID3DTexture2D *pTex = 0;
         //if (RImplementation.o.dx10_msaa)
@@ -86,13 +86,13 @@ void CRenderTarget::phase_combine()
     {
         HW.pDevice->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
         HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
-        u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
+        u_setrt(rt_Generic_0, rt_Generic_1, nullptr, HW.pBaseZB);
     }
     else
     {
         HW.pDevice->ClearRenderTargetView(rt_Generic_0_r->pRT, ColorRGBA);
         HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
-        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+        u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
     }
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(FALSE);
@@ -241,7 +241,6 @@ void CRenderTarget::phase_combine()
 
         // Draw
         RCache.set_Element(s_combine->E[0]);
-        //RCache.set_Geometry			(g_combine_VP		);
         RCache.set_Geometry(g_combine);
 
         RCache.set_c("m_v2w", m_v2w);
@@ -280,9 +279,9 @@ void CRenderTarget::phase_combine()
     {
         PIX_EVENT(Forward_rendering);
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
+            u_setrt(rt_Generic_0, nullptr, nullptr, HW.pBaseZB); // LDR RT
         else
-            u_setrt(rt_Generic_0_r, 0, 0, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
+            u_setrt(rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
@@ -319,9 +318,6 @@ void CRenderTarget::phase_combine()
     // for msaa we need a resolved color buffer - Holger
     phase_bloom(); // HDR RT invalidated here
 
-    //RImplementation.rmNormal();
-    //u_setrt(rt_Generic_1,0,0,HW.pBaseZB);
-
     // Distortion filter
     BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
     {
@@ -345,7 +341,7 @@ void CRenderTarget::phase_combine()
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
-            //CHK_DX(HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET, color_rgba(127,127,0,127), 1.0f, 0L));
+            //CHK_DX(HW.pDevice->Clear	( 0L, nullptr, D3DCLEAR_TARGET, color_rgba(127,127,0,127), 1.0f, 0L));
             RImplementation.r_dsgraph_render_distort();
             if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
         }
@@ -626,9 +622,9 @@ void CRenderTarget::phase_wallmarks()
     RCache.set_RT(0, 2);
     RCache.set_RT(0, 1);
     if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Color,NULL,NULL, HW.pBaseZB);
+        u_setrt(rt_Color, nullptr, nullptr, HW.pBaseZB);
     else
-        u_setrt(rt_Color,NULL,NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Color, nullptr, nullptr, rt_MSAADepth->pZRT);
     // Stencil	- draw only where stencil >= 0x1
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
     RCache.set_CullMode(CULL_CCW);
@@ -645,9 +641,9 @@ void CRenderTarget::phase_combine_volumetric()
 
     //u_setrt(rt_Generic_0,0,0,HW.pBaseZB );			// LDR RT
     if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
+        u_setrt(rt_Generic_0, rt_Generic_1, nullptr, HW.pBaseZB);
     else
-        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+        u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
     //	Sets limits to both render targets
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
     {

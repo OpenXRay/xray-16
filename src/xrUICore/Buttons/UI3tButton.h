@@ -14,7 +14,7 @@ public:
     // appearance
 
     virtual void InitButton(Fvector2 pos, Fvector2 size);
-    virtual void InitTexture(LPCSTR tex_name);
+    virtual bool InitTexture(pcstr texture, bool fatal = true);
     virtual void InitTexture(LPCSTR tex_enabled, LPCSTR tex_disabled, LPCSTR tex_touched, LPCSTR tex_highlighted);
 
     //.			void 	SetTextColor				(u32 color);

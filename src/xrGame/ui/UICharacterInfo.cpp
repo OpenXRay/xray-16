@@ -51,15 +51,15 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
     Init_IconInfoItem(*xml_doc, "icon", eIcon);
     Init_IconInfoItem(*xml_doc, "icon_over", eIconOver);
 
-    /*	Init_IconInfoItem( *xml_doc, "rank_icon",           eRankIcon     );
-        Init_IconInfoItem( *xml_doc, "rank_icon_over",      eRankIconOver );
+    Init_IconInfoItem(*xml_doc, "rank_icon", eRankIcon);
+    Init_IconInfoItem(*xml_doc, "rank_icon_over", eRankIconOver);
 
-        Init_IconInfoItem( *xml_doc, "commumity_icon",      eCommunityIcon     );
-        Init_IconInfoItem( *xml_doc, "commumity_icon_over", eCommunityIconOver );
+    Init_IconInfoItem(*xml_doc, "commumity_icon", eCommunityIcon);
+    Init_IconInfoItem(*xml_doc, "commumity_icon_over", eCommunityIconOver);
 
-        Init_IconInfoItem( *xml_doc, "commumity_big_icon",      eCommunityBigIcon     );
-        Init_IconInfoItem( *xml_doc, "commumity_big_icon_over", eCommunityBigIconOver );
-    */
+    Init_IconInfoItem(*xml_doc, "commumity_big_icon", eCommunityBigIcon);
+    Init_IconInfoItem(*xml_doc, "commumity_big_icon_over", eCommunityBigIconOver);
+
     VERIFY(m_icons[eIcon]);
     m_deadbody_color = color_argb(160, 160, 160, 160);
     if (xml_doc->NavigateToNode("icon:deadbody", 0))
@@ -203,38 +203,45 @@ void CUICharacterInfo::InitCharacter(u16 id)
     {
         m_icons[eIcon]->InitTexture(m_texture_name.c_str());
     }
-    //	if ( m_icons[eRankIcon        ] ) { m_icons[eRankIcon        ]->InitTexture( chInfo.Rank().id().c_str() ); }
+    if (m_icons[eRankIcon])
+        m_icons[eRankIcon]->InitTexture(chInfo.Rank().id().c_str());
 
-    /*
-        if ( Actor()->ID() != m_ownerID && !ignore_community( comm_id ) )
+    if (Actor()->ID() != m_ownerID && !ignore_community(comm_id))
+    {
+        if (m_icons[eCommunityIcon])
+            m_icons[eCommunityIcon]->InitTexture(community1);
+        if (m_icons[eCommunityBigIcon])
+            m_icons[eCommunityBigIcon]->InitTexture(community2);
+        return;
+    }
+
+    shared_str our_comm, enemy;
+    if (CUICharacterInfo::get_actor_community(&our_comm, &enemy))
+    {
+        if (xr_strcmp(our_comm, "actor")) // !=
         {
-            if ( m_icons[eCommunityIcon   ] ) { m_icons[eCommunityIcon   ]->InitTexture( community1 ); }
-            if ( m_icons[eCommunityBigIcon] ) { m_icons[eCommunityBigIcon]->InitTexture( community2 ); }
+            xr_strcpy(community1, sizeof(community1), our_comm.c_str());
+            xr_strcat(community1, sizeof(community1), "_icon");
+
+            xr_strcpy(community2, sizeof(community2), our_comm.c_str());
+            xr_strcat(community2, sizeof(community2), "_wide");
+
+            if (m_icons[eCommunityIcon])
+                m_icons[eCommunityIcon]->InitTexture(community1);
+            if (m_icons[eCommunityBigIcon])
+                m_icons[eCommunityBigIcon]->InitTexture(community2);
             return;
         }
+    }
 
-        shared_str our_comm, enemy;
-        if ( CUICharacterInfo::get_actor_community( &our_comm, &enemy ) )
-        {
-            if ( xr_strcmp( our_comm, "actor" ) ) // !=
-            {
-                xr_strcpy( community1, sizeof(community1), our_comm.c_str() );
-                xr_strcat( community1, sizeof(community1), "_icon" );
-
-                xr_strcpy( community2, sizeof(community2), our_comm.c_str() );
-                xr_strcat( community2, sizeof(community2), "_wide" );
-
-                if ( m_icons[eCommunityIcon   ] ) { m_icons[eCommunityIcon   ]->InitTexture( community1 ); }
-                if ( m_icons[eCommunityBigIcon] ) { m_icons[eCommunityBigIcon]->InitTexture( community2 ); }
-                return;
-            }
-        }
-
-        if ( m_icons[eCommunityIcon   ]     ) { m_icons[eCommunityIcon]->Show( false ); }
-        if ( m_icons[eCommunityBigIcon]     ) { m_icons[eCommunityBigIcon]->Show( false ); }
-        if ( m_icons[eCommunityIconOver   ] ) { m_icons[eCommunityIconOver]->Show( false ); }
-        if ( m_icons[eCommunityBigIconOver] ) { m_icons[eCommunityBigIconOver]->Show( false ); }
-    */
+    if (m_icons[eCommunityIcon])
+        m_icons[eCommunityIcon]->Show(false);
+    if (m_icons[eCommunityBigIcon])
+        m_icons[eCommunityBigIcon]->Show(false);
+    if (m_icons[eCommunityIconOver])
+        m_icons[eCommunityIconOver]->Show(false);
+    if (m_icons[eCommunityBigIconOver])
+        m_icons[eCommunityBigIconOver]->Show(false);
 }
 
 void CUICharacterInfo::InitCharacterMP(LPCSTR player_name, LPCSTR player_icon)
@@ -360,19 +367,19 @@ void CUICharacterInfo::ClearInfo()
 // ------- static ---------
 bool CUICharacterInfo::get_actor_community(shared_str* our, shared_str* enemy)
 {
-    VERIFY(our && enemy);
-    our->_set(NULL);
-    enemy->_set(NULL);
-    shared_str const& actor_team = Actor()->CharacterInfo().Community().id();
+    our->_set(nullptr);
+    enemy->_set(nullptr);
 
-    LPCSTR vs_teams = pSettings->r_string("actor_communities", actor_team.c_str());
-    if (_GetItemCount(vs_teams) != 2)
+    const auto& actor_team = Actor()->CharacterInfo().Community().id();
+
+    pcstr vs_teams = READ_IF_EXISTS(pSettings, r_string, "actor_communities", actor_team.c_str(), nullptr);
+    if (!vs_teams || _GetItemCount(vs_teams) != 2)
     {
         return false;
     }
-    u32 size_temp = (xr_strlen(vs_teams) + 1) * sizeof(char);
-    PSTR our_fract = (PSTR)_alloca(size_temp);
-    PSTR enemy_fract = (PSTR)_alloca(size_temp);
+    const size_t size_temp = (xr_strlen(vs_teams) + 1) * sizeof(char);
+    pstr our_fract = (pstr)_alloca(size_temp);
+    pstr enemy_fract = (pstr)_alloca(size_temp);
     _GetItem(vs_teams, 0, our_fract, size_temp);
     _GetItem(vs_teams, 1, enemy_fract, size_temp);
 
@@ -380,6 +387,7 @@ bool CUICharacterInfo::get_actor_community(shared_str* our, shared_str* enemy)
     {
         return false;
     }
+
     our->_set(our_fract);
     enemy->_set(enemy_fract);
     return true;
@@ -387,8 +395,9 @@ bool CUICharacterInfo::get_actor_community(shared_str* our, shared_str* enemy)
 
 bool CUICharacterInfo::ignore_community(shared_str const& check_community)
 {
-    LPCSTR comm_section_str = "ignore_icons_communities";
-    VERIFY2(pSettings->section_exist(comm_section_str), make_string("Section [%s] does not exist !", comm_section_str));
+    pcstr comm_section_str = "ignore_icons_communities";
+    if (!pSettings->section_exist(comm_section_str))
+        return false;
 
     CInifile::Sect& faction_section = pSettings->r_section(comm_section_str);
     auto ib = faction_section.Data.begin();

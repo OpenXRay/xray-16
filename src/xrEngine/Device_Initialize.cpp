@@ -45,15 +45,13 @@ void CRenderDevice::Initialize()
 
     if (!m_sdlWnd)
     {
-        const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
-            SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
+        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
+            SDL_WINDOW_RESIZABLE;
 
-  
-#if !defined(LINUX)
-        // xxx: need to fix getting rsRGL flag, it doesn't work now
-        if (strstr(Core.Params, "-gl") || psDeviceFlags.test(rsRGL))
-#endif
+        if (psDeviceFlags.test(rsRGL))
         {
+            flags |= SDL_WINDOW_OPENGL;
+
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -66,7 +64,7 @@ void CRenderDevice::Initialize()
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
-        xrDebug::SetApplicationWindow(m_sdlWnd);
+        xrDebug::SetWindowHandler(this);
     }
 }
 
@@ -79,20 +77,26 @@ void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
         alert->Print(font, "FPS       < 30:   %3.1f", stats.fFPS);
 }
 
-SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* area, void* /*data*/)
+SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, void* /*data*/)
 {
-    if (pInput->InputIsGrabbed())
+    if (!Device.AllowWindowDrag)
         return SDL_HITTEST_NORMAL;
 
+    SDL_Point area = *pArea; // copy
     const auto& rect = Device.m_rcWindowClient;
 
     // size of additional interactive area (in pixels)
     constexpr int hit = 15;
+    constexpr int fix = 65535; // u32(-1)
 
-    const bool leftSide = area->x <= rect.x + hit;
-    const bool topSide = area->y <= rect.y + hit;
-    const bool bottomSide = area->y >= rect.h - hit;
-    const bool rightSide = area->x >= rect.w - hit;
+    // Workaround for SDL bug 
+    if (area.x + hit >= fix && rect.w <= fix - hit)
+        area.x -= fix;
+
+    const bool leftSide = area.x <= rect.x + hit;
+    const bool topSide = area.y <= rect.y + hit;
+    const bool bottomSide = area.y >= rect.h - hit;
+    const bool rightSide = area.x >= rect.w - hit;
 
     if (leftSide && topSide)
         return SDL_HITTEST_RESIZE_TOPLEFT;

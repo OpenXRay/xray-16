@@ -62,16 +62,15 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
 
     string512 pth;
-    CUIXmlInit xml_init;
     strconcat(sizeof(pth), pth, start_from, ":main_wnd");
-    xml_init.InitWindow(uiXml, pth, 0, this);
+    CUIXmlInit::InitWindow(uiXml, pth, 0, this);
 
     m_map_move_step = uiXml.ReadAttribFlt(start_from, 0, "map_move_step", 10.0f);
 
     m_UILevelFrame = new CUIWindow();
     m_UILevelFrame->SetAutoDelete(true);
     strconcat(sizeof(pth), pth, start_from, ":level_frame");
-    xml_init.InitWindow(uiXml, pth, 0, m_UILevelFrame);
+    CUIXmlInit::InitWindow(uiXml, pth, 0, m_UILevelFrame);
     //	m_UIMainFrame->AttachChild		(m_UILevelFrame);
     AttachChild(m_UILevelFrame);
 
@@ -79,7 +78,7 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     m_UIMainFrame->SetAutoDelete(true);
     AttachChild(m_UIMainFrame);
     strconcat(sizeof(pth), pth, start_from, ":main_map_frame");
-    xml_init.InitFrameWindow(uiXml, pth, 0, m_UIMainFrame);
+    CUIXmlInit::InitFrameWindow(uiXml, pth, 0, m_UIMainFrame);
 
     m_scroll_mode = (uiXml.ReadAttribInt(start_from, 0, "scroll_enable", 0) == 1) ? true : false;
     if (m_scroll_mode)

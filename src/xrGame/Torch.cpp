@@ -456,7 +456,7 @@ void CTorch::afterDetach()
     inherited::afterDetach();
     Switch(false);
 }
-void CTorch::renderable_Render() { inherited::renderable_Render(); }
+
 void CTorch::enable(bool value)
 {
     inherited::enable(value);

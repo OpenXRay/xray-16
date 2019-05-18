@@ -422,6 +422,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
+        Device.AllowWindowDrag = true;
 #if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 0.9f);
 #endif
@@ -445,6 +446,7 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
+        Device.AllowWindowDrag = false;
 #if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 1.f);
 #endif
@@ -468,6 +470,22 @@ void CMainMenu::IR_OnMouseWheel(int x, int y)
         return;
 
     CDialogHolder::IR_UIOnMouseWheel(x, y);
+}
+
+void CMainMenu::IR_OnControllerPress(int btn)
+{
+    if (!IsActive())
+        return;
+
+    IR_OnKeyboardPress(ControllerButtonToKey[btn]);
+}
+
+void CMainMenu::IR_OnControllerRelease(int btn)
+{
+    if (!IsActive())
+        return;
+
+    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }

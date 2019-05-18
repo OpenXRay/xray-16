@@ -241,6 +241,7 @@
     <ClInclude Include="line_editor.h" />
     <ClInclude Include="line_edit_control.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MonitorManager.hpp" />
     <ClInclude Include="mp_logging.h" />
     <ClInclude Include="ObjectAnimator.h" />
     <ClInclude Include="ObjectDump.h" />
@@ -265,6 +266,7 @@
     <ClInclude Include="std_classes.h" />
     <ClInclude Include="StringTable\IStringTable.h" />
     <ClInclude Include="StringTable\IStringTableDefs.h" />
+    <ClInclude Include="TaskScheduler.hpp" />
     <ClInclude Include="Text_Console.h" />
     <ClInclude Include="thunderbolt.h" />
     <ClInclude Include="tntQAVI.h" />
@@ -358,6 +360,7 @@
     <ClCompile Include="line_editor.cpp" />
     <ClCompile Include="line_edit_control.cpp" />
     <ClCompile Include="mailSlot.cpp" />
+    <ClCompile Include="MonitorManager.cpp" />
     <ClCompile Include="ObjectAnimator.cpp" />
     <ClCompile Include="ObjectDump.cpp" />
     <ClCompile Include="PerformanceAlert.cpp" />
@@ -376,6 +379,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StringTable\IStringTable.cpp" />
+    <ClCompile Include="TaskScheduler.cpp" />
     <ClCompile Include="Text_Console.cpp" />
     <ClCompile Include="Text_Console_WndProc.cpp" />
     <ClCompile Include="thunderbolt.cpp" />
@@ -452,6 +456,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

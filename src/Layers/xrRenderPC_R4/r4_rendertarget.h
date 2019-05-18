@@ -343,16 +343,16 @@ public:
     void DoAsyncScreenshot();
 
 #ifdef DEBUG
-    IC void dbg_addline(Fvector& P0, Fvector& P1, u32 c)
+    void dbg_addline(Fvector& P0, Fvector& P1, u32 c)
     {
         dbg_lines.push_back(dbg_line_t());
         dbg_lines.back().P0 = P0;
         dbg_lines.back().P1 = P1;
         dbg_lines.back().color = c;
     }
-    IC void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.push_back(P0); }
+    void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.push_back(P0); }
 #else
-    IC void dbg_addline(Fvector& P0, Fvector& P1, u32 c) {}
-    IC void dbg_addplane(Fplane& P0, u32 c) {}
+    void dbg_addline(Fvector& /*P0*/, Fvector& /*P1*/, u32 /*c*/) {}
+    void dbg_addplane(Fplane& /*P0*/, u32 /*c*/) {}
 #endif
 };

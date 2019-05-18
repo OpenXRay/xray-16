@@ -141,7 +141,7 @@ public:
 
 private:
     static void print_error(lua_State* L, int iErrorCode);
-    static void onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err = nullptr);
+    static bool onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err = nullptr);
 
 public:
     static void on_error(lua_State* state);

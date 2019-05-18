@@ -39,7 +39,7 @@ ObjectFactory::ServerObjectBaseClass* CObjectItemScript::server_object(LPCSTR se
     {
         object = m_server_creator(section);
     }
-    catch (std::exception e)
+    catch (const std::exception& e)
     {
         Msg("Exception [%s] raised while creating server object from section [%s]", e.what(), section);
         return (nullptr);

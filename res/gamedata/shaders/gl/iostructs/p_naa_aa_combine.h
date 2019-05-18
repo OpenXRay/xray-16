@@ -1,6 +1,8 @@
 
 out vec4 SV_Target;
+#ifdef GBUFFER_OPTIMIZATION
 in vec4 gl_FragCoord;
+#endif // GBUFFER_OPTIMIZATION
 #ifdef USE_MSAA
 out float gl_FragDepth;
 #endif
@@ -26,7 +28,9 @@ c2_out _main ( v2p_aa_AA I );
 void main()
 {
 	v2p_aa_AA	I;
+#ifdef GBUFFER_OPTIMIZATION
 	I.HPos		= gl_FragCoord;
+#endif // GBUFFER_OPTIMIZATION
 	I.Tex0		= p_aa_AA_Tex0;
 	I.Tex1		= p_aa_AA_Tex1;
 	I.Tex2		= p_aa_AA_Tex2;

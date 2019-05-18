@@ -26,9 +26,7 @@ void CUIMotionIcon::Init(Frect const& zonemap_rect)
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MOTION_ICON_XML);
 
-    CUIXmlInit xml_init;
-
-    xml_init.InitWindow(uiXml, "window", 0, this);
+    CUIXmlInit::InitWindow(uiXml, "window", 0, this);
     float rel_sz = uiXml.ReadAttribFlt("window", 0, "rel_size", 1.0f);
     Fvector2 sz;
     Fvector2 pos;
@@ -44,12 +42,12 @@ void CUIMotionIcon::Init(Frect const& zonemap_rect)
     // float h = Device.dwHeight;
     // float w = Device.dwWidth;
     AttachChild(&m_luminosity_progress);
-    xml_init.InitProgressShape(uiXml, "luminosity_progress", 0, &m_luminosity_progress);
+    CUIXmlInit::InitProgressShape(uiXml, "luminosity_progress", 0, &m_luminosity_progress);
     m_luminosity_progress.SetWndSize(sz);
     m_luminosity_progress.SetWndPos(pos);
 
     AttachChild(&m_noise_progress);
-    xml_init.InitProgressShape(uiXml, "noise_progress", 0, &m_noise_progress);
+    CUIXmlInit::InitProgressShape(uiXml, "noise_progress", 0, &m_noise_progress);
     m_noise_progress.SetWndSize(sz);
     m_noise_progress.SetWndPos(pos);
 }

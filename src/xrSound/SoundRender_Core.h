@@ -138,7 +138,7 @@ public:
     void object_relcase(IGameObject* obj) override;
 
     float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
-    float get_occlusion(Fvector& P, float R, Fvector* occ);
+    float get_occlusion(Fvector& P, float R, Fvector* occ) override;
     CSoundRender_Environment* get_environment(const Fvector& P);
 
     void env_load();

@@ -22,13 +22,6 @@
 #include "string_table.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "autosave_manager.h"
-//Alundaio
-#ifdef ENGINE_LUA_ALIFE_STORAGE_MANAGER_CALLBACKS
-#include "pch_script.h"
-#include "xrScriptEngine/script_engine.hpp" 
-#endif
-//-Alundaio
-
 XRCORE_API string_path g_bug_report_file;
 
 using namespace ALife;
@@ -96,30 +89,12 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
     Msg("* Game %s is successfully saved to file '%s'", m_save_name, temp);
 #endif // DEBUG
 
-    //Alundaio: To get the savegame fname to make our own custom save states
-#ifdef ENGINE_LUA_ALIFE_STORAGE_MANAGER_CALLBACKS
-    luabind::functor<void> funct;
-    GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_save", funct);
-    if (funct)
-        funct(static_cast<pcstr>(m_save_name));
-#endif
-    //-Alundaio
-
     if (!update_name)
         xr_strcpy(m_save_name, save);
 }
 
 void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR file_name)
 {
-    //Alundaio: So we can get the fname to make our own custom save states
-#ifdef ENGINE_LUA_ALIFE_STORAGE_MANAGER_CALLBACKS
-    luabind::functor<void> funct;
-    GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_load", funct);
-    if (funct)
-        funct(file_name);
-#endif // _DEBUG
-    //-Alundaio
-
     IReader source(buffer, buffer_size);
     header().load(source);
     time_manager().load(source);
@@ -193,7 +168,7 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
     string512 temp;
     strconcat(sizeof(temp), temp, StringTable().translate("st_loading_saved_game").c_str(),
-        "\"", save_name,SAVE_EXTENSION, "\"");
+        " \"", save_name,SAVE_EXTENSION, "\"");
 
     g_pGamePersistent->SetLoadStageTitle(temp);
     g_pGamePersistent->LoadTitle();
@@ -201,7 +176,7 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
     unload();
     reload(m_section);
 
-    u32 source_count = stream->r_u32();
+    const u32 source_count = stream->r_u32();
     void* source_data = xr_malloc(source_count);
     rtc_decompress(source_data, source_count, stream->pointer(), stream->length() - 3 * sizeof(u32));
     FS.r_close(stream);

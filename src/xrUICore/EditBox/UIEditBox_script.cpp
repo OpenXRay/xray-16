@@ -16,5 +16,6 @@ SCRIPT_EXPORT(CUIEditBox, (CUIWindow), {
         class_<CUIEditBox, CUICustomEdit>("CUIEditBox")
             .def(constructor<>())
             .def("InitTexture", &CUIEditBox::InitTexture)
+            .def("InitTexture", +[](CUIEditBox* self, pcstr texture) { self->InitTexture(texture); })
     ];
 });

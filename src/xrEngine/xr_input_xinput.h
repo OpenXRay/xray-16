@@ -12,6 +12,7 @@ enum EGameActions
     kDOWN,
     kJUMP,
     kCROUCH,
+    kCROUCH_TOGGLE,
     kACCEL,
     kSPRINT_TOGGLE,
 
@@ -23,11 +24,15 @@ enum EGameActions
     kL_LOOKOUT,
     kR_LOOKOUT,
 
+    kENGINE,
+
     kCAM_1,
     kCAM_2,
     kCAM_3,
+    kCAM_4,
     kCAM_ZOOM_IN,
     kCAM_ZOOM_OUT,
+    kCAM_AUTOAIM,
 
     kTORCH,
     kNIGHT_VISION,
@@ -63,6 +68,9 @@ enum EGameActions
     kSKIN,
     kTEAM,
     kACTIVE_JOBS,
+    kMAP,
+    kCONTACTS,
+    kEXT_1,
 
     kVOTE_BEGIN,
     kSHOW_ADMIN_MENU,
@@ -75,6 +83,17 @@ enum EGameActions
 
     kSPEECH_MENU_0,
     kSPEECH_MENU_1,
+    kSPEECH_MENU_2,
+    kSPEECH_MENU_3,
+    kSPEECH_MENU_4,
+    kSPEECH_MENU_5,
+    kSPEECH_MENU_6,
+    kSPEECH_MENU_7,
+    kSPEECH_MENU_8,
+    kSPEECH_MENU_9,
+
+    kUSE_BANDAGE,
+    kUSE_MEDKIT,
 
     kQUICK_USE_1,
     kQUICK_USE_2,
@@ -100,8 +119,6 @@ enum EGameActions
     kCUSTOM13,
     kCUSTOM14,
     kCUSTOM15,
-
-    kCAM_AUTOAIM,
 
     kPDA_TAB1,
     kPDA_TAB2,

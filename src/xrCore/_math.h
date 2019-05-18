@@ -22,6 +22,7 @@ XRCORE_API extern processor_info ID;
 XRCORE_API extern u64 QPC() noexcept;
 
 XRCORE_API u64 GetCLK();
+XRCORE_API u32 GetCurrentCPU();
 }
 
 extern XRCORE_API void _initialize_cpu();

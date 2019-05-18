@@ -23,7 +23,7 @@ void CRender::level_Load(IReader* fs)
 
     // Begin
     pApp->LoadBegin();
-    RImplementation.Resources->DeferredLoad(TRUE);
+    Resources->DeferredLoad(TRUE);
     IReader* chunk;
 
     // Shaders
@@ -45,7 +45,7 @@ void CRender::level_Load(IReader* fs)
             LPSTR delim = strchr(n_sh, '/');
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
-            Shaders[i] = RImplementation.Resources->Create(n_sh, n_tlist);
+            Shaders[i] = Resources->Create(n_sh, n_tlist);
         }
         chunk->close();
     }
@@ -163,15 +163,28 @@ void CRender::level_Unload()
 
     //*** VB/IB
     for (I = 0; I < nVB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_vb(nVB[I]);
         _RELEASE(nVB[I]);
+    }
     for (I = 0; I < xVB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_vb(xVB[I]);
         _RELEASE(xVB[I]);
+    }
     nVB.clear();
     xVB.clear();
+
     for (I = 0; I < nIB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_ib(nIB[I]);
         _RELEASE(nIB[I]);
+    }
     for (I = 0; I < xIB.size(); I++)
+    {
+        HW.stats_manager.decrement_stats_ib(xIB[I]);
         _RELEASE(xIB[I]);
+    }
     nIB.clear();
     xIB.clear();
     nDC.clear();
@@ -189,7 +202,7 @@ void CRender::level_Unload()
 void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 {
     R_ASSERT2(base_fs, "Could not load geometry. File not found.");
-    RImplementation.Resources->Evict();
+    Resources->Evict();
     //	u32	dwUsage					= D3DUSAGE_WRITEONLY;
 
     xr_vector<VertexDeclarator>& _DC  = alternative ? xDC : nDC;
@@ -234,6 +247,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             BYTE* pData = xr_alloc<BYTE>(vCount * vSize);
             fs->r(pData, vCount * vSize);
             dx10BufferUtils::CreateVertexBuffer(&_VB[i], pData, vCount * vSize);
+            HW.stats_manager.increment_stats_vb(_VB[i]);
             xr_free(pData);
 
             //			fs->advance			(vCount*vSize);
@@ -265,6 +279,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             BYTE* pData = xr_alloc<BYTE>(iCount * 2);
             fs->r(pData, iCount * 2);
             dx10BufferUtils::CreateIndexBuffer(&_IB[i], pData, iCount * 2);
+            HW.stats_manager.increment_stats_ib(_IB[i]);
             xr_free(pData);
 
             //			fs().advance		(iCount*2);
@@ -408,7 +423,7 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
 void CRender::Load3DFluid()
 {
     // if (strstr(Core.Params,"-no_volumetric_fog"))
-    if (!RImplementation.o.volumetricfog)
+    if (!o.volumetricfog)
         return;
 
     string_path fn_game;

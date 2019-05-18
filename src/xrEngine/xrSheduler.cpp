@@ -53,7 +53,7 @@ void CSheduler::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     stats.FrameEnd();
     const float percentage = 100.f * stats.Update.result / Device.GetStats().EngineTotal.result;
-    font.OutNext("Scheduler:");
+    font.OutNext("Object Scheduler:");
     font.OutNext("- update:     %2.2fms, %2.1f%%", stats.Update.result, percentage);
     font.OutNext("- load:       %2.2fms", stats.Load);
     if (alert && stats.Update.result > 3.0f)
@@ -511,7 +511,7 @@ void Scheduler::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     stats.FrameEnd();
     const float percentage = 100.f * stats.Update.result / Device.GetStats().EngineTotal.result;
-    font.OutNext("SchedulerMT:");
+    font.OutNext("Object Scheduler MT:");
     font.OutNext("- update:     %2.2fms, %2.1f%%", stats.Update.result, percentage);
     font.OutNext("- load:       %2.2fms", stats.Load);
     if (alert && stats.Update.result > 3.0f)

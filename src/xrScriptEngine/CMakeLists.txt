@@ -10,7 +10,6 @@ add_dir("${DIRS}")
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
     ${SDL_INCLUDE_DIRS}
     )
 

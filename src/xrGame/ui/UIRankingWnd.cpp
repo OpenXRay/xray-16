@@ -78,15 +78,18 @@ void CUIRankingWnd::Init()
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);
     m_delay = (u32)xml.ReadAttribInt("main_wnd", 0, "delay", 3000);
 
-    m_background = UIHelper::CreateFrameWindow(xml, "background", this);
-    m_down_background = UIHelper::CreateFrameWindow(xml, "down_background", this);
+    m_background = UIHelper::CreateFrameWindow(xml, "background", this, false);
+    if (!m_background)
+        m_background2 = UIHelper::CreateFrameLine(xml, "background", this, false);
+    m_center_background = UIHelper::CreateStatic(xml, "center_background", this, false);
+    m_down_background = UIHelper::CreateFrameWindow(xml, "down_background", this, false);
 
     m_actor_ch_info = new CUICharacterInfo();
     m_actor_ch_info->SetAutoDelete(true);
     AttachChild(m_actor_ch_info);
     m_actor_ch_info->InitCharacterInfo(&xml, "actor_ch_info");
 
-    m_icon_overlay = UIHelper::CreateFrameWindow(xml, "actor_icon_over", this);
+    m_icon_overlay = UIHelper::CreateFrameWindow(xml, "actor_icon_over", this, false);
     m_money_caption = UIHelper::CreateTextWnd(xml, "money_caption", this);
     m_money_value = UIHelper::CreateTextWnd(xml, "money_value", this);
 
@@ -96,6 +99,9 @@ void CUIRankingWnd::Init()
     m_money_value->SetWndPos(pos);
 
     m_center_caption = UIHelper::CreateTextWnd(xml, "center_caption", this);
+    m_faction_static = UIHelper::CreateStatic(xml, "fraction_static", this, false);
+    m_faction_line1 = UIHelper::CreateFrameLine(xml, "fraction_line1", this, false);
+    m_faction_line2 = UIHelper::CreateFrameLine(xml, "fraction_line2", this, false);
 
     XML_NODE stored_root = xml.GetLocalRoot();
     XML_NODE node = xml.NavigateToNode("stat_info", 0);
@@ -130,39 +136,74 @@ void CUIRankingWnd::Init()
     xr_strcat(buf, sizeof(buf), StringTable().translate("ui_ranking_center_caption").c_str());
     m_center_caption->SetText(buf);
 
-    m_monster_icon_back = UIHelper::CreateStatic(xml, "monster_icon_back", this);
-    m_monster_icon = UIHelper::CreateStatic(xml, "monster_icon", this);
-    m_monster_background = UIHelper::CreateFrameWindow(xml, "monster_background", this);
-    m_monster_over = UIHelper::CreateFrameWindow(xml, "monster_over", this);
 
-    m_favorite_weapon_bckgrnd = UIHelper::CreateStatic(xml, "favorite_weapon_back", this);
-    m_favorite_weapon_icon = UIHelper::CreateStatic(xml, "favorite_weapon_icon", this);
-    m_favorite_weapon_ramka = UIHelper::CreateFrameWindow(xml, "favorite_weapon_ramka", this);
-    m_favorite_weapon_over = UIHelper::CreateFrameWindow(xml, "favorite_weapon_over", this);
+    m_factions_list = UIHelper::CreateScrollView(xml, "fraction_list", this, false);
+    if (m_factions_list)
+    {
+        m_factions_list->SetWindowName("---fraction_list");
+        m_factions_list->m_sort_function = fastdelegate::MakeDelegate(this, &CUIRankingWnd::SortingLessFunction);
 
-    m_achievements_background = UIHelper::CreateFrameWindow(xml, "achievements_background", this);
-    m_achievements = new CUIScrollView();
-    CUIXmlInit::InitScrollView(xml, "achievements_wnd", 0, m_achievements);
-    m_achievements->SetAutoDelete(true);
-    AttachChild(m_achievements);
-    m_achievements->SetWindowName("achievements_list");
+        pcstr fract_section = "pda_rank_communities";
 
-    LPCSTR section = "achievements";
-    VERIFY2(pSettings->section_exist(section), make_string("Section [%s] does not exist!", section));
+        if (pSettings->section_exist(fract_section))
+        {
+            node = xml.NavigateToNode("fraction_list", 0);
+            xml.SetLocalRoot(node);
+            CInifile::Sect& faction_section = pSettings->r_section(fract_section);
+            for (const auto& item : faction_section.Data)
+            {
+                add_faction(xml, item.first);
+            }
+            node = xml.NavigateToNode("fraction_list", 0);
+            xml.SetLocalRoot(stored_root);
+        }
+    }
 
-    CInifile::Sect& achievs_section = pSettings->r_section(section);
-    auto ib = achievs_section.Data.begin();
-    auto ie = achievs_section.Data.end();
-    for (u8 i = 0; ib != ie; ++ib, ++i)
-        add_achievement(xml, (*ib).first);
+    m_monster_icon_back = UIHelper::CreateStatic(xml, "monster_icon_back", this, false);
+    m_monster_icon = UIHelper::CreateStatic(xml, "monster_icon", this, false);
+    m_monster_background = UIHelper::CreateFrameWindow(xml, "monster_background", this, false);
+    m_monster_over = UIHelper::CreateFrameWindow(xml, "monster_over", this, false);
 
+    m_favorite_weapon_bckgrnd = UIHelper::CreateStatic(xml, "favorite_weapon_back", this, false);
+    m_favorite_weapon_icon = UIHelper::CreateStatic(xml, "favorite_weapon_icon", this, false);
+    m_favorite_weapon_ramka = UIHelper::CreateFrameWindow(xml, "favorite_weapon_ramka", this, false);
+    m_favorite_weapon_over = UIHelper::CreateFrameWindow(xml, "favorite_weapon_over", this, false);
+
+    m_achievements_background = UIHelper::CreateFrameWindow(xml, "achievements_background", this, false);
+    m_achievements = UIHelper::CreateScrollView(xml, "achievements_wnd", this, false);
+    if (m_achievements)
+    {
+        m_achievements->SetWindowName("achievements_list");
+
+        pcstr section = "achievements";
+
+        if (pSettings->section_exist(section))
+        {
+            CInifile::Sect& achievs_section = pSettings->r_section(section);
+            for (const auto& item : achievs_section.Data)
+                add_achievement(xml, item.first);
+        }
+    }
     xml.SetLocalRoot(stored_root);
+}
+
+void CUIRankingWnd::add_faction(CUIXml& xml, shared_str const& faction_id)
+{
+    CUIRankFaction* faction = new CUIRankFaction(faction_id);
+    faction->init_from_xml(xml);
+    faction->SetWindowName("fraction_item");
+    m_factions_list->AddWindow(faction, true);
+    Register(faction);
+}
+
+void CUIRankingWnd::clear_all_factions()
+{
+    m_factions_list->Clear();
 }
 
 void CUIRankingWnd::add_achievement(CUIXml& xml, shared_str const& achiev_id)
 {
     CUIAchievements* achievement = new CUIAchievements(m_achievements);
-    VERIFY2(pSettings->section_exist(achiev_id), make_string("Section [%s] does not exist!", achiev_id));
     achievement->init_from_xml(xml);
 
     achievement->SetName(pSettings->r_string(achiev_id, "name"));
@@ -177,13 +218,44 @@ void CUIRankingWnd::add_achievement(CUIXml& xml, shared_str const& achiev_id)
 
 void CUIRankingWnd::update_info()
 {
-    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
-    for (; b != e; b++)
-        (*b)->Update();
+    for (const auto& achievement : m_achieves_vec)
+        achievement->Update();
+
     get_statistic();
     get_best_monster();
     get_favorite_weapon();
+
+    if (!m_factions_list)
+        return;
+
+    bool force_rating = false;
+    for (u8 i = 0; i < m_factions_list->GetSize(); ++i)
+    {
+        CUIRankFaction* ui_faction = smart_cast<CUIRankFaction*>(m_factions_list->GetItem(i));
+        if (ui_faction)
+        {
+            if (ui_faction->get_cur_sn() != i + 1)
+            {
+                force_rating = true;
+                break;
+            }
+        }
+    }
+
+    for (u8 i = 0; i < m_factions_list->GetSize(); ++i)
+    {
+        CUIRankFaction* ui_faction = smart_cast<CUIRankFaction*>(m_factions_list->GetItem(i));
+        if (ui_faction)
+        {
+            ui_faction->update_info(i + 1);
+            ui_faction->rating(i + 1, force_rating);
+        }
+    }
+
+    m_factions_list->ForceUpdate();
+    get_value_from_script();
 }
+
 
 void CUIRankingWnd::DrawHint()
 {
@@ -213,41 +285,54 @@ void CUIRankingWnd::get_statistic()
 }
 void CUIRankingWnd::get_best_monster()
 {
-    luabind::functor<LPCSTR> funct;
-    R_ASSERT(GEnv.ScriptEngine->functor("pda.get_monster_back", funct));
-    LPCSTR str = funct();
-    if (!xr_strcmp(str, ""))
-        return;
+    pcstr str;
+    luabind::functor<pcstr> functor;
 
-    if (xr_strcmp(str, m_last_monster_icon_back))
+    if (GEnv.ScriptEngine->functor("pda.get_monster_back", functor))
     {
-        m_monster_icon_back->TextureOn();
-        m_monster_icon_back->InitTexture(str);
-        m_last_monster_icon_back = str;
+        str = functor();
+        if (!xr_strcmp(str, ""))
+            return;
+
+        if (xr_strcmp(str, m_last_monster_icon_back))
+        {
+            if (m_monster_icon_back)
+            {
+                m_monster_icon_back->TextureOn();
+                m_monster_icon_back->InitTexture(str);
+            }
+            m_last_monster_icon_back = str;
+        }
     }
 
-    R_ASSERT(GEnv.ScriptEngine->functor("pda.get_monster_icon", funct));
-    str = funct();
-    if (!xr_strcmp(str, ""))
-        return;
-
-    if (xr_strcmp(str, m_last_monster_icon))
+    if (GEnv.ScriptEngine->functor("pda.get_monster_icon", functor))
     {
-        m_monster_icon->TextureOn();
-        m_monster_icon->InitTexture(str);
-        m_last_monster_icon = str;
+        str = functor();
+        if (!xr_strcmp(str, ""))
+            return;
+
+        if (xr_strcmp(str, m_last_monster_icon))
+        {
+            if (m_monster_icon)
+            {
+                m_monster_icon->TextureOn();
+                m_monster_icon->InitTexture(str);
+            }
+            m_last_monster_icon = str;
+        }
     }
 }
 void CUIRankingWnd::get_favorite_weapon()
 {
-    luabind::functor<LPCSTR> funct;
-    R_ASSERT(GEnv.ScriptEngine->functor("pda.get_favorite_weapon", funct));
-    LPCSTR str = funct();
+    luabind::functor<pcstr> functor;
+    if(!GEnv.ScriptEngine->functor("pda.get_favorite_weapon", functor))
+        return;
+    pcstr str = functor();
 
     if (!xr_strcmp(str, ""))
         return;
 
-    if (xr_strcmp(str, m_last_weapon_icon))
+    if (m_favorite_weapon_icon && xr_strcmp(str, m_last_weapon_icon))
     {
         if (pSettings->section_exist(str) && pSettings->line_exist(str, "upgr_icon_x"))
         {
@@ -272,14 +357,43 @@ void CUIRankingWnd::get_favorite_weapon()
     }
 }
 
+bool xr_stdcall CUIRankingWnd::SortingLessFunction(CUIWindow* left, CUIWindow* right)
+{
+    CUIRankFaction* lpi = smart_cast<CUIRankFaction*>(left);
+    CUIRankFaction* rpi = smart_cast<CUIRankFaction*>(right);
+    VERIFY(lpi && rpi);
+    return (lpi->get_faction_power() > rpi->get_faction_power());
+}
+
+void CUIRankingWnd::get_value_from_script()
+{
+    string128 buf;
+    InventoryUtilities::GetTimePeriodAsString(buf, sizeof(buf), Level().GetStartGameTime(), Level().GetGameTime());
+    m_stat_info[0]->SetText(buf);
+
+    for (u8 i = 1; i < m_stat_count; ++i)
+    {
+        luabind::functor<pcstr> functor;
+        if (GEnv.ScriptEngine->functor("pda.get_stat", functor))
+        {
+            pcstr str = functor(i);
+            m_stat_info[i]->SetTextST(str);
+        }
+    }
+}
+
+
 void CUIRankingWnd::ResetAll()
 {
     m_last_monster_icon_back = "";
     m_last_monster_icon = "";
     m_last_weapon_icon = "";
-    m_monster_icon_back->TextureOff();
-    m_monster_icon->TextureOff();
-    m_favorite_weapon_icon->TextureOff();
+    if (m_monster_icon_back)
+        m_monster_icon_back->TextureOff();
+    if (m_monster_icon)
+        m_monster_icon->TextureOff();
+    if (m_favorite_weapon_icon)
+        m_favorite_weapon_icon->TextureOff();
     auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
         (*b)->Reset();

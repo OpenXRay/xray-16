@@ -14,10 +14,15 @@ _out _main( v2p I )
 			sky	*= 0.33;
 
 	// final tone-mapping
-	_out			o;
+	_out		o;
 
-	o.low        	=		sky.xyzz		;
-	o.high        	=		o.low/def_hdr	;
+#ifdef USE_VTF
+	o.low        	=	sky.xyzz;
+	o.high        	=	o.low/def_hdr;
+#else // USE_VTF
+	float scale	=	tex2D(s_tonemap, float2(0.5,0.5)).x;
+        tonemap			(o.low, o.high, sky, scale*2.0);
+#endif // USE_VTF
 
 	return        	o;
 }

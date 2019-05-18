@@ -4,25 +4,14 @@
 #include "xrCore/xr_token.h"
 #include "xrCDB/xrXRC.h"
 #include "XR_IOConsole.h"
+#include "MonitorManager.hpp"
 #include "SDL.h"	
 #include "SDL_syswm.h"
 
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;
-extern xr_vector<xr_token> VidMonitorsToken;
-extern xr_vector<xr_token> VidModesToken;
-extern xr_vector<xr_token> VidRefreshRateToken;
 
 extern XRCDB_API BOOL* cdb_bDebug;
-
-void FillMonitorsToken();
-void FreeMonitorsToken();
-
-void FillVidModesToken(u32 monitorID);
-void FreeVidModesToken();
-
-void FillRefreshRateToken();
-void FreeRefreshRateToken();
 
 void CRenderDevice::_SetupStates()
 {
@@ -58,7 +47,6 @@ void CRenderDevice::Create()
     if (GEnv.isDedicatedServer || editor())
         psDeviceFlags.set(rsFullscreen, false);
 
-    FillVidModesToken(Vid_SelectedMonitor);
     UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
@@ -74,42 +62,62 @@ void CRenderDevice::Create()
     PreCache(0, false, false);
 }
 
+bool windowIntersectsWithMonitor(const SDL_Rect& window, const SDL_Rect& monitor)
+{
+    const int x = std::max(window.x, monitor.x);
+    const int num1 = std::min(window.w, monitor.w);
+    const int y = std::max(window.y, monitor.y);
+    const int num2 = std::min(window.y, monitor.h);
+
+    return num1 >= x && num2 >= y;
+}
+
 void CRenderDevice::UpdateWindowProps(const bool windowed)
 {
     SelectResolution(windowed);
 
     if (windowed)
     {
-        // Get the maximal available resolution (penultimate token in VidModesToken)
-        u32 width, height;
-        sscanf(VidModesToken[VidModesToken.size() - 2].name, "%dx%d", &width, &height);
-
         const bool drawBorders = strstr(Core.Params, "-draw_borders");
 
-        bool maximalResolution = false;
-        if (b_is_Ready && !drawBorders && psCurrentVidMode[0] == width && psCurrentVidMode[1] == height)
-            maximalResolution = true;
+        bool useDesktopFullscreen = false;
+        if (b_is_Ready && !drawBorders && g_monitors.SelectedResolutionIsMaximal())
+            useDesktopFullscreen = true;
+
+        SDL_Rect rect;
+        SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
+        
+        if (!windowIntersectsWithMonitor(m_rcWindowBounds, rect))
+            SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
+
+        SDL_SetWindowBordered(m_sdlWnd, drawBorders ? SDL_TRUE : SDL_FALSE);
+        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
 
         // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
-        SDL_SetWindowFullscreen(m_sdlWnd, maximalResolution ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
-        SDL_SetWindowBordered(m_sdlWnd, drawBorders ? SDL_TRUE : SDL_FALSE);
+        SDL_SetWindowFullscreen(m_sdlWnd, useDesktopFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_FALSE);
     }
     else
     {
-        SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+        // Changing monitor, unset fullscreen for the previous monitor
+        if (SDL_GetWindowDisplayIndex(m_sdlWnd) != Vid_SelectedMonitor)
+            SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
 
-        // XXX: fix monitor selection
-        // it appears to be buggy
         SDL_Rect rect;
         SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
+        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
-        SDL_DisplayMode mode;
-        SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
-        mode.w = psCurrentVidMode[0];
-        mode.h = psCurrentVidMode[1];
-        mode.refresh_rate = Vid_SelectedRefreshRate;
-        SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
+
+        if (b_is_Ready)
+        {
+            SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
+            
+            SDL_DisplayMode mode;
+            SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
+            mode.w = psCurrentVidMode[0];
+            mode.h = psCurrentVidMode[1];
+            mode.refresh_rate = Vid_SelectedRefreshRate;
+            SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
+        }
     }
 
     UpdateWindowRects();
@@ -160,18 +168,39 @@ void CRenderDevice::SelectResolution(const bool windowed)
         string32 buff;
         xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-        if (_ParseItem(buff, VidModesToken.data()) == u32(-1)) // not found
+        if (!g_monitors.SelectedResolutionIsSafe()) // not found
         { // select safe
             SDL_DisplayMode current;
             SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
             current.w = psCurrentVidMode[0];
             current.h = psCurrentVidMode[1];
 
-            SDL_DisplayMode closest;
+            SDL_DisplayMode closest; // try closest mode
             if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
                 xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", closest.w, closest.h);
-            else
-                xr_sprintf(buff, sizeof(buff), "vid_mode %s", VidModesToken.back());
+            else // or just use maximal
+            {
+                const auto& r = g_monitors.GetMaximalResolution();
+                xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", r.first, r.second);
+            }
+
+            Console->Execute(buff);
+        }
+
+        if (!g_monitors.SelectedRefreshRateIsSafe())
+        {
+            SDL_DisplayMode current;
+            SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+            current.refresh_rate = Vid_SelectedRefreshRate;
+
+            SDL_DisplayMode closest; // try closest mode
+            if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
+                xr_sprintf(buff, sizeof(buff), "vid_refresh %d", closest.refresh_rate);
+            else // or just use maximal
+            {
+                const u32 rate = g_monitors.GetMaximalRefreshRate();
+                xr_sprintf(buff, sizeof(buff), "vid_refresh %d", rate);
+            }
 
             Console->Execute(buff);
         }
@@ -181,128 +210,17 @@ void CRenderDevice::SelectResolution(const bool windowed)
     }
 }
 
-struct uniqueRenderingMode
+SDL_Window* CRenderDevice::GetApplicationWindow()
 {
-    uniqueRenderingMode(pcstr v) : value(v) {}
-    pcstr value;
-    bool operator()(const xr_token& other) const
-    {
-        return !xr_stricmp(value, other.name);
-    }
-};
-
-void FillMonitorsToken()
-{
-    auto& monitors = VidMonitorsToken;
-
-    if (!monitors.empty())
-        FreeMonitorsToken();
-
-    int displayCount = SDL_GetNumVideoDisplays();
-    R_ASSERT3(displayCount > 0, "Failed to find display", SDL_GetError());
-    monitors.reserve(displayCount + 1);
-
-    for (int i = 0; i < displayCount; ++i)
-    {
-        string512 buf;
-        xr_sprintf(buf, sizeof(buf), "%d. %s", i + 1, SDL_GetDisplayName(i));
-        monitors.emplace_back(xr_strdup(buf), i);
-    }
-
-    monitors.emplace_back(nullptr, -1);
+    return m_sdlWnd;
 }
 
-void FillVidModesToken(u32 monitorID)
+void CRenderDevice::DisableFullscreen()
 {
-    auto& modes = VidModesToken;
-    auto& rates = VidRefreshRateToken;
-
-    if (!modes.empty())
-        FreeVidModesToken();
-
-    if (!rates.empty())
-        FreeRefreshRateToken();
-
-    int modeCount = SDL_GetNumDisplayModes(monitorID);
-    R_ASSERT3(modeCount > 0, "Failed to find display modes", SDL_GetError());
-    modes.reserve(modeCount + 1);
-
-    SDL_DisplayMode displayMode;
-    for (int i = modeCount - 1; i >= 0; --i)
-    {
-        R_ASSERT3(SDL_GetDisplayMode(monitorID, i, &displayMode) == 0, "Failed to find specified display mode", SDL_GetError());
-
-        string16 str;
-        xr_sprintf(str, sizeof(str), "%dx%d", displayMode.w, displayMode.h);
-
-        if (modes.cend() == std::find_if(modes.cbegin(), modes.cend(), uniqueRenderingMode(str)))
-            modes.emplace_back(xr_strdup(str), i);
-
-        // For the first time we can fill refresh rate token here
-        if (displayMode.w == psCurrentVidMode[0] && displayMode.h == psCurrentVidMode[1])
-        {
-            xr_itoa(displayMode.refresh_rate, str, 10);
-
-            rates.emplace_back(xr_strdup(str), displayMode.refresh_rate);
-        }
-    }
-
-    Msg("Available video modes[%d]:", modes.size());
-    for (const auto& mode : modes)
-        Msg("[%s]", mode.name);
-
-    modes.emplace_back(nullptr, -1);
-    rates.emplace_back(nullptr, -1);
+    SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
 }
 
-void FillRefreshRateToken()
+void CRenderDevice::ResetFullscreen()
 {
-    auto& rates = VidRefreshRateToken;
-
-    if (!rates.empty())
-        FreeRefreshRateToken();
-
-    int modeCount = SDL_GetNumDisplayModes(Vid_SelectedMonitor);
-    R_ASSERT3(modeCount > 0, "Failed to find display modes", SDL_GetError());
-
-    SDL_DisplayMode displayMode;
-    for (int i = modeCount - 1; i >= 0; --i)
-    {
-        R_ASSERT3(SDL_GetDisplayMode(Vid_SelectedMonitor, i, &displayMode) == 0, "Failed to find specified display mode",
-            SDL_GetError());
-
-        if (displayMode.w != psCurrentVidMode[0] || displayMode.h != psCurrentVidMode[1])
-            continue;
-
-        string16 buff;
-        xr_itoa(displayMode.refresh_rate, buff, 10);
-
-        rates.emplace_back(xr_strdup(buff), displayMode.refresh_rate);
-    }
-
-    rates.emplace_back(nullptr, -1);
-}
-
-void FreeMonitorsToken()
-{
-    for (auto& monitor : VidMonitorsToken)
-        xr_free(monitor.name);
-
-    VidMonitorsToken.clear();
-}
-
-void FreeVidModesToken()
-{
-    for (auto& mode : VidModesToken)
-        xr_free(mode.name);
-
-    VidModesToken.clear();
-}
-
-void FreeRefreshRateToken()
-{
-    for (auto& rate : VidRefreshRateToken)
-        xr_free(rate.name);
-
-    VidRefreshRateToken.clear();
+    UpdateWindowProps(!psDeviceFlags.test(rsFullscreen));
 }

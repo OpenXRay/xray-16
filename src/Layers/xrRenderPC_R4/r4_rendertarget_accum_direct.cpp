@@ -579,6 +579,8 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
 
+        // Pass view vector projected in shadow space to far pixel shader
+        // Needed for shadow fading.
         if (sub_phase == SE_SUN_FAR)
         {
             Fvector3 view_viewspace;

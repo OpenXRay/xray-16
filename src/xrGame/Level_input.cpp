@@ -48,12 +48,12 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eMouseWheel)(x);
-    /* avo: end */
-#endif
+    }
+
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
         return;
     if (Device.Paused()
@@ -79,12 +79,11 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eMouseMove)(dx, dy);
-    /* avo: end */
-#endif
+    }
 
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
         return;
@@ -124,12 +123,11 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     EGameActions _curr = get_binded_action(key);
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (!g_bDisableAllInput && g_actor)
+    {
         g_actor->callback(GameObject::eKeyPress)(key);
-    /* avo: end */
-#endif
+    }
 
     if (_curr == kPAUSE)
     {
@@ -501,12 +499,11 @@ void CLevel::IR_OnKeyboardRelease(int key)
     if (!bReady || g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eKeyRelease)(key);
-    /* avo: end */
-#endif
+    }
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
         return;
@@ -532,12 +529,11 @@ void CLevel::IR_OnKeyboardHold(int key)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eKeyHold)(key);
-    /* avo: end */
-#endif
+    }
 
 #ifdef DEBUG
     // Lain: added
@@ -585,6 +581,17 @@ void CLevel::IR_OnKeyboardHold(int key)
 }
 
 void CLevel::IR_OnMouseStop(int /**axis/**/, int /**value/**/) {}
+
+void CLevel::IR_OnControllerPress(int btn) 
+{ 
+    IR_OnKeyboardPress(ControllerButtonToKey[btn]); 
+}
+
+void CLevel::IR_OnControllerRelease(int btn)
+{
+    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
+}
+
 void CLevel::IR_OnActivate()
 {
     if (!pInput)

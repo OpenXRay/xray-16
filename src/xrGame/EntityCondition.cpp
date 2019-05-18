@@ -476,7 +476,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     }
 }
 
-float CEntityCondition::BleedingSpeed()
+float CEntityCondition::BleedingSpeed() const
 {
     float bleeding_speed = 0;
 

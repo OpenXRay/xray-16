@@ -178,15 +178,16 @@ void CWeaponMagazined::FireStart()
                 OnMagazineEmpty();
         }
     }
-    else
-    { // misfire
-        //Alundaio
-#ifdef EXTENDED_WEAPON_CALLBACKS
-        CGameObject *object = smart_cast<CGameObject*>(H_Parent());
+    else // misfire
+    {
+        // Alundaio
+        CGameObject* object = smart_cast<CGameObject*>(H_Parent());
         if (object)
-            object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
-#endif
-        //-Alundaio
+        {
+            auto& cb = object->callback(GameObject::eOnWeaponJammed);
+            if (cb)
+                cb(object->lua_game_object(), this->lua_game_object());
+        }
 
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
             CurrentGameUI()->AddCustomStatic("gun_jammed", true);
@@ -1177,13 +1178,14 @@ void CWeaponMagazined::OnZoomIn()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
-    //Alundaio: callback not sure why vs2013 gives error, it's fine
-#ifdef EXTENDED_WEAPON_CALLBACKS
-    CGameObject *object = smart_cast<CGameObject*>(H_Parent());
+    // Alundaio
+    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
     if (object)
-        object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(),this->lua_game_object());
-#endif
-    //-Alundaio
+    {
+        auto& cb = object->callback(GameObject::eOnWeaponZoomIn);
+        if (cb)
+            cb(object->lua_game_object(), this->lua_game_object());
+    }
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
     if (pActor)
@@ -1209,12 +1211,13 @@ void CWeaponMagazined::OnZoomOut()
         PlayAnimIdle();
 
     //Alundaio
-#ifdef EXTENDED_WEAPON_CALLBACKS
-    CGameObject *object = smart_cast<CGameObject*>(H_Parent());
+    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
     if (object)
-        object->callback(GameObject::eOnWeaponZoomOut)(object->lua_game_object(), this->lua_game_object());
-#endif
-    //-Alundaio
+    {
+        auto& cb = object->callback(GameObject::eOnWeaponZoomOut);
+        if (cb)
+            cb(object->lua_game_object(), this->lua_game_object());
+    }
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
 

@@ -69,7 +69,7 @@ public:
     IC void BoostRadiationProtection(const float value);
     IC void BoostTelepaticProtection(const float value);
     IC void BoostChemicalBurnProtection(const float value);
-    BOOSTER_MAP GetCurBoosterInfluences() { return m_booster_influences; };
+    const auto& GetCurBoosterInfluences() const { return m_booster_influences; }
     // хромание при потере сил и здоровья
     virtual bool IsLimping() const;
     virtual bool IsCantWalk() const;
@@ -113,9 +113,9 @@ public:
     float HitSlowmo(SHit* pHDS);
     virtual bool ApplyInfluence(const SMedicineInfluenceValues& V, const shared_str& sect);
     virtual bool ApplyBooster(const SBooster& B, const shared_str& sect);
-    float GetMaxPowerRestoreSpeed() { return m_max_power_restore_speed; };
-    float GetMaxWoundProtection() { return m_max_wound_protection; };
-    float GetMaxFireWoundProtection() { return m_max_fire_wound_protection; };
+    float GetMaxPowerRestoreSpeed() const { return m_max_power_restore_speed; };
+    float GetMaxWoundProtection() const { return m_max_wound_protection; };
+    float GetMaxFireWoundProtection() const { return m_max_fire_wound_protection; };
 protected:
     SMedicineInfluenceValues m_curr_medicine_influence;
     float m_fAlcohol;

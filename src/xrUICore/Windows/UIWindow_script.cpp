@@ -30,7 +30,10 @@ void SetCursorPosition_script(Fvector2& pos) { GetUICursor().SetUICursorPosition
 
 using namespace luabind;
 using namespace luabind::policy;
-
+Frect	get_texture_rect(LPCSTR icon_name)
+{
+    return CUITextureMaster::GetTextureRect(icon_name);
+}
 // clang-format off
 SCRIPT_EXPORT(CUIWindow, (), {
     module(luaState)
@@ -47,6 +50,30 @@ SCRIPT_EXPORT(CUIWindow, (), {
         def("SetCursorPosition", &SetCursorPosition_script),
         def("FitInRect", &fit_in_rect),
 
+        class_<TEX_INFO>("TEX_INFO")
+            .def("get_file_name", &TEX_INFO::get_file_name)
+            .def("get_rect", &TEX_INFO::get_rect),
+
+        def("GetTextureName", +[](pcstr iconName)
+        {
+            return CUITextureMaster::GetTextureFileName(iconName);
+        }),
+
+        def("GetTextureRect", +[](pcstr iconName)
+        {
+            return CUITextureMaster::GetTextureRect(iconName);
+        }),
+
+        def("GetTextureInfo", +[](pcstr name)
+        {
+            return CUITextureMaster::FindItem(name);
+        }),
+
+        def("GetTextureInfo", +[](pcstr name, pcstr defaultName)
+        {
+            return CUITextureMaster::FindItem(name, defaultName);
+        }),
+
         class_<CUIWindow>("CUIWindow")
             .def(constructor<>())
             .def("AttachChild", &CUIWindow::AttachChild, adopt<2>())
@@ -59,16 +86,25 @@ SCRIPT_EXPORT(CUIWindow, (), {
             .def("GetAbsoluteRect", &CUIWindow::GetAbsoluteRect)
 
             .def("SetWndRect", (void (CUIWindow::*)(Frect)) & CUIWindow::SetWndRect_script)
-            .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
             .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
+
             .def("GetWndPos", &get_wnd_pos)
+            .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
+
             .def("GetWidth", &CUIWindow::GetWidth)
+            .def("SetWidth", &CUIWindow::SetWidth)
+
             .def("GetHeight", &CUIWindow::GetHeight)
+            .def("SetHeight", &CUIWindow::SetHeight)
 
             .def("Enable", &CUIWindow::Enable)
             .def("IsEnabled", &CUIWindow::IsEnabled)
+
             .def("Show", &CUIWindow::Show)
             .def("IsShown", &CUIWindow::IsShown)
+
+            .def("SetFont", &CUIWindow::SetFont)
+            .def("GetFont", &CUIWindow::GetFont)
 
             .def("WindowName", &CUIWindow::WindowName_script)
             .def("SetWindowName", &CUIWindow::SetWindowName)

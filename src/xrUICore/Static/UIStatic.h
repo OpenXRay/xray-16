@@ -73,8 +73,8 @@ public:
     virtual u32 GetTextureColor() const { return m_UIStaticItem.GetTextureColor(); }
     virtual void SetTextureRect(const Frect& r) { m_UIStaticItem.SetTextureRect(r); }
     virtual const Frect& GetTextureRect() const { return m_UIStaticItem.GetTextureRect(); }
-    virtual void InitTexture(LPCSTR tex_name);
-    virtual void InitTextureEx(LPCSTR tex_name, LPCSTR sh_name = "hud" DELIMITER "default");
+    virtual bool InitTexture(pcstr texture, bool fatal = true);
+    virtual bool InitTextureEx(pcstr texture, pcstr shader = "hud" DELIMITER "default", bool fatal = true);
     CUIStaticItem* GetStaticItem() { return &m_UIStaticItem; }
     void SetTextureRect_script(Frect* pr) { m_UIStaticItem.SetTextureRect(*pr); }
     const Frect* GetTextureRect_script() { return &m_UIStaticItem.GetTextureRect(); }

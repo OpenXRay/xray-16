@@ -7,12 +7,12 @@
 using namespace luabind;
 
 CUIGameCustom* get_hud() { return CurrentGameUI(); }
-SCRIPT_EXPORT(CUIGameCustom, (), {
+SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
     module(luaState)[class_<StaticDrawableWrapper>("StaticDrawableWrapper")
                          .def_readwrite("m_endTime", &StaticDrawableWrapper::m_endTime)
                          .def("wnd", &StaticDrawableWrapper::wnd),
 
-        class_<CUIGameCustom>("CUIGameCustom")
+        class_<CUIGameCustom, CDialogHolder>("CUIGameCustom")
             .def("AddDialogToRender", &CUIGameCustom::AddDialogToRender)
             .def("RemoveDialogToRender", &CUIGameCustom::RemoveDialogToRender)
             .def("AddCustomStatic", &CUIGameCustom::AddCustomStatic)

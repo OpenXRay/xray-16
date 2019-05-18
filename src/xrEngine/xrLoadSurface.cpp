@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <FreeImage.h>
+#if defined(WINDOWS)
+#include <FreeImage/FreeImagePlus.h>
+#else
+#include <FreeImagePlus.h>
+#endif
 
 struct SExts
 {
@@ -80,39 +84,17 @@ void Surface_Init()
     Msg("* %d supported formats", formats.size());
 }
 
-BOOL Surface_Detect(string_path& F, LPSTR N)
+bool Surface_Detect(string_path& F, LPSTR N)
 {
     FS.update_path(F, "$game_textures$", strconcat(sizeof(F), F, N, ".dds"));
     FILE* file = fopen(F, "rb");
     if (file)
     {
         fclose(file);
-        return (TRUE);
+        return true;
     }
 
-    return (FALSE);
-}
-
-FIBITMAP* Surface_Load(char* full_name)
-{
-    // load
-    FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(full_name);
-    FIBITMAP* map = FreeImage_Load(fif, full_name);
-    if (0 == map)
-        return NULL;
-
-    // check if already 32bpp
-    if (32 == FreeImage_GetBPP(map))
-        return map;
-
-    // convert
-    FIBITMAP* map32 = FreeImage_ConvertTo32Bits(map);
-    if (0 == map32)
-        map32 = map;
-    else
-        FreeImage_Unload(map);
-
-    return map32;
+    return false;
 }
 
 u32* Surface_Load(char* name, u32& w, u32& h)
@@ -123,17 +105,29 @@ u32* Surface_Load(char* name, u32& w, u32& h)
     // detect format
     string_path full;
     if (!Surface_Detect(full, name))
-        return NULL;
+        return nullptr;
 
-    FIBITMAP* map32 = Surface_Load(full);
+    fipImage image;
+    image.load(full);
 
-    h = FreeImage_GetHeight(map32);
-    w = FreeImage_GetWidth(map32);
+    // convert if needed
+    if (image.getBitsPerPixel() != 32)
+    {
+        image.convertTo32Bits();
+    }
 
-    u32 memSize = w * h * 4;
-    u32* memPTR = (u32*)(xr_malloc(memSize));
-    u32* memDATA = (u32*)(FreeImage_GetScanLine(map32, 0));
-    CopyMemory(memPTR, memDATA, memSize);
-    FreeImage_Unload(map32);
-    return memPTR;
+    if (!image.isValid())
+        return nullptr;
+
+    w = image.getWidth();
+    h = image.getHeight();
+
+    const size_t size = w * h * 4;
+
+    u32* memory = (u32*)xr_malloc(size);
+    u32* data = (u32*)image.getScanLine(0);
+
+    CopyMemory(memory, data, size);
+
+    return memory;
 }

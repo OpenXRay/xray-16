@@ -8,7 +8,7 @@ list(APPEND DIRS
 
 add_dir("${DIRS}")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include )
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_definitions(-DdSINGLE -DdNODEBUG -D_SECURE_SCL=0 -DLINUX -D_cdecl= -D__forceinline=inline)
 

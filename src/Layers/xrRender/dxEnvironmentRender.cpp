@@ -163,7 +163,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-#else
+#else // USE_OGL
     ID3DBaseTexture* e0 = mixRen.sky_r_textures[0].second->surface_get();
     ID3DBaseTexture* e1 = mixRen.sky_r_textures[1].second->surface_get();
 
@@ -242,9 +242,21 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.set_xform_world(mSky);
     RCache.set_Geometry(sh_2geom);
     RCache.set_Shader(sh_2sky);
-    //	RCache.set_Textures			(&env.CurrentEnv->sky_r_textures);
+#ifdef USE_OGL
+    if (HW.Caps.geometry.bVTF)
+        RCache.set_Textures(&mixRen.sky_r_textures);
+#else // USE_OGL
     RCache.set_Textures(&mixRen.sky_r_textures);
+#endif // USE_OGL
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
+
+#ifdef USE_OGL
+	// Sun must be rendered to generic0 only as it is done in DX
+    if (!RImplementation.o.dx10_msaa)
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, HW.pBaseZB);
+    else
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+#endif // USE_OGL
 
     // Sun
     GEnv.Render->rmNormal();
@@ -258,9 +270,17 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.set_Z(TRUE);
     env.eff_LensFlare->Render(TRUE, FALSE, FALSE);
     RCache.set_Z(FALSE);
-#else
+#else // RENDER != R_R1
     env.eff_LensFlare->Render(TRUE, FALSE, FALSE);
-#endif
+#endif // RENDER != R_R1
+
+#ifdef USE_OGL
+    // set low/hi RTs for clouds
+    if (!RImplementation.o.dx10_msaa)
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, HW.pBaseZB);
+    else
+        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+ #endif // USE_OGL
 }
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)

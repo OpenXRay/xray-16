@@ -42,6 +42,8 @@ public:
     virtual void Initialize();
     virtual void Destroy();
 
+    void OnDeviceInitialize() override;
+
     virtual void OnRender();
     virtual void OnFrame();
 

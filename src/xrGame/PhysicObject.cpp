@@ -889,8 +889,11 @@ bool CPhysicObject::get_door_vectors(Fvector& closed, Fvector& open) const
 
     const SJointIKData& joint = bd.IK_data;
 
-    if (joint.type != jtJoint)
-        return false;
+    // Xottab_DUTY: commented this to allow sliding type doors
+    // https://github.com/OpenXRay/xray-16/issues/73
+    /*if (joint.type != jtJoint)
+        return false;*/
+
     const Fvector2& limits = joint.limits[1].limit;
 
     // if( limits.y < EPS ) //limits.y - limits.x < EPS

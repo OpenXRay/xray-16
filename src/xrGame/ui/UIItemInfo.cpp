@@ -64,7 +64,6 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 {
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
-    CUIXmlInit xml_init;
 
     if (uiXml.NavigateToNode("main_frame", 0))
     {
@@ -85,7 +84,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UIBackground = new CUIFrameWindow();
         UIBackground->SetAutoDelete(true);
         AttachChild(UIBackground);
-        xml_init.InitFrameWindow(uiXml, "background_frame", 0, UIBackground);
+        CUIXmlInit::InitFrameWindow(uiXml, "background_frame", 0, UIBackground);
     }
     m_complex_desc = false;
     if (uiXml.NavigateToNode("static_name", 0))
@@ -93,7 +92,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UIName = new CUITextWnd();
         AttachChild(UIName);
         UIName->SetAutoDelete(true);
-        xml_init.InitTextWnd(uiXml, "static_name", 0, UIName);
+        CUIXmlInit::InitTextWnd(uiXml, "static_name", 0, UIName);
         m_complex_desc = (uiXml.ReadAttribInt("static_name", 0, "complex_desc", 0) == 1);
     }
     if (uiXml.NavigateToNode("static_weight", 0))
@@ -101,7 +100,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UIWeight = new CUITextWnd();
         AttachChild(UIWeight);
         UIWeight->SetAutoDelete(true);
-        xml_init.InitTextWnd(uiXml, "static_weight", 0, UIWeight);
+        CUIXmlInit::InitTextWnd(uiXml, "static_weight", 0, UIWeight);
     }
 
     if (uiXml.NavigateToNode("static_cost", 0))
@@ -109,7 +108,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UICost = new CUITextWnd();
         AttachChild(UICost);
         UICost->SetAutoDelete(true);
-        xml_init.InitTextWnd(uiXml, "static_cost", 0, UICost);
+        CUIXmlInit::InitTextWnd(uiXml, "static_cost", 0, UICost);
     }
 
     if (uiXml.NavigateToNode("static_no_trade", 0))
@@ -117,7 +116,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UITradeTip = new CUITextWnd();
         AttachChild(UITradeTip);
         UITradeTip->SetAutoDelete(true);
-        xml_init.InitTextWnd(uiXml, "static_no_trade", 0, UITradeTip);
+        CUIXmlInit::InitTextWnd(uiXml, "static_no_trade", 0, UITradeTip);
     }
 
     if (uiXml.NavigateToNode("descr_list", 0))
@@ -149,8 +148,8 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UIDesc->SetAutoDelete(true);
         m_desc_info.bShowDescrText = !!uiXml.ReadAttribInt("descr_list", 0, "only_text_info", 1);
         m_b_FitToHeight = !!uiXml.ReadAttribInt("descr_list", 0, "fit_to_height", 0);
-        xml_init.InitScrollView(uiXml, "descr_list", 0, UIDesc);
-        xml_init.InitFont(uiXml, "descr_list:font", 0, m_desc_info.uDescClr, m_desc_info.pDescFont);
+        CUIXmlInit::InitScrollView(uiXml, "descr_list", 0, UIDesc);
+        CUIXmlInit::InitFont(uiXml, "descr_list:font", 0, m_desc_info.uDescClr, m_desc_info.pDescFont);
     }
 
     if (uiXml.NavigateToNode("image_static", 0))
@@ -158,7 +157,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UIItemImage = new CUIStatic();
         AttachChild(UIItemImage);
         UIItemImage->SetAutoDelete(true);
-        xml_init.InitStatic(uiXml, "image_static", 0, UIItemImage);
+        CUIXmlInit::InitStatic(uiXml, "image_static", 0, UIItemImage);
         UIItemImage->TextureOn();
 
         UIItemImage->TextureOff();
@@ -170,7 +169,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
         UIOutfitInfo->InitFromXml(uiXml);
     }
 
-    xml_init.InitAutoStaticGroup(uiXml, "auto", 0, this);
+    CUIXmlInit::InitAutoStaticGroup(uiXml, "auto", 0, this);
 }
 
 void CUIItemInfo::InitItemInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)

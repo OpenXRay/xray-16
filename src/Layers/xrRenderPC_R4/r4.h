@@ -237,26 +237,28 @@ public:
     int translateSector(IRender_Sector* pSector);
 
     // HW-occlusion culling
-    IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
-    IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
-    IC R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+    u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
+    void occq_end(u32& ID) { HWOCC.occq_end(ID); }
+    R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+
     ICF void apply_object(IRenderable* O)
     {
-        if (0 == O)
+        if (!O)
             return;
-        if (0 == O->renderable_ROS())
+        if (!O->renderable_ROS())
             return;
-        CROS_impl& LT = *((CROS_impl*)O->renderable_ROS());
+        CROS_impl& LT = *static_cast<CROS_impl*>(O->renderable_ROS());
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
         // o_hemi						= 0.5f*LT.get_hemi			()	;
         o_sun = 0.75f * LT.get_sun();
         CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
-    IC void apply_lmaterial()
+    
+    void apply_lmaterial()
     {
         R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (0 == C)
+        if (!C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
         VERIFY(RC_dx10texture == C->type);
@@ -349,6 +351,8 @@ public:
     virtual BOOL occ_visible(sPoly& P);
 
     // Main
+    void BeforeFrame() override;
+
     virtual void Calculate();
     virtual void Render();
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);

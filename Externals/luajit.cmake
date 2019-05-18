@@ -257,6 +257,7 @@ set ( LJCORE_C
   ${LUAJIT_DIR}/lj_err.c
   ${LUAJIT_DIR}/lj_char.c
   ${LUAJIT_DIR}/lj_bc.c
+  ${LUAJIT_DIR}/lj_buf.c
   ${LUAJIT_DIR}/lj_obj.c
   ${LUAJIT_DIR}/lj_str.c
   ${LUAJIT_DIR}/lj_tab.c
@@ -283,8 +284,11 @@ set ( LJCORE_C
   ${LUAJIT_DIR}/lj_opt_loop.c
   ${LUAJIT_DIR}/lj_opt_split.c
   ${LUAJIT_DIR}/lj_opt_sink.c
+  ${LUAJIT_DIR}/lj_profile.c
   ${LUAJIT_DIR}/lj_mcode.c
   ${LUAJIT_DIR}/lj_snap.c
+  ${LUAJIT_DIR}/lj_strfmt.c
+  ${LUAJIT_DIR}/lj_strfmt_num.c
   ${LUAJIT_DIR}/lj_record.c
   ${LUAJIT_DIR}/lj_crecord.c
   ${LUAJIT_DIR}/lj_ffrecord.c

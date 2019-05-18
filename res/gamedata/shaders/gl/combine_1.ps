@@ -9,7 +9,7 @@
 
 Texture2D s_half_depth;
 
-//include "ssao_blur.ps"
+#include "ssao_blur.ps"
 
 #ifdef HDAO
 #define USE_HDAO 1
@@ -60,7 +60,7 @@ Texture2D s_occ;
 //#_include "ssao_hdao.ps"
 #endif
 #else // USE_HDAO
-#ifdef	USE_HBAO
+#ifdef USE_HBAO
 #include "ssao_hbao.ps"
 #endif	//	USE_HBAO
 #endif // USE_HDAO
@@ -218,7 +218,14 @@ _out _main ( _input I, uint iSample )
 #ifdef         DBG_TMAPPING
         color                        	= D.xyz;
 #endif
+
+	// final tone-mapping
+#ifdef USE_VTF
         float          	tm_scale        = I.tc0.w;                // interpolated from VS
+#else // USE_VTF
+        float          	tm_scale        = tex2D        (s_tonemap,I.tc0).x;
+#endif // USE_VTF
+
 
 #ifdef        USE_SUPER_SPECULAR
         color        	= spec          - hspecular	;
