@@ -229,6 +229,9 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 
     if (g_Alive())
     {
+        if (cmd == kUSE && !psActorFlags.test(AF_MULTI_ITEM_PICKUP))
+            m_bPickupMode = false;
+
         if (m_holder)
         {
             m_holder->OnKeyboardRelease(cmd);
@@ -408,6 +411,9 @@ void CActor::ActorUse()
         CGameObject::u_EventSend(P);
         return;
     }
+
+    if (!psActorFlags.test(AF_MULTI_ITEM_PICKUP))
+        m_bPickupMode = true;
 
     if (character_physics_support()->movement()->PHCapture())
         character_physics_support()->movement()->PHReleaseObject();

@@ -30,6 +30,12 @@
 	<string id="ui_style_default">
 		<text>Зов Припяти</text>
 	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Упр. подбор предметов</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Множ. подбор предметов</text>
+	</string>
 	<string id="ui_mm_loadingstages">
 		<text>Стадии загрузки</text>
 	</string>
