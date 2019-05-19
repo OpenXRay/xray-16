@@ -3,6 +3,9 @@
 	<string id="st_unequip">
 		<text>Zdejmij</text>
 	</string>
+	<string id="st_donate">
+		<text>Podaruj</text>
+	</string>
 	<string id="st_loading_lights">
 		<text>Wczytywanie oœwietlenia</text>
 	</string>

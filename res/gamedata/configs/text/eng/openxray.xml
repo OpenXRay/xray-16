@@ -3,6 +3,9 @@
 	<string id="st_unequip">
 		<text>unequip</text>
 	</string>
+	<string id="st_donate">
+		<text>Donate</text>
+	</string>
 	<string id="st_loading_lights">
 		<text>Loading lights</text>
 	</string>
