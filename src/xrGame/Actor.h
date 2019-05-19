@@ -132,6 +132,7 @@ public:
 public:
     void AddGameNews_deffered(GAME_NEWS_DATA& news_data, u32 delay);
     virtual void AddGameNews(GAME_NEWS_DATA& news_data);
+    void ClearGameNews();
 
 protected:
     CActorStatisticMgr* m_statistic_manager;

@@ -321,8 +321,10 @@ public:
     //передача порции информации InventoryOwner
     bool GiveInfoPortion(LPCSTR info_id);
     bool DisableInfoPortion(LPCSTR info_id);
+
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time);
     void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type);
+    void ClearGameNews() const;
 
     void AddIconedTalkMessage_old(LPCSTR text, LPCSTR texture_name, LPCSTR templ_name){}
     void AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
