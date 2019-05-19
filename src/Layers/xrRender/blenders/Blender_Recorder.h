@@ -176,7 +176,10 @@ public:
 #endif // USE_OGL
 
     void r_ColorWriteEnable(bool cR = true, bool cG = true, bool cB = true, bool cA = true);
+    pcstr getSubPath(pcstr spt);
+    pcstr _defSubPath;
     void r_End();
+
 
     //
 

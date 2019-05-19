@@ -16,7 +16,7 @@
 
 #if defined(LINUX) || defined(FREEBSD)
 #include <stdint.h>
-#define _A_HIDDEN      0x02
+#define _A_HIDDEN 0x02
 #define _A_SUBDIR 0x00000010
 
 #if defined(XR_X64)
@@ -30,7 +30,8 @@ typedef __int64 __time64_t;
 typedef long __time32_t;
 typedef unsigned long _fsize_t;
 
-struct _finddata64i32_t {
+struct _finddata64i32_t
+{
     unsigned attrib;
     __time64_t time_create;
     __time64_t time_access;
@@ -99,18 +100,18 @@ public:
         u32 vfs_idx = u32(-1);
         shared_str path;
 #if defined(WINDOWS)
-        void *hSrcFile = nullptr;
-        void *hSrcMap = nullptr;
+        void* hSrcFile = nullptr;
+        void* hSrcMap = nullptr;
 #elif defined(LINUX) || defined(FREEBSD)
         int hSrcFile = 0;
 #endif
         CInifile* header = nullptr;
-        
+
         archive() = default;
         void open();
         void close();
     };
-    
+
     struct archive_header
     {
         u32 size_real;
@@ -262,6 +263,8 @@ public:
     void rescan_pathes();
     void lock_rescan();
     void unlock_rescan();
+
+    bool folder_exist(pcstr fullpath); // Graff46
 };
 
 extern XRCORE_API xr_unique_ptr<CLocatorAPI> xr_FS;

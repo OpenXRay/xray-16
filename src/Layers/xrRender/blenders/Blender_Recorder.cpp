@@ -36,7 +36,10 @@ static int ParseName(LPCSTR N)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBlender_Compile::CBlender_Compile() {}
+CBlender_Compile::CBlender_Compile()
+{ 
+    _defSubPath = getSubPath("clr");
+}
 CBlender_Compile::~CBlender_Compile() {}
 void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
 {
@@ -356,4 +359,15 @@ void CBlender_Compile::Stage_Constant(LPCSTR name)
     sh_list& lst = L_constants;
     int id = ParseName(name);
     passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
+}
+
+pcstr CBlender_Compile::getSubPath(pcstr spt)
+{
+    string_path tmp, pth;
+    strconcat(sizeof(pth), pth, GEnv.Render->getShaderPath(), spt);
+    FS.update_path(tmp, "$game_shaders$", pth);
+    if (FS.folder_exist(tmp))
+        return spt;
+    else
+        return nullptr;
 }
