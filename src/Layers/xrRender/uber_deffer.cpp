@@ -28,8 +28,8 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 
     string256 ps, vs, dt;
     strconcat(sizeof(vs), vs, "deffer_", _vspec, lmap ? "_lmh" : "");
-    if ((subpath) && (strlen(subpath) > 1))
-        strconcat(sizeof(ps), ps, subpath, "\\deffer_", _pspec, lmap ? "_lmh" : ""); // season
+    if ((subpath) && (subpath[0] != '\0' && subpath[1] != '\0'))
+        strconcat(sizeof(ps), ps, subpath, "/deffer_", _pspec, lmap ? "_lmh" : ""); // season
     else
         strconcat(sizeof(ps), ps, "deffer_", _pspec, lmap ? "_lmh" : ""); 
 

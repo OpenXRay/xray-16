@@ -401,8 +401,6 @@ static class cl_season_cb : public R_constant_setup //--#SM+#--
     }
 } binder_season_cb;
 
-
-
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {

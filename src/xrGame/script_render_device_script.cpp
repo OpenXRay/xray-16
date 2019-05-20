@@ -56,7 +56,6 @@ SCRIPT_EXPORT(CRenderDevice, (), {
                          .def_readonly("frame", &CRenderDevice::dwFrame)
                          .def("is_paused", &is_device_paused)
                          .def("pause", &set_device_paused)
-                            //Graff46 seasons
                          .def("set_season_colors", &set_season_clr),
         def("app_ready", &is_app_ready)];
 });

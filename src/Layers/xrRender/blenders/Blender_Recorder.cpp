@@ -37,9 +37,19 @@ static int ParseName(LPCSTR N)
 //////////////////////////////////////////////////////////////////////
 
 CBlender_Compile::CBlender_Compile()
-{ 
-    _defSubPath = getSubPath("clr");
+{
+    pcstr gprop = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "shader_path", "path", nullptr);
+    if (gprop == nullptr)
+    {
+        string_path fn;
+        FS.update_path(fn, "$level$", "level.ltx");
+        CInifile flevel(fn);
+        ShadersSubPath = READ_IF_EXISTS(&flevel, r_string, "shader_path", "path", nullptr);
+    }
+    else
+        ShadersSubPath = gprop;
 }
+
 CBlender_Compile::~CBlender_Compile() {}
 void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
 {
@@ -359,15 +369,4 @@ void CBlender_Compile::Stage_Constant(LPCSTR name)
     sh_list& lst = L_constants;
     int id = ParseName(name);
     passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
-}
-
-pcstr CBlender_Compile::getSubPath(pcstr spt)
-{
-    string_path tmp, pth;
-    strconcat(sizeof(pth), pth, GEnv.Render->getShaderPath(), spt);
-    FS.update_path(tmp, "$game_shaders$", pth);
-    if (FS.folder_exist(tmp))
-        return spt;
-    else
-        return nullptr;
 }

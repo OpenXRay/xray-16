@@ -202,10 +202,10 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case SE_R2_NORMAL_HQ: // deffer
-        uber_deffer(C, true, tvs, "base", oBlend.value, nullptr, false, C._defSubPath);
+        uber_deffer(C, true, tvs, "base", oBlend.value, nullptr, false, C.ShadersSubPath);
         break;
     case SE_R2_NORMAL_LQ: // deffer
-        uber_deffer(C, false, tvs, "base", oBlend.value, nullptr, false, C._defSubPath);
+        uber_deffer(C, false, tvs, "base", oBlend.value, nullptr, false, C.ShadersSubPath);
         break;
     case SE_R2_SHADOW: // smap-spot
         //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
@@ -213,7 +213,6 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
             C.r_Pass(tvs_s, "shadow_direct_base", FALSE);
-        // C.r_Constant("recolor_s", &binder_recolor_tex);
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_End();
         break;
@@ -255,7 +254,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     case SE_R2_NORMAL_HQ: // deffer
         if (bUseATOC)
         {
-            uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true, C._defSubPath);
+            uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true, C.ShadersSubPath);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_StencilRef(0x01);
@@ -264,7 +263,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_End();
         }
 
-        uber_deffer(C, true, tvs, "base", oBlend.value, 0, true, C._defSubPath);
+        uber_deffer(C, true, tvs, "base", oBlend.value, 0, true, C.ShadersSubPath);
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         // C.PassSET_ZB		(true,false);
@@ -277,7 +276,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     case SE_R2_NORMAL_LQ: // deffer
         if (bUseATOC)
         {
-            uber_deffer(C, false, tvs, "base_atoc", oBlend.value, 0, true, C._defSubPath);
+            uber_deffer(C, false, tvs, "base_atoc", oBlend.value, 0, true, C.ShadersSubPath);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_StencilRef(0x01);
             C.r_ColorWriteEnable(false, false, false, false);
@@ -286,7 +285,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_End();
         }
 
-        uber_deffer(C, false, tvs, "base", oBlend.value, 0, true, C._defSubPath);
+        uber_deffer(C, false, tvs, "base", oBlend.value, 0, true, C.ShadersSubPath);
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         //	Need only for ATOC to emulate stencil test
@@ -342,7 +341,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     case SE_R2_NORMAL_HQ: // deffer
         if (bUseATOC)
         {
-            uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true, C._defSubPath);
+            uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true, C.ShadersSubPath);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_StencilRef(0x01);
@@ -351,7 +350,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_End();
         }
 
-        uber_deffer(C, true, tvs, "base", oBlend.value, 0, true, C._defSubPath);
+        uber_deffer(C, true, tvs, "base", oBlend.value, 0, true, C.ShadersSubPath);
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         // C.PassSET_ZB		(true,false);
@@ -364,7 +363,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     case SE_R2_NORMAL_LQ: // deffer
         if (bUseATOC)
         {
-            uber_deffer(C, false, tvs, "base_atoc", oBlend.value, 0, true, C._defSubPath);
+            uber_deffer(C, false, tvs, "base_atoc", oBlend.value, 0, true, C.ShadersSubPath);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_StencilRef(0x01);
             C.r_ColorWriteEnable(false, false, false, false);
@@ -373,7 +372,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_End();
         }
 
-        uber_deffer(C, false, tvs, "base", oBlend.value, 0, true, C._defSubPath);
+        uber_deffer(C, false, tvs, "base", oBlend.value, 0, true, C.ShadersSubPath);
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         //	Need only for ATOC to emulate stencil test

@@ -9,8 +9,8 @@
 #pragma warning(disable : 4995)
 #if defined(WINDOWS)
 #include <direct.h>
-#endif
 #include <sys/stat.h>
+#endif
 #include <fcntl.h>
 #pragma warning(pop)
 
@@ -36,7 +36,7 @@ static constexpr pcstr FSLTX = "fs.ltx"
 static constexpr pcstr FSLTX = "fsgame.ltx";
 #endif
 
-    struct _open_file
+struct _open_file
 {
     union
     {
@@ -157,12 +157,11 @@ XRCORE_API void _dump_open_files(int mode)
     Log("----total count = ", g_open_files.size());
 }
 
-CLocatorAPI::CLocatorAPI()
-    : bNoRecurse(true), m_auth_code(0),
+CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
 #ifdef CONFIG_PROFILE_LOCKS
-      m_auth_lock(new Lock(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock)))
+    m_auth_lock(new Lock(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock)))
 #else
-      m_auth_lock(new Lock)
+    m_auth_lock(new Lock)
 #endif // CONFIG_PROFILE_LOCKS
 {
     m_Flags.zero();
@@ -200,7 +199,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
 
     restore_path_separators(temp_file_name);
-    // Msg("Register[%d] [%s]",vfs,temp_file_name);
+    //Msg("Register[%d] [%s]",vfs,temp_file_name);
 
     // Register file
     file desc;
@@ -369,7 +368,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, u32 archiveSize, bool sho
             return new CTempReader(src_data, dwSize, 0);
         }
 
-        if (-1 == ::lseek(fd, dwSize, SEEK_CUR))
+        if(-1 == ::lseek(fd, dwSize, SEEK_CUR))
             return nullptr;
     }
     return nullptr;
@@ -604,7 +603,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
             return;
         if (0 == xr_strcmp(entry.name, ".."))
             return;
-        if (path[xr_strlen(path) - 1] != _DELIMITER || path[xr_strlen(path) - 1] != '/')
+        if(path[xr_strlen(path) - 1] != _DELIMITER || path[xr_strlen(path) - 1] != '/')
             xr_strcat(N, DELIMITER);
         Register(N, 0xffffffff, 0, 0, entry.size, entry.size, (u32)entry.time_write);
         Recurse(N);
@@ -628,7 +627,7 @@ bool ignore_name(const char* _name)
     if (!strcmp(_name, ".vs"))
         return true; // ignore ".vs" folders
     const size_t len = strlen(_name);
-#define ENDS_WITH(n) (len > sizeof(n) && !strcmp(_name + len - (sizeof(n) - 1), n))
+#define ENDS_WITH(n) (len>sizeof(n) && !strcmp(_name+len-(sizeof(n)-1), n))
     if (ENDS_WITH(".VC.db"))
         return true;
     if (ENDS_WITH(".VC.opendb"))
@@ -652,8 +651,7 @@ bool ignore_name(const char* _name)
 bool ignore_path(pcstr _path)
 {
 #if defined(WINDOWS)
-    HANDLE h =
-        CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
+    HANDLE h = CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 
     if (h != INVALID_HANDLE_VALUE)
     {
@@ -679,7 +677,7 @@ bool ignore_path(pcstr _path)
 
 bool CLocatorAPI::Recurse(pcstr path)
 {
-    string_path scanPath = {0};
+    string_path scanPath = { 0 };
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, ".xrignore");
     struct stat buffer;
@@ -699,7 +697,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     globbuf.gl_offs = 256;
     int result = glob(scanPath, GLOB_NOSORT, NULL, &globbuf);
 
-    if (0 != result)
+    if(0 != result)
         return false;
 
     intptr_t handle = globbuf.gl_pathc - 1;
@@ -718,8 +716,8 @@ bool CLocatorAPI::Recurse(pcstr path)
         switch (fi.st_mode & S_IFMT)
         {
         case S_IFDIR: findData.attrib = _A_SUBDIR; break;
-        case S_IFREG: findData.attrib = 0; break; // File
-        default: findData.attrib = _A_HIDDEN; break; // Skip
+        case S_IFREG: findData.attrib = 0;         break; // File
+        default:      findData.attrib = _A_HIDDEN; break; // Skip
         }
         restore_path_separators(findData.name);
 #endif
@@ -797,9 +795,9 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
 #elif defined(LINUX) || defined(FREEBSD)
     if (SDL_strlen(fs_path) != 0)
     {
-        char* tmp_path = realpath(fs_path, NULL);
-        CHECK_OR_EXIT(
-            tmp_path && tmp_path[0], make_string("Cannot get realpath for \"%s\": %s", fs_path, strerror(errno)));
+        char *tmp_path = realpath(fs_path, NULL);
+        CHECK_OR_EXIT(tmp_path && tmp_path[0],
+            make_string("Cannot get realpath for \"%s\": %s", fs_path, strerror(errno)));
         SDL_strlcpy(full_current_directory, tmp_path, sizeof full_current_directory);
         free(tmp_path);
     }
@@ -990,6 +988,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     //-----------------------------------------------------------
 
     CreateLog(nullptr != strstr(Core.Params, "-nolog"));
+    xrDebug::OnFilesystemInitialized();
 }
 
 void CLocatorAPI::_destroy()
@@ -1055,7 +1054,8 @@ FileStatus CLocatorAPI::exist(string_path& fn, pcstr path, pcstr name, FSType fs
     return exist(fn, fsType);
 }
 
-FileStatus CLocatorAPI::exist(string_path& fn, pcstr path, pcstr name, pcstr ext, FSType fsType /*= FSType::Virtual*/)
+FileStatus CLocatorAPI::exist(
+    string_path& fn, pcstr path, pcstr name, pcstr ext, FSType fsType /*= FSType::Virtual*/)
 {
     string_path nm;
     strconcat(sizeof nm, nm, name, ext);
@@ -1337,6 +1337,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     u8* ptr = (u8*)::mmap(NULL, sz, PROT_READ, MAP_SHARED, A.hSrcFile, start);
     VERIFY3(ptr && ptr != MAP_FAILED, "cannot create file mapping on file", fname);
 #endif
+
 
     string1024 temp;
     xr_sprintf(temp, sizeof temp, "%s:%s", *A.path, fname);
@@ -1744,7 +1745,10 @@ int CLocatorAPI::file_length(pcstr src)
     return -1;
 }
 
-bool CLocatorAPI::path_exist(pcstr path) { return m_paths.find(path) != m_paths.end(); }
+bool CLocatorAPI::path_exist(pcstr path)
+{
+    return m_paths.find(path) != m_paths.end();
+}
 
 FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool recursive)
 {
@@ -1929,29 +1933,6 @@ bool CLocatorAPI::can_modify_file(pcstr fname)
     {
         return false;
     }
-}
-
-bool CLocatorAPI::folder_exist(pcstr fullpath) // only Win ?
-{   
-#ifdef WINDOWS
-    DWORD ftyp = GetFileAttributesA(fullpath);
-    if (ftyp == INVALID_FILE_ATTRIBUTES)
-        return false; // something is wrong with your path!
-
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
-        return true; // this is a directory!
-
-    return false; // this is not a directory!
-#elif defined(LINUX) || defined(FREEBSD)
-  
-    stat sb;
-    if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
-        return true;
-    return false;
-        
-#else
-#error provide implementation for your platform
-#endif 
 }
 
 bool CLocatorAPI::can_modify_file(pcstr path, pcstr name)
