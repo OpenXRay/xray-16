@@ -988,7 +988,6 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     //-----------------------------------------------------------
 
     CreateLog(nullptr != strstr(Core.Params, "-nolog"));
-    xrDebug::OnFilesystemInitialized();
 }
 
 void CLocatorAPI::_destroy()
