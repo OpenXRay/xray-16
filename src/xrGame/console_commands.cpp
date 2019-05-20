@@ -624,7 +624,13 @@ public:
 #endif
     } // virtual void Execute
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        if (ShadowOfChernobylMode || ClearSkyMode)
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
+        else
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION);
+    }
 }; // CCC_ALifeSave
 
 class CCC_ALifeLoadFrom : public IConsole_Command
@@ -696,7 +702,13 @@ public:
         Level().Send(net_packet, net_flags(TRUE));
     }
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        if (ShadowOfChernobylMode || ClearSkyMode)
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
+        else
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION);
+    }
 }; // CCC_ALifeLoadFrom
 
 class CCC_LoadLastSave : public IConsole_Command
