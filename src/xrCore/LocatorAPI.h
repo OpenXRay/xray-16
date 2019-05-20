@@ -81,7 +81,7 @@ public:
 class XRCORE_API CLocatorAPI : Noncopyable
 {
     friend class FS_Path;
-
+    
 public:
     struct file
     {
