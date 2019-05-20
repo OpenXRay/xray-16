@@ -183,7 +183,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 void CBlender_Tree::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-
+    
     //*************** codepath is the same, only shaders differ
     LPCSTR tvs = "tree";
     LPCSTR tvs_s = "shadow_direct_tree";
