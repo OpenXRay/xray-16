@@ -371,7 +371,7 @@ int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
     return result;
 }
 
-bool CScriptEngine::parse_namespace(LPCSTR caNamespaceName, LPSTR b, u32 b_size, LPSTR c, u32 c_size)
+bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size, pstr c, size_t c_size)
 {
     *b = 0;
     *c = 0;
@@ -413,15 +413,15 @@ lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameS
         if (!parse_namespace(caNameSpaceName, a, sizeof(a), b, sizeof(b)))
             return false;
         xr_sprintf(insert, header, caNameSpaceName, a, b);
-        u32 str_len = xr_strlen(insert);
-        u32 const total_size = str_len + tSize;
+        const size_t str_len = xr_strlen(insert);
+        const size_t total_size = str_len + tSize;
         if (total_size >= scriptBufferSize)
         {
             scriptBufferSize = total_size;
             scriptBuffer = (char*)xr_realloc(scriptBuffer, scriptBufferSize);
         }
         xr_strcpy(scriptBuffer, total_size, insert);
-        CopyMemory(scriptBuffer + str_len, caBuffer, u32(tSize));
+        CopyMemory(scriptBuffer + str_len, caBuffer, tSize);
         l_iErrorCode = luaL_loadbuffer(L, scriptBuffer, tSize + str_len, caScriptName);
     }
     else
@@ -1127,7 +1127,7 @@ bool CScriptEngine::load_file(const char* scriptName, const char* namespaceName)
 
 bool CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_exist)
 {
-    u32 string_length = xr_strlen(file_name);
+    const size_t string_length = xr_strlen(file_name);
     if (!warn_if_not_exist && no_file_exists(file_name, string_length))
         return false;
     string_path S, S1;
@@ -1204,7 +1204,7 @@ CScriptProcess* CScriptEngine::script_process(const ScriptProcessor& process_id)
     return nullptr;
 }
 
-void CScriptEngine::parse_script_namespace(const char* name, char* ns, u32 nsSize, char* func, u32 funcSize)
+void CScriptEngine::parse_script_namespace(pcstr name, pstr ns, size_t nsSize, pstr func, size_t funcSize)
 {
     const char* p = strrchr(name, '.');
     if (!p)
@@ -1214,7 +1214,7 @@ void CScriptEngine::parse_script_namespace(const char* name, char* ns, u32 nsSiz
     }
     else
     {
-        VERIFY(u32(p - name + 1) <= nsSize);
+        VERIFY(size_t(p - name + 1) <= nsSize);
         strncpy(ns, name, p - name);
         ns[p - name] = 0;
     }
@@ -1284,14 +1284,14 @@ bool CScriptEngine::UnregisterState(lua_State* state)
     return result;
 }
 
-bool CScriptEngine::no_file_exists(LPCSTR file_name, u32 string_length)
+bool CScriptEngine::no_file_exists(pcstr file_name, size_t string_length)
 {
     if (m_last_no_file_length != string_length)
         return false;
     return !memcmp(m_last_no_file, file_name, string_length);
 }
 
-void CScriptEngine::add_no_file(LPCSTR file_name, u32 string_length)
+void CScriptEngine::add_no_file(pcstr file_name, size_t string_length)
 {
     m_last_no_file_length = string_length;
     CopyMemory(m_last_no_file, file_name, string_length + 1);
