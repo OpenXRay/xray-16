@@ -122,6 +122,8 @@ class XRCORE_API xrCore
     u32 buildId = 0;
 
 public:
+    xrCore();
+
     string64 ApplicationName;
     string_path ApplicationPath;
     string_path WorkingPath;

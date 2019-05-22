@@ -187,6 +187,13 @@ void SDLLogOutput(void* /*userdata*/,
     Log(buf);
 }
 
+xrCore::xrCore()
+    : ApplicationName{}, ApplicationPath{},
+      WorkingPath{},
+      UserName{}, CompName{},
+      Params(nullptr), dwFrame(0),
+      PluginMode(false) {}
+
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);

@@ -939,6 +939,6 @@ void xrDebug::Initialize(pcstr commandLine)
 #ifdef DEBUG
     ShowErrorMessage = true;
 #else
-    ShowErrorMessage = strstr(commandLine, "-show_error_window");
+    ShowErrorMessage = commandLine ? strstr(commandLine, "-show_error_window") : false;
 #endif
 }
