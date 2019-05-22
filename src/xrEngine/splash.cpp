@@ -95,21 +95,6 @@ public:
         for (SDL_Surface* surface : self.m_surfaces)
             SDL_FreeSurface(surface);
         self.m_surfaces.clear();
-        SDL_SetEventFilter(nullptr, self_ptr);
-    }
-
-    static int on_window_event(void* self_ptr, SDL_Event* event)
-    {
-        auto& self = *static_cast<splash_screen*>(self_ptr);
-
-        if (event->type == SDL_WINDOWEVENT)
-        {
-            if (event->window.windowID == SDL_GetWindowID(self.m_window))
-                return 0; // skip splash screen events
-        }
-
-        // allow any other events
-        return 1;
     }
 
     void show(bool topmost)
@@ -145,7 +130,6 @@ public:
         SDL_UpdateWindowSurface(m_window);
 
         m_should_exit.Reset();
-        SDL_SetEventFilter(on_window_event, this);
         thread_spawn(splash_proc, "X-Ray Splash Thread", 0, this);
     }
 
