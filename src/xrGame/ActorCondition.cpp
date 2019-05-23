@@ -123,9 +123,9 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_zone_max_power[ALife::infl_psi] = pSettings->r_float(section, "psi_zone_max_power");
     m_zone_max_power[ALife::infl_electra] = pSettings->r_float(section, "electra_zone_max_power");
 
-    m_max_power_restore_speed = pSettings->r_float(section, "max_power_restore_speed");
-    m_max_wound_protection = READ_IF_EXISTS(pSettings, r_float, section, "max_wound_protection", 1.0f);
-    m_max_fire_wound_protection = READ_IF_EXISTS(pSettings, r_float, section, "max_fire_wound_protection", 1.0f);
+    m_max_power_restore_speed = pSettings->read_if_exists<float>(section, "max_power_restore_speed", 1.0f);
+    m_max_wound_protection = pSettings->read_if_exists<float>(section, "max_wound_protection", 1.0f);
+    m_max_fire_wound_protection = pSettings->read_if_exists<float>(section, "max_fire_wound_protection", 1.0f);
 
     VERIFY(!fis_zero(m_zone_max_power[ALife::infl_rad]));
     VERIFY(!fis_zero(m_zone_max_power[ALife::infl_fire]));
