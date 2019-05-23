@@ -170,6 +170,8 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kQUICK_USE_3:
     case kQUICK_USE_4:
     {
+        if (!CurrentGameUI()->GetActorMenu().m_pQuickSlot)
+            break;
         const shared_str& item_name = g_quick_use_slots[cmd - kQUICK_USE_1];
         if (item_name.size())
         {
