@@ -28,7 +28,8 @@ void CUIActorMenu::InitTradeMode()
     m_pInventoryBagList->Show(false);
     m_PartnerCharacterInfo->Show(true);
     m_PartnerMoney->Show(true);
-    m_pQuickSlot->Show(true);
+    if (m_pQuickSlot)
+        m_pQuickSlot->Show(true);
 
     m_pTradeActorBagList->Show(true);
     m_pTradeActorList->Show(true);
