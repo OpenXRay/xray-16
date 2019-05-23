@@ -50,10 +50,7 @@ void CUIActorMenu::Construct()
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
-    m_LeftBackground = new CUIStatic();
-    m_LeftBackground->SetAutoDelete(true);
-    AttachChild(m_LeftBackground);
-    CUIXmlInit::InitStatic(uiXml, "left_background", 0, m_LeftBackground);
+    m_LeftBackground = UIHelper::CreateStatic(uiXml, "left_background", this);
 
     m_pUpgradeWnd = new CUIInventoryUpgradeWnd();
     AttachChild(m_pUpgradeWnd);
@@ -71,16 +68,16 @@ void CUIActorMenu::Construct()
     m_PartnerCharacterInfo->InitCharacterInfo(&uiXml, "partner_ch_info");
 
     m_RightDelimiter = UIHelper::CreateStatic(uiXml, "right_delimiter", this);
-    //	m_ActorTradeCaption			= UIHelper::CreateTextWnd(uiXml, "right_delimiter:trade_caption", m_RightDelimiter);
+    if ((m_ActorTradeCaption = UIHelper::CreateTextWnd(uiXml, "right_delimiter:trade_caption", m_RightDelimiter, false)))
+        m_ActorTradeCaption->AdjustWidthToText();
     m_ActorTradePrice = UIHelper::CreateTextWnd(uiXml, "right_delimiter:trade_price", m_RightDelimiter);
     m_ActorTradeWeightMax = UIHelper::CreateTextWnd(uiXml, "right_delimiter:trade_weight_max", m_RightDelimiter);
-    //	m_ActorTradeCaption->AdjustWidthToText();
 
     m_LeftDelimiter = UIHelper::CreateStatic(uiXml, "left_delimiter", this);
-    //	m_PartnerTradeCaption		= UIHelper::CreateTextWnd(uiXml, "left_delimiter:trade_caption", m_LeftDelimiter);
+    if ((m_PartnerTradeCaption = UIHelper::CreateTextWnd(uiXml, "left_delimiter:trade_caption", m_LeftDelimiter, false)))
+        m_PartnerTradeCaption->AdjustWidthToText();
     m_PartnerTradePrice = UIHelper::CreateTextWnd(uiXml, "left_delimiter:trade_price", m_LeftDelimiter);
     m_PartnerTradeWeightMax = UIHelper::CreateTextWnd(uiXml, "left_delimiter:trade_weight_max", m_LeftDelimiter);
-    //	m_PartnerTradeCaption->AdjustWidthToText();
 
     m_ActorBottomInfo = UIHelper::CreateStatic(uiXml, "actor_weight_caption", this);
     m_ActorWeight = UIHelper::CreateTextWnd(uiXml, "actor_weight", this);
@@ -170,12 +167,13 @@ void CUIActorMenu::Construct()
     m_Helmet_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_helmet", this);
     m_Outfit_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_outfit", this);
 
-    m_trade_buy_button = UIHelper::Create3tButton(uiXml, "trade_buy_button", this);
-    m_trade_sell_button = UIHelper::Create3tButton(uiXml, "trade_sell_button", this);
+    m_trade_button = UIHelper::Create3tButton(uiXml, "trade_button", this, false);
+    m_trade_buy_button = UIHelper::Create3tButton(uiXml, "trade_buy_button", this, false);
+    m_trade_sell_button = UIHelper::Create3tButton(uiXml, "trade_sell_button", this, false);
     m_takeall_button = UIHelper::Create3tButton(uiXml, "takeall_button", this);
     m_exit_button = UIHelper::Create3tButton(uiXml, "exit_button", this);
 
-    //	m_clock_value						= UIHelper::CreateStatic(uiXml, "clock_value", this);
+    m_clock_value = UIHelper::CreateStatic(uiXml, "clock_value", this, false);
 
     /*
         m_pDeadBodyBagList					= new CUIDragDropListEx();

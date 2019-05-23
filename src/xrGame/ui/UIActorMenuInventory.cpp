@@ -48,18 +48,20 @@ void CUIActorMenu::InitInventoryMode()
     m_pQuickSlot->Show(true);
     m_pTrashList->Show(true);
     m_RightDelimiter->Show(false);
+    if (m_clock_value)
+        m_clock_value->Show(true);
 
     InitInventoryContents(m_pInventoryBagList);
 
     VERIFY(CurrentGameUI());
     CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(true);
-    //	m_clock_value->Show					(true);
 }
 
 void CUIActorMenu::DeInitInventoryMode()
 {
     m_pTrashList->Show(false);
-    //	m_clock_value->Show					(false);
+    if (m_clock_value)
+        m_clock_value->Show(false);
 }
 
 void CUIActorMenu::SendEvent_ActivateSlot(u16 slot, u16 recipient)
