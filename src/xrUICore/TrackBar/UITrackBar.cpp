@@ -7,8 +7,8 @@
 #define DEF_CONTROL_HEIGHT 16.0f
 
 CUITrackBar::CUITrackBar()
-    : m_f_min(0), m_f_max(1), m_f_val(0), m_f_opt_backup_value(0), m_f_step(0.01f), m_b_is_float(true),
-      m_b_invert(false), m_b_bound_already_set(false)
+    : m_b_invert(false), m_b_is_float(true), m_b_bound_already_set(false), m_f_val(0), m_f_max(1), m_f_min(0),
+      m_f_step(0.01f), m_f_opt_backup_value(0)
 {
     m_pSlider = new CUI3tButton();
     AttachChild(m_pSlider);
