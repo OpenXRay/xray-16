@@ -81,7 +81,7 @@ bool CUIInteractiveBackground<T>::InitState(IBState state, pcstr texture, bool f
         AttachChild(m_states[state]);
     }
 
-    const bool result = m_states[state]->InitTexture(texture, "hud" DELIMITER "default", fatal);
+    const bool result = m_states[state]->InitTexture(texture, fatal);
     m_states[state]->SetWndPos(Fvector2().set(0, 0));
     m_states[state]->SetWndSize(size);
 
