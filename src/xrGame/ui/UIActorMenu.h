@@ -354,6 +354,7 @@ public:
     void UpdatePartnerBag();
     void UpdateDeadBodyBag();
 
+    void xr_stdcall OnBtnPerformTrade(CUIWindow* w, void* d);
     void xr_stdcall OnBtnPerformTradeBuy(CUIWindow* w, void* d);
     void xr_stdcall OnBtnPerformTradeSell(CUIWindow* w, void* d);
     void xr_stdcall OnBtnExitClicked(CUIWindow* w, void* d);

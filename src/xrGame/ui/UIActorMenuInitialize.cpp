@@ -374,7 +374,7 @@ void CUIActorMenu::InitCallbacks()
     if (m_trade_button)
     {
         AddCallback(m_trade_button, BUTTON_CLICKED,
-            CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTradeBuy));
+            CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTrade));
     }
 
     if (m_trade_buy_button)
