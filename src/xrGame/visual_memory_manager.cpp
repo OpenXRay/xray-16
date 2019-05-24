@@ -140,7 +140,9 @@ void CVisualMemoryManager::reinit()
 
 void CVisualMemoryManager::reload(LPCSTR section)
 {
-    //	m_max_object_count			= READ_IF_EXISTS(pSettings,r_s32,section,"DynamicObjectsCount",1);
+    const s32 maxObjectCount = pSettings->read_if_exists<s32>(section, "DynamicObjectsCount", -1);
+    if (maxObjectCount > -1)
+        m_max_object_count = std::max<u32>(maxObjectCount, m_max_object_count);
 
     if (m_stalker)
     {
