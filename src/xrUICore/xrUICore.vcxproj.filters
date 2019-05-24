@@ -73,6 +73,9 @@
     <Filter Include="FontManager">
       <UniqueIdentifier>{6a4dc39a-f6c8-45f8-9505-11e65cb12e49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ListWnd">
+      <UniqueIdentifier>{5170a7a3-bd65-4f09-a9e4-74a6ec9e587c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arrow\ui_arrow.cpp">
@@ -256,6 +259,18 @@
     <ClCompile Include="Options\UIOptionsManagerScript.cpp">
       <Filter>Options</Filter>
     </ClCompile>
+    <ClCompile Include="ListWnd\UIListItemEx.cpp">
+      <Filter>ListWnd</Filter>
+    </ClCompile>
+    <ClCompile Include="ListWnd\UIListWnd.cpp">
+      <Filter>ListWnd</Filter>
+    </ClCompile>
+    <ClCompile Include="ListWnd\UIListWnd_script.cpp">
+      <Filter>ListWnd</Filter>
+    </ClCompile>
+    <ClCompile Include="ListWnd\UIListItem.cpp">
+      <Filter>ListWnd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h">
@@ -420,6 +435,18 @@
     </ClInclude>
     <ClInclude Include="Options\UIOptionsManagerScript.h">
       <Filter>Options</Filter>
+    </ClInclude>
+    <ClInclude Include="ListWnd\UIListItem.h">
+      <Filter>ListWnd</Filter>
+    </ClInclude>
+    <ClInclude Include="ListWnd\UIListItemEx.h">
+      <Filter>ListWnd</Filter>
+    </ClInclude>
+    <ClInclude Include="ListWnd\UIListWnd.h">
+      <Filter>ListWnd</Filter>
+    </ClInclude>
+    <ClInclude Include="ListWnd\UIListWnd_inline.h">
+      <Filter>ListWnd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

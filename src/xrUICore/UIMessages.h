@@ -65,6 +65,7 @@ enum EUIMessages
     // CUIListWnd
     LIST_ITEM_CLICKED,
     LIST_ITEM_SELECT,
+    LIST_ITEM_UNSELECT,
     LIST_ITEM_FOCUS_RECEIVED,
 
     // UIPropertiesBox
