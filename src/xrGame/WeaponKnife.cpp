@@ -38,8 +38,14 @@ CWeaponKnife::CWeaponKnife()
     m_Hit1SplashRadius = 1.0f;
     m_Hit2SplashRadius = 1.0f;
 
-    m_Hit1SpashDir.set(0.f, 0.f, 1.f);
+    m_Hit1SpashDir.set(0.f, -0.3, 1.f);
     m_Hit2SpashDir.set(0.f, 0.f, 1.f);
+
+    m_Splash1HitsCount = 3;
+    m_Splash1PerVictimsHCount = 1;
+    m_Splash2HitsCount = 2;
+
+    m_NextHitDivideFactor = 0.75f;
 }
 
 CWeaponKnife::~CWeaponKnife() {}
@@ -51,24 +57,101 @@ void CWeaponKnife::Load(LPCSTR section)
     fWallmarkSize = pSettings->r_float(section, "wm_size");
     m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, SOUND_TYPE_WEAPON_SHOOTING);
 
-    m_Hit1SpashDir = pSettings->r_fvector3(section, "splash1_direction");
-    m_Hit2SpashDir = pSettings->r_fvector3(section, "splash2_direction");
+    int i = 0;
+    int count = 0;
 
-    m_Hit1Distance = pSettings->r_float(section, "spash1_dist");
-    m_Hit2Distance = pSettings->r_float(section, "spash2_dist");
+    if (count++; pSettings->line_exist(section, "splash1_direction"))
+    {
+        m_Hit1SpashDir = pSettings->r_fvector3(section, "splash1_direction");
+        i++;
+    }
+    if (count++; pSettings->line_exist(section, "splash2_direction"))
+    {
+        m_Hit2SpashDir = pSettings->r_fvector3(section, "splash2_direction");
+        i++;
+    }
 
-    m_Hit1SplashRadius = pSettings->r_float(section, "spash1_radius");
-    m_Hit2SplashRadius = pSettings->r_float(section, "spash2_radius");
+    if (count++; pSettings->line_exist(section, "splash1_dist"))
+    {
+        m_Hit1Distance = pSettings->r_float(section, "splash1_dist");
+        i++;
+    }
+    else if (pSettings->line_exist(section, "spash1_dist"))
+    {
+        m_Hit1Distance = pSettings->r_float(section, "spash1_dist");
+        i++;
+    }
 
-    m_Splash1HitsCount = pSettings->r_u32(section, "splash1_hits_count");
-    m_Splash1PerVictimsHCount = pSettings->r_u32(section, "splash1_pervictim_hcount");
-    m_Splash2HitsCount = pSettings->r_u32(section, "splash2_hits_count");
+    if (count++; pSettings->line_exist(section, "splash2_dist"))
+    {
+        m_Hit2Distance = pSettings->r_float(section, "splash2_dist");
+        i++;
+    }
+    else if (pSettings->line_exist(section, "spash2_dist"))
+    {
+        m_Hit2Distance = pSettings->r_float(section, "spash2_dist");
+        i++;
+    }
+
+    if (count++; pSettings->line_exist(section, "splash1_radius"))
+    {
+        m_Hit1SplashRadius = pSettings->r_float(section, "splash1_radius");
+        i++;
+    }
+    else if (pSettings->line_exist(section, "spash1_radius"))
+    {
+        m_Hit1SplashRadius = pSettings->r_float(section, "spash1_radius");
+        i++;
+    }
+
+    if (count++; pSettings->line_exist(section, "splash2_radius"))
+    {
+        m_Hit2SplashRadius = pSettings->r_float(section, "splash2_radius");
+        i++;
+    }
+    else if (pSettings->line_exist(section, "spash2_radius"))
+    {
+        m_Hit2SplashRadius = pSettings->r_float(section, "spash2_radius");
+        i++;
+    }
+
+    if (count++; pSettings->line_exist(section, "splash1_hits_count"))
+    {
+        m_Splash1HitsCount = pSettings->r_u32(section, "splash1_hits_count");
+        i++;
+    }
+    if (count++; pSettings->line_exist(section, "splash1_pervictim_hcount"))
+    {
+        m_Splash1PerVictimsHCount = pSettings->r_u32(section, "splash1_pervictim_hcount");
+        i++;
+    }
+    if (count++; pSettings->line_exist(section, "splash2_hits_count"))
+    {
+        m_Splash2HitsCount = pSettings->r_u32(section, "splash2_hits_count");
+        i++;
+    }
+
+    if (count++; pSettings->line_exist(section, "splash_hit_divide_factor"))
+    {
+        m_NextHitDivideFactor = pSettings->r_float(section, "splash_hit_divide_factor");
+        i++;
+    }
+
+    if (i == 0)
+        oldStrikeMethod = true;
+    else
+    {
+        constexpr pcstr fields = "splash1_direction, splash2_direction, splash1_dist, splash2_dist, "
+            "splash1_radius, splash2_radius, splash1_hits_count, splash1_pervictim_hcount, "
+            "splash2_hits_count, splash_hit_divide_factor";
+        R_ASSERT3(i == count, "You need to provide all knife splash parameters or remove them all.", fields);
+    }
+
+    knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
+
 #ifdef DEBUG
     m_dbg_data.m_pick_vectors.reserve(std::max(m_Splash1HitsCount, m_Splash2HitsCount));
 #endif
-    m_NextHitDivideFactor = pSettings->r_float(section, "splash_hit_divide_factor");
-
-    knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
 }
 
 void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
@@ -140,6 +223,12 @@ void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
 
 void CWeaponKnife::KnifeStrike(const Fvector& pos, const Fvector& dir)
 {
+    if (oldStrikeMethod)
+    {
+        MakeShot(pos, dir);
+        return;
+    }
+
     IGameObject* real_victim = TryPick(pos, dir, m_hit_dist);
     if (real_victim)
     {
@@ -200,31 +289,39 @@ void CWeaponKnife::MakeShot(Fvector const& pos, Fvector const& dir, float const 
 void CWeaponKnife::OnMotionMark(u32 state, const motion_marks& M)
 {
     inherited::OnMotionMark(state, M);
-    if (state == eFire)
+    switch (state)
     {
+    case eFire:
+    {
+        if (oldStrikeMethod)
+            break;
         m_hit_dist = m_Hit1Distance;
         m_splash_dir = m_Hit1SpashDir;
         m_splash_radius = m_Hit1SplashRadius;
         m_hits_count = m_Splash1HitsCount;
         m_perv_hits_count = m_Splash1PerVictimsHCount;
+        fireDistance = m_hit_dist + m_splash_radius;
+        break;
     }
-    else if (state == eFire2)
+    case eFire2:
     {
+        if (oldStrikeMethod)
+            break;
         m_hit_dist = m_Hit2Distance;
         m_splash_dir = m_Hit2SpashDir;
         m_splash_radius = m_Hit2SplashRadius;
         m_hits_count = m_Splash2HitsCount;
         m_perv_hits_count = 0;
+        fireDistance = m_hit_dist + m_splash_radius;
+        break;
     }
-    else
-    {
+    default:
         return;
     }
 
     Fvector p1, d;
     p1.set(get_LastFP());
     d.set(get_LastFD());
-    fireDistance = m_hit_dist + m_splash_radius;
 
     if (H_Parent())
     {
