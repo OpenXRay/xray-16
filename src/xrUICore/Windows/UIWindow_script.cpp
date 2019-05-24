@@ -74,6 +74,16 @@ SCRIPT_EXPORT(CUIWindow, (), {
             return CUITextureMaster::FindItem(name, defaultName);
         }),
 
+        def("GetTextureInfo", +[](pcstr name, TEX_INFO& outValue)
+        {
+            return CUITextureMaster::FindItem(name, outValue);
+        }),
+
+        def("GetTextureInfo", +[](pcstr name, pcstr defaultName, TEX_INFO& outValue)
+        {
+            return CUITextureMaster::FindItem(name, defaultName, outValue);
+        }),
+
         class_<CUIWindow>("CUIWindow")
             .def(constructor<>())
             .def("AttachChild", &CUIWindow::AttachChild, adopt<2>())

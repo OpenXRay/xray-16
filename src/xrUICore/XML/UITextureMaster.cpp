@@ -165,19 +165,62 @@ float CUITextureMaster::GetTextureWidth(const shared_str& texture_name)
     return info.rect.width();
 }
 
+bool CUITextureMaster::GetTextureHeight(const shared_str& texture_name, float& outValue)
+{
+    TEX_INFO info;
+    if (FindItem(texture_name, info))
+    {
+        outValue = info.rect.height();
+        return true;
+    }
+    return false;
+}
+
+bool CUITextureMaster::GetTextureWidth(const shared_str& texture_name, float& outValue)
+{
+    TEX_INFO info;
+    if (FindItem(texture_name, info))
+    {
+        outValue = info.rect.width();
+        return true;
+    }
+    return false;
+
+}
+
 TEX_INFO CUITextureMaster::FindItem(const shared_str& texture_name, pcstr default_texture /*= nullptr*/)
+{
+    TEX_INFO info;
+    
+    VERIFY4(FindItem(texture_name, default_texture, info),
+        "Can't find texture", texture_name.c_str(), default_texture);
+
+    return info;
+}
+
+bool CUITextureMaster::FindItem(const shared_str& texture_name, TEX_INFO& outValue)
+{
+    return FindItem(texture_name, nullptr, outValue);
+}
+
+bool CUITextureMaster::FindItem(const shared_str& texture_name, pcstr default_texture, TEX_INFO& outValue)
 {
     auto it = m_textures.find(texture_name);
 
     if (it != m_textures.end())
-        return (it->second);
+    {
+        outValue = it->second;
+        return true;
+    }
 
     it = m_textures.find(default_texture);
     if (it != m_textures.end())
-        return (it->second);
+    {
+        outValue = it->second;
+        return true;
+    }
 
-    VERIFY4(false, "Can't find texture", texture_name.c_str(), default_texture);
-    return TEX_INFO();
+    return false;
 }
 
 bool CUITextureMaster::ItemExist(const shared_str& texture_name)
