@@ -103,7 +103,7 @@ void CUITrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
     // If it was successful then init disabled state too
     if (InitState(S_Enabled, UI_SLIDER_BAR, false))
     {
-        InitState(S_Disabled, UI_SLIDER_BAR, false);
+        InitState(S_Disabled, UI_SLIDER_BAR);
     }
     else // Try to initialize with SOC/CS texture names
     {
@@ -114,10 +114,16 @@ void CUITrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
     float item_width = 0.f;
     float item_height = 0.f;
 
-    if (!CUITextureMaster::GetTextureWidth(SLIDER_BOX_TEXTURE_E, item_width))
+    // Try to get width, if successful then get height too
+    if (CUITextureMaster::GetTextureWidth(SLIDER_BOX_TEXTURE_E, item_width))
+    {
+        CUITextureMaster::GetTextureHeight(SLIDER_BOX_TEXTURE_E, item_height);
+    }
+    else // Try to get width and height with SOC/CS texture names
+    {
         CUITextureMaster::GetTextureWidth(SLIDER_BUTTON_TEXTURE_E, item_width);
-    if (!CUITextureMaster::GetTextureHeight(SLIDER_BOX_TEXTURE_E, item_height))
         CUITextureMaster::GetTextureHeight(SLIDER_BUTTON_TEXTURE_E, item_height);
+    }
 
     item_width *= UI().get_current_kx();
 
