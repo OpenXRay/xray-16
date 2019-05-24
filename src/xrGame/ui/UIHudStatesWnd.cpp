@@ -371,15 +371,18 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
 
         if (m_ui_weapon_sign_ammo)
         {
+            string64 temp;
+            xr_sprintf(temp, "%s/%s", m_item_info.cur_ammo.c_str(), m_item_info.total_ammo.c_str());
+
             m_ui_weapon_sign_ammo->Show(true);
-            m_ui_weapon_sign_ammo->SetText(m_item_info.cur_ammo.c_str());
+            m_ui_weapon_sign_ammo->SetText(temp);
 
             // hack ^ begin
             CGameFont* pFont32 = GEnv.UI->Font().pFontGraffiti32Russian;
             CGameFont* pFont22 = GEnv.UI->Font().pFontGraffiti22Russian;
             CGameFont* pFont = pFont32;
 
-            if (GEnv.UI->is_widescreen())
+            if (UICore::is_widescreen())
             {
                 pFont = pFont22;
             }
