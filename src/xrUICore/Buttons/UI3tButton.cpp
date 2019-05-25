@@ -129,7 +129,7 @@ bool CUI3tButton::InitTexture(pcstr tex_name, bool fatal /*= true*/)
 
 bool CUI3tButton::InitTexture(pcstr tex_enabled, pcstr tex_disabled, pcstr tex_touched, pcstr tex_highlighted, bool fatal /*= true*/)
 {
-    bool failed = true;
+    bool failed = false;
     if (m_background)
     {
         failed |= !m_background->InitState(S_Enabled, tex_enabled, fatal);
