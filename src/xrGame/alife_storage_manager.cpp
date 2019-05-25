@@ -175,7 +175,7 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
     constexpr pcstr mismatch = "Saved game version mismatch or saved game is corrupted";
     const bool gameSaveIsValid = CSavedGameWrapper::valid_saved_game(*stream);
-    VERIFY2(gameSaveIsValid, mismatch, file_name);
+    VERIFY3(gameSaveIsValid, mismatch, file_name);
 
     if (!gameSaveIsValid)
     {
