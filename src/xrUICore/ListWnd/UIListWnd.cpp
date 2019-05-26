@@ -109,7 +109,7 @@ void CUIListWnd::SetWidth(float width)
     /*
         m_StaticActiveBackground.SetTile(iFloor(GetWidth()/ACTIVE_BACKGROUND_WIDTH), 
                                          iFloor(m_iItemHeight/ACTIVE_BACKGROUND_HEIGHT),
-                                         fmod(GetWidth(),float(ACTIVE_BACKGROUND_WIDTH)),
+                                         fmod(GetWidth(),float(ACTIVE_BACKGROUND_WIDTH)), 
                                          fmod(float(m_iItemHeight),float(ACTIVE_BACKGROUND_HEIGHT))
                                          );
     */
