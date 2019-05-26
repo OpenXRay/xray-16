@@ -48,6 +48,11 @@ CWeaponKnife::CWeaponKnife()
     m_NextHitDivideFactor = 0.75f;
 }
 
+enum class FieldTypes
+{
+    t_u32, t_float, t_fvector3
+};
+
 CWeaponKnife::~CWeaponKnife() {}
 void CWeaponKnife::Load(LPCSTR section)
 {
@@ -57,95 +62,88 @@ void CWeaponKnife::Load(LPCSTR section)
     fWallmarkSize = pSettings->r_float(section, "wm_size");
     m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, SOUND_TYPE_WEAPON_SHOOTING);
 
-    int i = 0;
-    int count = 0;
+    int successCount = 0;
+    string1024 missingFields;
 
-    if (count++; pSettings->line_exist(section, "splash1_direction"))
-    {
-        m_Hit1SpashDir = pSettings->r_fvector3(section, "splash1_direction");
-        i++;
-    }
-    if (count++; pSettings->line_exist(section, "splash2_direction"))
-    {
-        m_Hit2SpashDir = pSettings->r_fvector3(section, "splash2_direction");
-        i++;
-    }
+    // array of <name, fallbackName, type, variable>
+    constexpr u32 elementsCount = 10;
+    const xr_array<std::tuple<pcstr, pcstr, FieldTypes, void*>, elementsCount> fields =
+    {{
+        { "splash1_direction", nullptr, FieldTypes::t_fvector3, &m_Hit1SpashDir },
+        { "splash2_direction", nullptr, FieldTypes::t_fvector3, &m_Hit2SpashDir },
 
-    if (count++; pSettings->line_exist(section, "splash1_dist"))
-    {
-        m_Hit1Distance = pSettings->r_float(section, "splash1_dist");
-        i++;
-    }
-    else if (pSettings->line_exist(section, "spash1_dist"))
-    {
-        m_Hit1Distance = pSettings->r_float(section, "spash1_dist");
-        i++;
-    }
+        { "splash1_dist", "spash1_dist", FieldTypes::t_float, &m_Hit1Distance }, // We need those fallback names just because
+        { "splash2_dist", "spash2_dist", FieldTypes::t_float, &m_Hit2Distance }, // GSC was too lazy to fix the typos!!!
 
-    if (count++; pSettings->line_exist(section, "splash2_dist"))
+        { "splash1_radius", "spash1_radius", FieldTypes::t_float, &m_Hit1SplashRadius },
+        { "splash2_radius", "spash2_radius", FieldTypes::t_float, &m_Hit1SplashRadius },
+
+        { "splash1_hits_count", nullptr, FieldTypes::t_u32, &m_Splash1HitsCount },
+        { "splash1_pervictim_hcount", nullptr, FieldTypes::t_u32, &m_Splash1PerVictimsHCount },
+        { "splash2_hits_count", nullptr, FieldTypes::t_u32, &m_Splash2HitsCount },
+        { "splash_hit_divide_factor", nullptr, FieldTypes::t_float, &m_NextHitDivideFactor },
+    }};
+
+    const auto assertField = [&](pcstr name, pcstr /*fallback*/, FieldTypes /*type*/, void* outPtr)
     {
-        m_Hit2Distance = pSettings->r_float(section, "splash2_dist");
-        i++;
-    }
-    else if (pSettings->line_exist(section, "spash2_dist"))
+        R_ASSERT2(name && outPtr, "Some fields are missing or malformed");
+    };
+
+    for (const auto& field : fields)
     {
-        m_Hit2Distance = pSettings->r_float(section, "spash2_dist");
-        i++;
+        std::apply(assertField, field);
     }
 
-    if (count++; pSettings->line_exist(section, "splash1_radius"))
+    const auto processField = [&](pcstr name, pcstr fallback, FieldTypes type, void* outPtr)
     {
-        m_Hit1SplashRadius = pSettings->r_float(section, "splash1_radius");
-        i++;
-    }
-    else if (pSettings->line_exist(section, "spash1_radius"))
+        pcstr nameToRead = nullptr;
+        if (pSettings->line_exist(section, name))
+            nameToRead = name;
+        else if (fallback && pSettings->line_exist(section, fallback))
+            nameToRead = fallback;
+
+        if (!nameToRead)
+        {
+            if (xr_strlen(missingFields))
+                xr_strcat(missingFields, ", ");
+            xr_strcat(missingFields, name);
+            return;
+        }
+
+        switch (type)
+        {
+        case FieldTypes::t_u32:
+        {
+            u32* outValue = static_cast<u32*>(outPtr);
+            *outValue = pSettings->r_u32(section, nameToRead);
+            break;
+        }
+        case FieldTypes::t_float:
+        {
+            float* outValue = static_cast<float*>(outPtr);
+            *outValue = pSettings->r_float(section, nameToRead);
+            break;
+        }
+        case FieldTypes::t_fvector3:
+        {
+            Fvector3* outValue = static_cast<Fvector3*>(outPtr);
+            *outValue = pSettings->r_fvector3(section, nameToRead);
+            break;
+        }
+        }
+        successCount++;
+    };
+
+    for (const auto& field : fields)
     {
-        m_Hit1SplashRadius = pSettings->r_float(section, "spash1_radius");
-        i++;
+        std::apply(processField, field);
     }
 
-    if (count++; pSettings->line_exist(section, "splash2_radius"))
-    {
-        m_Hit2SplashRadius = pSettings->r_float(section, "splash2_radius");
-        i++;
-    }
-    else if (pSettings->line_exist(section, "spash2_radius"))
-    {
-        m_Hit2SplashRadius = pSettings->r_float(section, "spash2_radius");
-        i++;
-    }
+    R_ASSERT4(successCount == elementsCount || successCount == 0,
+        "You need to provide all knife splash parameters or remove them all.",
+        "Missing fields are:", missingFields);
 
-    if (count++; pSettings->line_exist(section, "splash1_hits_count"))
-    {
-        m_Splash1HitsCount = pSettings->r_u32(section, "splash1_hits_count");
-        i++;
-    }
-    if (count++; pSettings->line_exist(section, "splash1_pervictim_hcount"))
-    {
-        m_Splash1PerVictimsHCount = pSettings->r_u32(section, "splash1_pervictim_hcount");
-        i++;
-    }
-    if (count++; pSettings->line_exist(section, "splash2_hits_count"))
-    {
-        m_Splash2HitsCount = pSettings->r_u32(section, "splash2_hits_count");
-        i++;
-    }
-
-    if (count++; pSettings->line_exist(section, "splash_hit_divide_factor"))
-    {
-        m_NextHitDivideFactor = pSettings->r_float(section, "splash_hit_divide_factor");
-        i++;
-    }
-
-    if (i == 0)
-        oldStrikeMethod = true;
-    else
-    {
-        constexpr pcstr fields = "splash1_direction, splash2_direction, splash1_dist, splash2_dist, "
-            "splash1_radius, splash2_radius, splash1_hits_count, splash1_pervictim_hcount, "
-            "splash2_hits_count, splash_hit_divide_factor";
-        R_ASSERT3(i == count, "You need to provide all knife splash parameters or remove them all.", fields);
-    }
+    oldStrikeMethod = successCount == 0;
 
     knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
 
