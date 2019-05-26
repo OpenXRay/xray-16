@@ -712,7 +712,7 @@ void xrDebug::SetupExceptionHandler()
     else if (!strstr(commandLine, "-detailed_minidump"))
         minidumpFlags |= MiniDumpFilterMemory;
 #endif
-    
+
     BT_SetDumpType(minidumpFlags);
     //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
     BT_SetSupportEMail("openxray@yahoo.com");
@@ -939,6 +939,6 @@ void xrDebug::Initialize(pcstr commandLine)
 #ifdef DEBUG
     ShowErrorMessage = true;
 #else
-    ShowErrorMessage = commandLine ? strstr(commandLine, "-show_error_window") : false;
+    ShowErrorMessage = commandLine ? (bool)strstr(commandLine, "-show_error_window") : false;
 #endif
 }
