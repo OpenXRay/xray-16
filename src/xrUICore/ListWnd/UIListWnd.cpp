@@ -83,7 +83,7 @@ void CUIListWnd::InitListWnd(Fvector2 pos, Fvector2 size, float item_height)
         m_StaticActiveBackground.Init(ACTIVE_BACKGROUND,"hud\\default", 0,0,alNone);
         m_StaticActiveBackground.SetTile(iFloor(m_iItemWidth/ACTIVE_BACKGROUND_WIDTH), 
                                          iFloor(m_iItemHeight/ACTIVE_BACKGROUND_HEIGHT),
-                                         fmod(m_iItemWidth,float(ACTIVE_BACKGROUND_WIDTH)),
+                                         fmod(m_iItemWidth,float(ACTIVE_BACKGROUND_WIDTH)), 
                                          fmod(m_iItemHeight,float(ACTIVE_BACKGROUND_HEIGHT)));
     */
     UpdateList();
