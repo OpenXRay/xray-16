@@ -243,15 +243,20 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
         "Incorrect weather time", identifier);
     exec_time = tm.x * 3600.f + tm.y * 60.f + tm.z;
     exec_time_loaded = exec_time;
-    string_path st, st_env;
-    xr_strcpy(st, config.r_string(identifier, "sky_texture"));
-    strconcat(sizeof(st_env), st_env, st, "#small");
-    sky_texture_name = st;
-    sky_texture_env_name = st_env;
+
+    string_path skyTexture, skyTextureEnv;
+    xr_strcpy(skyTexture, config.r_string(identifier, "sky_texture"));
+    strconcat(sizeof(skyTextureEnv), skyTextureEnv, skyTexture, "#small");
+    sky_texture_name = skyTexture;
+    sky_texture_env_name = skyTextureEnv;
+    
     clouds_texture_name = config.r_string(identifier, "clouds_texture");
-    LPCSTR cldclr = config.r_string(identifier, "clouds_color");
+
+    pcstr cloudsColor = config.r_string(identifier, "clouds_color");
+
     float multiplier = 0, save = 0;
-    sscanf(cldclr, "%f,%f,%f,%f,%f", &clouds_color.x, &clouds_color.y, &clouds_color.z, &clouds_color.w, &multiplier);
+    sscanf(cloudsColor, "%f,%f,%f,%f,%f", &clouds_color.x, &clouds_color.y, &clouds_color.z, &clouds_color.w, &multiplier);
+
     save = clouds_color.w;
     clouds_color.mul(.5f * multiplier);
     clouds_color.w = save;
@@ -261,7 +266,8 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
     if (config.line_exist(identifier, "sky_rotation"))
         sky_rotation = deg2rad(config.r_float(identifier, "sky_rotation"));
     else
-        sky_rotation = 0;
+        sky_rotation = 0.0f;
+
     far_plane = config.r_float(identifier, "far_plane");
     fog_color = config.r_fvector3(identifier, "fog_color");
     fog_density = config.r_float(identifier, "fog_density");
