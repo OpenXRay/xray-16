@@ -220,7 +220,7 @@ void CUIListWnd::UpdateList()
 
     LIST_ITEM_LIST_it it = m_ItemList.begin();
 
-    //спрятать все элементы до участка
+    //спрятать все элементы до участка 
     //отображающейся в данный момент
     for (int i = 0; i < _min(m_ItemList.size(), m_iFirstShownIndex); ++i, ++it)
     {
