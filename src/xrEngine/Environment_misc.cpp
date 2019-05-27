@@ -80,7 +80,7 @@ float CEnvModifier::sum(CEnvModifier& M, Fvector3& view)
 //-----------------------------------------------------------------------------
 // Environment ambient
 //-----------------------------------------------------------------------------
-void CEnvAmbient::SSndChannel::load(CInifile& config, LPCSTR sect)
+void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect)
 {
     m_load_section = sect;
 
@@ -111,7 +111,7 @@ void CEnvAmbient::SSndChannel::load(CInifile& config, LPCSTR sect)
     }
 }
 
-CEnvAmbient::SEffect* CEnvAmbient::create_effect(CInifile& config, LPCSTR id)
+CEnvAmbient::SEffect* CEnvAmbient::create_effect(const CInifile& config, pcstr id)
 {
     SEffect* result = new SEffect();
     result->life_time = iFloor(config.r_float(id, "life_time") * 1000.f);
@@ -140,7 +140,7 @@ CEnvAmbient::SEffect* CEnvAmbient::create_effect(CInifile& config, LPCSTR id)
     return (result);
 }
 
-CEnvAmbient::SSndChannel* CEnvAmbient::create_sound_channel(CInifile& config, LPCSTR id)
+CEnvAmbient::SSndChannel* CEnvAmbient::create_sound_channel(const CInifile& config, pcstr id)
 {
     SSndChannel* result = new SSndChannel();
     result->load(config, id);
@@ -155,7 +155,7 @@ void CEnvAmbient::destroy()
 }
 
 void CEnvAmbient::load(
-    CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config, const shared_str& sect)
+    const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config, const shared_str& sect)
 {
     m_ambients_config_filename = ambients_config.fname();
     m_load_section = sect;
@@ -233,7 +233,7 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     {                                                                        \
         Msg("! Invalid '%s' in env-section '%s'", #C, identifier); \
     }
-void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
+void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config)
 {
     pcstr identifier = m_identifier.c_str();
 
@@ -517,7 +517,7 @@ void CEnvironment::load_level_specific_ambients()
     xr_delete(level_ambients);
 }
 
-CEnvDescriptor* CEnvironment::create_descriptor(shared_str const& identifier, CInifile* config)
+CEnvDescriptor* CEnvironment::create_descriptor(shared_str const& identifier, CInifile const* config)
 {
     CEnvDescriptor* result = new CEnvDescriptor(identifier);
     if (config)

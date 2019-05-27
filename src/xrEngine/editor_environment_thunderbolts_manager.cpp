@@ -286,7 +286,7 @@ shared_str manager::unique_collection_id(shared_str const& id) const
     return (m_collections_collection->generate_unique_id(id.c_str()));
 }
 
-SThunderboltDesc* manager::description(CInifile& config, shared_str const& section) const
+SThunderboltDesc* manager::description(const CInifile& config, shared_str const& section) const
 {
     for (const auto &i : m_thunderbolts)
         if (i->id() == section)

@@ -24,7 +24,7 @@ gradient::~gradient()
     ::ide().destroy(m_property_holder);
 }
 
-void gradient::load(CInifile& config, shared_str const& section_id, pcstr prefix)
+void gradient::load(const CInifile& config, shared_str const& section_id, pcstr prefix)
 {
     string_path temp;
     shader = config.r_string(section_id, strconcat(sizeof(temp), temp, prefix, "_shader"));

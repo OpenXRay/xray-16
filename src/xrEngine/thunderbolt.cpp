@@ -29,7 +29,7 @@ SThunderboltDesc::~SThunderboltDesc()
     xr_delete(m_GradientCenter);
 }
 
-void SThunderboltDesc::create_top_gradient(CInifile& pIni, shared_str const& sect)
+void SThunderboltDesc::create_top_gradient(const CInifile& pIni, shared_str const& sect)
 {
     m_GradientTop = new SFlare();
     m_GradientTop->shader = pIni.r_string(sect, "gradient_top_shader");
@@ -39,7 +39,7 @@ void SThunderboltDesc::create_top_gradient(CInifile& pIni, shared_str const& sec
     m_GradientTop->m_pFlare->CreateShader(*m_GradientTop->shader, *m_GradientTop->texture);
 }
 
-void SThunderboltDesc::create_center_gradient(CInifile& pIni, shared_str const& sect)
+void SThunderboltDesc::create_center_gradient(const CInifile& pIni, shared_str const& sect)
 {
     m_GradientCenter = new SFlare();
     m_GradientCenter->shader = pIni.r_string(sect, "gradient_center_shader");
@@ -49,7 +49,7 @@ void SThunderboltDesc::create_center_gradient(CInifile& pIni, shared_str const& 
     m_GradientCenter->m_pFlare->CreateShader(*m_GradientCenter->shader, *m_GradientCenter->texture);
 }
 
-void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
+void SThunderboltDesc::load(const CInifile& pIni, shared_str const& sect)
 {
     create_top_gradient(pIni, sect);
     create_center_gradient(pIni, sect);
@@ -76,7 +76,7 @@ void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
 // collection
 //----------------------------------------------------------------------------------------------
 SThunderboltCollection::SThunderboltCollection() {}
-void SThunderboltCollection::load(CInifile* pIni, CInifile* thunderbolts, LPCSTR sect)
+void SThunderboltCollection::load(CInifile const* pIni, CInifile const* thunderbolts, pcstr sect)
 {
     section = sect;
     int tb_count = pIni->line_count(sect);
@@ -128,7 +128,7 @@ CEffect_Thunderbolt::~CEffect_Thunderbolt()
 }
 
 shared_str CEffect_Thunderbolt::AppendDef(
-    CEnvironment& environment, CInifile* pIni, CInifile* thunderbolts, LPCSTR sect)
+    CEnvironment& environment, CInifile const* pIni, CInifile const* thunderbolts, pcstr sect)
 {
     if (!sect || (0 == sect[0]))
         return "";
