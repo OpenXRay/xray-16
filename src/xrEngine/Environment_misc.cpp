@@ -280,16 +280,24 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
     ambient = config.r_fvector3(identifier, "ambient_color");
     hemi_color = config.r_fvector4(identifier, "hemisphere_color");
     sun_color = config.r_fvector3(identifier, "sun_color");
-    // if (config.line_exist(identifier,"sun_altitude"))
-    sun_dir.setHP(deg2rad(config.r_float(identifier, "sun_altitude")),
-        deg2rad(config.r_float(identifier, "sun_longitude")));
+
+    Fvector2 sunVec{};
+
+    if (config.read_if_exists(sunVec, identifier, "sun_dir"))
+    {
+        // What if someone adapted SOC configs and didn't deleted sun_dir?
+        // Try to read optional overriding values.
+        config.read_if_exists(sunVec.y, identifier, "sun_altitude");
+        config.read_if_exists(sunVec.x, identifier, "sun_longitude");
+    }
+    else
+    {
+        sunVec.y = config.r_float(identifier, "sun_altitude");
+        sunVec.x = config.r_float(identifier, "sun_longitude");
+    }
+    sun_dir.setHP(deg2rad(sunVec.y), deg2rad(sunVec.x));
+
     R_ASSERT(_valid(sun_dir));
-    // else
-    // sun_dir.setHP (
-    // deg2rad(config.r_fvector2(identifier,"sun_dir").y),
-    // deg2rad(config.r_fvector2(identifier,"sun_dir").x)
-    // );
-    VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while loading");
 
     lens_flare_id = environment.eff_LensFlare->AppendDef(
         environment, environment.m_suns_config, config.r_string(identifier, "sun"));
