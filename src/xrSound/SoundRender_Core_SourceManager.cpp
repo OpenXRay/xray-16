@@ -11,7 +11,7 @@ CSoundRender_Source* CSoundRender_Core::i_create_source(pcstr name)
     xr_strlwr(id);
     if (strext(id))
         *strext(id) = 0;
-    xr_unordered_map<std::string, CSoundRender_Source*>::iterator it = s_sources.find(id);
+    auto it = s_sources.find(id);
     if (it != s_sources.end())
     {
         return it->second;

@@ -86,9 +86,9 @@ void CSoundRender_Core::_clear()
     env_unload();
 
     // remove sources
-    for (auto it = s_sources.begin(); it != s_sources.end(); ++it)
+    for (const auto& kv : s_sources)
     {
-        xr_delete(it->second);
+        delete kv.second;
     }
     s_sources.clear();
 
@@ -594,9 +594,9 @@ void CSoundRender_Core::refresh_sources()
 {
     for (u32 eit = 0; eit < s_emitters.size(); eit++)
         s_emitters[eit]->stop(false);
-    for (auto it = s_sources.begin(); it != s_sources.end(); ++it)
+    for (const auto& kv : s_sources)
     {
-        CSoundRender_Source* s = it->second;
+        CSoundRender_Source* s = kv.second;
         s->unload();
         s->load(*s->fname);
     }
