@@ -58,8 +58,7 @@ const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, 
     {nullptr, 0}};
 
 u32 ps_r3_msaa = 0; // = 0;
-const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2},
-    //{"8x", 3},
+const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2}, {"8x", 3},
     {nullptr, 0}};
 
 u32 ps_r3_msaa_atest = 0; // = 0;
