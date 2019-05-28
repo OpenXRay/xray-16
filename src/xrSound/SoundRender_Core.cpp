@@ -86,9 +86,9 @@ void CSoundRender_Core::_clear()
     env_unload();
 
     // remove sources
-    for (const auto& kv : s_sources)
+    for (auto& kv : s_sources)
     {
-        delete kv.second;
+        xr_delete(kv.second);
     }
     s_sources.clear();
 
