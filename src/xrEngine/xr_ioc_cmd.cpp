@@ -37,7 +37,7 @@ const xr_token constant_fps_token[] =
     { nullptr, -1 }
 };
 
-const xr_token snd_create_all_sources_token[] = {{"off", 0}, {"on", 1}, {nullptr, 0}};
+const xr_token snd_precache_all_token[] = {{"off", 0}, {"on", 1}, {nullptr, 0}};
 
 void IConsole_Command::InvalidSyntax()
 {
@@ -873,7 +873,7 @@ void CCC_Register()
     CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EAX);
     CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 4, 32);
     CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 4, 64);
-    CMD3(CCC_Token, "snd_create_all_sources", &psSoundCreateAllSources, snd_create_all_sources_token);
+    CMD3(CCC_Token, "snd_precache_all", &psSoundPrecacheAll, snd_precache_all_token);
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "snd_stats", &g_stats_flags, st_sound);

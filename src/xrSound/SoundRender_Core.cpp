@@ -23,7 +23,7 @@ float psSoundVFactor = 1.0f;
 
 float psSoundVMusic = 1.f;
 int psSoundCacheSizeMB = 32;
-u32 psSoundCreateAllSources = 0;
+u32 psSoundPrecacheAll = 0;
 CSoundRender_Core* SoundRender = nullptr;
 
 CSoundRender_Core::CSoundRender_Core()
@@ -77,7 +77,7 @@ void CSoundRender_Core::_initialize()
 
     bReady = true;
 
-    if (psSoundCreateAllSources == 1)
+    if (psSoundPrecacheAll == 1)
     {
         i_create_all_sources();
     }
