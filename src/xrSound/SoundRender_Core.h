@@ -137,6 +137,7 @@ public:
     bool i_allow_play(CSoundRender_Emitter* E);
     bool i_locked() override { return isLocked; }
     void object_relcase(IGameObject* obj) override;
+    void i_create_all_sources();
 
     float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
     float get_occlusion(Fvector& P, float R, Fvector* occ) override;
