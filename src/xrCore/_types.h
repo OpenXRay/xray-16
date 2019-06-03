@@ -55,7 +55,15 @@ constexpr double dbl_min = type_min<double>;
 constexpr double dbl_zero = type_zero<double>;
 constexpr double dbl_eps = type_epsilon<double>;
 
-constexpr int max_path = 260;
+#ifdef LINUX
+constexpr int max_path = PATH_MAX;
+#elif FREEBSD
+constexpr int max_path = PATH_MAX;
+#elif WINDOWS
+constexpr int max_path = MAX_PATH;
+#else
+#error Unsupported platform
+#endif
 
 using string16 = char[16];
 using string32 = char[32];
