@@ -25,7 +25,7 @@ private:
 
 public:
     CSavedGameWrapper(LPCSTR saved_game_name);
-    static LPCSTR saved_game_full_name(LPCSTR saved_game_name, string_path& result);
+    static pcstr saved_game_full_name(pcstr saved_game_name, string_path& result, pcstr extension);
     static bool saved_game_exist(LPCSTR saved_game_name);
     static bool valid_saved_game(IReader& stream);
     static bool valid_saved_game(LPCSTR saved_game_name);

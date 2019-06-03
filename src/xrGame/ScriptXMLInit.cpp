@@ -20,6 +20,7 @@
 #include "ui/UIMapInfo.h"
 #include "ui/UIMMShniaga.h"
 #include "xrUICore/ScrollView/UIScrollView.h"
+#include "xrUICore/ListWnd/UIListWnd.h"
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -110,6 +111,14 @@ CUIScrollView* CScriptXmlInit::InitScrollView(LPCSTR path, CUIWindow* parent)
 {
     CUIScrollView* pWnd = new CUIScrollView();
     CUIXmlInit::InitScrollView(m_xml, path, 0, pWnd);
+    _attach_child(pWnd, parent);
+    return pWnd;
+}
+
+CUIListWnd* CScriptXmlInit::InitListWnd(pcstr path, CUIWindow* parent)
+{
+    CUIListWnd* pWnd = new CUIListWnd();
+    CUIXmlInit::InitListWnd(m_xml, path, 0, pWnd);
     _attach_child(pWnd, parent);
     return pWnd;
 }
@@ -282,6 +291,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (), {
                          .def("InitKeyBinding", &CScriptXmlInit::InitKeyBinding)
                          .def("InitMMShniaga", &CScriptXmlInit::InitMMShniaga)
                          .def("InitScrollView", &CScriptXmlInit::InitScrollView)
+                         .def("InitList", &CScriptXmlInit::InitListWnd)
                          .def("InitListBox", &CScriptXmlInit::InitListBox)
                          .def("InitProgressBar", &CScriptXmlInit::InitProgressBar)];
 });

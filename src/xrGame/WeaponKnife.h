@@ -28,6 +28,8 @@ protected:
     u16 knife_material_idx;
 
 protected:
+    bool oldStrikeMethod;
+
     ALife::EHitType m_eHitType;
 
     ALife::EHitType m_eHitType_1;

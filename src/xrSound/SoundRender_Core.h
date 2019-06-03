@@ -3,6 +3,7 @@
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Cache.h"
+#include "xrCommon/xr_unordered_map.h"
 
 class CSoundRender_Core : public ISoundManager
 {
@@ -54,7 +55,7 @@ protected:
     CDB::MODEL* geom_ENV;
 
     // Containers
-    xr_vector<CSoundRender_Source*> s_sources;
+    xr_unordered_map<xr_string, CSoundRender_Source*> s_sources;
     xr_vector<CSoundRender_Emitter*> s_emitters;
     u32 s_emitters_u; // emitter update marker
     xr_vector<CSoundRender_Target*> s_targets;
@@ -136,6 +137,7 @@ public:
     bool i_allow_play(CSoundRender_Emitter* E);
     bool i_locked() override { return isLocked; }
     void object_relcase(IGameObject* obj) override;
+    void i_create_all_sources();
 
     float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
     float get_occlusion(Fvector& P, float R, Fvector* occ) override;

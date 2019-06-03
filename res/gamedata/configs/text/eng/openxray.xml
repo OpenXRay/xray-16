@@ -3,6 +3,9 @@
 	<string id="st_unequip">
 		<text>unequip</text>
 	</string>
+	<string id="st_donate">
+		<text>Donate</text>
+	</string>
 	<string id="st_loading_lights">
 		<text>Loading lights</text>
 	</string>
@@ -29,6 +32,12 @@
 	</string>
 	<string id="ui_style_default">
 		<text>Call of Pripyat</text>
+	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Simplified item pickup</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Multi item pickup</text>
 	</string>
 	<string id="ui_mm_loadingstages">
 		<text>Show loading stages</text>

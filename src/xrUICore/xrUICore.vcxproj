@@ -266,6 +266,10 @@
     <ClInclude Include="ListBox\UIListBox.h" />
     <ClInclude Include="ListBox\UIListBoxItem.h" />
     <ClInclude Include="ListBox\UIListBoxItemMsgChain.h" />
+    <ClInclude Include="ListWnd\UIListItem.h" />
+    <ClInclude Include="ListWnd\UIListItemEx.h" />
+    <ClInclude Include="ListWnd\UIListWnd.h" />
+    <ClInclude Include="ListWnd\UIListWnd_inline.h" />
     <ClInclude Include="MessageBox\UIMessageBox.h" />
     <ClInclude Include="Options\UIOptionsItem.h" />
     <ClInclude Include="Options\UIOptionsManager.h" />
@@ -326,6 +330,10 @@
     <ClCompile Include="ListBox\UIListBoxItem.cpp" />
     <ClCompile Include="ListBox\UIListBoxItemMsgChain.cpp" />
     <ClCompile Include="ListBox\UIListBox_script.cpp" />
+    <ClCompile Include="ListWnd\UIListItem.cpp" />
+    <ClCompile Include="ListWnd\UIListItemEx.cpp" />
+    <ClCompile Include="ListWnd\UIListWnd.cpp" />
+    <ClCompile Include="ListWnd\UIListWnd_script.cpp" />
     <ClCompile Include="MessageBox\UIMessageBox.cpp" />
     <ClCompile Include="MessageBox\UIMessageBox_script.cpp" />
     <ClCompile Include="Options\UIOptionsItem.cpp" />

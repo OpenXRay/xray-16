@@ -24,6 +24,7 @@ class CUIAnimatedStatic;
 class CUISleepStatic;
 class CUIOptionsItem;
 class CUIScrollView;
+class CUIListWnd;
 class CUIListBox;
 class CUIDragDropListEx;
 class CUIComboBox;
@@ -61,6 +62,7 @@ public:
     static bool InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOwner* pWnd, bool fatal = true);
     static bool InitOptionsItem(CUIXml& xml_doc, LPCSTR paht, int index, CUIOptionsItem* pWnd);
     static bool InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUIScrollView* pWnd, bool fatal = true);
+    static bool InitListWnd(CUIXml& xml_doc, pcstr path, int index, CUIListWnd* pWnd, bool fatal = true);
     static bool InitListBox(CUIXml& xml_doc, LPCSTR path, int index, CUIListBox* pWnd, bool fatal = true);
     static bool InitComboBox(CUIXml& xml_doc, LPCSTR path, int index, CUIComboBox* pWnd);
     static bool InitTrackBar(CUIXml& xml_doc, LPCSTR path, int index, CUITrackBar* pWnd, bool fatal = true);

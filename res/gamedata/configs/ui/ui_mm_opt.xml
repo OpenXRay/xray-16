@@ -571,6 +571,18 @@
             </text_color>
         </list_difficulty>
 
+		<cap_localization x="20" y="3" width="135" height="24">
+			<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_localization</text>
+		</cap_localization>
+		<list_localization x="180" y="5" width="235" height="20">
+			<options_item entry="g_language" group="mm_opt_gameplay"/>
+			<list_font r="170" g="170" b="170" font="letterica16"/>
+			<text_color>
+				<e r="170" g="170" b="170"/>
+				<d r="70" g="70" b="70"/>
+			</text_color>
+		</list_localization>
+
         <cap_ui_style x="20" y="3" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ui_style</text>
         </cap_ui_style>
@@ -666,6 +678,24 @@
             <options_item entry="hud_draw" group="mm_opt_gameplay"/>
         </check_hud_draw>
 
+        <cap_check_simplified_item_pickup x="20" y="3" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_simplified_item_pickup</text>
+        </cap_check_simplified_item_pickup>
+
+        <check_simplified_item_pickup x="167" y="0" width="44" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="cl_cod_pickup_mode" group="mm_opt_gameplay" is_integer="1"/>
+        </check_simplified_item_pickup>
+
+        <cap_check_multi_item_pickup x="20" y="3" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_multi_item_pickup</text>
+        </cap_check_multi_item_pickup>
+
+        <check_multi_item_pickup x="167" y="0" width="44" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="g_multi_item_pickup" group="mm_opt_gameplay"/>
+        </check_multi_item_pickup>
+
         <cap_check_loadingstages x="20" y="3" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_loadingstages</text>
         </cap_check_loadingstages>
@@ -674,18 +704,6 @@
 	        <texture>ui_inGame2_checkbox</texture>
             <options_item entry="rs_loadingstages" group="mm_opt_gameplay" is_integer="1"/>
         </check_loadingstages>
-
-		<cap_localization x="20" y="3" width="135" height="24">
-			<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_localization</text>
-		</cap_localization>
-		<list_localization x="180" y="5" width="235" height="20">
-			<options_item entry="g_language" group="mm_opt_gameplay"/>
-			<list_font r="170" g="170" b="170" font="letterica16"/>
-			<text_color>
-				<e r="170" g="170" b="170"/>
-				<d r="70" g="70" b="70"/>
-			</text_color>
-		</list_localization>
 
         <btn_check_updates x="338" y="322" width="108" height="24">
             <text align="c" font="letterica16">ui_mm_check_updates</text>

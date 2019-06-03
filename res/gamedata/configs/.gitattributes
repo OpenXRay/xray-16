@@ -1,2 +1,2 @@
 # Configs
-*.ltx text linguist-language=INI
+*.ltx linguist-language=INI diff=INI

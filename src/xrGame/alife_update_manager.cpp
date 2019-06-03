@@ -287,10 +287,16 @@ bool CALifeUpdateManager::load_game(LPCSTR game_name, bool no_assert)
         FS.update_path(file_name, "$game_saves$", temp);
         if (!FS.exist(file_name))
         {
-            R_ASSERT3(no_assert, "There is no saved game ", file_name);
-            return (false);
+            strconcat(sizeof(temp), temp, game_name, SAVE_EXTENSION_LEGACY);
+            FS.update_path(file_name, "$game_saves$", temp);
+            if (!FS.exist(file_name))
+            {
+                R_ASSERT3(no_assert, "There is no saved game ", game_name);
+                return (false);
+            }
         }
     }
+
     string512 S, S1;
     xr_strcpy(S, **m_server_command_line);
     LPSTR temp = strchr(S, '/');

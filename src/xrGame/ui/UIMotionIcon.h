@@ -2,14 +2,30 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 
-class CUIMotionIcon : public CUIWindow
+class CUIMotionIcon : public CUIStatic
 {
-    typedef CUIWindow inherited;
+    using inherited = CUIStatic;
 
 public:
+    enum EState
+    {
+        stNormal,
+        stCrouch,
+        stCreep,
+        stClimb,
+        stRun,
+        stSprint,
+        stLast
+    };
 private:
-    CUIProgressShape m_luminosity_progress;
-    CUIProgressShape m_noise_progress;
+    EState m_current_state;
+    xr_map<EState, CUIStatic*> m_states;
+    CUIProgressBar* m_power_progress;
+
+    CUIProgressShape* m_luminosity_progress_shape;
+    CUIProgressShape* m_noise_progress_shape;
+    CUIProgressBar* m_luminosity_progress_bar;
+    CUIProgressBar* m_noise_progress_bar;
 
     struct _npc_visibility
     {
@@ -21,7 +37,7 @@ private:
     xr_vector<_npc_visibility> m_npc_visibility;
     bool m_bchanged;
     float m_luminosity;
-    float cur_pos;
+    float m_cur_pos;
 
 public:
     virtual ~CUIMotionIcon();
@@ -29,8 +45,10 @@ public:
     virtual void Update();
     virtual void Draw();
     void Init(Frect const& rect);
+    void ShowState(EState state);
+    void SetPower(float Pos);
     void SetNoise(float Pos);
-    void SetLuminosity(float Pos);
+    void SetLuminosity(float newPos);
     void SetActorVisibility(u16 who_id, float value);
     void ResetVisibility();
 };

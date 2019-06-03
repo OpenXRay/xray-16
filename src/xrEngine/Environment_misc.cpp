@@ -80,7 +80,7 @@ float CEnvModifier::sum(CEnvModifier& M, Fvector3& view)
 //-----------------------------------------------------------------------------
 // Environment ambient
 //-----------------------------------------------------------------------------
-void CEnvAmbient::SSndChannel::load(CInifile& config, LPCSTR sect)
+void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect)
 {
     m_load_section = sect;
 
@@ -111,7 +111,7 @@ void CEnvAmbient::SSndChannel::load(CInifile& config, LPCSTR sect)
     }
 }
 
-CEnvAmbient::SEffect* CEnvAmbient::create_effect(CInifile& config, LPCSTR id)
+CEnvAmbient::SEffect* CEnvAmbient::create_effect(const CInifile& config, pcstr id)
 {
     SEffect* result = new SEffect();
     result->life_time = iFloor(config.r_float(id, "life_time") * 1000.f);
@@ -140,7 +140,7 @@ CEnvAmbient::SEffect* CEnvAmbient::create_effect(CInifile& config, LPCSTR id)
     return (result);
 }
 
-CEnvAmbient::SSndChannel* CEnvAmbient::create_sound_channel(CInifile& config, LPCSTR id)
+CEnvAmbient::SSndChannel* CEnvAmbient::create_sound_channel(const CInifile& config, pcstr id)
 {
     SSndChannel* result = new SSndChannel();
     result->load(config, id);
@@ -155,7 +155,7 @@ void CEnvAmbient::destroy()
 }
 
 void CEnvAmbient::load(
-    CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config, const shared_str& sect)
+    const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config, const shared_str& sect)
 {
     m_ambients_config_filename = ambients_config.fname();
     m_load_section = sect;
@@ -231,73 +231,87 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
 #define C_CHECK(C)                                                           \
     if (C.x < 0 || C.x > 2 || C.y < 0 || C.y > 2 || C.z < 0 || C.z > 2)      \
     {                                                                        \
-        Msg("! Invalid '%s' in env-section '%s'", #C, m_identifier.c_str()); \
+        Msg("! Invalid '%s' in env-section '%s'", #C, identifier); \
     }
-void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
+void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config)
 {
+    pcstr identifier = m_identifier.c_str();
+
     Ivector3 tm = {0, 0, 0};
-    sscanf(m_identifier.c_str(), "%d:%d:%d", &tm.x, &tm.y, &tm.z);
+    sscanf(identifier, "%d:%d:%d", &tm.x, &tm.y, &tm.z);
     R_ASSERT3((tm.x >= 0) && (tm.x < 24) && (tm.y >= 0) && (tm.y < 60) && (tm.z >= 0) && (tm.z < 60),
-        "Incorrect weather time", m_identifier.c_str());
+        "Incorrect weather time", identifier);
     exec_time = tm.x * 3600.f + tm.y * 60.f + tm.z;
     exec_time_loaded = exec_time;
-    string_path st, st_env;
-    xr_strcpy(st, config.r_string(m_identifier.c_str(), "sky_texture"));
-    strconcat(sizeof(st_env), st_env, st, "#small");
-    sky_texture_name = st;
-    sky_texture_env_name = st_env;
-    clouds_texture_name = config.r_string(m_identifier.c_str(), "clouds_texture");
-    LPCSTR cldclr = config.r_string(m_identifier.c_str(), "clouds_color");
+
+    string_path skyTexture, skyTextureEnv;
+    xr_strcpy(skyTexture, config.r_string(identifier, "sky_texture"));
+    strconcat(sizeof(skyTextureEnv), skyTextureEnv, skyTexture, "#small");
+    sky_texture_name = skyTexture;
+    sky_texture_env_name = skyTextureEnv;
+    
+    clouds_texture_name = config.r_string(identifier, "clouds_texture");
+
+    pcstr cloudsColor = config.r_string(identifier, "clouds_color");
+
     float multiplier = 0, save = 0;
-    sscanf(cldclr, "%f,%f,%f,%f,%f", &clouds_color.x, &clouds_color.y, &clouds_color.z, &clouds_color.w, &multiplier);
+    sscanf(cloudsColor, "%f,%f,%f,%f,%f", &clouds_color.x, &clouds_color.y, &clouds_color.z, &clouds_color.w, &multiplier);
+
     save = clouds_color.w;
     clouds_color.mul(.5f * multiplier);
     clouds_color.w = save;
 
-    sky_color = config.r_fvector3(m_identifier.c_str(), "sky_color");
+    sky_color = config.r_fvector3(identifier, "sky_color");
 
-    if (config.line_exist(m_identifier.c_str(), "sky_rotation"))
-        sky_rotation = deg2rad(config.r_float(m_identifier.c_str(), "sky_rotation"));
+    if (config.line_exist(identifier, "sky_rotation"))
+        sky_rotation = deg2rad(config.r_float(identifier, "sky_rotation"));
     else
-        sky_rotation = 0;
-    far_plane = config.r_float(m_identifier.c_str(), "far_plane");
-    fog_color = config.r_fvector3(m_identifier.c_str(), "fog_color");
-    fog_density = config.r_float(m_identifier.c_str(), "fog_density");
-    fog_distance = config.r_float(m_identifier.c_str(), "fog_distance");
-    rain_density = config.r_float(m_identifier.c_str(), "rain_density");
+        sky_rotation = 0.0f;
+
+    far_plane = config.r_float(identifier, "far_plane");
+    fog_color = config.r_fvector3(identifier, "fog_color");
+    fog_density = config.r_float(identifier, "fog_density");
+    fog_distance = config.r_float(identifier, "fog_distance");
+    rain_density = config.r_float(identifier, "rain_density");
     clamp(rain_density, 0.f, 1.f);
-    rain_color = config.r_fvector3(m_identifier.c_str(), "rain_color");
-    wind_velocity = config.r_float(m_identifier.c_str(), "wind_velocity");
-    wind_direction = deg2rad(config.r_float(m_identifier.c_str(), "wind_direction"));
-    ambient = config.r_fvector3(m_identifier.c_str(), "ambient_color");
-    hemi_color = config.r_fvector4(m_identifier.c_str(), "hemisphere_color");
-    sun_color = config.r_fvector3(m_identifier.c_str(), "sun_color");
-    // if (config.line_exist(m_identifier.c_str(),"sun_altitude"))
-    sun_dir.setHP(deg2rad(config.r_float(m_identifier.c_str(), "sun_altitude")),
-        deg2rad(config.r_float(m_identifier.c_str(), "sun_longitude")));
+    rain_color = config.r_fvector3(identifier, "rain_color");
+    wind_velocity = config.r_float(identifier, "wind_velocity");
+    wind_direction = deg2rad(config.r_float(identifier, "wind_direction"));
+    ambient = config.r_fvector3(identifier, "ambient_color");
+    hemi_color = config.r_fvector4(identifier, "hemisphere_color");
+    sun_color = config.r_fvector3(identifier, "sun_color");
+
+    Fvector2 sunVec{};
+
+    if (config.read_if_exists(sunVec, identifier, "sun_dir"))
+    {
+        // What if someone adapted SOC configs and didn't deleted sun_dir?
+        // Try to read optional overriding values.
+        config.read_if_exists(sunVec.y, identifier, "sun_altitude");
+        config.read_if_exists(sunVec.x, identifier, "sun_longitude");
+    }
+    else
+    {
+        sunVec.y = config.r_float(identifier, "sun_altitude");
+        sunVec.x = config.r_float(identifier, "sun_longitude");
+    }
+    sun_dir.setHP(deg2rad(sunVec.y), deg2rad(sunVec.x));
+
     R_ASSERT(_valid(sun_dir));
-    // else
-    // sun_dir.setHP (
-    // deg2rad(config.r_fvector2(m_identifier.c_str(),"sun_dir").y),
-    // deg2rad(config.r_fvector2(m_identifier.c_str(),"sun_dir").x)
-    // );
-    VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while loading");
 
     lens_flare_id = environment.eff_LensFlare->AppendDef(
-        environment, environment.m_suns_config, config.r_string(m_identifier.c_str(), "sun"));
+        environment, environment.m_suns_config, config.r_string(identifier, "sun"));
     tb_id = environment.eff_Thunderbolt->AppendDef(environment, environment.m_thunderbolt_collections_config,
-        environment.m_thunderbolts_config, config.r_string(m_identifier.c_str(), "thunderbolt_collection"));
-    bolt_period = (tb_id.size()) ? config.r_float(m_identifier.c_str(), "thunderbolt_period") : 0.f;
-    bolt_duration = (tb_id.size()) ? config.r_float(m_identifier.c_str(), "thunderbolt_duration") : 0.f;
-    env_ambient = config.line_exist(m_identifier.c_str(), "ambient") ?
-        environment.AppendEnvAmb(config.r_string(m_identifier.c_str(), "ambient")) :
+        environment.m_thunderbolts_config, config.r_string(identifier, "thunderbolt_collection"));
+    bolt_period = (tb_id.size()) ? config.r_float(identifier, "thunderbolt_period") : 0.f;
+    bolt_duration = (tb_id.size()) ? config.r_float(identifier, "thunderbolt_duration") : 0.f;
+    env_ambient = config.line_exist(identifier, "ambient") ?
+        environment.AppendEnvAmb(config.r_string(identifier, "ambient")) :
         0;
 
-
-
-    m_fSunShaftsIntensity = config.read_if_exists<float>(m_identifier.c_str(), "sun_shafts_intensity", 0.0);
-    m_fWaterIntensity = config.read_if_exists<float>(m_identifier.c_str(), "water_intensity", 1.0);
-    m_fTreeAmplitudeIntensity = config.read_if_exists<float>(m_identifier.c_str(), "tree_amplitude_intensity", 0.01);
+    m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);
+    m_fWaterIntensity = config.read_if_exists<float>(identifier, "water_intensity", 1.0);
+    m_fTreeAmplitudeIntensity = config.read_if_exists<float>(identifier, "tree_amplitude_intensity", 0.01);
 
     C_CHECK(clouds_color);
     C_CHECK(sky_color);
@@ -503,7 +517,7 @@ void CEnvironment::load_level_specific_ambients()
     xr_delete(level_ambients);
 }
 
-CEnvDescriptor* CEnvironment::create_descriptor(shared_str const& identifier, CInifile* config)
+CEnvDescriptor* CEnvironment::create_descriptor(shared_str const& identifier, CInifile const* config)
 {
     CEnvDescriptor* result = new CEnvDescriptor(identifier);
     if (config)

@@ -53,7 +53,7 @@ channel::~channel()
     ::ide().destroy(m_property_holder);
 }
 
-void channel::load(CInifile& config)
+void channel::load(const CInifile& config)
 {
     inherited::load(config, m_load_section.c_str());
 

@@ -102,7 +102,8 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
 
-    m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false);
+    if ((m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false)))
+        m_Prop_line->SetAutoDelete(false);
 
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {

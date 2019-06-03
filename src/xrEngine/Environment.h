@@ -78,7 +78,7 @@ public:
 
         typedef xr_vector<ref_sound> sounds_type;
 
-        void load(CInifile& config, LPCSTR sect);
+        void load(const CInifile& config, pcstr sect);
         ref_sound& get_rnd_sound() { return sounds()[Random.randI(sounds().size())]; }
         u32 get_rnd_sound_time()
         {
@@ -111,12 +111,12 @@ protected:
 public:
     const shared_str& name() { return m_load_section; }
     const shared_str& get_ambients_config_filename() { return m_ambients_config_filename; }
-    virtual void load(CInifile& ambients_config, CInifile& sound_channels_config,
-        CInifile& effects_config, const shared_str& section);
+    virtual void load(const CInifile& ambients_config, const CInifile& sound_channels_config,
+        const CInifile& effects_config, const shared_str& section);
     SEffect* get_rnd_effect() { return effects().empty() ? 0 : effects()[Random.randI(effects().size())]; }
     u32 get_rnd_effect_time() { return Random.randI(m_effect_period.x, m_effect_period.y); }
-    virtual SEffect* create_effect(CInifile& config, LPCSTR id);
-    virtual SSndChannel* create_sound_channel(CInifile& config, LPCSTR id);
+    virtual SEffect* create_effect(const CInifile& config, pcstr id);
+    virtual SSndChannel* create_sound_channel(const CInifile& config, pcstr id);
     virtual ~CEnvAmbient();
     void destroy();
     virtual EffectVec& effects() { return m_effects; }
@@ -172,7 +172,7 @@ public:
 
     CEnvDescriptor(shared_str const& identifier);
 
-    void load(CEnvironment& environment, CInifile& config);
+    void load(CEnvironment& environment, const CInifile& config);
     void copy(const CEnvDescriptor& src)
     {
         float tm0 = exec_time;
@@ -347,7 +347,7 @@ public:
     CInifile* m_thunderbolts_config;
 
 protected:
-    virtual CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile* config);
+    virtual CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile const* config);
     virtual void load_weathers();
     virtual void load_weather_effects();
     virtual void create_mixer();
@@ -356,9 +356,9 @@ protected:
     void load_level_specific_ambients();
 
 public:
-    virtual SThunderboltDesc* thunderbolt_description(CInifile& config, shared_str const& section);
+    virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);
     virtual SThunderboltCollection* thunderbolt_collection(
-        CInifile* pIni, CInifile* thunderbolts, LPCSTR section);
+        CInifile const* pIni, CInifile const* thunderbolts, pcstr section);
     virtual SThunderboltCollection* thunderbolt_collection(
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
     virtual CLensFlareDescriptor* add_flare(

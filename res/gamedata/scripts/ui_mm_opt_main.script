@@ -173,9 +173,9 @@ function options_dialog:InitCallBacks()
 	self:AddCallback("combo_renderer",		ui_events.LIST_ITEM_SELECT,	self.UpdateDependControls,	self)
 	self:AddCallback("btn_cancel_download",	ui_events.BUTTON_CLICKED,	self.OnBtn_CancelDownload,	self)
 	self:AddCallback("tab_ao_opt",			ui_events.TAB_CHANGED,		self.OnAOOptionChange,		self)
+	self:AddCallback("check_simple_pickup",	ui_events.BUTTON_CLICKED,	self.OnPickupOptionChange,	self)
 	self:AddCallback("track_r3_dyn_wet_surf_near", ui_events.BUTTON_CLICKED, self.OnDynWetSurfNearUpdate, self)
 	self:AddCallback("track_r3_dyn_wet_surf_far", ui_events.BUTTON_CLICKED,  self.OnDynWetSurfFarUpdate, self)
-
 
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_YES_CLICKED, self.OnApplyChanges, self)
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_NO_CLICKED, self.OnDiscardChanges,self)
@@ -285,6 +285,17 @@ function options_dialog:OnAOOptionChange()
 		self.combo_ssao:disable_id(4)
 	end
 	self.combo_ssao:SetCurrentOptValue()
+end
+
+function options_dialog:OnPickupOptionChange()
+	local simple = self.check_simple_pickup
+	local multi = self.check_multi_pickup
+
+	if (simple:GetCheck()) then
+		multi:Enable(true)
+	else
+		multi:Enable(false)
+	end
 end
 
 function options_dialog:OnBtnAdvGraphic()

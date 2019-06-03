@@ -24,7 +24,7 @@ class gradient : public SThunderboltDesc::SFlare, private Noncopyable
 public:
     gradient();
     ~gradient();
-    void load(CInifile& config, shared_str const& section_id, pcstr prefix);
+    void load(const CInifile& config, shared_str const& section_id, pcstr prefix);
     void save(CInifile& config, shared_str const& section_id, pcstr prefix);
     void fill(
         ::editor::environment::manager& environment, pcstr name, pcstr description, XRay::Editor::property_holder_base& holder);

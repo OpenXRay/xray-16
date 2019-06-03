@@ -197,12 +197,12 @@ void manager::unload()
 }
 
 CEnvAmbient* manager::AppendEnvAmb(const shared_str& sect) { return (m_ambients->get_ambient(sect)); }
-SThunderboltDesc* manager::thunderbolt_description(CInifile& config, shared_str const& section)
+SThunderboltDesc* manager::thunderbolt_description(const CInifile& config, shared_str const& section)
 {
     return (m_thunderbolts->description(config, section));
 }
 
-SThunderboltCollection* manager::thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, pcstr section)
+SThunderboltCollection* manager::thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section)
 {
     return (m_thunderbolts->get_collection(section));
 }

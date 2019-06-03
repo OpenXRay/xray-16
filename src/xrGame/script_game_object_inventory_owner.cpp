@@ -128,6 +128,11 @@ void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int
         Actor()->AddGameNews_deffered(news_data, delay);
 }
 
+void CScriptGameObject::ClearGameNews() const
+{
+    Actor()->ClearGameNews();
+}
+
 bool CScriptGameObject::HasInfo(LPCSTR info_id)
 {
     CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());

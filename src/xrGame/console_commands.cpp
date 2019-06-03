@@ -624,7 +624,13 @@ public:
 #endif
     } // virtual void Execute
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        if (ShadowOfChernobylMode || ClearSkyMode)
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
+        else
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION);
+    }
 }; // CCC_ALifeSave
 
 class CCC_ALifeLoadFrom : public IConsole_Command
@@ -696,7 +702,13 @@ public:
         Level().Send(net_packet, net_flags(TRUE));
     }
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        if (ShadowOfChernobylMode || ClearSkyMode)
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
+        else
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION);
+    }
 }; // CCC_ALifeLoadFrom
 
 class CCC_LoadLastSave : public IConsole_Command
@@ -1815,6 +1827,7 @@ void CCC_RegisterCommands()
     g_OptConCom.Init();
 
     CMD1(CCC_MemStats, "stat_memory");
+
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
@@ -1822,7 +1835,9 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
-// alife
+    CMD3(CCC_Mask, "g_multi_item_pickup", &psActorFlags, AF_MULTI_ITEM_PICKUP);
+
+    // alife
 #ifdef DEBUG
     CMD1(CCC_ALifePath, "al_path"); // build path
 

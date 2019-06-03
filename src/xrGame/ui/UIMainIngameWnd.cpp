@@ -127,35 +127,39 @@ void CUIMainIngameWnd::Init()
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
-    m_UIIcons = new CUIScrollView();
-    m_UIIcons->SetAutoDelete(true);
-    CUIXmlInit::InitScrollView(uiXml, "icons_scroll_view", 0, m_UIIcons);
-    AttachChild(m_UIIcons);
+    m_UIIcons = UIHelper::CreateScrollView(uiXml, "icons_scroll_view", this);
 
-    m_ind_bleeding = UIHelper::CreateStatic(uiXml, "indicator_bleeding", this);
-    m_ind_radiation = UIHelper::CreateStatic(uiXml, "indicator_radiation", this);
-    m_ind_starvation = UIHelper::CreateStatic(uiXml, "indicator_starvation", this);
-    m_ind_weapon_broken = UIHelper::CreateStatic(uiXml, "indicator_weapon_broken", this);
-    m_ind_helmet_broken = UIHelper::CreateStatic(uiXml, "indicator_helmet_broken", this);
-    m_ind_outfit_broken = UIHelper::CreateStatic(uiXml, "indicator_outfit_broken", this);
-    m_ind_overweight = UIHelper::CreateStatic(uiXml, "indicator_overweight", this);
+    m_ind_bleeding = UIHelper::CreateStatic(uiXml, "indicator_bleeding", this, false);
+    m_ind_radiation = UIHelper::CreateStatic(uiXml, "indicator_radiation", this, false);
+    m_ind_starvation = UIHelper::CreateStatic(uiXml, "indicator_starvation", this, false);
+    m_ind_weapon_broken = UIHelper::CreateStatic(uiXml, "indicator_weapon_broken", this, false);
+    m_ind_helmet_broken = UIHelper::CreateStatic(uiXml, "indicator_helmet_broken", this, false);
+    m_ind_outfit_broken = UIHelper::CreateStatic(uiXml, "indicator_outfit_broken", this, false);
+    m_ind_overweight = UIHelper::CreateStatic(uiXml, "indicator_overweight", this, false);
 
-    m_ind_boost_psy = UIHelper::CreateStatic(uiXml, "indicator_booster_psy", this);
-    m_ind_boost_radia = UIHelper::CreateStatic(uiXml, "indicator_booster_radia", this);
-    m_ind_boost_chem = UIHelper::CreateStatic(uiXml, "indicator_booster_chem", this);
-    m_ind_boost_wound = UIHelper::CreateStatic(uiXml, "indicator_booster_wound", this);
-    m_ind_boost_weight = UIHelper::CreateStatic(uiXml, "indicator_booster_weight", this);
-    m_ind_boost_health = UIHelper::CreateStatic(uiXml, "indicator_booster_health", this);
-    m_ind_boost_power = UIHelper::CreateStatic(uiXml, "indicator_booster_power", this);
-    m_ind_boost_rad = UIHelper::CreateStatic(uiXml, "indicator_booster_rad", this);
-    m_ind_boost_psy->Show(false);
-    m_ind_boost_radia->Show(false);
-    m_ind_boost_chem->Show(false);
-    m_ind_boost_wound->Show(false);
-    m_ind_boost_weight->Show(false);
-    m_ind_boost_health->Show(false);
-    m_ind_boost_power->Show(false);
-    m_ind_boost_rad->Show(false);
+    if ((m_ind_boost_psy = UIHelper::CreateStatic(uiXml, "indicator_booster_psy", this, false)))
+        m_ind_boost_psy->Show(false);
+
+    if ((m_ind_boost_radia = UIHelper::CreateStatic(uiXml, "indicator_booster_radia", this, false)))
+        m_ind_boost_radia->Show(false);
+
+    if ((m_ind_boost_chem = UIHelper::CreateStatic(uiXml, "indicator_booster_chem", this, false)))
+        m_ind_boost_chem->Show(false);
+
+    if ((m_ind_boost_wound = UIHelper::CreateStatic(uiXml, "indicator_booster_wound", this, false)))
+        m_ind_boost_wound->Show(false);
+
+    if ((m_ind_boost_weight = UIHelper::CreateStatic(uiXml, "indicator_booster_weight", this, false)))
+        m_ind_boost_weight->Show(false);
+
+    if ((m_ind_boost_health = UIHelper::CreateStatic(uiXml, "indicator_booster_health", this, false)))
+        m_ind_boost_health->Show(false);
+
+    if ((m_ind_boost_power = UIHelper::CreateStatic(uiXml, "indicator_booster_power", this, false)))
+        m_ind_boost_power->Show(false);
+
+    if ((m_ind_boost_rad = UIHelper::CreateStatic(uiXml, "indicator_booster_rad", this, false)))
+        m_ind_boost_rad->Show(false);
 
     // Загружаем иконки
     /*	if ( IsGameTypeSingle() )
@@ -229,21 +233,27 @@ void CUIMainIngameWnd::Init()
     AttachChild(m_ui_hud_states);
     m_ui_hud_states->InitFromXml(uiXml, "hud_states");
 
-    for (int i = 0; i < 4; i++)
+    int i = 0;
+    while (true)
     {
-        m_quick_slots_icons.push_back(new CUIStatic());
-        m_quick_slots_icons.back()->SetAutoDelete(true);
-        AttachChild(m_quick_slots_icons.back());
         string32 path;
         xr_sprintf(path, "quick_slot%d", i);
-        CUIXmlInit::InitStatic(uiXml, path, 0, m_quick_slots_icons.back());
+
+        CUIStatic* slot = UIHelper::CreateStatic(uiXml, path, this, false);
+        if (!slot)
+            break;
+
         xr_strcat(path, ":counter");
-        UIHelper::CreateStatic(uiXml, path, m_quick_slots_icons.back());
+        UIHelper::CreateStatic(uiXml, path, slot);
+
+        m_quick_slots_icons.push_back(slot);
+
+        xr_sprintf(path, "quick_slot%d_text", i);
+        CUITextWnd* text = UIHelper::CreateTextWnd(uiXml, path, this);
+        m_quick_slots_texts.push_back(text);
+
+        i++;
     }
-    m_QuickSlotText1 = UIHelper::CreateTextWnd(uiXml, "quick_slot0_text", this);
-    m_QuickSlotText2 = UIHelper::CreateTextWnd(uiXml, "quick_slot1_text", this);
-    m_QuickSlotText3 = UIHelper::CreateTextWnd(uiXml, "quick_slot2_text", this);
-    m_QuickSlotText4 = UIHelper::CreateTextWnd(uiXml, "quick_slot3_text", this);
 
     HUD_SOUND_ITEM::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
@@ -281,7 +291,7 @@ void CUIMainIngameWnd::Draw()
     if (!pActor || !pActor->g_Alive())
         return;
 
-    UIMotionIcon->SetNoise((s16)(0xffff & iFloor(pActor->m_snd_noise * 100)));
+    UIMotionIcon->SetNoise((s16)(0xffff & iFloor(pActor->m_snd_noise * 100.0f)));
 
     UIMotionIcon->Draw();
 
@@ -626,222 +636,237 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     flags |= LA_ONLYALPHA;
     flags |= LA_TEXTURECOLOR;
     // Bleeding icon
-    float bleeding = pActor->conditions().BleedingSpeed();
-    if (fis_zero(bleeding, EPS))
+    if (m_ind_bleeding)
     {
-        m_ind_bleeding->Show(false);
-        m_ind_bleeding->ResetColorAnimation();
-    }
-    else
-    {
-        m_ind_bleeding->Show(true);
-        if (bleeding < 0.35f)
+        const float bleeding = pActor->conditions().BleedingSpeed();
+        if (fis_zero(bleeding, EPS))
         {
-            m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_green");
-            m_ind_bleeding->SetColorAnimation("ui_slow_blinking_alpha", flags);
-        }
-        else if (bleeding < 0.7f)
-        {
-            m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_yellow");
-            m_ind_bleeding->SetColorAnimation("ui_medium_blinking_alpha", flags);
+            m_ind_bleeding->Show(false);
+            m_ind_bleeding->ResetColorAnimation();
         }
         else
         {
-            m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_red");
-            m_ind_bleeding->SetColorAnimation("ui_fast_blinking_alpha", flags);
+            m_ind_bleeding->Show(true);
+            if (bleeding < 0.35f)
+            {
+                m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_green");
+                m_ind_bleeding->SetColorAnimation("ui_slow_blinking_alpha", flags);
+            }
+            else if (bleeding < 0.7f)
+            {
+                m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_yellow");
+                m_ind_bleeding->SetColorAnimation("ui_medium_blinking_alpha", flags);
+            }
+            else
+            {
+                m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_red");
+                m_ind_bleeding->SetColorAnimation("ui_fast_blinking_alpha", flags);
+            }
         }
     }
+
     // Radiation icon
-    float radiation = pActor->conditions().GetRadiation();
-    if (fis_zero(radiation, EPS))
+    if (m_ind_radiation)
     {
-        m_ind_radiation->Show(false);
-        m_ind_radiation->ResetColorAnimation();
-    }
-    else
-    {
-        m_ind_radiation->Show(true);
-        if (radiation < 0.35f)
+        const float radiation = pActor->conditions().GetRadiation();
+        if (fis_zero(radiation, EPS))
         {
-            m_ind_radiation->InitTexture("ui_inGame2_circle_radiation_green");
-            m_ind_radiation->SetColorAnimation("ui_slow_blinking_alpha", flags);
-        }
-        else if (radiation < 0.7f)
-        {
-            m_ind_radiation->InitTexture("ui_inGame2_circle_radiation_yellow");
-            m_ind_radiation->SetColorAnimation("ui_medium_blinking_alpha", flags);
+            m_ind_radiation->Show(false);
+            m_ind_radiation->ResetColorAnimation();
         }
         else
         {
-            m_ind_radiation->InitTexture("ui_inGame2_circle_radiation_red");
-            m_ind_radiation->SetColorAnimation("ui_fast_blinking_alpha", flags);
+            m_ind_radiation->Show(true);
+            if (radiation < 0.35f)
+            {
+                m_ind_radiation->InitTexture("ui_inGame2_circle_radiation_green");
+                m_ind_radiation->SetColorAnimation("ui_slow_blinking_alpha", flags);
+            }
+            else if (radiation < 0.7f)
+            {
+                m_ind_radiation->InitTexture("ui_inGame2_circle_radiation_yellow");
+                m_ind_radiation->SetColorAnimation("ui_medium_blinking_alpha", flags);
+            }
+            else
+            {
+                m_ind_radiation->InitTexture("ui_inGame2_circle_radiation_red");
+                m_ind_radiation->SetColorAnimation("ui_fast_blinking_alpha", flags);
+            }
         }
     }
 
     // Satiety icon
-    float satiety = pActor->conditions().GetSatiety();
-    float satiety_critical = pActor->conditions().SatietyCritical();
-    float satiety_koef =
-        (satiety - satiety_critical) / (satiety >= satiety_critical ? 1 - satiety_critical : satiety_critical);
-    if (satiety_koef > 0.5)
-        m_ind_starvation->Show(false);
-    else
+    if (m_ind_starvation)
     {
-        m_ind_starvation->Show(true);
-        if (satiety_koef > 0.0f)
-            m_ind_starvation->InitTexture("ui_inGame2_circle_hunger_green");
-        else if (satiety_koef > -0.5f)
-            m_ind_starvation->InitTexture("ui_inGame2_circle_hunger_yellow");
+        const float satiety = pActor->conditions().GetSatiety();
+        const float satiety_critical = pActor->conditions().SatietyCritical();
+        const float satiety_koef =
+            (satiety - satiety_critical) / (satiety >= satiety_critical ? 1 - satiety_critical : satiety_critical);
+        if (satiety_koef > 0.5)
+            m_ind_starvation->Show(false);
         else
-            m_ind_starvation->InitTexture("ui_inGame2_circle_hunger_red");
+        {
+            m_ind_starvation->Show(true);
+            if (satiety_koef > 0.0f)
+                m_ind_starvation->InitTexture("ui_inGame2_circle_hunger_green");
+            else if (satiety_koef > -0.5f)
+                m_ind_starvation->InitTexture("ui_inGame2_circle_hunger_yellow");
+            else
+                m_ind_starvation->InitTexture("ui_inGame2_circle_hunger_red");
+        }
     }
+
     // Armor broken icon
-    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(pActor->inventory().ItemFromSlot(OUTFIT_SLOT));
-    m_ind_outfit_broken->Show(false);
-    if (outfit)
+    if (m_ind_outfit_broken)
     {
-        float condition = outfit->GetCondition();
-        if (condition < 0.75f)
+        CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(pActor->inventory().ItemFromSlot(OUTFIT_SLOT));
+        m_ind_outfit_broken->Show(false);
+        if (outfit)
         {
-            m_ind_outfit_broken->Show(true);
-            if (condition > 0.5f)
-                m_ind_outfit_broken->InitTexture("ui_inGame2_circle_Armorbroken_green");
-            else if (condition > 0.25f)
-                m_ind_outfit_broken->InitTexture("ui_inGame2_circle_Armorbroken_yellow");
-            else
-                m_ind_outfit_broken->InitTexture("ui_inGame2_circle_Armorbroken_red");
-        }
-    }
-    // Helmet broken icon
-    CHelmet* helmet = smart_cast<CHelmet*>(pActor->inventory().ItemFromSlot(HELMET_SLOT));
-    m_ind_helmet_broken->Show(false);
-    if (helmet)
-    {
-        float condition = helmet->GetCondition();
-        if (condition < 0.75f)
-        {
-            m_ind_helmet_broken->Show(true);
-            if (condition > 0.5f)
-                m_ind_helmet_broken->InitTexture("ui_inGame2_circle_Helmetbroken_green");
-            else if (condition > 0.25f)
-                m_ind_helmet_broken->InitTexture("ui_inGame2_circle_Helmetbroken_yellow");
-            else
-                m_ind_helmet_broken->InitTexture("ui_inGame2_circle_Helmetbroken_red");
-        }
-    }
-    // Weapon broken icon
-    u16 slot = pActor->inventory().GetActiveSlot();
-    m_ind_weapon_broken->Show(false);
-    if (slot == INV_SLOT_2 || slot == INV_SLOT_3)
-    {
-        CWeapon* weapon = smart_cast<CWeapon*>(pActor->inventory().ItemFromSlot(slot));
-        if (weapon)
-        {
-            float condition = weapon->GetCondition();
-            float start_misf_cond = weapon->GetMisfireStartCondition();
-            float end_misf_cond = weapon->GetMisfireEndCondition();
-            if (condition < start_misf_cond)
+            const float condition = outfit->GetCondition();
+            if (condition < 0.75f)
             {
-                m_ind_weapon_broken->Show(true);
-                if (condition > (start_misf_cond + end_misf_cond) / 2)
-                    m_ind_weapon_broken->InitTexture("ui_inGame2_circle_Gunbroken_green");
-                else if (condition > end_misf_cond)
-                    m_ind_weapon_broken->InitTexture("ui_inGame2_circle_Gunbroken_yellow");
+                m_ind_outfit_broken->Show(true);
+                if (condition > 0.5f)
+                    m_ind_outfit_broken->InitTexture("ui_inGame2_circle_Armorbroken_green");
+                else if (condition > 0.25f)
+                    m_ind_outfit_broken->InitTexture("ui_inGame2_circle_Armorbroken_yellow");
                 else
-                    m_ind_weapon_broken->InitTexture("ui_inGame2_circle_Gunbroken_red");
+                    m_ind_outfit_broken->InitTexture("ui_inGame2_circle_Armorbroken_red");
             }
         }
     }
-    // Overweight icon
-    float cur_weight = pActor->inventory().TotalWeight();
-    float max_weight = pActor->MaxWalkWeight();
-    m_ind_overweight->Show(false);
-    if (cur_weight >= max_weight - 10.0f && IsGameTypeSingle())
+    // Helmet broken icon
+    if (m_ind_helmet_broken)
     {
-        m_ind_overweight->Show(true);
-        if (cur_weight > max_weight)
-            m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_red");
-        // else if(cur_weight>max_weight-10.0f)
-        //	m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
-        else
-            m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
+        CHelmet* helmet = smart_cast<CHelmet*>(pActor->inventory().ItemFromSlot(HELMET_SLOT));
+        m_ind_helmet_broken->Show(false);
+        if (helmet)
+        {
+            const float condition = helmet->GetCondition();
+            if (condition < 0.75f)
+            {
+                m_ind_helmet_broken->Show(true);
+                if (condition > 0.5f)
+                    m_ind_helmet_broken->InitTexture("ui_inGame2_circle_Helmetbroken_green");
+                else if (condition > 0.25f)
+                    m_ind_helmet_broken->InitTexture("ui_inGame2_circle_Helmetbroken_yellow");
+                else
+                    m_ind_helmet_broken->InitTexture("ui_inGame2_circle_Helmetbroken_red");
+            }
+        }
+    }
+
+    // Weapon broken icon
+    if (m_ind_weapon_broken)
+    {
+        u16 slot = pActor->inventory().GetActiveSlot();
+        m_ind_weapon_broken->Show(false);
+        if (slot == INV_SLOT_2 || slot == INV_SLOT_3)
+        {
+            CWeapon* weapon = smart_cast<CWeapon*>(pActor->inventory().ItemFromSlot(slot));
+            if (weapon)
+            {
+                const float condition = weapon->GetCondition();
+                const float start_misf_cond = weapon->GetMisfireStartCondition();
+                const float end_misf_cond = weapon->GetMisfireEndCondition();
+                if (condition < start_misf_cond)
+                {
+                    m_ind_weapon_broken->Show(true);
+                    if (condition > (start_misf_cond + end_misf_cond) / 2)
+                        m_ind_weapon_broken->InitTexture("ui_inGame2_circle_Gunbroken_green");
+                    else if (condition > end_misf_cond)
+                        m_ind_weapon_broken->InitTexture("ui_inGame2_circle_Gunbroken_yellow");
+                    else
+                        m_ind_weapon_broken->InitTexture("ui_inGame2_circle_Gunbroken_red");
+                }
+            }
+        }
+    }
+
+    // Overweight icon
+    if (m_ind_overweight)
+    {
+        const float cur_weight = pActor->inventory().TotalWeight();
+        const float max_weight = pActor->MaxWalkWeight();
+        m_ind_overweight->Show(false);
+        if (cur_weight >= max_weight - 10.0f && IsGameTypeSingle())
+        {
+            m_ind_overweight->Show(true);
+            if (cur_weight > max_weight)
+                m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_red");
+            // else if(cur_weight>max_weight-10.0f)
+            //	m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
+            else
+                m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
+        }
     }
 }
 
 void CUIMainIngameWnd::UpdateQuickSlots()
 {
+    int i = 1;
     string32 tmp;
-    LPCSTR str = StringTable().translate("quick_use_str_1").c_str();
-    strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',')
-        tmp[1] = '\0';
-    m_QuickSlotText1->SetTextST(tmp);
 
-    str = StringTable().translate("quick_use_str_2").c_str();
-    strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',')
-        tmp[1] = '\0';
-    m_QuickSlotText2->SetTextST(tmp);
-
-    str = StringTable().translate("quick_use_str_3").c_str();
-    strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',')
-        tmp[1] = '\0';
-    m_QuickSlotText3->SetTextST(tmp);
-
-    str = StringTable().translate("quick_use_str_4").c_str();
-    strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',')
-        tmp[1] = '\0';
-    m_QuickSlotText4->SetTextST(tmp);
+    for (const auto& slot : m_quick_slots_texts)
+    {
+        xr_sprintf(tmp, "quick_use_str_%d", i);
+        pcstr str = StringTable().translate(tmp).c_str();
+        strncpy_s(tmp, sizeof(tmp), str, 3);
+        if (tmp[2] == ',')
+            tmp[1] = '\0';
+        slot->SetTextST(tmp);
+        ++i;
+    }
 
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!pActor)
         return;
 
-    for (u8 i = 0; i < 4; i++)
+    i = -1;
+    for (const auto& slot : m_quick_slots_icons)
     {
-        CUIStatic* wnd = smart_cast<CUIStatic*>(m_quick_slots_icons[i]->FindChild("counter"));
+        ++i;
+        CUIStatic* wnd = smart_cast<CUIStatic*>(slot->FindChild("counter"));
         if (wnd)
         {
             shared_str item_name = g_quick_use_slots[i];
             if (item_name.size())
             {
-                u32 count = pActor->inventory().dwfGetSameItemCount(item_name.c_str(), true);
+                const u32 count = pActor->inventory().dwfGetSameItemCount(item_name.c_str(), true);
                 string32 str;
                 xr_sprintf(str, "x%d", count);
                 wnd->TextItemControl()->SetText(str);
                 wnd->Show(true);
 
-                CUIStatic* main_slot = m_quick_slots_icons[i];
-                main_slot->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+                slot->SetShader(InventoryUtilities::GetEquipmentIconsShader());
                 Frect texture_rect;
                 texture_rect.x1 = pSettings->r_float(item_name, "inv_grid_x") * INV_GRID_WIDTH;
                 texture_rect.y1 = pSettings->r_float(item_name, "inv_grid_y") * INV_GRID_HEIGHT;
                 texture_rect.x2 = pSettings->r_float(item_name, "inv_grid_width") * INV_GRID_WIDTH;
                 texture_rect.y2 = pSettings->r_float(item_name, "inv_grid_height") * INV_GRID_HEIGHT;
                 texture_rect.rb.add(texture_rect.lt);
-                main_slot->SetTextureRect(texture_rect);
-                main_slot->TextureOn();
-                main_slot->SetStretchTexture(true);
+                slot->SetTextureRect(texture_rect);
+                slot->TextureOn();
+                slot->SetStretchTexture(true);
                 if (!count)
                 {
                     wnd->SetTextureColor(color_rgba(255, 255, 255, 0));
                     wnd->TextItemControl()->SetTextColor(color_rgba(255, 255, 255, 0));
-                    m_quick_slots_icons[i]->SetTextureColor(color_rgba(255, 255, 255, 100));
+                    slot->SetTextureColor(color_rgba(255, 255, 255, 100));
                 }
                 else
                 {
                     wnd->SetTextureColor(color_rgba(255, 255, 255, 255));
                     wnd->TextItemControl()->SetTextColor(color_rgba(255, 255, 255, 255));
-                    m_quick_slots_icons[i]->SetTextureColor(color_rgba(255, 255, 255, 255));
+                    slot->SetTextureColor(color_rgba(255, 255, 255, 255));
                 }
             }
             else
             {
                 wnd->Show(false);
-                m_quick_slots_icons[i]->SetTextureColor(color_rgba(255, 255, 255, 0));
-                //				m_quick_slots_icons[i]->Show(false);
+                slot->SetTextureColor(color_rgba(255, 255, 255, 0));
+                //slot->Show(false);
             }
         }
     }
@@ -856,57 +881,55 @@ void CUIMainIngameWnd::DrawMainIndicatorsForInventory()
     UpdateQuickSlots();
     UpdateBoosterIndicators(pActor->conditions().GetCurBoosterInfluences());
 
-    for (int i = 0; i < 4; i++)
-        m_quick_slots_icons[i]->Draw();
+    for (const auto& slot : m_quick_slots_icons)
+        slot->Draw();
 
-    m_QuickSlotText1->Draw();
-    m_QuickSlotText2->Draw();
-    m_QuickSlotText3->Draw();
-    m_QuickSlotText4->Draw();
+    for (const auto& slot : m_quick_slots_texts)
+        slot->Draw();
 
-    if (m_ind_boost_psy->IsShown())
+    if (m_ind_boost_psy && m_ind_boost_psy->IsShown())
     {
         m_ind_boost_psy->Update();
         m_ind_boost_psy->Draw();
     }
 
-    if (m_ind_boost_radia->IsShown())
+    if (m_ind_boost_radia && m_ind_boost_radia->IsShown())
     {
         m_ind_boost_radia->Update();
         m_ind_boost_radia->Draw();
     }
 
-    if (m_ind_boost_chem->IsShown())
+    if (m_ind_boost_chem && m_ind_boost_chem->IsShown())
     {
         m_ind_boost_chem->Update();
         m_ind_boost_chem->Draw();
     }
 
-    if (m_ind_boost_wound->IsShown())
+    if (m_ind_boost_wound && m_ind_boost_wound->IsShown())
     {
         m_ind_boost_wound->Update();
         m_ind_boost_wound->Draw();
     }
 
-    if (m_ind_boost_weight->IsShown())
+    if (m_ind_boost_weight && m_ind_boost_weight->IsShown())
     {
         m_ind_boost_weight->Update();
         m_ind_boost_weight->Draw();
     }
 
-    if (m_ind_boost_health->IsShown())
+    if (m_ind_boost_health && m_ind_boost_health->IsShown())
     {
         m_ind_boost_health->Update();
         m_ind_boost_health->Draw();
     }
 
-    if (m_ind_boost_power->IsShown())
+    if (m_ind_boost_power && m_ind_boost_power->IsShown())
     {
         m_ind_boost_power->Update();
         m_ind_boost_power->Draw();
     }
 
-    if (m_ind_boost_rad->IsShown())
+    if (m_ind_boost_rad && m_ind_boost_rad->IsShown())
     {
         m_ind_boost_rad->Update();
         m_ind_boost_rad->Draw();
@@ -917,14 +940,22 @@ void CUIMainIngameWnd::DrawMainIndicatorsForInventory()
 
 void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences)
 {
-    m_ind_boost_psy->Show(false);
-    m_ind_boost_radia->Show(false);
-    m_ind_boost_chem->Show(false);
-    m_ind_boost_wound->Show(false);
-    m_ind_boost_weight->Show(false);
-    m_ind_boost_health->Show(false);
-    m_ind_boost_power->Show(false);
-    m_ind_boost_rad->Show(false);
+    if (m_ind_boost_psy)
+        m_ind_boost_psy->Show(false);
+    if (m_ind_boost_radia)
+        m_ind_boost_radia->Show(false);
+    if (m_ind_boost_chem)
+        m_ind_boost_chem->Show(false);
+    if (m_ind_boost_wound)
+        m_ind_boost_wound->Show(false);
+    if (m_ind_boost_weight)
+        m_ind_boost_weight->Show(false);
+    if (m_ind_boost_health)
+        m_ind_boost_health->Show(false);
+    if (m_ind_boost_power)
+        m_ind_boost_power->Show(false);
+    if (m_ind_boost_rad)
+        m_ind_boost_rad->Show(false);
 
     LPCSTR str_flag = "ui_slow_blinking_alpha";
     u8 flags = 0;
@@ -939,77 +970,101 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
         {
         case eBoostHpRestore:
         {
-            m_ind_boost_health->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_health->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_health->ResetColorAnimation();
+            if (m_ind_boost_health)
+            {
+                m_ind_boost_health->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_health->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_health->ResetColorAnimation();
+            }
         }
         break;
         case eBoostPowerRestore:
         {
-            m_ind_boost_power->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_power->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_power->ResetColorAnimation();
+            if (m_ind_boost_power)
+            {
+                m_ind_boost_power->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_power->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_power->ResetColorAnimation();
+            }
         }
         break;
         case eBoostRadiationRestore:
         {
-            m_ind_boost_rad->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_rad->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_rad->ResetColorAnimation();
+            if (m_ind_boost_rad)
+            {
+                m_ind_boost_rad->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_rad->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_rad->ResetColorAnimation();
+            }
         }
         break;
         case eBoostBleedingRestore:
         {
-            m_ind_boost_wound->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_wound->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_wound->ResetColorAnimation();
+            if (m_ind_boost_wound)
+            {
+                m_ind_boost_wound->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_wound->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_wound->ResetColorAnimation();
+            }
         }
         break;
         case eBoostMaxWeight:
         {
-            m_ind_boost_weight->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_weight->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_weight->ResetColorAnimation();
+            if (m_ind_boost_weight)
+            {
+                m_ind_boost_weight->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_weight->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_weight->ResetColorAnimation();
+            }
         }
         break;
         case eBoostRadiationImmunity:
         case eBoostRadiationProtection:
         {
-            m_ind_boost_radia->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_radia->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_radia->ResetColorAnimation();
+            if (m_ind_boost_radia)
+            {
+                m_ind_boost_radia->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_radia->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_radia->ResetColorAnimation();
+            }
         }
         break;
         case eBoostTelepaticImmunity:
         case eBoostTelepaticProtection:
         {
-            m_ind_boost_psy->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_psy->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_psy->ResetColorAnimation();
+            if (m_ind_boost_psy)
+            {
+                m_ind_boost_psy->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_psy->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_psy->ResetColorAnimation();
+            }
         }
         break;
         case eBoostChemicalBurnImmunity:
         case eBoostChemicalBurnProtection:
         {
-            m_ind_boost_chem->Show(true);
-            if (b->second.fBoostTime <= 3.0f)
-                m_ind_boost_chem->SetColorAnimation(str_flag, flags);
-            else
-                m_ind_boost_chem->ResetColorAnimation();
+            if (m_ind_boost_chem)
+            {
+                m_ind_boost_chem->Show(true);
+                if (b->second.fBoostTime <= 3.0f)
+                    m_ind_boost_chem->SetColorAnimation(str_flag, flags);
+                else
+                    m_ind_boost_chem->ResetColorAnimation();
+            }
         }
         break;
         }

@@ -17,6 +17,7 @@ public:
     CUIFrameLineWnd();
     bool InitFrameLineWnd(LPCSTR base_name, Fvector2 pos, Fvector2 size, bool horizontal = true, bool fatal = true);
     void InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizontal = true);
+    bool InitTexture(pcstr texture, bool fatal = true);
     bool InitTexture(pcstr texture, pcstr shader = "hud" DELIMITER "default", bool fatal = true);
     virtual void Draw();
 

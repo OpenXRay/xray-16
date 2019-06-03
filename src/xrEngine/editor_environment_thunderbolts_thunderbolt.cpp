@@ -30,7 +30,7 @@ thunderbolt::~thunderbolt()
     ::ide().destroy(m_property_holder);
 }
 
-void thunderbolt::create_top_gradient(CInifile& config, shared_str const& section)
+void thunderbolt::create_top_gradient(const CInifile& config, shared_str const& section)
 {
     VERIFY(section == m_id);
     m_top = new gradient();
@@ -38,7 +38,7 @@ void thunderbolt::create_top_gradient(CInifile& config, shared_str const& sectio
     m_GradientTop = m_top;
 }
 
-void thunderbolt::create_center_gradient(CInifile& config, shared_str const& section)
+void thunderbolt::create_center_gradient(const CInifile& config, shared_str const& section)
 {
     VERIFY(section == m_id);
     m_center = new gradient();

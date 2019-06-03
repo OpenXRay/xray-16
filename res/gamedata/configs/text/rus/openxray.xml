@@ -3,6 +3,9 @@
 	<string id="st_unequip">
 		<text>убрать в рюкзак</text>
 	</string>
+	<string id="st_donate">
+		<text>Подарить</text>
+	</string>
 	<string id="st_loading_lights">
 		<text>Загрузка освещения</text>
 	</string>
@@ -29,6 +32,12 @@
 	</string>
 	<string id="ui_style_default">
 		<text>Зов Припяти</text>
+	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Упр. подбор предметов</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Множ. подбор предметов</text>
 	</string>
 	<string id="ui_mm_loadingstages">
 		<text>Стадии загрузки</text>
@@ -58,7 +67,7 @@
 		<text>Поле зрения</text>
 	</string>
 	<string id="ui_mm_localization">
-		<text>Language</text>
+		<text>Язык</text>
 	</string>
 	<string id="eng">
 		<text>Английский (English)</text>

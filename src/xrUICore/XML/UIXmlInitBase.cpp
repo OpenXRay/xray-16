@@ -9,6 +9,7 @@
 #include "ProgressBar/UIProgressShape.h"
 #include "TabControl/UITabControl.h"
 #include "Static/UIAnimatedStatic.h"
+#include "ListWnd/UIListWnd.h"
 #include "ListBox/UIListBox.h"
 #include "ComboBox/UIComboBox.h"
 #include "TrackBar/UITrackBar.h"
@@ -1147,6 +1148,63 @@ bool CUIXmlInitBase::InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUI
         pWnd->AddWindow(newText, true);
     }
     xml_doc.SetLocalRoot(_stored_root);
+    return true;
+}
+
+bool CUIXmlInitBase::InitListWnd(CUIXml& xml_doc, pcstr path, int index, CUIListWnd* pWnd, bool fatal /*= true*/)
+{
+    const bool nodeExist = xml_doc.NavigateToNode(path, index);
+    if (!nodeExist)
+    {
+        R_ASSERT4(!fatal, "XML node not found", path, xml_doc.m_xml_file_name);
+        return false;
+    }
+
+    Fvector2 pos, size;
+    pos.x = xml_doc.ReadAttribFlt(path, index, "x");
+    pos.y = xml_doc.ReadAttribFlt(path, index, "y");
+
+    InitAlignment(xml_doc, path, index, pos.x, pos.y, pWnd);
+
+    size.x = xml_doc.ReadAttribFlt(path, index, "width");
+    size.y = xml_doc.ReadAttribFlt(path, index, "height");
+    float item_height = xml_doc.ReadAttribFlt(path, index, "item_height");
+    int active_background = xml_doc.ReadAttribInt(path, index, "active_bg");
+
+    // Init font from xml config file
+    string256 buf;
+    CGameFont* LocalFont = nullptr;
+    u32 cl;
+
+    shared_str text_path = strconcat(sizeof(buf), buf, path, ":font");
+    InitFont(xml_doc, *text_path, index, cl, LocalFont);
+    if (LocalFont)
+    {
+        pWnd->SetFont(LocalFont);
+        pWnd->SetTextColor(cl);
+    }
+
+    pWnd->SetScrollBarProfile(xml_doc.ReadAttrib(path, index, "scroll_profile", "default"));
+    pWnd->InitListWnd(pos, size, item_height);
+    pWnd->EnableActiveBackground(!!active_background);
+
+    if (xml_doc.ReadAttribInt(path, index, "always_show_scroll"))
+    {
+        pWnd->SetAlwaysShowScroll(true);
+        pWnd->EnableAlwaysShowScroll(true);
+        pWnd->EnableScrollBar(true);
+    }
+
+    if (xml_doc.ReadAttribInt(path, index, "always_hide_scroll"))
+    {
+        pWnd->SetAlwaysShowScroll(false);
+        pWnd->EnableAlwaysShowScroll(true);
+    }
+
+
+    bool bVertFlip = (1 == xml_doc.ReadAttribInt(path, index, "flip_vert", 0));
+    pWnd->SetVertFlip(bVertFlip);
+
     return true;
 }
 

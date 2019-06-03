@@ -336,12 +336,12 @@ ENGINE_API int RunApplication()
     Engine.External.CreateRendererList();
     CheckAndSetupRenderer();
 
+    Engine.External.Initialize();
     InitEngine();
 
     if (CheckBenchmark())
         return 0;
 
-    Engine.External.Initialize();
     Startup();
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
@@ -406,9 +406,9 @@ void RunBenchmark(pcstr name)
         xr_strcpy(Core.Params, cmdSize, benchmarkCommand.c_str());
         xr_strlwr(Core.Params);
         InitInput();
+        Engine.External.Initialize();
         if (i)
             InitEngine();
-        Engine.External.Initialize();
         xr_strcpy(Console->ConfigFile, "user.ltx");
         if (strstr(Core.Params, "-ltx "))
         {

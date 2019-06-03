@@ -75,7 +75,7 @@ CSE_SmartCover::CSE_SmartCover(LPCSTR section) : CSE_ALifeDynamicObject(section)
     m_enter_min_enemy_distance = pSettings->r_float(section, "enter_min_enemy_distance");
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
     m_is_combat_cover = pSettings->r_bool(section, "is_combat_cover");
-    m_can_fire = m_is_combat_cover ? true : pSettings->r_bool(section, "can_fire");
+    m_can_fire = m_is_combat_cover ? true : pSettings->read_if_exists<bool>(section, "can_fire", false);
     m_need_to_reparse_loopholes = true;
 }
 

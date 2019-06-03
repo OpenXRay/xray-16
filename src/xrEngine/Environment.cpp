@@ -586,14 +586,14 @@ void CEnvironment::create_mixer()
 }
 
 void CEnvironment::destroy_mixer() { xr_delete(CurrentEnv); }
-SThunderboltDesc* CEnvironment::thunderbolt_description(CInifile& config, shared_str const& section)
+SThunderboltDesc* CEnvironment::thunderbolt_description(const CInifile& config, shared_str const& section)
 {
     SThunderboltDesc* result = new SThunderboltDesc();
     result->load(config, section);
     return (result);
 }
 
-SThunderboltCollection* CEnvironment::thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, LPCSTR section)
+SThunderboltCollection* CEnvironment::thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section)
 {
     SThunderboltCollection* result = new SThunderboltCollection();
     result->load(pIni, thunderbolts, section);

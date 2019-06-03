@@ -21,6 +21,11 @@ void CUIFrameLineWnd::InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizon
     bHorizontal = horizontal;
 }
 
+bool CUIFrameLineWnd::InitTexture(pcstr texture, bool fatal /*= true*/)
+{
+    return InitTexture(texture, "hud" DELIMITER "default", fatal);
+}
+
 bool CUIFrameLineWnd::InitTexture(pcstr texture, pcstr shader, bool fatal /*= true*/)
 {
     dbg_tex_name = texture;

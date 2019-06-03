@@ -45,8 +45,8 @@ public:
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_load_section; }
-    virtual SEffect* create_effect(CInifile& config, pcstr id);
-    virtual SSndChannel* create_sound_channel(CInifile& config, pcstr id);
+    virtual SEffect* create_effect(const CInifile& config, pcstr id);
+    virtual SSndChannel* create_sound_channel(const CInifile& config, pcstr id);
     virtual EffectVec& effects();
     virtual SSndChannelVec& get_snd_channels();
 

@@ -3,6 +3,9 @@
 	<string id="st_unequip">
 		<text>Zdejmij</text>
 	</string>
+	<string id="st_donate">
+		<text>Podaruj</text>
+	</string>
 	<string id="st_loading_lights">
 		<text>Wczytywanie oœwietlenia</text>
 	</string>
@@ -29,6 +32,12 @@
 	</string>
 	<string id="ui_style_default">
 		<text>Zew Prypeci</text>
+	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Uproszczone podn. przedmiotów</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Podn. wsz. przedmiotów na raz</text>
 	</string>
 	<string id="ui_mm_loadingstages">
 		<text>Postêp wczytywania</text>

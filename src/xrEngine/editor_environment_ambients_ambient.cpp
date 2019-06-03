@@ -197,7 +197,7 @@ ambient::property_holder_type* ambient::object() { return (m_property_holder); }
     return (m_manager.sounds_manager());
 }
 
-ambient::SEffect* ambient::create_effect(CInifile& config, pcstr id)
+ambient::SEffect* ambient::create_effect(const CInifile& config, pcstr id)
 {
     effect* result = new effect(m_manager.effects_manager(), id);
     result->load(config);
@@ -205,7 +205,7 @@ ambient::SEffect* ambient::create_effect(CInifile& config, pcstr id)
     return (result);
 }
 
-ambient::SSndChannel* ambient::create_sound_channel(CInifile& config, pcstr id)
+ambient::SSndChannel* ambient::create_sound_channel(const CInifile& config, pcstr id)
 {
     channel* result = new channel(m_manager.sounds_manager(), id);
     result->load(config);

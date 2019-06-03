@@ -41,7 +41,7 @@ public:
     void load();
     void save();
     void fill(XRay::Editor::property_holder_base* holder);
-    SThunderboltDesc* description(CInifile& config, shared_str const& section) const;
+    SThunderboltDesc* description(const CInifile& config, shared_str const& section) const;
     SThunderboltCollection* get_collection(shared_str const& section);
 
 public:

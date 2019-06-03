@@ -4,11 +4,20 @@
 #include "XML/UITextureMaster.h"
 #include "xrEngine/xr_input.h"
 
-#define DEF_CONTROL_HEIGHT 16.0f
+constexpr pcstr UI_SLIDER_BAR = "ui_inGame2_opt_slider_bar";
+
+constexpr pcstr UI_SLIDER_ENABLED = "ui_slider_e";
+constexpr pcstr UI_SLIDER_DISABLED = "ui_slider_d";
+
+constexpr pcstr SLIDER_BOX_TEXTURE = "ui_inGame2_opt_slider_box";
+constexpr pcstr SLIDER_BOX_TEXTURE_E = "ui_inGame2_opt_slider_box_e";
+
+constexpr pcstr SLIDER_BUTTON_TEXTURE = "ui_slider_button";
+constexpr pcstr SLIDER_BUTTON_TEXTURE_E = "ui_slider_button_e";
 
 CUITrackBar::CUITrackBar()
-    : m_f_min(0), m_f_max(1), m_f_val(0), m_f_opt_backup_value(0), m_f_step(0.01f), m_b_is_float(true),
-      m_b_invert(false), m_b_bound_already_set(false)
+    : m_b_invert(false), m_b_is_float(true), m_b_bound_already_set(false), m_f_val(0), m_f_max(1), m_f_min(0),
+      m_f_step(0.01f), m_f_opt_backup_value(0)
 {
     m_pSlider = new CUI3tButton();
     AttachChild(m_pSlider);
@@ -88,22 +97,41 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
 
 void CUITrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
 {
-    float item_height;
-    float item_width;
-
     InitIB(pos, size);
 
-    InitState(S_Enabled, "ui_inGame2_opt_slider_bar");
-    InitState(S_Disabled, "ui_inGame2_opt_slider_bar");
+    // Try to init enabled state with UI_SLIDER_BAR texture
+    // If it was successful then init disabled state too
+    if (InitState(S_Enabled, UI_SLIDER_BAR, false))
+    {
+        InitState(S_Disabled, UI_SLIDER_BAR);
+    }
+    else // Try to initialize with SOC/CS texture names
+    {
+        InitState(S_Enabled, UI_SLIDER_ENABLED, false);
+        InitState(S_Disabled, UI_SLIDER_DISABLED, false);
+    }
 
-    item_width = CUITextureMaster::GetTextureWidth("ui_inGame2_opt_slider_box_e");
-    item_height = CUITextureMaster::GetTextureHeight("ui_inGame2_opt_slider_box_e");
+    float item_width = 0.f;
+    float item_height = 0.f;
+
+    // Try to get width, if successful then get height too
+    if (CUITextureMaster::GetTextureWidth(SLIDER_BOX_TEXTURE_E, item_width))
+    {
+        CUITextureMaster::GetTextureHeight(SLIDER_BOX_TEXTURE_E, item_height);
+    }
+    else // Try to get width and height with SOC/CS texture names
+    {
+        CUITextureMaster::GetTextureWidth(SLIDER_BUTTON_TEXTURE_E, item_width);
+        CUITextureMaster::GetTextureHeight(SLIDER_BUTTON_TEXTURE_E, item_height);
+    }
 
     item_width *= UI().get_current_kx();
 
     m_pSlider->InitButton(
         Fvector2().set(0.0f, 0.0f) /*(size.y - item_height)/2.0f)*/, Fvector2().set(item_width, item_height)); // size
-    m_pSlider->InitTexture("ui_inGame2_opt_slider_box");
+
+    if (!m_pSlider->InitTexture(SLIDER_BOX_TEXTURE, false))
+       m_pSlider->InitTexture(SLIDER_BUTTON_TEXTURE, false);
 
     SetCurrentState(S_Enabled);
 }

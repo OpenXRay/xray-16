@@ -21,12 +21,12 @@ private:
     //-	typedef ALife::EInfluenceType	EIndicatorType;
 
     CUIStatic* m_back;
-    //	CUIStatic*			m_back_v;
-    //	CUIStatic*			m_back_over_arrow;
-    //	CUIStatic*			m_static_armor;
+    CUIStatic* m_back_v;
+    CUIStatic* m_back_over_arrow;
+    CUIStatic* m_static_armor;
 
-    //	CUIStatic*			m_resist_back[it_max];
-    CUIStatic* m_indik[it_max];
+    xr_map<ALife::EInfluenceType, CUIStatic*> m_resist_back;
+    xr_map<ALife::EInfluenceType, CUIStatic*> m_indik;
 
     CUITextWnd* m_ui_weapon_cur_ammo;
     CUITextWnd* m_ui_weapon_fmj_ammo;
@@ -36,17 +36,20 @@ private:
     CUITextWnd* m_ui_grenade;
     II_BriefInfo m_item_info;
 
+    CUIStatic* m_ui_weapon_sign_ammo;
     CUIStatic* m_ui_weapon_icon;
     Frect m_ui_weapon_icon_rect;
 
     CUIProgressBar* m_ui_health_bar;
-    //	CUIProgressBar*		m_ui_armor_bar;
+    CUIProgressBar* m_ui_armor_bar;
     CUIProgressBar* m_ui_stamina_bar;
 
-    //	CUIProgressShape*	m_progress_self;
+    CUIProgressShape* m_progress_self;
     CUIStatic* m_radia_damage;
-    //	UI_Arrow*			m_arrow;
-    //	UI_Arrow*			m_arrow_shadow;
+    UI_Arrow* m_arrow;
+    UI_Arrow* m_arrow_shadow;
+
+    CUIStatic* m_bleeding;
     /*
         CUIStatic*			m_bleeding_lev1;
         CUIStatic*			m_bleeding_lev2;
@@ -74,7 +77,7 @@ private:
     u32 m_timer_1sec;
 
     bool m_fake_indicators_update;
-    //	bool				m_cur_state_LA[it_max];
+    std::bitset<it_max> m_cur_state_LA;
     bool m_b_force_update;
 
 public:
@@ -106,6 +109,6 @@ protected:
 
     void Load_section_type(ALife::EInfluenceType type, LPCSTR section);
     void UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type);
-    //			void	SwitchLA			( bool state, ALife::EInfluenceType type );
+    void SwitchLA(bool state, ALife::EInfluenceType type);
 
 }; // class CUIHudStatesWnd

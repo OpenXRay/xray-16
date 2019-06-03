@@ -28,7 +28,8 @@ void CUIActorMenu::InitTradeMode()
     m_pInventoryBagList->Show(false);
     m_PartnerCharacterInfo->Show(true);
     m_PartnerMoney->Show(true);
-    m_pQuickSlot->Show(true);
+    if (m_pQuickSlot)
+        m_pQuickSlot->Show(true);
 
     m_pTradeActorBagList->Show(true);
     m_pTradeActorList->Show(true);
@@ -41,8 +42,12 @@ void CUIActorMenu::InitTradeMode()
 
     m_PartnerBottomInfo->Show(true);
     m_PartnerWeight->Show(true);
-    m_trade_buy_button->Show(true);
-    m_trade_sell_button->Show(true);
+    if (m_trade_button)
+        m_trade_button->Show(true);
+    if (m_trade_buy_button)
+        m_trade_buy_button->Show(true);
+    if (m_trade_sell_button)
+        m_trade_sell_button->Show(true);
 
     VERIFY(m_pPartnerInvOwner);
     m_pPartnerInvOwner->StartTrading();
@@ -139,8 +144,12 @@ void CUIActorMenu::DeInitTradeMode()
 
     m_PartnerBottomInfo->Show(false);
     m_PartnerWeight->Show(false);
-    m_trade_buy_button->Show(false);
-    m_trade_sell_button->Show(false);
+    if (m_trade_button)
+        m_trade_button->Show(false);
+    if (m_trade_buy_button)
+        m_trade_buy_button->Show(false);
+    if (m_trade_sell_button)
+        m_trade_sell_button->Show(false);
 
     if (!CurrentGameUI())
         return;
@@ -419,6 +428,49 @@ void CUIActorMenu::UpdatePrices()
     m_PartnerTradePrice->SetWndPos(pos);
     //	pos.x = pos.x - m_PartnerTradeCaption->GetWndSize().x - 5.0f;
     //	m_PartnerTradeCaption->SetWndPos( pos );
+}
+
+void CUIActorMenu::OnBtnPerformTrade(CUIWindow* w, void* d)
+{
+    if (m_pTradeActorList->ItemsCount() == 0 && m_pTradePartnerList->ItemsCount() == 0)
+    {
+        return;
+    }
+
+    int actor_money = (int)m_pActorInvOwner->get_money();
+    int partner_money = (int)m_pPartnerInvOwner->get_money();
+    int actor_price = (int)CalcItemsPrice(m_pTradeActorList, m_partner_trade, true);
+    int partner_price = (int)CalcItemsPrice(m_pTradePartnerList, m_partner_trade, false);
+
+    int delta_price = actor_price - partner_price;
+    actor_money += delta_price;
+    partner_money -= delta_price;
+
+    if ((actor_money >= 0) && (partner_money >= 0) && (actor_price >= 0 || partner_price > 0))
+    {
+        m_partner_trade->OnPerformTrade(partner_price, actor_price);
+
+        TransferItems(m_pTradeActorList, m_pTradePartnerBagList, m_partner_trade, true);
+        TransferItems(m_pTradePartnerList, m_pTradeActorBagList, m_partner_trade, false);
+    }
+    else
+    {
+        if (actor_money < 0)
+        {
+            CallMessageBoxOK("not_enough_money_actor");
+        }
+        else if (partner_money < 0)
+        {
+            CallMessageBoxOK("not_enough_money_partner");
+        }
+        else
+        {
+            CallMessageBoxOK("trade_dont_make");
+        }
+    }
+    SetCurrentItem(nullptr);
+
+    UpdateItemsPlace();
 }
 
 void CUIActorMenu::OnBtnPerformTradeBuy(CUIWindow* w, void* d)

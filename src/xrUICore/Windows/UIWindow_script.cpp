@@ -74,6 +74,16 @@ SCRIPT_EXPORT(CUIWindow, (), {
             return CUITextureMaster::FindItem(name, defaultName);
         }),
 
+        def("GetTextureInfo", +[](pcstr name, TEX_INFO& outValue)
+        {
+            return CUITextureMaster::FindItem(name, outValue);
+        }),
+
+        def("GetTextureInfo", +[](pcstr name, pcstr defaultName, TEX_INFO& outValue)
+        {
+            return CUITextureMaster::FindItem(name, defaultName, outValue);
+        }),
+
         class_<CUIWindow>("CUIWindow")
             .def(constructor<>())
             .def("AttachChild", &CUIWindow::AttachChild, adopt<2>())
@@ -178,7 +188,8 @@ SCRIPT_EXPORT(EnumUIMessages, (), {
                              value("WINDOW_KEYBOARD_CAPTURE_LOST", int(WINDOW_KEYBOARD_CAPTURE_LOST)),
 
                              // CUIButton
-                             value("BUTTON_CLICKED", int(BUTTON_CLICKED)), value("BUTTON_DOWN", int(BUTTON_DOWN)),
+                             value("BUTTON_CLICKED", int(BUTTON_CLICKED)),
+                             value("BUTTON_DOWN", int(BUTTON_DOWN)),
 
                              // CUITabControl
                              value("TAB_CHANGED", int(TAB_CHANGED)),
@@ -200,6 +211,7 @@ SCRIPT_EXPORT(EnumUIMessages, (), {
                              // CUIListWnd
                              value("LIST_ITEM_CLICKED", int(LIST_ITEM_CLICKED)),
                              value("LIST_ITEM_SELECT", int(LIST_ITEM_SELECT)),
+                             value("LIST_ITEM_UNSELECT", int(LIST_ITEM_UNSELECT)),
 
                              // UIPropertiesBox
                              value("PROPERTY_CLICKED", int(PROPERTY_CLICKED)),

@@ -57,7 +57,7 @@ void CLensFlareDescriptor::AddFlare(float fRadius, float fOpacity, float fPositi
     m_Flares.push_back(F);
 }
 
-void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
+void CLensFlareDescriptor::load(CInifile const* pIni, pcstr sect)
 {
     section = sect;
     m_Flags.set(flSource, pIni->r_bool(sect, "sun"));
@@ -497,7 +497,7 @@ void CLensFlare::Render(BOOL bSun, BOOL bFlares, BOOL bGradient)
     m_pRender->Render(*this, bSun, bFlares, bGradient);
 }
 
-shared_str CLensFlare::AppendDef(CEnvironment& environment, CInifile* pIni, LPCSTR sect)
+shared_str CLensFlare::AppendDef(CEnvironment& environment, CInifile const* pIni, pcstr sect)
 {
     if (!sect || (0 == sect[0]))
         return "";
