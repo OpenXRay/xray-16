@@ -9,7 +9,7 @@ CUIDebugFonts::CUIDebugFonts()
 }
 
 CUIDebugFonts::~CUIDebugFonts() {}
-void CUIDebugFonts::InitDebugFonts(Frect r)
+void CUIDebugFonts::InitDebugFonts(const Frect& r)
 {
     CUIDialogWnd::SetWndRect(r);
 

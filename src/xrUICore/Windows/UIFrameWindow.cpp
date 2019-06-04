@@ -267,7 +267,7 @@ void CUIFrameWindow::DrawElements()
     GEnv.UIRender->FlushPrimitive();
 }
 
-bool CUIFrameWindow::get_points(Frect const& r, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt)
+bool CUIFrameWindow::get_points(const Frect& r, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt)
 {
     LTt = m_tex_rect[i].lt;
     RBt = m_tex_rect[i].rb;
@@ -303,8 +303,8 @@ void CUIFrameWindow::draw_tile_line(Frect rect, int i, bool b_horz, Fvector2 con
         while (rect.lt.x + EPS_L < rect.rb.x)
         {
             get_points(rect, i, LTp, RBp, LTt, RBt);
-            rect.lt.x = RBp.x;
             draw_rect(LTp, RBp, LTt, RBt, m_texture_color, ts);
+            rect.lt.x = RBp.x;
         }
     }
     else
@@ -312,19 +312,19 @@ void CUIFrameWindow::draw_tile_line(Frect rect, int i, bool b_horz, Fvector2 con
         while (rect.lt.y + EPS_L < rect.rb.y)
         {
             get_points(rect, i, LTp, RBp, LTt, RBt);
-            rect.lt.y = RBp.y;
             draw_rect(LTp, RBp, LTt, RBt, m_texture_color, ts);
+            rect.lt.y = RBp.y;
         }
     }
 }
 
-void CUIFrameWindow::draw_tile_rect(Frect rect, int i, Fvector2 const& ts)
+void CUIFrameWindow::draw_tile_rect(const Frect& rect, int i, Fvector2 const& ts)
 {
-    Frect tmp = rect;
-    while (rect.lt.x + EPS_L < rect.rb.x)
+    float lt_x = rect.lt.x;
+    while (lt_x + EPS_L < rect.rb.x)
     {
         draw_tile_line(rect, i, false, ts);
-        rect.lt.x += m_tex_rect[i].width();
-        rect.lt.x = _min(rect.lt.x, tmp.rb.x);
+        lt_x += m_tex_rect[i].width();
+        lt_x = _min(lt_x, rect.rb.x);
     }
 }

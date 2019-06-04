@@ -43,7 +43,7 @@ protected:
     Frect m_tex_rect[fmMax];
     u32 m_texture_color;
     void DrawElements();
-    bool get_points(Frect const& r, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);
+    bool get_points(const Frect& r, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);
     void draw_tile_line(Frect rect, int i, bool b_horz, Fvector2 const& ts);
-    void draw_tile_rect(Frect rect, int i, Fvector2 const& ts);
+    void draw_tile_rect(const Frect& rect, int i, Fvector2 const& ts);
 };
