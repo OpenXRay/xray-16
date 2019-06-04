@@ -55,14 +55,12 @@ constexpr double dbl_min = type_min<double>;
 constexpr double dbl_zero = type_zero<double>;
 constexpr double dbl_eps = type_epsilon<double>;
 
-#ifdef LINUX
-constexpr int max_path = PATH_MAX;
-#elif FREEBSD
-constexpr int max_path = PATH_MAX;
-#elif WINDOWS
-constexpr int max_path = MAX_PATH;
+#if defined(LINUX) || defined(FREEBSD)
+constexpr size_t max_path = PATH_MAX;
+#elif defined(WINDOWS)
+constexpr size_t max_path = MAX_PATH;
 #else
-#error Unsupported platform
+#error Define here lenght of the file paths strings for your platform
 #endif
 
 using string16 = char[16];
