@@ -232,7 +232,7 @@ void CUICustomMap::SetActivePoint(const Fvector& vNewPoint)
     SetHeadingPivot(pos_on_map, Fvector2().set(0, 0), false);
 }
 
-bool CUICustomMap::IsRectVisible(Frect r)
+bool CUICustomMap::IsRectVisible(const Frect& r)
 {
     Fvector2 pos;
     GetAbsolutePos(pos);
@@ -241,7 +241,7 @@ bool CUICustomMap::IsRectVisible(Frect r)
     return !!WorkingArea().intersected(r);
 }
 
-bool CUICustomMap::NeedShowPointer(Frect r)
+bool CUICustomMap::NeedShowPointer(const Frect& r)
 {
     Frect map_visible_rect = WorkingArea();
     map_visible_rect.shrink(5, 5);
@@ -636,7 +636,7 @@ bool CUIMiniMap::GetPointerTo(const Fvector2& src, float item_radius, Fvector2& 
     return true;
 }
 
-bool CUIMiniMap::NeedShowPointer(Frect r)
+bool CUIMiniMap::NeedShowPointer(const Frect& r)
 {
     Fvector2 clip_center = GetStaticItem()->GetHeadingPivot();
 
@@ -647,7 +647,7 @@ bool CUIMiniMap::NeedShowPointer(Frect r)
     return (dist + spot_radius > WorkingArea().width() / 2.0f);
 }
 
-bool CUIMiniMap::IsRectVisible(Frect r)
+bool CUIMiniMap::IsRectVisible(const Frect& r)
 {
     Fvector2 clip_center = GetStaticItem()->GetHeadingPivot();
     float vis_radius = WorkingArea().width() / 2.0f;

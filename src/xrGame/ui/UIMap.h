@@ -54,8 +54,8 @@ public:
     virtual void Draw();
     virtual void Update();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
-    virtual bool IsRectVisible(Frect r);
-    virtual bool NeedShowPointer(Frect r);
+    virtual bool IsRectVisible(const Frect& r);
+    virtual bool NeedShowPointer(const Frect& r);
     bool Locked() { return !!m_flags.test(eLocked); }
     void SetLocked(bool b) { m_flags.set(eLocked, b); }
     void SetPointerDistance(float d) { m_pointer_dist = d; };
@@ -137,8 +137,8 @@ public:
     virtual void Draw();
     virtual bool GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos,
         float& heading); // position and heading for drawing pointer to src pos
-    virtual bool NeedShowPointer(Frect r);
-    virtual bool IsRectVisible(Frect r);
+    virtual bool NeedShowPointer(const Frect& r);
+    virtual bool IsRectVisible(const Frect& r);
 
 protected:
     virtual void UpdateSpots();
