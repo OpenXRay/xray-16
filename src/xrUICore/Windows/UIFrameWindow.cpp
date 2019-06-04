@@ -293,7 +293,7 @@ bool CUIFrameWindow::get_points(Frect const& r, int i, Fvector2& LTp, Fvector2& 
     return true;
 }
 
-void CUIFrameWindow::draw_tile_line(Frect rect, int i, bool b_horz, Fvector2 const& ts)
+void CUIFrameWindow::draw_tile_line(Frect& rect, int i, bool b_horz, Fvector2 const& ts)
 {
     Fvector2 LTt, RBt;
     Fvector2 LTp, RBp;
@@ -318,7 +318,7 @@ void CUIFrameWindow::draw_tile_line(Frect rect, int i, bool b_horz, Fvector2 con
     }
 }
 
-void CUIFrameWindow::draw_tile_rect(Frect rect, int i, Fvector2 const& ts)
+void CUIFrameWindow::draw_tile_rect(Frect& rect, int i, Fvector2 const& ts)
 {
     Frect tmp = rect;
     while (rect.lt.x + EPS_L < rect.rb.x)
