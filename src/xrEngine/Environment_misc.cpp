@@ -192,23 +192,43 @@ void CEnvAmbient::load(
     string_path tmp;
 
     // sounds
-    pcstr channels = ambients_config.r_string(sect, "sound_channels");
-    u32 cnt = _GetItemCount(channels);
+    pcstr channels = nullptr;
+    if (ambients_config.line_exist(sect, "snd_channels"))
+    {
+        channels = ambients_config.r_string(sect, "snd_channels");
+    }
+    if (ambients_config.line_exist(sect, "sound_channels")) // higher priority
+    {
+        channels = ambients_config.r_string(sect, "sound_channels");
+    }
+
+    size_t cnt = _GetItemCount(channels);
     // R_ASSERT3 (cnt,"sound_channels empty", sect.c_str());
     m_sound_channels.resize(cnt);
 
-    for (u32 i = 0; i < cnt; ++i)
+    for (size_t i = 0; i < cnt; ++i)
         m_sound_channels[i] = create_sound_channel(sound_channels_config, _GetItem(channels, i, tmp));
 
     // effects
-    m_effect_period.set(iFloor(ambients_config.r_float(sect, "min_effect_period") * 1000.f),
-        iFloor(ambients_config.r_float(sect, "max_effect_period") * 1000.f));
+    Fvector2 period;
+    if (ambients_config.read_if_exists(period, sect, "effect_period"))
+    {
+        ambients_config.read_if_exists(period.x, sect, "min_effect_period");
+        ambients_config.read_if_exists(period.y, sect, "max_effect_period");
+    }
+    else
+    {
+        period.x = ambients_config.r_float(sect, "min_effect_period");
+        period.y = ambients_config.r_float(sect, "max_effect_period");
+    }
+    m_effect_period.set(iFloor(period.x * 1000.f), iFloor(period.y * 1000.f));
+
     pcstr effs = ambients_config.r_string(sect, "effects");
     cnt = _GetItemCount(effs);
     // R_ASSERT3 (cnt,"effects empty", sect.c_str());
 
     m_effects.resize(cnt);
-    for (u32 k = 0; k < cnt; ++k)
+    for (size_t k = 0; k < cnt; ++k)
         m_effects[k] = create_effect(effects_config, _GetItem(effs, k, tmp));
 
     R_ASSERT(!m_sound_channels.empty() || !m_effects.empty());
