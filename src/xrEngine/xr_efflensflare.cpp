@@ -57,18 +57,53 @@ void CLensFlareDescriptor::AddFlare(float fRadius, float fOpacity, float fPositi
     m_Flares.push_back(F);
 }
 
+struct FlareDescriptorFields
+{
+    pcstr line;
+    pcstr shader;
+    pcstr texture;
+    pcstr radius;
+    pcstr ignore_color;
+};
+
+FlareDescriptorFields SourceFields =
+{
+    "source", "source_shader", "source_texture", "source_radius", "source_ignore_color"
+};
+
+FlareDescriptorFields SunFields =
+{
+    "sun", "sun_shader", "sun_texture", "sun_radius", "sun_ignore_color"
+};
+
 void CLensFlareDescriptor::load(CInifile const* pIni, pcstr sect)
 {
     section = sect;
-    m_Flags.set(flSource, pIni->r_bool(sect, "sun"));
-    if (m_Flags.is(flSource))
+
+    const auto read = [&](FlareDescriptorFields f)
     {
-        LPCSTR S = pIni->r_string(sect, "sun_shader");
-        LPCSTR T = pIni->r_string(sect, "sun_texture");
-        float r = pIni->r_float(sect, "sun_radius");
-        BOOL i = pIni->r_bool(sect, "sun_ignore_color");
-        SetSource(r, i, T, S);
+        m_Flags.set(flSource, pIni->r_bool(sect, f.line));
+        if (m_Flags.is(flSource))
+        {
+            pcstr s = pIni->r_string(sect, f.shader);
+            pcstr t = pIni->r_string(sect, f.texture);
+            float r = pIni->r_float(sect, f.radius);
+            bool i = pIni->r_bool(sect, f.ignore_color);
+            SetSource(r, i, t, s);
+        }
+    };
+
+    if (pIni->line_exist(sect, SourceFields.line))
+    {
+        read(SourceFields);
+        // What if someone adapted SOC configs and didn't deleted "source" field?
+        // Try to read "sun" optional overriding values.
+        if (pIni->line_exist(sect, SunFields.line))
+            read(SunFields);
     }
+    else
+        read(SunFields);
+
     m_Flags.set(flFlare, pIni->r_bool(sect, "flares"));
     if (m_Flags.is(flFlare))
     {
