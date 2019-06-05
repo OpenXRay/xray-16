@@ -111,11 +111,9 @@ EGameActions get_binded_action(int _dik)
         if (!b_is_group_matching)
             continue;
 
-        if (binding->m_keyboard[0] && binding->m_keyboard[0]->dik == _dik && b_is_group_matching)
-            return binding->m_action->id;
-
-        if (binding->m_keyboard[1] && binding->m_keyboard[1]->dik == _dik && b_is_group_matching)
-            return binding->m_action->id;
+        for (u8 i = 0; i < bindtypes_count && b_is_group_matching; ++i)
+            if (binding->m_keyboard[i] && binding->m_keyboard[i]->dik == _dik)
+                return binding->m_action->id;
     }
     return kNOTBINDED;
 }
@@ -174,11 +172,9 @@ public:
                 bool b_conflict =
                     !is_group_not_conflicted(binding->m_action->key_group, curr_pbinding->m_action->key_group);
 
-                if (binding->m_keyboard[0] == pkeyboard && b_conflict)
-                    binding->m_keyboard[0] = NULL;
-
-                if (binding->m_keyboard[1] == pkeyboard && b_conflict)
-                    binding->m_keyboard[1] = NULL;
+                for (u8 i = 0; i < bindtypes_count; ++i)
+                    if (binding->m_keyboard[i] == pkeyboard && b_conflict)
+                        binding->m_keyboard[i] = NULL;
             }
         }
 
@@ -242,8 +238,8 @@ public:
         for (int idx = 0; idx < bindings_count; ++idx)
         {
             _binding* pbinding = &g_key_bindings[idx];
-            pbinding->m_keyboard[0] = NULL;
-            pbinding->m_keyboard[1] = NULL;
+            for (u8 i = 0; i < bindtypes_count; ++i)
+                pbinding->m_keyboard[i] = NULL;
         }
         bindConsoleCmds.clear();
     }
@@ -276,9 +272,10 @@ public:
         for (int idx = 0; idx < bindings_count; ++idx)
         {
             _binding* pbinding = &g_key_bindings[idx];
-            xr_sprintf(buff, "[%s] primary is[%s] secondary is[%s]", pbinding->m_action->action_name,
+            xr_sprintf(buff, "[%s] primary is[%s] secondary is[%s] pad button is[%s]", pbinding->m_action->action_name,
                 (pbinding->m_keyboard[0]) ? pbinding->m_keyboard[0]->key_local_name.c_str() : "NULL",
-                (pbinding->m_keyboard[1]) ? pbinding->m_keyboard[1]->key_local_name.c_str() : "NULL");
+                (pbinding->m_keyboard[1]) ? pbinding->m_keyboard[1]->key_local_name.c_str() : "NULL",
+                (pbinding->m_keyboard[2]) ? pbinding->m_keyboard[2]->key_local_name.c_str() : "NULL");
             Log(buff);
         }
         Log("- --- Bind list end   ---");
@@ -356,8 +353,10 @@ void CCC_RegisterInput()
     initialize_bindings();
     CMD2(CCC_Bind, "bind", 0);
     CMD2(CCC_Bind, "bind_sec", 1);
+    CMD2(CCC_Bind, "bind_gpad", 2);
     CMD2(CCC_UnBind, "unbind", 0);
     CMD2(CCC_UnBind, "unbind_sec", 1);
+    CMD2(CCC_UnBind, "unbind_gpad", 2);
     CMD1(CCC_UnBindAll, "unbindall");
     CMD1(CCC_DefControls, "default_controls");
     CMD1(CCC_ListActions, "list_actions");

@@ -10,12 +10,13 @@ class CUIColorAnimatorWrapper;
 class CUIEditKeyBind : public CUIStatic, public CUIOptionsItem
 {
     bool m_bPrimary;
+    bool m_bGamepadBinds;
     _action* m_action;
     _keyboard* m_keyboard;
     _keyboard* m_opt_backup_value;
 
 public:
-    CUIEditKeyBind(bool bPrim);
+    CUIEditKeyBind(bool bPrim, bool bGcBinds = false);
     virtual ~CUIEditKeyBind();
     // options item
     virtual void AssignProps(const shared_str& entry, const shared_str& group);

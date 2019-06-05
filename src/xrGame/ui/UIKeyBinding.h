@@ -20,6 +20,8 @@ public:
 protected:
     void FillUpList(CUIXml& xml_doc, LPCSTR path);
 
+    bool b_isGamepadBinds;
+
     CUIFrameLineWnd m_header[3];
     CUIFrameWindow m_frame;
     CUIScrollView* m_scroll_wnd;
