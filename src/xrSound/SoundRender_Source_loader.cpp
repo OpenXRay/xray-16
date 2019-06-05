@@ -139,10 +139,12 @@ void CSoundRender_Source::load(pcstr name)
     if (!FS.exist("$level$", fn))
         FS.update_path(fn, "$game_sounds$", fn);
 
-#ifdef _EDITOR
     if (!FS.exist(fn))
+    {
+        Msg("! Can't find sound '%s'", name);
         FS.update_path(fn, "$game_sounds$", "$no_sound.ogg");
-#endif
+    }
+
     LoadWave(fn);
     SoundRender->cache.cat_create(CAT, dwBytesTotal);
 }
