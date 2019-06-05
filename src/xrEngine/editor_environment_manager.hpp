@@ -79,7 +79,6 @@ public:
     virtual SThunderboltCollection* thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section);
     virtual SThunderboltCollection* thunderbolt_collection(
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
-    virtual CLensFlareDescriptor* add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id);
     void save();
     shader_ids_type const& shader_ids() const;
     particle_ids_type const& particle_ids() const;
