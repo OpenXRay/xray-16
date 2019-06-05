@@ -84,18 +84,48 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect)
 {
     m_load_section = sect;
 
-    m_sound_dist.x = config.r_float(m_load_section, "min_distance");
-    m_sound_dist.y = config.r_float(m_load_section, "max_distance");
-    m_sound_period.x = config.r_s32(m_load_section, "period0");
-    m_sound_period.y = config.r_s32(m_load_section, "period1");
-    m_sound_period.z = config.r_s32(m_load_section, "period2");
-    m_sound_period.w = config.r_s32(m_load_section, "period3");
+    if (config.read_if_exists(m_sound_dist, m_load_section, "sound_dist"))
+    {
+        if (m_sound_dist.x > m_sound_dist.y)
+            std::swap(m_sound_dist.x, m_sound_dist.y);
+        config.read_if_exists(m_sound_dist.x, m_load_section, "min_distance");
+        config.read_if_exists(m_sound_dist.y, m_load_section, "max_distance");
+    }
+    else
+    {
+        m_sound_dist.x = config.r_float(m_load_section, "min_distance");
+        m_sound_dist.y = config.r_float(m_load_section, "max_distance");
+        R_ASSERT2(m_sound_dist.y > m_sound_dist.x, sect);
+    }
 
-    // m_sound_period = config.r_ivector4(sect,"sound_period");
+    Ivector2 staticPeriod;
+    Ivector4 period;
+    if (config.read_if_exists(period, m_load_section, "sound_period")) // Pre Clear Sky
+    {
+        config.read_if_exists(period.x, m_load_section, "period0");
+        config.read_if_exists(period.y, m_load_section, "period1");
+        config.read_if_exists(period.z, m_load_section, "period2");
+        config.read_if_exists(period.w, m_load_section, "period3");
+        m_sound_period.set(period.mul(1000.f));
+    }
+    else if (config.read_if_exists(staticPeriod, m_load_section, "sound_period")) // SOC
+    {
+        period = { staticPeriod.x, staticPeriod.y, staticPeriod.x, staticPeriod.y };
+        config.read_if_exists(period.x, m_load_section, "period0");
+        config.read_if_exists(period.y, m_load_section, "period1");
+        config.read_if_exists(period.z, m_load_section, "period2");
+        config.read_if_exists(period.w, m_load_section, "period3");
+        m_sound_period.set(period.mul(1000.f));
+    }
+    else // COP
+    {
+        m_sound_period.x = config.r_s32(m_load_section, "period0");
+        m_sound_period.y = config.r_s32(m_load_section, "period1");
+        m_sound_period.z = config.r_s32(m_load_section, "period2");
+        m_sound_period.w = config.r_s32(m_load_section, "period3");
+    }
+
     R_ASSERT(m_sound_period.x <= m_sound_period.y && m_sound_period.z <= m_sound_period.w);
-    // m_sound_period.mul (1000);// now in ms
-    // m_sound_dist = config.r_fvector2(sect,"sound_dist");
-    R_ASSERT2(m_sound_dist.y > m_sound_dist.x, sect);
 
     LPCSTR snds = config.r_string(sect, "sounds");
     u32 cnt = _GetItemCount(snds);
