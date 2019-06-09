@@ -295,9 +295,9 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     }
 
     Ivector3 tm = {0, 0, 0};
-    sscanf(identifier, "%d:%d:%d", &tm.x, &tm.y, &tm.z);
-    R_ASSERT3((tm.x >= 0) && (tm.x < 24) && (tm.y >= 0) && (tm.y < 60) && (tm.z >= 0) && (tm.z < 60),
-        "Incorrect weather time", identifier);
+    const int result = sscanf(m_identifier.c_str(), "%d:%d:%d", &tm.x, &tm.y, &tm.z);
+    R_ASSERT3(result == 3 && (tm.x >= 0) && (tm.x < 24) && (tm.y >= 0) && (tm.y < 60) && (tm.z >= 0) && (tm.z < 60),
+        "Incorrect weather time", m_identifier.c_str());
     exec_time = tm.x * 3600.f + tm.y * 60.f + tm.z;
     exec_time_loaded = exec_time;
 
