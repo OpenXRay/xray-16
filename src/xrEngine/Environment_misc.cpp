@@ -139,8 +139,6 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect, pcstr se
         _GetItem(snds, k, tmp);
         m_sounds[k].create(tmp, st_Effect, sg_SourceType);
     }
-
-    m_load_section = sect;
 }
 
 CEnvAmbient::SEffect* CEnvAmbient::create_effect(const CInifile& config, pcstr id)
