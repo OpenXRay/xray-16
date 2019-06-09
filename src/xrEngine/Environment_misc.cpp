@@ -669,25 +669,25 @@ void CEnvironment::load_weathers()
     }
 
     // ShoC style weather config
-    int weatherCount = 0;
+    u32 weatherCount = 0;
     if (pSettings->section_exist("weathers"))
     {
         weatherCount = pSettings->line_count("weathers");
         Log("~ ShoC style weather config detected");
     }
 
-    for (int weatherIdx = 0; weatherIdx < weatherCount; ++weatherIdx)
+    for (u32 weatherIdx = 0; weatherIdx < weatherCount; ++weatherIdx)
     {
         pcstr weatherName, weatherSection;
         if (pSettings->r_line("weathers", weatherIdx, &weatherName, &weatherSection))
         {
-            const int envCount = pSettings->line_count(weatherSection);
+            const u32 envCount = pSettings->line_count(weatherSection);
 
             EnvVec& env = WeatherCycles[weatherName];
             env.reserve(envCount);
             
             pcstr executionTime, envSection;
-            for (int envIdx = 0; envIdx < envCount; ++envIdx)
+            for (u32 envIdx = 0; envIdx < envCount; ++envIdx)
             {
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
@@ -742,14 +742,14 @@ void CEnvironment::load_weather_effects()
     }
 
     // ShoC style weather effects config
-    int weatherEffectsCount = 0;
+    u32 weatherEffectsCount = 0;
     if (pSettings->section_exist("weather_effects"))
     {
         weatherEffectsCount = pSettings->line_count("weather_effects");
         Log("~ ShoC style weather effects config detected");
     }
 
-    for (int weatherIdx = 0; weatherIdx < weatherEffectsCount; ++weatherIdx)
+    for (u32 weatherIdx = 0; weatherIdx < weatherEffectsCount; ++weatherIdx)
     {
         pcstr weatherName, weatherSection, envSection;
         if (pSettings->r_line("weather_effects", weatherIdx, &weatherName, &weatherSection))
@@ -757,9 +757,9 @@ void CEnvironment::load_weather_effects()
             EnvVec& env = WeatherFXs[weatherName];
             env.emplace_back(create_descriptor("00:00:00", nullptr));
 
-            const int envCount = pSettings->line_count(weatherSection);
+            const u32 envCount = pSettings->line_count(weatherSection);
             pcstr executionTime;
-            for (int envIdx = 0; envIdx < envCount; ++envIdx)
+            for (u32 envIdx = 0; envIdx < envCount; ++envIdx)
             {
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
