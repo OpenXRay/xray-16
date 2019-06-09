@@ -205,10 +205,10 @@ ambient::SEffect* ambient::create_effect(const CInifile& config, pcstr id)
     return (result);
 }
 
-ambient::SSndChannel* ambient::create_sound_channel(const CInifile& config, pcstr id)
+ambient::SSndChannel* ambient::create_sound_channel(const CInifile& config, pcstr id, pcstr sectionToReadFrom)
 {
     channel* result = new channel(m_manager.sounds_manager(), id);
-    result->load(config);
+    result->load(config, sectionToReadFrom);
     result->fill(m_sounds_collection);
     return (result);
 }

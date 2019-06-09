@@ -53,9 +53,9 @@ channel::~channel()
     ::ide().destroy(m_property_holder);
 }
 
-void channel::load(const CInifile& config)
+void channel::load(const CInifile& config, pcstr sectionToReadFrom)
 {
-    inherited::load(config, m_load_section.c_str());
+    inherited::load(config, m_load_section.c_str(), sectionToReadFrom);
 
     VERIFY(m_sounds.empty());
     pcstr sounds = config.r_string(m_load_section, "sounds");

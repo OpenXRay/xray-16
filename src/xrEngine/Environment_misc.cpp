@@ -80,9 +80,9 @@ float CEnvModifier::sum(CEnvModifier& M, Fvector3& view)
 //-----------------------------------------------------------------------------
 // Environment ambient
 //-----------------------------------------------------------------------------
-void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect)
+void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect, pcstr sectionToReadFrom)
 {
-    m_load_section = sect;
+    m_load_section = sectionToReadFrom ? sectionToReadFrom : sect;
 
     if (config.read_if_exists(m_sound_dist, m_load_section, "sound_dist"))
     {
@@ -127,18 +127,20 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect)
 
     R_ASSERT(m_sound_period.x <= m_sound_period.y && m_sound_period.z <= m_sound_period.w);
 
-    LPCSTR snds = config.r_string(sect, "sounds");
-    u32 cnt = _GetItemCount(snds);
+    pcstr snds = config.r_string(m_load_section, "sounds");
+    const int cnt = _GetItemCount(snds);
     string_path tmp;
-    R_ASSERT3(cnt, "sounds empty", sect);
+    R_ASSERT3(cnt, "sounds empty", m_load_section.c_str());
 
     m_sounds.resize(cnt);
 
-    for (u32 k = 0; k < cnt; ++k)
+    for (size_t k = 0; k < cnt; ++k)
     {
         _GetItem(snds, k, tmp);
         m_sounds[k].create(tmp, st_Effect, sg_SourceType);
     }
+
+    m_load_section = sect;
 }
 
 CEnvAmbient::SEffect* CEnvAmbient::create_effect(const CInifile& config, pcstr id)
@@ -170,10 +172,10 @@ CEnvAmbient::SEffect* CEnvAmbient::create_effect(const CInifile& config, pcstr i
     return (result);
 }
 
-CEnvAmbient::SSndChannel* CEnvAmbient::create_sound_channel(const CInifile& config, pcstr id)
+CEnvAmbient::SSndChannel* CEnvAmbient::create_sound_channel(const CInifile& config, pcstr id, pcstr sectionToReadFrom)
 {
     SSndChannel* result = new SSndChannel();
-    result->load(config, id);
+    result->load(config, id, sectionToReadFrom);
     return (result);
 }
 
@@ -193,13 +195,21 @@ void CEnvAmbient::load(
 
     // sounds
     pcstr channels = nullptr;
+    bool overrideReadingSection = false;
+    if (ambients_config.line_exist(sect, "sounds"))
+    {
+        channels = ambients_config.r_string(sect, "sounds");
+        overrideReadingSection = true;
+    }
     if (ambients_config.line_exist(sect, "snd_channels"))
     {
         channels = ambients_config.r_string(sect, "snd_channels");
+        overrideReadingSection = false;
     }
     if (ambients_config.line_exist(sect, "sound_channels")) // higher priority
     {
         channels = ambients_config.r_string(sect, "sound_channels");
+        overrideReadingSection = false;
     }
 
     size_t cnt = _GetItemCount(channels);
@@ -207,7 +217,8 @@ void CEnvAmbient::load(
     m_sound_channels.resize(cnt);
 
     for (size_t i = 0; i < cnt; ++i)
-        m_sound_channels[i] = create_sound_channel(sound_channels_config, _GetItem(channels, i, tmp));
+        m_sound_channels[i] = create_sound_channel(sound_channels_config, _GetItem(channels, i, tmp),
+            overrideReadingSection ? m_load_section.c_str() : nullptr);
 
     // effects
     Fvector2 period;

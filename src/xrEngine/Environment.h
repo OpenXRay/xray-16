@@ -78,7 +78,7 @@ public:
 
         typedef xr_vector<ref_sound> sounds_type;
 
-        void load(const CInifile& config, pcstr sect);
+        void load(const CInifile& config, pcstr sect, pcstr sectionToReadFrom = nullptr);
         ref_sound& get_rnd_sound() { return sounds()[Random.randI(sounds().size())]; }
         u32 get_rnd_sound_time()
         {
@@ -116,7 +116,7 @@ public:
     SEffect* get_rnd_effect() { return effects().empty() ? 0 : effects()[Random.randI(effects().size())]; }
     u32 get_rnd_effect_time() { return Random.randI(m_effect_period.x, m_effect_period.y); }
     virtual SEffect* create_effect(const CInifile& config, pcstr id);
-    virtual SSndChannel* create_sound_channel(const CInifile& config, pcstr id);
+    virtual SSndChannel* create_sound_channel(const CInifile& config, pcstr id, pcstr sectionToReadFrom = nullptr);
     virtual ~CEnvAmbient();
     void destroy();
     virtual EffectVec& effects() { return m_effects; }
