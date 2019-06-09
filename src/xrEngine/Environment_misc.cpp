@@ -551,9 +551,11 @@ CEnvAmbient* CEnvironment::AppendEnvAmb(const shared_str& sect)
         if (ambient->name().equal(sect))
             return ambient;
 
-    Ambients.emplace_back(new CEnvAmbient());
-    Ambients.back()->load(*m_ambients_config, *m_sound_channels_config, *m_effects_config, sect);
-    return Ambients.back();
+    CEnvAmbient* ambient = Ambients.emplace_back(new CEnvAmbient());
+    ambient->load(m_ambients_config ? *m_ambients_config : *pSettings,
+        m_sound_channels_config ? *m_sound_channels_config : *pSettings,
+        m_effects_config ? *m_effects_config : *pSettings, sect);
+    return ambient;
 }
 
 void CEnvironment::mods_load()
