@@ -328,7 +328,16 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config)
     wind_velocity = config.r_float(identifier, "wind_velocity");
     wind_direction = deg2rad(config.r_float(identifier, "wind_direction"));
     ambient = config.r_fvector3(identifier, "ambient_color");
-    hemi_color = config.r_fvector4(identifier, "hemisphere_color");
+
+    if (config.read_if_exists(hemi_color, identifier, "hemi_color"))
+    {
+        config.read_if_exists(hemi_color, identifier, "hemisphere_color");
+    }
+    else
+    {
+        hemi_color = config.r_fvector4(identifier, "hemisphere_color");
+    }
+
     sun_color = config.r_fvector3(identifier, "sun_color");
 
     Fvector2 sunVec{};
