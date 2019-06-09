@@ -611,19 +611,37 @@ void CEnvironment::load_level_specific_ambients()
     string_path full_path;
     CInifile* level_ambients = new CInifile(FS.update_path(full_path, "$game_config$", path), TRUE, TRUE, FALSE);
 
+    if (level_ambients->section_count() == 0)
+    {
+        xr_delete(level_ambients);
+        return;
+    }
+
     for (const auto& ambient : Ambients)
     {
         shared_str section_name = ambient->name();
 
+        CInifile const* sounds = m_sound_channels_config;
+        CInifile const* effects = m_effects_config;
+
         // choose a source ini file
-        CInifile* source =
-            (level_ambients && level_ambients->section_exist(section_name)) ? level_ambients : m_ambients_config;
+        CInifile const* source = nullptr;
+        if (level_ambients && level_ambients->section_exist(section_name))
+            source = level_ambients;
+        else if (m_ambients_config && m_ambients_config->section_exist(section_name))
+            source = m_ambients_config;
+        else
+        {
+            source = pSettings;
+            sounds = pSettings;
+            effects = pSettings;
+        }
 
         // check and reload if needed
         if (xr_strcmp(ambient->get_ambients_config_filename().c_str(), source->fname()))
         {
             ambient->destroy();
-            ambient->load(*source, *m_sound_channels_config, *m_effects_config, section_name);
+            ambient->load(*source, *sounds, *effects, section_name);
         }
     }
 
