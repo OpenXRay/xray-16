@@ -602,23 +602,21 @@ void CEnvironment::load_weathers()
     if (!WeatherCycles.empty())
         return;
 
-    auto file_list = FS.file_list_open("$game_weathers$", "");
+    FS_FileSet weathers;
+    FS.file_list(weathers, "$game_weathers$", FS_ListFiles, "*.ltx");
 
+    // CoP style weather config
     xr_string id;
-    for (const auto& file : *file_list)
+    for (const auto& file : weathers)
     {
-        const size_t length = xr_strlen(file);
-        VERIFY(length >= 4);
-        VERIFY(file[length - 4] == '.');
-        VERIFY(file[length - 3] == 'l');
-        VERIFY(file[length - 2] == 't');
-        VERIFY(file[length - 1] == 'x');
-        id.assign(file, length - 4);
+        pcstr fileName = file.name.c_str();
+        const size_t length = xr_strlen(fileName);
+        id.assign(fileName, length - 4);
         EnvVec& env = WeatherCycles[id.c_str()];
 
-        string_path file_name;
-        FS.update_path(file_name, "$game_weathers$", file);
-        CInifile* config = CInifile::Create(file_name);
+        string_path file_path;
+        FS.update_path(file_path, "$game_weathers$", fileName);
+        CInifile* config = CInifile::Create(file_path);
 
         auto& sections = config->sections();
         env.reserve(sections.size());
@@ -628,8 +626,6 @@ void CEnvironment::load_weathers()
 
         CInifile::Destroy(config);
     }
-
-    FS.file_list_close(file_list);
 
     R_ASSERT2(!WeatherCycles.empty(), "Empty weathers.");
 
@@ -648,22 +644,19 @@ void CEnvironment::load_weather_effects()
     if (!WeatherFXs.empty())
         return;
 
-    auto file_list = FS.file_list_open("$game_weather_effects$", "");
-    VERIFY(file_list);
+    FS_FileSet weathersEffects;
+    FS.file_list(weathersEffects, "$game_weather_effects$", FS_ListFiles, "*.ltx");
+
     xr_string id;
-    for (const auto& file : *file_list)
+    for (const auto& file : weathersEffects)
     {
-        const size_t length = xr_strlen(file);
-        VERIFY(length >= 4);
-        VERIFY(file[length - 4] == '.');
-        VERIFY(file[length - 3] == 'l');
-        VERIFY(file[length - 2] == 't');
-        VERIFY(file[length - 1] == 'x');
-        id.assign(file, length - 4);
+        pcstr fileName = file.name.c_str();
+        const size_t length = xr_strlen(fileName);
+        id.assign(fileName, length - 4);
         EnvVec& env = WeatherFXs[id.c_str()];
 
         string_path file_name;
-        FS.update_path(file_name, "$game_weather_effects$", file);
+        FS.update_path(file_name, "$game_weather_effects$", fileName);
         CInifile* config = CInifile::Create(file_name);
 
         auto& sections = config->sections();
@@ -679,8 +672,6 @@ void CEnvironment::load_weather_effects()
         env.emplace_back(create_descriptor("24:00:00", nullptr));
         env.back()->exec_time_loaded = DAY_LENGTH;
     }
-
-    FS.file_list_close(file_list);
 
 #if 0
     int line_count = pSettings->line_count("weather_effects");
