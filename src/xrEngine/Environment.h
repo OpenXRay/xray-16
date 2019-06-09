@@ -362,7 +362,7 @@ public:
     virtual SThunderboltCollection* thunderbolt_collection(
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
     virtual CLensFlareDescriptor* add_flare(
-        xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id);
+        xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni);
 
 public:
     float p_var_alt;

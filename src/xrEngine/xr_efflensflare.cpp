@@ -292,7 +292,11 @@ void CLensFlare::OnFrame(shared_str id)
     Fvector& c = g_pGamePersistent->Environment().CurrentEnv->sun_color;
     LightColor.set(c.x, c.y, c.z, 1.f);
 
-    CLensFlareDescriptor* desc = id.size() ? g_pGamePersistent->Environment().add_flare(m_Palette, id) : 0;
+    CInifile const* pIni = g_pGamePersistent->Environment().m_suns_config;
+    if (!pIni)
+        pIni = pSettings;
+
+    CLensFlareDescriptor* desc = id.size() ? g_pGamePersistent->Environment().add_flare(m_Palette, id, pIni) : nullptr;
 
     // LFState previous_state = m_State;
     switch (m_State)
@@ -536,11 +540,8 @@ shared_str CLensFlare::AppendDef(CEnvironment& environment, CInifile const* pIni
 {
     if (!sect || (0 == sect[0]))
         return "";
-    for (auto it = m_Palette.begin(); it != m_Palette.end(); it++)
-        if (0 == xr_strcmp(*(*it)->section, sect))
-            return sect;
 
-    environment.add_flare(m_Palette, sect);
+    environment.add_flare(m_Palette, sect, pIni);
     return sect;
 }
 

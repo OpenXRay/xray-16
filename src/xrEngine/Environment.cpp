@@ -611,14 +611,15 @@ SThunderboltCollection* CEnvironment::thunderbolt_collection(
     return nullptr;
 }
 
-CLensFlareDescriptor* CEnvironment::add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id)
+CLensFlareDescriptor* CEnvironment::add_flare(
+    xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni)
 {
     for (const auto& it: collection)
         if (it->section == id)
             return it;
 
     CLensFlareDescriptor* result = new CLensFlareDescriptor();
-    result->load(m_suns_config, id.c_str());
+    result->load(pIni, id.c_str());
     collection.push_back(result);
     return result;
 }
