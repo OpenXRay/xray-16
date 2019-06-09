@@ -362,11 +362,24 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config)
         environment, environment.m_suns_config, config.r_string(identifier, "sun"));
     tb_id = environment.eff_Thunderbolt->AppendDef(environment, environment.m_thunderbolt_collections_config,
         environment.m_thunderbolts_config, config.r_string(identifier, "thunderbolt_collection"));
-    bolt_period = (tb_id.size()) ? config.r_float(identifier, "thunderbolt_period") : 0.f;
-    bolt_duration = (tb_id.size()) ? config.r_float(identifier, "thunderbolt_duration") : 0.f;
     env_ambient = config.line_exist(identifier, "ambient") ?
         environment.AppendEnvAmb(config.r_string(identifier, "ambient")) :
         0;
+
+    // XXX: introduce new function and cleanup the code like this:
+    // config.read_if_exists(bolt_period, identifier, "thunderbolt_period", "bolt_period")
+    if (tb_id.size())
+    {
+        if (config.read_if_exists(bolt_period, identifier, "bolt_period"))
+            config.read_if_exists(bolt_period, identifier, "thunderbolt_period");
+        else
+            bolt_period = config.r_float(identifier, "thunderbolt_period");
+
+        if (config.read_if_exists(bolt_duration, identifier, "bolt_duration"))
+            config.read_if_exists(bolt_duration, identifier, "thunderbolt_duration");
+        else
+            bolt_duration = config.r_float(identifier, "thunderbolt_duration");
+    }
 
     m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);
     m_fWaterIntensity = config.read_if_exists<float>(identifier, "water_intensity", 1.0);
