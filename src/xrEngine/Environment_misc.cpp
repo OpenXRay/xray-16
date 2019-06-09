@@ -213,7 +213,6 @@ void CEnvAmbient::load(
     }
 
     size_t cnt = _GetItemCount(channels);
-    // R_ASSERT3 (cnt,"sound_channels empty", sect.c_str());
     m_sound_channels.resize(cnt);
 
     for (size_t i = 0; i < cnt; ++i)
@@ -234,13 +233,15 @@ void CEnvAmbient::load(
     }
     m_effect_period.set(iFloor(period.x * 1000.f), iFloor(period.y * 1000.f));
 
-    pcstr effs = ambients_config.r_string(sect, "effects");
-    cnt = _GetItemCount(effs);
-    // R_ASSERT3 (cnt,"effects empty", sect.c_str());
+    if (ambients_config.line_exist(sect, "effects"))
+    {
+        pcstr effs = ambients_config.r_string(sect, "effects");
+        cnt = _GetItemCount(effs);
 
-    m_effects.resize(cnt);
-    for (size_t k = 0; k < cnt; ++k)
-        m_effects[k] = create_effect(effects_config, _GetItem(effs, k, tmp));
+        m_effects.resize(cnt);
+        for (size_t k = 0; k < cnt; ++k)
+            m_effects[k] = create_effect(effects_config, _GetItem(effs, k, tmp));
+    }
 
     R_ASSERT(!m_sound_channels.empty() || !m_effects.empty());
 }
@@ -362,7 +363,7 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
         ambient = pSettings->r_fvector3(identifier, "ambient");
 
         if (config.line_exist(identifier, "env_ambient"))
-            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "env_ambient"));
+            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "env_ambient"), pSettings);
     }
     else
     {
@@ -556,16 +557,16 @@ void CEnvDescriptorMixer::lerp(
 //-----------------------------------------------------------------------------
 // Environment IO
 //-----------------------------------------------------------------------------
-CEnvAmbient* CEnvironment::AppendEnvAmb(const shared_str& sect)
+CEnvAmbient* CEnvironment::AppendEnvAmb(const shared_str& sect, CInifile const* pIni /*= nullptr*/)
 {
     for (const auto& ambient : Ambients)
         if (ambient->name().equal(sect))
             return ambient;
 
     CEnvAmbient* ambient = Ambients.emplace_back(new CEnvAmbient());
-    ambient->load(m_ambients_config ? *m_ambients_config : *pSettings,
-        m_sound_channels_config ? *m_sound_channels_config : *pSettings,
-        m_effects_config ? *m_effects_config : *pSettings, sect);
+    ambient->load(pIni ? *pIni : *m_ambients_config,
+        pIni ? *pIni : *m_sound_channels_config,
+        pIni ? *pIni : *m_effects_config, sect);
     return ambient;
 }
 

@@ -196,7 +196,7 @@ void manager::unload()
     Ambients.clear();
 }
 
-CEnvAmbient* manager::AppendEnvAmb(const shared_str& sect) { return (m_ambients->get_ambient(sect)); }
+CEnvAmbient* manager::AppendEnvAmb(const shared_str& sect, CInifile const* /*pIni = nullptr*/) { return (m_ambients->get_ambient(sect)); }
 SThunderboltDesc* manager::thunderbolt_description(const CInifile& config, shared_str const& section)
 {
     return (m_thunderbolts->description(config, section));

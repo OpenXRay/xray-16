@@ -74,7 +74,7 @@ public:
     virtual void load();
     virtual void unload();
     virtual void create_mixer();
-    virtual CEnvAmbient* AppendEnvAmb(const shared_str& sect);
+    CEnvAmbient* AppendEnvAmb(const shared_str& sect, CInifile const* pIni = nullptr) override;
     virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);
     virtual SThunderboltCollection* thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section);
     virtual SThunderboltCollection* thunderbolt_collection(

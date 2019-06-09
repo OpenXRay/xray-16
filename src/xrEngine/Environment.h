@@ -285,7 +285,7 @@ public:
     void SelectEnvs(float gt);
 
     void UpdateAmbient();
-    virtual CEnvAmbient* AppendEnvAmb(const shared_str& sect);
+    virtual CEnvAmbient* AppendEnvAmb(const shared_str& sect, CInifile const* pIni = nullptr);
 
     void Invalidate();
 
