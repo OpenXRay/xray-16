@@ -287,9 +287,11 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
 void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcstr section /*= nullptr*/)
 {
     pcstr identifier = m_identifier.c_str();
+    bool oldStyle = false;
     if (section)
     {
         identifier = section;
+        oldStyle = true;
     }
 
     Ivector3 tm = {0, 0, 0};
@@ -332,7 +334,6 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     rain_color = config.r_fvector3(identifier, "rain_color");
     wind_velocity = config.r_float(identifier, "wind_velocity");
     wind_direction = deg2rad(config.r_float(identifier, "wind_direction"));
-    ambient = config.r_fvector3(identifier, "ambient_color");
 
     if (config.read_if_exists(hemi_color, identifier, "hemi_color"))
     {
@@ -344,6 +345,20 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     }
 
     sun_color = config.r_fvector3(identifier, "sun_color");
+
+    if (oldStyle)
+    {
+        ambient = pSettings->r_fvector3(identifier, "ambient");
+
+        if (config.line_exist(identifier, "env_ambient"))
+            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "env_ambient"));
+    }
+    else
+    {
+        ambient = config.r_fvector3(identifier, "ambient_color");
+        if (config.line_exist(identifier, "ambient"))
+            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "ambient"));
+    }
 
     Fvector2 sunVec{};
 
@@ -363,13 +378,20 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     R_ASSERT(_valid(sun_dir));
 
-    lens_flare_id = environment.eff_LensFlare->AppendDef(
-        environment, environment.m_suns_config, config.r_string(identifier, "sun"));
-    tb_id = environment.eff_Thunderbolt->AppendDef(environment, environment.m_thunderbolt_collections_config,
-        environment.m_thunderbolts_config, config.r_string(identifier, "thunderbolt_collection"));
-    env_ambient = config.line_exist(identifier, "ambient") ?
-        environment.AppendEnvAmb(config.r_string(identifier, "ambient")) :
-        0;
+    if (oldStyle)
+    {
+        lens_flare_id = environment.eff_LensFlare->AppendDef(environment, pSettings,
+            config.r_string(section, "flares"));
+        tb_id = environment.eff_Thunderbolt->AppendDef(environment, pSettings,
+            pSettings, config.r_string(section, "thunderbolt"));
+    }
+    else
+    {
+        lens_flare_id = environment.eff_LensFlare->AppendDef(
+            environment, environment.m_suns_config, config.r_string(identifier, "sun"));
+        tb_id = environment.eff_Thunderbolt->AppendDef(environment, environment.m_thunderbolt_collections_config,
+            environment.m_thunderbolts_config, config.r_string(identifier, "thunderbolt_collection"));
+    }
 
     // XXX: introduce new function and cleanup the code like this:
     // config.read_if_exists(bolt_period, identifier, "thunderbolt_period", "bolt_period")
