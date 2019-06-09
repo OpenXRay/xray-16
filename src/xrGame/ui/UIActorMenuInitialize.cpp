@@ -326,6 +326,7 @@ void CUIActorMenu::Construct()
 
     m_allowed_drops[iQuickSlot].push_back(iActorBag);
     m_allowed_drops[iQuickSlot].push_back(iActorTrade);
+    m_allowed_drops[iQuickSlot].push_back(iQuickSlot);
 
     m_upgrade_selected = NULL;
     SetCurrentItem(NULL);
