@@ -129,29 +129,23 @@ CEnvironment::~CEnvironment()
     xr_delete(PerlinNoise1D);
     OnDeviceDestroy();
 
-    VERIFY(m_ambients_config);
     CInifile::Destroy(m_ambients_config);
-    m_ambients_config = 0;
+    m_ambients_config = nullptr;
 
-    VERIFY(m_sound_channels_config);
     CInifile::Destroy(m_sound_channels_config);
-    m_sound_channels_config = 0;
+    m_sound_channels_config = nullptr;
 
-    VERIFY(m_effects_config);
     CInifile::Destroy(m_effects_config);
-    m_effects_config = 0;
+    m_effects_config = nullptr;
 
-    VERIFY(m_suns_config);
     CInifile::Destroy(m_suns_config);
-    m_suns_config = 0;
+    m_suns_config = nullptr;
 
-    VERIFY(m_thunderbolt_collections_config);
     CInifile::Destroy(m_thunderbolt_collections_config);
-    m_thunderbolt_collections_config = 0;
+    m_thunderbolt_collections_config = nullptr;
 
-    VERIFY(m_thunderbolts_config);
     CInifile::Destroy(m_thunderbolts_config);
-    m_thunderbolts_config = 0;
+    m_thunderbolts_config = nullptr;
 
     destroy_mixer();
 }
