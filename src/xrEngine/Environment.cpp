@@ -87,6 +87,22 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     // tsky0 = Device.Resources->_CreateTexture("$user$sky0");
     // tsky1 = Device.Resources->_CreateTexture("$user$sky1");
 
+    // OpenXRay environment configuration
+    useDynamicSunDir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
+    sunDirAzimuth = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
+    clamp(sunDirAzimuth, 0.0f, 360.0f);
+    sunDirAzimuth *= (PI / 180.0f);
+
+    m_ambients_config = nullptr;
+    m_sound_channels_config = nullptr;
+    m_effects_config = nullptr;
+    m_suns_config = nullptr;
+    m_thunderbolt_collections_config = nullptr;
+    m_thunderbolts_config = nullptr;
+
+    if (!FS.exist("$game_config$", "environment" DELIMITER))
+        return;
+
     string_path file_name;
     m_ambients_config =
         new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), TRUE, TRUE, FALSE);
@@ -116,12 +132,6 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     p_fog_color = config->r_float("environment", "fog_color");
 
     xr_delete(config);
-
-    // OpenXRay environment configuration
-    useDynamicSunDir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
-    sunDirAzimuth = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
-    clamp(sunDirAzimuth, 0.0f, 360.0f);
-    sunDirAzimuth *= (PI / 180.0f);
 }
 
 CEnvironment::~CEnvironment()
