@@ -28,7 +28,7 @@ public:
             Tvector j;
             Tvector k;
         };
-        float m[3][3]; // Array
+        T m[3][3]; // Array
     };
     // Class members
     IC SelfRef set_rapid(const _matrix<T>& a)
