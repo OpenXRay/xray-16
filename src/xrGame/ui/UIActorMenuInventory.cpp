@@ -1469,8 +1469,8 @@ void CUIActorMenu::UpdateOutfit()
     Ivector2 afc;
     if (x != y)
     {
-        afc.x = x > 0.f ? af_count : 1;
-        afc.y = y > 0.f ? af_count : 1;
+        afc.x = x != 0.f ? af_count : 1;
+        afc.y = y != 0.f ? af_count : 1;
     }
     else
     {
