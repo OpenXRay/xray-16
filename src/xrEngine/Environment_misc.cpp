@@ -196,23 +196,25 @@ void CEnvAmbient::load(
     // sounds
     pcstr channels = nullptr;
     bool overrideReadingSection = false;
-    if (ambients_config.line_exist(sect, "sounds"))
+    if (ambients_config.line_exist(sect, "sounds")) // SOC
     {
         channels = ambients_config.r_string(sect, "sounds");
         overrideReadingSection = true;
     }
-    if (ambients_config.line_exist(sect, "snd_channels"))
+    if (ambients_config.line_exist(sect, "snd_channels")) // Pre Clear Sky
     {
         channels = ambients_config.r_string(sect, "snd_channels");
         overrideReadingSection = false;
     }
-    if (ambients_config.line_exist(sect, "sound_channels")) // higher priority
+    if (ambients_config.line_exist(sect, "sound_channels")) // COP, highest priority
     {
         channels = ambients_config.r_string(sect, "sound_channels");
         overrideReadingSection = false;
     }
 
-    size_t cnt = _GetItemCount(channels);
+    // SOC has no separate sound channels in env ambient section
+    // Env ambient IS the sound channel in SOC
+    size_t cnt = overrideReadingSection ? 1 : _GetItemCount(channels);
     m_sound_channels.resize(cnt);
 
     for (size_t i = 0; i < cnt; ++i)
