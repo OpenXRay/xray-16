@@ -1809,6 +1809,15 @@ public:
         if (!Device.editor())
             g_pGamePersistent->Environment().SetWeather(args, true);
     }
+    void fill_tips(vecTips& tips, u32 mode) override
+    {
+        if (!g_pGamePersistent || Device.editor())
+            return;
+        for (auto& [name, cycle] : g_pGamePersistent->Environment().WeatherCycles)
+        {
+            tips.push_back(name);
+        }
+    }
 };
 
 class CCC_CleanupTasks : public IConsole_Command
