@@ -40,8 +40,8 @@ private:
 public:
     ambient(manager const& manager, shared_str const& id);
     virtual ~ambient();
-    virtual void load(CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config,
-        const shared_str& section);
+    void load(const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config,
+        const shared_str& section) override;
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_load_section; }

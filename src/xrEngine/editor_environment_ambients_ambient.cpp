@@ -77,7 +77,7 @@ ambient::~ambient()
 }
 
 void ambient::load(
-    CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config, const shared_str& section)
+    const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config, const shared_str& section)
 {
     VERIFY(m_load_section == section);
     inherited::load(ambients_config, sound_channels_config, effects_config, m_load_section);
