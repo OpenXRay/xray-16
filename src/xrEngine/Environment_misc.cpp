@@ -100,7 +100,7 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect, pcstr se
 
     Ivector2 staticPeriod;
     Ivector4 period;
-    if (config.read_if_exists(period, m_load_section, "sound_period")) // Pre Clear Sky
+    if (config.try_read_if_exists(period, m_load_section, "sound_period")) // Pre Clear Sky
     {
         config.read_if_exists(period.x, m_load_section, "period0");
         config.read_if_exists(period.y, m_load_section, "period1");
