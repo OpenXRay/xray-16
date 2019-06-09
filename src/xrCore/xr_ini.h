@@ -106,6 +106,15 @@ public:
         return read<T>(section.c_str(), line);
     }
 
+    template<typename T>
+    bool try_read(T& outValue, pcstr section, pcstr line) const;
+
+    template<typename T>
+    bool try_read(T& outValue, const shared_str& section, pcstr line) const
+    {
+        return try_read<T>(outValue, section.c_str(), line);
+    }
+
     // Returns value if it exist, or returns default value
     template<typename T>
     T read_if_exists(pcstr section, pcstr line, T defaultValue) const
@@ -139,6 +148,22 @@ public:
     bool read_if_exists(T& outValue, const shared_str& section, pcstr line) const
     {
         return read_if_exists(outValue, section.c_str(), line);
+    }
+
+    template<typename T>
+    bool try_read_if_exists(T& outValue, pcstr section, pcstr line) const
+    {
+        if (line_exist(section, line))
+        {
+            return try_read<T>(outValue, section, line);
+        }
+        return false;
+    }
+
+    template<typename T>
+    bool try_read_if_exists(T& outValue, const shared_str& section, pcstr line) const
+    {
+        return try_read_if_exists(outValue, section.c_str(), line);
     }
 
     // Generic reading functions
