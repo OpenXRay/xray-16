@@ -172,7 +172,7 @@ public:
 
     CEnvDescriptor(shared_str const& identifier);
 
-    void load(CEnvironment& environment, const CInifile& config);
+    void load(CEnvironment& environment, const CInifile& config, pcstr section = nullptr);
     void copy(const CEnvDescriptor& src)
     {
         float tm0 = exec_time;
@@ -347,7 +347,7 @@ public:
     CInifile* m_thunderbolts_config;
 
 protected:
-    virtual CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile const* config);
+    virtual CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile const* config, pcstr section = nullptr);
     virtual void load_weathers();
     virtual void load_weather_effects();
     virtual void create_mixer();

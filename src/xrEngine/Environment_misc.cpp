@@ -283,9 +283,14 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     {                                                                        \
         Msg("! Invalid '%s' in env-section '%s'", #C, identifier); \
     }
-void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config)
+
+void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcstr section /*= nullptr*/)
 {
     pcstr identifier = m_identifier.c_str();
+    if (section)
+    {
+        identifier = section;
+    }
 
     Ivector3 tm = {0, 0, 0};
     sscanf(identifier, "%d:%d:%d", &tm.x, &tm.y, &tm.z);
@@ -299,7 +304,7 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config)
     strconcat(sizeof(skyTextureEnv), skyTextureEnv, skyTexture, "#small");
     sky_texture_name = skyTexture;
     sky_texture_env_name = skyTextureEnv;
-    
+
     clouds_texture_name = config.r_string(identifier, "clouds_texture");
 
     pcstr cloudsColor = config.r_string(identifier, "clouds_color");
@@ -589,12 +594,13 @@ void CEnvironment::load_level_specific_ambients()
     xr_delete(level_ambients);
 }
 
-CEnvDescriptor* CEnvironment::create_descriptor(shared_str const& identifier, CInifile const* config)
+CEnvDescriptor* CEnvironment::create_descriptor(shared_str const& identifier,
+    CInifile const* config, pcstr section /*= nullptr*/)
 {
     CEnvDescriptor* result = new CEnvDescriptor(identifier);
     if (config)
-        result->load(*this, *config);
-    return (result);
+        result->load(*this, *config, section);
+    return result;
 }
 
 void CEnvironment::load_weathers()
