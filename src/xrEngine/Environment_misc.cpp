@@ -668,6 +668,33 @@ void CEnvironment::load_weathers()
         CInifile::Destroy(config);
     }
 
+    // ShoC style weather config
+    int weatherCount = 0;
+    if (pSettings->section_exist("weathers"))
+    {
+        weatherCount = pSettings->line_count("weathers");
+        Log("~ ShoC style weather config detected");
+    }
+
+    for (int weatherIdx = 0; weatherIdx < weatherCount; ++weatherIdx)
+    {
+        pcstr weatherName, weatherSection;
+        if (pSettings->r_line("weathers", weatherIdx, &weatherName, &weatherSection))
+        {
+            const int envCount = pSettings->line_count(weatherSection);
+
+            EnvVec& env = WeatherCycles[weatherName];
+            env.reserve(envCount);
+            
+            pcstr executionTime, envSection;
+            for (int envIdx = 0; envIdx < envCount; ++envIdx)
+            {
+                if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
+                    env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
+            }
+        }
+    }
+
     R_ASSERT2(!WeatherCycles.empty(), "Empty weathers.");
 
     // sorting weather envs
@@ -714,29 +741,34 @@ void CEnvironment::load_weather_effects()
         env.back()->exec_time_loaded = DAY_LENGTH;
     }
 
-#if 0
-    int line_count = pSettings->line_count("weather_effects");
-    for (int w_idx = 0; w_idx < line_count; w_idx++)
+    // ShoC style weather effects config
+    int weatherEffectsCount = 0;
+    if (pSettings->section_exist("weather_effects"))
     {
-        LPCSTR weather, sect_w;
-        if (pSettings->r_line("weather_effects", w_idx, &weather, &sect_w))
+        weatherEffectsCount = pSettings->line_count("weather_effects");
+        Log("~ ShoC style weather effects config detected");
+    }
+
+    for (int weatherIdx = 0; weatherIdx < weatherEffectsCount; ++weatherIdx)
+    {
+        pcstr weatherName, weatherSection, envSection;
+        if (pSettings->r_line("weather_effects", weatherIdx, &weatherName, &weatherSection))
         {
-            EnvVec& env = WeatherFXs[weather];
-            env.emplace_back(new CEnvDescriptor("00:00:00"));
-            env.back()->exec_time_loaded = 0;
-            //. why? env.emplace_back (new CEnvDescriptor("00:00:00")); env.back()->exec_time_loaded = 0;
-            int env_count = pSettings->line_count(sect_w);
-            LPCSTR exec_tm, sect_e;
-            for (int env_idx = 0; env_idx < env_count; env_idx++)
+            EnvVec& env = WeatherFXs[weatherName];
+            env.emplace_back(create_descriptor("00:00:00", nullptr));
+
+            const int envCount = pSettings->line_count(weatherSection);
+            pcstr executionTime;
+            for (int envIdx = 0; envIdx < envCount; ++envIdx)
             {
-                if (pSettings->r_line(sect_w, env_idx, &exec_tm, &sect_e))
-                    env.emplace_back(create_descriptor(sect_e));
+                if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
+                    env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
             }
-            env.emplace_back(create_descriptor("23:59:59"));
+
+            env.emplace_back(create_descriptor("24:00:00", nullptr));
             env.back()->exec_time_loaded = DAY_LENGTH;
         }
     }
-#endif // #if 0
 
     // sorting weather envs
     for (auto& fx : WeatherFXs)
