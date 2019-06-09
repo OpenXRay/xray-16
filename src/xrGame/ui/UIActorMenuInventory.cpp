@@ -1480,8 +1480,10 @@ void CUIActorMenu::UpdateOutfit()
 
     m_pInventoryBeltList->SetCellsCapacity(afc);
 
-    for (const auto& beltOver : m_belt_list_over)
-        beltOver->SetVisible(false);
+    for (u8 i = 0; i < af_count; ++i)
+    {
+        m_belt_list_over[i]->SetVisible(false);
+    }
 }
 
 void CUIActorMenu::MoveArtefactsToBag()
