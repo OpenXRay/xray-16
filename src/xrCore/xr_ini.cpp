@@ -1195,6 +1195,13 @@ XRCORE_API Fvector2 CInifile::read(pcstr section, pcstr line) const
 }
 
 template<>
+XRCORE_API bool CInifile::try_read(Fvector2& outValue, pcstr section, pcstr line) const
+{
+    pcstr C = r_string(section, line);
+    return 2 == sscanf(C, "%f,%f", &outValue.x, &outValue.y);
+}
+
+template<>
 XRCORE_API Fvector3 CInifile::read(pcstr section, pcstr line) const
 {
     return r_fvector3(section, line);

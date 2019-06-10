@@ -100,38 +100,59 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     m_thunderbolt_collections_config = nullptr;
     m_thunderbolts_config = nullptr;
 
-    if (!FS.exist("$game_config$", "environment" DELIMITER))
-        return;
+    string_path filePath;
+    const bool environmentFolderExist = FS.exist("$game_config$", "environment" DELIMITER);
 
-    string_path file_name;
-    m_ambients_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), TRUE, TRUE, FALSE);
-    m_sound_channels_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), TRUE, TRUE, FALSE);
-    m_effects_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "effects.ltx"), TRUE, TRUE, FALSE);
-    m_suns_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), TRUE, TRUE, FALSE);
-    m_thunderbolt_collections_config = new CInifile(
-        FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
-    m_thunderbolts_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), TRUE, TRUE, FALSE);
+    CInifile const* config = pSettings;
+    pcstr section = "thunderbolt_common";
 
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "environment.ltx"), TRUE, TRUE, FALSE);
+    if (environmentFolderExist)
+    {
+        config = new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "environment.ltx"),
+            TRUE, TRUE, FALSE);
+        section = "environment";
+    }
+    else
+    {
+        R_ASSERT4(config->section_exist(section),
+            "Path (which is [Argument 1]) doesn't exist and section (which is [Argument 2]) is missing. "
+            "Please, use either COP or SOC weather config", filePath, section);
+    }
 
     // params
-    p_var_alt = deg2rad(config->r_float("environment", "altitude"));
-    p_var_long = deg2rad(config->r_float("environment", "delta_longitude"));
-    p_min_dist = std::min(.95f, config->r_float("environment", "min_dist_factor"));
-    p_tilt = deg2rad(config->r_float("environment", "tilt"));
-    p_second_prop = config->r_float("environment", "second_propability");
+    if (!config->try_read(p_var_alt, section, "altitude"))
+    {
+        p_var_alt.x = config->r_float(section, "altitude");
+        p_var_alt.y = p_var_alt.x;
+    }
+    p_var_alt.x = deg2rad(p_var_alt.x);
+    p_var_alt.y = deg2rad(p_var_alt.y);
+    p_var_long = deg2rad(config->r_float(section, "delta_longitude"));
+    p_min_dist = std::min(MAX_DIST_FACTOR, config->r_float(section, "min_dist_factor"));
+    p_tilt = deg2rad(config->r_float(section, "tilt"));
+    p_second_prop = config->r_float(section, "second_propability");
     clamp(p_second_prop, 0.f, 1.f);
-    p_sky_color = config->r_float("environment", "sky_color");
-    p_sun_color = config->r_float("environment", "sun_color");
-    p_fog_color = config->r_float("environment", "fog_color");
+    p_sky_color = config->r_float(section, "sky_color");
+    p_sun_color = config->r_float(section, "sun_color");
+    p_fog_color = config->r_float(section, "fog_color");
 
-    xr_delete(config);
+    if (environmentFolderExist)
+        xr_delete(config);
+    else
+        return;
+
+    m_ambients_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "ambients.ltx"), TRUE, TRUE, FALSE);
+    m_sound_channels_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), TRUE, TRUE, FALSE);
+    m_effects_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "effects.ltx"), TRUE, TRUE, FALSE);
+    m_suns_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "suns.ltx"), TRUE, TRUE, FALSE);
+    m_thunderbolt_collections_config = new CInifile(
+        FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
+    m_thunderbolts_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), TRUE, TRUE, FALSE);
 }
 
 CEnvironment::~CEnvironment()

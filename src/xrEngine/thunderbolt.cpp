@@ -187,7 +187,7 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
     float sun_h, sun_p;
     CEnvironment& environment = g_pGamePersistent->Environment();
     environment.CurrentEnv->sun_dir.getHP(sun_h, sun_p);
-    float alt = environment.p_var_alt; // Random.randF(environment.p_var_alt.x,environment.p_var_alt.y);
+    float alt = Random.randF(environment.p_var_alt.x, environment.p_var_alt.y);
     float lng = Random.randF(sun_h - environment.p_var_long + PI, sun_h + environment.p_var_long + PI);
     float dist = Random.randF(FAR_DIST * environment.p_min_dist, FAR_DIST * .95f);
     current_direction.setHP(lng, alt);

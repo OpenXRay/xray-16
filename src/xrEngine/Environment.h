@@ -365,7 +365,7 @@ public:
         xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni);
 
 public:
-    float p_var_alt;
+    Fvector2 p_var_alt;
     float p_var_long;
     float p_min_dist;
     float p_tilt;
