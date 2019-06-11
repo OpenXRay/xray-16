@@ -80,15 +80,17 @@ IC bool _valid(const float x) noexcept
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
 #if defined(WINDOWS) && defined(_MSC_VER)
-    int cls = _fpclass(double(x));
+    const int cls = _fpclass(static_cast<double>(x));
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
-    int cls = std::fpclassify((double )x);
+    const int cls = std::fpclassify(static_cast<double>(x));
     switch (cls)
     {
     case FP_NAN:
+        [[fallthrough]];
     case FP_INFINITE:
+        [[fallthrough]];
     case FP_SUBNORMAL:
         return false;
     default:
@@ -111,15 +113,17 @@ IC bool _valid(const double x)
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
 #if defined(WINDOWS) && defined(_MSC_VER)
-    int cls = _fpclass(x);
+    const int cls = _fpclass(x);
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
-    int cls = std::fpclassify((double )x);
+    const int cls = std::fpclassify(x);
     switch (cls)
     {
     case FP_NAN:
+        [[fallthrough]];
     case FP_INFINITE:
+        [[fallthrough]];
     case FP_SUBNORMAL:
         return false;
     default:
