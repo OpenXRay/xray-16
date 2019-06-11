@@ -88,7 +88,7 @@ IC bool _valid(const float x) noexcept
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
-    const int cls = std::fpclassify(static_cast<double>(x));
+    const int cls = std::fpclassify(x);
     switch (cls)
     {
     case FP_NAN:
