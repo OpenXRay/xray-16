@@ -300,7 +300,7 @@ public:
     }
     // Set file pointer to start of chunk data (0 for root chunk)
     IC void rewind() { impl().seek(0); }
-    u32 find_chunk(u32 ID, BOOL* bCompressed);
+    u32 find_chunk(u32 ID, bool* bCompressed);
 
     IC BOOL r_chunk(u32 ID, void* dest) // чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
     {
@@ -400,7 +400,7 @@ public:
     // iterators
     IReader* open_chunk_iterator(u32& ID, IReader* previous = NULL); // NULL=first
 
-    u32 find_chunk(u32 ID, BOOL* bCompressed = 0);
+    u32 find_chunk(u32 ID, bool* bCompressed = 0);
 
 private:
     typedef IReaderBase<IReader> inherited;

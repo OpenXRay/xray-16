@@ -319,7 +319,7 @@ void IWriter::VPrintf(const char* format, va_list args)
 // base stream
 IReader* IReader::open_chunk(u32 ID)
 {
-    BOOL bCompressed;
+    bool bCompressed;
 
     u32 dwSize = find_chunk(ID, &bCompressed);
     if (dwSize != 0)
@@ -355,7 +355,7 @@ IReaderTestPolicy::~IReaderTestPolicy() { xr_delete(m_test); };
 find_chunk_counter g_find_chunk_counter;
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
-u32 IReader::find_chunk(u32 ID, BOOL* bCompressed) { return inherited::find_chunk(ID, bCompressed); }
+u32 IReader::find_chunk(u32 ID, bool* bCompressed) { return inherited::find_chunk(ID, bCompressed); }
 IReader* IReader::open_chunk_iterator(u32& ID, IReader* _prev)
 {
     if (0 == _prev)

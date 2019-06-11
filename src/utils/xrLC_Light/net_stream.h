@@ -165,7 +165,7 @@ public:
     void r_string(char* dest, u32 tgt_sz);
     void r_stringZ(char* dest);
     void r_stringZ(shared_str& dest);
-    u32 find_chunk(u32 ID, BOOL* bCompressed = 0);
+    u32 find_chunk(u32 ID, bool* bCompressed = nullptr);
 
 private:
     typedef IReaderBase<INetReader> inherited;

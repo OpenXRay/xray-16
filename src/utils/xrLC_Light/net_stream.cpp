@@ -267,7 +267,7 @@ CReadMemoryBlock::~CReadMemoryBlock()
 }
 
 #include "xrCore/FS_impl.h"
-u32 INetReader::find_chunk(u32 ID, BOOL* bCompressed)
+u32 INetReader::find_chunk(u32 ID, bool* bCompressed)
 {
     R_ASSERT(false);
     return inherited::find_chunk(ID, bCompressed);
