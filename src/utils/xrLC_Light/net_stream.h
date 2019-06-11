@@ -168,7 +168,7 @@ public:
     u32 find_chunk(u32 ID, bool* bCompressed = nullptr);
 
 private:
-    typedef IReaderBase<INetReader> inherited;
+    using inherited = IReaderBase<INetReader>;
 };
 
 class XRLC_LIGHT_API INetReaderFile : public INetReader
