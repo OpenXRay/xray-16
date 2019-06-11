@@ -15,7 +15,7 @@ private:
 #endif
 
 public:
-    virtual void construct(pcstr file_name, const u32& window_size);
+    virtual void construct(pcstr file_name, const size_t& window_size);
     virtual void destroy();
 };
 

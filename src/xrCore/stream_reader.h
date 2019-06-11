@@ -9,32 +9,32 @@ private:
 #elif defined(LINUX) || defined(FREEBSD)
     int m_file_mapping_handle;
 #endif
-    u32 m_start_offset;
-    u32 m_file_size;
-    u32 m_archive_size;
-    u32 m_window_size;
+    size_t m_start_offset;
+    size_t m_file_size;
+    size_t m_archive_size;
+    size_t m_window_size;
 
 private:
-    u32 m_current_offset_from_start;
-    u32 m_current_window_size;
+    size_t m_current_offset_from_start;
+    size_t m_current_window_size;
     u8* m_current_map_view_of_file;
     u8* m_start_pointer;
     u8* m_current_pointer;
 
 private:
-    void map(const u32& new_offset);
+    void map(const size_t& new_offset);
     IC void unmap();
-    IC void remap(const u32& new_offset);
+    IC void remap(const size_t& new_offset);
 
 public:
     IC CStreamReader() = default;
 
 #if defined(WINDOWS)
-    virtual void construct(const HANDLE& file_mapping_handle, const u32& start_offset, const u32& file_size,
-        const u32& archive_size, const u32& window_size);
+    virtual void construct(const HANDLE& file_mapping_handle, const size_t& start_offset, const size_t& file_size,
+        const size_t& archive_size, const size_t& window_size);
 #elif defined(LINUX) || defined(FREEBSD)
-    virtual void construct(int file_mapping_handle, const u32& start_offset, const u32& file_size,
-        const u32& archive_size, const u32& window_size);
+    virtual void construct(int file_mapping_handle, const size_t& start_offset, const size_t& file_size,
+        const size_t& archive_size, const size_t& window_size);
 #endif
     virtual void destroy();
 
@@ -44,16 +44,16 @@ public:
 #elif defined(LINUX) || defined(FREEBSD)
     IC const int& file_mapping_handle() const;
 #endif
-    IC u32 elapsed() const;
-    IC const u32& length() const;
+    IC size_t elapsed() const;
+    IC const size_t& length() const;
     IC void seek(const int& offset);
-    IC u32 tell() const;
+    IC size_t tell() const;
     IC void close();
 
 public:
     void advance(const int& offset);
-    void r(void* buffer, u32 buffer_size);
-    CStreamReader* open_chunk(const u32& chunk_id);
+    void r(void* buffer, size_t buffer_size);
+    CStreamReader* open_chunk(const size_t& chunk_id);
     u32 find_chunk(u32 ID, bool* bCompressed = nullptr);
     //. CStreamReader*open_chunk_iterator(const u32 &chunk_id, CStreamReader *previous = 0); // 0 means first
 
