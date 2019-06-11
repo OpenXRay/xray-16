@@ -20,7 +20,7 @@ bool disk_file_reader::make_data_packet(NET_Packet& packet, u32 chunk_size)
     m_reader->r(pointer, size_to_write);
     packet.w(pointer, size_to_write);
 
-    return m_reader->eof() ? true : false;
+    return m_reader->eof();
 };
 
 bool disk_file_reader::is_first_packet() { return !m_reader->tell(); }
@@ -44,7 +44,7 @@ bool memory_reader::make_data_packet(NET_Packet& packet, u32 chunk_size)
     m_reader->r(pointer, size_to_write);
     packet.w(pointer, size_to_write);
 
-    return m_reader->eof() ? true : false;
+    return m_reader->eof();
 }
 
 bool memory_reader::is_first_packet() { return !m_reader->tell(); }

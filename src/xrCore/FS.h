@@ -195,7 +195,7 @@ public:
     virtual ~IReaderBase() {}
     IC implementation_type& impl() { return *(implementation_type*)this; }
     IC const implementation_type& impl() const { return *(implementation_type*)this; }
-    IC BOOL eof() const { return impl().elapsed() <= 0; };
+    IC bool eof() const { return impl().elapsed() <= 0; };
     IC void r(void* p, int cnt) { impl().r(p, cnt); }
     IC Fvector r_vec3()
     {

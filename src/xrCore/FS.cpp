@@ -396,11 +396,11 @@ void IReader::r(void* p, int cnt)
     CopyMemory(p, pointer(), cnt);
     advance(cnt);
 #ifdef DEBUG
-    BOOL bShow = FALSE;
+    bool bShow = false;
     if (dynamic_cast<CFileReader*>(this))
-        bShow = TRUE;
+        bShow = true;
     if (dynamic_cast<CVirtualFileReader*>(this))
-        bShow = TRUE;
+        bShow = true;
     if (bShow)
     {
         FS.dwOpenCounter++;
@@ -408,7 +408,7 @@ void IReader::r(void* p, int cnt)
 #endif
 };
 
-IC BOOL is_term(char a) { return (a == 13) || (a == 10); };
+IC bool is_term(char a) { return (a == 13) || (a == 10); };
 IC u32 IReader::advance_term_string()
 {
     u32 sz = 0;

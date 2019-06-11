@@ -11,7 +11,6 @@
 
 using namespace luabind;
 
-bool r_eof(IReader* self) { return (!!self->eof()); }
 LPCSTR r_stringZ(IReader* self)
 {
     shared_str temp;
@@ -45,5 +44,5 @@ SCRIPT_EXPORT(IReader, (), {
                          .def("r_stringZ", &r_stringZ)
                          .def("r_elapsed", &IReader::elapsed)
                          .def("r_advance", &IReader::advance)
-                         .def("r_eof", &r_eof)];
+                         .def("r_eof", &IReader::eof)];
 });
