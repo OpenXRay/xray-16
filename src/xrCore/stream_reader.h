@@ -70,8 +70,9 @@ public:
     //. void r_stringZ (char *dest, u32 tgt_sz);
     void r_stringZ(shared_str& dest);
     //. void r_stringZ (xr_string& dest);
+
 private:
-    typedef IReaderBase<CStreamReader> inherited;
+    using inherited = IReaderBase<CStreamReader>;
 };
 
 #include "stream_reader_inline.h"

@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #endif
 
-void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
+void CFileStreamReader::construct(pcstr file_name, const u32& window_size)
 {
 #if defined(WINDOWS)
     m_file_handle = CreateFile(file_name, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
