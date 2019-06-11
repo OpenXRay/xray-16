@@ -4,20 +4,6 @@
 #include <sys/mman.h>
 #endif
 
-IC CStreamReader::CStreamReader() {}
-IC CStreamReader::CStreamReader(const CStreamReader& object)
-    : m_start_offset(object.m_start_offset), m_file_size(object.m_file_size), m_archive_size(object.m_archive_size),
-      m_window_size(object.m_window_size)
-{
-    // should be never called
-}
-
-IC CStreamReader& CStreamReader::operator=(const CStreamReader&)
-{
-    // should be never called
-    return (*this);
-}
-
 #if defined(WINDOWS)
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
 #elif defined(LINUX) || defined(FREEBSD)

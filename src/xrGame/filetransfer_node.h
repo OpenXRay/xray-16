@@ -92,7 +92,7 @@ public:
     virtual bool opened() const;
 }; // class memory_writer_reader
 
-class filetransfer_node
+class filetransfer_node : public Noncopyable
 {
 private:
     u32 m_chunk_size;
@@ -113,7 +113,6 @@ public:
     filetransfer_node(CMemoryWriter* src_writer, u32 const max_size, u32 const chunk_size,
         sending_state_callback_t const& callback, u32 user_param = 0);
 
-    filetransfer_node& operator=(filetransfer_node const& copy) { NODEFAULT; };
     ~filetransfer_node();
 
     void calculate_chunk_size(u32 peak_throughput, u32 current_throughput);

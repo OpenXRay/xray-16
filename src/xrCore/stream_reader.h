@@ -1,7 +1,7 @@
 #ifndef STREAM_READER_H
 #define STREAM_READER_H
 
-class XRCORE_API CStreamReader : public IReaderBase<CStreamReader>
+class XRCORE_API CStreamReader : public IReaderBase<CStreamReader>, Noncopyable
 {
 private:
 #if defined(WINDOWS)
@@ -26,13 +26,8 @@ private:
     IC void unmap();
     IC void remap(const u32& new_offset);
 
-private:
-    // should not be called
-    IC CStreamReader(const CStreamReader& object);
-    IC CStreamReader& operator=(const CStreamReader&);
-
 public:
-    IC CStreamReader();
+    IC CStreamReader() = default;
 
 public:
 #if defined(WINDOWS)
