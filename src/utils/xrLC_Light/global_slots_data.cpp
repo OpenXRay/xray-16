@@ -50,7 +50,7 @@ void global_slots_data::Free()
 void global_slots_data::write(IWriter& w) const
 {
     w_pod(w, dtH);
-    const u32 buffer_size = sizeof(DetailSlot) * dtH.slot_count();
+    const size_t buffer_size = sizeof(DetailSlot) * dtH.slot_count();
     w.w(dtS, buffer_size);
     recalculation_data.write(w);
 }
@@ -59,7 +59,7 @@ void global_slots_data::read(INetReader& r)
 {
     r_pod(r, dtH);
     R_ASSERT(!dtS);
-    const u32 buffer_size = sizeof(DetailSlot) * dtH.slot_count();
+    const size_t buffer_size = sizeof(DetailSlot) * dtH.slot_count();
     dtS = (DetailSlot*)xr_malloc(buffer_size);
     R_ASSERT(dtS);
     r.r(dtS, buffer_size);

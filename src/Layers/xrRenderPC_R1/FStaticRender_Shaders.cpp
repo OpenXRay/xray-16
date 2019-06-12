@@ -75,7 +75,7 @@ public:
         }
 
         // duplicate and zero-terminate
-        u32 size = R->length();
+        const size_t size = R->length();
         u8* data = xr_alloc<u8>(size + 1);
         CopyMemory(data, R->pointer(), size);
         data[size] = 0;

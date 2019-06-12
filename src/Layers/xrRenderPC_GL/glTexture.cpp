@@ -45,7 +45,7 @@ int get_texture_load_lod(LPCSTR fn)
     return 2;
 }
 
-u32 calc_texture_size(int lod, u32 mip_cnt, u32 orig_size)
+u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 {
     if (1 == mip_cnt)
         return orig_size;
@@ -66,7 +66,7 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
     GLuint pTexture = 0;
     string_path fn;
     u32 dwWidth, dwHeight, dwDepth;
-    u32 img_size = 0;
+    size_t img_size = 0;
     int img_loaded_lod = 0;
     gli::gl::format fmt;
     u32 mip_cnt = u32(-1);

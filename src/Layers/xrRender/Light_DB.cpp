@@ -15,16 +15,15 @@ void CLight_DB::Load(IReader* fs)
         // Light itself
         sun = NULL;
 
-		u32 size = F->length();
-        u32 element = sizeof(Flight) + 4;
-        u32 count = (size / element);
+		const size_t size = F->length();
+        const size_t element = sizeof(Flight) + 4;
+        const size_t count = (size / element);
         VERIFY((count * element) == size);
         v_static.reserve(count);
-        for (u32 i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
             Flight Ldata;
-            u32 controller = 0;
-            F->r(&controller, 4);
+            u32 controller = F->r_u32();
             F->r(&Ldata, sizeof(Flight));
 
             light* L = Create();
@@ -82,12 +81,12 @@ void CLight_DB::LoadHemi()
 
             if (chunk)
             {
-                u32 size = chunk->length();
-                u32 element = sizeof(R_Light);
-                u32 count = size / element;
+                const size_t size = chunk->length();
+                const size_t element = sizeof(R_Light);
+                const size_t count = size / element;
                 VERIFY(count * element == size);
                 v_hemi.reserve(count);
-                for (u32 i = 0; i < count; i++)
+                for (size_t i = 0; i < count; i++)
                 {
                     R_Light Ldata;
                     chunk->r(&Ldata, sizeof(R_Light));

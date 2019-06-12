@@ -9,7 +9,7 @@ template <class T>
 void transfer(const char* name, xr_vector<T>& dest, IReader& F, u32 chunk)
 {
     IReader* O = F.open_chunk(chunk);
-    u32 count = O ? (O->length() / sizeof(T)) : 0;
+    size_t count = O ? (O->length() / sizeof(T)) : 0;
     Logger.clMsg("* %16s: %d", name, count);
     if (count)
     {
@@ -59,7 +59,7 @@ void global_claculation_data::xrLoad()
     {
         IReader* fs = FS.r_open("$level$", "build.lights");
         IReader* F;
-        u32 cnt;
+        size_t cnt;
         R_Light* L;
 
         // rgb
@@ -111,8 +111,8 @@ void global_claculation_data::xrLoad()
         {
             Surface_Init();
             F = fs->open_chunk(EB_Textures);
-            u32 tex_count = F->length() / sizeof(b_texture);
-            for (u32 t = 0; t < tex_count; t++)
+            const size_t tex_count = F->length() / sizeof(b_texture);
+            for (size_t t = 0; t < tex_count; t++)
             {
                 Logger.Progress(float(t) / float(tex_count));
 

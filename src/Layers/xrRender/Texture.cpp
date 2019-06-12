@@ -68,7 +68,7 @@ int get_texture_load_lod(LPCSTR fn)
         return 2;
 }
 
-u32 calc_texture_size(int lod, u32 mip_cnt, u32 orig_size)
+u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 {
     if (1 == mip_cnt)
         return orig_size;
@@ -278,7 +278,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     IDirect3DCubeTexture9* pTextureCUBE = nullptr;
     string_path fn;
     u32 dwWidth, dwHeight;
-    u32 img_size = 0;
+    size_t img_size = 0;
     int img_loaded_lod = 0;
     D3DFORMAT fmt;
     u32 mip_cnt = u32(-1);

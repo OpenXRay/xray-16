@@ -85,18 +85,18 @@ CGlowManager::~CGlowManager() {}
 void CGlowManager::Load(IReader* fs)
 {
     // glows itself
-    u32 size = fs->length();
+    const size_t size = fs->length();
     R_ASSERT(size);
-    u32 one = 4 * sizeof(float) + 1 * sizeof(u16);
+    const size_t one = sizeof(Fvector) + sizeof(float) + sizeof(u16);
     R_ASSERT(size % one == 0);
-    u32 count = size / one;
+    size_t count = size / one;
     Glows.reserve(count);
 
     for (; count; count--)
     {
         CGlow* G = new CGlow();
-        fs->r(&G->position, 3 * sizeof(float));
-        fs->r(&G->radius, 1 * sizeof(float));
+        fs->r(&G->position, sizeof(Fvector));
+        fs->r(&G->radius, sizeof(float));
         G->spatial.sphere.set(G->position, G->radius);
         G->direction.set(0, 0, 0);
 

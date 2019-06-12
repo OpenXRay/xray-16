@@ -45,7 +45,7 @@ void check_file(LPCSTR file_name)
             return;
         }
     }
-    u32 data_size = tmp_reader->length();
+    const size_t data_size = tmp_reader->length();
     u8* data = static_cast<u8*>(xr_malloc(data_size + 1));
 
     tmp_reader->r(data, static_cast<int>(data_size));
@@ -90,9 +90,9 @@ void unpack_file(LPCSTR file_name)
     }
     create_unpack_name(new_file_name);
 
-    u32 data_size = tmp_reader->length() - sizeof(u32); // first word is unpacket size ...
+    const size_t data_size = tmp_reader->length() - sizeof(u32); // first word is unpacket size ...
     u8* data = static_cast<u8*>(xr_malloc(data_size));
-    u32 uncomp_size = tmp_reader->r_u32();
+    const size_t uncomp_size = tmp_reader->r_u32();
     tmp_reader->r(data, data_size);
 
     if (uncomp_size > max_uncompressed_size)
