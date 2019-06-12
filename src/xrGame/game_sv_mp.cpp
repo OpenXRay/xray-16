@@ -1692,9 +1692,9 @@ void game_sv_mp::UpdatePlayersMoney()
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
-            game_PlayerState* ps = l_pC->ps;
-            if (!l_pC || !l_pC->net_Ready || !ps)
+            if (!l_pC || !l_pC->net_Ready || !l_pC->ps)
                 return;
+            game_PlayerState* ps = l_pC->ps;
             if (!ps->money_added && ps->m_aBonusMoney.empty())
                 return;
             //-----------------------------------------------------------
@@ -1818,7 +1818,7 @@ void game_sv_mp::RenewAllActorsHealth()
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
-            VERIFY2(l_pC->ps, make_string("player state of client, ClientID = 0x%08x", l_pC->ID.value()).c_str());
+            VERIFY2(l_pC && l_pC->ps, make_string("player state of client, ClientID = 0x%08x", l_pC->ID.value()).c_str());
             if (!l_pC || !l_pC->ps)
             {
                 return;

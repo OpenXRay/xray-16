@@ -108,10 +108,13 @@ void CCharacterPhysicsSupport::SetRemoved()
     m_eState = esRemoved;
     if (m_flags.test(fl_skeleton_in_shell))
     {
+        if (!m_pPhysicsShell)
+            return;
+
         if (m_pPhysicsShell->isEnabled())
             m_EntityAlife.processing_deactivate();
-        if (m_pPhysicsShell)
-            m_pPhysicsShell->Deactivate();
+
+        m_pPhysicsShell->Deactivate();
         xr_delete(m_pPhysicsShell);
     }
     else
