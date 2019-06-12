@@ -82,10 +82,13 @@ class XRCORE_API CLocatorAPI : Noncopyable
     friend class FS_Path;
 
 public:
+    // IMPORTNT: don't replace u32 with size_t for this struct
+    // (Letter A in the first word is forgotten intentionally,
+    //  size_t will blow up the engine compatibility with it's resources)
     struct file
     {
         pcstr name; // low-case name
-        u32 vfs; // 0xffffffff - standart file
+        size_t vfs; // 0xffffffff - standart file
         u32 crc; // contents CRC
         u32 ptr; // pointer inside vfs
         u32 size_real; //
@@ -95,8 +98,8 @@ public:
 
     struct archive
     {
-        u32 size = 0;
-        u32 vfs_idx = u32(-1);
+        size_t size = 0;
+        size_t vfs_idx = size_t(-1);
         shared_str path;
 #if defined(WINDOWS)
         void *hSrcFile = nullptr;
@@ -110,7 +113,10 @@ public:
         void open();
         void close();
     };
-    
+
+    // IMPORTNT: don't replace u32 with size_t for this struct
+    // (Letter A in the first word is forgotten intentionally,
+    //  size_t will blow up the engine compatibility with it's resources)
     struct archive_header
     {
         u32 size_real;
@@ -147,7 +153,7 @@ private:
     u64 m_auth_code;
 
     const file* RegisterExternal(pcstr name);
-    const file* Register(pcstr name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);
+    const file* Register(pcstr name, size_t vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);
     void ProcessArchive(pcstr path);
     void ProcessOne(pcstr path, const _finddata_t& entry);
     bool Recurse(pcstr path);
@@ -173,12 +179,12 @@ public:
     u32 dwOpenCounter;
 
 private:
-    void check_cached_files(pstr fname, const u32& fname_size, const file& desc, pcstr& source_name);
+    void check_cached_files(pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);
 
     void file_from_cache_impl(IReader*& R, LPSTR fname, const file& desc);
     void file_from_cache_impl(CStreamReader*& R, LPSTR fname, const file& desc);
     template <typename T>
-    void file_from_cache(T*& R, pstr fname, const u32& fname_size, const file& desc, pcstr& source_name);
+    void file_from_cache(T*& R, pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);
 
     void file_from_archive(IReader*& R, pcstr fname, const file& desc);
     void file_from_archive(CStreamReader*& R, pcstr fname, const file& desc);
@@ -248,7 +254,7 @@ public:
     FS_Path* append_path(pcstr path_alias, pcstr root, pcstr add, bool recursive);
     pcstr update_path(string_path& dest, pcstr initial, pcstr src, bool crashOnNotFound = true);
 
-    int file_list(FS_FileSet& dest, pcstr path, u32 flags = FS_ListFiles, pcstr mask = nullptr);
+    size_t file_list(FS_FileSet& dest, pcstr path, u32 flags = FS_ListFiles, pcstr mask = nullptr);
 
     bool load_all_unloaded_archives();
     void unload_archive(archive& A);

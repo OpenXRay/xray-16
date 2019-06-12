@@ -3,36 +3,36 @@
 
 class XRLC_LIGHT_API byte_count
 {
-    u32 _count;
+    size_t _count;
 
 public:
     byte_count() : _count(0) {}
-    IC u32 count() { return _count; }
+    IC size_t count() { return _count; }
     IC void reset() { _count = 0; }
-    IC void add(u32 cnt) { _count += cnt; }
+    IC void add(size_t cnt) { _count += cnt; }
 };
 
 class CReadMemoryBlock
 {
-    mutable u32 file_size;
+    mutable size_t file_size;
     mutable u8* _buffer;
-    const u32 buf_size;
-    mutable u32 position;
+    const size_t buf_size;
+    mutable size_t position;
 
 public:
-    CReadMemoryBlock(const u32 buf_size_, u8* buffer);
+    CReadMemoryBlock(const size_t buf_size_, u8* buffer);
     ~CReadMemoryBlock();
-    void r(void* p, int cnt) const;
-    u32 count() const { return file_size - position; }
+    void r(void* p, size_t cnt) const;
+    size_t count() const { return file_size - position; }
     void* pdata() const { return (void*)_buffer; }
-    // IC	void			reset_file_size	( u32 new_size ){file_size = new_size ;}
-    // IC	u32				get_file_size	( )				{return file_size; }
+    // IC	void			reset_file_size	( size_t new_size ){file_size = new_size ;}
+    // IC	size_t				get_file_size	( )				{return file_size; }
     void free_buff() const
     {
         file_size = 0;
         position = 0;
     }
-    void alloc(u32 _file_size) const
+    void alloc(size_t _file_size) const
     {
         R_ASSERT(buf_size >= _file_size);
         VERIFY(!allocated());
@@ -46,8 +46,8 @@ public:
 class IReadBlock
 {
 public:
-    virtual void r(void* p, int cnt) const = 0;
-    virtual u32 count() const = 0;
+    virtual void r(void* p, size_t cnt) const = 0;
+    virtual size_t count() const = 0;
     virtual void* pdata() const = 0;
 };
 
@@ -57,13 +57,13 @@ public:
 //{
 //	CReadMemoryBlock mem_reader;
 // public:
-//	CMemoryReadBlock	( const u32	file_size_, u8*	&buff ):mem_reader(file_size_, buff ){};
-//	virtual	void			r				( void *p, int cnt )const	{ mem_reader.r(p,cnt); }
-//	virtual	u32				count			()const						{ return mem_reader.count(); }
+//	CMemoryReadBlock	( const size_t	file_size_, u8*	&buff ):mem_reader(file_size_, buff ){};
+//	virtual	void			r				( void *p, size_t cnt )const	{ mem_reader.r(p,cnt); }
+//	virtual	size_t				count			()const						{ return mem_reader.count(); }
 //	virtual	void			*pdata			()const						{ return mem_reader.pdata(); }
 //
 //	void					free_buff		()const						{ mem_reader.free_buff(); }
-//	void					alloc			(u32 _file_size)const		{ mem_reader.alloc(_file_size); }
+//	void					alloc			(size_t _file_size)const		{ mem_reader.alloc(_file_size); }
 //	bool					allocated		()const						{ return mem_reader.allocated(); }
 //	bool					empty			()const						{ return mem_reader.empty(); }
 //};
@@ -71,16 +71,16 @@ public:
 class IWriteBlock
 {
 protected:
-    u32 size;
+    size_t size;
 
 public:
-    IWriteBlock(u32 _size) : size(_size) {}
+    IWriteBlock(size_t _size) : size(_size) {}
     virtual bool save_to(LPCSTR fn) = 0;
-    //	virtual u32		tell		() 								=0;
+    //	virtual size_t		tell		() 								=0;
     //	virtual	u8*		pointer		()								=0;
-    virtual void w(const void* ptr, u32 count) = 0;
+    virtual void w(const void* ptr, size_t count) = 0;
     virtual void send(IGenericStream* _stream) = 0;
-    virtual u32 rest() = 0;
+    virtual size_t rest() = 0;
 };
 
 class CMemoryWriteBlock
@@ -88,26 +88,26 @@ class CMemoryWriteBlock
 {
     // CMemoryWriter	mem_writer;
     u8* buffer;
-    const u32 buffer_size;
+    const size_t buffer_size;
 
     //	u8*				data;
-    u32 position;
+    size_t position;
 
-    //	u32				mem_size;
-    //	u32				file_size;
+    //	size_t				mem_size;
+    //	size_t				file_size;
 
 public:
-    CMemoryWriteBlock(u8* _buffer, u32 _size) : buffer(_buffer), buffer_size(_size), position(0) {}
+    CMemoryWriteBlock(u8* _buffer, size_t _size) : buffer(_buffer), buffer_size(_size), position(0) {}
     //	 bool			save_to				(LPCSTR fn)						{ return mem_writer.save_to(fn); }
     void send(IGenericStream* _stream);
-    u32 rest() { return buffer_size - tell(); }
-    void w(const void* ptr, u32 count);
+    size_t rest() { return buffer_size - tell(); }
+    void w(const void* ptr, size_t count);
 
 public:
     void clear() { position = 0; }
     bool is_empty() { return 0 == position; }
 private:
-    u32 tell() { return position; }
+    size_t tell() { return position; }
     u8* pointer() { return buffer; }
 };
 
@@ -121,15 +121,15 @@ class CFileWriteBlock : public IWriteBlock
     bool reopen;
 
 public:
-    CFileWriteBlock(LPCSTR fn, u32 _size, bool _reopen);
+    CFileWriteBlock(LPCSTR fn, size_t _size, bool _reopen);
     ~CFileWriteBlock();
-    virtual bool save_to(LPCSTR fn) { return false; };
-    virtual void send(IGenericStream* _stream);
-    virtual u32 rest();
+    bool save_to(LPCSTR fn) override { return false; };
+    void send(IGenericStream* _stream) override;
+    size_t rest() override;
     void w_close();
-    //	virtual u32		tell			() 							;
+    //	virtual size_t		tell			() 							;
     //	virtual	u8*		pointer			()							;
-    virtual void w(const void* ptr, u32 count);
+    void w(const void* ptr, size_t count) override;
 };
 
 class XRLC_LIGHT_API INetReader : public IReaderBase<INetReader>, public byte_count
@@ -141,31 +141,31 @@ public:
         // VERIFY(stream);
     }
     virtual ~INetReader();
-    IC int elapsed() const
+    IC size_t elapsed() const
     {
         VERIFY(false);
         return 0;
     };
-    void seek(u32 pos) { VERIFY(false); };
-    IC int tell() const
+    void seek(size_t pos) { VERIFY(false); };
+    IC size_t tell() const
     {
         VERIFY(false);
         return 0;
     };
-    // IC void			seek		(int ptr)		{	VERIFY(false); }
-    IC int length() const
+    // IC void			seek		(size_t ptr)		{	VERIFY(false); }
+    IC size_t length() const
     {
         VERIFY(false);
         return 0;
     };
     //	IC void*		pointer		()	const		{	VERIFY(false); return 0; 	};
-    IC void advance(int cnt) { VERIFY(false); }
-    virtual void r(void* p, int cnt) = 0;
+    IC void advance(size_t cnt) { VERIFY(false); }
+    void r(void* p, size_t cnt) override = 0;
 
-    void r_string(char* dest, u32 tgt_sz);
+    void r_string(char* dest, size_t tgt_sz);
     void r_stringZ(char* dest);
     void r_stringZ(shared_str& dest);
-    u32 find_chunk(u32 ID, bool* bCompressed = nullptr);
+    size_t find_chunk(u32 ID, bool* bCompressed = nullptr);
 
 private:
     using inherited = IReaderBase<INetReader>;
@@ -181,7 +181,7 @@ public:
     virtual ~INetReaderFile();
 
 private:
-    virtual void r(void* p, int cnt);
+    void r(void* p, size_t cnt) override;
 };
 //////////////////////////////////////////////////////////////////////////////
 class XRLC_LIGHT_API INetBuffWriter : public IWriter, public byte_count
@@ -190,13 +190,16 @@ protected:
     IWriteBlock* mem_writter;
     // CMemoryWriteBlock		mem_writter;
 private:
-    virtual void seek(u32 pos) { VERIFY(false); }
-    virtual u32 tell()
+    virtual void seek(size_t pos) { VERIFY(false); }
+
+    size_t tell() override
     {
         VERIFY(false);
         return 0;
     };
-    virtual void flush() { VERIFY(false); }
+
+    void flush() override
+    { VERIFY(false); }
 public:
     INetBuffWriter() : mem_writter(0)
     {
@@ -212,11 +215,11 @@ class XRLC_LIGHT_API INetMemoryBuffWriter : public IWriter, public byte_count
 //	public INetBuffWriter
 {
     IGenericStream* stream;
-    u32 net_block_write_data_size;
+    size_t net_block_write_data_size;
     CMemoryWriteBlock mem_writter;
 
 public:
-    INetMemoryBuffWriter(IGenericStream* _stream, u32 _block_size, u8* buffer)
+    INetMemoryBuffWriter(IGenericStream* _stream, size_t _block_size, u8* buffer)
         : mem_writter(buffer, _block_size), stream(_stream), net_block_write_data_size(_block_size)
     {
         // VERIFY(stream);
@@ -225,17 +228,20 @@ public:
 
 private:
     //	void					create_block			();
-    void w(const void* ptr, u32 count);
+    void w(const void* ptr, size_t count);
     void send_and_clear();
 
 private:
-    virtual void seek(u32 pos) { VERIFY(false); }
-    virtual u32 tell()
+    virtual void seek(size_t pos) { VERIFY(false); }
+
+    size_t tell() override
     {
         VERIFY(false);
         return 0;
     };
-    virtual void flush() { VERIFY(false); }
+
+    void flush() override
+    { VERIFY(false); }
 };
 class XRLC_LIGHT_API INetReaderGenStream : public INetReader
 {
@@ -247,26 +253,29 @@ protected:
     IGenericStream* stream;
 
 private:
-    virtual void r(void* p, int cnt);
+    void r(void* p, size_t cnt) override;
 };
 class XRLC_LIGHT_API INetIWriterGenStream : public IWriter
 {
     IGenericStream* stream;
-    u32 block_size;
+    size_t block_size;
 
 public:
-    INetIWriterGenStream(IGenericStream* _stream, u32 inital_size);
+    INetIWriterGenStream(IGenericStream* _stream, size_t inital_size);
     virtual ~INetIWriterGenStream();
 
 private:
-    virtual void w(const void* ptr, u32 count);
-    virtual void seek(u32 pos) { VERIFY(false); }
-    virtual u32 tell()
+    virtual void w(const void* ptr, size_t count);
+    virtual void seek(size_t pos) { VERIFY(false); }
+
+    size_t tell() override
     {
         VERIFY(false);
         return 0;
     };
-    virtual void flush() { VERIFY(false); }
+
+    void flush() override
+    { VERIFY(false); }
 };
 
 class XRLC_LIGHT_API INetBlockReader : public INetReaderGenStream
@@ -274,19 +283,19 @@ class XRLC_LIGHT_API INetBlockReader : public INetReaderGenStream
     CReadMemoryBlock mem_reader;
 
 public:
-    INetBlockReader(IGenericStream* _stream, u8* buffer, u32 _size_buffer)
+    INetBlockReader(IGenericStream* _stream, u8* buffer, size_t _size_buffer)
         : INetReaderGenStream(_stream), mem_reader(_size_buffer, buffer)
     {
     }
 
     void load_buffer(LPCSTR fn);
-    virtual void r(void* p, int cnt);
+    void r(void* p, size_t cnt) override;
     virtual ~INetBlockReader();
 
 private:
-    //	u32				_block_size;
+    //	size_t				_block_size;
     //	u8				*&_buffer;
-    void create_block(u32 size);
+    void create_block(size_t size);
     typedef INetReader inherited;
 };
 

@@ -69,14 +69,14 @@ struct eq_pointer<CStreamReader>
 struct eq_fname_free
 {
     shared_str _val;
-    eq_fname_free(shared_str s) { _val = s; }
+    eq_fname_free(shared_str s) : _val(s) {}
     bool operator()(_open_file& itm) const { return _val == itm._fn && itm._reader == nullptr; }
 };
 
 struct eq_fname_check
 {
     shared_str _val;
-    eq_fname_check(shared_str s) { _val = s; }
+    eq_fname_check(shared_str s) : _val(s) {}
     bool operator()(_open_file& itm) const { return _val == itm._fn && itm._reader != nullptr; }
 };
 
@@ -189,11 +189,11 @@ const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
     struct stat buffer;
     if (stat(name, &buffer) == -1)
         return nullptr;
-    return Register(name, u32(-1), 0, 0, buffer.st_size, buffer.st_size, u32(buffer.st_mtime));
+    return Register(name, size_t(-1), 0, 0, buffer.st_size, buffer.st_size, u32(buffer.st_mtime));
 }
 
 const CLocatorAPI::file* CLocatorAPI::Register(
-    pcstr name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif)
+    pcstr name, size_t vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif)
 {
     string256 temp_file_name;
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
@@ -261,9 +261,10 @@ const CLocatorAPI::file* CLocatorAPI::Register(
 }
 
 #if defined(WINDOWS)
-IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, u32 archiveSize, bool shouldDecrypt = false)
+IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bool shouldDecrypt = false)
 {
-    u32 dwType, dwSize;
+    u32 dwType;
+    size_t dwSize;
     DWORD read_byte;
     u32 pt = SetFilePointer(ptr, 0, nullptr, FILE_BEGIN);
     VERIFY(pt != INVALID_SET_FILE_POINTER);
@@ -291,7 +292,7 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, u32 archiveSize, bool 
             if (dwType & CFS_CompressMark)
             {
                 BYTE* dest = nullptr;
-                unsigned dest_sz = 0;
+                size_t dest_sz = 0;
 
                 if (shouldDecrypt) // Try WW key first
                     g_trivial_encryptor.decode(src_data, dwSize, src_data);
@@ -322,9 +323,10 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, u32 archiveSize, bool 
 #endif
 
 #if defined(LINUX) || defined(FREEBSD)
-IReader* open_chunk(int fd, u32 ID, pcstr archiveName, u32 archiveSize, bool shouldDecrypt = false)
+IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool shouldDecrypt = false)
 {
-    u32 dwType, dwSize;
+    u32 dwType;
+    size_t dwSize;
     ssize_t read_byte;
     ::lseek(fd, 0L, SEEK_SET);
 
@@ -347,7 +349,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, u32 archiveSize, bool sho
             if (dwType & CFS_CompressMark)
             {
                 BYTE* dest = nullptr;
-                unsigned dest_sz = 0;
+                size_t dest_sz = 0;
 
                 if (shouldDecrypt)
                     g_trivial_encryptor.decode(src_data, dwSize, src_data);
@@ -455,7 +457,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
         hdr->r(&header, sizeof(archive_header)); // Read header
 
-        int name_length = buffer_size - sizeof(archive_header) - sizeof(u32);
+        const size_t name_length = buffer_size - sizeof(archive_header) - sizeof(u32);
         VERIFY(name_length > 0);
         hdr->r(&name, name_length); // Read file name
         name[name_length] = 0;
@@ -766,8 +768,8 @@ bool CLocatorAPI::Recurse(pcstr path)
     return true;
 }
 
-bool file_handle_internal(pcstr file_name, u32& size, int& file_handle);
-void* FileDownload(pcstr file_name, const int& file_handle, u32& file_size);
+bool file_handle_internal(pcstr file_name, size_t& size, int& file_handle);
+void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size);
 
 void CLocatorAPI::setup_fs_path(pcstr fs_name, string_path& fs_path)
 {
@@ -790,6 +792,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     setup_fs_path(fs_name, fs_path);
 
     string_path full_current_directory;
+    
 #if defined(WINDOWS)
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
 #elif defined(LINUX) || defined(FREEBSD)
@@ -829,7 +832,7 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
     Log("using fs-ltx", fs_file_name);
 
     int file_handle;
-    u32 file_size;
+    size_t file_size;
     IReader* result = nullptr;
     CHECK_OR_EXIT(file_handle_internal(fs_file_name, file_size, file_handle),
         make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_file_name));
@@ -856,7 +859,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     CTimer t;
     t.Start();
     Log("Initializing File System...");
-    u32 M1 = Memory.mem_usage();
+    const size_t M1 = Memory.mem_usage();
 
     m_Flags.set(flags, true);
 
@@ -961,7 +964,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
         R_ASSERT(path_exist("$app_data_root$"));
     };
 
-    u32 M2 = Memory.mem_usage();
+    const size_t M2 = Memory.mem_usage();
     Msg("FS: %d files cached %d archives, %dKb memory used.", m_files.size(), m_archives.size(), (M2 - M1) / 1024);
 
     m_Flags.set(flReady, true);
@@ -1093,7 +1096,7 @@ xr_vector<pstr>* CLocatorAPI::file_list_open(pcstr _path, u32 flags)
     xr_vector<char*>* dest = new xr_vector<char*>();
 
     size_t base_len = xr_strlen(N);
-    for (++I; I != m_files.end(); I++)
+    for (++I; I != m_files.end(); ++I)
     {
         const file& entry = *I;
         if (0 != strncmp(entry.name, N, base_len))
@@ -1134,13 +1137,13 @@ void CLocatorAPI::file_list_close(xr_vector<pstr>*& lst)
 {
     if (lst)
     {
-        for (xr_vector<char*>::iterator I = lst->begin(); I != lst->end(); I++)
+        for (xr_vector<char*>::iterator I = lst->begin(); I != lst->end(); ++I)
             xr_free(*I);
         xr_delete(lst);
     }
 }
 
-int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
+size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_ListFiles*/, pcstr mask /*= nullptr*/)
 {
     R_ASSERT(path);
     VERIFY(flags);
@@ -1219,7 +1222,7 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
     return dest.size();
 }
 
-void CLocatorAPI::check_cached_files(pstr fname, const u32& fname_size, const file& desc, pcstr& source_name)
+void CLocatorAPI::check_cached_files(pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name)
 {
     string_path fname_copy;
     if (m_paths.size() <= 1)
@@ -1229,9 +1232,9 @@ void CLocatorAPI::check_cached_files(pstr fname, const u32& fname_size, const fi
         return;
 
     LPCSTR path_base = get_path("$server_root$")->m_Path;
-    u32 len_base = xr_strlen(path_base);
+    size_t len_base = xr_strlen(path_base);
     LPCSTR path_file = fname;
-    u32 len_file = xr_strlen(path_file);
+    const size_t len_file = xr_strlen(path_file);
     if (len_file <= len_base)
         return;
 
@@ -1307,8 +1310,7 @@ void CLocatorAPI::file_from_cache_impl(CStreamReader*& R, LPSTR fname, const fil
     R = r;
 }
 
-template <typename T>
-void CLocatorAPI::file_from_cache(T*& R, pstr fname, const u32& fname_size, const file& desc, pcstr& source_name)
+template <typename T> void CLocatorAPI::file_from_cache(T*& R, pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name)
 {
 #ifdef DEBUG
     if (m_Flags.is(flCacheFiles))
@@ -1322,14 +1324,14 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
 {
     // Archived one
     archive& A = m_archives[desc.vfs];
-    u32 start = desc.ptr / dwAllocGranularity * dwAllocGranularity;
-    u32 end = (desc.ptr + desc.size_compressed) / dwAllocGranularity;
+    size_t start = desc.ptr / dwAllocGranularity * dwAllocGranularity;
+    size_t end = (desc.ptr + desc.size_compressed) / dwAllocGranularity;
     if ((desc.ptr + desc.size_compressed) % dwAllocGranularity)
         end += 1;
     end *= dwAllocGranularity;
     if (end > A.size)
         end = A.size;
-    u32 sz = end - start;
+    const size_t sz = end - start;
 #if defined(WINDOWS)
     u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
     VERIFY3(ptr, "cannot create file mapping on file", fname);
@@ -1338,7 +1340,6 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     VERIFY3(ptr && ptr != MAP_FAILED, "cannot create file mapping on file", fname);
 #endif
 
-
     string1024 temp;
     xr_sprintf(temp, sizeof temp, "%s:%s", *A.path, fname);
 
@@ -1346,7 +1347,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     register_file_mapping(ptr, sz, temp);
 #endif // DEBUG
 
-    u32 ptr_offs = desc.ptr - start;
+    size_t ptr_offs = desc.ptr - start;
     if (desc.size_real == desc.size_compressed)
     {
         R = new CPackReader(ptr, ptr + ptr_offs, desc.size_real);
@@ -1385,7 +1386,7 @@ void CLocatorAPI::file_from_archive(CStreamReader*& R, pcstr fname, const file& 
 void CLocatorAPI::copy_file_to_build(IWriter* W, IReader* r) { W->w(r->pointer(), r->length()); }
 void CLocatorAPI::copy_file_to_build(IWriter* W, CStreamReader* r)
 {
-    u32 buffer_size = r->length();
+    const size_t buffer_size = r->length();
     u8* buffer = xr_alloc<u8>(buffer_size);
     r->r(buffer, buffer_size);
     W->w(buffer, buffer_size);

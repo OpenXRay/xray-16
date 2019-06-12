@@ -18,7 +18,7 @@ Image& Image::Create(u16 width, u16 height, void* data, ImageFormat format)
 void Image::SaveTGA(const char* name, ImageFormat format, bool align)
 {
     FILE* file = std::fopen(name, "wb");
-    auto writerFunc = [&](void* data, u32 dataSize) { std::fwrite(data, dataSize, 1, file); };
+    auto writerFunc = [&](void* data, size_t dataSize) { std::fwrite(data, dataSize, 1, file); };
     SaveTGA(writerFunc, format, align);
     std::fclose(file);
 }
@@ -26,7 +26,7 @@ void Image::SaveTGA(const char* name, ImageFormat format, bool align)
 void Image::SaveTGA(IWriter& writer, bool align) { SaveTGA(writer, format, align); }
 void Image::SaveTGA(IWriter& writer, ImageFormat format, bool align)
 {
-    auto writerFunc = [&](void* data, u32 dataSize) { writer.w(data, dataSize); };
+    auto writerFunc = [&](void* data, size_t dataSize) { writer.w(data, dataSize); };
     SaveTGA(writerFunc, format, align);
 }
 

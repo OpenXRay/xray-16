@@ -101,8 +101,8 @@ public:
         out_end = out_start + _rsize;
         out_iterator = out_start;
     }
-    IC u32 InputSize() { return u32(in_end - in_start); }
-    IC u32 OutSize() { return u32(out_iterator - out_start); }
+    IC size_t InputSize() { return size_t(in_end - in_start); }
+    IC size_t OutSize() { return size_t(out_iterator - out_start); }
     IC u8* OutPointer() { return out_start; }
     IC void OutRelease()
     {
@@ -655,7 +655,7 @@ bool Decode(int total_size) /* recover */
     return true;
 }
 
-unsigned _writeLZ(int hf, void* d, unsigned size)
+size_t _writeLZ(int hf, void* d, size_t size)
 {
     u8* start = (u8*)d;
     fs.Init_Input(start, start + size);
@@ -663,14 +663,14 @@ unsigned _writeLZ(int hf, void* d, unsigned size)
     // Actual compression
     Encode();
     // Flush cache
-    int size_out = fs.OutSize();
+    size_t size_out = fs.OutSize();
     if (size_out)
         _write(hf, fs.OutPointer(), size_out);
     fs.OutRelease();
     return size_out;
 }
 
-void _compressLZ(u8** dest, unsigned* dest_sz, void* src, unsigned src_sz)
+void _compressLZ(u8** dest, size_t* dest_sz, void* src, size_t src_sz)
 {
     u8* start = (u8*)src;
     fs.Init_Input(start, start + src_sz);
@@ -679,7 +679,7 @@ void _compressLZ(u8** dest, unsigned* dest_sz, void* src, unsigned src_sz)
     *dest_sz = fs.OutSize();
 }
 
-bool _decompressLZ(u8** dest, unsigned* dest_sz, void* src, unsigned src_sz, int total_size /*= -1*/)
+bool _decompressLZ(u8** dest, size_t* dest_sz, void* src, size_t src_sz, size_t total_size /*= -1*/)
 {
     u8* start = (u8*)src;
     fs.Init_Input(start, start + src_sz);
@@ -692,7 +692,7 @@ bool _decompressLZ(u8** dest, unsigned* dest_sz, void* src, unsigned src_sz, int
     return true;
 }
 
-unsigned _readLZ(int hf, void*& d, unsigned size)
+size_t _readLZ(int hf, void*& d, size_t size)
 {
     // Read file in memory
     u8* data = (u8*)xr_malloc(size);
