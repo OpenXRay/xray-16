@@ -2,11 +2,11 @@
 #include "xrCommon/xr_vector.h"
 
 // messages
-#define REG_PRIORITY_LOW 0x11111111
-#define REG_PRIORITY_NORMAL 0x22222222
-#define REG_PRIORITY_HIGH 0x33333333
-#define REG_PRIORITY_CAPTURE 0x7fffffff
-#define REG_PRIORITY_INVALID 0x80000000 // -2147483648, lowest for int
+constexpr int REG_PRIORITY_LOW = 0x11111111;
+constexpr int REG_PRIORITY_NORMAL = 0x22222222;
+constexpr int REG_PRIORITY_HIGH = 0x33333333;
+constexpr int REG_PRIORITY_CAPTURE = 0x7fffffff;
+constexpr int REG_PRIORITY_INVALID = std::numeric_limits<int>::lowest();
 
 struct IPure
 {
@@ -98,9 +98,11 @@ public:
             messages[0].Object->OnPure();
         else
         {
-            for (int i = 0; i < messages.size(); i++)
-                if (messages[i].Prio != REG_PRIORITY_INVALID)
-                    messages[i].Object->OnPure();
+            for (auto& message : messages)
+            {
+                if (message.Prio != REG_PRIORITY_INVALID)
+                    message.Object->OnPure();
+            }
         }
 
         if (changed)
