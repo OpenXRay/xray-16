@@ -757,8 +757,8 @@ bool CLocatorAPI::Recurse(pcstr path)
     if (newSize > oldSize)
     {
         std::sort(rec_files.begin() + oldSize, rec_files.end(), pred_str_ff);
-        for (size_t i = oldSize; i < newSize; i++)
-            ProcessOne(path, rec_files[i]);
+        for (auto& file : rec_files)
+            ProcessOne(path, file);
         rec_files.erase(rec_files.begin() + oldSize, rec_files.end());
     }
     // insert self
@@ -827,13 +827,11 @@ pcstr one_folder_back_and_rescan(FS_Path* path)
 
     FS_Path* pFSRoot = FS.get_path("$fs_root$");
     pFSRoot->_set_root(newPath);
-    FS.rescan_path(pFSRoot->m_Path, pFSRoot->m_Flags.is(FS_Path::flRecurse));
     return pFSRoot->m_Path;
 }
 
 IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 {
-
     setup_fs_path(fs_name);
 
     // if (m_Flags.is(flTargetFolderOnly)) {
@@ -930,6 +928,9 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     else
     {
         IReader* pFSltx = setup_fs_ltx(fs_name);
+
+        FS_Path* pFSRoot = FS.get_path("$fs_root$");
+        FS.rescan_path(pFSRoot->m_Path, pFSRoot->m_Flags.is(FS_Path::flRecurse));
 
         // append all pathes
         string_path id, root, add, def, capt;
