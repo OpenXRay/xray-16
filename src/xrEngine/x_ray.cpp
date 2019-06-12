@@ -174,6 +174,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
             xr_free(level.folder);
             xr_free(level.name);
         }
+        Levels.clear();
     }
     else if (E == eStart)
     {
