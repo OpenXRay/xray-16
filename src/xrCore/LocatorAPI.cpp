@@ -809,15 +809,31 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
 #endif
 
     FS_Path* path = new FS_Path(full_current_directory, "", "", "", 0);
+
 #ifdef DEBUG
-    Msg("$fs_root$ = %s", full_current_directory);
-#endif // #ifdef DEBUG
+    Msg("initial $fs_root$ = %s", full_current_directory);
+#endif
 
     m_paths.insert(std::make_pair(xr_strdup("$fs_root$"), path));
 }
 
+pcstr one_folder_back_and_rescan(FS_Path* path)
+{
+    string_path newPath = {};
+    xr_strcpy(newPath, sizeof(newPath), path->m_Path);
+    newPath[xr_strlen(newPath) - 1] = 0;
+    if (strrchr(newPath, _DELIMITER))
+        * (strrchr(newPath, _DELIMITER) + 1) = 0;
+
+    FS_Path* pFSRoot = FS.get_path("$fs_root$");
+    pFSRoot->_set_root(newPath);
+    FS.rescan_path(pFSRoot->m_Path, pFSRoot->m_Flags.is(FS_Path::flRecurse));
+    return pFSRoot->m_Path;
+}
+
 IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 {
+
     setup_fs_path(fs_name);
 
     // if (m_Flags.is(flTargetFolderOnly)) {
@@ -831,11 +847,44 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 
     Log("using fs-ltx", fs_file_name);
 
+    IReader* result = nullptr;
     int file_handle;
     size_t file_size;
-    IReader* result = nullptr;
-    CHECK_OR_EXIT(file_handle_internal(fs_file_name, file_size, file_handle),
+
+    bool fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
+
+    if (!fsltx_is_available)
+    {
+        fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
+        fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
+    }
+
+    if (!fsltx_is_available)
+    {
+        fs_file_name = one_folder_back_and_rescan(FS.get_path("$app_root$"));
+        fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
+    }
+
+#ifndef MASTER_GOLD
+    if (!fsltx_is_available)
+    {
+        fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
+        fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
+    }
+
+    if (!fsltx_is_available)
+    {
+        fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
+        fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
+    }
+#endif // MASTER_GOLD
+
+    CHECK_OR_EXIT(fsltx_is_available,
         make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_file_name));
+
+#ifdef DEBUG
+    Msg("final $fs_root$ = %s", fs_file_name);
+#endif
 
     void* buffer = FileDownload(fs_file_name, file_handle, file_size);
     result = new CTempReader(buffer, file_size, 0);
@@ -881,31 +930,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     else
     {
         IReader* pFSltx = setup_fs_ltx(fs_name);
-        /*
-         pcstr fs_ltx = (fs_name&&fs_name[0])?fs_name:FSLTX;
-         F = r_open(fs_ltx);
-         if (!F&&m_Flags.is(flScanAppRoot))
-         F = r_open("$app_root$",fs_ltx);
 
-         if (!F)
-         {
-         string_path tmpAppPath = "";
-         xr_strcpy(tmpAppPath,sizeof(tmpAppPath), Core.ApplicationPath);
-         if (xr_strlen(tmpAppPath))
-         {
-         tmpAppPath[xr_strlen(tmpAppPath)-1] = 0;
-         if (strrchr(tmpAppPath, _DELIMITER))
-         *(strrchr(tmpAppPath, _DELIMITER)+1) = 0;
-
-         FS_Path* pFSRoot = FS.get_path("$fs_root$");
-         pFSRoot->_set_root (tmpAppPath);
-         rescan_path (pFSRoot->m_Path, pFSRoot->m_Flags.is(FS_Path::flRecurse));
-         }
-         F = r_open("$fs_root$",fs_ltx);
-         }
-
-         Log ("using fs-ltx",fs_ltx);
-         */
         // append all pathes
         string_path id, root, add, def, capt;
         pcstr lp_add, lp_def, lp_capt;
