@@ -192,7 +192,7 @@ void server_site::start_transfer_file(shared_str const& file_name, ClientID cons
 {
     if (is_transfer_active(to_client, from_client))
     {
-        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
+        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client.value());
         return;
     }
     filetransfer_node* ftnode = new filetransfer_node(file_name, data_max_chunk_size, tstate_callback);
@@ -210,7 +210,7 @@ void server_site::start_transfer_file(CMemoryWriter& mem_writer, u32 mem_writer_
 {
     if (is_transfer_active(to_client, from_client))
     {
-        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
+        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client.value());
         return;
     }
     filetransfer_node* ftnode =
@@ -223,7 +223,7 @@ void server_site::start_transfer_file(u8* data_ptr, u32 const data_size, ClientI
 {
     if (is_transfer_active(to_client, from_client))
     {
-        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
+        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client.value());
         return;
     }
     filetransfer_node* ftnode =
@@ -235,7 +235,7 @@ void server_site::start_transfer_file(buffer_vector<mutable_buffer_t>& vector_of
 {
     if (is_transfer_active(to_client, from_client))
     {
-        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
+        Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client.value());
         return;
     }
     filetransfer_node* ftnode =
@@ -248,7 +248,7 @@ void server_site::stop_transfer_file(dst_src_pair_t const& tkey)
     transfer_sessions_t::iterator temp_iter = m_transfers.find(tkey);
     if (temp_iter == m_transfers.end())
     {
-        Msg("! ERROR: SV: no file transfer for client [%d] found from client [%d].", tkey.first, tkey.second);
+        Msg("! ERROR: SV: no file transfer for client [%d] found from client [%d].", tkey.first.value(), tkey.second.value());
         return;
     }
     if (!temp_iter->second->is_complete())
@@ -270,7 +270,7 @@ filereceiver_node* server_site::start_receive_file(
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
     if (temp_iter != m_receivers.end())
     {
-        Msg("! ERROR: SV: file already receiving from client [%d]", from_client);
+        Msg("! ERROR: SV: file already receiving from client [%d]", from_client.value());
         return NULL;
     }
     filereceiver_node* frnode = new filereceiver_node(file_name, rstate_callback);
@@ -290,7 +290,7 @@ filereceiver_node* server_site::start_receive_file(
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
     if (temp_iter != m_receivers.end())
     {
-        Msg("! ERROR: SV: file already receiving from client [%d]", from_client);
+        Msg("! ERROR: SV: file already receiving from client [%d]", from_client.value());
         return NULL;
     }
     filereceiver_node* frnode = new filereceiver_node(&mem_writer, rstate_callback);
@@ -303,7 +303,7 @@ void server_site::stop_receive_file(ClientID const& from_client)
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
     if (temp_iter == m_receivers.end())
     {
-        Msg("! ERROR: SV: no file receiving from client [%u] found", from_client);
+        Msg("! ERROR: SV: no file receiving from client [%u] found", from_client.value());
         return;
     }
     if (!temp_iter->second->is_complete())
@@ -491,7 +491,7 @@ filereceiver_node* client_site::start_receive_file(
 {
     if (is_receiving_active(from_client))
     {
-        Msg("! ERROR: CL: file already receiving from client [%d]", from_client);
+        Msg("! ERROR: CL: file already receiving from client [%d]", from_client.value());
         return NULL;
     }
     filereceiver_node* frnode = new filereceiver_node(file_name, rstate_callback);
@@ -510,7 +510,7 @@ filereceiver_node* client_site::start_receive_file(
 {
     if (is_receiving_active(from_client))
     {
-        Msg("! ERROR: CL: file already receiving from client [%d]", from_client);
+        Msg("! ERROR: CL: file already receiving from client [%d]", from_client.value());
         return NULL;
     }
     mem_writer.clear();
@@ -524,7 +524,7 @@ void client_site::stop_receive_file(ClientID const& from_client)
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
     if (temp_iter == m_receivers.end())
     {
-        Msg("! ERROR: CL: no file receiving from client [%u] found", from_client);
+        Msg("! ERROR: CL: no file receiving from client [%u] found", from_client.value());
         return;
     }
     if (!temp_iter->second->is_complete())

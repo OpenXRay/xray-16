@@ -308,7 +308,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
 #ifdef DEBUG
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (l_pC && l_pC->ps)
-            Msg("--- GAME_EVENT_PLAYER_KILLED: sender [%d][0x%08x]", l_pC->ps->GameID, sender);
+            Msg("--- GAME_EVENT_PLAYER_KILLED: sender [%d][0x%08x]", l_pC->ps->GameID, sender.value());
 #endif // #ifdef DEBUG
         OnPlayerKilled(P);
     }
@@ -317,7 +317,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
 #ifdef DEBUG
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (l_pC && l_pC->ps)
-            Msg("--- GAME_EVENT_PLAYER_HITTED: sender [%d][0x%08x]", l_pC->ps->GameID, sender);
+            Msg("--- GAME_EVENT_PLAYER_HITTED: sender [%d][0x%08x]", l_pC->ps->GameID, sender.value());
 #endif // #ifdef DEBUG
         OnPlayerHitted(P);
     }
@@ -384,7 +384,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
     break;
     case GAME_EVENT_PLAYER_STARTED: {
 #ifdef DEBUG
-        Msg("--- Player 0x%08x started.", sender);
+        Msg("--- Player 0x%08x started.", sender.value());
 #endif // #ifdef DEBUG
         if (CheckPlayerMapName(sender, P))
         {
@@ -441,7 +441,7 @@ bool game_sv_mp::CheckPlayerMapName(ClientID const& clientID, NET_Packet& P)
 
     if (xr_strcmp(Level().name().c_str(), temp_map_name))
     {
-        Msg("! Player 0x%08x has incorrect map name", clientID, temp_map_name);
+        Msg("! Player 0x%08x has incorrect map name", clientID.value(), temp_map_name);
         // ReconnectPlayer(clientID);
         return false;
     }
@@ -453,7 +453,7 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 void game_sv_mp::ReconnectPlayer(ClientID const& clientID)
 {
 #ifdef DEBUG
-    Msg("--- Reconnecting player 0x%08x", clientID);
+    Msg("--- Reconnecting player 0x%08x", clientID.value());
 #endif // #ifdef DEBUG
     NET_Packet P;
     P.w_begin(M_CHANGE_LEVEL_GAME);
