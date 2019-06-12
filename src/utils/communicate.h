@@ -49,6 +49,26 @@ struct b_texture
     u32 dwHeight;
     BOOL bHasAlpha;
     u32* pSurface;
+
+    b_texture()
+        : name(), dwWidth(0), dwHeight(0),
+          bHasAlpha(FALSE), pSurface(nullptr) {}
+
+    b_texture(const b_texture& copy)
+        : name(), dwWidth(copy.dwWidth), dwHeight(copy.dwHeight),
+          bHasAlpha(copy.bHasAlpha), pSurface(copy.pSurface)
+    {
+        xr_strcpy(name, copy.name);
+    }
+
+    b_texture(IReader*& file)
+    {
+        file->r(&name, sizeof(name));
+        dwWidth = file->r_u32();
+        dwHeight = file->r_u32();
+        file->r(&bHasAlpha, sizeof(bHasAlpha));
+        pSurface = reinterpret_cast<u32*>(file->r_u32());
+    }
 };
 
 struct b_light_control // controller or "layer", 30fps

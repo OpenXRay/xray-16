@@ -116,14 +116,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
                 {
                     Logger.Progress(float(t) / float(tex_count));
 
-                    // В данном месте в случае 64-битной сборки происходит чтение лишних 4 байт из файла потому,
-                    // что читается структура с указателем, размер которого разный для 32 и 64-битных систем.
-                    // Как следствие, продолжение работы компилятора невозможно.
-                    b_texture TEX;
-                    F->r(&TEX, sizeof(TEX));
-
-                    b_BuildTexture BT;
-                    CopyMemory(&BT, &TEX, sizeof(TEX));
+                    b_BuildTexture BT(F);
 
                     // load thumbnail
                     string128& N = BT.name;

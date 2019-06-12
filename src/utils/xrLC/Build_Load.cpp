@@ -297,11 +297,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         {
             Logger.Progress(float(t) / float(tex_count));
 
-            b_texture TEX;
-            F->r(&TEX, sizeof(TEX));
-
-            b_BuildTexture BT;
-            CopyMemory(&BT, &TEX, sizeof(TEX));
+            b_BuildTexture BT(F);
 
             // load thumbnail
             LPSTR N = BT.name;

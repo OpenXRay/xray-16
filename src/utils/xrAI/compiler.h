@@ -85,6 +85,10 @@ struct b_BuildTexture : public b_texture
 {
     STextureParams THM;
 
+    b_BuildTexture() : b_texture() {}
+    b_BuildTexture(IReader*& file) : b_texture(file) {}
+    b_BuildTexture(const b_texture& p) : b_texture(p) {}
+
     u32& Texel(u32 x, u32 y) { return pSurface[y * dwWidth + x]; }
     void Vflip()
     {

@@ -116,14 +116,11 @@ void global_claculation_data::xrLoad()
             {
                 Logger.Progress(float(t) / float(tex_count));
 
-                b_texture TEX;
-                F->r(&TEX, sizeof(TEX));
-#ifdef DEBUG
-                dbg_textures.push_back(TEX);
-#endif
+                b_BuildTexture BT(F);
 
-                b_BuildTexture BT;
-                CopyMemory(&BT, &TEX, sizeof(TEX));
+#ifdef DEBUG
+                dbg_textures.push_back(static_cast<b_texture>(BT));
+#endif
 
                 // load thumbnail
                 LPSTR N = BT.name;
