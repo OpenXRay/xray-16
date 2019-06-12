@@ -1,7 +1,7 @@
 #pragma once
 #include "xrDebug_macros.h"
 
-template <class T, int granularity>
+template <class T, size_t granularity>
 class poolSS
 {
     T* list;

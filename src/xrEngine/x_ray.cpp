@@ -169,10 +169,10 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         SDL_Event quit = { SDL_QUIT };
         SDL_PushEvent(&quit);
 
-        for (u32 i = 0; i < Levels.size(); i++)
+        for (auto& level : Levels)
         {
-            xr_free(Levels[i].folder);
-            xr_free(Levels[i].name);
+            xr_free(level.folder);
+            xr_free(level.name);
         }
     }
     else if (E == eStart)
@@ -383,10 +383,10 @@ void CApplication::Level_Append(LPCSTR folder)
 
 void CApplication::Level_Scan()
 {
-    for (u32 i = 0; i < Levels.size(); i++)
+    for (auto& level : Levels)
     {
-        xr_free(Levels[i].folder);
-        xr_free(Levels[i].name);
+        xr_free(level.folder);
+        xr_free(level.name);
     }
     Levels.clear();
 

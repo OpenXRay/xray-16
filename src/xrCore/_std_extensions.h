@@ -193,7 +193,7 @@ inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCST
     return result;
 }
 
-template <int count>
+template <size_t count>
 inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, ...)
 {
     va_list args;
@@ -244,13 +244,13 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 }
 #endif // #ifndef MASTER_GOLD
 
-template <int count>
+template <size_t count>
 inline int xr_strcpy(char(&destination)[count], LPCSTR source)
 {
     return xr_strcpy(destination, count, source);
 }
 
-template <int count>
+template <size_t count>
 inline int xr_strcat(char(&destination)[count], LPCSTR source)
 {
     return xr_strcat(destination, count, source);

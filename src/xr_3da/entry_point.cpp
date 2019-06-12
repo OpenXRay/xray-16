@@ -36,7 +36,7 @@ int entry_point(pcstr commandLine)
     string_path fsgame = "";
     if (strstr(commandLine, fsltx))
     {
-        const u32 sz = xr_strlen(fsltx);
+        const size_t sz = xr_strlen(fsltx);
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
     Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);

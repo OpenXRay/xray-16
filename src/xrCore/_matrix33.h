@@ -286,7 +286,7 @@ public:
     //--------------------------------------------------------------------------------
     // other unused function
     //--------------------------------------------------------------------------------
-    IC SelfRef McolcMcol(int cr, SelfCRef M, int c)
+    IC SelfRef McolcMcol(size_t cr, SelfCRef M, size_t c)
     {
         m[0][cr] = M.m[0][c];
         m[1][cr] = M.m[1][c];

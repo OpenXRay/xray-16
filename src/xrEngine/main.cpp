@@ -366,7 +366,7 @@ bool CheckBenchmark()
     pcstr benchName = "-batch_benchmark ";
     if (strstr(Core.Params, benchName))
     {
-        const u32 sz = xr_strlen(benchName);
+        const size_t sz = xr_strlen(benchName);
         string64 benchmarkName;
         sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
         RunBenchmark(benchmarkName);
@@ -376,7 +376,7 @@ bool CheckBenchmark()
     pcstr sashName = "-openautomate ";
     if (strstr(Core.Params, sashName))
     {
-        const u32 sz = xr_strlen(sashName);
+        const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
 #if !defined(LINUX)

@@ -326,7 +326,7 @@ void motions_container::dump()
     auto it = container.begin();
     auto _E = container.end();
     Log("--- motion container --- begin:");
-    u32 sz = sizeof(*this);
+    size_t sz = sizeof(*this);
     for (u32 k = 0; it != _E; k++, it++)
     {
         sz += it->second->mem_usage();

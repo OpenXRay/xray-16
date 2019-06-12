@@ -205,7 +205,7 @@ void CEffect_Rain::p_create()
 {
     // pool
     particle_pool.resize(max_particles);
-    for (u32 it = 0; it < particle_pool.size(); it++)
+    for (size_t it = 0; it < particle_pool.size(); it++)
     {
         Particle& P = particle_pool[it];
         P.prev = it ? (&particle_pool[it - 1]) : 0;

@@ -69,7 +69,7 @@ public:
 
         u32 result = m_strings[0].second;
 
-        for (u32 j = 1; j < m_count; ++j)
+        for (size_t j = 1; j < m_count; ++j)
             result += m_strings[j].second;
 
         if (result > max_concat_result_size)
@@ -88,7 +88,7 @@ public:
         memcpy(i, m_strings[0].first, m_strings[0].second * sizeof(*m_strings[0].first));
         i += m_strings[0].second;
 
-        for (u32 j = 1; j < m_count; ++j)
+        for (size_t j = 1; j < m_count; ++j)
         {
             memcpy(i, m_strings[j].first, m_strings[j].second * sizeof(*m_strings[j].first));
             i += m_strings[j].second;

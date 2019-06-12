@@ -161,7 +161,7 @@ struct CLoader
     {
         if (p.can_clear())
             data.clear();
-        const u32 prev_count = data.size();
+        const size_t prev_count = data.size();
         data.resize(prev_count + stream.r_u32());
         xr_vector<bool>::iterator I = data.begin() + prev_count;
         xr_vector<bool>::iterator E = data.end();

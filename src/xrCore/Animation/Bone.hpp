@@ -495,10 +495,10 @@ private:
     float hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
 
 public:
-    virtual u32 mem_usage()
+    virtual size_t mem_usage()
     {
-        u32 sz = sizeof(*this) + sizeof(vecBones::value_type) * children.size();
-        for (auto c_it = child_faces.begin(); c_it != child_faces.end(); c_it++)
+        size_t sz = sizeof(*this) + sizeof(vecBones::value_type) * children.size();
+        for (auto c_it = child_faces.begin(); c_it != child_faces.end(); ++c_it)
             sz += c_it->size() * sizeof(FacesVec::value_type) + sizeof(*c_it);
         return sz;
     }

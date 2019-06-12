@@ -461,7 +461,7 @@ EGameActions action_name_to_id(pcstr _name)
 
 _action* action_name_to_ptr(pcstr _name)
 {
-    int idx = 0;
+    size_t idx = 0;
     while (actions[idx].action_name)
     {
         if (!xr_stricmp(_name, actions[idx].action_name))
@@ -469,7 +469,7 @@ _action* action_name_to_ptr(pcstr _name)
         ++idx;
     }
     Msg("! [action_name_to_ptr] cant find corresponding 'id' for '%s'", _name);
-    return NULL;
+    return nullptr;
 }
 
 bool is_binded(EGameActions _action_id, int _dik)
@@ -512,7 +512,7 @@ int keyname_to_dik(pcstr _name)
 
 _keyboard* keyname_to_ptr(pcstr _name)
 {
-    int idx = 0;
+    size_t idx = 0;
     while (keyboards[idx].key_name)
     {
         _keyboard& kb = keyboards[idx];

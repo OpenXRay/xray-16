@@ -28,7 +28,8 @@
 //-------------------------------------------------------------------------------------------------
 void CPerlinNoise1D::init()
 {
-    int i, j, k;
+    int k;
+    size_t i, j;
 
     for (i = 0; i < B; i++)
     {
@@ -99,7 +100,7 @@ float CPerlinNoise1D::GetContinious(float v)
     float result = 0.0f;
     float amp = mAmplitude;
     v *= mFrequency;
-    for (int i = 0; i < mOctaves; i++)
+    for (size_t i = 0; i < mOctaves; i++)
     {
         float octave_time = mTimes[i];
         mTimes[i] = octave_time + v;
@@ -115,7 +116,8 @@ float CPerlinNoise1D::GetContinious(float v)
 //-------------------------------------------------------------------------------------------------
 void CPerlinNoise2D::init()
 {
-    int i, j, k;
+    int k;
+    size_t i, j;
 
     for (i = 0; i < B; i++)
     {
@@ -216,7 +218,8 @@ float CPerlinNoise2D::Get(float x, float y)
 //-------------------------------------------------------------------------------------------------
 void CPerlinNoise3D::init()
 {
-    int i, j, k;
+    int k;
+    size_t i, j;
 
     for (i = 0; i < B; i++)
     {

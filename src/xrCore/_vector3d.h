@@ -19,8 +19,8 @@ struct _vector3
     T x, y, z;
 
     // access operators
-    ICF T& operator[](int i) { return *((T*)this + i); }
-    ICF T& operator[](int i) const { return *((T*)this + i); }
+    ICF T& operator[](size_t i) { return *((T*)this + i); }
+    ICF T& operator[](size_t i) const { return *((T*)this + i); }
 
     ICF SelfRef set(T _x, T _y, T _z) noexcept
     {

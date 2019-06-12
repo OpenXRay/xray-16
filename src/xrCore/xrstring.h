@@ -25,7 +25,7 @@
 struct XRCORE_API str_value
 {
     u32 dwReference;
-    u32 dwLength;
+    u32 dwLength; // XXX: replace u32 with size_t
     u32 dwCRC;
     str_value* next;
     char value[];
@@ -216,7 +216,7 @@ IC void xr_strlwr(shared_str& src)
 #if defined(WINDOWS)
         xr_strlwr(lp);
 #elif defined(LINUX)
-        int i = 0;
+        size_t i = 0;
         while(lp[i])
         {
             lp[i] = (char) std::tolower(lp[i], std::locale());
@@ -230,7 +230,7 @@ IC void xr_strlwr(shared_str& src)
 
 IC char * xr_strlwr(char * src)
 {
-    int i = 0;
+    size_t i = 0;
     while(src[i])
     {
     	src[i] = (char) tolower(src[i]);// TODO rewrite locale-independent toupper_l()
