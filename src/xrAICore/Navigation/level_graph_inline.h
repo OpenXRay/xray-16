@@ -84,10 +84,11 @@ ICF const Fvector& CLevelGraph::vertex_position(
 IC const CLevelGraph::CPosition& CLevelGraph::vertex_position(
     CLevelGraph::CPosition& dest_position, const Fvector& source_position) const
 {
-    VERIFY(iFloor((source_position.z - header().box().vMin.z) / header().cell_size() + .5f) < (int)m_row_length);
-    int pxz = iFloor(((source_position.x - header().box().vMin.x) / header().cell_size() + .5f)) * m_row_length +
-        iFloor((source_position.z - header().box().vMin.z) / header().cell_size() + .5f);
-    int py = iFloor(65535.f * (source_position.y - header().box().vMin.y) / header().factor_y() + EPS_S);
+    const auto& box = header().box();
+    VERIFY(iFloor((source_position.z - box.vMin.z) / header().cell_size() + .5f) < (int)m_row_length);
+    int pxz = iFloor(((source_position.x - box.vMin.x) / header().cell_size() + .5f)) * m_row_length +
+        iFloor((source_position.z - box.vMin.z) / header().cell_size() + .5f);
+    int py = iFloor(65535.f * (source_position.y - box.vMin.y) / header().factor_y() + EPS_S);
     VERIFY(pxz < (1 << MAX_NODE_BIT_COUNT) - 1);
     dest_position.xz(u32(pxz));
     clamp(py, 0, 65535);
@@ -487,18 +488,19 @@ IC void CLevelGraph::assign_y_values(xr_vector<T>& path)
 IC u32 CLevelGraph::row_length() const { return (m_row_length); }
 IC bool CLevelGraph::valid_vertex_position(const Fvector& position) const
 {
-    if ((position.x < header().box().vMin.x - header().cell_size() * .5f) ||
-        (position.x > header().box().vMax.x + header().cell_size() * .5f) ||
-        (position.z < header().box().vMin.z - header().cell_size() * .5f) ||
-        (position.z > header().box().vMax.z + header().cell_size() * .5f))
+    const auto& box = header().box();
+    if ((position.x < box.vMin.x - header().cell_size() * .5f) ||
+        (position.x > box.vMax.x + header().cell_size() * .5f) ||
+        (position.z < box.vMin.z - header().cell_size() * .5f) ||
+        (position.z > box.vMax.z + header().cell_size() * .5f))
     {
         return false;
     }
 
-    if (!(iFloor((position.z - header().box().vMin.z) / header().cell_size() + .5f) < (int)m_row_length))
+    if (!(iFloor((position.z - box.vMin.z) / header().cell_size() + .5f) < (int)m_row_length))
         return (false);
 
-    if (!(iFloor((position.x - header().box().vMin.x) / header().cell_size() + .5f) < (int)m_column_length))
+    if (!(iFloor((position.x - box.vMin.x) / header().cell_size() + .5f) < (int)m_column_length))
         return (false);
 
     return ((vertex_position(position).xz() < (1 << MAX_NODE_BIT_COUNT) - 1));

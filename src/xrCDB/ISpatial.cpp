@@ -275,7 +275,9 @@ void ISpatial_DB::insert(ISpatial* S)
 #ifdef DEBUG
     Stats.Insert.Begin();
 
-    BOOL bValid = _valid(S->GetSpatialData().sphere.R) && _valid(S->GetSpatialData().sphere.P);
+    const auto& spatialData = S->GetSpatialData();
+
+    BOOL bValid = _valid(spatialData.sphere.R) && _valid(spatialData.sphere.P);
     if (!bValid)
     {
         IGameObject* O = dynamic_cast<IGameObject*>(S);
@@ -287,10 +289,10 @@ void ISpatial_DB::insert(ISpatial* S)
             CPS_Instance* P = dynamic_cast<CPS_Instance*>(S);
             if (P)
                 xrDebug::Fatal(DEBUG_INFO, "Invalid PS spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",
-                    VPUSH(S->GetSpatialData().sphere.P), S->GetSpatialData().sphere.R);
+                    VPUSH(spatialData.sphere.P), spatialData.sphere.R);
             else
                 xrDebug::Fatal(DEBUG_INFO, "Invalid OTHER spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",
-                    VPUSH(S->GetSpatialData().sphere.P), S->GetSpatialData().sphere.R);
+                    VPUSH(spatialData.sphere.P), spatialData.sphere.R);
 #else
             // In Linux there is a linking issue because `CPS_Instance` belongs to xrEngine
             // and is not available to xrCDB due to source code organization

@@ -57,8 +57,9 @@ BOOL CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results&
         }
     } pick((collide::ray_defs&)(Q), (const IGameObject&)(*owner), (IKinematics&)(*K));
 
-    R.r_results().erase(
-        std::remove_if(R.r_results().begin() + s_count, R.r_results().end(), pick), R.r_results().end());
+    auto& r_results = R.r_results();
+    r_results.erase(
+        std::remove_if(r_results.begin() + s_count, r_results.end(), pick), r_results.end());
     /*
     for( collide::rq_result* i = R.r_begin() + s_count; i < R.r_end(); ++i )
     {

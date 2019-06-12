@@ -15,8 +15,8 @@
 
 CPatrolPathParams::CPatrolPathParams(LPCSTR caPatrolPathToGo, EPatrolStartType tPatrolPathStart,
     EPatrolRouteType tPatrolPathStop, bool bRandom, u32 index)
+    : m_path_name(caPatrolPathToGo)
 {
-    m_path_name = caPatrolPathToGo;
     m_path = GEnv.AISpace->patrol_paths().path(m_path_name, true);
 
     THROW3(m_path, "There is no patrol path", caPatrolPathToGo);

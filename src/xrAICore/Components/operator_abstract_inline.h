@@ -24,9 +24,8 @@ IC CAbstractOperator::COperatorAbstract()
 
 TEMPLATE_SPECIALIZATION
 IC CAbstractOperator::COperatorAbstract(const CSConditionState& conditions, const CSConditionState& effects)
+    : m_conditions(conditions), m_effects(effects)
 {
-    m_conditions = conditions;
-    m_effects = effects;
     m_actuality = 0;
     m_weight_actual = false;
     m_min_weight = 0;

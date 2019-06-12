@@ -183,12 +183,13 @@ void CCF_Skeleton::BuildState()
         case SBoneShape::stCylinder:
         {
             const Fcylinder& C = shape.cylinder;
-            Mbone.transform_tiny(I->c_cylinder.m_center, C.m_center);
-            L2W.transform_tiny(I->c_cylinder.m_center);
-            Mbone.transform_dir(I->c_cylinder.m_direction, C.m_direction);
-            L2W.transform_dir(I->c_cylinder.m_direction);
-            I->c_cylinder.m_height = C.m_height;
-            I->c_cylinder.m_radius = C.m_radius;
+            auto& c_cylinder = I->c_cylinder;
+            Mbone.transform_tiny(c_cylinder.m_center, C.m_center);
+            L2W.transform_tiny(c_cylinder.m_center);
+            Mbone.transform_dir(c_cylinder.m_direction, C.m_direction);
+            L2W.transform_dir(c_cylinder.m_direction);
+            c_cylinder.m_height = C.m_height;
+            c_cylinder.m_radius = C.m_radius;
         }
         break;
         }
