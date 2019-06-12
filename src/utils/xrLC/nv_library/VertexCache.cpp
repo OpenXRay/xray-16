@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "VertexCache.h"
 
-VertexCache::VertexCache() { VertexCache(16); }
+VertexCache::VertexCache() : VertexCache(16) {}
 VertexCache::VertexCache(int size) { entries.assign(size, -1); }
 VertexCache::~VertexCache() { entries.clear(); }
 int VertexCache::At(int index) { return entries[index]; }
