@@ -503,7 +503,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                     string512 tmp;
                     _GetItem(inherited_names, k, tmp);
                     Sect& inherited_section = r_section(tmp);
-                    for (auto it = inherited_section.Data.begin(); it != inherited_section.Data.end(); it++)
+                    for (auto it = inherited_section.Data.begin(); it != inherited_section.Data.end(); ++it)
                         insert_item(Current, *it);
                 }
             }
@@ -686,7 +686,7 @@ u32 CInifile::line_count(pcstr Sname) const
     Sect& S = r_section(Sname);
     auto I = S.Data.cbegin();
     u32 C = 0;
-    for (; I != S.Data.cend(); I++)
+    for (; I != S.Data.cend(); ++I)
         if (*I->first)
             C++;
     return C;
@@ -911,7 +911,7 @@ bool CInifile::r_line(pcstr S, int L, pcstr* N, pcstr* V) const
     Sect& SS = r_section(S);
     if (L >= (int)SS.Data.size() || L < 0)
         return false;
-    for (auto I = SS.Data.cbegin(); I != SS.Data.cend(); I++)
+    for (auto I = SS.Data.cbegin(); I != SS.Data.cend(); ++I)
         if (!L--)
         {
             *N = *I->first;

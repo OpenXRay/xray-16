@@ -266,7 +266,7 @@ LPSTR _ChangeSymbol(LPSTR name, char src, char dest)
 
 xr_string& _ChangeSymbol(xr_string& name, char src, char dest)
 {
-    for (xr_string::iterator it = name.begin(); it != name.end(); it++)
+    for (xr_string::iterator it = name.begin(); it != name.end(); ++it)
         if (*it == src)
             *it = xr_string::value_type(dest);
     return name;
@@ -446,7 +446,7 @@ xr_string _ListToSequence(const SStringVec& lst)
     if (lst.size())
     {
         out = lst.front();
-        for (SStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); s_it++)
+        for (SStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); ++s_it)
             out += xr_string(",") + (*s_it);
     }
     return out;
@@ -515,7 +515,7 @@ shared_str _ListToSequence(const RStringVec& lst)
     if (lst.size())
     {
         out = *lst.front();
-        for (RStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); s_it++)
+        for (RStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); ++s_it)
         {
             out += ",";
             out += **s_it;

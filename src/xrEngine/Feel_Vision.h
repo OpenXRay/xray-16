@@ -57,14 +57,14 @@ public:
     {
         R.clear();
         xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
-        for (; I != E; I++)
+        for (; I != E; ++I)
             if (positive(I->fuzzy))
                 R.push_back(I->O);
     }
     Fvector feel_vision_get_vispoint(IGameObject* _O)
     {
         xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
-        for (; I != E; I++)
+        for (; I != E; ++I)
             if (_O == I->O)
             {
                 VERIFY(positive(I->fuzzy));

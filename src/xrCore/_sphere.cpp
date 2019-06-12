@@ -128,7 +128,7 @@ void Miniball::mtf_mb(It i)
 void Miniball::move_to_front(It j)
 {
     if (support_end == j)
-        support_end++;
+        ++support_end;
     L.splice(L.begin(), L, j);
 }
 

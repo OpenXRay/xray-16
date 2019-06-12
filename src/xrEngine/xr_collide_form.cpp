@@ -132,7 +132,7 @@ void CCF_Skeleton::BuildState()
         }
     }
 
-    for (auto I = elements.begin(); I != elements.end(); I++)
+    for (auto I = elements.begin(); I != elements.end(); ++I)
     {
         if (!I->valid())
             continue;
@@ -242,7 +242,7 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
     }
 
     BOOL bHIT = FALSE;
-    for (auto I = elements.begin(); I != elements.end(); I++)
+    for (auto I = elements.begin(); I != elements.end(); ++I)
     {
         if (!I->valid())
             continue;

@@ -80,7 +80,7 @@ inline bool CSDijkstra::step(TPathManager& path_manager)
     // iterating on the best node neighbours
     typename TPathManager::const_iterator i, e;
     path_manager.begin(best.index(), i, e);
-    for (; i != e; i++)
+    for (; i != e; ++i)
     {
         const Index& neighbour_index = path_manager.get_value(i);
         // check if neighbour is accessible

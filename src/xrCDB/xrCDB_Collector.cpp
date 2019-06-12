@@ -12,7 +12,7 @@ u32 Collector::VPack(const Fvector& V, float eps)
     xr_vector<Fvector>::iterator I, E;
     I = verts.begin();
     E = verts.end();
-    for (; I != E; I++)
+    for (; I != E; ++I)
         if (I->similar(V, eps))
             return u32(I - verts.begin());
 
@@ -366,7 +366,7 @@ u32 CollectorPacked::VPack(const Fvector& V)
 
     {
         DWORDList* vl = &(VM[ix][iy][iz]);
-        for (DWORDIt it = vl->begin(); it != vl->end(); it++)
+        for (DWORDIt it = vl->begin(); it != vl->end(); ++it)
             if (verts[*it].similar(V))
             {
                 P = *it;

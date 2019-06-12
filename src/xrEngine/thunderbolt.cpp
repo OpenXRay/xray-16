@@ -89,7 +89,7 @@ void SThunderboltCollection::load(CInifile const* pIni, CInifile const* thunderb
 }
 SThunderboltCollection::~SThunderboltCollection()
 {
-    for (auto d_it = palette.begin(); d_it != palette.end(); d_it++)
+    for (auto d_it = palette.begin(); d_it != palette.end(); ++d_it)
         xr_delete(*d_it);
 
     palette.clear();
@@ -121,7 +121,7 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
 
 CEffect_Thunderbolt::~CEffect_Thunderbolt()
 {
-    for (auto d_it = collection.begin(); d_it != collection.end(); d_it++)
+    for (auto d_it = collection.begin(); d_it != collection.end(); ++d_it)
         xr_delete(*d_it);
 
     collection.clear();

@@ -60,7 +60,7 @@ EVENT CEventAPI::Create(const char* N)
 {
     CS.Enter();
     CEvent E(N);
-    for (xr_vector<CEvent*>::iterator I = Events.begin(); I != Events.end(); I++)
+    for (xr_vector<CEvent*>::iterator I = Events.begin(); I != Events.end(); ++I)
     {
         if ((*I)->Equal(E))
         {

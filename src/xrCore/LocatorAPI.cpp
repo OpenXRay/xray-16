@@ -1631,7 +1631,7 @@ bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)
             files_it cur_item = I;
             const file& entry = *cur_item;
             I = cur_item;
-            I++;
+            ++I;
             if (0 != strncmp(entry.name, fpath, base_len))
                 break; // end of list
             const char* end_symbol = entry.name + xr_strlen(entry.name) - 1;
@@ -1651,7 +1651,7 @@ bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)
     }
     // remove folders
     files_set::reverse_iterator r_it = folders.rbegin();
-    for (; r_it != folders.rend(); r_it++)
+    for (; r_it != folders.rend(); ++r_it)
     {
         const char* end_symbol = r_it->name + xr_strlen(r_it->name) - 1;
         if (*end_symbol == _DELIMITER)
@@ -1847,7 +1847,7 @@ void CLocatorAPI::rescan_path(pcstr full_path, bool bRecurse)
         files_it cur_item = I;
         const file& entry = *cur_item;
         I = cur_item;
-        I++;
+        ++I;
         if (0 != strncmp(entry.name, full_path, base_len))
             break; // end of list
         if (entry.vfs != 0xFFFFFFFF)

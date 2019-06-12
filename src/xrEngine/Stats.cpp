@@ -229,7 +229,7 @@ void CStats::OnRender()
         GEnv.Sound->statistic(0, &snd_stat_ext);
         auto _I = snd_stat_ext.items.begin();
         auto _E = snd_stat_ext.items.end();
-        for (; _I != _E; _I++)
+        for (; _I != _E; ++_I)
         {
             const CSound_stats_ext::SItem& item = *_I;
             if (item._3D)

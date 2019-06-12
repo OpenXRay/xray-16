@@ -284,7 +284,7 @@ void CBoneData::CalculateM2B(const Fmatrix& parent)
     m2b_transform.mul_43(parent, bind_transform);
 
     // Calculate children
-    for (xr_vector<CBoneData*>::iterator C = children.begin(); C != children.end(); C++)
+    for (xr_vector<CBoneData*>::iterator C = children.begin(); C != children.end(); ++C)
         (*C)->CalculateM2B(m2b_transform);
 
     m2b_transform.invert();

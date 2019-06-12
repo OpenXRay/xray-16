@@ -36,7 +36,7 @@ inline void CEdgePathBuilder::get_edge_path(xr_vector<TEdge>& path, Vertex* best
 {
     Vertex *t1 = best, *t2 = best->back();
     size_t i;
-    for (i = 1; t2; t1 = t2, t2 = t2->back(), i++)
+    for (i = 1; t2; t1 = t2, t2 = t2->back(), ++i)
         ;
     size_t n = path.size();
     i--;
@@ -45,13 +45,13 @@ inline void CEdgePathBuilder::get_edge_path(xr_vector<TEdge>& path, Vertex* best
     if (!reverse_order)
     {
         auto it = path.rbegin();
-        for (; t2->back(); t2 = t2->back(), it++)
+        for (; t2->back(); t2 = t2->back(), ++it)
             *it = t2->edge();
     }
     else
     {
         auto it = path.begin() + n;
-        for (; t2->back(); t2 = t2->back(), it++)
+        for (; t2->back(); t2 = t2->back(), ++it)
             *it = t2->edge();
     }
 }

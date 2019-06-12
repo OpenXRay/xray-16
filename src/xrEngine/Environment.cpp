@@ -325,7 +325,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
             NormalizeTime(fGameTime - ((rewind_tm / (Current[1]->exec_time - fGameTime)) * current_length - rewind_tm));
         C1->copy(*Current[1]);
         C1->exec_time = NormalizeTime(start_tm);
-        for (auto t_it = CurrentWeather->begin() + 2; t_it != CurrentWeather->end() - 1; t_it++)
+        for (auto t_it = CurrentWeather->begin() + 2; t_it != CurrentWeather->end() - 1; ++t_it)
             (*t_it)->exec_time = NormalizeTime(start_tm + (*t_it)->exec_time_loaded);
         SelectEnv(PrevWeather, WFX_end_desc[0], CE->exec_time);
         SelectEnv(PrevWeather, WFX_end_desc[1], WFX_end_desc[0]->exec_time + 0.5f);
@@ -359,7 +359,7 @@ bool CEnvironment::StartWeatherFXFromTime(shared_str name, float time)
     if (!SetWeatherFX(name))
         return false;
 
-    for (auto it = CurrentWeather->begin(); it != CurrentWeather->end(); it++)
+    for (auto it = CurrentWeather->begin(); it != CurrentWeather->end(); ++it)
         (*it)->exec_time = NormalizeTime((*it)->exec_time - wfx_time + time);
 
     wfx_time = time;

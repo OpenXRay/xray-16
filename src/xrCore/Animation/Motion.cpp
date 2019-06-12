@@ -190,7 +190,7 @@ BOOL COMotion::NormalizeKeys(float from_time, float to_time, float speed)
     float t0 = E->keys.front()->time;
     FloatVec tms;
     tms.push_back(t0);
-    for (KeyIt it = E->keys.begin() + 1; it != E->keys.end(); it++)
+    for (KeyIt it = E->keys.begin() + 1; it != E->keys.end(); ++it)
     {
         if ((*it)->time > from_time)
         {
@@ -223,7 +223,7 @@ BOOL COMotion::NormalizeKeys(float from_time, float to_time, float speed)
         E = Envelope(EChannelType(ch));
         FloatIt f_it = tms.begin();
         VERIFY(tms.size() == E->keys.size());
-        for (KeyIt k_it = E->keys.begin(); k_it != E->keys.end(); k_it++, f_it++)
+        for (KeyIt k_it = E->keys.begin(); k_it != E->keys.end(); ++k_it, ++f_it)
             (*k_it)->time = *f_it;
     }
 
@@ -267,7 +267,7 @@ CSMotion::CSMotion(CSMotion* source) : CCustomMotion(source)
 CSMotion::~CSMotion() { Clear(); }
 void CSMotion::Clear()
 {
-    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
     {
         for (int ch = 0; ch < ctMaxChannel; ch++)
             xr_delete(bm_it->envs[ch]);
@@ -277,7 +277,7 @@ void CSMotion::Clear()
 
 st_BoneMotion* CSMotion::FindBoneMotion(shared_str name)
 {
-    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
         if (bm_it->name.equal(name))
             return &*bm_it;
     return 0;
@@ -372,7 +372,7 @@ void CSMotion::Save(IWriter& F)
     F.w_float(fFalloff);
     F.w_float(fPower);
     F.w_u16((u16)bone_mots.size());
-    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
     {
         xr_strlwr(bm_it->name);
         F.w_stringZ(bm_it->name);
@@ -401,7 +401,7 @@ bool CSMotion::Load(IReader& F)
         fPower = F.r_float();
         bone_mots.resize(F.r_u32());
         string64 temp_buf;
-        for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+        for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
         {
             bm_it->SetName(xr_itoa(int(bm_it - bone_mots.begin()), temp_buf, 10));
             bm_it->m_Flags.assign((u8)F.r_u32());
@@ -424,7 +424,7 @@ bool CSMotion::Load(IReader& F)
             fPower = F.r_float();
             bone_mots.resize(F.r_u32());
             string64 buf;
-            for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+            for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
             {
                 F.r_stringZ(buf, sizeof(buf));
                 bm_it->SetName(buf);
@@ -448,7 +448,7 @@ bool CSMotion::Load(IReader& F)
                 fPower = F.r_float();
                 bone_mots.resize(F.r_u16());
                 string64 buf;
-                for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+                for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
                 {
                     F.r_stringZ(buf, sizeof(buf));
                     bm_it->SetName(buf);
@@ -473,14 +473,14 @@ bool CSMotion::Load(IReader& F)
         }
     }
 
-    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
         xr_strlwr(bm_it->name);
     return true;
 }
 
 void CSMotion::Optimize()
 {
-    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
+    for (auto bm_it = bone_mots.begin(); bm_it != bone_mots.end(); ++bm_it)
     {
         for (int ch = 0; ch < ctMaxChannel; ch++)
             bm_it->envs[ch]->Optimize();

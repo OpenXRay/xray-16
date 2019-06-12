@@ -49,7 +49,7 @@ void CLAItem::Save(IWriter& F)
 
     F.open_chunk(CHUNK_ITEM_KEYS);
     F.w_u32(Keys.size());
-    for (auto it = Keys.begin(); it != Keys.end(); it++)
+    for (auto it = Keys.begin(); it != Keys.end(); ++it)
     {
         F.w_u32(it->first);
         F.w_u32(it->second);
@@ -119,11 +119,11 @@ u32 CLAItem::InterpolateRGB(int frame)
         B = Keys.upper_bound(frame); // ищем следующий ключ
         if (B == Keys.end()) // если его нет вернем цвет последнего ключа
         {
-            B--;
+            --B;
             return B->second;
         }
         A = B; // иначе в A занесем предыдущий ключ
-        A--;
+        --A;
     }
 
     R_ASSERT(Keys.size() > 1);
@@ -162,7 +162,7 @@ int CLAItem::PrevKeyFrame(int frame)
     if (A != Keys.end())
     {
         auto B = A;
-        B--;
+        --B;
         if (B != Keys.end())
             return B->first;
         return A->first;
@@ -195,7 +195,7 @@ void ELightAnimLibrary::OnCreate() { Load(); }
 void ELightAnimLibrary::OnDestroy() { Unload(); }
 void ELightAnimLibrary::Unload()
 {
-    for (LAItemIt it = Items.begin(); it != Items.end(); it++)
+    for (LAItemIt it = Items.begin(); it != Items.end(); ++it)
         xr_delete(*it);
     Items.clear();
 }
@@ -222,7 +222,7 @@ XR_EXPORT void ELightAnimLibrary::Load()
                 I->Load(*O);
                 if (version == 0)
                 {
-                    for (auto it = I->Keys.begin(); it != I->Keys.end(); it++)
+                    for (auto it = I->Keys.begin(); it != I->Keys.end(); ++it)
                         it->second = subst_alpha(bgr2rgb(it->second), color_get_A(it->second));
                 }
                 Items.push_back(I);
@@ -244,7 +244,7 @@ void ELightAnimLibrary::Save()
     F.close_chunk();
     F.open_chunk(CHUNK_ITEM_LIST);
     int count = 0;
-    for (LAItemIt it = Items.begin(); it != Items.end(); it++)
+    for (LAItemIt it = Items.begin(); it != Items.end(); ++it)
     {
         F.open_chunk(count++);
         (*it)->Save(F);
@@ -268,7 +268,7 @@ void ELightAnimLibrary::Reload()
 LAItemIt ELightAnimLibrary::FindItemI(LPCSTR name)
 {
     if (name && name[0])
-        for (LAItemIt it = Items.begin(); it != Items.end(); it++)
+        for (LAItemIt it = Items.begin(); it != Items.end(); ++it)
             if (0 == xr_strcmp((*it)->cName.c_str(), name))
                 return it;
     return Items.end();

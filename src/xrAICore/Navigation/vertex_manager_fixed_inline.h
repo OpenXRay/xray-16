@@ -36,7 +36,7 @@ inline void CFixedVertexManager::init()
     if (!m_current_path_id)
     {
         ZeroMemory(m_indexes, m_max_node_count * sizeof(IndexVertex));
-        m_current_path_id++;
+        ++m_current_path_id;
     }
 }
 
