@@ -446,7 +446,6 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
     IReader* hdr = open_chunk(A.hSrcFile, 1, A.path.c_str(), A.size, shouldDecrypt);
 
     R_ASSERT(hdr);
-    RStringVec fv;
 
     while (!hdr->eof())
     {

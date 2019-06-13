@@ -253,7 +253,7 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
         u8 KnifeSlot, KnifeIndex;
         pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
         //---------------------------------------------------------
-        PRESET_ITEMS TmpPresetItems;
+
         auto It = pItems->begin();
         auto Et = pItems->end();
         for (; It != Et; ++It)
@@ -491,7 +491,7 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
     u8 KnifeSlot, KnifeIndex;
     pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
     //---------------------------------------------------------
-    PRESET_ITEMS TmpPresetItems;
+
     auto It = PlayerDefItems.begin();
     auto Et = PlayerDefItems.end();
     for (; It != Et; ++It)

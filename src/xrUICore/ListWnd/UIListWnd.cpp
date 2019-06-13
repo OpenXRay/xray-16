@@ -185,9 +185,6 @@ void CUIListWnd::RemoveAll()
     if (m_ItemList.empty())
         return;
 
-    LIST_ITEM_LIST_it it;
-
-
     while (!m_ItemList.empty())
     {
         DetachChild(m_ItemList.front());

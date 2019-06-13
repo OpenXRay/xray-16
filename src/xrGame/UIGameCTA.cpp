@@ -506,7 +506,7 @@ void CUIGameCTA::SetPlayerDefItemsToBuyMenu()
     u8 KnifeSlot, KnifeIndex;
     m_pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
     //---------------------------------------------------------
-    PRESET_ITEMS TmpPresetItems;
+
     auto It = PlayerDefItems.begin();
     auto Et = PlayerDefItems.end();
     for (; It != Et; ++It)
