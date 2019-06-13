@@ -339,7 +339,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
             return nullptr;
 
         u32 tempSize = 0;
-        read_byte = ::read(fd, &dwSize, 4);
+        read_byte = ::read(fd, &tempSize, 4);
         dwSize = tempSize;
         if (read_byte == -1)
             return nullptr;
