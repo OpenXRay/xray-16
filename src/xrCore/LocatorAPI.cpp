@@ -263,8 +263,8 @@ const CLocatorAPI::file* CLocatorAPI::Register(
 #if defined(WINDOWS)
 IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bool shouldDecrypt = false)
 {
-    u32 dwType;
-    size_t dwSize;
+    u32 dwType = INVALID_SET_FILE_POINTER;
+    size_t dwSize = 0;
     DWORD read_byte;
     u32 pt = SetFilePointer(ptr, 0, nullptr, FILE_BEGIN);
     VERIFY(pt != INVALID_SET_FILE_POINTER);
@@ -277,7 +277,9 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bo
             return nullptr;
         //. VERIFY(res&&(read_byte==4));
 
-        res = ReadFile(ptr, &dwSize, 4, &read_byte, nullptr);
+        u32 tempSize = 0;
+        res = ReadFile(ptr, &tempSize, 4, &read_byte, nullptr);
+        dwSize = tempSize;
 
         if (read_byte == 0)
             return nullptr;
@@ -326,7 +328,7 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bo
 IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType;
-    size_t dwSize;
+    size_t dwSize = 0;
     ssize_t read_byte;
     ::lseek(fd, 0L, SEEK_SET);
 
@@ -336,7 +338,9 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
         if (read_byte == -1)
             return nullptr;
 
+        u32 tempSize = 0;
         read_byte = ::read(fd, &dwSize, 4);
+        dwSize = tempSize;
         if (read_byte == -1)
             return nullptr;
 
@@ -832,18 +836,18 @@ pcstr one_folder_back_and_rescan(FS_Path* path)
 
 IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 {
+    pcstr fs_file_name = FSLTX;
+    if (fs_name && *fs_name)
+        fs_file_name = fs_name;
+
+    Log("using fs-ltx", fs_file_name);
+
     setup_fs_path(fs_name);
 
     // if (m_Flags.is(flTargetFolderOnly)) {
     // append_path ("$fs_root$", "", 0, FALSE);
     // return (0);
     // }
-
-    pcstr fs_file_name = FSLTX;
-    if (fs_name && *fs_name)
-        fs_file_name = fs_name;
-
-    Log("using fs-ltx", fs_file_name);
 
     IReader* result = nullptr;
     int file_handle;
@@ -857,20 +861,20 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
     }
 
-    if (!fsltx_is_available)
+    else if (!fsltx_is_available)
     {
         fs_file_name = one_folder_back_and_rescan(FS.get_path("$app_root$"));
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
     }
 
 #ifndef MASTER_GOLD
-    if (!fsltx_is_available)
+    else if (!fsltx_is_available)
     {
         fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
     }
 
-    if (!fsltx_is_available)
+    else if (!fsltx_is_available)
     {
         fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);

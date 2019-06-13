@@ -79,7 +79,7 @@ IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwType;
-    size_t dwSize;
+    size_t dwSize = 0;
 
     rewind();
     while (!eof())
@@ -118,7 +118,7 @@ IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwType;
-    size_t dwSize;
+    size_t dwSize = 0;
 
     bool success = false;
 
@@ -198,7 +198,7 @@ IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwType;
-    size_t dwSize;
+    size_t dwSize = 0;
 
     if (!m_test)
     {
@@ -271,7 +271,7 @@ IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwType;
-    size_t dwSize;
+    size_t dwSize = 0;
 
     if (!m_test)
     {
