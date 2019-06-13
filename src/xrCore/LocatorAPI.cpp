@@ -1136,7 +1136,7 @@ xr_vector<pstr>* CLocatorAPI::file_list_open(pcstr _path, u32 flags)
                 continue;
 
             const char* entry_begin = entry.name + base_len;
-            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER))
+            if (flags & FS_RootOnly && strchr(entry_begin, _DELIMITER))
                 continue; // folder in folder
             dest->push_back(xr_strdup(entry_begin));
             pstr fname = dest->back();
@@ -1151,7 +1151,7 @@ xr_vector<pstr>* CLocatorAPI::file_list_open(pcstr _path, u32 flags)
                 continue;
             const char* entry_begin = entry.name + base_len;
 
-            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER) != end_symbol)
+            if (flags & FS_RootOnly && strchr(entry_begin, _DELIMITER) != end_symbol)
                 continue; // folder in folder
 
             dest->push_back(xr_strdup(entry_begin));
@@ -1205,7 +1205,7 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
             if ((flags & FS_ListFiles) == 0)
                 continue;
             LPCSTR entry_begin = entry.name + base_len;
-            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER))
+            if (flags & FS_RootOnly && strchr(entry_begin, _DELIMITER))
                 continue; // folder in folder
             // check extension
             if (b_mask)
@@ -1240,7 +1240,7 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
                 continue;
             LPCSTR entry_begin = entry.name + base_len;
 
-            if (flags & FS_RootOnly && strstr(entry_begin, DELIMITER) != end_symbol)
+            if (flags & FS_RootOnly && strchr(entry_begin, _DELIMITER) != end_symbol)
                 continue; // folder in folder
             u32 fl = FS_File::flSubDir | (entry.vfs ? FS_File::flVFS : 0);
             dest.insert(FS_File(entry_begin, entry.size_real, entry.modif, fl));
@@ -1881,7 +1881,7 @@ void CLocatorAPI::rescan_path(pcstr full_path, bool bRecurse)
         if (entry.vfs != 0xFFFFFFFF)
             continue;
         pcstr entry_begin = entry.name + base_len;
-        if (!bRecurse && strstr(entry_begin, DELIMITER))
+        if (!bRecurse && strchr(entry_begin, _DELIMITER))
             continue;
         // erase item
         auto str = pstr(cur_item->name);
