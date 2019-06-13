@@ -161,7 +161,7 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     {
     case file_transfer::receiving_data:
     {
-        Msg("* downloaded %d from %d bytes of screenshot from client [%d]", downloaded, total, m_chearer_id);
+        Msg("* downloaded %d from %d bytes of screenshot from client [%d]", downloaded, total, m_chearer_id.value());
         if (m_first_receive)
         {
             notify_admin(e_screenshot_response, "prepare for receive...");
@@ -179,7 +179,7 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     case file_transfer::receiving_aborted_by_peer:
     {
 #ifndef LINUX // FIXME!!!
-        Msg("* download screenshot aborted by peer [%u]", m_chearer_id);
+        Msg("* download screenshot aborted by peer [%u]", m_chearer_id.value());
         LPCSTR error_msg;
         char bufforint[16];
         STRCONCAT(
@@ -221,7 +221,7 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     {
     case file_transfer::receiving_data:
     {
-        Msg("* downloaded %d from %d bytes of config from client [%d]", downloaded, total, m_chearer_id);
+        Msg("* downloaded %d from %d bytes of config from client [%d]", downloaded, total, m_chearer_id.value());
         if (m_first_receive)
         {
             notify_admin(e_configs_response, "prepare for receive...");
@@ -239,7 +239,7 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     case file_transfer::receiving_aborted_by_peer:
     {
 #ifndef LINUX // FIXME!!!
-        Msg("* download config aborted by peer [%u]", m_chearer_id);
+        Msg("* download config aborted by peer [%u]", m_chearer_id.value());
         LPCSTR error_msg;
         char bufforint[16];
         STRCONCAT(error_msg, "download config terminated by peer [", ultoa(m_chearer_id.value(), bufforint, 10), "]");
@@ -278,16 +278,16 @@ void clientdata_proxy::upload_file_callback(file_transfer::sending_status_t stat
 {
     switch (status)
     {
-    case file_transfer::sending_data: { Msg("* uploaded %d from %d bytes to client [%d]", uploaded, total, m_admin_id);
+    case file_transfer::sending_data: { Msg("* uploaded %d from %d bytes to client [%d]", uploaded, total, m_admin_id.value());
     }
     break;
     case file_transfer::sending_aborted_by_user: { FATAL("* upload file terminated by user ");
     }
     break;
-    case file_transfer::sending_rejected_by_peer: { Msg("* upload file terminated by peer [%d]", m_admin_id);
+    case file_transfer::sending_rejected_by_peer: { Msg("* upload file terminated by peer [%d]", m_admin_id.value());
     }
     break;
-    case file_transfer::sending_complete: { Msg("* upload file to admin [%d] complete !", m_admin_id);
+    case file_transfer::sending_complete: { Msg("* upload file to admin [%d] complete !", m_admin_id.value());
     }
     break;
     };
