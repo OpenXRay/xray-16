@@ -70,7 +70,7 @@ ICF const Fvector CLevelGraph::vertex_position(const CLevelGraph::CPosition& sou
 {
     Fvector dest_position;
     unpack_xz(source_position, dest_position.x, dest_position.z);
-    dest_position.y = (float(source_position.y()) / 65535) * header().factor_y() + header().box().vMin.y;
+    dest_position.y = (float(source_position.y()) / 65535.f) * header().factor_y() + header().box().vMin.y;
     return (dest_position);
 }
 
