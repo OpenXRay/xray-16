@@ -371,7 +371,7 @@ public:
 
         dwDeathPointCount = m;
 
-        for (; I != E; I++, i++)
+        for (; I != E; ++I, ++i)
         {
             (*I).tNodeID = *i;
             (*I).tPoint = tpAI_Map->vertex_position(*i);
