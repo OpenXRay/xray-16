@@ -67,7 +67,9 @@ struct b_texture
         dwWidth = file->r_u32();
         dwHeight = file->r_u32();
         file->r(&bHasAlpha, sizeof(bHasAlpha));
-        pSurface = reinterpret_cast<u32*>(file->r_u32());
+        std::uint_least32_t temp = 0; // it should be at least 4 bytes,
+        file->r(&temp, 4);            // so that overflow will not happen
+        pSurface = nullptr;
     }
 };
 
