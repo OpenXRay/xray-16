@@ -98,7 +98,7 @@ void CUITextureMaster::ParseShTexInfo(pcstr xml_file)
 
 bool CUITextureMaster::IsSh(const shared_str& texture_name)
 {
-    return strstr(texture_name.c_str(), DELIMITER) ? false : true;
+    return strchr(texture_name.c_str(), _DELIMITER) == nullptr;
 }
 
 bool CUITextureMaster::InitTexture(

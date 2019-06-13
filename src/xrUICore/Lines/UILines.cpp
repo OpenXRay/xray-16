@@ -438,7 +438,7 @@ u32 CUILines::GetColorFromText(const xr_string& str) const
     StrSize begin, end, comma1_pos, comma2_pos, comma3_pos;
 
     begin = str.find(BEGIN);
-    end = str.find(END, begin);
+    end = str.find(_END, begin);
     if (begin == npos || end == npos)
         return m_dwTextColor;
     // try default color
@@ -499,11 +499,11 @@ void CUILines::CutFirstColoredTextEntry(xr_string& entry, u32& color, xr_string&
     entry.clear();
 
     StrSize begin = text.find(BEGIN);
-    StrSize end = text.find(END, begin);
+    StrSize end = text.find(_END, begin);
     if (xr_string::npos == end)
         begin = end;
     StrSize begin2 = text.find(BEGIN, end);
-    StrSize end2 = text.find(END, begin2);
+    StrSize end2 = text.find(_END, begin2);
     if (xr_string::npos == end2)
         begin2 = end2;
 

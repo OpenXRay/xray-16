@@ -899,7 +899,7 @@ void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& ou
     }
 
     bool all = (xr_strlen(filter_str) == 0);
-
+    const size_t filter_str_len = xr_strlen(filter_str);
     //vecTips::iterator itb = in_v.begin();
     //vecTips::iterator ite = in_v.end();
     //for (; itb != ite; ++itb)
@@ -913,8 +913,8 @@ void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& ou
             pcstr fd_str = strstr(str.c_str(), filter_str);
             if (fd_str)
             {
-                int fd_sz = str.size() - xr_strlen(fd_str);
-                TipString ts(str, fd_sz, fd_sz + xr_strlen(filter_str));
+                size_t fd_sz = str.size() - xr_strlen(fd_str);
+                TipString ts(str, fd_sz, fd_sz + filter_str_len);
                 out_v.push_back(ts);
             }
         }

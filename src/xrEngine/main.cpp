@@ -395,6 +395,7 @@ void RunBenchmark(pcstr name)
     FS.update_path(cfgPath, "$app_data_root$", name);
     CInifile ini(cfgPath);
     const u32 benchmarkCount = ini.line_count("benchmark");
+    const size_t hyphenLtxLen = xr_strlen("-ltx ");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
         LPCSTR benchmarkName, t;
@@ -413,7 +414,7 @@ void RunBenchmark(pcstr name)
         if (strstr(Core.Params, "-ltx "))
         {
             string64 cfgName;
-            sscanf(strstr(Core.Params, "-ltx ") + strlen("-ltx "), "%[^ ] ", cfgName);
+            sscanf(strstr(Core.Params, "-ltx ") + hyphenLtxLen, "%[^ ] ", cfgName);
             xr_strcpy(Console->ConfigFile, cfgName);
         }
         Startup();
