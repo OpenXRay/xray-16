@@ -885,7 +885,7 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
         make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_file_name));
 
 #ifdef DEBUG
-    Msg("final $fs_root$ = %s", fs_file_name);
+    Msg("final $fs_root$ = %s", FS.get_path("$fs_root$")->m_Path);
 #endif
 
     void* buffer = FileDownload(fs_file_name, file_handle, file_size);

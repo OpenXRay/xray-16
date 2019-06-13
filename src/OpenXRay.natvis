@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="_finddata32_t">
+    <DisplayString>{name, s}</DisplayString>
+  </Type>
+  <Type Name="_finddata32i64_t">
+    <DisplayString>{name, s}</DisplayString>
+  </Type>
+  <Type Name="_finddata64i32_t">
+    <DisplayString>{name, s}</DisplayString>
+  </Type>
+  <Type Name="__finddata64_t">
+    <DisplayString>{name, s}</DisplayString>
+  </Type>
+
   <!-- xrCore -->
   <Type Name="shared_str">
     <DisplayString Condition="p_ == 0">""</DisplayString>
@@ -32,6 +45,10 @@
 
   <Type Name="FS_Path">
     <DisplayString>{m_Path, s}</DisplayString>
+  </Type>
+
+  <Type Name="FS_File">
+    <DisplayString>{name, s}</DisplayString>
   </Type>
 
   <Type Name="CLocatorAPI::file">
