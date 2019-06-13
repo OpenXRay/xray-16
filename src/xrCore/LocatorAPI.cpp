@@ -393,10 +393,9 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         if (0 == xr_stricmp(read_path.c_str(), "gamedata"))
         {
             read_path = "$fs_root$";
-            auto P = m_paths.find(read_path.c_str());
-            if (P != m_paths.end())
+            FS_Path* root = nullptr;
+            if (get_path(read_path.c_str(), &root))
             {
-                FS_Path* root = P->second;
                 // R_ASSERT3 (root, "path not found ", read_path.c_str());
                 xr_strcpy(fs_entry_point, sizeof fs_entry_point, root->m_Path);
             }
@@ -413,9 +412,9 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
             auto P = m_paths.find(alias_name);
 
-            if (P != m_paths.end())
+            FS_Path* root = nullptr;
+            if (get_path("$fs_root$", &root))
             {
-                FS_Path* root = P->second;
                 // R_ASSERT3 (root, "path not found ", alias_name);
                 xr_strcpy(fs_entry_point, sizeof fs_entry_point, root->m_Path);
             }
@@ -431,11 +430,9 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
             Msg("Assuming that [%s] is encrypted ShoC archive", A.path.c_str());
             shouldDecrypt = true;
         }
-
-        auto P = m_paths.find("$fs_root$");
-        if (P != m_paths.end())
+        FS_Path* root = nullptr;
+        if (get_path("$fs_root$", &root))
         {
-            FS_Path* root = P->second;
             // R_ASSERT3 (root, "path not found ", read_path.c_str());
             xr_strcpy(fs_entry_point, sizeof fs_entry_point, root->m_Path);
         }
@@ -857,26 +854,26 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 
     if (!fsltx_is_available)
     {
-        fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
+        fs_file_name = one_folder_back_and_rescan(get_path("$fs_root$"));
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
     }
 
     else if (!fsltx_is_available)
     {
-        fs_file_name = one_folder_back_and_rescan(FS.get_path("$app_root$"));
+        fs_file_name = one_folder_back_and_rescan(get_path("$app_root$"));
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
     }
 
 #ifndef MASTER_GOLD
     else if (!fsltx_is_available)
     {
-        fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
+        fs_file_name = one_folder_back_and_rescan(get_path("$fs_root$"));
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
     }
 
     else if (!fsltx_is_available)
     {
-        fs_file_name = one_folder_back_and_rescan(FS.get_path("$fs_root$"));
+        fs_file_name = one_folder_back_and_rescan(get_path("$fs_root$"));
         fsltx_is_available = file_handle_internal(fs_file_name, file_size, file_handle);
     }
 #endif // MASTER_GOLD
@@ -885,7 +882,7 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
         make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_file_name));
 
 #ifdef DEBUG
-    Msg("final $fs_root$ = %s", FS.get_path("$fs_root$")->m_Path);
+    Msg("final $fs_root$ = %s", get_path("$fs_root$")->m_Path);
 #endif
 
     void* buffer = FileDownload(fs_file_name, file_handle, file_size);
@@ -933,8 +930,8 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     {
         IReader* pFSltx = setup_fs_ltx(fs_name);
 
-        FS_Path* pFSRoot = FS.get_path("$fs_root$");
-        FS.rescan_path(pFSRoot->m_Path, false);
+        FS_Path* pFSRoot = get_path("$fs_root$");
+        rescan_path(pFSRoot->m_Path, false);
 
         // append all pathes
         string_path id, root, add, def, capt;
@@ -1005,8 +1002,8 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     {
         string1024 c_newAppPathRoot;
         sscanf(strstr(Core.Params, "-overlaypath ") + 13, "%[^ ] ", c_newAppPathRoot);
-        FS_Path* pLogsPath = FS.get_path("$logs$");
-        FS_Path* pAppdataPath = FS.get_path("$app_data_root$");
+        FS_Path* pLogsPath = get_path("$logs$");
+        FS_Path* pAppdataPath = get_path("$app_data_root$");
 
         if (pLogsPath)
             pLogsPath->_set_root(c_newAppPathRoot);
