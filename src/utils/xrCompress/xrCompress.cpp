@@ -143,7 +143,7 @@ xrCompressor::ALIAS* xrCompressor::testALIAS(IReader* base, u32 crc, u32& a_test
                 return &I->second;
             }
         }
-        I++;
+        ++I;
     }
     return NULL;
 }
