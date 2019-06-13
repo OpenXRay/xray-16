@@ -9,7 +9,7 @@ void lm_layer::Pack(xr_vector<u32>& dest) const
     xr_vector<base_color>::const_iterator I = surface.begin();
     xr_vector<base_color>::const_iterator E = surface.end();
     xr_vector<u32>::iterator W = dest.begin();
-    for (; I != E; I++)
+    for (; I != E; ++I)
     {
         base_color_c C;
         I->_get(C);
@@ -26,7 +26,7 @@ void lm_layer::Pack_hemi(xr_vector<u32>& dest) const //.
     xr_vector<base_color>::const_iterator I = surface.begin();
     xr_vector<base_color>::const_iterator E = surface.end();
     xr_vector<u32>::iterator W = dest.begin();
-    for (; I != E; I++)
+    for (; I != E; ++I)
     {
         base_color_c C;
         I->_get(C);

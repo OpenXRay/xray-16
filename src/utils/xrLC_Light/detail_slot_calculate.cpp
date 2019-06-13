@@ -423,7 +423,7 @@ bool detail_slot_calculate(
             start.set(P.x, BB.vMax.y + EPS, P.z);
 
             float r_u, r_v, r_range;
-            for (auto tit = box_result.begin(); tit != box_result.end(); tit++)
+            for (auto tit = box_result.begin(); tit != box_result.end(); ++tit)
             {
                 CDB::TRI& T = tris[*tit];
                 Fvector V[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};

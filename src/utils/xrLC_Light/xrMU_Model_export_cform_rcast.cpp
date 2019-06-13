@@ -12,7 +12,7 @@ void xrMU_Model::export_cform_rcast(CDB::CollectorPacked& CL, Fmatrix& xform)
     v_faces adjacent;
     adjacent.reserve(6 * 2 * 3);
 
-    for (v_faces_it it = m_faces.begin(); it != m_faces.end(); it++)
+    for (v_faces_it it = m_faces.begin(); it != m_faces.end(); ++it)
     {
         _face* F = (*it);
         const Shader_xrLC& SH = F->Shader();

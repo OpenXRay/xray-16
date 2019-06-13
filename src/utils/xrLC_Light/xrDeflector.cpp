@@ -131,7 +131,7 @@ void CDeflector::OA_Export()
     tN.set(0, 0, 0);
     float density = 0;
     float fcount = 0;
-    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
     {
         Face* F = it->owner;
         Fvector SN;
@@ -147,7 +147,7 @@ void CDeflector::OA_Export()
     else
     {
         Logger.clMsg("* ERROR: Internal precision error in CDeflector::OA_Export");
-        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
         {
             Face& fc = *((*it).owner);
             inlc_global_data()->err_tjunction().w_fvector3(fc.v[0]->P);
@@ -178,7 +178,7 @@ void CDeflector::OA_Export()
 
     Fbox bb;
     bb.invalidate();
-    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
     {
         UVtri* T = &*it;
         Face* F = T->owner;
@@ -241,7 +241,7 @@ void CDeflector::GetRect(Fvector2& min, Fvector2& max)
     // Calculate bounds
     xr_vector<UVtri>::iterator it = UVpolys.begin();
     min = max = it->uv[0];
-    for (; it != UVpolys.end(); it++)
+    for (; it != UVpolys.end(); ++it)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -287,7 +287,7 @@ void CDeflector::RemapUV(
     UVtri tnew;
     if (bRotate)
     {
-        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
         {
             UVtri& T = *it;
             tnew.owner = T.owner;
@@ -302,7 +302,7 @@ void CDeflector::RemapUV(
     }
     else
     {
-        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
         {
             UVtri& T = *it;
             tnew.owner = T.owner;
