@@ -26,13 +26,13 @@ CLevelGraph::CLevelGraph()
 
 void CLevelGraph::Initialize(const char* filePath)
 {
-    const auto& box = header().box();
 
     m_reader = FS.r_open(filePath);
     // m_header & data
     m_header = (CHeader*)m_reader->pointer();
     R_ASSERT(header().version() == XRAI_CURRENT_VERSION);
     m_reader->advance(sizeof(CHeader));
+    const auto& box = header().box();
     m_nodes = (CVertex*)m_reader->pointer();
     m_row_length = iFloor((box.vMax.z - box.vMin.z) / header().cell_size() + EPS_L + 1.5f);
     m_column_length = iFloor((box.vMax.x - box.vMin.x) / header().cell_size() + EPS_L + 1.5f);
