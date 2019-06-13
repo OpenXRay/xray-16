@@ -1,6 +1,7 @@
 
 
 #include <stdlib.h>
+#define WINDOWS
 #include "xrCore/_types.h"
 #undef FLT_MAX
 #undef FLT_MIN
