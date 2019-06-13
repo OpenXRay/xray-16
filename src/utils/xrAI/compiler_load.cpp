@@ -42,7 +42,7 @@ void transfer(const char* name, xr_vector<T>& dest, IReader& F, u32 chunk)
     if (count)
     {
         dest.reserve(count);
-        dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count);
+        dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count); //-V595
     }
     if (O)
         O->close();

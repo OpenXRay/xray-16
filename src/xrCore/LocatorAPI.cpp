@@ -469,7 +469,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, 0);
     }
     hdr->close();
-}
+} //-V773
 
 void CLocatorAPI::archive::open()
 {

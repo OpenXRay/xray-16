@@ -184,11 +184,11 @@ void CMapActionZoomControl::init_internal()
     bool bZoom = !fsimilar(m_targetZoom, m_object->GlobalMap()->GetCurrentZoom().x, EPS_L);
     m_endMovingTime = Device.fTimeGlobal;
     if (bZoom && bMove)
-        m_endMovingTime += _max(map_zoom_time, dist / map_resize_speed);
+        m_endMovingTime += std::max(map_zoom_time, dist / map_resize_speed);
     else if (bZoom)
         m_endMovingTime += map_zoom_time;
     else if (bMove)
-        m_endMovingTime += _max(dist / map_resize_speed, min_move_time);
+        m_endMovingTime += std::max(dist / map_resize_speed, min_move_time);
 }
 
 void CMapActionZoomControl::update_target_state()

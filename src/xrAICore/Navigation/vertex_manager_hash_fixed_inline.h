@@ -104,7 +104,7 @@ inline CHashFixedVertexManagerT::Vertex& CHashFixedVertexManager::get_node(const
             return *vertex->m_vertex;
     }
     NODEFAULT;
-    return *vertex->m_vertex;
+    return *vertex->m_vertex; //-V522
 }
 
 TEMPLATE_SPECIALIZATION
