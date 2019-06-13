@@ -10,7 +10,7 @@ void CRender::addShaderOption(const char* name, const char* value)
 }
 
 template <typename T>
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)
 {
     HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
@@ -39,7 +39,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _hr;
 }
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
     void*& result, bool const disasm)
 {
     HRESULT _result = E_FAIL;
@@ -98,7 +98,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         string_path dname;
         strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, extension);
         IWriter* W = FS.w_open("$app_data_root$", dname);
-        W->w(disasm->GetBufferPointer(), (u32)disasm->GetBufferSize());
+        W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
         FS.w_close(W);
         _RELEASE(disasm);
     }
@@ -157,12 +157,12 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
 
     char sh_name[MAX_PATH] = "";
 
-    for (u32 i = 0; i < m_ShaderOptions.size(); ++i)
+    for (size_t i = 0; i < m_ShaderOptions.size(); ++i)
     {
         defines[def_it++] = m_ShaderOptions[i];
     }
 
-    u32 len = xr_strlen(sh_name);
+    size_t len = xr_strlen(sh_name);
     // options
     {
         xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));
@@ -795,7 +795,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
             u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
             file->w_u32(bytecodeCrc);
 
-            file->w(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
+            file->w(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
             FS.w_close(file);
 
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
@@ -817,7 +817,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
 static inline bool match_shader(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, LPCSTR const mask, size_t const mask_length)
 {
-    u32 const full_shader_id_length = xr_strlen(full_shader_id);
+    size_t const full_shader_id_length = xr_strlen(full_shader_id);
     if (full_shader_id_length == mask_length)
     {
 #ifndef MASTER_GOLD

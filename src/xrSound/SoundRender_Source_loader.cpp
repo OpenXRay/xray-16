@@ -23,7 +23,7 @@ size_t ov_read_func(void* ptr, size_t size, size_t nmemb, void* datasource)
     IReader* F = (IReader*)datasource;
     size_t exist_block = _max(0ul, iFloor(F->elapsed() / (float)size));
     size_t read_block = std::min(exist_block, nmemb);
-    F->r(ptr, (int)(read_block * size));
+    F->r(ptr, read_block * size);
     return read_block;
 }
 int ov_close_func(void* datasource) { return 0; }

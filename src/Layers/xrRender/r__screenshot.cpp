@@ -193,7 +193,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
             IWriter* fs = FS.w_open(name);
             if (fs)
             {
-                fs->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+                fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
                 FS.w_close(fs);
             }
         }
@@ -241,13 +241,13 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
                 IWriter* fs = FS.w_open(name);
                 if (fs)
                 {
-                    fs->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+                    fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
                     FS.w_close(fs);
                 }
             }
             else
             {
-                memory_writer->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+                memory_writer->w(saved->GetBufferPointer(), saved->GetBufferSize());
             }
         }
         _RELEASE(saved);
@@ -270,7 +270,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 #endif
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
-        fs->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+        fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
         FS.w_close(fs);
         _RELEASE(saved);
 
@@ -287,7 +287,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 #endif
             IWriter* fs2 = FS.w_open("$screenshots$", buf);
             R_ASSERT(fs2);
-            fs2->w(saved2->GetBufferPointer(), (u32)saved2->GetBufferSize());
+            fs2->w(saved2->GetBufferPointer(), saved2->GetBufferSize());
             FS.w_close(fs2);
             _RELEASE(saved2);
         }

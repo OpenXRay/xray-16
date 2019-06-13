@@ -465,7 +465,7 @@ void IReader::r_stringZ(shared_str& dest)
 void IReader::r_stringZ(xr_string& dest)
 {
     dest = (char*)(data + Pos);
-    Pos += int(dest.size() + 1);
+    Pos += dest.size() + 1;
 };
 
 void IReader::skip_stringZ()
