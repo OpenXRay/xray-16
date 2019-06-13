@@ -2308,11 +2308,11 @@ void game_sv_mp::OnPlayerChangeName(NET_Packet& P, ClientID sender)
     {
         Msg("Player \"%s\" try to change name on \"%s\" at public server.", ps->getName(), NewName);
 
-        NET_Packet P;
-        GenerateGameMessage(P);
-        P.w_u32(GAME_EVENT_SERVER_STRING_MESSAGE);
-        P.w_stringZ("Server is public. Can\'t change player name!");
-        m_server->SendTo(sender, P);
+        NET_Packet P2;
+        GenerateGameMessage(P2);
+        P2.w_u32(GAME_EVENT_SERVER_STRING_MESSAGE);
+        P2.w_stringZ("Server is public. Can\'t change player name!");
+        m_server->SendTo(sender, P2);
         return;
     }
 
@@ -2323,15 +2323,15 @@ void game_sv_mp::OnPlayerChangeName(NET_Packet& P, ClientID sender)
 
     if (pClient->owner)
     {
-        NET_Packet P;
-        GenerateGameMessage(P);
-        P.w_u32(GAME_EVENT_PLAYER_NAME);
-        P.w_u16(pClient->owner->ID);
-        P.w_s16(ps->team);
-        P.w_stringZ(old_name.c_str());
-        P.w_stringZ(ps->getName());
+        NET_Packet P3;
+        GenerateGameMessage(P3);
+        P3.w_u32(GAME_EVENT_PLAYER_NAME);
+        P3.w_u16(pClient->owner->ID);
+        P3.w_s16(ps->team);
+        P3.w_stringZ(old_name.c_str());
+        P3.w_stringZ(ps->getName());
         //---------------------------------------------------
-        real_sender tmp_functor(m_server, &P);
+        real_sender tmp_functor(m_server, &P3);
         m_server->ForEachClientDoSender(tmp_functor);
         //---------------------------------------------------
         pClient->owner->set_name_replace(ps->getName());
