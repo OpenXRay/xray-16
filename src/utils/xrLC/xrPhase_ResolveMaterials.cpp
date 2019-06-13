@@ -18,7 +18,7 @@ void CBuild::xrPhase_ResolveMaterials()
     xr_vector<_counter> counts;
     {
         counts.reserve(256);
-        for (vecFaceIt F_it = lc_global_data()->g_faces().begin(); F_it != lc_global_data()->g_faces().end(); F_it++)
+        for (vecFaceIt F_it = lc_global_data()->g_faces().begin(); F_it != lc_global_data()->g_faces().end(); ++F_it)
         {
             Face* F = *F_it;
             BOOL bCreate = TRUE;
@@ -53,7 +53,7 @@ void CBuild::xrPhase_ResolveMaterials()
             g_XSplit[I]->reserve(counts[I].dwCount);
         }
 
-        for (vecFaceIt F_it = lc_global_data()->g_faces().begin(); F_it != lc_global_data()->g_faces().end(); F_it++)
+        for (vecFaceIt F_it = lc_global_data()->g_faces().begin(); F_it != lc_global_data()->g_faces().end(); ++F_it)
         {
             Face* F = *F_it;
             if (!F->Shader().flags.bRendering)

@@ -60,7 +60,7 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
 
     CDB::CollectorPacked CL(scene_bb, lc_global_data()->g_vertices().size(), lc_global_data()->g_faces().size());
 
-    for (vecFaceIt it = lc_global_data()->g_faces().begin(); it != lc_global_data()->g_faces().end(); it++)
+    for (vecFaceIt it = lc_global_data()->g_faces().begin(); it != lc_global_data()->g_faces().end(); ++it)
     {
         Face* F = (*it);
         const Shader_xrLC& SH = F->Shader();

@@ -91,7 +91,7 @@ public:
 
     size_t GetID(LPCSTR name) const
     {
-        for (auto it = library.begin(); it != library.end(); it++)
+        for (auto it = library.begin(); it != library.end(); ++it)
             if (0 == xr_stricmp(name, it->Name))
                 return size_t(it - library.begin());
         return size_t(-1);
@@ -117,7 +117,7 @@ public:
 
     void Remove(LPCSTR name)
     {
-        for (auto it = library.begin(); it != library.end(); it++)
+        for (auto it = library.begin(); it != library.end(); ++it)
             if (0 == xr_stricmp(name, it->Name))
             {
                 library.erase(it);

@@ -89,7 +89,7 @@ void CBuild::PreOptimize()
         vecVertex& H = *(HASH[ix][iy][iz]);
 
         // Search similar vertices in hash table
-        for (vecVertexIt T = H.begin(); T != H.end(); T++)
+        for (vecVertexIt T = H.begin(); T != H.end(); ++T)
         {
             Vertex* pBase = *T;
             if (pBase->similar(*pTest, g_params().m_weld_distance))
