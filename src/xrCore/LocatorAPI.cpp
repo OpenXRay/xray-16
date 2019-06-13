@@ -934,7 +934,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
         IReader* pFSltx = setup_fs_ltx(fs_name);
 
         FS_Path* pFSRoot = FS.get_path("$fs_root$");
-        FS.rescan_path(pFSRoot->m_Path, pFSRoot->m_Flags.is(FS_Path::flRecurse));
+        FS.rescan_path(pFSRoot->m_Path, false);
 
         // append all pathes
         string_path id, root, add, def, capt;
