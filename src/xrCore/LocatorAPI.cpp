@@ -761,8 +761,8 @@ bool CLocatorAPI::Recurse(pcstr path)
     if (newSize > oldSize)
     {
         std::sort(rec_files.begin() + oldSize, rec_files.end(), pred_str_ff);
-        for (auto& file : rec_files)
-            ProcessOne(path, file);
+        for (size_t i = oldSize; i < newSize; i++) // Don't replace this with range-based for!
+            ProcessOne(path, rec_files[i]); // only index-based for can work correctly here
         rec_files.erase(rec_files.begin() + oldSize, rec_files.end());
     }
     // insert self
