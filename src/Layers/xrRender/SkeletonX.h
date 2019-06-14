@@ -138,7 +138,7 @@ template <typename T_vertex, typename T_buffer>
 BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S,
     const Fvector& D, u16* indices, CBoneData::FacesVec& faces)
 {
-    for (auto it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); ++it)
     {
         u32 idx = (*it) * 3;
         for (u32 k = 0; k < 3; k++)

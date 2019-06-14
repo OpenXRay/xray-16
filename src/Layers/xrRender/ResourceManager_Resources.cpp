@@ -379,7 +379,7 @@ void CResourceManager::DBG_VerifyTextures()
 {
     map_Texture::iterator I = m_textures.begin();
     map_Texture::iterator E = m_textures.end();
-    for (; I != E; I++)
+    for (; I != E; ++I)
     {
         R_ASSERT(I->first);
         R_ASSERT(I->second);

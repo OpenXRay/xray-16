@@ -65,7 +65,7 @@ dxRender_Visual* CModelPool::Instance_Duplicate(dxRender_Visual* V)
     N->Copy(V);
     N->Spawn();
     // inc ref counter
-    for (xr_vector<ModelDef>::iterator I = Models.begin(); I != Models.end(); I++)
+    for (xr_vector<ModelDef>::iterator I = Models.begin(); I != Models.end(); ++I)
         if (I->model == V)
         {
             I->refs++;
@@ -169,7 +169,7 @@ void CModelPool::Destroy()
     // Base/Reference
     xr_vector<ModelDef>::iterator I = Models.begin();
     xr_vector<ModelDef>::iterator E = Models.end();
-    for (; I != E; I++)
+    for (; I != E; ++I)
     {
         I->model->Release();
         xr_delete(I->model);
@@ -199,7 +199,7 @@ dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
 {
     dxRender_Visual* Model = nullptr;
     xr_vector<ModelDef>::iterator I;
-    for (I = Models.begin(); I != Models.end(); I++)
+    for (I = Models.begin(); I != Models.end(); ++I)
     {
         if (I->name[0] && (0 == xr_strcmp(*I->name, N)))
         {
@@ -395,7 +395,7 @@ void CModelPool::Prefetch()
     string256 section;
     strconcat(sizeof(section), section, "prefetch_visuals_", g_pGamePersistent->m_game_params.m_game_type);
     const CInifile::Sect& sect = pSettings->r_section(section);
-    for (auto I = sect.Data.cbegin(); I != sect.Data.cend(); I++)
+    for (auto I = sect.Data.cbegin(); I != sect.Data.cend(); ++I)
     {
         const CInifile::Item& item = *I;
         dxRender_Visual* V = Create(item.first.c_str());
@@ -408,7 +408,7 @@ void CModelPool::ClearPool(BOOL b_complete)
 {
     POOL_IT _I = Pool.begin();
     POOL_IT _E = Pool.end();
-    for (; _I != _E; _I++)
+    for (; _I != _E; ++_I)
     {
         Discard(_I->second, b_complete);
     }
@@ -434,7 +434,7 @@ void CModelPool::dump()
     Log("--- model pool --- begin:");
     u32 sz = 0;
     u32 k = 0;
-    for (xr_vector<ModelDef>::iterator I = Models.begin(); I != Models.end(); I++)
+    for (xr_vector<ModelDef>::iterator I = Models.begin(); I != Models.end(); ++I)
     {
         CKinematics* K = PCKinematics(I->model);
         if (K)
@@ -448,7 +448,7 @@ void CModelPool::dump()
     sz = 0;
     k = 0;
     int free_cnt = 0;
-    for (REGISTRY_IT it = Registry.begin(); it != Registry.end(); it++)
+    for (REGISTRY_IT it = Registry.begin(); it != Registry.end(); ++it)
     {
         CKinematics* K = PCKinematics((dxRender_Visual*)it->first);
         VERIFY(K);

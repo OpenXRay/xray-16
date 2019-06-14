@@ -733,7 +733,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
     // process constant-loaders
     R_constant_table::c_table::iterator it = C->table.begin();
     R_constant_table::c_table::iterator end = C->table.end();
-    for (; it != end; it++)
+    for (; it != end; ++it)
     {
         R_constant* Cs = &**it;
         VERIFY(Cs);

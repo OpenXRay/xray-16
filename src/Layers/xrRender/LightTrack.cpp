@@ -50,7 +50,7 @@ CROS_impl::CROS_impl()
 void CROS_impl::add(light* source)
 {
     // Search
-    for (xr_vector<Item>::iterator I = track.begin(); I != track.end(); I++)
+    for (xr_vector<Item>::iterator I = track.begin(); I != track.end(); ++I)
         if (source == I->source)
         {
             I->frame_touched = Device.dwFrame;

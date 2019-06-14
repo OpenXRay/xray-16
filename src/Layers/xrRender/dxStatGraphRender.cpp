@@ -22,7 +22,7 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
 
     u32 TriElem = 0;
     u32 LineElem = 0;
-    for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
+    for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); ++it)
     {
         switch (it->style)
         {
@@ -55,7 +55,7 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
         pv_Tri = pv_Tri_start;
 
         pv_Tri = pv_Tri_start;
-        for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
+        for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); ++it)
         {
             switch (it->style)
             {
@@ -73,7 +73,7 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
         pv_Line_start = (FVF::TL0uv*)RCache.Vertex.Lock(LineElem, hGeomLine->vb_stride, dwOffsetLine);
         pv_Line = pv_Line_start;
 
-        for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); it++)
+        for (auto it = owner.subgraphs.begin(); it != owner.subgraphs.end(); ++it)
         {
             switch (it->style)
             {
@@ -212,7 +212,7 @@ void dxStatGraphRender::RenderBars(CStatGraph& owner, FVF::TL0uv** ppv, CStatGra
     float column_width = elem_offs;
     if (column_width > 1)
         column_width--;
-    for (auto it = pelements->begin(); it != pelements->end(); it++)
+    for (auto it = pelements->begin(); it != pelements->end(); ++it)
     {
         float X = float(it - pelements->begin()) * elem_offs + owner.lt.x;
         float Y0 = base_y;
@@ -250,7 +250,7 @@ void dxStatGraphRender::RenderLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGr
     float base_y = float(owner.rb.y) + (owner.mn * elem_factor);
 
     for (auto it = pelements->begin() + 1; it != pelements->end() && it != pelements->end() + 1;
-         it++)
+         ++it)
     {
         auto it_prev = it - 1;
         float X0 = float(it_prev - pelements->begin()) * elem_offs + owner.lt.x;
@@ -271,7 +271,7 @@ void dxStatGraphRender::RenderBarLines(CStatGraph& owner, FVF::TL0uv** ppv, CSta
     float base_y = float(owner.rb.y) + (owner.mn * elem_factor);
 
     for (auto it = pelements->begin() + 1; it != pelements->end() && it != pelements->end() + 1;
-         it++)
+         ++it)
     {
         auto it_prev = it - 1;
         float X0 = float(it_prev - pelements->begin()) * elem_offs + owner.lt.x + elem_offs;
@@ -296,7 +296,7 @@ void dxStatGraphRender::RenderMarkers(CStatGraph& owner, FVF::TL0uv** ppv, CStat
     float elem_factor = float(owner.rb.y - owner.lt.y) / float(owner.mx - owner.mn);
     float base_y = float(owner.rb.y) + (owner.mn * elem_factor);
 
-    for (auto it = pmarkers->begin(); it != pmarkers->end() && it != pmarkers->end() + 1; it++)
+    for (auto it = pmarkers->begin(); it != pmarkers->end() && it != pmarkers->end() + 1; ++it)
     {
         CStatGraph::SMarker& CurMarker = *it;
         float X0 = 0, Y0 = 0, X1 = 0, Y1 = 0;

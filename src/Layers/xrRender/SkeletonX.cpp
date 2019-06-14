@@ -503,7 +503,7 @@ void CSkeletonX::_FillVerticesSoft1W(const Fmatrix& view, CSkeletonWallmark& wm,
                                      u16* indices, CBoneData::FacesVec& faces)
 {
     VERIFY(*Vertices1W);
-    for (auto it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); ++it)
     {
         Fvector p[3];
         u32 idx = (*it) * 3;
@@ -547,7 +547,7 @@ void CSkeletonX::_FillVerticesSoft2W(const Fmatrix& view, CSkeletonWallmark& wm,
                                      u16* indices, CBoneData::FacesVec& faces)
 {
     VERIFY(*Vertices2W);
-    for (auto it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); ++it)
     {
         Fvector p[3];
         u32 idx = (*it) * 3;

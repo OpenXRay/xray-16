@@ -1468,7 +1468,7 @@ template <typename vertex_buffer_type>
 void TEnumBoneVertices(
     vertex_buffer_type vertices, u16* indices, CBoneData::FacesVec& faces, SEnumVerticesCallback& C)
 {
-    for (auto it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); ++it)
     {
         u32 idx = (*it) * 3;
         for (u32 k = 0; k < 3; k++)

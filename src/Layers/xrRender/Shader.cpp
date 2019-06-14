@@ -146,7 +146,7 @@ u32 STextureList::find_texture_stage(const shared_str& TexName) const
 
     STextureList::const_iterator _it = this->begin();
     STextureList::const_iterator _end = this->end();
-    for (; _it != _end; _it++)
+    for (; _it != _end; ++_it)
     {
         const std::pair<u32, ref_texture>& loader = *_it;
 

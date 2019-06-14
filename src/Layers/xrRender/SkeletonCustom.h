@@ -309,7 +309,7 @@ public:
         if (!bInstance)
         {
             // sz += pUserData?pUserData->mem_usage() : 0;
-            for (vecBonesIt b_it = bones->begin(); b_it != bones->end(); b_it++)
+            for (vecBonesIt b_it = bones->begin(); b_it != bones->end(); ++b_it)
                 sz += sizeof(vecBones::value_type) + (*b_it)->mem_usage();
         }
         return sz;

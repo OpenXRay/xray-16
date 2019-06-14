@@ -63,7 +63,7 @@ void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
     // process constant-loaders
     R_constant_table::c_table::iterator it = m_ctable->table.begin();
     R_constant_table::c_table::iterator end = m_ctable->table.end();
-    for (; it != end; it++)
+    for (; it != end; ++it)
     {
         R_constant* Cs = &**it;
         if (Cs->handler)

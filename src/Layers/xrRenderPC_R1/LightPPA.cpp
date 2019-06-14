@@ -148,7 +148,7 @@ void CLightR_Manager::render_point(u32 _priority)
     // for each light
     Fvector lc_COP = Device.vCameraPosition;
     float lc_limit = ps_r1_dlights_clip;
-    for (xr_vector<light*>::iterator it = selected_point.begin(); it != selected_point.end(); it++)
+    for (xr_vector<light*>::iterator it = selected_point.begin(); it != selected_point.end(); ++it)
     {
         light* L = *it;
         VERIFY(L->spatial.sector && _valid(L->range));
@@ -225,7 +225,7 @@ void CLightR_Manager::render_spot(u32 _priority)
     Fvector lc_COP = Device.vCameraPosition;
     float lc_limit = ps_r1_dlights_clip;
 
-    for (xr_vector<light*>::iterator it = selected_spot.begin(); it != selected_spot.end(); it++)
+    for (xr_vector<light*>::iterator it = selected_spot.begin(); it != selected_spot.end(); ++it)
     {
         light* L = *it;
 

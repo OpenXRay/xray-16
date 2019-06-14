@@ -457,7 +457,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
             STextureList::iterator _it = _T->begin();
             STextureList::iterator _end = _T->end();
-            for (; _it != _end; _it++)
+            for (; _it != _end; ++_it)
             {
                 std::pair<u32, ref_texture>& loader = *_it;
                 u32 load_id = loader.first;
