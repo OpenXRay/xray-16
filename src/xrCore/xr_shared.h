@@ -88,7 +88,7 @@ protected:
     {
         if (0 == p_)
             return;
-        p_->m_ref_cnt--;
+        --p_->m_ref_cnt;
         if (0 == p_->m_ref_cnt)
             p_ = 0;
     }
@@ -96,7 +96,7 @@ protected:
     {
         T* v = rhs.p_;
         if (0 != v)
-            v->m_ref_cnt++;
+            ++v->m_ref_cnt;
         destroy();
         p_ = v;
     }
@@ -123,7 +123,7 @@ public:
     {
         T* v = container->dock(key, p);
         if (0 != v)
-            v->m_ref_cnt++;
+            ++v->m_ref_cnt;
         destroy();
         p_ = v;
     }
