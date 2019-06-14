@@ -21,7 +21,7 @@ public:
 
     CPHPositionsPairs& operator++(int)
     {
-        geom++;
+        ++geom;
         return *this;
     }
 

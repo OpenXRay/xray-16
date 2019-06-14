@@ -88,7 +88,7 @@ void CPHObject::Collide()
     {
         CPHMoveStorage* tracers = MoveStorage();
         CPHMoveStorage::iterator I = tracers->begin(), E = tracers->end();
-        for (; E != I; I++)
+        for (; E != I; ++I)
         {
             const Fvector *from = 0, *to = 0;
             Fvector dir;
