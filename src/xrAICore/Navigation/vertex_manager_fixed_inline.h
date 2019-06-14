@@ -32,7 +32,7 @@ inline void CFixedVertexManager::init()
 {
     CDataStorageBase::init();
     CDataStorageAllocator::init();
-    m_current_path_id++;
+    ++m_current_path_id;
     if (!m_current_path_id)
     {
         ZeroMemory(m_indexes, m_max_node_count * sizeof(IndexVertex));

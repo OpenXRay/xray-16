@@ -48,11 +48,11 @@ inline void CHashFixedVertexManager::init()
 {
     CDataStorageBase::init();
     CDataStorageAllocator::init();
-    m_current_path_id++;
+    ++m_current_path_id;
     m_vertex_count = 0;
     if (!m_current_path_id)
     {
-        m_current_path_id++;
+        ++m_current_path_id;
         ZeroMemory(m_hash, HashSize * sizeof(IndexVertex*));
         ZeroMemory(m_vertices, FixSize * sizeof(IndexVertex));
     }

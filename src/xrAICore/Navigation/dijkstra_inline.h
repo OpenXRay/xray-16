@@ -146,7 +146,7 @@ inline bool CSDijkstra::find(TPathManager& path_manager)
     // initialize data structures with new search
     initialize(path_manager);
     // iterate while opened list is not empty
-    for (TIteration i = TIteration(0); !data_storage().is_opened_empty(); i++)
+    for (TIteration i = TIteration(0); !data_storage().is_opened_empty(); ++i)
     {
         // check if we reached limit
         if (path_manager.is_limit_reached(i))
