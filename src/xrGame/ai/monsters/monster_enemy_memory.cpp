@@ -213,7 +213,7 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
     float max_value = 0.f;
 
     // find best at home first
-    for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++)
+    for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
     {
         if (!monster->Home->at_home(I->second.position))
             continue;
@@ -229,7 +229,7 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
     {
         // find any
         max_value = 0.f;
-        for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++)
+        for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
         {
             if (I->second.danger > max_value)
             {

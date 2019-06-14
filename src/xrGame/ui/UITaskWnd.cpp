@@ -238,7 +238,7 @@ void CUITaskWnd::ReloadTaskInfo()
 
     Locations map_locs = Level().MapManager().Locations();
     auto b = map_locs.begin(), e = map_locs.end();
-    for (; b != e; b++)
+    for (; b != e; ++b)
     {
         shared_str spot = b->spot_type;
         if (strstr(spot.c_str(), "treasure"))

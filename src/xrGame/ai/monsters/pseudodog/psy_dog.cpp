@@ -116,7 +116,7 @@ bool CPsyDog::spawn_phantom()
 //////////////////////////////////////////////////////////////////////////
 void CPsyDog::delete_all_phantoms()
 {
-    for (xr_vector<CPsyDogPhantom*>::iterator it = m_storage.begin(); it != m_storage.end(); it++)
+    for (xr_vector<CPsyDogPhantom*>::iterator it = m_storage.begin(); it != m_storage.end(); ++it)
         (*it)->destroy_from_parent();
 
     m_storage.clear();

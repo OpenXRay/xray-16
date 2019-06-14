@@ -1207,7 +1207,7 @@ void game_sv_CaptureTheArtefact::LoadArtefactRPoints()
         FS.r_close(F);
     }
     // verifying initialization of all rpoints
-    for (TeamsMap::const_iterator i = teams.begin(); i != teams.end(); i++)
+    for (TeamsMap::const_iterator i = teams.begin(); i != teams.end(); ++i)
     {
         if (!i->second.rPointInitialized)
         {
@@ -1622,7 +1622,7 @@ void game_sv_CaptureTheArtefact::ProcessPlayerDeath(game_PlayerState* playerStat
 void game_sv_CaptureTheArtefact::ReSpawnArtefacts()
 {
     TeamsMap::iterator te = teams.end();
-    for (TeamsMap::iterator ti = teams.begin(); ti != te; ti++)
+    for (TeamsMap::iterator ti = teams.begin(); ti != te; ++ti)
     {
         VERIFY2(!!ti->second.artefactName, make_string("not found artefact class name for team %d", ti->first).c_str());
         CSE_ALifeItemArtefact* tempSvEntity =

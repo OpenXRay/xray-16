@@ -288,7 +288,7 @@ void CUIStatsPlayerList::Update()
     auto it = m_pad->GetChildWndList().begin();
     auto itit = items.begin();
 
-    for (; it != m_pad->GetChildWndList().end(); it++, itit++)
+    for (; it != m_pad->GetChildWndList().end(); ++it, ++itit)
     {
         CUIStatsPlayerInfo* pi = smart_cast<CUIStatsPlayerInfo*>(*it);
         R_ASSERT(pi);

@@ -855,7 +855,7 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
                 (m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
     {
         auto it = m_scopes.begin();
-        for (; it != m_scopes.end(); it++)
+        for (; it != m_scopes.end(); ++it)
         {
             if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
                 return true;
@@ -881,7 +881,7 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
            (m_scopes[cur_scope]->m_sScopeName	== item_section_name))*/
     {
         auto it = m_scopes.begin();
-        for (; it != m_scopes.end(); it++)
+        for (; it != m_scopes.end(); ++it)
         {
             if (pSettings->r_string((*it), "scope_name") == item_section_name)
                 return true;
@@ -913,7 +913,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
        (m_scopes[cur_scope]->m_sScopeName == pIItem->object().cNameSect())*/)
     {
         auto it = m_scopes.begin();
-        for (; it != m_scopes.end(); it++)
+        for (; it != m_scopes.end(); ++it)
         {
             if (pSettings->r_string((*it), "scope_name") == pIItem->object().cNameSect())
                 m_cur_scope = u8(it - m_scopes.begin());
@@ -958,7 +958,7 @@ bool CWeaponMagazined::DetachScope(const char* item_section_name, bool b_spawn_i
 {
     bool detached = false;
     auto it = m_scopes.begin();
-    for (; it != m_scopes.end(); it++)
+    for (; it != m_scopes.end(); ++it)
     {
         LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
         if (!xr_strcmp(iter_scope_name, item_section_name))

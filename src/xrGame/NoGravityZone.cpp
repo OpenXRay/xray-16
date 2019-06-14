@@ -20,7 +20,7 @@ void CNoGravityZone::exit_Zone(SZoneObjectInfo& io)
 void CNoGravityZone::UpdateWorkload(u32 dt)
 {
     auto i = m_ObjectInfoMap.begin(), e = m_ObjectInfoMap.end();
-    for (; e != i; i++)
+    for (; e != i; ++i)
         switchGravity(*i, false);
 }
 void CNoGravityZone::switchGravity(SZoneObjectInfo& io, bool val)

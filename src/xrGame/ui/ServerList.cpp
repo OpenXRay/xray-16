@@ -319,7 +319,7 @@ void CServerList::FillUpDetailedServerInfo()
         }
 
         // TEAM 2
-        for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); it++)
+        for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); ++it)
         {
             PlayerInfo pf = *it;
             if (2 != pf.Team)

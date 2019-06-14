@@ -52,7 +52,7 @@ bool CControlAnimationBase::accel_chain_get(
     auto E = m_accel.chain.end();
 
     // пройти по всем Chain-векторам
-    for (auto I = B; I != E; I++)
+    for (auto I = B; I != E; ++I)
     {
         auto IT_B = I->begin();
         auto IT_E = I->end();
@@ -62,7 +62,7 @@ bool CControlAnimationBase::accel_chain_get(
         bool found = false;
 
         // Пройти по текущему вектору
-        for (auto IT = IT_B; IT != IT_E; IT++)
+        for (auto IT = IT_B; IT != IT_E; ++IT)
         {
             SAnimItem* item_it = m_anim_storage[*IT];
             VERIFY(item_it);
@@ -104,7 +104,7 @@ bool CControlAnimationBase::accel_chain_test()
     string256 error_msg;
 
     // пройти по всем Chain-векторам
-    for (auto I = m_accel.chain.begin(); I != m_accel.chain.end(); I++)
+    for (auto I = m_accel.chain.begin(); I != m_accel.chain.end(); ++I)
     {
         VERIFY2(I->size() >= 2, error_msg);
 
@@ -113,7 +113,7 @@ bool CControlAnimationBase::accel_chain_test()
         VERIFY(anim_from);
 
         // Пройти по текущему вектору
-        for (auto IT = I->begin() + 1; IT != I->end(); IT++)
+        for (auto IT = I->begin() + 1; IT != I->end(); ++IT)
         {
             anim_to = m_anim_storage[*IT];
 

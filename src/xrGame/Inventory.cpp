@@ -1246,7 +1246,7 @@ bool CInventory::CanTakeItem(CInventoryItem* inventory_item) const
     if (!inventory_item->CanTake())
         return false;
     TIItemContainer::const_iterator it;
-    for (it = m_all.begin(); it != m_all.end(); it++)
+    for (it = m_all.begin(); it != m_all.end(); ++it)
         if ((*it)->object().ID() == inventory_item->object().ID())
             break;
     VERIFY3(it == m_all.end(), "item already exists in inventory", *inventory_item->object().cName());

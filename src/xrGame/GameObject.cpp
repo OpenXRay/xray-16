@@ -944,7 +944,7 @@ void CGameObject::dbg_DrawSkeleton()
     Skeleton->_dbg_refresh();
 
     const CCF_Skeleton::ElementVec& Elements = Skeleton->_GetElements();
-    for (CCF_Skeleton::ElementVec::const_iterator I = Elements.begin(); I != Elements.end(); I++)
+    for (CCF_Skeleton::ElementVec::const_iterator I = Elements.begin(); I != Elements.end(); ++I)
     {
         if (!I->valid())
             continue;

@@ -138,7 +138,7 @@ void CActor::PickupModeUpdate()
     CFrustum frustum;
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    for (xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
+    for (xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); ++it)
     {
         if (CanPickItem(frustum, Device.vCameraPosition, *it))
             PickupInfoDraw(*it);

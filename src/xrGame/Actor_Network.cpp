@@ -1536,7 +1536,7 @@ void CActor::OnRender_Network()
                     Skeleton->_dbg_refresh();
 
                     const CCF_Skeleton::ElementVec& Elements = Skeleton->_GetElements();
-                    for (CCF_Skeleton::ElementVec::const_iterator I = Elements.begin(); I != Elements.end(); I++)
+                    for (CCF_Skeleton::ElementVec::const_iterator I = Elements.begin(); I != Elements.end(); ++I)
                     {
                         if (!I->valid())
                             continue;
@@ -1677,7 +1677,7 @@ void CActor::OnRender_Network()
             Fvector Pos1, Pos2;
             auto It = pLastPos->begin();
             Pos1 = *It;
-            for (; It != pLastPos->end(); It++)
+            for (; It != pLastPos->end(); ++It)
             {
                 Pos2 = *It;
 

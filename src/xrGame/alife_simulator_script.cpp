@@ -49,7 +49,7 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
     VERIFY(self);
 
     for (CALifeObjectRegistry::OBJECT_REGISTRY::const_iterator it = self->objects().objects().begin();
-         it != self->objects().objects().end(); it++)
+         it != self->objects().objects().end(); ++it)
     {
         CSE_ALifeDynamicObject* obj = it->second;
         if (xr_strcmp(obj->name_replace(), name) == 0)

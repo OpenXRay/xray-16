@@ -104,7 +104,7 @@ bool CPhraseDialog::SayPhrase(DIALOG_SHARED_PTR& phrase_dialog, const shared_str
     {
         //обновить список фраз, которые сейчас сможет говорить собеседник
         for (xr_vector<CPhraseGraph::CEdge>::const_iterator it = phrase_vertex->edges().begin();
-             it != phrase_vertex->edges().end(); it++)
+             it != phrase_vertex->edges().end(); ++it)
         {
             const CPhraseGraph::CEdge& edge = *it;
             CPhraseGraph::CVertex* next_phrase_vertex = phrase_dialog->data()->m_PhraseGraph.vertex(edge.vertex_id());

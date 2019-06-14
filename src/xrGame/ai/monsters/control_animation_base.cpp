@@ -313,7 +313,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
     // искать текущую анимацию в AA_VECTOR
     MotionID motion = smart_cast<IKinematicsAnimated*>(m_object->Visual())->LL_MotionID(anim_name);
 
-    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
+    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); ++it)
     {
         if (it->motion == motion)
             return (*it);
@@ -326,7 +326,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
 SAAParam& CControlAnimationBase::AA_GetParams(MotionID motion, float time_perc)
 {
     // искать текущую анимацию в AA_VECTOR
-    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
+    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); ++it)
     {
         if ((it->motion == motion) && (it->time == time_perc))
             return (*it);
@@ -503,7 +503,7 @@ void CControlAnimationBase::UpdateAnimCount()
 {
     IKinematicsAnimated* skel = smart_cast<IKinematicsAnimated*>(m_object->Visual());
 
-    for (auto it = m_anim_storage.begin(); it != m_anim_storage.end(); it++)
+    for (auto it = m_anim_storage.begin(); it != m_anim_storage.end(); ++it)
     {
         if (!(*it))
             continue;

@@ -254,7 +254,7 @@ void CControllerAnimation::select_legs_animation()
     else
     {
         // else select standing animation
-        for (auto it = m_legs.begin(); it != m_legs.end(); it++)
+        for (auto it = m_legs.begin(); it != m_legs.end(); ++it)
         {
             if ((it->first & m_current_legs_action) == m_current_legs_action)
             {
@@ -290,7 +290,7 @@ CControllerAnimation::SPathRotations CControllerAnimation::get_path_rotation(flo
     auto it_best = m_path_rotations[m_current_legs_action].begin();
     float best_diff = flt_max;
     for (auto it = m_path_rotations[m_current_legs_action].begin();
-         it != m_path_rotations[m_current_legs_action].end(); it++)
+         it != m_path_rotations[m_current_legs_action].end(); ++it)
     {
         float angle_diff = angle_normalize(it->angle);
 

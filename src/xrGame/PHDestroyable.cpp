@@ -152,7 +152,7 @@ void CPHDestroyable::Destroy(u16 source_id /*=u16(-1)*/, LPCSTR section /*="ph_s
 
     if (IsGameTypeSingle())
     {
-        for (; e != i; i++)
+        for (; e != i; ++i)
             GenSpawnReplace(source_id, section, *i);
     };
     ///////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ void CPHDestroyable::Load(CInifile* ini, LPCSTR section)
         CInifile::Sect& data = ini->r_section(section);
         if (data.Data.size() > 0)
             m_flags.set(fl_destroyable, true);
-        for (auto I = data.Data.cbegin(); I != data.Data.cend(); I++)
+        for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
             if (I->first.size())
                 m_destroyed_obj_visual_names.push_back(I->first);
     }
@@ -345,7 +345,7 @@ void CPHDestroyable::NotificateDestroy(CPHDestroyableNotificate* dn)
     {
         xr_vector<CPHDestroyableNotificate *>::iterator i = m_notificate_objects.begin(),
                                                         e = m_notificate_objects.end();
-        for (; i < e; i++)
+        for (; i < e; ++i)
             NotificatePart(*i);
         PhysicallyRemoveSelf();
         m_notificate_objects.clear();

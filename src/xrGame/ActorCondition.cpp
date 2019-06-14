@@ -536,7 +536,7 @@ void CActorCondition::save(NET_Packet& output_packet)
 
     output_packet.w_u8((u8)m_booster_influences.size());
     BOOSTER_MAP::iterator b = m_booster_influences.begin(), e = m_booster_influences.end();
-    for (; b != e; b++)
+    for (; b != e; ++b)
     {
         output_packet.w_u8((u8)b->second.m_type);
         output_packet.w_float(b->second.fBoostValue);

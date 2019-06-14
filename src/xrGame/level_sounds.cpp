@@ -178,7 +178,7 @@ void CLevelSoundManager::Load()
                 CInifile::Sect& S = gameLtx.r_section(music_sect);
                 auto it = S.Data.cbegin(), end = S.Data.cend();
                 m_MusicTracks.reserve(S.Data.size());
-                for (; it != end; it++)
+                for (; it != end; ++it)
                 {
                     m_MusicTracks.push_back(SMusicTrack());
                     m_MusicTracks.back().Load(*it->first, *it->second);

@@ -141,7 +141,7 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     {
         CInifile::Sect& S = pGameIni->r_section(sect_name.c_str());
         auto it = S.Data.cbegin(), end = S.Data.cend();
-        for (; it != end; it++)
+        for (; it != end; ++it)
         {
             shared_str map_name = it->first;
             xr_strlwr(map_name);

@@ -40,7 +40,7 @@ CUIRankingWnd::CUIRankingWnd()
 CUIRankingWnd::~CUIRankingWnd()
 {
     auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
-    for (; b != e; b++)
+    for (; b != e; ++b)
         xr_delete(*b);
     m_achieves_vec.clear();
 }
@@ -260,7 +260,7 @@ void CUIRankingWnd::update_info()
 void CUIRankingWnd::DrawHint()
 {
     auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
-    for (; b != e; b++)
+    for (; b != e; ++b)
     {
         if ((*b)->IsShown())
             (*b)->DrawHint();
@@ -395,7 +395,7 @@ void CUIRankingWnd::ResetAll()
     if (m_favorite_weapon_icon)
         m_favorite_weapon_icon->TextureOff();
     auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
-    for (; b != e; b++)
+    for (; b != e; ++b)
         (*b)->Reset();
 
     inherited::ResetAll();

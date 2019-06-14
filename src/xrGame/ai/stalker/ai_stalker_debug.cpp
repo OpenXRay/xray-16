@@ -358,7 +358,7 @@ void CAI_Stalker::debug_text()
 
         float fuzzy = 0.f;
         xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
-        for (; I != E; I++)
+        for (; I != E; ++I)
             if (I->O->ID() == memory().enemy().selected()->ID())
             {
                 fuzzy = I->fuzzy;

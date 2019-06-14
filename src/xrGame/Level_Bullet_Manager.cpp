@@ -847,7 +847,7 @@ void CBulletManager::Render()
 
     GEnv.UIRender->StartPrimitive((u32)bullet_num * 12, IUIRender::ptTriList, IUIRender::pttLIT);
 
-    for (auto it = m_BulletsRendered.begin(); it != m_BulletsRendered.end(); it++)
+    for (auto it = m_BulletsRendered.begin(); it != m_BulletsRendered.end(); ++it)
     {
         SBullet* bullet = &(*it);
         if (!bullet->flags.allow_tracer)
