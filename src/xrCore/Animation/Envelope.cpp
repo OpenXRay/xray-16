@@ -266,6 +266,6 @@ void CEnvelope::Optimize()
         for (KeyIt k_it = keys.begin(); k_it != keys.end(); ++k_it)
             xr_delete(*k_it);
         keys.clear();
-        keys = new_keys;
+        keys = std::move(new_keys);
     }
 }

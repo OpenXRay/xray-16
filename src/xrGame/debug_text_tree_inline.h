@@ -72,7 +72,7 @@ void text_tree::output(int current_indent, int indent, Columns& columns, OutFunc
 {
     xr_string buffer;
     buffer.reserve(1024);
-    buffer = "";
+    buffer.clear();
 
     for (int j = 0; j < current_indent; ++j)
     {

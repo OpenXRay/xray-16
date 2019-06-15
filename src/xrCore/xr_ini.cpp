@@ -351,10 +351,10 @@ CInifile::CInifile(pcstr fileName, bool readOnly, bool loadAtStart, bool saveAtE
 
     if (loadAtStart)
     {
-        const xr_string path = EFS_Utils::ExtractFilePath(m_file_name);
         IReader* R = FS.r_open(fileName);
         if (R)
         {
+            const xr_string path = EFS_Utils::ExtractFilePath(m_file_name);
             if (sect_count)
                 DATA.reserve(sect_count);
             Load(R, path.c_str(), allow_include_func);
@@ -455,11 +455,11 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
 
                 string_path fn;
                 strconcat(sizeof fn, fn, path, inc_name);
-                const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
                 if (!allow_include_func || allow_include_func(fn))
                 {
                     IReader* I = FS.r_open(fn);
                     R_ASSERT3(I, "Can't find include file:", inc_name);
+                    const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
                     Load(I, inc_path.c_str(), allow_include_func);
                     FS.r_close(I);
                 }

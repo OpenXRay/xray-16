@@ -435,7 +435,7 @@ void CLevelSpawnConstructor::generate_artefact_spawn_positions()
     m_graph_engine = new CGraphEngine(m_level_graph->header().vertex_count());
 
     xr_vector<u32> l_tpaStack;
-    SPAWN_STORAGE zones;
+    //SPAWN_STORAGE zones;
     l_tpaStack.reserve(1024);
     for (auto &K : m_spawns)
     {

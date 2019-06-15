@@ -194,15 +194,13 @@ void CUIWindow::GetAbsoluteRect(Frect& r)
 
 bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    Frect wndRect = GetWndRect();
-
     cursor_pos.x = x;
     cursor_pos.y = y;
 
     if (WINDOW_LBUTTON_DOWN == mouse_action)
     {
         static u32 _last_db_click_frame = 0;
-        u32 dwCurTime = Device.dwTimeContinual;
+        const u32 dwCurTime = Device.dwTimeContinual;
 
         if ((_last_db_click_frame != Device.dwFrame) && (dwCurTime - m_dwLastClickTime < DOUBLE_CLICK_TIME))
         {
@@ -215,6 +213,7 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
 
     if (GetParent() == NULL)
     {
+        const Frect& wndRect = GetWndRect();
         if (!wndRect.in(cursor_pos))
             return false;
         //получить координаты относительно окна
@@ -266,7 +265,7 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
     for (; it != m_ChildWndList.rend(); ++it)
     {
         CUIWindow* w = (*it);
-        Frect wndRect = w->GetWndRect();
+        const Frect& wndRect = w->GetWndRect();
         if (wndRect.in(cursor_pos))
         {
             if (w->IsEnabled())

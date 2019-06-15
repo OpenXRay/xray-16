@@ -148,8 +148,6 @@ bool ChimeraAttackState<Object>::select_target_for_move()
     Fvector const enemy_pos = enemy->Position();
     Fvector const self_pos = this->object->Position();
 
-    Fvector const self2enemy = enemy_pos - self_pos;
-
     float const attack_radius = get_attack_radius();
 
     Fvector const enemy_dir = normalize(enemy->Direction());
@@ -164,10 +162,11 @@ bool ChimeraAttackState<Object>::select_target_for_move()
     }
     else
     {
-        Fvector const self2behind = behind_point - self_pos;
+        Fvector const self2enemy = enemy_pos - self_pos;
 
         if (m_run_side == run_side_undefined || current_time() > m_run_side_select_tick)
         {
+            Fvector const self2behind = behind_point - self_pos;
             bool left_side = self2enemy.x * self2behind.z - self2enemy.z * self2behind.x > 0.f;
             if (!(rand() % 2))
             {

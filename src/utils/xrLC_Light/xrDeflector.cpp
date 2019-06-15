@@ -36,10 +36,10 @@ void lblit(lm_layer& dst, lm_layer& src, u32 px, u32 py, u32 aREF)
         {
             u32 dx = px + x;
             u32 dy = py + y;
-            base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
             if (sm >= aREF)
             {
+                base_color sc = src.surface[y * ss_x + x];
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -55,10 +55,10 @@ void blit(lm_layer& dst, u32 ds_x, u32 ds_y, lm_layer& src, u32 ss_x, u32 ss_y, 
         {
             u32 dx = px + x;
             u32 dy = py + y;
-            base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
             if (sm >= aREF)
             {
+                base_color sc = src.surface[y * ss_x + x];
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -89,10 +89,10 @@ void blit_r(lm_layer& dst, u32 ds_x, u32 ds_y, lm_layer& src, u32 ss_x, u32 ss_y
         {
             u32 dx = px + y;
             u32 dy = py + x;
-            base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
             if (sm >= aREF)
             {
+                base_color sc = src.surface[y * ss_x + x];
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -321,7 +321,7 @@ void CDeflector::RemapUV(u32 base_u, u32 base_v, u32 size_u, u32 size_v, u32 lm_
 {
     xr_vector<UVtri> tris_new;
     RemapUV(tris_new, base_u, base_v, size_u, size_v, lm_u, lm_v, bRotate);
-    UVpolys = tris_new;
+    UVpolys = std::move(tris_new);
 }
 
 void CDeflector::L_Calculate(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H)

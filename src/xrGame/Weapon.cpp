@@ -404,7 +404,6 @@ void CWeapon::Load(LPCSTR section)
     }
     else if (m_eScopeStatus == ALife::eAddonPermanent)
     {
-        shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
         if (!GEnv.isDedicatedServer)
         {
@@ -414,6 +413,7 @@ void CWeapon::Load(LPCSTR section)
                 pWpnScopeXml = new CUIXml();
                 pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
             }
+            shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
             CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
         }
     }

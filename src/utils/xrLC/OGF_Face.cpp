@@ -445,15 +445,15 @@ void OGF::MakeProgressive(float metric_limit)
         }
         catch (...)
         {
-            data.faces = _saved_faces;
-            data.vertices = _saved_vertices;
+            data.faces = std::move(_saved_faces);
+            data.vertices = std::move(_saved_vertices);
             progressive_clear();
             Logger.clMsg("* X-mesh simplification failed: access violation");
         }
         if (0 == VR)
         {
-            data.faces = _saved_faces;
-            data.vertices = _saved_vertices;
+            data.faces = std::move(_saved_faces);
+            data.vertices = std::move(_saved_vertices);
             progressive_clear();
             Logger.clMsg("* X-mesh simplification failed");
         }

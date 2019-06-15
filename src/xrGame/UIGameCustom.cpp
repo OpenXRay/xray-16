@@ -326,10 +326,10 @@ CMapListHelper gMapListHelper;
 void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName, const char* levelVer /*= "1.0"*/)
 {
     CInifile levelCfg(cfgName);
-    shared_str shLevelName = levelName.substr(0, levelName.find(_DELIMITER)).c_str();
-    shared_str shLevelVer = levelVer;
     if (levelCfg.section_exist("map_usage"))
     {
+        shared_str shLevelName = levelName.substr(0, levelName.find(_DELIMITER)).c_str();
+        shared_str shLevelVer = levelVer;
         if (levelCfg.line_exist("map_usage", "ver") && !levelVer)
             shLevelVer = levelCfg.r_string("map_usage", "ver");
         for (CInifile::Item& kv : levelCfg.r_section("map_usage").Data)
