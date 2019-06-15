@@ -45,7 +45,7 @@ void CRender::render_lights(light_Package& LP)
             for (u32 test = 0; test < source.size(); test++)
             {
                 light* L = source[test];
-                SMAP_Rect R;
+                SMAP_Rect R{};
                 if (LP_smap_pool.push(R, L->X.S.size))
                 {
                     // OK
@@ -60,8 +60,8 @@ void CRender::render_lights(light_Package& LP)
         }
 
         // save (lights are popped from back)
-        reverse(refactored.begin(), refactored.end());
-        LP.v_shadowed = refactored;
+        std::reverse(refactored.begin(), refactored.end());
+        LP.v_shadowed = std::move(refactored);
     }
 
     //////////////////////////////////////////////////////////////////////////

@@ -54,14 +54,14 @@ void CRender::render_lights(light_Package& LP)
                     L->vis.smap_ID = smap_ID;
                     refactored.push_back(L);
                     source.erase(source.begin() + test);
-                    test--;
+                    --test;
                 }
             }
         }
 
         // save (lights are popped from back)
         std::reverse(refactored.begin(), refactored.end());
-        LP.v_shadowed = refactored;
+        LP.v_shadowed = std::move(refactored);
     }
 
     PIX_EVENT(SHADOWED_LIGHTS);
