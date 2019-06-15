@@ -291,7 +291,7 @@ void CDeflector::RemapUV(
         {
             UVtri& T = *it;
             tnew.owner = T.owner;
-            for (int i = 0; i < 3; i++)
+            for (size_t i = 0; i < 3; i++)
             {
                 tc.x = ((T.uv[i].y - a_min.y) / a_size.y) * d_size.x + d_min.x;
                 tc.y = ((T.uv[i].x - a_min.x) / a_size.x) * d_size.y + d_min.y;
@@ -306,7 +306,7 @@ void CDeflector::RemapUV(
         {
             UVtri& T = *it;
             tnew.owner = T.owner;
-            for (int i = 0; i < 3; i++)
+            for (size_t i = 0; i < 3; i++)
             {
                 tc.x = ((T.uv[i].x - a_min.x) / a_size.x) * d_size.x + d_min.x;
                 tc.y = ((T.uv[i].y - a_min.y) / a_size.y) * d_size.y + d_min.y;
@@ -335,7 +335,7 @@ void CDeflector::L_Calculate(CDB::COLLIDER* DB, base_lighting* LightsSelected, H
         Fbox2 bounds;
         Bounds_Summary(bounds);
         H.initialize(bounds, (u32)UVpolys.size());
-        for (u32 fid = 0; fid < UVpolys.size(); fid++)
+        for (size_t fid = 0; fid < UVpolys.size(); fid++)
         {
             UVtri* T = &(UVpolys[fid]);
             Bounds(fid, bounds);
