@@ -9,10 +9,15 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow), {
-    module(luaState)[class_<CUIButton, CUIStatic>("CUIButton").def(constructor<>()),
+SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIButton, CUIStatic>("CUIButton")
+            .def(constructor<>()),
 
-        class_<CUI3tButton, CUIButton>("CUI3tButton").def(constructor<>()),
+        class_<CUI3tButton, CUIButton>("CUI3tButton")
+            .def(constructor<>()),
 
         class_<CUICheckButton, CUI3tButton>("CUICheckButton")
             .def(constructor<>())
@@ -20,13 +25,17 @@ SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow), {
             .def("SetCheck", &CUICheckButton::SetCheck)
             .def("SetDependControl", &CUICheckButton::SetDependControl),
 
-        class_<CUICustomSpin, CUIWindow>("CUICustomSpin").def("GetText", &CUICustomSpin::GetText),
+        class_<CUICustomSpin, CUIWindow>("CUICustomSpin")
+            .def("GetText", &CUICustomSpin::GetText),
 
-        class_<CUISpinNum, CUICustomSpin>("CUISpinNum").def(constructor<>()),
+        class_<CUISpinNum, CUICustomSpin>("CUISpinNum")
+            .def(constructor<>()),
 
-        class_<CUISpinFlt, CUICustomSpin>("CUISpinFlt").def(constructor<>()),
+        class_<CUISpinFlt, CUICustomSpin>("CUISpinFlt")
+            .def(constructor<>()),
 
-        class_<CUISpinText, CUICustomSpin>("CUISpinText").def(constructor<>()),
+        class_<CUISpinText, CUICustomSpin>("CUISpinText")
+            .def(constructor<>()),
 
         class_<CUITrackBar, CUIWindow>("CUITrackBar")
             .def(constructor<>())

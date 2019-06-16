@@ -121,20 +121,28 @@ SCRIPT_EXPORT(CUIWindow, (), {
     ];
 });
 
-SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow), {
-    module(luaState)[class_<CUIFrameWindow, CUIWindow>("CUIFrameWindow")
-                         .def(constructor<>())
-                         .def("SetWidth", &CUIFrameWindow::SetWidth)
-                         .def("SetHeight", &CUIFrameWindow::SetHeight)
-                         .def("SetColor", &CUIFrameWindow::SetTextureColor)];
+SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIFrameWindow, CUIWindow>("CUIFrameWindow")
+            .def(constructor<>())
+            .def("SetWidth", &CUIFrameWindow::SetWidth)
+            .def("SetHeight", &CUIFrameWindow::SetHeight)
+            .def("SetColor", &CUIFrameWindow::SetTextureColor)
+    ];
 });
 
-SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow), {
-    module(luaState)[class_<CUIFrameLineWnd, CUIWindow>("CUIFrameLineWnd")
-                         .def(constructor<>())
-                         .def("SetWidth", &CUIFrameLineWnd::SetWidth)
-                         .def("SetHeight", &CUIFrameLineWnd::SetHeight)
-                         .def("SetColor", &CUIFrameLineWnd::SetTextureColor)];
+SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIFrameLineWnd, CUIWindow>("CUIFrameLineWnd")
+            .def(constructor<>())
+            .def("SetWidth", &CUIFrameLineWnd::SetWidth)
+            .def("SetHeight", &CUIFrameLineWnd::SetHeight)
+            .def("SetColor", &CUIFrameLineWnd::SetTextureColor)
+    ];
 });
 
 SCRIPT_EXPORT(UIHint, (CUIWindow), {
@@ -149,7 +157,8 @@ SCRIPT_EXPORT(UIHint, (CUIWindow), {
     ];
 });
 
-SCRIPT_EXPORT(CUIScrollView, (CUIWindow), {
+SCRIPT_EXPORT(CUIScrollView, (CUIWindow),
+{
     module(luaState)
     [
         class_<CUIScrollView, CUIWindow>("CUIScrollView")
@@ -167,7 +176,8 @@ SCRIPT_EXPORT(CUIScrollView, (CUIWindow), {
     ];
 });
 
-SCRIPT_EXPORT(EnumUIMessages, (), {
+SCRIPT_EXPORT(EnumUIMessages, (),
+{
     class EnumUIMessages
     {
     };
@@ -176,59 +186,59 @@ SCRIPT_EXPORT(EnumUIMessages, (), {
         class_<EnumUIMessages>("ui_events")
         .enum_("events")
         [
-                             // CUIWindow
-                             value("WINDOW_LBUTTON_DOWN", int(WINDOW_LBUTTON_DOWN)),
-                             value("WINDOW_RBUTTON_DOWN", int(WINDOW_RBUTTON_DOWN)),
-                             value("WINDOW_LBUTTON_UP", int(WINDOW_LBUTTON_UP)),
-                             value("WINDOW_RBUTTON_UP", int(WINDOW_RBUTTON_UP)),
-                             value("WINDOW_MOUSE_MOVE", int(WINDOW_MOUSE_MOVE)),
-                             value("WINDOW_LBUTTON_DB_CLICK", int(WINDOW_LBUTTON_DB_CLICK)),
-                             value("WINDOW_KEY_PRESSED", int(WINDOW_KEY_PRESSED)),
-                             value("WINDOW_KEY_RELEASED", int(WINDOW_KEY_RELEASED)),
-                             value("WINDOW_KEYBOARD_CAPTURE_LOST", int(WINDOW_KEYBOARD_CAPTURE_LOST)),
+            // CUIWindow
+            value("WINDOW_LBUTTON_DOWN", int(WINDOW_LBUTTON_DOWN)),
+            value("WINDOW_RBUTTON_DOWN", int(WINDOW_RBUTTON_DOWN)),
+            value("WINDOW_LBUTTON_UP", int(WINDOW_LBUTTON_UP)),
+            value("WINDOW_RBUTTON_UP", int(WINDOW_RBUTTON_UP)),
+            value("WINDOW_MOUSE_MOVE", int(WINDOW_MOUSE_MOVE)),
+            value("WINDOW_LBUTTON_DB_CLICK", int(WINDOW_LBUTTON_DB_CLICK)),
+            value("WINDOW_KEY_PRESSED", int(WINDOW_KEY_PRESSED)),
+            value("WINDOW_KEY_RELEASED", int(WINDOW_KEY_RELEASED)),
+            value("WINDOW_KEYBOARD_CAPTURE_LOST", int(WINDOW_KEYBOARD_CAPTURE_LOST)),
 
-                             // CUIButton
-                             value("BUTTON_CLICKED", int(BUTTON_CLICKED)),
-                             value("BUTTON_DOWN", int(BUTTON_DOWN)),
+            // CUIButton
+            value("BUTTON_CLICKED", int(BUTTON_CLICKED)),
+            value("BUTTON_DOWN", int(BUTTON_DOWN)),
 
-                             // CUITabControl
-                             value("TAB_CHANGED", int(TAB_CHANGED)),
+            // CUITabControl
+            value("TAB_CHANGED", int(TAB_CHANGED)),
 
-                             // CUICheckButton
-                             value("CHECK_BUTTON_SET", int(CHECK_BUTTON_SET)),
-                             value("CHECK_BUTTON_RESET", int(CHECK_BUTTON_RESET)),
+            // CUICheckButton
+            value("CHECK_BUTTON_SET", int(CHECK_BUTTON_SET)),
+            value("CHECK_BUTTON_RESET", int(CHECK_BUTTON_RESET)),
 
-                             // CUIRadioButton
-                             value("RADIOBUTTON_SET", int(RADIOBUTTON_SET)),
+            // CUIRadioButton
+            value("RADIOBUTTON_SET", int(RADIOBUTTON_SET)),
 
-                             // CUIScrollBox
-                             value("SCROLLBOX_MOVE", int(SCROLLBOX_MOVE)),
+            // CUIScrollBox
+            value("SCROLLBOX_MOVE", int(SCROLLBOX_MOVE)),
 
-                             // CUIScrollBar
-                             value("SCROLLBAR_VSCROLL", int(SCROLLBAR_VSCROLL)),
-                             value("SCROLLBAR_HSCROLL", int(SCROLLBAR_HSCROLL)),
+            // CUIScrollBar
+            value("SCROLLBAR_VSCROLL", int(SCROLLBAR_VSCROLL)),
+            value("SCROLLBAR_HSCROLL", int(SCROLLBAR_HSCROLL)),
 
-                             // CUIListWnd
-                             value("LIST_ITEM_CLICKED", int(LIST_ITEM_CLICKED)),
-                             value("LIST_ITEM_SELECT", int(LIST_ITEM_SELECT)),
-                             value("LIST_ITEM_UNSELECT", int(LIST_ITEM_UNSELECT)),
+            // CUIListWnd
+            value("LIST_ITEM_CLICKED", int(LIST_ITEM_CLICKED)),
+            value("LIST_ITEM_SELECT", int(LIST_ITEM_SELECT)),
+            value("LIST_ITEM_UNSELECT", int(LIST_ITEM_UNSELECT)),
 
-                             // UIPropertiesBox
-                             value("PROPERTY_CLICKED", int(PROPERTY_CLICKED)),
+            // UIPropertiesBox
+            value("PROPERTY_CLICKED", int(PROPERTY_CLICKED)),
 
-                             // CUIMessageBox
-                             value("MESSAGE_BOX_OK_CLICKED", int(MESSAGE_BOX_OK_CLICKED)),
-                             value("MESSAGE_BOX_YES_CLICKED", int(MESSAGE_BOX_YES_CLICKED)),
-                             value("MESSAGE_BOX_NO_CLICKED", int(MESSAGE_BOX_NO_CLICKED)),
-                             value("MESSAGE_BOX_CANCEL_CLICKED", int(MESSAGE_BOX_CANCEL_CLICKED)),
-                             value("MESSAGE_BOX_COPY_CLICKED", int(MESSAGE_BOX_COPY_CLICKED)),
-                             value("MESSAGE_BOX_QUIT_GAME_CLICKED", int(MESSAGE_BOX_QUIT_GAME_CLICKED)),
-                             value("MESSAGE_BOX_QUIT_WIN_CLICKED", int(MESSAGE_BOX_QUIT_WIN_CLICKED)),
+            // CUIMessageBox
+            value("MESSAGE_BOX_OK_CLICKED", int(MESSAGE_BOX_OK_CLICKED)),
+            value("MESSAGE_BOX_YES_CLICKED", int(MESSAGE_BOX_YES_CLICKED)),
+            value("MESSAGE_BOX_NO_CLICKED", int(MESSAGE_BOX_NO_CLICKED)),
+            value("MESSAGE_BOX_CANCEL_CLICKED", int(MESSAGE_BOX_CANCEL_CLICKED)),
+            value("MESSAGE_BOX_COPY_CLICKED", int(MESSAGE_BOX_COPY_CLICKED)),
+            value("MESSAGE_BOX_QUIT_GAME_CLICKED", int(MESSAGE_BOX_QUIT_GAME_CLICKED)),
+            value("MESSAGE_BOX_QUIT_WIN_CLICKED", int(MESSAGE_BOX_QUIT_WIN_CLICKED)),
 
-                             value("EDIT_TEXT_COMMIT", int(EDIT_TEXT_COMMIT)),
-                             // CMainMenu
-                             value("MAIN_MENU_RELOADED", int(MAIN_MENU_RELOADED))
-                         ]
+            value("EDIT_TEXT_COMMIT", int(EDIT_TEXT_COMMIT)),
+            // CMainMenu
+            value("MAIN_MENU_RELOADED", int(MAIN_MENU_RELOADED))
+        ]
     ];
 });
 // clang-format on
