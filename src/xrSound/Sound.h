@@ -156,7 +156,7 @@ class XRSOUND_API ISoundManager
 
 protected:
     friend class ref_sound_data;
-    virtual void _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type) = 0;
+    virtual bool _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
     virtual void _destroy_data(ref_sound_data& S) = 0;
 
 public:
@@ -167,7 +167,7 @@ public:
     virtual void _restart() = 0;
     virtual bool i_locked() = 0;
 
-    virtual void create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type) = 0;
+    virtual bool create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
     virtual void attach_tail(ref_sound& S, pcstr fName) = 0;
     virtual void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) = 0;
     virtual void destroy(ref_sound& S) = 0;
@@ -230,8 +230,13 @@ public:
     u32 dwBytesTotal;
     float fTimeTotal;
 
-    ref_sound_data()  throw() : handle(0), feedback(0), s_type(st_Effect), g_type(0), g_object(0) {  }
-    ref_sound_data(pcstr fName, esound_type sound_type, int game_type) { GEnv.Sound->_create_data(*this, fName, sound_type, game_type); }
+    ref_sound_data() noexcept : handle(0), feedback(0), s_type(st_Effect), g_type(0), g_object(0) {}
+
+    ref_sound_data(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
+    {
+        GEnv.Sound->_create_data(*this, fName, sound_type, game_type, replaceWithNoSound);
+    }
+
     virtual ~ref_sound_data() { GEnv.Sound->_destroy_data(*this); }
     float get_length_sec() const { return fTimeTotal; }
 };
@@ -248,8 +253,9 @@ struct ref_sound
 {
     ref_sound_data_ptr _p;
 
-    ref_sound() {}
-    ~ref_sound() {}
+    ref_sound() = default;
+    ~ref_sound() = default;
+
     CSound_source*     _handle() const { return _p ? _p->handle   : nullptr; }
     CSound_emitter*    _feedback()     { return _p ? _p->feedback : nullptr; }
     IGameObject*       _g_object()   { VERIFY(_p); return _p->g_object;   }
@@ -257,8 +263,9 @@ struct ref_sound
     esound_type        _sound_type() { VERIFY(_p); return _p->s_type;     }
     CSound_UserDataPtr _g_userdata() { VERIFY(_p); return _p->g_userdata; }
 
-    void create(pcstr name, esound_type sound_type, int game_type)
-    { VerSndUnlocked(); GEnv.Sound->create(*this, name, sound_type, game_type); }
+    bool create(pcstr name, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
+    { VerSndUnlocked(); return GEnv.Sound->create(*this, name, sound_type, game_type, replaceWithNoSound); }
+
     void attach_tail(pcstr name)
     { VerSndUnlocked(); GEnv.Sound->attach_tail(*this, name); }
 

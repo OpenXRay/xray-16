@@ -273,11 +273,17 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     xr_free(_data);
 }
 
-void CSoundRender_Core::create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type)
+bool CSoundRender_Core::create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound /*= true*/)
 {
     if (!bPresent)
-        return;
-    S._p = new ref_sound_data(fName, sound_type, game_type);
+        return S._handle() != nullptr;
+
+    S._p = new ref_sound_data(fName, sound_type, game_type, replaceWithNoSound);
+
+    if (S._handle() == nullptr && !replaceWithNoSound)
+        S._p = nullptr; // no reason to keep it
+
+    return S._handle() != nullptr;
 }
 
 void CSoundRender_Core::attach_tail(ref_sound& S, pcstr fName)
@@ -394,20 +400,24 @@ void CSoundRender_Core::destroy(ref_sound& S)
     S._p = nullptr;
 }
 
-void CSoundRender_Core::_create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type)
+bool CSoundRender_Core::_create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound /*= true*/)
 {
     string_path fn;
     xr_strcpy(fn, fName);
     if (strext(fn))
         *strext(fn) = 0;
-    S.handle = (CSound_source*)SoundRender->i_create_source(fn);
-    S.g_type = game_type == sg_SourceType ? S.handle->game_type() : game_type;
+    const bool found = SoundRender->i_create_source(S.handle, fn, replaceWithNoSound);
+    const bool handleAvailable = found || replaceWithNoSound;
+    S.g_type = game_type;
+    if (game_type == sg_SourceType && handleAvailable)
+        S.g_type = S.handle->game_type();
     S.s_type = sound_type;
     S.feedback = nullptr;
     S.g_object = nullptr;
     S.g_userdata = nullptr;
-    S.dwBytesTotal = S.handle->bytes_total();
-    S.fTimeTotal = S.handle->length_sec();
+    S.dwBytesTotal = handleAvailable ? S.handle->bytes_total() : 0;
+    S.fTimeTotal = handleAvailable ? S.handle->length_sec() : 0.f;
+    return found;
 }
 
 void CSoundRender_Core::_destroy_data(ref_sound_data& S)
@@ -627,6 +637,7 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
 #endif
     }
 }
+
 void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
 {
     if (bEAX)

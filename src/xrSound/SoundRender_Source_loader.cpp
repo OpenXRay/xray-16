@@ -122,7 +122,7 @@ void CSoundRender_Source::LoadWave(pcstr pName)
     FS.r_close(wave);
 }
 
-void CSoundRender_Source::load(pcstr name)
+bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -139,14 +139,20 @@ void CSoundRender_Source::load(pcstr name)
     if (!FS.exist("$level$", fn))
         FS.update_path(fn, "$game_sounds$", fn);
 
-    if (!FS.exist(fn))
+    const bool soundExist = FS.exist(fn);
+    if (!soundExist && replaceWithNoSound)
     {
         Msg("! Can't find sound '%s'", name);
         FS.update_path(fn, "$game_sounds$", "$no_sound.ogg");
     }
+    
+    if (soundExist || replaceWithNoSound)
+    {
+        LoadWave(fn);
+        SoundRender->cache.cat_create(CAT, dwBytesTotal);
+    }
 
-    LoadWave(fn);
-    SoundRender->cache.cat_create(CAT, dwBytesTotal);
+    return soundExist;
 }
 
 void CSoundRender_Source::unload()

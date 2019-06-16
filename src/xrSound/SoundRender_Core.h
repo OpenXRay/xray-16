@@ -21,7 +21,7 @@ private:
     volatile bool isLocked;
 
 protected:
-    void _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type) override;
+    bool _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
     void _destroy_data(ref_sound_data& S) override;
 
     bool bListenerMoved;
@@ -88,7 +88,7 @@ public:
 
     // Sound interface
     void verify_refsound(ref_sound& S);
-    void create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type) override;
+    bool create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
     void attach_tail(ref_sound& S, pcstr fName) override;
 
     void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) override;
@@ -128,7 +128,10 @@ public:
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env);
 
 public:
-    CSoundRender_Source* i_create_source(pcstr name);
+    bool i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound = true);
+    bool i_create_source(CSoundRender_Source*& result, pcstr name, bool replaceWithNoSound = true);
+    CSoundRender_Source* i_create_source(pcstr name, bool replaceWithNoSound = true);
+
     void i_destroy_source(CSoundRender_Source* S);
     CSoundRender_Emitter* i_play(ref_sound* S, bool _loop, float delay);
     void i_start(CSoundRender_Emitter* E);
