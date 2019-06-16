@@ -326,7 +326,7 @@ void CActor::PickupInfoDraw(IGameObject* object)
 }
 
 void CActor::feel_sound_new(IGameObject* who, int /*type*/, const CSound_UserDataPtr& /*user_data*/,
-    const Fvector& /*Position*/, float power)
+    const Fvector& /*position*/, float power)
 {
     if (who == this)
         m_snd_noise = _max(m_snd_noise, power);

@@ -210,7 +210,7 @@ public:
     IC CMemoryManager& memory() const;
     virtual float feel_vision_mtl_transp(IGameObject* O, u32 element);
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
-        const Fvector& Position, float power) override;
+        const Fvector& position, float power) override;
 
     virtual bool useful(const CItemManager* manager, const CGameObject* object) const;
     virtual float evaluate(const CItemManager* manager, const CGameObject* object) const;

@@ -101,7 +101,7 @@ public:
     virtual void renderable_Render();
     virtual BOOL renderable_ShadowGenerate();
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
-        const Fvector& Position, float power) override;
+        const Fvector& position, float power) override;
     virtual Feel::Sound* dcast_FeelSound() { return this; }
     float m_snd_noise;
 #ifdef DEBUG

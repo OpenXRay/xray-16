@@ -110,7 +110,7 @@ public:
 
     virtual void init() {}
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
-        const Fvector& Position, float power) override;
+        const Fvector& position, float power) override;
     virtual bool feel_vision_isRelevant(IGameObject* O);
     virtual bool feel_touch_on_contact(IGameObject* O);
     virtual bool feel_touch_contact(IGameObject*);

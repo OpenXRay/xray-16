@@ -140,7 +140,7 @@ public:
 typedef resptr_core<ref_sound_data, resptr_base<ref_sound_data>> ref_sound_data_ptr;
 
 /// definition (Sound Callback)
-typedef void __stdcall sound_event(ref_sound_data_ptr S, float range);
+typedef void __stdcall sound_event(const ref_sound_data_ptr& S, float range);
 
 namespace CDB
 {

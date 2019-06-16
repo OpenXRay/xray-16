@@ -26,8 +26,8 @@
 #include "ActorEffector.h"
 #include "xrEngine/CameraBase.h"
 
-void CBaseMonster::feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
-    const Fvector& Position, float power)
+void CBaseMonster::feel_sound_new(IGameObject* who, int eType, const CSound_UserDataPtr& user_data,
+    const Fvector& position, float power)
 {
     if (!g_Alive())
         return;
@@ -46,7 +46,7 @@ void CBaseMonster::feel_sound_new(IGameObject* who, int type, const CSound_UserD
     // ignore distant sounds
     Fvector center;
     Center(center);
-    float dist = center.distance_to(Position);
+    float dist = center.distance_to(position);
     if (dist > db().m_max_hear_dist)
         return;
 
@@ -70,12 +70,12 @@ void CBaseMonster::feel_sound_new(IGameObject* who, int type, const CSound_UserD
         HitMemory.add_hit(who, eSideFront);
 
     // execute callback
-    sound_callback(who, eType, Position, power);
+    sound_callback(who, eType, position, power);
 
     // register in sound memory
     if (power >= db().m_fSoundThreshold)
     {
-        SoundMemory.HearSound(who, eType, Position, power, Device.dwTimeGlobal);
+        SoundMemory.HearSound(who, eType, position, power, Device.dwTimeGlobal);
     }
 }
 #define MAX_LOCK_TIME 2.f
