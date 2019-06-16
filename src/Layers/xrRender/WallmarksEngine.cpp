@@ -34,12 +34,12 @@ const float I_DIST_FADE_SQR = 1.f / W_DIST_FADE_SQR;
 const int MAX_TRIS = 1024;
 
 IC bool operator==(const CWallmarksEngine::wm_slot* slot, const ref_shader& shader) { return slot->shader == shader; }
-CWallmarksEngine::wm_slot* CWallmarksEngine::FindSlot(ref_shader shader)
+CWallmarksEngine::wm_slot* CWallmarksEngine::FindSlot(const ref_shader& shader)
 {
     auto it = std::find(marks.begin(), marks.end(), shader);
     return (it != marks.end()) ? *it : 0;
 }
-CWallmarksEngine::wm_slot* CWallmarksEngine::AppendSlot(ref_shader shader)
+CWallmarksEngine::wm_slot* CWallmarksEngine::AppendSlot(const ref_shader& shader)
 {
     marks.push_back(new wm_slot(shader));
     return marks.back();
@@ -199,7 +199,7 @@ void CWallmarksEngine::BuildMatrix(Fmatrix& mView, float invsz, const Fvector& f
 }
 
 void CWallmarksEngine::AddWallmark_internal(
-    CDB::TRI* pTri, const Fvector* pVerts, const Fvector& contact_point, ref_shader hShader, float sz)
+    CDB::TRI* pTri, const Fvector* pVerts, const Fvector& contact_point, const ref_shader& hShader, float sz)
 {
     // query for polygons in bounding box
     // calculate adjacency
@@ -292,7 +292,7 @@ void CWallmarksEngine::AddWallmark_internal(
 }
 
 void CWallmarksEngine::AddStaticWallmark(
-    CDB::TRI* pTri, const Fvector* pVerts, const Fvector& contact_point, ref_shader hShader, float sz)
+    CDB::TRI* pTri, const Fvector* pVerts, const Fvector& contact_point, const ref_shader& hShader, float sz)
 {
     // optimization cheat: don't allow wallmarks more than 100 m from viewer/actor
     if (contact_point.distance_to_sqr(Device.vCameraPosition) > _sqr(100.f))
@@ -343,7 +343,7 @@ void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
 }
 
 extern float r_ssaDISCARD;
-ICF void BeginStream(ref_geom hGeom, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start)
+ICF void BeginStream(const ref_geom& hGeom, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start)
 {
     w_offset = 0;
     w_verts = (FVF::LIT*)RCache.Vertex.Lock(MAX_TRIS * 3, hGeom->vb_stride, w_offset);

@@ -17,7 +17,7 @@ public:
     CSCompiler& begin(const char* name);
     CSCompiler& defSampler(LPCSTR ResourceName);
     CSCompiler& defSampler(LPCSTR ResourceName, const D3D_SAMPLER_DESC& def);
-    CSCompiler& defOutput(LPCSTR ResourceName, ref_rt rt);
+    CSCompiler& defOutput(LPCSTR ResourceName, const ref_rt& rt);
     CSCompiler& defTexture(LPCSTR ResourceName, ref_texture texture);
     void end();
 

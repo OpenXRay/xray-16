@@ -206,8 +206,8 @@ Fvector vunpack(s32 x, s32 y, s32 z)
     pck.z = -float(z) / 255.f;
     return pck;
 }
-Fvector vunpack(Ivector src) { return vunpack(src.x, src.y, src.z); }
-Ivector vpack(Fvector src)
+Fvector vunpack(const Ivector& src) { return vunpack(src.x, src.y, src.z); }
+Ivector vpack(const Fvector& src)
 {
     Fvector _v;
     int bx = fpack(src.x);

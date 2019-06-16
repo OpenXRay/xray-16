@@ -178,12 +178,12 @@ Fvector vunpack(s32 x, s32 y, s32 z)
     return pck;
 }
 
-Fvector vunpack(Ivector src)
+Fvector vunpack(const Ivector& src)
 {
     return vunpack(src.x, src.y, src.z);
 }
 
-Ivector vpack(Fvector src)
+Ivector vpack(const Fvector& src)
 {
     Fvector _v;
     int bx = fpack(src.x);

@@ -46,7 +46,7 @@ Fvector vunpack(s32 x, s32 y, s32 z)
     return pck;
 }
 
-Fvector vunpack(Ivector src) { return vunpack(src.x, src.y, src.z); }
+Fvector vunpack(const Ivector& src) { return vunpack(src.x, src.y, src.z); }
 Ivector vpack(Fvector src)
 {
     src.normalize();
