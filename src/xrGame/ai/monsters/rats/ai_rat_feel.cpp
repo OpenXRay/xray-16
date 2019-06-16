@@ -23,7 +23,7 @@ bool CAI_Rat::feel_vision_isRelevant(IGameObject* O)
 }
 
 void CAI_Rat::feel_sound_new(
-    IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power)
+    IGameObject* who, int eType, const CSound_UserDataPtr& user_data, const Fvector& Position, float power)
 {
     if (!g_Alive())
         return;

@@ -26,8 +26,8 @@
 #include "ActorEffector.h"
 #include "xrEngine/CameraBase.h"
 
-void CBaseMonster::feel_sound_new(
-    IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power)
+void CBaseMonster::feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
+    const Fvector& Position, float power)
 {
     if (!g_Alive())
         return;

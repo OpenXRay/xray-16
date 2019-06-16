@@ -109,8 +109,8 @@ public:
     virtual void reload(LPCSTR section);
 
     virtual void init() {}
-    virtual void feel_sound_new(
-        IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power);
+    void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
+        const Fvector& Position, float power) override;
     virtual bool feel_vision_isRelevant(IGameObject* O);
     virtual bool feel_touch_on_contact(IGameObject* O);
     virtual bool feel_touch_contact(IGameObject*);
