@@ -17,40 +17,41 @@ CScriptTokenList::CScriptTokenList()
 
 CScriptTokenList::~CScriptTokenList() noexcept
 {
-    // XXX: Xottab_DUTY: Replace with range-based for
-    iterator I = tokens().begin();
-    iterator E = tokens().end();
-    for (; I != E; ++I)
-        xr_free((*I).name);
+    for (xr_token& token : m_token_list)
+        xr_free(token.name);
 }
 
 void CScriptTokenList::add(pcstr name, int id)
 {
     VERIFY(token(name) == m_token_list.end() && token(id) == m_token_list.end());
-    xr_token temp;
-#pragma todo("Memory leak from xr_strdup() of token name!")
-    //! memory leak is here
-    temp.name = xr_strdup(name);
-    temp.id = id;
-    m_token_list.pop_back();
-    m_token_list.push_back(temp);
-    ZeroMemory(&temp, sizeof temp);
-    m_token_list.push_back(temp);
+
+    xr_token& back = m_token_list.back();
+    VERIFY(back.name == nullptr && back.id == -1);
+    back.name = xr_strdup(name);
+    back.id = id;
+
+    m_token_list.emplace_back(nullptr, -1);
 }
 
 void CScriptTokenList::remove(pcstr name)
 {
     iterator I = token(name);
-    VERIFY(I != m_token_list.end());
-    m_token_list.erase(I);
+    const bool tokenFound = I != m_token_list.end();
+    if (tokenFound)
+    {
+        xr_delete((*I).name);
+        m_token_list.erase(I);
+    }
+    else
+    {
+        Msg("! token with name [%s] not found while deleting it from CScriptTokenList", name);
+    }
 }
 
 void CScriptTokenList::clear()
 {
     m_token_list.clear();
-    xr_token temp;
-    ZeroMemory(&temp, sizeof(temp));
-    m_token_list.push_back(temp);
+    m_token_list.emplace_back(nullptr, -1);
 }
 
 int CScriptTokenList::id(pcstr name)
