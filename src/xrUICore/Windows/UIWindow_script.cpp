@@ -95,6 +95,13 @@ SCRIPT_EXPORT(CUIWindow, (), {
             .def("FocusReceiveTime", &CUIWindow::FocusReceiveTime)
             .def("GetAbsoluteRect", &CUIWindow::GetAbsoluteRect)
 
+            .def("Init", +[](CUIWindow* self, float x, float y, float width, float height)
+            {
+                const Frect rect { x, y, width, height };
+                self->SetWndRect(rect);
+            })
+            .def("Init", (void (CUIWindow::*)(Frect))& CUIWindow::SetWndRect_script)
+
             .def("SetWndRect", (void (CUIWindow::*)(Frect)) & CUIWindow::SetWndRect_script)
             .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
 
@@ -130,6 +137,12 @@ SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
             .def("SetWidth", &CUIFrameWindow::SetWidth)
             .def("SetHeight", &CUIFrameWindow::SetHeight)
             .def("SetColor", &CUIFrameWindow::SetTextureColor)
+            .def("Init", +[](CUIFrameWindow* self, pcstr texture, float x, float y, float width, float height)
+            {
+                const Frect rect { x, y, width, height };
+                self->SetWndRect(rect);
+                self->InitTexture(texture);
+            })
     ];
 });
 
@@ -142,6 +155,12 @@ SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
             .def("SetWidth", &CUIFrameLineWnd::SetWidth)
             .def("SetHeight", &CUIFrameLineWnd::SetHeight)
             .def("SetColor", &CUIFrameLineWnd::SetTextureColor)
+            .def("Init", +[](CUIFrameLineWnd* self, cpcstr texture, float x, float y, float width, float height, bool horizontal)
+            {
+                const Fvector2 pos { x, y };
+                const Fvector2 size { width, height };
+                self->InitFrameLineWnd(texture, pos, size, horizontal);
+            })
     ];
 });
 

@@ -10,6 +10,7 @@ SCRIPT_EXPORT(CUIMessageBox, (CUIStatic),
     [
         class_<CUIMessageBox, CUIStatic>("CUIMessageBox")
             .def(constructor<>())
+            .def("Init", &CUIMessageBox::InitMessageBox)
             .def("InitMessageBox", &CUIMessageBox::InitMessageBox)
             .def("SetText", &CUIMessageBox::SetText)
             .def("GetHost", &CUIMessageBox::GetHost)

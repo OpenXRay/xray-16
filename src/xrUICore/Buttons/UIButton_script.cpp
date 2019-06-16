@@ -14,6 +14,17 @@ SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
     module(luaState)
     [
         class_<CUIButton, CUIStatic>("CUIButton")
+            .def("Init", +[](CUIButton* self, float x, float y, float width, float height)
+            {
+                const Frect rect { x, y, width, height };
+                self->SetWndRect(rect);
+            })
+            .def("Init", +[](CUIButton* self, cpcstr texture, float x, float y, float width, float height)
+            {
+                const Frect rect { x, y, width, height };
+                self->SetWndRect(rect);
+                self->InitTexture(texture);
+            })
             .def(constructor<>()),
 
         class_<CUI3tButton, CUIButton>("CUI3tButton")
@@ -26,6 +37,13 @@ SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
             .def("SetDependControl", &CUICheckButton::SetDependControl),
 
         class_<CUICustomSpin, CUIWindow>("CUICustomSpin")
+            .def("Init", +[](CUICustomSpin* self, float x, float y, float width, float height)
+            {
+                const Fvector2 pos { x, y };
+                const Fvector2 size { width, height };
+
+                self->InitSpin(pos, size);
+            })
             .def("GetText", &CUICustomSpin::GetText),
 
         class_<CUISpinNum, CUICustomSpin>("CUISpinNum")
