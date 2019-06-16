@@ -180,15 +180,11 @@ void CMainMenu::ReadTextureInfo()
     string_path buf;
     FS_FileSet files;
 
-    const auto UpdateFileSet = [&](pcstr path)
+    const auto ParseFileSet = [&](pcstr path)
     {
         FS.file_list(files, "$game_config$", FS_ListFiles,
-            strconcat(sizeof(buf), buf, path, DELIMITER, "textures_descr" DELIMITER "*.xml")
+            strconcat(sizeof(buf), buf, path, DELIMITER "textures_descr" DELIMITER "*.xml")
         );
-    };
-
-    const auto ParseFileSet = [&]()
-    {
         for (const auto& file : files)
         {
             string_path path, name;
@@ -200,14 +196,25 @@ void CMainMenu::ReadTextureInfo()
         }
     };
 
-    UpdateFileSet(UI_PATH_DEFAULT);
-    ParseFileSet();
+    ParseFileSet(UI_PATH_DEFAULT);
 
-    if (0 == xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
-        return;
+    if (0 != xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
+        ParseFileSet(UI_PATH);
 
-    UpdateFileSet(UI_PATH);
-    ParseFileSet();
+    if (pSettings->section_exist("texture_desc"))
+    {
+        string256 single_item;
+
+        cpcstr itemsList = pSettings->r_string("texture_desc", "files");
+        const u32 itemsCount = _GetItemCount(itemsList);
+
+        for (u32 i = 0; i < itemsCount; i++)
+        {
+            _GetItem(itemsList, i, single_item);
+            xr_strcat(single_item, ".xml");
+            CUITextureMaster::ParseShTexInfo(single_item);
+        }
+    }
 }
 
 void CMainMenu::Activate(bool bActivate)
