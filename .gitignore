@@ -23,4 +23,3 @@ CMakeFiles/
 
 # exclude doxygen output
 doc/doxygen/html/*
-src/xrEngine/main.cpp
