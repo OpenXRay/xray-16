@@ -47,23 +47,31 @@ extern ENGINE_API BOOL bShowPauseString;
 
 //#define DEMO_BUILD
 
-string128 ErrMsgBoxTemplate[] = {"message_box_invalid_pass", "message_box_invalid_host", "message_box_session_full",
-    "message_box_server_reject", "message_box_cdkey_in_use", "message_box_cdkey_disabled", "message_box_cdkey_invalid",
-    "message_box_different_version", "message_box_gs_service_not_available",
-    "message_box_sb_master_server_connect_failed", "msg_box_no_new_patch", "msg_box_new_patch",
-    "msg_box_patch_download_error", "msg_box_patch_download_success", "msg_box_connect_to_master_server",
-    "msg_box_kicked_by_server", "msg_box_error_loading", "message_box_download_level"};
+constexpr cpcstr ErrMsgBoxTemplate[] =
+{
+    "message_box_invalid_pass",
+    "message_box_invalid_host",
+    "message_box_session_full",
+    "message_box_server_reject",
+    "message_box_cdkey_in_use",
+    "message_box_cdkey_disabled",
+    "message_box_cdkey_invalid",
+    "message_box_different_version",
+    "message_box_gs_service_not_available",
+    "message_box_sb_master_server_connect_failed",
+    "msg_box_no_new_patch",
+    "msg_box_new_patch",
+    "msg_box_patch_download_error",
+    "msg_box_patch_download_success",
+    "msg_box_connect_to_master_server",
+    "msg_box_kicked_by_server",
+    "msg_box_error_loading",
+    "message_box_download_level"
+};
 
 extern bool b_shniaganeed_pp;
 
 CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
-//----------------------------------------------------------------------------------
-#define INIT_MSGBOX(_box, _template)     \
-    {                                    \
-        _box = new CUIMessageBoxEx();    \
-        _box->InitMessageBox(_template); \
-    }
-//----------------------------------------------------------------------------------
 
 CMainMenu::CMainMenu() : languageChanged(false)
 {
@@ -117,13 +125,12 @@ CMainMenu::CMainMenu() : languageChanged(false)
         g_btnHint = new CUIButtonHint();
         g_statHint = new CUIButtonHint();
         m_pGameSpyFull = new CGameSpy_Full();
-#ifdef WINDOWS
 
-        for (u32 i = 0; i < u32(ErrMax); i++)
+#ifdef WINDOWS
+        for (cpcstr name : ErrMsgBoxTemplate)
         {
-            CUIMessageBoxEx* pNewErrDlg;
-            INIT_MSGBOX(pNewErrDlg, ErrMsgBoxTemplate[i]);
-            m_pMB_ErrDlgs.push_back(pNewErrDlg);
+            m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
+            m_pMB_ErrDlgs.back()->InitMessageBox(name);
         }
 
         m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_YES_CLICKED,
@@ -681,7 +688,8 @@ void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
     }
     if (!m_pMB_ErrDlgs[NewPatchFound])
     {
-        INIT_MSGBOX(m_pMB_ErrDlgs[NewPatchFound], "msg_box_new_patch");
+        m_pMB_ErrDlgs[NewPatchFound] = new CUIMessageBoxEx();
+        m_pMB_ErrDlgs[NewPatchFound]->InitMessageBox("msg_box_new_patch");
 
         shared_str tmpText;
         tmpText.printf(m_pMB_ErrDlgs[NewPatchFound]->GetText(), VersionName, URL);
