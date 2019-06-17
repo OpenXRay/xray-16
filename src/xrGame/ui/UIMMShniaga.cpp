@@ -14,6 +14,7 @@
 #include "login_manager.h"
 #include "MainMenu.h"
 #include "xrGameSpy/GameSpy_Full.h"
+#include "UIHelper.h"
 
 extern string_path g_last_saved_game;
 
@@ -90,6 +91,19 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
     m_mag_pos = m_magnifier->GetWndPos().x;
     strconcat(sizeof(_path), _path, path, ":shniaga");
     CUIXmlInit::InitStatic(xml_doc, _path, 0, m_shniaga);
+
+    strconcat(sizeof(_path), _path, path, ":shniaga:left_anim");
+    m_anims[0] = UIHelper::CreateStatic(xml_doc, _path, m_shniaga, false);
+
+    strconcat(sizeof(_path), _path, path, ":shniaga:right_anim");
+    m_anims[1] = UIHelper::CreateStatic(xml_doc, _path, m_shniaga, false);
+
+    strconcat(sizeof(_path), _path, path, ":shniaga:left_grating");
+    m_gratings[0] = UIHelper::CreateStatic(xml_doc, _path, m_shniaga, false);
+
+    strconcat(sizeof(_path), _path, path, ":shniaga:right_grating");
+    m_gratings[1] = UIHelper::CreateStatic(xml_doc, _path, m_shniaga, false);
+
     strconcat(sizeof(_path), _path, path, ":buttons_region");
     CUIXmlInit::InitScrollView(xml_doc, _path, 0, m_view);
     strconcat(sizeof(_path), _path, path, ":shniaga:magnifire:y_offset");
@@ -129,10 +143,16 @@ void CUIMMShniaga::OnDeviceReset() {}
 
 void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path, bool required /*= true*/)
 {
-    CGameFont* pF;
     u32 color;
+    CGameFont* pF;
+
     float button_height = xml_doc.ReadAttribFlt("button", 0, "h");
-    R_ASSERT(button_height);
+    const float btn_height = xml_doc.ReadAttribFlt(path, 0, "btn_height");
+
+    if (button_height == 0.0f && btn_height > button_height)
+        button_height = btn_height;
+
+    R_ASSERT(button_height > 0 || !required);
 
     CUIXmlInit::InitFont(xml_doc, path, 0, color, pF);
     if (!pF)
@@ -326,6 +346,17 @@ void CUIMMShniaga::Update()
     if (m_start_time > Device.dwTimeContinual - m_run_time)
     {
         Fvector2 pos = m_shniaga->GetWndPos();
+
+        if (m_anims[0])
+        {
+            float l = 2 * PI * m_anims[0]->GetHeight() / 2;
+            int n = iFloor(pos.y / l);
+            float a = 2 * PI * (pos.y - l * n) / l;
+            m_anims[0]->SetHeading(-a);
+            if (m_anims[1])
+                m_anims[1]->SetHeading(a);
+        }
+
         pos.y = this->pos(m_origin, m_destination, Device.dwTimeContinual - m_start_time);
         m_shniaga->SetWndPos(pos);
     }
