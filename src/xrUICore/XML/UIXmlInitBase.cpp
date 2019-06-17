@@ -760,7 +760,13 @@ bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUI
         newButton = radio ? new CUIRadioButton() : new CUITabButton();
         status &= Init3tButton(xml_doc, "button", i, newButton);
         newButton->m_btn_id = xml_doc.ReadAttrib("button", i, "id");
-        R_ASSERT3(newButton->m_btn_id.size(), xml_doc.m_xml_file_name, path);
+        if (!newButton->m_btn_id.size())
+        {
+            string32 temp;
+            Msg("! [%s] doesn't have `id` tag in file [%s]", xml_doc.m_xml_file_name, path);
+            xr_sprintf(temp, "tab_button_%d", i);
+            newButton->m_btn_id = temp;
+        }
         pWnd->AddItem(newButton);
     }
 
