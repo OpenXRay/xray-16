@@ -84,6 +84,7 @@ void CMMSound::music_Play()
     {
         m_music[0] = one;
         m_music[0].play(nullptr, sm_2D);
+        m_music[1].destroy();
     }
 }
 
@@ -92,7 +93,7 @@ void CMMSound::music_Update()
     if (Device.Paused())
         return;
 
-    if (!m_music[0]._feedback() || !m_music[1]._feedback())
+    if (!m_music[0]._feedback() || (m_music[1]._handle() && !m_music[1]._feedback()))
         music_Play();
 }
 
