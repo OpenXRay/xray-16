@@ -45,6 +45,7 @@ SCRIPT_EXPORT(CUIMessageBoxEx, (CUIDialogWnd), {
     [
         class_<CUIMessageBoxEx, CUIDialogWnd>("CUIMessageBoxEx")
             .def(constructor<>())
+            .def("Init", &CUIMessageBoxEx::InitMessageBox)
             .def("InitMessageBox", &CUIMessageBoxEx::InitMessageBox)
             .def("SetText", &CUIMessageBoxEx::SetText)
             .def("GetHost", &CUIMessageBoxEx::GetHost)
