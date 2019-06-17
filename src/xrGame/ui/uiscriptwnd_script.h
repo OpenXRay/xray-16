@@ -8,6 +8,7 @@ class CUIFrameWindow;
 class CUIFrameLineWnd;
 class CUIProgressBar;
 class CUITabControl;
+class CUIListWnd;
 class CUIListBox;
 
 template <typename T>

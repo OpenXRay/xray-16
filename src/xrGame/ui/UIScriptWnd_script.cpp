@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "UIScriptWnd.h"
+#include "xrUICore/ListWnd/UIListWnd.h" // Don't remove
 #include "xrUICore/TabControl/UITabControl.h" // Don't remove
 #include "uiscriptwnd_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -29,9 +30,8 @@ SCRIPT_EXPORT(CUIDialogWndEx, (CUIDialogWnd, IFactoryObject),
             .def("GetFrameLineWnd", (CUIFrameLineWnd* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIFrameLineWnd>)
             .def("GetProgressBar", (CUIProgressBar* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIProgressBar>)
             .def("GetTabControl", (CUITabControl* (BaseType::*)(pcstr)) &BaseType::GetControl<CUITabControl>)
-            // XXX: ListWnd and ListBox has the same functionality but different function prototypes
-            // We should not use ListBox for CS and SOC, we should return ListWnd class
-            //.def("GetListWnd", (CUIListBox* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIListBox>)
+            .def("GetListBox", (CUIListBox* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIListBox>)
+            .def("GetListWnd", (CUIListWnd* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIListWnd>)
     ];
 });
 // clang-format on
