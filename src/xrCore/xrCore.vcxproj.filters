@@ -339,6 +339,9 @@
     <ClCompile Include="Threading\TaskManager.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
+    <ClCompile Include="Animation\BoneEditor.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">

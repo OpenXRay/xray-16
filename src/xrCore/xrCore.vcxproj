@@ -284,6 +284,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation\Bone.cpp" />
+    <ClCompile Include="Animation\BoneEditor.cpp" />
     <ClCompile Include="Animation\Envelope.cpp" />
     <ClCompile Include="Animation\interp.cpp" />
     <ClCompile Include="Animation\Motion.cpp" />

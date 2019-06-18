@@ -392,13 +392,13 @@ public:
     void ResetData();
     void CopyData(CBone* bone);
 
-    void ShapeScale(const Fvector& amount);
-    void ShapeRotate(const Fvector& amount);
-    void ShapeMove(const Fvector& amount);
+    void ShapeScale(const Fvector& amount, bool parentCS = false);
+    void ShapeRotate(const Fvector& amount, bool parentCS = false);
+    void ShapeMove(const Fvector& amount, bool parentCS = false);
     void BindRotate(const Fvector& amount);
     void BindMove(const Fvector& amount);
     void BoneMove(const Fvector& amount);
-    void BoneRotate(const Fvector& axis, float angle);
+    void BoneRotate(const Fvector& axis, float angle, bool parentCS = false);
 
     bool Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix& parent);
 
