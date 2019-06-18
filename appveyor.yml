@@ -6,7 +6,7 @@ pull_requests:
 skip_tags: true
 
 image:
-- Visual Studio 2019
+- Visual Studio 2017
 
 configuration:
 - Debug
