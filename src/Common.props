@@ -39,6 +39,11 @@
   </PropertyGroup>
 
   <PropertyGroup Label="UserMacros">
+    <xrPlatformToolset Condition="'$(VisualStudioVersion)'=='15.0'">v141</xrPlatformToolset>
+    <xrPlatformToolset Condition="'$(VisualStudioVersion)'=='16.0'">v142</xrPlatformToolset>
+  </PropertyGroup>
+
+  <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
     <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
     <xrBinDir>$(SolutionDir)..\bin\$(xrPlatform)\$(Configuration)\</xrBinDir>
