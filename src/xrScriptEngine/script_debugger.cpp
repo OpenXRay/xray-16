@@ -225,7 +225,7 @@ void CScriptDebugger::DrawCurrentState()
     m_lua->DrawStackTrace();
     m_callStack->SetStackTraceLevel(0);
     m_lua->DrawGlobalVariables();
-    _SendMessage(DMSG_GOTO_STACKTRACE_LEVEL, GetStackTraceLevel(), 0);
+    //_SendMessage(DMSG_GOTO_STACKTRACE_LEVEL, GetStackTraceLevel(), 0); // xRayScriptDebugger crashes here
 }
 
 void CScriptDebugger::DebugBreak(const char* szFile, int nLine)
