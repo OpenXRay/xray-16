@@ -65,7 +65,7 @@ static bool terminate_char(char c, bool check_space = false)
 
 // -------------------------------------------------------------------------------------------------
 
-line_edit_control::line_edit_control(u32 str_buffer_size)
+line_edit_control::line_edit_control(size_t str_buffer_size)
 {
     m_edit_str = nullptr;
     m_inserted = nullptr;
@@ -75,8 +75,8 @@ line_edit_control::line_edit_control(u32 str_buffer_size)
     m_buf2 = nullptr;
     m_buf3 = nullptr;
 
-    for (u32 i = 0; i < SDL_NUM_SCANCODES; ++i)
-        m_actions[i] = nullptr;
+    for (auto& action : m_actions)
+        action = nullptr;
 
     init(str_buffer_size);
 
@@ -148,10 +148,10 @@ void line_edit_control::clear_states()
     update_key_states();
 }
 
-void line_edit_control::init(u32 str_buffer_size, init_mode mode)
+void line_edit_control::init(size_t str_buffer_size, init_mode mode)
 {
     m_buffer_size = str_buffer_size;
-    clamp(m_buffer_size, (int)MIN_BUF_SIZE, (int)MAX_BUF_SIZE);
+    clamp<size_t>(m_buffer_size, MIN_BUF_SIZE, MAX_BUF_SIZE);
 
     xr_free(m_edit_str);
     m_edit_str = (pstr)xr_malloc(m_buffer_size * sizeof(char));
@@ -171,11 +171,8 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
 
     clear_states();
 
-    for (u32 i = 0; i < SDL_NUM_SCANCODES; ++i)
-    {
-        xr_delete(m_actions[i]);
-        m_actions[i] = nullptr;
-    }
+    for (auto& action : m_actions)
+        xr_delete(action);
 
     m_current_mode = mode;
     if (mode == im_read_only)
@@ -259,8 +256,8 @@ void line_edit_control::clear_inserted() { m_inserted[0] = m_inserted[1] = 0; m_
 bool line_edit_control::empty_inserted() const { return m_inserted_pos == 0; }
 void line_edit_control::set_edit(pcstr str)
 {
-    u32 str_size = xr_strlen(str);
-    clamp(str_size, (u32)0, (u32)(m_buffer_size - 1));
+    size_t str_size = xr_strlen(str);
+    clamp<size_t>(str_size, 0, m_buffer_size - 1);
     strncpy_s(m_edit_str, m_buffer_size, str, str_size);
     m_edit_str[str_size] = 0;
 
@@ -461,8 +458,8 @@ void line_edit_control::update_bufs()
     m_buf2[0] = 0;
     m_buf3[0] = 0;
 
-    int edit_size = (int)xr_strlen(m_edit_str);
-    int ds = (m_cursor_view && m_insert_mode && m_p2 < edit_size) ? 1 : 0;
+    const size_t edit_size = xr_strlen(m_edit_str);
+    const u8 ds = (m_cursor_view && m_insert_mode && m_p2 < edit_size) ? 1 : 0;
     strncpy_s(m_buf0, m_buffer_size, m_edit_str, m_cur_pos);
     strncpy_s(m_buf1, m_buffer_size, m_edit_str, m_p1);
     strncpy_s(m_buf2, m_buffer_size, m_edit_str + m_p1, m_p2 - m_p1 + ds);
@@ -481,8 +478,8 @@ void line_edit_control::add_inserted_text()
         return;
     }
 
-    int old_edit_size = (int)xr_strlen(m_edit_str);
-    for (int i = 0; i < old_edit_size; ++i)
+    const size_t old_edit_size = xr_strlen(m_edit_str);
+    for (size_t i = 0; i < old_edit_size; ++i)
     {
         if ((m_edit_str[i] == '\n') || (m_edit_str[i] == '\t'))
         {
@@ -495,7 +492,7 @@ void line_edit_control::add_inserted_text()
     strncpy_s(buf, m_buffer_size, m_edit_str, m_p1); // part 1
     strncpy_s(m_undo_buf, m_buffer_size, m_edit_str + m_p1, m_p2 - m_p1);
 
-    int new_size = (int)xr_strlen(m_inserted);
+    size_t new_size = xr_strlen(m_inserted);
     if (m_buffer_size - 1 < m_p1 + new_size)
     {
         m_inserted[m_buffer_size - 1 - m_p1] = 0;
@@ -503,12 +500,12 @@ void line_edit_control::add_inserted_text()
     }
     strncpy_s(buf + m_p1, m_buffer_size - m_p1, m_inserted, _min(new_size, m_buffer_size - m_p1)); // part 2
 
-    u8 ds = (m_insert_mode && m_p2 < old_edit_size) ? 1 : 0;
+    const u8 ds = (m_insert_mode && m_p2 < old_edit_size) ? 1 : 0;
     strncpy_s(buf + m_p1 + new_size, m_buffer_size - (m_p1 + new_size), m_edit_str + m_p2 + ds,
         _min(old_edit_size - m_p2 - ds, m_buffer_size - m_p1 - new_size)); // part 3
     buf[m_buffer_size] = 0;
 
-    int szn = m_p1 + new_size + old_edit_size - m_p2 - ds;
+    const size_t szn = m_p1 + new_size + old_edit_size - m_p2 - ds;
     if (szn < m_buffer_size)
     {
         strncpy_s(m_edit_str, m_buffer_size, buf, szn); // part 1+2+3
@@ -556,7 +553,7 @@ void line_edit_control::undo_buf()
 void line_edit_control::select_all_buf()
 {
     m_select_start = 0;
-    m_cur_pos = (int)xr_strlen(m_edit_str);
+    m_cur_pos = xr_strlen(m_edit_str);
     m_mark = false;
 }
 
@@ -566,7 +563,7 @@ void line_edit_control::delete_selected_forward() { delete_selected(false); }
 void line_edit_control::delete_selected(bool back)
 {
     clamp_cur_pos();
-    int edit_len = (int)xr_strlen(m_edit_str);
+    const size_t edit_len = xr_strlen(m_edit_str);
     if (edit_len > 0)
     {
         if (back)
@@ -612,12 +609,12 @@ void line_edit_control::delete_word_forward()
 }
 
 void line_edit_control::move_pos_home() { m_cur_pos = 0; }
-void line_edit_control::move_pos_end() { m_cur_pos = (int)xr_strlen(m_edit_str); }
+void line_edit_control::move_pos_end() { m_cur_pos = xr_strlen(m_edit_str); }
 void line_edit_control::move_pos_left() { --m_cur_pos; }
 void line_edit_control::move_pos_right() { ++m_cur_pos; }
 void line_edit_control::move_pos_left_word()
 {
-    int i = m_cur_pos - 1;
+    size_t i = m_cur_pos - 1;
 
     while (i >= 0 && m_edit_str[i] == ' ')
         --i;
@@ -635,8 +632,8 @@ void line_edit_control::move_pos_left_word()
 
 void line_edit_control::move_pos_right_word()
 {
-    int edit_len = (int)xr_strlen(m_edit_str);
-    int i = m_cur_pos + 1;
+    const size_t edit_len = xr_strlen(m_edit_str);
+    size_t i = m_cur_pos + 1;
 
     while (i < edit_len && !terminate_char(m_edit_str[i], true))
         ++i;
@@ -665,7 +662,7 @@ void line_edit_control::compute_positions()
         m_p2 = m_select_start;
 }
 
-void line_edit_control::clamp_cur_pos() { clamp(m_cur_pos, 0, (int)xr_strlen(m_edit_str)); }
+void line_edit_control::clamp_cur_pos() { clamp<size_t>(m_cur_pos, 0, xr_strlen(m_edit_str)); }
 void line_edit_control::SwitchKL()
 {
 #ifdef WINDOWS
@@ -680,7 +677,7 @@ void line_edit_control::SwitchKL()
 
 void remove_spaces(pstr str)
 {
-    u32 str_size = xr_strlen(str);
+    const size_t str_size = xr_strlen(str);
     if (str_size < 1)
     {
         return;
@@ -688,7 +685,7 @@ void remove_spaces(pstr str)
     auto new_str = (pstr)_alloca((str_size + 1) * sizeof(char));
     new_str[0] = 0;
 
-    u32 a = 0, b = 0, i = 0;
+    size_t a = 0, b = 0, i = 0;
     while (b < str_size)
     {
         a = b;
@@ -721,12 +718,12 @@ void split_cmd(pstr first, pstr second, pcstr str)
     first[0] = 0;
     second[0] = 0;
 
-    u32 str_size = xr_strlen(str);
+    const size_t str_size = xr_strlen(str);
     if (str_size < 1)
         return;
 
     // split into =>>(cmd) (params)
-    u32 a = 0;
+    size_t a = 0;
 
     while (a < str_size && str[a] != ' ')
         ++a;

@@ -92,7 +92,7 @@ bool CConsole::is_mark(Console_mark type)
 
 CConsole::CConsole() : m_hShader_back(NULL)
 {
-    m_editor = new text_editor::line_editor((u32)CONSOLE_BUF_SIZE);
+    m_editor = new text_editor::line_editor(CONSOLE_BUF_SIZE);
     m_cmd_history_max = cmd_history_max;
     m_disable_tips = false;
     Register_callbacks();

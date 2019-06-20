@@ -4,10 +4,12 @@
 #include "xrEngine/line_edit_control.h"
 #include "xrEngine/xr_input.h"
 
+// XXX: replace u32 and int with size_t
+
 CUICustomEdit::CUICustomEdit()
 {
-    m_editor_control = new text_editor::line_edit_control((u32)EDIT_BUF_SIZE);
-    Init((u32)EDIT_BUF_SIZE);
+    m_editor_control = new text_editor::line_edit_control(EDIT_BUF_SIZE);
+    Init(EDIT_BUF_SIZE);
 
     TextItemControl()->SetVTextAlignment(valCenter);
     TextItemControl()->SetTextComplexMode(false);

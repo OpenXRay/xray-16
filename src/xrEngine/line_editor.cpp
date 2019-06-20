@@ -10,7 +10,7 @@
 
 namespace text_editor
 {
-line_editor::line_editor(u32 str_buffer_size) : m_control(str_buffer_size)
+line_editor::line_editor(size_t str_buffer_size) : m_control(str_buffer_size)
 {
 }
 

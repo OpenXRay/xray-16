@@ -50,8 +50,8 @@ class ENGINE_API line_edit_control
     using Callback = fastdelegate::FastDelegate0<void>;
 
 public:
-    line_edit_control(u32 str_buffer_size);
-    void init(u32 str_buffer_size, init_mode mode = im_standart);
+    line_edit_control(size_t str_buffer_size);
+    void init(size_t str_buffer_size, init_mode mode = im_standart);
     ~line_edit_control();
 
     void clear_states();
@@ -135,13 +135,13 @@ private:
         MIN_BUF_SIZE = 8,
         MAX_BUF_SIZE = 4096
     };
-    int m_buffer_size;
+    size_t m_buffer_size;
 
-    int m_cur_pos;
-    int m_inserted_pos;
-    int m_select_start;
-    int m_p1;
-    int m_p2;
+    size_t m_cur_pos;
+    size_t m_inserted_pos;
+    size_t m_select_start;
+    size_t m_p1;
+    size_t m_p2;
 
     float m_accel;
     float m_cur_time;
