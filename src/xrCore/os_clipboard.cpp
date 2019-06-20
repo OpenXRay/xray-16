@@ -12,7 +12,6 @@
 #pragma hdrstop
 #include "SDL.h"
 #include "os_clipboard.h"
-#include "xrCore/_std_extensions.h"
 
 void os_clipboard::copy_to_clipboard(pcstr buf)
 {
@@ -41,7 +40,8 @@ void os_clipboard::paste_from_clipboard(pstr buffer, size_t buffer_size)
 
     strncpy_s(buffer, buffer_size, clipData, buffer_size - 1);
 
-    for (size_t i = 0; i < xr_strlen(buffer); ++i)
+    const size_t length = xr_strlen(buffer);
+    for (size_t i = 0; i < length; ++i)
     {
         const char c = buffer[i];
         if (isprint(c) == 0 && c != char(-1) || c == '\t' || c == '\n') // "я" = -1
@@ -71,9 +71,7 @@ void os_clipboard::update_clipboard(pcstr string)
 
     if (!clipData)
     {
-        DEBUG_BREAK;
-        Msg("! Failed to get text from the clipboard: %s", SDL_GetError());
-        Log("! Falling back to copy_to_clipboard()");
+        VERIFY3(clipData, "Failed to get text from the clipboard", SDL_GetError());
         copy_to_clipboard(string);
         return;
     }
