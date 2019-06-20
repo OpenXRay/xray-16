@@ -2,6 +2,8 @@
 
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
+#include "xrCore/Threading/ScopeLock.hpp"
+#include <tbb/parallel_for_each.h>
 
 bool CSoundRender_Core::i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound /*= true*/)
 {
@@ -64,8 +66,10 @@ void CSoundRender_Core::i_create_all_sources()
 
     FS_FileSet flist;
     FS.file_list(flist, "$game_sounds$", FS_ListFiles, "*.ogg");
-    size_t createdCount = flist.size();
-    for (const FS_File& file : flist)
+    const size_t sizeBefore = s_sources.size();
+
+    Lock lock;
+    const auto processFile = [&](const FS_File& file)
     {
         string256 id;
         xr_strcpy(id, file.name.c_str());
@@ -74,19 +78,33 @@ void CSoundRender_Core::i_create_all_sources()
         if (strext(id))
             *strext(id) = 0;
 
-        const auto it = s_sources.find(id);
-        if (it != s_sources.end())
         {
-            --createdCount;
-            continue;
+            ScopeLock scope(&lock);
+            const auto it = s_sources.find(id);
+            if (it != s_sources.end())
+                return;
+            UNUSED(scope);
         }
 
         CSoundRender_Source* S = new CSoundRender_Source();
         S->load(id);
-        s_sources.insert({id, S});
+
+        lock.Enter();
+        s_sources.insert({ id, S });
+        lock.Leave();
+    };
+
+#ifdef USE_TBB_PARALLEL
+    tbb::parallel_for_each(flist, processFile);
+#else
+    for (const FS_File& file : flist)
+    {
+        processFile(file);
     }
+#endif
 
 #ifndef MASTER_GOLD
-    Msg("Finished creating %d sound sources. Duration: %d ms", createdCount, T.GetElapsed_ms());
+    Msg("Finished creating %d sound sources. Duration: %d ms",
+        s_sources.size() - sizeBefore, T.GetElapsed_ms());
 #endif
 }
