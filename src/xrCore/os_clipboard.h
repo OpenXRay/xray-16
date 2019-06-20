@@ -11,7 +11,7 @@
 
 namespace os_clipboard
 {
-XRCORE_API void copy_to_clipboard(pcstr buf);
+XRCORE_API void copy_to_clipboard(pcstr buf, bool alreadyUTF8 = false);
 XRCORE_API void paste_from_clipboard(pstr buf, size_t buf_size);
 XRCORE_API void update_clipboard(pcstr str);
 } // namespace os_clipboard
