@@ -226,7 +226,7 @@ void CGameTaskManager::UpdateActiveTask()
     for (u32 i = eTaskTypeStoryline; i < eTaskTypeCount; ++i)
     {
         CGameTask* activeTask = ActiveTask(static_cast<ETaskType>(i));
-        if (!activeTask)
+        if (!activeTask && (i == eTaskTypeStoryline || m_flags.test(eMultipleTasks)))
         {
             CGameTask* frontTask = IterateGet(nullptr, eTaskStateInProgress, static_cast<ETaskType>(i), true);
             if (frontTask)
