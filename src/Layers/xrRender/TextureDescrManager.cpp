@@ -5,8 +5,6 @@
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
 
-//#define SINGLETHREADED_TEXTURES_DESCR
-
 // eye-params
 float r__dtex_range = 50;
 class cl_dt_scaler : public R_constant_setup
@@ -28,21 +26,6 @@ void fix_texture_thm_name(pstr fn)
     }
 }
 
-#ifdef SINGLETHREADED_TEXTURES_DESCR
-#define DECLARE_DESCR_LOCK
-#define LOCK_DESCR()
-#define UNLOCK_DESCR()
-#define PROCESS_DESCR(processeable, function) \
-    for (const auto& item : processeable) \
-        function(item)
-#else
-#define DECLARE_DESCR_LOCK Lock descrLock
-#define LOCK_DESCR() descrLock.Enter()
-#define UNLOCK_DESCR() descrLock.Leave()
-#define PROCESS_DESCR(processeable, function) \
-    tbb::parallel_for_each(processeable, function)
-#endif
-
 void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 {
     string_path fname;
@@ -54,7 +37,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 #ifndef MASTER_GOLD
     Msg("Processing textures.ltx in [%s]", initial);
 #endif
-    DECLARE_DESCR_LOCK;
+    DECLARE_MT_LOCK(lock);
 
     CInifile ini(fname);
 
@@ -72,10 +55,10 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             if (listTHM)
                 Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
 
-            LOCK_DESCR();
+            DO_MT_LOCK(lock);
             texture_desc& desc = m_texture_details[item.first];
             cl_dt_scaler*& dts = m_detail_scalers[item.first];
-            UNLOCK_DESCR();
+            DO_MT_UNLOCK(lock);
 
             if (desc.m_assoc)
                 xr_delete(desc.m_assoc);
@@ -100,7 +83,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             else if (strstr(item.second.c_str(), "usage[diffuse]"))
                 desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
         };
-        PROCESS_DESCR(data.Data, processAssociation);
+        DO_MT_PROCESS_RANGE(data.Data, processAssociation);
     } // "association"
 
     if (ini.section_exist("specification"))
@@ -116,9 +99,9 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             if (listTHM)
                 Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
 
-            LOCK_DESCR();
+            DO_MT_LOCK(lock);
             texture_desc& desc = m_texture_details[item.first];
-            UNLOCK_DESCR();
+            DO_MT_UNLOCK(lock);
 
             if (desc.m_spec)
                 xr_delete(desc.m_spec);
@@ -135,7 +118,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
                 desc.m_spec->m_bump_name = bmode + 4;
             }
         };
-        PROCESS_DESCR(data.Data, processSpecification);
+        DO_MT_PROCESS_RANGE(data.Data, processSpecification);
     } // "specification"
 }
 
@@ -151,7 +134,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
     Msg("Processing %d .thm files in [%s]", flist.size(), initial);
 #endif
 
-    DECLARE_DESCR_LOCK;
+    DECLARE_MT_LOCK(lock);
 
     m_texture_details.reserve(m_texture_details.size() + flist.size());
     m_detail_scalers.reserve(m_detail_scalers.size() + flist.size());
@@ -176,10 +159,10 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         if (STextureParams::ttImage == tp.type || STextureParams::ttTerrain == tp.type ||
             STextureParams::ttNormalMap == tp.type)
         {
-            LOCK_DESCR();
+            DO_MT_LOCK(lock);
             texture_desc& desc = m_texture_details[fn];
             cl_dt_scaler*& dts = m_detail_scalers[fn];
-            UNLOCK_DESCR();
+            DO_MT_UNLOCK(lock);
 
             if (tp.detail_name.size() &&
                 tp.flags.is_any(STextureParams::flDiffuseDetail | STextureParams::flBumpDetail))
@@ -219,7 +202,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         }
     };
 
-    PROCESS_DESCR(flist, processFile);
+    DO_MT_PROCESS_RANGE(flist, processFile);
 }
 
 void CTextureDescrMngr::Load()

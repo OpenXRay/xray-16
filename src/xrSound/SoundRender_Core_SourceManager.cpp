@@ -63,12 +63,11 @@ void CSoundRender_Core::i_create_all_sources()
     CTimer T;
     T.Start();
 #endif
-
     FS_FileSet flist;
     FS.file_list(flist, "$game_sounds$", FS_ListFiles, "*.ogg");
     const size_t sizeBefore = s_sources.size();
 
-    Lock lock;
+    DECLARE_MT_LOCK(lock);
     const auto processFile = [&](const FS_File& file)
     {
         string256 id;
@@ -79,29 +78,21 @@ void CSoundRender_Core::i_create_all_sources()
             *strext(id) = 0;
 
         {
-            ScopeLock scope(&lock);
+            DECLARE_MT_SCOPE_LOCK(lock);
             const auto it = s_sources.find(id);
             if (it != s_sources.end())
                 return;
-            UNUSED(scope);
         }
 
         CSoundRender_Source* S = new CSoundRender_Source();
         S->load(id);
 
-        lock.Enter();
+        DO_MT_LOCK(lock);
         s_sources.insert({ id, S });
-        lock.Leave();
+        DO_MT_UNLOCK(lock);
     };
 
-#ifdef USE_TBB_PARALLEL
-    tbb::parallel_for_each(flist, processFile);
-#else
-    for (const FS_File& file : flist)
-    {
-        processFile(file);
-    }
-#endif
+    DO_MT_PROCESS_RANGE(flist, processFile);
 
 #ifndef MASTER_GOLD
     Msg("Finished creating %d sound sources. Duration: %d ms",
