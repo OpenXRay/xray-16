@@ -93,6 +93,9 @@ public:
 
     void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) override;
     void destroy(ref_sound& S) override;
+
+    void prefetch() override { i_create_all_sources(); }
+
     void stop_emitters() override;
     int pause_emitters(bool val) override;
 
@@ -131,6 +134,7 @@ public:
     bool i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound = true);
     bool i_create_source(CSoundRender_Source*& result, pcstr name, bool replaceWithNoSound = true);
     CSoundRender_Source* i_create_source(pcstr name, bool replaceWithNoSound = true);
+    void i_create_all_sources();
 
     void i_destroy_source(CSoundRender_Source* S);
     CSoundRender_Emitter* i_play(ref_sound* S, bool _loop, float delay);
@@ -140,7 +144,6 @@ public:
     bool i_allow_play(CSoundRender_Emitter* E);
     bool i_locked() override { return isLocked; }
     void object_relcase(IGameObject* obj) override;
-    void i_create_all_sources();
 
     float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
     float get_occlusion(Fvector& P, float R, Fvector* occ) override;

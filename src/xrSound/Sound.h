@@ -171,6 +171,9 @@ public:
     virtual void attach_tail(ref_sound& S, pcstr fName) = 0;
     virtual void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) = 0;
     virtual void destroy(ref_sound& S) = 0;
+
+    virtual void prefetch() = 0;
+
     virtual void stop_emitters() = 0;
     virtual int pause_emitters(bool val) = 0;
 
