@@ -78,6 +78,8 @@ public:
     void set_selected_mode(bool status) { m_unselected_mode = !status; }
     bool get_selected_mode() const { return !m_unselected_mode; }
 
+    bool char_is_allowed(char c);
+
 private:
     line_edit_control(line_edit_control const&);
     line_edit_control const& operator=(line_edit_control const&);
@@ -106,9 +108,7 @@ private:
     void xr_stdcall delete_word_forward();
     void xr_stdcall SwitchKL();
 
-    void assign_char_pairs(init_mode mode);
     void create_key_state(int const dik, key_state state);
-    void create_char_pair(int const dik, char c, char c_shift, bool translate = false);
 
     void clear_inserted();
     bool empty_inserted() const;
@@ -151,6 +151,7 @@ private:
     u32 m_last_changed_frame;
 
     Flags32 m_key_state;
+    init_mode m_current_mode;
 
     bool m_hold_mode;
     bool m_insert_mode;

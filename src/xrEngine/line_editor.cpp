@@ -24,11 +24,13 @@ void line_editor::IR_Capture()
 {
     IInputReceiver::IR_Capture();
     SDL_StartTextInput();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
 }
 
 void line_editor::IR_Release()
 {
     SDL_StopTextInput();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
     IInputReceiver::IR_Release();
 }
 } // namespace text_editor

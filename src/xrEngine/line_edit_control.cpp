@@ -177,6 +177,7 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
         m_actions[i] = nullptr;
     }
 
+    m_current_mode = mode;
     if (mode == im_read_only)
     {
         assign_callback(SDL_SCANCODE_A, ks_Ctrl, Callback(this, &line_edit_control::select_all_buf));
@@ -192,8 +193,6 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
     }
     else
     {
-        assign_char_pairs(mode);
-
         assign_callback(SDL_SCANCODE_INSERT, ks_free, Callback(this, &line_edit_control::flip_insert_mode));
         assign_callback(SDL_SCANCODE_A, ks_Ctrl, Callback(this, &line_edit_control::select_all_buf));
         assign_callback(SDL_SCANCODE_Z, ks_Ctrl, Callback(this, &line_edit_control::undo_buf));
@@ -220,7 +219,6 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
 
         assign_callback(SDL_SCANCODE_LSHIFT, ks_Ctrl, Callback(this, &line_edit_control::SwitchKL));
         assign_callback(SDL_SCANCODE_LSHIFT, ks_Alt, Callback(this, &line_edit_control::SwitchKL));
-
     } // if mode
 
     create_key_state(SDL_SCANCODE_LSHIFT, ks_LShift);
@@ -231,114 +229,6 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
     create_key_state(SDL_SCANCODE_RALT, ks_RAlt);
 }
 
-void line_edit_control::assign_char_pairs(init_mode mode)
-{
-    create_char_pair(SDL_SCANCODE_KP_0, '0', '0');
-    create_char_pair(SDL_SCANCODE_KP_1, '1', '1');
-    create_char_pair(SDL_SCANCODE_KP_2, '2', '2');
-    create_char_pair(SDL_SCANCODE_KP_3, '3', '3');
-    create_char_pair(SDL_SCANCODE_KP_4, '4', '4');
-    create_char_pair(SDL_SCANCODE_KP_5, '5', '5');
-    create_char_pair(SDL_SCANCODE_KP_6, '6', '6');
-    create_char_pair(SDL_SCANCODE_KP_7, '7', '7');
-    create_char_pair(SDL_SCANCODE_KP_8, '8', '8');
-    create_char_pair(SDL_SCANCODE_KP_9, '9', '9');
-
-    if (mode == im_number_only)
-    {
-        create_char_pair(SDL_SCANCODE_0, '0', '0');
-        create_char_pair(SDL_SCANCODE_1, '1', '1');
-        create_char_pair(SDL_SCANCODE_2, '2', '2');
-        create_char_pair(SDL_SCANCODE_3, '3', '3');
-        create_char_pair(SDL_SCANCODE_4, '4', '4');
-        create_char_pair(SDL_SCANCODE_5, '5', '5');
-        create_char_pair(SDL_SCANCODE_6, '6', '6');
-        create_char_pair(SDL_SCANCODE_7, '7', '7');
-        create_char_pair(SDL_SCANCODE_8, '8', '8');
-        create_char_pair(SDL_SCANCODE_9, '9', '9');
-        create_char_pair(SDL_SCANCODE_KP_MINUS, '-', '-');
-        create_char_pair(SDL_SCANCODE_MINUS, '-', '-');
-        create_char_pair(SDL_SCANCODE_KP_PLUS, '+', '+');
-        create_char_pair(SDL_SCANCODE_EQUALS, '+', '+');
-        return;
-    }
-
-    if (mode != im_file_name_mode)
-    {
-        create_char_pair(SDL_SCANCODE_0, '0', ')', true);
-        create_char_pair(SDL_SCANCODE_1, '1', '!', true);
-        create_char_pair(SDL_SCANCODE_2, '2', '@', true);
-        create_char_pair(SDL_SCANCODE_3, '3', '#', true);
-        create_char_pair(SDL_SCANCODE_4, '4', '$', true);
-        create_char_pair(SDL_SCANCODE_5, '5', '%', true);
-        create_char_pair(SDL_SCANCODE_6, '6', '^', true);
-        create_char_pair(SDL_SCANCODE_7, '7', '&', true);
-        create_char_pair(SDL_SCANCODE_8, '8', '*', true);
-        create_char_pair(SDL_SCANCODE_9, '9', '(', true);
-
-        create_char_pair(SDL_SCANCODE_BACKSLASH, '\\', '|', true);
-        create_char_pair(SDL_SCANCODE_LEFTBRACKET, '[', '{', true);
-        create_char_pair(SDL_SCANCODE_RIGHTBRACKET, ']', '}', true);
-        create_char_pair(SDL_SCANCODE_APOSTROPHE, '\'', '\"', true);
-        create_char_pair(SDL_SCANCODE_COMMA, ',', '<', true);
-        create_char_pair(SDL_SCANCODE_PERIOD, '.', '>', true);
-        create_char_pair(SDL_SCANCODE_EQUALS, '=', '+', true);
-        create_char_pair(SDL_SCANCODE_SEMICOLON, ';', ':', true);
-        create_char_pair(SDL_SCANCODE_SLASH, '/', '?', true);
-
-        create_char_pair(SDL_SCANCODE_KP_MULTIPLY, '*', '*');
-        create_char_pair(SDL_SCANCODE_KP_DIVIDE, '/', '/');
-    }
-    else
-    {
-        create_char_pair(SDL_SCANCODE_0, '0', '0');
-        create_char_pair(SDL_SCANCODE_1, '1', '1');
-        create_char_pair(SDL_SCANCODE_2, '2', '2');
-        create_char_pair(SDL_SCANCODE_3, '3', '3');
-        create_char_pair(SDL_SCANCODE_4, '4', '4');
-        create_char_pair(SDL_SCANCODE_5, '5', '5');
-        create_char_pair(SDL_SCANCODE_6, '6', '6');
-        create_char_pair(SDL_SCANCODE_7, '7', '7');
-        create_char_pair(SDL_SCANCODE_8, '8', '8');
-        create_char_pair(SDL_SCANCODE_9, '9', '9');
-    }
-
-    create_char_pair(SDL_SCANCODE_KP_MINUS, '-', '-');
-    create_char_pair(SDL_SCANCODE_KP_PLUS, '+', '+');
-    create_char_pair(SDL_SCANCODE_KP_PERIOD, '.', '.');
-
-    create_char_pair(SDL_SCANCODE_MINUS, '-', '_', true);
-    create_char_pair(SDL_SCANCODE_SPACE, ' ', ' ');
-    create_char_pair(SDL_SCANCODE_GRAVE, '`', '~', true);
-
-    create_char_pair(SDL_SCANCODE_A, 'a', 'A', true);
-    create_char_pair(SDL_SCANCODE_B, 'b', 'B', true);
-    create_char_pair(SDL_SCANCODE_C, 'c', 'C', true);
-    create_char_pair(SDL_SCANCODE_D, 'd', 'D', true);
-    create_char_pair(SDL_SCANCODE_E, 'e', 'E', true);
-    create_char_pair(SDL_SCANCODE_F, 'f', 'F', true);
-    create_char_pair(SDL_SCANCODE_G, 'g', 'G', true);
-    create_char_pair(SDL_SCANCODE_H, 'h', 'H', true);
-    create_char_pair(SDL_SCANCODE_I, 'i', 'I', true);
-    create_char_pair(SDL_SCANCODE_J, 'j', 'J', true);
-    create_char_pair(SDL_SCANCODE_K, 'k', 'K', true);
-    create_char_pair(SDL_SCANCODE_L, 'l', 'L', true);
-    create_char_pair(SDL_SCANCODE_M, 'm', 'M', true);
-    create_char_pair(SDL_SCANCODE_N, 'n', 'N', true);
-    create_char_pair(SDL_SCANCODE_O, 'o', 'O', true);
-    create_char_pair(SDL_SCANCODE_P, 'p', 'P', true);
-    create_char_pair(SDL_SCANCODE_Q, 'q', 'Q', true);
-    create_char_pair(SDL_SCANCODE_R, 'r', 'R', true);
-    create_char_pair(SDL_SCANCODE_S, 's', 'S', true);
-    create_char_pair(SDL_SCANCODE_T, 't', 'T', true);
-    create_char_pair(SDL_SCANCODE_U, 'u', 'U', true);
-    create_char_pair(SDL_SCANCODE_V, 'v', 'V', true);
-    create_char_pair(SDL_SCANCODE_W, 'w', 'W', true);
-    create_char_pair(SDL_SCANCODE_X, 'x', 'X', true);
-    create_char_pair(SDL_SCANCODE_Y, 'y', 'Y', true);
-    create_char_pair(SDL_SCANCODE_Z, 'z', 'Z', true);
-}
-
 void line_edit_control::create_key_state(int const dik, key_state state)
 {
     Base* prev = m_actions[dik];
@@ -347,16 +237,6 @@ void line_edit_control::create_key_state(int const dik, key_state state)
     // xr_delete( m_actions[dik] );
     //}
     m_actions[dik] = new text_editor::key_state_base(state, prev);
-}
-
-void line_edit_control::create_char_pair(int const dik, char c, char c_shift, bool translate)
-{
-    if (m_actions[dik])
-    {
-        xr_delete(m_actions[dik]);
-    }
-
-    m_actions[dik] = new text_editor::type_pair(dik, c, c_shift, translate);
 }
 
 void line_edit_control::assign_callback(int const dik, key_state state, Callback const& callback)
@@ -388,6 +268,37 @@ void line_edit_control::set_edit(pcstr str)
     m_select_start = m_cur_pos;
     m_accel = 1.0f;
     update_bufs();
+}
+
+bool line_edit_control::char_is_allowed(char c)
+{
+    if (m_current_mode == im_number_only)
+    {
+        switch (c)
+        {
+        case '7': case '8': case '9':
+        case '4': case '5': case '6':
+        case '1': case '2': case '3':
+        case '-': case '+':
+            return true;
+        default:
+            return false;
+        }
+    }
+    switch (c)
+    {
+    case '\'': case '\"': // ' and "
+    case '\\': case '/':  // \ and /
+    case '<': case '>':   // < and >
+    case '?': case '|':   // ? and |
+    case ';': case ':':   // ; and :
+    case '@': case '#':   // @ and #
+    case '$': case '%':   // $ and %
+    case '^': case '&':   // ^ and &
+    case '*': case '=':   // * and =
+        return m_current_mode != im_file_name_mode;
+    }
+    return true;
 }
 
 // ========================================================
@@ -447,13 +358,10 @@ void line_edit_control::on_text_input(const char *text)
     static std::locale locale("");
     const auto str = StringFromUTF8(text, locale);
 
-    for (const auto c : str)
+    for (char c : str)
     {
-        if (is_binded(kCONSOLE, c))
-        {
-            continue;
-        }
-        insert_character(c);
+        if (char_is_allowed(c))
+            insert_character(c);
     }
     add_inserted_text();
 

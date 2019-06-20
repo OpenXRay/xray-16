@@ -49,24 +49,6 @@ protected:
 
 // -------------------------------------------------------------------------------------------------
 
-class type_pair : public base
-{
-public:
-    type_pair(int dik, char c, char c_shift, bool b_translate);
-    virtual ~type_pair();
-    void init(int dik, char c, char c_shift, bool b_translate);
-    virtual void on_key_press(line_edit_control* const control);
-
-private:
-    int m_dik;
-    bool m_translate;
-    char m_char;
-    char m_char_shift;
-
-}; // class type_pair
-
-// -------------------------------------------------------------------------------------------------
-
 class key_state_base : public base
 {
 public:
