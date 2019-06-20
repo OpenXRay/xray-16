@@ -238,10 +238,17 @@ void line_edit_control::create_key_state(int const dik, key_state state)
 
 void line_edit_control::assign_callback(int const dik, key_state state, Callback const& callback)
 {
-    VERIFY(dik < SDL_NUM_SCANCODES);
+    VERIFY(dik < CInput::COUNT_KB_BUTTONS);
     Base* prev_action = m_actions[dik];
     m_actions[dik] = new text_editor::callback_base(callback, state);
     m_actions[dik]->on_assign(prev_action);
+}
+
+void line_edit_control::remove_callback(int dik)
+{
+    VERIFY(dik < CInput::COUNT_KB_BUTTONS);
+    if (dik > -1 && dik < CInput::COUNT_KB_BUTTONS)
+        xr_delete(m_actions[dik]);
 }
 
 void line_edit_control::insert_character(char c)
@@ -302,7 +309,7 @@ bool line_edit_control::char_is_allowed(char c)
 
 void line_edit_control::on_key_press(int dik)
 {
-    if (SDL_NUM_SCANCODES <= dik)
+    if (CInput::COUNT_KB_BUTTONS <= dik)
     {
         return;
     }

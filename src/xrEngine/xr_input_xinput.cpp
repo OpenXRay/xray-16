@@ -551,3 +551,13 @@ void GetActionAllBinding(LPCSTR _action, char* dst_buff, int dst_buff_sz)
         xr_sprintf(
             dst_buff, dst_buff_sz, "%s%s%s", prim[0] ? prim : "", (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "");
 }
+
+std::tuple<int, int> GetKeysBindedTo(EGameActions action_id)
+{
+    const _binding& binding = g_key_bindings[action_id];
+    return
+    {
+        binding.m_keyboard[0] ? binding.m_keyboard[0]->dik : -1,
+        binding.m_keyboard[1] ? binding.m_keyboard[1]->dik : -1
+    };
+}

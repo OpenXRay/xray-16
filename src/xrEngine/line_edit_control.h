@@ -8,6 +8,8 @@
 #ifndef LINE_EDIT_CONTROL_H_INCLUDED
 #define LINE_EDIT_CONTROL_H_INCLUDED
 
+#include "xr_input.h"
+
 namespace text_editor
 {
 void remove_spaces(pstr str); // in & out
@@ -62,6 +64,7 @@ public:
     void on_frame();
 
     void assign_callback(int const dik, key_state state, Callback const& callback);
+    void remove_callback(int dik);
 
     void insert_character(char c);
 
@@ -120,7 +123,7 @@ private:
     void clamp_cur_pos();
 
 private:
-    Base* m_actions[SDL_NUM_SCANCODES];
+    Base* m_actions[CInput::COUNT_KB_BUTTONS];
 
     char* m_edit_str;
     char* m_undo_buf;

@@ -381,7 +381,7 @@ bool CInput::get_dik_name(const int dik, LPSTR dest_str, int dest_sz)
     xr_string keyname;
     bool result;
 
-    if (dik < SDL_NUM_SCANCODES)
+    if (dik < COUNT_KB_BUTTONS)
         result = KbdKeyToButtonName(dik, keyname);
     else
         result = OtherDevicesKeyToButtonName(dik, keyname);
