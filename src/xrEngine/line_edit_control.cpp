@@ -665,11 +665,11 @@ void line_edit_control::compute_positions()
 void line_edit_control::clamp_cur_pos() { clamp<size_t>(m_cur_pos, 0, xr_strlen(m_edit_str)); }
 void line_edit_control::SwitchKL()
 {
+    // if SDL_HINT_GRAB_KEYBOARD is not set to 1 then return;
+    if (0 != xr_strcmp("1", SDL_GetHint("SDL_HINT_GRAB_KEYBOARD")))
+        return; // System will handle it
 #ifdef WINDOWS
-    // XXX: do we even need this?
-    // Check if SDL_HINT_GRAB_KEYBOARD works
-    // and enable in case if we will need this
-    if (false && pInput->IsExclusiveMode())
+    if (pInput->IsExclusiveMode())
         ActivateKeyboardLayout((HKL)HKL_NEXT, 0);
 #endif
 }
