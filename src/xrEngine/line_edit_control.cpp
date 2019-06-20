@@ -618,7 +618,7 @@ void line_edit_control::copy_to_clipboard()
     {
         return;
     }
-    u32 edit_len = xr_strlen(m_edit_str);
+    const size_t edit_len = xr_strlen(m_edit_str);
     auto buf = (pstr)_alloca((edit_len + 1) * sizeof(char));
     strncpy_s(buf, edit_len + 1, m_edit_str + m_p1, m_p2 - m_p1);
     buf[edit_len] = 0;
@@ -626,7 +626,11 @@ void line_edit_control::copy_to_clipboard()
     m_mark = false;
 }
 
-void line_edit_control::paste_from_clipboard() { os_clipboard::paste_from_clipboard(m_inserted, m_buffer_size - 1); }
+void line_edit_control::paste_from_clipboard()
+{
+    os_clipboard::paste_from_clipboard(m_inserted, m_buffer_size - 1);
+    m_inserted_pos += xr_strlen(m_inserted);
+}
 void line_edit_control::cut_to_clipboard()
 {
     copy_to_clipboard();
