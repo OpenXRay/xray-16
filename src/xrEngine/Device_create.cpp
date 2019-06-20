@@ -94,7 +94,7 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
         SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
 
         // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
-        SDL_SetWindowFullscreen(m_sdlWnd, useDesktopFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_FALSE);
+        SDL_SetWindowFullscreen(m_sdlWnd, useDesktopFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_DISABLE);
     }
     else
     {
