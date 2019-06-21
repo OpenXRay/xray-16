@@ -142,8 +142,11 @@ void IGame_Persistent::Prefetch()
     timer.Start();
     const auto memoryBefore = Memory.mem_usage();
 
-    Log("Loading sounds...");
-    GEnv.Sound->prefetch();
+    if (psSoundPrecacheAll != 0)
+    {
+        Log("Loading sounds...");
+        GEnv.Sound->prefetch();
+    }
 
     Log("Loading objects...");
     ObjectPool.prefetch();
