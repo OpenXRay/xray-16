@@ -24,19 +24,6 @@ xr_vector<xr_token> VidQualityToken;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 
-const xr_token constant_fps_token[] =
-{
-    { "st_opt_off", ConstantFPS_off },
-    { "st_opt_30", ConstantFPS_30 },
-    { "st_opt_50", ConstantFPS_50 },
-    { "st_opt_60", ConstantFPS_60 },
-    { "st_opt_72", ConstantFPS_72 },
-    { "st_opt_82", ConstantFPS_82 },
-    { "st_opt_90", ConstantFPS_90 },
-    { "st_opt_120", ConstantFPS_120 },
-    { nullptr, -1 }
-};
-
 const xr_token snd_precache_all_token[] = {{"off", 0}, {"on", 1}, {nullptr, 0}};
 
 void IConsole_Command::InvalidSyntax()
@@ -820,7 +807,7 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
     // CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175 );
 
-    CMD3(CCC_Token, "rs_constant_fps", &psConstantFPS, constant_fps_token);
+    // CMD3(CCC_Mask, "rs_constant_fps", &psDeviceFlags, rsConstantFPS );
     CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
     CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
 #endif

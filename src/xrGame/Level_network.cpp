@@ -312,7 +312,7 @@ void CLevel::Send(NET_Packet& P, u32 dwFlags, u32 dwTimeout)
     {
         // anti-cheat
         phTimefactor = 1.f;
-        psConstantFPS = ConstantFPS_off;
+        psDeviceFlags.set(rsConstantFPS, FALSE);
     }
 }
 
