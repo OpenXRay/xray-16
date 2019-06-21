@@ -1,6 +1,9 @@
 #include "stdafx.h"
-#include "xr_3da/resource.h"
+
 #include "splash.h"
+
+#include "xr_3da/resource.h"
+#include <thread>
 
 constexpr u32 SPLASH_FRAMERATE = 30;
 
@@ -90,11 +93,12 @@ public:
             }
         }
 
-        SDL_DestroyWindow(self.m_window);
-        self.m_window = nullptr;
         for (SDL_Surface* surface : self.m_surfaces)
             SDL_FreeSurface(surface);
         self.m_surfaces.clear();
+
+        SDL_DestroyWindow(self.m_window);
+        self.m_window = nullptr;
     }
 
     void show(bool topmost)
@@ -136,6 +140,11 @@ public:
     void hide()
     {
         m_should_exit.Set();
+        while (m_window != nullptr)
+        {
+            SDL_PumpEvents();
+            std::this_thread::yield();
+        }
     }
 } g_splash_screen;
 
