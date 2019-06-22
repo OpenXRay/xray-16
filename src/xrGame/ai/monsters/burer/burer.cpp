@@ -22,6 +22,13 @@
 #include "xrCore/_vector3d_ext.h"
 #include "ai/monsters/control_direction_base.h"
 
+#define FX_STAND_FRONT { "fx_stand_f", true }
+#define FX_STAND_BACK { "fx_stand_b", true }
+#define FX_STAND_LEFT { "fx_stand_l", true }
+#define FX_STAND_RIGHT { "fx_stand_r", true }
+
+#define FX_STAND_ALL FX_STAND_FRONT, FX_STAND_BACK, FX_STAND_LEFT, FX_STAND_RIGHT
+
 bool CBurer::can_scan = true;
 
 CBurer::CBurer()
@@ -134,40 +141,40 @@ void CBurer::Load(LPCSTR section)
     //		SVelocityParam &velocity_drag		= move().get_velocity(MonsterMovement::eVelocityParameterDrag);
 
     anim().AddAnim(eAnimStandIdle, "stand_idle_", -1, &velocity_none,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     anim().AddAnim(eAnimStandTurnLeft, "stand_turn_ls_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     anim().AddAnim(eAnimStandTurnRight, "stand_turn_rs_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     //	anim().AddAnim(eAnimStandDamaged,	"stand_idle_dmg_",		-1, &velocity_none,		PS_STAND); //, "fx_stand_f",
     //"fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimWalkFwd, "stand_walk_fwd_", -1, &velocity_walk,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     // anim().AddAnim(eAnimWalkDamaged,	"stand_walk_fwd_dmg_",	-1, &velocity_walk_dmg,	PS_STAND); //, 	"fx_stand_f",
     // "fx_stand_b", "fx_stand_l", "fx_stand_r");
     anim().AddAnim(eAnimRun, "stand_run_fwd_", -1, &velocity_run,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     // anim().AddAnim(eAnimRunDamaged,		"stand_run_dmg_",		-1,	&velocity_run_dmg,	PS_STAND); //, "fx_stand_f",
     // "fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimAttack, "stand_attack_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
 
     anim().AddAnim(eAnimDie, "stand_die_", -1, &velocity_none,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
 
     anim().AddAnim(eAnimShieldStart, "stand_shield_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     anim().AddAnim(eAnimShieldContinue, "stand_shield_idle_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
 
     anim().AddAnim(eAnimTeleFire, "stand_power_attack_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     anim().AddAnim(eAnimTelekinesis, "telekinesis_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
     anim().AddAnim(eAnimGraviFire, "stand_power_attack_", -1, &velocity_turn,
-        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND, FX_STAND_ALL);
 
     anim().AddAnim(eAnimRunTurnLeft, "stand_run_fwd_turn_left_", -1, &velocity_run, PS_STAND);
     anim().AddAnim(eAnimRunTurnRight, "stand_run_fwd_turn_right_", -1, &velocity_run, PS_STAND);

@@ -2,6 +2,32 @@
 #include "control_animation_base.h"
 
 void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s,
+    std::pair<cpcstr, bool> fx_front, std::pair<cpcstr, bool> fx_back,
+    std::pair<cpcstr, bool> fx_left, std::pair<cpcstr, bool> fx_right)
+{
+    SAnimItem* new_item = new SAnimItem();
+
+    new_item->target_name = tn;
+    new_item->spec_id = s_id;
+    new_item->velocity = *vel;
+    new_item->pos_state = p_s;
+
+    new_item->fxs.front = fx_front.first;
+    new_item->fxs.back = fx_back.first;
+    new_item->fxs.left = fx_left.first;
+    new_item->fxs.right = fx_right.first;
+
+    new_item->fxs.may_not_exist[0] = fx_front.second;
+    new_item->fxs.may_not_exist[1] = fx_back.second;
+    new_item->fxs.may_not_exist[2] = fx_left.second;
+    new_item->fxs.may_not_exist[3] = fx_right.second;
+
+    new_item->count = 0;
+
+    m_anim_storage[ma] = new_item;
+}
+
+void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s,
     LPCSTR fx_front, LPCSTR fx_back, LPCSTR fx_left, LPCSTR fx_right)
 {
     SAnimItem* new_item = new SAnimItem();
@@ -15,6 +41,8 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVeloci
     new_item->fxs.back = fx_back;
     new_item->fxs.left = fx_left;
     new_item->fxs.right = fx_right;
+
+    new_item->fxs.may_not_exist.reset();
 
     new_item->count = 0;
 

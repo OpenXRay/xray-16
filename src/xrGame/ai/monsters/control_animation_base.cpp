@@ -367,7 +367,12 @@ void CControlAnimationBase::FX_Play(EHitSide side, float amount)
     }
 
     if (p_str && p_str->size())
-        smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX(*(*p_str), amount);
+    {
+        if (anim_it->fxs.may_not_exist[side])
+            smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX_Safe(*(*p_str), amount);
+        else
+            smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX(*(*p_str), amount);
+    }
 
     fx_time_last_play = m_object->m_dwCurrentTime;
 }

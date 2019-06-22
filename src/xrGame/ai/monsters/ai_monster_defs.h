@@ -262,6 +262,15 @@ enum EPState
     PS_STAND_UPPER
 };
 
+enum EHitSide
+{
+    eSideFront = u32(0),
+    eSideBack,
+    eSideLeft,
+    eSideRight,
+    eSideCount
+};
+
 typedef shared_str anim_string;
 #define DEFAULT_ANIM eAnimStandIdle
 
@@ -282,6 +291,7 @@ struct SAnimItem
         anim_string back;
         anim_string left;
         anim_string right;
+        std::bitset<eSideCount> may_not_exist;
     } fxs;
 };
 
@@ -417,14 +427,6 @@ struct t_fx_index
 {
     s8 front;
     s8 back;
-};
-
-enum EHitSide
-{
-    eSideFront = u32(0),
-    eSideBack,
-    eSideLeft,
-    eSideRight
 };
 
 using ANIM_ITEM_VECTOR = xr_vector<SAnimItem*>;
