@@ -150,6 +150,31 @@ public:
         return read_if_exists(outValue, section.c_str(), line);
     }
 
+    // Returns true if value or fallback value exist, crashes otherwise
+    template<typename T>
+    bool read_if_exists(T& outValue, pcstr section, pcstr line, pcstr line2, bool at_least_one = false) const
+    {
+        if (line_exist(section, line))
+        {
+            outValue = read<T>(section, line);
+            return true;
+        }
+        if (line_exist(section, line2))
+        {
+            outValue = read<T>(section, line2);
+            return true;
+        }
+        if (at_least_one)
+            outValue = read<T>(section, line); // provoke crash
+        return false;
+    }
+
+    template<typename T>
+    bool read_if_exists(T& outValue, const shared_str& section, pcstr line, pcstr line2, bool at_least_one = false) const
+    {
+        return read_if_exists(outValue, section.c_str(), line, line2, at_least_one);
+    }
+
     template<typename T>
     bool try_read_if_exists(T& outValue, pcstr section, pcstr line) const
     {
