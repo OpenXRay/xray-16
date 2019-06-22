@@ -159,10 +159,10 @@ void CResourceManager::_DeleteDecl(const SDeclaration* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SVS* CResourceManager::_CreateVS(LPCSTR _name)
+SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullptr*/)
 {
     string_path name;
-    xr_strcpy(name, _name);
+    xr_strcpy(name, shader);
     if (0 == GEnv.Render->m_skinning)
         xr_strcat(name, "_0");
     if (1 == GEnv.Render->m_skinning)
@@ -174,12 +174,12 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
     
-    return CreateShader<SVS>(name, _name, true);
+    return CreateShader<SVS>(name, shader, fallbackShader, true);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 
-SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr, true); }
+SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr, nullptr, true); }
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)

@@ -163,10 +163,10 @@ void CResourceManager::_DeleteDecl(const SDeclaration* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SVS* CResourceManager::_CreateVS(LPCSTR _name)
+SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr /*fallbackShader = nullptr*/)
 {
     string_path name;
-    xr_strcpy(name, _name);
+    xr_strcpy(name, shader);
     if (0 == GEnv.Render->m_skinning) xr_strcat(name, "_0");
     if (1 == GEnv.Render->m_skinning) xr_strcat(name, "_1");
     if (2 == GEnv.Render->m_skinning) xr_strcat(name, "_2");
@@ -184,9 +184,9 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 
     string_path shName;
     {
-        const char* pchr = strchr(_name, '(');
-        ptrdiff_t size = pchr ? pchr - _name : xr_strlen(_name);
-        strncpy(shName, _name, size);
+        const char* pchr = strchr(shader, '(');
+        ptrdiff_t size = pchr ? pchr - shader : xr_strlen(shader);
+        strncpy(shName, shader, size);
         shName[size] = 0;
     }
 

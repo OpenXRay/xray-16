@@ -338,7 +338,8 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 #endif
 
 template <typename T>
-inline T* CResourceManager::CreateShader(const char* name, const char* filename /*= nullptr*/, const bool searchForEntryAndTarget /*= false*/)
+T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
+    cpcstr fallbackShader /*= nullptr*/, const bool searchForEntryAndTarget /*= false*/)
 {
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
@@ -380,15 +381,17 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
         IReader* file = FS.r_open(cname);
 
         bool fallback = strstr(Core.Params, "-lack_of_shaders");
-        if (!file && fallback)
+        if (!file && fallback || fallbackShader)
         {
         fallback:
             fallback = false;
 
             string1024 tmp;
-            xr_sprintf(tmp, "CreateShader: %s is missing. Replacing it with stub_default%s", cname, ShaderTypeTraits<T>::GetShaderExt());
+            xr_sprintf(tmp, "CreateShader: %s is missing. Replacing it with %s%s",
+                cname, fallbackShader ? fallbackShader : "stub_default", ShaderTypeTraits<T>::GetShaderExt());
             Msg(tmp);
-            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ShaderTypeTraits<T>::GetShaderExt());
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(),
+                fallbackShader ? fallbackShader : "stub_default", ShaderTypeTraits<T>::GetShaderExt());
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
