@@ -546,6 +546,7 @@ void CControlAnimationBase::UpdateAnimCount()
         {
             xr_sprintf(s, "Error! No animation: %s for monster %s", *((*it)->target_name), *m_object->cName());
             R_ASSERT2(count != 0, s);
+            subjectsToDelete.push_back(std::distance(m_anim_storage.begin(), it));
         }
     }
 
