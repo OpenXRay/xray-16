@@ -91,11 +91,20 @@ public:
 
     // создание карты анимаций (выполнять на Monster::Load)
     void AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s);
+
+    void AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> target, int s_id, SVelocityParam* vel, EPState p_s);
+
     void AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s, LPCSTR fx_front, LPCSTR fx_back,
         LPCSTR fx_left, LPCSTR fx_right);
+
+    void AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> target, int s_id, SVelocityParam* vel, EPState p_s,
+        LPCSTR fx_front, LPCSTR fx_back,
+        LPCSTR fx_left, LPCSTR fx_right);
+
     void AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> target, int s_id, SVelocityParam* vel, EPState p_s,
         std::pair<cpcstr, bool> fx_front, std::pair<cpcstr, bool> fx_back,
         std::pair<cpcstr, bool> fx_left, std::pair<cpcstr, bool> fx_right);
+
     void AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s,
         std::pair<cpcstr, bool> fx_front, std::pair<cpcstr, bool> fx_back,
         std::pair<cpcstr, bool> fx_left, std::pair<cpcstr, bool> fx_right);

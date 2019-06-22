@@ -79,6 +79,7 @@ void CAI_Boar::Load(LPCSTR section)
 
     anim().AddAnim(eAnimRunTurnLeft, "stand_run_look_left_", -1, &velocity_run, PS_STAND, FX_STAND_ALL);
     anim().AddAnim(eAnimRunTurnRight, "stand_run_look_right_", -1, &velocity_run, PS_STAND, FX_STAND_ALL);
+    anim().AddAnim(eAnimAttackRun, { "stand_run_attack_", true }, -1, &velocity_run, PS_STAND, FX_STAND_ALL);
 
     // define transitions
     anim().AddTransition(eAnimStandLieDown, eAnimSleep, eAnimLieToSleep, false);

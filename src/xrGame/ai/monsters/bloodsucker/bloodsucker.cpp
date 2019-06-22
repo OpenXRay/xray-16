@@ -107,7 +107,7 @@ void CAI_Bloodsucker::Load(LPCSTR section)
         anim().AddAnim(eAnimStandTurnLeft, "stand_turn_ls_", -1, &velocity_turn, PS_STAND);
         anim().AddAnim(eAnimStandTurnRight, "stand_turn_rs_", -1, &velocity_turn, PS_STAND);
         anim().AddAnim(eAnimSleep, "lie_sleep_", -1, &velocity_none, PS_LIE);
-        anim().AddAnim(eAnimSleepStanding, "stand_sleep_", -1, &velocity_none, PS_STAND);
+        anim().AddAnim(eAnimSleepStanding, { "stand_sleep_", true }, -1, &velocity_none, PS_STAND);
         anim().AddAnim(eAnimWalkFwd, "stand_walk_fwd_", -1, &velocity_walk, PS_STAND);
         anim().AddAnim(eAnimWalkDamaged, "stand_walk_fwd_dmg_", -1, &velocity_walk_dmg, PS_STAND);
         anim().AddAnim(eAnimRun, "stand_run_", -1, &velocity_run, PS_STAND);
@@ -148,7 +148,7 @@ void CAI_Bloodsucker::Load(LPCSTR section)
             "fx_stand_l", "fx_stand_r");
         anim().AddAnim(
             eAnimSleep, "lie_sleep_", -1, &velocity_none, PS_LIE, "fx_run_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
-        anim().AddAnim(eAnimSleepStanding, "stand_sleep_", -1, &velocity_none, PS_STAND, "fx_run_f", "fx_stand_b",
+        anim().AddAnim(eAnimSleepStanding, { "stand_sleep_", true }, -1, &velocity_none, PS_STAND, "fx_run_f", "fx_stand_b",
             "fx_stand_l", "fx_stand_r");
         anim().AddAnim(eAnimWalkFwd, "stand_walk_fwd_", -1, &velocity_walk, PS_STAND, "fx_run_f", "fx_stand_b",
             "fx_stand_l", "fx_stand_r");
