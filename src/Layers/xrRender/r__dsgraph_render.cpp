@@ -562,18 +562,21 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     PortalTraverser.traverse(_sector, ViewBase, _cop, mCombined, 0);
 
     // Determine visibility for static geometry hierrarhy
-    for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+    if (psDeviceFlags.test(rsDrawStatic))
     {
-        CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
-        dxRender_Visual* root = sector->root();
-        for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+        for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
         {
-            set_Frustum(&(sector->r_frustums[v_it]));
-            add_Geometry(root);
+            CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+            dxRender_Visual* root = sector->root();
+            for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+            {
+                set_Frustum(&(sector->r_frustums[v_it]));
+                add_Geometry(root);
+            }
         }
     }
 
-    if (_dynamic)
+    if (_dynamic && psDeviceFlags.test(rsDrawDynamic))
     {
         set_Object(nullptr);
 
@@ -603,12 +606,11 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
                 renderable->renderable_Render();
             }
         }
-    }
-
 #if RENDER != R_R1
-    if (g_pGameLevel && (phase == RImplementation.PHASE_SMAP) && ps_actor_shadow_flags.test(RFLAG_ACTOR_SHADOW))
-        g_hud->Render_Actor_Shadow(); // Actor Shadow
+        if (g_pGameLevel && (phase == RImplementation.PHASE_SMAP) && ps_actor_shadow_flags.test(RFLAG_ACTOR_SHADOW))
+            g_hud->Render_Actor_Shadow(); // Actor Shadow
 #endif
+    }
 
     // Restore
     ViewBase = ViewSave;
