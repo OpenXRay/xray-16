@@ -44,8 +44,10 @@ enum
     rsR3 = (1ul << 21ul),
     rsR4 = (1ul << 22ul), // 22 was reserved for editor
     rsRGL = (1ul << 23ul), // 23 was reserved for editor
+
     rsShowFPS = (1ul << 24ul), // 24 was reserved for editor
-    // 25-32 bit - reserved to Editor
+    rsDrawParticles = (1ul << 25ul), // 25 was reserved for editor
+    // 26-32 bit - reserved to Editor
 };
 
 //. ENGINE_API extern u32 psCurrentMode ;

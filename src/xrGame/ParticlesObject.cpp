@@ -273,6 +273,9 @@ float CParticlesObject::shedule_Scale()
 
 void CParticlesObject::renderable_Render()
 {
+    if (!psDeviceFlags.test(rsDrawParticles))
+        return;
+
     VERIFY(renderable.visual);
     u32 dt = Device.dwTimeGlobal - dwLastTime;
     if (dt)

@@ -810,6 +810,7 @@ void CCC_Register()
     // CMD3(CCC_Mask, "rs_constant_fps", &psDeviceFlags, rsConstantFPS );
     CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
     CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
+    CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
 #endif
 
     // Render device states
