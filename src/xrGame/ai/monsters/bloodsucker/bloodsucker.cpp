@@ -58,6 +58,7 @@ CAI_Bloodsucker::CAI_Bloodsucker()
     m_runaway_invisible_time = 0;
 
     using namespace detail::bloodsucker;
+    m_critical_hit_chance = default_critical_hit_chance;
 }
 
 CAI_Bloodsucker::~CAI_Bloodsucker() { xr_delete(StateMan); }
@@ -243,9 +244,9 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 
     m_vampire_want_speed = pSettings->r_float(section, "Vampire_Want_Speed");
     m_vampire_wound = pSettings->r_float(section, "Vampire_Wound");
-    m_vampire_gain_health = pSettings->r_float(section, "Vampire_GainHealth");
-    m_vampire_distance = pSettings->r_float(section, "Vampire_Distance");
-    m_sufficient_hits_before_vampire = pSettings->r_u32(section, "Vampire_Sufficient_Hits");
+    m_vampire_gain_health = pSettings->read_if_exists<float>(section, "Vampire_GainHealth", 0.5f);
+    m_vampire_distance = pSettings->read_if_exists<float>(section, "Vampire_Distance", 1.0f);
+    m_sufficient_hits_before_vampire = pSettings->read_if_exists<u32>(section, "Vampire_Sufficient_Hits", 5);
     m_sufficient_hits_before_vampire_random = -1 + (rand() % 3);
 
     invisible_particle_name = pSettings->r_string(section, "Particle_Invisible");
@@ -253,6 +254,9 @@ void CAI_Bloodsucker::Load(LPCSTR section)
     using namespace detail::bloodsucker;
 
     READ_IF_EXISTS(pSettings, r_float, section, "separate_factor", 0.f);
+
+    m_critical_hit_chance = pSettings->read_if_exists<float>(section, "critical_hit_chance",
+        default_critical_hit_chance);
 
     m_visibility_state_change_min_delay = READ_IF_EXISTS(
         pSettings, r_u32, section, "visibility_state_change_min_delay", default_visibility_state_change_min_delay);
