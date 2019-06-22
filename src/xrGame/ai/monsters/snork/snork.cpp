@@ -68,8 +68,8 @@ void CSnork::Load(LPCSTR section)
     anim().AddAnim(eAnimEat, "stand_eat_", -1, &velocity_none, PS_STAND, STAND_FX_ALL);
     anim().AddAnim(eAnimCheckCorpse, "stand_check_corpse_", -1, &velocity_none, PS_STAND, STAND_FX_ALL);
 
-    anim().AddAnim(eAnimRunTurnLeft, "stand_run_look_left_", -1, &velocity_run, PS_STAND, STAND_FX_ALL);
-    anim().AddAnim(eAnimRunTurnRight, "stand_run_look_right_", -1, &velocity_run, PS_STAND, STAND_FX_ALL);
+    anim().AddAnim(eAnimRunTurnLeft, { "stand_run_look_left_", true }, -1, &velocity_run, PS_STAND, STAND_FX_ALL);
+    anim().AddAnim(eAnimRunTurnRight, { "stand_run_look_right_", true }, -1, &velocity_run, PS_STAND, STAND_FX_ALL);
 
     anim().LinkAction(ACT_STAND_IDLE, eAnimStandIdle);
     anim().LinkAction(ACT_SIT_IDLE, eAnimStandIdle);
