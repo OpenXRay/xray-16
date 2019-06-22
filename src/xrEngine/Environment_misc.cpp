@@ -347,14 +347,7 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     wind_velocity = config.r_float(identifier, "wind_velocity");
     wind_direction = deg2rad(config.r_float(identifier, "wind_direction"));
 
-    if (config.read_if_exists(hemi_color, identifier, "hemi_color"))
-    {
-        config.read_if_exists(hemi_color, identifier, "hemisphere_color");
-    }
-    else
-    {
-        hemi_color = config.r_fvector4(identifier, "hemisphere_color");
-    }
+    config.read_if_exists(hemi_color, identifier, "hemisphere_color", "hemi_color", true);
 
     sun_color = config.r_fvector3(identifier, "sun_color");
 
@@ -405,19 +398,12 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
             environment.m_thunderbolts_config, config.r_string(identifier, "thunderbolt_collection"));
     }
 
-    // XXX: introduce new function and cleanup the code like this:
-    // config.read_if_exists(bolt_period, identifier, "thunderbolt_period", "bolt_period")
     if (tb_id.size())
     {
-        if (config.read_if_exists(bolt_period, identifier, "bolt_period"))
-            config.read_if_exists(bolt_period, identifier, "thunderbolt_period");
-        else
-            bolt_period = config.r_float(identifier, "thunderbolt_period");
-
-        if (config.read_if_exists(bolt_duration, identifier, "bolt_duration"))
-            config.read_if_exists(bolt_duration, identifier, "thunderbolt_duration");
-        else
-            bolt_duration = config.r_float(identifier, "thunderbolt_duration");
+        config.read_if_exists(bolt_period, identifier,
+            "thunderbolt_period", "bolt_period", true);
+        config.read_if_exists(bolt_duration, identifier,
+            "thunderbolt_duration", "bolt_duration", true);
     }
 
     m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);
