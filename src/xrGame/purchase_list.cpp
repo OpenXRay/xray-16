@@ -29,10 +29,17 @@ void CPurchaseList::process(CInifile& ini_file, LPCSTR section, CInventoryOwner&
     {
         VERIFY3((*I).second.size(), "PurchaseList : cannot handle lines in section without values", section);
 
-        string256 temp0, temp1;
+        string256 buffer;
         THROW3(_GetItemCount(*(*I).second) == 2, "Invalid parameters in section", section);
-        process(game_object, (*I).first, atoi(_GetItem(*(*I).second, 0, temp0)),
-            (float)atof(_GetItem(*(*I).second, 1, temp1)));
+        {
+            _GetItem(*(*I).second, 0, buffer);
+            int tmp_i;
+            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_i);
+            _GetItem(*(*I).second, 1, buffer);
+            float tmp_f;
+            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_f);
+            process(game_object, (*I).first, tmp_i, tmp_f);
+        }
     }
 }
 

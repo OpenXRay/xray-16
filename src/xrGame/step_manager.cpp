@@ -57,15 +57,15 @@ void CStepManager::reload(LPCSTR section)
     {
         _GetItem(val, 0, cur_elem);
 
-        param.cycles = u8(atoi(cur_elem));
+        std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), param.cycles);
         R_ASSERT(param.cycles >= 1);
 
         for (u32 j = 0; j < m_legs_count; j++)
         {
             _GetItem(val, 1 + j * 2, cur_elem);
-            param.step[j].time = float(atof(cur_elem));
+            std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), param.step[j].time);
             _GetItem(val, 1 + j * 2 + 1, cur_elem);
-            param.step[j].power = float(atof(cur_elem));
+            std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), param.step[j].power);
             VERIFY(_valid(param.step[j].power));
         }
 

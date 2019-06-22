@@ -203,8 +203,11 @@ int XMLDocument::ReadInt(XML_NODE node, const int default_int_val) const
 
     if (result_str == nullptr)
         return default_int_val;
-
-    return atoi(result_str);
+    {
+        int tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 int XMLDocument::ReadInt(pcstr path, const size_t index, const int default_int_val) const
@@ -213,7 +216,11 @@ int XMLDocument::ReadInt(pcstr path, const size_t index, const int default_int_v
     if (result_str == nullptr)
         return default_int_val;
 
-    return atoi(result_str);
+    {
+        int tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 int XMLDocument::ReadInt(XML_NODE start_node, pcstr path, const size_t index, const int default_int_val) const
@@ -222,7 +229,11 @@ int XMLDocument::ReadInt(XML_NODE start_node, pcstr path, const size_t index, co
     if (result_str == nullptr)
         return default_int_val;
 
-    return atoi(result_str);
+    {
+        int tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 float XMLDocument::ReadFlt(pcstr path, const size_t index, float default_flt_val) const
@@ -231,7 +242,11 @@ float XMLDocument::ReadFlt(pcstr path, const size_t index, float default_flt_val
     if (result_str == nullptr)
         return default_flt_val;
 
-    return static_cast<float>(atof(result_str));
+    {
+        float tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 float XMLDocument::ReadFlt(XML_NODE start_node, pcstr path, const size_t index, float default_flt_val) const
@@ -240,7 +255,11 @@ float XMLDocument::ReadFlt(XML_NODE start_node, pcstr path, const size_t index, 
     if (result_str == nullptr)
         return default_flt_val;
 
-    return static_cast<float>(atof(result_str));
+    {
+        float tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 float XMLDocument::ReadFlt(XML_NODE node, float default_flt_val) const
@@ -250,7 +269,11 @@ float XMLDocument::ReadFlt(XML_NODE node, float default_flt_val) const
     if (result_str == nullptr)
         return default_flt_val;
 
-    return static_cast<float>(atof(result_str));
+    {
+        float tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 pcstr XMLDocument::ReadAttrib(XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, pcstr default_str_val) const
@@ -287,7 +310,11 @@ int XMLDocument::ReadAttribInt(XML_NODE node, pcstr attrib, const int default_in
     if (result_str == nullptr)
         return default_int_val;
 
-    return atoi(result_str);
+    {
+        int tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 int XMLDocument::ReadAttribInt(pcstr path, const size_t index, pcstr attrib, int default_int_val) const
@@ -297,7 +324,11 @@ int XMLDocument::ReadAttribInt(pcstr path, const size_t index, pcstr attrib, int
     if (result_str == nullptr)
         return default_int_val;
 
-    return atoi(result_str);
+    {
+        int tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 int XMLDocument::ReadAttribInt(XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, const int default_int_val) const
@@ -306,7 +337,11 @@ int XMLDocument::ReadAttribInt(XML_NODE start_node, pcstr path, const size_t ind
 
     if (result_str == nullptr)
         return default_int_val;
-    return atoi(result_str);
+    {
+        int tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 float XMLDocument::ReadAttribFlt(pcstr path, const size_t index, pcstr attrib, const float default_flt_val) const
@@ -316,7 +351,11 @@ float XMLDocument::ReadAttribFlt(pcstr path, const size_t index, pcstr attrib, c
     if (result_str == nullptr)
         return default_flt_val;
 
-    return static_cast<float>(atof(result_str));
+    {
+        float tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 float XMLDocument::ReadAttribFlt(XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, const float default_flt_val) const
@@ -326,7 +365,11 @@ float XMLDocument::ReadAttribFlt(XML_NODE start_node, pcstr path, const size_t i
     if (result_str == nullptr)
         return default_flt_val;
 
-    return static_cast<float>(atof(result_str));
+    {
+        float tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 float XMLDocument::ReadAttribFlt(XML_NODE node, pcstr attrib, const float default_flt_val) const
@@ -336,7 +379,11 @@ float XMLDocument::ReadAttribFlt(XML_NODE node, pcstr attrib, const float defaul
     if (result_str == nullptr)
         return default_flt_val;
 
-    return static_cast<float>(atof(result_str));
+    {
+        float tmp;
+        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        return tmp;
+    }
 }
 
 size_t XMLDocument::GetNodesNum(pcstr path, const size_t index, pcstr tag_name) const

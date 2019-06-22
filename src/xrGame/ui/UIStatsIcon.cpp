@@ -82,7 +82,12 @@ void CUIStatsIcon::SetValue(LPCSTR str)
         if (strstr(str, "green"))
             team = 0;
 
-        const int rank = atoi(strchr(str, '0')) - 1;
+        int rank;
+        {
+            const char* tmp = strchr(str, '0');
+            std::from_chars(tmp, tmp + xr_strlen(tmp), rank);
+            rank -= 1;
+        }
 
         SetShader(m_tex_info[rank][team].sh);
         SetTextureRect(m_tex_info[rank][team].rect);

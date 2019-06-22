@@ -108,11 +108,16 @@ struct SVelocityParam
     void Load(LPCSTR section, LPCSTR line)
     {
         string32 buffer;
-        velocity.linear = float(atof(_GetItem(pSettings->r_string(section, line), 0, buffer)));
-        velocity.angular_real = float(atof(_GetItem(pSettings->r_string(section, line), 1, buffer)));
-        velocity.angular_path = float(atof(_GetItem(pSettings->r_string(section, line), 2, buffer)));
-        min_factor = float(atof(_GetItem(pSettings->r_string(section, line), 3, buffer)));
-        max_factor = float(atof(_GetItem(pSettings->r_string(section, line), 4, buffer)));
+        _GetItem(pSettings->r_string(section, line), 0, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), velocity.linear);
+        _GetItem(pSettings->r_string(section, line), 1, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), velocity.angular_real);
+        _GetItem(pSettings->r_string(section, line), 2, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), velocity.angular_path);
+        _GetItem(pSettings->r_string(section, line), 3, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), min_factor);
+        _GetItem(pSettings->r_string(section, line), 4, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), max_factor);
     }
 };
 

@@ -82,11 +82,17 @@ IC void CTradeParameters::process(_action_type type, CInifile& ini_file, const s
             _action.disable((*I).first);
             continue;
         }
-
-        string256 temp0, temp1;
+        string256 buffer;
         THROW3(_GetItemCount(*(*I).second) == 2, "Invalid parameters in section", *section);
-        _action.enable((*I).first, CTradeFactors((float)atof(_GetItem(*(*I).second, 0, temp0)),
-                                       (float)atof(_GetItem(*(*I).second, 1, temp1))));
+        {
+            _GetItem(*(*I).second, 0, buffer);
+            float tmp_0;
+            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_0);
+            _GetItem(*(*I).second, 1, buffer);
+            float tmp_1;
+            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_1);
+            _action.enable((*I).first, CTradeFactors(tmp_0, tmp_1));
+        }
     }
 }
 

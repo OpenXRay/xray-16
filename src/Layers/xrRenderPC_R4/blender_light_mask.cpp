@@ -86,7 +86,7 @@ void CBlender_accum_direct_mask_msaa::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        std::from_chars(Definition, Definition + xr_strlen(Definition), GEnv.Render->m_MSAASample);
     else
         GEnv.Render->m_MSAASample = -1;
 

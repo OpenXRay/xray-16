@@ -446,7 +446,7 @@ void CCar::VisualUpdate(float fov)
     Fvector C, V;
     Center(C);
     V.set(lin_vel);
-    
+
     m_car_sound->Update();
     if (Owner())
     {
@@ -953,12 +953,20 @@ void CCar::Init()
             xr_map<u16, SWheel>::iterator i = m_wheels_map.find(index);
 
             if (i != m_wheels_map.end())
-                i->second.CDamagableHealthItem::Init(float(atof(*item.second)), 2);
+            {
+                float tmp;
+                std::from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
+                i->second.CDamagableHealthItem::Init(tmp, 2);
+            }
             else
             {
                 xr_map<u16, SDoor>::iterator i = m_doors.find(index);
                 R_ASSERT3(i != m_doors.end(), "only wheel and doors bones allowed for damage defs", *item.first);
-                i->second.CDamagableHealthItem::Init(float(atof(*item.second)), 1);
+                {
+                    float tmp;
+                    std::from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
+                    i->second.CDamagableHealthItem::Init(tmp, 1);
+                }
             }
         }
     }
@@ -1981,48 +1989,30 @@ Fvector CCar::ExitVelocity()
 
 /***** added by Ray Twitty (aka Shadows) START *****/
 // получить и задать текущее количество топлива
-float CCar::GetfFuel()
-{
-    return m_fuel;
-}
+float CCar::GetfFuel() { return m_fuel; }
 
-void CCar::SetfFuel(float fuel)
-{
-    m_fuel = fuel;
-}
+void CCar::SetfFuel(float fuel) { m_fuel = fuel; }
 
-// получить и задать размер топливного бака 
-float CCar::GetfFuelTank()
-{
-    return m_fuel_tank;
-}
+// получить и задать размер топливного бака
+float CCar::GetfFuelTank() { return m_fuel_tank; }
 
-void CCar::SetfFuelTank(float fuel_tank)
-{
-    m_fuel_tank = fuel_tank;
-}
+void CCar::SetfFuelTank(float fuel_tank) { m_fuel_tank = fuel_tank; }
 
 // получить и задать величину потребление топлива
-float CCar::GetfFuelConsumption()
-{
-    return m_fuel_consumption;
-}
+float CCar::GetfFuelConsumption() { return m_fuel_consumption; }
 
-void CCar::SetfFuelConsumption(float fuel_consumption)
-{
-    m_fuel_consumption = fuel_consumption;
-}
+void CCar::SetfFuelConsumption(float fuel_consumption) { m_fuel_consumption = fuel_consumption; }
 
 // прибавить или убавить количество топлива
 void CCar::ChangefFuel(float fuel)
 {
-    if(m_fuel + fuel < 0)
+    if (m_fuel + fuel < 0)
     {
         m_fuel = 0;
         return;
     }
 
-    if(fuel < m_fuel_tank - m_fuel)
+    if (fuel < m_fuel_tank - m_fuel)
         m_fuel += fuel;
     else
         m_fuel = m_fuel_tank;
@@ -2032,21 +2022,18 @@ void CCar::ChangefFuel(float fuel)
 void CCar::ChangefHealth(float health)
 {
     float current_health = GetfHealth();
-    if(current_health + health < 0)
+    if (current_health + health < 0)
     {
         SetfHealth(0);
         return;
     }
 
-    if(health < 1 - current_health)
+    if (health < 1 - current_health)
         SetfHealth(current_health + health);
-	else
+    else
         SetfHealth(1);
 }
 
 // активен ли сейчас двигатель
-bool CCar::isActiveEngine()
-{
-    return b_engine_on;
-}
+bool CCar::isActiveEngine() { return b_engine_on; }
 /***** added by Ray Twitty (aka Shadows) END *****/

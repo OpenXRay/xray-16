@@ -35,8 +35,10 @@ void CDamageManager::reload(LPCSTR section, CInifile const* ini)
         if (ini->line_exist(section, "default"))
         {
             LPCSTR value = ini->r_string(section, "default");
-            m_default_hit_factor = (float)atof(_GetItem(value, 0, buffer));
-            m_default_wound_factor = (float)atof(_GetItem(value, 2, buffer));
+            _GetItem(value, 0, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), m_default_hit_factor);
+            _GetItem(value, 2, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), m_default_wound_factor);
         }
     }
 
@@ -83,16 +85,36 @@ void CDamageManager::load_section(LPCSTR section, CInifile const* ini)
             int bone = kinematics->LL_BoneID(i->first);
             R_ASSERT2(BI_NONE != bone, *(*i).first);
             CBoneInstance& bone_instance = kinematics->LL_GetBoneInstance(u16(bone));
-            bone_instance.set_param(0, (float)atof(_GetItem(*(*i).second, 0, buffer)));
-            bone_instance.set_param(1, (float)atoi(_GetItem(*(*i).second, 1, buffer)));
-            bone_instance.set_param(2, (float)atof(_GetItem(*(*i).second, 2, buffer)));
+            {
+                float tmp;
+                _GetItem(*(*i).second, 0, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                bone_instance.set_param(0, tmp);
+
+                _GetItem(*(*i).second, 2, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                bone_instance.set_param(2, tmp);
+                
+            }
+            {
+                int tmp;
+                _GetItem(*(*i).second, 1, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                bone_instance.set_param(1, tmp);
+            }
             if (_GetItemCount(*(*i).second) < 4)
             {
-                bone_instance.set_param(3, (float)atof(_GetItem(*(*i).second, 0, buffer)));
+                float tmp;
+                _GetItem(*(*i).second, 0, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                bone_instance.set_param(3, tmp);
             }
             else
             {
-                bone_instance.set_param(3, (float)atof(_GetItem(*(*i).second, 3, buffer)));
+                float tmp;
+                _GetItem(*(*i).second, 3, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                bone_instance.set_param(3, tmp);
             }
             if (0 == bone && (fis_zero(bone_instance.get_param(0)) || fis_zero(bone_instance.get_param(2))))
             {

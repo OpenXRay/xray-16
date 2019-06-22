@@ -274,7 +274,9 @@ void CRender::create()
     o.forcegloss = g ? TRUE : FALSE;
     if (g)
     {
-        o.forcegloss_v = float(atoi(g + xr_strlen("-gloss "))) / 255.f;
+        const char* tmp = g + xr_strlen("-gloss ");
+        std::from_chars(tmp, tmp + xr_strlen(tmp), o.forcegloss_v);
+        o.forcegloss_v /= 255.f;
     }
 
     // options

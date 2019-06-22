@@ -19,8 +19,18 @@ u32 CTeamInfo::GetTeam1_color()
     string256 _buff;
 
     LPCSTR tm_col = pSettings->r_string("team1", "color");
-    team1_color = color_argb(
-        155, atoi(_GetItem(tm_col, 0, _buff)), atoi(_GetItem(tm_col, 1, _buff)), atoi(_GetItem(tm_col, 2, _buff)));
+    {
+        u32 tmp_0, tmp_1, tmp_2;
+        _GetItem(tm_col, 0, _buff);
+        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_0);
+        _GetItem(tm_col, 1, _buff);
+        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_1);
+        _GetItem(tm_col, 2, _buff);
+        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_2);
+        team1_color = color_argb(
+            155, tmp_0, tmp_1, tmp_2);
+
+    }
     flags.set(flTeam1_color, true);
 
     return team1_color;
@@ -34,8 +44,18 @@ u32 CTeamInfo::GetTeam2_color()
     string256 _buff;
 
     LPCSTR tm_col = pSettings->r_string("team2", "color");
-    team2_color = color_argb(
-        155, atoi(_GetItem(tm_col, 0, _buff)), atoi(_GetItem(tm_col, 1, _buff)), atoi(_GetItem(tm_col, 2, _buff)));
+    {
+        u32 tmp_0, tmp_1, tmp_2;
+        _GetItem(tm_col, 0, _buff);
+        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_0);
+        _GetItem(tm_col, 1, _buff);
+        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_1);
+        _GetItem(tm_col, 2, _buff);
+        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_2);
+        team2_color = color_argb(
+            155, tmp_0, tmp_1, tmp_2);
+
+    }
     flags.set(flTeam2_color, true);
 
     return team2_color;

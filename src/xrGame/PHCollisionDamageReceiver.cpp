@@ -26,7 +26,11 @@ void CPHCollisionDamageReceiver::Init()
             const CInifile::Item& item = *I;
             u16 index = K->LL_BoneID(*item.first);
             R_ASSERT3(index != BI_NONE, "Wrong bone name", *item.first);
-            BoneInsert(index, float(atof(*item.second)));
+            {
+                float tmp;
+                std::from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
+                BoneInsert(index, tmp);
+            }
             CODEGeom* og = sh->PPhysicsShell()->get_GeomByID(index);
             // R_ASSERT3(og, "collision damage bone has no physics collision", *item.first);
             if (og)

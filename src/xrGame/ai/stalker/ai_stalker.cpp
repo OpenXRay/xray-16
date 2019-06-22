@@ -174,7 +174,12 @@ void CAI_Stalker::reinit()
         LPCSTR weights = SpecificCharacter().critical_wound_weights();
         string16 temp;
         for (int i = 0, n = _GetItemCount(weights); i < n; ++i)
-            m_critical_wound_weights.push_back((float)atof(_GetItem(weights, i, temp)));
+        {
+            float weight;
+            _GetItem(weights, i, temp);
+            std::from_chars(temp, temp + xr_strlen(temp), weight);
+            m_critical_wound_weights.push_back(weight);
+        }
     }
 
     m_update_rotation_on_frame = false;

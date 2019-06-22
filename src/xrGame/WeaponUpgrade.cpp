@@ -147,21 +147,25 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
     if (result2 && !test)
     {
         string32 buffer;
-        fvHitPower[egdMaster] = (float)atof(_GetItem(*s_sHitPower, 0, buffer));
+        _GetItem(*s_sHitPower, 0, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdMaster]);
         fvHitPower[egdNovice] = fvHitPower[egdStalker] = fvHitPower[egdVeteran] = fvHitPower[egdMaster];
 
         int num_game_diff_param = _GetItemCount(*s_sHitPower);
         if (num_game_diff_param > 1)
         {
-            fvHitPower[egdVeteran] = (float)atof(_GetItem(*s_sHitPower, 1, buffer));
+            _GetItem(*s_sHitPower, 1, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdVeteran]);
         }
         if (num_game_diff_param > 2)
         {
-            fvHitPower[egdStalker] = (float)atof(_GetItem(*s_sHitPower, 2, buffer));
+            _GetItem(*s_sHitPower, 2, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdStalker]);
         }
         if (num_game_diff_param > 3)
         {
-            fvHitPower[egdNovice] = (float)atof(_GetItem(*s_sHitPower, 3, buffer));
+            _GetItem(*s_sHitPower, 3, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdNovice]);
         }
     }
     result |= result2;
@@ -171,22 +175,26 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
     if (result2 && !test)
     {
         string32 buffer;
-        fvHitPowerCritical[egdMaster] = (float)atof(_GetItem(*s_sHitPowerCritical, 0, buffer));
+        _GetItem(*s_sHitPowerCritical, 0, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdMaster]);
         fvHitPowerCritical[egdNovice] = fvHitPowerCritical[egdStalker] = fvHitPowerCritical[egdVeteran] =
             fvHitPowerCritical[egdMaster];
 
         int num_game_diff_param = _GetItemCount(*s_sHitPowerCritical);
         if (num_game_diff_param > 1)
         {
-            fvHitPowerCritical[egdVeteran] = (float)atof(_GetItem(*s_sHitPowerCritical, 1, buffer));
+            _GetItem(*s_sHitPowerCritical, 1, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdVeteran]);
         }
         if (num_game_diff_param > 2)
         {
-            fvHitPowerCritical[egdStalker] = (float)atof(_GetItem(*s_sHitPowerCritical, 2, buffer));
+            _GetItem(*s_sHitPowerCritical, 2, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdStalker]);
         }
         if (num_game_diff_param > 3)
         {
-            fvHitPowerCritical[egdNovice] = (float)atof(_GetItem(*s_sHitPowerCritical, 3, buffer));
+            _GetItem(*s_sHitPowerCritical, 3, buffer);
+            std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdNovice]);
         }
     }
     result |= result2;

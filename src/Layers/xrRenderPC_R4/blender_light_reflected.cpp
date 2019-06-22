@@ -36,7 +36,7 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        std::from_chars(Definition, Definition + xr_strlen(Definition), GEnv.Render->m_MSAASample);
     else
         GEnv.Render->m_MSAASample = -1;
 

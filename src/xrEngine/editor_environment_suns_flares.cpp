@@ -80,9 +80,12 @@ void flares::load(CInifile& config, shared_str const& section)
     for (u32 i = 0; i < min_flare_count; ++i)
     {
         flare* object = new flare();
-        object->m_opacity = (float)atof(_GetItem(flare_opacity.c_str(), i, result, buffer_size));
-        object->m_position = (float)atof(_GetItem(flare_position.c_str(), i, result, buffer_size));
-        object->m_radius = (float)atof(_GetItem(flare_radius.c_str(), i, result, buffer_size));
+        _GetItem(flare_opacity.c_str(), i, result, buffer_size);
+        std::from_chars(result, result + xr_strlen(result), object->m_opacity);
+        _GetItem(flare_position.c_str(), i, result, buffer_size);
+        std::from_chars(result, result + xr_strlen(result), object->m_position);
+        _GetItem(flare_radius.c_str(), i, result, buffer_size);
+        std::from_chars(result, result + xr_strlen(result), object->m_radius);
         object->m_texture = _GetItem(flare_textures.c_str(), i, result, buffer_size);
         object->fill(m_collection);
         m_flares.push_back(object);

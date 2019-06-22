@@ -727,21 +727,29 @@ void CGameObject::spawn_supplies()
             if (V && xr_strlen(V))
             {
                 int n = _GetItemCount(V);
-                string16 temp;
                 if (n > 0)
-                    j = atoi(_GetItem(V, 0, temp)); // count
-
-                if (NULL != strstr(V, "prob="))
-                    p = (float)atof(strstr(V, "prob=") + 5);
+                {
+                    string16 temp;
+                    _GetItem(V, 0, temp);
+                    std::from_chars(temp, temp + xr_strlen(temp), j); // count
+                }
+                {
+                    const char* prob_c = strstr(V, "prob=");
+                    if (nullptr != prob_c)
+                        std::from_chars(prob_c + 5, prob_c + 5 + xr_strlen(prob_c + 5), p);
+                }
                 if (fis_zero(p))
                     p = 1.f;
                 if (!j)
                     j = 1;
-                if (NULL != strstr(V, "cond="))
-                    f_cond = (float)atof(strstr(V, "cond=") + 5);
-                bScope = (NULL != strstr(V, "scope"));
-                bSilencer = (NULL != strstr(V, "silencer"));
-                bLauncher = (NULL != strstr(V, "launcher"));
+                {
+                    const char* cond_c = strstr(V, "cond=");
+                    if (nullptr != cond_c)
+                        std::from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
+                }
+                bScope = (nullptr != strstr(V, "scope"));
+                bSilencer = (nullptr != strstr(V, "silencer"));
+                bLauncher = (nullptr != strstr(V, "launcher"));
             }
             for (u32 i = 0; i < j; ++i)
             {

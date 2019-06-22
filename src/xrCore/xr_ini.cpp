@@ -765,26 +765,58 @@ shared_str CInifile::r_string_wb(pcstr S, pcstr L) const
 u8 CInifile::r_u8(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return u8(atoi(C));
+    {
+        u8 tmp;
+        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        if (err == std::errc::invalid_argument)
+        {
+            return -1;
+        }
+        return tmp;
+    }
 }
 
 u16 CInifile::r_u16(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return u16(atoi(C));
+    {
+        u16 tmp;
+        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        if (err == std::errc::invalid_argument)
+        {
+            return -1;
+        }
+        return tmp;
+    }
 }
 
 u32 CInifile::r_u32(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return u32(atoi(C));
+    {
+        u32 tmp;
+        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        if (err == std::errc::invalid_argument)
+        {
+            return -1;
+        }
+        return tmp;
+    }
 }
 
 u64 CInifile::r_u64(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
 #ifndef _EDITOR
-    return _strtoui64(C, nullptr, 10);
+    {
+        u64 tmp;
+        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        if (err == std::errc::invalid_argument)
+        {
+            return -1;
+        }
+        return tmp;
+    }
 #else
     return (u64)_atoi64(C);
 #endif
@@ -793,31 +825,51 @@ u64 CInifile::r_u64(pcstr S, pcstr L) const
 s64 CInifile::r_s64(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return _atoi64(C);
+    {
+        s64 tmp;
+        std::from_chars(C, C + xr_strlen(C), tmp);
+        return tmp;
+    }
 }
 
 s8 CInifile::r_s8(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return s8(atoi(C));
+    {
+        s8 tmp;
+        std::from_chars(C, C + xr_strlen(C), tmp);
+        return tmp;
+    }
 }
 
 s16 CInifile::r_s16(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return s16(atoi(C));
+    {
+        s16 tmp;
+        std::from_chars(C, C + xr_strlen(C), tmp);
+        return tmp;
+    }
 }
 
 s32 CInifile::r_s32(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return s32(atoi(C));
+    {
+        s32 tmp;
+        std::from_chars(C, C + xr_strlen(C), tmp);
+        return tmp;
+    }
 }
 
 float CInifile::r_float(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    return float(atof(C));
+    {
+        float tmp;
+        std::from_chars(C, C + xr_strlen(C), tmp);
+        return tmp;
+    }
 }
 
 Fcolor CInifile::r_fcolor(pcstr S, pcstr L) const

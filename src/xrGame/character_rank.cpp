@@ -16,7 +16,7 @@ RANK_DATA::RANK_DATA(int idx, shared_str idn, LPCSTR threshold_str)
 {
     index = idx;
     id = idn;
-    threshold = (CHARACTER_RANK_VALUE)atoi(threshold_str);
+    std::from_chars(threshold_str, threshold_str + xr_strlen(threshold_str), threshold);
 }
 //////////////////////////////////////////////////////////////////////////
 CHARACTER_RANK::GOODWILL_TABLE CHARACTER_RANK::m_relation_table;

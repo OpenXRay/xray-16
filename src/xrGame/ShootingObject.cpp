@@ -106,10 +106,10 @@ void CShootingObject::LoadFireParams(LPCSTR section)
     //сила выстрела и его мощьность
     s_sHitPower = pSettings->r_string_wb(section, "hit_power"); //читаем строку силы хита пули оружия
     s_sHitPowerCritical = READ_IF_EXISTS(pSettings, r_string_wb, section, "hit_power_critical", s_sHitPower);
-    fvHitPower[egdMaster] =
-        (float)atof(_GetItem(*s_sHitPower, 0, buffer)); //первый параметр - это хит для уровня игры мастер
-    fvHitPowerCritical[egdMaster] =
-        (float)atof(_GetItem(*s_sHitPowerCritical, 0, buffer)); //первый параметр - это хит для уровня игры мастер
+    _GetItem(*s_sHitPower, 0, buffer); //первый параметр - это хит для уровня игры мастер
+    std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdMaster]);
+    _GetItem(*s_sHitPowerCritical, 0, buffer); //первый параметр - это хит для уровня игры мастер
+    std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdMaster]); 
 
     fvHitPower[egdNovice] = fvHitPower[egdStalker] = fvHitPower[egdVeteran] =
         fvHitPower[egdMaster]; //изначально параметры для других уровней сложности такие же
@@ -119,32 +119,35 @@ void CShootingObject::LoadFireParams(LPCSTR section)
     int num_game_diff_param = _GetItemCount(*s_sHitPower); //узнаём колличество параметров для хитов
     if (num_game_diff_param > 1) //если задан второй параметр хита
     {
-        fvHitPower[egdVeteran] = (float)atof(_GetItem(*s_sHitPower, 1, buffer)); //то вычитываем его для уровня ветерана
+        _GetItem(*s_sHitPower, 1, buffer);  //то вычитываем его для уровня ветерана
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdVeteran]);
     }
     if (num_game_diff_param > 2) //если задан третий параметр хита
     {
-        fvHitPower[egdStalker] = (float)atof(_GetItem(*s_sHitPower, 2, buffer)); //то вычитываем его для уровня сталкера
+        _GetItem(*s_sHitPower, 2, buffer); //то вычитываем его для уровня сталкера
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdStalker]);
     }
     if (num_game_diff_param > 3) //если задан четвёртый параметр хита
     {
-        fvHitPower[egdNovice] = (float)atof(_GetItem(*s_sHitPower, 3, buffer)); //то вычитываем его для уровня новичка
+        _GetItem(*s_sHitPower, 3, buffer); //то вычитываем его для уровня новичка
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPower[egdNovice]);
     }
 
     num_game_diff_param = _GetItemCount(*s_sHitPowerCritical); //узнаём колличество параметров
     if (num_game_diff_param > 1) //если задан второй параметр хита
     {
-        fvHitPowerCritical[egdVeteran] =
-            (float)atof(_GetItem(*s_sHitPowerCritical, 1, buffer)); //то вычитываем его для уровня ветерана
+        _GetItem(*s_sHitPowerCritical, 1, buffer); //то вычитываем его для уровня ветерана
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdVeteran]);
     }
     if (num_game_diff_param > 2) //если задан третий параметр хита
     {
-        fvHitPowerCritical[egdStalker] =
-            (float)atof(_GetItem(*s_sHitPowerCritical, 2, buffer)); //то вычитываем его для уровня сталкера
+        _GetItem(*s_sHitPowerCritical, 2, buffer); //то вычитываем его для уровня сталкера
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdStalker]);
     }
     if (num_game_diff_param > 3) //если задан четвёртый параметр хита
     {
-        fvHitPowerCritical[egdNovice] =
-            (float)atof(_GetItem(*s_sHitPowerCritical, 3, buffer)); //то вычитываем его для уровня новичка
+        _GetItem(*s_sHitPowerCritical, 3, buffer); //то вычитываем его для уровня новичка
+        std::from_chars(buffer, buffer + xr_strlen(buffer), fvHitPowerCritical[egdNovice]);
     }
 
     fHitImpulse = pSettings->r_float(section, "hit_impulse");

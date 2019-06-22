@@ -994,7 +994,7 @@ s32 game_sv_mp::ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vot
     char* start_time_str = strrchr(new_vote_str, ' ');
     if (!start_time_str || !xr_strlen(++start_time_str))
         return 0;
-    ret_time = atoi(start_time_str);
+    std::from_chars(start_time_str, start_time_str + xr_strlen(start_time_str), ret_time);
     *(start_time_str - 1) = 0;
     return ret_time;
 }
@@ -1619,7 +1619,10 @@ void game_sv_mp::LoadRanks()
             string16 temp;
             float f = 1.0f;
             if (r <= NumRanks)
-                f = float(atof(_GetItem(RDEB_str.c_str(), r, temp)));
+            {
+                _GetItem(RDEB_str.c_str(), r, temp);
+                std::from_chars(temp, temp + xr_strlen(temp), f);
+            }
             NewRank.m_aRankDiff_ExpBonus.push_back(f);
         };
 
@@ -1630,7 +1633,8 @@ void game_sv_mp::LoadRanks()
         for (int t = 0; t < TermsCount; t++)
         {
             string16 temp;
-            NewRank.m_iTerms[t] = atoi(_GetItem(sTerms.c_str(), t, temp));
+            _GetItem(sTerms.c_str(), t, temp);
+            std::from_chars(temp, temp + xr_strlen(temp), NewRank.m_iTerms[t]);
         }
         m_aRanks.push_back(NewRank);
     };
@@ -1800,7 +1804,9 @@ void game_sv_mp::ReadOptions(shared_str& options)
     u32 hours = 0, mins = 0;
     sscanf(StartTime, "%d:%d", &hours, &mins);
     u64 StartEnvGameTime = generate_time(1, 1, 1, hours, mins, 0, 0);
-    float EnvTimeFactor = float(atof(TimeFactor)) * GetEnvironmentGameTimeFactor();
+    float EnvTimeFactor;
+    std::from_chars(TimeFactor, TimeFactor + xr_strlen(TimeFactor), EnvTimeFactor);
+    EnvTimeFactor *= GetEnvironmentGameTimeFactor();
 
     SetEnvironmentGameTimeFactor(StartEnvGameTime, EnvTimeFactor);
     SetGameTimeFactor(StartEnvGameTime, g_fTimeFactor);

@@ -179,7 +179,11 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
         {
             pUserData->r_line(s, i, &name, &value);
             boneID = K->LL_BoneID(name);
-            m_hitBones.insert(std::make_pair(boneID, (float)atof(value)));
+            {
+                float tmp;
+                std::from_chars(value, value + xr_strlen(value), tmp);
+                m_hitBones.insert(std::make_pair(boneID, tmp));
+            }
         }
     }
 

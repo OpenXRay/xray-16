@@ -51,6 +51,9 @@
 //#include "Threading/Lock.hpp"
 #include "xrMemory.h"
 
+#include <charconv>
+#include <system_error>
+
 //#include "_stl_extensions.h"
 #include "_std_extensions.h"
 #include "xrCommon/xr_vector.h"

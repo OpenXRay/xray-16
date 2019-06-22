@@ -49,9 +49,16 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
 
         BoneProtection BP;
 
-        BP.koeff = (float)atof(_GetItem(i->second.c_str(), 0, buffer));
-        BP.armor = (float)atof(_GetItem(i->second.c_str(), 1, buffer));
-        BP.BonePassBullet = (bool)(atof(_GetItem(i->second.c_str(), 2, buffer)) > 0.5f);
+        _GetItem(i->second.c_str(), 0, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), BP.koeff);
+        _GetItem(i->second.c_str(), 1, buffer);
+        std::from_chars(buffer, buffer + xr_strlen(buffer), BP.armor);
+        _GetItem(i->second.c_str(), 2, buffer);
+        {
+            float tmp;
+            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+            BP.BonePassBullet = (tmp > 0.5f);
+        }
 
         if (!xr_strcmp(i->first.c_str(), "default"))
         {
@@ -87,16 +94,30 @@ void SBoneProtections::add(const shared_str& bone_sect, IKinematics* kinematics)
         if (!xr_strcmp(i->first.c_str(), "default"))
         {
             BoneProtection& BP = m_default;
-            BP.koeff += (float)atof(_GetItem(i->second.c_str(), 0, buffer));
-            BP.armor += (float)atof(_GetItem(i->second.c_str(), 1, buffer));
+            {
+                float tmp;
+                _GetItem(i->second.c_str(), 0, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                BP.koeff += tmp;
+                _GetItem(i->second.c_str(), 1, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                BP.armor += tmp;
+            }
         }
         else
         {
             s16 bone_id = kinematics->LL_BoneID(i->first);
             R_ASSERT2(BI_NONE != bone_id, i->first.c_str());
             BoneProtection& BP = m_bones_koeff[bone_id];
-            BP.koeff += (float)atof(_GetItem(i->second.c_str(), 0, buffer));
-            BP.armor += (float)atof(_GetItem(i->second.c_str(), 1, buffer));
+            {
+                float tmp;
+                _GetItem(i->second.c_str(), 0, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                BP.koeff += tmp;
+                _GetItem(i->second.c_str(), 1, buffer);
+                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                BP.armor += tmp;
+            }
         }
     }
 }

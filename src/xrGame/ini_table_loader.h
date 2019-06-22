@@ -47,13 +47,19 @@ private:
     {
         if constexpr(std::is_same<T_ITEM, int>::value)
         {
-            return atoi(str);
+            int tmp;
+            std::from_chars(str, str + xr_strlen(str), tmp);
+            return tmp;
         }
         else
         {
             static_assert(std::is_same_v<T_ITEM, float>,
                 "Specialization for convert in CIni_Table not found.");
-            return (float)atof(str);
+            {
+                float tmp;
+                std::from_chars(str, str + xr_strlen(str), tmp);
+                return tmp;
+            }
         }
     }
 };

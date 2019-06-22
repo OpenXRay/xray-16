@@ -541,8 +541,8 @@ public:
     CCC_DofFar(LPCSTR N, float* V, float _min = 0.0f, float _max = 10000.0f) : CCC_Float(N, V, _min, _max) {}
     virtual void Execute(LPCSTR args)
     {
-        float v = float(atof(args));
-
+        float v;
+        std::from_chars(args, args + xr_strlen(args), v);
         if (v < ps_r2_dof.y + 0.1f)
         {
             char pBuf[256];
@@ -569,7 +569,8 @@ public:
     CCC_DofNear(LPCSTR N, float* V, float _min = 0.0f, float _max = 10000.0f) : CCC_Float(N, V, _min, _max) {}
     virtual void Execute(LPCSTR args)
     {
-        float v = float(atof(args));
+        float v;
+        std::from_chars(args, args + xr_strlen(args), v);
 
         if (v > ps_r2_dof.y - 0.1f)
         {
@@ -597,7 +598,8 @@ public:
     CCC_DofFocus(LPCSTR N, float* V, float _min = 0.0f, float _max = 10000.0f) : CCC_Float(N, V, _min, _max) {}
     virtual void Execute(LPCSTR args)
     {
-        float v = float(atof(args));
+        float v;
+        std::from_chars(args, args + xr_strlen(args), v);
 
         if (v > ps_r2_dof.z - 0.1f)
         {

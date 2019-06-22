@@ -312,7 +312,11 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
         pServerInfo->ArtefactCount = GetInt(pServer, G_ARTEFACTS_COUNT_KEY);
         pServerInfo->ArtefactStayTime = GetFloat(pServer, G_ARTEFACT_STAY_TIME_KEY);
         pServerInfo->ArtefactRespawnTime = GetFloat(pServer, G_ARTEFACT_RESPAWN_TIME_KEY);
-        int reinf = atoi(GetString(pServer, G_REINFORCEMENT_KEY, "0"));
+        int reinf;
+        {
+            const char* tmp = GetString(pServer, G_REINFORCEMENT_KEY, "0");
+            std::from_chars(tmp, tmp + xr_strlen(tmp), reinf);
+        }
         switch (reinf)
         {
         case -1: pServerInfo->Reinforcement = -1; break;

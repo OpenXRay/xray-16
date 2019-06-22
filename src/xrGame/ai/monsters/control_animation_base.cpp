@@ -700,27 +700,27 @@ void parse_anim_params(LPCSTR val, SAAParam& anim)
     string16 cur_elem;
 
     _GetItem(val, 0, cur_elem);
-    anim.time = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.time);
     _GetItem(val, 1, cur_elem);
-    anim.hit_power = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.hit_power);
     _GetItem(val, 2, cur_elem);
-    anim.impulse = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.impulse);
     _GetItem(val, 3, cur_elem);
-    anim.impulse_dir.x = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.impulse_dir.x);
     _GetItem(val, 4, cur_elem);
-    anim.impulse_dir.y = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.impulse_dir.y);
     _GetItem(val, 5, cur_elem);
-    anim.impulse_dir.z = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.impulse_dir.z);
     _GetItem(val, 6, cur_elem);
-    anim.foh.from_yaw = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.foh.from_yaw);
     _GetItem(val, 7, cur_elem);
-    anim.foh.to_yaw = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.foh.to_yaw);
     _GetItem(val, 8, cur_elem);
-    anim.foh.from_pitch = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.foh.from_pitch);
     _GetItem(val, 9, cur_elem);
-    anim.foh.to_pitch = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.foh.to_pitch);
     _GetItem(val, 10, cur_elem);
-    anim.dist = float(atof(cur_elem));
+    std::from_chars(cur_elem, cur_elem + xr_strlen(cur_elem), anim.dist);
 
     anim.impulse_dir.normalize();
 

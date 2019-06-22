@@ -190,7 +190,8 @@ public:
     CCC_DumpOpenFiles(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = FALSE; };
     virtual void Execute(LPCSTR args)
     {
-        int _mode = atoi(args);
+        int _mode;
+        std::from_chars(args, args + xr_strlen(args), _mode);
         _dump_open_files(_mode);
     }
 };
@@ -487,7 +488,8 @@ public:
             return;
         }
 
-        u32 value = static_cast<u32>(std::atoi(args));
+        u32 value;
+        std::from_chars(args, args + xr_strlen(args), value);
 
         const auto it = std::find(rates->begin(), rates->end(), value);
 

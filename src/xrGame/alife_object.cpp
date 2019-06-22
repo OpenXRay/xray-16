@@ -45,8 +45,8 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
             if (strstr(V, "level=") != nullptr)
                 if (strstr(V, lname) != nullptr)
                     OnlyOne.push_back(k);
-            else
-                OnlyOne.push_back(k);
+                else
+                    OnlyOne.push_back(k);
         }
 
         if (!OnlyOne.empty())
@@ -70,19 +70,27 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         if (n > 0)
                         {
                             string64 tmp;
-                            spawn_count = atoi(_GetItem(V, 0, tmp)); //count
+                            _GetItem(V, 0, tmp);
+                            std::from_chars(tmp, tmp + xr_strlen(tmp), spawn_count); // count
                         }
 
-                        if (!spawn_count) spawn_count = 1;
-                        if (nullptr != strstr(V, "cond="))
-                            f_cond = static_cast<float>(atof(strstr(V, "cond=") + 5));
+                        if (!spawn_count)
+                            spawn_count = 1;
+                        {
+                            const char* cond_c = strstr(V, "cond=");
+                            if (nullptr != cond_c)
+                                std::from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
+                        }
                         bScope = nullptr != strstr(V, "scope");
                         bSilencer = nullptr != strstr(V, "silencer");
                         bLauncher = nullptr != strstr(V, "launcher");
-                        if (nullptr != strstr(V, "ammo_type="))
-                            i_ammo_type = atoi(strstr(V, "ammo_type=") + 10);
+                        {
+                            const char* ammo_type_c = strstr(V, "cond=");
+                            if (nullptr != ammo_type_c)
+                                std::from_chars(
+                                    ammo_type_c + 10, ammo_type_c + 10 + xr_strlen(ammo_type_c + 10), i_ammo_type);
+                        }
                     }
-
 
                     CSE_Abstract* E = alife().spawn_item(itmSection, o_Position, m_tNodeID, m_tGraphID, ID);
                     CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(E);
@@ -141,8 +149,11 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 
                 if (V && xr_strlen(V))
                 {
-                    string64 buf;
-                    j = atoi(_GetItem(V, 0, buf));
+                    {
+                        string64 buf;
+                        _GetItem(V, 0, buf);
+                        std::from_chars(buf, buf + xr_strlen(buf), j);
+                    }
                     if (!j)
                         j = 1;
 
@@ -150,12 +161,18 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                     bSilencer = nullptr != strstr(V, "silencer");
                     bLauncher = nullptr != strstr(V, "launcher");
                     // probability
-                    if (nullptr != strstr(V, "prob="))
-                        p = static_cast<float>(atof(strstr(V, "prob=") + 5));
+                    {
+                        const char* prob_c = strstr(V, "prob=");
+                        if (prob_c != nullptr)
+                            std::from_chars(prob_c + 5, prob_c + 5 + xr_strlen(prob_c + 5), p);
+                    }
                     if (fis_zero(p))
                         p = 1.0f;
-                    if (nullptr != strstr(V, "cond="))
-                        f_cond = static_cast<float>(atof(strstr(V, "cond=") + 5));
+                    {
+                        const char* cond_c = strstr(V, "cond=");
+                        if (nullptr != cond_c)
+                            std::from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
+                    }
                 }
                 for (u32 i = 0; i < j; ++i)
                 {

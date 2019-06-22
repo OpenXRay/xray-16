@@ -47,7 +47,9 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int 
         {
             _GetItem(str, 1, buf_str);
             if (xr_strlen(buf_str) > 0)
-                *volume = (float)atof(buf_str);
+            {
+                std::from_chars(buf_str, buf_str + xr_strlen(buf_str), *volume);
+            }       
         }
     }
 
@@ -58,7 +60,9 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int 
         {
             _GetItem(str, 2, buf_str);
             if (xr_strlen(buf_str) > 0)
-                *delay = (float)atof(buf_str);
+            {
+                std::from_chars(buf_str, buf_str + xr_strlen(buf_str), *delay);
+            } 
         }
     }
 }

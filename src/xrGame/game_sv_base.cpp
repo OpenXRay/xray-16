@@ -185,8 +185,14 @@ s32 game_sv_GameState::get_option_i(LPCSTR lst, LPCSTR name, s32 def)
 {
     string64 op;
     strconcat(sizeof(op), op, "/", name, "=");
-    if (strstr(lst, op))
-        return atoi(strstr(lst, op) + xr_strlen(op));
+    const char* str_c = strstr(lst, op);
+    if (str_c)
+    {
+        const char* tmp = str_c + xr_strlen(op);
+        s32 retval;
+        std::from_chars(tmp, tmp + xr_strlen(tmp), retval);
+        return retval;
+    }
     else
         return def;
 }
@@ -1213,7 +1219,8 @@ void game_sv_GameState::GenerateNewName(char const* old_name, char* dest, u32 co
     if (*currc != suffix_symbol)
         currc = old_name + old_name_size - 1;
 
-    int curret_number = atoi(currc + 1);
+    int curret_number;
+    std::from_chars(currc + 1, currc + 1 + xr_strlen(currc + 1), curret_number);
     ++curret_number;
 
     u32 name_length = static_cast<u32>(currc - old_name);
