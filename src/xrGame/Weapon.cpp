@@ -356,12 +356,17 @@ void CWeapon::Load(LPCSTR section)
     fireDispersionConditionFactor = pSettings->r_float(section, "fire_dispersion_condition_factor");
 
     // modified by Peacemaker [17.10.08]
-    //	misfireProbability			  = pSettings->r_float(section,"misfire_probability");
-    //	misfireConditionK			  = READ_IF_EXISTS(pSettings, r_float, section, "misfire_condition_k",	1.0f);
-    misfireStartCondition = pSettings->r_float(section, "misfire_start_condition");
+    const float misfireProbability = pSettings->read_if_exists<float>(section, "misfire_probability", 0.001f);
+    const float misfireConditionK = pSettings->read_if_exists<float>(section, "misfire_condition_k", 1.0f);
+
+    misfireStartCondition = pSettings->read_if_exists<float>(section, "misfire_start_condition", 0.95f);
     misfireEndCondition = pSettings->read_if_exists<float>(section, "misfire_end_condition", 0.f);
-    misfireStartProbability = pSettings->read_if_exists<float>(section, "misfire_start_prob", 0.f);
-    misfireEndProbability = pSettings->r_float(section, "misfire_end_prob");
+
+    misfireStartProbability = pSettings->read_if_exists<float>(section, "misfire_start_prob",
+        misfireProbability + powf(1.f - misfireStartCondition, 3.f) * misfireConditionK);
+    misfireEndProbability = pSettings->read_if_exists<float>(section, "misfire_end_prob",
+        misfireProbability + powf(1.f - misfireEndCondition, 3.f) * misfireConditionK);
+
     conditionDecreasePerShot = pSettings->r_float(section, "condition_shot_dec");
     conditionDecreasePerQueueShot = pSettings->read_if_exists<float>(section, "condition_queue_shot_dec", conditionDecreasePerShot);
 
