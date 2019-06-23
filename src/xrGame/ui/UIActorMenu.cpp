@@ -191,8 +191,12 @@ void CUIActorMenu::Update()
     case mmUndefined: break;
     case mmInventory:
     {
-        //			m_clock_value->TextItemControl()->SetText( InventoryUtilities::GetGameTimeAsString(
-        // InventoryUtilities::etpTimeToMinutes ).c_str() );
+        if (m_clock_value)
+        {
+            m_clock_value->SetText(InventoryUtilities::GetGameTimeAsString(
+                InventoryUtilities::etpTimeToMinutes).c_str());
+        }
+
         CurrentGameUI()->UIMainIngameWnd->UpdateZoneMap();
         break;
     }
