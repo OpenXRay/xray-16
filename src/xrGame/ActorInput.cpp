@@ -34,6 +34,8 @@
 
 extern u32 hud_adj_mode;
 
+bool g_bAutoClearCrouch = true;
+
 void CActor::IR_OnKeyboardPress(int cmd)
 {
     if (hud_adj_mode && pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
@@ -104,12 +106,17 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kSPRINT_TOGGLE: { mstate_wishful ^= mcSprint;
     }
     break;
+    case kCROUCH_TOGGLE:
+        if (!psActorFlags.test(AF_CROUCH_TOGGLE))
+            g_bAutoClearCrouch = !g_bAutoClearCrouch;
+        [[fallthrough]];
     case kCROUCH:
     {
-        if (psActorFlags.test(AF_CROUCH_TOGGLE))
+        if (psActorFlags.test(AF_CROUCH_TOGGLE) || !g_bAutoClearCrouch)
             mstate_wishful ^= mcCrouch;
     }
     break;
+
     case kCAM_1: cam_Set(eacFirstEye); break;
     case kCAM_2: cam_Set(eacLookAt); break;
     case kCAM_3: cam_Set(eacFreeLook); break;
@@ -258,6 +265,9 @@ void CActor::IR_OnKeyboardRelease(int cmd)
         case kDROP:
             if (GAME_PHASE_INPROGRESS == Game().Phase())
                 g_PerformDrop();
+            break;
+        case kCROUCH:
+            g_bAutoClearCrouch = true;
             break;
         }
     }
