@@ -30,7 +30,7 @@ void CUIMotionIcon::ResetVisibility()
     m_bchanged = true;
 }
 
-void CUIMotionIcon::Init(Frect const& zonemap_rect)
+bool CUIMotionIcon::Init(Frect const& zonemap_rect)
 {
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MOTION_ICON_XML);
@@ -41,20 +41,22 @@ void CUIMotionIcon::Init(Frect const& zonemap_rect)
         independent = CUIXmlInit::InitStatic(uiXml, "background", 0, this, false);
     }
 
-    const float rel_sz = uiXml.ReadAttribFlt("window", 0, "rel_size", 1.0f);
     Fvector2 sz;
     Fvector2 pos;
-    zonemap_rect.getsize(sz);
 
-    pos.set(sz.x / 2.0f, sz.y / 2.0f);
     if (!independent)
     {
+        const float rel_sz = uiXml.ReadAttribFlt("window", 0, "rel_size", 1.0f);
+        
+        zonemap_rect.getsize(sz);
+        pos.set(sz.x / 2.0f, sz.y / 2.0f);
+        
         SetWndSize(sz);
         SetWndPos(pos);
-    }
 
-    const float k = UICore::get_current_kx();
-    sz.mul(rel_sz * k);
+        const float k = UICore::get_current_kx();
+        sz.mul(rel_sz * k);
+    }
 
     // Initialization order matters, we should try progress bars first!!!
     m_luminosity_progress_bar = UIHelper::CreateProgressBar(uiXml, "luminosity_progress", this, false);
@@ -125,6 +127,8 @@ void CUIMotionIcon::Init(Frect const& zonemap_rect)
     }
 
     ShowState(stNormal);
+
+    return independent;
 }
 
 void CUIMotionIcon::ShowState(EState state)

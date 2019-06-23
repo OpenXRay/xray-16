@@ -223,8 +223,11 @@ void CUIMainIngameWnd::Init()
 
     UIMotionIcon = new CUIMotionIcon();
     UIMotionIcon->SetAutoDelete(true);
-    UIZoneMap->MapFrame().AttachChild(UIMotionIcon);
-    UIMotionIcon->Init(UIZoneMap->MapFrame().GetWndRect());
+    const bool independent = UIMotionIcon->Init(UIZoneMap->MapFrame().GetWndRect());
+    if (!independent)
+        UIZoneMap->MapFrame().AttachChild(UIMotionIcon);
+    else
+        AttachChild(UIMotionIcon);
 
     UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this);
 

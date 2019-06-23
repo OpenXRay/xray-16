@@ -44,7 +44,7 @@ public:
     CUIMotionIcon();
     virtual void Update();
     virtual void Draw();
-    void Init(Frect const& rect);
+    bool Init(Frect const& rect);
     void ShowState(EState state);
     void SetPower(float Pos);
     void SetNoise(float Pos);
