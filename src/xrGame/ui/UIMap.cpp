@@ -559,6 +559,12 @@ void CUIMiniMap::UpdateSpots()
 
 void CUIMiniMap::Draw()
 {
+    if (ClearSkyMode || ShadowOfChernobylMode)
+    {
+        inherited::Draw();
+        return;
+    }
+
     u32 segments_count = 20;
 
     GEnv.UIRender->SetShader(*m_UIStaticItem.GetShader());
