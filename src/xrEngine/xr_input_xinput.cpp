@@ -552,7 +552,7 @@ void GetActionAllBinding(LPCSTR _action, char* dst_buff, int dst_buff_sz)
             dst_buff, dst_buff_sz, "%s%s%s", prim[0] ? prim : "", (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "");
 }
 
-std::tuple<int, int> GetKeysBindedTo(EGameActions action_id)
+std::pair<int, int> GetKeysBindedTo(EGameActions action_id)
 {
     const _binding& binding = g_key_bindings[action_id];
     return

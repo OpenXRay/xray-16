@@ -179,4 +179,4 @@ ENGINE_API _keyboard* keyname_to_ptr(pcstr _name);
 
 ENGINE_API void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz);
 
-ENGINE_API std::tuple<int, int> GetKeysBindedTo(EGameActions action_id);
+ENGINE_API std::pair<int, int> GetKeysBindedTo(EGameActions action_id);
