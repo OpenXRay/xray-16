@@ -50,6 +50,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
     if (load_screen_renderer.IsActive())
         return;
 
+    bool quickSlot = false;
     switch (cmd)
     {
     case kWPN_FIRE:
@@ -165,10 +166,27 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
 
+    case kQUICK_USE_1:
+    case kQUICK_USE_2:
+    case kQUICK_USE_3:
+    case kQUICK_USE_4:
+        quickSlot = true;
+        [[fallthrough]];
     case kUSE_BANDAGE:
     case kUSE_MEDKIT:
     {
-        PIItem itm = inventory().item((cmd == kUSE_BANDAGE) ? CLSID_IITEM_BANDAGE : CLSID_IITEM_MEDKIT);
+        PIItem itm = nullptr;
+        if (quickSlot)
+        {
+            if (!CurrentGameUI()->GetActorMenu().m_pQuickSlot)
+                break;
+            const shared_str& item_name = g_quick_use_slots[cmd - kQUICK_USE_1];
+            if (item_name.size())
+                itm = inventory().GetAny(item_name.c_str());
+        }
+        else
+            itm = inventory().item((cmd == kUSE_BANDAGE) ? CLSID_IITEM_BANDAGE : CLSID_IITEM_MEDKIT);
+
         if (itm)
         {
             if (IsGameTypeSingle())
@@ -179,45 +197,14 @@ void CActor::IR_OnKeyboardPress(int cmd)
             StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true);
             if (_s->m_endTime == -1 && (ClearSkyMode || ShadowOfChernobylMode))
             {
-                _s->m_endTime = Device.fTimeGlobal + 3.0f;
+                constexpr float threeSec = 3.0f;
+                _s->m_endTime = Device.fTimeGlobal + threeSec;
             }
             string1024 str;
             strconcat(sizeof(str), str, *StringTable().translate("st_item_used"), ": ", itm->NameItem());
             _s->wnd()->SetText(str);
-        }
-    }
-    break;
-
-    case kQUICK_USE_1:
-    case kQUICK_USE_2:
-    case kQUICK_USE_3:
-    case kQUICK_USE_4:
-    {
-        if (!CurrentGameUI()->GetActorMenu().m_pQuickSlot)
-            break;
-        const shared_str& item_name = g_quick_use_slots[cmd - kQUICK_USE_1];
-        if (item_name.size())
-        {
-            PIItem itm = inventory().GetAny(item_name.c_str());
-
-            if (itm)
-            {
-                if (IsGameTypeSingle())
-                {
-                    inventory().Eat(itm);
-                }
-                else
-                {
-                    inventory().ClientEat(itm);
-                }
-
-                StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true);
-                string1024 str;
-                strconcat(sizeof(str), str, *StringTable().translate("st_item_used"), ": ", itm->NameItem());
-                _s->wnd()->TextItemControl()->SetText(str);
-
+            if (quickSlot)
                 CurrentGameUI()->GetActorMenu().m_pQuickSlot->ReloadReferences(this);
-            }
         }
     }
     break;
