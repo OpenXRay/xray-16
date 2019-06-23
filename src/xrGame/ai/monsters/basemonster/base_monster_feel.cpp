@@ -124,7 +124,8 @@ void CBaseMonster::HitEntity(
         {
             START_PROFILE("BaseMonster/Animation/HitEntity");
 
-            StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("monster_claws", false);
+            const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+            StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("monster_claws", false, compat ? 3.0f : -1.0f);
 
             float h1, p1;
             Device.vCameraDirection.getHP(h1, p1);

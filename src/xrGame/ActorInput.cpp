@@ -194,12 +194,9 @@ void CActor::IR_OnKeyboardPress(int cmd)
             else
                 inventory().ClientEat(itm);
 
-            StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true);
-            if (_s->m_endTime == -1 && (ClearSkyMode || ShadowOfChernobylMode))
-            {
-                constexpr float threeSec = 3.0f;
-                _s->m_endTime = Device.fTimeGlobal + threeSec;
-            }
+            const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+            StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true, compat ? 3.0f : -1.0f);
+
             string1024 str;
             strconcat(sizeof(str), str, *StringTable().translate("st_item_used"), ": ", itm->NameItem());
             _s->wnd()->SetText(str);

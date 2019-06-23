@@ -115,7 +115,7 @@ public:
     bool CrosshairShown() { return !!psHUD_Flags.test(HUD_CROSSHAIR_RT); }
     virtual void HideShownDialogs() {}
     virtual void ReinitDialogs() {}
-    StaticDrawableWrapper* AddCustomStatic(const char* id, bool singleInstance);
+    StaticDrawableWrapper* AddCustomStatic(const char* id, bool singleInstance, float ttlDefault = -1.0f);
     StaticDrawableWrapper* GetCustomStatic(const char* id);
     void RemoveCustomStatic(const char* id);
     void CommonMessageOut(const char* text);

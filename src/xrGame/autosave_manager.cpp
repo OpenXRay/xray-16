@@ -76,7 +76,8 @@ void CAutosaveManager::shedule_Update(u32 dt)
 #ifdef WINDOWS
     SetFileAttributes(S1, FILE_ATTRIBUTE_HIDDEN);
 #endif
-    CurrentGameUI()->AddCustomStatic("autosave", true);
+    const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+    StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("autosave", true, compat ? 3.0f : -1.0f);
 }
 
 void CAutosaveManager::on_game_loaded() { m_last_autosave_time = Device.dwTimeGlobal; }
