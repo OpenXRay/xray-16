@@ -165,6 +165,29 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
 
+    case kUSE_BANDAGE:
+    case kUSE_MEDKIT:
+    {
+        PIItem itm = inventory().item((cmd == kUSE_BANDAGE) ? CLSID_IITEM_BANDAGE : CLSID_IITEM_MEDKIT);
+        if (itm)
+        {
+            if (IsGameTypeSingle())
+                inventory().Eat(itm);
+            else
+                inventory().ClientEat(itm);
+
+            StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true);
+            if (_s->m_endTime == -1 && (ClearSkyMode || ShadowOfChernobylMode))
+            {
+                _s->m_endTime = Device.fTimeGlobal + 3.0f;
+            }
+            string1024 str;
+            strconcat(sizeof(str), str, *StringTable().translate("st_item_used"), ": ", itm->NameItem());
+            _s->wnd()->SetText(str);
+        }
+    }
+    break;
+
     case kQUICK_USE_1:
     case kQUICK_USE_2:
     case kQUICK_USE_3:
