@@ -339,7 +339,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 
 template <typename T>
 T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
-    cpcstr fallbackShader /*= nullptr*/, const bool searchForEntryAndTarget /*= false*/)
+    pcstr fallbackShader /*= nullptr*/, const bool searchForEntryAndTarget /*= false*/)
 {
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
@@ -380,22 +380,24 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         // Try to open
         IReader* file = FS.r_open(cname);
 
-        bool fallback = strstr(Core.Params, "-lack_of_shaders");
-        if (!file && fallback || fallbackShader)
+        // Here we can fallback to fallbackShader and then to "stub_default"
+        bool fallback = m_shader_fallback_allowed;
+        if (!file && (fallback || fallbackShader))
         {
         fallback:
-            fallback = false;
+            if (!fallbackShader)
+                fallback = false;
 
-            string1024 tmp;
-            xr_sprintf(tmp, "CreateShader: %s is missing. Replacing it with %s%s",
-                cname, fallbackShader ? fallbackShader : "stub_default", ShaderTypeTraits<T>::GetShaderExt());
-            Msg(tmp);
-            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(),
-                fallbackShader ? fallbackShader : "stub_default", ShaderTypeTraits<T>::GetShaderExt());
+            string_path tmp;
+            strconcat(sizeof(tmp), tmp, fallbackShader ? fallbackShader : "stub_default", ShaderTypeTraits<T>::GetShaderExt());
+
+            Msg("CreateShader: %s is missing. Replacing it with %s", cname, tmp);
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), tmp);
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
+            fallbackShader = nullptr;
         }
-        R_ASSERT3(file, "Shader file doesnt exist:", cname);
+        R_ASSERT3(file, "Shader file doesnt exist", cname);
 
         // Duplicate and zero-terminate
         const auto size = file->length();
