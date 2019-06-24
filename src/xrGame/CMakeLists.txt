@@ -116,5 +116,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "
 cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrEngine xrMiscMath luabind xrAPI xrAICore xrUICore xrSound xrScriptEngine cximage xrGameSpy ${LUA_LIBRARIES} xrCDB xrPhysics xrNetServer ${SDL_LIBRARIES})
-xr_install(${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} xrCore xrEngine xrMiscMath xrLuabind xrAPI xrAICore xrUICore xrSound xrScriptEngine cximage xrGameSpy ${LUA_LIBRARIES} xrCDB xrPhysics xrNetServer ${SDL_LIBRARIES})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    GROUP_READ 
+    WORLD_READ )

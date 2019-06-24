@@ -8,5 +8,8 @@ add_definitions(-DXRAPI_EXPORTS)
 
 add_library(${PROJECT_NAME} SHARED "xrAPI.cpp" "stdafx.h")
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-xr_install(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    GROUP_READ 
+    WORLD_READ )
 

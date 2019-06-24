@@ -1,0 +1,17 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Categories = Game
+Icon=openxray
+Icon[ru]=
+Exec=xr_3da
+Name = S.T.A.L.K.E.R: Call of Pripyat
+Comment=S.T.A.L.K.E.R: Call of Pripyat (Powered by OpenXRay)
+Comment[ru_RU]=S.T.A.L.K.E.R.: Зов Припяти (Powered by OpenXRay)
+Comment[uk]=S.T.A.L.K.E.R.: Поклик Прип'яті (Powered by OpenXRay)
+GenericName=Unofficial X-Ray Engine Linux port by OpenXRay team (Originally developed by GSC Game World)
+GenericName[ru_RU]=Неофициальный порт игрового движка X-Ray Engine от команды OpenXRay (Оригинальный движок разработан компанией GSC Game World)
+GenericName[uk]=Неофіційний порт ігрового движка X-Ray Engine від команди OpenXRay (Оригінальний движок розроблений компанією GSC Game World)
+

@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+ifeq ($(findstring parallel=,$(DEB_BUILD_OPTIONS)),)
+	export DEB_BUILD_OPTIONS+=parallel=$(shell getconf _NPROCESSORS_ONLN)
+endif
+
+%:
+	dh $@ --buildsystem=cmake --parallel
+
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+UBUNTU_CODENAME  := $(shell lsb_release -sc)
+UBUNTU_RELEASE  := $(shell lsb_release -sr)
+
+extra_flags += \
+-DCMAKE_C_COMPILER=gcc-8 \
+-DCMAKE_CXX_COMPILER=g++-8 \
+-DCMAKE_BUILD_TYPE="Release" \
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(extra_flags)
