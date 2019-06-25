@@ -227,7 +227,10 @@ void CConsole::OnRender()
     }
     if (!pFont2)
     {
-        pFont2 = new CGameFont("hud_font_di2", CGameFont::fsDeviceIndependent);
+        pcstr fontSection = "hud_font_di2";
+        if (!pSettings->section_exist(fontSection))
+            fontSection = "hud_font_di";
+        pFont2 = new CGameFont(fontSection, CGameFont::fsDeviceIndependent);
         pFont2->SetHeightI(0.025f);
     }
 
