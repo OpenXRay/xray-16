@@ -15,6 +15,5 @@
 #include "xrCore/xrCore.h"
 #include "xrCore/_fbox.h"
 #include "xrCore/_quaternion.h"
-#include "xrEngine/defines.h"
 #include "xrScriptEngine/DebugMacros.hpp" // XXX: move debug macros to xrCore
 #include "xrServerEntities/smart_cast.h"

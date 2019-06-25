@@ -356,11 +356,17 @@ void CObjectFactory::register_classes()
 #ifndef BENCHMARK_BUILD
     // We can't register both, since CLSID_LEVEL_CHANGER_S is created in COP scripts as "level_changer_s"
     // But in SOC scripts CLSID_LEVEL_CHANGER_S may be used as "level_changer"
+#ifndef NO_XR_GAME
     if (ShadowOfChernobylMode)
+    {
         ADD(CLevelChanger, CSE_ALifeLevelChanger, CLSID_LEVEL_CHANGER_S, "level_changer");
+    }
     else
+#endif // NO_XR_GAME
+    {
         ADD(CLevelChanger, CSE_ALifeLevelChanger, CLSID_LEVEL_CHANGER, "level_changer");
-#endif //	BENCHMARK_BUILD
+    }
+#endif // BENCHMARK_BUILD
     ADD(CScriptZone, CSE_ALifeSpaceRestrictor, CLSID_SCRIPT_ZONE, "script_zone");
     ADD(CSmartZone, CSE_ALifeSmartZone, CLSID_SMART_ZONE, "smart_zone");
     ADD(CTeamBaseZone, CSE_ALifeTeamBaseZone, CLSID_Z_TEAM_BASE, "team_base_zone");
