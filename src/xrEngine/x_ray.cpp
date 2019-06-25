@@ -515,6 +515,8 @@ CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
+        if (!A.header)
+            continue;
 
         LPCSTR ln = A.header->r_string("header", "level_name");
         LPCSTR lv = A.header->r_string("header", "level_ver");
