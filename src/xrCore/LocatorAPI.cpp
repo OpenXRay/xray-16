@@ -805,7 +805,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
         free(tmp_path);
     }
     else
-        SDL_strlcpy(full_current_directory, SDL_GetBasePath(), sizeof full_current_directory);
+        SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC", "SCOP"), sizeof full_current_directory);
 #endif
 
     FS_Path* path = new FS_Path(full_current_directory, "", "", "", 0);

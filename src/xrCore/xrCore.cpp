@@ -221,9 +221,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #else
-        char *base_path = SDL_GetBasePath();
-        SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
-        SDL_free(base_path);
+        char *pref_path = SDL_GetPrefPath("GSC", "SCOP");
+        SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
+        SDL_free(pref_path);
 #endif
 
 #ifdef _EDITOR
@@ -240,6 +240,14 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #else
         getcwd(WorkingPath, sizeof(WorkingPath));
+        chdir(ApplicationPath);
+        string_path tmp;
+        xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
+        unlink(tmp);
+        symlink("/usr/share/openxray/fsgame.ltx", tmp);
+        xr_sprintf(tmp, "%sgamedata", ApplicationPath);
+        unlink(tmp);
+        symlink("/usr/share/openxray/gamedata", tmp);
 #endif
 
 #if defined(WINDOWS)
