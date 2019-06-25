@@ -354,7 +354,12 @@ void CObjectFactory::register_classes()
     ADD(CHairsZone, CSE_ALifeZoneVisual, CLSID_Z_RUSTYH, "zone_rusty_hair");
     ADD(CMosquitoBald, CSE_ALifeAnomalousZone, CLSID_Z_DEAD, "zone_dead");
 #ifndef BENCHMARK_BUILD
-    ADD(CLevelChanger, CSE_ALifeLevelChanger, CLSID_LEVEL_CHANGER, "level_changer");
+    // We can't register both, since CLSID_LEVEL_CHANGER_S is created in COP scripts as "level_changer_s"
+    // But in SOC scripts CLSID_LEVEL_CHANGER_S may be used as "level_changer"
+    if (ShadowOfChernobylMode)
+        ADD(CLevelChanger, CSE_ALifeLevelChanger, CLSID_LEVEL_CHANGER_S, "level_changer");
+    else
+        ADD(CLevelChanger, CSE_ALifeLevelChanger, CLSID_LEVEL_CHANGER, "level_changer");
 #endif //	BENCHMARK_BUILD
     ADD(CScriptZone, CSE_ALifeSpaceRestrictor, CLSID_SCRIPT_ZONE, "script_zone");
     ADD(CSmartZone, CSE_ALifeSmartZone, CLSID_SMART_ZONE, "smart_zone");

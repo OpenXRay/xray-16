@@ -96,6 +96,7 @@
 #define CLSID_OBJECT_W_RG6 MK_CLSID('W', '_', 'R', 'G', '6', ' ', ' ', ' ')
 
 #define CLSID_OBJECT_W_STATMGUN MK_CLSID('W', '_', 'S', 'T', 'M', 'G', 'U', 'N')
+
 // Weapons Ammo
 #define CLSID_OBJECT_AMMO MK_CLSID('A', 'M', 'M', 'O', ' ', ' ', ' ', ' ')
 //-----------------------------------------------------------------------------
@@ -149,7 +150,11 @@
 #define CLSID_Z_NOGRAVITY MK_CLSID('Z', '_', 'N', 'O', 'G', 'R', 'A', 'V')
 #define CLSID_Z_FRYUP MK_CLSID('Z', '_', 'F', 'R', 'Y', 'U', 'P ', ' ')
 #define CLSID_Z_DEAD MK_CLSID('Z', '_', 'D', 'E', 'A', 'D', ' ', ' ')
+
+// Read more about this clsids in object_factory_register.cpp
 #define CLSID_LEVEL_CHANGER MK_CLSID('L', 'V', 'L', 'C', 'H', 'N', 'G', 'R')
+constexpr CLASS_ID CLSID_LEVEL_CHANGER_S = MK_CLSID('L', 'V', 'L', '_', 'C', 'H', 'N', 'G');
+
 #define CLSID_SCRIPT_ZONE MK_CLSID('S', 'C', 'R', 'I', 'P', 'T', 'Z', 'N')
 #define CLSID_Z_TEAM_BASE MK_CLSID('Z', '_', 'T', 'E', 'A', 'M', 'B', 'S')
 #define CLSID_Z_TORRID MK_CLSID('Z', '_', 'T', 'O', 'R', 'R', 'I', 'D')
@@ -159,6 +164,7 @@
 
 // Detectors
 #define CLSID_DETECTOR_SIMPLE MK_CLSID('D', '_', 'S', 'I', 'M', 'D', 'E', 'T')
+constexpr CLASS_ID CLSID_DETECTOR_VISUAL = MK_CLSID('D','_','V','I','S','D','E','T');
 #define CLSID_DETECTOR_ADVANCED MK_CLSID('D', '_', 'A', 'D', 'V', 'A', 'N', 'C')
 #define CLSID_DETECTOR_ELITE MK_CLSID('D', '_', 'E', 'L', 'I', 'T', 'E', ' ')
 #define CLSID_DETECTOR_SCIENTIFIC MK_CLSID('D', '_', 'S', 'C', 'I', 'E', 'N', 'T')
