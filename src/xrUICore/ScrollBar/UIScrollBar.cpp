@@ -42,6 +42,8 @@ void CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scroll_bar.xml");
 
     float height = xml_doc.ReadAttribFlt(profile, 0, (bIsHorizontal) ? "height" : "height_v");
+    if (height == 0.0f && ShadowOfChernobylMode)
+        height = xml_doc.ReadAttribFlt(profile, 0, "height");
     R_ASSERT(height > 0);
     m_hold_delay = xml_doc.ReadAttribFlt(profile, 0, "hold_delay", 50.0f);
 
