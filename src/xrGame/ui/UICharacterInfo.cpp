@@ -20,6 +20,7 @@
 #include "alife_object_registry.h"
 #include "xrServer.h"
 #include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
+#include "UIHelper.h"
 
 using namespace InventoryUtilities;
 
@@ -49,6 +50,9 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
     inherited::SetWndSize(size);
 
     Init_IconInfoItem(*xml_doc, "icon", eIcon);
+    if (!m_icons[eIcon])
+        Init_IconInfoItem(*xml_doc, "icon_static", eIcon);
+
     Init_IconInfoItem(*xml_doc, "icon_over", eIconOver);
 
     Init_IconInfoItem(*xml_doc, "rank_icon", eRankIcon);
@@ -83,38 +87,26 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
     Init_StrInfoItem(*xml_doc, "relation_caption", eRelationCaption);
     Init_StrInfoItem(*xml_doc, "relation_static", eRelation);
 
-    if (xml_doc->NavigateToNode("biography_list", 0))
-    {
-        pUIBio = new CUIScrollView();
-        pUIBio->SetAutoDelete(true);
-        CUIXmlInit::InitScrollView(*xml_doc, "biography_list", 0, pUIBio);
-        AttachChild(pUIBio);
-    }
+    pUIBio = UIHelper::CreateScrollView(*xml_doc, "biography_list", this, false);
 }
 
 void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
 {
-    if (xml_doc.NavigateToNode(item_str, 0))
+    CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
+    if (item)
     {
-        CUIStatic* pItem = m_icons[type] = new CUIStatic();
-        CUIXmlInit::InitStatic(xml_doc, item_str, 0, pItem);
-        AttachChild(pItem);
-        pItem->SetAutoDelete(true);
+        m_icons[type] = item;
     }
 }
 
 void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
 {
-    if (xml_doc.NavigateToNode(item_str, 0))
+    CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
+    if (item)
     {
-        CUIStatic* pItem = m_icons[type] = new CUIStatic();
-        CUIXmlInit::InitStatic(xml_doc, item_str, 0, pItem);
-
-        //.		pItem->ClipperOn();
-        pItem->Show(true);
-        pItem->Enable(true);
-        AttachChild(pItem);
-        pItem->SetAutoDelete(true);
+        //.		item->ClipperOn();
+        item->Show(true);
+        m_icons[type] = item;
     }
 }
 
