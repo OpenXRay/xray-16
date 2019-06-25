@@ -349,7 +349,8 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
 
     Msg("! Can't find texture '%s'", fname);
     const bool dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
-    R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
+    if (!ShadowOfChernobylMode)
+        R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
         return nullptr;
     goto _DDS;

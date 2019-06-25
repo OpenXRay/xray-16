@@ -6,6 +6,8 @@
 
 #include <gli/gli.hpp>
 
+constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
+
 void fix_texture_name(LPSTR fn)
 {
     LPSTR _ext = strext(fn);
@@ -91,9 +93,11 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 #else
 
     Msg("! Can't find texture '%s'", fname);
-    R_ASSERT(FS.exist(fn, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
-
-    //	xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
+    const bool dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
+    if (!ShadowOfChernobylMode)
+        R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
+    if (!dummyTextureExist)
+        return 0;
 
 #endif
 

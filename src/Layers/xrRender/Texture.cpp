@@ -310,7 +310,8 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
     Msg("! Can't find texture '%s'", fname);
     const bool dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
-    R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
+    if (!ShadowOfChernobylMode)
+        R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
         return nullptr;
     goto _DDS;
@@ -335,7 +336,7 @@ _DDS:
         Msg("! Can't get image info for texture '%s'", fn);
         FS.r_close(S);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"));
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
         goto _DDS;
@@ -356,7 +357,7 @@ _DDS_CUBE:
     {
         Msg("! Can't load texture '%s'", fn);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"));
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
         goto _DDS;
@@ -384,7 +385,7 @@ _DDS_2D:
     {
         Msg("! Can't load texture '%s'", fn);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"));
         xr_strlwr(temp);
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
