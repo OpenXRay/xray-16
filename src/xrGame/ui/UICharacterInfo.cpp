@@ -118,10 +118,13 @@ void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIIte
     }
 }
 
-void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)
+void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, cpcstr xml_name, cpcstr xml_name2 /*= nullptr*/)
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
+    bool result = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name, false);
+    if (!result)
+        result = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name2, false);
+    R_ASSERT3(result, "Cannot load XML file", xml_name);
     InitCharacterInfo(pos, size, &uiXml);
 }
 

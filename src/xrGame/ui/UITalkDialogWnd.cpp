@@ -16,6 +16,8 @@
 #include "UIHelper.h"
 
 constexpr pcstr TALK_XML = "talk.xml";
+constexpr pcstr TALK_CHARACTER_XML = "talk_character.xml";
+constexpr pcstr TRADE_CHARACTER_XML = "trade_character.xml";
 
 CUITalkDialogWnd::CUITalkDialogWnd()
     : m_uiXml(nullptr),
@@ -46,14 +48,16 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     if (UIOurIcon)
     {
         UIOurIcon->AttachChild(&UICharacterInfoLeft);
-        UICharacterInfoLeft.InitCharacterInfo(Fvector2().set(0, 0), UIOurIcon->GetWndSize(), "talk_character.xml");
+        UICharacterInfoLeft.InitCharacterInfo(Fvector2().set(0, 0), UIOurIcon->GetWndSize(),
+            TALK_CHARACTER_XML, TRADE_CHARACTER_XML);
     }
 
     UIOthersIcon = UIHelper::CreateStatic(*m_uiXml, "left_character_icon", this, false);
     if (UIOthersIcon)
     {
         UIOthersIcon->AttachChild(&UICharacterInfoRight);
-        UICharacterInfoRight.InitCharacterInfo(Fvector2().set(0, 0), UIOthersIcon->GetWndSize(), "talk_character.xml");
+        UICharacterInfoRight.InitCharacterInfo(Fvector2().set(0, 0), UIOthersIcon->GetWndSize(),
+            TALK_CHARACTER_XML, TRADE_CHARACTER_XML);
     }
 
     CUIWindow* answersParent = this;
