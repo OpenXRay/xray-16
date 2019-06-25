@@ -5,7 +5,6 @@ Type=Application
 Terminal=false
 Categories = Game
 Icon=openxray
-Icon[ru]=
 Exec=xr_3da
 Name = S.T.A.L.K.E.R: Call of Pripyat
 Comment=S.T.A.L.K.E.R: Call of Pripyat (Powered by OpenXRay)
