@@ -7,6 +7,6 @@ Homepage: https://github.com/OpenXRay/xray-16
 
 Package: openxray
 Architecture: any
-Depends: libc6, libsdl2-2.0-0, libopenal1, libtbb2, libcrypto++6, liblockfile1, libfreeimage3, libfreeimageplus3, liblua5.1-0, libogg0, libtheora0, libvorbis0a, liblzo2-2, libjpeg-turbo8
+Depends: libc6, libsdl2-2.0-0, libopenal1, libtbb2, libcrypto++6, liblockfile1, libfreeimage3, libfreeimageplus3, liblua5.1-0, libogg0, libtheora0, libvorbis0a, liblzo2-2, libjpeg-turbo8, libglew2.0
 Description: X-Ray Engine 1.6 expansion
  X-Ray Engine sources based on version 1.6.02. The original engine is used in S.T.A.L.K.E.R.: Call of Pripyat game released by GSC Game World.
