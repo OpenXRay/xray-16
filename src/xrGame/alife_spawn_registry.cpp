@@ -141,6 +141,12 @@ void CALifeSpawnRegistry::load(IReader& file_stream, xrGUID* save_guid)
 
     VERIFY(!m_chunk);
     m_chunk = file_stream.open_chunk(4);
+    if (!m_chunk)
+    {
+        string_path file_name;
+        FS.update_path(file_name, "$game_data$", GRAPH_NAME);
+        m_chunk = FS.r_open(file_name);
+    }
     R_ASSERT2(m_chunk, "Spawn version mismatch - REBUILD SPAWN!");
 
     VERIFY(!m_game_graph);

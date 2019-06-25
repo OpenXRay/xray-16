@@ -195,6 +195,7 @@
     <ClInclude Include="Navigation\graph_vertex_inline.h" />
     <ClInclude Include="Navigation\level_graph.h" />
     <ClInclude Include="Navigation\level_graph_inline.h" />
+    <ClInclude Include="Navigation\level_graph_manager.h" />
     <ClInclude Include="Navigation\level_graph_space.h" />
     <ClInclude Include="Navigation\level_graph_vertex_inline.h" />
     <ClInclude Include="Navigation\PathManagers\path_manager.h" />

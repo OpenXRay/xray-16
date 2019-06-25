@@ -11,6 +11,7 @@
 #include "Common/LevelStructure.hpp"
 #include "xrAICore/Navigation/level_graph_space.h"
 #include "xrAICore/Navigation/game_graph_space.h"
+#include "xrAICore/Navigation/level_graph_manager.h"
 
 namespace LevelGraph
 {
@@ -43,10 +44,12 @@ public:
     typedef LevelGraph::SContour SContour;
     typedef LevelGraph::ELineIntersections ELineIntersections;
 
+    using CLevelGraphManager = LevelGraph::CLevelGraphManager;
+
 private:
     IReader* m_reader; // level graph virtual storage
     CHeader* m_header; // level graph header
-    CVertex* m_nodes; // nodes array
+    CLevelGraphManager* m_nodes; // contains nodes array
     xr_vector<bool> m_access_mask;
     GameGraph::_LEVEL_ID m_level_id; // unique level identifier
     u32 m_row_length;
@@ -240,7 +243,7 @@ public:
     IC bool valid_vertex_position(const Fvector& position) const;
     bool neighbour_in_direction(const Fvector& direction, u32 start_vertex_id) const;
 
-    IC CVertex* vertices() { return m_nodes; }
+    IC CVertex* vertices() { return m_nodes->begin(); }
 };
 
 IC bool operator<(const CLevelGraph::CVertex& vertex, const u32& vertex_xz);

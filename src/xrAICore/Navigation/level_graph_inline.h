@@ -9,8 +9,8 @@
 #pragma once
 #include "xrCore/_fbox2.h"
 
-IC CLevelGraph::const_vertex_iterator CLevelGraph::begin() const { return (m_nodes); }
-IC CLevelGraph::const_vertex_iterator CLevelGraph::end() const { return (m_nodes + header().vertex_count()); }
+IC CLevelGraph::const_vertex_iterator CLevelGraph::begin() const { return (m_nodes->begin()); }
+IC CLevelGraph::const_vertex_iterator CLevelGraph::end() const { return (m_nodes->end()); }
 IC const CLevelGraph::CHeader& CLevelGraph::header() const { return (*m_header); }
 ICF bool CLevelGraph::valid_vertex_id(u32 id) const
 {
@@ -21,13 +21,13 @@ ICF bool CLevelGraph::valid_vertex_id(u32 id) const
 ICF CLevelGraph::CVertex* CLevelGraph::vertex(const u32 vertex_id) const
 {
     VERIFY(valid_vertex_id(vertex_id));
-    return (m_nodes + vertex_id);
+    return m_nodes->at(vertex_id);
 }
 
 ICF u32 CLevelGraph::vertex(const CVertex* vertex_p) const
 {
-    VERIFY((vertex_p >= m_nodes) && valid_vertex_id(u32(vertex_p - m_nodes)));
-    return (u32(vertex_p - m_nodes));
+    VERIFY((vertex_p >= m_nodes->begin()) && valid_vertex_id(u32(vertex_p - m_nodes->begin())));
+    return (u32(vertex_p - m_nodes->begin()));
 }
 
 ICF u32 CLevelGraph::vertex(const CVertex& vertex_r) const { return (vertex(&vertex_r)); }
@@ -293,8 +293,8 @@ IC void CLevelGraph::set_invalid_vertex(u32& vertex_id, CVertex** vertex) const
 
 IC const u32 CLevelGraph::vertex_id(const CLevelGraph::CVertex* vertex) const
 {
-    VERIFY(valid_vertex_id(u32(vertex - m_nodes)));
-    return (u32(vertex - m_nodes));
+    VERIFY(valid_vertex_id(u32(vertex - m_nodes->begin())));
+    return (u32(vertex - m_nodes->begin()));
 }
 
 IC Fvector CLevelGraph::v3d(const Fvector2& vector2d) const { return (Fvector().set(vector2d.x, 0.f, vector2d.y)); }
@@ -560,19 +560,19 @@ IC void CLevelGraph::iterate_vertices(
 
     if (valid_vertex_position(min_position))
         I = std::lower_bound(
-            m_nodes, m_nodes + header().vertex_count(), vertex_position(min_position).xz(), &vertex::predicate2);
+            m_nodes->begin(), m_nodes->end(), vertex_position(min_position).xz(), &vertex::predicate2);
     else
-        I = m_nodes;
+        I = m_nodes->begin();
 
     if (valid_vertex_position(max_position))
     {
         E = std::upper_bound(
-            m_nodes, m_nodes + header().vertex_count(), vertex_position(max_position).xz(), &vertex::predicate);
-        if (E != (m_nodes + header().vertex_count()))
+            m_nodes->begin(), m_nodes->end(), vertex_position(max_position).xz(), &vertex::predicate);
+        if (E != (m_nodes->end()))
             ++E;
     }
     else
-        E = m_nodes + header().vertex_count();
+        E = m_nodes->end();
 
     for (; I != E; ++I)
         predicate(*I);

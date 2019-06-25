@@ -26,14 +26,13 @@ CLevelGraph::CLevelGraph()
 
 void CLevelGraph::Initialize(const char* filePath)
 {
-
     m_reader = FS.r_open(filePath);
     // m_header & data
     m_header = (CHeader*)m_reader->pointer();
-    R_ASSERT(header().version() == XRAI_CURRENT_VERSION);
+    ASSERT_XRAI_VERSION_MATCH(header().version(), "Level graph version mismatch");
     m_reader->advance(sizeof(CHeader));
     const auto& box = header().box();
-    m_nodes = (CVertex*)m_reader->pointer();
+    m_nodes = new CLevelGraphManager(m_reader, header().vertex_count(), header().version());
     m_row_length = iFloor((box.vMax.z - box.vMin.z) / header().cell_size() + EPS_L + 1.5f);
     m_column_length = iFloor((box.vMax.x - box.vMin.x) / header().cell_size() + EPS_L + 1.5f);
     m_access_mask.assign(header().vertex_count(), true);
@@ -198,8 +197,8 @@ u32 CLevelGraph::vertex_id(const Fvector& position) const
         make_string("invalid position for CLevelGraph::vertex_id specified: [%f][%f][%f]", VPUSH(position)));
 
     CPosition _vertex_position = vertex_position(position);
-    CVertex* B = m_nodes;
-    CVertex* E = m_nodes + header().vertex_count();
+    CVertex* B = m_nodes->begin();
+    CVertex* E = m_nodes->end();
     CVertex* I = std::lower_bound(B, E, _vertex_position.xz());
     if ((I == E) || ((*I).position().xz() != _vertex_position.xz()))
         return (u32(-1));
@@ -269,8 +268,8 @@ u32 CLevelGraph::guess_vertex_id(u32 const& current_vertex_id, Fvector const& po
     float result_distance = nearest(best_point, position, vertex_contour);
     u32 result_vertex_id = current_vertex_id;
 
-    CVertex const* B = m_nodes;
-    CVertex const* E = m_nodes + header().vertex_count();
+    CVertex const* B = m_nodes->begin();
+    CVertex const* E = m_nodes->end();
     u32 start_x = (u32)std::max(0, int(x) - max_guess_vertex_count);
     u32 stop_x = std::min(max_x(), x + (u32)max_guess_vertex_count);
     u32 start_z = (u32)std::max(0, int(z) - max_guess_vertex_count);
