@@ -103,10 +103,27 @@ SCRIPT_EXPORT(CUIWindow, (), {
             .def("Init", (void (CUIWindow::*)(Frect))& CUIWindow::SetWndRect_script)
 
             .def("SetWndRect", (void (CUIWindow::*)(Frect)) & CUIWindow::SetWndRect_script)
+            .def("SetWndRect", +[](CUIWindow* self, float x, float y, float width, float height)
+            {
+                const Frect rect { x, y, width, height };
+                self->SetWndRect(rect);
+            })
+            
             .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
 
             .def("GetWndPos", &get_wnd_pos)
             .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
+
+            .def("SetWndPos", +[](CUIWindow* self, float x, float y)
+            {
+                const Fvector2 pos { x, y };
+                self->SetWndPos(pos);
+            })
+            .def("SetWndSize", +[](CUIWindow* self, float width, float height)
+            {
+                const Fvector2 size { width, height };
+                self->SetWndSize(size);
+            })
 
             .def("GetWidth", &CUIWindow::GetWidth)
             .def("SetWidth", &CUIWindow::SetWidth)
