@@ -114,3 +114,46 @@ constexpr pcstr LoadingScreenXML16x9ClearSky =
         <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti19\"/>\
     </loading_stage>\
 </w>";
+
+constexpr pcstr LoadingScreenXML16x9ShadowOfChernobyl =
+"<w>\
+    <background width=\"1024\" height=\"768\">\
+        <auto_static x=\"0\" y=\"0\" width=\"1024\" height=\"768\" stretch=\"1\">\
+            <texture>ui_mm_loading_screen</texture>\
+        </auto_static>\
+    </background>\
+    <loading_logo x=\"307\" y=\"368.3\" width=\"409.5\" height=\"256\" stretch=\"1\"/>\
+    <loading_progress x=\"379\" y=\"726\" width=\"268\" height=\"37\" mode=\"from_center\" min=\"0\" max=\"100\" pos=\"0\" inertion=\"5.0\" under_background=\"0\">\
+        <progress>\
+            <texture>ui_mm_loading_progress_bar</texture>\
+        </progress>\
+    </loading_progress>\
+    <loading_stage x=\"310\" y=\"700\" width=\"405\" height=\"20\" stretch=\"1\" always_show=\"1\">\
+        <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti19\"/>\
+    </loading_stage>\
+</w>";
+
+constexpr cpcstr LoadingScreenXMLTexturesDescription =
+"<w>\
+    <file name=\"ui\\ui_actor_loadgame_screen\">\
+        <texture id=\"ui_mm_loading_screen\" x=\"0\" y=\"0\" width=\"1024\" height=\"768\" />\
+        <texture id=\"ui_mm_loading_progress_bar\" x=\"0\" y=\"772\" width=\"506\" height=\"4\" />\
+    </file>\
+    <file name=\"ui\\ui_actor_widescreen_sidepanels\">\
+        <texture id=\"ui_mm_loading_left_widepanel\" x=\"0\" y=\"0\" width=\"128\" height=\"768\" />\
+        <texture id=\"ui_mm_loading_right_widepanel\" x=\"128\" y=\"0\" width=\"128\" height=\"768\" />\
+   </file>\
+</w>";
+
+constexpr cpcstr LoadingScreenXMLClearSkyTexturesDescription =
+"<w>\
+    <file name=\"ui\\ui_load\">\
+        <texture id=\"ui_mm_loading_screen\" x=\"0\" y=\"0\" width=\"1024\" height=\"768\" />\
+        <texture id=\"ui_mm_loading_progress_bar\" x=\"0\" y=\"768\" width=\"268\" height=\"37\" />\
+    </file>\
+    <file name=\"ui\\ui_ingame2_back_add2_w\">\
+        <texture id=\"ui_mm_loading_left_widepanel\" x=\"680\" y=\"0\" width=\"170\" height=\"768\" />\
+        <texture id=\"ui_mm_loading_right_widepanel\" x=\"850\" y=\"0\" width=\"170\" height=\"768\" />\
+   </file>\
+</w>";
+

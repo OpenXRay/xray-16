@@ -9,6 +9,7 @@
 
 #pragma once
 
+class CUIXml;
 class CUIStaticItem;
 #include "xrUICore/ui_defs.h"
 
@@ -38,6 +39,7 @@ class XRUICORE_API CUITextureMaster
 public:
     static void ParseShTexInfo(pcstr xml_file);
     static void ParseShTexInfo(pcstr path, pcstr xml_file);
+    static void ParseShTexInfo(CUIXml& xml, bool override); 
     static void FreeTexInfo();
     static void FreeCachedShaders();
 

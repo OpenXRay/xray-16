@@ -14,6 +14,7 @@
 #include "xrEngine/x_ray.h"
 #include "xrEngine/GameFont.h"
 #include "UIHelper.h"
+#include "xrUICore/XML/UITextureMaster.h"
 
 extern ENGINE_API int ps_rs_loading_stages;
 
@@ -34,8 +35,21 @@ void UILoadingScreen::Initialize()
 
     if (!loaded) // Robustness? Yes!
     {
-        if (ClearSkyMode)
+        if (ShadowOfChernobylMode)
         {
+            uiXml.Set(LoadingScreenXMLClearSkyTexturesDescription);
+            CUITextureMaster::ParseShTexInfo(uiXml, false);
+            uiXml.ClearInternal();
+            if (UICore::is_widescreen())
+                uiXml.Set(LoadingScreenXML16x9ShadowOfChernobyl);
+            else
+                uiXml.Set(LoadingScreenXMLClearSky);
+        }
+        else if (ClearSkyMode)
+        {
+            uiXml.Set(LoadingScreenXMLClearSkyTexturesDescription);
+            CUITextureMaster::ParseShTexInfo(uiXml, false);
+            uiXml.ClearInternal();
             if (UICore::is_widescreen())
                 uiXml.Set(LoadingScreenXML16x9ClearSky);
             else
@@ -43,6 +57,9 @@ void UILoadingScreen::Initialize()
         }
         else
         {
+            uiXml.Set(LoadingScreenXMLTexturesDescription);
+            CUITextureMaster::ParseShTexInfo(uiXml, false);
+            uiXml.ClearInternal();
             if (UICore::is_widescreen())
                 uiXml.Set(LoadingScreenXML16x9);
             else
