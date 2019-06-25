@@ -74,8 +74,11 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
     xr_strcpy(str, box_template);
     CUIXmlInitBase::InitStatic(uiXml, str, 0, this);
 
-    LPCSTR _type = uiXml.ReadAttrib(str, 0, "type", NULL);
-    R_ASSERT(_type);
+    LPCSTR _type = uiXml.ReadAttrib(str, 0, "type", nullptr);
+    R_ASSERT4(_type, "Please specify type for message box", str, uiXml.m_xml_file_name);
+
+    if (!_type)       // Assign this if we're debugging engine
+        _type = "ok"; // and know what we are doing
 
     m_eMessageBoxStyle = MESSAGEBOX_OK;
     if (0 == xr_stricmp(_type, "ok"))
