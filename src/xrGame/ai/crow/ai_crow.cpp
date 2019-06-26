@@ -23,11 +23,17 @@
 
 #endif
 
-void CAI_Crow::SAnim::Load(IKinematicsAnimated* visual, LPCSTR prefix)
+void CAI_Crow::SAnim::Load(IKinematicsAnimated* visual, cpcstr prefix, cpcstr prefix2)
 {
     const MotionID& M = visual->ID_Cycle_Safe(prefix);
     if (M)
         m_Animations.push_back(M);
+    else
+    {
+        const MotionID& M2 = visual->ID_Cycle_Safe(prefix2);
+        if (M2)
+            m_Animations.push_back(M2);
+    }
     for (int i = 0; (i < MAX_ANIM_COUNT) && (m_Animations.size() < MAX_ANIM_COUNT); ++i)
     {
         string128 sh_anim;
@@ -35,6 +41,14 @@ void CAI_Crow::SAnim::Load(IKinematicsAnimated* visual, LPCSTR prefix)
         const MotionID& M = visual->ID_Cycle_Safe(sh_anim);
         if (M)
             m_Animations.push_back(M);
+        else
+        {
+            xr_sprintf(sh_anim, "%s_%d", prefix2, i);
+            const MotionID& M2 = visual->ID_Cycle_Safe(sh_anim);
+
+            if (M2)
+                m_Animations.push_back(M2);
+        }
     }
     R_ASSERT(m_Animations.size());
 }
@@ -139,11 +153,11 @@ BOOL CAI_Crow::net_Spawn(CSE_Abstract* DC)
     // animations
     IKinematicsAnimated* M = smart_cast<IKinematicsAnimated*>(Visual());
     R_ASSERT(M);
-    m_Anims.m_death.Load(M, "death");
-    m_Anims.m_death_dead.Load(M, "death_drop");
-    m_Anims.m_death_idle.Load(M, "death_idle");
-    m_Anims.m_fly.Load(M, "fly_fwd");
-    m_Anims.m_idle.Load(M, "fly_idle");
+    m_Anims.m_death.Load(M, "death", "norm_death");
+    m_Anims.m_death_dead.Load(M, "death_drop", "norm_death_dead");
+    m_Anims.m_death_idle.Load(M, "death_idle", "norm_death_idle");
+    m_Anims.m_fly.Load(M, "fly_fwd", "norm_fly_fwd");
+    m_Anims.m_idle.Load(M, "fly_idle", "norm_idle");
 
     o_workload_frame = 0;
     o_workload_rframe = 0;
