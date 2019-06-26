@@ -122,7 +122,7 @@ constexpr pcstr LoadingScreenXML16x9ShadowOfChernobyl =
             <texture>ui_mm_loading_screen</texture>\
         </auto_static>\
     </background>\
-    <loading_logo x=\"307\" y=\"368.3\" width=\"409.5\" height=\"256\" stretch=\"1\"/>\
+    <loading_logo x=\"257\" y=\"369\" width=\"512\" height=\"256\" stretch=\"1\"/>\
     <loading_progress x=\"379\" y=\"726\" width=\"268\" height=\"37\" mode=\"from_center\" min=\"0\" max=\"100\" pos=\"0\" inertion=\"5.0\" under_background=\"0\">\
         <progress>\
             <texture>ui_mm_loading_progress_bar</texture>\
