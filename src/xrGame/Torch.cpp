@@ -19,6 +19,7 @@
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
 
+constexpr pcstr TORCH_DEFINITION = "torch_definition";
 static const float TORCH_INERTION_CLAMP = PI_DIV_6;
 static const float TORCH_INERTION_SPEED_MAX = 7.5f;
 static const float TORCH_INERTION_SPEED_MIN = 0.5f;
@@ -213,27 +214,47 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
     IKinematics* K = smart_cast<IKinematics*>(Visual());
     CInifile* pUserData = K->LL_UserData();
     R_ASSERT3(pUserData, "Empty Torch user data!", torch->get_visual());
-    lanim = LALib.FindItem(pUserData->r_string("torch_definition", "color_animator"));
-    guid_bone = K->LL_BoneID(pUserData->r_string("torch_definition", "guide_bone"));
+    lanim = LALib.FindItem(pUserData->r_string(TORCH_DEFINITION, "color_animator"));
+    guid_bone = K->LL_BoneID(pUserData->r_string(TORCH_DEFINITION, "guide_bone"));
     VERIFY(guid_bone != BI_NONE);
 
-    Fcolor clr = pUserData->r_fcolor("torch_definition", (b_r2) ? "color_r2" : "color");
+    Fcolor clr = pUserData->r_fcolor(TORCH_DEFINITION, (b_r2) ? "color_r2" : "color");
     fBrightness = clr.intensity();
-    float range = pUserData->r_float("torch_definition", (b_r2) ? "range_r2" : "range");
+    float range = pUserData->r_float(TORCH_DEFINITION, (b_r2) ? "range_r2" : "range");
     light_render->set_color(clr);
     light_render->set_range(range);
 
-    Fcolor clr_o = pUserData->r_fcolor("torch_definition", (b_r2) ? "omni_color_r2" : "omni_color");
-    float range_o = pUserData->r_float("torch_definition", (b_r2) ? "omni_range_r2" : "omni_range");
+    if (b_r2)
+    {
+        bool useVolumetric = pUserData->read_if_exists<bool>(TORCH_DEFINITION, "volumetric_enabled", false);
+        light_render->set_volumetric(useVolumetric);
+        if (useVolumetric)
+        {
+            float volQuality = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_quality", 1.f);
+            clamp(volQuality, 0.f, 1.f);
+            light_render->set_volumetric_quality(volQuality);
+
+            float volIntensity = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_intensity", 1.f);
+            clamp(volIntensity, 0.f, 10.f);
+            light_render->set_volumetric_intensity(volIntensity);
+
+            float volDistance = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_distance", 1.f);
+            clamp(volDistance, 0.f, 1.f);
+            light_render->set_volumetric_distance(volDistance);
+        }
+    }
+
+    Fcolor clr_o = pUserData->r_fcolor(TORCH_DEFINITION, (b_r2) ? "omni_color_r2" : "omni_color");
+    float range_o = pUserData->r_float(TORCH_DEFINITION, (b_r2) ? "omni_range_r2" : "omni_range");
     light_omni->set_color(clr_o);
     light_omni->set_range(range_o);
 
-    light_render->set_cone(deg2rad(pUserData->r_float("torch_definition", "spot_angle")));
-    light_render->set_texture(pUserData->r_string("torch_definition", "spot_texture"));
+    light_render->set_cone(deg2rad(pUserData->r_float(TORCH_DEFINITION, "spot_angle")));
+    light_render->set_texture(pUserData->r_string(TORCH_DEFINITION, "spot_texture"));
 
-    glow_render->set_texture(pUserData->r_string("torch_definition", "glow_texture"));
+    glow_render->set_texture(pUserData->r_string(TORCH_DEFINITION, "glow_texture"));
     glow_render->set_color(clr);
-    glow_render->set_radius(pUserData->r_float("torch_definition", "glow_radius"));
+    glow_render->set_radius(pUserData->r_float(TORCH_DEFINITION, "glow_radius"));
 
     //включить/выключить фонарик
     Switch(torch->m_active);
