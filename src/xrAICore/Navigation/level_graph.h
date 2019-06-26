@@ -243,7 +243,7 @@ public:
     IC bool valid_vertex_position(const Fvector& position) const;
     bool neighbour_in_direction(const Fvector& direction, u32 start_vertex_id) const;
 
-    IC CVertex* vertices() { return m_nodes->begin(); }
+    IC CVertex* vertices() { return m_nodes->front(); }
 };
 
 IC bool operator<(const CLevelGraph::CVertex& vertex, const u32& vertex_xz);

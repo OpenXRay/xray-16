@@ -17,19 +17,20 @@ public:
         {
             compatibilityMode = true;
             NodeCompressedOld* nodes = static_cast<NodeCompressedOld*>(stream->pointer());
+            CVertex* newNodes = new CVertex[vertex_count];
             for (u32 i = 0; i < vertex_count; ++i)
             {
-                CVertex* vertex = new CVertex();
-
-                NodeCompressed& newNode = *vertex;
+                CVertex& vertex = newNodes[i];
+                NodeCompressed& newNode = vertex;
                 NodeCompressedOld& oldNode = nodes[i];
+
                 CopyMemory(newNode.data, oldNode.data, sizeof(oldNode.data) / sizeof(u8));
                 newNode.high = oldNode.cover;
                 newNode.low = oldNode.cover;
                 newNode.plane = oldNode.plane;
                 newNode.p = oldNode.p;
 
-                m_nodes[i] = vertex;
+                m_nodes[i] = &vertex;
             }
         }
         else
@@ -54,12 +55,21 @@ public:
         m_nodes.clear();
     }
 
-    CVertex* begin() { return m_nodes.front(); }
-    CVertex* end() { return m_nodes.back(); }
+    [[nodiscard]] CVertex* front() { return m_nodes.front(); }
+    [[nodiscard]] CVertex* back() { return m_nodes.back(); }
 
-    CVertex* at(size_t id) { return m_nodes[id]; }
-    CVertex* operator[](size_t id) { return m_nodes[id]; }
+    [[nodiscard]] auto begin() { return m_nodes.begin(); }
+    [[nodiscard]] auto end() { return m_nodes.end(); }
 
-    CVertex* operator+(size_t id) { return m_nodes[id]; }
+    [[nodiscard]] auto cbegin() const { return m_nodes.cbegin(); }
+    [[nodiscard]] auto cend() const { return m_nodes.cend(); }
+
+    [[nodiscard]] CVertex* at(size_t id) { VERIFY(id < size()); return m_nodes[id]; }
+    [[nodiscard]] CVertex* operator[](size_t id) { return m_nodes[id]; }
+    
+    [[nodiscard]] CVertex* operator+(size_t id) { return m_nodes[id]; }
+
+    [[nodiscard]] bool empty() const { return m_nodes.empty(); }
+    [[nodiscard]] size_t size() const { return m_nodes.size(); }
 };
 } // namespace LevelGraph
