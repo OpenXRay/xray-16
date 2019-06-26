@@ -45,7 +45,7 @@ CInventory::CInventory()
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
     u16 sz;
-    const u16 tempSlotsCount = pSettings->r_s16("inventory", "slots_count");
+    const u16 tempSlotsCount = pSettings->read_if_exists<s16>("inventory", "slots_count", 10);
     if (tempSlotsCount > 0 && tempSlotsCount <= LAST_SLOT)
         sz = tempSlotsCount + 1;
     else

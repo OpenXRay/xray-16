@@ -104,10 +104,14 @@ void CInventoryItem::Load(LPCSTR section)
     R_ASSERT(m_weight >= 0.f);
 
     m_cost = pSettings->r_u32(section, "cost");
-    u32 sl = pSettings->r_u32(section, "slot");
+    u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT);
     m_ItemCurrPlace.base_slot_id = (sl == -1) ? 0 : (sl + 1);
 
-    m_Description = StringTable().translate(pSettings->r_string(section, DESCRIPTION_KEY));
+    // Description
+    if (pSettings->line_exist(section, "description"))
+        m_Description = StringTable().translate(pSettings->r_string(section, DESCRIPTION_KEY));
+    else
+        m_Description = "";
 
     m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
     m_can_trade = READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE);
@@ -120,9 +124,9 @@ void CInventoryItem::Load(LPCSTR section)
 
     if (BaseSlot() != NO_ACTIVE_SLOT || Belt())
     {
-        m_flags.set(FRuckDefault, pSettings->r_bool(section, "default_to_ruck"));
-        m_flags.set(FAllowSprint, pSettings->r_bool(section, "sprint_allowed"));
-        m_fControlInertionFactor = pSettings->r_float(section, "control_inertion_factor");
+        m_flags.set(FRuckDefault, pSettings->read_if_exists<bool>(section, "default_to_ruck", true));
+        m_flags.set(FAllowSprint, pSettings->read_if_exists<bool>(section, "sprint_allowed", true));
+        m_fControlInertionFactor = pSettings->read_if_exists<float>(section, "control_inertion_factor", 1.0f);
     }
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 }
@@ -131,7 +135,10 @@ void CInventoryItem::ReloadNames()
 {
     m_name = StringTable().translate(pSettings->r_string(m_object->cNameSect(), INV_NAME_KEY));
     m_nameShort = StringTable().translate(pSettings->r_string(m_object->cNameSect(), INV_NAME_SHORT_KEY));
-    m_Description = StringTable().translate(pSettings->r_string(m_object->cNameSect(), DESCRIPTION_KEY));
+    if (pSettings->line_exist(m_object->cNameSect(), "description"))
+        m_Description = StringTable().translate(pSettings->r_string(m_object->cNameSect(), DESCRIPTION_KEY));
+    else
+        m_Description = "";
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)

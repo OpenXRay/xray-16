@@ -933,11 +933,11 @@ void CGamePersistent::RestoreEffectorDOF() { SetEffectorDOF(m_dof[3]); }
 //	m_dof		[4];	// 0-dest 1-current 2-from 3-original
 void CGamePersistent::UpdateDof()
 {
-    static float diff_far = pSettings->r_float("zone_pick_dof", "far"); // 70.0f;
-    static float diff_near = pSettings->r_float("zone_pick_dof", "near"); //-70.0f;
-
     if (m_bPickableDOF)
     {
+        static float diff_far = pSettings->read_if_exists<float>("zone_pick_dof", "far", 70.0f);
+        static float diff_near = pSettings->read_if_exists<float>("zone_pick_dof", "near", -70.0f);
+
         Fvector pick_dof;
         pick_dof.y = HUD().GetCurrentRayQuery().range;
         pick_dof.x = pick_dof.y + diff_near;

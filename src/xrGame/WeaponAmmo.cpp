@@ -31,7 +31,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     //.	param_s.kCritical			= pSettings->r_float(section, "k_hit_critical");
     param_s.kImpulse = pSettings->r_float(section, "k_impulse");
     // m_kPierce				= pSettings->r_float(section, "k_pierce");
-    param_s.kAP = pSettings->r_float(section, "k_ap");
+    param_s.kAP = READ_IF_EXISTS(pSettings, r_float, section, "k_ap", 0.0f);
     param_s.u8ColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracer_color_ID", 0);
 
     if (pSettings->line_exist(section, "k_air_resistance"))
@@ -61,7 +61,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     if (pSettings->line_exist(section, "can_be_unlimited"))
         m_flags.set(cfCanBeUnlimited, pSettings->r_bool(section, "can_be_unlimited"));
 
-    m_flags.set(cfExplosive, pSettings->r_bool(section, "explosive"));
+    m_flags.set(cfExplosive,  READ_IF_EXISTS(pSettings, r_bool, section, "explosive", false));
 
     bullet_material_idx = GMLib.GetMaterialIdx(WEAPON_MATERIAL_NAME);
     VERIFY(u16(-1) != bullet_material_idx);
@@ -98,7 +98,7 @@ void CWeaponAmmo::Load(LPCSTR section)
     //.	cartridge_param.kCritical	= pSettings->r_float(section, "k_hit_critical");
     cartridge_param.kImpulse = pSettings->r_float(section, "k_impulse");
     // m_kPierce				= pSettings->r_float(section, "k_pierce");
-    cartridge_param.kAP = pSettings->r_float(section, "k_ap");
+    cartridge_param.kAP = READ_IF_EXISTS(pSettings, r_float, section, "k_ap", 0.0f);
     cartridge_param.u8ColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracer_color_ID", 0);
 
     if (pSettings->line_exist(section, "k_air_resistance"))

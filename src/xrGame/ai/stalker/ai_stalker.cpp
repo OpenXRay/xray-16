@@ -275,8 +275,16 @@ void CAI_Stalker::LoadSounds(LPCSTR section)
     sound().add(pSettings->r_string(section, "sound_enemy_killed_or_wounded"), 100, SOUND_TYPE_MONSTER_TALKING, 4,
         u32(eStalkerSoundMaskEnemyKilledOrWounded), eStalkerSoundEnemyKilledOrWounded, head_bone_name,
         new CStalkerSoundData(this));
-    sound().add(pSettings->r_string(section, "sound_throw_grenade"), 100, SOUND_TYPE_MONSTER_TALKING, 5,
-        u32(eStalkerSoundMaskKillWounded), eStalkerSoundThrowGrenade, head_bone_name, new CStalkerSoundData(this));
+    if (pSettings->line_exist(section, "sound_throw_grenade"))
+    {
+        sound().add(pSettings->r_string(section, "sound_throw_grenade"), 100, SOUND_TYPE_MONSTER_TALKING, 5,
+            u32(eStalkerSoundMaskKillWounded), eStalkerSoundThrowGrenade, head_bone_name, new CStalkerSoundData(this));
+    }
+    else
+    {
+        sound().add(pSettings->r_string(section, "sound_grenade_alarm"), 100, SOUND_TYPE_MONSTER_TALKING, 5,
+            u32(eStalkerSoundMaskKillWounded), eStalkerSoundThrowGrenade, head_bone_name, new CStalkerSoundData(this));
+    }
 }
 
 void CAI_Stalker::reload(LPCSTR section)

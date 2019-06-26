@@ -371,8 +371,8 @@ void CActor::Load(LPCSTR section)
 
     m_fPickupInfoRadius = pSettings->r_float(section, "pickup_info_radius");
 
-    m_fFeelGrenadeRadius = pSettings->r_float(section, "feel_grenade_radius");
-    m_fFeelGrenadeTime = pSettings->r_float(section, "feel_grenade_time");
+    m_fFeelGrenadeRadius = pSettings->read_if_exists<float>(section, "feel_grenade_radius", 10.0f);
+    m_fFeelGrenadeTime = pSettings->read_if_exists<float>(section, "feel_grenade_time", 1.0f);
     m_fFeelGrenadeTime *= 1000.0f;
 
     character_physics_support()->in_Load(section);
@@ -406,8 +406,16 @@ void CActor::Load(LPCSTR section)
             m_HeavyBreathSnd.create(
                 pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
             m_BloodSnd.create(pSettings->r_string(section, "heavy_blood_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
-            m_DangerSnd.create(
-                pSettings->r_string(section, "heavy_danger_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
+            if (pSettings->line_exist(section, "heavy_danger_snd"))
+            {
+                m_DangerSnd.create(pSettings->r_string(section, "heavy_danger_snd"),
+                    st_Effect, SOUND_TYPE_MONSTER_INJURING);
+            }
+            else
+            {
+                m_DangerSnd.create(pSettings->r_string(section, "heavy_blood_snd"),
+                    st_Effect, SOUND_TYPE_MONSTER_INJURING);
+            }
         }
     }
     if (psActorFlags.test(AF_PSP))

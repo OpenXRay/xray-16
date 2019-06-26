@@ -80,13 +80,13 @@ void CArtefact::Load(LPCSTR section)
         m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings);
     }
     m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
-    m_af_rank = pSettings->r_u8(section, "af_rank");
-    m_additional_weight = pSettings->r_float(section, "additional_inventory_weight");
+    m_af_rank = pSettings->read_if_exists<u8>(section, "af_rank", 0);
+    m_additional_weight = pSettings->read_if_exists<float>(section, "additional_inventory_weight", 0.0f);
 }
 
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
 {
-    if (pSettings->r_bool(cNameSect(), "can_be_controlled"))
+    if (pSettings->read_if_exists<bool>(cNameSect(), "can_be_controlled", false))
         m_detectorObj = new SArtefactDetectorsSupport(this);
 
     BOOL result = inherited::net_Spawn(DC);

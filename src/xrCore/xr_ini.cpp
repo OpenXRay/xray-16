@@ -887,7 +887,7 @@ Fvector4 CInifile::r_fvector4(pcstr S, pcstr L) const
 bool CInifile::r_bool(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    VERIFY2(xr_strlen(C) <= 5, make_string("\"%s\" is not a valid bool value, section[%s], line[%s]", C, S, L));
+    VERIFY2(C && xr_strlen(C) <= 5, make_string("\"%s\" is not a valid bool value, section[%s], line[%s]", C, S, L));
     char B[8];
     xr_strcpy(B, 7, C);
     B[7] = 0;
