@@ -966,7 +966,7 @@ void CActor::UpdateCL()
 
             for (u8 i = 0; i < bindtypes_count && allowed; ++i)
             {
-                const int dik = get_action_dik(kUSE, i);
+                const int dik = GetActionDik(kUSE, i);
                 if (dik && pInput->iGetAsyncKeyState(dik))
                     m_bPickupMode = true;
             }

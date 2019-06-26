@@ -79,8 +79,8 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     }
     if (str)
     {
-        EGameActions cmd = action_name_to_id(str);
-        m_continue_dik_guard = get_action_dik(cmd);
+        EGameActions cmd = ActionNameToId(str);
+        m_continue_dik_guard = GetActionDik(cmd);
     }
 
     m_flags.set(etiCanBeStopped, (m_continue_dik_guard == -1));
@@ -94,7 +94,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     {
         SActionItem& itm = m_actions[idx];
         LPCSTR str = xml->ReadAttrib("action", idx, "id");
-        itm.m_action = action_name_to_id(str);
+        itm.m_action = ActionNameToId(str);
         itm.m_bfinalize = !!xml->ReadAttribInt("action", idx, "finalize", FALSE);
         itm.m_functor = xml->Read(xml->GetLocalRoot(), "action", idx, "");
     }
@@ -338,7 +338,7 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
     for (u32 idx = 0; idx < m_actions.size(); ++idx)
     {
         SActionItem& itm = m_actions[idx];
-        bool b = is_binded(itm.m_action, dik);
+        bool b = IsBinded(itm.m_action, dik);
         if (b)
         {
             luabind::functor<void> functor_to_call;

@@ -78,7 +78,7 @@ void CUIGameSP::OnFrame()
         bool b_remove = false;
         for (u8 i = 0; i < bindtypes_count && !b_remove; ++i)
         {
-            const int dik = get_action_dik(kSCORES, i);
+            const int dik = GetActionDik(kSCORES, i);
             if (dik && !pInput->iGetAsyncKeyState(dik))
                 b_remove = true;
         }
@@ -123,7 +123,7 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
     if (!pActor->g_Alive())
         return false;
 
-    switch (get_binded_action(dik))
+    switch (GetBindedAction(dik))
     {
     case kACTIVE_JOBS:
     {
@@ -306,7 +306,7 @@ bool CChangeLevelWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (is_binded(kQUIT, dik))
+        if (IsBinded(kQUIT, dik))
             OnCancel();
         return true;
     }

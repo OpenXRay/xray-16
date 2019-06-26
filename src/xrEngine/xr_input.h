@@ -5,7 +5,7 @@
 
 // Mouse2 is a middle button in SDL,
 // but in X-Ray this is a right button
-enum xrMouse
+enum EMouseButton
 {
     MOUSE_1 = SDL_NUM_SCANCODES + SDL_BUTTON_LEFT,
     MOUSE_2 = SDL_NUM_SCANCODES + SDL_BUTTON_RIGHT,
@@ -16,7 +16,7 @@ enum xrMouse
     MOUSE_COUNT = MOUSE_5 - SDL_NUM_SCANCODES
 };
 
-enum xrController
+enum EControllerButton
 {
     XR_CONTROLLER_BUTTON_INVALID = -1,
     XR_CONTROLLER_BUTTON_A = SDL_CONTROLLER_BUTTON_A + MOUSE_MAX,
@@ -119,8 +119,8 @@ private:
     bool availableController;
 
 public:
-    u32 dwCurTime;
-    u32 MouseDelta;
+    u32 m_curTime;
+    u32 m_mouseDelta;
 
     const InputStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
@@ -129,7 +129,7 @@ public:
     void iRelease(IInputReceiver* pc);
     bool iGetAsyncKeyState(const int dik);
     bool iGetAsyncBtnState(const int btn);
-    bool iGetAsyncGcBtnState(const int btn);
+    bool iGetAsyncGpadBtnState(const int btn);
     void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
@@ -146,9 +146,9 @@ public:
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;
-    bool get_dik_name(const int dik, LPSTR dest, int dest_sz);
+    bool GetKeyName(const int dik, pstr dest, int dest_sz);
 
-    void feedback(u16 s1, u16 s2, float time);
+    void Feedback(u16 s1, u16 s2, float time);
 };
 
 extern ENGINE_API CInput* pInput;
