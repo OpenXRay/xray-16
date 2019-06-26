@@ -3,20 +3,20 @@
 #include "xrUICore/Static/UIStatic.h"
 #include "xrUICore/Options/UIOptionsItem.h"
 
-struct _action;
-struct _keyboard;
+struct game_action;
+struct keyboard_key;
 class CUIColorAnimatorWrapper;
 
 class CUIEditKeyBind : public CUIStatic, public CUIOptionsItem
 {
-    bool m_bPrimary;
-    bool m_bGamepadBinds;
-    _action* m_action;
-    _keyboard* m_keyboard;
-    _keyboard* m_opt_backup_value;
+    bool m_primary;
+    bool m_gpadBinds;
+    game_action* m_action;
+    keyboard_key* m_keyboard;
+    keyboard_key* m_opt_backup_value;
 
 public:
-    CUIEditKeyBind(bool bPrim, bool bGcBinds = false);
+    CUIEditKeyBind(bool primary, bool gpadBinds = false);
     virtual ~CUIEditKeyBind();
     // options item
     virtual void AssignProps(const shared_str& entry, const shared_str& group);
@@ -43,7 +43,7 @@ public:
 protected:
     void BindAction2Key();
 
-    bool m_bIsEditMode;
+    bool m_isEditMode;
 
     //.	CUIColorAnimatorWrapper*				m_pAnimation;
 };

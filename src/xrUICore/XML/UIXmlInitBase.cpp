@@ -401,13 +401,13 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3t
     LPCSTR accel = xml_doc.ReadAttrib(path, index, "accel", NULL);
     if (accel)
     {
-        int acc = keyname_to_dik(accel);
+        int acc = KeynameToDik(accel);
         pWnd->SetAccelerator(acc, 0);
     }
     accel = xml_doc.ReadAttrib(path, index, "accel_ext", NULL);
     if (accel)
     {
-        int acc = keyname_to_dik(accel);
+        int acc = KeynameToDik(accel);
         pWnd->SetAccelerator(acc, 1);
     }
 

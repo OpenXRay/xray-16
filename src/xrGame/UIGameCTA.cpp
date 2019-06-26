@@ -795,7 +795,7 @@ bool CUIGameCTA::IR_UIOnKeyboardPress(int dik)
     break;
     }
 
-    EGameActions cmd = get_binded_action(dik);
+    EGameActions cmd = GetBindedAction(dik);
     switch (cmd)
     {
     case kINVENTORY:

@@ -5,22 +5,24 @@
 #include "Common/object_broker.h"
 #include "xrEngine/XR_IOConsole.h"
 
-CUIEditKeyBind::CUIEditKeyBind(bool bPrim, bool bGcBinds /*= false*/)
+CUIEditKeyBind::CUIEditKeyBind(bool primary, bool gpadBinds /*= false*/)
 {
-    m_bPrimary = bPrim;
-    m_bGamepadBinds = bGcBinds;
-    m_bIsEditMode = false;
+    m_primary = primary;
+    m_gpadBinds = gpadBinds;
+    m_isEditMode = false;
     TextItemControl()->SetTextComplexMode(false);
     m_keyboard = NULL;
     m_opt_backup_value = NULL;
     m_action = NULL;
 }
+
 CUIEditKeyBind::~CUIEditKeyBind() {}
-u32 cut_string_by_length(CGameFont* pFont, LPCSTR src, LPSTR dst, u32 dst_size, float length)
+
+u32 CutStringByLength(CGameFont* font, LPCSTR src, LPSTR dst, u32 dst_size, float length)
 {
-    if (pFont->IsMultibyte())
+    if (font->IsMultibyte())
     {
-        u16 nPos = pFont->GetCutLengthPos(length, src);
+        u16 nPos = font->GetCutLengthPos(length, src);
         VERIFY(nPos < dst_size);
         strncpy_s(dst, dst_size, src, nPos);
         dst[nPos] = '\0';
@@ -28,7 +30,7 @@ u32 cut_string_by_length(CGameFont* pFont, LPCSTR src, LPSTR dst, u32 dst_size, 
     }
     else
     {
-        float text_len = pFont->SizeOf_(src);
+        float text_len = font->SizeOf_(src);
         UI().ClientToScreenScaledWidth(text_len);
         VERIFY(xr_strlen(src) <= dst_size);
         xr_strcpy(dst, dst_size, src);
@@ -37,7 +39,7 @@ u32 cut_string_by_length(CGameFont* pFont, LPCSTR src, LPSTR dst, u32 dst_size, 
         {
             dst[xr_strlen(dst) - 1] = 0;
             VERIFY(xr_strlen(dst));
-            text_len = pFont->SizeOf_(dst);
+            text_len = font->SizeOf_(dst);
             UI().ClientToScreenScaledWidth(text_len);
         }
 
@@ -53,7 +55,7 @@ void CUIEditKeyBind::SetText(const char* text)
     {
         string256 buff;
 
-        cut_string_by_length(TextItemControl()->GetFont(), text, buff, sizeof(buff), GetWidth());
+        CutStringByLength(TextItemControl()->GetFont(), text, buff, sizeof(buff), GetWidth());
 
         TextItemControl()->SetText(buff);
     }
@@ -78,11 +80,11 @@ void CUIEditKeyBind::OnFocusLost()
 
 bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
 {
-    if (m_bIsEditMode)
+    if (m_isEditMode)
     {
         string64 message;
 
-        m_keyboard = dik_to_ptr(mouse_btn, true);
+        m_keyboard = DikToPtr(mouse_btn, true);
         if (!m_keyboard)
             return true;
         SetValue();
@@ -111,9 +113,9 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
 
     string64 message;
-    if (m_bIsEditMode)
+    if (m_isEditMode)
     {
-        m_keyboard = dik_to_ptr(dik, true);
+        m_keyboard = DikToPtr(dik, true);
         if (!m_keyboard)
             return true;
 
@@ -129,10 +131,14 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-void CUIEditKeyBind::Update() { CUIStatic::Update(); }
+void CUIEditKeyBind::Update()
+{ 
+    CUIStatic::Update();
+}
+
 void CUIEditKeyBind::SetEditMode(bool b)
 {
-    m_bIsEditMode = b;
+    m_isEditMode = b;
 
     if (b)
     {
@@ -149,7 +155,7 @@ void CUIEditKeyBind::SetEditMode(bool b)
 void CUIEditKeyBind::AssignProps(const shared_str& entry, const shared_str& group)
 {
     CUIOptionsItem::AssignProps(entry, group);
-    m_action = action_name_to_ptr(entry.c_str());
+    m_action = ActionNameToPtr(entry.c_str());
 }
 
 void CUIEditKeyBind::SetValue()
@@ -162,10 +168,10 @@ void CUIEditKeyBind::SetValue()
 
 void CUIEditKeyBind::SetCurrentOptValue()
 {
-    _binding* pbinding = &g_key_bindings[m_action->id];
+    key_binding* binding = &g_key_bindings[m_action->id];
 
-    int idx = (!m_bGamepadBinds) ? ((m_bPrimary) ? 0 : 1) : 2;
-    m_keyboard = pbinding->m_keyboard[idx];
+    int idx = (!m_gpadBinds) ? ((m_primary) ? 0 : 1) : 2;
+    m_keyboard = binding->m_keyboard[idx];
 
     SetValue();
 }
@@ -188,16 +194,20 @@ void CUIEditKeyBind::UndoOptValue()
     CUIOptionsItem::UndoOptValue();
 }
 
-bool CUIEditKeyBind::IsChangedOptValue() const { return m_keyboard != m_opt_backup_value; }
+bool CUIEditKeyBind::IsChangedOptValue() const
+{
+    return m_keyboard != m_opt_backup_value;
+}
+
 void CUIEditKeyBind::BindAction2Key()
 {
-    xr_string comm_unbind = (!m_bGamepadBinds) ? ((m_bPrimary) ? "unbind " : "unbind_sec ") : "unbind_gpad ";
+    xr_string comm_unbind = (!m_gpadBinds) ? ((m_primary) ? "unbind " : "unbind_sec ") : "unbind_gpad ";
     comm_unbind += m_action->action_name;
     Console->Execute(comm_unbind.c_str());
 
     if (m_keyboard)
     {
-        xr_string comm_bind = (!m_bGamepadBinds) ? ((m_bPrimary) ? "bind " : "bind_sec ") : "bind_gpad ";
+        xr_string comm_bind = (!m_gpadBinds) ? ((m_primary) ? "bind " : "bind_sec ") : "bind_gpad ";
         comm_bind += m_action->action_name;
         comm_bind += " ";
         comm_bind += m_keyboard->key_name;
@@ -223,8 +233,8 @@ void CUIEditKeyBind::OnMessage(LPCSTR message)
     if (0 == xr_strcmp(m_action->action_name, command))
         return; // fuck
 
-    _action* other_action = action_name_to_ptr(command);
-    if (is_group_not_conflicted(m_action->key_group, other_action->key_group))
+    game_action* other_action = ActionNameToPtr(command);
+    if (IsGroupNotConflicted(m_action->key_group, other_action->key_group))
         return;
 
     SetText("---");

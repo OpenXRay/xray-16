@@ -7,7 +7,7 @@
 #include "xrCore/Text/StringConversion.hpp"
 #include "xrCore/xr_token.h"
 
-CInput* pInput = NULL;
+CInput* pInput = nullptr;
 IInputReceiver dummyController;
 
 xr_vector<xr_token> JoysticksToken;
@@ -24,7 +24,7 @@ constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
 float stop_vibration_time = flt_max;
 
-static void on_error_dialog(bool before)
+static void OnErrorDialog(bool before)
 {
     if (!pInput || !pInput->IsExclusiveMode() || Device.editor())
         return;
@@ -155,7 +155,7 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
         CInput::DisplayDevicesList();
     }
 
-    MouseDelta = 25;
+    m_mouseDelta = 25;
 
     mouseState.reset();
     keyboardState.reset();
@@ -166,7 +166,7 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
     //===================== Dummy pack
     iCapture(&dummyController);
 
-    xrDebug::SetDialogHandler(on_error_dialog);
+    xrDebug::SetDialogHandler(OnErrorDialog);
 
     SDL_StopTextInput(); // sanity
 
@@ -226,8 +226,8 @@ void CInput::MouseUpdate()
         {
         case SDL_MOUSEMOTION:
             mouseMoved = true;
-            mouseTimeStamp[0] = dwCurTime + event.motion.timestamp;
-            mouseTimeStamp[1] = dwCurTime + event.motion.timestamp;
+            mouseTimeStamp[0] = m_curTime + event.motion.timestamp;
+            mouseTimeStamp[1] = m_curTime + event.motion.timestamp;
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
             break;
@@ -241,8 +241,8 @@ void CInput::MouseUpdate()
             break;
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
-            mouseTimeStamp[2] = dwCurTime + event.wheel.timestamp;
-            mouseTimeStamp[3] = dwCurTime + event.wheel.timestamp;
+            mouseTimeStamp[2] = m_curTime + event.wheel.timestamp;
+            mouseTimeStamp[3] = m_curTime + event.wheel.timestamp;
             offs[2] += event.wheel.y;
             offs[3] += event.wheel.x;
             break;
@@ -262,9 +262,9 @@ void CInput::MouseUpdate()
     }
     else
     {
-        if (mouseTimeStamp[1] && dwCurTime - mouseTimeStamp[1] >= MouseDelta)
+        if (mouseTimeStamp[1] && m_curTime - mouseTimeStamp[1] >= m_mouseDelta)
             cbStack.back()->IR_OnMouseStop(0, mouseTimeStamp[1] = 0);
-        if (mouseTimeStamp[0] && dwCurTime - mouseTimeStamp[0] >= MouseDelta)
+        if (mouseTimeStamp[0] && m_curTime - mouseTimeStamp[0] >= m_mouseDelta)
             cbStack.back()->IR_OnMouseStop(0, mouseTimeStamp[0] = 0);
     }
 }
@@ -376,7 +376,7 @@ bool OtherDevicesKeyToButtonName(const int btn, xr_string& name)
     return false;
 }
 
-bool CInput::get_dik_name(const int dik, LPSTR dest_str, int dest_sz)
+bool CInput::GetKeyName(const int dik, pstr dest_str, int dest_sz)
 {
     xr_string keyname;
     bool result;
@@ -407,7 +407,7 @@ bool CInput::iGetAsyncKeyState(const int dik)
     if (dik >= XR_CONTROLLER_BUTTON_A && dik < XR_CONTROLLER_BUTTON_MAX)
     {
         const int mk = dik - XR_CONTROLLER_BUTTON_A;
-        return iGetAsyncGcBtnState(mk);
+        return iGetAsyncGpadBtnState(mk);
     }
 
     // unknown key ???
@@ -419,7 +419,7 @@ bool CInput::iGetAsyncBtnState(const int btn)
     return mouseState[btn];
 }
 
-bool CInput::iGetAsyncGcBtnState(const int btn)
+bool CInput::iGetAsyncGpadBtnState(const int btn)
 {
     return controllerState[btn];
 }
@@ -471,9 +471,8 @@ void CInput::iRelease(IInputReceiver* p)
     }
     else
     {
-        // we are not topmost receiver, so remove the nearest one
-        size_t cnt = cbStack.size();
-        for (; cnt > 0; --cnt)
+        // we are not topmost receiver, so remove the nearest one        
+        for (size_t cnt = cbStack.size(); cnt > 0; --cnt)
             if (cbStack[cnt - 1] == p)
             {
                 xr_vector<IInputReceiver*>::iterator it = cbStack.begin();
@@ -512,7 +511,7 @@ void CInput::OnFrame(void)
 {
     stats.FrameStart();
     stats.FrameTime.Begin();
-    dwCurTime = RDEVICE.TimerAsync_MMT();
+    m_curTime = RDEVICE.TimerAsync_MMT();
 
     if (Device.dwPrecacheFrame == 0 && !Device.IsAnselActive)
     {
@@ -553,7 +552,7 @@ bool CInput::IsExclusiveMode() const
     return exclusiveInput;
 }
 
-void CInput::feedback(u16 s1, u16 s2, float time)
+void CInput::Feedback(u16 s1, u16 s2, float time)
 {
     stop_vibration_time = RDEVICE.fTimeGlobal + time;
 }

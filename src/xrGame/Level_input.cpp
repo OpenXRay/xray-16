@@ -121,7 +121,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     bool b_ui_exist = !!CurrentGameUI();
 
-    EGameActions _curr = get_binded_action(key);
+    EGameActions _curr = GetBindedAction(key);
 
     /* avo: script callback */
     if (!g_bDisableAllInput && g_actor)
@@ -191,7 +191,7 @@ void CLevel::IR_OnKeyboardPress(int key)
             )
         return;
 
-    if (game && game->OnKeyboardPress(get_binded_action(key)))
+    if (game && game->OnKeyboardPress(GetBindedAction(key)))
         return;
 
     if (_curr == kQUICK_SAVE && IsGameTypeSingle())
@@ -473,14 +473,14 @@ void CLevel::IR_OnKeyboardPress(int key)
     }
 #endif // MASTER_GOLD
 
-    if (bindConsoleCmds.execute(key))
+    if (g_consoleBindCmds.execute(key))
         return;
 
     if (CURRENT_ENTITY())
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardPress(get_binded_action(key));
+            IR->IR_OnKeyboardPress(GetBindedAction(key));
     }
 
 #ifdef _DEBUG
@@ -507,7 +507,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
         return;
-    if (game && game->OnKeyboardRelease(get_binded_action(key)))
+    if (game && game->OnKeyboardRelease(GetBindedAction(key)))
         return;
     if (Device.Paused()
 #ifdef DEBUG
@@ -520,7 +520,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardRelease(get_binded_action(key));
+            IR->IR_OnKeyboardRelease(GetBindedAction(key));
     }
 }
 
@@ -576,7 +576,7 @@ void CLevel::IR_OnKeyboardHold(int key)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardHold(get_binded_action(key));
+            IR->IR_OnKeyboardHold(GetBindedAction(key));
     }
 }
 
@@ -617,7 +617,7 @@ void CLevel::IR_OnActivate()
     {
         if (IR_GetKeyState(i))
         {
-            EGameActions action = get_binded_action(i);
+            EGameActions action = GetBindedAction(i);
             switch (action)
             {
             case kFWD:

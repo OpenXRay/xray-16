@@ -4,7 +4,7 @@
 
 using namespace luabind;
 
-static int dik_to_bind(int dik) { return get_binded_action(dik); }
+static int dik_to_bind(int dik) { return GetBindedAction(dik); }
 SCRIPT_EXPORT(KeyBindings, (),
 {
     class EnumGameActions {};
