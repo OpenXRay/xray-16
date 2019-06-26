@@ -74,23 +74,35 @@ float4	unpack_color( float4 c ) { return c.bgra; }
 float4	unpack_D3DCOLOR( float4 c ) { return c.bgra; }
 float3	unpack_D3DCOLOR( float3 c ) { return c.bgr; }
 
-float3   p_hemi( float2 tc )
+float3   p_hemi(float2 tc)
 {
-//	float3	t_lmh = tex2D (s_hemi, tc);
-//	float3	t_lmh = s_hemi.Sample( smp_rtlinear, tc);
-//	return	dot(t_lmh,1.0/4.0);
-	float4	t_lmh = tex2D (s_hemi, tc);
-	return	float3(t_lmh.a);
+	float4 t_lmh = tex2D(s_hemi, tc);
+
+#ifdef USE_SHOC_RESOURCES
+	float r_lmh = (1.0/3.0);
+	return float3(dot(t_lmh.rgb, float3(r_lmh, r_lmh, r_lmh)));
+#else // USE_SHOC_RESOURCES
+	return float3(t_lmh.a);
+#endif // USE_SHOC_RESOURCES
 }
 
-float   get_hemi( float4 lmh)
+float	get_hemi(float4 lmh)
 {
+#ifdef USE_SHOC_RESOURCES
+	float r_lmh = (1.0/3.0);
+	return dot(lmh.rgb, float3(r_lmh, r_lmh, r_lmh));
+#else // USE_SHOC_RESOURCES
 	return lmh.a;
+#endif // USE_SHOC_RESOURCES
 }
 
-float   get_sun( float4 lmh)
+float	get_sun(float4 lmh)
 {
+#ifdef USE_SHOC_RESOURCES
+	return lmh.a;
+#else // USE_SHOC_RESOURCES
 	return lmh.g;
+#endif // USE_SHOC_RESOURCES
 }
 
 float3	v_hemi(float3 n)
