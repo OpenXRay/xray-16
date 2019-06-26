@@ -33,6 +33,8 @@ IC CGameLevelCrossTable::CGameLevelCrossTable(const void* buffer, const u32& /*b
     ASSERT_XRAI_VERSION_MATCH(m_tCrossTableHeader.version(), "Cross table version mismatch!");
 
     m_tpaCrossTable = (CCell*)buffer;
+    m_chunk = nullptr;
+    m_tpCrossTableVFS = nullptr;
 }
 
 IC CGameLevelCrossTable::~CGameLevelCrossTable()
