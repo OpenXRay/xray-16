@@ -11,6 +11,7 @@
 #include "ui/UILabel.h"
 #include "ui/ServerList.h"
 #include "ui/UIMapList.h"
+#include "ui/UIVersionList.h"
 #include "ui/UIKeyBinding.h"
 #include "xrUICore/EditBox/UIEditBox.h"
 #include "xrUICore/Static/UIAnimatedStatic.h"
@@ -203,6 +204,14 @@ CUIMapList* CScriptXmlInit::InitMapList(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
+CUIVersionList* CScriptXmlInit::InitVerList(LPCSTR path, CUIWindow* parent)
+{
+    CUIVersionList* pWnd = new CUIVersionList();
+    pWnd->InitFromXml(m_xml, path);
+    _attach_child(pWnd, parent);
+    return pWnd;
+}
+
 CUIMMShniaga* CScriptXmlInit::InitMMShniaga(LPCSTR path, CUIWindow* parent)
 {
     CUIMMShniaga* pWnd = new CUIMMShniaga();
@@ -288,6 +297,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (),
             .def("InitTab", &CScriptXmlInit::InitTab)
             .def("InitServerList", &CScriptXmlInit::InitServerList)
             .def("InitMapList", &CScriptXmlInit::InitMapList)
+            .def("InitVerList", &CScriptXmlInit::InitVerList)
             .def("InitMapInfo", &CScriptXmlInit::InitMapInfo)
             .def("InitTrackBar", &CScriptXmlInit::InitTrackBar)
             .def("InitCDkey", &CScriptXmlInit::InitCDkey)
