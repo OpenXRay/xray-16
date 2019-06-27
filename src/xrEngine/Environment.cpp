@@ -506,7 +506,7 @@ void CEnvironment::OnFrame()
     lerp(current_weight);
 
     // Igor. Dynamic sun position.
-    if (!GEnv.Render->is_sun_static() && useDynamicSunDir)
+    if (!GEnv.Render->is_sun_static() && useDynamicSunDir && !CurrentEnv->old_style)
         calculate_dynamic_sun_dir();
 
 #ifndef MASTER_GOLD
