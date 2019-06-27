@@ -114,6 +114,22 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> targ
     m_anim_storage[ma] = new_item;
 }
 
+void CControlAnimationBase::AddAnim2(EMotionAnim ma, std::pair<cpcstr, cpcstr> target, int s_id, SVelocityParam* vel, EPState p_s)
+{
+    SAnimItem* new_item = new SAnimItem();
+
+    new_item->target_name = target.first;
+    new_item->target_name2 = target.second;
+    new_item->target_may_not_exist = false;
+    new_item->spec_id = s_id;
+    new_item->velocity = *vel;
+    new_item->pos_state = p_s;
+
+    new_item->count = 0;
+
+    m_anim_storage[ma] = new_item;
+}
+
 void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s)
 {
     SAnimItem* new_item = new SAnimItem();

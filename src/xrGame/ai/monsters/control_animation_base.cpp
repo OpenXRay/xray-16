@@ -538,6 +538,24 @@ void CControlAnimationBase::UpdateAnimCount()
                 break;
         }
 
+        if (count == 0 && (*it)->target_name2.size())
+        {
+            for (int i = 0;; ++i)
+            {
+                strconcat(sizeof(s_temp), s_temp, *((*it)->target_name2), xr_itoa(i, s, 10));
+                LPCSTR name = s_temp;
+                MotionID id = skel->ID_Cycle_Safe(name);
+
+                if (id.valid())
+                {
+                    count++;
+                    AddAnimTranslation(id, name);
+                }
+                else
+                    break;
+            }
+        }
+
         if (count != 0)
             (*it)->count = count;
         else if ((*it)->target_may_not_exist)
@@ -563,6 +581,12 @@ void CControlAnimationBase::UpdateAnimCount()
                 break;
             m_tReplacedAnims.erase(it);
         }
+        const auto it = std::find_if(m_tMotions.begin(), m_tMotions.end(), [idx](const std::pair<EAction, SMotionItem>& item)
+        {
+            return item.second.anim == idx;
+        });
+        if (it != m_tMotions.end())
+            m_tMotions.erase(it);
     }
 }
 
