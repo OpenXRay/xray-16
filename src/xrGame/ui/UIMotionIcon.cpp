@@ -58,6 +58,8 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
         sz.mul(rel_sz * k);
     }
 
+    m_power_progress = UIHelper::CreateProgressBar(uiXml, "power_progress", this, false);
+
     // Initialization order matters, we should try progress bars first!!!
     m_luminosity_progress_bar = UIHelper::CreateProgressBar(uiXml, "luminosity_progress", this, false);
     m_noise_progress_bar = UIHelper::CreateProgressBar(uiXml, "noise_progress", this, false);
@@ -85,11 +87,6 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
 
     CUIStatic* state;
 
-    if ((state = UIHelper::CreateStatic(uiXml, "state_normal", this, false)))
-    {
-        m_states[stNormal] = state;
-        state->Show(false);
-    }
     if ((state = UIHelper::CreateStatic(uiXml, "state_normal", this, false)))
     {
         m_states[stNormal] = state;
@@ -145,7 +142,8 @@ void CUIMotionIcon::ShowState(EState state)
             curState->Enable(false);
         }
     }
-    CUIStatic* newState = m_states[m_current_state];
+
+    CUIStatic* newState = m_states[state];
     if (newState)
     {
         newState->Show(true);
