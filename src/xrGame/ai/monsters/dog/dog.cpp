@@ -35,61 +35,16 @@ CAI_Dog::~CAI_Dog() { xr_delete(StateMan); }
 void CAI_Dog::Load(LPCSTR section)
 {
     inherited::Load(section);
-    if (pSettings->line_exist(section, "anim_factor"))
-    {
-        m_anim_factor = pSettings->r_u32(section, "anim_factor");
-    }
-    else
-    {
-        m_anim_factor = 50;
-    }
+    m_anim_factor = pSettings->read_if_exists<u32>(section, "anim_factor", 50);
 
-    if (pSettings->line_exist(section, "corpse_use_timeout"))
-    {
-        m_corpse_use_timeout = 1000 * pSettings->r_u32(section, "corpse_use_timeout");
-    }
-    else
-    {
-        m_corpse_use_timeout = 5000;
-    }
+    m_corpse_use_timeout = 1000 * pSettings->read_if_exists<u32>(section, "corpse_use_timeout", 5); // default is 5000 (5 * 1000)
+    m_min_sleep_time = 1000 * pSettings->read_if_exists<u32>(section, "min_sleep_time", 5); // default is 5000 (5 * 1000)
+    m_min_life_time = 1000 * pSettings->read_if_exists<u32>(section, "min_life_time", 10); // default is 10000 (10 * 1000)
+    m_drive_out_time = 1000 * pSettings->read_if_exists<u32>(section, "drive_out_time", 10); // default is 10000 (10 * 1000)
 
-    if (pSettings->line_exist(section, "min_sleep_time"))
-    {
-        m_min_sleep_time = 1000 * pSettings->r_u32(section, "min_sleep_time");
-    }
-    else
-    {
-        m_min_sleep_time = 5000;
-    }
+    min_move_dist = pSettings->read_if_exists<u32>(section, "min_move_dist", 5);
+    max_move_dist = pSettings->read_if_exists<u32>(section, "max_move_dist", 7);
 
-    if (pSettings->line_exist(section, "min_life_time"))
-    {
-        m_min_life_time = 1000 * pSettings->r_u32(section, "min_life_time");
-    }
-    else
-    {
-        m_min_life_time = 10000;
-    }
-
-    if (pSettings->line_exist(section, "drive_out_time"))
-    {
-        m_drive_out_time = 1000 * pSettings->r_u32(section, "drive_out_time");
-    }
-    else
-    {
-        m_drive_out_time = 10000;
-    }
-
-    if (pSettings->line_exist(section, "min_move_dist"))
-    {
-        min_move_dist = pSettings->r_u32(section, "min_move_dist");
-        ;
-    }
-    if (pSettings->line_exist(section, "max_move_dist"))
-    {
-        max_move_dist = pSettings->r_u32(section, "max_move_dist");
-        ;
-    }
     if (max_move_dist < min_move_dist)
     {
         min_move_dist = u32(5);
