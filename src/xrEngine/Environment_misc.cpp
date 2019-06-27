@@ -695,7 +695,10 @@ void CEnvironment::load_weathers()
             for (u32 envIdx = 0; envIdx < envCount; ++envIdx)
             {
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
+                {
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
+                    env.back()->old_style = true;
+                }
             }
         }
     }
@@ -767,7 +770,10 @@ void CEnvironment::load_weather_effects()
             for (u32 envIdx = 0; envIdx < envCount; ++envIdx)
             {
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
+                {
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
+                    env.back()->old_style = true;
+                }
             }
 
             env.emplace_back(create_descriptor("24:00:00", nullptr));
