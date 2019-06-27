@@ -171,10 +171,14 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 
         .def("clear_game_news", &CScriptGameObject::ClearGameNews)
 
-        .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))(
-                                      &CScriptGameObject::AddIconedTalkMessage_old)) // old version, must remove!
-        .def("give_talk_message2",
-            (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))(&CScriptGameObject::AddIconedTalkMessage))
+        .def("give_talk_message", (void (CScriptGameObject::*)(cpcstr, cpcstr, Frect, cpcstr))
+            (&CScriptGameObject::AddIconedTalkMessage))
+
+        .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))
+            (&CScriptGameObject::AddIconedTalkMessage_old)) // old version, must remove!
+
+        .def("give_talk_message2", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))
+            (&CScriptGameObject::AddIconedTalkMessage))
 
         .def("has_info", &CScriptGameObject::HasInfo)
         .def("dont_has_info", &CScriptGameObject::DontHasInfo)

@@ -245,6 +245,24 @@ void CUITalkDialogWnd::AddIconedAnswer(LPCSTR caption, LPCSTR text, LPCSTR textu
     Actor()->game_news_registry->registry().objects().push_back(news_data);
 }
 
+void CUITalkDialogWnd::AddIconedAnswer(cpcstr text, cpcstr texture_name, Frect texture_rect, cpcstr templ_name)
+{
+    CUIAnswerItemIconed* itm = new CUIAnswerItemIconed(m_uiXml, templ_name);
+    itm->Init(text, texture_name, texture_rect);
+    UIAnswersList->AddWindow(itm, true);
+    UIAnswersList->ScrollToEnd();
+
+    GAME_NEWS_DATA news_data;
+    news_data.news_caption = text;
+    news_data.news_text = "";
+
+    news_data.m_type = GAME_NEWS_DATA::eTalk;
+    news_data.texture_name = texture_name;
+    news_data.receive_time = Level().GetGameTime();
+
+    Actor()->game_news_registry->registry().objects().push_back(news_data);
+}
+
 void CUITalkDialogWnd::SetOsoznanieMode(bool b)
 {
     if (UIOurIcon)
@@ -377,6 +395,15 @@ void CUIAnswerItemIconed::Init(LPCSTR text, LPCSTR name, LPCSTR texture_name)
 
     inherited::Init(res.c_str(), "");
     m_icon->InitTexture(texture_name);
+    m_icon->TextureOn();
+    m_icon->SetStretchTexture(true);
+}
+
+void CUIAnswerItemIconed::Init(cpcstr text, cpcstr texture_name, Frect texture_rect)
+{
+    inherited::Init(text, "");
+    m_icon->InitTexture(texture_name);
+    m_icon->SetTextureRect(texture_rect);
     m_icon->TextureOn();
     m_icon->SetStretchTexture(true);
 }

@@ -50,6 +50,7 @@ public:
     void SwitchToTrade();
     void SwitchToUpgrade();
     void AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
+    void AddIconedMessage(cpcstr text, cpcstr texture_name, Frect texture_rect, cpcstr templ_name);
 
 protected:
     //диалог
