@@ -42,9 +42,17 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     m_uiXml = new CUIXml();
     m_uiXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TALK_XML);
 
-    CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this);
+    CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this, false);
 
-    UIOurIcon = UIHelper::CreateStatic(*m_uiXml, "right_character_icon", this, false);
+    UIStaticTop = UIHelper::CreateStatic(*m_uiXml, "top_background", this, false);
+    UIStaticBottom = UIHelper::CreateStatic(*m_uiXml, "bottom_background", this, false);
+
+    pcstr ourTag = "right_character_icon";
+    pcstr othersTag = "left_character_icon";
+    if (ShadowOfChernobylMode)
+        std::swap(ourTag, othersTag);
+
+    UIOurIcon = UIHelper::CreateStatic(*m_uiXml, ourTag, this, false);
     if (UIOurIcon)
     {
         UIOurIcon->AttachChild(&UICharacterInfoLeft);
@@ -52,7 +60,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
             TALK_CHARACTER_XML, TRADE_CHARACTER_XML);
     }
 
-    UIOthersIcon = UIHelper::CreateStatic(*m_uiXml, "left_character_icon", this, false);
+    UIOthersIcon = UIHelper::CreateStatic(*m_uiXml, othersTag, this, false);
     if (UIOthersIcon)
     {
         UIOthersIcon->AttachChild(&UICharacterInfoRight);
@@ -67,11 +75,29 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     UIDialogFrameBottom = UIHelper::CreateStatic(*m_uiXml, "frame_bottom", this, false);
     if (UIDialogFrameBottom)
         questionsParent = UIDialogFrameBottom;
+    else
+    {
+        if (m_uiXml->NavigateToNode("frame_line_window", 1))
+        {
+            // XXX: Don't replace this with UI helper, until it's missing needed functionality to select the index
+            UIOurPhrasesFrame = new CUIFrameLineWnd();
+            UIOurPhrasesFrame->SetAutoDelete(true);
+            AttachChild(UIOurPhrasesFrame);
+            CUIXmlInitBase::InitFrameLine(*m_uiXml, "frame_line_window", 1, UIOurPhrasesFrame); // index for field is 1 (one) !!!
+            questionsParent = UIOurPhrasesFrame;
+        }
+    }
 
     // Main dialog frame
     UIDialogFrameTop = UIHelper::CreateStatic(*m_uiXml, "frame_top", this, false);
     if (UIDialogFrameTop)
         answersParent = UIDialogFrameTop;
+    else
+    {
+        UIDialogFrame = UIHelper::CreateFrameLine(*m_uiXml, "frame_line_window", this, false);
+        if (UIDialogFrame)
+            answersParent = UIDialogFrame;
+    }
 
     // Answers
     UIAnswersList = UIHelper::CreateScrollView(*m_uiXml, "answers_list", answersParent);
@@ -111,9 +137,6 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     Register(&UIToTradeButton);
     AddCallbackStr("question_item", LIST_ITEM_CLICKED, CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnQuestionClicked));
 
-    // XXX: Support stringized (trade_btn, upgrade_btn, exit_btn) callbacks
-    // To support it we just should check that it doesn't called twice
-    //AddCallbackStr("trade_btn", BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnTradeClicked));
     AddCallback(&UIToTradeButton, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnTradeClicked));
 
     //AddCallbackStr("upgrade_btn", BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnUpgradeClicked));
@@ -121,7 +144,6 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     if (UIToExitButton)
     {
         AddCallback(UIToExitButton, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnExitClicked));
-        //AddCallbackStr("exit_btn", BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnExitClicked));
     }
 }
 
@@ -275,6 +297,8 @@ void CUITalkDialogWnd::SetOsoznanieMode(bool b)
 
     if (UIDialogFrameTop)
         UIDialogFrameTop->Show(!b);
+    else if (UIDialogFrame)
+        UIDialogFrame->Show(!b);
 
     UIToTradeButton.Show(!b);
     if (mechanic_mode)

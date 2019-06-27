@@ -36,6 +36,12 @@ public:
     shared_str m_ClickedQuestionID;
 
     // Dialog interface elements
+    CUIStatic* UIStaticTop;
+    CUIStatic* UIStaticBottom;
+
+    CUIFrameLineWnd* UIDialogFrame;
+    CUIFrameLineWnd* UIOurPhrasesFrame;
+
     CUIStatic* UIDialogFrameTop;
     CUIStatic* UIDialogFrameBottom;
 
