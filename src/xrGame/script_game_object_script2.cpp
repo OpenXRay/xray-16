@@ -223,6 +223,11 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("skip_transfer_enemy", &CScriptGameObject::skip_transfer_enemy)
         .def("set_home", (void (CScriptGameObject::*)(LPCSTR, float, float, bool, float))(&CScriptGameObject::set_home))
         .def("set_home", (void (CScriptGameObject::*)(u32, float, float, bool, float))(&CScriptGameObject::set_home))
+        .def("set_home", +[](CScriptGameObject* self, pcstr name, float r_min, float r_max, bool aggressive)
+        {
+            constexpr float defaultMiddleRadius = 20; // taken from COP mob_home.script
+            self->set_home(name, r_min, r_max, aggressive, defaultMiddleRadius);
+        })
         .def("remove_home", &CScriptGameObject::remove_home)
         .def("berserk", &CScriptGameObject::berserk)
         .def("can_script_capture", &CScriptGameObject::can_script_capture)
