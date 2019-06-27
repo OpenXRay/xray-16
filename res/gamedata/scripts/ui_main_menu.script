@@ -1,0 +1,362 @@
+-- File:        UI_MAIN_MENU.SCRIPT
+-- Description: Load Dialog for STALKER
+-- Created:     28.10.2004
+-- Lasd edit:	18.01.2006
+-- Copyright:   2004 GSC Game World
+-- Author:      Serhiy Vynnychenko (narrator@gsc-game.kiev.ua)
+-- Version:     0.9
+
+class "main_menu" (CUIScriptWnd)
+
+function main_menu:__init() super()
+	self.mbox_mode = 0
+    self:InitControls()
+    self:InitCallBacks()
+    xr_s.on_main_menu_on()     						 --' Distemper 03.2008 --
+end
+
+function main_menu:__finalize()
+end
+
+function main_menu:InitControls()
+	self:SetWndRect					(Frect():set(0,0,1024,768))
+
+    local xml						= CScriptXmlInit()
+    xml:ParseFile					("ui_mm_main.xml")
+
+    xml:InitStatic					("background", self)
+    self.shniaga					= xml:InitMMShniaga("shniaga_wnd",self);
+
+	self.message_box				= CUIMessageBoxEx()
+	self:Register					(self.message_box, "msg_box")
+
+	local _ver = xml:InitStatic		("static_version",self)
+	local mm						= _G.main_menu.get_main_menu()
+	_ver:TextControl():SetText		("ver. " .. mm:GetGSVer())
+
+    self.l_mgr = mm:GetLoginMngr()
+    self.acc_mgr = mm:GetAccountMngr()
+    self.profile_store = mm:GetProfileStore()
+    self.gs_profile = self.l_mgr:get_current_profile()
+
+    if (self.gs_profile and not(level.present())) then
+		self.shniaga:ShowPage(CUIMMShniaga.epi_new_network_game) --fake
+		self.shniaga:SetPage(CUIMMShniaga.epi_main, "ui_mm_main.xml", "menu_main_logout")
+		self.shniaga:ShowPage(CUIMMShniaga.epi_main)
+    end
+end
+
+function main_menu:Show(f)
+	self.shniaga:SetVisibleMagnifier(f)
+end
+
+
+function main_menu:InitCallBacks()
+	-- new game
+	self:AddCallback("btn_novice",		ui_events.BUTTON_CLICKED,				self.OnButton_new_novice_game,		self)
+	self:AddCallback("btn_stalker",		ui_events.BUTTON_CLICKED,				self.OnButton_new_stalker_game,		self)
+	self:AddCallback("btn_veteran",		ui_events.BUTTON_CLICKED,				self.OnButton_new_veteran_game,		self)
+	self:AddCallback("btn_master",		ui_events.BUTTON_CLICKED,				self.OnButton_new_master_game,		self)
+	self:AddCallback("btn_spawn",		ui_events.BUTTON_CLICKED,				self.OnButton_load_spawn,			self)
+	-- options
+	self:AddCallback("btn_options",     ui_events.BUTTON_CLICKED,				self.OnButton_options_clicked,		self)
+	-- load
+	self:AddCallback("btn_load",        ui_events.BUTTON_CLICKED,				self.OnButton_load_clicked,			self)
+	-- save
+	self:AddCallback("btn_save",		ui_events.BUTTON_CLICKED,				self.OnButton_save_clicked,			self)
+	-- multiplayer
+
+	self:AddCallback("btn_net_game",	ui_events.BUTTON_CLICKED,				self.OnButton_network_game_clicked,	self)
+	self:AddCallback("btn_internet",	ui_events.BUTTON_CLICKED,				self.OnButton_internet_clicked,		self)
+	self:AddCallback("btn_localnet",	ui_events.BUTTON_CLICKED,				self.OnButton_localnet_clicked,		self)
+	self:AddCallback("btn_multiplayer", ui_events.BUTTON_CLICKED,				self.OnButton_multiplayer_clicked,	self)
+	self:AddCallback("btn_logout",		ui_events.BUTTON_CLICKED,				self.OnButton_logout_clicked,		self)
+
+	-- quit
+	self:AddCallback("btn_quit",		ui_events.BUTTON_CLICKED,				self.OnButton_quit_clicked,			self)
+	self:AddCallback("btn_quit_to_mm",	ui_events.BUTTON_CLICKED,				self.OnButton_disconnect_clicked,	self)
+	self:AddCallback("btn_ret",			ui_events.BUTTON_CLICKED,				self.OnButton_return_game,			self)
+	self:AddCallback("btn_lastsave",	ui_events.BUTTON_CLICKED,				self.OnButton_last_save,			self)
+	self:AddCallback("btn_credits",		ui_events.BUTTON_CLICKED,				self.OnButton_credits_clicked,		self)
+	-- message box
+	self:AddCallback("msg_box",     ui_events.MESSAGE_BOX_OK_CLICKED,		self.OnMsgOk,						self)
+	self:AddCallback("msg_box",     ui_events.MESSAGE_BOX_CANCEL_CLICKED,	self.OnMsgCancel,					self)
+	self:AddCallback("msg_box",     ui_events.MESSAGE_BOX_YES_CLICKED,		self.OnMsgYes,						self)
+	self:AddCallback("msg_box",     ui_events.MESSAGE_BOX_NO_CLICKED,		self.OnMsgNo,						self)
+	self:AddCallback("msg_box",			ui_events.MESSAGE_BOX_QUIT_GAME_CLICKED,self.OnMessageQuitGame,				self)
+	self:AddCallback("msg_box",			ui_events.MESSAGE_BOX_QUIT_WIN_CLICKED,	self.OnMessageQuitWin,				self)
+
+	self:Register(self, "self")
+	self:AddCallback("self",	ui_events.MAIN_MENU_RELOADED, self.OnMenuReloaded, self)
+end
+function main_menu:OnMsgOk()
+	self.mbox_mode = 0
+end
+
+function main_menu:OnMsgCancel()
+	self.mbox_mode = 0
+end
+
+function main_menu:OnMsgYes()
+
+	if 	self.mbox_mode == 1 then
+		self:LoadLastSave()
+	end
+
+	self.mbox_mode = 0
+end
+
+function main_menu:OnMsgNo()
+	self.mbox_mode = 0
+end
+
+function main_menu:LoadLastSave()
+	local					console = get_console()
+	console:execute			("main_menu off")
+	console:execute			("load_last_save")
+end
+
+function main_menu:OnButton_last_save()
+	if ( alife() == nil) then
+		self:LoadLastSave	()
+		return
+	end
+
+	if ( (db.actor ~= nil) and (db.actor:alive() == false) ) then
+		self:LoadLastSave	()
+		return
+	end
+
+	self.mbox_mode			= 1
+	self.message_box:InitMessageBox	("message_box_confirm_load_save")
+	self.message_box:ShowDialog(true)
+end
+
+function main_menu:OnButton_credits_clicked()
+--	local console = get_console()
+--	console:execute("main_menu off")
+	game.start_tutorial("credits_seq")
+end
+
+function main_menu:OnButton_quit_clicked()
+	self.message_box:InitMessageBox("message_box_quit_windows")
+	self.message_box:ShowDialog(true)
+end
+
+
+function main_menu:OnButton_disconnect_clicked()
+	self.message_box:InitMessageBox("message_box_quit_game")
+
+	if (level.game_id() ~= 1) then
+		self.message_box:SetText("ui_mm_disconnect_message")	-- MultiPlayer
+	else
+		self.message_box:SetText("ui_mm_quit_game_message")		-- SinglePlayer
+	end
+	self.message_box:ShowDialog(true)
+end
+
+function main_menu:OnMessageQuitGame()
+	local console = get_console()
+	console:execute("disconnect")
+end
+
+function main_menu:OnMessageQuitWin()
+	local console = get_console()
+	console:execute("quit")
+end
+
+function main_menu:OnButton_return_game()
+	local console = get_console()
+	console:execute("main_menu off")
+	xr_s.on_main_menu_off()      						--' Distemper 03.2008 --
+end
+
+function main_menu:OnButton_new_novice_game()
+	local console = get_console()
+	console:execute("g_game_difficulty gd_novice")
+	self:StartGame()
+end
+
+function main_menu:OnButton_new_stalker_game()
+	local console = get_console()
+	console:execute("g_game_difficulty gd_stalker")
+	self:StartGame()
+end
+
+function main_menu:OnButton_new_veteran_game()
+	local console = get_console()
+	console:execute("g_game_difficulty gd_veteran")
+	self:StartGame()
+end
+
+function main_menu:OnButton_new_master_game()
+	local console = get_console()
+	console:execute("g_game_difficulty gd_master")
+	self:StartGame()
+end
+
+function main_menu:StartGame()
+	local console = get_console()
+
+	if (alife() ~= nil) then
+		console:execute	("disconnect")
+	end
+	device():pause(false)
+	console:execute("start server(all/single/alife/new) client(localhost)")
+	console:execute("main_menu off")
+end
+
+function main_menu:OnButton_load_spawn()
+	if self.spawn_dlg == nil then
+		self.spawn_dlg = ui_spawn_dialog.spawn_dialog()
+		self.spawn_dlg.owner = self
+	end
+
+	self.spawn_dlg:ShowDialog(true)
+	self:HideDialog()
+	self:Show(false)
+end
+
+function main_menu:OnButton_save_clicked()
+	if self.save_dlg == nil then
+		self.save_dlg = ui_save_dialog.save_dialog()
+		self.save_dlg.owner = self
+	end
+
+	self.save_dlg:FillList()
+	self.save_dlg:ShowDialog(true)
+	self:HideDialog()
+	self:Show(false)
+end
+
+function main_menu:OnButton_options_clicked()
+	if self.opt_dlg == nil then
+		self.opt_dlg = ui_mm_opt_main.options_dialog()
+		self.opt_dlg.owner = self
+	end
+
+	self.opt_dlg:SetCurrentValues()
+	self.opt_dlg:ShowDialog(true)
+	self:HideDialog()
+	self:Show(false)
+end
+
+function main_menu:OnButton_load_clicked()
+	if self.load_dlg ==nil then
+		self.load_dlg = ui_load_dialog.load_dialog()
+		self.load_dlg.owner = self
+	end
+
+	self.load_dlg:FillList()
+	self.load_dlg:ShowDialog(true)
+	self:HideDialog()
+	self:Show(false)
+end
+
+function main_menu:OnButton_network_game_clicked()
+	self.shniaga:ShowPage(CUIMMShniaga.epi_new_network_game)
+end
+
+function main_menu:OnButton_multiplayer_clicked()
+	-- assert(self.gs_profile)
+
+	if not(self.mp_dlg) then
+        self.mp_dlg = ui_mp_main.mp_main(self.gs_profile:online())
+        self.mp_dlg.owner = self
+		self.mp_dlg:OnRadio_NetChanged()
+		if (self.mp_dlg.online) then
+			self.mp_dlg.dlg_profile:InitBestScores()
+			self.mp_dlg.dlg_profile:FillRewardsTable()
+		end
+    end
+    self.mp_dlg:UpdateControls()
+    self.mp_dlg:ShowDialog(true)
+
+    self:HideDialog()
+	self:Show(false)
+
+	local console			= get_console()
+	console:execute			("check_for_updates 0")
+end
+
+function main_menu:OnButton_logout_clicked()
+	-- assert(self.gs_profile)
+	self.shniaga:ShowPage(CUIMMShniaga.epi_new_network_game) --fake
+	self.l_mgr:logout()
+	self.gs_profile = nil
+	self.mp_dlg		= nil
+	self.shniaga:SetPage(CUIMMShniaga.epi_main, "ui_mm_main.xml", "menu_main")
+	self.shniaga:ShowPage(CUIMMShniaga.epi_main)
+end
+
+function main_menu:OnButton_internet_clicked()
+    if not(self.gs_dlg) then
+        self.gs_dlg = ui_mm_mp_gamespy.gamespy_page()
+        self.gs_dlg.owner = self
+    end
+    self.gs_dlg:ShowLoginPage()
+    self.gs_dlg:ShowDialog(true)
+
+	self:HideDialog()
+	self:Show(false)
+
+	local console			= get_console()
+	console:execute			("check_for_updates 0")
+end
+
+function main_menu:OnButton_localnet_clicked()
+	if not(self.ln_dlg) then
+        self.ln_dlg = ui_mm_mp_localnet.localnet_page()
+        self.ln_dlg.owner = self
+        self.ln_dlg.lp_nickname:SetText(self.l_mgr:get_nick_from_registry())
+        self.ln_dlg.lp_check_remember_me:SetCheck(self.l_mgr:get_remember_me_from_registry())
+    end
+    self.ln_dlg:ShowDialog(true)
+
+	self:HideDialog()
+	self:Show(false)
+
+	local console			= get_console()
+	console:execute			("check_for_updates 0")
+end
+
+function main_menu:Dispatch(cmd, param)  --virtual function
+	if cmd == 2 then
+		self:OnButton_multiplayer_clicked()
+	end
+	return true
+end
+
+function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	local bind = dik_to_bind(dik)
+	local console = get_console()
+
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			if level.present() and
+				(	((db.actor ~= nil)and(db.actor:alive())) or
+					(false==IsGameTypeSingle())
+				) then
+				self.OnButton_return_game()                      --' xStream 02.2008
+				-- console:execute("main_menu off")							   --' xStream 02.2008
+			end
+		end
+
+--		if dik == DIK_keys.DIK_S then
+--			self:OnButton_load_spawn()
+
+--		else
+		if dik == DIK_keys.DIK_Q then
+			self:OnMessageQuitWin()
+		end
+
+	end
+
+	return true
+end
+
+function main_menu:OnMenuReloaded()
+	self:OnButton_options_clicked()
+	self.opt_dlg:OnMenuReloaded()
+end
