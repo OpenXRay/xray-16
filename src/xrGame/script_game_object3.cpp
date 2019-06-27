@@ -572,7 +572,7 @@ void CScriptGameObject::set_desired_direction(const Fvector* desired_direction)
         if (fsimilar(desired_direction->magnitude(), 0.f))
             GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                 "CAI_Stalker : [%s] set_desired_direction - you passed zero direction!", stalker->cName().c_str());
-        else
+        else if (!ClearSkyMode && !ShadowOfChernobylMode)
         {
             if (!fsimilar(desired_direction->magnitude(), 1.f))
                 GEnv.ScriptEngine->script_log(LuaMessageType::Error,
@@ -581,7 +581,8 @@ void CScriptGameObject::set_desired_direction(const Fvector* desired_direction)
         }
 
         Fvector direction = *desired_direction;
-        direction.normalize_safe();
+        if (!ClearSkyMode && !ShadowOfChernobylMode)
+            direction.normalize_safe();
         stalker->movement().set_desired_direction(&direction);
     }
 }
@@ -748,11 +749,13 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector* 
     {
         if ((sight_type == SightManager::eSightTypeDirection) && vector3d && (_abs(vector3d->magnitude() - 1.f) > .01f))
         {
-#ifndef MASTER_GOLD
-            Msg("~ non-normalized direction passed [%f][%f][%f]", VPUSH(*vector3d));
-#endif
             if (!ClearSkyMode && !ShadowOfChernobylMode)
+            {
+#ifndef MASTER_GOLD
+                Msg("~ non-normalized direction passed [%f][%f][%f]", VPUSH(*vector3d));
+#endif
                 vector3d->normalize();
+            }
         }
 
         stalker->sight().setup(sight_type, vector3d);
@@ -780,11 +783,13 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector& 
     {
         if ((sight_type == SightManager::eSightTypeDirection) && (_abs(vector3d.magnitude() - 1.f) > .01f))
         {
-#ifndef MASTER_GOLD
-            Msg("~ non-normalized direction passed [%f][%f][%f]", VPUSH(vector3d));
-#endif
             if (!ClearSkyMode && !ShadowOfChernobylMode)
+            {
+#ifndef MASTER_GOLD
+                Msg("~ non-normalized direction passed [%f][%f][%f]", VPUSH(vector3d));
+#endif
                 vector3d.normalize();
+            }
         }
 
         stalker->sight().setup(sight_type, vector3d, torso_look);
