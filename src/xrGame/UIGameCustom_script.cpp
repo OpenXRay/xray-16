@@ -15,6 +15,10 @@ SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
         class_<CUIGameCustom, CDialogHolder>("CUIGameCustom")
             .def("AddDialogToRender", &CUIGameCustom::AddDialogToRender)
             .def("RemoveDialogToRender", &CUIGameCustom::RemoveDialogToRender)
+            .def("AddCustomStatic", +[](CUIGameCustom* self, pcstr id, bool singleInstance)
+            {
+                return self->AddCustomStatic(id, singleInstance);
+            })
             .def("AddCustomStatic", &CUIGameCustom::AddCustomStatic)
             .def("RemoveCustomStatic", &CUIGameCustom::RemoveCustomStatic)
             .def("HideActorMenu", &CUIGameCustom::HideActorMenu)
