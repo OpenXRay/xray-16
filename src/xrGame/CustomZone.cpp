@@ -78,6 +78,7 @@ void CCustomZone::Load(LPCSTR section)
     m_zone_flags.set(eIgnoreNonAlive, pSettings->r_bool(section, "ignore_nonalive"));
     m_zone_flags.set(eIgnoreSmall, pSettings->r_bool(section, "ignore_small"));
     m_zone_flags.set(eIgnoreArtefact, pSettings->r_bool(section, "ignore_artefacts"));
+    m_zone_flags.set(eVisibleByDetector, pSettings->read_if_exists<bool>(section, "visible_by_detector", false));
 
     //загрузить времена для зоны
     m_StateTime[eZoneStateIdle] = -1;

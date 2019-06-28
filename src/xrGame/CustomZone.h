@@ -106,7 +106,9 @@ protected:
         eIdleLightR1 = (1 << 15),
         eBoltEntranceParticles = (1 << 16),
         eUseSecondaryHit = (1 << 17),
+        eVisibleByDetector = (1 << 18),
     };
+
     u32 m_owner_id;
     u32 m_ttl;
     Flags32 m_zone_flags;
