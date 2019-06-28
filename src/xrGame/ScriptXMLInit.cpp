@@ -276,6 +276,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (),
             .def("InitEditBox", &CScriptXmlInit::InitEditBox)
             .def("InitStatic", &CScriptXmlInit::InitStatic)
             .def("InitTextWnd", &CScriptXmlInit::InitTextWnd)
+            .def("InitLabel", &CScriptXmlInit::InitStatic)
             .def("InitAnimStatic", &CScriptXmlInit::InitAnimStatic)
             .def("InitSleepStatic", &CScriptXmlInit::InitSleepStatic)
             .def("Init3tButton", &CScriptXmlInit::Init3tButton)
