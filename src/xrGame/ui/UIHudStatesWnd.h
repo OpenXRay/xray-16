@@ -23,7 +23,9 @@ private:
     CUIStatic* m_back;
     CUIStatic* m_back_v;
     CUIStatic* m_back_over_arrow;
+    CUIStatic* m_static_health;
     CUIStatic* m_static_armor;
+    CUIStatic* m_static_weapon;
 
     xr_map<ALife::EInfluenceType, CUIStatic*> m_resist_back;
     xr_map<ALife::EInfluenceType, CUIStatic*> m_indik;

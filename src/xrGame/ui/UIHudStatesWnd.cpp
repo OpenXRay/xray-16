@@ -107,11 +107,26 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     }
 
     m_back_over_arrow = UIHelper::CreateStatic(xml, "back_over_arrow", this, false);
+    m_static_health = UIHelper::CreateStatic(xml, "static_health", this, false);
     m_static_armor = UIHelper::CreateStatic(xml, "static_armor", this, false);
+    m_static_weapon = UIHelper::CreateStatic(xml, "static_weapon", this, false);;
 
-    m_ui_health_bar = UIHelper::CreateProgressBar(xml, "progress_bar_health", this);
-    m_ui_stamina_bar = UIHelper::CreateProgressBar(xml, "progress_bar_stamina", this);
-    m_ui_armor_bar = UIHelper::CreateProgressBar(xml, "progress_bar_armor", this, false);
+    CUIWindow* healthBarParent = this;
+    CUIWindow* armorBarParent = this;
+    CUIWindow* weaponsParent = this;
+    if (m_static_health && m_static_armor)
+    {
+        healthBarParent = m_static_health;
+        armorBarParent = m_static_armor;
+    }
+    if (m_static_weapon)
+    {
+        weaponsParent = m_static_weapon;
+    }
+
+    m_ui_health_bar = UIHelper::CreateProgressBar(xml, "progress_bar_health", healthBarParent);
+    m_ui_stamina_bar = UIHelper::CreateProgressBar(xml, "progress_bar_stamina", this, false);
+    m_ui_armor_bar = UIHelper::CreateProgressBar(xml, "progress_bar_armor", armorBarParent, false);
 
     if (m_static_armor || m_ui_armor_bar)
     {
@@ -133,7 +148,7 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
 
     m_lanim_name = xml.ReadAttrib("indik_rad", 0, "light_anim", "");
 
-    m_ui_weapon_sign_ammo = UIHelper::CreateStatic(xml, "static_ammo", this, false);
+    m_ui_weapon_sign_ammo = UIHelper::CreateStatic(xml, "static_ammo", weaponsParent, false);
     //m_ui_weapon_sign_ammo->SetEllipsis( CUIStatic::eepEnd, 2 );
 
     m_ui_weapon_cur_ammo = UIHelper::CreateTextWnd(xml, "static_cur_ammo", this, false);
@@ -143,7 +158,7 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_fire_mode = UIHelper::CreateTextWnd(xml, "static_fire_mode", this);
     m_ui_grenade = UIHelper::CreateTextWnd(xml, "static_grenade", this, false);
 
-    m_ui_weapon_icon = UIHelper::CreateStatic(xml, "static_wpn_icon", this);
+    m_ui_weapon_icon = UIHelper::CreateStatic(xml, "static_wpn_icon", weaponsParent);
     m_ui_weapon_icon->SetShader(InventoryUtilities::GetEquipmentIconsShader());
     //	m_ui_weapon_icon->Enable	( false );
     m_ui_weapon_icon_rect = m_ui_weapon_icon->GetWndRect();
@@ -211,7 +226,7 @@ void CUIHudStatesWnd::Load_section_type(ALife::EInfluenceType type, LPCSTR secti
     {
         m_zone_max_power[type] = 1.0f;
     }*/
-    m_zone_feel_radius[type] = pSettings->r_float(section, "zone_radius");
+    m_zone_feel_radius[type] = pSettings->read_if_exists<float>(section, "zone_radius", 1.0f);
     if (m_zone_feel_radius[type] <= 0.0f)
     {
         m_zone_feel_radius[type] = 1.0f;
@@ -220,7 +235,7 @@ void CUIHudStatesWnd::Load_section_type(ALife::EInfluenceType type, LPCSTR secti
     {
         m_zone_feel_radius_max = m_zone_feel_radius[type];
     }
-    m_zone_threshold[type] = pSettings->r_float(section, "threshold");
+    m_zone_threshold[type] = pSettings->read_if_exists<float>(section, "threshold", 0.05f);
 }
 
 void CUIHudStatesWnd::Update()
@@ -247,7 +262,7 @@ void CUIHudStatesWnd::UpdateHealth(CActor* actor)
     //		m_timer_1sec = Device.dwTimeGlobal;
     //	}
 
-    float cur_health = actor->GetfHealth();
+    const float cur_health = actor->GetfHealth();
     m_ui_health_bar->SetProgressPos(iCeil(cur_health * 100.0f * 35.f) / 35.f);
     if (_abs(cur_health - m_last_health) > m_health_blink)
     {
@@ -255,11 +270,14 @@ void CUIHudStatesWnd::UpdateHealth(CActor* actor)
         m_ui_health_bar->m_UIProgressItem.ResetColorAnimation();
     }
 
-    float cur_stamina = actor->conditions().GetPower();
-    m_ui_stamina_bar->SetProgressPos(iCeil(cur_stamina * 100.0f * 35.f) / 35.f);
-    if (!actor->conditions().IsCantSprint())
+    if (m_ui_stamina_bar)
     {
-        m_ui_stamina_bar->m_UIProgressItem.ResetColorAnimation();
+        const float cur_stamina = actor->conditions().GetPower();
+        m_ui_stamina_bar->SetProgressPos(iCeil(cur_stamina * 100.0f * 35.f) / 35.f);
+        if (!actor->conditions().IsCantSprint())
+        {
+            m_ui_stamina_bar->m_UIProgressItem.ResetColorAnimation();
+        }
     }
 
     if (m_static_armor && m_ui_armor_bar)
