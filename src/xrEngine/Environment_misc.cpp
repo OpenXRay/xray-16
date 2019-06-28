@@ -251,6 +251,8 @@ void CEnvAmbient::load(
 //-----------------------------------------------------------------------------
 CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(identifier)
 {
+    old_style = false;
+
     exec_time = 0.0f;
     exec_time_loaded = 0.0f;
 
