@@ -446,6 +446,11 @@ void player_hud::load(const shared_str& player_hud_sect)
         GEnv.Render->model_Delete(v);
     }
 
+    if (ShadowOfChernobylMode && !pSettings->line_exist(player_hud_sect, "visual"))
+    {
+        return;
+    }
+
     m_sect_name = player_hud_sect;
     const shared_str& model_name = pSettings->r_string(player_hud_sect, "visual");
     m_model = smart_cast<IKinematicsAnimated*>(GEnv.Render->model_Create(model_name.c_str()));
@@ -577,9 +582,12 @@ void player_hud::update(const Fmatrix& cam_trans)
     m_transform.mul(trans, m_attach_offset);
     // insert inertion here
 
-    m_model->UpdateTracks();
-    m_model->dcast_PKinematics()->CalculateBones_Invalidate();
-    m_model->dcast_PKinematics()->CalculateBones(TRUE);
+    if (m_model)
+    {
+        m_model->UpdateTracks();
+        m_model->dcast_PKinematics()->CalculateBones_Invalidate();
+        m_model->dcast_PKinematics()->CalculateBones(TRUE);
+    }
 
     if (m_attached_items[0])
         m_attached_items[0]->update(true);

@@ -159,6 +159,9 @@ void Manager::load_all_inventory()
 {
     LPCSTR items_section = "upgraded_inventory";
 
+    if (!pSettings->section_exist(items_section) && ShadowOfChernobylMode)
+        return;
+
     VERIFY2(pSettings->section_exist(items_section), make_string("Section [%s] does not exist !", items_section));
     VERIFY2(pSettings->line_count(items_section), make_string("Section [%s] is empty !", items_section));
 
@@ -194,6 +197,10 @@ void Manager::load_all_inventory()
 void Manager::load_all_properties()
 {
     LPCSTR properties_section = "upgrades_properties";
+
+    if (!pSettings->section_exist(properties_section) && ShadowOfChernobylMode)
+        return;
+
 
     VERIFY2(
         pSettings->section_exist(properties_section), make_string("Section [%s] does not exist !", properties_section));

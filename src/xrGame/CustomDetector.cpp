@@ -199,8 +199,8 @@ void CCustomDetector::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    m_fAfDetectRadius = pSettings->r_float(section, "af_radius");
-    m_fAfVisRadius = pSettings->r_float(section, "af_vis_radius");
+    m_fAfDetectRadius = pSettings->read_if_exists<float>(section, "af_radius", 30.0f);
+    m_fAfVisRadius = pSettings->read_if_exists<float>(section, "af_vis_radius", 2.0f);
     m_fDecayRate = READ_IF_EXISTS(pSettings, r_float, section, "decay_rate", 0.f); //Alundaio
     m_artefacts.load(section, "af");
 
