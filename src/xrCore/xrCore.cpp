@@ -9,6 +9,7 @@
 #pragma comment(lib, "winmm.lib")
 #elif defined(LINUX)
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <pwd.h>
 #include <unistd.h>
 #endif
@@ -243,11 +244,27 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         chdir(ApplicationPath);
         string_path tmp;
         xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
-        unlink(tmp);
-        symlink("/usr/share/openxray/fsgame.ltx", tmp);
+        struct stat statbuf;
+        memset(&statbuf, 0, sizeof(struct stat));
+
+        int res = lstat(tmp, &statbuf);
+
+        if(!S_ISLNK(statbuf.st_mode)) // If not symlink (original fsgame.ltx at first run), remove it
+            unlink(tmp);
+
+        if(-1 == res || !S_ISLNK(statbuf.st_mode))
+            symlink("/usr/share/openxray/fsgame.ltx", tmp);
+
         xr_sprintf(tmp, "%sgamedata", ApplicationPath);
-        unlink(tmp);
-        symlink("/usr/share/openxray/gamedata", tmp);
+
+        memset(&statbuf, 0, sizeof(struct stat));
+        res = lstat(tmp, &statbuf);
+
+        if(S_ISDIR(statbuf.st_mode)) // If folder (custom gamedata), remove it
+            rmdir(tmp);
+
+        if(-1 == res || !S_ISLNK(statbuf.st_mode))
+            symlink("/usr/share/openxray/gamedata", tmp);
 #endif
 
 #if defined(WINDOWS)
