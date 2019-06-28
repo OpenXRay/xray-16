@@ -75,6 +75,12 @@ void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const s
         m_texture = pLtx.r_string(sect_name, "texture");
         tmp = pLtx.r_fvector4(sect_name, "bound_rect");
     }
+    /// XXX: Check this case for Shadow of Chernobyl
+    /*else if (pLtx.line_exist(m_name, "texture"))
+    {
+        m_texture = pLtx.r_string(m_name, "texture");
+        tmp = pLtx.r_fvector4(m_name, "bound_rect");
+    }*/
     else
     {
         m_texture = "ui\\ui_nomap2";
