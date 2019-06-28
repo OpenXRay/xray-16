@@ -149,7 +149,7 @@ SDeclaration::~SDeclaration()
     RImplementation.Resources->_DeleteDecl(this);
     //	Release vertex layout
 #ifdef USE_OGL
-    glDeleteBuffers(1, &dcl);
+    glDeleteVertexArrays(1, &dcl);
 #elif defined(USE_DX10) || defined(USE_DX11)
     xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
     iLayout = vs_to_layout.begin();

@@ -14,6 +14,7 @@
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
+#include "Layers/xrRenderGL/glBufferPool.h"
 #else
 #include "FMesh.h"
 #include "FVisual.h"
@@ -483,17 +484,17 @@ void CModelPool::memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem
 
         if (vis_ptr == nullptr)
             continue;
-#if defined(USE_OGL)
+#ifdef USE_OGL
         GLint IB_size;
         GLint VB_size;
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vis_ptr->m_fast->p_rm_Indices);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (vis_ptr->m_fast->p_rm_Indices) ? vis_ptr->m_fast->p_rm_Indices->m_Buffer : 0);
         CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &IB_size));
 
         ib_mem_video += IB_size;
         ib_mem_system += IB_size;
 
-        glBindBuffer(GL_ARRAY_BUFFER, vis_ptr->m_fast->p_rm_Vertices);
+        glBindBuffer(GL_ARRAY_BUFFER, (vis_ptr->m_fast->p_rm_Vertices) ? vis_ptr->m_fast->p_rm_Vertices->m_Buffer : 0);
         CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &VB_size));
 
         vb_mem_video += VB_size;

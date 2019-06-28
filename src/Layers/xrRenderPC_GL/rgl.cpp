@@ -13,6 +13,7 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
+#include "Layers/xrRenderGL/glBufferPool.h"
 
 CRender RImplementation;
 
@@ -573,7 +574,7 @@ D3DVERTEXELEMENT9* CRender::getVB_Format(int id, BOOL _alt)
     return nDC[id].begin();
 }
 
-GLuint CRender::getVB(int id, BOOL _alt)
+IGLVertexBuffer* CRender::getVB(int id, BOOL _alt)
 {
     if (_alt)
     {
@@ -584,7 +585,7 @@ GLuint CRender::getVB(int id, BOOL _alt)
     return nVB[id];
 }
 
-GLuint CRender::getIB(int id, BOOL _alt)
+IGLIndexBuffer* CRender::getIB(int id, BOOL _alt)
 {
     if (_alt)
     {

@@ -684,6 +684,9 @@
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glBufferPool.cpp">
+      <Filter>dx9 to gl Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1123,6 +1126,9 @@
     </ClInclude>
     <ClInclude Include="blender_fxaa.h">
       <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderGL\glBufferPool.h">
+      <Filter>dx9 to gl Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

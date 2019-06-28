@@ -14,6 +14,9 @@
 #include "SH_Matrix.h"
 #include "SH_Constant.h"
 #include "SH_RT.h"
+#ifdef USE_OGL
+#include "Layers\xrRenderGL\glBufferPool.h"
+#endif // USE_OGL
 
 using sh_list = xr_vector<shared_str>;
 class CBlender_Compile;
@@ -81,6 +84,8 @@ struct ECORE_API resptrcode_geom : public resptr_base<SGeometry>
 #ifdef USE_OGL
     void create(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
     void create(u32 FVF, GLuint vb, GLuint ib);
+    void create(D3DVERTEXELEMENT9* decl, IGLVertexBuffer* vb, IGLIndexBuffer* ib);
+    void create(u32 FVF, IGLVertexBuffer* vb, IGLIndexBuffer* ib);
 #else
     void create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
     void create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);

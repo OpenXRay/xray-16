@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/Environment.h"
 #include "xrCore/FMesh.hpp"
 #include "FTreeVisual.h"
+#include "Layers/xrRenderGL/glBufferPool.h"
 
 shared_str m_xform;
 shared_str m_xform_v;
@@ -34,15 +34,9 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
         vCount = data->r_u32();
         vFormat = RImplementation.getVB_Format(ID);
 
-        VERIFY(NULL == p_rm_Vertices);
-
+        VERIFY(nullptr == p_rm_Vertices);
         p_rm_Vertices = RImplementation.getVB(ID);
-#ifdef USE_OGL
-        if (p_rm_Vertices)
-            bIsRefVertices = true;
-#else // USE_OGL
         p_rm_Vertices->AddRef();
-#endif // USE_OGL
 
         // indices
         dwPrimitives = 0;
@@ -51,14 +45,9 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
         iCount = data->r_u32();
         dwPrimitives = iCount / 3;
 
-        VERIFY(NULL == p_rm_Indices);
+        VERIFY(nullptr == p_rm_Indices);
         p_rm_Indices = RImplementation.getIB(ID);
-#ifdef USE_OGL
-        if (p_rm_Indices)
-            bIsRefIndices = true;
-#else // USE_OGL
         p_rm_Indices->AddRef();
-#endif // USE_OGL
     }
 
     // load tree-def
@@ -164,28 +153,14 @@ void FTreeVisual::Copy(dxRender_Visual* pSrc)
     FTreeVisual* pFrom = dynamic_cast<FTreeVisual*>(pSrc);
 
     PCOPY(rm_geom);
-
     PCOPY(p_rm_Vertices);
-#ifdef USE_OGL
-    if (p_rm_Vertices)
-        bIsRefVertices = true;
-#else // USE_OGL
     if (p_rm_Vertices)
         p_rm_Vertices->AddRef();
-#endif // USE_OGL
-
     PCOPY(vBase);
     PCOPY(vCount);
-
     PCOPY(p_rm_Indices);
-#ifdef USE_OGL
-    if (p_rm_Indices)
-        bIsRefIndices = true;
-#else // USE_OGL
     if (p_rm_Indices)
         p_rm_Indices->AddRef();
-#endif // USE_OGL
-
     PCOPY(iBase);
     PCOPY(iCount);
     PCOPY(dwPrimitives);

@@ -15,6 +15,7 @@
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
+#include "Layers/xrRenderGL/glBufferPool.h"
 
 class dxRender_Visual;
 
@@ -153,8 +154,8 @@ public:
     xr_vector<ref_shader> Shaders;
     typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
-    xr_vector<GLuint> nVB, xVB;
-    xr_vector<GLuint> nIB, xIB;
+    xr_vector<IGLVertexBuffer*> nVB, xVB;
+    xr_vector<IGLIndexBuffer*> nIB, xIB;
     xr_vector<dxRender_Visual*> Visuals;
     CPSLibrary PSLibrary;
 
@@ -224,8 +225,8 @@ public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
     D3DVERTEXELEMENT9* getVB_Format(int id, BOOL _alt = FALSE);
-    GLuint getVB(int id, BOOL _alt = FALSE);
-    GLuint getIB(int id, BOOL _alt = FALSE);
+    IGLVertexBuffer* getVB(int id, BOOL _alt = FALSE);
+    IGLIndexBuffer* getIB(int id, BOOL _alt = FALSE);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();

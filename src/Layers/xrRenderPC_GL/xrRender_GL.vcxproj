@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
     <ClCompile Include="..\xrRenderGL\GL Rain\glRainBlender.cpp" />
+    <ClCompile Include="..\xrRenderGL\glBufferPool.cpp" />
     <ClCompile Include="..\xrRenderGL\glHW.cpp" />
     <ClCompile Include="..\xrRenderGL\glBufferUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glDetailManager_VS.cpp" />
@@ -342,6 +343,7 @@
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h" />
+    <ClInclude Include="..\xrRenderGL\glBufferPool.h" />
     <ClInclude Include="..\xrRenderGL\glBufferUtils.h" />
     <ClInclude Include="..\xrRenderGL\glMinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderGL\glR_Backend_Runtime.h" />
