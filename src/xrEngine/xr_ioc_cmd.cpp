@@ -773,6 +773,12 @@ ENGINE_API int ps_r__Supersample = 1;
 
 void CCC_Register()
 {
+#ifdef DEBUG
+    const bool isDebugMode = true;
+#else // DEBUG
+    const bool isDebugMode = !!strstr(Core.Params, "-debug");
+#endif // DEBUG
+
     // General
     CMD1(CCC_Help, "help");
     CMD1(CCC_Quit, "quit");
@@ -804,14 +810,18 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_clear_bb", &psDeviceFlags, rsClearBB);
     CMD3(CCC_Mask, "rs_occlusion", &psDeviceFlags, rsOcclusion);
 
-    CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
     // CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175 );
-
     // CMD3(CCC_Mask, "rs_constant_fps", &psDeviceFlags, rsConstantFPS );
-    CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
-    CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
-    CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
-#endif
+#endif // DEBUG
+
+    // Console commands that are available with -debug key on release configuration and always available on mixed configuration
+    if (isDebugMode)
+    {
+        CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
+        CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
+        CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
+        CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
+    }
 
     // Render device states
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
