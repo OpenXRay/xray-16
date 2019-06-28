@@ -369,8 +369,8 @@ void CUIActorMenu::InitCallbacks()
     Register(m_takeall_button);
     Register(m_exit_button);
     Register(m_UIPropertiesBox);
-    VERIFY(m_pUpgradeWnd);
-    Register(m_pUpgradeWnd->m_btn_repair);
+    if (m_pUpgradeWnd)
+        Register(m_pUpgradeWnd->m_btn_repair);
 
     if (m_trade_button)
     {

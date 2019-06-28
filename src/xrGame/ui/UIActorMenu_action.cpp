@@ -387,16 +387,18 @@ void CUIActorMenu::OnMesBoxYes(CUIWindow*, void*)
     case mmInventory: break;
     case mmTrade: break;
     case mmUpgrade:
+    {
         if (m_repair_mode)
         {
             RepairEffect_CurItem();
             m_repair_mode = false;
         }
-        else
+        else if (m_pUpgradeWnd)
         {
             m_pUpgradeWnd->OnMesBoxYes();
         }
         break;
+    }
     case mmDeadBodySearch: break;
     default: R_ASSERT(0); break;
     }
