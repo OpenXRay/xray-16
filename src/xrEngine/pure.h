@@ -8,19 +8,12 @@ constexpr int REG_PRIORITY_HIGH = 0x33333333;
 constexpr int REG_PRIORITY_CAPTURE = 0x7fffffff;
 constexpr int REG_PRIORITY_INVALID = std::numeric_limits<int>::lowest();
 
-struct IPure
-{
-    virtual ~IPure() = default;
-    virtual void OnPure() = 0;
-};
-
 #define DECLARE_MESSAGE(name)\
-struct pure##name : IPure\
+struct pure##name\
 {\
     virtual void On##name() = 0;\
-private:\
-    void OnPure() override { On##name(); }\
-};
+    static ICF void __fastcall OnPure(pure##name* self) { self->On##name(); }\
+}
 
 DECLARE_MESSAGE(Frame); // XXX: rename to FrameStart
 DECLARE_MESSAGE(FrameEnd);
@@ -33,15 +26,15 @@ DECLARE_MESSAGE(DeviceReset);
 DECLARE_MESSAGE(UIReset);
 DECLARE_MESSAGE(ScreenResolutionChanged);
 
-struct MessageObject
-{
-    IPure* Object;
-    int Prio;
-};
-
 template<class T>
 class MessageRegistry
 {
+    struct MessageObject
+    {
+        T* Object;
+        int Prio;
+    };
+
     bool changed, inProcess;
     xr_vector<MessageObject> messages;
 
@@ -62,8 +55,11 @@ public:
         VERIFY(newMessage.Prio != REG_PRIORITY_INVALID);
 
         // Verify that we don't already have the same object with valid priority
-        for (auto& message : messages)
+        for (size_t i = 0; i < messages.size(); ++i)
+        {
+            auto& message = messages[i];
             VERIFY(!(message.Prio != REG_PRIORITY_INVALID && message.Object == newMessage.Object));
+        }
 #endif
         messages.emplace_back(newMessage);
 
@@ -75,10 +71,11 @@ public:
 
     void Remove(T* object)
     {
-        for (auto& it : messages)
+        for (size_t i = 0; i < messages.size(); ++i)
         {
-            if (it.Object == object)
-                it.Prio = REG_PRIORITY_INVALID;
+            auto& message = messages[i];
+            if (message.Object == object)
+                message.Prio = REG_PRIORITY_INVALID;
         }
 
         if (inProcess)
@@ -95,13 +92,14 @@ public:
         inProcess = true;
 
         if (messages[0].Prio == REG_PRIORITY_CAPTURE)
-            messages[0].Object->OnPure();
+            messages[0].Object->OnPure(messages[0].Object);
         else
         {
-            for (auto& message : messages)
+            for (size_t i = 0; i < messages.size(); ++i)
             {
+                const auto& message = messages[i];
                 if (message.Prio != REG_PRIORITY_INVALID)
-                    message.Object->OnPure();
+                    message.Object->OnPure(message.Object);
             }
         }
 
