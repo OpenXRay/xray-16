@@ -70,7 +70,7 @@ void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const s
     m_name = name;
     Fvector4 tmp;
 
-    if (pLtx.line_exist(m_name, "texture"))
+    if (pLtx.line_exist(sect_name, "texture"))
     {
         m_texture = pLtx.r_string(sect_name, "texture");
         tmp = pLtx.r_fvector4(sect_name, "bound_rect");
