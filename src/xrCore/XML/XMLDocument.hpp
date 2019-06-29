@@ -63,7 +63,7 @@ public:
 
     //возвращает количество узлов с заданым именем
     size_t GetNodesNum(pcstr path, const size_t index, pcstr tag_name) const;
-    size_t GetNodesNum(XML_NODE node, pcstr tag_name) const;
+    size_t GetNodesNum(XML_NODE node, pcstr tag_name, bool includingComments = true) const;
 
     //проверка того, что аттрибуты у тегов уникальны
     //(если не NULL, то уникальность нарушена и возврашается имя

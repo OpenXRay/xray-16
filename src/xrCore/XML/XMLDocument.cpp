@@ -360,7 +360,7 @@ size_t XMLDocument::GetNodesNum(pcstr path, const size_t index, pcstr tag_name) 
     return GetNodesNum(node, tag_name);
 }
 
-size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name) const
+size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name, bool includingComments /*= true*/) const
 {
     if (!node)
         return 0;
@@ -376,7 +376,8 @@ size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name) const
 
     while (el)
     {
-        ++result;
+        if (includingComments || el->Type() != TiXmlNode::NodeType::COMMENT)
+            ++result;
         if (!tag_name)
             el = el->NextSibling();
         else
