@@ -119,7 +119,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
 
-add_definitions ( -msse3 -mfpmath=sse )
+add_definitions ( -msse2 -mfpmath=sse )
 
 if( TBB_PARALLEL )
   add_definitions ( -DUSE_TBB_PARALLEL )
