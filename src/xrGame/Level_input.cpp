@@ -580,6 +580,22 @@ void CLevel::IR_OnKeyboardHold(int key)
     }
 }
 
+void CLevel::IR_OnTextInput(pcstr text)
+{
+    if (!bReady || g_bDisableAllInput)
+        return;
+
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnTextInput(text))
+        return;
+
+    if (CURRENT_ENTITY())
+    {
+        IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
+        if (IR)
+            IR->IR_OnTextInput(text);
+    }
+}
+
 void CLevel::IR_OnMouseStop(int /**axis/**/, int /**value/**/) {}
 
 void CLevel::IR_OnControllerPress(int btn) 

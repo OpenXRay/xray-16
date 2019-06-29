@@ -397,6 +397,35 @@ bool CUIWindow::OnKeyboardHold(int dik)
     return false;
 }
 
+bool CUIWindow::OnTextInput(pcstr text)
+{
+    bool result;
+
+    // если есть дочернее окно,захватившее клавиатуру,
+    // то сообщение направляем сразу ему
+    if (nullptr != m_pKeyboardCapturer)
+    {
+        result = m_pKeyboardCapturer->OnTextInput(text);
+
+        if (result)
+            return true;
+    }
+
+    WINDOW_LIST::reverse_iterator it = m_ChildWndList.rbegin();
+
+    for (; it != m_ChildWndList.rend(); ++it)
+    {
+        if ((*it)->IsEnabled())
+        {
+            result = (*it)->OnTextInput(text);
+
+            if (result)
+                return true;
+        }
+    }
+    return false;
+}
+
 void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 {
     if (NULL != GetParent())

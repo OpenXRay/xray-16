@@ -323,6 +323,17 @@ bool CDialogHolder::IR_UIOnKeyboardRelease(int dik)
     return true;
 }
 
+bool CDialogHolder::IR_UIOnTextInput(pcstr text)
+{
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+
+    return TIR->OnTextInput(text);
+}
+
 bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
 {
     CUIDialogWnd* TIR = TopInputReceiver();

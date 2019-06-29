@@ -25,7 +25,8 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool OnKeyboardHold(int dik);
 
-    virtual void OnFocusLost();
+    bool OnTextInput(pcstr text) override;
+
     virtual void Update();
     virtual void Draw();
     virtual void Show(bool status);

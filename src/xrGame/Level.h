@@ -309,6 +309,8 @@ public:
     void IR_OnKeyboardRelease(int key) override;
     void IR_OnKeyboardHold(int key) override;
 
+    void IR_OnTextInput(pcstr text) override;
+
     void IR_OnMousePress(int btn) override;
     void IR_OnMouseRelease(int btn) override;
     void IR_OnMouseHold(int btn) override;

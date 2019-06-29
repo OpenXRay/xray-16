@@ -86,7 +86,7 @@ void CUICustomEdit::InitCustomEdit(Fvector2 pos, Fvector2 size)
 }
 
 void CUICustomEdit::SetPasswordMode(bool mode) { TextItemControl()->SetPasswordMode(mode); }
-void CUICustomEdit::OnFocusLost() { inherited::OnFocusLost(); }
+
 void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     //кто-то другой захватил клавиатуру
@@ -145,6 +145,12 @@ bool CUICustomEdit::OnKeyboardHold(int dik)
     }
 
     ec().on_key_hold(dik);
+    return true;
+}
+
+bool CUICustomEdit::OnTextInput(pcstr text)
+{
+    ec().on_text_input(text);
     return true;
 }
 
@@ -298,7 +304,14 @@ void CUICustomEdit::press_tab()
 void CUICustomEdit::CaptureFocus(bool bCapture)
 {
     if (bCapture)
+    {
         GetParent()->SetKeyboardCapture(this, true);
+        ec().on_ir_capture();
+    }
+    else
+    {
+        ec().on_ir_release();
+    }
 
     m_bInputFocus = bCapture;
 }

@@ -42,7 +42,7 @@ public:
     virtual void IR_OnKeyboardPress(int /*dik*/) {}
     virtual void IR_OnKeyboardRelease(int /*dik*/) {}
     virtual void IR_OnKeyboardHold(int /*dik*/) {}
-    virtual void IR_OnTextInput(const char *) {}
+    virtual void IR_OnTextInput(pcstr text) {}
 
     virtual void IR_OnJoystickMove(int /*axis*/, int /*value*/) {}
     virtual void IR_OnJoystickPress(int /*dik*/) {}

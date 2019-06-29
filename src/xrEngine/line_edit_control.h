@@ -57,10 +57,15 @@ public:
     ~line_edit_control();
 
     void clear_states();
+
+    void on_ir_capture();
+    void on_ir_release();
+
     void on_key_press(int dik);
     void on_key_hold(int dik);
     void on_key_release(int dik);
     void on_text_input(const char *text);
+    
     void on_frame();
 
     void assign_callback(int const dik, key_state state, Callback const& callback);

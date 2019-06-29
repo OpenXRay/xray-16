@@ -478,6 +478,14 @@ void CMainMenu::IR_OnKeyboardHold(int dik)
     CDialogHolder::IR_UIOnKeyboardHold(dik);
 };
 
+void CMainMenu::IR_OnTextInput(pcstr text)
+{
+    if (!IsActive())
+        return;
+
+    CDialogHolder::IR_UIOnTextInput(text);
+}
+
 void CMainMenu::IR_OnMouseWheel(int x, int y)
 {
     if (!IsActive())

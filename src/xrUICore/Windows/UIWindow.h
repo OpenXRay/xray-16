@@ -39,6 +39,7 @@ public:
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool OnKeyboardHold(int dik);
+    virtual bool OnTextInput(pcstr text);
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnMouseMove();

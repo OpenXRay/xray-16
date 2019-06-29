@@ -148,6 +148,18 @@ void line_edit_control::clear_states()
     update_key_states();
 }
 
+void line_edit_control::on_ir_capture()
+{
+    SDL_StartTextInput();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+}
+
+void line_edit_control::on_ir_release()
+{
+    SDL_StopTextInput();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+}
+
 void line_edit_control::init(size_t str_buffer_size, init_mode mode)
 {
     m_buffer_size = str_buffer_size;

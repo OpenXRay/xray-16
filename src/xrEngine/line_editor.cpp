@@ -23,14 +23,12 @@ void line_editor::IR_OnTextInput(const char *text) { m_control.on_text_input(tex
 void line_editor::IR_Capture()
 {
     IInputReceiver::IR_Capture();
-    SDL_StartTextInput();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    m_control.on_ir_capture();
 }
 
 void line_editor::IR_Release()
 {
-    SDL_StopTextInput();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    m_control.on_ir_release();
     IInputReceiver::IR_Release();
 }
 } // namespace text_editor
