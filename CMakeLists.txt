@@ -4,7 +4,7 @@ project(OpenXRay)
 include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-set(CMAKE_SKIP_BUILD_RPATH TRUE)
+
 if(NOT WIN32)
 	set(CMAKE_INSTALL_PREFIX "") # Skip all *nix-style installing for a while. Use DESTDIR
     IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
@@ -136,6 +136,7 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL Release)
+    set(CMAKE_SKIP_BUILD_RPATH TRUE)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} ${PROJECT_NAME})
 endif ()
