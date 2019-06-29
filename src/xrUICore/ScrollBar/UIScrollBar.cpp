@@ -35,7 +35,7 @@ CUIScrollBar::CUIScrollBar()
     AttachChild(m_FrameBackground);
 }
 
-void CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal, LPCSTR profile)
+bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal, cpcstr profile)
 {
     string256 _path;
     CUIXml xml_doc;
@@ -155,8 +155,18 @@ void CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         m_ScrollBox->SetTextureVisible(true);
     }
 
+    bool result = true;
+
+    if (tempScroll && !tempScroll->IsShown())
+        result = false;
+
+    if (tempBackground && !tempBackground->IsShown())
+        result = false;
+
     xr_delete(tempScroll);
     xr_delete(tempBackground);
+
+    return result;
 }
 
 //корректировка размеров скроллера

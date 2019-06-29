@@ -21,7 +21,7 @@ protected:
 public:
     CUIFixedScrollBar();
     ~CUIFixedScrollBar() override;
-    virtual void InitScrollBar(Fvector2 pos, bool horizontal, LPCSTR profile = "pda");
+    virtual bool InitScrollBar(Fvector2 pos, bool horizontal, cpcstr profile = "pda");
     void SetWidth(float /*width*/) override {}
     void SetHeight(float /*height*/) override {}
     void Draw() override { inherited::Draw(); }
