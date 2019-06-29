@@ -8,27 +8,27 @@ class CUIFrameLineWnd;
 class XRUICORE_API CUIFixedScrollBar : public CUIScrollBar
 {
 private:
-    typedef CUIWindow inherited;
+    using inherited = CUIWindow;
 
 protected:
     CUI3tButton* m_ScrollBox;
     Ivector2 m_ScrollBoxOffset;
 
-    virtual void UpdateScrollBar();
-    virtual void ClampByViewRect();
-    virtual void SetPosScrollFromView(float view_pos, float view_width, float view_offs);
+    void UpdateScrollBar() override;
+    void ClampByViewRect() override;
+    void SetPosScrollFromView(float view_pos, float view_width, float view_offs) override;
 
 public:
     CUIFixedScrollBar();
-    virtual ~CUIFixedScrollBar();
+    ~CUIFixedScrollBar() override;
     virtual void InitScrollBar(Fvector2 pos, bool horizontal, LPCSTR profile = "pda");
-    virtual void SetWidth(float width){};
-    virtual void SetHeight(float height){};
-    virtual void Draw() { inherited::Draw(); };
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
-    virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
-    virtual bool OnMouseDown(int mouse_btn);
-    virtual bool OnMouseDownEx();
-    virtual void OnMouseUp(int mouse_btn);
-    virtual bool OnKeyboardHold(int dik);
+    void SetWidth(float /*width*/) override {}
+    void SetHeight(float /*height*/) override {}
+    void Draw() override { inherited::Draw(); }
+    void SendMessage(CUIWindow* pWnd, s16 msg, void* pData) override;
+    bool OnMouseAction(float x, float y, EUIMessages mouse_action) override;
+    bool OnMouseDown(int mouse_btn) override;
+    bool OnMouseDownEx() override;
+    void OnMouseUp(int mouse_btn) override;
+    bool OnKeyboardHold(int dik) override;
 };
