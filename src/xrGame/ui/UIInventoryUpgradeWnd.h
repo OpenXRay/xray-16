@@ -57,7 +57,7 @@ public:
     virtual ~CUIInventoryUpgradeWnd();
 
     virtual void Init();
-    void InitInventory(CInventoryItem* item, bool can_upgrade);
+    void InitInventory(CUICellItem* item, bool can_upgrade);
 
     IC CInventoryItem const* get_inventory() const { return m_inv_item; }
     IC LPCSTR get_cell_texture(UIUpgrade::ViewState state) const { return m_cell_textures[state].c_str(); }
@@ -95,12 +95,15 @@ public:
 
 protected:
     CUIStatic* m_background;
-    CUIStatic* m_item;
     CUIWindow* m_back;
+    CUIStatic* m_item;
+    CUIItemInfo* m_item_info;
     CInventoryItem* m_inv_item;
 
     shared_str m_cell_textures[UIUpgrade::STATE_COUNT];
     shared_str m_point_textures[UIUpgrade::STATE_COUNT];
+    shared_str m_border_texture;
+    shared_str m_ink_texture;
 
     SCHEMES m_schemes;
     Scheme* m_current_scheme;

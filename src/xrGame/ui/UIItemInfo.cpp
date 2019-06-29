@@ -38,7 +38,7 @@ CUIItemInfo::CUIItemInfo()
     UIWeight = NULL;
     UIItemImage = NULL;
     UIDesc = NULL;
-    //	UIConditionWnd				= NULL;
+    UIConditionWnd = nullptr;
     UIWpnParams = NULL;
     UIProperties = NULL;
     UIOutfitInfo = NULL;
@@ -53,7 +53,7 @@ CUIItemInfo::CUIItemInfo()
 
 CUIItemInfo::~CUIItemInfo()
 {
-    //	xr_delete	(UIConditionWnd);
+    xr_delete(UIConditionWnd);
     xr_delete(UIWpnParams);
     xr_delete(UIArtefactParams);
     xr_delete(UIProperties);
@@ -61,10 +61,13 @@ CUIItemInfo::~CUIItemInfo()
     xr_delete(UIBoosterInfo);
 }
 
-void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
+bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
 {
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
+
+    if (uiXml.GetNodesNum(uiXml.GetRoot(), nullptr, false) == 0)
+        return false;
 
     if (uiXml.NavigateToNode("main_frame", 0))
     {
@@ -92,8 +95,9 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 
     if (uiXml.NavigateToNode("descr_list", 0))
     {
-        //		UIConditionWnd					= new CUIConditionParams();
-        //		UIConditionWnd->InitFromXml		(uiXml);
+        UIConditionWnd = new CUIConditionParams();
+        UIConditionWnd->InitFromXml(uiXml);
+
         UIWpnParams = new CUIWpnParams();
         UIWpnParams->InitFromXml(uiXml);
 
@@ -141,6 +145,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
     }
 
     CUIXmlInit::InitAutoStaticGroup(uiXml, "auto", 0, this);
+    return true;
 }
 
 void CUIItemInfo::InitItemInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)
@@ -203,19 +208,22 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
             UIWeight->SetWndPos(pos);
         }
     }
-    if (UICost && IsGameTypeSingle() && item_price != u32(-1))
+    if (UICost && IsGameTypeSingle())
     {
-        xr_sprintf(str, "%d RU", item_price); // will be owerwritten in multiplayer
-        UICost->SetText(str);
-        pos.x = UICost->GetWndPos().x;
-        if (m_complex_desc)
+        if (item_price != u32(-1))
         {
-            UICost->SetWndPos(pos);
+            xr_sprintf(str, "%d RU", item_price); // will be owerwritten in multiplayer
+            UICost->SetText(str);
+            pos.x = UICost->GetWndPos().x;
+            if (m_complex_desc)
+            {
+                UICost->SetWndPos(pos);
+            }
+            UICost->Show(true);
         }
-        UICost->Show(true);
+        else
+            UICost->Show(false);
     }
-    else
-        UICost->Show(false);
 
     //	CActor* actor = smart_cast<CActor*>( Level().CurrentViewEntity() );
     //	if ( g_pGameLevel && Level().game && actor )
@@ -318,8 +326,8 @@ void CUIItemInfo::TryAddConditionInfo(CInventoryItem& pInvItem, CInventoryItem* 
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&pInvItem);
     if (weapon || outfit)
     {
-        //		UIConditionWnd->SetInfo( pCompareItem, pInvItem );
-        //		UIDesc->AddWindow( UIConditionWnd, false );
+        UIConditionWnd->SetInfo(pCompareItem, pInvItem);
+        UIDesc->AddWindow(UIConditionWnd, false);
     }
 }
 

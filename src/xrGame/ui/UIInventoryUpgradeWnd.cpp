@@ -67,60 +67,93 @@ void CUIInventoryUpgradeWnd::Init()
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, g_inventory_upgrade_xml);
 
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
+    m_border_texture = uiXml.ReadAttrib("border", 0, "texture");
+    m_ink_texture = uiXml.ReadAttrib("inking", 0, "texture");
 
-    m_item = UIHelper::CreateStatic(uiXml, "item_static", this);
-    m_back = UIHelper::CreateNormalWindow(uiXml, "back", this);
+    m_background = UIHelper::CreateStatic(uiXml, "background", this, false);
+    m_item = UIHelper::CreateStatic(uiXml, "item_static", this, false);
+    m_back = UIHelper::CreateNormalWindow(uiXml, "back", this, false);
     m_scheme_wnd = UIHelper::CreateNormalWindow(uiXml, "scheme", this);
+    
+    m_item_info = new CUIItemInfo();
+    if (m_item_info->InitItemInfo("inventory_upgrade_info.xml"))
+    {
+        m_item_info->SetAutoDelete(true);
+        AttachChild(m_item_info);
+    }
+    else
+    {
+        xr_delete(m_item_info);
+    }
+    
     m_btn_repair = UIHelper::Create3tButton(uiXml, "repair_button", this);
+    CUIActorMenu* parent_wnd = smart_cast<CUIActorMenu*>(m_pParentWnd);
+    if (parent_wnd)
+    {
+        // XXX: restore set_hind_wnd?
+        //m_btn_repair->set_hint_wnd(parent_wnd->get_hint_wnd());
+    }
 
     LoadCellsBacks(uiXml);
     LoadSchemes(uiXml);
 }
 
-void CUIInventoryUpgradeWnd::InitInventory(CInventoryItem* item, bool can_upgrade)
+void CUIInventoryUpgradeWnd::InitInventory(CUICellItem* cellItem, bool can_upgrade)
 {
-    m_inv_item = item;
-    bool is_shader = false;
+    if (m_item_info)
+        m_item_info->InitItem(cellItem);
+
+    if (!cellItem)
+        return;
+
+    m_inv_item = static_cast<PIItem>(cellItem ? cellItem->m_pData : nullptr);
     // Загружаем картинку
-    if (smart_cast<CWeapon*>(item))
+    if (m_item && m_inv_item)
     {
-        is_shader = true;
-        m_item->SetShader(InventoryUtilities::GetWeaponUpgradeIconsShader());
-        if (smart_cast<CWeaponRPG7*>(item))
+        bool is_shader = false;
+        if (smart_cast<CWeapon*>(m_inv_item))
+        {
+            is_shader = true;
+            m_item->SetShader(InventoryUtilities::GetWeaponUpgradeIconsShader());
+            if (smart_cast<CWeaponRPG7*>(m_inv_item))
+                m_item->SetShader(InventoryUtilities::GetOutfitUpgradeIconsShader());
+        }
+        else if (smart_cast<CCustomOutfit*>(m_inv_item) || smart_cast<CHelmet*>(m_inv_item))
+        {
+            is_shader = true;
             m_item->SetShader(InventoryUtilities::GetOutfitUpgradeIconsShader());
-    }
-    else if (smart_cast<CCustomOutfit*>(item) || smart_cast<CHelmet*>(item))
-    {
-        is_shader = true;
-        m_item->SetShader(InventoryUtilities::GetOutfitUpgradeIconsShader());
-    }
+        }
 
-    if (m_item && is_shader)
-    {
-        Irect item_upgrade_grid_rect = item->GetUpgrIconRect();
-        Frect texture_rect;
-        texture_rect.lt.set(item_upgrade_grid_rect.x1, item_upgrade_grid_rect.y1);
-        texture_rect.rb.set(item_upgrade_grid_rect.x2, item_upgrade_grid_rect.y2);
-        texture_rect.rb.add(texture_rect.lt);
-        m_item->GetUIStaticItem().SetTextureRect(texture_rect);
-        m_item->TextureOn();
-        m_item->SetStretchTexture(true);
-        Fvector2 v_r = Fvector2().set(item_upgrade_grid_rect.x2, item_upgrade_grid_rect.y2);
-        if (UI().is_widescreen())
-            v_r.x *= 0.8f;
+        if (is_shader)
+        {
+            Irect item_upgrade_grid_rect = m_inv_item->GetUpgrIconRect();
+            Frect texture_rect;
+            texture_rect.lt.set(item_upgrade_grid_rect.x1, item_upgrade_grid_rect.y1);
+            texture_rect.rb.set(item_upgrade_grid_rect.x2, item_upgrade_grid_rect.y2);
+            texture_rect.rb.add(texture_rect.lt);
+            m_item->GetUIStaticItem().SetTextureRect(texture_rect);
+            m_item->TextureOn();
+            m_item->SetStretchTexture(true);
+            Fvector2 v_r = Fvector2().set(item_upgrade_grid_rect.x2, item_upgrade_grid_rect.y2);
+            if (UI().is_widescreen())
+                v_r.x *= 0.8f;
 
-        m_item->GetUIStaticItem().SetSize(v_r);
-        m_item->SetWidth(v_r.x);
-        m_item->SetHeight(v_r.y);
-        m_item->Show(true);
+            m_item->GetUIStaticItem().SetSize(v_r);
+            m_item->SetWidth(v_r.x);
+            m_item->SetHeight(v_r.y);
+            m_item->Show(true);
+        }
+        else
+            m_item->Show(false);
     }
-    else
-        m_item->Show(false);
 
     m_scheme_wnd->DetachAll();
     m_scheme_wnd->Show(false);
-    m_back->DetachAll();
-    m_back->Show(false);
+    if (m_back)
+    {
+        m_back->DetachAll();
+        m_back->Show(false);
+    }
     m_btn_repair->Enable(false);
 
     if (ai().get_alife() && m_inv_item)
@@ -148,7 +181,8 @@ void CUIInventoryUpgradeWnd::Reset()
         for (auto& cell : scheme->cells)
         {
             cell->Reset();
-            cell->m_point->Reset();
+            if (cell->m_point)
+                cell->m_point->Reset();
         }
     }
 
@@ -183,7 +217,8 @@ void CUIInventoryUpgradeWnd::SetCurScheme(const shared_str& id)
 bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upgrade)
 {
     m_scheme_wnd->DetachAll();
-    m_back->DetachAll();
+    if (m_back)
+        m_back->DetachAll();
     m_btn_repair->Enable((inv_item.GetCondition() < 0.99f));
 
     if (!can_upgrade)
@@ -210,8 +245,8 @@ bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upg
     for (UIUpgrade* ui_item : m_current_scheme->cells)
     {
         m_scheme_wnd->AttachChild(ui_item);
-        //		m_item->AttachChild( ui_item->m_point );
-        m_back->AttachChild(ui_item->m_point);
+        if (m_back && ui_item->m_point)
+            m_back->AttachChild(ui_item->m_point);
 
         LPCSTR upgrade_name = get_manager().get_upgrade_by_index(inv_item, ui_item->get_scheme_index());
         ui_item->init_upgrade(upgrade_name, inv_item);
@@ -231,11 +266,15 @@ bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upg
         ui_item->set_texture(UIUpgrade::LAYER_ITEM, upgrade_p->icon_name());
         ui_item->set_texture(UIUpgrade::LAYER_POINT, m_point_textures[UIUpgrade::STATE_ENABLED].c_str()); // default
         ui_item->set_texture(UIUpgrade::LAYER_COLOR, m_cell_textures[UIUpgrade::STATE_ENABLED].c_str()); // default
+        ui_item->set_texture(UIUpgrade::LAYER_BORDER, m_border_texture.c_str());
+        ui_item->set_texture(UIUpgrade::LAYER_INK, m_ink_texture.c_str());
     }
 
     m_scheme_wnd->Show(true);
-    m_item->Show(true);
-    m_back->Show(true);
+    if (m_item)
+        m_item->Show(true);
+    if (m_back)
+        m_back->Show(true);
 
     UpdateAllUpgrades();
     return true;
@@ -327,7 +366,7 @@ void CUIInventoryUpgradeWnd::set_info_cur_upgrade(Upgrade_type* upgrade)
     UIUpgrade* uiu = FindUIUpgrade(upgrade);
     if (uiu)
     {
-        if (Device.dwTimeGlobal < uiu->FocusReceiveTime())
+        if (Device.dwTimeGlobal < uiu->FocusReceiveTime() + (m_item_info ? m_item_info->delay : 0))
         {
             upgrade = nullptr; // visible = false
         }

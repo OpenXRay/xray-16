@@ -75,7 +75,7 @@ void CUIActorMenu::SetupUpgradeItem()
         can_upgrade = CanUpgradeItem(item);
     }
 
-    m_pUpgradeWnd->InitInventory(item, can_upgrade);
+    m_pUpgradeWnd->InitInventory(CurrentItem(), can_upgrade);
     if (m_upgrade_info)
     {
         m_upgrade_info->Show(false);
