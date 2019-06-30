@@ -19,7 +19,7 @@ CUIScrollView::CUIScrollView()
     m_VScrollBar = NULL;
     m_visible_rgn.set(-1, -1);
 }
-CUIScrollView::CUIScrollView(CUIFixedScrollBar* scroll_bar)
+CUIScrollView::CUIScrollView(CUIScrollBar* scroll_bar)
 {
     m_rightIndent = 0.0f;
     m_leftIndent = 0.0f;
@@ -56,6 +56,18 @@ void CUIScrollView::InitScrollView()
         AttachChild(m_pad);
     }
     m_pad->SetWndPos(Fvector2().set(0, 0));
+
+    CUIFixedScrollBar* tmp_scroll = smart_cast<CUIFixedScrollBar*>(m_VScrollBar);
+    if (tmp_scroll)
+    {
+        if (!tmp_scroll->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f), false, *m_scrollbar_profile))
+        {
+            Msg("! Failed to init ScrollView with FixedScrollBar, trying to init with ScrollBar");
+            DetachChild(m_VScrollBar);
+            m_VScrollBar = nullptr;
+        }
+    }
+
     if (!m_VScrollBar)
     {
         m_VScrollBar = new CUIScrollBar();
@@ -64,17 +76,18 @@ void CUIScrollView::InitScrollView()
         Register(m_VScrollBar);
         AddCallback(m_VScrollBar, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIScrollView::OnScrollV));
     }
-    CUIFixedScrollBar* tmp_scroll = smart_cast<CUIFixedScrollBar*>(m_VScrollBar);
-    if (tmp_scroll)
-        tmp_scroll->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f), false, *m_scrollbar_profile);
+
+    if (!!m_scrollbar_profile && !tmp_scroll)
+    {
+        m_VScrollBar->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f),
+            GetWndSize().y, false, *m_scrollbar_profile);
+    }
     else
     {
-        if (!!m_scrollbar_profile)
-            m_VScrollBar->InitScrollBar(
-                Fvector2().set(GetWndSize().x, 0.0f), GetWndSize().y, false, *m_scrollbar_profile);
-        else
-            m_VScrollBar->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f), GetWndSize().y, false);
+        m_VScrollBar->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f),
+            GetWndSize().y, false);
     }
+
     Fvector2 sc_pos = {m_VScrollBar->GetWndPos().x - m_VScrollBar->GetWndSize().x, m_VScrollBar->GetWndPos().y};
     m_VScrollBar->SetWndPos(sc_pos);
     m_VScrollBar->SetWindowName("scroll_v");

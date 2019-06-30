@@ -134,7 +134,11 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
 
     if (tempBackground && tempBackground->IsShown())
     {
-        SetWndSize(tempBackground->GetWndSize());
+        if (m_bIsHorizontal)
+            SetHeight(tempBackground->GetHeight());
+        else
+            SetWidth(tempBackground->GetWidth());
+
         m_FrameBackground->InitFrameLineWnd(GetWndPos(), GetWndSize(), m_bIsHorizontal);
 
         m_FrameBackground->SetShader(tempBackground->GetShader());

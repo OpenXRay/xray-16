@@ -93,20 +93,38 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
         CUIWindow* rect_parent = m_UIMainFrame; // m_UILevelFrame;
         Frect r = rect_parent->GetWndRect();
 
-        m_UIMainScrollH = new CUIFixedScrollBar();
-        m_UIMainScrollH->SetAutoDelete(true);
-        m_UIMainScrollH->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), true);
+        auto tempScroll = new CUIFixedScrollBar();
+        if (tempScroll->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), true))
+            m_UIMainScrollH = tempScroll;
+        else
+        {
+            Msg("! Failed to init m_UIMainScrollH as FixedScrollBar, trying to initialize it as ScrollBar");
+            xr_delete(tempScroll);
+            m_UIMainScrollH = new CUIScrollBar();
+            m_UIMainScrollH->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), r.right - r.left - dx * 2 - sx, true, "pda");
+        }
+
         m_UIMainScrollH->SetStepSize(_max(1, (int)(m_UILevelFrame->GetWidth() * 0.1f)));
         m_UIMainScrollH->SetPageSize((int)m_UILevelFrame->GetWidth()); // iFloor
+        m_UIMainScrollH->SetAutoDelete(true);
         AttachChild(m_UIMainScrollH);
         Register(m_UIMainScrollH);
         AddCallback(m_UIMainScrollH, SCROLLBAR_HSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollH));
 
-        m_UIMainScrollV = new CUIFixedScrollBar();
-        m_UIMainScrollV->SetAutoDelete(true);
-        m_UIMainScrollV->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), false);
+        tempScroll = new CUIFixedScrollBar();
+        if (tempScroll->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), false))
+            m_UIMainScrollV = tempScroll;
+        else
+        {
+            Msg("! Failed to init m_UIMainScrollV as FixedScrollBar, trying to initialize it as ScrollBar");
+            xr_delete(tempScroll);
+            m_UIMainScrollV = new CUIScrollBar();
+            m_UIMainScrollV->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), r.bottom - r.top - dy * 2, false, "pda");
+        }
+
         m_UIMainScrollV->SetStepSize(_max(1, (int)(m_UILevelFrame->GetHeight() * 0.1f)));
         m_UIMainScrollV->SetPageSize((int)m_UILevelFrame->GetHeight());
+        m_UIMainScrollV->SetAutoDelete(true);
         AttachChild(m_UIMainScrollV);
         Register(m_UIMainScrollV);
         AddCallback(m_UIMainScrollV, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollV));
