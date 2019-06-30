@@ -56,12 +56,14 @@ void CUIRankingWnd::Show(bool status)
         m_money_value->SetText(buf);
         m_money_value->AdjustWidthToText();
         update_info();
+        inherited::Update();
     }
     inherited::Show(status);
 }
 
 void CUIRankingWnd::Update()
 {
+    inherited::Update();
     if (Device.dwTimeGlobal - m_previous_time > m_delay)
     {
         m_previous_time = Device.dwTimeGlobal;
