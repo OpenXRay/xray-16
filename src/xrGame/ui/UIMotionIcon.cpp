@@ -192,7 +192,12 @@ void CUIMotionIcon::SetLuminosity(float newPos)
     }
 }
 
-void CUIMotionIcon::Draw() { inherited::Draw(); }
+void CUIMotionIcon::Draw()
+{
+    if (!ClearSkyMode)
+        inherited::Draw();
+}
+
 void CUIMotionIcon::Update()
 {
     if (!IsGameTypeSingle())
