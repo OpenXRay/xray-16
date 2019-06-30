@@ -60,7 +60,7 @@ void os_clipboard::paste_from_clipboard(pstr buffer, size_t buffer_size)
     for (size_t i = 0; i < length; ++i)
     {
         const char c = buffer[i];
-        if (std::isalpha(c, locale) == 0 && c != char(-1) || c == '\t' || c == '\n') // "я" = -1
+        if (std::isprint(c, locale) == 0 && c != char(-1) || c == '\t' || c == '\n') // "я" = -1
         {
             buffer[i] = ' ';
         }
