@@ -15,7 +15,7 @@
 #include "SH_Constant.h"
 #include "SH_RT.h"
 #ifdef USE_OGL
-#include "Layers\xrRenderGL\glBufferPool.h"
+#include "Layers/xrRenderGL/glBufferPool.h"
 #endif // USE_OGL
 
 using sh_list = xr_vector<shared_str>;
