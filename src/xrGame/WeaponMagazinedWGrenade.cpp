@@ -916,6 +916,7 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
         info.fmj_ammo._set("--");
         info.ap_ammo._set("--");
         info.third_ammo._set("--"); //Alundaio
+        info.total_ammo = "--";
     }
     else
     {
@@ -924,22 +925,32 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
         info.ap_ammo._set("");
         info.third_ammo._set("");
 
+        int total = 0;
         if (at_size >= 1)
         {
-            xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(0) : GetAmmoCount(0));
+            const int fmj = m_bGrenadeMode ? GetAmmoCount2(0) : GetAmmoCount(0);
+            xr_sprintf(int_str, "%d", fmj);
             info.fmj_ammo._set(int_str);
+            total += fmj;
         }
         if (at_size >= 2)
         {
-            xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(1) : GetAmmoCount(1));
+            const int ap = m_bGrenadeMode ? GetAmmoCount2(1) : GetAmmoCount(1);
+            xr_sprintf(int_str, "%d", ap);
             info.ap_ammo._set(int_str);
+            total += ap;
         }
         if (at_size >= 3)
         {
-            xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(2) : GetAmmoCount(2));
+            const int third = m_bGrenadeMode ? GetAmmoCount2(2) : GetAmmoCount(2);
+            xr_sprintf(int_str, "%d", third);
             info.third_ammo._set(int_str);
+            total += third;
         }
-		//-Alundaio
+
+        xr_sprintf(int_str, "%d", total);
+        info.total_ammo = int_str;
+        //-Alundaio
     }
 
     if (ae != 0 && m_magazine.size() != 0)

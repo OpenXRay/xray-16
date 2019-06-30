@@ -1346,9 +1346,7 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     {
         return false;
     }
-    const int at = GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
-    xr_sprintf(int_str, "%d", at);
-    info.total_ammo = int_str;
+    GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
     
     info.grenade = "";
 
@@ -1358,6 +1356,7 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
         info.fmj_ammo._set("--");
         info.ap_ammo._set("--");
         info.third_ammo._set("--"); //Alundaio
+        info.total_ammo = "--";
     }
     else
     {
@@ -1367,21 +1366,31 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
         info.ap_ammo._set("");
         info.third_ammo._set("");
 
+        int total = 0;
         if (at_size >= 1)
         {
-            xr_sprintf(int_str, "%d", GetAmmoCount(0));
+            const int fmj = GetAmmoCount(0);
+            xr_sprintf(int_str, "%d", fmj);
             info.fmj_ammo._set(int_str);
+            total += fmj;
         }
         if (at_size >= 2)
         {
-            xr_sprintf(int_str, "%d", GetAmmoCount(1));
+            const int ap = GetAmmoCount(1);
+            xr_sprintf(int_str, "%d", ap);
             info.ap_ammo._set(int_str);
+            total += ap;
         }
         if (at_size >= 3)
         {
-            xr_sprintf(int_str, "%d", GetAmmoCount(2));
+            const int third = GetAmmoCount(2);
+            xr_sprintf(int_str, "%d", third);
             info.third_ammo._set(int_str);
+            total += third;
         }
+
+        xr_sprintf(int_str, "%d", total);
+        info.total_ammo = int_str;
         //-Alundaio
     }
 
