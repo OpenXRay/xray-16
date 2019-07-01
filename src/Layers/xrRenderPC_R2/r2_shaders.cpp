@@ -109,9 +109,8 @@ HRESULT CRender::shader_compile(
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
-        VERIFY(xr_strlen(c_smapsize) == 4 || atoi(c_smapsize) < 16384);
         xr_strcat(sh_name, c_smapsize);
-        len += 4;
+        len += xr_strlen(c_smapsize);
     }
 
     if (o.fp16_filter)
