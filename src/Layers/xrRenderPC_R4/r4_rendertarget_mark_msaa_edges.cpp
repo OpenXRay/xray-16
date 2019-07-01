@@ -24,6 +24,7 @@ void CRenderTarget::mark_msaa_edges()
         TRUE, D3DCMP_ALWAYS, 0x80, 0xFF, 0x80, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
     StateManager.SetColorWriteEnable(0);
     StateManager.SetDepthFunc(D3DCMP_ALWAYS);
+    // XXX: check if resource leak was fixed!
     // Here was resource leak
     // due to some bug in Microsoft beta run-time we changed
     // StateManager.SetDepthEnable( FALSE );
