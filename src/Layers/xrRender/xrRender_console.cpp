@@ -22,10 +22,12 @@ const xr_token qsmapsize_token[] =
     { "3072", 3072 },
     { "3584", 3584 },
     { "4096", 4096 },
+#ifndef USE_DX9
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
     { "8192", 8192 },
+#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if this really supported on OpenGL
     { "9216", 9216 },
     { "10240", 10240 },
     { "11264", 11264 },
@@ -34,6 +36,8 @@ const xr_token qsmapsize_token[] =
     { "14336", 14336 },
     { "15360", 15360 },
     { "16384", 16384 },
+#endif // defined(USE_DX11) || defined(USE_OGL)
+#endif // !USE_DX9
     { nullptr, 0 }
 };
 
