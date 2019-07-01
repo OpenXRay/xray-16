@@ -88,6 +88,8 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     D3D_FEATURE_LEVEL featureLevels[] =
     {
         D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0
     };
 
     R = D3D11CreateDevice(m_pAdapter,
