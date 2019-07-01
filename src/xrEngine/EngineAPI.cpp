@@ -117,6 +117,8 @@ void CEngineAPI::InitializeRenderers()
     R_ASSERT2(setupSelectedRenderer, "Can't setup renderer");
     setupSelectedRenderer();
 
+    Log("Selected renderer:", Console->GetString("renderer"));
+
     // Now unload unused renderers
     // XXX: Unloading disabled due to typeids invalidation
     /*if (GEnv.CurrentRenderer != 5)
