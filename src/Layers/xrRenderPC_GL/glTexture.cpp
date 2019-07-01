@@ -111,7 +111,7 @@ _DDS:
         img_size = S->length();
         R_ASSERT(S);
         gli::texture Texture = gli::load((char*)S->pointer(), img_size);
-        R_ASSERT(!Texture.empty());
+        R_ASSERT2(!Texture.empty(), fn);
         if (is_target_cube(Texture.target())) goto _DDS_CUBE;
         if (Texture.target() == gli::TARGET_3D) goto _DDS_3D;
         goto _DDS_2D;
