@@ -1,3 +1,4 @@
+
 // EngineAPI.cpp: implementation of the CEngineAPI class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -208,15 +209,9 @@ void CEngineAPI::CreateRendererList()
     auto& modes = VidQualityToken;
 
 #if defined(WINDOWS)
-    // Hide "d3d10.dll not found" message box for XP
-    SetErrorMode(SEM_FAILCRITICALERRORS);
-
     renderers[r2_library] = XRay::LoadModule(r2_library);
     renderers[r3_library] = XRay::LoadModule(r3_library);
     renderers[r4_library] = XRay::LoadModule(r4_library);
-
-    // Restore error handling
-    SetErrorMode(0);
 #endif
 
     const auto checkRenderer = [&](pcstr library, pcstr mode, int index)
