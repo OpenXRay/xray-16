@@ -26,6 +26,8 @@
 #include <glob.h>
 #endif
 
+constexpr size_t VFS_STANDARD_FILE = std::numeric_limits<size_t>::max();
+
 const u32 BIG_FILE_READER_WINDOW_SIZE = 1024 * 1024;
 
 xr_unique_ptr<CLocatorAPI> xr_FS;
@@ -244,7 +246,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
         if (!exist(path))
         {
             desc.name = xr_strdup(path);
-            desc.vfs = 0xffffffff;
+            desc.vfs = VFS_STANDARD_FILE;
             desc.ptr = 0;
             desc.size_real = 0;
             desc.size_compressed = 0;
@@ -607,7 +609,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
             return;
         if(path[xr_strlen(path) - 1] != _DELIMITER || path[xr_strlen(path) - 1] != '/')
             xr_strcat(N, DELIMITER);
-        Register(N, 0xffffffff, 0, 0, entry.size, entry.size, (u32)entry.time_write);
+        Register(N, VFS_STANDARD_FILE, 0, 0, entry.size, entry.size, (u32)entry.time_write);
         Recurse(N);
     }
     else
@@ -615,7 +617,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
         if (strext(N) && (0 == strncmp(strext(N), ".db", 3) || 0 == strncmp(strext(N), ".xdb", 4)))
             ProcessArchive(N);
         else
-            Register(N, 0xffffffff, 0, 0, entry.size, entry.size, (u32)entry.time_write);
+            Register(N, VFS_STANDARD_FILE, 0, 0, entry.size, entry.size, (u32)entry.time_write);
     }
 }
 
@@ -763,7 +765,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     }
     // insert self
     if (path && path[0] != 0)
-        Register(path, 0xffffffff, 0, 0, 0, 0, 0);
+        Register(path, VFS_STANDARD_FILE, 0, 0, 0, 0, 0);
 
     return true;
 }
@@ -1226,7 +1228,7 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
                 file.name = EFS.ChangeFileExt(entry_begin, "");
             else
                 file.name = entry_begin;
-            u32 fl = entry.vfs != 0xffffffff ? FS_File::flVFS : 0;
+            u32 fl = entry.vfs != VFS_STANDARD_FILE ? FS_File::flVFS : 0;
             file.size = entry.size_real;
             file.time_write = entry.modif;
             file.attrib = fl;
@@ -1309,7 +1311,7 @@ void CLocatorAPI::check_cached_files(pstr fname, const size_t& fname_size, const
         xr_delete(_dst);
         xr_delete(_src);
         set_file_age(fname_in_cache, desc.modif);
-        Register(fname_in_cache, 0xffffffff, 0, 0, desc.size_real, desc.size_real, desc.modif);
+        Register(fname_in_cache, VFS_STANDARD_FILE, 0, 0, desc.size_real, desc.size_real, desc.modif);
     }
 
     // Use
@@ -1538,7 +1540,7 @@ T* CLocatorAPI::r_open_impl(pcstr path, pcstr _fname)
         return nullptr;
 
     // OK, analyse
-    if (0xffffffff == desc->vfs)
+    if (VFS_STANDARD_FILE == desc->vfs)
         file_from_cache(R, fname, sizeof fname, *desc, source_name);
     else
         file_from_archive(R, fname, *desc);
@@ -1615,11 +1617,11 @@ void CLocatorAPI::w_close(IWriter*& S)
 #if defined(WINDOWS)
             struct _stat st;
             _stat(fname, &st);
-            Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
+            Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #elif defined(LINUX) || defined(FREEBSD)
             struct stat st;
             ::stat(fname, &st);
-            Register(fname, 0xffffffff, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
+            Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #endif
         }
     }
@@ -1877,7 +1879,7 @@ void CLocatorAPI::rescan_path(pcstr full_path, bool bRecurse)
         ++I;
         if (0 != strncmp(entry.name, full_path, base_len))
             break; // end of list
-        if (entry.vfs != 0xFFFFFFFF)
+        if (entry.vfs != VFS_STANDARD_FILE)
             continue;
         pcstr entry_begin = entry.name + base_len;
         if (!bRecurse && strchr(entry_begin, _DELIMITER))
