@@ -1151,8 +1151,10 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         light* fuckingsun = (light*)RImplementation.Lights.sun._get();
 
         // Common constants (light-related)
-        Fvector L_clr;
+        Fvector L_dir, L_clr;
         L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
+        Device.mView.transform_dir(L_dir, fuckingsun->direction);
+        L_dir.normalize();
 
         //	Use g_combine_2UV that was set up by accum_direct
         //	RCache.set_Geometry			(g_combine_2UV);
@@ -1161,7 +1163,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         //RCache.set_Element			(s_accum_direct_volumetric->E[sub_phase]);
         RCache.set_Element(Element);
         RCache.set_CullMode(CULL_CCW);
-        //		RCache.set_c				("Ldynamic_dir",		L_dir.x,L_dir.y,L_dir.z,0 );
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0);
         RCache.set_c("m_shadow", mShadow);
         Fmatrix m_Texgen;
@@ -1169,8 +1171,21 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         RCache.xforms.set_W(m_Texgen);
         RCache.xforms.set_V(Device.mView);
         RCache.xforms.set_P(Device.mProject);
-        u_compute_texgen_screen(m_Texgen);
-
+        //u_compute_texgen_screen(m_Texgen);
+        float _w = float(Device.dwWidth);
+        float _h = float(Device.dwHeight);
+        float o_w = (.5f / _w);
+        float o_h = (.5f / _h);
+        Fmatrix m_TexelAdjust =
+        {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            //	Removing half pixel offset
+            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
+            //0.5f, 0.5f , 0.0f, 1.0f
+        };
+        m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
         RCache.set_c("m_texgen", m_Texgen);
         //		RCache.set_c				("m_sunmask",			m_clouds_shadow);
 
