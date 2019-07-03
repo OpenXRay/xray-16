@@ -53,7 +53,18 @@ matrix:
 
 #    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
 #      addons: *clang60
-
+before_install:
+ - sudo add-apt-repository ppa:ubuntu-lxc/daily -y
+ - wget -q -O - https://files.viva64.com/etc/pubkey.txt | sudo apt-key add -
+ - sudo wget -O /etc/apt/sources.list.d/viva64.list
+          https://files.viva64.com/etc/viva64.list
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq coccinelle parallel 
+         libapparmor-dev libcap-dev libseccomp-dev
+         python3-dev python3-setuptools docbook2x 
+         libgnutls-dev libselinux1-dev linux-libc-dev pvs-studio
+         libio-socket-ssl-perl libnet-ssleay-perl sendemail 
+         ca-certificates
 
 install:
   - export CC=${C_COMPILER}
@@ -87,6 +98,32 @@ before_script:
 
 script:
 - if [ $TRAVIS_OS_NAME == linux ]; then make -j $core_count && file src/xrCore/xrCore.so; fi
+
+ - ./coccinelle/run-coccinelle.sh -i
+ - git diff --exit-code
+ - export CFLAGS="-Wall -Werror"
+ - export LDFLAGS="-pthread -lpthread"
+ - ./autogen.sh
+ - rm -Rf build
+ - mkdir build
+ - cd build
+ - ../configure --enable-tests --with-distro=unknown
+ - pvs-studio-analyzer credentials $PVS_USERNAME $PVS_KEY -o PVS-Studio.lic
+ - pvs-studio-analyzer trace -- make -j4
+ - pvs-studio-analyzer analyze -j2 -l PVS-Studio.lic
+     -o PVS-Studio-${CC}.log
+     --disableLicenseExpirationCheck
+ - plog-converter -t html PVS-Studio-${CC}.log -o PVS-Studio-${CC}.html
+
+ - sendemail -t mail@domain.com
+             -u "PVS-Studio $CC report, commit:$TRAVIS_COMMIT"
+             -m "PVS-Studio $CC report, commit:$TRAVIS_COMMIT"
+             -s smtp.gmail.com:587
+             -xu $MAIL_USER
+             -xp $MAIL_PASSWORD
+             -o tls=yes
+             -f $MAIL_USER
+             -a PVS-Studio-${CC}.log PVS-Studio-${CC}.html
 
 notifications:
   email: false
