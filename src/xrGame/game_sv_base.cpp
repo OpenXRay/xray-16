@@ -1242,7 +1242,7 @@ void game_sv_GameState::CheckPlayerName(xrClientData* CL)
     u32 current_name_length = xr_strlen(current_name);
 
     u32 new_name_dest_size = current_name_length + 16;
-    char* new_name_dest = static_cast<char*>(_alloca(new_name_dest_size));
+    char* new_name_dest = static_cast<char*>(xr_alloca(new_name_dest_size));
 
     while (FindPlayerName(current_name, CL))
     {

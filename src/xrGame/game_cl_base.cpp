@@ -122,7 +122,7 @@ void game_cl_GameState::net_import_state(NET_Packet& P)
     P.r_u16(p_count);
     R_ASSERT(p_count <= MAX_PLAYERS_COUNT);
 
-    buffer_vector<ClientID> valid_players(_alloca(sizeof(ClientID) * (p_count + 1)), (p_count + 1));
+    buffer_vector<ClientID> valid_players(xr_alloca(sizeof(ClientID) * (p_count + 1)), (p_count + 1));
 
     for (u16 p_it = 0; p_it < p_count; ++p_it)
     {

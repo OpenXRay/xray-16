@@ -401,7 +401,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
 
         // Duplicate and zero-terminate
         const auto size = file->length();
-        char* const data = (LPSTR)_alloca(size + 1);
+        char* const data = (LPSTR)xr_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
 

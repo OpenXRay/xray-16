@@ -158,7 +158,7 @@ void CStreamReader::r_stringZ(shared_str& dest)
             ++end_str;
         }
         if (!dest_str) // first iteration
-            dest_str = static_cast<char*>(_alloca(4096));
+            dest_str = static_cast<char*>(xr_alloca(4096));
 
         const size_t current_chunk_size = static_cast<size_t>(end_ptr - m_current_pointer);
         R_ASSERT(current_str_size + current_chunk_size <= 4096);

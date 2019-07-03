@@ -82,7 +82,7 @@ void CSpaceRestrictionComposition::initialize()
         if (!m_space_restriction_holder->restriction(_GetItem(*m_space_restrictors, i, element))->initialized())
             return;
 
-    Fsphere* spheres = (Fsphere*)_alloca(n * sizeof(Fsphere));
+    Fsphere* spheres = (Fsphere*)xr_alloca(n * sizeof(Fsphere));
     for (u32 i = 0; i < n; ++i)
     {
         SpaceRestrictionHolder::CBaseRestrictionPtr restriction =

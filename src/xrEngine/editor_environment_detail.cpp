@@ -39,11 +39,11 @@ bool logical_string_predicate::operator()(pcstr const& first, pcstr const& secon
 {
 #if defined(WINDOWS)
     u32 buffer_size0 = (xr_strlen(first) + 1) * 2;
-    LPCWSTR buffer0 = (LPCWSTR)_alloca(buffer_size0);
+    LPCWSTR buffer0 = (LPCWSTR)xr_alloca(buffer_size0);
     AnsiToUnicode(first, (LPVOID)buffer0, buffer_size0);
 
     u32 buffer_size1 = (xr_strlen(second) + 1) * 2;
-    LPCWSTR buffer1 = (LPCWSTR)_alloca(buffer_size1);
+    LPCWSTR buffer1 = (LPCWSTR)xr_alloca(buffer_size1);
     AnsiToUnicode(second, (LPVOID)buffer1, buffer_size1);
 
     return (StrCmpLogicalW(buffer0, buffer1) < 0);
@@ -56,11 +56,11 @@ bool logical_string_predicate::operator()(shared_str const& first, shared_str co
 {
 #if defined(WINDOWS)
     u32 buffer_size0 = (first.size() + 1) * 2;
-    LPCWSTR buffer0 = (LPCWSTR)_alloca(buffer_size0);
+    LPCWSTR buffer0 = (LPCWSTR)xr_alloca(buffer_size0);
     AnsiToUnicode(first.c_str(), (LPVOID)buffer0, buffer_size0);
 
     u32 buffer_size1 = (second.size() + 1) * 2;
-    LPCWSTR buffer1 = (LPCWSTR)_alloca(buffer_size1);
+    LPCWSTR buffer1 = (LPCWSTR)xr_alloca(buffer_size1);
     AnsiToUnicode(second.c_str(), (LPVOID)buffer1, buffer_size1);
 
     return (StrCmpLogicalW(buffer0, buffer1) < 0);

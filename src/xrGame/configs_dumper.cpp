@@ -141,7 +141,7 @@ void configs_dumper::write_configs()
     }
     CInifile active_params_dumper(NULL, FALSE, FALSE, FALSE);
     active_objects_t active_objects(
-        _alloca(sizeof(active_objects_t::value_type) * max_active_objects), max_active_objects);
+        xr_alloca(sizeof(active_objects_t::value_type) * max_active_objects), max_active_objects);
     active_objects_t::size_type aobjs_count = get_active_objects(active_objects);
     string16 tmp_strbuff;
     for (active_objects_t::size_type i = 0; i < aobjs_count; ++i)

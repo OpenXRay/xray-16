@@ -1861,7 +1861,7 @@ void game_cl_mp::extract_server_info(u8* data_ptr, u32 data_size)
         return;
     }
     using namespace file_transfer;
-    buffer_vector<const_buffer_t> tmp_vector(_alloca(sizeof(const_buffer_t) * 2), 2);
+    buffer_vector<const_buffer_t> tmp_vector(xr_alloca(sizeof(const_buffer_t) * 2), 2);
     split_received_to_buffers(data_ptr, data_size, tmp_vector);
     if (tmp_vector.empty())
     {

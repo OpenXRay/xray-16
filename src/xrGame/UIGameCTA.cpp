@@ -534,7 +534,7 @@ void CUIGameCTA::SetPlayerItemsToBuyMenu()
         auto& inventory = actor->inventory();
         u32 max_addammo_count = actor->inventory().m_all.size();
         aditional_ammo_t add_ammo(
-            _alloca(sizeof(aditional_ammo_t::value_type) * (max_addammo_count * 2)), max_addammo_count * 2);
+            xr_alloca(sizeof(aditional_ammo_t::value_type) * (max_addammo_count * 2)), max_addammo_count * 2);
         TryToDefuseAllWeapons(add_ammo);
         for (u16 i = inventory.FirstSlot(); i <= inventory.LastSlot(); i++)
             BuyMenuItemInserter(inventory.ItemFromSlot(i));
@@ -735,7 +735,7 @@ void CUIGameCTA::ShowBuySpawn(s32 spawn_cost)
     LPCSTR format_str = StringTable().translate("mp_press_yes2pay").c_str();
     VERIFY(format_str);
     size_t pay_frm_size = xr_strlen(format_str) * sizeof(char) + 64;
-    PSTR pay_frm_str = static_cast<char*>(_alloca(pay_frm_size));
+    PSTR pay_frm_str = static_cast<char*>(xr_alloca(pay_frm_size));
 
     xr_sprintf(pay_frm_str, pay_frm_size, format_str, abs(Game().local_player->money_for_round), abs(spawn_cost));
 

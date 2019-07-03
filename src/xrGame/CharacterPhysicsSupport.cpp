@@ -775,7 +775,7 @@ void reset_root_bone_start_pose( CPhysicsShell& shell )
 
     //u16 anim_bones_number = K->LL_BoneCount();
 
-    //buffer_vector<u32>	anim_bones_bind_positions( _alloca(anim_bones_number*sizeof(u32)),
+    //buffer_vector<u32>	anim_bones_bind_positions( xr_alloca(anim_bones_number*sizeof(u32)),
     //												anim_bones_number
     //											);
 #pragma todo("LL_GetBindTransform shoud use buffer_vector")

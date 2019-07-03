@@ -182,7 +182,7 @@ void SDLLogOutput(void* /*userdata*/,
 
     constexpr pcstr format = "%c [sdl][%s][%s]: %s";
     const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
-    pstr buf = (pstr)_alloca(size);
+    pstr buf = (pstr)xr_alloca(size);
 
     xr_sprintf(buf, size, format, mark, from, type, message);
     Log(buf);

@@ -203,13 +203,13 @@ BOOL NEW_ApplyBorders(lm_layer& lm, u32 ref)
 {
     bool bNeedContinue = false;
 
-    buffer_vector<base_color> buf_surf_line0(_alloca(lm.width * sizeof(base_color)), lm.width);
+    buffer_vector<base_color> buf_surf_line0(xr_alloca(lm.width * sizeof(base_color)), lm.width);
 
-    buffer_vector<base_color> buf_surf_line1(_alloca(lm.width * sizeof(base_color)), lm.width);
+    buffer_vector<base_color> buf_surf_line1(xr_alloca(lm.width * sizeof(base_color)), lm.width);
 
-    buffer_vector<u8> buf_marker_line0(_alloca(lm.width * sizeof(u8)), lm.width);
+    buffer_vector<u8> buf_marker_line0(xr_alloca(lm.width * sizeof(u8)), lm.width);
 
-    buffer_vector<u8> buf_marker_line1(_alloca(lm.width * sizeof(u8)), lm.width);
+    buffer_vector<u8> buf_marker_line1(xr_alloca(lm.width * sizeof(u8)), lm.width);
 
     lm_line line0(buf_surf_line0, buf_marker_line0);
     lm_line line1(buf_surf_line1, buf_marker_line1);

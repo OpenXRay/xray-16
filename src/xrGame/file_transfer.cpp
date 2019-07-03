@@ -68,7 +68,7 @@ void server_site::update_transfer()
         return;
 
     buffer_vector<dst_src_pair_t> to_stop_transfers(
-        _alloca(m_transfers.size() * sizeof(dst_src_pair_t)), m_transfers.size());
+        xr_alloca(m_transfers.size() * sizeof(dst_src_pair_t)), m_transfers.size());
 
     for (transfer_sessions_t::iterator ti = m_transfers.begin(), tie = m_transfers.end(); ti != tie; ++ti)
     {
@@ -159,7 +159,7 @@ void server_site::on_message(NET_Packet* packet, ClientID const& sender)
 void server_site::stop_obsolete_receivers()
 {
     u32 current_time = Device.dwTimeGlobal;
-    buffer_vector<ClientID> to_stop_receivers(_alloca(m_receivers.size() * sizeof(ClientID)), m_receivers.size());
+    buffer_vector<ClientID> to_stop_receivers(xr_alloca(m_receivers.size() * sizeof(ClientID)), m_receivers.size());
 
     for (receiving_sessions_t::iterator i = m_receivers.begin(), ie = m_receivers.end(); i != ie; ++i)
     {
@@ -548,7 +548,7 @@ void client_site::stop_receiving_sessions(buffer_vector<ClientID> const& rsessio
 void client_site::stop_obsolete_receivers()
 {
     u32 current_time = Device.dwTimeGlobal;
-    buffer_vector<ClientID> to_stop_receivers(_alloca(m_receivers.size() * sizeof(ClientID)), m_receivers.size());
+    buffer_vector<ClientID> to_stop_receivers(xr_alloca(m_receivers.size() * sizeof(ClientID)), m_receivers.size());
 
     for (receiving_sessions_t::iterator i = m_receivers.begin(), ie = m_receivers.end(); i != ie; ++i)
     {

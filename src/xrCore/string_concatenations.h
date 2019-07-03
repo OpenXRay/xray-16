@@ -72,7 +72,7 @@ IC pstr strconcat(int dest_sz, pstr dest, pcstr S1, pcstr S2, pcstr S3, pcstr S4
         xray::core::detail::string_tupples STRCONCAT_tupples_unique_identifier(__VA_ARGS__); \
         u32 STRCONCAT_buffer_size = STRCONCAT_tupples_unique_identifier.size();              \
         xray::core::detail::check_stack_overflow(STRCONCAT_buffer_size);                     \
-        (dest) = (pstr)_alloca(STRCONCAT_buffer_size);                                      \
+        (dest) = (pstr)xr_alloca(STRCONCAT_buffer_size);                                      \
         STRCONCAT_tupples_unique_identifier.concat(dest);                                    \
     } while (0)
 
@@ -82,7 +82,7 @@ IC pstr strconcat(int dest_sz, pstr dest, pcstr S1, pcstr S2, pcstr S3, pcstr S4
     do                                                                                       \
     {                                                                                        \
         xray::core::detail::string_tupples STRCONCAT_tupples_unique_identifier(__VA_ARGS__); \
-        (dest) = (pstr)_alloca(STRCONCAT_tupples_unique_identifier.size());                 \
+        (dest) = (pstr)xr_alloca(STRCONCAT_tupples_unique_identifier.size());                 \
         STRCONCAT_tupples_unique_identifier.concat(dest);                                    \
     } while (0)
 

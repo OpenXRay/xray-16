@@ -269,8 +269,8 @@ bool CUIFactionWarWnd::InitFactions()
         return false;
     }
     u32   size_temp   = (xr_strlen(vs_teams) + 1) * sizeof(char);
-    PSTR  our_fract   = (PSTR)_alloca( size_temp );
-    PSTR  enemy_fract = (PSTR)_alloca( size_temp );
+    PSTR  our_fract   = (PSTR)xr_alloca( size_temp );
+    PSTR  enemy_fract = (PSTR)xr_alloca( size_temp );
     _GetItem( vs_teams, 0, our_fract );
     _GetItem( vs_teams, 1, enemy_fract );
 

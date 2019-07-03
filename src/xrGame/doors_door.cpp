@@ -282,7 +282,7 @@ shared_str door::get_initiators_ids() const
     for (; i != e; ++i)
         buffer_size += xr_strlen((*i)->get_name()) + 2;
 
-    LPSTR const result = (LPSTR)_alloca(buffer_size);
+    LPSTR const result = (LPSTR)xr_alloca(buffer_size);
     *result = 0;
     LPSTR j = result;
     u32 left_size = buffer_size;

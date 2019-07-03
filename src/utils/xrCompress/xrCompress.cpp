@@ -155,7 +155,7 @@ void xrCompressor::write_file_header(
     size_t buffer_size = file_name_size + 4 * sizeof(u32);
     VERIFY(buffer_size <= 65535);
     size_t full_buffer_size = buffer_size + sizeof(u16);
-    u8* buffer = (u8*)_alloca(full_buffer_size);
+    u8* buffer = (u8*)xr_alloca(full_buffer_size);
     u8* buffer_start = buffer;
     *(u16*)buffer = (u16)buffer_size;
     buffer += sizeof(u16);

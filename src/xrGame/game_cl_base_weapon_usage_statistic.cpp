@@ -324,8 +324,8 @@ void Player_Statistic::net_save(NET_Packet* P)
     m_dwTotalShots_d = 0;
     P->w_u32(aWeaponStats.size());
 
-    victims_table::victims_table_t vt_storage(_alloca(sizeof(victims_table::victims_table_t::value_type) * 255), 255);
-    bone_table::bone_table_t bt_storage(_alloca(sizeof(bone_table::bone_table_t::value_type) * 65), 65);
+    victims_table::victims_table_t vt_storage(xr_alloca(sizeof(victims_table::victims_table_t::value_type) * 255), 255);
+    bone_table::bone_table_t bt_storage(xr_alloca(sizeof(bone_table::bone_table_t::value_type) * 65), 65);
 
     victims_table vict_table(vt_storage);
     bone_table bone_table(bt_storage);
@@ -351,8 +351,8 @@ void Player_Statistic::net_load(NET_Packet* P)
     m_dwTotalShots += P->r_u32();
     u32 NumWeapons = P->r_u32();
 
-    victims_table::victims_table_t vt_storage(_alloca(sizeof(victims_table::victims_table_t::value_type) * 255), 255);
-    bone_table::bone_table_t bt_storage(_alloca(sizeof(bone_table::bone_table_t::value_type) * 65), 65);
+    victims_table::victims_table_t vt_storage(xr_alloca(sizeof(victims_table::victims_table_t::value_type) * 255), 255);
+    bone_table::bone_table_t bt_storage(xr_alloca(sizeof(bone_table::bone_table_t::value_type) * 65), 65);
 
     victims_table vict_table(vt_storage);
     bone_table bone_table(bt_storage);

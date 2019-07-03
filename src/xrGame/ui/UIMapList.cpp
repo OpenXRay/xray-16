@@ -332,7 +332,7 @@ void CUIMapList::UpdateMapList(EGameIDs GameType)
         return;
     }
 
-    MapList map_list(_alloca(sizeof(shared_str) * list_size), list_size);
+    MapList map_list(xr_alloca(sizeof(shared_str) * list_size), list_size);
 
     for (u32 i = 0; i < list_size; ++i)
     {

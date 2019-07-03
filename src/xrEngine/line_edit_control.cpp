@@ -506,7 +506,7 @@ void line_edit_control::add_inserted_text()
         }
     }
 
-    auto buf = (pstr)_alloca((m_buffer_size + 1) * sizeof(char));
+    auto buf = (pstr)xr_alloca((m_buffer_size + 1) * sizeof(char));
 
     strncpy_s(buf, m_buffer_size, m_edit_str, m_p1); // part 1
     strncpy_s(m_undo_buf, m_buffer_size, m_edit_str + m_p1, m_p2 - m_p1);
@@ -543,7 +543,7 @@ void line_edit_control::copy_to_clipboard()
         return;
     }
     const size_t edit_len = xr_strlen(m_edit_str);
-    auto buf = (pstr)_alloca((edit_len + 1) * sizeof(char));
+    auto buf = (pstr)xr_alloca((edit_len + 1) * sizeof(char));
     strncpy_s(buf, edit_len + 1, m_edit_str + m_p1, m_p2 - m_p1);
     buf[edit_len] = 0;
     os_clipboard::copy_to_clipboard(buf);
@@ -702,7 +702,7 @@ void remove_spaces(pstr str)
     {
         return;
     }
-    auto new_str = (pstr)_alloca((str_size + 1) * sizeof(char));
+    auto new_str = (pstr)xr_alloca((str_size + 1) * sizeof(char));
     new_str[0] = 0;
 
     size_t a = 0, b = 0, i = 0;

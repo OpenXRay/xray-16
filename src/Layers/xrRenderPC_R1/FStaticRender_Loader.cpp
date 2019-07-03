@@ -226,7 +226,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
         _VB.resize(count);
 
         u32 buffer_size = (MAXD3DDECLLENGTH + 1) * sizeof(D3DVERTEXELEMENT9);
-        D3DVERTEXELEMENT9* dcl = (D3DVERTEXELEMENT9*)_alloca(buffer_size);
+        D3DVERTEXELEMENT9* dcl = (D3DVERTEXELEMENT9*)xr_alloca(buffer_size);
 
         for (u32 i = 0; i < count; i++)
         {

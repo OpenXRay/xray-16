@@ -317,7 +317,7 @@ void CFileWriteBlock::send(IGenericStream* _stream)
     _stream->SetLength(position + length);
     _stream->Seek(position);
 
-    void* block = _alloca(block_size);
+    void* block = xr_alloca(block_size);
 
     for (size_t n = length / block_size, i = 0; i < n; ++i)
     {

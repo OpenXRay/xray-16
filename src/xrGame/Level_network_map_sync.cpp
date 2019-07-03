@@ -10,7 +10,7 @@
 static const u32 r_buffer_size = 131072; // 128 Kb
 void CLevel::CalculateLevelCrc32()
 {
-    void* read_buffer = _alloca(r_buffer_size);
+    void* read_buffer = xr_alloca(r_buffer_size);
     Msg("* calculating checksum of level.geom");
     CStreamReader* geom = FS.rs_open("$level$", "level.geom");
     R_ASSERT2(geom, "failed to open level.geom file");

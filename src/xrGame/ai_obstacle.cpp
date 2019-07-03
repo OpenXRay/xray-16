@@ -108,7 +108,7 @@ void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)
     Fvector last_half_size = Fvector().set(flt_max, flt_max, flt_max);
     Fmatrix before_scale_matrix = Fidentity;
     Fmatrix xform = m_object->XFORM();
-    Fvector* points = (Fvector*)_alloca(visible_bone_count * 8 * sizeof(Fvector));
+    Fvector* points = (Fvector*)xr_alloca(visible_bone_count * 8 * sizeof(Fvector));
     Fvector* I = points;
     for (u16 i = 0; i < bone_count; ++i)
     {

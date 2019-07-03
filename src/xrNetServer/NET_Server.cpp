@@ -832,7 +832,7 @@ bool IPureServer::DisconnectClient(IClient* C, pcstr Reason)
 bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
 {
     u32 players_count = net_players.ClientsCount();
-    buffer_vector<IClient*> PlayersToDisconnect(_alloca(players_count * sizeof(IClient*)), players_count);
+    buffer_vector<IClient*> PlayersToDisconnect(xr_alloca(players_count * sizeof(IClient*)), players_count);
 
     struct ToDisconnectFillerFunctor
     {

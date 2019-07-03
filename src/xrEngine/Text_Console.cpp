@@ -244,7 +244,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     LPCSTR s_cur = ec().str_before_cursor();
 
     u32 cur_len = xr_strlen(s_cur) + xr_strlen(ch_cursor) + 1;
-    PSTR buf = (PSTR)_alloca(cur_len * sizeof(char));
+    PSTR buf = (PSTR)xr_alloca(cur_len * sizeof(char));
     xr_strcpy(buf, cur_len, s_cur);
     xr_strcat(buf, cur_len, ch_cursor);
     buf[cur_len - 1] = 0;

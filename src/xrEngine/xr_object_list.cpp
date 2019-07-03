@@ -258,7 +258,7 @@ void CObjectList::Update(bool bForce)
             stats.Total = objects_active.size() + objects_sleeping.size();
 
             u32 const objects_count = workload->size();
-            IGameObject** objects = (IGameObject**)_alloca(objects_count * sizeof(IGameObject*));
+            IGameObject** objects = (IGameObject**)xr_alloca(objects_count * sizeof(IGameObject*));
             std::copy(workload->begin(), workload->end(), objects);
 
             m_primary_crows.clear();

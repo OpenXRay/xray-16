@@ -187,7 +187,7 @@ void CGameTaskManager::UpdateTasks()
     {
         typedef buffer_vector<SGameTaskKey> Tasks;
         Tasks tasks(
-            _alloca(task_count * sizeof(SGameTaskKey)), task_count, GetGameTasks().begin(), GetGameTasks().end());
+            xr_alloca(task_count * sizeof(SGameTaskKey)), task_count, GetGameTasks().begin(), GetGameTasks().end());
 
         Tasks::const_iterator I = tasks.begin();
         Tasks::const_iterator E = tasks.end();

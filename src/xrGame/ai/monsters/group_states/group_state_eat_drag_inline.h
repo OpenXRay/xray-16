@@ -31,7 +31,7 @@ void CStateGroupDragAbstract::initialize()
     pcstr const bones = ini->r_string("capture_used_bones", "bones");
 
     int bone_number = _GetItemCount(bones);
-    u16* vbones = (u16*)_alloca(bone_number * sizeof(u16));
+    u16* vbones = (u16*)xr_alloca(bone_number * sizeof(u16));
     u16* I = vbones;
     u16* E = vbones + bone_number;
     for (; I != E; ++I)

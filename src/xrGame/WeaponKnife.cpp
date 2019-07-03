@@ -235,7 +235,7 @@ void CWeaponKnife::KnifeStrike(const Fvector& pos, const Fvector& dir)
         return;
     }
 
-    shot_targets_t dest_hits(_alloca(sizeof(Fvector) * m_hits_count), m_hits_count);
+    shot_targets_t dest_hits(xr_alloca(sizeof(Fvector) * m_hits_count), m_hits_count);
 
     if (SelectHitsToShot(dest_hits, pos))
     {
@@ -793,7 +793,7 @@ u32 CWeaponKnife::SelectHitsToShot(shot_targets_t& dst_dirs, Fvector const& f_po
         return 0;
 
     victims_list_t tmp_victims_list(
-        _alloca(m_spartial_query_res.size() * sizeof(CEntityAlive*)), m_spartial_query_res.size());
+        xr_alloca(m_spartial_query_res.size() * sizeof(CEntityAlive*)), m_spartial_query_res.size());
 
     create_victims_list(m_spartial_query_res, tmp_victims_list);
 
@@ -803,7 +803,7 @@ u32 CWeaponKnife::SelectHitsToShot(shot_targets_t& dst_dirs, Fvector const& f_po
         summ_shapes_count += get_entity_bones_count(*i);
     }
     victims_shapes_list_t tmp_shapes_list(
-        _alloca(summ_shapes_count * sizeof(victims_shapes_list_t::value_type)), summ_shapes_count);
+        xr_alloca(summ_shapes_count * sizeof(victims_shapes_list_t::value_type)), summ_shapes_count);
 
     Fvector basis_vector;
     if (m_eHitType == m_eHitType_1)

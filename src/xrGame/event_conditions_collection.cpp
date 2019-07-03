@@ -205,7 +205,7 @@ void event_conditions_collection::execute_root_condtiion(event_root_conditions_t
 
 event_condition_t* event_conditions_collection::add_and_condition(event_condition_t* left, event_condition_t* right)
 {
-    buffer_vector<event_argument_type> args_buffer(_alloca(sizeof(event_argument_type) * 2), 2);
+    buffer_vector<event_argument_type> args_buffer(xr_alloca(sizeof(event_argument_type) * 2), 2);
     event_argument_type tmp_arg;
     tmp_arg.m_argument_type_tag = event_argument_type::at_condition;
     tmp_arg.m_argument_value.cond_ptr_value = left;
@@ -219,7 +219,7 @@ event_condition_t* event_conditions_collection::add_and_condition(event_conditio
 
 event_condition_t* event_conditions_collection::add_or_condition(event_condition_t* left, event_condition_t* right)
 {
-    buffer_vector<event_argument_type> args_buffer(_alloca(sizeof(event_argument_type) * 2), 2);
+    buffer_vector<event_argument_type> args_buffer(xr_alloca(sizeof(event_argument_type) * 2), 2);
     event_argument_type tmp_arg;
     tmp_arg.m_argument_type_tag = event_argument_type::at_condition;
     tmp_arg.m_argument_value.cond_ptr_value = left;
@@ -235,7 +235,7 @@ event_condition_t* event_conditions_collection::add_hit_condition_dist(
     u32 hit_counts, u16 weapon_id, u16 bone_id, float_binary_function* fbfunc, float distanse)
 {
     buffer_vector<event_argument_type> args_buffer(
-        _alloca(sizeof(event_argument_type) * hpa_args_count), hpa_args_count);
+        xr_alloca(sizeof(event_argument_type) * hpa_args_count), hpa_args_count);
     event_argument_type tmp_arg;
     tmp_arg.m_argument_type_tag = event_argument_type::at_u32;
     tmp_arg.m_argument_value.u32_value = hit_counts;
@@ -264,7 +264,7 @@ event_condition_t* event_conditions_collection::add_kill_condition_dist(
     u32 kill_counts, u16 weapon_id, u16 kill_type, u16 special_kill_type, u32 time_period)
 {
     buffer_vector<event_argument_type> args_buffer(
-        _alloca(sizeof(event_argument_type) * kpa_args_count), kpa_args_count);
+        xr_alloca(sizeof(event_argument_type) * kpa_args_count), kpa_args_count);
     event_argument_type tmp_arg;
     tmp_arg.m_argument_type_tag = event_argument_type::at_u32;
     tmp_arg.m_argument_value.u32_value = kill_counts;
@@ -293,7 +293,7 @@ event_condition_t* event_conditions_collection::add_accumm_value_condition(
     u16 param_id, float_binary_function* fbfunc, float argument)
 {
     buffer_vector<event_argument_type> args_buffer(
-        _alloca(sizeof(event_argument_type) * cpa_args_count), cpa_args_count);
+        xr_alloca(sizeof(event_argument_type) * cpa_args_count), cpa_args_count);
     event_argument_type tmp_arg;
 
     tmp_arg.m_argument_type_tag = event_argument_type::at_u16;
@@ -315,7 +315,7 @@ event_condition_t* event_conditions_collection::add_accumm_value_condition(
     u16 param_id, u32_binary_function* fbfunc, u32 argument)
 {
     buffer_vector<event_argument_type> args_buffer(
-        _alloca(sizeof(event_argument_type) * cpa_args_count), cpa_args_count);
+        xr_alloca(sizeof(event_argument_type) * cpa_args_count), cpa_args_count);
     event_argument_type tmp_arg;
 
     tmp_arg.m_argument_type_tag = event_argument_type::at_u16;

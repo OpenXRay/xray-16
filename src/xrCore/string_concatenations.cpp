@@ -21,7 +21,7 @@ namespace strconcat_error
 void process(u32 const index, u32 const count, pcstr* strings)
 {
     u32 const max_string_size = 1024;
-    pstr temp = (pstr)_alloca((count * (max_string_size + 4) + 1) * sizeof(**strings));
+    pstr temp = (pstr)xr_alloca((count * (max_string_size + 4) + 1) * sizeof(**strings));
     pstr k = temp;
     *k++ = '[';
     for (u32 i = 0; i < count; ++i)
@@ -81,7 +81,7 @@ void check_stack_overflow(u32 stack_increment)
 #if defined(WINDOWS)
     __try
     {
-        void* p = _alloca(stack_increment);
+        void* p = xr_alloca(stack_increment);
         p;
     }
     __except (xray::core::detail::stack_overflow_exception_filter(GetExceptionCode()))

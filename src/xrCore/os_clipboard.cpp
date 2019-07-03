@@ -98,7 +98,7 @@ void os_clipboard::update_clipboard(pcstr string)
 
     const size_t bufferSize = (clipLength + stringLength + 1) * sizeof(char);
 
-    pstr buffer = (pstr)_alloca(bufferSize);
+    pstr buffer = (pstr)xr_alloca(bufferSize);
 
     xr_strcpy(buffer, bufferSize, clipData); // copy the clipboard
     xr_strcat(buffer, bufferSize, stringInUTF8.c_str()); // copy the new string

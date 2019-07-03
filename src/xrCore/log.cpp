@@ -83,7 +83,7 @@ void Log(const char* s)
 
     u32 length = xr_strlen(s);
 #ifndef _EDITOR
-    PSTR split = (PSTR)_alloca((length + 1) * sizeof(char));
+    PSTR split = (PSTR)xr_alloca((length + 1) * sizeof(char));
 #else
     PSTR split = (PSTR)alloca((length + 1) * sizeof(char));
 #endif
@@ -130,7 +130,7 @@ void Log(const char* msg, const char* dop)
     }
 
     u32 buffer_size = (xr_strlen(msg) + 1 + xr_strlen(dop) + 1) * sizeof(char);
-    PSTR buf = (PSTR)_alloca(buffer_size);
+    PSTR buf = (PSTR)xr_alloca(buffer_size);
     strconcat(buffer_size, buf, msg, " ", dop);
     Log(buf);
 }
@@ -138,7 +138,7 @@ void Log(const char* msg, const char* dop)
 void Log(const char* msg, u32 dop)
 {
     u32 buffer_size = (xr_strlen(msg) + 1 + 10 + 1) * sizeof(char);
-    PSTR buf = (PSTR)_alloca(buffer_size);
+    PSTR buf = (PSTR)xr_alloca(buffer_size);
 
     xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
     Log(buf);
@@ -147,7 +147,7 @@ void Log(const char* msg, u32 dop)
 void Log(const char* msg, u64 dop)
 {
     u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
-    PSTR buf = (PSTR)_alloca(buffer_size);
+    PSTR buf = (PSTR)xr_alloca(buffer_size);
 
     xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
     Log(buf);
@@ -156,7 +156,7 @@ void Log(const char* msg, u64 dop)
 void Log(const char* msg, int dop)
 {
     u32 buffer_size = (xr_strlen(msg) + 1 + 11 + 1) * sizeof(char);
-    PSTR buf = (PSTR)_alloca(buffer_size);
+    PSTR buf = (PSTR)xr_alloca(buffer_size);
 
     xr_sprintf(buf, buffer_size, "%s %i", msg, dop);
     Log(buf);
@@ -167,7 +167,7 @@ void Log(const char* msg, float dop)
     // actually, float string representation should be no more, than 40 characters,
     // but we will count with slight overhead
     u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
-    PSTR buf = (PSTR)_alloca(buffer_size);
+    PSTR buf = (PSTR)xr_alloca(buffer_size);
 
     xr_sprintf(buf, buffer_size, "%s %f", msg, dop);
     Log(buf);
@@ -176,7 +176,7 @@ void Log(const char* msg, float dop)
 void Log(const char* msg, const Fvector& dop)
 {
     u32 buffer_size = (xr_strlen(msg) + 2 + 3 * (64 + 1) + 1) * sizeof(char);
-    PSTR buf = (PSTR)_alloca(buffer_size);
+    PSTR buf = (PSTR)xr_alloca(buffer_size);
 
     xr_sprintf(buf, buffer_size, "%s (%f,%f,%f)", msg, VPUSH(dop));
     Log(buf);
@@ -185,7 +185,7 @@ void Log(const char* msg, const Fvector& dop)
 void Log(const char* msg, const Fmatrix& dop)
 {
     u32 buffer_size = (xr_strlen(msg) + 2 + 4 * (4 * (64 + 1) + 1) + 1) * sizeof(char);
-    PSTR buf = (PSTR)_alloca(buffer_size);
+    PSTR buf = (PSTR)xr_alloca(buffer_size);
 
     xr_sprintf(buf, buffer_size, "%s:\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n", msg, dop.i.x, dop.i.y,
         dop.i.z, dop._14_, dop.j.x, dop.j.y, dop.j.z, dop._24_, dop.k.x, dop.k.y, dop.k.z, dop._34_, dop.c.x, dop.c.y,

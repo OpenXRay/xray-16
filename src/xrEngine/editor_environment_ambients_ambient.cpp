@@ -115,7 +115,7 @@ void ambient::save(CInifile& config)
         for (const auto &i : m_sound_channels_ids)
             count += i->id().size() + 2;
 
-        temp = (pstr)_alloca(count * sizeof(char));
+        temp = (pstr)xr_alloca(count * sizeof(char));
         *temp = '\0';
         for (const auto &i : m_sound_channels_ids)
         {
@@ -135,7 +135,7 @@ void ambient::save(CInifile& config)
         for (const auto &i : m_effects_ids)
             count += i->id().size() + 2;
 
-        temp = (pstr)_alloca(count * sizeof(char));
+        temp = (pstr)xr_alloca(count * sizeof(char));
         *temp = '\0';
         for (const auto &i : m_effects_ids)
         {

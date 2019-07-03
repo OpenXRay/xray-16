@@ -365,7 +365,7 @@ void CUILines::Draw(float x, float y)
             {
                 u32 buff_len = sizeof(char) * xr_strlen(m_text.c_str()) + 1;
 
-                char* p = static_cast<char*>(_alloca(buff_len));
+                char* p = static_cast<char*>(xr_alloca(buff_len));
                 LPCSTR str = GetElipsisText(m_pFont, m_wndSize.x, m_text.c_str(), p, buff_len);
 
                 m_pFont->Out(text_pos.x, text_pos.y, "%s", str);

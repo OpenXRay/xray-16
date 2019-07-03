@@ -86,7 +86,7 @@ void show_animations()
 {
     u32 animation_count = g_animation_stats.size();
     const ANIMATION_STATS_PAIR** const animations =
-        (ANIMATION_STATS_PAIR const**)_alloca(animation_count * sizeof(ANIMATION_STATS_PAIR*));
+        (ANIMATION_STATS_PAIR const**)xr_alloca(animation_count * sizeof(ANIMATION_STATS_PAIR*));
     const ANIMATION_STATS_PAIR** i = animations;
     ANIMATION_STATS::const_iterator I = g_animation_stats.begin();
     ANIMATION_STATS::const_iterator E = g_animation_stats.end();
@@ -113,7 +113,7 @@ void show_animations()
 void show_blends()
 {
     u32 blend_count = g_blend_stats.size();
-    const BLEND_STATS_PAIR** const blends = (BLEND_STATS_PAIR const**)_alloca(blend_count * sizeof(BLEND_STATS_PAIR*));
+    const BLEND_STATS_PAIR** const blends = (BLEND_STATS_PAIR const**)xr_alloca(blend_count * sizeof(BLEND_STATS_PAIR*));
     const BLEND_STATS_PAIR** i = blends;
     BLEND_STATS::const_iterator I = g_blend_stats.begin();
     BLEND_STATS::const_iterator E = g_blend_stats.end();

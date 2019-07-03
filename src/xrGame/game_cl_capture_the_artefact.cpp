@@ -1238,16 +1238,16 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
         return;
 
     u32 psize = P.B.count + 1;
-    char* command = static_cast<char*>(_alloca(psize));
-    char* player = static_cast<char*>(_alloca(psize));
-    char* cmd_name = static_cast<char*>(_alloca(psize));
+    char* command = static_cast<char*>(xr_alloca(psize));
+    char* player = static_cast<char*>(xr_alloca(psize));
+    char* cmd_name = static_cast<char*>(xr_alloca(psize));
     char* tcmd_name = cmd_name;
     static constexpr pcstr scans_format = "%s %s %s %s %s";
 
     char* args[MAX_VOTE_PARAMS];
     for (u32 i = 0; i < MAX_VOTE_PARAMS; ++i)
     {
-        args[i] = static_cast<char*>(_alloca(psize + 1));
+        args[i] = static_cast<char*>(xr_alloca(psize + 1));
     }
 
     P.r_stringZ(command);
@@ -1288,7 +1288,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
             pcstr ted_str = StringTable().translate(ttable[i][1]).c_str();
             VERIFY(ted_str);
             tcmd_len = xr_strlen(ted_str) + 1;
-            tcmd_name = static_cast<char*>(_alloca(tcmd_len));
+            tcmd_name = static_cast<char*>(xr_alloca(tcmd_len));
             xr_strcpy(tcmd_name, tcmd_len, ted_str);
 #ifdef CLIENT_CTA_LOG
             Msg("---Translated command to: %s", tcmd_name);
@@ -1298,7 +1298,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     }
 
     u32 vstr_size = (args_count * (psize + 1)) + tcmd_len + 1;
-    char* vstr = static_cast<char*>(_alloca(vstr_size));
+    char* vstr = static_cast<char*>(xr_alloca(vstr_size));
     xr_strcpy(vstr, vstr_size, tcmd_name);
     for (int i = 0; i < args_count; ++i)
     {
@@ -1311,7 +1311,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     pcstr t_vote_str = StringTable().translate("mp_voting_started").c_str();
     VERIFY(t_vote_str);
     u32 fin_str_size = xr_strlen(t_vote_str) + vstr_size + xr_strlen(player) + 1;
-    char* fin_str = static_cast<char*>(_alloca(fin_str_size));
+    char* fin_str = static_cast<char*>(xr_alloca(fin_str_size));
 
 #ifdef CLIENT_CTA_LOG
     Msg("---Making finally string: (t_vote_str: %s), (vstr: %s), (player: %s)", t_vote_str, vstr, player);

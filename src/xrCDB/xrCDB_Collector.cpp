@@ -119,7 +119,7 @@ void Collector::calc_adjacency(xr_vector<u32>& dest)
     xr_vector<edge> _edges(edge_count);
     edge* edges = &*_edges.begin();
 #else
-    edge* edges = (edge*)_alloca(edge_count * sizeof(edge));
+    edge* edges = (edge*)xr_alloca(edge_count * sizeof(edge));
 #endif
     edge* i = edges;
     xr_vector<TRI>::const_iterator B = faces.begin(), I = B;

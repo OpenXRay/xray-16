@@ -219,9 +219,9 @@ bool actor::update_doors(doors_type const& detected_doors, float const average_s
 
     u32 const detected_doors_count = detected_doors.size();
     temp_doors_type new_doors_to_open(
-        _alloca(detected_doors_count * sizeof(doors_type::value_type)), detected_doors_count);
+        xr_alloca(detected_doors_count * sizeof(doors_type::value_type)), detected_doors_count);
     temp_doors_type new_doors_to_close(
-        _alloca(detected_doors_count * sizeof(doors_type::value_type)), detected_doors_count);
+        xr_alloca(detected_doors_count * sizeof(doors_type::value_type)), detected_doors_count);
 
     float const check_distance = average_speed * g_door_open_time + g_door_length;
 

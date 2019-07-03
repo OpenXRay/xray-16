@@ -147,7 +147,7 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
         // defusing all weapons
         u32 max_addammo_count = pCurActor->inventory().m_all.size();
         aditional_ammo_t add_ammo(
-            _alloca(sizeof(aditional_ammo_t::value_type) * (max_addammo_count * 2)), (max_addammo_count * 2));
+            xr_alloca(sizeof(aditional_ammo_t::value_type) * (max_addammo_count * 2)), (max_addammo_count * 2));
         TryToDefuseAllWeapons(add_ammo);
 
         //проверяем слоты
