@@ -5,9 +5,6 @@
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/qweasdd136963/luabind-deboostified.git
-[submodule "Externals/GameSpy"]
-	path = Externals/GameSpy
-	url = https://github.com/nitrocaster/GameSpy.git
 [submodule "Externals/AGS_SDK"]
 	path = Externals/AGS_SDK
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git
@@ -44,15 +41,6 @@
 [submodule "Externals/FreeMagic"]
 	path = Externals/FreeMagic
 	url = https://github.com/OpenXRay/FreeMagic.git
-[submodule "Externals/lightwave"]
-	path = Externals/lightwave
-	url = https://github.com/OpenXRay/LightWave.git
-[submodule "Externals/3dsmax"]
-	path = Externals/3dsmax
-	url = https://github.com/OpenXRay/3dsmax.git
-[submodule "Externals/maya"]
-	path = Externals/maya
-	url = https://github.com/OpenXRay/maya.git
 [submodule "Externals/nvapi"]
 	path = Externals/nvapi
 	url = https://github.com/OpenXRay/nvapi.git
