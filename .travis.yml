@@ -86,7 +86,7 @@ before_script:
     fi
 
   - if [ $TARGET_CPU == x86 ]; then
-       sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-7-multilib libpulse-dev:i386 libglib2.0-dev:i386;
+       sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-8-multilib libpulse-dev:i386 libglib2.0-dev:i386;
        sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386 libfreeimageplus-dev:i386;
        sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386;
        wget http://launchpadlibrarian.net/297657459/libsdl2-2.0-0_2.0.5+dfsg1-1ubuntu1_i386.deb;
@@ -98,24 +98,22 @@ before_script:
 
 script:
 - if [ $TRAVIS_OS_NAME == linux ]; then make -j $core_count && file src/xrCore/xrCore.so; fi
-
- - ./coccinelle/run-coccinelle.sh -i
- - git diff --exit-code
- - export CFLAGS="-Wall -Werror"
- - export LDFLAGS="-pthread -lpthread"
- - ./autogen.sh
- - rm -Rf build
- - mkdir build
- - cd build
- - ../configure --enable-tests --with-distro=unknown
- - pvs-studio-analyzer credentials $PVS_USERNAME $PVS_KEY -o PVS-Studio.lic
- - pvs-studio-analyzer trace -- make -j4
- - pvs-studio-analyzer analyze -j2 -l PVS-Studio.lic
+- ./coccinelle/run-coccinelle.sh -i
+- git diff --exit-code
+- export CFLAGS="-Wall -Werror"
+- export LDFLAGS="-pthread -lpthread"
+- ./autogen.sh
+- rm -Rf build
+- mkdir build
+- cd build
+- ../configure --enable-tests --with-distro=unknown
+- pvs-studio-analyzer credentials $PVS_USERNAME $PVS_KEY -o PVS-Studio.lic
+- pvs-studio-analyzer trace -- make -j4
+- pvs-studio-analyzer analyze -j2 -l PVS-Studio.lic
      -o PVS-Studio-${CC}.log
      --disableLicenseExpirationCheck
- - plog-converter -t html PVS-Studio-${CC}.log -o PVS-Studio-${CC}.html
-
- - sendemail -t mail@domain.com
+- plog-converter -t html PVS-Studio-${CC}.log -o PVS-Studio-${CC}.html
+- sendemail -t mail@domain.com
              -u "PVS-Studio $CC report, commit:$TRAVIS_COMMIT"
              -m "PVS-Studio $CC report, commit:$TRAVIS_COMMIT"
              -s smtp.gmail.com:587
