@@ -110,6 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CommonImportExport.inl" />
+    <None Include="PlatformBSD.inl">
+      <Filter>Platform</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
