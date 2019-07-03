@@ -1,3 +1,0 @@
-LIBRARY	xrD3D9-Null
-EXPORTS
-   Direct3DCreate9   @1
