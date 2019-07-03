@@ -88,7 +88,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
     P->constants = proto.constants;
     P->T = proto.T;
 #ifdef _EDITOR
-	P->M						=	proto.M;
+    P->M = proto.M;
 #endif
     P->C = proto.C;
 
@@ -178,8 +178,8 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr /*fallbackShader = nullpt
     SVS* _vs = new SVS();
     _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
-    //_vs->vs				= NULL;
-    //_vs->signature		= NULL;
+    //_vs->vs = NULL;
+    //_vs->signature = NULL;
     VERIFY(xr_strcmpi(name, "null") != 0);
 
     string_path shName;
@@ -193,11 +193,11 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr /*fallbackShader = nullpt
     string_path cname;
     strconcat(sizeof cname, cname, GEnv.Render->getShaderPath(),/*_name*/shName, ".vs");
     FS.update_path(cname, "$game_shaders$", cname);
-    //		LPCSTR						target		= NULL;
+    // LPCSTR target = NULL;
 
     // duplicate and zero-terminate
     IReader* file = FS.r_open(cname);
-    //	TODO: OGL: HACK: Implement all shaders. Remove this for PS
+    // TODO: OGL: HACK: Implement all shaders. Remove this for PS
     if (!file)
     {
     fallback:
@@ -224,10 +224,10 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr /*fallbackShader = nullpt
         goto fallback;
     }
 
-    //	Parse constant, texture, sampler binding
+    // Parse constant, texture, sampler binding
     if (SUCCEEDED(_hr))
     {
-        //	Let constant table parse it's data
+        // Let constant table parse it's data
         _vs->constants.parse(_result, RC_dest_vertex);
     }
 
@@ -274,12 +274,12 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 
     // duplicate and zero-terminate
     IReader* file = FS.r_open(cname);
-    //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
+    // TODO: DX10: HACK: Implement all shaders. Remove this for PS
     if (!file)
     {
     fallback:
         string1024 tmp;
-        //	TODO: HACK: Test failure
+        // TODO: HACK: Test failure
         //Memory.mem_compact();
         xr_sprintf(tmp, "OGL: %s is missing. Replace with stub_default.ps", cname);
         Msg(tmp);
@@ -304,10 +304,10 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         goto fallback;
     }
 
-    //	Parse constant, texture, sampler binding
+    // Parse constant, texture, sampler binding
     if (SUCCEEDED(_hr))
     {
-        //	Let constant table parse it's data
+        // Let constant table parse it's data
         _ps->constants.parse(_result, RC_dest_pixel);
     }
 
@@ -343,12 +343,12 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
 
     // duplicate and zero-terminate
     IReader* file = FS.r_open(cname);
-    //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
+    // TODO: DX10: HACK: Implement all shaders. Remove this for PS
     if (!file)
     {
     fallback:
         string1024 tmp;
-        //	TODO: HACK: Test failure
+        // TODO: HACK: Test failure
         //Memory.mem_compact();
         xr_sprintf(tmp, "OGL: %s is missing. Replace with stub_default.gs", cname);
         Msg(tmp);
@@ -372,10 +372,10 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
         goto fallback;
     }
 
-    //	Parse constant, texture, sampler binding
+    // Parse constant, texture, sampler binding
     if (SUCCEEDED(_hr))
     {
-        //	Let constant table parse it's data
+        // Let constant table parse it's data
         _gs->constants.parse(_result, RC_dest_geometry);
     }
 
@@ -507,7 +507,7 @@ void CResourceManager::DeleteGeom(const SGeometry* Geom)
 //--------------------------------------------------------------------------------------------------------------
 CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 {
-    // DBG_VerifyTextures	();
+    // DBG_VerifyTextures ();
     if (0 == xr_strcmp(_Name, "null")) return nullptr;
     R_ASSERT (_Name && _Name[0]);
     string_path Name;
@@ -515,9 +515,9 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 
     fix_texture_name(Name);
 
-#ifdef	DEBUG
-	simplify_texture(Name);
-#endif	//	DEBUG
+#ifdef DEBUG
+    simplify_texture(Name);
+#endif // DEBUG
 
     // ***** first pass - search already loaded texture
     LPSTR N = LPSTR(Name);
@@ -533,7 +533,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 
 void CResourceManager::_DeleteTexture(const CTexture* T)
 {
-    // DBG_VerifyTextures	();
+    // DBG_VerifyTextures();
 
     if (0 == (T->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
     LPSTR N = LPSTR(*T->cName);
@@ -547,17 +547,17 @@ void CResourceManager::_DeleteTexture(const CTexture* T)
 }
 
 #ifdef DEBUG
-void	CResourceManager::DBG_VerifyTextures	()
+void CResourceManager::DBG_VerifyTextures()
 {
-	map_Texture::iterator I		= m_textures.begin	();
-	map_Texture::iterator E		= m_textures.end	();
-	for (; I!=E; ++I) 
-	{
-		R_ASSERT(I->first);
-		R_ASSERT(I->second);
-		R_ASSERT(I->second->cName);
-		R_ASSERT(0==xr_strcmp(I->first,*I->second->cName));
-	}
+    map_Texture::iterator I = m_textures.begin();
+    map_Texture::iterator E = m_textures.end();
+    for (; I!=E; ++I) 
+    {
+        R_ASSERT(I->first);
+        R_ASSERT(I->second);
+        R_ASSERT(I->second->cName);
+        R_ASSERT(0==xr_strcmp(I->first,*I->second->cName));
+    }
 }
 #endif
 
