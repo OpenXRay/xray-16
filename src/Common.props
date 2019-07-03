@@ -44,6 +44,14 @@
     <Natvis Include="..\TypeHelper.natvis" Condition="exists('..\TypeHelper.natvis')"/>
     <Natvis Include="..\..\TypeHelper.natvis" Condition="exists('..\..\TypeHelper.natvis')"/>
   </ItemGroup>
+  
+  <PropertyGroup Label="UserMacros">
+    <!-- Default is v142 -->
+    <xrPlatformToolset>v142</xrPlatformToolset>
+    
+    <!-- v141 is allowed -->
+    <xrPlatformToolset Condition="'$(DefaultPlatformToolset)'=='v141'">v141</xrPlatformToolset>
+  </PropertyGroup>
 
   <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\_build\bin\</xrBinRootDir>
