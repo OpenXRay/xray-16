@@ -152,14 +152,14 @@ public:
         const size_t size = xr_strlen(string);
         for (size_t i = 0; i < size; ++i)
         {
-            name[pos] += string[i];
+            name[pos] = string[i];
             ++pos;
         }
     }
 
     void append(u32 value)
     {
-        name[pos] += '0' + char(value); // NOLINT
+        name[pos] = '0' + char(value); // NOLINT
         ++pos;
     }
 
