@@ -293,10 +293,6 @@
     <ClCompile Include="Compression\rt_compressor9.cpp" />
     <ClCompile Include="cpuid.cpp" />
     <ClCompile Include="crc32.cpp" />
-    <ClCompile Include="Crypto\xr_dsa.cpp" />
-    <ClCompile Include="Crypto\xr_dsa_signer.cpp" />
-    <ClCompile Include="Crypto\xr_dsa_verifyer.cpp" />
-    <ClCompile Include="Crypto\xr_sha.cpp" />
     <ClCompile Include="Debug\dxerr.cpp" />
     <ClCompile Include="Debug\MiniDump.cpp" />
     <ClCompile Include="dump_string.cpp" />
@@ -425,10 +421,6 @@
     <ClInclude Include="Containers\AssociativeVector.hpp" />
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="cpuid.h" />
-    <ClInclude Include="Crypto\xr_dsa.h" />
-    <ClInclude Include="Crypto\xr_dsa_signer.h" />
-    <ClInclude Include="Crypto\xr_dsa_verifyer.h" />
-    <ClInclude Include="Crypto\xr_sha.h" />
     <ClInclude Include="Debug\dxerr.h" />
     <ClInclude Include="Debug\DXGetErrorDescription.inl">
       <FileType>CppHeader</FileType>

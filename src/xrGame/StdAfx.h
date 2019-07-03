@@ -100,8 +100,6 @@
 #include "xrCore/_fbox2.h" // ~155
 #include "xrCore/_vector3d_ext.h"
 #include "xrCore/buffer_vector.h"
-#include "xrCore/Crypto/xr_dsa_signer.h" // ~70, very heavy to compile
-#include "xrCore/Crypto/xr_dsa_verifyer.h" // ~70, very heavy to compile
 #include "xrServerEntities/restriction_space.h" // only ~110, so small it's worth it
 #include "xrAICore/Components/condition_state.h" // only ~100, but it includes more
 //#include "xrScriptEngine/script_engine.hpp" // ~210 // XXX: See to it this goes to pch_script

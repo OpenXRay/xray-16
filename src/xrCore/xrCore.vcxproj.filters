@@ -94,9 +94,6 @@
     <Filter Include="Debug core\DxErr">
       <UniqueIdentifier>{0a558484-bd93-4e59-90eb-227898f999f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Crypto">
-      <UniqueIdentifier>{c56e1246-919c-4516-ad31-b9d3b4dadbc4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math\RNG">
       <UniqueIdentifier>{ba09a2fb-b14c-4c35-8e0d-957a47930740}</UniqueIdentifier>
     </Filter>
@@ -251,18 +248,6 @@
     </ClCompile>
     <ClCompile Include="Debug\dxerr.cpp">
       <Filter>Debug core\DxErr</Filter>
-    </ClCompile>
-    <ClCompile Include="Crypto\xr_dsa.cpp">
-      <Filter>Crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="Crypto\xr_sha.cpp">
-      <Filter>Crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="Crypto\xr_dsa_signer.cpp">
-      <Filter>Crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="Crypto\xr_dsa_verifyer.cpp">
-      <Filter>Crypto</Filter>
     </ClCompile>
     <ClCompile Include="xrDebug.cpp">
       <Filter>Debug core</Filter>
@@ -610,18 +595,6 @@
     </ClInclude>
     <ClInclude Include="..\Common\LevelStructure.hpp">
       <Filter>Kernel\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\xr_dsa.h">
-      <Filter>Crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\xr_sha.h">
-      <Filter>crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\xr_dsa_signer.h">
-      <Filter>Crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\xr_dsa_verifyer.h">
-      <Filter>Crypto</Filter>
     </ClInclude>
     <ClInclude Include="Math\Random32.hpp">
       <Filter>Math\RNG</Filter>
