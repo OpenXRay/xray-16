@@ -307,11 +307,6 @@ void CRenderDevice::on_idle()
     syncFrameDone.Wait(); // wait until secondary thread finish its job
     //renderFrameDone.Wait(); // wait until render thread finish its job
     
-    if (GEnv.isDedicatedServer)
-    {
-        FATAL("Я думал код здесь можно спокойно удалить @Debrovski");
-    }
-    
     if (!b_is_Active)
         Sleep(1);
 }
