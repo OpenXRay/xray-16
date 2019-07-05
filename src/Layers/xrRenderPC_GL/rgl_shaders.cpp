@@ -68,11 +68,13 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     xr_vector<pstr> source, includes;
     SHADER_MACRO defines[128];
     int def_it = 0;
-    char c_smapsize[32];
-    char c_gloss[32];
-    char c_sun_shafts[32];
-    char c_ssao[32];
-    char c_sun_quality[32];
+
+    // Don't move these variables to lower scope!
+    string32 c_smapsize;
+    string32 c_gloss;
+    string32 c_sun_shafts;
+    string32 c_ssao;
+    string32 c_sun_quality;
 
     // TODO: OGL: Implement these parameters.
     VERIFY(!pFunctionName);

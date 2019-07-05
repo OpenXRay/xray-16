@@ -200,6 +200,13 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     shader_options_holder options;
     shader_name_holder sh_name;
 
+    // Don't move these variables to lower scope!
+    string32 c_smap;
+    string32 c_gloss;
+    string32 c_sun_shafts;
+    string32 c_ssao;
+    string32 c_sun_quality;
+
     // options:
     const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value)
     {
@@ -211,7 +218,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
 
     // Shadow map size
     {
-        string32 c_smap;
         xr_itoa(o.smapsize, c_smap, 10);
         options.add("SMAP_size", c_smap);
         sh_name.append(c_smap);
@@ -255,7 +261,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
 
     // Force gloss
     {
-        string32 c_gloss;
         xr_sprintf(c_gloss, "%f", o.forcegloss_v);
         appendShaderOption(o.forcegloss, "FORCE_GLOSS", c_gloss);
     }
@@ -357,7 +362,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     // Sun shafts
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
-        string32 c_sun_shafts;
         xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);
         options.add("SUN_SHAFTS_QUALITY", c_sun_shafts);
         sh_name.append(ps_r_sun_shafts);
@@ -367,7 +371,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
 
     if (RImplementation.o.advancedpp && ps_r_ssao)
     {
-        string32 c_ssao;
         xr_sprintf(c_ssao, "%d", ps_r_ssao);
         options.add("SSAO_QUALITY", c_ssao);
         sh_name.append(ps_r_ssao);
@@ -378,7 +381,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     // Sun quality
     if (RImplementation.o.advancedpp && ps_r_sun_quality)
     {
-        string32 c_sun_quality;
         xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
         options.add("SUN_QUALITY", c_sun_quality);
         sh_name.append(ps_r_sun_quality);

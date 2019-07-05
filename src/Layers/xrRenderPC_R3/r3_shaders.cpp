@@ -128,12 +128,18 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
 {
     D3D_SHADER_MACRO defines[128];
     int def_it = 0;
+    
+    // Don't move these variables to lower scope!
+    string32 c_smapsize;
+    string32 c_gloss;
+    string32 c_sun_shafts;
+    string32 c_ssao;
+    string32 c_sun_quality;
 
     char sh_name[MAX_PATH] = "";
     size_t len = 0;
     // options
     {
-        string32 c_smapsize;
         xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
@@ -252,7 +258,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
 
     if (o.forcegloss)
     {
-        string32 c_gloss;
         xr_sprintf(c_gloss, "%f", o.forcegloss_v);
         defines[def_it].Name = "FORCE_GLOSS";
         defines[def_it].Definition = c_gloss;
@@ -422,7 +427,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
 
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
-        string32 c_sun_shafts;
         xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);
         defines[def_it].Name = "SUN_SHAFTS_QUALITY";
         defines[def_it].Definition = c_sun_shafts;
@@ -438,7 +442,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
 
     if (RImplementation.o.advancedpp && ps_r_ssao)
     {
-        string32 c_ssao;
         xr_sprintf(c_ssao, "%d", ps_r_ssao);
         defines[def_it].Name = "SSAO_QUALITY";
         defines[def_it].Definition = c_ssao;
@@ -454,7 +457,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
 
     if (RImplementation.o.advancedpp && ps_r_sun_quality)
     {
-        string32 c_sun_quality;
         xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
         defines[def_it].Name = "SUN_QUALITY";
         defines[def_it].Definition = c_sun_quality;
