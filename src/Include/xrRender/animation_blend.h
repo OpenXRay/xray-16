@@ -55,17 +55,12 @@ public:
     void set_accrue_state() { blend = eAccrue; }
     void set_falloff_state() { blend = eFalloff; }
     void set(const CBlend& r) { *this = r; }
+    CBlend() : blendAmount(0), timeCurrent(0), timeTotal(0), motionID(), bone_or_part(0), channel(0),
+        blend(eFREE_SLOT), blendAccrue(0), blendFalloff(0), blendPower(0), speed(0), playing(0),
+        stop_at_end_callback(0), stop_at_end(0), fall_at_end(0), Callback(nullptr), CallbackParam(nullptr), dwFrame(0)
+    {}
+
 #ifdef DEBUG
-    CBlend()
-        :
-
-          blendAmount(0),
-          timeCurrent(0), timeTotal(0), motionID(), bone_or_part(0), channel(0), blend(eFREE_SLOT), blendAccrue(0),
-          blendFalloff(0), blendPower(0), speed(0), playing(0), stop_at_end_callback(0), stop_at_end(0), fall_at_end(0),
-          Callback(nullptr), CallbackParam(nullptr), dwFrame(0)
-    {
-    }
-
     CBlend(const CBlend& r) { *this = r; }
     const CBlend& operator=(const CBlend& r)
     {
@@ -90,7 +85,6 @@ public:
         dwFrame = r.dwFrame;
         return *this;
     }
-
 #endif
 };
 

@@ -457,8 +457,10 @@ void fill_vid_mode_list(CHW* _hw)
     auto& AVM = AvailableVideoModes;
     for (const auto& it : displayModes)
     {
-        string32 str;
+        if (it.Width < 800)
+            continue;
 
+        string32 str;
         xr_sprintf(str, sizeof(str), "%dx%d", it.Width, it.Height);
 
         if (AVM.cend() != std::find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
@@ -469,7 +471,7 @@ void fill_vid_mode_list(CHW* _hw)
     }
     AVM.emplace_back(xr_token(nullptr, -1));
 
-    Msg("Available video modes[%d]:", AVM.size());
+    Msg("Available video modes [%d]:", AVM.size());
     for (const auto& mode : AVM)
         Msg("[%s]", mode.name);
 }
