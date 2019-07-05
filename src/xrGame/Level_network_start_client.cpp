@@ -153,38 +153,6 @@ bool CLevel::net_start_client4()
             Device.seqFrameMT.Add(g_pNetProcessor, REG_PRIORITY_HIGH + 2);
         else
             Device.seqFrame.Add(g_pNetProcessor, REG_PRIORITY_LOW - 2);
-
-        if (!psNET_direct_connect)
-        {
-            // Waiting for connection/configuration completition
-            CTimer timer_sync;
-            timer_sync.Start();
-            while (!net_isCompleted_Connect())
-                Sleep(5);
-            Msg("* connection sync: %d ms", timer_sync.GetElapsed_ms());
-            while (!net_isCompleted_Sync())
-            {
-                ClientReceive();
-                Sleep(5);
-            }
-        }
-        /*
-                if(psNET_direct_connect)
-                {
-                    ClientReceive();
-                    if(Server)
-                            Server->Update()	;
-                    Sleep(5);
-                }else
-
-                    while(!game_configured)
-                    {
-                        ClientReceive();
-                        if(Server)
-                            Server->Update()	;
-                        Sleep(5);
-                    }
-        */
     }
     return true;
 }

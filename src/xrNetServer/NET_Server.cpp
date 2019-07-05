@@ -187,11 +187,10 @@ IClient* IPureServer::ID_to_client(ClientID ID, bool ScanAll)
 
 //==============================================================================
 #ifdef CONFIG_PROFILE_LOCKS
-IPureServer::IPureServer(CTimer* timer, bool Dedicated) : m_bDedicated(Dedicated),
-                                                          csPlayers(MUTEX_PROFILE_ID(IPureServer::csPlayers)),
+IPureServer::IPureServer(CTimer* timer, bool Dedicated) : csPlayers(MUTEX_PROFILE_ID(IPureServer::csPlayers)),
                                                           csMessage(MUTEX_PROFILE_ID(csMessage))
 #else
-IPureServer::IPureServer(CTimer* timer, bool Dedicated) : m_bDedicated(Dedicated)
+IPureServer::IPureServer(CTimer* timer, bool Dedicated)
 #endif
 {
     device_timer = timer;

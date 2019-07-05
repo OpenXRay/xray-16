@@ -98,8 +98,6 @@ public:
     virtual void GetLevelInfo(CServerInfo* si) = 0;
 
     virtual bool net_Start(const char* op_server, const char* op_client) = 0;
-    virtual void net_Load(const char* name) = 0;
-    virtual void net_Save(const char* name) = 0;
     virtual void net_Stop();
     virtual void net_Update() = 0;
 

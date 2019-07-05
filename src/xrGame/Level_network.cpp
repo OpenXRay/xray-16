@@ -287,7 +287,6 @@ const int ConnectionTimeOut = 60000; // 1 min
 
 bool CLevel::Connect2Server(const char* options)
 {
-    NET_Packet P;
     m_bConnectResultReceived = false;
     m_bConnectResult = true;
 
@@ -295,47 +294,11 @@ bool CLevel::Connect2Server(const char* options)
         return FALSE;
     //---------------------------------------------------------------------------
     m_bConnectResultReceived = true;
-    while (!m_bConnectResultReceived)
-    {
-        ClientReceive();
-        Sleep(5);
-        if (Server)
-            Server->Update();
 
-        if (net_isFails_Connect())
-        {
-            OnConnectRejected();
-            Disconnect();
-            return FALSE;
-        }
-        //-----------------------------------------
-    }
     Msg("%c client : connection %s - <%s>", m_bConnectResult ? '*' : '!', m_bConnectResult ? "accepted" : "rejected",
         m_sConnectResult.c_str());
-    if (!m_bConnectResult)
-    {
-        if (Server)
-        {
-            Server->Disconnect();
-            xr_delete(Server);
-        }
-        OnConnectRejected();
-        Disconnect();
-        return FALSE;
-    };
 
     net_Syncronised = TRUE;
-
-    while (!net_IsSyncronised())
-    {
-        Sleep(1);
-        if (net_Disconnected)
-        {
-            OnConnectRejected();
-            Disconnect();
-            return FALSE;
-        }
-    };
 
     return TRUE;
 };
@@ -402,7 +365,7 @@ void CLevel::ClearAllObjects()
         {
             if (IsGameTypeSingle())
             {
-                FATAL("pObj->H_Parent()==NULL");
+                FATAL("pObj->H_Parent() != NULL");
             }
             else
             {
@@ -453,34 +416,4 @@ void CLevel::OnSessionFull()
 void CLevel::OnConnectRejected()
 {
     IPureClient::OnConnectRejected();
-
-    //	if (MainMenu()->GetErrorDialogType() != CMainMenu::ErrNoError)
-    //		MainMenu()->SetErrorDialog(CMainMenu::ErrServerReject);
 };
-
-void CLevel::net_OnChangeSelfName(NET_Packet* P)
-{
-    if (!P)
-        return;
-    string64 NewName;
-    P->r_stringZ(NewName);
-    if (!strstr(*m_caClientOptions, "/name="))
-    {
-        string1024 tmpstr;
-        xr_strcpy(tmpstr, *m_caClientOptions);
-        xr_strcat(tmpstr, "/name=");
-        xr_strcat(tmpstr, NewName);
-        m_caClientOptions = tmpstr;
-    }
-    else
-    {
-        string1024 tmpstr;
-        xr_strcpy(tmpstr, *m_caClientOptions);
-        *(strstr(tmpstr, "name=") + 5) = 0;
-        xr_strcat(tmpstr, NewName);
-        const char* ptmp = strstr(strstr(*m_caClientOptions, "name="), "/");
-        if (ptmp)
-            xr_strcat(tmpstr, ptmp);
-        m_caClientOptions = tmpstr;
-    }
-}

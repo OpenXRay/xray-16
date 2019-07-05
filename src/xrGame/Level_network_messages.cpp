@@ -111,26 +111,6 @@ void CLevel::ClientReceive()
         case M_UPDATE: { game->net_import_update(*P);
         }
         break;
-        case M_UPDATE_OBJECTS:
-        {
-            Objects.net_Import(P);
-
-            if (OnClient())
-                UpdateDeltaUpd(timeServer());
-            IClientStatistic pStat = Level().GetStatistic();
-            u32 dTime = 0;
-
-            if ((Level().timeServer() + pStat.getPing()) < P->timeReceive)
-            {
-                dTime = pStat.getPing();
-            }
-            else
-                dTime = Level().timeServer() - P->timeReceive + pStat.getPing();
-
-            u32 NumSteps = physics_world()->CalcNumSteps(dTime);
-            SetNumCrSteps(NumSteps);
-        }
-        break;
         case M_CL_UPDATE:
         {
             if (OnClient())
@@ -310,9 +290,6 @@ void CLevel::ClientReceive()
                 m_caServerOptions = NewServerOptions;
                 MakeReconnect();
             };
-        }
-        break;
-        case M_CHANGE_SELF_NAME: { net_OnChangeSelfName(P);
         }
         break;
         case M_BULLET_CHECK_RESPOND:

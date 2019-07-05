@@ -186,9 +186,6 @@ public:
     void SendBroadcast_LL(ClientID exclude, void* data, u32 size, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
     virtual void SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
 
-    // statistic
-    const IServerStatistic* GetStatistic() const { return &stats; }
-
     // extended functionality
     virtual u32 OnMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
     virtual IClient* client_Create() = 0; // create client info

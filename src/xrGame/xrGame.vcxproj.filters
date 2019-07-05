@@ -7509,12 +7509,6 @@
     <ClCompile Include="Level_SLS_Default.cpp">
       <Filter>Core\Client\Level</Filter>
     </ClCompile>
-    <ClCompile Include="Level_SLS_Load.cpp">
-      <Filter>Core\Client\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Level_SLS_Save.cpp">
-      <Filter>Core\Client\Level</Filter>
-    </ClCompile>
     <ClCompile Include="Level_start.cpp">
       <Filter>Core\Client\Level</Filter>
     </ClCompile>

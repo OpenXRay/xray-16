@@ -177,7 +177,6 @@ public:
     static LPCSTR get_map_download_url(LPCSTR level_name, LPCSTR level_version);
 
     void create_direct_client();
-    BOOL IsDedicated() const { return m_bDedicated; };
 
     virtual void GetServerInfo(CServerInfo* si);
 

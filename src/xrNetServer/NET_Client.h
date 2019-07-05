@@ -46,25 +46,10 @@ class XRNETSERVER_API IPureClient : Noncopyable
     };
 
 protected:
-    struct HOST_NODE : Noncopyable // deprecated...
-    {
-        HOST_NODE();
-        HOST_NODE(const HOST_NODE& rhs);
-        HOST_NODE(HOST_NODE&& rhs) noexcept;
-        ~HOST_NODE() noexcept;
-
-        DPN_APPLICATION_DESC* pdpAppDesc;
-        IDirectPlay8Address* pHostAddress;
-        shared_str dpSessionName;
-    };
-
     GameDescriptionData m_game_description;
     CTimer* device_timer;
 
     IDirectPlay8Client* NET;
-
-    Lock* net_csEnumeration;
-    xr_vector<HOST_NODE> net_Hosts;
 
     ConnectionState net_Connected;
     bool net_Syncronised;
@@ -77,8 +62,6 @@ protected:
     s32 net_TimeDelta;
     s32 net_TimeDelta_Calculated;
     s32 net_TimeDelta_User;
-
-    void Sync_Average();
 
     void SetClientID(ClientID const& local_client) { net_ClientID = local_client; }
     IC virtual void SendTo_LL(void* data, u32 size, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
@@ -93,9 +76,7 @@ public:
     bool net_isCompleted_Connect() const { return net_Connected == EnmConnectionCompleted; }
     bool net_isFails_Connect() const { return net_Connected == EnmConnectionFails; }
     bool net_isCompleted_Sync() const { return net_Syncronised; }
-    bool net_isDisconnected() const;
     GameDescriptionData const& get_net_DescriptionData() const { return m_game_description; }
-    pcstr net_SessionName() { return *net_Hosts.front().dpSessionName; }
     // receive
     void StartProcessQueue() { net_Queue.LockQ(); } // WARNING ! after Start must be End !!! <-
     virtual NET_Packet* net_msg_Retreive() { return net_Queue.Retreive(); } //							|
@@ -107,8 +88,6 @@ public:
     virtual void OnInvalidPassword() {}
     virtual void OnSessionFull() {}
     virtual void OnConnectRejected() {}
-    IClientStatistic& GetStatistic() { return net_Statistic; }
-    void UpdateStatistic();
     ClientID const& GetClientID() const { return net_ClientID; }
 
     // time management
@@ -116,7 +95,6 @@ public:
     u32 timeServer_Async() const { return TimerAsync(device_timer) + net_TimeDelta + net_TimeDelta_User; }
     u32 timeServer_Delta() const { return net_TimeDelta; }
     void timeServer_UserDelta(s32 d) { net_TimeDelta_User = d; }
-    IC void timeServer_Correct(u32 sv_time, u32 cl_time);
 
     virtual bool net_IsSyncronised();
 

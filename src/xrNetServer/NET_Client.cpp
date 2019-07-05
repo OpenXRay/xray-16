@@ -177,12 +177,8 @@ XRNETSERVER_API char psNET_Name[32] = "Player";
 XRNETSERVER_API bool psNET_direct_connect = false;
 
 //==============================================================================
-#ifdef CONFIG_PROFILE_LOCKS
-IPureClient::IPureClient(CTimer* timer)
-    : net_Statistic(timer), net_csEnumeration(new Lock(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration)))
-#else
-IPureClient::IPureClient(CTimer* timer) : net_Statistic(timer), net_csEnumeration(new Lock)
-#endif
+
+IPureClient::IPureClient(CTimer* timer) : net_Statistic(timer)
 {
     NET = nullptr;
     device_timer = timer;
@@ -195,7 +191,6 @@ IPureClient::IPureClient(CTimer* timer) : net_Statistic(timer), net_csEnumeratio
 IPureClient::~IPureClient()
 {
     psNET_direct_connect = false;
-    delete net_csEnumeration;
 }
 
 bool IPureClient::Connect(pcstr options)
@@ -212,16 +207,6 @@ void IPureClient::Disconnect()
 {
     if (NET)
         NET->Close(0);
-
-    // Clean up Host _list_
-    net_csEnumeration->Enter();
-    for (u32 i = 0; i < net_Hosts.size(); i++)
-    {
-        HOST_NODE& N = net_Hosts[i];
-        _RELEASE(N.pHostAddress);
-    }
-    net_Hosts.clear();
-    net_csEnumeration->Leave();
 
     // Release interfaces
     _SHOW_REF("cl_netCORE", NET);
@@ -243,14 +228,6 @@ void IPureClient::OnMessage(void* data, u32 size)
     u16 m_type;
     P->r_begin(m_type);
     net_Queue.UnlockQ();
-}
-
-void IPureClient::timeServer_Correct(u32 sv_time, u32 cl_time)
-{
-    u32 ping = net_Statistic.getPing();
-    u32 delta = sv_time + ping / 2 - cl_time;
-    net_DeltaArray.push(delta);
-    Sync_Average();
 }
 
 void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
@@ -283,59 +260,4 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
     }
 }
 
-void IPureClient::UpdateStatistic()
-{
-    // Query network statistic for this client
-    DPN_CONNECTION_INFO CI;
-    ZeroMemory(&CI, sizeof(CI));
-    CI.dwSize = sizeof(CI);
-    HRESULT hr = NET->GetConnectionInfo(&CI, 0);
-    if (FAILED(hr))
-        return;
-
-    net_Statistic.Update(CI);
-}
-
-void IPureClient::Sync_Average()
-{
-    //***** Analyze results
-    s64 summary_delta = 0;
-    s32 size = net_DeltaArray.size();
-    u32* I = net_DeltaArray.begin();
-    u32* E = I + size;
-    for (; I != E; I++)
-        summary_delta += *((int*)I);
-
-    s64 frac = s64(summary_delta) % s64(size);
-    if (frac < 0)
-        frac = -frac;
-    summary_delta /= s64(size);
-    if (frac > s64(size / 2))
-        summary_delta += (summary_delta < 0) ? -1 : 1;
-    net_TimeDelta_Calculated = s32(summary_delta);
-    net_TimeDelta = (net_TimeDelta * 5 + net_TimeDelta_Calculated) / 6;
-    //	Msg("* CLIENT: d(%d), dc(%d), s(%d)",net_TimeDelta,net_TimeDelta_Calculated,size);
-}
-
-bool IPureClient::net_isDisconnected() const { return net_Disconnected; }
-
 bool IPureClient::net_IsSyncronised() { return net_Syncronised; }
-
-IPureClient::HOST_NODE::HOST_NODE() : pdpAppDesc(new DPN_APPLICATION_DESC), pHostAddress(nullptr) {}
-
-IPureClient::HOST_NODE::HOST_NODE(const HOST_NODE& rhs) : pdpAppDesc(new DPN_APPLICATION_DESC)
-{
-    *pdpAppDesc = *rhs.pdpAppDesc;
-    pHostAddress = rhs.pHostAddress;
-    dpSessionName = rhs.dpSessionName;
-}
-
-IPureClient::HOST_NODE::HOST_NODE(HOST_NODE&& rhs) noexcept : pdpAppDesc(rhs.pdpAppDesc)
-{
-    pHostAddress = rhs.pHostAddress;
-    dpSessionName.swap(rhs.dpSessionName);
-    rhs.pdpAppDesc = nullptr;
-    rhs.pHostAddress = nullptr;
-}
-
-IPureClient::HOST_NODE::~HOST_NODE() noexcept { delete pdpAppDesc; }
