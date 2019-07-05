@@ -65,9 +65,10 @@ namespace std
 template <class K, class T>
 void swap(const xr_fixed_map_node<K, T>& left, const xr_fixed_map_node<K, T>& right)
 {
-    xr_fixed_map_node<K, T> temp(left);
-    left = right;
-    right = temp;
+    std::swap(left.first, right.first);
+    std::swap(left.second, right.second);
+    std::swap(left.left, right.left);
+    std::swap(left.right, right.right);
 }
 } // namespace std
 
@@ -363,7 +364,7 @@ public:
     size_t allocated() const { return limit; }
     size_t allocated_memory() const { return limit * sizeof(value_type); }
 
-    bool empty() const { return pool == 0 ; }
+    [[nodiscard]] bool empty() const { return pool == 0 ; }
     void clear() { pool = 0; }
 
     value_type* begin() { return nodes; }
@@ -372,7 +373,7 @@ public:
     value_type* first() { return nodes; }
     value_type* last() { return nodes + limit; } // for setup only
 
-    size_t size() const { return pool; }
+    [[nodiscard]] size_t size() const { return pool; }
 
     value_type& at_index(size_t v) { return nodes[v]; }
 
