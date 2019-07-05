@@ -11,17 +11,3 @@ SCRIPT_EXPORT(CSE_AbstractVisual, (CSE_Visual, CSE_Abstract), {
     module(luaState)[luabind_class_abstract2(CSE_AbstractVisual, "CSE_AbstractVisual", CSE_Visual,
         CSE_Abstract).def("getStartupAnimation", &CSE_AbstractVisual::getStartupAnimation)];
 });
-
-/**
-SCRIPT_EXPORT(CSE_SpawnGroup, (CSE_Abstract),
-{
-    module(luaState)
-    [
-        luabind_class_abstract1(
-            CSE_SpawnGroup,
-            "cse_event",
-            CSE_Abstract
-        )
-    ];
-});
-/**/

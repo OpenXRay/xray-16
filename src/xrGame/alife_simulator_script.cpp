@@ -503,8 +503,9 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
             .def("dont_has_info", &dont_has_info)
             .def("give_info", &AlifeGiveInfo)
             .def("disable_info", &AlifeRemoveInfo)
-            .def("switch_distance", &CALifeSimulator::switch_distance)
-            .def("set_switch_distance", &CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
+            .def("switch_distance", REMOVE_NOEXCEPT(&CALifeSimulator::switch_distance))
+            .def("set_switch_distance", REMOVE_NOEXCEPT(&CALifeSimulator::set_switch_distance)) //Alundaio: renamed to set_switch_distance from switch_distance
+            
             //Alundaio: extend alife simulator exports
             .def("teleport_object", &teleport_object)
             .def("iterate_info", &IterateInfo)

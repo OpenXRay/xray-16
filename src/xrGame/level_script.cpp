@@ -747,6 +747,7 @@ void patrol_path_remove(LPCSTR patrol_path) {
 template<typename T>
 struct EnumCallbackType {};
 
+// clang-format off
 IC static void CLevel_Export(lua_State* luaState)
 {
     class_<CEnvDescriptor>("CEnvDescriptor")
@@ -874,23 +875,23 @@ IC static void CLevel_Export(lua_State* luaState)
     module(luaState)
     [
         class_<CRayPick>("ray_pick")
-        .def(constructor<>())
-        .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
-        .def("set_position", &CRayPick::set_position)
-        .def("set_direction", &CRayPick::set_direction)
-        .def("set_range", &CRayPick::set_range)
-        .def("set_flags", &CRayPick::set_flags)
-        .def("set_ignore_object", &CRayPick::set_ignore_object)
-        .def("query", &CRayPick::query)
-        .def("get_result", &CRayPick::get_result)
-        .def("get_object", &CRayPick::get_object)
-        .def("get_distance", &CRayPick::get_distance)
-        .def("get_element", &CRayPick::get_element),
+            .def(constructor<>())
+            .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
+            .def("set_position", &CRayPick::set_position)
+            .def("set_direction", &CRayPick::set_direction)
+            .def("set_range", &CRayPick::set_range)
+            .def("set_flags", &CRayPick::set_flags)
+            .def("set_ignore_object", &CRayPick::set_ignore_object)
+            .def("query", &CRayPick::query)
+            .def("get_result", &CRayPick::get_result)
+            .def("get_object", &CRayPick::get_object)
+            .def("get_distance", &CRayPick::get_distance)
+            .def("get_element", &CRayPick::get_element),
         class_<script_rq_result>("rq_result")
-        .def_readonly("object", &script_rq_result::O)
-        .def_readonly("range", &script_rq_result::range)
-        .def_readonly("element", &script_rq_result::element)
-        .def(constructor<>()),
+            .def_readonly("object", &script_rq_result::O)
+            .def_readonly("range", &script_rq_result::range)
+            .def_readonly("element", &script_rq_result::element)
+            .def(constructor<>()),
         class_<EnumCallbackType<collide::rq_target>>("rq_target")
         .enum_("targets")
         [
@@ -904,16 +905,26 @@ IC static void CLevel_Export(lua_State* luaState)
         ]
     ];
 
-    module(luaState)[def("command_line", &command_line), def("IsGameTypeSingle", &IsGameTypeSingle),
-        def("IsDynamicMusic", &IsDynamicMusic), def("render_get_dx_level", &render_get_dx_level),
-        def("IsImportantSave", &IsImportantSave)];
+    module(luaState)
+    [
+        def("command_line", &command_line),
+        def("IsGameTypeSingle", REMOVE_NOEXCEPT(&IsGameTypeSingle)),
+        def("IsDynamicMusic", &IsDynamicMusic),
+        def("render_get_dx_level", &render_get_dx_level),
+        def("IsImportantSave", &IsImportantSave)
+    ];
 
-    module(luaState, "relation_registry")[def("community_goodwill", &g_community_goodwill),
+    module(luaState, "relation_registry")
+    [
+        def("community_goodwill", &g_community_goodwill),
         def("set_community_goodwill", &g_set_community_goodwill),
         def("change_community_goodwill", &g_change_community_goodwill),
 
-        def("community_relation", &g_get_community_relation), def("set_community_relation", &g_set_community_relation),
-        def("get_general_goodwill_between", &g_get_general_goodwill_between)];
+        def("community_relation", &g_get_community_relation),
+        def("set_community_relation", &g_set_community_relation),
+        def("get_general_goodwill_between", &g_get_general_goodwill_between)
+    ];
+
     module(luaState, "game")
     [
         class_<xrTime>("CTime")
@@ -966,5 +977,6 @@ IC static void CLevel_Export(lua_State* luaState)
 
     ];
 };
+// clang-format on
 
 SCRIPT_EXPORT_FUNC(CLevel, (), CLevel_Export);
