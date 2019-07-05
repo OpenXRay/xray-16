@@ -172,11 +172,9 @@ static void full_memory_stats()
     Msg("%I64dMB physical memory installed, %I64dMB available, %ld percent of memory in use",
         memCounters.TotalPhysicalMemory / (1024 * 1024), memCounters.FreePhysicalMemory / (1024 * 1024), memCounters.MemoryLoad);
 
-    Msg("PageFile usage: %I64dMB, Peak PageFile usage: %I64dMB,",
-        memCounters.PagefileUsage / (1024 * 1024), memCounters.PeakPagefileUsage / (1024 * 1024));
+    Msg("PageFile usage: %I64dMB, Peak PageFile usage: %I64dMB,", memCounters.PagefileUsage / (1024 * 1024),
+        memCounters.PeakPagefileUsage / (1024 * 1024));
 
-    Log("--------------------------------------------------------------------------------");
-	Log("# Build engine for <OXR_CoC 1.5b r7>");
     Log("--------------------------------------------------------------------------------");
 }
 
@@ -201,14 +199,6 @@ public:
         CCC_Token::Execute(args);
         if (g_pGameLevel && Level().game)
         {
-            //#ifndef	DEBUG
-            if (GameID() != eGameIDSingle)
-            {
-                Msg("For this game type difficulty level is disabled.");
-                return;
-            };
-            //#endif
-
             game_cl_Single* game = smart_cast<game_cl_Single*>(Level().game);
             VERIFY(game);
             game->OnDifficultyChanged();
@@ -1697,14 +1687,38 @@ public:
 class CCC_SetWeather : public IConsole_Command
 {
 public:
-    CCC_SetWeather(LPCSTR N) : IConsole_Command(N) {};
+    CCC_SetWeather(LPCSTR N) : IConsole_Command(N){};
     virtual void Execute(LPCSTR args)
     {
         if (!xr_strlen(args))
             return;
-
+        if (!g_pGamePersistent || !g_pGameLevel)
+            return;
         if (!Device.editor())
             g_pGamePersistent->Environment().SetWeather(args, true);
+    }
+
+    void fill_tips(vecTips& tips, u32 mode) override
+    {
+        if (!g_pGamePersistent || !g_pGameLevel || Device.editor())
+        {
+            IConsole_Command::fill_tips(tips, mode);
+            return;
+        }
+
+        string128 buff = {};
+        shared_str currWeather = g_pGamePersistent->Environment().GetWeather();
+
+        for (auto& [name, cycle] : g_pGamePersistent->Environment().WeatherCycles)
+        {
+            if (currWeather == name)
+            {
+                xr_sprintf(buff, sizeof(buff), "%s (current)", currWeather.c_str());
+                tips.push_back(buff);
+                continue;
+            }
+            tips.push_back(name);
+        }
     }
 };
 
