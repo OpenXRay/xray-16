@@ -56,9 +56,9 @@ const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_m
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
-#ifndef USE_DX9
+#if !defined(USE_DX9) && !defined(USE_OGL) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
-#endif // USE_DX10
+#endif // !USE_DX9
     {nullptr, 0}};
 
 u32 ps_r3_msaa = 0; // = 0;
