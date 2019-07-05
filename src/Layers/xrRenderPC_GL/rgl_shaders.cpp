@@ -57,17 +57,78 @@ static inline void load_includes(pcstr pSrcData, UINT SrcDataLen, xr_vector<pstr
 
 struct SHADER_MACRO
 {
-    pcstr Name          = nullptr;
-    pcstr Definition    = nullptr;
-    pstr  FullDefine    = nullptr;
+    pcstr Name = nullptr;
+    pcstr Definition = nullptr;
+    pstr  FullDefine = nullptr;
+};
+
+class shader_name_holder
+{
+    size_t pos{};
+    string_path name;
+
+public:
+    void append(cpcstr string)
+    {
+        const size_t size = xr_strlen(string);
+        for (size_t i = 0; i < size; ++i)
+        {
+            name[pos] = string[i];
+            ++pos;
+        }
+    }
+
+    void append(u32 value)
+    {
+        name[pos] = '0' + char(value); // NOLINT
+        ++pos;
+    }
+
+    void finish()
+    {
+        name[pos] = '\0';
+    }
+
+    pcstr c_str() const { return name; }
+};
+
+class shader_options_holder
+{
+    size_t pos{};
+    SHADER_MACRO m_options[128];
+
+public:
+    ~shader_options_holder()
+    {
+        for (; pos != 0; --pos)
+            xr_free(m_options[pos].FullDefine);
+    }
+
+    void add(cpcstr name, cpcstr value)
+    {
+        string512 option_line;
+        xr_sprintf(option_line, "#define %s\t%s\n", name, value);
+        m_options[pos] = { name, value, xr_strdup(option_line) };
+        ++pos;
+    }
+
+    void finish()
+    {
+        m_options[pos] = { nullptr, nullptr, nullptr };
+    }
+
+    size_t size() const { return pos; }
+    SHADER_MACRO& operator[](size_t idx) { return m_options[idx]; }
+    SHADER_MACRO* data() { return m_options; }
 };
 
 HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
 {
+    shader_options_holder options;
+    shader_name_holder sh_name;
+    
     xr_vector<pstr> source, includes;
-    SHADER_MACRO defines[128];
-    int def_it = 0;
 
     // Don't move these variables to lower scope!
     string32 c_smapsize;
@@ -84,513 +145,259 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     // open included files
     load_includes((pcstr)fs->pointer(), fs->length(), source, includes);
 
-    char sh_name[MAX_PATH] = "";
-    u32 len = 0;
-    // options
+    // options:
+    const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value)
     {
-        xr_sprintf(c_smapsize, "%d.0", u32(o.smapsize));
-        defines[def_it].Name = "SMAP_size";
-        defines[def_it].Definition = c_smapsize;
-        def_it++;
-        xr_sprintf(sh_name, "%d", u32(o.smapsize));
-        len += u32(xr_strlen(sh_name));
+        if (option)
+            options.add(macro, value);
+
+        sh_name.append(option);
+    };
+
+    // Shadow map size
+    {
+        xr_itoa(o.smapsize, c_smapsize, 10);
+        options.add("SMAP_size", c_smapsize);
+        sh_name.append(c_smapsize);
     }
 
-    if (o.fp16_filter)
-    {
-        defines[def_it].Name = "FP16_FILTER";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.fp16_filter);
-    ++len;
+    // FP16 Filter
+    appendShaderOption(o.fp16_filter, "FP16_FILTER", "1");
 
-    if (o.fp16_blend)
-    {
-        defines[def_it].Name = "FP16_BLEND";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.fp16_blend);
-    ++len;
+    // FP16 Blend
+    appendShaderOption(o.fp16_blend, "FP16_BLEND", "1");
 
-    if (o.HW_smap)
-    {
-        defines[def_it].Name = "USE_HWSMAP";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.HW_smap);
-    ++len;
+    // HW smap
+    appendShaderOption(o.HW_smap, "USE_HWSMAP", "1");
 
-    if (o.HW_smap_PCF)
-    {
-        defines[def_it].Name = "USE_HWSMAP_PCF";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.HW_smap_PCF);
-    ++len;
+    // HW smap PCF
+    appendShaderOption(o.HW_smap_PCF, "USE_HWSMAP_PCF", "1");
 
-    if (o.HW_smap_FETCH4)
-    {
-        defines[def_it].Name = "USE_FETCH4";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.HW_smap_FETCH4);
-    ++len;
+    // Fetch4
+    appendShaderOption(o.HW_smap_FETCH4, "USE_FETCH4", "1");
 
-    if (o.sjitter)
-    {
-        defines[def_it].Name = "USE_SJITTER";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.sjitter);
-    ++len;
+    // SJitter
+    appendShaderOption(o.sjitter, "USE_SJITTER", "1");
 
-    if (HW.Caps.raster_major >= 3)
-    {
-        defines[def_it].Name = "USE_BRANCHING";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(HW.Caps.raster_major >= 3);
-    ++len;
+    // Branching
+    appendShaderOption(HW.Caps.raster_major >= 3, "USE_BRANCHING", "1");
 
-    if (HW.Caps.geometry.bVTF)
-    {
-        defines[def_it].Name = "USE_VTF";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(HW.Caps.geometry.bVTF);
-    ++len;
+    // Vertex texture fetch
+    appendShaderOption(HW.Caps.geometry.bVTF, "USE_VTF", "1");
 
-    if (o.Tshadows)
-    {
-        defines[def_it].Name = "USE_TSHADOWS";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.Tshadows);
-    ++len;
+    // Tshadows
+    appendShaderOption(o.Tshadows, "USE_TSHADOWS", "1");
 
-    if (o.mblur)
-    {
-        defines[def_it].Name = "USE_MBLUR";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.mblur);
-    ++len;
+    // Motion blur
+    appendShaderOption(o.mblur, "USE_MBLUR", "1");
 
-    if (o.sunfilter)
-    {
-        defines[def_it].Name = "USE_SUNFILTER";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.sunfilter);
-    ++len;
+    // Sun filter
+    appendShaderOption(o.sunfilter, "USE_SUNFILTER", "1");
 
-    if (o.sunstatic)
-    {
-        defines[def_it].Name = "USE_R2_STATIC_SUN";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.sunstatic);
-    ++len;
+    // Static sun on R2 and higher
+    appendShaderOption(o.sunstatic, "USE_R2_STATIC_SUN", "1");
 
-    if (o.forcegloss)
+    // Force gloss
     {
         xr_sprintf(c_gloss, "%f", o.forcegloss_v);
-        defines[def_it].Name = "FORCE_GLOSS";
-        defines[def_it].Definition = c_gloss;
-        def_it++;
+        appendShaderOption(o.forcegloss, "FORCE_GLOSS", c_gloss);
     }
-    sh_name[len] = '0' + char(o.forcegloss);
-    ++len;
 
-    if (o.forceskinw)
-    {
-        defines[def_it].Name = "SKIN_COLOR";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.forceskinw);
-    ++len;
+    // Force skinw
+    appendShaderOption(o.forceskinw, "SKIN_COLOR", "1");
 
-    if (o.ssao_blur_on)
-    {
-        defines[def_it].Name = "USE_SSAO_BLUR";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.ssao_blur_on);
-    ++len;
+    // SSAO Blur
+    appendShaderOption(o.ssao_blur_on, "USE_SSAO_BLUR", "1");
 
+    // SSAO HDAO
     if (o.ssao_hdao)
     {
-        defines[def_it].Name = "HDAO";
-        defines[def_it].Definition = "1";
-        def_it++;
+        options.add("HDAO", "1");
+        sh_name.append(static_cast<u32>(1)); // HDAO on
+        sh_name.append(static_cast<u32>(0)); // HBAO off
+        sh_name.append(static_cast<u32>(0)); // HBAO vectorized off
     }
-    sh_name[len] = '0' + char(o.ssao_hdao);
-    ++len;
-
-    if (o.ssao_hbao)
+    else // SSAO HBAO
     {
-        defines[def_it].Name = "USE_HBAO";
-        defines[def_it].Definition = "1";
-        def_it++;
-        if (o.hbao_vectorized)
-        {
-            defines[def_it].Name = "VECTORIZED_CODE";
-            defines[def_it].Definition = "1";
-            def_it++;
-        }
+        sh_name.append(static_cast<u32>(0)); // HDAO off
+        sh_name.append(o.ssao_hbao);         // HBAO on/off
+
+        appendShaderOption(o.ssao_hbao, "USE_HBAO", "1");
+        appendShaderOption(o.hbao_vectorized, "VECTORIZED_CODE", "1");
     }
-    sh_name[len] = '0' + char(o.ssao_hbao);
-    ++len;
-    sh_name[len] = '0' + char(o.ssao_hbao ? o.hbao_vectorized : 0);
-    ++len;
 
     if (o.ssao_opt_data)
     {
-        defines[def_it].Name = "SSAO_OPT_DATA";
         if (o.ssao_half_data)
-            defines[def_it].Definition = "2";
+            options.add("SSAO_OPT_DATA", "2");
         else
-            defines[def_it].Definition = "1";
-        def_it++;
+            options.add("SSAO_OPT_DATA", "1");
     }
-    sh_name[len] = '0' + char(o.ssao_opt_data ? (o.ssao_half_data ? 2 : 1) : 0);
-    ++len;
+    sh_name.append(o.ssao_opt_data ? (o.ssao_half_data ? u32(2) : u32(1)) : u32(0));
 
     // skinning
-    if (m_skinning < 0)
-    {
-        defines[def_it].Name = "SKIN_NONE";
-        defines[def_it].Definition = "1";
-        def_it++;
-        sh_name[len] = '1';
-        ++len;
-    }
-    else
-    {
-        sh_name[len] = '0';
-        ++len;
-    }
+    // SKIN_NONE
+    appendShaderOption(m_skinning < 0, "SKIN_NONE", "1");
 
-    if (0 == m_skinning)
-    {
-        defines[def_it].Name = "SKIN_0";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(0 == m_skinning);
-    ++len;
+    // SKIN_0
+    appendShaderOption(0 == m_skinning, "SKIN_0", "1");
 
-    if (1 == m_skinning)
-    {
-        defines[def_it].Name = "SKIN_1";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(1 == m_skinning);
-    ++len;
+    // SKIN_1
+    appendShaderOption(1 == m_skinning, "SKIN_1", "1");
 
-    if (2 == m_skinning)
-    {
-        defines[def_it].Name = "SKIN_2";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(2 == m_skinning);
-    ++len;
+    // SKIN_2
+    appendShaderOption(2 == m_skinning, "SKIN_2", "1");
 
-    if (3 == m_skinning)
-    {
-        defines[def_it].Name = "SKIN_3";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(3 == m_skinning);
-    ++len;
+    // SKIN_3
+    appendShaderOption(3 == m_skinning, "SKIN_3", "1");
 
-    if (4 == m_skinning)
-    {
-        defines[def_it].Name = "SKIN_4";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(4 == m_skinning);
-    ++len;
+    // SKIN_4
+    appendShaderOption(4 == m_skinning, "SKIN_4", "1");
 
     //	Igor: need restart options
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER))
+    // Soft water
     {
-        defines[def_it].Name = "USE_SOFT_WATER";
-        defines[def_it].Definition = "1";
-        def_it++;
-        sh_name[len] = '1';
-        ++len;
-    }
-    else
-    {
-        sh_name[len] = '0';
-        ++len;
+        const bool softWater = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER);
+        appendShaderOption(softWater, "USE_SOFT_WATER", "1");
     }
 
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES))
+    // Soft particles
     {
-        defines[def_it].Name = "USE_SOFT_PARTICLES";
-        defines[def_it].Definition = "1";
-        def_it++;
-        sh_name[len] = '1';
-        ++len;
-    }
-    else
-    {
-        sh_name[len] = '0';
-        ++len;
+        const bool useSoftParticles = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES);
+        appendShaderOption(useSoftParticles, "USE_SOFT_PARTICLES", "1");
     }
 
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DOF))
+    // Depth of field
     {
-        defines[def_it].Name = "USE_DOF";
-        defines[def_it].Definition = "1";
-        def_it++;
-        sh_name[len] = '1';
-        ++len;
-    }
-    else
-    {
-        sh_name[len] = '0';
-        ++len;
+        const bool dof = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DOF);
+        appendShaderOption(dof, "USE_DOF", "1");
     }
 
+    // FXAA
     // SkyLoader: temporary added
-    if (ps_r2_fxaa)
-    {
-        defines[def_it].Name = "USE_FXAA";
-        defines[def_it].Definition = "1";
-        def_it++;
-        sh_name[len] = '1';
-        ++len;
-    }
-    else
-    {
-        sh_name[len] = '0';
-        ++len;
-    }
+    appendShaderOption(ps_r2_fxaa, "USE_FXAA", "1");
     // end
 
+    // Sun shafts
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
         xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);
-        defines[def_it].Name = "SUN_SHAFTS_QUALITY";
-        defines[def_it].Definition = c_sun_shafts;
-        def_it++;
-        sh_name[len] = '0' + char(ps_r_sun_shafts);
-        ++len;
+        options.add("SUN_SHAFTS_QUALITY", c_sun_shafts);
+        sh_name.append(ps_r_sun_shafts);
     }
     else
-    {
-        sh_name[len] = '0';
-        ++len;
-    }
+        sh_name.append(static_cast<u32>(0));
 
     if (RImplementation.o.advancedpp && ps_r_ssao)
     {
         xr_sprintf(c_ssao, "%d", ps_r_ssao);
-        defines[def_it].Name = "SSAO_QUALITY";
-        defines[def_it].Definition = c_ssao;
-        def_it++;
-        sh_name[len] = '0' + char(ps_r_ssao);
-        ++len;
+        options.add("SSAO_QUALITY", c_ssao);
+        sh_name.append(ps_r_ssao);
     }
     else
-    {
-        sh_name[len] = '0';
-        ++len;
-    }
+        sh_name.append(static_cast<u32>(0));
 
+    // Sun quality
     if (RImplementation.o.advancedpp && ps_r_sun_quality)
     {
         xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
-        defines[def_it].Name = "SUN_QUALITY";
-        defines[def_it].Definition = c_sun_quality;
-        def_it++;
-        sh_name[len] = '0' + char(ps_r_sun_quality);
-        ++len;
+        options.add("SUN_QUALITY", c_sun_quality);
+        sh_name.append(ps_r_sun_quality);
     }
     else
+        sh_name.append(static_cast<u32>(0));
+
+    // Steep parallax
     {
-        sh_name[len] = '0';
-        ++len;
+        const bool steepParallax = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX);
+        appendShaderOption(steepParallax, "ALLOW_STEEPPARALLAX", "1");
     }
 
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX))
-    {
-        defines[def_it].Name = "ALLOW_STEEPPARALLAX";
-        defines[def_it].Definition = "1";
-        def_it++;
-        sh_name[len] = '1';
-        ++len;
-    }
-    else
-    {
-        sh_name[len] = '0';
-        ++len;
-    }
+    // Geometry buffer optimization
+    appendShaderOption(o.dx10_gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
-    if (o.dx10_gbuffer_opt)
-    {
-        defines[def_it].Name = "GBUFFER_OPTIMIZATION";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.dx10_gbuffer_opt);
-    ++len;
+    // Shader Model 4.1
+    appendShaderOption(o.dx10_sm4_1, "SM_4_1", "1");
 
-    if (o.dx10_sm4_1)
-    {
-        defines[def_it].Name = "SM_4_1";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.dx10_sm4_1);
-    ++len;
+    // Minmax SM
+    appendShaderOption(o.dx10_minmax_sm, "USE_MINMAX_SM", "1");
 
-    if (o.dx10_minmax_sm)
-    {
-        defines[def_it].Name = "USE_MINMAX_SM";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(o.dx10_minmax_sm != 0);
-    ++len;
-
-    if (ShadowOfChernobylMode)
-    {
-        defines[def_it].Name = "USE_SHOC_RESOURCES";
-        defines[def_it].Definition = "1";
-        def_it++;
-    }
-    sh_name[len] = '0' + char(ShadowOfChernobylMode);
-    ++len;
+    // Shadow of Chernobyl compatibility
+    appendShaderOption(ShadowOfChernobylMode, "USE_SHOC_RESOURCES", "1");
 
     // add a #define for DX10_1 MSAA support
     if (o.dx10_msaa)
     {
-        static char samples[2];
+        appendShaderOption(o.dx10_msaa, "USE_MSAA", "1");
 
-        defines[def_it].Name = "USE_MSAA";
-        defines[def_it].Definition = "1";
-        def_it++;
-
-        defines[def_it].Name = "MSAA_SAMPLES";
-        samples[0] = char(o.dx10_msaa_samples) + '0';
-        samples[1] = 0;
-        defines[def_it].Definition = samples;
-        def_it++;
-
-        static char def[256];
-        if (m_MSAASample < 0)
-            def[0] = '0';
-        else
-            def[0] = '0' + char(m_MSAASample);
-
-        def[1] = 0;
-        defines[def_it].Name = "ISAMPLE";
-        defines[def_it].Definition = def;
-        def_it++;
-
-        if (o.dx10_msaa_opt)
         {
-            defines[def_it].Name = "MSAA_OPTIMIZATION";
-            defines[def_it].Definition = "1";
-            def_it++;
+            static char samples[2];
+            samples[0] = char(o.dx10_msaa_samples) + '0';
+            samples[1] = 0;
+            appendShaderOption(o.dx10_msaa_samples, "MSAA_SAMPLES", samples);
         }
 
-        sh_name[len] = '1';
-        ++len;
-        sh_name[len] = '0' + char(o.dx10_msaa_samples);
-        ++len;
-        sh_name[len] = '0';
-        ++len;
-        sh_name[len] = '0' + char(o.dx10_msaa_opt);
-        ++len;
+        {
+            static char def[2];
+            if (m_MSAASample < 0)
+                def[0] = '0';
+            else
+                def[0] = '0' + char(m_MSAASample);
+
+            def[1] = 0;
+            options.add("ISAMPLE", def);
+            sh_name.append(static_cast<u32>(0));
+        }
+
+        appendShaderOption(o.dx10_msaa_opt, "MSAA_OPTIMIZATION", "1");
 
         switch (o.dx10_msaa_alphatest)
         {
         case MSAA_ATEST_DX10_0_ATOC:
-            defines[def_it].Name = "MSAA_ALPHATEST_DX10_0_ATOC";
-            defines[def_it].Definition = "1";
-            def_it++;
-            sh_name[len] = '1';
-            ++len;
-            sh_name[len] = '0';
-            ++len;
-            sh_name[len] = '0';
-            ++len;
+            options.add("MSAA_ALPHATEST_DX10_0_ATOC", "1");
+
+            sh_name.append(static_cast<u32>(1)); // DX10_0_ATOC   on
+            sh_name.append(static_cast<u32>(0)); // DX10_1_ATOC   off
+            sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
             break;
         case MSAA_ATEST_DX10_1_ATOC:
-            defines[def_it].Name = "MSAA_ALPHATEST_DX10_1_ATOC";
-            defines[def_it].Definition = "1";
-            def_it++;
-            sh_name[len] = '0';
-            ++len;
-            sh_name[len] = '1';
-            ++len;
-            sh_name[len] = '0';
-            ++len;
+            options.add("MSAA_ALPHATEST_DX10_1_ATOC", "1");
+
+            sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
+            sh_name.append(static_cast<u32>(1)); // DX10_1_ATOC   on
+            sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
             break;
         case MSAA_ATEST_DX10_1_NATIVE:
-            defines[def_it].Name = "MSAA_ALPHATEST_DX10_1";
-            defines[def_it].Definition = "1";
-            def_it++;
-            sh_name[len] = '0';
-            ++len;
-            sh_name[len] = '0';
-            ++len;
-            sh_name[len] = '1';
-            ++len;
+            options.add("MSAA_ALPHATEST_DX10_1", "1");
+
+            sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
+            sh_name.append(static_cast<u32>(0)); // DX10_1_ATOC   off
+            sh_name.append(static_cast<u32>(1)); // DX10_1_NATIVE on
             break;
         default:
-            sh_name[len] = '0';
-            ++len;
-            sh_name[len] = '0';
-            ++len;
-            sh_name[len] = '0';
-            ++len;
+            sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
+            sh_name.append(static_cast<u32>(0)); // DX10_1_ATOC   off
+            sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
         }
     }
     else
     {
-        sh_name[len] = '0';
-        ++len;
-        sh_name[len] = '0';
-        ++len;
-        sh_name[len] = '0';
-        ++len;
-        sh_name[len] = '0';
-        ++len;
-        sh_name[len] = '0';
-        ++len;
-        sh_name[len] = '0';
-        ++len;
-        sh_name[len] = '0';
-        ++len;
+        sh_name.append(static_cast<u32>(0)); // MSAA off
+        sh_name.append(static_cast<u32>(0)); // No MSAA samples
+        sh_name.append(static_cast<u32>(0)); // No MSAA ISAMPLE
+        sh_name.append(static_cast<u32>(0)); // No MSAA optimization
+        sh_name.append(static_cast<u32>(0)); // DX10_0_ATOC   off
+        sh_name.append(static_cast<u32>(0)); // DX10_1_ATOC   off
+        sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
     }
+
+    // finish
+    options.finish();
+    sh_name.finish();
 
     // Compile sources list
     const size_t head_lines = 2; // "#version" line + name_comment line
-    size_t sources_lines = source.size() + def_it + head_lines;
+    size_t sources_lines = source.size() + options.size() + head_lines;
     string256 name_comment;
     xr_sprintf(name_comment, "// %s\n", name);
     pcstr* sources = xr_alloc<pcstr>(sources_lines);
@@ -602,19 +409,11 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     sources[1] = name_comment;
 
     // Make define lines
-    for (u32 i = 0; i < def_it; ++i)
+    for (size_t i = 0; i < options.size(); ++i)
     {
-        R_ASSERT2(defines[i].Name && defines[i].Definition, name);
-
-        string256 define_line;
-        xr_sprintf(define_line, "#define %s\t%s\n", defines[i].Name, defines[i].Definition);
-        const size_t define_len = xr_strlen(define_line);
-        defines[i].FullDefine = xr_alloc<char>(define_len + 1);
-        CopyMemory(defines[i].FullDefine, define_line, define_len * sizeof(char));
-        defines[i].FullDefine[define_len] = '\0';
-        sources[head_lines + i] = defines[i].FullDefine;
+        sources[head_lines + i] = options[i].FullDefine;
     }
-    CopyMemory(sources + head_lines + def_it, source.data(), source.size() * sizeof(pstr));
+    CopyMemory(sources + head_lines + options.size(), source.data(), source.size() * sizeof(pstr));
 
     // Compile the shader
     GLuint shader = *(GLuint*)result;
@@ -630,8 +429,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     *(GLuint*)result = program;
 
     // Free string resources
-    for (u32 i = 0; i < def_it; ++i)
-        xr_free(defines[i].FullDefine);
     xr_free(sources);
     for (auto it = includes.begin(); it != includes.end(); ++it)
         xr_free(*it);
