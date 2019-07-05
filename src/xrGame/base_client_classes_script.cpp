@@ -13,8 +13,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "ai/stalker/ai_stalker.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-//#include "ai/patrol_path.h"
-//#include "ai/patrol_point.h"
+
 using namespace luabind;
 
 // clang-format off
