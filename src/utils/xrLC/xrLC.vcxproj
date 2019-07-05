@@ -149,109 +149,109 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|Win32'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;FORCE_NO_EXCEPTIONS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;FORCE_NO_EXCEPTIONS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed_COC|Win32'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed_COC|x64'">
     <ClCompile>
       <AdditionalOptions>/Gs %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrExternals)FreeImage\Dist\x32;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(xrSdkDir)include\FreeImage;$(xrExternals)FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
+	  <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

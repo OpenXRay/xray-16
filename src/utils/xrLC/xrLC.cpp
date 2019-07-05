@@ -9,7 +9,6 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #pragma comment(lib, "d3dx9.lib")
-#pragma comment(lib, "FreeImage.lib")
 
 CBuild* pBuild = NULL;
 u32 version = 0;

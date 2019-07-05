@@ -145,163 +145,93 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x32\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x32\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x64\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x64\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x32\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x32\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x32\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x32\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x64\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x64\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x64\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x64\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x32\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x32\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed_COC|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x32\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x32\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x64\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x64\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed_COC|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrExternals)FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)FreeImage.dll" copy /y "$(xrExternals)FreeImage\Dist\x64\FreeImage.dll" "$(OutDir)FreeImage.dll"</Command>
-      <Outputs>$(OutDir)FreeImage.dll</Outputs>
-      <Inputs>$(xrExternals)FreeImage\Dist\x64\FreeImage.dll</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp" />
