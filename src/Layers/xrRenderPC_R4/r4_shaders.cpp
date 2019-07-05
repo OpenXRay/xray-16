@@ -322,6 +322,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         sh_name.append(static_cast<u32>(0));
     }
 
+    // skinning
     // SKIN_NONE
     appendShaderOption(m_skinning < 0, "SKIN_NONE", "1");
 
