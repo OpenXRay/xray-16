@@ -8,7 +8,6 @@
 #include <objbase.h>
 #endif
 #include "xrCore.h"
-#include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 
@@ -80,7 +79,6 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         Msg("command line %s\n", Params);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
-        ttapi.initialize();
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
@@ -166,7 +164,6 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
-        ttapi.destroy();
         FS._destroy();
         EFS._destroy();
         xr_FS.reset();

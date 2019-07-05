@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "MathUtil.hpp"
-#include "Threading/ThreadPool.hpp"
 
 #ifdef _EDITOR
 #include "SkeletonX.h"
@@ -19,7 +18,6 @@
 #include "SkinXW_CPP.hpp"
 #include "PLC_CPP.hpp"
 #endif
-#include "Skin4W_MT.hpp"
 
 #include "_math.h"
 
@@ -51,7 +49,6 @@ void Initialize()
     Skin2W = Skin2W_CPP;
     Skin3W = Skin3W_CPP;
     Skin4W = Skin4W_CPP;
-    Skin4W_MTs = Skin4W_CPP;
     PLCCalc = PLCCalc_SSE;
     //PLCCalc = PLCCalc_CPP;
 #endif
@@ -59,9 +56,6 @@ void Initialize()
     // SSE implementations of this functions is not used.
     // Found duplicate implementation in src\Layers\xrRenderPC_R1\LightShadows.cpp
     // Search for other duplicates
-
-    if (ttapi.threads.size() > 1)
-        Skin4W = Skin4W_MT;
 
     initialized = true;
 }
