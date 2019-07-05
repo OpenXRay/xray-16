@@ -82,8 +82,8 @@ public:
     using mapped_type = T;
     using value_type = xr_fixed_map_node<K, T>;
 
-    using callback = void __fastcall(value_type*);
-    using callback_cmp = bool __fastcall(value_type& N1, value_type& N2);
+    using callback = void __fastcall(const value_type&);
+    using callback_cmp = bool __fastcall(const value_type& N1, const value_type& N2);
 
     static_assert(TGrowMultiplier >= 1, "Grow multiplier can't be less than 1");
     static_assert(std::is_same_v<value_type, typename allocator::value_type>,
@@ -179,7 +179,7 @@ private:
     {
         if (N->left)
             recurse_left_right(N->left, CB);
-        CB(N);
+        CB(*N);
         if (N->right)
             recurse_left_right(N->right, CB);
     }
@@ -188,7 +188,7 @@ private:
     {
         if (N->right)
             recurse_right_left(N->right, CB);
-        CB(N);
+        CB(*N);
         if (N->left)
             recurse_right_left(N->left, CB);
     }
@@ -396,7 +396,7 @@ public:
     {
         value_type* _end = end();
         for (value_type* cur = begin(); cur != _end; ++cur)
-            CB(cur);
+            CB(*cur);
     }
 
     void get_left_right(xr_vector<T, xr_allocator<T>>& D)
@@ -434,6 +434,6 @@ public:
     void setup(callback CB)
     {
         for (size_t i = 0; i < limit; i++)
-            CB(nodes + i);
+            CB(*(nodes + i));
     }
 };
