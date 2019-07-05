@@ -121,9 +121,10 @@ private:
         }
         else
         {
-            std::move(first(), last(), newNodes);
-            for (value_type* cur = newNodes + limit; cur != newNodes + newLimit; ++cur)
+            for (value_type* cur = newNodes; cur != newNodes + newLimit; ++cur)
                 allocator::construct(cur);
+            if (pool)
+                std::move(first(), last(), newNodes);
         }
 
         for (size_t i = 0; i < pool; ++i)
