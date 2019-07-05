@@ -97,34 +97,35 @@ SCRIPT_EXPORT(CBlend, (), {
         class_<CBlend>("CBlend")
     ];
 });
-// clang-format on
 
-#pragma todo("Тут нужно когда-нибудь сделать рефакторинг @Debrovski")
-
-LPCSTR CPatrolPoint::getName(CPatrolPoint *pp) const {
+pcstr GetPointName(CPatrolPoint *pp)
+{
 	return pp->m_name.c_str();
 }
 
-void CPatrolPoint::setName(CPatrolPoint *pp, LPCSTR str) {
-	pp->m_name = shared_str(str);
+void SetPointName(CPatrolPoint *pp, pcstr str)
+{
+	pp->m_name = str;
 }
 
 SCRIPT_EXPORT(CPatrolPoint, (), {
-    module(luaState)[
+    module(luaState)
+    [
 		class_<CPatrolPoint>("CPatrolPoint")
 			.def(constructor<>())
 			.def_readwrite("m_position", &CPatrolPoint::m_position)
 			.def_readwrite("m_flags", &CPatrolPoint::m_flags)
 			.def_readwrite("m_level_vertex_id", &CPatrolPoint::m_level_vertex_id)
 			.def_readwrite("m_game_vertex_id", &CPatrolPoint::m_game_vertex_id)
-			.property("m_name", &CPatrolPoint::getName, &CPatrolPoint::setName)
+			.property("m_name", &GetPointName, &SetPointName)
 			.def("position", (CPatrolPoint& (CPatrolPoint::*) (Fvector)) (&CPatrolPoint::position))
 	];
 });
 
 
 SCRIPT_EXPORT(CPatrolPath, (), {
-	module(luaState)[
+	module(luaState)
+    [
 		class_<CPatrolPath>("CPatrolPath")
 			.def(constructor<>())
 			.def("add_point", &CPatrolPath::add_point)
@@ -135,12 +136,4 @@ SCRIPT_EXPORT(CPatrolPath, (), {
 	];
 });
 
-//class CPatrolPointScript
-//{
-//public:
-//    static LPCSTR getName(CPatrolPoint*);
-//    static void setName(CPatrolPoint*, LPCSTR);
-//    DECLARE_SCRIPT_REGISTER_FUNCTION
-//};
-
-
+// clang-format on

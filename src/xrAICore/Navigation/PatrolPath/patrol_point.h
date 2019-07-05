@@ -62,8 +62,7 @@ public:
     // for xrGame
     const GameGraph::_GRAPH_ID& game_vertex_id() const;
     CPatrolPoint& position(Fvector position);
-    LPCSTR getName(CPatrolPoint* pp) const;
-    void setName(CPatrolPoint* pp, LPCSTR str);
+
 #ifdef DEBUG
 public:
     IC void path(const CPatrolPath* path);
