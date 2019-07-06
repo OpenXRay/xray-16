@@ -98,9 +98,7 @@ bool CLevel::synchronize_client()
         deny_m_spawn = FALSE;
         return true;
     }
-#ifdef DEBUG
-    Msg("--- Waiting for server configuration...");
-#endif // #ifdef DEBUG
+
     if (Server)
     {
         ClientReceive();

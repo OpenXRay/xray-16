@@ -194,7 +194,6 @@ public:
 
     int GetPort() const { return psNET_Port; }
 
-    u32 GetClientsCount() { return net_players.ClientsCount(); };
     IClient* GetServerClient() const { return SV_Client; };
 
     template <typename SearchPredicate>
@@ -222,13 +221,6 @@ public:
 #endif
         csMessage.Leave();
     }
-
-#ifdef DEBUG
-    bool IsPlayersMonitorLockedByMe() const
-    {
-        return net_players.IsCurrentThreadIteratingOnClients() && !sender_functor_invoked;
-    };
-#endif
 
     IClient* GetClientByID(const ClientID& clientId)
     {
