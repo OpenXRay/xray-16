@@ -44,7 +44,7 @@ public:
 #elif defined(LINUX) || defined(FREEBSD)
     IC const int& file_mapping_handle() const;
 #endif
-    IC size_t elapsed() const;
+    IC intptr_t elapsed() const;
     IC const size_t& length() const;
     IC void seek(const int& offset);
     IC size_t tell() const;

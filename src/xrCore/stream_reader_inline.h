@@ -21,7 +21,7 @@ IC void CStreamReader::remap(const size_t& new_offset)
     map(new_offset);
 }
 
-IC size_t CStreamReader::elapsed() const
+IC intptr_t CStreamReader::elapsed() const
 {
     const size_t offset_from_file_start = tell();
     VERIFY(m_file_size >= offset_from_file_start);

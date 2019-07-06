@@ -366,7 +366,7 @@ protected:
     size_t advance_term_string();
 
 public:
-    IC size_t elapsed() const { return Size - Pos; }
+    IC intptr_t elapsed() const { return Size - Pos; }
     IC size_t tell() const { return Pos; }
     IC void seek(size_t ptr)
     {

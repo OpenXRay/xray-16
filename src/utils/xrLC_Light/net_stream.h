@@ -141,7 +141,7 @@ public:
         // VERIFY(stream);
     }
     virtual ~INetReader();
-    IC size_t elapsed() const
+    IC intptr_t elapsed() const
     {
         VERIFY(false);
         return 0;
