@@ -102,6 +102,7 @@ using RTokenVec = xr_vector<xr_rtoken>;
 #endif
 
 #include "net_utils.h"
+#include "Threading/ThreadUtil.h"
 
 // destructor
 template <class T>

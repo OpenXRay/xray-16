@@ -46,7 +46,7 @@ int entry_point(pcstr commandLine)
     xrDebug::Initialize(false);
 
     splash->SetStatus("Loading Core...");
-    thread_spawn(UIThreadProc, "OpenXRay Editor UI Thread", 0, nullptr);
+    ThreadUtil::CreateThread(UIThreadProc, "OpenXRay Editor UI Thread", 0, nullptr);
 
     UICreated.Wait();
     ReadyToShowUI.Set();

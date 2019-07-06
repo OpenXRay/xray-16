@@ -64,7 +64,6 @@ BOOL CRenderDevice::Begin()
 }
 
 void CRenderDevice::Clear() { GEnv.Render->Clear(); }
-extern void CheckPrivilegySlowdown();
 
 void CRenderDevice::End(void)
 {
@@ -93,7 +92,7 @@ void CRenderDevice::End(void)
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
             g_find_chunk_counter.flush();
 #endif
-            CheckPrivilegySlowdown();
+
             if (g_pGamePersistent->GameType() == 1) // haCk
             {
                 WINDOWINFO wi;
@@ -344,7 +343,8 @@ void CRenderDevice::Run()
 {
     g_bLoaded = FALSE;
     Log("Starting engine...");
-    thread_name("X-RAY Primary thread");
+    ThreadUtil::SetThreadName(NULL, "X-RAY Primary thread");
+
     // Startup timers and calculate timer delta
     dwTimeGlobal = 0;
     Timer_MM_Delta = 0;
@@ -358,8 +358,8 @@ void CRenderDevice::Run()
     }
     // Start all threads
     mt_bMustExit = FALSE;
-    thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-    //thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
+    ThreadUtil::CreateThread(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
+    //ThreadUtil::CreateThread(RenderThreadProc, "X-RAY Render thread", 0, this);
     
     // Load FPS Lock
     if (Core.ParamFlags.test(Core.nofpslock))

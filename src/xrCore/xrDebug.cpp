@@ -629,7 +629,8 @@ void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
         strcpy_s(temp, dumpPath);
         sprintf(dumpPath, "logs/%s", temp);
     }
-    WriteMiniDump(MINIDUMP_TYPE(MiniDumpFilterMemory | MiniDumpScanMemory), dumpPath, GetCurrentThreadId(), exPtrs);
+    WriteMiniDump(
+        MINIDUMP_TYPE(MiniDumpFilterMemory | MiniDumpScanMemory), dumpPath, ThreadUtil::GetCurrThreadId(), exPtrs);
 #endif
 }
 #endif

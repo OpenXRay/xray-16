@@ -93,11 +93,11 @@ CBulletManager::CBulletManager()
 #if 0 // def CONFIG_PROFILE_LOCKS
 	: m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
-		,m_thread_id(GetCurrentThreadId())
+		,m_thread_id(ThreadUtil::GetCurrThreadId())
 #endif // #ifdef DEBUG
 #else // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-    : m_thread_id(GetCurrentThreadId())
+    : m_thread_id(ThreadUtil::GetCurrThreadId())
 #endif // #ifdef DEBUG
 #endif // #ifdef CONFIG_PROFILE_LOCKS
 {
@@ -187,7 +187,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet, int iShotNum)
 {
 #ifdef DEBUG
-    VERIFY(m_thread_id == GetCurrentThreadId());
+    VERIFY(m_thread_id == ThreadUtil::GetCurrThreadId());
 #endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
@@ -204,8 +204,6 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 
 void CBulletManager::UpdateWorkload()
 {
-    //	VERIFY						( m_thread_id == GetCurrentThreadId() );
-
     rq_storage.r_clear();
 
     u32 const time_delta = Device.dwTimeDelta;

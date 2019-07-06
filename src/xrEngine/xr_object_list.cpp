@@ -38,7 +38,7 @@ void CObjectList::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
         alert->Print(font, "UpdateCL  > 3ms:  %3.1f", stats.Update.result);
 }
 
-CObjectList::CObjectList() : m_owner_thread_id(GetCurrentThreadId())
+CObjectList::CObjectList() : m_owner_thread_id(ThreadUtil::GetCurrThreadId())
 {
     statsFrame = u32(-1);
     ZeroMemory(map_NETID, 0xffff * sizeof(IGameObject*));

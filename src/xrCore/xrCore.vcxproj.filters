@@ -106,6 +106,9 @@
     <Filter Include="Memory">
       <UniqueIdentifier>{0173b19d-898c-495c-8d22-2cc3d8436008}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threading\Util">
+      <UniqueIdentifier>{d58c8dbd-1e58-42b0-8711-1d091c68e3ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -284,6 +287,9 @@
     </ClCompile>
     <ClCompile Include="FileCRC32.cpp">
       <Filter>FS</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ThreadUtil_Win.cpp">
+      <Filter>Threading\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -643,6 +649,9 @@
     </ClInclude>
     <ClInclude Include="Memory\XRayAllocator.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ThreadUtil.h">
+      <Filter>Threading\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

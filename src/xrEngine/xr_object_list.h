@@ -126,7 +126,7 @@ public:
 private:
     IC Objects& get_crows()
     {
-        if (GetCurrentThreadId() == m_owner_thread_id)
+        if (ThreadUtil::GetCurrThreadId() == m_owner_thread_id)
             return (m_crows[0]);
 
         return (m_crows[1]);
