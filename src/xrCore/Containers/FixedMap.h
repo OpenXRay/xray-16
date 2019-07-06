@@ -425,10 +425,11 @@ public:
 
     void get_any_p(xr_vector<value_type*, xr_allocator<value_type*>>& D)
     {
-        D.reserve(size());
+        D.resize(size());
+        value_type** _it = &D.front();
         value_type* _end = end();
-        for (value_type* cur = begin(); cur != _end; ++cur)
-            D.push_back(cur);
+        for (value_type* cur = begin(); cur != _end; ++cur, ++_it)
+            *_it = cur;
     }
 
     void setup(callback CB)
