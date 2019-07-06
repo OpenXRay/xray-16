@@ -169,7 +169,7 @@ private:
 
     value_type* create_child(value_type*& parent, const K& key)
     {
-        size_t PID = size_t(parent - nodes);
+        ptrdiff_t PID = ptrdiff_t(parent - nodes);
         value_type* N = add(key);
         parent = nodes + PID;
         return N;
@@ -234,7 +234,7 @@ public:
     {
         pool = 0;
         limit = 0;
-        nodes = 0;
+        nodes = nullptr;
     }
 
     ~xr_fixed_map()
