@@ -29,6 +29,7 @@ class IBlender;
 struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std::pair<u32, ref_texture>>
 {
     using inherited_vec = xr_vector<std::pair<u32, ref_texture>>;
+    STextureList() = default;
     ~STextureList();
 
     BOOL equal(const STextureList& base) const
@@ -76,6 +77,7 @@ struct ECORE_API SGeometry : public xr_resource_flagged
     ID3DIndexBuffer* ib;
 #endif
     u32 vb_stride;
+    SGeometry() = default;
     ~SGeometry();
 };
 
@@ -118,6 +120,7 @@ struct ECORE_API SPass : public xr_resource_flagged
     ref_matrix_list M;
 #endif
 
+    SPass() = default;
     ~SPass();
 
     BOOL equal(const SPass& other);
@@ -150,6 +153,7 @@ struct ECORE_API Shader : public xr_resource_flagged
 {
     ref_selement E[6]; // R1 - 0=norm_lod0(det), 1=norm_lod1(normal), 2=L_point, 3=L_spot, 4=L_for_models,
     // R2 - 0=deffer, 1=norm_lod1(normal), 2=psm, 3=ssm, 4=dsm
+    Shader() = default;
     ~Shader();
     BOOL equal(Shader* S);
     BOOL equal(Shader* S, int index);

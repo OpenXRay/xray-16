@@ -16,7 +16,7 @@ public:
         modeWaveForm
     };
 
-public:
+public:    
     Fcolor const_float;
     u32 const_dword;
 
