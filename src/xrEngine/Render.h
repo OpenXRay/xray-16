@@ -386,8 +386,6 @@ protected:
     virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) = 0;
 
 public:
-    virtual void Copy(IRender& _in) = 0;
-
     //	Gamma correction functions
     virtual void setGamma(float fGamma) = 0;
     virtual void setBrightness(float fGamma) = 0;

@@ -20,10 +20,6 @@ D3DXRenderBase::D3DXRenderBase()
     Resources = nullptr;
 }
 
-void D3DXRenderBase::Copy(IRender& _in)
-{
-    *this = *(D3DXRenderBase*)&_in;
-}
 void D3DXRenderBase::setGamma(float fGamma)
 {
 #ifndef USE_OGL
