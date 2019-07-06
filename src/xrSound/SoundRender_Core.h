@@ -1,8 +1,8 @@
 #pragma once
-
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Cache.h"
+#include "xrCommon/xr_unordered_map.h"
 
 class CSoundRender_Core : public ISoundManager
 {
@@ -54,7 +54,7 @@ protected:
     CDB::MODEL* geom_ENV;
 
     // Containers
-    xr_vector<CSoundRender_Source*> s_sources;
+    xr_unordered_map<xr_string, CSoundRender_Source*> s_sources;
     xr_vector<CSoundRender_Emitter*> s_emitters;
     u32 s_emitters_u; // emitter update marker
     xr_vector<CSoundRender_Target*> s_targets;
@@ -126,6 +126,8 @@ public:
 public:
     CSoundRender_Source* i_create_source(pcstr name);
     void i_destroy_source(CSoundRender_Source* S);
+    void CreateAllSources();
+
     CSoundRender_Emitter* i_play(ref_sound* S, bool _loop, float delay);
     void i_start(CSoundRender_Emitter* E);
     void i_stop(CSoundRender_Emitter* E);
