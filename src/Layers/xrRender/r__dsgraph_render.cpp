@@ -64,8 +64,7 @@ template <class T> void sort_tlist(xr_vector<typename T::value_type*>& lst, xr_v
     if (amount <= 1)
     {
         // Just sort by SSA
-        lst.reserve(textures.size());
-        for (auto &i : textures) lst.push_back(&i);
+        textures.get_any_p(lst);
         std::sort(lst.begin(), lst.end(), cmp_second_ssa<typename T::value_type *>);
     }
     else
@@ -109,8 +108,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         {
             mapNormalVS& vs = mapNormalPasses[_priority][iPass];
 
-            nrmVS.reserve(vs.size());
-            for (auto &i : vs) nrmVS.push_back(&i);
+            vs.get_any_p(nrmVS);
             std::sort(nrmVS.begin(), nrmVS.end(), cmp_second_ssa<mapNormalVS::value_type *>);
             for (auto & vs_it : nrmVS)
             {
@@ -121,8 +119,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                 mapNormalGS& gs = vs_it->second;
                 gs.ssa = 0;
 
-                nrmGS.reserve(gs.size());
-                for (auto &i : gs) nrmGS.push_back(&i);
+                gs.get_any_p(nrmGS);
                 std::sort(nrmGS.begin(), nrmGS.end(), cmp_second_ssa<mapNormalGS::value_type *>);
                 for (auto & gs_it : nrmGS)
                 {
@@ -134,8 +131,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                     ps.ssa = 0;
 
-                    nrmPS.reserve(ps.size());
-                    for (auto &i : ps) nrmPS.push_back(&i);
+                    ps.get_any_p(nrmPS);
                     std::sort(nrmPS.begin(), nrmPS.end(), cmp_ps_second_ssa<mapNormalPS::value_type *>);
                     for (auto &ps_it : nrmPS)
                     {
@@ -150,8 +146,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                         cs.ssa = 0;
 
-                        nrmCS.reserve(cs.size());
-                        for (auto &i : cs) nrmCS.push_back(&i);
+                        cs.get_any_p(nrmCS);
                         std::sort(nrmCS.begin(), nrmCS.end(), cmp_second_ssa<mapNormalCS::value_type *>);
                         for (auto &cs_it : nrmCS)
                         {
@@ -160,8 +155,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                             mapNormalStates& states = cs_it->second;
                             states.ssa = 0;
 
-                            nrmStates.reserve(states.size());
-                            for (auto &i : states) nrmStates.push_back(&i);
+                            states.get_any_p(nrmStates);
                             std::sort(nrmStates.begin(), nrmStates.end(), cmp_second_ssa<mapNormalStates::value_type *>);
                             for (auto &state_it : nrmStates)
                             {
@@ -224,8 +218,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
     {
         mapMatrixVS& vs = mapMatrixPasses[_priority][iPass];
 
-        matVS.reserve(vs.size());
-        for (auto &i : vs) matVS.push_back(&i);
+        vs.get_any_p(matVS);
         std::sort(matVS.begin(), matVS.end(), cmp_second_ssa<mapMatrixVS::value_type *>);
         for (auto &vs_id : matVS)
         {
@@ -235,8 +228,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
             mapMatrixGS& gs = vs_id->second;
             gs.ssa = 0;
 
-            matGS.reserve(gs.size());
-            for (auto &i : gs) matGS.push_back(&i);
+            gs.get_any_p(matGS);
             std::sort(matGS.begin(), matGS.end(), cmp_second_ssa<mapMatrixGS::value_type *>);
             for (auto &gs_it : matGS)
             {
@@ -248,8 +240,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                 ps.ssa = 0;
 
-                matPS.reserve(ps.size());
-                for (auto &i : ps) matPS.push_back(&i);
+                ps.get_any_p(matPS);
                 std::sort(matPS.begin(), matPS.end(), cmp_ps_second_ssa<mapMatrixPS::value_type *>);
                 for (auto &ps_it : matPS)
                 {
@@ -264,8 +255,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #endif
                     cs.ssa = 0;
 
-                    matCS.reserve(cs.size());
-                    for (auto &i : cs) matCS.push_back(&i);
+                    cs.get_any_p(matCS);
                     std::sort(matCS.begin(), matCS.end(), cmp_second_ssa<mapMatrixCS::value_type *>);
                     for (auto &cs_it : matCS)
                     {
@@ -274,8 +264,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                         mapMatrixStates& states = cs_it->second;
                         states.ssa = 0;
 
-                        matStates.reserve(states.size());
-                        for (auto &i : states) matStates.push_back(&i);
+                        states.get_any_p(matStates);
                         std::sort(matStates.begin(), matStates.end(), cmp_second_ssa<mapMatrixStates::value_type *>);
                         for (auto &state_it : matStates)
                         {
@@ -393,7 +382,7 @@ public:
 };
 
 template<class T>
-IC void render_item(T &item)
+IC void __fastcall render_item(const T& item)
 {
     dxRender_Visual* V = item.second.pVisual;
     VERIFY(V && V->shader._get());
@@ -412,18 +401,14 @@ template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs
 template<class T>
 IC void sort_front_to_back_render_and_clean(T &vec)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_l<typename T::value_type>); // front-to-back
-    for (auto &i : vec)
-        render_item(i);
+    vec.traverse_left_right(render_item);
     vec.clear();
 }
 
 template<class T>
 IC void sort_back_to_front_render_and_clean(T &vec)
 {
-    std::sort(vec.begin(), vec.end(), cmp_first_h<typename T::value_type>); // back-to-front
-    for (auto &i : vec)
-        render_item(i);
+    vec.traverse_right_left(render_item);
     vec.clear();
 }
 
