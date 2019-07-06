@@ -2,6 +2,12 @@
 
 #include "xrCommon/xr_allocator.h"
 
+// Both xr_fixed_map and xr_fixed_map_node doesn't support move operation
+// Trying to do so will result in a crash at some point
+// (at first it would be just fine, but this is a lie)
+
+// The container is just designed for copying, not moving
+
 template <class K, class T>
 struct xr_fixed_map_node
 {
@@ -19,27 +25,6 @@ struct xr_fixed_map_node
     {
         left = nullptr;
         right = nullptr;
-    }
-
-    xr_fixed_map_node(xr_fixed_map_node&& other) noexcept
-    {
-        first = std::move(other.first);
-        second = std::move(other.second);
-        left = other.left;
-        right = other.right;
-        other.left = nullptr;
-        other.right = nullptr;
-    }
-
-    xr_fixed_map_node& operator=(xr_fixed_map_node&& other) noexcept
-    {
-        first = std::move(other.first);
-        second = std::move(other.second);
-        left = other.left;
-        right = other.right;
-        other.left = nullptr;
-        other.right = nullptr;
-        return *this;
     }
 
     xr_fixed_map_node(const xr_fixed_map_node& other) noexcept
@@ -125,7 +110,7 @@ private:
             for (value_type* cur = newNodes; cur != newNodes + newLimit; ++cur)
                 allocator::construct(cur);
             if (pool)
-                std::move(first(), last(), newNodes);
+                std::copy(first(), last(), newNodes);
         }
 
         for (size_t i = 0; i < pool; ++i)
