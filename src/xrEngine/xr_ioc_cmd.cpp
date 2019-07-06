@@ -374,7 +374,7 @@ public:
     {
         if (Device.b_is_Ready)
         {
-            Device.RequireReset();
+            Device.Reset();
         }
     }
 };

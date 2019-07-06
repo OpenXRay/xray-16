@@ -58,6 +58,8 @@ public:
 class ENGINE_API CRenderDeviceData
 {
 public:
+    static constexpr u32 MaximalWaitTime = 33; // ms
+
     // Rendering resolution
     u32 dwWidth;
     u32 dwHeight;
@@ -257,18 +259,19 @@ public:
     IC CTimer_paused* GetTimerGlobal() { return &TimerGlobal; }
     u32 TimerAsync() { return TimerGlobal.GetElapsed_ms(); }
     u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
+
+private:
     // Creation & Destroying
-    void Create(void);
+    void CreateInternal();
+    void ResetInternal(bool precache = true);
+
+public:
+    void Create();
+    void WaitUntilCreated();
+
     void Run(void);
     void Destroy(void);
     void Reset(bool precache = true);
-    void RequireReset(bool doPrecache = true) const
-    {
-        SDL_Event reset = { SDL_USEREVENT };
-        reset.user.type = resetEventId;
-        reset.user.code = doPrecache;
-        SDL_PushEvent(&reset);
-    }
 
     void UpdateWindowProps(const bool windowed);
     void UpdateWindowRects();
@@ -296,9 +299,10 @@ public:
     }
 
 private:
-    DeviceState LastDeviceState;
-    u32 resetEventId;
+    std::atomic<bool> shouldReset;
+    std::atomic<bool> precacheWhileReset;
     std::atomic<bool> mtProcessingAllowed;
+    Event deviceCreated, deviceReadyToRun;
     Event primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events

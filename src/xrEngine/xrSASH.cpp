@@ -505,6 +505,7 @@ void xrSASH::TryInitEngine(bool bNoRun)
     {
         InitSound();
         Device.Create();
+        Device.WaitUntilCreated();
     }
 }
 

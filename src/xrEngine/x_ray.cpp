@@ -236,7 +236,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 
         Console->Execute("main_menu off");
         Console->Hide();
-        Device.RequireReset(false);
+        Device.Reset(false);
 
         g_pGameLevel = smart_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
         VERIFY(g_pGameLevel);

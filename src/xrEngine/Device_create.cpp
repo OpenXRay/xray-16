@@ -7,6 +7,7 @@
 #include "MonitorManager.hpp"
 #include "SDL.h"	
 #include "SDL_syswm.h"
+#include "TaskScheduler.hpp"
 
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;
@@ -27,6 +28,32 @@ void CRenderDevice::_SetupStates()
 }
 
 void CRenderDevice::Create()
+{
+    if (b_is_Ready)
+        return; // prevent double call
+
+    GEnv.Render->MakeContextCurrent(false);
+
+    // Start all threads
+    mt_bMustExit = FALSE;
+
+    thread_name("X-Ray Window thread");
+    thread_spawn(PrimaryThreadProc, "X-RAY Primary thread", 0, this);
+    thread_spawn(SecondaryThreadProc, "X-Ray Secondary thread", 0, this);
+    // thread_spawn(RenderThreadProc, "X-Ray Render thread", 0, this);
+
+    TaskScheduler = std::make_unique<TaskManager>();
+    TaskScheduler->Initialize();
+}
+
+void CRenderDevice::WaitUntilCreated()
+{
+    while (!deviceCreated.Wait(MaximalWaitTime))
+        SDL_PumpEvents();
+    GEnv.Render->MakeContextCurrent(true);
+}
+
+void CRenderDevice::CreateInternal()
 {
     if (b_is_Ready)
         return; // prevent double call

@@ -36,11 +36,17 @@ void CRenderDevice::Destroy()
     SDL_DestroyWindow(m_sdlWnd);
 }
 
+void CRenderDevice::Reset(bool precache /*= true*/)
+{
+    shouldReset = true;
+    precacheWhileReset = precache;
+}
+
 #include "IGame_Level.h"
 #include "CustomHUD.h"
 extern BOOL bNeed_re_create_env;
 
-void CRenderDevice::Reset(bool precache)
+void CRenderDevice::ResetInternal(bool precache)
 {
     TaskScheduler->RemoveTasksWithType(Task::Type::Renderer);
 

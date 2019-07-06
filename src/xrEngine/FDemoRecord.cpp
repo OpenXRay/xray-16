@@ -201,7 +201,7 @@ void CDemoRecord::MakeLevelMapProcess()
         psDeviceFlags.zero();
         psDeviceFlags.set(rsClearBB | rsFullscreen | rsDrawStatic, TRUE);
         if (!psDeviceFlags.equal(s_dev_flags, rsFullscreen))
-            Device.RequireReset();
+            Device.Reset();
     }
     break;
 
@@ -236,7 +236,7 @@ void CDemoRecord::MakeLevelMapProcess()
             BOOL bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
             psDeviceFlags = s_dev_flags;
             if (bDevReset)
-                Device.RequireReset();
+                Device.Reset();
             m_bMakeLevelMap = FALSE;
             m_iLMScreenshotFragment = -1;
         }

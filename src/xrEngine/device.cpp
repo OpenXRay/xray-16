@@ -55,7 +55,7 @@ bool CRenderDevice::RenderBegin()
     if (GEnv.isDedicatedServer)
         return true;
 
-    switch (LastDeviceState)
+    switch (GEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
@@ -65,7 +65,7 @@ bool CRenderDevice::RenderBegin()
 
     case DeviceState::NeedReset:
         // Check if the device is ready to be reset
-        RequireReset();
+        ResetInternal();
         return false;
 
     default: R_ASSERT(0);
@@ -167,8 +167,21 @@ void CRenderDevice::PrimaryThreadProc(void* context)
 {
     auto& device = *static_cast<CRenderDevice*>(context);
 
-    SDL_Event resetCheck;
-    bool shouldSwitch = true; // always switch for the first time
+    device.deviceCreated.Reset();
+    GEnv.Render->MakeContextCurrent(true);
+
+    device.CreateInternal();
+
+    GEnv.Render->MakeContextCurrent(false);
+    device.deviceCreated.Set();
+
+    device.deviceReadyToRun.Wait(); // ping
+    GEnv.Render->MakeContextCurrent(true);
+    
+    device.seqAppStart.Process();
+    GEnv.Render->ClearTarget();
+
+    device.deviceReadyToRun.Set(); // pong
 
     while (true)
     {
@@ -180,23 +193,14 @@ void CRenderDevice::PrimaryThreadProc(void* context)
             return;
         }
 
-        if (shouldSwitch)
+        if (device.shouldReset)
         {
-            GEnv.Render->MakeContextCurrent(true);
-            shouldSwitch = false;
+            device.ResetInternal(device.precacheWhileReset);
+            device.shouldReset = false;
+            device.precacheWhileReset = false;
         }
 
         device.ProcessFrame();
-
-        if (SDL_PeepEvents(&resetCheck, 1,
-            SDL_PEEKEVENT, SDL_USEREVENT, SDL_USEREVENT))
-        {
-            if (resetCheck.user.type == device.resetEventId)
-            {
-                shouldSwitch = true;
-                GEnv.Render->MakeContextCurrent(false);
-            }
-        }
 
         device.primaryFrameDone.Set();
     }
@@ -411,8 +415,6 @@ void CRenderDevice::message_loop()
         return;
     }
 
-    GEnv.Render->MakeContextCurrent(false);
-
     bool timedOut = false;
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
@@ -423,15 +425,6 @@ void CRenderDevice::message_loop()
         {
             count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
                 SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
-
-            // We need to collect only SDL_USEREVENT,
-            // Other types of events should not be collected
-            // Let's do this like that:
-            if (count < MAX_WINDOW_EVENTS)
-            {
-                count += SDL_PeepEvents(events + count, MAX_WINDOW_EVENTS - count,
-                    SDL_GETEVENT, SDL_USEREVENT, SDL_USEREVENT);
-            }
         }
 
         for (int i = 0; i < count; ++i)
@@ -440,16 +433,6 @@ void CRenderDevice::message_loop()
 
             switch (event.type)
             {
-            case SDL_USEREVENT:
-            {
-                if (event.user.type == resetEventId)
-                {
-                    GEnv.Render->MakeContextCurrent(true);
-                    Reset(event.user.code);
-                    GEnv.Render->MakeContextCurrent(false);
-                }
-                break;
-            }
             case SDL_WINDOWEVENT:
             {
                 switch (event.window.event)
@@ -470,9 +453,7 @@ void CRenderDevice::message_loop()
                         xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
                         Console->Execute(buff);
 
-                        GEnv.Render->MakeContextCurrent(true);
                         Reset();
-                        GEnv.Render->MakeContextCurrent(false);
                     }
                     else
                         UpdateWindowRects();
@@ -511,11 +492,10 @@ void CRenderDevice::message_loop()
 
         if (!timedOut)
         {
-            LastDeviceState = GEnv.Render->GetDeviceState();
             primaryProcessFrame.Set();
         }
 
-        timedOut = !primaryFrameDone.Wait(33);
+        timedOut = !primaryFrameDone.Wait(MaximalWaitTime);
     }
 
     if (timedOut)
@@ -526,7 +506,6 @@ void CRenderDevice::Run()
 {
     g_bLoaded = FALSE;
     Log("Starting engine...");
-    thread_name("X-RAY Window thread");
 
     // Startup timers and calculate timer delta
     dwTimeGlobal = 0;
@@ -540,22 +519,11 @@ void CRenderDevice::Run()
         Timer_MM_Delta = time_system - time_local;
     }
 
-    resetEventId = SDL_RegisterEvents(1);
-    R_ASSERT2(resetEventId != u32(-1), "Failed to allocate Device reset SDL event.");
-
-    // Start all threads
-    mt_bMustExit = FALSE;
-
-    thread_spawn(PrimaryThreadProc, "X-RAY Primary thread", 0, this);
-    thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-    // thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
-
-    TaskScheduler.reset(new TaskManager());
-    TaskScheduler->Initialize();
-
     // Pre start
-    seqAppStart.Process();
-    GEnv.Render->ClearTarget();
+    GEnv.Render->MakeContextCurrent(false);
+    deviceReadyToRun.Set();  // ping
+    deviceReadyToRun.Wait(); // pong
+
     splash::hide();
     SDL_HideWindow(m_sdlWnd);
     SDL_ShowWindow(m_sdlWnd);
