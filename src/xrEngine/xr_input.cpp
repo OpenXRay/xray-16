@@ -522,10 +522,6 @@ void CInput::OnFrame(void)
         if (availableController)
             GameControllerUpdate();
     }
-    else
-    {
-        SDL_FlushEvents(SDL_KEYDOWN, SDL_CONTROLLERDEVICEREMAPPED);
-    }
 
     stats.FrameTime.End();
     stats.FrameEnd();
