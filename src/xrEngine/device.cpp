@@ -362,7 +362,7 @@ void CRenderDevice::ProcessFrame()
     if (!BeforeFrame())
         return;
 
-    const auto frameStartTime = TimerGlobal.GetElapsed_ms();
+    const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
     GEnv.Render->BeforeFrame();
     FrameMove();
@@ -373,19 +373,18 @@ void CRenderDevice::ProcessFrame()
     syncProcessFrame.Set(); // allow secondary thread to do its job
     mtProcessingAllowed = true;
 
-    const auto frameEndTime = TimerGlobal.GetElapsed_ms();
-    const auto frameTime = frameEndTime - frameStartTime;
-
     DoRender();
 
-    // Eco render (by alpet)
-    u32 updateDelta = 0;
+    const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
+    const u64 frameTime = frameEndTime - frameStartTime;
+
+    u32 updateDelta = 2; // 2 ms
 
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
-    else if (Device.Paused() || IGame_Persistent::IsMainMenuActive())
-        updateDelta = 10;
+    else if (Device.Paused())
+        updateDelta = 16; // 16 ms, ~60 FPS max while paused
 
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
