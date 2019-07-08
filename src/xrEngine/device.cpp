@@ -521,7 +521,9 @@ void CRenderDevice::Run()
     // Pre start
     GEnv.Render->MakeContextCurrent(false);
     deviceReadyToRun.Set();  // ping
-    deviceReadyToRun.Wait(); // pong
+
+    while (!deviceReadyToRun.Wait(MaximalWaitTime))
+        SDL_PumpEvents(); // pong
 
     splash::hide();
     SDL_HideWindow(m_sdlWnd);
