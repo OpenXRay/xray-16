@@ -86,6 +86,9 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
     auto& gameWeathers = gMapListHelper.GetGameWeathers();
     Initialize(gameWeathers.size());
     weathers.resize(gameWeathers.size());
+    
+    // There is no mistake. Vanilla algorithm sorted config keys by alphabet.
+    // We did it for vanilla bug fixes and compataible with game data.
     string256 path;
     for (u32 i = 0; i < weathers.size(); i++)
     {
@@ -93,9 +96,16 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
         CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
         xr_sprintf(path, "change_weather:txt_%d", i+1);
         CUIXmlInit::InitTextWnd(xmlDoc, path, 0, GetButton(i).Text);
-        weathers[i].Name = gameWeathers[i].Name;
-        weathers[i].Time = gameWeathers[i].StartTime;
     }
+    Log("! Weathers name sorted by alphabet !");
+    weathers[0].Name = gameWeathers[0].Name;
+    weathers[0].Time = gameWeathers[0].StartTime;
+    weathers[1].Name = gameWeathers[3].Name;
+    weathers[1].Time = gameWeathers[3].StartTime;
+    weathers[2].Name = gameWeathers[2].Name;
+    weathers[2].Time = gameWeathers[2].StartTime;
+    weathers[3].Name = gameWeathers[1].Name;
+    weathers[3].Time = gameWeathers[1].StartTime;
 }
 
 void ChangeWeatherDialog::OnButtonClick(int i)
