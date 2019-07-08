@@ -981,6 +981,22 @@ void CScriptEngine::setup_auto_load()
     // lua_settop(lua(), 0);
 }
 
+// initialize lua standard library functions
+struct luajit
+{
+    static void open_lib(lua_State* L, pcstr module_name, lua_CFunction function)
+    {
+        lua_pushcfunction(L, function);
+        lua_pushstring(L, module_name);
+        lua_call(L, 1, 0);
+    }
+
+    static void allow_escape_sequences(bool allowed)
+    {
+        lj_allow_escape_sequences(allowed ? 1 : 0);
+    }
+};
+
 void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 {
 #ifdef USE_LUA_STUDIO
@@ -998,6 +1014,10 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
      
         luabind::allow_nil_conversion(nilConversion);
         luabind::disable_super_deprecation();
+
+        const bool escapeSequences =
+            pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_escape_sequences", false);
+        luajit::allow_escape_sequences(escapeSequences);
     }
 
     luabind::bind_class_info(lua());
@@ -1020,16 +1040,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         dumper.Dump(lua(), writer, options);
         FS.w_close(writer);
     }
-    // initialize lua standard library functions
-    struct luajit
-    {
-        static void open_lib(lua_State* L, pcstr module_name, lua_CFunction function)
-        {
-            lua_pushcfunction(L, function);
-            lua_pushstring(L, module_name);
-            lua_call(L, 1, 0);
-        }
-    };
+
     luajit::open_lib(lua(), "", luaopen_base);
     luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
     luajit::open_lib(lua(), LUA_TABLIBNAME, luaopen_table);
