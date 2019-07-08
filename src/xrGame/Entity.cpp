@@ -16,7 +16,6 @@
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
-#include "xrNetServer/NET_Messages.h"
 
 #define BODY_REMOVE_TIME 600000
 
@@ -303,7 +302,7 @@ void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
         P.w_u16(u16(whoID));
         P.w_u32(0);
         if (OnServer())
-            u_EventSend(P, net_flags(TRUE, TRUE, FALSE, TRUE));
+            u_EventSend(P);
     }
 };
 

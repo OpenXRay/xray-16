@@ -14,7 +14,6 @@ void xrServer::Process_update(NET_Packet& P, ClientID sender)
         Msg("---- UPDATE_Read --- ");
 #endif // #ifndef MASTER_GOLD
 
-    R_ASSERT(CL->flags.bLocal);
     // while has information
     while (!P.r_eof())
     {
@@ -58,9 +57,7 @@ void xrServer::Process_save(NET_Packet& P, ClientID sender)
 {
     xrClientData* CL = ID_to_client(sender);
     R_ASSERT2(CL, "Process_save client not found");
-    CL->net_Ready = TRUE;
 
-    R_ASSERT(CL->flags.bLocal);
     // while has information
     while (!P.r_eof())
     {

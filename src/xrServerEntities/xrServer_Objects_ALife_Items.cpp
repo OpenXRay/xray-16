@@ -382,11 +382,6 @@ BOOL CSE_ALifeItem::Net_Relevant()
     if (!m_physics_disabled && !fis_zero(State.linear_vel.square_magnitude(), EPS_L))
         return (TRUE);
 
-#ifdef XRGAME_EXPORTS
-//	if (Device.dwTimeGlobal < (m_last_update_time + update_rate()))
-//		return					(FALSE);
-#endif // XRGAME_EXPORTS
-
     return (FALSE);
 }
 

@@ -13,7 +13,6 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/game_graph.h"
-#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/MathUtils.h"
 #ifdef DEBUG
@@ -68,7 +67,7 @@ void CPHDestroyable::GenSpawnReplace(u16 ref_id, LPCSTR section, shared_str visu
     {
         NET_Packet P;
         D->Spawn_Write(P, TRUE);
-        Level().Send(P, net_flags(TRUE));
+        Level().Send(P);
         // Destroy
         F_entity_Destroy(D);
         m_depended_objects++;

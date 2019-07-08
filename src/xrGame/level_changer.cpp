@@ -17,7 +17,6 @@
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
-#include "xrNetServer/NET_Messages.h"
 
 #include "UIGameSP.h"
 #include "xrEngine/xr_collide_form.h"
@@ -121,7 +120,7 @@ void CLevelChanger::feel_touch_new(IGameObject* tpObject)
         p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
         p.w_vec3(m_position);
         p.w_vec3(m_angles);
-        Level().Send(p, net_flags(TRUE));
+        Level().Send(p);
         return;
     }
     Fvector p, r;

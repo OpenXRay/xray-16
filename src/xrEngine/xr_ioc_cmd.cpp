@@ -629,12 +629,6 @@ ENGINE_API float psHUD_FOV = 0.45f;
 // extern int psSkeletonUpdate;
 extern int rsDVB_Size;
 extern int rsDIB_Size;
-extern int psNET_ClientUpdate;
-extern int psNET_ClientPending;
-extern int psNET_ServerUpdate;
-extern int psNET_ServerPending;
-extern int psNET_DedicatedSleep;
-extern char psNET_Name[32];
 extern Flags32 psEnvFlags;
 // extern float r__dtex_range;
 
@@ -710,7 +704,6 @@ void CCC_Register()
 
     // Texture manager
     CMD4(CCC_Integer, "texture_lod", &psTextureLOD, 0, 2);
-    CMD4(CCC_Integer, "net_dedicated_sleep", &psNET_DedicatedSleep, 0, 64);
 
     // General video control
     CMD1(CCC_VidMode, "vid_mode");

@@ -1,7 +1,6 @@
 #include "pch_script.h"
 #include "game_base.h"
 #include "ai_space.h"
-#include "xrScriptEngine/script_engine.hpp"
 #include "Level.h"
 #include "xrMessages.h"
 
@@ -9,106 +8,10 @@ u64 g_qwStartGameTime = 12 * 60 * 60 * 1000;
 float g_fTimeFactor = pSettings->r_float("alife", "time_factor");
 u64 g_qwEStartGameTime = 12 * 60 * 60 * 1000;
 
-EGameIDs ParseStringToGameType(LPCSTR str);
-
-game_PlayerState::game_PlayerState(NET_Packet* account_info)
-{
-	GameID				= 0;
-	skin				= 0;
-	team				= 0;
-	money_for_round		= 0;	
-
-    experience_Real = 0;
-    rank = 0;
-    af_count = 0;
-    experience_New = 0;
-
-    flags__ = 0;
-    m_bCurrentVoteAgreed = 2;
-    RespawnTime = 0;
-    m_bPayForSpawn = false;
-
-	clear				();
-}
-
-void game_PlayerState::clear()
-{
-    m_iRivalKills = 0;
-    m_iSelfKills = 0;
-    m_iTeamKills = 0;
-    m_iKillsInRowCurr = 0;
-    m_iKillsInRowMax = 0;
-    m_iDeaths = 0;
-    lasthitter = 0;
-    lasthitweapon = 0;
-    experience_Real = 0;
-    rank = 0;
-    af_count = 0;
-    experience_New = 0;
-    pItemList.clear();
-    pSpawnPointsList.clear();
-    m_s16LastSRoint = -1;
-    LastBuyAcount = 0;
-    m_bClearRun = false;
-    DeathTime = 0;
-    mOldIDs.clear();
-    money_added = 0;
-    m_aBonusMoney.clear();
-    m_player_ip = "";
-    m_player_digest = "";
-}
-
-game_PlayerState::~game_PlayerState()
-{
-    pItemList.clear();
-    pSpawnPointsList.clear();
-};
-
-bool game_PlayerState::testFlag(u16 f) const { return !!(flags__ & f); }
-void game_PlayerState::setFlag(u16 f) { flags__ |= f; }
-void game_PlayerState::resetFlag(u16 f) { flags__ &= ~(f); }
-void game_PlayerState::net_Export(NET_Packet& P, BOOL Full)
-{
-   
-};
-
-void game_PlayerState::net_Import(NET_Packet& P)
-{
-};
-
-void game_PlayerState::skip_Import(NET_Packet& P)
-{
-}
-
-void game_PlayerState::SetGameID(u16 NewID)
-{
-    if (mOldIDs.size() >= 10)
-    {
-        mOldIDs.pop_front();
-    };
-    mOldIDs.push_back(GameID);
-    GameID = NewID;
-}
-bool game_PlayerState::HasOldID(u16 ID)
-{
-    auto ID_i = std::find(mOldIDs.begin(), mOldIDs.end(), ID);
-    if (ID_i != mOldIDs.end() && *(ID_i) == ID)
-        return true;
-    return false;
-}
-
-game_TeamState::game_TeamState()
-{
-    score = 0;
-    num_targets = 0;
-}
-
 game_GameState::game_GameState()
 {
-	m_type						= eGameIDSingle;// EGameIDs(u32(0));
-	m_phase						= GAME_PHASE_NONE;
-	m_round						= -1;
-	m_round_start_time_str[0]	= 0;
+	m_type = eGameIDSingle;
+	m_phase = GAME_PHASE_NONE;
 
     VERIFY(g_pGameLevel);
     m_qwStartProcessorTime = Level().timeServer_Async();
@@ -121,27 +24,6 @@ game_GameState::game_GameState()
 
 CLASS_ID game_GameState::getCLASS_ID(LPCSTR game_type_name, bool isServer)
 {
-    /*	if (!GEnv.isDedicatedServer)
-        {
-            string_path		S;
-            FS.update_path	(S,"$game_config$","script.ltx");
-            CInifile		*l_tpIniFile = new CInifile(S);
-            R_ASSERT		(l_tpIniFile);
-
-            string256				I;
-            xr_strcpy(I,l_tpIniFile->r_string("common","game_type_clsid_factory"));
-
-            luabind::functor<LPCSTR>	result;
-            R_ASSERT					(GEnv.ScriptEngine->functor(I,result));
-            shared_str clsid = result		(game_type_name, isServer);
-
-            xr_delete			(l_tpIniFile);
-            if(clsid.size()==0)
-                xrDebug::Fatal		(DEBUG_INFO,"Unknown game type: %s",game_type_name);
-
-            return				(TEXT2CLSID(*clsid));
-        }*/
-
     EGameIDs gameID = ParseStringToGameType(game_type_name);
     switch (gameID)
     {

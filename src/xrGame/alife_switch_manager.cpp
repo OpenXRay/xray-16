@@ -16,7 +16,6 @@
 #include "xrserver.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"
-#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "Level.h"
@@ -26,9 +25,9 @@ using namespace ALife;
 
 struct remove_non_savable_predicate
 {
-    IPureServer* m_server;
+    xrServer* m_server;
 
-    IC remove_non_savable_predicate(IPureServer* server)
+    IC remove_non_savable_predicate(xrServer* server)
     {
         VERIFY(server);
         m_server = server;
@@ -89,7 +88,7 @@ void CALifeSwitchManager::remove_online(CSE_ALifeDynamicObject* object, bool upd
             m_saved_chidren.end());
     }
 
-    server().Perform_destroy(object, net_flags(TRUE, TRUE));
+    server().Perform_destroy(object);
     VERIFY(object->children.empty());
 
     _OBJECT_ID object_id = object->ID;

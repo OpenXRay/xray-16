@@ -23,7 +23,6 @@
 #include "xrEngine/xr_input.h"
 #include "xrEngine/xr_object.h"
 #include "saved_game_wrapper.h"
-#include "xrNetServer/NET_Messages.h"
 
 #include "Include/xrRender/DebugRender.h"
 
@@ -240,7 +239,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         FS.rescan_pathes();
         NET_Packet net_packet;
         net_packet.w_begin(M_RELOAD_GAME);
-        Send(net_packet, net_flags(TRUE));
+        Send(net_packet);
         return;
     }
     case DIK_DIVIDE:

@@ -21,13 +21,7 @@ class IServerGameState : public virtual IGameState
 public:
     virtual ~IServerGameState() = 0;
     virtual void OnPlayerConnect(ClientID id) = 0;
-    virtual void OnPlayerDisconnect(ClientID id, char* name, u16 gameId) = 0;
-    virtual void OnPlayerConnectFinished(ClientID id) = 0;
-    virtual game_PlayerState* get_eid(u16 id) = 0;
     virtual void* get_client(u16 id) = 0;
-    virtual game_PlayerState* get_id(ClientID id) = 0;
-    virtual LPCSTR get_name_id(ClientID id) = 0;
-    virtual u16 get_id_2_eid(ClientID id) = 0;
     virtual CSE_Abstract* get_entity_from_eid(u16 id) = 0;
     virtual void signal_Syncronize() = 0;
     virtual void OnSwitchPhase(u32 oldPhase, u32 newPhase) = 0;
@@ -83,18 +77,12 @@ protected:
 
 public:
 	BOOL							sv_force_sync;
-	void							GenerateGameMessage		(NET_Packet &P);
 
-									game_sv_GameState		();
-	virtual							~game_sv_GameState		();
+    game_sv_GameState();
+	virtual ~game_sv_GameState();
 	// Main accessors
-	virtual		game_PlayerState*	get_eid					(u16 id);
-	virtual		void*				get_client				(u16 id); //if exist
-	virtual		game_PlayerState*	get_id					(ClientID id);
-	virtual		LPCSTR				get_name_id				(ClientID id);								
-				LPCSTR				get_player_name_id		(ClientID id);								
-	virtual		u16					get_id_2_eid			(ClientID id);
-				CSE_Abstract*		get_entity_from_eid		(u16 id);
+	virtual void* get_client(u16 id); //if exist
+    CSE_Abstract* get_entity_from_eid(u16 id);
 
 	// Signals
 	virtual		void				signal_Syncronize		();
@@ -112,9 +100,9 @@ public:
 	s32								get_option_i			(LPCSTR lst, LPCSTR name, s32 def = 0);
 	string64&						get_option_s			(LPCSTR lst, LPCSTR name, LPCSTR def = 0);
 
-	virtual		xr_vector<u16>*		get_children			(ClientID id_who);
-	void							u_EventGen				(NET_Packet& P, u16 type, u16 dest	);
-	void							u_EventSend				(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
+	virtual xr_vector<u16>* get_children(ClientID id_who);
+	void u_EventGen(NET_Packet& P, u16 type, u16 dest);
+	void u_EventSend(NET_Packet& P);
 
     // Events
     virtual BOOL OnPreCreate(CSE_Abstract* E) { return TRUE; };
@@ -125,10 +113,8 @@ public:
     virtual BOOL OnActivate(u16 eid_who, u16 eid_target) { return TRUE; };
     virtual void OnDestroyObject(u16 eid_who);
 
-	virtual		void				OnHit					(u16 id_hitter, u16 id_hitted, NET_Packet& P);	//кто-то получил Hit
-	virtual		void				OnPlayerConnect(ClientID id_who);
-	virtual		void				OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID);
-	virtual		void				OnPlayerConnectFinished(ClientID id_who)	{};
+	virtual void OnHit(u16 id_hitter, u16 id_hitted, NET_Packet& P);	//кто-то получил Hit
+	virtual void OnPlayerConnect(ClientID id_who);
 
     // Main
     virtual void Create(shared_str& options);

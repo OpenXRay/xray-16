@@ -100,7 +100,7 @@ class CALifeCommunicationManager : public virtual CALifeSimulatorBase
     #endif
     /**/
 public:
-    CALifeCommunicationManager(IPureServer* server, LPCSTR section);
+    CALifeCommunicationManager(xrServer* server, LPCSTR section);
     /**
         virtual				~CALifeCommunicationManager		();
                 void		communicate_with_customer		(CSE_ALifeHumanAbstract		*tpALifeHumanAbstract,

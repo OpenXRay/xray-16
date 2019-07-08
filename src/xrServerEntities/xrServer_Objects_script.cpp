@@ -101,8 +101,5 @@ SCRIPT_EXPORT(CSE_Motion, (), {
     ];
 });
 
-SCRIPT_EXPORT(CSE_Spectator, (CSE_Abstract),
-    { module(luaState)[luabind_class_abstract1(CSE_Spectator, "cse_spectator", CSE_Abstract)]; });
-
 SCRIPT_EXPORT(CSE_Temporary, (CSE_Abstract),
     { module(luaState)[luabind_class_abstract1(CSE_Temporary, "cse_temporary", CSE_Abstract)]; });

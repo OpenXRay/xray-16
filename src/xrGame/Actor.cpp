@@ -452,36 +452,7 @@ void CActor::Hit(SHit* pHDS)
     if (!g_Alive())
         bPlaySound = false;
 
-    if (!IsGameTypeSingle() && !GEnv.isDedicatedServer)
-    {
-        game_PlayerState* ps = Game().GetPlayerByGameID(ID());
-        if (ps && ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
-        {
-            bPlaySound = false;
-            if (Device.dwFrame != last_hit_frame && HDS.bone() != BI_NONE)
-            {
-                // вычислить позицию и направленность партикла
-                Fmatrix pos;
-
-                CParticlesPlayer::MakeXFORM(this, HDS.bone(), HDS.dir, HDS.p_in_bone_space, pos);
-
-                // установить particles
-                CParticlesObject* ps = NULL;
-
-                if (eacFirstEye == cam_active && this == Level().CurrentEntity())
-                    ps = CParticlesObject::Create(invincibility_fire_shield_1st, TRUE);
-                else
-                    ps = CParticlesObject::Create(invincibility_fire_shield_3rd, TRUE);
-
-                ps->UpdateParent(pos, Fvector().set(0.f, 0.f, 0.f));
-                GamePersistent().ps_needtoplay.push_back(ps);
-            };
-        };
-
-        last_hit_frame = Device.dwFrame;
-    };
-
-    if (!GEnv.isDedicatedServer && !sndHit[HDS.hit_type].empty() && conditions().PlayHitSound(pHDS))
+    if (!sndHit[HDS.hit_type].empty() && conditions().PlayHitSound(pHDS))
     {
         ref_sound& S = sndHit[HDS.hit_type][Random.randI(sndHit[HDS.hit_type].size())];
         bool b_snd_hit_playing = sndHit[HDS.hit_type].end() !=
@@ -583,46 +554,6 @@ void CActor::Hit(SHit* pHDS)
             );
         }
         inherited::Hit(&HDS);
-    }
-    else
-    {
-        m_bWasBackStabbed = false;
-        if (HDS.hit_type == ALife::eHitTypeWound_2 && Check_for_BackStab_Bone(HDS.bone()))
-        {
-            // convert impulse into local coordinate system
-            Fmatrix mInvXForm;
-            mInvXForm.invert(XFORM());
-            Fvector vLocalDir;
-            mInvXForm.transform_dir(vLocalDir, HDS.dir);
-            vLocalDir.invert();
-
-            Fvector a = {0, 0, 1};
-            float res = a.dotproduct(vLocalDir);
-            if (res < -0.707)
-            {
-                game_PlayerState* ps = Game().GetPlayerByGameID(ID());
-
-                if (!ps || !ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
-                    m_bWasBackStabbed = true;
-            }
-        };
-
-        float hit_power = 0.0f;
-
-        if (m_bWasBackStabbed)
-            hit_power = (HDS.damage() == 0) ? 0 : 100000.0f;
-        else
-            hit_power = HitArtefactsOnBelt(HDS.damage(), HDS.hit_type);
-
-        HDS.power = hit_power;
-        HDS.add_wound = true;
-        inherited::Hit(&HDS);
-
-        if (OnServer() && !g_Alive() && HDS.hit_type == ALife::eHitTypeExplosion)
-        {
-            game_PlayerState* ps = Game().GetPlayerByGameID(ID());
-            
-        }
     }
 }
 

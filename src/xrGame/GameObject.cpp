@@ -35,7 +35,6 @@
 #include "game_object_space.h"
 #include "doors_door.h"
 #include "doors.h"
-#include "xrNetServer/NET_Messages.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -729,7 +728,7 @@ void CGameObject::spawn_supplies()
 
                     NET_Packet P;
                     A->Spawn_Write(P, TRUE);
-                    Level().Send(P, net_flags(TRUE));
+                    Level().Send(P);
                     F_entity_Destroy(A);
                 }
             }
@@ -1060,7 +1059,7 @@ GameObjectSavedPosition CGameObject::ps_Element(u32 ID) const
 {
     VERIFY(ID < ps_Size());
     GameObjectSavedPosition SP = PositionStack[ID];
-    SP.dwTime += Level().timeServer_Delta();
+    SP.dwTime += 0;
     return SP;
 }
 
@@ -1072,7 +1071,7 @@ void CGameObject::u_EventGen(NET_Packet& P, u32 type, u32 dest)
     P.w_u16(u16(dest & 0xffff));
 }
 
-void CGameObject::u_EventSend(NET_Packet& P, u32 dwFlags) { Level().Send(P, dwFlags); }
+void CGameObject::u_EventSend(NET_Packet& P) { Level().Send(P); }
 #include "bolt.h"
 
 BOOL CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }

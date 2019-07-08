@@ -40,9 +40,7 @@
 #include "HUDManager.h"
 #include "raypick.h"
 #include "xrCDB/xr_collide_defs.h"
-#ifdef NAMESPACE_LEVEL_EXPORTS
-#include "xrNetServer/NET_Messages.h"
-#endif
+
 using namespace luabind;
 using namespace luabind::policy;
 
@@ -591,26 +589,8 @@ bool has_active_tutotial() { return (g_tutorial != NULL); }
 //ability to update level netpacket
 void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool bHighPriority = false, bool bSendImmediately = false)
 {
-    Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, bSendImmediately));
+    Level().Send(P);
 }
-/*
-void g_send(NET_Packet& P, bool bReliable)
-{
-    Level().Send(P, net_flags(bReliable, true, false, false));
-}
-void g_send(NET_Packet& P, bool bReliable, bool bSequential)
-{
-    Level().Send(P, net_flags(bReliable, bSequential, false, false));
-}
-void g_send(NET_Packet& P, bool bReliable, bool bSequential, bool bHighPriority)
-{
-    Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, false));
-}
-void g_send(NET_Packet& P, bool bReliable, bool bSequential, bool bHighPriority, bool bSendImmediately)
-{
-    Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, bSendImmediately));
-}
-*/
 
 void u_event_gen(NET_Packet& P, u32 _event, u32 _dest)
 {

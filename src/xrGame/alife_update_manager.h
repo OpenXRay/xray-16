@@ -41,7 +41,7 @@ protected:
     virtual void reload(LPCSTR section);
 
 public:
-    CALifeUpdateManager(IPureServer* server, LPCSTR section);
+    CALifeUpdateManager(xrServer* server, LPCSTR section);
     virtual ~CALifeUpdateManager();
     virtual shared_str shedule_Name() const { return shared_str("alife_simulator"); };
     virtual float shedule_Scale();

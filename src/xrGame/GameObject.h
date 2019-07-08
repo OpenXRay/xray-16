@@ -215,7 +215,7 @@ public:
     // Utilities
     // XXX: move out
     static void u_EventGen(NET_Packet& P, u32 type, u32 dest);
-    static void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
+    static void u_EventSend(NET_Packet& P);
     // Methods
     virtual void Load(LPCSTR section) override;
     void PostLoad(LPCSTR section) override; //--#SM+#--
@@ -230,7 +230,6 @@ public:
     virtual void net_Import(NET_Packet& packet) override {} // import from server
     virtual BOOL net_Spawn(CSE_Abstract* entity) override;
     virtual void net_Destroy() override;
-    virtual void net_ImportInput(NET_Packet& packet) override {}
     virtual BOOL net_Relevant() override { return getLocal(); } // send messages only if active and local
     virtual void net_MigrateInactive(NET_Packet& packet) override { Props.net_Local = FALSE; }
     virtual void net_MigrateActive(NET_Packet& packet) override { Props.net_Local = TRUE; }

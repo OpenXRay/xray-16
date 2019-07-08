@@ -163,7 +163,6 @@ public:
     virtual void OnInvalidHost();
     virtual void OnInvalidPassword();
     virtual void OnSessionFull();
-    virtual void OnConnectRejected();
 
 private:
     bool m_bNeed_CrPr = false;
@@ -185,25 +184,13 @@ private:
     u32 m_dwDeltaUpdate = 0;
     u32 m_dwLastNetUpdateTime = 0;
     void UpdateDeltaUpd(u32 LastTime);
-    void BlockCheatLoad();
     bool Connect2Server(const char* options);
-    shared_str m_client_digest; // for screenshots
 
 public:
-    shared_str const get_cdkey_digest() const { return m_client_digest; }
-private:
-    bool m_bConnectResultReceived;
-    bool m_bConnectResult;
-    xr_string m_sConnectResult;
-
-public:
-    void OnBuildVersionChallenge();
-    void OnConnectResult(NET_Packet* P);
     // Static particles
     using POVec = xr_vector<CParticlesObject*>;
     POVec m_StaticParticles;
     game_cl_GameState* game = nullptr;
-    bool m_bGameConfigStarted = false;
     bool game_configured = false;
     NET_Queue_Event* game_events = nullptr;
     xr_deque<CSE_Abstract*> game_spawn_queue;
@@ -224,16 +211,13 @@ protected:
     bool net_start_result_total;
     bool connected_to_server;
     bool deny_m_spawn; // only for debug...
-    bool sended_request_connection_data;
     void MakeReconnect();
     LevelMapSyncData map_data;
     bool synchronize_map_data();
     bool synchronize_client();
     bool xr_stdcall net_start1();
     bool xr_stdcall net_start2();
-    bool xr_stdcall net_start3();
     bool xr_stdcall net_start4();
-    bool xr_stdcall net_start5();
     bool xr_stdcall net_start6();
     bool xr_stdcall net_start_client1();
     bool xr_stdcall net_start_client2();
@@ -241,10 +225,8 @@ protected:
     bool xr_stdcall net_start_client4();
     bool xr_stdcall net_start_client5();
     bool xr_stdcall net_start_client6();
-    void CalculateLevelCrc32();
 
 public:
-    bool IsChecksumsEqual(u32 check_sum) const;
     // sounds
     xr_vector<ref_sound*> static_Sounds;
     // startup options
@@ -282,10 +264,9 @@ public:
     void InitializeClientGame(NET_Packet& P);
     void ClientReceive();
     void ClientSend();
-    void ClientSendProfileData();
     void ClientSave();
     u32 Objects_net_Save(NET_Packet* _Packet, u32 start, u32 count);
-    virtual void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
+    virtual void Send(NET_Packet& P);
     void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos); // only ask server
     void g_sv_Spawn(CSE_Abstract* E); // server reply/command spawning
     // Save/Load/State
@@ -350,7 +331,6 @@ public:
 
 public:
     void remove_objects();
-    virtual void OnSessionTerminate(pcstr reason);
 
 #ifdef DEBUG
     LevelGraphDebugRender* GetLevelGraphDebugRender() const { return levelGraphDebugRender; }

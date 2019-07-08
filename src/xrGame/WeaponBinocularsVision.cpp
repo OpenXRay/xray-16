@@ -169,26 +169,11 @@ void SBinocVisibleObj::Update()
 
                 if (our_inv_owner && others_inv_owner && !monster)
                 {
-                    if (IsGameTypeSingle())
+                    switch (RELATION_REGISTRY().GetRelationType(others_inv_owner, our_inv_owner))
                     {
-                        switch (RELATION_REGISTRY().GetRelationType(others_inv_owner, our_inv_owner))
-                        {
-                        case ALife::eRelationTypeEnemy: clr = m_colors[0].get(); break;
-                        case ALife::eRelationTypeNeutral: clr = m_colors[1].get(); break;
-                        case ALife::eRelationTypeFriend: clr = m_colors[2].get(); break;
-                        }
-                    }
-                    else
-                    {
-                        CEntityAlive* our_ealive = smart_cast<CEntityAlive*>(pActor);
-                        CEntityAlive* others_ealive = smart_cast<CEntityAlive*>(m_object);
-                        if (our_ealive && others_ealive)
-                        {
-                            if (Game().IsEnemy(our_ealive, others_ealive))
-                                clr = C_ON_ENEMY;
-                            else
-                                clr = C_ON_FRIEND;
-                        }
+                    case ALife::eRelationTypeEnemy: clr = m_colors[0].get(); break;
+                    case ALife::eRelationTypeNeutral: clr = m_colors[1].get(); break;
+                    case ALife::eRelationTypeFriend: clr = m_colors[2].get(); break;
                     }
                 }
             }

@@ -150,8 +150,6 @@ bool CLevel::Load_GameSpecific_After()
         scriptEngine.add_script_process(ScriptProcessor::Level, scriptEngine.CreateScriptProcess("level", scripts));
     }
 
-    BlockCheatLoad();
-
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
 
     return TRUE;
@@ -239,12 +237,4 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
             xrDebug::Fatal(DEBUG_INFO, "Game material '%d' not found", (*I).material);
         }
     }
-}
-
-void CLevel::BlockCheatLoad()
-{
-#ifndef DEBUG
-    if (game && (GameID() != eGameIDSingle))
-        phTimefactor = 1.f;
-#endif
 }

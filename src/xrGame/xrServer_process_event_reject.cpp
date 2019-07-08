@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "xrserver.h"
 #include "xrserver_objects.h"
-#include "xrNetServer/NET_Messages.h"
 
 bool xrServer::Process_event_reject(
     NET_Packet& P, const ClientID sender, const u32 time, const u16 id_parent, const u16 id_entity, bool send_message)
@@ -76,8 +75,7 @@ bool xrServer::Process_event_reject(
     // Signal to everyone (including sender)
     if (send_message)
     {
-        DWORD MODE = net_flags(TRUE, TRUE, FALSE, TRUE);
-        SendBroadcast(BroadcastCID, P, MODE);
+        SendBroadcast(BroadcastCID, P);
     }
 
     return (true);

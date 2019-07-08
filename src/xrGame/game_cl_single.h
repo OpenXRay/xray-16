@@ -7,8 +7,10 @@ class game_cl_Single : public game_cl_GameState
 
 public:
     game_cl_Single();
+
+    virtual LPCSTR type_name() const { return "single"; };
+
     virtual CUIGameCustom* createGameUI();
-    virtual pcstr getTeamSection(int Team);
     virtual bool IsServerControlHits() { return true; };
     virtual ALife::_TIME_ID GetStartGameTime();
     virtual ALife::_TIME_ID GetGameTime();

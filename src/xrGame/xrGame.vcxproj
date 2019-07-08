@@ -319,10 +319,6 @@
     <ClInclude Include="Actor_Flags.h" />
     <ClInclude Include="actor_input_handler.h" />
     <ClInclude Include="actor_memory.h" />
-    <ClInclude Include="actor_mp_client.h" />
-    <ClInclude Include="actor_mp_server.h" />
-    <ClInclude Include="actor_mp_state.h" />
-    <ClInclude Include="actor_mp_state_inline.h" />
     <ClInclude Include="actor_statistic_defs.h" />
     <ClInclude Include="actor_statistic_mgr.h" />
     <ClInclude Include="AdvancedDetector.h" />
@@ -773,7 +769,6 @@
     <ClInclude Include="BlackGraviArtifact.h" />
     <ClInclude Include="Bolt.h" />
     <ClInclude Include="BoneProtections.h" />
-    <ClInclude Include="bone_groups.h" />
     <ClInclude Include="BottleItem.h" />
     <ClInclude Include="BreakableObject.h" />
     <ClInclude Include="CameraEffector.h" />
@@ -796,7 +791,6 @@
     <ClInclude Include="client_spawn_manager.h" />
     <ClInclude Include="client_spawn_manager_inline.h" />
     <ClInclude Include="ClimableObject.h" />
-    <ClInclude Include="command_switch_counter.h" />
     <ClInclude Include="controller_state_panic_inline.h" />
     <ClInclude Include="control_action.h" />
     <ClInclude Include="control_action_inline.h" />
@@ -895,7 +889,6 @@
     <ClInclude Include="game_base_menu_events.h" />
     <ClInclude Include="game_cl_base.h" />
     <ClInclude Include="game_cl_single.h" />
-    <ClInclude Include="game_events_handler.h" />
     <ClInclude Include="game_location_selector.h" />
     <ClInclude Include="game_location_selector_inline.h" />
     <ClInclude Include="game_news.h" />
@@ -918,8 +911,6 @@
     <ClInclude Include="helicopter.h" />
     <ClInclude Include="Hit.h" />
     <ClInclude Include="HitMarker.h" />
-    <ClInclude Include="hits_store.h" />
-    <ClInclude Include="hits_store_inline.h" />
     <ClInclude Include="hit_immunity.h" />
     <ClInclude Include="hit_immunity_space.h" />
     <ClInclude Include="hit_memory_manager.h" />
@@ -983,8 +974,6 @@
     <ClInclude Include="inventory_upgrade_root.h" />
     <ClInclude Include="inventory_upgrade_root_inline.h" />
     <ClInclude Include="item_manager.h" />
-    <ClInclude Include="kills_store.h" />
-    <ClInclude Include="kills_store_inline.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelGraphDebugRender.hpp" />
     <ClInclude Include="Level_Bullet_Manager.h" />
@@ -1026,8 +1015,6 @@
     <ClInclude Include="MercuryBall.h" />
     <ClInclude Include="Mincer.h" />
     <ClInclude Include="Missile.h" />
-    <ClInclude Include="mixed_delegate.h" />
-    <ClInclude Include="mixed_delegate_unique_tags.h" />
     <ClInclude Include="monster_community.h" />
     <ClInclude Include="MosquitoBald.h" />
     <ClInclude Include="movement_manager.h" />
@@ -1057,8 +1044,6 @@
     <ClInclude Include="object_manager_inline.h" />
     <ClInclude Include="object_property_evaluators.h" />
     <ClInclude Include="object_property_evaluators_inline.h" />
-    <ClInclude Include="obsolete_queue.h" />
-    <ClInclude Include="obsolete_queue_inline.h" />
     <ClInclude Include="obstacles_query.h" />
     <ClInclude Include="obstacles_query_inline.h" />
     <ClInclude Include="ParticlesObject.h" />
@@ -1105,7 +1090,6 @@
     <ClInclude Include="PostprocessAnimator.h" />
     <ClInclude Include="pp_effector_custom.h" />
     <ClInclude Include="pp_effector_distance.h" />
-    <ClInclude Include="profile_data_types_script.h" />
     <ClInclude Include="property_evaluator.h" />
     <ClInclude Include="property_evaluator_const.h" />
     <ClInclude Include="property_evaluator_inline.h" />
@@ -1117,7 +1101,6 @@
     <ClInclude Include="purchase_list_inline.h" />
     <ClInclude Include="quadtree.h" />
     <ClInclude Include="quadtree_inline.h" />
-    <ClInclude Include="queued_async_method.h" />
     <ClInclude Include="RadioactiveZone.h" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="rat_states.h" />
@@ -1337,7 +1320,6 @@
     <ClInclude Include="stalker_velocity_collection_inline.h" />
     <ClInclude Include="stalker_velocity_holder.h" />
     <ClInclude Include="stalker_velocity_holder_inline.h" />
-    <ClInclude Include="state_arguments_functions.h" />
     <ClInclude Include="StaticHolderEntity.h" />
     <ClInclude Include="static_cast_checked.hpp" />
     <ClInclude Include="static_obstacles_avoider.h" />
@@ -1478,7 +1460,6 @@
     <ClInclude Include="wrapper_abstract.h" />
     <ClInclude Include="wrapper_abstract_inline.h" />
     <ClInclude Include="xrServer.h" />
-    <ClInclude Include="xrServerMapSync.h" />
     <ClInclude Include="xrServer_svclient_validation.h" />
     <ClInclude Include="xr_level_controller.h" />
     <ClInclude Include="xr_time.h" />
@@ -1659,13 +1640,6 @@
     <ClCompile Include="actor_input_handler.cpp" />
     <ClCompile Include="actor_memory.cpp" />
     <ClCompile Include="Actor_Movement.cpp" />
-    <ClCompile Include="actor_mp_client.cpp" />
-    <ClCompile Include="actor_mp_client_export.cpp" />
-    <ClCompile Include="actor_mp_client_import.cpp" />
-    <ClCompile Include="actor_mp_server.cpp" />
-    <ClCompile Include="actor_mp_server_export.cpp" />
-    <ClCompile Include="actor_mp_server_import.cpp" />
-    <ClCompile Include="actor_mp_state.cpp" />
     <ClCompile Include="Actor_Network.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2077,7 +2051,6 @@
     <ClCompile Include="BlackGraviArtifact.cpp" />
     <ClCompile Include="Bolt.cpp" />
     <ClCompile Include="BoneProtections.cpp" />
-    <ClCompile Include="bone_groups.cpp" />
     <ClCompile Include="BottleItem.cpp" />
     <ClCompile Include="BreakableObject.cpp" />
     <ClCompile Include="CameraEffector.cpp" />
@@ -2300,7 +2273,6 @@
     </ClCompile>
     <ClCompile Include="Hit.cpp" />
     <ClCompile Include="HitMarker.cpp" />
-    <ClCompile Include="hits_store.cpp" />
     <ClCompile Include="hit_immunity.cpp" />
     <ClCompile Include="hit_memory_manager.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -2422,7 +2394,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="kills_store.cpp" />
     <ClCompile Include="Level.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3052,7 +3023,6 @@
     </ClCompile>
     <ClCompile Include="stalker_velocity_collection.cpp" />
     <ClCompile Include="stalker_velocity_holder.cpp" />
-    <ClCompile Include="state_arguments_functions.cpp" />
     <ClCompile Include="static_cast_checked_test.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -3291,7 +3261,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="xrServerMapSync.cpp" />
     <ClCompile Include="xrServer_CL_connect.cpp" />
     <ClCompile Include="xrServer_Connect.cpp" />
     <ClCompile Include="xrServer_Disconnect.cpp" />

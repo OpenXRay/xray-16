@@ -39,7 +39,7 @@ void print_time(LPCSTR S, _TIME_ID tTimeID)
 }
 
 /**/
-CALifeCombatManager::CALifeCombatManager(IPureServer* server, LPCSTR section) : CALifeSimulatorBase(server, section)
+CALifeCombatManager::CALifeCombatManager(xrServer* server, LPCSTR section) : CALifeSimulatorBase(server, section)
 {
     /**
         seed						(u32(CPU::QPC() & 0xffffffff));

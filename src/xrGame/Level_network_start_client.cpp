@@ -8,7 +8,6 @@
 #include "game_cl_base.h"
 #include "NET_Queue.h"
 #include "hudmanager.h"
-#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/iphworld.h"
 
@@ -21,16 +20,14 @@ bool CLevel::net_Start_client(const char* options) { return false; }
 bool CLevel::net_start_client1()
 {
     pApp->LoadBegin();
+
     // name_of_server
     string64 name_of_server = "";
-    //	xr_strcpy						(name_of_server,*m_caClientOptions);
     if (strchr(*m_caClientOptions, '/'))
         strncpy_s(name_of_server, *m_caClientOptions, strchr(*m_caClientOptions, '/') - *m_caClientOptions);
 
     if (strchr(name_of_server, '/'))
         *strchr(name_of_server, '/') = 0;
-
-    // Startup client
 
     string256 temp;
     xr_sprintf(temp, "%s %s",
@@ -46,26 +43,15 @@ bool CLevel::net_start_client1()
 
 bool CLevel::net_start_client2()
 {
-    if (psNET_direct_connect)
-    {
-        Server->create_direct_client();
-        // offline account creation
-        m_bConnectResultReceived = false;
-        while (!m_bConnectResultReceived)
-        {
-            ClientReceive();
-            Server->Update();
-        }
-    }
+    Server->CreateSVClient();
+
+    // offline account creation
+    ClientReceive();
+    Server->Update();
 
     connected_to_server = Connect2Server(*m_caClientOptions);
 
     return true;
-}
-void rescan_mp_archives()
-{
-    FS_Path* mp_archs_path = FS.get_path("$game_arch_mp$");
-    FS.rescan_path(mp_archs_path->m_Path, mp_archs_path->m_Flags.is(FS_Path::flRecurse));
 }
 
 bool CLevel::net_start_client3()
@@ -76,25 +62,14 @@ bool CLevel::net_start_client3()
         LPCSTR level_ver = NULL;
         LPCSTR download_url = NULL;
 
-        if (psNET_direct_connect) // single
-        {
-            shared_str const& server_options = Server->GetConnectOptions();
-            level_name = name().c_str(); // Server->level_name		(server_options).c_str();
-            level_ver = Server->level_version(server_options).c_str(); // 1.0
-        }
-        else // multiplayer
-        {
-            level_name = get_net_DescriptionData().map_name;
-            level_ver = get_net_DescriptionData().map_version;
-            download_url = get_net_DescriptionData().download_url;
-            rescan_mp_archives(); // because if we are using psNET_direct_connect, we not download map...
-        }
+        shared_str const& server_options = Server->GetConnectOptions();
+        level_name = name().c_str();
+        level_ver = Server->level_version(server_options).c_str(); // 1.0
+
         // Determine internal level-ID
         int level_id = pApp->Level_ID(level_name, level_ver, true);
         if (level_id == -1)
         {
-            Disconnect();
-
             connected_to_server = FALSE;
             Msg("! Level (name:%s), (version:%s), not found, try to download from:%s", level_name, level_ver,
                 download_url);
@@ -115,9 +90,6 @@ bool CLevel::net_start_client3()
         deny_m_spawn = FALSE;
         // Load level
         R_ASSERT2(Load(level_id), "Loading failed.");
-        map_data.m_level_geom_crc32 = 0;
-        if (!IsGameTypeSingle())
-            CalculateLevelCrc32();
     }
     return true;
 }
@@ -157,18 +129,6 @@ bool CLevel::net_start_client4()
     return true;
 }
 
-void CLevel::ClientSendProfileData()
-{
-#ifdef DEBUG
-    Msg("* Sending profile data");
-#endif
-    NET_Packet NP;
-    NP.w_begin(M_CREATE_PLAYER_STATE);
-    game_PlayerState tmp_player_state(NULL);
-    tmp_player_state.net_Export(NP, TRUE);
-    Send(NP, net_flags(TRUE, TRUE, TRUE, TRUE));
-}
-
 bool CLevel::net_start_client5()
 {
     if (connected_to_server)
@@ -184,7 +144,7 @@ bool CLevel::net_start_client5()
             GEnv.Render->ResourcesDeferredUpload();
             LL_CheckTextures();
         }
-        sended_request_connection_data = FALSE;
+
         deny_m_spawn = TRUE;
     }
     return true;

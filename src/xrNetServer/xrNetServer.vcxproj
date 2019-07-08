@@ -247,8 +247,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NET_Client.h" />
-    <ClInclude Include="NET_Messages.h" />
-    <ClInclude Include="NET_PlayersMonitor.h" />
     <ClInclude Include="NET_Server.h" />
     <ClInclude Include="NET_Shared.h" />
     <ClInclude Include="stdafx.h" />

@@ -21,7 +21,6 @@
 #include "alife_object_registry.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "custommonster.h"
-#include "xrNetServer/NET_Messages.h"
 
 CRestrictedObject::~CRestrictedObject() {}
 IC void construct_string(LPSTR result, u32 const result_size, const xr_vector<ALife::_OBJECT_ID>& restrictions)
@@ -242,7 +241,7 @@ IC void CRestrictedObject::add_object_restriction(
     object().u_EventGen(net_packet, GE_ADD_RESTRICTION, object().ID());
     net_packet.w(&id, sizeof(id));
     net_packet.w(&restrictor_type, sizeof(restrictor_type));
-    Level().Send(net_packet, net_flags(TRUE, TRUE));
+    Level().Send(net_packet);
 }
 
 IC void CRestrictedObject::remove_object_restriction(
@@ -252,7 +251,7 @@ IC void CRestrictedObject::remove_object_restriction(
     object().u_EventGen(net_packet, GE_REMOVE_RESTRICTION, object().ID());
     net_packet.w(&id, sizeof(id));
     net_packet.w(&restrictor_type, sizeof(restrictor_type));
-    Level().Send(net_packet, net_flags(TRUE, TRUE));
+    Level().Send(net_packet);
 }
 
 template <typename P, bool value>
@@ -381,7 +380,7 @@ void CRestrictedObject::remove_all_restrictions(const RestrictionSpace::ERestric
     NET_Packet net_packet;
     object().u_EventGen(net_packet, GE_REMOVE_ALL_RESTRICTIONS, object().ID());
     net_packet.w(&restrictor_type, sizeof(restrictor_type));
-    Level().Send(net_packet, net_flags(TRUE, TRUE));
+    Level().Send(net_packet);
 }
 
 void CRestrictedObject::remove_all_restrictions()

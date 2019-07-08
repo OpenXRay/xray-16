@@ -22,7 +22,6 @@
 #include "restriction_space.h"
 #include "xrEngine/profiler.h"
 #include "mt_config.h"
-#include "xrNetServer/NET_Messages.h"
 
 using namespace ALife;
 
@@ -50,7 +49,7 @@ public:
     }
 };
 
-CALifeUpdateManager::CALifeUpdateManager(IPureServer* server, LPCSTR section)
+CALifeUpdateManager::CALifeUpdateManager(xrServer* server, LPCSTR section)
     : CALifeSwitchManager(server, section), CALifeSurgeManager(server, section), CALifeStorageManager(server, section),
       CALifeSimulatorBase(server, section)
 {
@@ -371,7 +370,7 @@ void CALifeUpdateManager::jump_to_level(LPCSTR level_name) const
     Fvector level_point = ai().game_graph().vertex(dest)->level_point();
     net_packet.w(&level_point, sizeof(level_point));
     net_packet.w_vec3(Fvector().set(0.f, 0.f, 0.f));
-    Level().Send(net_packet, net_flags(TRUE));
+    Level().Send(net_packet);
 }
 
 void CALifeUpdateManager::teleport_object(

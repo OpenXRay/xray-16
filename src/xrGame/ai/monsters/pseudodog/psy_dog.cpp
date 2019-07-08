@@ -17,7 +17,6 @@
 #include "ai/Monsters/Pseudodog/psy_dog_state_manager.h"
 #include "alife_object_registry.h"
 #include "xrServerEntities/xrserver_objects_alife_monsters.h"
-#include "xrNetServer/NET_Messages.h"
 
 CPsyDog::CPsyDog()
 {
@@ -105,7 +104,7 @@ bool CPsyDog::spawn_phantom()
     // spawn here
     NET_Packet P;
     phantom->Spawn_Write(P, TRUE);
-    Level().Send(P, net_flags(TRUE));
+    Level().Send(P);
     F_entity_Destroy(phantom);
 
     return true;

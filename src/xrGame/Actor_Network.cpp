@@ -797,14 +797,7 @@ void CActor::net_Relcase(IGameObject* O)
 
 BOOL CActor::net_Relevant() // relevant for export to server
 {
-    if (OnServer())
-    {
-        return getSVU() | getLocal();
-    }
-    else
-    {
-        return Local() & g_Alive();
-    };
+    return getSVU() | getLocal();
 };
 
 void CActor::SetCallbacks()

@@ -10,7 +10,6 @@
 #include "xrEngine/CameraBase.h"
 #include "player_hud.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
-#include "xrNetServer/NET_Messages.h"
 
 #include "xrUICore/ui_base.h"
 
@@ -201,7 +200,7 @@ void CHudItem::SendHiddenItem()
         NET_Packet P;
         object().u_EventGen(P, GE_WPN_STATE_CHANGE, object().ID());
         P.w_u8(u8(eHiding));
-        object().u_EventSend(P, net_flags(TRUE, TRUE, FALSE, TRUE));
+        object().u_EventSend(P);
     }
 }
 

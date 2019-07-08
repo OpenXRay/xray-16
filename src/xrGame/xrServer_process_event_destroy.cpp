@@ -8,7 +8,6 @@
 #include "game_sv_base.h"
 #include "ai_space.h"
 #include "alife_object_registry.h"
-#include "xrNetServer/NET_Messages.h"
 #include "xrServerEntities/xrMessages.h"
 
 xr_string xrServer::ent_name_safe(u16 eid)
@@ -25,7 +24,6 @@ xr_string xrServer::ent_name_safe(u16 eid)
 
 void xrServer::Process_event_destroy(NET_Packet& P, ClientID sender, u32 time, u16 ID, NET_Packet* pEPack)
 {
-    u32 MODE = net_flags(TRUE, TRUE);
     // Parse message
     u16 id_dest = ID;
 #ifdef DEBUG
@@ -69,7 +67,7 @@ void xrServer::Process_event_destroy(NET_Packet& P, ClientID sender, u32 time, u
 
     if (0xffff == parent_id && NULL == pEventPack)
     {
-        SendBroadcast(BroadcastCID, P, MODE);
+        SendBroadcast(BroadcastCID, P);
     }
     else
     {
@@ -95,7 +93,7 @@ void xrServer::Process_event_destroy(NET_Packet& P, ClientID sender, u32 time, u
 
     if (NULL == pEPack && NULL != pEventPack)
     {
-        SendBroadcast(BroadcastCID, *pEventPack, MODE);
+        SendBroadcast(BroadcastCID, *pEventPack);
     }
 
     // Everything OK, so perform entity-destroy

@@ -181,21 +181,6 @@ public:
     virtual void __stdcall assign_shapes(CShapeData::shape_def* shapes, u32 cnt);
 };
 
-class CSE_Spectator : public CSE_Abstract
-{
-    using inherited = CSE_Abstract;
-
-public:
-    CSE_Spectator(LPCSTR caSection);
-    virtual ~CSE_Spectator();
-    virtual u8 g_team();
-    virtual void UPDATE_Read(NET_Packet& P);
-    virtual void UPDATE_Write(NET_Packet& P);
-    virtual void STATE_Read(NET_Packet& P, u16 size);
-    virtual void STATE_Write(NET_Packet& P);
-    SERVER_ENTITY_EDITOR_METHODS
-};
-
 class CSE_Temporary : public CSE_Abstract
 {
     using inherited = CSE_Abstract;

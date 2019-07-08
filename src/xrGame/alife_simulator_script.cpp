@@ -20,7 +20,6 @@
 #include "xrServer.h"
 #include "Level.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-#include "xrNetServer/NET_Messages.h"
 
 using namespace luabind;
 using namespace luabind::policy;
@@ -305,7 +304,7 @@ void CALifeSimulator__release(CALifeSimulator* self, CSE_Abstract* object, bool)
     packet.w_u32(Level().timeServer());
     packet.w_u16(GE_DESTROY);
     packet.w_u16(object->ID);
-    Level().Send(packet, net_flags(TRUE, TRUE));
+    Level().Send(packet);
 }
 
 void CALifeSimulator__release2(CALifeSimulator *self, CSE_Abstract *object)

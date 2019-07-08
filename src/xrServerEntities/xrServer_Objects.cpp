@@ -78,20 +78,6 @@ void CSE_Shape::assign_shapes(CShapeData::shape_def* _shapes, u32 _cnt)
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// CSE_Spectator
-////////////////////////////////////////////////////////////////////////////
-CSE_Spectator::CSE_Spectator(LPCSTR caSection) : CSE_Abstract(caSection) {}
-CSE_Spectator::~CSE_Spectator() {}
-u8 CSE_Spectator::g_team() { return 0; }
-void CSE_Spectator::STATE_Read(NET_Packet& tNetPacket, u16 size) {}
-void CSE_Spectator::STATE_Write(NET_Packet& tNetPacket) {}
-void CSE_Spectator::UPDATE_Read(NET_Packet& tNetPacket) {}
-void CSE_Spectator::UPDATE_Write(NET_Packet& tNetPacket) {}
-#ifndef XRGAME_EXPORTS
-void CSE_Spectator::FillProps(LPCSTR pref, PropItemVec& items) { inherited::FillProps(pref, items); }
-#endif // #ifndef XRGAME_EXPORTS
-
-////////////////////////////////////////////////////////////////////////////
 // CSE_Temporary
 ////////////////////////////////////////////////////////////////////////////
 CSE_Temporary::CSE_Temporary(LPCSTR caSection) : CSE_Abstract(caSection) { m_tNodeID = u32(-1); }

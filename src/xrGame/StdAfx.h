@@ -145,7 +145,6 @@
 #include "xrGame/string_table.h" // ~100, somewhat heavy to compile
 #include "xrGame/WeaponMagazined.h" // ~70, VERY heavy to compile
 #include "visual_memory_manager.h" // only ~40, quite heavy to compile
-#include "xrNetServer/NET_Messages.h" // only ~60, depends on dplay macros
 #include "xrPhysics/DamageSource.h" // only ~65, very small
 #include "xrPhysics/debug_output.h" // only ~60, quite heavy to compile
 #include "xrServerEntities/alife_monster_brain.h" // only ~30, very heavy to compile
@@ -165,7 +164,6 @@
 #include "xrGame/CharacterPhysicsSupport.h" // ~65
 #include "xrGame/danger_object.h"
 #include "xrGame/Inventory.h" // ~120
-#include "xrGame/kills_store.h"
 #include "xrGame/MainMenu.h"
 #include "xrGame/map_location.h"
 #include "xrGame/map_location_defs.h"
@@ -201,9 +199,6 @@
 #include "xrGame/stalker_movement_manager_smart_cover.h" // ~60, INCREDIBLY heavy to compile
 #include "xrGame/stalker_base_action.h" // ~30, INCREDIBLY heavy to compile
 #include "xrGame/stalker_decision_space.h" // ~60, only enum's
-//#include "xrGame/Spectator.h" // ~60, INCREDIBLY heavy to compile
-//#include "xrGame/game_cl_mp.h" // ~60, INCREDIBLY heavy to compile
-#include "xrGame/game_events_handler.h" // ~30, INCREDIBLY heavy to compile
 #include "xrGame/steering_behaviour.h" // ~30, measurable compile time
 #include "xr_level_controller.h"
 #include "xrGame/UIGameCustom.h" // ~85, quite heavy to compile

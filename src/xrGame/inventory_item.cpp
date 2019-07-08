@@ -21,7 +21,6 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "Common/object_broker.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "debug_renderer.h"
@@ -294,7 +293,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
         // Send
         NET_Packet P;
         D->Spawn_Write(P, TRUE);
-        Level().Send(P, net_flags(TRUE));
+        Level().Send(P);
         // Destroy
         F_entity_Destroy(D);
     }
@@ -616,7 +615,7 @@ void CInventoryItem::net_Export(NET_Packet& P)
             NET_Packet stpk;
             obj->u_EventGen(stpk, GE_SYNC_ALIFEITEM, obj->ID());
             stpk.w_float(m_fCondition);
-            obj->u_EventSend(stpk, net_flags(FALSE));
+            obj->u_EventSend(stpk);
         }
         //-Alun
         return;

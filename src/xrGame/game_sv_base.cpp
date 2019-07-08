@@ -10,105 +10,24 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 #include "string_table.h"
-#include "xrNetServer/NET_Messages.h"
 
 #include "debug_renderer.h"
 
-ENGINE_API	bool g_dedicated_server;
-
-BOOL	net_sv_control_hit	= FALSE;
-
+BOOL net_sv_control_hit	= FALSE;
 
 // Main
-game_PlayerState*	game_sv_GameState::get_id					(ClientID id)							
-{
-    xrClientData* C = (xrClientData*)m_server->ID_to_client(id);
-    if (0 == C)
-        return NULL;
-    else
-        return C->ps;
-}
-
-LPCSTR				game_sv_GameState::get_name_id				(ClientID id)							
-{
-    xrClientData* C = (xrClientData*)m_server->ID_to_client(id);
-    return C == NULL ? NULL : C->ps->getName();
-}
-
-LPCSTR game_sv_GameState::get_player_name_id(ClientID id)
-{
-    xrClientData* xrCData = m_server->ID_to_client(id);
-    return xrCData == NULL ? "unknown" : xrCData->ps->getName();
-}
-
-u16					game_sv_GameState::get_id_2_eid				(ClientID id)
-{
-	xrClientData*	C	= (xrClientData*)m_server->ID_to_client	(id);
-	if (0==C)			return 0xffff;
-	CSE_Abstract*	E	= C->owner;
-	if (0==E)			return 0xffff;
-	return E->ID;
-}
-
-game_PlayerState* game_sv_GameState::get_eid(u16 id) // if exist
-{
-    CSE_Abstract* entity = get_entity_from_eid(id);
-
-    if (entity)
-    {
-        if (entity->owner)
-        {
-            if (entity->owner->ps)
-            {
-                if (entity->owner->ps->GameID == id)
-                    return entity->owner->ps;
-            }
-        }
-    }
-    //-------------------------------------------------
-    struct id_searcher
-    {
-        u16 id_to_search;
-        bool operator()(IClient* client)
-        {
-            xrClientData* tmp_client = static_cast<xrClientData*>(client);
-            if (!tmp_client->ps)
-                return false;
-            return tmp_client->ps->HasOldID(id_to_search);
-        }
-    };
-    id_searcher tmp_predicate;
-    tmp_predicate.id_to_search = id;
-    xrClientData* tmp_client = static_cast<xrClientData*>(m_server->FindClient(tmp_predicate));
-    if (tmp_client)
-        return tmp_client->ps;
-    return NULL;
-}
-
 void* game_sv_GameState::get_client(u16 id) // if exist
 {
     CSE_Abstract* entity = get_entity_from_eid(id);
-    if (entity && entity->owner && entity->owner->ps && entity->owner->ps->GameID == id)
+    if (entity && entity->owner)
         return entity->owner;
-    struct client_searcher
-    {
-        u16 binded_id;
-        bool operator()(IClient* client)
-        {
-            xrClientData* tmp_client = static_cast<xrClientData*>(client);
-            if (!tmp_client || !tmp_client->ps)
-                return false;
-            return tmp_client->ps->HasOldID(binded_id);
-        }
-    };
-    client_searcher searcher_predicate;
-    searcher_predicate.binded_id = id;
-    return m_server->FindClient(searcher_predicate);
+
+    return nullptr;
 }
 
 CSE_Abstract* game_sv_GameState::get_entity_from_eid(u16 id) { return m_server->ID_to_entity(id); }
 // Utilities
-xr_vector<u16>*		game_sv_GameState::get_children				(ClientID id)
+xr_vector<u16>* game_sv_GameState::get_children(ClientID id)
 {
     xrClientData* C = (xrClientData*)m_server->ID_to_client(id);
     if (0 == C)
@@ -170,7 +89,7 @@ string64& game_sv_GameState::get_option_s(LPCSTR lst, LPCSTR name, LPCSTR def)
 }
 void game_sv_GameState::signal_Syncronize() { sv_force_sync = TRUE; }
 // Network
-void game_sv_GameState::net_Export_State						(NET_Packet& P, ClientID to)
+void game_sv_GameState::net_Export_State(NET_Packet& P, ClientID to)
 {
 }
 
@@ -183,35 +102,30 @@ void game_sv_GameState::net_Export_GameTime(NET_Packet& P)
 };
 
 void game_sv_GameState::OnPlayerConnect(ClientID /**id_who/**/) { signal_Syncronize(); }
-void game_sv_GameState::OnPlayerDisconnect(ClientID id_who, LPSTR, u16) { signal_Syncronize(); }
 
-
-void game_sv_GameState::Create					(shared_str &options)
+void game_sv_GameState::Create(shared_str &options)
 {
-    if (!GEnv.isDedicatedServer)
-    {
-        // loading scripts
-        auto& scriptEngine = *GEnv.ScriptEngine;
-        scriptEngine.remove_script_process(ScriptProcessor::Game);
-        string_path S;
-        FS.update_path(S, "$game_config$", "script.ltx");
-        CInifile* l_tpIniFile = new CInifile(S);
-        R_ASSERT(l_tpIniFile);
+    // loading scripts
+    auto& scriptEngine = *GEnv.ScriptEngine;
+    scriptEngine.remove_script_process(ScriptProcessor::Game);
+    string_path S;
+    FS.update_path(S, "$game_config$", "script.ltx");
+    CInifile* l_tpIniFile = new CInifile(S);
+    R_ASSERT(l_tpIniFile);
 
-        if (l_tpIniFile->section_exist(type_name()))
-        {
-            shared_str scripts;
-            if (l_tpIniFile->r_string(type_name(), "script"))
-                scripts = l_tpIniFile->r_string(type_name(), "script");
-            else
-                scripts = "";
-            scriptEngine.add_script_process(ScriptProcessor::Game, scriptEngine.CreateScriptProcess("game", scripts));
-        }
-        xr_delete(l_tpIniFile);
+    if (l_tpIniFile->section_exist(type_name()))
+    {
+        shared_str scripts;
+        if (l_tpIniFile->r_string(type_name(), "script"))
+            scripts = l_tpIniFile->r_string(type_name(), "script");
+        else
+            scripts = "";
+        scriptEngine.add_script_process(ScriptProcessor::Game, scriptEngine.CreateScriptProcess("game", scripts));
     }
+    xr_delete(l_tpIniFile);
 }
 
-CSE_Abstract*		game_sv_GameState::spawn_begin				(LPCSTR N)
+CSE_Abstract* game_sv_GameState::spawn_begin(LPCSTR N)
 {
     CSE_Abstract* A = F_entity_Create(N);
     R_ASSERT(A); // create SE
@@ -237,7 +151,6 @@ CSE_Abstract* game_sv_GameState::spawn_end(CSE_Abstract* E, ClientID id)
     return N;
 }
 
-void game_sv_GameState::GenerateGameMessage(NET_Packet& P) { P.w_begin(M_GAMEMESSAGE); };
 void game_sv_GameState::u_EventGen(NET_Packet& P, u16 type, u16 dest)
 {
     P.w_begin(M_EVENT);
@@ -246,7 +159,7 @@ void game_sv_GameState::u_EventGen(NET_Packet& P, u16 type, u16 dest)
     P.w_u16(dest);
 }
 
-void game_sv_GameState::u_EventSend(NET_Packet& P, u32 dwFlags) { m_server->SendBroadcast(BroadcastCID, P, dwFlags); }
+void game_sv_GameState::u_EventSend(NET_Packet& P) { m_server->SendBroadcast(BroadcastCID, P); }
 void game_sv_GameState::Update()
 {
     if (!GEnv.isDedicatedServer)
@@ -267,14 +180,13 @@ void game_sv_GameState::OnDestroyObject(u16 eid_who)
 game_sv_GameState::game_sv_GameState()
 {
 	VERIFY(g_pGameLevel);
-	m_server					= Level().Server;
+	m_server = Level().Server;
 	m_event_queue = new GameEventQueue();
 }
 
 game_sv_GameState::~game_sv_GameState()
 {
-    if (!GEnv.isDedicatedServer)
-        GEnv.ScriptEngine->remove_script_process(ScriptProcessor::Game);
+    GEnv.ScriptEngine->remove_script_process(ScriptProcessor::Game);
     xr_delete(m_event_queue);
 }
 
@@ -291,25 +203,6 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
 {
     switch (type)
     {
-    case GAME_EVENT_PLAYER_CONNECTED:
-    {
-        ClientID ID;
-        tNetPacket.r_clientID(ID);
-        OnPlayerConnect(ID);
-    }
-    break;
-
-    case GAME_EVENT_PLAYER_DISCONNECTED:
-    {
-        ClientID ID;
-        tNetPacket.r_clientID(ID);
-        string1024 PlayerName;
-        tNetPacket.r_stringZ(PlayerName);
-        u16 GameID = tNetPacket.r_u16();
-        OnPlayerDisconnect(ID, PlayerName, GameID);
-    }
-    break;
-
     case GAME_EVENT_PLAYER_KILLED: {
     }
     break;
@@ -319,46 +212,13 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
         u16 id_src = tNetPacket.r_u16();
         CSE_Abstract* e_src = get_entity_from_eid(id_src);
 
-        if (!e_src) // && !IsGameTypeSingle() added by andy because of Phantom does not have server entity
-        {
-            if (IsGameTypeSingle())
-                break;
-
-            game_PlayerState* ps = get_eid(id_src);
-            if (!ps)
-                break;
-            id_src = ps->GameID;
-        }
-
-        OnHit(id_src, id_dest, tNetPacket);
-        m_server->SendBroadcast(BroadcastCID, tNetPacket, net_flags(TRUE, TRUE));
-    }
-    break;
-    case GAME_EVENT_CREATE_CLIENT:
-    {
-        IClient* CL = (IClient*)m_server->ID_to_client(sender);
-        VERIFY2(CL, "bad create client message GAME_EVENT_CREATE_CLIENT");
-        if (CL == NULL)
+        if (!e_src)
         {
             break;
         }
 
-        CL->flags.bConnected = TRUE;
-        m_server->AttachNewClient(CL);
-    }
-    break;
-    case GAME_EVENT_PLAYER_AUTH:
-    {
-        IClient* CL = m_server->ID_to_client(sender);
-        m_server->OnBuildVersionRespond(CL, tNetPacket);
-    }
-    break;
-    case GAME_EVENT_CREATE_PLAYER_STATE:
-    {
-        xrClientData* CL = m_server->ID_to_client(sender);
-        R_ASSERT2(CL, make_string("M_CREATE_PLAYER_STATE: client 0x%08x not found", sender.value()).c_str());
-        CL->ps = createPlayerState(&tNetPacket);
-        CL->ps->DeathTime = Device.dwTimeGlobal;
+        OnHit(id_src, id_dest, tNetPacket);
+        m_server->SendBroadcast(BroadcastCID, tNetPacket);
     }
     break;
     default:
@@ -521,32 +381,6 @@ void game_sv_GameState::on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src)
     creature->set_killer_id(e_src->ID);
 }
 
-//  [7/5/2005]
 #ifdef DEBUG
 extern Flags32 dbg_net_Draw_Flags;
 #endif
-
-
-
-//  [7/5/2005]
-
-class NameSearcherPredicate
-{
-public:
-    NameSearcherPredicate(char const* name, IClient const* to_exclude) : m_name(name), m_exclude(to_exclude) {}
-    inline bool operator()(IClient* client) const
-    {
-        if (client == m_exclude)
-            return false;
-
-        xrClientData* tmp_cl = static_cast<xrClientData*>(client);
-        if (!tmp_cl || !tmp_cl->ps)
-            return false;
-
-        return (xr_strcmp(tmp_cl->ps->getName(), m_name) == 0);
-    }
-
-private:
-	char const *	m_name;
-	IClient const * m_exclude;
-}; //class NameSearcherPredicate

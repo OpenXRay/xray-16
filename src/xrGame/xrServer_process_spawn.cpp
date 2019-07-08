@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "xrServer.h"
 #include "xrserver_objects.h"
-#include "xrNetServer/NET_Messages.h"
 #include "xrServerEntities/xrMessages.h"
 
 #ifdef DEBUG
@@ -149,13 +148,13 @@ CSE_Abstract* xrServer::Process_spawn(
         E->Spawn_Write(Packet, TRUE);
         if (E->s_flags.is(M_SPAWN_UPDATE))
             E->UPDATE_Write(Packet);
-        SendTo(CL->ID, Packet, net_flags(TRUE, TRUE));
+        SendTo(CL->ID, Packet);
 
         // For everybody, except client, which contains authorative copy
         E->Spawn_Write(Packet, FALSE);
         if (E->s_flags.is(M_SPAWN_UPDATE))
             E->UPDATE_Write(Packet);
-        SendBroadcast(CL->ID, Packet, net_flags(TRUE, TRUE));
+        SendBroadcast(CL->ID, Packet);
     }
     else
     {
@@ -164,7 +163,7 @@ CSE_Abstract* xrServer::Process_spawn(
             E->UPDATE_Write(Packet);
         ClientID clientID;
         clientID.set(0);
-        SendBroadcast(clientID, Packet, net_flags(TRUE, TRUE));
+        SendBroadcast(clientID, Packet);
     }
     if (!tpExistedEntity)
     {

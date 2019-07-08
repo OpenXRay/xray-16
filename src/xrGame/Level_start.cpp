@@ -36,9 +36,7 @@ bool CLevel::net_Start(const char* op_server, const char* op_client)
     //---------------------------------------------------------------------
     g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start1));
     g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start2));
-    g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start3));
     g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start4));
-    g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start5));
     g_loading_events.push_back(LOADING_EVENT(this, &CLevel::net_start6));
 
     return net_start_result_total;
@@ -88,8 +86,7 @@ bool CLevel::net_start2()
 {
     if (net_start_result_total && m_caServerOptions.size())
     {
-        GameDescriptionData game_descr;
-        if ((m_connect_server_err = Server->Connect(m_caServerOptions, game_descr)) != xrServer::ErrNoError)
+        if ((m_connect_server_err = Server->Connect(m_caServerOptions)) != xrServer::ErrNoError)
         {
             net_start_result_total = false;
             Msg("! Failed to start server.");
@@ -101,42 +98,6 @@ bool CLevel::net_start2()
             g_pGamePersistent->LoadTitle(true, map_data.m_name);
     }
     return true;
-}
-
-bool CLevel::net_start3()
-{
-    if (!net_start_result_total)
-        return true;
-    // add server port if don't have one in options
-    if (!strstr(m_caClientOptions.c_str(), "port=") && Server)
-    {
-        string64 PortStr;
-        xr_sprintf(PortStr, "/port=%d", Server->GetPort());
-
-        string4096 tmp;
-        xr_strcpy(tmp, m_caClientOptions.c_str());
-        xr_strcat(tmp, PortStr);
-
-        m_caClientOptions = tmp;
-    }
-    // add password string to client, if don't have one
-    if (m_caServerOptions.size())
-    {
-        if (strstr(m_caServerOptions.c_str(), "psw=") && !strstr(m_caClientOptions.c_str(), "psw="))
-        {
-            string64 PasswordStr = "";
-            const char* PSW = strstr(m_caServerOptions.c_str(), "psw=") + 4;
-            if (strchr(PSW, '/'))
-                strncpy_s(PasswordStr, PSW, strchr(PSW, '/') - PSW);
-            else
-                xr_strcpy(PasswordStr, PSW);
-
-			string4096	tmp;
-			xr_sprintf(tmp, "%s/psw=%s", m_caClientOptions.c_str(), PasswordStr);
-			m_caClientOptions = tmp;
-		};
-	};
-	return true;
 }
 
 bool CLevel::net_start4()
@@ -156,22 +117,6 @@ bool CLevel::net_start4()
     return false;
 }
 
-bool CLevel::net_start5()
-{
-    if (net_start_result_total)
-    {
-        NET_Packet NP;
-        NP.w_begin(M_CLIENTREADY);
-        Game().local_player->net_Export(NP, TRUE);
-        Send(NP, net_flags(TRUE, TRUE));
-
-        if (OnClient() && Server)
-        {
-            Server->SLS_Clear();
-        };
-    };
-    return true;
-}
 bool CLevel::net_start6()
 {
     // init bullet manager
@@ -194,13 +139,7 @@ bool CLevel::net_start6()
     {
         Msg("! Failed to start client. Check the connection or level existance.");
 
-        if (m_connect_server_err == xrServer::ErrConnect && !psNET_direct_connect && !GEnv.isDedicatedServer)
-        {
-            DEL_INSTANCE(g_pGameLevel);
-            Console->Execute("main_menu on");
-
-        }
-        else if (!map_data.m_map_loaded && map_data.m_name.size() && m_bConnectResult)
+        if (!map_data.m_map_loaded && map_data.m_name.size())
         {
             LPCSTR level_id_string = NULL;
             LPCSTR dialog_string = NULL;
@@ -210,58 +149,31 @@ bool CLevel::net_start6()
             STRCONCAT(level_id_string, StringTable().translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
             STRCONCAT(dialog_string, level_id_string, StringTable().translate("ui_st_map_not_found"));
 
-			DEL_INSTANCE	(g_pGameLevel);
-			Console->Execute("main_menu on");
-		}
-		else
-		if (map_data.IsInvalidClientChecksum())
-		{
-			LPCSTR level_id_string = NULL;
-			LPCSTR dialog_string = NULL;
-			LPCSTR download_url = !!map_data.m_map_download_url ? map_data.m_map_download_url.c_str() : "";
-			LPCSTR tmp_map_ver = !!map_data.m_map_version ? map_data.m_map_version.c_str() : "";
-
-            STRCONCAT(level_id_string, StringTable().translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
-            STRCONCAT(dialog_string, level_id_string, StringTable().translate("ui_st_map_data_corrupted"));
-
-			g_pGameLevel->net_Stop();
-			DEL_INSTANCE	(g_pGameLevel);
+			DEL_INSTANCE(g_pGameLevel);
 			Console->Execute("main_menu on");
 		}
 		else 
 		{
-			DEL_INSTANCE	(g_pGameLevel);
+			DEL_INSTANCE(g_pGameLevel);
 			Console->Execute("main_menu on");
 		}
 
         return true;
     }
 
-    if (!GEnv.isDedicatedServer)
-    {
-        if (CurrentGameUI())
-            CurrentGameUI()->OnConnected();
-    }
+    if (CurrentGameUI())
+        CurrentGameUI()->OnConnected();
 
     return true;
 }
 
 void CLevel::InitializeClientGame(NET_Packet& P)
 {
-    string256 game_type_name;
-    P.r_stringZ(game_type_name);
-    if (game && !xr_strcmp(game_type_name, game->type_name()))
+    if (game)
         return;
 
     xr_delete(game);
-#ifdef DEBUG
-    Msg("- Game configuring : Started ");
-#endif // #ifdef DEBUG
-    CLASS_ID clsid = game_GameState::getCLASS_ID(game_type_name, false);
-    game = smart_cast<game_cl_GameState*>(NEW_INSTANCE(clsid));
-    game->set_type_name(game_type_name);
-    game->Init();
-    m_bGameConfigStarted = TRUE;
+    game = new game_cl_Single();
 
     R_ASSERT(Load_GameSpecific_After());
 }

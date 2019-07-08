@@ -23,7 +23,6 @@
 #include "detail_path_builder.h"
 #include "xrEngine/profiler.h"
 #include "mt_config.h"
-#include "xrNetServer/NET_Messages.h"
 
 // Lain: added
 #include "steering_behaviour.h"
@@ -262,7 +261,7 @@ void CMovementManager::teleport(u32 game_vertex_id)
     net_packet.w(&_game_vertex_id, sizeof(_game_vertex_id));
     net_packet.w(&_level_vertex_id, sizeof(_level_vertex_id));
     net_packet.w_vec3(position);
-    Level().Send(net_packet, net_flags(TRUE, TRUE));
+    Level().Send(net_packet);
 }
 
 void CMovementManager::clear_path()

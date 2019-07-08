@@ -5,9 +5,8 @@
 #include "xrServer.h"
 #include "xrmessages.h"
 #include "ai_space.h"
-#include "xrNetServer/NET_Messages.h"
 
-void xrServer::Perform_destroy(CSE_Abstract* object, u32 mode)
+void xrServer::Perform_destroy(CSE_Abstract* object)
 {
     R_ASSERT(object);
     R_ASSERT(object->ID_Parent == 0xffff);
@@ -30,7 +29,7 @@ void xrServer::Perform_destroy(CSE_Abstract* object, u32 mode)
         verify_entities();
 #endif
 #endif
-        Perform_destroy(child, mode);
+        Perform_destroy(child);
     }
 
     //	Msg						("SLS-CLEAR : DESTROY [%s][%s]",object->name(),object->name_replace());
@@ -48,20 +47,11 @@ void xrServer::Perform_destroy(CSE_Abstract* object, u32 mode)
     P.w_u32(Device.dwTimeGlobal - 2 * NET_Latency);
     P.w_u16(GE_DESTROY);
     P.w_u16(object_id);
-    SendBroadcast(BroadcastCID, P, mode);
+    SendBroadcast(BroadcastCID, P);
 }
 
 void xrServer::SLS_Clear()
 {
-#if 0
-	Msg									("SLS-CLEAR : %d objects");
-	xrS_entities::const_iterator		I = entities.begin();
-	xrS_entities::const_iterator		E = entities.end();
-	for ( ; I != E; ++I)
-		Msg								("entity to destroy : [%d][%s][%s]",(*I).second->ID,(*I).second->name(),(*I).second->name_replace());
-#endif
-
-    u32 mode = net_flags(TRUE, TRUE);
     while (!entities.empty())
     {
         bool found = false;
@@ -72,7 +62,7 @@ void xrServer::SLS_Clear()
             if ((*I).second->ID_Parent != 0xffff)
                 continue;
             found = true;
-            Perform_destroy((*I).second, mode);
+            Perform_destroy((*I).second);
             break;
         }
         if (!found) // R_ASSERT(found);

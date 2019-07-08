@@ -273,7 +273,6 @@ public:
     virtual void net_Import(NET_Packet& packet) = 0; // import from server
     virtual BOOL net_Spawn(CSE_Abstract* entity) = 0;
     virtual void net_Destroy() = 0;
-    virtual void net_ImportInput(NET_Packet& packet) = 0;
     virtual BOOL net_Relevant() = 0; // relevant for export to server
     virtual void net_MigrateInactive(NET_Packet& packet) = 0;
     virtual void net_MigrateActive(NET_Packet& packet) = 0;

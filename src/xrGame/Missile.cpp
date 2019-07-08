@@ -15,7 +15,6 @@
 #include "CharacterPhysicsSupport.h"
 #include "inventory.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "xrNetServer/NET_Messages.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -153,7 +152,7 @@ void CMissile::spawn_fake_missile()
 
         NET_Packet P;
         object->Spawn_Write(P, TRUE);
-        Level().Send(P, net_flags(TRUE));
+        Level().Send(P);
         F_entity_Destroy(object);
     }
 }

@@ -239,24 +239,7 @@ void CCustomOutfit::ApplySkinModel(CActor* pActor, bool bDress, bool bHUDOnly)
     {
         if (!bHUDOnly && m_ActorVisual.size())
         {
-            shared_str NewVisual = NULL;
-            const auto TeamSection = Game().getTeamSection(pActor->g_Team());
-            if (TeamSection)
-            {
-                if (pSettings->line_exist(TeamSection, *cNameSect()))
-                {
-                    NewVisual = pSettings->r_string(TeamSection, *cNameSect());
-                    string256 SkinName;
-
-                    xr_strcpy(SkinName, pSettings->r_string("mp_skins_path", "skin_path"));
-                    xr_strcat(SkinName, *NewVisual);
-                    xr_strcat(SkinName, ".ogf");
-                    NewVisual._set(SkinName);
-                }
-            }
-            if (!NewVisual.size())
-                NewVisual = m_ActorVisual;
-
+            shared_str NewVisual = m_ActorVisual;
             pActor->ChangeVisual(NewVisual);
         }
 

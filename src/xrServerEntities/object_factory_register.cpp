@@ -163,8 +163,6 @@
 #include "smart_zone.h"
 #include "InventoryBox.h"
 
-#include "actor_mp_server.h"
-#include "actor_mp_client.h"
 #include "smart_cover_object.h"
 #include "HolderEntityObject.h"
 #endif // NO_XR_GAME
@@ -180,20 +178,16 @@ void CObjectFactory::register_classes()
 {
 #ifndef NO_XR_GAME
 	// client entities
-	add<CLevel>													(CLSID_GAME_LEVEL				,"level");
-	add<CGamePersistent>										(CLSID_GAME_PERSISTANT			,"game");
-	add<CHUDManager>											(CLSID_HUDMANAGER				,"hud_manager");
+	add<CLevel>(CLSID_GAME_LEVEL, "level");
+	add<CGamePersistent>(CLSID_GAME_PERSISTANT, "game");
+	add<CHUDManager>(CLSID_HUDMANAGER, "hud_manager");
 	//Server Game type
-	add<game_sv_Single>											(CLSID_SV_GAME_SINGLE			,"game_sv_single");
+	add<game_sv_Single>(CLSID_SV_GAME_SINGLE, "game_sv_single");
 	//Client Game type
-	add<game_cl_Single>											(CLSID_CL_GAME_SINGLE			,"game_cl_single");
-	add<CUIGameSP>												(CLSID_GAME_UI_SINGLE			,"game_ui_single");
+	add<game_cl_Single>(CLSID_CL_GAME_SINGLE, "game_cl_single");
+	add<CUIGameSP>(CLSID_GAME_UI_SINGLE, "game_ui_single");
 
-#	ifndef NO_SINGLE
-		ADD_MP(CActor,CActorMP,CSE_ALifeCreatureActor,CSE_ActorMP	,CLSID_OBJECT_ACTOR				,"actor");
-#	else // #ifndef NO_SINGLE
-		ADD(CActorMP,CSE_ActorMP	,CLSID_OBJECT_ACTOR				,"actor");
-#	endif // #ifndef NO_SINGLE
+    ADD(CActor, CSE_ALifeCreatureActor, CLSID_OBJECT_ACTOR, "actor");
 #else // NO_XR_GAME
     ADD(CActor, CSE_ALifeCreatureActor, CLSID_OBJECT_ACTOR, "actor");
 #endif // NO_XR_GAME

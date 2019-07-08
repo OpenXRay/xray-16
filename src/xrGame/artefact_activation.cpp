@@ -22,7 +22,6 @@
 #include "xrPhysics/iphworld.h"
 #include "restriction_space.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "xrNetServer/NET_Messages.h"
 
 SArtefactActivation::SArtefactActivation(CArtefact* af, u32 owner_id)
 {
@@ -188,7 +187,7 @@ void SArtefactActivation::SpawnAnomaly()
 
     NET_Packet P;
     object->Spawn_Write(P, TRUE);
-    Level().Send(P, net_flags(TRUE));
+    Level().Send(P);
     F_entity_Destroy(object);
     //. #ifdef DEBUG
     Msg("artefact [%s] spawned a zone [%s] at [%f]", *m_af->cName(), zone_sect, Device.fTimeGlobal);

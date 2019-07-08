@@ -10,7 +10,6 @@
 #include "Level.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "xrNetServer/NET_Messages.h"
 
 CRocketLauncher::CRocketLauncher()
 {
@@ -41,7 +40,7 @@ void CRocketLauncher::SpawnRocket(const shared_str& rocket_section, CGameObject*
 
     NET_Packet P;
     D->Spawn_Write(P, TRUE);
-    Level().Send(P, net_flags(TRUE));
+    Level().Send(P);
     F_entity_Destroy(D);
 }
 

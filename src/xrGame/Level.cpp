@@ -43,7 +43,6 @@
 #include "CustomDetector.h"
 #include "xrPhysics/IPHWorld.h"
 #include "xrPhysics/console_vars.h"
-#include "xrNetServer/NET_Messages.h"
 #include "xrEngine/GameFont.h"
 
 #ifdef DEBUG
@@ -203,7 +202,6 @@ bool g_bDebugEvents = false;
 
 void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 {
-    // Msg("--- event[%d] for [%d]",type,dest);
     IGameObject* O = Objects.net_Find(dest);
     if (0 == O)
     {
@@ -282,39 +280,6 @@ void CLevel::ProcessGameEvents()
             case M_EVENT:
             {
                 cl_Process_Event(dest, type, P);
-                break;
-            }
-            case M_MOVE_PLAYERS:
-            {
-                u8 Count = P.r_u8();
-                for (u8 i = 0; i < Count; i++)
-                {
-                    u16 ID = P.r_u16();
-                    Fvector NewPos, NewDir;
-                    P.r_vec3(NewPos);
-                    P.r_vec3(NewDir);
-                    CActor* OActor = smart_cast<CActor*>(Objects.net_Find(ID));
-                    if (0 == OActor)
-                        break;
-                    OActor->MoveActor(NewPos, NewDir);
-                }
-                NET_Packet PRespond;
-                PRespond.w_begin(M_MOVE_PLAYERS_RESPOND);
-                Send(PRespond, net_flags(TRUE, TRUE));
-                break;
-            }
-            case M_STATISTIC_UPDATE:
-            {
-               
-                break;
-            }
-            case M_FILE_TRANSFER:
-            {
-                break;
-            }
-            case M_GAMEMESSAGE:
-            {
-                Game().OnGameMessage(P);
                 break;
             }
             default:
@@ -538,10 +503,6 @@ void CLevel::OnRender()
             UI().Font().pFontStat->OutNext("Client Objects:      [%d]", Server->GetEntitiesNum());
         UI().Font().pFontStat->OutNext("Server Objects:      [%d]", Objects.o_count());
         UI().Font().pFontStat->OutNext("Interpolation Steps: [%d]", Level().GetInterpolationSteps());
-        if (Server)
-        {
-            UI().Font().pFontStat->OutNext("Server updates size: [%d]", Server->GetLastUpdatesSize());
-        }
         UI().Font().pFontStat->SetHeight(8.0f);
     }
 #endif
@@ -857,7 +818,6 @@ void CLevel::OnAlifeSimulatorLoaded()
     GameTaskManager().ResetStorage();
 }
 
-void CLevel::OnSessionTerminate(pcstr reason) {  }
 u32 GameID() { return Game().Type(); }
 CZoneList* CLevel::create_hud_zones_list()
 {

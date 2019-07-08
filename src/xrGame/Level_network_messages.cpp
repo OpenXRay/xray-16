@@ -33,35 +33,11 @@ LPSTR remove_version_option(LPCSTR opt_str, LPSTR new_opt_str, u32 new_opt_str_s
     return new_opt_str;
 }
 
-#ifdef DEBUG
-s32 lag_simmulator_min_ping = 0;
-s32 lag_simmulator_max_ping = 0;
-static bool SimmulateNetworkLag()
-{
-    static u32 max_lag_time = 0;
-
-    if (!lag_simmulator_max_ping && !lag_simmulator_min_ping)
-        return false;
-
-    if (!max_lag_time || (max_lag_time <= Device.dwTimeGlobal))
-    {
-        CRandom tmp_random(Device.dwTimeGlobal);
-        max_lag_time = Device.dwTimeGlobal + tmp_random.randI(lag_simmulator_min_ping, lag_simmulator_max_ping);
-        return false;
-    }
-    return true;
-}
-#endif
-
 void CLevel::ClientReceive()
 {
     m_dwRPC = 0;
     m_dwRPS = 0;
 
-#ifdef DEBUG
-    if (SimmulateNetworkLag())
-        return;
-#endif
     StartProcessQueue();
     for (NET_Packet* P = net_msg_Retreive(); P; P = net_msg_Retreive())
     {
@@ -111,42 +87,6 @@ void CLevel::ClientReceive()
         case M_UPDATE: { game->net_import_update(*P);
         }
         break;
-        case M_CL_UPDATE:
-        {
-            if (OnClient())
-                break;
-            P->r_u16(ID);
-            u32 Ping = P->r_u32();
-            CGameObject* O = smart_cast<CGameObject*>(Objects.net_Find(ID));
-            if (0 == O)
-                break;
-            O->net_Import(*P);
-            //---------------------------------------------------
-            UpdateDeltaUpd(timeServer());
-            if (pObjects4CrPr.empty() && pActors4CrPr.empty())
-                break;
-            if (!smart_cast<CActor*>(O))
-                break;
-
-            u32 dTime = 0;
-            if ((Level().timeServer() + Ping) < P->timeReceive)
-                dTime = Ping;
-            else
-                dTime = Level().timeServer() - P->timeReceive + Ping;
-            u32 NumSteps = physics_world()->CalcNumSteps(dTime);
-            SetNumCrSteps(NumSteps);
-
-            O->CrPr_SetActivationStep(u32(physics_world()->StepsNum()) - NumSteps);
-            AddActor_To_Actors4CrPr(O);
-        }
-        break;
-        case M_MOVE_PLAYERS:
-        {
-            game_events->insert(*P);
-            if (g_bDebugEvents)
-                ProcessGameEvents();
-        }
-        break;
         // [08.11.07] Alexander Maniluk: added new message handler for moving artefacts.
         case M_MOVE_ARTEFACTS:
         {
@@ -163,17 +103,6 @@ void CLevel::ClientReceive()
             };
         }
         break;
-        //------------------------------------------------
-        case M_CL_INPUT:
-        {
-            P->r_u16(ID);
-            IGameObject* O = Objects.net_Find(ID);
-            if (0 == O)
-                break;
-            O->net_ImportInput(*P);
-        }
-        break;
-        //---------------------------------------------------
         case M_SV_CONFIG_NEW_CLIENT: InitializeClientGame(*P); break;
         case M_SV_CONFIG_GAME: game->net_import_state(*P); break;
         case M_SV_CONFIG_FINISHED:
@@ -194,15 +123,6 @@ void CLevel::ClientReceive()
             char buffer[256];
             P->r_stringZ(buffer);
             Msg("- %s", buffer);
-        }
-        break;
-        case M_GAMEMESSAGE:
-        {
-            if (!game)
-                break;
-            game_events->insert(*P);
-            if (g_bDebugEvents)
-                ProcessGameEvents();
         }
         break;
         case M_RELOAD_GAME:
@@ -230,25 +150,6 @@ void CLevel::ClientReceive()
         }
         break;
         case M_SAVE_GAME: { ClientSave();
-        }
-        break;
-        case M_AUTH_CHALLENGE:
-        {
-            ClientSendProfileData();
-            OnBuildVersionChallenge();
-        }
-        break;
-        case M_CLIENT_CONNECT_RESULT: { OnConnectResult(P);
-        }
-        break;
-        case M_CLIENT_WARN:
-        {
-            if (!game)
-                break;
-            Game().OnWarnMessage(P);
-        }
-        break;
-        case M_SV_MAP_NAME: { map_data.ReceiveServerMapSync(*P);
         }
         break;
         case M_CHANGE_LEVEL_GAME:
@@ -295,23 +196,6 @@ void CLevel::ClientReceive()
         case M_BULLET_CHECK_RESPOND:
         {
 
-        }
-        break;
-        case M_STATISTIC_UPDATE:
-        {
-            Msg("--- CL: On Update Request");
-            if (!game)
-                break;
-            game_events->insert(*P);
-            if (g_bDebugEvents)
-                ProcessGameEvents();
-        }
-        break;
-        case M_FILE_TRANSFER:
-        {
-            game_events->insert(*P);
-            if (g_bDebugEvents)
-                ProcessGameEvents();
         }
         break;
         }

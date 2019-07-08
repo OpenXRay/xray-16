@@ -325,8 +325,7 @@ void CUIMainIngameWnd::Update()
     if (Device.dwFrame % 10)
         return;
 
-    game_PlayerState* lookat_player = Game().local_player;
-    bool b_God = (GodMode() || (!lookat_player)) ? true : lookat_player->testFlag(GAME_PLAYER_FLAG_INVINCIBLE);
+    bool b_God = GodMode()? true : false;
     if (b_God)
     {
         SetWarningIconColor(ewiInvincible, 0xffffffff);
@@ -337,27 +336,7 @@ void CUIMainIngameWnd::Update()
     }
 
     UpdateMainIndicators();
-    if (IsGameTypeSingle())
-        return;
-
-    // ewiArtefact
-    if (GameID() == eGameIDArtefactHunt)
-    {
-        bool b_Artefact = !!(pActor->inventory().ItemFromSlot(ARTEFACT_SLOT));
-        if (b_Artefact)
-        {
-            SetWarningIconColor(ewiArtefact, 0xffffff00);
-        }
-        else
-        {
-            SetWarningIconColor(ewiArtefact, 0x00ffffff);
-        }
-    }
-    else if (GameID() == eGameIDCaptureTheArtefact)
-    {
-        
-    }
-} // update
+}
 
 void CUIMainIngameWnd::RenderQuickInfos()
 {

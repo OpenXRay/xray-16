@@ -26,7 +26,6 @@
 #include "alife_object_registry.h"
 #include "CustomOutfit.h"
 #include "Bolt.h"
-#include "xrNetServer/NET_Messages.h"
 #include "ActorBackpack.h"
 
 CInventoryOwner::CInventoryOwner()
@@ -370,7 +369,7 @@ void CInventoryOwner::spawn_supplies()
         pda->m_original_owner = (u16)game_object->ID();
         NET_Packet P;
         abstract->Spawn_Write(P, TRUE);
-        Level().Send(P, net_flags(TRUE));
+        Level().Send(P);
         F_entity_Destroy(abstract);
     }
 }

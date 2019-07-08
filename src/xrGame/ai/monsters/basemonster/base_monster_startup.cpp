@@ -342,37 +342,6 @@ BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
     control().update_frame();
     control().update_schedule();
 
-    // spawn inventory item
-    //	if (ai().get_alife()) {
-    //
-    //		CSE_ALifeMonsterBase					*se_monster =
-    // smart_cast<CSE_ALifeMonsterBase*>(ai().alife().objects().object(ID()));
-    //		VERIFY									(se_monster);
-    //
-    //		if (se_monster->m_flags.is(CSE_ALifeMonsterBase::flNeedCheckSpawnItem)) {
-    //			float prob = Random.randF();
-    //			if ((prob < m_spawn_probability) || fsimilar(m_spawn_probability,1.f))
-    //				se_monster->m_flags.set(CSE_ALifeMonsterBase::flSkipSpawnItem, FALSE);
-    //
-    //			se_monster->m_flags.set(CSE_ALifeMonsterBase::flNeedCheckSpawnItem, FALSE);
-    //		}
-    //
-    //		if (!se_monster->m_flags.is(CSE_ALifeMonsterBase::flSkipSpawnItem)) {
-    //			CSE_Abstract	*object = Level().spawn_item
-    //(m_item_section,Position(),ai_location().level_vertex_id(),ID(),true);
-    //			CSE_ALifeObject	*alife_object = smart_cast<CSE_ALifeObject*>(object);
-    //			if (alife_object)
-    //				alife_object->m_flags.set	(CSE_ALifeObject::flCanSave,FALSE);
-    //
-    //			{
-    //				NET_Packet				P;
-    //				object->Spawn_Write		(P,TRUE);
-    //				Level().Send			(P,net_flags(TRUE));
-    //				F_entity_Destroy		(object);
-    //			}
-    //		}
-    //	}
-
     return (TRUE);
 }
 

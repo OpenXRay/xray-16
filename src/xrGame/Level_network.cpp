@@ -17,7 +17,6 @@
 #include "string_table.h"
 #include "UI/UIGameTutorial.h"
 #include "ui/UIPdaWnd.h"
-#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/physicscommon.h"
 
@@ -47,7 +46,7 @@ void CLevel::remove_objects()
         for (int i = 0; i < 20; ++i)
         {
             snd_Events.clear();
-            psNET_Flags.set(NETFLAG_MINIMIZEUPDATES, FALSE);
+
             // ugly hack for checks that update is twice on frame
             // we need it since we do updates for checking network messages
             ++(Device.dwFrame);
@@ -80,8 +79,7 @@ void CLevel::remove_objects()
     psDeviceFlags.set(rsDisableObjectsAsCrows, b_stored);
     g_b_ClearGameCaptions = true;
 
-    if (!GEnv.isDedicatedServer)
-        GEnv.ScriptEngine->collect_all_garbage();
+    GEnv.ScriptEngine->collect_all_garbage();
 
     stalker_animation_data_storage().clear();
 
@@ -135,7 +133,6 @@ void CLevel::net_Stop()
         g_tutorial2->Stop();
 
     bReady = false;
-    m_bGameConfigStarted = FALSE;
 
     remove_objects();
 
@@ -143,7 +140,6 @@ void CLevel::net_Stop()
     game_configured = FALSE;
 
     IGame_Level::net_Stop();
-    IPureClient::Disconnect();
 
     if (Server)
     {
@@ -151,8 +147,7 @@ void CLevel::net_Stop()
         xr_delete(Server);
     }
 
-    if (!GEnv.isDedicatedServer)
-        GEnv.ScriptEngine->collect_all_garbage();
+    GEnv.ScriptEngine->collect_all_garbage();
 
 #ifdef DEBUG
     show_animation_stats();
@@ -163,25 +158,6 @@ void CLevel::ClientSend()
 {
     NET_Packet P;
     u32 start = 0;
-    if (CurrentControlEntity())
-    {
-        IGameObject* pObj = CurrentControlEntity();
-        if (!pObj->getDestroy() && pObj->net_Relevant())
-        {
-            P.w_begin(M_CL_UPDATE);
-
-            P.w_u16(u16(pObj->ID()));
-            P.w_u32(0); // reserved place for client's ping
-
-            pObj->net_Export(P);
-
-            if (P.B.count > 9)
-            {
-                if (!OnServer())
-                    Send(P, net_flags(FALSE));
-            }
-        }
-    }
 
     while (1)
     {
@@ -191,7 +167,7 @@ void CLevel::ClientSend()
         if (P.B.count > 2)
         {
             stats.ClientSendInternal.Begin();
-            Send(P, net_flags(FALSE));
+            Send(P);
             stats.ClientSendInternal.End();
         }
         else
@@ -245,13 +221,13 @@ void CLevel::ClientSave()
         start = Objects_net_Save(&P, start, max_objects_size_in_save);
 
         if (P.B.count > 2)
-            Send(P, net_flags(FALSE));
+            Send(P);
         else
             break;
     }
 }
 
-void CLevel::Send(NET_Packet& P, u32 dwFlags, u32 dwTimeout)
+void CLevel::Send(NET_Packet& P)
 {
     ClientID _clid;
     _clid.set(1);
@@ -283,41 +259,13 @@ struct _NetworkProcessor : public pureFrame
 
 pureFrame* g_pNetProcessor = &NET_processor;
 
-const int ConnectionTimeOut = 60000; // 1 min
-
 bool CLevel::Connect2Server(const char* options)
 {
-    m_bConnectResultReceived = false;
-    m_bConnectResult = true;
+    R_ASSERT(options);
 
-    if (!Connect(options))
-        return FALSE;
-    //---------------------------------------------------------------------------
-    m_bConnectResultReceived = true;
+    Msg("* client : connection accepted - <All Ok>");
 
-    Msg("%c client : connection %s - <%s>", m_bConnectResult ? '*' : '!', m_bConnectResult ? "accepted" : "rejected",
-        m_sConnectResult.c_str());
-
-    net_Syncronised = TRUE;
-
-    return TRUE;
-};
-
-void CLevel::OnBuildVersionChallenge()
-{
-    NET_Packet P;
-    P.w_begin(M_CL_AUTH);
-    Send(P, net_flags(TRUE, TRUE, TRUE, TRUE));
-};
-
-void CLevel::OnConnectResult(NET_Packet* P)
-{
-	// multiple results can be sent during connection they should be "AND-ed"
-	m_bConnectResultReceived	= true;
-	ClientID tmp_client_id;
-	P->r_clientID				(tmp_client_id);
-	SetClientID					(tmp_client_id);
-    m_sConnectResult = "All Ok";
+    return true;
 };
 
 void CLevel::ClearAllObjects()
@@ -412,8 +360,3 @@ void CLevel::OnSessionFull()
     if (MainMenu()->GetErrorDialogType() == CMainMenu::ErrNoError)
         MainMenu()->SetErrorDialog(CMainMenu::ErrSessionFull);
 }
-
-void CLevel::OnConnectRejected()
-{
-    IPureClient::OnConnectRejected();
-};

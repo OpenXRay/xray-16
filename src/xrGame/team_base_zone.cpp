@@ -18,7 +18,6 @@
 #include "map_location.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/xr_collide_form.h"
-#include "xrNetServer/NET_Messages.h"
 #ifdef DEBUG
 #include "debug_renderer.h"
 #endif
@@ -106,7 +105,7 @@ void CTeamBaseZone::feel_touch_new(IGameObject* tpObject)
         P_.w_u16(GAME_EVENT_PLAYER_ENTER_TEAM_BASE);
         P_.w_u16(tpObject->ID());
         P_.w_u8(GetZoneTeam());
-        u_EventSend(P_, net_flags(TRUE, TRUE));
+        u_EventSend(P_);
     };
 }
 
@@ -119,7 +118,7 @@ void CTeamBaseZone::feel_touch_delete(IGameObject* tpObject)
         P_.w_u16(GAME_EVENT_PLAYER_LEAVE_TEAM_BASE);
         P_.w_u16(tpObject->ID());
         P_.w_u8(GetZoneTeam());
-        u_EventSend(P_, net_flags(TRUE, TRUE));
+        u_EventSend(P_);
     };
 }
 

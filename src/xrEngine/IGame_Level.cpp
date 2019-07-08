@@ -136,17 +136,8 @@ bool IGame_Level::Load(u32 dwNum)
     return true;
 }
 
-int psNET_DedicatedSleep = 5;
 void IGame_Level::OnRender()
 {
-    if (GEnv.isDedicatedServer)
-    {
-        Sleep(psNET_DedicatedSleep);
-        return;
-    }
-
-    // if (_abs(Device.fTimeDelta)<EPS_S) return;
-
 #ifdef _GPA_ENABLED
     TAL_ID rtID = TAL_MakeID(1, Core.dwFrame, 0);
     TAL_CreateID(rtID);

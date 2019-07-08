@@ -170,18 +170,6 @@ void CWalmarkManager::StartWorkflow()
         else
             ++_not_dist;
     }
-    /*
-        Msg("----------------------------------");
-        Msg("tri count=%d",						XRC.r_count());
-        Msg("far_dist=%d",						_not_dist);
-        Msg("RayTest = %d",						_ray_test);
-        Msg("c==tdBehind = %d",					_tri_behind);
-        Msg	("c!=tdPlane && dist>ndist = %d",	_tri_not_plane);
-        Msg("Wallmarks added = %d",				wm_count);
-        Msg("Time: %d",							T.GetElapsed_ms());
-
-        DBG_ClosedCashedDraw	(10000);
-    */
 }
 
 void CWalmarkManager::Load(LPCSTR section)

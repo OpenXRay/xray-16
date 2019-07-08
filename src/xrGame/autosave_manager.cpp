@@ -15,7 +15,6 @@
 #include "UIGameCustom.h"
 #include "Actor.h"
 #include "MainMenu.h"
-#include "xrNetServer/NET_Messages.h"
 
 extern LPCSTR alife_section;
 
@@ -68,7 +67,7 @@ void CAutosaveManager::shedule_Update(u32 dt)
     net_packet.w_begin(M_SAVE_GAME);
     net_packet.w_stringZ(temp);
     net_packet.w_u8(0);
-    Level().Send(net_packet, net_flags(TRUE));
+    Level().Send(net_packet);
 
     string_path S1;
     xr_strcat(temp, sizeof(temp), ".dds");

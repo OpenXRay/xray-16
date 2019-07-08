@@ -3,9 +3,8 @@
 #include "GameObject.h"
 #include "Inventory.h"
 #include "inventory_space.h"
+
 using namespace luabind;
-
-
 
 static void CInventoryOwner_Export(lua_State* luaState)
 {

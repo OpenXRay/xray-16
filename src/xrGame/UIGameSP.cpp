@@ -3,7 +3,6 @@
 #include "actor.h"
 #include "Level.h"
 #include "xrEngine/xr_input.h"
-#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "attachable_item.h"
@@ -265,7 +264,7 @@ void CChangeLevelWnd::OnOk()
     p.w_vec3(m_position);
     p.w_vec3(m_angles);
 
-    Level().Send(p, net_flags(TRUE));
+    Level().Send(p);
 }
 
 void CChangeLevelWnd::OnCancel()
