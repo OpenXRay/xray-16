@@ -42,7 +42,6 @@ void Initialize()
     Skin2W = Skin2W_SSE;
     Skin3W = Skin3W_SSE;
     Skin4W = Skin4W_SSE;
-    Skin4W_MTs = Skin4W_SSE;
     PLCCalc = PLCCalc_SSE;
 #else
     Skin1W = Skin1W_CPP;
