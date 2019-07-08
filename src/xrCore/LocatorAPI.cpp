@@ -253,7 +253,10 @@ const CLocatorAPI::file* CLocatorAPI::Register(
             desc.modif = u32(-1);
             std::pair<files_it, bool> I2 = m_files.insert(desc);
 
-            R_ASSERT(I2.second);
+            cpcstr failureDescription = "Failed to register file in filesystem.\n"
+                "First argument is the file we tried to insert, "
+                "second is the file that prevented the insertion.";
+            R_ASSERT4(I2.second, failureDescription, path, I2.first->name);
         }
         xr_strcpy(temp, sizeof temp, folder);
         if (xr_strlen(temp))
