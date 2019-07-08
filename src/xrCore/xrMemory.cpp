@@ -92,7 +92,7 @@ XRCORE_API void log_vminfo()
     Msg("* [win32]: free[%I64d MB], reserved[%u KB], committed[%u KB]", w_free / (1024 * 1024), w_reserved / 1024,
         w_committed / 1024);
 #else
-    Msg("* [win32]: free[%I64d K], reserved[%d K], committed[%d K]", w_free / 1024, w_reserved / 1024, w_committed / 1024);
+    Msg("* [win32]: free[%u K], reserved[%u K], committed[%u K]", w_free / 1024, w_reserved / 1024, w_committed / 1024);
 #endif
 }
 
