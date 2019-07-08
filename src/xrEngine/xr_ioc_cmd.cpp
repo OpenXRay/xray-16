@@ -749,7 +749,7 @@ public:
     }
 };
 
-ENGINE_API float g_fov = 55.0f;
+ENGINE_API float g_fov = 67.5f;
 ENGINE_API float psHUD_FOV = 0.45f;
 
 // extern int psSkeletonUpdate;
