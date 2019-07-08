@@ -1010,7 +1010,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     // Workarounds to preserve backwards compatibility with game scripts
     {
         const bool nilConversion =
-            pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", false);
+            pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", true);
      
         luabind::allow_nil_conversion(nilConversion);
         luabind::disable_super_deprecation();
