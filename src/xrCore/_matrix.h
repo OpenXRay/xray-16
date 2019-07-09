@@ -143,6 +143,8 @@ struct _matrix
         return *this;
     }
 
+    SelfRef invert_44(const Self& other);
+
     SelfRef transpose(const Self& matSource); // faster version of transpose
 
     IC SelfRef transpose() // self transpose - slower

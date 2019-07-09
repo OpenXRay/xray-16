@@ -271,7 +271,7 @@ void CRenderDevice::on_idle()
     // Matrices
     mFullTransform.mul(mProject, mView);
     GEnv.Render->SetCacheXform(mView, mProject);
-    mInvFullTransform.invert(mFullTransform);
+    mInvFullTransform.invert_44(mFullTransform);
 	
     vCameraPositionSaved = vCameraPosition;
     vCameraDirectionSaved = vCameraDirection;

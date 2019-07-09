@@ -39,40 +39,4 @@ ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServer::server_object(LP
 #undef TEMPLATE_SPECIALIZATION
 #undef CSObjectItemClientServer
 
-#ifndef NO_XR_GAME
-#define TEMPLATE_SPECIALIZATION                                                                     \
-    template <typename _client_type_single, typename _client_type_mp, typename _server_type_single, \
-        typename _server_type_mp>
-#define CSObjectItemClientServerSingleMp \
-    CObjectItemClientServerSingleMp<_client_type_single, _client_type_mp, _server_type_single, _server_type_mp>
-
-TEMPLATE_SPECIALIZATION
-IC CSObjectItemClientServerSingleMp::CObjectItemClientServerSingleMp(const CLASS_ID& clsid, LPCSTR script_clsid)
-    : inherited(clsid, script_clsid)
-{
-}
-
-TEMPLATE_SPECIALIZATION
-ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServerSingleMp::client_object() const
-{
-    ObjectFactory::ClientObjectBaseClass* result = new _client_type_single();
-
-    return (result->_construct());
-}
-
-TEMPLATE_SPECIALIZATION
-ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServerSingleMp::server_object(LPCSTR section) const
-{
-    ObjectFactory::ServerObjectBaseClass* result = new _server_type_single(section);
-
-    result = result->init();
-    R_ASSERT(result);
-    return (result);
-}
-
-#undef TEMPLATE_SPECIALIZATION
-#undef CSObjectItemClientServerSingleMp
-
-#endif // NO_XR_GAME
-
 #endif
