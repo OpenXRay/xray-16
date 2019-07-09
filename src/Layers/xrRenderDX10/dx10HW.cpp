@@ -517,4 +517,7 @@ void CHW::UpdateViews()
     R_CHK(R);
 
     _RELEASE(pDepthStencil);
+
+    SET_DEBUG_NAME(pBaseRT, "Base Render Target");
+    SET_DEBUG_NAME(pBaseZB, "Base ZB");
 }

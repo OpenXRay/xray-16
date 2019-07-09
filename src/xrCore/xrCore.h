@@ -45,14 +45,13 @@
 
 // Our headers
 #include "xrDebug.h"
-//#include "vector.h"
 
 #include "clsid.h"
 //#include "Threading/Lock.hpp"
 #include "xrMemory.h"
 
-//#include "_stl_extensions.h"
 #include "_std_extensions.h"
+#include "xrCommon/xr_smart_pointers.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_set.h"
 #include "xrsharedmem.h"

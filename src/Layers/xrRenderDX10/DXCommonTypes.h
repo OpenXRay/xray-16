@@ -61,6 +61,7 @@ typedef ID3D11ShaderResourceView ID3DShaderResourceView;
 typedef ID3D11Query ID3DQuery;
 typedef ID3D11Device ID3DDevice;
 typedef ID3D11DeviceContext ID3DDeviceContext;
+typedef ID3D11DeviceChild ID3DDeviceChild;
 
 #define D3D_COMMONSHADER_SAMPLER_SLOT_COUNT D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT
 
@@ -315,6 +316,7 @@ typedef ID3D10Texture1D ID3DTexture1D;
 typedef ID3D10Device ID3DDevice;
 typedef ID3D10Device ID3DDeviceContext;
 typedef ID3D10Resource ID3DResource;
+typedef ID3D10DeviceChild ID3DDeviceChild;
 
 #define D3D_COMMONSHADER_SAMPLER_SLOT_COUNT D3D10_COMMONSHADER_SAMPLER_SLOT_COUNT
 

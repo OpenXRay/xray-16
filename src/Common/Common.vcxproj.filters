@@ -85,6 +85,12 @@
     <ClInclude Include="..\xrCommon\xr_array.h">
       <Filter>xrCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_queue.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_smart_pointers.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">
@@ -104,5 +110,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CommonImportExport.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

@@ -402,6 +402,8 @@ inline T* CResourceManager::CreateShader(const char* name, const char* filename 
 
         CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
+        SET_DEBUG_NAME(sh->sh, name);
+
         return sh;
     }
 }
