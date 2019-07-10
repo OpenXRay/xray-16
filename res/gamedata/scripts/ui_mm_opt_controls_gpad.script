@@ -1,0 +1,25 @@
+class "opt_controls_gpad"(CUIWindow)
+
+function opt_controls_gpad:__init() super()
+end
+
+function opt_controls_gpad:__finalize()
+end
+
+function opt_controls_gpad:InitControls(x, y, xml, handler)
+	
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+	self:SetAutoDelete(true)
+	
+	xml:InitFrameLine	("tab_controls_gpad:cap_gamepadsetup", self)
+	xml:InitFrameLine	("tab_controls_gpad:cap_gamepadsetup", self)
+	
+	xml:InitKeyBinding	("tab_controls_gpad:key_binding_gpad", self)
+
+	btn_def = xml:Init3tButton("tab_controls_gpad:btn_default", self)
+	handler:Register(btn_def, "btn_gpad_default")
+	
+	btn_back = xml:Init3tButton("tab_controls_gpad:btn_controls", self)
+	handler:Register(btn_back, "btn_keyboard_controls")
+end
