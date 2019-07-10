@@ -28,5 +28,6 @@ function opt_controls:InitControls(x, y, xml, handler)
 	btn = xml:Init3tButton("tab_controls:btn_default", 			self)
 	handler:Register(btn, "btn_keyb_default")
 
-
+	btn_adv	= xml:Init3tButton	("tab_controls:btn_advanced",	self)
+	handler:Register			(btn_adv, "btn_gpad_controls")
 end
