@@ -59,10 +59,10 @@ public:
     UIHint* hint_wnd;
 
 public:
-    CUITaskWnd();
+    CUITaskWnd(UIHint* hint);
     virtual ~CUITaskWnd();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
-    void Init();
+    bool Init();
     virtual void Update();
     virtual void Draw();
     void DrawHint();

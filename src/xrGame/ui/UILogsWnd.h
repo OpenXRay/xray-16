@@ -73,7 +73,7 @@ public:
     CUILogsWnd();
     virtual ~CUILogsWnd();
 
-    void Init();
+    bool Init();
 
     virtual void Show(bool status);
     virtual void Update();

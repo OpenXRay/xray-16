@@ -46,10 +46,14 @@ CUIPdaWnd::CUIPdaWnd()
 
 CUIPdaWnd::~CUIPdaWnd()
 {
-    delete_data(pUITaskWnd);
-    delete_data(pUIFactionWarWnd);
-    delete_data(pUIRankingWnd);
-    delete_data(pUILogsWnd);
+    if (pUITaskWnd)
+        delete_data(pUITaskWnd);
+    if (pUIFactionWarWnd)
+        delete_data(pUIFactionWarWnd);
+    if (pUIRankingWnd)
+        delete_data(pUIRankingWnd);
+    if (pUILogsWnd)
+        delete_data(pUILogsWnd);
     delete_data(m_hint_wnd);
     delete_data(UINoice);
 }
@@ -82,19 +86,21 @@ void CUIPdaWnd::Init()
 
     if (IsGameTypeSingle())
     {
-        pUITaskWnd = new CUITaskWnd();
-        pUITaskWnd->hint_wnd = m_hint_wnd;
-        pUITaskWnd->Init();
+        pUITaskWnd = new CUITaskWnd(m_hint_wnd);
+        if (!pUITaskWnd->Init())
+            xr_delete(pUITaskWnd);
 
-        pUIFactionWarWnd = new CUIFactionWarWnd();
-        pUIFactionWarWnd->hint_wnd = m_hint_wnd;
-        pUIFactionWarWnd->Init();
+        pUIFactionWarWnd = new CUIFactionWarWnd(m_hint_wnd);
+        if (!pUIFactionWarWnd->Init())
+            xr_delete(pUIFactionWarWnd);
 
         pUIRankingWnd = new CUIRankingWnd();
-        pUIRankingWnd->Init();
+        if (!pUIRankingWnd->Init())
+            xr_delete(pUIRankingWnd);
 
         pUILogsWnd = new CUILogsWnd();
-        pUILogsWnd->Init();
+        if (!pUILogsWnd->Init())
+            xr_delete(pUILogsWnd);
     }
 
     UITabControl = new CUITabControl();
@@ -174,8 +180,8 @@ void CUIPdaWnd::Update()
             GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
     }
 
-    R_ASSERT(pUILogsWnd);
-    Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));
+    if (pUILogsWnd)
+        Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));
 }
 
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
@@ -189,19 +195,19 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         m_pActiveDialog->Show(false);
     }
 
-    if (section == "eptTasks")
+    if (section == "eptTasks" && pUITaskWnd)
     {
         m_pActiveDialog = pUITaskWnd;
     }
-    else if ( section == "eptFractionWar" )
+    else if (section == "eptFractionWar" && pUIFactionWarWnd)
     {
    		m_pActiveDialog = pUIFactionWarWnd;
     }
-    else if (section == "eptRanking")
+    else if (section == "eptRanking" && pUIRankingWnd)
     {
         m_pActiveDialog = pUIRankingWnd;
     }
-    else if (section == "eptLogs")
+    else if (section == "eptLogs" && pUILogsWnd)
     {
         m_pActiveDialog = pUILogsWnd;
     }
@@ -238,20 +244,26 @@ void CUIPdaWnd::SetActiveCaption()
 
 void CUIPdaWnd::Show_SecondTaskWnd(bool status)
 {
-    if (status)
+    if (pUITaskWnd)
     {
-        SetActiveSubdialog("eptTasks");
+        if (status)
+        {
+            SetActiveSubdialog("eptTasks");
+        }
+        pUITaskWnd->Show_TaskListWnd(status);
     }
-    pUITaskWnd->Show_TaskListWnd(status);
 }
 
 void CUIPdaWnd::Show_MapLegendWnd(bool status)
 {
-    if (status)
+    if (pUITaskWnd)
     {
-        SetActiveSubdialog("eptTasks");
+        if (status)
+        {
+            SetActiveSubdialog("eptTasks");
+        }
+        pUITaskWnd->ShowMapLegend(status);
     }
-    pUITaskWnd->ShowMapLegend(status);
 }
 
 void CUIPdaWnd::Draw()
@@ -264,19 +276,19 @@ void CUIPdaWnd::Draw()
 
 void CUIPdaWnd::DrawHint()
 {
-    if (m_pActiveDialog == pUITaskWnd)
+    if (m_pActiveDialog == pUITaskWnd && pUITaskWnd)
     {
         pUITaskWnd->DrawHint();
     }
-    else if ( m_pActiveDialog == pUIFactionWarWnd )
+    else if (m_pActiveDialog == pUIFactionWarWnd && pUIFactionWarWnd)
     {
     	m_hint_wnd->Draw();
     }
-    else if (m_pActiveDialog == pUIRankingWnd)
+    else if (m_pActiveDialog == pUIRankingWnd && pUIRankingWnd)
     {
         pUIRankingWnd->DrawHint();
     }
-    else if (m_pActiveDialog == pUILogsWnd)
+    else if (m_pActiveDialog == pUILogsWnd && pUILogsWnd)
     {
     }
     m_hint_wnd->Draw();
@@ -284,15 +296,21 @@ void CUIPdaWnd::DrawHint()
 
 void CUIPdaWnd::UpdatePda()
 {
-    pUILogsWnd->UpdateNews();
+    if (pUILogsWnd)
+        pUILogsWnd->UpdateNews();
 
-    if (m_pActiveDialog == pUITaskWnd)
+    if (m_pActiveDialog == pUITaskWnd && pUITaskWnd)
     {
         pUITaskWnd->ReloadTaskInfo();
     }
 }
 
-void CUIPdaWnd::UpdateRankingWnd() { pUIRankingWnd->Update(); }
+void CUIPdaWnd::UpdateRankingWnd()
+{
+    if (pUIRankingWnd)
+        pUIRankingWnd->Update();
+}
+
 void CUIPdaWnd::Reset()
 {
     inherited::ResetAll();

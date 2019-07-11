@@ -36,6 +36,7 @@ u64 const day2ms = u64(24 * 60 * 60 * 1000);
 
 CUILogsWnd::CUILogsWnd()
 {
+    m_list = nullptr;
     m_actor_ch_info = nullptr;
     m_previous_time = Device.dwTimeGlobal;
     m_selected_period = 0;
@@ -43,7 +44,8 @@ CUILogsWnd::CUILogsWnd()
 
 CUILogsWnd::~CUILogsWnd()
 {
-    m_list->Clear();
+    if (m_list)
+        m_list->Clear();
     delete_data(m_items_cache);
 }
 
@@ -99,9 +101,10 @@ void CUILogsWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     CUIWndCallback::OnEvent(pWnd, msg, pData);
 }
 
-void CUILogsWnd::Init()
+bool CUILogsWnd::Init()
 {
-    m_uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_LOGS_XML);
+    if (!m_uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_LOGS_XML, false))
+        return false;
 
     CUIXmlInit::InitWindow(m_uiXml, "main_wnd", 0, this);
 
@@ -167,7 +170,9 @@ void CUILogsWnd::Init()
 
     m_start_game_time = Level().GetStartGameTime();
     m_start_game_time = GetShiftPeriod(m_start_game_time, 0);
+    return true;
 }
+
 void itemToCache(CUIWindow* w)
 {
     w->SetAutoDelete(false);

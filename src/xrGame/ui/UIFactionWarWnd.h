@@ -21,8 +21,6 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
 
-    bool m_initialized;
-
     CUIFrameWindow* m_background;
     CUIFrameWindow* m_center_background;
 
@@ -89,7 +87,7 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 	float				m_max_power;
 
 public:
-						CUIFactionWarWnd		();
+						CUIFactionWarWnd		(UIHint* hint);
 	virtual				~CUIFactionWarWnd		();
 
 	virtual void		SendMessage				( CUIWindow* pWnd, s16 msg, void* pData );
@@ -99,7 +97,7 @@ public:
 			void		ShowInfo				( bool status );
 
 			void		Reset					();
-			void		Init					();
+			bool		Init					();
 			
 			bool		InitFactions			();
 			void		UpdateInfo				();

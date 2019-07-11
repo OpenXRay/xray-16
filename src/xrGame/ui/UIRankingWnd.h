@@ -78,7 +78,7 @@ public:
     virtual void DrawHint();
     virtual void ResetAll();
 
-    void Init();
+    bool Init();
     void update_info();
 
 protected:

@@ -24,7 +24,7 @@
 
 constexpr pcstr PDA_FACTION_WAR_XML = "pda_fraction_war.xml";
 
-CUIFactionWarWnd::CUIFactionWarWnd()
+CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint) : hint_wnd(hint)
 {
     Reset();
 }
@@ -52,14 +52,11 @@ void CUIFactionWarWnd::Reset()
     m_center_background2 = nullptr;
 }
 
-void CUIFactionWarWnd::Init()
+bool CUIFactionWarWnd::Init()
 {
 	CUIXml xml;
     if (!xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_FACTION_WAR_XML, false))
-    {
-        m_initialized = false;
-        return;
-    }
+        return false;
 
 	CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
 
@@ -165,14 +162,11 @@ void CUIFactionWarWnd::Init()
 	int delay = xml.ReadAttribInt( "main_wnd", 0, "update_delay", 3000 );
 	m_update_delay = (0 < delay)? (u32)delay : 0;
 
-    m_initialized = true;
+    return true;
 }
 
 void CUIFactionWarWnd::ShowInfo( bool status )
 {
-    if (!m_initialized)
-        return;
-
 //	m_target_static->Show( status );
 //	m_target_caption->Show( status );
 //	m_target_desc->Show( status );
@@ -223,9 +217,6 @@ void CUIFactionWarWnd::SendMessage( CUIWindow* pWnd, s16 msg, void* pData )
 
 void CUIFactionWarWnd::Show( bool status )
 {
-    if (!m_initialized)
-        return;
-
     if ( status )
         InitFactions();
 
@@ -237,9 +228,6 @@ void CUIFactionWarWnd::Show( bool status )
 
 void CUIFactionWarWnd::Update()
 {
-    if (!m_initialized)
-        return;
-
     inherited::Update();
     if ( !IsShown() )
     {
@@ -287,9 +275,6 @@ bool CUIFactionWarWnd::InitFactions()
 
 void CUIFactionWarWnd::UpdateInfo()
 {
-    if (!m_initialized)
-        return;
-
     if ( m_our_faction.get_faction_id2().size() == 0 )
     {
         if ( !InitFactions() )
@@ -354,9 +339,6 @@ void CUIFactionWarWnd::UpdateInfo()
 
 void CUIFactionWarWnd::UpdateWarStates( FactionState const& faction )
 {
-    if (!m_initialized)
-        return;
-
     Fvector2 pos;
     pos = m_war_states_parent->GetWndPos();
 
@@ -384,9 +366,6 @@ void CUIFactionWarWnd::UpdateWarStates( FactionState const& faction )
 
 void CUIFactionWarWnd::set_amount_our_bonus( int value )
 {
-    if (!m_initialized)
-        return;
-
     for ( u32 i = 0; i < max_bonuce; ++i )
     {
         m_our_bonuces[i]->SetTextureColor( color_rgba( 255, 255, 255, 70) );
@@ -400,9 +379,6 @@ void CUIFactionWarWnd::set_amount_our_bonus( int value )
 
 void CUIFactionWarWnd::set_amount_enemy_bonus( int value )
 {
-    if (!m_initialized)
-        return;
-
     for ( u32 i = 0; i < max_bonuce; ++i )
     {
         m_enemy_bonuces[i]->SetTextureColor( color_rgba( 255, 255, 255, 70) );

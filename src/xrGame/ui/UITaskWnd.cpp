@@ -21,7 +21,7 @@
 #include "Actor.h"
 #include "xrUICore/Buttons/UICheckButton.h"
 
-CUITaskWnd::CUITaskWnd()
+CUITaskWnd::CUITaskWnd(UIHint* hint)
     : m_background(nullptr), m_background2(nullptr),
       m_center_background(nullptr), m_right_bottom_background(nullptr),
       m_task_split(nullptr), m_pMapWnd(nullptr),
@@ -34,15 +34,17 @@ CUITaskWnd::CUITaskWnd()
       m_bTreasuresEnabled(false), m_bQuestNpcsEnabled(false),
       m_bSecondaryTasksEnabled(false), m_bPrimaryObjectsEnabled(false),
       m_task_wnd(nullptr), m_task_wnd_show(false),
-      m_map_legend_wnd(nullptr), hint_wnd(nullptr)
+      m_map_legend_wnd(nullptr), hint_wnd(hint)
 {
 }
 
 CUITaskWnd::~CUITaskWnd() { delete_data(m_pMapWnd); }
-void CUITaskWnd::Init()
+bool CUITaskWnd::Init()
 {
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_TASK_XML);
+    if (!xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_TASK_XML, false))
+        return false;
+
     VERIFY(hint_wnd);
 
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);
@@ -147,6 +149,8 @@ void CUITaskWnd::Init()
     m_pMapWnd->AttachChild(m_map_legend_wnd);
     m_map_legend_wnd->SetMessageTarget(this);
     m_map_legend_wnd->Show(false);
+
+    return true;
 }
 
 void CUITaskWnd::Update()

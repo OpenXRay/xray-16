@@ -83,11 +83,12 @@ void CUIRankingWnd::Update()
     }
 }
 
-void CUIRankingWnd::Init()
+bool CUIRankingWnd::Init()
 {
     Fvector2 pos;
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_RANKING_XML);
+    if (!xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_RANKING_XML, false))
+        return false;
 
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);
     m_delay = (u32)xml.ReadAttribInt("main_wnd", 0, "delay", 3000);
@@ -150,7 +151,6 @@ void CUIRankingWnd::Init()
     xr_strcat(buf, sizeof(buf), StringTable().translate("ui_ranking_center_caption").c_str());
     m_center_caption->SetText(buf);
 
-
     m_factions_list = UIHelper::CreateScrollView(xml, "fraction_list", this, false);
     if (m_factions_list)
     {
@@ -199,6 +199,8 @@ void CUIRankingWnd::Init()
         }
     }
     xml.SetLocalRoot(stored_root);
+
+    return true;
 }
 
 void CUIRankingWnd::add_faction(CUIXml& xml, shared_str const& faction_id)
