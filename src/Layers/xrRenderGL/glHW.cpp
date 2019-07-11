@@ -66,6 +66,8 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
+    Console->Execute("rs_v_sync apply");
+
 #ifdef DEBUG
     CHK_GL(glEnable(GL_DEBUG_OUTPUT));
     CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
