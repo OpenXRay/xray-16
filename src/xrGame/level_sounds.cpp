@@ -86,7 +86,14 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
 #ifdef DEBUG
     m_DbgName = fn;
 #endif
-    m_SourceStereo.create(fn, st_Music, sg_Undefined);
+    // create source
+    string_path _l, _r;
+    strconcat(sizeof(_l), _l, fn, "_l");
+    strconcat(sizeof(_r), _r, fn, "_r");
+    const bool left = m_SourceLeft.create(_l, st_Music, sg_Undefined);
+    const bool right = m_SourceRight.create(_r, st_Music, sg_Undefined);
+
+    m_SourceStereo.create(fn, st_Music, sg_Undefined, !left && !right);
 
     // parse params
     int cnt = _GetItemCount(params);
@@ -126,17 +133,31 @@ BOOL SMusicTrack::in(u32 game_time)
 void SMusicTrack::Play()
 {
     m_SourceStereo.play_at_pos(0, Fvector().set(0.0f, 0.0f, 0.0f), sm_2D);
+    m_SourceLeft.play_at_pos(0, Fvector().set(-0.5f, 0.f, 0.3f), sm_2D);
+    m_SourceRight.play_at_pos(0, Fvector().set(+0.5f, 0.f, 0.3f), sm_2D);
+
     SetVolume(1.0f);
 }
 
-BOOL SMusicTrack::IsPlaying()
+bool SMusicTrack::IsPlaying() const
 {
-    BOOL ret = (NULL != m_SourceStereo._feedback());
-    return ret;
+    const bool stereo = !!m_SourceStereo._feedback();
+    const bool mono = !!m_SourceLeft._feedback() && !!m_SourceRight._feedback();
+    return stereo || mono;
 }
 
-void SMusicTrack::SetVolume(float volume) { m_SourceStereo.set_volume(volume * m_Volume); }
-void SMusicTrack::Stop() { m_SourceStereo.stop_deferred(); }
+void SMusicTrack::SetVolume(float volume)
+{
+    m_SourceStereo.set_volume(volume * m_Volume);
+    m_SourceLeft.set_volume(volume * m_Volume);
+    m_SourceRight.set_volume(volume * m_Volume);
+}
+void SMusicTrack::Stop()
+{
+    m_SourceStereo.stop_deferred();
+    m_SourceLeft.stop_deferred();
+    m_SourceRight.stop_deferred();
+}
 
 //-----------------------------------------------------------------------------
 // level sound manager

@@ -260,7 +260,7 @@ struct ref_sound
     ~ref_sound() = default;
 
     CSound_source*     _handle() const { return _p ? _p->handle   : nullptr; }
-    CSound_emitter*    _feedback()     { return _p ? _p->feedback : nullptr; }
+    CSound_emitter*    _feedback() const { return _p ? _p->feedback : nullptr; }
     IGameObject*       _g_object()   { VERIFY(_p); return _p->g_object;   }
     int                _g_type()     { VERIFY(_p); return _p->g_type;     }
     esound_type        _sound_type() { VERIFY(_p); return _p->s_type;     }
