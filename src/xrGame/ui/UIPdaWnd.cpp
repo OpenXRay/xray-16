@@ -300,7 +300,7 @@ void CUIPdaWnd::Reset()
     if (pUITaskWnd)
         pUITaskWnd->ResetAll();
     if (pUIFactionWarWnd)	
-		pUITaskWnd->ResetAll();
+        pUIFactionWarWnd->ResetAll();
     if (pUIRankingWnd)
         pUIRankingWnd->ResetAll();
     if (pUILogsWnd)
