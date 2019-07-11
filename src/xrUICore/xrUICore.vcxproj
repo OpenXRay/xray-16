@@ -274,6 +274,7 @@
     <ClInclude Include="ui_defs.h" />
     <ClInclude Include="Windows\UIFrameLineWnd.h" />
     <ClInclude Include="Windows\UIFrameWindow.h" />
+    <ClInclude Include="Windows\UITextFrameLineWnd.h" />
     <ClInclude Include="Windows\UIWindow.h" />
     <ClInclude Include="XML\UITextureMaster.h" />
     <ClInclude Include="XML\UIXmlInitBase.h" />
@@ -342,6 +343,7 @@
     <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="Windows\UIFrameLineWnd.cpp" />
     <ClCompile Include="Windows\UIFrameWindow.cpp" />
+    <ClCompile Include="Windows\UITextFrameLineWnd.cpp" />
     <ClCompile Include="Windows\UIWindow.cpp" />
     <ClCompile Include="Windows\UIWindow_script.cpp" />
     <ClCompile Include="XML\UITextureMaster.cpp" />

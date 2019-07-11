@@ -271,6 +271,9 @@
     <ClCompile Include="ListWnd\UIListItem.cpp">
       <Filter>ListWnd</Filter>
     </ClCompile>
+    <ClCompile Include="Windows\UITextFrameLineWnd.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h">
@@ -447,6 +450,9 @@
     </ClInclude>
     <ClInclude Include="ListWnd\UIListWnd_inline.h">
       <Filter>ListWnd</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\UITextFrameLineWnd.h">
+      <Filter>Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
