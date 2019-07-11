@@ -26,6 +26,101 @@
 
 CUIActorMenu::CUIActorMenu()
 {
+    m_hint_wnd = nullptr;
+    m_ItemInfo = nullptr;
+    m_InfoCellItem = nullptr;
+    m_pCurrentCellItem = nullptr;
+    m_upgrade_selected = nullptr;
+    m_UIPropertiesBox = nullptr;
+
+    m_ActorStateInfo = nullptr;
+    m_ActorCharacterInfo = nullptr;
+    m_PartnerCharacterInfo = nullptr;
+
+    m_pInventoryBeltList = nullptr;
+    m_pInventoryPistolList = nullptr;
+    m_pInventoryAutomaticList = nullptr;
+    m_pInventoryOutfitList = nullptr;
+    m_pInventoryHelmetList = nullptr;
+    m_pInventoryDetectorList = nullptr;
+    m_pInventoryBagList = nullptr;
+
+    m_pTradeActorBagList = nullptr;
+    m_pTradeActorList = nullptr;
+    m_pTradePartnerBagList = nullptr;
+    m_pTradePartnerList = nullptr;
+    m_pDeadBodyBagList = nullptr;
+    m_pTrashList = nullptr;
+
+    for (auto& item : m_belt_list_over)
+        item = nullptr;
+
+    m_HelmetOver = nullptr;
+
+    m_InvSlot2Highlight = nullptr;
+    m_InvSlot3Highlight = nullptr;
+    m_HelmetSlotHighlight = nullptr;
+    m_OutfitSlotHighlight = nullptr;
+    m_DetectorSlotHighlight = nullptr;
+
+    for (auto& slot : m_QuickSlotsHighlight)
+        slot = nullptr;
+
+    for (auto& slot : m_ArtefactSlotsHighlight)
+        slot = nullptr;
+
+    m_pUpgradeWnd = nullptr;
+
+    m_LeftBackground = nullptr;
+
+    m_upgrade_info = nullptr;
+    m_message_box_yes_no = nullptr;
+    m_message_box_ok = nullptr;
+
+    m_pActorInvOwner = nullptr;
+    m_pPartnerInvOwner = nullptr;
+    m_pInvBox = nullptr;
+
+    m_ActorMoney = nullptr;
+    m_PartnerMoney = nullptr;
+    m_QuickSlot1 = nullptr;
+    m_QuickSlot2 = nullptr;
+    m_QuickSlot3 = nullptr;
+    m_QuickSlot4 = nullptr;
+
+    m_WeaponSlot1_progress = nullptr;
+    m_WeaponSlot2_progress = nullptr;
+    m_Helmet_progress = nullptr;
+    m_Outfit_progress = nullptr;
+
+    m_ActorBottomInfo = nullptr;
+    m_ActorWeight = nullptr;
+    m_ActorWeightMax = nullptr;
+
+    m_PartnerBottomInfo = nullptr;
+    m_PartnerWeight = nullptr;
+
+    m_LeftDelimiter = nullptr;
+    m_PartnerTradeCaption = nullptr;
+    m_PartnerTradePrice = nullptr;
+    m_PartnerTradeWeightMax = nullptr;
+
+    m_RightDelimiter = nullptr;
+    m_ActorTradeCaption = nullptr;
+    m_ActorTradePrice = nullptr;
+    m_ActorTradeWeightMax = nullptr;
+
+    m_actor_trade = nullptr;
+    m_partner_trade = nullptr;
+
+    m_trade_button = nullptr;
+    m_trade_buy_button = nullptr;
+    m_trade_sell_button = nullptr;
+    m_takeall_button = nullptr;
+    m_exit_button = nullptr;
+    m_clock_value = nullptr;
+    m_pQuickSlot = nullptr;
+
     m_currMenuMode = mmUndefined;
     m_trade_partner_inventory_state = 0;
     Construct();
