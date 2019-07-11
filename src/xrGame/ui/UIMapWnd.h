@@ -111,7 +111,7 @@ protected:
     void Activated();
 
 public:
-    CUIMapWnd();
+    CUIMapWnd(UIHint* hint);
     virtual ~CUIMapWnd();
 
     virtual void Init(LPCSTR xml_name, LPCSTR start_from);

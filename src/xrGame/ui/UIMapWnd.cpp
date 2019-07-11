@@ -21,7 +21,7 @@
 
 CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(
 CUIMapWnd* GetMapWnd() { return g_map_wnd; }
-CUIMapWnd::CUIMapWnd()
+CUIMapWnd::CUIMapWnd(UIHint* hint)
 {
     m_tgtMap = NULL;
     m_GlobalMap = NULL;
@@ -39,7 +39,7 @@ CUIMapWnd::CUIMapWnd()
     //	UIMainMapHeader			= NULL;
     m_scroll_mode = false;
     m_nav_timing = Device.dwTimeGlobal;
-    hint_wnd = NULL;
+    hint_wnd = hint;
     g_map_wnd = this;
 }
 

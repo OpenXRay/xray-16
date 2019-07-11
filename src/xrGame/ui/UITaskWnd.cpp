@@ -88,9 +88,8 @@ bool CUITaskWnd::Init()
     }
     m_bQuestNpcsEnabled = true;
 
-    m_pMapWnd = new CUIMapWnd();
+    m_pMapWnd = new CUIMapWnd(hint_wnd);
     m_pMapWnd->SetAutoDelete(false);
-    m_pMapWnd->hint_wnd = hint_wnd;
     m_pMapWnd->Init(PDA_TASK_XML, "map_wnd");
     AttachChild(m_pMapWnd);
 
