@@ -36,11 +36,11 @@ void RearrangeTabButtons(CUITabControl* pTab);
 
 CUIPdaWnd::CUIPdaWnd()
 {
-    pUITaskWnd = NULL;
-    pUIFactionWarWnd = NULL;
-    pUIRankingWnd = NULL;
-    pUILogsWnd = NULL;
-    m_hint_wnd = NULL;
+    pUITaskWnd = nullptr;
+    pUIFactionWarWnd = nullptr;
+    pUIRankingWnd = nullptr;
+    pUILogsWnd = nullptr;
+    m_hint_wnd = nullptr;
     Init();
 }
 
