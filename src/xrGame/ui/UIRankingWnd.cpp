@@ -28,6 +28,18 @@
 #define PDA_RANKING_XML "pda_ranking.xml"
 
 CUIRankingWnd::CUIRankingWnd()
+    : m_background(nullptr), m_background2(nullptr),
+      m_center_background(nullptr), m_down_background(nullptr),
+      m_icon_overlay(nullptr), m_money_caption(nullptr),
+      m_money_value(nullptr), m_center_caption(nullptr),
+      m_faction_static(nullptr), m_faction_line1(nullptr),
+      m_faction_line2(nullptr), m_factions_list(nullptr),
+      m_achievements(nullptr), m_achievements_background(nullptr),
+      m_monster_background(nullptr), m_monster_over(nullptr),
+      m_favorite_weapon_ramka(nullptr), m_favorite_weapon_over(nullptr),
+      m_monster_icon_back(nullptr), m_monster_icon(nullptr),
+      m_favorite_weapon_bckgrnd(nullptr), m_favorite_weapon_icon(nullptr),
+      m_stat_caption{}, m_stat_info{}, m_stat_count(0)
 {
     m_actor_ch_info = nullptr;
     m_previous_time = Device.dwTimeGlobal;
