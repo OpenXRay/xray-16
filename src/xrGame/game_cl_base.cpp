@@ -322,6 +322,11 @@ ClientID game_cl_GameState::GetClientIDByOrderID(u32 idx)
     return I->first;
 }
 
+void game_cl_GameState::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
+{
+    CurrentGameUI()->StartStopMenu(pDialog, bDoHideIndicators);
+}
+
 void game_cl_GameState::shedule_Update(u32 dt)
 {
     ScheduledBase::shedule_Update(dt);

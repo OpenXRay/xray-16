@@ -2248,6 +2248,9 @@
     <Filter Include="Core\Client\Ansel">
       <UniqueIdentifier>{5774e461-6abd-4bcb-888c-af7a7d5ab679}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Server\Games\server\base">
+      <UniqueIdentifier>{f7b72e14-4fc5-4054-98a9-cff48b3fc45b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -5739,12 +5742,6 @@
     <ClInclude Include="game_cl_capturetheartefact_snd_msg.h">
       <Filter>Core\Server\Games\client\capture_the_artefact</Filter>
     </ClInclude>
-    <ClInclude Include="game_sv_base.h">
-      <Filter>Core\Server\Games\server</Filter>
-    </ClInclude>
-    <ClInclude Include="game_sv_base_console_vars.h">
-      <Filter>Core\Server\Games\server</Filter>
-    </ClInclude>
     <ClInclude Include="game_sv_event_queue.h">
       <Filter>Core\Server\Games\server</Filter>
     </ClInclude>
@@ -6475,6 +6472,18 @@
     </ClInclude>
     <ClInclude Include="ui\UIActorInfo.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClInclude>
+    <ClInclude Include="game_cl_mp_script.h">
+      <Filter>Core\Server\Games\client\mp</Filter>
+    </ClInclude>
+    <ClInclude Include="game_sv_mp_script.h">
+      <Filter>Core\Server\Games\server\mp</Filter>
+    </ClInclude>
+    <ClInclude Include="game_sv_base.h">
+      <Filter>Core\Server\Games\server\base</Filter>
+    </ClInclude>
+    <ClInclude Include="game_sv_base_console_vars.h">
+      <Filter>Core\Server\Games\server\base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -8947,12 +8956,6 @@
     <ClCompile Include="game_cl_capturetheartefact_buywnd.cpp">
       <Filter>Core\Server\Games\client\capture_the_artefact</Filter>
     </ClCompile>
-    <ClCompile Include="game_sv_base.cpp">
-      <Filter>Core\Server\Games\server</Filter>
-    </ClCompile>
-    <ClCompile Include="game_sv_base_console_vars.cpp">
-      <Filter>Core\Server\Games\server</Filter>
-    </ClCompile>
     <ClCompile Include="game_sv_event_queue.cpp">
       <Filter>Core\Server\Games\server</Filter>
     </ClCompile>
@@ -9815,6 +9818,27 @@
     </ClCompile>
     <ClCompile Include="ui\UIActorInfo.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClCompile>
+    <ClCompile Include="game_cl_mp_script.cpp">
+      <Filter>Core\Server\Games\client\mp</Filter>
+    </ClCompile>
+    <ClCompile Include="game_sv_mp_script.cpp">
+      <Filter>Core\Server\Games\server\mp</Filter>
+    </ClCompile>
+    <ClCompile Include="game_base_script.cpp">
+      <Filter>Core\Server\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="game_sv_base.cpp">
+      <Filter>Core\Server\Games\server\base</Filter>
+    </ClCompile>
+    <ClCompile Include="game_sv_base_console_vars.cpp">
+      <Filter>Core\Server\Games\server\base</Filter>
+    </ClCompile>
+    <ClCompile Include="game_sv_base_script.cpp">
+      <Filter>Core\Server\Games\server\base</Filter>
+    </ClCompile>
+    <ClCompile Include="game_cl_base_script.cpp">
+      <Filter>Core\Server\Games\client\base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

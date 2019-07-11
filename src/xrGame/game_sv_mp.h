@@ -30,7 +30,9 @@ struct Rank_Struct
 
 class game_sv_mp : public game_sv_GameState
 {
-    typedef game_sv_GameState inherited;
+    friend void game_sv_mp_script_register(lua_State* luaState);
+
+    using inherited = game_sv_GameState;
 
 protected:
     //список трупов для удаления

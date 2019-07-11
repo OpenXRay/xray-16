@@ -10,6 +10,7 @@
 #include "ui/UIDialogWnd.h"
 
 using namespace luabind;
+using namespace luabind::policy;
 
 #pragma warning(push)
 #pragma warning(disable : 4709)
@@ -30,10 +31,13 @@ struct CWrapperBase : public T, public luabind::wrap_base
     DEFINE_LUA_WRAPPER_METHOD_V1(shedule_Update, u32)
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(GetMapEntities, xr_vector<SZoneMapEntityData>)
 
-    virtual game_PlayerState* createPlayerState()
+    game_PlayerState* createPlayerState() override
     {
-        return call_member<game_PlayerState*>(this, "createPlayerState")[adopt(result)];
+        return call_member<game_PlayerState*>(this, "createPlayerState");
+        // XXX: investigate
+        //return call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
     }
+
     static game_PlayerState* createPlayerState_static(inherited* ptr)
     {
         return ptr->self_type::inherited::createPlayerState();
@@ -50,7 +54,7 @@ game_cl_mp_script::game_cl_mp_script() : inherited(){};
 
 CScriptGameObject* game_cl_mp_script::GetObjectByGameID(u16 id)
 {
-    CObject* pObject = Level().Objects.net_Find(id);
+    IGameObject* pObject = Level().Objects.net_Find(id);
     CGameObject* pGameObject = smart_cast<CGameObject*>(pObject);
     if (!pGameObject)
         return NULL;
@@ -72,47 +76,60 @@ LPCSTR game_cl_mp_script::GetRoundTime()
     return bufTime;
 }
 
-#pragma optimize("s", on)
-void game_cl_mp::script_register(lua_State* L)
+SCRIPT_EXPORT(game_cl_GameState, (game_GameState),
 {
-    module(L)[class_<game_cl_GameState, game_GameState>("game_cl_GameState")
-                  .def_readwrite("local_svdpnid", &game_cl_GameState::local_svdpnid)
-                  .def_readwrite("local_player", &game_cl_GameState::local_player),
+    module(luaState)
+    [
+        class_<game_cl_GameState, game_GameState>("game_cl_GameState")
+            .def_readwrite("local_svdpnid", &game_cl_GameState::local_svdpnid)
+            .def_readwrite("local_player", &game_cl_GameState::local_player)
+    ];
+});
 
-        class_<game_cl_mp, game_cl_GameState>("game_cl_mp")];
+SCRIPT_EXPORT(game_cl_mp, (game_cl_GameState),
+{
+    module(luaState)
+    [
+        class_<game_cl_mp, game_cl_GameState>("game_cl_mp")
+    ];
+
+});
+
+void game_cl_mp_script_script_register(lua_State* luaState)
+{
+    using WrapType = CWrapperBase<game_cl_mp_script>;
+    using BaseType = game_cl_mp_script;
+
+    module(luaState)
+    [
+        class_<game_cl_mp_script, game_cl_mp, default_holder, WrapType>("game_cl_mp_script")
+            .def(constructor<>())
+            .def("CommonMessageOut", &BaseType::CommonMessageOut)
+            .def("GetPlayersCount", &BaseType::GetPlayersCount)
+            .def("GetObjectByGameID", &BaseType::GetObjectByGameID)
+            .def("GetPlayerByOrderID", &BaseType::GetPlayerByOrderID)
+            .def("GetClientIDByOrderID", &BaseType::GetClientIDByOrderID)
+            .def("GetLocalPlayer", &BaseType::GetLocalPlayer)
+            .def("EventGen", &BaseType::EventGen)
+            .def("GameEventGen", &BaseType::GameEventGen)
+            .def("EventSend", &BaseType::EventSend)
+            .def("StartStopMenu", &BaseType::StartStopMenu)
+            .def("StartMenu", &BaseType::StartStopMenu)
+            .def("StopMenu", &BaseType::StartStopMenu)
+            .def("GetRoundTime", &BaseType::GetRoundTime)
+            
+            .def("CanBeReady", &BaseType::CanBeReady, &WrapType::CanBeReady_static)
+            .def("Init", &BaseType::Init, &WrapType::Init_static)
+            .def("OnKeyboardPress", &BaseType::OnKeyboardPress, &WrapType::OnKeyboardPress_static)
+            .def("OnKeyboardRelease", &BaseType::OnKeyboardRelease, &WrapType::OnKeyboardRelease_static)
+            .def("net_import_state", &BaseType::net_import_state, &WrapType::net_import_state_static)
+            .def("shedule_Update", &BaseType::shedule_Update, &WrapType::shedule_Update_static)
+            .def("FillMapEntities", &BaseType::GetMapEntities, &WrapType::GetMapEntities_static)
+            .def("TranslateGameMessage", &BaseType::TranslateGameMessage, &WrapType::TranslateGameMessage_static)
+            
+            .def("createPlayerState", &BaseType::createPlayerState, &WrapType::createPlayerState_static, adopt<0>())
+            .def("createGameUI", &BaseType::createGameUI, &WrapType::createGameUI_static, adopt<0>())
+    ];
 }
 
-void game_cl_mp_script::script_register(lua_State* L)
-{
-    typedef CWrapperBase<game_cl_mp_script> WrapType;
-    typedef game_cl_mp_script BaseType;
-
-    module(L)[class_<game_cl_mp_script, WrapType, game_cl_mp>("game_cl_mp_script")
-                  .def(constructor<>())
-                  .def("CommonMessageOut", &BaseType::CommonMessageOut)
-                  .def("GetPlayersCount", &BaseType::GetPlayersCount)
-                  .def("GetObjectByGameID", &BaseType::GetObjectByGameID)
-                  .def("GetPlayerByOrderID", &BaseType::GetPlayerByOrderID)
-                  .def("GetClientIDByOrderID", &BaseType::GetClientIDByOrderID)
-                  .def("GetLocalPlayer", &BaseType::GetLocalPlayer)
-                  .def("EventGen", &BaseType::EventGen)
-                  .def("GameEventGen", &BaseType::GameEventGen)
-                  .def("EventSend", &BaseType::EventSend)
-                  .def("StartStopMenu", &BaseType::StartStopMenu)
-                  .def("StartMenu", &BaseType::StartStopMenu)
-                  .def("StopMenu", &BaseType::StartStopMenu)
-                  .def("GetRoundTime", &BaseType::GetRoundTime)
-
-                  .def("CanBeReady", &BaseType::CanBeReady, &WrapType::CanBeReady_static)
-                  .def("Init", &BaseType::Init, &WrapType::Init_static)
-                  .def("OnKeyboardPress", &BaseType::OnKeyboardPress, &WrapType::OnKeyboardPress_static)
-                  .def("OnKeyboardRelease", &BaseType::OnKeyboardRelease, &WrapType::OnKeyboardRelease_static)
-                  .def("net_import_state", &BaseType::net_import_state, &WrapType::net_import_state_static)
-                  .def("shedule_Update", &BaseType::shedule_Update, &WrapType::shedule_Update_static)
-                  .def("FillMapEntities", &BaseType::GetMapEntities, &WrapType::GetMapEntities_static)
-                  .def("TranslateGameMessage", &BaseType::TranslateGameMessage, &WrapType::TranslateGameMessage_static)
-
-                  .def("createPlayerState", &BaseType::createPlayerState, &WrapType::createPlayerState_static,
-                      adopt(result))
-                  .def("createGameUI", &BaseType::createGameUI, &WrapType::createGameUI_static, adopt(result))];
-}
+SCRIPT_EXPORT_FUNC(game_cl_mp_script, (game_cl_mp), game_cl_mp_script_script_register);
