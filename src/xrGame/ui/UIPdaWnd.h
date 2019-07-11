@@ -14,6 +14,7 @@ class UIHint;
 
 class CUITaskWnd;
 class CUIFactionWarWnd;
+class CUIActorInfoWnd;
 class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
@@ -44,6 +45,7 @@ protected:
 public:
     CUITaskWnd* pUITaskWnd;
     CUIFactionWarWnd* pUIFactionWarWnd;
+    CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
     CUILogsWnd* pUILogsWnd;
 

@@ -261,6 +261,11 @@ void CUISequenceSimpleItem::Start()
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
             bShowPda = true;
         }
+        else if (!stricmp(m_pda_section, "pda_statistics"))
+        {
+            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptStatistics");
+            bShowPda = true;
+        }
         else if (!xr_stricmp(m_pda_section, "pda_ranking"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptRanking");

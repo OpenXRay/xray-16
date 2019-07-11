@@ -25,6 +25,7 @@
 #include "xrUICore/Buttons/UIBtnHint.h"
 #include "UITaskWnd.h"
 #include "UIFactionWarWnd.h"
+#include "UIActorInfo.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
 
@@ -38,6 +39,7 @@ CUIPdaWnd::CUIPdaWnd()
 {
     pUITaskWnd = nullptr;
     pUIFactionWarWnd = nullptr;
+    pUIActorInfo = nullptr;
     pUIRankingWnd = nullptr;
     pUILogsWnd = nullptr;
     m_hint_wnd = nullptr;
@@ -50,6 +52,8 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUITaskWnd);
     if (pUIFactionWarWnd)
         delete_data(pUIFactionWarWnd);
+    if (pUIActorInfo)
+        delete_data(pUIActorInfo);
     if (pUIRankingWnd)
         delete_data(pUIRankingWnd);
     if (pUILogsWnd)
@@ -93,6 +97,10 @@ void CUIPdaWnd::Init()
         pUIFactionWarWnd = new CUIFactionWarWnd(m_hint_wnd);
         if (!pUIFactionWarWnd->Init())
             xr_delete(pUIFactionWarWnd);
+
+        pUIActorInfo = new CUIActorInfoWnd();
+        if (!pUIActorInfo->Init())
+            xr_delete(pUIActorInfo);
 
         pUIRankingWnd = new CUIRankingWnd();
         if (!pUIRankingWnd->Init())
@@ -202,6 +210,11 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     else if (section == "eptFractionWar" && pUIFactionWarWnd)
     {
    		m_pActiveDialog = pUIFactionWarWnd;
+    }
+    else if (section == "eptStatistics" && pUIActorInfo)
+    {
+        m_pActiveDialog = pUIActorInfo;
+        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
     }
     else if (section == "eptRanking" && pUIRankingWnd)
     {
@@ -319,6 +332,8 @@ void CUIPdaWnd::Reset()
         pUITaskWnd->ResetAll();
     if (pUIFactionWarWnd)	
         pUIFactionWarWnd->ResetAll();
+    if (pUIActorInfo)
+        pUIActorInfo->ResetAll();
     if (pUIRankingWnd)
         pUIRankingWnd->ResetAll();
     if (pUILogsWnd)

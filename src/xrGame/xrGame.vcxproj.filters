@@ -6473,6 +6473,9 @@
     <ClInclude Include="ui\UIRankFaction.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIActorInfo.h">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9808,6 +9811,9 @@
       <Filter>Core\Client\Ansel</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIRankFaction.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIActorInfo.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
   </ItemGroup>

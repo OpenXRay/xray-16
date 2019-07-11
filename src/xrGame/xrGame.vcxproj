@@ -1469,6 +1469,7 @@
     <ClInclude Include="ui\ServerList.h" />
     <ClInclude Include="ui\TeamInfo.h" />
     <ClInclude Include="ui\UIAchievements.h" />
+    <ClInclude Include="ui\UIActorInfo.h" />
     <ClInclude Include="ui\UIActorMenu.h" />
     <ClInclude Include="ui\UIActorStateInfo.h" />
     <ClInclude Include="ui\UIBoosterInfo.h" />
@@ -3373,6 +3374,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="ui\UIActorInfo.cpp" />
     <ClCompile Include="ui\UIActorMenu.cpp" />
     <ClCompile Include="ui\UIActorMenuDeadBodySearch.cpp" />
     <ClCompile Include="ui\UIActorMenuInitialize.cpp" />
