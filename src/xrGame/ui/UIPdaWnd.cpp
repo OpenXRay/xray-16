@@ -295,7 +295,7 @@ void CUIPdaWnd::DrawHint()
     }
     else if (m_pActiveDialog == pUIFactionWarWnd && pUIFactionWarWnd)
     {
-    	m_hint_wnd->Draw();
+        //m_hint_wnd->Draw();
     }
     else if (m_pActiveDialog == pUIRankingWnd && pUIRankingWnd)
     {

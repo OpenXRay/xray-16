@@ -24,9 +24,10 @@
 
 constexpr pcstr PDA_FACTION_WAR_XML = "pda_fraction_war.xml";
 
-CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint) : hint_wnd(hint)
+CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint)
 {
     Reset();
+    hint_wnd = hint;
 }
 
 CUIFactionWarWnd::~CUIFactionWarWnd()
