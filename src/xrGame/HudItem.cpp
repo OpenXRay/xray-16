@@ -146,7 +146,7 @@ void CHudItem::OnAnimationEnd(u32 state)
     }
 }
 
-void CHudItem::PlayAnimBore() { PlayHUDMotion("anm_bore", TRUE, this, GetState()); }
+void CHudItem::PlayAnimBore() { PlayHUDMotion("anm_bore", "anim_idle", TRUE, this, GetState()); }
 bool CHudItem::ActivateItem()
 {
     OnActiveItem();
@@ -275,6 +275,18 @@ u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem* W, u32 s
     return anim_time;
 }
 
+u32 CHudItem::PlayHUDMotion(const shared_str& M, const shared_str& M2, BOOL bMixIn, CHudItem* W, u32 state)
+{
+    u32 time = 0;
+
+    if (isHUDAnimationExist(M.c_str()))
+        time = PlayHUDMotion(M, bMixIn, W, state);
+    else if (isHUDAnimationExist(M2.c_str()))
+        time = PlayHUDMotion(M2, bMixIn, W, state);
+
+    return time;
+}
+
 u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, BOOL bMixIn)
 {
     m_current_motion = motion_name;
@@ -320,7 +332,7 @@ void CHudItem::PlayAnimIdle()
     if (TryPlayAnimIdle())
         return;
 
-    PlayHUDMotion("anm_idle", TRUE, NULL, GetState());
+    PlayHUDMotion("anm_idle", "anim_idle", TRUE, NULL, GetState());
 }
 
 bool CHudItem::TryPlayAnimIdle()
@@ -377,9 +389,9 @@ bool CHudItem::isHUDAnimationExist(pcstr anim_name)
     return false;
 }
 
-void CHudItem::PlayAnimIdleMovingCrouch() { PlayHUDMotion("anm_idle_moving_crouch", true, nullptr, GetState()); }
-void CHudItem::PlayAnimIdleMoving() { PlayHUDMotion("anm_idle_moving", true, nullptr, GetState()); }
-void CHudItem::PlayAnimIdleSprint() { PlayHUDMotion("anm_idle_sprint", true, nullptr, GetState()); }
+void CHudItem::PlayAnimIdleMovingCrouch() { PlayHUDMotion("anm_idle_moving_crouch", "anim_idle", true, nullptr, GetState()); }
+void CHudItem::PlayAnimIdleMoving() { PlayHUDMotion("anm_idle_moving", "anim_idle", true, nullptr, GetState()); }
+void CHudItem::PlayAnimIdleSprint() { PlayHUDMotion("anm_idle_sprint", "anim_idle", true, nullptr, GetState()); }
 void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 {
     if (GetState() == eIdle && !m_bStopAtEndAnimIsRunning)

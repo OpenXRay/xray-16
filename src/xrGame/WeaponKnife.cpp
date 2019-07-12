@@ -46,6 +46,9 @@ CWeaponKnife::CWeaponKnife()
     m_Splash2HitsCount = 2;
 
     m_NextHitDivideFactor = 0.75f;
+
+    oldStrikeMethod = false;
+    hitEndAnimation = false;
 }
 
 enum class FieldTypes
@@ -321,7 +324,7 @@ void CWeaponKnife::OnMotionMark(u32 state, const motion_marks& M)
     p1.set(get_LastFP());
     d.set(get_LastFD());
 
-    if (H_Parent())
+    if (H_Parent() && !hitEndAnimation)
     {
         smart_cast<CEntity*>(H_Parent())->g_fireParams(this, p1, d);
         KnifeStrike(p1, d);
@@ -335,8 +338,24 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
     case eHiding: SwitchState(eHidden); break;
 
     case eFire:
-    case eFire2: SwitchState(eIdle); break;
-
+    case eFire2:
+    {
+        if (attackStarted)
+        {
+            attackStarted = false;
+            if (state == eFire)
+                PlayHUDMotion("anm_attack_end", "anim_shoot1_end", FALSE, this, state);
+            else // eFire2
+                PlayHUDMotion("anm_attack2_end", "anim_shoot2_end", FALSE, this, state);
+            hitEndAnimation = true;
+        }
+        else
+        {
+            hitEndAnimation = false;
+            SwitchState(eIdle);
+        }
+        break;
+    }
     case eShowing:
     case eIdle: SwitchState(eIdle); break;
 
@@ -351,10 +370,11 @@ void CWeaponKnife::switch2_Attacking(u32 state)
         return;
 
     if (state == eFire)
-        PlayHUDMotion("anm_attack", FALSE, this, state);
+        PlayHUDMotion("anm_attack", "anim_shoot1_start", FALSE, this, state);
     else // eFire2
-        PlayHUDMotion("anm_attack2", FALSE, this, state);
+        PlayHUDMotion("anm_attack2", "anim_shoot2_start", FALSE, this, state);
 
+    attackStarted = true;
     SetPending(TRUE);
 }
 
@@ -370,7 +390,7 @@ void CWeaponKnife::switch2_Hiding()
 {
     FireEnd();
     VERIFY(GetState() == eHiding);
-    PlayHUDMotion("anm_hide", TRUE, this, GetState());
+    PlayHUDMotion("anm_hide", "anim_hide", TRUE, this, GetState());
 }
 
 void CWeaponKnife::switch2_Hidden()
@@ -382,7 +402,7 @@ void CWeaponKnife::switch2_Hidden()
 void CWeaponKnife::switch2_Showing()
 {
     VERIFY(GetState() == eShowing);
-    PlayHUDMotion("anm_show", FALSE, this, GetState());
+    PlayHUDMotion("anm_show", "anim_draw", FALSE, this, GetState());
 }
 
 void CWeaponKnife::FireStart()
