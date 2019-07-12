@@ -68,24 +68,13 @@ void CUICustomMap::Draw()
 void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     m_name = name;
-    Fvector4 tmp;
 
-    if (pLtx.line_exist(sect_name, "texture"))
-    {
-        m_texture = pLtx.r_string(sect_name, "texture");
-        tmp = pLtx.r_fvector4(sect_name, "bound_rect");
-    }
-    /// XXX: Check this case for Shadow of Chernobyl
-    /*else if (pLtx.line_exist(m_name, "texture"))
-    {
-        m_texture = pLtx.r_string(m_name, "texture");
-        tmp = pLtx.r_fvector4(m_name, "bound_rect");
-    }*/
-    else
-    {
-        m_texture = "ui\\ui_nomap2";
-        tmp.set(-10000.0f, -10000.0f, 10000.0f, 10000.0f);
-    }
+    m_texture = pLtx.read_if_exists<pcstr>(sect_name, "texture", "ui\\ui_nomap2");
+    if (pLtx.line_exist(m_name, "texture"))
+        m_texture = pLtx.r_string(m_name, "texture"); // Override if needed
+
+    Fvector4 tmp = pLtx.read_if_exists<Fvector4>(sect_name, "bound_rect", {-10000.0f, -10000.0f, 10000.0f, 10000.0f});
+    pLtx.read_if_exists(tmp, m_name, "bound_rect"); // Override if needed
 
     m_shader_name = sh_name;
 
