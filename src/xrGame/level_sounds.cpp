@@ -90,8 +90,8 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
     string_path _l, _r;
     strconcat(sizeof(_l), _l, fn, "_l");
     strconcat(sizeof(_r), _r, fn, "_r");
-    const bool left = m_SourceLeft.create(_l, st_Music, sg_Undefined);
-    const bool right = m_SourceRight.create(_r, st_Music, sg_Undefined);
+    const bool left = m_SourceLeft.create(_l, st_Music, sg_Undefined, false);
+    const bool right = m_SourceRight.create(_r, st_Music, sg_Undefined, false);
 
     m_SourceStereo.create(fn, st_Music, sg_Undefined, !left && !right);
 
