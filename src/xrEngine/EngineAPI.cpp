@@ -220,11 +220,10 @@ void CEngineAPI::CreateRendererList()
         {
             // Load SupportCheck, SetupEnv and GetModeName functions from DLL
             const auto checkSupport = (SupportCheck)renderers[library]->GetProcAddress(check_function);
-            const auto getModeName  = (GetModeName)renderers[library]->GetProcAddress(mode_function);
 
             // Test availability
             if (checkSupport && checkSupport())
-                modes.emplace_back(getModeName ? getModeName() : mode, index);
+                modes.emplace_back(mode, index);
             else // Close the handle if test is failed
                 renderers[library]->Close();
         }

@@ -17,11 +17,6 @@ XR_EXPORT void SetupEnv()
     xrRender_initconsole();
 }
 
-XR_EXPORT pcstr GetModeName()
-{
-    return "renderer_r4";
-}
-
 XR_EXPORT bool CheckRendererSupport()
 {
     return xrRender_test_hw() ? true : false;

@@ -17,11 +17,6 @@ XR_EXPORT void SetupEnv()
     xrRender_initconsole();
 }
 
-XR_EXPORT pcstr GetModeName()
-{
-    return "renderer_gl";
-}
-
 XR_EXPORT bool CheckRendererSupport()
 {
     // XXX: do a real check

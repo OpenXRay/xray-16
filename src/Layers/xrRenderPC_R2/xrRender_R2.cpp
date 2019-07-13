@@ -17,11 +17,6 @@ XR_EXPORT void SetupEnv()
     xrRender_initconsole();
 }
 
-XR_EXPORT pcstr GetModeName()
-{
-    return "renderer_r2.5";
-}
-
 XR_EXPORT bool CheckRendererSupport()
 {
     D3DCAPS9 caps;
