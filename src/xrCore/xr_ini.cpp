@@ -1114,6 +1114,12 @@ void CInifile::remove_line(pcstr S, pcstr L)
 }
 
 template<>
+XRCORE_API pcstr CInifile::read(pcstr section, pcstr line) const
+{
+    return r_string(section, line);
+}
+
+template<>
 XRCORE_API u8 CInifile::read(pcstr section, pcstr line) const
 {
     return r_u8(section, line);
