@@ -87,7 +87,10 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
                 editKB = new CUIEditKeyBind(false, true);
             editKB->SetAutoDelete(true);
             editKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, item->GetWndSize().y));
-            editKB->AssignProps(exe, "key_binding");
+            if (!m_isGamepadBinds)
+                editKB->AssignProps(exe, "key_binding");
+            else
+                editKB->AssignProps(exe, "key_binding_gpad");
             item->AttachChild(editKB);
 
             if (!m_isGamepadBinds)

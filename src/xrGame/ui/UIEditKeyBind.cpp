@@ -5,10 +5,10 @@
 #include "Common/object_broker.h"
 #include "xrEngine/XR_IOConsole.h"
 
-CUIEditKeyBind::CUIEditKeyBind(bool primary, bool gpadBinds /*= false*/)
+CUIEditKeyBind::CUIEditKeyBind(bool primary, bool isGamepadBinds /*= false*/)
 {
     m_primary = primary;
-    m_gpadBinds = gpadBinds;
+    m_isGamepadBinds = isGamepadBinds;
     m_isEditMode = false;
     TextItemControl()->SetTextComplexMode(false);
     m_keyboard = NULL;
@@ -87,6 +87,10 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
         m_keyboard = DikToPtr(mouse_btn, true);
         if (!m_keyboard)
             return true;
+
+        if (m_isGamepadBinds && (mouse_btn <= XR_CONTROLLER_BUTTON_A || mouse_btn >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
+            return true;
+
         SetValue();
         OnFocusLost();
 
@@ -117,6 +121,9 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
         m_keyboard = DikToPtr(dik, true);
         if (!m_keyboard)
+            return true;
+
+        if (m_isGamepadBinds && (dik <= XR_CONTROLLER_BUTTON_A || dik >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
             return true;
 
         SetValue();
@@ -170,7 +177,7 @@ void CUIEditKeyBind::SetCurrentOptValue()
 {
     key_binding* binding = &g_key_bindings[m_action->id];
 
-    int idx = (!m_gpadBinds) ? ((m_primary) ? 0 : 1) : 2;
+    int idx = (!m_isGamepadBinds) ? ((m_primary) ? 0 : 1) : 2;
     m_keyboard = binding->m_keyboard[idx];
 
     SetValue();
@@ -201,13 +208,13 @@ bool CUIEditKeyBind::IsChangedOptValue() const
 
 void CUIEditKeyBind::BindAction2Key()
 {
-    xr_string comm_unbind = (!m_gpadBinds) ? ((m_primary) ? "unbind " : "unbind_sec ") : "unbind_gpad ";
+    xr_string comm_unbind = (!m_isGamepadBinds) ? ((m_primary) ? "unbind " : "unbind_sec ") : "unbind_gpad ";
     comm_unbind += m_action->action_name;
     Console->Execute(comm_unbind.c_str());
 
     if (m_keyboard)
     {
-        xr_string comm_bind = (!m_gpadBinds) ? ((m_primary) ? "bind " : "bind_sec ") : "bind_gpad ";
+        xr_string comm_bind = (!m_isGamepadBinds) ? ((m_primary) ? "bind " : "bind_sec ") : "bind_gpad ";
         comm_bind += m_action->action_name;
         comm_bind += " ";
         comm_bind += m_keyboard->key_name;

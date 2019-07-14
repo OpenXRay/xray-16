@@ -116,6 +116,9 @@ function options_dialog:SetCurrentValues()
 
 	opt:SetCurrentValues("key_binding")
 	opt:SaveBackupValues("key_binding")
+	
+	opt:SetCurrentValues("key_binding_gpad")
+	opt:SaveBackupValues("key_binding_gpad")
 
 	self:UpdateDependControls()
 end
@@ -241,6 +244,7 @@ function options_dialog:OnBtnAccept()
 	opt:SaveValues("mm_opt_sound")
 	opt:SaveValues("mm_opt_controls")
 	--opt:SaveValues("mm_opt_controls_adv")
+	opt:SaveValues("key_binding_gpad")
 
 	if opt:NeedVidRestart() then
 		_G.b_discard_settings_shown = true
@@ -333,6 +337,12 @@ function options_dialog:OnBtnKbdControls()
 end
 
 function options_dialog:OnBtnGpadDefault()
+	local console			= get_console()
+	console:execute			("default_controls")
+
+	local opt				= COptionsManager()
+	opt:SetCurrentValues	("mm_opt_controls")
+	opt:SetCurrentValues	("key_binding_gpad")
 end
 
 function options_dialog:OnKeyboard(dik, keyboard_action)
