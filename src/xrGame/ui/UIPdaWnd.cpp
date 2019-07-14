@@ -37,6 +37,7 @@ void RearrangeTabButtons(CUITabControl* pTab);
 
 CUIPdaWnd::CUIPdaWnd()
 {
+    pUIMapWnd = nullptr;
     pUITaskWnd = nullptr;
     pUIFactionWarWnd = nullptr;
     pUIActorInfo = nullptr;
@@ -48,6 +49,8 @@ CUIPdaWnd::CUIPdaWnd()
 
 CUIPdaWnd::~CUIPdaWnd()
 {
+    if (pUIMapWnd)
+        delete_data(pUIMapWnd);
     if (pUITaskWnd)
         delete_data(pUITaskWnd);
     if (pUIFactionWarWnd)
@@ -90,6 +93,10 @@ void CUIPdaWnd::Init()
 
     if (IsGameTypeSingle())
     {
+        pUIMapWnd = new CUIMapWnd(m_hint_wnd);
+        if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
+            xr_delete(pUIMapWnd);
+
         pUITaskWnd = new CUITaskWnd(m_hint_wnd);
         if (!pUITaskWnd->Init())
             xr_delete(pUITaskWnd);
@@ -163,7 +170,10 @@ void CUIPdaWnd::Show(bool status)
 
         if (!m_pActiveDialog)
         {
-            SetActiveSubdialog("eptTasks");
+            if (pUIMapWnd && !pUITaskWnd)
+                SetActiveSubdialog("eptMap");
+            else
+                SetActiveSubdialog("eptTasks");
         }
         m_pActiveDialog->Show(true);
     }
@@ -203,7 +213,11 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         m_pActiveDialog->Show(false);
     }
 
-    if (section == "eptTasks" && pUITaskWnd)
+    if (section == "eptMap" && pUIMapWnd)
+    {
+        m_pActiveDialog = pUIMapWnd;
+    }
+    else if (section == "eptTasks" && pUITaskWnd)
     {
         m_pActiveDialog = pUITaskWnd;
     }
@@ -328,6 +342,8 @@ void CUIPdaWnd::Reset()
 {
     inherited::ResetAll();
 
+    if (pUIMapWnd)
+        pUIMapWnd->Reset();
     if (pUITaskWnd)
         pUITaskWnd->ResetAll();
     if (pUIFactionWarWnd)	

@@ -12,6 +12,7 @@ class CUIXml;
 class CUIFrameWindow;
 class UIHint;
 
+class CUIMapWnd;
 class CUITaskWnd;
 class CUIFactionWarWnd;
 class CUIActorInfoWnd;
@@ -43,6 +44,8 @@ protected:
     UIHint* m_hint_wnd;
 
 public:
+    // Поддиалоги PDA
+    CUIMapWnd* pUIMapWnd;
     CUITaskWnd* pUITaskWnd;
     CUIFactionWarWnd* pUIFactionWarWnd;
     CUIActorInfoWnd* pUIActorInfo;

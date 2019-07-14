@@ -43,7 +43,7 @@ private:
     CUIScrollBar* m_UIMainScrollH;
     CUIWindow* m_UILevelFrame;
     CMapActionPlanner* m_ActionPlanner;
-    //	CUIFrameLineWnd*			UIMainMapHeader;
+    CUIFrameLineWnd* m_UIMainMapHeader;
     CUIMapLocationHint* m_map_location_hint;
 
 #ifdef DEBUG
@@ -114,7 +114,7 @@ public:
     CUIMapWnd(UIHint* hint);
     virtual ~CUIMapWnd();
 
-    virtual void Init(LPCSTR xml_name, LPCSTR start_from);
+    virtual bool Init(cpcstr xml_name, cpcstr start_from, bool critical = true);
     virtual void Show(bool status);
     virtual void Draw();
     virtual void Reset();

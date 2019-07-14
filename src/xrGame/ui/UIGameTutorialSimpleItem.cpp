@@ -256,7 +256,12 @@ void CUISequenceSimpleItem::Start()
             return;
         }
 
-        if (!xr_stricmp(m_pda_section, "pda_tasks"))
+        if (!xr_stricmp(m_pda_section, "pda_map"))
+        {
+            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptMap");
+            bShowPda = true;
+        }
+        else if (!xr_stricmp(m_pda_section, "pda_tasks"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
             bShowPda = true;
