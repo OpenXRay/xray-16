@@ -134,6 +134,7 @@ struct _matrix
 
     SelfRef invert(const Self& a); // important: this is 4x3 invert, not the 4x4 one
     bool invert_b(const Self& a); // important: this is 4x3 invert, not the 4x4 one
+    SelfRef invert_44(const Self& a);
 
     IC SelfRef invert() // slower than invert other matrix
     {
