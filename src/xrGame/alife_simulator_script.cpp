@@ -44,7 +44,7 @@ bool valid_object_id(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
     return (object_id != 0xffff);
 }
 
-CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
+CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, pcstr name)
 {
     VERIFY(self);
 
@@ -56,7 +56,7 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
             return (it->second);
     }
 
-    return (0);
+    return nullptr;
 }
 
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID id, bool no_assert)
@@ -333,6 +333,7 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("level_name", &get_level_name)
             .def("object",
                 (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
+            .def("object", (CSE_ALifeDynamicObject*(*)(const CALifeSimulator*, pcstr))(alife_object))
             .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
                                alife_object))
 	        .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
