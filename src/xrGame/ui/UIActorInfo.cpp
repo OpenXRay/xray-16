@@ -3,7 +3,7 @@
 #include "UIXmlInit.h"
 
 #include "xrUICore/Windows/UITextFrameLineWnd.h"
-#include "xrUIcore/Static/UIAnimatedStatic.h"
+#include "xrUICore/Static/UIAnimatedStatic.h"
 
 #include "Actor.h"
 
