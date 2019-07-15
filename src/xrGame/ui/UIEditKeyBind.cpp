@@ -208,10 +208,6 @@ bool CUIEditKeyBind::IsChangedOptValue() const
 
 void CUIEditKeyBind::BindAction2Key()
 {
-    xr_string comm_unbind = (!m_isGamepadBinds) ? ((m_primary) ? "unbind " : "unbind_sec ") : "unbind_gpad ";
-    comm_unbind += m_action->action_name;
-    Console->Execute(comm_unbind.c_str());
-
     if (m_keyboard)
     {
         xr_string comm_bind = (!m_isGamepadBinds) ? ((m_primary) ? "bind " : "bind_sec ") : "bind_gpad ";
