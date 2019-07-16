@@ -16,6 +16,7 @@
 
 CHudItem::CHudItem()
 {
+    m_animation_slot = u32(-1);
     RenderHud(TRUE);
     EnableHudInertion(TRUE);
     AllowHudInertion(TRUE);
@@ -36,10 +37,15 @@ IFactoryObject* CHudItem::_construct()
 }
 
 CHudItem::~CHudItem() {}
-void CHudItem::Load(LPCSTR section)
+void CHudItem::Load(cpcstr section)
 {
-    hud_sect = pSettings->r_string(section, "hud");
-    m_animation_slot = pSettings->r_u32(section, "animation_slot");
+    //загрузить hud, если он нужен
+    hud_sect = pSettings->read_if_exists<pcstr>(section, "hud", nullptr);
+
+    if (m_animation_slot != u32(-1)) // if it has default hardcoded slot, then don't crash
+        pSettings->read_if_exists(m_animation_slot, section, "animation_slot");
+    else // if it doesn't, then crash if line is missing from config
+        m_animation_slot = pSettings->r_u32(section, "animation_slot");
 
     m_sounds.LoadSound(section, "snd_bore", "sndBore", true);
 }

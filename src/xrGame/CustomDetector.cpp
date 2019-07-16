@@ -197,6 +197,7 @@ BOOL CCustomDetector::net_Spawn(CSE_Abstract* DC)
 
 void CCustomDetector::Load(LPCSTR section)
 {
+    m_animation_slot = 7;
     inherited::Load(section);
 
     m_fAfDetectRadius = pSettings->read_if_exists<float>(section, "af_radius", 30.0f);
