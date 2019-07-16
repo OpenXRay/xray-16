@@ -119,23 +119,6 @@ void CEngineAPI::InitializeRenderers()
     setupSelectedRenderer();
 
     Log("Selected renderer:", Console->GetString("renderer"));
-
-    // Now unload unused renderers
-    // XXX: Unloading disabled due to typeids invalidation
-    /*if (GEnv.CurrentRenderer != 5)
-        renderers[gl_library]->close();
-
-    if (GEnv.CurrentRenderer != 4)
-        renderers[r4_library]->close();
-
-    if (GEnv.CurrentRenderer != 3)
-        renderers[r3_library]->close();
-
-    if (GEnv.CurrentRenderer != 2)
-        renderers[r2_library]->close();
-
-    if (GEnv.CurrentRenderer != 1)
-        renderers[r1_library]->close();*/
 }
 
 void CEngineAPI::Initialize(void)
@@ -170,6 +153,8 @@ void CEngineAPI::Initialize(void)
 
         tune_enabled = true;
     }
+
+    CloseUnusedLibraries();
 }
 
 void CEngineAPI::Destroy(void)
@@ -181,6 +166,27 @@ void CEngineAPI::Destroy(void)
     renderers.clear();
     Engine.Event._destroy();
     XRC.r_clear_compact();
+}
+
+void CEngineAPI::CloseUnusedLibraries()
+{
+    // Only windows because on linux only one library is loaded - xrRender_GL
+#ifdef WINDOWS
+    if (GEnv.CurrentRenderer != 5 && renderers[gl_library]->IsLoaded())
+        renderers[gl_library]->Close();
+
+    if (GEnv.CurrentRenderer != 4 && renderers[r4_library]->IsLoaded())
+        renderers[r4_library]->Close();
+
+    if (GEnv.CurrentRenderer != 3 && renderers[r3_library]->IsLoaded())
+        renderers[r3_library]->Close();
+
+    if (GEnv.CurrentRenderer != 2 && renderers[r2_library]->IsLoaded())
+        renderers[r2_library]->Close();
+
+    if (GEnv.CurrentRenderer != 1 && renderers[r1_library]->IsLoaded())
+        renderers[r1_library]->Close();
+#endif
 }
 
 void CEngineAPI::CreateRendererList()
