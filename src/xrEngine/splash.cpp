@@ -134,7 +134,7 @@ public:
         SDL_UpdateWindowSurface(m_window);
 
         m_should_exit.Reset();
-        thread_spawn(splash_proc, "X-Ray Splash Thread", 0, this);
+        Threading::SpawnThread(splash_proc, "X-Ray Splash Thread", 0, this);
     }
 
     void hide()

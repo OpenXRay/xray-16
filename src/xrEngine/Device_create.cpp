@@ -37,10 +37,10 @@ void CRenderDevice::Create()
     // Start all threads
     mt_bMustExit = FALSE;
 
-    thread_name("X-Ray Window thread");
-    thread_spawn(PrimaryThreadProc, "X-RAY Primary thread", 0, this);
-    thread_spawn(SecondaryThreadProc, "X-Ray Secondary thread", 0, this);
-    // thread_spawn(RenderThreadProc, "X-Ray Render thread", 0, this);
+    Threading::SetThreadName(NULL, "X-Ray Window thread");
+    Threading::SpawnThread(PrimaryThreadProc, "X-RAY Primary thread", 0, this);
+    Threading::SpawnThread(SecondaryThreadProc, "X-Ray Secondary thread", 0, this);
+    // Threading::SpawnThread(RenderThreadProc, "X-Ray Render thread", 0, this);
 
     TaskScheduler = std::make_unique<TaskManager>();
     TaskScheduler->Initialize();

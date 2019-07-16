@@ -80,7 +80,7 @@ void task_manager::startup()
     start_time.Start();
     tasks_completed = 0;
     // create_user( );
-    thread_spawn(task_manager::user_thread_proc, "release-user", 1024 * 1024, this);
+    Threading::SpawnThread(task_manager::user_thread_proc, "release-user", 1024 * 1024, this);
     for (;;)
     {
         Sleep(1);
@@ -197,7 +197,7 @@ void task_manager::release()
     init_lock.Enter();
     _release = true;
     init_lock.Leave();
-    //	thread_spawn	(task_manager::release_user_thread_proc,"release-user",1024*1024,this);
+    // Threading::SpawnThread(task_manager::release_user_thread_proc, "release-user", 1024 * 1024, this);
 }
 
 void task_manager::add_task(net_execution* task)
