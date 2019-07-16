@@ -227,15 +227,21 @@ void CreateLog(BOOL nl)
             abort();
         }
         
+#ifdef USE_LOG_TIMING
         time_t t = time(NULL);
         tm* ti = localtime(&t);
         char buf[64];
         strftime(buf, 64, "[%x %X]\t", ti);
+#endif
 
         for (u32 it = 0; it < LogFile.size(); it++)
         {
             LPCSTR s = LogFile[it].c_str();
-            LogWriter->w_printf("%s%s\n", buf, s ? s : "");
+#ifdef USE_LOG_TIMING
+            LogWriter->w_printf("%s%s\r\n", buf, s ? s : "");
+#else
+            LogWriter->w_printf("%s\r\n", s ? s : "");
+#endif
         }
         LogWriter->flush();
     }
