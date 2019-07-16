@@ -47,13 +47,14 @@ using VTResume = void __cdecl(void);
 
 class ENGINE_API CEngineAPI
 {
+    using SupportCheck = bool(*)();
+    using SetupEnv = void(*)();
+
     XRay::Module hGame;
     XRay::Module hTuner;
-    XRay::Module hRenderR1;
-    XRay::Module hRenderR2;
-    XRay::Module hRenderR3;
-    XRay::Module hRenderR4;
-    XRay::Module hRenderRGL;
+    xr_map<pcstr, XRay::Module> m_renderers;
+
+    SetupEnv m_setupSelectedRenderer;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
@@ -63,9 +64,10 @@ public:
     VTPause* tune_pause;
     VTResume* tune_resume;
     void Initialize();
+    void CloseUnusedLibraries();
 
     void InitializeRenderers();
-    void SetupCurrentRenderer();
+    void SelectRenderer();
 
     void Destroy();
 

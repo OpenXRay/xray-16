@@ -3,7 +3,9 @@
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-void SetupEnvR1()
+extern "C"
+{
+XR_EXPORT void SetupEnvR1()
 {
     GEnv.Render = &RImplementation;
     GEnv.RenderFactory = &RenderFactoryImpl;
@@ -15,16 +17,8 @@ void SetupEnvR1()
     xrRender_initconsole();
 }
 
-// This must not be optimized by compiler
-static const volatile class GEnvHelper
+XR_EXPORT bool CheckRendererSupport()
 {
-public:
-    GEnvHelper()
-    {
-        GEnv.SetupR1 = SetupEnvR1;
-    }
-    ~GEnvHelper()
-    {
-        GEnv.SetupR1 = nullptr;
-    }
-} helper;
+    return true;
+}
+}

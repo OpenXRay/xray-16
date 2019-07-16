@@ -1,6 +1,6 @@
 #include "stdafx.h"
-
 #include "ModuleLookup.hpp"
+
 #ifdef LINUX
 #include <dlfcn.h>
 #endif
@@ -45,7 +45,7 @@ void* ModuleHandle::Open(pcstr moduleName)
 
 void ModuleHandle::Close()
 {
-    if (dontUnload)
+    if (dontUnload || !IsLoaded())
         return;
 
     bool closed = false;

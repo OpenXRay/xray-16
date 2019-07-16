@@ -34,6 +34,7 @@ void CHW::DestroyD3D()
 {
     _SHOW_REF("refCount:pD3D", pD3D);
     _RELEASE(pD3D);
+    hD3D = nullptr;
 }
 
 void CHW::CreateDevice(HWND m_hWnd, bool move_window)

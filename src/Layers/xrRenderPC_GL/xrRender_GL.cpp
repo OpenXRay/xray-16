@@ -5,7 +5,9 @@
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-void SetupEnvRGL()
+extern "C"
+{
+XR_EXPORT void SetupEnvRGL()
 {
     GEnv.Render = &RImplementation;
     GEnv.RenderFactory = &RenderFactoryImpl;
@@ -17,25 +19,9 @@ void SetupEnvRGL()
     xrRender_initconsole();
 }
 
-bool SupportsOpenGLRendering()
+XR_EXPORT bool CheckRendererSupport()
 {
     // XXX: do a real check
     return true;
 }
-
-// This must not be optimized by compiler
-static const volatile class GEnvHelper
-{
-public:
-    GEnvHelper()
-    {
-        GEnv.CheckRGL = SupportsOpenGLRendering;
-        GEnv.SetupRGL = SetupEnvRGL;
-    }
-
-    ~GEnvHelper()
-    {
-        GEnv.SetupRGL = nullptr;
-        GEnv.SetupRGL = nullptr;
-    }
-} helper;
+}
