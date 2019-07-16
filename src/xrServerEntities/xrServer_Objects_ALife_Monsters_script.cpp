@@ -75,7 +75,7 @@ SCRIPT_EXPORT(CSE_ALifeTrader, (CSE_ALifeDynamicObjectVisual, CSE_ALifeTraderAbs
     ];
 });
 
-SCRIPT_EXPORT(CSE_ALifeCustomZone, (CSE_ALifeDynamicObject, CSE_Shape),
+SCRIPT_EXPORT(CSE_ALifeCustomZone, (CSE_ALifeSpaceRestrictor),
 {
 	module(luaState)[
 		luabind_class_dynamic_alife1(

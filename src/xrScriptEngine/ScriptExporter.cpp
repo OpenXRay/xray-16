@@ -19,6 +19,30 @@ ScriptExporter::Node::Node(const char* id, size_t depCount, const char* const* d
     InsertAfter(nullptr, this);
 }
 
+ScriptExporter::Node::~Node()
+{
+    // Remap locals
+    // ... <-> N <-> this <-> N <-> ...
+    {
+        if (prevNode)
+            prevNode->nextNode = this->nextNode;
+
+        if (nextNode)
+            nextNode->prevNode = this->prevNode;
+    }
+
+    // Remap globals
+    {
+        // this <-> N <-> ...
+        if (firstNode == this)
+            firstNode = this->nextNode;
+
+        // ... <-> N <-> this
+        if (lastNode == this)
+            lastNode = this->prevNode;
+    }
+}
+
 void ScriptExporter::Node::Export(lua_State* luaState)
 {
     if (done)
@@ -75,13 +99,13 @@ void ScriptExporter::Node::InsertAfter(Node* target, Node* node)
 {
     if (!target)
     {
-        node->prevNode = nullptr;
-        node->nextNode = firstNode;
-        if (firstNode)
-            firstNode->prevNode = node;
+        node->prevNode = lastNode;
+        node->nextNode = nullptr;
+        if (lastNode)
+            lastNode->nextNode = node;
         else
-            lastNode = node;
-        firstNode = node;
+            firstNode = node;
+        lastNode = node;
     }
     else
     {

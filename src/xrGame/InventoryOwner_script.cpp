@@ -8,9 +8,9 @@ using namespace luabind;
 
 static void CInventoryOwner_Export(lua_State* luaState)
 {
-        module(luaState)
-		[
-            class_<CInventory>("CInventory")
+    module(luaState)
+    [
+        class_<CInventory>("CInventory")
 			.def("TotalWeight", &CInventory::TotalWeight)
 			.def("CalcTotalWeight", &CInventory::CalcTotalWeight)
 			.def("GetActiveSlot", &CInventory::GetActiveSlot)
@@ -54,8 +54,8 @@ static void CInventoryOwner_Export(lua_State* luaState)
 #endif
 				luabind::value("LAST_SLOT", LAST_SLOT)
 			]
-			,
-			class_<CInventoryOwner>("CInventoryOwner")
+        ,
+        class_<CInventoryOwner>("CInventoryOwner")
 			//.def(constructor<>())
 			.def("trade_section", &CInventoryOwner::trade_section)
 			.def("sell_useless_items", &CInventoryOwner::sell_useless_items)
@@ -81,6 +81,6 @@ static void CInventoryOwner_Export(lua_State* luaState)
 			.def("deadbody_can_take_status", &CInventoryOwner::deadbody_can_take_status)
 			.def("deadbody_closed", &CInventoryOwner::deadbody_closed)
 			.def("deadbody_closed_status", &CInventoryOwner::deadbody_closed_status)
-		];
+    ];
 };
 SCRIPT_EXPORT_FUNC(CInventoryOwner, (), CInventoryOwner_Export);

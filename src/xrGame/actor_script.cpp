@@ -19,7 +19,8 @@ using namespace luabind;
 IC static void CActor_Export(lua_State* luaState)
 {
     module(luaState)
-    [class_<CActor, bases<CEntityAlive, CInventoryOwner>>("CActor")
+    [
+        class_<CActor, bases<CEntityAlive, CInventoryOwner>>("CActor")
             .def(constructor<>())
             .def("conditions", &CActor::conditions)
             .def("ObjectWeLookingAt", &CActor::ObjectWeLookingAt_script)
@@ -64,4 +65,4 @@ IC static void CActor_Export(lua_State* luaState)
     ];
 };
 
-SCRIPT_EXPORT_FUNC(CActor, (CGameObject), CActor_Export);
+SCRIPT_EXPORT_FUNC(CActor, (CEntityAlive, CInventoryOwner), CActor_Export);

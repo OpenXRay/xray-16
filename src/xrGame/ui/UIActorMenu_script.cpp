@@ -296,7 +296,7 @@ void CUIActorMenu::HighlightForEachInSlot(const luabind::functor<bool>& functor,
 template<class T>
 class enum_dummy {};
 
-SCRIPT_EXPORT(CUIActorMenu, (),
+SCRIPT_EXPORT(CUIActorMenu, (CUIDialogWnd),
 {
     module(luaState)
     [
