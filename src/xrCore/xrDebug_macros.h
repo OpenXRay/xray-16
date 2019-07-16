@@ -68,7 +68,7 @@
     {\
         static bool ignoreAlways = false;\
         if (!ignoreAlways && !(expr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr);\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, "Verifying failed");\
     } while (false)
 #define VERIFY2(expr, desc)\
     do\
