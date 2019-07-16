@@ -31,6 +31,22 @@ u16 INV_STATE_BLOCK_ALL = 0xffff;
 u16 INV_STATE_INV_WND = INV_STATE_BLOCK_ALL;
 u16 INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
 
+bool defaultSlotActiveness[] =
+{
+    true, // knife
+    true, // pistol
+    true, // automatic
+    true, // grenades
+    true, // binocular
+    true, // bolt
+    false, // outfit
+    false, // pda
+    false, // detector
+    false, // torch
+    true, // artefact
+    false // helmet
+};
+
 CInventorySlot::CInventorySlot()
 {
     m_pIItem = NULL;
@@ -64,10 +80,10 @@ CInventory::CInventory()
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
     {
         xr_sprintf(temp, "slot_persistent_%d", i);
-        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
+        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
 
         xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
+        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
     };
 
     m_bSlotsUseful = true;
