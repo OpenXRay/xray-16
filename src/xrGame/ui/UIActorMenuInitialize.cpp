@@ -123,6 +123,10 @@ CUIActorMenu::CUIActorMenu()
 
     m_currMenuMode = mmUndefined;
     m_trade_partner_inventory_state = 0;
+    // Xottab_DUTY: Let others can launch SOC without debugger
+    // XXX: to be removed
+    if (ShadowOfChernobylMode)
+        return;
     Construct();
 }
 

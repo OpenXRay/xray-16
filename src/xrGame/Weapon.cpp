@@ -411,7 +411,8 @@ void CWeapon::Load(LPCSTR section)
     else if (m_eScopeStatus == ALife::eAddonPermanent)
     {
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
-        if (!GEnv.isDedicatedServer)
+        // Xottab_DUTY: Let others can launch SOC without debugger
+        if (!GEnv.isDedicatedServer && !ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
         {
             m_UIScope = new CUIWindow();
             if (!pWpnScopeXml)

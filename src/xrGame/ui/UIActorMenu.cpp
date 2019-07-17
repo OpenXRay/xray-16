@@ -790,6 +790,10 @@ void CUIActorMenu::highlight_weapons_for_addon(PIItem addon_item, CUIDragDropLis
 
 void CUIActorMenu::ClearAllLists()
 {
+    // Xottab_DUTY: Let others can launch SOC without debugger
+    // XXX: to be removed
+    if (ShadowOfChernobylMode)
+        return;
     m_pInventoryBagList->ClearAll(true);
 
     m_pInventoryBeltList->ClearAll(true);
