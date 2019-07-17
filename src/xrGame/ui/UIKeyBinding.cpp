@@ -7,7 +7,7 @@
 #include "xr_level_controller.h"
 #include "string_table.h"
 
-CUIKeyBinding::CUIKeyBinding()
+CUIKeyBinding::CUIKeyBinding() : b_isGamepadBinds(false)
 {
     for (int i = 0; i < 3; i++)
         AttachChild(&m_header[i]);
@@ -24,10 +24,12 @@ void CUIKeyBinding::InitFromXml(CUIXml& xml_doc, LPCSTR path)
     AttachChild(m_scroll_wnd);
     CUIXmlInit::InitScrollView(xml_doc, strconcat(sizeof(buf), buf, path, ":scroll_view"), 0, m_scroll_wnd);
 
+    b_isGamepadBinds = !!(xml_doc.ReadAttribInt(path, 0, "gamepad_bind", 0));
     CUIXmlInit::InitFrameWindow(xml_doc, strconcat(sizeof(buf), buf, path, ":frame"), 0, &m_frame);
     CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_1"), 0, &m_header[0]);
     CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_2"), 0, &m_header[1]);
-    CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_3"), 0, &m_header[2]);
+    if (!b_isGamepadBinds)
+        CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_3"), 0, &m_header[2]);
 
     FillUpList(xml_doc, path);
 }
@@ -78,19 +80,26 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
 
             float item_width = m_header[1].GetWidth() - 3.0f;
             float item_pos = m_header[1].GetWndPos().x;
-            CUIEditKeyBind* pEditKB = new CUIEditKeyBind(true);
+            CUIEditKeyBind* pEditKB;
+            if (!b_isGamepadBinds)
+                pEditKB = new CUIEditKeyBind(true);
+            else
+                pEditKB = new CUIEditKeyBind(false, true);
             pEditKB->SetAutoDelete(true);
             pEditKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, pItem->GetWndSize().y));
             pEditKB->AssignProps(exe, "key_binding");
             pItem->AttachChild(pEditKB);
 
-            item_width = m_header[2].GetWidth() - 3.0f;
-            item_pos = m_header[2].GetWndPos().x;
-            pEditKB = new CUIEditKeyBind(false);
-            pEditKB->SetAutoDelete(true);
-            pEditKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, pItem->GetWndSize().y));
-            pEditKB->AssignProps(exe, "key_binding");
-            pItem->AttachChild(pEditKB);
+            if (!b_isGamepadBinds)
+            {
+                item_width = m_header[2].GetWidth() - 3.0f;
+                item_pos = m_header[2].GetWndPos().x;
+                pEditKB = new CUIEditKeyBind(false);
+                pEditKB->SetAutoDelete(true);
+                pEditKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, pItem->GetWndSize().y));
+                pEditKB->AssignProps(exe, "key_binding");
+                pItem->AttachChild(pEditKB);
+            }
         }
         xml_doc.SetLocalRoot(xml_doc.GetRoot());
     }

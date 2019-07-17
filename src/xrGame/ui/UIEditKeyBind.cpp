@@ -5,9 +5,10 @@
 #include "Common/object_broker.h"
 #include "xrEngine/XR_IOConsole.h"
 
-CUIEditKeyBind::CUIEditKeyBind(bool bPrim)
+CUIEditKeyBind::CUIEditKeyBind(bool bPrim, bool bGcBinds /*= false*/)
 {
     m_bPrimary = bPrim;
+    m_bGamepadBinds = bGcBinds;
     m_bIsEditMode = false;
     TextItemControl()->SetTextComplexMode(false);
     m_keyboard = NULL;
@@ -163,7 +164,7 @@ void CUIEditKeyBind::SetCurrentOptValue()
 {
     _binding* pbinding = &g_key_bindings[m_action->id];
 
-    int idx = (m_bPrimary) ? 0 : 1;
+    int idx = (!m_bGamepadBinds) ? ((m_bPrimary) ? 0 : 1) : 2;
     m_keyboard = pbinding->m_keyboard[idx];
 
     SetValue();
@@ -190,13 +191,13 @@ void CUIEditKeyBind::UndoOptValue()
 bool CUIEditKeyBind::IsChangedOptValue() const { return m_keyboard != m_opt_backup_value; }
 void CUIEditKeyBind::BindAction2Key()
 {
-    xr_string comm_unbind = (m_bPrimary) ? "unbind " : "unbind_sec ";
+    xr_string comm_unbind = (!m_bGamepadBinds) ? ((m_bPrimary) ? "unbind " : "unbind_sec ") : "unbind_gpad ";
     comm_unbind += m_action->action_name;
     Console->Execute(comm_unbind.c_str());
 
     if (m_keyboard)
     {
-        xr_string comm_bind = (m_bPrimary) ? "bind " : "bind_sec ";
+        xr_string comm_bind = (!m_bGamepadBinds) ? ((m_bPrimary) ? "bind " : "bind_sec ") : "bind_gpad ";
         comm_bind += m_action->action_name;
         comm_bind += " ";
         comm_bind += m_keyboard->key_name;

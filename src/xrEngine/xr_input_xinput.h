@@ -160,10 +160,11 @@ extern ENGINE_API _action actions[];
 extern ENGINE_API _keyboard keyboards[];
 
 #define bindings_count kLASTACTION
+#define bindtypes_count 3
 struct ENGINE_API _binding
 {
     _action* m_action;
-    _keyboard* m_keyboard[2];
+    _keyboard* m_keyboard[bindtypes_count];
 };
 
 extern ENGINE_API _binding g_key_bindings[];

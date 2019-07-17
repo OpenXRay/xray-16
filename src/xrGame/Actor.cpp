@@ -964,13 +964,12 @@ void CActor::UpdateCL()
         {
             const bool allowed = psActorFlags.test(AF_MULTI_ITEM_PICKUP);
 
-            auto dik = get_action_dik(kUSE, 0);
-            if (dik && pInput->iGetAsyncKeyState(dik) && allowed)
-                m_bPickupMode = true;
-
-            dik = get_action_dik(kUSE, 1);
-            if (dik && pInput->iGetAsyncKeyState(dik) && allowed)
-                m_bPickupMode = true;
+            for (u8 i = 0; i < bindtypes_count && allowed; ++i)
+            {
+                const int dik = get_action_dik(kUSE, i);
+                if (dik && pInput->iGetAsyncKeyState(dik))
+                    m_bPickupMode = true;
+            }
         }
         else
         {

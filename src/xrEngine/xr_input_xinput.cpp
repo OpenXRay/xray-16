@@ -475,11 +475,9 @@ _action* action_name_to_ptr(pcstr _name)
 bool is_binded(EGameActions _action_id, int _dik)
 {
     _binding* pbinding = &g_key_bindings[_action_id];
-    if (pbinding->m_keyboard[0] && pbinding->m_keyboard[0]->dik == _dik)
-        return true;
-
-    if (pbinding->m_keyboard[1] && pbinding->m_keyboard[1]->dik == _dik)
-        return true;
+    for (u8 i = 0; i < bindtypes_count; ++i)
+        if (pbinding->m_keyboard[i] && pbinding->m_keyboard[i]->dik == _dik)
+            return true;
 
     return false;
 }
@@ -490,11 +488,9 @@ int get_action_dik(EGameActions _action_id, int idx)
 
     if (idx == -1)
     {
-        if (pbinding->m_keyboard[0])
-            return pbinding->m_keyboard[0]->dik;
-
-        if (pbinding->m_keyboard[1])
-            return pbinding->m_keyboard[1]->dik;
+        for (u8 i = 0; i < bindtypes_count; ++i)
+            if (pbinding->m_keyboard[i])
+                return pbinding->m_keyboard[i]->dik;
     }
     else
     {
@@ -532,8 +528,10 @@ void GetActionAllBinding(LPCSTR _action, char* dst_buff, int dst_buff_sz)
 
     string128 prim;
     string128 sec;
+    string128 joy;
     prim[0] = 0;
     sec[0] = 0;
+    joy[0] = 0;
 
     if (pbinding->m_keyboard[0])
     {
@@ -543,13 +541,19 @@ void GetActionAllBinding(LPCSTR _action, char* dst_buff, int dst_buff_sz)
     {
         xr_strcpy(sec, pbinding->m_keyboard[1]->key_local_name.c_str());
     }
-    if (NULL == pbinding->m_keyboard[0] && NULL == pbinding->m_keyboard[1])
+    if (pbinding->m_keyboard[2])
+    {
+        xr_strcpy(joy, pbinding->m_keyboard[2]->key_local_name.c_str());
+    }
+    if (NULL == pbinding->m_keyboard[0] && NULL == pbinding->m_keyboard[1] && NULL == pbinding->m_keyboard[2])
     {
         xr_sprintf(dst_buff, dst_buff_sz, "%s", gStringTable->translate("st_key_notbinded").c_str());
     }
     else
         xr_sprintf(
-            dst_buff, dst_buff_sz, "%s%s%s", prim[0] ? prim : "", (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "");
+            dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "", 
+            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "", 
+            ((joy[0] && prim[0]) || (joy[0] && sec[0])) ? " , " : "", joy[0] ? joy : "");
 }
 
 std::pair<int, int> GetKeysBindedTo(EGameActions action_id)

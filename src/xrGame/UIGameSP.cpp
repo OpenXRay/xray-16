@@ -76,13 +76,12 @@ void CUIGameSP::OnFrame()
     if (m_game_objective)
     {
         bool b_remove = false;
-        int dik = get_action_dik(kSCORES, 0);
-        if (dik && !pInput->iGetAsyncKeyState(dik))
-            b_remove = true;
-
-        dik = get_action_dik(kSCORES, 1);
-        if (!b_remove && dik && !pInput->iGetAsyncKeyState(dik))
-            b_remove = true;
+        for (u8 i = 0; i < bindtypes_count && !b_remove; ++i)
+        {
+            const int dik = get_action_dik(kSCORES, i);
+            if (dik && !pInput->iGetAsyncKeyState(dik))
+                b_remove = true;
+        }
 
         if (b_remove)
         {
