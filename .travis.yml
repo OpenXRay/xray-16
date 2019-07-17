@@ -91,7 +91,7 @@ deploy:
   provider: releases
   api_key:
     secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
-  file: *.deb
+  file: ./*.deb
   skip_cleanup: true
   draft: true
 
