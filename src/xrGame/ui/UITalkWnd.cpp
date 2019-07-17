@@ -344,7 +344,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (is_binded(kUSE, dik) || is_binded(kQUIT, dik))
+        if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik))
         {
             if (!b_disable_break)
             {
@@ -352,7 +352,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 return true;
             }
         }
-        else if (is_binded(kSPRINT_TOGGLE, dik))
+        else if (IsBinded(kSPRINT_TOGGLE, dik))
         {
             if (UITalkDialogWnd->mechanic_mode)
                 SwitchToUpgrade();

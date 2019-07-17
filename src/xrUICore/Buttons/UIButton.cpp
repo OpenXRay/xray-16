@@ -214,8 +214,8 @@ bool CUIButton::IsAccelerator(int iAccel) const
     bool res = GetAccelerator(0) == iAccel || GetAccelerator(1) == iAccel;
     if (!res)
     {
-        res = ((m_uAccelerator[2] != -1) ? is_binded((EGameActions)GetAccelerator(2), iAccel) : false) ||
-            ((m_uAccelerator[3] != -1) ? is_binded((EGameActions)GetAccelerator(3), iAccel) : false);
+        res = ((m_uAccelerator[2] != -1) ? IsBinded((EGameActions)GetAccelerator(2), iAccel) : false) ||
+            ((m_uAccelerator[3] != -1) ? IsBinded((EGameActions)GetAccelerator(3), iAccel) : false);
     }
     return res;
 }

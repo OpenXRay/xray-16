@@ -312,7 +312,7 @@ bool CUIActorMenu::OnMouseAction(float x, float y, EUIMessages mouse_action)
 bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     InfoCurItem(NULL);
-    if (is_binded(kDROP, dik))
+    if (IsBinded(kDROP, dik))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action && CurrentIItem() && !CurrentIItem()->IsQuestItem() &&
             CurrentIItem()->parent_id() == m_pActorInvOwner->object_id())
@@ -323,7 +323,7 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
 
-    if (is_binded(kSPRINT_TOGGLE, dik))
+    if (IsBinded(kSPRINT_TOGGLE, dik))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {
@@ -332,7 +332,7 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
 
-    if (is_binded(kUSE, dik) || is_binded(kINVENTORY, dik))
+    if (IsBinded(kUSE, dik) || IsBinded(kINVENTORY, dik))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {
@@ -342,7 +342,7 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
 
-    if (is_binded(kQUIT, dik))
+    if (IsBinded(kQUIT, dik))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {

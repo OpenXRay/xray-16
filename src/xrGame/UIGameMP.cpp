@@ -27,7 +27,7 @@ void UIGameMP::ShowDemoPlayControl()
 
 bool UIGameMP::IR_UIOnKeyboardPress(int dik)
 {
-    if (is_binded(kCROUCH, dik) && Level().IsDemoPlay())
+    if (IsBinded(kCROUCH, dik) && Level().IsDemoPlay())
     {
         ShowDemoPlayControl();
         return true;
