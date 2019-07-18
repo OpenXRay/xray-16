@@ -87,6 +87,10 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
         m_keyboard = DikToPtr(mouse_btn, true);
         if (!m_keyboard)
             return true;
+
+        if (m_isGamepadBinds && (mouse_btn <= XR_CONTROLLER_BUTTON_A || mouse_btn >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
+            return true;
+
         SetValue();
         OnFocusLost();
 
@@ -117,6 +121,9 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
         m_keyboard = DikToPtr(dik, true);
         if (!m_keyboard)
+            return true;
+
+        if (m_isGamepadBinds && (dik <= XR_CONTROLLER_BUTTON_A || dik >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
             return true;
 
         SetValue();
@@ -201,10 +208,6 @@ bool CUIEditKeyBind::IsChangedOptValue() const
 
 void CUIEditKeyBind::BindAction2Key()
 {
-    xr_string comm_unbind = (!m_isGamepadBinds) ? ((m_primary) ? "unbind " : "unbind_sec ") : "unbind_gpad ";
-    comm_unbind += m_action->action_name;
-    Console->Execute(comm_unbind.c_str());
-
     if (m_keyboard)
     {
         xr_string comm_bind = (!m_isGamepadBinds) ? ((m_primary) ? "bind " : "bind_sec ") : "bind_gpad ";

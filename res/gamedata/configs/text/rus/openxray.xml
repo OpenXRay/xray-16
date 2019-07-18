@@ -69,6 +69,9 @@
 	<string id="ui_mm_localization">
 		<text>Язык</text>
 	</string>
+	<string id="ui_mm_gamepad_setup">
+		<text>Настройка геймпада</text>
+	</string>
 	<string id="eng">
 		<text>Английский (English)</text>
 	</string>

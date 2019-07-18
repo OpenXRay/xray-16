@@ -59,6 +59,12 @@ function options_dialog:InitControls()
 	self.dlg_video_adv:Show		(false)
 	self.dialog:AttachChild		(self.dlg_video_adv)
 	xml:InitWindow				("tab_size", 0, self.dlg_video_adv)
+	
+	self.dlg_controls_gpad		= ui_mm_opt_controls_gpad.opt_controls_gpad()
+	self.dlg_controls_gpad:InitControls(0,0, xml, self)
+	self.dlg_controls_gpad:Show	(false)
+	self.dialog:AttachChild		(self.dlg_controls_gpad)
+	xml:InitWindow				("tab_size", 0, self.dlg_controls_gpad)
 
 	local btn
 	btn = xml:Init3tButton		("main_dialog:btn_accept", self.dialog)
@@ -104,9 +110,15 @@ function options_dialog:SetCurrentValues()
 
 	opt:SetCurrentValues("mm_opt_controls")
 	opt:SaveBackupValues("mm_opt_controls")
+	
+	--opt:SetCurrentValues("mm_opt_controls_adv")
+	--opt:SaveBackupValues("mm_opt_controls_adv")
 
 	opt:SetCurrentValues("key_binding")
 	opt:SaveBackupValues("key_binding")
+	
+	opt:SetCurrentValues("key_binding_gpad")
+	opt:SaveBackupValues("key_binding_gpad")
 
 	self:UpdateDependControls()
 end
@@ -176,6 +188,9 @@ function options_dialog:InitCallBacks()
 	self:AddCallback("check_simple_pickup",	ui_events.BUTTON_CLICKED,	self.OnPickupOptionChange,	self)
 	self:AddCallback("track_r3_dyn_wet_surf_near", ui_events.BUTTON_CLICKED, self.OnDynWetSurfNearUpdate, self)
 	self:AddCallback("track_r3_dyn_wet_surf_far", ui_events.BUTTON_CLICKED,  self.OnDynWetSurfFarUpdate, self)
+	self:AddCallback("btn_gpad_controls", 	ui_events.BUTTON_CLICKED,	self.OnBtnGpadControls,		self)
+	self:AddCallback("btn_keyboard_controls", ui_events.BUTTON_CLICKED,	self.OnBtnKbdControls,		self)
+	self:AddCallback("btn_gpad_default",	ui_events.BUTTON_CLICKED,	self.OnBtnGpadDefault,		self)
 
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_YES_CLICKED, self.OnApplyChanges, self)
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_NO_CLICKED, self.OnDiscardChanges,self)
@@ -228,6 +243,8 @@ function options_dialog:OnBtnAccept()
 	opt:SaveValues("mm_opt_gameplay")
 	opt:SaveValues("mm_opt_sound")
 	opt:SaveValues("mm_opt_controls")
+	--opt:SaveValues("mm_opt_controls_adv")
+	opt:SaveValues("key_binding_gpad")
 
 	if opt:NeedVidRestart() then
 		_G.b_discard_settings_shown = true
@@ -262,6 +279,7 @@ function options_dialog:OnTabChange()
 	self.dlg_gameplay:Show	(false)
 	self.dlg_controls:Show	(false)
 	self.dlg_video_adv:Show	(false)
+	self.dlg_controls_gpad:Show(false)
 
 	local ids = self.tab:GetActiveId()
 	if ids == "video" then
@@ -306,6 +324,25 @@ end
 function options_dialog:OnSimplyGraphic()
 	self.dlg_video:Show		(true)
 	self.dlg_video_adv:Show	(false)
+end
+
+function options_dialog:OnBtnGpadControls()
+	self.dlg_controls:Show		(false)
+	self.dlg_controls_gpad:Show	(true)
+end
+
+function options_dialog:OnBtnKbdControls()
+	self.dlg_controls:Show		(true)
+	self.dlg_controls_gpad:Show	(false)
+end
+
+function options_dialog:OnBtnGpadDefault()
+	local console			= get_console()
+	console:execute			("default_controls")
+
+	local opt				= COptionsManager()
+	opt:SetCurrentValues	("mm_opt_controls")
+	opt:SetCurrentValues	("key_binding_gpad")
 end
 
 function options_dialog:OnKeyboard(dik, keyboard_action)
