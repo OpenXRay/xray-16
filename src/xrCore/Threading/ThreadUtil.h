@@ -1,5 +1,7 @@
 #pragma once
+#if defined(WINDOWS)
 #include <process.h>
+#endif
 
 namespace Threading
 {
