@@ -1,0 +1,32 @@
+class "opt_controls" (CUIWindow)
+
+function opt_controls:__init() super()
+end
+
+function opt_controls:__finalize()
+
+end
+
+function opt_controls:InitControls(x, y, xml, handler)
+
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+
+	self:SetAutoDelete(true)
+
+--	self.bk = xml:InitFrame("frame", self)
+
+	xml:InitStatic		("tab_controls:cap_mousesens",			self)
+	xml:InitFrameLine	("tab_controls:cap_keyboardsetup",		self)
+	xml:InitFrameLine	("tab_controls:cap_keyboardsetup",		self)
+	xml:InitTrackBar	("tab_controls:track_mousesens",		self)
+	xml:InitStatic		("tab_controls:cap_check_mouseinvert",	self)
+	xml:InitCheck		("tab_controls:check_mouseinvert",		self)
+	xml:InitKeyBinding	("tab_controls:key_binding",			self)
+
+	local btn
+	btn = xml:Init3tButton("tab_controls:btn_default", 			self)
+	handler:Register(btn, "btn_keyb_default")
+
+
+end
