@@ -145,6 +145,6 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 
 void WaitThread(ThreadHandle& threadHandle) { pthread_join(threadHandle, NULL); }
 
-void CloseThreadHandle(ThreadHandle& threadHandle) { pthread_detach(hThreadHandle); }
+void CloseThreadHandle(ThreadHandle& threadHandle) { pthread_detach(threadHandle); }
 #endif
 } // namespace Threading
