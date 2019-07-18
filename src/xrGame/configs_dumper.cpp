@@ -230,7 +230,7 @@ void configs_dumper::dump_config(complete_callback_t complete_cb)
     }
     m_make_start_event = CreateEvent(NULL, FALSE, TRUE, NULL);
     m_make_done_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-    thread_spawn(&configs_dumper::dumper_thread, "configs_dumper", 0, this);
+    Threading::SpawnThread(&configs_dumper::dumper_thread, "configs_dumper", 0, this);
     Engine.Sheduler.Register(this, TRUE);
 #endif
 }

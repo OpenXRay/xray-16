@@ -220,7 +220,7 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
 
     id.set(param);
     packet.construct(data, data_size);
-    // DWORD currentThreadId = GetCurrentThreadId();
+    // DWORD currentThreadId = Threading::GetCurrThreadId();
     // Msg("-S- Entering to csMessages from _Receive [%d]", currentThreadId);
     csMessage.Enter();
     // LogStackTrace(

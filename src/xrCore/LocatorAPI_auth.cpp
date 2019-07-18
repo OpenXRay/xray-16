@@ -15,11 +15,7 @@ void CLocatorAPI::auth_generate(xr_vector<shared_str>& ignore, xr_vector<shared_
     _o->ignore = ignore;
     _o->important = important;
 
-#if 1
     FS.auth_runtime(_o);
-#else
-    thread_spawn(auth_entry, "checksum", 0, _o);
-#endif
 }
 
 u64 CLocatorAPI::auth_get()

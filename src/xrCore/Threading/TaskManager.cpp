@@ -17,8 +17,8 @@ void TaskManagerBase::Initialize()
         return;
 
     shouldStop = false;
-    thread_spawn(taskManagerThread, "X-Ray Task Scheduler thread", 0, this);
-    thread_spawn(taskWatcherThread, "X-Ray Task Watcher thread", 0, this);
+    Threading::SpawnThread(taskManagerThread, "X-Ray Task Scheduler thread", 0, this);
+    Threading::SpawnThread(taskWatcherThread, "X-Ray Task Watcher thread", 0, this);
 }
 
 void TaskManagerBase::Destroy()

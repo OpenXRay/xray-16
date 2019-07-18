@@ -19,7 +19,7 @@ void LevelCompilerLoggerWindow::Initialize(const char* name)
     InitCommonControls();
     Sleep(150);
     xr_strcpy(this->name, name);
-    thread_spawn(LogThreadProc, "log-update", 1024 * 1024, this);
+    Threading::SpawnThread(LogThreadProc, "log-update", 1024 * 1024, this);
     while (!logWindow)
         Sleep(150);
     initialized = true;

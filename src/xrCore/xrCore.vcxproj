@@ -343,6 +343,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="Threading\Task.cpp" />
     <ClCompile Include="Threading\TaskManager.cpp" />
+    <ClCompile Include="Threading\ThreadUtil.cpp" />
     <ClCompile Include="XML\tinystr.cpp" />
     <ClCompile Include="XML\tinyxml.cpp" />
     <ClCompile Include="XML\tinyxmlerror.cpp" />
@@ -452,6 +453,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="Threading\Task.hpp" />
     <ClInclude Include="Threading\TaskManager.hpp" />
+    <ClInclude Include="Threading\ThreadUtil.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="XML\tinystr.h" />
     <ClInclude Include="XML\tinyxml.h" />
