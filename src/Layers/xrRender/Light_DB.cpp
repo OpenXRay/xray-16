@@ -6,14 +6,14 @@
 #include "utils/xrLC_Light/R_light.h"
 #include "Light_DB.h"
 
-CLight_DB::CLight_DB() {}
+CLight_DB::CLight_DB() : sun(nullptr) {}
 CLight_DB::~CLight_DB() {}
 void CLight_DB::Load(IReader* fs)
 {
     IReader* F = fs->open_chunk(fsL_LIGHT_DYNAMIC);
     {
         // Light itself
-        sun = NULL;
+        sun = nullptr;
 
 		const size_t size = F->length();
         const size_t element = sizeof(Flight) + 4;
@@ -184,13 +184,29 @@ void CLight_DB::Update()
 
         VERIFY2(E.sun_dir.y < 0, "Invalid sun direction settings in evironment-config");
         Fvector dir, pos;
-        dir.set(E.sun_dir).normalize();
+
+        if (!GEnv.Render->is_sun_static() && !ShadowOfChernobylMode)
+        {
+            // true sunlight direction
+            dir.set(E.sun_dir).normalize();
+        }
+        else
+        {
+            // for some reason E.sun_dir can point-up
+            dir.set(0.0f, -0.75f, 0.0f).add(E.sun_dir);
+            u32 counter = 0;
+            while (dir.magnitude() < 0.001f && counter < 10)
+            {
+                dir.add(E.sun_dir);
+                ++counter;
+            }
+            dir.normalize();
+        }
         pos.mad(Device.vCameraPosition, dir, -500.f);
 
         sun->set_rotation(dir, _sun->right);
         sun->set_position(pos);
-        sun->set_color(
-            E.sun_color.x * ps_r2_sun_lumscale, E.sun_color.y * ps_r2_sun_lumscale, E.sun_color.z * ps_r2_sun_lumscale);
+        sun->set_color(E.sun_color.x * ps_r2_sun_lumscale, E.sun_color.y * ps_r2_sun_lumscale, E.sun_color.z * ps_r2_sun_lumscale);
         sun->set_range(600.f);
     }
     // Clear selection
