@@ -181,67 +181,72 @@ IC size_t xr_strlen(const char* S) { return strlen(S); }
 #endif
 
 #if xr__cplusplus >= 201703L
+#define STRINGIZE_DETAIL(x) #x ""
+#define STRINGIZE(x) STRINGIZE_DETAIL(x)
+
+#define HERE __FILE__ ":" STRINGIZE(__LINE__)
+#define xr_from_chars(first,last,value) _xr_from_chars(first,last,value,HERE)
 template<class T>
-inline std::from_chars_result xr_from_chars(const char* first, const char* last, T& value)
+inline std::from_chars_result _xr_from_chars(const char* first, const char* last, T& value, const char* here)
 {
     //(*first=='+'?first+1:first)
     const auto retval = std::from_chars(first, last, value);
     const T tmp = (T)atoi(first);
     if (tmp != value)
     {
-        Msg("[charconv] %s converted to %d, proper value is %d", first, retval, tmp);
+        Msg("[charconv][%s] %s converted to %d, proper value is %d", here, first, retval, tmp);
     }
     return retval;
 }
 
 template<>
-inline std::from_chars_result xr_from_chars(const char* first, const char* last, u64& value)
+inline std::from_chars_result _xr_from_chars(const char* first, const char* last, u64& value, const char* here)
 {
     //(first=='+'?first+1:first)
     const auto retval = std::from_chars(first, last, value);
     const auto tmp = _strtoui64(first, nullptr, 10);
     if (tmp != value)
     {
-        Msg("[charconv] %s converted to %llu, proper value is %llu", first, retval, tmp);
+        Msg("[charconv][%s] %s converted to %llu, proper value is %llu", here, first, retval, tmp);
     }
     return retval;
 }
 
 template<>
-inline std::from_chars_result xr_from_chars(const char* first, const char* last, s64& value)
+inline std::from_chars_result _xr_from_chars(const char* first, const char* last, s64& value, const char* here)
 {
     //(first=='+'?first+1:first)
     const auto retval = std::from_chars(first, last, value);
     const auto tmp = _atoi64(first);
     if (tmp != value)
     {
-        Msg("[charconv] %s converted to %lld, proper value is %lld", first, retval, tmp);
+        Msg("[charconv][%s] %s converted to %lld, proper value is %lld", here, first, retval, tmp);
     }
     return retval;
 }
 
 template<>
-inline std::from_chars_result xr_from_chars(const char* first, const char* last, float& value)
+inline std::from_chars_result _xr_from_chars(const char* first, const char* last, float& value, const char* here)
 {
     //(first=='+'?first+1:first)
     const auto retval = std::from_chars(first, last, value);
     const auto tmp = (float)atof(first);
     if (tmp != value)
     {
-        Msg("[charconv] %s converted to %f, proper value is %f", first, retval, tmp);
+        Msg("[charconv][%s] %s converted to %f, proper value is %f", here, first, retval, tmp);
     }
     return retval;
 }
 
 template<>
-inline std::from_chars_result xr_from_chars(const char* first, const char* last, double& value)
+inline std::from_chars_result _xr_from_chars(const char* first, const char* last, double& value, const char* here)
 {
     //(first=='+'?first+1:first)
     const auto retval = std::from_chars(first, last, value);
     const auto tmp = atof(first);
     if (tmp != value)
     {
-        Msg("[charconv] %s converted to %f, proper value is %f", first, retval, tmp);
+        Msg("[charconv][%s] %s converted to %f, proper value is %f", here, first, retval, tmp);
     }
     return retval;
 }
